@@ -40,24 +40,24 @@
 template <int dim>
 class F : public Function<dim>
 {
-  public:
-    virtual double value (const Point<dim> &p,
-                          const unsigned int = 0) const
-      {
-        double s = 1;
-        for (unsigned int i=0; i<dim; ++i)
-          s *= p[i];
-        return s;
-      }
+public:
+  virtual double value (const Point<dim> &p,
+                        const unsigned int = 0) const
+  {
+    double s = 1;
+    for (unsigned int i=0; i<dim; ++i)
+      s *= p[i];
+    return s;
+  }
 };
 
 
 template<int dim>
 void test()
 {
-                                   // create 2 triangulations with the
-                                   // same coarse grid, and refine
-                                   // them differently
+  // create 2 triangulations with the
+  // same coarse grid, and refine
+  // them differently
   Triangulation<dim> tria;
 
   GridGenerator::hyper_cube (tria);
@@ -81,10 +81,10 @@ void test()
        cell != dh.end(); ++cell)
     for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       {
-                                         // check that the error is
-                                         // somewhat small. it won't
-                                         // be zero since we project
-                                         // and do not interpolate
+        // check that the error is
+        // somewhat small. it won't
+        // be zero since we project
+        // and do not interpolate
         Assert (std::fabs (v(cell->vertex_dof_index(i,0)) -
                            F<dim>().value (cell->vertex(i)))
                 < 1e-4,

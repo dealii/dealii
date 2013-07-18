@@ -36,24 +36,24 @@ std::vector<DataOutBase::Patch<2,2> > patches;
 
 class DataOutX : public DataOutInterface<2,2>
 {
-    virtual
-    const std::vector< ::DataOutBase::Patch<2,2> > &
-    get_patches () const
-      {
-	return patches;
-      }
+  virtual
+  const std::vector< ::DataOutBase::Patch<2,2> > &
+  get_patches () const
+  {
+    return patches;
+  }
 
-    virtual
-    std::vector<std::string>
-    get_dataset_names () const
-      {
-	return std::vector<std::string>();
-      }
+  virtual
+  std::vector<std::string>
+  get_dataset_names () const
+  {
+    return std::vector<std::string>();
+  }
 };
 
 
 template <int dim, int spacedim>
-void check(std::ostream& out)
+void check(std::ostream &out)
 {
   std::vector<std::pair<double,std::string> > names(5);
   names[0] = std::make_pair(0,"x1");

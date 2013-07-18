@@ -28,7 +28,7 @@ template <typename T>
 void check ()
 {
   using namespace numbers;
-  
+
   deallog << std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::quiet_NaN() << "   -->   ";
   deallog << is_finite(T(std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::quiet_NaN(), 0)) << ' ';
   deallog << is_finite(T(0,std::numeric_limits<typename numbers::NumberTraits<T>::real_type>::quiet_NaN())) << std::endl;
@@ -73,7 +73,7 @@ int main ()
 
   check<std::complex<double> > ();
   check<std::complex<long double> > ();
-  
+
   return 0;
 }
 

@@ -33,39 +33,39 @@ void test ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-	for (unsigned int l=0; l<dim; ++l)
-	  {
-					     // write some entries
-					     // into the tensors. may
-					     // be overwritten by
-					     // subsequent writes, but
-					     // who cares?
-	    A[i][j][k][l] = (i+1)*(j+1)*(l+1)*(k+1);
-	    B[i][j][k][l] = (i+2)*(j+3)*(l+4)*(k+5);
-	  }
-  
+        for (unsigned int l=0; l<dim; ++l)
+          {
+            // write some entries
+            // into the tensors. may
+            // be overwritten by
+            // subsequent writes, but
+            // who cares?
+            A[i][j][k][l] = (i+1)*(j+1)*(l+1)*(k+1);
+            B[i][j][k][l] = (i+2)*(j+3)*(l+4)*(k+5);
+          }
+
   T = A*B;
 
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-	for (unsigned int l=0; l<dim; ++l)
-	  {
-	    deallog << (int)T[i][j][k][l] << std::endl;
+        for (unsigned int l=0; l<dim; ++l)
+          {
+            deallog << (int)T[i][j][k][l] << std::endl;
 
-					     // calculate result by
-					     // hand
-	    double tmp = 0;
-	    for (unsigned int a=0; a<dim; ++a)
-	      for (unsigned int b=0; b<dim; ++b)
-		tmp += A[i][j][a][b] * B[a][b][k][l];
+            // calculate result by
+            // hand
+            double tmp = 0;
+            for (unsigned int a=0; a<dim; ++a)
+              for (unsigned int b=0; b<dim; ++b)
+                tmp += A[i][j][a][b] * B[a][b][k][l];
 
-	    Assert (std::fabs(T[i][j][k][l] - tmp) < 1e-14*tmp,
-		    ExcInternalError());
-	  }
+            Assert (std::fabs(T[i][j][k][l] - tmp) < 1e-14*tmp,
+                    ExcInternalError());
+          }
 }
 
-  
+
 
 
 int main ()
@@ -79,6 +79,6 @@ int main ()
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

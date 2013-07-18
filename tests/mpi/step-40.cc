@@ -62,35 +62,35 @@ namespace Step40
   template <int dim>
   class LaplaceProblem
   {
-    public:
-      LaplaceProblem ();
-      ~LaplaceProblem ();
+  public:
+    LaplaceProblem ();
+    ~LaplaceProblem ();
 
-      void run ();
+    void run ();
 
-    private:
-      void setup_system ();
-      void assemble_system ();
-      void solve ();
-      void refine_grid ();
+  private:
+    void setup_system ();
+    void assemble_system ();
+    void solve ();
+    void refine_grid ();
 
-      MPI_Comm mpi_communicator;
+    MPI_Comm mpi_communicator;
 
-      parallel::distributed::Triangulation<dim>   triangulation;
+    parallel::distributed::Triangulation<dim>   triangulation;
 
-      DoFHandler<dim>      dof_handler;
-      FE_Q<dim>            fe;
+    DoFHandler<dim>      dof_handler;
+    FE_Q<dim>            fe;
 
-      IndexSet             locally_owned_dofs;
-      IndexSet             locally_relevant_dofs;
+    IndexSet             locally_owned_dofs;
+    IndexSet             locally_relevant_dofs;
 
-      ConstraintMatrix     constraints;
+    ConstraintMatrix     constraints;
 
-      PETScWrappers::MPI::SparseMatrix system_matrix;
-      PETScWrappers::MPI::Vector locally_relevant_solution;
-      PETScWrappers::MPI::Vector system_rhs;
+    PETScWrappers::MPI::SparseMatrix system_matrix;
+    PETScWrappers::MPI::Vector locally_relevant_solution;
+    PETScWrappers::MPI::Vector system_rhs;
 
-      ConditionalOStream                pcout;
+    ConditionalOStream                pcout;
   };
 
 
@@ -98,22 +98,22 @@ namespace Step40
 
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem ()
-                  :
-                  mpi_communicator (MPI_COMM_WORLD),
-                  triangulation (mpi_communicator,
-                                 typename Triangulation<dim>::MeshSmoothing
-                                 (Triangulation<dim>::smoothing_on_refinement |
-                                  Triangulation<dim>::smoothing_on_coarsening)),
-                  dof_handler (triangulation),
-                  fe (2),
-                  pcout (Utilities::MPI::this_mpi_process(mpi_communicator)
-                          == 0
-			 ?
-			 deallog.get_file_stream()
-			 :
-			 std::cout,
-                         (Utilities::MPI::this_mpi_process(mpi_communicator)
-                          == 0))
+    :
+    mpi_communicator (MPI_COMM_WORLD),
+    triangulation (mpi_communicator,
+                   typename Triangulation<dim>::MeshSmoothing
+                   (Triangulation<dim>::smoothing_on_refinement |
+                    Triangulation<dim>::smoothing_on_coarsening)),
+    dof_handler (triangulation),
+    fe (2),
+    pcout (Utilities::MPI::this_mpi_process(mpi_communicator)
+           == 0
+           ?
+           deallog.get_file_stream()
+           :
+           std::cout,
+           (Utilities::MPI::this_mpi_process(mpi_communicator)
+            == 0))
   {}
 
 
@@ -137,7 +137,7 @@ namespace Step40
 
     locally_relevant_solution.reinit (locally_owned_dofs,
                                       locally_relevant_dofs,
-				      mpi_communicator);
+                                      mpi_communicator);
     system_rhs.reinit (locally_owned_dofs, mpi_communicator);
     system_rhs = 0;
 
@@ -189,8 +189,8 @@ namespace Step40
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -202,7 +202,7 @@ namespace Step40
           for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
             {
               const double
-                rhs_value
+              rhs_value
                 = (fe_values.quadrature_point(q_point)[1]
                    >
                    0.5+0.25*std::sin(4.0 * numbers::PI *
@@ -241,17 +241,17 @@ namespace Step40
   void LaplaceProblem<dim>::solve ()
   {
     PETScWrappers::MPI::Vector
-      completely_distributed_solution (mpi_communicator,
-                                       dof_handler.n_dofs(),
-                                       dof_handler.n_locally_owned_dofs());
+    completely_distributed_solution (mpi_communicator,
+                                     dof_handler.n_dofs(),
+                                     dof_handler.n_locally_owned_dofs());
 
     SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
 
     PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
 
     PETScWrappers::PreconditionBoomerAMG
-      preconditioner(system_matrix,
-                     PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
+    preconditioner(system_matrix,
+                   PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
 
     solver.solve (system_matrix, completely_distributed_solution, system_rhs,
                   preconditioner);
@@ -297,20 +297,20 @@ namespace Step40
         pcout << "   Number of active cells:       "
               << triangulation.n_global_active_cells()
               << std::endl
-	      << "      ";
-	for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
-	  pcout << triangulation.n_locally_owned_active_cells_per_processor()[i]
-		<< '+';
-	pcout << std::endl;
+              << "      ";
+        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
+          pcout << triangulation.n_locally_owned_active_cells_per_processor()[i]
+                << '+';
+        pcout << std::endl;
 
-	pcout << "   Number of degrees of freedom: "
+        pcout << "   Number of degrees of freedom: "
               << dof_handler.n_dofs()
               << std::endl
-	      << "      ";
-	for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
-	  pcout << dof_handler.n_locally_owned_dofs_per_processor()[i]
-		<< '+';
-	pcout << std::endl;
+              << "      ";
+        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
+          pcout << dof_handler.n_locally_owned_dofs_per_processor()[i]
+                << '+';
+        pcout << std::endl;
 
         assemble_system ();
         solve ();

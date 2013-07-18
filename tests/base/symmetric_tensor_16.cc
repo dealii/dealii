@@ -30,15 +30,15 @@ void test ()
   deallog << "dim=" << dim << std::endl;
 
   const SymmetricTensor<4,dim>
-    T = (identity_tensor<dim>()
-         - 1./dim * outer_product(unit_symmetric_tensor<dim>(),
-                                  unit_symmetric_tensor<dim>()));
+  T = (identity_tensor<dim>()
+       - 1./dim * outer_product(unit_symmetric_tensor<dim>(),
+                                unit_symmetric_tensor<dim>()));
 
   Assert ((T-deviator_tensor<dim>()).norm()
           <= 1e-15*T.norm(), ExcInternalError());
 }
 
-  
+
 
 
 int main ()
@@ -52,6 +52,6 @@ int main ()
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

@@ -35,65 +35,65 @@ using namespace Polynomials;
 
 
 template<int dim, class POLY>
-void check_poly(const Point<dim>& x,
-		const POLY& p)
+void check_poly(const Point<dim> &x,
+                const POLY &p)
 {
   const unsigned int n = p.n();
   std::vector<double> values (n);
   std::vector<Tensor<1,dim> > gradients(n);
   std::vector<Tensor<2,dim> > second(n);
-  
+
   p.compute (x, values, gradients, second);
-  
-  for (unsigned int k=0;k<n;++k)
+
+  for (unsigned int k=0; k<n; ++k)
     {
-                                       // first make sure the
-                                       // individual functions work in
-                                       // a consistent way
-      
-				       // Check if compute_value is ok
+      // first make sure the
+      // individual functions work in
+      // a consistent way
+
+      // Check if compute_value is ok
       double val = p.compute_value(k,x);
       if (std::fabs(val - values[k]) > 5.0E-15)
-	deallog << 'P' << k << ": values differ " << val << " != "
-		<< values[k] << std::endl;
+        deallog << 'P' << k << ": values differ " << val << " != "
+                << values[k] << std::endl;
 
-                                       // Check if compute_grad is ok
+      // Check if compute_grad is ok
       Tensor<1,dim> grad = p.compute_grad(k,x);
       if ((grad-gradients[k]) * (grad-gradients[k]) > 5e-15*5e-15)
-	deallog << 'P' << k << ": gradients differ " << grad << " != "
-		<< gradients[k] << std::endl;
-      
-				       // Check if compute_grad_grad is ok
+        deallog << 'P' << k << ": gradients differ " << grad << " != "
+                << gradients[k] << std::endl;
+
+      // Check if compute_grad_grad is ok
       Tensor<2,dim> grad2 = p.compute_grad_grad(k,x);
       Tensor<2,dim> diff = grad2-second[k];
       double s = 0;
       for (unsigned int i=0; i<dim; ++i)
-	for (unsigned int j=0; j<dim; ++j)
-	  s += diff[i][j]*diff[i][j];
+        for (unsigned int j=0; j<dim; ++j)
+          s += diff[i][j]*diff[i][j];
       if (s > 5e-15*5e-15)
-	deallog << 'P' << k << ": second derivatives differ " << grad2 << " != "
-		<< second[k] << std::endl;
+        deallog << 'P' << k << ": second derivatives differ " << grad2 << " != "
+                << second[k] << std::endl;
 
 
-                                       // finally output values,
-                                       // gradients, etc, to make sure
-                                       // that they are not only
-                                       // consistent, but also
-                                       // correct. Multiply them
-                                       // somewhat to make them
-                                       // significant despite our
-                                       // two-post-dot-digits limit
+      // finally output values,
+      // gradients, etc, to make sure
+      // that they are not only
+      // consistent, but also
+      // correct. Multiply them
+      // somewhat to make them
+      // significant despite our
+      // two-post-dot-digits limit
       values[k] *= std::pow(10., dim);
       gradients[k] *= std::pow(10., dim);
-      
+
       deallog << 'P' << k << "\t= " << values[k]
-	      << "\tgradient\t";
-      for (unsigned int d=0;d<dim;++d)
-	deallog << gradients[k][d] << '\t';
+              << "\tgradient\t";
+      for (unsigned int d=0; d<dim; ++d)
+        deallog << gradients[k][d] << '\t';
       deallog << "\t2nd\t";
-      for (unsigned int d1=0;d1<dim;++d1)
-	for (unsigned int d2=0;d2<dim;++d2)
-	  deallog << second[k][d1][d2] << '\t';
+      for (unsigned int d1=0; d1<dim; ++d1)
+        for (unsigned int d2=0; d2<dim; ++d2)
+          deallog << second[k][d1][d2] << '\t';
       deallog << std::endl;
     }
   deallog << std::endl;
@@ -102,8 +102,8 @@ void check_poly(const Point<dim>& x,
 
 template <int dim>
 void
-check_tensor (const std::vector<Polynomial<double> >& v,
-	      const Point<dim>& x)
+check_tensor (const std::vector<Polynomial<double> > &v,
+              const Point<dim> &x)
 {
   deallog.push("Tensor");
   TensorProductPolynomials<dim> p(v);
@@ -114,8 +114,8 @@ check_tensor (const std::vector<Polynomial<double> >& v,
 
 template <int dim>
 void
-check_poly (const std::vector<Polynomial<double> >& v,
-	    const Point<dim>& x)
+check_poly (const std::vector<Polynomial<double> > &v,
+            const Point<dim> &x)
 {
   deallog.push("Polyno");
   PolynomialSpace<dim> p(v);
@@ -126,7 +126,7 @@ check_poly (const std::vector<Polynomial<double> >& v,
 
 
 void
-check_dimensions (const std::vector<Polynomial<double> >& p)
+check_dimensions (const std::vector<Polynomial<double> > &p)
 {
   deallog.push("1d");
   check_tensor(p, Point<1>(.5));
@@ -152,16 +152,16 @@ int main()
 
   deallog.push("Lagrange");
   std::vector<Polynomial<double> > p;
-  for (unsigned int i=0;i<3;++i)
+  for (unsigned int i=0; i<3; ++i)
     p.push_back (LagrangeEquidistant(3, i));
 
   check_dimensions(p);
 
   deallog.pop();
   deallog.push("Legendre");
-  
+
   p.clear ();
-  for (unsigned int i=0;i<3;++i)
+  for (unsigned int i=0; i<3; ++i)
     p.push_back (Legendre(i));
 
   check_dimensions(p);
@@ -170,7 +170,7 @@ int main()
   deallog.push("Hierarchical");
 
   p.clear ();
-  for (unsigned int i=0;i<3;++i)
+  for (unsigned int i=0; i<3; ++i)
     p.push_back (Hierarchical(i));
 
   check_dimensions(p);

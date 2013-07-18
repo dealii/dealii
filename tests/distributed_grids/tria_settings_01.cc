@@ -36,7 +36,7 @@
 #include <fstream>
 
 template<int dim>
-void testit(parallel::distributed::Triangulation<dim> & tr)
+void testit(parallel::distributed::Triangulation<dim> &tr)
 {
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
@@ -48,38 +48,38 @@ void testit(parallel::distributed::Triangulation<dim> & tr)
   tr.execute_coarsening_and_refinement ();
 
   typename  parallel::distributed::Triangulation<dim>::active_cell_iterator it=tr.begin_active();
-  for (;it!=tr.end();++it)
+  for (; it!=tr.end(); ++it)
     {
       deallog << it->center() << ", ";
     }
-    deallog << std::endl;
+  deallog << std::endl;
 }
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   {
-    
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-					       dealii::Triangulation<dim>::none,
-					       parallel::distributed::Triangulation<dim>::default_setting);
-  testit(tr);
-  
+
+    parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
+                                                 dealii::Triangulation<dim>::none,
+                                                 parallel::distributed::Triangulation<dim>::default_setting);
+    testit(tr);
+
   }
-  
+
   {
-    
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-					       dealii::Triangulation<dim>::none,
-					       parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning);
-  testit(tr);
-  
+
+    parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
+                                                 dealii::Triangulation<dim>::none,
+                                                 parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning);
+    testit(tr);
+
   }
 
 
-  
-  
+
+
 
 }
 

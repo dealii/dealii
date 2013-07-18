@@ -52,10 +52,10 @@ void test ()
   GridGenerator::hyper_cube (tria);
   tria.refine_global(1);
 
-				// refine some of the cells.
+  // refine some of the cells.
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
+  cell = tria.begin_active(),
+  endc = tria.end();
   for (unsigned int counter = 0; cell!=endc; ++cell, ++counter)
     if (counter % 5 == 0)
       cell->set_refine_flag();
@@ -80,56 +80,56 @@ void test ()
   {
     std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof,
-					      0,
-					      ConstantFunction<dim>(1.),
-					      boundary_values);
-    std::map<types::global_dof_index,double>::const_iterator boundary_value = 
+                                              0,
+                                              ConstantFunction<dim>(1.),
+                                              boundary_values);
+    std::map<types::global_dof_index,double>::const_iterator boundary_value =
       boundary_values.begin();
     for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
       {
-	if (!correct_constraints.is_constrained(boundary_value->first))
-	  {
-	    correct_constraints.add_line(boundary_value->first);
-	    correct_constraints.set_inhomogeneity (boundary_value->first,
-						   boundary_value->second);
-	  }
+        if (!correct_constraints.is_constrained(boundary_value->first))
+          {
+            correct_constraints.add_line(boundary_value->first);
+            correct_constraints.set_inhomogeneity (boundary_value->first,
+                                                   boundary_value->second);
+          }
       }
   }
   correct_constraints.close();
 
   deallog << "Number of DoFs: " << dof.n_dofs() << std::endl
-	  << "Number of hanging nodes: "
-	  << library_constraints.n_constraints() << std::endl
-	  << "Total number of constraints: "
-	  << correct_constraints.n_constraints() << std::endl;
+          << "Number of hanging nodes: "
+          << library_constraints.n_constraints() << std::endl
+          << "Total number of constraints: "
+          << correct_constraints.n_constraints() << std::endl;
 
   VectorTools::interpolate_boundary_values (dof, 0, ConstantFunction<dim>(1.),
-					    library_constraints);
+                                            library_constraints);
   library_constraints.close();
 
-				// the two constraint matrices should look the
-				// same, so go through them and check
+  // the two constraint matrices should look the
+  // same, so go through them and check
   deallog << "Check that both constraint matrices are identical... ";
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
       Assert (correct_constraints.is_constrained(i) ==
-	      library_constraints.is_constrained(i), ExcInternalError());
-      typedef const std::vector<std::pair<types::global_dof_index, double> >& constraint_format;
+              library_constraints.is_constrained(i), ExcInternalError());
+      typedef const std::vector<std::pair<types::global_dof_index, double> > &constraint_format;
       if (correct_constraints.is_constrained(i))
-	{
-	  constraint_format correct = *correct_constraints.get_constraint_entries(i);
-	  constraint_format library = *library_constraints.get_constraint_entries(i);
-	  Assert (correct.size() == library.size(), ExcInternalError());
-	  for (unsigned int q=0; q<correct.size(); ++q)
-	    {
-	      Assert (correct[q].first == library[q].first, ExcInternalError());
-	      Assert (std::fabs(correct[q].second-library[q].second) < 1e-14,
-		      ExcInternalError());
-	    }
-	  Assert (std::fabs(correct_constraints.get_inhomogeneity(i)-
-			    library_constraints.get_inhomogeneity(i))<1e-14,
-		  ExcInternalError());
-	}
+        {
+          constraint_format correct = *correct_constraints.get_constraint_entries(i);
+          constraint_format library = *library_constraints.get_constraint_entries(i);
+          Assert (correct.size() == library.size(), ExcInternalError());
+          for (unsigned int q=0; q<correct.size(); ++q)
+            {
+              Assert (correct[q].first == library[q].first, ExcInternalError());
+              Assert (std::fabs(correct[q].second-library[q].second) < 1e-14,
+                      ExcInternalError());
+            }
+          Assert (std::fabs(correct_constraints.get_inhomogeneity(i)-
+                            library_constraints.get_inhomogeneity(i))<1e-14,
+                  ExcInternalError());
+        }
     }
   deallog << "OK." << std::endl;
 }

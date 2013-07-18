@@ -32,8 +32,8 @@ void test ()
   PETScWrappers::SparseMatrix m(s,s,s);
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<=i; ++j)
-        m.set (i,j, i+2*j);
-      
+      m.set (i,j, i+2*j);
+
   m.compress ();
 
   PETScWrappers::SparseMatrix m2(s,s,s);
@@ -45,26 +45,26 @@ void test ()
   // we now print the matrix m,
   // print after adding m2, and then subtract m2 again
   // to get the original matrix back.
-  
+
   deallog << "before: " << m(0,1) << std::endl;
-  for (unsigned int i=0;i<s;++i)
+  for (unsigned int i=0; i<s; ++i)
     deallog << m(i,i) << " ";
   deallog << std::endl;
 
   m.add(m2,1.0);
 
   deallog << "after: " << m(0,1) << std::endl;
-  for (unsigned int i=0;i<s;++i)
+  for (unsigned int i=0; i<s; ++i)
     deallog << m(i,i) << " ";
   deallog << std::endl;
 
   m.add(m2,-1.0);
 
   deallog << "back to original: " << m(0,1) << std::endl;
-  for (unsigned int i=0;i<s;++i)
+  for (unsigned int i=0; i<s; ++i)
     deallog << m(i,i) << " ";
   deallog << std::endl;
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -79,5 +79,5 @@ int main (int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   test ();
-  
+
 }

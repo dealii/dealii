@@ -39,7 +39,7 @@ void check ()
   catch (...)
     {
       deallog << "Exception caught, but none should happen here!!!"
-	      << std::endl;
+              << std::endl;
     }
 
   foo.enter_subsection("bar");

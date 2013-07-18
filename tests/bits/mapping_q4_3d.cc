@@ -35,7 +35,7 @@
 #include <fstream>
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mapping_q4_3d/output");
   deallog.attach(logfile);
@@ -57,9 +57,9 @@ int main ()
                                   update_JxW_values);
   fe_face_values.reinit (dof_handler.begin_active(), 0);
 
-                                   // if we got here, we got past the previous
-                                   // abort
+  // if we got here, we got past the previous
+  // abort
   deallog << "OK" << std::endl;
 }
 
-  
+

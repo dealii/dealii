@@ -57,22 +57,22 @@ void output (const Triangulation<dim> &tria)
       deallog << "  " << tria.n_active_cells(i) << std::endl;
       deallog << "  " << tria.n_cells(i) << std::endl;
       if (dim == 1)
-	{
-	  deallog << "  " << tria.n_active_lines(i) << std::endl;
-	  deallog << "  " << tria.n_lines(i) << std::endl;
-	}
+        {
+          deallog << "  " << tria.n_active_lines(i) << std::endl;
+          deallog << "  " << tria.n_lines(i) << std::endl;
+        }
 
       if (dim == 2)
-	{
-	  deallog << "  " << tria.n_active_quads(i) << std::endl;
-	  deallog << "  " << tria.n_quads(i) << std::endl;
-	}
+        {
+          deallog << "  " << tria.n_active_quads(i) << std::endl;
+          deallog << "  " << tria.n_quads(i) << std::endl;
+        }
 
       if (dim == 3)
-	{
-	  deallog << "  " << tria.n_active_hexs(i) << std::endl;
-	  deallog << "  " << tria.n_hexs(i) << std::endl;
-	}
+        {
+          deallog << "  " << tria.n_active_hexs(i) << std::endl;
+          deallog << "  " << tria.n_hexs(i) << std::endl;
+        }
     }
 }
 
@@ -93,28 +93,28 @@ void test (const char *filename)
     }
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
-				       // ignore the exception that we
-				       // get because the mesh has
-				       // distorted cells
+      // ignore the exception that we
+      // get because the mesh has
+      // distorted cells
       deallog << dcv.distorted_cells.size() << " cells are distorted."
-	      << std::endl;
+              << std::endl;
     }
   catch (std::exception &exc)
     {
       deallog << "  caught exception:" << std::endl
-	      << exc.what()
-	      << std::endl;
+              << exc.what()
+              << std::endl;
       return;
     }
 
   output (tria);
 
-				   // now refine a few cells and output again
+  // now refine a few cells and output again
   deallog << "  Refining..." << std::endl;
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active();
+  cell = tria.begin_active();
   for (unsigned int i=0; i<=std::min (tria.n_active_cells() / 3,
-				      10U); ++i, ++cell)
+                                      10U); ++i, ++cell)
     cell->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
 

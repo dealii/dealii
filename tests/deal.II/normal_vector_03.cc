@@ -37,24 +37,24 @@
 
 
 void create_triangulation(const unsigned int case_no,
-			  Triangulation<3> &tria)
+                          Triangulation<3> &tria)
 {
   switch (case_no)
     {
-      case 0:
-	    GridGenerator::hyper_cube(tria, 1., 3.);
-	    break;
-      case 1:
-      {
-	GridGenerator::hyper_cube(tria, 1., 3.);
-	Point<3> &v0=tria.begin_active()->vertex(0);
-	v0 = Point<3> (0,-0.5,-1);
-	Point<3> &v1=tria.begin_active()->vertex(1);
-	v1 = Point<3> (1.25, 0.25, 0.25);
-	break;
-      }
-      default:
-	    Assert(false, ExcNotImplemented());
+    case 0:
+      GridGenerator::hyper_cube(tria, 1., 3.);
+      break;
+    case 1:
+    {
+      GridGenerator::hyper_cube(tria, 1., 3.);
+      Point<3> &v0=tria.begin_active()->vertex(0);
+      v0 = Point<3> (0,-0.5,-1);
+      Point<3> &v1=tria.begin_active()->vertex(1);
+      v1 = Point<3> (1.25, 0.25, 0.25);
+      break;
+    }
+    default:
+      Assert(false, ExcNotImplemented());
     };
 }
 
@@ -80,36 +80,36 @@ int main ()
       const Triangulation<3>::active_cell_iterator cell=tria.begin_active();
       Triangulation<3>::face_iterator face;
       for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell; ++face_no)
-	{
-	  face=cell->face(face_no);
-	  boundary.get_normals_at_vertices(face, normals);
+        {
+          face=cell->face(face_no);
+          boundary.get_normals_at_vertices(face, normals);
 
-	  for (double xi=0; xi<=1; xi+=0.234)
-	    for (double eta=0; eta<=1; eta+=0.234)
-	      {
-		Point<3> p;
-		Tensor<1,3> normal;
+          for (double xi=0; xi<=1; xi+=0.234)
+            for (double eta=0; eta<=1; eta+=0.234)
+              {
+                Point<3> p;
+                Tensor<1,3> normal;
 
-		for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_face; ++v)
-		  {
-		    p += face->vertex(v) * linear_interpolator.shape_value(v,Point<2>(xi,eta));
-		    normal += normals[v] *
-			      linear_interpolator.shape_value(v,Point<2>(xi,eta));
-		  }
-		normal /= normal.norm();
+                for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_face; ++v)
+                  {
+                    p += face->vertex(v) * linear_interpolator.shape_value(v,Point<2>(xi,eta));
+                    normal += normals[v] *
+                              linear_interpolator.shape_value(v,Point<2>(xi,eta));
+                  }
+                normal /= normal.norm();
 
-		deallog << "p=" << p
-			<< ", n=" << boundary.normal_vector (face, p)
-			<< std::endl;
+                deallog << "p=" << p
+                        << ", n=" << boundary.normal_vector (face, p)
+                        << std::endl;
 
-		Assert ((boundary.normal_vector (face, p)
-			 -
-			normal).norm()
-			<
-			1e-10,
-			ExcInternalError());
-	      }
-	}
+                Assert ((boundary.normal_vector (face, p)
+                         -
+                         normal).norm()
+                        <
+                        1e-10,
+                        ExcInternalError());
+              }
+        }
 
       tria.clear();
     }

@@ -36,7 +36,7 @@ check ()
   make_complex_matrix (m);
   make_complex_matrix (n);
   m.equ (3.14159, n);
-  
+
   print_matrix (m);
 }
 

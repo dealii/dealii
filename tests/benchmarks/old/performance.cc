@@ -36,26 +36,26 @@
 
 
 template <int dim>
-void performance (Triangulation<dim>& tr,
-		  const Mapping<dim>& mapping,
-		  const FiniteElement<dim>& fe,
-		  const Quadrature<dim>& quadrature,
-		  UpdateFlags flags)
+void performance (Triangulation<dim> &tr,
+                  const Mapping<dim> &mapping,
+                  const FiniteElement<dim> &fe,
+                  const Quadrature<dim> &quadrature,
+                  UpdateFlags flags)
 {
   deallog << "Create dofs" << std::endl;
   DoFHandler<dim> dof (tr);
   dof.distribute_dofs (fe);
 
   deallog << "Create FEValues" << std::endl;
-  
+
   FEValues<dim> val (mapping, fe, quadrature, flags);
 
   DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   DoFHandler<dim>::active_cell_iterator end = dof.end();
 
   deallog << "Loop" << std::endl;
-  
-  for (;cell != end ; ++cell)
+
+  for (; cell != end ; ++cell)
     val.reinit(cell);
 
   deallog << "End" << std::endl;
@@ -63,53 +63,53 @@ void performance (Triangulation<dim>& tr,
 
 template <int dim>
 void loop (std::vector<FiniteElement<dim> *> elements,
-	    const Mapping<dim>& mapping,
-	    Triangulation<dim>& tr)
+           const Mapping<dim> &mapping,
+           Triangulation<dim> &tr)
 {
   QGauss<dim> gauss (4);
-  
+
   typename std::vector<FiniteElement<dim> *>::iterator elementp = elements.begin ();
   typename std::vector<FiniteElement<dim> *>::iterator end = elements.end ();
 
-  for (;elementp != end; ++elementp)
+  for (; elementp != end; ++elementp)
     {
-      const FiniteElement<dim>& element = **elementp;
+      const FiniteElement<dim> &element = **elementp;
 
       char dofs[20];
       std::ostrstream ost (dofs, 19);
       ost << element.n_dofs_per_cell() << std::ends;
-      
+
       deallog.push(dofs);
-      
+
       deallog.push("points");
       performance (tr, mapping, element, gauss, update_q_points);
       deallog.pop();
-  
+
       deallog.push("values");
       performance (tr, mapping, element, gauss, update_values);
       deallog.pop();
-  
+
       deallog.push("grads-");
       performance (tr, mapping, element, gauss, update_gradients);
       deallog.pop();
-  
+
       deallog.push("2nd---");
       performance (tr, mapping, element, gauss, update_second_derivatives);
       deallog.pop();
-  
+
       deallog.push("matrix");
       performance (tr, mapping, element, gauss, update_q_points
-		   | update_JxW_values
-		   | update_values
-		   | update_gradients);
+                   | update_JxW_values
+                   | update_values
+                   | update_gradients);
       deallog.pop();
 
       deallog.push("all---");
       performance (tr, mapping, element, gauss, update_q_points
-		   | update_JxW_values
-		   | update_values
-		   | update_gradients
-		   | update_second_derivatives);
+                   | update_JxW_values
+                   | update_values
+                   | update_gradients
+                   | update_second_derivatives);
       deallog.pop();
       deallog.pop();
     }
@@ -124,7 +124,7 @@ int main ()
   Triangulation<2> tr;
   GridGenerator::hyper_ball (tr);
   tr.refine_global (8);
-  
+
   MappingCartesian<2> cartesian;
   MappingQ1<2> mapping;
   MappingQ<2> mappingq1(1);

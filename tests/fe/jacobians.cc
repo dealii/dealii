@@ -37,25 +37,25 @@ void test()
 
   MappingQ<dim> mapping(3);
   FE_Nothing<dim> dummy;
-				// choose a point that is not right in the
-				// middle of the cell so that the Jacobian
-				// contains many nonzero entries
+  // choose a point that is not right in the
+  // middle of the cell so that the Jacobian
+  // contains many nonzero entries
   Point<dim> quad_p;
   for (int d=0; d<dim; ++d)
     quad_p(d) = 0.42 + 0.11 * d;
   Quadrature<dim> quad(quad_p);
   FEValues<dim> fe_val (mapping, dummy, quad,
-			update_jacobians | update_inverse_jacobians);
+                        update_jacobians | update_inverse_jacobians);
   deallog << dim << "d Jacobians:" << std::endl;
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active(), endc = tria.end();
+  cell = tria.begin_active(), endc = tria.end();
   for ( ; cell != endc; ++cell)
     {
       fe_val.reinit (cell);
-      
+
       for (unsigned int d=0; d<dim; ++d)
-	for (unsigned int e=0; e<dim; ++e)
-	  deallog << fe_val.jacobian(0)[d][e] << " ";
+        for (unsigned int e=0; e<dim; ++e)
+          deallog << fe_val.jacobian(0)[d][e] << " ";
       deallog << std::endl;
     }
   deallog << std::endl;
@@ -66,10 +66,10 @@ void test()
   for ( ; cell != endc; ++cell)
     {
       fe_val.reinit (cell);
-      
+
       for (unsigned int d=0; d<dim; ++d)
-	for (unsigned int e=0; e<dim; ++e)
-	  deallog << fe_val.inverse_jacobian(0)[d][e] << " ";
+        for (unsigned int e=0; e<dim; ++e)
+          deallog << fe_val.inverse_jacobian(0)[d][e] << " ";
       deallog << std::endl;
     }
   deallog << std::endl;

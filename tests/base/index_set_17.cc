@@ -31,9 +31,9 @@ void test ()
 {
   IndexSet is1 (100);
 
-				   // randomly add 90 elements to each
-				   // set, some of which may be
-				   // repetitions of previous ones
+  // randomly add 90 elements to each
+  // set, some of which may be
+  // repetitions of previous ones
   for (unsigned int i=0; i<9*is1.size()/10; ++i)
     {
       is1.add_index (rand() % is1.size());
@@ -42,7 +42,7 @@ void test ()
   is1.compress();
 
   deallog << "Number of intervals: "
-	  << is1.n_intervals() << std::endl;
+          << is1.n_intervals() << std::endl;
 
   is1.print(deallog);
 

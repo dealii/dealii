@@ -29,21 +29,21 @@ template <typename number>
 void check (const number &x)
 {
   deallog << "typeid(x).name() = " << typeid(x).name()
-	  << std::endl;
+          << std::endl;
 
   deallog << "typeid(NumberTraits<number>::real_type).name() = "
-	  << typeid(typename numbers::NumberTraits<number>::real_type).name()
-	  << std::endl;
+          << typeid(typename numbers::NumberTraits<number>::real_type).name()
+          << std::endl;
 
   deallog << numbers::NumberTraits<number>::conjugate (x)
-	  << std::endl;
+          << std::endl;
 
   deallog << numbers::NumberTraits<number>::abs_square (x)
-	  << std::endl;
+          << std::endl;
 
   deallog << numbers::NumberTraits<number>::abs (x)
-	  << std::endl;
-} 
+          << std::endl;
+}
 
 
 
@@ -62,7 +62,7 @@ int main ()
   check ((double)-1.5);
 
   check ((long double)1.5);
-  check ((long double)-1.5);  
+  check ((long double)-1.5);
 
   return 0;
 }

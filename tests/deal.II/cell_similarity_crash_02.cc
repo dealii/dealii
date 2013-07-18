@@ -45,13 +45,13 @@ void test()
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature, update_values);
 
-				   // initialize FEValues with the first cell
+  // initialize FEValues with the first cell
   fe_values.reinit (tr.begin_active());
 
-				   // then invalidate the cell iterator
+  // then invalidate the cell iterator
   tr.refine_global (1);
-				   // and invalidate it again. this
-				   // shouldn't do any further harm
+  // and invalidate it again. this
+  // shouldn't do any further harm
   tr.refine_global (1);
 
   deallog << "OK" << std::endl;

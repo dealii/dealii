@@ -36,7 +36,7 @@ std::ofstream logfile("thread_correctness_hp/output");
 template <int dim, typename Number>
 class MatrixFreeTestHP
 {
- public:
+public:
   MatrixFreeTestHP(const MatrixFree<dim,Number> &data_in):
     data (data_in)
   {};
@@ -47,8 +47,8 @@ class MatrixFreeTestHP
                const Vector<Number> &src,
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
-                                // Ask MatrixFree for cell_range for different
-                                // orders
+    // Ask MatrixFree for cell_range for different
+    // orders
     std::pair<unsigned int,unsigned int> subrange_deg =
       data.create_cell_subrange_hp (cell_range, 1);
     if (subrange_deg.second > subrange_deg.first)
@@ -100,12 +100,12 @@ void do_test (const unsigned int parallel_option)
   create_mesh (tria);
   tria.refine_global(2);
 
-                                // refine a few cells
+  // refine a few cells
   for (unsigned int i=0; i<11-3*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
-        cell = tria.begin_active (),
-        endc = tria.end();
+      cell = tria.begin_active (),
+      endc = tria.end();
       for (; cell!=endc; ++cell)
         if (rand() % (7-i) == 0)
           cell->set_refine_flag();
@@ -124,11 +124,11 @@ void do_test (const unsigned int parallel_option)
     }
 
   hp::DoFHandler<dim> dof(tria);
-                                // set the active FE index in a random order
+  // set the active FE index in a random order
   {
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof.begin_active(),
-      endc = dof.end();
+    cell = dof.begin_active(),
+    endc = dof.end();
     for (; cell!=endc; ++cell)
       {
         const unsigned int fe_index = rand() % max_degree;
@@ -136,7 +136,7 @@ void do_test (const unsigned int parallel_option)
       }
   }
 
-                                // setup DoFs
+  // setup DoFs
   dof.distribute_dofs(fe_collection);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof,
@@ -151,7 +151,7 @@ void do_test (const unsigned int parallel_option)
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-                                // set up reference MatrixFree
+  // set up reference MatrixFree
   MatrixFree<dim,number> mf_data;
   typename MatrixFree<dim,number>::AdditionalData data;
   data.tasks_parallel_scheme =
@@ -159,8 +159,8 @@ void do_test (const unsigned int parallel_option)
   mf_data.reinit (dof, constraints, quadrature_collection_mf, data);
   MatrixFreeTestHP<dim,number> mf (mf_data);
 
-                                // test different block sizes, starting from
-                                // auto setting (= 0)
+  // test different block sizes, starting from
+  // auto setting (= 0)
   for (unsigned int block_size = 0; block_size < 5; ++block_size)
     {
       deallog.push ("blk_" + Utilities::int_to_string(block_size,1));
@@ -181,8 +181,8 @@ void do_test (const unsigned int parallel_option)
       mf_data_par.reinit (dof, constraints, quadrature_collection_mf, data);
       MatrixFreeTestHP<dim,number> mf_par(mf_data_par);
 
-                                // fill a right hand side vector with random
-                                // numbers in unconstrained degrees of freedom
+      // fill a right hand side vector with random
+      // numbers in unconstrained degrees of freedom
       Vector<number> src (dof.n_dofs());
       Vector<number> result_ref(src), result_mf (src);
 
@@ -192,10 +192,10 @@ void do_test (const unsigned int parallel_option)
             src(i) = (double)rand()/RAND_MAX;
         }
 
-                                // now perform 30 matrix-vector products in
-                                // parallel and check their correctness (take
-                                // many of them to make sure that we hit an
-                                // error)
+      // now perform 30 matrix-vector products in
+      // parallel and check their correctness (take
+      // many of them to make sure that we hit an
+      // error)
       mf.vmult (result_ref, src);
       deallog << "Norm of difference: ";
       for (unsigned int i=0; i<50; ++i)
@@ -214,8 +214,8 @@ void do_test (const unsigned int parallel_option)
 template <int dim, int fe_degree>
 void test ()
 {
-                                // 'misuse' fe_degree for setting the parallel
-                                // option here
+  // 'misuse' fe_degree for setting the parallel
+  // option here
   unsigned int parallel_option = 0;
   if (fe_degree == 1)
     parallel_option = 0;

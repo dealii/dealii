@@ -40,7 +40,7 @@ int main ()
   // ensure that the precision of the underlying file stream object remained
   // unchanged
   deallog.get_file_stream() << numbers::PI << std::endl;
-  
+
   return 0;
 }
 

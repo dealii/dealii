@@ -52,9 +52,9 @@ void test()
   IndexSet locally_owned (vec.size());
   locally_owned.add_range (100*myid, 100*myid+100);
   locally_owned.add_range (vec.block(0).size()+100*myid,
-			   vec.block(0).size()+100*myid+100);
+                           vec.block(0).size()+100*myid+100);
   Assert (vec.locally_owned_elements() == locally_owned,
-	  ExcInternalError());
+          ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;

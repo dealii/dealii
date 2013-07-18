@@ -51,7 +51,7 @@ print_dofs (const hp::DoFHandler<dim> &dof)
       deallog << "Cell " << cell << " -- ";
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-	deallog << v[i] << ' ';
+        deallog << v[i] << ' ';
       deallog << std::endl;
     }
 }
@@ -60,11 +60,11 @@ print_dofs (const hp::DoFHandler<dim> &dof)
 
 template <int dim>
 void
-check_renumbering(hp::DoFHandler<dim>& dof)
+check_renumbering(hp::DoFHandler<dim> &dof)
 {
   for (unsigned int i=0; i<dof.get_fe().size(); ++i)
     {
-      const FiniteElement<dim>& element = dof.get_fe()[i];
+      const FiniteElement<dim> &element = dof.get_fe()[i];
       deallog << element.get_name() << std::endl;
     }
 
@@ -92,10 +92,10 @@ check ()
   {
     bool coin = false;
     for (typename hp::DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
-	 cell != dof.end(); ++cell)
+         cell != dof.end(); ++cell)
       {
-	cell->set_active_fe_index (coin ? 0 : 1);
-	coin = !coin;
+        cell->set_active_fe_index (coin ? 0 : 1);
+        coin = !coin;
       }
   }
 

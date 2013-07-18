@@ -45,11 +45,11 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-	   const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   deallog << "FE=" << fe.get_name()
-	  << std::endl;
+          << std::endl;
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -57,33 +57,33 @@ void test (const Triangulation<dim>& tr,
   Vector<double> fe_function(dof.n_dofs());
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     fe_function(i) = i+1;
-  
+
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
-			   update_values | update_gradients | update_hessians);
+                           update_values | update_gradients | update_hessians);
   fe_values.reinit (dof.begin_active());
 
   std::vector<double> scalar_values (quadrature.size());
   std::vector<Vector<double> >
-    vector_values (quadrature.size(),
-		   Vector<double>(fe.n_components()));
+  vector_values (quadrature.size(),
+                 Vector<double>(fe.n_components()));
 
   fe_values.get_function_values (fe_function, vector_values);
-  
+
   for (unsigned int c=0; c<fe.n_components(); ++c)
     {
       FEValuesExtractors::Scalar single_component (c);
       fe_values[single_component].get_function_values (fe_function,
-						       scalar_values);
+                                                       scalar_values);
       deallog << "component=" << c << std::endl;
-      
+
       for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-	{
-	  deallog << scalar_values[q] << std::endl;
-	  Assert (std::fabs(scalar_values[q] - vector_values[q](c))
-		  <= 1e-12 * std::fabs(scalar_values[q]),
-		  ExcInternalError());
-	}
+        {
+          deallog << scalar_values[q] << std::endl;
+          Assert (std::fabs(scalar_values[q] - vector_values[q](c))
+                  <= 1e-12 * std::fabs(scalar_values[q]),
+                  ExcInternalError());
+        }
     }
 }
 
@@ -99,8 +99,8 @@ void test_hyper_sphere()
   tr.set_boundary (0, boundary);
 
   FESystem<dim> fe (FE_Q<dim>(1), 1,
-		    FE_RaviartThomas<dim>(1), 1,
-		    FE_Nedelec<dim>(0), 1);
+                    FE_RaviartThomas<dim>(1), 1,
+                    FE_Nedelec<dim>(0), 1);
   test(tr, fe);
 }
 

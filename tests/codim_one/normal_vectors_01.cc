@@ -39,36 +39,36 @@ void test ()
 {
   Triangulation<dim,dim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
-  
+
   Triangulation<dim-1,dim> tria;
   GridTools::extract_boundary_mesh (volume_mesh, tria);
-  
+
   FE_Q<dim-1,dim> fe (1);
   DoFHandler<dim-1,dim> dh(tria);
   MappingQ<dim-1,dim> mapping(1,true);
-  
+
   dh.distribute_dofs (fe);
-  
+
   FEFaceValues<dim-1,dim> fe_face_values (mapping, fe, QTrapez<dim-2>(),
-					  update_normal_vectors);
+                                          update_normal_vectors);
 
   for (typename DoFHandler<dim-1,dim>::active_cell_iterator
-	 cell = dh.begin_active();
+       cell = dh.begin_active();
        cell != dh.end(); ++cell)
     {
       deallog << "Face centered at " << cell->center()
-	      << std::endl;
+              << std::endl;
 
       for (unsigned int f=0; f<GeometryInfo<dim-1>::faces_per_cell; ++f)
-	{
-	  deallog << "  Edge centered at " << cell->face(f)->center()
-		  << std::endl;
-      
-	  fe_face_values.reinit (cell,f);
-	  for (unsigned int q=0; q<fe_face_values.n_quadrature_points; ++q)
-	    deallog << "    normal_vector=" << fe_face_values.normal_vector(q)
-		    << std::endl;
-	}
+        {
+          deallog << "  Edge centered at " << cell->face(f)->center()
+                  << std::endl;
+
+          fe_face_values.reinit (cell,f);
+          for (unsigned int q=0; q<fe_face_values.n_quadrature_points; ++q)
+            deallog << "    normal_vector=" << fe_face_values.normal_vector(q)
+                    << std::endl;
+        }
     }
 }
 
@@ -82,6 +82,6 @@ int main ()
 
 //  test<2> ();
   test<3> ();
-  
+
   return 0;
 }

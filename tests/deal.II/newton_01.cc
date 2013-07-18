@@ -28,76 +28,76 @@ using namespace dealii;
 
 class SquareRoot : public Subscriptor
 {
-  public:
-    void start_vector (Vector<double>& start) const;
-    void residual (NamedData<Vector<double>*>& out, 
-        const NamedData<Vector<double>*>& in);
-    void solve (NamedData<Vector<double>*>& out, 
-        const NamedData<Vector<double>*>& in);
+public:
+  void start_vector (Vector<double> &start) const;
+  void residual (NamedData<Vector<double>*> &out,
+                 const NamedData<Vector<double>*> &in);
+  void solve (NamedData<Vector<double>*> &out,
+              const NamedData<Vector<double>*> &in);
 };
 
-class SquareRootResidual : public 
-                       Algorithms::Operator<Vector<double> >
+class SquareRootResidual : public
+  Algorithms::Operator<Vector<double> >
 {
-    SmartPointer<SquareRoot, SquareRootResidual>
-      discretization;
-  public:
+  SmartPointer<SquareRoot, SquareRootResidual>
+  discretization;
+public:
 
-    SquareRootResidual(SquareRoot& problem)
-      : discretization(&problem)
-    {}
+  SquareRootResidual(SquareRoot &problem)
+    : discretization(&problem)
+  {}
 
-    virtual void operator ()(
-        NamedData<Vector<double>*>& out, 
-        const NamedData<Vector<double>*>& in) 
-    {
-      discretization->residual(out,in);
-    }
+  virtual void operator ()(
+    NamedData<Vector<double>*> &out,
+    const NamedData<Vector<double>*> &in)
+  {
+    discretization->residual(out,in);
+  }
 };
 
-class SquareRootSolver : public 
-                       Algorithms::Operator<Vector<double> >
+class SquareRootSolver : public
+  Algorithms::Operator<Vector<double> >
 {
-    SmartPointer<SquareRoot, SquareRootSolver>
-      solver;
-  public:
+  SmartPointer<SquareRoot, SquareRootSolver>
+  solver;
+public:
 
-    SquareRootSolver(SquareRoot& problem)
-      : solver(&problem)
-    {}
+  SquareRootSolver(SquareRoot &problem)
+    : solver(&problem)
+  {}
 
-    virtual void operator ()(
-        NamedData<Vector<double>*>& out, 
-        const NamedData<Vector<double>*>& in) 
-    {
-      solver->solve(out,in);
-    }
+  virtual void operator ()(
+    NamedData<Vector<double>*> &out,
+    const NamedData<Vector<double>*> &in)
+  {
+    solver->solve(out,in);
+  }
 };
 
 void SquareRoot::residual (
-    NamedData<Vector<double>*>& out, 
-    const NamedData<Vector<double>*>& in) 
+  NamedData<Vector<double>*> &out,
+  const NamedData<Vector<double>*> &in)
 {
   //residuum = 0
   *out(0) = 0.;
-  const Vector<double> &x = *in(in.find("Newton iterate")); 
+  const Vector<double> &x = *in(in.find("Newton iterate"));
   *out(0) = x*x - 2.;
 }
 
 void SquareRoot::solve (
-    NamedData<Vector<double>*>& out, 
-    const NamedData<Vector<double>*>& in)
+  NamedData<Vector<double>*> &out,
+  const NamedData<Vector<double>*> &in)
 {
   *out(0) = 0;
-  const Vector<double> &x = *in(in.find("Newton iterate")); 
+  const Vector<double> &x = *in(in.find("Newton iterate"));
   const Vector<double> &r = *in(in.find("Newton residual"));
 
   (*out(0))(0) = 1./2./x(0)* r(0);
-} 
+}
 
 
 
-void test () 
+void test ()
 {
   SquareRoot square_root;
   SquareRootSolver sq_solver (square_root);
@@ -106,8 +106,8 @@ void test ()
   Algorithms::OutputOperator<Vector<double> > output;
 
   Algorithms::Newton<Vector<double> > newton(
-      sq_residual,
-      sq_solver); 
+    sq_residual,
+    sq_solver);
   newton.initialize(output);
 
   NamedData<Vector<double>*> in_data;
@@ -115,7 +115,7 @@ void test ()
 
   Vector<double> solution (1);
   solution = 10.;
-  Vector<double>* p = &solution;
+  Vector<double> *p = &solution;
   out_data.add(p, "solution");
 
   newton.control.set_reduction(1.e-20);
@@ -125,8 +125,8 @@ void test ()
   deallog << " square root " << (*out_data(0))(0) << std::endl;
 }
 
-  
-  
+
+
 
 int main()
 {

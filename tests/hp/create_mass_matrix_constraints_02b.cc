@@ -64,27 +64,27 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-   hp::FECollection<dim> element;
-   element.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
-                                     FE_Q<dim>(2), 1));
-   element.push_back (FESystem<dim> (FE_Q<dim>(2), 1,
-                                     FE_Q<dim>(3), 1));
-   element.push_back (FESystem<dim> (FE_Q<dim>(3), 1,
-                                     FE_Q<dim>(4), 1));
+  hp::FECollection<dim> element;
+  element.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
+                                    FE_Q<dim>(2), 1));
+  element.push_back (FESystem<dim> (FE_Q<dim>(2), 1,
+                                    FE_Q<dim>(3), 1));
+  element.push_back (FESystem<dim> (FE_Q<dim>(3), 1,
+                                    FE_Q<dim>(4), 1));
 
-   hp::DoFHandler<dim> dof(tr);
+  hp::DoFHandler<dim> dof(tr);
 
-   for (typename hp::DoFHandler<dim>::active_cell_iterator
- 	 cell = dof.begin_active();
-        cell != dof.end(); ++cell)
-     cell->set_active_fe_index (rand() % element.size());
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
+       cell = dof.begin_active();
+       cell != dof.end(); ++cell)
+    cell->set_active_fe_index (rand() % element.size());
 
   dof.distribute_dofs(element);
 
-				   // use a more complicated mapping
-				   // of the domain and a quadrature
-				   // formula suited to the elements
-				   // we have here
+  // use a more complicated mapping
+  // of the domain and a quadrature
+  // formula suited to the elements
+  // we have here
   MappingQ<dim> mapping (3);
   QGauss<dim> quadrature(6);
 
@@ -95,9 +95,9 @@ check ()
                                            constraints);
   constraints.close ();
 
-				   // create sparsity pattern. note
-				   // that different components should
-				   // not couple, so use pattern
+  // create sparsity pattern. note
+  // that different components should
+  // not couple, so use pattern
   SparsityPattern sparsity;
   {
     Table<2,DoFTools::Coupling> mask (2, 2);
@@ -113,8 +113,8 @@ check ()
   matrix_ref.reinit (sparsity);
 
   MatrixTools::
-    create_mass_matrix (hp::MappingCollection<dim>(mapping), dof,
-			hp::QCollection<dim>(quadrature), matrix_ref);
+  create_mass_matrix (hp::MappingCollection<dim>(mapping), dof,
+                      hp::QCollection<dim>(quadrature), matrix_ref);
   constraints.condense(matrix_ref);
 
   const Function<dim> *const dummy = 0;

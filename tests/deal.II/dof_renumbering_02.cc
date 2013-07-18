@@ -43,7 +43,7 @@ template <int dim>
 void
 print_dofs (const DoFHandler<dim> &dof)
 {
-  const FiniteElement<dim>& fe = dof.get_fe();
+  const FiniteElement<dim> &fe = dof.get_fe();
   std::vector<types::global_dof_index> v (fe.dofs_per_cell);
   std_cxx1x::shared_ptr<FEValues<dim> > fevalues;
 
@@ -58,14 +58,14 @@ print_dofs (const DoFHandler<dim> &dof)
     {
       Point<dim> p = cell->center();
       if (fevalues.get() != 0)
-	fevalues->reinit(cell);
+        fevalues->reinit(cell);
 
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-	if (fevalues.get() != 0)
-	  deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
-	else
-	  deallog << p << '\t' << v[i] << std::endl;
+        if (fevalues.get() != 0)
+          deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
+        else
+          deallog << p << '\t' << v[i] << std::endl;
       deallog << std::endl;
     }
 }
@@ -76,7 +76,7 @@ template <int dim>
 void
 print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
 {
-  const FiniteElement<dim>& fe = dof.get_fe();
+  const FiniteElement<dim> &fe = dof.get_fe();
   std::vector<types::global_dof_index> v (fe.dofs_per_cell);
   std_cxx1x::shared_ptr<FEValues<dim> > fevalues;
 
@@ -91,14 +91,14 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
     {
       Point<dim> p = cell->center();
       if (fevalues.get() != 0)
-	fevalues->reinit(cell);
+        fevalues->reinit(cell);
 
       cell->get_mg_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-	if (fevalues.get() != 0)
-	  deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
-	else
-	  deallog << p << '\t' << v[i] << std::endl;
+        if (fevalues.get() != 0)
+          deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
+        else
+          deallog << p << '\t' << v[i] << std::endl;
       deallog << std::endl;
     }
 }
@@ -106,26 +106,26 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
 
 template <int dim>
 void
-check_renumbering(MGDoFHandler<dim>& mgdof)
+check_renumbering(MGDoFHandler<dim> &mgdof)
 {
-  const FiniteElement<dim>& element = mgdof.get_fe();
-  DoFHandler<dim>& dof = mgdof;
+  const FiniteElement<dim> &element = mgdof.get_fe();
+  DoFHandler<dim> &dof = mgdof;
   deallog << element.get_name() << std::endl;
 
-				   // Prepare a reordering of
-				   // components for later use
+  // Prepare a reordering of
+  // components for later use
   std::vector<unsigned int> order(element.n_components());
   for (unsigned int i=0; i<order.size(); ++i) order[i] = order.size()-i-1;
 
   Point<dim> direction;
-  for (unsigned int i=0;i<dim;++i)
+  for (unsigned int i=0; i<dim; ++i)
     direction(i) = -5.0001+i;
 
   deallog << std::endl << "Downstream numbering cell-wise" << std::endl;
   DoFRenumbering::downstream(dof, direction);
   print_dofs (dof);
-				   // Check level ordering
-  for (unsigned int level=0;level<dof.get_tria().n_levels();++level)
+  // Check level ordering
+  for (unsigned int level=0; level<dof.get_tria().n_levels(); ++level)
     {
       deallog << "Level " << level << std::endl;
       DoFRenumbering::downstream(mgdof, level, direction);
@@ -135,8 +135,8 @@ check_renumbering(MGDoFHandler<dim>& mgdof)
   deallog << std::endl << "Downstream numbering dof-wise" << std::endl;
   DoFRenumbering::downstream(dof, direction, true);
   print_dofs (dof);
-				   // Check level ordering
-  for (unsigned int level=0;level<dof.get_tria().n_levels();++level)
+  // Check level ordering
+  for (unsigned int level=0; level<dof.get_tria().n_levels(); ++level)
     {
       deallog << "Level " << level << std::endl;
       DoFRenumbering::downstream(mgdof, level, direction, true);

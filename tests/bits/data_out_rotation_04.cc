@@ -36,20 +36,24 @@ std::string output_file_name = "data_out_rotation_04/output";
 template <int dim>
 class XDataOut : public DataOutRotation<dim>
 {
-  public:
-    const std::vector<typename ::DataOutBase::Patch<dim+1,dim+1> > &
-    get_patches() const
-      { return DataOutRotation<dim>::get_patches(); }
+public:
+  const std::vector<typename ::DataOutBase::Patch<dim+1,dim+1> > &
+  get_patches() const
+  {
+    return DataOutRotation<dim>::get_patches();
+  }
 
-    std::vector<std::string>
-    get_dataset_names () const
-      { return DataOutRotation<dim>::get_dataset_names();  }
+  std::vector<std::string>
+  get_dataset_names () const
+  {
+    return DataOutRotation<dim>::get_dataset_names();
+  }
 
-    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
-    get_vector_data_ranges () const
-      {
-	return DataOutRotation<dim>::get_vector_data_ranges ();
-      }
+  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
+  get_vector_data_ranges () const
+  {
+    return DataOutRotation<dim>::get_vector_data_ranges ();
+  }
 };
 
 // have a class that makes sure we can get at the patches and data set
@@ -57,29 +61,33 @@ class XDataOut : public DataOutRotation<dim>
 template <int dim>
 class XDataOutReader : public DataOutReader<dim+1>
 {
-  public:
-    const std::vector<typename ::DataOutBase::Patch<dim+1,dim+1> > &
-    get_patches() const
-      { return DataOutReader<dim+1>::get_patches(); }
+public:
+  const std::vector<typename ::DataOutBase::Patch<dim+1,dim+1> > &
+  get_patches() const
+  {
+    return DataOutReader<dim+1>::get_patches();
+  }
 
-    std::vector<std::string>
-    get_dataset_names () const
-      { return DataOutReader<dim+1>::get_dataset_names();  }
+  std::vector<std::string>
+  get_dataset_names () const
+  {
+    return DataOutReader<dim+1>::get_dataset_names();
+  }
 
-    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
-    get_vector_data_ranges () const
-      {
-	return DataOutReader<dim+1>::get_vector_data_ranges ();
-      }
+  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
+  get_vector_data_ranges () const
+  {
+    return DataOutReader<dim+1>::get_vector_data_ranges ();
+  }
 };
 
 
 void
 my_check_this (const DoFHandler<3> &,
-            const Vector<double>  &,
-            const Vector<double>  &)
+               const Vector<double> &,
+               const Vector<double> &)
 {
-				   // no checks in 3d
+  // no checks in 3d
 }
 
 
@@ -87,8 +95,8 @@ my_check_this (const DoFHandler<3> &,
 template <int dim>
 void
 my_check_this (const DoFHandler<dim> &dof_handler,
-            const Vector<double>  &v_node,
-            const Vector<double>  &v_cell)
+               const Vector<double>  &v_node,
+               const Vector<double>  &v_cell)
 {
   XDataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -98,8 +106,8 @@ my_check_this (const DoFHandler<dim> &dof_handler,
 
   {
     std::ofstream tmp ("data_out_rotation_04.tmp");
-				     // use full precision to avoid
-				     // errors
+    // use full precision to avoid
+    // errors
     tmp.precision (20);
     data_out.write_deal_II_intermediate (tmp);
   }
@@ -110,47 +118,47 @@ my_check_this (const DoFHandler<dim> &dof_handler,
     reader.read (tmp);
   }
 
-				   // finally make sure that we have
-				   // read everything back in
-				   // correctly
+  // finally make sure that we have
+  // read everything back in
+  // correctly
   Assert (data_out.get_dataset_names() == reader.get_dataset_names(),
-	  ExcInternalError());
+          ExcInternalError());
 
   Assert (data_out.get_patches().size() == reader.get_patches().size(),
- 	  ExcInternalError());
+          ExcInternalError());
 
   for (unsigned int i=0; i<reader.get_patches().size(); ++i)
     Assert (data_out.get_patches()[i] == reader.get_patches()[i],
-	    ExcInternalError());
+            ExcInternalError());
 
   deallog << data_out.get_vector_data_ranges().size()
-	  << std::endl;
+          << std::endl;
   Assert (data_out.get_vector_data_ranges().size() ==
-	  reader.get_vector_data_ranges().size(),
-	  ExcInternalError());
+          reader.get_vector_data_ranges().size(),
+          ExcInternalError());
   for (unsigned int i=0; i<data_out.get_vector_data_ranges().size(); ++i)
     {
       deallog << std_cxx1x::get<0>(data_out.get_vector_data_ranges()[i])
-	      << ' '
-	      << std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
-	      << ' '
-	      << std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
-	      << std::endl;
+              << ' '
+              << std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
+              << ' '
+              << std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
+              << std::endl;
       Assert (std_cxx1x::get<0>(data_out.get_vector_data_ranges()[i])
-	      ==
-	      std_cxx1x::get<0>(reader.get_vector_data_ranges()[i]),
-	      ExcInternalError());
+              ==
+              std_cxx1x::get<0>(reader.get_vector_data_ranges()[i]),
+              ExcInternalError());
       Assert (std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
-	      ==
-	      std_cxx1x::get<1>(reader.get_vector_data_ranges()[i]),
-	      ExcInternalError());
+              ==
+              std_cxx1x::get<1>(reader.get_vector_data_ranges()[i]),
+              ExcInternalError());
       Assert (std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
-	      ==
-	      std_cxx1x::get<2>(reader.get_vector_data_ranges()[i]),
-	      ExcInternalError());
+              ==
+              std_cxx1x::get<2>(reader.get_vector_data_ranges()[i]),
+              ExcInternalError());
     }
 
-				   // for good measure, delete tmp file
+  // for good measure, delete tmp file
   remove ("data_out_rotation_04.tmp");
 
   deallog << "OK" << std::endl;
@@ -163,13 +171,13 @@ check_this (const DoFHandler<dim> &dof_handler,
             const Vector<double>  &v_node,
             const Vector<double>  &v_cell)
 {
-				   // since we can't forward declare
-				   // check_this in this file (it is forward
-				   // declared in data_out_common.h), we
-				   // also can't make the driver file aware of
-				   // the overload for 1d. to avoid linker
-				   // errors, we can consequently not overload
-				   // check_this, and need this forwarder
-				   // function
+  // since we can't forward declare
+  // check_this in this file (it is forward
+  // declared in data_out_common.h), we
+  // also can't make the driver file aware of
+  // the overload for 1d. to avoid linker
+  // errors, we can consequently not overload
+  // check_this, and need this forwarder
+  // function
   my_check_this (dof_handler, v_node, v_cell);
 }

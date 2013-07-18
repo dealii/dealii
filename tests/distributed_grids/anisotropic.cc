@@ -33,7 +33,7 @@
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -49,7 +49,7 @@ void test(std::ostream& /*out*/)
     {
       deallog << e.get_exc_name() << std::endl;
     }
-  
+
 }
 
 

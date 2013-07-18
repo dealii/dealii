@@ -37,10 +37,10 @@ void test ()
   volume_mesh.refine_global(1);
 
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = volume_mesh.begin_active();
+       cell = volume_mesh.begin_active();
        cell != volume_mesh.end(); ++cell)
     Assert (cell->direction_flag() == true,
-	    ExcInternalError());
+            ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

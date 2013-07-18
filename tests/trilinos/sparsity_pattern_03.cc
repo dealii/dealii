@@ -21,7 +21,7 @@
 #include "sparsity_pattern_common.h"
 #include <deal.II/base/utilities.h>
 
-int main (int argc, char** argv)
+int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv);
 
@@ -35,5 +35,5 @@ int main (int argc, char** argv)
   print ();
 }
 
-  
-  
+
+

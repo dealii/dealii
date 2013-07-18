@@ -38,21 +38,21 @@ void test ()
   TrilinosWrappers::MPI::Vector test1, test2;
 
   Assert (test1.vector_partitioner().SameAs(test2.vector_partitioner()),
-	  ExcInternalError());
+          ExcInternalError());
 
-				   // first processor owns 2 indices, second
-				   // processor owns none
+  // first processor owns 2 indices, second
+  // processor owns none
   IndexSet local_owned(2);
   if (myid == 0)
     local_owned.add_range (0,2);
 
   test1.reinit (local_owned, MPI_COMM_WORLD);
 
-				// reinit Trilinos vector from other vector
+  // reinit Trilinos vector from other vector
   test2.reinit (test1, true);
 
   Assert (test1.vector_partitioner().SameAs(test2.vector_partitioner()),
-	  ExcInternalError());
+          ExcInternalError());
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;

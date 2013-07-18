@@ -29,10 +29,10 @@ namespace dealii
 {
   template <int dim, int spacedim>
   bool operator == (const Triangulation<dim,spacedim> &t1,
-		    const Triangulation<dim,spacedim> &t2)
+                    const Triangulation<dim,spacedim> &t2)
   {
-				     // test a few attributes, though we can't
-				     // test everything unfortunately...
+    // test a few attributes, though we can't
+    // test everything unfortunately...
     if (t1.n_active_cells() != t2.n_active_cells())
       return false;
 
@@ -43,66 +43,66 @@ namespace dealii
       return false;
 
     typename Triangulation<dim,spacedim>::cell_iterator
-      c1 = t1.begin(),
-      c2 = t2.begin();
+    c1 = t1.begin(),
+    c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
-	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	  {
-	    if (c1->vertex(v) != c2->vertex(v))
-	      return false;
-	    if (c1->vertex_index(v) != c2->vertex_index(v))
-	      return false;
-	  }
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          {
+            if (c1->vertex(v) != c2->vertex(v))
+              return false;
+            if (c1->vertex_index(v) != c2->vertex_index(v))
+              return false;
+          }
 
-	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	  {
-	    if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
-	      return false;
+        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+          {
+            if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
+              return false;
 
-	    if (c1->face(f)->at_boundary())
-	      {
-		if (c1->face(f)->boundary_indicator() !=
-		    c2->face(f)->boundary_indicator())
-		  return false;
-	      }
-	    else
-	      {
-		if (c1->neighbor(f)->level() != c2->neighbor(f)->level())
-		  return false;
-		if (c1->neighbor(f)->index() != c2->neighbor(f)->index())
-		  return false;
-	      }
-	  }
+            if (c1->face(f)->at_boundary())
+              {
+                if (c1->face(f)->boundary_indicator() !=
+                    c2->face(f)->boundary_indicator())
+                  return false;
+              }
+            else
+              {
+                if (c1->neighbor(f)->level() != c2->neighbor(f)->level())
+                  return false;
+                if (c1->neighbor(f)->index() != c2->neighbor(f)->index())
+                  return false;
+              }
+          }
 
-	if (c1->active() && c2->active()
-	    && (c1->subdomain_id() != c2->subdomain_id()))
-	  return false;
+        if (c1->active() && c2->active()
+            && (c1->subdomain_id() != c2->subdomain_id()))
+          return false;
 
-	if (c1->level_subdomain_id() != c2->level_subdomain_id())
-	  return false;
+        if (c1->level_subdomain_id() != c2->level_subdomain_id())
+          return false;
 
-	if (c1->material_id() != c2->material_id())
-	  return false;
+        if (c1->material_id() != c2->material_id())
+          return false;
 
-	if (c1->user_index() != c2->user_index())
-	  return false;
+        if (c1->user_index() != c2->user_index())
+          return false;
 
-	if (c1->user_flag_set() != c2->user_flag_set())
-	  return false;
+        if (c1->user_flag_set() != c2->user_flag_set())
+          return false;
       }
 
-				     // also check the order of raw iterators as they contain
-				     // something about the history of the triangulation
+    // also check the order of raw iterators as they contain
+    // something about the history of the triangulation
     typename Triangulation<dim,spacedim>::cell_iterator
-      r1 = t1.begin(),
-      r2 = t2.begin();
+    r1 = t1.begin(),
+    r2 = t2.begin();
     for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
       {
-	if (r1->level() != r2->level())
-	  return false;
-	if (r1->index() != r2->index())
-	  return false;
+        if (r1->level() != r2->level())
+          return false;
+        if (r1->index() != r2->index())
+          return false;
       }
 
     return true;
@@ -114,11 +114,11 @@ template <int dim, int spacedim>
 void do_boundary (Triangulation<dim,spacedim> &t1)
 {
   typename Triangulation<dim,spacedim>::cell_iterator
-    c1 = t1.begin();
+  c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (c1->at_boundary(f))
-	c1->face(f)->set_boundary_indicator (42);
+        c1->face(f)->set_boundary_indicator (42);
 }
 
 
@@ -137,7 +137,7 @@ void test ()
   // coarsen again as this takes away the finest level but may leave
   // around some of this level's cells
   for (typename Triangulation<dim,spacedim>::active_cell_iterator
-    cell = tria_1.begin_active(2); cell != tria_1.end(); ++cell)
+       cell = tria_1.begin_active(2); cell != tria_1.end(); ++cell)
     cell->set_coarsen_flag ();
   tria_1.execute_coarsening_and_refinement();
   // now add one cell again

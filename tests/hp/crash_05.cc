@@ -41,8 +41,8 @@ void test ()
   GridGenerator::hyper_cube(tria);
   tria.refine_global (1);
 
-				   // use the same element, but with
-				   // different indices
+  // use the same element, but with
+  // different indices
   hp::FECollection<dim> fe_collection;
   for (unsigned int i=0; i<tria.n_active_cells(); ++i)
     fe_collection.push_back(FE_Q<dim> (1));
@@ -51,19 +51,19 @@ void test ()
 
   unsigned int fe_index = 0;
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell, ++fe_index)
     {
       deallog << "Setting fe_index=" << fe_index << " on cell " << cell
-	      << std::endl;
+              << std::endl;
       cell->set_active_fe_index (fe_index);
     }
-  
+
   dof_handler.distribute_dofs(fe_collection);
 
   std::vector<types::global_dof_index> local_dof_indices;
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-         cell=dof_handler.begin_active();
+       cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     {
       local_dof_indices.resize (cell->get_fe().dofs_per_cell);
@@ -81,14 +81,14 @@ int main ()
 {
   std::ofstream logfile("crash_05/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

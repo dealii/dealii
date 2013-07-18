@@ -38,7 +38,7 @@ void test ()
 
   Triangulation<dim-1,dim> boundary_mesh;
   map<Triangulation<dim-1,dim>::cell_iterator,Triangulation<dim,dim>::face_iterator >
-    surface_to_volume_mapping;
+  surface_to_volume_mapping;
   Triangulation<dim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
 
@@ -52,17 +52,17 @@ void test ()
   deallog << "n_dofs=" << boundary_dh.n_dofs() << std::endl;
 
   for (DoFHandler<dim-1,dim>::active_cell_iterator
-	 cell = boundary_dh.begin_active(),
-	 endc = boundary_dh.end(); cell!=endc; ++cell)
+       cell = boundary_dh.begin_active(),
+       endc = boundary_dh.end(); cell!=endc; ++cell)
     {
       deallog << "Cell: " << cell << std::endl;
       for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
-	{
-	  unsigned int index = cell->vertex_dof_index(v,0);
-	  deallog << "vertex: " << v
-		  << ", global: " << cell->vertex_index(v)
-		  << " index: " << index << std::endl;
-	}
+        {
+          unsigned int index = cell->vertex_dof_index(v,0);
+          deallog << "vertex: " << v
+                  << ", global: " << cell->vertex_index(v)
+                  << " index: " << index << std::endl;
+        }
 
       deallog << std::endl;
     }
@@ -78,4 +78,4 @@ int main ()
   deallog.depth_console(0);
 
   test ();
- }
+}

@@ -53,18 +53,18 @@ void test()
 
   GridGenerator::hyper_cube(tr);
   tr.refine_global (2);
-            for (unsigned int step=0; step<8; ++step)
-        {
-          typename Triangulation<dim>::active_cell_iterator
-            cell = tr.begin_active(),
-            endc = tr.end();
+  for (unsigned int step=0; step<8; ++step)
+    {
+      typename Triangulation<dim>::active_cell_iterator
+      cell = tr.begin_active(),
+      endc = tr.end();
 
-            for (; cell!=endc; ++cell)
-                if (std::rand()%42==1)
-                cell->set_refine_flag ();
+      for (; cell!=endc; ++cell)
+        if (std::rand()%42==1)
+          cell->set_refine_flag ();
 
-         tr.execute_coarsening_and_refinement ();
-        }
+      tr.execute_coarsening_and_refinement ();
+    }
 
   DoFHandler<dim> dofh(tr);
 
@@ -94,10 +94,10 @@ void test()
 
   if (myid==0)
     {
-      for (unsigned int i=0;i<numproc;++i)
-	{
-	  cat_file((std::string("p4est_3d_constraintmatrix_01/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
-	}
+      for (unsigned int i=0; i<numproc; ++i)
+        {
+          cat_file((std::string("p4est_3d_constraintmatrix_01/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
+        }
 
     }
 }

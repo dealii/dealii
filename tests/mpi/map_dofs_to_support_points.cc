@@ -44,32 +44,32 @@ void test()
 
   std::map<types::global_dof_index, Point<dim> > points;
   DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
-					dofh,
-					points);
+                                        dofh,
+                                        points);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       for (typename std::map<types::global_dof_index, Point<dim> >::const_iterator
-	     p = points.begin();
-	   p != points.end();
-	   ++p)
-	deallog << p->first << " -> " << p->second
-		<< std::endl;
+           p = points.begin();
+           p != points.end();
+           ++p)
+        deallog << p->first << " -> " << p->second
+                << std::endl;
     }
 
-				   // the result of the call above is
-				   // supposed to be a map that
-				   // contains exactly the locally
-				   // relevant dofs, so test this
+  // the result of the call above is
+  // supposed to be a map that
+  // contains exactly the locally
+  // relevant dofs, so test this
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
 
   for (unsigned int i=0; i<dofh.n_dofs(); ++i)
     if (relevant_set.is_element(i))
       Assert (points.find(i) != points.end(),
-	      ExcInternalError())
+              ExcInternalError())
       else
-      Assert (points.find(i) == points.end(),
-	      ExcInternalError());
+        Assert (points.find(i) == points.end(),
+                ExcInternalError());
 }
 
 

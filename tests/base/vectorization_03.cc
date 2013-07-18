@@ -33,7 +33,7 @@ void print_vec (VECVEC &v)
     {
       deallog << "[";
       for (unsigned int j=0; j<v[i].size(); ++j)
-	deallog << v[i][j] << " ";
+        deallog << v[i][j] << " ";
       deallog << "]";
     }
   deallog << std::endl;

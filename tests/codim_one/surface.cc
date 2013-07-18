@@ -44,76 +44,77 @@ std::ofstream logfile("surface/output");
 // which are more and more refined, and prints the error on the
 // output.
 template <int dim, int spacedim>
-void test(std::string filename) {
+void test(std::string filename)
+{
 
-    Triangulation<dim, spacedim> triangulation;
-    GridIn<dim, spacedim> gi;
+  Triangulation<dim, spacedim> triangulation;
+  GridIn<dim, spacedim> gi;
 
-    gi.attach_triangulation (triangulation);
-    std::ifstream in (filename.c_str());
-    gi.read_ucd (in);
+  gi.attach_triangulation (triangulation);
+  std::ifstream in (filename.c_str());
+  gi.read_ucd (in);
 
-    const QGauss<dim> quadrature(2);
-    const FE_Q<dim,spacedim> dummy_fe (1);
-    DoFHandler<dim,spacedim> dof_handler (triangulation);
+  const QGauss<dim> quadrature(2);
+  const FE_Q<dim,spacedim> dummy_fe (1);
+  DoFHandler<dim,spacedim> dof_handler (triangulation);
 
-    FEValues<dim,spacedim> fe_values (dummy_fe, quadrature,
-				      update_JxW_values | 
-				      update_cell_normal_vectors | 
-				      update_quadrature_points);
-  
-    dof_handler.distribute_dofs (dummy_fe);
+  FEValues<dim,spacedim> fe_values (dummy_fe, quadrature,
+                                    update_JxW_values |
+                                    update_cell_normal_vectors |
+                                    update_quadrature_points);
 
-    double area = 0;
-    double normals = 0;
+  dof_handler.distribute_dofs (dummy_fe);
 
-    typename DoFHandler<dim,spacedim>::active_cell_iterator
-	cell = dof_handler.begin_active(),
-	endc = dof_handler.end();
+  double area = 0;
+  double normals = 0;
 
-    std::vector<Point<spacedim> > expectedcellnormals(fe_values.n_quadrature_points);
+  typename DoFHandler<dim,spacedim>::active_cell_iterator
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+  std::vector<Point<spacedim> > expectedcellnormals(fe_values.n_quadrature_points);
+
+  for (; cell!=endc; ++cell)
     {
-	fe_values.reinit (cell);    
-	const std::vector<Point<spacedim> > & cellnormals = fe_values.get_cell_normal_vectors();
-	const std::vector<Point<spacedim> > & quad_points = fe_values.get_quadrature_points();
-      
-	for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
-	{
-	    expectedcellnormals[i] = quad_points[i]/quad_points[i].norm();
-	    area += fe_values.JxW (i);
-	    normals += (expectedcellnormals[i]-cellnormals[i]).norm();
-	}
+      fe_values.reinit (cell);
+      const std::vector<Point<spacedim> > &cellnormals = fe_values.get_cell_normal_vectors();
+      const std::vector<Point<spacedim> > &quad_points = fe_values.get_quadrature_points();
+
+      for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
+        {
+          expectedcellnormals[i] = quad_points[i]/quad_points[i].norm();
+          area += fe_values.JxW (i);
+          normals += (expectedcellnormals[i]-cellnormals[i]).norm();
+        }
     };
 
-    deallog<<"Approximate measure of hyper sphere = "<<area<<std::endl;
-    deallog<<"Error = "<<std::fabs(dim*2*numbers::PI-area)<<std::endl;
-    deallog << "Average error in norms: " 
-	    << ( normals/dof_handler.get_tria().n_active_cells()
-		 /fe_values.n_quadrature_points) 
-	    << std::endl;
+  deallog<<"Approximate measure of hyper sphere = "<<area<<std::endl;
+  deallog<<"Error = "<<std::fabs(dim*2*numbers::PI-area)<<std::endl;
+  deallog << "Average error in norms: "
+          << ( normals/dof_handler.get_tria().n_active_cells()
+               /fe_values.n_quadrature_points)
+          << std::endl;
 
 }
 
 
 
-int main () 
+int main ()
 {
-    deallog.attach(logfile);
-    deallog.depth_console(0);
-  
-    deallog<<"Test <1,2>"<<std::endl;
-    test<1,2>("grids/circle_1.inp");
-    test<1,2>("grids/circle_2.inp");
-    test<1,2>("grids/circle_3.inp");
-    test<1,2>("grids/circle_4.inp");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
 
-    deallog<<"Test <2,3>"<<std::endl;
-    test<2,3>("grids/sphere_1.inp"); 
-    test<2,3>("grids/sphere_2.inp");
-    test<2,3>("grids/sphere_3.inp");
-    test<2,3>("grids/sphere_4.inp");
-  
-    return 0;
+  deallog<<"Test <1,2>"<<std::endl;
+  test<1,2>("grids/circle_1.inp");
+  test<1,2>("grids/circle_2.inp");
+  test<1,2>("grids/circle_3.inp");
+  test<1,2>("grids/circle_4.inp");
+
+  deallog<<"Test <2,3>"<<std::endl;
+  test<2,3>("grids/sphere_1.inp");
+  test<2,3>("grids/sphere_2.inp");
+  test<2,3>("grids/sphere_3.inp");
+  test<2,3>("grids/sphere_4.inp");
+
+  return 0;
 }

@@ -41,70 +41,70 @@
 template <int dim>
 class MyBoundary : public Boundary<dim>
 {
-    virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
-      {
-	deallog << "Finding point between "
-		<< line->vertex(0) << " and "
-		<< line->vertex(1) << std::endl;
+  virtual Point<dim>
+  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+  {
+    deallog << "Finding point between "
+            << line->vertex(0) << " and "
+            << line->vertex(1) << std::endl;
 
-					 // in 2d, find a point that
-					 // lies on the opposite side
-					 // of the quad. in 3d, choose
-					 // the midpoint of the edge
-	if (dim == 2)
-	  return Point<dim>(0,1.25);
-	else
-	  return (line->vertex(0) + line->vertex(1)) / 2;
-      }
+    // in 2d, find a point that
+    // lies on the opposite side
+    // of the quad. in 3d, choose
+    // the midpoint of the edge
+    if (dim == 2)
+      return Point<dim>(0,1.25);
+    else
+      return (line->vertex(0) + line->vertex(1)) / 2;
+  }
 
-    virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
-      {
-	deallog << "Finding point between "
-		<< quad->vertex(0) << " and "
-		<< quad->vertex(1) << " and "
-		<< quad->vertex(2) << " and "
-		<< quad->vertex(3) << std::endl;
+  virtual Point<dim>
+  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+  {
+    deallog << "Finding point between "
+            << quad->vertex(0) << " and "
+            << quad->vertex(1) << " and "
+            << quad->vertex(2) << " and "
+            << quad->vertex(3) << std::endl;
 
-	return Point<dim>(0,0,1.25);
-      }
+    return Point<dim>(0,0,1.25);
+  }
 
-    virtual
-    Point<dim>
-    project_to_surface (const typename Triangulation<dim>::line_iterator &,
-			const Point<dim> &p) const
-      {
-	deallog << "Projecting line point " << p << std::endl;
+  virtual
+  Point<dim>
+  project_to_surface (const typename Triangulation<dim>::line_iterator &,
+                      const Point<dim> &p) const
+  {
+    deallog << "Projecting line point " << p << std::endl;
 
-	if (dim == 2)
-	  return Point<dim>(p[0], 1.25-2.25*std::fabs(p[0]));
-	else
-	  return p;
-      }
+    if (dim == 2)
+      return Point<dim>(p[0], 1.25-2.25*std::fabs(p[0]));
+    else
+      return p;
+  }
 
-    virtual
-    Point<dim>
-    project_to_surface (const typename Triangulation<dim>::quad_iterator &,
-			const Point<dim> &p) const
-      {
-	deallog << "Projecting quad point " << p << std::endl;
+  virtual
+  Point<dim>
+  project_to_surface (const typename Triangulation<dim>::quad_iterator &,
+                      const Point<dim> &p) const
+  {
+    deallog << "Projecting quad point " << p << std::endl;
 
-	Assert (dim == 3, ExcInternalError());
+    Assert (dim == 3, ExcInternalError());
 
-	return Point<dim>(p[0], p[1],
-			  1.25-2.25*std::max(std::fabs(p[0]),
-					     std::fabs(p[1])));
-      }
+    return Point<dim>(p[0], p[1],
+                      1.25-2.25*std::max(std::fabs(p[0]),
+                                         std::fabs(p[1])));
+  }
 
-    virtual
-    Point<dim>
-    project_to_surface (const typename Triangulation<dim>::hex_iterator &,
-			const Point<dim> &) const
-      {
-	Assert (false, ExcInternalError());
-	return Point<dim>();
-      }
+  virtual
+  Point<dim>
+  project_to_surface (const typename Triangulation<dim>::hex_iterator &,
+                      const Point<dim> &) const
+  {
+    Assert (false, ExcInternalError());
+    return Point<dim>();
+  }
 };
 
 
@@ -114,18 +114,18 @@ void check ()
 {
   MyBoundary<dim> my_boundary;
 
-				   // create a single square/cube
+  // create a single square/cube
   Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
   GridGenerator::hyper_cube (coarse_grid, -1, 1);
 
-				   // set bottom face to use MyBoundary
+  // set bottom face to use MyBoundary
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     if (coarse_grid.begin_active()->face(f)->center()[dim-1] == -1)
       coarse_grid.begin_active()->face(f)->set_boundary_indicator (1);
   coarse_grid.set_boundary (1, my_boundary);
 
-				   // now try to refine this one
-				   // cell. we should get an exception
+  // now try to refine this one
+  // cell. we should get an exception
   try
     {
       coarse_grid.begin_active()->set_refine_flag ();
@@ -134,17 +134,17 @@ void check ()
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
       typename Triangulation<dim>::DistortedCellList
-	subset = GridTools::fix_up_distorted_child_cells (dcv,
-							  coarse_grid);
+      subset = GridTools::fix_up_distorted_child_cells (dcv,
+                                                        coarse_grid);
       Assert (subset.distorted_cells.size() == 1,
-	      ExcInternalError());
+              ExcInternalError());
     }
 
   Assert (coarse_grid.n_levels() == 2, ExcInternalError());
   Assert (coarse_grid.n_active_cells() == 1<<dim, ExcInternalError());
 
-				   // output the coordinates of the
-				   // child cells
+  // output the coordinates of the
+  // child cells
   GridOut().write_gnuplot (coarse_grid, deallog.get_file_stream());
 }
 

@@ -33,8 +33,8 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-		      const hp::FECollection<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -42,13 +42,13 @@ void test (const Triangulation<dim>& tr,
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     {
       deallog << "FE=" << fe[0].get_name()
-	      << ", case=" << i
-	      << std::endl;
+              << ", case=" << i
+              << std::endl;
 
       std::set<types::boundary_id> boundary_ids;
       for (unsigned int j=0; j<=i; ++j)
-	boundary_ids.insert (j);
-      
+        boundary_ids.insert (j);
+
       ConstraintMatrix cm;
       VectorTools::compute_no_normal_flux_constraints (dof, 0, boundary_ids, cm);
 
@@ -65,7 +65,7 @@ void test_hyper_cube()
 
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     tr.begin_active()->face(i)->set_boundary_indicator (i);
-  
+
   tr.refine_global(2);
 
   for (unsigned int degree=1; degree<4; ++degree)
@@ -80,7 +80,7 @@ int main()
 {
   std::ofstream logfile ("no_flux_hp_01/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
   deallog.threshold_double(1.e-12);

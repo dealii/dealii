@@ -52,43 +52,43 @@
 template<int dim>
 class FilteredDataOut : public DataOut<dim>
 {
-  public:
-    FilteredDataOut (const unsigned int subdomain_id)
-		    :
-		    subdomain_id (subdomain_id)
-      {}
+public:
+  FilteredDataOut (const unsigned int subdomain_id)
+    :
+    subdomain_id (subdomain_id)
+  {}
 
-    virtual typename DoFHandler<dim>::cell_iterator
-    first_cell ()
+  virtual typename DoFHandler<dim>::cell_iterator
+  first_cell ()
+  {
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = this->dofs->begin_active();
+    while ((cell != this->dofs->end()) &&
+           (cell->subdomain_id() != subdomain_id))
+      ++cell;
+
+    return cell;
+  }
+
+  virtual typename DoFHandler<dim>::cell_iterator
+  next_cell (const typename DoFHandler<dim>::cell_iterator &old_cell)
+  {
+    if (old_cell != this->dofs->end())
       {
-	typename DoFHandler<dim>::active_cell_iterator
-	  cell = this->dofs->begin_active();
-	while ((cell != this->dofs->end()) &&
-	       (cell->subdomain_id() != subdomain_id))
-	  ++cell;
+        const IteratorFilters::SubdomainEqualTo
+        predicate(subdomain_id);
 
-	return cell;
+        return
+          ++(FilteredIterator
+             <typename DoFHandler<dim>::active_cell_iterator>
+             (predicate,old_cell));
       }
+    else
+      return old_cell;
+  }
 
-    virtual typename DoFHandler<dim>::cell_iterator
-    next_cell (const typename DoFHandler<dim>::cell_iterator &old_cell)
-      {
-	if (old_cell != this->dofs->end())
-	  {
-	    const IteratorFilters::SubdomainEqualTo
-	      predicate(subdomain_id);
-
-	    return
-	      ++(FilteredIterator
-		 <typename DoFHandler<dim>::active_cell_iterator>
-		 (predicate,old_cell));
-	  }
-	else
-	  return old_cell;
-      }
-
-  private:
-    const unsigned int subdomain_id;
+private:
+  const unsigned int subdomain_id;
 };
 
 
@@ -106,33 +106,33 @@ void test()
 
 
   GridGenerator::hyper_shell (tr,
-			      Point<dim>(),
-			      R0,
-			      R1,
-			      12,
-			      true);
+                              Point<dim>(),
+                              R0,
+                              R1,
+                              12,
+                              true);
   static HyperShellBoundary<dim> boundary;
   tr.set_boundary (0, boundary);
   tr.set_boundary (1, boundary);
 
   tr.refine_global (1);
-  for (unsigned int step=0; step<20;++step)
-        {
-          typename Triangulation<dim>::active_cell_iterator
-            cell = tr.begin_active(),
-            endc = tr.end();
+  for (unsigned int step=0; step<20; ++step)
+    {
+      typename Triangulation<dim>::active_cell_iterator
+      cell = tr.begin_active(),
+      endc = tr.end();
 
-            for (; cell!=endc; ++cell)
-                if (std::rand()%42==1)
-                cell->set_refine_flag ();
+      for (; cell!=endc; ++cell)
+        if (std::rand()%42==1)
+          cell->set_refine_flag ();
 
-         tr.execute_coarsening_and_refinement ();
-        }
+      tr.execute_coarsening_and_refinement ();
+    }
 
   DoFHandler<dim> dofh(tr);
 
   static FESystem<dim> fe (FE_Q<dim>(1+1), dim,
-			   FE_Q<dim>(1), 1);
+                           FE_Q<dim>(1), 1);
 
   dofh.distribute_dofs (fe);
 
@@ -158,65 +158,65 @@ void test()
   velocity_mask[dim] = false;
 
   VectorTools::interpolate_boundary_values (dofh,
-					      0,
-					      ZeroFunction<dim>(dim+1),
-					      cm,
-					      velocity_mask);
+                                            0,
+                                            ZeroFunction<dim>(dim+1),
+                                            cm,
+                                            velocity_mask);
 
-    std::set<types::boundary_id> no_normal_flux_boundaries;
-    no_normal_flux_boundaries.insert (1);
+  std::set<types::boundary_id> no_normal_flux_boundaries;
+  no_normal_flux_boundaries.insert (1);
 
 
-    VectorTools::compute_no_normal_flux_constraints (dofh, 0,
-						     no_normal_flux_boundaries,
-						     cm);
+  VectorTools::compute_no_normal_flux_constraints (dofh, 0,
+                                                   no_normal_flux_boundaries,
+                                                   cm);
 
-    cm.close ();
+  cm.close ();
 
-    cm.distribute(x);
-    x_rel = x;
+  cm.distribute(x);
+  x_rel = x;
 
-    std::vector<std::string> joint_solution_names (dim, "vel");
-    joint_solution_names.push_back ("p");
+  std::vector<std::string> joint_solution_names (dim, "vel");
+  joint_solution_names.push_back ("p");
 
-    FilteredDataOut<dim> data_out (tr.locally_owned_subdomain());
-    data_out.attach_dof_handler (dofh);
+  FilteredDataOut<dim> data_out (tr.locally_owned_subdomain());
+  data_out.attach_dof_handler (dofh);
 
-    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      data_component_interpretation
-      (dim+1, DataComponentInterpretation::component_is_scalar);
-    for (unsigned int i=0; i<dim; ++i)
-      data_component_interpretation[i]
-	= DataComponentInterpretation::component_is_part_of_vector;
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+  data_component_interpretation
+  (dim+1, DataComponentInterpretation::component_is_scalar);
+  for (unsigned int i=0; i<dim; ++i)
+    data_component_interpretation[i]
+      = DataComponentInterpretation::component_is_part_of_vector;
 
-    data_out.add_data_vector(x_rel, joint_solution_names,
-			     DataOut<dim>::type_dof_data,
-			     data_component_interpretation);
-    data_out.build_patches (4);
-    const std::string filename = ("p4est_2d_constraintmatrix_03/solution." +
-				  Utilities::int_to_string
-				  (tr.locally_owned_subdomain(), 4) +
-				  ".d2");
-    std::ofstream output (filename.c_str());
-    data_out.write_deal_II_intermediate (output);
+  data_out.add_data_vector(x_rel, joint_solution_names,
+                           DataOut<dim>::type_dof_data,
+                           data_component_interpretation);
+  data_out.build_patches (4);
+  const std::string filename = ("p4est_2d_constraintmatrix_03/solution." +
+                                Utilities::int_to_string
+                                (tr.locally_owned_subdomain(), 4) +
+                                ".d2");
+  std::ofstream output (filename.c_str());
+  data_out.write_deal_II_intermediate (output);
 
-    TrilinosWrappers::Vector x_dub;
-    x_dub.reinit(dof_set.size());
-    x_dub = x_rel;
+  TrilinosWrappers::Vector x_dub;
+  x_dub.reinit(dof_set.size());
+  x_dub = x_rel;
 
-    if (myid==0)
-      {
-	std::ofstream file((std::string("p4est_2d_constraintmatrix_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
-	file << "**** proc " << myid << std::endl;
-	x_dub.print(file);
-      }
+  if (myid==0)
+    {
+      std::ofstream file((std::string("p4est_2d_constraintmatrix_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
+      file << "**** proc " << myid << std::endl;
+      x_dub.print(file);
+    }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);
 
-    if (myid==0)
-      {
-	cat_file((std::string("p4est_2d_constraintmatrix_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(0)).c_str());
-      }
+  if (myid==0)
+    {
+      cat_file((std::string("p4est_2d_constraintmatrix_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(0)).c_str());
+    }
 
   tr.set_boundary (0);
   tr.set_boundary (1);

@@ -29,8 +29,8 @@ void test ()
 {
   Tensor<2,dim> t;
 
-				   // choose the same symmetric tensor
-				   // as in symmetric_tensor_09
+  // choose the same symmetric tensor
+  // as in symmetric_tensor_09
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=i; j<dim; ++j)
       t[i][j] = t[j][i] = (1.+(i+1)*(j*2));
@@ -38,11 +38,11 @@ void test ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       deallog << i << ' ' << j << ' ' << t[i][j] << std::endl;
-  
+
   deallog << determinant(t) << std::endl;
 }
 
-  
+
 
 
 int main ()
@@ -55,6 +55,6 @@ int main ()
 
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

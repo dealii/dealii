@@ -46,15 +46,15 @@ int main()
   deallog.threshold_double(1.e-10);
 
   Threads::Thread<int> t;
-				   // join non-existing thread
+  // join non-existing thread
   deallog << (t.valid() ? "true" : "false")
-	  << std::endl;
+          << std::endl;
 
-				   // now assign a thread object and
-				   // wait for it
+  // now assign a thread object and
+  // wait for it
   t = Threads::new_thread (worker);
   deallog << (t.valid() ? "true" : "false")
-	  << std::endl;
+          << std::endl;
   deallog << "return value = " << t.return_value()
-	  << std::endl;
+          << std::endl;
 }

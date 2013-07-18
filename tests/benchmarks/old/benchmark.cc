@@ -42,29 +42,29 @@ int main()
       deallog << "size = " << nx << "  dim = " << dim << std::endl;
 
       start = clock();
-      for (unsigned int i=0;i<ITER;i++)
-	{
-	  u.reinit(dim);
-	  v.reinit(dim);
-	}
+      for (unsigned int i=0; i<ITER; i++)
+        {
+          u.reinit(dim);
+          v.reinit(dim);
+        }
       diff = clock()-start;
       deallog << "reinit: " << double(diff)/(2*ITER) << std::endl;
 
       start = clock();
-      for (unsigned int i=0;i<ITER;i++)
-	{
-	  u = (double) i;
-	}
+      for (unsigned int i=0; i<ITER; i++)
+        {
+          u = (double) i;
+        }
       diff = clock()-start;
       deallog << "operator=(double): " << double(diff)/ITER << std::endl;
 
       QuickMatrix<double> A(nx,nx);
 
       start = clock();
-      for (unsigned int i=0;i<ITER;i++)
-	{
-	  A.vmult(v,u);
-	}
+      for (unsigned int i=0; i<ITER; i++)
+        {
+          A.vmult(v,u);
+        }
       diff = clock()-start;
       deallog << "vmult: " << double(diff)/ITER << std::endl;
     }

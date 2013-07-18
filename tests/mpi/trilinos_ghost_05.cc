@@ -19,10 +19,10 @@
 // check correct behaviour of Trilinos ghosted vectors
 // check if assignment from a normal vector works correctly and updates the ghost values
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/trilinos_vector.h>    
+#include <deal.II/lac/trilinos_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -38,8 +38,8 @@ void test ()
 
   unsigned int ghostel=(numproc>1)?2:1;
 
-				   // each processor owns 2 indices and all
-                                   // are ghosting one element
+  // each processor owns 2 indices and all
+  // are ghosting one element
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
   IndexSet local_relevant(numproc*2);
@@ -49,11 +49,11 @@ void test ()
   TrilinosWrappers::MPI::Vector x(local_active, MPI_COMM_WORLD);
   TrilinosWrappers::MPI::Vector v(local_relevant, MPI_COMM_WORLD);
 
-                                     // set local values
+  // set local values
   x(myid*2)=myid*2.0;
   x(myid*2+1)=myid*2.0+1.0;
 
-				   // transfer to ghosted vector v and check
+  // transfer to ghosted vector v and check
   x.compress(VectorOperation::insert);
   v=x;
 
@@ -61,10 +61,10 @@ void test ()
   Assert(v(myid*2+1) == myid*2.0+1.0, ExcInternalError());
   Assert(v(ghostel) == ghostel, ExcInternalError());
 
-				   // change x, transfer, and check again
+  // change x, transfer, and check again
   x*=2.0;
   v=x;
-  
+
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
   Assert(v(ghostel) == 2.0*ghostel, ExcInternalError());
@@ -74,7 +74,7 @@ void test ()
       deallog << myid*2 << ":" << v(myid*2) << std::endl;
       deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
     }
-  
+
   if (myid == 0)
     deallog << "OK" << std::endl;
 }

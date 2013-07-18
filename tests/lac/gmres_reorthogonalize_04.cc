@@ -28,24 +28,25 @@
 // reimplements things from vector.templates.h in another way which is more
 // prone to roundoff, the linker will select this version instead of the one
 // in the deal.II library
-namespace dealii{
-template <typename Number>
-template <typename Number2>
-Number Vector<Number>::operator* (const Vector<Number2> &v) const
+namespace dealii
 {
-  Number sum = 0;
-  for (unsigned int i=0; i<size(); ++i)
-    sum += val[i] * v.val[i];
-  return sum;
-}
-template <typename Number>
-typename Vector<Number>::real_type Vector<Number>::l2_norm () const
-{
-  real_type sum = 0;
-  for (unsigned int i=0; i<size(); ++i)
-    sum += val[i] * val[i];
-  return std::sqrt(sum);
-}
+  template <typename Number>
+  template <typename Number2>
+  Number Vector<Number>::operator* (const Vector<Number2> &v) const
+  {
+    Number sum = 0;
+    for (unsigned int i=0; i<size(); ++i)
+      sum += val[i] * v.val[i];
+    return sum;
+  }
+  template <typename Number>
+  typename Vector<Number>::real_type Vector<Number>::l2_norm () const
+  {
+    real_type sum = 0;
+    for (unsigned int i=0; i<size(); ++i)
+      sum += val[i] * val[i];
+    return std::sqrt(sum);
+  }
 }
 
 

@@ -42,58 +42,58 @@ int main ()
   const double outer_radius=5.;
   GridGenerator::hyper_shell(tria, origin, inner_radius, outer_radius, 8);
   tria.refine_global(2);
-  
-				   // build up a map of vertex indices
-				   // of boundary vertices to the new
-				   // boundary points
+
+  // build up a map of vertex indices
+  // of boundary vertices to the new
+  // boundary points
   std::map<types::global_dof_index,Point<dim> > new_points;
-  
-				   // new center and new radius
-				   // of the inner circle.
+
+  // new center and new radius
+  // of the inner circle.
   const Point<dim> n_center(0,-1);
   const double n_radius=0.5;
 
   Triangulation<dim>::cell_iterator cell=tria.begin_active(),
-					     endc=tria.end();
+                                    endc=tria.end();
   Triangulation<dim>::face_iterator face;
   for (; cell!=endc; ++cell)
     {
       if (cell->at_boundary())
-	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-	  {
-	    face=cell->face(face_no);
-	    if (face->at_boundary())
-	      for (unsigned int vertex_no=0;
-		   vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
-		{
-		  const Point<dim> &v=face->vertex(vertex_no);
-		  if (std::fabs(std::sqrt(v.square())-outer_radius)<1e-12)
-		    {
-						       // leave the
-						       // point, where
-						       // they are.
-		      new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
-			face->vertex_index(vertex_no), v));
-		    }
-		  else if (std::fabs(std::sqrt(v.square())-inner_radius)<1e-12)
-		    {
-						       // move the
-						       // center of
-						       // the inner
-						       // circle to
-						       // (-1,0) and
-						       // take half
-						       // the radius
-						       // of the
-						       // circle.
-		      new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
-			face->vertex_index(vertex_no), n_radius/inner_radius*v+n_center));
-		      face->set_boundary_indicator(1);
-		    }
-		  else
-		    Assert(false, ExcInternalError());
-		}  
-	  }
+        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+          {
+            face=cell->face(face_no);
+            if (face->at_boundary())
+              for (unsigned int vertex_no=0;
+                   vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
+                {
+                  const Point<dim> &v=face->vertex(vertex_no);
+                  if (std::fabs(std::sqrt(v.square())-outer_radius)<1e-12)
+                    {
+                      // leave the
+                      // point, where
+                      // they are.
+                      new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
+                                          face->vertex_index(vertex_no), v));
+                    }
+                  else if (std::fabs(std::sqrt(v.square())-inner_radius)<1e-12)
+                    {
+                      // move the
+                      // center of
+                      // the inner
+                      // circle to
+                      // (-1,0) and
+                      // take half
+                      // the radius
+                      // of the
+                      // circle.
+                      new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
+                                          face->vertex_index(vertex_no), n_radius/inner_radius*v+n_center));
+                      face->set_boundary_indicator(1);
+                    }
+                  else
+                    Assert(false, ExcInternalError());
+                }
+          }
     }
 
   GridGenerator::laplace_transformation (tria, new_points);
@@ -105,6 +105,6 @@ int main ()
   grid_out.write_eps(tria, eps_stream2, &mapping);
 
   tria.clear();
-  
+
   return 0;
 }

@@ -48,17 +48,21 @@
 template<int dim>
 class MySquareFunction : public Function<dim>
 {
-  public:
-    MySquareFunction () : Function<dim>(2) {}
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component) const
-      {	return (component+1)*p.square(); }
-    
-    virtual void   vector_value (const Point<dim>   &p,
-				 Vector<double>     &values) const
-      { values(0) = value(p,0);
-	values(1) = value(p,1); }
+public:
+  MySquareFunction () : Function<dim>(2) {}
+
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int  component) const
+  {
+    return (component+1)*p.square();
+  }
+
+  virtual void   vector_value (const Point<dim>   &p,
+                               Vector<double>     &values) const
+  {
+    values(0) = value(p,0);
+    values(1) = value(p,1);
+  }
 };
 
 
@@ -67,7 +71,7 @@ class MySquareFunction : public Function<dim>
 template <int dim>
 void
 check_boundary (const hp::DoFHandler<dim> &dof,
-		const hp::MappingCollection<dim>    &mapping)
+                const hp::MappingCollection<dim>    &mapping)
 {
   MySquareFunction<dim> coefficient;
   typename FunctionMap<dim>::type function_map;
@@ -75,41 +79,41 @@ check_boundary (const hp::DoFHandler<dim> &dof,
 
   hp::QCollection<dim-1> face_quadrature;
   face_quadrature.push_back (QGauss<dim-1>(6));
-  
+
   std::vector<types::global_dof_index> dof_to_boundary_mapping;
   DoFTools::map_dof_to_boundary_indices (dof,
-					 dof_to_boundary_mapping);
+                                         dof_to_boundary_mapping);
 
   SparsityPattern sparsity(dof.n_boundary_dofs(function_map),
-			   dof.max_couplings_between_boundary_dofs());
+                           dof.max_couplings_between_boundary_dofs());
   DoFTools::make_boundary_sparsity_pattern (dof,
-					    function_map,
-					    dof_to_boundary_mapping,
-					    sparsity);
+                                            function_map,
+                                            dof_to_boundary_mapping,
+                                            sparsity);
   sparsity.compress ();
 
   SparseMatrix<double> matrix;
   matrix.reinit (sparsity);
-  
+
   Vector<double> rhs (dof.n_boundary_dofs(function_map));
   MatrixTools::
-    create_boundary_mass_matrix (mapping, dof,
-				 face_quadrature, matrix,
-				 function_map, rhs,
-				 dof_to_boundary_mapping,
-				 &coefficient);
+  create_boundary_mass_matrix (mapping, dof,
+                               face_quadrature, matrix,
+                               function_map, rhs,
+                               dof_to_boundary_mapping,
+                               &coefficient);
 
-				   // since we only generate
-				   // output with two digits after
-				   // the dot, and since matrix
-				   // entries are usually in the
-				   // range of 1 or below,
-				   // multiply matrix by 100 to
-				   // make test more sensitive
+  // since we only generate
+  // output with two digits after
+  // the dot, and since matrix
+  // entries are usually in the
+  // range of 1 or below,
+  // multiply matrix by 100 to
+  // make test more sensitive
   for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
     matrix.global_entry(i) *= 100;
-  
-				   // finally write out matrix
+
+  // finally write out matrix
   matrix.print (deallog.get_file_stream());
 }
 
@@ -117,7 +121,7 @@ check_boundary (const hp::DoFHandler<dim> &dof,
 
 void
 check_boundary (const hp::DoFHandler<1> &,
-		const hp::MappingCollection<1>    &)
+                const hp::MappingCollection<1> &)
 {}
 
 
@@ -127,7 +131,7 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -138,27 +142,27 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-				   // create a system element composed
-				   // of one Q1 and one Q2 element
+  // create a system element composed
+  // of one Q1 and one Q2 element
   hp::FECollection<dim> element;
   element.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
-				    FE_Q<dim>(2), 1));
+                                    FE_Q<dim>(2), 1));
   hp::DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // use a more complicated mapping
-				   // of the domain and a quadrature
-				   // formula suited to the elements
-				   // we have here
+  // use a more complicated mapping
+  // of the domain and a quadrature
+  // formula suited to the elements
+  // we have here
   hp::MappingCollection<dim> mapping;
   mapping.push_back (MappingQ<dim>(3));
 
   hp::QCollection<dim> quadrature;
   quadrature.push_back (QGauss<dim>(6));
 
-				   // create sparsity pattern. note
-				   // that different components should
-				   // not couple, so use pattern
+  // create sparsity pattern. note
+  // that different components should
+  // not couple, so use pattern
   SparsityPattern sparsity (dof.n_dofs(), dof.n_dofs());
   std::vector<std::vector<bool> > mask (2, std::vector<bool>(2, false));
   mask[0][0] = mask[1][1] = true;
@@ -168,11 +172,11 @@ check ()
   constraints.close ();
   constraints.condense (sparsity);
   sparsity.compress ();
-  
+
   SparseMatrix<double> matrix;
 
   Functions::ExpFunction<dim> coefficient;
-  
+
   typename FunctionMap<dim>::type function_map;
   function_map[0] = &coefficient;
 
@@ -180,31 +184,31 @@ check ()
     {
       matrix.reinit(sparsity);
       switch (test)
-	{
-	  case 0:
-		MatrixTools::
-		  create_mass_matrix (mapping, dof,
-				      quadrature, matrix, &coefficient);
-		break;
-	  case 1:
-		MatrixTools::
-		  create_laplace_matrix (mapping, dof,
-					 quadrature, matrix, &coefficient);
-		break;
-	  default:
-		Assert (false, ExcInternalError());
-	};
+        {
+        case 0:
+          MatrixTools::
+          create_mass_matrix (mapping, dof,
+                              quadrature, matrix, &coefficient);
+          break;
+        case 1:
+          MatrixTools::
+          create_laplace_matrix (mapping, dof,
+                                 quadrature, matrix, &coefficient);
+          break;
+        default:
+          Assert (false, ExcInternalError());
+        };
 
-				       // since we only generate
-				       // output with two digits after
-				       // the dot, and since matrix
-				       // entries are usually in the
-				       // range of 1 or below,
-				       // multiply matrix by 100 to
-				       // make test more sensitive
+      // since we only generate
+      // output with two digits after
+      // the dot, and since matrix
+      // entries are usually in the
+      // range of 1 or below,
+      // multiply matrix by 100 to
+      // make test more sensitive
       for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
-	deallog.get_file_stream() << matrix.global_entry(i) * 100
-				  << std::endl;
+        deallog.get_file_stream() << matrix.global_entry(i) * 100
+                                  << std::endl;
     };
 
   if (dim > 1)
@@ -217,7 +221,7 @@ int main ()
 {
   std::ofstream logfile ("matrices/output");
   logfile.precision (2);
-  logfile.setf(std::ios::fixed);  
+  logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
   deallog.depth_console (0);
 

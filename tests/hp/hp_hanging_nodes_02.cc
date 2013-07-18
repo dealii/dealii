@@ -57,7 +57,7 @@ std::ofstream logfile("hp_hanging_nodes_02/output");
 
 template <int dim>
 void run (bool random_p,
-	  unsigned int *indx)
+          unsigned int *indx)
 {
   Triangulation<dim>     triangulation;
   hp::FECollection<dim>              fe;
@@ -65,9 +65,9 @@ void run (bool random_p,
   ConstraintMatrix     hanging_node_constraints;
 
   FE_Q<dim> fe_1 (indx[0]),
-    fe_2 (indx[1]),
-    fe_3 (indx[2]),
-    fe_4 (indx[3]);
+       fe_2 (indx[1]),
+       fe_3 (indx[2]),
+       fe_4 (indx[3]);
 
   fe.push_back (fe_1);
   fe.push_back (fe_2);
@@ -77,48 +77,48 @@ void run (bool random_p,
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (5-dim);
   deallog << "Number of active cells: "
-	    << triangulation.n_active_cells()
-	    << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl;
   deallog << "Total number of cells: "
-	    << triangulation.n_cells()
-	    << std::endl;
+          << triangulation.n_cells()
+          << std::endl;
 
-				   // Now to the p-Method. Assign
-				   // random active_fe_indices to the
-				   // different cells.
+  // Now to the p-Method. Assign
+  // random active_fe_indices to the
+  // different cells.
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active (),
-						     endc = dof_handler.end ();
+                                                     endc = dof_handler.end ();
   if (random_p)
     {
       for (; cell != endc; ++cell)
-	{
-	  cell->set_active_fe_index ((int)(4.0 * (double) random () / (double) RAND_MAX));
-	}
+        {
+          cell->set_active_fe_index ((int)(4.0 * (double) random () / (double) RAND_MAX));
+        }
     }
   else
     {
       unsigned int cell_no = 0;
       for (; cell != endc; ++cell)
-	{
-	  if (cell_no >= triangulation.n_active_cells () / 2)
-	    cell->set_active_fe_index (1);
-	  else
-	    cell->set_active_fe_index (0);
-	}
+        {
+          if (cell_no >= triangulation.n_active_cells () / 2)
+            cell->set_active_fe_index (1);
+          else
+            cell->set_active_fe_index (0);
+        }
     }
 
 
   dof_handler.distribute_dofs (fe);
   deallog << "Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
-	    << std::endl;
+          << dof_handler.n_dofs()
+          << std::endl;
 
-				   // Create constraints which stem from
-				   // the different polynomial degrees on
-				   // the different elements.
+  // Create constraints which stem from
+  // the different polynomial degrees on
+  // the different elements.
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
+                                           hanging_node_constraints);
 
   hanging_node_constraints.print (deallog.get_file_stream ());
 
@@ -146,9 +146,9 @@ int main ()
   deallog.threshold_double(1.e-10);
 
   unsigned int index[] =
-    {
-	  1,2,3,4,5,6,7
-    };
+  {
+    1,2,3,4,5,6,7
+  };
 
 
   deallog << "Testing Order 1" << std::endl;

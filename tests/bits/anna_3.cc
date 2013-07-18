@@ -45,27 +45,27 @@
 template <int dim>
 class SystemTest
 {
-  public:
-    SystemTest ();
-    void run ();
+public:
+  SystemTest ();
+  void run ();
 
-  private:
-    void make_grid_and_dofs ();
-    void check ();
+private:
+  void make_grid_and_dofs ();
+  void check ();
 
 
-    Triangulation<dim>     triangulation;
-    FESystem<dim>          fe;
-    DoFHandler<dim>        dof_handler;
+  Triangulation<dim>     triangulation;
+  FESystem<dim>          fe;
+  DoFHandler<dim>        dof_handler;
 
 
 };
 
 template <int dim>
 SystemTest<dim>::SystemTest () :
-                fe (FE_Nedelec<dim>(0), 2,
-                    FE_Q<dim>(1), 1),
-		dof_handler (triangulation)
+  fe (FE_Nedelec<dim>(0), 2,
+      FE_Q<dim>(1), 1),
+  dof_handler (triangulation)
 {}
 
 
@@ -102,8 +102,8 @@ void SystemTest<dim>::check ()
           deallog << "  DoF " << i << std::endl;
     };
 
-  std::vector<types::global_dof_index> dofs_per_component (fe.n_components(), 
-      static_cast<types::global_dof_index>(0));
+  std::vector<types::global_dof_index> dofs_per_component (fe.n_components(),
+                                                           static_cast<types::global_dof_index>(0));
   DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
   deallog << "DoFs per component: ";
   for (unsigned int i=0; i<fe.n_components(); ++i)
@@ -119,8 +119,8 @@ void SystemTest<dim>::run ()
   make_grid_and_dofs ();
   check();
 
-                                   // renumber degrees of freedom and
-                                   // try again
+  // renumber degrees of freedom and
+  // try again
   deallog << std::endl << "*** Renumbering ***" << std::endl;
   DoFRenumbering::component_wise (dof_handler);
   check ();

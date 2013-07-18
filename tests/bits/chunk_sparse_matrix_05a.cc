@@ -35,10 +35,10 @@ void test (const unsigned int chunk_size)
 
   ChunkSparseMatrix<double> m(sp);
 
-                                   // first set a few entries. count how many
-                                   // entries we have. note that for square
-                                   // matrices we also always store the
-                                   // diagonal element
+  // first set a few entries. count how many
+  // entries we have. note that for square
+  // matrices we also always store the
+  // diagonal element
   unsigned int counter = 0;
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
@@ -52,10 +52,10 @@ void test (const unsigned int chunk_size)
 
   if (chunk_size == 1)
     Assert (m.n_nonzero_elements() == counter,
-	    ExcInternalError())
-  else
-    Assert (m.n_nonzero_elements() >= counter,
-	    ExcInternalError());
+            ExcInternalError())
+    else
+      Assert (m.n_nonzero_elements() >= counter,
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -73,32 +73,32 @@ int main ()
     {
       const unsigned int chunk_sizes[] = { 1, 2, 4, 5, 7 };
       for (unsigned int i=0;
-	   i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
-	   ++i)
-	test (chunk_sizes[i]);
+           i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
+           ++i)
+        test (chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
 
       return 1;
     }
   catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

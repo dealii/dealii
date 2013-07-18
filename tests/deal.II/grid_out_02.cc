@@ -40,11 +40,11 @@ std::ofstream logfile("grid_out_02/output");
 
 template <int dim>
 void test ()
-{  
+{
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
   tria.refine_global(2);
-  
+
   GridOut grid_out;
   grid_out.write_dx (tria, logfile);
 

@@ -31,16 +31,16 @@
 using namespace Polynomials;
 
 
-void check_derivatives (const std::vector<Polynomial<double> >& p,
-			const unsigned int                      n_deriv)
+void check_derivatives (const std::vector<Polynomial<double> > &p,
+                        const unsigned int                      n_deriv)
 {
-				// check whether the values and derivatives
-				// are evaluated correctly some randomly
-				// generated points. compare with a polynomial
-				// that is not in product form (we get the
-				// expanded form by adding a dummy polynomial;
-				// addition of polynomials destroys the
-				// product form in the current implementation)
+  // check whether the values and derivatives
+  // are evaluated correctly some randomly
+  // generated points. compare with a polynomial
+  // that is not in product form (we get the
+  // expanded form by adding a dummy polynomial;
+  // addition of polynomials destroys the
+  // product form in the current implementation)
   deallog << "Representation of derivatives up to order " << n_deriv-1 << std::endl;
   std::vector<double> values(n_deriv), values_ref(n_deriv);
   Monomial<double> zero (0,0);
@@ -52,15 +52,15 @@ void check_derivatives (const std::vector<Polynomial<double> >& p,
       q += zero;
       q.value (x, values_ref);
       for (unsigned int i=0; i<n_deriv; ++i)
-	{
-	  deallog << ".";
-	  if (std::fabs (values[i]-values_ref[i]) >
-	      std::max(1e-11,1e-11*std::fabs(values[i])))
-	    deallog << "Error deriv" << i << "  lg y="
-		    << std::log10(std::fabs(values[i]-values_ref[i]))
-		    << ", is: " << values[i] << ", should be: " << values_ref[i]
-		    << std::endl;
-	}
+        {
+          deallog << ".";
+          if (std::fabs (values[i]-values_ref[i]) >
+              std::max(1e-11,1e-11*std::fabs(values[i])))
+            deallog << "Error deriv" << i << "  lg y="
+                    << std::log10(std::fabs(values[i]-values_ref[i]))
+                    << ", is: " << values[i] << ", should be: " << values_ref[i]
+                    << std::endl;
+        }
     }
   deallog << std::endl;
 
@@ -69,7 +69,7 @@ void check_derivatives (const std::vector<Polynomial<double> >& p,
 
 
 void
-check_poly (const Quadrature<1>& q)
+check_poly (const Quadrature<1> &q)
 {
   deallog << "Points: " << q.size() << std::endl;
   std::vector<Polynomial<double> > p = generate_complete_Lagrange_basis(q.get_points());
@@ -106,9 +106,9 @@ int main()
   deallog.pop();
   deallog << std::endl;
 
-				// Lagrange elements on GL points have good
-				// conditioning, so test to some very high
-				// orders
+  // Lagrange elements on GL points have good
+  // conditioning, so test to some very high
+  // orders
   deallog.push("GaussLobatto");
   for (unsigned i=1; i<8; i+=2)
     check_poly (QGaussLobatto<1>(i+1));

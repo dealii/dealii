@@ -30,7 +30,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_nedelec.h>	
+#include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_values.h>
 #include <iomanip>
 #include <fstream>
@@ -54,7 +54,7 @@ void test ()
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("nedelec_1/output");
   deallog.attach(logfile);
@@ -63,6 +63,6 @@ int main ()
 
   test<2> ();
   test<3> ();
-  
+
   return 0;
 }

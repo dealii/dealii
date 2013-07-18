@@ -37,26 +37,27 @@
 template <int dim>
 class F : public Function<dim>
 {
-  public:
-    F() : Function<dim>(2) {}
-    virtual void vector_value (const Point<dim> &p,
-			       Vector<double> &v) const
-      {
-	v = 0;
-	v[0] = p.square();
-      }
+public:
+  F() : Function<dim>(2) {}
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<double> &v) const
+  {
+    v = 0;
+    v[0] = p.square();
+  }
 };
 
 double abs_zero(double a)
 {
-  if( std::abs(a) < 1e-10)
+  if ( std::abs(a) < 1e-10)
     return 0;
   else
     return a;
 }
 
 template <int dim>
-void test() {
+void test()
+{
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(8/dim);
@@ -75,27 +76,27 @@ void test() {
   deallog << "V norm: " << v1.l2_norm() << std::endl;
 
   Functions::FEFieldFunction<dim, DoFHandler<dim>, Vector<double> >
-    fef(dh, v1);
+  fef(dh, v1);
 
   VectorTools::interpolate(dh, fef, v2);
 
   v2.add(-1, v1);
   deallog << "Interpolation error: " << abs_zero(v2.l2_norm())
-	  << std::endl;
+          << std::endl;
 
   Vector<double> error(tria.n_active_cells());
   QGauss<dim> quad(2);
   VectorTools::integrate_difference(dh, v1, F<dim>(),
-				    error, quad,
-				    VectorTools::L2_norm);
+                                    error, quad,
+                                    VectorTools::L2_norm);
   deallog << "L2 Interpolation error: "
-	  << abs_zero(error.l2_norm()) << std::endl;
+          << abs_zero(error.l2_norm()) << std::endl;
   error = 0;
   VectorTools::integrate_difference(dh, v1, fef,
-				    error, quad,
-				    VectorTools::L2_norm);
+                                    error, quad,
+                                    VectorTools::L2_norm);
   deallog << "L2 Interpolation error with fef: "
-	  << abs_zero(error.l2_norm()) << std::endl;
+          << abs_zero(error.l2_norm()) << std::endl;
 
 }
 

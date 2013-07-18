@@ -24,18 +24,20 @@
 #include <fstream>
 
 
-				 // Take the example from the
-				 // documentation but instead of
-				 // running anything simply print
-				 // parameters
+// Take the example from the
+// documentation but instead of
+// running anything simply print
+// parameters
 class HelperClass : public MultipleParameterLoop::UserClass
 {
-  public:
-    virtual void create_new (unsigned int run_no)
-      { this->run_no = run_no; }
-    virtual void declare_parameters (ParameterHandler &prm);
-    virtual void run (ParameterHandler &prm);
-    unsigned int run_no;
+public:
+  virtual void create_new (unsigned int run_no)
+  {
+    this->run_no = run_no;
+  }
+  virtual void declare_parameters (ParameterHandler &prm);
+  virtual void run (ParameterHandler &prm);
+  unsigned int run_no;
 };
 
 
@@ -43,16 +45,16 @@ void HelperClass::declare_parameters (ParameterHandler &prm)
 {
   prm.enter_subsection ("Testing");
   prm.declare_entry ("string list",
-		     "a",
-		     Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-		     "docs 1");
+                     "a",
+                     Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
+                     "docs 1");
   prm.declare_entry ("int",
-		     "1",
-		     Patterns::Integer());
+                     "1",
+                     Patterns::Integer());
   prm.declare_entry ("double",
-		     "3.1415926",
-		     Patterns::Double(),
-		     "docs 3");
+                     "3.1415926",
+                     Patterns::Double(),
+                     "docs 3");
   prm.leave_subsection ();
 }
 

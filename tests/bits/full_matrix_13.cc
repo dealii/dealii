@@ -34,7 +34,7 @@ check ()
   make_matrix (m);
   Vector<number> v;
   make_vector (v);
-  
+
   deallog << m.matrix_norm_square (v) << std::endl;
 }
 

@@ -36,25 +36,25 @@ std::ofstream logfile("grid_tools_03/output");
 template <int dim>
 void test1 ()
 {
-				   // test 1: hypercube
+  // test 1: hypercube
   if (true)
     {
       Triangulation<dim> tria;
       GridGenerator::hyper_cube(tria);
 
       for (unsigned int i=0; i<2; ++i)
-	{
-	  tria.refine_global(2);
-	  deallog << dim << "d, "
-		  << "hypercube volume, "
-		  << i*2
-		  << " refinements: "
-		  << GridTools::volume (tria)
-		  << std::endl;
-	};
+        {
+          tria.refine_global(2);
+          deallog << dim << "d, "
+                  << "hypercube volume, "
+                  << i*2
+                  << " refinements: "
+                  << GridTools::volume (tria)
+                  << std::endl;
+        };
     };
 
-				   // test 2: hyperball
+  // test 2: hyperball
   if (dim >= 2)
     {
       Triangulation<dim> tria;
@@ -64,19 +64,19 @@ void test1 ()
       tria.set_boundary (0, boundary);
 
       for (unsigned int i=0; i<4; ++i)
-	{
-	  tria.refine_global(1);
-	  deallog << dim << "d, "
-		  << "hyperball volume, "
-		  << i
-		  << " refinements: "
-		  << GridTools::volume (tria)
-		  << std::endl;
-	}
+        {
+          tria.refine_global(1);
+          deallog << dim << "d, "
+                  << "hyperball volume, "
+                  << i
+                  << " refinements: "
+                  << GridTools::volume (tria)
+                  << std::endl;
+        }
       deallog << "exact value="
-	      << (dim==2 ? numbers::PI :
-		  4./3.*numbers::PI)
-	      << std::endl;
+              << (dim==2 ? numbers::PI :
+                  4./3.*numbers::PI)
+              << std::endl;
     }
 }
 

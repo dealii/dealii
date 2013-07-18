@@ -32,16 +32,16 @@
 
 void test ()
 {
-				   // test for an initialized mask
+  // test for an initialized mask
   Assert (BlockMask(12,false).represents_n_blocks(12) == true,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (BlockMask(12,false).represents_n_blocks(13) == false,
-	  ExcInternalError());
-				   // test for an empty mask
+          ExcInternalError());
+  // test for an empty mask
   Assert (BlockMask().represents_n_blocks(12) == true,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (BlockMask().represents_n_blocks(13) == true,
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

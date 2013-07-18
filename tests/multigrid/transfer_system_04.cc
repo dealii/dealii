@@ -43,10 +43,10 @@ using namespace std;
 template <int dim, typename number, int spacedim>
 void
 reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
-	       MGLevelObject<dealii::Vector<number> > &v)
+               MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.min_level();
-       level<=v.max_leve();++level)
+       level<=v.max_leve(); ++level)
     {
       unsigned int n = mg_dof.n_dofs (level);
       v[level].reinit(n);
@@ -58,8 +58,8 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 template <typename Transfer>
 void
 make_matrix (const Transfer &transfer,
-	     const unsigned int high_level,
-	     FullMatrix<double> &matrix)
+             const unsigned int high_level,
+             FullMatrix<double> &matrix)
 {
   Vector<double> src (matrix.n());
   Vector<double> dst (matrix.m());
@@ -69,7 +69,7 @@ make_matrix (const Transfer &transfer,
       src(i) = 1;
       transfer.prolongate (high_level, dst, src);
       for (unsigned int j=0; j<dst.size(); ++j)
-	matrix(j,i) = dst(j);
+        matrix(j,i) = dst(j);
     }
 }
 
@@ -80,7 +80,7 @@ void print_matrix (const FullMatrix<double> &m)
   for (unsigned int i=0; i<m.m(); ++i)
     {
       for (unsigned int j=0; j<m.n(); ++j)
-	deallog << m(i,j) << ' ';
+        deallog << m(i,j) << ' ';
       deallog << std::endl;
     }
 }
@@ -89,7 +89,7 @@ void print_matrix (const FullMatrix<double> &m)
 
 
 template <int dim>
-void check (const FiniteElement<dim>& fe)
+void check (const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -110,8 +110,8 @@ void check (const FiniteElement<dim>& fe)
   MGTransferSelect<double> transfer;
 
   transfer.build_matrices(mg_dof_handler, mg_dof_handler,
-			  0, 0,
-			  block_component, block_component);
+                          0, 0,
+                          block_component, block_component);
 
   std::vector<std::vector<types::global_dof_index> > dofs_per_block(tr.n_levels(), std::vector<types::global_dof_index>(2));
   MGTools::count_dofs_per_block(mg_dof_handler, dofs_per_block, block_component);

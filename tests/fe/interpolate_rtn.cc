@@ -26,29 +26,29 @@
 // FE_RaviartThomasNodal<dim>::interpolate(...)
 
 template <int dim>
-void check1(const Function<dim>& f,
-	    const unsigned int degree)
+void check1(const Function<dim> &f,
+            const unsigned int degree)
 {
   FE_RaviartThomasNodal<dim> fe(degree);
   deallog << fe.get_name() << ' ';
   deallog << fe.get_generalized_support_points().size() << ' ';
-  
+
   std::vector<double> dofs(fe.dofs_per_cell);
-  
+
   std::vector<std::vector<double> >
-    values(dim, std::vector<double>(fe.get_generalized_support_points().size()));
+  values(dim, std::vector<double>(fe.get_generalized_support_points().size()));
   std::vector<Vector<double> >
-    vectors(fe.get_generalized_support_points().size(),
-	    Vector<double>(dim));
+  vectors(fe.get_generalized_support_points().size(),
+          Vector<double>(dim));
   f.vector_value_list(fe.get_generalized_support_points(), vectors);
 
-  for (unsigned int c=0;c<values.size();++c)
-    for (unsigned int k=0;k<values[c].size();++k)
+  for (unsigned int c=0; c<values.size(); ++c)
+    for (unsigned int k=0; k<values[c].size(); ++k)
       values[c][k] = vectors[k](c);
-  
+
   fe.interpolate(dofs, values);
   deallog << " vector " << vector_difference(fe,dofs,f,0);
-  
+
   fe.interpolate(dofs, vectors, 0);
   deallog << " Vector " << vector_difference(fe,dofs,f,0) << std::endl;
 }

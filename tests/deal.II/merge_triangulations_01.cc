@@ -53,34 +53,34 @@ void test (const int testcase)
   Point<dim> shift;
   switch (testcase)
     {
-      case 0:
-	    shift[0] = 2;
-	    break;
-      case 1:
-	    shift[0] = 1;
-	    break;
-      case 2:
-	    for (unsigned int d=0; d<dim; ++d)
-	      shift[d] = 1;
-	    break;
-      default:
-	    Assert (false, ExcNotImplemented());
+    case 0:
+      shift[0] = 2;
+      break;
+    case 1:
+      shift[0] = 1;
+      break;
+    case 2:
+      for (unsigned int d=0; d<dim; ++d)
+        shift[d] = 1;
+      break;
+    default:
+      Assert (false, ExcNotImplemented());
     }
   GridTools::shift (shift, tria_2);
 
-				   // fill tria_3 with something, to
-				   // make sure that the function we
-				   // call later can deal with prior
-				   // content
+  // fill tria_3 with something, to
+  // make sure that the function we
+  // call later can deal with prior
+  // content
   GridGenerator::hyper_cube(tria_3);
 
-				   // now merge triangulations
+  // now merge triangulations
   GridGenerator::merge_triangulations (tria_1, tria_2, tria_3);
 
   GridOut().write_gnuplot (tria_3, logfile);
 
   deallog << "     Total number of cells        = " << tria_3.n_cells() << std::endl
-	  << "     Total number of vertices = " << tria_3.n_used_vertices() << std::endl;
+          << "     Total number of vertices = " << tria_3.n_used_vertices() << std::endl;
 }
 
 

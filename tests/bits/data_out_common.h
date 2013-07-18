@@ -1,6 +1,6 @@
 //----------------------------  dof_tools_common.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2005, 2008, 2010 by the deal.II authors
 //
@@ -72,10 +72,10 @@ check (const FiniteElement<dim> &fe,
   deallog << "Checking " << name
           << " in " << dim << "d:"
           << std::endl;
-  
-                                   // create tria and dofhandler
-                                   // objects. set different boundary
-                                   // and sub-domain ids
+
+  // create tria and dofhandler
+  // objects. set different boundary
+  // and sub-domain ids
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
   tria.refine_global (1);
@@ -90,8 +90,8 @@ check (const FiniteElement<dim> &fe,
 
   Vector<double> v_cell (dof_handler.get_tria().n_active_cells());
   for (unsigned int i=0; i<v_cell.size(); ++i) v_cell(i) = i;
-  
-                                   // call main function in .cc files
+
+  // call main function in .cc files
   check_this (dof_handler, v_node, v_cell);
 }
 
@@ -100,14 +100,14 @@ check (const FiniteElement<dim> &fe,
 
 
 #define CHECK(EL,deg,dim)\
- { FE_ ## EL<dim> EL(deg);   \
-   check(EL, #EL #deg); }
+  { FE_ ## EL<dim> EL(deg);   \
+    check(EL, #EL #deg); }
 
 #define CHECK_ALL(EL,deg)\
- { CHECK(EL,deg,1); \
-   CHECK(EL,deg,2); \
-   CHECK(EL,deg,3); \
- }
+  { CHECK(EL,deg,1); \
+    CHECK(EL,deg,2); \
+    CHECK(EL,deg,3); \
+  }
 
 
 int
@@ -120,7 +120,7 @@ main()
       logfile << std::setprecision (2);
       deallog.attach(logfile);
       deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+      deallog.threshold_double(1.e-10);
 
       CHECK_ALL(Q,1);
       CHECK_ALL(Q,2);
@@ -132,30 +132,30 @@ main()
 
       CHECK(Nedelec, 0, 2);
       CHECK(Nedelec, 0, 3);
-  
+
       return 0;
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

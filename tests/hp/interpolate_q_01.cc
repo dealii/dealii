@@ -45,21 +45,21 @@
 template <int dim>
 class F :  public Function<dim>
 {
-  public:
-    F (const unsigned int q) : q(q) {}
-    
-    virtual double value (const Point<dim> &p,
-			  const unsigned int) const
-      {
-	double v=0;
-	for (unsigned int d=0; d<dim; ++d)
-	  for (unsigned int i=0; i<=q; ++i)
-	    v += (d+1)*(i+1)*std::pow (p[d], 1.*i);
-	return v;
-      }
+public:
+  F (const unsigned int q) : q(q) {}
 
-  private:
-    const unsigned int q;
+  virtual double value (const Point<dim> &p,
+                        const unsigned int) const
+  {
+    double v=0;
+    for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int i=0; i<=q; ++i)
+        v += (d+1)*(i+1)*std::pow (p[d], 1.*i);
+    return v;
+  }
+
+private:
+  const unsigned int q;
 };
 
 
@@ -75,34 +75,34 @@ void test ()
     {
       FE_Q<dim>              fe(p);
       hp::FECollection<dim> hp_fe (fe);
-      
+
       hp::DoFHandler<dim>        dof_handler(triangulation);
       dof_handler.distribute_dofs (hp_fe);
 
       Vector<double> interpolant (dof_handler.n_dofs());
       Vector<float>  error (triangulation.n_active_cells());
       for (unsigned int q=0; q<=p+2; ++q)
-	{
-					   // interpolate the function
-	  VectorTools::interpolate (dof_handler,
-				    F<dim> (q),
-				    interpolant);
-      
-					   // then compute the interpolation error
-	  VectorTools::integrate_difference (dof_handler,
-					     interpolant,
-					     F<dim> (q),
-					     error,
-					     hp::QCollection<dim>(QGauss<dim>(q+2)),
-					     VectorTools::L2_norm);
-	  if (q<=p)
-	    Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
-		    ExcInternalError());
+        {
+          // interpolate the function
+          VectorTools::interpolate (dof_handler,
+                                    F<dim> (q),
+                                    interpolant);
 
-	  deallog << fe.get_name() << ", P_" << q
-		  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
-		  << std::endl;
-	}
+          // then compute the interpolation error
+          VectorTools::integrate_difference (dof_handler,
+                                             interpolant,
+                                             F<dim> (q),
+                                             error,
+                                             hp::QCollection<dim>(QGauss<dim>(q+2)),
+                                             VectorTools::L2_norm);
+          if (q<=p)
+            Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
+                    ExcInternalError());
+
+          deallog << fe.get_name() << ", P_" << q
+                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
+                  << std::endl;
+        }
     }
 }
 
@@ -113,7 +113,7 @@ int main ()
   std::ofstream logfile("interpolate_q_01/output");
   logfile.precision (3);
   deallog << std::setprecision(3);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

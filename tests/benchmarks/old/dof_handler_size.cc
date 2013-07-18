@@ -33,7 +33,7 @@ using namespace dealii;
 
 // Fill dof handlers for different elements and see how large they get.
 template <class DOF>
-void check_dofs(DOF& dof)
+void check_dofs(DOF &dof)
 {
   FE_Q<DOF::dimension> q1(1);
   FE_Q<DOF::dimension> q3(3);
@@ -42,28 +42,28 @@ void check_dofs(DOF& dof)
 
   dof.distribute_dofs(q1);
   deallog << "Dofs Q1   " << std::setw(12) << dof.n_dofs()
-	  << " memory " << std::setw(12) << dof.memory_consumption()
-	  << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
-	  << std::endl;
-  
+          << " memory " << std::setw(12) << dof.memory_consumption()
+          << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
+          << std::endl;
+
   dof.distribute_dofs(q3);
   deallog << "Dofs Q3   " << std::setw(12) << dof.n_dofs()
-	  << " memory " << std::setw(12) << dof.memory_consumption()
-	  << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
-	  << std::endl;
-  
+          << " memory " << std::setw(12) << dof.memory_consumption()
+          << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
+          << std::endl;
+
   dof.distribute_dofs(sys1);
   deallog << "Dofs Sys1 " << std::setw(12) << dof.n_dofs()
-	  << " memory " << std::setw(12) << dof.memory_consumption()
-	  << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
-	  << std::endl;
-  
+          << " memory " << std::setw(12) << dof.memory_consumption()
+          << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
+          << std::endl;
+
   dof.distribute_dofs(sys2);
   deallog << "Dofs Sys2 " << std::setw(12) << dof.n_dofs()
-	  << " memory " << std::setw(12) << dof.memory_consumption()
-	  << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
-	  << std::endl;
-  
+          << " memory " << std::setw(12) << dof.memory_consumption()
+          << " quotient " << (1./dof.n_dofs()*dof.memory_consumption())
+          << std::endl;
+
   dof.clear();
 }
 
@@ -76,21 +76,21 @@ void check (bool local)
   GridGenerator::hyper_cube(tr);
 
   if (local)
-    for (unsigned int i=0;i<99/dim;++i)
+    for (unsigned int i=0; i<99/dim; ++i)
       {
-	tr.last_active()->set_refine_flag();
-	tr.execute_coarsening_and_refinement();
+        tr.last_active()->set_refine_flag();
+        tr.execute_coarsening_and_refinement();
       }
   else
     tr.refine_global(18/dim);
-  
+
   deallog << "Levels " << tr.n_levels() << "Cells "<< tr.n_cells()
-	  << std::endl
-	  << " active " << std::setw(12)  << tr.n_active_cells()
-	  << " memory " << std::setw(12)  << tr.memory_consumption()
-	  << " quotient " << (1./tr.n_cells()*tr.memory_consumption())
-	  << std::endl;
-  
+          << std::endl
+          << " active " << std::setw(12)  << tr.n_active_cells()
+          << " memory " << std::setw(12)  << tr.memory_consumption()
+          << " quotient " << (1./tr.n_cells()*tr.memory_consumption())
+          << std::endl;
+
   FE_Q<dim> q1(1);
   FE_Q<dim> q3(3);
   FESystem<dim> sys1(q3, 1);
@@ -113,7 +113,7 @@ int main()
   check<2>(true);
   check<3>(true);
   deallog.pop();
-  deallog.push("global");  
+  deallog.push("global");
   check<2>(false);
   check<3>(false);
   deallog.pop();

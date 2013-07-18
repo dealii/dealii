@@ -41,8 +41,8 @@ void test ()
   static const HyperBallBoundary<dim> boundary;
   tria.set_boundary (0, boundary);
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active (),
-    endc = tria.end();
+  cell = tria.begin_active (),
+  endc = tria.end();
   for (; cell!=endc; ++cell)
     if (cell->center().norm()<1e-8)
       cell->set_refine_flag();
@@ -73,10 +73,10 @@ void test ()
   DoFHandler<dim> dof (tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
-                                // there should not be any hanging nodes or
-                                // boundary conditions for FE_DGQ as there are
-                                // only interior DoFs on the elements, but try
-                                // anyway
+  // there should not be any hanging nodes or
+  // boundary conditions for FE_DGQ as there are
+  // only interior DoFs on the elements, but try
+  // anyway
   DoFTools::make_hanging_node_constraints(dof, constraints);
   VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
                                             constraints);
@@ -84,6 +84,6 @@ void test ()
 
   do_test<dim, fe_degree, double> (dof, constraints);
 
-                                // test with coloring only as well
+  // test with coloring only as well
   do_test<dim, fe_degree, double> (dof, constraints, 2);
 }

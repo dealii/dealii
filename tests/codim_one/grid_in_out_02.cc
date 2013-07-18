@@ -30,15 +30,16 @@
 std::ofstream logfile("grid_in_out_02/output");
 
 template <int dim, int spacedim>
-void test(std::string filename) {
-    Triangulation<dim, spacedim> tria;
-    GridIn<dim, spacedim> gi;
-    gi.attach_triangulation (tria);
-    std::ifstream in (filename.c_str());
-    gi.read_ucd (in);
+void test(std::string filename)
+{
+  Triangulation<dim, spacedim> tria;
+  GridIn<dim, spacedim> gi;
+  gi.attach_triangulation (tria);
+  std::ifstream in (filename.c_str());
+  gi.read_ucd (in);
 
-    GridOut grid_out;
-    grid_out.write_gnuplot (tria, logfile);
+  GridOut grid_out;
+  grid_out.write_gnuplot (tria, logfile);
 }
 
 int main ()

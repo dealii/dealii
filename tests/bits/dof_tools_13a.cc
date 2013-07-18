@@ -37,8 +37,8 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // this doesn't make much sense if
-                                   // the element is not primitive
+  // this doesn't make much sense if
+  // the element is not primitive
   if (dof_handler.get_fe().is_primitive() == false)
     return;
 
@@ -46,61 +46,61 @@ check_this (const DoFHandler<dim> &dof_handler)
   for (unsigned int i=0; i<cell_data.size(); ++i)
     cell_data(i) = i;
 
-                                   // distribute to first component
+  // distribute to first component
   Vector<double> dof_data (dof_handler.n_dofs());
 
-				   // preset the vector to make sure
-				   // that the function zeroes out
-				   // previous content. however, only
-				   // touch those elements that we
-				   // will actually use
+  // preset the vector to make sure
+  // that the function zeroes out
+  // previous content. however, only
+  // touch those elements that we
+  // will actually use
   std::vector<bool> component_dofs (dof_handler.n_dofs());
   {
     std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
-				      false);
+                                      false);
     component_mask[0] = true;
     DoFTools::extract_dofs (dof_handler, ComponentMask(component_mask), component_dofs);
 
     for (unsigned int i=0; i<dof_data.size(); ++i)
       if (component_dofs[i] == true)
-	dof_data(i) = i+1;
+        dof_data(i) = i+1;
       else
-	dof_data(i) = 0;
+        dof_data(i) = 0;
   }
 
   DoFTools::distribute_cell_to_dof_vector (dof_handler,
                                            cell_data,
                                            dof_data);
-                                   // output every third element
+  // output every third element
   for (unsigned int i=0; i<dof_data.size(); i+=3)
     deallog << dof_data(i) << " ";
   deallog << std::endl;
 
-				   // check that no other values were
-				   // set
+  // check that no other values were
+  // set
   for (unsigned int i=0; i<dof_data.size(); ++i)
     if (component_dofs[i] == false)
       Assert (dof_data(i) == 0,
-	      ExcInternalError());
+              ExcInternalError());
 
 
-                                   // distribute to last component. by
-                                   // default we distribute to
-                                   // component zero
+  // distribute to last component. by
+  // default we distribute to
+  // component zero
 
-				   // preset the vector again to make
-				   // sure that the function zeroes out
-				   // previous content.
+  // preset the vector again to make
+  // sure that the function zeroes out
+  // previous content.
   {
     std::vector<bool> component_mask (dof_handler.get_fe().n_components(),
-				      false);
+                                      false);
     component_mask.back() = true;
     DoFTools::extract_dofs (dof_handler, ComponentMask(component_mask), component_dofs);
     for (unsigned int i=0; i<dof_data.size(); ++i)
       if (component_dofs[i] == true)
-	dof_data(i) = i+1;
+        dof_data(i) = i+1;
       else
-	dof_data(i) = 0;
+        dof_data(i) = 0;
   }
   DoFTools::distribute_cell_to_dof_vector (dof_handler,
                                            cell_data,
@@ -110,10 +110,10 @@ check_this (const DoFHandler<dim> &dof_handler)
     deallog << dof_data(i) << " ";
   deallog << std::endl;
 
-				   // check that no other values were
-				   // set
+  // check that no other values were
+  // set
   for (unsigned int i=0; i<dof_data.size(); ++i)
     if (component_dofs[i] == false)
       Assert (dof_data(i) == 0,
-	      ExcInternalError());
+              ExcInternalError());
 }

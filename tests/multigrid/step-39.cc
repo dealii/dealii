@@ -71,13 +71,13 @@ namespace Step39
   {
   public:
     void cell(MeshWorker::DoFInfo<dim> &dinfo,
-	      typename MeshWorker::IntegrationInfo<dim> &info) const;
+              typename MeshWorker::IntegrationInfo<dim> &info) const;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo,
-		  typename MeshWorker::IntegrationInfo<dim> &info) const;
+                  typename MeshWorker::IntegrationInfo<dim> &info) const;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
-	      MeshWorker::DoFInfo<dim> &dinfo2,
-	      typename MeshWorker::IntegrationInfo<dim> &info1,
-	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              MeshWorker::DoFInfo<dim> &dinfo2,
+              typename MeshWorker::IntegrationInfo<dim> &info1,
+              typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -123,9 +123,9 @@ namespace Step39
     void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
-	      MeshWorker::DoFInfo<dim> &dinfo2,
-	      typename MeshWorker::IntegrationInfo<dim> &info1,
-	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              MeshWorker::DoFInfo<dim> &dinfo2,
+              typename MeshWorker::IntegrationInfo<dim> &info1,
+              typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -169,9 +169,9 @@ namespace Step39
     void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
-	      MeshWorker::DoFInfo<dim> &dinfo2,
-	      typename MeshWorker::IntegrationInfo<dim> &info1,
-	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              MeshWorker::DoFInfo<dim> &dinfo2,
+              typename MeshWorker::IntegrationInfo<dim> &info1,
+              typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -247,9 +247,9 @@ namespace Step39
     void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
-	      MeshWorker::DoFInfo<dim> &dinfo2,
-	      typename MeshWorker::IntegrationInfo<dim> &info1,
-	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              MeshWorker::DoFInfo<dim> &dinfo2,
+              typename MeshWorker::IntegrationInfo<dim> &info1,
+              typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -473,7 +473,7 @@ namespace Step39
     MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
     assembler.initialize(mg_matrix);
     assembler.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
-    
+
     MatrixIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
       mg_dof_handler.begin(), mg_dof_handler.end(),
@@ -717,7 +717,7 @@ int main()
       using namespace dealii;
       using namespace Step39;
       initlog(__FILE__);
-      
+
       FE_DGQ<2> fe1(2);
       InteriorPenaltyProblem<2> test1(fe1);
       test1.run(6);

@@ -52,7 +52,7 @@ print_dofs (const DoFHandler<dim> &dof)
       cell->get_dof_indices (v);
       deallog << "cell=" << cell << std::endl;
       for (unsigned int i=0; i<v.size(); ++i)
-	deallog << v[i] << std::endl;
+        deallog << v[i] << std::endl;
     }
 }
 
@@ -68,7 +68,7 @@ check ()
 
   FESystem<dim> fe(FE_Q<dim>(2),2);
   DoFHandler<dim> dof(tr);
-  
+
   dof.distribute_dofs(fe);
   std::vector<types::global_dof_index> new_dofs (dof.n_dofs());
   DoFRenumbering::boost::compute_Cuthill_McKee(new_dofs, dof);

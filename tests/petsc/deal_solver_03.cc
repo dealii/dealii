@@ -41,8 +41,8 @@
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve( SOLVER& solver, const MATRIX& A,
-	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+check_solve( SOLVER &solver, const MATRIX &A,
+             VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
@@ -52,7 +52,7 @@ check_solve( SOLVER& solver, const MATRIX& A,
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception& e)
+  catch (std::exception &e)
     {
       deallog << e.what() << std::endl;
       abort ();
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
-                                     // Make matrix
+    // Make matrix
     FDMatrix testproblem(size, size);
     PETScWrappers::SparseMatrix  A(dim, dim, 5);
     testproblem.five_point(A);
@@ -98,6 +98,6 @@ int main(int argc, char **argv)
     check_solve (solver, A,u,f, preconditioner);
   }
   GrowingVectorMemory<PETScWrappers::Vector>::release_unused_memory ();
-  
+
 }
 

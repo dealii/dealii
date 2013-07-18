@@ -38,21 +38,21 @@
 
 template <typename number>
 void print_formatted (const FullMatrix<number> &A,
-		      const unsigned int        precision,
-		      const unsigned int        width)
+                      const unsigned int        precision,
+                      const unsigned int        width)
 {
   for (unsigned int i=0; i<A.m(); ++i)
     {
       for (unsigned int j=0; j<A.n(); ++j)
-	{
-	  if (A(i,j) != 0)
-	    deallog << std::setw(width) << std::setprecision(precision)
-		    << A(i,j);
-	  else
-	    deallog << std::setw(width) << std::setprecision(precision)
-		    << "~";
-	  deallog << ' ';
-	};
+        {
+          if (A(i,j) != 0)
+            deallog << std::setw(width) << std::setprecision(precision)
+                    << A(i,j);
+          else
+            deallog << std::setw(width) << std::setprecision(precision)
+                    << "~";
+          deallog << ' ';
+        };
       deallog << std::endl;
     };
 }
@@ -60,16 +60,16 @@ void print_formatted (const FullMatrix<number> &A,
 
 template <int dim>
 inline void
-check_prolongation (FiniteElement<dim>& fe, const char* name)
+check_prolongation (FiniteElement<dim> &fe, const char *name)
 {
   deallog << name << '<' << dim << '>' << " constraint " << std::endl;
   print_formatted (fe.constraints(), 7, 10);
 
-  for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
+  for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_cell; ++i)
     {
       deallog << name << '<' << dim << '>' << " prolongation " << i << std::endl;
       if (fe.isotropic_prolongation_is_implemented())
-	print_formatted (fe.get_prolongation_matrix(i), 6, 8);
+        print_formatted (fe.get_prolongation_matrix(i), 6, 8);
     }
 }
 
@@ -77,8 +77,8 @@ check_prolongation (FiniteElement<dim>& fe, const char* name)
 #define CHECK_ALL(EL,deg,dim) { FE_ ## EL<dim> EL(deg); check_prolongation(EL, #EL #deg); }
 #define CHECK_SYS1(sub1,N1,dim) { FESystem<dim> q(sub1, N1); check_prolongation(q, #sub1 #N1); }
 #define CHECK_SYS2(sub1,N1,sub2,N2,dim) { FESystem<dim> q(sub1, N1, sub2, N2); \
-                                          check_prolongation(q, #sub1 #N1 #sub2 #N2); }
+    check_prolongation(q, #sub1 #N1 #sub2 #N2); }
 #define CHECK_SYS3(sub1,N1,sub2,N2,sub3,N3,dim) { FESystem<dim> q(sub1, N1, sub2, N2, sub3, N3); \
-                                          check_prolongation(q, #sub1 #N1 #sub2 #N2 #sub3 #N3); }
+    check_prolongation(q, #sub1 #N1 #sub2 #N2 #sub3 #N3); }
 
 

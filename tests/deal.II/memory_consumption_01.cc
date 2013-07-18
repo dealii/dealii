@@ -63,30 +63,30 @@ using namespace dealii;
 template <int dim>
 class Step6
 {
-  public:
-    Step6 ();
-    ~Step6 ();
+public:
+  Step6 ();
+  ~Step6 ();
 
-    void run ();
+  void run ();
 
-  private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void refine_grid ();
+private:
+  void setup_system ();
+  void assemble_system ();
+  void solve ();
+  void refine_grid ();
 
-    Triangulation<dim>   triangulation;
+  Triangulation<dim>   triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    FE_Q<dim>            fe;
+  DoFHandler<dim>      dof_handler;
+  FE_Q<dim>            fe;
 
-    ConstraintMatrix     hanging_node_constraints;
+  ConstraintMatrix     hanging_node_constraints;
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> system_matrix;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+  Vector<double>       solution;
+  Vector<double>       system_rhs;
 };
 
 
@@ -95,15 +95,15 @@ class Step6
 template <int dim>
 class Coefficient : public Function<dim>
 {
-  public:
-    Coefficient () : Function<dim>() {}
+public:
+  Coefficient () : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int  component = 0) const;
 
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+  virtual void value_list (const std::vector<Point<dim> > &points,
+                           std::vector<double>            &values,
+                           const unsigned int              component = 0) const;
 };
 
 
@@ -147,9 +147,9 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
 template <int dim>
 Step6<dim>::Step6 ()
-                :
-                dof_handler (triangulation),
-                fe (2)
+  :
+  dof_handler (triangulation),
+  fe (2)
 {}
 
 
@@ -209,8 +209,8 @@ void Step6<dim>::assemble_system ()
   std::vector<double>    coefficient_values (n_q_points);
 
   typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix = 0;
@@ -315,54 +315,54 @@ void Step6<dim>::run ()
 
       if (cycle == 0)
         {
-	  if (dim > 1)
-	    {
-	      GridGenerator::hyper_ball (triangulation);
+          if (dim > 1)
+            {
+              GridGenerator::hyper_ball (triangulation);
 
-	      static const HyperBallBoundary<dim> boundary;
-	      triangulation.set_boundary (0, boundary);
+              static const HyperBallBoundary<dim> boundary;
+              triangulation.set_boundary (0, boundary);
 
-	      triangulation.refine_global (1);
-	    }
-	  else
-	    {
-	      GridGenerator::hyper_cube (triangulation);
-	      triangulation.refine_global (3);
-	    }
+              triangulation.refine_global (1);
+            }
+          else
+            {
+              GridGenerator::hyper_cube (triangulation);
+              triangulation.refine_global (3);
+            }
         }
       else
         refine_grid ();
 
 
       deallog << "   Number of active cells:       "
-	      << triangulation.n_active_cells()
-	      << std::endl;
+              << triangulation.n_active_cells()
+              << std::endl;
 
       setup_system ();
 
       deallog << "   Number of degrees of freedom: "
-	      << dof_handler.n_dofs()
-	      << std::endl;
+              << dof_handler.n_dofs()
+              << std::endl;
 
       assemble_system ();
       solve ();
 
       deallog << "Memory consumption -- Triangulation: " << triangulation.memory_consumption()
-	      << std::endl;
+              << std::endl;
       deallog << "Memory consumption -- DoFHandler:    " << dof_handler.memory_consumption()
-	      << std::endl;
+              << std::endl;
       deallog << "Memory consumption -- FE:            " << fe.memory_consumption()
-	      << std::endl;
+              << std::endl;
       deallog << "Memory consumption -- Constraints:   " << hanging_node_constraints.memory_consumption()
-	      << std::endl;
+              << std::endl;
       deallog << "Memory consumption -- Sparsity:      " << sparsity_pattern.memory_consumption()
-	      << std::endl;
+              << std::endl;
       deallog << "Memory consumption -- Matrix:        " << system_matrix.memory_consumption()
-	      << std::endl;
+              << std::endl;
       deallog << "Memory consumption -- Solution:      " << solution.memory_consumption()
-	      << std::endl;
+              << std::endl;
       deallog << "Memory consumption -- Rhs:           " << system_rhs.memory_consumption()
-	      << std::endl;
+              << std::endl;
     }
 
   DataOutBase::EpsFlags eps_flags;
@@ -376,7 +376,7 @@ void Step6<dim>::run ()
   data_out.build_patches ();
 
   deallog << "Memory consumption -- DataOut:       " << data_out.memory_consumption()
-	  << std::endl;
+          << std::endl;
 }
 
 

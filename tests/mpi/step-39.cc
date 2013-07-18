@@ -74,13 +74,13 @@ namespace Step39
   {
   public:
     void cell(MeshWorker::DoFInfo<dim> &dinfo,
-	      typename MeshWorker::IntegrationInfo<dim> &info) const;
+              typename MeshWorker::IntegrationInfo<dim> &info) const;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo,
-		  typename MeshWorker::IntegrationInfo<dim> &info) const;
+                  typename MeshWorker::IntegrationInfo<dim> &info) const;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
-	      MeshWorker::DoFInfo<dim> &dinfo2,
-	      typename MeshWorker::IntegrationInfo<dim> &info1,
-	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              MeshWorker::DoFInfo<dim> &dinfo2,
+              typename MeshWorker::IntegrationInfo<dim> &info1,
+              typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -126,9 +126,9 @@ namespace Step39
     void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
-	      MeshWorker::DoFInfo<dim> &dinfo2,
-	      typename MeshWorker::IntegrationInfo<dim> &info1,
-	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              MeshWorker::DoFInfo<dim> &dinfo2,
+              typename MeshWorker::IntegrationInfo<dim> &info1,
+              typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -172,9 +172,9 @@ namespace Step39
     void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
-	      MeshWorker::DoFInfo<dim> &dinfo2,
-	      typename MeshWorker::IntegrationInfo<dim> &info1,
-	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              MeshWorker::DoFInfo<dim> &dinfo2,
+              typename MeshWorker::IntegrationInfo<dim> &info1,
+              typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -250,9 +250,9 @@ namespace Step39
     void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
-	      MeshWorker::DoFInfo<dim> &dinfo2,
-	      typename MeshWorker::IntegrationInfo<dim> &info1,
-	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              MeshWorker::DoFInfo<dim> &dinfo2,
+              typename MeshWorker::IntegrationInfo<dim> &info1,
+              typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -365,9 +365,9 @@ namespace Step39
     const MappingQ1<dim>      mapping;
     const FiniteElement<dim> &fe;
     DoFHandler<dim>           dof_handler;
-    
+
     IndexSet locally_relevant_set;
-    
+
     TrilinosWrappers::SparseMatrix matrix;
     TrilinosWrappers::MPI::Vector       solution;
     TrilinosWrappers::MPI::Vector       right_hand_side;
@@ -401,7 +401,7 @@ namespace Step39
   {
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs (fe);
-    
+
     DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_set);
     solution.reinit(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     right_hand_side.reinit(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -417,16 +417,16 @@ namespace Step39
     mg_matrix_dg_up.clear();
     mg_matrix_dg_down.resize(0, n_levels-1);
     mg_matrix_dg_down.clear();
-    
+
     for (unsigned int level=mg_matrix.min_level();
          level<=mg_matrix.max_level(); ++level)
       {
         CompressedSimpleSparsityPattern c_sparsity(dof_handler.n_dofs(level));
         MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
-	mg_matrix[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-				dof_handler.locally_owned_mg_dofs(level),
-				c_sparsity,
-				MPI_COMM_WORLD, true);
+        mg_matrix[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                                dof_handler.locally_owned_mg_dofs(level),
+                                c_sparsity,
+                                MPI_COMM_WORLD, true);
 
         if (level>0)
           {
@@ -434,14 +434,14 @@ namespace Step39
             ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
             MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
 
-	    mg_matrix_dg_up[level].reinit(dof_handler.locally_owned_mg_dofs(level-1),
-					  dof_handler.locally_owned_mg_dofs(level),
-					  ci_sparsity,
-					  MPI_COMM_WORLD, true);
-	    mg_matrix_dg_down[level].reinit(dof_handler.locally_owned_mg_dofs(level-1),
-					    dof_handler.locally_owned_mg_dofs(level),
-					    ci_sparsity,
-					    MPI_COMM_WORLD, true);
+            mg_matrix_dg_up[level].reinit(dof_handler.locally_owned_mg_dofs(level-1),
+                                          dof_handler.locally_owned_mg_dofs(level),
+                                          ci_sparsity,
+                                          MPI_COMM_WORLD, true);
+            mg_matrix_dg_down[level].reinit(dof_handler.locally_owned_mg_dofs(level-1),
+                                            dof_handler.locally_owned_mg_dofs(level),
+                                            ci_sparsity,
+                                            MPI_COMM_WORLD, true);
           }
       }
   }
@@ -460,18 +460,18 @@ namespace Step39
 
     MeshWorker::Assembler::MatrixSimple<TrilinosWrappers::SparseMatrix> assembler;
     assembler.initialize(matrix);
-    
+
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
+    begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-    
+    end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
+
     MatrixIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim>(
       begin, end,
       dof_info, info_box,
       integrator, assembler);
-    
+
     matrix.compress(VectorOperation::add);
   }
 
@@ -490,26 +490,26 @@ namespace Step39
     MeshWorker::Assembler::MGMatrixSimple<TrilinosWrappers::SparseMatrix> assembler;
     assembler.initialize(mg_matrix);
     assembler.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
-    
+
     FilteredIterator<typename DoFHandler<dim>::level_cell_iterator>
-      begin(IteratorFilters::LocallyOwnedLevelCell(), dof_handler.begin());
+    begin(IteratorFilters::LocallyOwnedLevelCell(), dof_handler.begin());
     FilteredIterator<typename DoFHandler<dim>::level_cell_iterator>
-      end(IteratorFilters::LocallyOwnedLevelCell(), dof_handler.end());
+    end(IteratorFilters::LocallyOwnedLevelCell(), dof_handler.end());
 
     MatrixIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
       begin, end,
       dof_info, info_box,
       integrator, assembler);
-    
-    for (unsigned int level=mg_matrix.min_level(); level <= mg_matrix.max_level();++level)
+
+    for (unsigned int level=mg_matrix.min_level(); level <= mg_matrix.max_level(); ++level)
       {
-	mg_matrix[level].compress(VectorOperation::add);
-	if (level > mg_matrix.min_level())
-	  {
-	    mg_matrix_dg_up[level].compress(VectorOperation::add);
-	    mg_matrix_dg_down[level].compress(VectorOperation::add);
-	  }
+        mg_matrix[level].compress(VectorOperation::add);
+        if (level > mg_matrix.min_level())
+          {
+            mg_matrix_dg_up[level].compress(VectorOperation::add);
+            mg_matrix_dg_down[level].compress(VectorOperation::add);
+          }
       }
   }
 
@@ -526,21 +526,21 @@ namespace Step39
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
     MeshWorker::Assembler::ResidualSimple<TrilinosWrappers::MPI::Vector> assembler;
-    NamedData<TrilinosWrappers::MPI::Vector*> data;
+    NamedData<TrilinosWrappers::MPI::Vector *> data;
     TrilinosWrappers::MPI::Vector *rhs = &right_hand_side;
     data.add(rhs, "RHS");
     assembler.initialize(data);
 
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
+    begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-    
+    end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
+
 
     RHSIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim>(begin, end,
-      dof_info, info_box,
-      integrator, assembler);
+                                           dof_info, info_box,
+                                           integrator, assembler);
 
     right_hand_side.compress(VectorOperation::add);
     right_hand_side *= -1.;
@@ -562,7 +562,7 @@ namespace Step39
     PreconditionIdentity identity;
     TrilinosWrappers::SparseMatrix coarse_matrix = mg_matrix[0];
     MGCoarseGridLACIteration<SolverCG<TrilinosWrappers::MPI::Vector>,TrilinosWrappers::MPI::Vector>
-      coarse_grid_solver(coarse_solver, coarse_matrix, identity);
+    coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
     typedef TrilinosWrappers::PreconditionJacobi Smoother;
     MGSmootherPrecondition<TrilinosWrappers::SparseMatrix, Smoother, TrilinosWrappers::MPI::Vector> mg_smoother;
@@ -574,8 +574,8 @@ namespace Step39
     MGMatrix<TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector> mgup(&mg_matrix_dg_up);
 
     Multigrid<TrilinosWrappers::MPI::Vector > mg(dof_handler, mgmatrix,
-                                  coarse_grid_solver, mg_transfer,
-                                  mg_smoother, mg_smoother);
+                                                 coarse_grid_solver, mg_transfer,
+                                                 mg_smoother, mg_smoother);
     mg.set_edge_flux_matrices(mgdown, mgup);
 
     PreconditionMG<dim, TrilinosWrappers::MPI::Vector,
@@ -592,7 +592,7 @@ namespace Step39
     TrilinosWrappers::MPI::Vector ghost;
     ghost.reinit(locally_relevant_set, MPI_COMM_WORLD);
     ghost = solution;
-    
+
     std::vector<unsigned int> old_user_indices;
     triangulation.save_user_indices(old_user_indices);
 
@@ -606,7 +606,7 @@ namespace Step39
     const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
-    NamedData<TrilinosWrappers::MPI::Vector* > solution_data;
+    NamedData<TrilinosWrappers::MPI::Vector * > solution_data;
     solution_data.add(&ghost, "solution");
 
     info_box.cell_selector.add("solution", false, false, true);
@@ -623,17 +623,17 @@ namespace Step39
     BlockVector<double> *est = &estimates;
     out_data.add(est, "cells");
     assembler.initialize(out_data, false);
-    
+
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
+    begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-    
+    end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
+
     Estimator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
-					    begin, end,
-					    dof_info, info_box,
-					    integrator, assembler);
+      begin, end,
+      dof_info, info_box,
+      integrator, assembler);
 
     triangulation.load_user_indices(old_user_indices);
     return estimates.block(0).l2_norm();
@@ -691,20 +691,20 @@ namespace Step39
   // {
   //   char *fn = new char[100];
   //   sprintf(fn, "step-39/sol-%02d", cycle);
-    
+
   //   std::string filename(fn);
   //   filename += ".gnuplot";
   //   deallog << "Writing solution to <" << filename << ">..."
   //           << std::endl << std::endl;
   //   std::ofstream gnuplot_output (filename.c_str());
-    
+
   //   DataOut<dim> data_out;
   //   data_out.attach_dof_handler (dof_handler);
   //   data_out.add_data_vector (solution, "u");
   //   data_out.add_data_vector (estimates.block(0), "est");
-    
+
   //   data_out.build_patches ();
-    
+
   //   data_out.write_gnuplot(gnuplot_output);
   // }
 
@@ -718,13 +718,13 @@ namespace Step39
         deallog << "Step " << s << std::endl;
         if (estimates.block(0).size() == 0)
           triangulation.refine_global(1);
-	else
-        {
-	  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
-										    estimates.block(0),
-										    0.5, 0.0);
-	  triangulation.execute_coarsening_and_refinement ();
-        }
+        else
+          {
+            parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
+                estimates.block(0),
+                0.5, 0.0);
+            triangulation.execute_coarsening_and_refinement ();
+          }
 
         deallog << "Triangulation "
                 << triangulation.n_active_cells() << " cells, "
@@ -744,7 +744,7 @@ namespace Step39
         assemble_right_hand_side();
         deallog << "Solve" << std::endl;
         solve();
-	//error();
+        //error();
         deallog << "Estimate " << estimate() << std::endl;
         //output_results(s);
       }
@@ -757,10 +757,10 @@ int main(int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   mpi_initlog(__FILE__, true);
-    
+
   using namespace dealii;
   using namespace Step39;
-  
+
   try
     {
       FE_DGQ<2> fe1(2);

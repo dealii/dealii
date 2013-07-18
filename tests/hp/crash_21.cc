@@ -58,40 +58,40 @@ namespace Step
   template <int dim>
   class Problem : public Subscriptor
   {
-    public:
-      Problem ();
-      ~Problem ();
+  public:
+    Problem ();
+    ~Problem ();
 
-      void refine_mesh ();
-      void setup_system ();
+    void refine_mesh ();
+    void setup_system ();
 
-    private:
-      Triangulation<dim>   	triangulation;
+  private:
+    Triangulation<dim>    triangulation;
 
-      hp::DoFHandler<dim>   	dof_handler;
-      hp::FECollection<dim>    	fe_collection;
-      hp::QCollection<dim>     	quadrature_collection;
-      hp::QCollection<dim-1>   	face_quadrature_collection;
+    hp::DoFHandler<dim>     dof_handler;
+    hp::FECollection<dim>     fe_collection;
+    hp::QCollection<dim>      quadrature_collection;
+    hp::QCollection<dim-1>    face_quadrature_collection;
 
-      ConstraintMatrix     	constraints;
+    ConstraintMatrix      constraints;
 
-      SparsityPattern      	sparsity_pattern;
-      SparseMatrix<double> 	system_matrix;
+    SparsityPattern       sparsity_pattern;
+    SparseMatrix<double>  system_matrix;
   };
 
 
 
   template <int dim>
   Problem<dim>::Problem ()
-		  :
-		  dof_handler (triangulation)
+    :
+    dof_handler (triangulation)
   {
     GridGenerator::hyper_cube(triangulation);
     for (unsigned int degree=1; degree<=7; ++degree)
       {
-	fe_collection.push_back (FE_DGQ<dim>(degree));
-	quadrature_collection.push_back (QGauss<dim>(degree+1));
-	face_quadrature_collection.push_back (QGauss<dim-1>(degree+1));
+        fe_collection.push_back (FE_DGQ<dim>(degree));
+        quadrature_collection.push_back (QGauss<dim>(degree+1));
+        face_quadrature_collection.push_back (QGauss<dim-1>(degree+1));
       }
   }
 
@@ -112,20 +112,20 @@ namespace Step
 
 
     CompressedSetSparsityPattern csp (dof_handler.n_dofs(),
-				      dof_handler.n_dofs());
+                                      dof_handler.n_dofs());
     DoFTools::make_flux_sparsity_pattern (dof_handler, csp, constraints, false);
     sparsity_pattern.copy_from (csp);
     system_matrix.reinit (sparsity_pattern);
 
     deallog << "   Number of active cells:       "
-	    << triangulation.n_active_cells()
-	    << std::endl
-	    << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
-	    << std::endl
-	    << "   Number of constraints       : "
-	    << constraints.n_constraints()
-	    << std::endl;
+            << triangulation.n_active_cells()
+            << std::endl
+            << "   Number of degrees of freedom: "
+            << dof_handler.n_dofs()
+            << std::endl
+            << "   Number of constraints       : "
+            << constraints.n_constraints()
+            << std::endl;
     deallog << "nnz=" << sparsity_pattern.n_nonzero_elements() << std::endl;
   }
 

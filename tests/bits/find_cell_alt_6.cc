@@ -47,23 +47,23 @@
 
 void check (Triangulation<2> &tria)
 {
-   const std::vector<Point<2> > &v = tria.get_vertices();
-   MappingQ1<2> map;
-   
-   for(unsigned i=0; i<tria.n_vertices(); i++)
-      {
-         std::pair<Triangulation<2>::active_cell_iterator, Point<2> >
-            cell = GridTools::find_active_cell_around_point(map, tria, v[i]);
+  const std::vector<Point<2> > &v = tria.get_vertices();
+  MappingQ1<2> map;
 
-         deallog << "Vertex <" << v[i] << "> found in cell ";
-         for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-            deallog << "<" << cell.first->vertex(v) << "> ";
-         deallog << " [local: " << cell.second << "]" << std::endl;
-      }
+  for (unsigned i=0; i<tria.n_vertices(); i++)
+    {
+      std::pair<Triangulation<2>::active_cell_iterator, Point<2> >
+      cell = GridTools::find_active_cell_around_point(map, tria, v[i]);
+
+      deallog << "Vertex <" << v[i] << "> found in cell ";
+      for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+        deallog << "<" << cell.first->vertex(v) << "> ";
+      deallog << " [local: " << cell.second << "]" << std::endl;
+    }
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("find_cell_alt_6/output");
   deallog.attach(logfile);
@@ -81,11 +81,11 @@ int main ()
     }
   catch (const std::exception &exc)
     {
-				       // we shouldn't get here...
+      // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
       deallog << exc.what() << std::endl;
     }
 }
 
-  
-  
+
+

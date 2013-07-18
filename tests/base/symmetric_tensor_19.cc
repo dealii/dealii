@@ -32,46 +32,46 @@ void check (const SymmetricTensor<4,dim> &A)
 {
   const SymmetricTensor<4,dim> B = invert (A);
 
-                                   // check left inverse
+  // check left inverse
   deallog << "    checking left inverse" << std::endl;
   const SymmetricTensor<4,dim> T_left = B*A;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-	for (unsigned int l=0; l<dim; ++l)
-	  {
-	    deallog << "      "
+        for (unsigned int l=0; l<dim; ++l)
+          {
+            deallog << "      "
                     << A[i][j][k][l] << ' '
                     << B[i][j][k][l] << ' '
                     << T_left[i][j][k][l] << std::endl;
 
-	    Assert (std::fabs(T_left[i][j][k][l] -
+            Assert (std::fabs(T_left[i][j][k][l] -
                               identity_tensor<dim>()[i][j][k][l])
                     < 1e-10,
-		    ExcInternalError());
-	  }
+                    ExcInternalError());
+          }
 
-                                   // check left inverse
+  // check left inverse
   deallog << "    checking right inverse" << std::endl;
   const SymmetricTensor<4,dim> T_right = A*B;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-	for (unsigned int l=0; l<dim; ++l)
-	  {
-	    deallog << "      "
+        for (unsigned int l=0; l<dim; ++l)
+          {
+            deallog << "      "
                     << A[i][j][k][l] << ' '
                     << B[i][j][k][l] << ' '
                     << T_right[i][j][k][l] << std::endl;
 
-	    Assert (std::fabs(T_right[i][j][k][l] -
+            Assert (std::fabs(T_right[i][j][k][l] -
                               identity_tensor<dim>()[i][j][k][l])
                     < 1e-10,
-		    ExcInternalError());
-	  }
+                    ExcInternalError());
+          }
 }
 
-  
+
 
 template <int dim>
 void test ()
@@ -81,42 +81,42 @@ void test ()
   deallog << "  unit tensor" << std::endl;
   check (identity_tensor<dim>());
 
-                                   // do something with a more complicated
-                                   // tensor. make sure it is not
-                                   // rank-deficient, so choose elements by
-                                   // hand
+  // do something with a more complicated
+  // tensor. make sure it is not
+  // rank-deficient, so choose elements by
+  // hand
   deallog << "  complicated tensor" << std::endl;
   SymmetricTensor<4,dim> A;
   switch (dim)
     {
-      case 1:
-            A[0][0][0][0] = 2;
-            break;
-            
-      case 2:
-            A[0][0][0][0] = 2;
-            A[0][0][1][1] = 4;
-            A[0][0][0][1] = 8;
-            A[1][1][0][0] = 4;
-            A[1][1][1][1] = 6;
-            A[1][1][0][1] = 10;
-            A[0][1][0][0] = 6;
-            A[0][1][1][1] = 10;
-            A[0][1][0][1] = 16;
-            break;
+    case 1:
+      A[0][0][0][0] = 2;
+      break;
 
-      case 3:
-                                             // I'm too lazy to code something
-                                             // up by hand here
-            for (unsigned int i=0; i<3; ++i)
-              for (unsigned int j=0; j<3; ++j)
-                for (unsigned int k=0; k<3; ++k)
-                  for (unsigned int l=0; l<3; ++l)
-                    A[i][j][k][l] = 1.*rand()/RAND_MAX;
-            break;
-            
-      default:
-            Assert (false, ExcNotImplemented());
+    case 2:
+      A[0][0][0][0] = 2;
+      A[0][0][1][1] = 4;
+      A[0][0][0][1] = 8;
+      A[1][1][0][0] = 4;
+      A[1][1][1][1] = 6;
+      A[1][1][0][1] = 10;
+      A[0][1][0][0] = 6;
+      A[0][1][1][1] = 10;
+      A[0][1][0][1] = 16;
+      break;
+
+    case 3:
+      // I'm too lazy to code something
+      // up by hand here
+      for (unsigned int i=0; i<3; ++i)
+        for (unsigned int j=0; j<3; ++j)
+          for (unsigned int k=0; k<3; ++k)
+            for (unsigned int l=0; l<3; ++l)
+              A[i][j][k][l] = 1.*rand()/RAND_MAX;
+      break;
+
+    default:
+      Assert (false, ExcNotImplemented());
     }
   check (A);
 }
@@ -134,6 +134,6 @@ int main ()
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

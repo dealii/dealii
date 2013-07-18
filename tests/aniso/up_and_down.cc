@@ -47,19 +47,19 @@
 template <int dim>
 Point<dim> transform (const Point<dim> p)
 {
-  switch (dim) 
+  switch (dim)
     {
-      case 1:
-            return p;
-      case 2:
-            return Point<dim>(p(0)*(1+p(1)), p(1)*(1+p(0)));
-      case 3:
-            return Point<dim>(p(0)*(1+p(1))*(1+p(2)),
-                              p(1)*(1+p(0))*(1+p(2)),
-                              p(2)*(1+p(0))*(1+p(1)));
-      default:
-            Assert (false, ExcNotImplemented());
-            return Point<dim>();
+    case 1:
+      return p;
+    case 2:
+      return Point<dim>(p(0)*(1+p(1)), p(1)*(1+p(0)));
+    case 3:
+      return Point<dim>(p(0)*(1+p(1))*(1+p(2)),
+                        p(1)*(1+p(0))*(1+p(2)),
+                        p(2)*(1+p(0))*(1+p(1)));
+    default:
+      Assert (false, ExcNotImplemented());
+      return Point<dim>();
     };
 }
 
@@ -71,17 +71,17 @@ void check_element (const Triangulation<dim> &tr,
   DoFHandler<dim> dof_handler(tr);
   dof_handler.distribute_dofs (fe);
 
-                                   // create a mostly arbitrary
-                                   // function plus a trend on this
-                                   // grid
+  // create a mostly arbitrary
+  // function plus a trend on this
+  // grid
   Vector<double> tmp(dof_handler.n_dofs());
   for (unsigned int i=0; i<tmp.size(); ++i)
     tmp(i) = i;//(i + 13*i%17);
 
-                                   // restrict this function to the
-                                   // next coarser level and
-                                   // distribute it again to the
-                                   // higher level
+  // restrict this function to the
+  // next coarser level and
+  // distribute it again to the
+  // higher level
   Vector<double> x(tmp.size());
   Vector<double> v(fe.dofs_per_cell);
   for (typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin();
@@ -89,24 +89,24 @@ void check_element (const Triangulation<dim> &tr,
     if (cell->has_children() &&
         cell->child(0)->active())
       {
-                                         // first make sure that what
-                                         // we do is reasonable. for
-                                         // this, _all_ children have
-                                         // to be active, not only
-                                         // some of them
+        // first make sure that what
+        // we do is reasonable. for
+        // this, _all_ children have
+        // to be active, not only
+        // some of them
         for (unsigned int c=0; c<cell->n_children(); ++c)
           Assert (cell->child(c)->active(), ExcInternalError());
 
-                                         // then restrict and prolongate
+        // then restrict and prolongate
         cell->get_interpolated_dof_values (tmp, v);
         cell->set_dof_values_by_interpolation (v, x);
       };
 
-                                   // now x is a function on the fine
-                                   // grid that is representable on
-                                   // the coarse grid. so another
-                                   // cycle should not alter it any
-                                   // more:
+  // now x is a function on the fine
+  // grid that is representable on
+  // the coarse grid. so another
+  // cycle should not alter it any
+  // more:
   Vector<double> x2(x.size());
   for (typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin();
        cell!=dof_handler.end(); ++cell)
@@ -117,7 +117,7 @@ void check_element (const Triangulation<dim> &tr,
         cell->set_dof_values_by_interpolation (v, x2);
       };
 
-                                   // then check that this is so:
+  // then check that this is so:
   x2 -= x;
   const double relative_residual = (x2.l2_norm() / x.l2_norm());
 
@@ -130,106 +130,108 @@ void check_element (const Triangulation<dim> &tr,
 
 
 template <int dim>
-void test () 
+void test ()
 {
   const std::string ref_case_names[7]=
-    {"RefinementCase<dim>::cut_x",
-     "RefinementCase<dim>::cut_y",
-     "RefinementCase<dim>::cut_xy",
-     "RefinementCase<dim>::cut_z",
-     "RefinementCase<dim>::cut_xz",
-     "RefinementCase<dim>::cut_yz",
-     "RefinementCase<dim>::cut_xyz"};
+  {
+    "RefinementCase<dim>::cut_x",
+    "RefinementCase<dim>::cut_y",
+    "RefinementCase<dim>::cut_xy",
+    "RefinementCase<dim>::cut_z",
+    "RefinementCase<dim>::cut_xz",
+    "RefinementCase<dim>::cut_yz",
+    "RefinementCase<dim>::cut_xyz"
+  };
 
-  const unsigned int n_ref_cases_for_dim[4]={0,1,3,7};
-  
-				   // now for a list of finite
-				   // elements, for which we want to
-				   // test. we happily waste tons of
-				   // memory here, but who cares...
+  const unsigned int n_ref_cases_for_dim[4]= {0,1,3,7};
+
+  // now for a list of finite
+  // elements, for which we want to
+  // test. we happily waste tons of
+  // memory here, but who cares...
   const FiniteElement<dim> *fe_list[]
-    = 
-    {
-					   // FE_DGQ
-	  new FE_DGQ<dim>(0),
-	  new FE_DGQ<dim>(1),
-	  new FE_DGQ<dim>(2),
-	  (dim<3 ? new FE_DGQ<dim>(3) : 0),
-	  (dim<3 ? new FE_DGQ<dim>(4) : 0),
-	      
-					   // FE_DGP
-	  new FE_DGP<dim>(0),
-	  new FE_DGP<dim>(1),
-	  new FE_DGP<dim>(2),
-	  new FE_DGP<dim>(3),
-	  
-                                           // some composed elements
-                                           // of increasing
-                                           // complexity, to check the
-                                           // logics by which the
-                                           // matrices of the composed
-                                           // elements are assembled
-                                           // from those of the base
-                                           // elements.
-          new FESystem<dim> (FE_DGQ<dim>(1), 2),
-          new FESystem<dim> (FE_DGP<dim>(1), 1,
-                             FE_DGQ<dim>(2), 2),
-          new FESystem<dim> (FE_DGP<dim>(1), 2,
-                             FE_DGQ<dim>(2), 2,
-                             FE_DGP<dim>(0), 1),
-          new FESystem<dim> (FE_DGQ<dim>(1), 2,
-                             FESystem<dim> (FE_DGQ<dim>(1), 2,
-                                            FE_DGP<dim>(2), 2,
-                                            FE_DGQ<dim>(2), 1), 2,
-                             FE_DGP<dim>(0), 1),
-          new FESystem<dim> (FE_DGP<dim>(1), 2,
-                             FESystem<dim> (FE_DGP<dim>(1), 2,
-                                            FE_DGQ<dim>(2), 2,
-                                            FESystem<dim>(FE_DGQ<dim>(0),
-                                                          3),
-                                            1), 2,
-                             FE_DGQ<dim>(0), 1),
-	  
-					   // some continuous FEs
-	  new FE_Q<dim>(1),
-	  new FE_Q<dim>(2),
-	  new FESystem<dim> (FE_Q<dim>(1), 2),
-	  new FESystem<dim> (FE_DGQ<dim>(1), 2,
-			     FESystem<dim> (FE_Q<dim>(1), 2,
-					    FE_Q<dim>(2), 1,
-					    FE_DGP<dim>(2), 1), 2,
-			     FE_Q<dim>(3),1)
-    };
+  =
+  {
+    // FE_DGQ
+    new FE_DGQ<dim>(0),
+    new FE_DGQ<dim>(1),
+    new FE_DGQ<dim>(2),
+    (dim<3 ? new FE_DGQ<dim>(3) : 0),
+    (dim<3 ? new FE_DGQ<dim>(4) : 0),
+
+    // FE_DGP
+    new FE_DGP<dim>(0),
+    new FE_DGP<dim>(1),
+    new FE_DGP<dim>(2),
+    new FE_DGP<dim>(3),
+
+    // some composed elements
+    // of increasing
+    // complexity, to check the
+    // logics by which the
+    // matrices of the composed
+    // elements are assembled
+    // from those of the base
+    // elements.
+    new FESystem<dim> (FE_DGQ<dim>(1), 2),
+    new FESystem<dim> (FE_DGP<dim>(1), 1,
+    FE_DGQ<dim>(2), 2),
+    new FESystem<dim> (FE_DGP<dim>(1), 2,
+    FE_DGQ<dim>(2), 2,
+    FE_DGP<dim>(0), 1),
+    new FESystem<dim> (FE_DGQ<dim>(1), 2,
+    FESystem<dim> (FE_DGQ<dim>(1), 2,
+    FE_DGP<dim>(2), 2,
+    FE_DGQ<dim>(2), 1), 2,
+    FE_DGP<dim>(0), 1),
+    new FESystem<dim> (FE_DGP<dim>(1), 2,
+    FESystem<dim> (FE_DGP<dim>(1), 2,
+    FE_DGQ<dim>(2), 2,
+    FESystem<dim>(FE_DGQ<dim>(0),
+    3),
+    1), 2,
+    FE_DGQ<dim>(0), 1),
+
+    // some continuous FEs
+    new FE_Q<dim>(1),
+    new FE_Q<dim>(2),
+    new FESystem<dim> (FE_Q<dim>(1), 2),
+    new FESystem<dim> (FE_DGQ<dim>(1), 2,
+    FESystem<dim> (FE_Q<dim>(1), 2,
+    FE_Q<dim>(2), 1,
+    FE_DGP<dim>(2), 1), 2,
+    FE_Q<dim>(3),1)
+  };
 
   for (unsigned int j=0; j<n_ref_cases_for_dim[dim]; ++j)
     {
-				       // make a coarse triangulation as a
-				       // hypercube. if in more than 1d, distort it
-				       // so that it is no more an affine image of
-				       // the hypercube, to make things more
-				       // difficult. then refine it globally once
-				       // and refine again in an anisotropic way
+      // make a coarse triangulation as a
+      // hypercube. if in more than 1d, distort it
+      // so that it is no more an affine image of
+      // the hypercube, to make things more
+      // difficult. then refine it globally once
+      // and refine again in an anisotropic way
       Triangulation<dim> tr;
       GridGenerator::hyper_cube(tr, 0., 1.);
       Point<dim> (*p) (Point<dim>) = &transform<dim>;
       GridTools::transform (p, tr);
       tr.refine_global (1);
       typename Triangulation<dim>::active_cell_iterator cell=tr.begin_active(),
-							endc=tr.end();
+                                                        endc=tr.end();
       for (; cell!=endc; ++cell)
-	cell->set_refine_flag(RefinementCase<dim>(j+1));
+        cell->set_refine_flag(RefinementCase<dim>(j+1));
 
       tr.execute_coarsening_and_refinement();
-      
 
-  
+
+
       for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)
-	if (fe_list[i] != 0)
-	  {
-	    deallog << dim << "d, uniform grid, fe #" << i
-		    << ", " << ref_case_names[j];
-	    check_element (tr, *fe_list[i]);
-	  }
+        if (fe_list[i] != 0)
+          {
+            deallog << dim << "d, uniform grid, fe #" << i
+                    << ", " << ref_case_names[j];
+            check_element (tr, *fe_list[i]);
+          }
     }
 }
 
@@ -240,15 +242,15 @@ main()
 {
   std::ofstream logfile ("up_and_down/output");
   logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);  
+  logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<1>();
   test<2>();
   test<3>();
-  
+
   return 0;
 }
 

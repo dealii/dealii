@@ -43,11 +43,11 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-		   Triangulation<dim>::limit_level_difference_at_vertices);
+  triangulation (MPI_COMM_WORLD,
+                 Triangulation<dim>::limit_level_difference_at_vertices);
 
   FESystem<dim> fe (FE_Q<dim>(3),2,
-		    FE_DGQ<dim>(1),1);
+                    FE_DGQ<dim>(1),1);
 
   DoFHandler<dim> dof_handler (triangulation);
 
@@ -59,16 +59,16 @@ void test()
   DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
 
   Assert (std::accumulate (dofs_per_component.begin(), dofs_per_component.end(), 0U)
-	  == dof_handler.n_dofs(),
-	  ExcInternalError());
-      
+          == dof_handler.n_dofs(),
+          ExcInternalError());
+
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
     {
       deallog << "Total number of dofs: " << dof_handler.n_dofs() << std::endl;
       for (unsigned int i=0; i<dofs_per_component.size(); ++i)
-	deallog << "Block " << i << " has " << dofs_per_component[i] << " global dofs"
-		<< std::endl;
+        deallog << "Block " << i << " has " << dofs_per_component[i] << " global dofs"
+                << std::endl;
     }
 }
 

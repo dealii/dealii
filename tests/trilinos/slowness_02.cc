@@ -23,7 +23,7 @@
 //
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -36,10 +36,10 @@ void test ()
 {
   const unsigned int N = 200;
 
-                                   // build the sparse matrix 
+  // build the sparse matrix
   TrilinosWrappers::SparseMatrix matrix (N*N, N*N, 5U);
-  for(unsigned int i=0; i<N; i++)
-    for(unsigned int j=0; j<N; j++)
+  for (unsigned int i=0; i<N; i++)
+    for (unsigned int j=0; j<N; j++)
       {
         const unsigned int global = i*N+j;
         matrix.set(global, global, 4);
@@ -65,22 +65,22 @@ void test ()
           }
       }
   matrix.compress ();
-  
-  
-                                   // then do a single matrix-vector
-                                   // multiplication with subsequent formation
-                                   // of the matrix norm
+
+
+  // then do a single matrix-vector
+  // multiplication with subsequent formation
+  // of the matrix norm
   TrilinosWrappers::Vector v1(N*N), v2(N*N);
   for (unsigned int i=0; i<N*N; ++i)
     v1(i) = i;
   matrix.vmult (v2, v1);
-  
-  deallog << v1*v2 << std::endl;
+
+  deallog << v1 *v2 << std::endl;
 }
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("slowness_02/output");
   deallog.attach(logfile);
@@ -97,25 +97,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
   return 0;

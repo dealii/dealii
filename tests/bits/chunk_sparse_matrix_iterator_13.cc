@@ -28,9 +28,9 @@ void test (const unsigned int chunk_size)
 {
   deallog << "Chunk size: " << chunk_size << std::endl;
 
-                                   // create a sparsity pattern with totally
-                                   // empty lines (not even diagonals, since
-                                   // not quadratic)
+  // create a sparsity pattern with totally
+  // empty lines (not even diagonals, since
+  // not quadratic)
   ChunkSparsityPattern sp(5,5,3,chunk_size);
   for (unsigned int i=0; i<5; ++i)
     for (unsigned int j=0; j<5; ++j)
@@ -40,29 +40,29 @@ void test (const unsigned int chunk_size)
         sp.add (i,j);
   sp.compress ();
 
-                                   // attach a sparse matrix to it
+  // attach a sparse matrix to it
   ChunkSparseMatrix<double> m(sp);
 
   for (unsigned int row=0; row<sp.n_rows(); ++row)
     Assert (m.begin(row)-m.begin(row) == 0,
-	    ExcInternalError());
+            ExcInternalError());
 
   for (unsigned int row=0; row<sp.n_rows(); ++row)
     Assert (m.end(row)-m.begin(row) == (int)sp.row_length(row),
-	    ExcInternalError());
+            ExcInternalError());
   for (unsigned int row=0; row<sp.n_rows(); ++row)
     Assert (m.begin(row)-m.end(row) == -(int)sp.row_length(row),
-	    ExcInternalError());
+            ExcInternalError());
 
   {
     unsigned int counter = 0;
     for (unsigned int row=0; row<sp.n_rows(); ++row)
       {
-	Assert (m.begin(row)-m.begin(0) == (int)counter,
-		ExcInternalError());
-	Assert (m.begin(0)-m.begin(row) == -(int)counter,
-		ExcInternalError());
-	counter += sp.row_length(row);
+        Assert (m.begin(row)-m.begin(0) == (int)counter,
+                ExcInternalError());
+        Assert (m.begin(0)-m.begin(row) == -(int)counter,
+                ExcInternalError());
+        counter += sp.row_length(row);
       }
   }
 
@@ -71,9 +71,9 @@ void test (const unsigned int chunk_size)
   Assert (m.end(sp.n_rows()-1) - m.end() == 0, ExcInternalError());
   Assert (m.end() - m.end(sp.n_rows()-1) == 0, ExcInternalError());
   Assert (m.end() - m.begin() == (int)sp.n_nonzero_elements(),
-	  ExcInternalError());
+          ExcInternalError());
   Assert (m.begin() - m.end() == -(int)sp.n_nonzero_elements(),
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -97,25 +97,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

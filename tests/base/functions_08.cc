@@ -28,9 +28,9 @@ class X : public TensorFunction<1,dim>
 {
 public:
   virtual Tensor<1,dim> value (const Point<dim> &p) const
-    {
-      return p;
-    }
+  {
+    return p;
+  }
 };
 
 
@@ -39,7 +39,7 @@ void check1 ()
 {
   X<dim> x;
   VectorFunctionFromTensorFunction<dim>
-    object (x, 1, dim+2);
+  object (x, 1, dim+2);
 
   Assert (object.n_components == dim+2, ExcInternalError());
 
@@ -47,25 +47,25 @@ void check1 ()
     {
       Point<dim> p;
       for (unsigned int d=0; d<dim; ++d)
-	p[d] = i+d;
+        p[d] = i+d;
 
       for (unsigned int c=0; c<dim+2; ++c)
-	if (c==0 || c==dim+1)
-	  Assert (object.value(p,c) == 0,
-		ExcInternalError())
-	else
-	  Assert (object.value(p,c) == p[c-1],
-		  ExcInternalError());
+        if (c==0 || c==dim+1)
+          Assert (object.value(p,c) == 0,
+                  ExcInternalError())
+          else
+            Assert (object.value(p,c) == p[c-1],
+                    ExcInternalError());
 
       Vector<double> v(dim+2);
       object.vector_value (p, v);
       for (unsigned int c=0; c<dim+2; ++c)
-	if (c==0 || c==dim+1)
-	  Assert (v(c) == 0,
-		ExcInternalError())
-	else
-	  Assert (v(c) == p[c-1],
-		  ExcInternalError());
+        if (c==0 || c==dim+1)
+          Assert (v(c) == 0,
+                  ExcInternalError())
+          else
+            Assert (v(c) == p[c-1],
+                    ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

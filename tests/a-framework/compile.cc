@@ -34,7 +34,7 @@ int main ()
   deallog.depth_console(0);
 
   function_that_does_not_exist ();
-  
+
   deallog << "OK" << std::endl;
 }
 

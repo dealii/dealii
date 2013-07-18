@@ -37,17 +37,17 @@ class TimeStep : public TimeStepBase
 {
 public:
   TimeStep (const unsigned int time_step_number)
-  :
-  TimeStepBase(0),
-  time_step_number (time_step_number)
-    {}
+    :
+    TimeStepBase(0),
+    time_step_number (time_step_number)
+  {}
 
   virtual void end_sweep ()
-    {
-      static Threads::Mutex mutex;
-      Threads::Mutex::ScopedLock lock(mutex);
-      end_sweep_flags[time_step_number] = true;
-    }
+  {
+    static Threads::Mutex mutex;
+    Threads::Mutex::ScopedLock lock(mutex);
+    end_sweep_flags[time_step_number] = true;
+  }
 
   virtual void solve_primal_problem () {}
 
@@ -60,8 +60,8 @@ void test ()
 {
   // create time steps, more than there are likely threads on current machines
   TimeDependent td (TimeDependent::TimeSteppingData(0,0),
-		    TimeDependent::TimeSteppingData(0,0),
-		    TimeDependent::TimeSteppingData(0,0));
+                    TimeDependent::TimeSteppingData(0,0),
+                    TimeDependent::TimeSteppingData(0,0));
   const unsigned int n_time_steps = 10000;
   for (unsigned int i=0; i<n_time_steps; ++i)
     td.add_timestep (new TimeStep(i));
@@ -71,7 +71,7 @@ void test ()
 
   // make sure we have called TimeStep::end_sweep once for every time step object
   Assert (end_sweep_flags == std::vector<bool> (n_time_steps, true),
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

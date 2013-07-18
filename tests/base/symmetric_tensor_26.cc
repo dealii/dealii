@@ -35,10 +35,10 @@ void check ()
   Tensor<1,dim> x;
   for (unsigned int i=0; i<dim; ++i)
     x[i] = std::rand() % 10;
-  
+
   deallog << "S = " << S << std::endl;
   deallog << "x = " << x << std::endl;
-  deallog << "S*x = " << S*x << std::endl;
+  deallog << "S*x = " << S *x << std::endl;
 }
 
 
@@ -53,6 +53,6 @@ int main ()
   check<1> ();
   check<2> ();
   check<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

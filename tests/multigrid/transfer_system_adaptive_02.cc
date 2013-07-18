@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// test like _01 but with boundary conditions 
+// test like _01 but with boundary conditions
 #include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
@@ -45,10 +45,10 @@ using namespace std;
 template <int dim, typename number, int spacedim>
 void
 reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
-	       MGLevelObject<dealii::Vector<number> > &v)
+               MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.min_level();
-       level<=v.max_leve();++level)
+       level<=v.max_leve(); ++level)
     {
       unsigned int n = mg_dof.n_dofs (level);
       v[level].reinit(n);
@@ -60,8 +60,8 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 template <typename Transfer>
 void
 make_matrix (const Transfer &transfer,
-	     const unsigned int high_level,
-	     FullMatrix<double> &matrix)
+             const unsigned int high_level,
+             FullMatrix<double> &matrix)
 {
   Vector<double> src (matrix.n());
   Vector<double> dst (matrix.m());
@@ -71,7 +71,7 @@ make_matrix (const Transfer &transfer,
       src(i) = 1;
       transfer.prolongate (high_level, dst, src);
       for (unsigned int j=0; j<dst.size(); ++j)
-	matrix(j,i) = dst(j);
+        matrix(j,i) = dst(j);
     }
 }
 
@@ -82,7 +82,7 @@ void print_matrix (const FullMatrix<double> &m)
   for (unsigned int i=0; i<m.m(); ++i)
     {
       for (unsigned int j=0; j<m.n(); ++j)
-	deallog << m(i,j) << ' ';
+        deallog << m(i,j) << ' ';
       deallog << std::endl;
     }
 }
@@ -91,23 +91,23 @@ void print_matrix (const FullMatrix<double> &m)
 template<int dim>
 void refine_mesh (Triangulation<dim> &triangulation)
 {
-    bool cell_refined = false;
+  bool cell_refined = false;
   for (typename Triangulation<dim>::active_cell_iterator
-      cell = triangulation.begin_active();
-      cell != triangulation.end(); ++cell)
-  {
+       cell = triangulation.begin_active();
+       cell != triangulation.end(); ++cell)
+    {
       const Point<dim> p = cell->center();
       bool positive = p(0) > 0;
       if (positive)
-      {
-        cell->set_refine_flag();
-        cell_refined = true;
-      }
-  }
-  if(!cell_refined)//if no cell was selected for refinement, refine global
+        {
+          cell->set_refine_flag();
+          cell_refined = true;
+        }
+    }
+  if (!cell_refined) //if no cell was selected for refinement, refine global
     for (typename Triangulation<dim>::active_cell_iterator
-        cell = triangulation.begin_active();
-        cell != triangulation.end(); ++cell)
+         cell = triangulation.begin_active();
+         cell != triangulation.end(); ++cell)
       cell->set_refine_flag();
   triangulation.execute_coarsening_and_refinement ();
 }
@@ -115,7 +115,7 @@ void refine_mesh (Triangulation<dim> &triangulation)
 
 
 template <int dim>
-void check (const FiniteElement<dim>& fe)
+void check (const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -125,21 +125,21 @@ void check (const FiniteElement<dim>& fe)
   subdivisions[0] = 2;
 
   const Point<dim> bottom_left = (dim == 2 ?
-      Point<dim>(-1,-1) : Point<dim>(-1,-1,-1));
+                                  Point<dim>(-1,-1) : Point<dim>(-1,-1,-1));
   const Point<dim> top_right   = (dim == 2 ?
-      Point<dim>(1,1) : Point<dim>(1,1,1));
+                                  Point<dim>(1,1) : Point<dim>(1,1,1));
   GridGenerator::subdivided_hyper_rectangle (tr,
-      subdivisions, bottom_left, top_right, true);
+                                             subdivisions, bottom_left, top_right, true);
   refine_mesh(tr);
 
   MGDoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
 
   deallog << "Global  dofs: " << mg_dof_handler.n_dofs() << std::endl;
-  for(unsigned int l=0; l<tr.n_levels(); ++l)
+  for (unsigned int l=0; l<tr.n_levels(); ++l)
     {
       deallog << "Level " << l << " dofs:";
-	deallog << ' ' << mg_dof_handler.n_dofs(l);
+      deallog << ' ' << mg_dof_handler.n_dofs(l);
       deallog << std::endl;
     }
 
@@ -160,7 +160,7 @@ void check (const FiniteElement<dim>& fe)
   transfer.build_matrices(mg_dof_handler);
 
   FullMatrix<double> prolong_0_1 (mg_dof_handler.n_dofs(1),
-				  mg_dof_handler.n_dofs(0));
+                                  mg_dof_handler.n_dofs(0));
 
   deallog << "Level 0->1" << std::endl;
   make_matrix (transfer, 1, prolong_0_1);

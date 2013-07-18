@@ -51,7 +51,7 @@ print_dofs (const DoFHandler<dim> &dof)
       deallog << "Cell " << cell << " -- ";
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-	deallog << v[i] << ' ';
+        deallog << v[i] << ' ';
       deallog << std::endl;
     }
 }
@@ -69,7 +69,7 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
       deallog << "Cell " << cell << " -- ";
       cell->get_mg_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-	deallog << v[i] << ' ';
+        deallog << v[i] << ' ';
       deallog << std::endl;
     }
 }
@@ -77,21 +77,21 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
 
 template <int dim>
 void
-check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
+check_renumbering(MGDoFHandler<dim> &mgdof, bool discontinuous)
 {
-  const FiniteElement<dim>& element = mgdof.get_fe();
-  DoFHandler<dim>& dof = mgdof;
+  const FiniteElement<dim> &element = mgdof.get_fe();
+  DoFHandler<dim> &dof = mgdof;
 
-				   // Prepare a reordering of
-				   // components for later use
+  // Prepare a reordering of
+  // components for later use
   std::vector<unsigned int> order(element.n_components());
   for (unsigned int i=0; i<order.size(); ++i) order[i] = order.size()-i-1;
 
   Point<dim> direction;
-  for (unsigned int i=0;i<dim;++i)
+  for (unsigned int i=0; i<dim; ++i)
     direction(i) = std::pow(10.,static_cast<double>(i));
 
-				   // Check global ordering
+  // Check global ordering
   print_dofs (dof);
 
   if (discontinuous)
@@ -117,8 +117,8 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
   DoFRenumbering::sort_selected_dofs_back (dof, selected_dofs);
   print_dofs (dof);
 
-				   // Check level ordering
-  for (unsigned int level=0;level<dof.get_tria().n_levels();++level)
+  // Check level ordering
+  for (unsigned int level=0; level<dof.get_tria().n_levels(); ++level)
     {
       print_dofs (mgdof, level);
 
@@ -129,17 +129,17 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
 //        print_dofs (mgdof, level);
 
       if (discontinuous)
-	{
-	  DoFRenumbering::downstream(mgdof, level, direction);
-	}
+        {
+          DoFRenumbering::downstream(mgdof, level, direction);
+        }
 
-                                       // renumber the non-MG part of the
-                                       // DoFHandler again. this is probably
-                                       // not what was meant in the first
-                                       // place, but is compatible with the
-                                       // behavior of the
-                                       // DoFRenumbering::component_wise set
-                                       // of functions before December 2005
+      // renumber the non-MG part of the
+      // DoFHandler again. this is probably
+      // not what was meant in the first
+      // place, but is compatible with the
+      // behavior of the
+      // DoFRenumbering::component_wise set
+      // of functions before December 2005
       DoFRenumbering::component_wise (static_cast<DoFHandler<dim>&>(mgdof),
                                       order);
       print_dofs (mgdof, level);

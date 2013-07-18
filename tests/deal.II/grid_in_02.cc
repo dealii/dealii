@@ -46,13 +46,13 @@ std::ofstream logfile("grid_in_02/output");
 template <int dim>
 void test2 ()
 {
-                                   // read a much larger grid (30k
-                                   // cells). with the old grid
-                                   // reordering scheme, this took >90
-                                   // minutes (exact timing not
-                                   // available, program was killed
-                                   // before), with the new one it
-                                   // takes less than 8 seconds
+  // read a much larger grid (30k
+  // cells). with the old grid
+  // reordering scheme, this took >90
+  // minutes (exact timing not
+  // available, program was killed
+  // before), with the new one it
+  // takes less than 8 seconds
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
@@ -63,24 +63,24 @@ void test2 ()
     }
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
-				       // ignore the exception that we
-				       // get because the mesh has
-				       // distorted cells
+      // ignore the exception that we
+      // get because the mesh has
+      // distorted cells
       deallog << dcv.distorted_cells.size() << " cells are distorted."
-	      << std::endl;
+              << std::endl;
     }
 
   Triangulation<2>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
+  cell = tria.begin_active(),
+  endc = tria.end();
   for (; cell != endc; ++cell)
     for (unsigned int f=0; f<GeometryInfo<2>::faces_per_cell; ++f)
       for (unsigned int e=0; e<GeometryInfo<2>::faces_per_cell; ++e)
-	if (f != e)
-	  if (!cell->at_boundary(e) && !cell->at_boundary(f))
-	    Assert (cell->neighbor(e) !=
-		    cell->neighbor(f),
-		    ExcInternalError());
+        if (f != e)
+          if (!cell->at_boundary(e) && !cell->at_boundary(f))
+            Assert (cell->neighbor(e) !=
+                    cell->neighbor(f),
+                    ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

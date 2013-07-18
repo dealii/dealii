@@ -30,12 +30,12 @@
 template<int dim>
 void test()
 {
-                                   // create 3 triangulations
+  // create 3 triangulations
   Triangulation<dim> tria[3];
 
   GridGenerator::hyper_cube (tria[0]);
   tria[0].refine_global (1);
-  
+
   GridGenerator::hyper_cube (tria[1]);
   GridTools::scale (2, tria[1]);
   tria[1].refine_global (2);
@@ -47,15 +47,15 @@ void test()
       GridGenerator::hyper_cube (tria[2]);
       GridTools::shift (Point<dim>(2.), tria[2]);
     }
-      
+
   tria[2].refine_global (3);
 
   DoFHandler<dim> dh0 (tria[0]);
   DoFHandler<dim> dh1 (tria[1]);
   DoFHandler<dim> dh2 (tria[2]);
-  
+
   DoFHandler<dim> *dof_handler[3] = { &dh0, &dh1, &dh2 };
-  
+
   for (unsigned int i=0; i<3; ++i)
     for (unsigned int j=0; j<3; ++j)
       {
@@ -63,7 +63,7 @@ void test()
                 ==
                 (i == j),
                 ExcInternalError());
-        
+
         deallog << "meshes " << i << " and " << j << ": "
                 << (GridTools::have_same_coarse_mesh (*dof_handler[i], *dof_handler[j])
                     ?

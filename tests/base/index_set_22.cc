@@ -31,9 +31,9 @@ void test ()
 {
   IndexSet is1 (100);
 
-				   // randomly add 90 elements to each
-				   // set, some of which may be
-				   // repetitions of previous ones
+  // randomly add 90 elements to each
+  // set, some of which may be
+  // repetitions of previous ones
   for (unsigned int i=0; i<9*is1.size()/10; ++i)
     is1.add_index (rand() % is1.size());
 
@@ -45,7 +45,7 @@ void test ()
 
   for (unsigned int i=0; i<is1.size(); i++)
     Assert(is1.is_element(i) == zeros_and_ones[i],
-	   ExcInternalError());
+           ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

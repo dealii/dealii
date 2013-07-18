@@ -29,7 +29,7 @@
 
 template <class MATRIX, class VECTOR>
 void
-check(const MATRIX& A, const VECTOR& f)
+check(const MATRIX &A, const VECTOR &f)
 {
   std::vector<std::string> names;
   names.push_back("cg");
@@ -42,28 +42,28 @@ check(const MATRIX& A, const VECTOR& f)
   SolverSelector<VECTOR> solver;
   PreconditionSSOR<SparseMatrix<double> > pre;
   pre.initialize(A);
-  
+
   VECTOR u;
   u.reinit(f);
 
   std::vector<std::string>::const_iterator name;
-  
+
   solver.set_control(cont1);
-  for (name = names.begin(); name != names.end();++name)
+  for (name = names.begin(); name != names.end(); ++name)
     {
       solver.select(*name);
       u = 0.;
       solver.solve(A, u, f, pre);
     }
-  
+
   solver.set_control(cont2);
-  for (name = names.begin(); name != names.end();++name)
+  for (name = names.begin(); name != names.end(); ++name)
     {
       solver.select(*name);
       u = 0.;
       solver.solve(A, u, f, pre);
     }
-  
+
 }
 
 
@@ -78,10 +78,10 @@ int main()
 
   unsigned int size=37;
   unsigned int dim = (size-1)*(size-1);
-  
+
   deallog << "Size " << size << " Unknowns " << dim << std::endl;
-  
-				   // Make matrix
+
+  // Make matrix
   FDMatrix testproblem(size, size);
   SparsityPattern structure(dim, dim, 5);
   testproblem.five_point_structure(structure);
@@ -90,6 +90,6 @@ int main()
   testproblem.five_point(A);
   Vector<double>  f(dim);
   f = 1.;
-  
+
   check(A, f);
 }

@@ -32,16 +32,16 @@
 
 void test ()
 {
-				   // test for an initialized mask
+  // test for an initialized mask
   Assert (ComponentMask(12,false).represents_n_components(12) == true,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (ComponentMask(12,false).represents_n_components(13) == false,
-	  ExcInternalError());
-				   // test for an empty mask
+          ExcInternalError());
+  // test for an empty mask
   Assert (ComponentMask().represents_n_components(12) == true,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (ComponentMask().represents_n_components(13) == true,
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

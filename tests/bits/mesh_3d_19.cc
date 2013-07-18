@@ -55,7 +55,7 @@ void test_with_wrong_face_orientation ()
 
   for (unsigned int i=0; i<6; ++i)
     deallog << "cell->neighbor(3)->face(" << i << ")="
-	    << cell->neighbor(3)->face(i) << std::endl;
+            << cell->neighbor(3)->face(i) << std::endl;
 }
 
 
@@ -64,7 +64,7 @@ int main ()
 {
   std::ofstream logfile(logname);
   deallog << std::setprecision (3);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

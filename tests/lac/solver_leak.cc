@@ -40,8 +40,8 @@
 
 template<class SOLVER, class MATRIX, class VECTOR>
 void
-check_solve( const MATRIX& A,
-	     VECTOR& u, VECTOR& f)
+check_solve( const MATRIX &A,
+             VECTOR &u, VECTOR &f)
 {
   GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-3);
@@ -49,15 +49,15 @@ check_solve( const MATRIX& A,
   PreconditionIdentity prec_no;
   u = 0.;
   f = 0.;
-  
-  try 
+
+  try
     {
       solver.solve(A, u, f, prec_no);
     }
-  catch (std::exception& e)
+  catch (std::exception &e)
     {
       deallog << e.what() << std::endl;
-    }  
+    }
 }
 
 int main()
@@ -68,26 +68,26 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   for (unsigned int size=4; size <= 30; size *= 3)
     {
       unsigned int dim = (size-1)*(size-1);
 
       deallog << "Size " << size << " Unknowns " << dim << std::endl;
-      
-				       // Make matrix
+
+      // Make matrix
       FDMatrix testproblem(size, size);
       SparsityPattern structure(dim, dim, 5);
       testproblem.five_point_structure(structure);
       structure.compress();
       SparseMatrix<double>  A(structure);
       testproblem.five_point(A);
-      
+
       Vector<double>  f(dim);
       Vector<double>  u(dim);
       Vector<double> res(dim);
 
-      deallog.push("alreadydone");      
+      deallog.push("alreadydone");
       check_solve<SolverCG<> >(A,u,f);
       check_solve<SolverGMRES<> >(A,u,f);
 //      check_solve<SolverFGMRES<> >(A,u,f);

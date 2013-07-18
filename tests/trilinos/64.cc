@@ -59,22 +59,22 @@ int main (int argc,char **argv)
   try
     {
       {
-	const unsigned int n_dofs=420;
-					 // check
-					 // TrilinosWrappers::SparseMatrix
+        const unsigned int n_dofs=420;
+        // check
+        // TrilinosWrappers::SparseMatrix
         TrilinosWrappers::SparseMatrix
-	  v1 (n_dofs, n_dofs, 5U);
+        v1 (n_dofs, n_dofs, 5U);
         test (v1);
 
-					 // check
-					 // TrilinosWrappers::SparseMatrix
-	const unsigned int n_jobs =
-	  Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
-	Assert(n_dofs%n_jobs==0, ExcInternalError());
-	const unsigned int n_local_dofs=n_dofs/n_jobs;
-	Epetra_Map map(static_cast<TrilinosWrappers::types::int_type>(n_dofs),
-		       static_cast<TrilinosWrappers::types::int_type>(n_local_dofs),
-		       Utilities::Trilinos::comm_world());
+        // check
+        // TrilinosWrappers::SparseMatrix
+        const unsigned int n_jobs =
+          Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
+        Assert(n_dofs%n_jobs==0, ExcInternalError());
+        const unsigned int n_local_dofs=n_dofs/n_jobs;
+        Epetra_Map map(static_cast<TrilinosWrappers::types::int_type>(n_dofs),
+                       static_cast<TrilinosWrappers::types::int_type>(n_local_dofs),
+                       Utilities::Trilinos::comm_world());
         TrilinosWrappers::SparseMatrix v2 (map, 5);
         test (v2);
       }
@@ -82,25 +82,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
 
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

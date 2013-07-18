@@ -32,14 +32,14 @@
 
 template <int dim, int spacedim>
 void check(DataOutBase::TecplotFlags flags,
-	       std::ostream& out)
+           std::ostream &out)
 {
   const unsigned int np = 4;
-  
+
   std::vector<DataOutBase::Patch<dim, spacedim> > patches(np);
-  
+
   create_patches(patches);
-  
+
   std::vector<std::string> names(5);
   names[0] = "x1";
   names[1] = "x2";
@@ -56,12 +56,13 @@ void check_all()
 {
   char name[100];
   DataOutBase::TecplotFlags flags;
-  if (true) {
-    sprintf(name, "data_out_base_tecplot_bin/%d%d.tecplot", dim, spacedim);
-    flags.tecplot_binary_file_name=name;
-    
-    check<dim,spacedim>(flags, deallog.get_file_stream());
-  }
+  if (true)
+    {
+      sprintf(name, "data_out_base_tecplot_bin/%d%d.tecplot", dim, spacedim);
+      flags.tecplot_binary_file_name=name;
+
+      check<dim,spacedim>(flags, deallog.get_file_stream());
+    }
 }
 
 int main()

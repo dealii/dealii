@@ -46,7 +46,7 @@ void check (const Triangulation<dim> &tria)
   dof_handler.distribute_dofs (fe);
 
   QGauss<dim-1> q_face(3);
-  
+
   FEFaceValues<dim>    fe_face_values (mapping, fe, q_face,
                                        update_normal_vectors);
   fe_face_values.reinit (dof_handler.begin_active(), 0);
@@ -55,25 +55,25 @@ void check (const Triangulation<dim> &tria)
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mapping_cartesian_1/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<2> coarse_grid;
     GridGenerator::hyper_cube (coarse_grid);
     check (coarse_grid);
   }
 
-  {  
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_cube (coarse_grid);
     check (coarse_grid);
-  }  
+  }
 }
 
-  
-  
+
+

@@ -82,31 +82,31 @@ void test ()
 
   {
     typename Triangulation<dim> :: active_cell_iterator
-        cell = triangulation.begin_active(),
-        endc = triangulation.end();
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
 
-    for(; cell != endc; cell++)
-    {
+    for (; cell != endc; cell++)
+      {
         Point<dim> center = cell->center();
 
-        if(center[0] < 0)
-        {
-          cell->set_subdomain_id(1);
-        }
+        if (center[0] < 0)
+          {
+            cell->set_subdomain_id(1);
+          }
 
         double h=0;
-        for(unsigned d=0; d<dim; ++d) h += center[d];
+        for (unsigned d=0; d<dim; ++d) h += center[d];
 
-        if(std::fabs(h) + 1e-6 > 0.25*dim)
+        if (std::fabs(h) + 1e-6 > 0.25*dim)
           cell->set_refine_flag();
-    }
+      }
 
     triangulation.execute_coarsening_and_refinement();
   }
 
-				// create fe_collection and
-				// distribute dofs. in this test,
-                                // we are looking at FESystems.
+  // create fe_collection and
+  // distribute dofs. in this test,
+  // we are looking at FESystems.
 
   hp::FECollection<dim>    fe_collection;
 
@@ -120,26 +120,26 @@ void test ()
 
   {
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
-    for(; cell != endc; cell++)
-    {
-      if(cell->subdomain_id()==1 )
-        cell->set_active_fe_index(1);
-      else
-        cell->set_active_fe_index(0);
-    }
+    for (; cell != endc; cell++)
+      {
+        if (cell->subdomain_id()==1 )
+          cell->set_active_fe_index(1);
+        else
+          cell->set_active_fe_index(0);
+      }
 
     dof_handler.distribute_dofs (fe_collection);
   }
 
   deallog << "   Number of active cells:       "
-	  << triangulation.n_active_cells()
-	  << std::endl
-	  << "   Number of degrees of freedom: "
-	  << dof_handler.n_dofs()
-	  << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl
+          << "   Number of degrees of freedom: "
+          << dof_handler.n_dofs()
+          << std::endl;
 
 
   // .... test constraint handling
@@ -154,29 +154,29 @@ void test ()
           << constraints.n_constraints()
           << std::endl;
 
-				   // the FE assignment is entirely
-				   // symmetric, so the number of
-				   // constraints must be even
+  // the FE assignment is entirely
+  // symmetric, so the number of
+  // constraints must be even
   Assert (constraints.n_constraints() % 2 == 0, ExcInternalError());
 
   {
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
-    for(; cell != endc; cell++)
+    for (; cell != endc; cell++)
       {
-	deallog << cell << ' ' << cell->active_fe_index() << std::endl
-		<< "   ";
-	std::vector<types::global_dof_index> local_dof_indices (cell->get_fe().dofs_per_cell);
-	cell->get_dof_indices (local_dof_indices);
+        deallog << cell << ' ' << cell->active_fe_index() << std::endl
+                << "   ";
+        std::vector<types::global_dof_index> local_dof_indices (cell->get_fe().dofs_per_cell);
+        cell->get_dof_indices (local_dof_indices);
 
-	for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-	  deallog << local_dof_indices[i]
-		  << (constraints.is_constrained(local_dof_indices[i]) ?
-		      "*" : "")
-		  << ' ';
-	deallog << std::endl;
+        for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+          deallog << local_dof_indices[i]
+                  << (constraints.is_constrained(local_dof_indices[i]) ?
+                      "*" : "")
+                  << ' ';
+        deallog << std::endl;
       }
   }
 }

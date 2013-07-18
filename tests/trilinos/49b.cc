@@ -41,14 +41,14 @@ void test (TrilinosWrappers::MPI::BlockVector &v)
   v = w;
 
 
-                                   // make sure we get the expected result
+  // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
       Assert (w(i) == i, ExcInternalError());
       Assert (v(i) == i, ExcInternalError());
     }
 
-				   // now also check the reverse assignment
+  // now also check the reverse assignment
   w = 0;
   w = v;
   for (unsigned int i=0; i<v.size(); ++i)
@@ -76,13 +76,13 @@ int main (int argc,char **argv)
   try
     {
       {
-	std::vector<Epetra_Map> sizes;
-	Epetra_Map map(TrilinosWrappers::types::int_type(3),
-		       TrilinosWrappers::types::int_type(3),
-		       0,
-		       Utilities::Trilinos::comm_world());
-	sizes.push_back (map);
-	sizes.push_back (map);
+        std::vector<Epetra_Map> sizes;
+        Epetra_Map map(TrilinosWrappers::types::int_type(3),
+                       TrilinosWrappers::types::int_type(3),
+                       0,
+                       Utilities::Trilinos::comm_world());
+        sizes.push_back (map);
+        sizes.push_back (map);
 
         TrilinosWrappers::MPI::BlockVector v (sizes);
         test (v);
@@ -91,25 +91,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
 
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

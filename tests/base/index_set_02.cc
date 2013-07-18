@@ -33,21 +33,21 @@ void test ()
   index_set.add_index (3);
   index_set.add_index (4);
   deallog << (index_set.is_contiguous() ? "true" : "false")
-	  << std::endl;
+          << std::endl;
   Assert (index_set.is_contiguous() == true, ExcInternalError());
 
   for (unsigned int i=0; i<index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
-	    << std::endl;
+            << std::endl;
 
   index_set.add_index (6);
   deallog << (index_set.is_contiguous() ? "true" : "false")
-	  << std::endl;
+          << std::endl;
   Assert (index_set.is_contiguous() == false, ExcInternalError());
 
   for (unsigned int i=0; i<index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
-	    << std::endl;
+            << std::endl;
 }
 
 

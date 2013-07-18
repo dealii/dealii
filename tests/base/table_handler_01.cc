@@ -38,14 +38,14 @@ int main ()
   TableHandler table;
 
   for (unsigned int i=1; i<=10; ++i)
-  {
-    table.add_value("numbers", i);
-    table.add_value("squares", i*i);
-    table.add_value("square roots", sqrt(i));
-  }
+    {
+      table.add_value("numbers", i);
+      table.add_value("squares", i*i);
+      table.add_value("square roots", sqrt(i));
+    }
 
   table.set_tex_table_caption("This is a caption text with \\LaTeX{} symbols");
 
-                                 // output
+  // output
   table.write_tex(deallog.get_file_stream());
 }

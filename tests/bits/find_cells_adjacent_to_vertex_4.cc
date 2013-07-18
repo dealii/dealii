@@ -34,17 +34,17 @@
 
 void check (Triangulation<2> &tria)
 {
-  for(unsigned i=0; i<tria.n_vertices(); i++)
+  for (unsigned i=0; i<tria.n_vertices(); i++)
     {
       std::vector<Triangulation<2>::active_cell_iterator>
-	cells = GridTools::find_cells_adjacent_to_vertex(tria, i);
+      cells = GridTools::find_cells_adjacent_to_vertex(tria, i);
 
       deallog << "Vertex " << i << " at "
-	      << tria.get_vertices()[i] << ": "
-	      << cells.size() << " cells" << std::endl;
+              << tria.get_vertices()[i] << ": "
+              << cells.size() << " cells" << std::endl;
 
-      for(unsigned c=0; c<cells.size(); c++)
-	deallog << "   " << cells[c] << std::endl;
+      for (unsigned c=0; c<cells.size(); c++)
+        deallog << "   " << cells[c] << std::endl;
     }
 }
 
@@ -58,35 +58,35 @@ int main ()
 
   try
     {
-				       // set up the vertices of the
-				       // cells: the center plus 16
-				       // points on the perimeter of a
-				       // circle
+      // set up the vertices of the
+      // cells: the center plus 16
+      // points on the perimeter of a
+      // circle
       const unsigned int dim = 2;
       std::vector<Point<dim> > vertices;
       vertices.push_back (Point<dim>());
 
       for (unsigned int i=0; i<16; ++i)
-	vertices.push_back (Point<dim>(std::cos(i*2*numbers::PI/16),
-				       std::sin(i*2*numbers::PI/16)));
+        vertices.push_back (Point<dim>(std::cos(i*2*numbers::PI/16),
+                                       std::sin(i*2*numbers::PI/16)));
 
-				       // now create the 8 cells
+      // now create the 8 cells
       std::vector<CellData<dim> > cells;
       for (unsigned int c=0; c<8; ++c)
-	{
-	  CellData<dim> d;
-	  d.vertices[0] = 0;
-	  d.vertices[1] = 1+2*c;
-	  d.vertices[2] = 1+((2*c+2) % 16);
-	  d.vertices[3] = 1+2*c+1;
-	  cells.push_back(d);
-	}
+        {
+          CellData<dim> d;
+          d.vertices[0] = 0;
+          d.vertices[1] = 1+2*c;
+          d.vertices[2] = 1+((2*c+2) % 16);
+          d.vertices[3] = 1+2*c+1;
+          cells.push_back(d);
+        }
 
       Triangulation<dim> coarse_grid;
       coarse_grid.create_triangulation (vertices, cells,
-					SubCellData());
+                                        SubCellData());
 
-				       // now also refine one cell
+      // now also refine one cell
       coarse_grid.begin_active()->set_refine_flag();
       coarse_grid.execute_coarsening_and_refinement();
 
@@ -94,7 +94,7 @@ int main ()
     }
   catch (const std::exception &exc)
     {
-				       // we shouldn't get here...
+      // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
       deallog << exc.what() << std::endl;
     }

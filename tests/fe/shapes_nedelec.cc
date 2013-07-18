@@ -50,7 +50,7 @@ main()
   plot_FE_Nedelec_shape_functions<2>();
   deallog << "FE_Nedelec<3>" << std::endl;
   plot_FE_Nedelec_shape_functions<3>();
-  
+
   return 0;
 }
 

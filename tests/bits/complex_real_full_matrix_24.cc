@@ -36,7 +36,7 @@ check ()
   make_matrix (m);
   make_matrix (n);
   m.add (3.14159, n);
-  
+
   print_matrix (m);
 }
 

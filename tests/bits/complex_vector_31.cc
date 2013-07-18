@@ -19,7 +19,7 @@
 // check Vector<std::complex<double> >::l2_norm()
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -27,17 +27,17 @@
 
 void test (Vector<std::complex<double> > &v)
 {
-                                   // set some elements of the vector
+  // set some elements of the vector
   std::complex<double> norm = 0;
   for (unsigned int i=0; i<v.size(); i+=1+i)
     {
       v(i) = std::complex<double> (i+1., i+2.);
       norm += std::conj(std::complex<double> (i+1., i+2.)) *
-	      std::complex<double> (i+1., i+2.);
+              std::complex<double> (i+1., i+2.);
     }
   v.compress ();
 
-                                   // then check the norm
+  // then check the norm
   Assert (std::abs(v.norm_sqr() - norm) < 1e-14*std::abs(norm),
           ExcInternalError());
 
@@ -46,7 +46,7 @@ void test (Vector<std::complex<double> > &v)
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("complex_vector_31/output");
   deallog.attach(logfile);
@@ -61,25 +61,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

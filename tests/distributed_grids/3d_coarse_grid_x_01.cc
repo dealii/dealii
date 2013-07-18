@@ -32,7 +32,7 @@
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   if (true)
     {
@@ -43,8 +43,8 @@ void test(std::ostream& /*out*/)
       GridGenerator::hyper_cube(tr);
 
       deallog << "Triangulation copied back from p4est has "
-	      << tr.n_active_cells()
-	      << " active cells" << std::endl;
+              << tr.n_active_cells()
+              << " active cells" << std::endl;
       GridOut().write_gnuplot (tr, deallog.get_file_stream());
     }
 
@@ -58,8 +58,8 @@ void test(std::ostream& /*out*/)
       GridGenerator::hyper_ball(tr, Point<dim>(), 3.);
 
       deallog << "Triangulation copied back from p4est has "
-	      << tr.n_active_cells()
-	      << " active cells" << std::endl;
+              << tr.n_active_cells()
+              << " active cells" << std::endl;
       GridOut().write_gnuplot (tr, deallog.get_file_stream());
     }
 
@@ -72,8 +72,8 @@ void test(std::ostream& /*out*/)
       GridGenerator::half_hyper_ball(tr, Point<dim>(), 3.);
 
       deallog << "Triangulation copied back from p4est has "
-	      << tr.n_active_cells()
-	      << " active cells" << std::endl;
+              << tr.n_active_cells()
+              << " active cells" << std::endl;
       GridOut().write_gnuplot (tr, deallog.get_file_stream());
     }
 }

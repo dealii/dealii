@@ -39,7 +39,7 @@
 void check (Triangulation<3> &tria)
 {
   Point<3> p (0.75,0.75,0.75);
-  
+
   Triangulation<3>::active_cell_iterator cell
     = GridTools::find_active_cell_around_point (tria, p);
 
@@ -50,23 +50,23 @@ void check (Triangulation<3> &tria)
 
   // Transform back and forth
   Point<3> pp =
-     StaticMappingQ1<3>::mapping.transform_unit_to_real_cell
-     ( cell,
-       GeometryInfo<3>::project_to_unit_cell
-       (
-         StaticMappingQ1<3>::mapping.transform_real_to_unit_cell
-         ( cell,
-           p
-           )
-         )
-       );
-                                                                       
+    StaticMappingQ1<3>::mapping.transform_unit_to_real_cell
+    ( cell,
+      GeometryInfo<3>::project_to_unit_cell
+      (
+        StaticMappingQ1<3>::mapping.transform_real_to_unit_cell
+        ( cell,
+          p
+        )
+      )
+    );
+
   Assert (p.distance (pp) < 1e-15,  ExcInternalError());
 
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("find_cell_5/output");
   deallog.attach(logfile);
@@ -82,11 +82,11 @@ int main ()
     }
   catch (const std::exception &exc)
     {
-				       // we shouldn't get here...
+      // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
       deallog << exc.what() << std::endl;
     }
 }
 
-  
-  
+
+

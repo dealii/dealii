@@ -60,43 +60,43 @@ Point<2> tilt_coordinates (const Point<2> p)
 
 void
 transform_grid (Triangulation<2> &tria,
-		const unsigned int  transform)
+                const unsigned int  transform)
 {
   switch (transform)
     {
-                                       // first round: take
-                                       // original grid
-      case 0:
-	    break;
-            
-					     // second round: rotate
-					     // triangulation
-      case 1:
-	    GridTools::rotate (3.14159265358/2, tria);
-	    break;
+      // first round: take
+      // original grid
+    case 0:
+      break;
 
-					     // third round: inflate
-					     // by a factor of 2
-      case 2:
-	    GridTools::scale (2, tria);
-	    break;
+      // second round: rotate
+      // triangulation
+    case 1:
+      GridTools::rotate (3.14159265358/2, tria);
+      break;
 
-                                             // third round: scale
-                                             // back, rotate back,
-                                             // stretch
-      case 3:
-            GridTools::scale (.5, tria);
-	    GridTools::rotate (-3.14159265358/2, tria);
-            GridTools::transform (&stretch_coordinates, tria);
-            
-	    break;
-            
-      default:
-	    Assert (false, ExcNotImplemented());
+      // third round: inflate
+      // by a factor of 2
+    case 2:
+      GridTools::scale (2, tria);
+      break;
+
+      // third round: scale
+      // back, rotate back,
+      // stretch
+    case 3:
+      GridTools::scale (.5, tria);
+      GridTools::rotate (-3.14159265358/2, tria);
+      GridTools::transform (&stretch_coordinates, tria);
+
+      break;
+
+    default:
+      Assert (false, ExcNotImplemented());
     };
 }
 
-	    
+
 
 
 template<int dim>
@@ -107,61 +107,61 @@ plot_shape_functions(const unsigned int degree)
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
 
-				   // check the following with a
-				   // number of transformed
-				   // triangulations
+  // check the following with a
+  // number of transformed
+  // triangulations
   for (unsigned int transform=0; transform<4; ++transform)
     {
       std::ostringstream ost;
       ost << "Nedelec" << degree << "-Transform" << transform;
       deallog.push(ost.str());
-      
+
       transform_grid (tr, transform);
 
       DoFHandler<dim> dof(tr);
       typename DoFHandler<dim>::cell_iterator c = dof.begin();
       dof.distribute_dofs(element);
-      
+
       QTrapez<1> q_trapez;
       const unsigned int div=2;
       QIterated<dim> q(q_trapez, div);
       FEValues<dim> fe(element, q, update_values|update_gradients|update_q_points);
       fe.reinit(c);
-      
-      for (unsigned int q_point=0;q_point< q.size();++q_point)
-	{
-					   // Output function in
-					   // gnuplot readable format,
-					   // namely x y z u0x u0y u0z u1x...
-	  deallog << "value    " << q_point << '\t' << fe.quadrature_point(q_point);
-	  
-	  for (unsigned int i=0;i<element.dofs_per_cell;++i)
-	    {
-	      for (unsigned int c=0; c<dim; ++c)
-		deallog << '\t' << fe.shape_value_component(i,q_point,c);
-	    }
 
-					   // Output the gradients in
-					   // similar fashion
-	  deallog << std::endl << "gradient " << q_point << '\t' << fe.quadrature_point(q_point);
-	  
-	  for (unsigned int i=0;i<element.dofs_per_cell;++i)
-	    {
-	      for (unsigned int c=0; c<dim; ++c)
-		{
-		  for (unsigned int d=0; d<dim; ++d)
-		    deallog << '\t' << fe.shape_grad_component(i,q_point,c)[d];
-		}
-	    }
-	  deallog << std::endl;
-	  
-	  if ((q_point+1) % (2*div-1) == 0)
-	    {
-	      deallog << "value    " << std::endl;
-	      deallog << "gradient " << std::endl;
-	    }
-	}
-      
+      for (unsigned int q_point=0; q_point< q.size(); ++q_point)
+        {
+          // Output function in
+          // gnuplot readable format,
+          // namely x y z u0x u0y u0z u1x...
+          deallog << "value    " << q_point << '\t' << fe.quadrature_point(q_point);
+
+          for (unsigned int i=0; i<element.dofs_per_cell; ++i)
+            {
+              for (unsigned int c=0; c<dim; ++c)
+                deallog << '\t' << fe.shape_value_component(i,q_point,c);
+            }
+
+          // Output the gradients in
+          // similar fashion
+          deallog << std::endl << "gradient " << q_point << '\t' << fe.quadrature_point(q_point);
+
+          for (unsigned int i=0; i<element.dofs_per_cell; ++i)
+            {
+              for (unsigned int c=0; c<dim; ++c)
+                {
+                  for (unsigned int d=0; d<dim; ++d)
+                    deallog << '\t' << fe.shape_grad_component(i,q_point,c)[d];
+                }
+            }
+          deallog << std::endl;
+
+          if ((q_point+1) % (2*div-1) == 0)
+            {
+              deallog << "value    " << std::endl;
+              deallog << "gradient " << std::endl;
+            }
+        }
+
       deallog << std::endl;
       deallog.pop();
     }
@@ -173,13 +173,13 @@ main()
 {
   std::ofstream logfile ("nedelec/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   plot_shape_functions<2> (0);
   plot_shape_functions<2> (1);
-  
+
   return 0;
 }
 

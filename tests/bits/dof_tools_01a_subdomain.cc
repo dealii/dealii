@@ -22,7 +22,7 @@
 // check
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim> &,
-//	                    SparsityPattern       &, ...)
+//                      SparsityPattern       &, ...)
 // with the subdomain argument
 
 
@@ -33,22 +33,22 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // create sparsity pattern
+  // create sparsity pattern
   SparsityPattern sp (dof_handler.n_dofs(),
                       dof_handler.max_couplings_between_dofs());
 
-				   // pass a subdomain id; note that
-				   // the framework sets the subdomain
-				   // id to the level of each cell
+  // pass a subdomain id; note that
+  // the framework sets the subdomain
+  // id to the level of each cell
   DoFTools::make_sparsity_pattern (dof_handler, sp,
-				   ConstraintMatrix(), true,
-				   2);
+                                   ConstraintMatrix(), true,
+                                   2);
   sp.compress ();
-  
-                                   // write out 10 lines of this
-                                   // pattern (if we write out the
-                                   // whole pattern, the output file
-                                   // would be in the range of 40 MB)
+
+  // write out 10 lines of this
+  // pattern (if we write out the
+  // whole pattern, the output file
+  // would be in the range of 40 MB)
   for (unsigned int l=0; l<10; ++l)
     {
       const unsigned int line = l*(sp.n_rows()/10);
@@ -57,7 +57,7 @@ check_this (const DoFHandler<dim> &dof_handler)
       deallog << std::endl;
     }
 
-                                   // write out some other indicators
+  // write out some other indicators
   deallog << sp.bandwidth () << std::endl
           << sp.max_entries_per_row () << std::endl
           << sp.n_nonzero_elements () << std::endl;

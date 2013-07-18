@@ -26,7 +26,7 @@
 #include <fstream>
 #include <string>
 
-// test the method evaluate_all_convergence_rates with argument reference_column_key, 
+// test the method evaluate_all_convergence_rates with argument reference_column_key,
 
 int main ()
 {
@@ -38,16 +38,16 @@ int main ()
   ConvergenceTable table;
 
   for (unsigned int i=1; i<=4; ++i)
-  {
-    table.add_value("error", 1./sqrt(i));
-    table.add_value("error2", std::pow(1./sqrt(i),2.));
-    table.add_value("error3", std::pow(1./sqrt(i),3.));
-    table.add_value("error4", std::pow(1./sqrt(i),4.));
-    table.add_value("key", i);
-  }
+    {
+      table.add_value("error", 1./sqrt(i));
+      table.add_value("error2", std::pow(1./sqrt(i),2.));
+      table.add_value("error3", std::pow(1./sqrt(i),3.));
+      table.add_value("error4", std::pow(1./sqrt(i),4.));
+      table.add_value("key", i);
+    }
   table.omit_column_from_convergence_rate_evaluation ( "key" );
   table.evaluate_all_convergence_rates("key", ConvergenceTable::reduction_rate_log2);
 
-                                 // output
+  // output
   table.write_text(deallog.get_file_stream());
 }

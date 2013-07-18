@@ -32,5 +32,5 @@ int main ()
   row_length<SparsityPattern> ();
 }
 
-  
-  
+
+

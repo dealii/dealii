@@ -30,10 +30,10 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   double a[3][3] = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};
   double b[3][3] = {{25,31,37}, {45,57,69}, {75,96,117}};
-    
+
   const unsigned int dim=3;
   Tensor<2,dim> t(a);
   Tensor<2,dim> tt;
@@ -42,10 +42,10 @@ int main ()
   Assert (transpose(transpose(result)) == result, ExcInternalError());
 
   Vector<double> unrolled(9);
-  
+
   t.unroll(unrolled);
   deallog << "unrolled:";
-  for (unsigned i=0;i<9;i++)
+  for (unsigned i=0; i<9; i++)
     deallog << ' ' << unrolled(i);
   deallog << std::endl;
 
@@ -53,17 +53,17 @@ int main ()
   for (unsigned int i=0; i<dim; ++i)
     {
       for (unsigned int j=0; j<dim; ++j)
-	deallog << t[i][j] << ' ';
+        deallog << t[i][j] << ' ';
       deallog << std::endl;
     };
-  
+
   contract (tt,t,t);
 
   deallog << "tt=" << std::endl;
   for (unsigned int i=0; i<dim; ++i)
     {
       for (unsigned int j=0; j<dim; ++j)
-	deallog << tt[i][j] << ' ';
+        deallog << tt[i][j] << ' ';
       deallog << std::endl;
     };
 
@@ -79,20 +79,20 @@ int main ()
       Tensor<1,3> result;
       cross_product(result,e1,e2);
       deallog << '\t' << result[0]
-	      << '\t' << result[1]
-	      << '\t' << result[2] << std::endl;
-      
+              << '\t' << result[1]
+              << '\t' << result[2] << std::endl;
+
       cross_product(result,e2,e3);
       deallog << '\t' << result[0]
-	      << '\t' << result[1] << '\t'
-	      << result[2] << std::endl;
-      
+              << '\t' << result[1] << '\t'
+              << result[2] << std::endl;
+
       cross_product(result,e3,e1);
       deallog << '\t' << result[0]
-	      << '\t' << result[1]
-	      << '\t' << result[2] << std::endl;
-      
-	deallog.pop();
+              << '\t' << result[1]
+              << '\t' << result[2] << std::endl;
+
+      deallog.pop();
     }
 
   if (tt==result)

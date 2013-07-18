@@ -58,10 +58,10 @@ template <int dim>
 int generate_grid (Triangulation<dim> &tria)
 {
   Point<dim> p1,
-    p2;
+        p2;
   std::vector<unsigned int> sub_div;
 
-				   // Define a rectangular shape
+  // Define a rectangular shape
   for (unsigned int d=0; d < dim; ++d)
     {
       p1(d) = 0;
@@ -70,7 +70,7 @@ int generate_grid (Triangulation<dim> &tria)
     }
   GridGenerator::subdivided_hyper_rectangle (tria, sub_div, p1, p2, true);
 
-				   // Refine the first cell.
+  // Refine the first cell.
   tria.begin_active ()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
 
@@ -84,21 +84,21 @@ void test_constraints (hp::FECollection<dim> &fe_coll)
 {
   Triangulation<dim> tria;
 
-				   // Setup a rectangular domain
-				   // where one cell is h-refined,
-				   // while the other cell is
-				   // unrefined. Furthermore every cell
-				   // gets a different active_fe_index.
-				   // This should serve as a testcase
-				   // for the hanging node constraints.
+  // Setup a rectangular domain
+  // where one cell is h-refined,
+  // while the other cell is
+  // unrefined. Furthermore every cell
+  // gets a different active_fe_index.
+  // This should serve as a testcase
+  // for the hanging node constraints.
   generate_grid (tria);
 
-				   // Now assign increasing
-				   // active_fe_indices to
-				   // the different cells.
+  // Now assign increasing
+  // active_fe_indices to
+  // the different cells.
   hp::DoFHandler<dim> dof_handler (tria);
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active (),
-					    endc = dof_handler.end ();
+                                                     endc = dof_handler.end ();
   unsigned int fe_indx = 0;
   for (; cell != endc; ++cell)
     {
@@ -106,17 +106,17 @@ void test_constraints (hp::FECollection<dim> &fe_coll)
       ++fe_indx;
     }
 
-				   // Distribute DoFs;
+  // Distribute DoFs;
   dof_handler.distribute_dofs (fe_coll);
   deallog << "DoFs: " << dof_handler.n_dofs () << std::endl;
 
-				   // Create the constraints.
+  // Create the constraints.
   ConstraintMatrix constraint_matrix;
 
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   constraint_matrix);
+                                           constraint_matrix);
 
-				   // Output the constraints
+  // Output the constraints
   constraint_matrix.print (deallog.get_file_stream ());
 }
 
@@ -126,31 +126,31 @@ void test_constraints_old (FiniteElement<dim> &fe)
 {
   Triangulation<dim> tria;
 
-				   // Setup a rectangular domain
-				   // where one cell is h-refined,
-				   // while the other cell is
-				   // unrefined. Furthermore every cell
-				   // gets a different active_fe_index.
-				   // This should serve as a testcase
-				   // for the hanging node constraints.
+  // Setup a rectangular domain
+  // where one cell is h-refined,
+  // while the other cell is
+  // unrefined. Furthermore every cell
+  // gets a different active_fe_index.
+  // This should serve as a testcase
+  // for the hanging node constraints.
   generate_grid (tria);
 
-				   // Now assign increasing
-				   // active_fe_indices to
-				   // the different cells.
+  // Now assign increasing
+  // active_fe_indices to
+  // the different cells.
   DoFHandler<dim> dof_handler (tria);
 
-				   // Distribute DoFs;
+  // Distribute DoFs;
   dof_handler.distribute_dofs (fe);
   deallog << "DoFs: " << dof_handler.n_dofs () << std::endl;
 
-				   // Create the constraints.
+  // Create the constraints.
   ConstraintMatrix constraint_matrix;
 
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   constraint_matrix);
+                                           constraint_matrix);
 
-				   // Output the constraints
+  // Output the constraints
   constraint_matrix.print (deallog.get_file_stream ());
 }
 

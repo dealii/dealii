@@ -18,19 +18,19 @@
 
 // check TrilinosScalar
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <fstream>
 
-int main (int argc, char** argv) 
+int main (int argc, char **argv)
 {
   std::ofstream logfile("70/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 

@@ -39,8 +39,8 @@
 // check
 //   DoFTools::
 //   make_flux_sparsity_pattern (const DoFHandler<dim> &,
-//	                         SparsityPattern       &,
-//	                         ConstraintMatrix      &);
+//                           SparsityPattern       &,
+//                           ConstraintMatrix      &);
 // this used to fail at one point because we forgot that in 1d
 // neighboring cells can be more than one level apart. with
 // FE_DGQ(0) elements, we get the following mesh and DoF indices:
@@ -59,17 +59,17 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // create sparsity pattern
+  // create sparsity pattern
   SparsityPattern sp (dof_handler.n_dofs(),
                       dof_handler.max_couplings_between_dofs()*2);
   DoFTools::make_flux_sparsity_pattern (dof_handler, sp,
-					ConstraintMatrix());
+                                        ConstraintMatrix());
   sp.compress ();
 
-                                   // write out 20 lines of this
-                                   // pattern (if we write out the
-                                   // whole pattern, the output file
-                                   // would be in the range of 40 MB)
+  // write out 20 lines of this
+  // pattern (if we write out the
+  // whole pattern, the output file
+  // would be in the range of 40 MB)
   for (unsigned int l=0; l<sp.n_rows(); ++l)
     {
       for (unsigned int c=0; c<sp.row_length(l); ++c)
@@ -77,7 +77,7 @@ check_this (const DoFHandler<dim> &dof_handler)
       deallog << std::endl;
     }
 
-                                   // write out some other indicators
+  // write out some other indicators
   deallog << sp.bandwidth () << std::endl
           << sp.max_entries_per_row () << std::endl
           << sp.n_nonzero_elements () << std::endl;
@@ -96,8 +96,8 @@ check_this (const DoFHandler<dim> &dof_handler)
 void
 check_this ()
 {
-				   // create a mesh where two cells at levels
-				   // 1 and 3 are adjacent
+  // create a mesh where two cells at levels
+  // 1 and 3 are adjacent
   const int dim = 1;
   Triangulation<dim> tr;
   GridGenerator::hyper_cube (tr);
@@ -105,7 +105,7 @@ check_this ()
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
   for (Triangulation<dim>::active_cell_iterator
-	 c=tr.begin_active(2); c!=tr.end_active(2); ++c)
+       c=tr.begin_active(2); c!=tr.end_active(2); ++c)
     c->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 
@@ -135,24 +135,24 @@ main()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

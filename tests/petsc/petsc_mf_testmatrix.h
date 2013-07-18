@@ -17,75 +17,75 @@
 
 class PetscFDMatrix : public dealii::PETScWrappers::MatrixFree
 {
-  public:
-				     /**
-				      * Constructor specifying grid resolution.
-				      */
-    PetscFDMatrix(unsigned int size, unsigned int dim);
+public:
+  /**
+   * Constructor specifying grid resolution.
+   */
+  PetscFDMatrix(unsigned int size, unsigned int dim);
 
-                                         /**
-                                          * Matrix-vector multiplication:
-                                          * let <i>dst = M*src</i> with
-                                          * <i>M</i> being this matrix.
-                                          *
-                                          * Source and destination must
-                                          * not be the same vector.
-                                          */
-    void vmult (dealii::PETScWrappers::VectorBase       &dst,
-                const dealii::PETScWrappers::VectorBase &src) const;
+  /**
+   * Matrix-vector multiplication:
+   * let <i>dst = M*src</i> with
+   * <i>M</i> being this matrix.
+   *
+   * Source and destination must
+   * not be the same vector.
+   */
+  void vmult (dealii::PETScWrappers::VectorBase       &dst,
+              const dealii::PETScWrappers::VectorBase &src) const;
 
-                                         /**
-                                          * Matrix-vector multiplication: let
-                                          * <i>dst = M<sup>T</sup>*src</i> with
-                                          * <i>M</i> being this matrix. This
-                                          * function does the same as @p vmult()
-                                          * but takes the transposed matrix.
-                                          *
-                                          * Source and destination must
-                                          * not be the same vector.
-                                          */
-    void Tvmult (dealii::PETScWrappers::VectorBase       &dst,
-                 const dealii::PETScWrappers::VectorBase &src) const;
+  /**
+   * Matrix-vector multiplication: let
+   * <i>dst = M<sup>T</sup>*src</i> with
+   * <i>M</i> being this matrix. This
+   * function does the same as @p vmult()
+   * but takes the transposed matrix.
+   *
+   * Source and destination must
+   * not be the same vector.
+   */
+  void Tvmult (dealii::PETScWrappers::VectorBase       &dst,
+               const dealii::PETScWrappers::VectorBase &src) const;
 
-                                         /**
-                                          * Adding Matrix-vector
-                                          * multiplication. Add
-                                          * <i>M*src</i> on <i>dst</i>
-                                          * with <i>M</i> being this
-                                          * matrix.
-                                          *
-                                          * Source and destination must
-                                          * not be the same vector.
-                                          */
-    void vmult_add (dealii::PETScWrappers::VectorBase       &dst,
-                    const dealii::PETScWrappers::VectorBase &src) const;
+  /**
+   * Adding Matrix-vector
+   * multiplication. Add
+   * <i>M*src</i> on <i>dst</i>
+   * with <i>M</i> being this
+   * matrix.
+   *
+   * Source and destination must
+   * not be the same vector.
+   */
+  void vmult_add (dealii::PETScWrappers::VectorBase       &dst,
+                  const dealii::PETScWrappers::VectorBase &src) const;
 
-                                         /**
-                                          * Adding Matrix-vector
-                                          * multiplication. Add
-                                          * <i>M<sup>T</sup>*src</i> to
-                                          * <i>dst</i> with <i>M</i> being
-                                          * this matrix. This function
-                                          * does the same as @p vmult_add()
-                                          * but takes the transposed
-                                          * matrix.
-                                          *
-                                          * Source and destination must
-                                          * not be the same vector.
-                                          */
-    void Tvmult_add (dealii::PETScWrappers::VectorBase       &dst,
-                     const dealii::PETScWrappers::VectorBase &src) const;
+  /**
+   * Adding Matrix-vector
+   * multiplication. Add
+   * <i>M<sup>T</sup>*src</i> to
+   * <i>dst</i> with <i>M</i> being
+   * this matrix. This function
+   * does the same as @p vmult_add()
+   * but takes the transposed
+   * matrix.
+   *
+   * Source and destination must
+   * not be the same vector.
+   */
+  void Tvmult_add (dealii::PETScWrappers::VectorBase       &dst,
+                   const dealii::PETScWrappers::VectorBase &src) const;
 
 private:
-				     /**
-				      * Number of gridpoints in x-direction.
-				      */
-    unsigned int nx;
+  /**
+   * Number of gridpoints in x-direction.
+   */
+  unsigned int nx;
 
-				     /**
-				      * Number of gridpoints in y-direction.
-				      */
-    unsigned int ny;
+  /**
+   * Number of gridpoints in y-direction.
+   */
+  unsigned int ny;
 };
 
 
@@ -93,8 +93,8 @@ private:
 
 inline
 PetscFDMatrix::PetscFDMatrix(unsigned int size, unsigned int dim)
-             : PETScWrappers::MatrixFree (dim, dim, dim, dim),
-               nx (size), ny (size)
+  : PETScWrappers::MatrixFree (dim, dim, dim, dim),
+    nx (size), ny (size)
 {}
 
 
@@ -104,11 +104,11 @@ void
 PetscFDMatrix::vmult_add (dealii::PETScWrappers::VectorBase       &dst,
                           const dealii::PETScWrappers::VectorBase &src) const
 {
-  for(unsigned int i=0;i<=ny-2;i++)
+  for (unsigned int i=0; i<=ny-2; i++)
     {
-      for(unsigned int j=0;j<=nx-2; j++)
+      for (unsigned int j=0; j<=nx-2; j++)
         {
-                                                  // Number of the row to be entered
+          // Number of the row to be entered
           unsigned int row = j+(nx-1)*i;
 
           dst(row) += 4. * src(row);              // A.set(row, row, 4.);
@@ -124,7 +124,7 @@ PetscFDMatrix::vmult_add (dealii::PETScWrappers::VectorBase       &dst,
               dst(row) += -1. * src(row-(nx-1));  // A.set(row, row-(nx-1), -1.);
             }
         }
-    } 
+    }
 }
 
 

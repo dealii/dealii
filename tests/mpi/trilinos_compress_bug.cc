@@ -43,23 +43,23 @@ void test ()
     locally_owned.add_range(0,9);
   else
     locally_owned.add_range(9,21);
-// 
+//
   TrilinosWrappers::MPI::Vector test1(locally_owned);
   if (myid==0)
-  {
-    types::global_dof_index idx[]={0,1,2,3,4,5,6,7,8};
-    double val[]={0,1,2,3,4,5,6,7,8};
-    test1.add(9,idx,val);
-  }
-  else
-  {
-   {
-    types::global_dof_index idx[]={1,9,3,10,5,11,12,13,14};
-    double val[]={1,9,3,10,5,11,12,13,14};
-    test1.add(9,idx,val);
+    {
+      types::global_dof_index idx[]= {0,1,2,3,4,5,6,7,8};
+      double val[]= {0,1,2,3,4,5,6,7,8};
+      test1.add(9,idx,val);
     }
-  }
-  
+  else
+    {
+      {
+        types::global_dof_index idx[]= {1,9,3,10,5,11,12,13,14};
+        double val[]= {1,9,3,10,5,11,12,13,14};
+        test1.add(9,idx,val);
+      }
+    }
+
   test1.compress(VectorOperation::add);
 
   //TrilinosWrappers::MPI::Vector test(test1.vector_partitioner()); // works
@@ -69,21 +69,21 @@ void test ()
   test = 0;
 
   if (myid==0)
-    test(locally_owned.nth_index_in_set(5))=7;  
+    test(locally_owned.nth_index_in_set(5))=7;
 
   if (myid==0)
     deallog << "before compress: " << test(locally_owned.nth_index_in_set(5)) << endl;
-      
+
   test.compress(VectorOperation::insert);
-  
+
   if (myid==0)
     deallog << "after compress: " << test(locally_owned.nth_index_in_set(5)) << endl;
-      
-  // Trilinos produces a 0 instead of a 7 here. Why? 
+
+  // Trilinos produces a 0 instead of a 7 here. Why?
   if (myid==0)
-  {
-    Assert(test(locally_owned.nth_index_in_set(5)) == 7, ExcInternalError());
-  }
+    {
+      Assert(test(locally_owned.nth_index_in_set(5)) == 7, ExcInternalError());
+    }
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;

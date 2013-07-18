@@ -47,7 +47,7 @@ void test ()
   FE_Q<dim> p(1);
 
   FESystem<dim> fe_system(u, 2, p, 1);
-  
+
   MappingQ<dim> mapping(2);
   hp::MappingCollection<dim> mapping_collection(mapping);
 
@@ -60,25 +60,25 @@ void test ()
   //distribute dofs
   hp_dof_handler.distribute_dofs(fe_collection);
   dof_handler.distribute_dofs(fe_system);
-  
+
   //basically, dof_handler and hp_dof_handler are the same
   //so they should contain the same number of dofs.
   Assert(hp_dof_handler.n_dofs() == dof_handler.n_dofs(),ExcInternalError());
-  
+
   //now map the dofs to the support points and show them on the screen
   std::vector<Point<dim> > map(dof_handler.n_dofs());
   std::vector<Point<dim> > hp_map(hp_dof_handler.n_dofs());
-  
+
   DoFTools::map_dofs_to_support_points(mapping, dof_handler, map);
   DoFTools::map_dofs_to_support_points(mapping_collection, hp_dof_handler, hp_map);
 
-                                   // output the elements
+  // output the elements
   for (unsigned int i=0; i<hp_map.size(); i++)
-  {
-  	//both maps should contain the same
-  	Assert(hp_map[i]==map[i], ExcInternalError());
-    deallog << hp_map[i] << " ";
-  }
+    {
+      //both maps should contain the same
+      Assert(hp_map[i]==map[i], ExcInternalError());
+      deallog << hp_map[i] << " ";
+    }
   deallog<<std::endl;
 
 }

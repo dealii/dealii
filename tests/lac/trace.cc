@@ -43,9 +43,9 @@ int main()
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<N; ++j)
       {
-	m(i,j) = i+j;
-	if (i==j)
-	  tr += i+j;
+        m(i,j) = i+j;
+        if (i==j)
+          tr += i+j;
       }
 
   deallog << "Trace=" << m.trace() << std::endl;

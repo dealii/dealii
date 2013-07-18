@@ -37,33 +37,33 @@ void test ()
 
   BlockMask m(v);
 
-				   // test for an initialized mask
+  // test for an initialized mask
   Assert (m.first_selected_block() == 3,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (BlockMask(12,true).first_selected_block() == 0,
-	  ExcInternalError());
-				   // test for an empty mask
+          ExcInternalError());
+  // test for an empty mask
   Assert (BlockMask().first_selected_block(12) == 0,
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 
-				   // the following should yield an exception:
-  try 
+  // the following should yield an exception:
+  try
     {
       Assert (BlockMask(12,true).first_selected_block(13) == 0,
-	      ExcInternalError());
+              ExcInternalError());
     }
   catch (ExceptionBase &e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
-  
-				   // as should this: 
-  try 
+
+  // as should this:
+  try
     {
       Assert (BlockMask(12,false).first_selected_block() == 0,
-	      ExcInternalError());
+              ExcInternalError());
     }
   catch (ExceptionBase &e)
     {

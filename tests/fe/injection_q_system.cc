@@ -28,7 +28,7 @@ void test ()
   for (unsigned int i=1; i<4; ++i)
     for (unsigned int j=i; j<4; ++j)
       do_check (FESystem<dim>(FE_Q<dim>(i), 1,
-			      FE_DGQ<dim>(i-1), 1),
-		FESystem<dim>(FE_Q<dim>(j), 1,
-			      FE_DGQ<dim>(j-1), 1));
+                              FE_DGQ<dim>(i-1), 1),
+                FESystem<dim>(FE_Q<dim>(j), 1,
+                              FE_DGQ<dim>(j-1), 1));
 }

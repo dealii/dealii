@@ -34,7 +34,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   SparseMatrixEZ<double> ez(5,4);
   ez.set(0,0,2.);
   ez.set(0,2,3.);

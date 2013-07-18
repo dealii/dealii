@@ -52,14 +52,14 @@ main()
 {
   std::ofstream logfile ("rtn_3/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test<2>();
   test<3>();
-  
+
   return 0;
 }
 

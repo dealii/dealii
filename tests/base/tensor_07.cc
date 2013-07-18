@@ -28,11 +28,11 @@ template <int dim>
 void test_constant()
 {
   Tensor<2,dim> t;
-  for (unsigned int i=0;i<dim;++i)
-    for (unsigned int j=0;j<dim;++j)
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
       t[i][j] = 2.;
   deallog << "Constant dim " << dim << '\t' << double_contract(t,t)
-	  << " compare " << 4*dim*dim << std::endl;
+          << " compare " << 4*dim *dim << std::endl;
 }
 
 
@@ -41,15 +41,15 @@ void test_equal()
 {
   Tensor<2,dim> t;
   unsigned int sum = 0;
-  for (unsigned int i=0;i<dim;++i)
-    for (unsigned int j=0;j<dim;++j)
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
       {
-	t[i][j] = i+dim*j;
-	sum += (i+dim*j)*(i+dim*j);
+        t[i][j] = i+dim*j;
+        sum += (i+dim*j)*(i+dim*j);
       }
-  
+
   deallog << "Equal    dim " << dim << '\t' << double_contract(t,t)
-	  << " compare " << sum << std::endl;
+          << " compare " << sum << std::endl;
 }
 
 
@@ -59,16 +59,16 @@ void test_unequal()
   Tensor<2,dim> s;
   Tensor<2,dim> t;
   unsigned int sum = 0;
-  for (unsigned int i=0;i<dim;++i)
-    for (unsigned int j=0;j<dim;++j)
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
       {
-	s[i][j] = i+dim*j;
-	t[i][j] = dim*i+j;
-	sum += (i+dim*j)*(dim*i+j);
+        s[i][j] = i+dim*j;
+        t[i][j] = dim*i+j;
+        sum += (i+dim*j)*(dim*i+j);
       }
-  
+
   deallog << "Unequal  dim " << dim << '\t' << double_contract(s,t)
-	  << " compare " << sum << std::endl;
+          << " compare " << sum << std::endl;
 }
 
 

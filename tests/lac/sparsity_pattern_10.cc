@@ -32,5 +32,5 @@ int main ()
   matrix_position<SparsityPattern> ();
 }
 
-  
-  
+
+

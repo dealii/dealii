@@ -45,53 +45,53 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-				   // Create triangulation
+  // Create triangulation
   Triangulation<2> tri;
   GridGenerator::hyper_cube( tri );
   tri.refine_global( 2 );
 
-				   // now do some sort of random, anisotropic
-				   // refinement
+  // now do some sort of random, anisotropic
+  // refinement
   Triangulation<2>::active_cell_iterator cell = tri.begin_active(), end = tri.end();
-  for( ; cell != end; ++cell )
+  for ( ; cell != end; ++cell )
     {
       switch (rand()%4)
-	{
-					   /// If a randomly drawn
-					   /// number is 0 or 1 we
-					   /// cut x or y, resp.
-	  case 0:
-		cell->set_refine_flag( RefinementCase<2>::cut_axis(0) );
-		break;
-	  case 1:
-		cell->set_refine_flag( RefinementCase<2>::cut_axis(1) );
-		break;
+        {
+          /// If a randomly drawn
+          /// number is 0 or 1 we
+          /// cut x or y, resp.
+        case 0:
+          cell->set_refine_flag( RefinementCase<2>::cut_axis(0) );
+          break;
+        case 1:
+          cell->set_refine_flag( RefinementCase<2>::cut_axis(1) );
+          break;
 
-	  case 2:
-						 /// If the number is 2 we
-						 /// refine isotropically
-		cell->set_refine_flag();
-		break;
+        case 2:
+          /// If the number is 2 we
+          /// refine isotropically
+          cell->set_refine_flag();
+          break;
 
-	  default:
-						 /// If the number is 3 we don't refine
-		;
-	}
+        default:
+          /// If the number is 3 we don't refine
+          ;
+        }
     }
-				   /// refine the mesh
+  /// refine the mesh
   tri.execute_coarsening_and_refinement();
 
-				   /// For each vertex find the patch of cells
-				   /// that surrounds it
-  for( unsigned v=0; v<tri.n_vertices(); ++v )
+  /// For each vertex find the patch of cells
+  /// that surrounds it
+  for ( unsigned v=0; v<tri.n_vertices(); ++v )
     if (tri.get_used_vertices()[v] == true)
       {
-	deallog << "Vertex=" << v << std::endl;
+        deallog << "Vertex=" << v << std::endl;
 
-	const std::vector<Triangulation<2>::active_cell_iterator>
-	  tmp = GridTools::find_cells_adjacent_to_vertex( tri, v );
+        const std::vector<Triangulation<2>::active_cell_iterator>
+        tmp = GridTools::find_cells_adjacent_to_vertex( tri, v );
 
-	for (unsigned int i=0; i<tmp.size(); ++i)
-	  deallog << "   " << tmp[i] << std::endl;
+        for (unsigned int i=0; i<tmp.size(); ++i)
+          deallog << "   " << tmp[i] << std::endl;
       }
 }

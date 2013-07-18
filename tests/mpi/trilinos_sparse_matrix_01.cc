@@ -49,25 +49,25 @@ void test ()
     }
   else if (n_procs == 2)
     {
-				       // row_partitioning should be { [0, 2), [2, n_rows) }
-				       // col_partitioning should be { [0, 2), [2, n_cols) }
-				       // col_relevant_set should be { [0, 3), [1, n_cols) }
+      // row_partitioning should be { [0, 2), [2, n_rows) }
+      // col_partitioning should be { [0, 2), [2, n_cols) }
+      // col_relevant_set should be { [0, 3), [1, n_cols) }
       if (my_id == 0)
-	{
-	  row_partitioning.add_range(0, 2);
-	  col_partitioning.add_range(0, 2);
-	}
+        {
+          row_partitioning.add_range(0, 2);
+          col_partitioning.add_range(0, 2);
+        }
       else if (my_id == 1)
-	{
-	  row_partitioning.add_range(2, n_rows);
-	  col_partitioning.add_range(2, n_cols);
-	}
+        {
+          row_partitioning.add_range(2, n_rows);
+          col_partitioning.add_range(2, n_cols);
+        }
     }
   else
     Assert (false, ExcNotImplemented());
 
   TrilinosWrappers::SparsityPattern sp (row_partitioning,
-					col_partitioning, MPI_COMM_WORLD);
+                                        col_partitioning, MPI_COMM_WORLD);
   if (my_id == 0)
     {
       sp.add (0, 0);
@@ -89,10 +89,10 @@ void test ()
       A.set(0, 0, 0.1);
       A.set(0, 2, 0.2);
       A.set(2,3, 0.3);
-    }  
+    }
 
   A.compress(VectorOperation::insert);
-  
+
   if (my_id == 0)
     {
       //A.add (0, 0, 1.33);
@@ -100,23 +100,24 @@ void test ()
     }
   if ((n_procs == 1) || (my_id == 1))
     A.add(0,0, 1.67);
-    //A.begin()->value() += 1.67; // crashes
-  
+  //A.begin()->value() += 1.67; // crashes
+
   A.compress(VectorOperation::add);
 
   if (my_id==0)
     {
       deallog << "A(0,0)=" << A(0,0) << std::endl;
     }
-  
- 
-    if (my_id == 0) deallog << "OK" << std::endl;
+
+
+  if (my_id == 0) deallog << "OK" << std::endl;
 }
 
 
 
 int main (int argc, char **argv)
-{  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

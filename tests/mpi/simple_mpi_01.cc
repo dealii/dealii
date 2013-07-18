@@ -37,24 +37,24 @@ void test_mpi()
   if (myid==0)
     deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
 
-  for (unsigned int i=1;i<numprocs;++i)
+  for (unsigned int i=1; i<numprocs; ++i)
     {
       MPI_Barrier(MPI_COMM_WORLD);
 //      system("sleep 1");
 
       if (myid==0)
-	{
-	  unsigned int buf=numbers::invalid_unsigned_int;
-	  MPI_Status status;
-	  MPI_Recv(&buf, 1, MPI_UNSIGNED, i, 1, MPI_COMM_WORLD, &status);
-	  deallog << "got message '" << buf << "' from CPU " << i+1 << "!" << std::endl;
-	  Assert(buf == i, ExcInternalError());
+        {
+          unsigned int buf=numbers::invalid_unsigned_int;
+          MPI_Status status;
+          MPI_Recv(&buf, 1, MPI_UNSIGNED, i, 1, MPI_COMM_WORLD, &status);
+          deallog << "got message '" << buf << "' from CPU " << i+1 << "!" << std::endl;
+          Assert(buf == i, ExcInternalError());
 
-	}
+        }
       else if (myid==i )
-	{
-	  MPI_Send(&myid, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-	}
+        {
+          MPI_Send(&myid, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+        }
 
 
     }

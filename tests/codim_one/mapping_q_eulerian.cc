@@ -40,20 +40,21 @@
 std::ofstream logfile("mapping_q_eulerian/output");
 
 template <int dim, int spacedim>
-void test(std::string filename, unsigned int degree) {
+void test(std::string filename, unsigned int degree)
+{
   Triangulation<dim, spacedim> tria;
   FE_Q<dim, spacedim> base_fe(degree);
   FESystem<dim, spacedim> fe(base_fe, spacedim);
 
   DoFHandler<dim, spacedim> shift_dh(tria);
-  
+
   GridIn<dim, spacedim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in (filename.c_str());
   gi.read_ucd (in);
 
   shift_dh.distribute_dofs(fe);
-  
+
   Vector<double> shift(shift_dh.n_dofs());
 
   shift.add(+1);
@@ -64,41 +65,41 @@ void test(std::string filename, unsigned int degree) {
 
   QTrapez<dim> quad;
   MappingQEulerian<dim,Vector<double>,spacedim> mapping(degree, shift, shift_dh);
-  
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell=tria.begin_active(), 
-    endc=tria.end() ;
+
+  typename Triangulation<dim,spacedim>::active_cell_iterator cell=tria.begin_active(),
+                                                             endc=tria.end() ;
   Point<spacedim> real;
   Point<dim> unit;
   double eps = 1e-10;
-  for(;cell!=endc;++cell)
+  for (; cell!=endc; ++cell)
     {
-      deallog<<cell<< std::endl;	
-      for(unsigned int q=0; q<quad.size(); ++q)
-	{
-	  real = mapping.transform_unit_to_real_cell(cell, quad.point(q));
-	  unit = mapping.transform_real_to_unit_cell(cell, real);
-	  deallog<<quad.point(q)<< " -> " << real << std::endl;
-	  if( (unit-quad.point(q)).norm()>eps)
-	    deallog<<"Error: "<< quad.point(q)
-		   << " != " << unit << std::endl;
-	}
-    }	   
-    
+      deallog<<cell<< std::endl;
+      for (unsigned int q=0; q<quad.size(); ++q)
+        {
+          real = mapping.transform_unit_to_real_cell(cell, quad.point(q));
+          unit = mapping.transform_real_to_unit_cell(cell, real);
+          deallog<<quad.point(q)<< " -> " << real << std::endl;
+          if ( (unit-quad.point(q)).norm()>eps)
+            deallog<<"Error: "<< quad.point(q)
+                   << " != " << unit << std::endl;
+        }
+    }
+
 }
 
-int main () 
+int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
- test<1,2>("grids/circle_1.inp",1);
- test<1,2>("grids/circle_1.inp",2);
- test<2,3>("grids/square.inp",1);
- test<2,3>("grids/square.inp",2);
- test<2,3>("grids/sphere_1.inp",1);
+
+  test<1,2>("grids/circle_1.inp",1);
+  test<1,2>("grids/circle_1.inp",2);
+  test<2,3>("grids/square.inp",1);
+  test<2,3>("grids/square.inp",2);
+  test<2,3>("grids/sphere_1.inp",1);
 // test<2,3>("grids/problem.inp",1);
   test<2,3>("grids/sphere_1.inp",2);
 
   return 0;
 }
-                  
+

@@ -45,20 +45,20 @@ int main ()
   unsigned int n_keys = 15;
   unsigned int n_rows = 40000;
 
-  for (unsigned int j=0;j<n_rows;++j)
+  for (unsigned int j=0; j<n_rows; ++j)
     {
       table.add_value("begin", std::string("this is some text"));
-      for (unsigned int i=0;i<n_keys;++i)
-      {
-	table.add_value(keys[i], j*1.0+i/100.0);
-      }
+      for (unsigned int i=0; i<n_keys; ++i)
+        {
+          table.add_value(keys[i], j*1.0+i/100.0);
+        }
     }
-  
+
   timer.enter_section("write");
   {
     std::ofstream data("datatable.txt");
     table.write_text(data);
-//		   TableHandler::table_with_separate_column_description);
+//       TableHandler::table_with_separate_column_description);
   }
-  timer.exit_section("write");  
+  timer.exit_section("write");
 }

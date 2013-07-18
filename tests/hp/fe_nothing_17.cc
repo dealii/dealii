@@ -49,7 +49,7 @@ void transfer(std::ostream &out)
   tria.refine_global(5-dim);
 
   FESystem<dim> fe(FE_Q<dim> (1), 1,
-		   FE_Nothing<dim>(), 1);
+                   FE_Nothing<dim>(), 1);
   DoFHandler<dim> dof_handler(tria);
 
   Vector<double> solution;
@@ -64,9 +64,9 @@ void transfer(std::ostream &out)
 
   SolutionTransfer<dim> soltrans(dof_handler);
 
-				   // test a): pure refinement
+  // test a): pure refinement
   typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),
-						    endc=tria.end();
+                                                    endc=tria.end();
   ++cell;
   ++cell;
   for (; cell!=endc; ++cell)
@@ -82,7 +82,7 @@ void transfer(std::ostream &out)
   solution.reinit (dof_handler.n_dofs());
   solution = tmp_q;
 
-				   // test b): with coarsening
+  // test b): with coarsening
   soltrans.clear();
 
   cell=tria.begin_active(tria.n_levels()-1);

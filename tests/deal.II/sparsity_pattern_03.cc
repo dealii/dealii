@@ -48,8 +48,8 @@ template <int dim>
 void
 check ()
 {
-				   // create two different triangulations
-  Triangulation<dim> triangulation_1;  
+  // create two different triangulations
+  Triangulation<dim> triangulation_1;
   if (dim==2)
     GridGenerator::hyper_ball(triangulation_1, Point<dim>(), 1);
   else
@@ -63,7 +63,7 @@ check ()
     triangulation_1.refine_global(2);
 
 
-  Triangulation<dim> triangulation_2;  
+  Triangulation<dim> triangulation_2;
   if (dim==2)
     GridGenerator::hyper_ball(triangulation_2, Point<dim>(), 1);
   else
@@ -77,18 +77,18 @@ check ()
     triangulation_2.refine_global(2);
 
 
-  
+
   FESystem<dim> element_1(FE_Q<dim>(1), 2,
-			  FE_Q<dim>(2), 1);
+                          FE_Q<dim>(2), 1);
   FESystem<dim> element_2(FE_Q<dim>(3), 1,
-			  FE_DGQ<dim>(0), 2);
+                          FE_DGQ<dim>(0), 2);
   DoFHandler<dim> dof_1(triangulation_1);
   DoFHandler<dim> dof_2(triangulation_2);
   dof_1.distribute_dofs(element_1);
   dof_2.distribute_dofs(element_2);
 
   SparsityPattern sparsity (dof_1.n_dofs(), dof_2.n_dofs(),
-			    std::max(dof_1.n_dofs(), dof_2.n_dofs()));
+                            std::max(dof_1.n_dofs(), dof_2.n_dofs()));
   DoFTools::make_sparsity_pattern (dof_1, dof_2, sparsity);
   sparsity.compress ();
 
@@ -101,7 +101,7 @@ int main ()
 {
   std::ofstream logfile ("sparsity_pattern_03/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

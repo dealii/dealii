@@ -18,7 +18,7 @@
 
 // check TrilinosWrappers::SparseMatrix::clear ()
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -43,12 +43,12 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("62/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -63,25 +63,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

@@ -40,17 +40,17 @@ void test ()
       s << "test test" << number << "test test";
 
       Assert (Utilities::get_integer_at_position (s.str(),
-						  9).first
-	      == number,
-	      ExcInternalError());
+                                                  9).first
+              == number,
+              ExcInternalError());
       Assert (Utilities::get_integer_at_position (s.str(),
-						  9).second
-	      == i+1,
-	      ExcInternalError());
+                                                  9).second
+              == i+1,
+              ExcInternalError());
 
       deallog << i << ' ' << Utilities::get_integer_at_position (s.str(),
-								 9).first
-	      << std::endl;
+                                                                 9).first
+              << std::endl;
 
       number = number*10 + i;
     }

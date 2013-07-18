@@ -28,7 +28,7 @@ int main()
 
   PathSearch::add_class("CC");
 
-				   // Open with full debugging
+  // Open with full debugging
   PathSearch cc("CC", 3);
   cc.add_path("../");
   cc.add_path("../scripts/", PathSearch::front);
@@ -40,13 +40,13 @@ int main()
   cc.add_suffix(".h", PathSearch::after_none);
   deallog << cc.find("tests") << std::endl;
   cc.show(deallog);
-  
+
   PathSearch mesh("MESH", 3);
   mesh.add_path("../bits/");
   mesh.show(deallog);
   std::ifstream in(mesh.find("grid_in_msh_01.2d").c_str());
   std::string line;
-  for (unsigned int i=0;i<4;++i)
+  for (unsigned int i=0; i<4; ++i)
     {
       in >> line;
       deallog << ' ' << line;

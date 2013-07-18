@@ -40,11 +40,11 @@
 
 template <int dim, class stream>
 void
-print_dofs (const DoFHandler<dim> &dof, stream & out)
+print_dofs (const DoFHandler<dim> &dof, stream &out)
 {
   out << std::setprecision (2);
   out << std::fixed;
-  const FiniteElement<dim>& fe = dof.get_fe();
+  const FiniteElement<dim> &fe = dof.get_fe();
   std::vector<types::global_dof_index> v (fe.dofs_per_cell);
   std_cxx1x::shared_ptr<FEValues<dim> > fevalues;
 
@@ -59,14 +59,14 @@ print_dofs (const DoFHandler<dim> &dof, stream & out)
     {
       Point<dim> p = cell->center();
       if (fevalues.get() != 0)
-	fevalues->reinit(cell);
+        fevalues->reinit(cell);
 
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-	if (fevalues.get() != 0)
-	  out << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
-	else
-	  out << p << '\t' << v[i] << std::endl;
+        if (fevalues.get() != 0)
+          out << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
+        else
+          out << p << '\t' << v[i] << std::endl;
     }
 }
 
@@ -99,9 +99,9 @@ check ()
   deallog << o2.str();
 
   if (o1.str()!=o2.str())
-	deallog << "OK" << std::endl;
+    deallog << "OK" << std::endl;
   else
-	Assert(false, ExcInternalError());
+    Assert(false, ExcInternalError());
 
   DoFRenumbering::hierarchical(dof);
   print_dofs(dof, o3);
@@ -109,9 +109,9 @@ check ()
 
   // doing renumbering twice does not change the result?!
   if (o2.str()==o3.str())
-	deallog << "OK" << std::endl;
+    deallog << "OK" << std::endl;
   else
-	Assert(false, ExcInternalError());
+    Assert(false, ExcInternalError());
 
 }
 

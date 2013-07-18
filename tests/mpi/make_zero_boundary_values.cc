@@ -45,21 +45,21 @@ void test()
   {
     ConstraintMatrix boundary_values;
     DoFTools::make_zero_boundary_constraints (dofh,
-					      boundary_values);
+                                              boundary_values);
     if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
       boundary_values.print (deallog.get_file_stream());
   }
 
-				   // the result of extract_boundary_dofs is
-				   // supposed to be a subset of the locally
-				   // relevant dofs, so do the test again with
-				   // that
+  // the result of extract_boundary_dofs is
+  // supposed to be a subset of the locally
+  // relevant dofs, so do the test again with
+  // that
   {
     IndexSet relevant_set (dofh.n_dofs());
     DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
     ConstraintMatrix boundary_values (relevant_set);
     DoFTools::make_zero_boundary_constraints (dofh,
-					      boundary_values);
+                                              boundary_values);
     if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
       boundary_values.print (deallog.get_file_stream());
   }

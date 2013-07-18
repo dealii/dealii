@@ -53,22 +53,22 @@ void test1 ()
 template <int dim>
 void test2 ()
 {
-                                   // read a much larger grid (30k
-                                   // cells). with the old grid
-                                   // reordering scheme, this took >90
-                                   // minutes (exact timing not
-                                   // available, program was killed
-                                   // before), with the new one it
-                                   // takes less than 8 seconds
-				   //
-				   // note that the input file is no good: it
-				   // contains two pairs of two cells, where
-				   // the two members of each pair share 3
-				   // vertices (in 2d) -- this can of course
-				   // not work properly. it makes the
-				   // grid_in_02 testcase fail when using this
-				   // input file, but grid_in_02/2d.xda is a
-				   // corrected input file.
+  // read a much larger grid (30k
+  // cells). with the old grid
+  // reordering scheme, this took >90
+  // minutes (exact timing not
+  // available, program was killed
+  // before), with the new one it
+  // takes less than 8 seconds
+  //
+  // note that the input file is no good: it
+  // contains two pairs of two cells, where
+  // the two members of each pair share 3
+  // vertices (in 2d) -- this can of course
+  // not work properly. it makes the
+  // grid_in_02 testcase fail when using this
+  // input file, but grid_in_02/2d.xda is a
+  // corrected input file.
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
@@ -79,11 +79,11 @@ void test2 ()
     }
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
-				       // ignore the exception that we
-				       // get because the mesh has
-				       // distorted cells
+      // ignore the exception that we
+      // get because the mesh has
+      // distorted cells
       deallog << dcv.distorted_cells.size() << " cells are distorted."
-	      << std::endl;
+              << std::endl;
     }
 
 
@@ -113,7 +113,7 @@ void test3 ()
 
 template<int dim>
 void check_file (const std::string name,
-		 typename GridIn<dim>::Format format)
+                 typename GridIn<dim>::Format format)
 {
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
@@ -124,15 +124,15 @@ void check_file (const std::string name,
     }
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
-				       // ignore the exception
+      // ignore the exception
       deallog << dcv.distorted_cells.size() << " cells are distorted."
-	      << std::endl;
+              << std::endl;
     }
 
   deallog << name
-	  << '\t' << tria.n_vertices()
-	  << '\t' << tria.n_cells()
-	  << std::endl;
+          << '\t' << tria.n_vertices()
+          << '\t' << tria.n_cells()
+          << std::endl;
 }
 
 void filename_resolution()
@@ -152,7 +152,7 @@ int main ()
 
   test1<2> ();
   test2<2> ();
-				   // test3 needs NetCDF
+  // test3 needs NetCDF
 //    test3<2> ();
 
   filename_resolution();

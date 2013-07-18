@@ -89,20 +89,20 @@ void test()
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
     parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans2 (dh);
 
-    for (unsigned int i = 0;i < locally_owned_dofs.n_elements();++i)
+    for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
         x (idx) = idx;
         x2 (idx) = 2 * idx;
 
-//	std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
+//  std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
       }
 
     x.compress(VectorOperation::insert);
     solution=x;
     x*=2.0;
     solution2 = x;
-    
+
 
     soltrans.prepare_serialization (solution);
     soltrans2.prepare_serialization (solution2);
@@ -115,8 +115,8 @@ void test()
         deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
       }
     deallog << "Checksum: "
-    << tr.get_checksum ()
-    << std::endl;
+            << tr.get_checksum ()
+            << std::endl;
 
   }
   MPI_Barrier (MPI_COMM_WORLD);
@@ -144,7 +144,7 @@ void test()
     soltrans.deserialize (solution);
     soltrans2.deserialize (solution2);
 
-    for (unsigned int i = 0;i < locally_owned_dofs.n_elements();++i)
+    for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
         //std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
@@ -153,7 +153,7 @@ void test()
       }
 
     double norm = solution.l1_norm();
-	double norm2 = solution2.l1_norm();
+    double norm2 = solution2.l1_norm();
 
     if (myid == 0)
       {
@@ -161,11 +161,11 @@ void test()
         deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
       }
     deallog << "Checksum: "
-    << tr.get_checksum ()
-    << std::endl;
+            << tr.get_checksum ()
+            << std::endl;
     deallog << "sum: "
-    << norm << " " << norm2
-    << std::endl;
+            << norm << " " << norm2
+            << std::endl;
   }
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -176,7 +176,7 @@ void test()
 int main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  
+
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 

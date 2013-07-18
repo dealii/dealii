@@ -36,7 +36,7 @@
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
   Triangulation<dim> tr2 (Triangulation<dim>::limit_level_difference_at_vertices);
@@ -46,7 +46,7 @@ void test(std::ostream& /*out*/)
     gi.attach_triangulation (tr);
     std::ifstream in ("../deal.II/grid_in_3d_02/747.ucd");
     gi.read (in);
-				     //tr.refine_global (1);
+    //tr.refine_global (1);
   }
 
   {
@@ -54,63 +54,63 @@ void test(std::ostream& /*out*/)
     gi.attach_triangulation (tr2);
     std::ifstream in ("../deal.II/grid_in_3d_02/747.ucd");
     gi.read (in);
-				     //tr2.refine_global (1);
+    //tr2.refine_global (1);
   }
 
   Assert (tr.n_active_cells() == tr2.n_active_cells(),
-	  ExcInternalError());
-      deallog << " Number of cells: "
-	      << tr.n_active_cells() << ' '
-	      << tr2.n_active_cells()
-	      << std::endl;
+          ExcInternalError());
+  deallog << " Number of cells: "
+          << tr.n_active_cells() << ' '
+          << tr2.n_active_cells()
+          << std::endl;
 
 
   for (unsigned int i=0; i<2; ++i)
     {
-				       // refine one-tenth of cells randomly
+      // refine one-tenth of cells randomly
       std::vector<bool> flags (tr.n_active_cells(), false);
       for (unsigned int k=0; k<flags.size()/30 + 1; ++k)
-	flags[rand() % flags.size()] = true;
-				       // make sure there's at least one that
-				       // will be refined
+        flags[rand() % flags.size()] = true;
+      // make sure there's at least one that
+      // will be refined
       flags[0] = true;
 
       InterGridMap<Triangulation<dim> > intergrid_map;
       intergrid_map.make_mapping (tr, tr2);
 
-				       // refine tr and tr2
+      // refine tr and tr2
       unsigned int index=0;
       for (typename Triangulation<dim>::active_cell_iterator
-	     cell = tr.begin_active();
-	   cell != tr.end(); ++cell, ++index)
-	if (flags[index])
-	  {
-	    cell->set_refine_flag();
-	    intergrid_map[cell]->set_refine_flag();
-	  }
+           cell = tr.begin_active();
+           cell != tr.end(); ++cell, ++index)
+        if (flags[index])
+          {
+            cell->set_refine_flag();
+            intergrid_map[cell]->set_refine_flag();
+          }
       Assert (index == tr.n_active_cells(), ExcInternalError());
 
-				       // flag all other cells for coarsening
-				       // (this should ensure that at least
-				       // some of them will actually be
-				       // coarsened)
+      // flag all other cells for coarsening
+      // (this should ensure that at least
+      // some of them will actually be
+      // coarsened)
       index=0;
       for (typename Triangulation<dim>::active_cell_iterator
-	     cell = tr.begin_active();
-	   cell != tr.end(); ++cell, ++index)
-	if (!flags[index])
-	  {
-	    cell->set_coarsen_flag();
-	    intergrid_map[cell]->set_coarsen_flag();
-	  }
+           cell = tr.begin_active();
+           cell != tr.end(); ++cell, ++index)
+        if (!flags[index])
+          {
+            cell->set_coarsen_flag();
+            intergrid_map[cell]->set_coarsen_flag();
+          }
 
       tr.execute_coarsening_and_refinement ();
       tr2.execute_coarsening_and_refinement ();
 
       deallog << i << " Number of cells: "
-	      << tr.n_active_cells() << ' '
-	      << tr2.n_active_cells()
-	      << std::endl;
+              << tr.n_active_cells() << ' '
+              << tr2.n_active_cells()
+              << std::endl;
 
       assert_tria_equal("3d_coarsening_04", tr, tr2);
 

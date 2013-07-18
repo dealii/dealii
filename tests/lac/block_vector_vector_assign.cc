@@ -30,7 +30,7 @@
 
 template <typename Vector1, typename Vector2>
 bool operator == (const Vector1 &v1,
-		  const Vector2 &v2)
+                  const Vector2 &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -48,7 +48,7 @@ void test ()
   ivector[1] = 4;
   ivector[2] = 3;
   ivector[3] = 5;
-  
+
   BlockVector<double> v1(ivector);
   Vector<double> v2(v1.size());
 
@@ -78,7 +78,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   try
     {
       test ();
@@ -86,29 +86,29 @@ int main ()
   catch (std::exception &e)
     {
       deallog << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << e.what() << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+      // abort
       return 2;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+      // abort
       return 3;
     };
-  
-  
+
+
   return 0;
 }
 

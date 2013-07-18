@@ -27,17 +27,17 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-				   // create a pattern and let it
-				   // output its description
+  // create a pattern and let it
+  // output its description
   Patterns::Integer pattern(-1,42);
   const std::string desc = pattern.description();
 
-				   // now let the same class re-create
-				   // a pattern object from the
-				   // description and verify that the
-				   // result is the same as what we
-				   // started out with
-  Patterns::Integer * pattern2 = Patterns::Integer::create (desc);
+  // now let the same class re-create
+  // a pattern object from the
+  // description and verify that the
+  // result is the same as what we
+  // started out with
+  Patterns::Integer *pattern2 = Patterns::Integer::create (desc);
 
   Assert (pattern2 != 0, ExcInternalError());
   Assert (desc == pattern2->description(), ExcInternalError());

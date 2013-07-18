@@ -46,10 +46,10 @@ void
 check ()
 {
   Triangulation<dim> tr;
-   GridGenerator::half_hyper_shell (tr,
-			      Point<dim>(),
-			      0.5,
-			      1,0);
+  GridGenerator::half_hyper_shell (tr,
+                                   Point<dim>(),
+                                   0.5,
+                                   1,0);
 
   ConstraintMatrix cm;
   MappingQ<dim> mapping(1);

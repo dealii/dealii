@@ -16,7 +16,7 @@
 
 
 
-// Test the functionality of the laplacian in the FEFieldFunction class. 
+// Test the functionality of the laplacian in the FEFieldFunction class.
 
 #include "../tests.h"
 #include <fstream>
@@ -33,7 +33,8 @@
 #include <deal.II/numerics/vector_tools.h>
 
 template <int dim>
-void test() {
+void test()
+{
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(9/dim);
@@ -52,14 +53,14 @@ void test() {
   deallog << "V norm: " << v1.l2_norm() << std::endl;
 
   Functions::FEFieldFunction<dim, DoFHandler<dim>, Vector<double> >
-    fef(dh, v1);
+  fef(dh, v1);
 
-	//create the origin
-	Point<dim> p;
-	//compute the error of the laplacian in this point
+  //create the origin
+  Point<dim> p;
+  //compute the error of the laplacian in this point
   deallog << "Value of the laplacian in 0:" << std::endl;
   deallog << "correct value: " << ff.laplacian(p) <<", approximation: "<< fef.laplacian(p) << std::endl;
-  
+
   //now we want to test the list version
   Point<dim> p1 = Point<dim>::unit_vector(0);
   p1 = p1 * 0.5;
@@ -69,12 +70,12 @@ void test() {
   vec.push_back(p2);
   std::vector<double> values_c(2);
   std::vector<double> values_a(2);
-  
+
   //get the laplacians at these two points
   ff.laplacian_list(vec, values_c);
   fef.laplacian_list(vec, values_a);
-    deallog << "Value of the laplacian in 0.5*e1 and 0.25 * e1:" << std::endl;
-    deallog << " correct values: " <<values_c[0] << " " << values_c[1]  <<", approximations: "<<values_a[0] << " " << values_a[1] << std::endl;
+  deallog << "Value of the laplacian in 0.5*e1 and 0.25 * e1:" << std::endl;
+  deallog << " correct values: " <<values_c[0] << " " << values_c[1]  <<", approximations: "<<values_a[0] << " " << values_a[1] << std::endl;
 }
 
 int main ()

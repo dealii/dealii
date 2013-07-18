@@ -44,63 +44,66 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-		   Triangulation<dim>::limit_level_difference_at_vertices);
+  triangulation (MPI_COMM_WORLD,
+                 Triangulation<dim>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global (1);
 
   {
     typename Triangulation<dim>::cell_iterator
-      it=triangulation.begin_active();
+    it=triangulation.begin_active();
     it->set_refine_flag();
     triangulation.execute_coarsening_and_refinement ();
-    
+
     it=triangulation.begin(1);
-    ++it;++it;++it;
+    ++it;
+    ++it;
+    ++it;
     it=triangulation.begin(1);
-    for (unsigned int a=0;a<4;a++)
+    for (unsigned int a=0; a<4; a++)
       it->child(a)->set_coarsen_flag();
-    
+
     triangulation.prepare_coarsening_and_refinement ();
-    
-    { //data out
+
+    {
+      //data out
       FE_Q<dim>            fe(1);
       DoFHandler<dim>      dof_handler(triangulation);
-      
+
       dof_handler.distribute_dofs(fe);
-      
+
       unsigned int n_coarse=0;
       Vector<float> subdomain (triangulation.n_active_cells());
       {
-	unsigned int index = 0;
-	
-	for (typename Triangulation<dim>::active_cell_iterator
-	       cell = triangulation.begin_active();
-	     cell != triangulation.end(); ++cell, ++index)
-	  {
-	    subdomain(index)=0;
-	    
-	    if (cell->is_ghost() || cell->is_artificial())
-	      subdomain(index)=-4;
-	    
-	    if (cell->refine_flag_set())
-	      subdomain(index)+=1;
-	    if (cell->coarsen_flag_set())
-	      {
-		subdomain(index)+=2;
-		++n_coarse;
-	      }
-	  }
+        unsigned int index = 0;
+
+        for (typename Triangulation<dim>::active_cell_iterator
+             cell = triangulation.begin_active();
+             cell != triangulation.end(); ++cell, ++index)
+          {
+            subdomain(index)=0;
+
+            if (cell->is_ghost() || cell->is_artificial())
+              subdomain(index)=-4;
+
+            if (cell->refine_flag_set())
+              subdomain(index)+=1;
+            if (cell->coarsen_flag_set())
+              {
+                subdomain(index)+=2;
+                ++n_coarse;
+              }
+          }
       }
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	{
-	  deallog << "id=" << triangulation.locally_owned_subdomain()
-		  << " n_coarsen=" << n_coarse << std::endl;
-	  for (unsigned int i=0; i<subdomain.size(); ++i)
-	    deallog << subdomain(i) << std::endl;
-	}
-      
+        {
+          deallog << "id=" << triangulation.locally_owned_subdomain()
+                  << " n_coarsen=" << n_coarse << std::endl;
+          for (unsigned int i=0; i<subdomain.size(); ++i)
+            deallog << subdomain(i) << std::endl;
+        }
+
       triangulation.execute_coarsening_and_refinement ();
     }
   }

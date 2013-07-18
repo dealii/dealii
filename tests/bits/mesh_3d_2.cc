@@ -36,7 +36,7 @@
 #include <fstream>
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mesh_3d_2/output");
   deallog.attach(logfile);
@@ -46,7 +46,7 @@ int main ()
   Triangulation<3> coarse_grid;
   create_two_cubes (coarse_grid);
 
-                                   // output all lines and faces
+  // output all lines and faces
   for (Triangulation<3>::active_cell_iterator cell=coarse_grid.begin_active();
        cell != coarse_grid.end(); ++cell)
     {
@@ -69,13 +69,13 @@ int main ()
                 << std::endl;
     }
 
-                                   // we know that from the second
-                                   // cell, the common face must have
-                                   // wrong orientation. check this
+  // we know that from the second
+  // cell, the common face must have
+  // wrong orientation. check this
   Assert ((++coarse_grid.begin_active())->face_orientation(5)
           == false,
           ExcInternalError());
 }
 
-  
-  
+
+

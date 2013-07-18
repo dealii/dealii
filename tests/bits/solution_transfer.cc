@@ -43,18 +43,19 @@
 template<int dim>
 class MyFunction : public Function<dim>
 {
-  public:
-    MyFunction () : Function<dim>() {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int) const
-      {	double f=sin(p[0]*4);
-	if (dim>1)
-	  f*=cos(p[1]*4);
-	if (dim>2)
-	  f*=exp(p[2]*4);
-	return f;
-      };
+public:
+  MyFunction () : Function<dim>() {};
+
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int) const
+  {
+    double f=sin(p[0]*4);
+    if (dim>1)
+      f*=cos(p[1]*4);
+    if (dim>2)
+      f*=exp(p[2]*4);
+    return f;
+  };
 };
 
 
@@ -75,7 +76,7 @@ void transfer(std::ostream &out)
   DataOut<dim> q_data_out, dgq_data_out;
   ConstraintMatrix cm;
   cm.close();
-  
+
   q_dof_handler.distribute_dofs (fe_q);
   q_solution.reinit(q_dof_handler.n_dofs());
 
@@ -84,7 +85,7 @@ void transfer(std::ostream &out)
 
   VectorTools::interpolate (mapping, q_dof_handler, function, q_solution);
   VectorTools::project (mapping, dgq_dof_handler, cm,
-			QGauss<dim>(3), function, dgq_solution);
+                        QGauss<dim>(3), function, dgq_solution);
 
   q_data_out.attach_dof_handler (q_dof_handler);
   q_data_out.add_data_vector (q_solution, "solution");
@@ -101,9 +102,9 @@ void transfer(std::ostream &out)
   SolutionTransfer<dim> q_soltrans(q_dof_handler);
   SolutionTransfer<dim> dgq_soltrans(dgq_dof_handler);
 
-				   // test a): pure refinement
+  // test a): pure refinement
   typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),
-						    endc=tria.end();
+                                                    endc=tria.end();
   ++cell;
   ++cell;
   for (; cell!=endc; ++cell)
@@ -120,7 +121,7 @@ void transfer(std::ostream &out)
   q_soltrans.refine_interpolate(q_solution, tmp_q);
   q_solution.reinit (q_dof_handler.n_dofs());
   q_solution = tmp_q;
-  
+
   Vector<double> tmp_dgq (dgq_dof_handler.n_dofs());
   dgq_soltrans.refine_interpolate(dgq_solution, tmp_dgq);
   dgq_solution.reinit (dgq_dof_handler.n_dofs());
@@ -131,20 +132,20 @@ void transfer(std::ostream &out)
   q_data_out.add_data_vector (q_solution, "solution");
   q_data_out.build_patches ();
   deallog << "Interpolated/tranferred solution after pure refinement, FE_Q"
-	  << std::endl << std::endl;
+          << std::endl << std::endl;
   q_data_out.write_gnuplot (out);
 
   dgq_data_out.clear_data_vectors();
   dgq_data_out.add_data_vector (dgq_solution, "solution");
   dgq_data_out.build_patches ();
   deallog << "Interpolated/tranferred solution after pure refinement, FE_DGQ"
-	  << std::endl << std::endl;
+          << std::endl << std::endl;
   dgq_data_out.write_gnuplot (out);
 
-				   // test b): with coarsening
+  // test b): with coarsening
   q_soltrans.clear();
   dgq_soltrans.clear();
-  
+
   cell=tria.begin_active(tria.n_levels()-1);
   endc=tria.end(tria.n_levels()-1);
   cell->set_refine_flag();
@@ -152,7 +153,7 @@ void transfer(std::ostream &out)
   for (; cell!=endc; ++cell)
     cell->set_coarsen_flag();
   Vector<double> q_old_solution=q_solution,
-	       dgq_old_solution=dgq_solution;
+                 dgq_old_solution=dgq_solution;
   tria.prepare_coarsening_and_refinement();
   q_soltrans.prepare_for_coarsening_and_refinement(q_old_solution);
   dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_old_solution);
@@ -168,14 +169,14 @@ void transfer(std::ostream &out)
   q_data_out.add_data_vector (q_solution, "solution");
   q_data_out.build_patches ();
   deallog << "Interpolated/tranferred solution after coarsening and refinement, FE_Q"
-	  << std::endl << std::endl;
+          << std::endl << std::endl;
   q_data_out.write_gnuplot (out);
 
   dgq_data_out.clear_data_vectors();
   dgq_data_out.add_data_vector (dgq_solution, "solution");
   dgq_data_out.build_patches ();
   deallog << "Interpolated/tranferred solution after coarsening and refinement, FE_DGQ"
-	  << std::endl << std::endl;
+          << std::endl << std::endl;
   dgq_data_out.write_gnuplot (out);
 }
 

@@ -29,9 +29,9 @@
 #include <deal.II/lac/sparse_ilu.h>
 #include <fstream>
 
-  
 
-int main () 
+
+int main ()
 {
   std::ofstream logfile("sparse_lu_decomposition_1/output");
   deallog.attach(logfile);
@@ -41,7 +41,7 @@ int main ()
   SmartPointer<SparseLUDecomposition<double> > sparse_decomp;
 
   deallog << "OK" << std::endl;
-  
+
   return 0;
 }
 

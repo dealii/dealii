@@ -19,7 +19,7 @@
 // check Vector<double>::equ (s,V)
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -33,13 +33,13 @@ void test (Vector<double> &v,
       v(i) = i;
       w(i) = i+1.;
     }
-  
+
   v.compress ();
   w.compress ();
 
   v.equ (2, w);
 
-                                   // make sure we get the expected result
+  // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
       Assert (w(i) == i+1., ExcInternalError());
@@ -51,7 +51,7 @@ void test (Vector<double> &v,
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("vector_46/output");
   deallog.attach(logfile);
@@ -67,25 +67,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

@@ -27,13 +27,13 @@
 //TODO: Several functions are commented out since implementations are missing
 
 #define WRITE(type) { out << "Writing " # type " dimensions " \
-<< dim << ',' << spacedim << std::endl; \
-DataOutBase::write_ ## type (patches, names, vectors, type ## flags, out); }
+                            << dim << ',' << spacedim << std::endl; \
+  DataOutBase::write_ ## type (patches, names, vectors, type ## flags, out); }
 
 template <int dim, int spacedim>
 void
-write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
-	      std::ostream& out)
+write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> > &patches,
+              std::ostream &out)
 {
   std::vector<std::string> names(2);
   names[0] = std::string("first name");
@@ -67,9 +67,9 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
 template<int dim>
 struct PatchInfo
 {
-    static double vertices[GeometryInfo<dim>::vertices_per_cell][3];
-    static double offsets[GeometryInfo<dim>::vertices_per_cell][3];
-    static int neighbors[GeometryInfo<dim>::vertices_per_cell][GeometryInfo<dim>::faces_per_cell];
+  static double vertices[GeometryInfo<dim>::vertices_per_cell][3];
+  static double offsets[GeometryInfo<dim>::vertices_per_cell][3];
+  static int neighbors[GeometryInfo<dim>::vertices_per_cell][GeometryInfo<dim>::faces_per_cell];
 };
 
 
@@ -164,43 +164,43 @@ double PatchInfo<3>::offsets[8][3]
 
 template <int dim, int spacedim>
 void
-create_patches(std::vector<DataOutBase::Patch<dim,spacedim> >& patches)
+create_patches(std::vector<DataOutBase::Patch<dim,spacedim> > &patches)
 {
   const unsigned int ncells = GeometryInfo<dim>::vertices_per_cell;
   const unsigned int nsub = 3;
 
   patches.resize(ncells);
 
-  for (unsigned int c = 0; c < ncells;++c)
+  for (unsigned int c = 0; c < ncells; ++c)
     {
-      DataOutBase::Patch<dim, spacedim>& p = patches[c];
+      DataOutBase::Patch<dim, spacedim> &p = patches[c];
       p.patch_index = c;
       p.n_subdivisions = nsub;
 
-      for (unsigned int i=0;i<ncells;++i)
-	for (unsigned int j=0;j<spacedim;++j)
-	  p.vertices[i](j) = PatchInfo<dim>::vertices[i][j]
-			     + PatchInfo<dim>::offsets[c][j];
+      for (unsigned int i=0; i<ncells; ++i)
+        for (unsigned int j=0; j<spacedim; ++j)
+          p.vertices[i](j) = PatchInfo<dim>::vertices[i][j]
+                             + PatchInfo<dim>::offsets[c][j];
 
-      for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
-	p.neighbors[i] = (unsigned int) PatchInfo<dim>::neighbors[c][i];
+      for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+        p.neighbors[i] = (unsigned int) PatchInfo<dim>::neighbors[c][i];
 
       unsigned int ndata = 1;
-      for (unsigned int i=0;i<dim;++i)
-	ndata *= nsub+1;
+      for (unsigned int i=0; i<dim; ++i)
+        ndata *= nsub+1;
 
       p.data.reinit(2,ndata);
-      for (unsigned int i=0;i<ndata;++i)
-	{
-	  p.data(0,i) = i;
-	  p.data(1,i) = -(float) i;
-	}
+      for (unsigned int i=0; i<ndata; ++i)
+        {
+          p.data(0,i) = i;
+          p.data(1,i) = -(float) i;
+        }
     }
 }
 
 
 template<int dim, int spacedim>
-void test(std::ostream& out)
+void test(std::ostream &out)
 {
   std::vector<DataOutBase::Patch<dim, spacedim> > patches;
   create_patches(patches);

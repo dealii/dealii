@@ -35,7 +35,7 @@ check ()
 
   FullMatrix<number> n;
   n = m;
-  
+
   print_matrix (n);
 }
 

@@ -78,53 +78,53 @@ void test ()
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (2);
 
-				   // refine the offspring of one of the cells
-				   // on level 1
+  // refine the offspring of one of the cells
+  // on level 1
   for (unsigned int i=0; i<4; ++i)
     triangulation.begin(1)->child(i)->set_refine_flag ();
   triangulation.execute_coarsening_and_refinement ();
 
   deallog << "n_active_cells = " << triangulation.n_active_cells()
-	  << std::endl;
+          << std::endl;
 
 
   for (Triangulation<2>::cell_iterator
-	 cell = triangulation.begin();
+       cell = triangulation.begin();
        cell != triangulation.end(); ++cell)
     {
       deallog << "Cell = " << cell
-	      << (cell->active() ? " is active " : " is not active ");
+              << (cell->active() ? " is active " : " is not active ");
       if (!cell->active())
-	{
-	  deallog << "and has children: ";
-	  for (unsigned int i=0; i<4; ++i)
-	    deallog << cell->child(i) << ' ';
-	}
+        {
+          deallog << "and has children: ";
+          for (unsigned int i=0; i<4; ++i)
+            deallog << cell->child(i) << ' ';
+        }
       deallog << std::endl;
     }
-  
-				       // now flag everything for coarsening
-				       // again
+
+  // now flag everything for coarsening
+  // again
   for (Triangulation<2>::active_cell_iterator
-	 cell = triangulation.begin_active();
+       cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
     cell->set_coarsen_flag ();
   triangulation.execute_coarsening_and_refinement ();
 
   deallog << "n_active_cells = " << triangulation.n_active_cells()
-	  << std::endl;
-  
+          << std::endl;
+
   for (Triangulation<2>::cell_iterator
-	 cell = triangulation.begin();
+       cell = triangulation.begin();
        cell != triangulation.end(); ++cell)
     {
       Assert ((cell->refine_flag_set() == false)
-	      &&
-	      (cell->coarsen_flag_set() == false),
-	      ExcInternalError());
+              &&
+              (cell->coarsen_flag_set() == false),
+              ExcInternalError());
       if (!cell->active())
-	Assert (cell_is_patch_level_1<2>(cell),
-		ExcInternalError());
+        Assert (cell_is_patch_level_1<2>(cell),
+                ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -132,11 +132,11 @@ void test ()
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -147,25 +147,25 @@ int main ()
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
 
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     }
 

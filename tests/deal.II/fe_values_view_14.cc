@@ -40,11 +40,11 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-	   const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   deallog << "FE=" << fe.get_name()
-	  << std::endl;
+          << std::endl;
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -52,40 +52,40 @@ void test (const Triangulation<dim>& tr,
   Vector<double> fe_function(dof.n_dofs());
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     fe_function(i) = i+1;
-  
+
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
-			   update_values | update_gradients | update_hessians);
+                           update_values | update_gradients | update_hessians);
   fe_values.reinit (dof.begin_active());
 
   std::vector<Tensor<1,dim> > selected_vector_values (quadrature.size());
   std::vector<Vector<double> > vector_values (quadrature.size(),
-					      Vector<double>(fe.n_components()));
+                                              Vector<double>(fe.n_components()));
 
   fe_values.get_function_values (fe_function, vector_values);
-  
+
   for (unsigned int c=0; c<fe.n_components(); ++c)
-				     // use a vector extractor if there
-				     // are sufficiently many components
-				     // left after the current component
-				     // 'c'
+    // use a vector extractor if there
+    // are sufficiently many components
+    // left after the current component
+    // 'c'
     if (c+dim <= fe.n_components())
       {
-	FEValuesExtractors::Vector vector_components (c);
-	fe_values[vector_components].get_function_values (fe_function,
-							 selected_vector_values);
-	deallog << "component=" << c << std::endl;
-      
-	for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-	  for (unsigned int d=0; d<dim; ++d)
-	    {
-	      deallog << selected_vector_values[q][d] << std::endl;
-	      Assert ((std::fabs (selected_vector_values[q][d] - vector_values[q](c+d))
-		       <= 1e-12 * selected_vector_values[q].norm())
-		      ||
-		      (selected_vector_values[q].norm() < 1e-12),
-		      ExcInternalError());
-	    }
+        FEValuesExtractors::Vector vector_components (c);
+        fe_values[vector_components].get_function_values (fe_function,
+                                                          selected_vector_values);
+        deallog << "component=" << c << std::endl;
+
+        for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+          for (unsigned int d=0; d<dim; ++d)
+            {
+              deallog << selected_vector_values[q][d] << std::endl;
+              Assert ((std::fabs (selected_vector_values[q][d] - vector_values[q](c+d))
+                       <= 1e-12 * selected_vector_values[q].norm())
+                      ||
+                      (selected_vector_values[q].norm() < 1e-12),
+                      ExcInternalError());
+            }
       }
 }
 
@@ -101,8 +101,8 @@ void test_hyper_sphere()
   tr.set_boundary (0, boundary);
 
   FESystem<dim> fe (FE_Q<dim>(1), 1,
-		    FE_RaviartThomas<dim>(1), 1,
-		    FE_Nedelec<dim>(0), 1);
+                    FE_RaviartThomas<dim>(1), 1,
+                    FE_Nedelec<dim>(0), 1);
   test(tr, fe);
 }
 

@@ -40,8 +40,8 @@ void plot_FE_Q_Hierarchical_shape_functions()
   plot_face_shape_functions(m, q2, "QHierarchical2");
   test_compute_functions(m, q2, "QHierarchical2");
 
-				   // skip the following tests to
-				   // reduce run-time
+  // skip the following tests to
+  // reduce run-time
   if (dim < 3)
     {
       FE_Q_Hierarchical<dim> q3(3);
@@ -69,7 +69,7 @@ main()
   plot_FE_Q_Hierarchical_shape_functions<1>();
   plot_FE_Q_Hierarchical_shape_functions<2>();
   plot_FE_Q_Hierarchical_shape_functions<3>();
-  
+
   return 0;
 }
 

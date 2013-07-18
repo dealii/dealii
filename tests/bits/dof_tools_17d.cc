@@ -22,7 +22,7 @@
 // check
 //   DoFTools::
 //   make_flux_sparsity_pattern (const DoFHandler<dim> &,
-//	                         BlockCompressedSparsityPattern  &);
+//                           BlockCompressedSparsityPattern  &);
 
 std::string output_file_name = "dof_tools_17d/output";
 
@@ -31,16 +31,16 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // we split up the matrix into
-                                   // blocks according to the number
-                                   // of dofs in each component. this
-                                   // fails if the element is not
-                                   // primitive, so skip this test for
-                                   // such elements
+  // we split up the matrix into
+  // blocks according to the number
+  // of dofs in each component. this
+  // fails if the element is not
+  // primitive, so skip this test for
+  // such elements
   if (dof_handler.get_fe().is_primitive() != true)
     return;
-  
-                                   // create sparsity pattern
+
+  // create sparsity pattern
   const unsigned int n_components = dof_handler.get_fe().n_components();
   BlockCompressedSparsityPattern sp (n_components,
                                      n_components);
@@ -52,19 +52,19 @@ check_this (const DoFHandler<dim> &dof_handler)
       sp.block(i,j).reinit(dofs_per_component[i],
                            dofs_per_component[j]);
   sp.collect_sizes ();
-  
+
   DoFTools::make_flux_sparsity_pattern (dof_handler, sp);
   sp.compress ();
-  
-                                   // write out 20 lines of this
-                                   // pattern (if we write out the
-                                   // whole pattern, the output file
-                                   // would be in the range of 40 MB)
+
+  // write out 20 lines of this
+  // pattern (if we write out the
+  // whole pattern, the output file
+  // would be in the range of 40 MB)
   for (unsigned int l=0; l<20; ++l)
     {
       const unsigned int line = l*(sp.n_rows()/20);
       std::pair<unsigned int,unsigned int>
-        block_row = sp.get_row_indices().global_to_local(line);
+      block_row = sp.get_row_indices().global_to_local(line);
       for (unsigned int col=0; col<n_components; ++col)
         {
           for (unsigned int c=0;
@@ -76,7 +76,7 @@ check_this (const DoFHandler<dim> &dof_handler)
         }
     }
 
-                                   // write out some other indicators
+  // write out some other indicators
   for (unsigned int r=0; r<n_components; ++r)
     for (unsigned int c=0; c<n_components; ++c)
       {
@@ -84,7 +84,7 @@ check_this (const DoFHandler<dim> &dof_handler)
         deallog << x.bandwidth () << std::endl
                 << x.max_entries_per_row () << std::endl
                 << x.n_nonzero_elements () << std::endl;
-        
+
         unsigned int hash = 0;
         for (unsigned int l=0; l<x.n_rows(); ++l)
           hash += l*x.row_length(l);

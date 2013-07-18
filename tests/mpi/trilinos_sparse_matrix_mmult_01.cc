@@ -47,24 +47,24 @@ void test ()
   else if (n_procs == 2)
     {
       if (my_id == 0)
-	{
-	  row_partitioning.add_range(0, 1);
-	  col_partitioning.add_range(0, 1);
-	}
+        {
+          row_partitioning.add_range(0, 1);
+          col_partitioning.add_range(0, 1);
+        }
       else if (my_id == 1)
-	{
-	  row_partitioning.add_range(1, n_rows);
-	  col_partitioning.add_range(1, n_cols);
-	}
+        {
+          row_partitioning.add_range(1, n_rows);
+          col_partitioning.add_range(1, n_cols);
+        }
     }
   else
     Assert (false, ExcNotImplemented());
 
-				   /* A is
+  /* A is
 
-				      0     1
-				      0     1
-				   */
+     0     1
+     0     1
+  */
   const unsigned int n_entries = 2;
   const unsigned int line [n_entries] = {0, 1};
   const unsigned int local_index [n_entries] = {1, 1};
@@ -98,47 +98,47 @@ void test ()
   TrilinosWrappers::SparseMatrix AtA;
   A.Tmmult (AtA, A);
 
-				   /* AtA should be
+  /* AtA should be
 
-				      0     0
-				      0     2
-				   */
+     0     0
+     0     2
+  */
 
-				   // checking AtA row partitioning
+  // checking AtA row partitioning
   if (n_procs == 2)
     {
       if (my_id == 0)
-	{
-	  Assert(AtA.local_range().first == 0,
-		 ExcMessage("AtA Local Range is not as expected."));
-	  Assert(AtA.local_range().second == 1,
-		 ExcMessage("AtA Local Range is not as expected."));
-	}
+        {
+          Assert(AtA.local_range().first == 0,
+                 ExcMessage("AtA Local Range is not as expected."));
+          Assert(AtA.local_range().second == 1,
+                 ExcMessage("AtA Local Range is not as expected."));
+        }
       if (my_id == 1)
-	{
-	  Assert(AtA.local_range().first == 1,
-		 ExcMessage("AtA Local Range is not as expected."));
-	  Assert(AtA.local_range().second == 2,
-		 ExcMessage("AtA Local Range is not as expected."));
-	}
+        {
+          Assert(AtA.local_range().first == 1,
+                 ExcMessage("AtA Local Range is not as expected."));
+          Assert(AtA.local_range().second == 2,
+                 ExcMessage("AtA Local Range is not as expected."));
+        }
     }
 
-				   // checking AtA elements. note that
-				   // the el() function either returns
-				   // the correct value, or zero in
-				   // case the element is stored on
-				   // other processors. consequently,
-				   // in the following we only test
-				   // that the values that *must* be
-				   // zero in AtA are indeed zero, but
-				   // not that the others have the
-				   // correct value
+  // checking AtA elements. note that
+  // the el() function either returns
+  // the correct value, or zero in
+  // case the element is stored on
+  // other processors. consequently,
+  // in the following we only test
+  // that the values that *must* be
+  // zero in AtA are indeed zero, but
+  // not that the others have the
+  // correct value
   Assert(AtA.el(0, 0) == 0, ExcMessage("Wrong element in AtA!"));
   Assert(AtA.el(0, 1) == 0, ExcMessage("Wrong element in AtA!"));
   Assert(AtA.el(1, 0) == 0, ExcMessage("Wrong element in AtA!"));
 
-				   // now also check the one nonzero
-				   // element
+  // now also check the one nonzero
+  // element
   if ((n_procs == 1) || (my_id == 1))
     Assert(AtA.el(1, 1) == 2, ExcMessage("Wrong element in AtA!"));
 

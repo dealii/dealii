@@ -25,10 +25,10 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_in.h>
-  
+
 #include <fstream>
 #include <cmath>
-  
+
 
 template <int dim>
 void gmsh_grid (const char *name)
@@ -38,7 +38,7 @@ void gmsh_grid (const char *name)
   grid_in.attach_triangulation (tria);
   std::ifstream input_file(name);
   grid_in.read_msh(input_file);
-  
+
   deallog << "  " << tria.n_active_cells() << " active cells" << std::endl;
 
   int hash = 0;
@@ -51,13 +51,13 @@ void gmsh_grid (const char *name)
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("grid_in_msh_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-				
+
   try
     {
       gmsh_grid<2> ("grid_in_msh_01.2d.msh");
@@ -69,26 +69,26 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
-  
+
   return 0;
 }

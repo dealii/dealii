@@ -38,18 +38,18 @@ template <int dim>
 void test ()
 {
   deallog << dim << "D" << std::endl;
-  
+
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation);
 
-                                   // refine the mesh in a random way so as to
-                                   // generate as many hanging node
-                                   // constraints as possible
+  // refine the mesh in a random way so as to
+  // generate as many hanging node
+  // constraints as possible
   triangulation.refine_global (4-dim);
   for (unsigned int i=0; i<11-2*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
-        cell = triangulation.begin_active();
+      cell = triangulation.begin_active();
       for (unsigned int index=0; cell != triangulation.end(); ++cell, ++index)
         if (index % (3*dim) == 0)
           cell->set_refine_flag();
@@ -57,9 +57,9 @@ void test ()
     }
   deallog << "Number of cells: " << triangulation.n_active_cells()
           << std::endl;
-  
-                                   // set up a DoFHandler and compute hanging
-                                   // node constraints
+
+  // set up a DoFHandler and compute hanging
+  // node constraints
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
@@ -70,18 +70,18 @@ void test ()
   constraints.close ();
   deallog << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-                                   // then set up two vectors
+  // then set up two vectors
   Vector<double> A(dof_handler.n_dofs()), B(dof_handler.n_dofs());
 
-                                   // then fill the two vectors by setting up
-                                   // bogus matrix entries and (1) writing
-                                   // them into the vector and condensing away
-                                   // hanging node constraints later on, or
-                                   // (2) distributing them right away
+  // then fill the two vectors by setting up
+  // bogus matrix entries and (1) writing
+  // them into the vector and condensing away
+  // hanging node constraints later on, or
+  // (2) distributing them right away
   std::vector<types::global_dof_index> local_dofs (fe.dofs_per_cell);
   Vector<double> local_vector (fe.dofs_per_cell);
   for (typename DoFHandler<dim>::active_cell_iterator
-         cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     {
       cell->get_dof_indices (local_dofs);
@@ -89,27 +89,27 @@ void test ()
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         local_vector(i) = (i+1.)*(local_dofs[i]+1.);
 
-                                       // copy local to global by ourselves
+      // copy local to global by ourselves
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         A(local_dofs[i]) += local_vector(i);
 
-                                       // or let other functions do that
+      // or let other functions do that
       constraints.distribute_local_to_global (local_vector, local_dofs, B);
     }
 
-                                   // now condense away constraints from A
+  // now condense away constraints from A
   constraints.condense (A);
 
-                                   // we haven't yet set the entries
-                                   // for constrained nodes. we can do so at
-                                   // will, since these values don't matter
-                                   // anyway
+  // we haven't yet set the entries
+  // for constrained nodes. we can do so at
+  // will, since these values don't matter
+  // anyway
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     if (constraints.is_constrained(i))
       B(i) = A(i);
-  
-                                   // now comes the check: we subtract B from
-                                   // A, and make sure that the result is zero
+
+  // now comes the check: we subtract B from
+  // A, and make sure that the result is zero
   A -= B;
   deallog << "|A|=" << A.l2_norm() << std::endl;
   deallog << "|B|=" << B.l2_norm() << std::endl;
@@ -135,25 +135,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

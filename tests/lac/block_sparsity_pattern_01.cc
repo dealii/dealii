@@ -49,34 +49,34 @@ int main()
   BlockIndices cols(col_blocks);
 
   std::vector<std::vector<unsigned int> >
-    row_length(cols.size(),
-	       std::vector<unsigned int>(rows.total_size()));
-  for (unsigned int jb=0;jb<row_length.size();++jb)
-      for (unsigned int i=0;i<row_length[jb].size();++i)
-	{
-	  const unsigned int d = col_blocks[jb]-1;
-	  row_length[jb][i] = (i+1) % d +1;
-	}
-  
-  for (unsigned int j=0;j<row_length.size();++j)
+  row_length(cols.size(),
+             std::vector<unsigned int>(rows.total_size()));
+  for (unsigned int jb=0; jb<row_length.size(); ++jb)
+    for (unsigned int i=0; i<row_length[jb].size(); ++i)
+      {
+        const unsigned int d = col_blocks[jb]-1;
+        row_length[jb][i] = (i+1) % d +1;
+      }
+
+  for (unsigned int j=0; j<row_length.size(); ++j)
     {
-      for (unsigned int i=0;i<row_length[j].size();++i)
-	deallog << ' ' << row_length[j][i];
+      for (unsigned int i=0; i<row_length[j].size(); ++i)
+        deallog << ' ' << row_length[j][i];
       deallog << std::endl;
     }
-  
+
   sparsity.reinit(rows, cols, row_length);
 
-  for (unsigned int ib = 0;ib<rows.size();++ib)
-    for (unsigned int i=0;i<rows.block_size(ib);++i)
+  for (unsigned int ib = 0; ib<rows.size(); ++ib)
+    for (unsigned int i=0; i<rows.block_size(ib); ++i)
       {
-	const unsigned int ii = rows.local_to_global(ib,i);
-	for (unsigned int jb = 0;jb<cols.size();++jb)
-	  for (unsigned int j=0;j<row_length[jb][ii];++j)
-	    sparsity.add(ii, cols.local_to_global(jb,j));
+        const unsigned int ii = rows.local_to_global(ib,i);
+        for (unsigned int jb = 0; jb<cols.size(); ++jb)
+          for (unsigned int j=0; j<row_length[jb][ii]; ++j)
+            sparsity.add(ii, cols.local_to_global(jb,j));
       }
-  
+
   sparsity.print(logfile);
-  
+
   return 0;
 }

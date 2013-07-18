@@ -45,11 +45,11 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-		   Triangulation<dim>::limit_level_difference_at_vertices);
+  triangulation (MPI_COMM_WORLD,
+                 Triangulation<dim>::limit_level_difference_at_vertices);
 
   FESystem<dim> fe (FE_Q<dim>(3),2,
-		    FE_DGQ<dim>(1),1);
+                    FE_DGQ<dim>(1),1);
 
   DoFHandler<dim> dof_handler (triangulation);
 
@@ -59,75 +59,75 @@ void test()
   const unsigned int n_refinements[] = { 0, 4, 3, 2 };
   for (unsigned int i=0; i<n_refinements[dim]; ++i)
     {
-				       // refine one-fifth of cells randomly
+      // refine one-fifth of cells randomly
       std::vector<bool> flags (triangulation.n_active_cells(), false);
       for (unsigned int k=0; k<flags.size()/5 + 1; ++k)
-	flags[rand() % flags.size()] = true;
-				       // make sure there's at least one that
-				       // will be refined
+        flags[rand() % flags.size()] = true;
+      // make sure there's at least one that
+      // will be refined
       flags[0] = true;
 
-				       // refine triangulation
+      // refine triangulation
       unsigned int index=0;
       for (typename Triangulation<dim>::active_cell_iterator
-	     cell = triangulation.begin_active();
-	   cell != triangulation.end(); ++cell)
-	if (!cell->is_ghost() && !cell->is_artificial())
-	  {
-	    if (flags[index])
-	      cell->set_refine_flag();
-	    ++index;
-	  }
+           cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell)
+        if (!cell->is_ghost() && !cell->is_artificial())
+          {
+            if (flags[index])
+              cell->set_refine_flag();
+            ++index;
+          }
 
       Assert (index <= triangulation.n_active_cells(), ExcInternalError());
 
-				       // flag all other cells for coarsening
-				       // (this should ensure that at least
-				       // some of them will actually be
-				       // coarsened)
+      // flag all other cells for coarsening
+      // (this should ensure that at least
+      // some of them will actually be
+      // coarsened)
       index=0;
       for (typename Triangulation<dim>::active_cell_iterator
-	     cell = triangulation.begin_active();
-	   cell != triangulation.end(); ++cell)
-	if (!cell->is_ghost() && !cell->is_artificial())
-	  {
-	    if (!flags[index])
-	      cell->set_coarsen_flag();
-	    ++index;
-	  }
+           cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell)
+        if (!cell->is_ghost() && !cell->is_artificial())
+          {
+            if (!flags[index])
+              cell->set_coarsen_flag();
+            ++index;
+          }
 
       triangulation.execute_coarsening_and_refinement ();
       dof_handler.distribute_dofs (fe);
 
       const unsigned int N = dof_handler.n_dofs();
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << N << std::endl;
+        deallog << N << std::endl;
 
       Assert (dof_handler.n_locally_owned_dofs() <= N,
-	      ExcInternalError());
+              ExcInternalError());
       for (unsigned int i=0;
-	   i<dof_handler.n_locally_owned_dofs_per_processor().size(); ++i)
-	Assert (dof_handler.n_locally_owned_dofs_per_processor()[i] <= N,
-		ExcInternalError());
+           i<dof_handler.n_locally_owned_dofs_per_processor().size(); ++i)
+        Assert (dof_handler.n_locally_owned_dofs_per_processor()[i] <= N,
+                ExcInternalError());
       Assert (std::accumulate (dof_handler.n_locally_owned_dofs_per_processor().begin(),
-			       dof_handler.n_locally_owned_dofs_per_processor().end(),
-			       0U) == N,
-	      ExcInternalError());
+                               dof_handler.n_locally_owned_dofs_per_processor().end(),
+                               0U) == N,
+              ExcInternalError());
 
       IndexSet all (N), really_all (N);
-				       // poor man's union operation
+      // poor man's union operation
       for (unsigned int i=0;
-	   i<dof_handler.n_locally_owned_dofs_per_processor().size(); ++i)
-	for (unsigned int j=0; j<N; ++j)
-	  if (dof_handler.locally_owned_dofs_per_processor()[i]
-	      .is_element(j))
-	    {
-	      Assert (all.is_element(j) == false, ExcInternalError());
-	      all.add_index (j);
-	    }
+           i<dof_handler.n_locally_owned_dofs_per_processor().size(); ++i)
+        for (unsigned int j=0; j<N; ++j)
+          if (dof_handler.locally_owned_dofs_per_processor()[i]
+              .is_element(j))
+            {
+              Assert (all.is_element(j) == false, ExcInternalError());
+              all.add_index (j);
+            }
       really_all.add_range (0, N);
       Assert (all == really_all,
-	      ExcInternalError());
+              ExcInternalError());
     }
 }
 

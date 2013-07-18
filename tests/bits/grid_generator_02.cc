@@ -31,7 +31,7 @@
 
 
 template<int dim>
-void test(std::ostream& out)
+void test(std::ostream &out)
 {
   Point<dim> p1;
   p1[0] = 2.;
@@ -45,10 +45,10 @@ void test(std::ostream& out)
   p3[0] = 2.;
   if (dim>1) p3[1] = 1.;
   if (dim>2) p3[2] = 4.;
-  
+
   GridOut go;
 
-                                   // uniformly subdivided mesh
+  // uniformly subdivided mesh
   if (true)
     {
       deallog << "subdivided_hyper_rectangle" << std::endl;
@@ -59,11 +59,11 @@ void test(std::ostream& out)
 
       GridGenerator::subdivided_hyper_rectangle(tr, sub, p1, p2, true);
       if (tr.n_cells() > 0)
-	go.write_gnuplot(tr, out);
+        go.write_gnuplot(tr, out);
     }
 
 
-                                   // non-uniformly subdivided mesh
+  // non-uniformly subdivided mesh
   if (true)
     {
       deallog << "subdivided_hyper_rectangle" << std::endl;
@@ -78,7 +78,7 @@ void test(std::ostream& out)
 
       GridGenerator::subdivided_hyper_rectangle(tr, sub, p1, p2, true);
       if (tr.n_cells() > 0)
-	go.write_gnuplot(tr, out);
+        go.write_gnuplot(tr, out);
     }
 }
 
@@ -89,7 +89,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   deallog.push("1d");
   test<1>(logfile);
   deallog.pop();

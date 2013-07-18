@@ -39,35 +39,35 @@ void
 check_this (const FiniteElement<dim> &fe,
             const FiniteElement<dim> &/*fe2*/)
 {
-                                   // only check if both elements have
-                                   // support points. otherwise,
-                                   // interpolation doesn't really
-                                   // work
+  // only check if both elements have
+  // support points. otherwise,
+  // interpolation doesn't really
+  // work
   if (fe.n_components() != 1)
     return;
 
-                                   // ignore this check if this fe has already
-                                   // been treated
+  // ignore this check if this fe has already
+  // been treated
   static std::set<std::string> already_checked;
   if (already_checked.find(fe.get_name()) != already_checked.end())
     return;
   already_checked.insert (fe.get_name());
 
-				   // only test elements with support
-				   // points
+  // only test elements with support
+  // points
   if (fe.has_support_points() == false)
     return;
 
-                                   // test with different quadrature formulas
+  // test with different quadrature formulas
   Quadrature<dim> q_rhs(fe.get_unit_support_points(),
-			std::vector<double> (fe.dofs_per_cell,
-					     1./fe.dofs_per_cell));
-      
+                        std::vector<double> (fe.dofs_per_cell,
+                                             1./fe.dofs_per_cell));
+
   FullMatrix<double> X (fe.dofs_per_cell,
                         q_rhs.size());
 
   Assert (X.m() == X.n(), ExcInternalError());
-  
+
   FETools::compute_projection_from_quadrature_points_matrix (fe,
                                                              q_rhs, q_rhs,
                                                              X);

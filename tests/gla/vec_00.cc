@@ -28,17 +28,17 @@
 
 #include "gla.h"
 
-template <class LA> 
+template <class LA>
 void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-  
+
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
 
-				   // each processor owns 2 indices and all
-				   // are ghosting Element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting Element 1 (the second)
 
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
@@ -51,10 +51,10 @@ void test ()
   if (myid==numproc-1)
     something.add_range(numproc,100);
 
-  
+
   {
     typename LA::MPI::Vector v1;
-    
+
     v1.reinit(something, MPI_COMM_WORLD);
     Assert(!v1.has_ghost_elements(), ExcInternalError());
     Assert(v1.size()==100, ExcInternalError());
@@ -66,14 +66,14 @@ void test ()
     v2.reinit(local_active,MPI_COMM_WORLD);
     Assert(!v2.has_ghost_elements(), ExcInternalError());
     Assert(v2.size()==numproc*2, ExcInternalError());
-   
+
     v2.reinit(local_active, local_relevant, MPI_COMM_WORLD);
     Assert(v2.has_ghost_elements(), ExcInternalError());
     Assert(v2.size()==numproc*2, ExcInternalError());
-    
+
   }
 
-				   // done
+  // done
   if (myid==0)
     deallog << "OK" << std::endl;
 }
@@ -95,28 +95,28 @@ int main (int argc, char **argv)
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
-      {	
-	deallog.push("PETSc");
-	test<LA_PETSc>();
-	deallog.pop();	
-	deallog.push("Trilinos");
-	test<LA_Trilinos>();
-	deallog.pop();	
+      {
+        deallog.push("PETSc");
+        test<LA_PETSc>();
+        deallog.pop();
+        deallog.push("Trilinos");
+        test<LA_Trilinos>();
+        deallog.pop();
       }
-      
+
     }
   else
-      {	
-	deallog.push("PETSc");
-	test<LA_PETSc>();
-	deallog.pop();	
-	deallog.push("Trilinos");
-	test<LA_Trilinos>();
-	deallog.pop();	
-      }
+    {
+      deallog.push("PETSc");
+      test<LA_PETSc>();
+      deallog.pop();
+      deallog.push("Trilinos");
+      test<LA_Trilinos>();
+      deallog.pop();
+    }
 
   if (myid==9999)
     test<LA_Dummy>();
-  
+
 
 }

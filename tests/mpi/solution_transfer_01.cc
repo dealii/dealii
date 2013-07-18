@@ -53,9 +53,9 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<2> tria(MPI_COMM_WORLD,
-					       typename Triangulation<2>::MeshSmoothing
-					       (Triangulation<2>::smoothing_on_refinement |
-						Triangulation<2>::smoothing_on_coarsening));
+                                               typename Triangulation<2>::MeshSmoothing
+                                               (Triangulation<2>::smoothing_on_refinement |
+                                                Triangulation<2>::smoothing_on_coarsening));
 
   GridGenerator::hyper_cube (tria,-1.0,1.0);
 
@@ -92,8 +92,8 @@ void test()
   solution.reinit(locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
   solution = tmp;
 
-				   // make sure no processor is
-				   // hanging
+  // make sure no processor is
+  // hanging
   MPI_Barrier (MPI_COMM_WORLD);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -131,5 +131,5 @@ int main(int argc, char *argv[])
       test<3>();
     }
 
-  
+
 }

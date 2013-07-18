@@ -46,14 +46,14 @@
 
 
 template <int dim>
-class LinearFunction : public Function<dim> 
+class LinearFunction : public Function<dim>
 {
-  public:
-    double value (const Point<dim> &p,
-		  const unsigned int) const
-      {
-	return 1;
-      }
+public:
+  double value (const Point<dim> &p,
+                const unsigned int) const
+  {
+    return 1;
+  }
 };
 
 
@@ -69,17 +69,17 @@ void test()
   const FE_Q<dim> fe(2);
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs (fe);
-  
+
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-					     MPI_COMM_WORLD);
+                                             MPI_COMM_WORLD);
   VectorTools::interpolate (dofh,
-			    LinearFunction<dim>(),
-			    interpolated);
+                            LinearFunction<dim>(),
+                            interpolated);
 
   double norm = interpolated.l2_norm();
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "norm = " << norm
-	    << std::endl;
+            << std::endl;
 }
 
 
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
       deallog.pop();
 
       deallog.push("3d");
-				       //    test<3>();
+      //    test<3>();
       deallog.pop();
     }
   else

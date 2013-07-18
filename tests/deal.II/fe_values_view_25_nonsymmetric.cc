@@ -37,11 +37,11 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-	   const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   deallog << "FE=" << fe.get_name()
-	  << std::endl;
+          << std::endl;
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -52,17 +52,17 @@ void test (const Triangulation<dim>& tr,
 
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
-			   update_values | update_gradients | update_q_points);
+                           update_values | update_gradients | update_q_points);
   fe_values.reinit (dof.begin_active());
 
-				   // let the FEValues object compute the
-				   // divergences at quadrature points
+  // let the FEValues object compute the
+  // divergences at quadrature points
   std::vector<Tensor<1,dim> > divergences (quadrature.size());
   FEValuesExtractors::Tensor<2> extractor(0);
   fe_values[extractor]
-    .get_function_divergences (fe_function, divergences);
+  .get_function_divergences (fe_function, divergences);
 
-				   // now do the same "by hand"
+  // now do the same "by hand"
   std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
   dof.begin_active()->get_dof_indices (local_dof_indices);
 
@@ -71,9 +71,9 @@ void test (const Triangulation<dim>& tr,
       deallog << "i=" << i << std::endl;
 
       for (unsigned int q=0; q<quadrature.size(); ++q)
-	deallog << "  q_point=" << fe_values.quadrature_point(q) << std::endl
-		<< "    value= " << fe_values[extractor].value (i,q) << std::endl
-      		<< "    div= " << fe_values[extractor].divergence (i,q) << std::endl;
+        deallog << "  q_point=" << fe_values.quadrature_point(q) << std::endl
+                << "    value= " << fe_values[extractor].value (i,q) << std::endl
+                << "    div= " << fe_values[extractor].divergence (i,q) << std::endl;
     }
 }
 
@@ -86,7 +86,7 @@ void test_hyper_cube()
   GridGenerator::hyper_cube(tr);
 
   FESystem<dim> fe (FE_Q<dim>(1),
-		    Tensor<2,dim>::n_independent_components);
+                    Tensor<2,dim>::n_independent_components);
   test(tr, fe);
 }
 

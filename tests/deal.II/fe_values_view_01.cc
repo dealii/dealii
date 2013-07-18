@@ -38,52 +38,52 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-	   const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   deallog << "FE=" << fe.get_name()
-	  << std::endl;
+          << std::endl;
 
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
-			   update_values | update_gradients | update_hessians);
+                           update_values | update_gradients | update_hessians);
   fe_values.reinit (dof.begin_active());
-  
+
   for (unsigned int c=0; c<fe.n_components(); ++c)
     {
       FEValuesExtractors::Scalar single_component (c);
 
       for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-	for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-	  {
-	    deallog << "i=" << i << ", q=" << q << std::endl;
-	    deallog << "   "
-		    << fe_values[single_component].value (i,q) << ' ';
-	    for (unsigned int k=0; k<dim; ++k)
-	      deallog << fe_values[single_component].gradient (i,q) << ' ';
-	    deallog << std::endl;
-	    for (unsigned int k=0; k<dim; ++k)
-	      for (unsigned int l=0; l<dim; ++l)
-		deallog << fe_values[single_component].hessian (i,q)[k][l] << std::endl;
+        for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+          {
+            deallog << "i=" << i << ", q=" << q << std::endl;
+            deallog << "   "
+                    << fe_values[single_component].value (i,q) << ' ';
+            for (unsigned int k=0; k<dim; ++k)
+              deallog << fe_values[single_component].gradient (i,q) << ' ';
+            deallog << std::endl;
+            for (unsigned int k=0; k<dim; ++k)
+              for (unsigned int l=0; l<dim; ++l)
+                deallog << fe_values[single_component].hessian (i,q)[k][l] << std::endl;
 
-	    Assert (fe_values[single_component].value (i,q)
-		    ==
-		    fe_values.shape_value_component (i,q,c),
-		    ExcInternalError());
+            Assert (fe_values[single_component].value (i,q)
+                    ==
+                    fe_values.shape_value_component (i,q,c),
+                    ExcInternalError());
 
-	    Assert (fe_values[single_component].gradient (i,q)
-		    ==
-		    fe_values.shape_grad_component (i,q,c),
-		    ExcInternalError());
+            Assert (fe_values[single_component].gradient (i,q)
+                    ==
+                    fe_values.shape_grad_component (i,q,c),
+                    ExcInternalError());
 
-	    Assert (fe_values[single_component].hessian (i,q)
-		    ==
-		    fe_values.shape_hessian_component (i,q,c),
-		    ExcInternalError());
-	  }
+            Assert (fe_values[single_component].hessian (i,q)
+                    ==
+                    fe_values.shape_hessian_component (i,q,c),
+                    ExcInternalError());
+          }
     }
 }
 
@@ -99,8 +99,8 @@ void test_hyper_sphere()
   tr.set_boundary (0, boundary);
 
   FESystem<dim> fe (FE_Q<dim>(1), 1,
-		    FE_Q<dim>(2), 2,
-		    FE_DGQ<dim>(3), dim);
+                    FE_Q<dim>(2), 2,
+                    FE_DGQ<dim>(3), dim);
   test(tr, fe);
 }
 

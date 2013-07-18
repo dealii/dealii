@@ -45,14 +45,14 @@
 
 
 template <int dim>
-class LinearFunction : public Function<dim> 
+class LinearFunction : public Function<dim>
 {
-  public:
-    double value (const Point<dim> &p,
-		  const unsigned int) const
-      {
-	return p[0] + 2;
-      }
+public:
+  double value (const Point<dim> &p,
+                const unsigned int) const
+  {
+    return p[0] + 2;
+  }
 };
 
 
@@ -69,11 +69,11 @@ void test()
   dofh.distribute_dofs (fe);
 
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-					     MPI_COMM_WORLD);
+                                             MPI_COMM_WORLD);
   VectorTools::interpolate (dofh,
-			    LinearFunction<dim>(),
-			    interpolated);
-  
+                            LinearFunction<dim>(),
+                            interpolated);
+
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
@@ -84,8 +84,8 @@ void test()
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "mean=" << mean
-	    << std::endl;
-  
+            << std::endl;
+
   Assert (std::fabs(mean - 2) < 1e-3, ExcInternalError());
 }
 

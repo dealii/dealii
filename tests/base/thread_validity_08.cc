@@ -36,7 +36,7 @@ void worker ()
   spin_lock = 1;
 }
 
-  
+
 
 int main()
 {
@@ -46,32 +46,32 @@ int main()
   deallog.threshold_double(1.e-10);
 
   mutex.acquire ();
-				   // start and abandon the
-				   // thread. because we hold the
-				   // lock, the started task can not
-				   // proceed to print out "OK" until
-				   // we release the lock which we do
-				   // only after some time to give the
-				   // thread a way to start up
-				   //
-				   // if detachment from threads isn't
-				   // possible, then the worker()
-				   // function will hang because it
-				   // won't be able to acquire the
-				   // mutex
+  // start and abandon the
+  // thread. because we hold the
+  // lock, the started task can not
+  // proceed to print out "OK" until
+  // we release the lock which we do
+  // only after some time to give the
+  // thread a way to start up
+  //
+  // if detachment from threads isn't
+  // possible, then the worker()
+  // function will hang because it
+  // won't be able to acquire the
+  // mutex
   {
     Threads::new_thread (worker);
   }
   sleep (1);
 
-				   // let abandoned thread continue
+  // let abandoned thread continue
   mutex.release ();
 
-				   // wait for thread to finish
+  // wait for thread to finish
   while (spin_lock == 0)
     ;
 
-				   // release the lock that the thread
-				   // acquired to avoid pthread errors
+  // release the lock that the thread
+  // acquired to avoid pthread errors
   mutex.release ();
 }

@@ -35,11 +35,11 @@ void test ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       deallog << i << ' ' << j << ' ' << t[i][j] << std::endl;
-  
+
   deallog << determinant(t) << std::endl;
 }
 
-  
+
 
 
 int main ()
@@ -52,6 +52,6 @@ int main ()
 
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

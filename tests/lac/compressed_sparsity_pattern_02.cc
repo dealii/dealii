@@ -32,5 +32,5 @@ int main ()
   print_gnuplot<CompressedSparsityPattern> ();
 }
 
-  
-  
+
+

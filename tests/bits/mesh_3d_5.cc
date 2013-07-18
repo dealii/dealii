@@ -34,8 +34,8 @@
 
 void check_this (Triangulation<3> &tria)
 {
-                                   // look at all faces, not only
-                                   // active ones
+  // look at all faces, not only
+  // active ones
   for (Triangulation<3>::cell_iterator cell=tria.begin();
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
@@ -58,7 +58,7 @@ void check (Triangulation<3> &tria)
 {
   deallog << "Initial check" << std::endl;
   check_this (tria);
-  
+
   for (unsigned int r=0; r<3; ++r)
     {
       tria.refine_global (1);
@@ -69,39 +69,39 @@ void check (Triangulation<3> &tria)
   coarsen_global (tria);
   deallog << "Check " << 1 << std::endl;
   check_this (tria);
-  
+
   tria.refine_global (1);
   deallog << "Check " << 2 << std::endl;
   check_this (tria);
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mesh_3d_5/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<3> coarse_grid;
     create_two_cubes (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     create_L_shape (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     check (coarse_grid);
   }
-  
+
 }
 
-  
-  
+
+

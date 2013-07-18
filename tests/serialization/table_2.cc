@@ -23,28 +23,29 @@
 
 
 void test ()
-{ 
+{
   unsigned int index1 = 3, index2 = 4;
   TableIndices<2> indices1(index1, index2);
   unsigned int sum_of_indices = index1 + index2;
-  
+
   Table<2, int> t1(index1, index2);
   Table<2, int> t2(index1, index2);
 
-  index1 = 2; index2 = 5;
+  index1 = 2;
+  index2 = 5;
   Table<2, int> t3(index1, index2);
-  
+
   unsigned int counter = 0;
   for (unsigned int i1 = 0; i1 < indices1[0]; ++i1)
-  {
-    for (unsigned int i2 = 0; i2 < indices1[1]; ++i2)
     {
-      t1[i1][i2] = counter ++;
-      t2[i1][i2] = counter + sum_of_indices;
+      for (unsigned int i2 = 0; i2 < indices1[1]; ++i2)
+        {
+          t1[i1][i2] = counter ++;
+          t2[i1][i2] = counter + sum_of_indices;
+        }
     }
-  }
   verify (t1, t2);
-  
+
   verify (t1, t3);
 }
 

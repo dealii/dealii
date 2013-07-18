@@ -23,7 +23,7 @@
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim> &,
 //                          std::vector<std::vector<bool> > &,
-//	                    SparsityPattern       &,
+//                      SparsityPattern       &,
 //                          ConstraintMatrix,
 //                          true);
 
@@ -35,7 +35,7 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // set up X-shape mask
+  // set up X-shape mask
   const unsigned int n_components = dof_handler.get_fe().n_components();
   Table<2,DoFTools::Coupling> mask (n_components,n_components);
   for (unsigned int i=0; i<n_components; ++i)
@@ -47,17 +47,17 @@ check_this (const DoFHandler<dim> &dof_handler)
   ConstraintMatrix cm;
   DoFTools::make_hanging_node_constraints (dof_handler, cm);
   cm.close ();
-  
-                                   // create sparsity pattern
+
+  // create sparsity pattern
   SparsityPattern sp (dof_handler.n_dofs(),
                       dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, mask, sp, cm, true);
   sp.compress ();
-  
-                                   // write out 10 lines of this
-                                   // pattern (if we write out the
-                                   // whole pattern, the output file
-                                   // would be in the range of 40 MB)
+
+  // write out 10 lines of this
+  // pattern (if we write out the
+  // whole pattern, the output file
+  // would be in the range of 40 MB)
   for (unsigned int l=0; l<10; ++l)
     {
       const unsigned int line = l*(sp.n_rows()/10);
@@ -66,7 +66,7 @@ check_this (const DoFHandler<dim> &dof_handler)
       deallog << std::endl;
     }
 
-                                   // write out some other indicators
+  // write out some other indicators
   deallog << sp.bandwidth () << std::endl
           << sp.max_entries_per_row () << std::endl
           << sp.n_nonzero_elements () << std::endl;

@@ -45,16 +45,16 @@ void check (const unsigned int testcase)
 
   switch (testcase)
     {
-      case 1:
-	    deallog << "Pinched cell in " << dim << "d" << std::endl;
-	    vertices[0] = vertices[1];
-	    break;
-      case 2:
-	    deallog << "Twisted cell in " << dim << "d" << std::endl;
-	    std::swap (vertices[0], vertices[1]);
-	    break;
-      default:
-	    Assert (false, ExcNotImplemented());
+    case 1:
+      deallog << "Pinched cell in " << dim << "d" << std::endl;
+      vertices[0] = vertices[1];
+      break;
+    case 2:
+      deallog << "Twisted cell in " << dim << "d" << std::endl;
+      std::swap (vertices[0], vertices[1]);
+      break;
+    default:
+      Assert (false, ExcNotImplemented());
     }
 
 
@@ -78,9 +78,9 @@ void check (const unsigned int testcase)
       flag = true;
 
       deallog << dcv.distorted_cells.size() << " distorted cells"
-	      << std::endl;
+              << std::endl;
       Assert (dcv.distorted_cells.front() == coarse_grid.begin(0),
-	      ExcInternalError());
+              ExcInternalError());
     }
 
   Assert (flag == true, ExcInternalError());

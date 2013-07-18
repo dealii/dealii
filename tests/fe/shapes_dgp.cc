@@ -39,12 +39,12 @@ void plot_FE_DGP_shape_functions()
   plot_shape_functions(m, p2, "DGP2");
   plot_face_shape_functions(m, p2, "DGP2");
   test_compute_functions(m, p2, "DGP2");
-      
+
   FE_DGP<dim> p3(3);
   plot_shape_functions(m, p3, "DGP3");
   plot_face_shape_functions(m, p3, "DGP3");
   test_compute_functions(m, p3, "DGP3");
-      
+
 //    FE_DGP<dim> p4(4);
 //    plot_shape_functions(m, p4, "DGP4");
 //    plot_face_shape_functions(m, p4, "DGP4");
@@ -73,11 +73,11 @@ main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   plot_FE_DGP_shape_functions<1>();
   plot_FE_DGP_shape_functions<2>();
   plot_FE_DGP_shape_functions<3>();
-  
+
   return 0;
 }
 

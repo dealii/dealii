@@ -44,7 +44,7 @@
 using namespace std;
 
 template <int dim>
-void check_simple(const FiniteElement<dim>& fe)
+void check_simple(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -62,13 +62,13 @@ void check_simple(const FiniteElement<dim>& fe)
   ConstraintMatrix     hanging_node_constraints;
   DoFTools::make_hanging_node_constraints (mgdof, hanging_node_constraints);
   hanging_node_constraints.close ();
-  
+
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(mgdof);
 
   MGTransferPrebuilt<Vector<double> > transfer(hanging_node_constraints, mg_constrained_dofs);
   transfer.build_matrices(mgdof);
-  
+
   transfer.print_matrices(deallog.get_file_stream());
   transfer.print_indices(deallog.get_file_stream());
 }
@@ -77,7 +77,7 @@ void check_simple(const FiniteElement<dim>& fe)
 int main()
 {
   initlog(__FILE__);
-  
+
   check_simple (FE_DGP<2>(0));
   check_simple (FE_DGP<2>(1));
   check_simple (FE_DGQ<2>(1));

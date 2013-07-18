@@ -44,37 +44,37 @@
 template<int dim>
 void test()
 {
-  #ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_THREADS
 
   DeadlockKiller killer;
-  #endif
-  
-				   // 0 components is not okay
+#endif
+
+  // 0 components is not okay
   FESystem<dim> fe(FE_Q<dim>(1), 1, FE_Q<dim>(2), 0);
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
   tria.refine_global(2);
-tria.begin_active()->set_refine_flag();
-tria.execute_coarsening_and_refinement();
+  tria.begin_active()->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
 
   DoFHandler<dim> dofh(tria);
 
-dofh.distribute_dofs(fe);
+  dofh.distribute_dofs(fe);
 
-ConstraintMatrix cm;
+  ConstraintMatrix cm;
 
   DoFTools::make_hanging_node_constraints (dofh, cm);
   cm.close ();
 
-std::ostringstream ss;
-cm.print(ss);
+  std::ostringstream ss;
+  cm.print(ss);
 
-deallog << ss.str() << std::endl;
-
-
+  deallog << ss.str() << std::endl;
 
 
-  
+
+
+
   deallog << "ok" << std::endl;
 }
 
@@ -84,13 +84,13 @@ main()
 {
   std::ofstream logfile ("fe_system/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test<2>();
-  
+
   return 0;
 }
 

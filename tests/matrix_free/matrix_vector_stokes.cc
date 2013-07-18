@@ -56,7 +56,7 @@ std::ofstream logfile("matrix_vector_stokes/output");
 template <int dim, int degree_p, typename VectorType>
 class MatrixFreeTest
 {
- public:
+public:
   typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
   typedef double Number;
 
@@ -74,7 +74,7 @@ class MatrixFreeTest
     FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> velocity (data, 0);
     FEEvaluation<dim,degree_p  ,degree_p+2,1,  Number> pressure (data, 1);
 
-    for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         velocity.reinit (cell);
         velocity.read_dof_values (src, 0);
@@ -91,7 +91,7 @@ class MatrixFreeTest
             vector_t div = -velocity.get_divergence(q);
             pressure.submit_value   (div, q);
 
-                               // subtract p * I
+            // subtract p * I
             for (unsigned int d=0; d<dim; ++d)
               sym_grad_u[d][d] -= pres;
 
@@ -202,7 +202,7 @@ void test ()
   vec1[dim].reinit (dofs_per_block[dim]);
   vec2[dim].reinit (vec1[dim]);
 
-                                // this is from step-22
+  // this is from step-22
   {
     QGauss<dim>   quadrature_formula(fe_degree+2);
 
@@ -226,8 +226,8 @@ void test ()
     std::vector<double>                  phi_p       (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         fe_values.reinit (cell);
@@ -249,7 +249,7 @@ void test ()
                     local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
                                           - div_phi_u[i] * phi_p[j]
                                           - phi_p[i] * div_phi_u[j])
-                      * fe_values.JxW(q);
+                                         * fe_values.JxW(q);
                   }
               }
           }
@@ -264,7 +264,7 @@ void test ()
       }
   }
 
-                                // first system_rhs with random numbers
+  // first system_rhs with random numbers
   for (unsigned int i=0; i<dim+1; ++i)
     for (unsigned int j=0; j<system_rhs.block(i).size(); ++j)
       {
@@ -273,14 +273,14 @@ void test ()
         vec1[i](j) = val;
       }
 
-                                // setup matrix-free structure
+  // setup matrix-free structure
   {
     std::vector<const DoFHandler<dim>*> dofs;
     dofs.push_back(&dof_handler_u);
     dofs.push_back(&dof_handler_p);
     ConstraintMatrix dummy_constraints;
     dummy_constraints.close();
-    std::vector<const ConstraintMatrix*> constraints;
+    std::vector<const ConstraintMatrix *> constraints;
     constraints.push_back (&dummy_constraints);
     constraints.push_back (&dummy_constraints);
     QGauss<1> quad(fe_degree+2);
@@ -296,7 +296,7 @@ void test ()
   MatrixFreeTest<dim,fe_degree,VectorType> mf (mf_data);
   mf.vmult (vec2, vec1);
 
-                                // Verification
+  // Verification
   double error = 0.;
   for (unsigned int i=0; i<dim+1; ++i)
     for (unsigned int j=0; j<system_rhs.block(i).size(); ++j)

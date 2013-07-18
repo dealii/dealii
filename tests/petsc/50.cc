@@ -36,13 +36,13 @@ void test (PETScWrappers::Vector &v)
       w(i) = i;
       x(i) = i+1;
     }
-  
-                                   // first copy from w and make sure we get
-                                   // the expected result. then copy from x
-                                   // and do the same. in at least one of the
-                                   // two cases, the template argument to
-                                   // Vector<T> must be different from
-                                   // PetscScalar
+
+  // first copy from w and make sure we get
+  // the expected result. then copy from x
+  // and do the same. in at least one of the
+  // two cases, the template argument to
+  // Vector<T> must be different from
+  // PetscScalar
   v = w;
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -58,13 +58,13 @@ void test (PETScWrappers::Vector &v)
       Assert (v(i) == i+1, ExcInternalError());
       Assert (x(i) == i+1, ExcInternalError());
     }
-  
+
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("50/output");
   deallog.attach(logfile);
@@ -78,30 +78,30 @@ int main (int argc,char **argv)
         PETScWrappers::Vector v (100);
         test (v);
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

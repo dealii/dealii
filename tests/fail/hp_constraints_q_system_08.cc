@@ -31,7 +31,7 @@ void test ()
   hp::FECollection<dim> fe;
   for (unsigned int i=1; i<4; ++i)
     fe.push_back (FESystem<dim>(FE_Q<dim>(i), 1,
-				FE_DGQ<dim>(i+1), 1));
-  
+                                FE_DGQ<dim>(i+1), 1));
+
   test_with_hanging_nodes_random_aniso (fe);
 }

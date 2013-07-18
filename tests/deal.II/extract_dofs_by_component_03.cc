@@ -51,23 +51,23 @@ check ()
   tr.refine_global (1);
 
   FESystem<dim> element (FE_Q<dim>(1), 1,
-			 FE_Q<dim>(2), 2);
+                         FE_Q<dim>(2), 2);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // try all possible components
+  // try all possible components
   for (unsigned int c=0; c<element.n_components(); ++c)
-  {
-    Vector<double> in(tr.n_active_cells());
-    for (unsigned int i=0; i<in.size(); ++i)
-      in[i] = i;
-    Vector<double> out(dof.n_dofs());
-    DoFTools::distribute_cell_to_dof_vector (dof, in, out, c);
+    {
+      Vector<double> in(tr.n_active_cells());
+      for (unsigned int i=0; i<in.size(); ++i)
+        in[i] = i;
+      Vector<double> out(dof.n_dofs());
+      DoFTools::distribute_cell_to_dof_vector (dof, in, out, c);
 
-    for (unsigned int d=0; d<dof.n_dofs(); ++d)
-      deallog << out[d] << std::endl;
-    deallog << std::endl;
-  }
+      for (unsigned int d=0; d<dof.n_dofs(); ++d)
+        deallog << out[d] << std::endl;
+      deallog << std::endl;
+    }
 }
 
 

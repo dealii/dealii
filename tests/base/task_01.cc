@@ -27,13 +27,13 @@
 #include <deal.II/base/thread_management.h>
 
 
-void test () 
+void test ()
 {
   sleep (3);
   deallog << "OK" << std::endl;
 }
 
-  
+
 int main()
 {
   std::ofstream logfile("task_01/output");

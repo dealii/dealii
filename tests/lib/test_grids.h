@@ -42,86 +42,86 @@
  */
 namespace TestGrids
 {
-				   /**
-				    * Generate grids based on
-				    * hypercube. These meshes have a
-				    * regular geometry and topology.
-				    *
-				    * @param <tt>refinement</tt>
-				    * denotes the number of refinement
-				    * steps of the root cell.
-				    *
-				    * @param if <tt>local</tt> is
-				    * <tt>true</tt>, refine only the
-				    * cell containing the corner with
-				    * only negative coordinates.
-				    */
+  /**
+   * Generate grids based on
+   * hypercube. These meshes have a
+   * regular geometry and topology.
+   *
+   * @param <tt>refinement</tt>
+   * denotes the number of refinement
+   * steps of the root cell.
+   *
+   * @param if <tt>local</tt> is
+   * <tt>true</tt>, refine only the
+   * cell containing the corner with
+   * only negative coordinates.
+   */
   template <int dim>
-  void hypercube(Triangulation<dim>& tr,
-		 unsigned int refinement = 0,
-		 bool local = false)
+  void hypercube(Triangulation<dim> &tr,
+                 unsigned int refinement = 0,
+                 bool local = false)
   {
     GridGenerator::hyper_cube(tr, -1., 1.);
     if (refinement && !local)
       tr.refine_global(refinement);
     if (refinement && local)
       {
-	tr.refine_global(1);
-	for (unsigned int i=1;i<refinement;++i)
-	  {
-	    for (typename Triangulation<dim>::active_cell_iterator
-		   cell = tr.begin_active(); cell != tr.end(); ++cell)
-	      {
-		const Point<dim>& p = cell->center();
-		bool negative = true;
-		for (unsigned int d=0;d<dim;++d)
-		  if (p(d) >= 0.)negative = false;
-		if (negative)
-		  cell->set_refine_flag();
-	      }
-	    tr.execute_coarsening_and_refinement();
-	  }
+        tr.refine_global(1);
+        for (unsigned int i=1; i<refinement; ++i)
+          {
+            for (typename Triangulation<dim>::active_cell_iterator
+                 cell = tr.begin_active(); cell != tr.end(); ++cell)
+              {
+                const Point<dim> &p = cell->center();
+                bool negative = true;
+                for (unsigned int d=0; d<dim; ++d)
+                  if (p(d) >= 0.)negative = false;
+                if (negative)
+                  cell->set_refine_flag();
+              }
+            tr.execute_coarsening_and_refinement();
+          }
       }
     deallog << "Triangulation hypercube " << dim << "D refinement " << refinement;
     if (local)
       deallog << " local ";
     deallog << " steps " << tr.n_active_cells() << " active cells "
-	    << tr.n_cells() << " total cells " << std::endl;
+            << tr.n_cells() << " total cells " << std::endl;
   }
 
-				   /**
-				    * Create a star-shaped mesh,
-				    * having more than the average
-				    * <tt>2<sup>dim</sup></tt> cells
-				    * in the central vertex.
-				    *
-				    * @param <tt>refinement</tt>
-				    * denotes the number of refinement
-				    * steps of the root mesh.
-				    *
-				    * @param if <tt>local</tt> is
-				    * <tt>true</tt>, refine only one
-				    * of the coarse cells.
-				    */
+  /**
+   * Create a star-shaped mesh,
+   * having more than the average
+   * <tt>2<sup>dim</sup></tt> cells
+   * in the central vertex.
+   *
+   * @param <tt>refinement</tt>
+   * denotes the number of refinement
+   * steps of the root mesh.
+   *
+   * @param if <tt>local</tt> is
+   * <tt>true</tt>, refine only one
+   * of the coarse cells.
+   */
   template <int dim>
-  void star_shaped(Triangulation<dim>& tr,
-		   unsigned int refinement = 0,
-		   bool local = false);
-				   /**
-				    * Local refinement of every other
-				    * cell in a checkerboard fashion.
-				    */
+  void star_shaped(Triangulation<dim> &tr,
+                   unsigned int refinement = 0,
+                   bool local = false);
+  /**
+   * Local refinement of every other
+   * cell in a checkerboard fashion.
+   */
   template <int dim>
-  void checkers(Triangulation<dim>& tr);
-				   /**
-				    * Islands of local refinement
-				    */
+  void checkers(Triangulation<dim> &tr);
+  /**
+   * Islands of local refinement
+   */
   template <int dim>
-  void islands(Triangulation<dim>& tr);
-				   /**
-				    * Local refinement with an
-				    * unrefined hole.
-				    */
+  void islands(Triangulation<dim> &tr);
+  /**
+   * Local refinement with an
+   * unrefined hole.
+   */
   template <int dim>
-  void laguna(Triangulation<dim>& tr);
+  void laguna(Triangulation<dim> &tr);
 }

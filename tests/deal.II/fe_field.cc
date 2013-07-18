@@ -41,41 +41,41 @@ void
 check ()
 {
   Triangulation<dim> triangulation;
-  
+
   GridGenerator::subdivided_hyper_cube (triangulation, 2);
   hp::FECollection<dim> fe_collection;
-  
+
   for (unsigned int i = 1; i <= triangulation.n_active_cells (); ++i)
     fe_collection.push_back (FE_Q<dim> (i));
-  
+
   hp::DoFHandler<dim> dof_handler (triangulation);
-  
+
   dof_handler.distribute_dofs (fe_collection);
-  
+
   Vector<double> vector (dof_handler.n_dofs ());
-  
+
   for (unsigned int i = 0; i < dof_handler.n_dofs (); ++i)
     vector (i) = i;
-  
+
   Functions::FEFieldFunction<dim, hp::DoFHandler<dim> >
-    fe_field (dof_handler, vector);
+  fe_field (dof_handler, vector);
   QGauss<dim> quadrature (5);
-  
+
   deallog << "values:" <<std::endl;
-  
+
   std::vector<double> values (quadrature.size ());
-  
+
   fe_field.value_list (quadrature.get_points (), values);
-  
+
   for (unsigned int q_point = 0; q_point < quadrature.size (); ++q_point)
     deallog << values[q_point] << std::endl;
-  
+
   deallog << "gradients:" <<std::endl;
-  
+
   std::vector<Tensor<1, dim> > gradients (quadrature.size ());
-  
+
   fe_field.gradient_list (quadrature.get_points (), gradients);
-  
+
   for (unsigned int q_point = 0; q_point < quadrature.size (); ++q_point)
     deallog << gradients[q_point] << std::endl;
 }
@@ -83,9 +83,9 @@ check ()
 
 int main ()
 {
-  initlog(__FILE__);  
+  initlog(__FILE__);
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
 
   deallog.push ("1d");
   check<1> ();

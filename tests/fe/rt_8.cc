@@ -62,7 +62,7 @@ test (const unsigned int degree)
 
   const unsigned int dofs_per_cell = fe_rt.dofs_per_cell;
   FullMatrix<double> mass_matrix (dofs_per_cell, dofs_per_cell);
-  
+
   Assert (fe.get_fe().n_components() == dim, ExcInternalError());
 
 
@@ -71,13 +71,13 @@ test (const unsigned int degree)
       for (unsigned int j=0; j<dofs_per_cell; ++j)
         for (unsigned int d=0; d<dim; ++d)
           mass_matrix(i,j)
-            += (fe.shape_value_component(i,q_point,d) *
-                fe.shape_value_component(j,q_point,d) *
-                fe.JxW(q_point));
+          += (fe.shape_value_component(i,q_point,d) *
+              fe.shape_value_component(j,q_point,d) *
+              fe.JxW(q_point));
   for (unsigned int i=0; i<dofs_per_cell; ++i)
     for (unsigned int j=0; j<dofs_per_cell; ++j)
       if (std::fabs(mass_matrix(i,j)) < 1e-14)
-	mass_matrix(i,j) = 0;
+        mass_matrix(i,j) = 0;
   mass_matrix.print_formatted (logfile, 3, false, 0, " ", 1);
 
   SolverControl           solver_control (dofs_per_cell,
@@ -101,14 +101,14 @@ int
 main()
 {
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   for (unsigned int i=0; i<4; ++i)
     test<2>(i);
-  
+
   return 0;
 }
 

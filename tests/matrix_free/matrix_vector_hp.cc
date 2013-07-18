@@ -35,7 +35,7 @@ std::ofstream logfile("matrix_vector_hp/output");
 template <int dim, typename Number>
 class MatrixFreeTestHP
 {
- public:
+public:
   MatrixFreeTestHP(const MatrixFree<dim,Number> &data_in):
     data (data_in)
   {};
@@ -103,12 +103,12 @@ void test ()
   tria.set_boundary (0, boundary);
   tria.refine_global(1);
 
-                                // refine a few cells
+  // refine a few cells
   for (unsigned int i=0; i<11-3*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
-        cell = tria.begin_active (),
-        endc = tria.end();
+      cell = tria.begin_active (),
+      endc = tria.end();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
         if (counter % (7-i) == 0)
@@ -130,11 +130,11 @@ void test ()
     }
 
   hp::DoFHandler<dim> dof(tria);
-                                // set the active FE index in a random order
+  // set the active FE index in a random order
   {
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof.begin_active(),
-      endc = dof.end();
+    cell = dof.begin_active(),
+    endc = dof.end();
     for (; cell!=endc; ++cell)
       {
         const unsigned int fe_index = rand() % max_degree;
@@ -142,7 +142,7 @@ void test ()
       }
   }
 
-                                // setup DoFs
+  // setup DoFs
   dof.distribute_dofs(fe_collection);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof,
@@ -163,7 +163,7 @@ void test ()
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
   //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-                                // set up MatrixFree
+  // set up MatrixFree
   MatrixFree<dim,number> mf_data;
   typename MatrixFree<dim,number>::AdditionalData data;
   data.tasks_parallel_scheme =
@@ -171,8 +171,8 @@ void test ()
   mf_data.reinit (dof, constraints, quadrature_collection_mf, data);
   MatrixFreeTestHP<dim,number> mf (mf_data);
 
-                                // assemble sparse matrix with (\nabla v,
-                                // \nabla u) + (v, 10 * u)
+  // assemble sparse matrix with (\nabla v,
+  // \nabla u) + (v, 10 * u)
   {
     hp::FEValues<dim> hp_fe_values (fe_collection,
                                     quadrature_collection,
@@ -182,8 +182,8 @@ void test ()
     std::vector<types::global_dof_index> local_dof_indices;
 
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof.begin_active(),
-      endc = dof.end();
+    cell = dof.begin_active(),
+    endc = dof.end();
     for (; cell!=endc; ++cell)
       {
         const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -214,8 +214,8 @@ void test ()
       }
   }
 
-                                // fill a right hand side vector with random
-                                // numbers in unconstrained degrees of freedom
+  // fill a right hand side vector with random
+  // numbers in unconstrained degrees of freedom
   Vector<double> src (dof.n_dofs());
   Vector<double> result_spmv(src), result_mf (src);
 
@@ -225,8 +225,8 @@ void test ()
         src(i) = (double)rand()/RAND_MAX;
     }
 
-                                // now perform matrix-vector product and check
-                                // its correctness
+  // now perform matrix-vector product and check
+  // its correctness
   system_matrix.vmult (result_spmv, src);
   mf.vmult (result_mf, src);
 

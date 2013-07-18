@@ -24,7 +24,7 @@
 namespace dealii
 {
   bool compare (const TableHandler &t1,
-		const TableHandler &t2)
+                const TableHandler &t2)
   {
     std::ostringstream o1, o2;
     t1.write_tex (o1);
@@ -44,12 +44,12 @@ void test ()
 
 
   for (unsigned int i=0; i<10; ++i)
-  {
-    t1.add_value(keys[(0+i)%4], i);
-    t1.add_value(keys[(1+i)%4], sqrt(i));
-    t1.add_value(keys[(2+i)%4], 'a'+i);
-    t1.add_value(keys[(3+i)%4], std::string("abc-")+"0123456789"[i]);
-  }
+    {
+      t1.add_value(keys[(0+i)%4], i);
+      t1.add_value(keys[(1+i)%4], sqrt(i));
+      t1.add_value(keys[(2+i)%4], 'a'+i);
+      t1.add_value(keys[(3+i)%4], std::string("abc-")+"0123456789"[i]);
+    }
   t1.set_tex_table_caption("This is a caption text with \\LaTeX{} symbols");
 
   verify (t1, t2);

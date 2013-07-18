@@ -26,14 +26,14 @@
 // pointed to
 template <typename T>
 bool compare (const T &t1,
-	      const T &t2)
+              const T &t2)
 {
   return t1 == t2;
 }
 
 template <typename T>
 bool compare (T *t1,
-	      T *t2)
+              T *t2)
 {
   return *t1 == *t2;
 }
@@ -41,20 +41,20 @@ bool compare (T *t1,
 
 template <typename T>
 void verify (const T &t1,
-	     T       &t2)
+             T       &t2)
 {
-				   // save data to archive
+  // save data to archive
   std::ostringstream oss;
   {
     boost::archive::text_oarchive oa(oss);
     oa << t1;
-				     // archive and stream closed when
-				     // destructors are called
+    // archive and stream closed when
+    // destructors are called
   }
   deallog << oss.str() << std::endl;
 
-				   // verify correctness of the
-				   // serialization
+  // verify correctness of the
+  // serialization
   {
     std::istringstream  iss(oss.str());
     boost::archive::text_iarchive ia(iss);

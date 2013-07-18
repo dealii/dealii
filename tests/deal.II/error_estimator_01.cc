@@ -44,14 +44,14 @@ check ()
 {
   Functions::CosineFunction<spacedim> function;
   Triangulation<dim,spacedim> tr;
-  
+
   GridGenerator::hyper_cube(tr, -1,1);
 
   tr.refine_global (1);
   tr.begin_active()->set_refine_flag ();
   tr.execute_coarsening_and_refinement ();
- 
-  
+
+
   FE_Q<dim,spacedim> element(3);
   DoFHandler<dim,spacedim> dof(tr);
   dof.distribute_dofs(element);
@@ -61,14 +61,14 @@ check ()
 
   std::map<types::boundary_id,const Function<spacedim>*> neumann_bc;
   neumann_bc[0] = &function;
-  
+
   Vector<double> v (dof.n_dofs());
   VectorTools::interpolate (mapping, dof, function, v);
 
   Vector<float> error (tr.n_active_cells());
 
   KellyErrorEstimator<dim,spacedim>::estimate (mapping, dof, q_face, neumann_bc,
-					       v, error);
+                                               v, error);
 
   deallog << "Estimated error:" << std::endl;
   for (unsigned int i=0; i<error.size(); ++i)
@@ -80,11 +80,11 @@ int main ()
 {
   std::ofstream logfile ("error_estimator_01/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 
- 
+
   deallog.push ("2d_2");
   check<2,2> ();
   deallog.pop ();

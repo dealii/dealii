@@ -59,14 +59,14 @@ check (const FE_Q<dim>   &fe,
 
 
 #define CHECK(EL,deg,dim)\
- { FE_ ## EL<dim> EL(deg);   \
-   check(EL, #EL #deg); }
+  { FE_ ## EL<dim> EL(deg);   \
+    check(EL, #EL #deg); }
 
 #define CHECK_ALL(EL,deg)\
- { CHECK(EL,deg,1); \
-   CHECK(EL,deg,2); \
-   CHECK(EL,deg,3); \
- }
+  { CHECK(EL,deg,1); \
+    CHECK(EL,deg,2); \
+    CHECK(EL,deg,3); \
+  }
 
 
 int
@@ -84,30 +84,30 @@ main()
       CHECK_ALL(Q,2);
       CHECK_ALL(Q,3);
       CHECK_ALL(Q,4);
-  
+
       return 0;
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

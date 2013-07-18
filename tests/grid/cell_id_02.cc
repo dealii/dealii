@@ -35,12 +35,12 @@
 #include <sstream>
 
 template <class TRIA>
-void check (TRIA & tr)
+void check (TRIA &tr)
 {
   typename TRIA::cell_iterator cell = tr.begin(),
-        endc = tr.end();
+                               endc = tr.end();
 
-  
+
   for (; cell!=endc; ++cell)
     {
       std::ostringstream outb;
@@ -53,19 +53,19 @@ void check (TRIA & tr)
 
 
   CellId empty;
-  
+
   Assert(tr.begin()->id() != tr.begin_active()->id(), ExcInternalError());
   Assert(tr.begin()->id() != empty, ExcInternalError());
   Assert(tr.begin()->id() == tr.begin()->id(), ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
 
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-  
+
   initlog(__FILE__);
   deal_II_exceptions::disable_abort_on_exception();
 
@@ -77,5 +77,5 @@ int main (int argc, char *argv[])
   check(tria);
 }
 
-  
-  
+
+

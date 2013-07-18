@@ -41,43 +41,43 @@
 char logname[] = "work_stream_03/output";
 
 template<int dim>
-  double
-  value(const Point<dim> &p)
-  {
-    double val = 0;
-    for (unsigned int d = 0; d < dim; ++d)
-      for (unsigned int i = 0; i <= 1; ++i)
-        val += std::pow(p[d], 1. * i);
-    return val;
-  }
+double
+value(const Point<dim> &p)
+{
+  double val = 0;
+  for (unsigned int d = 0; d < dim; ++d)
+    for (unsigned int i = 0; i <= 1; ++i)
+      val += std::pow(p[d], 1. * i);
+  return val;
+}
 
 namespace
 {
   template<int dim>
-    struct Scratch
+  struct Scratch
+  {
+    Scratch(const FiniteElement<dim> &fe, const Quadrature<dim> &quadrature) :
+      fe_collection(fe), quadrature_collection(quadrature), x_fe_values(
+        fe_collection, quadrature_collection, update_q_points), rhs_values(
+          quadrature_collection.size())
     {
-      Scratch(const FiniteElement<dim> &fe, const Quadrature<dim> &quadrature) :
-          fe_collection(fe), quadrature_collection(quadrature), x_fe_values(
-              fe_collection, quadrature_collection, update_q_points), rhs_values(
-              quadrature_collection.size())
-      {
-      }
+    }
 
-      Scratch(const Scratch &data) :
-          fe_collection(data.fe_collection), quadrature_collection(
-              data.quadrature_collection), x_fe_values(fe_collection,
-              quadrature_collection, update_q_points), rhs_values(
-              data.rhs_values)
-      {
-      }
+    Scratch(const Scratch &data) :
+      fe_collection(data.fe_collection), quadrature_collection(
+        data.quadrature_collection), x_fe_values(fe_collection,
+                                                 quadrature_collection, update_q_points), rhs_values(
+                                                   data.rhs_values)
+    {
+    }
 
-      const FiniteElement<dim> &fe_collection;
-      const Quadrature<dim> &quadrature_collection;
+    const FiniteElement<dim> &fe_collection;
+    const Quadrature<dim> &quadrature_collection;
 
-      FEValues<dim> x_fe_values;
+    FEValues<dim> x_fe_values;
 
-      std::vector<double> rhs_values;
-    };
+    std::vector<double> rhs_values;
+  };
 
   struct CopyData
   {
@@ -87,7 +87,7 @@ namespace
 
 void
 zero_subrange(const unsigned int begin, const unsigned int end,
-    std::vector<double> &dst)
+              std::vector<double> &dst)
 {
   for (unsigned int i = begin; i < end; ++i)
     dst[i] = 0;
@@ -96,7 +96,7 @@ zero_subrange(const unsigned int begin, const unsigned int end,
 
 void
 zero_element(std::vector<double> &dst,
-	     const unsigned int i)
+             const unsigned int i)
 {
   dst[i] = 0;
 }
@@ -104,24 +104,24 @@ zero_element(std::vector<double> &dst,
 
 template<int dim>
 void
-  mass_assembler(const typename Triangulation<dim>::active_cell_iterator &cell,
-      Scratch<dim> &data, CopyData &copy_data)
-  {
-    data.x_fe_values.reinit(cell);
+mass_assembler(const typename Triangulation<dim>::active_cell_iterator &cell,
+               Scratch<dim> &data, CopyData &copy_data)
+{
+  data.x_fe_values.reinit(cell);
 
-    const Point<dim> q = data.x_fe_values.quadrature_point(0);
+  const Point<dim> q = data.x_fe_values.quadrature_point(0);
 
-    // this appears to be the key: the following two ways both overwrite some
-    // of the memory in which we store the quadrature point location.
-    parallel::apply_to_subranges(0U, copy_data.cell_rhs.size(),
-        std_cxx1x::bind(&zero_subrange, std_cxx1x::_1, std_cxx1x::_2,
-            std_cxx1x::ref(copy_data.cell_rhs)), 1);
+  // this appears to be the key: the following two ways both overwrite some
+  // of the memory in which we store the quadrature point location.
+  parallel::apply_to_subranges(0U, copy_data.cell_rhs.size(),
+                               std_cxx1x::bind(&zero_subrange, std_cxx1x::_1, std_cxx1x::_2,
+                                               std_cxx1x::ref(copy_data.cell_rhs)), 1);
 
-    Assert(q == data.x_fe_values.quadrature_point(0),
-        ExcInternalError());
+  Assert(q == data.x_fe_values.quadrature_point(0),
+         ExcInternalError());
 
-    copy_data.cell_rhs[0] = value(data.x_fe_values.quadrature_point(0));
-  }
+  copy_data.cell_rhs[0] = value(data.x_fe_values.quadrature_point(0));
+}
 
 
 void
@@ -152,9 +152,9 @@ do_project()
       CopyData copy_data;
       copy_data.cell_rhs.resize(8);
       WorkStream::run(triangulation.begin_active(), triangulation.end(),
-          &mass_assembler<dim>,
-          std_cxx1x::bind(&copy_local_to_global, std_cxx1x::_1, &sum),
-          assembler_data, copy_data, 8, 1);
+                      &mass_assembler<dim>,
+                      std_cxx1x::bind(&copy_local_to_global, std_cxx1x::_1, &sum),
+                      assembler_data, copy_data, 8, 1);
 
       Assert (std::fabs(sum-288.) < 1e-12, ExcInternalError());
       deallog << sum << std::endl;

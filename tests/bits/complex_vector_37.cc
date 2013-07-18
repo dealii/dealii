@@ -19,7 +19,7 @@
 // check Vector<std::complex<double> >::add (scalar)
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -29,22 +29,22 @@ void test (Vector<std::complex<double> > &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = std::complex<double> (i+1., i+2.);
-  
+
   v.compress ();
 
   v.add (1.);
 
-                                   // make sure we get the expected result
+  // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     Assert (v(i) == std::complex<double> (i+2., i+2.),
-	    ExcInternalError());
+            ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("complex_vector_37/output");
   deallog.attach(logfile);
@@ -59,25 +59,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

@@ -40,7 +40,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-3);
   SolverBicgstab<> bicgstab(control, mem);
@@ -50,7 +50,7 @@ int main()
     for (unsigned int j=0; j<4; ++j)
       sparsity_pattern.add(i,j);
   sparsity_pattern.compress();
-  
+
   SparseMatrix<double> M(sparsity_pattern);
   M.set(0,0,21.1);
   M.set(0,1,0);
@@ -78,10 +78,10 @@ int main()
   ilu.decompose (M);
 
   Vector<double> solution (4);
-				   // this would fail with elements of
-				   // the solution vector being set to
-				   // NaN before Roger's suggested
-				   // change
+  // this would fail with elements of
+  // the solution vector being set to
+  // NaN before Roger's suggested
+  // change
   bicgstab.solve (M, solution, rhs, ilu);
 
   for (unsigned int i=0; i<4; ++i)
@@ -90,6 +90,6 @@ int main()
   Vector<double> res (4);
   M.residual (res, solution, rhs);
   deallog << "residual=" << res.l2_norm()
-	  << std::endl;
+          << std::endl;
 }
 

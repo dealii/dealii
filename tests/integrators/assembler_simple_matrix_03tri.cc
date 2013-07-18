@@ -41,49 +41,49 @@
 using namespace dealii;
 
 template <typename number>
-void fill_matrices(MeshWorker::LocalResults<number>& results, bool face)
+void fill_matrices(MeshWorker::LocalResults<number> &results, bool face)
 {
-  for (unsigned int k=0;k<results.n_matrices();++k)
+  for (unsigned int k=0; k<results.n_matrices(); ++k)
     {
-      FullMatrix<number>& M = results.matrix(k, false).matrix;
+      FullMatrix<number> &M = results.matrix(k, false).matrix;
       double base = 1000*(results.matrix(k).row+1) + 100*(results.matrix(k).column+1);
-      for (unsigned int i=0;i<M.m();++i)
-	for (unsigned int j=0;j<M.n();++j)
-	  {
-	    M(i,j) = base + 10*i+j;
-	    if (face)
-	      results.matrix(k, true).matrix(i,j) = base + 10*i+j;
-	  }
+      for (unsigned int i=0; i<M.m(); ++i)
+        for (unsigned int j=0; j<M.n(); ++j)
+          {
+            M(i,j) = base + 10*i+j;
+            if (face)
+              results.matrix(k, true).matrix(i,j) = base + 10*i+j;
+          }
     }
 }
 
 
 template <int dim>
-void test(FiniteElement<dim>& fe)
+void test(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
-  
+
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
-  
+
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
   dof.initialize_local_block_info();
   DoFRenumbering::component_wise(dof);
-  
+
   deallog << "DoFs " << dof.n_dofs() << std::endl;
-  
+
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   typename DoFHandler<dim>::face_iterator face = cell->face(1);
   typename DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(1);
-  
+
   CompressedSparsityPattern csp(dof.n_dofs(),dof.n_dofs());
   DoFTools::make_flux_sparsity_pattern(dof, csp);
   TrilinosWrappers::SparsityPattern sparsity;
   sparsity.copy_from(csp);
   TrilinosWrappers::SparseMatrix M(sparsity);
-  
+
   MeshWorker::Assembler::MatrixSimple<TrilinosWrappers::SparseMatrix> ass;
   ass.initialize(M);
   ass.initialize_local_blocks(dof.block_info().local());
@@ -98,7 +98,7 @@ void test(FiniteElement<dim>& fe)
   ass.assemble(info);
   M.print(deallog.get_file_stream());
   M = 0.;
-  
+
   deallog << "face" << std::endl;
   ass.initialize_info(info, true);
   info.reinit(cell, face, 1);
@@ -109,22 +109,22 @@ void test(FiniteElement<dim>& fe)
   M.print(deallog.get_file_stream());
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   initlog(__FILE__);
-  
+
   FE_DGP<2> p0(0);
   FE_DGP<2> p1(1);
   FE_RaviartThomas<2> rt0(0);
   FE_Q<2> q2(2);
-  
+
   FESystem<2> sys1(p0, 2, p1, 1);
   FESystem<2> sys2(p0, 2, rt0, 1);
   FESystem<2> sys3(rt0, 1, p0, 2);
   FESystem<2> sys4(p1, 2, q2, 2);
   FESystem<2> sys5(q2, 2, p1, 2);
-  
+
   test(sys1);
   test(sys2);
   test(sys3);

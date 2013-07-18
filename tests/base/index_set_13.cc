@@ -44,15 +44,15 @@ void test ()
   for (unsigned int i=0; i<is3.size(); ++i)
     {
       deallog << i << ' ' << (is3.is_element(i) ? "true" : "false")
-	      << std::endl;
+              << std::endl;
 
       Assert ((is1.is_element(i) && is2.is_element(i))
-	      ==
-	      is3.is_element(i),
-	      ExcInternalError());
+              ==
+              is3.is_element(i),
+              ExcInternalError());
     }
 
-				   // some sanity tests
+  // some sanity tests
   Assert ((is1 & is2) == (is2 & is1), ExcInternalError());
   Assert ((is1 & is3) == (is2 & is3), ExcInternalError());
   Assert ((is1 & is3) == is3, ExcInternalError());

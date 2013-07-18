@@ -42,14 +42,14 @@ void test()
   SparseMatrix<double> mat;
   mat.reinit(sparsity);
   mat = IdentityMatrix(size);
-  
+
   Vector<double> rhs;
   Vector<double> solvec;
   solvec.reinit(size);
-    
+
   rhs.reinit(size);
   rhs(size-1)=1.0;
-  
+
   SolverControl solvctrl(1000, 1e-12, true);
   SOLVER solver(solvctrl);
 
@@ -68,6 +68,6 @@ int main()
 
   test<SolverGMRES<Vector<double> > >();
   test<SolverCG<Vector<double> > >();
-  test<SolverFGMRES<Vector<double> > >();    
+  test<SolverFGMRES<Vector<double> > >();
 }
 

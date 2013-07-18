@@ -46,19 +46,19 @@
 template<int dim>
 class MyFunction : public Function<dim>
 {
-  public:
-    MyFunction () : Function<dim>() {};
+public:
+  MyFunction () : Function<dim>() {};
 
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int) const
-      {
-	double f=0.25 + 2 * p[0];
-	if (dim>1)
-	  f+=0.772 * p[1];
-	if (dim>2)
-	  f-=3.112 * p[2];
-	return f;
-      };
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int) const
+  {
+    double f=0.25 + 2 * p[0];
+    if (dim>1)
+      f+=0.772 * p[1];
+    if (dim>2)
+      f-=3.112 * p[2];
+    return f;
+  };
 };
 
 
@@ -83,9 +83,9 @@ void transfer(std::ostream &out)
   Vector<double> dgq_solution;
   MappingQ1<dim> mapping;
 
-				// refine a few cells
+  // refine a few cells
   typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),
-						    endc=tria.end();
+                                                    endc=tria.end();
   ++cell;
   ++cell;
   for (; cell!=endc; ++cell)
@@ -93,23 +93,23 @@ void transfer(std::ostream &out)
   tria.prepare_coarsening_and_refinement();
   tria.execute_coarsening_and_refinement();
 
-				// randomly assign FE orders
+  // randomly assign FE orders
   unsigned int counter = 0;
   {
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell=q_dof_handler.begin_active(),
-      celldg=dgq_dof_handler.begin_active(),
-      endc=q_dof_handler.end();
+    cell=q_dof_handler.begin_active(),
+    celldg=dgq_dof_handler.begin_active(),
+    endc=q_dof_handler.end();
     for (; cell!=endc; ++cell, ++celldg, ++counter)
       {
-	if (counter < 15)
-	  cell->set_active_fe_index(1);
-	else
-	  cell->set_active_fe_index(rand()%max_degree);
-	if (counter < 15)
-	  celldg->set_active_fe_index(1);
-	else
-	  celldg->set_active_fe_index(rand()%max_degree);
+        if (counter < 15)
+          cell->set_active_fe_index(1);
+        else
+          cell->set_active_fe_index(rand()%max_degree);
+        if (counter < 15)
+          celldg->set_active_fe_index(1);
+        else
+          celldg->set_active_fe_index(rand()%max_degree);
       }
   }
 
@@ -128,8 +128,8 @@ void transfer(std::ostream &out)
   SolutionTransfer<dim,Vector<double>,hp::DoFHandler<dim> > dgq_soltrans(dgq_dof_handler);
 
 
-				// test b): do some coarsening and
-				// refinement
+  // test b): do some coarsening and
+  // refinement
   q_soltrans.clear();
   dgq_soltrans.clear();
 
@@ -139,15 +139,15 @@ void transfer(std::ostream &out)
   for (; cell!=endc; ++cell, ++counter)
     {
       if (counter > 120)
-	cell->set_coarsen_flag();
+        cell->set_coarsen_flag();
       else if (rand() % 3 == 0)
-	cell->set_refine_flag();
+        cell->set_refine_flag();
       else if (rand() % 3 == 3)
-	cell->set_coarsen_flag();
+        cell->set_coarsen_flag();
     }
 
   Vector<double> q_old_solution=q_solution,
-    dgq_old_solution=dgq_solution;
+                 dgq_old_solution=dgq_solution;
   tria.prepare_coarsening_and_refinement();
   q_soltrans.prepare_for_coarsening_and_refinement(q_old_solution);
   dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_old_solution);
@@ -156,19 +156,19 @@ void transfer(std::ostream &out)
   counter = 0;
   {
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = q_dof_handler.begin_active(),
-      celldg = dgq_dof_handler.begin_active(),
-      endc = q_dof_handler.end();
+    cell = q_dof_handler.begin_active(),
+    celldg = dgq_dof_handler.begin_active(),
+    endc = q_dof_handler.end();
     for (; cell!=endc; ++cell, ++celldg, ++counter)
       {
-	if (counter > 20 && counter < 90)
-	  cell->set_active_fe_index(0);
-	else
-	  cell->set_active_fe_index(rand()%max_degree);
-	if (counter > 20 && counter < 90)
-	  celldg->set_active_fe_index(0);
-	else
-	  celldg->set_active_fe_index(rand()%max_degree);
+        if (counter > 20 && counter < 90)
+          cell->set_active_fe_index(0);
+        else
+          cell->set_active_fe_index(rand()%max_degree);
+        if (counter > 20 && counter < 90)
+          celldg->set_active_fe_index(0);
+        else
+          celldg->set_active_fe_index(rand()%max_degree);
       }
   }
 
@@ -179,28 +179,28 @@ void transfer(std::ostream &out)
   q_soltrans.interpolate(q_old_solution, q_solution);
   dgq_soltrans.interpolate(dgq_old_solution, dgq_solution);
 
-				// check correctness by comparing the values
-				// on points of QGauss of order 2.
+  // check correctness by comparing the values
+  // on points of QGauss of order 2.
   MyFunction<dim> func;
   {
     double error = 0;
     const hp::QCollection<dim> quad (QGauss<dim> (2));
     hp::FEValues<dim> hp_fe_val (fe_q, quad, update_values |
-				 update_quadrature_points);
+                                 update_quadrature_points);
     std::vector<double> vals (quad[0].size());
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = q_dof_handler.begin_active(),
-      endc = q_dof_handler.end();
+    cell = q_dof_handler.begin_active(),
+    endc = q_dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-	hp_fe_val.reinit (cell, 0);
-	const FEValues<dim> &fe_val = hp_fe_val.get_present_fe_values();
-	fe_val.get_function_values (q_solution, vals);
-	for (unsigned int q=0; q<fe_val.n_quadrature_points; ++q)
-	  {
-	    error += std::fabs(func.value(fe_val.quadrature_point(q),0)-
-			       vals[q]);
-	  }
+        hp_fe_val.reinit (cell, 0);
+        const FEValues<dim> &fe_val = hp_fe_val.get_present_fe_values();
+        fe_val.get_function_values (q_solution, vals);
+        for (unsigned int q=0; q<fe_val.n_quadrature_points; ++q)
+          {
+            error += std::fabs(func.value(fe_val.quadrature_point(q),0)-
+                               vals[q]);
+          }
       }
     deallog << "Error in interpolating hp FE_Q: " << error << std::endl;
   }
@@ -208,21 +208,21 @@ void transfer(std::ostream &out)
     double error = 0;
     const hp::QCollection<dim> quad (QGauss<dim> (2));
     hp::FEValues<dim> hp_fe_val (fe_dgq, quad, update_values |
-				 update_quadrature_points);
+                                 update_quadrature_points);
     std::vector<double> vals (quad[0].size());
     typename hp::DoFHandler<dim>::active_cell_iterator
-      celldg = dgq_dof_handler.begin_active(),
-      endc =  dgq_dof_handler.end();
+    celldg = dgq_dof_handler.begin_active(),
+    endc =  dgq_dof_handler.end();
     for (; celldg!=endc; ++celldg)
       {
-	hp_fe_val.reinit (celldg, 0);
-	const FEValues<dim> &fe_val = hp_fe_val.get_present_fe_values();
-	fe_val.get_function_values (dgq_solution, vals);
-	for (unsigned int q=0; q<fe_val.n_quadrature_points; ++q)
-	  {
-	    error += std::fabs(func.value(fe_val.quadrature_point(q),0)-
-			       vals[q]);
-	  }
+        hp_fe_val.reinit (celldg, 0);
+        const FEValues<dim> &fe_val = hp_fe_val.get_present_fe_values();
+        fe_val.get_function_values (dgq_solution, vals);
+        for (unsigned int q=0; q<fe_val.n_quadrature_points; ++q)
+          {
+            error += std::fabs(func.value(fe_val.quadrature_point(q),0)-
+                               vals[q]);
+          }
       }
     deallog << "Error in interpolating hp FE_DGQ: " << error << std::endl;
   }

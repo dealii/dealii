@@ -28,7 +28,7 @@ template <int dim>
 void test ()
 {
   deallog << "dim=" << dim << std::endl;
-  
+
   SymmetricTensor<2,dim> t;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=i; j<dim; ++j)
@@ -43,7 +43,7 @@ void test ()
       deallog << i << ' ' << j << ' ' << x[i][j] << std::endl;
 }
 
-  
+
 
 
 int main ()
@@ -57,6 +57,6 @@ int main ()
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

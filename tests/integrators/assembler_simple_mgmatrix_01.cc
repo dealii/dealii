@@ -37,12 +37,12 @@
 using namespace dealii;
 
 template <class DOFINFO, class MATRIX>
-void test(DOFINFO& info, MeshWorker::Assembler::MGMatrixSimple<MATRIX>& ass)
-{  
+void test(DOFINFO &info, MeshWorker::Assembler::MGMatrixSimple<MATRIX> &ass)
+{
   ass.initialize_info(info, false);
   deallog << "No faces" << std::endl;
   info.print_debug(deallog);
-  
+
   ass.initialize_info(info, true);
   deallog << "With faces" << std::endl;
   info.print_debug(deallog);
@@ -54,7 +54,7 @@ int main()
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console (0);
-  
+
   Triangulation<2,2> tr;
   GridGenerator::hyper_cube(tr);
   FE_DGP<2,2> fe1(1);
@@ -67,7 +67,7 @@ int main()
   DoFHandler<2,2> dof1(tr);
   dof1.distribute_dofs(fes1);
   DoFHandler<2,2> dof2(tr);
-  dof2.distribute_dofs(fes2);    
+  dof2.distribute_dofs(fes2);
   dof1.initialize_local_block_info();
   dof2.initialize_local_block_info();
   MeshWorker::DoFInfo<2,2,double> info1(dof1);
@@ -82,5 +82,5 @@ int main()
   test(info1b, ass1);
   deallog.pop();
   deallog.push("More blocks");
-  test(info2b, ass1);  
+  test(info2b, ass1);
 }

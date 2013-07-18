@@ -45,7 +45,7 @@
 using namespace std;
 
 template <int dim>
-void check_simple(const FiniteElement<dim>& fe)
+void check_simple(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -67,13 +67,13 @@ void check_simple(const FiniteElement<dim>& fe)
   typename FunctionMap<dim>::type dirichlet_boundary;
   ZeroFunction<dim> homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  
+
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(mgdof, dirichlet_boundary);
 
   MGTransferPrebuilt<Vector<double> > transfer(hanging_node_constraints, mg_constrained_dofs);
   transfer.build_matrices(mgdof);
-  
+
   transfer.print_matrices(deallog.get_file_stream());
   transfer.print_indices(deallog.get_file_stream());
 }
@@ -82,7 +82,7 @@ void check_simple(const FiniteElement<dim>& fe)
 int main()
 {
   initlog(__FILE__);
-  
+
   check_simple (FE_DGP<2>(0));
   check_simple (FE_DGP<2>(1));
   check_simple (FE_DGQ<2>(1));

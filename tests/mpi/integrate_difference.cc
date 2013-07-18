@@ -43,14 +43,14 @@
 
 
 template <int dim>
-class LinearFunction : public Function<dim> 
+class LinearFunction : public Function<dim>
 {
-  public:
-    double value (const Point<dim> &p,
-		  const unsigned int) const
-      {
-	return p[0];
-      }
+public:
+  double value (const Point<dim> &p,
+                const unsigned int) const
+  {
+    return p[0];
+  }
 };
 
 
@@ -67,47 +67,47 @@ void test()
   dofh.distribute_dofs (fe);
 
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-					     MPI_COMM_WORLD);
+                                             MPI_COMM_WORLD);
   VectorTools::interpolate (dofh,
-			    LinearFunction<dim>(),
-			    interpolated);
-  
+                            LinearFunction<dim>(),
+                            interpolated);
+
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
   x_rel = interpolated;
 
-				   // integrate the difference between the
-				   // linear function above and the zero
-				   // function. for this case, we can
-				   // compute the exact values by hand. the
-				   // ones printed in the output are correct
+  // integrate the difference between the
+  // linear function above and the zero
+  // function. for this case, we can
+  // compute the exact values by hand. the
+  // ones printed in the output are correct
   Vector<float> results (tr.n_active_cells());
   VectorTools::integrate_difference (dofh, x_rel,
-				     ZeroFunction<dim>(),
-				     results,
-				     QGauss<dim>(3),
-				     VectorTools::L2_norm);
+                                     ZeroFunction<dim>(),
+                                     results,
+                                     QGauss<dim>(3),
+                                     VectorTools::L2_norm);
   double local = results.l2_norm() * results.l2_norm();
   double global;
 
   MPI_Allreduce (&local, &global, 1, MPI_DOUBLE,
-		 MPI_SUM, 
-		 tr.get_communicator());
+                 MPI_SUM,
+                 tr.get_communicator());
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "difference = " << std::sqrt(global)
-	    << std::endl;
+            << std::endl;
 
-				   // we have f(\vec x)=x, so the difference
-				   // squared is \int f(x)^2 = 1/3 and the
-				   // norm is 1/sqrt(3)
-				   //
-				   // note that we have used a quadrature
-				   // formula of sufficient order to get exact
-				   // results
+  // we have f(\vec x)=x, so the difference
+  // squared is \int f(x)^2 = 1/3 and the
+  // norm is 1/sqrt(3)
+  //
+  // note that we have used a quadrature
+  // formula of sufficient order to get exact
+  // results
   Assert (std::fabs(std::sqrt(global) - 1./std::sqrt(3.)) < 1e-6,
-  	  ExcInternalError());
+          ExcInternalError());
 }
 
 

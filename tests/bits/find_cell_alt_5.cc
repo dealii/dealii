@@ -35,9 +35,9 @@
 
 void check (Triangulation<3> &tria)
 {
-   MappingQ1<3> map;
+  MappingQ1<3> map;
   Point<3> p (0.75,0.75,0.75);
-  
+
   std::pair<Triangulation<3>::active_cell_iterator, Point<3> > cell
     = GridTools::find_active_cell_around_point (map, tria, p);
 
@@ -48,11 +48,11 @@ void check (Triangulation<3> &tria)
   deallog << std::endl;
 
   Assert (GeometryInfo<3>::distance_to_unit_cell(cell.second) < 1e-10,
-	  ExcInternalError());
+          ExcInternalError());
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("find_cell_alt_5/output");
   deallog.attach(logfile);
@@ -68,11 +68,11 @@ int main ()
     }
   catch (const std::exception &exc)
     {
-				       // we shouldn't get here...
+      // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
       deallog << exc.what() << std::endl;
     }
 }
 
-  
-  
+
+

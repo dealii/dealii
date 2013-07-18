@@ -31,17 +31,17 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // no other args
+  // no other args
   deallog << dof_handler.n_boundary_dofs() << std::endl;
 
-                                   // with FunctionMap
+  // with FunctionMap
   typename FunctionMap<dim>::type fm;
   fm[0] = 0;
   deallog << dof_handler.n_boundary_dofs(fm) << std::endl;
-  
-                                   // with std::set
+
+  // with std::set
   std::set<types::boundary_id> s;
   s.insert (0);
   deallog << dof_handler.n_boundary_dofs(s) << std::endl;
-  
+
 }

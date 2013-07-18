@@ -45,22 +45,23 @@
 template<int dim>
 class MyFunction : public Function<dim>
 {
-  public:
-    MyFunction () : Function<dim>() {};
+public:
+  MyFunction () : Function<dim>() {};
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int) const
-      { double f=p[0]*2.0+1.0;
-        if (dim>1)
-          f*=p[1]*3.3-1.0;
-        if (dim>2)
-          f*=p[2]*5.0;
-        return f;
-      };
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int) const
+  {
+    double f=p[0]*2.0+1.0;
+    if (dim>1)
+      f*=p[1]*3.3-1.0;
+    if (dim>2)
+      f*=p[2]*5.0;
+    return f;
+  };
 };
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   MyFunction<dim> func;
   MappingQ1<dim> mapping;
@@ -75,8 +76,8 @@ void test(std::ostream& /*out*/)
   parallel::distributed::SolutionTransfer<dim, Vector<double> > soltrans(dofh);
 
   for (typename Triangulation<dim>::active_cell_iterator
-	     cell = tr.begin_active();
-	   cell != tr.end(); ++cell)
+       cell = tr.begin_active();
+       cell != tr.end(); ++cell)
     {
       cell->set_refine_flag();
     }
@@ -85,9 +86,9 @@ void test(std::ostream& /*out*/)
 
   Vector<double> solution(dofh.n_dofs());
   VectorTools::interpolate (mapping,
-			    * static_cast<dealii::DoFHandler<dim>* >(&dofh),
-			    func,
-			    solution);
+                            * static_cast<dealii::DoFHandler<dim>* >(&dofh),
+                            func,
+                            solution);
 
   soltrans.prepare_for_coarsening_and_refinement(solution);
 
@@ -102,13 +103,13 @@ void test(std::ostream& /*out*/)
   Vector<double> difference(tr.n_global_active_cells());
 
   VectorTools::integrate_difference(mapping,
-				    dofh,
-				    interpolated_solution,
-				    func,
-				    difference,
-				    QGauss<dim>(2),
-				    VectorTools::L2_norm);
-   deallog << "error: " << difference.l2_norm() << std::endl;
+                                    dofh,
+                                    interpolated_solution,
+                                    func,
+                                    difference,
+                                    QGauss<dim>(2),
+                                    VectorTools::L2_norm);
+  deallog << "error: " << difference.l2_norm() << std::endl;
 
 }
 

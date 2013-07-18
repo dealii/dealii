@@ -32,5 +32,5 @@ int main ()
   copy_from_2<SparsityPattern, CompressedSetSparsityPattern> ();
 }
 
-  
-  
+
+

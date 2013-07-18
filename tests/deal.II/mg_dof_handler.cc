@@ -36,7 +36,7 @@ int main ()
 {
   std::ofstream logfile("mg_dof_handler/output");
   deallog << std::setprecision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -47,13 +47,13 @@ int main ()
 
   FE_DGQ<dim> fe(1);
   MGDoFHandler<dim> dof_handler(tria);
-  
+
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
   Triangulation<dim>::active_cell_iterator
-    cell=tria.begin_active(),
-    endc=tria.end();
+  cell=tria.begin_active(),
+  endc=tria.end();
   for (; cell!=endc; ++cell)
     cell->set_coarsen_flag();
   tria.execute_coarsening_and_refinement();

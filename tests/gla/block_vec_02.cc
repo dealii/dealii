@@ -29,12 +29,12 @@
 
 #include "gla.h"
 
-template <class LA> 
+template <class LA>
 void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-  
+
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
 
@@ -77,14 +77,14 @@ void test ()
   cm.add_line(0);
   cm.add_entry(0, 1, 3.0);
   cm.close();
-  
+
   if (myid==0)
     deallog << "before: " << v(0) << std::endl;
   cm.distribute(v); // this should set x(0)= 3.0 * x(1) = 3.0
   if (myid==0)
     deallog << "after: " << v(0) << std::endl;
-  
-				   // done
+
+  // done
   if (myid==0)
     deallog << "OK" << std::endl;
 }

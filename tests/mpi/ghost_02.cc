@@ -31,12 +31,12 @@ void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-  
+
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
 
-				   // each processor owns 2 indices and all
-				   // are ghosting Element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting Element 1 (the second)
 
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
@@ -54,41 +54,41 @@ void test ()
   Assert(v2(1) == 1.5, ExcInternalError());
   Assert(v2(myid*2) == 1.5, ExcInternalError());
   Assert(v2(myid*2+1) == 1.5, ExcInternalError());
-  
-				   // set local values
+
+  // set local values
   vb(myid*2)=myid*2.0;
   vb(myid*2+1)=myid*2.0+1.0;
 
   vb.compress(VectorOperation::insert);
   vb*=2.0;
   v=vb;
-  
-  
-				   // check local values
+
+
+  // check local values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       deallog << myid*2 << ":" << v(myid*2) << std::endl;
       deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
     }
-  
+
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
-  
 
-				   // check ghost values
+
+  // check ghost values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << v(1) << std::endl;
   Assert(v(1) == 2.0, ExcInternalError());
 
-				   //assignment from ghosted to ghosted
+  //assignment from ghosted to ghosted
   v2 = v;
   Assert(v2(1) == 2.0, ExcInternalError());
   Assert(v2(myid*2) == myid*4.0, ExcInternalError());
   Assert(v2(myid*2+1) == myid*4.0+2.0, ExcInternalError());
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << v2(1) << std::endl;
-  
-				   // done
+
+  // done
   if (myid==0)
     deallog << "OK" << std::endl;
 }
@@ -114,6 +114,6 @@ int main (int argc, char **argv)
     }
   else
     test();
-  
-  
+
+
 }

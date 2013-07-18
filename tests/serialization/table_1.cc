@@ -22,22 +22,22 @@
 #include <boost/serialization/vector.hpp>
 
 void test ()
-{ 
+{
   unsigned int index1 = 3;
   Table<1, int> t1(index1);
-  
+
   Table<1, int> t2(index1);
 
   unsigned int index3 = 2;
   Table<1, int> t3(index3);
 
   for (unsigned int i = 0; i< index1; i++)
-  {
-    t1[i] = i + 1;
-    t2[i] = i + 1 + index1;
-  }
+    {
+      t1[i] = i + 1;
+      t2[i] = i + 1 + index1;
+    }
   verify (t1, t2);
-  
+
   verify (t1, t3);
 }
 

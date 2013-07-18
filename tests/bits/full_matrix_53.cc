@@ -28,11 +28,11 @@ std::string output_file_name = "full_matrix_53/output";
 template <typename number>
 void
 calculate(const FullMatrix<number> A,
-	  const FullMatrix<number> B)
+          const FullMatrix<number> B)
 {
 
   FullMatrix<number> A_r_inv(A.n(),A.m());
-  FullMatrix<number> identity(A.m(),A.m()); 
+  FullMatrix<number> identity(A.m(),A.m());
   A_r_inv.right_invert(A);
   deallog<<"A matrix"<<std::endl;
   display_matrix(A);
@@ -62,22 +62,22 @@ template <typename number>
 void
 check ()
 {
-  
+
   FullMatrix<number> A(1,2);
-  fill_matrix(A);  
+  fill_matrix(A);
 
   FullMatrix<number> B(2,1);
   fill_matrix(B);
 
-  calculate(A,B); 
+  calculate(A,B);
 
   FullMatrix<number> A1(2,3);
-  fill_matrix(A1);  
+  fill_matrix(A1);
 
   FullMatrix<number> B1(3,2);
   fill_matrix(B1);
 
-  calculate(A1,B1); 
+  calculate(A1,B1);
 
 }
 

@@ -63,8 +63,8 @@ void test(std::string filename, unsigned int degree = 1)
   std::ifstream in (filename.c_str());
   gi.read_ucd (in);
 
-				// finite elements used for the
-				// projection
+  // finite elements used for the
+  // projection
   const FE_Q<dim,spacedim> fe (degree);
   const MappingQ<dim, spacedim> mapping(degree);
 
@@ -79,9 +79,9 @@ void test(std::string filename, unsigned int degree = 1)
       << "no. of dofs per cell "<< fe.dofs_per_cell<< std::endl;
 
 
-				//  definition of the exact function
-				//  and calculation of the projected
-				//  one
+  //  definition of the exact function
+  //  and calculation of the projected
+  //  one
   Vector<double> projected_one(dof_handler.n_dofs());
 
   Functions::CosineFunction<spacedim> the_function;
@@ -97,17 +97,17 @@ void test(std::string filename, unsigned int degree = 1)
   ConstraintMatrix constraints;
   constraints.close();
   VectorTools::project(mapping, dof_handler, constraints,
-		       quad, the_function, projected_one);
+                       quad, the_function, projected_one);
 
   deallog << "L2 norm of projected vector: "
-	  << projected_one.l2_norm() << std::endl;
+          << projected_one.l2_norm() << std::endl;
 
 
-				// compute the H1 difference
+  // compute the H1 difference
   Vector<float> difference_per_cell (triangulation.n_active_cells());
   VectorTools::integrate_difference (dof_handler, projected_one,
-				     the_function, difference_per_cell,
-				     quad, VectorTools::H1_norm);
+                                     the_function, difference_per_cell,
+                                     quad, VectorTools::H1_norm);
 
   deallog << "H1 error: " << difference_per_cell.l2_norm() << std::endl;
 }
@@ -121,19 +121,19 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-12);
 
-    deallog<<"Test <1,2>, Q1, Q2, Q3"<<std::endl;
-    test<1,2>("grids/circle_4.inp",1);
-    test<1,2>("grids/circle_4.inp",2);
-    test<1,2>("grids/circle_4.inp",3);
+  deallog<<"Test <1,2>, Q1, Q2, Q3"<<std::endl;
+  test<1,2>("grids/circle_4.inp",1);
+  test<1,2>("grids/circle_4.inp",2);
+  test<1,2>("grids/circle_4.inp",3);
 
-    deallog<<std::endl;
+  deallog<<std::endl;
 
-    deallog<<"Test <2,3>, Q1, Q2, Q3"<<std::endl;
-    test<2,3>("grids/sphere_1.inp",1);
-    test<2,3>("grids/sphere_1.inp",2);
-    test<2,3>("grids/sphere_1.inp",3);
+  deallog<<"Test <2,3>, Q1, Q2, Q3"<<std::endl;
+  test<2,3>("grids/sphere_1.inp",1);
+  test<2,3>("grids/sphere_1.inp",2);
+  test<2,3>("grids/sphere_1.inp",3);
 
 
-    return 0;
+  return 0;
 }
 

@@ -26,15 +26,15 @@
 #include <deal.II/base/thread_management.h>
 
 
-void test (int i) 
+void test (int i)
 {
   deallog << "Task " << i << " starting..." << std::endl;
   sleep (1);
   deallog << "Task " << i << " finished!" << std::endl;
 }
 
-  
-  
+
+
 
 int main()
 {
@@ -42,7 +42,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   Threads::Task<> t1 = Threads::new_task (test, 1);
   {
     Threads::Task<> t2 = Threads::new_task (test, 2);
@@ -50,6 +50,6 @@ int main()
     t1.join ();
     t2.join ();
   }
-  
+
   deallog << "OK" << std::endl;
 }

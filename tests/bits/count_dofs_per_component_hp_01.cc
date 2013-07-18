@@ -68,7 +68,7 @@ void test ()
       deallog <<"DoFs in the " <<i<<". component for hp FE: "<< dofs_per_component_hp.at(i)<< std::endl;
 
       Assert (dofs_per_component.at(i) == dofs_per_component_hp.at(i),
-	      ExcInternalError());
+              ExcInternalError());
     }
 
 }

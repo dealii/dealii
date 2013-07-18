@@ -47,15 +47,15 @@ void test ()
   ComponentMask m2(v2);
   ComponentMask m = m1 | m2;
 
-				   // verify equality
+  // verify equality
   Assert (m == ComponentMask(v),
-	  ExcInternalError());
+          ExcInternalError());
   Assert (!(m == m1),
-	  ExcInternalError());
+          ExcInternalError());
   Assert (!(m == ComponentMask(v1)),
-	  ExcInternalError());
+          ExcInternalError());
   Assert (!(m == ComponentMask(v2)),
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

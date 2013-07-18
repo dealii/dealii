@@ -44,7 +44,7 @@ void do_refine (Triangulation<1> &tria)
 void do_refine (Triangulation<2> &tria)
 {
   const int dim = 2;
-  
+
   tria.refine_global (2);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement ();
@@ -58,7 +58,7 @@ void do_refine (Triangulation<2> &tria)
 void do_refine (Triangulation<3> &tria)
 {
   const int dim = 3;
-  
+
   tria.refine_global (2);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement ();
@@ -83,11 +83,11 @@ void check ()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
   do_refine (tria);
-				   // refine the mesh globally and
-				   // verify that the parent relation
-				   // holds
+  // refine the mesh globally and
+  // verify that the parent relation
+  // holds
   tria.refine_global (1);
-  
+
   MGDoFHandler<dim> dof_handler (tria);
 
   for (typename MGDoFHandler<dim>::cell_iterator cell = dof_handler.begin();
@@ -95,27 +95,27 @@ void check ()
     for (unsigned int child = 0; child < cell->n_children (); ++child)
       Assert (cell->child (child)->parent () == cell,
               ExcInternalError ());
-  
-				   // coarsen the mesh globally and
-				   // verify that the parent relation
-				   // holds
+
+  // coarsen the mesh globally and
+  // verify that the parent relation
+  // holds
   for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active ();
        cell != tria.end (); ++cell)
     cell->set_coarsen_flag ();
-  
+
   tria.execute_coarsening_and_refinement ();
-  
+
   for (typename MGDoFHandler<dim>::cell_iterator cell = dof_handler.begin ();
        cell != dof_handler.end(); ++cell)
     for (unsigned int child = 0; child < cell->n_children (); ++child)
       Assert (cell->child (child)->parent () == cell,
-	          ExcInternalError());
-  
+              ExcInternalError());
+
   deallog << "OK for " << dim << "d" << std::endl;
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("refine_and_coarsen_for_parents_03/output");
   deallog.attach(logfile);
@@ -127,5 +127,5 @@ int main ()
   check<3> ();
 }
 
-  
-  
+
+

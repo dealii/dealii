@@ -31,7 +31,7 @@ template <typename number>
 void test_laplacian(unsigned int n)
 {
   TridiagonalMatrix<number> M(n-1, true);
-  for (unsigned int i=0;i<n-2;++i)
+  for (unsigned int i=0; i<n-2; ++i)
     {
       M(i,i) = 2.;
       M(i,i+1) = -1.;
@@ -39,14 +39,14 @@ void test_laplacian(unsigned int n)
   M(n-2,n-2) = 2.;
 
   M.compute_eigenvalues();
-  for (unsigned int i=0;i<5;++i)
-    deallog << '\t' << M.eigenvalue(i)*n*n;
+  for (unsigned int i=0; i<5; ++i)
+    deallog << '\t' << M.eigenvalue(i)*n *n;
   deallog << "\t cond " << M.eigenvalue(n-2)/M.eigenvalue(0) << std::endl;
 }
 
 
 int main()
-{ 
+{
   const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);

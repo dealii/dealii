@@ -62,13 +62,13 @@ void test ();
 
 template <int dim>
 void do_check (const Triangulation<dim> &triangulation,
-	       const hp::FECollection<dim> &fe)
-{  
+               const hp::FECollection<dim> &fe)
+{
   hp::DoFHandler<dim>        dof_handler(triangulation);
 
-				   // distribute fe_indices randomly
+  // distribute fe_indices randomly
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     cell->set_active_fe_index (rand() % fe.size());
   dof_handler.distribute_dofs (fe);
@@ -77,7 +77,7 @@ void do_check (const Triangulation<dim> &triangulation,
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   constraints);
+                                           constraints);
   constraints.close ();
 
   constraints.print (deallog.get_file_stream());
@@ -91,7 +91,7 @@ void test_with_wrong_face_orientation (const hp::FECollection<3> &fe)
   GridGenerator::hyper_ball (triangulation);
   triangulation.begin_active()->set_refine_flag ();
   triangulation.execute_coarsening_and_refinement ();
-  
+
   do_check (triangulation, fe);
 }
 
@@ -101,7 +101,7 @@ int main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

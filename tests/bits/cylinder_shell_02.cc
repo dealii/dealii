@@ -33,9 +33,9 @@
 #include <deal.II/fe/fe_values.h>
 #include <fstream>
 
-    
 
-int main () 
+
+int main ()
 {
   std::ofstream logfile("cylinder_shell_02/output");
   deallog.attach(logfile);
@@ -43,7 +43,7 @@ int main ()
   deallog.threshold_double(1.e-10);
   deallog << std::setprecision (2);
 
-                                   // generate a hyperball in 3d
+  // generate a hyperball in 3d
   Triangulation<3> tria;
   GridGenerator::cylinder_shell (tria, 1, .8, 1);
 
@@ -53,9 +53,9 @@ int main ()
 
   QMidpoint<3> q;
   FEValues<3> fe_values (fe, q, update_JxW_values);
-  
-                                   // make sure that all cells have positive
-                                   // volume
+
+  // make sure that all cells have positive
+  // volume
   for (DoFHandler<3>::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     {

@@ -35,31 +35,31 @@
 
 void test ()
 {
-				   // the following element has more
-				   // components than blocks
+  // the following element has more
+  // components than blocks
   FESystem<2> fe (FE_RaviartThomas<2>(1), 2);
 
-				   // try all possible component
-				   // masks, which we encode as bit
-				   // strings
+  // try all possible component
+  // masks, which we encode as bit
+  // strings
   for (unsigned int int_mask=0; int_mask<(1U<<fe.n_components()); ++int_mask)
-  {
-    std::vector<bool> component_mask (fe.n_components());
-    for (unsigned int c=0; c<fe.n_components(); ++c)
-      component_mask[c] = (int_mask & (1<<c));
+    {
+      std::vector<bool> component_mask (fe.n_components());
+      for (unsigned int c=0; c<fe.n_components(); ++c)
+        component_mask[c] = (int_mask & (1<<c));
 
-				     // now try to convert to a block
-				     // mask. this should not always
-				     // work
-    try
-      {
-	deallog << fe.block_mask (component_mask) << std::endl;
-      }
-    catch (ExceptionBase &e)
-      {
-        deallog << e.get_exc_name() << std::endl;
-      }
-  }
+      // now try to convert to a block
+      // mask. this should not always
+      // work
+      try
+        {
+          deallog << fe.block_mask (component_mask) << std::endl;
+        }
+      catch (ExceptionBase &e)
+        {
+          deallog << e.get_exc_name() << std::endl;
+        }
+    }
 
   deallog << "OK" << std::endl;
 }

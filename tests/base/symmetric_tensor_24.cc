@@ -33,13 +33,13 @@ void check ()
   for (unsigned int i=0; i<S::n_independent_components; ++i)
     {
       deallog << i << "  --  "
-	      << S::unrolled_to_component_indices (i)
-	      << std::endl;
+              << S::unrolled_to_component_indices (i)
+              << std::endl;
       Assert (S::component_to_unrolled_index
-	      (S::unrolled_to_component_indices (i))
-	      ==
-	      i,
-	      ExcInternalError());
+              (S::unrolled_to_component_indices (i))
+              ==
+              i,
+              ExcInternalError());
     }
 }
 

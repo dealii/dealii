@@ -34,8 +34,8 @@ void sub_test()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active (),
-    endc = tria.end();
+  cell = tria.begin_active (),
+  endc = tria.end();
   for (; cell!=endc; ++cell)
     if (cell->center().norm()<1e-8)
       cell->set_refine_flag();
@@ -56,7 +56,7 @@ void sub_test()
   DoFHandler<dim> dof (tria);
   deallog << "Testing " << fe.get_name() << std::endl;
 
-                                // run test for several different meshes
+  // run test for several different meshes
   for (unsigned int i=0; i<8-2*dim; ++i)
     {
       cell = tria.begin_active ();
@@ -94,7 +94,7 @@ void sub_test()
 
       for (unsigned int i=0; i<dof.n_dofs(); ++i)
         {
-          if(constraints.is_constrained(i))
+          if (constraints.is_constrained(i))
             continue;
           const double entry = rand()/(double)RAND_MAX;
           in_dist(i) = entry;
@@ -105,7 +105,7 @@ void sub_test()
 
       out_copy -= out_ref;
       double diff_norm = out_copy.linfty_norm();
-      deallog << "Error in copied MF: " << diff_norm 
+      deallog << "Error in copied MF: " << diff_norm
               << std::endl;
     }
   deallog << std::endl;

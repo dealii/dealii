@@ -40,16 +40,16 @@ std::ofstream logfile("grid_in_msh_03/output");
 
 template<int dim>
 void check_file (const std::string name,
-		 typename GridIn<dim>::Format format)
+                 typename GridIn<dim>::Format format)
 {
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   gi.read(name, format);
   deallog << name
-	  << '\t' << tria.n_vertices()
-	  << '\t' << tria.n_cells()
-	  << std::endl;
+          << '\t' << tria.n_vertices()
+          << '\t' << tria.n_cells()
+          << std::endl;
 
   GridOut grid_out;
   grid_out.write_gnuplot (tria, deallog.get_file_stream());

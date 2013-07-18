@@ -26,11 +26,11 @@
 
 // given the name of a file, copy it to deallog
 // and then delete it
-void cat_file(const char * filename)
+void cat_file(const char *filename)
 {
   std::ifstream in(filename);
   Assert (in, ExcIO());
-  
+
   while (in)
     {
       std::string s;
@@ -38,19 +38,19 @@ void cat_file(const char * filename)
       deallog.get_file_stream() << s << "\n";
     }
   in.close();
-  
+
   std::remove (filename);
 }
 
 
 template <int dim>
 void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
-		const char *                               dirname,
-		const char *                               filename)
+                const char                                *dirname,
+                const char                                *filename)
 {
   deallog << "Checksum: "
-	  << tria.get_checksum ()
-	  << std::endl;
+          << tria.get_checksum ()
+          << std::endl;
 
   chdir (dirname);
   tria.write_mesh_vtk (filename);
@@ -61,29 +61,29 @@ void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
       int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
-				       // copy the .pvtu and .vtu files
-				       // into the logstream
+      // copy the .pvtu and .vtu files
+      // into the logstream
       if (myid==0)
-	{
-	  std::ifstream in((std::string(filename) + ".pvtu").c_str());
-	  while (in)
-	    {
-	      std::string s;
-	      std::getline(in, s);
-	      deallog.get_file_stream() << s << "\n";
-	    }
-	}
+        {
+          std::ifstream in((std::string(filename) + ".pvtu").c_str());
+          while (in)
+            {
+              std::string s;
+              std::getline(in, s);
+              deallog.get_file_stream() << s << "\n";
+            }
+        }
 
       if (myid==0)
-	{
-	  std::ifstream in((std::string(filename) + "_0000.vtu").c_str());
-	  while (in)
-	    {
-	      std::string s;
-	      std::getline(in, s);
-	      deallog.get_file_stream() << s << "\n";
-	    }
-	}
+        {
+          std::ifstream in((std::string(filename) + "_0000.vtu").c_str());
+          while (in)
+            {
+              std::string s;
+              std::getline(in, s);
+              deallog.get_file_stream() << s << "\n";
+            }
+        }
     }
 
 
@@ -92,10 +92,10 @@ void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
 
 
 template <int dim>
-void assert_tria_equal(const char* testdir, const Triangulation<dim> & a, const Triangulation<dim> & b)
+void assert_tria_equal(const char *testdir, const Triangulation<dim> &a, const Triangulation<dim> &b)
 {
   Assert (a.n_active_cells() == b.n_active_cells(),
-	      ExcInternalError());
+          ExcInternalError());
 
   std::string file1=std::string(testdir)+"/tmp_grid1";
   std::string file2=std::string(testdir)+"/tmp_grid2";
@@ -108,11 +108,11 @@ void assert_tria_equal(const char* testdir, const Triangulation<dim> & a, const 
   out1.close();
   out2.close();
 
-				   //compare the two files
+  //compare the two files
   std::string cmd = std::string("diff -q ")+file1+std::string(" ")+file2;
   Assert (system(cmd.c_str()) == 0, ExcInternalError());
 
-				   //and delete them
+  //and delete them
   std::remove (file1.c_str());
   std::remove (file2.c_str());
 }
@@ -121,7 +121,7 @@ void assert_tria_equal(const char* testdir, const Triangulation<dim> & a, const 
 template <typename T>
 LogStream &
 operator << (LogStream &out,
-	     const std::vector<T> &v)
+             const std::vector<T> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     out << v[i] << (i == v.size()-1 ? "" : " ");

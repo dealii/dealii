@@ -38,17 +38,17 @@ void test ()
 
   BlockSparseMatrix<double> m(bsp);
 
-                                   // advance it to the end of the matrix
+  // advance it to the end of the matrix
   BlockSparseMatrix<double>::const_iterator it = m.begin();
   for (unsigned int i=0; i<4; ++i)
     ++it;
 
-                                   // now also get an end iterator
+  // now also get an end iterator
   BlockSparseMatrix<double>::const_iterator it2 = m.end();
 
-                                   // make sure that the two of them match
+  // make sure that the two of them match
   Assert (it == it2, ExcInternalError());
-   
+
   deallog << "OK" << std::endl;
 }
 
@@ -68,25 +68,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

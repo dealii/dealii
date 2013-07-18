@@ -34,18 +34,18 @@ void
 test(const unsigned int degree)
 {
   deallog << "FE_RaviartThomas<" << dim << "> (" << degree << ")"
-	  << std::endl;
-  
+          << std::endl;
+
   FE_RaviartThomas<dim> fe_rt(degree);
-  const FullMatrix<double> & constraints = fe_rt.constraints();
+  const FullMatrix<double> &constraints = fe_rt.constraints();
 
   for (unsigned int i=0; i<constraints.m(); ++i)
     {
       for (unsigned int j=0; j<constraints.n(); ++j)
-	deallog << constraints(i,j) << ' ';
+        deallog << constraints(i,j) << ' ';
       deallog << std::endl;
     }
-  
+
   deallog << std::endl;
 }
 
@@ -55,14 +55,14 @@ main()
 {
   std::ofstream logfile ("rt_3/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   for (unsigned int degree=0; degree<4; ++degree)
     test<2>(degree);
-  
+
   return 0;
 }
 

@@ -19,7 +19,7 @@
 // check Vector<double>::mean_value()
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -27,7 +27,7 @@
 
 void test (Vector<double> &v)
 {
-                                   // set some elements of the vector
+  // set some elements of the vector
   double sum = 0;
   for (unsigned int i=0; i<v.size(); i+=1+i)
     {
@@ -36,7 +36,7 @@ void test (Vector<double> &v)
     }
   v.compress ();
 
-                                   // then check the norm
+  // then check the norm
   Assert (std::fabs(v.mean_value() - sum/v.size()) < 1e-14*sum/v.size(),
           ExcInternalError());
 
@@ -45,7 +45,7 @@ void test (Vector<double> &v)
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("vector_32/output");
   deallog.attach(logfile);
@@ -60,25 +60,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

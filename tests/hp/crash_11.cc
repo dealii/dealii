@@ -56,14 +56,14 @@ int main ()
   deallog.threshold_double(1.e-10);
 
 
-				   // create a mesh like this (viewed
-				   // from top):
-				   //
-				   // *---*---*
-				   // | 2 | 3 |
-				   // *---*---*
-				   // | 0 | 1 |
-				   // *---*---*
+  // create a mesh like this (viewed
+  // from top):
+  //
+  // *---*---*
+  // | 2 | 3 |
+  // *---*---*
+  // | 0 | 1 |
+  // *---*---*
   Triangulation<3>     triangulation;
   std::vector<unsigned int> subdivisions (3, 2);
   subdivisions[2] = 1;
@@ -78,16 +78,16 @@ int main ()
 
   hp::DoFHandler<3>        dof_handler(triangulation);
 
-				   // assign polynomial degrees like this:
-                                   //
-				   // *---*---*
-				   // | 1 | 2 |
-				   // *---*---*
-				   // | 4 | 3 |
-				   // *---*---*
-                                   //
+  // assign polynomial degrees like this:
+  //
+  // *---*---*
+  // | 1 | 2 |
+  // *---*---*
+  // | 4 | 3 |
+  // *---*---*
+  //
   hp::DoFHandler<3>::active_cell_iterator
-    cell = dof_handler.begin_active();
+  cell = dof_handler.begin_active();
   cell->set_active_fe_index (0);
   ++cell;
   cell->set_active_fe_index (1);
@@ -98,37 +98,37 @@ int main ()
 
   dof_handler.distribute_dofs (fe);
 
-                                   // for illustrative purposes, print
-                                   // out the numbers of the dofs that
-                                   // belong to the shared edge
-                                   // (that's the one that has four
-                                   // different fe indices associated
-                                   // with it). note that there is
-                                   // only one such line so we can
-                                   // quit the loop once we find it
+  // for illustrative purposes, print
+  // out the numbers of the dofs that
+  // belong to the shared edge
+  // (that's the one that has four
+  // different fe indices associated
+  // with it). note that there is
+  // only one such line so we can
+  // quit the loop once we find it
   for (hp::DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
       if (cell->line(l)->n_active_fe_indices() == 4)
-	{
-	  deallog << "Shared line: " << cell->line(l) << std::endl;
-	  for (unsigned int i=0; i<4; ++i)
-	    {
-	      deallog << "DoF indices for fe_index=" << i << ": ";
-	      std::vector<types::global_dof_index> line_dofs (fe[i].dofs_per_line + 2*fe[i].dofs_per_vertex);
-	      cell->line(l)->get_dof_indices (line_dofs, i);
-	      for (unsigned int j=0; j<fe[i].dofs_per_line + 2*fe[i].dofs_per_vertex; ++j)
-		deallog << line_dofs[j] << ' ';
-	      deallog << std::endl;
-	    }
+        {
+          deallog << "Shared line: " << cell->line(l) << std::endl;
+          for (unsigned int i=0; i<4; ++i)
+            {
+              deallog << "DoF indices for fe_index=" << i << ": ";
+              std::vector<types::global_dof_index> line_dofs (fe[i].dofs_per_line + 2*fe[i].dofs_per_vertex);
+              cell->line(l)->get_dof_indices (line_dofs, i);
+              for (unsigned int j=0; j<fe[i].dofs_per_line + 2*fe[i].dofs_per_vertex; ++j)
+                deallog << line_dofs[j] << ' ';
+              deallog << std::endl;
+            }
 
-	  goto done;
-	}
-  done:
+          goto done;
+        }
+done:
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   constraints);
+                                           constraints);
   constraints.close ();
 
   constraints.print (deallog.get_file_stream());

@@ -35,7 +35,8 @@
 std::ofstream logfile("grid_refinement/output");
 
 template <int dim, int spacedim>
-void test(std::string filename) {
+void test(std::string filename)
+{
   HyperBallBoundary<dim, spacedim> boundary;
   Triangulation<dim, spacedim> tria;
   tria.set_boundary(1, boundary);
@@ -46,10 +47,11 @@ void test(std::string filename) {
 
   GridOut grid_out;
   grid_out.set_flags (GridOutFlags::Ucd(true));
-  for(unsigned int cycle=0; cycle<3; ++cycle) {
-    tria.refine_global(1);
-    grid_out.write_msh (tria, logfile);
-  }
+  for (unsigned int cycle=0; cycle<3; ++cycle)
+    {
+      tria.refine_global(1);
+      grid_out.write_msh (tria, logfile);
+    }
 }
 
 int main ()

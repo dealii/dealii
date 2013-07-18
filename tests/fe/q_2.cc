@@ -38,18 +38,18 @@ void
 test(const FE_Q<dim> &fe_q)
 {
   deallog << fe_q.get_name()
-	  << std::endl;
+          << std::endl;
 
   for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     {
-      const FullMatrix<double> & m = fe_q.get_prolongation_matrix(c);
+      const FullMatrix<double> &m = fe_q.get_prolongation_matrix(c);
 
       for (unsigned int i=0; i<m.m(); ++i)
-	{
-	  for (unsigned int j=0; j<m.n(); ++j)
-	    deallog << 100*m(i,j) << ' ';
-	  deallog << std::endl;
-	}
+        {
+          for (unsigned int j=0; j<m.n(); ++j)
+            deallog << 100*m(i,j) << ' ';
+          deallog << std::endl;
+        }
 
       deallog << std::endl;
     }
@@ -69,13 +69,13 @@ main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-				// Test the non-equidistant version as
-				// well
+  // Test the non-equidistant version as
+  // well
   const QGaussLobatto<1> quad(5);
 
-                                   // we had the matrices precomputed
-                                   // up to Q4 for 1d, Q3 for 2d and
-                                   // Q2 for 3d
+  // we had the matrices precomputed
+  // up to Q4 for 1d, Q3 for 2d and
+  // Q2 for 3d
   for (unsigned int degree=1; degree<=4; ++degree)
     test<1>(FE_Q<1>(degree));
 

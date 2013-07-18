@@ -29,7 +29,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/eigen.h>
 
-void diff(FullMatrix<double>& M)
+void diff(FullMatrix<double> &M)
 {
   const double err = M.frobenius_norm();
   if (err < 1.e-14)
@@ -41,7 +41,7 @@ void diff(FullMatrix<double>& M)
 
 void test (const unsigned int n, const unsigned int m)
 {
-				   // Create some random matrices
+  // Create some random matrices
   FullMatrix<double> A(n,n);
   FullMatrix<double> C(m,m);
   FullMatrix<double> B(n,m);
@@ -49,22 +49,22 @@ void test (const unsigned int n, const unsigned int m)
   FullMatrix<double> Bt(m,n);
   FullMatrix<double> Dt(n,m);
 
-  for (unsigned int i=0;i<n;++i)
+  for (unsigned int i=0; i<n; ++i)
     {
-      for (unsigned int j=0;j<n;++j)
-	A(i,j) = std::rand();
-      for (unsigned int j=0;j<m;++j)
-	{
-	  B(i,j) = Bt(j,i) = std::rand();
-	  D(j,i) = Dt(i,j) = std::rand();
-	}
+      for (unsigned int j=0; j<n; ++j)
+        A(i,j) = std::rand();
+      for (unsigned int j=0; j<m; ++j)
+        {
+          B(i,j) = Bt(j,i) = std::rand();
+          D(j,i) = Dt(i,j) = std::rand();
+        }
     }
-  for (unsigned int i=0;i<m;++i)
-    for (unsigned int j=0;j<m;++j)
+  for (unsigned int i=0; i<m; ++i)
+    for (unsigned int j=0; j<m; ++j)
       C(i,j) = std::rand();
 
-				   // Compare first Schur complement
-				   // with mmult.
+  // Compare first Schur complement
+  // with mmult.
   FullMatrix<double> S1(m,m);
   S1.triple_product(A, D, B, false, false);
 
@@ -75,8 +75,8 @@ void test (const unsigned int n, const unsigned int m)
   aux2.add(-1., S1);
   diff(aux2);
 
-				   // Compare second Schur complement
-				   // with mmult
+  // Compare second Schur complement
+  // with mmult
   FullMatrix<double> S2(n,n);
   S2.triple_product(C, B, D, false, false);
 
@@ -87,7 +87,7 @@ void test (const unsigned int n, const unsigned int m)
   aux4.add(-1., S2);
   diff(aux4);
 
-				   // Check transpose versions
+  // Check transpose versions
   aux2 = 0.;
   aux2.triple_product(A, Dt, B, true, false);
   aux2.add(-1., S1);

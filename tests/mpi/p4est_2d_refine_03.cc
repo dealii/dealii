@@ -41,7 +41,7 @@ void test()
   if (true)
     {
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "hyper_cube" << std::endl;
+        deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -49,38 +49,38 @@ void test()
       tr.refine_global(1);
 
       while (tr.n_global_active_cells() < 20000/Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD))
-	{
-	  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	    deallog << "refine_loop..." << std::endl;
-	  std::vector<bool> flags (tr.n_active_cells(), false);
+        {
+          if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+            deallog << "refine_loop..." << std::endl;
+          std::vector<bool> flags (tr.n_active_cells(), false);
 
-					   // refine one fifth of all cells each
-					   // time (but at least one).
-					   // note that only the own marked cells
-					   // will be refined.
-	  for (unsigned int i=0; i<tr.n_active_cells() / 5 + 1; ++i)
-	    {
-	      const unsigned int x = rand() % flags.size();
-	      flags[x] = true;
-	    }
+          // refine one fifth of all cells each
+          // time (but at least one).
+          // note that only the own marked cells
+          // will be refined.
+          for (unsigned int i=0; i<tr.n_active_cells() / 5 + 1; ++i)
+            {
+              const unsigned int x = rand() % flags.size();
+              flags[x] = true;
+            }
 
-	  unsigned int index=0;
-	  for (typename Triangulation<dim>::active_cell_iterator
-		 cell = tr.begin_active();
-	       cell != tr.end(); ++cell, ++index)
-	    if (flags[index])
-	      {
-		cell->set_refine_flag();
-	      }
+          unsigned int index=0;
+          for (typename Triangulation<dim>::active_cell_iterator
+               cell = tr.begin_active();
+               cell != tr.end(); ++cell, ++index)
+            if (flags[index])
+              {
+                cell->set_refine_flag();
+              }
 
-	  Assert (index == tr.n_active_cells(), ExcInternalError());
-	  tr.execute_coarsening_and_refinement ();
+          Assert (index == tr.n_active_cells(), ExcInternalError());
+          tr.execute_coarsening_and_refinement ();
 
-	  if (myid == 0)
-	    {
-	      deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
-	    }
-	}
+          if (myid == 0)
+            {
+              deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+            }
+        }
     }
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)

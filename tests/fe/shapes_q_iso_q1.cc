@@ -40,8 +40,8 @@ void plot_FE_Q_shape_functions()
   plot_face_shape_functions(m, q2, "Q2_iso_Q1");
   test_compute_functions(m, q2, "Q2_iso_Q1");
 
-				   // skip the following tests to
-				   // reduce run-time
+  // skip the following tests to
+  // reduce run-time
   if (dim < 3)
     {
       FE_Q_iso_Q1<dim> q3(3);

@@ -46,27 +46,27 @@ const bool errors = false;
 template <int dim>
 void
 check (const unsigned int level,
-       const Mapping<dim>& mapping,
-       const FiniteElement<dim>& element,
-       const Quadrature<dim>& quadrature)
+       const Mapping<dim> &mapping,
+       const FiniteElement<dim> &element,
+       const Quadrature<dim> &quadrature)
 {
   Triangulation<dim> tr;
 
   Functions::CosineFunction<dim> cosine;
-  
+
   DoFHandler<dim> dof(tr);
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
     GridGenerator::hyper_cube(tr, -1,1);
-  
+
   tr.refine_global (level);
-  
+
   dof.distribute_dofs(element);
 
   FEValues<dim> fe (mapping, element, quadrature,
-		    update_values
-		    | update_q_points | update_JxW_values);
+                    update_values
+                    | update_q_points | update_JxW_values);
 
   std::vector <types::global_dof_index> global_dofs (element.dofs_per_cell);
   std::vector <double> function (quadrature.size());
@@ -75,52 +75,52 @@ check (const unsigned int level,
   Vector<double> f (dof.n_dofs ());
 
   SparsityPattern A_pattern (dof.n_dofs (), dof.n_dofs (),
-			     dof.max_couplings_between_dofs());
+                             dof.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern(dof, A_pattern);
   A_pattern.compress ();
-  
+
   SparseMatrix<double> A(A_pattern);
-  
+
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   const typename DoFHandler<dim>::cell_iterator end = dof.end();
 
-  for (; cell != end;++cell)
+  for (; cell != end; ++cell)
     {
       fe.reinit(cell);
       cell->get_dof_indices (global_dofs);
       cosine.value_list (fe.get_quadrature_points(), function);
 
-      for (unsigned int k=0;k<quadrature.size();++k)
-	{
-	  double dx = fe.JxW (k);
+      for (unsigned int k=0; k<quadrature.size(); ++k)
+        {
+          double dx = fe.JxW (k);
 
-	  for (unsigned int i=0;i<element.dofs_per_cell;++i)
-	    {
-	      const double v = fe.shape_value (i,k);
-	      double rhs = dx * v * (function[k]);
+          for (unsigned int i=0; i<element.dofs_per_cell; ++i)
+            {
+              const double v = fe.shape_value (i,k);
+              double rhs = dx * v * (function[k]);
 
-	      f(global_dofs[i]) += rhs;
-	      for (unsigned int j=0;j<element.dofs_per_cell;++j)
-		{
-		  const double u = fe.shape_value (j,k);
-		  double el = dx * (u*v/* + (Du*Dv) */);
-		  A.add (global_dofs[i], global_dofs[j], el);
-		}
-	    }
-	}
+              f(global_dofs[i]) += rhs;
+              for (unsigned int j=0; j<element.dofs_per_cell; ++j)
+                {
+                  const double u = fe.shape_value (j,k);
+                  double el = dx * (u*v/* + (Du*Dv) */);
+                  A.add (global_dofs[i], global_dofs[j], el);
+                }
+            }
+        }
     }
 
   SolverControl control (1000, 1.e-10, false, false);
   PrimitiveVectorMemory<Vector<double> > mem;
   SolverCG<Vector<double> > solver (control, mem);
   PreconditionIdentity prec;
-  
+
   solver.solve (A, u, f, prec);
 
   FEValues<dim> fe2 (mapping, element, quadrature,
-		     update_values | update_gradients
-		     | update_second_derivatives
-		     | update_q_points | update_JxW_values);
+                     update_values | update_gradients
+                     | update_second_derivatives
+                     | update_q_points | update_JxW_values);
 
   double l2 = 0.;
   double h1 = 0.;
@@ -131,41 +131,41 @@ check (const unsigned int level,
   std::vector<Tensor<1,dim> > Df (quadrature.size());
   std::vector<Tensor<2,dim> > DDu (quadrature.size());
   std::vector<Tensor<2,dim> > DDf (quadrature.size());
-  
-  for (cell = dof.begin_active(); cell != end;++cell)
+
+  for (cell = dof.begin_active(); cell != end; ++cell)
     {
       fe2.reinit (cell);
-      
+
       cosine.value_list (fe2.get_quadrature_points(), function);
       cosine.gradient_list (fe2.get_quadrature_points(), Df);
       cosine.hessian_list (fe2.get_quadrature_points(), DDf);
       fe2.get_function_values (u, u_local);
       fe2.get_function_grads (u, Du);
       fe2.get_function_2nd_derivatives (u,DDu);
-      
-      for (unsigned int k=0;k<quadrature.size();++k)
-	{
-	  const double dx = fe.JxW (k);
-	  double e =  u_local[k];
-	  if (errors) e -= function[k];
-	  l2 += dx*e*e;
-	  for (unsigned int i=0;i<dim;++i)
-	    {
-	      e = Du[k][i];
-	      if (errors) e -= Df[k][i];
-	      h1 += dx*e*e;
-	      for (unsigned int j=0;j<dim;++j)
-		{
-		  e = DDu[k][i][j];
-		  if (errors) e -= DDf[k][i][j];
-		  h2 += dx*e*e;
-		}
-	    }
-	}
+
+      for (unsigned int k=0; k<quadrature.size(); ++k)
+        {
+          const double dx = fe.JxW (k);
+          double e =  u_local[k];
+          if (errors) e -= function[k];
+          l2 += dx*e*e;
+          for (unsigned int i=0; i<dim; ++i)
+            {
+              e = Du[k][i];
+              if (errors) e -= Df[k][i];
+              h1 += dx*e*e;
+              for (unsigned int j=0; j<dim; ++j)
+                {
+                  e = DDu[k][i][j];
+                  if (errors) e -= DDf[k][i][j];
+                  h2 += dx*e*e;
+                }
+            }
+        }
     }
-      deallog << "L2: " << l2 << std::endl;
-      deallog << "H1: " << h1 << std::endl;
-      deallog << "H2: " << h2 << std::endl;  
+  deallog << "L2: " << l2 << std::endl;
+  deallog << "H1: " << h1 << std::endl;
+  deallog << "H2: " << h2 << std::endl;
 }
 
 template <int dim>
@@ -186,7 +186,7 @@ void loop ()
       elements.push_back (new FE_Q<dim> (3));
       elements.push_back (new FE_Q<dim> (4));
     }
-  
+
   elements.push_back (new FE_DGQ<dim> (1));
   elements.push_back (new FE_DGQ<dim> (2));
   if (dim<3)
@@ -194,13 +194,13 @@ void loop ()
       elements.push_back (new FE_DGQ<dim> (3));
       elements.push_back (new FE_DGQ<dim> (4));
     }
-  
-  for (unsigned int m=0;m<maps.size();++m)
-    for (unsigned int e=0;e<elements.size();++e)
-    {
-      check (1, *maps[m], *elements[e], gauss);
+
+  for (unsigned int m=0; m<maps.size(); ++m)
+    for (unsigned int e=0; e<elements.size(); ++e)
+      {
+        check (1, *maps[m], *elements[e], gauss);
 //      check (2, *maps[m], *elements[e], gauss);
-    }
+      }
 }
 
 
@@ -208,7 +208,7 @@ int main ()
 {
   std::ofstream logfile ("derivatives/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   if (!errors) deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

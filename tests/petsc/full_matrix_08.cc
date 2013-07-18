@@ -19,15 +19,15 @@
 // check PETScWrappers::FullMatrix::frobenius_norm
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_full_matrix.h>    
+#include <deal.II/lac/petsc_full_matrix.h>
 #include <fstream>
 #include <iostream>
 
 
 void test (PETScWrappers::FullMatrix &m)
 {
-                                   // first set a few entries. count how many
-                                   // entries we have
+  // first set a few entries. count how many
+  // entries we have
   PetscScalar norm = 0;
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
@@ -40,17 +40,17 @@ void test (PETScWrappers::FullMatrix &m)
 
   m.compress ();
 
-                                   // compare against the exact value of the
-                                   // l2-norm (max row-sum)
+  // compare against the exact value of the
+  // l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
   Assert (m.frobenius_norm() == norm, ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("full_matrix_08/output");
   deallog.attach(logfile);
@@ -64,30 +64,30 @@ int main (int argc,char **argv)
         PETScWrappers::FullMatrix m (5,5);
         test (m);
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

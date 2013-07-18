@@ -40,8 +40,8 @@ test(const unsigned int degree1,
 {
   deallog << "FE_DGPMonomial" << dim << "> (" << degree1 << ")"
           << " to FE_DGPMonomial<" << dim << "> (" << degree2 << ")"
-	  << std::endl;
-  
+          << std::endl;
+
   FE_DGPMonomial<dim> fe1(degree1);
   FE_DGPMonomial<dim> fe2(degree2);
 
@@ -53,10 +53,10 @@ test(const unsigned int degree1,
     {
       for (unsigned int j=0; j<m.n(); ++j)
         deallog << m(i,j) << ' ';
-      
+
       deallog << std::endl;
     }
-  
+
   deallog << std::endl;
 }
 
@@ -66,7 +66,7 @@ main()
 {
   std::ofstream logfile ("dgp_monomial_2/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -80,7 +80,7 @@ main()
   for (unsigned int degree1=1; degree1<=2; ++degree1)
     for (unsigned int degree2=1; degree2<=2; ++degree2)
       test<3>(degree1, degree2);
-  
+
   return 0;
 }
 

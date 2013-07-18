@@ -39,7 +39,7 @@ void test ()
     std::ofstream out("index_set_readwrite_02/a.idxset");
     is1.block_write(out);
   }
-  
+
   IndexSet is2;
   std::ifstream in("index_set_readwrite_02/a.idxset");
   is2.block_read(in);

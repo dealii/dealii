@@ -44,7 +44,7 @@ void test ()
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("compressed_sparsity_pattern_05/output");
   deallog.attach(logfile);

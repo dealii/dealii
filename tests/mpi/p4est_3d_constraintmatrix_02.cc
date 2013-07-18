@@ -54,17 +54,17 @@ void test()
   GridGenerator::hyper_cube(tr);
   tr.refine_global (2);
   for (unsigned int step=0; step<15; ++step)
-        {
-          typename Triangulation<dim>::active_cell_iterator
-            cell = tr.begin_active(),
-            endc = tr.end();
+    {
+      typename Triangulation<dim>::active_cell_iterator
+      cell = tr.begin_active(),
+      endc = tr.end();
 
-            for (; cell!=endc; ++cell)
-                if (std::rand()%42==1)
-                cell->set_refine_flag ();
+      for (; cell!=endc; ++cell)
+        if (std::rand()%42==1)
+          cell->set_refine_flag ();
 
-         tr.execute_coarsening_and_refinement ();
-        }
+      tr.execute_coarsening_and_refinement ();
+    }
 
   DoFHandler<dim> dofh(tr);
 
@@ -93,7 +93,7 @@ void test()
   cm.distribute(x);
   x_rel = x;
 
-				   //x.print(std::cout);
+  //x.print(std::cout);
 
 //  x_rel.print(std::cout);
 
@@ -103,28 +103,28 @@ void test()
   x_dub = x_rel;
 
   {
-	std::stringstream out;
+    std::stringstream out;
     out << "**** proc " << myid << std::endl;
     x_dub.print (out);
 
-	if (myid==0)
-	  deallog << out.str() << std::endl;
-	else
-	  MPI_Send((void*)out.str().c_str(),out.str().size()+1, MPI_CHAR, 0, 1, MPI_COMM_WORLD);
+    if (myid==0)
+      deallog << out.str() << std::endl;
+    else
+      MPI_Send((void *)out.str().c_str(),out.str().size()+1, MPI_CHAR, 0, 1, MPI_COMM_WORLD);
   }
 
   if (myid == 0)
     {
-      for (unsigned int i = 1;i < numproc;++i)
+      for (unsigned int i = 1; i < numproc; ++i)
         {
-		  MPI_Status status;
-		  int msglen;
-		  MPI_Probe(i, 1, MPI_COMM_WORLD, &status);
-		  MPI_Get_count(&status, MPI_CHAR, &msglen);
-		  std::vector<char> buf(msglen);
-		  MPI_Recv(&buf[0], msglen, MPI_CHAR, status.MPI_SOURCE, 1,
-                 MPI_COMM_WORLD, &status);
-		  deallog << &buf[0] << std::endl;
+          MPI_Status status;
+          int msglen;
+          MPI_Probe(i, 1, MPI_COMM_WORLD, &status);
+          MPI_Get_count(&status, MPI_CHAR, &msglen);
+          std::vector<char> buf(msglen);
+          MPI_Recv(&buf[0], msglen, MPI_CHAR, status.MPI_SOURCE, 1,
+                   MPI_COMM_WORLD, &status);
+          deallog << &buf[0] << std::endl;
         }
     }
 

@@ -32,7 +32,7 @@ int main ()
   deallog.depth_console(0);
 
   compile error;
-  
+
   deallog << "OK" << std::endl;
 }
 

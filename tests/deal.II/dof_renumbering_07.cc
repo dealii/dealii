@@ -42,7 +42,7 @@ template <int dim>
 void
 print_dofs (const DoFHandler<dim> &dof)
 {
-  const FiniteElement<dim>& fe = dof.get_fe();
+  const FiniteElement<dim> &fe = dof.get_fe();
   std::vector<types::global_dof_index> v (fe.dofs_per_cell);
   std_cxx1x::shared_ptr<FEValues<dim> > fevalues;
 
@@ -57,14 +57,14 @@ print_dofs (const DoFHandler<dim> &dof)
     {
       Point<dim> p = cell->center();
       if (fevalues.get() != 0)
-	fevalues->reinit(cell);
+        fevalues->reinit(cell);
 
       cell->get_dof_indices (v);
       for (unsigned int i=0; i<v.size(); ++i)
-	if (fevalues.get() != 0)
-	  deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
-	else
-	  deallog << p << '\t' << v[i] << std::endl;
+        if (fevalues.get() != 0)
+          deallog << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
+        else
+          deallog << p << '\t' << v[i] << std::endl;
       deallog << std::endl;
     }
 }
@@ -73,13 +73,13 @@ print_dofs (const DoFHandler<dim> &dof)
 
 template <int dim>
 void
-check_renumbering(DoFHandler<dim>& dof)
+check_renumbering(DoFHandler<dim> &dof)
 {
-  const FiniteElement<dim>& element = dof.get_fe();
+  const FiniteElement<dim> &element = dof.get_fe();
   deallog << element.get_name() << std::endl;
 
   DoFRenumbering::boost::Cuthill_McKee(dof);
-  for (unsigned int level=0;level<dof.get_tria().n_levels();++level)
+  for (unsigned int level=0; level<dof.get_tria().n_levels(); ++level)
     DoFRenumbering::Cuthill_McKee(dof, level);
   print_dofs (dof);
 }
@@ -107,7 +107,7 @@ check ()
 
   {
     FESystem<dim> fe(FE_DGQ<dim>(1),1,
-		     FE_Q<dim>(2),dim);
+                     FE_Q<dim>(2),dim);
     DoFHandler<dim> dof(tr);
 
     dof.distribute_dofs(fe);

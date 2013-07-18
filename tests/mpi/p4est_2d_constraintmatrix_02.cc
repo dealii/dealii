@@ -49,10 +49,10 @@ void test()
 
   GridGenerator::hyper_cube(tr);
 
-  for (int i=0;i<12;++i)
+  for (int i=0; i<12; ++i)
     {
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "step " << i << std::endl;
+        deallog << "step " << i << std::endl;
 
 
       tr.begin_active()->set_refine_flag();
@@ -72,22 +72,22 @@ void test()
       DoFTools::make_hanging_node_constraints (dofh, cm2);
 
       if (myid==0)
-	{
-	  std::stringstream s;
-	  cm.print(s);
-	  deallog << s.str();
+        {
+          std::stringstream s;
+          cm.print(s);
+          deallog << s.str();
 
-	  deallog << "****" << std::endl;
+          deallog << "****" << std::endl;
 
-	  std::stringstream s2;
-	  cm2.print(s2);
-	  deallog << s2.str();
+          std::stringstream s2;
+          cm2.print(s2);
+          deallog << s2.str();
 
-	  if (s.str()==s2.str())
-	    deallog << "ok" << std::endl;
-	  else
-	    deallog << "not ok" << std::endl;
-	}
+          if (s.str()==s2.str())
+            deallog << "ok" << std::endl;
+          else
+            deallog << "not ok" << std::endl;
+        }
     }
 
 }

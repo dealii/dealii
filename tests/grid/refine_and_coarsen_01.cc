@@ -45,23 +45,23 @@ void check ()
   Vector<float> estimated_error_per_cell;
   estimated_error_per_cell.reinit(tria.n_active_cells());
   for (unsigned int j=0; j<estimated_error_per_cell.size(); ++j)
-      estimated_error_per_cell(j)= 1.;
+    estimated_error_per_cell(j)= 1.;
 
   deallog << "n_active_cells: " << tria.n_active_cells() << std::endl;
-  
-  
+
+
   GridRefinement::refine_and_coarsen_fixed_fraction (tria,
-						     estimated_error_per_cell,
-						     0.25, 0);
+                                                     estimated_error_per_cell,
+                                                     0.25, 0);
   tria.execute_coarsening_and_refinement ();
 
   deallog << "n_active_cells: " << tria.n_active_cells() << std::endl;
-  
+
   deallog << "OK for " << dim << "d" << std::endl;
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("refine_and_coarsen_01/output");
   deallog.attach(logfile);
@@ -73,5 +73,5 @@ int main ()
   check<3> ();
 }
 
-  
-  
+
+

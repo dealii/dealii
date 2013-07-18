@@ -46,7 +46,7 @@ int main (int argc,char **argv)
   row_partitioning.add_range(0, 3);
   col_partitioning.add_range(0, 4);
 
-				   // Add element (2,3) to the matrix
+  // Add element (2,3) to the matrix
   TrilinosWrappers::SparsityPattern sp (row_partitioning, col_partitioning);
   sp.add (2,3);
   sp.compress();
@@ -55,10 +55,10 @@ int main (int argc,char **argv)
   A.add (2, 3, 2.0);
   A.compress();
 
-				   // verify that entry (2,3) is
-				   // indeed what we expect. verify
-				   // that both methods of accessing
-				   // the entry work
+  // verify that entry (2,3) is
+  // indeed what we expect. verify
+  // that both methods of accessing
+  // the entry work
   Assert (A.el(2, 3) == 2, ExcInternalError());
   Assert (A(2, 3) == 2, ExcInternalError());
 

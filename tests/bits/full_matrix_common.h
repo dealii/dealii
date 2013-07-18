@@ -1,6 +1,6 @@
 //----------------------------  full_matrix_common.h  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2007, 2008 by the deal.II authors
 //
@@ -84,7 +84,7 @@ print_matrix (const FullMatrix<number> &m)
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       deallog << i << ' ' << j << ' ' << m(i,j)
-	      << std::endl;
+              << std::endl;
 }
 
 
@@ -95,29 +95,29 @@ print_vector (const Vector<number> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     deallog << i << ' ' << v(i)
-	    << std::endl;
+            << std::endl;
 }
 
 template <typename number>
-void 
+void
 display_matrix(FullMatrix<number> M)
 {
   deallog<<M.m()<<"x"<<M.n()<<" matrix"<<std::endl;
-  for (unsigned int i=0;i<M.m();i++)
+  for (unsigned int i=0; i<M.m(); i++)
     {
-      for (unsigned int j=0;j<M.n();j++)
-	deallog<<M(i,j)<<" ";
+      for (unsigned int j=0; j<M.n(); j++)
+        deallog<<M(i,j)<<" ";
       deallog<<std::endl;
     }
 }
 
 
 template <typename number>
-void 
+void
 fill_matrix(FullMatrix<number> &A)
 {
-  for (unsigned int i=0; i<A.m();i++)
-    for (unsigned int j=0; j<A.n();j++)
+  for (unsigned int i=0; i<A.m(); i++)
+    for (unsigned int j=0; j<A.n(); j++)
       A(i,j)=number(i*A.n() + j+1);
 }
 
@@ -134,30 +134,30 @@ main()
 
       check<double> ();
       check<float> ();
-      
+
       return 0;
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-	      << "----------------------------------------------------"
-	      << std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-	      << exc.what() << std::endl
-	      << "Aborting!" << std::endl
-	      << "----------------------------------------------------"
-	      << std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-	      << "----------------------------------------------------"
-	      << std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-	      << "Aborting!" << std::endl
-	      << "----------------------------------------------------"
-	      << std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

@@ -31,11 +31,13 @@ void compare (double t1, double t2, double ratio)
   double r = t2/t1;
   double d = std::fabs(r-ratio) / ratio;
 
-				   // relative error < 15%?
+  // relative error < 15%?
   if (d <= .15)
     {
       deallog << "OK" << std::endl;
-    } else {
+    }
+  else
+    {
       deallog << "Ratio " << r << " should be " << ratio << std::endl;
     }
 }
@@ -48,9 +50,9 @@ void burn (unsigned int n)
   for (unsigned int i=0 ; i<n ; ++i)
     {
       for (unsigned int j=1 ; j<100000 ; ++j)
-	{
-	  s += 1./j * i;
-	}
+        {
+          s += 1./j * i;
+        }
     }
 }
 

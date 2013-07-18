@@ -35,7 +35,7 @@ check ()
   for (unsigned int n=1; n<=3; ++n)
     {
       const std::complex<number> array[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    
+
       FullMatrix<std::complex<number> > m(n,n, array);
       print_matrix (m);
       deallog << m.determinant () << std::endl;

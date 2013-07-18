@@ -35,8 +35,8 @@
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve( SOLVER& solver, const MATRIX& A,
-	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+check_solve( SOLVER &solver, const MATRIX &A,
+             VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
@@ -46,7 +46,7 @@ check_solve( SOLVER& solver, const MATRIX& A,
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception& e)
+  catch (std::exception &e)
     {
       deallog << e.what() << std::endl;
       abort ();
@@ -55,11 +55,11 @@ check_solve( SOLVER& solver, const MATRIX& A,
   deallog << "Solver stopped after " << solver.control().last_step()
           << " iterations" << std::endl;
 
-				   // we use a direct solver as a
-				   // preconditioner. this should
-				   // converge in one step!
+  // we use a direct solver as a
+  // preconditioner. this should
+  // converge in one step!
   Assert (solver.control().last_step() == 1,
-	  ExcInternalError());
+          ExcInternalError());
 }
 
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
-                                     // Make matrix
+    // Make matrix
     FDMatrix testproblem(size, size);
     PETScWrappers::SparseMatrix  A(dim, dim, 5);
     testproblem.five_point(A);
@@ -96,6 +96,6 @@ int main(int argc, char **argv)
     PETScWrappers::PreconditionLU preconditioner(A);
     check_solve (solver, A,u,f, preconditioner);
   }
-  
+
 }
 

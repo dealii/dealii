@@ -48,9 +48,9 @@ void check_this (Triangulation<3> &tria)
   dof_handler.distribute_dofs (fe);
 
   unsigned int global_face = 0;
-  
-                                   // look at all faces, not only
-                                   // active ones
+
+  // look at all faces, not only
+  // active ones
   for (DoFHandler<3>::cell_iterator cell=dof_handler.begin();
        cell != dof_handler.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
@@ -61,30 +61,30 @@ void check_this (Triangulation<3> &tria)
           fe_face_values1.reinit (cell, f);
           fe_face_values2.reinit (cell->neighbor(f), nn);
 
-                                           // in order to reduce
-                                           // output file size, only
-                                           // write every seventeenth
-                                           // normal vector. if the
-                                           // normals differ anyway,
-                                           // then the assertion below
-                                           // will catch this, and if
-                                           // we compute _all_ normals
-                                           // wrongly, then outputting
-                                           // some will be ok, I guess
+          // in order to reduce
+          // output file size, only
+          // write every seventeenth
+          // normal vector. if the
+          // normals differ anyway,
+          // then the assertion below
+          // will catch this, and if
+          // we compute _all_ normals
+          // wrongly, then outputting
+          // some will be ok, I guess
           if (global_face++ % 17 == 0)
             deallog << "Cell " << cell << ", face " << f
                     << " n=" << fe_face_values1.normal_vector(0)
                     << std::endl;
 
-                                           // normal vectors should be
-                                           // in opposite directions,
-                                           // so their sum should be
-                                           // close to zero
+          // normal vectors should be
+          // in opposite directions,
+          // so their sum should be
+          // close to zero
           Assert ((fe_face_values1.normal_vector(0) +
-                  fe_face_values2.normal_vector(0)).square()
+                   fe_face_values2.normal_vector(0)).square()
                   < 1e-20,
                   ExcInternalError());
-        }          
+        }
 }
 
 
@@ -92,7 +92,7 @@ void check (Triangulation<3> &tria)
 {
   deallog << "Initial check" << std::endl;
   check_this (tria);
-  
+
   for (unsigned int r=0; r<3; ++r)
     {
       tria.refine_global (1);
@@ -103,39 +103,39 @@ void check (Triangulation<3> &tria)
   coarsen_global (tria);
   deallog << "Check " << 1 << std::endl;
   check_this (tria);
-  
+
   tria.refine_global (1);
   deallog << "Check " << 2 << std::endl;
   check_this (tria);
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mesh_3d_6/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<3> coarse_grid;
     create_two_cubes (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     create_L_shape (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     check (coarse_grid);
   }
-  
+
 }
 
-  
-  
+
+

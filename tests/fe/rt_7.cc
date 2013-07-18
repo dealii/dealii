@@ -48,7 +48,7 @@ plot_shape_functions(const unsigned int degree)
   DoFHandler<dim> dof(tr);
   typename DoFHandler<dim>::cell_iterator c = dof.begin();
   dof.distribute_dofs(fe_rt);
-      
+
   QTrapez<1> q_trapez;
   const unsigned int div=10;
   QIterated<dim> q(q_trapez, div);
@@ -56,15 +56,15 @@ plot_shape_functions(const unsigned int degree)
   fe.reinit(c);
 
   Assert (fe.get_fe().n_components() == dim, ExcInternalError());
-  
+
   for (unsigned int q_point=0; q_point<q.size(); ++q_point)
     {
       if (q_point % QIterated<1>(q_trapez,div).size() == 0)
         deallog << std::endl;
-      
+
       deallog << fe.quadrature_point(q_point) << " ";
-	      
-      for (unsigned int i=0;i<fe_rt.dofs_per_cell;++i)
+
+      for (unsigned int i=0; i<fe_rt.dofs_per_cell; ++i)
         for (unsigned int c=0; c<fe.get_fe().n_components(); ++c)
           deallog << " " << fe.shape_value_component(i,q_point,c);
 
@@ -78,13 +78,13 @@ main()
 {
   std::ofstream logfile ("rt_7/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   plot_shape_functions<2>(2);
-  
+
   return 0;
 }
 

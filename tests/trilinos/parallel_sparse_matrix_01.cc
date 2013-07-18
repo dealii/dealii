@@ -37,14 +37,14 @@
 
 void test ()
 {
-                                   // create a parallel matrix where the first
-                                   // process has 10 rows, the second one 20,
-                                   // the third one 30, and so on
+  // create a parallel matrix where the first
+  // process has 10 rows, the second one 20,
+  // the third one 30, and so on
   unsigned int N = 0;
   std::vector<unsigned int> local_rows_per_process
-    (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
+  (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
   std::vector<unsigned int> start_row
-    (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
+  (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
   for (unsigned int i=0;
        i<Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
        ++i)
@@ -54,10 +54,10 @@ void test ()
       start_row[i] += i*10;
     }
 
-                                   // here is a sparsity pattern for which we
-                                   // used to allocate additional memory for 2
-                                   // processes. note that only one of the
-                                   // four blocks uses Inodes
+  // here is a sparsity pattern for which we
+  // used to allocate additional memory for 2
+  // processes. note that only one of the
+  // four blocks uses Inodes
   CompressedSparsityPattern csp (N,N);
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<N; ++j)
@@ -69,9 +69,9 @@ void test ()
           csp.add (i,i-local_rows_per_process.back());
       }
 
-                                   // here is a sparsity pattern for which no
-                                   // Inodes are used, but it doesn't allocate
-                                   // additional memory
+  // here is a sparsity pattern for which no
+  // Inodes are used, but it doesn't allocate
+  // additional memory
 //   for (unsigned int bi=0; bi<get_n_mpi_processes(); ++bi)
 //     for (unsigned int bj=0; bj<get_n_mpi_processes(); ++bj)
 //       for (unsigned int i=0; i<local_rows_per_process[bi]; ++i)
@@ -81,19 +81,19 @@ void test ()
 
 
 
-                                   // now create a matrix with this sparsity
-                                   // pattern
+  // now create a matrix with this sparsity
+  // pattern
   Epetra_Map map (TrilinosWrappers::types::int_type(-1),
-		  TrilinosWrappers::types::int_type
-		  (local_rows_per_process[Utilities::Trilinos::get_this_mpi_process
-					  (Utilities::Trilinos::comm_world())]),
-		  0, Utilities::Trilinos::comm_world());
+                  TrilinosWrappers::types::int_type
+                  (local_rows_per_process[Utilities::Trilinos::get_this_mpi_process
+                                          (Utilities::Trilinos::comm_world())]),
+                  0, Utilities::Trilinos::comm_world());
 
   TrilinosWrappers::SparseMatrix m;
   m.reinit (map, csp);
-                                   // now write into the exact same matrix
-                                   // entries as have been created by the
-                                   // sparsity pattern above
+  // now write into the exact same matrix
+  // entries as have been created by the
+  // sparsity pattern above
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<csp.row_length(i); ++j)
       m.add (i, csp.column_number(i,j), 1.);
@@ -122,25 +122,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
 
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

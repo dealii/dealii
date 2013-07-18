@@ -33,7 +33,7 @@ void check ()
     {
       SymmetricTensor<2,dim> S;
       for (unsigned int i=0; i<S.n_independent_components; ++i)
-	S[S.unrolled_to_component_indices (i)] = std::rand () % 10;
+        S[S.unrolled_to_component_indices (i)] = std::rand () % 10;
 
       deallog << "S = " << S << std::endl;
       deallog << "first invariant  = " << first_invariant(S) << std::endl;
@@ -42,21 +42,21 @@ void check ()
 
       Tensor<2,dim> S_cubed;
       for (unsigned int d=0; d<dim; ++d)
-	for (unsigned int e=0; e<dim; ++e)
-	  for (unsigned int f=0; f<dim; ++f)
-	    for (unsigned int g=0; g<dim; ++g)
-	      S_cubed[d][e] += S[d][f] * S[f][g] * S[g][e];
+        for (unsigned int e=0; e<dim; ++e)
+          for (unsigned int f=0; f<dim; ++f)
+            for (unsigned int g=0; g<dim; ++g)
+              S_cubed[d][e] += S[d][f] * S[f][g] * S[g][e];
 
       Tensor<2,dim> S_squared;
       for (unsigned int d=0; d<dim; ++d)
-	for (unsigned int e=0; e<dim; ++e)
-	  for (unsigned int f=0; f<dim; ++f)
-	    S_squared[d][e] += S[d][f] * S[f][e];
+        for (unsigned int e=0; e<dim; ++e)
+          for (unsigned int f=0; f<dim; ++f)
+            S_squared[d][e] += S[d][f] * S[f][e];
 
       Tensor<2,dim> R = S_cubed
-			- first_invariant(S) * S_squared
-			+ second_invariant(S) * S
-			- third_invariant(S) * unit_symmetric_tensor<dim> ();
+                        - first_invariant(S) * S_squared
+                        + second_invariant(S) * S
+                        - third_invariant(S) * unit_symmetric_tensor<dim> ();
       deallog << R << std::endl;
 
       Assert (R.norm() < 1e-10, ExcInternalError());

@@ -38,32 +38,32 @@ void
 check_this (const FiniteElement<dim> &fe,
             const FiniteElement<dim> &/*fe2*/)
 {
-                                   // only check if both elements have
-                                   // support points. otherwise,
-                                   // interpolation doesn't really
-                                   // work
+  // only check if both elements have
+  // support points. otherwise,
+  // interpolation doesn't really
+  // work
   if (fe.n_components() != 1)
     return;
 
-                                   // ignore this check if this fe has already
-                                   // been treated
+  // ignore this check if this fe has already
+  // been treated
   static std::set<std::string> already_checked;
   if (already_checked.find(fe.get_name()) != already_checked.end())
     return;
   already_checked.insert (fe.get_name());
-  
 
-                                   // test with different quadrature formulas
+
+  // test with different quadrature formulas
   QGauss<dim> q_lhs(fe.degree+1);
   QGauss<dim> q_rhs(fe.degree+1>2 ? fe.degree+1-2 : 1);
-      
+
   FullMatrix<double> X (fe.dofs_per_cell,
                         q_rhs.size());
 
   FETools::compute_projection_from_quadrature_points_matrix (fe,
                                                              q_lhs, q_rhs,
                                                              X);
-      
+
   output_matrix (X);
 }
 

@@ -34,14 +34,14 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-                                   // each processor owns 2 indices and all
-                                   // are ghosting element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting element 1 (the second)
   IndexSet local_owned(numproc*2);
   local_owned.add_range(myid*2,myid*2+2);
 
   parallel::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
 
-                                     // set local values
+  // set local values
   v(myid*2)=myid*2.0;
   v(myid*2+1)=myid*2.0+1.0;
 
@@ -57,7 +57,7 @@ void test ()
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 
-                                // check l2 norm
+  // check l2 norm
   const double l2_norm = v.l2_norm();
   if (myid == 0)
     deallog << "L2 norm: " << l2_norm << std::endl;

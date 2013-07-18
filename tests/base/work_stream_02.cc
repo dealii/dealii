@@ -32,13 +32,13 @@ struct ScratchData
 
 struct CopyData
 {
-    unsigned int computed;
+  unsigned int computed;
 };
 
 
 void worker (const std::vector<unsigned int>::iterator &i,
-	     ScratchData &,
-	     CopyData &ad)
+             ScratchData &,
+             CopyData &ad)
 {
   ad.computed = *i * 2;
 }
@@ -49,19 +49,19 @@ void copier (const CopyData &ad)
 }
 
 
-void test () 
+void test ()
 {
   std::vector<unsigned int> v;
   for (unsigned int i=0; i<20; ++i)
     v.push_back (i);
-  
+
   WorkStream::run (v.begin(), v.end(), &worker, &copier,
-		   ScratchData(),
-		   CopyData());
+                   ScratchData(),
+                   CopyData());
 }
 
-  
-  
+
+
 
 int main()
 {

@@ -29,14 +29,14 @@
 #include <fstream>
 
 class MySolverControl:
-   public SolverControl
+  public SolverControl
 {
-  public:
-    virtual State check(const unsigned int step,const double)
-      {
-	deallog << "MySolverControl " << step << std::endl;
-	return SolverControl::check(step, 0);
-      }
+public:
+  virtual State check(const unsigned int step,const double)
+  {
+    deallog << "MySolverControl " << step << std::endl;
+    return SolverControl::check(step, 0);
+  }
 };
 
 
@@ -44,7 +44,7 @@ class MySolverControl:
 
 template <class MATRIX, class VECTOR>
 void
-check(const MATRIX& A, const VECTOR& f)
+check(const MATRIX &A, const VECTOR &f)
 {
   std::vector<std::string> names;
   names.push_back("cg");
@@ -63,14 +63,14 @@ check(const MATRIX& A, const VECTOR& f)
   std::vector<std::string>::const_iterator name;
 
   solver.set_control(mycont);
-  for (name = names.begin(); name != names.end();++name)
+  for (name = names.begin(); name != names.end(); ++name)
     {
       solver.select(*name);
       u = 0.;
       solver.solve(A, u, f, pre);
     }
 
-				   //test deprecated constructor too:
+  //test deprecated constructor too:
   GrowingVectorMemory<VECTOR> mem;
   SolverSelector<VECTOR> solver2("gmres", mycont, mem);
   u = 0.;
@@ -91,7 +91,7 @@ int main()
 
   deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
-				   // Make matrix
+  // Make matrix
   FDMatrix testproblem(size, size);
   SparsityPattern structure(dim, dim, 5);
   testproblem.five_point_structure(structure);

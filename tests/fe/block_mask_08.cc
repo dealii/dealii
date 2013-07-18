@@ -32,16 +32,16 @@
 
 void test ()
 {
-				   // test for an initialized mask
+  // test for an initialized mask
   Assert (BlockMask(12,false).represents_the_all_selected_mask() == false,
-	  ExcInternalError());
-				   // note the semantics of the following as
-				   // described in the documentation
+          ExcInternalError());
+  // note the semantics of the following as
+  // described in the documentation
   Assert (BlockMask(12,true).represents_the_all_selected_mask() == false,
-	  ExcInternalError());
-				   // test for an empty mask
+          ExcInternalError());
+  // test for an empty mask
   Assert (BlockMask().represents_the_all_selected_mask() == true,
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

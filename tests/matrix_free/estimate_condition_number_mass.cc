@@ -48,7 +48,7 @@ mass_operator (const MatrixFree<dim,Number>  &data,
   FEEvaluationGeneral<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
-  for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
     {
       fe_eval.reinit (cell);
       fe_eval.read_dof_values (src);
@@ -67,7 +67,7 @@ mass_operator (const MatrixFree<dim,Number>  &data,
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
- public:
+public:
   typedef VectorizedArray<Number> vector_t;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
@@ -78,11 +78,11 @@ class MatrixFreeTest
               const Vector<Number> &src) const
   {
     dst = 0;
-    const std_cxx1x::function<void(const MatrixFree<dim,Number>  &,
-                                   Vector<Number>       &,
+    const std_cxx1x::function<void(const MatrixFree<dim,Number> &,
+                                   Vector<Number> &,
                                    const Vector<Number> &,
-                                   const std::pair<unsigned int,unsigned int>&)>
-      wrap = mass_operator<dim,fe_degree,Number>;
+                                   const std::pair<unsigned int,unsigned int> &)>
+    wrap = mass_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
   };
 

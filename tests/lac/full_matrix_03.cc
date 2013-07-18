@@ -52,15 +52,15 @@ main ()
   FullMatrix<double> Zb(3,3,entries_Z);
   FullMatrix<double> C(3,3);
   FullMatrix<double> D(3,3);
- 
+
   //compute C= A^T*B^T in two different ways and compare for equality
   Za.Tadd(1.,A);
   Zb.Tadd(1.,B);
   Za.mmult(D,Zb);
   A.TmTmult(C,B);
-  
+
   D.add(-1,C);
   Assert ( D.frobenius_norm() < 1e-15,
            ExcInternalError());
   deallog << "OK" << std::endl;
-}    
+}

@@ -35,7 +35,7 @@ int main ()
 {
   std::ofstream logfile("hp_dof_handler/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -48,13 +48,13 @@ int main ()
   fe_collection.push_back (FE_DGQ<dim> (1));
 
   hp::DoFHandler<dim> dof_handler(tria);
-  
+
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
   Triangulation<dim>::active_cell_iterator
-    cell=tria.begin_active(),
-    endc=tria.end();
+  cell=tria.begin_active(),
+  endc=tria.end();
   for (; cell!=endc; ++cell)
     cell->set_coarsen_flag();
   tria.execute_coarsening_and_refinement();

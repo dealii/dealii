@@ -46,7 +46,7 @@ void check ()
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement ();
 
-				   // store which cells we have here
+  // store which cells we have here
   std::vector<typename Triangulation<dim>::active_cell_iterator> cells;
   for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
        cell != tria.end(); ++cell)
@@ -55,8 +55,8 @@ void check ()
   const unsigned int n_cells = tria.n_active_cells();
   deallog << n_cells << std::endl;
 
-				   // refine the mesh globally, then coarsen
-				   // it again globally
+  // refine the mesh globally, then coarsen
+  // it again globally
   tria.refine_global (1);
 
   for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
@@ -65,23 +65,23 @@ void check ()
   tria.execute_coarsening_and_refinement ();
 
 
-				   // verify that we get the same cells again
+  // verify that we get the same cells again
   deallog << n_cells << ' ' << tria.n_active_cells()
-	  << std::endl;
-  
+          << std::endl;
+
   Assert (tria.n_active_cells() == n_cells,
-	  ExcInternalError());
+          ExcInternalError());
 
   unsigned int index = 0;
   for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
        cell != tria.end(); ++cell, ++index)
     Assert (cells[index] == cell,
-	    ExcInternalError());
+            ExcInternalError());
 
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("refine_and_coarsen_3d/output");
   deallog.attach(logfile);
@@ -91,5 +91,5 @@ int main ()
   check<3> ();
 }
 
-  
-  
+
+

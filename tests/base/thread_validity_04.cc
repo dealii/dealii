@@ -30,32 +30,32 @@
 
 struct X
 {
-    X(int i) : i(i) {}
-    int i;
+  X(int i) : i(i) {}
+  int i;
 
-    void execute () const
-      {
-	Assert (i == 42, ExcInternalError());
-	deallog << "OK" << std::endl;
-      }
-    
-  private:
-    X(const X&);
-    X & operator= (const X&);
+  void execute () const
+  {
+    Assert (i == 42, ExcInternalError());
+    deallog << "OK" << std::endl;
+  }
+
+private:
+  X(const X &);
+  X &operator= (const X &);
 };
 
 
 
 
-void test () 
+void test ()
 {
   const X x(42);
   Threads::Thread<void> t = Threads::spawn (x, &X::execute)();
   t.join ();
 }
 
-  
-  
+
+
 
 int main()
 {

@@ -48,13 +48,13 @@ template <int dim>
 void test ()
 {
   deallog << dim << 'd' << std::endl;
-  
-  Triangulation<dim> tria;  
+
+  Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria,0,1);
   tria.refine_global (1);
 
-                                   // destroy the uniformity of the matrix by
-                                   // refining one cell
+  // destroy the uniformity of the matrix by
+  // refining one cell
   tria.begin_active()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
   tria.refine_global(8-2*dim);
@@ -62,25 +62,25 @@ void test ()
   FE_Q<dim> fe (1);
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
-    
+
   deallog << "Number of dofs = " << dof_handler.n_dofs() << std::endl;
-  
+
   SparsityPattern sparsity_pattern;
   sparsity_pattern.reinit (dof_handler.n_dofs(),
                            dof_handler.n_dofs(),
                            dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress ();
-  
+
   SparseMatrix<float> B;
-  B.reinit (sparsity_pattern);  
-  
+  B.reinit (sparsity_pattern);
+
   QGauss<dim> qr (2);
   MatrixTools::create_mass_matrix (dof_handler, qr, B);
 
-                                   // scale lower left part of the matrix by
-                                   // 1/2 and upper right part by 2 to make
-                                   // matrix nonsymmetric
+  // scale lower left part of the matrix by
+  // 1/2 and upper right part by 2 to make
+  // matrix nonsymmetric
   for (SparseMatrix<float>::iterator p=B.begin();
        p!=B.end(); ++p)
     if (p->column() < p->row())
@@ -88,16 +88,16 @@ void test ()
     else if (p->column() > p->row())
       p->value() = p->value() * 2;
 
-                                   // check that we've done it right
+  // check that we've done it right
   for (SparseMatrix<float>::iterator p=B.begin();
        p!=B.end(); ++p)
     if (p->column() != p->row())
       Assert (B(p->row(),p->column()) != B(p->column(),p->row()),
               ExcInternalError());
-  
-                                   // for a number of different solution
-                                   // vectors, make up a matching rhs vector
-                                   // and check what the UMFPACK solver finds
+
+  // for a number of different solution
+  // vectors, make up a matching rhs vector
+  // and check what the UMFPACK solver finds
   for (unsigned int i=0; i<3; ++i)
     {
       Vector<double> solution (dof_handler.n_dofs());

@@ -32,7 +32,7 @@ void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
- 
+
   std::vector<IndexSet> local_active(2);
 
   // block 0:
@@ -48,29 +48,29 @@ void test ()
   v.block(1).reinit(local_active[1], complete_index_set(2*numproc), MPI_COMM_WORLD);
   v.collect_sizes();
 
-  for (unsigned int i=0;i<v.size();++i)
+  for (unsigned int i=0; i<v.size(); ++i)
     v(i)=1.0+i;
   v.compress(VectorOperation::insert);
 
   IndexSet local_active_together(3*numproc);
   local_active_together.add_range(myid,myid+1);
   local_active_together.add_range(numproc+myid*2,numproc+myid*2+2);
-  
+
   ConstraintMatrix cm(local_active_together);
   cm.add_line(numproc + myid*2);
   cm.close();
 
-  deallog << "vector before:" << std::endl;  
+  deallog << "vector before:" << std::endl;
   v.block(0).print(deallog.get_file_stream());
   v.block(1).print(deallog.get_file_stream());
 
   deallog << std::endl;
-  deallog << "CM:" << std::endl;  
+  deallog << "CM:" << std::endl;
   cm.print(deallog.get_file_stream());
-  
+
   cm.set_zero(v);
-  
-  deallog << "vector after:" << std::endl;  
+
+  deallog << "vector after:" << std::endl;
   v.block(0).print(deallog.get_file_stream());
   v.block(1).print(deallog.get_file_stream());
 

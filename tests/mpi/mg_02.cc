@@ -49,31 +49,31 @@ void test()
     deallog << "hyper_cube" << std::endl;
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-					       Triangulation<dim>::none,
-					       parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+                                               Triangulation<dim>::none,
+                                               parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
 
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
   DoFHandler<dim> dofh(tr);
 
-    {
-          for (unsigned int lvl=0;lvl<tr.n_levels();++lvl)
-            {
-              deallog << "level " << lvl << ": ";
-              typename DoFHandler<dim>::cell_iterator
-              cell = dofh.begin(lvl),
-              endc = dofh.end(lvl);
+  {
+    for (unsigned int lvl=0; lvl<tr.n_levels(); ++lvl)
+      {
+        deallog << "level " << lvl << ": ";
+        typename DoFHandler<dim>::cell_iterator
+        cell = dofh.begin(lvl),
+        endc = dofh.end(lvl);
 
-              for (;cell!=endc;++cell)
-                {
-                if (cell->level_subdomain_id()!=4294967294)
-                  deallog << cell->level_subdomain_id();
-                else
-                  deallog << "-";
-                }
-              deallog << std::endl;
-            }
-    }
+        for (; cell!=endc; ++cell)
+          {
+            if (cell->level_subdomain_id()!=4294967294)
+              deallog << cell->level_subdomain_id();
+            else
+              deallog << "-";
+          }
+        deallog << std::endl;
+      }
+  }
 
   static const FE_DGP<dim> fe(0);
   Assert(dofh.has_active_dofs()==false, ExcInternalError());
@@ -88,25 +88,25 @@ void test()
 
   Assert(dofh.has_active_dofs()==true, ExcInternalError());
   Assert(dofh.has_level_dofs()==true, ExcInternalError());
-    {
-      deallog << "Levels: " << tr.n_global_levels() << std::endl;
-      std::cout << "Levels: " << tr.n_global_levels() << std::endl;
-      
-      deallog << "n_locally_owned_dofs_per_processor:" << std::endl;
-      for (unsigned int i=0; i<dofh.n_locally_owned_dofs_per_processor().size(); ++i)
-	deallog << dofh.n_locally_owned_dofs_per_processor()[i] << std::endl;
+  {
+    deallog << "Levels: " << tr.n_global_levels() << std::endl;
+    std::cout << "Levels: " << tr.n_global_levels() << std::endl;
 
-      deallog << "locally_owned_mg_dofs_per_processor:" << std::endl;
-      for (unsigned int lvl=0;lvl<tr.n_global_levels();++lvl)
-	{
-	  deallog << "level " << lvl << ":" << std::endl;
-	  
-	  const std::vector<IndexSet> & vec = dofh.locally_owned_mg_dofs_per_processor(lvl);
-      
-	  for (unsigned int i=0; i<vec.size(); ++i)
-	    deallog << vec[i].n_elements() << std::endl;
-	}
-    }
+    deallog << "n_locally_owned_dofs_per_processor:" << std::endl;
+    for (unsigned int i=0; i<dofh.n_locally_owned_dofs_per_processor().size(); ++i)
+      deallog << dofh.n_locally_owned_dofs_per_processor()[i] << std::endl;
+
+    deallog << "locally_owned_mg_dofs_per_processor:" << std::endl;
+    for (unsigned int lvl=0; lvl<tr.n_global_levels(); ++lvl)
+      {
+        deallog << "level " << lvl << ":" << std::endl;
+
+        const std::vector<IndexSet> &vec = dofh.locally_owned_mg_dofs_per_processor(lvl);
+
+        for (unsigned int i=0; i<vec.size(); ++i)
+          deallog << vec[i].n_elements() << std::endl;
+      }
+  }
 }
 
 

@@ -20,7 +20,7 @@
 // ChunkSparseMatrix::set()
 
 #include "../tests.h"
-#include <deal.II/lac/chunk_sparse_matrix.h>    
+#include <deal.II/lac/chunk_sparse_matrix.h>
 #include <fstream>
 #include <iomanip>
 
@@ -35,14 +35,14 @@ void test (const unsigned int chunk_size)
   sp.compress ();
 
   ChunkSparseMatrix<double> m(sp);
-  
-                                   // first set a few entries
+
+  // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-                                   // then make sure we retrieve the same ones
+  // then make sure we retrieve the same ones
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
@@ -71,32 +71,32 @@ int main ()
     {
       const unsigned int chunk_sizes[] = { 1, 2, 4, 5, 7 };
       for (unsigned int i=0;
-	   i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
-	   ++i)
-	test (chunk_sizes[i]);
+           i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
+           ++i)
+        test (chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

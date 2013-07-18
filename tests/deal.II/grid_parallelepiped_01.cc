@@ -47,10 +47,10 @@ void check_1d_parallelepiped_by_comparison (bool log)
   // parallelepiped.
   Point<1> (corners) [1];
   corners[0] = Point<1> (0.5);
-  
+
   Triangulation<1> triangulation_parallelepiped;
   GridGenerator::parallelepiped (triangulation_parallelepiped, corners, false);
-  
+
   Triangulation<1> triangulation_cube;
   GridGenerator::hyper_cube (triangulation_cube, 0., 0.5);
 
@@ -58,10 +58,10 @@ void check_1d_parallelepiped_by_comparison (bool log)
     {
       logfile << "\ncheck 1d parallelepiped (hyper_cube): ";
       if (GridTools::have_same_coarse_mesh (triangulation_parallelepiped,
-					    triangulation_cube))
-	logfile << "OK";
+                                            triangulation_cube))
+        logfile << "OK";
       else
-	logfile << "not OK... coarse grids are different but they should be the same";
+        logfile << "not OK... coarse grids are different but they should be the same";
     }
 }
 
@@ -74,7 +74,7 @@ void check_2d_parallelepiped_by_comparison (bool log)
   Point<2> (corners) [2];
   corners[0] = Point<2> (0.0, 0.5);
   corners[1] = Point<2> (0.5, 0.0);
-  
+
   Triangulation<2> triangulation_parallelepiped;
   GridGenerator::parallelepiped (triangulation_parallelepiped, corners, false);
 
@@ -85,17 +85,17 @@ void check_2d_parallelepiped_by_comparison (bool log)
     {
       logfile << "\ncheck 2d parallelepiped (parallelogram): ";
       if (GridTools::have_same_coarse_mesh (triangulation_parallelepiped,
-					    triangulation_parallelogram))
-	logfile << "OK";
+                                            triangulation_parallelogram))
+        logfile << "OK";
 
       else
-	logfile << "not OK... coarse grids are different but they should be the same";
+        logfile << "not OK... coarse grids are different but they should be the same";
     }
 }
 
 int main ()
 {
-  // Check parallelepiped 
+  // Check parallelepiped
   check_1d_parallelepiped_by_comparison (true);
   check_2d_parallelepiped_by_comparison (true);
   logfile << "\n";

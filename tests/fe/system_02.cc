@@ -49,7 +49,7 @@ main()
 {
   std::ofstream logfile ("system_02/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -70,7 +70,7 @@ main()
     FESystem<2> fe(FESystem<2>(FE_Q<2>(1), 2), 1, FE_DGQ<2>(2),0, FE_Q<2>(1), 1);
     check<2>(fe);
   }
-  
+
   return 0;
 }
 

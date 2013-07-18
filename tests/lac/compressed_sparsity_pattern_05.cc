@@ -32,5 +32,5 @@ int main ()
   copy_with_offdiagonals_2<CompressedSparsityPattern> ();
 }
 
-  
-  
+
+

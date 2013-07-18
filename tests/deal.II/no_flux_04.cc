@@ -45,42 +45,42 @@
 template <int dim>
 class RadialFunction : public Function<dim>
 {
-  public:
-    RadialFunction() : Function<dim> (dim) {}
+public:
+  RadialFunction() : Function<dim> (dim) {}
 
-    virtual void vector_value (const Point<dim> &p,
-			       Vector<double> &v) const
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<double> &v) const
+  {
+    Assert (v.size() == dim, ExcInternalError());
+
+    switch (dim)
       {
-	Assert (v.size() == dim, ExcInternalError());
-
-	switch (dim)
-	  {
-	    case 2:
-		  v(0) = p[0] + p[1];
-		  v(1) = p[1] - p[0];
-		  break;
-	    case 3:
-		  v(0) = p[0] + p[1];
-		  v(1) = p[1] - p[0];
-		  v(2) = p[2];
-		  break;
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  }
+      case 2:
+        v(0) = p[0] + p[1];
+        v(1) = p[1] - p[0];
+        break;
+      case 3:
+        v(0) = p[0] + p[1];
+        v(1) = p[1] - p[0];
+        v(2) = p[2];
+        break;
+      default:
+        Assert (false, ExcNotImplemented());
       }
+  }
 };
 
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-	   const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   deallog << "FE=" << fe.get_name()
-	  << std::endl;
+          << std::endl;
 
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert (0);
@@ -97,7 +97,7 @@ void test (const Triangulation<dim>& tr,
 
   cm.distribute (v);
 
-				   // remove small entries
+  // remove small entries
   for (unsigned int i=0; i<v.size(); ++i)
     if (std::fabs (v(i)) < 1e-12)
       v(i) = 0;
@@ -106,12 +106,12 @@ void test (const Triangulation<dim>& tr,
   data_out.attach_dof_handler (dh);
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (dim, DataComponentInterpretation::component_is_part_of_vector);
+  data_component_interpretation
+  (dim, DataComponentInterpretation::component_is_part_of_vector);
 
   data_out.add_data_vector (v, "x",
-			    DataOut<dim>::type_dof_data,
-			    data_component_interpretation);
+                            DataOut<dim>::type_dof_data,
+                            data_component_interpretation);
   data_out.build_patches (fe.degree);
 
   data_out.write_vtk (deallog.get_file_stream());

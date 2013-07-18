@@ -53,8 +53,8 @@ void test ()
   GridGenerator::hyper_cube (tria,0,1);
   tria.refine_global (1);
 
-                                   // destroy the uniformity of the matrix by
-                                   // refining one cell
+  // destroy the uniformity of the matrix by
+  // refining one cell
   tria.begin_active()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
   tria.refine_global(8-2*dim);
@@ -70,13 +70,13 @@ void test ()
   for (unsigned int i=0; i<3; ++i)
     for (unsigned int j=0; j<3; ++j)
       sparsity_pattern.block(i,j).reinit (i!=2 ?
-					  dof_handler.n_dofs()/3 :
-					  dof_handler.n_dofs()-2*(dof_handler.n_dofs()/3),
-					  j!=2 ?
-					  dof_handler.n_dofs()/3 :
-					  dof_handler.n_dofs()-2*(dof_handler.n_dofs()/3),
-					  dof_handler.max_couplings_between_dofs(),
-					  false);
+                                          dof_handler.n_dofs()/3 :
+                                          dof_handler.n_dofs()-2*(dof_handler.n_dofs()/3),
+                                          j!=2 ?
+                                          dof_handler.n_dofs()/3 :
+                                          dof_handler.n_dofs()-2*(dof_handler.n_dofs()/3),
+                                          dof_handler.max_couplings_between_dofs(),
+                                          false);
   sparsity_pattern.collect_sizes();
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress ();
@@ -85,13 +85,13 @@ void test ()
   B.reinit (sparsity_pattern);
 
   {
-				     // for some reason, we can't
-				     // create block matrices directly
-				     // in matrixtools...
+    // for some reason, we can't
+    // create block matrices directly
+    // in matrixtools...
     SparsityPattern xsparsity_pattern;
     xsparsity_pattern.reinit (dof_handler.n_dofs(),
-			      dof_handler.n_dofs(),
-			      dof_handler.max_couplings_between_dofs());
+                              dof_handler.n_dofs(),
+                              dof_handler.max_couplings_between_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, xsparsity_pattern);
     xsparsity_pattern.compress ();
 
@@ -101,32 +101,32 @@ void test ()
     QGauss<dim> qr (2);
     MatrixTools::create_mass_matrix (dof_handler, qr, xB);
 
-				     // scale lower left part of the matrix by
-				     // 1/2 and upper right part by 2 to make
-				     // matrix nonsymmetric
+    // scale lower left part of the matrix by
+    // 1/2 and upper right part by 2 to make
+    // matrix nonsymmetric
     for (SparseMatrix<double>::iterator p=xB.begin();
-	 p!=xB.end(); ++p)
+         p!=xB.end(); ++p)
       if (p->column() < p->row())
-	p->value() = p->value()/2;
+        p->value() = p->value()/2;
       else if (p->column() > p->row())
-	p->value() = p->value() * 2;
+        p->value() = p->value() * 2;
 
-				     // check that we've done it right
+    // check that we've done it right
     for (SparseMatrix<double>::iterator p=xB.begin();
-	 p!=xB.end(); ++p)
+         p!=xB.end(); ++p)
       if (p->column() != p->row())
-	Assert (xB(p->row(),p->column()) != xB(p->column(),p->row()),
-		ExcInternalError());
+        Assert (xB(p->row(),p->column()) != xB(p->column(),p->row()),
+                ExcInternalError());
 
-				     // now copy stuff over
+    // now copy stuff over
     for (SparseMatrix<double>::const_iterator i = xB.begin(); i != xB.end(); ++i)
       B.set (i->row(), i->column(), i->value());
   }
 
 
-                                   // for a number of different solution
-                                   // vectors, make up a matching rhs vector
-                                   // and check what the UMFPACK solver finds
+  // for a number of different solution
+  // vectors, make up a matching rhs vector
+  // and check what the UMFPACK solver finds
   for (unsigned int i=0; i<3; ++i)
     {
       BlockVector<double> solution (3);

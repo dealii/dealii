@@ -31,15 +31,15 @@ std::ofstream logfile("grid_in_tecplot/output");
 
 template <int dim>
 void test (const std::string &infilename)
-{  
+{
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   gi.read (infilename);
 
   logfile<<"------------------------------------------"<<std::endl
-	 <<"output for grid in "<<infilename<<std::endl;
-  
+         <<"output for grid in "<<infilename<<std::endl;
+
   GridOut grid_out;
   grid_out.set_flags (GridOutFlags::Ucd(true));
   grid_out.write_ucd (tria, logfile);

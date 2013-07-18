@@ -49,38 +49,38 @@ void test ()
   Triangulation<dim> triangulation;
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler(triangulation);
-  
+
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (1);
 
   dof_handler.distribute_dofs (fe);
 
-				   // loop over all cells, active or
-				   // not
+  // loop over all cells, active or
+  // not
   std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
   for (typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin();
        cell != dof_handler.end(); ++cell)
     {
       try
-	{	  
-	  cell->get_dof_indices (local_dof_indices);
-	}
-      catch(...)
-	{
-	  deallog << "Assertion: cell not active." << std::endl;
-	  continue;
-	}
-      
-      
+        {
+          cell->get_dof_indices (local_dof_indices);
+        }
+      catch (...)
+        {
+          deallog << "Assertion: cell not active." << std::endl;
+          continue;
+        }
+
+
       deallog << "Cell = " << cell
-	      << ", DoFs=";
+              << ", DoFs=";
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	{
-	  Assert (local_dof_indices[i] != DoFHandler<dim>::invalid_dof_index,
-		  ExcInternalError());
-	  deallog << local_dof_indices[i] << ' ';
-	}
-      
+        {
+          Assert (local_dof_indices[i] != DoFHandler<dim>::invalid_dof_index,
+                  ExcInternalError());
+          deallog << local_dof_indices[i] << ' ';
+        }
+
       deallog << std::endl;
     }
 }
@@ -98,7 +98,7 @@ int main ()
   test<1>();
   test<2>();
   test<3>();
-  
+
   return 0;
 }
 

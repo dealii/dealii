@@ -36,31 +36,31 @@
 
 
 template <class TRIA>
-void check (TRIA & tr)
+void check (TRIA &tr)
 {
   typename TRIA::cell_iterator cell = tr.begin(),
-        endc = tr.end();
-  
+                               endc = tr.end();
+
   for (; cell!=endc; ++cell)
     {
       deallog << cell->level_subdomain_id() << " ";
       try
-	{
-	  deallog << cell->subdomain_id();
-	}
+        {
+          deallog << cell->subdomain_id();
+        }
       catch (...)
-	{
-	  deallog << ".";
-	  
-	}
+        {
+          deallog << ".";
+
+        }
       deallog << std::endl;
     }
-  
+
   deallog << "OK" << std::endl;
 }
 
 
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv[])
 {
   deal_II_exceptions::disable_abort_on_exception();
 
@@ -80,5 +80,5 @@ int main (int argc, char *argv[])
   check(tria2);
 }
 
-  
-  
+
+

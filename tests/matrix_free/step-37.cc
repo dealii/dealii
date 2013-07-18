@@ -576,7 +576,7 @@ namespace Step37
 
     typedef PreconditionChebyshev<LevelMatrixType,Vector<double> > SMOOTHER;
     MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double> >
-      mg_smoother;
+    mg_smoother;
 
     typename SMOOTHER::AdditionalData smoother_data;
     smoother_data.smoothing_range = 10.;

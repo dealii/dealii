@@ -59,14 +59,14 @@ void test()
   TrilinosWrappers::MPI::Vector x_ref;
   x_ref.reinit(owned_set, MPI_COMM_WORLD);
   VectorTools::interpolate(dofh,
-			   ConstantFunction<dim> (1.),
-			   x_ref);
+                           ConstantFunction<dim> (1.),
+                           x_ref);
 
   TrilinosWrappers::MPI::Vector x1 (x_ref);
 
-				// we have interpolated values, so
-				// ConstraintMatrix::distribute should not do
-				// anything
+  // we have interpolated values, so
+  // ConstraintMatrix::distribute should not do
+  // anything
   x1 = x_ref;
   ConstraintMatrix cm(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, cm);
@@ -79,9 +79,9 @@ void test()
     if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
       deallog << "err:" << err << std::endl;
 
-				// now test the same thing with a fresh vector
-				// that we manually fill with ones, not by a
-				// function in interpolate
+  // now test the same thing with a fresh vector
+  // that we manually fill with ones, not by a
+  // function in interpolate
   TrilinosWrappers::MPI::Vector x2 (owned_set, MPI_COMM_WORLD);
   x2 = 1;
   cm.distribute(x2);

@@ -23,13 +23,13 @@
 #include <deal.II/base/utilities.h>
 #include <fstream>
 
-void print_it(Utilities::MPI::MinMaxAvg & result)
+void print_it(Utilities::MPI::MinMaxAvg &result)
 {
   deallog << "sum: " << result.sum
-	  << " avg: " << result.avg
-	  << " min: " << result.min << " @" << result.min_index
-	  << " max: " << result.max << " @" << result.max_index
-	  << std::endl;
+          << " avg: " << result.avg
+          << " min: " << result.min << " @" << result.min_index
+          << " max: " << result.max << " @" << result.max_index
+          << std::endl;
 }
 
 void test()

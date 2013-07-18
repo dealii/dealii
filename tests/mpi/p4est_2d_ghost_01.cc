@@ -43,69 +43,69 @@ void test()
   if (true)
     {
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "hyper_cube" << std::endl;
+        deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
       GridGenerator::subdivided_hyper_cube(tr, 2);
 
       if (myid==0)
-	{
+        {
 
-	  std::vector< unsigned int > cell_subd;
-	  cell_subd.resize(tr.n_active_cells());
+          std::vector< unsigned int > cell_subd;
+          cell_subd.resize(tr.n_active_cells());
 
-	  GridTools::get_subdomain_association(tr, cell_subd);
-	  for (unsigned int i=0;i<tr.n_active_cells();++i)
-	    deallog << cell_subd[i] << " ";
-	  deallog << std::endl;
-	}
+          GridTools::get_subdomain_association(tr, cell_subd);
+          for (unsigned int i=0; i<tr.n_active_cells(); ++i)
+            deallog << cell_subd[i] << " ";
+          deallog << std::endl;
+        }
 
-				       //check that all local
-				       //neighbors have the
-				       //correct level and a valid
-				       //subdomainid
+      //check that all local
+      //neighbors have the
+      //correct level and a valid
+      //subdomainid
       typename Triangulation<dim,dim>::active_cell_iterator cell;
 
       for (cell = tr.begin_active();
-	   cell != tr.end();
-	   ++cell)
-	{
-	  if (cell->subdomain_id() != (unsigned int)myid)
-	    {
-	      Assert (cell->is_ghost() || cell->is_artificial(),
-		      ExcInternalError());
-	      continue;
-	    }
+           cell != tr.end();
+           ++cell)
+        {
+          if (cell->subdomain_id() != (unsigned int)myid)
+            {
+              Assert (cell->is_ghost() || cell->is_artificial(),
+                      ExcInternalError());
+              continue;
+            }
 
-	  for (unsigned int n=0;n<GeometryInfo<dim>::faces_per_cell;++n)
-	    {
-	      if (cell->at_boundary(n))
-		continue;
-	      Assert (cell->neighbor(n).state() == IteratorState::valid,
+          for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+            {
+              if (cell->at_boundary(n))
+                continue;
+              Assert (cell->neighbor(n).state() == IteratorState::valid,
                       ExcInternalError());
 
-	      Assert( cell->neighbor(n)->level() == cell->level(),
-		      ExcInternalError());
+              Assert( cell->neighbor(n)->level() == cell->level(),
+                      ExcInternalError());
 
-	      Assert(!cell->neighbor(n)->has_children(), ExcInternalError() );
-	      Assert( cell->neighbor(n)->subdomain_id()< numprocs, ExcInternalError());
+              Assert(!cell->neighbor(n)->has_children(), ExcInternalError() );
+              Assert( cell->neighbor(n)->subdomain_id()< numprocs, ExcInternalError());
 
-					       // all neighbors of
-					       // locally owned cells
-					       // must be ghosts but
-					       // can't be artificial
-	      Assert (cell->neighbor(n)->is_ghost(), ExcInternalError());
-	      Assert (!cell->neighbor(n)->is_artificial(), ExcInternalError());
-	    }
+              // all neighbors of
+              // locally owned cells
+              // must be ghosts but
+              // can't be artificial
+              Assert (cell->neighbor(n)->is_ghost(), ExcInternalError());
+              Assert (!cell->neighbor(n)->is_artificial(), ExcInternalError());
+            }
 
 
-	}
+        }
 
       const unsigned int checksum = tr.get_checksum ();
       deallog << "Checksum: "
-	      << checksum
-	      << std::endl;
+              << checksum
+              << std::endl;
     }
 
   deallog << "OK" << std::endl;

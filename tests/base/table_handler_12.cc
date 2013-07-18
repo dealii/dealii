@@ -38,20 +38,20 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-				   // set precision on the output
-				   // stream to 4 digits
+  // set precision on the output
+  // stream to 4 digits
   logfile << std::setprecision(4);
 
-				   // but then set precision on the
-				   // table output to 2
+  // but then set precision on the
+  // table output to 2
   TableHandler table;
   table.add_value("key", 0.123456789);
   table.set_precision ("key", 2);
 
-				   // now output the table...
+  // now output the table...
   table.write_text(logfile);
-				   // ...and then output some other
-				   // number, hopefully with 4 digits
-				   // of precision
+  // ...and then output some other
+  // number, hopefully with 4 digits
+  // of precision
   logfile << 0.123456789 << std::endl;
 }

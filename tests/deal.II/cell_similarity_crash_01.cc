@@ -50,19 +50,19 @@ void test()
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature, update_values);
 
-				   // initialize FEValues with the first cell
+  // initialize FEValues with the first cell
   fe_values.reinit (dof.begin_active());
 
-				   // then make this first cell invalid by
-				   // coarsening it away
+  // then make this first cell invalid by
+  // coarsening it away
   for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     tr.begin(1)->child(c)->set_coarsen_flag();
   tr.execute_coarsening_and_refinement ();
   dof.distribute_dofs(fe);
 
-				   // initialize FEValues with what is now the
-				   // first cell. this used to fail (see the
-				   // reason given at the top)
+  // initialize FEValues with what is now the
+  // first cell. this used to fail (see the
+  // reason given at the top)
   fe_values.reinit (dof.begin_active());
 
   deallog << "OK" << std::endl;
@@ -75,7 +75,7 @@ int main()
   deallog << std::setprecision (4);
   deallog.threshold_double(1.e-7);
 
-  test<1>();  
+  test<1>();
   test<2>();
   test<3>();
 }

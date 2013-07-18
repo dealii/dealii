@@ -28,7 +28,7 @@
 
 
 
-void test () 
+void test ()
 {
   std::ofstream logfile("block_matrices/output");
   deallog << std::fixed;
@@ -38,7 +38,7 @@ void test ()
   deallog.threshold_double(1.e-10);
 
   BlockSparsityPattern bsp(3,2);
-				   // set sizes
+  // set sizes
   bsp.block(0,0).reinit ( 2, 10, 7);
   bsp.block(0,1).reinit ( 2, 19, 8);
   bsp.block(1,0).reinit ( 7, 10, 6);
@@ -47,120 +47,119 @@ void test ()
   bsp.block(2,1).reinit (10, 19, 12);
   bsp.collect_sizes ();
 
-				   // add this pseudo-random sparsity
-				   // pattern:
-				   // 0   1    1 1 1    1 1 1    1 1 1 
-				   // 1    1 1 1    1 1 1    1 1 1    1
-				   // 2       1 1 1 1    1 1 1    1 1 1
-				   // 3   1 1 1    1 1 1 1    1 1 1    
-				   // 4   1    1 1 1    1 1 1 1    1 1 
-				   // 5    1 1 1    1 1 1    1 1 1 1   
-				   // 6    1    1 1 1    1 1 1    1 1 1
-				   // 7   1 1 1 1    1 1 1    1 1 1    
-				   // 8   1    1 1 1 1    1 1 1    1 1 
-				   // 9   11 1 1    1 1 1 1    1 1 1   
-				   // 1    1    1 1 1    1 1 1 1    1 1
-				   // 11    1 1 1    1 1 1    1 1 1 1  
-				   // 12  1 11   1 1 1    1 1 1    1 1 
-				   // 13   1 111 1    1 1 1    1 1 1   
-				   // 14   1   11 1 1 1    1 1 1    1 1
-				   // 15    1 1 1    1 1 1 1    1 1 1  
-				   // 16  1 1    1 1 1    1 1 1 1    1 
-				   // 17     1 1 11   1 1 1    1 1 1 1 
-				   // 18   1 1    111 1    1 1 1    1 1
+  // add this pseudo-random sparsity
+  // pattern:
+  // 0   1    1 1 1    1 1 1    1 1 1
+  // 1    1 1 1    1 1 1    1 1 1    1
+  // 2       1 1 1 1    1 1 1    1 1 1
+  // 3   1 1 1    1 1 1 1    1 1 1
+  // 4   1    1 1 1    1 1 1 1    1 1
+  // 5    1 1 1    1 1 1    1 1 1 1
+  // 6    1    1 1 1    1 1 1    1 1 1
+  // 7   1 1 1 1    1 1 1    1 1 1
+  // 8   1    1 1 1 1    1 1 1    1 1
+  // 9   11 1 1    1 1 1 1    1 1 1
+  // 1    1    1 1 1    1 1 1 1    1 1
+  // 11    1 1 1    1 1 1    1 1 1 1
+  // 12  1 11   1 1 1    1 1 1    1 1
+  // 13   1 111 1    1 1 1    1 1 1
+  // 14   1   11 1 1 1    1 1 1    1 1
+  // 15    1 1 1    1 1 1 1    1 1 1
+  // 16  1 1    1 1 1    1 1 1 1    1
+  // 17     1 1 11   1 1 1    1 1 1 1
+  // 18   1 1    111 1    1 1 1    1 1
   for (unsigned int row=0; row<19; ++row)
     for (unsigned int i=0; i<10; ++i)
       bsp.add (row, (row*5+i*9)%29);
   bsp.compress ();
 
-				   // now check whether the elements
-				   // we inserted are indeed those
-				   // that are in there. for now, we
-				   // only check their number, but
-				   // their places are checked later
-				   // with the matrix-vector
-				   // operations.
+  // now check whether the elements
+  // we inserted are indeed those
+  // that are in there. for now, we
+  // only check their number, but
+  // their places are checked later
+  // with the matrix-vector
+  // operations.
   unsigned int total_nonzero_elements = 0;
   for (unsigned int row=0; row<19; ++row)
     {
-				       // first count the number of
-				       // elements in each row
+      // first count the number of
+      // elements in each row
       std::vector<bool> t(29, false);
       for (unsigned int i=0; i<10; ++i)
-	t[(row*5+i*9)%29] = true;
-				       // if we are in the third block
-				       // row, then the first matrix
-				       // is square, so there may be
-				       // an additional element
+        t[(row*5+i*9)%29] = true;
+      // if we are in the third block
+      // row, then the first matrix
+      // is square, so there may be
+      // an additional element
       if (row>=9)
-	t[row-9] = true;
+        t[row-9] = true;
 
       deallog << "Row " << row << " sparsity:  ";
       for (unsigned int i=0; i<29; ++i)
-	deallog << t[i];
+        deallog << t[i];
       deallog << std::endl;
-      
+
       const unsigned int c=count(t.begin(), t.end(), true);
-      
-				       // now see how many elements
-				       // there really are:
+
+      // now see how many elements
+      // there really are:
       unsigned int ac=0;
       for (unsigned int col=0; col<2; ++col)
-	if (row<2)
-	  ac += bsp.block(0,col).row_length(row-0);
-	else
-	  if (row<9)
-	    ac += bsp.block(1,col).row_length(row-2);
-	  else
-	    ac += bsp.block(2,col).row_length(row-9);
+        if (row<2)
+          ac += bsp.block(0,col).row_length(row-0);
+        else if (row<9)
+          ac += bsp.block(1,col).row_length(row-2);
+        else
+          ac += bsp.block(2,col).row_length(row-9);
       deallog << "Row=" << row
-	      << ": expected length=" << c
-	      << ", actual length=" << ac
-	      << std::endl;
+              << ": expected length=" << c
+              << ", actual length=" << ac
+              << std::endl;
       total_nonzero_elements += ac;
       AssertThrow (c==ac, ExcInternalError());
     };
   deallog << total_nonzero_elements << "=="
-	  << bsp.n_nonzero_elements()
-	  << std::endl;
+          << bsp.n_nonzero_elements()
+          << std::endl;
   AssertThrow (total_nonzero_elements == bsp.n_nonzero_elements(),
-	       ExcInternalError());
+               ExcInternalError());
 
 
 
-  
-				   // now make a matrix with this
-				   // sparsity pattern
+
+  // now make a matrix with this
+  // sparsity pattern
   BlockSparseMatrix<double> bsm (bsp);
   deallog << total_nonzero_elements << "=="
-	  << bsm.n_nonzero_elements()
-	  << std::endl;
+          << bsm.n_nonzero_elements()
+          << std::endl;
   AssertThrow (total_nonzero_elements == bsm.n_nonzero_elements(),
-	       ExcInternalError());
-  
-				   // try to write something into it,
-				   // set entry (i,j) to i*j
+               ExcInternalError());
+
+  // try to write something into it,
+  // set entry (i,j) to i*j
   for (unsigned int row=0; row<19; ++row)
     for (unsigned int i=0; i<10; ++i)
       bsm.set (row, (row*5+i*9)%29, row*((row*5+i*9)%29));
-				   // and add .5 to each value
+  // and add .5 to each value
   for (unsigned int row=0; row<19; ++row)
     for (unsigned int i=0; i<10; ++i)
       bsm.add (row, (row*5+i*9)%29, 0.5);
 
 
-				   // Check the iterator
+  // Check the iterator
   deallog.push("Iterator");
   BlockSparseMatrix<double>::const_iterator iter = bsm.begin();
   const BlockSparseMatrix<double>::const_iterator end_iter = bsm.end();
-  for (;iter != end_iter;++iter)
+  for (; iter != end_iter; ++iter)
     deallog << iter->row() << '\t' << iter->column()
-	    << '\t' << iter->value() << std::endl;
+            << '\t' << iter->value() << std::endl;
   deallog.pop();
-  
-				   // now allocate two block vectors
-				   // and see what we can get after
-				   // vmults:
+
+  // now allocate two block vectors
+  // and see what we can get after
+  // vmults:
   BlockVector<double> src;
   std::vector<types::global_dof_index> src_sizes (2);
   src_sizes[0] = 10;
@@ -178,30 +177,30 @@ void test ()
     src(i) = i;
 
   bsm.vmult (dst, src);
-				   // now check what came out
+  // now check what came out
   for (unsigned int row=0; row<19; ++row)
     {
       std::vector<double> t(29, 0.);
-				       // first check which elements
-				       // in this row exist
+      // first check which elements
+      // in this row exist
       for (unsigned int i=0; i<10; ++i)
-	t[(row*5+i*9)%29] = row*((row*5+i*9)%29);
-      
-      for (unsigned int i=0; i<10; ++i)
-	t[(row*5+i*9)%29] += 0.5;
+        t[(row*5+i*9)%29] = row*((row*5+i*9)%29);
 
-				       // compute the exact result
+      for (unsigned int i=0; i<10; ++i)
+        t[(row*5+i*9)%29] += 0.5;
+
+      // compute the exact result
       double row_sum = 0;
       for (unsigned int i=0; i<29; ++i)
-	row_sum += t[i]*i;
+        row_sum += t[i]*i;
 
-				       // compare to vmult result
+      // compare to vmult result
       Assert (row_sum == dst(row), ExcInternalError());
       deallog << "vmult " << row << ' ' << row_sum << ' ' << dst(row) << std::endl;
     };
 
 
-				   // test matrix_scalar_product. note that dst=M*src
+  // test matrix_scalar_product. note that dst=M*src
   const double msp1 = dst.norm_sqr ();
   const double msp2 = bsm.matrix_scalar_product (dst, src);
   Assert (msp1 == msp2, ExcInternalError());
@@ -220,28 +219,28 @@ int main ()
   catch (std::exception &e)
     {
       std::cerr << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      // abort
       return 2;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      // abort
       return 3;
     };
-  
-  
+
+
   return 0;
 }

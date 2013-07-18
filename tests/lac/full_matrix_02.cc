@@ -51,14 +51,14 @@ main ()
   FullMatrix<double> Z(3,3,entries_Z);
   FullMatrix<double> C(3,3);
   FullMatrix<double> D(3,3);
- 
+
   //compute C= A*B^T in two different ways and compare for equality
   Z.Tadd(1.,B);
   A.mmult(D,Z);
   A.mTmult(C,B);
-  
+
   D.add(-1,C);
   Assert ( D.frobenius_norm() < 1e-15,
            ExcInternalError());
   deallog << "OK" << std::endl;
-}    
+}

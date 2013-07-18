@@ -175,7 +175,7 @@ namespace Step50
   {
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs (fe);
-    
+
     deallog << "Number of degrees of freedom: "
             << mg_dof_handler.n_dofs();
 
@@ -226,14 +226,14 @@ namespace Step50
         MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
 
         mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
-            mg_dof_handler.locally_owned_mg_dofs(level),
-            csp,
-            MPI_COMM_WORLD, true);
+                                  mg_dof_handler.locally_owned_mg_dofs(level),
+                                  csp,
+                                  MPI_COMM_WORLD, true);
 
         mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
-            mg_dof_handler.locally_owned_mg_dofs(level),
-            csp,
-            MPI_COMM_WORLD, true);
+                                            mg_dof_handler.locally_owned_mg_dofs(level),
+                                            csp,
+                                            MPI_COMM_WORLD, true);
       }
   }
 
@@ -353,7 +353,7 @@ namespace Step50
                                      fe_values.JxW(q_point));
 
           cell->get_mg_dof_indices (local_dof_indices);
-	  
+
           boundary_constraints[cell->level()]
           .distribute_local_to_global (cell_matrix,
                                        local_dof_indices,
@@ -371,7 +371,7 @@ namespace Step50
                                        mg_interface_matrices[cell->level()]);
         }
 
-    for (unsigned int i=0;i<triangulation.n_global_levels();++i)
+    for (unsigned int i=0; i<triangulation.n_global_levels(); ++i)
       {
         mg_matrices[i].compress(VectorOperation::add);
         mg_interface_matrices[i].compress(VectorOperation::add);
@@ -463,16 +463,16 @@ namespace Step50
           }
         else
           triangulation.refine_global (1);
-          //refine_grid ();
+        //refine_grid ();
 
 
         deallog << "   Number of active cells:       "
                 << triangulation.n_global_active_cells()
                 << std::endl;
 
-	MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
         setup_system ();
-	MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
 
         deallog << "   Number of degrees of freedom: "
                 << mg_dof_handler.n_dofs()
@@ -483,11 +483,11 @@ namespace Step50
                       ? ")" : ", ");
         deallog << std::endl;
 
-	MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
         assemble_system ();
-	MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
         assemble_multigrid ();
-	MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
         solve ();
       }
   }

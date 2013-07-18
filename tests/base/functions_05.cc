@@ -25,16 +25,16 @@ template <int dim>
 void check1 ()
 {
   ScalarFunctionFromFunctionObject<dim>
-    object (&Point<dim>::norm);
+  object (&Point<dim>::norm);
 
   for (unsigned int i=0; i<10; ++i)
     {
       Point<dim> p;
       for (unsigned int d=0; d<dim; ++d)
-	p[d] = i+d;
+        p[d] = i+d;
 
       Assert (object.value(p) == p.norm(),
-	      ExcInternalError());
+              ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -49,18 +49,18 @@ void check2 ()
     q[d] = d;
 
   ScalarFunctionFromFunctionObject<dim>
-    object (std_cxx1x::bind (&Point<dim>::distance,
-			     q,
-			     std_cxx1x::_1));
+  object (std_cxx1x::bind (&Point<dim>::distance,
+                           q,
+                           std_cxx1x::_1));
 
   for (unsigned int i=0; i<10; ++i)
     {
       Point<dim> p;
       for (unsigned int d=0; d<dim; ++d)
-	p[d] = i+d;
+        p[d] = i+d;
 
       Assert (object.value(p) == q.distance (p),
-	      ExcInternalError());
+              ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

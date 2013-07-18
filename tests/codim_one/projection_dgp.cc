@@ -51,7 +51,8 @@ std::ofstream logfile("projection_dgp/output");
 
 
 template <int dim, int spacedim>
-void test(std::string filename, unsigned int n) {
+void test(std::string filename, unsigned int n)
+{
 
   Triangulation<dim, spacedim> triangulation;
   GridIn<dim, spacedim> gi;
@@ -64,7 +65,7 @@ void test(std::string filename, unsigned int n) {
   DoFHandler<dim,spacedim> dof_handler (triangulation);
 
   dof_handler.distribute_dofs (fe);
-  
+
   // Now we interpolate the constant function on the mesh, and check
   // that this is consistent with what we expect.
   Vector<double> interpolated_one(dof_handler.n_dofs());
@@ -75,7 +76,7 @@ void test(std::string filename, unsigned int n) {
   ConstraintMatrix constraints;
   constraints.close();
   VectorTools::project(dof_handler, constraints, quad, cosine, interpolated_one);
- 
+
   DataOut<dim, DoFHandler<dim,spacedim> > dataout;
   dataout.attach_dof_handler(dof_handler);
   dataout.add_data_vector(interpolated_one, "numbering");
@@ -85,18 +86,18 @@ void test(std::string filename, unsigned int n) {
 
 
 
-int main () 
+int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   for (unsigned int n=1; n<5; n++)
     {
       deallog << "Test<1,2>, continous finite element q_" << n << std::endl;
       test<1,2>("grids/circle_2.inp",n);
-      
-     deallog << "Test<2,3>, continous finite element q_" << n << std::endl;
-     test<2,3>("grids/sphere_2.inp",n);
+
+      deallog << "Test<2,3>, continous finite element q_" << n << std::endl;
+      test<2,3>("grids/sphere_2.inp",n);
     }
   return 0;
 }

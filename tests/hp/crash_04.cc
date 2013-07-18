@@ -55,14 +55,14 @@ int main ()
 {
   std::ofstream logfile("crash_04/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

@@ -68,9 +68,9 @@ void test()
   // owned range by 50 on each side
   IndexSet locally_relevant_range (vec.size());
   locally_relevant_range.add_range (std::max<int> (100*myid-50, 0),
-				    std::min (static_cast<types::global_dof_index>(100*myid+150), vec.block(0).size()));
+                                    std::min (static_cast<types::global_dof_index>(100*myid+150), vec.block(0).size()));
   locally_relevant_range.add_range (vec.block(0).size()+std::max<int> (100*myid-50, 0),
-				    vec.block(0).size()+std::min (static_cast<types::global_dof_index>(100*myid+150), vec.block(0).size()));
+                                    vec.block(0).size()+std::min (static_cast<types::global_dof_index>(100*myid+150), vec.block(0).size()));
   ConstraintMatrix cm (locally_relevant_range);
 
   // add constraints that constrain an element in the middle of the
@@ -83,28 +83,28 @@ void test()
   for (unsigned int p=0; p<n_processes; ++p)
     {
       if ((p != 0) && locally_relevant_range.is_element (p*100+10))
-	{
-	  cm.add_line (p*100+10);
-	  cm.add_entry (p*100+10,
-			p*100-25,
-			1);
-	  cm.add_line (vec.block(0).size()+p*100+10);
-	  cm.add_entry (vec.block(0).size()+p*100+10,
-			vec.block(0).size()+p*100-25,
-			1);
-	}
+        {
+          cm.add_line (p*100+10);
+          cm.add_entry (p*100+10,
+                        p*100-25,
+                        1);
+          cm.add_line (vec.block(0).size()+p*100+10);
+          cm.add_entry (vec.block(0).size()+p*100+10,
+                        vec.block(0).size()+p*100-25,
+                        1);
+        }
 
       if ((p != n_processes-1) && locally_relevant_range.is_element (p*100+90))
-	{
-	  cm.add_line (p*100+90);
-	  cm.add_entry (p*100+90,
-			p*100+105,
-			1);
-	  cm.add_line (vec.block(0).size()+p*100+90);
-	  cm.add_entry (vec.block(0).size()+p*100+90,
-			vec.block(0).size()+p*100+105,
-			1);
-	}
+        {
+          cm.add_line (p*100+90);
+          cm.add_entry (p*100+90,
+                        p*100+105,
+                        1);
+          cm.add_line (vec.block(0).size()+p*100+90);
+          cm.add_entry (vec.block(0).size()+p*100+90,
+                        vec.block(0).size()+p*100+105,
+                        1);
+        }
     }
   cm.close ();
 
@@ -114,40 +114,40 @@ void test()
   // verify correctness
   if (myid != 0)
     Assert (vec(vec.block(0).local_range().first+10) == vec.block(0).local_range().first-25,
-	    ExcInternalError());
+            ExcInternalError());
 
   if (myid != n_processes-1)
     Assert (vec(vec.block(0).local_range().first+90) == vec.block(0).local_range().first+105,
-	    ExcInternalError());
+            ExcInternalError());
 
   if (myid != 0)
     Assert (vec(vec.block(0).size()+vec.block(1).local_range().first+10) == vec.block(1).local_range().first-25,
-	    ExcInternalError());
+            ExcInternalError());
 
   if (myid != n_processes-1)
     Assert (vec(vec.block(0).size()+vec.block(1).local_range().first+90) == vec.block(1).local_range().first+105,
-	    ExcInternalError());
+            ExcInternalError());
 
-  
+
   for (unsigned int i=vec.block(0).local_range().first; i<vec.block(0).local_range().second; ++i)
     {
       if ((i != vec.block(0).local_range().first+10)
-	  &&
-	  (i != vec.block(0).local_range().first+90))
-	{
-	  double val = vec.block(0)(i);
-	  Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
-	}
+          &&
+          (i != vec.block(0).local_range().first+90))
+        {
+          double val = vec.block(0)(i);
+          Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
+        }
     }
   for (unsigned int i=vec.block(1).local_range().first; i<vec.block(1).local_range().second; ++i)
     {
       if ((i != vec.block(1).local_range().first+10)
-	  &&
-	  (i != vec.block(1).local_range().first+90))
-	{
-	  double val = vec.block(1)(i);
-	  Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
-	}
+          &&
+          (i != vec.block(1).local_range().first+90))
+        {
+          double val = vec.block(1)(i);
+          Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
+        }
     }
 
   {
@@ -160,10 +160,10 @@ void test()
     // but then correct for the constrained values
     for (unsigned int p=0; p<n_processes; ++p)
       {
-	if (p != 0)
-	  exact_l1 = exact_l1 - (p*100+10) + (p*100-25);
-	if (p != n_processes-1)
-	  exact_l1 = exact_l1 - (p*100+90) + (p*100+105);
+        if (p != 0)
+          exact_l1 = exact_l1 - (p*100+10) + (p*100-25);
+        if (p != n_processes-1)
+          exact_l1 = exact_l1 - (p*100+90) + (p*100+105);
       }
 
     const double l1_norm = vec.l1_norm();

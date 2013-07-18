@@ -41,22 +41,22 @@
 
 
 bool operator == (const BlockSparsityPattern &sp1,
-		  const BlockSparsityPattern &sp2)
+                  const BlockSparsityPattern &sp2)
 {
   if (sp1.n_block_rows() != sp2.n_block_rows())
     return false;
-  
+
   if (sp1.n_block_cols() != sp2.n_block_cols())
     return false;
-  
+
   for (unsigned int i=0; i<sp1.n_block_rows(); ++i)
     for (unsigned int j=0; j<sp1.n_block_cols(); ++j)
       if (!(sp1.block(i,j) == sp2.block(i,j)))
-	{
-	  Assert (false, ExcInternalError());
-	  return false;
-	}
-  
+        {
+          Assert (false, ExcInternalError());
+          return false;
+        }
+
   return true;
 }
 
@@ -67,7 +67,7 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -80,10 +80,10 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-				   // create a system element composed
-				   // of one Q1 and one Q2 element
+  // create a system element composed
+  // of one Q1 and one Q2 element
   FESystem<dim> element(FE_Q<dim>(1), 1,
-			FE_Q<dim>(2), 1);
+                        FE_Q<dim>(2), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
@@ -93,32 +93,32 @@ check ()
 
 
 //--------------- Regular sparsity pattern checks -----------------
-  
-				   // first way: directly
+
+  // first way: directly
   SparsityPattern sparsity_1 (dof.n_dofs(), dof.n_dofs());
   DoFTools::make_sparsity_pattern (dof, sparsity_1);
   constraints.condense (sparsity_1);
   sparsity_1.compress ();
 
-				   // second way: via direct elimination of
-				   // constraints
+  // second way: via direct elimination of
+  // constraints
   SparsityPattern sparsity_2;
   CompressedSetSparsityPattern csp_2 (dof.n_dofs());
   DoFTools::make_sparsity_pattern (dof, csp_2, constraints);
   sparsity_2.copy_from (csp_2);
 
 
-				   // the exact content of sparsity
-				   // patterns is checked in other
-				   // tests, so only make sure that
-				   // sparsity_[12] are equal
+  // the exact content of sparsity
+  // patterns is checked in other
+  // tests, so only make sure that
+  // sparsity_[12] are equal
   deallog << "Check 1:"
-	  << " -- "
-	  << (sparsity_1 == sparsity_2 ? "ok" : "failed")
-	  << std::endl;
+          << " -- "
+          << (sparsity_1 == sparsity_2 ? "ok" : "failed")
+          << std::endl;
 
 
-  
+
 //--------------- Block sparsity pattern checks -----------------
 
   const unsigned int n  = dof.n_dofs();
@@ -150,9 +150,9 @@ check ()
   sparsity_4.copy_from (csp_4);
 
   deallog << "Check 2:"
-	  << " -- "
-	  << (sparsity_3 == sparsity_4 ? "ok" : "failed")
-	  << std::endl;
+          << " -- "
+          << (sparsity_3 == sparsity_4 ? "ok" : "failed")
+          << std::endl;
 }
 
 
@@ -161,7 +161,7 @@ int main ()
 {
   std::ofstream logfile ("sparsity_pattern_05_x/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

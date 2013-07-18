@@ -32,7 +32,7 @@ void test (PETScWrappers::MatrixBase &m)
   Assert (m.m() != 0, ExcInternalError());
   Assert (m.n() != 0, ExcInternalError());
 
-                                   // build a tri-diagonal pattern
+  // build a tri-diagonal pattern
   double norm_sqr = 0;
   unsigned int nnz = 0;
   const unsigned int N = m.m();
@@ -45,7 +45,7 @@ void test (PETScWrappers::MatrixBase &m)
           norm_sqr += s*s;
           ++nnz;
         }
-      
+
       if (i<N-5)
         {
           const double s = rand();
@@ -53,14 +53,14 @@ void test (PETScWrappers::MatrixBase &m)
           norm_sqr += s*s;
           ++nnz;
         }
-      
+
       const double s = rand();
       m.add (i,i,s);
       norm_sqr += s*s;
       ++nnz;
     }
   m.compress ();
-  
+
   deallog << m.frobenius_norm() << ' ' << std::sqrt (norm_sqr)
           << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;
@@ -70,8 +70,8 @@ void test (PETScWrappers::MatrixBase &m)
           ExcInternalError());
   Assert (m.n_nonzero_elements()-nnz == 0, ExcInternalError());
 
-                                   // now remove the entries of row N/2. set
-                                   // diagonal entries to rnd
+  // now remove the entries of row N/2. set
+  // diagonal entries to rnd
   const double rnd = rand();
   for (unsigned int i=0; i<N; ++i)
     {
@@ -79,9 +79,9 @@ void test (PETScWrappers::MatrixBase &m)
       norm_sqr -= s*s;
     }
   norm_sqr += rnd*rnd;
-  
+
   m.clear_row (N/2, rnd);
-  
+
   deallog << m.frobenius_norm() << ' ' << std::sqrt (norm_sqr)
           << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;
@@ -90,17 +90,17 @@ void test (PETScWrappers::MatrixBase &m)
           < std::fabs (std::sqrt (norm_sqr)),
           ExcInternalError());
 
-                                   // make sure that zeroing out rows does at
-                                   // least not add new nonzero entries (it
-                                   // may remove some, though)
+  // make sure that zeroing out rows does at
+  // least not add new nonzero entries (it
+  // may remove some, though)
   Assert (m.n_nonzero_elements() <= nnz, ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("68/output");
   deallog.attach(logfile);
@@ -114,30 +114,30 @@ int main (int argc,char **argv)
         PETScWrappers::SparseMatrix v (14,14,3);
         test (v);
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

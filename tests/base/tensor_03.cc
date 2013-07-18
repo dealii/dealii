@@ -31,9 +31,9 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   double a[3] = {1, 2, 3};
-    
+
   const unsigned int dim=3;
   Tensor<1,dim> t(a);
 
@@ -42,6 +42,6 @@ int main ()
   deallog << t.norm() << std::endl;
 
   Assert (t.norm() == 0, ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }

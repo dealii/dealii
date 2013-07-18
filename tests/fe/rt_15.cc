@@ -55,12 +55,12 @@ test (const unsigned int degree)
   FE_RaviartThomas<dim> fe_rt(degree);
 
   deallog << "Degree=" << degree
-	  << std::endl;
-  
+          << std::endl;
+
   for (double h=1; h>1./128; h/=2)
-    {      
+    {
       deallog << "  h=" << h
-	      << std::endl;
+              << std::endl;
 
       Triangulation<dim> tr;
       GridGenerator::hyper_cube(tr, 0., h);
@@ -73,17 +73,17 @@ test (const unsigned int degree)
       FESubfaceValues<dim> fe_values (fe_rt, quadrature, update_gradients);
       fe_values.reinit (dof.begin_active(), 0, 0);
       for (unsigned int q=0; q<quadrature.size(); ++q)
-	{
-	  deallog << "    Quadrature point " << q << ": ";
-	  for (unsigned int i=0; i<fe_rt.dofs_per_cell; ++i)
-	    {
-	      deallog << '[';
-	      for (unsigned int c=0; c<fe_rt.n_components(); ++c)
-		deallog << fe_values.shape_grad_component(i,q,c) << ' ';
-	      deallog << ']';
-	    }
-	  deallog << std::endl;
-	}
+        {
+          deallog << "    Quadrature point " << q << ": ";
+          for (unsigned int i=0; i<fe_rt.dofs_per_cell; ++i)
+            {
+              deallog << '[';
+              for (unsigned int c=0; c<fe_rt.n_components(); ++c)
+                deallog << fe_values.shape_grad_component(i,q,c) << ' ';
+              deallog << ']';
+            }
+          deallog << std::endl;
+        }
     }
 }
 
@@ -92,14 +92,14 @@ int
 main()
 {
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   for (unsigned int i=0; i<4; ++i)
     test<2>(i);
-  
+
   return 0;
 }
 

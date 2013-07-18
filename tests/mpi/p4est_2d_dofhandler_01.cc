@@ -55,31 +55,31 @@ void test()
   static const FE_Q<dim> fe(2);
   dofh.distribute_dofs (fe);
 
-   if (myid==0)
-     {
-       deallog << "dofh.n_dofs() " << dofh.n_locally_owned_dofs_per_processor() << std::endl;
-       deallog << "dofh.n_locally_owned_dofs() " << dofh.n_locally_owned_dofs() << std::endl;
-     }
+  if (myid==0)
+    {
+      deallog << "dofh.n_dofs() " << dofh.n_locally_owned_dofs_per_processor() << std::endl;
+      deallog << "dofh.n_locally_owned_dofs() " << dofh.n_locally_owned_dofs() << std::endl;
+    }
 
-   typename
-     DoFHandler<dim>::active_cell_iterator cell
-     = dofh.begin_active();
+  typename
+  DoFHandler<dim>::active_cell_iterator cell
+    = dofh.begin_active();
 
-   const unsigned int dofs_per_cell = dofh.get_fe().dofs_per_cell;
-   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+  const unsigned int dofs_per_cell = dofh.get_fe().dofs_per_cell;
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
 
-   if (myid==0)
-     for (; cell != dofh.end(); ++cell)
-       if (!cell->is_artificial())
-	 {
-	   cell->get_dof_indices (local_dof_indices);
+  if (myid==0)
+    for (; cell != dofh.end(); ++cell)
+      if (!cell->is_artificial())
+        {
+          cell->get_dof_indices (local_dof_indices);
 
-	   for (unsigned int i=0;i<dofs_per_cell;++i)
-	     deallog << local_dof_indices[i] << " ";
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            deallog << local_dof_indices[i] << " ";
 
-	   deallog << std::endl;
-	 }
+          deallog << std::endl;
+        }
 
 }
 

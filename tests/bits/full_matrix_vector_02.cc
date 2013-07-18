@@ -32,18 +32,18 @@ void test (Vector<double> &v,
   FullMatrix<double> m(v.size(), v.size());
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
-        m(i,j) = ( i+2*j);
+      m(i,j) = ( i+2*j);
 
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
-  
+
   v.compress ();
   w.compress ();
 
-                                   // w:=Mv
+  // w:=Mv
   m.Tvmult (w,v);
 
-                                   // make sure we get the expected result
+  // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
       Assert (v(i) == i, ExcInternalError());
@@ -59,7 +59,7 @@ void test (Vector<double> &v,
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("full_matrix_vector_02/output");
   deallog.attach(logfile);
@@ -75,25 +75,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

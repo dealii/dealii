@@ -59,9 +59,9 @@ void test ()
   DoFTools::extract_locally_relevant_dofs (dof2,
                                            locally_relevant_dofs2);
 
-  parallel::distributed::Vector<double> 
-    v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD),
-    v2_interpolated(v2);
+  parallel::distributed::Vector<double>
+  v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD),
+  v2_interpolated(v2);
 
   // set first vector to 1
   VectorTools::interpolate(dof2, ConstantFunction<dim>(1.), v2);

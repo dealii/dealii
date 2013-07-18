@@ -45,13 +45,13 @@ int main ()
 
   Triangulation<dim,spacedim> boundary_mesh;
 
-				   /*****************************************************************/
-				   // Create Surface Mesh:  Boundary of hypercube without one face
+  /*****************************************************************/
+  // Create Surface Mesh:  Boundary of hypercube without one face
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
     Triangulation<spacedim>::active_cell_iterator
-      cell = volume_mesh.begin_active();
+    cell = volume_mesh.begin_active();
 
     cell->face(0)->set_all_boundary_indicators (1);
     std::set<types::boundary_id> boundary_ids;
@@ -62,27 +62,27 @@ int main ()
   boundary_mesh.execute_coarsening_and_refinement ();
 
   Triangulation<dim,spacedim>::active_cell_iterator
-    cell = boundary_mesh.begin_active();
+  cell = boundary_mesh.begin_active();
   for (; cell!=boundary_mesh.end(); ++cell)
     {
       deallog << "Cell = " << cell << std::endl;
       deallog << "  direction_flag = " << cell->direction_flag() << std::endl;
 
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	{
-	  deallog << "  face = " << face
-		  << "  (neighbor = " << cell->neighbor(face) << ")"
-		  << std::endl;
+        {
+          deallog << "  face = " << face
+                  << "  (neighbor = " << cell->neighbor(face) << ")"
+                  << std::endl;
 
-	  if (cell->face(face)->has_children())
-	    for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
-	      {
-		deallog << "    subface = " << c << std::endl;
-		deallog << "              "
-			<< cell->neighbor_child_on_subface(face, c)
-			<< std::endl;
-	      }
-	}
+          if (cell->face(face)->has_children())
+            for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
+              {
+                deallog << "    subface = " << c << std::endl;
+                deallog << "              "
+                        << cell->neighbor_child_on_subface(face, c)
+                        << std::endl;
+              }
+        }
     }
 
   return 0;

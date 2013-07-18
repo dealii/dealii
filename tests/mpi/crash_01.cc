@@ -42,8 +42,8 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-		   Triangulation<dim>::limit_level_difference_at_vertices);
+  triangulation (MPI_COMM_WORLD,
+                 Triangulation<dim>::limit_level_difference_at_vertices);
 
   FE_Q<dim> fe(1);
 
@@ -62,7 +62,7 @@ void test()
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  
+
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
     {

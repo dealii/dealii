@@ -30,8 +30,8 @@ void test ()
   v(0) = 1;
   v(1) = 2;
 
-                                   // first check reading through a const
-                                   // iterator
+  // first check reading through a const
+  // iterator
   {
     PETScWrappers::BlockVector::const_iterator i=v.begin();
     Assert (*i == 1, ExcInternalError());
@@ -39,17 +39,17 @@ void test ()
     Assert (*i == 2, ExcInternalError());
   }
 
-                                   // same, but create iterator in a different
-                                   // way
+  // same, but create iterator in a different
+  // way
   {
     PETScWrappers::BlockVector::const_iterator
-      i=const_cast<const PETScWrappers::BlockVector&>(v).begin();
+    i=const_cast<const PETScWrappers::BlockVector &>(v).begin();
     Assert (*i == 1, ExcInternalError());
     ++i;
     Assert (*i == 2, ExcInternalError());
   }
 
-                                   // read through a read-write iterator
+  // read through a read-write iterator
   {
     PETScWrappers::BlockVector::iterator i = v.begin();
     Assert (*i == 1, ExcInternalError());
@@ -57,23 +57,23 @@ void test ()
     Assert (*i == 2, ExcInternalError());
   }
 
-                                   // write through a read-write iterator
+  // write through a read-write iterator
   {
     PETScWrappers::BlockVector::iterator i = v.begin();
 
     *i = 2;
     ++i;
     *i = 3;
-  }  
+  }
 
-                                   // and read again
+  // and read again
   {
     PETScWrappers::BlockVector::iterator i = v.begin();
     Assert (*i == 2, ExcInternalError());
     ++i;
     Assert (*i == 3, ExcInternalError());
   }
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -92,30 +92,30 @@ int main (int argc,char **argv)
       {
         test ();
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

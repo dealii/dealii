@@ -38,8 +38,8 @@ template <int dim>
 void test ()
 {
   deallog << dim << "d:"
-	  << std::endl;
-  
+          << std::endl;
+
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
   tria.refine_global(2);
@@ -50,12 +50,12 @@ void test ()
 
       Vector<float> criteria (tria.n_active_cells());
       for (unsigned int i=0; i<tria.n_active_cells(); ++i)
-	criteria(i) = i;
+        criteria(i) = i;
 
       GridRefinement::refine_and_coarsen_fixed_fraction (tria,
-							 criteria,
-							 0.8, 0.03,
-							 10000);
+                                                         criteria,
+                                                         0.8, 0.03,
+                                                         10000);
       tria.execute_coarsening_and_refinement();
     }
 }

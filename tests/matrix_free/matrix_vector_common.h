@@ -49,7 +49,7 @@ helmholtz_operator (const MatrixFree<dim,Number>  &data,
   FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
-  for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
     {
       fe_eval.reinit (cell);
       fe_eval.read_dof_values (src);
@@ -69,7 +69,7 @@ helmholtz_operator (const MatrixFree<dim,Number>  &data,
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
- public:
+public:
   typedef VectorizedArray<Number> vector_t;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
@@ -80,11 +80,11 @@ class MatrixFreeTest
               const Vector<Number> &src) const
   {
     dst = 0;
-    const std_cxx1x::function<void(const MatrixFree<dim,Number>  &,
-                                   Vector<Number>       &,
+    const std_cxx1x::function<void(const MatrixFree<dim,Number> &,
+                                   Vector<Number> &,
                                    const Vector<Number> &,
-                                   const std::pair<unsigned int,unsigned int>&)>
-      wrap = helmholtz_operator<dim,fe_degree,Number>;
+                                   const std::pair<unsigned int,unsigned int> &)>
+    wrap = helmholtz_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
   };
 
@@ -98,7 +98,7 @@ private:
 
 template <int dim, int fe_degree, typename number>
 void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix&constraints,
+              const ConstraintMatrix &constraints,
               const unsigned int     parallel_option = 0)
 {
 
@@ -137,7 +137,7 @@ void do_test (const DoFHandler<dim> &dof,
 
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      if(constraints.is_constrained(i))
+      if (constraints.is_constrained(i))
         continue;
       const double entry = rand()/(double)RAND_MAX;
       in(i) = entry;
@@ -147,8 +147,8 @@ void do_test (const DoFHandler<dim> &dof,
   mf.vmult (out_dist, in_dist);
 
 
-                                // assemble sparse matrix with (\nabla v,
-                                // \nabla u) + (v, 10 * u)
+  // assemble sparse matrix with (\nabla v,
+  // \nabla u) + (v, 10 * u)
   SparsityPattern sparsity;
   {
     CompressedSimpleSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
@@ -170,8 +170,8 @@ void do_test (const DoFHandler<dim> &dof,
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof.begin_active(),
-      endc = dof.end();
+    cell = dof.begin_active(),
+    endc = dof.end();
     for (; cell!=endc; ++cell)
       {
         cell_matrix = 0;

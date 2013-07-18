@@ -35,8 +35,8 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-                                   // each processor owns 2 indices and all
-                                   // are ghosting element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting element 1 (the second)
   IndexSet local_owned(numproc*2);
   local_owned.add_range(myid*2,myid*2+2);
   IndexSet local_relevant(numproc*2);
@@ -45,7 +45,7 @@ void test ()
 
   parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
-                                     // set local values and check them
+  // set local values and check them
   v(myid*2)=myid*2.0;
   v(myid*2+1)=myid*2.0+1.0;
 
@@ -55,8 +55,8 @@ void test ()
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 
-                                // set ghost dof on remote process, no
-                                // compress called
+  // set ghost dof on remote process, no
+  // compress called
   if (myid > 0)
     v(1) = 7;
 
@@ -66,29 +66,29 @@ void test ()
   if (myid > 0)
     Assert (v(1) == 7.0, ExcInternalError());
 
-                                // reset to zero
+  // reset to zero
   v = 0;
 
   Assert(v(myid*2) == 0., ExcInternalError());
   Assert(v(myid*2+1) == 0., ExcInternalError());
 
-                                // check that everything remains zero also
-                                // after compress
+  // check that everything remains zero also
+  // after compress
   v.compress(VectorOperation::add);
 
   Assert(v(myid*2) == 0., ExcInternalError());
   Assert(v(myid*2+1) == 0., ExcInternalError());
 
-                                // set element 1 on owning process to
-                                // something nonzero
+  // set element 1 on owning process to
+  // something nonzero
   if (myid == 0)
     v(1) = 2.;
   if (myid > 0)
     Assert (v(1) == 0., ExcInternalError());
 
-                                // check that all processors get the correct
-                                // value again, and that it is erased by
-                                // operator=
+  // check that all processors get the correct
+  // value again, and that it is erased by
+  // operator=
   v.update_ghost_values();
 
   Assert (v(1) == 2.0, ExcInternalError());

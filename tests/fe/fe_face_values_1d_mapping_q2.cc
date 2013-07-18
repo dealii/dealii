@@ -46,21 +46,21 @@
 template<int dim>
 inline void
 plot_faces(Mapping<dim> &mapping,
-	   FiniteElement<dim> &fe,
-	   typename DoFHandler<dim>::cell_iterator &cell)
+           FiniteElement<dim> &fe,
+           typename DoFHandler<dim>::cell_iterator &cell)
 {
-				   // create a QGauss<0>(4), which should
-				   // still only have 1 quadrature point
+  // create a QGauss<0>(4), which should
+  // still only have 1 quadrature point
   QGauss<dim-1> q(4);
   Assert (q.size() == 1, ExcInternalError());
 
   FEFaceValues<dim> fe_values(mapping, fe, q,
-			      UpdateFlags(update_q_points
-					  | update_JxW_values
-					  | update_values
-					  | update_gradients
-					  | update_hessians
-					  | update_normal_vectors));
+                              UpdateFlags(update_q_points
+                                          | update_JxW_values
+                                          | update_values
+                                          | update_gradients
+                                          | update_hessians
+                                          | update_normal_vectors));
 
   for (unsigned int face_nr=0;
        face_nr < GeometryInfo<dim>::faces_per_cell;
@@ -69,18 +69,18 @@ plot_faces(Mapping<dim> &mapping,
       deallog << "Face=" << face_nr << std::endl;
       fe_values.reinit(cell, face_nr);
 
-				       // print some data on the location
+      // print some data on the location
       deallog << "x=" << fe_values.quadrature_point(0) << std::endl;
       deallog << "n=" << fe_values.normal_vector(0) << std::endl;
       deallog << "JxW=" << fe_values.JxW(0) << std::endl;
 
-				       // now print some data on the shape
-				       // functions
+      // now print some data on the shape
+      // functions
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	deallog << "shape_function " << i << ":" << std::endl
-		<< "  phi=" << fe_values.shape_value(i,0) << std::endl
-		<< "  grad phi=" << fe_values.shape_grad(i,0) << std::endl
-		<< "  grad^2 phi=" << fe_values.shape_hessian(i,0) << std::endl;
+        deallog << "shape_function " << i << ":" << std::endl
+                << "  phi=" << fe_values.shape_value(i,0) << std::endl
+                << "  grad phi=" << fe_values.shape_grad(i,0) << std::endl
+                << "  grad^2 phi=" << fe_values.shape_hessian(i,0) << std::endl;
 
       deallog << std::endl;
     }
@@ -91,58 +91,58 @@ plot_faces(Mapping<dim> &mapping,
 template<int dim>
 inline void
 plot_subfaces(Mapping<dim> &mapping,
-	      FiniteElement<dim> &fe,
-	      typename DoFHandler<dim>::cell_iterator &cell)
+              FiniteElement<dim> &fe,
+              typename DoFHandler<dim>::cell_iterator &cell)
 {
 
-				   // create a QGauss<0>(4), which should
-				   // still only have 1 quadrature point
+  // create a QGauss<0>(4), which should
+  // still only have 1 quadrature point
   QGauss<dim-1> q(4);
   Assert (q.size() == 1, ExcInternalError());
 
   FESubfaceValues<dim> fe_values(mapping, fe, q,
-				 UpdateFlags(update_q_points
-					     | update_JxW_values
-					     | update_values
-					     | update_gradients
-					     | update_hessians
-					     | update_normal_vectors));
+                                 UpdateFlags(update_q_points
+                                             | update_JxW_values
+                                             | update_values
+                                             | update_gradients
+                                             | update_hessians
+                                             | update_normal_vectors));
   for (unsigned int face_nr=0;
        face_nr < GeometryInfo<dim>::faces_per_cell;
        ++ face_nr)
     for (unsigned int sub_nr=0;
-	 sub_nr < GeometryInfo<dim>::max_children_per_face;
-	 ++ sub_nr)
+         sub_nr < GeometryInfo<dim>::max_children_per_face;
+         ++ sub_nr)
       {
-	deallog << "Face=" << face_nr
-		<< ", subface=" << sub_nr
-		<< std::endl;
-	
-	fe_values.reinit(cell, face_nr, sub_nr);
-	
-					 // print some data on the location
-	deallog << "x=" << fe_values.quadrature_point(0) << std::endl;
-	deallog << "n=" << fe_values.normal_vector(0) << std::endl;
-	deallog << "JxW=" << fe_values.JxW(0) << std::endl;
+        deallog << "Face=" << face_nr
+                << ", subface=" << sub_nr
+                << std::endl;
 
-					 // now print some data on the shape
-					 // functions
-	for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	  deallog << "shape_function " << i << ":" << std::endl
-		  << "  phi=" << fe_values.shape_value(i,0) << std::endl
-		  << "  grad phi=" << fe_values.shape_grad(i,0) << std::endl
-		  << "  grad^2 phi=" << fe_values.shape_hessian(i,0) << std::endl;
+        fe_values.reinit(cell, face_nr, sub_nr);
 
-	deallog << std::endl;
+        // print some data on the location
+        deallog << "x=" << fe_values.quadrature_point(0) << std::endl;
+        deallog << "n=" << fe_values.normal_vector(0) << std::endl;
+        deallog << "JxW=" << fe_values.JxW(0) << std::endl;
+
+        // now print some data on the shape
+        // functions
+        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+          deallog << "shape_function " << i << ":" << std::endl
+                  << "  phi=" << fe_values.shape_value(i,0) << std::endl
+                  << "  grad phi=" << fe_values.shape_grad(i,0) << std::endl
+                  << "  grad^2 phi=" << fe_values.shape_hessian(i,0) << std::endl;
+
+        deallog << std::endl;
       }
 }
 
-  
+
 template<int dim>
 void mapping_test()
 {
   deallog << "dim=" << dim << std::endl;
-  
+
   std::vector<Mapping<dim> *> mapping_ptr;
   std::vector<std::string> mapping_strings;
 
@@ -154,22 +154,22 @@ void mapping_test()
 
   FE_Q<dim> fe_q4(2);
   DoFHandler<dim> dof(tria);
-  dof.distribute_dofs(fe_q4);      
+  dof.distribute_dofs(fe_q4);
 
   typename DoFHandler<dim>::cell_iterator cell = dof.begin_active();
   {
     std::ostringstream ost;
     ost << "MappingFace" << dim << "d-"
-	<< mapping_name;
-    deallog << ost.str() << std::endl;	    
+        << mapping_name;
+    deallog << ost.str() << std::endl;
     plot_faces(mapping, fe_q4, cell);
   }
 
   {
     std::ostringstream ost;
     ost << "MappingSubface" << dim << "d-"
-	<< mapping_name;
-    deallog << ost.str() << std::endl;	    
+        << mapping_name;
+    deallog << ost.str() << std::endl;
     plot_subfaces(mapping, fe_q4, cell);
   }
 }
@@ -183,10 +183,10 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
-				   // ----------------------- 
-				   // Tests for dim=1
-				   // -----------------------
+
+  // -----------------------
+  // Tests for dim=1
+  // -----------------------
   mapping_test<1>();
 }
 

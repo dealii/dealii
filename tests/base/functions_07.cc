@@ -26,13 +26,13 @@
 template <int dim>
 class F : public Function<dim>
 {
-  public:
-    double laplacian (const Point<dim> &p,
-		      const unsigned int c) const
-      {
-	Assert (c == 0, ExcInternalError());
-	return p.norm();
-      }
+public:
+  double laplacian (const Point<dim> &p,
+                    const unsigned int c) const
+  {
+    Assert (c == 0, ExcInternalError());
+    return p.norm();
+  }
 };
 
 
@@ -44,7 +44,7 @@ void check ()
     {
       Point<dim> p;
       for (unsigned int d=0; d<dim; ++d)
-	p[d] = d;
+        p[d] = d;
       points.push_back (p);
     }
 
@@ -54,7 +54,7 @@ void check ()
 
   for (unsigned int i=0; i<10; ++i)
     Assert (points[i].norm() == laplacians[i],
-	    ExcInternalError());
+            ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

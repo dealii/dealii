@@ -41,23 +41,23 @@
 template <int dim>
 class F : public Function<dim>
 {
-  public:
-    F() : Function<dim>(2) {}
+public:
+  F() : Function<dim>(2) {}
 
-    virtual void vector_value (const Point<dim> &p,
-			       Vector<double> &v) const
-      {
-	v[0] = p[0];
-	v[1] = 0;
-      }
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<double> &v) const
+  {
+    v[0] = p[0];
+    v[1] = 0;
+  }
 
-    virtual void vector_gradient (const Point<dim> &p,
-				  std::vector<Tensor<1,dim> > &v) const
-      {
-	v[0] = 0;
-	v[1] = 0;
-	v[0][0] = 1;
-      }
+  virtual void vector_gradient (const Point<dim> &p,
+                                std::vector<Tensor<1,dim> > &v) const
+  {
+    v[0] = 0;
+    v[1] = 0;
+    v[0][0] = 1;
+  }
 };
 
 
@@ -76,51 +76,51 @@ void test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-				   // interpolate a quadratic function
-				   // into the space; this function
-				   // can be represented exactly, so
-				   // that we can compare again later
+  // interpolate a quadratic function
+  // into the space; this function
+  // can be represented exactly, so
+  // that we can compare again later
   Vector<double> solution(dof_handler.n_dofs());
   VectorTools::interpolate (dof_handler, F<dim>(), solution);
 
   Functions::FEFieldFunction<2> fe_function (dof_handler, solution);
 
-				   // add only one points but also set
-				   // the active cell to one that
-				   // doesn't contain the current
-				   // point.  the problem happens
-				   // because we walk over a bunch of
-				   // cells in the process of finding
-				   // all of these points and then
-				   // realize when we get to the one
-				   // at the end that the coordinates
-				   // for this point can't be found in
-				   // the cell we have touched last
-				   // (it's too far away from that
-				   // cell, and the inverse mapping
-				   // does not converge
+  // add only one points but also set
+  // the active cell to one that
+  // doesn't contain the current
+  // point.  the problem happens
+  // because we walk over a bunch of
+  // cells in the process of finding
+  // all of these points and then
+  // realize when we get to the one
+  // at the end that the coordinates
+  // for this point can't be found in
+  // the cell we have touched last
+  // (it's too far away from that
+  // cell, and the inverse mapping
+  // does not converge
   Point<dim> point(-0.27999999999999992, -0.62999999999999989);
   fe_function.set_active_cell (typename DoFHandler<dim>::active_cell_iterator
-			       (&triangulation,
-				1,
-				4,
-				&dof_handler));
+                               (&triangulation,
+                                1,
+                                4,
+                                &dof_handler));
 
   std::vector<Tensor<1,dim> > m(2);
   fe_function.vector_gradient (point, m);
 
   Assert (std::fabs(m[0][0] - 1)
-	  <
-	  1e-10 * std::fabs(m[0][0] + 1),
-	  ExcInternalError());
+          <
+          1e-10 * std::fabs(m[0][0] + 1),
+          ExcInternalError());
   Assert (std::fabs(m[0][1])
-	  <
-	  1e-10,
-	  ExcInternalError());
+          <
+          1e-10,
+          ExcInternalError());
   Assert (m[1].norm()
-	  <
-	  1e-10,
-	  ExcInternalError());
+          <
+          1e-10,
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

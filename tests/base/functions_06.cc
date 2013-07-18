@@ -26,7 +26,7 @@ template <int dim>
 void check1 ()
 {
   VectorFunctionFromScalarFunctionObject<dim>
-    object (&Point<dim>::norm, 1, 3);
+  object (&Point<dim>::norm, 1, 3);
 
   Assert (object.n_components == 3, ExcInternalError());
 
@@ -34,17 +34,17 @@ void check1 ()
     {
       Point<dim> p;
       for (unsigned int d=0; d<dim; ++d)
-	p[d] = i+d;
+        p[d] = i+d;
 
       for (unsigned int c=0; c<3; ++c)
-	Assert (object.value(p,c) == (c==1 ? p.norm() : 0),
-		ExcInternalError());
+        Assert (object.value(p,c) == (c==1 ? p.norm() : 0),
+                ExcInternalError());
 
       Vector<double> v(3);
       object.vector_value (p, v);
       for (unsigned int c=0; c<3; ++c)
-	Assert (v(c) == (c==1 ? p.norm() : 0),
-		ExcInternalError());
+        Assert (v(c) == (c==1 ? p.norm() : 0),
+                ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -59,18 +59,18 @@ void check2 ()
     q[d] = d;
 
   ScalarFunctionFromFunctionObject<dim>
-    object (std_cxx1x::bind (&Point<dim>::distance,
-			     q,
-			     std_cxx1x::_1));
+  object (std_cxx1x::bind (&Point<dim>::distance,
+                           q,
+                           std_cxx1x::_1));
 
   for (unsigned int i=0; i<10; ++i)
     {
       Point<dim> p;
       for (unsigned int d=0; d<dim; ++d)
-	p[d] = i+d;
+        p[d] = i+d;
 
       Assert (object.value(p) == q.distance (p),
-	      ExcInternalError());
+              ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

@@ -42,7 +42,7 @@ template<int dim>
 void check (double r1, double r2, unsigned int n)
 {
   deallog << "dim=" << dim << std::endl;
-  
+
   Point<dim> center;
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridGenerator::hyper_shell (tria, center, r1, r2, n, true);
@@ -52,20 +52,20 @@ void check (double r1, double r2, unsigned int n)
   for (unsigned int i=0; i<2; ++i)
     {
       try
-	{
-	  tria.refine_global(1);
-	}
+        {
+          tria.refine_global(1);
+        }
       catch (typename Triangulation<dim>::DistortedCellList &dcv)
-	{
-	  deallog << "Found " << dcv.distorted_cells.size()
-		  << " distorted cells" << std::endl;
+        {
+          deallog << "Found " << dcv.distorted_cells.size()
+                  << " distorted cells" << std::endl;
 
-	  typename Triangulation<dim>::DistortedCellList
-	    subset = GridTools::fix_up_distorted_child_cells (dcv,
-							      tria);
-	  deallog << subset.distorted_cells.size()
-		  << " distorted cells remaining" << std::endl;
-	}
+          typename Triangulation<dim>::DistortedCellList
+          subset = GridTools::fix_up_distorted_child_cells (dcv,
+                                                            tria);
+          deallog << subset.distorted_cells.size()
+                  << " distorted cells remaining" << std::endl;
+        }
     }
 
   GridOut grid_out;
@@ -82,7 +82,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   check<2> (4., 5., 10);
   check<3> (3., 5., 6);
 }

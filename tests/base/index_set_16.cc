@@ -34,28 +34,28 @@ void test ()
 
   is1.add_range(0,10);
   is1.add_range(20,100);
-  
+
   is2.add_range(0,50);
 //  is2.add_range(10,15);
-  
+
   IndexSet is3 = is1;
   is3.subtract_set(is2);
-  
+
   is1.print(deallog);
   is2.print(deallog);
-  is3.print(deallog);  
-  
+  is3.print(deallog);
+
   for (unsigned int i=0; i<is3.size(); ++i)
     {
       Assert ((is1.is_element(i) && !is2.is_element(i))
-	      ==
-	      is3.is_element(i),
-	      ExcInternalError());
+              ==
+              is3.is_element(i),
+              ExcInternalError());
     }
 
   deallog << is3.index_within_set(51) << std::endl;
   Assert(is3.index_within_set(51)==1, ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 

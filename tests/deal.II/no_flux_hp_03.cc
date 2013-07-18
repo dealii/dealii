@@ -34,18 +34,18 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-		      const hp::FECollection<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   deallog << "FE=" << fe[0].get_name()
-	  << std::endl;
+          << std::endl;
 
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert (0);
-      
+
   ConstraintMatrix cm;
   VectorTools::compute_no_normal_flux_constraints (dof, 0, boundary_ids, cm);
 
@@ -62,7 +62,7 @@ void test_hyper_sphere()
 
   static const HyperBallBoundary<dim> boundary;
   tr.set_boundary (0, boundary);
-  
+
   tr.refine_global(2);
 
   for (unsigned int degree=1; degree<4; ++degree)

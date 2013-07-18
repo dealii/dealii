@@ -41,7 +41,7 @@ std::ofstream logfile("face_orientations_3d/output");
 void test (const char *filename)
 {
   deallog << "Reading " << filename << std::endl;
-  
+
   Triangulation<3> tria;
   GridIn<3> gi;
   gi.attach_triangulation (tria);
@@ -59,13 +59,13 @@ void test (const char *filename)
         {
           ++misoriented_faces;
 
-                                           // check that the face is
-                                           // correctly oriented from
-                                           // the other side at
-                                           // least. note that if this
-                                           // face is misoriented,
-                                           // then there must be a
-                                           // neighbor over there
+          // check that the face is
+          // correctly oriented from
+          // the other side at
+          // least. note that if this
+          // face is misoriented,
+          // then there must be a
+          // neighbor over there
           Assert (cell->neighbor(f)
                   ->face_orientation(cell->neighbor_of_neighbor(f))
                   == true,

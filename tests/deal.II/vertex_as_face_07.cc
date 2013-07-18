@@ -36,8 +36,8 @@
 
 template <int spacedim>
 void print_dofs (const typename hp::DoFHandler<1,spacedim>::face_iterator &i,
-		 const unsigned int fe_index,
-		 const unsigned int n)
+                 const unsigned int fe_index,
+                 const unsigned int n)
 {
   std::vector<types::global_dof_index> dof_indices (n);
   i->get_dof_indices (dof_indices, fe_index);
@@ -50,7 +50,7 @@ void print_dofs (const typename hp::DoFHandler<1,spacedim>::face_iterator &i,
 
 template <int spacedim>
 void print_dofs (const typename hp::DoFHandler<1,spacedim>::cell_iterator &i,
-		 const unsigned int n)
+                 const unsigned int n)
 {
   std::vector<types::global_dof_index> dof_indices (n);
   i->get_dof_indices (dof_indices);
@@ -68,9 +68,9 @@ void test ()
   GridGenerator::hyper_cube (tria);
 
   FESystem<1,spacedim> fe1(FE_Q<1,spacedim>(2),1,
-			   FE_Q<1,spacedim>(1),1);
+                           FE_Q<1,spacedim>(1),1);
   FESystem<1,spacedim> fe2(FE_Q<1,spacedim>(3),1,
-			   FE_Q<1,spacedim>(2),1);
+                           FE_Q<1,spacedim>(2),1);
   hp::FECollection<1,spacedim> fe_collection;
   fe_collection.push_back (fe1);
   fe_collection.push_back (fe2);
@@ -87,28 +87,28 @@ void test ()
   {
     unsigned int index = 0;
     for (typename hp::DoFHandler<1,spacedim>::active_cell_iterator
-	   cell = dof_handler.begin_active();
-	 cell != dof_handler.end(); ++cell, index = (index + 1) % fe_collection.size())
+         cell = dof_handler.begin_active();
+         cell != dof_handler.end(); ++cell, index = (index + 1) % fe_collection.size())
       cell->set_active_fe_index (index);
   }
   dof_handler.distribute_dofs (fe_collection);
 
   for (typename hp::DoFHandler<1,spacedim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     {
       deallog << "Cell: " << cell
-	      << ", active_fe_index=" << cell->active_fe_index()
-	      << std::endl;
+              << ", active_fe_index=" << cell->active_fe_index()
+              << std::endl;
 
       print_dofs<spacedim> (cell,
-			    cell->get_fe().dofs_per_cell);
+                            cell->get_fe().dofs_per_cell);
       print_dofs<spacedim> (cell->face(0),
-			    cell->active_fe_index(),
-			    cell->get_fe().dofs_per_face);
+                            cell->active_fe_index(),
+                            cell->get_fe().dofs_per_face);
       print_dofs<spacedim> (cell->face(1),
-			    cell->active_fe_index(),
-			    cell->get_fe().dofs_per_face);
+                            cell->active_fe_index(),
+                            cell->get_fe().dofs_per_face);
     }
 }
 

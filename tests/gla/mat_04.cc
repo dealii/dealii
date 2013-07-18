@@ -44,7 +44,7 @@ void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-  
+
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
 
@@ -52,18 +52,18 @@ void test ()
   cm.close();
 
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-                     typename Triangulation<dim>::MeshSmoothing
-                     (Triangulation<dim>::smoothing_on_refinement |
-                      Triangulation<dim>::smoothing_on_coarsening));
+  triangulation (MPI_COMM_WORLD,
+                 typename Triangulation<dim>::MeshSmoothing
+                 (Triangulation<dim>::smoothing_on_refinement |
+                  Triangulation<dim>::smoothing_on_coarsening));
   const double R0      = 6371000.-2890000;
   const double R1      = 6371000.-  35000.;
   GridGenerator::hyper_shell (triangulation,
-                                  Point<dim>(),
-                                  R0,
-                                  R1,
-                                  (dim==3) ? 96 : 12,
-                                  true);
+                              Point<dim>(),
+                              R0,
+                              R1,
+                              (dim==3) ? 96 : 12,
+                              true);
 
   FE_Q<dim>                                 temperature_fe(1);
 
@@ -77,20 +77,20 @@ void test ()
   CompressedSimpleSparsityPattern sp (relevant);
   typename LA::MPI::SparseMatrix matrix;
   DoFTools::make_sparsity_pattern (dof_handler, sp,
-                                       cm, false,
-                                       Utilities::MPI::
-                                       this_mpi_process(MPI_COMM_WORLD));
+                                   cm, false,
+                                   Utilities::MPI::
+                                   this_mpi_process(MPI_COMM_WORLD));
   SparsityTools::distribute_sparsity_pattern(sp,
-      dof_handler.n_locally_owned_dofs_per_processor(),
-      MPI_COMM_WORLD, relevant);
+                                             dof_handler.n_locally_owned_dofs_per_processor(),
+                                             MPI_COMM_WORLD, relevant);
   sp.compress();
   matrix.reinit (owned, owned, sp, MPI_COMM_WORLD);
 
 
   matrix.print(deallog.get_file_stream());
-  
 
-				   // done
+
+  // done
   if (myid==0)
     deallog << "OK" << std::endl;
 }
@@ -101,10 +101,10 @@ template <int dim>
 void test_trilinos_alternative ()
 {
   typedef LA_Trilinos LA;
-   
+
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-  
+
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
 
@@ -112,18 +112,18 @@ void test_trilinos_alternative ()
   cm.close();
 
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-                     typename Triangulation<dim>::MeshSmoothing
-                     (Triangulation<dim>::smoothing_on_refinement |
-                      Triangulation<dim>::smoothing_on_coarsening));
+  triangulation (MPI_COMM_WORLD,
+                 typename Triangulation<dim>::MeshSmoothing
+                 (Triangulation<dim>::smoothing_on_refinement |
+                  Triangulation<dim>::smoothing_on_coarsening));
   const double R0      = 6371000.-2890000;
   const double R1      = 6371000.-  35000.;
   GridGenerator::hyper_shell (triangulation,
-                                  Point<dim>(),
-                                  R0,
-                                  R1,
-                                  (dim==3) ? 96 : 12,
-                                  true);
+                              Point<dim>(),
+                              R0,
+                              R1,
+                              (dim==3) ? 96 : 12,
+                              true);
 
   FE_Q<dim>                                 temperature_fe(1);
 
@@ -137,15 +137,15 @@ void test_trilinos_alternative ()
   TrilinosWrappers::SparsityPattern sp (owned, MPI_COMM_WORLD);
   typename LA::MPI::SparseMatrix matrix;
   DoFTools::make_sparsity_pattern (dof_handler, sp,
-                                       cm, false,
-                                       Utilities::MPI::
-                                       this_mpi_process(MPI_COMM_WORLD));
+                                   cm, false,
+                                   Utilities::MPI::
+                                   this_mpi_process(MPI_COMM_WORLD));
   sp.compress();
   matrix.reinit (sp);
 
   matrix.print(deallog.get_file_stream());
 
-				   // done
+  // done
   if (myid==0)
     deallog << "OK" << std::endl;
 }
@@ -155,20 +155,21 @@ int main (int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll log(__FILE__);
 
-  {	
+  {
     deallog.push("PETSc");
     test<LA_PETSc,2>();
-    deallog.pop();	
+    deallog.pop();
     deallog.push("Trilinos");
     test<LA_Trilinos,2>();
-    deallog.pop();	
+    deallog.pop();
     deallog.push("Trilinos_alt");
     test_trilinos_alternative<2>();
-    deallog.pop();  }
-  
+    deallog.pop();
+  }
+
   // compile, don't run
   //if (myid==9999)
-    //  test<LA_Dummy>();
-  
+  //  test<LA_Dummy>();
+
 
 }

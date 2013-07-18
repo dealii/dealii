@@ -381,7 +381,7 @@ namespace Step48
 
 
 
-int main (int argc, char ** argv)
+int main (int argc, char **argv)
 {
   Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 

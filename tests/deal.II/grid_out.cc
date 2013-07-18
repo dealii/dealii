@@ -34,7 +34,7 @@ std::ofstream logfile("grid_out/output");
 
 template <int dim>
 void test ()
-{  
+{
   Triangulation<dim> tria;
   static const HyperBallBoundary<dim> x;
   if (dim == 2)
@@ -45,10 +45,10 @@ void test ()
   else
     GridGenerator::hyper_cube (tria);
   tria.refine_global(1);
-  
+
   GridOut grid_out;
   GridOutFlags::Eps<2> eps2(GridOutFlags::EpsFlagsBase::width,
-			    300, .5, false, 5, true);
+                            300, .5, false, 5, true);
   grid_out.set_flags (eps2);
 
   if (dim != 1)

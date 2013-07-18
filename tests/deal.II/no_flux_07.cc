@@ -45,8 +45,8 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-		      const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -66,9 +66,9 @@ void test_hyper_cube()
 {
   Triangulation<dim> tr;
 
-				   // create a hypercube, then shear
-				   // its top surface to make the
-				   // result non-square
+  // create a hypercube, then shear
+  // its top surface to make the
+  // result non-square
   GridGenerator::hyper_cube(tr);
   Point<dim> shift;
   for (unsigned int i=GeometryInfo<dim>::vertices_per_cell/2;

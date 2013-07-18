@@ -28,9 +28,9 @@
 #include <fstream>
 #include <iomanip>
 
-    
 
-int main () 
+
+int main ()
 {
   std::ofstream logfile("cylinder_shell_01/output");
   deallog.attach(logfile);
@@ -38,12 +38,12 @@ int main ()
   deallog.threshold_double(1.e-10);
   deallog << std::setprecision (2);
 
-                                   // generate a hyperball in 3d
+  // generate a hyperball in 3d
   Triangulation<3> tria;
   GridGenerator::cylinder_shell (tria, 1, .8, 1);
 
-                                   // make sure that all cells have positive
-                                   // volume
+  // make sure that all cells have positive
+  // volume
   for (Triangulation<3>::active_cell_iterator cell=tria.begin_active();
        cell!=tria.end(); ++cell)
     deallog << cell << ' ' << cell->measure () << std::endl;

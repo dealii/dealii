@@ -34,14 +34,14 @@
 
 template <int dim, int spacedim>
 void check(DataOutBase::GnuplotFlags flags,
-	   std::ostream& out)
+           std::ostream &out)
 {
   const unsigned int np = 4;
-  
+
   std::vector<DataOutBase::Patch<dim, spacedim> > patches(np);
-  
+
   create_patches(patches);
-  
+
   std::vector<std::string> names(5);
   names[0] = "x1";
   names[1] = "x2";
@@ -54,24 +54,24 @@ void check(DataOutBase::GnuplotFlags flags,
 
 
 template<int dim, int spacedim>
-void check_all(std::ostream& log)
+void check_all(std::ostream &log)
 {
 #if SEPARATE_FILES == 0
-  std::ostream& out = log;
+  std::ostream &out = log;
 #endif
-  
+
   char name[100];
-  const char* format = "data_out_base_gnuplot/%d%d.gnuplot";
+  const char *format = "data_out_base_gnuplot/%d%d.gnuplot";
   DataOutBase::GnuplotFlags flags;
-  for (unsigned int i=0;i<5;++i)
+  for (unsigned int i=0; i<5; ++i)
     {
       sprintf(name, format, dim, spacedim, "");
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else
-	out << "==============================\n"
-	    << name
-	    << "\n==============================\n";
+      out << "==============================\n"
+          << name
+          << "\n==============================\n";
 #endif
       check<dim,spacedim>(flags, out);
     }
@@ -84,5 +84,5 @@ int main()
   check_all<1,2>(logfile);
   check_all<2,2>(logfile);
   check_all<2,3>(logfile);
-  check_all<3,3>(logfile);  
+  check_all<3,3>(logfile);
 }

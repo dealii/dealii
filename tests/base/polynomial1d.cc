@@ -33,14 +33,14 @@
 using namespace Polynomials;
 
 
-double scalar_product (const Polynomial<double>& p1,
-		       const Polynomial<double>& p2)
+double scalar_product (const Polynomial<double> &p1,
+                       const Polynomial<double> &p2)
 {
   unsigned int degree = (p1.degree() + p2.degree())/2 + 1;
   QGauss<1> gauss(degree);
 
   double sum = 0.;
-  for (unsigned int i=0;i<gauss.size();++i)
+  for (unsigned int i=0; i<gauss.size(); ++i)
     {
       double x = gauss.point(i)(0);
       double P1 = p1.value(x);
@@ -59,7 +59,7 @@ void polynomial_arithmetic ()
   c1[2] = 5;
   c1[3] = 4;
   Polynomial<double> p1(c1);
-  
+
   std::vector<double> c2(3);
   c2[0] = .4;
   c2[1] = .7;
@@ -85,8 +85,8 @@ void polynomial_arithmetic ()
   std::cerr << "*P2" << std::endl;
   p2 *= p1;
   p2.print(std::cerr);
-  
-  for (unsigned int i=0;i<7;++i)
+
+  for (unsigned int i=0; i<7; ++i)
     {
       std::cerr << "derive" << std::endl;
       p1 = p1.derivative();
@@ -105,88 +105,88 @@ int main ()
   deallog.log_cerr();
 
   polynomial_arithmetic();
-  
+
   std::vector<Polynomial<double> > p;
   std::vector<Polynomial<double> > q;
 
   deallog << "Legendre" << std::endl;
-  
-  for (unsigned int i=0;i<12;++i)
+
+  for (unsigned int i=0; i<12; ++i)
     {
       p.push_back (Legendre(i));
     }
-  
-  
-  for (unsigned int i=0;i<p.size();++i)
-    for (unsigned int j=0;j<=i;++j)
+
+
+  for (unsigned int i=0; i<p.size(); ++i)
+    for (unsigned int j=0; j<=i; ++j)
       deallog << 'P' << i << " * P" << j
-	      << " = " << scalar_product(p[i], p[j]) << std::endl;
+              << " = " << scalar_product(p[i], p[j]) << std::endl;
 
 
   deallog << "LagrangeEquidistant" << std::endl;
-  
+
   p.clear();
-  for (unsigned int i=0;i<6;++i)
+  for (unsigned int i=0; i<6; ++i)
     {
       p.push_back(LagrangeEquidistant(6, i));
       q.push_back(LagrangeEquidistant(6, i));
     }
 
-				   // We add 1.0001 because of bugs in
-				   // the ostream classes
-  for (unsigned int i=0;i<p.size();++i)
-    for (unsigned int j=0;j<p.size();++j)
+  // We add 1.0001 because of bugs in
+  // the ostream classes
+  for (unsigned int i=0; i<p.size(); ++i)
+    for (unsigned int j=0; j<p.size(); ++j)
       deallog << 'P' << i << "(x" << j
-	      << ") = " << p[i].value((double) j/p.size())+1.0001 << std::endl;
+              << ") = " << p[i].value((double) j/p.size())+1.0001 << std::endl;
 
-  for (unsigned int i=0;i<p.size();++i)
+  for (unsigned int i=0; i<p.size(); ++i)
     {
       q[i].scale(.5);
-      for (unsigned int j=0;j<p.size();++j)
-	{
-	  double x = (double) j/p.size();
-	  if (std::fabs(q[i].value(2.*x)-p[i].value(x)) > 1.e-15)
-	    deallog << "Polynomial " << i
-		    << ": Values q(" << 2.*x
-		    << ") and p(" << x
-		    << ") differ after scale: " << q[i].value(2.*x)
-		    << " != " << p[i].value(x)
-		    << std::endl;
-	}
+      for (unsigned int j=0; j<p.size(); ++j)
+        {
+          double x = (double) j/p.size();
+          if (std::fabs(q[i].value(2.*x)-p[i].value(x)) > 1.e-15)
+            deallog << "Polynomial " << i
+                    << ": Values q(" << 2.*x
+                    << ") and p(" << x
+                    << ") differ after scale: " << q[i].value(2.*x)
+                    << " != " << p[i].value(x)
+                    << std::endl;
+        }
       q[i].shift((double) 1.);
-      for (unsigned int j=0;j<p.size();++j)
-	{
-	  double x = (double) j/p.size();
-	  double diff = std::fabs(q[i].value(2.*x-1.)-p[i].value(x));
-	  if (diff > 1.e-13)
-	    deallog << "Polynomial " << i
-		    << ": Values q(" << 2.*x-1.
-		    << ") and p(" << x
-		    << ") differ by 10^" << std::log(diff)/std::log(10.)
-		    << " after shift: " << q[i].value(2.*x-1.)
-		    << " != " << p[i].value(x)
-		    << std::endl;
-	}
+      for (unsigned int j=0; j<p.size(); ++j)
+        {
+          double x = (double) j/p.size();
+          double diff = std::fabs(q[i].value(2.*x-1.)-p[i].value(x));
+          if (diff > 1.e-13)
+            deallog << "Polynomial " << i
+                    << ": Values q(" << 2.*x-1.
+                    << ") and p(" << x
+                    << ") differ by 10^" << std::log(diff)/std::log(10.)
+                    << " after shift: " << q[i].value(2.*x-1.)
+                    << " != " << p[i].value(x)
+                    << std::endl;
+        }
     }
 
   deallog << "Hierarchical" << std::endl;
-  
+
   p.clear ();
-  for (unsigned int i=0;i<12;++i)
+  for (unsigned int i=0; i<12; ++i)
     {
       p.push_back (Hierarchical(i));
     }
 
-  for (unsigned int i=0;i<p.size();++i)
+  for (unsigned int i=0; i<p.size(); ++i)
     {
       deallog << "N0(P" << i << ")"
-	      << " = " << p[i].value(0.) << std::endl;
+              << " = " << p[i].value(0.) << std::endl;
     }
 
-  for (unsigned int i=0;i<p.size();++i)
+  for (unsigned int i=0; i<p.size(); ++i)
     {
       deallog << "N1(P" << i << ")"
-	      << " = " << p[i].value(1.) << std::endl;
+              << " = " << p[i].value(1.) << std::endl;
     }
 
   std::vector<double> values (p.size());
@@ -194,15 +194,15 @@ int main ()
   for (unsigned int j=2; j<p.size(); ++j)
     {
       double factor = 1.;
-      for (unsigned int k=0; k<j;++k)
-	factor /= 2. * (j-k);
+      for (unsigned int k=0; k<j; ++k)
+        factor /= 2. * (j-k);
 
-      for (unsigned int i=0;i<p.size();++i)
-	{
-	  p[i].value (.5, values);
-	  deallog << "N" << j << "(P" << i << ")"
-		  << " = " << values[j] * factor << std::endl;
-	}
+      for (unsigned int i=0; i<p.size(); ++i)
+        {
+          p[i].value (.5, values);
+          deallog << "N" << j << "(P" << i << ")"
+                  << " = " << values[j] * factor << std::endl;
+        }
     }
 }
 

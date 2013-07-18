@@ -37,65 +37,65 @@ int main ()
       ParameterHandler prm;
       prm.enter_subsection ("Testing testing");
       {
-	prm.declare_entry ("string list",
-			   "a",
-			   Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-			   "docs 1");
-	prm.declare_entry ("int/int",
-			   "1",
-			   Patterns::Integer());
-	prm.declare_entry ("double_double",
-			   "3.1415926",
-			   Patterns::Double(),
-			   "docs 3");
+        prm.declare_entry ("string list",
+                           "a",
+                           Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
+                           "docs 1");
+        prm.declare_entry ("int/int",
+                           "1",
+                           Patterns::Integer());
+        prm.declare_entry ("double_double",
+                           "3.1415926",
+                           Patterns::Double(),
+                           "docs 3");
 
-	prm.enter_subsection ("Testing%testing");
-	{
-	  prm.declare_entry ("string&list",
-			     "a,b,c",
-			     Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-			     "docs 1");
-	  prm.declare_entry ("int*int",
-			     "2",
-			     Patterns::Integer());
-	  prm.declare_entry ("double+double",
-			     "6.1415926",
-			     Patterns::Double(),
-			     "docs 3");
-	}
-	prm.leave_subsection ();
+        prm.enter_subsection ("Testing%testing");
+        {
+          prm.declare_entry ("string&list",
+                             "a,b,c",
+                             Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
+                             "docs 1");
+          prm.declare_entry ("int*int",
+                             "2",
+                             Patterns::Integer());
+          prm.declare_entry ("double+double",
+                             "6.1415926",
+                             Patterns::Double(),
+                             "docs 3");
+        }
+        prm.leave_subsection ();
       }
       prm.leave_subsection ();
 
-                                       // read and then write
-                                       // parameters. take same input file
-                                       // as for parameter_handler_3, but
-                                       // use different output format
+      // read and then write
+      // parameters. take same input file
+      // as for parameter_handler_3, but
+      // use different output format
       prm.read_input("parameter_handler_8/prm");
       prm.log_parameters (deallog);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
 
       return 1;
     }
   catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 

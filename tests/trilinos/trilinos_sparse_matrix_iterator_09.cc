@@ -29,18 +29,18 @@
 
 void test ()
 {
-                                   // create a sparsity pattern with totally
-                                   // empty lines (not even diagonals, since
-                                   // not quadratic)
+  // create a sparsity pattern with totally
+  // empty lines (not even diagonals, since
+  // not quadratic)
   TrilinosWrappers::SparsityPattern sparsity(4,5,1);
   sparsity.add (1,1);
   sparsity.add (3,1);
   sparsity.compress ();
 
-                                   // attach a sparse matrix to it
+  // attach a sparse matrix to it
   TrilinosWrappers::SparseMatrix A(sparsity);
 
-                                   // and loop over the elements of it
+  // and loop over the elements of it
   for (TrilinosWrappers::SparseMatrix::const_iterator k=A.begin();
        k!=A.end(); ++k)
     deallog << k->row() << ' ' << k->column() << ' ' << k->value()
@@ -65,25 +65,25 @@ int main (int argc, char **argv)
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
 
       return 1;
     }
   catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

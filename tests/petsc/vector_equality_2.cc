@@ -20,7 +20,7 @@
 // equal
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>    
+#include <deal.II/lac/petsc_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -29,16 +29,16 @@
 void test (PETScWrappers::Vector &v,
            PETScWrappers::Vector &w)
 {
-                                   // set only certain elements of each
-                                   // vector
+  // set only certain elements of each
+  // vector
   for (unsigned int i=0; i<v.size(); ++i)
     {
       v(i) = i;
       if (i%3 == 0)
         w(i) = i+1.;
     }
-                                   // but then copy elements and make sure the
-                                   // vectors are actually equal
+  // but then copy elements and make sure the
+  // vectors are actually equal
   v = w;
   Assert (v==w, ExcInternalError());
 
@@ -62,30 +62,30 @@ int main (int argc, char **argv)
         PETScWrappers::Vector w (100);
         test (v,w);
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

@@ -70,36 +70,36 @@ void test(bool use_inhomogeneity_for_rhs)
   cm.close();
   cm.print(logfile);
 
-  
+
   CompressedSimpleSparsityPattern csp(5,5);
-  for (unsigned int i=0;i<5;++i)
+  for (unsigned int i=0; i<5; ++i)
     csp.add(i,i);
-    
+
   SparsityPattern sp;
   sp.copy_from(csp);
   SparseMatrix<double> mat(sp);
   Vector<double> rhs(5);
 
   std::vector<types::global_dof_index> local_dofs;
-  for (unsigned int i=0;i<5;++i)
+  for (unsigned int i=0; i<5; ++i)
     local_dofs.push_back(i);
 
   FullMatrix<double> local_mat(5,5);
   Vector<double> local_vec(5);
-  for (unsigned int i=0;i<5;++i)
+  for (unsigned int i=0; i<5; ++i)
     local_mat(i,i)=2.0;
-  
+
   local_vec = 0;
 
   cm.distribute_local_to_global(local_mat, local_vec, local_dofs, mat, rhs, use_inhomogeneity_for_rhs);
 
   mat.print(logfile);
   rhs.print(logfile);
-  
+
 }
 
 
-int main () 
+int main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);
@@ -109,7 +109,7 @@ int main ()
 
   // Use the constraints for the right-hand-side
   {
-    test(true);	
+    test(true);
   }
 
   // Don not use the constraints for the right-hand-side

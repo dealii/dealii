@@ -62,17 +62,17 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-				   // create a system element composed
-				   // of one Q1 and one Q2 element
+  // create a system element composed
+  // of one Q1 and one Q2 element
   FESystem<dim> element(FE_Q<dim>(1), 1,
-			FE_Q<dim>(2), 1);
+                        FE_Q<dim>(2), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // use a more complicated mapping
-				   // of the domain and a quadrature
-				   // formula suited to the elements
-				   // we have here
+  // use a more complicated mapping
+  // of the domain and a quadrature
+  // formula suited to the elements
+  // we have here
   MappingQ<dim> mapping (3);
   QGauss<dim> quadrature(6);
 
@@ -83,9 +83,9 @@ check ()
                                            constraints);
   constraints.close ();
 
-				   // create sparsity pattern. note
-				   // that different components should
-				   // not couple, so use pattern
+  // create sparsity pattern. note
+  // that different components should
+  // not couple, so use pattern
   SparsityPattern sparsity;
   {
     Table<2,DoFTools::Coupling> mask (2, 2);
@@ -101,8 +101,8 @@ check ()
   matrix_ref.reinit (sparsity);
 
   MatrixTools::
-    create_laplace_matrix (mapping, dof,
-                           quadrature, matrix_ref);
+  create_laplace_matrix (mapping, dof,
+                         quadrature, matrix_ref);
   constraints.condense(matrix_ref);
 
   const Function<dim> *const dummy = 0;

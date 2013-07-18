@@ -43,7 +43,7 @@ void test ()
   tria.refine_global (2);
   tria.begin_active()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
-  tria.refine_global (2);  
+  tria.refine_global (2);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim> (1));
@@ -54,15 +54,15 @@ void test ()
   hp::DoFHandler<dim> dof_handler(tria);
 
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     cell->set_active_fe_index (rand() % fe_collection.size());
-  
+
   dof_handler.distribute_dofs(fe_collection);
 
   std::vector<types::global_dof_index> local_dof_indices;
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-         cell=dof_handler.begin_active();
+       cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     {
       local_dof_indices.resize (cell->get_fe().dofs_per_cell);
@@ -80,14 +80,14 @@ int main ()
 {
   std::ofstream logfile("random/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

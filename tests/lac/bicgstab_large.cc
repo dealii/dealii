@@ -37,10 +37,10 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   SparsityPattern sparsity_pattern(4,4);
   sparsity_pattern.compress();
-  
+
   SparseMatrix<double> M(sparsity_pattern);
   M.diag_element(0) = 1;
   M.diag_element(1) = 10;
@@ -63,7 +63,7 @@ int main()
   Vector<double> res (4);
   M.residual (res, solution, rhs);
   deallog << "residual=" << res.l2_norm()
-	  << std::endl;
+          << std::endl;
 
   // now set up the same problem but with matrix entries scaled by 1e10 and
   // solver tolerance scaled by 1e10. should get the same solution
@@ -80,6 +80,6 @@ int main()
   solution.print(deallog);
   M1.residual (res, solution, rhs);
   deallog << "residual=" << res.l2_norm()
-	  << std::endl;
+          << std::endl;
 }
 

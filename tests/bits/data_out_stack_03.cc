@@ -34,28 +34,28 @@
 
 
 template <int dim>
-void run () 
+void run ()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (1);
-  
+
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs (fe);
 
-				   // create a continuous field over
-				   // this DoFHandler
+  // create a continuous field over
+  // this DoFHandler
   Vector<double> v(dof_handler.n_dofs());
   v = 1.;
   v(v.size()/2) = 2.;
 
-				   // output this field using
-				   // DataOutStack. the result should
-				   // be a continuous field again
+  // output this field using
+  // DataOutStack. the result should
+  // be a continuous field again
   DataOutStack<dim> data_out_stack;
   data_out_stack.declare_data_vector ("solution",
-				      DataOutStack<dim>::dof_vector);
+                                      DataOutStack<dim>::dof_vector);
   data_out_stack.new_parameter_value (1,1);
   data_out_stack.attach_dof_handler (dof_handler);
   data_out_stack.add_data_vector (v, "solution");
@@ -67,7 +67,7 @@ void run ()
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("data_out_stack_03/output");
   deallog.attach(logfile);

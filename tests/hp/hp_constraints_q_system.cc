@@ -34,7 +34,7 @@ void test ()
   for (unsigned int i=1; i<4; ++i)
     {
       fe.push_back (FESystem<dim>(FE_Q<dim>(i), 1,
-				  FE_DGQ<dim>(i+1), 1));
+                                  FE_DGQ<dim>(i+1), 1));
       degrees.push_back (i);
     }
 

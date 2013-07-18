@@ -19,7 +19,7 @@
 // check querying matrix sizes
 
 #include "../tests.h"
-#include <deal.II/lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 
 
@@ -33,7 +33,7 @@ void test ()
   sp.compress ();
 
   SparseMatrix<double> m(sp);
-  
+
   Assert (m.m() == 5, ExcInternalError());
   Assert (m.n() == 5, ExcInternalError());
 
@@ -56,25 +56,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

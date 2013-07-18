@@ -42,8 +42,8 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-		   Triangulation<dim>::limit_level_difference_at_vertices);
+  triangulation (MPI_COMM_WORLD,
+                 Triangulation<dim>::limit_level_difference_at_vertices);
 
   FESystem<dim> fe (FE_DGQ<dim>(0),2);
 

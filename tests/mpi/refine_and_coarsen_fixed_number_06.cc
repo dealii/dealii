@@ -50,19 +50,19 @@ void test()
 
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
   parallel::distributed::GridRefinement::
-    refine_and_coarsen_fixed_number (triangulation,
-				     estimated_error_per_cell,
-				     0.3, 0.03);
+  refine_and_coarsen_fixed_number (triangulation,
+                                   estimated_error_per_cell,
+                                   0.3, 0.03);
   parallel::distributed::GridRefinement::
-    refine_and_coarsen_fixed_fraction (triangulation,
-				     estimated_error_per_cell,
-				     0.3, 0.03);
+  refine_and_coarsen_fixed_fraction (triangulation,
+                                     estimated_error_per_cell,
+                                     0.3, 0.03);
   triangulation.execute_coarsening_and_refinement ();
 
   if (myid==0)
-	deallog << "n_global_active_cells="
-	<< triangulation.n_global_active_cells()
-	<< std::endl;
+    deallog << "n_global_active_cells="
+            << triangulation.n_global_active_cells()
+            << std::endl;
 
   if (myid==0)
     deallog << "OK" << std::endl;

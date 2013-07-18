@@ -20,7 +20,7 @@
 // equal and different template arguments
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -29,16 +29,16 @@
 void test (Vector<std::complex<double> > &v,
            Vector<std::complex<float> > &w)
 {
-                                   // set only certain elements of each
-                                   // vector
+  // set only certain elements of each
+  // vector
   for (unsigned int i=0; i<v.size(); ++i)
     {
       v(i) = std::complex<double> (i, i+1.);
       if (i%3 == 0)
         w(i) = std::complex<double> (i+1., i+2.);
     }
-                                   // but then copy elements and make sure the
-                                   // vectors are actually equal
+  // but then copy elements and make sure the
+  // vectors are actually equal
   v = w;
   Assert (! (v!=w), ExcInternalError());
   Assert (! (w!=v), ExcInternalError());
@@ -64,25 +64,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

@@ -47,19 +47,19 @@ const unsigned int n_functionals = 3;
 template <int dim>
 class Local : public Subscriptor
 {
-  public:
-    typedef EmptyInfo CellInfo;
-    
-    void cell(MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info) const;
-    void bdry(MeshWorker::DoFInfo<dim>& dinfo, CellInfo& info) const;
-    void face(MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
-	      CellInfo& info1, CellInfo& info2) const;
+public:
+  typedef EmptyInfo CellInfo;
+
+  void cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
+  void bdry(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
+  void face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
+            CellInfo &info1, CellInfo &info2) const;
 };
 
 
 template <int dim>
 void
-Local<dim>::cell(MeshWorker::DoFInfo<dim>& info, CellInfo&) const
+Local<dim>::cell(MeshWorker::DoFInfo<dim> &info, CellInfo &) const
 {
   info.value(0) = 1.;
 }
@@ -67,7 +67,7 @@ Local<dim>::cell(MeshWorker::DoFInfo<dim>& info, CellInfo&) const
 
 template <int dim>
 void
-Local<dim>::bdry(MeshWorker::DoFInfo<dim>&  info, CellInfo&) const
+Local<dim>::bdry(MeshWorker::DoFInfo<dim>  &info, CellInfo &) const
 {
   info.value(2) = 1.;
 }
@@ -75,8 +75,8 @@ Local<dim>::bdry(MeshWorker::DoFInfo<dim>&  info, CellInfo&) const
 
 template <int dim>
 void
-Local<dim>::face(MeshWorker::DoFInfo<dim>&  info1, MeshWorker::DoFInfo<dim>& info2,
-		 CellInfo&, CellInfo&) const
+Local<dim>::face(MeshWorker::DoFInfo<dim>  &info1, MeshWorker::DoFInfo<dim> &info2,
+                 CellInfo &, CellInfo &) const
 {
   info1.value(1) = 1./2.;
   info2.value(1) = 1./2.;
@@ -85,42 +85,42 @@ Local<dim>::face(MeshWorker::DoFInfo<dim>&  info1, MeshWorker::DoFInfo<dim>& inf
 
 template <int dim>
 void
-test_mesh(MGDoFHandler<dim>& mgdofs)
+test_mesh(MGDoFHandler<dim> &mgdofs)
 {
-  const DoFHandler<dim>& dofs = mgdofs;
-  
+  const DoFHandler<dim> &dofs = mgdofs;
+
   Local<dim> local;
   EmptyInfoBox info_box;
   MeshWorker::DoFInfo<dim> dof_info(dofs);
-  
+
   MeshWorker::Assembler::Functional<double> assembler;
   assembler.initialize(n_functionals);
-  
+
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
-    (dofs.begin_active(), dofs.end(),
-     dof_info, info_box,
-     std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
-     std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
-     std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
-     assembler, true);
+  (dofs.begin_active(), dofs.end(),
+   dof_info, info_box,
+   std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
+   std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
+   std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
+   assembler, true);
 
   deallog << "  Results";
-  for (unsigned int i=0;i<n_functionals;++i)
+  for (unsigned int i=0; i<n_functionals; ++i)
     deallog << '\t' << assembler(i);
   deallog << std::endl;
 
   assembler.initialize(n_functionals);
   MeshWorker::DoFInfo<dim> mg_dof_info(mgdofs);
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
-    (mgdofs.begin(), mgdofs.end(),
-     mg_dof_info, info_box,
-     std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
-     std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
-     std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
-     assembler, true);
+  (mgdofs.begin(), mgdofs.end(),
+   mg_dof_info, info_box,
+   std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
+   std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
+   std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
+   assembler, true);
 
   deallog << "MGResults";
-  for (unsigned int i=0;i<n_functionals;++i)
+  for (unsigned int i=0; i<n_functionals; ++i)
     deallog << '\t' << assembler(i);
   deallog << std::endl;
 }
@@ -128,7 +128,7 @@ test_mesh(MGDoFHandler<dim>& mgdofs)
 
 template<int dim>
 void
-test(const FiniteElement<dim>& fe)
+test(const FiniteElement<dim> &fe)
 {
   Triangulation<dim> tr;
   MGDoFHandler<dim> dofs(tr);
@@ -159,10 +159,10 @@ int main ()
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console (0);
-  
+
   FE_DGP<2> el2(0);
   FE_DGP<3> el3(0);
-  
+
   deallog.push("2D");
   test(el2);
   deallog.pop();

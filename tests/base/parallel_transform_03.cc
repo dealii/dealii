@@ -43,15 +43,15 @@ int main()
       y(i) = 2*i;
       z(i) = 3*i;
     }
-  
-				   // set a=x+y-z, which happens to be
-				   // zero
+
+  // set a=x+y-z, which happens to be
+  // zero
   parallel::transform (x.begin(), x.end(),
-		       y.begin(),
-		       z.begin(),
-		       a.begin(),
-		       (boost::lambda::_1 + boost::lambda::_2 - boost::lambda::_3),
-		       10);
+                       y.begin(),
+                       z.begin(),
+                       a.begin(),
+                       (boost::lambda::_1 + boost::lambda::_2 - boost::lambda::_3),
+                       10);
 
   Assert (a.l2_norm() == 0, ExcInternalError());
 

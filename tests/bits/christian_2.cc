@@ -37,7 +37,7 @@ int main()
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, 0, 1);
   FE_Q<2> fe(1);
- 
+
   DoFHandler<2> dof(tria);
   dof.distribute_dofs(fe);
 
@@ -45,7 +45,7 @@ int main()
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     sol(i) = i;
 
-                                   // test output using DataOutStack
+  // test output using DataOutStack
   DataOutStack<2> data_out_stack;
   data_out_stack.declare_data_vector("dof", DataOutStack<2>::dof_vector);
   data_out_stack.new_parameter_value(2.5,1.);

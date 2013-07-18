@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2011 by the deal.II authors
 //
@@ -29,19 +29,19 @@ using namespace dealii;
 
 
 void
-print_patches (const SparsityPattern& bl)
+print_patches (const SparsityPattern &bl)
 {
-  for (unsigned int i=0;i<bl.n_rows();++i)
+  for (unsigned int i=0; i<bl.n_rows(); ++i)
     {
       deallog << "Block " << std::setw(3) << i;
       std::vector<unsigned int> entries;
-      for (SparsityPattern::row_iterator b = bl.row_begin(i);b != bl.row_end(i);++b)
-	entries.push_back(*b);
-      
+      for (SparsityPattern::row_iterator b = bl.row_begin(i); b != bl.row_end(i); ++b)
+        entries.push_back(*b);
+
       std::sort(entries.begin(), entries.end());
-      
-      for (unsigned int i=0;i<entries.size();++i)
-	deallog << ' ' << std::setw(4) << entries[i];
+
+      for (unsigned int i=0; i<entries.size(); ++i)
+        deallog << ' ' << std::setw(4) << entries[i];
       deallog << std::endl;
     }
 }
@@ -49,14 +49,14 @@ print_patches (const SparsityPattern& bl)
 
 template <int dim>
 void test_global_refinement(
-  void (*test_block_list)(const Triangulation<dim>& tr, const FiniteElement<dim>& fe))
+  void (*test_block_list)(const Triangulation<dim> &tr, const FiniteElement<dim> &fe))
 {
   Triangulation<dim> trc, trl;
   GridGenerator::hyper_cube(trc);
   trc.refine_global(2);
   GridGenerator::hyper_L(trl);
   trl.refine_global(1);
-  
+
   FE_DGQ<dim> fe1(0);
   FE_DGQ<dim> fe2(1);
 //  FE_Q<dim> fe3(1);
@@ -64,7 +64,7 @@ void test_global_refinement(
   FE_RaviartThomas<dim> fe5(1);
   FE_Nedelec<dim> fe6(0);
   FE_Nedelec<dim> fe7(1);
-  
+
   deallog.push("Square");
   test_block_list(trc, fe1);
   test_block_list(trc, fe2);

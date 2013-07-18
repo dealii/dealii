@@ -42,25 +42,25 @@
 
 #include <fstream>
 
-				// Create a mesh with hanging
-				// nodes and FEQ/FENothing interfaces
-				// in several admissible configurations
-                                // we'd like to check.  In 2D the mesh
-                                // looks like the following (with 0
-                                // and 1 denoting the two element types)
-                                //
-                                // +---------+----+----+
-                                // |         | 1  | 1  |
-                                // |    0    +----+----+
-                                // |         | 1  | 1  |
-                                // +----+----+----+----+
-                                // | 0  | 0  |         |
-                                // +----+----+    1    |
-                                // | 0  | 0  |         |
-                                // +----+----+---------+
-				//
-				// We then attempt to make hanging node
-				// constraints on this mesh.
+// Create a mesh with hanging
+// nodes and FEQ/FENothing interfaces
+// in several admissible configurations
+// we'd like to check.  In 2D the mesh
+// looks like the following (with 0
+// and 1 denoting the two element types)
+//
+// +---------+----+----+
+// |         | 1  | 1  |
+// |    0    +----+----+
+// |         | 1  | 1  |
+// +----+----+----+----+
+// | 0  | 0  |         |
+// +----+----+    1    |
+// | 0  | 0  |         |
+// +----+----+---------+
+//
+// We then attempt to make hanging node
+// constraints on this mesh.
 
 template <int dim>
 void test ()
@@ -71,30 +71,30 @@ void test ()
 
   {
     typename Triangulation<dim> :: active_cell_iterator
-        cell = triangulation.begin_active(),
-        endc = triangulation.end();
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
 
-    for(; cell != endc; cell++)
-    {
+    for (; cell != endc; cell++)
+      {
         Point<dim> center = cell->center();
 
-        if(center[0] < 0)
-        {
-          cell->set_subdomain_id(1);
-        }
+        if (center[0] < 0)
+          {
+            cell->set_subdomain_id(1);
+          }
 
         double h=0;
-        for(unsigned d=0; d<dim; ++d) h += center[d];
+        for (unsigned d=0; d<dim; ++d) h += center[d];
 
-        if(std::fabs(h) + 1e-6 > 0.25*dim)
+        if (std::fabs(h) + 1e-6 > 0.25*dim)
           cell->set_refine_flag();
-    }
+      }
 
     triangulation.execute_coarsening_and_refinement();
   }
 
-				// create fe_collection and
-				// distribute dofs
+  // create fe_collection and
+  // distribute dofs
 
   hp::FECollection<dim>    fe_collection;
 
@@ -103,33 +103,33 @@ void test ()
 
   hp::DoFHandler<dim>      dof_handler (triangulation);
 
-				   // loop over cells, and set cells
-				   // within a circle to be of type
-				   // FE_Nothing, while outside the
-				   // circle to be of type FE_Q(1)
+  // loop over cells, and set cells
+  // within a circle to be of type
+  // FE_Nothing, while outside the
+  // circle to be of type FE_Q(1)
   {
     typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
-    for(; cell != endc; cell++)
-    {
-      if(cell->subdomain_id()==1 )
-        cell->set_active_fe_index(1);
-      else
-        cell->set_active_fe_index(0);
-    }
+    for (; cell != endc; cell++)
+      {
+        if (cell->subdomain_id()==1 )
+          cell->set_active_fe_index(1);
+        else
+          cell->set_active_fe_index(0);
+      }
 
     dof_handler.distribute_dofs (fe_collection);
   }
 
 
   deallog << "   Number of active cells:       "
-	  << triangulation.n_active_cells()
-	  << std::endl
-	  << "   Number of degrees of freedom: "
-	  << dof_handler.n_dofs()
-	  << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl
+          << "   Number of degrees of freedom: "
+          << dof_handler.n_dofs()
+          << std::endl;
 
 
   // .... test constraint handling

@@ -44,12 +44,12 @@ void check (const unsigned int testcase)
 
   switch (testcase)
     {
-      case 2:
-	    deallog << "Twisted cell in " << dim << "d" << std::endl;
-            std::swap (vertices[1], vertices[0]);
-	    break;
-      default:
-	    Assert (false, ExcNotImplemented());
+    case 2:
+      deallog << "Twisted cell in " << dim << "d" << std::endl;
+      std::swap (vertices[1], vertices[0]);
+      break;
+    default:
+      Assert (false, ExcNotImplemented());
     }
 
 
@@ -80,7 +80,7 @@ void check (const unsigned int testcase)
   QGauss<dim> quadrature(2);
   FEValues<dim> fe_values(dummy, quadrature, update_JxW_values);
   // should throw an assertion
-  try 
+  try
     {
       fe_values.reinit(coarse_grid.begin());
     }

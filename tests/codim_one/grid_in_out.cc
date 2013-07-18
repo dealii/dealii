@@ -30,17 +30,18 @@
 std::ofstream logfile("grid_in_out/output");
 
 template <int dim, int spacedim>
-void test(std::string filename) {
-    Triangulation<dim, spacedim> tria;
-    GridIn<dim, spacedim> gi;
-    gi.attach_triangulation (tria);
-    std::ifstream in (filename.c_str());
-    gi.read_ucd (in);
+void test(std::string filename)
+{
+  Triangulation<dim, spacedim> tria;
+  GridIn<dim, spacedim> gi;
+  gi.attach_triangulation (tria);
+  std::ifstream in (filename.c_str());
+  gi.read_ucd (in);
 
-    GridOut grid_out;
-    grid_out.set_flags (GridOutFlags::Ucd(true));
-    grid_out.write_ucd (tria, logfile);
-    grid_out.write_msh (tria, logfile);
+  GridOut grid_out;
+  grid_out.set_flags (GridOutFlags::Ucd(true));
+  grid_out.write_ucd (tria, logfile);
+  grid_out.write_msh (tria, logfile);
 }
 
 int main ()

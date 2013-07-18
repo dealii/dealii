@@ -51,8 +51,8 @@ int main()
 
   BlockSparsityPattern bsp;
 
-				   // we used to access an invalid
-				   // block number here
+  // we used to access an invalid
+  // block number here
   bsp.copy_from (bcsp);
 
   deallog << "OK" << std::endl;

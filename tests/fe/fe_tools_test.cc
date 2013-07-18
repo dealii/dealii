@@ -39,7 +39,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-				 // This is needed for C++ output:
+// This is needed for C++ output:
 #include <fstream>
 #include <cmath>
 
@@ -47,18 +47,18 @@ const double pi=std::acos(-1.);
 
 class TestFunction: public Function<2>
 {
-  public:
-    TestFunction() {}
-    virtual ~TestFunction() {}
-    
-    virtual double value(const Point<2> &p,
-			 const unsigned int component) const;
+public:
+  TestFunction() {}
+  virtual ~TestFunction() {}
+
+  virtual double value(const Point<2> &p,
+                       const unsigned int component) const;
 };
 
 
 double
 TestFunction::value(const Point<2> &p,
-		    const unsigned int component) const
+                    const unsigned int component) const
 {
   Assert(component==0, ExcInternalError());
   return std::sin(pi*p(0))*std::cos(pi*p(1));
@@ -74,7 +74,7 @@ void make_grid (Triangulation<2> &triangulation)
   const Point<2> p0=triangulation.begin_active()->vertex(0);
 
   triangulation.refine_global(1);
-  
+
   for (unsigned int step=0; step<1; ++step)
     {
       Triangulation<2>::active_cell_iterator cell, endc;
@@ -82,11 +82,11 @@ void make_grid (Triangulation<2> &triangulation)
       endc = triangulation.end();
 
       for (; cell!=endc; ++cell)
-	if (cell->vertex(0)==p0)
-	  {
-	    cell->set_refine_flag ();
-	    break;
-	  }
+        if (cell->vertex(0)==p0)
+          {
+            cell->set_refine_flag ();
+            break;
+          }
 
       triangulation.execute_coarsening_and_refinement ();
     };
@@ -95,12 +95,12 @@ void make_grid (Triangulation<2> &triangulation)
 
 template<int dim>
 void test(const Triangulation<dim> &tria,
-	  const Mapping<dim> &mapping,
-	  const FiniteElement<dim> &fe1,
-	  const std::string &fe_string1,
-	  const FiniteElement<dim> &fe2,
-	  const std::string &fe_string2,
-	  const unsigned int testcase)
+          const Mapping<dim> &mapping,
+          const FiniteElement<dim> &fe1,
+          const std::string &fe_string1,
+          const FiniteElement<dim> &fe2,
+          const std::string &fe_string2,
+          const unsigned int testcase)
 {
   DoFHandler<dim> dof_handler1 (tria);
   DoFHandler<dim> dof_handler2 (tria);
@@ -119,32 +119,32 @@ void test(const Triangulation<dim> &tria,
   ConstraintMatrix constraints2;
   DoFTools::make_hanging_node_constraints (dof_handler2, constraints2);
   constraints2.close();
-  
+
   QGauss<dim> quadrature(4);
   TestFunction function;
   VectorTools::project(mapping,
-    dof_handler1,
-    constraints1,
-    quadrature,
-    function,
-    function1);
+                       dof_handler1,
+                       constraints1,
+                       quadrature,
+                       function,
+                       function1);
 
   switch (testcase)
     {
-      case 1:
-	    FETools::interpolate(dof_handler1, function1,
-				 dof_handler2, constraints2, function2);
-	    break;
-      case 2:
-	    FETools::back_interpolate(dof_handler1, constraints1, function1,
-				      dof_handler2, constraints2, function1_back);
-	    break;
-      case 3:
-	    FETools::interpolation_difference(dof_handler1, constraints1, function1,
-					      dof_handler2, constraints2, function1_back);
-	    break;
-      default:
-	    Assert(false, ExcNotImplemented());
+    case 1:
+      FETools::interpolate(dof_handler1, function1,
+                           dof_handler2, constraints2, function2);
+      break;
+    case 2:
+      FETools::back_interpolate(dof_handler1, constraints1, function1,
+                                dof_handler2, constraints2, function1_back);
+      break;
+    case 3:
+      FETools::interpolation_difference(dof_handler1, constraints1, function1,
+                                        dof_handler2, constraints2, function1_back);
+      break;
+    default:
+      Assert(false, ExcNotImplemented());
     }
 
   DataOut<dim> data_out;
@@ -160,26 +160,26 @@ void test(const Triangulation<dim> &tria,
   std::string file2_name=fe_string1+"_";
   switch (testcase)
     {
-      case 1:
-	    data_out.attach_dof_handler (dof_handler2);
-	    data_out.add_data_vector (function2, fe_string2);
- 	    file2_name+=fe_string2+"_interpolation.gnuplot";
-	    break;
-      case 2:
-	    data_out.attach_dof_handler (dof_handler1);
-	    data_out.add_data_vector (function1_back, fe_string1);
-	    file2_name+=fe_string2+"_back_interpolation.gnuplot";
-	    break;
-      case 3:
-   	    data_out.attach_dof_handler (dof_handler1);
-   	    data_out.add_data_vector (function1_back, fe_string1);
-   	    file2_name+=fe_string2+"_interpolation_diff.gnuplot";
-   	    break;
-      default:
-	    Assert(false, ExcNotImplemented());
+    case 1:
+      data_out.attach_dof_handler (dof_handler2);
+      data_out.add_data_vector (function2, fe_string2);
+      file2_name+=fe_string2+"_interpolation.gnuplot";
+      break;
+    case 2:
+      data_out.attach_dof_handler (dof_handler1);
+      data_out.add_data_vector (function1_back, fe_string1);
+      file2_name+=fe_string2+"_back_interpolation.gnuplot";
+      break;
+    case 3:
+      data_out.attach_dof_handler (dof_handler1);
+      data_out.add_data_vector (function1_back, fe_string1);
+      file2_name+=fe_string2+"_interpolation_diff.gnuplot";
+      break;
+    default:
+      Assert(false, ExcNotImplemented());
     }
   deallog << file2_name << std::endl;
-  
+
   data_out.build_patches (2);
   data_out.write_gnuplot(deallog.get_file_stream());
 //  std::ofstream file2(file2_name.c_str());
@@ -190,18 +190,18 @@ void test(const Triangulation<dim> &tria,
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("fe_tools_test/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   Triangulation<2> tria;
   MappingQ1<2> mapping;
-  
+
   make_grid (tria);
-  
+
   deallog.push("dg2dg1_int");
   test(tria, mapping, FE_DGQ<2>(2), "dg2", FE_DGQ<2>(1), "dg1", 1);
   deallog.pop();

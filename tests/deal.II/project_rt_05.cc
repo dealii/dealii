@@ -28,9 +28,9 @@ template <int dim>
 void test ()
 {
   if (dim != 1)
-				     // this is interesting also in 3d, but is
-				     // exceedingly slow there. limit to the
-				     // case of RT(0) elements in 3d
+    // this is interesting also in 3d, but is
+    // exceedingly slow there. limit to the
+    // case of RT(0) elements in 3d
     for (unsigned int p=0; p<(dim == 2 ? 3 : 1); ++p)
       test_with_2d_deformed_refined_mesh (FE_RaviartThomas<dim>(p), p+1, 1);
 }

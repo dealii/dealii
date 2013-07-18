@@ -37,15 +37,15 @@
 
 
 #define TEST(dim, l, el, deg) { el<dim> fe(deg); \
-  deallog << # el << '<' << dim << ">(" << deg << ')' << std::endl; \
-  print_matrix(tr ## dim, l, fe, #el); }
+    deallog << # el << '<' << dim << ">(" << deg << ')' << std::endl; \
+    print_matrix(tr ## dim, l, fe, #el); }
 
 template<int dim>
 inline void
-print_matrix(Triangulation<dim>& tr,
-	     unsigned int level,
-	     const FiniteElement<dim>& finel,
-	     const char* /*name*/)
+print_matrix(Triangulation<dim> &tr,
+             unsigned int level,
+             const FiniteElement<dim> &finel,
+             const char * /*name*/)
 {
   MGDoFHandler<dim> dof(tr);
   dof.distribute_dofs(finel);
@@ -58,14 +58,14 @@ print_matrix(Triangulation<dim>& tr,
   Vector<double> in(n_fine);
   Vector<double> out(n_coarse);
 
-  for (unsigned int i=0;i<n_fine;++i)
+  for (unsigned int i=0; i<n_fine; ++i)
     {
       in = 0.;
       out = 0.;
       in(i) = 1.;
       transfer.restrict_and_add(level,out,in);
-      for (unsigned int k=0;k<out.size();++k)
-	deallog << '\t' << out(k);
+      for (unsigned int k=0; k<out.size(); ++k)
+        deallog << '\t' << out(k);
       deallog << std::endl;
     }
   deallog << std::endl;
@@ -80,7 +80,7 @@ main()
   deallog << std::setprecision(3);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   Triangulation<2> tr2;
 
   GridGenerator::hyper_cube(tr2, -1., 1.);

@@ -36,18 +36,18 @@ void check ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-	{
-	  Assert (TableIndices<3>(i,j,k)
-		  ==
-		  T::unrolled_to_component_indices (i*dim*dim+j*dim+k),
-		  ExcInternalError());
-	  Assert (T::component_to_unrolled_index(TableIndices<3>(i,j,k))
-		  ==
-		  i*dim*dim+j*dim+k,
-		  ExcInternalError());
-	  Assert (t[TableIndices<3>(i,j,k)] == t[i][j][k],
-		  ExcInternalError());
-	}
+        {
+          Assert (TableIndices<3>(i,j,k)
+                  ==
+                  T::unrolled_to_component_indices (i*dim*dim+j*dim+k),
+                  ExcInternalError());
+          Assert (T::component_to_unrolled_index(TableIndices<3>(i,j,k))
+                  ==
+                  i*dim*dim+j*dim+k,
+                  ExcInternalError());
+          Assert (t[TableIndices<3>(i,j,k)] == t[i][j][k],
+                  ExcInternalError());
+        }
   deallog << "OK" << std::endl;
 }
 

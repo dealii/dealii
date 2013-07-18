@@ -42,7 +42,7 @@ void check (const Triangulation<dim> &tria)
   dof_handler.distribute_dofs (fe);
 
   QGauss<dim-1> q_face(3);
-  
+
   FEFaceValues<dim>    fe_face_values (fe, q_face,
                                        update_q_points | update_JxW_values);
   FESubfaceValues<dim> fe_subface_values (fe, q_face,
@@ -50,13 +50,13 @@ void check (const Triangulation<dim> &tria)
 
   Point<dim> n1, n2;
   for (typename DoFHandler<dim>::active_cell_iterator
-         cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     {
-                                       // first integrate over faces
-                                       // and make sure that the
-                                       // result of the integration is
-                                       // close to zero
+      // first integrate over faces
+      // and make sure that the
+      // result of the integration is
+      // close to zero
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
           {
@@ -65,9 +65,9 @@ void check (const Triangulation<dim> &tria)
               n1 += fe_face_values.quadrature_point(q) *
                     fe_face_values.JxW(q);
           }
-      
-                                       // now same for subface
-                                       // integration
+
+      // now same for subface
+      // integration
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
           for (unsigned int sf=0; sf<GeometryInfo<dim>::max_children_per_face; ++sf)
@@ -78,7 +78,7 @@ void check (const Triangulation<dim> &tria)
                       fe_subface_values.JxW(q);
             }
     }
-  
+
   Assert (n1*n1 < 1e-24, ExcInternalError());
   deallog << " face integration is ok: "
           << std::sqrt (n1*n1)
@@ -90,39 +90,39 @@ void check (const Triangulation<dim> &tria)
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("q_point_sum_1/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<2> coarse_grid;
     GridGenerator::hyper_cube (coarse_grid, -1, 1);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_cube (coarse_grid, -1, 1);
     check (coarse_grid);
   }
 
-  
-  {  
+
+  {
     Triangulation<2> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     check (coarse_grid);
   }
-  
+
 }
 
-  
-  
+
+

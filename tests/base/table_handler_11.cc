@@ -47,17 +47,17 @@ int main ()
   table.add_value(keys[2], std::string("abc"));
   table.add_value(keys[3], std::string("A"));
   table.add_value(keys[4], 123456789.0);
-  
+
   table.add_column_to_supercolumn("key1","short");
   table.add_column_to_supercolumn("key2","short");
   table.add_column_to_supercolumn("key3","very_long_supercolumn");
   table.add_column_to_supercolumn("key4","very_long_supercolumn");
 
   table.write_text(deallog.get_file_stream(),
-		   TableHandler::table_with_separate_column_description);
-  
+                   TableHandler::table_with_separate_column_description);
+
   deallog << std::endl;
-  
+
   table.write_text(deallog.get_file_stream(),
-		   TableHandler::table_with_headers);  
+                   TableHandler::table_with_headers);
 }

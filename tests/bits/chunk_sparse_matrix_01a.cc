@@ -37,13 +37,13 @@ void test (const unsigned int chunk_size)
 
   ChunkSparseMatrix<double> m(sp);
 
-                                   // first set a few entries
+  // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-                                   // then make sure we retrieve the same ones
+  // then make sure we retrieve the same ones
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
@@ -53,21 +53,21 @@ void test (const unsigned int chunk_size)
         }
       else
         {
-					   // reading elements not in the
-					   // sparsity pattern should return
-					   // zero
-	  const double x = m.el(i,j);
-	  Assert (x == 0, ExcInternalError());
+          // reading elements not in the
+          // sparsity pattern should return
+          // zero
+          const double x = m.el(i,j);
+          Assert (x == 0, ExcInternalError());
 
-					   // if this is a sparsity_pattern
-					   // with chunk_size==1, then we need
-					   // to get an exception if we access
-					   // any other element. if
-					   // chunk_size>1, then this isn't
-					   // necessarily true. because the
-					   // matrix is square, we may also
-					   // always access the diagonal
-					   // element
+          // if this is a sparsity_pattern
+          // with chunk_size==1, then we need
+          // to get an exception if we access
+          // any other element. if
+          // chunk_size>1, then this isn't
+          // necessarily true. because the
+          // matrix is square, we may also
+          // always access the diagonal
+          // element
           bool exc_thrown = false;
           try
             {
@@ -78,7 +78,7 @@ void test (const unsigned int chunk_size)
               exc_thrown = true;
             }
           Assert ((exc_thrown == true) || (chunk_size > 1) || (i==j),
-		  ExcInternalError());
+                  ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
@@ -97,32 +97,32 @@ int main ()
     {
       const unsigned int chunk_sizes[] = { 1, 2, 4, 5, 7 };
       for (unsigned int i=0;
-	   i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
-	   ++i)
-	test (chunk_sizes[i]);
+           i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
+           ++i)
+        test (chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
 
       return 1;
     }
   catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

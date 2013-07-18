@@ -37,9 +37,9 @@ void test ()
   mapping_collection.push_back (MappingQ<dim>(2));
   mapping_collection.push_back (MappingQ<dim>(1));
 
-                                   // now create a copy and make sure
-                                   // it goes out of scope before the
-                                   // original
+  // now create a copy and make sure
+  // it goes out of scope before the
+  // original
   {
     hp::MappingCollection<dim> copy (mapping_collection);
   }
@@ -51,14 +51,14 @@ int main ()
 {
   std::ofstream logfile("mapping_collection_01/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

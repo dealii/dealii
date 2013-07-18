@@ -28,15 +28,15 @@ void test (const unsigned int chunk_size)
 {
   deallog << "Chunk size: " << chunk_size << std::endl;
 
-                                   // create a sparsity pattern with totally
-                                   // empty lines (not even diagonals, since
-                                   // not quadratic)
+  // create a sparsity pattern with totally
+  // empty lines (not even diagonals, since
+  // not quadratic)
   ChunkSparsityPattern sparsity(4,5,1,chunk_size);
   sparsity.add (1,1);
   sparsity.add (3,1);
   sparsity.compress ();
 
-                                   // attach a sparse matrix to it
+  // attach a sparse matrix to it
   ChunkSparseMatrix<double> A(sparsity);
 
   ChunkSparseMatrix<double>::const_iterator k = A.begin(),
@@ -53,7 +53,7 @@ void test (const unsigned int chunk_size)
 
   Assert (k == k, ExcInternalError());
   Assert (!(k != k), ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -74,25 +74,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

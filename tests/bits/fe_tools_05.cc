@@ -31,18 +31,18 @@ void
 check_this (const FiniteElement<dim> &fe1,
             const FiniteElement<dim> &fe2)
 {
-                                   // only check if both elements have
-                                   // support points. otherwise,
-                                   // interpolation doesn't really
-                                   // work
+  // only check if both elements have
+  // support points. otherwise,
+  // interpolation doesn't really
+  // work
   if ((fe1.get_unit_support_points().size() == 0) ||
       (fe2.get_unit_support_points().size() == 0))
     return;
-                                   //  likewise for non-primitive elements
+  //  likewise for non-primitive elements
   if (!fe1.is_primitive() || !fe2.is_primitive())
     return;
-                                   // we need to have dof_constraints
-                                   // for this test
+  // we need to have dof_constraints
+  // for this test
   if (!fe2.constraints_are_implemented())
     return;
 
@@ -52,11 +52,11 @@ check_this (const FiniteElement<dim> &fe1,
   ConstraintMatrix cm;
   DoFTools::make_hanging_node_constraints (*dof2, cm);
   cm.close ();
-  
+
   Vector<double> in (dof1->n_dofs());
   for (unsigned int i=0; i<in.size(); ++i) in(i) = i;
   Vector<double> out (dof2->n_dofs());
-  
+
   FETools::interpolate (*dof1, in, *dof2, cm, out);
   output_vector (out);
 }

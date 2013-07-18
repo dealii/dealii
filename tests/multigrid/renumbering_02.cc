@@ -45,7 +45,7 @@ void check()
 {
   FE_DGQ<dim> fe(1);
   deallog << fe.get_name() << std::endl;
-  
+
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
@@ -53,7 +53,7 @@ void check()
   for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_cell; ++i, ++cell)
     cell->set_coarsen_flag();
   tria.execute_coarsening_and_refinement ();
-  
+
   MGDoFHandler<dim> mg_dof_handler(tria);
   mg_dof_handler.distribute_dofs(fe);
   Point<dim> a;

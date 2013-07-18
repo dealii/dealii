@@ -61,8 +61,8 @@ void test (const char *filename)
   catch (std::exception &exc)
     {
       deallog << "  caught exception:" << std::endl
-	      << exc.what()
-	      << std::endl;
+              << exc.what()
+              << std::endl;
       return;
     }
 

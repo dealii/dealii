@@ -27,7 +27,7 @@
 #include <fstream>
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("block_matrix_array_01/output");
   deallog.attach(logfile);
@@ -39,9 +39,9 @@ int main ()
   FullMatrix<double> B(4,3);
   FullMatrix<double> C(3,3);
   PrimitiveVectorMemory<Vector<double> > mem;
-  
+
   BlockMatrixArray<double> block(2,2,mem);
-  
+
   block.enter(A1,0,0);
   block.enter(A2,0,0,2,true);
   block.enter(B,0,1,-3.);
@@ -49,6 +49,6 @@ int main ()
   block.enter(C,1,1,1.,true);
 
   block.print_latex(deallog);
-  
+
   return 0;
 }

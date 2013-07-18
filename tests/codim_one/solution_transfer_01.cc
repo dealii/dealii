@@ -60,11 +60,11 @@ int main ()
 
   Triangulation<dim,spacedim> boundary_mesh;
 
-				   // create a line in 2d
+  // create a line in 2d
   GridGenerator::hyper_cube (boundary_mesh);
 
-				   // attach a piecewise constant
-				   // element to this one cell
+  // attach a piecewise constant
+  // element to this one cell
   FE_DGQ<dim,spacedim> fe(0);
   DoFHandler<dim,spacedim>  dh (boundary_mesh);
   dh.distribute_dofs(fe);
@@ -77,11 +77,11 @@ int main ()
     deallog << solution(i) << std::endl;
 
 
-				   // Do some refinement
+  // Do some refinement
   boundary_mesh.begin_active()->set_refine_flag ();
 
   SolutionTransfer<dim, Vector<double>, DoFHandler<dim,spacedim> >
-    soltrans(dh);
+  soltrans(dh);
 
   boundary_mesh.prepare_coarsening_and_refinement();
 
@@ -90,8 +90,8 @@ int main ()
 
   dh.distribute_dofs(fe);
 
-				   // get the interpolated solution
-				   // back
+  // get the interpolated solution
+  // back
   Vector<double> tmp(dh.n_dofs());
   tmp = 2;
   soltrans.interpolate(solution, tmp);

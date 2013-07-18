@@ -53,7 +53,7 @@ void test ();
 template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number=double>
 class MatrixFreeTest
 {
- public:
+public:
   bool read_vector;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
@@ -69,7 +69,7 @@ class MatrixFreeTest
   {
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval (data);
 
-    for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         fe_eval.reinit (cell);
 
@@ -111,7 +111,7 @@ protected:
 
 template <int dim, int fe_degree, typename number>
 void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix&constraints)
+              const ConstraintMatrix &constraints)
 {
   // use this for info on problem
   //std::cout << "Number of cells: " << dof.get_tria().n_active_cells()
@@ -121,10 +121,10 @@ void do_test (const DoFHandler<dim> &dof,
 
   Vector<number> solution (dof.n_dofs());
 
-                                // create vector with random entries
+  // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      if(constraints.is_constrained(i))
+      if (constraints.is_constrained(i))
         continue;
       const double entry = rand()/(double)RAND_MAX;
       solution(i) = entry;
@@ -176,7 +176,7 @@ void test ()
   GridGenerator::hyper_ball (tria);
   static const HyperBallBoundary<dim> boundary;
   tria.set_boundary (0, boundary);
-                                // refine first and last cell
+  // refine first and last cell
   tria.begin(tria.n_levels()-1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();

@@ -20,7 +20,7 @@
 // existing PETSc vector.
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>    
+#include <deal.II/lac/petsc_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -29,19 +29,19 @@
 void test (PETScWrappers::Vector &v,
            PETScWrappers::Vector &w)
 {
-                                   // set the first vector
+  // set the first vector
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
 
-                                   // copy elements by reference
+  // copy elements by reference
   for (unsigned int i=0; i<v.size(); ++i)
     w(i) = v(i);
 
-                                   // check that they're equal
+  // check that they're equal
   Assert (v==w, ExcInternalError());
-  
+
   v=w;
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -60,7 +60,7 @@ int main (int argc, char **argv)
       Vec vpetsc;
       int ierr = VecCreateSeq (PETSC_COMM_SELF, 100, &vpetsc);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-      {	
+      {
         PETScWrappers::Vector v (vpetsc);
         PETScWrappers::Vector w (100);
         test (v,w);
@@ -74,30 +74,30 @@ int main (int argc, char **argv)
 
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

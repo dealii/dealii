@@ -33,18 +33,18 @@ void
 check_this (const DoFHandler<dim> &dof_handler)
 {
   const FiniteElement<dim> &fe = dof_handler.get_fe();
-  
+
   for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
     {
       deallog << fe.face_to_equivalent_cell_index (i)
-	      << ' '
-	      << fe.face_to_cell_index (i, 0)
-	      << std::endl;
+              << ' '
+              << fe.face_to_cell_index (i, 0)
+              << std::endl;
       Assert (fe.face_to_equivalent_cell_index (i) ==
-	      fe.face_to_cell_index (i, 0),
-	      ExcInternalError());
+              fe.face_to_cell_index (i, 0),
+              ExcInternalError());
     }
-  
+
   deallog << "OK" << std::endl;
 }
 

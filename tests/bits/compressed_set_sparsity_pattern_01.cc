@@ -28,10 +28,10 @@
 
 void test ()
 {
-                                   // set up a sparsity pattern. since
-                                   // CompressedSetSparsityPatterns are most
-                                   // often used for 3d, use a rather large
-                                   // number of entries per row
+  // set up a sparsity pattern. since
+  // CompressedSetSparsityPatterns are most
+  // often used for 3d, use a rather large
+  // number of entries per row
   const unsigned int N = 1000;
   CompressedSetSparsityPattern csp (N,N);
   for (unsigned int i=0; i<N; ++i)
@@ -45,7 +45,7 @@ void test ()
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("compressed_set_sparsity_pattern_01/output");
   deallog.attach(logfile);

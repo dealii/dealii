@@ -38,8 +38,8 @@ int main()
   deallog.depth_console(0);
 
 
-				   // assemble a 2x2 block identity
-				   // matrix
+  // assemble a 2x2 block identity
+  // matrix
   BlockSparsityPattern block_structure(2,2);
   block_structure.block(0,0).reinit (2,2,1);
   block_structure.block(0,1).reinit (2,2,1);
@@ -59,29 +59,29 @@ int main()
   block_A.add(2,2,1);
   block_A.add(3,3,1);
 
-				   // block vector with 2 blocks of 2
-				   // components each
+  // block vector with 2 blocks of 2
+  // components each
   BlockVector<double> a (2,2);
   a(0) = 2;
   a(1) = 3;
   a(2) = 4;
   a(3) = 5;
-  
-				   // this should work (check that
-				   // sizes of objects are all
-				   // correct)
+
+  // this should work (check that
+  // sizes of objects are all
+  // correct)
   BlockVector<double> b (2,2);
   block_A.vmult (b,a);
 
-				   // and while at it also check
-				   // whether the result was correct
+  // and while at it also check
+  // whether the result was correct
   Assert (b(0) == 2, ExcInternalError());
   Assert (b(1) == 3, ExcInternalError());
   Assert (b(2) == 4, ExcInternalError());
   Assert (b(3) == 5, ExcInternalError());
 
-				   // now solve with MinRes. This
-				   // didn't work at one point
+  // now solve with MinRes. This
+  // didn't work at one point
   SolverControl  solver_control (1000, 1e-12);
   SolverMinRes<BlockVector<double> > minres (solver_control);
 

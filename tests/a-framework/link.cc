@@ -32,7 +32,7 @@ int main ()
   deallog.depth_console(0);
 
   std::abort ();
-  
+
   deallog << "OK" << std::endl;
 }
 

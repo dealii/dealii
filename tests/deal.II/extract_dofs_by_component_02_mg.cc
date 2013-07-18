@@ -54,31 +54,31 @@ check ()
   tr.execute_coarsening_and_refinement();
 
   FESystem<dim> element (FE_Q<dim>(2), 1,
-			 FE_Nedelec<dim>(0), 1);
+                         FE_Nedelec<dim>(0), 1);
   MGDoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // try all possible block
-				   // masks, which we encode as bit
-				   // strings
+  // try all possible block
+  // masks, which we encode as bit
+  // strings
   for (unsigned int int_mask=0; int_mask<(1U<<element[0].n_blocks()); ++int_mask)
-  {
-    std::vector<bool> component_mask (element[0].n_blocks());
-    for (unsigned int c=0; c<element[0].n_blocks(); ++c)
-      component_mask[c] = (int_mask & (1<<c));
+    {
+      std::vector<bool> component_mask (element[0].n_blocks());
+      for (unsigned int c=0; c<element[0].n_blocks(); ++c)
+        component_mask[c] = (int_mask & (1<<c));
 
-    for (unsigned int level=0; level<tr.n_levels(); ++level)
-      {
-	deallog << "level=" << level << std::endl;
+      for (unsigned int level=0; level<tr.n_levels(); ++level)
+        {
+          deallog << "level=" << level << std::endl;
 
-	std::vector<bool> dofs (dof.n_dofs(level));
-	DoFTools::extract_level_dofs (level, dof, BlockMask(component_mask), dofs);
+          std::vector<bool> dofs (dof.n_dofs(level));
+          DoFTools::extract_level_dofs (level, dof, BlockMask(component_mask), dofs);
 
-	for (unsigned int d=0; d<dofs.size(); ++d)
-	  deallog << dofs[d];
-	deallog << std::endl;
-      }
-  }
+          for (unsigned int d=0; d<dofs.size(); ++d)
+            deallog << dofs[d];
+          deallog << std::endl;
+        }
+    }
 }
 
 

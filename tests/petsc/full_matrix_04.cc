@@ -19,7 +19,7 @@
 // check querying matrix sizes
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_full_matrix.h>    
+#include <deal.II/lac/petsc_full_matrix.h>
 #include <fstream>
 #include <iostream>
 
@@ -34,7 +34,7 @@ void test (PETScWrappers::FullMatrix &m)
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("full_matrix_04/output");
   deallog.attach(logfile);
@@ -48,30 +48,30 @@ int main (int argc,char **argv)
         PETScWrappers::FullMatrix m (5,5);
         test (m);
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

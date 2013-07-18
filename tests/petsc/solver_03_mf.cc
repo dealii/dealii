@@ -34,18 +34,18 @@
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve( SOLVER& solver, const MATRIX& A,
-	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+check_solve( SOLVER &solver, const MATRIX &A,
+             VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
   u = 0.;
   f = 1.;
-  try 
+  try
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception& e)
+  catch (std::exception &e)
     {
       std::cout << e.what() << std::endl;
       deallog << e.what() << std::endl;
@@ -66,14 +66,14 @@ int main(int argc, char **argv)
   deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  {  
+  {
     SolverControl control(100, 1.e-3);
 
     const unsigned int size = 32;
     unsigned int dim = (size-1)*(size-1);
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
-      
+
     PetscFDMatrix  A(size, dim);
 
     PETScWrappers::Vector  f(dim);
@@ -87,6 +87,6 @@ int main(int argc, char **argv)
     PETScWrappers::PreconditionNone preconditioner(A);
     check_solve (solver, A,u,f, preconditioner);
   }
-  
+
 }
 

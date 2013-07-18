@@ -34,32 +34,32 @@ void test ()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-				   // test for an initialized mask
+  // test for an initialized mask
   Assert (BlockMask(12,true).n_selected_blocks() == 12,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (BlockMask(12,true).n_selected_blocks(12) == 12,
-	  ExcInternalError());
-				   // test for an empty mask
+          ExcInternalError());
+  // test for an empty mask
   Assert (BlockMask().n_selected_blocks(12) == 12,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (BlockMask().n_selected_blocks(13) == 13,
-	  ExcInternalError());
+          ExcInternalError());
 
 
   deallog << "OK" << std::endl;
 
-				   // this now must throw an exception,
-				   // though:
-  try 
+  // this now must throw an exception,
+  // though:
+  try
     {
       Assert (BlockMask(12,true).n_selected_blocks(13) == 12,
-	      ExcInternalError());
+              ExcInternalError());
     }
   catch (ExceptionBase &e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
-  
+
 }
 
 

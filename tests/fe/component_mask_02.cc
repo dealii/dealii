@@ -38,11 +38,11 @@ void test ()
 
   ComponentMask m(v);
 
-				   // verify equality
+  // verify equality
   for (unsigned int i=0; i<v.size(); ++i)
     Assert (m[i] == v[i], ExcInternalError());
 
-				   // this needs to throw an exception
+  // this needs to throw an exception
   try
     {
       m[v.size()];

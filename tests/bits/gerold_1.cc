@@ -55,23 +55,23 @@
 
 
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
-  public:
-    LaplaceProblem ();
-    void run ();
-    
-  private:
+public:
+  LaplaceProblem ();
+  void run ();
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+private:
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
+  Triangulation<dim>   triangulation;
+  FE_Q<dim>            fe;
+  DoFHandler<dim>      dof_handler;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> system_matrix;
+
+  Vector<double>       solution;
+  Vector<double>       system_rhs;
 };
 
 
@@ -79,24 +79,24 @@ class LaplaceProblem
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-                fe (1),
-		dof_handler (triangulation)
+  fe (1),
+  dof_handler (triangulation)
 {}
 
 
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   deallog << "Solving problem in " << dim << " space dimensions." << std::endl;
-  
- 
-  
+
+
+
   GridIn<dim> grid_in;
   grid_in.attach_triangulation (triangulation);
 
 
   std::ifstream input_file("gerold_1.inp");
- 
+
 
   deallog << "read ucd data file" << std::endl;
 
@@ -106,13 +106,13 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("gerold_1/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-				
+
   try
     {
       LaplaceProblem<3> laplace_problem_3d;
@@ -121,26 +121,26 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
-  
+
   return 0;
 }

@@ -42,34 +42,34 @@
 
 using namespace std;
 
-void log_vector (const std::vector<std::set<types::global_dof_index> >& count)
+void log_vector (const std::vector<std::set<types::global_dof_index> > &count)
 {
-  for (unsigned int l=0;l<count.size();++l)
+  for (unsigned int l=0; l<count.size(); ++l)
     {
       deallog << "Level " << l << ':';
       for (std::set<types::global_dof_index>::const_iterator c=count[l].begin();
-	   c != count[l].end();++c)
-	deallog << ' ' << *c;
+           c != count[l].end(); ++c)
+        deallog << ' ' << *c;
       deallog << std::endl;
     }
 }
 
 
 template <int dim>
-void check_fe(FiniteElement<dim>& fe)
+void check_fe(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
-  
+
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
   ZeroFunction<dim> zero;
   typename FunctionMap<dim>::type fmap;
   fmap.insert(std::make_pair(0, &zero));
-  
+
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  
+
   std::vector<std::set<types::global_dof_index> > boundary_indices(tr.n_levels());
   MGTools::make_boundary_list(mgdof, fmap, boundary_indices);
   log_vector(boundary_indices);
@@ -82,7 +82,7 @@ void check()
   FE_Q<dim> q1(1);
   FE_Q<dim> q2(2);
 //  FE_DGQ<dim> dq1(1);
-  
+
   FESystem<dim> s1(q1, 2, q2,1);
 
   check_fe(q1);

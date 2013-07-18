@@ -19,7 +19,7 @@
 // check Vector<std::complex<double> >::ratio
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -35,23 +35,23 @@ void test (Vector<std::complex<double> > &v,
       w(i) = std::complex<double> (i+2., i+3.);
       x(i) = std::complex<double> (i+3., i+4.);
     }
-  
+
   v.compress ();
   w.compress ();
   x.compress ();
 
   v.ratio (w, x);
 
-                                   // make sure we get the expected result
+  // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
       Assert (w(i) == std::complex<double> (i+2., i+3.),
-	      ExcInternalError());
+              ExcInternalError());
       Assert (x(i) == std::complex<double> (i+3., i+4.),
-	      ExcInternalError());
+              ExcInternalError());
       Assert (std::abs(v(i) -
-		       std::complex<double> (i+2., i+3.) /
-		       std::complex<double> (i+3., i+4.)) < 1e-14*std::abs(v(i)),
+                       std::complex<double> (i+2., i+3.) /
+                       std::complex<double> (i+3., i+4.)) < 1e-14*std::abs(v(i)),
               ExcInternalError());
     }
 
@@ -60,7 +60,7 @@ void test (Vector<std::complex<double> > &v,
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("complex_vector_48/output");
   deallog.attach(logfile);
@@ -77,25 +77,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

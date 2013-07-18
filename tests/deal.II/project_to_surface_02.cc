@@ -36,24 +36,24 @@
 
 class Rotate2d
 {
-  public:
-    Rotate2d (const double angle)
-		    :
-		    angle(angle)
-      {}
+public:
+  Rotate2d (const double angle)
+    :
+    angle(angle)
+  {}
 
-    template <int spacedim>
-    Point<spacedim> operator() (const Point<spacedim> p) const
-      {
-	Point<spacedim> q;
-	q[0] = std::cos(angle)*p(0) - std::sin(angle) * p(1);
-	q[1] = std::sin(angle)*p(0) + std::cos(angle) * p(1);
-	for (unsigned d=2; d<spacedim; ++d)
-	  q[d] = p[d];
-	return q;
-      }
-  private:
-    const double angle;
+  template <int spacedim>
+  Point<spacedim> operator() (const Point<spacedim> p) const
+  {
+    Point<spacedim> q;
+    q[0] = std::cos(angle)*p(0) - std::sin(angle) * p(1);
+    q[1] = std::sin(angle)*p(0) + std::cos(angle) * p(1);
+    for (unsigned d=2; d<spacedim; ++d)
+      q[d] = p[d];
+    return q;
+  }
+private:
+  const double angle;
 };
 
 
@@ -71,7 +71,7 @@ void do_rotate (Triangulation<1> &)
 
 template <int dim>
 void create_triangulation(const bool rotate,
-			  Triangulation<dim> &tria)
+                          Triangulation<dim> &tria)
 {
   GridGenerator::hyper_cube(tria, 1., 3.);
 
@@ -84,7 +84,7 @@ template <int dim>
 void test ()
 {
   deallog << "dim=" << dim << std::endl;
-  
+
   Triangulation<dim> tria;
   StraightBoundary<dim> boundary;
 
@@ -96,37 +96,37 @@ void test ()
       const typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
       Point<dim> trial_point;
       for (unsigned int i=0; i<dim; ++i)
-	trial_point[i] = 1.5;
-      
+        trial_point[i] = 1.5;
+
       for (unsigned int e=0; e<GeometryInfo<dim>::quads_per_cell; ++e)
-	{
-	  const typename Triangulation<dim>::quad_iterator
-	    quad = (dim > 2 ? cell->quad(e) :
-		    *reinterpret_cast<const typename Triangulation<dim>::quad_iterator*>(&cell));
-	  
-	  deallog << "    Quad " << e << ", projected point=";
+        {
+          const typename Triangulation<dim>::quad_iterator
+          quad = (dim > 2 ? cell->quad(e) :
+                  *reinterpret_cast<const typename Triangulation<dim>::quad_iterator *>(&cell));
 
-	  const Point<dim> p = boundary.project_to_surface (quad, trial_point);
-	  deallog << p;
-	  deallog << "  (quad is from ";
-	  deallog << quad->vertex(0);
-	  deallog << " to ";
-	  deallog << quad->vertex(1);
-	  deallog << " to ";
-	  deallog << quad->vertex(2);
-	  deallog << " to ";
-	  deallog << quad->vertex(3);
-	  deallog << ")" << std::endl;
+          deallog << "    Quad " << e << ", projected point=";
 
-					   // now make sure that p is
-					   // indeed closer to
-					   // trial_point than any of
-					   // the vertices of the quad
-	  for (unsigned int v=0; v<4; ++v)
-	    Assert (p.distance (trial_point) <=
-		    quad->vertex(v).distance (trial_point),
-		    ExcInternalError());
-	}
+          const Point<dim> p = boundary.project_to_surface (quad, trial_point);
+          deallog << p;
+          deallog << "  (quad is from ";
+          deallog << quad->vertex(0);
+          deallog << " to ";
+          deallog << quad->vertex(1);
+          deallog << " to ";
+          deallog << quad->vertex(2);
+          deallog << " to ";
+          deallog << quad->vertex(3);
+          deallog << ")" << std::endl;
+
+          // now make sure that p is
+          // indeed closer to
+          // trial_point than any of
+          // the vertices of the quad
+          for (unsigned int v=0; v<4; ++v)
+            Assert (p.distance (trial_point) <=
+                    quad->vertex(v).distance (trial_point),
+                    ExcInternalError());
+        }
       tria.clear();
     }
 }
@@ -138,7 +138,7 @@ int main ()
 {
   std::ofstream logfile ("project_to_surface_02/output");
   deallog << std::setprecision (3);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

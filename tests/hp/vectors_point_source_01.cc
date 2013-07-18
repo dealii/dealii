@@ -50,7 +50,7 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -61,21 +61,21 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-				   // create a system element composed
-				   // of one Q1 and one Q2 element
+  // create a system element composed
+  // of one Q1 and one Q2 element
   hp::FECollection<dim> element;
   element.push_back (FE_Q<dim>(1));
   hp::DoFHandler<dim> dof(tr);
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof.begin_active(); cell!=dof.end(); ++cell)
+       cell = dof.begin_active(); cell!=dof.end(); ++cell)
     cell->set_active_fe_index (rand() % element.size());
-  
+
   dof.distribute_dofs(element);
 
-				   // use a more complicated mapping
-				   // of the domain and a quadrature
-				   // formula suited to the elements
-				   // we have here
+  // use a more complicated mapping
+  // of the domain and a quadrature
+  // formula suited to the elements
+  // we have here
   hp::MappingCollection<dim> mapping;
   mapping.push_back (MappingQ<dim>(3));
 
@@ -84,8 +84,8 @@ check ()
 
   Vector<double> rhs (dof.n_dofs());
   VectorTools::create_point_source_vector (dof,
-					   tr.begin()->center(),
-					   rhs);
+                                           tr.begin()->center(),
+                                           rhs);
   for (unsigned int i=0; i<rhs.size(); ++i)
     deallog << rhs(i) << std::endl;
 }
@@ -96,7 +96,7 @@ int main ()
 {
   std::ofstream logfile ("vectors_point_source_01/output");
   logfile.precision (4);
-  logfile.setf(std::ios::fixed);  
+  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);

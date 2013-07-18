@@ -37,33 +37,33 @@ void test ()
 
   ComponentMask m(v);
 
-				   // test for an initialized mask
+  // test for an initialized mask
   Assert (m.first_selected_component() == 3,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (ComponentMask(12,true).first_selected_component() == 0,
-	  ExcInternalError());
-				   // test for an empty mask
+          ExcInternalError());
+  // test for an empty mask
   Assert (ComponentMask().first_selected_component(12) == 0,
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 
-				   // the following should yield an exception:
-  try 
+  // the following should yield an exception:
+  try
     {
       Assert (ComponentMask(12,true).first_selected_component(13) == 0,
-	      ExcInternalError());
+              ExcInternalError());
     }
   catch (ExceptionBase &e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
-  
-				   // as should this:
+
+  // as should this:
   try
     {
       Assert (ComponentMask(12,false).first_selected_component() == 0,
-	      ExcInternalError());
+              ExcInternalError());
     }
   catch (ExceptionBase &e)
     {

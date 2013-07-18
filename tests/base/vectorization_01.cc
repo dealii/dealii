@@ -66,7 +66,7 @@ void test ()
     deallog << a[i] << " ";
   deallog << std::endl;
 
-				// check setting elements for large vectors
+  // check setting elements for large vectors
   a.resize (0);
   a.resize (100000, 1);
   deallog << "Check large initialization: ";
@@ -74,7 +74,7 @@ void test ()
     AssertDimension (a[i], 1);
   deallog << "OK" << std::endl;
 
-				// check resize for large vectors
+  // check resize for large vectors
   deallog << "Check large resize: ";
   a.resize (200000, 2);
   a.resize (400000);

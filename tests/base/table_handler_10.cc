@@ -41,26 +41,26 @@ int main ()
 
   std::string keys[3] = { "key1", "key2", "key3" };
 
-				   // fill rows 1 and 2 partially
+  // fill rows 1 and 2 partially
   table.add_value(keys[0], 0.0);
   table.add_value(keys[0], 1.0);
-				   // now fill row 3 completely
+  // now fill row 3 completely
   table.add_value(keys[0], 2.0);
   table.add_value(keys[1], 123.456);
   table.add_value(keys[2], std::string("abc"));
 
-				   // now again fill row 4 partially
+  // now again fill row 4 partially
   table.add_value(keys[0], 1.0);
 
-				   // produce output. hope that row 4 is
-				   // completely padded
+  // produce output. hope that row 4 is
+  // completely padded
   table.write_text(deallog.get_file_stream(),
-		   TableHandler::table_with_separate_column_description);
+                   TableHandler::table_with_separate_column_description);
 
   table.set_scientific(keys[0], true);
   table.set_precision(keys[1], 1);
 
   table.write_text(deallog.get_file_stream(),
-		   TableHandler::table_with_separate_column_description);
-  
+                   TableHandler::table_with_separate_column_description);
+
 }

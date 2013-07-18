@@ -34,9 +34,9 @@ void test ()
 
   ConstraintMatrix cm1, cm2;
 
-				   // a "regular" and a singular
-				   // constraint to each of the
-				   // constraint matrices
+  // a "regular" and a singular
+  // constraint to each of the
+  // constraint matrices
   cm1.add_line (1);
   cm1.add_entry (1, 2, 42.);
   cm1.add_line (4);
@@ -59,12 +59,12 @@ int main ()
 {
   std::ofstream logfile("constraints_zero_merge/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   test ();
-  
+
   deallog << "OK" << std::endl;
 }

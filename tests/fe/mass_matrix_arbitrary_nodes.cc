@@ -44,9 +44,9 @@ void check ()
 
       Triangulation<dim> tr;
       if (dim == 1)
-	GridGenerator::hyper_cube (tr);
+        GridGenerator::hyper_cube (tr);
       else
-      	GridGenerator::hyper_ball (tr);
+        GridGenerator::hyper_ball (tr);
       tr.refine_global (3-dim);
 
       FE_DGQArbitraryNodes<dim> fe ((QGauss<1>(q_points)));
@@ -54,25 +54,25 @@ void check ()
       dh.distribute_dofs (fe);
 
       SparsityPattern sp (dh.n_dofs(),
-			  dh.n_dofs(),
-			  fe.dofs_per_cell);
+                          dh.n_dofs(),
+                          fe.dofs_per_cell);
       DoFTools::make_sparsity_pattern (dh, sp);
       sp.compress();
 
       SparseMatrix<double> mass_matrix (sp);
       MatrixTools::create_mass_matrix (dh,
-				       QGauss<dim>(q_points),
-				       mass_matrix);
+                                       QGauss<dim>(q_points),
+                                       mass_matrix);
 
-				       // verify that the matrix is diagonal
+      // verify that the matrix is diagonal
       for (unsigned int i=0; i<dh.n_dofs(); ++i)
-	{
-	  deallog << mass_matrix.el(i,i) << std::endl;
-	  for (unsigned int j=0; j<dh.n_dofs(); ++j)
-	    if (i != j)
-	      Assert (std::fabs(mass_matrix.el(i,j) / mass_matrix.el(i,i)) < 1e-14,
-		      ExcInternalError());
-	}
+        {
+          deallog << mass_matrix.el(i,i) << std::endl;
+          for (unsigned int j=0; j<dh.n_dofs(); ++j)
+            if (i != j)
+              Assert (std::fabs(mass_matrix.el(i,j) / mass_matrix.el(i,i)) < 1e-14,
+                      ExcInternalError());
+        }
     }
 }
 

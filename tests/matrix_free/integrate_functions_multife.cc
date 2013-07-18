@@ -47,7 +47,7 @@ std::ofstream logfile("integrate_functions_multife/output");
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
- public:
+public:
   typedef std::vector<Vector<Number> > VectorType;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
@@ -107,20 +107,20 @@ operator () (const MatrixFree<dim,Number> &data,
   AlignedVector<VectorizedArray<Number> > gradients1 (dim*n_q_points1);
   std::vector<types::global_dof_index> dof_indices0 (dofs_per_cell0);
   std::vector<types::global_dof_index> dof_indices1 (dofs_per_cell1);
-  for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
     {
       fe_eval0.reinit(cell);
       fe_eval1.reinit(cell);
       fe_eval01.reinit(cell);
 
-                                // compare values with the ones the FEValues
-                                // gives us. Those are seen as reference
+      // compare values with the ones the FEValues
+      // gives us. Those are seen as reference
       for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
         {
-                                // FE 0, Quad 0
-                                // generate random numbers at quadrature
-                                // points and test them with basis functions
-                                // and their gradients
+          // FE 0, Quad 0
+          // generate random numbers at quadrature
+          // points and test them with basis functions
+          // and their gradients
           for (unsigned int q=0; q<n_q_points0; ++q)
             {
               values0[q][j] = rand()/(double)RAND_MAX;
@@ -143,7 +143,7 @@ operator () (const MatrixFree<dim,Number> &data,
               dst[0+1](dof_indices0[i]) += sum;
             }
 
-                                // FE 1, Quad 1
+          // FE 1, Quad 1
           fe_val1.reinit (data.get_cell_iterator(cell,j,1));
           data.get_cell_iterator(cell,j,1)->get_dof_indices(dof_indices1);
 
@@ -166,7 +166,7 @@ operator () (const MatrixFree<dim,Number> &data,
               dst[2+1](dof_indices1[i]) += sum;
             }
 
-                                // FE 0, Quad 1
+          // FE 0, Quad 1
           fe_val01.reinit (data.get_cell_iterator(cell,j,0));
           for (unsigned int i=0; i<dofs_per_cell0; ++i)
             {
@@ -182,7 +182,7 @@ operator () (const MatrixFree<dim,Number> &data,
             }
         }
 
-                                // FE 0, Quad 0
+      // FE 0, Quad 0
       for (unsigned int q=0; q<n_q_points0; ++q)
         {
           fe_eval0.submit_value (values0[q], q);
@@ -194,7 +194,7 @@ operator () (const MatrixFree<dim,Number> &data,
       fe_eval0.integrate (true,true);
       fe_eval0.distribute_local_to_global (dst[0]);
 
-                                // FE 1, Quad 1
+      // FE 1, Quad 1
       for (unsigned int q=0; q<n_q_points1; ++q)
         {
           fe_eval1.submit_value (values1[q], q);
@@ -206,7 +206,7 @@ operator () (const MatrixFree<dim,Number> &data,
       fe_eval1.integrate (true,true);
       fe_eval1.distribute_local_to_global (dst[2]);
 
-                                // FE 0, Quad 1
+      // FE 0, Quad 1
       for (unsigned int q=0; q<n_q_points1; ++q)
         {
           fe_eval01.submit_value (values1[q], q);
@@ -225,15 +225,15 @@ operator () (const MatrixFree<dim,Number> &data,
 template <int dim, int fe_degree, typename number>
 void test ()
 {
-                                // create hyper ball geometry and refine some
-                                // cells
+  // create hyper ball geometry and refine some
+  // cells
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
   static const HyperBallBoundary<dim> boundary;
   tria.set_boundary (0, boundary);
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active (),
-    endc = tria.end();
+  cell = tria.begin_active (),
+  endc = tria.end();
   for (; cell!=endc; ++cell)
     if (cell->center().norm()<1e-8)
       cell->set_refine_flag();

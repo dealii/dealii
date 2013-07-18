@@ -31,10 +31,14 @@
 
 struct X
 {
-    X() : i(0) {}
-    X(const X &x) : i(x.i+1) {}
-    X & operator= (const X &x) { i = x.i+1; return *this;}
-    int i;
+  X() : i(0) {}
+  X(const X &x) : i(x.i+1) {}
+  X &operator= (const X &x)
+  {
+    i = x.i+1;
+    return *this;
+  }
+  int i;
 };
 
 
@@ -49,12 +53,12 @@ void execute_value (X x)
 {
   Assert (x.i > 0, ExcInternalError());
   deallog << __PRETTY_FUNCTION__ << ' ' << (x.i>0 ? "OK" : "not OK")
-	  << std::endl;
+          << std::endl;
   deallog << "OK" << std::endl;
 }
 
 
-void test () 
+void test ()
 {
   {
     X x;
@@ -68,8 +72,8 @@ void test ()
   }
 }
 
-  
-  
+
+
 
 int main()
 {

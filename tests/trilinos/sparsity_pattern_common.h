@@ -1,6 +1,6 @@
 //---------------------------  sparsity_pattern_common.h  -------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2008 by the deal.II authors
 //
@@ -32,16 +32,16 @@ void do_reinit (TrilinosWrappers::SparsityPattern &sp)
 
 void build_sparsity (TrilinosWrappers::SparsityPattern &sparsity_pattern)
 {
-				   // generate usual 5-point sparsity pattern
+  // generate usual 5-point sparsity pattern
   do_reinit (sparsity_pattern);
   FDMatrix(N,N).five_point_structure (sparsity_pattern);
   sparsity_pattern.compress ();
 
   deallog << sparsity_pattern.n_rows() << " "
-	  << sparsity_pattern.n_cols() << " "
-	  << sparsity_pattern.bandwidth() << " "
-	  << sparsity_pattern.n_nonzero_elements()
-	  << std::endl;
+          << sparsity_pattern.n_cols() << " "
+          << sparsity_pattern.bandwidth() << " "
+          << sparsity_pattern.n_nonzero_elements()
+          << std::endl;
 }
 
 
@@ -50,7 +50,7 @@ void row_length ()
 {
   TrilinosWrappers::SparsityPattern sparsity_pattern;
   build_sparsity (sparsity_pattern);
-  
+
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     deallog << sparsity_pattern.row_length(i) << std::endl;
 
@@ -82,4 +82,4 @@ void print ()
 }
 
 
-  
+

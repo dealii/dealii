@@ -30,12 +30,12 @@
 template<int dim>
 void test()
 {
-                                   // create 3 triangulations
+  // create 3 triangulations
   Triangulation<dim> tria[3];
 
   GridGenerator::hyper_cube (tria[0]);
   tria[0].refine_global (1);
-  
+
   GridGenerator::hyper_cube (tria[1]);
   GridTools::scale (2, tria[1]);
   tria[1].refine_global (2);
@@ -47,7 +47,7 @@ void test()
       GridGenerator::hyper_cube (tria[2]);
       GridTools::shift (Point<dim>(2.), tria[2]);
     }
-      
+
   tria[2].refine_global (3);
 
   for (unsigned int i=0; i<3; ++i)
@@ -57,7 +57,7 @@ void test()
                 ==
                 (i == j),
                 ExcInternalError());
-        
+
         deallog << "meshes " << i << " and " << j << ": "
                 << (GridTools::have_same_coarse_mesh (tria[i], tria[j])
                     ?

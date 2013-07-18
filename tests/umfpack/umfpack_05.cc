@@ -32,21 +32,21 @@
 void test ()
 {
   std::vector<unsigned int> size (2,2U);
-  
+
   BlockSparsityPattern b_sparsity_pattern;
   b_sparsity_pattern.reinit(size.size(),size.size());
-  for (unsigned int k=0; k<size.size();++k)
-    for (unsigned int l=0; l<size.size();++l)
+  for (unsigned int k=0; k<size.size(); ++k)
+    for (unsigned int l=0; l<size.size(); ++l)
       b_sparsity_pattern.block(k,l).reinit(size[k],
-					   size[l],
-					   2);
+                                           size[l],
+                                           2);
   b_sparsity_pattern.collect_sizes();
   for (unsigned int i=0; i<4; ++i)
     for (unsigned int j=0; j<4; ++j)
       b_sparsity_pattern.add (i,j);
   b_sparsity_pattern.compress();
-  
-  BlockSparseMatrix<double> Bb (b_sparsity_pattern);  
+
+  BlockSparseMatrix<double> Bb (b_sparsity_pattern);
   for (unsigned int i=0; i<4; ++i)
     Bb.add (i,i,1);
 
@@ -56,12 +56,12 @@ void test ()
   Vector<double> ubb(4);
   for (unsigned int i=0; i<4; ++i)
     ubb(i) = i;
-  
+
   umfpackb.solve(ubb);
 
   for (unsigned int i=0; i<4; ++i)
     Assert (std::fabs (ubb(i) - i) < 1e-12,
-	    ExcInternalError());
+            ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

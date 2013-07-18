@@ -39,7 +39,7 @@ check ()
   make_complex_vector (w);
   for (unsigned int i=0; i<w.size(); ++i)
     w(i) = w(i)+std::complex<number>(1.);
-  
+
   deallog << m.matrix_scalar_product (v,w) << std::endl;
 }
 

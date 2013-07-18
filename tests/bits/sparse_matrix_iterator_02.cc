@@ -20,7 +20,7 @@
 // iterator
 
 #include "../tests.h"
-#include <deal.II/lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 #include <iomanip>
 
@@ -43,7 +43,7 @@ void test ()
           ||
           (i==j))
         m.set (i,j, i*j);
-  
+
   SparseMatrix<double>::const_iterator i = m.begin();
   for (; i!=m.end(); ++i)
     {
@@ -72,25 +72,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

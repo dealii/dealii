@@ -36,29 +36,29 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-/* Like in _06 */
+  /* Like in _06 */
   TableHandler table;
   table.set_auto_fill_mode (true);
 
   std::string keys[3] = { "key1", "key2", "key3" };
 
-				   // fill rows 1 and 2 partially
+  // fill rows 1 and 2 partially
   table.add_value(keys[0], 0);
   table.add_value(keys[0], 1);
-				   // now fill row 3 completely
+  // now fill row 3 completely
   table.add_value(keys[0], 2);
   table.add_value(keys[1], 13);
   table.add_value(keys[2], std::string("a"));
 
-				   // now again fill row 4 partially
+  // now again fill row 4 partially
   table.add_value(keys[0], 1);
 
-/* Now copy and write the file from the copy */
+  /* Now copy and write the file from the copy */
   TableHandler table2;
   table2 = table;
 
-				   // produce output. hope that row 4 is
-				   // completely padded
+  // produce output. hope that row 4 is
+  // completely padded
   table2.write_text(deallog.get_file_stream(),
-		   TableHandler::table_with_separate_column_description);
+                    TableHandler::table_with_separate_column_description);
 }

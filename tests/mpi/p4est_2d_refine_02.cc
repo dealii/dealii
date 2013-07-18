@@ -34,19 +34,19 @@
 #include <fstream>
 
 template <class TRIA>
-void check (TRIA & tr)
+void check (TRIA &tr)
 {
   typename TRIA::cell_iterator cell = tr.begin(),
-        endc = tr.end();
-  
+                               endc = tr.end();
+
   for (; cell!=endc; ++cell)
     {
       deallog << "cell level=" << cell->level() << " index=" << cell->index();
       if (!cell->has_children())
-	deallog << " subdomain: " << cell->subdomain_id();
+        deallog << " subdomain: " << cell->subdomain_id();
       deallog << std::endl;
     }
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -59,7 +59,7 @@ void test()
   if (true)
     {
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "hyper_cube" << std::endl;
+        deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -70,17 +70,17 @@ void test()
       tr.execute_coarsening_and_refinement ();
 
       if (myid == 0)
-	{
-	  deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
-	}
+        {
+          deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+        }
 
       const unsigned int checksum = tr.get_checksum ();
       deallog << "Checksum: "
-	      << checksum
-	      << std::endl;
+              << checksum
+              << std::endl;
 
-      check(tr); 
-      }
+      check(tr);
+    }
 
 
 

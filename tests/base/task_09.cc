@@ -39,20 +39,20 @@ void test ()
 
 void outer ()
 {
-				   // wait for some time to make sure
-				   // that really all outer tasks have
-				   // been started, then start a bunch
-				   // of new tasks and wait for them
-				   // to finish. it used to be that
-				   // the join() function used a mutex
-				   // which could only be acquired
-				   // once the spawned task has
-				   // finished, but since we already
-				   // have so many tasks running at
-				   // this point, the children never
-				   // get to run and so never release
-				   // the mutex that we try to acquire
-				   // in join()
+  // wait for some time to make sure
+  // that really all outer tasks have
+  // been started, then start a bunch
+  // of new tasks and wait for them
+  // to finish. it used to be that
+  // the join() function used a mutex
+  // which could only be acquired
+  // once the spawned task has
+  // finished, but since we already
+  // have so many tasks running at
+  // this point, the children never
+  // get to run and so never release
+  // the mutex that we try to acquire
+  // in join()
   sleep (1);
 
   Threads::new_task (test).join();

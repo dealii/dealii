@@ -42,8 +42,8 @@ template <int dim>
 Point<dim> rotate_to_y (const Point<dim> &p)
 {
   return Point<dim> (p[0]*std::cos(xy_angle) - p[1]*std::sin(xy_angle),
-		     p[0]*std::sin(xy_angle) + p[1]*std::cos(xy_angle),
-		     p[2]);
+                     p[0]*std::sin(xy_angle) + p[1]*std::cos(xy_angle),
+                     p[2]);
 }
 
 
@@ -53,23 +53,23 @@ void check ()
   Triangulation<dim> triangulation;
   GridGenerator::cylinder (triangulation);
 
-  GridTools::transform ((Point<dim> (*)(const Point<dim>&))&rotate_to_y<dim>, triangulation);
-  
+  GridTools::transform ((Point<dim> ( *)(const Point<dim> &))&rotate_to_y<dim>, triangulation);
+
   static const CylinderBoundary<dim> boundary (1,
-					       Point<dim>(std::cos(xy_angle), std::sin(xy_angle), 0),
-					       Point<dim>());
+                                               Point<dim>(std::cos(xy_angle), std::sin(xy_angle), 0),
+                                               Point<dim>());
   triangulation.set_boundary (0, boundary);
   triangulation.refine_global (2);
 
   for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active();
+       cell = triangulation.begin_active();
        cell!=triangulation.end(); ++cell)
     for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       deallog << cell->vertex(i) << std::endl;
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("cylinder_04/output");
   deallog.attach(logfile);
@@ -79,5 +79,5 @@ int main ()
   check<3> ();
 }
 
-  
-  
+
+

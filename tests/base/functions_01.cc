@@ -34,20 +34,20 @@
 #include <fstream>
 #include <string>
 
-#define CHECK(F) { deallog << #F << std::endl;	\
-  F f;								\
-  check_function_value_consistency(f, 5);				\
-  check_function_gradient_consistency(f, 5);			\
-  check_gradient(f, 5); \
-}  
-  
+#define CHECK(F) { deallog << #F << std::endl;  \
+    F f;                \
+    check_function_value_consistency(f, 5);       \
+    check_function_gradient_consistency(f, 5);      \
+    check_gradient(f, 5); \
+  }
 
-#define CHECKN(F,arg) { deallog << #F << '(' << arg << ')' << std::endl;	\
-  F f(arg);								\
-  check_function_value_consistency(f, arg+1);				\
-  check_function_gradient_consistency(f, arg+1);			\
-}  
-  
+
+#define CHECKN(F,arg) { deallog << #F << '(' << arg << ')' << std::endl;  \
+    F f(arg);               \
+    check_function_value_consistency(f, arg+1);       \
+    check_function_gradient_consistency(f, arg+1);      \
+  }
+
 
 int main()
 {
@@ -67,5 +67,5 @@ int main()
   CHECK(Functions::CosineGradFunction<3>);
   CHECK(Functions::ExpFunction<1>);
   CHECK(Functions::ExpFunction<2>);
-  CHECK(Functions::ExpFunction<3>);  
+  CHECK(Functions::ExpFunction<3>);
 }

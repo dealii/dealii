@@ -27,19 +27,19 @@
 
 void test ()
 {
-  std::vector<double>		v(9);
+  std::vector<double>   v(9);
   for (unsigned int i = 0; i < v.size(); ++i)
     v[i] = double(i+1);
 
-  std::vector<types::global_dof_index>	partition(3);
+  std::vector<types::global_dof_index>  partition(3);
   for (unsigned int i = 0; i < partition.size(); ++i)
     partition[i] = 3;
 
-  dealii::BlockVector<double>	b(partition);
+  dealii::BlockVector<double> b(partition);
   Assert (b.n_blocks() == partition.size(),
-	  ExcInternalError());
+          ExcInternalError());
 
-  unsigned int			size = 0;
+  unsigned int      size = 0;
   for (unsigned int i = 0; i < b.n_blocks(); ++i)
     {
       Assert (b.block(i).size() == partition[i], ExcInternalError());
@@ -53,7 +53,7 @@ void test ()
       Assert (b(i) == v[i], ExcInternalError());
     }
 
-  dealii::BlockVector<double>	c;
+  dealii::BlockVector<double> c;
   c = b;
   Assert (c == b, ExcInternalError());
   Assert (c.n_blocks() == b.n_blocks(), ExcInternalError());
@@ -73,8 +73,8 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-                                   // do the same weird stuff as in
-                                   // tests/base/reference.cc
+  // do the same weird stuff as in
+  // tests/base/reference.cc
 #if __GNUC__ != 2
   std::basic_streambuf<char> *old_cerr_buf = std::cerr.rdbuf();
 #else
@@ -89,25 +89,25 @@ int main ()
   catch (std::exception &e)
     {
       std::cerr << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      // abort
       return 0;
     }
   catch (...)
     {
       std::cerr << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      // abort
       return 0;
     };
 

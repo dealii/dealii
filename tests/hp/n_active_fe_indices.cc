@@ -38,7 +38,7 @@ template <int dim>
 void check_cells (const hp::DoFHandler<dim> &dof_handler)
 {
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-         cell=dof_handler.begin_active();
+       cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     {
       deallog << "cell=" << cell << std::endl;
@@ -63,10 +63,10 @@ template <int dim>
 void check_faces (const hp::DoFHandler<dim> &dof_handler)
 {
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-         cell=dof_handler.begin_active();
+       cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      {        
+      {
         deallog << "face=" << cell->face(f) << std::endl;
         deallog << "n="
                 << cell->face(f)->n_active_fe_indices ()
@@ -94,10 +94,10 @@ template <int dim>
 void check_edges (const hp::DoFHandler<dim> &dof_handler)
 {
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-         cell=dof_handler.begin_active();
+       cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
-      {        
+      {
         deallog << "edge=" << cell->line(e) << std::endl;
         deallog << "n="
                 << cell->line(e)->n_active_fe_indices ()
@@ -123,7 +123,7 @@ void test ()
   tria.refine_global (2);
   tria.begin_active()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
-  tria.refine_global (2);  
+  tria.refine_global (2);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim> (1));
@@ -134,10 +134,10 @@ void test ()
   hp::DoFHandler<dim> dof_handler(tria);
 
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     cell->set_active_fe_index (rand() % fe_collection.size());
-  
+
   dof_handler.distribute_dofs(fe_collection);
 
   check_cells (dof_handler);
@@ -150,14 +150,14 @@ int main ()
 {
   std::ofstream logfile("n_active_fe_indices/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

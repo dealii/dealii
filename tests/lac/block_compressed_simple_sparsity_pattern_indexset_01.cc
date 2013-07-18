@@ -45,7 +45,7 @@ int main()
   part.push_back(b);
   part.push_back(a);
   BlockCompressedSimpleSparsityPattern csp(part);
-  
+
   deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols() << std::endl;
   deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
   deallog << "size block(1,0):" << csp.block(1,0).n_rows() << "x" << csp.block(1,0).n_cols() << std::endl;
@@ -57,16 +57,16 @@ int main()
   deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
   deallog << "size block(1,0):" << csp.block(1,0).n_rows() << "x" << csp.block(1,0).n_cols() << std::endl;
 
-  for (int i=0;i<13;++i)
+  for (int i=0; i<13; ++i)
     {
       if (i==0 || i==3 || i==5)
-	{
-	  csp.add(i,0);
-	  csp.add(i,i);
-	}
-    }  
+        {
+          csp.add(i,0);
+          csp.add(i,i);
+        }
+    }
 
-  csp.print(logfile);  
-  
+  csp.print(logfile);
+
   return 0;
 }

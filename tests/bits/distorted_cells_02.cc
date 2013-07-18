@@ -56,9 +56,9 @@ void check ()
       flag = true;
 
       deallog << dcv.distorted_cells.size() << " distorted cells"
-	      << std::endl;
+              << std::endl;
       Assert (dcv.distorted_cells.front() == coarse_grid.begin(0),
-	      ExcInternalError());
+              ExcInternalError());
     }
 
   Assert (flag == true, ExcInternalError());

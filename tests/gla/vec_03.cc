@@ -29,17 +29,17 @@
 
 #include "gla.h"
 
-template <class LA> 
+template <class LA>
 void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-  
+
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
 
-				   // each processor owns 2 indices and all
-				   // are ghosting Element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting Element 1 (the second)
 
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
@@ -51,7 +51,7 @@ void test ()
 
   vb = 1.0;
 
-				   // set local values
+  // set local values
   vb(myid*2)=myid*2.0;
   vb(myid*2+1)=myid*2.0+1.0;
 
@@ -64,13 +64,13 @@ void test ()
 
   Assert(!vb.has_ghost_elements(), ExcInternalError());
   Assert(v.has_ghost_elements(), ExcInternalError());
-  
-				   // check local values
-    {
-      deallog << myid*2 << ": " << v(myid*2) << std::endl;
-      deallog << myid*2+1 << ": " << v(myid*2+1) << std::endl;
-    }
-  
+
+  // check local values
+  {
+    deallog << myid*2 << ": " << v(myid*2) << std::endl;
+    deallog << myid*2+1 << ": " << v(myid*2+1) << std::endl;
+  }
+
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 
@@ -78,14 +78,14 @@ void test ()
   cm.add_line(1);
   cm.add_entry(1 ,2, 3.0);
   cm.close();
-  
+
   if (myid==0)
     deallog << "before: " << vb(1) << std::endl;
   cm.distribute(vb); // this should set x(1)= 3.0 * x(2) = 12.0
   if (myid==0)
     deallog << "after: " << vb(1) << std::endl;
-  
-				   // done
+
+  // done
   if (myid==0)
     deallog << "OK" << std::endl;
 }

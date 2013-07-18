@@ -28,29 +28,29 @@
 
 void test (Vector<double> &v)
 {
-                                   // set some entries in the
-                                   // matrix. actually, set them all
+  // set some entries in the
+  // matrix. actually, set them all
   SparsityPattern sp (v.size(),v.size(),v.size());
   for (unsigned int i=0; i<v.size(); ++i)
     for (unsigned int j=0; j<v.size(); ++j)
       sp.add (i,j);
   sp.compress ();
 
-                                   // then create a matrix from that
+  // then create a matrix from that
   SparseMatrix<double> m(sp);
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
-        m.set (i,j, i+2*j);
+      m.set (i,j, i+2*j);
 
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
-  
+
   v.compress ();
 
-                                   // <w,Mv>
+  // <w,Mv>
   const double s = m.matrix_norm_square (v);
 
-                                   // make sure we get the expected result
+  // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     Assert (v(i) == i, ExcInternalError());
 
@@ -66,7 +66,7 @@ void test (Vector<double> &v)
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("sparse_matrix_vector_06/output");
   deallog.attach(logfile);
@@ -81,25 +81,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

@@ -38,14 +38,14 @@ void test (bool second_case=false)
   if (dim==3)
     {
       for (unsigned int i=4; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	vertices[i](2)=-1;
+        vertices[i](2)=-1;
       vertices[5](1)=1;
       vertices[6](0)=1;
       vertices[6](1)=1;
       vertices[7](0)=1;
     }
   std::vector<CellData<dim> > cells(1);
-  for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     cells[0].vertices[i]=i;
 
   if (dim==3 && second_case)
@@ -53,7 +53,7 @@ void test (bool second_case=false)
       std::swap(cells[0].vertices[1],cells[0].vertices[3]);
       std::swap(cells[0].vertices[5],cells[0].vertices[7]);
       for (unsigned int i=4; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	vertices[i](2)=1;
+        vertices[i](2)=1;
     }
 
   SubCellData subcelldata;
@@ -63,9 +63,9 @@ void test (bool second_case=false)
   tria.create_triangulation_compatibility(vertices,cells,subcelldata);
 
   logfile<<"---------------------------------------------"
-	 <<std::endl<<"dim="<<dim
-	 <<(second_case ? ", second case" : ", first case")
-	 <<std::endl<<std::endl;
+         <<std::endl<<"dim="<<dim
+         <<(second_case ? ", second case" : ", first case")
+         <<std::endl<<std::endl;
 
   GridOut grid_out;
   grid_out.set_flags (GridOutFlags::Ucd(true));

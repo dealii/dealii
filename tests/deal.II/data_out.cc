@@ -49,20 +49,20 @@ std::ofstream logfile("data_out/output");
 template <int dim>
 class LaplaceProblem
 {
-  public:
-    LaplaceProblem ();
-    void run ();
+public:
+  LaplaceProblem ();
+  void run ();
 
-  private:
-    void make_grid_and_dofs ();
-    void solve ();
-    void output_results () const;
+private:
+  void make_grid_and_dofs ();
+  void solve ();
+  void output_results () const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+  Triangulation<dim>   triangulation;
+  FE_Q<dim>            fe;
+  DoFHandler<dim>      dof_handler;
 
-    Vector<double>       solution;
+  Vector<double>       solution;
 };
 
 
@@ -86,17 +86,17 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 
 
   deallog << "   Number of active cells: "
-	  << triangulation.n_active_cells()
-	  << std::endl
-	  << "   Total number of cells: "
-	  << triangulation.n_cells()
-	  << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl
+          << "   Total number of cells: "
+          << triangulation.n_cells()
+          << std::endl;
 
   dof_handler.distribute_dofs (fe);
 
   deallog << "   Number of degrees of freedom: "
-	  << dof_handler.n_dofs()
-	  << std::endl;
+          << dof_handler.n_dofs()
+          << std::endl;
 
   solution.reinit (dof_handler.n_dofs());
 }
@@ -107,8 +107,8 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
-				   // dummy solve. just insert some
-				   // arbitrary values
+  // dummy solve. just insert some
+  // arbitrary values
   for (unsigned int i=0; i<solution.size(); ++i)
     solution(i) = i;
 }
@@ -120,7 +120,7 @@ void LaplaceProblem<2>::output_results () const
 {
   const unsigned int dim = 2;
 
-				   // test regular output in 2d
+  // test regular output in 2d
   if (true)
     {
       DataOut<dim> data_out;
@@ -136,7 +136,7 @@ void LaplaceProblem<2>::output_results () const
       data_out.write_eps (logfile);
     };
 
-				   // test DataOutRotation in 2d
+  // test DataOutRotation in 2d
   if (true)
     {
       DataOutRotation<dim> data_out;
@@ -158,7 +158,7 @@ void LaplaceProblem<3>::output_results () const
 {
   const unsigned int dim = 3;
 
-				   // test regular output in 3d
+  // test regular output in 3d
   if (true)
     {
       DataOut<dim> data_out;
@@ -172,9 +172,9 @@ void LaplaceProblem<3>::output_results () const
       data_out.write_ucd (logfile);
     };
 
-				   // test DataOutFaces in 3d. note:
-				   // not all output formats support
-				   // this
+  // test DataOutFaces in 3d. note:
+  // not all output formats support
+  // this
   if (true)
     {
       DataOutFaces<dim> data_out;

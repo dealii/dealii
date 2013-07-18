@@ -56,7 +56,7 @@ void test ()
   GridGenerator :: hyper_cube (triangulation, -0.5, 0.5);
 
   FESystem<dim> fe (FE_Q<dim>(1), 1,
-		    FE_Nothing<dim>(), 1);
+                    FE_Nothing<dim>(), 1);
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
 
@@ -65,16 +65,16 @@ void test ()
   FEValuesExtractors::Scalar nothing(1);
   fe_values.reinit (dof_handler.begin_active(), 0);
 
-				   // the following (second) call to reinit
-				   // used to abort
+  // the following (second) call to reinit
+  // used to abort
   fe_values.reinit (dof_handler.begin_active(), 1);
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
       deallog << "i=" << i
-	      << ", q=" << q
-	      << ", value="
-	      << fe_values[nothing].value(i,q)
-	      << std::endl;
+              << ", q=" << q
+              << ", value="
+              << fe_values[nothing].value(i,q)
+              << std::endl;
 }
 
 

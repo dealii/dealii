@@ -36,8 +36,8 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-				   // each processor owns 2 indices and all
-                                   // are ghosting element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting element 1 (the second)
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
   IndexSet local_relevant(numproc*2);
@@ -47,7 +47,7 @@ void test ()
   TrilinosWrappers::MPI::Vector v(local_active, MPI_COMM_WORLD);
   TrilinosWrappers::MPI::Vector v_tmp(local_relevant, MPI_COMM_WORLD);
 
-                                     // set local values
+  // set local values
   v(myid*2)=myid*2.0;
   v(myid*2+1)=myid*2.0+1.0;
 
@@ -65,7 +65,7 @@ void test ()
 
   v_tmp.reinit(v,false,true);
 
-                                  // check ghost values
+  // check ghost values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << v_tmp(1) << std::endl;
   Assert(v_tmp(1) == 2.0, ExcInternalError());

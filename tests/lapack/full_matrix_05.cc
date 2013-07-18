@@ -29,18 +29,18 @@
 
 const double left[] =
 {
-      4., -1., -1., -1.,
-      -1., 4., -1., -1.,
-      -1., -1., 4., -1.,
-      -1., -1., -1., 4.
+  4., -1., -1., -1.,
+  -1., 4., -1., -1.,
+  -1., -1., 4., -1.,
+  -1., -1., -1., 4.
 };
 
 const double right[] =
 {
-      4., -1., -1., -1.,
-      -1., 5., -1., -1.,
-      -1., -1., 6., -1.,
-      -1., -1., -1., 7.
+  4., -1., -1., -1.,
+  -1., 5., -1., -1.,
+  -1., -1., 6., -1.,
+  -1., -1., -1., 7.
 };
 
 
@@ -52,35 +52,35 @@ int main()
   logfile.precision(1);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   FullMatrix<double> A(4,4,left),
-                     B(4,4,right);
+             B(4,4,right);
   LAPACKFullMatrix<double> LA(4,4),
-                           LB(4,4);
-  for(unsigned int itype=1;itype<=3; ++itype)
-    {                     
-      deallog << std::endl 
-              << "generalized eigenvalue problem of type " 
-	      << itype << std::endl;
+                   LB(4,4);
+  for (unsigned int itype=1; itype<=3; ++itype)
+    {
+      deallog << std::endl
+              << "generalized eigenvalue problem of type "
+              << itype << std::endl;
       LA = A;
       LB = B;
       std::vector<Vector<double> > eigenvectors(A.m());
       LA.compute_generalized_eigenvalues_symmetric (LB, eigenvectors, itype);
-      
-      for (unsigned int i=0;i<A.m();++i)
-	{
-	  std::complex<double> lambda = LA.eigenvalue(i);
-	  deallog << "generalized eigenvalue "
-		  << std::scientific << lambda.real() << '\t'
-		  << std::scientific << lambda.imag() << std::endl
-		  << "generalized eigenvector ";
-	  for (unsigned int j=0;j<A.m();++j)
-	    {
-	      deallog << std::scientific 
-	              << eigenvectors[i](j)/eigenvectors[i](0) 
-		      << '\t';
-	    }
-	  deallog << std::endl;
-	}
+
+      for (unsigned int i=0; i<A.m(); ++i)
+        {
+          std::complex<double> lambda = LA.eigenvalue(i);
+          deallog << "generalized eigenvalue "
+                  << std::scientific << lambda.real() << '\t'
+                  << std::scientific << lambda.imag() << std::endl
+                  << "generalized eigenvector ";
+          for (unsigned int j=0; j<A.m(); ++j)
+            {
+              deallog << std::scientific
+                      << eigenvectors[i](j)/eigenvectors[i](0)
+                      << '\t';
+            }
+          deallog << std::endl;
+        }
     }
 }

@@ -40,12 +40,12 @@ int main()
   for (unsigned int i=0; i<N; ++i)
     x(i) = i;
 
-				   // set y=2*x
+  // set y=2*x
   parallel::transform (x.begin(), x.end(), y.begin(),
-		       (2*boost::lambda::_1),
-		       10);
+                       (2*boost::lambda::_1),
+                       10);
 
-				   // compute y=0 from the previous result
+  // compute y=0 from the previous result
   y -= x;
   y -= x;
 

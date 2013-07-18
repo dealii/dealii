@@ -42,26 +42,26 @@ std::ofstream logfile("data_out_03/output");
 template <int dim>
 class Identity : public Function<dim>
 {
-  public:
-    Identity ()
-		    :
-		    Function<dim>(dim)
-      {
-      }
+public:
+  Identity ()
+    :
+    Function<dim>(dim)
+  {
+  }
 
 
-    virtual double value (const Point<dim> &p,
-			  const unsigned int component) const
-      {
-	return p(component);
-      }
+  virtual double value (const Point<dim> &p,
+                        const unsigned int component) const
+  {
+    return p(component);
+  }
 
-    virtual void vector_value(const Point<dim> &p,
-			      Vector< double > & values) const
-      {
-	for (unsigned int i=0;i<dim;i++)
-	  values(i) = p(i);
-      }
+  virtual void vector_value(const Point<dim> &p,
+                            Vector< double > &values) const
+  {
+    for (unsigned int i=0; i<dim; i++)
+      values(i) = p(i);
+  }
 };
 
 
@@ -77,7 +77,7 @@ int main ()
   Triangulation<2,3> tria;
 
   std::map< Triangulation<2,3>::cell_iterator,
-    Triangulation<3,3>::face_iterator> surface_to_volume_mapping;
+      Triangulation<3,3>::face_iterator> surface_to_volume_mapping;
 
   HyperBallBoundary<3> boundary_description;
   Triangulation<3> volume_mesh;
@@ -95,13 +95,13 @@ int main ()
   boundary_ids.insert(0);
 
   GridTools::extract_boundary_mesh (volume_mesh, tria,
-				    boundary_ids);
+                                    boundary_ids);
 
   // test for the position
   MappingQ<2,3>   mapping(mapping_degree,true);
 
   FESystem<2,3> fe_test (FE_Q<2,3>
-							    (fe_degree),3);
+                         (fe_degree),3);
   DoFHandler<2,3> dh_test(tria);
   dh_test.distribute_dofs(fe_test);
 
@@ -109,17 +109,17 @@ int main ()
   VectorTools::interpolate(mapping,dh_test,Identity<3>(),position);
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (3, DataComponentInterpretation::component_is_part_of_vector);
+  data_component_interpretation
+  (3, DataComponentInterpretation::component_is_part_of_vector);
 
   std::vector<std::string> solution_names (3, "position");
 
   DataOut<2, DoFHandler<2,3> > data_out;
   data_out.attach_dof_handler (dh_test);
   data_out.add_data_vector (position, solution_names,
-			    DataOut<2,DoFHandler<2,
-			    3> >::type_dof_data,
-			    data_component_interpretation);
+                            DataOut<2,DoFHandler<2,
+                            3> >::type_dof_data,
+                            data_component_interpretation);
   data_out.build_patches (mapping, 2);
 
   data_out.write_gnuplot (deallog.get_file_stream());

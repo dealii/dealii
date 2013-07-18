@@ -58,20 +58,22 @@ void print_2d (const AnisotropicPolynomials<2> &aniso)
 
 
 template <class Pol>
-void check_2d () 
+void check_2d ()
 {
-                                   // two checks with higher degree in
-                                   // x or y direction
+  // two checks with higher degree in
+  // x or y direction
   {
     PolVector pols[2] = { Pol::generate_complete_basis (3),
-                          Pol::generate_complete_basis (1) };
+                          Pol::generate_complete_basis (1)
+                        };
     std::vector<PolVector> p(&pols[0], &pols[2]);
     AnisotropicPolynomials<2> aniso (p);
     print_2d (aniso);
   }
   {
     PolVector pols[2] = { Pol::generate_complete_basis (2),
-                          Pol::generate_complete_basis (3) };
+                          Pol::generate_complete_basis (3)
+                        };
     std::vector<PolVector> p(&pols[0], &pols[2]);
     AnisotropicPolynomials<2> aniso (p);
 
@@ -110,14 +112,15 @@ void print_3d (const AnisotropicPolynomials<3> &aniso)
 
 
 template <class Pol>
-void check_3d () 
+void check_3d ()
 {
-                                   // three checks with higher degree
-                                   // in x, y or z direction
+  // three checks with higher degree
+  // in x, y or z direction
   {
     PolVector pols[3] = { Pol::generate_complete_basis (3),
                           Pol::generate_complete_basis (1),
-                          Pol::generate_complete_basis (1) };
+                          Pol::generate_complete_basis (1)
+                        };
     std::vector<PolVector> p(&pols[0], &pols[3]);
     AnisotropicPolynomials<3> aniso (p);
     print_3d (aniso);
@@ -125,7 +128,8 @@ void check_3d ()
   {
     PolVector pols[3] = { Pol::generate_complete_basis (1),
                           Pol::generate_complete_basis (3),
-                          Pol::generate_complete_basis (1) };
+                          Pol::generate_complete_basis (1)
+                        };
     std::vector<PolVector> p(&pols[0], &pols[3]);
     AnisotropicPolynomials<3> aniso (p);
     print_3d (aniso);
@@ -133,7 +137,8 @@ void check_3d ()
   {
     PolVector pols[3] = { Pol::generate_complete_basis (1),
                           Pol::generate_complete_basis (2),
-                          Pol::generate_complete_basis (3) };
+                          Pol::generate_complete_basis (3)
+                        };
     std::vector<PolVector> p(&pols[0], &pols[3]);
     AnisotropicPolynomials<3> aniso (p);
     print_3d (aniso);
@@ -143,7 +148,7 @@ void check_3d ()
 
 
 template <class Pol>
-void check () 
+void check ()
 {
   check_2d<Pol> ();
   check_3d<Pol> ();

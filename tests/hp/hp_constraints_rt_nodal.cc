@@ -30,7 +30,7 @@ void test ()
 {
   if (dim == 1)
     return;
-  
+
   deallog << "Test for dim = " << dim << std::endl << std::endl;
   hp::FECollection<dim> fe;
   std::vector<unsigned int> degrees;

@@ -42,8 +42,8 @@ void
 check ()
 {
   Functions::CosineFunction<dim> cosine;
-  
-  Triangulation<dim> tr;  
+
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -53,7 +53,7 @@ check ()
   tr.execute_coarsening_and_refinement ();
   if (dim==1)
     tr.refine_global(2);
-  
+
   FE_Q<dim> element(3);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
@@ -65,14 +65,14 @@ check ()
   Vector<float> second (tr.n_active_cells());
 
   DerivativeApproximation::
-    approximate_gradient (dof, v, gradient);
+  approximate_gradient (dof, v, gradient);
   DerivativeApproximation::
-    approximate_second_derivative (dof, v, second);
-  
+  approximate_second_derivative (dof, v, second);
+
   deallog << "Approximated gradient:" << std::endl;
   for (unsigned int i=0; i<gradient.size(); ++i)
     deallog << gradient(i)*100 << std::endl;
-  
+
   deallog << "Approximated second derivative:" << std::endl;
   for (unsigned int i=0; i<gradient.size(); ++i)
     deallog << second(i)*100 << std::endl;
@@ -82,7 +82,7 @@ int main ()
 {
   std::ofstream logfile ("derivative_approximation/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

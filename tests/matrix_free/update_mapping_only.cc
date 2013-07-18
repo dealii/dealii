@@ -53,10 +53,10 @@ void test ()
 
   Vector<double> solution (dof.n_dofs());
 
-                                // create vector with random entries
+  // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      if(constraints.is_constrained(i))
+      if (constraints.is_constrained(i))
         continue;
       const double entry = rand()/(double)RAND_MAX;
       solution(i) = entry;
@@ -78,7 +78,7 @@ void test ()
           shift(1) = -0.005;
         }
       MappingQEulerian<dim> mapping(2,shift,dofh_eulerian);
-      
+
       {
         const QGauss<1> quad (fe_degree+1);
         typename MatrixFree<dim,double>::AdditionalData data;
@@ -88,7 +88,7 @@ void test ()
           data.initialize_indices = false;
         mf_data.reinit (mapping, dof, constraints, quad, data);
       }
-      
+
       MatrixFreeTest<dim,fe_degree,fe_degree+1> mf (mf_data, mapping);
       mf.test_functions(solution);
     }

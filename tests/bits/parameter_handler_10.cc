@@ -37,7 +37,7 @@ void check (const char *p)
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("parameter_handler_10/output");
   deallog.attach(logfile);
@@ -45,6 +45,6 @@ int main ()
   deallog.threshold_double(1.e-10);
 
   check ("parameter_handler_10/prm");
-  
+
   return 0;
 }

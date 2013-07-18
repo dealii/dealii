@@ -35,16 +35,16 @@ void worker ()
 
 Threads::Thread<> worker_thread;
 
-void waiter (int i) 
+void waiter (int i)
 {
   worker_thread.join ();
-  
+
   deallog << "Waiting thread " << i << " was woken up."
-	  << std::endl;
+          << std::endl;
 }
 
-  
-  
+
+
 
 int main()
 {

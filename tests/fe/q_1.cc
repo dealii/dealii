@@ -38,14 +38,14 @@ void
 test(const FE_Q<dim> &fe_q)
 {
   deallog << fe_q.get_name()
-	  << std::endl;
+          << std::endl;
 
-  const FullMatrix<double> & constraints = fe_q.constraints();
+  const FullMatrix<double> &constraints = fe_q.constraints();
 
   for (unsigned int i=0; i<constraints.m(); ++i)
     {
       for (unsigned int j=0; j<constraints.n(); ++j)
-	deallog << 100*constraints(i,j) << ' ';
+        deallog << 100*constraints(i,j) << ' ';
       deallog << std::endl;
     }
 
@@ -65,13 +65,13 @@ main()
   deallog.threshold_double(1.e-10);
 
 
-				// Test the non-equidistant version as
-				// well
+  // Test the non-equidistant version as
+  // well
   const QGaussLobatto<1> quad(5);
 
-                                   // no constraints in 1d, but we had
-                                   // the matrices precomputed up to
-                                   // Q4 for 2d and Q2 for 3d
+  // no constraints in 1d, but we had
+  // the matrices precomputed up to
+  // Q4 for 2d and Q2 for 3d
   for (unsigned int degree=1; degree<=4; ++degree)
     test<2>(FE_Q<2>(degree));
 

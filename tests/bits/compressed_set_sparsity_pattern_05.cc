@@ -40,15 +40,15 @@ void test ()
     {
       unsigned int index = 0;
       for (CompressedSetSparsityPattern::row_iterator
-	     j = csp.row_begin(i); j != csp.row_end(i); ++j, ++index)
-	deallog << i << ' ' << index << ' ' << *j
-		<< std::endl;
+           j = csp.row_begin(i); j != csp.row_end(i); ++j, ++index)
+        deallog << i << ' ' << index << ' ' << *j
+                << std::endl;
     }
 }
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("compressed_set_sparsity_pattern_05/output");
   deallog.attach(logfile);

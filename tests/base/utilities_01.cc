@@ -26,7 +26,7 @@
 #include <deal.II/base/utilities.h>
 
 
-void test () 
+void test ()
 {
   deallog << Utilities::int_to_string (42,4) << std::endl;
   deallog << Utilities::int_to_string (42) << std::endl;
@@ -47,19 +47,19 @@ void test ()
     Assert (Utilities::split_string_list (p).size() == 3,
             ExcInternalError());
     Assert (Utilities::split_string_list (p)[0] == "alpha",
-            ExcInternalError());  
+            ExcInternalError());
     Assert (Utilities::split_string_list (p)[1] == "beta",
             ExcInternalError());
     Assert (Utilities::split_string_list (p)[2] == "gamma",
             ExcInternalError());
   }
-  
+
   {
     const char *p = "alpha; beta; gamma ";
     Assert (Utilities::split_string_list (p, ';').size() == 3,
             ExcInternalError());
     Assert (Utilities::split_string_list (p, ';')[0] == "alpha",
-            ExcInternalError());  
+            ExcInternalError());
     Assert (Utilities::split_string_list (p, ';')[1] == "beta",
             ExcInternalError());
     Assert (Utilities::split_string_list (p, ';')[2] == "gamma",
@@ -72,8 +72,8 @@ void test ()
   deallog << std::endl;
 }
 
-  
-  
+
+
 
 int main()
 {

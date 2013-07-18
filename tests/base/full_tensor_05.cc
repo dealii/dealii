@@ -32,9 +32,9 @@ void test ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
-	for (unsigned int l=0; l<dim; ++l)
-	  t[i][j][k][l] = ((i==k) && (j==l) ? 1 : 0);
-	  
+        for (unsigned int l=0; l<dim; ++l)
+          t[i][j][k][l] = ((i==k) && (j==l) ? 1 : 0);
+
   Tensor<2,dim> a, b;
   a[0][0] = 1;
   a[1][1] = 2;
@@ -43,38 +43,38 @@ void test ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       {
-	double tmp_ij = 0;
-	for (unsigned int k=0; k<dim; ++k)
-	  for (unsigned int l=0; l<dim; ++l)
-	    {
-	      deallog << i << ' ' << j << ' ' << k << ' ' << l << ": "
-		      << t[i][j][k][l] << ' ' << a[k][l]
-		      << std::endl;
-	      tmp_ij += t[i][j][k][l] * a[k][l];
-	    }
-	b[i][j] = tmp_ij;
-      }  
+        double tmp_ij = 0;
+        for (unsigned int k=0; k<dim; ++k)
+          for (unsigned int l=0; l<dim; ++l)
+            {
+              deallog << i << ' ' << j << ' ' << k << ' ' << l << ": "
+                      << t[i][j][k][l] << ' ' << a[k][l]
+                      << std::endl;
+              tmp_ij += t[i][j][k][l] * a[k][l];
+            }
+        b[i][j] = tmp_ij;
+      }
 
   Assert (a == b, ExcInternalError());
 
-				   // try the same thing with scaled
-				   // tensors etc
+  // try the same thing with scaled
+  // tensors etc
   t *= 2;
   b.clear ();
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       {
-	double tmp_ij = 0;
-	for (unsigned int k=0; k<dim; ++k)
-	  for (unsigned int l=0; l<dim; ++l)
-	    tmp_ij += t[i][j][k][l] * a[k][l];
-	b[i][j] = tmp_ij;
+        double tmp_ij = 0;
+        for (unsigned int k=0; k<dim; ++k)
+          for (unsigned int l=0; l<dim; ++l)
+            tmp_ij += t[i][j][k][l] * a[k][l];
+        b[i][j] = tmp_ij;
       }
 
   Assert (a == b/2, ExcInternalError());
 }
 
-  
+
 
 
 int main ()
@@ -87,6 +87,6 @@ int main ()
 
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

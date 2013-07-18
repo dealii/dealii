@@ -36,8 +36,8 @@ void test ()
   index_set.add_index (14);
   index_set.add_index (16);
 
-				   // clear the IndexSet and then set elements
-				   // again
+  // clear the IndexSet and then set elements
+  // again
   index_set.clear ();
 
   index_set.add_range (2,4);
@@ -49,7 +49,7 @@ void test ()
 
   for (unsigned int i=0; i<index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
-	    << std::endl;
+            << std::endl;
 }
 
 

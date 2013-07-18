@@ -34,36 +34,36 @@
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve( SOLVER& solver, const MATRIX& A,
-	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+check_solve( SOLVER &solver, const MATRIX &A,
+             VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   u = 0.;
   f = 1.;
-  try 
+  try
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception& e)
+  catch (std::exception &e)
     {
       deallog << e.what() << std::endl;
-    }  
+    }
 }
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_Tsolve(SOLVER& solver, const MATRIX& A,
-	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+check_Tsolve(SOLVER &solver, const MATRIX &A,
+             VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   u = 0.;
   f = 1.;
-  try 
+  try
     {
       solver.Tsolve(A,u,f,P);
     }
-  catch (std::exception& e)
+  catch (std::exception &e)
     {
       deallog << e.what() << std::endl;
-    }  
+    }
 }
 
 int main()
@@ -74,7 +74,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-3);
   SolverControl verbose_control(100, 1.e-3, true);
@@ -86,8 +86,8 @@ int main()
       unsigned int dim = (size-1)*(size-1);
 
       deallog << "Size " << size << " Unknowns " << dim << std::endl;
-      
-				       // Make matrix
+
+      // Make matrix
       FDMatrix testproblem(size, size);
       SparsityPattern structure(dim, dim, 5);
       testproblem.five_point_structure(structure);
@@ -110,31 +110,31 @@ int main()
 
       f = 1.;
       u = 1.;
-      
+
       try
-	{
-	  deallog.push("no-fail");
-	  control.set_max_steps(10);
-	  check_solve(cg,A,u,f,prec_no);
-	  control.set_max_steps(100);
-	  deallog.pop();
-	  
-	  deallog.push("no");
-	  check_solve(cg,A,u,f,prec_no);
-	  deallog.pop();
-	  
-	  deallog.push("rich");
-	  check_solve(cg,A,u,f,prec_richardson);
-	  deallog.pop();
-	  
-	  deallog.push("ssor");
-	  check_solve(cg,A,u,f,prec_ssor);
-	  deallog.pop();
-	}
-      catch (std::exception& e)
-	{
-	  std::cerr << "Exception: " << e.what() << std::endl;
-	}
+        {
+          deallog.push("no-fail");
+          control.set_max_steps(10);
+          check_solve(cg,A,u,f,prec_no);
+          control.set_max_steps(100);
+          deallog.pop();
+
+          deallog.push("no");
+          check_solve(cg,A,u,f,prec_no);
+          deallog.pop();
+
+          deallog.push("rich");
+          check_solve(cg,A,u,f,prec_richardson);
+          deallog.pop();
+
+          deallog.push("ssor");
+          check_solve(cg,A,u,f,prec_ssor);
+          deallog.pop();
+        }
+      catch (std::exception &e)
+        {
+          std::cerr << "Exception: " << e.what() << std::endl;
+        }
     }
 }
 

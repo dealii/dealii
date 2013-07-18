@@ -41,7 +41,7 @@ void test ();
 template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number=double>
 class MatrixFreeTest
 {
- public:
+public:
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data   (data_in),
     fe_val (data.get_dof_handler().get_fe(),
@@ -50,18 +50,18 @@ class MatrixFreeTest
   {};
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in,
-             const Mapping<dim>               &mapping):
+                 const Mapping<dim>               &mapping):
     data   (data_in),
     fe_val (mapping, data.get_dof_handler().get_fe(),
             Quadrature<dim>(data.get_quadrature(0)),
             update_values | update_gradients | update_hessians)
   {};
 
-    virtual ~MatrixFreeTest ()
-      {}
+  virtual ~MatrixFreeTest ()
+  {}
 
-                                // make function virtual to allow derived
-                                // classes to define a different function
+  // make function virtual to allow derived
+  // classes to define a different function
   virtual void
   operator () (const MatrixFree<dim,Number> &data,
                Vector<Number> &,
@@ -74,14 +74,14 @@ class MatrixFreeTest
     std::vector<Tensor<1,dim> > reference_grads (fe_eval.n_q_points);
     std::vector<Tensor<2,dim> > reference_hess (fe_eval.n_q_points);
 
-    for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         fe_eval.reinit (cell);
         fe_eval.read_dof_values(src);
         fe_eval.evaluate (true,true,true);
 
-                                // compare values with the ones the FEValues
-                                // gives us. Those are seen as reference
+        // compare values with the ones the FEValues
+        // gives us. Those are seen as reference
         for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
           {
             fe_val.reinit (data.get_cell_iterator(cell,j));
@@ -101,7 +101,7 @@ class MatrixFreeTest
                 for (unsigned int d=0; d<dim; ++d)
                   {
                     errors[3] += std::fabs(fe_eval.get_hessian_diagonal(q)[d][j]-
-                                             reference_hess[q][d][d]);
+                                           reference_hess[q][d][d]);
                     for (unsigned int e=0; e<dim; ++e)
                       errors[4] += std::fabs(fe_eval.get_hessian(q)[d][e][j]-
                                              reference_hess[q][d][e]);
@@ -111,9 +111,9 @@ class MatrixFreeTest
                 for (unsigned int d=0; d<dim; ++d)
                   total[1] += std::fabs(reference_grads[q][d]);
 
-                                // reference for second derivatives computed
-                                // from fe_eval because FEValues is not
-                                // accurate enough with finite differences
+                // reference for second derivatives computed
+                // from fe_eval because FEValues is not
+                // accurate enough with finite differences
                 total[2] += std::fabs(fe_eval.get_laplacian(q)[j]);
                 for (unsigned int d=0; d<dim; ++d)
                   {
@@ -138,8 +138,8 @@ class MatrixFreeTest
     Vector<Number> dst_dummy;
     data.cell_loop (&MatrixFreeTest::operator(), this, dst_dummy, src);
 
-                                // for doubles, use a stricter condition than
-                                // for floats for the relative error size
+    // for doubles, use a stricter condition than
+    // for floats for the relative error size
     if (types_are_equal<Number,double>::value == true)
       {
         deallog.threshold_double (5e-14);
@@ -148,14 +148,14 @@ class MatrixFreeTest
         deallog << "Error function gradients: "
                 << errors[1]/total[1] << std::endl;
 
-                                // need to set quite a loose tolerance because
-                                // FEValues approximates Hessians with finite
-                                // differences, which are not so
-                                // accurate. moreover, Hessians are quite
-                                // large since we chose random numbers. for
-                                // some elements, it might also be zero
-                                // (linear elements on quadrilaterals), so
-                                // need to check for division by 0, too.
+        // need to set quite a loose tolerance because
+        // FEValues approximates Hessians with finite
+        // differences, which are not so
+        // accurate. moreover, Hessians are quite
+        // large since we chose random numbers. for
+        // some elements, it might also be zero
+        // (linear elements on quadrilaterals), so
+        // need to check for division by 0, too.
         deallog.threshold_double (5e-7);
         const double output2 = total[2] == 0 ? 0. : errors[2] / total[2];
         deallog << "Error function Laplacians: " << output2 << std::endl;
@@ -194,15 +194,15 @@ protected:
 template <int dim, int fe_degree,typename Number>
 class MatrixFreeTest<dim,fe_degree,0,Number>
 {
- public:
+public:
   MatrixFreeTest(const MatrixFree<dim,Number> &)
   {};
 
   MatrixFreeTest(const MatrixFree<dim,Number> &,
-             const Mapping<dim>               &)
+                 const Mapping<dim> &)
   {};
 
-  void cell_integration (Vector<Number>       &,
+  void cell_integration (Vector<Number> &,
                          const Vector<Number> &,
                          const std::pair<unsigned int,unsigned int>) const {}
 
@@ -215,7 +215,7 @@ class MatrixFreeTest<dim,fe_degree,0,Number>
 
 template <int dim, int fe_degree, typename number>
 void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix&constraints)
+              const ConstraintMatrix &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   // use this for info on problem
@@ -226,10 +226,10 @@ void do_test (const DoFHandler<dim> &dof,
 
   Vector<number> solution (dof.n_dofs());
 
-                                // create vector with random entries
+  // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      if(constraints.is_constrained(i))
+      if (constraints.is_constrained(i))
         continue;
       const double entry = rand()/(double)RAND_MAX;
       solution(i) = entry;

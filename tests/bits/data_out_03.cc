@@ -33,14 +33,18 @@ std::string output_file_name = "data_out_03/output";
 template <int dim>
 class XDataOut : public DataOut<dim>
 {
-  public:
-    const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
-    get_patches() const
-      { return DataOut<dim>::get_patches(); }
+public:
+  const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
+  get_patches() const
+  {
+    return DataOut<dim>::get_patches();
+  }
 
-    std::vector<std::string>
-    get_dataset_names () const    
-      { return DataOut<dim>::get_dataset_names();  }
+  std::vector<std::string>
+  get_dataset_names () const
+  {
+    return DataOut<dim>::get_dataset_names();
+  }
 };
 
 // have a class that makes sure we can get at the patches and data set
@@ -48,14 +52,18 @@ class XDataOut : public DataOut<dim>
 template <int dim>
 class XDataOutReader : public DataOutReader<dim>
 {
-  public:
-    const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
-    get_patches() const
-      { return DataOutReader<dim>::get_patches(); }
+public:
+  const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
+  get_patches() const
+  {
+    return DataOutReader<dim>::get_patches();
+  }
 
-    std::vector<std::string>
-    get_dataset_names () const    
-      { return DataOutReader<dim>::get_dataset_names();  }
+  std::vector<std::string>
+  get_dataset_names () const
+  {
+    return DataOutReader<dim>::get_dataset_names();
+  }
 };
 
 
@@ -70,7 +78,7 @@ check_this (const DoFHandler<dim> &dof_handler,
   data_out.add_data_vector (v_node, "node_data");
   data_out.add_data_vector (v_cell, "cell_data");
   data_out.build_patches ();
-  
+
   {
     std::ofstream tmp ("data_out_03.tmp");
     data_out.write_deal_II_intermediate (tmp);
@@ -80,24 +88,24 @@ check_this (const DoFHandler<dim> &dof_handler,
   {
     std::ifstream tmp ("data_out_03.tmp");
     reader.read (tmp);
-  }  
+  }
 
-				   // finally make sure that we have
-				   // read everything back in
-				   // correctly
+  // finally make sure that we have
+  // read everything back in
+  // correctly
   Assert (data_out.get_dataset_names() == reader.get_dataset_names(),
-	  ExcInternalError());
-  
+          ExcInternalError());
+
   Assert (data_out.get_patches().size() == reader.get_patches().size(),
- 	  ExcInternalError());
+          ExcInternalError());
 
   for (unsigned int i=0; i<reader.get_patches().size(); ++i)
     Assert (data_out.get_patches()[i] == reader.get_patches()[i],
-	    ExcInternalError());
+            ExcInternalError());
 
-				   // for good measure, delete tmp file
+  // for good measure, delete tmp file
   remove ("data_out_03.tmp");
-  
+
   deallog << "OK" << std::endl;
 }
 

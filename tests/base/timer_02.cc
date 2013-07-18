@@ -36,13 +36,13 @@ int main ()
   deallog.threshold_double(1.e-10);
 
   {
-    
-  TimerOutput t(logfile, TimerOutput::summary, TimerOutput::cpu_times);
 
-  t.enter_subsection("hi");
-  t.leave_subsection("hi");
+    TimerOutput t(logfile, TimerOutput::summary, TimerOutput::cpu_times);
+
+    t.enter_subsection("hi");
+    t.leave_subsection("hi");
   }
-  
+
   deallog << "ok" << std::endl;
 }
 

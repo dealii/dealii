@@ -45,13 +45,13 @@ template <int dim>
 void test ()
 {
   deallog << "dim=" << dim << std::endl;
-  
+
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global (2);
   tria.begin_active()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
-  tria.refine_global (4-dim);  
+  tria.refine_global (4-dim);
 
   hp::FECollection<dim> fe_collection;
   hp::QCollection<dim> q_collection;
@@ -60,15 +60,15 @@ void test ()
       fe_collection.push_back(FE_Q<dim> (i));
       q_collection.push_back (QGauss<dim> (i+2));
     }
-  
+
 
   hp::DoFHandler<dim> dof_handler(tria);
 
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     cell->set_active_fe_index (rand() % fe_collection.size());
-  
+
   dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> vec (dof_handler.n_dofs());
@@ -77,15 +77,15 @@ void test ()
 
   Vector<float> diff (tria.n_active_cells());
 
-  VectorTools::NormType norms[] = 
-    {
-          VectorTools::mean,
-          VectorTools::L1_norm,
-          VectorTools::L2_norm,
-          VectorTools::Linfty_norm,
-          VectorTools::H1_seminorm,
-          VectorTools::W1p_seminorm
-    };
+  VectorTools::NormType norms[] =
+  {
+    VectorTools::mean,
+    VectorTools::L1_norm,
+    VectorTools::L2_norm,
+    VectorTools::Linfty_norm,
+    VectorTools::H1_seminorm,
+    VectorTools::W1p_seminorm
+  };
   for (unsigned int i=0; i<sizeof(norms)/sizeof(norms[0]); ++i)
     {
       VectorTools::integrate_difference (dof_handler,
@@ -104,14 +104,14 @@ int main ()
   std::ofstream logfile("integrate_difference/output");
   logfile.precision(2);
   deallog << std::setprecision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

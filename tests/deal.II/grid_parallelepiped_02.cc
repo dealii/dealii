@@ -45,59 +45,59 @@ std::ofstream logfile ("grid_parallelepiped_02/output");
 template<int dim>
 void check_nd_parallelepiped_by_comparison (bool log)
 {
-  
+
   // build corners for this particular dim that are known to give the
   // same output order as subdivided parallelepiped:
   Point<dim> (corners) [dim];
-  
+
   switch (dim)
     {
     case 1:
-      {
-	corners[0] = Point<dim> (0.50);
-	break;
-      }
-      
+    {
+      corners[0] = Point<dim> (0.50);
+      break;
+    }
+
     case 2:
-      {
-	corners[0] = Point<dim> (0.25, 0.50);
-	corners[1] = Point<dim> (0.50, 0.25);
-	break;
-      }
+    {
+      corners[0] = Point<dim> (0.25, 0.50);
+      corners[1] = Point<dim> (0.50, 0.25);
+      break;
+    }
 
     case 3:
-      {
-	corners[0] = Point<dim> (0.25, 0.50, 0.50);
-	corners[1] = Point<dim> (0.50, 0.25, 0.50);
-	corners[2] = Point<dim> (0.50, 0.50, 0.25);
-	break;
-      }
-      
+    {
+      corners[0] = Point<dim> (0.25, 0.50, 0.50);
+      corners[1] = Point<dim> (0.50, 0.25, 0.50);
+      corners[2] = Point<dim> (0.50, 0.50, 0.25);
+      break;
+    }
+
     default:
       Assert (false, ExcInternalError ());
     };
-  
+
   Triangulation<dim> triangulation_parallelepiped;
   GridGenerator::parallelepiped (triangulation_parallelepiped, corners, false);
-  
+
   Triangulation<dim> triangulation_subdivided_parallelepiped;
   GridGenerator::subdivided_parallelepiped (triangulation_subdivided_parallelepiped, 1, corners, false);
-  
+
   if (log)
     {
       logfile << "\ncheck " << dim << "d parallelepiped (subdivided_parallelepiped): ";
       if (GridTools::have_same_coarse_mesh (triangulation_parallelepiped,
-					    triangulation_subdivided_parallelepiped))
-	logfile << "OK";
-      
+                                            triangulation_subdivided_parallelepiped))
+        logfile << "OK";
+
       else
-	logfile << "not OK... coarse grids are different but they should be the same";
+        logfile << "not OK... coarse grids are different but they should be the same";
     }
 }
 
 int main ()
 {
-  // Check parallelepiped 
+  // Check parallelepiped
   check_nd_parallelepiped_by_comparison<1> (true);
   check_nd_parallelepiped_by_comparison<2> (true);
   check_nd_parallelepiped_by_comparison<3> (true);

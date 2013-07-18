@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
@@ -43,7 +43,7 @@ check_this (const DoFHandler<dim> &dof_handler);
 void
 output_vector (std::vector<bool> &v)
 {
-for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i=0; i<v.size(); ++i)
     deallog << (v[i] ? '1' : '0');
   deallog << std::endl;
 }
@@ -52,8 +52,8 @@ for (unsigned int i=0; i<v.size(); ++i)
 void
 output_vector (std::vector<unsigned int> &v)
 {
-for (unsigned int i=0; i<v.size(); ++i)
-  deallog << ' ' << v[i];
+  for (unsigned int i=0; i<v.size(); ++i)
+    deallog << ' ' << v[i];
   deallog << std::endl;
 }
 
@@ -61,21 +61,21 @@ for (unsigned int i=0; i<v.size(); ++i)
 
 template <int dim>
 void
-check (const Triangulation<dim>& tria,
+check (const Triangulation<dim> &tria,
        const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
-  
+
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
 
-                                   // call main function in .cc files
+  // call main function in .cc files
   check_this (dof_handler);
 }
 
 
 template <int dim>
-void check_grid(const Triangulation<dim>& tr)
+void check_grid(const Triangulation<dim> &tr)
 {
   FE_Q<dim> q1(1);
   check(tr, q1);
@@ -83,7 +83,7 @@ void check_grid(const Triangulation<dim>& tr)
   check(tr, q2);
   FE_Q<dim> q3(3);
   check(tr, q3);
-  
+
   FE_DGQ<dim> dgq0(0);
   check(tr, dgq0);
   FE_DGQ<dim> dgq1(1);
@@ -95,7 +95,7 @@ void check_grid(const Triangulation<dim>& tr)
   check(tr, dgp1);
   FE_DGP<dim> dgp2(2);
   check(tr, dgp2);
-  
+
   FE_Nedelec<dim> nedelec1(1);
   check(tr, nedelec1);
 

@@ -41,24 +41,28 @@
 template<int dim>
 class MySquareFunction : public Function<dim>
 {
-  public:
-    MySquareFunction () : Function<dim>(2) {}
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component) const
-      {	return (component+1)*p.square(); }
-    
-    virtual void   vector_value (const Point<dim>   &p,
-				 Vector<double>     &values) const
-      { values(0) = value(p,0);
-	values(1) = value(p,1); }
+public:
+  MySquareFunction () : Function<dim>(2) {}
+
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int  component) const
+  {
+    return (component+1)*p.square();
+  }
+
+  virtual void   vector_value (const Point<dim>   &p,
+                               Vector<double>     &values) const
+  {
+    values(0) = value(p,0);
+    values(1) = value(p,1);
+  }
 };
 
 
 
 template <int dim>
 Quadrature<dim-1> &
-get_q_face (Function<dim>&)
+get_q_face (Function<dim> &)
 {
   static QGauss<dim-1> q(4);
   return q;
@@ -66,7 +70,7 @@ get_q_face (Function<dim>&)
 
 
 Quadrature<0> &
-get_q_face (Function<1>&)
+get_q_face (Function<1> &)
 {
   Quadrature<0> *q = 0;
   return *q;
@@ -80,8 +84,8 @@ void
 check ()
 {
   Functions::CosineFunction<dim> function;
-  
-  Triangulation<dim> tr;  
+
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -91,7 +95,7 @@ check ()
   tr.execute_coarsening_and_refinement ();
   if (dim==1)
     tr.refine_global(2);
-  
+
   FE_Q<dim> element(3);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
@@ -101,14 +105,14 @@ check ()
 
   std::map<types::boundary_id,const Function<dim>*> neumann_bc;
   neumann_bc[0] = &function;
-  
+
   Vector<double> v (dof.n_dofs());
   VectorTools::interpolate (mapping, dof, function, v);
 
   Vector<float> error (tr.n_active_cells());
 
   KellyErrorEstimator<dim>::estimate (mapping, dof, q_face, neumann_bc,
-				      v, error);
+                                      v, error);
 
   deallog << "Estimated error:" << std::endl;
   for (unsigned int i=0; i<error.size(); ++i)
@@ -120,7 +124,7 @@ int main ()
 {
   std::ofstream logfile ("error_estimator/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

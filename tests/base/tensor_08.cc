@@ -29,17 +29,17 @@ void test_select(double f1, double f2)
 {
   Tensor<2,dim> t;
   unsigned int k = 0;
-  for (unsigned int i=0;i<dim;++i)
-    for (unsigned int j=0;j<dim;++j)
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
       t[i][j] = ++k;
-  
-  for (unsigned int i=0;i<dim;++i)
-    for (unsigned int j=0;j<dim;++j)
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
       {
-	Tensor<1,dim> u, v;
-	u[i] = f1;
-	v[j] = f2;
-	deallog << '\t' << contract3(u,t,v);
+        Tensor<1,dim> u, v;
+        u[i] = f1;
+        v[j] = f2;
+        deallog << '\t' << contract3(u,t,v);
       }
   deallog << std::endl;
 }
@@ -49,14 +49,14 @@ int main ()
 {
   std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
   std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);  
+  deallog.attach(logfile);
   deallog.depth_console(0);
   deallog << std::setprecision(3);
 
   test_select<2>(1.,1.);
   test_select<3>(1.,1.);
   test_select<4>(1.,1.);
-  
+
   test_select<2>(2.,3.);
   test_select<3>(2.,3.);
   test_select<4>(2.,3.);

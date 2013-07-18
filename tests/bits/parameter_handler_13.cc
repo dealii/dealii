@@ -28,8 +28,8 @@ void check (const char *p)
   ParameterHandler prm;
   prm.declare_entry ("test_13", "-1:a, 0:b, 1:c",
                      Patterns::Map(Patterns::Integer(-1,1),
-				   Patterns::Selection("a|b|c"),
-				   2,3));
+                                   Patterns::Selection("a|b|c"),
+                                   2,3));
 
   std::ifstream in(p);
   prm.read_input (in);

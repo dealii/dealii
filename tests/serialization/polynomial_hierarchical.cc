@@ -23,12 +23,12 @@
 
 void test ()
 {
-  unsigned int degree1 = 3; 
+  unsigned int degree1 = 3;
   Polynomials::Hierarchical p1(degree1);
-  
+
   unsigned int degree2 = 7;
   Polynomials::Hierarchical p2(degree2);
-  
+
   verify (p1, p2);
 }
 

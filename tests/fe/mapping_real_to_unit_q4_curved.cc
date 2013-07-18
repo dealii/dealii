@@ -39,17 +39,17 @@ void test_real_to_unit_cell()
 {
   deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
-				   // define a boundary that fits the
-				   // the vertices of the hyper cube
-				   // we're going to create below
+  // define a boundary that fits the
+  // the vertices of the hyper cube
+  // we're going to create below
   HyperBallBoundary<dim,spacedim> boundary (Point<spacedim>(),
-					    std::sqrt(1.*dim));
+                                            std::sqrt(1.*dim));
 
   Triangulation<dim, spacedim>   triangulation;
   GridGenerator::hyper_cube (triangulation, -1, 1);
 
-				   // set the boundary indicator for
-				   // one face of the single cell
+  // set the boundary indicator for
+  // one face of the single cell
   triangulation.set_boundary (1, boundary);
   triangulation.begin_active()->face(0)->set_boundary_indicator (1);
 
@@ -58,50 +58,50 @@ void test_real_to_unit_cell()
 
   switch (dim)
     {
-      case 1:
-	    for (unsigned int x=0; x<n_points;++x)
-	      unit_points[x][0] = double(x)/double(n_points);
-	    break;
+    case 1:
+      for (unsigned int x=0; x<n_points; ++x)
+        unit_points[x][0] = double(x)/double(n_points);
+      break;
 
-      case 2:
-	    for (unsigned int x=0; x<n_points;++x)
-	      for (unsigned int y=0; y<n_points;++y)
-		{
-		  unit_points[y * n_points + x][0] = double(x)/double(n_points);
-		  unit_points[y * n_points + x][1] = double(y)/double(n_points);
-		}
-	    break;
+    case 2:
+      for (unsigned int x=0; x<n_points; ++x)
+        for (unsigned int y=0; y<n_points; ++y)
+          {
+            unit_points[y * n_points + x][0] = double(x)/double(n_points);
+            unit_points[y * n_points + x][1] = double(y)/double(n_points);
+          }
+      break;
 
-      case 3:
-	    for (unsigned int x=0; x<n_points;++x)
-	      for (unsigned int y=0; y<n_points;++y)
-		for (unsigned int z=0; z<n_points;++z)
-		{
-		  unit_points[z * n_points + y * n_points + x][0] = double(x)/double(n_points);
-		  unit_points[z * n_points + y * n_points + x][1] = double(y)/double(n_points);
-		  unit_points[z * n_points + y * n_points + x][2] = double(z)/double(n_points);
-		}
-	    break;
+    case 3:
+      for (unsigned int x=0; x<n_points; ++x)
+        for (unsigned int y=0; y<n_points; ++y)
+          for (unsigned int z=0; z<n_points; ++z)
+            {
+              unit_points[z * n_points + y * n_points + x][0] = double(x)/double(n_points);
+              unit_points[z * n_points + y * n_points + x][1] = double(y)/double(n_points);
+              unit_points[z * n_points + y * n_points + x][2] = double(z)/double(n_points);
+            }
+      break;
     }
 
 
   MappingQ< dim, spacedim > map(4);
 
-				   // work with this cell (unlike the
-				   // _q1 test where we move vertices)
+  // work with this cell (unlike the
+  // _q1 test where we move vertices)
   typename Triangulation<dim, spacedim >::active_cell_iterator
-    cell = triangulation.begin_active();
-  for (unsigned int i=0; i<unit_points.size();++i)
+  cell = triangulation.begin_active();
+  for (unsigned int i=0; i<unit_points.size(); ++i)
     {
-				       // for each of the points,
-				       // verify that if we apply
-				       // the forward map and then
-				       // pull back that we get
-				       // the same point again
+      // for each of the points,
+      // verify that if we apply
+      // the forward map and then
+      // pull back that we get
+      // the same point again
       const Point<spacedim> p = map.transform_unit_to_real_cell(cell,unit_points[i]);
       const Point<dim> p_unit = map.transform_real_to_unit_cell(cell,p);
       Assert (unit_points[i].distance(p_unit) < 1e-10,
-	      ExcInternalError());
+              ExcInternalError());
     }
   deallog << "OK" << std::endl;
 }

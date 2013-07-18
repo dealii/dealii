@@ -46,7 +46,8 @@ std::ofstream logfile("data_out/output");
 
 
 template <int dim, int spacedim>
-void test(std::string filename) {
+void test(std::string filename)
+{
 
   Triangulation<dim, spacedim> triangulation;
   GridIn<dim, spacedim> gi;
@@ -59,12 +60,12 @@ void test(std::string filename) {
   DoFHandler<dim,spacedim> dof_handler (triangulation);
 
   dof_handler.distribute_dofs (fe);
-  
+
   // Output the vertex numbering
   Vector<double> numbering(dof_handler.n_dofs());
-  for(unsigned int i=0; i <numbering.size(); ++i) 
-      numbering(i) = i;
-  
+  for (unsigned int i=0; i <numbering.size(); ++i)
+    numbering(i) = i;
+
   DataOut<dim, DoFHandler<dim,spacedim> > dataout;
   dataout.attach_dof_handler(dof_handler);
   dataout.add_data_vector(numbering, "numbering");
@@ -74,7 +75,7 @@ void test(std::string filename) {
 
 
 
-int main () 
+int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);

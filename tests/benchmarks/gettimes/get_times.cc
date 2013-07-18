@@ -25,138 +25,143 @@
 
 using namespace std;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
-	ifstream input;
-	stringstream ss;
-	const int IGNORE_LINES = 3; //Number of initial lines to ignore
-	const string DELIM = "*"; //String to divide test data
+  ifstream input;
+  stringstream ss;
+  const int IGNORE_LINES = 3; //Number of initial lines to ignore
+  const string DELIM = "*"; //String to divide test data
 
-	input.open("temp.txt");
+  input.open("temp.txt");
 
-	vector<string> names;
-	vector<double> times;
-	
-	//If no revision number, retrieve column names 
-	if(argc <= 1)
-	{
-		string curr_line;
-	
-		//Ignore first n lines + delimeter- they don't hold any useful data
-		for(int i = 0; i < IGNORE_LINES + 1; i++)
-		{
-			getline(input, curr_line);
-		}
-	
-		while(!input.eof()) {
-			
-			getline(input, curr_line);
-			if(curr_line == "")
-				continue;
-			if(curr_line == DELIM)
-				break;
-		
-			////cout << "curr line: " << curr_line << endl;
-			//Looking for the string after the '|' and ' '
-			int first_char = 0;
-			if(curr_line[0] == '|')
-				first_char++;
-			if (curr_line[1] == ' ')
-				first_char++;
+  vector<string> names;
+  vector<double> times;
 
-			
-			////cout << "first char at pos: " << first_char << endl;
-			
-			//Find end of string
-			int num_chars = 0;
-			while(curr_line[first_char + num_chars] != '|')
-				num_chars++;
+  //If no revision number, retrieve column names
+  if (argc <= 1)
+    {
+      string curr_line;
 
-			num_chars--;
-			
-			while(curr_line[first_char + num_chars] == ' ')
-			  num_chars--;
-			
-			names.push_back(curr_line.substr(first_char, num_chars+1));
-		}
-	}
+      //Ignore first n lines + delimeter- they don't hold any useful data
+      for (int i = 0; i < IGNORE_LINES + 1; i++)
+        {
+          getline(input, curr_line);
+        }
 
-	else //Else, extract execution time from each line 
-	{
-		
-		int time_index = 0;
-		
-		while(!input.eof())
-		{
-		
-			string curr_line = "";
-	
-			//Read in line
-			getline(input,curr_line);
+      while (!input.eof())
+        {
 
-			//Check for delimeter
-			if(curr_line == DELIM)
-			{
-				////cout << "Delimeter detected" << endl;
-				time_index = 0;
-				//Ignore first n lines- they don't hold any useful data
-				for(int i = 0; i < IGNORE_LINES; i++)
-				{
-					string dummy;
-					getline(input, dummy);
-					////cout << "Skipping: " << dummy << endl;
-				}
-				continue;
-			}
-			
-			////cout << "Reading: " << curr_line << endl;
+          getline(input, curr_line);
+          if (curr_line == "")
+            continue;
+          if (curr_line == DELIM)
+            break;
 
-			if(curr_line == "" && DELIM != "")
-				continue;
+          ////cout << "curr line: " << curr_line << endl;
+          //Looking for the string after the '|' and ' '
+          int first_char = 0;
+          if (curr_line[0] == '|')
+            first_char++;
+          if (curr_line[1] == ' ')
+            first_char++;
 
 
-			//Looking for a number that ends with 's'
-			int last_s = curr_line.rfind('s');
-			//In case 's' is not used in the future
-			assert(isdigit(curr_line[last_s - 1])); // Test: s preceded by number
-			
-			//Find time string and convert to double
-			int num_start = last_s - 1;
-				while(curr_line[num_start] != ' ')
-				num_start--;
-			string timestr = curr_line.substr(num_start+1, last_s - num_start);
-			double time = (double)atof(timestr.substr(0,timestr.size()-1).c_str());
-			
-			assert(times.size() >= time_index);
-			// first addition of times to vector; each loop, times.size() should be one less than time_index	
-			if(times.size() == time_index) 
-				times.push_back(time);
-			else
-				times[time_index] = (time < times[time_index]) ? time : times[time_index]; //else, determines minimum time and stores it
-			time_index++;
+          ////cout << "first char at pos: " << first_char << endl;
 
-		}
-	}
+          //Find end of string
+          int num_chars = 0;
+          while (curr_line[first_char + num_chars] != '|')
+            num_chars++;
+
+          num_chars--;
+
+          while (curr_line[first_char + num_chars] == ' ')
+            num_chars--;
+
+          names.push_back(curr_line.substr(first_char, num_chars+1));
+        }
+    }
+
+  else //Else, extract execution time from each line
+    {
+
+      int time_index = 0;
+
+      while (!input.eof())
+        {
+
+          string curr_line = "";
+
+          //Read in line
+          getline(input,curr_line);
+
+          //Check for delimeter
+          if (curr_line == DELIM)
+            {
+              ////cout << "Delimeter detected" << endl;
+              time_index = 0;
+              //Ignore first n lines- they don't hold any useful data
+              for (int i = 0; i < IGNORE_LINES; i++)
+                {
+                  string dummy;
+                  getline(input, dummy);
+                  ////cout << "Skipping: " << dummy << endl;
+                }
+              continue;
+            }
+
+          ////cout << "Reading: " << curr_line << endl;
+
+          if (curr_line == "" && DELIM != "")
+            continue;
 
 
-	//Output individual names
-	if(argc <= 1) {
-		for(int i = 0; i < names.size(); i++) {
-			cout << names[i];
-			if(i < names.size() - 1)
-				cout << endl;
-		}
-	}
+          //Looking for a number that ends with 's'
+          int last_s = curr_line.rfind('s');
+          //In case 's' is not used in the future
+          assert(isdigit(curr_line[last_s - 1])); // Test: s preceded by number
 
-	//Output individual times
-	if(argc > 1) {
-		cout << argv[1]; 
-		for(int i = 0; i < times.size(); i++)
-			cout << " " << times[i];
-	}
+          //Find time string and convert to double
+          int num_start = last_s - 1;
+          while (curr_line[num_start] != ' ')
+            num_start--;
+          string timestr = curr_line.substr(num_start+1, last_s - num_start);
+          double time = (double)atof(timestr.substr(0,timestr.size()-1).c_str());
 
-	cout << endl;
+          assert(times.size() >= time_index);
+          // first addition of times to vector; each loop, times.size() should be one less than time_index
+          if (times.size() == time_index)
+            times.push_back(time);
+          else
+            times[time_index] = (time < times[time_index]) ? time : times[time_index]; //else, determines minimum time and stores it
+          time_index++;
 
-	
-	return 0;
+        }
+    }
+
+
+  //Output individual names
+  if (argc <= 1)
+    {
+      for (int i = 0; i < names.size(); i++)
+        {
+          cout << names[i];
+          if (i < names.size() - 1)
+            cout << endl;
+        }
+    }
+
+  //Output individual times
+  if (argc > 1)
+    {
+      cout << argv[1];
+      for (int i = 0; i < times.size(); i++)
+        cout << " " << times[i];
+    }
+
+  cout << endl;
+
+
+  return 0;
 }

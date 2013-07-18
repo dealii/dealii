@@ -36,23 +36,23 @@
 
 void test ()
 {
-				   // the following element has more
-				   // components than blocks
+  // the following element has more
+  // components than blocks
   FESystem<2> fe (FE_RaviartThomas<2>(1), 3);
 
-				   // try all possible block
-				   // masks, which we encode as bit
-				   // strings
+  // try all possible block
+  // masks, which we encode as bit
+  // strings
   for (unsigned int int_mask=0; int_mask<(1U<<fe.n_blocks()); ++int_mask)
-  {
-    std::vector<bool> block_mask (fe.n_blocks());
-    for (unsigned int c=0; c<fe.n_blocks(); ++c)
-      block_mask[c] = (int_mask & (1<<c));
+    {
+      std::vector<bool> block_mask (fe.n_blocks());
+      for (unsigned int c=0; c<fe.n_blocks(); ++c)
+        block_mask[c] = (int_mask & (1<<c));
 
-				     // make sure that the round-trip works
-    Assert (BlockMask(block_mask) == fe.block_mask(fe.component_mask(BlockMask(block_mask))),
-	    ExcInternalError());
-  }
+      // make sure that the round-trip works
+      Assert (BlockMask(block_mask) == fe.block_mask(fe.component_mask(BlockMask(block_mask))),
+              ExcInternalError());
+    }
 
   deallog << "OK" << std::endl;
 }

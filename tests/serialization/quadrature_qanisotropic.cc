@@ -22,26 +22,26 @@
 #include <boost/serialization/vector.hpp>
 
 void test ()
-{ 
+{
   const unsigned int dim = 2;
-  
+
   std::vector<Point <1> > points1;
   points1.push_back(Point<1>(0.));
   points1.push_back(Point<1>(1.));
   double w1[2] = {0.5, 0.5};
   std::vector<double> weights1(w1, &w1[2]);
-  
+
   std::vector<Point <1> > points2;
   points2.push_back(Point<1>(0.25));
   points2.push_back(Point<1>(0.75));
-  double w2[2] = {0.4, 0.6}; 
+  double w2[2] = {0.4, 0.6};
   std::vector<double> weights2(w2, &w2[2]);
-  
+
   Quadrature<1> qx(points1, weights1);
   Quadrature<1> qy(points2, weights2);
-  
+
   QAnisotropic<dim> q1(qx, qy);
-   
+
   QAnisotropic<dim> q2(qy, qx);
 
   verify (q1, q2);

@@ -30,7 +30,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   Tensor<2,3> t;
   t[0][0] = 1;
   t[1][1] = 2;
@@ -44,11 +44,11 @@ int main ()
 
   Assert (t[0][1] == t[1][0], ExcInternalError());
 
-                                   // make sure transposition doesn't change
-                                   // anything
+  // make sure transposition doesn't change
+  // anything
   Assert (t == transpose(t), ExcInternalError());
 
-                                   // check norm of tensor
+  // check norm of tensor
   Assert (std::fabs(t.norm() - std::sqrt(1.*1+2*2+3*3+2*4*4+2*5*5+2*6*6))
           < 1e-14,
           ExcInternalError());

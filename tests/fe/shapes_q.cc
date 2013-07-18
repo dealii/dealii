@@ -40,8 +40,8 @@ void plot_FE_Q_shape_functions()
   plot_face_shape_functions(m, q2, "Q2");
   test_compute_functions(m, q2, "Q2");
 
-				   // skip the following tests to
-				   // reduce run-time
+  // skip the following tests to
+  // reduce run-time
   if (dim < 3)
     {
       FE_Q<dim> q3(3);
@@ -54,7 +54,7 @@ void plot_FE_Q_shape_functions()
       plot_face_shape_functions(m, q4, "Q4");
       test_compute_functions(m, q4, "Q4");
     };
-  
+
 //    FE_Q<dim> q5(5);
 //    plot_shape_functions(m, q5, "Q5");
 //    FE_Q<dim> q6(6);
@@ -78,11 +78,11 @@ main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   plot_FE_Q_shape_functions<1>();
   plot_FE_Q_shape_functions<2>();
   plot_FE_Q_shape_functions<3>();
-  
+
   return 0;
 }
 

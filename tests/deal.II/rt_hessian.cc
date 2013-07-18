@@ -40,8 +40,8 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-	   const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -54,16 +54,16 @@ void test (const Triangulation<dim>& tr,
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       deallog << fe_values.shape_hessian_component (0,0,0)[i][j] << std::endl;
-  
-				   // compare the hessian with
-				   // itself. this fails if the
-				   // values are NaN's which the
-				   // Hessian consists of at the
-				   // time this test is written
+
+  // compare the hessian with
+  // itself. this fails if the
+  // values are NaN's which the
+  // Hessian consists of at the
+  // time this test is written
   Assert (fe_values.shape_hessian_component (0,0,0)
-	  ==
-	  fe_values.shape_hessian_component (0,0,0),
-	  ExcInternalError());
+          ==
+          fe_values.shape_hessian_component (0,0,0),
+          ExcInternalError());
 }
 
 

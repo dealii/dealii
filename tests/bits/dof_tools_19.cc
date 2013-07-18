@@ -27,7 +27,7 @@
 // check
 //   DoFTools::
 //   make_hanging_node_constraints (const DoFHandler<dim> &,
-//	                            ConstraintMatrix      &);
+//                              ConstraintMatrix      &);
 //
 // As the results of dof_tools_03 seem unclear, this test aims
 // at verifying the constraints by projecting a constant function
@@ -46,19 +46,19 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // there's presently a crash in the
-                                   // Raviart-Thomas element. don't
-                                   // check this element for that
-                                   // reason. this case is covered in
-                                   // rt_crash_01, however
+  // there's presently a crash in the
+  // Raviart-Thomas element. don't
+  // check this element for that
+  // reason. this case is covered in
+  // rt_crash_01, however
   if (dof_handler.get_fe().get_name().find ("RaviartThomas") !=
       std::string::npos)
     return;
-  
-  ConstantFunction<dim> test_func (1, dof_handler.get_fe().n_components ()); 
 
-                                   // don't run this test if hanging
-                                   // nodes are not implemented
+  ConstantFunction<dim> test_func (1, dof_handler.get_fe().n_components ());
+
+  // don't run this test if hanging
+  // nodes are not implemented
   if (dof_handler.get_fe().constraints_are_implemented() == false)
     return;
 
@@ -74,8 +74,8 @@ check_this (const DoFHandler<dim> &dof_handler)
   Vector<double> solution (dof_handler.n_dofs ());
 
   VectorTools::project (dof_handler, cm,
-			quadrature, test_func,
-			solution);
+                        quadrature, test_func,
+                        solution);
   cm.distribute (solution);
 
   // Evaluate error
@@ -86,6 +86,6 @@ check_this (const DoFHandler<dim> &dof_handler)
   const double p_l2_error = cellwise_errors.l2_norm();
 
   Assert (p_l2_error < 1e-11, ExcInternalError());
-  
+
   deallog << "L2_Error : " << p_l2_error << std::endl;
 }

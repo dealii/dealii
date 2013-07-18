@@ -43,26 +43,26 @@ void test_hyper_cube()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_rectangle(tr, Point<dim>(), Point<dim>(1,1,1), true);
-  
+
   FESystem<dim> fe (FE_Q<dim>(2), dim);
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   deallog << "FE=" << fe.get_name()
-	  << std::endl;
+          << std::endl;
 
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert (1);
   boundary_ids.insert (3);
-  
+
   ConstraintMatrix cm;
   const MappingQ<dim> mapping(4);
   VectorTools::compute_no_normal_flux_constraints (dof, 0,
-						   boundary_ids, cm,
-						   mapping);
+                                                   boundary_ids, cm,
+                                                   mapping);
   cm.close();
-      
+
   cm.print (deallog.get_file_stream ());
 }
 
@@ -71,7 +71,7 @@ int main()
 {
   std::ofstream logfile ("no_flux_06/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
   deallog.threshold_double(1.e-12);

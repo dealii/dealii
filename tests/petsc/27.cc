@@ -16,10 +16,10 @@
 
 
 
-// check PETScWrappers::Vector::operator = (Vector) 
+// check PETScWrappers::Vector::operator = (Vector)
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_vector.h>    
+#include <deal.II/lac/petsc_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -27,19 +27,19 @@
 
 void test (PETScWrappers::Vector &v)
 {
-                                   // set some entries of the vector
+  // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
     if (i%3 == 0)
       v(i) = i+1.;
   v.compress ();
 
-                                   // then copy it
+  // then copy it
   PETScWrappers::Vector w (v.size());
   w = v;
 
-                                   // make sure they're equal
-  deallog << v*w << ' ' << v.l2_norm() * w.l2_norm()
-          << ' ' << v*w - v.l2_norm() * w.l2_norm() << std::endl;
+  // make sure they're equal
+  deallog << v *w << ' ' << v.l2_norm() * w.l2_norm()
+          << ' ' << v *w - v.l2_norm() * w.l2_norm() << std::endl;
   const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;
   Assert (std::fabs(v*w - v.l2_norm() * w.l2_norm()) < eps*(v*w),
           ExcInternalError());
@@ -49,7 +49,7 @@ void test (PETScWrappers::Vector &v)
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("27/output");
   deallog.attach(logfile);
@@ -63,30 +63,30 @@ int main (int argc,char **argv)
         PETScWrappers::Vector v (100);
         test (v);
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

@@ -21,7 +21,7 @@
 #include "sparsity_pattern_common.h"
 #include <deal.II/base/utilities.h>
 
-int main (int argc, char** argv)
+int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv);
   std::ofstream logfile("sparsity_pattern_01/output");
@@ -34,5 +34,5 @@ int main (int argc, char** argv)
   row_length ();
 }
 
-  
-  
+
+

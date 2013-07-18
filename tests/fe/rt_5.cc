@@ -34,21 +34,21 @@ void
 test(const unsigned int degree)
 {
   deallog << "FE_RaviartThomas<" << dim << "> (" << degree << ")"
-	  << std::endl;
-  
+          << std::endl;
+
   FE_RaviartThomas<dim> fe_rt(degree);
 
   for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     {
-      const FullMatrix<double> & m = fe_rt.get_restriction_matrix(c);
+      const FullMatrix<double> &m = fe_rt.get_restriction_matrix(c);
 
       for (unsigned int i=0; i<m.m(); ++i)
-	{
-	  for (unsigned int j=0; j<m.n(); ++j)
-	    deallog << m(i,j) << ' ';
-	  deallog << std::endl;
-	}
-      
+        {
+          for (unsigned int j=0; j<m.n(); ++j)
+            deallog << m(i,j) << ' ';
+          deallog << std::endl;
+        }
+
       deallog << std::endl;
     }
 }
@@ -59,7 +59,7 @@ main()
 {
   std::ofstream logfile ("rt_5/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -69,6 +69,6 @@ main()
       test<2>(degree);
       test<3>(degree);
     }
-  
+
   return 0;
 }

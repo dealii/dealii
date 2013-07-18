@@ -17,30 +17,30 @@
 
 class EmptyInfo
 {
-  public:
-    template <class DOFINFO>
-    void reinit(const DOFINFO&)
-      {}
+public:
+  template <class DOFINFO>
+  void reinit(const DOFINFO &)
+  {}
 };
 
 
 class EmptyInfoBox
 {
-   public:
-    typedef EmptyInfo CellInfo;
-    template <int dim, class DOFINFO>
-    void post_cell(const MeshWorker::DoFInfoBox<dim, DOFINFO>&)
-      {}
-    
-    template <int dim, class DOFINFO>
-    void post_faces(const MeshWorker::DoFInfoBox<dim, DOFINFO>&)
-      {}
-    
-    EmptyInfo cell;
-    EmptyInfo boundary;
-    EmptyInfo face;
-    EmptyInfo subface;
-    EmptyInfo neighbor;
+public:
+  typedef EmptyInfo CellInfo;
+  template <int dim, class DOFINFO>
+  void post_cell(const MeshWorker::DoFInfoBox<dim, DOFINFO> &)
+  {}
+
+  template <int dim, class DOFINFO>
+  void post_faces(const MeshWorker::DoFInfoBox<dim, DOFINFO> &)
+  {}
+
+  EmptyInfo cell;
+  EmptyInfo boundary;
+  EmptyInfo face;
+  EmptyInfo subface;
+  EmptyInfo neighbor;
 };
 
 

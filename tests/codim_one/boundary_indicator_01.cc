@@ -41,7 +41,7 @@ using namespace std;
 
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim>& tria)
+void save_mesh(const Triangulation<dim,spacedim> &tria)
 {
   GridOut grid_out;
   grid_out.write_gnuplot (tria, deallog.get_file_stream());
@@ -54,7 +54,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-				   // Extract the boundary of 3/4 of a sphere
+  // Extract the boundary of 3/4 of a sphere
   {
     const int dim = 3;
     deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
@@ -64,51 +64,51 @@ int main ()
     GridGenerator::hyper_ball(volume_mesh);
     volume_mesh.set_boundary (0, boundary_description);
 
-				     // exclude one of the 6 faces
-				     // from the surface mesh
-				     // extraction
+    // exclude one of the 6 faces
+    // from the surface mesh
+    // extraction
     for (Triangulation<dim>::active_cell_iterator
-	   cell = volume_mesh.begin_active();
-	 cell != volume_mesh.end(); ++cell)
+         cell = volume_mesh.begin_active();
+         cell != volume_mesh.end(); ++cell)
       {
-	bool done = false;
-	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	  if (cell->at_boundary(f))
-	    {
-	      cell->face(f)->set_boundary_indicator(1);
-	      done = true;
-	      break;
-	    }
-	if (done)
-	  break;
+        bool done = false;
+        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+          if (cell->at_boundary(f))
+            {
+              cell->face(f)->set_boundary_indicator(1);
+              done = true;
+              break;
+            }
+        if (done)
+          break;
       }
 
     const HyperBallBoundary<dim-1,dim> surface_description;
     Triangulation<dim-1,dim> boundary_mesh;
     boundary_mesh.set_boundary (0, surface_description);
 
-				     // now extract a mesh of the 5
-				     // surface faces
+    // now extract a mesh of the 5
+    // surface faces
     std::set<types::boundary_id> boundary_indicators;
     boundary_indicators.insert (0);
     GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
-				      boundary_indicators);
+                                      boundary_indicators);
     deallog << volume_mesh.n_active_cells () << std::endl;
     deallog << boundary_mesh.n_active_cells () << std::endl;
 
-				     // at this point, all cells and
-				     // edges of the surface mesh
-				     // should have boundary indicator
-				     // 0. set those at the boundary
-				     // of the mesh to 1 to force
-				     // straight line refinement, then
-				     // refine
+    // at this point, all cells and
+    // edges of the surface mesh
+    // should have boundary indicator
+    // 0. set those at the boundary
+    // of the mesh to 1 to force
+    // straight line refinement, then
+    // refine
     for (Triangulation<dim-1,dim>::active_cell_iterator
-	   cell = boundary_mesh.begin_active();
-	 cell != boundary_mesh.end(); ++cell)
+         cell = boundary_mesh.begin_active();
+         cell != boundary_mesh.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim-1>::faces_per_cell; ++f)
-	if (cell->at_boundary(f))
-	  cell->face(f)->set_boundary_indicator(1);
+        if (cell->at_boundary(f))
+          cell->face(f)->set_boundary_indicator(1);
 
     boundary_mesh.refine_global (2);
 

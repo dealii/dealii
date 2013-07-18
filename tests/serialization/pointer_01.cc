@@ -26,39 +26,39 @@ int object_number = 1;
 
 class C
 {
-  public:
-    C ()
-      {
-	object_number = ::object_number++;
-	deallog << "Default constructor. Object number "
-		<< object_number
-		<< std::endl;
-      }
+public:
+  C ()
+  {
+    object_number = ::object_number++;
+    deallog << "Default constructor. Object number "
+            << object_number
+            << std::endl;
+  }
 
-    C (const C&)
-      {
-	object_number = ::object_number++;
-	deallog << "copy constructor. Object number "
-		<< object_number
-		<< std::endl;
-      }
+  C (const C &)
+  {
+    object_number = ::object_number++;
+    deallog << "copy constructor. Object number "
+            << object_number
+            << std::endl;
+  }
 
-    template <typename Archive>
-    void serialize (Archive &ar, const unsigned int version)
-      {
-	deallog << "Serializing object number "
-		<< object_number
-		<< " via " << typeid(Archive).name()
-		<< std::endl;
-      }
+  template <typename Archive>
+  void serialize (Archive &ar, const unsigned int version)
+  {
+    deallog << "Serializing object number "
+            << object_number
+            << " via " << typeid(Archive).name()
+            << std::endl;
+  }
 
-    bool operator == (const C &) const
-      {
-	return true;
-      }
+  bool operator == (const C &) const
+  {
+    return true;
+  }
 
-  private:
-    unsigned int object_number;
+private:
+  unsigned int object_number;
 };
 
 
@@ -66,12 +66,12 @@ void test ()
 {
   C *p1 = new C();
   C *p2;
-  
+
   verify (p1, p2);
 
-				   // p2 should have been created, and should
-				   // have been different from the address of
-				   // p1
+  // p2 should have been created, and should
+  // have been different from the address of
+  // p1
   Assert (p2 != 0, ExcInternalError());
   Assert (p1 != p2, ExcInternalError());
 

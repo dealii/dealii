@@ -55,19 +55,19 @@ void test ()
 
   hp::DoFHandler<dim>      dof_handler (triangulation);
 
-				   // loop over cells, and set cells
-				   // within a circle to be of type
-				   // FE_Nothing, while outside the
-				   // circle to be of type FE_Q(1)
+  // loop over cells, and set cells
+  // within a circle to be of type
+  // FE_Nothing, while outside the
+  // circle to be of type FE_Q(1)
 
   typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
 
-  for(; cell != endc; cell++)
+  for (; cell != endc; cell++)
     {
       Point<dim> center = cell->center();
-      if( std::sqrt(center.square()) < 0.25 )
+      if ( std::sqrt(center.square()) < 0.25 )
         cell->set_active_fe_index(1);
       else
         cell->set_active_fe_index(0);
@@ -76,51 +76,51 @@ void test ()
   dof_handler.distribute_dofs (fe_collection);
 
   deallog << "   Number of active cells:       "
-	  << triangulation.n_active_cells()
-	  << std::endl
-	  << "   Number of degrees of freedom: "
-	  << dof_handler.n_dofs()
-	  << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl
+          << "   Number of degrees of freedom: "
+          << dof_handler.n_dofs()
+          << std::endl;
 
 
 
-				   // .... new test code beyond fe_nothing_01.cc
+  // .... new test code beyond fe_nothing_01.cc
 
   hp::QCollection<dim>     quadrature_collection;
   quadrature_collection.push_back(QGauss<dim>(2));
   quadrature_collection.push_back(QGauss<dim>(0));
 
   hp::FEValues<dim> hp_fe_values (fe_collection,
-				  quadrature_collection,
-				  update_values    |  update_gradients |
-				  update_quadrature_points  |  update_JxW_values);
+                                  quadrature_collection,
+                                  update_values    |  update_gradients |
+                                  update_quadrature_points  |  update_JxW_values);
 
   cell = dof_handler.begin_active();
 
-  for(; cell !=endc; cell++)
+  for (; cell !=endc; cell++)
     {
       deallog << "This is a "
-	      << (cell->active_fe_index() == 1 ? "FE_Nothing" : "FE_Q")
-	      << " cell"
-	      << std::endl;
+              << (cell->active_fe_index() == 1 ? "FE_Nothing" : "FE_Q")
+              << " cell"
+              << std::endl;
 
       if (cell->get_fe().dofs_per_cell == 0)
-	continue;
+        continue;
 
-				       // attempt to reinit hp_fe_values object
+      // attempt to reinit hp_fe_values object
       hp_fe_values.reinit (cell);
 
       const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
       const FEValues<dim>  &fe_values    = hp_fe_values.get_present_fe_values ();
 
       for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
-	{
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      deallog << fe_values.shape_value(i,q_point) << std::endl;
-	      deallog << fe_values.shape_grad(i,q_point) << std::endl;
-	    }
-	}
+        {
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            {
+              deallog << fe_values.shape_value(i,q_point) << std::endl;
+              deallog << fe_values.shape_grad(i,q_point) << std::endl;
+            }
+        }
 
     }
 

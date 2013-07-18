@@ -48,7 +48,7 @@ template <> Table<2,types::material_id> material_ids<2>()
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<3; ++j)
       t[i][j] = 1;
-				   // produce a hole in the middle
+  // produce a hole in the middle
   t[1][1] = (types::material_id)(-1);
   return t;
 }
@@ -60,8 +60,8 @@ template <> Table<3,types::material_id> material_ids<3>()
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<3; ++j)
       for (unsigned int k=0; k<4; ++k)
-	t[i][j][k] = 1;
-				   // produce a hole in the middle
+        t[i][j][k] = 1;
+  // produce a hole in the middle
   t[1][1][1] = (types::material_id)(-1);
   t[1][1][2] = (types::material_id)(-1);
   return t;
@@ -70,7 +70,7 @@ template <> Table<3,types::material_id> material_ids<3>()
 
 
 template<int dim>
-void test(std::ostream& out)
+void test(std::ostream &out)
 {
   Point<dim> p1;
   p1[0] = 2.;
@@ -89,7 +89,7 @@ void test(std::ostream& out)
 
   GridOut go;
 
-                                   // uniformly subdivided mesh
+  // uniformly subdivided mesh
   if (true)
     {
       deallog << "subdivided_hyper_rectangle" << std::endl;
@@ -99,13 +99,13 @@ void test(std::ostream& out)
         sub[i] = std::vector<double> (i+2, (p2[i]-p1[i])/(i+2));
 
       GridGenerator::subdivided_hyper_rectangle(tr, sub, p1, material_ids<dim>(),
-						dim!=1);
+                                                dim!=1);
       if (tr.n_cells() > 0)
-	go.write_gnuplot(tr, out);
+        go.write_gnuplot(tr, out);
     }
 
 
-                                   // non-uniformly subdivided mesh
+  // non-uniformly subdivided mesh
   if (true)
     {
       deallog << "subdivided_hyper_rectangle" << std::endl;
@@ -119,9 +119,9 @@ void test(std::ostream& out)
         }
 
       GridGenerator::subdivided_hyper_rectangle(tr, sub, p1, material_ids<dim>(),
-						dim!=1);
+                                                dim!=1);
       if (tr.n_cells() > 0)
-	go.write_gnuplot(tr, out);
+        go.write_gnuplot(tr, out);
     }
 }
 

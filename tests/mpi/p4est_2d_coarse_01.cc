@@ -47,43 +47,43 @@ void test()
       gi.attach_triangulation (tr);
       std::ifstream in ("../deal.II/grid_in_02/2d.xda");
       try
-	{
-	  gi.read_xda (in);
-	}
+        {
+          gi.read_xda (in);
+        }
       catch (const typename Triangulation<dim>::DistortedCellList &distorted_cells)
-	{
-					   // ignore distorted cells
-	  deallog << distorted_cells.distorted_cells.size()
-		  << " distorted cells after creating mesh."
-		  << std::endl;
-	}
+        {
+          // ignore distorted cells
+          deallog << distorted_cells.distorted_cells.size()
+                  << " distorted cells after creating mesh."
+                  << std::endl;
+        }
 
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "subdomainid = "
-		<< tr.begin_active()->subdomain_id()
-		<< std::endl;
+        deallog << "subdomainid = "
+                << tr.begin_active()->subdomain_id()
+                << std::endl;
 
 //      std::vector< unsigned int > cell_subd;
 //      cell_subd.resize(tr.n_active_cells());
 
 //      GridTools::get_subdomain_association(tr, cell_subd);
 //       for (unsigned int i=0;i<tr.n_active_cells();++i)
-// 	deallog << cell_subd[i] << " ";
+//  deallog << cell_subd[i] << " ";
 //       deallog << std::endl;
 
       if (myid == 0)
-	{
-	  deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+        {
+          deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
 
-	  Assert(tr.n_global_active_cells() == tr.n_active_cells(),
-		 ExcInternalError() );
-	}
+          Assert(tr.n_global_active_cells() == tr.n_active_cells(),
+                 ExcInternalError() );
+        }
 
       const unsigned int checksum = tr.get_checksum ();
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "Checksum: "
-		<< checksum
-		<< std::endl;
+        deallog << "Checksum: "
+                << checksum
+                << std::endl;
     }
 
 

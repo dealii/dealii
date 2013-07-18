@@ -50,7 +50,7 @@ int main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -67,7 +67,7 @@ int main ()
   points_glob.push_back (Point<2> (0.5, 1.0));
   points_glob.push_back (Point<2> (0.0, 1.0));
 
-				   // Prepare cell data
+  // Prepare cell data
   std::vector<CellData<2> > cells (3);
 
   cells[0].vertices[0] = 0;
@@ -93,17 +93,17 @@ int main ()
 
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement ();
-      
+
   hp::FECollection<2> fe;
   fe.push_back (FE_Q<2>(1));
   fe.push_back (FE_Q<2>(2));
 
   hp::DoFHandler<2>        dof_handler(triangulation);
 
-				   // distribute fe_indices randomly
+  // distribute fe_indices randomly
   unsigned int cell_no = 0;
   for (hp::DoFHandler<2>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell, ++cell_no)
     cell->set_active_fe_index (0);
   (++dof_handler.begin_active())->set_active_fe_index (1);
@@ -112,29 +112,29 @@ int main ()
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
   for (hp::DoFHandler<2>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     {
       deallog << "Cell=" << cell << std::endl;
       deallog << "    vertices="
-	      << cell->vertex_index(0) << ' '
-	      << cell->vertex_index(1) << ' '
-	      << cell->vertex_index(2) << ' '
-	      << cell->vertex_index(3) << std::endl;
+              << cell->vertex_index(0) << ' '
+              << cell->vertex_index(1) << ' '
+              << cell->vertex_index(2) << ' '
+              << cell->vertex_index(3) << std::endl;
       deallog << "    active_fe_index=" << cell->active_fe_index() << std::endl;
 
       deallog << "    dofs=";
       std::vector<types::global_dof_index> local_dofs (fe[cell->active_fe_index()].dofs_per_cell);
       cell->get_dof_indices (local_dofs);
       for (unsigned int i=0; i<fe[cell->active_fe_index()].dofs_per_cell; ++i)
-	deallog << local_dofs[i] << ' ';
+        deallog << local_dofs[i] << ' ';
       deallog << std::endl;
     }
 
-  
+
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   constraints);
+                                           constraints);
   constraints.close ();
 
   constraints.print (deallog.get_file_stream());

@@ -36,12 +36,12 @@ void test ()
 {
   const unsigned int N = 200;
 
-                                   // build the sparse matrix
+  // build the sparse matrix
   Epetra_Map map (TrilinosWrappers::types::int_type(N*N), 0,
-		  Utilities::Trilinos::comm_world());
+                  Utilities::Trilinos::comm_world());
   TrilinosWrappers::SparseMatrix matrix (map, 5);
-  for(unsigned int i=0; i<N; i++)
-    for(unsigned int j=0; j<N; j++)
+  for (unsigned int i=0; i<N; i++)
+    for (unsigned int j=0; j<N; j++)
       {
         const unsigned int global = i*N+j;
         matrix.set(global, global, 4);
@@ -68,16 +68,16 @@ void test ()
       }
   matrix.compress ();
 
-                                   // then do a single matrix-vector
-                                   // multiplication with subsequent formation
-                                   // of the matrix norm
+  // then do a single matrix-vector
+  // multiplication with subsequent formation
+  // of the matrix norm
   TrilinosWrappers::MPI::Vector v1(map);
   TrilinosWrappers::MPI::Vector v2(map);
   for (unsigned int i=0; i<N*N; ++i)
     v1(i) = i;
   matrix.vmult (v2, v1);
 
-  deallog << v1*v2 << std::endl;
+  deallog << v1 *v2 << std::endl;
 }
 
 
@@ -99,25 +99,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
 
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 

@@ -49,12 +49,13 @@
 void create_grid (Triangulation<2> &tria)
 {
   const unsigned int n_points=5;
-  
+
   const Point<2> points[n_points] = { Point<2>(0.0,0.0),
-                               Point<2>(1.0,1.0),
-                               Point<2>(2.0,2.0),
-                               Point<2>(0.0,2.0),
-                               Point<2>(2.0,0.0)};
+                                      Point<2>(1.0,1.0),
+                                      Point<2>(2.0,2.0),
+                                      Point<2>(0.0,2.0),
+                                      Point<2>(2.0,0.0)
+                                    };
   std::vector<Point<2> > vertices(n_points);
   vertices.assign(points,points+n_points);
 
@@ -68,8 +69,8 @@ void create_grid (Triangulation<2> &tria)
   cells[1].vertices[2]   = 2;
   cells[1].vertices[3]   = 1;
 
-                                   // generate a triangulation
-                                   // out of this
+  // generate a triangulation
+  // out of this
   GridReordering<2>::reorder_cells (cells);
   try
     {
@@ -77,7 +78,7 @@ void create_grid (Triangulation<2> &tria)
     }
   catch (Triangulation<2>::DistortedCellList &dcv)
     {
-				       // ignore the exception
+      // ignore the exception
     }
 }
 
@@ -88,11 +89,11 @@ void check_neighbors (const Triangulation<2> &tria)
   for (unsigned int f=0; f<GeometryInfo<2>::faces_per_cell; ++f)
     if (cell->neighbor(f).state()==IteratorState::valid)
       {
-	const unsigned int neighbor_neighbor=cell->neighbor_of_neighbor(f);
-	deallog << "At face " << f << ": neighbor_of_neighbor="
-		<< neighbor_neighbor << std::endl;
-	Assert(cell->face(f)==cell->neighbor(f)->face(neighbor_neighbor),
-	       ExcMessage("Error in neighbor_of_neighbor() function!"));
+        const unsigned int neighbor_neighbor=cell->neighbor_of_neighbor(f);
+        deallog << "At face " << f << ": neighbor_of_neighbor="
+                << neighbor_neighbor << std::endl;
+        Assert(cell->face(f)==cell->neighbor(f)->face(neighbor_neighbor),
+               ExcMessage("Error in neighbor_of_neighbor() function!"));
       }
 }
 
@@ -104,7 +105,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   Triangulation<2> tria;
   create_grid(tria);
   check_neighbors(tria);

@@ -31,20 +31,20 @@
 template<int dim>
 void test()
 {
-                                   // create 2 triangulations with the
-                                   // same coarse grid, and refine
-                                   // them differently
+  // create 2 triangulations with the
+  // same coarse grid, and refine
+  // them differently
   Triangulation<dim> tria[2];
 
   GridGenerator::hyper_cube (tria[0]);
   GridGenerator::hyper_cube (tria[1]);
-  
+
   tria[0].refine_global (2);
   tria[1].refine_global (2);
 
   tria[0].begin_active()->set_refine_flag();
   tria[0].execute_coarsening_and_refinement ();
-  
+
   tria[1].last_active()->set_refine_flag();
   tria[1].execute_coarsening_and_refinement ();
 
@@ -52,9 +52,9 @@ void test()
   tria[1].execute_coarsening_and_refinement ();
 
   typedef
-    std::list<std::pair<typename Triangulation<dim>::cell_iterator,
-                        typename Triangulation<dim>::cell_iterator> >
-    CellList;
+  std::list<std::pair<typename Triangulation<dim>::cell_iterator,
+      typename Triangulation<dim>::cell_iterator> >
+      CellList;
 
   const CellList cell_list
     = GridTools::get_finest_common_cells (tria[0], tria[1]);

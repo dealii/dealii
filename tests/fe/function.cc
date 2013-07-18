@@ -39,11 +39,11 @@
 // Call this function with a system consisting of several copies of
 // the SAME element
 template<int dim>
-void vector_values(const FiniteElement<dim>& fe)
+void vector_values(const FiniteElement<dim> &fe)
 {
   Assert(fe.n_base_elements() == 1, ExcNotImplemented());
   deallog.push(fe.get_name());
-  
+
   QTrapez<dim> quadrature;
   std::vector<unsigned int> renumbering(fe.dofs_per_cell);
   std::vector<std::vector<unsigned int> > component_start;
@@ -56,15 +56,15 @@ void vector_values(const FiniteElement<dim>& fe)
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
   DoFRenumbering::component_wise(dof);
-  
+
   Vector<float> v(dof.n_dofs());
-  for (unsigned int i=0;i<v.size();++i)
+  for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
-  
+
   FEValues<dim> feval(fe, quadrature, update_values);
   std::vector<Vector<double> > local(quadrature.size(),
-				     Vector<double>(fe.n_components()));
-  
+                                     Vector<double>(fe.n_components()));
+
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   const typename DoFHandler<dim>::active_cell_iterator end = dof.end();
 
@@ -74,13 +74,13 @@ void vector_values(const FiniteElement<dim>& fe)
       deallog << "Cell " << cell_no++ << std::endl;
       feval.reinit(cell);
       feval.get_function_values(v, local);
-      for (unsigned int c=0;c<fe.n_components();++c)
-	{
-	  deallog << "Component " << c;
-	  for (unsigned int k=0;k<quadrature.size();++k)
-	    deallog << '\t' << (int) local[k](c);
-	  deallog << std::endl;
-	}
+      for (unsigned int c=0; c<fe.n_components(); ++c)
+        {
+          deallog << "Component " << c;
+          for (unsigned int k=0; k<quadrature.size(); ++k)
+            deallog << '\t' << (int) local[k](c);
+          deallog << std::endl;
+        }
       ++cell;
     }
   deallog.pop();
@@ -104,6 +104,6 @@ int main()
   deallog.threshold_double(1.e-10);
 
   test_vectors<2>();
-  
+
   return 0;
 }

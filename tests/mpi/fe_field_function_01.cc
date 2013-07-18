@@ -46,14 +46,14 @@
 
 
 template <int dim>
-class LinearFunction : public Function<dim> 
+class LinearFunction : public Function<dim>
 {
-  public:
-    double value (const Point<dim> &p,
-		  const unsigned int) const
-      {
-	return p[0] + 2;
-      }
+public:
+  double value (const Point<dim> &p,
+                const unsigned int) const
+  {
+    return p[0] + 2;
+  }
 };
 
 
@@ -72,45 +72,45 @@ void test()
   dofh.distribute_dofs (fe);
 
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-					     MPI_COMM_WORLD);
+                                             MPI_COMM_WORLD);
   VectorTools::interpolate (dofh,
-			    LinearFunction<dim>(),
-			    interpolated);
-  
+                            LinearFunction<dim>(),
+                            interpolated);
+
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
   x_rel = interpolated;
 
   Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>
-    field_function (dofh, x_rel);
+  field_function (dofh, x_rel);
 
   for (unsigned int test=0; test<4; ++test)
     {
       double value;
       Point<dim> p = (dim == 2 ?
-		      Point<dim>(test/2+1,test%2+1)/3 :
-		      Point<dim>(test/2+1,test/2+1,test%2+1)/3);
+                      Point<dim>(test/2+1,test%2+1)/3 :
+                      Point<dim>(test/2+1,test/2+1,test%2+1)/3);
 
       // see if we can find the point on the current processor
       bool point_found = false;
       try
-	{
-	  value = field_function.value (p);
-	  point_found = true;
+        {
+          value = field_function.value (p);
+          point_found = true;
 
-	  Assert (std::fabs(value - (p[0]+2)) < 1e-8* std::fabs(value + (p[0]+2)),
-		  ExcInternalError());
-	}
+          Assert (std::fabs(value - (p[0]+2)) < 1e-8* std::fabs(value + (p[0]+2)),
+                  ExcInternalError());
+        }
       catch (typename Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere &)
-	{
-	  point_found = false;
-	}
+        {
+          point_found = false;
+        }
 
       Assert (Utilities::MPI::sum(point_found ? 1 : 0, MPI_COMM_WORLD) == 1,
-	      ExcInternalError());  
+              ExcInternalError());
     }
-  
+
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 

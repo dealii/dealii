@@ -18,7 +18,7 @@
 
 // check SparseMatrix::Tvmult_add
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -40,14 +40,14 @@ void test (TrilinosWrappers::Vector &v,
       v(i) = i;
       w(i) = i;
     }
-  
+
   m.compress ();
   v.compress ();
   w.compress ();
-                                   // w:=Mv
+  // w:=Mv
   m.Tvmult_add (w,v);
 
-                                   // make sure we get the expected result
+  // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
       Assert (v(i) == i, ExcInternalError());
@@ -68,7 +68,7 @@ int main (int argc, char **argv)
   std::ofstream logfile("sparse_matrix_vector_04/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -84,25 +84,25 @@ int main (int argc, char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

@@ -25,31 +25,31 @@
 
 template<typename DATA>
 void
-test_const(const NamedData<DATA>& data)
+test_const(const NamedData<DATA> &data)
 {
   NamedData<DATA> newdata;
   newdata.merge(data);
   data.print(deallog);
-  
+
   deallog << "Const should be true: " << (newdata.is_const() ? "true" : "false") << std::endl;
 }
 
 template<typename DATA>
 void
-test_selector(const NamedData<DATA>& data)
+test_selector(const NamedData<DATA> &data)
 {
   NamedSelection select;
   select.add("P1");
   select.add("P6");
-  select.add("P5");  
+  select.add("P5");
   select.add("P3");
   select.initialize(data);
 
-  for (unsigned int i=0;i<select.size();++i)
+  for (unsigned int i=0; i<select.size(); ++i)
     {
       deallog << "Selection " << i << ':';
       if (select(i) != deal_II_numbers::invalid_unsigned_int)
-	deallog << data.name(select(i)) << ' ' << *data(select(i));
+        deallog << data.name(select(i)) << ' ' << *data(select(i));
       deallog << std::endl;
     }
 }
@@ -70,7 +70,7 @@ test_shared_pointer()
   p = std_cxx1x::shared_ptr<double>(new double);
   data.add(p, "P5");
 
-  for (unsigned int i=0;i<data.size();++i)
+  for (unsigned int i=0; i<data.size(); ++i)
     *data(i) = i+0.5;
 
   test_const(data);

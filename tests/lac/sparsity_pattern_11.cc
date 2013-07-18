@@ -32,5 +32,5 @@ int main ()
   block_read_write<SparsityPattern> ();
 }
 
-  
-  
+
+

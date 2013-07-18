@@ -85,7 +85,7 @@ namespace Step22
   class StokesProblem
   {
   public:
-    StokesProblem (const unsigned int degree, FESystem<dim> & fe_);
+    StokesProblem (const unsigned int degree, FESystem<dim> &fe_);
     void run ();
 
   private:
@@ -385,7 +385,7 @@ namespace Step22
   }
 
   template <int dim>
-  StokesProblem<dim>::StokesProblem (const unsigned int degree, FESystem<dim> & fe_)
+  StokesProblem<dim>::StokesProblem (const unsigned int degree, FESystem<dim> &fe_)
     :
     degree (degree),
     triangulation (Triangulation<dim>::maximum_smoothing),
@@ -465,12 +465,12 @@ namespace Step22
                        n_p = dofs_per_block[1];
 
     deallog << "   Number of active cells: "
-	    << triangulation.n_active_cells()
-	    << std::endl
-	    << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
-	    << " (" << n_u << '+' << n_p << ')'
-	    << std::endl;
+            << triangulation.n_active_cells()
+            << std::endl
+            << "   Number of degrees of freedom: "
+            << dof_handler.n_dofs()
+            << " (" << n_u << '+' << n_p << ')'
+            << std::endl;
 
     {
       BlockCompressedSimpleSparsityPattern csp (2,2);
@@ -626,7 +626,7 @@ namespace Step22
                                                 local_dof_indices,
                                                 system_matrix, system_rhs);
       }
-    
+
     A_preconditioner
       = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new
           typename InnerPreconditioner<dim>::type());
@@ -740,7 +740,7 @@ namespace Step22
                                        difference_per_cell, quadrature,
                                        VectorTools::mean,&pressure_mask);
     double integral = difference_per_cell.mean_value()*n_active_cells;
-				     //std::cout<<"mean difference "<<integral *integral<<std::endl;
+    //std::cout<<"mean difference "<<integral *integral<<std::endl;
     L2_error_pressure -= integral*integral;
 
 //    std::cout<<"Pressure error squared: "<<L2_error_pressure<<std::endl;
@@ -929,9 +929,9 @@ int main ()
   using namespace Step22;
 
   initlog(__FILE__);
- 
+
   deallog.depth_file (1);
-  
+
   unsigned int degree;
   const unsigned int dim=2;
   {

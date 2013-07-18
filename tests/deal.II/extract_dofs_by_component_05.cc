@@ -51,9 +51,9 @@ check ()
   tr.refine_global (1);
 
   FESystem<dim> element (FE_Q<dim>(1), 1,
-			 FE_RaviartThomas<dim>(0), 1,
-			 FE_Q<dim>(1), 1,
-			 FE_Nedelec<dim>(0), 1);
+                         FE_RaviartThomas<dim>(0), 1,
+                         FE_Q<dim>(1), 1,
+                         FE_Nedelec<dim>(0), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 

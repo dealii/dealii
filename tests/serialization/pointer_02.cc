@@ -31,47 +31,47 @@ int objects_destroyed = 0;
 
 class C
 {
-  public:
-    C ()
-      {
-	object_number = ::object_number++;
-	deallog << "Default constructor. Object number "
-		<< object_number
-		<< std::endl;
-      }
+public:
+  C ()
+  {
+    object_number = ::object_number++;
+    deallog << "Default constructor. Object number "
+            << object_number
+            << std::endl;
+  }
 
-    C (const C&)
-      {
-	object_number = ::object_number++;
-	deallog << "copy constructor. Object number "
-		<< object_number
-		<< std::endl;
-      }
+  C (const C &)
+  {
+    object_number = ::object_number++;
+    deallog << "copy constructor. Object number "
+            << object_number
+            << std::endl;
+  }
 
-    ~C ()
-      {
-	deallog << "destructor. Object number "
-		<< object_number
-		<< std::endl;
-	++objects_destroyed;
-      }
-    
-    template <typename Archive>
-    void serialize (Archive &ar, const unsigned int version)
-      {
-	deallog << "Serializing object number "
-		<< object_number
-		<< " via " << typeid(Archive).name()
-		<< std::endl;
-      }
+  ~C ()
+  {
+    deallog << "destructor. Object number "
+            << object_number
+            << std::endl;
+    ++objects_destroyed;
+  }
 
-    bool operator == (const C &) const
-      {
-	return true;
-      }
+  template <typename Archive>
+  void serialize (Archive &ar, const unsigned int version)
+  {
+    deallog << "Serializing object number "
+            << object_number
+            << " via " << typeid(Archive).name()
+            << std::endl;
+  }
 
-  private:
-    unsigned int object_number;
+  bool operator == (const C &) const
+  {
+    return true;
+  }
+
+private:
+  unsigned int object_number;
 };
 
 
@@ -80,7 +80,7 @@ void test ()
   {
     C *p1 = new C();
     C *p2 = new C();
-  
+
     verify (p1, p2);
 
     Assert (p1 != p2, ExcInternalError());
@@ -89,10 +89,10 @@ void test ()
     delete p2;
   }
 
-				   // as mentioned above, p2 is overwritten by
-				   // a pointer to a new object, leaving the
-				   // original object pointed to as a memory
-				   // leak. assert that this behavior persists
+  // as mentioned above, p2 is overwritten by
+  // a pointer to a new object, leaving the
+  // original object pointed to as a memory
+  // leak. assert that this behavior persists
   Assert (objects_destroyed == 2, ExcInternalError());
 }
 

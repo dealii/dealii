@@ -45,29 +45,29 @@ void test ()
   GridGenerator::hyper_cube (tria, 0, 1);
   tria.refine_global(1);
 
-				// refine all cells except the one located at
-				// [0.25, 0.25, 0.25]
+  // refine all cells except the one located at
+  // [0.25, 0.25, 0.25]
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = tria.begin_active();
+       cell = tria.begin_active();
        cell != tria.end(); ++cell)
     {
       Point<dim> diff(0.25,0.25,0.25);
       diff -= cell->center();
       if (diff.norm() > 0.25 && !(cell->is_ghost() || cell->is_artificial()))
-	cell->set_refine_flag();
+        cell->set_refine_flag();
     }
   tria.execute_coarsening_and_refinement();
   dof.distribute_dofs(fe);
 
-				// build constraint matrix
+  // build constraint matrix
   IndexSet locally_relevant (dof.n_dofs());
   DoFTools::extract_locally_relevant_dofs (dof, locally_relevant);
   ConstraintMatrix constraints (locally_relevant);
   DoFTools::make_hanging_node_constraints (dof, constraints);
   constraints.close();
 
-				// print out constraints for each
-				// processor.
+  // print out constraints for each
+  // processor.
   const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
@@ -86,14 +86,14 @@ void test ()
 
   if (myid==0)
     {
-      for (unsigned int i=0;i<numproc;++i)
-	{
-	  cat_file((std::string("p4est_3d_constraintmatrix_04/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
-	}
+      for (unsigned int i=0; i<numproc; ++i)
+        {
+          cat_file((std::string("p4est_3d_constraintmatrix_04/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
+        }
     }
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

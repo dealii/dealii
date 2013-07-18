@@ -38,7 +38,7 @@ int main ()
 
     double x[1] = { 1 };
     Assert ((t == SymmetricTensor<2,1>(x)),
-	    ExcInternalError());
+            ExcInternalError());
   }
 
   {
@@ -49,7 +49,7 @@ int main ()
 
     double x[3] = { 1, 2, 3 };
     Assert ((t == SymmetricTensor<2,2>(x)),
-	    ExcInternalError());
+            ExcInternalError());
   }
 
   {
@@ -63,8 +63,8 @@ int main ()
 
     double x[6] = { 1, 2, 3, 4, 5, 6 };
     Assert ((t == SymmetricTensor<2,3>(x)),
-	    ExcInternalError());
+            ExcInternalError());
   }
-  
+
   deallog << "OK" << std::endl;
 }

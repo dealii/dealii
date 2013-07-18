@@ -40,7 +40,7 @@ void test ()
   GridGenerator::hyper_cube (tria);
 
   FESystem<1,spacedim> fe(FE_Q<1,spacedim>(2),2,
-			  FE_Q<1,spacedim>(1),1);
+                          FE_Q<1,spacedim>(1),1);
   DoFHandler<1,spacedim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
 
@@ -52,7 +52,7 @@ void test ()
   dof_handler.distribute_dofs (fe);
 
   for (typename DoFHandler<1,spacedim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     {
       deallog << "Cell: " << cell << std::endl;

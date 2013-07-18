@@ -57,44 +57,44 @@ std::ofstream logfile("step-11/output");
 
 
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
-  public:
-    LaplaceProblem (const unsigned int mapping_degree);
-    void run ();
-    
-  private:
-    void setup_system ();
-    void assemble_and_solve ();
-    void solve ();
+public:
+  LaplaceProblem (const unsigned int mapping_degree);
+  void run ();
 
-    Triangulation<dim>   triangulation;
-    hp::FECollection<dim>            fe;
-    hp::DoFHandler<dim>      dof_handler;
-    hp::MappingCollection<dim>        mapping;
+private:
+  void setup_system ();
+  void assemble_and_solve ();
+  void solve ();
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
-    ConstraintMatrix     mean_value_constraints;
+  Triangulation<dim>   triangulation;
+  hp::FECollection<dim>            fe;
+  hp::DoFHandler<dim>      dof_handler;
+  hp::MappingCollection<dim>        mapping;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> system_matrix;
+  ConstraintMatrix     mean_value_constraints;
 
-    TableHandler         output_table;
+  Vector<double>       solution;
+  Vector<double>       system_rhs;
+
+  TableHandler         output_table;
 };
 
 
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem (const unsigned int mapping_degree) :
-                fe (FE_Q<dim>(1)),
-		dof_handler (triangulation),
-		mapping (MappingQ<dim>(mapping_degree))
+  fe (FE_Q<dim>(1)),
+  dof_handler (triangulation),
+  mapping (MappingQ<dim>(mapping_degree))
 {
   deallog << "Using mapping with degree " << mapping_degree << ":"
-	    << std::endl
-	    << "============================"
-	    << std::endl;
+          << std::endl
+          << "============================"
+          << std::endl;
 }
 
 
@@ -108,24 +108,24 @@ void LaplaceProblem<dim>::setup_system ()
 
   std::vector<bool> boundary_dofs (dof_handler.n_dofs(), false);
   DoFTools::extract_boundary_dofs (dof_handler, std::vector<bool>(1,true),
-				   boundary_dofs);
+                                   boundary_dofs);
 
   const unsigned int first_boundary_dof
     = std::distance (boundary_dofs.begin(),
-		     std::find (boundary_dofs.begin(),
-				boundary_dofs.end(),
-				true));
+                     std::find (boundary_dofs.begin(),
+                                boundary_dofs.end(),
+                                true));
 
   mean_value_constraints.clear ();
   mean_value_constraints.add_line (first_boundary_dof);
   for (unsigned int i=first_boundary_dof+1; i<dof_handler.n_dofs(); ++i)
     if (boundary_dofs[i] == true)
       mean_value_constraints.add_entry (first_boundary_dof,
-					i, -1);
+                                        i, -1);
   mean_value_constraints.close ();
 
   CompressedSparsityPattern csp (dof_handler.n_dofs(),
-				 dof_handler.n_dofs());
+                                 dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, csp);
   mean_value_constraints.condense (csp);
 
@@ -136,39 +136,39 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_and_solve () 
+void LaplaceProblem<dim>::assemble_and_solve ()
 {
 
   const unsigned int gauss_degree
     = std::max (static_cast<unsigned int>(std::ceil(1.*(static_cast<const MappingQ<dim>&>(mapping[0]).get_degree()+1)/2)),
-		2U);
+                2U);
   MatrixTools::create_laplace_matrix (mapping, dof_handler,
-				      hp::QCollection<dim>(QGauss<dim>(gauss_degree)),
-				      system_matrix);
+                                      hp::QCollection<dim>(QGauss<dim>(gauss_degree)),
+                                      system_matrix);
   VectorTools::create_right_hand_side (mapping, dof_handler,
-				       hp::QCollection<dim>(QGauss<dim>(gauss_degree)),
-				       ConstantFunction<dim>(-2),
-				       system_rhs);
+                                       hp::QCollection<dim>(QGauss<dim>(gauss_degree)),
+                                       ConstantFunction<dim>(-2),
+                                       system_rhs);
   Vector<double> tmp (system_rhs.size());
   VectorTools::create_boundary_right_hand_side (mapping, dof_handler,
-						hp::QCollection<dim-1>(QGauss<dim-1>(gauss_degree)),
-						ConstantFunction<dim>(1),
-						tmp);
+                                                hp::QCollection<dim-1>(QGauss<dim-1>(gauss_degree)),
+                                                ConstantFunction<dim>(1),
+                                                tmp);
   system_rhs += tmp;
 
   mean_value_constraints.condense (system_matrix);
-  mean_value_constraints.condense (system_rhs);  
+  mean_value_constraints.condense (system_rhs);
 
   solve ();
   mean_value_constraints.distribute (solution);
 
   Vector<float> norm_per_cell (triangulation.n_active_cells());
   VectorTools::integrate_difference (mapping, dof_handler,
-				     solution,
-				     ZeroFunction<dim>(),
-				     norm_per_cell,
-				     hp::QCollection<dim>(QGauss<dim>(gauss_degree+1)),
-				     VectorTools::H1_seminorm);
+                                     solution,
+                                     ZeroFunction<dim>(),
+                                     norm_per_cell,
+                                     hp::QCollection<dim>(QGauss<dim>(gauss_degree+1)),
+                                     VectorTools::H1_seminorm);
   const double norm = norm_per_cell.l2_norm();
 
   output_table.add_value ("cells", triangulation.n_active_cells());
@@ -179,7 +179,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -188,18 +188,18 @@ void LaplaceProblem<dim>::solve ()
   preconditioner.initialize(system_matrix, 1.2);
 
   cg.solve (system_matrix, solution, system_rhs,
-	    preconditioner);
+            preconditioner);
 }
 
 
 
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   GridGenerator::hyper_ball (triangulation);
   static const HyperBallBoundary<dim> boundary;
   triangulation.set_boundary (0, boundary);
-  
+
   for (unsigned int cycle=0; cycle<6; ++cycle, triangulation.refine_global(1))
     {
       setup_system ();
@@ -212,9 +212,9 @@ void LaplaceProblem<dim>::run ()
   deallog << std::endl;
 }
 
-    
 
-int main () 
+
+int main ()
 {
   try
     {
@@ -223,32 +223,32 @@ int main ()
 
       deallog.attach(logfile);
       deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);  
+      deallog.threshold_double(1.e-10);
 
       for (unsigned int mapping_degree=1; mapping_degree<=3; ++mapping_degree)
-	LaplaceProblem<2>(mapping_degree).run ();
+        LaplaceProblem<2>(mapping_degree).run ();
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 

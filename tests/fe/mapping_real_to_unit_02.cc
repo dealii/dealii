@@ -58,19 +58,20 @@ void test2()
 
   std::vector<Point<dim> > points(19*19);
   std::vector<double> m (19*19);
-  
+
   if (1) //works if changed to "if (0)"   <<<<<<<<<
     for (unsigned int i = 0; i < 19; i++)
-    for (unsigned int j = 0; j < 19; j++)
-      { /// all points are inside
-        points[19*i+j] (0) = -0.7 + (i + 1) * .07;
-        points[19*i+j] (1) = -0.7 + (j + 1) * .07;
-      }
+      for (unsigned int j = 0; j < 19; j++)
+        {
+          /// all points are inside
+          points[19*i+j] (0) = -0.7 + (i + 1) * .07;
+          points[19*i+j] (1) = -0.7 + (j + 1) * .07;
+        }
   points[95]=p;
   fe_function.value_list (points, m); // <<<< this fails at point[95] but only if the other points are filled in?!
-  
+
   triangulation.set_boundary (0);
-  
+
   deallog << "OK" << std::endl;
 }
 

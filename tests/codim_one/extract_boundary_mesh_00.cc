@@ -38,46 +38,49 @@ using namespace std;
 
 template <int s_dim, int spacedim>
 bool test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mesh,
-			       map< typename Triangulation<s_dim,spacedim>::cell_iterator,
-				    typename Triangulation<s_dim+1,spacedim>::face_iterator >
-			       &surface_to_volume_mapping,
-			       const int verbosity = 1)
+                               map< typename Triangulation<s_dim,spacedim>::cell_iterator,
+                               typename Triangulation<s_dim+1,spacedim>::face_iterator >
+                               &surface_to_volume_mapping,
+                               const int verbosity = 1)
 {
   typename Triangulation<s_dim,spacedim>::active_cell_iterator
-    cell = boundary_mesh.begin_active(),
-    endc = boundary_mesh.end();
+  cell = boundary_mesh.begin_active(),
+  endc = boundary_mesh.end();
   typename Triangulation<s_dim+1,spacedim>::face_iterator face;
 
   bool success = true;
 
   if (verbosity>1)
     deallog << "Vol faces" << "\t" << "Surf cell" <<
-      "\t" << "Distance" <<endl;
+            "\t" << "Distance" <<endl;
 
-  for (; cell!=endc; ++cell){
+  for (; cell!=endc; ++cell)
+    {
 
-    face = surface_to_volume_mapping [cell];
+      face = surface_to_volume_mapping [cell];
 
-    for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
-      {
-	Point<spacedim> diff(face->vertex(k));
-	diff -= cell->vertex(k);
-	if (verbosity>1){
-	  deallog << face->vertex(k) << "\t\t";
-	  deallog << cell->vertex(k) << "\t\t\t" << diff.square() << endl;
-	}
-	if (diff.square()>0){
-	  success = false;
-	  break;
-	}
-      }
-    if (verbosity>1) deallog << endl;
-  }
+      for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+        {
+          Point<spacedim> diff(face->vertex(k));
+          diff -= cell->vertex(k);
+          if (verbosity>1)
+            {
+              deallog << face->vertex(k) << "\t\t";
+              deallog << cell->vertex(k) << "\t\t\t" << diff.square() << endl;
+            }
+          if (diff.square()>0)
+            {
+              success = false;
+              break;
+            }
+        }
+      if (verbosity>1) deallog << endl;
+    }
   return success;
 }
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim>& tria)
+void save_mesh(const Triangulation<dim,spacedim> &tria)
 {
   GridOut grid_out;
   grid_out.write_ucd (tria, deallog.get_file_stream());
@@ -91,13 +94,14 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  { // Extract the whole boundary of a hyper-cube
+  {
+    // Extract the whole boundary of a hyper-cube
     const int dim = 2;
 
     deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
     map< Triangulation<dim-1,dim>::cell_iterator,
-	 Triangulation<dim,dim>::face_iterator>
-      surface_to_volume_mapping;
+         Triangulation<dim,dim>::face_iterator>
+         surface_to_volume_mapping;
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
@@ -121,13 +125,14 @@ int main ()
 
   }
 
-  { // Extract the whole boundary of a hyper-cube
+  {
+    // Extract the whole boundary of a hyper-cube
     const int dim = 3;
 
     deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
     map< Triangulation<dim-1,dim>::cell_iterator,
-	 Triangulation<dim,dim>::face_iterator>
-      surface_to_volume_mapping;
+         Triangulation<dim,dim>::face_iterator>
+         surface_to_volume_mapping;
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
@@ -152,14 +157,15 @@ int main ()
   }
 
 
-  { // Extract a piece of the boundary of a hyper-cube
+  {
+    // Extract a piece of the boundary of a hyper-cube
 
     const int dim = 3;
     deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
 
     map< Triangulation<dim-1,dim>::cell_iterator,
-	 Triangulation<dim,dim>::face_iterator>
-      surface_to_volume_mapping;
+         Triangulation<dim,dim>::face_iterator>
+         surface_to_volume_mapping;
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
@@ -174,7 +180,7 @@ int main ()
 
     surface_to_volume_mapping
       = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
-					  boundary_ids);
+                                          boundary_ids);
 
     if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
       deallog << "Passed.";
@@ -190,5 +196,5 @@ int main ()
 
 
 
-   return 0;
- }
+  return 0;
+}

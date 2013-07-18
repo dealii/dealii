@@ -32,7 +32,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   ConditionalOStream o(logfile, true);
   o << "Yes" << std::endl;
   deallog << o.is_active() << std::endl;

@@ -28,7 +28,7 @@ struct FillTensor
 {
   static void fill_tensor(Tensor<rank, dim> &tensor, int base)
   {
-    for(int i = 0; i < dim; ++i)
+    for (int i = 0; i < dim; ++i)
       FillTensor<rank-1,dim>::fill_tensor(tensor[i], 10 * base + i);
   }
 };
@@ -38,7 +38,7 @@ struct FillTensor<1, dim>
 {
   static void fill_tensor(Tensor<1, dim> &tensor, int base)
   {
-    for(int i = 0; i < dim; ++i)
+    for (int i = 0; i < dim; ++i)
       tensor[i] = 10 * base + i;
   }
 };
@@ -51,7 +51,7 @@ struct PrintTensor
 {
   static void print_tensor(const Tensor<rank, dim> &tensor)
   {
-    for(int i = 0; i < dim; ++i)
+    for (int i = 0; i < dim; ++i)
       {
         PrintTensor<rank-1,dim>::print_tensor(tensor[i]);
         deallog << " ";
@@ -64,7 +64,7 @@ struct PrintTensor<1, dim>
 {
   static void print_tensor(const Tensor<1, dim> &tensor)
   {
-    for(int i = 0; i < dim; ++i)
+    for (int i = 0; i < dim; ++i)
       deallog << tensor[i] << " ";
   }
 };

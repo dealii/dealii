@@ -39,12 +39,12 @@ void test ()
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<sp.row_length (i); ++j)
       deallog << i << ' ' << j << ' ' << sp.column_number (i,j)
-              << std::endl;  
+              << std::endl;
 }
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("sparsity_pattern_01_x/output");
   deallog.attach(logfile);

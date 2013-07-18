@@ -19,7 +19,7 @@
 // check Vector<double>::operator() in set-mode
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -27,9 +27,9 @@
 
 void test (Vector<double> &v)
 {
-                                   // set only certain elements of the
-                                   // vector. have a bit pattern of where we
-                                   // actually wrote elements to
+  // set only certain elements of the
+  // vector. have a bit pattern of where we
+  // actually wrote elements to
   std::vector<bool> pattern (v.size(), false);
   for (unsigned int i=0; i<v.size(); i+=1+i)
     {
@@ -39,20 +39,20 @@ void test (Vector<double> &v)
 
   v.compress ();
 
-                                   // check that they are ok, and this time
-                                   // all of them
+  // check that they are ok, and this time
+  // all of them
   for (unsigned int i=0; i<v.size(); ++i)
     Assert ((((pattern[i] == true) && (v(i) == i))
              ||
              ((pattern[i] == false) && (v(i) == 0))),
-             ExcInternalError());
+            ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("vector_12/output");
   deallog.attach(logfile);
@@ -67,25 +67,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

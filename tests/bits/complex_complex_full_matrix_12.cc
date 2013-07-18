@@ -34,7 +34,7 @@ check ()
 {
   FullMatrix<std::complex<number> > m(3,3);
   deallog << m.all_zero() << std::endl;
-  
+
   make_complex_matrix (m);
   deallog << m.all_zero() << std::endl;
 }

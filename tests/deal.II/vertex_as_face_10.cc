@@ -38,7 +38,7 @@ void test ()
   tria.begin_active()->face(1)->set_boundary_indicator(4);
 
   std::vector<types::boundary_id>
-    boundary_ids = tria.get_boundary_indicators ();
+  boundary_ids = tria.get_boundary_indicators ();
 
   for (unsigned int i=0; i<boundary_ids.size(); ++i)
     deallog << (int)boundary_ids[i] << std::endl;

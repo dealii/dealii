@@ -30,7 +30,7 @@ void
 test_leak()
 {
   GrowingVectorMemory<VECTOR> mem;
-  VECTOR* v = mem.alloc();
+  VECTOR *v = mem.alloc();
   v->reinit(5);
 }
 
@@ -40,12 +40,12 @@ void
 test_stat()
 {
   GrowingVectorMemory<VECTOR> mem(1, true);
-  VECTOR* v1 = mem.alloc();
-  VECTOR* v2 = mem.alloc();
-  VECTOR* v3 = mem.alloc();
-  VECTOR* v4 = mem.alloc();
-  VECTOR* v5 = mem.alloc();
-  VECTOR* v6 = mem.alloc();
+  VECTOR *v1 = mem.alloc();
+  VECTOR *v2 = mem.alloc();
+  VECTOR *v3 = mem.alloc();
+  VECTOR *v4 = mem.alloc();
+  VECTOR *v5 = mem.alloc();
+  VECTOR *v6 = mem.alloc();
   v1->reinit(5);
   v2->reinit(5);
   v3->reinit(5);
@@ -78,7 +78,7 @@ main()
   deallog.threshold_double(1.e-10);
 
   test_stat<Vector<double> >();
-  
+
   try
     {
       test_leak<Vector<double> >();

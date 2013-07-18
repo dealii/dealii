@@ -53,15 +53,15 @@ check ()
   GridGenerator::hyper_cube(tr, -1,1);
   tr.refine_global (1);
 
-				   // use a simpler finite element
-				   // than in the _01x test
+  // use a simpler finite element
+  // than in the _01x test
   FESystem<dim> element (FE_DGQ<dim>(0), 1,
-			 FE_Nedelec<dim>(0), 1);
+                         FE_Nedelec<dim>(0), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // use a mask that only has the
-				   // first component set
+  // use a mask that only has the
+  // first component set
   std::vector<bool> component_mask (element.n_components(), false);
   component_mask[0] = true;
 

@@ -44,11 +44,11 @@ int main ()
 
   Vector<float> unrolled(9);
 
-				// cast result to double to profit from zero
-				// threshold and so on
+  // cast result to double to profit from zero
+  // threshold and so on
   t.unroll(unrolled);
   deallog << "unrolled:";
-  for (unsigned i=0;i<9;i++)
+  for (unsigned i=0; i<9; i++)
     deallog << ' ' << static_cast<double>(unrolled(i));
   deallog << std::endl;
 
@@ -56,7 +56,7 @@ int main ()
   for (unsigned int i=0; i<dim; ++i)
     {
       for (unsigned int j=0; j<dim; ++j)
-	deallog << static_cast<double>(t[i][j]) << ' ';
+        deallog << static_cast<double>(t[i][j]) << ' ';
       deallog << std::endl;
     };
 
@@ -68,7 +68,7 @@ int main ()
   for (unsigned int i=0; i<dim; ++i)
     {
       for (unsigned int j=0; j<dim; ++j)
-	deallog << static_cast<double>(tt[i][j]) << ' ';
+        deallog << static_cast<double>(tt[i][j]) << ' ';
       deallog << std::endl;
     };
 
@@ -84,18 +84,18 @@ int main ()
       Tensor<1,3,float> result;
       cross_product(result,e1,e2);
       deallog << '\t' << static_cast<double>(result[0])
-	      << '\t' << static_cast<double>(result[1])
-	      << '\t' << static_cast<double>(result[2]) << std::endl;
+              << '\t' << static_cast<double>(result[1])
+              << '\t' << static_cast<double>(result[2]) << std::endl;
 
       cross_product(result,e2,e3);
       deallog << '\t' << static_cast<double>(result[0])
-	      << '\t' << static_cast<double>(result[1]) << '\t'
-	      << static_cast<double>(result[2]) << std::endl;
+              << '\t' << static_cast<double>(result[1]) << '\t'
+              << static_cast<double>(result[2]) << std::endl;
 
       cross_product(result,e3,e1);
       deallog << '\t' << static_cast<double>(result[0])
-	      << '\t' << static_cast<double>(result[1])
-	      << '\t' << static_cast<double>(result[2]) << std::endl;
+              << '\t' << static_cast<double>(result[1])
+              << '\t' << static_cast<double>(result[2]) << std::endl;
 
       deallog.pop();
     }

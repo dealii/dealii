@@ -20,7 +20,7 @@
 // SparseMatrix
 
 #include "../tests.h"
-#include <deal.II/lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 
 
@@ -34,13 +34,13 @@ void test ()
   sp.compress ();
 
   SparseMatrix<double> m(sp);
-  
-                                   // first set a few entries. count how many
-                                   // entries we have. note that for square
-                                   // matrices we also always store the
-                                   // diagonal element, so add one per row,
-                                   // but don't count it when traversing the
-                                   // row
+
+  // first set a few entries. count how many
+  // entries we have. note that for square
+  // matrices we also always store the
+  // diagonal element, so add one per row,
+  // but don't count it when traversing the
+  // row
   unsigned int counter = 0;
   for (unsigned int i=0; i<m.m(); ++i)
     {
@@ -57,7 +57,7 @@ void test ()
   deallog << m.n_nonzero_elements() << std::endl;
   Assert (m.n_nonzero_elements() == counter,
           ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -77,25 +77,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

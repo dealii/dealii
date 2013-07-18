@@ -25,25 +25,25 @@
 
 template <int dim>
 void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
-		const char *                               dirname,
-		const char *                               filename)
+                const char                                *dirname,
+                const char                                *filename)
 {
   deallog << "Checksum: "
-	  << tria.get_checksum ()
-	  << std::endl;
+          << tria.get_checksum ()
+          << std::endl;
 
   chdir (dirname);
   tria.write_mesh_vtk (filename);
 
-				   // copy the .pvtu and .vtu files
-				   // into the logstream
+  // copy the .pvtu and .vtu files
+  // into the logstream
   {
     std::ifstream in((std::string(filename) + ".pvtu").c_str());
     while (in)
       {
-	std::string s;
-	std::getline(in, s);
-	deallog.get_file_stream() << s << "\n";
+        std::string s;
+        std::getline(in, s);
+        deallog.get_file_stream() << s << "\n";
       }
   }
 
@@ -51,9 +51,9 @@ void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
     std::ifstream in((std::string(filename) + "_0000.vtu").c_str());
     while (in)
       {
-	std::string s;
-	std::getline(in, s);
-	deallog.get_file_stream() << s << "\n";
+        std::string s;
+        std::getline(in, s);
+        deallog.get_file_stream() << s << "\n";
       }
   }
 
@@ -62,10 +62,10 @@ void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
 
 
 template <int dim>
-void assert_tria_equal(const char* testdir, const Triangulation<dim> & a, const Triangulation<dim> & b)
+void assert_tria_equal(const char *testdir, const Triangulation<dim> &a, const Triangulation<dim> &b)
 {
   Assert (a.n_active_cells() == b.n_active_cells(),
-	      ExcInternalError());
+          ExcInternalError());
 
   std::string file1=std::string(testdir)+"/tmp_grid1";
   std::string file2=std::string(testdir)+"/tmp_grid2";
@@ -78,11 +78,11 @@ void assert_tria_equal(const char* testdir, const Triangulation<dim> & a, const 
   out1.close();
   out2.close();
 
-				   //compare the two files
+  //compare the two files
   std::string cmd = std::string("diff -q ")+file1+std::string(" ")+file2;
   Assert (system(cmd.c_str()) == 0, ExcInternalError());
 
-				   //and delete them
+  //and delete them
   std::remove (file1.c_str());
   std::remove (file2.c_str());
 }

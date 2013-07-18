@@ -47,7 +47,7 @@ std::ofstream logfile("get_functions_variants/output");
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
- public:
+public:
   typedef Vector<Number> VectorType;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
@@ -64,7 +64,7 @@ class MatrixFreeTest
     for (unsigned int i=0; i<5; ++i)
       errors[i] = 0;
     data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number>::operator(), this,
-                    const_cast<VectorType&>(src), src);
+                    const_cast<VectorType &>(src), src);
 
     deallog << "Error val, function values alone: "
             << errors[0] << std::endl;
@@ -89,7 +89,7 @@ private:
 template <int dim, int fe_degree, typename Number>
 void MatrixFreeTest<dim,fe_degree,Number>::
 operator () (const MatrixFree<dim,Number> &data,
-             VectorType       &,
+             VectorType &,
              const VectorType &src,
              const std::pair<unsigned int,unsigned int> &cell_range) const
 {
@@ -98,37 +98,37 @@ operator () (const MatrixFree<dim,Number> &data,
   FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval3 (data);
   FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval4 (data);
   FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval5 (data);
-  for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
-    {  
+  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
+    {
       fe_eval.reinit (cell);
       fe_eval.read_dof_values(src);
       fe_eval.evaluate (true,true,true);
 
-                                // only for values (additional test)
+      // only for values (additional test)
       fe_eval2.reinit (cell);
       fe_eval2.read_dof_values(src);
       fe_eval2.evaluate (true,false,false);
 
-                                // only gradients
+      // only gradients
       fe_eval3.reinit (cell);
       fe_eval3.read_dof_values(src);
       fe_eval3.evaluate (false,true,false);
 
-                                // only values and gradients
+      // only values and gradients
       fe_eval4.reinit (cell);
       fe_eval4.read_dof_values(src);
       fe_eval4.evaluate(true,true,false);
 
-                                // only laplacians
+      // only laplacians
       fe_eval5.reinit (cell);
       fe_eval5.read_dof_values(src);
       fe_eval5.evaluate (false,false,true);
- 
 
-                                // compare values with the values that we get
-                                // when expanding the full
-                                // FEEvaluations. Those are tested in other
-                                // functions and seen as reference here
+
+      // compare values with the values that we get
+      // when expanding the full
+      // FEEvaluations. Those are tested in other
+      // functions and seen as reference here
       for (unsigned int q=0; q<fe_eval.n_q_points; ++q)
         for (unsigned int j=0; j<VectorizedArray<Number>::n_array_elements; ++j)
           {
@@ -166,7 +166,7 @@ void test ()
 
   Vector<double> solution_dist (dof.n_dofs());
 
-                                // create vector with random entries
+  // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
       const double entry = rand()/(double)RAND_MAX;

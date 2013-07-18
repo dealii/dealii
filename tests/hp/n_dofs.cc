@@ -49,7 +49,7 @@ void test (const FiniteElement<dim> &fe)
   tria.refine_global (2);
   tria.begin_active()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
-  tria.refine_global (1);  
+  tria.refine_global (1);
 
   const hp::FECollection<dim> fe_collection (fe);
 
@@ -60,36 +60,36 @@ void test (const FiniteElement<dim> &fe)
   dof_handler.distribute_dofs (fe);
 
   deallog << fe.get_name() << ' ' << dof_handler.n_dofs()
-	  << ' ' << hp_dof_handler.n_dofs() << std::endl;
+          << ' ' << hp_dof_handler.n_dofs() << std::endl;
 
   Assert (dof_handler.n_dofs() == hp_dof_handler.n_dofs(),
-	  ExcInternalError());
+          ExcInternalError());
 }
 
 
 
 #define CHECK(EL,deg,dim)\
- { FE_ ## EL<dim> EL(deg);   \
-   test(EL); }
+  { FE_ ## EL<dim> EL(deg);   \
+    test(EL); }
 
 #define CHECK_SYS1(sub1,N1,dim) \
- { FESystem<dim> q(sub1, N1);   \
-   test(q); }
+  { FESystem<dim> q(sub1, N1);   \
+    test(q); }
 
 #define CHECK_SYS2(sub1,N1,sub2,N2,dim) \
- { FESystem<dim> q(sub1, N1, sub2, N2); \
-   test(q); }
+  { FESystem<dim> q(sub1, N1, sub2, N2); \
+    test(q); }
 
 #define CHECK_SYS3(sub1,N1,sub2,N2,sub3,N3,dim)   \
- { FESystem<dim> q(sub1, N1, sub2, N2, sub3, N3); \
-   test(q); }
+  { FESystem<dim> q(sub1, N1, sub2, N2, sub3, N3); \
+    test(q); }
 
 
 #define CHECK_ALL(EL,deg)\
- { CHECK(EL,deg,1); \
-   CHECK(EL,deg,2); \
-   CHECK(EL,deg,3); \
- }
+  { CHECK(EL,deg,1); \
+    CHECK(EL,deg,2); \
+    CHECK(EL,deg,3); \
+  }
 
 
 
@@ -97,10 +97,10 @@ int main ()
 {
   std::ofstream logfile("n_dofs/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   CHECK_ALL(Q,1);
   CHECK_ALL(Q,2);
@@ -155,26 +155,26 @@ int main ()
 
   CHECK_SYS3(FE_DGQ<3>(1),  3,FE_DGP<3>(3),1,FE_Q<3>(1),3,3);
 
-				   // systems of systems  
+  // systems of systems
   CHECK_SYS3((FESystem<2>(FE_Q<2>(1),3)), 3,
-	     FE_DGQ<2>(0), 1,
-	     FE_Q<2>(1), 3,
-	     2);
+             FE_DGQ<2>(0), 1,
+             FE_Q<2>(1), 3,
+             2);
   CHECK_SYS3(FE_DGQ<2>(3), 1,
-	     FESystem<2>(FE_DGQ<2>(0),3), 1,
-	     FESystem<2>(FE_Q<2>(2),1,
-			 FE_DGQ<2>(0),1),2,
-	     2);
+             FESystem<2>(FE_DGQ<2>(0),3), 1,
+             FESystem<2>(FE_Q<2>(2),1,
+                         FE_DGQ<2>(0),1),2,
+             2);
 
-				   // systems with Nedelec elements
+  // systems with Nedelec elements
   CHECK_SYS2 (FE_DGQ<2>(3), 1,
-	      FE_Nedelec<2>(0), 2,
-	      2);
+              FE_Nedelec<2>(0), 2,
+              2);
   CHECK_SYS3(FE_Nedelec<2>(0), 1,
-	     FESystem<2>(FE_DGQ<2>(1),2), 1,
-	     FESystem<2>(FE_Q<2>(2),1,
-			 FE_Nedelec<2>(0),2),2,
-	     2);
-  
+             FESystem<2>(FE_DGQ<2>(1),2), 1,
+             FESystem<2>(FE_Q<2>(2),1,
+                         FE_Nedelec<2>(0),2),2,
+             2);
+
   deallog << "OK" << std::endl;
 }

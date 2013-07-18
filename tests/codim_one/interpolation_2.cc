@@ -47,7 +47,8 @@ std::ofstream logfile("interpolation_2/output");
 
 
 template <int dim, int spacedim>
-void test(std::string filename) {
+void test(std::string filename)
+{
 
   Triangulation<dim, spacedim> triangulation;
   GridIn<dim, spacedim> gi;
@@ -60,14 +61,14 @@ void test(std::string filename) {
   DoFHandler<dim,spacedim> dof_handler (triangulation);
 
   dof_handler.distribute_dofs (fe);
-  
+
   // Now we interpolate the constant function on the mesh, and check
   // that this is consistent with what we expect.
   Vector<double> interpolated_one(dof_handler.n_dofs());
-  
+
   Functions::CosineFunction<spacedim> cosine;
   VectorTools::interpolate(dof_handler, cosine, interpolated_one);
-  
+
   DataOut<dim, DoFHandler<dim,spacedim> > dataout;
   dataout.attach_dof_handler(dof_handler);
   dataout.add_data_vector(interpolated_one, "numbering");
@@ -77,11 +78,11 @@ void test(std::string filename) {
 
 
 
-int main () 
+int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   deallog << "Test<1,2>" << std::endl;
   test<1,2>("grids/circle_2.inp");
 

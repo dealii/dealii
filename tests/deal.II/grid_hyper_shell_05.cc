@@ -52,24 +52,24 @@ void check (const unsigned int n)
   Triangulation<dim> tria (Triangulation<dim>::none);
   GridGenerator::hyper_shell (tria, center, 0.5, 1, n, true);
 
-				   // this is the test that failed
-				   // before
+  // this is the test that failed
+  // before
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = tria.begin_active();
+       cell = tria.begin_active();
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       Assert (cell->face(f)->at_boundary() == cell->at_boundary(f),
-	      ExcInternalError());
+              ExcInternalError());
 
-				   // also output something slightly
-				   // more useful
+  // also output something slightly
+  // more useful
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = tria.begin_active();
+       cell = tria.begin_active();
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
-	deallog << cell->face(f) << ' ' << (int)cell->face(f)->boundary_indicator()
-		<< ' ' << cell->face(f)->center().norm() << std::endl;
+        deallog << cell->face(f) << ' ' << (int)cell->face(f)->boundary_indicator()
+                << ' ' << cell->face(f)->center().norm() << std::endl;
 }
 
 

@@ -51,30 +51,30 @@ using namespace std;
 template <int dim>
 class F :  public Function<dim>
 {
-  public:
-    F (const unsigned int q) : q(q) {}
+public:
+  F (const unsigned int q) : q(q) {}
 
-    virtual double value (const Point<dim> &p,
-			  const unsigned int) const
-      {
-	double v=0;
-	for (unsigned int d=0; d<dim; ++d)
-	  for (unsigned int i=0; i<=q; ++i)
-	    v += (d+1)*(i+1)*std::pow (p[d], 1.*i);
-	return v;
-      }
+  virtual double value (const Point<dim> &p,
+                        const unsigned int) const
+  {
+    double v=0;
+    for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int i=0; i<=q; ++i)
+        v += (d+1)*(i+1)*std::pow (p[d], 1.*i);
+    return v;
+  }
 
-  private:
-    const unsigned int q;
+private:
+  const unsigned int q;
 };
 
 
 
 template <int dim>
-void test (Triangulation<dim>& triangulation)
+void test (Triangulation<dim> &triangulation)
 {
-				   // create a MappingQ(3) which is used on ALL
-				   // cells
+  // create a MappingQ(3) which is used on ALL
+  // cells
   MappingQ<3> mapping(3, true);
   for (unsigned int p=1; p<7-dim; ++p)
     {
@@ -85,26 +85,26 @@ void test (Triangulation<dim>& triangulation)
       Vector<double> interpolant (dof_handler.n_dofs());
       Vector<float>  error (triangulation.n_active_cells());
       for (unsigned int q=0; q<=p+2; ++q)
-	{
-					   // interpolate the function
-	  VectorTools::interpolate (mapping, dof_handler,
-				    F<dim> (q),
-				    interpolant);
+        {
+          // interpolate the function
+          VectorTools::interpolate (mapping, dof_handler,
+                                    F<dim> (q),
+                                    interpolant);
 
-					   // then compute the interpolation error
-	  VectorTools::integrate_difference (mapping, dof_handler,
-					     interpolant,
-					     F<dim> (q),
-					     error,
-					     QGauss<dim>(q+2),
-					     VectorTools::L2_norm);
-	  deallog << fe.get_name() << ", P_" << q
-		  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
-		  << std::endl;
-	  if (q<=p)
-	    Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
-		    ExcInternalError());
-	}
+          // then compute the interpolation error
+          VectorTools::integrate_difference (mapping, dof_handler,
+                                             interpolant,
+                                             F<dim> (q),
+                                             error,
+                                             QGauss<dim>(q+2),
+                                             VectorTools::L2_norm);
+          deallog << fe.get_name() << ", P_" << q
+                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
+                  << std::endl;
+          if (q<=p)
+            Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
+                    ExcInternalError());
+        }
     }
 }
 

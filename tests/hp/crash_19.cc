@@ -59,14 +59,15 @@ std::ofstream logfile("crash_19/output");
 
 
 template <int dim>
-class ExactSolution: public Function<dim> {
-  public:
-    ExactSolution () {}
-    virtual double value (const Point<dim>& p, const unsigned int) const
-      {
-	return p (0);
-      }
- };
+class ExactSolution: public Function<dim>
+{
+public:
+  ExactSolution () {}
+  virtual double value (const Point<dim> &p, const unsigned int) const
+  {
+    return p (0);
+  }
+};
 
 
 template <int dim>
@@ -81,16 +82,16 @@ void test ()
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (2);
   deallog << "Number of active cells: "
-	  << triangulation.n_active_cells()
-	  << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl;
   deallog << "Total number of cells: "
-	  << triangulation.n_cells()
-	  << std::endl;
+          << triangulation.n_cells()
+          << std::endl;
 
   dof_handler.distribute_dofs (fe);
   deallog << "Number of degrees of freedom: "
-	  << dof_handler.n_dofs()
-	  << std::endl;
+          << dof_handler.n_dofs()
+          << std::endl;
 
   ExactSolution<dim> exact_solution;
   std::map<types::global_dof_index,double> boundary_values;
@@ -100,9 +101,9 @@ void test ()
                                             boundary_values);
   if (dim == 1)
     VectorTools::interpolate_boundary_values (dof_handler,
-					      1,
-					      exact_solution,
-					      boundary_values);
+                                              1,
+                                              exact_solution,
+                                              boundary_values);
 
   for (std::map<types::global_dof_index,double>::iterator i=boundary_values.begin();
        i != boundary_values.end(); ++i)
@@ -128,24 +129,24 @@ int main ()
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 

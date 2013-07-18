@@ -34,21 +34,21 @@ check_this (const DoFHandler<dim> &dof_handler,
             const Vector<double>  &v_node,
             const Vector<double>  &v_cell)
 {
-                                   // 3d would generate 4d data, which
-                                   // we don't presently support
-                                   //
-                                   // output for 2d+time is not
-                                   // presently implemented
+  // 3d would generate 4d data, which
+  // we don't presently support
+  //
+  // output for 2d+time is not
+  // presently implemented
   if (dim > 1)
     return;
-  
+
   DataOutStack<dim> data_out_stack;
   data_out_stack.declare_data_vector ("node_data",
                                       DataOutStack<dim>::dof_vector);
   data_out_stack.declare_data_vector ("cell_data",
                                       DataOutStack<dim>::cell_vector);
-  
-  
+
+
   data_out_stack.new_parameter_value (1., 1.);
   data_out_stack.attach_dof_handler (dof_handler);
 
@@ -72,23 +72,23 @@ check_this (const DoFHandler<dim> &dof_handler,
   data_out_stack.add_data_vector (vc1, names_2);
   data_out_stack.build_patches ();
   data_out_stack.finish_parameter_value ();
-  
+
   data_out_stack.write_dx (deallog.get_file_stream());
   data_out_stack.set_flags (DataOutBase::UcdFlags(true));
-  data_out_stack.write_ucd (deallog.get_file_stream());  
+  data_out_stack.write_ucd (deallog.get_file_stream());
   data_out_stack.write_gmv (deallog.get_file_stream());
   data_out_stack.write_tecplot (deallog.get_file_stream());
   data_out_stack.write_vtk (deallog.get_file_stream());
   data_out_stack.write_gnuplot (deallog.get_file_stream());
   data_out_stack.write_deal_II_intermediate (deallog.get_file_stream());
 
-                                   // the following is only
-                                   // implemented for 2d (=1d+time)
+  // the following is only
+  // implemented for 2d (=1d+time)
   if (dim == 1)
     {
       data_out_stack.write_povray (deallog.get_file_stream());
       data_out_stack.write_eps (deallog.get_file_stream());
-    }  
+    }
 }
 
 

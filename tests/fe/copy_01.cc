@@ -37,8 +37,8 @@ void
 test(const unsigned int degree)
 {
   deallog << "FE_Q<" << dim << "> (" << degree << ")"
-	  << std::endl;
-  
+          << std::endl;
+
   FE_Q<dim> fe_q(degree);
   FE_Q<dim> x(fe_q);
 }
@@ -49,14 +49,14 @@ main()
 {
   std::ofstream logfile ("copy_01/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-                                   // no constraints in 1d, but we had
-                                   // the matrices precomputed up to
-                                   // Q4 for 2d and Q2 for 3d
+  // no constraints in 1d, but we had
+  // the matrices precomputed up to
+  // Q4 for 2d and Q2 for 3d
   for (unsigned int degree=1; degree<=4; ++degree)
     test<2>(degree);
 

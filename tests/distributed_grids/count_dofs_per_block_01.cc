@@ -43,11 +43,11 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-		   Triangulation<dim>::limit_level_difference_at_vertices);
+  triangulation (MPI_COMM_WORLD,
+                 Triangulation<dim>::limit_level_difference_at_vertices);
 
   FESystem<dim> fe (FE_Q<dim>(3),2,
-		    FE_DGQ<dim>(1),1);
+                    FE_DGQ<dim>(1),1);
 
   DoFHandler<dim> dof_handler (triangulation);
 
@@ -57,33 +57,33 @@ void test()
   const unsigned int n_refinements[] = { 0, 4, 3, 2 };
   for (unsigned int i=0; i<n_refinements[dim]; ++i)
     {
-				       // refine one-fifth of cells randomly
+      // refine one-fifth of cells randomly
       std::vector<bool> flags (triangulation.n_active_cells(), false);
       for (unsigned int k=0; k<flags.size()/5 + 1; ++k)
-	flags[rand() % flags.size()] = true;
-				       // make sure there's at least one that
-				       // will be refined
+        flags[rand() % flags.size()] = true;
+      // make sure there's at least one that
+      // will be refined
       flags[0] = true;
 
-				       // refine triangulation
+      // refine triangulation
       unsigned int index=0;
       for (typename Triangulation<dim>::active_cell_iterator
-	     cell = triangulation.begin_active();
-	   cell != triangulation.end(); ++cell, ++index)
-	if (flags[index])
-	  cell->set_refine_flag();
+           cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell, ++index)
+        if (flags[index])
+          cell->set_refine_flag();
       Assert (index == triangulation.n_active_cells(), ExcInternalError());
 
-				       // flag all other cells for coarsening
-				       // (this should ensure that at least
-				       // some of them will actually be
-				       // coarsened)
+      // flag all other cells for coarsening
+      // (this should ensure that at least
+      // some of them will actually be
+      // coarsened)
       index=0;
       for (typename Triangulation<dim>::active_cell_iterator
-	     cell = triangulation.begin_active();
-	   cell != triangulation.end(); ++cell, ++index)
-	if (!flags[index])
-	  cell->set_coarsen_flag();
+           cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell, ++index)
+        if (!flags[index])
+          cell->set_coarsen_flag();
 
       triangulation.execute_coarsening_and_refinement ();
       dof_handler.distribute_dofs (fe);
@@ -92,17 +92,17 @@ void test()
       DoFTools::count_dofs_per_block (dof_handler, dofs_per_block);
 
       Assert (std::accumulate (dofs_per_block.begin(), dofs_per_block.end(), 0U)
-	      == dof_handler.n_dofs(),
-	      ExcInternalError());
-      
+              == dof_handler.n_dofs(),
+              ExcInternalError());
+
       unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
       if (myid == 0)
-	{
-	  deallog << "Total number of dofs: " << dof_handler.n_dofs() << std::endl;
-	  for (unsigned int i=0; i<dofs_per_block.size(); ++i)
-	    deallog << "Block " << i << " has " << dofs_per_block[i] << " global dofs"
-		    << std::endl;
-	}
+        {
+          deallog << "Total number of dofs: " << dof_handler.n_dofs() << std::endl;
+          for (unsigned int i=0; i<dofs_per_block.size(); ++i)
+            deallog << "Block " << i << " has " << dofs_per_block[i] << " global dofs"
+                    << std::endl;
+        }
     }
 }
 

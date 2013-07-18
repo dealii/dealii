@@ -34,7 +34,7 @@
 template<typename MatrixType>
 void test (MatrixType &m)
 {
-  m.add(0,0,1);  
+  m.add(0,0,1);
   m = 0;
   m.compress();
 
@@ -45,7 +45,7 @@ void test (MatrixType &m)
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("64/output");
   deallog.attach(logfile);
@@ -56,49 +56,49 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-	const unsigned int n_dofs=420;
-					 // check
-					 // PETScWrappers::SparseMatrix
+        const unsigned int n_dofs=420;
+        // check
+        // PETScWrappers::SparseMatrix
         PETScWrappers::SparseMatrix
-	  v1 (n_dofs, n_dofs, 5);
+        v1 (n_dofs, n_dofs, 5);
         test (v1);
 
-					 // check
-					 // PETScWrappers::MPI::SparseMatrix
-	MPI_Comm mpi_communicator (MPI_COMM_WORLD);	
-	int n_jobs=1;
-	MPI_Comm_size (mpi_communicator, &n_jobs);
-	const unsigned int n_mpi_processes=static_cast<unsigned int>(n_jobs);
-	Assert(n_dofs%n_mpi_processes==0, ExcInternalError());
-	const unsigned int n_local_dofs=n_dofs/n_mpi_processes;
+        // check
+        // PETScWrappers::MPI::SparseMatrix
+        MPI_Comm mpi_communicator (MPI_COMM_WORLD);
+        int n_jobs=1;
+        MPI_Comm_size (mpi_communicator, &n_jobs);
+        const unsigned int n_mpi_processes=static_cast<unsigned int>(n_jobs);
+        Assert(n_dofs%n_mpi_processes==0, ExcInternalError());
+        const unsigned int n_local_dofs=n_dofs/n_mpi_processes;
         PETScWrappers::MPI::SparseMatrix
-	  v2 (mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);
+        v2 (mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);
         test (v2);
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

@@ -25,16 +25,16 @@
 #include <iomanip>
 
 
-int main () 
+int main ()
 {
-  try 
+  try
     {
       std::ofstream logfile("parameter_handler_6/output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
-                                       // same as parameter_handler_3
+      // same as parameter_handler_3
       ParameterHandler prm;
       prm.enter_subsection ("Testing");
       prm.declare_entry ("string list",
@@ -49,44 +49,44 @@ int main ()
                          Patterns::Double(),
                          "docs 3");
       prm.leave_subsection ();
-      
+
       prm.read_input("parameter_handler_3/prm");
 
-                                       // now set some of the entries to
-                                       // different values
+      // now set some of the entries to
+      // different values
       prm.enter_subsection ("Testing");
       prm.set ("string list", "a, c, b");
       prm.set ("int", "5");
       prm.set ("double", "2.71828");
       prm.leave_subsection ();
-      
-                                       // then write
+
+      // then write
       prm.print_parameters (logfile, ParameterHandler::Text);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
-  
+
   return 0;
 }

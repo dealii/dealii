@@ -46,23 +46,23 @@
 template <int dim>
 class F :  public Function<dim>
 {
-  public:
-    F (const unsigned int q) : Function<dim>(3), q(q) {}
-    
-    virtual void vector_value (const Point<dim> &p,
-			       Vector<double>   &v) const
-      {
-	for (unsigned int c=0; c<v.size(); ++c)
-	  {
-	    v(c) = 0;
-	    for (unsigned int d=0; d<dim; ++d)
-	      for (unsigned int i=0; i<=q; ++i)
-		v(c) += (d+1)*(i+1)*std::pow (p[d], 1.*i)+c;
-	  }
-      }
+public:
+  F (const unsigned int q) : Function<dim>(3), q(q) {}
 
-  private:
-    const unsigned int q;
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<double>   &v) const
+  {
+    for (unsigned int c=0; c<v.size(); ++c)
+      {
+        v(c) = 0;
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int i=0; i<=q; ++i)
+            v(c) += (d+1)*(i+1)*std::pow (p[d], 1.*i)+c;
+      }
+  }
+
+private:
+  const unsigned int q;
 };
 
 
@@ -79,7 +79,7 @@ void test ()
       FE_Q<dim> fe_p(p);
       FE_Q<dim> fe_p1(p+1);
       FESystem<dim>              fe(fe_p, 2,
-				    fe_p1, 1);
+                                    fe_p1, 1);
       hp::FECollection<dim> hp_fe (fe);
       hp::DoFHandler<dim>        dof_handler(triangulation);
       dof_handler.distribute_dofs (hp_fe);
@@ -87,27 +87,27 @@ void test ()
       Vector<double> interpolant (dof_handler.n_dofs());
       Vector<float>  error (triangulation.n_active_cells());
       for (unsigned int q=0; q<=p+2; ++q)
-	{
-					   // interpolate the function
-	  VectorTools::interpolate (dof_handler,
-				    F<dim> (q),
-				    interpolant);
-      
-					   // then compute the interpolation error
-	  VectorTools::integrate_difference (dof_handler,
-					     interpolant,
-					     F<dim> (q),
-					     error,
-					     hp::QCollection<dim>(QGauss<dim>(q+2)),
-					     VectorTools::L2_norm);
-	  if (q<=p)
-	    Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
-		    ExcInternalError());
+        {
+          // interpolate the function
+          VectorTools::interpolate (dof_handler,
+                                    F<dim> (q),
+                                    interpolant);
 
-	  deallog << fe.get_name() << ", P_" << q
-		  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
-		  << std::endl;
-	}
+          // then compute the interpolation error
+          VectorTools::integrate_difference (dof_handler,
+                                             interpolant,
+                                             F<dim> (q),
+                                             error,
+                                             hp::QCollection<dim>(QGauss<dim>(q+2)),
+                                             VectorTools::L2_norm);
+          if (q<=p)
+            Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
+                    ExcInternalError());
+
+          deallog << fe.get_name() << ", P_" << q
+                  << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
+                  << std::endl;
+        }
     }
 }
 
@@ -118,7 +118,7 @@ int main ()
   std::ofstream logfile("interpolate_q_system_01/output");
   logfile.precision (3);
   deallog << std::setprecision(3);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -36,12 +36,12 @@
 template <int dim>
 class F : public Function<dim>
 {
-  public:
-    virtual double value (const Point<dim> &p,
-			  const unsigned int) const
-      {
-	return p.square();
-      }
+public:
+  virtual double value (const Point<dim> &p,
+                        const unsigned int) const
+  {
+    return p.square();
+  }
 };
 
 
@@ -65,19 +65,19 @@ void test()
   Functions::FEFieldFunction<2> fe_function (dof_handler, solution);
   std::vector<Point<dim> > points;
 
-				   // add a bunch of points. all
-				   // points are inside the circle.
-				   // the problem happens because we
-				   // walk over a bunch of cells in
-				   // the process of finding all of
-				   // these points and then realize
-				   // when we get to the one at the
-				   // end that the coordinates for
-				   // this point can't be found in the
-				   // cell we have touched last (it's
-				   // too far away from that cell, and
-				   // the inverse mapping does not
-				   // converge
+  // add a bunch of points. all
+  // points are inside the circle.
+  // the problem happens because we
+  // walk over a bunch of cells in
+  // the process of finding all of
+  // these points and then realize
+  // when we get to the one at the
+  // end that the coordinates for
+  // this point can't be found in the
+  // cell we have touched last (it's
+  // too far away from that cell, and
+  // the inverse mapping does not
+  // converge
   for (unsigned int i=0; i<20; ++i)
     for (unsigned int j=0; j<20; ++j)
       points.push_back (Point<dim>(-0.7+i*0.07,-0.7+j*0.07));
@@ -88,9 +88,9 @@ void test()
 
   for (unsigned int i=0; i<m.size(); ++i)
     Assert (std::fabs(m[i] - points[i].square())
-	    <
-	    1e-10 * std::fabs(m[i] + points[i].square()),
-	    ExcInternalError());
+            <
+            1e-10 * std::fabs(m[i] + points[i].square()),
+            ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

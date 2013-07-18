@@ -41,54 +41,54 @@
 using namespace dealii;
 
 template <int dim>
-void indices (const DoFHandler<dim>& dof, unsigned int repeat)
+void indices (const DoFHandler<dim> &dof, unsigned int repeat)
 {
   typedef typename DoFHandler<dim>::active_cell_iterator I;
-  
+
   std::vector<unsigned int> dofs(dof.get_fe().dofs_per_cell);
   const I end = dof.end();
 
-  for (unsigned int k=0;k<repeat;++k)
-    for (I i=dof.begin_active(); i!=end;++i)
+  for (unsigned int k=0; k<repeat; ++k)
+    for (I i=dof.begin_active(); i!=end; ++i)
       i->get_dof_indices(dofs);
 }
 
 
 template <int dim>
-void fevalues (const DoFHandler<dim>& dof,
-	       UpdateFlags updates)
+void fevalues (const DoFHandler<dim> &dof,
+               UpdateFlags updates)
 {
   typedef typename DoFHandler<dim>::active_cell_iterator I;
   const I end = dof.end();
-  
+
   QGauss<dim> quadrature(5);
   MappingQ1<dim> mapping;
   FEValues<dim> fe(mapping, dof.get_fe(), quadrature, updates);
-  
-  for (I i=dof.begin_active(); i!=end;++i)
+
+  for (I i=dof.begin_active(); i!=end; ++i)
     fe.reinit(i);
 }
 
 
 template <int dim>
-void fefacevalues (const DoFHandler<dim>& dof,
-		   UpdateFlags updates)
+void fefacevalues (const DoFHandler<dim> &dof,
+                   UpdateFlags updates)
 {
   typedef typename DoFHandler<dim>::active_cell_iterator I;
   const I end = dof.end();
-  
+
   QGauss<dim-1> quadrature(5);
   MappingQ1<dim> mapping;
   FEFaceValues<dim> fe(mapping, dof.get_fe(), quadrature, updates);
-  
-  for (I i=dof.begin_active(); i!=end;++i)
-    for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+
+  for (I i=dof.begin_active(); i!=end; ++i)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       fe.reinit(i, f);
 }
 
 
 template <int dim>
-void check_mapping (const DoFHandler<dim>& dof)
+void check_mapping (const DoFHandler<dim> &dof)
 {
   deallog.push("cell");
   fevalues(dof,  update_q_points);
@@ -98,7 +98,7 @@ void check_mapping (const DoFHandler<dim>& dof)
   fevalues(dof,  update_q_points | update_JxW_values);
   deallog << "qpoints|JxW" << std::endl;
   deallog.pop();
-  
+
   deallog.push("face");
   fefacevalues(dof,  update_quadrature_points);
   deallog << "qpoints" << std::endl;
@@ -109,12 +109,12 @@ void check_mapping (const DoFHandler<dim>& dof)
   fefacevalues(dof,  update_q_points | update_JxW_values | update_normal_vectors);
   deallog << "qpoints|JxW|normals" << std::endl;
   deallog.pop();
-  
+
 }
 
 
 template <int dim>
-void check_values (const DoFHandler<dim>& dof)
+void check_values (const DoFHandler<dim> &dof)
 {
   indices(dof, 100);
   deallog << "Index*100" << std::endl;
@@ -126,13 +126,13 @@ void check_values (const DoFHandler<dim>& dof)
   fevalues(dof,  update_values | update_JxW_values);
   deallog << "values|JxW" << std::endl;
   fevalues(dof,  update_values | update_gradients
-	   | update_q_points | update_JxW_values);
+           | update_q_points | update_JxW_values);
   deallog << "values|gradients|qpoints|JxW" << std::endl;
 //  fevalues(dof,  update_values | update_gradients | update_second_derivatives
-//	   | update_q_points | update_JxW_values);
+//     | update_q_points | update_JxW_values);
 //  deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
   deallog.pop();
-  
+
   deallog.push("face");
   fefacevalues(dof,  update_values);
   deallog << "values" << std::endl;
@@ -141,12 +141,12 @@ void check_values (const DoFHandler<dim>& dof)
   fefacevalues(dof,  update_values | update_JxW_values);
   deallog << "values|JxW" << std::endl;
   fefacevalues(dof,  update_values | update_gradients
-	       | update_q_points | update_JxW_values | update_normal_vectors);
+               | update_q_points | update_JxW_values | update_normal_vectors);
   deallog << "values|gradients|qpoints|JxW|normals" << std::endl;
 //  fefacevalues(dof,  update_values | update_gradients | update_second_derivatives
-//	   | update_q_points | update_JxW_values);
+//     | update_q_points | update_JxW_values);
 //  deallog << "values|gradients|2nds|qpoints|JxW" << std::endl;
-  deallog.pop();  
+  deallog.pop();
 }
 
 
@@ -157,8 +157,8 @@ void check_q ()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
   tr.refine_global(REF/dim);
-  
-  for (unsigned int i=1;i<5;++i)
+
+  for (unsigned int i=1; i<5; ++i)
     {
       FE_Q<dim> q(i);
       deallog.push(q.get_name());
@@ -166,9 +166,9 @@ void check_q ()
       DoFHandler<dim> dof(tr);
       dof.distribute_dofs(q);
       deallog << "Dofs " << dof.n_dofs() << std::endl;
-      
+
       if (i==1)
-	check_mapping(dof);
+        check_mapping(dof);
       check_values(dof);
       deallog.pop();
     }
@@ -185,7 +185,7 @@ void check_sys ()
 
   FE_Q<dim> q(1);
 
-  for (unsigned int i=1;i<5;++i)
+  for (unsigned int i=1; i<5; ++i)
     {
       FESystem<dim> fe(q,1<<i);
       deallog.push(fe.get_name());
@@ -193,9 +193,9 @@ void check_sys ()
       DoFHandler<dim> dof(tr);
       dof.distribute_dofs(fe);
       deallog << "Dofs " << dof.n_dofs() << std::endl;
-      
+
       if (i==1)
-	check_mapping(dof);
+        check_mapping(dof);
       check_values(dof);
       deallog.pop();
     }

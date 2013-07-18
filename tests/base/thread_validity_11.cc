@@ -30,18 +30,18 @@ void execute ()
 {}
 
 
-void test () 
+void test ()
 {
   Threads::Thread<> t = Threads::spawn (&execute)();
   deallog << "Before first join()" << std::endl;
   t.join ();
   deallog << "Between join()s" << std::endl;
   t.join ();
-  deallog << "After second join()" << std::endl;  
+  deallog << "After second join()" << std::endl;
 }
 
-  
-  
+
+
 
 int main()
 {

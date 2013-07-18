@@ -43,20 +43,20 @@ void test ()
   GridGenerator::hyper_cube(tria_1);
   GridGenerator::hyper_cube(tria_2);
 
-				   // fill tria_3 with something, to
-				   // make sure that the function we
-				   // call later can deal with prior
-				   // content
+  // fill tria_3 with something, to
+  // make sure that the function we
+  // call later can deal with prior
+  // content
   GridGenerator::hyper_cube(tria_3);
 
-				   // refine once, then refine first
-				   // cell
+  // refine once, then refine first
+  // cell
   tria_1.refine_global (1);
   tria_1.begin_active()->set_refine_flag();
   tria_1.execute_coarsening_and_refinement ();
 
-				   // similar for second grid, but
-				   // different cell
+  // similar for second grid, but
+  // different cell
   tria_2.refine_global (1);
   (++tria_2.begin_active())->set_refine_flag();
   tria_2.execute_coarsening_and_refinement ();
@@ -66,7 +66,7 @@ void test ()
   GridOut().write_gnuplot (tria_3, logfile);
 
   deallog << "     Total number of cells        = " << tria_3.n_cells() << std::endl
-	  << "     Total number of active cells = " << tria_3.n_active_cells() << std::endl;
+          << "     Total number of active cells = " << tria_3.n_active_cells() << std::endl;
 }
 
 
@@ -77,10 +77,10 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   return 0;
 }

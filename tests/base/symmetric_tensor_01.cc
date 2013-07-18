@@ -30,7 +30,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   SymmetricTensor<2,2> t;
   t[0][0] = 1;
   t[1][1] = 2;
@@ -38,22 +38,22 @@ int main ()
 
   Assert (t[0][1] == t[1][0], ExcInternalError());
 
-                                   // check that if a single element is
-                                   // accessed, its transpose element gets the
-                                   // same value
+  // check that if a single element is
+  // accessed, its transpose element gets the
+  // same value
   t[1][0] = 4;
   Assert (t[0][1] == 4, ExcInternalError());
 
-                                   // make sure transposition doesn't change
-                                   // anything
+  // make sure transposition doesn't change
+  // anything
   Assert (t == transpose(t), ExcInternalError());
 
-                                   // check norm of tensor
+  // check norm of tensor
   Assert (std::fabs(t.norm() - std::sqrt(1.*1+2*2+2*4*4)) < 1e-14,
           ExcInternalError());
 
-                                   // make sure norm is induced by scalar
-                                   // product
+  // make sure norm is induced by scalar
+  // product
   Assert (std::fabs (t.norm()*t.norm() - t*t) < 1e-14,
           ExcInternalError());
 

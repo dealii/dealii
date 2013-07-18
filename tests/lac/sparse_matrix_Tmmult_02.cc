@@ -36,15 +36,15 @@
 
 void test (const unsigned int n)
 {
-				   // Create some random full matrices in the
-				   // data structures of a sparse matrix
+  // Create some random full matrices in the
+  // data structures of a sparse matrix
   SparsityPattern sp (n,n);
   SparsityPattern C_sp (n,n);
-  for (unsigned int i=0;i<n;++i)
-    for (unsigned int j=0;j<n;++j)
+  for (unsigned int i=0; i<n; ++i)
+    for (unsigned int j=0; j<n; ++j)
       {
-	sp.add (i,j);
-	C_sp.add (i,j);
+        sp.add (i,j);
+        C_sp.add (i,j);
       }
   sp.compress ();
   C_sp.compress ();
@@ -53,27 +53,27 @@ void test (const unsigned int n)
   SparseMatrix<double> B(sp);
   SparseMatrix<double> C(C_sp);
 
-  for (unsigned int i=0;i<n;++i)
+  for (unsigned int i=0; i<n; ++i)
     {
-      for (unsigned int j=0;j<n;++j)
-	A.set(i,j,std::rand());
-      for (unsigned int j=0;j<n;++j)
-	B.set(i,j,std::rand());
+      for (unsigned int j=0; j<n; ++j)
+        A.set(i,j,std::rand());
+      for (unsigned int j=0; j<n; ++j)
+        B.set(i,j,std::rand());
     }
 
   Vector<double> v(n);
-  for (unsigned int j=0;j<n;++j)
+  for (unsigned int j=0; j<n; ++j)
     v(j) = std::rand();
 
-				   // now form the matrix-matrix product and
-				   // initialize a test rhs
+  // now form the matrix-matrix product and
+  // initialize a test rhs
   A.Tmmult (C, B, v);
 
   Vector<double> x(n), y(n), z(n), tmp(n);
-  for (unsigned int j=0;j<n;++j)
+  for (unsigned int j=0; j<n; ++j)
     x(j) = std::rand();
 
-				   // then test for correctness
+  // then test for correctness
   C.vmult (y, x);
 
   B.vmult (tmp, x);
@@ -82,7 +82,7 @@ void test (const unsigned int n)
 
   y -= z;
   Assert (y.l2_norm() <= 1e-12 * z.l2_norm(),
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

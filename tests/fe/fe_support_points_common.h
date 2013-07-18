@@ -40,7 +40,7 @@
 
 template <int dim>
 inline void
-check_support (const FiniteElement<dim>& finel, const char* name)
+check_support (const FiniteElement<dim> &finel, const char *name)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
@@ -51,7 +51,7 @@ check_support (const FiniteElement<dim>& finel, const char* name)
 
   const std::vector<Point<dim> > &cell_points = finel.get_unit_support_points ();
 
-  for (unsigned int k=0;k<cell_points.size();++k)
+  for (unsigned int k=0; k<cell_points.size(); ++k)
     deallog << std::setprecision(3) << cell_points[k] << std::endl;
 
   const std::vector<Point<dim-1> > &face_points = finel.get_unit_face_support_points ();
@@ -59,17 +59,17 @@ check_support (const FiniteElement<dim>& finel, const char* name)
 
   Quadrature<dim-1> q(face_points, dummy_weights);
 
-  for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     {
       std::vector<Point<dim> > q_points (q.get_points().size());
       QProjector<dim>::project_to_face (q, i, q_points);
       Quadrature<dim> qp(q_points);
       deallog << name << '<' << dim << '>' << " face " << i
-		<< " support points" << std::endl;
+              << " support points" << std::endl;
 
       for (unsigned int k=0; k<face_points.size(); ++k)
-	deallog << std::setprecision(3) << qp.point(k)
-		<< std::endl;
+        deallog << std::setprecision(3) << qp.point(k)
+                << std::endl;
     }
 }
 
@@ -77,8 +77,8 @@ check_support (const FiniteElement<dim>& finel, const char* name)
 #define CHECK_ALL(EL,deg,dim) { FE_ ## EL<dim> EL(deg); check_support(EL, #EL #deg); }
 #define CHECK_SYS1(sub1,N1,dim) { FESystem<dim> q(sub1, N1); check_support(q, #sub1 #N1); }
 #define CHECK_SYS2(sub1,N1,sub2,N2,dim) { FESystem<dim> q(sub1, N1, sub2, N2); \
-                                          check_support(q, #sub1 #N1 #sub2 #N2); }
+    check_support(q, #sub1 #N1 #sub2 #N2); }
 #define CHECK_SYS3(sub1,N1,sub2,N2,sub3,N3,dim) { FESystem<dim> q(sub1, N1, sub2, N2, sub3, N3); \
-                                          check_support(q, #sub1 #N1 #sub2 #N2 #sub3 #N3); }
+    check_support(q, #sub1 #N1 #sub2 #N2 #sub3 #N3); }
 
 

@@ -42,34 +42,34 @@
 template <int dim>
 class MyBoundary : public Boundary<dim>
 {
-    virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
-      {
-	deallog << "Finding point between "
-		<< line->vertex(0) << " and "
-		<< line->vertex(1) << std::endl;
+  virtual Point<dim>
+  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+  {
+    deallog << "Finding point between "
+            << line->vertex(0) << " and "
+            << line->vertex(1) << std::endl;
 
-					 // in 2d, find a point that
-					 // lies on the opposite side
-					 // of the quad. in 3d, choose
-					 // the midpoint of the edge
-	if (dim == 2)
-	  return Point<dim>(0,0.75);
-	else
-	  return (line->vertex(0) + line->vertex(1)) / 2;
-      }
+    // in 2d, find a point that
+    // lies on the opposite side
+    // of the quad. in 3d, choose
+    // the midpoint of the edge
+    if (dim == 2)
+      return Point<dim>(0,0.75);
+    else
+      return (line->vertex(0) + line->vertex(1)) / 2;
+  }
 
-    virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
-      {
-	deallog << "Finding point between "
-		<< quad->vertex(0) << " and "
-		<< quad->vertex(1) << " and "
-		<< quad->vertex(2) << " and "
-		<< quad->vertex(3) << std::endl;
+  virtual Point<dim>
+  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+  {
+    deallog << "Finding point between "
+            << quad->vertex(0) << " and "
+            << quad->vertex(1) << " and "
+            << quad->vertex(2) << " and "
+            << quad->vertex(3) << std::endl;
 
-	return Point<dim>(0,0,.75);
-      }
+    return Point<dim>(0,0,.75);
+  }
 };
 
 
@@ -79,18 +79,18 @@ void check ()
 {
   MyBoundary<dim> my_boundary;
 
-				   // create a single square/cube
+  // create a single square/cube
   Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
   GridGenerator::hyper_cube (coarse_grid, -1, 1);
 
-				   // set bottom face to use MyBoundary
+  // set bottom face to use MyBoundary
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     if (coarse_grid.begin_active()->face(f)->center()[dim-1] == -1)
       coarse_grid.begin_active()->face(f)->set_boundary_indicator (1);
   coarse_grid.set_boundary (1, my_boundary);
 
-				   // now try to refine this one
-				   // cell. we should get an exception
+  // now try to refine this one
+  // cell. we should get an exception
   bool flag = false;
   try
     {
@@ -102,21 +102,21 @@ void check ()
       flag = true;
 
       deallog << dcv.distorted_cells.size() << " distorted cells"
-	      << std::endl;
+              << std::endl;
       Assert (dcv.distorted_cells.front() == coarse_grid.begin(0),
-	      ExcInternalError());
+              ExcInternalError());
 
-				       // ignore the exception, i.e. do not
-				       // even attempt to fix up the problem
-				       // (but see the _04 testcase for this)
+      // ignore the exception, i.e. do not
+      // even attempt to fix up the problem
+      // (but see the _04 testcase for this)
     }
 
   Assert (flag == true, ExcInternalError());
   Assert (coarse_grid.n_levels() == 2, ExcInternalError());
   Assert (coarse_grid.n_active_cells() == 1<<dim, ExcInternalError());
 
-				   // output the coordinates of the
-				   // child cells
+  // output the coordinates of the
+  // child cells
   GridOut().write_gnuplot (coarse_grid, deallog.get_file_stream());
 }
 

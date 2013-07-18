@@ -33,7 +33,7 @@
 
 
 
-void test () 
+void test ()
 {
   std::ofstream logfile("is_block_matrix/output");
   deallog << std::fixed;
@@ -43,24 +43,24 @@ void test ()
   deallog.threshold_double(1.e-10);
 
   deallog << IsBlockMatrix<SparseMatrix<double> >::value << ' '
-	  << IsBlockMatrix<SparseMatrix<float> >::value << ' '
-	  << IsBlockMatrix<SparseMatrixEZ<double> >::value << ' '
-    	  << IsBlockMatrix<SparseMatrixEZ<float> >::value << std::endl;
-  
+          << IsBlockMatrix<SparseMatrix<float> >::value << ' '
+          << IsBlockMatrix<SparseMatrixEZ<double> >::value << ' '
+          << IsBlockMatrix<SparseMatrixEZ<float> >::value << std::endl;
+
   deallog << IsBlockMatrix<BlockSparseMatrix<double> >::value << ' '
-	  << IsBlockMatrix<BlockSparseMatrix<float> >::value << ' '
-	  << IsBlockMatrix<BlockSparseMatrixEZ<double> >::value << ' '
-    	  << IsBlockMatrix<BlockSparseMatrixEZ<float> >::value << std::endl;
+          << IsBlockMatrix<BlockSparseMatrix<float> >::value << ' '
+          << IsBlockMatrix<BlockSparseMatrixEZ<double> >::value << ' '
+          << IsBlockMatrix<BlockSparseMatrixEZ<float> >::value << std::endl;
 
   deallog << IsBlockMatrix<SparsityPattern>::value << ' '
-	  << IsBlockMatrix<CompressedSparsityPattern>::value << ' '
-	  << IsBlockMatrix<CompressedSetSparsityPattern>::value << ' '
-    	  << IsBlockMatrix<CompressedSimpleSparsityPattern>::value << std::endl;
+          << IsBlockMatrix<CompressedSparsityPattern>::value << ' '
+          << IsBlockMatrix<CompressedSetSparsityPattern>::value << ' '
+          << IsBlockMatrix<CompressedSimpleSparsityPattern>::value << std::endl;
 
   deallog << IsBlockMatrix<BlockSparsityPattern>::value << ' '
-	  << IsBlockMatrix<BlockCompressedSparsityPattern>::value << ' '
-	  << IsBlockMatrix<BlockCompressedSetSparsityPattern>::value << ' '
-    	  << IsBlockMatrix<BlockCompressedSimpleSparsityPattern>::value << std::endl;
+          << IsBlockMatrix<BlockCompressedSparsityPattern>::value << ' '
+          << IsBlockMatrix<BlockCompressedSetSparsityPattern>::value << ' '
+          << IsBlockMatrix<BlockCompressedSimpleSparsityPattern>::value << std::endl;
 }
 
 
@@ -75,28 +75,28 @@ int main ()
   catch (std::exception &e)
     {
       std::cerr << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      // abort
       return 2;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      // abort
       return 3;
     };
-  
-  
+
+
   return 0;
 }

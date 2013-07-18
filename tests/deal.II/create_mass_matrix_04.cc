@@ -54,7 +54,7 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -65,23 +65,23 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-				   // create a system element composed
-				   // of one Q1 and one Q2 element
+  // create a system element composed
+  // of one Q1 and one Q2 element
   FESystem<dim> element(FE_Q<dim>(1), 1,
-			FE_Q<dim>(2), 1);
+                        FE_Q<dim>(2), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // use a more complicated mapping
-				   // of the domain and a quadrature
-				   // formula suited to the elements
-				   // we have here
+  // use a more complicated mapping
+  // of the domain and a quadrature
+  // formula suited to the elements
+  // we have here
   MappingQ<dim> mapping (3);
   QGauss<dim> quadrature(6);
 
-				   // create sparsity pattern. note
-				   // that different components should
-				   // not couple, so use pattern
+  // create sparsity pattern. note
+  // that different components should
+  // not couple, so use pattern
   SparsityPattern sparsity (dof.n_dofs(), dof.n_dofs());
   std::vector<std::vector<bool> > mask (2, std::vector<bool>(2, false));
   mask[0][0] = mask[1][1] = true;
@@ -91,31 +91,31 @@ check ()
   constraints.close ();
   constraints.condense (sparsity);
   sparsity.compress ();
-  
+
   SparseMatrix<double> matrix;
   matrix.reinit (sparsity);
 
   Functions::ExpFunction<dim> rhs_function;
-  
-  Vector<double> rhs (dof.n_dofs());
-  
-  MatrixTools::
-    create_mass_matrix (mapping, dof,
-			quadrature, matrix,
-			rhs_function, rhs,
-			&rhs_function);
 
-				   // since we only generate
-				   // output with two digits after
-				   // the dot, and since matrix
-				   // entries are usually in the
-				   // range of 1 or below,
-				   // multiply matrix by 100 to
-				   // make test more sensitive
+  Vector<double> rhs (dof.n_dofs());
+
+  MatrixTools::
+  create_mass_matrix (mapping, dof,
+                      quadrature, matrix,
+                      rhs_function, rhs,
+                      &rhs_function);
+
+  // since we only generate
+  // output with two digits after
+  // the dot, and since matrix
+  // entries are usually in the
+  // range of 1 or below,
+  // multiply matrix by 100 to
+  // make test more sensitive
   deallog << "Matrix: " << std::endl;
   for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
     deallog << matrix.global_entry(i) * 100
-	    << std::endl;
+            << std::endl;
 
   deallog << "RHS vector: " << std::endl;
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
@@ -128,7 +128,7 @@ int main ()
 {
   std::ofstream logfile ("create_mass_matrix_04/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

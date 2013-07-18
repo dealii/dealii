@@ -46,7 +46,7 @@ void test ()
   //define DoFhandler and FEs
   FE_Q<dim> fe1(1);
   FE_Q<dim> fe2(2);
-  
+
   MappingQ<dim> mapping(1);
   hp::MappingCollection<dim> mapping_collection(mapping);
 
@@ -60,8 +60,8 @@ void test ()
   hp_dof_handler.begin_active()->set_active_fe_index(1);
   hp_dof_handler.distribute_dofs(fe_collection);
 
-  
-  
+
+
   //now map the dofs to the support points and show them on the screen
   std::vector<Point<dim> > hp_map(hp_dof_handler.n_dofs());
 
@@ -69,9 +69,9 @@ void test ()
 
   // output the elements
   for (unsigned int i=0; i<hp_map.size(); i++)
-  {
-    deallog<< " Location of " << i<<" th DoF: "<<hp_map[i] << " | ";
-  }
+    {
+      deallog<< " Location of " << i<<" th DoF: "<<hp_map[i] << " | ";
+    }
   deallog<<std::endl;
 
 }

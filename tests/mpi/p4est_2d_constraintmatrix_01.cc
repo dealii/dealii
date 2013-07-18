@@ -84,10 +84,10 @@ void test()
 
   if (myid==0)
     {
-      for (unsigned int i=0;i<numproc;++i)
-	{
-	  cat_file((std::string("p4est_2d_constraintmatrix_01/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
-	}
+      for (unsigned int i=0; i<numproc; ++i)
+        {
+          cat_file((std::string("p4est_2d_constraintmatrix_01/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
+        }
 
     }
 }

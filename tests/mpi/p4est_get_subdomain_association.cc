@@ -59,20 +59,20 @@ void test()
   static const FE_Q<dim> fe(2);
   dofh.distribute_dofs (fe);
 
-   if (myid==1)
-     {
-       deallog << "dofh.n_dofs() " << dofh.n_locally_owned_dofs_per_processor() << std::endl;
-       deallog << "dofh.n_locally_owned_dofs() " << dofh.n_locally_owned_dofs() << std::endl;
+  if (myid==1)
+    {
+      deallog << "dofh.n_dofs() " << dofh.n_locally_owned_dofs_per_processor() << std::endl;
+      deallog << "dofh.n_locally_owned_dofs() " << dofh.n_locally_owned_dofs() << std::endl;
 
-       const IndexSet set
-	 = DoFTools::dof_indices_with_subdomain_association
-	 (dofh,
-	  tr.locally_owned_subdomain());
+      const IndexSet set
+        = DoFTools::dof_indices_with_subdomain_association
+          (dofh,
+           tr.locally_owned_subdomain());
 
-       deallog << set.n_elements() << std::endl;
-       for (unsigned int i=0; i<set.n_elements(); ++i)
-	 deallog << "   " << set.nth_index_in_set(i) << std::endl;
-     }
+      deallog << set.n_elements() << std::endl;
+      for (unsigned int i=0; i<set.n_elements(); ++i)
+        deallog << "   " << set.nth_index_in_set(i) << std::endl;
+    }
 }
 
 

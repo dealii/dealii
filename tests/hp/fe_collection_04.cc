@@ -34,19 +34,19 @@
 template <int dim>
 void test ()
 {
-				   // now the same with one of the elements
-				   // being non-primitive. the other one can
-				   // then not simply be a FESystem but must
-				   // in fact be an FESystem of FESystem to
-				   // hide multiple components in one
-				   // block. this test tries to see what
-				   // happens if one doesn't do this
+  // now the same with one of the elements
+  // being non-primitive. the other one can
+  // then not simply be a FESystem but must
+  // in fact be an FESystem of FESystem to
+  // hide multiple components in one
+  // block. this test tries to see what
+  // happens if one doesn't do this
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back (FE_RaviartThomas<dim>(1));
   fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
 
-				   // we will get an assertion failure in
-				   // n_blocks here.
+  // we will get an assertion failure in
+  // n_blocks here.
   try
     {
       fe_collection.n_blocks();

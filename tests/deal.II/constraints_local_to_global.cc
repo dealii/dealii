@@ -61,7 +61,7 @@ void test ()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof, constraints);
   VectorTools::interpolate_boundary_values (dof, 1, ZeroFunction<dim>(),
-					    constraints);
+                                            constraints);
   constraints.close();
 
   SparsityPattern sparsity;
@@ -76,41 +76,41 @@ void test ()
   FullMatrix<double> local_mat (fe.dofs_per_cell, fe.dofs_per_cell);
   std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
 
-				// loop over cells, fill local matrix with
-				// random values, insert both into sparse and
-				// full matrix. Make some random entries equal
-				// to zero
+  // loop over cells, fill local matrix with
+  // random values, insert both into sparse and
+  // full matrix. Make some random entries equal
+  // to zero
   typename DoFHandler<dim>::active_cell_iterator
-    cell = dof.begin_active(), endc = dof.end();
+  cell = dof.begin_active(), endc = dof.end();
   unsigned int counter = 0;
   for ( ; cell != endc; ++cell)
     {
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	for (unsigned int j=0; j<fe.dofs_per_cell; ++j, ++counter)
-	  if (counter % 42 == 0)
-	    local_mat(i,j) = 0;
-	  else
-	    local_mat (i,j) = (double)rand() / RAND_MAX;
+        for (unsigned int j=0; j<fe.dofs_per_cell; ++j, ++counter)
+          if (counter % 42 == 0)
+            local_mat(i,j) = 0;
+          else
+            local_mat (i,j) = (double)rand() / RAND_MAX;
       cell->get_dof_indices (local_dof_indices);
       constraints.distribute_local_to_global (local_mat, local_dof_indices,
-					      sparse);
+                                              sparse);
       constraints.distribute_local_to_global (local_mat, local_dof_indices,
-					      full);
+                                              full);
     }
 
-				// now check that the entries are indeed the
-				// same by copying the sparse matrix into a
-				// full matrix and checking the Frobenius norm
-				// of the difference matrix
+  // now check that the entries are indeed the
+  // same by copying the sparse matrix into a
+  // full matrix and checking the Frobenius norm
+  // of the difference matrix
   FullMatrix<double> ref;
   ref.copy_from (sparse);
   full.add (-1., ref);
   deallog << "Difference between full and sparse matrix: "
-	  << full.frobenius_norm() << std::endl;
+          << full.frobenius_norm() << std::endl;
 }
 
 
-int main () 
+int main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

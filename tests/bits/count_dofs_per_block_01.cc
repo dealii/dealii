@@ -47,22 +47,22 @@ std::string output_file_name = "count_dofs_per_block_01/output";
 
 
 void print (const std::vector<types::global_dof_index> &v)
-{  
+{
   deallog << v.size();
   for (unsigned int i=0; i<v.size(); ++i)
     deallog << ' ' << v[i];
   deallog << std::endl;
 }
 
-  
+
 
 template <int dim>
 void
 check ()
 {
-                                   // create tria and dofhandler
-                                   // objects. set different boundary
-                                   // and sub-domain ids
+  // create tria and dofhandler
+  // objects. set different boundary
+  // and sub-domain ids
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
   tria.refine_global (1);
@@ -72,12 +72,12 @@ check ()
       tria.execute_coarsening_and_refinement ();
     }
 
-				   // Taylor-Hood element
+  // Taylor-Hood element
   FESystem<dim> fe (FE_Q<dim>(1), dim, FE_DGQ<dim>(0), 1);
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
 
-				   // no grouping
+  // no grouping
   {
     std::vector<types::global_dof_index> dpc(dim+1);
     DoFTools::count_dofs_per_component (dof_handler, dpc);
@@ -91,8 +91,8 @@ check ()
   }
 
 
-				   // grouping into less groups than
-				   // components
+  // grouping into less groups than
+  // components
   {
     std::vector<unsigned int> group(dim+1, 0);
     group[dim] = 1;
@@ -101,18 +101,18 @@ check ()
     Assert (dpc.size() == 2, ExcInternalError());
     print (dpc);
   }
-  
-  {
-    std::vector<unsigned int> group(dim+1, 0);
-    group[dim] = 1;
-    std::vector<types::global_dof_index> dpc(2);
-    DoFTools::count_dofs_per_block (dof_handler, dpc, group);
-    Assert (dpc.size() == 2, ExcInternalError());
-    print (dpc);
-  }  
 
-				   // grouping into more groups than
-				   // components
+  {
+    std::vector<unsigned int> group(dim+1, 0);
+    group[dim] = 1;
+    std::vector<types::global_dof_index> dpc(2);
+    DoFTools::count_dofs_per_block (dof_handler, dpc, group);
+    Assert (dpc.size() == 2, ExcInternalError());
+    print (dpc);
+  }
+
+  // grouping into more groups than
+  // components
   {
     std::vector<unsigned int> group(dim+1, 2*dim);
     group[dim] = 0;
@@ -121,7 +121,7 @@ check ()
     Assert (dpc.size() == 2*dim+1, ExcInternalError());
     print (dpc);
   }
-  
+
   {
     std::vector<unsigned int> group(dim+1, 2*dim);
     group[dim] = 0;
@@ -129,7 +129,7 @@ check ()
     DoFTools::count_dofs_per_block (dof_handler, dpc, group);
     Assert (dpc.size() == 2*dim+1, ExcInternalError());
     print (dpc);
-  }  
+  }
 }
 
 

@@ -45,29 +45,30 @@ void test ()
       if (i<myid)
         my_start += set - i;
     }
-                                   // each processor owns some indices and all
-                                   // are ghosting elements from three
-                                   // processors (the second). some entries
-                                   // are right around the border between two
-                                   // processors
+  // each processor owns some indices and all
+  // are ghosting elements from three
+  // processors (the second). some entries
+  // are right around the border between two
+  // processors
   IndexSet local_owned(global_size);
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet local_relevant(global_size);
   local_relevant = local_owned;
   unsigned int ghost_indices [10] = {1, 2, 13, set-2, set-1, set, set+1, 2*set,
-                                     2*set+1, 2*set+3};
+                                     2*set+1, 2*set+3
+                                    };
   local_relevant.add_indices (&ghost_indices[0], &ghost_indices[0]+10);
 
   Utilities::MPI::Partitioner v(local_owned, local_relevant, MPI_COMM_WORLD);
 
-                                // check locally owned range
+  // check locally owned range
   for (unsigned int i=my_start; i<my_start+local_size; ++i)
     {
       AssertDimension (v.global_to_local(i), i-my_start);
       AssertDimension (v.local_to_global(i-my_start), i);
     }
 
-                                // check ghost indices
+  // check ghost indices
   for (unsigned int i=0, count=0; i<10; ++i)
     if (ghost_indices[i] < my_start || ghost_indices[i] >= my_start+local_size)
       {
@@ -76,8 +77,8 @@ void test ()
         ++count;
       }
 
-                                // check that loc->glob and glob->loc form an
-                                // identity operation
+  // check that loc->glob and glob->loc form an
+  // identity operation
   for (unsigned int i=0; i<local_size+v.n_ghost_indices(); ++i)
     AssertDimension (i, v.global_to_local(v.local_to_global(i)));
 

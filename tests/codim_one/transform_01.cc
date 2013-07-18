@@ -45,7 +45,7 @@ Point<dim> warp (const Point<dim> &p)
 
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim>& tria)
+void save_mesh(const Triangulation<dim,spacedim> &tria)
 {
   GridOut grid_out;
   grid_out.write_gnuplot (tria, deallog.get_file_stream());
@@ -59,32 +59,32 @@ int main ()
   deallog.depth_console(0);
 
   Triangulation<2,3> triangulation;
-  
+
   HyperBallBoundary<3> boundary_description;
   Triangulation<3> volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
-  
+
   volume_mesh.set_boundary (1, boundary_description);
   volume_mesh.set_boundary (0, boundary_description);
   volume_mesh.refine_global (3);
-  
+
   static HyperBallBoundary<3-1,3> surface_description;
   triangulation.set_boundary (1, surface_description);
   triangulation.set_boundary (0, surface_description);
-  
+
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
-  
+
   GridTools::extract_boundary_mesh (volume_mesh, triangulation,
-				    boundary_ids);
+                                    boundary_ids);
   triangulation.set_boundary (1);
   triangulation.set_boundary (0);
   GridTools::transform (&warp<3>, triangulation);
 
   deallog << "Surface mesh has " << triangulation.n_active_cells()
-	  << " cells."
-	  << std::endl;
+          << " cells."
+          << std::endl;
   save_mesh (triangulation);
-  
+
   return 0;
 }

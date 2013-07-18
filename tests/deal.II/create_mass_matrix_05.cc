@@ -47,7 +47,7 @@ template <int dim>
 void
 check ()
 {
-  Triangulation<dim> tr;  
+  Triangulation<dim> tr;
   if (dim==2)
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
@@ -58,25 +58,25 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-				   // create a system element composed
-				   // of non-primitive elements
+  // create a system element composed
+  // of non-primitive elements
   FESystem<dim> element(FE_RaviartThomas<dim>(1), 2);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // use a more complicated mapping
-				   // of the domain and a quadrature
-				   // formula suited to the elements
-				   // we have here
+  // use a more complicated mapping
+  // of the domain and a quadrature
+  // formula suited to the elements
+  // we have here
   MappingQ<dim> mapping (3);
   QGauss<dim> quadrature(6);
 
-				   // create sparsity pattern. note
-				   // that different blocks should
-				   // not couple, so use pattern
+  // create sparsity pattern. note
+  // that different blocks should
+  // not couple, so use pattern
   SparsityPattern sparsity (dof.n_dofs(), dof.n_dofs());
   std::vector<std::vector<bool> > mask (dim*2,
-					std::vector<bool>(dim*2, false));
+                                        std::vector<bool>(dim*2, false));
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       mask[i][j] = true;
@@ -89,25 +89,25 @@ check ()
   constraints.close ();
   constraints.condense (sparsity);
   sparsity.compress ();
-  
+
   SparseMatrix<double> matrix;
   matrix.reinit (sparsity);
 
   MatrixTools::
-    create_mass_matrix (mapping, dof,
-			quadrature, matrix);
+  create_mass_matrix (mapping, dof,
+                      quadrature, matrix);
 
-				   // since we only generate
-				   // output with two digits after
-				   // the dot, and since matrix
-				   // entries are usually in the
-				   // range of 1 or below,
-				   // multiply matrix by 100 to
-				   // make test more sensitive
+  // since we only generate
+  // output with two digits after
+  // the dot, and since matrix
+  // entries are usually in the
+  // range of 1 or below,
+  // multiply matrix by 100 to
+  // make test more sensitive
   deallog << "Matrix: " << std::endl;
   for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
     deallog << matrix.global_entry(i) * 100
-	    << std::endl;
+            << std::endl;
 }
 
 
@@ -116,7 +116,7 @@ int main ()
 {
   std::ofstream logfile ("create_mass_matrix_05/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

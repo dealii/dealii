@@ -49,21 +49,21 @@ void check ()
   Triangulation<dim> triangulation;
   GridGenerator::cylinder (triangulation);
 
-  GridTools::transform ((Point<dim> (*)(const Point<dim>&))&rotate_to_y<dim>, triangulation);
-  
+  GridTools::transform ((Point<dim> ( *)(const Point<dim> &))&rotate_to_y<dim>, triangulation);
+
   static const CylinderBoundary<dim> boundary (1,2);
   triangulation.set_boundary (0, boundary);
   triangulation.refine_global (2);
 
   for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active();
+       cell = triangulation.begin_active();
        cell!=triangulation.end(); ++cell)
     for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       deallog << cell->vertex(i) << std::endl;
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("cylinder_03/output");
   deallog.attach(logfile);
@@ -73,5 +73,5 @@ int main ()
   check<3> ();
 }
 
-  
-  
+
+

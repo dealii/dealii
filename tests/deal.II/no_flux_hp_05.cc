@@ -38,8 +38,8 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-		      const hp::FECollection<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -49,12 +49,12 @@ void test (const Triangulation<dim>& tr,
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     {
       deallog << "FE=" << fe[0].get_name()
-	      << ", case=" << i
-	      << std::endl;
+              << ", case=" << i
+              << std::endl;
 
       std::set<types::boundary_id> boundary_ids;
       for (unsigned int j=0; j<=i; ++j)
-	boundary_ids.insert (j);
+        boundary_ids.insert (j);
 
       ConstraintMatrix cm;
       VectorTools::compute_no_normal_flux_constraints (dof, 0, boundary_ids, cm);
@@ -78,7 +78,7 @@ void test_hyper_cube()
   for (unsigned int degree=1; degree<4; ++degree)
     {
       hp::FECollection<dim> fe (FESystem<dim> (FE_Q<dim>(degree), dim,
-			                                   FE_DGP<dim>(degree+1), 1));
+                                               FE_DGP<dim>(degree+1), 1));
       test(tr, fe);
     }
 }

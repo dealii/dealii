@@ -62,22 +62,22 @@ void output (const Triangulation<dim> &tria)
       deallog << "  " << tria.n_active_cells(i) << std::endl;
       deallog << "  " << tria.n_cells(i) << std::endl;
       if (dim == 1)
-	{
-	  deallog << "  " << tria.n_active_lines(i) << std::endl;
-	  deallog << "  " << tria.n_lines(i) << std::endl;
-	}
+        {
+          deallog << "  " << tria.n_active_lines(i) << std::endl;
+          deallog << "  " << tria.n_lines(i) << std::endl;
+        }
 
       if (dim == 2)
-	{
-	  deallog << "  " << tria.n_active_quads(i) << std::endl;
-	  deallog << "  " << tria.n_quads(i) << std::endl;
-	}
+        {
+          deallog << "  " << tria.n_active_quads(i) << std::endl;
+          deallog << "  " << tria.n_quads(i) << std::endl;
+        }
 
       if (dim == 3)
-	{
-	  deallog << "  " << tria.n_active_hexs(i) << std::endl;
-	  deallog << "  " << tria.n_hexs(i) << std::endl;
-	}
+        {
+          deallog << "  " << tria.n_active_hexs(i) << std::endl;
+          deallog << "  " << tria.n_hexs(i) << std::endl;
+        }
     }
 }
 

@@ -26,14 +26,14 @@
 #include <iomanip>
 
 
-int main () 
+int main ()
 {
   try
     {
       std::ofstream logfile("parameter_handler_5/output");
       deallog.attach(logfile);
       deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+      deallog.threshold_double(1.e-10);
 
       ParameterHandler prm;
       prm.declare_entry ("int",
@@ -48,27 +48,27 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
-  
+
   return 0;
 }

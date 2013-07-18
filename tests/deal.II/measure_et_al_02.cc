@@ -30,7 +30,7 @@
 
 template<int dim>
 void create_triangulation(const unsigned int,
-			  Triangulation<dim> &)
+                          Triangulation<dim> &)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -38,54 +38,54 @@ void create_triangulation(const unsigned int,
 
 template<>
 void create_triangulation(const unsigned int case_no,
-			  Triangulation<2> &tria)
+                          Triangulation<2> &tria)
 {
   switch (case_no)
     {
-      case 0:
-	    GridGenerator::hyper_cube(tria, 1., 3.);
-	    break;
-      case 1:
-      {
-	GridGenerator::hyper_cube(tria, 1., 3.);
-	Point<2> &v0=tria.begin_active()->vertex(0);
-	v0(0) = 0.;
-	break;
-	}
-		case 2:
-      {
-	GridGenerator::hyper_cube(tria, 1., 3.);
-	Point<2> &v0=tria.begin_active()->vertex(0);
-	v0(0) = 0.;
- 	Point<2> &v3=tria.begin_active()->vertex(3);
- 	v3(0) = 4.;
-	break;
-      }
-      default:
-	    Assert(false, ExcNotImplemented());
+    case 0:
+      GridGenerator::hyper_cube(tria, 1., 3.);
+      break;
+    case 1:
+    {
+      GridGenerator::hyper_cube(tria, 1., 3.);
+      Point<2> &v0=tria.begin_active()->vertex(0);
+      v0(0) = 0.;
+      break;
+    }
+    case 2:
+    {
+      GridGenerator::hyper_cube(tria, 1., 3.);
+      Point<2> &v0=tria.begin_active()->vertex(0);
+      v0(0) = 0.;
+      Point<2> &v3=tria.begin_active()->vertex(3);
+      v3(0) = 4.;
+      break;
+    }
+    default:
+      Assert(false, ExcNotImplemented());
     };
 }
 
 
 template<>
 void create_triangulation(const unsigned int case_no,
-			  Triangulation<3> &tria)
+                          Triangulation<3> &tria)
 {
   switch (case_no)
     {
-      case 0:
-	    GridGenerator::hyper_cube(tria, 1., 3.);
-	    break;
-      case 1:
-		case 2:// like case 1
-      {
-	GridGenerator::hyper_cube(tria, 1., 3.);
-	Point<3> &v0=tria.begin_active()->vertex(0);
-	v0(0) = 0.;
-	break;
-      }
-	  default:
-	    Assert(false, ExcNotImplemented());
+    case 0:
+      GridGenerator::hyper_cube(tria, 1., 3.);
+      break;
+    case 1:
+    case 2:// like case 1
+    {
+      GridGenerator::hyper_cube(tria, 1., 3.);
+      Point<3> &v0=tria.begin_active()->vertex(0);
+      v0(0) = 0.;
+      break;
+    }
+    default:
+      Assert(false, ExcNotImplemented());
     };
 }
 
@@ -98,11 +98,11 @@ void test()
     {
       create_triangulation(case_no, tria);
       deallog << "dim" << dim << ":case" << case_no << ":diameter="
-	      << tria.begin_active()->diameter() << std::endl;
+              << tria.begin_active()->diameter() << std::endl;
       deallog << "dim" << dim << ":case" << case_no << ":extent_in_direction="
-	      << tria.begin_active()->extent_in_direction(0) << std::endl;
+              << tria.begin_active()->extent_in_direction(0) << std::endl;
       deallog << "dim" << dim << ":case" << case_no << ":minimum_vertex_distance="
-	      << tria.begin_active()->minimum_vertex_distance() << std::endl;
+              << tria.begin_active()->minimum_vertex_distance() << std::endl;
       tria.clear();
     }
 }

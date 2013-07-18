@@ -19,7 +19,7 @@
 // test SparsityPattern::iterator
 
 #include "../tests.h"
-#include <deal.II/lac/sparsity_pattern.h>    
+#include <deal.II/lac/sparsity_pattern.h>
 #include <fstream>
 #include <iomanip>
 
@@ -35,8 +35,8 @@ void test ()
 
   SparsityPattern::const_iterator i = sp.begin();
   for (; i!=sp.end(); ++i)
-    deallog << i->row() << ' ' << i->column() << std::endl;    
-  
+    deallog << i->row() << ' ' << i->column() << std::endl;
+
   deallog << "OK" << std::endl;
 }
 
@@ -56,25 +56,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

@@ -20,7 +20,7 @@
 // for some time, leading to a linker error
 
 #include "../tests.h"
-#include <deal.II/lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 #include <iomanip>
 
@@ -41,7 +41,7 @@ void test ()
   deallog << i->value() << std::endl;
   i++;
   deallog << i->value() << std::endl;
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -61,25 +61,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

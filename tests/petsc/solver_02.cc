@@ -34,22 +34,22 @@
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve( SOLVER& solver, const MATRIX& A,
-	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+check_solve( SOLVER &solver, const MATRIX &A,
+             VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
-  
+
   u = 0.;
   f = 1.;
-  try 
+  try
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception& e)
+  catch (std::exception &e)
     {
       deallog << e.what() << std::endl;
-                                       // just like for Richardson: we end up
-                                       // here normally for this solver
+      // just like for Richardson: we end up
+      // here normally for this solver
     }
 
   deallog << "Solver stopped after " << solver.control().last_step()
@@ -66,15 +66,15 @@ int main(int argc, char **argv)
   deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  {  
+  {
     SolverControl control(100, 1.e-3);
 
     const unsigned int size = 32;
     unsigned int dim = (size-1)*(size-1);
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
-      
-                                     // Make matrix
+
+    // Make matrix
     FDMatrix testproblem(size, size);
     PETScWrappers::SparseMatrix  A(dim, dim, 5);
     testproblem.five_point(A);
@@ -90,6 +90,6 @@ int main(int argc, char **argv)
     PETScWrappers::PreconditionJacobi preconditioner(A);
     check_solve (solver, A,u,f, preconditioner);
   }
-  
+
 }
 

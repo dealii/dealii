@@ -23,7 +23,7 @@
 #include <fstream>
 #include <iomanip>
 
-int main () 
+int main ()
 {
   std::ofstream logfile("matrix_out/output");
   logfile << std::fixed;
@@ -34,51 +34,51 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-				   // test for a square full matrix
+  // test for a square full matrix
   if (true)
     {
       FullMatrix<double> full_matrix(4,4);
       for (unsigned int i=0; i<4; ++i)
-	full_matrix(i,i) = 1;
-      
+        full_matrix(i,i) = 1;
+
       MatrixOut matrix_out;
       matrix_out.build_patches (full_matrix, "full_matrix");
       matrix_out.write_gnuplot (logfile);
     };
-  
-				   // test for a rectangular sparse
-				   // matrix
+
+  // test for a rectangular sparse
+  // matrix
   if (true)
     {
       SparsityPattern sparsity (4,8,7);
       for (unsigned int i=0; i<4; ++i)
-	for (unsigned int j=0; j<8; ++j)
-	  if (i!=j)
-	    sparsity.add (i,j);
+        for (unsigned int j=0; j<8; ++j)
+          if (i!=j)
+            sparsity.add (i,j);
       sparsity.compress ();
 
       SparseMatrix<double> sparse_matrix(sparsity);
       for (unsigned int i=0; i<4; ++i)
-	for (unsigned int j=0; j<8; ++j)
-	  sparse_matrix.set(i,j, static_cast<signed int>(i-j));
-  
+        for (unsigned int j=0; j<8; ++j)
+          sparse_matrix.set(i,j, static_cast<signed int>(i-j));
+
       MatrixOut matrix_out;
       matrix_out.build_patches (sparse_matrix, "sparse_matrix",
-				MatrixOut::Options (true));
+                                MatrixOut::Options (true));
       matrix_out.write_eps (logfile);
     };
 
-				   // test collation of elements
+  // test collation of elements
   if (true)
     {
       FullMatrix<double> full_matrix(20,20);
       for (unsigned int i=0; i<20; ++i)
-	for (unsigned int j=0; j<20; ++j)
-	  full_matrix(i,j) = (1.*i*i/20/20-1.*j*j*j/20/20/20);
-  
+        for (unsigned int j=0; j<20; ++j)
+          full_matrix(i,j) = (1.*i*i/20/20-1.*j*j*j/20/20/20);
+
       MatrixOut matrix_out;
       matrix_out.build_patches (full_matrix, "collated_matrix",
-				MatrixOut::Options (false, 4));
+                                MatrixOut::Options (false, 4));
       matrix_out.write_gmv (logfile);
     };
 }

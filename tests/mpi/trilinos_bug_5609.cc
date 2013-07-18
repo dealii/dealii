@@ -40,7 +40,7 @@ void test ()
   Epetra_FEVector x1(Map);
   x1.PutScalar (0);
 
-				// let all processors set global entry 0 to 1
+  // let all processors set global entry 0 to 1
   const int GID = 0;
   const double value = 1;
   x1.ReplaceGlobalValues(1, &GID, &value);
@@ -48,16 +48,16 @@ void test ()
   if (Comm.MyPID()==0)
     Assert (x1[0][0] == 1, ExcInternalError());
 
-				// copy vector
+  // copy vector
   Epetra_FEVector x2 (x1);
 
   x2.PutScalar(0);
 
-				// re-apply 1 to the vector, but only on the
-				// owning processor. should be enough to set
-				// the value (as non-local data in x1 should
-				// be been eliminated after calling
-				// GlobalAssemble).
+  // re-apply 1 to the vector, but only on the
+  // owning processor. should be enough to set
+  // the value (as non-local data in x1 should
+  // be been eliminated after calling
+  // GlobalAssemble).
   if (Comm.MyPID()==0)
     x2.ReplaceGlobalValues(1, &GID, &value);
   x2.GlobalAssemble (Insert);

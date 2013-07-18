@@ -38,11 +38,11 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-	   const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   deallog << "FE=" << fe.get_name()
-	  << std::endl;
+          << std::endl;
 
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -50,33 +50,33 @@ void test (const Triangulation<dim>& tr,
   Vector<double> fe_function(dof.n_dofs());
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     fe_function(i) = i+1;
-  
+
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
-			   update_values | update_gradients | update_hessians);
+                           update_values | update_gradients | update_hessians);
   fe_values.reinit (dof.begin_active());
 
   std::vector<Tensor<2,dim> > scalar_values (quadrature.size());
   std::vector<std::vector<Tensor<2,dim> > >
-    vector_values (quadrature.size(),
-		   std::vector<Tensor<2,dim> >(fe.n_components()));
+  vector_values (quadrature.size(),
+                 std::vector<Tensor<2,dim> >(fe.n_components()));
 
   fe_values.get_function_hessians (fe_function, vector_values);
-  
+
   for (unsigned int c=0; c<fe.n_components(); ++c)
     {
       FEValuesExtractors::Scalar single_component (c);
       fe_values[single_component].get_function_hessians (fe_function,
-							 scalar_values);
+                                                         scalar_values);
       deallog << "component=" << c << std::endl;
-      
+
       for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-	{
-	  deallog << scalar_values[q] << std::endl;
-	  Assert ((scalar_values[q] - vector_values[q][c]).norm()
-		  <= 1e-12 * scalar_values[q].norm(),
-		  ExcInternalError());
-	}
+        {
+          deallog << scalar_values[q] << std::endl;
+          Assert ((scalar_values[q] - vector_values[q][c]).norm()
+                  <= 1e-12 * scalar_values[q].norm(),
+                  ExcInternalError());
+        }
     }
 }
 
@@ -92,8 +92,8 @@ void test_hyper_sphere()
   tr.set_boundary (0, boundary);
 
   FESystem<dim> fe (FE_Q<dim>(1), 1,
-		    FE_Q<dim>(2), 2,
-		    FE_DGQ<dim>(3), dim);
+                    FE_Q<dim>(2), 2,
+                    FE_DGQ<dim>(3), dim);
   test(tr, fe);
 }
 

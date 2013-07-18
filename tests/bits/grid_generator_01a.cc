@@ -32,7 +32,7 @@
 
 
 template<int dim>
-void test(std::ostream& out)
+void test(std::ostream &out)
 {
   Point<dim> p1;
   p1[0] = 2.;
@@ -50,16 +50,16 @@ void test(std::ostream& out)
   HalfHyperBallBoundary<dim> boundary_description (p1, 3);
   GridOut go;
   GridOut::OutputFormat format = GridOut::gnuplot;
-  
-    {
-      deallog << "half_hyper_ball" << std::endl;
-      Triangulation<dim> tr;
-      GridGenerator::half_hyper_ball(tr, p1, 3.);
-      tr.set_boundary (0, boundary_description);
 
-      tr.refine_global (2);
-      go.write(tr, out, format);
-    }  
+  {
+    deallog << "half_hyper_ball" << std::endl;
+    Triangulation<dim> tr;
+    GridGenerator::half_hyper_ball(tr, p1, 3.);
+    tr.set_boundary (0, boundary_description);
+
+    tr.refine_global (2);
+    go.write(tr, out, format);
+  }
 }
 
 
@@ -69,7 +69,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   deallog.push("3d");
   test<3>(logfile);
   deallog.pop();

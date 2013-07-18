@@ -40,17 +40,17 @@ int main ()
   ConvergenceTable table_2;
 
   for (unsigned int i=1; i<=4; ++i)
-  {
-    table.add_value("error", 3.*i);
-    table.add_value("key", i);
-    table_2.add_value("error", std::pow(1./sqrt(i),4.));
-    table_2.add_value("key", i);
-  }
+    {
+      table.add_value("error", 3.*i);
+      table.add_value("key", i);
+      table_2.add_value("error", std::pow(1./sqrt(i),4.));
+      table_2.add_value("key", i);
+    }
 
   table.evaluate_convergence_rates("error", "key", ConvergenceTable::reduction_rate);
   table_2.evaluate_convergence_rates("error", "key", ConvergenceTable::reduction_rate_log2);
 
-                                 // output
+  // output
   table.write_text(deallog.get_file_stream());
   table_2.write_text(deallog.get_file_stream());
 }

@@ -18,17 +18,17 @@
 
 // check TrilinosWrappers::SparseMatrix::frobenius_norm
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>    
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <fstream>
 #include <iostream>
 
 
 void test (TrilinosWrappers::SparseMatrix &m)
 {
-                                   // first set a few entries. count how many
-                                   // entries we have
+  // first set a few entries. count how many
+  // entries we have
   TrilinosScalar norm = 0;
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
@@ -41,22 +41,22 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
   m.compress ();
 
-                                   // compare against the exact value of the
-                                   // l2-norm (max row-sum)
+  // compare against the exact value of the
+  // l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
   Assert (m.frobenius_norm() == norm, ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("08/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -71,25 +71,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

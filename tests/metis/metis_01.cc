@@ -35,22 +35,22 @@ void test ()
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (5-dim);
 
-                                   // subdivide into 5 subdomains
+  // subdivide into 5 subdomains
   deallog << "RECURSIVE" << std::endl;
   GridTools::partition_triangulation (5, triangulation);
   for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active();
+       cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
     deallog << cell << ' ' << cell->subdomain_id() << std::endl;
 
-                                   // subdivide into 9 subdomains. note that
-                                   // this uses the k-way subdivision (for
-                                   // more than 8 subdomains) rather than the
-                                   // recursive one
+  // subdivide into 9 subdomains. note that
+  // this uses the k-way subdivision (for
+  // more than 8 subdomains) rather than the
+  // recursive one
   deallog << "K-WAY" << std::endl;
   GridTools::partition_triangulation (9, triangulation);
   for (typename Triangulation<dim>::active_cell_iterator
-         cell = triangulation.begin_active();
+       cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
     deallog << cell << ' ' << cell->subdomain_id() << std::endl;
 }
@@ -73,25 +73,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

@@ -53,14 +53,14 @@ void test(std::string filename)
   DoFRenumbering::component_wise (dof_handler);
 
   for (typename DoFHandler<dim,spacedim>::active_cell_iterator
-	 cell = dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
+       cell = dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
     {
       std::vector<types::global_dof_index> x (cell->get_fe().dofs_per_cell);
       cell->get_dof_indices (x);
 
       deallog << cell << std::endl;
       for (unsigned int i=0; i<x.size(); ++i)
-	deallog << "  " << x[i] << std::endl;
+        deallog << "  " << x[i] << std::endl;
     }
 }
 

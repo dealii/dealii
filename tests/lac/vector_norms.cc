@@ -36,7 +36,7 @@ void check_norms ()
   unsigned int skip = 73;
   for (unsigned int size=1; size<200000; size+=skip)
     {
-                                // test correctness
+      // test correctness
       if (size > 10000)
         skip += 17;
       Vector<number> vec(size);
@@ -47,7 +47,7 @@ void check_norms ()
       Assert (std::abs(l1_norm-0.5*size*(size+1)) < acc*0.5*size*(size+1),
               ExcInternalError());
 
-                                // test accuracy of summation
+      // test accuracy of summation
       const long double value = 3.14159265358979323846;
       vec = (number)value;
       const number l1_norma = vec.l1_norm();
@@ -73,7 +73,7 @@ void check_complex_norms ()
   unsigned int skip = 73;
   for (unsigned int size=1; size<100000; size+=skip)
     {
-                                // test correctness
+      // test correctness
       if (size > 10000)
         skip += 17;
       Vector<std::complex<number> > vec(size);
@@ -88,7 +88,7 @@ void check_complex_norms ()
       Assert (std::abs(l1_norm-sum) < acc*sum,
               ExcInternalError());
 
-                                // test accuracy of summation
+      // test accuracy of summation
       const std::complex<long double> value (3.14159265358979323846, 0.1);
       vec = std::complex<number>(value);
       const number l1_norma = vec.l1_norm();

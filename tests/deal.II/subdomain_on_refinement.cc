@@ -38,9 +38,9 @@ std::ofstream logfile("subdomain_on_refinement/output");
 
 
 DeclException2 (ExcNumberMismatch,
-		int, int,
-		<< "The numbers " << arg1 << " and " << arg2
-		<< " should be equal, but are not.");
+                int, int,
+                << "The numbers " << arg1 << " and " << arg2
+                << " should be equal, but are not.");
 
 
 template <int dim>
@@ -51,11 +51,11 @@ void test ()
   tria.begin_active()->set_subdomain_id (42);
   tria.refine_global (2);
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active (),
-    endc = tria.end ();
+  cell = tria.begin_active (),
+  endc = tria.end ();
   for (; cell!=endc; ++cell)
     Assert (cell->subdomain_id() == 42,
-	    ExcInternalError());
+            ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
@@ -70,6 +70,6 @@ int main ()
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   return 0;
 }

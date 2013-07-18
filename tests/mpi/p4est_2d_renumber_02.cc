@@ -55,7 +55,7 @@ void test()
   sub[0] = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
   sub[1] = 1;
   GridGenerator::subdivided_hyper_rectangle(static_cast<Triangulation<dim>&>(tr),
-					    sub, Point<2>(0,0), Point<2>(1,1));
+                                            sub, Point<2>(0,0), Point<2>(1,1));
 
   const FE_Q<dim> fe_q(1);
   FESystem<dim> fe(fe_q,2);
@@ -82,32 +82,32 @@ void test()
 
     if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
       {
-	dof_set.print(deallog);
-	for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
-	  {
-	    deallog << "Dofs owned by processor " << i << ": ";
-	    dofh.locally_owned_dofs_per_processor()[i].print(deallog);
-	    deallog << std::endl;
-	  }
+        dof_set.print(deallog);
+        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
+          {
+            deallog << "Dofs owned by processor " << i << ": ";
+            dofh.locally_owned_dofs_per_processor()[i].print(deallog);
+            deallog << std::endl;
+          }
       }
 
     if (myid==0)
       {
 
-	std::vector<types::global_dof_index> local_dof_indices;
-	typename DoFHandler<dim>::active_cell_iterator
-	  cell, endc = dofh.end();
+        std::vector<types::global_dof_index> local_dof_indices;
+        typename DoFHandler<dim>::active_cell_iterator
+        cell, endc = dofh.end();
 
-	if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	  for (cell = dofh.begin_active(); cell != endc; ++cell)
-	    if (!cell->is_artificial() && !cell->is_ghost())
-	      {
-		local_dof_indices.resize (cell->get_fe().dofs_per_cell);
-		cell->get_dof_indices (local_dof_indices);
-		for (unsigned int i=0;i< cell->get_fe().dofs_per_cell;++i)
-		  deallog << local_dof_indices[i] << " ";
-		deallog << std::endl;
-	      }
+        if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+          for (cell = dofh.begin_active(); cell != endc; ++cell)
+            if (!cell->is_artificial() && !cell->is_ghost())
+              {
+                local_dof_indices.resize (cell->get_fe().dofs_per_cell);
+                cell->get_dof_indices (local_dof_indices);
+                for (unsigned int i=0; i< cell->get_fe().dofs_per_cell; ++i)
+                  deallog << local_dof_indices[i] << " ";
+                deallog << std::endl;
+              }
       }
   }
 }

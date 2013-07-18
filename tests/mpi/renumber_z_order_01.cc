@@ -74,7 +74,7 @@ void test()
   DoFRenumbering::hierarchical (dofh);
 
   if (myid == 0)
-      deallog << "n_global_active_cells: " << tr.n_global_active_cells() << std::endl;
+    deallog << "n_global_active_cells: " << tr.n_global_active_cells() << std::endl;
 
   TrilinosWrappers::MPI::Vector vector;
   vector.reinit (dofh.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -91,7 +91,7 @@ void test()
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dofh.begin_active(),
-           endc = dofh.end();
+    endc = dofh.end();
     for (; cell != endc; ++cell)
       if (cell->subdomain_id() == tr.locally_owned_subdomain())
         {

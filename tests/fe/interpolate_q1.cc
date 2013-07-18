@@ -28,16 +28,16 @@
 // FE_DGQ<dim>::interpolate(...)
 
 template <int dim>
-void check(const Function<dim>& f,
-	   const unsigned int degree)
+void check(const Function<dim> &f,
+           const unsigned int degree)
 {
   FE_Q<dim> fe(degree);
   deallog << fe.get_name() << ' ';
-  
+
   std::vector<double> dofs(fe.dofs_per_cell);
-  
+
   std::vector<std::vector<double> >
-    values(1, std::vector<double>(fe.get_unit_support_points().size()));
+  values(1, std::vector<double>(fe.get_unit_support_points().size()));
   f.value_list(fe.get_unit_support_points(), values[0]);
   fe.interpolate(dofs, values[0]);
   deallog << " value " << difference(fe,dofs,f);
@@ -45,23 +45,23 @@ void check(const Function<dim>& f,
   deallog << " vector " << difference(fe,dofs,f);
 
   std::vector<Vector<double> >
-    vectors(fe.get_unit_support_points().size(), Vector<double>(1));
+  vectors(fe.get_unit_support_points().size(), Vector<double>(1));
   f.vector_value_list(fe.get_unit_support_points(), vectors);
   fe.interpolate(dofs, vectors, 0);
   deallog << " Vector " << difference(fe,dofs,f) << std::endl;
 }
 
 template <int dim>
-void check_dg(const Function<dim>& f,
-	      const unsigned int degree)
+void check_dg(const Function<dim> &f,
+              const unsigned int degree)
 {
   FE_DGQ<dim> fe(degree);
   deallog << fe.get_name() << ' ';
-  
+
   std::vector<double> dofs(fe.dofs_per_cell);
-  
+
   std::vector<std::vector<double> >
-    values(1, std::vector<double>(fe.get_unit_support_points().size()));
+  values(1, std::vector<double>(fe.get_unit_support_points().size()));
   f.value_list(fe.get_unit_support_points(), values[0]);
   fe.interpolate(dofs, values[0]);
   deallog << " value " << difference(fe,dofs,f);
@@ -69,24 +69,24 @@ void check_dg(const Function<dim>& f,
   deallog << " vector " << difference(fe,dofs,f);
 
   std::vector<Vector<double> >
-    vectors(fe.get_unit_support_points().size(), Vector<double>(1));
+  vectors(fe.get_unit_support_points().size(), Vector<double>(1));
   f.vector_value_list(fe.get_unit_support_points(), vectors);
   fe.interpolate(dofs, vectors, 0);
   deallog << " Vector " << difference(fe,dofs,f) << std::endl;
 }
 
 template <int dim>
-void check_dg_lobatto(const Function<dim>& f,
-		      const unsigned int degree)
+void check_dg_lobatto(const Function<dim> &f,
+                      const unsigned int degree)
 {
   QGaussLobatto<1> fe_quadrature(degree);
   FE_DGQArbitraryNodes<dim> fe(fe_quadrature);
   deallog << fe.get_name() << ' ';
-  
+
   std::vector<double> dofs(fe.dofs_per_cell);
-  
+
   std::vector<std::vector<double> >
-    values(1, std::vector<double>(fe.get_unit_support_points().size()));
+  values(1, std::vector<double>(fe.get_unit_support_points().size()));
   f.value_list(fe.get_unit_support_points(), values[0]);
   fe.interpolate(dofs, values[0]);
   deallog << " value " << difference(fe,dofs,f);
@@ -94,7 +94,7 @@ void check_dg_lobatto(const Function<dim>& f,
   deallog << " vector " << difference(fe,dofs,f);
 
   std::vector<Vector<double> >
-    vectors(fe.get_unit_support_points().size(), Vector<double>(1));
+  vectors(fe.get_unit_support_points().size(), Vector<double>(1));
   f.vector_value_list(fe.get_unit_support_points(), vectors);
   fe.interpolate(dofs, vectors, 0);
   deallog << " Vector " << difference(fe,dofs,f) << std::endl;

@@ -26,8 +26,8 @@
 // instantiation here
 template class SolverSelector<>;
 
-int main () 
-{  
+int main ()
+{
   std::ofstream logfile("solver_selector_00/output");
   deallog.attach(logfile);
   deallog.depth_console(0);

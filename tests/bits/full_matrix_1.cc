@@ -26,7 +26,7 @@
 #include <fstream>
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("full_matrix_1/output");
   deallog.attach(logfile);
@@ -52,8 +52,8 @@ int main ()
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<N; ++j)
       {
-	deallog << i << ' ' << j << ' ' << f(i,j) << std::endl;
-	Assert (f(i,j) == sm(i,j), ExcInternalError());
+        deallog << i << ' ' << j << ' ' << f(i,j) << std::endl;
+        Assert (f(i,j) == sm(i,j), ExcInternalError());
       }
 
   deallog << "OK" << std::endl;

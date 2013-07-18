@@ -36,9 +36,9 @@ void test ()
   fe_collection.push_back (FE_Q<dim>(2));
   fe_collection.push_back (FE_Q<dim>(3));
 
-                                   // now create a copy and make sure
-                                   // it goes out of scope before the
-                                   // original
+  // now create a copy and make sure
+  // it goes out of scope before the
+  // original
   {
     hp::FECollection<dim> copy (fe_collection);
   }

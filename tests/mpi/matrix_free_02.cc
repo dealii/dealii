@@ -51,7 +51,7 @@ helmholtz_operator (const MatrixFree<dim,Number>  &data,
   FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
-  for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
     {
       fe_eval.reinit (cell);
 
@@ -72,7 +72,7 @@ helmholtz_operator (const MatrixFree<dim,Number>  &data,
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
- public:
+public:
   typedef VectorizedArray<Number> vector_t;
   static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
 
@@ -84,11 +84,11 @@ class MatrixFreeTest
               const parallel::distributed::Vector<Number> &src) const
   {
     dst = 0;
-    const std_cxx1x::function<void(const MatrixFree<dim,Number>  &,
-                                   parallel::distributed::Vector<Number>&,
-                                   const parallel::distributed::Vector<Number>&,
-                                   const std::pair<unsigned int,unsigned int>&)>
-      wrap = helmholtz_operator<dim,fe_degree,Number>;
+    const std_cxx1x::function<void(const MatrixFree<dim,Number> &,
+                                   parallel::distributed::Vector<Number> &,
+                                   const parallel::distributed::Vector<Number> &,
+                                   const std::pair<unsigned int,unsigned int> &)>
+    wrap = helmholtz_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
   };
 
@@ -109,9 +109,9 @@ void test ()
   GridGenerator::hyper_cube (tria);
   tria.refine_global(1);
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active (),
-    endc = tria.end();
-   cell = tria.begin_active ();
+  cell = tria.begin_active (),
+  endc = tria.end();
+  cell = tria.begin_active ();
   for (; cell!=endc; ++cell)
     if (cell->is_locally_owned())
       if (cell->center().norm()<0.2)
@@ -178,7 +178,7 @@ void test ()
     {
       const unsigned int glob_index =
         owned_set.nth_index_in_set (i);
-      if(constraints.is_constrained(glob_index))
+      if (constraints.is_constrained(glob_index))
         continue;
       in.local_element(i) = (double)rand()/RAND_MAX;
     }
@@ -218,8 +218,8 @@ void test ()
       MPI_Barrier(MPI_COMM_WORLD);
       deallog << "Norm of difference:";
 
-                                // run 10 times to make a possible error more
-                                // likely to show up
+      // run 10 times to make a possible error more
+      // likely to show up
       for (unsigned int run=0; run<10; ++run)
         {
           mf.vmult (out, in);
@@ -233,7 +233,7 @@ void test ()
 }
 
 
-int main (int argc, char ** argv)
+int main (int argc, char **argv)
 {
   Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv,
                                                          numbers::invalid_unsigned_int);

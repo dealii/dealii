@@ -50,49 +50,49 @@ void test ()
   triangulation.refine_global(4);
 
   hp::FECollection<dim>    fe_collection;
-  
+
   fe_collection.push_back (FE_Q<dim>(1));
   fe_collection.push_back (FE_Nothing<dim>());
 
   hp::DoFHandler<dim>      dof_handler (triangulation);
 
-				   // loop over cells, and set cells
-				   // within a circle to be of type
-				   // FE_Nothing, while outside the
-				   // circle to be of type FE_Q(1)
-       
-  typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+  // loop over cells, and set cells
+  // within a circle to be of type
+  // FE_Nothing, while outside the
+  // circle to be of type FE_Q(1)
 
-  for(; cell != endc; cell++)
-  {
+  typename hp::DoFHandler<dim>::active_cell_iterator
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
+
+  for (; cell != endc; cell++)
+    {
       Point<dim> center = cell->center();
-      if(std::sqrt(center.square()) < 0.25 )
+      if (std::sqrt(center.square()) < 0.25 )
         cell->set_active_fe_index(1);
       else
         cell->set_active_fe_index(0);
-  }
+    }
 
   dof_handler.distribute_dofs (fe_collection);
 
   deallog << "   Number of active cells:       "
-	  << triangulation.n_active_cells()
-	  << std::endl
-	  << "   Number of degrees of freedom: "
-	  << dof_handler.n_dofs()
-	  << std::endl;
-  
-  
-  
+          << triangulation.n_active_cells()
+          << std::endl
+          << "   Number of degrees of freedom: "
+          << dof_handler.n_dofs()
+          << std::endl;
+
+
+
   // .... test constraint handling
-  
+
   ConstraintMatrix constraints;
-  
+
   DoFTools::make_hanging_node_constraints (dof_handler, constraints);
 
   constraints.close();
-  
+
   deallog << "   Number of constraints:        "
           << constraints.n_constraints()
           << std::endl;

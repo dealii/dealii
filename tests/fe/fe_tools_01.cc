@@ -29,17 +29,17 @@
 #include <deal.II/base/quadrature.h>
 
 template <int dim>
-void test_fe(const char* name)
+void test_fe(const char *name)
 {
-  FiniteElement<dim>* fe = FETools::get_fe_from_name<dim>(std::string(name));
+  FiniteElement<dim> *fe = FETools::get_fe_from_name<dim>(std::string(name));
 
   deallog << fe->get_name() << std::endl
-	  << '\t' << fe->dofs_per_cell
-	  << '\t' << fe->dofs_per_vertex
-	  << '\t' << fe->dofs_per_line
-	  << '\t' << fe->dofs_per_quad
-	  << '\t' << fe->dofs_per_hex
-	  << std::endl;
+          << '\t' << fe->dofs_per_cell
+          << '\t' << fe->dofs_per_vertex
+          << '\t' << fe->dofs_per_line
+          << '\t' << fe->dofs_per_quad
+          << '\t' << fe->dofs_per_hex
+          << std::endl;
 }
 
 
@@ -50,7 +50,7 @@ main()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-				   // These names are all correct.
+  // These names are all correct.
   test_fe<1>("FE_Q(1)");
   test_fe<1>("FE_Q(2)");
   test_fe<1>("FE_Q<1>(2)");
@@ -69,20 +69,20 @@ main()
   test_fe<2>("FESystem[FESystem<2>[FE_Q<2>(2)^2-FE_DGQ<2>(1)]^2-FE_Q(1)]");
   test_fe<2>("FESystem[FESystem[FESystem[FE_Q(1)^2-FE_Q(1)]^2]-FESystem[FE_Q(1)^2]-FESystem[FE_Q(1)-FE_DGP(0)]]");
 
-				   // Now set up a list of malformed
-				   // names
-  std::vector<const char*> names;
+  // Now set up a list of malformed
+  // names
+  std::vector<const char *> names;
 //  names.push_back("FE_Q[2]");
 
-  for(unsigned int i=0;i<names.size();++i)
+  for (unsigned int i=0; i<names.size(); ++i)
     {
       try
-	{
-	  test_fe<2>(names[i]);
-	}
-      catch(ExceptionBase& e)
-	{
-	  logfile << e.what();
-	}
+        {
+          test_fe<2>(names[i]);
+        }
+      catch (ExceptionBase &e)
+        {
+          logfile << e.what();
+        }
     }
 }

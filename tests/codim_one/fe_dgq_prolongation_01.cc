@@ -41,8 +41,8 @@ int main ()
       deallog << "Degree=" << degree << std::endl;
       FE_DGQ<dim,spacedim> fe(degree);
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-	  deallog << fe.get_prolongation_matrix(0)(i,j) << std::endl;
+        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+          deallog << fe.get_prolongation_matrix(0)(i,j) << std::endl;
     }
 
   return 0;

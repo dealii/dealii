@@ -60,9 +60,9 @@ check ()
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // use a mask that only has the one
-				   // component set and cycle over
-				   // which one that is
+  // use a mask that only has the one
+  // component set and cycle over
+  // which one that is
   for (unsigned int comp=0; comp<element.n_components(); ++comp)
     {
       std::vector<bool> component_mask (element.n_components(), false);
@@ -72,7 +72,7 @@ check ()
       DoFTools::extract_dofs (dof, ComponentMask(component_mask), dofs);
 
       for (unsigned int d=0; d<dof.n_dofs(); ++d)
-	deallog << dofs[d];
+        deallog << dofs[d];
       deallog << std::endl;
     }
 }

@@ -19,7 +19,7 @@
 // compare collective setting of elements in a trilinos matrix using
 // TrilinosWrappers::SparseMatrix::set() with element-wise setting
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <fstream>
@@ -28,7 +28,7 @@
 
 void test (TrilinosWrappers::SparseMatrix &m)
 {
-                                   // first set a few entries one-by-one
+  // first set a few entries one-by-one
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
@@ -38,44 +38,44 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
   TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), m.n()/3+1);
 
-				   // now set the same elements row-wise
-   {
+  // now set the same elements row-wise
+  {
     std::vector<types::global_dof_index> col_indices (m.n()/3+1);
     std::vector<double> col_values (m.n()/3+1);
     for (unsigned int i=0; i<m.m(); ++i)
       {
-	unsigned int col_index = 0;
-				   // count the number of elements in this
-				   // row
-	for (unsigned int j=0; j<m.n(); ++j)
-	  if ((i+2*j+1) % 3 == 0)
-	    ++col_index;
+        unsigned int col_index = 0;
+        // count the number of elements in this
+        // row
+        for (unsigned int j=0; j<m.n(); ++j)
+          if ((i+2*j+1) % 3 == 0)
+            ++col_index;
 
-	col_indices.resize(col_index);
-	col_values.resize(col_index);
-	col_index = 0;
+        col_indices.resize(col_index);
+        col_values.resize(col_index);
+        col_index = 0;
 
-				   // extract column values
-	for (unsigned int j=0; j<m.n(); ++j)
-	  if ((i+2*j+1) % 3 == 0)
-	    {
-	      col_indices[col_index] = j;
-	      col_values[col_index] =  i*j*.5+.5;
-	      col_index++;
-	    }
+        // extract column values
+        for (unsigned int j=0; j<m.n(); ++j)
+          if ((i+2*j+1) % 3 == 0)
+            {
+              col_indices[col_index] = j;
+              col_values[col_index] =  i*j*.5+.5;
+              col_index++;
+            }
 
-	m2.set (i, col_indices, col_values);
+        m2.set (i, col_indices, col_values);
       }
   }
 
   m2.compress();
 
-				   // subtract the matrix m from this one,
-				   // we should get a zero matrix.
+  // subtract the matrix m from this one,
+  // we should get a zero matrix.
   m2.add(-1.0, m);
-				   // Calculate the Frobenius norm of the
-				   // matrix in order to check whether all
-				   // elements really are zero.
+  // Calculate the Frobenius norm of the
+  // matrix in order to check whether all
+  // elements really are zero.
   double norm = m2.frobenius_norm();
   Assert (norm == 0, ExcInternalError());
 
@@ -84,12 +84,12 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("sparse_matrix_set_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -103,25 +103,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

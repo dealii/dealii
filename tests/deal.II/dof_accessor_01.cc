@@ -52,11 +52,11 @@ void test ()
   dof_handler.distribute_dofs (fe);
 
   typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active();
+  cell = dof_handler.begin_active();
   ++cell;
 
   typename DoFHandler<dim>::face_iterator
-    face = dof_handler.begin_active()->face(0);
+  face = dof_handler.begin_active()->face(0);
   face = cell->face(0);
   deallog << cell->face(0) << ' ' << face << std::endl;
   Assert (cell->face(0) == face, ExcInternalError());

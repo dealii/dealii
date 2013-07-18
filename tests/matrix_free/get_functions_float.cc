@@ -37,12 +37,12 @@ void test ()
   create_mesh (tria);
   tria.refine_global(4-dim);
 
-                                // refine a few cells
+  // refine a few cells
   for (unsigned int i=0; i<10-3*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
-        cell = tria.begin_active (),
-        endc = tria.end();
+      cell = tria.begin_active (),
+      endc = tria.end();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
         if (counter % (7-i) == 0)

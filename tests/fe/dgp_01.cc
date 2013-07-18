@@ -52,14 +52,14 @@ test(const unsigned int degree)
   QGauss<dim> q(degree+1);
   FEValues<dim> fe_values (fe, q, update_values);
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = tr.begin_active(); cell != tr.end(); ++cell)
+       cell = tr.begin_active(); cell != tr.end(); ++cell)
     {
       fe_values.reinit (cell);
       for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-	Assert (fe_values.shape_value (0,q) == 1,
-		ExcInternalError());
+        Assert (fe_values.shape_value (0,q) == 1,
+                ExcInternalError());
     }
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -69,7 +69,7 @@ main()
 {
   std::ofstream logfile ("dgp_01/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -82,7 +82,7 @@ main()
 
   for (unsigned int degree=0; degree<=4; ++degree)
     test<3>(degree);
-  
+
   return 0;
 }
 

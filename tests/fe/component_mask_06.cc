@@ -32,32 +32,32 @@
 
 void test ()
 {
-				   // test for an initialized mask
+  // test for an initialized mask
   Assert (ComponentMask(12,true).n_selected_components() == 12,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (ComponentMask(12,true).n_selected_components(12) == 12,
-	  ExcInternalError());
-				   // test for an empty mask
+          ExcInternalError());
+  // test for an empty mask
   Assert (ComponentMask().n_selected_components(12) == 12,
-	  ExcInternalError());
+          ExcInternalError());
   Assert (ComponentMask().n_selected_components(13) == 13,
-	  ExcInternalError());
+          ExcInternalError());
 
 
   deallog << "OK" << std::endl;
 
-				   // this now must throw an exception,
-				   // though:
-  try 
+  // this now must throw an exception,
+  // though:
+  try
     {
       Assert (ComponentMask(12,true).n_selected_components(13) == 12,
-	      ExcInternalError());
+              ExcInternalError());
     }
   catch (ExceptionBase &e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
-  
+
 }
 
 

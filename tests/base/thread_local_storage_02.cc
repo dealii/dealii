@@ -28,12 +28,24 @@
 
 struct X
 {
-    X ()  { Assert (false, ExcInternalError()); };
-    X (int n)  { deallog << "Creating" << std::endl;
-      Assert (n==42, ExcInternalError()); };
-    X (const X&)  { deallog << "Copying" << std::endl; };
-    ~X () { deallog << "Destroying " << std::endl; };
-    int i;
+  X ()
+  {
+    Assert (false, ExcInternalError());
+  };
+  X (int n)
+  {
+    deallog << "Creating" << std::endl;
+    Assert (n==42, ExcInternalError());
+  };
+  X (const X &)
+  {
+    deallog << "Copying" << std::endl;
+  };
+  ~X ()
+  {
+    deallog << "Destroying " << std::endl;
+  };
+  int i;
 };
 
 Threads::ThreadLocalStorage<X> *tls_data;
@@ -44,66 +56,66 @@ void execute (int i)
 {
   tls_data->get().i = i;
 
-				   // indicate that the TLS object has been
-				   // accessed
+  // indicate that the TLS object has been
+  // accessed
   static Threads::Mutex m;
   {
     Threads::Mutex::ScopedLock l(m);
     ++counter;
   }
 
-				   // wait in order to make sure that the
-				   // thread lives longer than the TLS object
+  // wait in order to make sure that the
+  // thread lives longer than the TLS object
   sleep (5);
 }
 
 
-void test () 
+void test ()
 {
-				   // create a thread local storage object
+  // create a thread local storage object
   X exemplar(42);
   tls_data = new Threads::ThreadLocalStorage<X>(exemplar);
-  
-				   // create 5 threads and wait for their
-				   // return. the OS will create 5 individual
-				   // thread ids, which means that we will
-				   // create 5 individual thread specific
-				   // storage locations
+
+  // create 5 threads and wait for their
+  // return. the OS will create 5 individual
+  // thread ids, which means that we will
+  // create 5 individual thread specific
+  // storage locations
   Threads::ThreadGroup<> tg;
   for (unsigned int i=10; i<15; ++i)
     tg += Threads::new_thread (execute, i);
 
-				   // spin lock until all threads have created
-				   // their objects
+  // spin lock until all threads have created
+  // their objects
   while (counter != 5);
-  
-				   // delete the TLS object. this should also
-				   // destroy all the objects created so far,
-				   // namely 5 of them, plus the one copy the
-				   // TLS object stores; while that happens,
-				   // we should get output into logstream
+
+  // delete the TLS object. this should also
+  // destroy all the objects created so far,
+  // namely 5 of them, plus the one copy the
+  // TLS object stores; while that happens,
+  // we should get output into logstream
   delete tls_data;
 
-				   // write something into the output
-				   // file. this also makes sure that the
-				   // output file records the order in which
-				   // this output is generated and in which
-				   // the TLS objects were destroyed. we want
-				   // that these objects are destroyed when
-				   // the TLS object is destroyed, not when
-				   // the threads exit
+  // write something into the output
+  // file. this also makes sure that the
+  // output file records the order in which
+  // this output is generated and in which
+  // the TLS objects were destroyed. we want
+  // that these objects are destroyed when
+  // the TLS object is destroyed, not when
+  // the threads exit
   deallog << "Done." << std::endl;
 
-				   // now make sure the threads all finish
+  // now make sure the threads all finish
   tg.join_all ();
 
-				   // at this point, the seventh object will
-				   // be destroyed, which is the exemplar
-				   // object local to this function
+  // at this point, the seventh object will
+  // be destroyed, which is the exemplar
+  // object local to this function
 }
 
-  
-  
+
+
 
 int main()
 {

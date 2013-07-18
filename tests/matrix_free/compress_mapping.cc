@@ -85,7 +85,7 @@ void test ()
   const unsigned int n_affine = mf.get_mapping_info().affine_data.size();
   const unsigned int n_general = mf.get_mapping_info().mapping_data_gen[0].rowstart_jacobians.size()-1;
 
-                                // should do at least some compression
+  // should do at least some compression
   Assert(n_cartesian+n_affine+n_general < n_macro_cells, ExcInternalError());
   Assert(n_cartesian * 5 < n_macro_cells, ExcInternalError());
   Assert(n_affine * 10 < n_macro_cells, ExcInternalError());
@@ -121,8 +121,8 @@ void test_cube ()
   const unsigned int n_affine = mf.get_mapping_info().affine_data.size();
   const unsigned int n_general = mf.get_mapping_info().mapping_data_gen[0].rowstart_jacobians.size()-1;
 
-                                // should have one Cartesian cell and no other
-                                // cell type
+  // should have one Cartesian cell and no other
+  // cell type
   AssertDimension(n_cartesian, 1);
   AssertDimension(n_affine, 0);
   AssertDimension(n_general, 0);
@@ -166,8 +166,8 @@ void test_parallelogram ()
   const unsigned int n_affine = mf.get_mapping_info().affine_data.size();
   const unsigned int n_general = mf.get_mapping_info().mapping_data_gen[0].rowstart_jacobians.size()-1;
 
-                                // should have one affine cell and no other
-                                // cell type
+  // should have one affine cell and no other
+  // cell type
   AssertDimension(n_cartesian, 0);
   AssertDimension(n_affine, 1);
   AssertDimension(n_general, 0);

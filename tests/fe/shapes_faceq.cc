@@ -31,7 +31,7 @@ template<int dim>
 void plot_FE_FaceQ_shape_functions()
 {
   MappingQ1<dim> m;
-  
+
   FE_FaceQ<dim> q0(0);
   FE_FaceQ<dim> q1(1);
   FE_FaceQ<dim> q2(2);
@@ -46,8 +46,8 @@ void plot_FE_FaceQ_shape_functions()
   plot_face_shape_functions(m, q1, "FaceQ1", update_values);
   plot_face_shape_functions(m, q2, "FaceQ2", update_values);
   plot_face_shape_functions(m, q3, "FaceQ3", update_values);
-  plot_face_shape_functions(m, sys0, "System0", update_values);  
-  plot_face_shape_functions(m, sys1, "System1", update_values);  
+  plot_face_shape_functions(m, sys0, "System0", update_values);
+  plot_face_shape_functions(m, sys1, "System1", update_values);
   plot_face_shape_functions(m, sys00, "System0-0", update_values);
   plot_face_shape_functions(m, sys11, "System1-1", update_values);
 }
@@ -65,7 +65,7 @@ main()
 
   plot_FE_FaceQ_shape_functions<2>();
 //  plot_FE_FaceQ_shape_functions<3>();
-  
+
   return 0;
 }
 

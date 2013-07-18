@@ -48,22 +48,23 @@
 template<int dim>
 class MyFunction : public Function<dim>
 {
-  public:
-    MyFunction () : Function<dim>() {};
+public:
+  MyFunction () : Function<dim>() {};
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int) const
-      { double f=p[0]*2.0+1.0;
-        if (dim>1)
-          f*=p[1]*3.3-1.0;
-        if (dim>2)
-          f*=p[2]*5.0;
-        return f;
-      };
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int) const
+  {
+    double f=p[0]*2.0+1.0;
+    if (dim>1)
+      f*=p[1]*3.3-1.0;
+    if (dim>2)
+      f*=p[2]*5.0;
+    return f;
+  };
 };
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   MyFunction<dim> func;
   MappingQ1<dim> mapping;
@@ -77,47 +78,47 @@ void test(std::ostream& /*out*/)
 
   parallel::distributed::SolutionTransfer<dim, Vector<double> > soltrans(dofh);
 
-  for (int i=0;i<4;++i)
+  for (int i=0; i<4; ++i)
     {
 
       for (typename Triangulation<dim>::cell_iterator
-	     cell = tr.begin();
-	   cell != tr.end(); ++cell)
-	{
-	  if (cell->has_children() && !(rand() % 3))
-	    for (unsigned int c=0;c<GeometryInfo<dim>::max_children_per_cell; ++c)
-	      if (!cell->child(c)->has_children())
-		cell->child(c)->set_coarsen_flag();
-	}
+           cell = tr.begin();
+           cell != tr.end(); ++cell)
+        {
+          if (cell->has_children() && !(rand() % 3))
+            for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+              if (!cell->child(c)->has_children())
+                cell->child(c)->set_coarsen_flag();
+        }
       for (typename Triangulation<dim>::active_cell_iterator
-	     cell = tr.begin_active();
-	   cell != tr.end(); ++cell)
-	{
-	  if (!(rand() % 3))
-	    {
-	      cell->clear_coarsen_flag();
-	      cell->set_refine_flag();
-	    }
+           cell = tr.begin_active();
+           cell != tr.end(); ++cell)
+        {
+          if (!(rand() % 3))
+            {
+              cell->clear_coarsen_flag();
+              cell->set_refine_flag();
+            }
 
-	}
+        }
 
       tr.prepare_coarsening_and_refinement();
 
       Vector<double> solution(dofh.n_dofs());
       VectorTools::interpolate (mapping,
-				* static_cast<dealii::DoFHandler<dim>* >(&dofh),
-				func,
-				solution);
+                                * static_cast<dealii::DoFHandler<dim>* >(&dofh),
+                                func,
+                                solution);
 
       soltrans.prepare_for_coarsening_and_refinement(solution);
 
       tr.execute_coarsening_and_refinement ();
       if (0)
-	{
-	  std::ofstream out ("grid-1.eps");
-	  GridOut grid_out;
-	  grid_out.write_eps (tr, out);
-	}
+        {
+          std::ofstream out ("grid-1.eps");
+          GridOut grid_out;
+          grid_out.write_eps (tr, out);
+        }
 
       dofh.distribute_dofs (fe);
 
@@ -128,12 +129,12 @@ void test(std::ostream& /*out*/)
       Vector<double> difference(tr.n_global_active_cells());
 
       VectorTools::integrate_difference(mapping,
-					dofh,
-					interpolated_solution,
-					func,
-					difference,
-					QGauss<dim>(2),
-					VectorTools::L2_norm);
+                                        dofh,
+                                        interpolated_solution,
+                                        func,
+                                        difference,
+                                        QGauss<dim>(2),
+                                        VectorTools::L2_norm);
       deallog << "error: " << difference.l2_norm() << std::endl;
     }
 
@@ -161,5 +162,5 @@ int main(int argc, char *argv[])
   deallog.push("3d");
   test<3>(logfile);
   deallog.pop();
-  
+
 }

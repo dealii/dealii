@@ -19,7 +19,7 @@
 // nonzero value
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -27,7 +27,7 @@
 
 void test (Vector<std::complex<double> > &v)
 {
-                                   // set some entries of the vector
+  // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
     if (i%3 == 0)
       v(i) = std::complex<double> (i+1., i+2.);
@@ -42,7 +42,7 @@ void test (Vector<std::complex<double> > &v)
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("complex_vector_26/output");
   deallog.attach(logfile);
@@ -57,25 +57,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

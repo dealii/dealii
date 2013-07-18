@@ -42,17 +42,17 @@
 template<int dim>
 class MyFunction : public Function<dim>
 {
-  public:
-    MyFunction () : Function<dim>() {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int) const
-      {
-	double ret_value=sin(p[0]*4)*cos(p[1]*4);
-	if (dim==3)
-	  ret_value*=sin(5*p[2]+1);
-	return ret_value;
-      };
+public:
+  MyFunction () : Function<dim>() {};
+
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int) const
+  {
+    double ret_value=sin(p[0]*4)*cos(p[1]*4);
+    if (dim==3)
+      ret_value*=sin(5*p[2]+1);
+    return ret_value;
+  };
 };
 
 
@@ -68,7 +68,7 @@ void transfer(std::ostream &out)
   Vector<double> solution;
   MappingQ1<dim> mapping;
   DataOut<dim> data_out;
-  
+
   dof_handler.distribute_dofs (fe);
   solution.reinit(dof_handler.n_dofs());
 
@@ -82,9 +82,9 @@ void transfer(std::ostream &out)
 
   SolutionTransfer<dim> soltrans(dof_handler);
 
-				   // test a): pure refinement
+  // test a): pure refinement
   typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),
-						    endc=tria.end();
+                                                    endc=tria.end();
   for (; cell!=endc; ++cell)
     cell->set_refine_flag(RefinementCase<dim>::cut_x);
 
@@ -104,7 +104,7 @@ void transfer(std::ostream &out)
   deallog << "Interpolated/tranferred solution after pure refinement" << std::endl << std::endl;
   data_out.write_gnuplot (out);
 
-				   // test b): with coarsening
+  // test b): with coarsening
   SolutionTransfer<dim> soltrans2(dof_handler);
   cell=tria.begin_active(tria.n_levels()-1);
   endc=tria.end(tria.n_levels()-1);
@@ -135,7 +135,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   transfer<2>(logfile);
   transfer<3>(logfile);
 }

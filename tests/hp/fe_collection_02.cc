@@ -32,25 +32,25 @@
 template <int dim>
 void test ()
 {
-				   // test things with a collection of
-				   // primitive elements
+  // test things with a collection of
+  // primitive elements
   {
     hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
     Assert (fe_collection.n_components() == dim,
-	    ExcInternalError());
+            ExcInternalError());
   }
 
-				   // now the same with one of the elements
-				   // being non-primitive
+  // now the same with one of the elements
+  // being non-primitive
   if (dim > 1)
     {
       hp::FECollection<dim> fe_collection;
       fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
       fe_collection.push_back (FE_RaviartThomas<dim>(1));
       Assert (fe_collection.n_components() == dim,
-	    ExcInternalError());
+              ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

@@ -49,7 +49,7 @@ void test ()
   b.push_back (make_vectorized_array(27.));
   a.insert_back (b.begin(), b.end());
 
-				// keep reference in sync
+  // keep reference in sync
   b_ref = a_ref;
   b_ref.push_back (27);
   a_ref.insert (a_ref.end(), b_ref.begin(), b_ref.end());
@@ -82,7 +82,7 @@ void test ()
       Assert (a[i][d] == a_ref[i], ExcInternalError());
   deallog << "OK" << std::endl;
 
-				// check setting elements for large vectors
+  // check setting elements for large vectors
   a.resize (0);
   a.resize (100000, make_vectorized_array(1.));
   deallog << "Check large initialization: ";
@@ -91,7 +91,7 @@ void test ()
       Assert (a[i][d] == 1., ExcInternalError());
   deallog << "OK" << std::endl;
 
-				// check resize for large vectors
+  // check resize for large vectors
   deallog << "Check large resize: ";
   a.resize (200000, make_vectorized_array(2.));
   a.resize (400000);

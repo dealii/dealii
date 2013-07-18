@@ -123,7 +123,7 @@ template <int dim>
 void HelmholtzProblem<dim>::assemble_system ()
 {
   timer.enter_subsection("write into matrix");
-  
+
   QGauss<dim>   quadrature_formula(fe.degree+1);
 
   const unsigned int n_q_points    = quadrature_formula.size();
@@ -160,11 +160,11 @@ void HelmholtzProblem<dim>::assemble_system ()
                                      fe_values.JxW(q_point));
           }
 
-        cell->get_dof_indices (local_dof_indices);
-        hanging_node_constraints.distribute_local_to_global (cell_matrix,
-                                                             local_dof_indices,
-                                                             system_matrix);
-      }
+      cell->get_dof_indices (local_dof_indices);
+      hanging_node_constraints.distribute_local_to_global (cell_matrix,
+                                                           local_dof_indices,
+                                                           system_matrix);
+    }
 
   timer.leave_subsection();
 }

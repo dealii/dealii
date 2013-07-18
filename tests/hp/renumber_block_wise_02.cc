@@ -66,23 +66,23 @@ get_dofs (const hp::DoFHandler<dim> &dof)
 
 template <int dim>
 void
-check_renumbering(hp::DoFHandler<dim>& dof)
+check_renumbering(hp::DoFHandler<dim> &dof)
 {
-				   // Prepare a reordering of
-				   // components so that each
-				   // component maps to its natural
-				   // block
+  // Prepare a reordering of
+  // components so that each
+  // component maps to its natural
+  // block
   std::vector<unsigned int> order(dof.get_fe().n_components());
   order[0] = 0;
   order[1] = 1;
   order[2] = 1;
 
-				   // do component-wise and save the
-				   // results
+  // do component-wise and save the
+  // results
   DoFRenumbering::component_wise (dof, order);
   const std::vector<types::global_dof_index> vc = get_dofs (dof);
 
-				   // now do the same with blocks
+  // now do the same with blocks
   DoFRenumbering::block_wise (dof);
   const std::vector<types::global_dof_index> vb = get_dofs (dof);
 
@@ -111,15 +111,15 @@ check ()
   {
     bool coin = false;
     for (typename hp::DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
-	 cell != dof.end(); ++cell)
+         cell != dof.end(); ++cell)
       {
-	cell->set_active_fe_index (coin ? 0 : 1);
-	coin = !coin;
+        cell->set_active_fe_index (coin ? 0 : 1);
+        coin = !coin;
       }
   }
 
-				   // note that the following elements
-				   // have 3 components but 2 blocks
+  // note that the following elements
+  // have 3 components but 2 blocks
   FESystem<dim> e1 (FE_DGQ<dim>(1), 1, FESystem<dim>(FE_DGQ<dim>(2), 2), 1);
   FESystem<dim> e2 (FE_DGQ<dim>(2), 1, FESystem<dim>(FE_DGQ<dim>(1), 2), 1);
 

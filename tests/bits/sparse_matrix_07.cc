@@ -19,7 +19,7 @@
 // check SparseMatrix::linfty_norm
 
 #include "../tests.h"
-#include <deal.II/lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 
 
@@ -33,19 +33,19 @@ void test ()
   sp.compress ();
 
   SparseMatrix<double> m(sp);
-  
-                                   // first set a few entries. count how many
-                                   // entries we have
+
+  // first set a few entries. count how many
+  // entries we have
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       if ((i+2*j+1) % 3 == 0)
-        m.set (i,j, i*j*.5+.5);  
+        m.set (i,j, i*j*.5+.5);
 
-                                   // compare against the exact value of the
-                                   // linfty-norm (max row-sum)
+  // compare against the exact value of the
+  // linfty-norm (max row-sum)
   deallog << m.linfty_norm() << std::endl;
   Assert (m.linfty_norm() == 8.5, ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -65,25 +65,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

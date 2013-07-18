@@ -43,7 +43,7 @@ void test()
   if (true)
     {
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "hyper_cube" << std::endl;
+        deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -61,60 +61,60 @@ void test()
 
 
       if (myid==0)
-	{
+        {
 
-	  std::vector< unsigned int > cell_subd;
-	  cell_subd.resize(tr.n_active_cells());
+          std::vector< unsigned int > cell_subd;
+          cell_subd.resize(tr.n_active_cells());
 
-	  GridTools::get_subdomain_association(tr, cell_subd);
-	  for (unsigned int i=0;i<tr.n_active_cells();++i)
-	    deallog << cell_subd[i] << " ";
-	  deallog << std::endl;
-	}
+          GridTools::get_subdomain_association(tr, cell_subd);
+          for (unsigned int i=0; i<tr.n_active_cells(); ++i)
+            deallog << cell_subd[i] << " ";
+          deallog << std::endl;
+        }
 
-				       //check that all local
-				       //neighbors have the
-				       //correct level
+      //check that all local
+      //neighbors have the
+      //correct level
       typename Triangulation<dim,dim>::active_cell_iterator cell;
 
       for (cell = tr.begin_active();
-	   cell != tr.end();
-	   ++cell)
-	{
-	  if (cell->subdomain_id() != (unsigned int)myid)
-	    {
-	      Assert (cell->is_ghost() || cell->is_artificial(),
-		      ExcInternalError());
-	    }
-	  else
-	  for (unsigned int n=0;n<GeometryInfo<dim>::faces_per_cell;++n)
-	    {
-	      if (cell->at_boundary(n))
-		continue;
-	      Assert (cell->neighbor(n).state() == IteratorState::valid,
-		      ExcInternalError());
+           cell != tr.end();
+           ++cell)
+        {
+          if (cell->subdomain_id() != (unsigned int)myid)
+            {
+              Assert (cell->is_ghost() || cell->is_artificial(),
+                      ExcInternalError());
+            }
+          else
+            for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+              {
+                if (cell->at_boundary(n))
+                  continue;
+                Assert (cell->neighbor(n).state() == IteratorState::valid,
+                        ExcInternalError());
 
-	      Assert( cell->neighbor(n)->level() == cell->level(),
-		      ExcInternalError());
+                Assert( cell->neighbor(n)->level() == cell->level(),
+                        ExcInternalError());
 
-	      Assert(!cell->neighbor(n)->has_children(), ExcInternalError() );
+                Assert(!cell->neighbor(n)->has_children(), ExcInternalError() );
 
-	    }
+              }
 
 
 
-	}
+        }
 
       const unsigned int checksum = tr.get_checksum ();
       if (myid==0)
-	{
-	  deallog << "Checksum: "
-		  << checksum
-		  << std::endl;
+        {
+          deallog << "Checksum: "
+                  << checksum
+                  << std::endl;
 
-	  std::ofstream file("p4est_3d_ghost_01/1.gpl");
-	  GridOut().write_gnuplot (tr, file);
-	}
+          std::ofstream file("p4est_3d_ghost_01/1.gpl");
+          GridOut().write_gnuplot (tr, file);
+        }
 
       deallog << "#global cells " << tr.n_global_active_cells() << std::endl;
     }
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   std::cout << myid << ":" << getpid() << std::endl;
-				   //system("sleep 20");
+  //system("sleep 20");
 
 
   deallog.push(Utilities::int_to_string(myid));

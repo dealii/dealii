@@ -34,8 +34,8 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-                                   // each processor owns 2 indices and all
-                                   // are ghosting element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting element 1 (the second)
   IndexSet local_owned(numproc*2);
   local_owned.add_range(myid*2,myid*2+2);
   IndexSet local_relevant(numproc*2);
@@ -44,7 +44,7 @@ void test ()
 
   parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
-                                     // set local values and check them
+  // set local values and check them
   v(myid*2)=myid*2.0;
   v(myid*2+1)=myid*2.0+1.0;
 
@@ -54,8 +54,8 @@ void test ()
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 
-                                // set ghost dof on all processors, compress
-                                // (insert mode)
+  // set ghost dof on all processors, compress
+  // (insert mode)
   v(1) = 7;
   v.compress(VectorOperation::insert);
 
@@ -65,11 +65,11 @@ void test ()
       deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
     }
 
-                                // import ghosts onto all procs
+  // import ghosts onto all procs
   v.update_ghost_values();
   Assert (v(1) == 7.0, ExcInternalError());
 
-                                // check l2 norm
+  // check l2 norm
   const double l2_norm = v.l2_norm();
   if (myid == 0)
     deallog << "L2 norm: " << l2_norm << std::endl;

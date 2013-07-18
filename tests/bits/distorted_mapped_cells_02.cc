@@ -44,18 +44,19 @@ void test()
   FEValues<dim> fe_val (mapping, dummy, quad, update_JxW_values);
   double integral = 0.;
   /*typename*/ Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active(), endc = tria.end();
+  cell = tria.begin_active(), endc = tria.end();
   for ( ; cell != endc; ++cell)
     {
-      try{
-	fe_val.reinit (cell);
-      for (unsigned int q=0; q<quad.size(); ++q)
-        integral += fe_val.JxW(q);
-      }
-    catch (ExceptionBase &e)
-      {
-        deallog << e.get_exc_name() << std::endl;
-      }
+      try
+        {
+          fe_val.reinit (cell);
+          for (unsigned int q=0; q<quad.size(); ++q)
+            integral += fe_val.JxW(q);
+        }
+      catch (ExceptionBase &e)
+        {
+          deallog << e.get_exc_name() << std::endl;
+        }
     }
   deallog << "Integral = " << integral << std::endl;
 }

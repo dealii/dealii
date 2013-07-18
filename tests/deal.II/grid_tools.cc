@@ -34,40 +34,40 @@ std::ofstream logfile("grid_tools/output");
 template <int dim>
 void test1 ()
 {
-				   // test 1: hypercube
+  // test 1: hypercube
   if (true)
     {
       Triangulation<dim> tria;
       GridGenerator::hyper_cube(tria);
 
       for (unsigned int i=0; i<2; ++i)
-	{
-	  tria.refine_global(2);
-	  deallog << dim << "d, "
-		  << "hypercube diameter, "
-		  << i*2
-		  << " refinements: "
-		  << GridTools::diameter (tria)
-		  << std::endl;
-	};
+        {
+          tria.refine_global(2);
+          deallog << dim << "d, "
+                  << "hypercube diameter, "
+                  << i*2
+                  << " refinements: "
+                  << GridTools::diameter (tria)
+                  << std::endl;
+        };
     };
 
-				   // test 2: hyperball
+  // test 2: hyperball
   if (dim == 2)
     {
       Triangulation<dim> tria;
       GridGenerator::hyper_ball(tria, Point<dim>(), 1);
 
       for (unsigned int i=0; i<2; ++i)
-	{
-	  tria.refine_global(2);
-	  deallog << dim << "d, "
-		  << "hyperball diameter, "
-		  << i*2
-		  << " refinements: "
-		  << GridTools::diameter (tria)
-		  << std::endl;
-	};
+        {
+          tria.refine_global(2);
+          deallog << dim << "d, "
+                  << "hyperball diameter, "
+                  << i*2
+                  << " refinements: "
+                  << GridTools::diameter (tria)
+                  << std::endl;
+        };
     };
 }
 
@@ -80,7 +80,7 @@ void test2 ()
 
   logfile << "Unchanged grid:" << std::endl;
   GridOut().write_gnuplot (tria, logfile);
-  
+
   logfile << "Shifted grid:" << std::endl;
   const Point<2> shift(1,2);
   GridTools::shift (shift, tria);
@@ -105,7 +105,7 @@ int main ()
   test1<3> ();
 
   test2 ();
-  
+
   return 0;
 }
 

@@ -37,15 +37,16 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-				   // generate a version of the
-				   // Nedelec element but force it to
-				   // use the old-style constraints
-  struct MyFE : FE_Nedelec<3> {
-      MyFE () : FE_Nedelec<3>(0) {};
-      virtual bool hp_constraints_are_implemented () const
-	{
-	  return false;
-	}
+  // generate a version of the
+  // Nedelec element but force it to
+  // use the old-style constraints
+  struct MyFE : FE_Nedelec<3>
+  {
+    MyFE () : FE_Nedelec<3>(0) {};
+    virtual bool hp_constraints_are_implemented () const
+    {
+      return false;
+    }
   } fe;
 
   Triangulation<3> tr(Triangulation<3>::limit_level_difference_at_vertices);

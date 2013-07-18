@@ -19,9 +19,9 @@
 // check TrilinosWrappers::Vector::operator*(Vector) on two vectors that are
 // not orthogonal
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_vector.h>    
+#include <deal.II/lac/trilinos_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -30,9 +30,9 @@
 void test (TrilinosWrappers::Vector &v,
            TrilinosWrappers::Vector &w)
 {
-                                   // set only certain elements of each
-                                   // vector, and record the expected scalar
-                                   // product
+  // set only certain elements of each
+  // vector, and record the expected scalar
+  // product
   double product = 0;
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -43,11 +43,11 @@ void test (TrilinosWrappers::Vector &v,
           product += i*(i+1);
         }
     }
-  
+
   v.compress ();
   w.compress ();
 
-                                   // make sure the scalar product is zero
+  // make sure the scalar product is zero
   Assert (v*w == product, ExcInternalError());
 
   deallog << "OK" << std::endl;
@@ -55,12 +55,12 @@ void test (TrilinosWrappers::Vector &v,
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("23/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -76,25 +76,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

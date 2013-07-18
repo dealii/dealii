@@ -19,13 +19,13 @@
 
 template <int dim>
 void
-test_block_list(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
+test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
-  
+
   MGDoFHandler<dim> dof;
-  dof.initialize(tr, fe); 
-  
+  dof.initialize(tr, fe);
+
   const unsigned int level = tr.n_levels()-1;
 
   {

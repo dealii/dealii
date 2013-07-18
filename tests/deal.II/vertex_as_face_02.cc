@@ -41,7 +41,7 @@ void test ()
   tria.refine_global (2);
 
   for (typename Triangulation<1,spacedim>::active_cell_iterator
-	 cell = tria.begin_active();
+       cell = tria.begin_active();
        cell != tria.end(); ++cell)
     {
       deallog << "Cell: " << cell << std::endl;

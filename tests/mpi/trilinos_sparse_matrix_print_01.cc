@@ -46,25 +46,25 @@ void test ()
     }
   else if (n_procs == 2)
     {
-				       // row_partitioning should be { [0, 2), [2, n_rows) }
-				       // col_partitioning should be { [0, 2), [2, n_cols) }
-				       // col_relevant_set should be { [0, 3), [1, n_cols) }
+      // row_partitioning should be { [0, 2), [2, n_rows) }
+      // col_partitioning should be { [0, 2), [2, n_cols) }
+      // col_relevant_set should be { [0, 3), [1, n_cols) }
       if (my_id == 0)
-	{
-	  row_partitioning.add_range(0, 2);
-	  col_partitioning.add_range(0, 2);
-	}
+        {
+          row_partitioning.add_range(0, 2);
+          col_partitioning.add_range(0, 2);
+        }
       else if (my_id == 1)
-	{
-	  row_partitioning.add_range(2, n_rows);
-	  col_partitioning.add_range(2, n_cols);
-	}
+        {
+          row_partitioning.add_range(2, n_rows);
+          col_partitioning.add_range(2, n_cols);
+        }
     }
   else
     Assert (false, ExcNotImplemented());
 
   TrilinosWrappers::SparsityPattern sp (row_partitioning,
-					col_partitioning, MPI_COMM_WORLD);
+                                        col_partitioning, MPI_COMM_WORLD);
   if ((n_procs == 1) || (my_id == 1))
     sp.add(2,3);
   sp.compress();
@@ -90,8 +90,8 @@ int main (int argc, char **argv)
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
-				   // let processor 1 speak if we run
-				   // in parallel
+  // let processor 1 speak if we run
+  // in parallel
   if ((n_procs == 1) || (myid == 1))
     {
       std::ofstream logfile(output_file_for_mpi("trilinos_sparse_matrix_print_01").c_str());

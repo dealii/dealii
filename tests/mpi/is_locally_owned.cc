@@ -54,31 +54,31 @@ void test()
        ++cell)
     {
       if (cell->is_locally_owned())
-	{
-	  if (myid==0)
-	    deallog << cell << ": locally owned"
-		    << std::endl;
-	  Assert (!cell->is_ghost() && !cell->is_artificial(),
-		  ExcInternalError());
-	}
+        {
+          if (myid==0)
+            deallog << cell << ": locally owned"
+                    << std::endl;
+          Assert (!cell->is_ghost() && !cell->is_artificial(),
+                  ExcInternalError());
+        }
       else if (cell->is_ghost())
-	{
-	  if (myid==0)
-	    deallog << cell << ": ghost"
-		    << std::endl;
-	  Assert (!cell->is_locally_owned() && !cell->is_artificial(),
-		  ExcInternalError());
-	}
+        {
+          if (myid==0)
+            deallog << cell << ": ghost"
+                    << std::endl;
+          Assert (!cell->is_locally_owned() && !cell->is_artificial(),
+                  ExcInternalError());
+        }
       else if (cell->is_artificial())
-	{
-	  if (myid==0)
-	    deallog << cell << ": artificial"
-		    << std::endl;
-	  Assert (!cell->is_locally_owned() && !cell->is_ghost(),
-		  ExcInternalError());
-	}
+        {
+          if (myid==0)
+            deallog << cell << ": artificial"
+                    << std::endl;
+          Assert (!cell->is_locally_owned() && !cell->is_ghost(),
+                  ExcInternalError());
+        }
       else
-	Assert (false, ExcInternalError());
+        Assert (false, ExcInternalError());
     }
 }
 
@@ -105,5 +105,5 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-  
+
 }

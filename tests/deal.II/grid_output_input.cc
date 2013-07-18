@@ -32,13 +32,13 @@
 
 
 template<int dim>
-void test(std::ostream& out)
+void test(std::ostream &out)
 {
   GridOut go;
   go.set_flags(GridOutFlags::Ucd(false, true, true));
   go.set_flags(GridOutFlags::Msh(true, true));
   Triangulation<dim> tr;
-  
+
   GridGenerator::hyper_cube_with_cylindrical_hole(tr, .3, .4, 1, 1, false);
   CylinderBoundary<dim> boundary(.3, 2);
   tr.set_boundary(1, boundary);
@@ -50,10 +50,10 @@ void test(std::ostream& out)
   tr.refine_global(1);
   deallog << "Writing refined from constructor" << std::endl;
   go.write_ucd(tr, out);
-  
+
   tr.set_boundary(1);
   tr.clear();
-  
+
   GridIn<dim> gi;
   gi.attach_triangulation(tr);
   {
@@ -67,13 +67,13 @@ void test(std::ostream& out)
   tr.refine_global(1);
   deallog << "Writing refined from file" << std::endl;
   go.write_ucd(tr, out);
-  
+
   {
     std::ofstream grid_file("grid_output_input/grid.msh");
     go.write_msh(tr, grid_file);
     grid_file.close();
   }
-  
+
   tr.set_boundary(1);
   tr.clear();
 }
@@ -84,7 +84,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   deallog.push("3d");
   test<3>(logfile);
   deallog.pop();

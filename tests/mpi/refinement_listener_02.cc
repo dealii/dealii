@@ -49,9 +49,9 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<2>
-    tr(MPI_COMM_WORLD,
-       Triangulation<2>::MeshSmoothing(),
-       parallel::distributed::Triangulation<2>::mesh_reconstruction_after_repartitioning);
+  tr(MPI_COMM_WORLD,
+     Triangulation<2>::MeshSmoothing(),
+     parallel::distributed::Triangulation<2>::mesh_reconstruction_after_repartitioning);
   GridGenerator::hyper_cube(tr);
   tr.signals.post_refinement.connect (&listener);
 
@@ -60,13 +60,13 @@ void test()
   tr.refine_global (1);
   if (myid == 0)
     deallog << "refine_global(1) results in a total of " << counter
-	    << std::endl;
+            << std::endl;
 
   counter = 0;
   tr.refine_global (3);
   if (myid == 0)
     deallog << "refine_global(3) results in a total of " << counter
-	    << std::endl;
+            << std::endl;
 
 
   // now also find the bottom left corner of the domain and, on the processor
@@ -76,13 +76,13 @@ void test()
       counter = 0;
       Triangulation<2>::cell_iterator cell = tr.begin(0);
       while (cell->has_children())
-	cell = cell->child(0);
+        cell = cell->child(0);
       if (cell->is_locally_owned())
-	cell->set_refine_flag();
+        cell->set_refine_flag();
       tr.execute_coarsening_and_refinement ();
       if (myid == 0)
-	deallog << "local refinement results in a total of " << counter
-		<< std::endl;
+        deallog << "local refinement results in a total of " << counter
+                << std::endl;
     }
 }
 

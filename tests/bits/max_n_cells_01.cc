@@ -46,12 +46,12 @@ void test ()
 
       Vector<float> criteria (tria.n_active_cells());
       for (unsigned int i=0; i<tria.n_active_cells(); ++i)
-	criteria(i) = i;
+        criteria(i) = i;
 
       GridRefinement::refine_and_coarsen_fixed_number (tria,
-						       criteria,
-						       1./4, 1./64,
-						       10000);
+                                                       criteria,
+                                                       1./4, 1./64,
+                                                       10000);
       tria.execute_coarsening_and_refinement();
     }
 }

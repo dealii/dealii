@@ -39,7 +39,7 @@ std::string modify_name (const std::string &name)
   std::string::size_type pos;
   while ((pos = new_name.find(dim_name)) != std::string::npos)
     new_name.replace (pos, 3, "");
-  
+
   return new_name;
 }
 
@@ -52,24 +52,24 @@ check_this (const FiniteElement<dim> &fe1,
 {
   FiniteElement<dim> *p1, *p2;
 
-				   // check that the name of the fe
-				   // and the name of the fe that we
-				   // re-create from this name are
-				   // identitical. this is also a
-				   // pretty good indication that the
-				   // two FEs are actually the same
+  // check that the name of the fe
+  // and the name of the fe that we
+  // re-create from this name are
+  // identitical. this is also a
+  // pretty good indication that the
+  // two FEs are actually the same
   deallog << modify_name<dim> (fe1.get_name());
   p1 = FETools::get_fe_from_name<dim> (modify_name<dim> (fe1.get_name()));
   Assert (fe1.get_name() == p1->get_name(),
-	  ExcInternalError());
+          ExcInternalError());
   deallog << " ok" << std::endl;
   delete p1;
 
-				   // same for fe2
+  // same for fe2
   deallog << modify_name<dim> (fe2.get_name());
   p2 = FETools::get_fe_from_name<dim> (modify_name<dim> (fe2.get_name()));
   Assert (fe2.get_name() == p2->get_name(),
-	  ExcInternalError());
+          ExcInternalError());
   deallog << " ok" << std::endl;
   delete p2;
 }

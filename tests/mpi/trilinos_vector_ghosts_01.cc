@@ -57,9 +57,9 @@ void test()
   dofh.distribute_dofs (fe);
 
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-					     MPI_COMM_WORLD);
+                                             MPI_COMM_WORLD);
   Assert (interpolated.has_ghost_elements() == false,
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

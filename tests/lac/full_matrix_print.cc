@@ -39,7 +39,7 @@ main ()
   deallog.threshold_double(1.e-10);
 
   logfile << numbers::PI << std::endl;
-  
+
   FullMatrix<double> T(3,3,entries);
 
   // try writing to a regular stream
@@ -55,4 +55,4 @@ main ()
   logfile << numbers::PI << std::endl;
 }
 
-      
+

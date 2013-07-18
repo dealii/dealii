@@ -39,7 +39,7 @@
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   {
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -50,11 +50,11 @@ void test(std::ostream& /*out*/)
     tr.begin_active()->set_refine_flag();
     tr.execute_coarsening_and_refinement ();
 
-				     // for better visibility, refine
-				     // all children of the sole
-				     // level-1 cell once more. this
-				     // will introduce more level-1
-				     // cells as well.
+    // for better visibility, refine
+    // all children of the sole
+    // level-1 cell once more. this
+    // will introduce more level-1
+    // cells as well.
     for (unsigned int c=0; c<8; ++c)
       tr.begin(1)->child(c)->set_refine_flag();
     tr.execute_coarsening_and_refinement ();

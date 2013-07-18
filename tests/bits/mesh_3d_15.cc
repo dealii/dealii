@@ -42,10 +42,10 @@
 void check_this (Triangulation<3> &tria)
 {
   FE_Q<3> fe(1);
-  
+
   DoFHandler<3> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
-  
+
   DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
   for (; cell!=dof_handler.end(); ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell;
@@ -57,32 +57,32 @@ void check_this (Triangulation<3> &tria)
              subface_no<GeometryInfo<3>::max_children_per_face;
              ++subface_no)
           {
-                                             // get an iterator
-                                             // pointing to the cell
-                                             // behind the present
-                                             // subface
+            // get an iterator
+            // pointing to the cell
+            // behind the present
+            // subface
 
-					     // way a) construct it ourselves,
-					     // considering orientation and
-					     // rotation of the face
+            // way a) construct it ourselves,
+            // considering orientation and
+            // rotation of the face
             const DoFHandler<3>::cell_iterator
-              neighbor = cell->neighbor(face_no);
+            neighbor = cell->neighbor(face_no);
             const unsigned int neighbor_neighbor
               = cell->neighbor_of_neighbor (face_no);
             const unsigned int neighbor_child_index
               = (GeometryInfo<3>::
                  child_cell_on_face(RefinementCase<3>::isotropic_refinement,neighbor_neighbor,
                                     (subface_no),
-				    neighbor->face_orientation(neighbor_neighbor)));
+                                    neighbor->face_orientation(neighbor_neighbor)));
             const DoFHandler<3>::active_cell_iterator neighbor_child
               = neighbor->child(neighbor_child_index);
 
-					     // way b) use the convenient
-					     // function
-					     // neighbor_child_on_subface
+            // way b) use the convenient
+            // function
+            // neighbor_child_on_subface
 
-					     // make sure, that both ways yield
-					     // the same result
+            // make sure, that both ways yield
+            // the same result
             Assert (neighbor_child ==
                     cell->neighbor_child_on_subface (face_no,
                                                      subface_no),
@@ -96,7 +96,7 @@ void check (Triangulation<3> &tria)
 {
   (++tria.begin_active())->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
-  
+
   deallog << "Initial check" << std::endl;
   check_this (tria);
 //TODO:[WB] Is there a reason to do this three times?
@@ -111,39 +111,39 @@ void check (Triangulation<3> &tria)
   coarsen_global (tria);
   deallog << "Check " << 1 << std::endl;
   check_this (tria);
-  
+
   tria.refine_global (1);
   deallog << "Check " << 2 << std::endl;
   check_this (tria);
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mesh_3d_15/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<3> coarse_grid;
     create_two_cubes (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     create_L_shape (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     check (coarse_grid);
   }
-  
+
 }
 
-  
-  
+
+

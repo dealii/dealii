@@ -61,22 +61,22 @@ void test()
   GridGenerator::hyper_cube(tr);
 
   tr.refine_global (1);
-  for (unsigned int step=0; step<5;++step)
-        {
-          typename Triangulation<dim>::active_cell_iterator
-            cell = tr.begin_active(),
-            endc = tr.end();
+  for (unsigned int step=0; step<5; ++step)
+    {
+      typename Triangulation<dim>::active_cell_iterator
+      cell = tr.begin_active(),
+      endc = tr.end();
 
-            for (; cell!=endc; ++cell)
-                if (std::rand()%42==1)
-                cell->set_refine_flag ();
+      for (; cell!=endc; ++cell)
+        if (std::rand()%42==1)
+          cell->set_refine_flag ();
 
-         tr.execute_coarsening_and_refinement ();
-        }
+      tr.execute_coarsening_and_refinement ();
+    }
   DoFHandler<dim> dofh(tr);
 
   static FESystem<dim> fe (FE_Q<dim>(1+1), dim,
-			   FE_Q<dim>(1), 1);
+                           FE_Q<dim>(1), 1);
 
   dofh.distribute_dofs (fe);
 
@@ -99,45 +99,45 @@ void test()
   velocity_mask[dim] = false;
 
   VectorTools::interpolate_boundary_values (dofh,
-					    0,
-					    ZeroFunction<dim>(dim+1),
-					    cm,
-					    velocity_mask);
+                                            0,
+                                            ZeroFunction<dim>(dim+1),
+                                            cm,
+                                            velocity_mask);
 
-    cm.close ();
+  cm.close ();
 
-    TrilinosWrappers::MPI::Vector x_test;
-    x_test.reinit(x_rel);
+  TrilinosWrappers::MPI::Vector x_test;
+  x_test.reinit(x_rel);
 
-    x_test=x;
+  x_test=x;
 
-    bool throwing=false;
-    deal_II_exceptions::disable_abort_on_exception();
-    try
-      {
-	cm.distribute(x_test);
-      }
-    catch (const ExceptionBase &e)
-      {
-	if (myid==0)
-	  deallog << "Exception: " << e.get_exc_name() << std::endl;
-	throwing=true;
-      }
-    Assert(throwing, ExcInternalError());
+  bool throwing=false;
+  deal_II_exceptions::disable_abort_on_exception();
+  try
+    {
+      cm.distribute(x_test);
+    }
+  catch (const ExceptionBase &e)
+    {
+      if (myid==0)
+        deallog << "Exception: " << e.get_exc_name() << std::endl;
+      throwing=true;
+    }
+  Assert(throwing, ExcInternalError());
 
-    cm.distribute(x);
-    x_rel = x;
+  cm.distribute(x);
+  x_rel = x;
 
-				     //l2_norm() not possible for ghosted vectors...
-    //double a=0;//x_test.l2_norm();
-    //double b=0;//x_rel.l2_norm();
+  //l2_norm() not possible for ghosted vectors...
+  //double a=0;//x_test.l2_norm();
+  //double b=0;//x_rel.l2_norm();
 
-/*    if (myid==0)
-      deallog << a << " vs " << b << std::endl;
-*/
-/*    Assert (x_test.l2_norm() == x_rel.l2_norm(),
-      ExcInternalError());
-*/
+  /*    if (myid==0)
+        deallog << a << " vs " << b << std::endl;
+  */
+  /*    Assert (x_test.l2_norm() == x_rel.l2_norm(),
+        ExcInternalError());
+  */
 }
 
 

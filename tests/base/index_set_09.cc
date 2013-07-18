@@ -39,7 +39,7 @@ void test ()
   index_set.add_index (9);
 
   deallog << index_set.n_elements()
-	  << std::endl;
+          << std::endl;
 }
 
 

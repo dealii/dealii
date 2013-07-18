@@ -43,7 +43,7 @@ void test ()
   tria.refine_global (1);
   tria.begin_active()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
-  tria.refine_global (1);  
+  tria.refine_global (1);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim> (1));
@@ -54,10 +54,10 @@ void test ()
   hp::DoFHandler<dim> dof_handler(tria);
 
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     cell->set_active_fe_index (rand() % fe_collection.size());
-  
+
   dof_handler.distribute_dofs(fe_collection);
 
   ConstraintMatrix cm;
@@ -70,9 +70,9 @@ int main ()
 {
   initlog(__FILE__);
   deallogfile << std::setprecision(2);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

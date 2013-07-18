@@ -58,9 +58,9 @@ template <int dim>
 void
 check ()
 {
-                                   // create tria and dofhandler
-                                   // objects. set different boundary
-                                   // and sub-domain ids
+  // create tria and dofhandler
+  // objects. set different boundary
+  // and sub-domain ids
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
   tria.refine_global (1);
@@ -70,8 +70,8 @@ check ()
       tria.execute_coarsening_and_refinement ();
     }
 
-				   // produce two copies of the Taylor-Hood
-				   // element
+  // produce two copies of the Taylor-Hood
+  // element
   hp::FECollection<dim> fe;
   fe.push_back (FESystem<dim> (FE_Q<dim>(1), dim, FE_DGQ<dim>(0), 1));
   fe.push_back (FESystem<dim> (FE_Q<dim>(1), dim, FE_DGQ<dim>(0), 1));
@@ -79,14 +79,14 @@ check ()
   hp::DoFHandler<dim> dof_handler (tria);
 
   typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     cell->set_active_fe_index (std::rand() % fe.size());
 
   dof_handler.distribute_dofs (fe);
 
-				   // no grouping
+  // no grouping
   {
     std::vector<types::global_dof_index> dpc(dim+1);
     DoFTools::count_dofs_per_component (dof_handler, dpc);
@@ -100,8 +100,8 @@ check ()
   }
 
 
-				   // grouping into less groups than
-				   // components
+  // grouping into less groups than
+  // components
   {
     std::vector<unsigned int> group(dim+1, 0);
     group[dim] = 1;
@@ -120,8 +120,8 @@ check ()
     print (dpc);
   }
 
-				   // grouping into more groups than
-				   // components
+  // grouping into more groups than
+  // components
   {
     std::vector<unsigned int> group(dim+1, 2*dim);
     group[dim] = 0;

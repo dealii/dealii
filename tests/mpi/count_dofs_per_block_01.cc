@@ -43,11 +43,11 @@ template<int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>
-    triangulation (MPI_COMM_WORLD,
-		   Triangulation<dim>::limit_level_difference_at_vertices);
+  triangulation (MPI_COMM_WORLD,
+                 Triangulation<dim>::limit_level_difference_at_vertices);
 
   FESystem<dim> fe (FE_Q<dim>(3),2,
-		    FE_DGQ<dim>(1),1);
+                    FE_DGQ<dim>(1),1);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global (4);

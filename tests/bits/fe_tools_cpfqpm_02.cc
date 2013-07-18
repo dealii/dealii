@@ -39,38 +39,38 @@ void
 check_this (const FiniteElement<dim> &fe,
             const FiniteElement<dim> &/*fe2*/)
 {
-                                   // only check if both elements have
-                                   // support points. otherwise,
-                                   // interpolation doesn't really
-                                   // work
+  // only check if both elements have
+  // support points. otherwise,
+  // interpolation doesn't really
+  // work
   if (fe.n_components() != 1)
     return;
 
-                                   // ignore this check if this fe has already
-                                   // been treated
+  // ignore this check if this fe has already
+  // been treated
   static std::set<std::string> already_checked;
   if (already_checked.find(fe.get_name()) != already_checked.end())
     return;
   already_checked.insert (fe.get_name());
-  
 
-                                   // test with the same quadrature formulas
-                                   // of a degree that is high enough to
-                                   // exactly capture the data
+
+  // test with the same quadrature formulas
+  // of a degree that is high enough to
+  // exactly capture the data
   QGauss<dim> q_lhs(fe.degree+1);
   QGauss<dim> q_rhs(fe.degree+1);
 
-                                   // this test can only succeed if there are
-                                   // at least as many degrees of freedom in
-                                   // the finite element as there are
-                                   // quadrature points
+  // this test can only succeed if there are
+  // at least as many degrees of freedom in
+  // the finite element as there are
+  // quadrature points
   if (fe.dofs_per_cell < q_rhs.size())
     return;
 
   deallog << "dofs_per_cell=" << fe.dofs_per_cell
           << ", n_q_points=" << q_rhs.size()
           << std::endl;
-  
+
   FullMatrix<double> X (fe.dofs_per_cell,
                         q_rhs.size());
 
@@ -78,9 +78,9 @@ check_this (const FiniteElement<dim> &fe,
                                                              q_lhs, q_rhs,
                                                              X);
 
-                                   // then compute the matrix that
-                                   // interpolates back to the quadrature
-                                   // points
+  // then compute the matrix that
+  // interpolates back to the quadrature
+  // points
   FullMatrix<double> I_q (q_rhs.size(), fe.dofs_per_cell);
   FETools::compute_interpolation_to_quadrature_points_matrix (fe, q_rhs,
                                                               I_q);
@@ -89,9 +89,9 @@ check_this (const FiniteElement<dim> &fe,
                               q_rhs.size());
   I_q.mmult (product, X);
 
-                                   // the product should be the identity
-                                   // matrix now. make sure that this is
-                                   // indeed the case
+  // the product should be the identity
+  // matrix now. make sure that this is
+  // indeed the case
   for (unsigned int i=0; i<product.m(); ++i)
     product(i,i) -= 1;
 

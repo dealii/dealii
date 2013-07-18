@@ -18,7 +18,7 @@
 
 // check has_support_on_face for some elements
 //
-// this program is a modified version of one by Roy Stogner, 
+// this program is a modified version of one by Roy Stogner,
 // University of Texas at Austin
 
 #include "../tests.h"
@@ -32,20 +32,21 @@
 
 
 template <int dim>
-void check (const FiniteElement<dim> &fe) {
-    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-         face++)
-      for (unsigned int i = 0; i < fe.dofs_per_cell; i++)
-        if (fe.has_support_on_face(i, face))
-          deallog << "Basis function " << i
-                  << " has support on face " << face << std::endl;
+void check (const FiniteElement<dim> &fe)
+{
+  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+       face++)
+    for (unsigned int i = 0; i < fe.dofs_per_cell; i++)
+      if (fe.has_support_on_face(i, face))
+        deallog << "Basis function " << i
+                << " has support on face " << face << std::endl;
 }
 
 
 #define check_el(fe) { deallog << #fe << std::endl; check(fe); }
 
 template <int dim>
-void check () 
+void check ()
 {
   deallog << "************ dim = " << dim << std::endl;
   check_el (FE_Q<dim>(1));
@@ -73,7 +74,7 @@ void check ()
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("roy_1/output");
   deallog.attach(logfile);
@@ -82,7 +83,7 @@ int main ()
 
 //  check<1> ();
   check<2> ();
-//  check<3> ();  
-  
+//  check<3> ();
+
   return 0;
 }

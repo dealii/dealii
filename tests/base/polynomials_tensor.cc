@@ -32,8 +32,8 @@
 using namespace std;
 
 template<int dim, class POLY>
-void check_point (const Point<dim>& x,
-		  const POLY& p)
+void check_point (const Point<dim> &x,
+                  const POLY &p)
 {
   const unsigned int n = p.n();
   std::vector<Tensor<1,dim> > values(n);
@@ -41,17 +41,17 @@ void check_point (const Point<dim>& x,
   std::vector<Tensor<3,dim> > seconds(0);
 
   p.compute(x, values, gradients, seconds);
-  
+
   deallog << "Point " << x << std::endl;
-  for (unsigned int i=0;i<n;++i)
+  for (unsigned int i=0; i<n; ++i)
     {
       deallog << "p[" << i << "] value ";
-      for (unsigned int d=0;d<dim;++d)
-	deallog << (int) (values[i][d]+.5) << ' ';
+      for (unsigned int d=0; d<dim; ++d)
+        deallog << (int) (values[i][d]+.5) << ' ';
       deallog << " first ";
-      for (unsigned int d1=0;d1<dim;++d1)
-	for (unsigned int d2=0;d2<dim;++d2)
-	  deallog << (int) (gradients[i][d1][d2]+.5) << ' ';
+      for (unsigned int d1=0; d1<dim; ++d1)
+        for (unsigned int d2=0; d2<dim; ++d2)
+          deallog << (int) (gradients[i][d1][d2]+.5) << ' ';
       deallog << std::endl;
     }
 }
@@ -61,17 +61,17 @@ template<int dim>
 void check_bdm ()
 {
   Point<dim> x;
-  
+
   PolynomialsBDM<dim> p1(1);
   PolynomialsBDM<dim> p2(2);
   PolynomialsBDM<dim> p3(3);
   PolynomialsBDM<dim> p4(4);
-  
+
   x(0) = 2.;
   x(1) = 3.;
   if (dim>2)
     x(2) = 4;
-  
+
   check_point(x, p1);
   check_point(x, p2);
   check_point(x, p3);
@@ -82,17 +82,17 @@ template<int dim>
 void check_rt ()
 {
   Point<dim> x;
-  
+
   PolynomialsRaviartThomas<dim> p0(0);
   PolynomialsRaviartThomas<dim> p1(1);
   PolynomialsRaviartThomas<dim> p2(2);
   PolynomialsRaviartThomas<dim> p3(3);
-  
+
   x(0) = 2.;
   x(1) = 3.;
   if (dim>2)
     x(2) = 4;
-  
+
   check_point(x, p0);
   check_point(x, p1);
   check_point(x, p2);

@@ -35,9 +35,9 @@
 unsigned int count_wrong_faces (const Triangulation<3> &tria)
 {
   unsigned int count = 0;
-  
-                                   // count faces with "wrong"
-                                   // orientation
+
+  // count faces with "wrong"
+  // orientation
   for (Triangulation<3>::active_cell_iterator cell=tria.begin_active();
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
@@ -46,7 +46,7 @@ unsigned int count_wrong_faces (const Triangulation<3> &tria)
   return count;
 }
 
-  
+
 
 void check (Triangulation<3> &tria)
 {
@@ -59,7 +59,7 @@ void check (Triangulation<3> &tria)
       Assert (count == initial_count * (4<<(2*r)),
               ExcInternalError());
     }
-  
+
   {
     coarsen_global (tria);
     const unsigned int count = count_wrong_faces (tria);
@@ -67,7 +67,7 @@ void check (Triangulation<3> &tria)
     Assert (count == initial_count * (4<<(2*1)),
             ExcInternalError());
   }
-  
+
   {
     tria.refine_global (1);
     const unsigned int count = count_wrong_faces (tria);
@@ -77,34 +77,34 @@ void check (Triangulation<3> &tria)
   }
 }
 
-  
 
-int main () 
+
+int main ()
 {
   std::ofstream logfile("mesh_3d_4/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<3> coarse_grid;
     create_two_cubes (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     create_L_shape (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     check (coarse_grid);
   }
-  
+
 }
 
-  
-  
+
+

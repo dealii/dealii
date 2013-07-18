@@ -45,18 +45,19 @@
 
 void check (Triangulation<2> &tria)
 {
-  for(unsigned i=0; i<tria.n_vertices(); i++)
+  for (unsigned i=0; i<tria.n_vertices(); i++)
     {
       std::vector<Triangulation<2>::active_cell_iterator>
-	cells = GridTools::find_cells_adjacent_to_vertex(tria, i);
+      cells = GridTools::find_cells_adjacent_to_vertex(tria, i);
 
       deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": " << cells.size() << " cells" << std::endl;
 
-      for(unsigned c=0; c<cells.size(); c++) {
-	for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-	  deallog << "<" << cells[c]->vertex(v) << "> ";
-	deallog << std::endl;
-      }
+      for (unsigned c=0; c<cells.size(); c++)
+        {
+          for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+            deallog << "<" << cells[c]->vertex(v) << "> ";
+          deallog << std::endl;
+        }
     }
 }
 
@@ -79,7 +80,7 @@ int main ()
     }
   catch (const std::exception &exc)
     {
-				       // we shouldn't get here...
+      // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
       deallog << exc.what() << std::endl;
     }

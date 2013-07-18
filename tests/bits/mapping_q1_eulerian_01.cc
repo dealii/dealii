@@ -64,23 +64,23 @@ using namespace dealii;
 template <int dim>
 class Displacement : public Function<dim>
 {
-  public:
-    Displacement() :
-		    Function<dim>(dim)
-      {}
+public:
+  Displacement() :
+    Function<dim>(dim)
+  {}
 
-    double value (const Point<dim> &p,
-		  const unsigned int component) const
-      {
-	return p[component];
-      }
+  double value (const Point<dim> &p,
+                const unsigned int component) const
+  {
+    return p[component];
+  }
 
-    void vector_value (const Point<dim> &p,
-		       Vector<double> &v) const
-      {
-	for (unsigned int i=0; i<dim; ++i)
-	  v(i) = p[i];
-      }
+  void vector_value (const Point<dim> &p,
+                     Vector<double> &v) const
+  {
+    for (unsigned int i=0; i<dim; ++i)
+      v(i) = p[i];
+  }
 };
 
 
@@ -99,17 +99,17 @@ void test ()
   Vector<double> displacements (dof_handler.n_dofs());
 
   VectorTools::interpolate (dof_handler,
-			    Displacement<dim>(),
-			    displacements);
+                            Displacement<dim>(),
+                            displacements);
 
   MappingQ1Eulerian<dim> euler(displacements, dof_handler);
-				   // now the actual test
+  // now the actual test
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   std::vector<std::string> names (dim, "displacement");
   data_out.add_data_vector(displacements,names);
 
-  				   // output with all cells curved
+  // output with all cells curved
   data_out.build_patches(euler,1,DataOut<dim>::curved_inner_cells);
   data_out.write_gnuplot(deallog.get_file_stream());
 }

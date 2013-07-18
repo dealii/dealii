@@ -65,28 +65,28 @@ void test()
   cm1.close();
   ConstraintMatrix cm2;
   cm2.close();
-  
+
   IndexSet  dof1_locally_owned_dofs = dofh1.locally_owned_dofs();
   IndexSet  dof2_locally_owned_dofs = dofh2.locally_owned_dofs();
   IndexSet  dof1_locally_relevant_dofs;
   IndexSet  dof2_locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs (dofh2,
-					   dof2_locally_relevant_dofs);
+                                           dof2_locally_relevant_dofs);
   DoFTools::extract_locally_relevant_dofs (dofh1,
-					   dof1_locally_relevant_dofs);
-  
+                                           dof1_locally_relevant_dofs);
+
   PETScWrappers::MPI::Vector u1(dof1_locally_owned_dofs, dof1_locally_relevant_dofs, MPI_COMM_WORLD);
 
   PETScWrappers::MPI::Vector out(dof1_locally_owned_dofs, MPI_COMM_WORLD);
 
   FETools::interpolation_difference
-    (dofh1, cm1, u1, dofh2, cm2, out);
+  (dofh1, cm1, u1, dofh2, cm2, out);
 
   double norm = out.l2_norm();
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "norm = " << norm
-	    << std::endl;
+            << std::endl;
 }
 
 
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
       deallog.pop();
 
       deallog.push("3d");
-				       //    test<3>();
+      //    test<3>();
       deallog.pop();
     }
   else

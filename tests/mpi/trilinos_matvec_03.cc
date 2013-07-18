@@ -54,16 +54,16 @@ void test ()
       // col_partitioning should be { [0, 2), [2, n_cols) }
       // col_relevant_set should be { [0, 3), [1, n_cols) }
       if (my_id == 0)
-	{
-	  row_partitioning.add_range(0, n_rows);
-	  col_partitioning.add_range(0, n_cols);
-	}
+        {
+          row_partitioning.add_range(0, n_rows);
+          col_partitioning.add_range(0, n_cols);
+        }
     }
   else
     Assert (false, ExcNotImplemented());
 
   TrilinosWrappers::SparsityPattern sp (row_partitioning,
-					col_partitioning, MPI_COMM_WORLD);
+                                        col_partitioning, MPI_COMM_WORLD);
   if (my_id == 0)
     {
       sp.add (0, 0);
@@ -88,8 +88,8 @@ void test ()
   y.reinit (row_partitioning, MPI_COMM_WORLD);
 
   parallel::distributed::Vector<double>
-    dx (col_partitioning, col_partitioning, MPI_COMM_WORLD),
-    dy (row_partitioning, row_partitioning, MPI_COMM_WORLD);
+  dx (col_partitioning, col_partitioning, MPI_COMM_WORLD),
+  dy (row_partitioning, row_partitioning, MPI_COMM_WORLD);
 
   for (unsigned int i=0; i<col_partitioning.n_elements(); ++i)
     {
@@ -102,8 +102,8 @@ void test ()
   A.vmult (y, x);
   A.vmult (dy, dx);
 
-				// compare whether we got the same result
-				// (should be no roundoff difference)
+  // compare whether we got the same result
+  // (should be no roundoff difference)
   for (unsigned int i=0; i<row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
@@ -113,8 +113,8 @@ void test ()
   A.vmult_add (y, x);
   A.vmult_add (dy, dx);
 
-				// compare whether we got the same result
-				// (should be no roundoff difference)
+  // compare whether we got the same result
+  // (should be no roundoff difference)
   for (unsigned int i=0; i<row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);

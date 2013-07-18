@@ -43,10 +43,10 @@ using namespace std;
 template <int dim, typename number, int spacedim>
 void
 reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
-	       MGLevelObject<dealii::Vector<number> > &v)
+               MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.min_level();
-       level<=v.max_leve();++level)
+       level<=v.max_leve(); ++level)
     {
       unsigned int n = mg_dof.n_dofs (level);
       v[level].reinit(n);
@@ -58,8 +58,8 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 template <typename Transfer>
 void
 make_matrix (const Transfer &transfer,
-	     const unsigned int high_level,
-	     FullMatrix<double> &matrix)
+             const unsigned int high_level,
+             FullMatrix<double> &matrix)
 {
   Vector<double> src (matrix.n());
   Vector<double> dst (matrix.m());
@@ -69,7 +69,7 @@ make_matrix (const Transfer &transfer,
       src(i) = 1;
       transfer.prolongate (high_level, dst, src);
       for (unsigned int j=0; j<dst.size(); ++j)
-	matrix(j,i) = dst(j);
+        matrix(j,i) = dst(j);
     }
 }
 
@@ -80,7 +80,7 @@ void print_matrix (const FullMatrix<double> &m)
   for (unsigned int i=0; i<m.m(); ++i)
     {
       for (unsigned int j=0; j<m.n(); ++j)
-	deallog << m(i,j) << ' ';
+        deallog << m(i,j) << ' ';
       deallog << std::endl;
     }
 }
@@ -89,7 +89,7 @@ void print_matrix (const FullMatrix<double> &m)
 
 
 template <int dim>
-void check (const FiniteElement<dim>& fe)
+void check (const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -106,18 +106,18 @@ void check (const FiniteElement<dim>& fe)
 
   MGTransferSelect<double> transfer;
 
-				   // group all components into one
-				   // block, and do the transfer
-				   // matrices on this block
+  // group all components into one
+  // block, and do the transfer
+  // matrices on this block
   transfer.build_matrices(mg_dof_handler, mg_dof_handler,
-			  0, 0,
-			  std::vector<unsigned int>(2, 0U),
-			  std::vector<unsigned int>(2, 0U));
+                          0, 0,
+                          std::vector<unsigned int>(2, 0U),
+                          std::vector<unsigned int>(2, 0U));
 
   FullMatrix<double> prolong_0_1 (mg_dof_handler.n_dofs(1),
-				  mg_dof_handler.n_dofs(0));
+                                  mg_dof_handler.n_dofs(0));
   FullMatrix<double> prolong_1_2 (mg_dof_handler.n_dofs(2),
-				  mg_dof_handler.n_dofs(1));
+                                  mg_dof_handler.n_dofs(1));
 
   deallog << "Level 0->1" << std::endl;
   make_matrix (transfer, 1, prolong_0_1);

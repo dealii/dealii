@@ -42,7 +42,7 @@ std::ofstream logfile("number_cache_01/output");
 template <int dim>
 void output (const Triangulation<dim> &tria)
 {
-  
+
   deallog << "  " << tria.n_active_cells() << std::endl;
   deallog << "  " << tria.n_cells() << std::endl;
   deallog << "  " << tria.n_active_lines() << std::endl;
@@ -57,22 +57,22 @@ void output (const Triangulation<dim> &tria)
       deallog << "  " << tria.n_active_cells(i) << std::endl;
       deallog << "  " << tria.n_cells(i) << std::endl;
       if (dim == 1)
-	{
-	  deallog << "  " << tria.n_active_lines(i) << std::endl;
-	  deallog << "  " << tria.n_lines(i) << std::endl;
-	}
-      
+        {
+          deallog << "  " << tria.n_active_lines(i) << std::endl;
+          deallog << "  " << tria.n_lines(i) << std::endl;
+        }
+
       if (dim == 2)
-	{
-	  deallog << "  " << tria.n_active_quads(i) << std::endl;
-	  deallog << "  " << tria.n_quads(i) << std::endl;
-	}
-      
+        {
+          deallog << "  " << tria.n_active_quads(i) << std::endl;
+          deallog << "  " << tria.n_quads(i) << std::endl;
+        }
+
       if (dim == 3)
-	{
-	  deallog << "  " << tria.n_active_hexs(i) << std::endl;
-	  deallog << "  " << tria.n_hexs(i) << std::endl;
-	}
+        {
+          deallog << "  " << tria.n_active_hexs(i) << std::endl;
+          deallog << "  " << tria.n_hexs(i) << std::endl;
+        }
     }
 }
 
@@ -81,10 +81,10 @@ template <int dim>
 void test ()
 {
   deallog << dim << "d" << std::endl;
-  
+
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
-  
+
   output (tria);
 
   deallog << "Refining..." << std::endl;

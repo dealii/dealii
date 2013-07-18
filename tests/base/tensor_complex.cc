@@ -35,19 +35,21 @@ int main ()
   deallog.threshold_double(1.e-10);
 
   double a_double[3][3][2] = {{{1,-1}, {2,0}, {3,0}},
-			      {{3,0}, {4,0}, {5,0}},
-			      {{6,0}, {7,0}, {8,3}}};
+    {{3,0}, {4,0}, {5,0}},
+    {{6,0}, {7,0}, {8,3}}
+  };
   double b_double[3][3][2] = {{{24,-2}, {31,-2}, {37,6}},
-			      {{45,-3}, {57,0},  {69,15}},
-			      {{75,12}, {96,21}, {108,48}}};
+    {{45,-3}, {57,0},  {69,15}},
+    {{75,12}, {96,21}, {108,48}}
+  };
 
   const unsigned int dim=3;
   std::complex<double> a[dim][dim], b[dim][dim];
   for (unsigned int d=0; d<dim; ++d)
     for (unsigned int e=0; e<dim; ++e)
       {
-	a[d][e] = std::complex<double>(a_double[d][e][0],a_double[d][e][1]);
-	b[d][e] = std::complex<double>(b_double[d][e][0],b_double[d][e][1]);
+        a[d][e] = std::complex<double>(a_double[d][e][0],a_double[d][e][1]);
+        b[d][e] = std::complex<double>(b_double[d][e][0],b_double[d][e][1]);
       }
 
   Tensor<2,dim,std::complex<double> > t(a);
@@ -58,11 +60,11 @@ int main ()
 
   Vector<std::complex<double> > unrolled(9);
 
-				// cast result to double to profit from zero
-				// threshold and so on
+  // cast result to double to profit from zero
+  // threshold and so on
   t.unroll(unrolled);
   deallog << "unrolled:";
-  for (unsigned i=0;i<9;i++)
+  for (unsigned i=0; i<9; i++)
     deallog << ' ' << unrolled(i);
   deallog << std::endl;
 
@@ -70,7 +72,7 @@ int main ()
   for (unsigned int i=0; i<dim; ++i)
     {
       for (unsigned int j=0; j<dim; ++j)
-	deallog << t[i][j] << ' ';
+        deallog << t[i][j] << ' ';
       deallog << std::endl;
     };
 
@@ -82,7 +84,7 @@ int main ()
   for (unsigned int i=0; i<dim; ++i)
     {
       for (unsigned int j=0; j<dim; ++j)
-	deallog << tt[i][j] << ' ';
+        deallog << tt[i][j] << ' ';
       deallog << std::endl;
     };
 
@@ -98,18 +100,18 @@ int main ()
       Tensor<1,3,std::complex<double> > result;
       cross_product(result,e1,e2);
       deallog << '\t' << result[0]
-	      << '\t' << result[1]
-	      << '\t' << result[2] << std::endl;
+              << '\t' << result[1]
+              << '\t' << result[2] << std::endl;
 
       cross_product(result,e2,e3);
       deallog << '\t' << result[0]
-	      << '\t' << result[1] << '\t'
-	      << result[2] << std::endl;
+              << '\t' << result[1] << '\t'
+              << result[2] << std::endl;
 
       cross_product(result,e3,e1);
       deallog << '\t' << result[0]
-	      << '\t' << result[1]
-	      << '\t' << result[2] << std::endl;
+              << '\t' << result[1]
+              << '\t' << result[2] << std::endl;
 
       deallog.pop();
     }

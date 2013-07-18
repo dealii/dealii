@@ -43,7 +43,7 @@ void test ()
 
   FE_Q<dim> fe (fe_degree);
 
-                                // setup DoFs
+  // setup DoFs
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   dof.distribute_mg_dofs(fe);
@@ -57,7 +57,7 @@ void test ()
   //std::cout << "Number of cells: " << dof.get_tria().n_active_cells() << std::endl;
   //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
-                                // set up MatrixFree
+  // set up MatrixFree
   QGauss<1> quad (fe_degree+1);
   MatrixFree<dim> mf_data;
   mf_data.reinit (dof, constraints, quad);
@@ -71,7 +71,7 @@ void test ()
   }
   system_matrix.reinit (sparsity);
 
-                                // setup MG levels
+  // setup MG levels
   const unsigned int nlevels = tria.n_levels();
   typedef MatrixFree<dim> MatrixFreeTestType;
   MGLevelObject<MatrixFreeTestType>    mg_matrices;
@@ -88,7 +88,7 @@ void test ()
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
   std::vector<std::set<types::global_dof_index> > boundary_indices(nlevels);
   MGTools::make_boundary_list (dof, dirichlet_boundary, boundary_indices);
-  for (unsigned int level=0;level<nlevels;++level)
+  for (unsigned int level=0; level<nlevels; ++level)
     {
       std::set<types::global_dof_index>::iterator bc_it = boundary_indices[level].begin();
       for ( ; bc_it != boundary_indices[level].end(); ++bc_it)
@@ -105,9 +105,9 @@ void test ()
       mg_ref_matrices[level].reinit (mg_sparsities[level]);
     }
 
-                                // assemble sparse matrix with (\nabla v,
-                                // \nabla u) + (v, 10 * u) on the actual
-                                // discretization and on all levels
+  // assemble sparse matrix with (\nabla v,
+  // \nabla u) + (v, 10 * u) on the actual
+  // discretization and on all levels
   {
     QGauss<dim> quad (fe_degree+1);
     FEValues<dim> fe_values (fe, quad,
@@ -119,8 +119,8 @@ void test ()
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof.begin_active(),
-      endc = dof.end();
+    cell = dof.begin_active(),
+    endc = dof.end();
     for (; cell!=endc; ++cell)
       {
         cell_matrix = 0;
@@ -144,8 +144,8 @@ void test ()
 
     // now to the MG assembly
     typename DoFHandler<dim>::cell_iterator
-      cellm = dof.begin(),
-      endcm = dof.end();
+    cellm = dof.begin(),
+    endcm = dof.end();
     for (; cellm!=endcm; ++cellm)
       {
         cell_matrix = 0;
@@ -163,14 +163,14 @@ void test ()
             }
         cellm->get_mg_dof_indices (local_dof_indices);
         mg_constraints[cellm->level()]
-          .distribute_local_to_global (cell_matrix,
-                                       local_dof_indices,
-                                       mg_ref_matrices[cellm->level()]);
+        .distribute_local_to_global (cell_matrix,
+                                     local_dof_indices,
+                                     mg_ref_matrices[cellm->level()]);
       }
   }
 
-                                // fill a right hand side vector with random
-                                // numbers in unconstrained degrees of freedom
+  // fill a right hand side vector with random
+  // numbers in unconstrained degrees of freedom
   Vector<double> src (dof.n_dofs());
   Vector<double> result_spmv(src), result_mf (src);
 
@@ -180,8 +180,8 @@ void test ()
         src(i) = (double)rand()/RAND_MAX;
     }
 
-                                // now perform matrix-vector product and check
-                                // its correctness
+  // now perform matrix-vector product and check
+  // its correctness
   system_matrix.vmult (result_spmv, src);
   MatrixFreeTest<dim,fe_degree,double> mf (mf_data);
   mf.vmult (result_mf, src);
@@ -201,15 +201,15 @@ void test ()
             src(i) = (double)rand()/RAND_MAX;
         }
 
-                                // now perform matrix-vector product and check
-                                // its correctness
+      // now perform matrix-vector product and check
+      // its correctness
       mg_ref_matrices[level].vmult (result_spmv, src);
       MatrixFreeTest<dim,fe_degree,double> mf_lev (mg_matrices[level]);
       mf_lev.vmult (result_mf, src);
 
       result_mf -= result_spmv;
       const double diff_norm = result_mf.linfty_norm();
-      deallog << "Norm of difference MG level " << level  
+      deallog << "Norm of difference MG level " << level
               << ": " << diff_norm << std::endl;
     }
   deallog << std::endl;

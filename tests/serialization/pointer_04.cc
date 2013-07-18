@@ -31,52 +31,52 @@ int object_number = 1;
 
 class C
 {
-  public:
-    C ()
-      {
-	object_number = ::object_number++;
-	deallog << "Default constructor. Object number "
-		<< object_number
-		<< std::endl;
-      }
+public:
+  C ()
+  {
+    object_number = ::object_number++;
+    deallog << "Default constructor. Object number "
+            << object_number
+            << std::endl;
+  }
 
-    C (const C&)
-      {
-	object_number = ::object_number++;
-	deallog << "copy constructor. Object number "
-		<< object_number
-		<< std::endl;
-      }
+  C (const C &)
+  {
+    object_number = ::object_number++;
+    deallog << "copy constructor. Object number "
+            << object_number
+            << std::endl;
+  }
 
-    ~C ()
-      {
-	deallog << "destructor. Object number "
-		<< object_number
-		<< std::endl;
-      }
-    
-    template <typename Archive>
-    void serialize (Archive &ar, const unsigned int version)
-      {
-	deallog << "Serializing object number "
-		<< object_number
-		<< " via " << typeid(Archive).name()
-		<< std::endl;
-      }
+  ~C ()
+  {
+    deallog << "destructor. Object number "
+            << object_number
+            << std::endl;
+  }
 
-    bool operator == (const C &) const
-      {
-	return true;
-      }
+  template <typename Archive>
+  void serialize (Archive &ar, const unsigned int version)
+  {
+    deallog << "Serializing object number "
+            << object_number
+            << " via " << typeid(Archive).name()
+            << std::endl;
+  }
 
-  private:
-    unsigned int object_number;
+  bool operator == (const C &) const
+  {
+    return true;
+  }
+
+private:
+  unsigned int object_number;
 };
 
 
 template <typename T>
-bool compare (const std::pair<T*,T*> &t1,
-	      const std::pair<T*,T*> &t2)
+bool compare (const std::pair<T *,T *> &t1,
+              const std::pair<T *,T *> &t2)
 {
   return (*t1.first == *t2.first) && (*t1.second == *t2.second);
 }
@@ -86,25 +86,25 @@ void test ()
 {
   {
     C c;
-    std::pair<C*,C*> pair_1 (&c, &c);
-    std::pair<C*,C*> pair_2;
-  
+    std::pair<C *,C *> pair_1 (&c, &c);
+    std::pair<C *,C *> pair_2;
+
     verify (pair_1, pair_2);
 
-				     // boost::serialize should have
-				     // recognized that the two pointers in
-				     // pair_1 point to the same object and
-				     // consequently re-create only one object
-				     // that the two components of the
-				     // re-created pair point to
+    // boost::serialize should have
+    // recognized that the two pointers in
+    // pair_1 point to the same object and
+    // consequently re-create only one object
+    // that the two components of the
+    // re-created pair point to
     Assert (pair_2.first == pair_2.second, ExcInternalError());
     Assert (object_number == 3, ExcInternalError());
 
-				     // destroy the newly created object. this
-				     // must succeed and would likely throw
-				     // some sort of error if the object
-				     // pointed to was on the stack (like 'c')
-				     // rather than on the heap
+    // destroy the newly created object. this
+    // must succeed and would likely throw
+    // some sort of error if the object
+    // pointed to was on the stack (like 'c')
+    // rather than on the heap
     delete pair_2.first;
   }
 }

@@ -36,22 +36,22 @@ std::ofstream logfile("grid_tools_02/output");
 template <int dim>
 void test1 ()
 {
-				   // test 1: hypercube
+  // test 1: hypercube
   if (true)
     {
       Triangulation<dim,dim+1> tria;
       GridGenerator::hyper_cube(tria);
 
       for (unsigned int i=0; i<2; ++i)
-	{
-	  tria.refine_global(2);
-	  deallog << dim << "d, "
-		  << "hypercube diameter, "
-		  << i*2
-		  << " refinements: "
-		  << GridTools::diameter (tria)
-		  << std::endl;
-	}
+        {
+          tria.refine_global(2);
+          deallog << dim << "d, "
+                  << "hypercube diameter, "
+                  << i*2
+                  << " refinements: "
+                  << GridTools::diameter (tria)
+                  << std::endl;
+        }
     }
 }
 

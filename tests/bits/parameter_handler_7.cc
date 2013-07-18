@@ -49,35 +49,35 @@ int main ()
                          "docs 3");
       prm.leave_subsection ();
 
-                                       // read and then write
-                                       // parameters. take same input file
-                                       // as for parameter_handler_3, but
-                                       // use different output format
+      // read and then write
+      // parameters. take same input file
+      // as for parameter_handler_3, but
+      // use different output format
       prm.read_input("parameter_handler_3/prm");
       prm.print_parameters (logfile, ParameterHandler::Description);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
 
       return 1;
     }
   catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 

@@ -32,7 +32,7 @@
 
 
 bool predicate (const Point<3> &p,
-		const double    diameter)
+                const double    diameter)
 {
   return ((p[0]-.2)*(p[0]-.2) + (p[2]-p[1]/4)*(p[2]-p[1]/4) < diameter * diameter);
 }
@@ -53,14 +53,14 @@ int main ()
   tria.refine_global(2);
 
   deallog << "n_cells=" << tria.n_active_cells() << std::endl;
-  
-				   // build up a map of vertex indices
-				   // of boundary vertices to the new
-				   // boundary points
+
+  // build up a map of vertex indices
+  // of boundary vertices to the new
+  // boundary points
   std::map<unsigned int,Point<dim> > new_points;
-  
+
   Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),
-					   endc=tria.end();
+                                           endc=tria.end();
 
   for (cell=tria.begin_active(); cell!=endc; ++cell)
     if (predicate(cell->center(), cell->diameter()))
@@ -74,8 +74,8 @@ int main ()
     if (!predicate (cell->center(), cell->diameter()))
       cell->set_coarsen_flag ();
 
-				   // make sure there really are no refinement
-				   // flags set
+  // make sure there really are no refinement
+  // flags set
   tria.prepare_coarsening_and_refinement();
   for (cell=tria.begin_active(); cell!=endc; ++cell)
     Assert (!cell->refine_flag_set(), ExcInternalError());
@@ -83,6 +83,6 @@ int main ()
   tria.execute_coarsening_and_refinement();
 
   deallog << "n_cells=" << tria.n_active_cells() << std::endl;
-  
+
   return 0;
 }

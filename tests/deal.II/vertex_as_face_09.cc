@@ -41,7 +41,7 @@ void test ()
 
   deallog << "n_cells = " << tria.n_active_cells() << std::endl;
   deallog << "n_boundary_ids = " << tria.get_boundary_indicators ().size()
-	  << std::endl;
+          << std::endl;
 }
 
 

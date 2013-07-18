@@ -28,19 +28,19 @@
 
 #include "gla.h"
 
-template <class LA> 
+template <class LA>
 void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-  
+
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
 
   IndexSet block1(10);
   if (numproc==1)
     block1.add_range(0,10);
-  
+
   if (myid==0)
     block1.add_range(0,7);
   if (myid==1)
@@ -49,7 +49,7 @@ void test ()
   IndexSet block2(5);
   if (numproc==1)
     block2.add_range(0,5);
-  
+
   if (myid==0)
     block2.add_range(0,2);
   if (myid==1)
@@ -59,17 +59,17 @@ void test ()
   std::vector<IndexSet> partitioning;
   partitioning.push_back(block1);
   partitioning.push_back(block2);
-  
+
   //LA::MPI::CompressedBlockSparsityPattern sp(partitioning);
   BlockCompressedSimpleSparsityPattern sp(partitioning);
-  for (unsigned int i=0;i<15;++i)
+  for (unsigned int i=0; i<15; ++i)
     {
       sp.add(i,i);
       sp.add(i,1);
     }
   sp.compress();
 
-  typename LA::MPI::BlockSparseMatrix matrix;  
+  typename LA::MPI::BlockSparseMatrix matrix;
   matrix.reinit (partitioning, sp, MPI_COMM_WORLD);
 
   matrix.add(1,1,1.3);
@@ -81,8 +81,8 @@ void test ()
       deallog << "(0,0) = " << matrix(0,0) << std::endl;
       deallog << "(1,1) = " << matrix(1,1) << std::endl;
     }
- 
-				   // done
+
+  // done
   if (myid==0)
     deallog << "OK" << std::endl;
 }
@@ -94,18 +94,18 @@ int main (int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll log(__FILE__);
 
-  {	
+  {
     deallog.push("PETSc");
     test<LA_PETSc>();
-    deallog.pop();	
+    deallog.pop();
     deallog.push("Trilinos");
     test<LA_Trilinos>();
-    deallog.pop();	
+    deallog.pop();
   }
-  
+
   // compile, don't run
   //if (myid==9999)
-    //  test<LA_Dummy>();
-  
+  //  test<LA_Dummy>();
+
 
 }

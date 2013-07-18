@@ -20,7 +20,7 @@
 // PETSc in the way we expect, ie. *a* PETSc object exist.
 
 #include "../tests.h"
-#include <deal.II/lac/slepc_solver.h>    
+#include <deal.II/lac/slepc_solver.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/numbers.h>
 #include <fstream>
@@ -28,7 +28,7 @@
 
 std::ofstream logfile ("00/output");
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   deallog.attach (logfile);
   deallog.depth_console (1);
@@ -36,62 +36,62 @@ int main (int argc,char **argv)
   try
     {
 
-      logfile << "Initializing SLEPc (PETSc): " 
-	      << std::flush;
+      logfile << "Initializing SLEPc (PETSc): "
+              << std::flush;
 
       SlepcInitialize (&argc, &argv, 0, 0);
       {
-	logfile << "ok" 
-		<< std::endl;
+        logfile << "ok"
+                << std::endl;
 
-	// Do something simple with PETSc
-	logfile << "Using PetscScalar:" 
-		<< std::endl;
+        // Do something simple with PETSc
+        logfile << "Using PetscScalar:"
+                << std::endl;
 
-	const PetscScalar pi  = numbers::PI;
-	const PetscScalar two = 2.;
+        const PetscScalar pi  = numbers::PI;
+        const PetscScalar two = 2.;
 
-	logfile << "   pi:           " << pi 
-		<< std::endl
-		<< "   two:          " << two 
-		<< std::endl
-		<< "   two times pi: " << two*pi 
-		<< std::endl;
+        logfile << "   pi:           " << pi
+                << std::endl
+                << "   two:          " << two
+                << std::endl
+                << "   two times pi: " << two *pi
+                << std::endl;
 
-	
-	logfile << "Finalizing SLEPc (PETSc): " 
-		<< std::flush;
+
+        logfile << "Finalizing SLEPc (PETSc): "
+                << std::flush;
 
       }
       SlepcFinalize ();
 
-      logfile << "ok" 
-	      << std::endl << std::endl;
+      logfile << "ok"
+              << std::endl << std::endl;
     }
 
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
 
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

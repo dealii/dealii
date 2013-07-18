@@ -40,7 +40,7 @@ int main ()
   // ensure that the width of the underlying file stream object remained
   // unchanged
   deallog.get_file_stream() << numbers::PI*2 << 42 << std::endl;
-  
+
   return 0;
 }
 

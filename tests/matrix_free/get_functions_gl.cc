@@ -33,20 +33,20 @@ std::ofstream logfile("get_functions_gl/output");
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTestGL : public MatrixFreeTest<dim, fe_degree, fe_degree+1, Number>
 {
- public:
+public:
 
   MatrixFreeTestGL(const MatrixFree<dim,Number> &data,
-               const Mapping<dim>               &mapping):
+                   const Mapping<dim>               &mapping):
     MatrixFreeTest<dim, fe_degree, fe_degree+1, Number>(data, mapping)
   {};
 
   void operator() (const MatrixFree<dim,Number> &data,
-                   Vector<Number>       &,
+                   Vector<Number> &,
                    const Vector<Number> &src,
                    const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluationGL<dim,fe_degree,1,Number> fe_eval (this->data);
-    for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         fe_eval.reinit (cell);
         std::vector<double> reference_values (fe_eval.n_q_points);
@@ -55,8 +55,8 @@ class MatrixFreeTestGL : public MatrixFreeTest<dim, fe_degree, fe_degree+1, Numb
         fe_eval.read_dof_values(src);
         fe_eval.evaluate (true,true,true);
 
-                                // compare values with the ones the FEValues
-                                // gives us. Those are seen as reference
+        // compare values with the ones the FEValues
+        // gives us. Those are seen as reference
         for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
           {
             this->fe_val.reinit (data.get_cell_iterator(cell,j));
@@ -93,7 +93,7 @@ void test ()
   GridGenerator::hyper_ball (tria);
   static const HyperBallBoundary<dim> boundary;
   tria.set_boundary (0, boundary);
-                                // refine first and last cell
+  // refine first and last cell
   tria.begin(tria.n_levels()-1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
@@ -115,10 +115,10 @@ void test ()
 
   Vector<number> solution (dof.n_dofs());
 
-                                // create vector with random entries
+  // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      if(constraints.is_constrained(i))
+      if (constraints.is_constrained(i))
         continue;
       const double entry = rand()/(double)RAND_MAX;
       solution(i) = entry;

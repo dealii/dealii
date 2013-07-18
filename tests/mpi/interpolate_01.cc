@@ -55,8 +55,8 @@ void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
-				   // create a mesh so that all but one
-				   // processor are empty
+  // create a mesh so that all but one
+  // processor are empty
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
   GridGenerator::hyper_cube (tr);
   FE_Q<dim> fe (1);
@@ -69,14 +69,14 @@ void test()
   x.reinit(owned_set, MPI_COMM_WORLD);
 
   VectorTools::interpolate(dofh,
-			   ConstantFunction<dim>(1),
-			   x);
+                           ConstantFunction<dim>(1),
+                           x);
   const double norm = x.l2_norm();
   if (myid == 0)
     deallog << dofh.n_locally_owned_dofs() << ' ' << dofh.n_dofs()
-	    << std::endl
-	    << norm
-	    << std::endl;
+            << std::endl
+            << norm
+            << std::endl;
 }
 
 

@@ -55,7 +55,7 @@ void check_parallelepiped (bool colorize, bool log)
       corners[0] = Point<dim> (0.0, 0.5);
       corners[1] = Point<dim> (0.5, 0.0);
       break;
-      
+
     case 3:
       corners[0] = Point<dim> (0.0, 0.5, 0.5);
       corners[1] = Point<dim> (0.5, 0.0, 0.5);
@@ -65,10 +65,10 @@ void check_parallelepiped (bool colorize, bool log)
     default:
       Assert (false, ExcInternalError ());
     }
-  
+
   Triangulation<dim> triangulation;
   GridGenerator::parallelepiped (triangulation, corners, colorize);
-  
+
   GridOut grid_out;
 
   if (log)
@@ -82,7 +82,7 @@ void check_parallelepiped (bool colorize, bool log)
 
 int main ()
 {
-  // Check parallelepiped 
+  // Check parallelepiped
   check_parallelepiped<1> (false, true);
   check_parallelepiped<2> (false, true);
   check_parallelepiped<3> (true,  true);

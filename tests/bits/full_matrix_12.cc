@@ -32,7 +32,7 @@ check ()
 {
   FullMatrix<number> m(3,3);
   deallog << m.all_zero() << std::endl;
-  
+
   make_matrix (m);
   deallog << m.all_zero() << std::endl;
 }

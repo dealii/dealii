@@ -40,19 +40,19 @@
 
 
 template<int dim>
-void test (const Triangulation<dim>& tr,
-	   const FiniteElement<dim>& fe)
+void test (const Triangulation<dim> &tr,
+           const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   deallog << "FE=" << fe.get_name()
-	  << std::endl;
+          << std::endl;
 
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature, update_hessians);
 
-					   // we used to fail here
+  // we used to fail here
   fe_values.reinit (dof.begin_active());
 
   deallog << "OK" << std::endl;

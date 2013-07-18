@@ -41,7 +41,7 @@
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_cell; ++i)
     {
@@ -50,27 +50,27 @@ void test(std::ostream& /*out*/)
       GridGenerator::hyper_cube(tr);
 
       deallog << i << ' ' << tr.n_active_cells()
-	      << std::endl;
+              << std::endl;
 
       tr.refine_global (1);
 
       deallog << i << ' ' << tr.n_active_cells()
-	      << std::endl;
+              << std::endl;
 
       Assert (tr.n_active_cells() == 8,
-	      ExcInternalError());
+              ExcInternalError());
 
       typename Triangulation<dim>::active_cell_iterator
-	cell = tr.begin_active();
+      cell = tr.begin_active();
       std::advance (cell, i);
       cell->set_refine_flag();
       tr.execute_coarsening_and_refinement ();
 
       deallog << i << ' ' << tr.n_active_cells()
-	      << std::endl;
+              << std::endl;
 
       Assert (tr.n_active_cells() == 15,
-	      ExcInternalError());
+              ExcInternalError());
     }
 }
 

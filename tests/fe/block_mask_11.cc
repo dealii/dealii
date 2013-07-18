@@ -47,15 +47,15 @@ void test ()
   BlockMask m2(v2);
   BlockMask m = m1 | m2;
 
-				   // verify equality
+  // verify equality
   Assert (m == BlockMask(v),
-	  ExcInternalError());
+          ExcInternalError());
   Assert (!(m == m1),
-	  ExcInternalError());
+          ExcInternalError());
   Assert (!(m == BlockMask(v1)),
-	  ExcInternalError());
+          ExcInternalError());
   Assert (!(m == BlockMask(v2)),
-	  ExcInternalError());
+          ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

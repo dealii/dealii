@@ -52,7 +52,7 @@ void test()
     deallog << "hyper_cube" << std::endl;
 
   std::string filename =
-      (std::string("p4est_save_02/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat");
+    (std::string("p4est_save_02/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat");
   {
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -60,13 +60,13 @@ void test()
 
     tr.refine_global(2);
     for (typename Triangulation<dim>::active_cell_iterator
-	   cell = tr.begin_active();
-	 cell != tr.end(); ++cell)
+         cell = tr.begin_active();
+         cell != tr.end(); ++cell)
       if (!cell->is_ghost() && !cell->is_artificial())
-	if (cell->center().norm() < 0.3)
-	  {
-	    cell->set_refine_flag();
-	  }
+        if (cell->center().norm() < 0.3)
+          {
+            cell->set_refine_flag();
+          }
 
     tr.execute_coarsening_and_refinement ();
 
@@ -85,30 +85,30 @@ void test()
 
     parallel::distributed::SolutionTransfer<dim,PETScWrappers::MPI::Vector> soltrans(dh);
 
-    for (unsigned int i=0;i<locally_owned_dofs.n_elements();++i)
+    for (unsigned int i=0; i<locally_owned_dofs.n_elements(); ++i)
       {
-	unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
-	x(idx)=idx;
-	
-//	std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
+        unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
+        x(idx)=idx;
+
+//  std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
       }
 
     x.compress(VectorOperation::insert);
     solution=x;
-    
+
     soltrans.prepare_serialization (solution);
 
     tr.save(filename.c_str());
-  
+
     if (myid == 0)
       {
-	deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
-	deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
+        deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+        deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
       }
     deallog << "Checksum: "
-	    << tr.get_checksum ()
-	    << std::endl;
-  
+            << tr.get_checksum ()
+            << std::endl;
+
   }
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -131,28 +131,28 @@ void test()
     parallel::distributed::SolutionTransfer<dim,PETScWrappers::MPI::Vector> soltrans(dh);
     solution = 2;
     soltrans.deserialize(solution);
-    
-    for (unsigned int i=0;i<locally_owned_dofs.n_elements();++i)
+
+    for (unsigned int i=0; i<locally_owned_dofs.n_elements(); ++i)
       {
-	unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
-	//std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
-	Assert(idx == solution(idx),ExcInternalError());
-	
+        unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
+        //std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
+        Assert(idx == solution(idx),ExcInternalError());
+
       }
 
     double norm = solution.l1_norm();
 
     if (myid == 0)
       {
-	deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
-	deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
+        deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+        deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
       }
     deallog << "Checksum: "
-	    << tr.get_checksum ()
-	    << std::endl;
+            << tr.get_checksum ()
+            << std::endl;
     deallog << "sum: "
-	    << norm
-	    << std::endl;
+            << norm
+            << std::endl;
   }
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)

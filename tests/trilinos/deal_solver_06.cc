@@ -40,8 +40,8 @@
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve( SOLVER& solver, const MATRIX& A,
-	     VECTOR& u, VECTOR& f, const PRECONDITION& P)
+check_solve( SOLVER &solver, const MATRIX &A,
+             VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
@@ -51,7 +51,7 @@ check_solve( SOLVER& solver, const MATRIX& A,
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception& e)
+  catch (std::exception &e)
     {
       deallog << e.what() << std::endl;
     }
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
-                                     // Make matrix
+    // Make matrix
     FDMatrix testproblem(size, size);
     CompressedSimpleSparsityPattern csp (dim, dim);
     testproblem.five_point_structure(csp);

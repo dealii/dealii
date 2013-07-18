@@ -24,9 +24,9 @@
 //
 // this was fixed 2004-04-05, and this test checks that it works
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_vector.h>    
+#include <deal.II/lac/trilinos_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -35,15 +35,15 @@
 void test (TrilinosWrappers::Vector &v,
            TrilinosWrappers::Vector &w)
 {
-                                   // set the first vector
+  // set the first vector
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
 
-                                   // copy elements by reference
+  // copy elements by reference
   for (unsigned int i=0; i<v.size(); ++i)
     w(i) = v(i);
 
-                                   // check that they're equal
+  // check that they're equal
   Assert (v==w, ExcInternalError());
 
   deallog << "OK" << std::endl;
@@ -56,7 +56,7 @@ int main (int argc, char **argv)
   std::ofstream logfile("vector_assign_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -72,25 +72,25 @@ int main (int argc, char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

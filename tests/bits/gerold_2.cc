@@ -41,10 +41,10 @@
 template <int dim>
 class LaplaceProblem
 {
-  public:
-    void run ();
-  private:
-    Triangulation<dim>   triangulation;
+public:
+  void run ();
+private:
+  Triangulation<dim>   triangulation;
 };
 
 
@@ -59,7 +59,7 @@ void LaplaceProblem<dim>::run ()
 
   SparsityPattern cell_connectivity;
   GridTools::get_face_connectivity_of_cells (triangulation,
-					     cell_connectivity);
+                                             cell_connectivity);
   std::vector<types::global_dof_index> permutation(triangulation.n_active_cells());
   SparsityTools::reorder_Cuthill_McKee (cell_connectivity, permutation);
 
@@ -83,24 +83,24 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     }
   catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 

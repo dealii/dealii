@@ -43,7 +43,7 @@ void test ()
   ComponentMask m2(v2);
   ComponentMask m = m1 | m2;
 
-				   // verify equality
+  // verify equality
   for (unsigned int i=0; i<v1.size(); ++i)
     Assert (m[i] == (v1[i] || v2[i]), ExcInternalError());
 

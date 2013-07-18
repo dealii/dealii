@@ -25,14 +25,14 @@
 
 
 int sum (const int begin,
-	 const int end)
+         const int end)
 {
   int s=0;
   for (int i=begin; i<end; ++i)
     s += i;
   return s;
 }
-  
+
 
 int main()
 {

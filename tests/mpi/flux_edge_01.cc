@@ -80,9 +80,9 @@ namespace Step39
     const MappingQ1<dim>      mapping;
     const FiniteElement<dim> &fe;
     DoFHandler<dim>           dof_handler;
-    
+
     IndexSet locally_relevant_set;
-    
+
     TrilinosWrappers::SparseMatrix matrix;
 
     MGLevelObject<TrilinosWrappers::SparseMatrix> mg_matrix;
@@ -112,9 +112,9 @@ namespace Step39
   {
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs (fe);
-    
+
     DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_set);
-    
+
     CompressedSimpleSparsityPattern c_sparsity(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_flux_sparsity_pattern(dof_handler, c_sparsity);
     matrix.reinit(dof_handler.locally_owned_dofs(), c_sparsity, MPI_COMM_WORLD, true);
@@ -126,16 +126,16 @@ namespace Step39
     mg_matrix_dg_up.clear();
     mg_matrix_dg_down.resize(0, n_levels-1);
     mg_matrix_dg_down.clear();
-    
+
     for (unsigned int level=mg_matrix.min_level();
          level<=mg_matrix.max_level(); ++level)
       {
         CompressedSimpleSparsityPattern c_sparsity(dof_handler.n_dofs(level));
         MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
-	mg_matrix[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-				dof_handler.locally_owned_mg_dofs(level),
-				c_sparsity,
-				MPI_COMM_WORLD, true);
+        mg_matrix[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                                dof_handler.locally_owned_mg_dofs(level),
+                                c_sparsity,
+                                MPI_COMM_WORLD, true);
 
         if (level>0)
           {
@@ -143,14 +143,14 @@ namespace Step39
             ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
             MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
 
-	    mg_matrix_dg_up[level].reinit(dof_handler.locally_owned_mg_dofs(level-1),
-					  dof_handler.locally_owned_mg_dofs(level),
-					  ci_sparsity,
-					  MPI_COMM_WORLD, true);
-	    mg_matrix_dg_down[level].reinit(dof_handler.locally_owned_mg_dofs(level-1),
-					    dof_handler.locally_owned_mg_dofs(level),
-					    ci_sparsity,
-					    MPI_COMM_WORLD, true);
+            mg_matrix_dg_up[level].reinit(dof_handler.locally_owned_mg_dofs(level-1),
+                                          dof_handler.locally_owned_mg_dofs(level),
+                                          ci_sparsity,
+                                          MPI_COMM_WORLD, true);
+            mg_matrix_dg_down[level].reinit(dof_handler.locally_owned_mg_dofs(level-1),
+                                            dof_handler.locally_owned_mg_dofs(level),
+                                            ci_sparsity,
+                                            MPI_COMM_WORLD, true);
           }
       }
   }
@@ -166,13 +166,13 @@ namespace Step39
         deallog << "Step " << s << std::endl;
         if (s==0)
           triangulation.refine_global(1);
-	else
-        {
-	  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-	    triangulation.begin_active(triangulation.n_levels()-1)->set_refine_flag();
-	      
-	  triangulation.execute_coarsening_and_refinement ();
-        }
+        else
+          {
+            if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+              triangulation.begin_active(triangulation.n_levels()-1)->set_refine_flag();
+
+            triangulation.execute_coarsening_and_refinement ();
+          }
 
         deallog << "Triangulation "
                 << triangulation.n_active_cells() << " cells, "
@@ -193,10 +193,10 @@ int main(int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   mpi_initlog(__FILE__, true);
-    
+
   using namespace dealii;
   using namespace Step39;
-  
+
   try
     {
       FE_DGQ<2> fe1(0);

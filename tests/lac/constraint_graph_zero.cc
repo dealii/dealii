@@ -37,13 +37,13 @@ void test ()
 
   ConstraintMatrix cm;
 
-				   // a "regular" constraint
+  // a "regular" constraint
   cm.add_line (1);
   cm.add_entry (1, 2, 42.);
 
-				   // a "singular" constraint
+  // a "singular" constraint
   cm.add_line (4);
-  
+
   cm.write_dot (deallog.get_file_stream());
 }
 
@@ -52,12 +52,12 @@ int main ()
 {
   std::ofstream logfile("constraint_graph_zero/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   test ();
-  
+
   deallog << "OK" << std::endl;
 }

@@ -29,8 +29,8 @@ void test ()
 {
   Tensor<2,dim> t;
 
-				   // choose the same symmetric tensor
-				   // as in symmetric_tensor_10
+  // choose the same symmetric tensor
+  // as in symmetric_tensor_10
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       t[i][j] = 1. * rand() / RAND_MAX;
@@ -38,12 +38,12 @@ void test ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       deallog << "A[" << i+1 << ',' << j+1 << "] := " << t[i][j] << ';'
-	      << std::endl;
-  
+              << std::endl;
+
   deallog << determinant(t) << std::endl;
 }
 
-  
+
 
 
 int main ()
@@ -59,6 +59,6 @@ int main ()
   test<6> ();
   test<7> ();
   test<8> ();
-  
+
   deallog << "OK" << std::endl;
 }

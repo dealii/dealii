@@ -31,7 +31,7 @@
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -40,8 +40,8 @@ void test(std::ostream& /*out*/)
   gi.read ("../deal.II/grid_in_3d_02/747.ucd");
 
   deallog << "Checksum: "
-	  << tr.get_checksum ()
-	  << std::endl;
+          << tr.get_checksum ()
+          << std::endl;
 }
 
 

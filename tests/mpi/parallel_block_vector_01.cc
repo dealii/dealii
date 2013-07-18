@@ -36,10 +36,10 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-                                   // each processor from processor 1 to 8
-                                   // owns 2 indices (the other processors do
-                                   // not own any dof), and all processors are
-                                   // ghosting element 1 (the second)
+  // each processor from processor 1 to 8
+  // owns 2 indices (the other processors do
+  // not own any dof), and all processors are
+  // ghosting element 1 (the second)
   IndexSet local_owned(std::min(16U,numproc*2));
   if (myid < 8)
     local_owned.add_range(myid*2,myid*2+2);
@@ -49,7 +49,7 @@ void test ()
 
   parallel::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
 
-                                     // set local values
+  // set local values
   if (myid < 8)
     {
       v(myid*2)=myid*2.0;
@@ -68,7 +68,7 @@ void test ()
     w.block(i) = v;
   w.collect_sizes();
 
-                                // check l2 norm
+  // check l2 norm
   {
     const double l2_norm = w.l2_norm();
     if (myid == 0)
@@ -77,7 +77,7 @@ void test ()
            ExcInternalError());
   }
 
-                                // check l1 norm
+  // check l1 norm
   {
     const double l1_norm = w.l1_norm();
     if (myid == 0)
@@ -86,7 +86,7 @@ void test ()
            ExcInternalError());
   }
 
-                                // check linfty norm
+  // check linfty norm
   {
     const double linfty_norm = w.linfty_norm();
     if (myid == 0)
@@ -95,7 +95,7 @@ void test ()
            ExcInternalError());
   }
 
-                                // check lp norm
+  // check lp norm
   {
     const double lp_norm = w.lp_norm(2.2);
     if (myid == 0)
@@ -105,9 +105,9 @@ void test ()
             ExcInternalError());
   }
 
-                                // check mean value (should be equal to l1
-                                // norm divided by vector size here since we
-                                // have no negative entries)
+  // check mean value (should be equal to l1
+  // norm divided by vector size here since we
+  // have no negative entries)
   {
     const double mean = w.mean_value();
     if (myid == 0)
@@ -116,7 +116,7 @@ void test ()
     Assert (std::fabs (mean * w.size() - w.l1_norm()) < 1e-15,
             ExcInternalError());
   }
-                                // check inner product
+  // check inner product
   {
     const double norm_sqr = w.norm_sqr();
     Assert (std::fabs(w * w - norm_sqr) < 1e-15,
@@ -126,14 +126,14 @@ void test ()
     Assert (std::fabs(w2 * w - norm_sqr) < 1e-15,
             ExcInternalError());
 
-    if(myid<8)
+    if (myid<8)
       w2.block(0).local_element(0) = -1;
     const double inner_prod = w * w2;
     if (myid == 0)
       deallog << "Inner product: " << inner_prod << std::endl;
   }
 
-                                // check operator ==
+  // check operator ==
   {
     parallel::distributed::BlockVector<double> w2 (w);
     bool equal = (w2 == w);
@@ -144,7 +144,7 @@ void test ()
     if (myid == 0)
       deallog << " v!=v2 ? " << not_equal << std::endl;
 
-                                // change v2 on one proc only
+    // change v2 on one proc only
     if (myid == 0)
       w2.block(0).local_element(1) = 2.2212;
 
@@ -155,7 +155,7 @@ void test ()
     if (myid == 0)
       deallog << " v!=v2 ? " << not_equal << std::endl;
 
-                                // reset
+    // reset
     w2 = w;
     equal = (w2 == w);
     if (myid == 0)
@@ -164,7 +164,7 @@ void test ()
     if (myid == 0)
       deallog << " v!=v2 ? " << not_equal << std::endl;
 
-                                // change some value on all procs
+    // change some value on all procs
     if (myid < 8)
       w2.block(1).local_element(0) = -1;
     equal = (w2 == w);
@@ -175,7 +175,7 @@ void test ()
       deallog << " v!=v2 ? " << not_equal << std::endl;
   }
 
-                                // check all_zero
+  // check all_zero
   {
     bool allzero = w.all_zero();
     if (myid == 0)
@@ -186,7 +186,7 @@ void test ()
     if (myid == 0)
       deallog << " v2==0 ? " << allzero << std::endl;
 
-                                // now change one element to nonzero
+    // now change one element to nonzero
     if (myid == 0)
       w2.block(1).local_element(1) = 1;
     allzero = w2.all_zero();
@@ -195,15 +195,15 @@ void test ()
   }
 
 
-                                // check all_non_negative
+  // check all_non_negative
   {
     bool allnonneg = w.is_non_negative();
     if (myid == 0)
       deallog << " v>=0 ? " << allnonneg << std::endl;
     parallel::distributed::BlockVector<double> w2, w3;
 
-                                // vector where all processors have
-                                // non-negative entries
+    // vector where all processors have
+    // non-negative entries
     w2 = w;
     if (myid < 8)
       w2.block(0).local_element(0) = -1;
@@ -211,13 +211,13 @@ void test ()
     if (myid == 0)
       deallog << " v2>=0 ? " << allnonneg << std::endl;
 
-                                // zero vector
+    // zero vector
     w3.reinit (w2);
     allnonneg = w3.is_non_negative();
     if (myid == 0)
       deallog << " v3>=0 ? " << allnonneg << std::endl;
 
-                                // only one processor has non-negative entry
+    // only one processor has non-negative entry
     w3 = w;
     if (myid == 1 || numproc==1)
       w3.block(0).local_element(0) = -1;

@@ -26,12 +26,12 @@ void test ()
 {
   unsigned int n1 = 3;
   double coefficient1 = 5.;
-  
+
   Polynomials::Monomial<double> m1(n1, coefficient1);
 
   unsigned int n2 = 3;
   double coefficient2 = 2.;
-  
+
   Polynomials::Monomial<double> m2(n2, coefficient2);
 
   verify (m1, m2);

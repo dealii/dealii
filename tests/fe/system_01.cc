@@ -44,7 +44,7 @@ check(const FiniteElement<dim> &fe1,
       const FiniteElement<dim> &fe2)
 {
   deallog << fe1.get_name () << " to " << fe2.get_name ()
- 	  << std::endl;
+          << std::endl;
 
   FullMatrix<float> m (fe2.dofs_per_cell,
                        fe1.dofs_per_cell);
@@ -54,25 +54,25 @@ check(const FiniteElement<dim> &fe1,
     {
       for (unsigned int j=0; j<m.n(); ++j)
         deallog << m(i,j) << ' ';
-      
+
       deallog << std::endl;
     }
-  
+
   deallog << std::endl;
 }
 
 
 
 #define CHECK_SYS1(sub1_1,N1_1,sub2_1,N2_1,dim) \
- { FESystem<dim> fe1(sub1_1, N1_1);   \
-   FESystem<dim> fe2(sub2_1, N2_1);   \
-   check(fe1, fe2); \
-   check(fe2, fe1); \
- }
+  { FESystem<dim> fe1(sub1_1, N1_1);   \
+    FESystem<dim> fe2(sub2_1, N2_1);   \
+    check(fe1, fe2); \
+    check(fe2, fe1); \
+  }
 
 #define CHECK_SYS3(sub1,N1,sub2,N2,sub3,N3,dim)   \
- { FESystem<dim> q(sub1, N1, sub2, N2, sub3, N3); \
-   check(q, q); }
+  { FESystem<dim> q(sub1, N1, sub2, N2, sub3, N3); \
+    check(q, q); }
 
 
 int
@@ -80,7 +80,7 @@ main()
 {
   std::ofstream logfile ("system_01/output");
   deallog << std::setprecision(PRECISION);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -106,19 +106,19 @@ main()
              FE_DGQ<3>(3),2,
              3);
 
-                                   // systems in 1d
+  // systems in 1d
   CHECK_SYS3(FE_Q<1>(1),  3,FE_DGQ<1>(3),1,FE_Q<1>(1),3,1);
   CHECK_SYS3(FE_DGQ<1>(2),2,FE_DGQ<1>(2),2,FE_Q<1>(3),3,1);
   CHECK_SYS3(FE_DGQ<1>(3),1,FE_DGQ<1>(3),1,FE_Q<1>(2),3,1);
 
-                                   // systems in 2d
+  // systems in 2d
   CHECK_SYS3(FE_Q<2>(1),  3,FE_DGQ<2>(3),1,FE_Q<2>(1),3,2);
   CHECK_SYS3(FE_DGQ<2>(2),2,FE_DGQ<2>(2),2,FE_Q<2>(3),3,2);
 
-                                   // systems in 3d
+  // systems in 3d
   CHECK_SYS3(FE_Q<3>(1),  3,FE_DGQ<3>(3),1,FE_Q<3>(1),3,3);
 
-                                   // systems of systems  
+  // systems of systems
   CHECK_SYS3((FESystem<2>(FE_Q<2>(1),3)), 3,
              FE_DGQ<2>(3), 1,
              FE_Q<2>(1), 3,

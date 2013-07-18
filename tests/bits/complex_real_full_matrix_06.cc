@@ -37,7 +37,7 @@ check ()
 
   FullMatrix<std::complex<number> > n;
   n = m;
-  
+
   print_matrix (n);
 }
 

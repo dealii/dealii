@@ -33,7 +33,7 @@
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -46,10 +46,10 @@ void test(std::ostream& /*out*/)
     }
   catch (const typename Triangulation<dim>::DistortedCellList &distorted_cells)
     {
-				       // ignore distorted cells
+      // ignore distorted cells
       deallog << distorted_cells.distorted_cells.size()
-	      << " distorted cells after creating mesh."
-	      << std::endl;
+              << " distorted cells after creating mesh."
+              << std::endl;
     }
 
   write_vtk (tr, "2d_coarse_grid_02", "1");

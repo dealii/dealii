@@ -31,8 +31,8 @@ void test()
   unsigned int values[2] = { 1, 2 };
   unsigned int maxima[2];
   Utilities::MPI::max (values,
-		       MPI_COMM_WORLD,
-		       maxima);
+                       MPI_COMM_WORLD,
+                       maxima);
   Assert (maxima[0] == 1, ExcInternalError());
   Assert (maxima[1] == 2, ExcInternalError());
 

@@ -34,45 +34,45 @@ int main ()
 
   ParameterHandler prm;
   prm.declare_entry ("int1",
-		     "1",
-		     Patterns::Integer(),
-		     "doc 1");
+                     "1",
+                     Patterns::Integer(),
+                     "doc 1");
   prm.declare_entry ("int2",
-		     "2",
-		     Patterns::Integer(),
-		     "doc 2");
+                     "2",
+                     Patterns::Integer(),
+                     "doc 2");
   prm.enter_subsection ("ss1");
   {
     prm.declare_entry ("double 1",
-		       "1.234",
-		       Patterns::Double(),
-		       "doc 3");
+                       "1.234",
+                       Patterns::Double(),
+                       "doc 3");
 
     prm.enter_subsection ("ss2");
     {
       prm.declare_entry ("double 2",
-			 "4.321",
-			 Patterns::Double(),
-			 "doc 4");
+                         "4.321",
+                         Patterns::Double(),
+                         "doc 4");
     }
     prm.leave_subsection ();
   }
   prm.leave_subsection ();
 
-				   // things with strange characters
+  // things with strange characters
   prm.enter_subsection ("Testing%testing");
   {
     prm.declare_entry ("string&list",
-		       "< & > ; /",
-		       Patterns::Anything(),
-		       "docs 1");
+                       "< & > ; /",
+                       Patterns::Anything(),
+                       "docs 1");
     prm.declare_entry ("int*int",
-		       "2",
-		       Patterns::Integer());
+                       "2",
+                       Patterns::Integer());
     prm.declare_entry ("double+double",
-		       "6.1415926",
-		       Patterns::Double(),
-		       "docs 3");
+                       "6.1415926",
+                       Patterns::Double(),
+                       "docs 3");
   }
   prm.leave_subsection ();
 

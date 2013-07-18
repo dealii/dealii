@@ -28,23 +28,23 @@ int counter = 10;
 
 struct X
 {
-    Threads::ThreadLocalStorage<int> tls_data;
+  Threads::ThreadLocalStorage<int> tls_data;
 
-    X ()
-		    :
-		    tls_data (42)
-      {}
+  X ()
+    :
+    tls_data (42)
+  {}
 
-    int f ()
-      {
-					 // use TLS::operator=
-	tls_data = counter++;
-					 // access TLS data and have it
-					 // converted to the right data type
-					 // without the need to call
-					 // tls_data.get()
-	return tls_data;
-      }
+  int f ()
+  {
+    // use TLS::operator=
+    tls_data = counter++;
+    // access TLS data and have it
+    // converted to the right data type
+    // without the need to call
+    // tls_data.get()
+    return tls_data;
+  }
 };
 
 
@@ -55,13 +55,13 @@ void test ()
     Threads::Thread<int> t;
     t = Threads::new_thread (&X::f, x);
     Assert (t.return_value() == 10,
-	    ExcInternalError());
+            ExcInternalError());
   }
   {
     Threads::Thread<int> t;
     t = Threads::new_thread (&X::f, x);
     Assert (t.return_value() == 11,
-	    ExcInternalError());
+            ExcInternalError());
   }
 
   Assert (counter == 12, ExcInternalError());

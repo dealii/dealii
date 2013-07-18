@@ -67,10 +67,10 @@ void test()
 
   if (myid == 0)
     deallog <<  "#cells = " << triangulation.n_global_active_cells()
-	    << std::endl;
+            << std::endl;
 
-				// create FE_System and fill in no-normal flux
-				// conditions on boundary 1 (outer)
+  // create FE_System and fill in no-normal flux
+  // conditions on boundary 1 (outer)
   static const FESystem<dim> fe(FE_Q<dim> (1), dim);
   DoFHandler<dim> dofh(triangulation);
   dofh.distribute_dofs (fe);
@@ -78,7 +78,7 @@ void test()
 
   if (myid == 0)
     deallog <<  "#dofs = " << dofh.locally_owned_dofs().size()
-	    << std::endl;
+            << std::endl;
 
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
@@ -90,16 +90,17 @@ void test()
   no_normal_flux_boundaries.insert (0);
   const unsigned int degree = 1;
   VectorTools::compute_no_normal_flux_constraints (dofh, 0,
-						   no_normal_flux_boundaries,
-						   constraints,
-						   MappingQ<dim>(degree));
+                                                   no_normal_flux_boundaries,
+                                                   constraints,
+                                                   MappingQ<dim>(degree));
   constraints.close();
 
   std::string base = output_file_for_mpi("no_flux_constraints_03");
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  { //write the constraintmatrix to a file on each cpu
+  {
+    //write the constraintmatrix to a file on each cpu
     std::string fname = base + "cm_" + Utilities::int_to_string(myid) + ".dot";
     std::ofstream file(fname.c_str());
     constraints.print(file);
@@ -107,48 +108,48 @@ void test()
   MPI_Barrier(MPI_COMM_WORLD);
   sleep(1);
   if (myid==0)
-  {
-	//sort and merge the constraint matrices on proc 0, generate a checksum
-	//and output that into the deallog
-        system((std::string("cat ") + base + "cm_*.dot | sort -n | uniq > " + base + "cm").c_str());
-        system((std::string("md5sum ") + base + "cm > " + base + "cm.check").c_str());
-        {
-          std::ifstream file((base+"cm.check").c_str());
-          std::string str;
-          while (!file.eof())
-            {
-              std::getline(file, str);
-              deallog << str << std::endl;
-            }
-        }
+    {
+      //sort and merge the constraint matrices on proc 0, generate a checksum
+      //and output that into the deallog
+      system((std::string("cat ") + base + "cm_*.dot | sort -n | uniq > " + base + "cm").c_str());
+      system((std::string("md5sum ") + base + "cm > " + base + "cm.check").c_str());
+      {
+        std::ifstream file((base+"cm.check").c_str());
+        std::string str;
+        while (!file.eof())
+          {
+            std::getline(file, str);
+            deallog << str << std::endl;
+          }
+      }
 
-					 // delete the files created
-					 // by processor 0
-	std::remove ((base + "cm").c_str());
-	std::remove ((base + "cm.check").c_str());
-  }
+      // delete the files created
+      // by processor 0
+      std::remove ((base + "cm").c_str());
+      std::remove ((base + "cm.check").c_str());
+    }
 
-				   // remove tmp files again. wait
-				   // till processor 0 has done its
-				   // job with them
+  // remove tmp files again. wait
+  // till processor 0 has done its
+  // job with them
   MPI_Barrier(MPI_COMM_WORLD);
   std::remove ((base + "cm_" + Utilities::int_to_string(myid) + ".dot").c_str());
 
 
-				// print the number of constraints. since
-				// processors might write info in different
-				// orders, copy all numbers to root processor
+  // print the number of constraints. since
+  // processors might write info in different
+  // orders, copy all numbers to root processor
   std::vector<unsigned int> n_constraints_glob (numprocs);
   unsigned int n_constraints = constraints.n_constraints();
   MPI_Gather (&n_constraints, 1, MPI_UNSIGNED,
-	      &n_constraints_glob[0], 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+              &n_constraints_glob[0], 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
   if (myid == 0)
     for (unsigned int i=0; i<numprocs; ++i)
       deallog <<  "#constraints on " << i << ": " << n_constraints_glob[i]
-	      << std::endl;
+              << std::endl;
 
-				// dummy assembly: put 1 in all components of
-				// the vector
+  // dummy assembly: put 1 in all components of
+  // the vector
   TrilinosWrappers::MPI::Vector vector;
   vector.reinit (dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   {
@@ -158,22 +159,22 @@ void test()
     for (unsigned int i=0; i<dofs_per_cell; ++i)
       local_vector(i) = 1.;
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dofh.begin_active(),
-      endc = dofh.end();
+    cell = dofh.begin_active(),
+    endc = dofh.end();
     for (; cell!=endc; ++cell)
       if (cell->subdomain_id() == triangulation.locally_owned_subdomain())
-	{
-	  cell->get_dof_indices (local_dof_indices);
-	  constraints.distribute_local_to_global (local_vector,
-						  local_dof_indices,
-						  vector);
-	}
+        {
+          cell->get_dof_indices (local_dof_indices);
+          constraints.distribute_local_to_global (local_vector,
+                                                  local_dof_indices,
+                                                  vector);
+        }
     vector.compress (VectorOperation::add);
   }
 
-				// now check that no entries were generated
-				// for constrained entries on the locally
-				// owned range.
+  // now check that no entries were generated
+  // for constrained entries on the locally
+  // owned range.
   const std::pair<unsigned int,unsigned int> range = vector.local_range();
   for (unsigned int i=range.first; i<range.second; ++i)
     if (constraints.is_constrained(i))
@@ -195,14 +196,14 @@ int main(int argc, char *argv[])
 
     if (myid == 0)
       {
-	std::ofstream logfile(output_file_for_mpi("no_flux_constraints_03").c_str());
-	deallog.attach(logfile);
-	deallog.depth_console(0);
-	deallog.threshold_double(1.e-10);
+        std::ofstream logfile(output_file_for_mpi("no_flux_constraints_03").c_str());
+        deallog.attach(logfile);
+        deallog.depth_console(0);
+        deallog.threshold_double(1.e-10);
 
-	deallog.push("3d");
-	test<3>();
-	deallog.pop();
+        deallog.push("3d");
+        test<3>();
+        deallog.pop();
       }
     else
       test<3>();

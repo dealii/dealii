@@ -38,10 +38,10 @@
 using namespace dealii;
 
 template <int dim>
-void test(FiniteElement<dim>& fe)
+void test(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
-  
+
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
@@ -51,10 +51,10 @@ void test(FiniteElement<dim>& fe)
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
   dof.initialize_local_block_info();
-  
+
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   typename DoFHandler<dim>::face_iterator face = cell->face(1);
-  
+
   MeshWorker::Assembler::MatrixSimple<FullMatrix<double> > ass;
   ass.initialize_local_blocks(dof.block_info().local());
   MeshWorker::DoFInfo<dim> info(dof.block_info());
@@ -64,7 +64,7 @@ void test(FiniteElement<dim>& fe)
   info.reinit(cell);
   info.print_debug(deallog);
   deallog.pop();
-  
+
   deallog.push("face1");
   info.reinit(cell, face, 1);
   info.print_debug(deallog);
@@ -92,7 +92,7 @@ int main()
   FESystem<2> sys1(p0,1, p1, 1);
   FESystem<2> sys2(p2,2,p0,3,p1,1);
   FESystem<2> sys3(p0, 2, rt0, 1);
-  
+
   test(sys1);
   test(sys2);
   test(sys3);

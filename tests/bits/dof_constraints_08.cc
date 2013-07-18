@@ -42,19 +42,19 @@ template <int dim>
 void test ()
 {
   deallog << dim << "D" << std::endl;
-  
+
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation);
 
-                                   // refine once, then refine first cell to
-                                   // create hanging nodes
+  // refine once, then refine first cell to
+  // create hanging nodes
   triangulation.refine_global (1);
   triangulation.begin_active()->set_refine_flag ();
   triangulation.execute_coarsening_and_refinement ();
   deallog << "Number of cells: " << triangulation.n_active_cells() << std::endl;
-  
-                                   // set up a DoFHandler and compute hanging
-                                   // node constraints for a Q2 element
+
+  // set up a DoFHandler and compute hanging
+  // node constraints for a Q2 element
   FE_Q<dim> fe(2);
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
@@ -72,15 +72,15 @@ void test ()
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     b(i) = (1.+1.*i*i)/3;
 
-                                   // now condense away constraints
+  // now condense away constraints
   constraints.condense (b);
 
-                                   // and output what we have
+  // and output what we have
   for (BlockVector<double>::const_iterator i=b.begin(); i!=b.end(); ++i)
     deallog << *i << std::endl;
 
-                                   // now also make sure that the elements in
-                                   // constrained rows are zero
+  // now also make sure that the elements in
+  // constrained rows are zero
   for (unsigned int i=0; i<b.size(); ++i)
     if (constraints.is_constrained(i))
       Assert (b(i) == 0, ExcInternalError());
@@ -104,25 +104,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

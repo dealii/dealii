@@ -31,52 +31,52 @@ std::ofstream logfile("tensor_matrix_conversion/output");
 
 
 template <typename number>
-void 
+void
 fill_matrix(FullMatrix<number> &A)
 {
-  for (unsigned int i=0; i<A.m();i++)
-    for (unsigned int j=0; j<A.n();j++)
+  for (unsigned int i=0; i<A.m(); i++)
+    for (unsigned int j=0; j<A.n(); j++)
       A(i,j)=number(i*A.n() + j+1);
 }
 
 template <typename number>
-void 
+void
 display_matrix(FullMatrix<number> M)
 {
   deallog<<M.m()<<"x"<<M.n()<<" matrix"<<std::endl;
-  for (unsigned int i=0;i<M.m();i++)
+  for (unsigned int i=0; i<M.m(); i++)
     {
-      for (unsigned int j=0;j<M.n();j++)
-	deallog<<M(i,j)<<" ";
+      for (unsigned int j=0; j<M.n(); j++)
+        deallog<<M(i,j)<<" ";
       deallog<<std::endl;
     }
 }
 
 template <int b>
-void 
+void
 fill_tensor_2(Tensor<2,b> &T)
 {
-  for (unsigned int i=0; i<b;i++)
-    for (unsigned int j=0; j<b;j++)
+  for (unsigned int i=0; i<b; i++)
+    for (unsigned int j=0; j<b; j++)
       T[i][j]=i*b + j+1;
 }
 
 
 template <int b>
-void 
+void
 display_tensor_2(Tensor<2,b> &T)
 {
   deallog<<b<<"x"<<b<<" tensor"<<std::endl;
-  for (unsigned int i=0; i<b;i++)
+  for (unsigned int i=0; i<b; i++)
     {
-      for (unsigned int j=0; j<b;j++)    
-	deallog<<T[i][j]<<" ";
+      for (unsigned int j=0; j<b; j++)
+        deallog<<T[i][j]<<" ";
       deallog<<std::endl;
     }
-	
+
 }
 
-int main () 
+int main ()
 {
 
   deallog.attach(logfile);
@@ -89,11 +89,11 @@ int main ()
   for (unsigned int n=0; n<3; n++)
     for (unsigned int i=0; i<10-n; i++)
       for (unsigned int j=0; j<10-n; j++)
-      {
-	A1.copy_from(T1,0,n,0,n,i,j);
-	display_matrix(A1);
-	A1 = 0;
-      }
+        {
+          A1.copy_from(T1,0,n,0,n,i,j);
+          display_matrix(A1);
+          A1 = 0;
+        }
 
   FullMatrix<double> A2(3,3);
   fill_matrix(A2);
@@ -101,14 +101,14 @@ int main ()
   for (unsigned int n=0; n<3; n++)
     for (unsigned int i=0; i<3-n; i++)
       for (unsigned int j=0; j<3-n; j++)
-      {
-	A2.copy_to(T2,0,n,0,n,i,j);
-	display_tensor_2(T2);
-	T2 = 0;
-      }
+        {
+          A2.copy_to(T2,0,n,0,n,i,j);
+          display_tensor_2(T2);
+          T2 = 0;
+        }
 
 
 
   return 0;
 }
-                  
+

@@ -26,7 +26,7 @@
 #include <iostream>
 #include <vector>
 
-void check(TrilinosWrappers::MPI::Vector & v, bool ghost)
+void check(TrilinosWrappers::MPI::Vector &v, bool ghost)
 {
   Assert(v.has_ghost_elements()==ghost, ExcMessage("wrong ghost elements"));
 }

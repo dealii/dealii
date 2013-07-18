@@ -19,26 +19,26 @@
 // check PETScWrappers::SparseMatrix::operator *=
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_sparse_matrix.h>    
+#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <fstream>
 #include <iostream>
 
 
 void test (PETScWrappers::SparseMatrix &m)
 {
-                                   // first set a few entries
+  // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
   m.compress ();
-  
-                                   // then multiply everything by 1.25 and
-                                   // make sure we retrieve the values we
-                                   // expect
+
+  // then multiply everything by 1.25 and
+  // make sure we retrieve the values we
+  // expect
   m *= 1.25;
-  
+
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
       if ((i+2*j+1) % 3 == 0)
@@ -57,7 +57,7 @@ void test (PETScWrappers::SparseMatrix &m)
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("09/output");
   deallog.attach(logfile);
@@ -71,30 +71,30 @@ int main (int argc,char **argv)
         PETScWrappers::SparseMatrix m (5,5,3);
         test (m);
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

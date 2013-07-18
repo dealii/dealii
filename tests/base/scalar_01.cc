@@ -47,7 +47,7 @@ int main ()
   compare (T(13.), 13.);
   compare (T(t1), 13.);
   compare (static_cast<double>(t1), 13.);
-  compare (static_cast<double&>(t1), 13.);
+  compare (static_cast<double &>(t1), 13.);
   compare ((T() = t1), 13.);
   compare ((T() = 13.), 13.);
   compare ((t1==t1), true);
@@ -67,6 +67,6 @@ int main ()
 
   t1.clear();
   compare (t1, 0.);
-  
+
   deallog << "OK" << std::endl;
 }

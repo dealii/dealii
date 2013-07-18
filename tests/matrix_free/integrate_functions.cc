@@ -46,7 +46,7 @@ std::ofstream logfile("integrate_functions/output");
 template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
- public:
+public:
   typedef std::vector<Vector<Number>*> VectorType;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
@@ -95,16 +95,16 @@ operator () (const MatrixFree<dim,Number> &data,
   AlignedVector<VectorizedArray<Number> > values (n_q_points);
   AlignedVector<VectorizedArray<Number> > gradients (dim*n_q_points);
   std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
-  for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
     {
       fe_eval.reinit(cell);
-                                // compare values with the ones the FEValues
-                                // gives us. Those are seen as reference
+      // compare values with the ones the FEValues
+      // gives us. Those are seen as reference
       for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
         {
-                                // generate random numbers at quadrature
-                                // points and test them with basis functions
-                                // and their gradients
+          // generate random numbers at quadrature
+          // points and test them with basis functions
+          // and their gradients
           for (unsigned int q=0; q<n_q_points; ++q)
             {
               values[q][j] = rand()/(double)RAND_MAX;
@@ -151,8 +151,8 @@ void test ()
   static const HyperBallBoundary<dim> boundary;
   tria.set_boundary (0, boundary);
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active (),
-    endc = tria.end();
+  cell = tria.begin_active (),
+  endc = tria.end();
   for (; cell!=endc; ++cell)
     if (cell->center().norm()<1e-8)
       cell->set_refine_flag();

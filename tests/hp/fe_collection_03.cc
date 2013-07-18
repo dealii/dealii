@@ -32,28 +32,28 @@
 template <int dim>
 void test ()
 {
-				   // test things with a collection of
-				   // primitive elements
+  // test things with a collection of
+  // primitive elements
   {
     hp::FECollection<dim> fe_collection;
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
     fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
     Assert (fe_collection.n_components() == dim,
-	    ExcInternalError());
+            ExcInternalError());
   }
 
-				   // now the same with one of the elements
-				   // being non-primitive. the other one can
-				   // then not simply be a FESystem but must
-				   // in fact be an FESystem of FESystem to
-				   // hide multiple components in one block
+  // now the same with one of the elements
+  // being non-primitive. the other one can
+  // then not simply be a FESystem but must
+  // in fact be an FESystem of FESystem to
+  // hide multiple components in one block
   if (dim > 1)
     {
       hp::FECollection<dim> fe_collection;
       fe_collection.push_back (FESystem<dim>(FESystem<dim>(FE_Q<dim>(2),dim),1));
       fe_collection.push_back (FE_RaviartThomas<dim>(1));
       Assert (fe_collection.n_blocks() == 1,
-	      ExcInternalError());
+              ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

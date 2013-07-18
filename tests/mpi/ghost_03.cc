@@ -31,12 +31,12 @@ void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-  
+
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
 
-				   // each processor owns 2 indices and all
-				   // are ghosting Element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting Element 1 (the second)
 
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
@@ -46,7 +46,7 @@ void test ()
   PETScWrappers::MPI::Vector vb(local_active, MPI_COMM_WORLD);
   PETScWrappers::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
 
-				   // set local values
+  // set local values
   vb(myid*2)=myid*2.0;
   vb(myid*2+1)=myid*2.0+1.0;
 
@@ -90,7 +90,7 @@ void test ()
       deallog << e.get_exc_name() << std::endl;
     }
 
-				   // done
+  // done
   if (myid==0)
     deallog << "OK" << std::endl;
 }

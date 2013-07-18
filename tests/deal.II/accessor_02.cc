@@ -30,8 +30,8 @@
 
 
 template <class ACCESSOR>
-LogStream&
-operator << (LogStream& log, const TriaIterator<ACCESSOR>& i)
+LogStream &
+operator << (LogStream &log, const TriaIterator<ACCESSOR> &i)
 {
   log << ACCESSOR::dimension << ' '
       << ACCESSOR::structure_dimension << ' '
@@ -42,18 +42,18 @@ operator << (LogStream& log, const TriaIterator<ACCESSOR>& i)
 
 
 template <class DH>
-void test_in_dim(const DH& d1, const DH& d2)
+void test_in_dim(const DH &d1, const DH &d2)
 {
   typename DH::active_cell_iterator a = d1.begin_active();
   typename DH::cell_iterator l = d1.begin(d1.get_tria().n_levels()-1);
 
   deallog << "a " << a << std::endl
-	  << "l " << l << std::endl;
+          << "l " << l << std::endl;
 }
 
 
 template<int dim>
-void init_tria (Triangulation<dim>& tr)
+void init_tria (Triangulation<dim> &tr)
 {
   GridGenerator::hyper_cube(tr);
   tr.refine_global(4-dim);
@@ -61,9 +61,9 @@ void init_tria (Triangulation<dim>& tr)
 
 
 template<int dim>
-void init_dofs (DoFHandler<dim>& dof,
-		const Triangulation<dim>& tr,
-		const FiniteElement<dim>& fe)
+void init_dofs (DoFHandler<dim> &dof,
+                const Triangulation<dim> &tr,
+                const FiniteElement<dim> &fe)
 {
   dof.initialize(tr, fe);
 }

@@ -58,7 +58,7 @@ int main ()
   table_1.add_value("n_cells", 96);
   table_1.add_value("error", 2.274e-06);
   table_1.add_value("n_cells", 128);
-  table_1.add_value("error", 9.597e-07); 
+  table_1.add_value("error", 9.597e-07);
   table_1.set_scientific("error", true);
   table_1.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate);
   table_1.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate_log2, 1);

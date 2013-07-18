@@ -48,13 +48,13 @@ std::ofstream logfile("get_values_plain/output");
 template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number=double>
 class MatrixFreeTest
 {
- public:
+public:
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data   (data_in)
   {};
 
-                                // make function virtual to allow derived
-                                // classes to define a different function
+  // make function virtual to allow derived
+  // classes to define a different function
   virtual void
   operator () (const MatrixFree<dim,Number> &data,
                Vector<Number> &,
@@ -63,7 +63,7 @@ class MatrixFreeTest
   {
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval (data);
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval_plain (data);
-    for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         fe_eval.reinit (cell);
         fe_eval.read_dof_values(src);
@@ -105,7 +105,7 @@ protected:
 
 template <int dim, int fe_degree, typename number>
 void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix&constraints)
+              const ConstraintMatrix &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   //std::cout << "Number of cells: " << dof.get_tria().n_active_cells()
@@ -115,10 +115,10 @@ void do_test (const DoFHandler<dim> &dof,
 
   Vector<number> solution (dof.n_dofs());
 
-                                // create vector with random entries
+  // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      if(constraints.is_constrained(i))
+      if (constraints.is_constrained(i))
         continue;
       const double entry = rand()/(double)RAND_MAX;
       solution(i) = entry;
@@ -147,12 +147,12 @@ void test ()
   tria.set_boundary (0, boundary);
   tria.set_boundary (1, boundary);
 
-                                // refine a few cells
+  // refine a few cells
   for (unsigned int i=0; i<11-3*dim; ++i)
     {
       typename Triangulation<dim>::active_cell_iterator
-        cell = tria.begin_active (),
-        endc = tria.end();
+      cell = tria.begin_active (),
+      endc = tria.end();
       unsigned int counter = 0;
       for (; cell!=endc; ++cell, ++counter)
         if (counter % (7-i) == 0)

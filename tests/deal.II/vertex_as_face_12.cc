@@ -35,7 +35,7 @@ void test ()
   GridGenerator::hyper_cube (tria);
 
   typename Triangulation<1,spacedim>::face_iterator
-    face = tria.begin_active()->face(0);
+  face = tria.begin_active()->face(0);
 
   deallog << face << std::endl;
 }

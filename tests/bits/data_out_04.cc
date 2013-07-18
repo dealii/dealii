@@ -36,31 +36,35 @@ std::string output_file_name = "data_out_04/output";
 template <int dim>
 class XDataOut : public DataOut<dim>
 {
-  public:
-    const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
-    get_patches() const
-      { return DataOut<dim>::get_patches(); }
+public:
+  const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
+  get_patches() const
+  {
+    return DataOut<dim>::get_patches();
+  }
 
-    std::vector<std::string>
-    get_dataset_names () const
-      { return DataOut<dim>::get_dataset_names();  }
+  std::vector<std::string>
+  get_dataset_names () const
+  {
+    return DataOut<dim>::get_dataset_names();
+  }
 
+  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
+  get_vector_data_ranges () const
+  {
+    // if we have enough components for a
+    // vector solution, make the last dim
+    // components a vector
     std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
-    get_vector_data_ranges () const
-      {
-					 // if we have enough components for a
-					 // vector solution, make the last dim
-					 // components a vector
-	std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
-	  retval;
-	if (get_dataset_names().size() >= dim)
-	  retval.push_back (std_cxx1x::tuple
-			    <unsigned int, unsigned int, std::string>
-			    (get_dataset_names().size()-dim,
-			     get_dataset_names().size()-1,
-			     "vector_data"));
-	return retval;
-      }
+    retval;
+    if (get_dataset_names().size() >= dim)
+      retval.push_back (std_cxx1x::tuple
+                        <unsigned int, unsigned int, std::string>
+                        (get_dataset_names().size()-dim,
+                         get_dataset_names().size()-1,
+                         "vector_data"));
+    return retval;
+  }
 };
 
 // have a class that makes sure we can get at the patches and data set
@@ -68,20 +72,24 @@ class XDataOut : public DataOut<dim>
 template <int dim>
 class XDataOutReader : public DataOutReader<dim>
 {
-  public:
-    const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
-    get_patches() const
-      { return DataOutReader<dim>::get_patches(); }
+public:
+  const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
+  get_patches() const
+  {
+    return DataOutReader<dim>::get_patches();
+  }
 
-    std::vector<std::string>
-    get_dataset_names () const
-      { return DataOutReader<dim>::get_dataset_names();  }
+  std::vector<std::string>
+  get_dataset_names () const
+  {
+    return DataOutReader<dim>::get_dataset_names();
+  }
 
-    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
-    get_vector_data_ranges () const
-      {
-	return DataOutReader<dim>::get_vector_data_ranges ();
-      }
+  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
+  get_vector_data_ranges () const
+  {
+    return DataOutReader<dim>::get_vector_data_ranges ();
+  }
 };
 
 
@@ -108,47 +116,47 @@ check_this (const DoFHandler<dim> &dof_handler,
     reader.read (tmp);
   }
 
-				   // finally make sure that we have
-				   // read everything back in
-				   // correctly
+  // finally make sure that we have
+  // read everything back in
+  // correctly
   Assert (data_out.get_dataset_names() == reader.get_dataset_names(),
-	  ExcInternalError());
+          ExcInternalError());
 
   Assert (data_out.get_patches().size() == reader.get_patches().size(),
- 	  ExcInternalError());
+          ExcInternalError());
 
   for (unsigned int i=0; i<reader.get_patches().size(); ++i)
     Assert (data_out.get_patches()[i] == reader.get_patches()[i],
-	    ExcInternalError());
+            ExcInternalError());
 
   deallog << data_out.get_vector_data_ranges().size()
-	  << std::endl;
+          << std::endl;
   Assert (data_out.get_vector_data_ranges().size() ==
-	  reader.get_vector_data_ranges().size(),
-	  ExcInternalError());
+          reader.get_vector_data_ranges().size(),
+          ExcInternalError());
   for (unsigned int i=0; i<data_out.get_vector_data_ranges().size(); ++i)
     {
       deallog << std_cxx1x::get<0>(data_out.get_vector_data_ranges()[i])
-	      << ' '
-	      << std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
-	      << ' '
-	      << std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
-	      << std::endl;
+              << ' '
+              << std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
+              << ' '
+              << std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
+              << std::endl;
       Assert (std_cxx1x::get<0>(data_out.get_vector_data_ranges()[i])
-	      ==
-	      std_cxx1x::get<0>(reader.get_vector_data_ranges()[i]),
-	      ExcInternalError());
+              ==
+              std_cxx1x::get<0>(reader.get_vector_data_ranges()[i]),
+              ExcInternalError());
       Assert (std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
-	      ==
-	      std_cxx1x::get<1>(reader.get_vector_data_ranges()[i]),
-	      ExcInternalError());
+              ==
+              std_cxx1x::get<1>(reader.get_vector_data_ranges()[i]),
+              ExcInternalError());
       Assert (std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
-	      ==
-	      std_cxx1x::get<2>(reader.get_vector_data_ranges()[i]),
-	      ExcInternalError());
+              ==
+              std_cxx1x::get<2>(reader.get_vector_data_ranges()[i]),
+              ExcInternalError());
     }
 
-				   // for good measure, delete tmp file
+  // for good measure, delete tmp file
   remove ("data_out_04.tmp");
 
   deallog << "OK" << std::endl;

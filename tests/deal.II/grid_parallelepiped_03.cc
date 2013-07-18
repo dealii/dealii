@@ -55,7 +55,7 @@ void check_subdivided_parallelepiped (bool colorize, bool log)
       corners[0] = Point<dim> (0.25, 0.50);
       corners[1] = Point<dim> (0.50, 0.25);
       break;
-      
+
     case 3:
       corners[0] = Point<dim> (0.25, 0.50, 0.50);
       corners[1] = Point<dim> (0.50, 0.25, 0.50);
@@ -66,12 +66,12 @@ void check_subdivided_parallelepiped (bool colorize, bool log)
       Assert (false, ExcInternalError ());
     }
 
-  // The number of subdivisions can be anything reasonable:  
+  // The number of subdivisions can be anything reasonable:
   const unsigned int n_subdivisions = (2*dim+1);
 
   Triangulation<dim> triangulation;
   GridGenerator::subdivided_parallelepiped (triangulation, n_subdivisions, corners, colorize);
-  
+
   GridOut grid_out;
 
   if (log)
@@ -85,7 +85,7 @@ void check_subdivided_parallelepiped (bool colorize, bool log)
 
 int main ()
 {
-  // Check parallelepiped 
+  // Check parallelepiped
   check_subdivided_parallelepiped<1> (false, true);
   check_subdivided_parallelepiped<2> (false, true);
   check_subdivided_parallelepiped<3> (true,  true);

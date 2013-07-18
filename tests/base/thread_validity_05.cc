@@ -29,27 +29,27 @@
 
 struct X
 {
-    X(int i) : i(i) {}
-    int i;
+  X(int i) : i(i) {}
+  int i;
 
-    void execute ()
-      {
-	Assert (false, ExcInternalError());
-      }
+  void execute ()
+  {
+    Assert (false, ExcInternalError());
+  }
 
-    void execute () const
-      {
-	Assert (i == 42, ExcInternalError());
-	deallog << "OK" << std::endl;
-      }
-    
-  private:
-    X(const X&);
-    X & operator= (const X&);
+  void execute () const
+  {
+    Assert (i == 42, ExcInternalError());
+    deallog << "OK" << std::endl;
+  }
+
+private:
+  X(const X &);
+  X &operator= (const X &);
 };
 
 
-void test1 () 
+void test1 ()
 {
   const X x(42);
   Threads::Thread<void> t = Threads::spawn (x, &X::execute)();
@@ -59,35 +59,35 @@ void test1 ()
 
 struct Y
 {
-    Y(int i) : i(i) {}
-    int i;
+  Y(int i) : i(i) {}
+  int i;
 
-    void execute ()
-      {
-	Assert (i == 42, ExcInternalError());
-	deallog << "OK" << std::endl;
-      }
+  void execute ()
+  {
+    Assert (i == 42, ExcInternalError());
+    deallog << "OK" << std::endl;
+  }
 
-    void execute () const
-      {
-	Assert (false, ExcInternalError());
-      }
-    
-  private:
-    Y(const Y&);
-    Y & operator= (const Y&);
+  void execute () const
+  {
+    Assert (false, ExcInternalError());
+  }
+
+private:
+  Y(const Y &);
+  Y &operator= (const Y &);
 };
 
 
-void test2 () 
+void test2 ()
 {
   Y y(42);
   Threads::Thread<void> t = Threads::spawn (y, &Y::execute)();
   t.join ();
 }
 
-  
-  
+
+
 
 int main()
 {

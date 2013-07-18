@@ -54,7 +54,7 @@
 #include <fstream>
 
 template<int dim>
-void output(parallel::distributed::Triangulation<dim> & tr)
+void output(parallel::distributed::Triangulation<dim> &tr)
 {
   const std::string filename = ("mg_03/mesh." +
                                 Utilities::int_to_string
@@ -73,8 +73,8 @@ void test()
     deallog << "hyper_cube" << std::endl;
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-					       Triangulation<dim>::none,
-					       parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+                                               Triangulation<dim>::none,
+                                               parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
 
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
@@ -87,26 +87,26 @@ void test()
   dofh.distribute_mg_dofs (fe);
 
   {
-    for (unsigned int lvl=0;lvl<tr.n_levels();++lvl)
+    for (unsigned int lvl=0; lvl<tr.n_levels(); ++lvl)
       {
-	deallog << "level " << lvl << ": ";
-	typename DoFHandler<dim>::cell_iterator
-	  cell = dofh.begin(lvl),
-	  endc = dofh.end(lvl);
-	
-	for (;cell!=endc;++cell)
-	  {
-	    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
-	    cell->get_mg_dof_indices(dofs);
-	    
-	    for (unsigned int i=0;i<dofs.size();++i)
-	      if (dofs[i]==numbers::invalid_dof_index)
-		deallog << "- ";
-	      else
-		deallog << dofs[i] << " ";
-	    deallog << " | ";
-	  }
-	deallog << std::endl;
+        deallog << "level " << lvl << ": ";
+        typename DoFHandler<dim>::cell_iterator
+        cell = dofh.begin(lvl),
+        endc = dofh.end(lvl);
+
+        for (; cell!=endc; ++cell)
+          {
+            std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
+            cell->get_mg_dof_indices(dofs);
+
+            for (unsigned int i=0; i<dofs.size(); ++i)
+              if (dofs[i]==numbers::invalid_dof_index)
+                deallog << "- ";
+              else
+                deallog << dofs[i] << " ";
+            deallog << " | ";
+          }
+        deallog << std::endl;
       }
   }
 

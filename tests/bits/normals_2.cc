@@ -54,22 +54,22 @@ void check (const Triangulation<dim> &tria,
   deallog.threshold_double(1.e-10);
 
   QGauss<dim-1> q_face(3);
-  
+
   FEFaceValues<dim>    fe_face_values (mapping, fe, q_face,
                                        update_normal_vectors | update_JxW_values);
   FESubfaceValues<dim> fe_subface_values (mapping, fe, q_face,
                                           update_normal_vectors | update_JxW_values);
 
   for (typename DoFHandler<dim>::active_cell_iterator
-         cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     {
       Tensor<1,dim> n1, n2;
 
-                                       // first integrate over faces
-                                       // and make sure that the
-                                       // result of the integration is
-                                       // close to zero
+      // first integrate over faces
+      // and make sure that the
+      // result of the integration is
+      // close to zero
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         {
           fe_face_values.reinit (cell, f);
@@ -82,8 +82,8 @@ void check (const Triangulation<dim> &tria,
               << std::sqrt (n1*n1)
               << std::endl;
 
-                                       // now same for subface
-                                       // integration
+      // now same for subface
+      // integration
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         for (unsigned int sf=0; sf<GeometryInfo<dim>::max_children_per_face; ++sf)
           {
@@ -100,14 +100,14 @@ void check (const Triangulation<dim> &tria,
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("normals_2/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<2> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     static const HyperBallBoundary<2> boundary;
@@ -116,8 +116,8 @@ int main ()
     check (coarse_grid, 2);
     check (coarse_grid, 4);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     static const HyperBallBoundary<3> boundary;
@@ -126,8 +126,8 @@ int main ()
     check (coarse_grid, 2);
     check (coarse_grid, 3);
   }
-  
+
 }
 
-  
-  
+
+

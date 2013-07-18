@@ -36,11 +36,11 @@
 
 
 template <class TRIA>
-void check (TRIA & tr)
+void check (TRIA &tr)
 {
   typename TRIA::cell_iterator cell = tr.begin(),
-        endc = tr.end();
-  
+                               endc = tr.end();
+
   for (; cell!=endc; ++cell)
     {
       deallog << cell->level() << " " << cell->index() << " " << cell->id() << std::endl;
@@ -50,10 +50,10 @@ void check (TRIA & tr)
 }
 
 
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-  
+
   initlog(__FILE__);
   deal_II_exceptions::disable_abort_on_exception();
 
@@ -72,9 +72,9 @@ int main (int argc, char *argv[])
     tria.refine_global (1);
     check(tria);
   }
-  
+
 
 }
 
-  
-  
+
+

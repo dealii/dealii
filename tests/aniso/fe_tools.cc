@@ -35,21 +35,21 @@
 
 template <typename number>
 void print_formatted (const FullMatrix<number> &A,
-		      const unsigned int        precision,
-		      const unsigned int        width)
+                      const unsigned int        precision,
+                      const unsigned int        width)
 {
   for (unsigned int i=0; i<A.m(); ++i)
     {
       for (unsigned int j=0; j<A.n(); ++j)
-	{
-	  if (A(i,j) != 0)
-	    deallog << std::setw(width) << std::setprecision(precision)
-		    << A(i,j);
-	  else
-	    deallog << std::setw(width) << std::setprecision(precision)
-		    << "~";
-	  deallog << ' ';
-	};
+        {
+          if (A(i,j) != 0)
+            deallog << std::setw(width) << std::setprecision(precision)
+                    << A(i,j);
+          else
+            deallog << std::setw(width) << std::setprecision(precision)
+                    << "~";
+          deallog << ' ';
+        };
       deallog << std::endl;
     };
 }
@@ -57,53 +57,55 @@ void print_formatted (const FullMatrix<number> &A,
 
 
 template<int dim>
-void test_embedding (const FiniteElement<dim>& fe)
+void test_embedding (const FiniteElement<dim> &fe)
 {
   const std::string refine_case_names[8]=
-    {"no_refinement",
-     "cut_x",
-     "cut_y",
-     "cut_xy",
-     "cut_z",
-     "cut_xz",
-     "cut_yz",
-     "cut_xyz"};
-  
+  {
+    "no_refinement",
+    "cut_x",
+    "cut_y",
+    "cut_xy",
+    "cut_z",
+    "cut_xz",
+    "cut_yz",
+    "cut_xyz"
+  };
+
   const unsigned int n = fe.dofs_per_cell;
-  
+
   std::vector<std::vector<FullMatrix<double> > > P;
   P.resize(RefinementCase<dim>::isotropic_refinement);
   for (unsigned int ref_case=RefinementCase<dim>::cut_x;
        ref_case<RefinementCase<dim>::isotropic_refinement+1;
        ++ref_case)
     for (unsigned int c=0;
-	 c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-	 ++c)
+         c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+         ++c)
       P[ref_case-1].push_back(FullMatrix<double>(n));
-  
+
   FETools::compute_embedding_matrices(fe, P);
-  
+
   for (unsigned int ref_case=RefinementCase<dim>::cut_x;
        ref_case<RefinementCase<dim>::isotropic_refinement+1;
        ++ref_case)
     for (unsigned int c=0;
-	 c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-	 ++c)
+         c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+         ++c)
       {
-	deallog << fe.get_name() << " embedding, RefinementCase<dim>:: " << refine_case_names[ref_case] << ", child " << c << std::endl;
-	print_formatted(P[ref_case-1][c], 4, 6);
+        deallog << fe.get_name() << " embedding, RefinementCase<dim>:: " << refine_case_names[ref_case] << ", child " << c << std::endl;
+        print_formatted(P[ref_case-1][c], 4, 6);
       }
 }
 
-  
+
 template<int dim>
-void test_projection (const FiniteElement<dim>& fe1,
-		      const FiniteElement<dim>& fe2,
-		      std::ostream& out)
+void test_projection (const FiniteElement<dim> &fe1,
+                      const FiniteElement<dim> &fe2,
+                      std::ostream &out)
 {
   out << fe1.get_name() << " -> "
       << fe2.get_name() << std::endl;
-  
+
   const unsigned int n1 = fe1.dofs_per_cell;
   const unsigned int n2 = fe2.dofs_per_cell;
 
@@ -113,13 +115,13 @@ void test_projection (const FiniteElement<dim>& fe1,
   for (unsigned int i=0; i<n2; ++i)
     for (unsigned int j=0; j<n1; ++j)
       if (std::fabs(P(i,j)) < 1e-12)
-	P(i,j) = 0;
+        P(i,j) = 0;
   P.print_formatted(out, 3, false, 5);
 }
 
-  
+
 template<int dim>
-void test_projection (std::ostream& out)
+void test_projection (std::ostream &out)
 {
   FE_DGQ<dim> q0(0);
   FE_DGQ<dim> q1(1);

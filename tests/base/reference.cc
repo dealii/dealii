@@ -37,12 +37,24 @@ int next = 0;
 
 class Test : public Subscriptor
 {
-    const char* name;
-  public:
-    Test(const char* n) : name(n) { deallog << "Construct " << name << std::endl; }
-    ~Test()                       { deallog << "Destruct " << name << std::endl;  }
-    void f()        { deallog << "mutable" << std::endl; }
-    void f() const  { deallog << "const" << std::endl;   }
+  const char *name;
+public:
+  Test(const char *n) : name(n)
+  {
+    deallog << "Construct " << name << std::endl;
+  }
+  ~Test()
+  {
+    deallog << "Destruct " << name << std::endl;
+  }
+  void f()
+  {
+    deallog << "mutable" << std::endl;
+  }
+  void f() const
+  {
+    deallog << "const" << std::endl;
+  }
 };
 
 
@@ -58,15 +70,15 @@ int main()
   try
     {
       Test a("A");
-      const Test& b("B");
-      
+      const Test &b("B");
+
       SmartPointer<Test,Test>       r(&a, "Test R");
       SmartPointer<const Test,Test> s(&a, "const Test S");
 //  SmartPointer<Test,Test>       t=&b;    // this one should not work
-      SmartPointer<Test,Test>       t(const_cast<Test*>(&b), "Test T");
+      SmartPointer<Test,Test>       t(const_cast<Test *>(&b), "Test T");
       SmartPointer<const Test,Test> u(&b, "const Test");
-      
-      
+
+
       deallog << "a ";
       a.f();            // should print "mutable", since #a# is not const
       deallog << "b ";
@@ -75,13 +87,13 @@ int main()
       r->f();           // should print "mutable", since it points to the non-const #a#
       deallog << "s ";
       s->f();           // should print "const", since it points to the const #b#
-				       // but we made it const
+      // but we made it const
       deallog << "t ";
       t->f();           // should print "mutable", since #b# is const, but
-				       // we casted the constness away
+      // we casted the constness away
       deallog << "u ";
       u->f();           // should print "const" since #b# is const
-				       // Now try if subscriptor works
+      // Now try if subscriptor works
       Test c("C");
       r = &c;
       Test d("D");
@@ -93,6 +105,6 @@ int main()
     {
       deallog << e.get_exc_name() << std::endl;
     }
-  
+
 }
 

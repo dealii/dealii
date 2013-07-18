@@ -19,7 +19,7 @@
 
 template <int dim>
 void
-test_block_list(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
+test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 

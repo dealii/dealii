@@ -36,8 +36,8 @@ void sub_test()
   tria.begin_active ()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   typename Triangulation<dim>::active_cell_iterator
-    cell = tria.begin_active (),
-    endc = tria.end();
+  cell = tria.begin_active (),
+  endc = tria.end();
   for (; cell!=endc; ++cell)
     if (cell->center().norm()<0.5)
       cell->set_refine_flag();
@@ -56,7 +56,7 @@ void sub_test()
   DoFHandler<dim> dof (tria);
   deallog << "Testing " << fe.get_name() << std::endl;
 
-                                // run test for several different meshes
+  // run test for several different meshes
   for (unsigned int i=0; i<8-2*dim; ++i)
     {
       cell = tria.begin_active ();
@@ -84,9 +84,9 @@ void sub_test()
         mf_data.reinit (dof, constraints, quad,
                         typename MatrixFree<dim,number>::AdditionalData(MPI_COMM_SELF,MatrixFree<dim,number>::AdditionalData::none));
 
-                                // choose block size of 3 which introduces
-                                // some irregularity to the blocks (stress the
-                                // non-overlapping computation harder)
+        // choose block size of 3 which introduces
+        // some irregularity to the blocks (stress the
+        // non-overlapping computation harder)
         mf_data_color.reinit (dof, constraints, quad,
                               typename MatrixFree<dim,number>::AdditionalData
                               (MPI_COMM_SELF,
@@ -104,11 +104,11 @@ void sub_test()
       MatrixFreeTest<dim,fe_degree,number> mf_partition (mf_data_partition);
       Vector<number> in_dist (dof.n_dofs());
       Vector<number> out_dist (in_dist), out_color (in_dist),
-        out_partition(in_dist);
+             out_partition(in_dist);
 
       for (unsigned int i=0; i<dof.n_dofs(); ++i)
         {
-          if(constraints.is_constrained(i))
+          if (constraints.is_constrained(i))
             continue;
           const double entry = rand()/(double)RAND_MAX;
           in_dist(i) = entry;
@@ -116,22 +116,22 @@ void sub_test()
 
       mf_ref.vmult (out_dist, in_dist);
 
-                                // make 10 sweeps in order to get in some
-                                // variation to the threaded program
+      // make 10 sweeps in order to get in some
+      // variation to the threaded program
       for (unsigned int sweep = 0; sweep < 10; ++sweep)
         {
           mf_color.vmult (out_color, in_dist);
           mf_partition.vmult (out_partition, in_dist);
-      
+
           out_color -= out_dist;
           double diff_norm = out_color.linfty_norm();
-          deallog << "Sweep " << sweep 
-                  << ", error in partition/color:     " << diff_norm 
+          deallog << "Sweep " << sweep
+                  << ", error in partition/color:     " << diff_norm
                   << std::endl;
           out_partition -= out_dist;
           diff_norm = out_partition.linfty_norm();
-          deallog << "Sweep " << sweep 
-                  << ", error in partition/partition: " << diff_norm 
+          deallog << "Sweep " << sweep
+                  << ", error in partition/partition: " << diff_norm
                   << std::endl;
         }
       deallog << std::endl;

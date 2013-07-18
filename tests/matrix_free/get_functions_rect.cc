@@ -58,7 +58,7 @@ void test ()
   GridGenerator::hyper_ball (tria);
   static const HyperBallBoundary<dim> boundary;
   tria.set_boundary (0, boundary);
-                                // refine first and last cell
+  // refine first and last cell
   tria.begin(tria.n_levels()-1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
@@ -73,9 +73,9 @@ void test ()
   constraints.close();
 
 
-                                // in the other functions, use do_test in
-                                // get_functions_common, but here we have to
-                                // manually choose non-rectangular tests.
+  // in the other functions, use do_test in
+  // get_functions_common, but here we have to
+  // manually choose non-rectangular tests.
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   //std::cout << "Number of cells: " << dof.get_tria().n_active_cells()
   //          << std::endl;
@@ -84,10 +84,10 @@ void test ()
 
   Vector<number> solution (dof.n_dofs());
 
-                                // create vector with random entries
+  // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      if(constraints.is_constrained(i))
+      if (constraints.is_constrained(i))
         continue;
       const double entry = rand()/(double)RAND_MAX;
       solution(i) = entry;

@@ -21,7 +21,7 @@ public:
    * Matrix-vector-product.
    */
   template <typename number2>
-  void vmult(Vector<number2>&, const Vector<number2>&) const;
+  void vmult(Vector<number2> &, const Vector<number2> &) const;
 protected:
   const unsigned int nx;
   const unsigned int ny;
@@ -31,21 +31,21 @@ protected:
 template<typename number>
 QuickMatrix<number>::QuickMatrix(unsigned int nx, unsigned int ny)
   :
-nx(nx), ny(ny)
+  nx(nx), ny(ny)
 {}
 
 template<typename number>
 template <typename number2>
 void
-QuickMatrix<number>::vmult(Vector<number2>& d,
-			   const Vector<number2>& s) const
+QuickMatrix<number>::vmult(Vector<number2> &d,
+                           const Vector<number2> &s) const
 {
   const unsigned int step = nx-1;
   const unsigned int right = step-1;
   const unsigned int top = ny-1;
 
   // Bottom row
-  
+
   d(0) = s(0) - .25 * ( s(1) + s(step) );
 
   for (unsigned int x=1; x<right; ++x)
@@ -60,30 +60,30 @@ QuickMatrix<number>::vmult(Vector<number2>& d,
     {
       start += step;
       d(start) = s(start)
-	- .25 * ( s(start-step) + s(start+1) + s(start+step) );
-      
+                 - .25 * ( s(start-step) + s(start+1) + s(start+step) );
+
       for (unsigned int x=1; x<right; ++x)
-	{
-	  const unsigned int xy = start+x;
-	  d(xy) = s(xy)
-	    - .25 * ( s(xy-step) + s(xy-1) + s(xy+1) + s(xy+step) );
-	}
+        {
+          const unsigned int xy = start+x;
+          d(xy) = s(xy)
+                  - .25 * ( s(xy-step) + s(xy-1) + s(xy+1) + s(xy+step) );
+        }
       d(start+right) = s(start+right)
-	- .25 * ( s(start+right-1) + s(start+right+step) );
+                       - .25 * ( s(start+right-1) + s(start+right+step) );
     }
-  
+
   // Top row
 
   start += step;
   d(start) = s(start)
-    - .25 * ( s(start-step) + s(start+1) );
+             - .25 * ( s(start-step) + s(start+1) );
 
   for (unsigned int x=1; x<right; ++x)
     {
       const unsigned int xy = start+x;
       d(xy) = s(xy)
-	- .25 * ( s(xy-step) + s(xy-1) + s(xy+1) );
+              - .25 * ( s(xy-step) + s(xy-1) + s(xy+1) );
     }
   d(start+right) = s(start+right)
-    - .25 * ( s(start+right-step) + s(start+right-1) );
+                   - .25 * ( s(start+right-step) + s(start+right-1) );
 }

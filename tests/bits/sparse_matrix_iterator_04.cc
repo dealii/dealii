@@ -19,7 +19,7 @@
 // and reading them back through the matrix itself
 
 #include "../tests.h"
-#include <deal.II/lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 #include <iomanip>
 
@@ -39,7 +39,7 @@ void test ()
   SparseMatrix<double>::iterator i = m.begin();
   for (; i!=m.end(); ++i)
     i->value() = i->row()*i->column();
-  
+
   for (unsigned int i=0; i<5; ++i)
     for (unsigned int j=0; j<5; ++j)
       if (((i+2*j+1) % 3 == 0)
@@ -51,7 +51,7 @@ void test ()
           Assert (std::fabs(m.el(i,j)-i*j) < 1e-14,
                   ExcInternalError());
         }
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -71,25 +71,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

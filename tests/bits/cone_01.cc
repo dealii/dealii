@@ -50,7 +50,7 @@ void check ()
   triangulation.refine_global (2);
 
   GridOut().write_gnuplot (triangulation,
-			   deallog.get_file_stream());
+                           deallog.get_file_stream());
 }
 
 

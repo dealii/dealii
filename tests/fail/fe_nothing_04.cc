@@ -51,48 +51,48 @@ void test ()
   triangulation.refine_global(4);
 
   hp::FECollection<dim>    fe_collection;
-  
-          // test the behavior of the FE_Nothing element
-          // in multicomponent systems (for, e.g., solving
-          // Stokes' equations).
-  
+
+  // test the behavior of the FE_Nothing element
+  // in multicomponent systems (for, e.g., solving
+  // Stokes' equations).
+
   fe_collection.push_back (FESystem<dim>(FE_RaviartThomas<dim>(0), 1,
                                          FE_DGQ<dim>(0), 1));
-                                         
+
   fe_collection.push_back (FESystem<dim>(FE_Nothing<dim>(dim), 1,
                                          FE_Nothing<dim>(), 1));
 
 
   hp::DoFHandler<dim>      dof_handler (triangulation);
 
-				   // loop over cells, and set cells
-				   // within a circle to be of type
-				   // FE_Nothing, while outside the
-				   // circle to be of type RT(0)/DG(0)
-       
-  typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+  // loop over cells, and set cells
+  // within a circle to be of type
+  // FE_Nothing, while outside the
+  // circle to be of type RT(0)/DG(0)
 
-  for(; cell != endc; cell++)
-  {
+  typename hp::DoFHandler<dim>::active_cell_iterator
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
+
+  for (; cell != endc; cell++)
+    {
       Point<dim> center = cell->center();
-      if(std::sqrt(center.square()) < 0.25 )
+      if (std::sqrt(center.square()) < 0.25 )
         cell->set_active_fe_index(1);
       else
         cell->set_active_fe_index(0);
-  }
+    }
 
-        // attempt to distribute dofs
+  // attempt to distribute dofs
 
   dof_handler.distribute_dofs (fe_collection);
 
   deallog << "   Number of active cells:       "
-	  << triangulation.n_active_cells()
-	  << std::endl
-	  << "   Number of degrees of freedom: "
-	  << dof_handler.n_dofs()
-	  << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl
+          << "   Number of degrees of freedom: "
+          << dof_handler.n_dofs()
+          << std::endl;
 }
 
 

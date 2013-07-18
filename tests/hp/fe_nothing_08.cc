@@ -57,10 +57,10 @@ void test ()
   hp::DoFHandler<dim>      dof_handler (triangulation);
 
   typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
 
-  for(; cell != endc; cell++)
+  for (; cell != endc; cell++)
     if (cell->center()[0] > 0)
       cell->set_active_fe_index(1);
     else
@@ -71,11 +71,11 @@ void test ()
 
   std::map<types::global_dof_index, double> bv;
   VectorTools::interpolate_boundary_values (dof_handler,
-					    0,
-					    ZeroFunction<dim>(1),
-					    bv);
+                                            0,
+                                            ZeroFunction<dim>(1),
+                                            bv);
   for (std::map<types::global_dof_index, double>::iterator
-	 p = bv.begin(); p!=bv.end(); ++p)
+       p = bv.begin(); p!=bv.end(); ++p)
     deallog << p->first << ' ' << p->second << std::endl;
 }
 

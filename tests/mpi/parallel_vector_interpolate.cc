@@ -56,7 +56,7 @@ void test ()
   parallel::distributed::Vector<double> v1(dof1.locally_owned_dofs(),
                                            locally_relevant_dofs1,
                                            MPI_COMM_WORLD),
-    v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD);
+                                           v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD);
 
   // set first vector to 1
   VectorTools::interpolate(dof1, ConstantFunction<dim>(1.), v1);

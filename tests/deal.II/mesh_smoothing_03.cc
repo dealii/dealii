@@ -48,63 +48,63 @@ using namespace dealii;
 
 void test ()
 {
-				   // generate a 100x3 mesh
+  // generate a 100x3 mesh
   Triangulation<2> triangulation (Triangulation<2>::eliminate_unrefined_islands);
   std::vector<unsigned int> ref(2);
   ref[0] = 100;
   ref[1] = 3;
   GridGenerator::subdivided_hyper_rectangle (triangulation, ref,
-					     Point<2>(), Point<2>(100,3));
+                                             Point<2>(), Point<2>(100,3));
 
-				   // refine all cells at the lower
-				   // boundary. we then have 600 cells
+  // refine all cells at the lower
+  // boundary. we then have 600 cells
   for (Triangulation<2>::cell_iterator
-	 cell = triangulation.begin();
+       cell = triangulation.begin();
        cell != triangulation.end(); ++cell)
     if (cell->center()[1] < 1)
       cell->set_refine_flag ();
   triangulation.execute_coarsening_and_refinement ();
   deallog << "n_active_cells = " << triangulation.n_active_cells()
-	  << std::endl;
+          << std::endl;
 
-				   // now mark all cells at the top
-				   // boundary for refinement with the
-				   // exception of the top right
-				   // one. this means that the only
-				   // cell that qualifies the island
-				   // condition is the one in the
-				   // center at the left boundary
-				   // (bottom neighbor already
-				   // refined, top neighbor to be
-				   // refined). but upon it being
-				   // flagged, its right neighbor will
-				   // also qualify, and then the right
-				   // neighbor of that one, etc. in
-				   // total, the old algorithm needs
-				   // 102 iterations through the
-				   // prepare_c_and_r loop (one for
-				   // each of the cells in the middle
-				   // stripe, plus two for apparently
-				   // other things). after the changes
-				   // to tria.cc, we now need 2
-				   // iterations
+  // now mark all cells at the top
+  // boundary for refinement with the
+  // exception of the top right
+  // one. this means that the only
+  // cell that qualifies the island
+  // condition is the one in the
+  // center at the left boundary
+  // (bottom neighbor already
+  // refined, top neighbor to be
+  // refined). but upon it being
+  // flagged, its right neighbor will
+  // also qualify, and then the right
+  // neighbor of that one, etc. in
+  // total, the old algorithm needs
+  // 102 iterations through the
+  // prepare_c_and_r loop (one for
+  // each of the cells in the middle
+  // stripe, plus two for apparently
+  // other things). after the changes
+  // to tria.cc, we now need 2
+  // iterations
   for (Triangulation<2>::cell_iterator
-	 cell = triangulation.begin();
+       cell = triangulation.begin();
        cell != triangulation.end(); ++cell)
     if (cell->center()[1] > 2)
       if (cell->center()[0] < 99)
-	cell->set_refine_flag ();
+        cell->set_refine_flag ();
   triangulation.execute_coarsening_and_refinement ();
 
-				   // output the new number of
-				   // cells. should now be 1200 since
-				   // we have refined every cell in
-				   // the mesh. unfortunately, there
-				   // is no way to test actually test
-				   // the number of iterations in
-				   // prepare_c_and_r :-(
+  // output the new number of
+  // cells. should now be 1200 since
+  // we have refined every cell in
+  // the mesh. unfortunately, there
+  // is no way to test actually test
+  // the number of iterations in
+  // prepare_c_and_r :-(
   deallog << "n_active_cells = " << triangulation.n_active_cells()
-	  << std::endl;
+          << std::endl;
 }
 
 
@@ -124,25 +124,25 @@ int main ()
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
 
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     }
 

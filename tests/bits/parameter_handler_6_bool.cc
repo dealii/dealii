@@ -25,16 +25,16 @@
 #include <iomanip>
 
 
-int main () 
+int main ()
 {
-  try 
+  try
     {
       std::ofstream logfile("parameter_handler_6_bool/output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
-                                       // same as parameter_handler_3
+      // same as parameter_handler_3
       ParameterHandler prm;
       prm.enter_subsection ("Testing");
       prm.declare_entry ("bool",
@@ -42,51 +42,51 @@ int main ()
                          Patterns::Bool(),
                          "docs 1");
       prm.leave_subsection ();
-      
+
       prm.read_input("parameter_handler_6_bool/prm");
 
-                                       // now set the parameter to a different
-                                       // value
+      // now set the parameter to a different
+      // value
       prm.enter_subsection ("Testing");
       prm.set ("bool", true);
       prm.leave_subsection ();
-      
-                                       // then write
+
+      // then write
       prm.print_parameters (logfile, ParameterHandler::Text);
 
-                                       // and do it again with the opposite
-                                       // value
+      // and do it again with the opposite
+      // value
       prm.enter_subsection ("Testing");
       prm.set ("bool", false);
       prm.leave_subsection ();
-      
-                                       // then write
+
+      // then write
       prm.print_parameters (logfile, ParameterHandler::Text);
     }
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
-  
+
   return 0;
 }

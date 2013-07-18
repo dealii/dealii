@@ -27,7 +27,7 @@ void test ()
 {
   if (dim == 1)
     return;
-  
+
   for (unsigned int i=0; i<4; ++i)
     for (unsigned int j=i; j<4; ++j)
       do_check (FE_RaviartThomas<dim>(i), FE_RaviartThomas<dim>(j));

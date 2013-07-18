@@ -21,11 +21,11 @@
 --------------------------------------------------------
 An error occurred in line <1028> of file </scratch/deal-trunk/deal.II/include/deal.II/lac/constraint_matrix.templates.h> in function
     void dealii::ConstraintMatrix::distribute(VectorType&) const [with VectorType = dealii::TrilinosWrappers::MPI::Vector]
-The violated condition was: 
+The violated condition was:
     vec(it->line) == it->entries.size()
 The name and call sequence of the exception was:
     ExcIncorrectConstraint(it->line, it->entries.size())
-Additional Information: 
+Additional Information:
 While distributing the constraint for DoF 41, it turns out that one of the processors who own the 2 degrees of freedom that x_41 is constrained against does not know about the constraint on x_41. Did you not initialize the ConstraintMatrix with the appropriate locally_relevant set so that every processor who owns a DoF that constrains another DoF also knows about this constraint?
 --------------------------------------------------------
 
@@ -64,12 +64,14 @@ void test()
   if (myid==0)
     {
       typename Triangulation<dim>::active_cell_iterator it = tr.begin_active();
-      ++it;++it;++it;
-      for (unsigned int i=0;i<5;++i)
-	{
-	  it->set_refine_flag();
-	  ++it;	  
-	}
+      ++it;
+      ++it;
+      ++it;
+      for (unsigned int i=0; i<5; ++i)
+        {
+          it->set_refine_flag();
+          ++it;
+        }
     }
   tr.execute_coarsening_and_refinement();
 
@@ -79,8 +81,8 @@ void test()
 
   IndexSet locally_relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh,
-					   locally_relevant_set);
-  
+                                           locally_relevant_set);
+
   ConstraintMatrix cm;
   cm.reinit (locally_relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, cm);
@@ -89,11 +91,11 @@ void test()
   ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
   VectorTools::interpolate_boundary_values (dofh,
-					    dirichlet_boundary,
-					    cm);
-  
+                                            dirichlet_boundary,
+                                            cm);
+
   cm.close();
-  
+
   TrilinosWrappers::MPI::Vector vec (dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)
     vec(i) = i;
@@ -108,7 +110,7 @@ void test()
       deallog <<"constraint_matrix:" << std::endl;
       cm.print(deallog.get_file_stream());
     }
-  
+
   cm.distribute (vec);
 
   if (myid == 0)

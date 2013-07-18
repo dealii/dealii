@@ -43,7 +43,7 @@ void test (const char *filename)
   const unsigned int dim = 3;
 
   deallog << "Reading " << filename << std::endl;
-  
+
   Triangulation<3> tria;
   GridIn<3> gi;
   gi.attach_triangulation (tria);
@@ -56,8 +56,8 @@ void test (const char *filename)
   catch (std::exception &exc)
     {
       deallog << "  caught exception:" << std::endl
-	      << exc.what()
-	      << std::endl;
+              << exc.what()
+              << std::endl;
       return;
     }
 
@@ -78,7 +78,7 @@ void test1()
   GridIn<3> gi;
   gi.attach_triangulation (tria);
   gi.read ("grid_in_3d/1.nc");
-  
+
   GridOut grid_out;
   std::ofstream gnufile("square.gnuplot");
   grid_out.write_gnuplot (tria, gnufile);
@@ -104,8 +104,8 @@ int main ()
   test ("grid_in_3d/evil_2.in");
   test ("grid_in_3d/evil_3.in");
   test ("grid_in_3d/evil_4.in");
-  
-				   // test1 needs NetCDF
+
+  // test1 needs NetCDF
 //    test1 ();
 }
 

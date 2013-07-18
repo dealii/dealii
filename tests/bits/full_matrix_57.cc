@@ -30,14 +30,14 @@ const double ints[9] = { 0, -1., 1., -2., 2., -3., 3., -4., 4.};
 template <typename number>
 void
 check ()
- {
+{
   deallog << std::fixed;
   deallog << std::setprecision(1);
   deallog.depth_console(0);
 
   Vector<double> First4(4), Second4(4), First9(9);
   FullMatrix<double>F4(4,4),  F9(9,9);
-  
+
 
   deallog << "Original Vector V" << std::endl;
   deallog << "=================" << std::endl;
@@ -49,7 +49,7 @@ check ()
     }
   deallog << std::endl;
   deallog << std::endl;
-  
+
   deallog << "Original Vector W" << std::endl;
   deallog << "=================" << std::endl;
 
@@ -62,30 +62,30 @@ check ()
   deallog << std::endl;
 
   F4.outer_product(First4, Second4);
-  
+
   deallog << "Outer_Product of V and W" << std::endl;
   deallog << "========================" << std::endl;
   display_matrix(F4);
-  deallog << std::endl;    	  
+  deallog << std::endl;
   deallog << std::endl;
 
   deallog << std::endl;
-  
+
   F4.outer_product(First4, First4);
-  
+
   deallog << "Outer_Product of V and V" << std::endl;
   deallog << "========================" << std::endl;
   display_matrix(F4);
-  deallog << std::endl;    	  
+  deallog << std::endl;
   deallog << std::endl;
 
 
   F4.outer_product(Second4, Second4);
-  
+
   deallog << "Outer_Product of W and W" << std::endl;
   deallog << "========================" << std::endl;
   display_matrix(F4);
-  deallog << std::endl;    	  
+  deallog << std::endl;
   deallog << std::endl;
   deallog << std::endl;
 
@@ -101,11 +101,11 @@ check ()
   deallog << std::endl;
 
   F9.outer_product(First9, First9);
-  
+
   deallog << "Outer_Product of V and V" << std::endl;
   deallog << "========================" << std::endl;
   display_matrix(F9);
-  deallog << std::endl;    	  
+  deallog << std::endl;
   deallog << std::endl;
 
   deallog << std::endl;
@@ -122,14 +122,14 @@ check ()
   deallog << std::endl;
 
   F9.outer_product(First9, First9);
-  
+
   deallog << "Outer_Product of V and V" << std::endl;
   deallog << "========================" << std::endl;
   display_matrix(F9);
-  deallog << std::endl;    	  
+  deallog << std::endl;
   deallog << std::endl;
 
   deallog << std::endl;
 }
 
-      
+

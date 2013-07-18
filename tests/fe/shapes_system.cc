@@ -48,16 +48,16 @@ void plot_FE_System_shape_functions()
 //   plot_face_shape_functions(m, p2, "System2");
 //   test_compute_functions(m, p2, "System2");
 
-                                   // some tests with the Nedelec
-                                   // element. don't try to make sense
-                                   // out of the composed elements,
-                                   // they are simply constructed as
-                                   // complicated as possible to
-                                   // trigger as many assertions as
-                                   // possible (and they _have_, in
-                                   // the past, literally dozens of
-                                   // assertions)
-  if (dim != 1) 
+  // some tests with the Nedelec
+  // element. don't try to make sense
+  // out of the composed elements,
+  // they are simply constructed as
+  // complicated as possible to
+  // trigger as many assertions as
+  // possible (and they _have_, in
+  // the past, literally dozens of
+  // assertions)
+  if (dim != 1)
     {
       FESystem<dim> p3(FE_Nedelec<dim>(1), 1,
                        FESystem<dim> (FE_Q<dim>(1),1,
@@ -66,8 +66,8 @@ void plot_FE_System_shape_functions()
                        FE_DGQ<dim>(0), 2);
       test_compute_functions(m, p3, "System_Nedelec_1");
 
-                                       // the following is simply too
-                                       // expensive in 3d...
+      // the following is simply too
+      // expensive in 3d...
       if (dim != 3)
         {
           FESystem<dim> p4(p3, 1,
@@ -95,7 +95,7 @@ main()
   plot_FE_System_shape_functions<2>();
   deallog << "FE_System<3>" << std::endl;
   plot_FE_System_shape_functions<3>();
-  
+
   return 0;
 }
 

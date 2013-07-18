@@ -51,11 +51,11 @@ void test ()
   Vector<double> b1 (N);
   Vector<double> b2 (N);
 
-                                   // then fill the two matrices and vectors
-                                   // by setting up bogus matrix entries and
-                                   // (1) writing them into the matrix and
-                                   // applying boundary values later on, or
-                                   // (2) applying them right away
+  // then fill the two matrices and vectors
+  // by setting up bogus matrix entries and
+  // (1) writing them into the matrix and
+  // applying boundary values later on, or
+  // (2) applying them right away
   std::map<types::global_dof_index,double> boundary_values;
   boundary_values[N/2] = 42;
 
@@ -63,37 +63,37 @@ void test ()
   std::vector<types::global_dof_index> local_dofs (N);
   FullMatrix<double> local_matrix (N,N);
   Vector<double> local_vector (N);
-    {
-      for (unsigned int i=0; i<N; ++i)
-	local_dofs[i] = i;
+  {
+    for (unsigned int i=0; i<N; ++i)
+      local_dofs[i] = i;
 
-      local_matrix = 0;
-      for (unsigned int i=0; i<N; ++i)
-        for (unsigned int j=0; j<N; ++j)
-          local_matrix(i,j) = i*N+j;
-      for (unsigned int i=0; i<N; ++i)
-        local_vector(i) = i+1;
+    local_matrix = 0;
+    for (unsigned int i=0; i<N; ++i)
+      for (unsigned int j=0; j<N; ++j)
+        local_matrix(i,j) = i*N+j;
+    for (unsigned int i=0; i<N; ++i)
+      local_vector(i) = i+1;
 
-      // copy local to global by ourselves
-      for (unsigned int i=0; i<N; ++i)
-        for (unsigned int j=0; j<N; ++j)
-          A.add (local_dofs[i], local_dofs[j], local_matrix(i,j));
-      for (unsigned int i=0; i<N; ++i)
-        b1(local_dofs[i]) += local_vector(i);
+    // copy local to global by ourselves
+    for (unsigned int i=0; i<N; ++i)
+      for (unsigned int j=0; j<N; ++j)
+        A.add (local_dofs[i], local_dofs[j], local_matrix(i,j));
+    for (unsigned int i=0; i<N; ++i)
+      b1(local_dofs[i]) += local_vector(i);
 
-                                       // or let other functions do that after
-                                       // removing boundary values
-      MatrixTools::local_apply_boundary_values (boundary_values, local_dofs,
-                                                local_matrix, local_vector,
-                                                false);
-      for (unsigned int i=0; i<N; ++i)
-        for (unsigned int j=0; j<N; ++j)
-          B.add (local_dofs[i], local_dofs[j], local_matrix(i,j));
-      for (unsigned int i=0; i<N; ++i)
-        b2(local_dofs[i]) += local_vector(i);
-    }
+    // or let other functions do that after
+    // removing boundary values
+    MatrixTools::local_apply_boundary_values (boundary_values, local_dofs,
+                                              local_matrix, local_vector,
+                                              false);
+    for (unsigned int i=0; i<N; ++i)
+      for (unsigned int j=0; j<N; ++j)
+        B.add (local_dofs[i], local_dofs[j], local_matrix(i,j));
+    for (unsigned int i=0; i<N; ++i)
+      b2(local_dofs[i]) += local_vector(i);
+  }
 
-                                   // for A, remove boundary values only now.
+  // for A, remove boundary values only now.
   Vector<double> x (N);
   MatrixTools::apply_boundary_values (boundary_values, A, x, b1, false);
 
@@ -107,15 +107,15 @@ void test ()
   deallog << "b2=" << std::endl;
   b2.print (deallog.get_file_stream());
 
-                                   // now comes the check: we subtract B from
-                                   // A, and make sure that the result is zero
+  // now comes the check: we subtract B from
+  // A, and make sure that the result is zero
   A.add (-1., B);
   deallog << "|A|=" << A.frobenius_norm() << std::endl;
   deallog << "|B|=" << B.frobenius_norm() << std::endl;
   Assert (A.frobenius_norm() < 1e-12*B.frobenius_norm(),
           ExcInternalError());
 
-                                   // similar for b1 and b2
+  // similar for b1 and b2
   b1 -= b2;
   deallog << "|b1|=" << b1.l2_norm() << std::endl;
   deallog << "|b2|=" << b2.l2_norm() << std::endl;
@@ -139,25 +139,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
 
       return 1;
     }
   catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

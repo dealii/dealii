@@ -57,22 +57,22 @@ char logname[] = "crash_12/output";
 template <int dim>
 void test ()
 {
-				   // create a mesh like this (viewed
-				   // from top, if in 3d):
-				   // *---*---*
-				   // | 0 | 1 |
-				   // *---*---*
+  // create a mesh like this (viewed
+  // from top, if in 3d):
+  // *---*---*
+  // | 0 | 1 |
+  // *---*---*
   Triangulation<dim>     triangulation;
   std::vector<unsigned int> subdivisions (dim, 1);
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle (triangulation, subdivisions,
                                              Point<dim>(),
-					     (dim == 3 ?
-					      Point<dim>(2,1,1) :
-					      Point<dim>(2,1)));
+                                             (dim == 3 ?
+                                              Point<dim>(2,1,1) :
+                                              Point<dim>(2,1)));
   (++triangulation.begin_active())->set_refine_flag ();
   triangulation.execute_coarsening_and_refinement ();
-  
+
   hp::FECollection<dim> fe;
   fe.push_back (FE_Q<dim>(1));
   fe.push_back (FE_Q<dim>(2));
@@ -85,28 +85,28 @@ void test ()
   for (unsigned int i=0; i<fe.size(); ++i)
     for (unsigned int j=0; j<fe.size(); ++j)
       {
-	deallog << "Testing " << fe[i].get_name()
-		<< " vs. " << fe[j].get_name()
-		<< std::endl;
-	
-					 // set fe on coarse cell to 'i', on
-					 // all fine cells to 'j'
-	typename hp::DoFHandler<dim>::active_cell_iterator
-	  cell = dof_handler.begin_active();
-	cell->set_active_fe_index (i);
-	++cell;
+        deallog << "Testing " << fe[i].get_name()
+                << " vs. " << fe[j].get_name()
+                << std::endl;
 
-	for (; cell != dof_handler.end(); ++cell)
-	  cell->set_active_fe_index (j);
+        // set fe on coarse cell to 'i', on
+        // all fine cells to 'j'
+        typename hp::DoFHandler<dim>::active_cell_iterator
+        cell = dof_handler.begin_active();
+        cell->set_active_fe_index (i);
+        ++cell;
 
-	dof_handler.distribute_dofs (fe);
-  
-	ConstraintMatrix constraints;
-	DoFTools::make_hanging_node_constraints (dof_handler,
-						 constraints);
-	constraints.close ();
-	
-	constraints.print (deallog.get_file_stream());
+        for (; cell != dof_handler.end(); ++cell)
+          cell->set_active_fe_index (j);
+
+        dof_handler.distribute_dofs (fe);
+
+        ConstraintMatrix constraints;
+        DoFTools::make_hanging_node_constraints (dof_handler,
+                                                 constraints);
+        constraints.close ();
+
+        constraints.print (deallog.get_file_stream());
       }
 }
 
@@ -116,7 +116,7 @@ int main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (4);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

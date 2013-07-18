@@ -16,7 +16,7 @@
 
 
 
-// like grid_in_out but test persistent triangulation 
+// like grid_in_out but test persistent triangulation
 
 #include "../tests.h"
 #include <fstream>
@@ -32,27 +32,28 @@
 std::ofstream logfile("grid_in_out_03/output");
 
 template <int dim, int spacedim>
-void test(std::string filename) {
+void test(std::string filename)
+{
   logfile << " Tria<" << dim << "," << spacedim << ">: "
-	  << filename << std::endl;
+          << filename << std::endl;
   Triangulation<dim, spacedim> tria;
   GridIn<dim, spacedim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in (filename.c_str());
   gi.read_ucd (in);
-  
+
   PersistentTriangulation<dim, spacedim> ptria(tria);
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
 
   ptria.restore();
-  for(unsigned int i=0; i<2; ++i) 
+  for (unsigned int i=0; i<2; ++i)
     {
-      for(cell=ptria.begin_active(); cell != ptria.end(); ++cell)
-	if(cell->center()[0]<.5)
-	  cell->set_refine_flag();
+      for (cell=ptria.begin_active(); cell != ptria.end(); ++cell)
+        if (cell->center()[0]<.5)
+          cell->set_refine_flag();
       ptria.execute_coarsening_and_refinement();
     }
-  
+
   ptria.write_flags(logfile);
 }
 

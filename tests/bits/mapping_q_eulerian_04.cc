@@ -41,7 +41,8 @@
 std::ofstream logfile("mapping_q_eulerian_04/output");
 
 template <int dim, int spacedim>
-void test() {
+void test()
+{
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria);
   FE_Q<dim, spacedim> base_fe(1);
@@ -50,7 +51,7 @@ void test() {
   DoFHandler<dim, spacedim> shift_dh(tria);
 
   shift_dh.distribute_dofs(fe);
-  
+
   Vector<double> shift(shift_dh.n_dofs());
 
   shift.add(+1);
@@ -61,36 +62,36 @@ void test() {
 
   QTrapez<dim> quad;
   MappingQ1Eulerian<dim,Vector<double>,spacedim> mapping(shift, shift_dh);
-  
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell=tria.begin_active(), 
-    endc=tria.end() ;
+
+  typename Triangulation<dim,spacedim>::active_cell_iterator cell=tria.begin_active(),
+                                                             endc=tria.end() ;
   Point<spacedim> real;
   Point<dim> unit;
   double eps = 1e-10;
-  for(;cell!=endc;++cell)
+  for (; cell!=endc; ++cell)
     {
-      deallog<<cell<< std::endl;	
-      for(unsigned int q=0; q<quad.size(); ++q)
-	{
-	  real = mapping.transform_unit_to_real_cell(cell, quad.point(q));
-	  unit = mapping.transform_real_to_unit_cell(cell, real);
-	  deallog<<quad.point(q)<< " -> " << real << std::endl;
-	  if( (unit-quad.point(q)).norm()>eps)
-	    deallog<<quad.point(q)<< " != " << unit << std::endl;
-	}
-    }	   
-    
+      deallog<<cell<< std::endl;
+      for (unsigned int q=0; q<quad.size(); ++q)
+        {
+          real = mapping.transform_unit_to_real_cell(cell, quad.point(q));
+          unit = mapping.transform_real_to_unit_cell(cell, real);
+          deallog<<quad.point(q)<< " -> " << real << std::endl;
+          if ( (unit-quad.point(q)).norm()>eps)
+            deallog<<quad.point(q)<< " != " << unit << std::endl;
+        }
+    }
+
 }
 
-int main () 
+int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   test<1,1>();
   test<2,2>();
   test<3,3>();
 
   return 0;
 }
-                  
+

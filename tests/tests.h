@@ -46,7 +46,7 @@ std::ofstream deallogfile;
 
 inline
 void
-initlog(const char* filename, bool console=false)
+initlog(const char *filename, bool console=false)
 {
   deallogname = JobIdentifier::base_name(filename) + std::string("/output");
   deallogfile.open(deallogname.c_str());
@@ -66,8 +66,8 @@ output_file_for_mpi (const std::string &directory)
 {
 #ifdef DEAL_II_WITH_MPI
   return (directory + "/ncpu_" +
-	  Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) +
-	  "/output");
+          Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) +
+          "/output");
 #else
   return (directory + "/ncpu_1/output");
 #endif
@@ -76,7 +76,7 @@ output_file_for_mpi (const std::string &directory)
 
 inline
 void
-mpi_initlog(const char* filename, bool console=false)
+mpi_initlog(const char *filename, bool console=false)
 {
 #ifdef DEAL_II_WITH_MPI
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
@@ -86,7 +86,7 @@ mpi_initlog(const char* filename, bool console=false)
       deallogfile.open(deallogname.c_str());
       deallog.attach(deallogfile);
       if (!console)
-	deallog.depth_console(0);
+        deallog.depth_console(0);
 
 //TODO: Remove this line and replace by test_mode()
       deallog.threshold_float(1.e-8);
@@ -103,71 +103,71 @@ mpi_initlog(const char* filename, bool console=false)
    on proc 0 */
 class MPILogInitAll
 {
-  public:
-    MPILogInitAll(const char* filename, bool console=false)
-		    : m_filename(filename)
-      {
+public:
+  MPILogInitAll(const char *filename, bool console=false)
+    : m_filename(filename)
+  {
 #ifdef DEAL_II_WITH_MPI
-	unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-	deallogname = output_file_for_mpi(JobIdentifier::base_name(filename));
-	if (myid != 0)
-	  deallogname = deallogname + Utilities::int_to_string(myid);
-	deallogfile.open(deallogname.c_str());
-	deallog.attach(deallogfile);
-	if (!console)
-	  deallog.depth_console(0);
+    unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+    deallogname = output_file_for_mpi(JobIdentifier::base_name(filename));
+    if (myid != 0)
+      deallogname = deallogname + Utilities::int_to_string(myid);
+    deallogfile.open(deallogname.c_str());
+    deallog.attach(deallogfile);
+    if (!console)
+      deallog.depth_console(0);
 
 //TODO: Remove this line and replace by test_mode()
-	deallog.threshold_float(1.e-8);
-	deallog.push(Utilities::int_to_string(myid));
+    deallog.threshold_float(1.e-8);
+    deallog.push(Utilities::int_to_string(myid));
 #else
-	// can't use this function if not using MPI
-	Assert (false, ExcInternalError());
+    // can't use this function if not using MPI
+    Assert (false, ExcInternalError());
 #endif
-      }
+  }
 
-    ~MPILogInitAll()
-      {
+  ~MPILogInitAll()
+  {
 #ifdef DEAL_II_WITH_MPI
-	unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-	unsigned int nproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+    unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+    unsigned int nproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
-	deallog.pop();
-	if (myid!=0)
-	  {
-	    deallog.detach();
-	    deallogfile.close();
-	  }
-
-	MPI_Barrier(MPI_COMM_WORLD);
-
-	if (myid==0)
-	  {
-	    for (unsigned int i=1;i<nproc;++i)
-	      {
-		std::string filename = output_file_for_mpi(JobIdentifier::base_name(m_filename.c_str()))
-				       + Utilities::int_to_string(i);
-		std::ifstream in(filename.c_str());
-		Assert (in, ExcIO());
-
-		while (in)
-		  {
-		    std::string s;
-		    std::getline(in, s);
-		    deallog.get_file_stream() << s << "\n";
-		  }
-		in.close();
-		std::remove (filename.c_str());
-	      }
-	  }
-#else
-	// can't use this function if not using MPI
-	Assert (false, ExcInternalError());
-#endif
+    deallog.pop();
+    if (myid!=0)
+      {
+        deallog.detach();
+        deallogfile.close();
       }
-  private:
 
-    std::string m_filename;
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (myid==0)
+      {
+        for (unsigned int i=1; i<nproc; ++i)
+          {
+            std::string filename = output_file_for_mpi(JobIdentifier::base_name(m_filename.c_str()))
+                                   + Utilities::int_to_string(i);
+            std::ifstream in(filename.c_str());
+            Assert (in, ExcIO());
+
+            while (in)
+              {
+                std::string s;
+                std::getline(in, s);
+                deallog.get_file_stream() << s << "\n";
+              }
+            in.close();
+            std::remove (filename.c_str());
+          }
+      }
+#else
+    // can't use this function if not using MPI
+    Assert (false, ExcInternalError());
+#endif
+  }
+private:
+
+  std::string m_filename;
 
 };
 
@@ -185,10 +185,10 @@ class MPILogInitAll
 // baseline
 struct SwitchOffStacktrace
 {
-    SwitchOffStacktrace ()
-      {
-	deal_II_exceptions::suppress_stacktrace_in_exceptions ();
-      }
+  SwitchOffStacktrace ()
+  {
+    deal_II_exceptions::suppress_stacktrace_in_exceptions ();
+  }
 } deal_II_stacktrace_dummy;
 
 #endif
@@ -197,19 +197,19 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
 
-    namespace Vector
-    {
+  namespace Vector
+  {
 
-      extern unsigned int minimum_parallel_grain_size;
+    extern unsigned int minimum_parallel_grain_size;
 
-    }
+  }
 
-    namespace SparseMatrix
-    {
+  namespace SparseMatrix
+  {
 
-      extern unsigned int minimum_parallel_grain_size;
+    extern unsigned int minimum_parallel_grain_size;
 
-    }
+  }
 
 }
 
@@ -219,14 +219,14 @@ namespace internal
 struct SetGrainSizes
 {
 
-    SetGrainSizes ()
-      {
+  SetGrainSizes ()
+  {
 
-	internal::Vector::minimum_parallel_grain_size = 2;
+    internal::Vector::minimum_parallel_grain_size = 2;
 
-	internal::SparseMatrix::minimum_parallel_grain_size = 2;
+    internal::SparseMatrix::minimum_parallel_grain_size = 2;
 
-      }
+  }
 
 }
 set_grain_sizes;
@@ -246,44 +246,44 @@ set_grain_sizes;
 
 struct DeadlockKiller
 {
-  private:
-    static void nuke_it ()
-      {
-	char * env = std::getenv("WALLTIME");
+private:
+  static void nuke_it ()
+  {
+    char *env = std::getenv("WALLTIME");
 
-	if (env != 0)
-	  {
-	    std::istringstream conv (env);
-	    int delay;
-	    conv >> delay;
-	    if (conv)
-	      {
-		sleep (delay);
-		std::cerr << "Time's up: Killing job after "
-			  << delay
-			  << " seconds because it overran its allowed walltime."
-			  << std::endl;
-		std::abort ();
-	      }
-	    else
-	      {
-		std::cerr << "Invalid value for WALLTIME environment variable."
-			  << std::endl;
-		std::abort ();
-	      }
-	  }
-	else
-          // environment variable is not set, so assume infinite wait time
-          // and simply quit this thread
-	  {
-	  }
-      }
-
-  public:
-    DeadlockKiller ()
+    if (env != 0)
       {
-	dealii::Threads::new_thread (&nuke_it);
+        std::istringstream conv (env);
+        int delay;
+        conv >> delay;
+        if (conv)
+          {
+            sleep (delay);
+            std::cerr << "Time's up: Killing job after "
+                      << delay
+                      << " seconds because it overran its allowed walltime."
+                      << std::endl;
+            std::abort ();
+          }
+        else
+          {
+            std::cerr << "Invalid value for WALLTIME environment variable."
+                      << std::endl;
+            std::abort ();
+          }
       }
+    else
+      // environment variable is not set, so assume infinite wait time
+      // and simply quit this thread
+      {
+      }
+  }
+
+public:
+  DeadlockKiller ()
+  {
+    dealii::Threads::new_thread (&nuke_it);
+  }
 };
 
 #endif

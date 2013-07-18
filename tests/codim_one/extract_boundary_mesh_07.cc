@@ -55,13 +55,13 @@ namespace Step38
   private:
     static const unsigned int boundary_dim = spacedim-1;
 
-    Triangulation<spacedim> 				 volume_mesh_triangulation;
+    Triangulation<spacedim>          volume_mesh_triangulation;
     Triangulation<boundary_dim,spacedim>   boundary_triangulation;
 
-    FE_Q<spacedim>					 	 space_fe;
+    FE_Q<spacedim>             space_fe;
     FE_Q<boundary_dim,spacedim>            boundary_fe;
 
-    DoFHandler<spacedim>					 space_dof_handler;
+    DoFHandler<spacedim>           space_dof_handler;
     DoFHandler<boundary_dim,spacedim>      contact_dof_handler;
 
   };
@@ -70,11 +70,11 @@ namespace Step38
   template <int spacedim>
   Extract_Mesh_Test<spacedim>::
   Extract_Mesh_Test ()
-  :
-  space_fe (spacedim),
-  boundary_fe (1),
-  space_dof_handler(volume_mesh_triangulation),
-  contact_dof_handler(boundary_triangulation)
+    :
+    space_fe (spacedim),
+    boundary_fe (1),
+    space_dof_handler(volume_mesh_triangulation),
+    contact_dof_handler(boundary_triangulation)
   {}
 
   template <int spacedim>
@@ -87,19 +87,19 @@ namespace Step38
     space_dof_handler.distribute_dofs(space_fe);
 
     std::map<typename DoFHandler<boundary_dim, spacedim>::cell_iterator,
-	     typename DoFHandler<spacedim>::face_iterator>
-      element_assignment =
-      GridTools::extract_boundary_mesh(space_dof_handler,
-				       contact_dof_handler,
-				       boundary_ids);
+        typename DoFHandler<spacedim>::face_iterator>
+        element_assignment =
+          GridTools::extract_boundary_mesh(space_dof_handler,
+                                           contact_dof_handler,
+                                           boundary_ids);
 
     contact_dof_handler.distribute_dofs(boundary_fe);
 
     typename std::map<typename DoFHandler<boundary_dim, spacedim>::cell_iterator,typename DoFHandler<spacedim>::face_iterator>::iterator Iterator;
 
-    for (Iterator = element_assignment.begin();Iterator != element_assignment.end(); ++Iterator)
+    for (Iterator = element_assignment.begin(); Iterator != element_assignment.end(); ++Iterator)
       {
-	deallog << "element_assignment maps " << Iterator->first << " onto " << Iterator->second << std::endl;
+        deallog << "element_assignment maps " << Iterator->first << " onto " << Iterator->second << std::endl;
       }
 
   }
@@ -119,4 +119,4 @@ int main ()
     Extract_Mesh_Test<2> Test;
     Test.run();
   }
- }
+}

@@ -65,76 +65,76 @@ void test ()
   hp::DoFHandler<dim> dof_handler(tria);
 
   for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     cell->set_active_fe_index (rand() % fe_collection.size());
 
   dof_handler.distribute_dofs(fe_collection);
 
-				   // interpolate a linear function
+  // interpolate a linear function
   Vector<double> vec (dof_handler.n_dofs());
   VectorTools::interpolate (dof_handler,
-			    Functions::Monomial<dim>
-			    (dim == 1 ?
-			     Point<dim>(1.) :
-			     (dim == 2 ?
-			      Point<dim>(1.,0.) :
-			      Point<dim>(1.,0.,0.))),
-			    vec);
+                            Functions::Monomial<dim>
+                            (dim == 1 ?
+                             Point<dim>(1.) :
+                             (dim == 2 ?
+                              Point<dim>(1.,0.) :
+                              Point<dim>(1.,0.,0.))),
+                            vec);
 
   Vector<float> diff (tria.n_active_cells());
 
-				   // L1 norm. the function is u(x)=x, so its
-				   // L1 norm should be equal to 1/2
+  // L1 norm. the function is u(x)=x, so its
+  // L1 norm should be equal to 1/2
   {
     VectorTools::integrate_difference (dof_handler,
-				       vec,
-				       ZeroFunction<dim>(),
-				       diff,
-				       q_collection,
-				       VectorTools::L1_norm);
+                                       vec,
+                                       ZeroFunction<dim>(),
+                                       diff,
+                                       q_collection,
+                                       VectorTools::L1_norm);
     deallog << "L1, diff=" << diff.l1_norm() << std::endl;
   }
 
-				   // H1 seminorm. the function is u(x)=x, so
-				   // its H1 seminorm should be equal to 1/2
+  // H1 seminorm. the function is u(x)=x, so
+  // its H1 seminorm should be equal to 1/2
   {
     VectorTools::integrate_difference (dof_handler,
-				       vec,
-				       ZeroFunction<dim>(),
-				       diff,
-				       q_collection,
-				       VectorTools::H1_seminorm);
+                                       vec,
+                                       ZeroFunction<dim>(),
+                                       diff,
+                                       q_collection,
+                                       VectorTools::H1_seminorm);
     deallog << "H1 seminorm, diff=" << diff.l2_norm() << std::endl;
   }
 
-				   // W1infty seminorm. the function is
-				   // u(x)=x, so the norm must be equal to 1
-				   // on every cell
+  // W1infty seminorm. the function is
+  // u(x)=x, so the norm must be equal to 1
+  // on every cell
   {
     VectorTools::integrate_difference (dof_handler,
-				       vec,
-				       ZeroFunction<dim>(),
-				       diff,
-				       q_collection,
-				       VectorTools::W1infty_seminorm);
+                                       vec,
+                                       ZeroFunction<dim>(),
+                                       diff,
+                                       q_collection,
+                                       VectorTools::W1infty_seminorm);
     deallog << "W1infty semi, diff=" << diff.linfty_norm() << std::endl;
-				     // also ensure that we indeed get the
-				     // same value on every cell
+    // also ensure that we indeed get the
+    // same value on every cell
     diff. add(-1);
     Assert (diff.l2_norm() == 0, ExcInternalError());
   }
 
-				   // W1infty norm. the Linfty norm is one, so
-				   // the W1infty norm must be two. but not on
-				   // every cell
+  // W1infty norm. the Linfty norm is one, so
+  // the W1infty norm must be two. but not on
+  // every cell
   {
     VectorTools::integrate_difference (dof_handler,
-				       vec,
-				       ZeroFunction<dim>(),
-				       diff,
-				       q_collection,
-				       VectorTools::W1infty_norm);
+                                       vec,
+                                       ZeroFunction<dim>(),
+                                       diff,
+                                       q_collection,
+                                       VectorTools::W1infty_norm);
     deallog << "W1infty, diff=" << diff.linfty_norm() << std::endl;
     diff.add(-2);
     Assert (diff.l1_norm() > 0.5, ExcInternalError());

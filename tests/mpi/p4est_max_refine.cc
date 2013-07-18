@@ -41,7 +41,7 @@ void test()
   if (true)
     {
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "hyper_cube" << std::endl;
+        deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -49,27 +49,27 @@ void test()
 //      tr.refine_global(1);
 
       int level = 0;
-      
-      for (int i=0;i<29;++i)
-	{
-	  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	    deallog << "refine_loop... level=" << level  << std::endl;
-	  
-	  if (myid==0)
-	    tr.begin_active(level)->set_refine_flag();
 
-	  deallog.push("crap");
-	  tr.execute_coarsening_and_refinement ();
-	  deallog.pop();
-	  
+      for (int i=0; i<29; ++i)
+        {
+          if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+            deallog << "refine_loop... level=" << level  << std::endl;
 
-	  if (myid == 0)
-	    {
-	      deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
-	    }
+          if (myid==0)
+            tr.begin_active(level)->set_refine_flag();
 
-	  level++;
-	}
+          deallog.push("crap");
+          tr.execute_coarsening_and_refinement ();
+          deallog.pop();
+
+
+          if (myid == 0)
+            {
+              deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+            }
+
+          level++;
+        }
     }
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -80,7 +80,7 @@ void test()
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  
+
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 

@@ -31,7 +31,7 @@
 
 
 template<int dim>
-void test(std::ostream& out)
+void test(std::ostream &out)
 {
   Triangulation<2> triangulation;
   Triangulation<3> tr;
@@ -50,6 +50,6 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<3>(logfile);
 }

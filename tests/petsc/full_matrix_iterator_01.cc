@@ -19,7 +19,7 @@
 // test PETScWrappers::MatrixBase::const_iterator
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_full_matrix.h>    
+#include <deal.II/lac/petsc_full_matrix.h>
 #include <fstream>
 #include <iostream>
 
@@ -29,7 +29,7 @@ void test ()
   PETScWrappers::FullMatrix m(5,5);
   m.set (0,0,1);
   m.set (1,1,2);
-  m.set (1,2,3);  
+  m.set (1,2,3);
   m.compress ();
   PETScWrappers::FullMatrix::const_iterator i = m.begin();
   deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
@@ -37,7 +37,7 @@ void test ()
   deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
   i++;
   deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -56,30 +56,30 @@ int main (int argc,char **argv)
       {
         test ();
       }
-      
+
     }
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

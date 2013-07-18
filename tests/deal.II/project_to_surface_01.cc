@@ -36,24 +36,24 @@
 
 class Rotate2d
 {
-  public:
-    Rotate2d (const double angle)
-		    :
-		    angle(angle)
-      {}
+public:
+  Rotate2d (const double angle)
+    :
+    angle(angle)
+  {}
 
-    template <int spacedim>
-    Point<spacedim> operator() (const Point<spacedim> p) const
-      {
-	Point<spacedim> q;
-	q[0] = std::cos(angle)*p(0) - std::sin(angle) * p(1);
-	q[1] = std::sin(angle)*p(0) + std::cos(angle) * p(1);
-	for (unsigned d=2; d<spacedim; ++d)
-	  q[d] = p[d];
-	return q;
-      }
-  private:
-    const double angle;
+  template <int spacedim>
+  Point<spacedim> operator() (const Point<spacedim> p) const
+  {
+    Point<spacedim> q;
+    q[0] = std::cos(angle)*p(0) - std::sin(angle) * p(1);
+    q[1] = std::sin(angle)*p(0) + std::cos(angle) * p(1);
+    for (unsigned d=2; d<spacedim; ++d)
+      q[d] = p[d];
+    return q;
+  }
+private:
+  const double angle;
 };
 
 
@@ -71,7 +71,7 @@ void do_rotate (Triangulation<1> &)
 
 template <int dim>
 void create_triangulation(const bool rotate,
-			  Triangulation<dim> &tria)
+                          Triangulation<dim> &tria)
 {
   GridGenerator::hyper_cube(tria, 1., 3.);
 
@@ -84,7 +84,7 @@ template <int dim>
 void test ()
 {
   deallog << "dim=" << dim << std::endl;
-  
+
   Triangulation<dim> tria;
   StraightBoundary<dim> boundary;
 
@@ -96,29 +96,29 @@ void test ()
       const typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
       Point<dim> trial_point;
       for (unsigned int i=0; i<dim; ++i)
-	trial_point[i] = 1.5;
-      
-      for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
-	{
-	  deallog << "    Line " << e << ", projected point=";
-	  if (dim > 1)
-	    deallog << boundary.project_to_surface (cell->line(e), trial_point);
-	  else
-	    deallog << boundary.project_to_surface (cell, trial_point);
+        trial_point[i] = 1.5;
 
-	  deallog << "  (line is from ";
-	  if (dim > 1)
-	    deallog << cell->line(e)->vertex(0);
-	  else
-	    deallog << cell->vertex(0);
-	  deallog << " to ";
-	  if (dim > 1)
-	    deallog << cell->line(e)->vertex(1);
-	  else
-	    deallog << cell->vertex(1);
-	  
-	  deallog << ")" << std::endl;
-	}
+      for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
+        {
+          deallog << "    Line " << e << ", projected point=";
+          if (dim > 1)
+            deallog << boundary.project_to_surface (cell->line(e), trial_point);
+          else
+            deallog << boundary.project_to_surface (cell, trial_point);
+
+          deallog << "  (line is from ";
+          if (dim > 1)
+            deallog << cell->line(e)->vertex(0);
+          else
+            deallog << cell->vertex(0);
+          deallog << " to ";
+          if (dim > 1)
+            deallog << cell->line(e)->vertex(1);
+          else
+            deallog << cell->vertex(1);
+
+          deallog << ")" << std::endl;
+        }
       tria.clear();
     }
 }
@@ -130,7 +130,7 @@ int main ()
 {
   std::ofstream logfile ("project_to_surface_01/output");
   deallog << std::setprecision (3);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

@@ -28,7 +28,7 @@ template <int dim>
 void test ()
 {
   if (dim > 1)
-				     // only p=1 implemented at present
+    // only p=1 implemented at present
     for (unsigned int p=1; p<2; ++p)
       test_with_2d_deformed_mesh (FE_Nedelec<dim>(p-1), p, 1);
 }

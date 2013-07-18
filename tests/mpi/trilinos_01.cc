@@ -35,8 +35,8 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-				   // each processor owns 2 indices and all
-                                   // are ghosting element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting element 1 (the second)
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
   IndexSet local_relevant(numproc*2);
@@ -46,7 +46,7 @@ void test ()
   TrilinosWrappers::MPI::Vector v(local_active, MPI_COMM_WORLD);
   TrilinosWrappers::MPI::Vector v_tmp(local_relevant, MPI_COMM_WORLD);
 
-				   // only one CPU checks has_ghost_elements()
+  // only one CPU checks has_ghost_elements()
   MPI_Barrier(MPI_COMM_WORLD);
   if (myid==0)
     {
@@ -58,25 +58,25 @@ void test ()
   if (myid==1)
     {
       MPI_Status status;
-      MPI_Request request;	
+      MPI_Request request;
       int flag=0;
       int tests=0;
-      
+
       while (!flag && tests<10)
-	{
-	  tests++;
-	  MPI_Iprobe(0, 12345, MPI_COMM_WORLD, &flag, &status);
-	  std::cout << flag << std::endl;
-	  
-	  sleep(1);
-	}
-      
+        {
+          tests++;
+          MPI_Iprobe(0, 12345, MPI_COMM_WORLD, &flag, &status);
+          std::cout << flag << std::endl;
+
+          sleep(1);
+        }
+
       Assert(flag!=0, ExcMessage("hang in has_ghost_elements()"));
     }
-  
+
 
   MPI_Barrier(MPI_COMM_WORLD);
-  
+
   deallog << v_tmp.has_ghost_elements() << std::endl;
 
   if (myid==0)

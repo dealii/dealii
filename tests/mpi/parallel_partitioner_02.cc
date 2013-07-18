@@ -44,11 +44,11 @@ void test ()
       if (i<myid)
         my_start += set - i;
     }
-                                   // each processor owns some indices and all
-                                   // are ghosting elements from three
-                                   // processors (the second). some entries
-                                   // are right around the border between two
-                                   // processors
+  // each processor owns some indices and all
+  // are ghosting elements from three
+  // processors (the second). some entries
+  // are right around the border between two
+  // processors
   IndexSet local_owned(global_size);
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet local_relevant(global_size);
@@ -56,15 +56,16 @@ void test ()
   if (myid < 6)
     {
       unsigned int ghost_indices [10] = {1, 2, 13, set-2, set-1, set, set+1, 2*set,
-                                         2*set+1, 2*set+3};
+                                         2*set+1, 2*set+3
+                                        };
       local_relevant.add_indices (&ghost_indices[0], &ghost_indices[0]+10);
     }
 
   Utilities::MPI::Partitioner v(local_owned, local_relevant, MPI_COMM_WORLD);
 
-                                // check number of import indices everywhere
-                                // (counted the above) times the number of
-                                // processors which have these as ghosts
+  // check number of import indices everywhere
+  // (counted the above) times the number of
+  // processors which have these as ghosts
   const unsigned int n_procs_with_ghosts = std::min (numproc-1, 5U);
   if (myid == 0)
     {

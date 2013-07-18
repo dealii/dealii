@@ -32,7 +32,7 @@
 #include <fstream>
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("coarsening_3d/output");
   deallog.attach(logfile);
@@ -42,7 +42,7 @@ int main ()
   Triangulation<3> coarse_grid;
   create_L_shape (coarse_grid);
 
-                                   // refine once, then unrefine again
+  // refine once, then unrefine again
   coarse_grid.refine_global (1);
   for (Triangulation<3>::active_cell_iterator c=coarse_grid.begin_active();
        c != coarse_grid.end(); ++c)
@@ -52,5 +52,5 @@ int main ()
   deallog << "ok." << std::endl;
 }
 
-  
-  
+
+

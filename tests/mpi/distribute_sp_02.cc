@@ -43,7 +43,7 @@ void test_mpi()
   unsigned int num_local=10;
   unsigned int n=numprocs*num_local;
   std::vector<types::global_dof_index> rows_per_cpu;
-  for (unsigned int i=0;i<numprocs;++i)
+  for (unsigned int i=0; i<numprocs; ++i)
     rows_per_cpu.push_back(num_local);
 
   IndexSet locally_rel(n);
@@ -55,29 +55,29 @@ void test_mpi()
 
   std::vector<IndexSet> partitioning;
   partitioning.push_back(locally_rel);
-  
+
   BlockCompressedSimpleSparsityPattern csp(partitioning);
-  
-  for (unsigned int i=0;i<n;++i)
+
+  for (unsigned int i=0; i<n; ++i)
     csp.add(i, myid);
-  
+
   if (myid==0)
     {
       deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols() << std::endl;
       deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
     }
-  
-  SparsityTools::distribute_sparsity_pattern<>(csp,
-					       rows_per_cpu,
-					       MPI_COMM_WORLD,
-					       locally_rel);
-/*  {
-    std::ofstream f((std::string("after")+Utilities::int_to_string(myid)).c_str());
-    csp.print(f);
-    }*/
 
-				   // checking...
-   for (unsigned int r=0;r<num_local;++r)
+  SparsityTools::distribute_sparsity_pattern<>(csp,
+                                               rows_per_cpu,
+                                               MPI_COMM_WORLD,
+                                               locally_rel);
+  /*  {
+      std::ofstream f((std::string("after")+Utilities::int_to_string(myid)).c_str());
+      csp.print(f);
+      }*/
+
+  // checking...
+  for (unsigned int r=0; r<num_local; ++r)
     {
       unsigned int indx=r+myid*num_local;
       unsigned int len=csp.row_length(indx);
@@ -85,15 +85,15 @@ void test_mpi()
 //std::cout << "myid=" << myid << " idx=" << indx << " len=" << len <<std::endl;
 
       if (myid>0 && myid<numprocs-1)
-	Assert(len==3, ExcInternalError());
+        Assert(len==3, ExcInternalError());
       if (myid==0 || myid==numprocs-1)
-	Assert(len==2, ExcInternalError());
+        Assert(len==2, ExcInternalError());
 
       Assert(csp.exists(indx, myid), ExcInternalError());
       if (myid>0)
-	Assert(csp.exists(indx, myid-1), ExcInternalError());
+        Assert(csp.exists(indx, myid-1), ExcInternalError());
       if (myid<numprocs-1)
-	Assert(csp.exists(indx, myid+1), ExcInternalError());
+        Assert(csp.exists(indx, myid+1), ExcInternalError());
     }
 
   if (myid==0)
@@ -102,26 +102,26 @@ void test_mpi()
   IndexSet bla(1);
   if (myid==0)
     bla.add_index(0);
-  
+
   partitioning.push_back(bla);
 
   csp.reinit(partitioning);
-  for (unsigned int i=0;i<n;++i)
+  for (unsigned int i=0; i<n; ++i)
     csp.add(i, myid);
 
   SparsityTools::distribute_sparsity_pattern<>(csp,
-					       rows_per_cpu,
-					       MPI_COMM_WORLD,
-					       locally_rel);
+                                               rows_per_cpu,
+                                               MPI_COMM_WORLD,
+                                               locally_rel);
 
   if (myid==0)
     {
       deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols() << std::endl;
       deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
     }
-  
-				   // checking...
-  for (unsigned int r=0;r<num_local;++r)
+
+  // checking...
+  for (unsigned int r=0; r<num_local; ++r)
     {
       unsigned int indx=r+myid*num_local;
       unsigned int len=csp.row_length(indx);
@@ -129,17 +129,17 @@ void test_mpi()
       //std::cout << "myid=" << myid << " idx=" << indx << " len=" << len <<std::endl;
 
       if (myid>0 && myid<numprocs-1)
-	Assert(len==3, ExcInternalError());
+        Assert(len==3, ExcInternalError());
       if (myid==numprocs-1 || myid==0)
-	Assert(len==2, ExcInternalError());
-      
+        Assert(len==2, ExcInternalError());
+
       Assert(csp.exists(indx, myid), ExcInternalError());
       if (myid>0)
-	Assert(csp.exists(indx, myid-1), ExcInternalError());
+        Assert(csp.exists(indx, myid-1), ExcInternalError());
       if (myid<numprocs-1)
-	Assert(csp.exists(indx, myid+1), ExcInternalError());
+        Assert(csp.exists(indx, myid+1), ExcInternalError());
     }
-   
+
   if (myid==0)
     deallog << "done" << std::endl;
 

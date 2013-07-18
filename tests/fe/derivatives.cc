@@ -35,12 +35,12 @@
 
 template<int dim>
 inline void
-plot_derivatives(Mapping<dim>& mapping,
-		     FiniteElement<dim>& finel,
-		     const char* name)
+plot_derivatives(Mapping<dim> &mapping,
+                 FiniteElement<dim> &finel,
+                 const char *name)
 {
   deallog.push (name);
-  
+
   Triangulation<dim> tr;
   DoFHandler<dim> dof(tr);
   GridGenerator::hyper_cube(tr, 2., 5.);
@@ -52,27 +52,27 @@ plot_derivatives(Mapping<dim>& mapping,
   QTrapez<dim> q;
 //  QIterated<dim> q(q_trapez, div);
   FEValues<dim> fe(mapping, finel, q, UpdateFlags(update_gradients
-						  | update_second_derivatives));
+                                                  | update_second_derivatives));
   fe.reinit(c);
 
   unsigned int k=0;
-  for (unsigned int mz=0;mz<=((dim>2) ? div : 0) ;++mz)
+  for (unsigned int mz=0; mz<=((dim>2) ? div : 0) ; ++mz)
     {
-      for (unsigned int my=0;my<=((dim>1) ? div : 0) ;++my)
-	{
-	  for (unsigned int mx=0;mx<=div;++mx)
-	    {
-	      deallog << q.point(k) << std::endl;
-	  
-	      for (unsigned int i=0;i<finel.dofs_per_cell;++i)
-		{
-		  deallog << "\tGrad " << fe.shape_grad(i,k);
-		  deallog << "\t2nd " << fe.shape_hessian(i,k);
-		  deallog << std::endl;
-		}
-	      k++;
-	    }
-	}
+      for (unsigned int my=0; my<=((dim>1) ? div : 0) ; ++my)
+        {
+          for (unsigned int mx=0; mx<=div; ++mx)
+            {
+              deallog << q.point(k) << std::endl;
+
+              for (unsigned int i=0; i<finel.dofs_per_cell; ++i)
+                {
+                  deallog << "\tGrad " << fe.shape_grad(i,k);
+                  deallog << "\t2nd " << fe.shape_hessian(i,k);
+                  deallog << std::endl;
+                }
+              k++;
+            }
+        }
     }
   deallog.pop ();
 }
@@ -146,30 +146,30 @@ main()
 {
   std::ofstream logfile ("derivatives/output");
   deallog << std::setprecision(2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   deallog.push ("1d");
   plot_FE_Q_shape_functions<1>();
   deallog.pop ();
-  
+
   deallog.push ("2d");
   plot_FE_Q_shape_functions<2>();
   plot_FE_DGQ_shape_functions<2>();
   deallog.pop ();
-  
+
   deallog.push ("3d");
 //  plot_FE_Q_shape_functions<3>();
   deallog.pop ();
-  
 
-				   // FESystem test.
+
+  // FESystem test.
   MappingQ1<2> m;
   FESystem<2> q2_q3(FE_Q<2>(2), 1,
-		    FE_Q<2>(3), 1);
+                    FE_Q<2>(3), 1);
 //  plot_derivatives(m, q2_q3, "Q2_Q3");
-  
+
   return 0;
 }
 

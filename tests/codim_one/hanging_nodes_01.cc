@@ -45,13 +45,13 @@ int main ()
 
   Triangulation<dim,spacedim> boundary_mesh;
 
-				   /*****************************************************************/
-				   // Create Surface Mesh:  Boundary of hypercube without one face
+  /*****************************************************************/
+  // Create Surface Mesh:  Boundary of hypercube without one face
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
     Triangulation<spacedim>::active_cell_iterator
-      cell = volume_mesh.begin_active();
+    cell = volume_mesh.begin_active();
 
     cell->face(0)->set_all_boundary_indicators (1);
     std::set<types::boundary_id> boundary_ids;
@@ -61,7 +61,7 @@ int main ()
   boundary_mesh.begin_active()->set_refine_flag ();
   boundary_mesh.execute_coarsening_and_refinement ();
 
-				   /*****************************************************************/
+  /*****************************************************************/
   FE_Q<dim,spacedim> fe(1);
   DoFHandler<dim,spacedim>  dh (boundary_mesh);
   ConstraintMatrix     hanging_node_constraints;

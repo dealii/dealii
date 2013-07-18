@@ -45,22 +45,23 @@ void test ()
       if (i<myid)
         my_start += set - i;
     }
-                                   // each processor owns some indices and all
-                                   // are ghosting elements from three
-                                   // processors (the second). some entries
-                                   // are right around the border between two
-                                   // processors
+  // each processor owns some indices and all
+  // are ghosting elements from three
+  // processors (the second). some entries
+  // are right around the border between two
+  // processors
   IndexSet local_owned(global_size);
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet local_relevant(global_size);
   local_relevant = local_owned;
   unsigned int ghost_indices [10] = {1, 2, 13, set-2, set-1, set, set+1, 2*set,
-                                     2*set+1, 2*set+3};
+                                     2*set+1, 2*set+3
+                                    };
   local_relevant.add_indices (&ghost_indices[0], &ghost_indices[0]+10);
 
   Utilities::MPI::Partitioner v(local_owned, local_relevant, MPI_COMM_WORLD);
 
-                                // write the info on ghost processors and import indices to file
+  // write the info on ghost processors and import indices to file
   {
     std::ofstream file((std::string("parallel_partitioner_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
     file << "**** proc " << myid << std::endl;
@@ -85,7 +86,7 @@ void test ()
 
   if (myid==0)
     {
-      for (unsigned int i=0;i<numproc;++i)
+      for (unsigned int i=0; i<numproc; ++i)
         {
           cat_file((std::string("parallel_partitioner_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
         }

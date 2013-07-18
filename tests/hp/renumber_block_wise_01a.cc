@@ -64,10 +64,10 @@ get_dofs (const hp::DoFHandler<dim> &dof)
 
 template <int dim>
 void
-check_renumbering(hp::DoFHandler<dim>& dof)
+check_renumbering(hp::DoFHandler<dim> &dof)
 {
-				   // do component-wise and save the
-				   // results
+  // do component-wise and save the
+  // results
   DoFRenumbering::component_wise (dof);
   const std::vector<types::global_dof_index> vc = get_dofs (dof);
 
@@ -87,10 +87,10 @@ check ()
   {
     bool coin = false;
     for (typename hp::DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
-	 cell != dof.end(); ++cell)
+         cell != dof.end(); ++cell)
       {
-	cell->set_active_fe_index (coin ? 0 : 1);
-	coin = !coin;
+        cell->set_active_fe_index (coin ? 0 : 1);
+        coin = !coin;
       }
   }
 

@@ -46,10 +46,11 @@
 
 std::ofstream logfile("interpolation_3/output");
 
-// Test interpolation on system of finite elements. 
+// Test interpolation on system of finite elements.
 
 template <int dim, int spacedim>
-void test(std::string filename) {
+void test(std::string filename)
+{
 
   Triangulation<dim, spacedim> triangulation;
   GridIn<dim, spacedim> gi;
@@ -63,20 +64,20 @@ void test(std::string filename) {
   DoFHandler<dim,spacedim> dof_handler (triangulation);
 
   dof_handler.distribute_dofs (fe);
-  
+
   // Now we interpolate the constant function on the mesh, and check
   // that this is consistent with what we expect.
   Vector<double> interpolated_one(dof_handler.n_dofs());
-  
+
   FunctionParser<spacedim> func(spacedim);
   std::map<std::string, double> maps;
-  if(spacedim == 2)
-      func.initialize("x,y", "x^2; y^2", maps);
+  if (spacedim == 2)
+    func.initialize("x,y", "x^2; y^2", maps);
   else
-      func.initialize("x,y,z", "x^2; y^2; z^2", maps);
-  
+    func.initialize("x,y,z", "x^2; y^2; z^2", maps);
+
   VectorTools::interpolate(dof_handler, func, interpolated_one);
-  
+
   DataOut<dim, DoFHandler<dim,spacedim> > dataout;
   dataout.attach_dof_handler(dof_handler);
   dataout.add_data_vector(interpolated_one, "test");
@@ -86,11 +87,11 @@ void test(std::string filename) {
 
 
 
-int main () 
+int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   deallog << "Test<1,2>" << std::endl;
   test<1,2>("grids/circle_2.inp");
 

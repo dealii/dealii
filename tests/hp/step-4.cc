@@ -53,51 +53,51 @@ std::ofstream logfile("step-4/output");
 
 
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
-  public:
-    LaplaceProblem ();
-    void run ();
-    
-  private:
-    void make_grid_and_dofs ();
-    void assemble_system ();
-    void solve ();
-    void output_results () const;
+public:
+  LaplaceProblem ();
+  void run ();
 
-    Triangulation<dim>   triangulation;
-    hp::FECollection<dim>            fe;
-    hp::DoFHandler<dim>      dof_handler;
+private:
+  void make_grid_and_dofs ();
+  void assemble_system ();
+  void solve ();
+  void output_results () const;
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
+  Triangulation<dim>   triangulation;
+  hp::FECollection<dim>            fe;
+  hp::DoFHandler<dim>      dof_handler;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> system_matrix;
+
+  Vector<double>       solution;
+  Vector<double>       system_rhs;
 };
 
 
 
 template <int dim>
-class RightHandSide : public Function<dim> 
+class RightHandSide : public Function<dim>
 {
-  public:
-    RightHandSide () : Function<dim>() {}
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
+public:
+  RightHandSide () : Function<dim>() {}
+
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int  component = 0) const;
 };
 
 
 
 template <int dim>
-class BoundaryValues : public Function<dim> 
+class BoundaryValues : public Function<dim>
 {
-  public:
-    BoundaryValues () : Function<dim>() {}
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
+public:
+  BoundaryValues () : Function<dim>() {}
+
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int  component = 0) const;
 };
 
 
@@ -105,7 +105,7 @@ class BoundaryValues : public Function<dim>
 
 template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
-				  const unsigned int /*component*/) const 
+                                  const unsigned int /*component*/) const
 {
   double return_value = 0;
   for (unsigned int i=0; i<dim; ++i)
@@ -117,7 +117,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 
 template <int dim>
 double BoundaryValues<dim>::value (const Point<dim> &p,
-				   const unsigned int /*component*/) const 
+                                   const unsigned int /*component*/) const
 {
   return p.square();
 }
@@ -130,8 +130,8 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-                fe (FE_Q<dim>(1)),
-		dof_handler (triangulation)
+  fe (FE_Q<dim>(1)),
+  dof_handler (triangulation)
 {}
 
 
@@ -141,23 +141,23 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (6-dim);
-  
+
   deallog << "   Number of active cells: "
-	    << triangulation.n_active_cells()
-	    << std::endl
-	    << "   Total number of cells: "
-	    << triangulation.n_cells()
-	    << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl
+          << "   Total number of cells: "
+          << triangulation.n_cells()
+          << std::endl;
 
   dof_handler.distribute_dofs (fe);
 
   deallog << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
-	    << std::endl;
+          << dof_handler.n_dofs()
+          << std::endl;
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
+                           dof_handler.n_dofs(),
+                           dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
 
@@ -170,15 +170,15 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
-{  
+void LaplaceProblem<dim>::assemble_system ()
+{
   hp::QCollection<dim>  quadrature_formula(QGauss<dim>(2));
 
   const RightHandSide<dim> right_hand_side;
 
-  hp::FEValues<dim> x_fe_values (fe, quadrature_formula, 
-			   update_values   | update_gradients |
-                           update_q_points | update_JxW_values);
+  hp::FEValues<dim> x_fe_values (fe, quadrature_formula,
+                                 update_values   | update_gradients |
+                                 update_q_points | update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe[0].dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula[0].size();
@@ -189,66 +189,66 @@ void LaplaceProblem<dim>::assemble_system ()
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
+                                                     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       x_fe_values.reinit (cell);
 
       const FEValues<dim> &fe_values = x_fe_values.get_present_fe_values();
-      
+
       cell_matrix = 0;
       cell_rhs = 0;
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  {
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_grad (i, q_point) *
-				   fe_values.shape_grad (j, q_point) *
-				   fe_values.JxW (q_point));
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              cell_matrix(i,j) += (fe_values.shape_grad (i, q_point) *
+                                   fe_values.shape_grad (j, q_point) *
+                                   fe_values.JxW (q_point));
 
-	    cell_rhs(i) += (fe_values.shape_value (i, q_point) *
-			    right_hand_side.value (fe_values.quadrature_point (q_point)) *
-			    fe_values.JxW (q_point));
-	  }
-      
+            cell_rhs(i) += (fe_values.shape_value (i, q_point) *
+                            right_hand_side.value (fe_values.quadrature_point (q_point)) *
+                            fe_values.JxW (q_point));
+          }
+
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    system_matrix.add (local_dof_indices[i],
-			       local_dof_indices[j],
-			       cell_matrix(i,j));
-	  
-	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	}
+        {
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            system_matrix.add (local_dof_indices[i],
+                               local_dof_indices[j],
+                               cell_matrix(i,j));
+
+          system_rhs(local_dof_indices[i]) += cell_rhs(i);
+        }
     }
 
-  
+
   std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
-					    0,
-					    BoundaryValues<dim>(),
-					    boundary_values);
+                                            0,
+                                            BoundaryValues<dim>(),
+                                            boundary_values);
   MatrixTools::apply_boundary_values (boundary_values,
-				      system_matrix,
-				      solution,
-				      system_rhs);
+                                      system_matrix,
+                                      solution,
+                                      system_rhs);
 }
 
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
   cg.solve (system_matrix, solution, system_rhs,
-	    PreconditionIdentity());
+            PreconditionIdentity());
 
   deallog << "   " << solver_control.last_step()
-	    << " CG iterations needed to obtain convergence."
-	    << std::endl;
+          << " CG iterations needed to obtain convergence."
+          << std::endl;
 }
 
 
@@ -270,10 +270,10 @@ void LaplaceProblem<dim>::output_results () const
 
 
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   deallog << "Solving problem in " << dim << " space dimensions." << std::endl;
-  
+
   make_grid_and_dofs();
   assemble_system ();
   solve ();
@@ -282,25 +282,25 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main () 
+int main ()
 {
   logfile.precision(2);
   deallog << std::setprecision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   deallog.depth_console (0);
   {
     LaplaceProblem<2> laplace_problem_2d;
     laplace_problem_2d.run ();
   }
-  
+
   {
     LaplaceProblem<3> laplace_problem_3d;
     laplace_problem_3d.run ();
   }
-  
+
   return 0;
 }

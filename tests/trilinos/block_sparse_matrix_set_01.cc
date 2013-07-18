@@ -22,7 +22,7 @@
 // would result from a vector-valued problem with a Laplace operator in 1D
 // in each component
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/full_matrix.h>
@@ -32,32 +32,32 @@
 
 void test ()
 {
-                                   // first set a few entries one-by-one in
-                                   // a small matrix
+  // first set a few entries one-by-one in
+  // a small matrix
   const unsigned int block_size = 16;
   TrilinosWrappers::SparseMatrix m_small (block_size,block_size,3U);
   for (unsigned int i=0; i<block_size; ++i)
     for (unsigned int j=0; j<block_size; ++j)
       if (std::fabs((double)i-j) < 2)
-	{
-	  double value;
-	  if (i == j) 
-	    value = 1.; 	   // for this example, set the values to
-				   // one and not some to two, since we do
-				   // not insert elements into the sparsity
-				   // pattern, but only set already present
-				   // ones.
-	  else
-	    value = -1.;
+        {
+          double value;
+          if (i == j)
+            value = 1.;      // for this example, set the values to
+          // one and not some to two, since we do
+          // not insert elements into the sparsity
+          // pattern, but only set already present
+          // ones.
+          else
+            value = -1.;
 
-	  m_small.set (i,j, value);
-	}
+          m_small.set (i,j, value);
+        }
   m_small.compress();
 
-				   // Then build two matrices consisting of
-				   // several copies of the small
-				   // matrix. The matrix m2 will be filled
-				   // later.
+  // Then build two matrices consisting of
+  // several copies of the small
+  // matrix. The matrix m2 will be filled
+  // later.
   TrilinosWrappers::BlockSparseMatrix m, m2;
   m.reinit(3,2);
   m2.reinit(3,2);
@@ -66,61 +66,61 @@ void test ()
       m.block(block_row, block_col).copy_from(m_small);
   m.collect_sizes();
 
-				   // fill the second matrix with the
-				   // sparsity pattern (but not the
-				   // values)
+  // fill the second matrix with the
+  // sparsity pattern (but not the
+  // values)
   for (unsigned int block_row = 0; block_row<m.n_block_rows(); ++block_row)
     for (unsigned int block_col = 0; block_col<m.n_block_cols(); ++block_col)
       m2.block(block_row, block_col).reinit(m_small);
   m2.collect_sizes();
 
-				   // now add the same elements from a full
-				   // matrix
+  // now add the same elements from a full
+  // matrix
   {
     FullMatrix<double> full_matrix(2*m.n_block_rows(),2*m.n_block_cols());
     for (unsigned int block_row = 0; block_row<m.n_block_rows(); ++block_row)
       for (unsigned int block_col = 0; block_col<m.n_block_cols(); ++block_col)
-	{
-	  full_matrix(block_row*2,block_col*2) = 1;
-	  full_matrix(block_row*2+1,block_col*2+1) = 1.;
-	  full_matrix(block_row*2,block_col*2+1) = -1;
-	  full_matrix(block_row*2+1,block_col*2) = -1.;
-	}
+        {
+          full_matrix(block_row*2,block_col*2) = 1;
+          full_matrix(block_row*2+1,block_col*2+1) = 1.;
+          full_matrix(block_row*2,block_col*2+1) = -1;
+          full_matrix(block_row*2+1,block_col*2) = -1.;
+        }
 
     std::vector<types::global_dof_index> local_row_indices (2*m.n_block_rows());
     std::vector<types::global_dof_index> local_col_indices (2*m.n_block_cols());
 
     for (unsigned int i=0; i<block_size-1; ++i)
       {
-	for (unsigned int block_row = 0; block_row<m.n_block_rows(); ++block_row)
-	  {
-	    local_row_indices[2*block_row] = block_row*block_size + i;
-	    local_row_indices[2*block_row+1] = block_row*block_size + i + 1;
-	  }
-	for (unsigned int block_col = 0; block_col<m.n_block_cols(); ++block_col)
-	  {
-	    local_col_indices[2*block_col] = block_col*block_size + i;
-	    local_col_indices[2*block_col+1] = block_col*block_size + i + 1;
-	  }
+        for (unsigned int block_row = 0; block_row<m.n_block_rows(); ++block_row)
+          {
+            local_row_indices[2*block_row] = block_row*block_size + i;
+            local_row_indices[2*block_row+1] = block_row*block_size + i + 1;
+          }
+        for (unsigned int block_col = 0; block_col<m.n_block_cols(); ++block_col)
+          {
+            local_col_indices[2*block_col] = block_col*block_size + i;
+            local_col_indices[2*block_col+1] = block_col*block_size + i + 1;
+          }
 
-	m2.set (local_row_indices, local_col_indices, full_matrix);
+        m2.set (local_row_indices, local_col_indices, full_matrix);
       }
   }
 
   m2.compress();
 
-				   // subtract the matrix m from this one,
-				   // we should get a zero matrix
+  // subtract the matrix m from this one,
+  // we should get a zero matrix
   double norm = 0;
   for (unsigned int block_row = 0; block_row<m.n_block_rows(); ++block_row)
     for (unsigned int block_col = 0; block_col<m.n_block_cols(); ++block_col)
       {
-	m2.block(block_row,block_col).add(-1.0, m.block(block_row,block_col));
+        m2.block(block_row,block_col).add(-1.0, m.block(block_row,block_col));
 
-				   // calculate the Frobenius norm of the
-				   // matrix in order to check whether all
-				   // elements really are zero
-	norm += m2.block(block_row,block_col).frobenius_norm();
+        // calculate the Frobenius norm of the
+        // matrix in order to check whether all
+        // elements really are zero
+        norm += m2.block(block_row,block_col).frobenius_norm();
       }
   Assert (norm == 0, ExcInternalError());
 
@@ -129,12 +129,12 @@ void test ()
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("block_sparse_matrix_set_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -147,25 +147,25 @@ int main (int argc,char **argv)
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     };
 }

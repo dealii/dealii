@@ -28,7 +28,7 @@
 
 // test DataOutReader::merge
 
-void cat_file(const char * filename)
+void cat_file(const char *filename)
 {
   std::ifstream in(filename);
   while (in)
@@ -43,11 +43,11 @@ template <int dim, int spacedim>
 void check()
 {
   const unsigned int np = 1;
-  
+
   std::vector<DataOutBase::Patch<dim, spacedim> > patches(np);
-  
+
   create_patches(patches);
-  
+
   std::vector<std::string> names(5);
   names[0] = "x1";
   names[1] = "x2";
@@ -55,29 +55,29 @@ void check()
   names[3] = "x4";
   names[4] = "i";
   std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
-  
+
   std::ostringstream old_data;
-  DataOutBase::write_deal_II_intermediate(patches, names, vectors, 
-					  DataOutBase::Deal_II_IntermediateFlags(),
-					  old_data);
+  DataOutBase::write_deal_II_intermediate(patches, names, vectors,
+                                          DataOutBase::Deal_II_IntermediateFlags(),
+                                          old_data);
 
   DataOutReader<dim,spacedim> data;
   {
     std::istringstream input(old_data.str());
     data.read (input);
-  }  
+  }
   DataOutReader<dim,spacedim> additional_data;
   {
     std::istringstream input(old_data.str());
     additional_data.read (input);
   }
-   
+
   data.merge (additional_data);
 
   {
     std::ofstream out2( "data_out_reader_01/outfile");
     data.write_deal_II_intermediate (out2);
-  }  
+  }
 
   cat_file("data_out_reader_01/outfile");
   std::remove ("data_out_reader_01/outfile");
@@ -93,5 +93,5 @@ int main()
   check<1,2>();
   check<2,2>();
   check<2,3>();
-  check<3,3>();  
+  check<3,3>();
 }

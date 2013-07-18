@@ -47,7 +47,7 @@ int main (int argc,char **argv)
   {
     double value = 1;
     for (SparseMatrix<double>::iterator p=matrix.begin();
-	 p != matrix.end(); ++p, ++value)
+         p != matrix.end(); ++p, ++value)
       p->value() = value;
   }
   deallog << "Original:" << std::endl;

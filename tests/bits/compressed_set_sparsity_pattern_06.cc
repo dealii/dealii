@@ -44,7 +44,7 @@ void test ()
 
 
 
-int main () 
+int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);

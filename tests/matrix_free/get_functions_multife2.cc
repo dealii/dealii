@@ -50,7 +50,7 @@ std::ofstream logfile("get_functions_multife2/output");
 template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number=double>
 class MatrixFreeTest
 {
- public:
+public:
   typedef std::vector<Vector<Number> > VectorType;
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
@@ -84,7 +84,7 @@ class MatrixFreeTest
     std::vector<double> reference_values2 (fe_eval2.n_q_points);
     std::vector<Tensor<1,dim> > reference_grads2 (fe_eval2.n_q_points);
     std::vector<Tensor<2,dim> > reference_hess2 (fe_eval2.n_q_points);
-    for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
+    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         fe_eval0.reinit (cell);
         fe_eval0.read_dof_values(src[0]);
@@ -98,11 +98,11 @@ class MatrixFreeTest
         fe_eval2.read_dof_values(src[2]);
         fe_eval2.evaluate (true,true,true);
 
-                                // compare values with the ones the FEValues
-                                // gives us. Those are seen as reference
+        // compare values with the ones the FEValues
+        // gives us. Those are seen as reference
         for (unsigned int j=0; j<data.n_components_filled(cell); ++j)
           {
-                                // FE 0
+            // FE 0
             fe_val0.reinit (data.get_cell_iterator(cell,j,0));
             fe_val0.get_function_values(src[0], reference_values0);
             fe_val0.get_function_gradients(src[0], reference_grads0);
@@ -123,7 +123,7 @@ class MatrixFreeTest
                 total[2] += std::fabs(fe_eval0.get_laplacian(q)[j]);
               }
 
-                                // FE 1
+            // FE 1
             fe_val1.reinit (data.get_cell_iterator(cell,j,1));
             fe_val1.get_function_values(src[1], reference_values1);
             fe_val1.get_function_gradients(src[1], reference_grads1);
@@ -144,7 +144,7 @@ class MatrixFreeTest
                 total[5] += std::fabs(fe_eval1.get_laplacian(q)[j]);
               }
 
-                                // FE 2
+            // FE 2
             fe_val2.reinit (data.get_cell_iterator(cell,j,2));
             fe_val2.get_function_values(src[2], reference_values2);
             fe_val2.get_function_gradients(src[2], reference_grads2);
@@ -179,13 +179,13 @@ class MatrixFreeTest
     data.cell_loop (&MatrixFreeTest<dim,fe_degree,n_q_points_1d,Number>::operator(),
                     this, dst_dummy, src);
 
-                                // avoid dividing by zero
+    // avoid dividing by zero
     for (unsigned int i=0; i<9; ++i)
       if (std::fabs(total[i]) < 1e-20)
         total[i] = 1;
 
-                                // for doubles, use a stricter condition then
-                                // for floats for the relative error size
+    // for doubles, use a stricter condition then
+    // for floats for the relative error size
     for (unsigned int i=0; i<3; ++i)
       {
         if (types_are_equal<Number,double>::value == true)
@@ -196,14 +196,14 @@ class MatrixFreeTest
             deallog << "Error function gradients FE " << i << ": "
                     << errors[i*3+1]/total[i*3+1] << std::endl;
 
-                                // need to set quite a loose tolerance because
-                                // FEValues approximates Hessians with finite
-                                // differences, which are not so
-                                // accurate. moreover, Hessians are quite
-                                // large since we chose random numbers. for
-                                // some elements, it might also be zero
-                                // (linear elements on quadrilaterals), so
-                                // need to check for division by 0, too.
+            // need to set quite a loose tolerance because
+            // FEValues approximates Hessians with finite
+            // differences, which are not so
+            // accurate. moreover, Hessians are quite
+            // large since we chose random numbers. for
+            // some elements, it might also be zero
+            // (linear elements on quadrilaterals), so
+            // need to check for division by 0, too.
             deallog.threshold_double (2e-6);
             const double output2 = total[i*3+2] == 0 ? 0. : errors[i*3+2] / total[i*3+2];
             deallog << "Error function Laplacians FE " << i << ": " << output2 << std::endl;
@@ -298,7 +298,7 @@ void test ()
   for (unsigned int no=0; no<3; ++no)
     for (unsigned int i=0; i<dof[no]->n_dofs(); ++i)
       {
-        if(constraints[no]->is_constrained(i))
+        if (constraints[no]->is_constrained(i))
           continue;
         const double entry = rand()/(double)RAND_MAX;
         src[no](i) = entry;
@@ -329,9 +329,9 @@ int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);
-                                // need to set quite a loose tolerance because
-                                // FEValues approximates Hessians with finite
-                                // differences, which are not so accurate
+  // need to set quite a loose tolerance because
+  // FEValues approximates Hessians with finite
+  // differences, which are not so accurate
   deallog.threshold_double(2.e-5);
   deallog << std::setprecision (3);
 

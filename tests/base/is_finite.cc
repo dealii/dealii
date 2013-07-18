@@ -28,7 +28,7 @@ template <typename T>
 void check ()
 {
   using namespace numbers;
-  
+
   deallog << std::numeric_limits<T>::quiet_NaN() << "   -->   ";
   deallog << is_finite(std::numeric_limits<T>::quiet_NaN()) << std::endl;
 
@@ -68,7 +68,7 @@ int main ()
 
   check<int> ();
   check<unsigned int> ();
-  
+
   return 0;
 }
 

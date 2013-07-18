@@ -31,7 +31,7 @@
 
 
 template<int dim>
-void test(std::ostream& out)
+void test(std::ostream &out)
 {
   Point<dim> p1;
   p1[0] = 2.;
@@ -45,9 +45,9 @@ void test(std::ostream& out)
   p3[0] = 2.;
   if (dim>1) p3[1] = 1.;
   if (dim>2) p3[2] = 4.;
-  
 
-                                   // loop without rotation 
+
+  // loop without rotation
   if (true)
     {
       deallog <<"moebius, no rotation" << std::endl;
@@ -58,11 +58,11 @@ void test(std::ostream& out)
       go.write_ucd(tr, out);
     }
 
-                                   // loop with quarter rotation (1 * pi/2)
+  // loop with quarter rotation (1 * pi/2)
   if (true)
     {
       deallog << "---------------------------"<<std::endl
-	      << "moebius, quarter rotation (1* Pi/2)" << std::endl;
+              << "moebius, quarter rotation (1* Pi/2)" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 1, 10.0, 2.0);
       GridOut go;
@@ -70,11 +70,11 @@ void test(std::ostream& out)
       go.write_ucd(tr, out);
     }
 
-                                   // loop with half rotation (2 * pi/2)
+  // loop with half rotation (2 * pi/2)
   if (true)
     {
       deallog << "---------------------------"<<std::endl
-	      << "moebius, half rotation (2* Pi/2)" << std::endl;
+              << "moebius, half rotation (2* Pi/2)" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 2, 10.0, 2.0);
       GridOut go;
@@ -82,11 +82,11 @@ void test(std::ostream& out)
       go.write_ucd(tr, out);
     }
 
-                                   // loop with three quarter rotation (3 * pi/2)
+  // loop with three quarter rotation (3 * pi/2)
   if (true)
     {
       deallog << "---------------------------"<<std::endl
-	      << "moebius, three quarter rotation (3* Pi/2)" << std::endl;
+              << "moebius, three quarter rotation (3* Pi/2)" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 3, 10.0, 2.0);
       GridOut go;
@@ -94,11 +94,11 @@ void test(std::ostream& out)
       go.write_ucd(tr, out);
     }
 
-                                   // loop with full rotation (1 * pi/2)
+  // loop with full rotation (1 * pi/2)
   if (true)
     {
       deallog << "---------------------------"<<std::endl
-	      << "moebius, full rotation (2* Pi)" << std::endl;
+              << "moebius, full rotation (2* Pi)" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::moebius(tr, 20, 4, 10.0, 2.0);
       GridOut go;
@@ -114,6 +114,6 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<3>(logfile);
 }

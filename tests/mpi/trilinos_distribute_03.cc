@@ -39,7 +39,7 @@ void test()
   IndexSet idx(100);
   if (myid==0)
     idx.add_range(0,100);
-  
+
   TrilinosWrappers::MPI::Vector vec (idx, MPI_COMM_WORLD);
 
   for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)

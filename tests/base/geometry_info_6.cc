@@ -31,111 +31,111 @@ void test ()
 {
   deallog << "Checking in " << dim << "d" << std::endl;
 
-				   // check the determinant of the
-				   // transformation for the reference
-				   // cell. the determinant should be one in
-				   // that case
+  // check the determinant of the
+  // transformation for the reference
+  // cell. the determinant should be one in
+  // that case
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
 
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-						     determinants);
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+                                                     determinants);
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-	deallog << "Reference cell: " << determinants[v]
-		<< std::endl;
-	Assert (static_cast<double>(determinants[v]) == 1, ExcInternalError());
+        deallog << "Reference cell: " << determinants[v]
+                << std::endl;
+        Assert (static_cast<double>(determinants[v]) == 1, ExcInternalError());
       }
   }
 
-				   // try the same, but move squash the cell
-				   // in the x-direction by a factor of 10
+  // try the same, but move squash the cell
+  // in the x-direction by a factor of 10
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-	vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
-	vertices[v][0] /= 10;
+        vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
+        vertices[v][0] /= 10;
       }
 
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-						     determinants);
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+                                                     determinants);
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-	deallog << "Squashed cell: " << determinants[v]
-		<< std::endl;
-	Assert (static_cast<double>(determinants[v]) == 0.1, ExcInternalError());
+        deallog << "Squashed cell: " << determinants[v]
+                << std::endl;
+        Assert (static_cast<double>(determinants[v]) == 0.1, ExcInternalError());
       }
   }
 
 
-				   // try the same, but move squash the cell
-				   // in the x-direction by a factor of 10 and
-				   // rotate it around the z-axis (unless in
-				   // 1d)
+  // try the same, but move squash the cell
+  // in the x-direction by a factor of 10 and
+  // rotate it around the z-axis (unless in
+  // 1d)
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-	vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
-	vertices[v][0] /= 10;
+        vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
+        vertices[v][0] /= 10;
 
-	if (dim > 1)
-	  {
-	    std::swap (vertices[v][0], vertices[v][1]);
-	    vertices[v][1] *= -1;
-	  }
+        if (dim > 1)
+          {
+            std::swap (vertices[v][0], vertices[v][1]);
+            vertices[v][1] *= -1;
+          }
       }
 
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-						     determinants);
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+                                                     determinants);
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-	deallog << "Squashed+rotated cell: " << determinants[v]
-		<< std::endl;
-	Assert (static_cast<double>(determinants[v]) == 0.1, ExcInternalError());
+        deallog << "Squashed+rotated cell: " << determinants[v]
+                << std::endl;
+        Assert (static_cast<double>(determinants[v]) == 0.1, ExcInternalError());
       }
   }
 
-				   // pinched cell
+  // pinched cell
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     vertices[1] /= 10;
-    
+
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-						     determinants);
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+                                                     determinants);
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       deallog << "Pinched cell: " << determinants[v]
-	      << std::endl;
+              << std::endl;
   }
 
 
-				   // inverted cell
+  // inverted cell
   {
     Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       vertices[v] = GeometryInfo<dim>::unit_cell_vertex(v);
     std::swap (vertices[0], vertices[1]);
-    
+
     Tensor<0,dim> determinants[GeometryInfo<dim>::vertices_per_cell];
     GeometryInfo<dim>::alternating_form_at_vertices (vertices,
-						     determinants);
-    for (unsigned int v=0;v<GeometryInfo<dim>::vertices_per_cell;++v)
+                                                     determinants);
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       deallog << "Inverted cell: " << determinants[v]
-	      << std::endl;
+              << std::endl;
   }
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("geometry_info_6/output");
   deallog.attach(logfile);

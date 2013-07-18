@@ -36,7 +36,7 @@ check ()
   make_complex_matrix (m);
   Vector<std::complex<number> > v;
   make_complex_vector (v);
-  
+
   deallog << m.matrix_norm_square (v) << std::endl;
 }
 

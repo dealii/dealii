@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// test like _05 but with a TransferSelect that selects the first two vector 
+// test like _05 but with a TransferSelect that selects the first two vector
 // components as the first block
 
 #include "../tests.h"
@@ -47,10 +47,10 @@ using namespace std;
 template <int dim, typename number, int spacedim>
 void
 reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
-	       MGLevelObject<dealii::Vector<number> > &v)
+               MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.min_level();
-       level<=v.max_leve();++level)
+       level<=v.max_leve(); ++level)
     {
       unsigned int n = mg_dof.n_dofs (level);
       v[level].reinit(n);
@@ -62,8 +62,8 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 template <typename Transfer>
 void
 make_matrix (const Transfer &transfer,
-	     const unsigned int high_level,
-	     FullMatrix<double> &matrix)
+             const unsigned int high_level,
+             FullMatrix<double> &matrix)
 {
   Vector<double> src (matrix.n());
   Vector<double> dst (matrix.m());
@@ -73,7 +73,7 @@ make_matrix (const Transfer &transfer,
       src(i) = 1;
       transfer.prolongate (high_level, dst, src);
       for (unsigned int j=0; j<dst.size(); ++j)
-	matrix(j,i) = dst(j);
+        matrix(j,i) = dst(j);
     }
 }
 
@@ -84,7 +84,7 @@ void print_matrix (const FullMatrix<double> &m)
   for (unsigned int i=0; i<m.m(); ++i)
     {
       for (unsigned int j=0; j<m.n(); ++j)
-	deallog << m(i,j) << ' ';
+        deallog << m(i,j) << ' ';
       deallog << std::endl;
     }
 }
@@ -93,23 +93,23 @@ void print_matrix (const FullMatrix<double> &m)
 template<int dim>
 void refine_mesh (Triangulation<dim> &triangulation)
 {
-    bool cell_refined = false;
+  bool cell_refined = false;
   for (typename Triangulation<dim>::active_cell_iterator
-      cell = triangulation.begin_active();
-      cell != triangulation.end(); ++cell)
-  {
+       cell = triangulation.begin_active();
+       cell != triangulation.end(); ++cell)
+    {
       const Point<dim> p = cell->center();
       bool positive = p(0) > 0;
       if (positive)
-      {
-        cell->set_refine_flag();
-        cell_refined = true;
-      }
-  }
-  if(!cell_refined)//if no cell was selected for refinement, refine global
+        {
+          cell->set_refine_flag();
+          cell_refined = true;
+        }
+    }
+  if (!cell_refined) //if no cell was selected for refinement, refine global
     for (typename Triangulation<dim>::active_cell_iterator
-        cell = triangulation.begin_active();
-        cell != triangulation.end(); ++cell)
+         cell = triangulation.begin_active();
+         cell != triangulation.end(); ++cell)
       cell->set_refine_flag();
   triangulation.execute_coarsening_and_refinement ();
 }
@@ -117,7 +117,7 @@ void refine_mesh (Triangulation<dim> &triangulation)
 
 
 template <int dim>
-void check (const FiniteElement<dim>& fe)
+void check (const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -127,11 +127,11 @@ void check (const FiniteElement<dim>& fe)
   subdivisions[0] = 2;
 
   const Point<dim> bottom_left = (dim == 2 ?
-      Point<dim>(-1,-1) : Point<dim>(-1,-1,-1));
+                                  Point<dim>(-1,-1) : Point<dim>(-1,-1,-1));
   const Point<dim> top_right   = (dim == 2 ?
-      Point<dim>(1,1) : Point<dim>(1,1,1));
+                                  Point<dim>(1,1) : Point<dim>(1,1,1));
   GridGenerator::subdivided_hyper_rectangle (tr,
-      subdivisions, bottom_left, top_right, true);
+                                             subdivisions, bottom_left, top_right, true);
   refine_mesh(tr);
 
   MGDoFHandler<dim> mg_dof_handler(tr);
@@ -141,27 +141,27 @@ void check (const FiniteElement<dim>& fe)
   block_selected[2] = 1;
 
   deallog << "Global  dofs: " << mg_dof_handler.n_dofs() << std::endl;
-  for(unsigned int l=0; l<tr.n_levels(); ++l)
+  for (unsigned int l=0; l<tr.n_levels(); ++l)
     {
       deallog << "Level " << l << " dofs:";
-	deallog << ' ' << mg_dof_handler.n_dofs(l);
+      deallog << ' ' << mg_dof_handler.n_dofs(l);
       deallog << std::endl;
     }
 
-  DoFRenumbering::component_wise (mg_dof_handler, 
-      block_selected);
+  DoFRenumbering::component_wise (mg_dof_handler,
+                                  block_selected);
   for (unsigned int level=0; level<tr.n_levels(); ++level)
-    DoFRenumbering::component_wise (mg_dof_handler, 
-        level, block_selected);
+    DoFRenumbering::component_wise (mg_dof_handler,
+                                    level, block_selected);
 
   MGTransferSelect<double> transfer;
-  transfer.build_matrices(mg_dof_handler, mg_dof_handler, 
-      0, 0, block_selected, block_selected);
+  transfer.build_matrices(mg_dof_handler, mg_dof_handler,
+                          0, 0, block_selected, block_selected);
 
-  std::vector<std::vector<types::global_dof_index> > 
-    dofs_per_block(tr.n_levels(), std::vector<types::global_dof_index>(2));
-  MGTools::count_dofs_per_block(mg_dof_handler, 
-      dofs_per_block, block_selected);
+  std::vector<std::vector<types::global_dof_index> >
+  dofs_per_block(tr.n_levels(), std::vector<types::global_dof_index>(2));
+  MGTools::count_dofs_per_block(mg_dof_handler,
+                                dofs_per_block, block_selected);
 
   FullMatrix<double> prolong_0_1 (dofs_per_block[1][0],
                                   dofs_per_block[0][0]);

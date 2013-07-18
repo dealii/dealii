@@ -44,7 +44,7 @@ void test ()
 
   hp::DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs (fe_collection);
-  
+
   tria.refine_global (1);
   dof_handler.distribute_dofs (fe_collection);
 
@@ -53,7 +53,7 @@ void test ()
   dof_handler.distribute_dofs (fe_collection);
 
   tria.begin_active()->set_refine_flag ();
-  tria.execute_coarsening_and_refinement ();  
+  tria.execute_coarsening_and_refinement ();
   dof_handler.distribute_dofs (fe_collection);
 }
 
@@ -63,14 +63,14 @@ int main ()
 {
   std::ofstream logfile("crash_03/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test<1> ();
   test<2> ();
   test<3> ();
-  
+
   deallog << "OK" << std::endl;
 }

@@ -44,20 +44,20 @@ void test()
 
   IndexSet relevant_set, boundary_dofs;
   DoFTools::extract_boundary_dofs (dofh,
-				   std::vector<bool>(1,true),
-				   boundary_dofs);
+                                   std::vector<bool>(1,true),
+                                   boundary_dofs);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     boundary_dofs.write (deallog.get_file_stream());
 
-				   // the result of
-				   // extract_boundary_dofs is
-				   // supposed to be a subset of the
-				   // locally relevant dofs, so test
-				   // this
+  // the result of
+  // extract_boundary_dofs is
+  // supposed to be a subset of the
+  // locally relevant dofs, so test
+  // this
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
   boundary_dofs.subtract_set (relevant_set);
   Assert (boundary_dofs.n_elements() == 0,
-	  ExcInternalError());
+          ExcInternalError());
 }
 
 

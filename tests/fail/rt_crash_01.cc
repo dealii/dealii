@@ -36,19 +36,19 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // there's presently a crash in the
-                                   // Raviart-Thomas element. only
-                                   // check for these elements,
-                                   // everything else is handled in
-                                   // dof_tools_19
+  // there's presently a crash in the
+  // Raviart-Thomas element. only
+  // check for these elements,
+  // everything else is handled in
+  // dof_tools_19
   if (dof_handler.get_fe().get_name().find ("RaviartThomas") ==
       std::string::npos)
     return;
 
   ConstantFunction<dim> test_func (1, dof_handler.get_fe().n_components ());
 
-                                   // don't run this test if hanging
-                                   // nodes are not implemented
+  // don't run this test if hanging
+  // nodes are not implemented
   if (dof_handler.get_fe().constraints_are_implemented() == false)
     return;
 
@@ -64,16 +64,16 @@ check_this (const DoFHandler<dim> &dof_handler)
   Vector<double> solution (dof_handler.n_dofs ());
 
   VectorTools::project (dof_handler, cm,
-			quadrature, test_func,
-			solution);
+                        quadrature, test_func,
+                        solution);
   cm.distribute (solution);
 
-				   // all values of the projected solution
-				   // should be close around 1 (the value of
-				   // the original function)
+  // all values of the projected solution
+  // should be close around 1 (the value of
+  // the original function)
   for (unsigned int i=0; i<solution.size(); ++i)
     Assert (std::fabs (solution(i)-1) < 1e-6,
-	    ExcInternalError());
+            ExcInternalError());
 
   // Evaluate error
   Vector<double> cellwise_errors (dof_handler.get_tria ().n_active_cells());

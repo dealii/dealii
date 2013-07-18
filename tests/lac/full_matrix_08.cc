@@ -43,12 +43,12 @@ main ()
   FullMatrix<double> A(3,3,entries_A);
   FullMatrix<double> C(3,3);
   FullMatrix<double> D(3,3,compare);
- 
+
   //compute C= A^T*A
   A.Tmmult(C,A);
 
   C.add(-1., D);
   Assert(C.frobenius_norm() < 1e-12, ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
-}    
+}

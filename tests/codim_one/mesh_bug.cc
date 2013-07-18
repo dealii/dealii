@@ -34,7 +34,7 @@
 #include <grid/tria_boundary_lib.h>
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mesh_bug/output");
 
@@ -46,14 +46,14 @@ int main ()
 
   const std::vector<Point<3> > &vertices = tria.get_vertices();
 
-  for(unsigned int i=0; i<vertices.size(); ++i)
-    if(vertices[i](2)>1e-7)
+  for (unsigned int i=0; i<vertices.size(); ++i)
+    if (vertices[i](2)>1e-7)
       std::cout << "Error!" << std::endl;
-  
-  
+
+
   GridOut go;
   go.write_ucd(tria, logfile);
 
   return 0;
 }
-                  
+

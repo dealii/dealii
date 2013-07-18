@@ -40,9 +40,9 @@ int main ()
   for (unsigned int i=0; i<4; ++i)
     sp.add (i,i);
 
-				   // create a graph with components
-				   // 0,2 and 1,3 that are
-				   // disconnected
+  // create a graph with components
+  // 0,2 and 1,3 that are
+  // disconnected
   sp.add (0,2);
   sp.add (2,0);
 
@@ -51,7 +51,7 @@ int main ()
 
   sp.compress ();
 
-				   // now find permutation
+  // now find permutation
   std::vector<types::global_dof_index> permutation(4);
   SparsityTools::reorder_Cuthill_McKee (sp, permutation);
 

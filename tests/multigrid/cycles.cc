@@ -41,50 +41,50 @@ class MGAll
   public MGTransferBase<VECTOR>,
   public MGCoarseGridBase<VECTOR>
 {
-  public:
-    virtual ~MGAll()
-      {}
-    
-    virtual void smooth (const unsigned int,
-			 VECTOR &, const VECTOR &) const
-      {}
+public:
+  virtual ~MGAll()
+  {}
 
-    virtual void prolongate (const unsigned int,
-			     VECTOR &, const VECTOR &) const
-      {}
-    
-    virtual void restrict_and_add (const unsigned int,
-				   VECTOR &, const VECTOR &) const
-      {}
+  virtual void smooth (const unsigned int,
+                       VECTOR &, const VECTOR &) const
+  {}
 
-    virtual void clear () 
-      {}
-    
-    virtual void operator() (const unsigned int,
-			     VECTOR &, const VECTOR &) const
-      {}
+  virtual void prolongate (const unsigned int,
+                           VECTOR &, const VECTOR &) const
+  {}
+
+  virtual void restrict_and_add (const unsigned int,
+                                 VECTOR &, const VECTOR &) const
+  {}
+
+  virtual void clear ()
+  {}
+
+  virtual void operator() (const unsigned int,
+                           VECTOR &, const VECTOR &) const
+  {}
 };
 
 void test_cycles(unsigned int minlevel, unsigned int maxlevel)
 {
   MGAll all;
   MGLevelObject<FullMatrix<double> > level_matrices(0, maxlevel);
-  for (unsigned int i=0;i<=maxlevel;++i)
+  for (unsigned int i=0; i<=maxlevel; ++i)
     level_matrices[i].reinit(N, N);
   MGMatrix<FullMatrix<double>, VECTOR> mgmatrix(&level_matrices);
-  
+
   Multigrid<VECTOR> mg1(minlevel, maxlevel, mgmatrix, all, all, all, all,
-			Multigrid<VECTOR>::v_cycle);
+                        Multigrid<VECTOR>::v_cycle);
   mg1.set_debug(3);
-  for (unsigned int i=minlevel;i<=maxlevel;++i)
+  for (unsigned int i=minlevel; i<=maxlevel; ++i)
     mg1.defect[i].reinit(N);
   mg1.cycle();
   deallog << std::endl;
-  
+
   mg1.set_cycle(Multigrid<VECTOR>::w_cycle);
   mg1.cycle();
   deallog << std::endl;
-  
+
   mg1.set_cycle(Multigrid<VECTOR>::f_cycle);
   mg1.cycle();
 }
@@ -95,7 +95,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   test_cycles (0,4);
   test_cycles (2,5);
 }

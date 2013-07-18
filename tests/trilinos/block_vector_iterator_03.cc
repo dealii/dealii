@@ -18,7 +18,7 @@
 // this test is an adaptation of lac/block_vector_iterator for PETSc block
 // vectors
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/trilinos_block_vector.h>
@@ -32,7 +32,7 @@
 
 template <typename number>
 bool operator == (const TrilinosWrappers::BlockVector &v1,
-		  const TrilinosWrappers::BlockVector &v2)
+                  const TrilinosWrappers::BlockVector &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -50,165 +50,165 @@ void test ()
   ivector[1] = 4;
   ivector[2] = 3;
   ivector[3] = 5;
-  
-				   // Check 1: initialization via
-				   // iterators
+
+  // Check 1: initialization via
+  // iterators
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
       TrilinosWrappers::BlockVector v2(ivector);
 
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
-				       // initialize other vector
-				       // through iterators
+        v1(i) = i;
+      // initialize other vector
+      // through iterators
       TrilinosWrappers::BlockVector::iterator p2 = v2.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p2)
-	*p2 = i;
+        *p2 = i;
       Assert (p2==v2.end(), ExcInternalError());
-      
-				       // check that the two vectors are equal
+
+      // check that the two vectors are equal
       deallog << "Check 1: " << (v1==v2 ? "true" : "false") << std::endl;
     };
 
-				   // Check 1: initialization via
-				   // iterators
+  // Check 1: initialization via
+  // iterators
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
 
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
-				       // initialize other vector
-				       // through iterators into first
-				       // vector
+        v1(i) = i;
+      // initialize other vector
+      // through iterators into first
+      // vector
       TrilinosWrappers::BlockVector v2(ivector, v1.begin(), v1.end());
-				       // check that the two vectors are equal
+      // check that the two vectors are equal
       deallog << "Check 2: " << (v1==v2 ? "true" : "false") << std::endl;
     };
 
-				   // Check 3: loop forward and back
-				   // and check that things are the
-				   // same
+  // Check 3: loop forward and back
+  // and check that things are the
+  // same
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
+        v1(i) = i;
 
       TrilinosWrappers::BlockVector::iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
-	Assert (*p1 == i, ExcInternalError());
+        Assert (*p1 == i, ExcInternalError());
 
       Assert (p1 == v1.end(), ExcInternalError());
-      
-				       // move back into allowable
-				       // region
+
+      // move back into allowable
+      // region
       --p1;
 
-				       // check backwards
+      // check backwards
       for (unsigned int i=0; i<v1.size(); ++i, --p1)
-	Assert (*p1 == v1.size()-i-1, ExcInternalError());
+        Assert (*p1 == v1.size()-i-1, ExcInternalError());
 
-				       // if we came thus far,
-				       // everything is alright
+      // if we came thus far,
+      // everything is alright
       deallog << "Check 3: true" << std::endl;
     };
 
 
-				   // Check 4: same, but this time
-				   // with const iterators
+  // Check 4: same, but this time
+  // with const iterators
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
+        v1(i) = i;
 
       TrilinosWrappers::BlockVector::const_iterator p1 = v1.begin();
       for (unsigned int i=0; i<v1.size(); ++i, ++p1)
-	Assert (*p1 == i, ExcInternalError());
+        Assert (*p1 == i, ExcInternalError());
 
       Assert (p1 == v1.end(), ExcInternalError());
 
-				       // move back into allowable
-				       // region
+      // move back into allowable
+      // region
       --p1;
 
-				       // check backwards
+      // check backwards
       for (unsigned int i=0; i<v1.size(); ++i, --p1)
-	{
-	  const double val = *p1;
-	  const double ref = v1.size()-i-1;
-	  Assert (val==ref, ExcInternalError());
-	};
+        {
+          const double val = *p1;
+          const double ref = v1.size()-i-1;
+          Assert (val==ref, ExcInternalError());
+        };
 
-				       // if we came thus far,
-				       // everything is alright
+      // if we came thus far,
+      // everything is alright
       deallog << "Check 4: true" << std::endl;
     };
 
-				   // Checks 5-14: use some standard
-				   // algorithms
+  // Checks 5-14: use some standard
+  // algorithms
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
+        v1(i) = i;
 
-				       // check std::distance
-				       // algorithm
+      // check std::distance
+      // algorithm
       deallog << "Check 5: "
-	      << (std::distance (v1.begin(), v1.end()) ==
-		  static_cast<signed int>(v1.size()) ?
-		  "true" : "false")
-	      << std::endl;
+              << (std::distance (v1.begin(), v1.end()) ==
+                  static_cast<signed int>(v1.size()) ?
+                  "true" : "false")
+              << std::endl;
 
-				       // check std::copy
+      // check std::copy
       TrilinosWrappers::BlockVector v2(ivector);
       std::copy (v1.begin(), v1.end(), v2.begin());
       deallog << "Check 6: " << (v1 == v2 ? "true" : "false") << std::endl;
 
-				       // check std::transform
+      // check std::transform
       std::transform (v1.begin(), v1.end(), v2.begin(),
-		      std::bind2nd (std::multiplies<double>(),
-				    2.0));
+                      std::bind2nd (std::multiplies<double>(),
+                                    2.0));
       v2 *= 1./2.;
       deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
 
 
-				       // check operators +/-, +=/-=
+      // check operators +/-, +=/-=
       deallog << "Check 8: "
-	      << (std::distance(v1.begin(), v1.begin()+3) == 3 ?
-		  "true" : "false")
-	      << std::endl;
+              << (std::distance(v1.begin(), v1.begin()+3) == 3 ?
+                  "true" : "false")
+              << std::endl;
       deallog << "Check 9: "
-	      << (std::distance(v1.end()-6, v1.end()) == 6 ?
-		  "true" : "false")
-	      << std::endl;
+              << (std::distance(v1.end()-6, v1.end()) == 6 ?
+                  "true" : "false")
+              << std::endl;
       deallog << "Check 10: "
-	      << (std::distance(v1.begin(), v1.end()) == (signed)v1.size() ?
-		  "true" : "false")
-	      << std::endl;
+              << (std::distance(v1.begin(), v1.end()) == (signed)v1.size() ?
+                  "true" : "false")
+              << std::endl;
       deallog << "Check 11: "
-	      << (std::distance(v1.begin(), (v1.begin()+=7)) == 7 ?
-		  "true" : "false")
-	      << std::endl;
+              << (std::distance(v1.begin(), (v1.begin()+=7)) == 7 ?
+                  "true" : "false")
+              << std::endl;
       deallog << "Check 12: "
-	      << (std::distance((v1.end()-=4), v1.end()) == 4 ?
-		  "true" : "false")
-	      << std::endl;
+              << (std::distance((v1.end()-=4), v1.end()) == 4 ?
+                  "true" : "false")
+              << std::endl;
 
-				       // check advance
+      // check advance
       TrilinosWrappers::BlockVector::iterator p2 = v1.begin();
       std::advance (p2, v1.size());
       deallog << "Check 13: " << (p2 == v1.end() ? "true" : "false") << std::endl;
@@ -218,104 +218,104 @@ void test ()
       deallog << "Check 14: " << (p3 == v1.end() ? "true" : "false") << std::endl;
     };
 
-				   // Check 15: initialization through
-				   // iterators
+  // Check 15: initialization through
+  // iterators
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
+        v1(i) = i;
 
-				       // initialize a normal vector
-				       // from it
+      // initialize a normal vector
+      // from it
       Vector<double> v2(v1.begin(), v1.end());
 
-				       // and reverse way
+      // and reverse way
       TrilinosWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
       deallog << "Check 15: " << (v1==v3 ? "true" : "false") << std::endl;
     };
 
-				   // Check 16: initialization through
-				   // iterators. variant with one
-				   // constant object
+  // Check 16: initialization through
+  // iterators. variant with one
+  // constant object
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
+        v1(i) = i;
 
-				       // initialize a normal vector
-				       // from it
+      // initialize a normal vector
+      // from it
       const Vector<double> v2(v1.begin(), v1.end());
 
-				       // and reverse way
+      // and reverse way
       TrilinosWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
       deallog << "Check 16: " << (v1==v3 ? "true" : "false") << std::endl;
     };
-  
-				   // Check 17: initialization through
-				   // iterators. variant with two
-				   // constant object
+
+  // Check 17: initialization through
+  // iterators. variant with two
+  // constant object
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
+        v1(i) = i;
 
-				       // initialize a normal vector
-				       // from it
+      // initialize a normal vector
+      // from it
       const Vector<double> v2(v1.begin(), v1.end());
 
-				       // and reverse way
+      // and reverse way
       const TrilinosWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
       deallog << "Check 17: " << (v1==v3 ? "true" : "false") << std::endl;
     };
 
-				   // Check 18: initialization through
-				   // iterators. variant with three
-				   // constant object
+  // Check 18: initialization through
+  // iterators. variant with three
+  // constant object
   if (true)
     {
       TrilinosWrappers::BlockVector v0(ivector);
-				       // initialize first vector with
-				       // simple loop
+      // initialize first vector with
+      // simple loop
       for (unsigned int i=0; i<v0.size(); ++i)
-	v0(i) = i;
+        v0(i) = i;
 
       const TrilinosWrappers::BlockVector v1 = v0;
-      
-				       // initialize a normal vector
-				       // from it
+
+      // initialize a normal vector
+      // from it
       const Vector<double> v2(v1.begin(), v1.end());
 
-				       // and reverse way
+      // and reverse way
       const TrilinosWrappers::BlockVector v3(ivector, v2.begin(), v2.end());
       deallog << "Check 18: " << (v1==v3 ? "true" : "false") << std::endl;
     };
-  
-				   // Check 19: operator[]
+
+  // Check 19: operator[]
   if (true)
     {
       TrilinosWrappers::BlockVector v1(ivector);
       for (unsigned int i=0; i<v1.size(); ++i)
-	v1(i) = i;
+        v1(i) = i;
 
       for (unsigned int i=0; i<v1.size(); ++i)
-	{
-	  const TrilinosWrappers::BlockVector::iterator p = (v1.begin()+i);
-	  for (unsigned int j=0; j<v1.size(); ++j)
-	    Assert (p[(signed)j-(signed)i] == j, ExcInternalError());
-	};
+        {
+          const TrilinosWrappers::BlockVector::iterator p = (v1.begin()+i);
+          for (unsigned int j=0; j<v1.size(); ++j)
+            Assert (p[(signed)j-(signed)i] == j, ExcInternalError());
+        };
 
-				       // if we came thus far,
-				       // everything is alright
-      deallog << "Check 19: true" << std::endl;      
+      // if we came thus far,
+      // everything is alright
+      deallog << "Check 19: true" << std::endl;
     };
 }
 
@@ -330,11 +330,11 @@ int main (int argc,char **argv)
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
-  
+
   try
     {
       {
@@ -344,29 +344,29 @@ int main (int argc,char **argv)
   catch (std::exception &e)
     {
       std::cerr << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      // abort
       return 2;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-	   << "Aborting!" << std::endl
-	   << "----------------------------------------------------"
-	   << std::endl;
-				       // abort
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      // abort
       return 3;
     };
-  
-  
+
+
   return 0;
 }
 

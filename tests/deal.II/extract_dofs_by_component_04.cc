@@ -50,32 +50,32 @@ check ()
   tr.refine_global (1);
 
   FESystem<dim> element (FE_Q<dim>(1), 1,
-			 FE_RaviartThomas<dim>(0), 1,
-			 FE_Q<dim>(1), 1,
-			 FE_Nedelec<dim>(0), 1);
+                         FE_RaviartThomas<dim>(0), 1,
+                         FE_Q<dim>(1), 1,
+                         FE_Nedelec<dim>(0), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-				   // try all possible component
-				   // masks, which we encode as bit
-				   // strings
+  // try all possible component
+  // masks, which we encode as bit
+  // strings
   for (unsigned int int_mask=0; int_mask<(1U<<element.n_components()); ++int_mask)
-  {
-    std::vector<bool> component_mask (element.n_components());
-    for (unsigned int c=0; c<element.n_components(); ++c)
-      component_mask[c] = (int_mask & (1<<c));
+    {
+      std::vector<bool> component_mask (element.n_components());
+      for (unsigned int c=0; c<element.n_components(); ++c)
+        component_mask[c] = (int_mask & (1<<c));
 
-    std::vector<std::vector<bool> > constant_modes;
-    DoFTools::extract_constant_modes (dof, component_mask, constant_modes);
+      std::vector<std::vector<bool> > constant_modes;
+      DoFTools::extract_constant_modes (dof, component_mask, constant_modes);
 
-    for (unsigned int d=0; d<constant_modes.size(); ++d)
-      {
-	deallog << "constant mode " << d << std::endl;
-	for (unsigned int e=0; e<constant_modes[d].size(); ++e)
-	  deallog << constant_modes[d][e];
-	deallog << std::endl;
-      }
-  }
+      for (unsigned int d=0; d<constant_modes.size(); ++d)
+        {
+          deallog << "constant mode " << d << std::endl;
+          for (unsigned int e=0; e<constant_modes[d].size(); ++e)
+            deallog << constant_modes[d][e];
+          deallog << std::endl;
+        }
+    }
 }
 
 

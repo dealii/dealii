@@ -34,16 +34,16 @@ template <typename int_type>
 void test ()
 {
   const Epetra_Map map (int_type(1),
-			0,
-			Epetra_MpiComm(MPI_COMM_SELF));
+                        0,
+                        Epetra_MpiComm(MPI_COMM_SELF));
 
   int n_entries_per_row[1] = {1};
   Epetra_CrsGraph graph (Copy, map, map,
-			 &n_entries_per_row[0], true);
+                         &n_entries_per_row[0], true);
 
   int_type row_indices[1] = {0};
   graph.InsertGlobalIndices (int_type(0),
-			     1, &row_indices[0]);
+                             1, &row_indices[0]);
 
   graph.FillComplete(map, map);
 }

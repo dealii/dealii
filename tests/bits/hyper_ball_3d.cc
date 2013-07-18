@@ -32,9 +32,9 @@
 #include <deal.II/grid/grid_generator.h>
 #include <fstream>
 #include <iomanip>
-    
 
-int main () 
+
+int main ()
 {
   std::ofstream logfile("hyper_ball_3d/output");
   deallog.attach(logfile);
@@ -42,17 +42,17 @@ int main ()
   deallog.threshold_double(1.e-10);
   deallog << std::setprecision (2);
 
-                                   // generate a hyperball in 3d
+  // generate a hyperball in 3d
   Triangulation<3> tria;
   GridGenerator::hyper_ball (tria, Point<3>(), std::sqrt(3.));
 
-                                   // output all faces. there should
-                                   // be 6 external ones, but there
-                                   // used to be a bug in the
-                                   // triangulation code that
-                                   // generated more than that, with
-                                   // some of them internal to the
-                                   // ball
+  // output all faces. there should
+  // be 6 external ones, but there
+  // used to be a bug in the
+  // triangulation code that
+  // generated more than that, with
+  // some of them internal to the
+  // ball
   unsigned int external_faces = 0;
   for (Triangulation<3>::face_iterator face=tria.begin_face();
        face!=tria.end_face(); ++face)
@@ -78,6 +78,6 @@ int main ()
   deallog << "External faces: " << external_faces << std::endl;
 
   Assert (external_faces == 6, ExcInternalError());
-  
+
   return 0;
 }

@@ -26,11 +26,11 @@
 
 struct X
 {
-    X(int i) : i(i) {}
-    int i;
-  private:
-    X(const X&);
-    X & operator= (const X&);
+  X(int i) : i(i) {}
+  int i;
+private:
+  X(const X &);
+  X &operator= (const X &);
 };
 
 
@@ -41,15 +41,15 @@ void execute (const X &x)
 }
 
 
-void test () 
+void test ()
 {
   X x(42);
   Threads::Thread<void> t = Threads::spawn (&execute)(x);
   t.join ();
 }
 
-  
-  
+
+
 
 int main()
 {

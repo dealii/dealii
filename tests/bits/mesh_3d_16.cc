@@ -47,7 +47,7 @@ void check (Triangulation<3> &tria)
   dof_handler.distribute_dofs (fe);
 
   QGauss<2> q_face(3);
-  
+
   FEFaceValues<3>    fe_face_values (fe, q_face,
                                      update_normal_vectors | update_JxW_values);
   FESubfaceValues<3> fe_subface_values (fe, q_face,
@@ -58,10 +58,10 @@ void check (Triangulation<3> &tria)
     {
       Tensor<1,3> n1, n2;
 
-                                       // first integrate over faces
-                                       // and make sure that the
-                                       // result of the integration is
-                                       // close to zero
+      // first integrate over faces
+      // and make sure that the
+      // result of the integration is
+      // close to zero
       for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
         {
           fe_face_values.reinit (cell, f);
@@ -74,16 +74,16 @@ void check (Triangulation<3> &tria)
               << std::sqrt (n1*n1)
               << std::endl;
 
-                                       // now same for subface
-                                       // integration
+      // now same for subface
+      // integration
       for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
         for (unsigned int sf=0; sf<GeometryInfo<3>::max_children_per_face; ++sf)
-        {
-          fe_subface_values.reinit (cell, f, sf);
-          for (unsigned int q=0; q<q_face.size(); ++q)
-            n2 += fe_subface_values.normal_vector(q) *
-                  fe_subface_values.JxW(q);
-        }
+          {
+            fe_subface_values.reinit (cell, f, sf);
+            for (unsigned int q=0; q<q_face.size(); ++q)
+              n2 += fe_subface_values.normal_vector(q) *
+                    fe_subface_values.JxW(q);
+          }
       Assert (n2*n2 < 1e-24, ExcInternalError());
       deallog << cell << " subface integration is ok: "
               << std::sqrt (n2*n2)
@@ -92,32 +92,32 @@ void check (Triangulation<3> &tria)
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mesh_3d_16/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<3> coarse_grid;
     create_two_cubes (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     create_L_shape (coarse_grid);
     check (coarse_grid);
   }
-  
-  {  
+
+  {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
     check (coarse_grid);
   }
-  
+
 }
 
-  
-  
+
+

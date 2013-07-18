@@ -44,7 +44,8 @@ void create_two_cubes (Triangulation<3> &coarse_grid)
                                Point<3>(1,1,0),
                                Point<3>(0,1,0),
                                Point<3>(2,0,0),
-                               Point<3>(2,1,0)};
+                               Point<3>(2,1,0)
+                             };
   std::vector<Point<3> > vertices;
   for (unsigned int i=0; i<6; ++i)
     vertices.push_back (points[i]);
@@ -52,10 +53,11 @@ void create_two_cubes (Triangulation<3> &coarse_grid)
     vertices.push_back (points[i] + Point<3>(0,0,-1));
 
   std::vector<CellData<3> > cells;
-    
+
   const unsigned int connectivity[2][4]
-    = { { 0,1,2,3 },
-        { 1,4,5,2 } };
+  = { { 0,1,2,3 },
+    { 1,4,5,2 }
+  };
   for (unsigned int i=0; i<2; ++i)
     {
       CellData<3> cell;
@@ -67,8 +69,8 @@ void create_two_cubes (Triangulation<3> &coarse_grid)
       cells.push_back (cell);
     }
 
-                                   // finally generate a triangulation
-                                   // out of this
+  // finally generate a triangulation
+  // out of this
   GridReordering<3>::reorder_cells (cells);
   coarse_grid.create_triangulation_compatibility (vertices, cells, SubCellData());
 }
@@ -82,7 +84,7 @@ void check (Triangulation<3> &tria)
                                    update_q_points | update_JxW_values);
   FEFaceValues<3> fe_face_values2 (fe, quadrature,
                                    update_q_points | update_JxW_values);
-  
+
   DoFHandler<3> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
 
@@ -94,15 +96,15 @@ void check (Triangulation<3> &tria)
           const unsigned int nn
             = cell->neighbor_of_neighbor (f);
 
-                                           // this test is about
-                                           // properly oriented
-                                           // faces. mesh_3d_7 does it
-                                           // for mis-oriented faces
+          // this test is about
+          // properly oriented
+          // faces. mesh_3d_7 does it
+          // for mis-oriented faces
           Assert (cell->face_orientation(f) == true,
                   ExcInternalError());
           Assert (cell->neighbor(f)->face_orientation(nn) == true,
                   ExcInternalError());
-          
+
           fe_face_values1.reinit (cell, f);
           fe_face_values2.reinit (cell->neighbor(f), nn);
 
@@ -122,7 +124,7 @@ void check (Triangulation<3> &tria)
 }
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("q_points/output");
   deallog.attach(logfile);
@@ -134,8 +136,8 @@ int main ()
   check (coarse_grid);
 
   coarse_grid.refine_global (1);
-  check (coarse_grid);  
+  check (coarse_grid);
 }
 
-  
-  
+
+

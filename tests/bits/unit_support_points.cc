@@ -22,7 +22,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/fe/fe_system.h>		
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
@@ -31,7 +31,7 @@
 
 
 template <int dim>
-void check_cell1 (const FiniteElement<dim> &fe) 
+void check_cell1 (const FiniteElement<dim> &fe)
 {
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     Assert (fe.get_unit_support_points()[i] ==
@@ -42,7 +42,7 @@ void check_cell1 (const FiniteElement<dim> &fe)
 
 
 template <int dim>
-void check_face1 (const FiniteElement<dim> &fe) 
+void check_face1 (const FiniteElement<dim> &fe)
 {
   for (unsigned int i=0; i<fe.dofs_per_face; ++i)
     Assert (fe.get_unit_face_support_points()[i] ==
@@ -52,13 +52,13 @@ void check_face1 (const FiniteElement<dim> &fe)
 }
 
 
-void check_face1 (const FiniteElement<1> &) 
+void check_face1 (const FiniteElement<1> &)
 {}
 
 
 
 template <int dim>
-void check1 (const FiniteElement<dim> &fe) 
+void check1 (const FiniteElement<dim> &fe)
 {
   check_cell1 (fe);
   check_face1 (fe);
@@ -67,7 +67,7 @@ void check1 (const FiniteElement<dim> &fe)
 
 template <int dim>
 void check_cell2 (const FiniteElement<dim> &fe,
-                  const unsigned int        comp) 
+                  const unsigned int        comp)
 {
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     if (fe.system_to_component_index(i).first == comp)
@@ -79,25 +79,25 @@ void check_cell2 (const FiniteElement<dim> &fe,
 
 template <int dim>
 void check_face2 (const FiniteElement<dim> &fe,
-                  const unsigned int        comp) 
+                  const unsigned int        comp)
 {
-      for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-        if (fe.face_system_to_component_index(i).first == comp)
-          deallog << i << " " << fe.unit_face_support_point(i)
-                  << std::endl;
-      deallog << "dim=" << dim << ", face=ok" << std::endl;
+  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+    if (fe.face_system_to_component_index(i).first == comp)
+      deallog << i << " " << fe.unit_face_support_point(i)
+              << std::endl;
+  deallog << "dim=" << dim << ", face=ok" << std::endl;
 }
 
 
 void check_face2 (const FiniteElement<1> &,
-                  const unsigned int) 
+                  const unsigned int)
 {}
 
 
 
 template <int dim>
 void check2 (const FiniteElement<dim> &fe,
-             const unsigned int        comp) 
+             const unsigned int        comp)
 {
   check_cell2 (fe, comp);
   check_face2 (fe, comp);
@@ -106,7 +106,7 @@ void check2 (const FiniteElement<dim> &fe,
 
 
 template <int dim>
-void check () 
+void check ()
 {
   check1 (FE_Q<dim>(2));
   check1 (FE_DGQ<dim>(2));
@@ -124,9 +124,9 @@ void check ()
           0);
 }
 
-    
 
-int main () 
+
+int main ()
 {
   std::ofstream logfile("unit_support_points/output");
   deallog.attach(logfile);

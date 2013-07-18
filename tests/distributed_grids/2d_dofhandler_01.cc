@@ -39,12 +39,12 @@
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test(std::ostream & /*out*/)
 {
   deallog << "hyper_cube" << std::endl;
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
-      
+
   GridGenerator::hyper_cube(tr);
   tr.refine_global (1);
   DoFHandler<dim> dofh(tr);
@@ -52,37 +52,37 @@ void test(std::ostream& /*out*/)
   static const FE_Q<dim> fe(2);
   dofh.distribute_dofs (fe);
 
-   typename
-     DoFHandler<dim>::active_cell_iterator cell
-     = dofh.begin_active();
+  typename
+  DoFHandler<dim>::active_cell_iterator cell
+    = dofh.begin_active();
 
-   const unsigned int dofs_per_cell = dofh.get_fe().dofs_per_cell;
-   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+  const unsigned int dofs_per_cell = dofh.get_fe().dofs_per_cell;
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
 
-      
-   for (; cell != dofh.end(); ++cell)
-     {
-       cell->get_dof_indices (local_dof_indices);
 
-       for (unsigned int i=0;i<dofs_per_cell;++i)
- 	deallog << local_dof_indices[i] << " ";
+  for (; cell != dofh.end(); ++cell)
+    {
+      cell->get_dof_indices (local_dof_indices);
 
-       deallog << std::endl;
-     }
-  
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        deallog << local_dof_indices[i] << " ";
+
+      deallog << std::endl;
+    }
+
 }
 
 
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  
+
   std::ofstream logfile("2d_dofhandler_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   deallog.push("2d");
   test<2>(logfile);
   deallog.pop();

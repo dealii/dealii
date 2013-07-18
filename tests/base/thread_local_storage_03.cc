@@ -27,21 +27,21 @@
 
 struct X
 {
-    Threads::ThreadLocalStorage<int> tls_data;
+  Threads::ThreadLocalStorage<int> tls_data;
 
-    X ()
-		    :
-		    tls_data (42)
-      {}
+  X ()
+    :
+    tls_data (42)
+  {}
 
-    int f ()
-      {
-					 // access TLS data and have it
-					 // converted to the right data type
-					 // without the need to call
-					 // tls_data.get()
-	return tls_data;
-      }
+  int f ()
+  {
+    // access TLS data and have it
+    // converted to the right data type
+    // without the need to call
+    // tls_data.get()
+    return tls_data;
+  }
 };
 
 
@@ -52,7 +52,7 @@ void test ()
   t = Threads::new_thread (&X::f, x);
 
   Assert (t.return_value() == 42,
-	  ExcInternalError());
+          ExcInternalError());
 }
 
 

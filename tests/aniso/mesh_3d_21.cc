@@ -44,18 +44,18 @@ FE_DGQ<3> fe(1);
 QGauss<2> quadrature(3);
 MappingQ<3> mapping(2);
 FEFaceValues<3> fe_face_values1 (mapping, fe, quadrature,
-				 update_q_points | update_JxW_values |
-				 update_normal_vectors);
+                                 update_q_points | update_JxW_values |
+                                 update_normal_vectors);
 FESubfaceValues<3> fe_face_values2 (mapping, fe, quadrature,
-				    update_q_points | update_JxW_values |
-				    update_normal_vectors);
+                                    update_q_points | update_JxW_values |
+                                    update_normal_vectors);
 
 void check_this (Triangulation<3> &tria)
 {
 
   DoFHandler<3> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
-  
+
   DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
   for (; cell!=dof_handler.end(); ++cell)
     for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell;
@@ -67,8 +67,8 @@ void check_this (Triangulation<3> &tria)
              subface_no<cell->face(face_no)->number_of_children();
              ++subface_no)
           {
-	    unsigned int neighbor_neighbor = cell->neighbor_face_no(face_no);
-		
+            unsigned int neighbor_neighbor = cell->neighbor_face_no(face_no);
+
             const DoFHandler<3>::active_cell_iterator neighbor_child
               = cell->neighbor_child_on_subface(face_no, subface_no);
 
@@ -89,7 +89,7 @@ void check_this (Triangulation<3> &tria)
                          fe_face_values2.normal_vector(q)).square()
                         < 1e-20,
                         ExcInternalError());
-              }            
+              }
           }
 }
 
@@ -99,34 +99,34 @@ void check_this (Triangulation<3> &tria)
 // quadrature points both on faces and neighboring subfaces match.
 void check (Triangulation<3> &tria_org)
 {
-  for (unsigned int c=0;c<tria_org.n_active_cells();++c)
+  for (unsigned int c=0; c<tria_org.n_active_cells(); ++c)
     for (unsigned int i=1; i<8; ++i)
       {
-	Triangulation<3> tria;
-	tria.copy_triangulation(tria_org);
-	Triangulation<3>::active_cell_iterator cell=tria.begin_active();
-	for (unsigned int j=0;j<c;++j)
-	  ++cell;
-	cell->set_refine_flag (RefinementCase<3>(i));
-	tria.execute_coarsening_and_refinement ();
-	
-	deallog << "Initial check, cell = "<<c<<", ref_case = " <<i<< std::endl;
-	check_this (tria);
-	
-	for (unsigned int r=0; r<2; ++r)
-	  {
-	    tria.refine_global (1);
-	    deallog << "Check " << r << ", " << tria.n_active_cells() << " active cells"<< std::endl;
-	    check_this (tria);
-	  }
+        Triangulation<3> tria;
+        tria.copy_triangulation(tria_org);
+        Triangulation<3>::active_cell_iterator cell=tria.begin_active();
+        for (unsigned int j=0; j<c; ++j)
+          ++cell;
+        cell->set_refine_flag (RefinementCase<3>(i));
+        tria.execute_coarsening_and_refinement ();
 
-	coarsen_global (tria);
-	deallog << "Check " << 0 << ", " << tria.n_active_cells() << " active cells"<< std::endl;
-	check_this (tria);
-	
-	tria.refine_global (1);
-	deallog << "Check " << 1 << ", " << tria.n_active_cells() << " active cells"<< std::endl;
-	check_this (tria);
+        deallog << "Initial check, cell = "<<c<<", ref_case = " <<i<< std::endl;
+        check_this (tria);
+
+        for (unsigned int r=0; r<2; ++r)
+          {
+            tria.refine_global (1);
+            deallog << "Check " << r << ", " << tria.n_active_cells() << " active cells"<< std::endl;
+            check_this (tria);
+          }
+
+        coarsen_global (tria);
+        deallog << "Check " << 0 << ", " << tria.n_active_cells() << " active cells"<< std::endl;
+        check_this (tria);
+
+        tria.refine_global (1);
+        deallog << "Check " << 1 << ", " << tria.n_active_cells() << " active cells"<< std::endl;
+        check_this (tria);
       }
 }
 
@@ -137,124 +137,124 @@ void check (Triangulation<3> &tria_org)
 void check2 (Triangulation<3> &orig_tria)
 {
   for (unsigned int i=0; i<orig_tria.n_active_cells(); ++i)
-  {
-    Triangulation<3> tria;
-    tria.copy_triangulation(orig_tria);
-    Triangulation<3>::cell_iterator cell = tria.begin_active(),
-				    endc = tria.end();
-    for (unsigned int j=0; j<i; ++j)
-      ++cell;
-    cell->set_refine_flag(RefinementCase<3>::cut_z);
-    tria.execute_coarsening_and_refinement ();
-    
-    cell=tria.begin();
-    for (; cell!=endc;++cell)
-      if (cell->refinement_case()==RefinementCase<3>::cut_z)
-	{
-	  cell->child(0)->set_refine_flag(RefinementCase<3>::cut_xy);
-	  cell->child(1)->set_refine_flag(RefinementCase<3>::cut_xy);
-	}
-    tria.execute_coarsening_and_refinement ();
-    
-    deallog << "2 -> Initial check, cell " << i << ", " << tria.n_active_cells() << " active cells" << std::endl;
-    check_this (tria);
-    
-    for (unsigned int r=0; r<2; ++r)
-      {
-	tria.refine_global (1);
-	deallog << "2 -> Check " << r << ", " << tria.n_active_cells() << " active cells" << std::endl;
-	check_this (tria);
-	deallog << "           ... done." << std::endl;
-      }
+    {
+      Triangulation<3> tria;
+      tria.copy_triangulation(orig_tria);
+      Triangulation<3>::cell_iterator cell = tria.begin_active(),
+                                      endc = tria.end();
+      for (unsigned int j=0; j<i; ++j)
+        ++cell;
+      cell->set_refine_flag(RefinementCase<3>::cut_z);
+      tria.execute_coarsening_and_refinement ();
 
-    coarsen_global (tria);
-    deallog << "Check " << 0 << ", " << tria.n_active_cells() << " active cells"<< std::endl;
-    check_this (tria);
-    
-    tria.refine_global (1);
-    deallog << "Check " << 1 << ", " << tria.n_active_cells() << " active cells"<< std::endl;
-    check_this (tria);
-  }
+      cell=tria.begin();
+      for (; cell!=endc; ++cell)
+        if (cell->refinement_case()==RefinementCase<3>::cut_z)
+          {
+            cell->child(0)->set_refine_flag(RefinementCase<3>::cut_xy);
+            cell->child(1)->set_refine_flag(RefinementCase<3>::cut_xy);
+          }
+      tria.execute_coarsening_and_refinement ();
+
+      deallog << "2 -> Initial check, cell " << i << ", " << tria.n_active_cells() << " active cells" << std::endl;
+      check_this (tria);
+
+      for (unsigned int r=0; r<2; ++r)
+        {
+          tria.refine_global (1);
+          deallog << "2 -> Check " << r << ", " << tria.n_active_cells() << " active cells" << std::endl;
+          check_this (tria);
+          deallog << "           ... done." << std::endl;
+        }
+
+      coarsen_global (tria);
+      deallog << "Check " << 0 << ", " << tria.n_active_cells() << " active cells"<< std::endl;
+      check_this (tria);
+
+      tria.refine_global (1);
+      deallog << "Check " << 1 << ", " << tria.n_active_cells() << " active cells"<< std::endl;
+      check_this (tria);
+    }
 }
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("mesh_3d_21/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  {  
+  {
     Triangulation<3> coarse_grid(Triangulation<3>::allow_anisotropic_smoothing);
     GridGenerator::hyper_cube (coarse_grid);
     coarse_grid.refine_global(1);
     check2 (coarse_grid);
     check (coarse_grid);
   }
-  
-   {  
-     Triangulation<3> coarse_grid;
-     create_two_cubes (coarse_grid);
-     check (coarse_grid);
-   }
 
-   {  
-     Triangulation<3> coarse_grid;
-     create_L_shape (coarse_grid);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    create_two_cubes (coarse_grid);
+    check (coarse_grid);
+  }
 
-   {  
-     Triangulation<3> coarse_grid;
-     GridGenerator::hyper_ball (coarse_grid);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    create_L_shape (coarse_grid);
+    check (coarse_grid);
+  }
 
-   {
-     Triangulation<3> coarse_grid;
-     create_two_cubes_rotation (coarse_grid,1);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    GridGenerator::hyper_ball (coarse_grid);
+    check (coarse_grid);
+  }
 
-   {
-     Triangulation<3> coarse_grid;
-     create_two_cubes_rotation (coarse_grid,2);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    create_two_cubes_rotation (coarse_grid,1);
+    check (coarse_grid);
+  }
 
-   {
-     Triangulation<3> coarse_grid;
-     create_two_cubes_rotation (coarse_grid,3);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    create_two_cubes_rotation (coarse_grid,2);
+    check (coarse_grid);
+  }
 
-   {
-     Triangulation<3> coarse_grid;
-     GridGenerator::moebius(coarse_grid, 5, 0, 10.0, 2.0);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    create_two_cubes_rotation (coarse_grid,3);
+    check (coarse_grid);
+  }
 
-   {
-     Triangulation<3> coarse_grid;
-     GridGenerator::moebius(coarse_grid, 5, 1, 10.0, 2.0);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    GridGenerator::moebius(coarse_grid, 5, 0, 10.0, 2.0);
+    check (coarse_grid);
+  }
 
-   {
-     Triangulation<3> coarse_grid;
-     GridGenerator::moebius(coarse_grid, 5, 2, 10.0, 2.0);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    GridGenerator::moebius(coarse_grid, 5, 1, 10.0, 2.0);
+    check (coarse_grid);
+  }
 
-   {
-     Triangulation<3> coarse_grid;
-     GridGenerator::moebius(coarse_grid, 5, 3, 10.0, 2.0);
-     check (coarse_grid);
-   }
+  {
+    Triangulation<3> coarse_grid;
+    GridGenerator::moebius(coarse_grid, 5, 2, 10.0, 2.0);
+    check (coarse_grid);
+  }
+
+  {
+    Triangulation<3> coarse_grid;
+    GridGenerator::moebius(coarse_grid, 5, 3, 10.0, 2.0);
+    check (coarse_grid);
+  }
 
 }
 
-  
-  
+
+

@@ -27,62 +27,62 @@
 // FE_Q<dim>::interpolate(...)
 
 template <int dim>
-void check1(const Function<dim>& f,
-	    const unsigned int degree,
-	    const unsigned int comp)
+void check1(const Function<dim> &f,
+            const unsigned int degree,
+            const unsigned int comp)
 {
   FE_Q<dim> feq(degree);
   FESystem<dim> fe(feq, comp);
   deallog << fe.get_name() << ' ';
-  
+
   std::vector<double> dofs(fe.dofs_per_cell);
-  
+
   std::vector<std::vector<double> >
-    values(comp, std::vector<double>(fe.get_unit_support_points().size()));
+  values(comp, std::vector<double>(fe.get_unit_support_points().size()));
   std::vector<Vector<double> >
-    vectors(fe.get_unit_support_points().size(),
-	    Vector<double>(f.n_components));
+  vectors(fe.get_unit_support_points().size(),
+          Vector<double>(f.n_components));
   f.vector_value_list(fe.get_unit_support_points(), vectors);
-  for (unsigned int c=0;c<values.size();++c)
-    for (unsigned int k=0;k<values[c].size();++k)
+  for (unsigned int c=0; c<values.size(); ++c)
+    for (unsigned int k=0; k<values[c].size(); ++k)
       values[c][k] = vectors[k](c);
-  
+
   fe.interpolate(dofs, values);
   deallog << " vector " << vector_difference(fe,dofs,f,0);
-  
+
   fe.interpolate(dofs, vectors, 0);
   deallog << " Vector " << vector_difference(fe,dofs,f,0) << std::endl;
 }
 
 template <int dim>
-void check3(const Function<dim>& f,
-	    const unsigned int degree,
-	    const unsigned int comp1,
-	    const unsigned int comp2,
-	    const unsigned int comp3)
+void check3(const Function<dim> &f,
+            const unsigned int degree,
+            const unsigned int comp1,
+            const unsigned int comp2,
+            const unsigned int comp3)
 {
   FE_Q<dim> feq1(degree);
   FE_Q<dim> feq2(degree+1);
   FE_Q<dim> feq3(degree+2);
   FESystem<dim> fe(feq1, comp1, feq2, comp2, feq3, comp3);
   deallog << fe.get_name() << ' ';
-  
+
   std::vector<double> dofs(fe.dofs_per_cell);
-  
+
   std::vector<std::vector<double> >
-    values(f.n_components,
-	   std::vector<double>(fe.get_unit_support_points().size()));
+  values(f.n_components,
+         std::vector<double>(fe.get_unit_support_points().size()));
   std::vector<Vector<double> >
-    vectors(fe.get_unit_support_points().size(),
-	    Vector<double>(f.n_components));
+  vectors(fe.get_unit_support_points().size(),
+          Vector<double>(f.n_components));
   f.vector_value_list(fe.get_unit_support_points(), vectors);
-  for (unsigned int c=0;c<values.size();++c)
-    for (unsigned int k=0;k<values[c].size();++k)
+  for (unsigned int c=0; c<values.size(); ++c)
+    for (unsigned int k=0; k<values[c].size(); ++k)
       values[c][k] = vectors[k](c);
-  
+
   fe.interpolate(dofs, values);
   deallog << " vector " << vector_difference(fe,dofs,f,0);
-  
+
   fe.interpolate(dofs, vectors, 0);
   deallog << " Vector " << vector_difference(fe,dofs,f,0) << std::endl;
 }

@@ -42,7 +42,7 @@ void test()
   if (true)
     {
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "hyper_cube" << std::endl;
+        deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -54,22 +54,22 @@ void test()
 
       GridTools::get_subdomain_association(tr, cell_subd);
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	{
-	  for (unsigned int i=0;i<tr.n_active_cells();++i)
-	    deallog << cell_subd[i] << " ";
-	  deallog << std::endl;
-	}
+        {
+          for (unsigned int i=0; i<tr.n_active_cells(); ++i)
+            deallog << cell_subd[i] << " ";
+          deallog << std::endl;
+        }
 
       if (myid == 0)
-	{
-	  deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
-	}
+        {
+          deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+        }
 
       const unsigned int checksum = tr.get_checksum ();
       if (myid == 0)
-	deallog << "Checksum: "
-		<< checksum
-		<< std::endl;
+        deallog << "Checksum: "
+                << checksum
+                << std::endl;
     }
 
 

@@ -40,25 +40,25 @@ template <int dim>
 void test ()
 {
   deallog << dim << "D" << std::endl;
-  
+
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation);
 
-                                   // refine once, then refine first cell to
-                                   // create hanging nodes
+  // refine once, then refine first cell to
+  // create hanging nodes
   triangulation.refine_global (1);
   triangulation.execute_coarsening_and_refinement ();
   deallog << "Number of cells: " << triangulation.n_active_cells() << std::endl;
-  
-                                   // set up a DoFHandler and compute hanging
-                                   // node constraints for a Q2 element
+
+  // set up a DoFHandler and compute hanging
+  // node constraints for a Q2 element
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
   deallog << "Number of dofs: " << dof_handler.n_dofs() << std::endl;
 
-                                   // then set up a sparsity pattern and a
-                                   // matrix on top of it
+  // then set up a sparsity pattern and a
+  // matrix on top of it
   std::vector<unsigned int> block_sizes(2);
   block_sizes[0] = dof_handler.n_dofs()/3;
   block_sizes[1] = dof_handler.n_dofs() - block_sizes[0];
@@ -69,14 +69,14 @@ void test ()
       sparsity.block(i,j).reinit (block_sizes[i], block_sizes[j],
                                   dof_handler.max_couplings_between_dofs());
   sparsity.collect_sizes();
-  
+
   DoFTools::make_sparsity_pattern (dof_handler, sparsity);
   sparsity.compress ();
   BlockSparseMatrix<double> A(sparsity);
 
-                                   // and output what we have. first for the
-                                   // individual blocks, and later for all
-                                   // together (which yielded an abort)
+  // and output what we have. first for the
+  // individual blocks, and later for all
+  // together (which yielded an abort)
   deallog << "Blockwise output" << std::endl;
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
@@ -109,25 +109,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

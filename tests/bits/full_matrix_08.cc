@@ -35,7 +35,7 @@ check ()
 
   FullMatrix<number> n;
   n.copy_from (m);
-  
+
   print_matrix (n);
 }
 

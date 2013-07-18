@@ -19,10 +19,10 @@
 // while computing the l2norm on ghosted vectors is unsafe, computing
 // the linfty norm should be ok. test this
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/trilinos_vector.h>    
+#include <deal.II/lac/trilinos_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -36,8 +36,8 @@ void test ()
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
 
-				   // each processor owns 2 indices and all
-                                   // are ghosting element 1 (the second)
+  // each processor owns 2 indices and all
+  // are ghosting element 1 (the second)
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
   IndexSet local_relevant(numproc*2);
@@ -46,9 +46,9 @@ void test ()
 
   TrilinosWrappers::MPI::Vector v(local_active, MPI_COMM_WORLD);
   TrilinosWrappers::MPI::Vector v_tmp(local_relevant, MPI_COMM_WORLD);
-  
 
-                                     // set local values
+
+  // set local values
   v(myid*2)=myid*2;
   v(myid*2+1)=myid*2+1;
 
@@ -67,10 +67,10 @@ void test ()
       deallog << e.get_exc_name() << std::endl;
       exc = true;
     }
-  
+
   Assert (exc == false, ExcInternalError());
   Assert (norm == 2.*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)-1,
-	  ExcInternalError());
+          ExcInternalError());
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       deallog << norm << std::endl;

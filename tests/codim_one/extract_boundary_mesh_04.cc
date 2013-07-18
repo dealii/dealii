@@ -38,48 +38,49 @@ using namespace std;
 
 template <int s_dim, int spacedim>
 void test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mesh,
-			       map< typename Triangulation<s_dim,spacedim>::cell_iterator,
-				    typename Triangulation<s_dim+1,spacedim>::face_iterator >
-			       &surface_to_volume_mapping)
+                               map< typename Triangulation<s_dim,spacedim>::cell_iterator,
+                               typename Triangulation<s_dim+1,spacedim>::face_iterator >
+                               &surface_to_volume_mapping)
 {
   typename Triangulation<s_dim,spacedim>::active_cell_iterator
-    cell = boundary_mesh.begin_active(),
-    endc = boundary_mesh.end();
+  cell = boundary_mesh.begin_active(),
+  endc = boundary_mesh.end();
   typename Triangulation<s_dim+1,spacedim>::face_iterator face;
 
-  for (; cell!=endc; ++cell){
+  for (; cell!=endc; ++cell)
+    {
 
-    face = surface_to_volume_mapping [cell];
-    Assert (face->at_boundary(), ExcInternalError());
+      face = surface_to_volume_mapping [cell];
+      Assert (face->at_boundary(), ExcInternalError());
 
-    deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
-    for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
-      {
-	deallog << "  " << cell->vertex(k) << std::endl;
-	Assert (std::fabs(cell->vertex(k).distance (Point<spacedim>()) - 1) < 1e-12,
-		ExcInternalError());
-      }
+      deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
+      for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+        {
+          deallog << "  " << cell->vertex(k) << std::endl;
+          Assert (std::fabs(cell->vertex(k).distance (Point<spacedim>()) - 1) < 1e-12,
+                  ExcInternalError());
+        }
 
-    deallog << "Volume face: " << face << " with vertices:" << std::endl;
-    for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
-      {
-	deallog << "  " << face->vertex(k) << std::endl;
-	Assert (std::fabs(face->vertex(k).distance (Point<spacedim>()) - 1) < 1e-12,
-		ExcInternalError());
-      }
+      deallog << "Volume face: " << face << " with vertices:" << std::endl;
+      for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+        {
+          deallog << "  " << face->vertex(k) << std::endl;
+          Assert (std::fabs(face->vertex(k).distance (Point<spacedim>()) - 1) < 1e-12,
+                  ExcInternalError());
+        }
 
 
-    for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
-      {
-	Point<spacedim> diff(face->vertex(k));
-	diff -= cell->vertex(k);
-	Assert (diff.square() == 0, ExcInternalError());
-      }
-  }
+      for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+        {
+          Point<spacedim> diff(face->vertex(k));
+          diff -= cell->vertex(k);
+          Assert (diff.square() == 0, ExcInternalError());
+        }
+    }
 }
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim>& tria)
+void save_mesh(const Triangulation<dim,spacedim> &tria)
 {
   GridOut grid_out;
   grid_out.write_gnuplot (tria, deallog.get_file_stream());
@@ -94,23 +95,24 @@ int main ()
   deallog.depth_console(0);
 
 
-  { // Extract the boundary of a hyper-sphere
+  {
+    // Extract the boundary of a hyper-sphere
 
     const int dim = 3;
     deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
 
     map< Triangulation<dim-1,dim>::cell_iterator,
- 	 Triangulation<dim,dim>::face_iterator>
-      surface_to_volume_mapping;
+         Triangulation<dim,dim>::face_iterator>
+         surface_to_volume_mapping;
     const HyperBallBoundary<dim> boundary_description;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
     for (Triangulation<dim>::active_cell_iterator
-	   cell = volume_mesh.begin_active();
-	 cell != volume_mesh.end(); ++cell)
+         cell = volume_mesh.begin_active();
+         cell != volume_mesh.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	if (cell->at_boundary(f) && (cell->center()[dim-1]>0))
-	  cell->face(f)->set_all_boundary_indicators (1);
+        if (cell->at_boundary(f) && (cell->center()[dim-1]>0))
+          cell->face(f)->set_all_boundary_indicators (1);
 
     volume_mesh.set_boundary (1, boundary_description);
     volume_mesh.set_boundary (0, boundary_description);
@@ -126,7 +128,7 @@ int main ()
 
     surface_to_volume_mapping
       = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
-					  boundary_ids);
+                                          boundary_ids);
 
     deallog << volume_mesh.n_active_cells () << std::endl;
     deallog << boundary_mesh.n_active_cells () << std::endl;
@@ -137,5 +139,5 @@ int main ()
   }
 
 
-   return 0;
- }
+  return 0;
+}

@@ -30,44 +30,44 @@ void test ()
   v(0) = 1;
   v(1) = 2;
 
-                                   // first check reading through a const
-                                   // iterator
+  // first check reading through a const
+  // iterator
   {
     BlockVector<double>::const_iterator i=v.begin();
     Assert (i[0] == 1, ExcInternalError());
     Assert (i[1] == 2, ExcInternalError());
   }
 
-                                   // same, but create iterator in a different
-                                   // way
+  // same, but create iterator in a different
+  // way
   {
     BlockVector<double>::const_iterator
-      i=const_cast<const BlockVector<double>&>(v).begin();
+    i=const_cast<const BlockVector<double>&>(v).begin();
     Assert (i[0] == 1, ExcInternalError());
     Assert (i[1] == 2, ExcInternalError());
   }
 
-                                   // read through a read-write iterator
+  // read through a read-write iterator
   {
     BlockVector<double>::iterator i = v.begin();
     Assert (i[0] == 1, ExcInternalError());
     Assert (i[1] == 2, ExcInternalError());
   }
 
-                                   // write through a read-write iterator
+  // write through a read-write iterator
   {
     BlockVector<double>::iterator i = v.begin();
     i[0] = 2;
     i[1] = 3;
-  }  
+  }
 
-                                   // and read again
+  // and read again
   {
     BlockVector<double>::iterator i = v.begin();
     Assert (i[0] == 2, ExcInternalError());
     Assert (i[1] == 3, ExcInternalError());
   }
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -87,25 +87,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

@@ -28,40 +28,40 @@
 #include <cmath>
 
 template<typename number>
-void check_sparse_product(const SparseMatrix<number>& m1, SparseMatrix<number>& m2)
+void check_sparse_product(const SparseMatrix<number> &m1, SparseMatrix<number> &m2)
 {
   Vector<double> v(m2.n());
   Vector<double> w(m1.m());
   deallog << "Sizes\t" << v.size() << '\t' << w.size() << std::endl;
-  
-  for (unsigned int i=0;i<v.size();++i)
+
+  for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i+1.;
-  
-  for (unsigned int i=0;i<v.size();++i)
+
+  for (unsigned int i=0; i<v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
-  
+
   GrowingVectorMemory<Vector<double> > mem;
-  
+
   ProductSparseMatrix<number, number> product(m1, m2, mem);
-  
+
   product.vmult(w,v);
-  for (unsigned int i=0;i<w.size();++i)
+  for (unsigned int i=0; i<w.size(); ++i)
     deallog << ' ' << w(i);
   deallog << std::endl;
-  
+
   product.vmult_add(w,v);
-  for (unsigned int i=0;i<w.size();++i)
+  for (unsigned int i=0; i<w.size(); ++i)
     deallog << ' ' << w(i);
   deallog << std::endl;
-  
+
   product.Tvmult(v,w);
-  for (unsigned int i=0;i<v.size();++i)
+  for (unsigned int i=0; i<v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
-  
+
   product.Tvmult_add(v,w);
-  for (unsigned int i=0;i<v.size();++i)
+  for (unsigned int i=0; i<v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
 }
@@ -75,16 +75,16 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   SparsityPattern sparsity1(2,3,3);
   SparsityPattern sparsity2(3,4,4);
 
-  for (unsigned int i=0;i<2;++i)
-    for (unsigned int j=0;j<3;++j)
+  for (unsigned int i=0; i<2; ++i)
+    for (unsigned int j=0; j<3; ++j)
       {
-	sparsity1.add(i,j);
-	sparsity2.add(j,i);
-	sparsity2.add(j,2+i);
+        sparsity1.add(i,j);
+        sparsity2.add(j,i);
+        sparsity2.add(j,2+i);
       }
   sparsity1.compress();
   sparsity2.compress();
@@ -92,12 +92,12 @@ int main()
   SparseMatrix<double> m1(sparsity1);
   SparseMatrix<double> m2(sparsity2);
 
-  for (unsigned int i=0;i<2;++i)
-    for (unsigned int j=0;j<3;++j)
+  for (unsigned int i=0; i<2; ++i)
+    for (unsigned int j=0; j<3; ++j)
       {
-	m1.set(i, j, 1.*i-j);
-	m2.set(j, i, 1.*i-j);
-	m2.set(j, 2+i, 1.*j-i);
+        m1.set(i, j, 1.*i-j);
+        m2.set(j, i, 1.*i-j);
+        m2.set(j, 2+i, 1.*j-i);
       }
   check_sparse_product(m1, m2);
 }

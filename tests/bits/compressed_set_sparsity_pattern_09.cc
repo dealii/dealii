@@ -33,13 +33,13 @@ void test ()
 
   csp.reinit (N, N);
   Assert (csp.empty() == false, ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("compressed_set_sparsity_pattern_09/output");
   deallog.attach(logfile);

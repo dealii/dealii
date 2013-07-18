@@ -59,96 +59,96 @@ std::ofstream logfile("step-8/output");
 
 
 template <int dim>
-class ElasticProblem 
+class ElasticProblem
 {
-  public:
-    ElasticProblem ();
-    ~ElasticProblem ();
-    void run ();
-    
-  private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+public:
+  ElasticProblem ();
+  ~ElasticProblem ();
+  void run ();
 
-    Triangulation<dim>   triangulation;
-    DoFHandler<dim>      dof_handler;
+private:
+  void setup_system ();
+  void assemble_system ();
+  void solve ();
+  void refine_grid ();
+  void output_results (const unsigned int cycle) const;
 
-    FESystem<dim>        fe;
+  Triangulation<dim>   triangulation;
+  DoFHandler<dim>      dof_handler;
 
-    ConstraintMatrix     hanging_node_constraints;
+  FESystem<dim>        fe;
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
+  ConstraintMatrix     hanging_node_constraints;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> system_matrix;
+
+  Vector<double>       solution;
+  Vector<double>       system_rhs;
 };
 
 
 
 template <int dim>
-class RightHandSide :  public Function<dim> 
+class RightHandSide :  public Function<dim>
 {
-  public:
-    RightHandSide ();
-    
-    virtual void vector_value (const Point<dim> &p,
-			       Vector<double>   &values) const;
+public:
+  RightHandSide ();
 
-    virtual void vector_value_list (const std::vector<Point<dim> > &points,
-				    std::vector<Vector<double> >   &value_list) const;
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<double>   &values) const;
+
+  virtual void vector_value_list (const std::vector<Point<dim> > &points,
+                                  std::vector<Vector<double> >   &value_list) const;
 };
 
 
 template <int dim>
 RightHandSide<dim>::RightHandSide ()
-		:
-		Function<dim> (dim)
+  :
+  Function<dim> (dim)
 {}
 
 
 template <int dim>
 inline
 void RightHandSide<dim>::vector_value (const Point<dim> &p,
-				       Vector<double>   &values) const 
+                                       Vector<double>   &values) const
 {
-  Assert (values.size() == dim, 
-	  ExcDimensionMismatch (values.size(), dim));
+  Assert (values.size() == dim,
+          ExcDimensionMismatch (values.size(), dim));
   Assert (dim >= 2, ExcNotImplemented());
-  
+
   Point<dim> point_1, point_2;
   point_1(0) = 0.5;
   point_2(0) = -0.5;
-  
+
   if (((p-point_1).square() < 0.2*0.2) ||
       ((p-point_2).square() < 0.2*0.2))
     values(0) = 1;
   else
     values(0) = 0;
-  
+
   if (p.square() < 0.2*0.2)
     values(1) = 1;
   else
-    values(1) = 0;    
+    values(1) = 0;
 }
 
 
 
 template <int dim>
 void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-					    std::vector<Vector<double> >   &value_list) const 
+                                            std::vector<Vector<double> >   &value_list) const
 {
-  Assert (value_list.size() == points.size(), 
-	  ExcDimensionMismatch (value_list.size(), points.size()));
+  Assert (value_list.size() == points.size(),
+          ExcDimensionMismatch (value_list.size(), points.size()));
 
   const unsigned int n_points = points.size();
 
   for (unsigned int p=0; p<n_points; ++p)
     RightHandSide<dim>::vector_value (points[p],
-				      value_list[p]);
+                                      value_list[p]);
 }
 
 
@@ -158,16 +158,16 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 
 template <int dim>
 ElasticProblem<dim>::ElasticProblem ()
-		:
-		dof_handler (triangulation),
-		fe (FE_Q<dim>(1), dim)
+  :
+  dof_handler (triangulation),
+  fe (FE_Q<dim>(1), dim)
 {}
 
 
 
 
 template <int dim>
-ElasticProblem<dim>::~ElasticProblem () 
+ElasticProblem<dim>::~ElasticProblem ()
 {
   dof_handler.clear ();
 }
@@ -180,11 +180,11 @@ void ElasticProblem<dim>::setup_system ()
   dof_handler.distribute_dofs (fe);
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
+                                           hanging_node_constraints);
   hanging_node_constraints.close ();
   sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
+                           dof_handler.n_dofs(),
+                           dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
   hanging_node_constraints.condense (sparsity_pattern);
@@ -200,13 +200,13 @@ void ElasticProblem<dim>::setup_system ()
 
 
 template <int dim>
-void ElasticProblem<dim>::assemble_system () 
-{  
+void ElasticProblem<dim>::assemble_system ()
+{
   QGauss<dim>  quadrature_formula (2);
 
-  FEValues<dim> x_fe_values (fe, quadrature_formula, 
-			   update_values   | update_gradients |
-                           update_q_points | update_JxW_values);
+  FEValues<dim> x_fe_values (fe, quadrature_formula,
+                             update_values   | update_gradients |
+                             update_q_points | update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.size();
@@ -223,11 +223,11 @@ void ElasticProblem<dim>::assemble_system ()
 
   RightHandSide<dim>      right_hand_side;
   std::vector<Vector<double> > rhs_values (n_q_points,
-					   Vector<double>(dim));
+                                           Vector<double>(dim));
 
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
+                                                 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix = 0;
@@ -235,70 +235,70 @@ void ElasticProblem<dim>::assemble_system ()
 
       x_fe_values.reinit (cell);
       const FEValues<dim> &fe_values = x_fe_values.get_present_fe_values();
-      
+
       lambda.value_list (fe_values.get_quadrature_points(), lambda_values);
       mu.value_list     (fe_values.get_quadrature_points(), mu_values);
 
       right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
-					 rhs_values);
-      
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  const unsigned int 
-	    component_i = fe.system_to_component_index(i).first;
-	  
-	  for (unsigned int j=0; j<dofs_per_cell; ++j) 
-	    {
-	      const unsigned int 
-		component_j = fe.system_to_component_index(j).first;
-	      
-	      for (unsigned int q_point=0; q_point<n_q_points;
-		   ++q_point)
-		{
-		  cell_matrix(i,j) 
-		    += 
-		    (
-		      (fe_values.shape_grad(i,q_point)[component_i] *
-		       fe_values.shape_grad(j,q_point)[component_j] *
-		       lambda_values[q_point])
-		      +
-		      (fe_values.shape_grad(i,q_point)[component_j] *
-		       fe_values.shape_grad(j,q_point)[component_i] *
-		       mu_values[q_point])
-		      +
-		      ((component_i == component_j) ?
-		       (fe_values.shape_grad(i,q_point) *
-			fe_values.shape_grad(j,q_point) *
-			mu_values[q_point])  :
-		       0)
-		    )
-		    *
-		    fe_values.JxW(q_point);
-		}
-	    }
-	}
+                                         rhs_values);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  const unsigned int 
-	    component_i = fe.system_to_component_index(i).first;
-	  
-	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	    cell_rhs(i) += fe_values.shape_value(i,q_point) *
-			   rhs_values[q_point](component_i) *
-			   fe_values.JxW(q_point);
-	}
+        {
+          const unsigned int
+          component_i = fe.system_to_component_index(i).first;
+
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            {
+              const unsigned int
+              component_j = fe.system_to_component_index(j).first;
+
+              for (unsigned int q_point=0; q_point<n_q_points;
+                   ++q_point)
+                {
+                  cell_matrix(i,j)
+                  +=
+                    (
+                      (fe_values.shape_grad(i,q_point)[component_i] *
+                       fe_values.shape_grad(j,q_point)[component_j] *
+                       lambda_values[q_point])
+                      +
+                      (fe_values.shape_grad(i,q_point)[component_j] *
+                       fe_values.shape_grad(j,q_point)[component_i] *
+                       mu_values[q_point])
+                      +
+                      ((component_i == component_j) ?
+                       (fe_values.shape_grad(i,q_point) *
+                        fe_values.shape_grad(j,q_point) *
+                        mu_values[q_point])  :
+                       0)
+                    )
+                    *
+                    fe_values.JxW(q_point);
+                }
+            }
+        }
+
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+        {
+          const unsigned int
+          component_i = fe.system_to_component_index(i).first;
+
+          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+            cell_rhs(i) += fe_values.shape_value(i,q_point) *
+                           rhs_values[q_point](component_i) *
+                           fe_values.JxW(q_point);
+        }
 
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    system_matrix.add (local_dof_indices[i],
-			       local_dof_indices[j],
-			       cell_matrix(i,j));
-	  
-	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	}
+        {
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            system_matrix.add (local_dof_indices[i],
+                               local_dof_indices[j],
+                               cell_matrix(i,j));
+
+          system_rhs(local_dof_indices[i]) += cell_rhs(i);
+        }
     }
 
   hanging_node_constraints.condense (system_matrix);
@@ -306,20 +306,20 @@ void ElasticProblem<dim>::assemble_system ()
 
   std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
-					    0,
-					    ZeroFunction<dim>(dim),
-					    boundary_values);
+                                            0,
+                                            ZeroFunction<dim>(dim),
+                                            boundary_values);
   MatrixTools::apply_boundary_values (boundary_values,
-				      system_matrix,
-				      solution,
-				      system_rhs);
+                                      system_matrix,
+                                      solution,
+                                      system_rhs);
 }
 
 
 
 
 template <int dim>
-void ElasticProblem<dim>::solve () 
+void ElasticProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -328,7 +328,7 @@ void ElasticProblem<dim>::solve ()
   preconditioner.initialize(system_matrix, 1.2);
 
   cg.solve (system_matrix, solution, system_rhs,
-	    preconditioner);
+            preconditioner);
 
   hanging_node_constraints.distribute (solution);
 }
@@ -342,14 +342,14 @@ void ElasticProblem<dim>::refine_grid ()
 
   typename FunctionMap<dim>::type neumann_boundary;
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      QGauss<dim-1>(2),
-				      neumann_boundary,
-				      solution,
-				      estimated_error_per_cell);
+                                      QGauss<dim-1>(2),
+                                      neumann_boundary,
+                                      solution,
+                                      estimated_error_per_cell);
 
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						   estimated_error_per_cell,
-						   0.3, 0.03);
+                                                   estimated_error_per_cell,
+                                                   0.3, 0.03);
 
   triangulation.execute_coarsening_and_refinement ();
 }
@@ -362,33 +362,33 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
   std::string filename = "solution-";
   filename += ('0' + cycle);
   Assert (cycle < 10, ExcInternalError());
-  
+
   filename += ".gmv";
 
   DataOut<dim,DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
 
- 
+
 
   std::vector<std::string> solution_names;
   switch (dim)
     {
-      case 1:
-	    solution_names.push_back ("displacement");
-	    break;
-      case 2:
-	    solution_names.push_back ("x_displacement");	    
-	    solution_names.push_back ("y_displacement");
-	    break;
-      case 3:
-	    solution_names.push_back ("x_displacement");	    
-	    solution_names.push_back ("y_displacement");
-	    solution_names.push_back ("z_displacement");
-	    break;
-      default:
-	    Assert (false, ExcNotImplemented());
+    case 1:
+      solution_names.push_back ("displacement");
+      break;
+    case 2:
+      solution_names.push_back ("x_displacement");
+      solution_names.push_back ("y_displacement");
+      break;
+    case 3:
+      solution_names.push_back ("x_displacement");
+      solution_names.push_back ("y_displacement");
+      solution_names.push_back ("z_displacement");
+      break;
+    default:
+      Assert (false, ExcNotImplemented());
     }
-	     
+
   data_out.add_data_vector (solution, solution_names);
   data_out.build_patches ();
   data_out.write_gmv (deallog.get_file_stream());
@@ -398,30 +398,30 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 
 
 template <int dim>
-void ElasticProblem<dim>::run () 
+void ElasticProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<4; ++cycle)
     {
       deallog << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
-	{
-	  GridGenerator::hyper_cube (triangulation, -1, 1);
-	  triangulation.refine_global (2);
-	}
+        {
+          GridGenerator::hyper_cube (triangulation, -1, 1);
+          triangulation.refine_global (2);
+        }
       else
-	refine_grid ();
+        refine_grid ();
 
       deallog << "   Number of active cells:       "
-		<< triangulation.n_active_cells()
-		<< std::endl;
+              << triangulation.n_active_cells()
+              << std::endl;
 
       setup_system ();
 
       deallog << "   Number of degrees of freedom: "
-		<< dof_handler.n_dofs()
-		<< std::endl;
-      
+              << dof_handler.n_dofs()
+              << std::endl;
+
       assemble_system ();
       solve ();
       output_results (cycle);
@@ -429,14 +429,14 @@ void ElasticProblem<dim>::run ()
 }
 
 
-int main () 
+int main ()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
   try
     {
@@ -448,25 +448,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     }
 

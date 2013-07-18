@@ -59,7 +59,7 @@ private:
   const unsigned int degree;
   const unsigned int n_stress_components; // components of stress
   const unsigned int n_gamma_components; // scalar plastic multiplier
-    
+
 
   Triangulation<dim> triangulation;
   FESystem<dim> fe;
@@ -75,12 +75,12 @@ private:
 
 template <int dim>
 MixedElastoPlasticity<dim>::MixedElastoPlasticity(const unsigned int degree):
-degree(degree),
-n_stress_components(dim*dim),
-n_gamma_components(1),
-fe( FE_Q<dim>(degree), n_stress_components,
-    FE_Q<dim>(degree), n_gamma_components),
-dof_handler(triangulation)
+  degree(degree),
+  n_stress_components(dim *dim),
+  n_gamma_components(1),
+  fe( FE_Q<dim>(degree), n_stress_components,
+      FE_Q<dim>(degree), n_gamma_components),
+  dof_handler(triangulation)
 {
 }
 
@@ -93,15 +93,15 @@ void MixedElastoPlasticity<dim>::make_grid_and_dofs()
   dof_handler.distribute_dofs(fe);
 
   deallog << "Number of stress components: "
-            << n_stress_components
-            << "\tNumber of gamma components: "
-            << n_gamma_components << std::endl;  
-    
+          << n_stress_components
+          << "\tNumber of gamma components: "
+          << n_gamma_components << std::endl;
+
   // stress -> 0 gamma -> 1
   std::vector<unsigned int> block_component(n_stress_components + n_gamma_components, 1);
   for (unsigned int ii = 0; ii < n_stress_components; ii++)
     block_component[ii] = 0;
-    
+
   DoFRenumbering::component_wise(dof_handler);
 
   // total number of dof per block component
@@ -112,16 +112,16 @@ void MixedElastoPlasticity<dim>::make_grid_and_dofs()
   const unsigned int n_gamma_dof = dofs_per_block[1];
 
   deallog << "Number of active cells: "
-            << triangulation.n_active_cells()
-            << std::endl
-            << "Total number of cells: "
-            << triangulation.n_cells()
-            << std::endl
-            << "Number of degrees of freedom: "
-            << dof_handler.n_dofs()
-            << " = (" << n_stress_dof << " + "
-            << n_gamma_dof << ")"
-            << std::endl;
+          << triangulation.n_active_cells()
+          << std::endl
+          << "Total number of cells: "
+          << triangulation.n_cells()
+          << std::endl
+          << "Number of degrees of freedom: "
+          << dof_handler.n_dofs()
+          << " = (" << n_stress_dof << " + "
+          << n_gamma_dof << ")"
+          << std::endl;
 
   // following step-22 use of simple compressed block sparsity pattern for efficiency
   {
@@ -167,21 +167,21 @@ void MixedElastoPlasticity<dim>::assemble_system()
 
   std::vector<unsigned int> local_dof_indices(dofs_per_cell);
 
-    
+
   const FEValuesExtractors::Tensor<2> stress_extr(0);//rank2
   const FEValuesExtractors::Scalar gamma_extr(n_stress_components);
 
   deallog   << "fe.dofs_per_cell: " << fe.dofs_per_cell
-	      << "\tquadrature_formula.size(): " << quadrature_formula.size()
-	      << std::endl;
-                
+            << "\tquadrature_formula.size(): " << quadrature_formula.size()
+            << std::endl;
+
   typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
-                                                   
+                                                 endc = dof_handler.end();
+
 
   std::vector<Tensor<1,dim> > div_values(n_q_points);
   std::vector<Tensor<2,dim> > stress_values(n_q_points);
-                                                                     
+
   unsigned int cc = 0;
   for (; cell!=endc; ++cell) //loop over all cells
     {
@@ -190,7 +190,7 @@ void MixedElastoPlasticity<dim>::assemble_system()
       cell_rhs = 0;
 
       fe_values.reinit (cell); //compute requested values for a given cell
-        
+
       fe_values[stress_extr].get_function_values(solution,stress_values);
       fe_values[stress_extr].get_function_divergences(solution,div_values);
     }
@@ -209,17 +209,19 @@ void check()
 {
   static const unsigned int dim = 3;
   {
-    for (unsigned int i = 0; i < dim; i++) {
-      for (unsigned int j = 0; j < dim; j++) {
-	TableIndices<2> indices(i,j);
-	unsigned int unrolled = Tensor<2,dim>::component_to_unrolled_index(indices);
-	deallog<<i<<" "<<j<<" -> "<<unrolled<<std::endl;
-	indices = Tensor<2,dim>::unrolled_to_component_indices(unrolled);
-	deallog<<unrolled<<" -> "<<indices[0]<<" "<<indices[1]<<std::endl;
+    for (unsigned int i = 0; i < dim; i++)
+      {
+        for (unsigned int j = 0; j < dim; j++)
+          {
+            TableIndices<2> indices(i,j);
+            unsigned int unrolled = Tensor<2,dim>::component_to_unrolled_index(indices);
+            deallog<<i<<" "<<j<<" -> "<<unrolled<<std::endl;
+            indices = Tensor<2,dim>::unrolled_to_component_indices(unrolled);
+            deallog<<unrolled<<" -> "<<indices[0]<<" "<<indices[1]<<std::endl;
+          }
       }
-    }
   }
-	
+
   MixedElastoPlasticity < 3 > elasto_plasticity(1);
   elasto_plasticity.run();
 

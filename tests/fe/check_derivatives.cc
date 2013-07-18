@@ -40,16 +40,16 @@ const double delta_x = 1e-8;
 
 template <int dim>
 void test (const FiniteElement<dim> &fe,
-           const Quadrature<dim>    &quadrature) 
+           const Quadrature<dim>    &quadrature)
 {
   deallog << fe.get_name() << ' ' << fe.dofs_per_cell << ' ';
-  
+
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     for (unsigned int q=0; q<quadrature.size(); ++q)
       for (unsigned int c=0; c<fe.n_components(); ++c)
         {
           const Point<dim> point = quadrature.point(q);
-          
+
           const Tensor<1,dim> gradient
             = fe.shape_grad_component (i, point, c);
 
@@ -89,7 +89,7 @@ void check (const unsigned int min_degree,
 
 template <template <int> class FE>
 void check1 (const unsigned int min_degree,
-            const unsigned int max_degree)
+             const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -106,7 +106,7 @@ void check1 (const unsigned int min_degree,
 // Nedelec exists only in 2d/3d
 template <>
 void check1<FE_Nedelec> (const unsigned int min_degree,
-			 const unsigned int max_degree)
+                         const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -120,7 +120,7 @@ void check1<FE_Nedelec> (const unsigned int min_degree,
 // former is also not implemented in 3d
 template <>
 void check1<FE_RaviartThomas> (const unsigned int min_degree,
-			      const unsigned int max_degree)
+                               const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -130,7 +130,7 @@ void check1<FE_RaviartThomas> (const unsigned int min_degree,
 
 template <>
 void check1<FE_RaviartThomasNodal> (const unsigned int min_degree,
-                                   const unsigned int max_degree)
+                                    const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -146,7 +146,7 @@ main()
 {
   std::ofstream logfile ("check_derivatives/output");
   deallog << std::setprecision(2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
 
@@ -160,7 +160,7 @@ main()
   check1<FE_Nedelec> (0,1);
   check1<FE_RaviartThomas> (0,4);
   check1<FE_RaviartThomasNodal> (0,2);
-  
+
   return 0;
 }
 

@@ -23,7 +23,7 @@
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim> &,
 //                          std::vector<std::vector<bool> > &,
-//	                    SparsityPattern       &);
+//                      SparsityPattern       &);
 
 
 std::string output_file_name = "dof_tools_02a/output";
@@ -33,23 +33,23 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-                                   // set up X-shape mask
+  // set up X-shape mask
   const unsigned int n_components = dof_handler.get_fe().n_components();
   std::vector<std::vector<bool> > mask (n_components,
                                         std::vector<bool>(n_components,false));
   for (unsigned int i=0; i<n_components; ++i)
     mask[i][i] = mask[i][n_components-i-1] = true;
-  
-                                   // create sparsity pattern
+
+  // create sparsity pattern
   SparsityPattern sp (dof_handler.n_dofs(),
                       dof_handler.max_couplings_between_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, mask, sp);
   sp.compress ();
-  
-                                   // write out 20 lines of this
-                                   // pattern (if we write out the
-                                   // whole pattern, the output file
-                                   // would be in the range of 40 MB)
+
+  // write out 20 lines of this
+  // pattern (if we write out the
+  // whole pattern, the output file
+  // would be in the range of 40 MB)
   for (unsigned int l=0; l<20; ++l)
     {
       const unsigned int line = l*(sp.n_rows()/20);
@@ -58,7 +58,7 @@ check_this (const DoFHandler<dim> &dof_handler)
       deallog << std::endl;
     }
 
-                                   // write out some other indicators
+  // write out some other indicators
   deallog << sp.bandwidth () << std::endl
           << sp.max_entries_per_row () << std::endl
           << sp.n_nonzero_elements () << std::endl;

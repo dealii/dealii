@@ -19,7 +19,7 @@
 // check Vector<std::complex<double> >::mean_value()
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>    
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -27,7 +27,7 @@
 
 void test (Vector<std::complex<double> > &v)
 {
-                                   // set some elements of the vector
+  // set some elements of the vector
   std::complex<double> sum = 0;
   for (unsigned int i=0; i<v.size(); i+=1+i)
     {
@@ -36,9 +36,9 @@ void test (Vector<std::complex<double> > &v)
     }
   v.compress ();
 
-                                   // then check the norm
+  // then check the norm
   Assert (std::abs(v.mean_value() - sum/(1.*v.size())) <
-	  1e-14*std::abs(sum)/v.size(),
+          1e-14*std::abs(sum)/v.size(),
           ExcInternalError());
 
   deallog << "OK" << std::endl;
@@ -46,7 +46,7 @@ void test (Vector<std::complex<double> > &v)
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("complex_vector_32/output");
   deallog.attach(logfile);
@@ -61,25 +61,25 @@ int main ()
   catch (std::exception &exc)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
-      
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "----------------------------------------------------"
+              << std::endl;
       deallog << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
       return 1;
     };
 }

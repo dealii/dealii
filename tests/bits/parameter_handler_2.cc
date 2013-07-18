@@ -25,7 +25,7 @@
 #include <fstream>
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("parameter_handler_2/output");
   deallog.attach(logfile);
@@ -47,6 +47,6 @@ int main ()
   prm.leave_subsection ();
 
   deallog << list << std::endl;
-  
+
   return 0;
 }
