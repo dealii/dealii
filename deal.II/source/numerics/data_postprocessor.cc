@@ -14,6 +14,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/numerics/data_postprocessor.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 
