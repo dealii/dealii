@@ -115,7 +115,7 @@ void test()
             }
           cm.distribute_local_to_global (local_vector, local_dof_indices, vector);
         }
-    vector.compress();
+    vector.compress(VectorOperation::add);
   }
   double norm = vector.l2_norm();
   if (myid == 0)

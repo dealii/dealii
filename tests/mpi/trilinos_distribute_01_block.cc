@@ -53,7 +53,7 @@ void test()
     vec.block(0)(i) = i;
   for (unsigned int i=vec.block(1).local_range().first; i<vec.block(1).local_range().second; ++i)
     vec.block(1)(i) = i;
-  vec.compress();
+  vec.compress(VectorOperation::insert);
 
   // verify correctness so far
   {
@@ -112,8 +112,6 @@ void test()
   cm.distribute (vec);
 
   // verify correctness
-  vec.compress ();
-
   if (myid != 0)
     Assert (vec(vec.block(0).local_range().first+10) == vec.block(0).local_range().first-25,
 	    ExcInternalError());

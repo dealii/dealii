@@ -45,7 +45,7 @@ void test ()
   DoFTools::extract_locally_relevant_dofs (dof_handler,locally_relevant_dofs);
 
   PETScWrappers::MPI::Vector force;
-  force.reinit (mpi_communicator, locally_owned_dofs);
+  force.reinit (locally_owned_dofs, mpi_communicator);
   Assert(!force.has_ghost_elements(), ExcInternalError());
 
   ConstraintMatrix constraints (locally_relevant_dofs);

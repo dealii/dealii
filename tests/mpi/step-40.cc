@@ -131,12 +131,10 @@ namespace Step40
     DoFTools::extract_locally_relevant_dofs (dof_handler,
                                              locally_relevant_dofs);
 
-    locally_relevant_solution.reinit (mpi_communicator,
-                                      locally_owned_dofs,
-                                      locally_relevant_dofs);
-    system_rhs.reinit (mpi_communicator,
-                       dof_handler.n_dofs(),
-                       dof_handler.n_locally_owned_dofs());
+    locally_relevant_solution.reinit (locally_owned_dofs,
+                                      locally_relevant_dofs,
+				      mpi_communicator);
+    system_rhs.reinit (locally_owned_dofs, mpi_communicator);
     system_rhs = 0;
 
     constraints.clear ();
@@ -228,8 +226,8 @@ namespace Step40
                                                   system_rhs);
         }
 
-    system_matrix.compress ();
-    system_rhs.compress ();
+    system_matrix.compress (VectorOperation::add);
+    system_rhs.compress (VectorOperation::add);
   }
 
 

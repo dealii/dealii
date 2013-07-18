@@ -65,7 +65,7 @@ void test()
 
   DoFTools::extract_locally_relevant_dofs (dh,locally_relevant_dofs);
 
-  PETScWrappers::MPI::Vector solution(MPI_COMM_WORLD,locally_owned_dofs,locally_relevant_dofs);
+  PETScWrappers::MPI::Vector solution(locally_owned_dofs,locally_relevant_dofs, MPI_COMM_WORLD);
 
   parallel::distributed::SolutionTransfer<2,PETScWrappers::MPI::Vector> soltrans(dh);
 
@@ -81,11 +81,11 @@ void test()
   locally_owned_dofs = dh.locally_owned_dofs ();
   DoFTools::extract_locally_relevant_dofs (dh,locally_relevant_dofs);
 
-  PETScWrappers::MPI::Vector  tmp(MPI_COMM_WORLD,dh.n_dofs(),dh.n_locally_owned_dofs());
+  PETScWrappers::MPI::Vector  tmp(locally_owned_dofs, MPI_COMM_WORLD);
 
   soltrans.interpolate (tmp);
 
-  solution.reinit(MPI_COMM_WORLD,locally_owned_dofs,locally_relevant_dofs);
+  solution.reinit(locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
   solution = tmp;
 
 				   // make sure no processor is

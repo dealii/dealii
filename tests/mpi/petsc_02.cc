@@ -50,7 +50,7 @@ void test()
     mat.add(0, 0, 1.0);
 
 
-  mat.compress();
+  mat.compress(VectorOperation::add);
 
   if (myid==0)
     deallog << "done" << std::endl;

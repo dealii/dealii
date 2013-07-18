@@ -57,7 +57,6 @@ void test()
   VectorTools::interpolate(dofh,
 			   ConstantFunction<dim> (1.),
 			   x_ref);
-  x_ref.compress();
 
   TrilinosWrappers::MPI::Vector x1 (x_ref);
 

@@ -164,7 +164,7 @@ void test()
 						  local_dof_indices,
 						  vector);
 	}
-    vector.compress (Add);
+    vector.compress (VectorOperation::add);
   }
 
 				// now check that no entries were generated

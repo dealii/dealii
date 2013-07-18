@@ -66,7 +66,6 @@ void test()
   VectorTools::interpolate(dofh,
 			   ConstantFunction<dim>(1),
 			   x);
-  x.compress ();
   const double norm = x.l2_norm();
   if (myid == 0)
     deallog << dofh.n_locally_owned_dofs() << ' ' << dofh.n_dofs()

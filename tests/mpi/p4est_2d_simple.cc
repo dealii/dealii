@@ -59,7 +59,7 @@ void test()
 	}
       else
 	{
-	  Assert( tr.begin_active()->subdomain_id()==types::artificial_subdomain_id,
+	  Assert( tr.begin_active()->subdomain_id()==numbers::artificial_subdomain_id,
 		  ExcInternalError() );
 	}
 

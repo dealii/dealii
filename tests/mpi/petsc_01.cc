@@ -53,7 +53,7 @@ void test()
   
   mat.add((2*myid+2)%(2*numprocs),(2*myid+2)%(2*numprocs),0.1);
   
-  mat.compress();
+  mat.compress(VectorOperation::add);
 
   std::vector<types::global_dof_index> rows(1,1);
   mat.clear_rows(rows);
@@ -69,7 +69,7 @@ void test()
   
   mat.add((2*myid+2)%(2*numprocs),(2*myid+2)%(2*numprocs),0.1);
   
-  mat.compress();
+  mat.compress(VectorOperation::add);
 //    mat.write_ascii();
 
   if (myid==0)

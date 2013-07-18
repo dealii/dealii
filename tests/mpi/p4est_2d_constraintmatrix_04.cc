@@ -182,7 +182,6 @@ void test()
   VectorTools::interpolate(dofh,
 			   TemperatureInitialValues<dim>(),
 			   x);
-  x.compress();
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
   x_rel = x;
@@ -258,7 +257,6 @@ void test()
       trans.interpolate(x);
 
       x_rel.reinit(relevant_set, MPI_COMM_WORLD);
-      x_rel.compress();
 
       ConstraintMatrix cm(relevant_set);
       DoFTools::make_hanging_node_constraints (dofh, cm);
@@ -285,7 +283,6 @@ void test()
   VectorTools::interpolate(dofh,
 			   TemperatureInitialValues<dim>(),
 			   x_ref);
-  x_ref.compress();
 
   x_ref -= x;
   double err = x_ref.linfty_norm();

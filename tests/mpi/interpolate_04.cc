@@ -71,9 +71,9 @@ void test()
   DoFTools::extract_locally_relevant_dofs (dofh1,
 					   dof1_locally_relevant_dofs);
   
-  PETScWrappers::MPI::Vector u1(MPI_COMM_WORLD, dof1_locally_owned_dofs, dof1_locally_relevant_dofs);
+  PETScWrappers::MPI::Vector u1(dof1_locally_owned_dofs, dof1_locally_relevant_dofs, MPI_COMM_WORLD);
 
-  PETScWrappers::MPI::Vector out(MPI_COMM_WORLD, dof1_locally_owned_dofs);
+  PETScWrappers::MPI::Vector out(dof1_locally_owned_dofs, MPI_COMM_WORLD);
 
   FETools::interpolation_difference
     (dofh1, cm1, u1, dofh2, cm2, out);
