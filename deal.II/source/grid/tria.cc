@@ -10999,15 +10999,8 @@ template <int dim, int spacedim>
 typename Triangulation<dim,spacedim>::cell_iterator
 Triangulation<dim,spacedim>::last () const
 {
-  return last (levels.size()-1);
-}
+  const unsigned int level = levels.size()-1;
 
-
-
-template <int dim, int spacedim>
-typename Triangulation<dim,spacedim>::cell_iterator
-Triangulation<dim,spacedim>::last (const unsigned int level) const
-{
   Assert (level<n_global_levels() || level<levels.size(), ExcInvalidLevel(level));
   if (levels[level]->cells.cells.size() ==0)
     return end(level);
@@ -11037,27 +11030,6 @@ Triangulation<dim,spacedim>::last_active () const
   cell_iterator cell = last();
 
   if (cell != end())
-    {
-      // then move to the last active one
-      if (cell->active()==true)
-        return cell;
-      while ((--cell).state() == IteratorState::valid)
-        if (cell->active()==true)
-          return cell;
-    }
-  return cell;
-}
-
-
-
-template <int dim, int spacedim>
-typename Triangulation<dim,spacedim>::active_cell_iterator
-Triangulation<dim,spacedim>::last_active (const unsigned int level) const
-{
-  // get the last used cell on this level
-  cell_iterator cell = last(level);
-
-  if (cell != end(level))
     {
       // then move to the last active one
       if (cell->active()==true)
@@ -12234,10 +12206,9 @@ void Triangulation<dim, spacedim>::execute_coarsening ()
   // deleted (if the latter are on a
   // higher level for example)
   //
-  // if there is only one level,
-  // there can not be anything to do
-  if (levels.size() >= 2)
-    for (cell = last(levels.size()-2); cell!=endc; --cell)
+  // cells on level 0 are never coarsened, so we can skip it
+  for (unsigned int level = n_levels()-1; level>=1; --level)
+    for (cell = begin(level); cell!=end(level); --cell)
       if (cell->user_flag_set())
         // use a separate function,
         // since this is dimension

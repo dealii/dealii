@@ -2657,21 +2657,9 @@ public:
 
   /**
    *  Return an iterator pointing to the
-   *  last used cell on level @p level.
-   */
-  cell_iterator        last (const unsigned int level) const;
-
-  /**
-   *  Return an iterator pointing to the
    *  last active cell.
    */
   active_cell_iterator last_active () const;
-
-  /**
-   *  Return an iterator pointing to the
-   *  last active cell on level @p level.
-   */
-  active_cell_iterator last_active (const unsigned int level) const;
   /*@}*/
 
   /*---------------------------------------*/
