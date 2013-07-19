@@ -12208,7 +12208,7 @@ void Triangulation<dim, spacedim>::execute_coarsening ()
   //
   // cells on level 0 are never coarsened, so we can skip it
   for (unsigned int level = n_levels()-1; level>=1; --level)
-    for (cell = begin(level); cell!=end(level); --cell)
+    for (cell = begin(level); cell!=end(level); ++cell)
       if (cell->user_flag_set())
         // use a separate function,
         // since this is dimension
