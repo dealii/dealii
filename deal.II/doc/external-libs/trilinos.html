@@ -52,11 +52,10 @@
     <h5>Installing Trilinos</h5>
 
     <p style="color: red">
-      Note: Trilinos versions 10.8.0, 10.8.1, 10.10.2, 10.12.1 are not
-      compatible with deal.II. They contain subtle bugs related to (parallel)
-      matrices and vectors.  Versions tested to work are 10.8.5,
-      10.12.2, and 11.0.3. We recommend only using one of the tested versions
-      for the time being.
+      Note: Trilinos versions older than 10.12.2 can cause problems and are
+      therefore not recommended. The newest version tested to work is 11.4.1.
+      Major releases after this version may cause problems, so we recommend
+      sticking to this version if at all possible.
     </p>
 
     <p>
@@ -65,41 +64,34 @@
       reasonable configuration:
 	<pre>
 
-    cd trilinos-10.12.2
+    cd trilinos-11.4.1
     mkdir build
     cd build
 
-    cmake -D Trilinos_ENABLE_OPTIONAL_PACKAGES:BOOL=ON \
-      -D Trilinos_ENABLE_Sacado:BOOL=ON \
-      -D Trilinos_ENABLE_Stratimikos:BOOL=ON \
-      -D CMAKE_BUILD_TYPE:STRING=RELEASE \
-      -D CMAKE_CXX_FLAGS:STRING="-g -O3" \
-      -D CMAKE_C_FLAGS:STRING="-g -O3" \
-      -D CMAKE_FORTRAN_FLAGS:STRING="-g -O5" \
-      -D Trilinos_EXTRA_LINK_FLAGS:STRING="-lgfortran" \
-      -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE \
-      -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE \
-      -D TPL_ENABLE_MPI:BOOL=ON \
-      -D BUILD_SHARED_LIBS:BOOL=ON \
-      -D CMAKE_INSTALL_PREFIX:PATH=$HOME/share/trilinos ..
+    cmake -D Trilinos_ENABLE_Sacado=ON \
+      -D Trilinos_ENABLE_Stratimikos=ON \
+      -D CMAKE_BUILD_TYPE=RELEASE \
+      -D CMAKE_CXX_FLAGS="-g -O3" \
+      -D CMAKE_C_FLAGS="-g -O3" \
+      -D CMAKE_FORTRAN_FLAGS="-g -O5" \
+      -D Trilinos_EXTRA_LINK_FLAGS="-lgfortran" \
+      -D CMAKE_VERBOSE_MAKEFILE=FALSE \
+      -D Trilinos_VERBOSE_CONFIGURE=FALSE \
+      -D TPL_ENABLE_MPI=ON \
+      -D BUILD_SHARED_LIBS=ON \
+      -D CMAKE_INSTALL_PREFIX:PATH=$HOME/share/trilinos \
+      ..
 
-    make
     make install
 	</pre>
       You will need to adjust the path into which you want to install Trilinos
-      in the second to last line of the cmake command.
-    </p>
-
-    <p>
-      <b>Using MPI:</b> If you
-      want to use Trilinos with MPI on parallel machines,
-      use <code>TPL_ENABLE_MPI=ON</code> instead.
+      in the CMAKE_INSTALL_PREFIX line.
     </p>
 
     <p>
       <b>Parallel builds:</b>
       If your computer has more than one processor core, use
-      <code>make -jN</code> instead of <code>make</code> in the last two lines
+      <code>make -jN</code> instead of <code>make</code> in the last line
       above, where <code>N</code> is the number of processors you have.
     </p>
 
