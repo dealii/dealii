@@ -2612,8 +2612,16 @@ public:
   cell_iterator        begin       (const unsigned int level = 0) const;
 
   /**
-   *  Iterator to the first active
-   *  cell on level @p level.
+   *  Iterator to the first active cell on level @p level. If the
+   *  given level does not contain any active cells (i.e., all cells
+   *  on this level are further refined, then this function returns
+   *  <code>end_active(level)</code> so that loops of the kind
+   *  @code
+   *    for (cell=tria.begin_active(level); cell!=tria.end_active(level); ++cell)
+   *      ...
+   *  @endcode
+   *  have zero iterations, as may be expected if there are no active
+   *  cells on this level.
    */
   active_cell_iterator begin_active(const unsigned int level = 0) const;
 
@@ -2634,10 +2642,9 @@ public:
   cell_iterator        end (const unsigned int level) const;
 
   /**
-   * Return an active iterator which is the
-   * first iterator not on level. If @p level
-   * is the last level, then this returns
-   * <tt>end()</tt>.
+   * Return an active iterator which is the first active iterator not
+   * on the given level. If @p level is the last level, then this
+   * returns <tt>end()</tt>.
    */
   active_cell_iterator end_active (const unsigned int level) const;
 
