@@ -290,19 +290,19 @@ namespace WorkStream
         n_emitted_items (0),
         chunk_size (chunk_size)
       {
-        // initialize copies of
-        // additional_data. since
-        // this is frequently
-        // expensive (creating
-        // FEValues objects etc) do
-        // that in parallel
-        Threads::TaskGroup<> tasks;
-        for (unsigned int i=0; i<ring_buffer.size(); ++i)
-          tasks += Threads::new_task (&IteratorRangeToItemStream::init_buffer_elements,
-                                      *this,
-                                      i,
-                                      std_cxx1x::cref(sample_copy_data));
-        tasks.join_all ();
+	// initialize the elements of the ring buffer
+        for (unsigned int element=0; element<ring_buffer.size(); ++element)
+	  {
+	    Assert (ring_buffer[element].n_items == 0,
+		    ExcInternalError());
+
+	    ring_buffer[element].work_items.resize (chunk_size,
+						    remaining_iterator_range.second);
+	    ring_buffer[element].scratch_data = &thread_local_scratch;
+	    ring_buffer[element].sample_scratch_data = &sample_scratch_data;
+	    ring_buffer[element].copy_datas.resize (chunk_size,
+						    sample_copy_data);
+	  }
       }
 
       /**
