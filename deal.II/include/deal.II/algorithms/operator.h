@@ -26,6 +26,17 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * Namespace containing numerical algorithms in a unified form.
+ *
+ * All algorithmic classes in this namespace are derived from either
+ * Operator or OutputOperator, depending on whether they return a
+ * value or not. See the documentation of those classes for more
+ * detailed information on how to use them.
+ *
+ * @author Guido Kanschat
+ * @date 2012, 2013
+ */
 namespace Algorithms
 {
   /**
