@@ -252,7 +252,7 @@ void TestCases<dim>::run (const unsigned int test_case)
           // refine the presently
           // second last cell 17
           // times
-          cell = tria->last_active(tria->n_levels()-1);
+          cell = tria->last_active();
           --cell;
           cell->set_refine_flag ();
           tria->execute_coarsening_and_refinement ();

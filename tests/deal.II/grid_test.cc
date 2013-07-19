@@ -209,7 +209,7 @@ void test (const int test_case)
           // refine the presently
           // last cell several
           // times
-          cell = tria.last_active(tria.n_levels()-1);
+          cell = tria.last_active();
           cell->set_refine_flag ();
           tria.execute_coarsening_and_refinement ();
         };

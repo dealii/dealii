@@ -79,7 +79,7 @@ void test()
   for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
     triangulation.begin(1)->child(c)->set_refine_flag();
   for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-    triangulation.last(1)->child(c)->set_coarsen_flag();
+    (--triangulation.begin(2))->child(c)->set_coarsen_flag();
 
   triangulation.prepare_coarsening_and_refinement ();
 
