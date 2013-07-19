@@ -50,7 +50,7 @@ public:
                       << "very hot ..." << std::endl;
         }
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC);
+        boost::xtime_get(&xt, boost::TIME_UTC_);
         xt.sec += 3;
         boost::thread::sleep(xt);
         m_chickens += value;
@@ -85,7 +85,7 @@ void chef()
             std::cout << "(" << clock() << ") Chef: cooking ..." << std::endl;
         }
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC);
+        boost::xtime_get(&xt, boost::TIME_UTC_);
         xt.sec += 2;
         boost::thread::sleep(xt);
         {
@@ -111,7 +111,7 @@ struct phil
             if (m_id > 0)
             {
                 boost::xtime xt;
-                boost::xtime_get(&xt, boost::TIME_UTC);
+                boost::xtime_get(&xt, boost::TIME_UTC_);
                 xt.sec += 3;
                 boost::thread::sleep(xt);
             }

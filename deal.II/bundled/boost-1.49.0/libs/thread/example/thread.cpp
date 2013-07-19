@@ -14,7 +14,7 @@ struct thread_alarm
     void operator()()
     {
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC);
+        boost::xtime_get(&xt, boost::TIME_UTC_);
         xt.sec += m_secs;
 
         boost::thread::sleep(xt);

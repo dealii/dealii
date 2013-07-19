@@ -10,7 +10,7 @@
 int main(int argc, char* argv[])
 {
     boost::xtime xt;
-    boost::xtime_get(&xt, boost::TIME_UTC);
+    boost::xtime_get(&xt, boost::TIME_UTC_);
     xt.sec += 1;
     boost::thread::sleep(xt); // Sleep for 1 second
 }
