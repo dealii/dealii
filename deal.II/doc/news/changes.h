@@ -609,16 +609,6 @@ This is now fixed.
 (Timo Heister, 2013/03/01)
 </li>
 
-<li> Added DataOutBase::write_svg() to allow for the output of a given
-list of patches in two space dimensions in the SVG format (Scalable Vector
-Graphics, an generic XML-based vector image format developed and maintained
-by the World Wide Web Consortium W3C). An additional dimension (z-direction)
-is employed for the visualization of data values taken from a data vector.
-This function also provides patch coloring for the visual enhancement.
-<br>
-(Christian Wülker, 2013/05/10)
-</li>
-
 </ol>
 
 
