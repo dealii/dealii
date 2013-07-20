@@ -134,11 +134,6 @@ ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
 #
-# Define some custom targets for convenience
-#
-INCLUDE(setup_custom_targets)
-
-#
 # And finally, print the configuration:
 #
 FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)

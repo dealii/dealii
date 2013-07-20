@@ -67,6 +67,16 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
       )
   ENDIF()
 
+  #
+  # A custom target with the same name as the component:
+  #
+  ADD_CUSTOM_TARGET(compat_files
+    DEPENDS
+      expand_instantiations
+      make_dependencies
+      report_features
+    )
+
   IF(NOT CMAKE_CROSSCOMPILING)
     ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)
   ENDIF()

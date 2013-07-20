@@ -50,6 +50,8 @@ ADD_SUBDIRECTORY(matrix_free)
 ADD_SUBDIRECTORY(meshworker)
 
 
+ADD_CUSTOM_TARGET(library)
+
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${build} build_lowercase)
 
@@ -65,6 +67,8 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     ${deal_ii_objects_${build_lowercase}}
     )
 
+  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+
   SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     PROPERTIES
     VERSION "${DEAL_II_PACKAGE_VERSION}"
@@ -74,7 +78,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     # a C++ library is still ABI backwards compatible :-]
     #
     SOVERSION "${DEAL_II_PACKAGE_VERSION}"
-    LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
+    LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
     COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
     COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
     INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"

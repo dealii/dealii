@@ -47,6 +47,11 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   ADD_SUBDIRECTORY(doxygen)
 
   #
+  # A custom target with the same name as the component:
+  #
+  ADD_CUSTOM_TARGET(documentation DEPENDS doxygen)
+
+  #
   # Install the static elements of the html documentation:
   #
   INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
