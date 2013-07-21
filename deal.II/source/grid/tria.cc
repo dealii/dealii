@@ -12206,8 +12206,9 @@ void Triangulation<dim, spacedim>::execute_coarsening ()
   // deleted (if the latter are on a
   // higher level for example)
   //
-  // since we delete the *children* of cells, we only need to start
-  // considering cells on the second highest level, n_levels()-2.
+  // since we delete the *children* of cells, we can ignore cells
+  // on the highest level, i.e., level must be less than or equal
+  // to n_levels()-2.
   if (levels.size() >= 2)
     for (cell = last(); cell!=endc; --cell)
       if (cell->user_flag_set() && cell->level()<=static_cast<int>(levels.size()-2))
