@@ -2909,9 +2909,9 @@ namespace DoFTools
                                                                          face_orientation, face_flip, face_rotation)];
 
                       // And finally constrain the two DoFs respecting component_mask:
-                      if (transformation(i,j) != 0)
+                      if (transformation(i,jj) != 0)
                         constraint_matrix.add_entry(dofs_2[i], dofs_1[j],
-                                                    transformation(i,j));
+                                                    transformation(i,jj));
                     }
                 }
         }
