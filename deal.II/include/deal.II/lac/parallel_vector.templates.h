@@ -584,7 +584,7 @@ namespace parallel
 #endif
 
       out << "Process #" << partitioner->this_mpi_process() << std::endl
-          << "Local range: [" << partitioner->local_range().first << "/"
+          << "Local range: [" << partitioner->local_range().first << ", "
           << partitioner->local_range().second << "), global size: "
           << partitioner->size() << std::endl
           << "Vector data:" << std::endl;

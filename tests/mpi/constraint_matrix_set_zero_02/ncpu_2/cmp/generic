@@ -1,13 +1,13 @@
 
 DEAL:0::vector before:
 Process #0
-Local range: [0/1], global size: 2
+Local range: [0, 1), global size: 2
 Vector data:
 1.000e+00 
 Ghost entries (global index / value):
 (1/0.000e+00) 
 Process #0
-Local range: [0/2], global size: 4
+Local range: [0, 2), global size: 4
 Vector data:
 3.000e+00 4.000e+00 
 Ghost entries (global index / value):
@@ -17,13 +17,13 @@ DEAL:0::CM:
     2 = 0
 DEAL:0::vector after:
 Process #0
-Local range: [0/1], global size: 2
+Local range: [0, 1), global size: 2
 Vector data:
 1.000e+00 
 Ghost entries (global index / value):
 (1/0.000e+00) 
 Process #0
-Local range: [0/2], global size: 4
+Local range: [0, 2), global size: 4
 Vector data:
 0.000e+00 4.000e+00 
 Ghost entries (global index / value):
@@ -32,13 +32,13 @@ DEAL:0::OK
 
 DEAL:1::vector before:
 Process #1
-Local range: [1/2], global size: 2
+Local range: [1, 2), global size: 2
 Vector data:
 2.000e+00 
 Ghost entries (global index / value):
 (0/0.000e+00) 
 Process #1
-Local range: [2/4], global size: 4
+Local range: [2, 4), global size: 4
 Vector data:
 5.000e+00 6.000e+00 
 Ghost entries (global index / value):
@@ -48,13 +48,13 @@ DEAL:1::CM:
     4 = 0
 DEAL:1::vector after:
 Process #1
-Local range: [1/2], global size: 2
+Local range: [1, 2), global size: 2
 Vector data:
 2.000e+00 
 Ghost entries (global index / value):
 (0/0.000e+00) 
 Process #1
-Local range: [2/4], global size: 4
+Local range: [2, 4), global size: 4
 Vector data:
 0.000e+00 6.000e+00 
 Ghost entries (global index / value):
