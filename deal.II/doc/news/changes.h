@@ -164,6 +164,12 @@ this function.
 
 <ol>
 
+<li>New: VectorTools::project and a whole host of similar functions
+are now also available for objects of type hp::DoFHandler.
+<br>
+(Wolfgang Bangerth, 2013/07/21)
+</li>
+
 <li>Fixed: hp::DoFHandler::n_boundary_dofs() had a bug that always led
 to a failed assertion. This is now fixed.
 <br>

@@ -81,7 +81,6 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof_col,
      SP    &sparsity);
 
-    // #if deal_II_dimension > 1
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
     (const DoFHandler<deal_II_dimension>& dof,
@@ -107,6 +106,15 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
+
+#if deal_II_dimension < 3
+    template void
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
+    (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+     const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
+     SP    &sparsity);
+ #endif
 
     template void
     DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>

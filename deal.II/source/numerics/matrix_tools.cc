@@ -1276,7 +1276,7 @@ namespace MatrixCreator
       UpdateFlags update_flags = UpdateFlags (update_values     |
                                               update_JxW_values |
                                               update_quadrature_points);
-      hp::FEFaceValues<dim> x_fe_values (mapping, fe_collection, q, update_flags);
+      hp::FEFaceValues<dim,spacedim> x_fe_values (mapping, fe_collection, q, update_flags);
 
       // two variables for the coefficient,
       // one for the two cases indicated in

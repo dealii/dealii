@@ -658,7 +658,7 @@ namespace VectorTools
 
   /**
    * Calls the project()
-   * function, see above, with
+   * function above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
    */
   template <int dim, class VECTOR, int spacedim>
@@ -669,6 +669,40 @@ namespace VectorTools
                 VECTOR                   &vec,
                 const bool                enforce_zero_boundary = false,
                 const Quadrature<dim-1>  &q_boundary = (dim > 1 ?
+                                                        QGauss<dim-1>(2) :
+                                                        Quadrature<dim-1>(0)),
+                const bool                project_to_boundary_first = false);
+
+  /**
+   * Same as above, but for arguments of type hp::DoFHandler,
+   * hp::QuadratureCollection, hp::MappingCollection
+   */
+  template <int dim, class VECTOR, int spacedim>
+  void project (const hp::MappingCollection<dim, spacedim>       &mapping,
+                const hp::DoFHandler<dim,spacedim>    &dof,
+                const ConstraintMatrix   &constraints,
+                const hp::QCollection<dim>    &quadrature,
+                const Function<spacedim>      &function,
+                VECTOR                   &vec,
+                const bool                enforce_zero_boundary = false,
+                const hp::QCollection<dim-1>  &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
+                                                        QGauss<dim-1>(2) :
+                                                        Quadrature<dim-1>(0)),
+                const bool                project_to_boundary_first = false);
+
+  /**
+   * Calls the project()
+   * function above, with a collection of
+   * MappingQ1@<dim@>() objects.
+   */
+  template <int dim, class VECTOR, int spacedim>
+  void project (const hp::DoFHandler<dim,spacedim>    &dof,
+                const ConstraintMatrix   &constraints,
+                const hp::QCollection<dim>    &quadrature,
+                const Function<spacedim>      &function,
+                VECTOR                   &vec,
+                const bool                enforce_zero_boundary = false,
+                const hp::QCollection<dim-1>  &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
                                                         QGauss<dim-1>(2) :
                                                         Quadrature<dim-1>(0)),
                 const bool                project_to_boundary_first = false);
@@ -763,6 +797,18 @@ namespace VectorTools
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension>            &mapping,
                                const DH                 &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
+                               std::map<types::global_dof_index,double> &boundary_values,
+                               const ComponentMask       &component_mask = ComponentMask());
+
+  /**
+   * Like the previous function, but take a mapping collection to go with
+   * the hp::DoFHandler object.
+   */
+  template <int dim, int spacedim>
+  void
+  interpolate_boundary_values (const hp::MappingCollection<dim,spacedim>            &mapping,
+                               const hp::DoFHandler<dim,spacedim>                 &dof,
+                               const typename FunctionMap<spacedim>::type &function_map,
                                std::map<types::global_dof_index,double> &boundary_values,
                                const ComponentMask       &component_mask = ComponentMask());
 
@@ -1050,6 +1096,29 @@ namespace VectorTools
   void project_boundary_values (const DoFHandler<dim,spacedim>    &dof,
                                 const typename FunctionMap<spacedim>::type &boundary_function,
                                 const Quadrature<dim-1>  &q,
+                                std::map<types::global_dof_index,double> &boundary_values,
+                                std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+
+  /**
+   * Same as above, but for objects of type hp::DoFHandler
+   */
+  template <int dim, int spacedim>
+  void project_boundary_values (const hp::MappingCollection<dim, spacedim>       &mapping,
+                                const hp::DoFHandler<dim,spacedim>    &dof,
+                                const typename FunctionMap<spacedim>::type &boundary_functions,
+                                const hp::QCollection<dim-1>  &q,
+                                std::map<types::global_dof_index,double> &boundary_values,
+                                std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+
+  /**
+   * Calls the project_boundary_values()
+   * function, see above, with
+   * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   */
+  template <int dim, int spacedim>
+  void project_boundary_values (const hp::DoFHandler<dim,spacedim>    &dof,
+                                const typename FunctionMap<spacedim>::type &boundary_function,
+                                const hp::QCollection<dim-1>  &q,
                                 std::map<types::global_dof_index,double> &boundary_values,
                                 std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 

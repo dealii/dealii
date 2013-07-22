@@ -118,6 +118,29 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
          const bool,
          const Quadrature<deal_II_dimension-1> &,
          const bool);
+
+      template
+        void project
+        (const hp::MappingCollection<deal_II_dimension,deal_II_space_dimension>      &,
+         const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>   &,
+         const ConstraintMatrix                &,
+         const hp::QCollection<deal_II_dimension>   &,
+         const Function<deal_II_space_dimension>     &,
+         VEC                                   &,
+         const bool,
+         const hp::QCollection<deal_II_dimension-1> &,
+         const bool);
+
+      template
+        void project
+        (const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>   &,
+         const ConstraintMatrix                &,
+         const hp::QCollection<deal_II_dimension>   &,
+         const Function<deal_II_space_dimension>     &,
+         VEC                                   &,
+         const bool,
+         const hp::QCollection<deal_II_dimension-1> &,
+         const bool);
       \}
 #endif
   }
@@ -404,8 +427,28 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 // where applicable and move to codimension cases above also when applicable
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-#if deal_II_dimension == deal_II_space_dimension
     namespace VectorTools \{
+
+#if deal_II_dimension <= deal_II_space_dimension
+      template
+        void project_boundary_values<deal_II_dimension,deal_II_space_dimension>
+        (const hp::MappingCollection<deal_II_dimension,deal_II_space_dimension>  &,
+         const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>  &,
+         const FunctionMap<deal_II_space_dimension>::type &,
+         const hp::QCollection<deal_II_dimension-1>&,
+         std::map<types::global_dof_index,double>&, 
+         std::vector<unsigned int>);
+
+      template
+        void project_boundary_values<deal_II_dimension,deal_II_space_dimension>
+        (const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>  &,
+         const FunctionMap<deal_II_space_dimension>::type &,
+         const hp::QCollection<deal_II_dimension-1>&,
+         std::map<types::global_dof_index,double>&, 
+         std::vector<unsigned int>);
+#endif
+
+#if deal_II_dimension == deal_II_space_dimension
       template
         void create_right_hand_side<deal_II_dimension>
         (const hp::MappingCollection<deal_II_dimension>    &,
@@ -518,7 +561,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
 
 
-#if deal_II_dimension > 1
       template
         void project_boundary_values<deal_II_dimension>
         (const Mapping<deal_II_dimension>     &,
@@ -526,30 +568,15 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
          const FunctionMap<deal_II_dimension>::type &,
          const Quadrature<deal_II_dimension-1>&,
          std::map<types::global_dof_index,double>&, std::vector<unsigned int>);
-#endif
 
       template
         void project_boundary_values<deal_II_dimension>
         (const DoFHandler<deal_II_dimension>  &,
          const FunctionMap<deal_II_dimension>::type &,
          const Quadrature<deal_II_dimension-1>&,
-         std::map<types::global_dof_index,double>&, std::vector<unsigned int>);
+         std::map<types::global_dof_index,double>&, 
+         std::vector<unsigned int>);
 
-
-      template
-        void project_boundary_values<deal_II_dimension>
-        (const Mapping<deal_II_dimension>     &,
-         const DoFHandler<deal_II_dimension>  &,
-         const FunctionMap<deal_II_dimension>::type &,
-         const Quadrature<deal_II_dimension-1>&,
-         ConstraintMatrix&, std::vector<unsigned int>);
-
-      template
-        void project_boundary_values<deal_II_dimension>
-        (const DoFHandler<deal_II_dimension>  &,
-         const FunctionMap<deal_II_dimension>::type &,
-         const Quadrature<deal_II_dimension-1>&,
-         ConstraintMatrix&, std::vector<unsigned int>);
 
 
 #if deal_II_dimension != 1
@@ -600,8 +627,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
                                             ConstraintMatrix      &constraints,
                                             const Mapping<deal_II_dimension>    &mapping);
 #endif
-      \}
 #endif
+      \}
   }
 
 
