@@ -1395,7 +1395,7 @@ private:
    * <i>r</i> are stored within the index range
    * #rowstart[<i>r</i>]...#rowstart[<i>r+1</i>]. Therefore to find out
    * whether a given element (<i>r,c</i>) exists, we have to check whether the
-   * column number <i>c</i> exists in the abovementioned range within this
+   * column number <i>c</i> exists in the above-mentioned range within this
    * array. If it exists, say at position <i>p</i> within this array, the
    * value of the respective element in the sparse matrix will also be at
    * position <i>p</i> of the values array of that class.
