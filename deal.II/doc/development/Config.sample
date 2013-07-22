@@ -83,6 +83,10 @@
 #   "C Compiler."
 #   )
 #
+# SET(CMAKE_Fortran_COMPILER "" CACHE STRING
+#   "Fortran Compiler."
+#   )
+#
 # SET(CMAKE_CXX_FLAGS "" CACHE STRING
 #   "The user supplied cache variable will be appended _at the end_ of the auto generated CMAKE_CXX_FLAGS variable"
 #   )
@@ -288,16 +292,22 @@
 # conservative. Only the current compiler and the variable MPI_CXX_COMPILER
 # is used to find MPI. (MPI_CXX_COMPILER takes precedence.)
 #
+# (MPI_C_COMPILER and MPI_Fortran_COMPILER are considered, too)
+#
+#
 # DEAL_II_WITH_MPI=ON will trigger a more sophisticated search for MPI.
 #
 # The best way to force a specific MPI implementation to be used is to set
-# CMAKE_C_COMPILER and CMAKE_CXX_COMPILER to the appropriate MPI wrapper
-# (See above).
+# CMAKE_CXX_COMPILER, CMAKE_C_COMPILER and CMAKE_Fortran_COMPILER to the
+# appropriate MPI wrapper (See above).
 #
 # Alternatively, specify the mpi wrapper that will be queried for the mpi
 # link interface:
 #
 # SET(MPI_CXX_COMPILER "mpicxx" CACHE STRING "")
+#
+# SET(MPI_C_COMPILER "mpicc" CACHE STRING "")
+# SET(MPI_Fortran_COMPILER "mpif90" CACHE STRING "")
 #
 #
 # Manual setup:
@@ -312,6 +322,12 @@
 # SET(MPI_CXX_INCLUDE_PATH "include directory for mpi" CACHE STRING "")
 # SET(MPI_CXX_COMPILE_FLAGS "..." CACHE STRING "")
 # SET(MPI_CXX_LINK_FLAGS "..." CACHE STRING "")
+#
+# Additionally:
+#
+# SET(MPI_C_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(MPI_Fortran_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+#
 #
 
 

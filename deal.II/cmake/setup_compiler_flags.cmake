@@ -65,9 +65,7 @@
 #
 # Check the user provided CXX flags:
 #
-#
-# Omit to test for a sane C and Fortran toolchain for now..
-#
+MESSAGE(STATUS "")
 IF(NOT "${CMAKE_CXX_FLAGS_SAVED}" STREQUAL "${DEAL_II_CXX_FLAGS_SAVED}")
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
 ENDIF()

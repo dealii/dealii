@@ -51,7 +51,7 @@ FIND_PACKAGE(LAPACK)
 FOREACH(_lib blacs blacsCinit blacsF77init)
   STRING(TOUPPER "${_lib}" _lib_upper)
   FIND_LIBRARY(${_lib_upper}_LIBRARY
-    NAMES ${_lib} ${_lib}_MPI-LINUX-0
+    NAMES ${_lib} ${_lib}_MPI-LINUX-0 ${_lib}_MPI-DARWIN-0
     HINTS
       ${BLACS_DIR}
       ${SCALAPACK_DIR}
