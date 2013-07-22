@@ -12211,7 +12211,7 @@ void Triangulation<dim, spacedim>::execute_coarsening ()
   // to n_levels()-2.
   if (levels.size() >= 2)
     for (cell = last(); cell!=endc; --cell)
-      if (cell->user_flag_set() && cell->level()<=static_cast<int>(levels.size()-2))
+      if (cell->level()<=static_cast<int>(levels.size()-2) && cell->user_flag_set())
         // use a separate function,
         // since this is dimension
         // specific
