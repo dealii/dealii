@@ -69,16 +69,8 @@ INCLUDE(setup_cached_variables)
 # Now, set the project and set up the rest:
 #
 PROJECT(deal.II CXX)
-ENABLE_LANGUAGE(C)
-
-#
-# TODO: A quick test. Refactor.
-# It would be highly appreciated to use ENABLE_LANGUAGE(... OPTIONAL) here
-# - but this is broken beyond believe up until cmake-2.11.* *sigh*
-#
-IF(ENABLE_FORTRAN)
-  ENABLE_LANGUAGE(Fortran)
-ENDIF()
+ENABLE_LANGUAGE_OPTIONAL(C)
+ENABLE_LANGUAGE_OPTIONAL(Fortran)
 
 INCLUDE(setup_deal_ii)
 INCLUDE(setup_compiler_flags)

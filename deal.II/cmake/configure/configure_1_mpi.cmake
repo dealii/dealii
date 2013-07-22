@@ -17,6 +17,9 @@
 #
 # Configuration for mpi support:
 #
+# We look for the C and Fortran libraries as well because they are needed
+# by some external libraries:
+#
 
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   #
