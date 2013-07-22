@@ -2347,7 +2347,7 @@ namespace VectorTools
                                 std::map<types::global_dof_index,double> &boundary_values,
                                 std::vector<unsigned int> component_mapping)
   {
-    do_project_boundary_values (hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof,
+    do_project_boundary_values (mapping, dof,
         boundary_functions,
         q, boundary_values,
         component_mapping);
