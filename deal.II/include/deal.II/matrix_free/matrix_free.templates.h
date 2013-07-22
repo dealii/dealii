@@ -463,7 +463,6 @@ void MatrixFree<dim,Number>::initialize_indices
 {
   const unsigned int n_fe = dof_handlers.n_dof_handlers;
   const unsigned int n_active_cells = cell_level_index.size();
-  const unsigned int n_mpi_procs = size_info.n_procs;
 
   AssertDimension (n_active_cells, cell_level_index.size());
   AssertDimension (n_fe, locally_owned_set.size());
