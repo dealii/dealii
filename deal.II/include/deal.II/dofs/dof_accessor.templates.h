@@ -3463,7 +3463,7 @@ namespace internal
            dealii::TriaAccessor<0, 1, DH::space_dimension>::interior_vertex)),
          cell.vertex_index(i),
          &cell.get_dof_handler());
-      return typename dealii::TriaIterator<dealii::DoFAccessor<DH::dimension-1,DH,lda> > (a);
+      return dealii::TriaIterator<dealii::DoFAccessor<0,DH,lda> > (a);
     }
 
 
