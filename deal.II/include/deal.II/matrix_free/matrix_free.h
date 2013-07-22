@@ -558,15 +558,18 @@ public:
 
   /**
    * Returns a list of all degrees of freedom that are constrained. The list
-   * is returned in local index space for the locally owned range of the
-   * vector, not in global numbers. In addition, it only returns the indices
-   * for degrees of freedom that are owned locally, not for ghosts.
+   * is returned in MPI-local index space for the locally owned range of the
+   * vector, not in global MPI index space that spans all MPI processors. To
+   * get numbers in global index space, call
+   * <tt>get_vector_partitioner()->local_to_global</tt> on an entry of the
+   * vector. In addition, it only returns the indices for degrees of freedom
+   * that are owned locally, not for ghosts.
    */
-  const std::vector<types::global_dof_index> &
+  const std::vector<unsigned int> &
   get_constrained_dofs (const unsigned int fe_component = 0) const;
 
   /**
-   * Calls renumber_dofs function in dof info which renumbers the degrees
+   * Calls renumber_dofs function in dof_info which renumbers the degrees
    * of freedom according to the ordering for parallelization.
    */
   void renumber_dofs (std::vector<types::global_dof_index> &renumbering,
@@ -976,7 +979,7 @@ MatrixFree<dim,Number>::get_vector_partitioner (const unsigned int comp) const
 
 template <int dim, typename Number>
 inline
-const std::vector<types::global_dof_index> &
+const std::vector<unsigned int> &
 MatrixFree<dim,Number>::get_constrained_dofs (const unsigned int comp) const
 {
   AssertIndexRange (comp, n_components());
@@ -1207,8 +1210,7 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
   AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
   AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
   AssertIndexRange (vector_number, vectorization_length);
-  const unsigned int irreg_filled =
-    std_cxx1x::get<2>(dof_info[dof_index].row_starts[macro_cell_number]);
+  const unsigned int irreg_filled = dof_info[dof_index].row_starts[macro_cell_number][2];
   if (irreg_filled > 0)
     AssertIndexRange (vector_number, irreg_filled);
 #endif
@@ -1246,8 +1248,7 @@ MatrixFree<dim,Number>::get_hp_cell_iterator(const unsigned int macro_cell_numbe
   AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
   AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
   AssertIndexRange (vector_number, vectorization_length);
-  const unsigned int irreg_filled =
-    std_cxx1x::get<2>(dof_info[dof_index].row_starts[macro_cell_number]);
+  const unsigned int irreg_filled = dof_info[dof_index].row_starts[macro_cell_number][2];
   if (irreg_filled > 0)
     AssertIndexRange (vector_number, irreg_filled);
 #endif
@@ -1269,7 +1270,7 @@ bool
 MatrixFree<dim,Number>::at_irregular_cell (const unsigned int macro_cell) const
 {
   AssertIndexRange (macro_cell, size_info.n_macro_cells);
-  return std_cxx1x::get<2>(dof_info[0].row_starts[macro_cell]) > 0;
+  return dof_info[0].row_starts[macro_cell][2] > 0;
 }
 
 
@@ -1280,8 +1281,7 @@ unsigned int
 MatrixFree<dim,Number>::n_components_filled (const unsigned int macro_cell) const
 {
   AssertIndexRange (macro_cell, size_info.n_macro_cells);
-  const unsigned int n_filled =
-    std_cxx1x::get<2>(dof_info[0].row_starts[macro_cell]);
+  const unsigned int n_filled = dof_info[0].row_starts[macro_cell][2];
   if (n_filled == 0)
     return VectorizedArray<Number>::n_array_elements;
   else

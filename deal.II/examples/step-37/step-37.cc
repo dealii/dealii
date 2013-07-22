@@ -596,7 +596,7 @@ namespace Step37
   {
     data.cell_loop (&LaplaceOperator::local_apply, this, dst, src);
 
-    const std::vector<types::global_dof_index> &
+    const std::vector<unsigned int> &
     constrained_dofs = data.get_constrained_dofs();
     for (unsigned int i=0; i<constrained_dofs.size(); ++i)
       dst(constrained_dofs[i]) += src(constrained_dofs[i]);
@@ -637,7 +637,7 @@ namespace Step37
 
     diagonal_values = diagonal;
 
-    const std::vector<types::global_dof_index> &
+    const std::vector<unsigned int> &
     constrained_dofs = data.get_constrained_dofs();
     for (unsigned int i=0; i<constrained_dofs.size(); ++i)
       diagonal_values(constrained_dofs[i]) = 1.0;
