@@ -345,7 +345,6 @@ namespace VectorTools
                                       std::map<types::global_dof_index,double> &boundary_values)
     {
       const unsigned int dim      = DH::dimension;
-      const unsigned int spacedim = DH::space_dimension;
 
       // loop over all boundary faces
       // to get all dof indices of
