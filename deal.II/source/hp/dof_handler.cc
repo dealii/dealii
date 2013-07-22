@@ -1955,7 +1955,8 @@ namespace hp
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
             dofs_on_face.resize (dofs_per_face);
 
-            cell->face(f)->get_dof_indices (dofs_on_face);
+            cell->face(f)->get_dof_indices (dofs_on_face,
+	                                    cell->active_fe_index());
             for (unsigned int i=0; i<dofs_per_face; ++i)
               boundary_dofs.insert(dofs_on_face[i]);
           };

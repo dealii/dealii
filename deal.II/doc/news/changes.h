@@ -164,6 +164,12 @@ this function.
 
 <ol>
 
+<li>Fixed: hp::DoFHandler::n_boundary_dofs() had a bug that always led
+to a failed assertion. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/07/21)
+</li>
+
 <li>Fixed: VectorTools::project has an option to first project onto the
 boundary. However, the implementation of this option ignored the mapping
 that is provided to the function. This is now fixed.
