@@ -38,13 +38,26 @@
 
     <dl>
       <dt>
+          <strong style="color:red">2013/07/24: Version 8.0 released</strong>
+      </dt>
+      <dd>
+          deal.II version 8.0 was released today. This is a major new
+	  release, featuring the conversion of the configuration and
+	  build system to <a href="http://www.cmake.org/">CMake</a>,
+	  support for parallel computations with more than 4 billion
+	  unknowns, and many more. A full list of changes can be
+	  found <a href="../doxygen/deal.II/changes_between_7_3_and_8_0.html"
+	  target="body">here</a>.
+      </dd>
+
+      <dt>
           <strong>2013/06/05: 64-bit version of deal.II</strong>
       </dt>
       <dd>
           Because the global dof index variables in deal.II were of type
-    unsigned int, it was not possible to create a dof_handler with more than
-    4.3 billions of unknowns. The 64-bit version of deal.II uses unsigned long
-    long int and thus, allows for 18e18 unknowns.
+	  unsigned int, it was not possible to create a dof_handler with more than
+	  4.3 billions of unknowns. The 64-bit version of deal.II uses unsigned long
+	  long int and thus, allows for 18e18 unknowns.
       </dd>
 
 
