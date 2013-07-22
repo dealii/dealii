@@ -1,0 +1,10 @@
+
+DEAL::DoFs of face_1:
+DEAL::4 is located at 1.000 3.000
+DEAL::5 is located at -1.000 3.000
+DEAL::DoFs of face_2:
+DEAL::0 is located at -1.000 -3.000
+DEAL::1 is located at 1.000 -3.000
+    4 1:  1.000
+    5 0:  1.000
+DEAL::Matching:
