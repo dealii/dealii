@@ -535,9 +535,12 @@ namespace VectorTools
             // parts. We want the
             // function to hold on
             // all parts of the boundary
+            const std::vector<types::boundary_id>
+            used_boundary_indicators = dof.get_tria().get_boundary_indicators();
+
             typename FunctionMap<spacedim>::type boundary_functions;
-            for (types::boundary_id c=0; c<numbers::internal_face_boundary_id; ++c)
-              boundary_functions[c] = &function;
+            for (unsigned int i=0; i<used_boundary_indicators.size(); ++i)
+              boundary_functions[used_boundary_indicators[i]] = &function;
             project_boundary_values (mapping, dof, boundary_functions, q_boundary,
                                      boundary_values);
           }
