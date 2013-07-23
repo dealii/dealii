@@ -55,4 +55,4 @@ s/-0\.(0+)(?!\d)/0.\1/g;
 s/^DEAL.*::_.*\n//g;
 
 # Normalize version string:
-s/written by deal\.II .\..\.pre/written by deal.II 8.0.pre/;
+#s/written by deal\.II .\..\.pre/written by deal.II 8.0.pre/;
