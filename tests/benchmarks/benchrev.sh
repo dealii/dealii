@@ -3,16 +3,18 @@
 source testlist.sh
 
 PREVREVISION="`svn info deal.II | grep Revision | sed s/Revision://`"
-MAKECMD="nice make -j10"
+MAKECMD="nice make -j10 install"
+#MAKECMD="nice make -j10 optimized"
 export MAKECMD
 
 echo "testing $PREVREVISION"
 
-cd deal.II
   echo "configure"
-  ./configure --disable-threads --with-petsc=no || exit 2
+  cd build
+  cmake ../deal.II || exit 2
+  #./configure --disable-threads --with-petsc=no || exit 2
   echo "compiling" 
-  $MAKECMD optimized || exit 3
+  $MAKECMD || exit 3
   
   cd ..
 

@@ -7,14 +7,13 @@ begin = \
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Highcharts Example</title>
+		<title>deal.II regression timings</title>
 
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
-<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
 <script>
 $(function () {
     var chart;
@@ -76,7 +75,7 @@ chart.xAxis[0].setExtremes(28000,chart.xAxis[0].getExtremes().dataMax);
 	</head>
 	<body>
 deal.II performance benchmarks, see 
-<a href="http://www.dealii.org/testsuite.html">http://www.dealii.org/testsuite.html</a><br>
+<a href="http://www.dealii.org/testsuite.html">http://www.dealii.org/testsuite.html</a><br><br>
 
 <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
 
@@ -121,22 +120,33 @@ for fname in list:
 	    for l in data:
 	        if (len(l.strip())<1):
 		    continue
+
+                if (baseline>-1 and baseline<0.5):
+                    continue;
 		
-		lnumbers = [float(x) for x in l.split()]
+                def isfloat(x):
+                    try:
+                        float(x)
+                        return True
+                    except ValueError:
+                        return False
+		lnumbers = [float(x) for x in l.split() if isfloat(x)]
 		if len(lnumbers)<=1:
 		    continue;
 
-		if baseline<0:
+		if baseline<0 and len(lnumbers)>idx:
 		    baseline=lnumbers[idx]
 
-		if lnumbers[0]==0:
+		if lnumbers[0]<27000:
 		    continue;
-		
+                
 		if (i==1):
 		    print(","),
 		i=1;
+
 		    
-		print "[%d,%f]" % (lnumbers[0], (lnumbers[idx]-baseline)/baseline*100.0)
+                if len(lnumbers)>idx:
+                    print "[%d,%f]" % (lnumbers[0], (lnumbers[idx]-baseline)/baseline*100.0)
 	    print "]}\n"
        
 
