@@ -296,11 +296,11 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      const std::vector<types::global_dof_index>  &,
      SP    &);
 
-    //template void
-    //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<1,3>,SP>
-    //(const hp::DoFHandler<1,3>& dof,
-    // const std::vector<types::global_dof_index>  &,
-    // SP    &);
+    template void
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<1,3>,SP>
+    (const hp::DoFHandler<1,3>& dof,
+     const std::vector<types::global_dof_index>  &,
+     SP    &);
 
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<1,3>,SP>
@@ -309,12 +309,12 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
 
-    //template void
-    //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<1,3>,SP>
-    //(const hp::DoFHandler<1,3>& dof,
-    // const FunctionMap<3>::type  &boundary_indicators,
-    // const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
-    // SP    &sparsity);
+    template void
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<1,3>,SP>
+    (const hp::DoFHandler<1,3>& dof,
+     const FunctionMap<3>::type  &boundary_indicators,
+     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
+     SP    &sparsity);
 
 #endif
 
@@ -1179,18 +1179,18 @@ DoFTools::extract_hanging_node_dofs
 (const DoFHandler<1,3> &dof_handler,
  std::vector<bool>     &selected_dofs);
 
-// template
-// void
-// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<1,3> >
-// (const hp::DoFHandler<1,3> &,
-//  const std::set<unsigned char> &,
-//  std::vector<types::global_dof_index> &);
+template
+void
+DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<1,3> >
+(const hp::DoFHandler<1,3> &,
+ const std::set<unsigned char> &,
+ std::vector<types::global_dof_index> &);
 
-// template
-// void
-// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<1,3> >
-// (const hp::DoFHandler<1,3> &,
-//  std::vector<types::global_dof_index> &);
+template
+void
+DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<1,3> >
+(const hp::DoFHandler<1,3> &,
+ std::vector<types::global_dof_index> &);
 
 #endif
 

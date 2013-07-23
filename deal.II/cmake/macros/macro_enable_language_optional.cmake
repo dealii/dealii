@@ -48,8 +48,9 @@ MACRO(ENABLE_LANGUAGE_OPTIONAL _language)
     FILE(WRITE ${_tmp}/CMakeLists.txt
       "PROJECT(foobar ${_language})"
       )
+
     EXECUTE_PROCESS(
-      COMMAND ${CMAKE_COMMAND} ${_hint} .
+      COMMAND ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_hint} .
       WORKING_DIRECTORY ${_tmp}
       RESULT_VARIABLE _result
       OUTPUT_QUIET
