@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#REV=24500
-REV=29000
+# set the version we want to start with. the first revision that
+# can be used with this script is r24500
+REV=30125
 
 rm -rf deal.II
 svn co -r $REV https://svn.dealii.org/trunk/deal.II
@@ -21,4 +22,3 @@ for test in $TESTS ; do
       cd ..
 done
 
- 
