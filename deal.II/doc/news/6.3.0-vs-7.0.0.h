@@ -51,8 +51,7 @@ more naturally preserves consistency.
 	<br>
 	As a consequence, if your makefile makes any assumption on the
 	location of deal.II include files or the name of the deal.II library
-	it will need to be changed. The <a
-	href="../../development/makefiles.html">sample Makefiles</a> have been
+	it will need to be changed. The sample Makefiles have been
 	updated for this.
 	<br>
 	(WB 2010/10/25)
