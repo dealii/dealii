@@ -1,7 +1,7 @@
 ######################################################################
 # $Id$
 #
-# Copyright (C) 2001, 2003, 2005, 2010, 2011, 2012, the deal.II authors
+# Copyright (C) 2001, 2003, 2005, 2010, 2011, 2012, 2013, the deal.II authors
 #
 # Remove insignificant volatile data from output files of tests
 #
@@ -54,5 +54,6 @@ s/-0\.(0+)(?!\d)/0.\1/g;
 # remove deal.II debug output
 s/^DEAL.*::_.*\n//g;
 
-# Normalize version string:
-s/written by deal\.II .\..\.pre/written by deal.II 8.0.pre/;
+# Normalize version string by replacing (for example) 'written by
+# deal.II 8.1.pre' by written by 'written by deal.II x.y.z'
+s/written by deal\.II \d+\.\d+\.(pre|\d+)/written by deal.II x.y,z/;
