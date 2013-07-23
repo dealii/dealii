@@ -82,6 +82,11 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
+  # Silence Clang warnings about unused parameters:
+  #
+  SET(CMAKE_CXX_FLAGS "-Qunused-arguments ${CMAKE_CXX_FLAGS}")
+
+  #
   # *Boy*, clang seems to be the very definition of "pedantic" in
   # "-pedantic" mode, so disable a bunch of harmless warnings
   # (that are mainly triggered in third party headers so that we cannot
@@ -120,9 +125,7 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
-  IF(NOT(CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
-    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
-  ENDIF()
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-felide-constructors")
 
