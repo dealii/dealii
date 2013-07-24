@@ -44,6 +44,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>New: The DataOut, DataOutFaces, and DataOutRotation classes now allow
+  the output of data vectors using different DoFHandler objects (based on the
+  same triangulation), by new functions add_data_vector. This is used in the
+  step-31 tutorial program which avoids creating a joint DoFHandler just for
+  output.
+  <br>
+  (Martin Kronbichler, 2013/07/24)
+  </li>
+
   <li>Changed: GridGenerator used to be a class with only static members
   but is now a namespace, like all other similar constructs in deal.II.
   <br>

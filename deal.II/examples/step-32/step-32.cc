@@ -3225,14 +3225,36 @@ namespace Step32
   }
 
 
-  // The <code>output_results()</code> function does mostly what the
-  // corresponding one did in to step-31, in particular the merging data from
-  // the two DoFHandler objects (for the Stokes and the temperature parts of
-  // the problem) into one. There is one minor change: we make sure that each
-  // processor only works on the subdomain it owns locally (and not on ghost
-  // or artificial cells) when building the joint solution vector. The same
-  // will then have to be done in DataOut::build_patches(), but that function
-  // does so automatically.
+  // The <code>output_results()</code> function has a similar task to the one
+  // in step-31. However, here we are going to demonstrate a different
+  // technique on how to merge output from different DoFHandler objects. The
+  // way we're going to achieve this recombination is to create a joint
+  // DoFHandler that collects both components, the Stokes solution and the
+  // temperature solution. This can be nicely done by combining the finite
+  // elements from the two systems to form one FESystem, and let this
+  // collective system define a new DoFHandler object. To be sure that
+  // everything was done correctly, we perform a sanity check that ensures
+  // that we got all the dofs from both Stokes and temperature even in the
+  // combined system. We then combine the data vectors. Unfortunately, there
+  // is no straight-forward relation that tells us how to sort Stokes and
+  // temperature vector into the joint vector. The way we can get around this
+  // trouble is to rely on the information collected in the FESystem. For each
+  // dof on a cell, the joint finite element knows to which equation component
+  // (velocity component, pressure, or temperature) it belongs – that's the
+  // information we need! So we step through all cells (with iterators into
+  // all three DoFHandlers moving in synch), and for each joint cell dof, we
+  // read out that component using the FiniteElement::system_to_base_index
+  // function (see there for a description of what the various parts of its
+  // return value contain). We also need to keep track whether we're on a
+  // Stokes dof or a temperature dof, which is contained in
+  // joint_fe.system_to_base_index(i).first.first. Eventually, the dof_indices
+  // data structures on either of the three systems tell us how the relation
+  // between global vector and local dofs looks like on the present cell,
+  // which concludes this tedious work. We make sure that each processor only
+  // works on the subdomain it owns locally (and not on ghost or artificial
+  // cells) when building the joint solution vector. The same will then have
+  // to be done in DataOut::build_patches(), but that function does so
+  // automatically.
   //
   // What we end up with is a set of patches that we can write using the
   // functions in DataOutBase in a variety of output formats. Here, we then

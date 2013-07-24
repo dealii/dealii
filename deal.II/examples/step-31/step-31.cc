@@ -1918,133 +1918,42 @@ namespace Step31
   // This function writes the solution to a VTK output file for visualization,
   // which is done every tenth time step. This is usually quite a simple task,
   // since the deal.II library provides functions that do almost all the job
-  // for us. In this case, the situation is a bit more complicated, since we
-  // want to visualize both the Stokes solution and the temperature as one
-  // data set, but we have done all the calculations based on two different
-  // DoFHandler objects, a situation the DataOut class usually used for output
-  // is not prepared to deal with. The way we're going to achieve this
-  // recombination is to create a joint DoFHandler that collects both
-  // components, the Stokes solution and the temperature solution. This can be
-  // nicely done by combining the finite elements from the two systems to form
-  // one FESystem, and let this collective system define a new DoFHandler
-  // object. To be sure that everything was done correctly, we perform a
-  // sanity check that ensures that we got all the dofs from both Stokes and
-  // temperature even in the combined system.
-  //
-  // Next, we create a vector that will collect the actual solution
-  // values. Since this vector is only going to be used for output, we create
-  // it as a deal.II vector that nicely cooperate with the data output
-  // classes. Remember that we used Trilinos vectors for assembly and solving.
+  // for us. There is one new function compared to previous examples: We want
+  // to visualize both the Stokes solution and the temperature as one data
+  // set, but we have done all the calculations based on two different
+  // DoFHandler objects. Luckily, the DataOut class is prepared to deal with
+  // it. All we have to do is to not attach one single DoFHandler at the
+  // beginning and then use that for all added vector, but specify the
+  // DoFHandler to each vector separately. The rest is done as in step-22. We
+  // create solution names (that are going to appear in the visualization
+  // program for the individual components). The first <code>dim</code>
+  // components are the vector velocity, and then we have pressure for the
+  // Stokes part, whereas temperature is scalar. This information is read out
+  // using the DataComponentInterpretation helper class. Next, we actually
+  // attach the data vectors with their DoFHandler objects, build patches
+  // according to the degree of freedom, which are (sub-) elements that
+  // describe the data for visualization programs. Finally, we set a file name
+  // (that includes the time step number) and write the vtk file.
   template <int dim>
   void BoussinesqFlowProblem<dim>::output_results ()  const
   {
     if (timestep_number % 10 != 0)
       return;
 
-    const FESystem<dim> joint_fe (stokes_fe, 1,
-                                  temperature_fe, 1);
-    DoFHandler<dim> joint_dof_handler (triangulation);
-    joint_dof_handler.distribute_dofs (joint_fe);
-    Assert (joint_dof_handler.n_dofs() ==
-            stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
-            ExcInternalError());
-
-    Vector<double> joint_solution (joint_dof_handler.n_dofs());
-
-    // Unfortunately, there is no straight-forward relation that tells us how
-    // to sort Stokes and temperature vector into the joint vector. The way we
-    // can get around this trouble is to rely on the information collected in
-    // the FESystem. For each dof in a cell, the joint finite element knows to
-    // which equation component (velocity component, pressure, or temperature)
-    // it belongs &ndash; that's the information we need!  So we step through
-    // all cells (with iterators into all three DoFHandlers moving in synch),
-    // and for each joint cell dof, we read out that component using the
-    // FiniteElement::system_to_base_index function (see there for a
-    // description of what the various parts of its return value contain). We
-    // also need to keep track whether we're on a Stokes dof or a temperature
-    // dof, which is contained in
-    // <code>joint_fe.system_to_base_index(i).first.first</code>.  Eventually,
-    // the dof_indices data structures on either of the three systems tell us
-    // how the relation between global vector and local dofs looks like on the
-    // present cell, which concludes this tedious work.
-    //
-    // There's one thing worth remembering when looking at the output: In our
-    // algorithm, we first solve for the Stokes system at time level
-    // <i>n-1</i> in each time step and then for the temperature at time level
-    // <i>n</i> using the previously computed velocity. These are the two
-    // components we join for output, so these two parts of the output file
-    // are actually misaligned by one time step. Since we consider graphical
-    // output as only a qualititative means to understand a solution, we
-    // ignore this $\mathcal{O}(h)$ error.
-    {
-      std::vector<types::global_dof_index> local_joint_dof_indices (joint_fe.dofs_per_cell);
-      std::vector<types::global_dof_index> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
-      std::vector<types::global_dof_index> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
-
-      typename DoFHandler<dim>::active_cell_iterator
-      joint_cell       = joint_dof_handler.begin_active(),
-      joint_endc       = joint_dof_handler.end(),
-      stokes_cell      = stokes_dof_handler.begin_active(),
-      temperature_cell = temperature_dof_handler.begin_active();
-      for (; joint_cell!=joint_endc; ++joint_cell, ++stokes_cell, ++temperature_cell)
-        {
-          joint_cell->get_dof_indices (local_joint_dof_indices);
-          stokes_cell->get_dof_indices (local_stokes_dof_indices);
-          temperature_cell->get_dof_indices (local_temperature_dof_indices);
-
-          for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
-            if (joint_fe.system_to_base_index(i).first.first == 0)
-              {
-                Assert (joint_fe.system_to_base_index(i).second
-                        <
-                        local_stokes_dof_indices.size(),
-                        ExcInternalError());
-                joint_solution(local_joint_dof_indices[i])
-                  = stokes_solution(local_stokes_dof_indices[joint_fe.system_to_base_index(i).second]);
-              }
-            else
-              {
-                Assert (joint_fe.system_to_base_index(i).first.first == 1,
-                        ExcInternalError());
-                Assert (joint_fe.system_to_base_index(i).second
-                        <
-                        local_temperature_dof_indices.size(),
-                        ExcInternalError());
-                joint_solution(local_joint_dof_indices[i])
-                  = temperature_solution(local_temperature_dof_indices[joint_fe.system_to_base_index(i).second]);
-              }
-        }
-    }
-
-    // Next, we proceed as we've done in step-22. We create solution names
-    // (that are going to appear in the visualization program for the
-    // individual components), and attach the joint dof handler to a DataOut
-    // object. The first <code>dim</code> components are the vector velocity,
-    // and then we have pressure and temperature. This information is read out
-    // using the DataComponentInterpretation helper class. Next, we attach the
-    // solution values together with the names of its components to the output
-    // object, and build patches according to the degree of freedom, which are
-    // (sub-) elements that describe the data for visualization
-    // programs. Finally, we set a file name (that includes the time step
-    // number) and write the vtk file.
-    std::vector<std::string> joint_solution_names (dim, "velocity");
-    joint_solution_names.push_back ("p");
-    joint_solution_names.push_back ("T");
-
-    DataOut<dim> data_out;
-
-    data_out.attach_dof_handler (joint_dof_handler);
-
+    std::vector<std::string> stokes_names (dim, "velocity");
+    stokes_names.push_back ("p");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (dim+2, DataComponentInterpretation::component_is_scalar);
+    stokes_component_interpretation
+    (dim+1, DataComponentInterpretation::component_is_scalar);
     for (unsigned int i=0; i<dim; ++i)
-      data_component_interpretation[i]
+      stokes_component_interpretation[i]
         = DataComponentInterpretation::component_is_part_of_vector;
 
-    data_out.add_data_vector (joint_solution, joint_solution_names,
-                              DataOut<dim>::type_dof_data,
-                              data_component_interpretation);
+    DataOut<dim> data_out;
+    data_out.add_data_vector (stokes_dof_handler, stokes_solution,
+                              stokes_names, stokes_component_interpretation);
+    data_out.add_data_vector (temperature_dof_handler, temperature_solution,
+                              "T");
     data_out.build_patches (std::min(stokes_degree, temperature_degree));
 
     std::ostringstream filename;

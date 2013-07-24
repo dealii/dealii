@@ -36,38 +36,29 @@ namespace internal
   namespace DataOutFaces
   {
     template <int dim, int spacedim>
-    template <class FE>
     ParallelData<dim,spacedim>::
-    ParallelData (const Quadrature<dim-1> &quadrature,
-                  const unsigned int n_components,
-                  const unsigned int n_datasets,
+    ParallelData (const unsigned int n_datasets,
                   const unsigned int n_subdivisions,
                   const std::vector<unsigned int> &n_postprocessor_outputs,
                   const Mapping<dim,spacedim> &mapping,
-                  const FE &finite_elements,
+                  const std::vector<std_cxx1x::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                   const UpdateFlags update_flags)
       :
       internal::DataOut::
-      ParallelDataBase<dim,spacedim> (n_components,
-                                      n_datasets,
+      ParallelDataBase<dim,spacedim> (n_datasets,
                                       n_subdivisions,
-                                      quadrature.size(),
                                       n_postprocessor_outputs,
-                                      finite_elements),
-      q_collection (quadrature),
-      mapping_collection (mapping),
-      x_fe_values (this->mapping_collection,
-                   this->fe_collection,
-                   q_collection,
-                   update_flags)
+                                      mapping,
+                                      finite_elements,
+                                      update_flags,
+                                      true)
     {}
 
 
+
     /**
-     * In a WorkStream context, use
-     * this function to append the
-     * patch computed by the parallel
-     * stage to the array of patches.
+     * In a WorkStream context, use this function to append the patch computed
+     * by the parallel stage to the array of patches.
      */
     template <int dim, int spacedim>
     void
@@ -81,11 +72,13 @@ namespace internal
 }
 
 
+
 template <int dim, class DH>
 DataOutFaces<dim,DH>::DataOutFaces(const bool so)
   :
   surface_only(so)
 {}
+
 
 
 template <int dim, class DH>
@@ -98,14 +91,10 @@ build_one_patch (const FaceDescriptor *cell_and_face,
   Assert (cell_and_face->first->is_locally_owned(),
           ExcNotImplemented());
 
-  // we use the mapping to transform the
-  // vertices. However, the mapping works on
-  // cells, not faces, so transform the face
-  // vertex to a cell vertex, that to a unit
-  // cell vertex and then, finally, that to
-  // the mapped vertex. In most cases this
-  // complicated procedure will be the
-  // identity.
+  // we use the mapping to transform the vertices. However, the mapping works
+  // on cells, not faces, so transform the face vertex to a cell vertex, that
+  // to a unit cell vertex and then, finally, that to the mapped vertex. In
+  // most cases this complicated procedure will be the identity.
   for (unsigned int vertex=0; vertex<GeometryInfo<DH::dimension-1>::vertices_per_cell; ++vertex)
     patch.vertices[vertex] = data.mapping_collection[0].transform_unit_to_real_cell
                              (cell_and_face->first,
@@ -119,24 +108,22 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 
   if (data.n_datasets > 0)
     {
-      data.x_fe_values.reinit (cell_and_face->first, cell_and_face->second);
-      const FEFaceValues<DH::dimension> &fe_patch_values
-        = data.x_fe_values.get_present_fe_values ();
+      data.reinit_all_fe_values(this->dof_data, cell_and_face->first,
+                                cell_and_face->second);
+      const FEValuesBase<DH::dimension> &fe_patch_values
+        = data.get_present_fe_values (0);
 
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
 
       // store the intermediate points
       Assert(patch.space_dim==DH::dimension, ExcInternalError());
       const std::vector<Point<DH::dimension> > &q_points=fe_patch_values.get_quadrature_points();
-      // resize the patch.data member
-      // in order to have enough memory
-      // for the quadrature points as
-      // well
+      // resize the patch.data member in order to have enough memory for the
+      // quadrature points as well
       patch.data.reinit(data.n_datasets+DH::dimension,
                         patch.data.size(1));
-      // set the flag indicating that
-      // for this cell the points are
-      // explicitly given
+      // set the flag indicating that for this cell the points are explicitly
+      // given
       patch.points_are_available=true;
       // copy points to patch.data
       for (unsigned int i=0; i<DH::dimension; ++i)
@@ -149,29 +136,27 @@ build_one_patch (const FaceDescriptor *cell_and_face,
       // first fill dof_data
       for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
         {
+          const FEValuesBase<DH::dimension> &fe_patch_values
+            = data.get_present_fe_values (dataset);
+          const unsigned int n_components
+            = fe_patch_values.get_fe().n_components();
           const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
           if (postprocessor != 0)
             {
-              // we have to postprocess the
-              // data, so determine, which
-              // fields have to be updated
+              // we have to postprocess the data, so determine, which fields
+              // have to be updated
               const UpdateFlags update_flags=postprocessor->get_needed_update_flags();
 
-              // get normals, if
-              // needed. this is a
-              // geometrical information
-              // and thus does not depend
-              // on the number of
-              // components of the data
+              // get normals, if needed. this is a geometrical information and
+              // thus does not depend on the number of components of the data
               // vector
               if (update_flags & update_normal_vectors)
                 data.patch_normals=fe_patch_values.get_normal_vectors();
 
-              if (data.n_components == 1)
+              if (n_components == 1)
                 {
-                  // at each point there is
-                  // only one component of
-                  // value, gradient etc.
+                  // at each point there is only one component of value,
+                  // gradient etc.
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (fe_patch_values,
                                                                   data.patch_values);
@@ -195,10 +180,9 @@ build_one_patch (const FaceDescriptor *cell_and_face,
                 }
               else
                 {
-                  // at each point there is
-                  // a vector valued
-                  // function and its
+                  // at each point there is a vector valued function and its
                   // derivative...
+                  data.resize_system_vectors(n_components);
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (fe_patch_values,
                                                                   data.patch_values_system);
@@ -228,13 +212,10 @@ build_one_patch (const FaceDescriptor *cell_and_face,
                     = data.postprocessed_values[dataset][q](component);
             }
           else
-            // now we use the given data
-            // vector without
-            // modifications. again, we
-            // treat single component
-            // functions separately for
-            // efficiency reasons.
-            if (data.n_components == 1)
+            // now we use the given data vector without modifications. again,
+            // we treat single component functions separately for efficiency
+            // reasons.
+            if (n_components == 1)
               {
                 this->dof_data[dataset]->get_function_values (fe_patch_values,
                                                               data.patch_values);
@@ -243,36 +224,29 @@ build_one_patch (const FaceDescriptor *cell_and_face,
               }
             else
               {
+                data.resize_system_vectors(n_components);
                 this->dof_data[dataset]->get_function_values (fe_patch_values,
                                                               data.patch_values_system);
-                for (unsigned int component=0; component<data.n_components;
+                for (unsigned int component=0; component<n_components;
                      ++component)
                   for (unsigned int q=0; q<n_q_points; ++q)
                     patch.data(offset+component,q) =
                       data.patch_values_system[q](component);
               }
-          // increment the counter for the
-          // actual data record
+          // increment the counter for the actual data record
           offset+=this->dof_data[dataset]->n_output_variables;
         }
 
       // then do the cell data
       for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
         {
-          // we need to get at
-          // the number of the
-          // cell to which this
-          // face belongs in
-          // order to access the
-          // cell data. this is
-          // not readily
-          // available, so choose
-          // the following rather
-          // inefficient way:
+          // we need to get at the number of the cell to which this face
+          // belongs in order to access the cell data. this is not readily
+          // available, so choose the following rather inefficient way:
           Assert (cell_and_face->first->active(), ExcCellNotActiveForCellData());
           const unsigned int cell_number
-            = std::distance (this->dofs->begin_active(),
-                             typename DH::active_cell_iterator(cell_and_face->first));
+            = std::distance (this->triangulation->begin_active(),
+                             typename Triangulation<DH::dimension,DH::space_dimension>::active_cell_iterator(cell_and_face->first));
 
           const double value
             = this->cell_data[dataset]->get_cell_data_value (cell_number);
@@ -297,8 +271,7 @@ template <int dim, class DH>
 void DataOutFaces<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
                                           const unsigned int n_subdivisions_)
 {
-  // Check consistency of redundant
-  // template parameter
+  // Check consistency of redundant template parameter
   Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
 
   const unsigned int n_subdivisions = (n_subdivisions_ != 0)
@@ -309,33 +282,22 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
           ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   typedef DataOut_DoFData<DH,DH::dimension+1> BaseClass;
-  Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
-
-  // before we start the loop:
-  // create a quadrature rule that
-  // actually has the points on this
-  // patch
-  const QTrapez<1>       q_trapez;
-  const QIterated<DH::dimension-1> patch_points (q_trapez, n_subdivisions);
-
-  const unsigned int n_components   = this->dofs->get_fe().n_components();
+  Assert (this->triangulation != 0,
+          typename BaseClass::ExcNoTriangulationSelected());
 
   unsigned int n_datasets     = this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     n_datasets += this->dof_data[i]->n_output_variables;
 
-  // first count the cells we want to
-  // create patches of and make sure
-  // there is enough memory for that
+  // first count the cells we want to create patches of and make sure there is
+  // enough memory for that
   std::vector<FaceDescriptor> all_faces;
   for (FaceDescriptor face=first_face();
-       face.first != this->dofs->end();
+       face.first != this->triangulation->end();
        face = next_face(face))
     all_faces.push_back (face);
 
-  // clear the patches array and
-  // allocate the right number of
-  // elements
+  // clear the patches array and allocate the right number of elements
   this->patches.clear ();
   this->patches.reserve (all_faces.size());
   Assert (this->patches.size() == 0, ExcInternalError());
@@ -354,17 +316,17 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
       update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();
   update_flags |= update_quadrature_points;
 
-  internal::DataOutFaces::ParallelData<DH::dimension, DH::dimension>
-  thread_data (patch_points, n_components, n_datasets,
+  internal::DataOutFaces::ParallelData<DH::dimension, DH::space_dimension>
+  thread_data (n_datasets,
                n_subdivisions,
                n_postprocessor_outputs,
                mapping,
-               this->dofs->get_fe(),
+               this->get_finite_elements(),
                update_flags);
   DataOutBase::Patch<DH::dimension-1,DH::space_dimension> sample_patch;
   sample_patch.n_subdivisions = n_subdivisions;
   sample_patch.data.reinit (n_datasets,
-                            patch_points.size());
+                            Utilities::fixed_power<DH::dimension-1>(n_subdivisions+1));
 
   // now build the patches in parallel
   WorkStream::run (&all_faces[0],
@@ -386,8 +348,8 @@ DataOutFaces<dim,DH>::first_face ()
 {
   // simply find first active cell
   // with a face on the boundary
-  typename DH::active_cell_iterator cell = this->dofs->begin_active();
-  for (; cell != this->dofs->end(); ++cell)
+  typename Triangulation<DH::dimension,DH::space_dimension>::active_cell_iterator cell = this->triangulation->begin_active();
+  for (; cell != this->triangulation->end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
       if (!surface_only || cell->face(f)->at_boundary())
         return FaceDescriptor(cell, f);
@@ -407,9 +369,7 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 {
   FaceDescriptor face = old_face;
 
-  // first check whether the present
-  // cell has more faces on the
-  // boundary
+  // first check whether the present cell has more faces on the boundary
   for (unsigned int f=face.second+1; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
     if (!surface_only || face.first->face(f)->at_boundary())
       // yup, that is so, so return it
@@ -418,23 +378,19 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
         return face;
       };
 
-  // otherwise find the next active
-  // cell that has a face on the
-  // boundary
+  // otherwise find the next active cell that has a face on the boundary
 
-  // convert the iterator to an
-  // active_iterator and advance
-  // this to the next active cell
-  typename DH::active_cell_iterator active_cell = face.first;
+  // convert the iterator to an active_iterator and advance this to the next
+  // active cell
+  typename Triangulation<DH::dimension,DH::space_dimension>::active_cell_iterator active_cell = face.first;
 
   // increase face pointer by one
   ++active_cell;
 
   // while there are active cells
-  while (active_cell != this->dofs->end())
+  while (active_cell != this->triangulation->end())
     {
-      // check all the faces of this
-      // active cell
+      // check all the faces of this active cell
       for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
         if (!surface_only || active_cell->face(f)->at_boundary())
           {
@@ -442,15 +398,12 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
             face.second = f;
             return face;
           };
-      // the present cell had no
-      // faces on the boundary, so
-      // check next cell
+      // the present cell had no faces on the boundary, so check next cell
       ++active_cell;
     };
 
-  // we fell off the edge, so return
-  // with invalid pointer
-  face.first  = this->dofs->end();
+  // we fell off the edge, so return with invalid pointer
+  face.first  = this->triangulation->end();
   face.second = 0;
   return face;
 }

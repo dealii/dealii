@@ -38,6 +38,28 @@ for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENS
   add_data_vector<VEC> (const VEC                 &,
                       const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
 
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension,deal_II_dimension>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC            &,
+                        const std::string   &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension,deal_II_dimension>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC                       &,
+                        const std::vector<std::string> &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension,deal_II_dimension>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC                 &,
+                        const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
+
+
+
 // stuff needed for face data
 
   template void
@@ -58,6 +80,28 @@ for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENS
   DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>::
   add_data_vector<VEC> (const VEC                 &,
                       const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC            &,
+                        const std::string   &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC                       &,
+                        const std::vector<std::string> &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension-1,deal_II_dimension>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC                 &,
+                        const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
+
+
 
 // things for DataOutRotation
 
@@ -80,6 +124,28 @@ for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENS
   add_data_vector<VEC> (const VEC                 &,
                       const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
 
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension+1,deal_II_dimension+1>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC            &,
+                        const std::string   &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension+1,deal_II_dimension+1>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC                       &,
+                        const std::vector<std::string> &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension+1,deal_II_dimension+1>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension> &,
+                        const VEC                 &,
+                        const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension>::space_dimension> &);
+
+
+
 // codim 1
 
   #if deal_II_dimension < 3
@@ -101,6 +167,26 @@ for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENS
   DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension+1>,deal_II_dimension,deal_II_dimension+1>::
   add_data_vector<VEC> (const VEC                 &,
                       const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension+1>::space_dimension> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension+1>,deal_II_dimension,deal_II_dimension+1>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension+1> &,
+                        const VEC            &,
+                        const std::string   &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension+1>,deal_II_dimension,deal_II_dimension+1>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension+1> &,
+                        const VEC                       &,
+                        const std::vector<std::string> &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension+1>,deal_II_dimension,deal_II_dimension+1>::
+  add_data_vector<VEC> (const DH<deal_II_dimension,deal_II_dimension+1> &,
+                        const VEC                 &,
+                        const DataPostprocessor<DH<deal_II_dimension,deal_II_dimension+1>::space_dimension> &);
   #endif
 
 
@@ -126,6 +212,26 @@ for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENS
   DataOut_DoFData<DH<1,3>,1,3>::
   add_data_vector<VEC> (const VEC                 &,
                       const DataPostprocessor<DH<1,3>::space_dimension> &);
+
+  template void
+  DataOut_DoFData<DH<1,3>,1,3>::
+  add_data_vector<VEC> (const DH<1,3> &,
+                        const VEC            &,
+                        const std::string   &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<1,3>,1,3>::
+  add_data_vector<VEC> (const DH<1,3> &,
+                        const VEC                       &,
+                        const std::vector<std::string> &,
+                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &);
+
+  template void
+  DataOut_DoFData<DH<1,3>,1,3>::
+  add_data_vector<VEC> (const DH<1,3> &,
+                        const VEC                 &,
+                        const DataPostprocessor<DH<1,3>::space_dimension> &);
   #endif
 
 }

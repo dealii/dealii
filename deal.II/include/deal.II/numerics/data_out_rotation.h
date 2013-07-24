@@ -43,20 +43,15 @@ namespace internal
     template <int dim, int spacedim>
     struct ParallelData : public internal::DataOut::ParallelDataBase<dim,spacedim>
     {
-      template <class FE>
-      ParallelData (const Quadrature<dim> &quadrature,
-                    const unsigned int n_components,
-                    const unsigned int n_datasets,
+      ParallelData (const unsigned int n_datasets,
                     const unsigned int n_subdivisions,
                     const unsigned int n_patches_per_circle,
                     const std::vector<unsigned int> &n_postprocessor_outputs,
-                    const FE &finite_elements,
+                    const Mapping<dim,spacedim> &mapping,
+                    const std::vector<std_cxx1x::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                     const UpdateFlags update_flags);
 
       const unsigned int n_patches_per_circle;
-
-      const dealii::hp::QCollection<dim> q_collection;
-      dealii::hp::FEValues<dim,spacedim> x_fe_values;
 
       std::vector<Point<spacedim> > patch_evaluation_points;
     };

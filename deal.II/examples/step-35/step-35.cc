@@ -1261,8 +1261,8 @@ namespace Step35
   // pieces of data into a single DoFHandler object, and then use that to
   // drive graphical output.
   //
-  // We will not elaborate on this process here, but rather refer to step-31
-  // and step-32, where a similar procedure is used (and is documented) to
+  // We will not elaborate on this process here, but rather refer to step-32,
+  // where a similar procedure is used (and is documented) to
   // create a joint DoFHandler object for all variables.
   //
   // Let us also note that we here compute the vorticity as a scalar quantity
