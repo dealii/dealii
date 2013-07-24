@@ -237,16 +237,32 @@ namespace GridTools
                Triangulation<2> &triangulation);
 
   /**
-   * This function transformes the @p Triangulation @p tria smoothly to a
-   * domain that is described by the boundary points in the map @p
-   * new_points. This map maps the point indices to the boundary points in the
-   * transformed domain.
+   * Transform the given triangulation smoothly to a different domain where
+   * each of the vertices at the boundary of the triangulation is mapped to
+   * the corresponding points in the @p new_points map.
    *
-   * Note, that the @p Triangulation is changed in-place, therefore you don't
-   * need to keep two triangulations, but the given triangulation is changed
-   * (overwritten).
+   * The way this function works is that it solves a Laplace equation for each
+   * of the dim components of a displacement field that maps the current
+   * domain into one described by @p new_points . The @p new_points array
+   * therefore represents the boundary values of this displacement field.
+   * The function then evaluates this displacement field at each vertex in
+   * the interior and uses it to place the mapped vertex where the
+   * displacement field locates it. Because the solution of the Laplace
+   * equation is smooth, this guarantees a smooth mapping from the old
+   * domain to the new one.
    *
-   * In 1d, this function is not currently implemented.
+   * @param[in] new_points The locations where a subset of the existing vertices
+   * are to be placed. Typically, this would be a map from the vertex indices
+   * of all nodes on the boundary to their new locations, thus completely
+   * specifying the geometry of the mapped domain. However, it may also include
+   * interior points if necessary and it does not need to include all boundary
+   * vertices (although you then lose control over the exact shape of the mapped
+   * domain).
+   *
+   * @param[in,out] tria The Triangulation object. This object is changed in-place,
+   * i.e., the previous locations of vertices are overwritten.
+   *
+   * @note This function is not currently implemented for the 1d case.
    */
   template <int dim>
   void laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
