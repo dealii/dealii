@@ -17,42 +17,45 @@
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
+namespace GridGenerator 
+\{
 #if deal_II_dimension <= deal_II_space_dimension
     template void
-      GridGenerator::hyper_rectangle<deal_II_dimension, deal_II_space_dimension> (
+      hyper_rectangle<deal_II_dimension, deal_II_space_dimension> (
 	Triangulation<deal_II_dimension, deal_II_space_dimension> &,
 	const Point<deal_II_space_dimension>&, const Point<deal_II_space_dimension>&,
 	const bool);
     
     template void
-      GridGenerator::colorize_hyper_rectangle<deal_II_dimension, deal_II_space_dimension> (
+      colorize_hyper_rectangle<deal_II_dimension, deal_II_space_dimension> (
 	Triangulation<deal_II_dimension, deal_II_space_dimension> &);
     
     template void
-      GridGenerator::hyper_cube<deal_II_dimension, deal_II_space_dimension> (
+      hyper_cube<deal_II_dimension, deal_II_space_dimension> (
 	Triangulation<deal_II_dimension, deal_II_space_dimension> &, const double, const double);
     
     template
       void
-      GridGenerator::merge_triangulations
+      merge_triangulations
       (const Triangulation<deal_II_dimension,deal_II_space_dimension> &triangulation_1,
        const Triangulation<deal_II_dimension,deal_II_space_dimension> &triangulation_2,
        Triangulation<deal_II_dimension,deal_II_space_dimension>       &result);
       
 #endif
+\}  
   }
 
 
 for (deal_II_dimension : DIMENSIONS)
 {
-  
+namespace GridGenerator \{  
   template void
-    GridGenerator::subdivided_hyper_cube<deal_II_dimension> (
+    subdivided_hyper_cube<deal_II_dimension> (
       Triangulation<deal_II_dimension> &,
       const unsigned int, const double, const double);
   
   template void
-    GridGenerator::subdivided_hyper_rectangle<deal_II_dimension>
+    subdivided_hyper_rectangle<deal_II_dimension>
     (Triangulation<deal_II_dimension> &,
      const std::vector<unsigned int>&,
      const Point<deal_II_dimension>&,
@@ -61,7 +64,7 @@ for (deal_II_dimension : DIMENSIONS)
   
   template
     void
-    GridGenerator::subdivided_hyper_rectangle(
+    subdivided_hyper_rectangle(
       Triangulation<deal_II_dimension>              &,
       const std::vector<std::vector<double> > &,
       const Point<deal_II_dimension>                &,
@@ -69,32 +72,31 @@ for (deal_II_dimension : DIMENSIONS)
       const bool                       );
   
     template void
-      GridGenerator::parallelepiped<deal_II_dimension> (
+      parallelepiped<deal_II_dimension> (
 	Triangulation<deal_II_dimension>&,
 	const Point<deal_II_dimension> (&) [deal_II_dimension], 
 	const bool);  
   
     template void
-      GridGenerator::subdivided_parallelepiped<deal_II_dimension> (
+      subdivided_parallelepiped<deal_II_dimension> (
 	Triangulation<deal_II_dimension>&,
-	const size_type,
+	const unsigned int,
 	const Point<deal_II_dimension> (&) [deal_II_dimension], 
 	const bool);  
 
     template void
-      GridGenerator::subdivided_parallelepiped<deal_II_dimension> (
+      subdivided_parallelepiped<deal_II_dimension> (
 	Triangulation<deal_II_dimension>&,
-	const size_type [deal_II_dimension], 
+	const unsigned int [deal_II_dimension], 
 	const Point<deal_II_dimension> (&) [deal_II_dimension], 
 	const bool);  
   
 #if deal_II_dimension > 1
   template void
-    GridGenerator::
     laplace_transformation<deal_II_dimension> (Triangulation<deal_II_dimension> &,
 					       const std::map<types::global_dof_index,Point<deal_II_dimension> > &);
 #endif
   
-  
+\}  
  }
 
