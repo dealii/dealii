@@ -44,6 +44,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: When typing <code>make run</code> in the step-32 directory,
+  the program was executed with <code>mpirun -np 2 ./step-32</code>. This
+  assumes that a program <code>mpirun</code> exists, but also does that
+  deal.II was in fact compiled with MPI support on. Neither was intended.
+  This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/07/24)
+  </li>
+
   <li>New: The DataOut, DataOutFaces, and DataOutRotation classes now allow
   the output of data vectors using different DoFHandler objects (based on the
   same triangulation), by new functions add_data_vector. This is used in the

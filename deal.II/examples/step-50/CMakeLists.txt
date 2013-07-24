@@ -11,9 +11,6 @@ SET(TARGET_SRC
   # You can specify additional files here!
   )
 
-# A custom command line to run the program
-SET(TARGET_RUN mpirun -np 2 ${TARGET})
-
 # Define the output that should be cleaned:
 SET(CLEAN_UP_FILES *.vtu *.pvtu *.visit)
 
