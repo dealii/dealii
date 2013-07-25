@@ -684,7 +684,7 @@
   \right)_\Omega,
 @f}
  * where $\varepsilon(\mathbf u) = \frac 12 \left([\nabla\mathbf u] +
- * [\nabla\mathbf u]^2\right)$ is the symmetrized gradient.
+ * [\nabla\mathbf u]^T\right)$ is the symmetrized gradient.
  * In the second to last step, we used that the scalar product between
  * an arbitrary tensor $\nabla\mathbf u$ and a symmetric tensor
  * $\frac 12[\partial_i v_j + \partial_j v_i]$ equals the scalar product

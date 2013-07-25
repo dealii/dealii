@@ -209,7 +209,7 @@ namespace internal
    *   template <>
    *   void X<dim>::f<0> () { ...operate on the vertices of a cell... }
    *
-   *   template <int dim, int subdim> void f(X<dim> &x) {
+   *   template <int dim, int subdim> void g(X<dim> &x) {
    *     x.f<subdim> ();
    *   }
    * @endcode
@@ -238,7 +238,7 @@ namespace internal
    *   template <int dim>
    *   void X<dim>::f (int2type<1>) { ...operate on the lines of a cell... }
    *
-   *   template <int dim, int subdim> void f(X<dim> &x) {
+   *   template <int dim, int subdim> void g(X<dim> &x) {
    *     x.f (int2type<subdim>());
    *   }
    * @endcode

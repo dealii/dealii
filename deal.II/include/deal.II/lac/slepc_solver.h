@@ -297,7 +297,7 @@ namespace SLEPcWrappers
     EPS *get_eps ();
 
     /**
-     * Solve the linear system for </code>n_eigenpairs</code>
+     * Solve the linear system for <code>n_eigenpairs</code>
      * eigenstates. Parameter <code>n_converged</code> contains the
      * actual number of eigenstates that have .  converged; this can
      * be both fewer or more than n_eigenpairs, depending on the

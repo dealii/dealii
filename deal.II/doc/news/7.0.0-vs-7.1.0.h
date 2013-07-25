@@ -727,7 +727,7 @@ were not properly mapped. This is now fixed.
 
 <li> New: Restructured the internals of <code>PETScWrappers::Precondition*</code>
 to allow a PETSc PC object to exist without a solver. New: Use
-<code>Precondition*::vmult()</code> to apply the preconditioner once.
+<code>Precondition*::%vmult()</code> to apply the preconditioner once.
 Preconditioners now have a default constructor and an <code>initialize()</code>
 function and are no longer initialized in the solver call,
 but in the constructor or <code>initialize()</code>.

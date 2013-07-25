@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * same. The handling in SmartPointer will take care of this.
  *
  * @note Due to a problem with <tt>volatile</tt> declarations, this
- * additional feature is switched of if multithreading is used.
+ * additional feature is switched off if multithreading is used.
  *
  * @ingroup memory
  * @author Guido Kanschat, 1998 - 2005

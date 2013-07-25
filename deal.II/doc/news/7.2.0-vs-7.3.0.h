@@ -224,7 +224,7 @@ that takes a std::vector<IndexSet> (same interface as in Trilinos).
 <br>
 (Timo Heister, 2013/02/19)
 
-<li> New: PETScWrappers::*Matrix::add(other, factor) to
+<li> New: PETScWrappers::*Matrix::%add(other, factor) to
 add a scaled other matrix to the current matrix.
 <br>
 (Jose Javier Munoz Criollo, 2013/02/19)

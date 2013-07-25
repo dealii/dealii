@@ -1147,7 +1147,7 @@ public:
   /**
    * Write the data of this object en bloc to a file. This is done in a binary
    * mode, so the output is neither readable by humans nor (probably) by other
-   * computers using a different operating system of number format.
+   * computers using a different operating system or number format.
    *
    * The purpose of this function is that you can swap out matrices and
    * sparsity pattern if you are short of memory, want to communicate between

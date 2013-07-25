@@ -226,7 +226,7 @@ namespace Utilities
    * templates.
    *
    * Use this class as in
-   * <code>fixed_int_power@<5,2@>::value</code>
+   * <code>fixed_int_power@<5,2@>::%value</code>
    * to compute 5<sup>2</sup>.
    */
   template <int a, int N>

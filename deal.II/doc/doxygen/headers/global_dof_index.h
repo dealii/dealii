@@ -65,6 +65,7 @@
  * can solve now, there is no reason for the number of non-zero entries in a 
  * sparse matrix to go over four billions. Thus, we still use unsigned int
  * for, e.g., row_lengths in the object.
+ * </dd>
  *
- * 
+ * </dl>
  */

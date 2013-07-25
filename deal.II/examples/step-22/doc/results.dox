@@ -119,7 +119,7 @@ This plot uses the capability of VTK-based visualization programs (in
 this case of VisIt) to show vector data; this is the result of us
 declaring the velocity components of the finite element in use to be a
 set of vector components, rather than independent scalar components in
-the <code>StokesProblem@<dim@>::output_results</code> function of this
+the <code>StokesProblem@<dim@>::%output_results</code> function of this
 tutorial program.
 
 

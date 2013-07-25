@@ -111,7 +111,7 @@
  * 
  * @subsection Inst2p Provided instances
  *
- * Like with the classes in section Inst1, the instances provided in the
+ * Like with the classes in section @ref Inst1, the instances provided in the
  * library are often listed in the documentation of that class in a form
  * similar to this:
  @verbatim

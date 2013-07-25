@@ -52,6 +52,8 @@ template <int dim, int spacedim> class FESubfaceValues;
  * the transform() functions of
  * inheriting classes in order to
  * work.
+ *
+ * @ingroup mapping
  */
 enum MappingType
 {

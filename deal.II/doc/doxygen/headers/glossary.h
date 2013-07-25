@@ -544,7 +544,7 @@
  * to adding elements or setting them.  In some cases, not all processors may
  * be adding elements, for example if a processor does not own any cells when
  * using a very coarse (initial) mesh.  For this reason, compress() takes an
- * argument of type VectorOperation, which can be either ::add, or ::insert.
+ * argument of type VectorOperation, which can be either ::%add, or ::%insert.
  * This argument is required for vectors and matrices starting with the 7.3
  * release.
  *
