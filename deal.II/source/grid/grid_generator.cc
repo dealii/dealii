@@ -186,9 +186,10 @@ namespace GridGenerator
      * outer.
      */
     void
-    colorize_hyper_shell (
-      Triangulation<2> &tria,
-      const Point<2> &, const double, const double)
+    colorize_hyper_shell (Triangulation<2> &tria,
+                          const Point<2> &,
+                          const double,
+                          const double)
     {
       // In spite of receiving geometrical
       // data, we do this only based on
@@ -196,11 +197,11 @@ namespace GridGenerator
 
       // For the mesh based on  cube,
       // this is highly irregular
-      for (Triangulation<2>::cell_iterator cell = tria.begin();
-           cell != tria.end(); ++cell)
+      for (Triangulation<2>::cell_iterator cell = tria.begin ();
+           cell != tria.end (); ++cell)
         {
-          Assert (cell->face(2)->at_boundary(), ExcInternalError());
-          cell->face(2)->set_boundary_indicator(1);
+          Assert(cell->face(2)->at_boundary(), ExcInternalError());
+          cell->face (2)->set_boundary_indicator (1);
         }
     }
 
