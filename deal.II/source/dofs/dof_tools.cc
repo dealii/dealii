@@ -2648,7 +2648,7 @@ namespace DoFTools
 
                         // break if the n_master_dofs == 0, because we are
                         // attempting to constrain to an element that has
-                        // has no face dofs
+                        // no face dofs
                         if (master_dofs.size() == 0) break;
 
                         // make sure the element constraints for this face
