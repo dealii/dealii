@@ -356,3 +356,16 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
   #endif
 
 }
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+{
+  namespace internal \{
+    namespace DataOut \{
+#if deal_II_dimension <= deal_II_space_dimension
+      template class ParallelDataBase<deal_II_dimension,deal_II_space_dimension>;
+      template class ParallelData<deal_II_dimension,deal_II_space_dimension>;
+#endif
+    \}
+  \}
+}
