@@ -82,7 +82,7 @@ DEAL_II_NAMESPACE_OPEN
  * takes a solution that consists of velocity, pressure and temperature (dim+2
  * components) and computes a variety of output quantities, some of which
  * are vector valued and some of which are scalar. On the other hand,
- * in step-28 we implement a postprocessor that only computes the magnitude
+ * in step-29 we implement a postprocessor that only computes the magnitude
  * of a complex number given by a two-component finite element. It seems silly
  * to have to implement four virtual functions for this
  * (compute_derived_quantities_scalar() or compute_derived_quantities_vector(),
