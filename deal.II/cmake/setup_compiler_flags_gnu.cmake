@@ -148,7 +148,7 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   #
   # If -Og is not available, fall back to -O0:
   #
-  IF(NOT DEAL_II_HAVE_FLAG_O0)
+  IF(NOT DEAL_II_HAVE_FLAG_Og)
     ADD_FLAGS(DEAL_II_CXX_FLAGS_DEBUG "-O0")
   ENDIF()
 

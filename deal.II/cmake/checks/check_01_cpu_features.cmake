@@ -46,6 +46,7 @@ ELSE()
   MESSAGE(STATUS
     "No suitable C compiler was found! Assuming little endian platform."
     )
+  SET(DEAL_II_WORDS_BIGENDIAN "0")
 ENDIF()
 
 
