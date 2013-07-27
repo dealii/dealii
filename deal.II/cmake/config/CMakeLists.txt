@@ -81,7 +81,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     )
   LIST(APPEND CONFIG_LIBRARIES
     ${_keyword}
-    ${CONFIG_LIBRARIES_${_build}}
+    \${DEAL_II_LIBRARIES_${_build}}
     )
 
   SET(CONFIG_TARGET_${_build}
@@ -89,7 +89,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     )
   LIST(APPEND CONFIG_TARGET
     ${_keyword}
-    ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
+    \${DEAL_II_TARGET_${_build}}
     )
 ENDFOREACH()
 
