@@ -142,7 +142,7 @@ ENDIF()
 
 
 OPTION(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
-  "Allow platform introspection for CPU command set, SSE and AVX"
+  "Allow platform introspection for CPU command sets, SSE and AVX"
   ON
   )
 MARK_AS_ADVANCED(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
@@ -201,7 +201,6 @@ OPTION(DEAL_II_WITH_64BIT_INDICES
   )
 
 
-
 #
 # Tell the user very prominently, that we're doing things differently w.r.t
 # CMAKE_(C|CXX)_FLAGS_(DEBUG|RELEASE)
@@ -213,12 +212,14 @@ FOREACH(_flag
   SHARED_LINKER_FLAGS_DEBUG
   )
   IF(NOT "${CMAKE_${_flag}}" STREQUAL "")
+    UNSET(${CMAKE_${_flag}} CACHE)
     MESSAGE(FATAL_ERROR
       "\nThe deal.II cmake build system does not use CMAKE_${_flag}.\n"
       "Use DEAL_II_${_flag}, instead!\n\n"
       )
   ENDIF()
 ENDFOREACH()
+
 
 #
 # Hide all unused compiler flag variables:
@@ -245,6 +246,7 @@ FOREACH(_flag
   # Go away...
   SET(${_flag} "" CACHE INTERNAL "" FORCE)
 ENDFOREACH()
+
 
 #
 # Set cached compiler flags to an empty string:

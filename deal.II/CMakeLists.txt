@@ -72,6 +72,8 @@ PROJECT(deal.II CXX)
 ENABLE_LANGUAGE_OPTIONAL(C)
 ENABLE_LANGUAGE_OPTIONAL(Fortran)
 
+INCLUDE(setup_post_project_call)
+
 INCLUDE(setup_deal_ii)
 INCLUDE(setup_compiler_flags)
 

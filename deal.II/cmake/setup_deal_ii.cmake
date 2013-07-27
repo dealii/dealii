@@ -51,8 +51,6 @@
 #     DEAL_II_PROJECT_CONFIG_RELDIR   *)
 #
 #     DEAL_II_BUILD_TYPES
-#     DEAL_II_WITH_BUNDLED_DIRECTORY
-#     DEAL_II_WITH_DOC_DIRECTORY
 #
 # *)  Can be overwritten by the command line via -D<...>
 #
@@ -146,49 +144,3 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
   LIST(APPEND DEAL_II_BUILD_TYPES "RELEASE")
 ENDIF()
 
-
-########################################################################
-#                                                                      #
-#   Cleanup and setup that has to happen after the call to PROJECT():  #
-#                                                                      #
-########################################################################
-
-#
-# Cleanup some files used for storing the names of all object targets that
-# will be bundled to the deal.II library.
-# (Right now, i.e. cmake 2.8.8, this is the only reliable way to get
-# information into a global scope...)
-#
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER "${_build}" _build_lowercase)
-  FILE(REMOVE
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${_build_lowercase}
-    )
-ENDFOREACH()
-
-IF(DEAL_II_PREFER_STATIC_LIBS)
-  #
-  # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS
-  # is set. This will prefer static archives instead of shared libraries:
-  #
-  # TODO: Does this work on a Windows or CYGWIN target?
-  LIST(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
-ENDIF()
-
-#
-# Cross compilation stuff:
-#
-IF(CMAKE_CROSSCOMPILING)
-  #
-  # Disable platform introspection when cross compiling
-  #
-  SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION OFF CACHE BOOL "" FORCE)
-
-  #
-  # Import native expand_instantiations for use in cross compilation:
-  #
-  SET(DEAL_II_NATIVE "DEAL_II_NATIVE-NOTFOUND" CACHE FILEPATH
-    "A pointer to a native deal.Ii build directory"
-    )
-  INCLUDE(${DEAL_II_NATIVE}/cmake/scripts/importExecutables.cmake)
-ENDIF()
