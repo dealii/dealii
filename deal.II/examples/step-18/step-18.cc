@@ -1330,10 +1330,10 @@ namespace Step18
       subdomain_id (subdomain_id)
     {}
 
-    virtual typename DoFHandler<dim>::cell_iterator
+    virtual typename DataOut<dim>::cell_iterator
     first_cell ()
     {
-      typename DoFHandler<dim>::active_cell_iterator
+      typename DataOut<dim>::active_cell_iterator
       cell = this->dofs->begin_active();
       while ((cell != this->dofs->end()) &&
              (cell->subdomain_id() != subdomain_id))
@@ -1342,8 +1342,8 @@ namespace Step18
       return cell;
     }
 
-    virtual typename DoFHandler<dim>::cell_iterator
-    next_cell (const typename DoFHandler<dim>::cell_iterator &old_cell)
+    virtual typename DataOut<dim>::cell_iterator
+    next_cell (const typename DataOut<dim>::cell_iterator &old_cell)
     {
       if (old_cell != this->dofs->end())
         {
@@ -1352,7 +1352,7 @@ namespace Step18
 
           return
             ++(FilteredIterator
-               <typename DoFHandler<dim>::active_cell_iterator>
+               <typename DataOut<dim>::active_cell_iterator>
                (predicate,old_cell));
         }
       else
