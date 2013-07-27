@@ -39,7 +39,6 @@
 #     DEAL_II_PREFER_STATIC_LIBS
 #     DEAL_II_STATIC_EXECUTABLE
 #     CMAKE_INSTALL_RPATH_USE_LINK_PATH
-#     CMAKE_C_FLAGS                     *)
 #     CMAKE_CXX_FLAGS                   *)
 #     DEAL_II_LINKER_FLAGS              *)
 #     DEAL_II_CXX_FLAGS_DEBUG
@@ -48,7 +47,7 @@
 #     DEAL_II_LINKER_FLAGS_RELEASE
 #     DEAL_II_WITH_64BIT_INDICES
 #
-# *)  May also be set via environment variable (CFLAGS, CXXFLAGS, LDFLAGS)
+# *)  May also be set via environment variable (CXXFLAGS, LDFLAGS)
 #     (a nonempty cached variable has precedence and will not be
 #     overwritten by environment)
 #
