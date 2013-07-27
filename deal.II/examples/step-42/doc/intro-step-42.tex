@@ -83,7 +83,7 @@ is zero with the outward normal $n$. If there is contact ($u_n = g$) the tangent
 vanishes, because we consider a frictionless situation and the normal stress is
 negative. The gap $g$ comes with the start configuration of the obstacle and the
 deformable body. We refer that you have to ensure that the obstacle does not hit
-the boundary of $\Gamma_C$ 
+the boundary of $\Gamma_C$
 
 \section{Derivation of the variational inequality}
 
@@ -227,7 +227,8 @@ Again the first case is for elastic and the second for plastic deformation.
 
 Just as in step-41 we compose a saddle point problem out of the minimisation
 problem. Again we do so to gain a formulation that allows us to solve a linear
-system of equations finally.\\
+system of equations finally.
+
 We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W'$,
 $W'$ dual space of the trace space $W:=\left[ H_0^{\frac{1}{2}}(\Gamma_C)
 \right]^{\textrm{dim}}$ of $V$ restricted to $\Gamma_C$, $$K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
@@ -236,9 +237,8 @@ of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
 denotes the duality pairing, i.e. a boundary integral, between $W'$ and $W$.
 Intuitively, $K$ is the cone of all "non-positive functions", except that $ K\subset
 \left( \left[ H_0^{\frac{1}{2}}(\Gamma_C) \right]^{\textrm{dim}} \right)' $ and
-so contains other objects besides regular functions as well. This yields:\\
+so contains other objects besides regular functions as well. This yields:
 
-\noindent
 \textit{Find $u\in V$ and $\lambda\in K$ such that}
 \begin{align*}
  \hat{a}(u,v) + b(v,\lambda) &= f(v),\quad &&v\in V\\
@@ -304,7 +304,7 @@ method for the contact. It sums up the results of the sections before and works 
  $$\mathcal{F}_{k+1}:=\lbrace p\in\mathcal{S}:\Lambda^k_p +
  c\left(\left[B^TU^k\right]_p - G_p\right) \leq 0\rbrace.$$
  Projection $U^k$ so that it holds the second equation in (2)
- $$\hat U^K := P_{\mathcal{A}_{k+1}}(U^k).$$ 
+ $$\hat U^K := P_{\mathcal{A}_{k+1}}(U^k).$$
  \item[(5)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
  F\left(U^{k}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
  step (1).
@@ -353,7 +353,7 @@ above that we only linearize the problem. In step (2) we have to solve a linear 
 criteria. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones
 are iterated out and the second ensures an accurate enough residual which means that the plastic zones are also iterated out.\\
 A similar method can also be found in Brunssen, Schmid, Schaefer, Wohlmuth: A
-fast and robust iterative solver for nonlinear contact problems using a 
+fast and robust iterative solver for nonlinear contact problems using a
 primal-dual active set strategy and algebraic multigrid, Int. J. Numer.
 Meth. Engng, 2007, 69, pp. 524-543. But in advance we apply a line search to
 obtain a more robust method regarding the start value. Solving an elastic
@@ -379,12 +379,12 @@ results it yields a quite reasonable adaptive mesh for the contact zone.
 
 This tutorial is essentailly a mixture of step-40 and step-41 but instead of
 PETSc we let the Trilinos library deal with parallelizing the linear algebra
-(like in step-32). Since we are trying to solve a similar problem like in 
+(like in step-32). Since we are trying to solve a similar problem like in
 step-41 we will use the same methods but now in parallel.
 
 Another difficulty is the handling of the different constraints from
-(the dirichlet conditons), the hanging nodes and the inequality condition that 
-arises from the contact. For this purpose we create three objects of type 
+(the dirichlet conditons), the hanging nodes and the inequality condition that
+arises from the contact. For this purpose we create three objects of type
 ConstraintMatrix.
 
 Beside the ConstitutiveLaw class there is another new class called Input. This
