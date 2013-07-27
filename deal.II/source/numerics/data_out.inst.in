@@ -381,7 +381,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II_space_di
       ParallelDataBase<deal_II_dimension,deal_II_space_dimension>::
       reinit_all_fe_values<dealii::DH<deal_II_dimension,deal_II_space_dimension> >
       (std::vector<std_cxx1x::shared_ptr<DataEntryBase<dealii::DH<deal_II_dimension,deal_II_space_dimension> > > > &dof_data,
-       const typename dealii::Triangulation<deal_II_dimension,deal_II_space_dimension>::cell_iterator &cell,
+       const dealii::Triangulation<deal_II_dimension,deal_II_space_dimension>::cell_iterator &cell,
        const unsigned int face);
 #endif
     \}
