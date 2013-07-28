@@ -1020,12 +1020,12 @@ no_constraint:
                k++)
             {
               unsigned int cell = partition_list[k];
-              unsigned int no_neighbors = connectivity.row_length(cell);
+              unsigned int n_neighbors = connectivity.row_length(cell);
 
               // In the worst case, each neighbor has a different color. So we
-              // find at least one available color between 0 and no_neighbors.
-              color_finder.resize(no_neighbors+1);
-              for (unsigned int j=0; j<=no_neighbors; ++j)
+              // find at least one available color between 0 and n_neighbors.
+              color_finder.resize(n_neighbors+1);
+              for (unsigned int j=0; j<=n_neighbors; ++j)
                 color_finder[j]=true;
               CompressedSimpleSparsityPattern::row_iterator
               neighbor = connectivity.row_begin(cell),
@@ -1035,7 +1035,7 @@ no_constraint:
                   // Mark the color that a neighbor within the partition has
                   // as taken
                   if (cell_partition[*neighbor] == part &&
-                      cell_color[*neighbor] <= no_neighbors)
+                      cell_color[*neighbor] <= n_neighbors)
                     color_finder[cell_color[*neighbor]] = false;
                 }
               // Choose the smallest color that is not taken for the block
