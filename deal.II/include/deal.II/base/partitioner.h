@@ -49,12 +49,12 @@ namespace Utilities
      * where other processors might require information from. In a
      * sense, these import indices form the dual of the ghost
      * indices. This information is gathered once when constructing the
-     * partitioner, which obviates subsequent global communcation steps
+     * partitioner, which obviates subsequent global communication steps
      * when exchanging data.
      *
-     * The partitioner includes a mechanism for converting global to
-     * local and local to global indices. The storage convention for the
-     * partitioner is as follows. The local range is associated with
+     * The partitioner includes a mechanism for converting global to local and
+     * local to global indices. Internally, this class stores vector elements
+     * using the convention as follows: The local range is associated with
      * local indices [0,@p local_size), and ghost indices are stored
      * consecutively in [@p local_size, @p local_size + @p
      * n_ghost_indices). The ghost indices are sorted according to their
