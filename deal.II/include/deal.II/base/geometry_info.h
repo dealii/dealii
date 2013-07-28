@@ -2173,8 +2173,7 @@ struct GeometryInfo
   void
   alternating_form_at_vertices
   (const Point<spacedim> (&vertices)[vertices_per_cell],
-   Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell])
-  ;
+   Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell]);
 
   /**
    * For each face of the reference
