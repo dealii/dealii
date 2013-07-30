@@ -59,7 +59,6 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     # Do this unconditionally for the most common case:
     # TODO: Non-GNU setups...
     #
-    #
     # Switch the library preference back to prefer dynamic libraries if
     # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
     # this case system libraries should be linked dynamically.
@@ -97,8 +96,12 @@ SET(DEAL_II_LAPACK_FUNCTIONS
   )
 
 MACRO(CHECK_FOR_LAPACK_FUNCTIONS)
-  LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${LAPACK_LINKER_FLAGS}")
+  #
+  # Clear the test flags because the following test will use a C compiler
+  #
+  CLEAR_CMAKE_REQUIRED()
+  SET(CMAKE_REQUIRED_FLAGS "${LAPACK_LINKER_FLAGS}")
+  SET(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
   #
   # Push -pthread as well:
   #

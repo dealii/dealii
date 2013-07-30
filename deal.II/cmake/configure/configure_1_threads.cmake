@@ -36,7 +36,15 @@ MACRO(SETUP_THREADING)
     # this case system libraries should be linked dynamically.
     #
     SWITCH_LIBRARY_PREFERENCE()
+
+    #
+    # Clear the test flags because FindThreads.cmake will use a C compiler:
+    #
+    CLEAR_CMAKE_REQUIRED()
+
     FIND_PACKAGE(Threads)
+
+    RESET_CMAKE_REQUIRED()
     SWITCH_LIBRARY_PREFERENCE()
 
   ELSE()
