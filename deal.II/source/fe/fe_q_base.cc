@@ -993,6 +993,7 @@ template <class POLY, int dim, int spacedim>
 std::vector<unsigned int>
 FE_Q_Base<POLY,dim,spacedim>::get_dpo_vector(const unsigned int deg)
 {
+  AssertThrow(deg>0,ExcMessage("FE_Q needs to be of degree > 0."));
   std::vector<unsigned int> dpo(dim+1, 1U);
   for (unsigned int i=1; i<dpo.size(); ++i)
     dpo[i]=dpo[i-1]*(deg-1);
