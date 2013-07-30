@@ -30,7 +30,7 @@ MACRO(ENABLE_IF_LINKS _variable _flag)
     STRING(REPLACE "," "" _flag_name "${_flag_name}")
     STRING(REPLACE "--" "__" _flag_name "${_flag_name}")
     SET(_backup ${CMAKE_REQUIRED_LIBRARIES})
-    SET(CMAKE_REQUIRED_LIBRARIES "${_flag_stripped}")
+    LIST(APPEND CMAKE_REQUIRED_LIBRARIES "${_flag_stripped}")
     CHECK_CXX_COMPILER_FLAG(
       ""
       DEAL_II_HAVE_FLAG_${_flag_name}

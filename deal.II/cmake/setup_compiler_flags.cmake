@@ -65,22 +65,25 @@
 #
 # Check the user provided CXX flags:
 #
+
 MESSAGE(STATUS "")
 IF(NOT "${CMAKE_CXX_FLAGS_SAVED}" STREQUAL "${DEAL_II_CXX_FLAGS_SAVED}")
+  # Rerun this test if cxx flags changed:
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
 ENDIF()
 SET(DEAL_II_CXX_FLAGS_SAVED "${CMAKE_CXX_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
 
-SET(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS_SAVED}")
+# Initialize all CMAKE_REQUIRED_* variables a this point:
+RESET_CMAKE_REQUIRED()
+
 CHECK_CXX_SOURCE_COMPILES(
   "int main(){ return 0; }"
   DEAL_II_HAVE_USABLE_CXX_FLAGS)
-SET(CMAKE_REQUIRED_FLAGS "")
 
 IF(NOT DEAL_II_HAVE_USABLE_CXX_FLAGS)
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
   MESSAGE(FATAL_ERROR "\n"
-    "Configuration error: Cannot compile with the specified CXX flags: "
+    "Configuration error: Cannot compile with the user supplied CXX flags:\n"
     "${CMAKE_CXX_FLAGS_SAVED}\n"
     )
 ENDIF()

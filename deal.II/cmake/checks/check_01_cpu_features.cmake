@@ -51,14 +51,6 @@ ENDIF()
 
 
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-
-  #
-  # These tests depend on certain cpu instruction sets being enabled, so
-  # use the user supplied compiler flags for the tests as well:
-  #
-  SET(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS_SAVED}")
-
-
   #
   # Take care that the following tests are rerun if CMAKE_REQUIRED_FLAGS
   # changes..
@@ -144,9 +136,8 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     }
     "
     DEAL_II_HAVE_AVX)
-
-  SET(CMAKE_REQUIRED_FLAGS "")
 ENDIF()
+
 
 IF(DEAL_II_HAVE_SSE2)
   IF(DEAL_II_HAVE_AVX)
@@ -157,4 +148,3 @@ IF(DEAL_II_HAVE_SSE2)
 ELSE()
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
 ENDIF()
-

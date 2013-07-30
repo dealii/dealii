@@ -303,15 +303,18 @@
     POP_TEST_FLAG()
 	  </pre>
 
-	<li> Libraries necessary for linkage can be set in the list variable
-	  <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best two hard set
-	  this variable to a specific value and later on cleaning it,
-	  instead of appending/removing:
+        <li> Necessary include directories and libraries necessary for
+        linkage can be set in the list variables
+        <code>CMAKE_REQUIRED_INCLUDES</code> and
+        <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best ot append these
+        lists and later on reset <code>CMAKE_REQUIRED_*</code> (including
+        <code>CMAKE_REQUIRED_FLAGS</code>) to their default values:
 	  <pre>
 
-    SET(CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;
+    LIST(APPEND CMAKE_REQUIRED_INCLUDES &lt;a list of includes&gt;)
+    LIST(APPEND CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;)
     CHECK_CXX_SOURCE_COMPILES(...)
-    SET(CMAKE_REQUIRED_LIBRARIES)
+    RESET_CMAKE_REQUIRED()
 	  </pre>
       </ul>
     </p>

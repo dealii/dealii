@@ -162,7 +162,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # Test whether that is indeed the case
     #
     IF(${var})
-      SET(CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIRS})
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIRS})
       PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
 
       CHECK_CXX_SOURCE_COMPILES(
@@ -203,8 +203,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         ENDIF()
       ENDIF()
 
-      POP_TEST_FLAG()
-      SET(CMAKE_REQUIRED_INCLUDES)
+      RESET_CMAKE_REQUIRED()
 
       #
       # Remove the following variables from the cache to force a recheck:
