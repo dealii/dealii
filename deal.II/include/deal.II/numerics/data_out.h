@@ -861,6 +861,9 @@ protected:
 
 
 /**
+ * This class is the main class to provide output of data described by finite
+ * element fields defined on a collection of cells.
+ *
  * This class is an actual implementation of the functionality proposed by
  * the DataOut_DoFData class. It offers a function build_patches() that
  * generates the patches to be written in some graphics format from the data
