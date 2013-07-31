@@ -81,7 +81,7 @@ namespace Step15
   //   $\delta u^n$, and one for the current iterate $u^n$.
   // - The <code>setup_system</code> function takes an argument that denotes whether
   //   this is the first time it is called or not. The difference is that the
-  //   first time around we need to distributed degrees of freedom and set the
+  //   first time around we need to distribute the degrees of freedom and set the
   //   solution vector for $u^n$ to the correct size. The following times, the
   //   function is called after we have already done these steps as part of
   //   refining the mesh in <code>refine_mesh</code>.
@@ -267,12 +267,12 @@ namespace Step15
         // For the assembly of the linear system, we have to obtain the values
         // of the previous solution's gradients at the quadrature
         // points. There is a standard way of doing this: the
-        // FEValues::get_function function takes a vector that represents a
-        // finite element field defined on a DoFHandler, and evaluates the
-        // gradients of this field at the quadrature points of the cell with
-        // which the FEValues object has last been reinitialized. The values
-        // of the gradients at all quadrature points are then written into the
-        // second argument:
+        // FEValues::get_function_gradients function takes a vector that
+        // represents a finite element field defined on a DoFHandler, and
+        // evaluates the gradients of this field at the quadrature points of the
+        // cell with which the FEValues object has last been reinitialized.
+        // The values of the gradients at all quadrature points are then written
+        // into the second argument:
         fe_values.get_function_gradients(present_solution,
                                          old_solution_gradients);
 
@@ -520,7 +520,7 @@ namespace Step15
     const unsigned int           dofs_per_cell = fe.dofs_per_cell;
     const unsigned int           n_q_points    = quadrature_formula.size();
 
-    Vector<double>               cell_rhs (dofs_per_cell);
+    Vector<double>               cell_residual (dofs_per_cell);
     std::vector<Tensor<1, dim> > gradients(n_q_points);
 
     std::vector<types::global_dof_index>    local_dof_indices (dofs_per_cell);
@@ -530,7 +530,7 @@ namespace Step15
     endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-        cell_rhs = 0;
+        cell_residual = 0;
         fe_values.reinit (cell);
 
         // The actual computation is much as in
@@ -549,7 +549,7 @@ namespace Step15
                                              gradients[q_point]);
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_rhs(i) -= (fe_values.shape_grad(i, q_point)
+              cell_residual(i) -= (fe_values.shape_grad(i, q_point)
                               * coeff
                               * gradients[q_point]
                               * fe_values.JxW(q_point));
@@ -557,7 +557,7 @@ namespace Step15
 
         cell->get_dof_indices (local_dof_indices);
         for (unsigned int i=0; i<dofs_per_cell; ++i)
-          residual(local_dof_indices[i]) += cell_rhs(i);
+          residual(local_dof_indices[i]) += cell_residual(i);
       }
 
     // At the end of this function we also have to deal with the hanging node
@@ -596,7 +596,7 @@ namespace Step15
   // As discussed in the introduction, Newton's method frequently does not
   // converge if we always take full steps, i.e., compute $u^{n+1}=u^n+\delta
   // u^n$. Rather, one needs a damping parameter (step length) $\alpha^n$ and
-  // set $u^{n+1}=u^n+\alpha^n\; delta u^n$. This function is the one called
+  // set $u^{n+1}=u^n+\alpha^n\delta u^n$. This function is the one called
   // to compute $\alpha^n$.
   //
   // Here, we simply always return 0.1. This is of course a sub-optimal
