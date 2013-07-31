@@ -25,9 +25,14 @@ MACRO(FEATURE_SLEPC_FIND_EXTERNAL var)
 
   IF(SLEPC_FOUND)
     #
-    # Check whether SLEPc and PETSc are compatible.
+    # Check whether SLEPc and PETSc are compatible according to
+    # SLEPc's rules: This is equivalent to asking if the VERSION_MAJOR
+    # and VERSION_MINOR of PETSc and SLEPc are
+    # equivalent; and where VERSION_SUBMINORs are allowed to differ.
     #
-    IF("${SLEPC_VERSION}" STREQUAL "${PETSC_VERSION}")
+    IF( ("${SLEPC_VERSION_MAJOR}" STREQUAL "${PETSC_VERSION_MAJOR}")
+       AND
+       ("${SLEPC_VERSION_MINOR}" STREQUAL "${PETSC_VERSION_MINOR}"))
       SET(${var} TRUE)
     ELSE()
 
