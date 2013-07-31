@@ -1,0 +1,25 @@
+# Listing of Parameters
+# ---------------------
+
+# polynomial degree of the FE_Q finite element space, typically 1 or 2
+set polynomial degree             = 2
+
+# number of initial global refinements before the first computation
+set number of initial refinements = 2
+
+# number of adaptive cycles to run
+set number of cycles              = 11
+
+# refinement strategy for each cycle:
+# global: one global refinement
+# percentage: fixed percentage gets refined using kelly
+# fix dofs: tries to achieve 2^initial_refinement*300 dofs after cycle 1 (only
+# use 2 cycles!). Changes the coarse mesh!
+set refinement strategy           = percentage
+
+# obstacle file to read, leave empty to use a sphere or 'obstacle_file.pbm'
+set obstacle filename             = 
+
+# directory to put output files (graphical output and benchmark statistics,
+# leave empty to put into current directory
+set output directory              = p2adaptive
