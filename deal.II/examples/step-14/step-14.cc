@@ -2589,7 +2589,7 @@ namespace Step14
       Assert (cell->neighbor(face_no).state() == IteratorState::valid,
               ExcInternalError());
       // If we have that, then we need to find out with which face of the
-      // neighboring cell we have to work, i.e. the <code>home-many</code>the
+      // neighboring cell we have to work, i.e. the <code>how-many'th</code> the
       // neighbor the present cell is of the cell behind the present face. For
       // this, there is a function, and we put the result into a variable with
       // the name <code>neighbor_neighbor</code>:
@@ -2671,7 +2671,7 @@ namespace Step14
               ExcInternalError());
 
       // Then find out which neighbor the present cell is of the adjacent
-      // cell. Note that we will operator on the children of this adjacent
+      // cell. Note that we will operate on the children of this adjacent
       // cell, but that their orientation is the same as that of their mother,
       // i.e. the neigbor direction is the same.
       const unsigned int
@@ -2836,7 +2836,7 @@ namespace Step14
 
       // Finally, we have a variable that denotes the maximum number of
       // degrees of freedom we allow for the (primal) discretization. If it is
-      // exceeded, we stop the process of solving and intermittend mesh
+      // exceeded, we stop the process of solving and intermittent mesh
       // refinement. Its default value is 20,000.
       unsigned int max_degrees_of_freedom;
 

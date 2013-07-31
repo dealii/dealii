@@ -72,7 +72,7 @@ eigenvalue.
 
 In order to numerically find solutions to this equation, i.e. a set of
 pairs of eigenvalues/eigenfunctions, we use the usual finite element
-approach of multiplying the equation from the left with testfunctions,
+approach of multiplying the equation from the left with test functions,
 integrating by parts, and searching for solutions in finite
 dimensional spaces by approximating $\Psi(\mathbf
 x)\approx\Psi_h(\mathbf x)=\sum_{j}\phi_j(\mathbf x)\tilde\psi_j$,
