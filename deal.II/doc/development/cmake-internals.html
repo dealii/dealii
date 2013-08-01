@@ -19,7 +19,7 @@
     <p>
       This page provides details about the CMake build system. Files
       processed by the top level <code>CMakeLists.txt</code> script are
-      listed in the TOC in cronological order.
+      listed in the TOC in chronological order.
     </p>
 
     <p>
@@ -115,7 +115,7 @@
       )
       </pre>
       CMake operates almost always with variables in global state. To guard
-      against accidential overwrite of variables the following naming
+      against accidental overwrite of variables the following naming
       conventions must be followed at all times:
       <ul>
         <li>
@@ -260,11 +260,11 @@
 	 <pre>
 
     CHECK_CXX_SOURCE_COMPILES(source variable)
-      - Checks whether it is possible to compile _and_ link the code snipet
-        &lt;source&gt;. If succesful, variable is set to 1.
+      - Checks whether it is possible to compile _and_ link the code snippet
+        &lt;source&gt;. If successful, variable is set to 1.
 
     CHECK_CXX_SOURCE_RUNS(source variable)
-      - variable is set to 1 if &lt;source&gt; coulde be succesfully compiled and
+      - variable is set to 1 if &lt;source&gt; could be successfully compiled and
         linked and the resulting program ran and exited without error.
         Avoid this macro outside of a DEAL_II_ALLOW_PLATFORM_INTROSPECTION
         guard. A sensible fallback should be provided if the check cannot
@@ -306,7 +306,7 @@
         <li> Necessary include directories and libraries necessary for
         linkage can be set in the list variables
         <code>CMAKE_REQUIRED_INCLUDES</code> and
-        <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best ot append these
+        <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best to append these
         lists and later on reset <code>CMAKE_REQUIRED_*</code> (including
         <code>CMAKE_REQUIRED_FLAGS</code>) to their default values:
 	  <pre>
@@ -432,7 +432,7 @@
 
     FEATURE_&lt;FEATURE&gt;_DEPENDS              (a variable)
       - a variable which contains an optional list of other features
-        this feature depends on (and which have to be enbled for this feature
+        this feature depends on (and which have to be enabled for this feature
         to work.) The features must be given with the full option toggle:
         DEAL_II_WITH_[...]
 
@@ -607,7 +607,7 @@
     # Glob for all header files associated with the object target:
     # As this list is only for cosmetic reasons, so that associated header
     # files show up in IDEs, we don't manage an explicit list (with the
-    # tradeoff to have to run "make rebuild_cache" when a new header file
+    # trade-off to have to run "make rebuild_cache" when a new header file
     # emerges...)
     #
     FILE(GLOB _header
