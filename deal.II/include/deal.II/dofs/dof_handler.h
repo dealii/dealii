@@ -23,6 +23,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
