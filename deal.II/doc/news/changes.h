@@ -45,6 +45,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  add has_ghost_elements() for PETScWrappers::MPI::BlockVector and
+  TrilinosWrappers::MPI::BlockVector.
+  <br>
+  (Timo Heister, 2013/08/01)
+  </li>
+
+  <li>
   SparsityTools::distribute_sparsity_pattern did not work correctly for
   block systems, this has been fixed (function has a different signature).
   <br>
