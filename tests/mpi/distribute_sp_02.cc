@@ -42,9 +42,9 @@ void test_mpi()
 
   unsigned int num_local=10;
   unsigned int n=numprocs*num_local;
-  std::vector<types::global_dof_index> rows_per_cpu;
+  std::vector<IndexSet> locally_owned_dofs_per_cpu(numprocs, IndexSet(n));
   for (unsigned int i=0; i<numprocs; ++i)
-    rows_per_cpu.push_back(num_local);
+    locally_owned_dofs_per_cpu[i].add_range((i)*num_local, (i+1)*num_local);
 
   IndexSet locally_rel(n);
   locally_rel.add_range(myid*num_local, (myid+1)*num_local);
@@ -68,7 +68,7 @@ void test_mpi()
     }
 
   SparsityTools::distribute_sparsity_pattern<>(csp,
-                                               rows_per_cpu,
+                                               locally_owned_dofs_per_cpu,
                                                MPI_COMM_WORLD,
                                                locally_rel);
   /*  {
@@ -96,6 +96,8 @@ void test_mpi()
         Assert(csp.exists(indx, myid+1), ExcInternalError());
     }
 
+
+  //now a 2x2 block system where the 2,2 block has size 1x1:
   if (myid==0)
     deallog << "part 2" << std::endl;
 
@@ -104,13 +106,18 @@ void test_mpi()
     bla.add_index(0);
 
   partitioning.push_back(bla);
-
+  
   csp.reinit(partitioning);
   for (unsigned int i=0; i<n; ++i)
     csp.add(i, myid);
 
+  std::vector<IndexSet> locally_owned_dofs_per_cpu2(numprocs, IndexSet(n));
+  for (unsigned int i=0; i<numprocs; ++i)
+    locally_owned_dofs_per_cpu2[i].add_range((i)*num_local, (i+1)*num_local);
+
+  
   SparsityTools::distribute_sparsity_pattern<>(csp,
-                                               rows_per_cpu,
+                                               locally_owned_dofs_per_cpu2,
                                                MPI_COMM_WORLD,
                                                locally_rel);
 
