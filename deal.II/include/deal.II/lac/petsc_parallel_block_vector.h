@@ -314,6 +314,11 @@ namespace PETScWrappers
       void reinit (const unsigned int num_blocks);
 
       /**
+       * Returns if this vector is a ghosted vector (and thus read-only).
+       */
+      bool has_ghost_elements() const;
+
+      /**
        * Return a reference to the MPI
        * communicator object in use with
        * this vector.
@@ -543,6 +548,17 @@ namespace PETScWrappers
       return block(0).get_mpi_communicator();
     }
 
+    inline
+    bool
+    BlockVector::has_ghost_elements() const
+    {
+      bool ghosted=block(0).has_ghost_elements();
+#ifdef DEBUG
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        Assert(block(i).has_ghost_elements()==ghosted, ExcInternalError());
+#endif
+      return ghosted;
+    }
 
 
     inline

@@ -236,7 +236,9 @@ namespace SparsityTools
    * range of elements stored locally
    * and should be the one used in
    * the constructor of the
-   * CompressedSimpleSparsityPattern. Only
+   * CompressedSimpleSparsityPattern.
+   * This should be the locally relevant set.
+   * Only
    * rows contained in myrange are
    * checked in csp for transfer.
    * This function needs to be used
@@ -250,6 +252,19 @@ namespace SparsityTools
                                    const std::vector<size_type> &rows_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange);
+
+  /**
+   * similar to the function above, but includes support for
+   * BlockCompressedSimpleSparsityPattern.
+   * @p owned_set_per_cpu is typically DoFHandler::locally_owned_dofs_per_processor 
+   * and @p myrange are locally_relevant_dofs.
+   */
+  template <class CSP_t>
+  void distribute_sparsity_pattern(CSP_t &csp,
+                                   const std::vector<IndexSet> &owned_set_per_cpu,
+                                   const MPI_Comm &mpi_comm,
+                                   const IndexSet &myrange);
+
 #endif
 
 

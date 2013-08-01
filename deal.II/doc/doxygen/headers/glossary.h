@@ -369,6 +369,11 @@
  * faces and edges. In this case, the boundary object associated with a particular
  * boundary indicator is also used to move the new center points of cells back
  * onto the manifold that the triangulation describes whenever a cell is refined.
+ *
+ * @note For parallel triangulations of type parallel::distributed::Triangulation,
+ * it is not enough to set boundary indicators only once at the beginning. See
+ * the long discussion on this topic in the class documentation of
+ * parallel::distributed::Triangulation .
  * </dd>
  *
  * @see @ref boundary "The module on boundaries"

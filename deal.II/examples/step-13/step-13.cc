@@ -848,8 +848,8 @@ namespace Step13
           // lead to deadlocks. A similar situation arises, when one changes
           // the code to have a return statement somewhere in the middle of
           // the locked block, and forgets that before we call
-          // <code>return</code>, we also have to unlock the mutex. This all
-          // is not be a problem here, but we want to show the general
+          // <code>return</code>, we also have to unlock the mutex. All this
+          // is no problem here, but we want to show the general
           // technique to cope with these problems nevertheless: have an
           // object that upon initialization (i.e. in its constructor) locks
           // the mutex, and on running the destructor unlocks it again. This

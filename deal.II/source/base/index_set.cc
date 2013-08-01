@@ -271,6 +271,8 @@ IndexSet::block_read(std::istream &in)
   if (n_ranges)
     in.read(reinterpret_cast<char *>(&*ranges.begin()),
             ranges.size() * sizeof(Range));
+
+  do_compress(); // needed so that largest_range can be recomputed
 }
 
 

@@ -44,6 +44,20 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>
+  add has_ghost_elements() for PETScWrappers::MPI::BlockVector and
+  TrilinosWrappers::MPI::BlockVector.
+  <br>
+  (Timo Heister, 2013/08/01)
+  </li>
+
+  <li>
+  SparsityTools::distribute_sparsity_pattern did not work correctly for
+  block systems, this has been fixed (function has a different signature).
+  <br>
+  (Timo Heister, 2013/07/31)
+  </li>
+
   <li>Fixed: When typing <code>make run</code> in the step-32 directory,
   the program was executed with <code>mpirun -np 2 ./step-32</code>. This
   assumes that a program <code>mpirun</code> exists, but also does that

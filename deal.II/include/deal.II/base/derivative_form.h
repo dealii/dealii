@@ -35,11 +35,8 @@ DEAL_II_NAMESPACE_OPEN
    In deal.II we represent these derivaties using objects of
    type DerivativeForm<1,dim,spacedim>, DerivativeForm<2,dim,spacedim> and so on.
 
-
    @author Sebastian Pauletti, 2011
-
 */
-
 template <int order, int dim, int spacedim>
 class DerivativeForm
 {

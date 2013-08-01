@@ -32,10 +32,10 @@
 #
 
 MACRO(ENABLE_LANGUAGE_OPTIONAL _language)
-  #
-  # Run this check exactly once:
-  #
   IF(NOT ${_language}_CHECKED)
+    #
+    # Run this check exactly once:
+    #
     SET(${_language}_CHECKED TRUE CACHE INTERNAL "" FORCE)
 
     SET(_tmp ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/${_language}_test)
@@ -58,9 +58,17 @@ MACRO(ENABLE_LANGUAGE_OPTIONAL _language)
       )
 
     IF("${_result}" STREQUAL "0")
+      SET(DEAL_II_${_language}_COMPILER_WORKS TRUE CACHE INTERNAL "" FORCE)
       ENABLE_LANGUAGE(${_language})
     ELSE()
       MESSAGE(STATUS "No working ${_language} compiler found, disabling ${_language}")
+    ENDIF()
+  ELSE()
+    #
+    # Enable the language depending on the cached result from a former run:
+    #
+    IF(DEAL_II_${_language}_COMPILER_WORKS)
+      ENABLE_LANGUAGE(${_language})
     ENDIF()
   ENDIF()
 ENDMACRO()

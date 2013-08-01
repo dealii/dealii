@@ -95,7 +95,7 @@ u^{0}=g$ in the first step and with $\delta u^{n}=0$ in all the following steps.
 <h3>Weak formulation of the problem</h3>
 
 Starting with the strong formulation above, we get the weak formulation by multiplying
-both sides of the PDE with a testfunction $\varphi$ and integrating by parts on both sides:
+both sides of the PDE with a test function $\varphi$ and integrating by parts on both sides:
   @f[
   \left( \nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
   \delta u^{n} \right)-\left(\nabla \varphi ,\frac{\nabla u^{n} \cdot \nabla
@@ -112,7 +112,7 @@ Reducing this space to a finite dimensional space with basis $\left\{
   \delta u^{n}=\sum_{j=0}^{N-1} U_{j} \varphi_{j}
 @f]
 
-Using the basis functions as testfunctions and defining $a_{n}:=\frac{1}
+Using the basis functions as test functions and defining $a_{n}:=\frac{1}
 {\sqrt{1+|\nabla u^{n}|^{2}}}$, we can rewrite the weak formualtion:
 
 @f[

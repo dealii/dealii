@@ -123,7 +123,7 @@ public:
 
 
 
-/*
+/**
  * Provide a tensor valued function which always returns a constant tensor
  * value. Obviously, all derivates of this function are zero.
  *
@@ -162,7 +162,7 @@ private:
 
 
 
-/*
+/**
  * Provide a tensor valued function which always returns zero.
  * Obviously, all derivates of this function are zero.
  *
