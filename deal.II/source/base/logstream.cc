@@ -137,65 +137,23 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
   // Print to the internal stringstream:
   stream << p;
 
-
-  // This is a bloody hack until LogStream got reimplemented as a proper
-  // child of std::streambuf (or similar).
-  //
-  // The problem is that at this point we would like to know whether an
-  // std::flush or std::endl has called us, however, there is no way to
-  // detect this in a sane manner.
-  //
-  // The obvious idea to compare function pointers,
-  //   std::ostream & (* const p_flush) (std::ostream &) = &std::flush;
-  //   p == p_flush ? ...,
-  // is wrong as there doesn't has to be a _single_ std::flush instance...
-  // there could be multiple of it. And in fact, LLVM's libc++ implements
-  // std::flush and std::endl in a way that every shared library and
-  // executable has its local copy... fun...
-  //
-  // - Maier, 2013
-
-  class QueryStreambuf : public std::streambuf
-  {
-    // Implement a minimalistic stream buffer that only stores the fact
-    // whether overflow or sync was called
-    public:
-      QueryStreambuf()
-        : _flushed(false), _newline_written(false)
-      {
-      }
-      bool flushed() { return _flushed; }
-      bool newline_written() { return _newline_written; }
-    private:
-      int_type overflow(int_type ch)
-        {
-          _newline_written = true;
-          return ch;
-        }
-      int sync()
-        {
-          _flushed = true;
-          return 0;
-        }
-      bool _flushed;
-      bool _newline_written;
-  } query_streambuf;
-
-  {
-    // and initialize an ostream with this streambuf:
-    std::ostream inject (&query_streambuf);
-    inject << p;
-  }
-
-  if (query_streambuf.flushed())
+  // Next check whether this is the <tt>flush</tt> or <tt>endl</tt>
+  // manipulator, and if so print out the message.
+  std::ostream & (* const p_flush) (std::ostream &) = &std::flush;
+  std::ostream & (* const p_endl) (std::ostream &) = &std::endl;
+  if (p == p_flush || p == p_endl)
     {
       Threads::Mutex::ScopedLock lock(write_lock);
 
-      // Print the line head in case of a previous newline:
+      // Print the line head in case of a newline:
       if (at_newline)
         print_line_head();
 
-      at_newline = query_streambuf.newline_written();
+      if (p == p_flush)
+        at_newline = false;
+
+      if (p == p_endl)
+        at_newline = true;
 
       if (get_prefixes().size() <= std_depth)
         *std_out << stream.str();
@@ -203,7 +161,7 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
       if (file && (get_prefixes().size() <= file_depth))
         *file << stream.str() << std::flush;
 
-      // Start a new string:
+      // Start a new string
       stream.str("");
     }
 

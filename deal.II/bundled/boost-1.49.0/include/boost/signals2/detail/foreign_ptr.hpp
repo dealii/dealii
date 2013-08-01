@@ -18,6 +18,14 @@
 #include <boost/smart_ptr/bad_weak_ptr.hpp>
 #include <boost/utility/swap.hpp>
 
+#if !defined(BOOST_INTEL_STDCXX0X)
+namespace std
+{
+  template<typename T> class shared_ptr;
+  template<typename T> class weak_ptr;
+}
+#endif
+
 namespace boost
 {
   template<typename T> class shared_ptr;
@@ -31,20 +39,10 @@ namespace boost
     {
       typedef boost::shared_ptr<T> shared_type;
     };
-
-// Workaround for a bug in boost:
-// https://svn.boost.org/trac/boost/ticket/6655
-//
-// It should be save to depend on DEAL macros at this point as this header
-// should only be used by deal.II and dependend projects...
-//
-// - Maier, 2013
-#ifdef DEAL_II_CAN_USE_CXX11
     template<typename T> struct weak_ptr_traits<std::weak_ptr<T> >
     {
       typedef std::shared_ptr<T> shared_type;
     };
-#endif
 
     template<typename SharedPtr> struct shared_ptr_traits
     {};
@@ -53,13 +51,10 @@ namespace boost
     {
       typedef boost::weak_ptr<T> weak_type;
     };
-// as above
-#ifdef DEAL_II_CAN_USE_CXX11
     template<typename T> struct shared_ptr_traits<std::shared_ptr<T> >
     {
       typedef std::weak_ptr<T> weak_type;
     };
-#endif
 
     namespace detail
     {
