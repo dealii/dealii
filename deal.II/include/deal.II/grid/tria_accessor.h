@@ -26,12 +26,8 @@
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/cell_id.h>
 
+#include <utility>
 
-namespace std
-{
-  template<class T1, class T2>
-  struct pair;
-}
 
 DEAL_II_NAMESPACE_OPEN
 
