@@ -116,7 +116,7 @@ void test ()
                                    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
 
   SparsityTools::distribute_sparsity_pattern(sp,
-                                             stokes_dof_handler.n_locally_owned_dofs_per_processor(),
+                                             stokes_dof_handler.locally_owned_dofs_per_processor(),
                                              MPI_COMM_WORLD, stokes_relevant_set);
 
 
