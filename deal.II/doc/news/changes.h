@@ -44,8 +44,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: An assertion wrongly triggered in
+  DoFTools::make_hanging_node_constraints when used with a particular
+  combination of FESystem elements containing FE_Nothing. This is now fixed.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2013/08/01)
+  </li>
+
   <li>
-  add has_ghost_elements() for PETScWrappers::MPI::BlockVector and
+  New: Add has_ghost_elements() for PETScWrappers::MPI::BlockVector and
   TrilinosWrappers::MPI::BlockVector.
   <br>
   (Timo Heister, 2013/08/01)
