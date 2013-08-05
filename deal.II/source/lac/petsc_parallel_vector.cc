@@ -131,7 +131,7 @@ namespace PETScWrappers
       MPI_Allreduce (&k, &k_global, 1,
                      MPI_INT, MPI_LOR, communicator);
 
-      if (k_global)
+      if (k_global || has_ghost_elements())
         {
           // FIXME: I'd like to use this here,
           // but somehow it leads to odd errors
@@ -176,7 +176,7 @@ namespace PETScWrappers
             }
         }
       else
-        reinit (communicator, v.size(), v.local_size(), fast);
+        reinit (v.communicator, v.size(), v.local_size(), fast);
     }
 
 
