@@ -1,0 +1,67 @@
+
+DEAL:0:PETSc::numproc=10
+DEAL:0:PETSc::0: 0.00000
+DEAL:0:PETSc::1: 2.00000
+DEAL:0:PETSc::before: 2.00000
+DEAL:0:PETSc::after: 12.0000
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=10
+DEAL:0:Trilinos::0: 0.00000
+DEAL:0:Trilinos::1: 2.00000
+DEAL:0:Trilinos::before: 2.00000
+DEAL:0:Trilinos::after: 12.0000
+DEAL:0:Trilinos::OK
+
+DEAL:1:PETSc::2: 4.00000
+DEAL:1:PETSc::3: 6.00000
+DEAL:1:Trilinos::2: 4.00000
+DEAL:1:Trilinos::3: 6.00000
+
+
+DEAL:2:PETSc::4: 8.00000
+DEAL:2:PETSc::5: 10.0000
+DEAL:2:Trilinos::4: 8.00000
+DEAL:2:Trilinos::5: 10.0000
+
+
+DEAL:3:PETSc::6: 12.0000
+DEAL:3:PETSc::7: 14.0000
+DEAL:3:Trilinos::6: 12.0000
+DEAL:3:Trilinos::7: 14.0000
+
+
+DEAL:4:PETSc::8: 16.0000
+DEAL:4:PETSc::9: 18.0000
+DEAL:4:Trilinos::8: 16.0000
+DEAL:4:Trilinos::9: 18.0000
+
+
+DEAL:5:PETSc::10: 20.0000
+DEAL:5:PETSc::11: 22.0000
+DEAL:5:Trilinos::10: 20.0000
+DEAL:5:Trilinos::11: 22.0000
+
+
+DEAL:6:PETSc::12: 24.0000
+DEAL:6:PETSc::13: 26.0000
+DEAL:6:Trilinos::12: 24.0000
+DEAL:6:Trilinos::13: 26.0000
+
+
+DEAL:7:PETSc::14: 28.0000
+DEAL:7:PETSc::15: 30.0000
+DEAL:7:Trilinos::14: 28.0000
+DEAL:7:Trilinos::15: 30.0000
+
+
+DEAL:8:PETSc::16: 32.0000
+DEAL:8:PETSc::17: 34.0000
+DEAL:8:Trilinos::16: 32.0000
+DEAL:8:Trilinos::17: 34.0000
+
+
+DEAL:9:PETSc::18: 36.0000
+DEAL:9:PETSc::19: 38.0000
+DEAL:9:Trilinos::18: 36.0000
+DEAL:9:Trilinos::19: 38.0000
+
