@@ -166,9 +166,17 @@ namespace PETScWrappers
     Vector::reinit (const Vector &v,
                     const bool    fast)
     {
-      communicator = v.communicator;
-
-      reinit (communicator, v.size(), v.local_size(), fast);
+      if (v.has_ghost_elements())
+        {
+          reinit (v.locally_owned_elements(), v.ghost_indices, v.communicator);
+          if (!fast)
+            {
+              int ierr = VecSet(vector, 0.0);
+              AssertThrow (ierr == 0, ExcPETScError(ierr));
+            }
+        }
+      else
+        reinit (communicator, v.size(), v.local_size(), fast);
     }
 
 
