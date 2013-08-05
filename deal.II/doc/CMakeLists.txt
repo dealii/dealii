@@ -15,17 +15,18 @@
 ## ---------------------------------------------------------------------
 
 
-#
-# Required packages for the document generation:
-#
-FIND_PACKAGE(Perl)
-FIND_PACKAGE(Doxygen)
 
 
 #
 # Set up all necessary bits for the documentation
 #
 IF(DEAL_II_COMPONENT_DOCUMENTATION)
+
+  #
+  # Required packages for the document generation:
+  #
+  FIND_PACKAGE(Perl)
+  FIND_PACKAGE(Doxygen)
 
   #
   # Do we have all necessary dependencies?
