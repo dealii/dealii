@@ -941,7 +941,7 @@ public:
 
   /**
    * Return a reference to the underlying
-   * BlockIndices data of the rows.
+   * BlockIndices data of the columns.
    */
   const BlockIndices &get_column_indices () const;
 
