@@ -159,6 +159,11 @@ namespace PETScWrappers
       SparseMatrix ();
 
       /**
+       * Destructor to free the PETSc object.
+       */
+      ~SparseMatrix ();
+
+      /**
        * Create a sparse matrix of
        * dimensions @p m times @p n, with
        * an initial guess of @p
