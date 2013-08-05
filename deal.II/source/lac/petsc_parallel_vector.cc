@@ -194,6 +194,14 @@ namespace PETScWrappers
                     const IndexSet &ghost,
                     const MPI_Comm     &comm)
     {
+      int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      ierr = VecDestroy (vector);
+#else
+      ierr = VecDestroy (&vector);
+#endif
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
       communicator = comm;
 
       Assert(local.is_contiguous(), ExcNotImplemented());
@@ -215,6 +223,14 @@ namespace PETScWrappers
     Vector::reinit (const IndexSet &local,
                     const MPI_Comm &comm)
     {
+      int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      ierr = VecDestroy (vector);
+#else
+      ierr = VecDestroy (&vector);
+#endif
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
       communicator = comm;
 
       Assert(local.is_contiguous(), ExcNotImplemented());

@@ -594,9 +594,17 @@ namespace PETScWrappers
           // Vector x,v;x=v;
           // we skip the code below and create a simple serial vector of
           // length 0
+
+          int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+          ierr = VecDestroy (vector);
+#else
+          ierr = VecDestroy (&vector);
+#endif
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+
           const int n = 0;
-          const int ierr
-                  = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
+          ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
           ghosted = false;
           ghost_indices.clear();
