@@ -413,6 +413,11 @@ public:
   BlockMatrixBase ();
 
   /**
+   * Destructor.
+   */
+  ~BlockMatrixBase ();
+
+  /**
    * Copy the given matrix to this
    * one.  The operation throws an
    * error if the sparsity patterns
@@ -1736,6 +1741,12 @@ inline
 BlockMatrixBase<MatrixType>::BlockMatrixBase ()
 {}
 
+template <typename MatrixType>
+inline
+BlockMatrixBase<MatrixType>::~BlockMatrixBase ()
+{
+  clear ();
+}
 
 
 template <class MatrixType>
