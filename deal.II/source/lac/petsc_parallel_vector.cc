@@ -39,6 +39,7 @@ namespace PETScWrappers
       const int ierr
         = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
+      ghosted = false;
     }
 
 

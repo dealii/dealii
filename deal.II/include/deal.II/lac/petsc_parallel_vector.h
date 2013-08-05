@@ -588,10 +588,30 @@ namespace PETScWrappers
     Vector &
     Vector::operator = (const Vector &v)
     {
+      if (v.size()==0)
+        {
+          // this happens if v has not been initialized to something useful:
+          // Vector x,v;x=v;
+          // we skip the code below and create a simple serial vector of
+          // length 0
+          const int n = 0;
+          const int ierr
+                  = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ghosted = false;
+          ghost_indices.clear();
+          return *this;
+        }
+
       // if the vectors have different sizes,
       // then first resize the present one
       if (size() != v.size())
-        reinit (v.communicator, v.size(), v.local_size(), true);
+        {
+          if (v.has_ghost_elements())
+            reinit( v.locally_owned_elements(), v.ghost_indices, v.communicator);
+          else
+            reinit (v.communicator, v.size(), v.local_size(), true);
+        }
 
       const int ierr = VecCopy (v.vector, vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));

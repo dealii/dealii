@@ -44,6 +44,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>
+  Fixed: various fixes with assignment and reinit of PETScWrappers::MPI::Vector.
+  <br>
+  (Timo Heister, 2013/08/05)
+  </li>
+
   <li>Fixed: An assertion wrongly triggered in
   DoFTools::make_hanging_node_constraints when used with a particular
   combination of FESystem elements containing FE_Nothing. This is now fixed.
