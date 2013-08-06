@@ -45,6 +45,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: The various block matrix classes are all derived from BlockMatrixBase
+  which had race conditions when the set() or add() functions were called from
+  different threads. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/08/05)
+  </li>
+
+  <li>
   Fixed: various fixes with assignment and reinit of PETScWrappers::MPI::Vector.
   <br>
   (Timo Heister, 2013/08/05)
