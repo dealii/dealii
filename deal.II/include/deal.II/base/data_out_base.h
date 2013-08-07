@@ -1222,11 +1222,21 @@ public:
      */
     unsigned int cycle;
 
+   /**
+     * Flag to determine whether the current
+     * date and time shall be printed as a comment
+     * in the file's second line.
+     *
+     * Default is <tt>true</tt>.
+     */
+    bool print_date_and_time;
+
     /**
      * Default constructor.
      */
-    VtkFlags (const double       time  = std::numeric_limits<double>::min(),
-              const unsigned int cycle = std::numeric_limits<unsigned int>::min());
+    VtkFlags (const double       time   = std::numeric_limits<double>::min(),
+              const unsigned int cycle  = std::numeric_limits<unsigned int>::min(),
+              const bool print_date_and_time = true);
 
     /**
      * Declare the flags with name
@@ -1848,7 +1858,7 @@ public:
    * DataOutInterface::write_vtu_footer() and DataOutInterface::write_vtu_main()
    * by DataOutBase::write_vtu().
    */
-  static void write_vtu_header (std::ostream &out);
+  static void write_vtu_header (std::ostream &out, const VtkFlags &flags);
 
   /**
    * This writes the footer for the xml based vtu file format. This

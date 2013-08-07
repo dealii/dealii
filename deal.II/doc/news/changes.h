@@ -45,6 +45,16 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: DataOutBase::VtkFlags now has a flag
+  DataOutBase::VtkFlags::print_date_and_time that can be used to suppress output
+  of date and time in output files. This is useful in test suites where a newer
+  run at a different time produces differences against previously stored files,
+  even though the actual data is exactly the same.
+  <br>
+  (Oleh Krehel, 2013/08/06)
+  </li>
+
+  <li>
   Fixed: The various block matrix classes are all derived from BlockMatrixBase
   which had race conditions when the set() or add() functions were called from
   different threads. This is now fixed.
