@@ -606,8 +606,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
       for (unsigned int i=0; i<this->dofs_per_face; ++i)
         sum += interpolation_matrix(j,i);
 
-      Assert (std::fabs(sum-1) < 2e-13*this->degree*(dim-1),
-              ExcInternalError());
+      Assert (std::fabs(sum-1) < eps, ExcInternalError());
     }
 }
 
@@ -688,8 +687,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
           for (unsigned int i=0; i<this->dofs_per_face; ++i)
             sum += interpolation_matrix(j,i);
 
-          Assert (std::fabs(sum-1) < 2e-13*this->degree*dim,
-                  ExcInternalError());
+          Assert (std::fabs(sum-1) < eps, ExcInternalError());
         }
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != 0)

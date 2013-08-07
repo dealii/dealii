@@ -162,7 +162,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 
   // Rule of thumb for FP accuracy, that can be expected for a given
   // polynomial degree.  This value is used to cut off values close to zero.
-  const double eps = 2e-13*this->degree*(dim-1);
+  const double eps = 2e-13*(this->degree+1)*(dim-1);
 
   // compute the interpolation matrix by simply taking the value at the
   // support points.
@@ -195,8 +195,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
       for (unsigned int i=0; i<this->dofs_per_face; ++i)
         sum += interpolation_matrix(j,i);
 
-      Assert (std::fabs(sum-1) < 2e-13*this->degree*(dim-1),
-              ExcInternalError());
+      Assert (std::fabs(sum-1) < eps, ExcInternalError());
     }
 }
 
@@ -238,7 +237,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
       // Rule of thumb for FP accuracy, that can be expected for a given
       // polynomial degree.  This value is used to cut off values close to
       // zero.
-      const double eps = 2e-13*this->degree*(dim-1);
+      const double eps = 2e-13*(this->degree+1)*(dim-1);
 
       // compute the interpolation matrix by simply taking the value at the
       // support points.
@@ -273,8 +272,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
           for (unsigned int i=0; i<this->dofs_per_face; ++i)
             sum += interpolation_matrix(j,i);
 
-          Assert (std::fabs(sum-1) < 2e-13*this->degree*(dim-1),
-                  ExcInternalError());
+          Assert (std::fabs(sum-1) < eps, ExcInternalError());
         }
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != 0)
