@@ -1302,7 +1302,9 @@ private:
      * anything.
      */
     TemporaryData & operator = (const TemporaryData &)
-    {}
+    {
+      return *this;
+    }
   };
 
   /**
