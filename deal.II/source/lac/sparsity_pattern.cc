@@ -1195,6 +1195,7 @@ template void SparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const
 template void SparsityPattern::copy_from<float> (const FullMatrix<float> &, bool);
 template void SparsityPattern::copy_from<double> (const FullMatrix<double> &, bool);
 
+template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &);
 template void SparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &);
 template void SparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &);
 template void SparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const CompressedSimpleSparsityPattern &);

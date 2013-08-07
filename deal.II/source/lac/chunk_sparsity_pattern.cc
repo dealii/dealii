@@ -265,22 +265,26 @@ namespace internal
     // distinguish between compressed sparsity types that define row_begin()
     // and SparsityPattern that uses begin() as iterator type
     template <typename Sparsity>
-    void copy_row (const Sparsity       &csp,
-                   const size_type       row,
-                   ChunkSparsityPattern &dst)
+    void copy_row (const Sparsity                  &csp,
+                   const size_type                  row,
+                   const unsigned int               chunk_size,
+                   CompressedSimpleSparsityPattern &dst)
     {
       typename Sparsity::row_iterator col_num = csp.row_begin (row);
+      const size_type reduced_row = row/chunk_size;
       for (; col_num != csp.row_end (row); ++col_num)
-        dst.add (row, *col_num);
+        dst.add (reduced_row, *col_num/chunk_size);
     }
 
-    void copy_row (const SparsityPattern &csp,
-                   const size_type        row,
-                   ChunkSparsityPattern  &dst)
+    void copy_row (const SparsityPattern           &csp,
+                   const size_type                  row,
+                   const unsigned int               chunk_size,
+                   CompressedSimpleSparsityPattern &dst)
     {
       SparsityPattern::iterator col_num = csp.begin (row);
+      const size_type reduced_row = row/chunk_size;
       for (; col_num != csp.end (row); ++col_num)
-        dst.add (row, col_num->column());
+        dst.add (reduced_row, col_num->column()/chunk_size);
     }
   }
 }
@@ -293,22 +297,27 @@ ChunkSparsityPattern::copy_from (const SparsityType &csp,
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
-  // count number of entries per row, then initialize the underlying sparsity
-  // pattern
-  std::vector<size_type> entries_per_row (csp.n_rows(), 0);
+  // simple case: just use the other sparsity pattern
+  if (chunk_size == 1)
+    {
+      sparsity_pattern.copy_from (csp);
+      return;
+    }
+
+  // create a temporary compressed sparsity pattern that collects all entries
+  // from the input sparsity pattern and then initialize the underlying small
+  // sparsity pattern
+  this->chunk_size = chunk_size;
+  rows = csp.n_rows();
+  cols = csp.n_cols();
+  const size_type m_chunks = (csp.n_rows()+chunk_size-1) / chunk_size,
+                  n_chunks = (csp.n_cols()+chunk_size-1) / chunk_size;
+  CompressedSimpleSparsityPattern temporary_sp(m_chunks, n_chunks);
+
   for (size_type row = 0; row<csp.n_rows(); ++row)
-    entries_per_row[row] = csp.row_length(row);
+    internal::copy_row(csp, row, chunk_size, temporary_sp);
 
-  reinit (csp.n_rows(), csp.n_cols(),
-          entries_per_row,
-          chunk_size);
-
-  // then actually fill it
-  for (size_type row = 0; row<csp.n_rows(); ++row)
-    internal::copy_row(csp, row, *this);
-
-  // finally compress
-  compress ();
+  sparsity_pattern.copy_from (temporary_sp);
 }
 
 

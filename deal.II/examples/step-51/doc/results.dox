@@ -6,6 +6,7 @@ The program writes convergence tables to the screen while running:
 
 @code
 Q1 elements:
+cells dofs      val L2        grad L2      val L2-post   
    16    80 4.570e+00    - 1.221e+01    - 4.333e+00    -
    36   168 1.869e+00 2.20 7.299e+00 1.27 1.734e+00 2.26
    64   288 7.177e-01 3.33 4.218e+00 1.91 2.538e-01 6.68
@@ -18,6 +19,7 @@ Q1 elements:
  9216 37248 4.690e-03 1.97 3.228e-02 1.97 1.600e-04 2.96
 
 Q3 elements:
+cells dofs      val L2        grad L2      val L2-post   
    16   160 2.398e-01    - 1.873e+00    - 1.354e-01    -
    36   336 5.843e-02 3.48 5.075e-01 3.22 1.882e-02 4.87
    64   576 3.466e-02 1.82 2.534e-01 2.41 4.326e-03 5.11

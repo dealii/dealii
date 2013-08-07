@@ -339,21 +339,13 @@ Step51<dim>::setup_system ()
 
   constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler, constraints);
-  std::map<unsigned int,double> boundary_values;
   typename FunctionMap<dim>::type boundary_functions;
   Solution<dim> solution;
   boundary_functions[0] = &solution;
   VectorTools::project_boundary_values (mapping, dof_handler,
                                         boundary_functions,
                                         QGauss<dim-1>(fe.degree+1),
-                                        boundary_values);
-  for (std::map<unsigned int,double>::iterator it = boundary_values.begin();
-       it != boundary_values.end(); ++it)
-    if (constraints.is_constrained(it->first) == false)
-      {
-        constraints.add_line(it->first);
-        constraints.set_inhomogeneity(it->first, it->second);
-      }
+                                        constraints);
   constraints.close ();
 
   {
