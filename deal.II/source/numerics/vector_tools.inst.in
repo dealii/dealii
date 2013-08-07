@@ -577,6 +577,22 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
          std::map<types::global_dof_index,double>&, 
          std::vector<unsigned int>);
 
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const Mapping<deal_II_dimension>     &,
+         const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         ConstraintMatrix&, std::vector<unsigned int>);
+
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         ConstraintMatrix&, 
+         std::vector<unsigned int>);
+
 
 
 #if deal_II_dimension != 1
