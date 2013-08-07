@@ -1023,9 +1023,9 @@ DEAL::components=1
 DEAL::blocks=1:[4]->4
 DEAL::degree=0
 DEAL::conformity= L2
-DEAL::unit_support_points=0
+DEAL::unit_support_points=4
 DEAL::unit_face_support_points=1
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=4
 DEAL::generalized_face_support_points=1
 DEAL::face_to_equivalent_cell_index: 0
 DEAL::face_to_cell_index: 0
@@ -1054,9 +1054,9 @@ DEAL::components=1
 DEAL::blocks=1:[8]->8
 DEAL::degree=1
 DEAL::conformity= L2
-DEAL::unit_support_points=0
+DEAL::unit_support_points=8
 DEAL::unit_face_support_points=2
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=8
 DEAL::generalized_face_support_points=2
 DEAL::face_to_equivalent_cell_index: 0 1
 DEAL::face_to_cell_index: 0 1
@@ -1085,9 +1085,9 @@ DEAL::components=1
 DEAL::blocks=1:[16]->16
 DEAL::degree=3
 DEAL::conformity= L2
-DEAL::unit_support_points=0
+DEAL::unit_support_points=16
 DEAL::unit_face_support_points=4
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=16
 DEAL::generalized_face_support_points=4
 DEAL::face_to_equivalent_cell_index: 0 1 2 3
 DEAL::face_to_cell_index: 0 1 2 3
@@ -2350,9 +2350,9 @@ DEAL::components=1
 DEAL::blocks=1:[6]->6
 DEAL::degree=0
 DEAL::conformity= L2
-DEAL::unit_support_points=0
+DEAL::unit_support_points=6
 DEAL::unit_face_support_points=1
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=6
 DEAL::generalized_face_support_points=1
 DEAL::face_to_equivalent_cell_index: 0
 DEAL::face_to_cell_index: 0
@@ -2385,9 +2385,9 @@ DEAL::components=1
 DEAL::blocks=1:[24]->24
 DEAL::degree=1
 DEAL::conformity= L2
-DEAL::unit_support_points=0
+DEAL::unit_support_points=24
 DEAL::unit_face_support_points=4
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=24
 DEAL::generalized_face_support_points=4
 DEAL::face_to_equivalent_cell_index: 0 1 2 3
 DEAL::face_to_cell_index: 0 1 2 3
@@ -2420,9 +2420,9 @@ DEAL::components=1
 DEAL::blocks=1:[96]->96
 DEAL::degree=3
 DEAL::conformity= L2
-DEAL::unit_support_points=0
+DEAL::unit_support_points=96
 DEAL::unit_face_support_points=16
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=96
 DEAL::generalized_face_support_points=16
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 DEAL::face_to_cell_index: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
