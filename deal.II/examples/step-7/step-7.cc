@@ -950,7 +950,7 @@ namespace Step7
   //
   // For this, we will use the following convention: Faces belonging to Gamma1
   // will have the boundary indicator <code>0</code> (which is the default, so
-  // we don't have to set it explicitely), and faces belonging to Gamma2 will
+  // we don't have to set it explicitly), and faces belonging to Gamma2 will
   // use <code>1</code> as boundary indicator.  To set these values, we loop
   // over all cells, then over all faces of a given cell, check whether it is
   // part of the boundary that we want to denote by Gamma2, and if so set its
