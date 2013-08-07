@@ -22,7 +22,6 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/multigrid/mg_base.h>
