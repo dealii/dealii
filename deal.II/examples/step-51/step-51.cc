@@ -32,17 +32,19 @@
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
@@ -270,7 +272,7 @@ private:
   void assemble_system (const bool reconstruct_trace = false);
   void solve ();
   void postprocess ();
-  void refine_mesh ();
+  void refine_grid (const unsigned int cylce);
   void output_results (const unsigned int cycle);
 
   Triangulation<dim>   triangulation;
@@ -652,8 +654,8 @@ Step51<dim>::postprocess()
   const unsigned int n_q_points = quadrature.size();
   std::vector<double> u_values(n_q_points);
   std::vector<Tensor<1,dim> > u_gradients(n_q_points);
-  FEValuesExtractors::Vector gradients(0);
-  FEValuesExtractors::Scalar values(dim);
+  FEValuesExtractors::Vector fluxes(0);
+  FEValuesExtractors::Scalar scalar(dim);
   FEValues<dim> fe_values_local(mapping, fe_local, quadrature, update_values);
   FullMatrix<double> cell_matrix(fe_u_post.dofs_per_cell,
                                  fe_u_post.dofs_per_cell);
@@ -669,8 +671,8 @@ Step51<dim>::postprocess()
       fe_values.reinit(cell);
       fe_values_local.reinit(cell_loc);
 
-      fe_values_local[values].get_function_values(solution_local, u_values);
-      fe_values_local[gradients].get_function_values(solution_local, u_gradients);
+      fe_values_local[scalar].get_function_values(solution_local, u_values);
+      fe_values_local[fluxes].get_function_values(solution_local, u_gradients);
       for (unsigned int i=1; i<fe_u_post.dofs_per_cell; ++i)
         {
           for (unsigned int j=0; j<fe_u_post.dofs_per_cell; ++j)
@@ -757,31 +759,79 @@ void Step51<dim>::output_results (const unsigned int cycle)
 
 
 
+template <int dim>
+void Step51<dim>::refine_grid (const unsigned int cycle)
+{
+  const bool do_cube = true;
+  if (cycle == 0)
+    {
+      if (!do_cube)
+        {
+          GridGenerator::hyper_ball (triangulation);
+          static const HyperBallBoundary<dim> boundary;
+          triangulation.set_boundary(0, boundary);
+          triangulation.refine_global(6-2*dim);
+        }
+      else
+        GridGenerator::subdivided_hyper_cube (triangulation, 2, -1, 1);
+    }
+  else
+    switch (refinement_mode)
+      {
+      case global_refinement:
+        {
+          if (do_cube)
+            {
+              triangulation.clear();
+              GridGenerator::subdivided_hyper_cube (triangulation, 2+(cycle%2), -1, 1);
+              triangulation.refine_global(3-dim+cycle/2);
+            }
+          else
+            triangulation.refine_global (1);
+          break;
+        }
+
+      case adaptive_refinement:
+      {
+        Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+
+        FEValuesExtractors::Scalar scalar(dim);
+        typename FunctionMap<dim>::type neumann_boundary;
+        KellyErrorEstimator<dim>::estimate (dof_handler_local,
+                                            QGauss<dim-1>(3),
+                                            neumann_boundary,
+                                            solution_local,
+                                            estimated_error_per_cell,
+                                            fe_local.component_mask(scalar));
+
+        GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+                                                         estimated_error_per_cell,
+                                                         0.3, 0.);
+
+        triangulation.execute_coarsening_and_refinement ();
+
+        break;
+      }
+
+      default:
+      {
+        Assert (false, ExcNotImplemented());
+      }
+      }
+  }
+
+
+
+
 
 template <int dim>
 void Step51<dim>::run ()
 {
-  const bool do_cube = true;
-  if (!do_cube)
-    {
-      GridGenerator::hyper_ball (triangulation);
-      static const HyperBallBoundary<dim> boundary;
-      triangulation.set_boundary(0, boundary);
-      triangulation.refine_global(6-2*dim);
-    }
-
   for (unsigned int cycle=0; cycle<10; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
-
-      if (do_cube)
-        {
-          triangulation.clear();
-          GridGenerator::subdivided_hyper_cube (triangulation, 2+(cycle%2), -1, 1);
-          triangulation.refine_global(3-dim+cycle/2);
-        }
-      else triangulation.refine_global(1);
-
+      
+      refine_grid (cycle);
       setup_system ();
       assemble_system (false);
       solve ();

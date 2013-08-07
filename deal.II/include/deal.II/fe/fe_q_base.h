@@ -62,13 +62,11 @@ public:
   /**
    * Return the matrix interpolating from a face of of one element to the face
    * of the neighboring element.  The size of the matrix is then
-   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>.
-   *
-   * Derived elements will have to implement this function. They may only
-   * provide interpolation matrices for certain source finite elements, for
-   * example those from the same family. If they don't implement interpolation
-   * from a given element, then they must throw an exception of type
-   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. The
+   * FE_Q element family only provides interpolation matrices for elements of
+   * the same type and FE_Nothing. For all other elements, an exception of
+   * type FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is
+   * thrown.
    */
   virtual void
   get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
@@ -77,13 +75,11 @@ public:
   /**
    * Return the matrix interpolating from a face of of one element to the face
    * of the neighboring element.  The size of the matrix is then
-   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>.
-   *
-   * Derived elements will have to implement this function. They may only
-   * provide interpolation matrices for certain source finite elements, for
-   * example those from the same family. If they don't implement interpolation
-   * from a given element, then they must throw an exception of type
-   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. The
+   * FE_Q element family only provides interpolation matrices for elements of
+   * the same type and FE_Nothing. For all other elements, an exception of
+   * type FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is
+   * thrown.
    */
   virtual void
   get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,

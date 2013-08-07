@@ -754,7 +754,7 @@ hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
     {
       // dofs are located along lines, so two dofs are identical if they are
       // located at identical positions. if we had only equidistant points, we
-      // could simple check for similarity like (i+1)*q == (j+1)*p, but we
+      // could simply check for similarity like (i+1)*q == (j+1)*p, but we
       // might have other support points (e.g. Gauss-Lobatto
       // points). Therefore, read the points in unit_support_points for the
       // first coordinate direction. We take the lexicographic ordering of the
