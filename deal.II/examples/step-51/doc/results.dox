@@ -1,0 +1,42 @@
+<h1>Results</h1>
+
+
+The program writes convergence tables to the screen while running:
+
+
+@code
+Q1 elements:
+   16    80 4.570e+00    - 1.221e+01    - 4.333e+00    -
+   36   168 1.869e+00 2.20 7.299e+00 1.27 1.734e+00 2.26
+   64   288 7.177e-01 3.33 4.218e+00 1.91 2.538e-01 6.68
+  144   624 2.729e-01 2.38 1.867e+00 2.01 6.110e-02 3.51
+  256  1088 1.493e-01 2.10 1.046e+00 2.01 2.878e-02 2.62
+  576  2400 6.964e-02 1.88 4.847e-01 1.90 9.202e-03 2.81
+ 1024  4224 4.018e-02 1.91 2.785e-01 1.93 4.027e-03 2.87
+ 2304  9408 1.831e-02 1.94 1.264e-01 1.95 1.236e-03 2.91
+ 4096 16640 1.043e-02 1.96 7.185e-02 1.96 5.306e-04 2.94
+ 9216 37248 4.690e-03 1.97 3.228e-02 1.97 1.600e-04 2.96
+
+Q3 elements:
+   16   160 2.398e-01    - 1.873e+00    - 1.354e-01    -
+   36   336 5.843e-02 3.48 5.075e-01 3.22 1.882e-02 4.87
+   64   576 3.466e-02 1.82 2.534e-01 2.41 4.326e-03 5.11
+  144  1248 8.297e-03 3.53 5.925e-02 3.58 6.330e-04 4.74
+  256  2176 2.254e-03 4.53 1.636e-02 4.47 1.403e-04 5.24
+  576  4800 4.558e-04 3.94 3.278e-03 3.96 1.844e-05 5.01
+ 1024  8448 1.471e-04 3.93 1.052e-03 3.95 4.378e-06 5.00
+ 2304 18816 2.956e-05 3.96 2.104e-04 3.97 5.751e-07 5.01
+ 4096 33280 9.428e-06 3.97 6.697e-05 3.98 1.362e-07 5.01
+ 9216 74496 1.876e-06 3.98 1.330e-05 3.99 1.817e-08 4.97
+@endcode
+
+
+One can see the error reduction upon grid refinement, and for the cases where
+global refinement was performed, also the convergence rates can be seen. The
+quadratic convergence rates of Q1 elements in the $L_2$ norm for both the
+scalar variable and the gradient variable can clearly be seen, as is the cubic
+rate for the postprocessed scalar variable in the $L_2$ norm. Likewise, the
+scalar variable and gradient for Q3 elements converge at fourth order and the
+postprocessed scalar variable at fifth order.
+
+The same convergence rates are observed in 3d.

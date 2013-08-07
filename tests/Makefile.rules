@@ -26,7 +26,7 @@ MAIL ?= mail
 
 # this lets you overwrite the diff tool for comparisons.
 # recommended environment setting:
-#   export DEAL_II_DIFF="numdiff -a 1e-6 -q"
+#   export DEAL_II_DIFF="numdiff -a 1e-6 -q -s ' \t\n:'"
 DEAL_II_DIFF ?= diff
 
 PLATFORM = $(TARGET)+$(GXX-VERSION:intel_%=%)

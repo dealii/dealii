@@ -1,0 +1,5 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This tutorial program presents the implementation of a hybridizable
+discontinuous Galkerin method for the convection-diffusion equation.

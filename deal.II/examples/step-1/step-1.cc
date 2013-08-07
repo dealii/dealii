@@ -93,7 +93,7 @@ void second_grid ()
   // We then fill it with a ring domain. The center of the ring shall be the
   // point (1,0), and inner and outer radius shall be 0.5 and 1. The number of
   // circumferential cells could be adjusted automatically by this function,
-  // but we choose to set it explicitely to 10 as the last argument:
+  // but we choose to set it explicitly to 10 as the last argument:
   const Point<2> center (1,0);
   const double inner_radius = 0.5,
                outer_radius = 1.0;

@@ -2692,39 +2692,15 @@ namespace DoFTools
                         // another possibility is what happens in crash_13.
                         // there, we have FESystem(FE_Q(1),FE_DGQ(0)) vs.
                         // FESystem(FE_Q(1),FE_DGQ(1)). neither of them
-                        // dominates the other. the point is that it
-                        // doesn't matter, since hopefully for this case,
-                        // both sides' dofs should have been unified.
-                        //
-                        // make sure this is actually true. this actually
-                        // only matters, of course, if either of the two
-                        // finite elements actually do have dofs on the
-                        // face
-                        if ((cell->get_fe().dofs_per_face != 0)
-                            ||
-                            (cell->neighbor(face)->get_fe().dofs_per_face != 0))
-                          {
-                            Assert (cell->get_fe().dofs_per_face
-                                    ==
-                                    cell->neighbor(face)->get_fe().dofs_per_face,
-                                    ExcNotImplemented());
-
-                            // (ab)use the master and slave dofs arrays for
-                            // a moment here
-                            master_dofs.resize (cell->get_fe().dofs_per_face);
-                            cell->face(face)
-                            ->get_dof_indices (master_dofs,
-                                               cell->active_fe_index ());
-
-                            slave_dofs.resize (cell->neighbor(face)->get_fe().dofs_per_face);
-                            cell->face(face)
-                            ->get_dof_indices (slave_dofs,
-                                               cell->neighbor(face)->active_fe_index ());
-
-                            for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
-                              AssertDimension (master_dofs[i], slave_dofs[i]);
-                          }
-
+                        // dominates the other.
+			//
+			// a final possibility is that we have something like
+			// FESystem(FE_Q(1),FE_Q(1)) vs
+			// FESystem(FE_Q(1),FE_Nothing()), see
+			// hp/fe_nothing_18/19.
+			//
+			// in any case, the point is that it doesn't
+                        // matter. there is nothing to do here.
                         break;
                       }
 

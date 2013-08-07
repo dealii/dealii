@@ -84,7 +84,7 @@ other time dependent problems, we find that the character of a
 solution changes as time progresses. For example, for the wave
 equation, we may have a single wave travelling through the domain,
 where the solution is smooth or even constant in front of and behind
-the wave &mdash& adaptivity would be really useful for such cases, but the
+the wave &mdash; adaptivity would be really useful for such cases, but the
 key is that the area where we need to refine the mesh changes from
 time step to time step!
 

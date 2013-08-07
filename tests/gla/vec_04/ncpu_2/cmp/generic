@@ -1,0 +1,19 @@
+
+DEAL:0:PETSc::numproc=2
+DEAL:0:PETSc::ghosted value: 2.00000
+DEAL:0:PETSc::ghosted value: 2.00000
+DEAL:0:PETSc::ghosted value: 2.00000
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=2
+DEAL:0:Trilinos::ghosted value: 2.00000
+DEAL:0:Trilinos::ghosted value: 2.00000
+DEAL:0:Trilinos::ghosted value: 2.00000
+DEAL:0:Trilinos::OK
+
+DEAL:1:PETSc::ghosted value: 2.00000
+DEAL:1:PETSc::ghosted value: 2.00000
+DEAL:1:PETSc::ghosted value: 2.00000
+DEAL:1:Trilinos::ghosted value: 2.00000
+DEAL:1:Trilinos::ghosted value: 2.00000
+DEAL:1:Trilinos::ghosted value: 2.00000
+

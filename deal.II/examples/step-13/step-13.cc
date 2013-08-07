@@ -170,7 +170,7 @@ namespace Step13
     // macros. We use this mechanism here again.
     //
     // From this, the actual declaration of this class should be evident. Note
-    // that of course even if we do not list a destructor explicitely, an
+    // that of course even if we do not list a destructor explicitly, an
     // implicit destructor is generated from the compiler, and it is virtual
     // just as the one of the base class.
     template <int dim>

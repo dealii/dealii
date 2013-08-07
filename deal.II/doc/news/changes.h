@@ -45,7 +45,28 @@ inconvenience this causes.
 
 <ol>
   <li>
-  add has_ghost_elements() for PETScWrappers::MPI::BlockVector and
+  Fixed: The various block matrix classes are all derived from BlockMatrixBase
+  which had race conditions when the set() or add() functions were called from
+  different threads. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/08/05)
+  </li>
+
+  <li>
+  Fixed: various fixes with assignment and reinit of PETScWrappers::MPI::Vector.
+  <br>
+  (Timo Heister, 2013/08/05)
+  </li>
+
+  <li>Fixed: An assertion wrongly triggered in
+  DoFTools::make_hanging_node_constraints when used with a particular
+  combination of FESystem elements containing FE_Nothing. This is now fixed.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2013/08/01)
+  </li>
+
+  <li>
+  New: Add has_ghost_elements() for PETScWrappers::MPI::BlockVector and
   TrilinosWrappers::MPI::BlockVector.
   <br>
   (Timo Heister, 2013/08/01)

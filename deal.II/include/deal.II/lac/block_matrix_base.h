@@ -20,6 +20,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/memory_consumption.h>
@@ -411,6 +412,11 @@ public:
    * Default constructor.
    */
   BlockMatrixBase ();
+
+  /**
+   * Destructor.
+   */
+  ~BlockMatrixBase ();
 
   /**
    * Copy the given matrix to this
@@ -936,7 +942,7 @@ public:
 
   /**
    * Return a reference to the underlying
-   * BlockIndices data of the rows.
+   * BlockIndices data of the columns.
    */
   const BlockIndices &get_column_indices () const;
 
@@ -1241,30 +1247,72 @@ protected:
 
 
 private:
-  /**
-   * Temporary vector for counting the
-   * elements written into the
-   * individual blocks when doing a
-   * collective add or set.
-   */
-  std::vector<size_type> counter_within_block;
 
   /**
-   * Temporary vector for column
-   * indices on each block when writing
-   * local to global data on each
-   * sparse matrix.
+   * A structure containing some fields used by the
+   * set() and add() functions that is used to pre-sort
+   * the input fields. Since one can reasonably expect
+   * to call set() and add() from multiple threads at once
+   * as long as the matrix indices that are touched are
+   * disjoint, these temporary data fields need to be
+   * guarded by a mutex; the structure therefore contains such
+   * a mutex as a member variable.
    */
-  std::vector<std::vector<size_type> > column_indices;
+  struct TemporaryData
+  {
+    /**
+     * Temporary vector for counting the
+     * elements written into the
+     * individual blocks when doing a
+     * collective add or set.
+     */
+    std::vector<size_type> counter_within_block;
+
+    /**
+     * Temporary vector for column
+     * indices on each block when writing
+     * local to global data on each
+     * sparse matrix.
+     */
+    std::vector<std::vector<size_type> > column_indices;
+
+    /**
+     * Temporary vector for storing the
+     * local values (they need to be
+     * reordered when writing local to
+     * global).
+     */
+    std::vector<std::vector<double> > column_values;
+
+    /**
+     * A mutex variable used to guard access to the member
+     * variables of this structure;
+     */
+    Threads::Mutex mutex;
+
+    /**
+     * Copy operator. This is needed because the default copy
+     * operator of this class is deleted (since Threads::Mutex is
+     * not copyable) and hence the default copy operator of the
+     * enclosing class is also deleted.
+     *
+     * The implementation here simply does nothing -- TemporaryData
+     * objects are just scratch objects that are resized at the
+     * beginning of their use, so there is no point actually copying
+     * anything.
+     */
+    TemporaryData & operator = (const TemporaryData &)
+    {}
+  };
 
   /**
-   * Temporary vector for storing the
-   * local values (they need to be
-   * reordered when writing local to
-   * global).
+   * A set of scratch arrays that can be used by the add()
+   * and set() functions that take pointers to data to
+   * pre-sort indices before use. Access from multiple threads
+   * is synchronized via the mutex variable that is part of the
+   * structure.
    */
-  std::vector<std::vector<double> > column_values;
-
+  TemporaryData temporary_data;
 
   /**
    * Make the iterator class a
@@ -1736,6 +1784,12 @@ inline
 BlockMatrixBase<MatrixType>::BlockMatrixBase ()
 {}
 
+template <typename MatrixType>
+inline
+BlockMatrixBase<MatrixType>::~BlockMatrixBase ()
+{
+  clear ();
+}
 
 
 template <class MatrixType>
@@ -1761,9 +1815,10 @@ BlockMatrixBase<MatrixType>::memory_consumption () const
     MemoryConsumption::memory_consumption(row_block_indices)+
     MemoryConsumption::memory_consumption(column_block_indices)+
     MemoryConsumption::memory_consumption(sub_objects)+
-    MemoryConsumption::memory_consumption(counter_within_block)+
-    MemoryConsumption::memory_consumption(column_indices)+
-    MemoryConsumption::memory_consumption(column_values);
+    MemoryConsumption::memory_consumption(temporary_data.counter_within_block)+
+    MemoryConsumption::memory_consumption(temporary_data.column_indices)+
+    MemoryConsumption::memory_consumption(temporary_data.column_values)+
+    MemoryConsumption::memory_consumption(temporary_data.mutex);
 
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
@@ -1965,12 +2020,16 @@ BlockMatrixBase<MatrixType>::set (const size_type  row,
 {
   prepare_set_operation();
 
+  // lock access to the temporary data structure to
+  // allow multiple threads to call this function concurrently
+  Threads::Mutex::ScopedLock lock (temporary_data.mutex);
+
   // Resize scratch arrays
-  if (column_indices.size() < this->n_block_cols())
+  if (temporary_data.column_indices.size() < this->n_block_cols())
     {
-      column_indices.resize (this->n_block_cols());
-      column_values.resize (this->n_block_cols());
-      counter_within_block.resize (this->n_block_cols());
+      temporary_data.column_indices.resize (this->n_block_cols());
+      temporary_data.column_values.resize (this->n_block_cols());
+      temporary_data.counter_within_block.resize (this->n_block_cols());
     }
 
   // Resize sub-arrays to n_cols. This
@@ -1983,19 +2042,19 @@ BlockMatrixBase<MatrixType>::set (const size_type  row,
   // whether the size of one is large
   // enough before actually going
   // through all of them.
-  if (column_indices[0].size() < n_cols)
+  if (temporary_data.column_indices[0].size() < n_cols)
     {
       for (unsigned int i=0; i<this->n_block_cols(); ++i)
         {
-          column_indices[i].resize(n_cols);
-          column_values[i].resize(n_cols);
+          temporary_data.column_indices[i].resize(n_cols);
+          temporary_data.column_values[i].resize(n_cols);
         }
     }
 
   // Reset the number of added elements
   // in each block to zero.
   for (unsigned int i=0; i<this->n_block_cols(); ++i)
-    counter_within_block[i] = 0;
+    temporary_data.counter_within_block[i] = 0;
 
   // Go through the column indices to
   // find out which portions of the
@@ -2016,10 +2075,10 @@ BlockMatrixBase<MatrixType>::set (const size_type  row,
       const std::pair<unsigned int, size_type>
       col_index = this->column_block_indices.global_to_local(col_indices[j]);
 
-      const size_type local_index = counter_within_block[col_index.first]++;
+      const size_type local_index = temporary_data.counter_within_block[col_index.first]++;
 
-      column_indices[col_index.first][local_index] = col_index.second;
-      column_values[col_index.first][local_index] = value;
+      temporary_data.column_indices[col_index.first][local_index] = col_index.second;
+      temporary_data.column_values[col_index.first][local_index] = value;
     }
 
 #ifdef DEBUG
@@ -2027,7 +2086,7 @@ BlockMatrixBase<MatrixType>::set (const size_type  row,
   // the right length has been obtained.
   size_type length = 0;
   for (unsigned int i=0; i<this->n_block_cols(); ++i)
-    length += counter_within_block[i];
+    length += temporary_data.counter_within_block[i];
   Assert (length <= n_cols, ExcInternalError());
 #endif
 
@@ -2040,14 +2099,14 @@ BlockMatrixBase<MatrixType>::set (const size_type  row,
   row_index = this->row_block_indices.global_to_local (row);
   for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
     {
-      if (counter_within_block[block_col] == 0)
+      if (temporary_data.counter_within_block[block_col] == 0)
         continue;
 
       block(row_index.first, block_col).set
       (row_index.second,
-       counter_within_block[block_col],
-       &column_indices[block_col][0],
-       &column_values[block_col][0],
+       temporary_data.counter_within_block[block_col],
+       &temporary_data.column_indices[block_col][0],
+       &temporary_data.column_values[block_col][0],
        false);
     }
 }
@@ -2210,12 +2269,14 @@ BlockMatrixBase<MatrixType>::add (const size_type  row,
       return;
     }
 
-  // Resize scratch arrays
-  if (column_indices.size() < this->n_block_cols())
+  // Lock scratch arrays, then resize them
+  Threads::Mutex::ScopedLock lock (temporary_data.mutex);
+
+  if (temporary_data.column_indices.size() < this->n_block_cols())
     {
-      column_indices.resize (this->n_block_cols());
-      column_values.resize (this->n_block_cols());
-      counter_within_block.resize (this->n_block_cols());
+      temporary_data.column_indices.resize (this->n_block_cols());
+      temporary_data.column_values.resize (this->n_block_cols());
+      temporary_data.counter_within_block.resize (this->n_block_cols());
     }
 
   // Resize sub-arrays to n_cols. This
@@ -2228,19 +2289,19 @@ BlockMatrixBase<MatrixType>::add (const size_type  row,
   // whether the size of one is large
   // enough before actually going
   // through all of them.
-  if (column_indices[0].size() < n_cols)
+  if (temporary_data.column_indices[0].size() < n_cols)
     {
       for (unsigned int i=0; i<this->n_block_cols(); ++i)
         {
-          column_indices[i].resize(n_cols);
-          column_values[i].resize(n_cols);
+          temporary_data.column_indices[i].resize(n_cols);
+          temporary_data.column_values[i].resize(n_cols);
         }
     }
 
   // Reset the number of added elements
   // in each block to zero.
   for (unsigned int i=0; i<this->n_block_cols(); ++i)
-    counter_within_block[i] = 0;
+    temporary_data.counter_within_block[i] = 0;
 
   // Go through the column indices to
   // find out which portions of the
@@ -2261,10 +2322,10 @@ BlockMatrixBase<MatrixType>::add (const size_type  row,
       const std::pair<unsigned int, size_type>
       col_index = this->column_block_indices.global_to_local(col_indices[j]);
 
-      const size_type local_index = counter_within_block[col_index.first]++;
+      const size_type local_index = temporary_data.counter_within_block[col_index.first]++;
 
-      column_indices[col_index.first][local_index] = col_index.second;
-      column_values[col_index.first][local_index] = value;
+      temporary_data.column_indices[col_index.first][local_index] = col_index.second;
+      temporary_data.column_values[col_index.first][local_index] = value;
     }
 
 #ifdef DEBUG
@@ -2272,7 +2333,7 @@ BlockMatrixBase<MatrixType>::add (const size_type  row,
   // the right length has been obtained.
   size_type length = 0;
   for (unsigned int i=0; i<this->n_block_cols(); ++i)
-    length += counter_within_block[i];
+    length += temporary_data.counter_within_block[i];
   Assert (length <= n_cols, ExcInternalError());
 #endif
 
@@ -2285,14 +2346,14 @@ BlockMatrixBase<MatrixType>::add (const size_type  row,
   row_index = this->row_block_indices.global_to_local (row);
   for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
     {
-      if (counter_within_block[block_col] == 0)
+      if (temporary_data.counter_within_block[block_col] == 0)
         continue;
 
       block(row_index.first, block_col).add
       (row_index.second,
-       counter_within_block[block_col],
-       &column_indices[block_col][0],
-       &column_values[block_col][0],
+       temporary_data.counter_within_block[block_col],
+       &temporary_data.column_indices[block_col][0],
+       &temporary_data.column_values[block_col][0],
        false,
        col_indices_are_sorted);
     }

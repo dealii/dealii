@@ -99,7 +99,7 @@ namespace Step16
   class LaplaceProblem
   {
   public:
-    LaplaceProblem (const unsigned int deg);
+    LaplaceProblem (const unsigned int degree);
     void run ();
 
   private:
@@ -130,7 +130,7 @@ namespace Step16
     const unsigned int degree;
 
     // The following four objects are the only additional member variables,
-    // compared to step-6. They first three represent the operators that act
+    // compared to step-6. The first three represent the operators that act
     // on individual levels of the multilevel hierarchy, rather than on the
     // finest mesh as do the objects above while the last object stores
     // information about the boundary indices on each level and information
@@ -351,7 +351,7 @@ namespace Step16
 
   // @sect4{LaplaceProblem::assemble_system}
 
-  // The following function assembles the linear system on the finesh level of
+  // The following function assembles the linear system on the finest level of
   // the mesh. It is almost exactly the same as in step-6, with the exception
   // that we don't eliminate hanging nodes and boundary values after
   // assembling, but while copying local contributions into the global
@@ -472,9 +472,9 @@ namespace Step16
     // The indices just identified will later be used to decide where the
     // assembled value has to be added into on each level.  On the other hand,
     // we also have to impose zero boundary conditions on the external
-    // boundary of each level. But this the <code>MGConstraints</code> knows
-    // it. So we simply ask for them by calling <code>get_boundary_indices
-    // ()</code>.  The third step is to construct constraints on all those
+    // boundary of each level. But this the <code>MGConstraints</code> knows.
+    // So we simply ask for them by calling <code>get_boundary_indices()</code>.
+    // The third step is to construct constraints on all those
     // degrees of freedom: their value should be zero after each application
     // of the level operators. To this end, we construct ConstraintMatrix
     // objects for each level, and add to each of these constraints for each

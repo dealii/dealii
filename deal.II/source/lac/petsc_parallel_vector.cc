@@ -39,6 +39,7 @@ namespace PETScWrappers
       const int ierr
         = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
+      ghosted = false;
     }
 
 
@@ -130,7 +131,7 @@ namespace PETScWrappers
       MPI_Allreduce (&k, &k_global, 1,
                      MPI_INT, MPI_LOR, communicator);
 
-      if (k_global)
+      if (k_global || has_ghost_elements())
         {
           // FIXME: I'd like to use this here,
           // but somehow it leads to odd errors
@@ -165,9 +166,17 @@ namespace PETScWrappers
     Vector::reinit (const Vector &v,
                     const bool    fast)
     {
-      communicator = v.communicator;
-
-      reinit (communicator, v.size(), v.local_size(), fast);
+      if (v.has_ghost_elements())
+        {
+          reinit (v.locally_owned_elements(), v.ghost_indices, v.communicator);
+          if (!fast)
+            {
+              int ierr = VecSet(vector, 0.0);
+              AssertThrow (ierr == 0, ExcPETScError(ierr));
+            }
+        }
+      else
+        reinit (v.communicator, v.size(), v.local_size(), fast);
     }
 
 
@@ -185,6 +194,14 @@ namespace PETScWrappers
                     const IndexSet &ghost,
                     const MPI_Comm     &comm)
     {
+      int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      ierr = VecDestroy (vector);
+#else
+      ierr = VecDestroy (&vector);
+#endif
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
       communicator = comm;
 
       Assert(local.is_contiguous(), ExcNotImplemented());
@@ -206,6 +223,14 @@ namespace PETScWrappers
     Vector::reinit (const IndexSet &local,
                     const MPI_Comm &comm)
     {
+      int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      ierr = VecDestroy (vector);
+#else
+      ierr = VecDestroy (&vector);
+#endif
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
       communicator = comm;
 
       Assert(local.is_contiguous(), ExcNotImplemented());
