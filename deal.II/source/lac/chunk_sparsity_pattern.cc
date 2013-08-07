@@ -296,6 +296,9 @@ ChunkSparsityPattern::copy_from (const SparsityType &csp,
                                  const size_type     chunk_size)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+  this->chunk_size = chunk_size;
+  rows = csp.n_rows();
+  cols = csp.n_cols();
 
   // simple case: just use the other sparsity pattern
   if (chunk_size == 1)
@@ -307,9 +310,6 @@ ChunkSparsityPattern::copy_from (const SparsityType &csp,
   // create a temporary compressed sparsity pattern that collects all entries
   // from the input sparsity pattern and then initialize the underlying small
   // sparsity pattern
-  this->chunk_size = chunk_size;
-  rows = csp.n_rows();
-  cols = csp.n_cols();
   const size_type m_chunks = (csp.n_rows()+chunk_size-1) / chunk_size,
                   n_chunks = (csp.n_cols()+chunk_size-1) / chunk_size;
   CompressedSimpleSparsityPattern temporary_sp(m_chunks, n_chunks);
