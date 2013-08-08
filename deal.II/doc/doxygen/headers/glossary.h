@@ -1215,7 +1215,7 @@ Article{JK10,
  *      // in 3d
  *      for (cell=dof_handler.begin_active();
  *           cell!=dof_handler.end(); ++cell)
- *        for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++l)
+ *        for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
  *          if (cell->line(l)->at_boundary())
  *            {
  *               do something with this line
@@ -1271,7 +1271,7 @@ Article{JK10,
  *   @code
  *      for (cell=dof_handler.begin_active();
  *           cell!=dof_handler.end(); ++cell)
- *        for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++l)
+ *        for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
  *          if (cell->line(l)->at_boundary())
  *            {
  *              cell->line(l)->set_user_index(42);
