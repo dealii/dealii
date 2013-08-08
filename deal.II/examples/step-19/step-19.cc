@@ -297,7 +297,7 @@ namespace Step19
               prm.get_bool ("Dummy generate output");
             }
             prm.leave_subsection ();
-            // We would assign the result to a variable, or course, but don't
+            // We would assign the result to a variable, of course, but don't
             // here in order not to generate an unused variable that the
             // compiler might warn about.
             //

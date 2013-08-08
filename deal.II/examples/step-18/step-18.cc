@@ -106,8 +106,8 @@ namespace Step18
   // in the form $C_{ijkl} = \mu (\delta_{ik} \delta_{jl} + \delta_{il}
   // \delta_{jk}) + \lambda \delta_{ij} \delta_{kl}$. This tensor maps
   // symmetric tensor of rank 2 to symmetric tensors of rank 2. A function
-  // implementing its creation for given values of the Lame constants lambda
-  // and mu is straightforward:
+  // implementing its creation for given values of the Lame constants $\lambda$
+  // and $\mu$ is straightforward:
   template <int dim>
   SymmetricTensor<4,dim>
   get_stress_strain_tensor (const double lambda, const double mu)
@@ -443,7 +443,7 @@ namespace Step18
     // One difference of this program is that we declare the quadrature
     // formula in the class declaration. The reason is that in all the other
     // programs, it didn't do much harm if we had used different quadrature
-    // formulas when computing the matrix and the righ hand side, for
+    // formulas when computing the matrix and the right hand side, for
     // example. However, in the present case it does: we store information in
     // the quadrature points, so we have to make sure all parts of the program
     // agree on where they are and how many there are on each cell. Thus, let
@@ -1456,7 +1456,7 @@ namespace Step18
     // As a last piece of data, let us also add the partitioning of the domain
     // into subdomains associated with the processors if this is a parallel
     // job. This works in the exact same way as in the step-17 program:
-    std::vector<unsigned int> partition_int (triangulation.n_active_cells());
+    std::vector<types::subdomain_id> partition_int (triangulation.n_active_cells());
     GridTools::get_subdomain_association (triangulation, partition_int);
     const Vector<double> partitioning(partition_int.begin(),
                                       partition_int.end());

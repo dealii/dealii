@@ -367,7 +367,7 @@ namespace Step29
                ExcDimensionMismatch (computed_quantities[i].size(), 1));
         Assert(uh[i].size() == 2, ExcDimensionMismatch (uh[i].size(), 2));
 
-        computed_quantities[i](0) = sqrt(uh[i](0)*uh[i](0) + uh[i](1)*uh[i](1));
+        computed_quantities[i](0) = std::sqrt(uh[i](0)*uh[i](0) + uh[i](1)*uh[i](1));
       }
   }
 

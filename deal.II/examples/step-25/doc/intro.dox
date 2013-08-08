@@ -101,8 +101,8 @@ To this end, we can use Newton's method. Given the nonlinear equation $F(u^n) = 
   \mbox{ Find } \delta u^n_l \mbox{ s.t. } F'(u^n_l)\delta u^n_l = -F(u^n_l) 
   \mbox{, set }  u^n_{l+1} = u^n_l + \delta u^n_l.
 \f}
-The iteration can be initialized with the old time step, i.e. $u^{n,0} =
-u^{n-1}$, and eventually it will produce a solution to the first equation of
+The iteration can be initialized with the old time step, i.e. $u^n_0 = u^{n-1}$, 
+and eventually it will produce a solution to the first equation of
 the split formulation (see above). For the time discretizaion of the
 sine-Gordon equation under consideration here, we have that 
 \f{eqnarray*}
@@ -120,7 +120,7 @@ With hindsight, we choose both the solution and the test space to be $H^1(\Omega
   &\mbox{ Find}& \delta u^n_l \in H^1(\Omega) \mbox{ s.t. } 
   \left( F'(u^n_l)\delta u^n_l, \varphi \right)_{\Omega} 
   = -\left(F(u^n_l), \varphi \right)_{\Omega} \;\forall\varphi\in H^1(\Omega),
-  \mbox{ set } u^n_{l+1} = u^n_l + \delta u^n_l,\; u^{n,0} = u^{n-1}.\\
+  \mbox{ set } u^n_{l+1} = u^n_l + \delta u^n_l,\; u^n_0 = u^{n-1}.\\
   &\mbox{ Find}& v^n \in H^1(\Omega) \mbox{ s.t. }
   \left( v^n, \varphi \right)_{\Omega} = \left( v^{n-1}, \varphi \right)_{\Omega} 
          - k\theta\left( \nabla u^n, \nabla\varphi \right)_{\Omega} 
@@ -157,9 +157,9 @@ Above, the matrix $F_h'(\cdot)$ and the vector $F_h(\cdot)$ denote the discrete 
 \f{eqnarray*}
   F_h(U^{n,l}) &=&  \left[ M+k^2\theta^2A \right] U^{n,l} -  
                 \left[ M-k^2\theta(1-\theta)A \right] U^{n-1} - k MV^{n-1} 
-                + k^2\theta S(u^{n,l}, u^{n-1}),\\
+                + k^2\theta S(u^n_l, u^{n-1}),\\
   F_h'(U^{n,l}) &=& M+k^2\theta^2A 
-                                - k^2\theta^2N(u^{n,l},u^{n-1})
+                                - k^2\theta^2N(u^n_l,u^{n-1})
 \f}
 Again, note that the first matrix equation above is, in fact, the
 defition of an iterative procedure, so it is solved multiple times
@@ -176,9 +176,9 @@ i.e. $N_{ij}(f,g) = \left( \cos\left[ \theta f + (1-\theta) g\right]\varphi_i,
 What solvers can we use for the first equation? Let's look at the matrix we
 have to invert:
 @f[
-  (M-k^2\theta^2N)_{ij} = 
+  (M+k^2\theta^2(A-N))_{ij} = 
   \int_\Omega (1-k^2\theta^2 \cos \alpha) 
- \varphi_i\varphi_j \; dx,
+  \varphi_i\varphi_j \; dx+\int_\Omega \nabla\varphi_i\nabla\varphi_j \; dx,
 @f]
 for some $\alpha$ that depends on the present and previous solution. First,
 note that the matrix is symmetric. In addition, if the time step $k$ is small

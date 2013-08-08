@@ -179,7 +179,7 @@ one. A stable reactor should have $k_{\mathrm{eff}}=1$.
 [For those who wonder how this can be achieved in practice without
 inadvertently getting slightly larger than one and triggering a nuclear bomb:
 first, fission processes happen on different time scales. While most neutrons
-are releases very quickly after a fission event, a small number of neutrons
+are released very quickly after a fission event, a small number of neutrons
 are only released by daughter nuclei after several further decays, up to 10-60
 seconds after the fission was initiated. If one is therefore slightly beyond
 $k_{\mathrm{eff}}=1$, one therefore has many seconds to react until all the
@@ -431,7 +431,7 @@ these three cases, as follows:
 <li> If the cell $K$ is active on mesh $g$, but not $g'$, then the
   basis functions $\varphi_{g'}^j$ are only defined either on the children
   $K_c,0\le c<2^{\texttt{dim}}$, or on children of these children if cell $K$
-  is refined more than once more on mesh $g'$.
+  is refined more than once on mesh $g'$.
 
   Let us assume for a second that $K$ is only once more refined on mesh $g'$
   than on mesh $g$. Using the fact that we use embedded finite element spaces

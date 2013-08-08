@@ -333,7 +333,7 @@ namespace Step25
 
   // @sect4{SineGordonProblem::assemble_system}
 
-  // This functions assembles the system matrix and right-hand side vector for
+  // This function assembles the system matrix and right-hand side vector for
   // each iteration of Newton's method. The reader should refer to the
   // Introduction for the explicit formulas for the system matrix and
   // right-hand side.
@@ -350,7 +350,6 @@ namespace Step25
   {
     // First we assemble the Jacobian matrix $F'_h(U^{n,l})$, where $U^{n,l}$
     // is stored in the vector <code>solution</code> for convenience.
-    system_matrix = 0;
     system_matrix.copy_from (mass_matrix);
     system_matrix.add (std::pow(time_step*theta,2), laplace_matrix);
 
@@ -361,7 +360,6 @@ namespace Step25
     // Then, we compute the right-hand side vector $-F_h(U^{n,l})$.
     system_rhs = 0;
 
-    tmp_matrix = 0;
     tmp_matrix.copy_from (mass_matrix);
     tmp_matrix.add (std::pow(time_step*theta,2), laplace_matrix);
 
@@ -369,17 +367,14 @@ namespace Step25
     tmp_matrix.vmult (tmp_vector, solution);
     system_rhs += tmp_vector;
 
-    tmp_matrix = 0;
     tmp_matrix.copy_from (mass_matrix);
     tmp_matrix.add (-std::pow(time_step,2)*theta*(1-theta), laplace_matrix);
 
-    tmp_vector = 0;
     tmp_matrix.vmult (tmp_vector, old_solution);
     system_rhs -= tmp_vector;
 
     system_rhs.add (-time_step, M_x_velocity);
 
-    tmp_vector = 0;
     compute_nl_term (old_solution, solution, tmp_vector);
     system_rhs.add (std::pow(time_step,2)*theta, tmp_vector);
 
@@ -413,6 +408,7 @@ namespace Step25
                                                 const Vector<double> &new_data,
                                                 Vector<double>       &nl_term) const
   {
+    nl_term = 0;
     const QGauss<dim> quadrature_formula (3);
     FEValues<dim>     fe_values (fe, quadrature_formula,
                                  update_values |
@@ -433,6 +429,7 @@ namespace Step25
 
     for (; cell!=endc; ++cell)
       {
+        local_nl_term = 0;
         // Once we re-initialize our <code>FEValues</code> instantiation to
         // the current cell, we make use of the
         // <code>get_function_values</code> routine to get the values of the
@@ -459,8 +456,6 @@ namespace Step25
 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           nl_term(local_dof_indices[i]) += local_nl_term(i);
-
-        local_nl_term = 0;
       }
   }
 
@@ -495,6 +490,7 @@ namespace Step25
 
     for (; cell!=endc; ++cell)
       {
+        local_nl_matrix = 0;
         // Again, first we re-initialize our <code>FEValues</code>
         // instantiation to the current cell.
         fe_values.reinit (cell);
@@ -521,8 +517,6 @@ namespace Step25
           for (unsigned int j=0; j<dofs_per_cell; ++j)
             nl_matrix.add(local_dof_indices[i], local_dof_indices[j],
                           local_nl_matrix(i,j));
-
-        local_nl_matrix = 0;
       }
   }
 
@@ -562,7 +556,6 @@ namespace Step25
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    solution_update = 0;
     cg.solve (system_matrix, solution_update,
               system_rhs,
               preconditioner);
@@ -686,11 +679,9 @@ namespace Step25
         laplace_matrix.vmult (tmp_vector, solution);
         M_x_velocity.add (-time_step*theta, tmp_vector);
 
-        tmp_vector = 0;
         laplace_matrix.vmult (tmp_vector, old_solution);
         M_x_velocity.add (-time_step*(1-theta), tmp_vector);
 
-        tmp_vector = 0;
         compute_nl_term (old_solution, solution, tmp_vector);
         M_x_velocity.add (-time_step, tmp_vector);
 

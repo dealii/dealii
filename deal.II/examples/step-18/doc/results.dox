@@ -111,10 +111,10 @@ examples/\step-18> ../\step-19/\step-19
 
 Converter from deal.II intermediate format to other graphics formats.
 
-Usage: ./\step-19 [-p parameter_file] list_of_input_files [-x output_format] output_file
+Usage: ./\step-19 [-p parameter_file] list_of_input_files [-x output_format] -o output_file
 
-examples/\step-18> ../\step-19/\step-19 solution-0001.0000.d2 -x gmv solution-0001.0000.gmv
-examples/\step-18> ../\step-19/\step-19 solution-0002.0000.d2 -x gmv solution-0002.0000.gmv
+examples/\step-18> ../\step-19/\step-19 solution-0001.0000.d2 -x gmv -o solution-0001.0000.gmv
+examples/\step-18> ../\step-19/\step-19 solution-0002.0000.d2 -x gmv -o solution-0002.0000.gmv
 [...]
 @endcode
 Of course, since we have run the program only in sequential mode, we

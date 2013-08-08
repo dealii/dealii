@@ -156,7 +156,7 @@ time derivatives for both variables, for which it is simple to write
 down time stepping schemes. Note that we do not have boundary
 conditions for $v$ at first. However, we could enforce $v=\frac{\partial
 g}{\partial t}$ on the boundary. It turns out in numerical examples that this
-as actually necessary: without doing so the solution doesn't look particularly
+is actually necessary: without doing so the solution doesn't look particularly
 wrong, but the Crank-Nicolson scheme does not conserve energy if one doesn't
 enforce these boundary conditions.
 
@@ -296,9 +296,9 @@ where
 	\\
 	A^{n,n-1}_{ij} &=& (\nabla\phi_i^n, \nabla\phi_j^{n-1}),
 	\\
-	F^n_{ij} &=& (f^n,\phi_i^n),
+	F^n_{i} &=& (f^n,\phi_i^n),
 	\\
-	F^{n-1}_{ij} &=& (f^{n-1},\phi_i^n).
+	F^{n-1}_{i} &=& (f^{n-1},\phi_i^n).
 @f}
 
 If we solve these two equations, we can move the solution one step

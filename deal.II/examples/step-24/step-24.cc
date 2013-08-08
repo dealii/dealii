@@ -132,7 +132,7 @@ namespace Step24
   // pressure. In the physical setting considered in this program, these are
   // small absorbers, which we model as a series of little circles where we
   // assume that the pressure surplus is one, whereas no absorption and
-  // therefore no pressure surplus is anywhere else. This is how we do things
+  // therefore no pressure surplus is everywhere else. This is how we do things
   // (note that if we wanted to expand this program to not only compile but
   // also to run, we would have to initialize the sources with
   // three-dimensional source locations):
@@ -311,7 +311,7 @@ namespace Step24
     //
     // A first observation would be that this matrix is much sparser than the
     // regular mass matrix, since none of the shape functions with purely
-    // interior support contributes to this matrix. We could therefore
+    // interior support contribute to this matrix. We could therefore
     // optimize the storage pattern to this situation and build up a second
     // sparsity pattern that only contains the nonzero entries that we
     // need. There is a trade-off to make here: first, we would have to have a
@@ -475,7 +475,7 @@ namespace Step24
   // consumption of the program, the introduction of a few temporary vectors
   // isn't doing much harm.
   //
-  // The only changes to this function are: First, that we do not have to
+  // The only changes to this function are: first, that we do not have to
   // project initial values for the velocity $v$, since we know that it is
   // zero. And second that we evaluate the solution at the detector locations
   // computed in the constructor. This is done using the

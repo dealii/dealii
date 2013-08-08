@@ -107,7 +107,7 @@ following, let us consider some of the tools one would employ when
 simulating problems in which the deformation becomes <i>large</i>.
 
 @note The model we will consider below is not founded on anything that
-would be mathematical sound: we will consider a model in which we
+would be mathematically sound: we will consider a model in which we
 produce a small deformation, deform the physical coordinates of the
 body by this deformation, and then consider the next loading step
 again as a linear problem. This isn't consistent, since the assumption

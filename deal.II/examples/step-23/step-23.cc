@@ -54,7 +54,7 @@
 // Here are the only three include files of some new interest: The first one
 // is already used, for example, for the
 // VectorTools::interpolate_boundary_values and
-// VectorTools::apply_boundary_values functions. However, we here use another
+// MatrixTools::apply_boundary_values functions. However, we here use another
 // function in that class, VectorTools::project to compute our initial values
 // as the $L^2$ projection of the continuous initial values. Furthermore, we
 // use VectorTools::create_right_hand_side to generate the integrals
@@ -68,8 +68,8 @@
 // mass and Laplace matrices, although it would have only taken copying the
 // relevant code from any number of previous tutorial programs. Rather, we
 // want to focus on the things that are truly new to this program and
-// therefore use the MatrixTools::create_mass_matrix and
-// MatrixTools::create_laplace_matrix functions. They are declared here:
+// therefore use the MatrixCreator::create_mass_matrix and
+// MatrixCreator::create_laplace_matrix functions. They are declared here:
 #include <deal.II/numerics/matrix_tools.h>
 
 // Finally, here is an include file that contains all sorts of tool functions

@@ -105,8 +105,8 @@ If you want to explore a bit, try out some of the following things:
 
   To make such a change, we would have to compute the mass and Laplace
   matrices with a variable coefficient. Fortunately, this isn't too hard: the
-  functions MatrixTools::create_laplace_matrix and
-  MatrixTools::create_vector_tools have additional default parameters that can
+  functions MatrixCreator::create_laplace_matrix and
+  MatrixCreator::create_mass_matrix have additional default parameters that can
   be used to pass non-constant coefficient functions to them. The required
   changes are therefore relatively small. On the other hand, care must be
   taken again to make sure the time step is within the allowed range.

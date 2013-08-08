@@ -118,7 +118,7 @@ defined as the derivative of the pressure potential:
 v = \frac{\partial\bar{p}}{\partial t} 
 @f]
 
-With the second variables, one then transform the forward problem into
+With the second variable, one then transforms the forward problem into
 two separate equations:
 @f{eqnarray*}
 \bar{p}_{t} - v & = & 0 \\
