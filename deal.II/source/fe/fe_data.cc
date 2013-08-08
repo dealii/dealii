@@ -113,6 +113,15 @@ face_to_cell_index (const unsigned int face_index,
   Assert (face < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
 
+  // see the function's documentation for an explanation of this
+  // assertion -- in essence, derived classes have to implement
+  // an overloaded version of this function
+  Assert ((this->dofs_per_line <= 1) && (this->dofs_per_quad <= 1),
+          ExcMessage ("The function in this base class can not handle this case. "
+                      "Rather, the derived class you are using must provide "
+                      "an overloaded version but apparently hasn't done so. See "
+                      "the documentation of this function for more information."));
+
   // DoF on a vertex
   if (face_index < this->first_face_line_index)
     {

@@ -426,7 +426,25 @@ public:
    * @return The index of this degree of freedom within the set
    *   of degrees of freedom on the entire cell. The returned value
    *   will be between zero and dofs_per_cell.
+   *
+   * @note This function exists in this class because that is where it
+   * was first implemented. However, it can't really work in the most
+   * general case without knowing what element we have. The reason is that
+   * when a face is flipped or rotated, we also need to know whether we
+   * need to swap the degrees of freedom on this face, or whether they
+   * are immune from this. For this, consider the situation of a $Q_3$
+   * element in 2d. If face_flip is true, then we need to consider
+   * the two degrees of freedom on the edge in reverse order. On the other
+   * hand, if the element were a $Q_1^2$, then because the two degrees of
+   * freedom on this edge belong to different vector components, they
+   * should not be considered in reverse order. What all of this shows is
+   * that the function can't work if there are more than one degree of
+   * freedom per line or quad, and that in these cases the function will
+   * throw an exception pointing out that this functionality will need
+   * to be provided by a derived class that knows what degrees of freedom
+   * actually represent.
    */
+  virtual
   unsigned int face_to_cell_index (const unsigned int face_dof_index,
                                    const unsigned int face,
                                    const bool face_orientation = true,

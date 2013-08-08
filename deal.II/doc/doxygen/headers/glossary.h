@@ -837,7 +837,10 @@
  * is pointing the other direction. There are not very many places in
  * application programs where you need this information actually, but
  * a few places in the library make use of this. Note that in 2d, the
- * result is always @p true.
+ * result is always @p true. However, while every face in 2d is always
+ * in standard orientation, you can sometimes specify something to
+ * assume that this is not so; an example is the function
+ * DoFTools::make_periodicity_constraints().
  *
  * There are two other flags that describe the orientation of a face:
  * face_flip and face_rotation. Some documentation for these
