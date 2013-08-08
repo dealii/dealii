@@ -3,3 +3,52 @@
 
 This tutorial program presents the implementation of a hybridizable
 discontinuous Galkerin method for the convection-diffusion equation.
+
+<h3>  Hybridizable discontinuous Galerkin methods</h3>
+
+One common argument against the use of discontinuous Galerkin elements
+is the large number of globally coupled degrees of freedom that one
+must solve in an implicit system.  For the FE_DGP_Monomial basis, each 
+scalar solution component is represented by polynomials of degree p
+which yields (1/dim!)*\prod_{i=1}^{dim}(k+i) degrees of freedom per
+element.  Typically, all degrees of freedom in an element are coupled
+to all of the degrees of freedom in the adjacent elements.  The resulting
+discrete equations yield very large linear systems very quickly, especially
+for systems of equations in dim=2 or dim=3.  
+
+To alleviate the computational cost of solving such large linear systems, 
+the hybridizable discontinuous Galerkin (HDG) methodology has recently been 
+developed by Cockburn and co-workers \cite{...}.  The HDG method achieves
+this goal by formulating the mathematical problem in such a way that the only
+global unknowns are single-valued ``trace''-values on the skeleton of the
+mesh, i.e. element edges.  The DG solution on element interiors is thus decoupled
+from the neighboring elements, enabling an element-by-element solution process
+for the `interior' solution fields.
+
+- Discuss theoretical convergence rates.  Other big picture HDG details?
+
+<h3> HDG applied to the convection-diffusion problem </h3>
+
+- Problem formulation.  Flux-formulation, HDG formulation, 
+domain, BCs, etc.  
+
+- Reference:
+@article{Nguyen20093232,
+title = "An implicit high-order hybridizable discontinuous Galerkin method for linear convection–diffusion equations ",
+journal = "Journal of Computational Physics ",
+volume = "228",
+number = "9",
+pages = "3232 - 3254",
+year = "2009",
+note = "",
+issn = "0021-9991",
+doi = "http://dx.doi.org/10.1016/j.jcp.2009.01.030",
+url = "http://www.sciencedirect.com/science/article/pii/S0021999109000308",
+author = "N.C. Nguyen and J. Peraire and B. Cockburn",
+keywords = "Finite element methods",
+keywords = "Discontinuous Galerkin methods",
+keywords = "Hybrid/mixed methods",
+keywords = "Convection–diffusion equations "
+}
+
+<h3> Implementation </h3>
