@@ -74,6 +74,12 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 
 #
+# Disable Wlong-long that will trigger a lot of warnings when compiling
+# with disabled C++11 support:
+#
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+
+#
 # Disable deprecation warnings
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-deprecated")
