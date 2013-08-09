@@ -23,7 +23,11 @@ modifications to application programs. We apologize for the
 inconvenience this causes.
 </p>
 
-<ol>
+<ol> Removed: The member function face_to_equivalent_cell_index() in
+FiniteElementData has been removed. It had been deprecated a while
+back already. Please use FiniteElement::face_to_cell_index() instead.
+<br>
+(Wolfgang Bangerth, 2013/08/09)
 
 </ol>
 

@@ -546,6 +546,68 @@ block_mask (const ComponentMask &component_mask) const
 
 template <int dim, int spacedim>
 unsigned int
+FiniteElement<dim,spacedim>::
+face_to_cell_index (const unsigned int face_index,
+                    const unsigned int face,
+                    const bool face_orientation,
+                    const bool face_flip,
+                    const bool face_rotation) const
+{
+  Assert (face_index < this->dofs_per_face,
+          ExcIndexRange(face_index, 0, this->dofs_per_face));
+  Assert (face < GeometryInfo<dim>::faces_per_cell,
+          ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
+
+  // see the function's documentation for an explanation of this
+  // assertion -- in essence, derived classes have to implement
+  // an overloaded version of this function if we are to use any
+  // other than standard orientation
+  if ((face_orientation != true) || (face_flip != false) || (face_rotation != false))
+    Assert ((this->dofs_per_line <= 1) && (this->dofs_per_quad <= 1),
+            ExcMessage ("The function in this base class can not handle this case. "
+                        "Rather, the derived class you are using must provide "
+                        "an overloaded version but apparently hasn't done so. See "
+                        "the documentation of this function for more information."));
+
+  // DoF on a vertex
+  if (face_index < this->first_face_line_index)
+    {
+      // Vertex number on the face
+      const unsigned int face_vertex = face_index / this->dofs_per_vertex;
+      return face_index % this->dofs_per_vertex
+             + GeometryInfo<dim>::face_to_cell_vertices(face, face_vertex,
+                                                        face_orientation,
+                                                        face_flip,
+                                                        face_rotation)
+             * this->dofs_per_vertex;
+    }
+  // Else, DoF on a line?
+  if (face_index < this->first_face_quad_index)
+    {
+      // Ignore vertex dofs
+      const unsigned int index = face_index - this->first_face_line_index;
+      // Line number on the face
+      const unsigned int face_line = index / this->dofs_per_line;
+      return this->first_line_index + index % this->dofs_per_line
+             + GeometryInfo<dim>::face_to_cell_lines(face, face_line,
+                                                     face_orientation,
+                                                     face_flip,
+                                                     face_rotation)
+             * this->dofs_per_line;
+    }
+  // Else, DoF is on a quad
+
+  // Ignore vertex and line dofs
+  const unsigned int index = face_index - this->first_face_quad_index;
+  return this->first_quad_index + index
+         + face * this->dofs_per_quad;
+}
+
+
+
+
+template <int dim, int spacedim>
+unsigned int
 FiniteElement<dim,spacedim>::adjust_quad_dof_index_for_face_orientation (const unsigned int index,
     const bool face_orientation,
     const bool face_flip,
