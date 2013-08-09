@@ -28,6 +28,7 @@
 #include <deal.II/base/tensor_function.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -295,16 +296,22 @@ public:
   void run ();
 
 private:
+    
+  struct PerTaskData;
+  struct ScratchData;
+    
   void setup_system ();
   void assemble_system (const bool reconstruct_trace = false);
+  void assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                   ScratchData &scratch,
+                                   PerTaskData &task_data);
+  void copy_local_to_global(const PerTaskData &data);
   void solve ();
   void postprocess ();
   void refine_grid (const unsigned int cylce);
   void output_results (const unsigned int cycle);
 
   Triangulation<dim>   triangulation;
-
-  const MappingQ<dim>  mapping;
   
 // The 'local' solutions are interior to each element.  These
 // represent the primal solution field $u$ as well as the auxiliary
@@ -363,7 +370,6 @@ private:
 template <int dim>
 Step51<dim>::Step51 (const unsigned int degree,
                      const RefinementMode refinement_mode) :
-  mapping  (3),
   fe_local (FE_DGQ<dim>(degree), dim,
             FE_DGQ<dim>(degree), 1),
   dof_handler_local (triangulation),
@@ -374,7 +380,178 @@ Step51<dim>::Step51 (const unsigned int degree,
   refinement_mode (refinement_mode)
 {}
 
+template <int dim>
+struct Step51<dim>::PerTaskData
+{
+    FullMatrix<double> cell_matrix;
+    Vector<double>     cell_vector;
+    std::vector<types::global_dof_index> dof_indices;
+    
+    bool trace_reconstruct;
+    
+    PerTaskData(const unsigned int n_dofs, const bool trace_reconstruct)
+    : cell_matrix(n_dofs, n_dofs),
+      cell_vector(n_dofs),
+      dof_indices(n_dofs),
+      trace_reconstruct(trace_reconstruct)
+    {}
+    
+    void reset(){
+        cell_matrix = 0.0;
+        cell_vector = 0.0;
+    }
+};
 
+template <int dim>
+struct Step51<dim>::ScratchData
+{
+    const Vector<double> &solution;
+    Vector<double> &solution_local;
+    
+    FEValues<dim>     fe_values_local;
+    FEFaceValues<dim> fe_face_values_local;
+    FEFaceValues<dim> fe_face_values;
+    
+    FullMatrix<double> ll_matrix;
+    FullMatrix<double> lf_matrix;
+    FullMatrix<double> fl_matrix;
+    FullMatrix<double> tmp_matrix;
+    FullMatrix<double> ff_matrix;
+    Vector<double>     l_rhs;
+    Vector<double>     f_rhs;
+    Vector<double>     tmp_rhs;
+    
+    std::vector<Tensor<1,dim> > q_phi;
+    std::vector<double>         q_phi_div;
+    std::vector<double>         u_phi;
+    std::vector<Tensor<1,dim> > u_phi_grad;
+    std::vector<double>         tr_phi;
+    std::vector<double>         trace_values;
+    
+    std::vector<std::vector<unsigned int> > fe_local_support_on_face;
+    std::vector<std::vector<unsigned int> > fe_support_on_face;
+    
+    bool trace_reconstruct;
+    
+    ConvectionVelocity<dim> convection_velocity;
+    RightHandSide<dim> right_hand_side;
+    const Solution<dim> exact_solution;
+    
+        // Full constructor
+    ScratchData(const Vector<double> &solution,
+                Vector<double> &solution_local,
+                const FiniteElement<dim> &fe,
+                const FiniteElement<dim> &fe_local,
+                const QGauss<dim>   &quadrature_formula,
+                const QGauss<dim-1> &face_quadrature_formula,
+                const UpdateFlags local_flags,
+                const UpdateFlags local_face_flags,
+                const UpdateFlags flags,
+                const bool trace_reconstruct)
+      :
+      solution(solution),
+      solution_local(solution_local),
+      fe_values_local (fe_local, quadrature_formula, local_flags),
+      fe_face_values_local (fe_local, face_quadrature_formula, local_face_flags),
+      fe_face_values (fe, face_quadrature_formula, flags),
+      ll_matrix (fe_local.dofs_per_cell, fe_local.dofs_per_cell),
+      lf_matrix (fe_local.dofs_per_cell, fe.dofs_per_cell),
+      fl_matrix (fe.dofs_per_cell, fe_local.dofs_per_cell),
+      tmp_matrix (fe.dofs_per_cell, fe_local.dofs_per_cell),
+      ff_matrix (fe.dofs_per_cell, fe.dofs_per_cell),
+      l_rhs (fe_local.dofs_per_cell),
+      f_rhs (fe.dofs_per_cell),
+      tmp_rhs (fe_local.dofs_per_cell),
+      q_phi (fe_local.dofs_per_cell),
+      q_phi_div (fe_local.dofs_per_cell),
+      u_phi (fe_local.dofs_per_cell),
+      u_phi_grad (fe_local.dofs_per_cell),
+      tr_phi (fe.dofs_per_cell),
+      trace_values(face_quadrature_formula.size()),
+      fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell),
+      fe_support_on_face(GeometryInfo<dim>::faces_per_cell),
+      trace_reconstruct (trace_reconstruct)
+    {
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+            for (unsigned int i=0; i<fe_local.dofs_per_cell; ++i) {
+                if (fe_local.has_support_on_face(i,face))
+                    fe_local_support_on_face[face].push_back(i);
+            }
+        
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+            for (unsigned int i=0; i<fe.dofs_per_cell; ++i) {
+                if (fe.has_support_on_face(i,face))
+                    fe_support_on_face[face].push_back(i);
+            }
+    }
+    
+        // Copy constructor
+    ScratchData(const ScratchData &sd)
+      :
+      solution(sd.solution),
+      solution_local(sd.solution_local),
+      fe_values_local (sd.fe_values_local.get_fe(),
+                       sd.fe_values_local.get_quadrature(),
+                       sd.fe_values_local.get_update_flags()),
+      fe_face_values_local (sd.fe_face_values_local.get_fe(),
+                            sd.fe_face_values_local.get_quadrature(),
+                            sd.fe_face_values_local.get_update_flags()),
+      fe_face_values (sd.fe_face_values.get_fe(),
+                      sd.fe_face_values.get_quadrature(),
+                      sd.fe_face_values.get_update_flags()),
+      ll_matrix (sd.ll_matrix),
+      lf_matrix (sd.lf_matrix),
+      fl_matrix (sd.fl_matrix),
+      tmp_matrix (sd.tmp_matrix),
+      ff_matrix (sd.ff_matrix),
+      l_rhs (sd.l_rhs),
+      f_rhs (sd.f_rhs),
+      tmp_rhs (sd.tmp_rhs),
+      q_phi (sd.q_phi),
+      q_phi_div (sd.q_phi_div),
+      u_phi (sd.u_phi),
+      u_phi_grad (sd.u_phi_grad),
+      tr_phi (sd.tr_phi),
+      trace_values(sd.trace_values),
+      fe_local_support_on_face(sd.fe_local_support_on_face),
+      fe_support_on_face(sd.fe_support_on_face),
+      trace_reconstruct(sd.trace_reconstruct)
+    {}
+    
+    void reset(){
+        ll_matrix  = 0.0;
+        lf_matrix  = 0.0;
+        fl_matrix  = 0.0;
+        tmp_matrix = 0.0;
+        ff_matrix  = 0.0;
+        l_rhs      = 0.0;
+        f_rhs      = 0.0;
+        tmp_rhs    = 0.0;
+        
+        for (int i=0; i<q_phi.size(); ++i){
+            q_phi[i]   = 0.0;
+            q_phi_div  = 0.0;
+            u_phi      = 0.0;
+            u_phi_grad = 0.0;
+        }
+        
+        for (int i=0; i<tr_phi.size(); ++i)
+            tr_phi[i] = 0.0;
+        
+        for (int i=0; i<trace_values.size(); ++i)
+            trace_values[i] = 0.0;
+    }
+};
+
+template <int dim>
+void Step51<dim>::copy_local_to_global(const PerTaskData &data)
+{
+    if(data.trace_reconstruct == false)
+      constraints.distribute_local_to_global (data.cell_matrix,
+                                              data.cell_vector,
+                                              data.dof_indices,
+                                              system_matrix, system_rhs);
+}
 
 template <int dim>
 void
@@ -397,9 +574,9 @@ Step51<dim>::setup_system ()
   constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler, constraints);
   typename FunctionMap<dim>::type boundary_functions;
-  Solution<dim> solution;
-  boundary_functions[0] = &solution;
-  VectorTools::project_boundary_values (mapping, dof_handler,
+  Solution<dim> solution_function;
+  boundary_functions[0] = &solution_function;
+  VectorTools::project_boundary_values (dof_handler,
                                         boundary_functions,
                                         QGauss<dim-1>(fe.degree+1),
                                         constraints);
@@ -414,177 +591,166 @@ Step51<dim>::setup_system ()
   system_matrix.reinit (sparsity_pattern);
 }
 
-
-
 template <int dim>
 void
 Step51<dim>::assemble_system (const bool trace_reconstruct)
 {
-  QGauss<dim>   quadrature_formula(fe.degree+1);
-  QGauss<dim-1> face_quadrature_formula(fe.degree+1);
+    const QGauss<dim>   quadrature_formula(fe.degree+1);
+    const QGauss<dim-1> face_quadrature_formula(fe.degree+1);
+    
+    const UpdateFlags local_flags (update_values | update_gradients |
+                                   update_JxW_values | update_quadrature_points);
+    
+    const UpdateFlags local_face_flags (update_values);
+    
+    const UpdateFlags flags ( update_values | update_normal_vectors |
+                             update_quadrature_points |
+                             update_JxW_values);
+    
+    PerTaskData task_data (fe.dofs_per_cell,
+                           trace_reconstruct);
+    ScratchData scratch (solution,
+                         solution_local,
+                         fe, fe_local,
+                         quadrature_formula,
+                         face_quadrature_formula,
+                         local_flags,
+                         local_face_flags,
+                         flags,
+                         trace_reconstruct);
+    
+    WorkStream::run(dof_handler.begin_active(),
+                    dof_handler.end(),
+                    *this,
+                    &Step51<dim>::assemble_system_one_cell,
+                    &Step51<dim>::copy_local_to_global,
+                    scratch,
+                    task_data);
+}
 
-  FEValues<dim> fe_values_local (mapping, fe_local, quadrature_formula,
-                                 update_values | update_gradients |
-                                 update_JxW_values | update_quadrature_points);
-  FEFaceValues<dim> fe_face_values (mapping, fe, face_quadrature_formula,
-                                    update_values | update_normal_vectors |
-                                    update_quadrature_points |
-                                    update_JxW_values);
-  FEFaceValues<dim> fe_face_values_local (mapping, fe_local,
-                                          face_quadrature_formula,
-                                          update_values);
 
-  const unsigned int n_q_points    = quadrature_formula.size();
-  const unsigned int n_face_q_points = face_quadrature_formula.size();
+template <int dim>
+void
+Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                       ScratchData &scratch,
+                                       PerTaskData &task_data)
+{
+        // Construct iterator for dof_handler_local
+  typename DoFHandler<dim>::active_cell_iterator
+    loc_cell (&triangulation,
+              cell->level(),
+              cell->index(),
+              &dof_handler_local);
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int loc_dofs_per_cell = fe_local.dofs_per_cell;
+  const unsigned int n_q_points    = scratch.fe_values_local.get_quadrature().size();
+  const unsigned int n_face_q_points = scratch.fe_face_values_local.get_quadrature().size();
 
-  FullMatrix<double> ll_matrix (loc_dofs_per_cell, loc_dofs_per_cell);
-  FullMatrix<double> lf_matrix (loc_dofs_per_cell, dofs_per_cell);
-  FullMatrix<double> fl_matrix (dofs_per_cell, loc_dofs_per_cell);
-  FullMatrix<double> tmp_matrix (dofs_per_cell, loc_dofs_per_cell);
-  FullMatrix<double> ff_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>     l_rhs (loc_dofs_per_cell);
-  Vector<double>     f_rhs (dofs_per_cell);
-  Vector<double>     tmp_rhs (loc_dofs_per_cell);
-
-  std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
-  std::vector<types::global_dof_index> loc_dof_indices (loc_dofs_per_cell);
-
-  std::vector<Tensor<1,dim> > q_phi (loc_dofs_per_cell);
-  std::vector<double>         q_phi_div (loc_dofs_per_cell);
-  std::vector<double>         u_phi (loc_dofs_per_cell);
-  std::vector<Tensor<1,dim> > u_phi_grad (loc_dofs_per_cell);
-  std::vector<double>         tr_phi (dofs_per_cell);
-
-  std::vector<double> trace_values(n_face_q_points);
+        //  const unsigned int dofs_per_cell = scratch.fe_face_values.get_fe().dofs_per_cell;
+  const unsigned int loc_dofs_per_cell = scratch.fe_values_local.get_fe().dofs_per_cell;
 
   // Choose stabilization parameter to be 5 * diffusion = 5
   const double tau_stab_diffusion = 5.;
 
-  ConvectionVelocity<dim> convection_velocity;
-  RightHandSide<dim> right_hand_side;
-  const Solution<dim> exact_solution;
-
   const FEValuesExtractors::Vector fluxes (0);
   const FEValuesExtractors::Scalar scalar (dim);
 
-  std::vector<std::vector<unsigned int> >
-    fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell);
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int i=0; i<loc_dofs_per_cell; ++i)
-      if (fe_local.has_support_on_face(i,face))
-        fe_local_support_on_face[face].push_back(i);
-  std::vector<std::vector<unsigned int> >
-    fe_support_on_face(GeometryInfo<dim>::faces_per_cell);
-  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int i=0; i<dofs_per_cell; ++i)
-      if (fe.has_support_on_face(i,face))
-        fe_support_on_face[face].push_back(i);
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    loc_cell = dof_handler_local.begin_active(),
-    endc = dof_handler.end();
-  for (; cell!=endc; ++cell, ++loc_cell)
-    {
-      ll_matrix = 0;
-      l_rhs = 0;
-      if (!trace_reconstruct)
+      scratch.ll_matrix = 0;
+      scratch.l_rhs = 0;
+      if (!scratch.trace_reconstruct)
         {
-          lf_matrix = 0;
-          fl_matrix = 0;
-          ff_matrix = 0;
-          f_rhs = 0;
+          scratch.lf_matrix = 0;
+          scratch.fl_matrix = 0;
+          scratch.ff_matrix = 0;
+          scratch.f_rhs = 0;
         }
-      fe_values_local.reinit (loc_cell);
+      scratch.fe_values_local.reinit (loc_cell);
 
       for (unsigned int q=0; q<n_q_points; ++q)
         {
           const double rhs_value
-            = right_hand_side.value(fe_values_local.quadrature_point(q));
+            = scratch.right_hand_side.value(scratch.fe_values_local.quadrature_point(q));
           const Tensor<1,dim> convection
-            = convection_velocity.value(fe_values_local.quadrature_point(q));
-          const double JxW = fe_values_local.JxW(q);
+            = scratch.convection_velocity.value(scratch.fe_values_local.quadrature_point(q));
+          const double JxW = scratch.fe_values_local.JxW(q);
           for (unsigned int k=0; k<loc_dofs_per_cell; ++k)
             {
-              q_phi[k] = fe_values_local[fluxes].value(k,q);
-              q_phi_div[k] = fe_values_local[fluxes].divergence(k,q);
-              u_phi[k] = fe_values_local[scalar].value(k,q);
-              u_phi_grad[k] = fe_values_local[scalar].gradient(k,q);
+              scratch.q_phi[k] = scratch.fe_values_local[fluxes].value(k,q);
+              scratch.q_phi_div[k] = scratch.fe_values_local[fluxes].divergence(k,q);
+              scratch.u_phi[k] = scratch.fe_values_local[scalar].value(k,q);
+              scratch.u_phi_grad[k] = scratch.fe_values_local[scalar].gradient(k,q);
             }
           for (unsigned int i=0; i<loc_dofs_per_cell; ++i)
             {
               for (unsigned int j=0; j<loc_dofs_per_cell; ++j)
-                ll_matrix(i,j) += (
-                                   q_phi[i] * q_phi[j]
+                scratch.ll_matrix(i,j) += (
+                                   scratch.q_phi[i] * scratch.q_phi[j]
                                    -
-                                   q_phi_div[i] * u_phi[j]
+                                   scratch.q_phi_div[i] * scratch.u_phi[j]
                                    +
-                                   u_phi[i] * q_phi_div[j]
+                                   scratch.u_phi[i] * scratch.q_phi_div[j]
                                    -
-                                   (u_phi_grad[i] * convection) * u_phi[j]
+                                   (scratch.u_phi_grad[i] * convection) * scratch.u_phi[j]
                                    ) * JxW;
-              l_rhs(i) += u_phi[i] * rhs_value * JxW;
+              scratch.l_rhs(i) += scratch.u_phi[i] * rhs_value * JxW;
             }
         }
 
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         {
-          fe_face_values_local.reinit(loc_cell, face);
-          fe_face_values.reinit(cell, face);
-          if (trace_reconstruct)
-            fe_face_values.get_function_values (solution, trace_values);
+          scratch.fe_face_values_local.reinit(loc_cell, face);
+          scratch.fe_face_values.reinit(cell, face);
+          if (scratch.trace_reconstruct)
+            scratch.fe_face_values.get_function_values (scratch.solution, scratch.trace_values);
 
           for (unsigned int q=0; q<n_face_q_points; ++q)
             {
-              const double JxW = fe_face_values.JxW(q);
-              const Point<dim> normal = fe_face_values.normal_vector(q);
+              const double JxW = scratch.fe_face_values.JxW(q);
+              const Point<dim> normal = scratch.fe_face_values.normal_vector(q);
               const Tensor<1,dim> convection
-                = convection_velocity.value(fe_face_values.quadrature_point(q));
+                = scratch.convection_velocity.value(scratch.fe_face_values.quadrature_point(q));
               const double tau_stab = (tau_stab_diffusion +
                                        std::abs(convection * normal));
 
-              for (unsigned int k=0; k<fe_local_support_on_face[face].size(); ++k)
+              for (unsigned int k=0; k<scratch.fe_local_support_on_face[face].size(); ++k)
                 {
-                  const unsigned int kk=fe_local_support_on_face[face][k];
-                  q_phi[k] = fe_face_values_local[fluxes].value(kk,q);
-                  u_phi[k] = fe_face_values_local[scalar].value(kk,q);
+                  const unsigned int kk=scratch.fe_local_support_on_face[face][k];
+                  scratch.q_phi[k] = scratch.fe_face_values_local[fluxes].value(kk,q);
+                  scratch.u_phi[k] = scratch.fe_face_values_local[scalar].value(kk,q);
                 }
-              if (!trace_reconstruct)
+
+              if (!scratch.trace_reconstruct)
                 {
-                  for (unsigned int k=0; k<fe_support_on_face[face].size(); ++k)
-                    tr_phi[k] =
-                      fe_face_values.shape_value(fe_support_on_face[face][k],q);
-                  for (unsigned int i=0; i<fe_local_support_on_face[face].size(); ++i)
-                    for (unsigned int j=0; j<fe_support_on_face[face].size(); ++j)
+                  for (unsigned int k=0; k<scratch.fe_support_on_face[face].size(); ++k)
+                    scratch.tr_phi[k] =
+                      scratch.fe_face_values.shape_value(scratch.fe_support_on_face[face][k],q);
+                  for (unsigned int i=0; i<scratch.fe_local_support_on_face[face].size(); ++i)
+                    for (unsigned int j=0; j<scratch.fe_support_on_face[face].size(); ++j)
                       {
-                        const unsigned int ii=fe_local_support_on_face[face][i];
-                        const unsigned int jj=fe_support_on_face[face][j];
-                        lf_matrix(ii,jj) += (
-                                             (q_phi[i] * normal
+                        const unsigned int ii=scratch.fe_local_support_on_face[face][i];
+                        const unsigned int jj=scratch.fe_support_on_face[face][j];
+                        scratch.lf_matrix(ii,jj) += (
+                                             (scratch.q_phi[i] * normal
                                               +
                                               (convection * normal -
-                                               tau_stab) * u_phi[i])
-                                             * tr_phi[j]
+                                               tau_stab) * scratch.u_phi[i])
+                                             * scratch.tr_phi[j]
                                              ) * JxW;
-                        fl_matrix(jj,ii) -= (
-                                             (q_phi[i] * normal
+                        scratch.fl_matrix(jj,ii) -= (
+                                             (scratch.q_phi[i] * normal
                                               +
-                                              tau_stab * u_phi[i])
-                                             * tr_phi[j]
+                                              tau_stab * scratch.u_phi[i])
+                                             * scratch.tr_phi[j]
                                              ) * JxW;
                       }
 
-                  for (unsigned int i=0; i<fe_support_on_face[face].size(); ++i)
-                    for (unsigned int j=0; j<fe_support_on_face[face].size(); ++j)
+                  for (unsigned int i=0; i<scratch.fe_support_on_face[face].size(); ++i)
+                    for (unsigned int j=0; j<scratch.fe_support_on_face[face].size(); ++j)
                       {
-                        const unsigned int ii=fe_support_on_face[face][i];
-                        const unsigned int jj=fe_support_on_face[face][j];
-                        ff_matrix(ii,jj) += (
+                        const unsigned int ii=scratch.fe_support_on_face[face][i];
+                        const unsigned int jj=scratch.fe_support_on_face[face][j];
+                        scratch.ff_matrix(ii,jj) += (
                                              (convection * normal - tau_stab) *
-                                             tr_phi[i] * tr_phi[j]
+                                             scratch.tr_phi[i] * scratch.tr_phi[j]
                                              ) * JxW;
                       }
 
@@ -593,53 +759,51 @@ Step51<dim>::assemble_system (const bool trace_reconstruct)
                       (cell->face(face)->boundary_indicator() == 1))
                     {
                       const double neumann_value =
-                        exact_solution.value(fe_face_values.quadrature_point(q));
-                      for (unsigned int i=0; i<fe_support_on_face[face].size(); ++i)
+                        scratch.exact_solution.value(scratch.fe_face_values.quadrature_point(q));
+                      for (unsigned int i=0; i<scratch.fe_support_on_face[face].size(); ++i)
                         {
-                          const unsigned int ii=fe_support_on_face[face][i];
-                          f_rhs(ii) -= tr_phi[i] * neumann_value * JxW;
+                          const unsigned int ii=scratch.fe_support_on_face[face][i];
+                          scratch.f_rhs(ii) -= scratch.tr_phi[i] * neumann_value * JxW;
                         }
                     }
                 }
 
-              for (unsigned int i=0; i<fe_local_support_on_face[face].size(); ++i)
-                for (unsigned int j=0; j<fe_local_support_on_face[face].size(); ++j)
+              for (unsigned int i=0; i<scratch.fe_local_support_on_face[face].size(); ++i)
+                for (unsigned int j=0; j<scratch.fe_local_support_on_face[face].size(); ++j)
                   {
-                    const unsigned int ii=fe_local_support_on_face[face][i];
-                    const unsigned int jj=fe_local_support_on_face[face][j];
-                    ll_matrix(ii,jj) += tau_stab * u_phi[i] * u_phi[j] * JxW;
+                    const unsigned int ii=scratch.fe_local_support_on_face[face][i];
+                    const unsigned int jj=scratch.fe_local_support_on_face[face][j];
+                    scratch.ll_matrix(ii,jj) += tau_stab * scratch.u_phi[i] * scratch.u_phi[j] * JxW;
                   }
 
               // compute the local right hand side contributions from trace
-              if (trace_reconstruct)
-                for (unsigned int i=0; i<fe_local_support_on_face[face].size(); ++i)
+              if (scratch.trace_reconstruct)
+                for (unsigned int i=0; i<scratch.fe_local_support_on_face[face].size(); ++i)
                   {
-                    const unsigned int ii=fe_local_support_on_face[face][i];
-                    l_rhs(ii) -= (q_phi[i] * normal
+                    const unsigned int ii=scratch.fe_local_support_on_face[face][i];
+                    scratch.l_rhs(ii) -= (scratch.q_phi[i] * normal
                                   +
-                                  u_phi[i] * (convection * normal - tau_stab)
-                                  ) * trace_values[q] * JxW;
+                                  scratch.u_phi[i] * (convection * normal - tau_stab)
+                                  ) * scratch.trace_values[q] * JxW;
                   }
             }
         }
 
-      ll_matrix.gauss_jordan();
-      if (trace_reconstruct == false)
+      scratch.ll_matrix.gauss_jordan();
+      if (scratch.trace_reconstruct == false)
         {
-          fl_matrix.mmult(tmp_matrix, ll_matrix);
-          tmp_matrix.vmult_add(f_rhs, l_rhs);
-          tmp_matrix.mmult(ff_matrix, lf_matrix, true);
-          cell->get_dof_indices(dof_indices);
-          constraints.distribute_local_to_global (ff_matrix, f_rhs,
-                                                  dof_indices,
-                                                  system_matrix, system_rhs);
+          scratch.fl_matrix.mmult(scratch.tmp_matrix, scratch.ll_matrix);
+          scratch.tmp_matrix.vmult_add(scratch.f_rhs, scratch.l_rhs);
+          scratch.tmp_matrix.mmult(scratch.ff_matrix, scratch.lf_matrix, true);
+          cell->get_dof_indices(task_data.dof_indices);
+          task_data.cell_matrix = scratch.ff_matrix;
+          task_data.cell_vector = scratch.f_rhs;
         }
       else
         {
-          ll_matrix.vmult(tmp_rhs, l_rhs);
-          loc_cell->set_dof_values(tmp_rhs, solution_local);
+          scratch.ll_matrix.vmult(scratch.tmp_rhs, scratch.l_rhs);
+          loc_cell->set_dof_values(scratch.tmp_rhs, scratch.solution_local);
         }
-    }
 }
 
 
@@ -658,6 +822,7 @@ void Step51<dim>::solve ()
 
   system_matrix.clear();
   sparsity_pattern.reinit(0,0,0,1);
+    
   constraints.distribute(solution);
 
   // update local values
@@ -674,7 +839,7 @@ Step51<dim>::postprocess()
   Vector<float> difference_per_cell (triangulation.n_active_cells());
 
   ComponentSelectFunction<dim> value_select (dim, dim+1);
-  VectorTools::integrate_difference (mapping, dof_handler_local,
+  VectorTools::integrate_difference (dof_handler_local,
                                      solution_local,
                                      SolutionAndGradient<dim>(),
                                      difference_per_cell,
@@ -685,7 +850,7 @@ Step51<dim>::postprocess()
 
   ComponentSelectFunction<dim> gradient_select (std::pair<unsigned int,unsigned int>(0, dim),
                                                 dim+1);
-  VectorTools::integrate_difference (mapping, dof_handler_local,
+  VectorTools::integrate_difference (dof_handler_local,
                                      solution_local,
                                      SolutionAndGradient<dim>(),
                                      difference_per_cell,
@@ -702,7 +867,7 @@ Step51<dim>::postprocess()
   // construct post-processed solution with (hopefully) higher order of
   // accuracy
   QGauss<dim> quadrature(fe_u_post.degree+1);
-  FEValues<dim> fe_values(mapping, fe_u_post, quadrature,
+  FEValues<dim> fe_values(fe_u_post, quadrature,
                           update_values | update_JxW_values |
                           update_gradients);
 
@@ -711,7 +876,7 @@ Step51<dim>::postprocess()
   std::vector<Tensor<1,dim> > u_gradients(n_q_points);
   FEValuesExtractors::Vector fluxes(0);
   FEValuesExtractors::Scalar scalar(dim);
-  FEValues<dim> fe_values_local(mapping, fe_local, quadrature, update_values);
+  FEValues<dim> fe_values_local(fe_local, quadrature, update_values);
   FullMatrix<double> cell_matrix(fe_u_post.dofs_per_cell,
                                  fe_u_post.dofs_per_cell);
   Vector<double> cell_rhs(fe_u_post.dofs_per_cell);
@@ -764,7 +929,7 @@ Step51<dim>::postprocess()
       cell->distribute_local_to_global(cell_sol, solution_u_post);
     }
 
-  VectorTools::integrate_difference (mapping, dof_handler_u_post,
+  VectorTools::integrate_difference (dof_handler_u_post,
                                      solution_u_post,
                                      Solution<dim>(),
                                      difference_per_cell,
@@ -846,32 +1011,18 @@ void Step51<dim>::output_results (const unsigned int cycle)
 template <int dim>
 void Step51<dim>::refine_grid (const unsigned int cycle)
 {
-  const bool do_cube = true;
   if (cycle == 0)
     {
-      if (!do_cube)
-        {
-          GridGenerator::hyper_ball (triangulation);
-          static const HyperBallBoundary<dim> boundary;
-          triangulation.set_boundary(0, boundary);
-          triangulation.refine_global(6-2*dim);
-        }
-      else
-        GridGenerator::subdivided_hyper_cube (triangulation, 2, -1, 1);
+      GridGenerator::subdivided_hyper_cube (triangulation, 2, -1, 1);
     }
   else
     switch (refinement_mode)
       {
       case global_refinement:
         {
-          if (do_cube)
-            {
-              triangulation.clear();
-              GridGenerator::subdivided_hyper_cube (triangulation, 2+(cycle%2), -1, 1);
-              triangulation.refine_global(3-dim+cycle/2);
-            }
-          else
-            triangulation.refine_global (1);
+            triangulation.clear();
+            GridGenerator::subdivided_hyper_cube (triangulation, 2+(cycle%2), -1, 1);
+            triangulation.refine_global(3-dim+cycle/2);
           break;
         }
 
