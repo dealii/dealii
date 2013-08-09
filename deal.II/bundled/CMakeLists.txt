@@ -68,9 +68,10 @@ ENDIF()
 #
 # Threading Building Blocks library
 #
-IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
+   AND NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
   #
-  # Cygwin is unsupported by tbb
+  # Cygwin is unsupported by tbb, Windows due to the way we compile tbb...
   #
   SET(FEATURE_THREADS_HAVE_BUNDLED TRUE)
   OPTION(DEAL_II_FORCE_BUNDLED_THREADS
