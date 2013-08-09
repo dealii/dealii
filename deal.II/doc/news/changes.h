@@ -35,6 +35,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li>
+  New: It is now possible to compile and link deal.II against LLVM's libcxx. For
+  this, a few issues with C++ standard violations are resolved.
+  <br>
+  (Matthias Maier, 2013/08/09)
+  </li>
 </ol>
 
 
