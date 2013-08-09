@@ -35,8 +35,8 @@ namespace boost
 // Workaround for a bug in boost:
 // https://svn.boost.org/trac/boost/ticket/6655
 //
-// It should be save to depend on DEAL macros at this point as this header
-// should only be used by deal.II and dependend projects...
+// It should be safe to depend on DEAL macros at this point as this header
+// should only be used by deal.II and dependent projects...
 //
 // - Maier, 2013
 #ifdef DEAL_II_CAN_USE_CXX11
