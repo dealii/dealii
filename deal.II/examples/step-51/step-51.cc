@@ -19,7 +19,10 @@
  *         Scott T. Miller, The Pennsylvania State University, 2013
  */
 
-
+// @sect3{Include files}
+//
+// Most of the deal.II include files have already been covered in previous
+// examples are are not commented on.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
@@ -41,6 +44,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -48,23 +52,35 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-//! New include:  fe_face.h
-//  Explain that it implements fe on 
-//  codim=1 surfaces of a geometric discretization
-#include <deal.II/fe/fe_dgq.h>
+// However, we do have a few new includes for the example.
+// The first one defines finite element spaces on the faces
+// of the triangulation, which we refer to as the 'skeleton'.
+// These finite elements do not have any support on the element
+// interior, and they represent polynomials that have a single
+// value on each codimension-1 surface, but admit discontinuities
+// on codimension-2 surfaces.
 #include <deal.II/fe/fe_face.h>
 
-//! New include:  explain the chunk_xxx
+// The second new file we include defines a new type of sparse matrix.
+// The regular <code>SparseMatrix</code> type stores indices to all non-zero entries.
+// The <code>ChunkSparseMatrix</code> takes advantage of the coupled nature of
+// DG solutions.  It stores an index to a matrix sub-block of a specified
+// size.  In the HDG context, this sub-block-size is actually the number
+// of degrees of freedom per face defined by the skeleton solution field.
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
-//! New include:  output data on faces of a 
-//  triangulation
+// The final new include for this example deals with data output.  Since
+// we have a finite element field defined on the skeleton of the mesh,
+// we would like to visualize what that solution actually is.
+// DataOutFaces does exactly this; the interface is the almost the same
+// as the familiar DataOut, but the output only has codimension-1 data for
+// the simulation.
 #include <deal.II/numerics/data_out_faces.h>
 
 using namespace dealii;
 
 // @sect3{Equation data}
-
+//
 // The structure of the analytic solution is the same as in step-7. There
 // are two exceptions. Firstly, we also create a solution for the 3d case,
 // and secondly, we take into account the convection velocity in the right
@@ -259,7 +275,11 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
                                                     * this->width);
 }
 
+// @sect3{The Step51 HDG solver class}
 
+// The HDG solution procedure follows closely that of step-7.  The major
+// difference is the use of 3 different sets of <code>DoFHandler</code> and FE objects,
+// along with the <code>ChunkSparseMatrix</code> and the corresponding solutions vectors.
 
 template <int dim>
 class Step51
@@ -286,23 +306,31 @@ private:
 
   const MappingQ<dim>  mapping;
   
-  // local (element interior) solutions
+// The 'local' solutions are interior to each element.  These
+// represent the primal solution field $u$ as well as the auxiliary
+// field $\mathbf{q} = \nabla u$. 
   FESystem<dim>        fe_local;
   DoFHandler<dim>      dof_handler_local;
 
-  // global (trace/skeleton) solution
-  // Note that FE_FaceQ<dim> represents
-  // finite element data on the faces/edges
-  // of our triangulation
+// The new finite element type and corresponding <code>DoFHandler</code>
+// are used for the global solution that couples the element-level local
+// solution.
   FE_FaceQ<dim>        fe;
   DoFHandler<dim>      dof_handler;
 
-  // post-processed solution
+// As stated in the introduction, HDG solutions can be post-processed to
+// attain superconvegence rates of $\mathcal{O}(h^{p+2})$.
+// The post-processed solution is a discontinuous finite element solution
+// representing the primal variable on the interior of each cell.
+// We define a FE type to represent this post-processed solution, which we
+// only use for output after constructing it.
   FE_DGQ<dim>          fe_u_post;
   DoFHandler<dim>      dof_handler_u_post;
 
-  // Dirichlet BCs are strongly enforced
-  // on the "skeleton" solution
+// The degrees of freedom corresponding to the skeleton strongly enforce
+// Dirichlet boundary conditions, just as in a continuous Galerkin finite
+// element method.  We can enforce the boundary conditions in an analogous
+// manner through the use of <code>ConstrainMatrix</code> constructs.
   ConstraintMatrix     constraints;
   
   // Comment on chunk.
