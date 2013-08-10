@@ -1101,7 +1101,9 @@ unsigned int
 GeometryInfo<2>::child_cell_on_face (const RefinementCase<2> &ref_case,
                                      const unsigned int face,
                                      const unsigned int subface,
-                                     const bool, const bool face_flip, const bool,
+                                     const bool /*face_orientation*/,
+                                     const bool face_flip,
+                                     const bool /*face_rotation*/,
                                      const RefinementCase<1> &)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
