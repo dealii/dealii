@@ -1,5 +1,5 @@
 /**
- * @page changes_after_8_0 Changes after Version 8.0
+// * @page changes_after_8_0 Changes after Version 8.0
 
 <p>
 This is the list of changes made after the release of
@@ -54,6 +54,18 @@ back already. Please use FiniteElement::face_to_cell_index() instead.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>
+  Fixed: The FiniteElement::face_to_cell_index() function had a bug
+  that made it work incorrectly for elements that have more than one
+  degree of freedom per line (in 2d) or per quad (in 3d). This is now
+  fixed for the most common cases, namely the FE_Q elements as well
+  as elements composed of FESystem elements. For all other cases, an
+  exception is generated reporting that this case is not implemented.
+  If you run into this, let us know.
+  <br>
+  (Wolfgang Bangerth, 2013/08/10)
+  </li>
+
   <li>
   New: DataOutBase::VtkFlags now has a flag
   DataOutBase::VtkFlags::print_date_and_time that can be used to suppress output

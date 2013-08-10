@@ -745,6 +745,45 @@ FESystem<dim,spacedim>
 }
 
 
+template <int dim, int spacedim>
+unsigned int
+FESystem<dim,spacedim>::
+face_to_cell_index (const unsigned int face_dof_index,
+                    const unsigned int face,
+                    const bool face_orientation,
+                    const bool face_flip,
+                    const bool face_rotation) const
+{
+  // we need to ask the base elements how they want to translate
+  // the DoFs within their own numbering. thus, translate to
+  // the base element numbering and then back
+  const std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+  face_base_index = this->face_system_to_base_index(face_dof_index);
+
+  const unsigned int
+  base_face_to_cell_index
+  = this->base_element(face_base_index.first.first).face_to_cell_index (face_base_index.second,
+                                                                        face,
+                                                                        face_orientation,
+                                                                        face_flip,
+                                                                        face_rotation);
+
+  // it would be nice if we had a base_to_system_index function, but
+  // all that exists is a component_to_system_index function. we can't do
+  // this here because it won't work for non-primitive elements. consequently,
+  // simply do a loop over all dofs till we find whether it corresponds
+  // to the one we're interested in -- crude, maybe, but works for now
+  const std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+  target = std::make_pair (face_base_index.first, base_face_to_cell_index);
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    if (this->system_to_base_index(i) == target)
+      return i;
+
+  Assert (false, ExcInternalError());
+  return numbers::invalid_unsigned_int;
+}
+
+
 
 //---------------------------------------------------------------------------
 // Data field initialization
