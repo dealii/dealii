@@ -1053,8 +1053,13 @@ face_to_cell_index (const unsigned int face_index,
         // of pictures of how all the faces can look like with the various
         // flips and rotations.
         //
-        // that said, the Q2 case is easy enough to implement
-        Assert (this->dofs_per_line <= 1, ExcNotImplemented());
+        // that said, the Q2 case is easy enough to implement, as is the case
+        // where everything is in standard orientation
+        Assert ((this->dofs_per_line <= 1) ||
+                ((face_orientation == true) &&
+                 (face_flip == false) &&
+                 (face_rotation == false)),
+                ExcNotImplemented());
         adjusted_dof_index_on_line = dof_index_on_line;
         break;
       }
@@ -1079,7 +1084,11 @@ face_to_cell_index (const unsigned int face_index,
       // the same is true here as above for the 3d case -- someone will
       // just have to draw a bunch of pictures. in the meantime,
       // we can implement the Q2 case in which it is simple
-      Assert (this->dofs_per_quad <= 1, ExcNotImplemented());
+      Assert ((this->dofs_per_quad <= 1) ||
+              ((face_orientation == true) &&
+               (face_flip == false) &&
+               (face_rotation == false)),
+              ExcNotImplemented());
       return (this->first_quad_index
               + face * this->dofs_per_quad
               + index);
