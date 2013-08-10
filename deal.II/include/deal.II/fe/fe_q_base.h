@@ -154,6 +154,48 @@ public:
                            const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
 
   /**
+   * Given an index in the natural ordering of indices on a face, return the
+   * index of the same degree of freedom on the cell.
+   *
+   * To explain the concept, consider the case where we would like to know
+   * whether a degree of freedom on a face, for example as part of an FESystem
+   * element, is primitive. Unfortunately, the
+   * is_primitive() function in the FiniteElement class takes a cell index, so
+   * we would need to find the cell index of the shape function that
+   * corresponds to the present face index. This function does that.
+   *
+   * Code implementing this would then look like this:
+   * @code
+   * for (i=0; i<dofs_per_face; ++i)
+   *  if (fe.is_primitive(fe.face_to_equivalent_cell_index(i, some_face_no)))
+   *   ... do whatever
+   * @endcode
+   * The function takes additional arguments that account for the fact that
+   * actual faces can be in their standard ordering with respect to the cell
+   * under consideration, or can be flipped, oriented, etc.
+   *
+   * @param face_dof_index The index of the degree of freedom on a face.
+   *   This index must be between zero and dofs_per_face.
+   * @param face The number of the face this degree of freedom lives on.
+   *   This number must be between zero and GeometryInfo::faces_per_cell.
+   * @param face_orientation One part of the description of the orientation
+   *   of the face. See @ref GlossFaceOrientation .
+   * @param face_flip One part of the description of the orientation
+   *   of the face. See @ref GlossFaceOrientation .
+   * @param face_rotation One part of the description of the orientation
+   *   of the face. See @ref GlossFaceOrientation .
+   * @return The index of this degree of freedom within the set
+   *   of degrees of freedom on the entire cell. The returned value
+   *   will be between zero and dofs_per_cell.
+   */
+  virtual
+  unsigned int face_to_cell_index (const unsigned int face_dof_index,
+                                   const unsigned int face,
+                                   const bool face_orientation = true,
+                                   const bool face_flip        = false,
+                                   const bool face_rotation    = false) const;
+
+  /**
    * @name Functions to support hp
    * @{
    */

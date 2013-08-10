@@ -569,38 +569,57 @@ face_to_cell_index (const unsigned int face_index,
                         "an overloaded version but apparently hasn't done so. See "
                         "the documentation of this function for more information."));
 
-  // DoF on a vertex
+  // we need to distinguish between DoFs on vertices, lines and in 3d quads.
+  // do so in a sequence of if-else statements
   if (face_index < this->first_face_line_index)
+    // DoF is on a vertex
     {
-      // Vertex number on the face
-      const unsigned int face_vertex = face_index / this->dofs_per_vertex;
-      return face_index % this->dofs_per_vertex
-             + GeometryInfo<dim>::face_to_cell_vertices(face, face_vertex,
-                                                        face_orientation,
-                                                        face_flip,
-                                                        face_rotation)
-             * this->dofs_per_vertex;
-    }
-  // Else, DoF on a line?
-  if (face_index < this->first_face_quad_index)
-    {
-      // Ignore vertex dofs
-      const unsigned int index = face_index - this->first_face_line_index;
-      // Line number on the face
-      const unsigned int face_line = index / this->dofs_per_line;
-      return this->first_line_index + index % this->dofs_per_line
-             + GeometryInfo<dim>::face_to_cell_lines(face, face_line,
-                                                     face_orientation,
-                                                     face_flip,
-                                                     face_rotation)
-             * this->dofs_per_line;
-    }
-  // Else, DoF is on a quad
+      // get the number of the vertex on the face that corresponds to this DoF,
+      // along with the number of the DoF on this vertex
+      const unsigned int face_vertex         = face_index / this->dofs_per_vertex;
+      const unsigned int dof_index_on_vertex = face_index % this->dofs_per_vertex;
 
-  // Ignore vertex and line dofs
-  const unsigned int index = face_index - this->first_face_quad_index;
-  return this->first_quad_index + index
-         + face * this->dofs_per_quad;
+      // then get the number of this vertex on the cell and translate
+      // this to a DoF number on the cell
+      return (GeometryInfo<dim>::face_to_cell_vertices(face, face_vertex,
+                                                       face_orientation,
+                                                       face_flip,
+                                                       face_rotation)
+              * this->dofs_per_vertex
+              +
+              dof_index_on_vertex);
+    }
+  else if (face_index < this->first_face_quad_index)
+    // DoF is on a face
+    {
+      // do the same kind of translation as before. we need to only consider
+      // DoFs on the lines, i.e., ignoring those on the vertices
+      const unsigned int index = face_index - this->first_face_line_index;
+
+      const unsigned int face_line         = index / this->dofs_per_line;
+      const unsigned int dof_index_on_line = index % this->dofs_per_line;
+
+      return (this->first_line_index
+              + GeometryInfo<dim>::face_to_cell_lines(face, face_line,
+                                                      face_orientation,
+                                                      face_flip,
+                                                      face_rotation)
+              * this->dofs_per_line
+              +
+              dof_index_on_line);
+    }
+  else
+    // DoF is on a quad
+    {
+      Assert (dim >= 3, ExcInternalError());
+
+      // ignore vertex and line dofs
+      const unsigned int index = face_index - this->first_face_quad_index;
+
+      return (this->first_quad_index
+              + face * this->dofs_per_quad
+              + index);
+    }
 }
 
 

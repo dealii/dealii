@@ -986,6 +986,108 @@ FE_Q_Base<POLY,dim,spacedim>::initialize_quad_dof_index_permutation ()
 
 
 
+template <class POLY, int dim, int spacedim>
+unsigned int
+FE_Q_Base<POLY,dim,spacedim>::
+face_to_cell_index (const unsigned int face_index,
+                    const unsigned int face,
+                    const bool face_orientation,
+                    const bool face_flip,
+                    const bool face_rotation) const
+{
+  Assert (face_index < this->dofs_per_face,
+          ExcIndexRange(face_index, 0, this->dofs_per_face));
+  Assert (face < GeometryInfo<dim>::faces_per_cell,
+          ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
+
+  // we need to distinguish between DoFs on vertices, lines and in 3d quads.
+  // do so in a sequence of if-else statements
+  if (face_index < this->first_face_line_index)
+    // DoF is on a vertex
+    {
+      // get the number of the vertex on the face that corresponds to this DoF,
+      // along with the number of the DoF on this vertex
+      const unsigned int face_vertex         = face_index / this->dofs_per_vertex;
+      const unsigned int dof_index_on_vertex = face_index % this->dofs_per_vertex;
+
+      // then get the number of this vertex on the cell and translate
+      // this to a DoF number on the cell
+      return (GeometryInfo<dim>::face_to_cell_vertices(face, face_vertex,
+                                                       face_orientation,
+                                                       face_flip,
+                                                       face_rotation)
+              * this->dofs_per_vertex
+              +
+              dof_index_on_vertex);
+    }
+  else if (face_index < this->first_face_quad_index)
+    // DoF is on a face
+    {
+      // do the same kind of translation as before. we need to only consider
+      // DoFs on the lines, i.e., ignoring those on the vertices
+      const unsigned int index = face_index - this->first_face_line_index;
+
+      const unsigned int face_line         = index / this->dofs_per_line;
+      const unsigned int dof_index_on_line = index % this->dofs_per_line;
+
+      // we now also need to adjust the line index for the case of
+      // face orientation, face flips, etc
+      unsigned int adjusted_dof_index_on_line;
+      switch (dim)
+      {
+      case 1:
+        Assert (false, ExcInternalError());
+
+      case 2:
+        // in 2d, only face_flip has a meaning. if it is set, consider
+        // dofs in reverse order
+        if (face_flip == false)
+          adjusted_dof_index_on_line = dof_index_on_line;
+        else
+          adjusted_dof_index_on_line = this->dofs_per_line - dof_index_on_line - 1;
+        break;
+
+      case 3:
+        // in 3d, things are difficult. someone will have to think
+        // about how this code here should look like, by drawing a bunch
+        // of pictures of how all the faces can look like with the various
+        // flips and rotations.
+        //
+        // that said, the Q2 case is easy enough to implement
+        Assert (this->dofs_per_line <= 1, ExcNotImplemented());
+        adjusted_dof_index_on_line = dof_index_on_line;
+        break;
+      }
+
+      return (this->first_line_index
+              + GeometryInfo<dim>::face_to_cell_lines(face, face_line,
+                                                      face_orientation,
+                                                      face_flip,
+                                                      face_rotation)
+              * this->dofs_per_line
+              +
+              adjusted_dof_index_on_line);
+    }
+  else
+    // DoF is on a quad
+    {
+      Assert (dim >= 3, ExcInternalError());
+
+      // ignore vertex and line dofs
+      const unsigned int index = face_index - this->first_face_quad_index;
+
+      // the same is true here as above for the 3d case -- someone will
+      // just have to draw a bunch of pictures. in the meantime,
+      // we can implement the Q2 case in which it is simple
+      Assert (this->dofs_per_quad <= 1, ExcNotImplemented());
+      return (this->first_quad_index
+              + face * this->dofs_per_quad
+              + index);
+    }
+}
+
+
+
 
 template <class POLY, int dim, int spacedim>
 std::vector<unsigned int>
