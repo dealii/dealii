@@ -413,9 +413,7 @@ struct Step51<dim>::ScratchData
     FullMatrix<double> lf_matrix;
     FullMatrix<double> fl_matrix;
     FullMatrix<double> tmp_matrix;
-    FullMatrix<double> ff_matrix;
     Vector<double>     l_rhs;
-    Vector<double>     f_rhs;
     Vector<double>     tmp_rhs;
     
     std::vector<Tensor<1,dim> > q_phi;
@@ -428,8 +426,6 @@ struct Step51<dim>::ScratchData
     std::vector<std::vector<unsigned int> > fe_local_support_on_face;
     std::vector<std::vector<unsigned int> > fe_support_on_face;
     
-    bool trace_reconstruct;
-    
     ConvectionVelocity<dim> convection_velocity;
     RightHandSide<dim> right_hand_side;
     const Solution<dim> exact_solution;
@@ -441,8 +437,7 @@ struct Step51<dim>::ScratchData
                 const QGauss<dim-1> &face_quadrature_formula,
                 const UpdateFlags local_flags,
                 const UpdateFlags local_face_flags,
-                const UpdateFlags flags,
-                const bool trace_reconstruct)
+                const UpdateFlags flags)
       :
       fe_values_local (fe_local, quadrature_formula, local_flags),
       fe_face_values_local (fe_local, face_quadrature_formula, local_face_flags),
@@ -451,9 +446,7 @@ struct Step51<dim>::ScratchData
       lf_matrix (fe_local.dofs_per_cell, fe.dofs_per_cell),
       fl_matrix (fe.dofs_per_cell, fe_local.dofs_per_cell),
       tmp_matrix (fe.dofs_per_cell, fe_local.dofs_per_cell),
-      ff_matrix (fe.dofs_per_cell, fe.dofs_per_cell),
       l_rhs (fe_local.dofs_per_cell),
-      f_rhs (fe.dofs_per_cell),
       tmp_rhs (fe_local.dofs_per_cell),
       q_phi (fe_local.dofs_per_cell),
       q_phi_div (fe_local.dofs_per_cell),
@@ -462,8 +455,7 @@ struct Step51<dim>::ScratchData
       tr_phi (fe.dofs_per_cell),
       trace_values(face_quadrature_formula.size()),
       fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell),
-      fe_support_on_face(GeometryInfo<dim>::faces_per_cell),
-      trace_reconstruct (trace_reconstruct)
+      fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
     {
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             for (unsigned int i=0; i<fe_local.dofs_per_cell; ++i) {
@@ -494,9 +486,7 @@ struct Step51<dim>::ScratchData
       lf_matrix (sd.lf_matrix),
       fl_matrix (sd.fl_matrix),
       tmp_matrix (sd.tmp_matrix),
-      ff_matrix (sd.ff_matrix),
       l_rhs (sd.l_rhs),
-      f_rhs (sd.f_rhs),
       tmp_rhs (sd.tmp_rhs),
       q_phi (sd.q_phi),
       q_phi_div (sd.q_phi_div),
@@ -505,33 +495,15 @@ struct Step51<dim>::ScratchData
       tr_phi (sd.tr_phi),
       trace_values(sd.trace_values),
       fe_local_support_on_face(sd.fe_local_support_on_face),
-      fe_support_on_face(sd.fe_support_on_face),
-      trace_reconstruct(sd.trace_reconstruct)
+      fe_support_on_face(sd.fe_support_on_face)
     {}
     
-    void reset(){
-        ll_matrix  = 0.0;
-        lf_matrix  = 0.0;
-        fl_matrix  = 0.0;
-        tmp_matrix = 0.0;
-        ff_matrix  = 0.0;
-        l_rhs      = 0.0;
-        f_rhs      = 0.0;
-        tmp_rhs    = 0.0;
-        
-        for (int i=0; i<q_phi.size(); ++i){
-            q_phi[i]   = 0.0;
-            q_phi_div  = 0.0;
-            u_phi      = 0.0;
-            u_phi_grad = 0.0;
-        }
-        
-        for (int i=0; i<tr_phi.size(); ++i)
-            tr_phi[i] = 0.0;
-        
-        for (int i=0; i<trace_values.size(); ++i)
-            trace_values[i] = 0.0;
-    }
+// We manually reset our matrices to zero in the assembly process,
+// since certain matrices are only used in the reconstruction process.
+// We therefore do not implement an methods in <code>reset()</code>, but
+// need to have it for the WorkStream interface.   
+    void reset() {}
+    
 };
 
 template <int dim>
@@ -607,8 +579,7 @@ Step51<dim>::assemble_system (const bool trace_reconstruct)
                          face_quadrature_formula,
                          local_flags,
                          local_face_flags,
-                         flags,
-                         trace_reconstruct);
+                         flags);
     
     WorkStream::run(dof_handler.begin_active(),
                     dof_handler.end(),
@@ -647,12 +618,11 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
 
       scratch.ll_matrix = 0;
       scratch.l_rhs = 0;
-      if (!scratch.trace_reconstruct)
+      if (!task_data.trace_reconstruct)
         {
           scratch.lf_matrix = 0;
           scratch.fl_matrix = 0;
-          scratch.ff_matrix = 0;
-          scratch.f_rhs = 0;
+          task_data.reset();
         }
       scratch.fe_values_local.reinit (loc_cell);
 
@@ -690,7 +660,7 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
         {
           scratch.fe_face_values_local.reinit(loc_cell, face);
           scratch.fe_face_values.reinit(cell, face);
-          if (scratch.trace_reconstruct)
+          if (task_data.trace_reconstruct)
             scratch.fe_face_values.get_function_values (solution, scratch.trace_values);
 
           for (unsigned int q=0; q<n_face_q_points; ++q)
@@ -709,7 +679,7 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
                   scratch.u_phi[k] = scratch.fe_face_values_local[scalar].value(kk,q);
                 }
 
-              if (!scratch.trace_reconstruct)
+              if (!task_data.trace_reconstruct)
                 {
                   for (unsigned int k=0; k<scratch.fe_support_on_face[face].size(); ++k)
                     scratch.tr_phi[k] =
@@ -739,7 +709,7 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
                       {
                         const unsigned int ii=scratch.fe_support_on_face[face][i];
                         const unsigned int jj=scratch.fe_support_on_face[face][j];
-                        scratch.ff_matrix(ii,jj) += (
+                        task_data.cell_matrix(ii,jj) += (
                                              (convection * normal - tau_stab) *
                                              scratch.tr_phi[i] * scratch.tr_phi[j]
                                              ) * JxW;
@@ -754,7 +724,7 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
                       for (unsigned int i=0; i<scratch.fe_support_on_face[face].size(); ++i)
                         {
                           const unsigned int ii=scratch.fe_support_on_face[face][i];
-                          scratch.f_rhs(ii) -= scratch.tr_phi[i] * neumann_value * JxW;
+                          task_data.cell_vector(ii) -= scratch.tr_phi[i] * neumann_value * JxW;
                         }
                     }
                 }
@@ -768,7 +738,7 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
                   }
 
               // compute the local right hand side contributions from trace
-              if (scratch.trace_reconstruct)
+              if (task_data.trace_reconstruct)
                 for (unsigned int i=0; i<scratch.fe_local_support_on_face[face].size(); ++i)
                   {
                     const unsigned int ii=scratch.fe_local_support_on_face[face][i];
@@ -781,14 +751,12 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
         }
 
       scratch.ll_matrix.gauss_jordan();
-      if (scratch.trace_reconstruct == false)
+      if (task_data.trace_reconstruct == false)
         {
           scratch.fl_matrix.mmult(scratch.tmp_matrix, scratch.ll_matrix);
-          scratch.tmp_matrix.vmult_add(scratch.f_rhs, scratch.l_rhs);
-          scratch.tmp_matrix.mmult(scratch.ff_matrix, scratch.lf_matrix, true);
+          scratch.tmp_matrix.vmult_add(task_data.cell_vector, scratch.l_rhs);
+          scratch.tmp_matrix.mmult(task_data.cell_matrix, scratch.lf_matrix, true);
           cell->get_dof_indices(task_data.dof_indices);
-          task_data.cell_matrix = scratch.ff_matrix;
-          task_data.cell_vector = scratch.f_rhs;
         }
       else
         {
