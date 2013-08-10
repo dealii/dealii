@@ -1820,7 +1820,7 @@ BlockMatrixBase<MatrixType>::memory_consumption () const
     MemoryConsumption::memory_consumption(temporary_data.counter_within_block)+
     MemoryConsumption::memory_consumption(temporary_data.column_indices)+
     MemoryConsumption::memory_consumption(temporary_data.column_values)+
-    MemoryConsumption::memory_consumption(temporary_data.mutex);
+    sizeof(temporary_data.mutex);
 
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
