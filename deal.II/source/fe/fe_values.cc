@@ -1641,7 +1641,10 @@ namespace internal
       scalars.resize (n_scalars);
       for (unsigned int component=0; component<n_scalars; ++component)
         {
-          scalars[component].~Scalar();
+          // Use a typedef here to work around an issue with gcc-4.1:
+          typedef dealii::FEValuesViews::Scalar<dim,spacedim> ScalarView;
+          scalars[component].ScalarView::~ScalarView ();
+
           new (&scalars[component])
           dealii::FEValuesViews::Scalar<dim,spacedim>(fe_values,
                                                       component);
@@ -1660,7 +1663,10 @@ namespace internal
       vectors.resize (n_vectors);
       for (unsigned int component=0; component<n_vectors; ++component)
         {
-          vectors[component].~Vector ();
+          // Use a typedef here to work around an issue with gcc-4.1:
+          typedef dealii::FEValuesViews::Vector<dim,spacedim> VectorView;
+          vectors[component].VectorView::~VectorView ();
+
           new (&vectors[component])
           dealii::FEValuesViews::Vector<dim,spacedim>(fe_values,
                                                       component);
@@ -1675,7 +1681,9 @@ namespace internal
       symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
       for (unsigned int component = 0; component < n_symmetric_second_order_tensors; ++component)
         {
-          symmetric_second_order_tensors[component].~SymmetricTensor();
+          // Use a typedef here to work around an issue with gcc-4.1:
+          typedef dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim> SymmetricTensorView;
+          symmetric_second_order_tensors[component].SymmetricTensorView::~SymmetricTensorView();
 
           new (&symmetric_second_order_tensors[component])
           dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim > (fe_values,
@@ -1692,7 +1700,9 @@ namespace internal
       second_order_tensors.resize(n_second_order_tensors);
       for (unsigned int component = 0; component < n_second_order_tensors; ++component)
         {
-          second_order_tensors[component].~Tensor();
+          // Use a typedef here to work around an issue with gcc-4.1:
+          typedef dealii::FEValuesViews::Tensor<2, dim, spacedim> TensorView;
+          second_order_tensors[component].TensorView::~TensorView();
 
           new (&second_order_tensors[component])
           dealii::FEValuesViews::Tensor<2, dim, spacedim > (fe_values,
