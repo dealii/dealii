@@ -1000,6 +1000,15 @@ face_to_cell_index (const unsigned int face_index,
   Assert (face < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
 
+//TODO: we could presumably solve the 3d case below using the
+// adjust_quad_dof_index_for_face_orientation_table field. for the
+// 2d case, we can't use adjust_line_dof_index_for_line_orientation_table
+// since that array is empty (presumably because we thought that
+// there are no flipped edges in 2d, but these can happen in
+// DoFTools::make_periodicity_constraints, for example). so we
+// would need to either fill this field, or rely on derived classes
+// implementing this function, as we currently do
+
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
   if (face_index < this->first_face_line_index)
