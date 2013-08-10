@@ -15,7 +15,7 @@
  * ---------------------------------------------------------------------
 
  *
- * Author: Martin Kronbichler, TU Muenchen,
+ * Author: Martin Kronbichler, Technische Universität München,
  *         Scott T. Miller, The Pennsylvania State University, 2013
  */
 
@@ -405,9 +405,6 @@ struct Step51<dim>::PerTaskData
 template <int dim>
 struct Step51<dim>::ScratchData
 {
-    const Vector<double> &solution;
-    Vector<double> &solution_local;
-    
     FEValues<dim>     fe_values_local;
     FEFaceValues<dim> fe_face_values_local;
     FEFaceValues<dim> fe_face_values;
@@ -438,9 +435,7 @@ struct Step51<dim>::ScratchData
     const Solution<dim> exact_solution;
     
         // Full constructor
-    ScratchData(const Vector<double> &solution,
-                Vector<double> &solution_local,
-                const FiniteElement<dim> &fe,
+    ScratchData(const FiniteElement<dim> &fe,
                 const FiniteElement<dim> &fe_local,
                 const QGauss<dim>   &quadrature_formula,
                 const QGauss<dim-1> &face_quadrature_formula,
@@ -449,8 +444,6 @@ struct Step51<dim>::ScratchData
                 const UpdateFlags flags,
                 const bool trace_reconstruct)
       :
-      solution(solution),
-      solution_local(solution_local),
       fe_values_local (fe_local, quadrature_formula, local_flags),
       fe_face_values_local (fe_local, face_quadrature_formula, local_face_flags),
       fe_face_values (fe, face_quadrature_formula, flags),
@@ -488,8 +481,6 @@ struct Step51<dim>::ScratchData
         // Copy constructor
     ScratchData(const ScratchData &sd)
       :
-      solution(sd.solution),
-      solution_local(sd.solution_local),
       fe_values_local (sd.fe_values_local.get_fe(),
                        sd.fe_values_local.get_quadrature(),
                        sd.fe_values_local.get_update_flags()),
@@ -591,6 +582,8 @@ Step51<dim>::setup_system ()
   system_matrix.reinit (sparsity_pattern);
 }
 
+
+
 template <int dim>
 void
 Step51<dim>::assemble_system (const bool trace_reconstruct)
@@ -609,9 +602,7 @@ Step51<dim>::assemble_system (const bool trace_reconstruct)
     
     PerTaskData task_data (fe.dofs_per_cell,
                            trace_reconstruct);
-    ScratchData scratch (solution,
-                         solution_local,
-                         fe, fe_local,
+    ScratchData scratch (fe, fe_local,
                          quadrature_formula,
                          face_quadrature_formula,
                          local_flags,
@@ -700,7 +691,7 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
           scratch.fe_face_values_local.reinit(loc_cell, face);
           scratch.fe_face_values.reinit(cell, face);
           if (scratch.trace_reconstruct)
-            scratch.fe_face_values.get_function_values (scratch.solution, scratch.trace_values);
+            scratch.fe_face_values.get_function_values (solution, scratch.trace_values);
 
           for (unsigned int q=0; q<n_face_q_points; ++q)
             {
@@ -802,7 +793,7 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
       else
         {
           scratch.ll_matrix.vmult(scratch.tmp_rhs, scratch.l_rhs);
-          loc_cell->set_dof_values(scratch.tmp_rhs, scratch.solution_local);
+          loc_cell->set_dof_values(scratch.tmp_rhs, solution_local);
         }
 }
 
