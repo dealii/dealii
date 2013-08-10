@@ -344,22 +344,6 @@ int main()
     }
 
 
-  deallog << "Test for 3D, Q4:" << std::endl << std::endl;
-
-  for (int i = 0; i < 8; ++i)
-    {
-      // Generate a triangulation and match:
-      Triangulation<3> triangulation;
-      FE_Q<3> fe(4);
-      DoFHandler<3> dof_handler;
-
-      deallog << "Triangulation:" << i << std::endl;
-
-      generate_grid(triangulation, i);
-      dof_handler.initialize(triangulation, fe);
-      print_matching(dof_handler);
-    }
-
   deallog << "Test for 3D, Taylor-Hood with Component-Mask on v:" << std::endl << std::endl;
 
   for (int i = 0; i < 8; ++i)
