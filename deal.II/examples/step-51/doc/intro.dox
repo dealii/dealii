@@ -10,7 +10,7 @@ One common argument against the use of discontinuous Galerkin elements
 is the large number of globally coupled degrees of freedom that one
 must solve in an implicit system.  For the FE_DGP_Monomial basis, each 
 scalar solution component is represented by polynomials of degree p
-which yields (1/dim!)*\prod_{i=1}^{dim}(k+i) degrees of freedom per
+which yields $(1/dim!)*\prod_{i=1}^{dim}(k+i)$ degrees of freedom per
 element.  Typically, all degrees of freedom in an element are coupled
 to all of the degrees of freedom in the adjacent elements.  The resulting
 discrete equations yield very large linear systems very quickly, especially
@@ -18,37 +18,99 @@ for systems of equations in dim=2 or dim=3.
 
 To alleviate the computational cost of solving such large linear systems, 
 the hybridizable discontinuous Galerkin (HDG) methodology has recently been 
-developed by Cockburn and co-workers \cite{...}.  The HDG method achieves
-this goal by formulating the mathematical problem in such a way that the only
-global unknowns are single-valued ``trace''-values on the skeleton of the
-mesh, i.e. element edges.  The DG solution on element interiors is thus decoupled
-from the neighboring elements, enabling an element-by-element solution process
-for the `interior' solution fields.
+developed by Cockburn and co-workers 
+(<b>
+   N.C. Nguyen and J. Peraire:
+   <i>Hybridizable discontinuous Galerkin methods for partial differential 
+   equations in continuum mechanics</i>, Journal of Computational Physics,
+   2012, 231:18, 5955-5988.
+   <a href="http://dx.doi.org/10.1016/j.jcp.2012.02.033">[DOI]</a>
+</b>).
+The HDG method achieves
+this goal by formulating the mathematical problem using Dirichlet-to-Neumann
+mappings.  The partial differential equations are first written as a first
+order system, and each field is then discretized via a DG method.  At this
+point the  single-valued ``trace'' values on the skeleton of the
+mesh, i.e. element edges, are taken to be independent unknown quantities.  
+The Dirichlet-to-Neumann map concept then permits the solution procedure:
+<ol>
+  <li> Solve a Dirichlet problem on each element individually, where the local/interior
+element solutions no longer couple to neighboring elements.  This is known as the
+'local solver', and is an <i>embarrissingly parallel</i> element-by-element 
+solution process.
+  <li>  Use the local element solutions to construct the global problem for the 
+trace values.  These are the only globally coupled unknowns.
+  <li>  Modify the local solutions from the computed trace values.
+</ol>
 
-- Discuss theoretical convergence rates.  Other big picture HDG details?
+Another criticism of traditional DG methods is that the approximate fluxes
+converge suboptimally.   The local HDG solutions can be shown to converge
+as $\mathcal{O}(h^{p+1})$.  Additionally, a super-convergence property can 
+be used to post-process a new approximate solution that converges at the 
+rate $\mathcal{O}(h^{p+2})$.
+
+
 
 <h3> HDG applied to the convection-diffusion problem </h3>
 
-- Problem formulation.  Flux-formulation, HDG formulation, 
-domain, BCs, etc.  
+The HDG formulation used for this example is taken from 
+<break>
+<b>
+  N.C. Nguyen, J. Peraire, B. Cockburn:
+  <i>An implicit high-order hybridizable discontinuous Galerkin method 
+  for linear convection–diffusion equations</i>, 
+  Journal of Computational Physics, 2009, 228:9, 3232-3254. 
+  <a href="http://dx.doi.org/10.1016/j.jcp.2009.01.030">[DOI]</a>
+</b>
 
-- Reference:
-@article{Nguyen20093232,
-title = "An implicit high-order hybridizable discontinuous Galerkin method for linear convection–diffusion equations ",
-journal = "Journal of Computational Physics ",
-volume = "228",
-number = "9",
-pages = "3232 - 3254",
-year = "2009",
-note = "",
-issn = "0021-9991",
-doi = "http://dx.doi.org/10.1016/j.jcp.2009.01.030",
-url = "http://www.sciencedirect.com/science/article/pii/S0021999109000308",
-author = "N.C. Nguyen and J. Peraire and B. Cockburn",
-keywords = "Finite element methods",
-keywords = "Discontinuous Galerkin methods",
-keywords = "Hybrid/mixed methods",
-keywords = "Convection–diffusion equations "
-}
+We consider the convection-diffusion equation:
+@f{eqnarray*}
+	\nabla \cdot (\mathbf{c} u) - \nabla \cdot (\kappa \nabla u) &= f,
+	\quad \text{ in } \Omega, \\
+	u &= g_D, \quad \text{ on } \partial \Omega_D, \\
+	(\mathbf{c} u - \kappa \nabla u)\cdot \mathbf{n} &= g_N, 
+	\quad \text{ on }  \partial \Omega_D.
+@f}
+
+Introduce the auxiliary variable $\mathbf{q}=-\kappa \nabla u$ and rewrite
+the above equation as the first order system:
+@f{eqnarray*}
+  \mathbf{q} + \kappa \nabla u &= 0, \quad \text{ in } \Omega, \\
+  \nabla \cdot (\mathbf{c} u + \mathbf{q}) &= f, \quad \text{ in } \Omega, \\
+  u &= g_D, \quad \text{ on } \partial \Omega_D, \\
+  (\mathbf{q} + \mathbf{c}u)\cdot\mathbf{n} = &= g_N, 
+	\quad \text{ on }  \partial \Omega_D.
+@f}
+
+
+
+<h3> Problem specific data </h3>
+Example specific data:
+$\Omega := [-1,1]^d$
+
+\mathbf{c} = \begin{cases}
+1, & \textrm{dim}=1
+(y, -x), & \textrm{dim}=2
+(y, -x, 1), & \textrm{dim}=3
+\end{cases}
+
+the centers $x_i$ of the exponentials are 
+  $\{x_i\}_1^3 = \{ -\frac{1}{3}, 0, \frac{1}{3} \}$
+  $\{\mathbf{x}_i\}_1^3 = \{ (-\frac{1}{2},\frac{1}{2})
+  							 (-\frac{1}{2},-\frac{1}{2})
+  							 (\frac{1}{2},-\frac{1}{2})
+  						  \}$
+  $\{\mathbf{x}_i\}_1^3 = \{ (-\frac{1}{2},\frac{1}{2}, \frac{1}{4})
+  							 (-\frac{3}{5},-\frac{1}{2}, -\frac{1}{8})
+  							 (\frac{1}{2},-\frac{1}{2}, \frac{1}{2})
+  						  \}$
+   
 
 <h3> Implementation </h3>
+
+Implementation notes:
+
+- WorkStream to parallelize local solvers.  Workstream is already used in step-32, step-44.
+- Reconstructing the trace
+- Post-processing the solution for superconvergence
+- DataOutFaces:  direct output of the global solution

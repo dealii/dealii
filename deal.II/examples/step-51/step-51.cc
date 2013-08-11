@@ -281,6 +281,8 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 // The HDG solution procedure follows closely that of step-7.  The major
 // difference is the use of 3 different sets of <code>DoFHandler</code> and FE objects,
 // along with the <code>ChunkSparseMatrix</code> and the corresponding solutions vectors.
+// We also use WorkStream to enable a multi-threaded local solution process which exploits
+// the embarrassingly parallel nature of the local solver.
 
 template <int dim>
 class Step51
