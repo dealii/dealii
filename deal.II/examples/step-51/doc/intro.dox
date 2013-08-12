@@ -54,7 +54,7 @@ rate $\mathcal{O}(h^{p+2})$.
 <h3> HDG applied to the convection-diffusion problem </h3>
 
 The HDG formulation used for this example is taken from 
-<break>
+<br>
 <b>
   N.C. Nguyen, J. Peraire, B. Cockburn:
   <i>An implicit high-order hybridizable discontinuous Galerkin method 
@@ -88,11 +88,13 @@ the above equation as the first order system:
 Example specific data:
 $\Omega := [-1,1]^d$
 
+\f[
 \mathbf{c} = \begin{cases}
-1, & \textrm{dim}=1
-(y, -x), & \textrm{dim}=2
+1, & \textrm{dim}=1 \\
+(y, -x), & \textrm{dim}=2 \\
 (y, -x, 1), & \textrm{dim}=3
 \end{cases}
+\f]
 
 the centers $x_i$ of the exponentials are 
   $\{x_i\}_1^3 = \{ -\frac{1}{3}, 0, \frac{1}{3} \}$
