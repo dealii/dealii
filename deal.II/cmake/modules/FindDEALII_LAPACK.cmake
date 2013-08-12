@@ -111,6 +111,7 @@ IF(LAPACK_FOUND)
   SWITCH_LIBRARY_PREFERENCE()
 
 ELSE()
+  SET(DEALII_LAPACK_FOUND FALSE)
 
   #
   # If we couldn't find LAPACK, clean up the library variables:

@@ -243,7 +243,15 @@
 # BLA_VENDOR will also be recognized by FindLAPACK.cmake.
 #
 # If your BLAS/LAPACK installation resides at a non system location, specify
-# a hint with CMAKE_PREFIX_PATH.
+# a hint with LAPACK_DIR and BLAS_DIR, or CMAKE_PREFIX_PATH:
+#
+# SET(LAPACK_DIR "..." CACHE PATH
+#   "The preferred installation prefix for searching for LAPACK"
+#   )
+#
+# SET(BLAS_DIR "..." CACHE PATH
+#   "The preferred installation prefix for searching for BLAS"
+#   )
 #
 #
 # Manual setup:
