@@ -36,7 +36,7 @@ ENDFOREACH()
 # TODO: There might be an external dependency for metis, ignore this for
 # now.
 #
-FIND_PACKAGE(LAPACK)
+FIND_PACKAGE(DEALII_LAPACK)
 FIND_PACKAGE(METIS)
 
 #

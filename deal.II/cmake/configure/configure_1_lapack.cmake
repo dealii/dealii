@@ -19,63 +19,9 @@
 #
 
 MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
-  FIND_PACKAGE(LAPACK)
-
-  #
-  # So, well... LAPACK_LINKER_FLAGS and LAPACK_LIBRARIES should contain the
-  # complete link interface. But for invalid user overrides we include
-  # BLAS_LIBRARIES and BLAS_LINKER_FLAGS as well..
-  #
-  IF(NOT LAPACK_LINKER_FLAGS MATCHES "${BLAS_LINKER_FLAGS}")
-    MESSAGE(STATUS
-      "Manually adding BLAS_LINKER_FLAGS to LAPACK_LINKER_FLAGS"
-      )
-    ADD_FLAGS(LAPACK_LINKER_FLAGS "${BLAS_LINKER_FLAGS}")
-  ENDIF()
-  IF(NOT "${LAPACK_LIBRARIES}" MATCHES "${BLAS_LIBRARIES}")
-    MESSAGE(STATUS
-      "Manually adding BLAS_LIBRARIES to LAPACK_LIBRARIES"
-      )
-    LIST(APPEND LAPACK_LIBRARIES ${BLAS_LIBRARIES})
-  ENDIF()
-
-  MARK_AS_ADVANCED(
-    atlas_LIBRARY
-    blas_LIBRARY
-    gslcblas_LIBRARY
-    lapack_LIBRARY
-    m_LIBRARY
-    ptf77blas_LIBRARY
-    ptlapack_LIBRARY
-    refblas_LIBRARY
-    reflapack_LIBRARY
-    )
+  FIND_PACKAGE(DEALII_LAPACK)
 
   IF(LAPACK_FOUND)
-    #
-    # Well, in case of static archives we have to manually pick up the
-    # complete link interface. *sigh*
-    #
-    # Do this unconditionally for the most common case:
-    # TODO: Non-GNU setups...
-    #
-    # Switch the library preference back to prefer dynamic libraries if
-    # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
-    # this case system libraries should be linked dynamically.
-    #
-    SWITCH_LIBRARY_PREFERENCE()
-    FOREACH(_lib gfortran m quadmath)
-      FIND_LIBRARY(${_lib}_LIBRARY
-        NAMES ${_lib}
-        HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
-      MARK_AS_ADVANCED(${_lib}_LIBRARY)
-
-      IF(NOT ${_lib}_LIBRARY MATCHES "-NOTFOUND")
-        LIST(APPEND LAPACK_LIBRARIES ${${_lib}_LIBRARY})
-      ENDIF()
-    ENDFOREACH()
-    SWITCH_LIBRARY_PREFERENCE()
-
     SET(${var} TRUE)
   ENDIF()
 ENDMACRO()
