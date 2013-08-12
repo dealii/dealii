@@ -234,7 +234,7 @@ namespace PETScWrappers
     vmult (*y, *x);
 
     // copy the result back to dst
-    ierr = VecCopy (&(*(*y)), dst);
+    ierr = VecCopy (static_cast<const Vec &>(*y), dst);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     delete (x);
