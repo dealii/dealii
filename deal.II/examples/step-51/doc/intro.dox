@@ -65,20 +65,20 @@ The HDG formulation used for this example is taken from
 
 We consider the convection-diffusion equation:
 @f{eqnarray*}
-	\nabla \cdot (\mathbf{c} u) - \nabla \cdot (\kappa \nabla u) &= f,
+	\nabla \cdot (\mathbf{c} u) - \nabla \cdot (\kappa \nabla u) &=& f,
 	\quad \text{ in } \Omega, \\
-	u &= g_D, \quad \text{ on } \partial \Omega_D, \\
-	(\mathbf{c} u - \kappa \nabla u)\cdot \mathbf{n} &= g_N, 
+	u &=& g_D, \quad \text{ on } \partial \Omega_D, \\
+	(\mathbf{c} u - \kappa \nabla u)\cdot \mathbf{n} &=& g_N, 
 	\quad \text{ on }  \partial \Omega_D.
 @f}
 
 Introduce the auxiliary variable $\mathbf{q}=-\kappa \nabla u$ and rewrite
 the above equation as the first order system:
 @f{eqnarray*}
-  \mathbf{q} + \kappa \nabla u &= 0, \quad \text{ in } \Omega, \\
-  \nabla \cdot (\mathbf{c} u + \mathbf{q}) &= f, \quad \text{ in } \Omega, \\
-  u &= g_D, \quad \text{ on } \partial \Omega_D, \\
-  (\mathbf{q} + \mathbf{c}u)\cdot\mathbf{n} = &= g_N, 
+  \mathbf{q} + \kappa \nabla u &=& 0, \quad \text{ in } \Omega, \\
+  \nabla \cdot (\mathbf{c} u + \mathbf{q}) &=& f, \quad \text{ in } \Omega, \\
+  u &=& g_D, \quad \text{ on } \partial \Omega_D, \\
+  (\mathbf{q} + \mathbf{c}u)\cdot\mathbf{n}  &=& g_N, 
 	\quad \text{ on }  \partial \Omega_D.
 @f}
 

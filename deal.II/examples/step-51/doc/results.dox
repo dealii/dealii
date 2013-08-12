@@ -1,11 +1,25 @@
 <h1>Results</h1>
 
 
-The program writes convergence tables to the screen while running:
-
+When the program is run, it outputs information about the respective steps and
+convergence tables with errors in the various components in the end. In 2D,
+the convergence tables look the following:
 
 @code
-Q1 elements:
+Q1 elements, adaptive refinement:
+cells dofs   val L2    grad L2  val L2-post 
+    4    24 6.101e+00 1.065e+01   5.098e+00 
+   10    58 3.168e+00 9.223e+00   2.431e+00 
+   28   148 2.888e+00 9.368e+00   2.644e+00 
+   55   272 6.756e-01 4.088e+00   2.400e-01 
+  109   578 2.175e-01 1.529e+00   7.350e-02 
+  214  1072 9.783e-02 9.006e-01   2.219e-02 
+  409  2056 4.812e-02 5.193e-01   1.081e-02 
+  811  3880 2.714e-02 2.971e-01   4.669e-03 
+ 1555  7204 1.365e-02 1.789e-01   2.627e-03 
+ 2956 13198 7.919e-03 1.009e-01   1.006e-03 
+
+Q1 elements, global refinement:
 cells dofs      val L2        grad L2      val L2-post   
    16    80 4.570e+00    - 1.221e+01    - 4.333e+00    -
    36   168 1.869e+00 2.20 7.299e+00 1.27 1.734e+00 2.26
@@ -18,7 +32,7 @@ cells dofs      val L2        grad L2      val L2-post
  4096 16640 1.043e-02 1.96 7.185e-02 1.96 5.306e-04 2.94
  9216 37248 4.690e-03 1.97 3.228e-02 1.97 1.600e-04 2.96
 
-Q3 elements:
+Q3 elements, global refinement:
 cells dofs      val L2        grad L2      val L2-post   
    16   160 2.398e-01    - 1.873e+00    - 1.354e-01    -
    36   336 5.843e-02 3.48 5.075e-01 3.22 1.882e-02 4.87
@@ -43,7 +57,9 @@ postprocessed scalar variable at fifth order.
 
 The same convergence rates are observed in 3d.
 @code
-Q1 elements:
+Q1 elements, adaptive refinement:
+
+Q1 elements, global refinement:
 cells   dofs       val L2          grad L2       val L2-post   
      8     144 3.846e+00     - 1.519e+01     - 2.388e+00     - 
     27     432 4.677e+00 -0.48 2.158e+01 -0.87 3.441e+00 -0.90 
@@ -56,6 +72,7 @@ cells   dofs       val L2          grad L2       val L2-post
  32768  405504 4.637e-02  1.88 3.986e-01  1.89 5.932e-03  2.82 
 110592 1354752 2.133e-02  1.92 1.831e-01  1.92 1.851e-03  2.87 
 
+Q3 elements, global refinement:
 cells   dofs       val L2        grad L2      val L2-post   
      8     576 3.845e+00    - 1.742e+01    - 3.550e+00    - 
     27    1728 8.915e-01 3.60 6.939e+00 2.27 5.865e-01 4.44 
@@ -68,3 +85,89 @@ cells   dofs       val L2        grad L2      val L2-post
  32768 1622016 1.723e-04 3.91 1.518e-03 3.93 5.603e-06 4.99 
 110592 5419008 3.482e-05 3.94 3.057e-04 3.95 7.375e-07 5.00 
 @endcode
+
+
+<h3>Possibilities for extensions</h3>
+
+This tutorial program shows the a basic implementation of an HDG method
+without particular focus on a high performance implementation. Let us look at
+the computing time of the tutorial program and the share of the individual
+components:
+
+<table align="center" border="1">
+  <tr>
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+    <th>Setup</th>
+    <th>Assemble</th>
+    <th>Solve</th>
+    <th>Trace reconstruct</th>
+    <th>Post-processing</th>
+    <th>Output</th>
+  </tr>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Total time</th>
+    <th colspan="6">Relative share</th>
+  </tr>
+  <tr>
+    <td align="left">2D, Q1, cycle 9, 37,248 dofs</td>
+    <td align="center">5.34s</td>
+    <td align="center">0.7%</td>
+    <td align="center">1.2%</td>
+    <td align="center">89.5%</td>
+    <td align="center">0.9%</td>
+    <td align="center">2.3%</td>
+    <td align="center">5.4%</td>
+  </tr>
+  <tr>
+    <td align="left">2D, Q3, cycle 9, 74,496 dofs</td>
+    <td align="center">22.2s</td>
+    <td align="center">0.4%</td>
+    <td align="center">4.3%</td>
+    <td align="center">84.1%</td>
+    <td align="center">4.1%</td>
+    <td align="center">3.5%</td>
+    <td align="center">3.6%</td>
+  </tr>
+  <tr>
+    <td align="left">3D, Q1, cycle 7, 172,800 dofs</td>
+    <td align="center">9.06s</td>
+    <td align="center">3.1%</td>
+    <td align="center">8.9%</td>
+    <td align="center">42.7%</td>
+    <td align="center">7.0%</td>
+    <td align="center">20.6%</td>
+    <td align="center">17.7%</td>
+  </tr>
+  <tr>
+    <td align="left">3D, Q3, cycle 7, 691,200 dofs</td>
+    <td align="center">516s</td>
+    <td align="center">0.6%</td>
+    <td align="center">34.5%</td>
+    <td align="center">13.4%</td>
+    <td align="center">32.8%</td>
+    <td align="center">17.1%</td>
+    <td align="center">1.5%</td>
+  </tr>
+</table>
+
+As can be seen from the table, the solver and assembly calls dominate the
+runtime of the program. This also gives a clear indication of where an
+improvement makes most sense.
+
+<ol>
+  <li> Better linear solvers: We use a GMRES iterative solver without
+  preconditioner, where the number of iteration increases with increasing
+  problem size (the number of iterations for Q1 elements and global
+  refinements start at 8 for the small sizes but increase up to 2592 for the
+  largest size). To do better, one could for example use an algebraic
+  multigrid preconditioner from Trilinos. For diffusion-dominated problems as
+  the problem at hand with finer meshes, such a solver can be designed that
+  uses the matrix-vector products from the more efficient ChunkSparseMatrix on
+  the finest level, as long as we are not working in parallel with MPI.
+
+  <li> Speed up assembly by pre-assembling parts that do not change from one
+  cell to another (those that do neither contain variable coefficients nor
+  mapping-dependent terms.
+</ol>
