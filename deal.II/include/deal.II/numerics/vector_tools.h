@@ -182,7 +182,7 @@ class ConstraintMatrix;
  *
  * <li> Creation of right hand side vectors for point sources:
  *   The create_point_source_vector() function computes the vector
- *   $f_i = \int_\Omega \delta_0(x-x_0) \phi_i(x) dx$.
+ *   $f_i = \int_\Omega \delta(x-x_0) \phi_i(x) dx$.
  *
  * <li> Creation of boundary right hand side vectors: The
  *   create_boundary_right_hand_side() function computes the vector
@@ -1785,7 +1785,9 @@ namespace VectorTools
 
   /**
    * Create a right hand side
-   * vector for a point source at point @p p.
+   * vector for a point source at point @p p. In other words, it creates
+   * a vector $F$ so that
+   * $F_i = \int_\Omega \delta(x-p) \phi_i(x) dx$.
    * Prior content of the
    * given @p rhs_vector vector is
    * deleted.
