@@ -745,6 +745,52 @@ namespace TrilinosWrappers
                                              const AdditionalData &, const double,
                                              const ::dealii::SparsityPattern *);
 
+
+
+
+  /* -------------------------- PreconditionAMG -------------------------- */
+
+  void 
+  PreconditionIdentity::vmult(VectorBase       &dst,
+                              const VectorBase &src) const
+  {
+    dst = src;
+  }
+
+  void
+  PreconditionIdentity::Tvmult(VectorBase       &dst,
+                               const VectorBase &src) const
+  {
+    dst = src;
+  }
+
+  void 
+  PreconditionIdentity::vmult(dealii::Vector<double>       &dst,
+                              const dealii::Vector<double> &src) const
+  {
+    dst = src;
+  }
+
+  void
+  PreconditionIdentity::Tvmult(dealii::Vector<double>       &dst,
+                               const dealii::Vector<double> &src) const
+  {
+    dst = src;
+  }
+
+  void
+  PreconditionIdentity::vmult(parallel::distributed::Vector<double>       &dst,
+                              const parallel::distributed::Vector<double> &src) const
+  {
+    dst = src;
+  }
+
+  void
+  PreconditionIdentity::Tvmult(parallel::distributed::Vector<double>       &dst,
+                               const parallel::distributed::Vector<double> &src) const
+  {
+    dst = src;
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE

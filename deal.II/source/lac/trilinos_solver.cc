@@ -208,11 +208,14 @@ namespace TrilinosWrappers
         Assert (false, ExcNotImplemented());
       }
 
-    // Introduce the
-    // preconditioner, ...
-    ierr = solver.SetPrecOperator (const_cast<Epetra_Operator *>
-                                   (preconditioner.preconditioner.get()));
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    // Introduce the preconditioner, 
+    // if not the identity preconditioner ...
+    if (preconditioner.preconditioner.use_count()!=0)
+    {
+      ierr = solver.SetPrecOperator (const_cast<Epetra_Operator *>
+                                     (preconditioner.preconditioner.get()));
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    }
 
     // ... set some options, ...
     solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?

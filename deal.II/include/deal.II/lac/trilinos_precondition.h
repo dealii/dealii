@@ -121,13 +121,13 @@ namespace TrilinosWrappers
     /**
      * Apply the preconditioner.
      */
-    void vmult (VectorBase       &dst,
-                const VectorBase &src) const;
+    virtual void vmult (VectorBase       &dst,
+                        const VectorBase &src) const;
 
     /**
      * Apply the transpose preconditioner.
      */
-    void Tvmult (VectorBase       &dst,
+    virtual void Tvmult (VectorBase       &dst,
                  const VectorBase &src) const;
 
     /**
@@ -137,8 +137,8 @@ namespace TrilinosWrappers
      * in the Trilinos wrapper
      * class.
      */
-    void vmult (dealii::Vector<double>       &dst,
-                const dealii::Vector<double> &src) const;
+    virtual void vmult (dealii::Vector<double>       &dst,
+                        const dealii::Vector<double> &src) const;
 
     /**
      * Apply the transpose preconditioner on
@@ -147,8 +147,8 @@ namespace TrilinosWrappers
      * in the Trilinos wrapper
      * class.
      */
-    void Tvmult (dealii::Vector<double>       &dst,
-                 const dealii::Vector<double> &src) const;
+    virtual void Tvmult (dealii::Vector<double>       &dst,
+                         const dealii::Vector<double> &src) const;
 
     /**
      * Apply the preconditioner on deal.II
@@ -156,8 +156,8 @@ namespace TrilinosWrappers
      * the ones provided in the Trilinos
      * wrapper class.
      */
-    void vmult (dealii::parallel::distributed::Vector<double>       &dst,
-                const dealii::parallel::distributed::Vector<double> &src) const;
+    virtual void vmult (dealii::parallel::distributed::Vector<double>       &dst,
+                        const dealii::parallel::distributed::Vector<double> &src) const;
 
     /**
      * Apply the transpose preconditioner on deal.II
@@ -165,8 +165,8 @@ namespace TrilinosWrappers
      * the ones provided in the Trilinos
      * wrapper class.
      */
-    void Tvmult (dealii::parallel::distributed::Vector<double>       &dst,
-                 const dealii::parallel::distributed::Vector<double> &src) const;
+    virtual void Tvmult (dealii::parallel::distributed::Vector<double>       &dst,
+                         const dealii::parallel::distributed::Vector<double> &src) const;
 
     /**
      * Exception.
@@ -1504,6 +1504,64 @@ namespace TrilinosWrappers
      * Trilinos format.
      */
     std_cxx1x::shared_ptr<SparseMatrix> trilinos_matrix;
+  };
+
+
+
+  /**
+   * A wrapper class for an identity preconditioner for Trilinos matrices.
+   *
+   * @ingroup TrilinosWrappers
+   * @ingroup Preconditioners
+   * @author Bruno Turcksin, 2013
+   */
+  class PreconditionIdentity : public PreconditionBase
+  {
+  public:
+
+    /**
+     * Apply the preconditioner, i.e., dst = src.
+     */
+    void vmult (VectorBase       &dst,
+                const VectorBase &src) const;
+
+    /**
+     * Apply the transport conditioner, i.e., dst = src.
+     */
+    void Tvmult (VectorBase       &dst,
+                 const VectorBase &src) const;
+
+    /**
+     * Apply the preconditioner on deal.II data structures 
+     * instead of the ones provided in the Trilinos wrapper class, 
+     * i.e., dst = src.
+     */
+    void vmult (dealii::Vector<double>       &dst,
+                const dealii::Vector<double> &src) const;
+
+    /**
+     * Apply the transpose preconditioner on deal.II data structures 
+     * instead of the ones provided in the Trilinos wrapper class,
+     * i.e. dst = src.
+     */
+    void Tvmult (dealii::Vector<double>       &dst,
+                 const dealii::Vector<double> &src) const;
+
+    /**
+     * Apply the preconditioner on deal.II parallel data structures 
+     * instead of the ones provided in the Trilinos wrapper class,
+     * i.e., dst = src.
+     */
+    void vmult (parallel::distributed::Vector<double>       &dst,
+                const dealii::parallel::distributed::Vector<double> &src) const;
+
+    /**
+     * Apply the transpose preconditioner on deal.II parallel data structures 
+     * instead of the ones provided in the Trilinos wrapper class,
+     * i.e., dst = src.
+     */
+    void Tvmult (parallel::distributed::Vector<double>       &dst,
+                 const dealii::parallel::distributed::Vector<double> &src) const;
   };
 
 
