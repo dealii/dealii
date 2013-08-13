@@ -6,7 +6,7 @@ Use: Convert an ABAQUS .inp file to an AVS UCD file.
 
 Author: Jean-Paul Pelteret
         jppelteret.uct@gmail.com
-        modified by: Timo Heister, heister@math.tamu.edu
+        modified by: Timo Heister, heister@clemson.edu
 ===================================================
 
 
