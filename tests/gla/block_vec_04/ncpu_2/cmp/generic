@@ -1,0 +1,11 @@
+
+DEAL:0:PETSc::numproc=2
+DEAL:0:PETSc::Exception: ExcDimensionMismatch(n_blocks(), v.n_blocks())
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=2
+DEAL:0:Trilinos::Exception: ExcDimensionMismatch(n_blocks(), v.n_blocks())
+DEAL:0:Trilinos::OK
+
+DEAL:1:PETSc::Exception: ExcDimensionMismatch(n_blocks(), v.n_blocks())
+DEAL:1:Trilinos::Exception: ExcDimensionMismatch(n_blocks(), v.n_blocks())
+
