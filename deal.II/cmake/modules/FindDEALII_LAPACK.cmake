@@ -50,6 +50,17 @@ FIND_PACKAGE(LAPACK)
 
 SET(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
 
+MARK_AS_ADVANCED(
+  atlas_LIBRARY
+  blas_LIBRARY
+  gslcblas_LIBRARY
+  lapack_LIBRARY
+  m_LIBRARY
+  ptf77blas_LIBRARY
+  ptlapack_LIBRARY
+  refblas_LIBRARY
+  reflapack_LIBRARY
+  )
 
 
 IF(LAPACK_FOUND)
@@ -72,18 +83,6 @@ IF(LAPACK_FOUND)
       )
     LIST(APPEND LAPACK_LIBRARIES ${BLAS_LIBRARIES})
   ENDIF()
-
-  MARK_AS_ADVANCED(
-    atlas_LIBRARY
-    blas_LIBRARY
-    gslcblas_LIBRARY
-    lapack_LIBRARY
-    m_LIBRARY
-    ptf77blas_LIBRARY
-    ptlapack_LIBRARY
-    refblas_LIBRARY
-    reflapack_LIBRARY
-    )
 
   #
   # Well, in case of static archives we have to manually pick up the
@@ -110,8 +109,20 @@ IF(LAPACK_FOUND)
   ENDFOREACH()
   SWITCH_LIBRARY_PREFERENCE()
 
+  MARK_AS_ADVANCED(
+    BLAS_DIR
+    LAPACK_DIR
+    )
+
 ELSE()
   SET(DEALII_LAPACK_FOUND FALSE)
+
+  SET(LAPACK_DIR "" CACHE PATH
+    "An optional hint to a LAPACK installation"
+    )
+  SET(BLAS_DIR "" CACHE PATH
+    "An optional hint to a BLAS installation"
+    )
 
   #
   # If we couldn't find LAPACK, clean up the library variables:
