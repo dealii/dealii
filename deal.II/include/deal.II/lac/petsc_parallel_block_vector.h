@@ -441,17 +441,25 @@ namespace PETScWrappers
       return *this;
     }
 
-
-
     inline
     BlockVector &
     BlockVector::operator = (const BlockVector &v)
     {
-      BaseClass::operator = (v);
+      // we only allow assignment to vectors with the same number of blocks
+      // or to an empty BlockVector
+      Assert (n_blocks() == 0 || n_blocks() == v.n_blocks(),
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+
+      if (this->n_blocks() != v.n_blocks())
+        reinit(v.n_blocks());
+
+      for (size_type i=0; i<this->n_blocks(); ++i)
+        this->components[i] = v.block(i);
+
+      collect_sizes();
+
       return *this;
     }
-
-
 
     inline
     BlockVector::~BlockVector ()
