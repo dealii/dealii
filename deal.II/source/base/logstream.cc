@@ -161,24 +161,24 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
     // whether overflow or sync was called
     public:
       QueryStreambuf()
-        : _flushed(false), _newline_written(false)
+        : flushed_(false), newline_written_(false)
       {
       }
-      bool flushed() { return _flushed; }
-      bool newline_written() { return _newline_written; }
+      bool flushed() { return flushed_; }
+      bool newline_written() { return newline_written_; }
     private:
       int_type overflow(int_type ch)
         {
-          _newline_written = true;
+          newline_written_ = true;
           return ch;
         }
       int sync()
         {
-          _flushed = true;
+          flushed_ = true;
           return 0;
         }
-      bool _flushed;
-      bool _newline_written;
+      bool flushed_;
+      bool newline_written_;
   } query_streambuf;
 
   {
