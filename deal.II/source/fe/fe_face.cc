@@ -30,10 +30,7 @@ namespace
   get_QGaussLobatto_points (const unsigned int degree)
   {
     if (degree > 0)
-      {
-        QGaussLobatto<1> quad(degree+1);
-        return quad.get_points();
-      }
+      return QGaussLobatto<1>(degree+1).get_points();
     else
       return std::vector<Point<1> >(1, Point<1>(0.5));
   }
@@ -56,8 +53,6 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
       this->unit_face_support_points[0][d] = 0.5;
   else
     {
-      const double step = 1./this->degree;
-      Point<codim> p;
       std::vector<Point<1> > points = get_QGaussLobatto_points(degree);
 
       unsigned int k=0;
@@ -65,6 +60,8 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
         for (unsigned int iy=0; iy <= ((codim>1) ? this->degree : 0) ; ++iy)
           for (unsigned int ix=0; ix<=this->degree; ++ix)
             {
+	      Point<codim> p;
+	      
               p(0) = points[ix][0];
               if (codim>1)
                 p(1) = points[iy][0];
@@ -158,7 +155,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
            ExcInterpolationNotImplemented ()));
 
   // generate a quadrature with the unit face support points. 
-  Quadrature<dim-1> face_quadrature (source_fe.get_unit_face_support_points ());
+  const Quadrature<dim-1> face_quadrature (source_fe.get_unit_face_support_points ());
 
   // Rule of thumb for FP accuracy, that can be expected for a given
   // polynomial degree.  This value is used to cut off values close to zero.
@@ -232,7 +229,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
                ExcInterpolationNotImplemented ()));
 
       // generate a quadrature with the unit face support points. 
-      Quadrature<dim-1> face_quadrature (source_fe->get_unit_face_support_points ());
+      const Quadrature<dim-1> face_quadrature (source_fe->get_unit_face_support_points ());
 
       // Rule of thumb for FP accuracy, that can be expected for a given
       // polynomial degree.  This value is used to cut off values close to
