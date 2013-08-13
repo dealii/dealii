@@ -3328,7 +3328,8 @@ namespace Step32
                 }
           }
     }
-
+    
+    joint_solution.compress(VectorOperation::insert);
 
     IndexSet locally_relevant_joint_dofs(joint_dof_handler.n_dofs());
     DoFTools::extract_locally_relevant_dofs (joint_dof_handler, locally_relevant_joint_dofs);
