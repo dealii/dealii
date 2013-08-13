@@ -58,7 +58,7 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
   STRING(TOLOWER "${DEAL_II_BUILD_TYPE}" _deal_ii_build_type)
 
   IF( NOT "${_cmake_build_type}" MATCHES "^(debug|release)$"
-      OR NOT _deal_ii_build_type MATCHES "${_cmake_build_type}"
+      OR NOT _deal_ii_build_type MATCHES "${_cmake_build_type}" )
 
     IF("${DEAL_II_BUILD_TYPE}" STREQUAL "DebugRelease")
       SET(_new_build_type "Debug")
