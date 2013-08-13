@@ -61,16 +61,16 @@ MACRO(DEAL_II_SETUP_TARGET _target)
     )
 
   #
-  # Append build type dependend flags and definitions.
+  # Append build type dependent flags and definitions.
   #
 
   #
   # For this we obey the behaviour of the "optimized" and "debug"
   # keywords and this is a bit tricky:
   #
-  # If the global property DEBUG_CONFIGURATIONS is set all build
-  # types that (case insensitive) match one of the listed build types is
-  # considered a "debug" build. The rest is "optimized".
+  # If the global property DEBUG_CONFIGURATIONS is set all build types that
+  # (case insensitively) match one of the listed build types is considered
+  # a "debug" build. The rest is "optimized".
   #
   # Otherwise every build type that (case insensitively) matches "debug" is
   # considered a debug build.
@@ -97,7 +97,12 @@ MACRO(DEAL_II_SETUP_TARGET _target)
     ENDIF()
   ENDIF()
 
-  IF(_on_debug_build)
+  #
+  # We can only append DEBUG link flags and compile definitions if deal.II
+  # was build with Debug or DebugRelease build type. So test for this:
+  #
+  IF( _on_debug_build
+      AND DEAL_II_BUILD_TYPE MATCHES "Debug" )
     SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
       LINK_FLAGS " ${DEAL_II_LINKER_FLAGS_DEBUG}"
       )

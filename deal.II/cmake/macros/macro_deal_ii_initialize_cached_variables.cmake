@@ -51,9 +51,15 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
   ENDIF()
 
   #
-  # Reset build type if unsupported:
+  # Reset build type if unsupported, i.e. if it is not (case insensitively
+  # equal to Debug or Release or unsupported by the current build type:
   #
-  IF(NOT DEAL_II_BUILD_TYPE MATCHES "${CMAKE_BUILD_TYPE}")
+  STRING(TOLOWER "${CMAKE_BUILD_TYPE}" _cmake_build_type)
+  STRING(TOLOWER "${DEAL_II_BUILD_TYPE}" _deal_ii_build_type)
+
+  IF( NOT "${_cmake_build_type}" MATCHES "^(debug|release)$"
+      OR NOT _deal_ii_build_type MATCHES "${_cmake_build_type}"
+
     IF("${DEAL_II_BUILD_TYPE}" STREQUAL "DebugRelease")
       SET(_new_build_type "Debug")
     ELSE()
