@@ -301,6 +301,10 @@ private:
     
   struct PerTaskData;
   struct ScratchData;
+  
+  struct EmptyData;
+  struct PostProcessScratchData;
+  void NullFunction(const EmptyData &data);
     
   void setup_system ();
   void assemble_system (const bool reconstruct_trace = false);
@@ -310,6 +314,9 @@ private:
   void copy_local_to_global(const PerTaskData &data);
   void solve ();
   void postprocess ();
+  void postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                   PostProcessScratchData &scratch,
+                                   EmptyData &task_data);
   void refine_grid (const unsigned int cylce);
   void output_results (const unsigned int cycle);
 
@@ -507,6 +514,69 @@ struct Step51<dim>::ScratchData
     void reset() {}
     
 };
+
+template <int dim>
+struct Step51<dim>::EmptyData
+{
+    EmptyData(){}
+    void reset(){}
+};
+
+template <int dim>
+struct Step51<dim>::PostProcessScratchData
+{
+  FEValues<dim> fe_values_local;
+  FEValues<dim> fe_values;
+    
+  std::vector<double> u_values;
+  std::vector<Tensor<1,dim> > u_gradients;
+  FullMatrix<double> cell_matrix;
+  
+  Vector<double> cell_rhs;
+  Vector<double> cell_sol;
+    
+        // Full constructor
+  PostProcessScratchData(const FiniteElement<dim> &fe,
+                const FiniteElement<dim> &fe_local,
+                const QGauss<dim>   &quadrature_formula,
+                const UpdateFlags local_flags,
+                const UpdateFlags flags)
+      :
+      fe_values_local (fe_local, quadrature_formula, local_flags),
+      fe_values (fe, quadrature_formula, flags),
+      u_values (quadrature_formula.size()),
+      u_gradients (quadrature_formula.size()),
+      cell_matrix (fe.dofs_per_cell, fe.dofs_per_cell),
+      cell_rhs (fe.dofs_per_cell),
+      cell_sol (fe.dofs_per_cell)
+      {}
+    
+        // Copy constructor
+  PostProcessScratchData(const PostProcessScratchData &sd)
+      :
+      fe_values_local (sd.fe_values_local.get_fe(),
+                       sd.fe_values_local.get_quadrature(),
+                       sd.fe_values_local.get_update_flags()),
+      fe_values (sd.fe_values.get_fe(),
+                      sd.fe_values.get_quadrature(),
+                      sd.fe_values.get_update_flags()),
+      u_values (sd.u_values),
+      u_gradients (sd.u_gradients),
+      cell_matrix (sd.cell_matrix),
+      cell_rhs (sd.cell_rhs),
+      cell_sol (sd.cell_sol)
+    {}
+       
+    void reset() {
+      cell_matrix = 0.;
+      cell_rhs = 0.;
+      cell_sol = 0.;
+    }
+    
+};
+
+template <int dim>
+void Step51<dim>::NullFunction(const EmptyData &data){}
 
 template <int dim>
 void Step51<dim>::copy_local_to_global(const PerTaskData &data)
@@ -796,7 +866,31 @@ template <int dim>
 void
 Step51<dim>::postprocess()
 {
-  const unsigned int n_active_cells=triangulation.n_active_cells();
+  // construct post-processed solution with (hopefully) higher order of
+  // accuracy
+  {
+    const QGauss<dim>   quadrature_formula(fe_u_post.degree+1);
+    const UpdateFlags local_flags (update_values);
+    const UpdateFlags flags ( update_values | update_gradients |
+                             update_JxW_values);
+  
+    EmptyData task_data;
+    
+    PostProcessScratchData scratch (fe_u_post, fe_local,
+                         quadrature_formula,
+                         local_flags,
+                         flags);
+    
+    WorkStream::run(dof_handler_u_post.begin_active(),
+                    dof_handler_u_post.end(),
+                    *this,
+                    &Step51<dim>::postprocess_one_cell,
+                    &Step51<dim>::NullFunction,
+                    scratch,
+                    task_data);
+    }
+
+// Compute some convergence rates, etc., and add to a table
   Vector<float> difference_per_cell (triangulation.n_active_cells());
 
   ComponentSelectFunction<dim> value_select (dim, dim+1);
@@ -820,86 +914,84 @@ Step51<dim>::postprocess()
                                      &gradient_select);
   const double grad_error = difference_per_cell.l2_norm();
 
-  convergence_table.add_value("cells", n_active_cells);
-  convergence_table.add_value("dofs", dof_handler.n_dofs());
-  convergence_table.add_value("val L2", L2_error);
-  convergence_table.add_value("grad L2", grad_error);
-
-  // construct post-processed solution with (hopefully) higher order of
-  // accuracy
-  QGauss<dim> quadrature(fe_u_post.degree+1);
-  FEValues<dim> fe_values(fe_u_post, quadrature,
-                          update_values | update_JxW_values |
-                          update_gradients);
-
-  const unsigned int n_q_points = quadrature.size();
-  std::vector<double> u_values(n_q_points);
-  std::vector<Tensor<1,dim> > u_gradients(n_q_points);
-  FEValuesExtractors::Vector fluxes(0);
-  FEValuesExtractors::Scalar scalar(dim);
-  FEValues<dim> fe_values_local(fe_local, quadrature, update_values);
-  FullMatrix<double> cell_matrix(fe_u_post.dofs_per_cell,
-                                 fe_u_post.dofs_per_cell);
-  Vector<double> cell_rhs(fe_u_post.dofs_per_cell);
-  Vector<double> cell_sol(fe_u_post.dofs_per_cell);
-
-  typename DoFHandler<dim>::active_cell_iterator
-    cell_loc = dof_handler_local.begin_active(),
-    cell = dof_handler_u_post.begin_active(),
-    endc = dof_handler_u_post.end();
-  for ( ; cell != endc; ++cell, ++cell_loc)
-    {
-      fe_values.reinit(cell);
-      fe_values_local.reinit(cell_loc);
-
-      fe_values_local[scalar].get_function_values(solution_local, u_values);
-      fe_values_local[fluxes].get_function_values(solution_local, u_gradients);
-      for (unsigned int i=1; i<fe_u_post.dofs_per_cell; ++i)
-        {
-          for (unsigned int j=0; j<fe_u_post.dofs_per_cell; ++j)
-            {
-              double sum = 0;
-              for (unsigned int q=0; q<quadrature.size(); ++q)
-                sum += (fe_values.shape_grad(i,q) *
-                        fe_values.shape_grad(j,q)
-                        ) * fe_values.JxW(q);
-              cell_matrix(i,j) = sum;
-            }
-          double sum = 0;
-          for (unsigned int q=0; q<quadrature.size(); ++q)
-            sum -= (fe_values.shape_grad(i,q) * u_gradients[q]
-                    ) * fe_values.JxW(q);
-          cell_rhs(i) = sum;
-        }
-      for (unsigned int j=0; j<fe_u_post.dofs_per_cell; ++j)
-        {
-          double sum = 0;
-          for (unsigned int q=0; q<quadrature.size(); ++q)
-            sum += fe_values.shape_value(j,q) * fe_values.JxW(q);
-          cell_matrix(0,j) = sum;
-        }
-      {
-        double sum = 0;
-        for (unsigned int q=0; q<quadrature.size(); ++q)
-          sum += u_values[q] * fe_values.JxW(q);
-        cell_rhs(0) = sum;
-      }
-
-      cell_matrix.gauss_jordan();
-      cell_matrix.vmult(cell_sol, cell_rhs);
-      cell->distribute_local_to_global(cell_sol, solution_u_post);
-    }
-
   VectorTools::integrate_difference (dof_handler_u_post,
                                      solution_u_post,
                                      Solution<dim>(),
                                      difference_per_cell,
                                      QGauss<dim>(fe.degree+3),
                                      VectorTools::L2_norm);
-  double post_error = difference_per_cell.l2_norm();
-  convergence_table.add_value("val L2-post", post_error);
+  const double post_error = difference_per_cell.l2_norm();
+  
+  convergence_table.add_value("cells", 		 triangulation.n_active_cells());
+  convergence_table.add_value("dofs", 	 	 dof_handler.n_dofs());
+  convergence_table.add_value("val L2", 	 L2_error);
+  convergence_table.add_value("grad L2", 	 grad_error);
+  convergence_table.add_value("val L2-post", post_error);  
 }
 
+template <int dim>
+void
+Step51<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                       PostProcessScratchData &scratch,
+                                       EmptyData &task_data)
+{
+  scratch.reset();
+
+  typename DoFHandler<dim>::active_cell_iterator
+    loc_cell (&triangulation,
+              cell->level(),
+              cell->index(),
+              &dof_handler_local);
+              
+  scratch.fe_values_local.reinit (loc_cell);
+  scratch.fe_values.reinit(cell);
+  
+  FEValuesExtractors::Vector fluxes(0);
+  FEValuesExtractors::Scalar scalar(dim);
+
+  const unsigned int n_q_points = scratch.fe_values.get_quadrature().size();
+  const unsigned int dofs_per_cell = scratch.fe_values.dofs_per_cell;
+
+  scratch.fe_values_local[scalar].get_function_values(solution_local, scratch.u_values);
+  scratch.fe_values_local[fluxes].get_function_values(solution_local, scratch.u_gradients);
+  
+  double sum = 0;
+  for (unsigned int i=1; i<dofs_per_cell; ++i)
+	{
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+		{
+		  sum = 0;
+		  for (unsigned int q=0; q<n_q_points; ++q)
+			sum += (scratch.fe_values.shape_grad(i,q) *
+					scratch.fe_values.shape_grad(j,q)
+					) * scratch.fe_values.JxW(q);
+		  scratch.cell_matrix(i,j) = sum;
+		}
+	  
+	  sum = 0;
+	  for (unsigned int q=0; q<n_q_points; ++q)
+		sum -= (scratch.fe_values.shape_grad(i,q) * scratch.u_gradients[q]
+				) * scratch.fe_values.JxW(q);
+	  scratch.cell_rhs(i) = sum;
+	}
+  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	{
+	  sum = 0;
+	  for (unsigned int q=0; q<n_q_points; ++q)
+		sum += scratch.fe_values.shape_value(j,q) * scratch.fe_values.JxW(q);
+	  scratch.cell_matrix(0,j) = sum;
+	}
+  {
+	sum = 0;
+	for (unsigned int q=0; q<n_q_points; ++q)
+	  sum += scratch.u_values[q] * scratch.fe_values.JxW(q);
+	scratch.cell_rhs(0) = sum;
+  }
+
+  scratch.cell_matrix.gauss_jordan();
+  scratch.cell_matrix.vmult(scratch.cell_sol, scratch.cell_rhs);
+  cell->distribute_local_to_global(scratch.cell_sol, solution_u_post);
+}
 
 
 template <int dim>
