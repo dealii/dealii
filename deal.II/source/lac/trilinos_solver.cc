@@ -87,6 +87,7 @@ namespace TrilinosWrappers
                               &x.trilinos_vector(),
                               const_cast<Epetra_MultiVector *>(&b.trilinos_vector())));
 
+    std::cout<<"ewww"<<std::endl;
     execute_solve(preconditioner);
   }
 
@@ -209,13 +210,16 @@ namespace TrilinosWrappers
       }
 
     // Introduce the preconditioner, 
-    // if not the identity preconditioner ...
+    // if the identity preconditioner is used,
+    // the precondioner is set to none, ...
     if (preconditioner.preconditioner.use_count()!=0)
     {
       ierr = solver.SetPrecOperator (const_cast<Epetra_Operator *>
                                      (preconditioner.preconditioner.get()));
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     }
+    else
+      solver.SetAztecOption(AZ_precond,AZ_none);
 
     // ... set some options, ...
     solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?
