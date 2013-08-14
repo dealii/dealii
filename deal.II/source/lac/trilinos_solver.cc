@@ -87,7 +87,6 @@ namespace TrilinosWrappers
                               &x.trilinos_vector(),
                               const_cast<Epetra_MultiVector *>(&b.trilinos_vector())));
 
-    std::cout<<"ewww"<<std::endl;
     execute_solve(preconditioner);
   }
 
