@@ -797,8 +797,8 @@ public:
    * one.
    *
    * If the present object is a
-   * rank-4 tensor, the the result
-   * is a rank-2 tensor, the
+   * rank-4 tensor, then the result
+   * is a rank-2 tensor, i.e., the
    * operation contracts over the
    * last two indices of the
    * present object and the indices
