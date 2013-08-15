@@ -57,6 +57,16 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: Creating objects of type MappingQ was previously only possible
+  for low order polynomials. For orders higher than around 6, one ran
+  into assertions that tested for internal consistency. These assertions
+  have now been appropriately relaxes for the growth of round-off errors
+  with growing polynomial degrees.
+  <br>
+  (Juan Carlos Araujo Cabarcas, Wolfgang Bangerth, 2013/08/14)
+  </li>
+
+  <li>
   New: MappingQEulerian is now also instantiated for vector elements
   of type TrilinosWrappers::Vector as well as the MPI and block
   variants.
