@@ -1858,7 +1858,8 @@ public:
    * DataOutInterface::write_vtu_footer() and DataOutInterface::write_vtu_main()
    * by DataOutBase::write_vtu().
    */
-  static void write_vtu_header (std::ostream &out, const VtkFlags &flags);
+  static void write_vtu_header (std::ostream &out,
+                                const VtkFlags &flags);
 
   /**
    * This writes the footer for the xml based vtu file format. This
