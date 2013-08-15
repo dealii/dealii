@@ -57,6 +57,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: There are now global functions <code>scalar_product</code>
+  that compute the scalar product (double contraction) between
+  tensors of rank 2.
+  <br>
+  (Scott Miller, 2013/08/14)
+  </li>
+
+  <li>
   Fixed: Creating objects of type MappingQ was previously only possible
   for low order polynomials. For orders higher than around 6, one ran
   into assertions that tested for internal consistency. These assertions
