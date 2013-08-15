@@ -18,6 +18,9 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>

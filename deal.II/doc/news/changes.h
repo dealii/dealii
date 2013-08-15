@@ -57,6 +57,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: MappingQEulerian is now also instantiated for vector elements
+  of type TrilinosWrappers::Vector as well as the MPI and block
+  variants.
+  <br>
+  (Armin Ghajar Jazi, 2013/08/14)
+  </li>
+
+  <li>
   Fixed: The FiniteElement::face_to_cell_index() function had a bug
   that made it work incorrectly for elements that have more than one
   degree of freedom per line (in 2d) or per quad (in 3d). This is now
