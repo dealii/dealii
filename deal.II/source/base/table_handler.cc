@@ -343,25 +343,60 @@ void TableHandler::write_text(std::ostream &out,
   const unsigned int nrows  = n_rows();
   const unsigned int n_cols = sel_columns.size();
 
-  // handle the simple format separately first
-  if (format==simple_table_with_separate_column_description)
+  // cache the columns and compute the widths of each column for alignment
+  std::vector<const Column *> cols;
+  std::vector<unsigned int> column_widths (n_cols, 0);
+  for (unsigned int j=0; j<n_cols; ++j)
+    {
+      std::string key=sel_columns[j];
+      const std::map<std::string, Column>::const_iterator
+      col_iter=columns.find(key);
+      Assert(col_iter!=columns.end(), ExcInternalError());
+      cols.push_back(&(col_iter->second));
+
+      column_widths[j] = col_iter->second.max_length;
+    }
+
+  switch (format)
+    {
+    case org_mode_table:
+    {
+      // write the captions
+      out << "| " << std::left;
+      for (unsigned int j=0; j<n_cols; ++j)
+        {
+          const std::string &key = sel_columns[j];
+          out << std::setw(column_widths[j]);
+          out << key << " | ";
+        }
+      out << std::endl;
+
+      // write the body
+      for (unsigned int i=0; i<nrows; ++i)
+        {
+          out << "| ";
+          for (unsigned int j=0; j<n_cols; ++j)
+            {
+              const Column &column=*(cols[j]);
+
+              out << std::setw(column_widths[j]);
+              out << column.entries[i].get_cached_string();
+              out << " | ";
+            }
+          out << '\n';
+        }
+
+      out << std::flush;
+      return;
+    }
+    
+    case simple_table_with_separate_column_description:
     {
       // write the captions
       for (unsigned int j=0; j<n_cols; ++j)
         {
           const std::string &key = sel_columns[j];
           out << "# " << j+1 << ": " << key << '\n';
-        }
-
-      // cache the columns
-      std::vector<const Column *> cols;
-      for (unsigned int j=0; j<n_cols; ++j)
-        {
-          std::string key=sel_columns[j];
-          const std::map<std::string, Column>::const_iterator
-          col_iter=columns.find(key);
-          Assert(col_iter!=columns.end(), ExcInternalError());
-          cols.push_back(&(col_iter->second));
         }
 
       // write the body
@@ -380,33 +415,21 @@ void TableHandler::write_text(std::ostream &out,
       out << std::flush;
       return;
     }
-
-  // cache the columns and compute the widths of each column for alignment
-  std::vector<const Column *> cols;
-  std::vector<unsigned int> column_widths (n_cols, 0);
-  for (unsigned int j=0; j<n_cols; ++j)
+    
+    case table_with_separate_column_description:
     {
-      std::string key=sel_columns[j];
-      const std::map<std::string, Column>::const_iterator
-      col_iter=columns.find(key);
-      Assert(col_iter!=columns.end(), ExcInternalError());
-      cols.push_back(&(col_iter->second));
-
-      column_widths[j] = col_iter->second.max_length;
-    }
-
-  // writing the captions for table_with_separate_column_description
-  // means that we ignore supercolumns and output the column
-  // header for each column. enumerate columns starting with 1
-  if (format == table_with_separate_column_description)
-    {
+      // writing the captions for table_with_separate_column_description
+      // means that we ignore supercolumns and output the column
+      // header for each column. enumerate columns starting with 1
       for (unsigned int j=0; j<n_cols; ++j)
         {
           std::string key=sel_columns[j];
           out << "# " << j+1 << ": " << key << '\n';
         }
+      break;
     }
-  else if (format == table_with_headers)
+    
+    case table_with_headers:
     {
       // This format output supercolumn headers and aligns them centered
       // over all the columns that belong to it.
@@ -480,12 +503,16 @@ void TableHandler::write_text(std::ostream &out,
           out << ' ';
         }
       out << '\n';
+      break;
     }
-  else
-    Assert (false, ExcInternalError());
+    
+    default:
+      Assert (false, ExcInternalError());
+    }
 
-
-  // finally output the data itself
+  
+  // finally output the data itself for
+  // table_with_headers or table_with_separate_column_description:
   for (unsigned int i=0; i<nrows; ++i)
     {
       for (unsigned int j=0; j<n_cols; ++j)

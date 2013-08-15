@@ -311,13 +311,23 @@ public:
    *     2 13 a
    *     1 0 ""
    *   @endcode
-   *
-   **/
+   * - <code>org_mode_table</code>: Outputs to org-mode (http://orgmode.org/) table
+   *   format. It is easy to convert org-mode tables to HTML/LaTeX/csv.
+   *   Example output:
+   *   @code
+   *   | key1 | key2 | key3 |
+   *   | 0    | 0    | ""   |
+   *   | 1    | 0    | ""   |
+   *   | 2    | 13   | a    |
+   *   | 1    | 0    | ""   |
+   *   @endcode
+   */
   enum TextOutputFormat
   {
     table_with_headers,
     table_with_separate_column_description,
-    simple_table_with_separate_column_description
+    simple_table_with_separate_column_description,
+    org_mode_table
   };
 
   /**

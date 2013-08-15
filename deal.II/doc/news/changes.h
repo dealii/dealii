@@ -57,6 +57,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: TableHandler::write_text() now also supports output in
+  org-mode (http://orgmode.org/) format via a new entry in the
+  TableHandler::TextOutputFormat enumeration.
+  <br>
+  (Oleh Krehel, 2013/08/15)
+  </li>
+
+  <li>
   New: There are now global functions <code>scalar_product</code>
   that compute the scalar product (double contraction) between
   tensors of rank 2.
