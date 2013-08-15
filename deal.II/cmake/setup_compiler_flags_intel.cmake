@@ -104,11 +104,24 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   #
   # General optimization flags:
   #
-  ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O1")
+
+  IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13.0" )
+    ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
+  ELSE()
+    #
+    # Disable aggressive optimization for intel-13* compilers, until we
+    # resolve a lot of funny miscompilations...
+    #
+    # - Maier, 2013
+    #
+    ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O1")
+  ENDIF()
+
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-ip")
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-ansi-alias") # equiv. -fstrict-aliasing
+  # equivalent to -fno-strict-aliasing:
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")
 ENDIF()
 
 
