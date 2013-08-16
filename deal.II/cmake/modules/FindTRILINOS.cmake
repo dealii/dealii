@@ -22,6 +22,7 @@
 #   TRILINOS_DIR (cached)
 #   TRILINOS_INCLUDE_DIRS
 #   TRILINOS_LIBRARIES
+#   TRILINOS_VERSION
 #   TRILINOS_VERSION_MAJOR
 #   TRILINOS_VERSION_MINOR
 #   TRILINOS_VERSION_SUBMINOR
@@ -96,8 +97,10 @@ MARK_AS_ADVANCED(TRILINOS_CONFIG_DIR)
 
 IF(TRILINOS_FOUND)
   #
-  # Extract the major and minor version numbers:
+  # Extract version numbers:
   #
+  SET(TRILINOS_VERSION "${Trilinos_VERSION}")
+
   STRING(REGEX REPLACE
     "^([0-9]+).*$" "\\1"
     TRILINOS_VERSION_MAJOR "${Trilinos_VERSION}")
