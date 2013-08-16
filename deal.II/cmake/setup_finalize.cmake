@@ -187,6 +187,13 @@ FOREACH(_var ${_features})
       _both("#        ${_var} set up with external dependencies\n")
 
       #
+      # Print out version number:
+      #
+      IF(DEFINED ${_feature}_VERSION)
+        _detailed("#            ${_feature}_VERSION = ${${_feature}_VERSION}\n")
+      ENDIF()
+
+      #
       # Print the feature configuration:
       #
       FOREACH(_var2 ${_features_config})
