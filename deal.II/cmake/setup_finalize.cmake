@@ -194,6 +194,13 @@ FOREACH(_var ${_features})
       ENDIF()
 
       #
+      # Print out ${_feature}_DIR:
+      #
+      IF(DEFINED ${_feature}_DIR)
+        _detailed("#            ${_feature}_DIR = ${${_feature}_DIR}\n")
+      ENDIF()
+
+      #
       # Print the feature configuration:
       #
       FOREACH(_var2 ${_features_config})

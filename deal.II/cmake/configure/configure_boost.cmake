@@ -82,7 +82,12 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
       Boost_SYSTEM_FOUND AND
       (NOT DEAL_II_WITH_THREADS OR Boost_THREAD_FOUND)
     )
+    MARK_AS_ADVANCED(BOOST_DIR)
     SET(${var} TRUE)
+  ELSE()
+    SET(BOOST_DIR "" CACHE PATH
+      "An optional hint to a boost directory"
+      )
   ENDIF()
 ENDMACRO()
 
