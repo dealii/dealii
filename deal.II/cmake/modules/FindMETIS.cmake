@@ -21,6 +21,9 @@
 #
 #   METIS_LIBRARIES
 #   METIS_INCLUDE_DIRS
+#   METIS_VERSION
+#   METIS_VERSION_MAJOR
+#   METIS_VERSION_MINOR
 #
 
 INCLUDE(FindPackageHandleStandardArgs)
@@ -87,13 +90,27 @@ IF(METIS_FOUND)
   #
   # Extract the version number out of metis.h
   #
-  FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" METIS_MAJOR_STRING
-    REGEX "METIS_VER_MAJOR")
-  STRING(REGEX REPLACE "^.*METIS_VER_MAJOR.* ([0-9]+).*" "\\1" METIS_MAJOR "${METIS_MAJOR_STRING}")
-
-  FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" METIS_MINOR_STRING
-    REGEX "METIS_VER_MINOR")
-  STRING(REGEX REPLACE "^.*METIS_VER_MINOR.* ([0-9]+).*" "\\1" METIS_MINOR "${METIS_MINOR_STRING}")
+  FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_major_string
+    REGEX "METIS_VER_MAJOR"
+    )
+  STRING(REGEX REPLACE "^.*METIS_VER_MAJOR.* ([0-9]+).*" "\\1"
+    METIS_VERSION_MAJOR "${_metis_major_string}"
+    )
+  FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_minor_string
+    REGEX "METIS_VER_MINOR"
+    )
+  STRING(REGEX REPLACE "^.*METIS_VER_MINOR.* ([0-9]+).*" "\\1"
+    METIS_VERSION_MINOR "${_metis_minor_string}"
+    )
+  FILE(STRINGS "${METIS_INCLUDE_DIR}/metis.h" _metis_subminor_string
+    REGEX "METIS_VER_SUBMINOR"
+    )
+  STRING(REGEX REPLACE "^.*METIS_VER_SUBMINOR.* ([0-9]+).*" "\\1"
+    METIS_VERSION_SUBMINOR "${_metis_subminor_string}"
+    )
+  SET(METIS_VERSION
+    "${METIS_VERSION_MAJOR}.${METIS_VERSION_MINOR}.${METIS_VERSION_SUBMINOR}"
+    )
 
   MARK_AS_ADVANCED(METIS_DIR)
 ELSE()
