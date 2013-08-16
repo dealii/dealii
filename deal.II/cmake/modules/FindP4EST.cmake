@@ -21,6 +21,11 @@
 #   P4EST_LIBRARIES
 #   P4EST_INCLUDE_DIRS
 #   P4EST_WITH_MPI
+#   P4EST_VERSION
+#   P4EST_VERSION_MAJOR
+#   P4EST_VERSION_MINOR
+#   P4EST_VERSION_SUBMINOR
+#   P4EST_VERSION_POINT
 #
 
 INCLUDE(FindPackageHandleStandardArgs)
@@ -50,7 +55,7 @@ ENDIF()
 # given, take what we chose for p4est.
 #
 
-FIND_PATH(P4EST_INCLUDE_DIR p4est.h
+FIND_PATH(P4EST_INCLUDE_DIR p4est_config.h
   HINTS
     ${P4EST_DIR}
   PATH_SUFFIXES
@@ -120,6 +125,27 @@ IF(P4EST_FOUND)
   ELSE()
     SET(P4EST_WITH_MPI TRUE)
   ENDIF()
+
+  #
+  # Extract version numbers:
+  #
+  FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VERSION
+    REGEX "#define P4EST_VERSION \"")
+  STRING(REGEX REPLACE "^.*P4EST_VERSION.*\"([0-9]+.*)\".*" "\\1"
+    P4EST_VERSION "${P4EST_VERSION}"
+    )
+  STRING(REGEX REPLACE
+    "^([0-9]+).*$" "\\1"
+    P4EST_VERSION_MAJOR "${P4EST_VERSION}")
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.([0-9]+).*$" "\\1"
+    P4EST_VERSION_MINOR "${P4EST_VERSION}")
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
+    P4EST_VERSION_SUBMINOR "${P4EST_VERSION}")
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
+    P4EST_VERSION_POINT "${P4EST_VERSION}")
 
   MARK_AS_ADVANCED(P4EST_DIR)
 ELSE()
