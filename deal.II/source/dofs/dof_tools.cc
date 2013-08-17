@@ -2768,6 +2768,12 @@ namespace DoFTools
     // to this particular child
     //
     // @precondition: face_1 is supposed to be active
+    //
+    // @note As bug #82 ((http://code.google.com/p/dealii/issues/detail?id=82) and the
+    // corresponding testcase bits/periodicity_05 demonstrate, we can occasionally
+    // get into trouble if we already have the constraint x1=x2 and want to insert
+    // x2=x1. we avoid this by skipping an identity constraint if the opposite
+    // constraint already exists
     template <typename FaceIterator>
     void
     set_periodicity_constraints (const FaceIterator                          &face_1,
@@ -2873,21 +2879,83 @@ namespace DoFTools
                   ||
                   component_mask[fe.face_system_to_component_index(i).first])
                 {
-                  constraint_matrix.add_line(dofs_2[i]);
+                  // as mentioned in the comment above this function, we need
+                  // to be careful about treating identity constraints differently.
+                  // consequently, find out whether this dof 'i' will be
+                  // identity constrained
+                  //
+                  // to check whether this is the case, first see whether there are
+                  // any weights other than 0 and 1, then in a first stage make sure
+                  // that if so there is only one weight equal to 1
+                  bool is_identity_constrained = true;
                   for (unsigned int jj=0; jj<dofs_per_face; ++jj)
+                    if (((transformation(i,jj) == 0) || (transformation(i,jj) == 1)) == false)
+                      {
+                        is_identity_constrained = false;
+                        break;
+                      }
+                  unsigned int identity_constraint_target = numbers::invalid_unsigned_int;
+                  if (is_identity_constrained == true)
+                    {
+                      bool one_identity_found = false;
+                      for (unsigned int jj=0; jj<dofs_per_face; ++jj)
+                        if (transformation(i,jj) == 1)
+                          {
+                            if (one_identity_found == false)
+                              {
+                                one_identity_found = true;
+                                identity_constraint_target = jj;
+                              }
+                            else
+                              {
+                                is_identity_constrained = false;
+                                identity_constraint_target = numbers::invalid_unsigned_int;
+                                break;
+                              }
+                          }
+                    }
+
+                  // now treat constraints, either as an equality constraint or
+                  // as a sequence of constraints
+                  if (is_identity_constrained == true)
                     {
                       // Query the correct face_index on face_2 respecting the given
                       // orientation:
                       const unsigned int j =
-                        cell_to_rotated_face_index[fe.face_to_cell_index(jj, 0, /* It doesn't really matter, just assume
+                        cell_to_rotated_face_index[fe.face_to_cell_index(identity_constraint_target,
+                            0, /* It doesn't really matter, just assume
                            * we're on the first face...
                            */
                                                                          face_orientation, face_flip, face_rotation)];
 
-                      // And finally constrain the two DoFs respecting component_mask:
-                      if (transformation(i,jj) != 0)
-                        constraint_matrix.add_entry(dofs_2[i], dofs_1[j],
-                                                    transformation(i,jj));
+                      // if the two aren't already identity constrained (whichever way
+                      // around, then enter the constraint. otherwise there is nothing
+                      // for us still to do
+                      if (constraint_matrix.are_identity_constrained(dofs_2[i], dofs_1[i]) == false)
+                        {
+                          constraint_matrix.add_line(dofs_2[i]);
+                          constraint_matrix.add_entry(dofs_2[i], dofs_1[j], 1);
+                        }
+                    }
+                  else
+                    {
+                      // this is just a regular constraint. enter it piece by piece
+                      constraint_matrix.add_line(dofs_2[i]);
+                      for (unsigned int jj=0; jj<dofs_per_face; ++jj)
+                        {
+                          // Query the correct face_index on face_2 respecting the given
+                          // orientation:
+                          const unsigned int j =
+                            cell_to_rotated_face_index[fe.face_to_cell_index(jj, 0, /* It doesn't really matter, just assume
+                               * we're on the first face...
+                               */
+                                                                             face_orientation, face_flip, face_rotation)];
+
+                          // And finally constrain the two DoFs respecting component_mask:
+                          if (transformation(i,jj) != 0)
+                            constraint_matrix.add_entry(dofs_2[i], dofs_1[j],
+                                                        transformation(i,jj));
+                        }
                     }
                 }
         }
