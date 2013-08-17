@@ -172,9 +172,7 @@ FOREACH(_var ${_variables})
     LIST(APPEND _components "${_var}")
   ELSEIF(_var MATCHES "(MPI_CXX_COMPILER|MPI_CXX_COMPILE_FLAGS|MPI_CXX_LINK_FLAGS)")
     LIST(APPEND _features_config ${_var})
-  ELSEIF(_var MATCHES "(LIBRARIES|INCLUDE_PATH|INCLUDE_DIRS|LINKER_FLAGS)"
-         # Avoid a lot of Trilinos variables:
-         AND (NOT _var MATCHES "_TPL_|_MPI_") )
+  ELSEIF(_var MATCHES "(LIBRARIES|INCLUDE_PATH|INCLUDE_DIRS|LINKER_FLAGS)")
     LIST(APPEND _features_config ${_var})
   ENDIF()
 ENDFOREACH()

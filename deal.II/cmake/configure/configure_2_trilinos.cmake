@@ -131,10 +131,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "has to be configured to use the same number of bits as deal.II, but "
         "found:\n"
         "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
-        "  TRILINOS_WITH_NO_32BIT_INDICES = ${TRILINOS_WITH_NO_32_BIT_INDICES}\n" 
+        "  TRILINOS_WITH_NO_32BIT_INDICES = ${TRILINOS_WITH_NO_32_BIT_INDICES}\n"
         )
       SET(${var} FALSE)
-    ENDIF()  
+    ENDIF()
 
     #
     # Trilinos has to be configured with 64bit indices if deal.II uses unsigned long
@@ -143,73 +143,41 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     IF(TRILINOS_WITH_NO_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
       MESSAGE(STATUS "deal.II was configured to use 64bit global indices but "
         "Trilinos was not."
-        ) 
+        )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "has to be configured to use the same number of bits as deal.II, but "
         "found:\n"
         "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
-        "  TRILINOS_WITH_NO_64BIT_INDICES = ${TRILINOS_WITH_NO_64_BIT_INDICES}\n" 
+        "  TRILINOS_WITH_NO_64BIT_INDICES = ${TRILINOS_WITH_NO_64_BIT_INDICES}\n"
         )
       SET(${var} FALSE)
-    ENDIF()  
-
+    ENDIF()
 
     #
     # Some versions of Sacado_cmath.hpp do things that aren't compatible
     # with the -std=c++0x flag of GCC, see deal.II FAQ.
     # Test whether that is indeed the case
     #
-    IF(${var})
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIRS})
-      PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
+    IF(DEAL_II_CAN_USE_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
 
-      CHECK_CXX_SOURCE_COMPILES(
-        "
-        #include <Sacado_cmath.hpp>
-        int main(){ return 0; }
-        "
-        TRILINOS_SUPPORTS_CPP11)
-
-      IF(DEAL_II_CAN_USE_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
-        #
-        # Try whether exporting HAS_C99_TR1_CMATH helps:
-        #
-        PUSH_TEST_FLAG("-DHAS_C99_TR1_CMATH")
-        CHECK_CXX_SOURCE_COMPILES(
-          "
-          #include <Sacado_cmath.hpp>
-          int main(){ return 0; }
-          "
-          TRILINOS_HAS_C99_TR1_WORKAROUND)
-        POP_TEST_FLAG()
-
-        IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
-          LIST(APPEND DEAL_II_DEFINITIONS "HAS_C99_TR1_CMATH")
-          LIST(APPEND DEAL_II_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
-        ELSE()
-          MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
-            "The installation is not compatible with the C++ standard selected for "
-            "this compiler."
-            )
-          SET(TRILINOS_ADDITIONAL_ERROR_STRING
-            ${TRILINOS_ADDITIONAL_ERROR_STRING}
-            "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-            "is not compatible with the C++ standard selected for\n"
-            "this compiler. See the deal.II FAQ page for a solution.\n\n"
-            )
-          SET(${var} FALSE)
-        ENDIF()
+      IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
+        LIST(APPEND DEAL_II_DEFINITIONS "HAS_C99_TR1_CMATH")
+        LIST(APPEND DEAL_II_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
+      ELSE()
+        MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+          "The installation is not compatible with the C++ standard selected for "
+          "this compiler."
+          )
+        SET(TRILINOS_ADDITIONAL_ERROR_STRING
+          ${TRILINOS_ADDITIONAL_ERROR_STRING}
+          "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
+          "is not compatible with the C++ standard selected for\n"
+          "this compiler. See the deal.II FAQ page for a solution.\n\n"
+          )
+        SET(${var} FALSE)
       ENDIF()
-
-      RESET_CMAKE_REQUIRED()
-
-      #
-      # Remove the following variables from the cache to force a recheck:
-      #
-      UNSET(TRILINOS_SUPPORTS_CPP11 CACHE)
-      UNSET(TRILINOS_HAS_C99_TR1_WORKAROUND CACHE)
     ENDIF()
 
   ENDIF(TRILINOS_FOUND)
@@ -217,13 +185,6 @@ ENDMACRO()
 
 
 MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
-  #
-  # *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
-  #
-  STRING(REGEX REPLACE
-    "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
-    TRILINOS_INCLUDE_DIRS "${TRILINOS_INCLUDE_DIRS}"
-    )
 
   INCLUDE_DIRECTORIES(${TRILINOS_INCLUDE_DIRS})
 
