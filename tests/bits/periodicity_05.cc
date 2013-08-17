@@ -140,7 +140,7 @@ void Deal2PeriodicBug::makeGrid()
   triangulation.begin_active()->face(1)->set_boundary_indicator(2);
   triangulation.refine_global(1);
 
-  typename Triangulation<2>::active_cell_iterator cell = triangulation.begin_active();
+  Triangulation<2>::active_cell_iterator cell = triangulation.begin_active();
   (++(++cell))->set_refine_flag();
   triangulation.prepare_coarsening_and_refinement();
   triangulation.execute_coarsening_and_refinement();
