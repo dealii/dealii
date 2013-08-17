@@ -49,7 +49,7 @@ FOREACH(_file ${_macro_files})
 ENDFOREACH()
 
 #
-# Check whether the doc and bundled folders are available:
+# Check for the existence of various optional folders:
 #
 IF(EXISTS ${CMAKE_SOURCE_DIR}/bundled/CMakeLists.txt)
   SET(DEAL_II_HAVE_BUNDLED_DIRECTORY TRUE)
@@ -57,6 +57,14 @@ ENDIF()
 
 IF(EXISTS ${CMAKE_SOURCE_DIR}/doc/CMakeLists.txt)
   SET(DEAL_II_HAVE_DOC_DIRECTORY TRUE)
+ENDIF()
+
+IF(NOT DEFINED TEST_DIR)
+  GET_FILENAME_COMPONENT(TEST_DIR "${CMAKE_SOURCE_DIR}" PATH)
+  SET(TEST_DIR "${TEST_DIR}/tests")
+ENDIF()
+IF(EXISTS ${TEST_DIR}/CMakeLists.txt)
+  SET(DEAL_II_HAVE_TESTS_DIRECTORY TRUE)
 ENDIF()
 
 #
@@ -136,6 +144,10 @@ ADD_SUBDIRECTORY(source) # has to be included after bundled
 ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
+
+IF(DEAL_II_HAVE_TESTS_DIRECTORY)
+  ADD_SUBDIRECTORY(${TEST_DIR} ${CMAKE_BINARY_DIR}/tests)
+ENDIF()
 
 #
 # And finally, print the configuration:

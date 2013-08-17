@@ -1,0 +1,1 @@
+ADD_CUSTOM_TARGET(foobar)
