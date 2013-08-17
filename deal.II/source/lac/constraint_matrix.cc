@@ -1542,6 +1542,36 @@ bool ConstraintMatrix::is_identity_constrained (const size_type index) const
 }
 
 
+bool ConstraintMatrix::are_identity_constrained (const size_type index1,
+                                                       const size_type index2) const
+{
+  if (is_constrained(index1) == true)
+    {
+      const ConstraintLine &p = lines[lines_cache[calculate_line_index(index1)]];
+      Assert (p.line == index1, ExcInternalError());
+
+      // return if an entry for this line was found and if it has only one
+      // entry equal to 1.0 and that one is index2
+      return ((p.entries.size() == 1) &&
+          (p.entries[0].first == index2) &&
+          (p.entries[0].second == 1.0));
+    }
+  else if (is_constrained(index2) == true)
+    {
+      const ConstraintLine &p = lines[lines_cache[calculate_line_index(index2)]];
+      Assert (p.line == index2, ExcInternalError());
+
+      // return if an entry for this line was found and if it has only one
+      // entry equal to 1.0 and that one is index1
+      return ((p.entries.size() == 1) &&
+          (p.entries[0].first == index1) &&
+          (p.entries[0].second == 1.0));
+    }
+  else
+    return false;
+}
+
+
 
 ConstraintMatrix::size_type
 ConstraintMatrix::max_constraint_indirections () const

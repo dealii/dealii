@@ -57,6 +57,20 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: Under some circumstances (see http://code.google.com/p/dealii/issues/detail?id=82)
+  the DoFTools::make_periodicity_constraints() function could create cycles in
+  the ConstraintMatrix object. This is now fixed.
+  <br>
+  (David Emerson, Wolfgang Bangerth, 2013/08/16)
+  </li>
+
+  <li>
+  New: There is now a function ConstraintMatrix::are_identity_constrained().
+  <br>
+  (Wolfgang Bangerth, 2013/08/16)
+  </li>
+
+  <li>
   New: TableHandler::write_text() now also supports output in
   org-mode (http://orgmode.org/) format via a new entry in the
   TableHandler::TextOutputFormat enumeration.

@@ -549,6 +549,15 @@ public:
   bool is_identity_constrained (const size_type index) const;
 
   /**
+   * Return whether the two given degrees of freedom are linked by an
+   * equality constraint that either constrains index1 to be so that
+   * <code>index1=index2</code> or constrains index2 so that
+   * <code>index2=index1</code>.
+   */
+  bool are_identity_constrained (const size_type index1,
+                                     const size_type index2) const;
+
+  /**
    * Return the maximum number of other
    * dofs that one dof is constrained
    * to. For example, in 2d a hanging
