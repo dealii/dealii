@@ -224,7 +224,7 @@
 
 	mkdir build
 	cd build
-	cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+	cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/dir ../deal.II
 	make install
       </pre>
       These steps compile, link and install the deal.II library. The
@@ -235,12 +235,13 @@
     <p>
       <b>Note:</b>
       <ul>
-	<li> <code>/path/install/dir</code> is the directory which deal.II
+	<li> <code>/path/to/install/dir</code> is the directory which deal.II
 	  should be installed into. This can be a directory in your home
 	  directory (e.g., <code>~/bin/deal.II</code>) or a directory
 	  such as <code>/usr/local</code> if you have root privileges. 
-	  Another option is to use <code>`pwd`/../installed/</code> (note the
-	  backticks).
+	  Another option is to use something like <code>`pwd`/../installed/</code> (note the
+	  backticks). Make sure the installation directory is not the same
+	  as the location where you unpacked <tt>deal.II/</tt>.
 
 	<li> If your machine has multiple processors, use <code>make
 	  -jN</code> in the last step, where <code>N</code> is the
