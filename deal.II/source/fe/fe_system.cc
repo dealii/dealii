@@ -46,7 +46,10 @@ namespace
 
 
 template <int dim, int spacedim>
-FESystem<dim,spacedim>::InternalData::InternalData(const unsigned int n_base_elements):
+FESystem<dim,spacedim>::InternalData::InternalData(const unsigned int n_base_elements,
+                                                   const bool         compute_hessians)
+:
+  compute_hessians (compute_hessians),
   base_fe_datas(n_base_elements),
   base_fe_values_datas(n_base_elements)
 {}
@@ -839,7 +842,8 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
                                   const Quadrature<dim> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData *data = new InternalData(this->n_base_elements());
+  InternalData *data = new InternalData(this->n_base_elements(),
+                                        flags & update_hessians);
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
@@ -850,7 +854,6 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
   // finite differencing are required,
   // then initialize some objects for
   // that
-  data->compute_hessians = flags & update_hessians;
   if (data->compute_hessians)
     {
       // delete
@@ -926,14 +929,14 @@ FESystem<dim,spacedim>::get_face_data (
   const Quadrature<dim-1> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData *data = new InternalData(this->n_base_elements());
+  InternalData *data = new InternalData(this->n_base_elements(),
+                                        flags & update_hessians);
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
   flags = data->update_once | data->update_each;
 
   UpdateFlags sub_flags = flags;
-  data->compute_hessians = flags & update_hessians;
   if (data->compute_hessians)
     {
       sub_flags = UpdateFlags (sub_flags ^ update_hessians);
@@ -978,14 +981,14 @@ FESystem<dim,spacedim>::get_subface_data (
   const Quadrature<dim-1> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData *data = new InternalData(this->n_base_elements());
+  InternalData *data = new InternalData(this->n_base_elements(),
+                                        flags & update_hessians);
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
   flags = data->update_once | data->update_each;
 
   UpdateFlags sub_flags = flags;
-  data->compute_hessians = flags & update_hessians;
   if (data->compute_hessians)
     {
       sub_flags = UpdateFlags (sub_flags ^ update_hessians);
