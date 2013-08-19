@@ -32,7 +32,7 @@ CALLBACK(${TEST}.run
   "Run successful" "Running the test failed with the following error message"
   )
 
-CALLBACK(${TEST}.compare
-  "Run successful" "Running the test failed with the following error message"
+CALLBACK(${TEST}.diff
+  "Diff successful" "Diff failed:"
   )
 

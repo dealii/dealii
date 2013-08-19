@@ -51,6 +51,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
         )
 
+
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         COMMAND ${_test}
         DEPENDS ${_test}
@@ -59,6 +60,21 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
       ADD_CUSTOM_TARGET(${_test}.run
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         )
+
+
+      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
+        COMMAND numdiff 
+          ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+          ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.output
+          > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
+        DEPENDS
+          ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+          ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.output
+        )
+      ADD_CUSTOM_TARGET(${_test}.diff
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
+        )
+
 
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND}
