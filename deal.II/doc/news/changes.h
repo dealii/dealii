@@ -57,6 +57,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: SolutionTransfer used to crash whenever one transfered in the hp
+  context between cells that use FE_Nothing and FE_Q. This is now fixed.
+  <br>
+  (Krzyszof Bzowski, Wolfgang Bangerth, 2013/08/18)
+  </li>
+
+  <li>
   Fixed: Under some circumstances (see http://code.google.com/p/dealii/issues/detail?id=82)
   the DoFTools::make_periodicity_constraints() function could create cycles in
   the ConstraintMatrix object. This is now fixed.
