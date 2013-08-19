@@ -28,6 +28,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_target)
 
       STRING(TOLOWER ${_build} _build_lowercase)
       ADD_EXECUTABLE(${_test_target}.${_build_lowercase}
+        EXCLUDE_FROM_ALL
         ${_test_target}.cc
         )
       SET_TARGET_PROPERTIES(${_test_target}.${_build_lowercase} PROPERTIES
@@ -36,15 +37,19 @@ MACRO(DEAL_II_ADD_TEST _category _test_target)
         COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
         LINKER_LANGUAGE "CXX"
         )
-      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+      SET_PROPERTY(TARGET ${_test_target}.${_build_lowercase} APPEND PROPERTY
         INCLUDE_DIRECTORIES
           "${CMAKE_BINARY_DIR}/include"
           "${CMAKE_SOURCE_DIR}/include"
         )
-
       TARGET_LINK_LIBRARIES(${_test_target}.${_build_lowercase}
         ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
         )
+
+      ADD_TEST(${_test_target}.${_build_lowercase}.build
+        ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${_test_target}.${_build_lowercase}
+        )
+
     ENDIF()
 
   ENDFOREACH()
