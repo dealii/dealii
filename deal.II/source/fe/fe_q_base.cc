@@ -459,18 +459,17 @@ FE_Q_Base<POLY,dim,spacedim>::
 get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                           FullMatrix<double>       &interpolation_matrix) const
 {
-  Assert (interpolation_matrix.m() == this->dofs_per_cell,
-          ExcDimensionMismatch (interpolation_matrix.m(),
-                                this->dofs_per_cell));
-  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
-          ExcDimensionMismatch (interpolation_matrix.m(),
-                                x_source_fe.dofs_per_cell));
-
   // go through the list of elements we can interpolate from
   if (const FE_Q_Base<POLY,dim,spacedim> *source_fe
       = dynamic_cast<const FE_Q_Base<POLY,dim,spacedim>*>(&x_source_fe))
     {
       // ok, source is a Q element, so we will be able to do the work
+      Assert (interpolation_matrix.m() == this->dofs_per_cell,
+              ExcDimensionMismatch (interpolation_matrix.m(),
+                                    this->dofs_per_cell));
+      Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+              ExcDimensionMismatch (interpolation_matrix.m(),
+                                    x_source_fe.dofs_per_cell));
 
       // only evaluate Q dofs
       const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(this->degree+1);
@@ -530,6 +529,16 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
       // element represents a function that is constant zero and has no
       // degrees of freedom, so the interpolation is simply a multiplication
       // with a n_dofs x 0 matrix. there is nothing to do here
+
+      // we would like to verify that the number of rows and columns of
+      // the matrix equals this->dofs_per_cell and zero. unfortunately,
+      // whenever we do FullMatrix::reinit(m,0), it sets both rows and
+      // columns to zero, instead of m and zero. thus, only test the
+      // number of columns
+      Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+              ExcDimensionMismatch (interpolation_matrix.m(),
+                                    x_source_fe.dofs_per_cell));
+
     }
   else
     AssertThrow (false,
