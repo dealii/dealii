@@ -19,7 +19,7 @@
 #     DEAL_II_ADD_TEST(category test_name [configurations])
 #
 
-MACRO(DEAL_II_ADD_TEST _category _test_target)
+MACRO(DEAL_II_ADD_TEST _category _test_name)
 
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
@@ -27,27 +27,45 @@ MACRO(DEAL_II_ADD_TEST _category _test_target)
     IF(_match OR "${ARGN}" STREQUAL "")
 
       STRING(TOLOWER ${_build} _build_lowercase)
-      ADD_EXECUTABLE(${_test_target}.${_build_lowercase}
-        EXCLUDE_FROM_ALL
-        ${_test_target}.cc
-        )
-      SET_TARGET_PROPERTIES(${_test_target}.${_build_lowercase} PROPERTIES
+      SET(_test ${_test_name}.${_build_lowercase})
+
+      ADD_EXECUTABLE(${_test} EXCLUDE_FROM_ALL ${_test_name}.cc)
+
+      SET_TARGET_PROPERTIES(${_test} PROPERTIES
         LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
         COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
         COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
         LINKER_LANGUAGE "CXX"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_test}"
         )
-      SET_PROPERTY(TARGET ${_test_target}.${_build_lowercase} APPEND PROPERTY
+      SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
         INCLUDE_DIRECTORIES
           "${CMAKE_BINARY_DIR}/include"
           "${CMAKE_SOURCE_DIR}/include"
         )
-      TARGET_LINK_LIBRARIES(${_test_target}.${_build_lowercase}
+      SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
+        COMPILE_DEFINITIONS
+          SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+        )
+      TARGET_LINK_LIBRARIES(${_test_name}.${_build_lowercase}
         ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
         )
 
-      ADD_TEST(${_test_target}.${_build_lowercase}.build
-        ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${_test_target}.${_build_lowercase}
+      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+        COMMAND ${_test}
+        DEPENDS ${_test}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
+        )
+      ADD_CUSTOM_TARGET(${_test}.run
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+        )
+
+      ADD_TEST(NAME ${_test}
+        COMMAND ${CMAKE_COMMAND}
+          -DTEST=${_test}
+          -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
+          -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         )
 
     ENDIF()

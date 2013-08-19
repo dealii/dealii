@@ -1,4 +1,6 @@
 MESSAGE(STATUS "Registering tests")
+
 ADD_SUBDIRECTORY(base)
+
 #ADD_SUBDIRECTORY(bits)
 #ADD_SUBDIRECTORY(fe)
