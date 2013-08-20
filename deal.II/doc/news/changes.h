@@ -57,6 +57,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: The SLEPcWrappers classes could not be compiled for 64-bit
+  indices. This is now fixed.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2013/08/20)
+  </li>
+
+  <li>
   Fixed: SolutionTransfer used to crash whenever one transfered in the hp
   context between cells that use FE_Nothing and FE_Q. This is now fixed.
   <br>
