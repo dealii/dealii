@@ -1,0 +1,186 @@
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 1998 - 2013 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+{
+    namespace VectorTools \{
+      template
+        void interpolate_boundary_values (
+          const MGDoFHandler<deal_II_dimension> &,
+          const types::boundary_id,
+          const Function<deal_II_dimension>   &,
+	  ConstraintMatrix&,
+          const ComponentMask    &);
+
+      template
+        void interpolate_boundary_values (
+          const MGDoFHandler<deal_II_dimension> &,
+          const types::boundary_id,
+          const Function<deal_II_dimension>   &,
+          std::map<types::global_dof_index,double>       &,
+          const ComponentMask    &);
+    \}
+}
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; DH : DOFHANDLER_TEMPLATES)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace VectorTools \{
+      template
+        void interpolate_boundary_values
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const FunctionMap<deal_II_space_dimension>::type &,
+         std::map<types::global_dof_index,double>       &,
+         const ComponentMask    &);
+
+      template
+        void interpolate_boundary_values
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const types::boundary_id,
+         const Function<deal_II_space_dimension>   &,
+         std::map<types::global_dof_index,double>       &,
+         const ComponentMask    &);
+
+      template
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const types::boundary_id,
+          const Function<deal_II_space_dimension>   &,
+          std::map<types::global_dof_index,double>       &,
+          const ComponentMask    &);
+
+      template
+        void interpolate_boundary_values
+        (const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const FunctionMap<deal_II_space_dimension>::type &,
+         std::map<types::global_dof_index,double>       &,
+         const ComponentMask    &);
+
+      template
+        void interpolate_boundary_values (
+          const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const FunctionMap<deal_II_space_dimension>::type   &,
+          ConstraintMatrix                    &,
+          const ComponentMask    &);
+
+      template
+        void interpolate_boundary_values
+        (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
+         const DH<deal_II_dimension,deal_II_space_dimension> &,
+         const types::boundary_id,
+         const Function<deal_II_space_dimension>   &,
+         ConstraintMatrix                    &,
+         const ComponentMask             &);
+
+      template
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const types::boundary_id,
+          const Function<deal_II_space_dimension>   &,
+          ConstraintMatrix                    &,
+          const ComponentMask    &);
+
+      template
+        void interpolate_boundary_values (
+          const DH<deal_II_dimension,deal_II_space_dimension> &,
+          const FunctionMap<deal_II_space_dimension>::type   &,
+          ConstraintMatrix                    &,
+          const ComponentMask    &);
+        \}
+#endif
+}
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+    namespace VectorTools \{
+#if deal_II_dimension == deal_II_space_dimension
+
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const Mapping<deal_II_dimension>     &,
+         const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         std::map<types::global_dof_index,double>&, std::vector<unsigned int>);
+
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         std::map<types::global_dof_index,double>&, 
+         std::vector<unsigned int>);
+
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const Mapping<deal_II_dimension>     &,
+         const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         ConstraintMatrix&, std::vector<unsigned int>);
+
+      template
+        void project_boundary_values<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>  &,
+         const FunctionMap<deal_II_dimension>::type &,
+         const Quadrature<deal_II_dimension-1>&,
+         ConstraintMatrix&, 
+         std::vector<unsigned int>);
+
+
+
+#if deal_II_dimension != 1
+      template
+        void project_boundary_values_curl_conforming<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id,
+         ConstraintMatrix&,
+         const Mapping<deal_II_dimension>&);
+      template
+        void project_boundary_values_curl_conforming<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id,
+         ConstraintMatrix&,
+         const hp::MappingCollection<deal_II_dimension>&);
+      template
+        void project_boundary_values_div_conforming<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id,
+         ConstraintMatrix&,
+         const Mapping<deal_II_dimension>&);
+      template
+        void project_boundary_values_div_conforming<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id,
+         ConstraintMatrix&,
+         const hp::MappingCollection<deal_II_dimension>&);
+#endif
+#endif
+      \}
+  }
