@@ -62,5 +62,6 @@ ENDIF()
 #
 SET_IF_EMPTY(DEAL_II_TEST_TIME_LIMIT 60)
 
+MESSAGE(STATUS "Proceed to test definitions")
 
 ADD_SUBDIRECTORY(base)
