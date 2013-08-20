@@ -12,12 +12,6 @@
 #  small doubles
 ######################################################################
 
-# Remove absolute path names. Get the path to the testsuite from
-# the location of this script
-$D = $0;
-$D =~ s!tests/normalize.pl!!;
-s!$D!DEAL_II_PATH/!g;
-
 # Remove JobID
 
 s/JobId.*//;
@@ -37,19 +31,9 @@ s/by the deal.II library on.*//;
 
 s/line <\d+> of file <.*\//file </;
 
-# Make small exponentials zero
-
-#s/-?\d?\.\d+e-[123456789]\d+/0.00/g;
-
 # See if we have a -0.0... (not followed by any other digit) and replace it
 # by the same number without the negative sign
 s/-0\.(0+)(?!\d)/0.\1/g;
-
-# Residual values
-
-#s/value.*//;
-#s/with residual.*//;
-
 
 # remove deal.II debug output
 s/^DEAL.*::_.*\n//g;

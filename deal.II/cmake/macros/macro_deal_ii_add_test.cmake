@@ -15,6 +15,30 @@
 ## ---------------------------------------------------------------------
 
 #
+# A Macro to set up tests for thes testsuite
+#
+# This macro assumes that a test
+#
+#   ./tests/category/test_name.cc
+#   ./tests/category/test_name.*.output
+#
+# is available in the testsuite.
+#
+# [configurations] is a list of configurations against this test should be
+# run. Possible values are an empty list, DEBUG, RELEASE or
+# "DEBUG;RELEASE".
+#
+# The following variables must be set:
+#
+# DEAL_II_TEST_DIFF
+#   - specifying the executable and command line of the diff command to use
+#
+# DEAL_II_TEST_TIME_LIMIT
+#   - specifying the maximal wall clock time in seconds a test is allowed
+#     to run
+#
+# TODO: LABEL and MEASUREMENT
+#
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name [configurations])
 #
@@ -54,8 +78,12 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
 
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         COMMAND ${_test}
-        DEPENDS ${_test}
+        # TODO: Refactor:
+        COMMAND ${PERL_EXECUTABLE} -pi
+            ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
+            ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
+        DEPENDS ${_test} ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
         )
       ADD_CUSTOM_TARGET(${_test}.run
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
@@ -63,7 +91,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
 
 
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
-        COMMAND numdiff 
+        COMMAND ${DEAL_II_TEST_DIFF}
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.output
           > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
@@ -83,9 +111,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         )
+      SET_TESTS_PROPERTIES(${_test} PROPERTIES
+        LABEL "${_category}"
+        TIMEOUT ${DEAL_II_TEST_TIME_LIMIT}
+        )
 
     ENDIF()
 
   ENDFOREACH()
 
 ENDMACRO()
+

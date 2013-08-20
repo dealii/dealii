@@ -28,6 +28,7 @@
 #     DEAL_II_COMPONENT_EXAMPLES
 #     DEAL_II_COMPONENT_MESH_CONVERTER
 #     DEAL_II_COMPONENT_PARAMETER_GUI
+#     DEAL_II_COMPONENT_TESTSUITE
 #     DEAL_II_FORCE_AUTODETECTION
 #
 # Options regarding compilation and linking:
@@ -92,6 +93,13 @@ OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
   "Build and install the parameter_gui. This adds a COMPONENT \"parameter_gui\" to the build system."
   OFF
   )
+
+IF(DEAL_II_HAVE_TESTS_DIRECTORY)
+  OPTION(DEAL_II_COMPONENT_TESTSUITE
+    "Setup the full testsuite. TODO"
+    OFF
+    )
+ENDIF()
 
 OPTION(DEAL_II_ALLOW_AUTODETECTION
   "Allow to automatically setup features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
