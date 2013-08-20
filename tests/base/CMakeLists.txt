@@ -1,6 +1,6 @@
 GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-FILE(GLOB _tests "anisotropic_1.cc")
+FILE(GLOB _tests "*.output")
 
 FOREACH(_test ${_tests})
   GET_FILENAME_COMPONENT(_test ${_test} NAME_WE)

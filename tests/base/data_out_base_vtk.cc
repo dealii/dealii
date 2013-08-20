@@ -65,7 +65,7 @@ void check_all(std::ostream &log)
   DataOutBase::VtkFlags flags;
   if (true)
     {
-      sprintf(name, "data_out_base_vtk/%d%d.vtk", dim, spacedim);
+      sprintf(name, "%d%d.vtk", dim, spacedim);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else

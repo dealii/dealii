@@ -80,12 +80,12 @@ void check_all(std::ostream &log)
 #endif
 
   char name[100];
-  const char *format = "data_out_base_eps/%d%d%d%s.eps";
+  const char *format = "%d%d%d%s.eps";
   DataOutBase::EpsFlags flags;
 
   if (true)
     {
-      sprintf(name, "data_out_base_eps/cont%d%d%d.eps", dim, 4, 4);
+      sprintf(name, "cont%d%d%d.eps", dim, 4, 4);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else

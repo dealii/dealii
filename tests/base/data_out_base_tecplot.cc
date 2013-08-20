@@ -65,7 +65,7 @@ void check_all(std::ostream &log)
   DataOutBase::TecplotFlags flags;
   if (true)
     {
-      sprintf(name, "data_out_base_tecplot/%d%d.tecplot", dim, spacedim);
+      sprintf(name, "%d%d.tecplot", dim, spacedim);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else

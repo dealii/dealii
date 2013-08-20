@@ -58,7 +58,7 @@ void check_all()
   DataOutBase::TecplotFlags flags;
   if (true)
     {
-      sprintf(name, "data_out_base_tecplot_bin/%d%d.tecplot", dim, spacedim);
+      sprintf(name, "%d%d.tecplot", dim, spacedim);
       flags.tecplot_binary_file_name=name;
 
       check<dim,spacedim>(flags, deallog.get_file_stream());

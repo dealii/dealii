@@ -70,7 +70,7 @@ void check_all(std::ostream &log)
 
   if (true)
     {
-      sprintf(name, "data_out_base_vtu_time/%d%d.vtu", dim, spacedim);
+      sprintf(name, "%d%d.vtu", dim, spacedim);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else

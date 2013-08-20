@@ -61,7 +61,7 @@ void check_all(std::ostream &log)
 #endif
 
   char name[100];
-  const char *format = "data_out_base_gnuplot/%d%d.gnuplot";
+  const char *format = "%d%d.gnuplot";
   DataOutBase::GnuplotFlags flags;
   for (unsigned int i=0; i<5; ++i)
     {
