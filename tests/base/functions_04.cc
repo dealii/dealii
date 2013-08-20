@@ -196,7 +196,7 @@ check_function(const Functions::FlowFunction<dim> &f,
 
 int main()
 {
-  std::string logname = "output"
+  std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -76,7 +76,7 @@ void check1 ()
 
 int main()
 {
-  std::string logname = "output"
+  std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);
