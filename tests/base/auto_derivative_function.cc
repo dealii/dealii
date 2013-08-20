@@ -121,7 +121,7 @@ void ExactSinExp<dim>::vector_gradient (const Point<dim>       &p,
 
 int main()
 {
-  std::ofstream logfile("auto_derivative_function/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

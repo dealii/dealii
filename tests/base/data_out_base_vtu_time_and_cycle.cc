@@ -86,7 +86,7 @@ void check_all(std::ostream &log)
 
 int main()
 {
-  std::ofstream logfile("data_out_base_vtu_time_and_cycle/output");
+  std::ofstream logfile("output");
   check_all<1,1>(logfile);
   check_all<1,2>(logfile);
   check_all<2,2>(logfile);

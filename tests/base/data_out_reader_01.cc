@@ -86,7 +86,7 @@ void check()
 
 int main()
 {
-  std::ofstream logfile("data_out_reader_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
   check<1,1>();

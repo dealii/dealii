@@ -79,7 +79,7 @@ void check_all(std::ostream &log)
 
 int main()
 {
-  std::ofstream logfile("data_out_base_tecplot/output",
+  std::ofstream logfile("output",
                         std::ios_base::trunc | std::ios_base::binary);
   check_all<1,1>(logfile);
   check_all<1,2>(logfile);

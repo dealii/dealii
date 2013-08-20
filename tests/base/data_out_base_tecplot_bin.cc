@@ -67,7 +67,7 @@ void check_all()
 
 int main()
 {
-  std::ofstream logfile("data_out_base_tecplot_bin/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   check_all<1,1>();

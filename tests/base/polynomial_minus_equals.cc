@@ -33,7 +33,7 @@ using namespace dealii;
 
 int main ()
 {
-  std::ofstream logfile("polynomial_minus_equals/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

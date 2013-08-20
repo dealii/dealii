@@ -194,7 +194,7 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 
 int main()
 {
-  std::ofstream logfile("quadrature_test/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
