@@ -57,6 +57,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: Some operations in the MappingQ class are now done in higher
+  precision arithmetic to mitigate the ill-conditioning that appears
+  when using mappings of high order (say, order 6 or 8 or 10).
+  <br>
+  (Juan Carlos Araujo Cabarcas, 2013/08/20)
+  </li>
+
+  <li>
   Fixed: The SLEPcWrappers classes could not be compiled for 64-bit
   indices. This is now fixed.
   <br>
