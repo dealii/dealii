@@ -1,5 +1,5 @@
 ==============================
-data_out_base_gmv/11.gmv
+11.gmv
 ==============================
 gmvinput ascii
 
@@ -47,7 +47,7 @@ i 1
 endvars
 endgmv
 ==============================
-data_out_base_gmv/12.gmv
+12.gmv
 ==============================
 gmvinput ascii
 
@@ -95,7 +95,7 @@ i 1
 endvars
 endgmv
 ==============================
-data_out_base_gmv/22.gmv
+22.gmv
 ==============================
 gmvinput ascii
 
@@ -183,7 +183,7 @@ i 1
 endvars
 endgmv
 ==============================
-data_out_base_gmv/23.gmv
+23.gmv
 ==============================
 gmvinput ascii
 
@@ -271,7 +271,7 @@ i 1
 endvars
 endgmv
 ==============================
-data_out_base_gmv/33.gmv
+33.gmv
 ==============================
 gmvinput ascii
 
