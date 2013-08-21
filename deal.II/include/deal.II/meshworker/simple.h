@@ -1200,7 +1200,7 @@ namespace MeshWorker
 
     template <class MATRIX, class VECTOR>
     inline void
-    MatrixSimple<MATRIX>::initialize(const ConstraintMatrix &c)
+    SystemSimple<MATRIX,VECTOR>::initialize(const ConstraintMatrix &c)
     {
       MatrixSimple<MATRIX>::initialize(c);
       ResidualSimple<VECTOR>::initialize(c);
