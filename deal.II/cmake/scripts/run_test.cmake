@@ -17,22 +17,22 @@ MACRO(CALLBACK _target _msg_success _msg_error)
 
   ELSE()
 
-    MESSAGE("${_target}: ${_msg_error}:")
+    MESSAGE("*** ${_msg_error}: ***")
     MESSAGE(${_output})
-    MESSAGE(FATAL_ERROR "${TEST}: Test aborted.")
+    MESSAGE(FATAL_ERROR "*** Test aborted.")
   ENDIF()
 ENDMACRO()
 
 
 CALLBACK(${TEST}
-  "Build successful" "Build failed with the following error message"
+  "Build successful" "BUILD FAILED"
   )
 
 CALLBACK(${TEST}.run
-  "Run successful" "Running the test failed with the following error message"
+  "Run successful" "RUN FAILED"
   )
 
 CALLBACK(${TEST}.diff
-  "Diff successful" "Diff failed:"
+  "Diff successful" "DIFF FAILED"
   )
 
