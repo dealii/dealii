@@ -38,7 +38,7 @@ using namespace dealii;
 
 int main()
 {
-  std::ofstream logfile ("anisotropic_crash/output");
+  std::ofstream logfile ("output");
   logfile.precision (3);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);

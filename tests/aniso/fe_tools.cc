@@ -170,7 +170,7 @@ void test_projection (std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("fe_tools/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog << std::setprecision(5);

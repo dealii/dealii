@@ -100,7 +100,7 @@ void test_isotropic (int type, std::ostream *logfile)
                                     300, .01, false, 5, false);
           grid_out.set_flags (eps2);
           std::ostringstream filename;
-          filename << "refine_and_coarsen_anisotropic/grid_" << type << "_" << cycle << ".eps";
+          filename << "grid_" << type << "_" << cycle << ".eps";
           std::ofstream outfile(filename.str().c_str());
           grid_out.write_eps (tria, outfile);
         }
@@ -121,7 +121,7 @@ int main ()
   std::ostream *logfile;
 
   if (single_file)
-    logfile = new std::ofstream("refine_and_coarsen_anisotropic/output");
+    logfile = new std::ofstream("output");
   else
     logfile = &std::cout;
 
