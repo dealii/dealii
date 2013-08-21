@@ -53,7 +53,7 @@ int main ()
 
   GridIn<dim,dim+1> grid_in;
   grid_in.attach_triangulation (triangulation);
-  std::ifstream fname("square.msh");
+  std::ifstream fname("grids/square.msh");
   grid_in.read_msh (fname);
 
   dof_handler.distribute_dofs (fe);

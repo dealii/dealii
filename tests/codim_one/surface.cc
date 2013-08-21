@@ -105,16 +105,16 @@ int main ()
   deallog.depth_console(0);
 
   deallog<<"Test <1,2>"<<std::endl;
-  test<1,2>("SOURCE_DIR/grids/circle_1.inp");
-  test<1,2>("SOURCE_DIR/grids/circle_2.inp");
-  test<1,2>("SOURCE_DIR/grids/circle_3.inp");
-  test<1,2>("SOURCE_DIR/grids/circle_4.inp");
+  test<1,2>(SOURCE_DIR "/grids/circle_1.inp");
+  test<1,2>(SOURCE_DIR "/grids/circle_2.inp");
+  test<1,2>(SOURCE_DIR "/grids/circle_3.inp");
+  test<1,2>(SOURCE_DIR "/grids/circle_4.inp");
 
   deallog<<"Test <2,3>"<<std::endl;
-  test<2,3>("SOURCE_DIR/grids/sphere_1.inp");
-  test<2,3>("SOURCE_DIR/grids/sphere_2.inp");
-  test<2,3>("SOURCE_DIR/grids/sphere_3.inp");
-  test<2,3>("SOURCE_DIR/grids/sphere_4.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_2.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_3.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_4.inp");
 
   return 0;
 }

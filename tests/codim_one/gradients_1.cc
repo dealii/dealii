@@ -122,16 +122,16 @@ int main ()
   deallog.threshold_double(1.e-12);
 
   deallog<<"Test <1,2>, Q1, Q2, Q3"<<std::endl;
-  test<1,2>("SOURCE_DIR/grids/circle_4.inp",1);
-  test<1,2>("SOURCE_DIR/grids/circle_4.inp",2);
-  test<1,2>("SOURCE_DIR/grids/circle_4.inp",3);
+  test<1,2>(SOURCE_DIR "/grids/circle_4.inp",1);
+  test<1,2>(SOURCE_DIR "/grids/circle_4.inp",2);
+  test<1,2>(SOURCE_DIR "/grids/circle_4.inp",3);
 
   deallog<<std::endl;
 
   deallog<<"Test <2,3>, Q1, Q2, Q3"<<std::endl;
-  test<2,3>("SOURCE_DIR/grids/sphere_1.inp",1);
-  test<2,3>("SOURCE_DIR/grids/sphere_1.inp",2);
-  test<2,3>("SOURCE_DIR/grids/sphere_1.inp",3);
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp",1);
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp",2);
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp",3);
 
 
   return 0;

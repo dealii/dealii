@@ -49,9 +49,9 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  test<1,2>("SOURCE_DIR/grids/circle_1.inp");
-  test<2,3>("SOURCE_DIR/grids/square.inp");
-  test<2,3>("SOURCE_DIR/grids/sphere_1.inp");
+  test<1,2>(SOURCE_DIR "/grids/circle_1.inp");
+  test<2,3>(SOURCE_DIR "/grids/square.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp");
 
   return 0;
 }

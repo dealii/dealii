@@ -126,7 +126,7 @@ BEM<spacedim>::run()
     {
 
 
-      read_grid("SOURCE_DIR/grids/circle_R10.inp");
+      read_grid(SOURCE_DIR "/grids/circle_R10.inp");
 
       Point<spacedim> p;
       HyperBallBoundary<spacedim-1, spacedim> boundary(p,10.);

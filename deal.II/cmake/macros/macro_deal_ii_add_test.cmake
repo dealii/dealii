@@ -70,7 +70,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         )
       SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
         COMPILE_DEFINITIONS
-          SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+          SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
         )
       TARGET_LINK_LIBRARIES(${_test_name}.${_build_lowercase}
         ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}

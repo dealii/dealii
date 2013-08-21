@@ -89,10 +89,10 @@ int main ()
   for (unsigned int n=1; n<8; ++n)
     {
       deallog << "Test<1,2>, finite element q_" << n << std::endl;
-      test<1,2>("SOURCE_DIR/grids/circle_2.inp",n);
+      test<1,2>(SOURCE_DIR "/grids/circle_2.inp",n);
 
       deallog << "Test<1,2>, finite element q_" << n << std::endl;
-      test<2,3>("SOURCE_DIR/grids/sphere_2.inp",n);
+      test<2,3>(SOURCE_DIR "/grids/sphere_2.inp",n);
     }
   return 0;
 }
