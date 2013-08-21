@@ -60,8 +60,9 @@ ENDIF()
 #
 # Set a default time limit of 60 seconds:
 #
-SET_IF_EMPTY(DEAL_II_TEST_TIME_LIMIT 60)
+SET_IF_EMPTY(DEAL_II_TEST_TIME_LIMIT 120)
 
 MESSAGE(STATUS "Proceed to test definitions")
 
+ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
