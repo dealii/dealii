@@ -64,6 +64,15 @@ SET_IF_EMPTY(DEAL_II_TEST_TIME_LIMIT 120)
 
 MESSAGE(STATUS "Proceed to test definitions")
 
+#$(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),mpi,),) \
+#$(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),gla,),) \
+#$(if $(USE_CONTRIB_P4EST:no=),    distributed_grids,) \
+#$(if $(USE_CONTRIB_PETSC:no=),    petsc,) \
+#$(if $(USE_CONTRIB_SLEPC:no=),    slepc,) \
+#$(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
+#$(if $(USE_CONTRIB_METIS:no=),    metis,) \
+#$(if $(USE_CONTRIB_HSL:no=),      hsl,) \
+#$(if $(USE_CONTRIB_LAPACK:no=),   lapack,)
 
 #a-framework
 #all-headers
@@ -93,4 +102,7 @@ ADD_SUBDIRECTORY(codim_one)
 #serialization
 #slepc
 #trilinos
-#umfpack
+
+IF(DEAL_II_WITH_UMFPACK)
+  ADD_SUBDIRECTORY(umfpack)
+ENDIF()
