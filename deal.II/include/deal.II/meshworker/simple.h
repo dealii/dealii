@@ -459,6 +459,15 @@ namespace MeshWorker
       void initialize(MATRIX &m, VECTOR &rhs);
 
       /**
+       * Initialize the constraints. After this function has been
+       * called with a valid ConstraintMatrix, the function
+       * ConstraintMatrix::distribute_local_to_global() will be used
+       * by assemble() to distribute the cell and face matrices into a
+       * global sparse matrix.
+       */
+      void initialize(const ConstraintMatrix &constraints);
+
+      /**
        * Initialize the local data
        * in the
        * DoFInfo
@@ -1189,7 +1198,15 @@ namespace MeshWorker
       ResidualSimple<VECTOR>::initialize(data);
     }
 
+    template <class MATRIX, class VECTOR>
+    inline void
+    MatrixSimple<MATRIX>::initialize(const ConstraintMatrix &c)
+    {
+      MatrixSimple<MATRIX>::initialize(c);
+      ResidualSimple<VECTOR>::initialize(c);
+    }
 
+    
     template <class MATRIX, class VECTOR>
     template <class DOFINFO>
     inline void
