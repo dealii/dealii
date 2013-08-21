@@ -187,11 +187,11 @@ namespace SLEPcWrappers
 
     // get number of converged eigenstates
     ierr = EPSGetConverged (solver_data->eps,
-                            reinterpret_cast<PetscInt *>(n_converged));
+                            reinterpret_cast<PetscInt*>(n_converged));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    PetscInt n_iterations = 0;
-    double residual_norm = 1e300;
+    PetscInt n_iterations   = 0;
+    PetscReal residual_norm = 1.e300;
 
     // @todo Investigate elaborating on some of this to act on the
     // complete eigenspectrum
@@ -200,9 +200,13 @@ namespace SLEPcWrappers
       ierr = EPSGetIterationNumber (solver_data->eps, &n_iterations);
       AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-      // get the residual norm of the most extreme eigenvalue
-      ierr = EPSComputeResidualNorm (solver_data->eps, 0, &residual_norm);
-      AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+      // get the residual norm of the most extreme eigenvalue if and
+      // only if at least one eigenvector has converged.
+      if ((*n_converged)>0)
+	{
+	  ierr = EPSComputeResidualNorm (solver_data->eps, 0, &residual_norm);
+	  AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+	}
 
       // check the solver state
       const SolverControl::State state
