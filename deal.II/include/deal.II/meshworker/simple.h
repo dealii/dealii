@@ -911,7 +911,7 @@ namespace MeshWorker
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(k,j)) >= threshold)
-                if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                if (//mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                     !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   G.add(i1[j], i2[k], M(k,j));
         }
@@ -941,7 +941,7 @@ namespace MeshWorker
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(j,k)) >= threshold)
-                if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                if (//mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                     !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   G.add(i1[j], i2[k], M(j,k));
         }
