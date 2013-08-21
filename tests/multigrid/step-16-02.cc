@@ -106,8 +106,8 @@ void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim>& dinfo,
 				       typename MeshWorker::IntegrationInfo<dim>& info) const
 {
   const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
-  Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0),
-  			  Laplace::compute_penalty(dinfo, dinfo, deg, deg));
+//  Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0),
+//  			  Laplace::compute_penalty(dinfo, dinfo, deg, deg));
 }
 
 
@@ -117,10 +117,10 @@ void LaplaceMatrix<dim>::face(
   MeshWorker::IntegrationInfo<dim>& info1, MeshWorker::IntegrationInfo<dim>& info2) const
 {
   const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
-  Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix, 
-		     dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
-		     info1.fe_values(0), info2.fe_values(0),
-		     Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
+//  Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix, 
+//		     dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
+//		     info1.fe_values(0), info2.fe_values(0),
+//		     Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
 }
 
 template <int dim>
@@ -135,7 +135,7 @@ private:
   void assemble_system ();
   void assemble_multigrid (const bool &use_mw);
   void solve ();
-  void refine_grid ();
+  void refine_grid (const std::string& reftype);
   void output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
@@ -182,9 +182,9 @@ template <int dim>
 double Coefficient<dim>::value (const Point<dim> &p,
                                 const unsigned int) const
 {
-  if (p.square() < 0.5*0.5)
-    return 20;
-  else
+//  if (p.square() < 0.5*0.5)
+//    return 20;
+//  else
     return 1;
 }
 
@@ -354,16 +354,14 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool& use_mw)
     MeshWorker::IntegrationInfoBox<dim> info_box;
     UpdateFlags update_flags = update_values | update_gradients | update_hessians;
     info_box.add_update_flags_all(update_flags);
-    info_box.initialize(fe, mapping);//, &dof_handler.block_info());
+    info_box.initialize(fe, mapping);
 
-    MeshWorker::DoFInfo<dim> dof_info(mg_dof_handler);//.block_info());
+    MeshWorker::DoFInfo<dim> dof_info(mg_dof_handler);
 
     MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
     assembler.initialize(mg_constrained_dofs);
-    //  assembler.initialize_local_blocks(dof_handler.block_info().local());
     assembler.initialize(mg_matrices);
     assembler.initialize_interfaces(mg_interface_in, mg_interface_out);
-//    assembler.initialize_fluxes(mg_matrix_up, mg_matrix_down);
 
     MeshWorker::integration_loop<dim, dim> (
         mg_dof_handler.begin(), mg_dof_handler.end(),
@@ -455,10 +453,11 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool& use_mw)
   const unsigned int nlevels = triangulation.n_levels();
   for (unsigned int level=1;level<nlevels;++level)
   {
-//    deallog << "dG up " << mg_matrix_up[level].l1_norm();
-//    deallog << " dG down " << mg_matrix_down[level].l1_norm() << std::endl;
-    deallog << "cG in " << mg_interface_in[level].l1_norm();
-    deallog << " cG out " << mg_interface_out[level].l1_norm() << std::endl;
+    std::cout << "cG in " << mg_interface_in[level].l1_norm() << std::endl;
+//    mg_interface_in[level].print(std::cout);
+    std::cout << "cG out " << mg_interface_out[level].l1_norm() << std::endl;
+//    mg_interface_out[level].print(std::cout);
+    std::cout << std::endl;
   }
 }
 
@@ -518,7 +517,7 @@ void LaplaceProblem<dim>::solve ()
 
   MGMatrix<> mg_matrix(&mg_matrices);
   MGMatrix<> mg_interface_up(&mg_interface_in);
-  MGMatrix<> mg_interface_down(&mg_interface_out);
+  MGMatrix<> mg_interface_down(&mg_interface_in);
 
   Multigrid<Vector<double> > mg(mg_dof_handler,
                                 mg_matrix,
@@ -566,19 +565,37 @@ void LaplaceProblem<dim>::solve ()
 // today compared to those that were
 // available when step-6 was written.
 template <int dim>
-void LaplaceProblem<dim>::refine_grid ()
+void LaplaceProblem<dim>::refine_grid (const std::string& reftype)
 {
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-
-  KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
-                                      QGauss<dim-1>(3),
-                                      typename FunctionMap<dim>::type(),
-                                      solution,
-                                      estimated_error_per_cell);
-  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                   estimated_error_per_cell,
-                                                   0.3, 0.03);
-  triangulation.execute_coarsening_and_refinement ();
+  bool cell_refined = false;
+  if (reftype == "center" || !cell_refined)
+    {
+      for (typename Triangulation<dim>::active_cell_iterator
+	     cell = triangulation.begin_active();
+	   cell != triangulation.end(); ++cell)
+	for (unsigned int vertex=0;
+	     vertex < GeometryInfo<dim>::vertices_per_cell;
+	     ++vertex)
+	  {
+	    {
+	      const Point<dim> p = cell->vertex(vertex);
+	      const Point<dim> origin = (dim == 2 ?
+					 Point<dim>(0,0) :
+					 Point<dim>(0,0,0));
+	      const double dist = p.distance(origin);
+	      if(dist<0.25/M_PI)
+		{
+		  cell->set_refine_flag ();
+		  cell_refined = true;
+		  break;
+		}
+	    }
+	  }
+    }
+  if (reftype=="global" || !cell_refined)
+    triangulation.refine_global(1);
+  else
+    triangulation.execute_coarsening_and_refinement ();
 }
 
 
@@ -597,8 +614,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
            << cycle
            << ".vtk";
 
-//  std::ofstream output (filename.str().c_str());
-//  data_out.write_vtk (output);
+  std::ofstream output (filename.str().c_str());
+  data_out.write_vtk (output);
 }
 
 
@@ -621,15 +638,15 @@ void LaplaceProblem<dim>::run ()
 
       if (cycle == 0)
         {
-          GridGenerator::hyper_ball (triangulation);
+          GridGenerator::hyper_cube (triangulation, -1, 1);
 
-          static const HyperBallBoundary<dim> boundary;
-          triangulation.set_boundary (0, boundary);
+//          static const HyperBallBoundary<dim> boundary;
+//          triangulation.set_boundary (0, boundary);
 
           triangulation.refine_global (1);
         }
       else
-        refine_grid ();
+        refine_grid ("center");
 
 
       deallog << "   Number of active cells:       "
