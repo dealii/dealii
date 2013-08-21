@@ -66,6 +66,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         INCLUDE_DIRECTORIES
           "${CMAKE_BINARY_DIR}/include"
           "${CMAKE_SOURCE_DIR}/include"
+          "${CMAKE_SOURCE_DIR}/include/deal.II/"
         )
       SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
         COMPILE_DEFINITIONS
