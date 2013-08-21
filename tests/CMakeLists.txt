@@ -66,3 +66,5 @@ MESSAGE(STATUS "Proceed to test definitions")
 
 ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
+#ADD_SUBDIRECTORY(bits)
+ADD_SUBDIRECTORY(codim_one)

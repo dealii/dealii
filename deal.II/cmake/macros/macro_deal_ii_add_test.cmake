@@ -91,14 +91,21 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         )
 
 
+      SET(_comparison ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name})
+      IF(EXISTS ${_comparison}.${_build_lowercase}.output)
+        SET(_comparison ${_comparison}.${_build_lowercase}.output)
+      ELSE()
+        SET(_comparison ${_comparison}.output)
+      ENDIF()
+
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
         COMMAND ${DEAL_II_TEST_DIFF}
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-          ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.output
+          ${_comparison}
           | tee ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
         DEPENDS
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-          ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.output
+          ${_comparison}
         )
       ADD_CUSTOM_TARGET(${_test}.diff
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
