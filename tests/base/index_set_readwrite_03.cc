@@ -36,12 +36,12 @@ void test ()
   is1.add_range(0,75);
 
   {
-    std::ofstream out("index_set_readwrite_03/a.idxset");
+    std::ofstream out("a.idxset");
     is1.block_write(out);
   }
 
   IndexSet is2;
-  std::ifstream in("index_set_readwrite_03/a.idxset");
+  std::ifstream in("a.idxset");
   is2.block_read(in);
 
   Assert(is1 == is2, ExcInternalError());
@@ -50,7 +50,7 @@ void test ()
   
   deallog << "OK" << std::endl;
 
-  std::remove ("index_set_readwrite_03/a.idxset");
+  std::remove ("a.idxset");
 }
 
 
