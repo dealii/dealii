@@ -112,14 +112,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         )
 
 
-      ADD_TEST(NAME ${_test}
+      ADD_TEST(NAME ${_category}/${_test}
         COMMAND ${CMAKE_COMMAND}
           -DTEST=${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         )
-      SET_TESTS_PROPERTIES(${_test} PROPERTIES
+      SET_TESTS_PROPERTIES(${_category}/${_test} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${DEAL_II_TEST_TIME_LIMIT}
         )
