@@ -88,6 +88,25 @@ namespace internal
       get_fe_collection () const;
 
       /**
+       * Get a reference to the collection of mapping objects used
+       * here.
+       */
+      const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &
+      get_mapping_collection () const;
+
+      /**
+       * Get a reference to the collection of quadrature objects used
+       * here.
+       */
+      const dealii::hp::QCollection<q_dim> &
+      get_quadrature_collection () const;
+
+      /**
+       * Get the underlying update flags.
+       */
+      UpdateFlags get_update_flags() const;
+
+      /**
        * Return a reference to the @p FEValues object selected by the last
        * call to select_fe_values(). select_fe_values() in turn is called when
        * you called the @p reinit function of the <tt>hp::FE*Values</tt> class
@@ -591,6 +610,36 @@ namespace internal
     FEValuesBase<dim,q_dim,FEValues>::get_fe_collection () const
     {
       return *fe_collection;
+    }
+
+
+
+    template <int dim, int q_dim, class FEValues>
+    inline
+    const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &
+    FEValuesBase<dim,q_dim,FEValues>::get_mapping_collection () const
+    {
+      return *mapping_collection;
+    }
+
+
+
+    template <int dim, int q_dim, class FEValues>
+    inline
+    const dealii::hp::QCollection<q_dim> &
+    FEValuesBase<dim,q_dim,FEValues>::get_quadrature_collection () const
+    {
+      return q_collection;
+    }
+
+
+
+    template <int dim, int q_dim, class FEValues>
+    inline
+    dealii::UpdateFlags
+    FEValuesBase<dim,q_dim,FEValues>::get_update_flags () const
+    {
+      return update_flags;
     }
   }
 

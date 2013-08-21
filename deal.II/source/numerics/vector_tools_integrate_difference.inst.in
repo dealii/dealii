@@ -22,21 +22,11 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
 
       template
         void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_space_dimension>
-        (const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
+        (const Mapping<deal_II_dimension, deal_II_space_dimension>&,
+         const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
          const VEC&,
          const Function<deal_II_space_dimension>&,
          Vector<float>&,
-         const Quadrature<deal_II_dimension>&,
-         const NormType&,
-         const Function<deal_II_space_dimension>*,
-         const double);
-
-      template
-        void integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_space_dimension >
-        (const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
-         const VEC&,
-         const Function<deal_II_space_dimension>&,
-         Vector<double>&,
          const Quadrature<deal_II_dimension>&,
          const NormType&,
          const Function<deal_II_space_dimension>*,
@@ -44,8 +34,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
 
       template
         void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_space_dimension>
-        (const Mapping<deal_II_dimension, deal_II_space_dimension>&,
-         const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
+        (const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
          const VEC&,
          const Function<deal_II_space_dimension>&,
          Vector<float>&,
@@ -66,62 +55,63 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
          const Function<deal_II_space_dimension>*,
          const double);
 
-      \}
-#endif
-  }
-
-
-
-//TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension, deal_II_space_dimension>
-// where applicable and move to codimension cases above also when applicable
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-  {
-#if deal_II_dimension == deal_II_space_dimension
-
-    namespace VectorTools \{
+      template
+        void integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_space_dimension >
+        (const DoFHandler<deal_II_dimension, deal_II_space_dimension>&,
+         const VEC&,
+         const Function<deal_II_space_dimension>&,
+         Vector<double>&,
+         const Quadrature<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_space_dimension>*,
+         const double);
 
       template
-        void integrate_difference<deal_II_dimension>
-        (const hp::DoFHandler<deal_II_dimension>&,
+        void integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_space_dimension>
+        (const hp::MappingCollection<deal_II_dimension,deal_II_space_dimension>&,
+         const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
          const VEC&,
-         const Function<deal_II_dimension>&,
+         const Function<deal_II_space_dimension>&,
          Vector<double>&,
          const hp::QCollection<deal_II_dimension>&,
          const NormType&,
-         const Function<deal_II_dimension>*,
+         const Function<deal_II_space_dimension>*,
          const double);
+
       template
-        void integrate_difference<deal_II_dimension>
-        (const hp::DoFHandler<deal_II_dimension>&,
+        void integrate_difference<deal_II_dimension, VEC, Vector<double>, deal_II_space_dimension>
+        (const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
          const VEC&,
-         const Function<deal_II_dimension>&,
-         Vector<float>&,
-         const hp::QCollection<deal_II_dimension>&,
-         const NormType&,
-         const Function<deal_II_dimension>*,
-         const double);
-      template
-        void integrate_difference<deal_II_dimension>
-        (const hp::MappingCollection<deal_II_dimension>&,
-         const hp::DoFHandler<deal_II_dimension>&,
-         const VEC&,
-         const Function<deal_II_dimension>&,
+         const Function<deal_II_space_dimension>&,
          Vector<double>&,
          const hp::QCollection<deal_II_dimension>&,
          const NormType&,
-         const Function<deal_II_dimension>*,
+         const Function<deal_II_space_dimension>*,
          const double);
+
       template
-        void integrate_difference<deal_II_dimension>
-        (const hp::MappingCollection<deal_II_dimension>&,
-         const hp::DoFHandler<deal_II_dimension>&,
+        void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_space_dimension>
+        (const hp::MappingCollection<deal_II_dimension,deal_II_space_dimension>&,
+         const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
          const VEC&,
-         const Function<deal_II_dimension>&,
+         const Function<deal_II_space_dimension>&,
          Vector<float>&,
          const hp::QCollection<deal_II_dimension>&,
          const NormType&,
-         const Function<deal_II_dimension>*,
+         const Function<deal_II_space_dimension>*,
          const double);
+
+      template
+        void integrate_difference<deal_II_dimension, VEC, Vector<float>, deal_II_space_dimension>
+        (const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+         const VEC&,
+         const Function<deal_II_space_dimension>&,
+         Vector<float>&,
+         const hp::QCollection<deal_II_dimension>&,
+         const NormType&,
+         const Function<deal_II_space_dimension>*,
+         const double);
+
       \}
 #endif
   }
