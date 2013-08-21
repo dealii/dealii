@@ -95,6 +95,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.output
           > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
+        # and a second time to get the output:
+        COMMAND ${DEAL_II_TEST_DIFF}
+          ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+          ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.output
         DEPENDS
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.output

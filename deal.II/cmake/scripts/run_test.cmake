@@ -7,7 +7,7 @@
 
 MACRO(CALLBACK _target _msg_success _msg_error)
   EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-    --build ${DEAL_II_BINARY_DIR} --target ${_target}
+    --build ${DEAL_II_BINARY_DIR} --target ${_target}/fast
     RESULT_VARIABLE _result_code
     OUTPUT_VARIABLE _output
     )
