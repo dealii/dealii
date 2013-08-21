@@ -16,6 +16,7 @@ to all of the degrees of freedom in the adjacent elements.  The resulting
 discrete equations yield very large linear systems very quickly, especially
 for systems of equations in dim=2 or dim=3.  
 
+<h4> Reducing the size of the linear system </h4>
 To alleviate the computational cost of solving such large linear systems, 
 the hybridizable discontinuous Galerkin (HDG) methodology has recently been 
 developed by Cockburn and co-workers 
@@ -40,12 +41,45 @@ element solutions no longer couple to neighboring elements.  This is known as th
 solution process.
   <li>  Use the local element solutions to construct the global problem for the 
 trace values.  These are the only globally coupled unknowns.
-  <li>  Modify the local solutions from the computed trace values.
+  <li>  Reconstruct the local solutions from the computed trace values.
 </ol>
 
+The above procedure also has a linear algebra interpretation and referred to
+as static condensation. Let us write the complete linear system associated to
+the HDG problem as a block system with the discrete DG variables <i>U</i> as
+first block and the skeleton variables $\Lambda$ as the second block:
+@f{eqnarray*}
+\begin{pmatrix} A & B \\ C & D \end{pmatrix}
+\begin{pmatrix} U \\ \Lambda \end{pmatrix}
+=
+\begin{pmatrix} F \\ G \end{pmatrix}
+@f}
+Our aim is now to eliminate the <i>U</i> block with a Schur complement
+approach similar to step-20, which results in the following two steps:
+@f{eqnarray*}
+(D - C A^{-1} B) \Lambda &=& G - C A^{-1} F \\
+A U &=& F - B \Lambda
+@f}
+The steps in the Dirichlet-to-Neumann map concept hence correspond to
+<ol>
+  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand side $G - C A^{-1} F$,
+  <li> solving the Schur complement system for $\Lambda$, and
+  <li> solving the equation for <i>U</i> using the second equation which uses $\Lambda$.
+</ol>
+
+The important ingredient from the linear algebra point of view is that the
+matrix <i>A</i> is block-diagonal with block size equal to the number of
+degrees of freedom of the interior DG variables which are always only related
+to a single cell. The coupling to other cells is introduced by the matrices
+<i>B</i> and <i>C</i> over the skeleton variable. The block-diagonality of
+<i>A</i> and the structure in <i>B</i> and <i>C</i> allow us to invert the
+matrix <i>A</i> element by element (the local solution of the Dirichelt
+problem) and subtract $CA^{-1}B$ from $D$.
+
+<h4> Solution quality and rates of convergence</h4>
 Another criticism of traditional DG methods is that the approximate fluxes
-converge suboptimally.   The local HDG solutions can be shown to converge
-as $\mathcal{O}(h^{p+1})$.  Additionally, a super-convergence property can 
+converge suboptimally.  The local HDG solutions can be shown to converge
+as $\mathcal{O}(h^{p+1})$, i.e., at optimal order.  Additionally, a super-convergence property can 
 be used to post-process a new approximate solution that converges at the 
 rate $\mathcal{O}(h^{p+2})$.
 
