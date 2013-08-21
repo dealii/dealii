@@ -88,6 +88,8 @@ public:
 
 template <int dim>
 LaplaceMatrix<dim>::LaplaceMatrix()
+		:
+		MeshWorker::LocalIntegrator<dim>(true, false, false)
 {}
 
 
@@ -660,10 +662,8 @@ void LaplaceProblem<dim>::run ()
 // in step-6:
 int main ()
 {
-  std::ofstream logfile("step-16/output");
+  initlog(__FILE__, true);
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
-  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   try
