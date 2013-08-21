@@ -64,7 +64,7 @@ void test ()
 
 int main ()
 {
-  ofstream logfile("direction_flag_02/output");
+  ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

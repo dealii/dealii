@@ -64,7 +64,33 @@ SET_IF_EMPTY(DEAL_II_TEST_TIME_LIMIT 120)
 
 MESSAGE(STATUS "Proceed to test definitions")
 
+
+#a-framework
+#all-headers
 ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
-#ADD_SUBDIRECTORY(bits)
+#benchmarks
+#bits
 ADD_SUBDIRECTORY(codim_one)
+#deal.II
+#distributed_grids
+#fail
+#fe
+#gla
+#grid
+#hp
+#hsl
+#integrators
+#lac
+#lapack
+#lib
+#matrix_free
+#mesh_converter
+#metis
+#mpi
+#multigrid
+#petsc
+#serialization
+#slepc
+#trilinos
+#umfpack

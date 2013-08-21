@@ -32,7 +32,7 @@
 
 #include <string>
 
-std::ofstream logfile("interpolate_boundary_values_03/output");
+std::ofstream logfile("output");
 
 void test()
 {

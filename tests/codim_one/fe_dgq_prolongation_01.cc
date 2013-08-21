@@ -29,7 +29,7 @@ using namespace dealii;
 
 int main ()
 {
-  std::ofstream logfile("fe_dgq_prolongation_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

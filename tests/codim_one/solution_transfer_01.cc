@@ -51,7 +51,7 @@ using namespace dealii;
 
 int main ()
 {
-  std::ofstream logfile("solution_transfer_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

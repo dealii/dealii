@@ -31,7 +31,7 @@
 
 #include <string>
 
-std::ofstream logfile("interpolate_boundary_values_02/output");
+std::ofstream logfile("output");
 
 void test()
 {

@@ -50,7 +50,7 @@ void save_mesh(const Triangulation<dim,spacedim> &tria)
 
 int main ()
 {
-  ofstream logfile("boundary_indicator_01/output");
+  ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

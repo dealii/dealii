@@ -37,7 +37,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/fe/mapping_q.h>
 
-std::ofstream logfile("data_out_03/output");
+std::ofstream logfile("output");
 
 template <int dim>
 class Identity : public Function<dim>

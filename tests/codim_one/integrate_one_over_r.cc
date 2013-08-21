@@ -41,7 +41,7 @@ double exact_integral_one_over_r(const unsigned int i,
                                  const unsigned int j,
                                  const unsigned int vertex_index);
 
-ofstream logfile("integrate_one_over_r/output");
+ofstream logfile("output");
 
 int main()
 {

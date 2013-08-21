@@ -108,7 +108,7 @@ namespace Step38
 
 int main ()
 {
-  std::ofstream logfile("extract_boundary_mesh_07/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

@@ -60,7 +60,7 @@ void test (unsigned int degree)
 
 int main ()
 {
-  std::ofstream logfile("mapping_03/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

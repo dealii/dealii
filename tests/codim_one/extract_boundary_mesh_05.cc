@@ -73,7 +73,7 @@ void test ()
 int main ()
 {
 
-  ofstream logfile("extract_boundary_mesh_05/output");
+  ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

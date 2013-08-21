@@ -39,7 +39,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/numerics/data_out.h>
 
-std::ofstream logfile("fe_values_extractor_01/output");
+std::ofstream logfile("output");
 
 
 int main ()
