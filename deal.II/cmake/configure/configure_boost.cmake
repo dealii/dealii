@@ -26,7 +26,7 @@
 IF(NOT FEATURE_THREADS_PROCESSED)
   MESSAGE(FATAL_ERROR "\n"
     "Internal build system error:\n"
-    "configure_boost.cmake included before configure_tbb.cmake\n\n"
+    "configure_boost.cmake included before configure_1_threads.cmake\n\n"
     )
 ENDIF()
 
@@ -108,19 +108,8 @@ MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
   #
   LIST(REMOVE_ITEM Boost_LIBRARIES "pthread")
 
-  #
-  # Transform  Boost_LIBRARIES into a list of debug and release libraries
-  # without keywords:
-  #
-  SPLIT_DEBUG_RELEASE(_boost_debug _boost_release ${Boost_LIBRARIES})
+  DEAL_II_APPEND_LIBRARIES(${Boost_LIBRARIES})
 
-  IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${_boost_debug})
-  ENDIF()
-
-  IF (CMAKE_BUILD_TYPE MATCHES "Release")
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE ${_boost_release})
-  ENDIF()
 ENDMACRO()
 
 
