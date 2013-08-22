@@ -1631,8 +1631,14 @@ public:
    * this class is asked to write out all declarations to a stream using
    * the print_parameters() function.
    *
-   * The function generates an exception if the default value doesn't match
-   * the given pattern. An entry can be declared more than once without
+   * The function generates an exception of type ExcValueDoesNotMatchPattern
+   * if the default value doesn't match the given pattern, using the C++
+   * throw mechanism. However, this exception is only generated <i>after</i>
+   * the entry has been created; if you have code where no sensible default
+   * value for a parameter is possible, you can then catch and ignore this
+   * exception.
+   *
+   * @note An entry can be declared more than once without
    * generating an error, for example to override an earlier default value.
    */
   void declare_entry (const std::string           &entry,
