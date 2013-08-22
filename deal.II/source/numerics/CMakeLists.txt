@@ -22,6 +22,7 @@ FILE(GLOB _header
 
 SET(_src
   data_out.cc
+  data_out_dof_data.cc
   data_out_faces.cc
   data_out_rotation.cc
   data_out_stack.cc
@@ -50,8 +51,9 @@ SET(_src
   )
 
 SET(_inst
-  data_out_faces.inst.in
   data_out.inst.in
+  data_out_dof_data.inst.in
+  data_out_faces.inst.in
   data_out_rotation.inst.in
   data_out_stack.inst.in
   data_postprocessor.inst.in
