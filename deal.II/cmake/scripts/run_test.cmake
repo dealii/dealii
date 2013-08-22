@@ -1,13 +1,14 @@
 #
-# The following variables have to be set:
+# TODO: The following variables have to be set:
 #
 # TEST
+# TEST_SUFFIX
 # DEAL_II_BINARY_DIR
 #
 
-MACRO(CALLBACK _target _msg_success _msg_error)
+MACRO(CALLBACK _target _target_suffix _msg_success _msg_error)
   EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-    --build ${DEAL_II_BINARY_DIR} --target ${_target}
+    --build ${DEAL_II_BINARY_DIR} --target ${_target}${_target_suffix}
     RESULT_VARIABLE _result_code
     OUTPUT_VARIABLE _output
     )
@@ -24,15 +25,15 @@ MACRO(CALLBACK _target _msg_success _msg_error)
 ENDMACRO()
 
 
-CALLBACK(${TEST}
+CALLBACK(${TEST} "${TEST_SUFFIX}"
   "Build successful" "BUILD FAILED"
   )
 
-CALLBACK(${TEST}.run
+CALLBACK(${TEST} ".run"
   "Run successful" "RUN FAILED"
   )
 
-CALLBACK(${TEST}.diff
+CALLBACK(${TEST} ".diff"
   "Diff successful" "DIFF FAILED"
   )
 

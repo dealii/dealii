@@ -111,10 +111,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
         )
 
+      IF(CMAKE_GENERATOR MATCHES "Makefiles")
+        SET(_test_suffix "/fast")
+      ENDIF()
 
       ADD_TEST(NAME ${_category}/${_test}
         COMMAND ${CMAKE_COMMAND}
           -DTEST=${_test}
+          -DTEST_SUFFIX=${_test_suffix}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
