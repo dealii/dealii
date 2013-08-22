@@ -80,12 +80,9 @@ for (deal_II_dimension : DIMENSIONS)
                                            ConstraintMatrix &constraints);
 
 #endif
- }
 
-
-for (deal_II_dimension : DIMENSIONS)
-{
 #if deal_II_dimension < 3
+
 template
 void
 DoFTools::
@@ -130,5 +127,21 @@ DoFTools::make_zero_boundary_constraints
  const types::boundary_id          ,
  ConstraintMatrix                        &,
  const ComponentMask                 &);
+
+template
+void
+DoFTools::compute_intergrid_constraints<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension> &, const unsigned int,
+  const DoFHandler<deal_II_dimension> &, const unsigned int,
+  const InterGridMap<DoFHandler<deal_II_dimension> > &,
+  ConstraintMatrix&);
+
+template
+void
+DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const unsigned int,
+ const DoFHandler<deal_II_dimension> &, const unsigned int,
+ const InterGridMap<DoFHandler<deal_II_dimension> > &,
+ std::vector<std::map<types::global_dof_index, float> > &);
 
 }
