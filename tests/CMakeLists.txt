@@ -23,6 +23,8 @@
 # NUMDIFF_DIR
 #
 
+SET(CTEST_USE_LAUNCHERS TRUE)
+
 #
 # We need perl for the testsuite:
 #
@@ -61,6 +63,7 @@ ENDIF()
 # Set a default time limit of 60 seconds:
 #
 SET_IF_EMPTY(DEAL_II_TEST_TIME_LIMIT 120)
+
 
 MESSAGE(STATUS "Proceed to test definitions")
 

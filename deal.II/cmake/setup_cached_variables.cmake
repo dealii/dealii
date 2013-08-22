@@ -94,13 +94,6 @@ OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
   OFF
   )
 
-IF(DEAL_II_HAVE_TESTS_DIRECTORY)
-  OPTION(DEAL_II_COMPONENT_TESTSUITE
-    "Setup the full testsuite. TODO"
-    OFF
-    )
-ENDIF()
-
 OPTION(DEAL_II_ALLOW_AUTODETECTION
   "Allow to automatically setup features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
   ON
@@ -118,6 +111,12 @@ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     "Install path prefix, prepended onto install directories."
     )
 ENDIF()
+
+
+OPTION(BUILD_TESTING
+  "This option will enable the configuration of the build tests"
+  OFF
+  )
 
 
 ########################################################################
