@@ -19,7 +19,7 @@
 // check that VectorTools::project works for FESystem(FE_Q) elements correctly
 // on a uniformly refined mesh for functions of degree q
 
-char logname[] = "project_q_system_02/output";
+char logname[] = "output";
 
 
 #include "project_common.h"

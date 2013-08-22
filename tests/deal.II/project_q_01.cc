@@ -18,7 +18,7 @@
 
 // check that VectorTools::project works for Q elements correctly
 
-char logname[] = "project_q_01/output";
+char logname[] = "output";
 
 
 #include "project_common.h"

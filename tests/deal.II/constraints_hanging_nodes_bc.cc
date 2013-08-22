@@ -42,7 +42,7 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("constraints_hanging_nodes_bc/output");
+std::ofstream logfile("output");
 
 
 template <int dim>

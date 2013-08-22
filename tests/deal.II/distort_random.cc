@@ -28,7 +28,7 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("distort_random/output");
+std::ofstream logfile("output");
 
 
 

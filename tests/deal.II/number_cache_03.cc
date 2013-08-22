@@ -40,7 +40,7 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("number_cache_03/output");
+std::ofstream logfile("output");
 
 
 

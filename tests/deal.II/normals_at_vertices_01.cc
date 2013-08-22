@@ -60,7 +60,7 @@ void create_triangulation(const unsigned int case_no,
 
 int main ()
 {
-  std::ofstream logfile ("normals_at_vertices_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
   deallog << std::fixed;
   deallog.attach(logfile);

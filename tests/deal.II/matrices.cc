@@ -210,7 +210,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("matrices/output");
+  std::ofstream logfile ("output");
   logfile << std::setprecision (2);
   logfile << std::fixed;
   deallog << std::setprecision (2);

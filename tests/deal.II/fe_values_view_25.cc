@@ -93,7 +93,7 @@ void test_hyper_cube()
 
 int main()
 {
-  std::ofstream logfile ("fe_values_view_25/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);

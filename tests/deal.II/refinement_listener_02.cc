@@ -29,7 +29,7 @@
 #include <iomanip>
 #include <cstdio>
 
-std::ofstream logfile("refinement_listener_02/output");
+std::ofstream logfile("output");
 
 
 

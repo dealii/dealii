@@ -35,7 +35,7 @@
 #include <iostream>
 #include <iomanip>
 
-std::ofstream logfile("grid_hyper_shell/output");
+std::ofstream logfile("output");
 
 
 template<int dim>

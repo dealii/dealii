@@ -78,7 +78,7 @@ int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile ("fe_values_view_invalid_02/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
 
   deallog.attach(logfile);

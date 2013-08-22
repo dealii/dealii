@@ -28,7 +28,7 @@
 #include <iomanip>
 
 
-std::ofstream logfile("line_coarsening_3d/output");
+std::ofstream logfile("output");
 
 
 // create a triangulation of a cylinder, where the line along the axis is common

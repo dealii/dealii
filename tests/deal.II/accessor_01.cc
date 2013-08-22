@@ -71,7 +71,7 @@ void init_dofs (DoFHandler<dim> &dof,
 
 int main ()
 {
-  initlog(__FILE__, true);
+  initlog();
   deallog.depth_console(0);
 
   Triangulation<2> t2;

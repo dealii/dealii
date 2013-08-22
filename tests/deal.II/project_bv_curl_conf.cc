@@ -24,7 +24,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/numerics/vector_tools.h>
 
-std::ofstream logfile ("project_bv_curl_conf/output");
+std::ofstream logfile ("output");
 
 template <int dim>
 class BoundaryFunction: public Function<dim>

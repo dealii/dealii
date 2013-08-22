@@ -34,7 +34,7 @@
 #include <iomanip>
 
 // Output
-std::ofstream logfile ("grid_parallelepiped_01/output");
+std::ofstream logfile ("output");
 
 // As sketched in the deal.II docs, the parallelepiped class is just a
 // hyper_rectangle in 1d and a parallelogram in 2d. That can checked

@@ -122,7 +122,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("error_estimator/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);

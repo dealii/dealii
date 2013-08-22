@@ -35,7 +35,7 @@
 #include <iomanip>
 #include <cstdio>
 
-std::ofstream logfile("tria_last/output");
+std::ofstream logfile("output");
 
 
 

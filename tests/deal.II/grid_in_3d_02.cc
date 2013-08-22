@@ -40,7 +40,7 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("grid_in_3d_02/output");
+std::ofstream logfile("output");
 
 
 void test (const char *filename)
@@ -97,6 +97,6 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test ("grid_in_3d_02/747.ucd");
+  test ("747.ucd");
 }
 

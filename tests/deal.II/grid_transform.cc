@@ -101,7 +101,7 @@ int main ()
   tria.set_boundary(1, inner_ball);
 
   GridOut grid_out;
-  std::ofstream eps_stream2("grid_transform/output");
+  std::ofstream eps_stream2("output");
   grid_out.write_eps(tria, eps_stream2, &mapping);
 
   tria.clear();

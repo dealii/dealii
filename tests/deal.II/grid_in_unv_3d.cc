@@ -36,7 +36,7 @@
 #include <iomanip>
 #include <string>
 
-std::ofstream logfile("grid_in_unv_3d/output");
+std::ofstream logfile("output");
 
 
 template<int dim>
@@ -58,7 +58,7 @@ void check_file (const std::string name,
 
 void filename_resolution()
 {
-  check_file<3> (std::string("grid_in_unv_3d/3D"), GridIn<3>::unv);
+  check_file<3> (std::string("3D"), GridIn<3>::unv);
 }
 
 

@@ -18,7 +18,7 @@
 
 // check that VectorTools::project works for DGP_Monomial elements correctly
 
-char logname[] = "project_dgp_monomial_01/output";
+char logname[] = "output";
 
 
 #include "project_common.h"

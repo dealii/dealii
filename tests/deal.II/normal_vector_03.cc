@@ -62,7 +62,7 @@ void create_triangulation(const unsigned int case_no,
 
 int main ()
 {
-  std::ofstream logfile ("normal_vector_03/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
   deallog << std::fixed;
   deallog.attach(logfile);

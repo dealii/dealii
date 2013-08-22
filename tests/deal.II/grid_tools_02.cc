@@ -29,7 +29,7 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("grid_tools_02/output");
+std::ofstream logfile("output");
 
 
 

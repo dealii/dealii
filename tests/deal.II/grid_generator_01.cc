@@ -30,7 +30,7 @@
 #include <iostream>
 #include <iomanip>
 
-std::ofstream logfile("grid_generator_01/output");
+std::ofstream logfile("output");
 
 
 template<int dim>

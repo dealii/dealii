@@ -53,7 +53,7 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("inhomogeneous_constraints_04/output");
+std::ofstream logfile("output");
 
 using namespace dealii;
 

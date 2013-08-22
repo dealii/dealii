@@ -27,7 +27,7 @@
 #include <iomanip>
 
 
-std::ofstream logfile("maximal_cell_diameter/output");
+std::ofstream logfile("output");
 
 
 

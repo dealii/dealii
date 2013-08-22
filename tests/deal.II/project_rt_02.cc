@@ -18,7 +18,7 @@
 
 // check that VectorTools::project works for RT elements correctly
 
-char logname[] = "project_rt_02/output";
+char logname[] = "output";
 
 
 #include "project_common.h"

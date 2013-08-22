@@ -26,7 +26,7 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("grid_tools/output");
+std::ofstream logfile("output");
 
 
 

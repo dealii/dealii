@@ -41,7 +41,7 @@
 #include <deal.II/base/logstream.h>
 
 
-std::ofstream logfile("data_out_postprocessor_01/output");
+std::ofstream logfile("output");
 
 
 template <int dim>

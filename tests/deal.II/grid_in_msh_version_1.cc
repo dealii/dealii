@@ -35,7 +35,7 @@
 #include <iomanip>
 #include <string>
 
-std::ofstream logfile("grid_in_msh_version_1/output");
+std::ofstream logfile("output");
 
 
 template<int dim>
@@ -57,8 +57,8 @@ void check_file (const std::string name,
 
 void filename_resolution()
 {
-  check_file<2> (std::string("grid_in_msh_version_1/input_v1"), GridIn<2>::msh);
-  check_file<2> (std::string("grid_in_msh_version_1/input_v2"), GridIn<2>::msh);
+  check_file<2> (std::string("input_v1"), GridIn<2>::msh);
+  check_file<2> (std::string("input_v2"), GridIn<2>::msh);
 }
 
 

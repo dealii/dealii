@@ -163,7 +163,7 @@ void TestPointValueHistory<dim>::run()
   test_copy.evaluate_field("Solution", solution);
   std::vector <double> input_value(n_inputs, 1);
   test_copy.push_back_independent(input_value);
-  test_copy.write_gnuplot("point_value_history_01/Test_Copy");
+  test_copy.write_gnuplot("Test_Copy");
   test_copy.status(deallog.get_file_stream());
   test_copy.clear ();
   // end of assignment operator check
@@ -215,8 +215,8 @@ void TestPointValueHistory<dim>::run()
       post_processed = solution;
       post_processed.add(2.0); // simple post processing, giving it a dc offset
     }
-  node_monitor.write_gnuplot("point_value_history_01/node");
-  no_dof_handler.write_gnuplot("point_value_history_01/no_dof");
+  node_monitor.write_gnuplot("node");
+  no_dof_handler.write_gnuplot("no_dof");
 
   node_monitor.status (deallog.get_file_stream());
   no_dof_handler.status (deallog.get_file_stream());
@@ -226,16 +226,16 @@ void TestPointValueHistory<dim>::run()
   // copy all the data into deallog and
   // delete those files
   const std::string filenames[]
-    = { "point_value_history_01/node_00.gpl",
-        "point_value_history_01/node_01.gpl",
-        "point_value_history_01/node_02.gpl",
-        "point_value_history_01/node_03.gpl",
-        "point_value_history_01/node_04.gpl",
-        "point_value_history_01/node_05.gpl",
-        "point_value_history_01/node_indep.gpl",
-        "point_value_history_01/Test_Copy_00.gpl",
-        "point_value_history_01/Test_Copy_indep.gpl",
-        "point_value_history_01/no_dof_indep.gpl"
+    = { "node_00.gpl",
+        "node_01.gpl",
+        "node_02.gpl",
+        "node_03.gpl",
+        "node_04.gpl",
+        "node_05.gpl",
+        "node_indep.gpl",
+        "Test_Copy_00.gpl",
+        "Test_Copy_indep.gpl",
+        "no_dof_indep.gpl"
       };
 
   for (unsigned int i=0; i<sizeof(filenames)/sizeof(filenames[0]); ++i)
@@ -264,7 +264,7 @@ void TestPointValueHistory<dim>::run()
 
 int main()
 {
-  std::ofstream logfile("point_value_history_01/output");
+  std::ofstream logfile("output");
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);
   deallog.attach(logfile);

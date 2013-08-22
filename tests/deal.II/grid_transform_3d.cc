@@ -91,7 +91,7 @@ int main ()
 
 
   GridOut grid_out;
-  std::ofstream out("grid_transform_3d/output");
+  std::ofstream out("output");
   out.precision (5);
   out << std::fixed;
   grid_out.write_gnuplot(tria, out);

@@ -27,7 +27,7 @@
 #include <iomanip>
 
 
-std::ofstream logfile("constraints_merge_05/output");
+std::ofstream logfile("output");
 
 
 void merge_check ()

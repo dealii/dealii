@@ -76,7 +76,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("extract_dofs_by_component_01x/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);

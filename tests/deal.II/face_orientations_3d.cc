@@ -35,7 +35,7 @@
 #include <iomanip>
 
 
-std::ofstream logfile("face_orientations_3d/output");
+std::ofstream logfile("output");
 
 
 void test (const char *filename)

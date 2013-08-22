@@ -28,7 +28,7 @@
 
 int main()
 {
-  std::ofstream logfile ("fe_values_extractor_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
 
   deallog.attach(logfile);

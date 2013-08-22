@@ -18,7 +18,7 @@
 
 // check that VectorTools::project works for Nedelec elements correctly
 
-char logname[] = "project_nedelec_04/output";
+char logname[] = "output";
 
 
 #include "project_common.h"

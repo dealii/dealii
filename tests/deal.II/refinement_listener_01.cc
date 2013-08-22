@@ -28,7 +28,7 @@
 #include <iomanip>
 #include <cstdio>
 
-std::ofstream logfile("refinement_listener_01/output");
+std::ofstream logfile("output");
 
 
 template <int dim, int spacedim = dim>

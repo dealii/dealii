@@ -207,7 +207,7 @@ void MixedElastoPlasticity<dim>::run()
 
 int main()
 {
-  std::ofstream logfile ("fe_values_view_21_nonsymmetric/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);

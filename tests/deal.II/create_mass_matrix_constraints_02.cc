@@ -129,7 +129,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("create_mass_matrix_constraints_02/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
   deallog.attach(logfile);
   deallog.threshold_double(1e-10);

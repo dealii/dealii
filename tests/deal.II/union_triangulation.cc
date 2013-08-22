@@ -32,7 +32,7 @@
 #include <iomanip>
 #include <cstdio>
 
-std::ofstream logfile("union_triangulation/output");
+std::ofstream logfile("output");
 
 
 

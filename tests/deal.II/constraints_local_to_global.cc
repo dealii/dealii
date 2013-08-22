@@ -42,7 +42,7 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("constraints_local_to_global/output");
+std::ofstream logfile("output");
 
 template <int dim>
 void test ()

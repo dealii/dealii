@@ -18,7 +18,7 @@
 
 // check that VectorTools::project works for DGP elements correctly
 
-char logname[] = "project_dgp_02/output";
+char logname[] = "output";
 
 
 #include "project_common.h"
