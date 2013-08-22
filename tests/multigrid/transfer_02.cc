@@ -169,7 +169,7 @@ void check_simple(const FiniteElement<dim> &fe)
 
 int main()
 {
-  std::ofstream logfile("transfer_02/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(6);
   deallog.attach(logfile);
   deallog.depth_console(0);

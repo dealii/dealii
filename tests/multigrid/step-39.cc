@@ -647,7 +647,7 @@ namespace Step39
   void InteriorPenaltyProblem<dim>::output_results (const unsigned int cycle) const
   {
     char *fn = new char[100];
-    sprintf(fn, "step-39/sol-%02d", cycle);
+    sprintf(fn, "sol-%02d", cycle);
 
     std::string filename(fn);
     filename += ".gnuplot";

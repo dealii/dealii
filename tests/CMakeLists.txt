@@ -70,7 +70,6 @@ MESSAGE(STATUS "Proceed to test definitions")
 #$(if $(USE_CONTRIB_PETSC:no=),    petsc,) \
 #$(if $(USE_CONTRIB_SLEPC:no=),    slepc,) \
 #$(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
-#$(if $(USE_CONTRIB_HSL:no=),      hsl,) \
 #$(if $(USE_CONTRIB_LAPACK:no=),   lapack,)
 
 #a-framework
@@ -81,23 +80,23 @@ ADD_SUBDIRECTORY(base)
 #bits
 ADD_SUBDIRECTORY(codim_one)
 #deal.II
-#distributed_grids
 #fail
 #fe
-#gla
 #grid
 #hp
-#hsl
 #integrators
 #lac
 #lapack
 #lib
 #matrix_free
 #mesh_converter
-#mpi
-#multigrid
-#petsc
+ADD_SUBDIRECTORY(multigrid)
 #serialization
+
+#distributed_grids
+#gla
+#mpi
+#petsc
 #slepc
 #trilinos
 

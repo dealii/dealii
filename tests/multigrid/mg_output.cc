@@ -283,7 +283,7 @@ void check_simple(const FiniteElement<dim> &fe)
 
 int main()
 {
-  std::ofstream logfile("mg_output/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

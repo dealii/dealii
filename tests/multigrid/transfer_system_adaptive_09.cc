@@ -167,7 +167,7 @@ void check (const FiniteElement<dim> &fe, const unsigned int selected_block)
 
 int main()
 {
-  std::ofstream logfile("transfer_system_adaptive_09/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
