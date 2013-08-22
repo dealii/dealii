@@ -31,6 +31,18 @@ inconvenience this causes.
   <br>
   (Wolfgang Bangerth, 2013/08/09)
   </li>
+
+  <li>
+  Changed: The typedefs DataOut::cell_iterator and
+  DataOut::active_cell_iterator were previously defined as
+  DoFHandler::(active)_cell_iterator, while they are now
+  Triangulation::(active)_cell_iterator. This is necessary to support DataOut
+  on multiple DoFHandler objects. This affects possible overloading of
+  DataOut::next_cell(cell_iterator). Use the typedef
+  DataOut::(active)_cell_iterator as argument type instead.
+  <br>
+  (Martin Kronbichler, 2013/07/24)
+  </li>
 </ol>
 
 
@@ -56,6 +68,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>
+  Improved: Several .cc files in the deal.II directory have been split in
+  order to better utilize multiple processors when compiling in parallel and
+  reduce memory requirements of the compilation stage.
+  <br>
+  (Martin Kronbichler, 2013/08/22)
+  </li>
+
   <li>
   Fixed: The ParameterHandler::declare_entry() did not check that the
   default value of a parameter indeed satisfies the pattern given for this
