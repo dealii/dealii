@@ -29,11 +29,11 @@ CALLBACK(${TEST} "${TEST_SUFFIX}"
   "Build successful" "BUILD FAILED"
   )
 
-CALLBACK(${TEST} ".run"
+CALLBACK(${TEST} ".run${TEST_SUFFIX}"
   "Run successful" "RUN FAILED"
   )
 
-CALLBACK(${TEST} ".diff"
+CALLBACK(${TEST} ".diff${TEST_SUFFIX}"
   "Diff successful" "DIFF FAILED"
   )
 
