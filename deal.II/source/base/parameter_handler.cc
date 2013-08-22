@@ -433,14 +433,18 @@ namespace Patterns
 
   List::List (const PatternBase  &p,
               const unsigned int  min_elements,
-              const unsigned int  max_elements)
+              const unsigned int  max_elements,
+              const std::string  &separator)
     :
     pattern (p.clone()),
     min_elements (min_elements),
-    max_elements (max_elements)
+    max_elements (max_elements),
+    separator (separator)
   {
     Assert (min_elements <= max_elements,
             ExcInvalidRange (min_elements, max_elements));
+    Assert (separator.size() > 0,
+            ExcMessage ("The separator must have a non-zero length."));
   }
 
 
@@ -457,7 +461,6 @@ namespace Patterns
   {
     std::string tmp = test_string_list;
     std::vector<std::string> split_list;
-    split_list.reserve (std::count (tmp.begin(), tmp.end(), ',')+1);
 
     // first split the input list
     while (tmp.length() != 0)
@@ -465,10 +468,10 @@ namespace Patterns
         std::string name;
         name = tmp;
 
-        if (name.find(",") != std::string::npos)
+        if (name.find(separator) != std::string::npos)
           {
-            name.erase (name.find(","), std::string::npos);
-            tmp.erase (0, tmp.find(",")+1);
+            name.erase (name.find(separator), std::string::npos);
+            tmp.erase (0, tmp.find(separator)+separator.size());
           }
         else
           tmp = "";
@@ -481,7 +484,7 @@ namespace Patterns
           name.erase (name.length()-1, 1);
 
         split_list.push_back (name);
-      };
+      }
 
     if ((split_list.size() < min_elements) ||
         (split_list.size() > max_elements))
@@ -506,8 +509,10 @@ namespace Patterns
     description << description_init
                 << " list of <" << pattern->description() << ">"
                 << " of length " << min_elements << "..." << max_elements
-                << " (inclusive)"
-                << "]";
+                << " (inclusive)";
+    if (separator != ",")
+      description << " separated by <" << separator << ">";
+    description << "]";
 
     return description.str();
   }
@@ -517,7 +522,7 @@ namespace Patterns
   PatternBase *
   List::clone () const
   {
-    return new List(*pattern, min_elements, max_elements);
+    return new List(*pattern, min_elements, max_elements, separator);
   }
 
 
@@ -525,7 +530,8 @@ namespace Patterns
   List::memory_consumption () const
   {
     return (sizeof(*this) +
-            MemoryConsumption::memory_consumption(*pattern));
+            MemoryConsumption::memory_consumption(*pattern) +
+            MemoryConsumption::memory_consumption(separator));
   }
 
 
@@ -552,7 +558,12 @@ namespace Patterns
         if (!(is >> max_elements))
           return new List(*base_pattern, min_elements);
 
-        return new List(*base_pattern, min_elements, max_elements);
+        is.ignore(strlen(" separated by <"));
+        std::string separator;
+        if (!is)
+          std::getline(is, separator, '>');
+
+        return new List(*base_pattern, min_elements, max_elements, separator);
       }
     else
       return 0;

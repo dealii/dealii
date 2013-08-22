@@ -57,6 +57,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: Patterns::List now accepts a string that denotes the separator
+  between entries of the list.
+  <br>
+  (Wolfgang Bangerth, 2013/08/21)
+  </li>
+
+  <li>
   Fixed: Some operations in the MappingQ class are now done in higher
   precision arithmetic to mitigate the ill-conditioning that appears
   when using mappings of high order (say, order 6 or 8 or 10).

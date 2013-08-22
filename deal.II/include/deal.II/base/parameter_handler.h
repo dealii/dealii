@@ -369,7 +369,8 @@ namespace Patterns
 
 
   /**
-   * This pattern matches a list of comma-separated values each of which
+   * This pattern matches a list of values separated by commas (or another
+   * string), each of which
    * have to match a pattern given to the constructor. With two additional
    * parameters, the number of elements this list has to have can be
    * specified. If none is specified, the list may have zero or more
@@ -389,12 +390,14 @@ namespace Patterns
      * Constructor. Take the given parameter as the specification of valid
      * elements of the list.
      *
-     * The two other arguments can be used to denote minimal and maximal
-     * allowable lengths of the list.
+     * The three other arguments can be used to denote minimal and maximal
+     * allowable lengths of the list, and the string that is used as a
+     * separator between elements of the list.
      */
     List (const PatternBase  &base_pattern,
           const unsigned int  min_elements = 0,
-          const unsigned int  max_elements = max_int_value);
+          const unsigned int  max_elements = max_int_value,
+          const std::string  &separator = ",");
 
     /**
      * Destructor.
@@ -460,6 +463,11 @@ namespace Patterns
      * Maximum number of elements the list must have.
      */
     const unsigned int max_elements;
+
+    /**
+     * Separator between elements of the list.
+     */
+    const std::string separator;
 
     /**
      * Initial part of description
