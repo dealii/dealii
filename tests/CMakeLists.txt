@@ -79,7 +79,7 @@ ADD_SUBDIRECTORY(base)
 #benchmarks
 #bits
 ADD_SUBDIRECTORY(codim_one)
-#deal.II
+ADD_SUBDIRECTORY(deal.II)
 #fail
 ADD_SUBDIRECTORY(fe)
 ADD_SUBDIRECTORY(grid)
