@@ -15,16 +15,9 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
-{
-#if deal_II_dimension != 1 && deal_II_dimension <= deal_II_space_dimension
-template class KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>;
-#endif
-}
-
 for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; DH : DOFHANDLER_TEMPLATES )
 {
-#if deal_II_dimension != 1 && deal_II_dimension <= deal_II_space_dimension
+#if deal_II_dimension == 1 && deal_II_dimension <= deal_II_space_dimension
 
 template
 void

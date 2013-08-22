@@ -3492,6 +3492,7 @@ namespace internal
 
 
 template <class DH, bool lda>
+inline
 TriaIterator<DoFAccessor<DH::dimension-1,DH,lda> >
 DoFCellAccessor<DH,lda>::face (const unsigned int i) const
 {
@@ -3519,6 +3520,7 @@ DoFCellAccessor<DH,lda>::get_dof_indices (std::vector<types::global_dof_index> &
 }
 
 
+
 template<class DH, bool lda>
 inline
 void DoFCellAccessor<DH,lda>::get_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const
@@ -3526,12 +3528,15 @@ void DoFCellAccessor<DH,lda>::get_mg_dof_indices (std::vector<types::global_dof_
   DoFAccessor<dim, DH,lda>::get_mg_dof_indices (this->level (), dof_indices);
 }
 
+
+
 template<class DH, bool lda>
 inline
 void DoFCellAccessor<DH,lda>::set_mg_dof_indices (const std::vector<types::global_dof_index> &dof_indices)
 {
   DoFAccessor<dim, DH,lda>::set_mg_dof_indices (this->level (), dof_indices);
 }
+
 
 
 template<class DH, bool lda>
@@ -3548,6 +3553,7 @@ void DoFCellAccessor<DH,lda>::get_active_or_mg_dof_indices (std::vector<types::g
 
 template <class DH, bool lda>
 template <class InputVector, typename number>
+inline
 void
 DoFCellAccessor<DH,lda>::get_dof_values (const InputVector &values,
                                          Vector<number>    &local_values) const
@@ -3564,6 +3570,7 @@ DoFCellAccessor<DH,lda>::get_dof_values (const InputVector &values,
 
 template <class DH, bool lda>
 template <class InputVector, typename ForwardIterator>
+inline
 void
 DoFCellAccessor<DH,lda>::get_dof_values (const InputVector &values,
                                          ForwardIterator    local_values_begin,
@@ -3579,6 +3586,7 @@ DoFCellAccessor<DH,lda>::get_dof_values (const InputVector &values,
 
 template <class DH, bool lda>
 template <class InputVector, typename ForwardIterator>
+inline
 void
 DoFCellAccessor<DH,lda>::get_dof_values (const ConstraintMatrix &constraints,
                                          const InputVector      &values,
@@ -3596,6 +3604,7 @@ DoFCellAccessor<DH,lda>::get_dof_values (const ConstraintMatrix &constraints,
 
 template <class DH, bool lda>
 template <class OutputVector, typename number>
+inline
 void
 DoFCellAccessor<DH,lda>::set_dof_values (const Vector<number> &local_values,
                                          OutputVector         &values) const

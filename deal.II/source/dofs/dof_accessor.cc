@@ -117,8 +117,8 @@ get_interpolated_dof_values (const InputVector &values,
           typename BaseClass::ExcVectorDoesNotMatch());
 
   if (!this->has_children())
-    // if this cell has no children: simply
-    // return the exact values on this cell
+    // if this cell has no children: simply return the exact values on this
+    // cell
     this->get_dof_values (values, interpolated_values);
   else
     // otherwise clobber them from the children
@@ -128,80 +128,45 @@ get_interpolated_dof_values (const InputVector &values,
 
       interpolated_values = 0;
 
-      // later on we will have to
-      // push the values interpolated
-      // from the child to the mother
-      // cell into the output
-      // vector. unfortunately, there
-      // are two types of elements:
-      // ones where you add up the
-      // contributions from the
-      // different child cells, and
-      // ones where you overwrite.
+      // later on we will have to push the values interpolated from the child
+      // to the mother cell into the output vector. unfortunately, there are
+      // two types of elements: ones where you add up the contributions from
+      // the different child cells, and ones where you overwrite.
       //
-      // an example for the first is
-      // piecewise constant (and
-      // discontinuous) elements,
-      // where we build the value on
-      // the coarse cell by averaging
-      // the values from the cell
-      // (i.e. by adding up a
-      // fraction of the values of
-      // their values)
+      // an example for the first is piecewise constant (and discontinuous)
+      // elements, where we build the value on the coarse cell by averaging
+      // the values from the cell (i.e. by adding up a fraction of the values
+      // of their values)
       //
-      // an example for the latter
-      // are the usual continuous
-      // elements. the value on a
-      // vertex of a coarse cell must
-      // there be the same,
-      // irrespective of the adjacent
-      // cell we are presently on. so
-      // we always overwrite. in
-      // fact, we must, since we
-      // cannot know in advance how
-      // many neighbors there will
-      // be, so there is no way to
-      // compute the average with
-      // fixed factors
+      // an example for the latter are the usual continuous elements. the
+      // value on a vertex of a coarse cell must there be the same,
+      // irrespective of the adjacent cell we are presently on. so we always
+      // overwrite. in fact, we must, since we cannot know in advance how many
+      // neighbors there will be, so there is no way to compute the average
+      // with fixed factors
       //
-      // so we have to find out to
-      // which type this element
-      // belongs. the difficulty is:
-      // the finite element may be a
-      // composed one, so we can only
-      // hope to do this for each
-      // shape function
-      // individually. in fact, there
-      // are even weird finite
-      // elements (for example the
-      // Raviart-Thomas element)
-      // which have shape functions
-      // that are additive (interior
-      // ones) and others that are
-      // overwriting (face degrees of
-      // freedom that need to be
-      // continuous across the
-      // face). to avoid checking
-      // this over and over again, we
-      // do this once now and cache
-      // the results
+      // so we have to find out to which type this element belongs. the
+      // difficulty is: the finite element may be a composed one, so we can
+      // only hope to do this for each shape function individually. in fact,
+      // there are even weird finite elements (for example the Raviart-Thomas
+      // element) which have shape functions that are additive (interior ones)
+      // and others that are overwriting (face degrees of freedom that need to
+      // be continuous across the face). to avoid checking this over and over
+      // again, we do this once now and cache the results
       std::vector<bool> restriction_is_additive (dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         restriction_is_additive[i] = fe.restriction_is_additive(i);
 
       for (unsigned int child=0; child<this->n_children(); ++child)
         {
-          // get the values from the present
-          // child, if necessary by
+          // get the values from the present child, if necessary by
           // interpolation itself
           this->child(child)->get_interpolated_dof_values (values,
                                                            tmp1);
-          // interpolate these to the mother
-          // cell
+          // interpolate these to the mother cell
           fe.get_restriction_matrix(child, this->refinement_case()).vmult (tmp2, tmp1);
 
-          // and add up or set them
-          // in the output vector
+          // and add up or set them in the output vector
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             if (restriction_is_additive[i])
               interpolated_values(i) += tmp2(i);
@@ -232,8 +197,7 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
           typename BaseClass::ExcVectorDoesNotMatch());
 
   if (!this->has_children())
-    // if this cell has no children: simply
-    // set the values on this cell
+    // if this cell has no children: simply set the values on this cell
     this->set_dof_values (local_values, values);
   else
     // otherwise distribute them to the children
@@ -245,12 +209,8 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
           Assert (this->child(child)->get_fe().dofs_per_cell == dofs_per_cell,
                   ExcNotImplemented());
 
-          // prolong the given data
-          // to the present
-          // cell. FullMatrix only
-          // wants us to call vmult
-          // if the matrix size is
-          // actually non-zero, so
+          // prolong the given data to the present cell. FullMatrix only wants
+          // us to call vmult if the matrix size is actually non-zero, so
           // check that case
           if (tmp.size() > 0)
             {

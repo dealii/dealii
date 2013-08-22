@@ -29,6 +29,7 @@ SET(_src
   derivative_approximation.cc
   dof_output_operator.cc
   error_estimator.cc
+  error_estimator_1d.cc
   fe_field_function.cc
   matrix_tools.cc
   histogram.cc
@@ -55,6 +56,7 @@ SET(_inst
   derivative_approximation.inst.in
   dof_output_operator.inst.in
   error_estimator.inst.in
+  error_estimator_1d.inst.in
   fe_field_function.inst.in
   matrix_tools.inst.in
   point_value_history.inst.in

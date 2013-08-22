@@ -234,114 +234,59 @@ class KellyErrorEstimator
 {
 public:
   /**
-   * Implementation of the error
-   * estimator described above. You
-   * may give a coefficient, but
-   * there is a default value which
-   * denotes the constant
-   * coefficient with value
-   * one. The coefficient function
-   * may either be a scalar one, in
-   * which case it is used for all
-   * components of the finite
-   * element, or a vector-valued
-   * one with as many components as
-   * there are in the finite
-   * element; in the latter case,
-   * each component is weighted by
-   * the respective component in
-   * the coefficient.
+   * Implementation of the error estimator described above. You may give a
+   * coefficient, but there is a default value which denotes the constant
+   * coefficient with value one. The coefficient function may either be a
+   * scalar one, in which case it is used for all components of the finite
+   * element, or a vector-valued one with as many components as there are in
+   * the finite element; in the latter case, each component is weighted by the
+   * respective component in the coefficient.
    *
-   * You might give a list of
-   * components you want to
-   * evaluate, in case the finite
-   * element used by the
-   * DoFHandler object is
-   * vector-valued. You then have
-   * to set those entries to true
-   * in the bit-vector
-   * @p component_mask
-   * (see @ref GlossComponentMask)
-   * for which the
-   * respective component is to be
-   * used in the error
-   * estimator. The default is to
-   * use all components, which is
-   * done by either providing a
-   * bit-vector with all-set
-   * entries, or an empty
-   * bit-vector.
+   * You might give a list of components you want to evaluate, in case the
+   * finite element used by the DoFHandler object is vector-valued. You then
+   * have to set those entries to true in the bit-vector @p component_mask
+   * (see @ref GlossComponentMask) for which the respective component is to be
+   * used in the error estimator. The default is to use all components, which
+   * is done by either providing a bit-vector with all-set entries, or an
+   * empty bit-vector.
    *
-   * The @p subdomain_id parameter
-   * indicates whether we shall compute
-   * indicators for all cells (in case its
-   * value is the default,
-   * <tt>numbers::invalid_unsigned_int</tt>),
-   * or only for the cells belonging to a
-   * certain subdomain with the given
-   * indicator. The latter case is used for
-   * parallel computations where all
-   * processor nodes have the global grid
-   * stored, and could well compute all the
-   * indicators for all cells themselves,
-   * but where it is more efficient to have
-   * each process compute only indicators
-   * for the cells it owns, and have them
-   * exchange the resulting information
-   * afterwards. This is in particular true
-   * for the case where meshes are very
-   * large and computing indicators for @em
-   * every cell is too expensive, while
-   * computing indicators for only local
-   * cells is acceptable. Note that if you
-   * only ask for the indicators of a
-   * certain subdomain to be computed, you
-   * must nevertheless make sure that this
-   * function has access to the correct
-   * node values of @em all degrees of
-   * freedom. This is since the function
-   * needs to access DoF values on
-   * neighboring cells as well, even if
-   * they belong to a different subdomain.
+   * The @p subdomain_id parameter indicates whether we shall compute
+   * indicators for all cells (in case its value is the default,
+   * <tt>numbers::invalid_unsigned_int</tt>), or only for the cells belonging
+   * to a certain subdomain with the given indicator. The latter case is used
+   * for parallel computations where all processor nodes have the global grid
+   * stored, and could well compute all the indicators for all cells
+   * themselves, but where it is more efficient to have each process compute
+   * only indicators for the cells it owns, and have them exchange the
+   * resulting information afterwards. This is in particular true for the case
+   * where meshes are very large and computing indicators for @em every cell
+   * is too expensive, while computing indicators for only local cells is
+   * acceptable. Note that if you only ask for the indicators of a certain
+   * subdomain to be computed, you must nevertheless make sure that this
+   * function has access to the correct node values of @em all degrees of
+   * freedom. This is since the function needs to access DoF values on
+   * neighboring cells as well, even if they belong to a different subdomain.
    *
-   * The @p material_id parameter has a similar
-   * meaning: if not set to its default value
-   * (which is numbers::invalid_material_id),
-   * it means that indicators will only be
-   * computed for cells with this particular
-   * material id.
+   * The @p material_id parameter has a similar meaning: if not set to its
+   * default value (which is numbers::invalid_material_id), it means that
+   * indicators will only be computed for cells with this particular material
+   * id.
    *
-   * The @p n_threads parameter used to
-   * indicate the number of threads to be
-   * used to compute the error
-   * estimator. This parameter is now
-   * ignored, with the number of threads
-   * determined automatically. The
-   * parameter is retained for
-   * compatibility with old versions of the
-   * library.
+   * The @p n_threads parameter used to indicate the number of threads to be
+   * used to compute the error estimator. This parameter is now ignored, with
+   * the number of threads determined automatically. The parameter is retained
+   * for compatibility with old versions of the library.
    *
-   * @note If the DoFHandler object
-   * given as an argument to this
-   * function builds on a
-   * parallel::distributed::Triangulation,
-   * this function skips
-   * computations on all cells that
-   * are not locally owned. In that
-   * case, the only valid value for
-   * the subdomain_id argument
-   * (besides the invalid value) is
-   * the subdomain id that is
-   * associated with the currently
+   * @note If the DoFHandler object given as an argument to this function
+   * builds on a parallel::distributed::Triangulation, this function skips
+   * computations on all cells that are not locally owned. In that case, the
+   * only valid value for the subdomain_id argument (besides the invalid
+   * value) is the subdomain id that is associated with the currently
    * processor, as reported by
    * parallel::distributed::Triangulation::locally_owned_subdomain(). Even
-   * though nothing is computed on
-   * cells that we don't locally
-   * own, the error indicator
-   * vector must still have a
-   * length equal to the number of
-   * active cell in the mesh as
-   * reported by
+   * though nothing is computed on cells that we don't locally own, the error
+   * indicator vector must still have a length equal to the number of active
+   * cell in the mesh as reported by
    * parallel::distributed::Triangulation::n_locally_owned_active_cells().
    */
   template <typename InputVector, class DH>
@@ -358,8 +303,7 @@ public:
                         const types::material_id       material_id = numbers::invalid_material_id);
 
   /**
-   * Calls the @p estimate
-   * function, see above, with
+   * Calls the @p estimate function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
    */
   template <typename InputVector, class DH>
@@ -375,31 +319,17 @@ public:
                         const types::material_id       material_id = numbers::invalid_material_id);
 
   /**
-   * Same function as above, but
-   * accepts more than one solution
-   * vector and returns one error
-   * vector for each solution
-   * vector. For the reason of
-   * existence of this function,
-   * see the general documentation
-   * of this class.
+   * Same function as above, but accepts more than one solution vector and
+   * returns one error vector for each solution vector. For the reason of
+   * existence of this function, see the general documentation of this class.
    *
-   * Since we do not want to force
-   * the user of this function to
-   * copy around their solution
-   * vectors, the vector of
-   * solution vectors takes
-   * pointers to the solutions,
-   * rather than being a vector of
-   * vectors. This makes it simpler
-   * to have the solution vectors
-   * somewhere in memory, rather
-   * than to have them collected
-   * somewhere special. (Note that
-   * it is not possible to
-   * construct of vector of
-   * references, so we had to use a
-   * vector of pointers.)
+   * Since we do not want to force the user of this function to copy around
+   * their solution vectors, the vector of solution vectors takes pointers to
+   * the solutions, rather than being a vector of vectors. This makes it
+   * simpler to have the solution vectors somewhere in memory, rather than to
+   * have them collected somewhere special. (Note that it is not possible to
+   * construct of vector of references, so we had to use a vector of
+   * pointers.)
    */
   template <typename InputVector, class DH>
   static void estimate (const Mapping<dim, spacedim>          &mapping,
@@ -415,8 +345,7 @@ public:
                         const types::material_id           material_id = numbers::invalid_material_id);
 
   /**
-   * Calls the @p estimate
-   * function, see above, with
+   * Calls the @p estimate function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
    */
   template <typename InputVector, class DH>
@@ -433,10 +362,8 @@ public:
 
 
   /**
-   * Equivalent to the set of functions
-   * above, except that this one takes a
-   * quadrature collection for hp finite
-   * element dof handlers.
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, class DH>
   static void estimate (const Mapping<dim, spacedim>      &mapping,
@@ -453,10 +380,8 @@ public:
 
 
   /**
-   * Equivalent to the set of functions
-   * above, except that this one takes a
-   * quadrature collection for hp finite
-   * element dof handlers.
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, class DH>
   static void estimate (const DH                &dof,
@@ -472,10 +397,8 @@ public:
 
 
   /**
-   * Equivalent to the set of functions
-   * above, except that this one takes a
-   * quadrature collection for hp finite
-   * element dof handlers.
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, class DH>
   static void estimate (const Mapping<dim, spacedim>          &mapping,
@@ -492,10 +415,8 @@ public:
 
 
   /**
-   * Equivalent to the set of functions
-   * above, except that this one takes a
-   * quadrature collection for hp finite
-   * element dof handlers.
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, class DH>
   static void estimate (const DH                    &dof,
@@ -561,51 +482,28 @@ class KellyErrorEstimator<1,spacedim>
 {
 public:
   /**
-   * Implementation of the error
-   * estimator described above. You
-   * may give a coefficient, but
-   * there is a default value which
-   * denotes the constant
-   * coefficient with value
-   * one. The coefficient function
-   * may either be a scalar one, in
-   * which case it is used for all
-   * components of the finite
-   * element, or a vector-valued
-   * one with as many components as
-   * there are in the finite
-   * element; in the latter case,
-   * each component is weighted by
-   * the respective component in
-   * the coefficient.
+   * Implementation of the error estimator described above. You may give a
+   * coefficient, but there is a default value which denotes the constant
+   * coefficient with value one. The coefficient function may either be a
+   * scalar one, in which case it is used for all components of the finite
+   * element, or a vector-valued one with as many components as there are in
+   * the finite element; in the latter case, each component is weighted by the
+   * respective component in the coefficient.
    *
-   * You might give a list of components
-   * you want to evaluate, in case the
-   * finite element used by the DoFHandler
-   * object is vector-valued. You then have
-   * to set those entries to true in the
-   * bit-vector @p component_mask for which
-   * the respective component is to be used
-   * in the error estimator. The default is
-   * to use all components, which is done
-   * by either providing a bit-vector with
-   * all-set entries, or an empty
-   * bit-vector. All the other parameters
-   * are as in the general case used for 2d
-   * and higher.
+   * You might give a list of components you want to evaluate, in case the
+   * finite element used by the DoFHandler object is vector-valued. You then
+   * have to set those entries to true in the bit-vector @p component_mask for
+   * which the respective component is to be used in the error estimator. The
+   * default is to use all components, which is done by either providing a
+   * bit-vector with all-set entries, or an empty bit-vector. All the other
+   * parameters are as in the general case used for 2d and higher.
    *
-   * The estimator supports multithreading
-   * and splits the cells to
-   * <tt>multithread_info.n_default_threads</tt>
-   * (default) threads. The number of
-   * threads to be used in multithreaded
-   * mode can be set with the last
-   * parameter of the error estimator.
-   * Multithreading is not presently
-   * implemented for 1d, but we retain the
-   * respective parameter for compatibility
-   * with the function signature in the
-   * general case.
+   * The estimator supports multithreading and splits the cells to
+   * <tt>multithread_info.n_default_threads</tt> (default) threads. The number
+   * of threads to be used in multithreaded mode can be set with the last
+   * parameter of the error estimator.  Multithreading is not presently
+   * implemented for 1d, but we retain the respective parameter for
+   * compatibility with the function signature in the general case.
    */
   template <typename InputVector, class DH>
   static void estimate (const Mapping<1,spacedim>  &mapping,
@@ -621,8 +519,7 @@ public:
                         const types::material_id       material_id = numbers::invalid_material_id);
 
   /**
-   * Calls the @p estimate
-   * function, see above, with
+   * Calls the @p estimate function, see above, with
    * <tt>mapping=MappingQ1<1>()</tt>.
    */
   template <typename InputVector, class DH>
@@ -638,31 +535,17 @@ public:
                         const types::material_id       material_id = numbers::invalid_material_id);
 
   /**
-   * Same function as above, but
-   * accepts more than one solution
-   * vectors and returns one error
-   * vector for each solution
-   * vector. For the reason of
-   * existence of this function,
-   * see the general documentation
-   * of this class.
+   * Same function as above, but accepts more than one solution vectors and
+   * returns one error vector for each solution vector. For the reason of
+   * existence of this function, see the general documentation of this class.
    *
-   * Since we do not want to force
-   * the user of this function to
-   * copy around their solution
-   * vectors, the vector of
-   * solution vectors takes
-   * pointers to the solutions,
-   * rather than being a vector of
-   * vectors. This makes it simpler
-   * to have the solution vectors
-   * somewhere in memory, rather
-   * than to have them collected
-   * somewhere special. (Note that
-   * it is not possible to
-   * construct of vector of
-   * references, so we had to use a
-   * vector of pointers.)
+   * Since we do not want to force the user of this function to copy around
+   * their solution vectors, the vector of solution vectors takes pointers to
+   * the solutions, rather than being a vector of vectors. This makes it
+   * simpler to have the solution vectors somewhere in memory, rather than to
+   * have them collected somewhere special. (Note that it is not possible to
+   * construct of vector of references, so we had to use a vector of
+   * pointers.)
    */
   template <typename InputVector, class DH>
   static void estimate (const Mapping<1,spacedim>          &mapping,
@@ -678,8 +561,7 @@ public:
                         const types::material_id           material_id = numbers::invalid_material_id);
 
   /**
-   * Calls the @p estimate
-   * function, see above, with
+   * Calls the @p estimate function, see above, with
    * <tt>mapping=MappingQ1<1>()</tt>.
    */
   template <typename InputVector, class DH>
@@ -696,10 +578,8 @@ public:
 
 
   /**
-   * Equivalent to the set of functions
-   * above, except that this one takes a
-   * quadrature collection for hp finite
-   * element dof handlers.
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, class DH>
   static void estimate (const Mapping<1,spacedim>      &mapping,
@@ -716,10 +596,8 @@ public:
 
 
   /**
-   * Equivalent to the set of functions
-   * above, except that this one takes a
-   * quadrature collection for hp finite
-   * element dof handlers.
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, class DH>
   static void estimate (const DH                &dof,
@@ -735,10 +613,8 @@ public:
 
 
   /**
-   * Equivalent to the set of functions
-   * above, except that this one takes a
-   * quadrature collection for hp finite
-   * element dof handlers.
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, class DH>
   static void estimate (const Mapping<1,spacedim>          &mapping,
@@ -755,10 +631,8 @@ public:
 
 
   /**
-   * Equivalent to the set of functions
-   * above, except that this one takes a
-   * quadrature collection for hp finite
-   * element dof handlers.
+   * Equivalent to the set of functions above, except that this one takes a
+   * quadrature collection for hp finite element dof handlers.
    */
   template <typename InputVector, class DH>
   static void estimate (const DH                    &dof,
