@@ -1524,7 +1524,7 @@ namespace VectorTools
                                            boundary_function.n_components));
 
               Assert (component_mask.n_selected_components(fe.n_components()) > 0,
-                      ExcNoComponentSelected());
+                      ComponentMask::ExcNoComponentSelected());
 
               // now set the value of
               // the vertex degree of
@@ -5482,7 +5482,7 @@ namespace VectorTools
             }
         // Error out if we have not constrained anything. Note that in this
         // case the vector v is always nonempty.
-        Assert (n == 0 || counter > 0, ExcNoComponentSelected());
+        Assert (n == 0 || counter > 0, ComponentMask::ExcNoComponentSelected());
 
         s /= counter;
 
