@@ -23,7 +23,7 @@
 int
 main()
 {
-  initlog(__FILE__);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   CHECK_ALL(Q_iso_Q1,1,2);

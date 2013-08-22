@@ -74,7 +74,7 @@ using namespace dealii;
 // Function for initialize deallog. Normally, it should be called at
 // the beginning of main() like
 //
-// initlog(__FILE__);
+// initlog();
 //
 // This will open the correct output file, divert log output there and
 // switch off screen output. If screen output is desired, provide the
@@ -84,9 +84,9 @@ std::ofstream deallogfile;
 
 inline
 void
-initlog(const char *filename, bool console=false)
+initlog(bool console=false)
 {
-  deallogname = JobIdentifier::base_name(filename) + std::string("/output");
+  deallogname = "/output";
   deallogfile.open(deallogname.c_str());
   deallog.attach(deallogfile);
   if (!console)

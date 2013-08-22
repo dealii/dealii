@@ -47,7 +47,7 @@ ON__> "void dealii::Subscriptor::do_unsubscribe(const char*) const",
 
 int main ()
 {
-  initlog(__FILE__);
+  initlog();
   {
     FE_Q<2> fe(1);
     {
