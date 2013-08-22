@@ -577,7 +577,7 @@ GridOut::declare_parameters(ParameterHandler &param)
   GridOutFlags::XFig::declare_parameters(param);
   param.leave_subsection();
 
-  param.enter_subsection("MathGl");
+  param.enter_subsection("MathGL");
   GridOutFlags::MathGL::declare_parameters(param);
   param.leave_subsection();
 }
