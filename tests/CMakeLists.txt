@@ -70,7 +70,6 @@ MESSAGE(STATUS "Proceed to test definitions")
 #$(if $(USE_CONTRIB_PETSC:no=),    petsc,) \
 #$(if $(USE_CONTRIB_SLEPC:no=),    slepc,) \
 #$(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
-#$(if $(USE_CONTRIB_LAPACK:no=),   lapack,)
 
 #a-framework
 #all-headers
@@ -86,7 +85,6 @@ ADD_SUBDIRECTORY(codim_one)
 #hp
 #integrators
 #lac
-#lapack
 #lib
 #matrix_free
 #mesh_converter
@@ -99,6 +97,10 @@ ADD_SUBDIRECTORY(multigrid)
 #petsc
 #slepc
 #trilinos
+
+IF(DEAL_II_WITH_LAPACK)
+  ADD_SUBDIRECTORY(lapack)
+ENDIF()
 
 IF(DEAL_II_WITH_METIS)
   ADD_SUBDIRECTORY(metis)

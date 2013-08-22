@@ -48,7 +48,7 @@ const double right[] =
 
 int main()
 {
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   logfile.precision(1);
   deallog.attach(logfile);
