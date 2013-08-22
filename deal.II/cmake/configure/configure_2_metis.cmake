@@ -38,6 +38,7 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
       SET(METIS_DIR "" CACHE PATH
         "An optional hint to a metis directory"
         )
+      MARK_AS_ADVANCED(CLEAR METIS_DIR)
     ENDIF()
   ENDIF()
 ENDMACRO()

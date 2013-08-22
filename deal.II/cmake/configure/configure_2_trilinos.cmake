@@ -181,6 +181,15 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
   ENDIF(TRILINOS_FOUND)
+
+  IF(NOT ${var})
+    UNSET(TRILINOS_CONFIG CACHE)
+    SET(TRILINOS_DIR "" CACHE STRING
+      "An optional hint to a Trilinos installation"
+      )
+    MARK_AS_ADVANCED(CLEAR TRILINOS_DIR)
+  ENDIF()
+
 ENDMACRO()
 
 

@@ -104,6 +104,7 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
       SET(PETSC_ARCH "" CACHE STRING
         "An optional hint to a PETSc arch"
         )
+      MARK_AS_ADVANCED(CLEAR PETSC_DIR PETSC_ARCH)
     ENDIF()
   ENDIF()
 ENDMACRO()
