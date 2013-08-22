@@ -86,7 +86,7 @@ inline
 void
 initlog(bool console=false)
 {
-  deallogname = "/output";
+  deallogname = "output";
   deallogfile.open(deallogname.c_str());
   deallog.attach(deallogfile);
   if (!console)
