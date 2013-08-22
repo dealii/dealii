@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 2013 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,20 +14,10 @@
 //
 // ---------------------------------------------------------------------
 
+// This file compiles the third quarter of the instantiations from solution_transfer.cc
+// to reduce the compilation unit (and memory consumption)
 
-for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-  {
-#if deal_II_dimension <= deal_II_space_dimension
-#if (deal_II_space_dimension == DIM_A) || (deal_II_space_dimension == DIM_B)
+#define INSTANTIATE_HP_DH
+//#define SOLUTION_TRANSFER_INSTANTIATE_PART_TWO
 
-#ifndef COMPILE_HP_DH
-    template class SolutionTransfer<deal_II_dimension, VEC, DoFHandler<deal_II_dimension, deal_II_space_dimension> >;
-#else
-    template class SolutionTransfer<deal_II_dimension, VEC, hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> >;
-#endif
-#endif
-#endif
-}
-
-
-
+#include "solution_transfer.cc"

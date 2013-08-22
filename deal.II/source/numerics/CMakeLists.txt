@@ -36,6 +36,8 @@ SET(_src
   point_value_history.cc
   solution_transfer.cc
   solution_transfer_inst2.cc
+  solution_transfer_inst3.cc
+  solution_transfer_inst4.cc
   time_dependent.cc
   vector_tools_boundary.cc
   vector_tools_constraints.cc

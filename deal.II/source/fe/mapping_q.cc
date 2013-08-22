@@ -130,15 +130,11 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
                               || (dim != spacedim)),
   feq(degree)
 {
-  // Construct the tensor product
-  // polynomials used as shape
-  // functions for the Qp mapping of
-  // cells at the boundary.
-  std::vector<Polynomials::LagrangeEquidistant> v;
-  for (unsigned int i=0; i<=degree; ++i)
-    v.push_back(Polynomials::LagrangeEquidistant(degree,i));
-
-  tensor_pols = new TensorProductPolynomials<dim> (v);
+  // Construct the tensor product polynomials used as shape functions for the
+  // Qp mapping of cells at the boundary.
+  const QGaussLobatto<1> points(degree+1);
+  tensor_pols = new TensorProductPolynomials<dim>
+    (Polynomials::LagrangeEquidistant::generate_complete_basis(degree));
   Assert (n_shape_functions==tensor_pols->n(),
           ExcInternalError());
   Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
@@ -696,7 +692,7 @@ MappingQ<dim,spacedim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
   // one. check this
   for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
     Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
-                                     loqvs[unit_point].end(),0.)-1)<1e-12*this->degree*this->degree,
+                                     loqvs[unit_point].end(),0.)-1)<1e-13*this->degree,
            ExcInternalError());
 }
 

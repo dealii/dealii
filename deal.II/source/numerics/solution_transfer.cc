@@ -764,6 +764,8 @@ SolutionTransfer<dim, VECTOR, DH>::Pointerstruct::memory_consumption () const
 #define DIM_B 2
 #endif
 
+// This file compiles the first quarter of the instantiations from solution_transfer.cc
+// to reduce the compilation unit (and memory consumption)
 #include "solution_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

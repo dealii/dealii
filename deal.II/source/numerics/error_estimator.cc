@@ -536,7 +536,7 @@ namespace internal
         }
 
       // now go to the generic function that does all the other things
-      local_face_integrals[face] = 
+      local_face_integrals[face] =
         integrate_over_face (parallel_data, face, fe_face_values_cell);
     }
 

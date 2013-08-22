@@ -122,10 +122,9 @@ namespace Utilities
     void
     Partitioner::set_ghost_indices (const IndexSet &ghost_indices_in)
     {
-      // Set ghost indices from input. To be sure
-      // that no entries from the locally owned
-      // range are present, subtract the locally
-      // owned indices in any case.
+      // Set ghost indices from input. To be sure that no entries from the
+      // locally owned range are present, subtract the locally owned indices
+      // in any case.
       Assert (ghost_indices_in.n_elements() == 0 ||
               ghost_indices_in.size() == locally_owned_range_data.size(),
               ExcDimensionMismatch (ghost_indices_in.size(),
@@ -137,18 +136,14 @@ namespace Utilities
       ghost_indices_data.compress();
       n_ghost_indices_data = ghost_indices_data.n_elements();
 
-      // In the rest of this function, we determine
-      // the point-to-point communication pattern of
-      // the partitioner. We make up a list with
-      // both the processors the ghost indices
-      // actually belong to, and the indices that
-      // are locally held but ghost indices of other
-      // processors. This allows then to import and
-      // export data very easily.
+      // In the rest of this function, we determine the point-to-point
+      // communication pattern of the partitioner. We make up a list with both
+      // the processors the ghost indices actually belong to, and the indices
+      // that are locally held but ghost indices of other processors. This
+      // allows then to import and export data very easily.
 
-      // find out the end index for each processor
-      // and communicate it (this implies the start
-      // index for the next processor)
+      // find out the end index for each processor and communicate it (this
+      // implies the start index for the next processor)
 #ifdef DEAL_II_WITH_MPI
       if (n_procs < 2)
         {
@@ -165,9 +160,8 @@ namespace Utilities
                     MPI_BYTE, communicator);
       first_index[n_procs] = global_size;
 
-      // fix case when there are some processors
-      // without any locally owned indices: then
-      // there might be a zero in some entries
+      // fix case when there are some processors without any locally owned
+      // indices: then there might be a zero in some entries
       if (global_size > 0)
         {
           unsigned int first_proc_with_nonzero_dofs = 0;
@@ -181,8 +175,7 @@ namespace Utilities
             if (first_index[i] == 0)
               first_index[i] = first_index[i-1];
 
-          // correct if our processor has a wrong local
-          // range
+          // correct if our processor has a wrong local range
           if (first_index[my_pid] != local_range_data.first)
             {
               Assert(local_range_data.first == local_range_data.second,
@@ -191,20 +184,16 @@ namespace Utilities
             }
         }
 
-      // Allocate memory for data that will be
-      // exported
+      // Allocate memory for data that will be exported
       std::vector<types::global_dof_index> expanded_ghost_indices (n_ghost_indices_data);
       unsigned int n_ghost_targets = 0;
       if (n_ghost_indices_data > 0)
         {
-          // Create first a vector of ghost_targets from
-          // the list of ghost indices and then push
-          // back new values. When we are done, copy the
-          // data to that field of the partitioner. This
-          // way, the variable ghost_targets will have
-          // exactly the size we need, whereas the
-          // vector filled with push_back might actually
-          // be too long.
+          // Create first a vector of ghost_targets from the list of ghost
+          // indices and then push back new values. When we are done, copy the
+          // data to that field of the partitioner. This way, the variable
+          // ghost_targets will have exactly the size we need, whereas the
+          // vector filled with push_back might actually be too long.
           unsigned int current_proc = 0;
           ghost_indices_data.fill_index_vector (expanded_ghost_indices);
           unsigned int current_index = expanded_ghost_indices[0];
@@ -233,8 +222,7 @@ namespace Utilities
             n_ghost_indices_data - ghost_targets_temp[n_ghost_targets-1].second;
           ghost_targets_data = ghost_targets_temp;
         }
-      // find the processes that want to import to
-      // me
+      // find the processes that want to import to me
       {
         std::vector<int> send_buffer (n_procs, 0);
         std::vector<int> receive_buffer (n_procs, 0);
@@ -257,9 +245,8 @@ namespace Utilities
         import_targets_data = import_targets_temp;
       }
 
-      // send and receive indices for import
-      // data. non-blocking receives and blocking
-      // sends
+      // send and receive indices for import data. non-blocking receives and
+      // blocking sends
       std::vector<types::global_dof_index> expanded_import_indices (n_import_indices_data);
       {
         unsigned int current_index_start = 0;
@@ -290,9 +277,8 @@ namespace Utilities
         MPI_Waitall (import_requests.size(), &import_requests[0],
                      MPI_STATUSES_IGNORE);
 
-        // transform import indices to local index
-        // space and compress contiguous indices in
-        // form of ranges
+        // transform import indices to local index space and compress
+        // contiguous indices in form of ranges
         {
           types::global_dof_index last_index = numbers::invalid_dof_index-1;
           std::vector<std::pair<types::global_dof_index,types::global_dof_index> > compressed_import_indices;
