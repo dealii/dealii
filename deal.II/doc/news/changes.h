@@ -57,6 +57,15 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: The ParameterHandler::declare_entry() did not check that the
+  default value of a parameter indeed satisfies the pattern given for this
+  parameter (despite a statement in the documentation that this checking
+  would happen). This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/08/21)
+  </li>
+
+  <li>
   New: Patterns::List and Patterns::Map now accept a string
   different than the default comma that denotes the separator
   between entries of the list or map.

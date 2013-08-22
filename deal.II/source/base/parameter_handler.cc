@@ -1579,6 +1579,14 @@ ParameterHandler::declare_entry (const std::string           &entry,
                                  const Patterns::PatternBase &pattern,
                                  const std::string           &documentation)
 {
+  Assert (pattern.match (default_value),
+	  ExcMessage (std::string("The default value <") +
+		      default_value +
+		      "> for the entry <" +
+		      entry +
+		      "> does not match the given pattern " +
+		      pattern.description()));
+  
   entries->put (get_current_full_path(entry) + path_separator + "value",
                 default_value);
   entries->put (get_current_full_path(entry) + path_separator + "default_value",
