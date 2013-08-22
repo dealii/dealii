@@ -16,8 +16,7 @@
 
 
 
-// check the Patterns::List pattern with a separator different from the
-// default ','
+// check the Patterns::Map pattern with a separator other than the default ','
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -27,24 +26,26 @@
 void check (const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "-1,0",
-                     Patterns::List(Patterns::Integer(-1,1),2,3,"xyz"));
+  prm.declare_entry ("test_13", "-1:a, 0:b, 1:c",
+                     Patterns::Map(Patterns::Integer(-1,1),
+                                   Patterns::Selection("a|b|c"),
+                                   2,3, "xyz"));
 
   std::ifstream in(p);
   prm.read_input (in);
 
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_13=" << prm.get ("test_13") << std::endl;
 }
 
 
 int main ()
 {
-  std::ofstream logfile("parameter_handler_1a/output");
+  std::ofstream logfile("parameter_handler_13a/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  check ("parameter_handler_1a/prm");
+  check ("parameter_handler_13a/prm");
 
   return 0;
 }

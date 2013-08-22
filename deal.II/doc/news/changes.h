@@ -57,8 +57,9 @@ inconvenience this causes.
 
 <ol>
   <li>
-  New: Patterns::List now accepts a string that denotes the separator
-  between entries of the list.
+  New: Patterns::List and Patterns::Map now accept a string
+  different than the default comma that denotes the separator
+  between entries of the list or map.
   <br>
   (Wolfgang Bangerth, 2013/08/21)
   </li>

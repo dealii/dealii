@@ -562,6 +562,8 @@ namespace Patterns
         std::string separator;
         if (!is)
           std::getline(is, separator, '>');
+        else
+          separator = ",";
 
         return new List(*base_pattern, min_elements, max_elements, separator);
       }
@@ -580,15 +582,22 @@ namespace Patterns
   Map::Map (const PatternBase  &p_key,
             const PatternBase  &p_value,
             const unsigned int  min_elements,
-            const unsigned int  max_elements)
+            const unsigned int  max_elements,
+            const std::string  &separator)
     :
     key_pattern (p_key.clone()),
     value_pattern (p_value.clone()),
     min_elements (min_elements),
-    max_elements (max_elements)
+    max_elements (max_elements),
+    separator (separator)
   {
     Assert (min_elements <= max_elements,
             ExcInvalidRange (min_elements, max_elements));
+    Assert (separator.size() > 0,
+            ExcMessage ("The separator must have a non-zero length."));
+    Assert (separator != ":",
+            ExcMessage ("The separator can not be a colon ':' sicne that "
+                        "is the separator between the two elements of <key:value> pairs"));
   }
 
 
@@ -608,7 +617,6 @@ namespace Patterns
   {
     std::string tmp = test_string_list;
     std::vector<std::string> split_list;
-    split_list.reserve (std::count (tmp.begin(), tmp.end(), ',')+1);
 
     // first split the input list at comma sites
     while (tmp.length() != 0)
@@ -616,10 +624,10 @@ namespace Patterns
         std::string map_entry;
         map_entry = tmp;
 
-        if (map_entry.find(",") != std::string::npos)
+        if (map_entry.find(separator) != std::string::npos)
           {
-            map_entry.erase (map_entry.find(","), std::string::npos);
-            tmp.erase (0, tmp.find(",")+1);
+            map_entry.erase (map_entry.find(separator), std::string::npos);
+            tmp.erase (0, tmp.find(separator)+separator.size());
           }
         else
           tmp = "";
@@ -632,7 +640,7 @@ namespace Patterns
           map_entry.erase (map_entry.length()-1, 1);
 
         split_list.push_back (map_entry);
-      };
+      }
 
     if ((split_list.size() < min_elements) ||
         (split_list.size() > max_elements))
@@ -680,8 +688,10 @@ namespace Patterns
                 << key_pattern->description() << ":"
                 << value_pattern->description() << ">"
                 << " of length " << min_elements << "..." << max_elements
-                << " (inclusive)"
-                << "]";
+                << " (inclusive)";
+    if (separator != ",")
+      description << " separated by <" << separator << ">";
+    description << "]";
 
     return description.str();
   }
@@ -691,7 +701,9 @@ namespace Patterns
   PatternBase *
   Map::clone () const
   {
-    return new Map(*key_pattern, *value_pattern, min_elements, max_elements);
+    return new Map(*key_pattern, *value_pattern,
+                   min_elements, max_elements,
+                   separator);
   }
 
 
@@ -700,7 +712,8 @@ namespace Patterns
   {
     return (sizeof(*this) +
             MemoryConsumption::memory_consumption (*key_pattern) +
-            MemoryConsumption::memory_consumption (*value_pattern));
+            MemoryConsumption::memory_consumption (*value_pattern) +
+            MemoryConsumption::memory_consumption (separator));
   }
 
 
@@ -735,7 +748,16 @@ namespace Patterns
         if (!(is >> max_elements))
           return new Map(*key_pattern, *value_pattern, min_elements);
 
-        return new Map(*key_pattern, *value_pattern, min_elements, max_elements);
+        is.ignore(strlen(" separated by <"));
+        std::string separator;
+        if (!is)
+          std::getline(is, separator, '>');
+        else
+          separator = ",";
+
+        return new Map(*key_pattern, *value_pattern,
+                       min_elements, max_elements,
+                       separator);
       }
     else
       return 0;
