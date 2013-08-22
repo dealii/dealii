@@ -49,7 +49,7 @@ void check_q_dg0(const Function<dim> &f,
 
 int main()
 {
-  std::ofstream logfile ("interpolate_q_dg0/output");
+  std::ofstream logfile ("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(2.e-15);

@@ -112,7 +112,7 @@ check (const unsigned int p)
 int
 main()
 {
-  std::ofstream logfile ("nedelec_3/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

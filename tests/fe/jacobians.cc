@@ -79,7 +79,7 @@ void test()
 int
 main()
 {
-  std::ofstream logfile ("jacobians/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(4) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);

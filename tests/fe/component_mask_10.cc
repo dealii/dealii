@@ -53,7 +53,7 @@ void test ()
 
 int main()
 {
-  std::ofstream logfile ("component_mask_10/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (4);
 
   deallog.attach(logfile);

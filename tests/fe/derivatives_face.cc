@@ -106,7 +106,7 @@ void plot_FE_DGQ_shape_functions()
 int
 main()
 {
-  std::ofstream logfile ("derivatives_face/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);

@@ -81,7 +81,7 @@ ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(codim_one)
 #deal.II
 #fail
-#fe
+ADD_SUBDIRECTORY(fe)
 #grid
 #hp
 #integrators

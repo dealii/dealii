@@ -16,7 +16,7 @@
 
 
 
-char logname[] = "injection_dgp_monomial/output";
+char logname[] = "output";
 
 
 #include "injection_common.h"

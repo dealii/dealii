@@ -41,7 +41,7 @@
 #define PRECISION 2
 
 
-std::ofstream logfile ("rt_12/output");
+std::ofstream logfile ("output");
 
 template<int dim>
 void

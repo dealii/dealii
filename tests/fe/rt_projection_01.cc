@@ -22,7 +22,7 @@
 
 
 
-char logname[] = "rt_projection_01/output";
+char logname[] = "output";
 #include "deformed_projection.h"
 
 

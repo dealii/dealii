@@ -41,7 +41,7 @@ void test ()
 
 int main()
 {
-  std::ofstream logfile ("block_mask_04/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (4);
 
   deallog.attach(logfile);

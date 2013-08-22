@@ -23,7 +23,7 @@
 #include <fstream>
 
 
-std::ofstream logfile ("numbering/output");
+std::ofstream logfile ("output");
 
 
 template <int dim>

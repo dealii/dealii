@@ -50,7 +50,7 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_dgq.h>
 
-std::ofstream logfile ("rt_normal_02/output");
+std::ofstream logfile ("output");
 
 
 /*

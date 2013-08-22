@@ -24,7 +24,7 @@
 // gnuplot file for the values of functions of degree K with
 // transformation N, do
 
-// perl -n -e 'print if s/DEAL:NedelecK-TransformN::value//' nedelec/output
+// perl -n -e 'print if s/DEAL:NedelecK-TransformN::value//' output
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
@@ -171,7 +171,7 @@ plot_shape_functions(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("nedelec/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

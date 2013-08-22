@@ -243,7 +243,7 @@ void MappingTest<dim>::graphical_output ()
 
 int main ()
 {
-  std::ofstream logfile ("mapping_q_eulerian/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);

@@ -52,41 +52,42 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
 
       STRING(TOLOWER ${_build} _build_lowercase)
       SET(_test ${_test_name}.${_build_lowercase})
+      SET(_full_test ${_category}-${_test_name}.${_build_lowercase})
 
-      ADD_EXECUTABLE(${_test} EXCLUDE_FROM_ALL ${_test_name}.cc)
+      ADD_EXECUTABLE(${_full_test} EXCLUDE_FROM_ALL ${_test_name}.cc)
 
-      SET_TARGET_PROPERTIES(${_test} PROPERTIES
+      SET_TARGET_PROPERTIES(${_full_test} PROPERTIES
         LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
         COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
         COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
         LINKER_LANGUAGE "CXX"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_test}"
         )
-      SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
+      SET_PROPERTY(TARGET ${_full_test} APPEND PROPERTY
         INCLUDE_DIRECTORIES
           "${CMAKE_BINARY_DIR}/include"
           "${CMAKE_SOURCE_DIR}/include"
           "${CMAKE_SOURCE_DIR}/include/deal.II/"
         )
-      SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
+      SET_PROPERTY(TARGET ${_full_test} APPEND PROPERTY
         COMPILE_DEFINITIONS
           SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
         )
-      TARGET_LINK_LIBRARIES(${_test_name}.${_build_lowercase}
+      TARGET_LINK_LIBRARIES(${_full_test}
         ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
         )
 
 
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-        COMMAND ${_test}
+        COMMAND ${_full_test}
         # TODO: Refactor:
         COMMAND ${PERL_EXECUTABLE} -pi
             ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
             ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
-        DEPENDS ${_test} ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
+        DEPENDS ${_full_test} ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
         )
-      ADD_CUSTOM_TARGET(${_test}.run
+      ADD_CUSTOM_TARGET(${_full_test}.run
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         )
 
@@ -107,7 +108,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${_comparison}
         )
-      ADD_CUSTOM_TARGET(${_test}.diff
+      ADD_CUSTOM_TARGET(${_full_test}.diff
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
         )
 
@@ -117,7 +118,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
 
       ADD_TEST(NAME ${_category}/${_test}
         COMMAND ${CMAKE_COMMAND}
-          -DTEST=${_test}
+          -DTEST=${_full_test}
           -DTEST_SUFFIX=${_test_suffix}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake

@@ -47,7 +47,7 @@ test(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("copy_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

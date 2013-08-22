@@ -586,7 +586,7 @@ int create_alternate_unitsquare (Triangulation<2> &tria)
 
 int main (int /*argc*/, char **/*argv*/)
 {
-  std::ofstream logfile ("abf_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   logfile << std::setprecision(PRECISION);

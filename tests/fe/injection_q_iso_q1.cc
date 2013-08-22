@@ -16,7 +16,7 @@
 
 
 
-char logname[] = "injection_q_iso_q1/output";
+char logname[] = "output";
 
 
 #include "injection_common.h"
