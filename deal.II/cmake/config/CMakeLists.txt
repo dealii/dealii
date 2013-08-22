@@ -76,8 +76,8 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
   SET(CONFIG_LIBRARIES_${_build}
     \${DEAL_II_PATH}/\${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${_build}}
-    ${DEAL_II_EXTERNAL_LIBRARIES}
     ${DEAL_II_EXTERNAL_LIBRARIES_${_build}}
+    ${DEAL_II_EXTERNAL_LIBRARIES}
     )
   LIST(APPEND CONFIG_LIBRARIES
     ${_keyword}
@@ -172,8 +172,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     #
     SET(_libs)
     FOREACH(_lib
-        ${DEAL_II_EXTERNAL_LIBRARIES}
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
+        ${DEAL_II_EXTERNAL_LIBRARIES}
         )
       IF(_lib MATCHES "^/")
         LIST(APPEND _libs "${_lib}")
@@ -188,8 +188,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     SET(_paths)
     FOREACH(_lib
         $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
-        ${DEAL_II_EXTERNAL_LIBRARIES}
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
+        ${DEAL_II_EXTERNAL_LIBRARIES}
         )
       LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
       #

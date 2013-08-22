@@ -742,7 +742,7 @@ MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const
   // one. check this
   for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
     Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
-                                     lohvs[unit_point].end(),0.) - 1)<1e-13,
+                                     lohvs[unit_point].end(),0.) - 1)<1e-12*this->degree*this->degree,
            ExcInternalError());
 }
 
@@ -790,29 +790,39 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
 
   // Compute the stiffness matrix of
   // the inner dofs
-  FullMatrix<double> S(n_inner);
+  FullMatrix<long double> S(n_inner);
   for (unsigned int point=0; point<n_q_points; ++point)
     for (unsigned int i=0; i<n_inner; ++i)
       for (unsigned int j=0; j<n_inner; ++j)
-        S(i,j) += contract(quadrature_data.derivative(point, n_outer+i),
-                           quadrature_data.derivative(point, n_outer+j))
-                  * quadrature.weight(point);
+	{
+	  long double res = 0.;
+	  for (unsigned int l=0; l<dim; ++l)
+	    res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+		   (long double)quadrature_data.derivative(point, n_outer+j)[l];
+
+	  S(i,j) += res * (long double)quadrature.weight(point);
+	}
 
   // Compute the components of T to be the
   // product of gradients of inner and
   // outer shape functions.
-  FullMatrix<double> T(n_inner, n_outer);
+  FullMatrix<long double> T(n_inner, n_outer);
   for (unsigned int point=0; point<n_q_points; ++point)
     for (unsigned int i=0; i<n_inner; ++i)
       for (unsigned int k=0; k<n_outer; ++k)
-        T(i,k) += contract(quadrature_data.derivative(point, n_outer+i),
-                           quadrature_data.derivative(point, k))
-                  *quadrature.weight(point);
+	{
+	  long double res = 0.;
+	  for (unsigned int l=0; l<dim; ++l)
+	    res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+		   (long double)quadrature_data.derivative(point, k)[l];
 
-  FullMatrix<double> S_1(n_inner);
+	  T(i,k) += res *(long double)quadrature.weight(point);
+	}
+
+  FullMatrix<long double> S_1(n_inner);
   S_1.invert(S);
 
-  FullMatrix<double> S_1_T(n_inner, n_outer);
+  FullMatrix<long double> S_1_T(n_inner, n_outer);
 
   // S:=S_1*T
   S_1.mmult(S_1_T,T);

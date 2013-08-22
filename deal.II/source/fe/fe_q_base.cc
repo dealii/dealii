@@ -459,71 +459,91 @@ FE_Q_Base<POLY,dim,spacedim>::
 get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                           FullMatrix<double>       &interpolation_matrix) const
 {
-  // this is only implemented, if the source FE is also a Q element
-  AssertThrow ((dynamic_cast<const FE_Q_Base<POLY,dim,spacedim> *>(&x_source_fe) != 0),
-               (typename FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented()));
-
-  Assert (interpolation_matrix.m() == this->dofs_per_cell,
-          ExcDimensionMismatch (interpolation_matrix.m(),
-                                this->dofs_per_cell));
-  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
-          ExcDimensionMismatch (interpolation_matrix.m(),
-                                x_source_fe.dofs_per_cell));
-
-  // ok, source is a Q element, so we will be able to do the work
-  const FE_Q_Base<POLY,dim,spacedim> &source_fe
-    = dynamic_cast<const FE_Q_Base<POLY,dim,spacedim>&>(x_source_fe);
-
-  // only evaluate Q dofs
-  const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(this->degree+1);
-  const unsigned int source_q_dofs_per_cell = Utilities::fixed_power<dim>(source_fe.degree+1);
-
-  // evaluation is simply done by evaluating the other FE's basis functions on
-  // the unit support points (FE_Q has the property that the cell
-  // interpolation matrix is a unit matrix, so no need to evaluate it and
-  // invert it)
-  for (unsigned int j=0; j<q_dofs_per_cell; ++j)
+  // go through the list of elements we can interpolate from
+  if (const FE_Q_Base<POLY,dim,spacedim> *source_fe
+      = dynamic_cast<const FE_Q_Base<POLY,dim,spacedim>*>(&x_source_fe))
     {
-      // read in a point on this cell and evaluate the shape functions there
-      const Point<dim> p = this->unit_support_points[j];
+      // ok, source is a Q element, so we will be able to do the work
+      Assert (interpolation_matrix.m() == this->dofs_per_cell,
+              ExcDimensionMismatch (interpolation_matrix.m(),
+                                    this->dofs_per_cell));
+      Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+              ExcDimensionMismatch (interpolation_matrix.m(),
+                                    x_source_fe.dofs_per_cell));
 
-      // FE_Q element evaluates to 1 in unit support point and to zero in all
-      // other points by construction
-      Assert(std::abs(this->poly_space.compute_value (j, p)-1.)<1e-13,
-             ExcInternalError());
+      // only evaluate Q dofs
+      const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(this->degree+1);
+      const unsigned int source_q_dofs_per_cell = Utilities::fixed_power<dim>(source_fe->degree+1);
 
-      for (unsigned int i=0; i<source_q_dofs_per_cell; ++i)
-        interpolation_matrix(j,i) = source_fe.poly_space.compute_value (i, p);
-    }
-
-  // for FE_Q_DG0, add one last row of identity
-  if (q_dofs_per_cell < this->dofs_per_cell)
-    {
-      AssertDimension(source_q_dofs_per_cell+1, source_fe.dofs_per_cell);
-      for (unsigned int i=0; i<source_q_dofs_per_cell; ++i)
-        interpolation_matrix(q_dofs_per_cell, i) = 0.;
+      // evaluation is simply done by evaluating the other FE's basis functions on
+      // the unit support points (FE_Q has the property that the cell
+      // interpolation matrix is a unit matrix, so no need to evaluate it and
+      // invert it)
       for (unsigned int j=0; j<q_dofs_per_cell; ++j)
-        interpolation_matrix(j, source_q_dofs_per_cell) = 0.;
-      interpolation_matrix(q_dofs_per_cell, source_q_dofs_per_cell) = 1.;
+        {
+          // read in a point on this cell and evaluate the shape functions there
+          const Point<dim> p = this->unit_support_points[j];
+
+          // FE_Q element evaluates to 1 in unit support point and to zero in all
+          // other points by construction
+          Assert(std::abs(this->poly_space.compute_value (j, p)-1.)<1e-13,
+                 ExcInternalError());
+
+          for (unsigned int i=0; i<source_q_dofs_per_cell; ++i)
+            interpolation_matrix(j,i) = source_fe->poly_space.compute_value (i, p);
+        }
+
+      // for FE_Q_DG0, add one last row of identity
+      if (q_dofs_per_cell < this->dofs_per_cell)
+        {
+          AssertDimension(source_q_dofs_per_cell+1, source_fe->dofs_per_cell);
+          for (unsigned int i=0; i<source_q_dofs_per_cell; ++i)
+            interpolation_matrix(q_dofs_per_cell, i) = 0.;
+          for (unsigned int j=0; j<q_dofs_per_cell; ++j)
+            interpolation_matrix(j, source_q_dofs_per_cell) = 0.;
+          interpolation_matrix(q_dofs_per_cell, source_q_dofs_per_cell) = 1.;
+        }
+
+      // cut off very small values
+      const double eps = 2e-13*this->degree*dim;
+      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+        for (unsigned int j=0; j<source_fe->dofs_per_cell; ++j)
+          if (std::fabs(interpolation_matrix(i,j)) < eps)
+            interpolation_matrix(i,j) = 0.;
+
+      // make sure that the row sum of each of the matrices is 1 at this
+      // point. this must be so since the shape functions sum up to 1
+      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+        {
+          double sum = 0.;
+          for (unsigned int j=0; j<source_fe->dofs_per_cell; ++j)
+            sum += interpolation_matrix(i,j);
+
+          Assert (std::fabs(sum-1) < eps, ExcInternalError());
+        }
     }
-
-  // cut off very small values
-  const double eps = 2e-13*this->degree*dim;
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-    for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
-      if (std::fabs(interpolation_matrix(i,j)) < eps)
-        interpolation_matrix(i,j) = 0.;
-
-  // make sure that the row sum of each of the matrices is 1 at this
-  // point. this must be so since the shape functions sum up to 1
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+  else if (const FE_Nothing<dim> *source_fe
+      = dynamic_cast<const FE_Nothing<dim>*>(&x_source_fe))
     {
-      double sum = 0.;
-      for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
-        sum += interpolation_matrix(i,j);
+      // the element we want to interpolate from is an FE_Nothing. this
+      // element represents a function that is constant zero and has no
+      // degrees of freedom, so the interpolation is simply a multiplication
+      // with a n_dofs x 0 matrix. there is nothing to do here
 
-      Assert (std::fabs(sum-1) < eps, ExcInternalError());
+      // we would like to verify that the number of rows and columns of
+      // the matrix equals this->dofs_per_cell and zero. unfortunately,
+      // whenever we do FullMatrix::reinit(m,0), it sets both rows and
+      // columns to zero, instead of m and zero. thus, only test the
+      // number of columns
+      Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+              ExcDimensionMismatch (interpolation_matrix.m(),
+                                    x_source_fe.dofs_per_cell));
+
     }
+  else
+    AssertThrow (false,
+                 (typename FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented()));
+
 }
 
 

@@ -459,6 +459,15 @@ namespace MeshWorker
       void initialize(MATRIX &m, VECTOR &rhs);
 
       /**
+       * Initialize the constraints. After this function has been
+       * called with a valid ConstraintMatrix, the function
+       * ConstraintMatrix::distribute_local_to_global() will be used
+       * by assemble() to distribute the cell and face matrices into a
+       * global sparse matrix.
+       */
+      void initialize(const ConstraintMatrix &constraints);
+
+      /**
        * Initialize the local data
        * in the
        * DoFInfo
@@ -911,7 +920,7 @@ namespace MeshWorker
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(k,j)) >= threshold)
-                if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                if (//mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                     !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   G.add(i1[j], i2[k], M(k,j));
         }
@@ -941,7 +950,7 @@ namespace MeshWorker
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(j,k)) >= threshold)
-                if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                if (//mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                     !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   G.add(i1[j], i2[k], M(j,k));
         }
@@ -1189,7 +1198,15 @@ namespace MeshWorker
       ResidualSimple<VECTOR>::initialize(data);
     }
 
+    template <class MATRIX, class VECTOR>
+    inline void
+    SystemSimple<MATRIX,VECTOR>::initialize(const ConstraintMatrix &c)
+    {
+      MatrixSimple<MATRIX>::initialize(c);
+      ResidualSimple<VECTOR>::initialize(c);
+    }
 
+    
     template <class MATRIX, class VECTOR>
     template <class DOFINFO>
     inline void

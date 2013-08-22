@@ -57,13 +57,11 @@ int main()
   triangulation.refine_global (1);
 
 
-  hp::DoFHandler<2> dof_handler(triangulation);
   hp::FECollection<2>     fe_collection;
-
-
   fe_collection.push_back(FE_Q<2>(1));
   fe_collection.push_back(FE_Nothing<2>());
 
+  hp::DoFHandler<2> dof_handler(triangulation);
 
   // Assign FE to cells
   hp::DoFHandler<2>::active_cell_iterator cell;
@@ -95,18 +93,18 @@ int main()
   data_out.write_vtu (deallog.get_file_stream());
 
 
+  // Interpoalte solution
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2> > solultion_trans(dof_handler);
+  solultion_trans.prepare_for_coarsening_and_refinement(solution);
+
+  triangulation.execute_coarsening_and_refinement ();
   // Assign FE_Q_ to all cells
   cell = dof_handler.begin_active();
   for( ; cell != endc; ++cell){
     cell->set_active_fe_index(0);          
   }
-
-
-  // Interpoalte solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2> > solultion_trans(dof_handler);
-  solultion_trans.prepare_for_coarsening_and_refinement(solution);
-  triangulation.execute_coarsening_and_refinement ();
   dof_handler.distribute_dofs (fe_collection);
+  
   Vector<double> new_solution(dof_handler.n_dofs());
   solultion_trans.interpolate(solution, new_solution);
 

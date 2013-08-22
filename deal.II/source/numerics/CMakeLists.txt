@@ -29,6 +29,7 @@ SET(_src
   derivative_approximation.cc
   dof_output_operator.cc
   error_estimator.cc
+  error_estimator_1d.cc
   fe_field_function.cc
   matrix_tools.cc
   histogram.cc
@@ -36,7 +37,14 @@ SET(_src
   solution_transfer.cc
   solution_transfer_inst2.cc
   time_dependent.cc
-  vector_tools.cc
+  vector_tools_boundary.cc
+  vector_tools_constraints.cc
+  vector_tools_integrate_difference.cc
+  vector_tools_interpolate.cc
+  vector_tools_mean_value.cc
+  vector_tools_point_value.cc
+  vector_tools_project.cc
+  vector_tools_rhs.cc
   )
 
 SET(_inst
@@ -48,12 +56,20 @@ SET(_inst
   derivative_approximation.inst.in
   dof_output_operator.inst.in
   error_estimator.inst.in
+  error_estimator_1d.inst.in
   fe_field_function.inst.in
   matrix_tools.inst.in
   point_value_history.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in
-  vector_tools.inst.in
+  vector_tools_boundary.inst.in
+  vector_tools_constraints.inst.in
+  vector_tools_integrate_difference.inst.in
+  vector_tools_interpolate.inst.in
+  vector_tools_mean_value.inst.in
+  vector_tools_point_value.inst.in
+  vector_tools_project.inst.in
+  vector_tools_rhs.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_numerics OBJECT ${_src} ${_header} ${_inst})

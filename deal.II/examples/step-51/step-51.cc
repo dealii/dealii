@@ -33,7 +33,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
-#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -738,9 +738,11 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
           for (unsigned int q=0; q<n_face_q_points; ++q)
             {
               const double JxW = scratch.fe_face_values.JxW(q);
+              const Point<dim> quadrature_point =
+                scratch.fe_face_values.quadrature_point(q);
               const Point<dim> normal = scratch.fe_face_values.normal_vector(q);
               const Tensor<1,dim> convection
-                = scratch.convection_velocity.value(scratch.fe_face_values.quadrature_point(q));
+                = scratch.convection_velocity.value(quadrature_point);
               const double tau_stab = (tau_stab_diffusion +
                                        std::abs(convection * normal));
 
@@ -792,11 +794,12 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
                       (cell->face(face)->boundary_indicator() == 1))
                     {
                       const double neumann_value =
-                        scratch.exact_solution.value(scratch.fe_face_values.quadrature_point(q));
+                        - scratch.exact_solution.gradient (quadrature_point) * normal
+                        + convection * normal * scratch.exact_solution.value(quadrature_point);
                       for (unsigned int i=0; i<scratch.fe_support_on_face[face].size(); ++i)
                         {
                           const unsigned int ii=scratch.fe_support_on_face[face][i];
-                          task_data.cell_vector(ii) -= scratch.tr_phi[i] * neumann_value * JxW;
+                          task_data.cell_vector(ii) += scratch.tr_phi[i] * neumann_value * JxW;
                         }
                     }
                 }
@@ -815,9 +818,9 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
                   {
                     const unsigned int ii=scratch.fe_local_support_on_face[face][i];
                     scratch.l_rhs(ii) -= (scratch.q_phi[i] * normal
-                                  +
-                                  scratch.u_phi[i] * (convection * normal - tau_stab)
-                                  ) * scratch.trace_values[q] * JxW;
+                                          +
+                                          scratch.u_phi[i] * (convection * normal - tau_stab)
+                                          ) * scratch.trace_values[q] * JxW;
                   }
             }
         }
@@ -843,12 +846,12 @@ template <int dim>
 void Step51<dim>::solve ()
 {
   SolverControl solver_control (system_matrix.m()*10,
-                                1e-10*system_rhs.l2_norm());
-  SolverGMRES<> solver (solver_control, 50);
+                                1e-11*system_rhs.l2_norm());
+  SolverBicgstab<> solver (solver_control, false);
   solver.solve (system_matrix, solution, system_rhs,
                 PreconditionIdentity());
 
-  std::cout << "   Number of GMRES iterations: " << solver_control.last_step()
+  std::cout << "   Number of BiCGStab iterations: " << solver_control.last_step()
             << std::endl;
 
   system_matrix.clear();
@@ -1067,46 +1070,62 @@ void Step51<dim>::refine_grid (const unsigned int cycle)
   if (cycle == 0)
     {
       GridGenerator::subdivided_hyper_cube (triangulation, 2, -1, 1);
+      triangulation.refine_global(3-dim);
     }
   else
     switch (refinement_mode)
       {
       case global_refinement:
         {
-            triangulation.clear();
-            GridGenerator::subdivided_hyper_cube (triangulation, 2+(cycle%2), -1, 1);
-            triangulation.refine_global(3-dim+cycle/2);
+          triangulation.clear();
+          GridGenerator::subdivided_hyper_cube (triangulation, 2+(cycle%2), -1, 1);
+          triangulation.refine_global(3-dim+cycle/2);
           break;
         }
 
       case adaptive_refinement:
-      {
-        Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+        {
+          Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-        FEValuesExtractors::Scalar scalar(dim);
-        typename FunctionMap<dim>::type neumann_boundary;
-        KellyErrorEstimator<dim>::estimate (dof_handler_local,
-                                            QGauss<dim-1>(3),
-                                            neumann_boundary,
-                                            solution_local,
-                                            estimated_error_per_cell,
-                                            fe_local.component_mask(scalar));
+          FEValuesExtractors::Scalar scalar(dim);
+          typename FunctionMap<dim>::type neumann_boundary;
+          KellyErrorEstimator<dim>::estimate (dof_handler_local,
+                                              QGauss<dim-1>(3),
+                                              neumann_boundary,
+                                              solution_local,
+                                              estimated_error_per_cell,
+                                              fe_local.component_mask(scalar));
 
-        GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                         estimated_error_per_cell,
-                                                         0.3, 0.);
+          GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+                                                           estimated_error_per_cell,
+                                                           0.3, 0.);
 
-        triangulation.execute_coarsening_and_refinement ();
+          triangulation.execute_coarsening_and_refinement ();
 
-        break;
-      }
+          break;
+        }
 
       default:
-      {
-        Assert (false, ExcNotImplemented());
+        {
+          Assert (false, ExcNotImplemented());
+        }
       }
-      }
-  }
+
+  // Just as in step-7, we set the boundary indicator of one of the faces to 1
+  // where we want to specify Neumann boundary conditions instead of Dirichlet
+  // conditions. Since we re-create the triangulation every time for global
+  // refinement, the flags are set in every refinement step, not just at the
+  // beginning.
+  typename Triangulation<dim>::cell_iterator
+    cell = triangulation.begin (),
+    endc = triangulation.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12)
+          ||
+          (std::fabs(cell->face(face)->center()(1) - (-1)) < 1e-12))
+        cell->face(face)->set_boundary_indicator (1);
+}
 
 
 

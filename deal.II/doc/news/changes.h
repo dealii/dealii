@@ -57,6 +57,28 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: Some operations in the MappingQ class are now done in higher
+  precision arithmetic to mitigate the ill-conditioning that appears
+  when using mappings of high order (say, order 6 or 8 or 10).
+  <br>
+  (Juan Carlos Araujo Cabarcas, 2013/08/20)
+  </li>
+
+  <li>
+  Fixed: The SLEPcWrappers classes could not be compiled for 64-bit
+  indices. This is now fixed.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2013/08/20)
+  </li>
+
+  <li>
+  Fixed: SolutionTransfer used to crash whenever one transfered in the hp
+  context between cells that use FE_Nothing and FE_Q. This is now fixed.
+  <br>
+  (Krzyszof Bzowski, Wolfgang Bangerth, 2013/08/18)
+  </li>
+
+  <li>
   Fixed: Under some circumstances (see http://code.google.com/p/dealii/issues/detail?id=82)
   the DoFTools::make_periodicity_constraints() function could create cycles in
   the ConstraintMatrix object. This is now fixed.

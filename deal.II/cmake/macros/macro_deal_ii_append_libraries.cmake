@@ -14,42 +14,34 @@
 ##
 ## ---------------------------------------------------------------------
 
-
 #
-# A small macro to split a list of libraries with debug, optimized and
-# general keywords into two lists consisting of all libraries necessary for
-# the debug and release target only. If no keyword is given "optimized" is
-# assumed.
+# A small macro to add libraries to
+#   DEAL_II_EXTERNAL_LIBRARIES
+#   DEAL_II_EXTERNAL_LIBRARIES_DEBUG
+#   DEAL_II_EXTERNAL_LIBRARIES_RELEASE
+# depending on the "optmized", "debug" or "general" keyword
 #
 # Usage:
-#     SPLIT_DEBUG_RELEASE(list_debug list_release <...list of libraries...>)
-#
+#   DEAL_II_APPEND_LIBRARIES(<list of libraries>)
 #
 
-MACRO(SPLIT_DEBUG_RELEASE _list_debug _list_release)
+MACRO(DEAL_II_APPEND_LIBRARIES)
 
-  SET(_toggle "optimized")
+  SET(_toggle "general")
   FOREACH(_tmp ${ARGN})
-    IF("${_tmp}" STREQUAL "debug" OR
-       "${_tmp}" STREQUAL "optimized" OR
-       "${_tmp}" STREQUAL "general")
+    IF( "${_tmp}" STREQUAL "debug" OR
+        "${_tmp}" STREQUAL "optimized" OR
+        "${_tmp}" STREQUAL "general" )
       SET(_toggle "${_tmp}")
     ELSE()
       IF("${_toggle}" STREQUAL "general")
-        LIST(APPEND ${_list_debug} "${_tmp}")
-        LIST(APPEND ${_list_release} "${_tmp}")
+        LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${_tmp})
       ELSEIF("${_toggle}" STREQUAL "debug")
-        LIST(APPEND ${_list_debug} "${_tmp}")
+        LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${_tmp})
       ELSEIF("${_toggle}" STREQUAL "optimized")
-        LIST(APPEND ${_list_release} "${_tmp}")
+        LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE ${_tmp})
       ENDIF()
     ENDIF()
   ENDFOREACH()
-
-  IF("${${_list_debug}}" STREQUAL "")
-    SET(${_list_debug} ${${_list_release}})
-  ELSEIF("${${_list_release}}" STREQUAL "")
-    SET(${_list_release} ${${_list_debug}})
-  ENDIF()
 
 ENDMACRO()

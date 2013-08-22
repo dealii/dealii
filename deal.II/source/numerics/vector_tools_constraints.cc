@@ -20,6 +20,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // ---------------------------- explicit instantiations --------------------
-#include "vector_tools.inst"
+#include "vector_tools_constraints.inst"
 
 DEAL_II_NAMESPACE_CLOSE

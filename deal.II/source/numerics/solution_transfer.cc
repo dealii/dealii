@@ -188,24 +188,13 @@ namespace internal
           {
             matrices(i,j).reinit (fe[i].dofs_per_cell, fe[j].dofs_per_cell);
 
-            // see if we can get the
-            // interpolation matrices
-            // for this combination
-            // of elements. if not,
-            // reset the matrix sizes
-            // to zero to indicate
-            // that this particular
-            // combination isn't
-            // supported. this isn't
-            // an outright error
-            // right away since we
-            // may never need to
-            // actually interpolate
-            // between these two
-            // elements on actual
-            // cells; we simply have
-            // to trigger an error if
-            // someone actually tries
+            // see if we can get the interpolation matrices for this
+            // combination of elements. if not, reset the matrix sizes to zero
+            // to indicate that this particular combination isn't
+            // supported. this isn't an outright error right away since we may
+            // never need to actually interpolate between these two elements
+            // on actual cells; we simply have to trigger an error if someone
+            // actually tries
             try
               {
                 fe[i].get_interpolation_matrix (fe[j], matrices(i,j));
@@ -574,12 +563,41 @@ interpolate (const std::vector<VECTOR> &all_in,
                           local_values.reinit (cell->has_children() ?
                                                cell->child(0)->get_fe().dofs_per_cell
                                                : cell->get_fe().dofs_per_cell, true);
-                          AssertDimension (local_values.size(),
-                                           interpolation_hp(new_fe_index,old_index).m());
+			  // do the interpolation. we get into trouble if the
+			  // interpolation_hp(new,old) matrix hasn't been computed.
+			  // this can happen if the respective elements don't support
+			  // the corresponding interpolation; if that's the case, then
+			  // the computation of the matrix simply sets the matrix
+			  // back to size zero. so if we get here and that is
+			  // the wrong size, then this may be because the elements
+			  // haven't implemented the correct function yet
+			  //
+			  // there is one wrinkle. we would like to only error out if
+			  // the size of the matrix is 0 times 0 but at least one
+			  // of the elements has more than one dof per cell. the
+			  // problem is that if you reinit a matrix to 4x0, it automatically
+			  // sets its size to 0x0. so we can only execute the following
+			  // test if *both* elements have dofs_per_cell>0, not if *at
+			  // least one* have.
+			  Assert (! ((interpolation_hp(new_fe_index,old_index).m() == 0)
+				     &&
+				     (interpolation_hp(new_fe_index,old_index).n() == 0)
+				     &&
+				     ((dof_handler->get_fe()[new_fe_index].dofs_per_cell > 0)
+				      &&
+				      (dof_handler->get_fe()[old_index].dofs_per_cell > 0))),
+				  ExcMessage ("The interpolation between two different "
+					      "elements you are trying to use here has "
+					      "not been implemented for this pair of "
+					      "elements!"));
+
                           // simple case where all children have the
                           // same FE index: just interpolate to their FE
                           // first and then use the standard routines
-                          interpolation_hp(new_fe_index,old_index).vmult (local_values, tmp);
+			  if (tmp.size() > 0)
+			    interpolation_hp(new_fe_index,old_index).vmult (local_values, tmp);
+			  else
+			    local_values = 0;
                         }
 
                       if (cell->has_children() == false)
@@ -596,9 +614,24 @@ interpolate (const std::vector<VECTOR> &all_in,
                                     AssertDimension (tmp.size(),
                                                      interpolation_hp(c_index,old_index).n());
                                     local_values.reinit(cell->child(child)->get_fe().dofs_per_cell, true);
-                                    AssertDimension (local_values.size(),
-                                                     interpolation_hp(c_index,old_index).m());
-                                    interpolation_hp(c_index,old_index).vmult (local_values, tmp);
+
+				    // do the interpolation. same problem as above
+				    Assert (! ((interpolation_hp(c_index,old_index).m() == 0)
+					       &&
+					       (interpolation_hp(c_index,old_index).n() == 0)
+					       &&
+					       ((dof_handler->get_fe()[c_index].dofs_per_cell > 0)
+						&&
+						(dof_handler->get_fe()[old_index].dofs_per_cell > 0))),
+					    ExcMessage ("The interpolation between two different "
+							"elements you are trying to use here has "
+							"not been implemented for this pair of "
+							"elements!"));
+
+				    if (tmp.size() > 0)
+				      interpolation_hp(c_index,old_index).vmult (local_values, tmp);
+                                    else
+                                      local_values = 0;
                                   }
                                 else
                                   local_values = tmp;
