@@ -23,8 +23,6 @@
 # NUMDIFF_DIR
 #
 
-SET(CTEST_USE_LAUNCHERS TRUE)
-
 #
 # We need perl for the testsuite:
 #
