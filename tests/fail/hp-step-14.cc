@@ -1258,7 +1258,7 @@ namespace DualFunctional
     AssertThrow (total_volume > 0,
                  ExcEvaluationPointNotFound(evaluation_point));
 
-    rhs.scale (1./total_volume);
+    rhs /= total_volume;
   }
 
 

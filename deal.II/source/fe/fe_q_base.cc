@@ -522,8 +522,7 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
           Assert (std::fabs(sum-1) < eps, ExcInternalError());
         }
     }
-  else if (const FE_Nothing<dim> *source_fe
-      = dynamic_cast<const FE_Nothing<dim>*>(&x_source_fe))
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&x_source_fe))
     {
       // the element we want to interpolate from is an FE_Nothing. this
       // element represents a function that is constant zero and has no

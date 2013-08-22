@@ -369,7 +369,8 @@ namespace Patterns
 
 
   /**
-   * This pattern matches a list of comma-separated values each of which
+   * This pattern matches a list of values separated by commas (or another
+   * string), each of which
    * have to match a pattern given to the constructor. With two additional
    * parameters, the number of elements this list has to have can be
    * specified. If none is specified, the list may have zero or more
@@ -389,12 +390,14 @@ namespace Patterns
      * Constructor. Take the given parameter as the specification of valid
      * elements of the list.
      *
-     * The two other arguments can be used to denote minimal and maximal
-     * allowable lengths of the list.
+     * The three other arguments can be used to denote minimal and maximal
+     * allowable lengths of the list, and the string that is used as a
+     * separator between elements of the list.
      */
     List (const PatternBase  &base_pattern,
           const unsigned int  min_elements = 0,
-          const unsigned int  max_elements = max_int_value);
+          const unsigned int  max_elements = max_int_value,
+          const std::string  &separator = ",");
 
     /**
      * Destructor.
@@ -462,6 +465,11 @@ namespace Patterns
     const unsigned int max_elements;
 
     /**
+     * Separator between elements of the list.
+     */
+    const std::string separator;
+
+    /**
      * Initial part of description
      */
     static const char *description_init;
@@ -474,7 +482,8 @@ namespace Patterns
    * pattern given to the constructor. For each entry of the map,
    * parameters have to be entered in the form <code>key: value</code>. In
    * other words, a map is described in the form
-   * <code>key1: value1, key2: value2, key3: value3, ...</code>.
+   * <code>key1: value1, key2: value2, key3: value3, ...</code>. A constructor
+   * argument allows to choose a delimiter between pairs other than the comma.
    *
    * With two additional parameters, the number of elements this list has
    * to have can be specified. If none is specified, the map may have zero
@@ -494,13 +503,15 @@ namespace Patterns
      * Constructor. Take the given parameter as the specification of valid
      * elements of the list.
      *
-     * The two other arguments can be used to denote minimal and maximal
-     * allowable lengths of the list.
+     * The three other arguments can be used to denote minimal and maximal
+     * allowable lengths of the list as well as the separator used to delimit
+     * pairs of the map.
      */
     Map (const PatternBase  &key_pattern,
          const PatternBase  &value_pattern,
          const unsigned int  min_elements = 0,
-         const unsigned int  max_elements = max_int_value);
+         const unsigned int  max_elements = max_int_value,
+         const std::string  &separator = ",");
 
     /**
      * Destructor.
@@ -567,6 +578,11 @@ namespace Patterns
      * Maximum number of elements the list must have.
      */
     const unsigned int max_elements;
+
+    /**
+     * Separator between elements of the list.
+     */
+    const std::string separator;
 
     /**
      * Initial part of description
@@ -1615,8 +1631,14 @@ public:
    * this class is asked to write out all declarations to a stream using
    * the print_parameters() function.
    *
-   * The function generates an exception if the default value doesn't match
-   * the given pattern. An entry can be declared more than once without
+   * The function generates an exception of type ExcValueDoesNotMatchPattern
+   * if the default value doesn't match the given pattern, using the C++
+   * throw mechanism. However, this exception is only generated <i>after</i>
+   * the entry has been created; if you have code where no sensible default
+   * value for a parameter is possible, you can then catch and ignore this
+   * exception.
+   *
+   * @note An entry can be declared more than once without
    * generating an error, for example to override an earlier default value.
    */
   void declare_entry (const std::string           &entry,

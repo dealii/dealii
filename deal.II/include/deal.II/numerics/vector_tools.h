@@ -2418,11 +2418,6 @@ namespace VectorTools
    * Exception
    */
   DeclException0 (ExcNonInterpolatingFE);
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoComponentSelected);
 }
 
 

@@ -2228,13 +2228,16 @@ DataOutBase::SvgFlags::SvgFlags (const unsigned int height_vector,
                                  const int polar_angle,
                                  const unsigned int line_thickness,
                                  const bool margin,
-                                 const bool draw_colorbar) :
-  height_vector(height_vector),
-  azimuth_angle(azimuth_angle),
-  polar_angle(polar_angle),
-  line_thickness(line_thickness),
-  margin(margin),
-  draw_colorbar(draw_colorbar)
+                                 const bool draw_colorbar)
+		:
+		height(4000),
+		width(0),
+		height_vector(height_vector),
+		azimuth_angle(azimuth_angle),
+		polar_angle(polar_angle),
+		line_thickness(line_thickness),
+		margin(margin),
+		draw_colorbar(draw_colorbar)
 {}
 
 
@@ -5611,8 +5614,8 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
   // do not allow volume rendering
   AssertThrow (dim==2, ExcNotImplemented());
 
-  const unsigned int height = 4000;
-  unsigned int width;
+  const unsigned int height = flags.height;
+  unsigned int width = flags.width;
 
   // margin around the plotted area
   unsigned int margin_in_percent = 0;
@@ -5932,10 +5935,11 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
             }
         }
     }
-
+  
 
 // write the svg file
-  width = static_cast<unsigned int>(.5 + height * (x_dimension_perspective / y_dimension_perspective));
+  if (width==0)
+    width = static_cast<unsigned int>(.5 + height * (x_dimension_perspective / y_dimension_perspective));
   unsigned int additional_width = 0;
 
   if (flags.draw_colorbar) additional_width = static_cast<unsigned int>(.5 + height * .3); // additional width for colorbar

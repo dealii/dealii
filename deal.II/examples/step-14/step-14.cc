@@ -1692,7 +1692,7 @@ namespace Step14
       // Finally, we have by now only integrated the gradients of the shape
       // functions, not taking their mean value. We fix this by dividing by
       // the measure of the volume over which we have integrated:
-      rhs.scale (1./total_volume);
+      rhs /= total_volume;
     }
 
 

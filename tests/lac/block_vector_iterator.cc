@@ -179,7 +179,7 @@ void test ()
       std::transform (v1.begin(), v1.end(), v2.begin(),
                       std::bind2nd (std::multiplies<double>(),
                                     2.0));
-      v2.scale (1./2.);
+      v2 *= 1./2.;
       deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
 
 

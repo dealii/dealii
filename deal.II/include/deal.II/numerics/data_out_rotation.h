@@ -19,7 +19,7 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/data_out_dof_data.h>
 
 #include <string>
 #include <vector>

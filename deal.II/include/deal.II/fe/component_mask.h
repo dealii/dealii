@@ -209,6 +209,11 @@ public:
   std::size_t
   memory_consumption () const;
 
+  /**
+   * Exception
+   */
+  DeclException0 (ExcNoComponentSelected);
+
 private:
   /**
    * The actual component mask.

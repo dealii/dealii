@@ -339,8 +339,6 @@ namespace internal
                          const typename DH::face_iterator        &face,
                          dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_cell)
     {
-      const unsigned int dim = DH::dimension;
-
       const unsigned int n_q_points         = parallel_data.psi[0].size(),
                          n_components       = parallel_data.finite_element.n_components(),
                          n_solution_vectors = parallel_data.psi.size();
@@ -488,9 +486,7 @@ namespace internal
       const unsigned int dim = DH::dimension;
 
       const typename DH::face_iterator face = cell->face(face_no);
-      const unsigned int n_q_points         = parallel_data.face_quadratures[cell->active_fe_index()].size(),
-                         n_components       = parallel_data.finite_element.n_components(),
-                         n_solution_vectors = solutions.size();
+      const unsigned int n_solution_vectors = solutions.size();
 
 
       // initialize data of the restriction
@@ -536,7 +532,7 @@ namespace internal
         }
 
       // now go to the generic function that does all the other things
-      local_face_integrals[face] = 
+      local_face_integrals[face] =
         integrate_over_face (parallel_data, face, fe_face_values_cell);
     }
 
@@ -566,9 +562,7 @@ namespace internal
       const unsigned int dim = DH::dimension;
 
       const typename DH::cell_iterator neighbor = cell->neighbor(face_no);
-      const unsigned int n_q_points         = parallel_data.face_quadratures[cell->active_fe_index()].size(),
-                         n_components       = parallel_data.finite_element.n_components(),
-                         n_solution_vectors = solutions.size();
+      const unsigned int n_solution_vectors = solutions.size();
       const typename DH::face_iterator
       face=cell->face(face_no);
 
@@ -655,7 +649,6 @@ namespace internal
                        const std::vector<const InputVector *> &solutions)
     {
       const unsigned int dim = DH::dimension;
-      const unsigned int spacedim = DH::dimension;
       const unsigned int n_solution_vectors = solutions.size();
 
       const types::subdomain_id subdomain_id = parallel_data.subdomain_id;
