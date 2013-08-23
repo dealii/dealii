@@ -53,88 +53,46 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
   const unsigned int dim = 2;
   std::vector<Point<dim> > line_points (2);
 
-  // loop over each of the lines,
-  // and if it is at the
-  // boundary, then first get the
-  // boundary description and
-  // second compute the points on
-  // it. if not at the boundary,
-  // get the respective points
-  // from another function
+  // loop over each of the lines, and if it is at the boundary, then first get
+  // the boundary description and second compute the points on it. if not at
+  // the boundary, get the respective points from another function
   for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
     {
       const Triangulation<dim>::line_iterator line = cell->line(line_no);
 
       if (line->at_boundary())
         {
-          // first get the normal
-          // vectors at the two
-          // vertices of this line
-          // from the boundary
-          // description
+          // first get the normal vectors at the two vertices of this line
+          // from the boundary description
           const Boundary<dim> &boundary
             = line->get_triangulation().get_boundary(line->boundary_indicator());
 
           Boundary<dim>::FaceVertexNormals face_vertex_normals;
           boundary.get_normals_at_vertices (line, face_vertex_normals);
 
-          // then transform them into
-          // interpolation points for
-          // a cubic polynomial
+          // then transform them into interpolation points for a cubic
+          // polynomial
           //
-          // for this, note that if
-          // we describe the boundary
-          // curve as a polynomial in
-          // tangential coordinate
-          // @p{t=0..1} (along the
-          // line) and @p{s} in
-          // normal direction, then
-          // the cubic mapping is
-          // such that @p{s = a*t**3
-          // + b*t**2 + c*t + d}, and
-          // we want to determine the
-          // interpolation points at
-          // @p{t=1/3} and
-          // @p{t=2/3}. Since at
-          // @p{t=0,1} we want a
-          // vertex which is actually
-          // at the boundary, we know
-          // that @p{d=0} and
-          // @p{a=-b-c}. As
-          // side-conditions, we want
-          // that the derivatives at
-          // @p{t=0} and @p{t=1},
-          // i.e. at the vertices
-          // match those returned by
-          // the boundary. We then
-          // have that
-          // @p{s(1/3)=1/27(2b+8c)}
-          // and
-          // @p{s(2/3)=4/27b+10/27c}.
+          // for this, note that if we describe the boundary curve as a
+          // polynomial in tangential coordinate @p{t=0..1} (along the line)
+          // and @p{s} in normal direction, then the cubic mapping is such
+          // that @p{s = a*t**3 + b*t**2 + c*t + d}, and we want to determine
+          // the interpolation points at @p{t=0.276} and @p{t=0.724}
+          // (Gauss-Lobatto points). Since at @p{t=0,1} we want a vertex which
+          // is actually at the boundary, we know that @p{d=0} and @p{a=-b-c},
+          // which gives @p{s(0.276)} and @{s(0.726)} in terms of @p{b,c}. As
+          // side-conditions, we want that the derivatives at @p{t=0} and
+          // @p{t=1}, i.e. at the vertices match those returned by the
+          // boundary.
           //
-          // The task is then first
-          // to determine the
-          // coefficients from the
-          // tangentials. for that,
-          // first rotate the
-          // tangents of @p{s(t)}
-          // into the global
-          // coordinate system. they
-          // are @p{A (1,c)} and @p{A
-          // (1,-b-2c)} with @p{A} the
-          // rotation matrix, since
-          // the tangentials in the
-          // coordinate system
-          // relative to the line are
-          // @p{(1,c)} and @p{(1,-b-2c)}
-          // at the two vertices,
-          // respectively. We then
-          // have to make sure by
-          // matching @p{b,c} that
-          // these tangentials are
-          // orthogonal to the normals
-          // returned by the boundary
-          // object
+          // The task is then first to determine the coefficients from the
+          // tangentials. for that, first rotate the tangents of @p{s(t)} into
+          // the global coordinate system. they are @p{A (1,c)} and @p{A
+          // (1,-b-2c)} with @p{A} the rotation matrix, since the tangentials
+          // in the coordinate system relative to the line are @p{(1,c)} and
+          // @p{(1,-b-2c)} at the two vertices, respectively. We then have to
+          // make sure by matching @p{b,c} that these tangentials are
+          // orthogonal to the normals returned by the boundary object
           const Tensor<1,2> coordinate_vector = line->vertex(1) - line->vertex(0);
           const double      h                 = std::sqrt(coordinate_vector * coordinate_vector);
           Tensor<1,2> coordinate_axis = coordinate_vector;
@@ -151,18 +109,18 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
                              -face_vertex_normals[1][0] * std::sin(alpha)))
                            -2*c;
 
+          QGaussLobatto<1> quad_points(4);
+          const double t1 = quad_points.point(1)[0];
+          const double t2 = quad_points.point(2)[0];
+          const double s_t1 = (((-b-c)*t1+b)*t1+c)*t1;
+          const double s_t2 = (((-b-c)*t2+b)*t2+c)*t2;
 
-          // next evaluate the so
-          // determined cubic
-          // polynomial at the points
-          // 1/3 and 2/3, first in
-          // unit coordinates
-          const Point<2> new_unit_points[2] = { Point<2>(1./3., 1./27.*(2*b+8*c)),
-                                                Point<2>(2./3., 4./27.*b+10./27.*c)
+          // next evaluate the so determined cubic polynomial at the points
+          // 1/3 and 2/3, first in unit coordinates
+          const Point<2> new_unit_points[2] = { Point<2>(t1, s_t1),
+                                                Point<2>(t2, s_t2)
                                               };
-          // then transform these
-          // points to real
-          // coordinates by rotating,
+          // then transform these points to real coordinates by rotating,
           // scaling and shifting
           for (unsigned int i=0; i<2; ++i)
             {

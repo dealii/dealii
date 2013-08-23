@@ -1566,7 +1566,7 @@ public:
     virtual
     void
     create_notification (const Triangulation<dim, spacedim> &tria);
-  } DEAL_II_DEPRECATED;
+  };
 
   /**
    * A structure that is used as an
