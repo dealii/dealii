@@ -462,40 +462,6 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool& use_mw)
 }
 
 
-
-// @sect4{LaplaceProblem::solve}
-
-// This is the other function that is
-// significantly different in support of the
-// multigrid solver (or, in fact, the
-// preconditioner for which we use the
-// multigrid method).
-//
-// Let us start out by setting up two of the
-// components of multilevel methods: transfer
-// operators between levels, and a solver on
-// the coarsest level. In finite element
-// methods, the transfer operators are
-// derived from the finite element function
-// spaces involved and can often be computed
-// in a generic way independent of the
-// problem under consideration. In that case,
-// we can use the MGTransferPrebuilt class
-// that, given the constraints on the global
-// level and an MGDoFHandler object computes
-// the matrices corresponding to these
-// transfer operators.
-//
-// The second part of the following lines
-// deals with the coarse grid solver. Since
-// our coarse grid is very coarse indeed, we
-// decide for a direct solver (a Householder
-// decomposition of the coarsest level
-// matrix), even if its implementation is not
-// particularly sophisticated. If our coarse
-// mesh had many more cells than the five we
-// have here, something better suited would
-// obviously be necessary here.
 template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
@@ -545,25 +511,6 @@ void LaplaceProblem<dim>::solve ()
 }
 
 
-
-// @sect4{Postprocessing}
-
-// The following two functions postprocess a
-// solution once it is computed. In
-// particular, the first one refines the mesh
-// at the beginning of each cycle while the
-// second one outputs results at the end of
-// each such cycle. The functions are almost
-// unchanged from those in step-6, with the
-// exception of two minor differences: The
-// KellyErrorEstimator::estimate function
-// wants an argument of type DoFHandler, not
-// MGDoFHandler, and so we have to cast from
-// derived to base class; and we generate
-// output in VTK format, to use the more
-// modern visualization programs available
-// today compared to those that were
-// available when step-6 was written.
 template <int dim>
 void LaplaceProblem<dim>::refine_grid (const std::string& reftype)
 {
@@ -619,16 +566,6 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 }
 
 
-// @sect4{LaplaceProblem::run}
-
-// Like several of the functions above, this
-// is almost exactly a copy of of the
-// corresponding function in step-6. The only
-// difference is the call to
-// <code>assemble_multigrid</code> that takes
-// care of forming the matrices on every
-// level that we need in the multigrid
-// method.
 template <int dim>
 void LaplaceProblem<dim>::run ()
 {
@@ -673,10 +610,6 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-// @sect3{The main() function}
-//
-// This is again the same function as
-// in step-6:
 int main ()
 {
   initlog(__FILE__, true);
