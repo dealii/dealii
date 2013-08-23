@@ -256,29 +256,24 @@ namespace MeshWorker
     {
     public:
       /**
-       * Constructor, initializing
-       * the #threshold, which
-       * limits how small numbers
-       * may be to be entered into
-       * the matrix.
+       * Constructor, initializing the #threshold, which limits how
+       * small numbers may be to be entered into the matrix.
        */
       MGMatrixSimple(double threshold = 1.e-12);
 
       /**
-       * Store the result matrix
-       * for later assembling.
+       * Store the result matrix for later assembling.
        */
       void initialize(MGLevelObject<MATRIX> &m);
 
       /**
-       * Initialize the multilevel
-       * constraints.
+       * Initialize the multilevel constraints.
        */
       void initialize(const MGConstrainedDoFs &mg_constrained_dofs);
 
       /**
-       * @deprecated This function is of no effect. Only the block info
-       * structure in DoFInfo is being used.
+       * @deprecated This function is of no effect. Only the block
+       * info structure in DoFInfo is being used.
        *
        * Store information on the local block structure. If the
        * assembler is inititialized with this function,
@@ -920,8 +915,7 @@ namespace MeshWorker
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(k,j)) >= threshold)
-                if (//mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
-                    !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+		if (!mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   G.add(i1[j], i2[k], M(k,j));
         }
     }
@@ -950,8 +944,7 @@ namespace MeshWorker
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(j,k)) >= threshold)
-                if (//mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
-                    !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+                if (!mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   G.add(i1[j], i2[k], M(j,k));
         }
     }
@@ -967,49 +960,41 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-
-      if (mg_constrained_dofs == 0)
-        {
-          for (unsigned int j=0; j<i1.size(); ++j)
-            for (unsigned int k=0; k<i2.size(); ++k)
-              if (std::fabs(M(j,k)) >= threshold)
-                G.add(i1[j], i2[k], M(j,k));
-        }
-      else
-        {
-          for (unsigned int j=0; j<i1.size(); ++j)
-            for (unsigned int k=0; k<i2.size(); ++k)
-              if (std::fabs(M(j,k)) >= threshold)
-                // Enter values into matrix only if j corresponds to a
-                // degree of freedom on the refinemenent edge, k does
-                // not, and both are not on the boundary. This is part
-                // the difference between the complete matrix with no
-                // boundary condition at the refinement edge and and
-                // the matrix assembled above by assemble().
-
-                // Thus the logic is: enter the row if it is
-                // constrained by hanging node constraints (actually,
-                // the whole refinement edge), but not if it is
-                // constrained by a boundary constraint.
-                if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
-                    !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
-                  {
-                    if (mg_constrained_dofs->set_boundary_values())
-                      {
-                        if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-                             !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
-                            ||
-                            (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-                             mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
-                             i1[j] == i2[k]))
-                          G.add(i1[j], i2[k], M(j,k));
-                      }
-                    else
-                      G.add(i1[j], i2[k], M(j,k));
-                  }
-        }
+      Assert(mg_constrained_dofs != 0, ExcInternalError());
+      
+      for (unsigned int j=0; j<i1.size(); ++j)
+	for (unsigned int k=0; k<i2.size(); ++k)
+	  if (std::fabs(M(j,k)) >= threshold)
+					     // Enter values into matrix only if j corresponds to a
+					     // degree of freedom on the refinemenent edge, k does
+					     // not, and both are not on the boundary. This is part
+					     // the difference between the complete matrix with no
+					     // boundary condition at the refinement edge and and
+					     // the matrix assembled above by assemble().
+	    
+					     // Thus the logic is: enter the row if it is
+					     // constrained by hanging node constraints (actually,
+					     // the whole refinement edge), but not if it is
+					     // constrained by a boundary constraint.
+	    if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+		!mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+	      {
+		if (mg_constrained_dofs->set_boundary_values())
+		  {
+		    if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+			 !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
+			||
+			(mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+			 mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
+			 i1[j] == i2[k]))
+		      G.add(i1[j], i2[k], M(j,k));
+		  }
+		else
+		  G.add(i1[j], i2[k], M(j,k));
+	      }
     }
-
+    
+    
     template <class MATRIX>
     inline void
     MGMatrixSimple<MATRIX>::assemble_out(
@@ -1021,38 +1006,29 @@ namespace MeshWorker
     {
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
-
-      if (mg_constrained_dofs == 0)
-        {
-          for (unsigned int j=0; j<i1.size(); ++j)
-            for (unsigned int k=0; k<i2.size(); ++k)
-              if (std::fabs(M(k,j)) >= threshold)
-                G.add(i1[j], i2[k], M(k,j));
-        }
-      else
-        {
-          for (unsigned int j=0; j<i1.size(); ++j)
-            for (unsigned int k=0; k<i2.size(); ++k)
-              if (std::fabs(M(k,j)) >= threshold)
-                if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
-                    !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
-                  {
-                    if (mg_constrained_dofs->set_boundary_values())
-                      {
-                        if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-                             !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
-                            ||
-                            (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-                             mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
-                             i1[j] == i2[k]))
-                          G.add(i1[j], i2[k], M(k,j));
-                      }
-                    else
-                      G.add(i1[j], i2[k], M(k,j));
-                  }
-        }
+      Assert(mg_constrained_dofs != 0, ExcInternalError());
+      
+      for (unsigned int j=0; j<i1.size(); ++j)
+	for (unsigned int k=0; k<i2.size(); ++k)
+	  if (std::fabs(M(k,j)) >= threshold)
+	    if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+		!mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+	      {
+		if (mg_constrained_dofs->set_boundary_values())
+		  {
+		    if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+			 !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
+			||
+			(mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+			 mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
+			 i1[j] == i2[k]))
+		      G.add(i1[j], i2[k], M(k,j));
+		  }
+		else
+		  G.add(i1[j], i2[k], M(k,j));
+	      }
     }
-
+  
 
     template <class MATRIX>
     template <class DOFINFO>
