@@ -164,7 +164,7 @@ namespace FETools
    * numbering of local degrees of freedom, namely first first vertex,
    * then second vertex, after vertices lines, quads, and hexes. For
    * each index, the entry indicates the index which this degree of
-   * freedom receives in a umbering scheme, where the first block is
+   * freedom receives in a numbering scheme, where the first block is
    * numbered completely before the second.
    */
   template<int dim, int spacedim>
