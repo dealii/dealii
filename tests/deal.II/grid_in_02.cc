@@ -56,7 +56,7 @@ void test2 ()
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("2d.xda");
+  std::ifstream in (SOURCE_DIR "/grid_in_02/2d.xda");
   try
     {
       gi.read_xda (in);

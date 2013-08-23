@@ -47,9 +47,9 @@ void test (const std::string &infilename)
 
 int main ()
 {
-  test<2> ("1.dat");
-  test<2> ("2.dat");
-  test<2> ("3.dat");
-  test<2> ("4.dat");
+  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/1.dat"));
+  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/2.dat"));
+  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/3.dat"));
+  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/4.dat"));
 }
 
