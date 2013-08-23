@@ -85,7 +85,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
       #
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         COMMAND ${_full_test}
-        COMMAND ${PERL_EXECUTABLE} -pi
+        COMMAND
+            ${PERL_EXECUTABLE} -pi
             ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
             ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
@@ -100,10 +101,11 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
       ENDIF()
 
       ADD_CUSTOM_TARGET(${_full_test}.diff
-        COMMAND ${DEAL_II_TEST_DIFF}
+        COMMAND
+          ${DEAL_II_TEST_DIFF}
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${_comparison}
-          | tee ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
+          > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
         DEPENDS
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${_comparison}

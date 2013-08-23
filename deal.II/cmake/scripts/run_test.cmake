@@ -12,7 +12,10 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   )
 
 IF("${_result_code}" STREQUAL "0")
+  MESSAGE("***   ***")
   MESSAGE("${TEST}: Diff successful")
+  MESSAGE(${_output})
+  MESSAGE("***   ***")
 
 ELSE()
 
