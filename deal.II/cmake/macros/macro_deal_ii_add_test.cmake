@@ -37,8 +37,6 @@
 #   - specifying the maximal wall clock time in seconds a test is allowed
 #     to run
 #
-# TODO: LABEL and MEASUREMENT
-#
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name [configurations])
 #
@@ -54,6 +52,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
       SET(_test ${_test_name}.${_build_lowercase})
       SET(_full_test ${_category}-${_test_name}.${_build_lowercase})
 
+      #
+      # Add an executable for the current test and set up compile
+      # definitions and the full link interface:
+      #
       ADD_EXECUTABLE(${_full_test} EXCLUDE_FROM_ALL ${_test_name}.cc)
 
       SET_TARGET_PROPERTIES(${_full_test} PROPERTIES
@@ -78,19 +80,17 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         )
 
 
+      #
+      # Add a top level target to run the test and compare the output:
+      #
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         COMMAND ${_full_test}
-        # TODO: Refactor:
         COMMAND ${PERL_EXECUTABLE} -pi
             ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
             ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         DEPENDS ${_full_test} ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
         )
-      ADD_CUSTOM_TARGET(${_full_test}.run
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-        )
-
 
       SET(_comparison ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name})
       IF(EXISTS ${_comparison}.${_build_lowercase}.output)
@@ -99,7 +99,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         SET(_comparison ${_comparison}.output)
       ENDIF()
 
-      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
+      ADD_CUSTOM_TARGET(${_full_test}.diff
         COMMAND ${DEAL_II_TEST_DIFF}
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${_comparison}
@@ -108,18 +108,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${_comparison}
         )
-      ADD_CUSTOM_TARGET(${_full_test}.diff
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
-        )
 
-      IF(CMAKE_GENERATOR MATCHES "Makefiles")
-        SET(_test_suffix "/fast")
-      ENDIF()
 
+      #
+      # And finally add the test:
+      #
       ADD_TEST(NAME ${_category}/${_test}
         COMMAND ${CMAKE_COMMAND}
           -DTEST=${_full_test}
-          -DTEST_SUFFIX=${_test_suffix}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
