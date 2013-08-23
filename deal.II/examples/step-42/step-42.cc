@@ -217,7 +217,7 @@ double Input<dim>::obstacle_function(double x, double y) {
 }
 
 // As mentioned above this function reads in the
-// obstacle datas and stores them in the std::vector
+// obstacle data and stores them in the std::vector
 // obstacle_data. It will be used only in run ().
 template<int dim>
 void Input<dim>::read_obstacle(const char* name) {
@@ -244,11 +244,11 @@ void Input<dim>::read_obstacle(const char* name) {
 
 // This class provides an interface
 // for a constitutive law. In this
-// example we are using an elasto
-// plastic material behavior with linear,
+// example we are using an elastoplastic
+// material behavior with linear,
 // isotropic hardening.
-// For gamma = 0 we obtain perfect elasto
-// plasticity behavior.
+// For gamma = 0 we obtain perfect elastoplastic
+// behavior.
 template<int dim>
 class ConstitutiveLaw {
 public:
@@ -312,7 +312,8 @@ ConstitutiveLaw<dim>::ConstitutiveLaw(double _E, double _nu, double _sigma_0,
 
 // @sect3{ConstitutiveLaw::ConstitutiveLaw}
 
-// Calculates the strain for the shape functions.
+// Calculates the strain $\varepsilon(\varphi)=\dfrac{1}{2}\left(\nabla\varphi + \nabla\varphi^T$
+// for the shape functions $\varphi$.
 template<int dim>
 inline SymmetricTensor<2, dim> ConstitutiveLaw<dim>::get_strain(
 		const FEValues<dim> &fe_values, const unsigned int shape_func,
@@ -331,7 +332,9 @@ inline SymmetricTensor<2, dim> ConstitutiveLaw<dim>::get_strain(
 // deviator part of the stresses in a quadrature point back to
 // the yield stress plus the linear isotropic hardening.
 // Also we sum up the elastic and the plastic quadrature
-// points.
+// points. We need this function to calculate the nonlinear
+// residual in
+// PlasticityContactProblem::residual_nl_system(TrilinosWrappers::MPI::Vector &u).
 template<int dim>
 void ConstitutiveLaw<dim>::plast_linear_hardening(
 		SymmetricTensor<4, dim> &stress_strain_tensor,
@@ -364,8 +367,16 @@ void ConstitutiveLaw<dim>::plast_linear_hardening(
 
 // @sect3{ConstitutiveLaw::linearized_plast_linear_hardening}
 
-// This function returns the linearized stress strain tensor.
-// It contains the derivative of the nonlinear constitutive law.
+// This function returns the linearized stress strain tensor
+// in the solution $u^{i-1}$ of the previous Newton $i-1$ step.
+// The parameter strain_tensor $\varepsilon(u^{i-1})$ is calculated
+// by $u^{i-1}$. It contains the derivative of the nonlinear
+// constitutive law. As the result this function returns
+// the stress_strain_tensor of the nonlinear problem as well as
+// the stress_strain_tensor_linearized of the linearized problem.
+// See
+// PlasticityContactProblem::assemble_nl_system(TrilinosWrappers::MPI::Vector &u)
+// where this function is used.
 template<int dim>
 void ConstitutiveLaw<dim>::linearized_plast_linear_hardening(
 		SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
@@ -426,7 +437,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
 	if (component == 1)
 		return_value = 0.0;
 	if (component == 2)
-	  return_value = 0.0;//-26923.07692;
+	  return_value = 0.0;
 
 	return return_value;
 }
@@ -592,7 +603,7 @@ private:
 	void
 	output_results(const std::string &title);
 	void
-	output_for_benchmark(const unsigned int cycle);
+	output_contact_force(const unsigned int cycle);
 
 	double to_refine_factor;
 	double to_coarsen_factor;
@@ -606,6 +617,9 @@ private:
 	FESystem<dim> fe;
 	DoFHandler<dim> dof_handler;
 
+	// We are using the SolutionTransfer class to interpolate the
+	// solution on the new refined mesh. It appears in th refine_grid()
+	// and the run() function.
 	std_cxx1x::shared_ptr<
 			parallel::distributed::SolutionTransfer<dim,
 					TrilinosWrappers::MPI::Vector> > soltrans;
@@ -1755,10 +1769,24 @@ void PlasticityContactProblem<dim>::output_results(
 	move_mesh(tmp);
 }
 
-// @sect4{PlasticityContactProblem::output_for_benchmark}
+// @sect4{PlasticityContactProblem::output_contact_force}
 
+// This function provides the contact force by calculating
+// an integral over the contact pressure in z-directions
+// over the contact area. For this purpose we set the contact
+// pressure lambda to 0 for all inactive dofs. For all
+// active dofs we lambda contains the quotient of the nonlinear
+// residual (resid_vector) and corresponding diagonal entry
+// of the mass matrix (diag_mass_matrix_vector). Because it is
+// not unlikely that hanging nodes shows up in the contact area
+// it is important to apply contraints_hanging_nodes.distribute
+// to the distributed_lambda vector.
+// To calculate the contact pressure in a certain point in the
+// contact area, we have make use of the Functions::FEFieldFunction
+// In parallel this is little tricky because we have to find the
+// process with the right cell which contains this point.
 template<int dim>
-void PlasticityContactProblem<dim>::output_for_benchmark(
+void PlasticityContactProblem<dim>::output_contact_force(
 		const unsigned int cycle) {
 	Functions::FEFieldFunction<dim, DoFHandler<dim>,
 			TrilinosWrappers::MPI::Vector> solution_function(dof_handler,
@@ -1819,7 +1847,7 @@ void PlasticityContactProblem<dim>::output_for_benchmark(
 		typename DoFHandler<dim>::active_cell_iterator cell =
 				dof_handler.begin_active(), endc = dof_handler.end();
 		for (; cell != endc; ++cell)
-			if (cell->is_locally_owned())
+		  if (cell->is_locally_owned())
 				for (unsigned int face = 0;
 						face < GeometryInfo < dim > ::faces_per_cell; ++face)
 					if (cell->face(face)->at_boundary()
