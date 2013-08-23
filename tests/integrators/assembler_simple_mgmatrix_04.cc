@@ -20,15 +20,31 @@
  */
 
 #include "../tests.h"
+#include <deal.II/base/function.h>
+#include <deal.II/base/function_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 
+#include <deal.II/integrators/laplace.h>
+
+#include <deal.II/meshworker/dof_info.h>
+#include <deal.II/meshworker/integration_info.h>
+#include <deal.II/meshworker/local_integrator.h>
+#include <deal.II/meshworker/simple.h>
+#include <deal.II/meshworker/loop.h>
+
+#include <deal.II/multigrid/sparse_matrix_collection.h>
+
 using namespace dealii;
+using namespace LocalIntegrators;
+
 
 template <int dim>
 class LaplaceMatrix : public MeshWorker::LocalIntegrator<dim>
@@ -50,10 +66,7 @@ LaplaceMatrix<dim>::LaplaceMatrix()
 template <int dim>
 void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const
 {
-  const unsigned int n_blocks = dinfo.block_info->local().size();
-  AssertDimension (dinfo.n_matrices(), n_blocks*n_blocks);
-  for(unsigned int b=0; b<n_blocks; ++b)
-    Laplace::cell_matrix(dinfo.matrix(b+b*n_blocks,false).matrix, info.fe_values(b));
+  Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values());
 }
 
 
@@ -61,13 +74,9 @@ template <int dim>
 void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim>& dinfo,
 				       typename MeshWorker::IntegrationInfo<dim>& info) const
 {
-  const unsigned int n_blocks = dinfo.block_info->local().size();
-  for(unsigned int b=0; b<n_blocks; ++b)
-    {
-      const unsigned int deg = info.fe_values(b).get_fe().tensor_degree();
-      Laplace::nitsche_matrix(dinfo.matrix(b+b*n_blocks,false).matrix, info.fe_values(b),
+  const unsigned int deg = info.fe_values().get_fe().tensor_degree();
+  Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(),
 			      Laplace::compute_penalty(dinfo, dinfo, deg, deg));
-    } 
 }
 
 
@@ -76,110 +85,43 @@ void LaplaceMatrix<dim>::face(
   MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
   MeshWorker::IntegrationInfo<dim>& info1, MeshWorker::IntegrationInfo<dim>& info2) const
 {
-  const unsigned int n_blocks = dinfo1.block_info->local().size();
-  for (unsigned int b=0;b<n_blocks;++b)
-    {
-      const unsigned int diag = b+b*n_blocks;
-      if (info1.fe_values(b).get_fe().conforms(FiniteElementData<dim>::H1))
-	continue;
-      
-      const unsigned int deg = info1.fe_values(b).get_fe().tensor_degree();
-      
-      if (info1.fe_values(b).get_fe().conforms(FiniteElementData<dim>::Hdiv) &&
-	  !info1.fe_values(b).get_fe().conforms(FiniteElementData<dim>::Hcurl))
-	Laplace::ip_tangential_matrix(dinfo1.matrix(diag,false).matrix, dinfo1.matrix(diag,true).matrix, 
-				      dinfo2.matrix(diag,true).matrix, dinfo2.matrix(diag,false).matrix,
-				      info1.fe_values(b), info2.fe_values(b),
+  if (info1.fe_values().get_fe().conforms(FiniteElementData<dim>::H1))
+    return;
+  
+  const unsigned int deg = info1.fe_values().get_fe().tensor_degree();
+  
+  if (info1.fe_values().get_fe().conforms(FiniteElementData<dim>::Hdiv) &&
+	  !info1.fe_values().get_fe().conforms(FiniteElementData<dim>::Hcurl))
+	Laplace::ip_tangential_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix, 
+				      dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
+				      info1.fe_values(), info2.fe_values(),
 				      Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
       else
-	Laplace::ip_matrix(dinfo1.matrix(diag,false).matrix, dinfo1.matrix(diag,true).matrix, 
-			   dinfo2.matrix(diag,true).matrix, dinfo2.matrix(diag,false).matrix,
-			   info1.fe_values(b), info2.fe_values(b),
+	Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix, 
+			   dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
+			   info1.fe_values(), info2.fe_values(),
 			   Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
-    }
-}
-
-template <int dim>
-class LaplaceMatrix : public MeshWorker::LocalIntegrator<dim>
-{
-public:
-  LaplaceMatrix();
-  virtual void cell(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const;
-  virtual void boundary(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const;
-  virtual void face(MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
-		    MeshWorker::IntegrationInfo<dim>& info1, MeshWorker::IntegrationInfo<dim>& info2) const;
-};
-
-
-template <int dim>
-LaplaceMatrix<dim>::LaplaceMatrix()
-{}
-
-
-template <int dim>
-void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const
-{
-  const unsigned int n_blocks = dinfo.block_info->local().size();
-  AssertDimension (dinfo.n_matrices(), n_blocks*n_blocks);
-  for(unsigned int b=0; b<n_blocks; ++b)
-    Laplace::cell_matrix(dinfo.matrix(b+b*n_blocks,false).matrix, info.fe_values(b));
 }
 
 
 template <int dim>
-void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim>& dinfo,
-				       typename MeshWorker::IntegrationInfo<dim>& info) const
-{
-  const unsigned int n_blocks = dinfo.block_info->local().size();
-  for(unsigned int b=0; b<n_blocks; ++b)
-    {
-      const unsigned int deg = info.fe_values(b).get_fe().tensor_degree();
-      Laplace::nitsche_matrix(dinfo.matrix(b+b*n_blocks,false).matrix, info.fe_values(b),
-			      Laplace::compute_penalty(dinfo, dinfo, deg, deg));
-    } 
-}
-
-
-template <int dim>
-void LaplaceMatrix<dim>::face(
-  MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
-  MeshWorker::IntegrationInfo<dim>& info1, MeshWorker::IntegrationInfo<dim>& info2) const
-{
-  const unsigned int n_blocks = dinfo1.block_info->local().size();
-  for (unsigned int b=0;b<n_blocks;++b)
-    {
-      const unsigned int diag = b+b*n_blocks;
-      if (info1.fe_values(b).get_fe().conforms(FiniteElementData<dim>::H1))
-	continue;
-      
-      const unsigned int deg = info1.fe_values(b).get_fe().tensor_degree();
-      
-      if (info1.fe_values(b).get_fe().conforms(FiniteElementData<dim>::Hdiv) &&
-	  !info1.fe_values(b).get_fe().conforms(FiniteElementData<dim>::Hcurl))
-	Laplace::ip_tangential_matrix(dinfo1.matrix(diag,false).matrix, dinfo1.matrix(diag,true).matrix, 
-				      dinfo2.matrix(diag,true).matrix, dinfo2.matrix(diag,false).matrix,
-				      info1.fe_values(b), info2.fe_values(b),
-				      Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
-      else
-	Laplace::ip_matrix(dinfo1.matrix(diag,false).matrix, dinfo1.matrix(diag,true).matrix, 
-			   dinfo2.matrix(diag,true).matrix, dinfo2.matrix(diag,false).matrix,
-			   info1.fe_values(b), info2.fe_values(b),
-			   Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
-    }
-}
-
-template <int dim>
-void assemble_mg_matrix(FiniteElement<dim> &fe, Mapping<dim>& mapping, DoFHandler<dim>& dof_handler,
+void assemble_mg_matrix(DoFHandler<dim>& dof_handler,
    MeshWorker::LocalIntegrator<dim>& matrix_integrator, mg::SparseMatrixCollection<double>& mg)
 {
+  MGConstrainedDoFs mg_constraints;
+  mg_constraints.clear();
+  mg_constraints.initialize(dof_handler);
+  
   mg.set_zero();
+
+  MappingQ1<dim> mapping;
   
   MeshWorker::IntegrationInfoBox<dim> info_box;
   UpdateFlags update_flags = update_values | update_gradients | update_hessians;
   info_box.add_update_flags_all(update_flags);
-  info_box.initialize(fe, mapping, &dof_handler.block_info());
+  info_box.initialize(dof_handler.get_fe(), mapping);
 
-  MeshWorker::DoFInfo<dim> dof_info(dof_handler.block_info());
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
   
   MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
   assembler.initialize(mg_constraints);
@@ -188,13 +130,13 @@ void assemble_mg_matrix(FiniteElement<dim> &fe, Mapping<dim>& mapping, DoFHandle
   assembler.initialize_fluxes(mg.matrix_up, mg.matrix_down);
   
   MeshWorker::integration_loop<dim, dim> (
-    mg_dof_handler.begin(), mg_dof_handler.end(),
+    dof_handler.begin_mg(), dof_handler.end_mg(),
     dof_info, info_box, matrix_integrator, assembler);
 
-  const unsigned int nlevels = triangulation.n_levels();
+  const unsigned int nlevels = dof_handler.get_tria().n_levels();
   for (unsigned int level=0;level<nlevels;++level)
   {
-    for(unsigned int i=0; i<mg_dof_handler.n_dofs(level); ++i)
+    for(unsigned int i=0; i<dof_handler.n_dofs(level); ++i)
       if(mg.matrix[level].diag_element(i)==0)
         mg.matrix[level].set(i,i,1.);
   }
@@ -214,52 +156,15 @@ void test(FiniteElement<dim> &fe)
   GridGenerator::subdivided_hyper_rectangle(tr, repititions, p1, p2);
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
-
-//  MGDoFHandler<dim> dof(tr);
-//  dof.distribute_dofs(fe);
-//  dof.initialize_local_block_info();
-//  DoFRenumbering::component_wise(dof);
-//
-//  deallog << "DoFs " << dof.n_dofs() << std::endl;
-//
-//  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin_active();
-//  typename MGDoFHandler<dim>::face_iterator face = cell->face(1);
-//  typename MGDoFHandler<dim>::cell_iterator neighbor = cell->neighbor(1);
-//
-//  MGLevelObject<SparsityPattern> sparsity(0, tr.n_levels()-1);
-//  MGLevelObject<SparseMatrix<double> > matrix(0, tr.n_levels()-1);
-//
-//  for (unsigned int level=0; level<tr.n_levels(); ++level)
-//    {
-//      CompressedSparsityPattern csp(dof.n_dofs(level),dof.n_dofs(level));
-//      MGTools::make_flux_sparsity_pattern(dof, csp, level);
-//      sparsity[level].copy_from(csp);
-//      matrix[level].reinit(sparsity[level]);
-//    }
-//
-//  MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > ass;
-//  ass.initialize(matrix);
-//  ass.initialize_local_blocks(dof.block_info().local());
-//  MeshWorker::DoFInfo<dim> info(dof.block_info());
-//  ass.initialize_info(info, false);
-//  MeshWorker::DoFInfo<dim> infon(dof.block_info());
-//  ass.initialize_info(infon, true);
-//
-//  deallog << "cell" << std::endl;
-//  info.reinit(cell);
-//  fill_matrices(info, false);
-//  ass.assemble(info);
-//  matrix[1].print_formatted(deallog.get_file_stream(), 0, false, 6);
-//  matrix[1] = 0.;
-//
-//  deallog << "face" << std::endl;
-//  ass.initialize_info(info, true);
-//  info.reinit(cell, face, 1);
-//  infon.reinit(neighbor, neighbor->face(0), 0);
-//  fill_matrices(info, true);
-//  fill_matrices(infon, true);
-//  ass.assemble(info, infon);
-//  matrix[1].print_formatted(deallog.get_file_stream(), 0, false, 6);
+  
+  LaplaceMatrix<dim> matrix_integrator;
+  
+  MGDoFHandler<dim> dof(tr);
+  dof.distribute_dofs(fe);
+  mg::SparseMatrixCollection<double> mg;
+  mg.resize(0,tr.n_levels()-1);
+  mg.reinit(dof);
+  assemble_mg_matrix(dof, matrix_integrator, mg);
 }
 
 int main()
