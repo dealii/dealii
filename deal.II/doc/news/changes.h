@@ -69,6 +69,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: The method VectorTools::compute_normal_flux_constraints can be used to
+  force a vector finite element function to be normal to the boundary.
+  <br>
+  (Martin Kronbichler, 2013/08/23)
+  </li>
+
+  <li>
   Improved: MappingQ now uses the points of the Gauss-Lobatto quadrature
   formula as support points instead of equispaced ones. This allows its use
   for high polynomial orders and also gives better interpolation of circular
