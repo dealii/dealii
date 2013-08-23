@@ -12,16 +12,16 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   )
 
 IF("${_result_code}" STREQUAL "0")
-  MESSAGE("***   ***")
-  MESSAGE("${TEST}: Diff successful")
-  MESSAGE(${_output})
-  MESSAGE("***   ***")
+  MESSAGE("${TEST}: BUILD successful")
+  MESSAGE("${TEST}: RUN successful")
+  MESSAGE("${TEST}: DIFF successful")
 
 ELSE()
 
-  MESSAGE("***   ***")
-  MESSAGE("${TEST}: Diff failed:")
+  MESSAGE("***      ***")
   MESSAGE(${_output})
-  MESSAGE("***   ***")
+  # TODO: Be a bit more verbose ;-)
+  MESSAGE("${TEST}: TEST failed")
+  MESSAGE("***      ***")
   MESSAGE(FATAL_ERROR "*** Test aborted.")
 ENDIF()
