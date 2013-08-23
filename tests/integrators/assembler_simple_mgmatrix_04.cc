@@ -165,6 +165,20 @@ void test(FiniteElement<dim> &fe)
   mg.resize(0,tr.n_levels()-1);
   mg.reinit(dof);
   assemble_mg_matrix(dof, matrix_integrator, mg);
+
+  for (unsigned int level=0;level<tr.nlevels();++level)
+  {
+    deallog << "mg" << std::endl;
+    mg.matrix[level].print(deallog.get_file_stream());
+    deallog << "in" << std::endl;
+    mg.matrix_in[level].print(deallog.get_file_stream());
+    deallog << "out" << std::endl;
+    mg.matrix_out[level].print(deallog.get_file_stream());
+    deallog << "up" << std::endl;
+    mg.matrix_up[level].print(deallog.get_file_stream());
+    deallog << "down" << std::endl;
+    mg.matrix_down[level].print(deallog.get_file_stream());
+  }
 }
 
 int main()
