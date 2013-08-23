@@ -69,6 +69,16 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Improved: MappingQ now uses the points of the Gauss-Lobatto quadrature
+  formula as support points instead of equispaced ones. This allows its use
+  for high polynomial orders and also gives better interpolation of circular
+  boundaries. Beware that mappings of order three and higher will behave
+  slightly differently now (usually better).
+  <br>
+  (Martin Kronbichler, 2013/08/23)
+  </li>
+
+  <li>
   Improved: Several .cc files in the deal.II directory have been split in
   order to better utilize multiple processors when compiling in parallel and
   reduce memory requirements of the compilation stage.
