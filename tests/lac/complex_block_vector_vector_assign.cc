@@ -72,7 +72,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("complex_block_vector_vector_assign/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);

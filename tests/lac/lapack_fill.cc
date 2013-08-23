@@ -27,7 +27,7 @@
 
 int main ()
 {
-  std::ofstream logfile("lapack_fill/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

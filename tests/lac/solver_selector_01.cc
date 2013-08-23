@@ -69,7 +69,7 @@ check(const MATRIX &A, const VECTOR &f)
 
 int main()
 {
-  std::ofstream logfile("solver_selector_01/output");
+  std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);

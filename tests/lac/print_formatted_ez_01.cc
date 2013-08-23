@@ -28,7 +28,7 @@
 
 int main()
 {
-  std::ofstream logfile("print_formatted_ez_01/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);

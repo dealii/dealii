@@ -53,7 +53,7 @@ check_solve( SOLVER &solver, const MATRIX &A,
 
 int main()
 {
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);

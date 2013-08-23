@@ -31,7 +31,7 @@
 void test ()
 {
   IndexSet rel;
-  std::ifstream f("constraints_01/is.23");
+  std::ifstream f(SOURCE_DIR "/constraints_01/is.23");
   rel.read(f);
 
   ConstraintMatrix cm;
@@ -60,7 +60,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("constraints_01/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

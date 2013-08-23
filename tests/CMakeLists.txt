@@ -85,7 +85,7 @@ ADD_SUBDIRECTORY(fe)
 ADD_SUBDIRECTORY(grid)
 #hp
 #integrators
-#lac
+ADD_SUBDIRECTORY(lac)
 #lib
 #matrix_free
 #mesh_converter

@@ -69,7 +69,7 @@ void check_sparse_product(const SparseMatrix<number> &m1, SparseMatrix<number> &
 
 int main()
 {
-  std::ofstream logfile("matrix_lib/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(0);
   deallog.attach(logfile);

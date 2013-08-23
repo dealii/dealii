@@ -30,7 +30,7 @@
 
 int main()
 {
-  std::ofstream logfile("matrices_lapack/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);

@@ -80,7 +80,7 @@ check(const MATRIX &A, const VECTOR &f)
 
 int main()
 {
-  std::ofstream logfile("solver_selector_02/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

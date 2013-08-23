@@ -112,7 +112,7 @@ void check_complex_norms ()
 
 int main()
 {
-  std::ofstream logfile("vector_norms/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);

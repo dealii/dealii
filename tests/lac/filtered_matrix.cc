@@ -85,7 +85,7 @@ void test (const FilteredMatrix<VECTOR> &M)
 
 int main()
 {
-  std::ofstream logfile("filtered_matrix/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

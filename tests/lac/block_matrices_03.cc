@@ -59,7 +59,7 @@ void do_add (const bool even_or_odd,
 
 void test ()
 {
-  std::ofstream logfile("block_matrices_03/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);

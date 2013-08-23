@@ -57,7 +57,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("constraints_zero_merge/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

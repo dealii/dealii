@@ -22,7 +22,7 @@
 
 int main ()
 {
-  std::ofstream logfile("sparsity_pattern_08/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);

@@ -32,7 +32,7 @@
 
 int main()
 {
-  std::ofstream logfile("eigen/output");
+  std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);

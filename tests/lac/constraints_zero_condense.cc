@@ -70,7 +70,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("constraints_zero_condense/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision (2);
 
   deallog.attach(logfile);

@@ -28,7 +28,7 @@
 
 int main()
 {
-  std::ofstream logfile("block_compressed_01/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(2);
   deallog.attach(logfile);

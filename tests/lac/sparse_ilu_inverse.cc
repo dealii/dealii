@@ -35,7 +35,7 @@
 
 int main()
 {
-  std::ofstream logfile("sparse_ilu_inverse/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(3);
   deallog.attach(logfile);

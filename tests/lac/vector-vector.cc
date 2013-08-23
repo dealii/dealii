@@ -138,7 +138,7 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   d1.sadd (2, 2, d2, 2, d3);
   print (d1);
 
-  d1 *= 4.;
+  d1.scale (4.);
   print (d1);
 
   deallog << "equ" << std::endl;
@@ -156,7 +156,7 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
 
 int main()
 {
-  std::ofstream logfile("vector-vector/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);

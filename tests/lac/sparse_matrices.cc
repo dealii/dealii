@@ -275,7 +275,7 @@ void check_conjugate(std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("sparse_matrices/output");
+  std::ofstream logfile("output");
   logfile << std::setprecision(3);
   deallog << std::setprecision(3);
   deallog.attach(logfile);

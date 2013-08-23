@@ -56,7 +56,7 @@ void test (const BlockIndices &idx)
 
 int main()
 {
-  std::ofstream logfile("block_indices/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
