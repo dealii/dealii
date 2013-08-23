@@ -166,20 +166,27 @@ void test(FiniteElement<dim> &fe)
   mg.reinit(dof);
   assemble_mg_matrix(dof, matrix_integrator, mg);
 
-  for (unsigned int level=0;level<tr.nlevels();++level)
+  for (unsigned int level=0;level<tr.n_levels();++level)
   {
-    deallog << "mg" << std::endl;
-    mg.matrix[level].print(deallog.get_file_stream());
-    deallog << "in" << std::endl;
-    mg.matrix_in[level].print(deallog.get_file_stream());
-    deallog << "out" << std::endl;
-    mg.matrix_out[level].print(deallog.get_file_stream());
-    deallog << "up" << std::endl;
-    mg.matrix_up[level].print(deallog.get_file_stream());
-    deallog << "down" << std::endl;
-    mg.matrix_down[level].print(deallog.get_file_stream());
+    const unsigned int prec = 1;
+    const unsigned int wd = 5;
+    
+    deallog << "Level " << level << std::endl << "mg" << std::endl;
+    mg.matrix[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+    if (level>0)
+      {
+	deallog << "in" << std::endl;
+	mg.matrix_in[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+	deallog << "out" << std::endl;
+	mg.matrix_out[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+	deallog << "up" << std::endl;
+	mg.matrix_up[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+	deallog << "down" << std::endl;
+	mg.matrix_down[level].print_formatted(deallog.get_file_stream(), prec, false, wd, "0.");
+      }
   }
 }
+
 
 int main()
 {
@@ -191,6 +198,7 @@ int main()
   FE_DGP<2> p0(0);
   FE_DGP<2> p1(1);
   FE_RaviartThomas<2> rt0(0);
+  FE_RaviartThomas<2> rt1(1);
   FE_Q<2> q2(2);
 
   FESystem<2> sys1(p0, 2, p1, 1);
@@ -199,7 +207,8 @@ int main()
   FESystem<2> sys4(p1, 2, q2, 2);
   FESystem<2> sys5(q2, 2, p1, 2);
 
-  test(sys1);
+  test(rt0);
+  test(rt1);
 //  test(sys2);
 //  test(sys3);
 //  test(sys4);
