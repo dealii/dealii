@@ -1,0 +1,14 @@
+
+DEAL:0:3d::# flagged cells = 224
+DEAL:0:3d::#cells = 7712
+DEAL:0:3d::#dofs = 27018
+DEAL:0:3d::#constraints on 0: 297
+DEAL:0:3d::#constraints on 1: 1263
+DEAL:0:3d::#constraints on 2: 811
+DEAL:0:3d::#constraints on 3: 1376
+DEAL:0:3d::#constraints on 4: 841
+DEAL:0:3d::#constraints on 5: 1362
+DEAL:0:3d::#constraints on 6: 925
+DEAL:0:3d::#constraints on 7: 1217
+DEAL:0:3d::#constraints on 8: 577
+DEAL:0:3d::OK

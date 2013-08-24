@@ -4713,7 +4713,7 @@ namespace VectorTools
                   {
                     n_scalar_indices =
                       std::max(n_scalar_indices,
-                               fe.face_system_to_component_index(i).second);
+                               fe.face_system_to_component_index(i).second+1);
                     cell_vector_dofs[fe.face_system_to_component_index(i).second]
                       [fe.face_system_to_component_index(i).first-first_vector_component]
                       = face_dofs[i];
@@ -4728,6 +4728,7 @@ namespace VectorTools
 
     // iterate over the list of all vector components we found and see if we
     // can find constrained ones
+    unsigned int n_total_constraints_found = 0;
     for (typename std::set<std_cxx1x::array<unsigned int,dim>,PointComparator<dim> >::
            const_iterator it=vector_dofs.begin(); it!=vector_dofs.end(); ++it)
       {
@@ -4738,13 +4739,16 @@ namespace VectorTools
             {
               is_constrained[d] = true;
               ++n_constraints;
+              ++n_total_constraints_found;
             }
           else
             is_constrained[d] = false;
-        if (n_constraints > 0 && n_constraints < dim)
+        if (n_constraints > 0)
           {
-            // if more than one no-flux constraint is present, no normal flux
-            // can be set on the boundary
+            // if more than one no-flux constraint is present, we need to
+            // constrain all vector degrees of freedom (we are in a corner
+            // where several faces meet and to get a continuous FE solution we
+            // need to set all conditions to zero).
             if (n_constraints > 1)
               {
                 for (unsigned int d=0; d<dim; ++d)
@@ -4764,6 +4768,7 @@ namespace VectorTools
                   constrained_index = d;
                   normal[d] = 1.;
                 }
+            AssertIndexRange(constrained_index, dim);
             const std::vector<std::pair<unsigned int, double> >* constrained
               = no_normal_flux_constraints.get_constraint_entries((*it)[constrained_index]);
             // find components to which this index is constrained to
@@ -4793,6 +4798,8 @@ namespace VectorTools
               }
           }
       }
+    AssertDimension(n_total_constraints_found,
+                    no_normal_flux_constraints.n_constraints());
   }
 
 
