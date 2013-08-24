@@ -1529,7 +1529,13 @@ namespace VectorTools
    * different boundary indicators and call this function twice, once for each
    * boundary indicators; doing so will yield only one normal vector at this
    * point per invocation (because we consider only one boundary part at a
-   * time), with the result that the normal vectors will not be averaged.
+   * time), with the result that the normal vectors will not be averaged. This
+   * situation also needs to be taken into account when using this function
+   * around reentrant corners on Cartesian meshes. If no-normal-flux boundary
+   * conditions are to be enforced on non-Cartesian meshes around reentrant
+   * corners, one may even get cycles in the constraints as one will in
+   * general constrain different components from the two sides. In that case,
+   * set a no-slip constraint on the reentrant vertex first.
    *
    *
    * <h4>Computing constraints in 3d</h4>
