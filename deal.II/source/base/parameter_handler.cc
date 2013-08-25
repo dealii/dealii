@@ -2414,7 +2414,7 @@ ParameterHandler::scan_line (std::string         line,
           return false;
         }
 
-      std::ifstream input (line);
+      std::ifstream input (line.c_str());
       if (!input)
         {
           std::cerr << "Line <" << lineno
