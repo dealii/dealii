@@ -2491,11 +2491,12 @@ MultipleParameterLoop::~MultipleParameterLoop ()
 
 
 
-bool MultipleParameterLoop::read_input (std::istream &input)
+bool MultipleParameterLoop::read_input (std::istream &input,
+                                        const std::string &filename)
 {
   AssertThrow (input, ExcIO());
 
-  bool x = ParameterHandler::read_input (input);
+  bool x = ParameterHandler::read_input (input, filename);
   if (x)
     init_branches ();
   return x;

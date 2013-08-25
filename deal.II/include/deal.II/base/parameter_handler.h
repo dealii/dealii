@@ -2246,7 +2246,28 @@ public:
    */
   virtual ~MultipleParameterLoop ();
 
-  virtual bool read_input (std::istream &Input);
+  /**
+   * Read input from a stream until the stream returns the <tt>eof</tt> condition
+   * or error. The second argument can be used to denote the name of the file
+   * (if that's what the input stream represents) we are reading from; this
+   * is only used when creating output for error messages.
+   *
+   * Return whether the read was successful.
+   */
+  virtual bool read_input (std::istream &input,
+                           const std::string &filename = "input file");
+
+  /**
+   * Read input from a file the name of which is given. The PathSearch
+   * class "PARAMETERS" is used to find the file.
+   *
+   * Return whether the read was successful.
+   *
+   * Unless <tt>optional</tt> is <tt>true</tt>, this function will
+   * automatically generate the requested file with default values if the
+   * file did not exist. This file will not contain additional comments if
+   * <tt>write_stripped_file</tt> is <tt>true</tt>.
+   */
   virtual bool read_input (const std::string &FileName,
                            const bool optional = false,
                            const bool write_stripped_file = false);
