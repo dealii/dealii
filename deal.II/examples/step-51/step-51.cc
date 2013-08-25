@@ -896,8 +896,6 @@ Step51<dim>::postprocess()
     const UpdateFlags flags ( update_values | update_gradients |
                               update_JxW_values);
 
-    EmptyData task_data;
-
     PostProcessScratchData scratch (fe_u_post, fe_local,
                                     quadrature_formula,
                                     local_flags,
@@ -905,11 +903,12 @@ Step51<dim>::postprocess()
 
     WorkStream::run(dof_handler_u_post.begin_active(),
                     dof_handler_u_post.end(),
-                    *this,
-                    &Step51<dim>::postprocess_one_cell,
-                    std_cxx1x::function<unsigned int>(),
+                    std_cxx1x::bind (&Step51<dim>::postprocess_one_cell,
+                                     std_cxx1x::ref(*this),
+                                     std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
+                    std_cxx1x::function<void(const unsigned int&)>(),
                     scratch,
-                    task_data);
+                    0U);
   }
 
   // Compute some convergence rates, etc., and add to a table
