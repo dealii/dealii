@@ -1325,8 +1325,7 @@ bool ParameterHandler::read_input (std::istream &input)
     {
       ++lineno;
       getline (input, line);
-      if (!scan_line (line, lineno))
-        status = false;
+      status &= scan_line (line, lineno);
     }
 
   return status;
@@ -1391,8 +1390,7 @@ bool ParameterHandler::read_input_from_string (const char *s)
       input.erase (0, input.find('\n')+1);
       ++lineno;
 
-      if (!scan_line (line, lineno))
-        status = false;
+      status &= scan_line (line, lineno);
     }
 
   return status;
@@ -2293,11 +2291,14 @@ ParameterHandler::scan_line (std::string        line,
     line.erase (line.find("  "), 1);
   // now every existing whitespace
   // should be exactly one ' ';
-  // if at end or beginning: delete
-  if ((line.length() != 0) && (std::isspace (line[0])))  line.erase (0, 1);
+  // if at beginning: delete
+  if ((line.length() != 0) && (std::isspace (line[0])))
+    line.erase (0, 1);
   // if line is now empty: leave
-  if (line.length() == 0) return true;
+  if (line.length() == 0)
+    return true;
 
+  // also delete spaces at the end
   if (std::isspace (line[line.length()-1]))
     line.erase (line.size()-1, 1);
 
