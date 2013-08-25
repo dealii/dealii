@@ -2393,6 +2393,42 @@ ParameterHandler::scan_line (std::string         line,
         }
     }
 
+  // an include statement?
+  if ((line.find ("INCLUDE ") == 0) ||
+      (line.find ("include ") == 0))
+    {
+      // erase "set" statement and eliminate
+      // spaces around the '='
+      line.erase (0, 7);
+      while ((line.size() > 0) && (line[0] == ' '))
+        line.erase (0, 1);
+
+      // the remainder must then be a filename
+      if (line.size() == 0)
+        {
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << "> is an include statement but does not name a file!"
+                    << std::endl;
+
+          return false;
+        }
+
+      std::ifstream input (line);
+      if (!input)
+        {
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << "> is an include statement but the file <"
+                    << line << "> could not be opened!"
+                    << std::endl;
+
+          return false;
+        }
+      else
+        return read_input (input);
+    }
+
   // this line matched nothing known
   std::cerr << "Line <" << lineno
             << "> of file <" << input_filename

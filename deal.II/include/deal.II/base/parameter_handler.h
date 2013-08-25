@@ -889,7 +889,7 @@ namespace Patterns
  *     set Geometry       = [0,1]x[0,3]
  *   @endcode
  *   Input may be sorted into subsection trees in order to give the input a
- *   logical structure.
+ *   logical structure, and input files may include other files.
  *
  *   The ParameterHandler class is discussed in detail in the @ref step_19
  *   "step-19" example program, and is used in more realistic situations in
@@ -1034,9 +1034,23 @@ namespace Patterns
  *   <tt>=</tt> sign.
  *
  *
+ *   <h3>Including other input files</h3>
+ *
+ *   An input file can include other include files using the syntax
+ *   @code
+ *     ...
+ *     include some_other_file.prm
+ *     ...
+ *   @endcode
+ *   The file so referenced is searched for relative to the current
+ *   directory (not relative to the directory in which the including
+ *   parameter file is located, since this is not known to all three
+ *   versions of the read_input() function).
+ *
+ *
  *   <h3>Reading data from input sources</h3>
  *
- *   In order to read input you can use three possibilities: reading from
+ *   In order to read input there are three possibilities: reading from
  *   an <tt>std::istream</tt> object, reading from a file of which the name
  *   is given and reading from a string in memory in which the lines are
  *   separated by <tt>@\n</tt> characters. These possibilities are used as

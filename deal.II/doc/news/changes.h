@@ -69,6 +69,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: The ParameterHandler class can now deal with including one parameter
+  file from another.
+  <br>
+  (Wolfgang Bangerth, 2013/08/25)
+  </li>
+
+  <li>
   New: The method VectorTools::compute_normal_flux_constraints can be used to
   force a vector finite element function to be normal to the boundary.
   <br>
