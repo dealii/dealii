@@ -1313,7 +1313,8 @@ ParameterHandler::get_current_full_path (const std::string &name) const
 
 
 
-bool ParameterHandler::read_input (std::istream &input)
+bool ParameterHandler::read_input (std::istream &input,
+                                   const std::string &filename)
 {
   AssertThrow (input, ExcIO());
 
@@ -1325,7 +1326,7 @@ bool ParameterHandler::read_input (std::istream &input)
     {
       ++lineno;
       getline (input, line);
-      status &= scan_line (line, lineno);
+      status &= scan_line (line, filename, lineno);
     }
 
   return status;
@@ -1345,7 +1346,7 @@ bool ParameterHandler::read_input (const std::string &filename,
       std::ifstream input (openname.c_str());
       AssertThrow(input, ExcIO());
 
-      return read_input (input);
+      return read_input (input, filename);
     }
   catch (const PathSearch::ExcFileNotFound &)
     {
@@ -1370,7 +1371,7 @@ bool ParameterHandler::read_input_from_string (const char *s)
   // create an istringstream representation and pass it off
   // to the other functions doing this work
   std::istringstream in (s);
-  return read_input (in);
+  return read_input (in, "input string");
 }
 
 
@@ -2254,8 +2255,9 @@ ParameterHandler::log_parameters_section (LogStream &out)
 
 
 bool
-ParameterHandler::scan_line (std::string        line,
-                             const unsigned int lineno)
+ParameterHandler::scan_line (std::string         line,
+                             const std::string  &input_filename,
+                             const unsigned int  lineno)
 {
   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
@@ -2291,8 +2293,9 @@ ParameterHandler::scan_line (std::string        line,
       // check whether subsection exists
       if (!entries->get_child_optional (get_current_full_path(subsection)))
         {
-          std::cerr << "Line " << lineno
-                    << ": There is no such subsection to be entered: "
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << ">: There is no such subsection to be entered: "
                     << demangle(get_current_full_path(subsection)) << std::endl;
           for (unsigned int i=0; i<subsection_path.size(); ++i)
             std::cerr << std::setw(i*2+4) << " "
@@ -2313,8 +2316,9 @@ ParameterHandler::scan_line (std::string        line,
     {
       if (subsection_path.size() == 0)
         {
-          std::cerr << "Line " << lineno
-                    << ": There is no subsection to leave here!" << std::endl;
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << ">: There is no subsection to leave here!" << std::endl;
           return false;
         }
       else
@@ -2355,7 +2359,9 @@ ParameterHandler::scan_line (std::string        line,
                 = entries->get<unsigned int> (get_current_full_path(entry_name) + path_separator + "pattern");
               if (!patterns[pattern_index]->match(entry_value))
                 {
-                  std::cerr << "Line " << lineno << ":" << std::endl
+                  std::cerr << "Line <" << lineno
+                            << "> of file <" << input_filename
+                            << ">:" << std::endl
                             << "    The entry value" << std::endl
                             << "        " << entry_value << std::endl
                             << "    for the entry named" << std::endl
@@ -2373,8 +2379,9 @@ ParameterHandler::scan_line (std::string        line,
         }
       else
         {
-          std::cerr << "Line " << lineno
-                    << ": No such entry was declared:" << std::endl
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << ">: No such entry was declared:" << std::endl
                     << "    " << entry_name << std::endl
                     << "    <Present subsection:" << std::endl;
           for (unsigned int i=0; i<subsection_path.size(); ++i)
@@ -2387,8 +2394,9 @@ ParameterHandler::scan_line (std::string        line,
     }
 
   // this line matched nothing known
-  std::cerr << "Line " << lineno
-            << ": This line matched nothing known ('set' or 'subsection' missing!?):" << std::endl
+  std::cerr << "Line <" << lineno
+            << "> of file <" << input_filename
+            << ">: This line matched nothing known ('set' or 'subsection' missing!?):" << std::endl
             << "    " << line << std::endl;
   return false;
 }

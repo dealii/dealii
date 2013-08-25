@@ -1575,12 +1575,15 @@ public:
   virtual ~ParameterHandler ();
 
   /**
-   * Read input from a stream until stream returns <tt>eof</tt> condition
-   * or error.
+   * Read input from a stream until the stream returns the <tt>eof</tt> condition
+   * or error. The second argument can be used to denote the name of the file
+   * (if that's what the input stream represents) we are reading from; this
+   * is only used when creating output for error messages.
    *
    * Return whether the read was successful.
    */
-  virtual bool read_input (std::istream &input);
+  virtual bool read_input (std::istream &input,
+                           const std::string &filename = "input file");
 
   /**
    * Read input from a file the name of which is given. The PathSearch
@@ -1945,7 +1948,8 @@ private:
   std::string get_current_full_path (const std::string &name) const;
 
   /**
-   * Scan one line of input. <tt>lineno</tt> is the number of the line
+   * Scan one line of input. <tt>input_filename</tt> and <tt>lineno</tt>
+   * are the name of the input file and the current number of the line
    * presently scanned (for the logs if there are messages). Return
    * <tt>false</tt> if line contained stuff that could not be understood,
    * the uppermost subsection was to be left by an <tt>END</tt> or
@@ -1957,6 +1961,7 @@ private:
    * caller's variable is not changed.
    */
   bool scan_line (std::string         line,
+                  const std::string  &input_filename,
                   const unsigned int  lineno);
 
   friend class MultipleParameterLoop;
