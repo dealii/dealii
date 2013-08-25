@@ -1367,33 +1367,10 @@ bool ParameterHandler::read_input (const std::string &filename,
 
 bool ParameterHandler::read_input_from_string (const char *s)
 {
-  // if empty std::string then exit
-  // with success
-  if ((s == 0) || ((*s) == 0)) return true;
-
-  std::string line;
-  std::string input (s);
-  int    lineno=0;
-
-  // if necessary append a newline char
-  // to make all lines equal
-  if (input[input.length()-1] != '\n')
-    input += '\n';
-
-  bool status = true;
-  while (input.size() != 0)
-    {
-      // get one line from Input (=s)
-      line.assign (input, 0, input.find('\n'));
-      // delete this part including
-      // the backspace
-      input.erase (0, input.find('\n')+1);
-      ++lineno;
-
-      status &= scan_line (line, lineno);
-    }
-
-  return status;
+  // create an istringstream representation and pass it off
+  // to the other functions doing this work
+  std::istringstream in (s);
+  return read_input (in);
 }
 
 
