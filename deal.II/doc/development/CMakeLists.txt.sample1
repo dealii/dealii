@@ -1,0 +1,20 @@
+FIND_PACKAGE(deal.II 8.0 REQUIRED
+  HINTS
+    ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
+    # You can specify additional hints for search paths here, e.g.
+    # $ENV{HOME}/workspace/deal.II
+  )
+
+# Set the name of the project and target:
+SET(TARGET "step-1")
+
+# Declare all source files the target consists of:
+SET(TARGET_SRC
+  step-1.cc
+  # You can specify additional files here!
+  )
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+PROJECT(${TARGET} CXX)
+DEAL_II_INVOKE_AUTOPILOT()
