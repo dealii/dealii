@@ -40,7 +40,7 @@
 // between the projected and unprojected function.
 // This should reveal any errors in the constraint_matrix:
 
-std::string output_file_name("dof_tools_21/output");
+std::string output_file_name("output");
 
 
 template <int dim>

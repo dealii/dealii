@@ -50,7 +50,7 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("step-3/output");
+std::ofstream logfile("output");
 
 
 

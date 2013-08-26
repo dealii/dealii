@@ -36,7 +36,7 @@
 #include <fstream>
 
 
-std::ofstream logfile("step-2/output");
+std::ofstream logfile("output");
 
 
 void make_grid (Triangulation<2> &triangulation)

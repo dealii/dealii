@@ -53,18 +53,18 @@ void gmsh_grid (const char *name)
 
 int main ()
 {
-  std::ofstream logfile("grid_in_msh_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   try
     {
-      gmsh_grid<2> ("grid_in_msh_01.2d.msh");
-      gmsh_grid<2> ("grid_in_msh_01.2da.msh");
-      gmsh_grid<3> ("grid_in_msh_01.3d.msh");
-      gmsh_grid<3> ("grid_in_msh_01.3da.msh");
-      gmsh_grid<3> ("grid_in_msh_01.3d_neg.msh");
+      gmsh_grid<2> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.2d.msh");
+      gmsh_grid<2> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.2da.msh");
+      gmsh_grid<3> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.3d.msh");
+      gmsh_grid<3> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.3da.msh");
+      gmsh_grid<3> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.3d_neg.msh");
     }
   catch (std::exception &exc)
     {

@@ -1,0 +1,31 @@
+
+DEAL::Chunk size = 1
+DEAL::row 0:  done 0, left -3 done 1, left -2 done 2, left -1
+DEAL::row 1:  done 0, left -2 done 1, left -1
+DEAL::row 2:  done 0, left -3 done 1, left -2 done 2, left -1
+DEAL::row 3:  done 0, left -3 done 1, left -2 done 2, left -1
+DEAL::row 4:  done 0, left -2 done 1, left -1
+DEAL::Chunk size = 2
+DEAL::row 0:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 1:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 2:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 3:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 4:  done 0, left -3 done 1, left -2 done 2, left -1
+DEAL::Chunk size = 4
+DEAL::row 0:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 1:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 2:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 3:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 4:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::Chunk size = 5
+DEAL::row 0:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 1:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 2:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 3:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 4:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::Chunk size = 7
+DEAL::row 0:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 1:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 2:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 3:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1
+DEAL::row 4:  done 0, left -5 done 1, left -4 done 2, left -3 done 3, left -2 done 4, left -1

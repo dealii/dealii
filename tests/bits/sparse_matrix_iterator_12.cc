@@ -60,7 +60,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("sparse_matrix_iterator_12/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -101,7 +101,7 @@ void check_neighbors (const Triangulation<2> &tria)
 
 int main()
 {
-  std::ofstream logfile("neighboring_cells_at_two_faces/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

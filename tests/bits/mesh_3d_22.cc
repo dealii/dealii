@@ -123,7 +123,7 @@ void test (Triangulation<dim> &triangulation)
 
 int main ()
 {
-  std::ofstream logfile ("mesh_3d_22/output");
+  std::ofstream logfile ("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.0e-10);
@@ -131,7 +131,7 @@ int main ()
   Triangulation<3> triangulation;
   GridIn<3> grid_in;
   grid_in.attach_triangulation(triangulation);
-  std::ifstream inputStream("mesh_3d_22/mesh.msh");
+  std::ifstream inputStream(SOURCE_DIR "/mesh_3d_22/mesh.msh");
   grid_in.read_msh (inputStream);
   test<3>(triangulation);
 }

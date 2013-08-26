@@ -21,7 +21,7 @@
 // crash that at the time of writing the test afflicts all
 // hp/hp_constraints_*_03 tests
 
-char logname[] = "mesh_3d_18/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

@@ -168,7 +168,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("point_difference_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (4);
   deallog.attach(logfile);
   deallog.depth_console (0);

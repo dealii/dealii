@@ -1,0 +1,11 @@
+
+DEAL::   Number of active cells:       7
+DEAL::  Total number of degrees of freedom: 36
+DEAL::   Number of degrees of freedom for the field variable U: 22
+DEAL::   Number of degrees of freedom for the pressure variable p: 14
+DEAL::1.0 1.0 0 1.0 0 0 0 0 1.0 1.0 1.0 0 0 0 0 1.0 0 0 1.0 1.0 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL::   Number of active cells:       15
+DEAL::  Total number of degrees of freedom: 151
+DEAL::   Number of degrees of freedom for the field variable U: 105
+DEAL::   Number of degrees of freedom for the pressure variable p: 105
+DEAL::1.0 1.0 1.0 1.0 1.0 1.0 0 1.0 0 0 0 0 0 0 0 0 0 0 0 0 1.0 1.0 1.0 1.0 1.0 1.0 0 0 0 0 0 0 0 0 0 0 0 1.0 1.0 0 0 0 0 0 1.0 1.0 1.0 1.0 1.0 0 0 0 0 0 0 0 0 0 0 1.0 1.0 0 0 0 0 0 1.0 1.0 0 0 0 0 0 1.0 0 0 0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.0 1.0 0 0 0 0 0 0 0 0 0 1.0 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.0 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 

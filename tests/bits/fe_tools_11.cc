@@ -25,7 +25,7 @@
 // marker at all (see the documentation)
 
 
-std::string output_file_name = "fe_tools_11/output";
+std::string output_file_name = "output";
 
 template <int dim>
 std::string modify_name (const std::string &name)

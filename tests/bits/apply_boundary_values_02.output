@@ -1,0 +1,22 @@
+
+DEAL::1D
+DEAL::Number of cells: 115
+DEAL::Number of dofs: 116
+DEAL::|A|=0
+DEAL::|B|=362551.
+DEAL::|b1|=0
+DEAL::|b2|=28527.8
+DEAL::2D
+DEAL::Number of cells: 1186
+DEAL::Number of dofs: 1537
+DEAL::|A|=0
+DEAL::|B|=1.20834e+09
+DEAL::|b1|=1.33751e-09
+DEAL::|b2|=1.28179e+08
+DEAL::3D
+DEAL::Number of cells: 736
+DEAL::Number of dofs: 1311
+DEAL::|A|=0
+DEAL::|B|=4.48897e+09
+DEAL::|b1|=0
+DEAL::|b2|=2.75486e+09

@@ -18,7 +18,7 @@
 
 // an attempt to understand the failure of mesh_3d_18
 
-char logname[] = "mesh_3d_19/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

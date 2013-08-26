@@ -84,7 +84,7 @@ main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile ("distorted_mapped_cells_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(4) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -30,7 +30,7 @@
 // characteristics
 
 
-std::string output_file_name = "fe_tools_cpfqpm_01/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

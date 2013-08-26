@@ -24,7 +24,7 @@
 
 
 
-std::string output_file_name = "n_dofs_per_object/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

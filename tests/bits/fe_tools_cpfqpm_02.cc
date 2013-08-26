@@ -31,7 +31,7 @@
 // back to the quadrature points is an identity operation
 
 
-std::string output_file_name = "fe_tools_cpfqpm_02/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

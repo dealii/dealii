@@ -22,7 +22,7 @@
 //   FETools::get_projection_matrix
 
 
-std::string output_file_name = "fe_tools_12/output";
+std::string output_file_name = "output";
 
 
 

@@ -22,7 +22,7 @@
 //   FE::subface_interpolation
 
 
-std::string output_file_name = "subface_interpolation/output";
+std::string output_file_name = "output";
 
 
 

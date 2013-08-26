@@ -24,7 +24,7 @@
 //   FETools::back_interpolate(6) with parallel vector
 
 
-std::string output_file_name = "fe_tools_06b/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

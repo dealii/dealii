@@ -21,7 +21,7 @@
 // between the two sides of the face. The same applies for lines in non-standard
 // orientation. this test is derived from deal.II/project_q_03
 
-char logname[] = "face_orientation_and_fe_q_02/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

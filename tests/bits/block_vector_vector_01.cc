@@ -43,7 +43,7 @@ void test (Vector<double> &v)
 
 int main ()
 {
-  std::ofstream logfile("block_vector_vector_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

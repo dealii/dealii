@@ -23,7 +23,7 @@
 //   FETools::get_fe_from_name
 
 
-std::string output_file_name = "fe_tools_09/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

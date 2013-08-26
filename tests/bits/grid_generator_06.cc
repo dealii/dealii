@@ -46,7 +46,7 @@ void test(std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("grid_generator_06/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

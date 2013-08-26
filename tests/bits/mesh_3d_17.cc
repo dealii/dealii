@@ -131,7 +131,7 @@ void check (Triangulation<3> &tria)
 
 int main ()
 {
-  std::ofstream logfile("mesh_3d_17/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -139,7 +139,7 @@ int main ()
   Triangulation<3> coarse_grid;
   GridIn<3> in;
   in.attach_triangulation(coarse_grid);
-  std::ifstream ucd_file("two_cubes.inp");
+  std::ifstream ucd_file(SOURCE_DIR "/two_cubes.inp");
   in.read_ucd(ucd_file);
   ucd_file.close();
 

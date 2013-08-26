@@ -24,7 +24,7 @@
 // this test only tests the whole thing for p==3, since higher polynomial
 // degrees take forever to test. this should, at one point, probably be fixed
 
-char logname[] = "face_orientation_and_fe_q_01/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

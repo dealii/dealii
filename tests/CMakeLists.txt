@@ -77,7 +77,7 @@ MESSAGE(STATUS "Proceed to test definitions")
 ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
 #benchmarks
-#bits
+ADD_SUBDIRECTORY(bits)
 ADD_SUBDIRECTORY(codim_one)
 ADD_SUBDIRECTORY(deal.II)
 #fail
@@ -88,9 +88,10 @@ ADD_SUBDIRECTORY(grid)
 ADD_SUBDIRECTORY(lac)
 #lib
 ADD_SUBDIRECTORY(matrix_free)
-#mesh_converter
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(serialization)
+
+#mesh_converter
 
 #distributed_grids
 #gla

@@ -95,7 +95,7 @@ void LaplaceProblem<dim>::run ()
   grid_in.attach_triangulation (triangulation);
 
 
-  std::ifstream input_file("gerold_1.inp");
+  std::ifstream input_file(SOURCE_DIR "/gerold_1.inp");
 
 
   deallog << "read ucd data file" << std::endl;
@@ -108,7 +108,7 @@ void LaplaceProblem<dim>::run ()
 
 int main ()
 {
-  std::ofstream logfile("gerold_1/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

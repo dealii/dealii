@@ -27,7 +27,7 @@
 #include <fstream>
 
 
-std::ofstream logfile("compressed_set_sparsity_pattern_06/output");
+std::ofstream logfile("output");
 
 void test ()
 {

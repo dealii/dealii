@@ -1126,7 +1126,7 @@ void LaplaceProblem<dim>::run ()
 // application.
 int main ()
 {
-  std::ofstream logfile ("joa_1/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
   deallog << std::fixed;
   deallog.attach(logfile);

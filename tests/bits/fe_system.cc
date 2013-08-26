@@ -82,7 +82,7 @@ void test()
 int
 main()
 {
-  std::ofstream logfile ("fe_system/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

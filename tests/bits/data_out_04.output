@@ -1,0 +1,75 @@
+
+DEAL::Checking Q1 in 1d:
+DEAL::1
+DEAL::1 1 vector_data
+DEAL::OK
+DEAL::Checking Q1 in 2d:
+DEAL::1
+DEAL::0 1 vector_data
+DEAL::OK
+DEAL::Checking Q1 in 3d:
+DEAL::0
+DEAL::OK
+DEAL::Checking Q2 in 1d:
+DEAL::1
+DEAL::1 1 vector_data
+DEAL::OK
+DEAL::Checking Q2 in 2d:
+DEAL::1
+DEAL::0 1 vector_data
+DEAL::OK
+DEAL::Checking Q2 in 3d:
+DEAL::0
+DEAL::OK
+DEAL::Checking Q3 in 1d:
+DEAL::1
+DEAL::1 1 vector_data
+DEAL::OK
+DEAL::Checking Q3 in 2d:
+DEAL::1
+DEAL::0 1 vector_data
+DEAL::OK
+DEAL::Checking Q3 in 3d:
+DEAL::0
+DEAL::OK
+DEAL::Checking DGQ0 in 1d:
+DEAL::1
+DEAL::1 1 vector_data
+DEAL::OK
+DEAL::Checking DGQ0 in 2d:
+DEAL::1
+DEAL::0 1 vector_data
+DEAL::OK
+DEAL::Checking DGQ0 in 3d:
+DEAL::0
+DEAL::OK
+DEAL::Checking DGQ1 in 1d:
+DEAL::1
+DEAL::1 1 vector_data
+DEAL::OK
+DEAL::Checking DGQ1 in 2d:
+DEAL::1
+DEAL::0 1 vector_data
+DEAL::OK
+DEAL::Checking DGQ1 in 3d:
+DEAL::0
+DEAL::OK
+DEAL::Checking DGQ2 in 1d:
+DEAL::1
+DEAL::1 1 vector_data
+DEAL::OK
+DEAL::Checking DGQ2 in 2d:
+DEAL::1
+DEAL::0 1 vector_data
+DEAL::OK
+DEAL::Checking DGQ2 in 3d:
+DEAL::0
+DEAL::OK
+DEAL::Checking Nedelec0 in 2d:
+DEAL::1
+DEAL::1 2 vector_data
+DEAL::OK
+DEAL::Checking Nedelec0 in 3d:
+DEAL::1
+DEAL::1 3 vector_data
+DEAL::OK

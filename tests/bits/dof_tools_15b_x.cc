@@ -25,7 +25,7 @@
 //                                   const std::vector<unsigned int> &
 //                               CompressedSetSparsityPattern &);
 
-std::string output_file_name = "dof_tools_15b_x/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

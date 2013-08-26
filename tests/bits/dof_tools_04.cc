@@ -22,7 +22,7 @@
 //   DoFTools::extract_hanging_node_constraints
 
 
-std::string output_file_name = "dof_tools_04/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

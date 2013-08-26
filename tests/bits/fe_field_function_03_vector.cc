@@ -80,7 +80,7 @@ void test()
 
 int main ()
 {
-  std::ofstream logfile("fe_field_function_03_vector/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

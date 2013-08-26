@@ -25,7 +25,7 @@
 
 
 
-std::string output_file_name = "hp_constraints_are_implemented/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

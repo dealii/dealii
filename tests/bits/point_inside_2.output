@@ -1,0 +1,29 @@
+
+DEAL::0.500000 0.500000  	 inside 1 expected 1
+DEAL::2.00000 0.500000  	 inside 0 expected 0
+DEAL::0.500000 2.00000  	 inside 0 expected 0
+DEAL::0.500000 0.500000  	 inside 1 expected 1
+DEAL::-2.00000 0.500000  	 inside 0 expected 0
+DEAL::0.500000 -2.00000  	 inside 0 expected 0
+DEAL::0.500000 0.500000  	 inside 1 expected 1
+DEAL::0.900000 0.900000  	 inside 1 expected 1
+DEAL::1.00000 0.500000  	 inside 1 expected 1
+DEAL::1.00000 0.500000  	 inside 1 expected 1
+DEAL::1.00000 0.500000  	 inside 0 expected 0
+DEAL::-0.100000 0.100000  	 inside 1 expected 1
+DEAL::-0.240000 0.500000  	 inside 1 expected 1
+DEAL::-0.260000 0.500000  	 inside 1 expected 1
+DEAL::0.500000 0.500000 0.500000  	 inside 1 expected 1
+DEAL::2.00000 0.500000 0.500000  	 inside 0 expected 0
+DEAL::0.500000 2.00000 0.500000  	 inside 0 expected 0
+DEAL::0.500000 0.500000 2.00000  	 inside 0 expected 0
+DEAL::-2.00000 0.500000 0.500000  	 inside 0 expected 0
+DEAL::0.500000 -2.00000 0.500000  	 inside 0 expected 0
+DEAL::0.500000 0.500000 -2.00000  	 inside 0 expected 0
+DEAL::0.900000 0.900000 0.900000  	 inside 1 expected 1
+DEAL::1.00000 0.500000 0.500000  	 inside 1 expected 1
+DEAL::1.00000 0.500000 0.500000  	 inside 1 expected 1
+DEAL::1.00000 0.500000 0.500000  	 inside 0 expected 0
+DEAL::-0.100000 0.100000 0.100000  	 inside 1 expected 1
+DEAL::-0.240000 0.500000 0.500000  	 inside 1 expected 1
+DEAL::-0.260000 0.500000 0.500000  	 inside 0 expected 0

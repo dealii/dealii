@@ -249,7 +249,7 @@ void curved_grid (std::ofstream &out)
 
 int main ()
 {
-  std::ofstream logfile("data_out_curved_cells/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog << std::setprecision (4);
   logfile << std::setprecision (4);

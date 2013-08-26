@@ -23,7 +23,7 @@
 //   FETools::extrapolate(5)
 
 
-std::string output_file_name = "fe_tools_08/output";
+std::string output_file_name = "output";
 
 
 template <int dim>
