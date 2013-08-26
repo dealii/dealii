@@ -37,14 +37,14 @@ The Dirichlet-to-Neumann map concept then permits the solution procedure:
 <ol>
   <li> Solve a Dirichlet problem on each element individually, where the local/interior
 element solutions no longer couple to neighboring elements.  This is known as the
-'local solver', and is an <i>embarrissingly parallel</i> element-by-element 
+'local solver', and is an <i>embarrassingly parallel</i> element-by-element 
 solution process.
-  <li>  Use the local element solutions to construct the global problem for the 
+  <li>  Use the local element equations to construct the global problem for the 
 trace values.  These are the only globally coupled unknowns.
-  <li>  Reconstruct the local solutions from the computed trace values.
+  <li>  Solve for the element-local solutions using the computed trace values.
 </ol>
 
-The above procedure also has a linear algebra interpretation and referred to
+The above procedure also has a linear algebra interpretation and is referred to
 as static condensation. Let us write the complete linear system associated to
 the HDG problem as a block system with the discrete DG variables <i>U</i> as
 first block and the skeleton variables $\Lambda$ as the second block:
@@ -73,7 +73,7 @@ degrees of freedom of the interior DG variables which are always only related
 to a single cell. The coupling to other cells is introduced by the matrices
 <i>B</i> and <i>C</i> over the skeleton variable. The block-diagonality of
 <i>A</i> and the structure in <i>B</i> and <i>C</i> allow us to invert the
-matrix <i>A</i> element by element (the local solution of the Dirichelt
+matrix <i>A</i> element by element (the local solution of the Dirichlet
 problem) and subtract $CA^{-1}B$ from $D$.
 
 <h4> Solution quality and rates of convergence</h4>
@@ -103,7 +103,7 @@ We consider the convection-diffusion equation:
 	\quad \text{ in } \Omega, \\
 	u &=& g_D, \quad \text{ on } \partial \Omega_D, \\
 	(\mathbf{c} u - \kappa \nabla u)\cdot \mathbf{n} &=& g_N, 
-	\quad \text{ on }  \partial \Omega_D.
+	\quad \text{ on }  \partial \Omega_N.
 @f}
 
 Introduce the auxiliary variable $\mathbf{q}=-\kappa \nabla u$ and rewrite
@@ -113,7 +113,62 @@ the above equation as the first order system:
   \nabla \cdot (\mathbf{c} u + \mathbf{q}) &=& f, \quad \text{ in } \Omega, \\
   u &=& g_D, \quad \text{ on } \partial \Omega_D, \\
   (\mathbf{q} + \mathbf{c}u)\cdot\mathbf{n}  &=& g_N, 
-	\quad \text{ on }  \partial \Omega_D.
+	\quad \text{ on }  \partial \Omega_N.
+@f}
+
+We multiply these equations by the weight functions $\mathbf{v}, w$ 
+and integrate by parts over every element $K$ to obtain:
+@f{eqnarray*}
+  (\kappa^{-1} \mathbf{q}, \mathbf{v})_K - (u, \nabla\cdot\mathbf{v})_K
+    + <\hat{u}, \mathbf{v}\cdot\mathbf{n}>_{\partial K} &=& 0, \\
+  - (\mathbf{c} u + \mathbf{q}, \nabla w)_K 
+    + <(\hat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}, w>_{\partial K}
+    &=& (f,w)_K.
+@f}
+
+The terms decorated with a $\hat{}$ denote the numerical traces (also commonly referred
+to as numerical fluxes).   They are approximations
+to the interior values on the boundary of the element.  To ensure conservation, 
+these terms must be single-valued on any given element edge $\partial K$.
+We eliminate the numerical trace $\hat{\mathbf{q}}$ by using traces of the form:
+@f{eqnarray*}
+  \hat{\mathbf{c} u}+\hat{\mathbf{q}} = \mathbf{c}\hat{u} + \mathbf{q}
+  + \tau(u - \hat{u})\mathbf{n} \quad \text{ on } \partial K.
+@f}
+The local stabilization parameter $\tau$ has effects on stability and accuracy of 
+HDG solutions; see the literature for a further discussion.
+
+The trace/skeleton variables in HDG methods are single-valued on element faces.  As such,
+they must strongly represent the Dirichlet data on $\partial\Omega_D$.  We introduce
+a new variable $\lambda$ such that
+@f{equation*}
+  \hat{u} = 
+  \begin{cases}
+     g_D  & \text{ on } \partial \Omega_D, \\
+     \lambda & \text{otherwise}.
+\end{cases}
+@f} 
+
+Eliminating $\hat{u}$ from the weak form in favor of $\lambda$, summing the elemental
+contributions across all elements in the triangulation, and enforcing the normal
+component of the numerical flux, we arrive at the final form of the problem:  
+Find $(\mathbf{q}, u, \lambda)$ such that
+@f{eqnarray*}
+  (\kappa^{-1} \mathbf{q}, \mathbf{v})_{\mathcal{T}}
+    - (u, \nabla\cdot\mathbf{v})_{\mathcal{T}}
+    + <\lambda, \mathbf{v}\cdot\mathbf{n}>_{\partial\mathcal{T}}
+    &=&
+    - <g_D, \mathbf{v}\cdot\mathbf{n}>_{\partial\Omega_D},
+\\
+  - (\mathbf{c} u + \mathbf{q}, \nabla w)_{\mathcal{T}}
+    + <(\hat{\mathbf{c}u} + \hat{\mathbf{q}})\cdot\mathbf{n}, w>_{\partial \mathcal{T}}
+    &=&
+    (f, w)_{\mathcal{T}},
+\\
+  < \left[ \negthinspace \left[ (\hat{\mathbf{c}u} + \hat{\mathbf{q}})\cdot\mathbf{n}
+    \right] \negthinspace \right], \mu>_{\partial \mathcal{T}}
+    &=&
+    <g_N, \mu>_{\partial\Omega_N}
 @f}
 
 
