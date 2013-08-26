@@ -90,7 +90,7 @@ ADD_SUBDIRECTORY(lac)
 ADD_SUBDIRECTORY(matrix_free)
 #mesh_converter
 ADD_SUBDIRECTORY(multigrid)
-#serialization
+ADD_SUBDIRECTORY(serialization)
 
 #distributed_grids
 #gla
