@@ -22,7 +22,7 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("estimate_condition_number_mass/output");
+std::ofstream logfile("output");
 
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>

@@ -87,7 +87,7 @@ ADD_SUBDIRECTORY(grid)
 #integrators
 ADD_SUBDIRECTORY(lac)
 #lib
-#matrix_free
+ADD_SUBDIRECTORY(matrix_free)
 #mesh_converter
 ADD_SUBDIRECTORY(multigrid)
 #serialization

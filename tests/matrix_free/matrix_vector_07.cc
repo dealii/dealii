@@ -28,7 +28,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/fe/fe_dgq.h>
 
-std::ofstream logfile("matrix_vector_07/output");
+std::ofstream logfile("output");
 
 #include "matrix_vector_common.h"
 

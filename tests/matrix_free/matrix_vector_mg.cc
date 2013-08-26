@@ -23,7 +23,7 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("matrix_vector_mg/output");
+std::ofstream logfile("output");
 
 #include "matrix_vector_common.h"
 #include <deal.II/multigrid/mg_tools.h>

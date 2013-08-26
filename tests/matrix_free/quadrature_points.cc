@@ -39,7 +39,7 @@
 #include <fstream>
 #include <iostream>
 
-std::ofstream logfile("quadrature_points/output");
+std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree>

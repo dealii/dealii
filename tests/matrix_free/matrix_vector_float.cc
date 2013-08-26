@@ -23,7 +23,7 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("matrix_vector_float/output");
+std::ofstream logfile("output");
 
 #include "create_mesh.h"
 #include "matrix_vector_common.h"

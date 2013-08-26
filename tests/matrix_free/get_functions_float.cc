@@ -25,7 +25,7 @@
 #include <deal.II/base/function.h>
 #include "create_mesh.h"
 
-std::ofstream logfile("get_functions_float/output");
+std::ofstream logfile("output");
 
 #include "get_functions_common.h"
 

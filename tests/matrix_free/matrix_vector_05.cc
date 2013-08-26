@@ -23,7 +23,7 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("matrix_vector_05/output");
+std::ofstream logfile("output");
 
 #include "matrix_vector_common.h"
 

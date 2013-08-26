@@ -22,7 +22,7 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("get_functions_constraints/output");
+std::ofstream logfile("output");
 
 #include "get_functions_common.h"
 

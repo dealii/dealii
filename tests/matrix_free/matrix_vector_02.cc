@@ -24,7 +24,7 @@
 #include "../tests.h"
 #include <deal.II/base/function.h>
 
-std::ofstream logfile("matrix_vector_02/output");
+std::ofstream logfile("output");
 
 #include "matrix_vector_common.h"
 

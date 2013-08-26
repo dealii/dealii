@@ -41,7 +41,7 @@
 
 #include <iostream>
 
-std::ofstream logfile("integrate_functions_multife/output");
+std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>

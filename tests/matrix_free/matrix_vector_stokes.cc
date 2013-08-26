@@ -23,7 +23,7 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("matrix_vector_stokes/output");
+std::ofstream logfile("output");
 
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>

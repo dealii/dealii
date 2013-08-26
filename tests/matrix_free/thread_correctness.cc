@@ -23,7 +23,7 @@
 #include <deal.II/base/function.h>
 #include "create_mesh.h"
 
-std::ofstream logfile("thread_correctness/output");
+std::ofstream logfile("output");
 
 #include "matrix_vector_common.h"
 
