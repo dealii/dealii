@@ -530,7 +530,7 @@ namespace WorkStream
           {
             try
               {
-                if (worker.empty() == false)
+                if (worker)
                   worker (current_item->work_items[i],
                           *scratch_data,
                           current_item->copy_datas[i]);
@@ -634,7 +634,7 @@ namespace WorkStream
           {
             try
               {
-                if (copier.empty() == false)
+                if (copier)
                   copier (current_item->copy_datas[i]);
               }
             catch (const std::exception &exc)
