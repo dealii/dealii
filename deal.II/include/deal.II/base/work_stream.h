@@ -790,8 +790,13 @@ namespace WorkStream
 
     for (Iterator i=begin; i!=end; ++i)
       {
-        worker (i, scratch_data, copy_data);
-        copier (copy_data);
+        if (static_cast<const std_cxx1x::function<void (const Iterator &,
+                                                        ScratchData &,
+                                                        CopyData &)> >(worker))
+          worker (i, scratch_data, copy_data);
+        if (static_cast<const std_cxx1x::function<void (const CopyData &)> >
+            (copier))
+          copier (copy_data);
       }
 #endif
   }
