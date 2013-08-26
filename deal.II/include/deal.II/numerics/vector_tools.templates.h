@@ -4729,8 +4729,9 @@ namespace VectorTools
     // iterate over the list of all vector components we found and see if we
     // can find constrained ones
     unsigned int n_total_constraints_found = 0;
-    for (typename std::set<std_cxx1x::array<unsigned int,dim>,PointComparator<dim> >::
-           const_iterator it=vector_dofs.begin(); it!=vector_dofs.end(); ++it)
+    for (typename std::set<std_cxx1x::array<types::global_dof_index,dim>,
+           PointComparator<dim> >::const_iterator it=vector_dofs.begin(); 
+           it!=vector_dofs.end(); ++it)
       {
         unsigned int n_constraints = 0;
         bool is_constrained[dim];
@@ -4769,7 +4770,7 @@ namespace VectorTools
                   normal[d] = 1.;
                 }
             AssertIndexRange(constrained_index, dim);
-            const std::vector<std::pair<unsigned int, double> >* constrained
+            const std::vector<std::pair<types::global_dof_index, double> >* constrained
               = no_normal_flux_constraints.get_constraint_entries((*it)[constrained_index]);
             // find components to which this index is constrained to
             Assert(constrained != 0, ExcInternalError());
