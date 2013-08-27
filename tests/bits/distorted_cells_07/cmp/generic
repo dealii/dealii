@@ -1,7 +1,0 @@
-
-DEAL::Twisted cell in 1d
-DEAL::(typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point))
-DEAL::Twisted cell in 2d
-DEAL::(typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point))
-DEAL::Twisted cell in 3d
-DEAL::(typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point))
