@@ -1,0 +1,23 @@
+
+DEAL::dim=1
+DEAL::i=0, diff=8.1
+DEAL::i=1, diff=8.1
+DEAL::i=2, diff=56.
+DEAL::i=3, diff=4.2e+02
+DEAL::i=4, diff=1.5e+03
+DEAL::i=5, diff=1.5e+03
+DEAL::dim=2
+DEAL::i=0, diff=80.
+DEAL::i=1, diff=80.
+DEAL::i=2, diff=1.4e+03
+DEAL::i=3, diff=3.0e+04
+DEAL::i=4, diff=9.6e+03
+DEAL::i=5, diff=9.6e+03
+DEAL::dim=3
+DEAL::i=0, diff=5.0e+02
+DEAL::i=1, diff=5.0e+02
+DEAL::i=2, diff=1.2e+04
+DEAL::i=3, diff=3.3e+05
+DEAL::i=4, diff=3.9e+04
+DEAL::i=5, diff=3.9e+04
+DEAL::OK

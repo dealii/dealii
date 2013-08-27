@@ -73,10 +73,8 @@ MESSAGE(STATUS "Proceed to test definitions")
 #$(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
 
 #a-framework
-#all-headers
 ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
-#benchmarks
 ADD_SUBDIRECTORY(bits)
 ADD_SUBDIRECTORY(codim_one)
 ADD_SUBDIRECTORY(deal.II)
@@ -84,13 +82,14 @@ ADD_SUBDIRECTORY(deal.II)
 ADD_SUBDIRECTORY(fe)
 ADD_SUBDIRECTORY(grid)
 ADD_SUBDIRECTORY(hp)
-#integrators
+ADD_SUBDIRECTORY(integrators)
 ADD_SUBDIRECTORY(lac)
-#lib
 ADD_SUBDIRECTORY(matrix_free)
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(serialization)
 
+#all-headers
+#benchmarks
 #mesh_converter
 
 #distributed_grids

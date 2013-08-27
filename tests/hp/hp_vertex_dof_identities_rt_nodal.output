@@ -1,0 +1,27 @@
+
+DEAL::Identities for FE_RaviartThomasNodal<2>(0) and FE_RaviartThomasNodal<2>(0): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(0) and FE_RaviartThomasNodal<2>(1): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(0) and FE_RaviartThomasNodal<2>(2): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(0) and FE_RaviartThomasNodal<2>(3): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(1) and FE_RaviartThomasNodal<2>(0): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(1) and FE_RaviartThomasNodal<2>(1): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(1) and FE_RaviartThomasNodal<2>(2): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(1) and FE_RaviartThomasNodal<2>(3): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(2) and FE_RaviartThomasNodal<2>(0): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(2) and FE_RaviartThomasNodal<2>(1): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(2) and FE_RaviartThomasNodal<2>(2): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(2) and FE_RaviartThomasNodal<2>(3): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(3) and FE_RaviartThomasNodal<2>(0): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(3) and FE_RaviartThomasNodal<2>(1): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(3) and FE_RaviartThomasNodal<2>(2): 0
+DEAL::Identities for FE_RaviartThomasNodal<2>(3) and FE_RaviartThomasNodal<2>(3): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(0) and FE_RaviartThomasNodal<3>(0): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(0) and FE_RaviartThomasNodal<3>(1): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(0) and FE_RaviartThomasNodal<3>(2): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(1) and FE_RaviartThomasNodal<3>(0): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(1) and FE_RaviartThomasNodal<3>(1): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(1) and FE_RaviartThomasNodal<3>(2): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(2) and FE_RaviartThomasNodal<3>(0): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(2) and FE_RaviartThomasNodal<3>(1): 0
+DEAL::Identities for FE_RaviartThomasNodal<3>(2) and FE_RaviartThomasNodal<3>(2): 0
+DEAL::OK

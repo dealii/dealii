@@ -1,0 +1,1094 @@
+
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::Setting fe_index=2 on cell 1.2
+DEAL::Setting fe_index=3 on cell 1.3
+DEAL::cell=1.0, face=1
+DEAL::fe1=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(0)], fe2=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(1)]
+DEAL::1
+DEAL::3
+DEAL::
+DEAL::cell=1.0, face=3
+DEAL::fe1=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(0)], fe2=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
+DEAL::2
+DEAL::3
+DEAL::
+DEAL::cell=1.1, face=0
+DEAL::fe1=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(1)], fe2=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(0)]
+DEAL::1
+DEAL::3
+DEAL::
+DEAL::cell=1.1, face=3
+DEAL::fe1=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(1)], fe2=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(3)]
+DEAL::3
+DEAL::6
+DEAL::
+DEAL::cell=1.2, face=1
+DEAL::fe1=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)], fe2=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(3)]
+DEAL::3
+DEAL::12
+DEAL::
+DEAL::cell=1.2, face=2
+DEAL::fe1=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)], fe2=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(0)]
+DEAL::2
+DEAL::3
+DEAL::
+DEAL::cell=1.3, face=0
+DEAL::fe1=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(3)], fe2=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
+DEAL::3
+DEAL::12
+DEAL::
+DEAL::cell=1.3, face=2
+DEAL::fe1=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(3)], fe2=FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(1)]
+DEAL::3
+DEAL::6
+DEAL::
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::Setting fe_index=2 on cell 1.2
+DEAL::Setting fe_index=3 on cell 1.3
+DEAL::cell=1.0, face=1
+DEAL::fe1=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(0)], fe2=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(1)]
+DEAL::1
+DEAL::3
+DEAL::5
+DEAL::
+DEAL::cell=1.0, face=3
+DEAL::fe1=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(0)], fe2=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(2)]
+DEAL::2
+DEAL::3
+DEAL::7
+DEAL::
+DEAL::cell=1.1, face=0
+DEAL::fe1=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(1)], fe2=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(0)]
+DEAL::1
+DEAL::3
+DEAL::5
+DEAL::
+DEAL::cell=1.1, face=3
+DEAL::fe1=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(1)], fe2=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
+DEAL::3
+DEAL::11
+DEAL::14
+DEAL::
+DEAL::cell=1.2, face=1
+DEAL::fe1=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(2)], fe2=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
+DEAL::3
+DEAL::21
+DEAL::23
+DEAL::
+DEAL::cell=1.2, face=2
+DEAL::fe1=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(2)], fe2=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(0)]
+DEAL::2
+DEAL::3
+DEAL::7
+DEAL::
+DEAL::cell=1.3, face=0
+DEAL::fe1=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)], fe2=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(2)]
+DEAL::3
+DEAL::21
+DEAL::23
+DEAL::
+DEAL::cell=1.3, face=2
+DEAL::fe1=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)], fe2=FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(1)]
+DEAL::3
+DEAL::11
+DEAL::14
+DEAL::
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::Setting fe_index=2 on cell 1.2
+DEAL::Setting fe_index=3 on cell 1.3
+DEAL::cell=1.0, face=1
+DEAL::fe1=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(0)], fe2=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(1)]
+DEAL::1
+DEAL::3
+DEAL::6
+DEAL::7
+DEAL::
+DEAL::cell=1.0, face=3
+DEAL::fe1=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(0)], fe2=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(2)]
+DEAL::2
+DEAL::3
+DEAL::10
+DEAL::11
+DEAL::
+DEAL::cell=1.1, face=0
+DEAL::fe1=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(1)], fe2=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(0)]
+DEAL::1
+DEAL::3
+DEAL::6
+DEAL::7
+DEAL::
+DEAL::cell=1.1, face=3
+DEAL::fe1=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(1)], fe2=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(3)]
+DEAL::3
+DEAL::18
+DEAL::23
+DEAL::24
+DEAL::
+DEAL::cell=1.2, face=1
+DEAL::fe1=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(2)], fe2=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(3)]
+DEAL::3
+DEAL::34
+DEAL::37
+DEAL::38
+DEAL::
+DEAL::cell=1.2, face=2
+DEAL::fe1=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(2)], fe2=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(0)]
+DEAL::2
+DEAL::3
+DEAL::10
+DEAL::11
+DEAL::
+DEAL::cell=1.3, face=0
+DEAL::fe1=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(3)], fe2=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(2)]
+DEAL::3
+DEAL::34
+DEAL::37
+DEAL::38
+DEAL::
+DEAL::cell=1.3, face=2
+DEAL::fe1=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(3)], fe2=FESystem<2>[FE_Q<2>(3)-FE_DGQ<2>(1)]
+DEAL::3
+DEAL::18
+DEAL::23
+DEAL::24
+DEAL::
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::Setting fe_index=2 on cell 1.2
+DEAL::Setting fe_index=3 on cell 1.3
+DEAL::Setting fe_index=4 on cell 1.4
+DEAL::Setting fe_index=5 on cell 1.5
+DEAL::Setting fe_index=6 on cell 1.6
+DEAL::Setting fe_index=7 on cell 1.7
+DEAL::cell=1.0, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)]
+DEAL::1
+DEAL::3
+DEAL::5
+DEAL::7
+DEAL::
+DEAL::cell=1.0, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
+DEAL::2
+DEAL::6
+DEAL::3
+DEAL::7
+DEAL::
+DEAL::cell=1.0, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)]
+DEAL::4
+DEAL::5
+DEAL::6
+DEAL::7
+DEAL::
+DEAL::cell=1.1, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)]
+DEAL::1
+DEAL::3
+DEAL::5
+DEAL::7
+DEAL::
+DEAL::cell=1.1, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)]
+DEAL::3
+DEAL::7
+DEAL::10
+DEAL::12
+DEAL::
+DEAL::cell=1.1, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::11
+DEAL::7
+DEAL::12
+DEAL::
+DEAL::cell=1.2, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)]
+DEAL::3
+DEAL::22
+DEAL::7
+DEAL::24
+DEAL::
+DEAL::cell=1.2, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)]
+DEAL::2
+DEAL::6
+DEAL::3
+DEAL::7
+DEAL::
+DEAL::cell=1.2, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::7
+DEAL::23
+DEAL::24
+DEAL::
+DEAL::cell=1.3, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
+DEAL::3
+DEAL::22
+DEAL::7
+DEAL::24
+DEAL::
+DEAL::cell=1.3, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)]
+DEAL::3
+DEAL::7
+DEAL::10
+DEAL::12
+DEAL::
+DEAL::cell=1.3, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::12
+DEAL::24
+DEAL::53
+DEAL::
+DEAL::cell=1.4, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::7
+DEAL::119
+DEAL::121
+DEAL::
+DEAL::cell=1.4, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::120
+DEAL::7
+DEAL::121
+DEAL::
+DEAL::cell=1.4, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)]
+DEAL::4
+DEAL::5
+DEAL::6
+DEAL::7
+DEAL::
+DEAL::cell=1.5, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)]
+DEAL::5
+DEAL::7
+DEAL::119
+DEAL::121
+DEAL::
+DEAL::cell=1.5, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::121
+DEAL::12
+DEAL::124
+DEAL::
+DEAL::cell=1.5, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::11
+DEAL::7
+DEAL::12
+DEAL::
+DEAL::cell=1.6, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::24
+DEAL::121
+DEAL::134
+DEAL::
+DEAL::cell=1.6, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(0)]
+DEAL::6
+DEAL::120
+DEAL::7
+DEAL::121
+DEAL::
+DEAL::cell=1.6, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::7
+DEAL::23
+DEAL::24
+DEAL::
+DEAL::cell=1.7, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
+DEAL::7
+DEAL::24
+DEAL::121
+DEAL::134
+DEAL::
+DEAL::cell=1.7, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(1)]
+DEAL::7
+DEAL::121
+DEAL::12
+DEAL::124
+DEAL::
+DEAL::cell=1.7, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::12
+DEAL::24
+DEAL::53
+DEAL::
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::Setting fe_index=2 on cell 1.2
+DEAL::Setting fe_index=3 on cell 1.3
+DEAL::Setting fe_index=4 on cell 1.4
+DEAL::Setting fe_index=5 on cell 1.5
+DEAL::Setting fe_index=6 on cell 1.6
+DEAL::Setting fe_index=7 on cell 1.7
+DEAL::cell=1.0, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)]
+DEAL::1
+DEAL::3
+DEAL::5
+DEAL::7
+DEAL::17
+DEAL::19
+DEAL::9
+DEAL::13
+DEAL::21
+DEAL::
+DEAL::cell=1.0, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)]
+DEAL::2
+DEAL::6
+DEAL::3
+DEAL::7
+DEAL::11
+DEAL::15
+DEAL::18
+DEAL::19
+DEAL::23
+DEAL::
+DEAL::cell=1.0, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)]
+DEAL::4
+DEAL::5
+DEAL::6
+DEAL::7
+DEAL::12
+DEAL::13
+DEAL::14
+DEAL::15
+DEAL::25
+DEAL::
+DEAL::cell=1.1, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)]
+DEAL::1
+DEAL::3
+DEAL::5
+DEAL::7
+DEAL::17
+DEAL::19
+DEAL::9
+DEAL::13
+DEAL::21
+DEAL::
+DEAL::cell=1.1, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
+DEAL::3
+DEAL::7
+DEAL::29
+DEAL::31
+DEAL::34
+DEAL::37
+DEAL::19
+DEAL::39
+DEAL::42
+DEAL::
+DEAL::cell=1.1, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::30
+DEAL::7
+DEAL::31
+DEAL::13
+DEAL::35
+DEAL::36
+DEAL::37
+DEAL::44
+DEAL::
+DEAL::cell=1.2, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
+DEAL::3
+DEAL::55
+DEAL::7
+DEAL::57
+DEAL::19
+DEAL::65
+DEAL::59
+DEAL::62
+DEAL::67
+DEAL::
+DEAL::cell=1.2, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)]
+DEAL::2
+DEAL::6
+DEAL::3
+DEAL::7
+DEAL::11
+DEAL::15
+DEAL::18
+DEAL::19
+DEAL::23
+DEAL::
+DEAL::cell=1.2, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::7
+DEAL::56
+DEAL::57
+DEAL::61
+DEAL::62
+DEAL::15
+DEAL::63
+DEAL::70
+DEAL::
+DEAL::cell=1.3, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)]
+DEAL::3
+DEAL::55
+DEAL::7
+DEAL::57
+DEAL::19
+DEAL::65
+DEAL::59
+DEAL::62
+DEAL::67
+DEAL::
+DEAL::cell=1.3, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)]
+DEAL::3
+DEAL::7
+DEAL::29
+DEAL::31
+DEAL::34
+DEAL::37
+DEAL::19
+DEAL::39
+DEAL::42
+DEAL::
+DEAL::cell=1.3, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::31
+DEAL::57
+DEAL::100
+DEAL::62
+DEAL::103
+DEAL::37
+DEAL::104
+DEAL::109
+DEAL::
+DEAL::cell=1.4, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::7
+DEAL::176
+DEAL::178
+DEAL::184
+DEAL::186
+DEAL::13
+DEAL::180
+DEAL::188
+DEAL::
+DEAL::cell=1.4, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::177
+DEAL::7
+DEAL::178
+DEAL::15
+DEAL::182
+DEAL::185
+DEAL::186
+DEAL::190
+DEAL::
+DEAL::cell=1.4, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)]
+DEAL::4
+DEAL::5
+DEAL::6
+DEAL::7
+DEAL::12
+DEAL::13
+DEAL::14
+DEAL::15
+DEAL::25
+DEAL::
+DEAL::cell=1.5, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)]
+DEAL::5
+DEAL::7
+DEAL::176
+DEAL::178
+DEAL::184
+DEAL::186
+DEAL::13
+DEAL::180
+DEAL::188
+DEAL::
+DEAL::cell=1.5, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::178
+DEAL::31
+DEAL::195
+DEAL::37
+DEAL::198
+DEAL::186
+DEAL::200
+DEAL::203
+DEAL::
+DEAL::cell=1.5, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::30
+DEAL::7
+DEAL::31
+DEAL::13
+DEAL::35
+DEAL::36
+DEAL::37
+DEAL::44
+DEAL::
+DEAL::cell=1.6, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::57
+DEAL::178
+DEAL::215
+DEAL::186
+DEAL::220
+DEAL::62
+DEAL::217
+DEAL::222
+DEAL::
+DEAL::cell=1.6, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(0)]
+DEAL::6
+DEAL::177
+DEAL::7
+DEAL::178
+DEAL::15
+DEAL::182
+DEAL::185
+DEAL::186
+DEAL::190
+DEAL::
+DEAL::cell=1.6, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::7
+DEAL::56
+DEAL::57
+DEAL::61
+DEAL::62
+DEAL::15
+DEAL::63
+DEAL::70
+DEAL::
+DEAL::cell=1.7, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(2)]
+DEAL::7
+DEAL::57
+DEAL::178
+DEAL::215
+DEAL::186
+DEAL::220
+DEAL::62
+DEAL::217
+DEAL::222
+DEAL::
+DEAL::cell=1.7, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(1)]
+DEAL::7
+DEAL::178
+DEAL::31
+DEAL::195
+DEAL::37
+DEAL::198
+DEAL::186
+DEAL::200
+DEAL::203
+DEAL::
+DEAL::cell=1.7, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::31
+DEAL::57
+DEAL::100
+DEAL::62
+DEAL::103
+DEAL::37
+DEAL::104
+DEAL::109
+DEAL::
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::Setting fe_index=2 on cell 1.2
+DEAL::Setting fe_index=3 on cell 1.3
+DEAL::Setting fe_index=4 on cell 1.4
+DEAL::Setting fe_index=5 on cell 1.5
+DEAL::Setting fe_index=6 on cell 1.6
+DEAL::Setting fe_index=7 on cell 1.7
+DEAL::cell=1.0, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)]
+DEAL::1
+DEAL::3
+DEAL::5
+DEAL::7
+DEAL::26
+DEAL::27
+DEAL::30
+DEAL::31
+DEAL::10
+DEAL::11
+DEAL::18
+DEAL::19
+DEAL::36
+DEAL::37
+DEAL::38
+DEAL::39
+DEAL::
+DEAL::cell=1.0, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)]
+DEAL::2
+DEAL::6
+DEAL::3
+DEAL::7
+DEAL::14
+DEAL::15
+DEAL::22
+DEAL::23
+DEAL::28
+DEAL::29
+DEAL::30
+DEAL::31
+DEAL::44
+DEAL::45
+DEAL::46
+DEAL::47
+DEAL::
+DEAL::cell=1.0, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)]
+DEAL::4
+DEAL::5
+DEAL::6
+DEAL::7
+DEAL::16
+DEAL::17
+DEAL::18
+DEAL::19
+DEAL::20
+DEAL::21
+DEAL::22
+DEAL::23
+DEAL::52
+DEAL::53
+DEAL::54
+DEAL::55
+DEAL::
+DEAL::cell=1.1, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)]
+DEAL::1
+DEAL::3
+DEAL::5
+DEAL::7
+DEAL::26
+DEAL::27
+DEAL::30
+DEAL::31
+DEAL::10
+DEAL::11
+DEAL::18
+DEAL::19
+DEAL::36
+DEAL::37
+DEAL::38
+DEAL::39
+DEAL::
+DEAL::cell=1.1, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)]
+DEAL::3
+DEAL::7
+DEAL::66
+DEAL::68
+DEAL::73
+DEAL::74
+DEAL::79
+DEAL::80
+DEAL::30
+DEAL::31
+DEAL::83
+DEAL::84
+DEAL::93
+DEAL::94
+DEAL::95
+DEAL::96
+DEAL::
+DEAL::cell=1.1, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::67
+DEAL::7
+DEAL::68
+DEAL::18
+DEAL::19
+DEAL::75
+DEAL::76
+DEAL::77
+DEAL::78
+DEAL::79
+DEAL::80
+DEAL::101
+DEAL::102
+DEAL::103
+DEAL::104
+DEAL::
+DEAL::cell=1.2, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)]
+DEAL::3
+DEAL::122
+DEAL::7
+DEAL::124
+DEAL::30
+DEAL::31
+DEAL::139
+DEAL::140
+DEAL::127
+DEAL::128
+DEAL::133
+DEAL::134
+DEAL::145
+DEAL::146
+DEAL::147
+DEAL::148
+DEAL::
+DEAL::cell=1.2, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)]
+DEAL::2
+DEAL::6
+DEAL::3
+DEAL::7
+DEAL::14
+DEAL::15
+DEAL::22
+DEAL::23
+DEAL::28
+DEAL::29
+DEAL::30
+DEAL::31
+DEAL::44
+DEAL::45
+DEAL::46
+DEAL::47
+DEAL::
+DEAL::cell=1.2, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::7
+DEAL::123
+DEAL::124
+DEAL::131
+DEAL::132
+DEAL::133
+DEAL::134
+DEAL::22
+DEAL::23
+DEAL::135
+DEAL::136
+DEAL::157
+DEAL::158
+DEAL::159
+DEAL::160
+DEAL::
+DEAL::cell=1.3, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)]
+DEAL::3
+DEAL::122
+DEAL::7
+DEAL::124
+DEAL::30
+DEAL::31
+DEAL::139
+DEAL::140
+DEAL::127
+DEAL::128
+DEAL::133
+DEAL::134
+DEAL::145
+DEAL::146
+DEAL::147
+DEAL::148
+DEAL::
+DEAL::cell=1.3, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)]
+DEAL::3
+DEAL::7
+DEAL::66
+DEAL::68
+DEAL::73
+DEAL::74
+DEAL::79
+DEAL::80
+DEAL::30
+DEAL::31
+DEAL::83
+DEAL::84
+DEAL::93
+DEAL::94
+DEAL::95
+DEAL::96
+DEAL::
+DEAL::cell=1.3, face=5
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::68
+DEAL::124
+DEAL::197
+DEAL::133
+DEAL::134
+DEAL::202
+DEAL::203
+DEAL::79
+DEAL::80
+DEAL::204
+DEAL::205
+DEAL::220
+DEAL::221
+DEAL::222
+DEAL::223
+DEAL::
+DEAL::cell=1.4, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::7
+DEAL::297
+DEAL::299
+DEAL::310
+DEAL::311
+DEAL::314
+DEAL::315
+DEAL::18
+DEAL::19
+DEAL::302
+DEAL::303
+DEAL::320
+DEAL::321
+DEAL::322
+DEAL::323
+DEAL::
+DEAL::cell=1.4, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::298
+DEAL::7
+DEAL::299
+DEAL::22
+DEAL::23
+DEAL::306
+DEAL::307
+DEAL::312
+DEAL::313
+DEAL::314
+DEAL::315
+DEAL::328
+DEAL::329
+DEAL::330
+DEAL::331
+DEAL::
+DEAL::cell=1.4, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)]
+DEAL::4
+DEAL::5
+DEAL::6
+DEAL::7
+DEAL::16
+DEAL::17
+DEAL::18
+DEAL::19
+DEAL::20
+DEAL::21
+DEAL::22
+DEAL::23
+DEAL::52
+DEAL::53
+DEAL::54
+DEAL::55
+DEAL::
+DEAL::cell=1.5, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)]
+DEAL::5
+DEAL::7
+DEAL::297
+DEAL::299
+DEAL::310
+DEAL::311
+DEAL::314
+DEAL::315
+DEAL::18
+DEAL::19
+DEAL::302
+DEAL::303
+DEAL::320
+DEAL::321
+DEAL::322
+DEAL::323
+DEAL::
+DEAL::cell=1.5, face=3
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::299
+DEAL::68
+DEAL::346
+DEAL::79
+DEAL::80
+DEAL::351
+DEAL::352
+DEAL::314
+DEAL::315
+DEAL::355
+DEAL::356
+DEAL::365
+DEAL::366
+DEAL::367
+DEAL::368
+DEAL::
+DEAL::cell=1.5, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)]
+DEAL::5
+DEAL::67
+DEAL::7
+DEAL::68
+DEAL::18
+DEAL::19
+DEAL::75
+DEAL::76
+DEAL::77
+DEAL::78
+DEAL::79
+DEAL::80
+DEAL::101
+DEAL::102
+DEAL::103
+DEAL::104
+DEAL::
+DEAL::cell=1.6, face=1
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::124
+DEAL::299
+DEAL::390
+DEAL::314
+DEAL::315
+DEAL::399
+DEAL::400
+DEAL::133
+DEAL::134
+DEAL::393
+DEAL::394
+DEAL::405
+DEAL::406
+DEAL::407
+DEAL::408
+DEAL::
+DEAL::cell=1.6, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(0)]
+DEAL::6
+DEAL::298
+DEAL::7
+DEAL::299
+DEAL::22
+DEAL::23
+DEAL::306
+DEAL::307
+DEAL::312
+DEAL::313
+DEAL::314
+DEAL::315
+DEAL::328
+DEAL::329
+DEAL::330
+DEAL::331
+DEAL::
+DEAL::cell=1.6, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)]
+DEAL::6
+DEAL::7
+DEAL::123
+DEAL::124
+DEAL::131
+DEAL::132
+DEAL::133
+DEAL::134
+DEAL::22
+DEAL::23
+DEAL::135
+DEAL::136
+DEAL::157
+DEAL::158
+DEAL::159
+DEAL::160
+DEAL::
+DEAL::cell=1.7, face=0
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(2)]
+DEAL::7
+DEAL::124
+DEAL::299
+DEAL::390
+DEAL::314
+DEAL::315
+DEAL::399
+DEAL::400
+DEAL::133
+DEAL::134
+DEAL::393
+DEAL::394
+DEAL::405
+DEAL::406
+DEAL::407
+DEAL::408
+DEAL::
+DEAL::cell=1.7, face=2
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(1)]
+DEAL::7
+DEAL::299
+DEAL::68
+DEAL::346
+DEAL::79
+DEAL::80
+DEAL::351
+DEAL::352
+DEAL::314
+DEAL::315
+DEAL::355
+DEAL::356
+DEAL::365
+DEAL::366
+DEAL::367
+DEAL::368
+DEAL::
+DEAL::cell=1.7, face=4
+DEAL::fe1=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)], fe2=FESystem<3>[FE_Q<3>(3)-FE_DGQ<3>(3)]
+DEAL::7
+DEAL::68
+DEAL::124
+DEAL::197
+DEAL::133
+DEAL::134
+DEAL::202
+DEAL::203
+DEAL::79
+DEAL::80
+DEAL::204
+DEAL::205
+DEAL::220
+DEAL::221
+DEAL::222
+DEAL::223
+DEAL::
+DEAL::OK

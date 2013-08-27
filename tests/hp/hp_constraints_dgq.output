@@ -1,0 +1,768 @@
+
+DEAL::Test for dim = 1
+DEAL::
+DEAL::No hanging nodes test
+DEAL::n_dofs=23
+DEAL::
+DEAL::
+DEAL::Hanging nodes test
+DEAL::n_dofs=18
+DEAL::
+DEAL::
+DEAL::Wrong face orientation test
+DEAL::
+DEAL::
+DEAL::2d deformed mesh test
+DEAL::
+DEAL::
+DEAL::2d deformed refined mesh test
+DEAL::
+DEAL::
+DEAL::Interpolation test
+DEAL::Testing FE_DGQ<1>(0) vs. FE_DGQ<1>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(0) vs. FE_DGQ<1>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(0) vs. FE_DGQ<1>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(0) vs. FE_DGQ<1>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(1) vs. FE_DGQ<1>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(1) vs. FE_DGQ<1>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(1) vs. FE_DGQ<1>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(1) vs. FE_DGQ<1>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(2) vs. FE_DGQ<1>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(2) vs. FE_DGQ<1>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(2) vs. FE_DGQ<1>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(2) vs. FE_DGQ<1>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(3) vs. FE_DGQ<1>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(3) vs. FE_DGQ<1>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(3) vs. FE_DGQ<1>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(3) vs. FE_DGQ<1>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(0) vs. FE_DGQ<1>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(0) vs. FE_DGQ<1>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(0) vs. FE_DGQ<1>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(0) vs. FE_DGQ<1>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(1) vs. FE_DGQ<1>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(1) vs. FE_DGQ<1>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(1) vs. FE_DGQ<1>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(1) vs. FE_DGQ<1>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(2) vs. FE_DGQ<1>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(2) vs. FE_DGQ<1>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(2) vs. FE_DGQ<1>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(2) vs. FE_DGQ<1>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(3) vs. FE_DGQ<1>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(3) vs. FE_DGQ<1>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(3) vs. FE_DGQ<1>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<1>(3) vs. FE_DGQ<1>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::
+DEAL::
+DEAL::Random hanging nodes
+DEAL::n_dofs=18
+DEAL::
+DEAL::
+DEAL::
+DEAL::
+DEAL::Test for dim = 2
+DEAL::
+DEAL::No hanging nodes test
+DEAL::n_dofs=468
+DEAL::
+DEAL::
+DEAL::Hanging nodes test
+DEAL::n_dofs=178
+DEAL::
+DEAL::
+DEAL::Wrong face orientation test
+DEAL::
+DEAL::
+DEAL::2d deformed mesh test
+DEAL::n_dofs=33
+DEAL::
+DEAL::
+DEAL::2d deformed refined mesh test
+DEAL::n_dofs=54
+DEAL::n_dofs=32
+DEAL::n_dofs=55
+DEAL::
+DEAL::
+DEAL::Interpolation test
+DEAL::Testing FE_DGQ<2>(0) vs. FE_DGQ<2>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(0) vs. FE_DGQ<2>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(0) vs. FE_DGQ<2>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(0) vs. FE_DGQ<2>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(1) vs. FE_DGQ<2>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(1) vs. FE_DGQ<2>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(1) vs. FE_DGQ<2>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(1) vs. FE_DGQ<2>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(2) vs. FE_DGQ<2>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(2) vs. FE_DGQ<2>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(2) vs. FE_DGQ<2>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(2) vs. FE_DGQ<2>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(3) vs. FE_DGQ<2>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(3) vs. FE_DGQ<2>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(3) vs. FE_DGQ<2>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(3) vs. FE_DGQ<2>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(0) vs. FE_DGQ<2>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(0) vs. FE_DGQ<2>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(0) vs. FE_DGQ<2>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(0) vs. FE_DGQ<2>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(1) vs. FE_DGQ<2>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(1) vs. FE_DGQ<2>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(1) vs. FE_DGQ<2>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(1) vs. FE_DGQ<2>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(2) vs. FE_DGQ<2>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(2) vs. FE_DGQ<2>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(2) vs. FE_DGQ<2>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(2) vs. FE_DGQ<2>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(3) vs. FE_DGQ<2>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(3) vs. FE_DGQ<2>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(3) vs. FE_DGQ<2>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<2>(3) vs. FE_DGQ<2>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::
+DEAL::
+DEAL::Random hanging nodes
+DEAL::n_dofs=1409
+DEAL::
+DEAL::
+DEAL::
+DEAL::
+DEAL::Test for dim = 3
+DEAL::
+DEAL::No hanging nodes test
+DEAL::n_dofs=13265
+DEAL::
+DEAL::
+DEAL::Hanging nodes test
+DEAL::n_dofs=3010
+DEAL::
+DEAL::
+DEAL::Wrong face orientation test
+DEAL::n_dofs=174
+DEAL::n_dofs=272
+DEAL::n_dofs=328
+DEAL::n_dofs=498
+DEAL::n_dofs=335
+DEAL::n_dofs=480
+DEAL::n_dofs=510
+DEAL::
+DEAL::
+DEAL::2d deformed mesh test
+DEAL::
+DEAL::
+DEAL::2d deformed refined mesh test
+DEAL::
+DEAL::
+DEAL::Interpolation test
+DEAL::Testing FE_DGQ<3>(0) vs. FE_DGQ<3>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(0) vs. FE_DGQ<3>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(0) vs. FE_DGQ<3>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(0) vs. FE_DGQ<3>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(1) vs. FE_DGQ<3>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(1) vs. FE_DGQ<3>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(1) vs. FE_DGQ<3>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(1) vs. FE_DGQ<3>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(2) vs. FE_DGQ<3>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(2) vs. FE_DGQ<3>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(2) vs. FE_DGQ<3>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(2) vs. FE_DGQ<3>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(3) vs. FE_DGQ<3>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(3) vs. FE_DGQ<3>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(3) vs. FE_DGQ<3>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(3) vs. FE_DGQ<3>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(0) vs. FE_DGQ<3>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(0) vs. FE_DGQ<3>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(0) vs. FE_DGQ<3>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(0) vs. FE_DGQ<3>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(1) vs. FE_DGQ<3>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(1) vs. FE_DGQ<3>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(1) vs. FE_DGQ<3>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(1) vs. FE_DGQ<3>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(2) vs. FE_DGQ<3>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(2) vs. FE_DGQ<3>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(2) vs. FE_DGQ<3>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(2) vs. FE_DGQ<3>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(3) vs. FE_DGQ<3>(0)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(3) vs. FE_DGQ<3>(1)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(3) vs. FE_DGQ<3>(2)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::Testing FE_DGQ<3>(3) vs. FE_DGQ<3>(3)
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::  Relative interpolation error before constraints: 0
+DEAL::  Relative difference after constraints: 0
+DEAL::
+DEAL::
+DEAL::Random hanging nodes
+DEAL::n_dofs=17628
+DEAL::
+DEAL::
+DEAL::
+DEAL::

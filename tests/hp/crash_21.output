@@ -1,0 +1,32 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       1
+DEAL::   Number of degrees of freedom: 2
+DEAL::   Number of constraints       : 0
+DEAL::nnz=4
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       2
+DEAL::   Number of degrees of freedom: 4
+DEAL::   Number of constraints       : 0
+DEAL::nnz=16
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       3
+DEAL::   Number of degrees of freedom: 6
+DEAL::   Number of constraints       : 0
+DEAL::nnz=28
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       1
+DEAL::   Number of degrees of freedom: 4
+DEAL::   Number of constraints       : 0
+DEAL::nnz=16
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       4
+DEAL::   Number of degrees of freedom: 16
+DEAL::   Number of constraints       : 0
+DEAL::nnz=192
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       7
+DEAL::   Number of degrees of freedom: 28
+DEAL::   Number of constraints       : 0
+DEAL::nnz=432
+DEAL::OK

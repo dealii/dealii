@@ -1,0 +1,187 @@
+
+DEAL::Identities for FESystem<2>[FE_Q<2>(1)^3] and FESystem<2>[FE_Q<2>(1)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(1)^3] and FESystem<2>[FE_Q<2>(2)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(1)^3] and FESystem<2>[FE_Q<2>(3)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(1)^3] and FESystem<2>[FE_Q<2>(4)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(1)^3] and FESystem<2>[FE_Q<2>(5)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(2)^3] and FESystem<2>[FE_Q<2>(1)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(2)^3] and FESystem<2>[FE_Q<2>(2)^3]: 3
+DEAL::0 0
+DEAL::1 1
+DEAL::2 2
+DEAL::Identities for FESystem<2>[FE_Q<2>(2)^3] and FESystem<2>[FE_Q<2>(3)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(2)^3] and FESystem<2>[FE_Q<2>(4)^3]: 3
+DEAL::0 4
+DEAL::1 13
+DEAL::2 22
+DEAL::Identities for FESystem<2>[FE_Q<2>(2)^3] and FESystem<2>[FE_Q<2>(5)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(3)^3] and FESystem<2>[FE_Q<2>(1)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(3)^3] and FESystem<2>[FE_Q<2>(2)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(3)^3] and FESystem<2>[FE_Q<2>(3)^3]: 12
+DEAL::0 0
+DEAL::1 1
+DEAL::2 2
+DEAL::3 3
+DEAL::4 4
+DEAL::5 5
+DEAL::6 6
+DEAL::7 7
+DEAL::8 8
+DEAL::9 9
+DEAL::10 10
+DEAL::11 11
+DEAL::Identities for FESystem<2>[FE_Q<2>(3)^3] and FESystem<2>[FE_Q<2>(4)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(3)^3] and FESystem<2>[FE_Q<2>(5)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(4)^3] and FESystem<2>[FE_Q<2>(1)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(4)^3] and FESystem<2>[FE_Q<2>(2)^3]: 3
+DEAL::4 0
+DEAL::13 1
+DEAL::22 2
+DEAL::Identities for FESystem<2>[FE_Q<2>(4)^3] and FESystem<2>[FE_Q<2>(3)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(4)^3] and FESystem<2>[FE_Q<2>(4)^3]: 27
+DEAL::0 0
+DEAL::1 1
+DEAL::2 2
+DEAL::3 3
+DEAL::4 4
+DEAL::5 5
+DEAL::6 6
+DEAL::7 7
+DEAL::8 8
+DEAL::9 9
+DEAL::10 10
+DEAL::11 11
+DEAL::12 12
+DEAL::13 13
+DEAL::14 14
+DEAL::15 15
+DEAL::16 16
+DEAL::17 17
+DEAL::18 18
+DEAL::19 19
+DEAL::20 20
+DEAL::21 21
+DEAL::22 22
+DEAL::23 23
+DEAL::24 24
+DEAL::25 25
+DEAL::26 26
+DEAL::Identities for FESystem<2>[FE_Q<2>(4)^3] and FESystem<2>[FE_Q<2>(5)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(5)^3] and FESystem<2>[FE_Q<2>(1)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(5)^3] and FESystem<2>[FE_Q<2>(2)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(5)^3] and FESystem<2>[FE_Q<2>(3)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(5)^3] and FESystem<2>[FE_Q<2>(4)^3]: 0
+DEAL::Identities for FESystem<2>[FE_Q<2>(5)^3] and FESystem<2>[FE_Q<2>(5)^3]: 48
+DEAL::0 0
+DEAL::1 1
+DEAL::2 2
+DEAL::3 3
+DEAL::4 4
+DEAL::5 5
+DEAL::6 6
+DEAL::7 7
+DEAL::8 8
+DEAL::9 9
+DEAL::10 10
+DEAL::11 11
+DEAL::12 12
+DEAL::13 13
+DEAL::14 14
+DEAL::15 15
+DEAL::16 16
+DEAL::17 17
+DEAL::18 18
+DEAL::19 19
+DEAL::20 20
+DEAL::21 21
+DEAL::22 22
+DEAL::23 23
+DEAL::24 24
+DEAL::25 25
+DEAL::26 26
+DEAL::27 27
+DEAL::28 28
+DEAL::29 29
+DEAL::30 30
+DEAL::31 31
+DEAL::32 32
+DEAL::33 33
+DEAL::34 34
+DEAL::35 35
+DEAL::36 36
+DEAL::37 37
+DEAL::38 38
+DEAL::39 39
+DEAL::40 40
+DEAL::41 41
+DEAL::42 42
+DEAL::43 43
+DEAL::44 44
+DEAL::45 45
+DEAL::46 46
+DEAL::47 47
+DEAL::Identities for FESystem<3>[FE_Q<3>(1)^3] and FESystem<3>[FE_Q<3>(1)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(1)^3] and FESystem<3>[FE_Q<3>(2)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(1)^3] and FESystem<3>[FE_Q<3>(3)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(1)^3] and FESystem<3>[FE_Q<3>(4)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(2)^3] and FESystem<3>[FE_Q<3>(1)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(2)^3] and FESystem<3>[FE_Q<3>(2)^3]: 3
+DEAL::0 0
+DEAL::1 1
+DEAL::2 2
+DEAL::Identities for FESystem<3>[FE_Q<3>(2)^3] and FESystem<3>[FE_Q<3>(3)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(2)^3] and FESystem<3>[FE_Q<3>(4)^3]: 3
+DEAL::0 4
+DEAL::1 13
+DEAL::2 22
+DEAL::Identities for FESystem<3>[FE_Q<3>(3)^3] and FESystem<3>[FE_Q<3>(1)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(3)^3] and FESystem<3>[FE_Q<3>(2)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(3)^3] and FESystem<3>[FE_Q<3>(3)^3]: 12
+DEAL::0 0
+DEAL::1 1
+DEAL::2 2
+DEAL::3 3
+DEAL::4 4
+DEAL::5 5
+DEAL::6 6
+DEAL::7 7
+DEAL::8 8
+DEAL::9 9
+DEAL::10 10
+DEAL::11 11
+DEAL::Identities for FESystem<3>[FE_Q<3>(3)^3] and FESystem<3>[FE_Q<3>(4)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(4)^3] and FESystem<3>[FE_Q<3>(1)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(4)^3] and FESystem<3>[FE_Q<3>(2)^3]: 3
+DEAL::4 0
+DEAL::13 1
+DEAL::22 2
+DEAL::Identities for FESystem<3>[FE_Q<3>(4)^3] and FESystem<3>[FE_Q<3>(3)^3]: 0
+DEAL::Identities for FESystem<3>[FE_Q<3>(4)^3] and FESystem<3>[FE_Q<3>(4)^3]: 27
+DEAL::0 0
+DEAL::1 1
+DEAL::2 2
+DEAL::3 3
+DEAL::4 4
+DEAL::5 5
+DEAL::6 6
+DEAL::7 7
+DEAL::8 8
+DEAL::9 9
+DEAL::10 10
+DEAL::11 11
+DEAL::12 12
+DEAL::13 13
+DEAL::14 14
+DEAL::15 15
+DEAL::16 16
+DEAL::17 17
+DEAL::18 18
+DEAL::19 19
+DEAL::20 20
+DEAL::21 21
+DEAL::22 22
+DEAL::23 23
+DEAL::24 24
+DEAL::25 25
+DEAL::26 26
+DEAL::OK

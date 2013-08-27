@@ -1,0 +1,44 @@
+
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::1.0
+DEAL::0 1 
+DEAL::1.1
+DEAL::1 2 
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::Setting fe_index=2 on cell 1.2
+DEAL::Setting fe_index=3 on cell 1.3
+DEAL::1.0
+DEAL::0 1 2 3 
+DEAL::1.1
+DEAL::1 4 3 5 
+DEAL::1.2
+DEAL::2 3 6 7 
+DEAL::1.3
+DEAL::3 5 7 8 
+DEAL::Setting fe_index=0 on cell 1.0
+DEAL::Setting fe_index=1 on cell 1.1
+DEAL::Setting fe_index=2 on cell 1.2
+DEAL::Setting fe_index=3 on cell 1.3
+DEAL::Setting fe_index=4 on cell 1.4
+DEAL::Setting fe_index=5 on cell 1.5
+DEAL::Setting fe_index=6 on cell 1.6
+DEAL::Setting fe_index=7 on cell 1.7
+DEAL::1.0
+DEAL::0 1 2 3 4 5 6 7 
+DEAL::1.1
+DEAL::1 8 3 9 5 10 7 11 
+DEAL::1.2
+DEAL::2 3 12 13 6 7 14 15 
+DEAL::1.3
+DEAL::3 9 13 16 7 11 15 17 
+DEAL::1.4
+DEAL::4 5 6 7 18 19 20 21 
+DEAL::1.5
+DEAL::5 10 7 11 19 22 21 23 
+DEAL::1.6
+DEAL::6 7 14 15 20 21 24 25 
+DEAL::1.7
+DEAL::7 11 15 17 21 23 25 26 
+DEAL::OK

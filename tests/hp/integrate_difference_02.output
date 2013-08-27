@@ -1,0 +1,17 @@
+
+DEAL::dim=1
+DEAL::L1, diff=0.50
+DEAL::H1 seminorm, diff=1.0
+DEAL::W1infty semi, diff=1.0
+DEAL::W1infty, diff=2.0
+DEAL::dim=2
+DEAL::L1, diff=0.50
+DEAL::H1 seminorm, diff=1.0
+DEAL::W1infty semi, diff=1.0
+DEAL::W1infty, diff=2.0
+DEAL::dim=3
+DEAL::L1, diff=0.50
+DEAL::H1 seminorm, diff=1.0
+DEAL::W1infty semi, diff=1.0
+DEAL::W1infty, diff=2.0
+DEAL::OK
