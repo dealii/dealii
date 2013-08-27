@@ -22,7 +22,7 @@
 // these tests check that we can deal with FESystem(FE_Q(p),FE_DGQ(q)) for
 // different p,q
 
-char logname[] = "hp_constraints_q_system_x/output";
+char logname[] = "output";
 
 
 #include "hp_constraints_common.h"

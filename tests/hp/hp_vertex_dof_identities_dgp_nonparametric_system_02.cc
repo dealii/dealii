@@ -75,7 +75,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_vertex_dof_identities_dgp_nonparametric_system_02/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

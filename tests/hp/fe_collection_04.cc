@@ -65,7 +65,7 @@ int main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile("fe_collection_04/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

@@ -27,7 +27,7 @@
 // Q5/Q4. Higher order finite elements in 3d will probably only
 // exacerbate the problem, but the code there appears to be robust.
 
-char logname[] = "crash_12/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

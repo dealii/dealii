@@ -156,7 +156,7 @@ void test_constraints_old (FiniteElement<dim> &fe)
 
 int main ()
 {
-  std::ofstream logfile("hp_hanging_nodes_01/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

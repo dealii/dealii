@@ -71,7 +71,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("get_active_fe_indices/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

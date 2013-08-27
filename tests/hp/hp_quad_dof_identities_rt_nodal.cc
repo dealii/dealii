@@ -64,7 +64,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_quad_dof_identities_rt_nodal/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

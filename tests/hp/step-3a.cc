@@ -53,7 +53,7 @@
 #include <fstream>
 #include <iostream>
 
-std::ofstream logfile("step-3a/output");
+std::ofstream logfile("output");
 
 
 

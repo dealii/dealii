@@ -135,7 +135,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("renumber_block_wise_02/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);

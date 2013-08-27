@@ -83,7 +83,7 @@ ADD_SUBDIRECTORY(deal.II)
 #fail
 ADD_SUBDIRECTORY(fe)
 ADD_SUBDIRECTORY(grid)
-#hp
+ADD_SUBDIRECTORY(hp)
 #integrators
 ADD_SUBDIRECTORY(lac)
 #lib

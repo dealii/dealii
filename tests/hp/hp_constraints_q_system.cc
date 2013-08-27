@@ -19,7 +19,7 @@
 // check that computation of hp constraints works for FESystem(FE_Q) elements correctly
 // on a uniformly refined mesh for functions of degree q
 
-char logname[] = "hp_constraints_q_system/output";
+char logname[] = "output";
 
 
 #include "hp_constraints_common.h"

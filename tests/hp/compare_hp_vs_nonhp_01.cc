@@ -51,7 +51,7 @@
 #include <fstream>
 #include <iostream>
 
-std::ofstream logfile("compare_hp_vs_nonhp_01/output");
+std::ofstream logfile("output");
 
 
 template <int dim>

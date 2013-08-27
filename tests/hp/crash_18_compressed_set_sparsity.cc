@@ -24,7 +24,7 @@
 // like crash_18, but use a Compressed*Set*SparsityPattern instead to test
 // that class some more
 
-char logname[] = "crash_18_compressed_set_sparsity/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

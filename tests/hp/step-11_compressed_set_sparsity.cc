@@ -26,7 +26,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <fstream>
-std::ofstream logfile("step-11_compressed_set_sparsity/output");
+std::ofstream logfile("output");
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>

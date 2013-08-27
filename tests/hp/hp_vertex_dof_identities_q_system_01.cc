@@ -65,7 +65,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_vertex_dof_identities_q_system_01/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

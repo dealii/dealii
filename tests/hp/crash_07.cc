@@ -19,7 +19,7 @@
 // a distilled version of hp_constraints_q_05 and a couple of other tests
 // where DoFs were constrained to other DoFs already constrained
 
-char logname[] = "crash_07/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

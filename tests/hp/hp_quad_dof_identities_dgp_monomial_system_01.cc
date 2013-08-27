@@ -65,7 +65,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_quad_dof_identities_dgp_monomial_system_01/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
