@@ -23,6 +23,7 @@
             <li><a href="#cmakesimple">Simple <code>CMakeLists.txt</code></a>
 	      <ul>
 		<li><a href="#cmakesimple.multiple">Adding multiple executable targets</a>
+		<li><a href="#cmakesimple.libs">Adding libraries and common source files</a>
 		<li><a href="#cmakesimple.run">Adding a "run" target</a>
 	      </ul>
             <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code>            <li><a href="#cmakeadvanced">Advanced <code>CMakeLists.txt</code></a>
@@ -61,19 +62,19 @@
     <h3>Simple CMakeLists.txt</h3>
 
     <p>
-      For larger projects the simple <code>CMakeLists.txt</code> presented
-      above tends to be too inflexible. So, if you wish to have more
-      control about targets the <code>DEAL_II_SETUP_TARGET</code> macro
-      might be of interest for you. Here is a full example
-      (<a href="CMakeLists.txt.sample3"
-          target="_top">plain text</a> version):
+      In this section, we start out with a
+      minimal <code>CMakeLists.txt</code> based on
+      the <code>DEAL_II_SETUP_TARGET</code> macro. This method gives
+      full control of what's happening and is easily extensible to
+      more complex projects, as exemplified in the subsections here an
+      later in the section on <a href="cmakeadvanced">advanced
+      topics</a>. Here is a full example
+      (<a href="CMakeLists.txt.sample3" target="_top">plain text</a>
+      version):
       
       TODO: Fix plain text after finalizing!
 
-      TODO: Do some nicer formatting of pre. Here and possibly
-      globally. Do not use indentation by hand for this.
-
-<pre class="sample">
+<pre class="cmake">
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 FIND_PACKAGE(deal.II 8.0 REQUIRED
@@ -93,7 +94,7 @@ DEAL_II_SETUP_TARGET(mycode)
     <h4>Adding multiple executable targets</h4>
     
     <p>In order to specify multiple executable targets, simply repeat the last two lines of the simple <code>CMakeLists.txt</code>:</p>
-<pre class="sample">
+<pre class="cmake">
 ADD_EXECUTABLE(mycode2 mycode2.cc)
 DEAL_II_SETUP_TARGET(mycode2)
 
@@ -105,6 +106,46 @@ If the list gets longer, consider using
 a <a href="#cmakeadvanced.foreach">loop</a>, possibly
 with <a href="#cmakeadvanced.glob">GLOB</a>.
 
+    <a name="cmakesimple.libs"></a>
+    <h4>Adding libraries and common source files</h4>
+
+    <p>
+      Adding a library is as simple as adding an executable target. We
+      specify the library name and then have to tell cmake that the
+      executables depend on it. The code in the simple file below the
+      project definition accordingly changes for instance to:
+    </p>
+
+<pre class="cmake">
+ADD_LIBRARY(mylib libsrc1.cc libsrc2.cc libsrc3.cc)
+
+ADD_EXECUTABLE(mycode mycode.cc)
+DEAL_II_SETUP_TARGET(mycode)
+TARGET_LINK_LIBRARIES(mycode mylib)
+</pre>
+
+<p>When you have <a href="#cmakesimple.multiple">multiple targets</a>,
+repeat the last line of code for each of them. Accordingly,
+a <a href="#cmakeadvanced.foreach">loop</a> becomes even more
+attractive.</p>
+
+<p>If you only have a single file or few files with common source
+code, an alternative to creating a library might be the option:</p>
+
+<pre class="cmake">
+ADD_EXECUTABLE(mycode mycode.cc common.cc)
+DEAL_II_SETUP_TARGET(mycode)
+
+ADD_EXECUTABLE(mycode2 mycode2.cc common.cc)
+DEAL_II_SETUP_TARGET(mycode2)
+</pre>
+
+<p>You should be aware though that <code>common.cc</code> will be
+compiled for each target, not only once.</p>
+
+TODO: Matthias, is this correct?
+
+
     <a name="cmakesimple.run"></a>
     <h4>Adding a "run" target</h4>
     
@@ -114,7 +155,7 @@ with <a href="#cmakeadvanced.glob">GLOB</a>.
       can only run a single executable):
     </p>
 
-<pre class="sample">
+<pre class="cmake">
 ADD_CUSTOM_TARGET(run COMMAND mycode
   COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration")
 </pre>
@@ -134,7 +175,7 @@ ADD_CUSTOM_TARGET(run COMMAND mycode
       projects:
     </p>
 
-<pre class="sample">
+<pre class="cmake">
 FIND_PACKAGE(deal.II 8.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
@@ -209,7 +250,7 @@ $ cmake .
       variables before <code>DEAL_II_INVOKE_AUTOPILOT()</code> is called
       (<a href="CMakeLists.txt.sample2" target="_top">plain text</a> version):
 
-<pre class="sample">
+<pre class="cmake">
 # (Optional)
 # Specify a list of files (file globs) that will be removed
 # with the "make runclean" and "make distclean" targets.
