@@ -163,7 +163,7 @@ void test ()
 int
 main()
 {
-  std::ofstream logfile ("rt_6/output");
+  std::ofstream logfile ("output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);

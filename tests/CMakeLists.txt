@@ -78,7 +78,7 @@ ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(bits)
 ADD_SUBDIRECTORY(codim_one)
 ADD_SUBDIRECTORY(deal.II)
-#fail
+ADD_SUBDIRECTORY(fail)
 ADD_SUBDIRECTORY(fe)
 ADD_SUBDIRECTORY(grid)
 ADD_SUBDIRECTORY(hp)
@@ -88,6 +88,7 @@ ADD_SUBDIRECTORY(matrix_free)
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(serialization)
 
+# These three are a little bit special
 #all-headers
 #benchmarks
 #mesh_converter

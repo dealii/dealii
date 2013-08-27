@@ -57,7 +57,7 @@ test(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("rt_4/output");
+  std::ofstream logfile ("output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);

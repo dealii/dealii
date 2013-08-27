@@ -32,7 +32,7 @@
 
 #include <fstream>
 
-std::ofstream logfile ("abf_approximation_01/output");
+std::ofstream logfile ("output");
 
 char buf[1000];
 

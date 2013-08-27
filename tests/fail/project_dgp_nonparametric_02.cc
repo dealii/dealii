@@ -19,7 +19,7 @@
 // check that VectorTools::project works for DGPNonparametric elements
 // correctly on a uniformly refined mesh for functions of degree q
 
-char logname[] = "project_dgp_nonparametric_02/output";
+char logname[] = "output";
 
 
 #include "../deal.II/project_common.h"

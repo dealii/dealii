@@ -16,7 +16,7 @@
 
 
 
-char logname[] = "injection_q_hierarchical/output";
+char logname[] = "output";
 
 
 #include "../fe/injection_common.h"
