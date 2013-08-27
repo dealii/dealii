@@ -72,7 +72,7 @@ MESSAGE(STATUS "Proceed to test definitions")
 #$(if $(USE_CONTRIB_SLEPC:no=),    slepc,) \
 #$(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
 
-#a-framework
+ADD_SUBDIRECTORY(a-framework)
 ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(bits)

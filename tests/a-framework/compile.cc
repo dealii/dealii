@@ -29,7 +29,7 @@ void function_that_does_not_exist ();
 
 int main ()
 {
-  std::ofstream logfile("compile/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
