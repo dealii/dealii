@@ -10,20 +10,22 @@
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
   </head>
-
+  
   <body>
-
+    
     <h1>How to interface with <acronym>deal.II</acronym> in your own
       project</h1>
-
-    <p>
+    
     <table class="tutorial" width="50%">
       <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
       <tr><td valign="top">
 	  <ul>
-            <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code></a>
             <li><a href="#cmakesimple">Simple <code>CMakeLists.txt</code></a>
-            <li><a href="#cmakeadvanced">Advanced <code>CMakeLists.txt</code></a>
+	      <ul>
+		<li><a href="#cmakesimple.multiple">Adding multiple executable targets</a>
+		<li><a href="#cmakesimple.run">Adding a "run" target</a>
+	      </ul>
+            <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code>            <li><a href="#cmakeadvanced">Advanced <code>CMakeLists.txt</code></a>
             <ul>
               <li> TODO, see list</li>
             </ul>
@@ -34,7 +36,6 @@
 	</td>
       </tr>
     </table>
-    </p>
 
     <p>
       <code>cmake</code> is the configuration and build tool we use
@@ -56,38 +57,105 @@
       <a href="cmake.html" target="body">deal.II CMake ReadMe</a>.)
     </p>
 
+    <a name="cmakesimple"></a>
+    <h3>Simple CMakeLists.txt</h3>
+
+    <p>
+      For larger projects the simple <code>CMakeLists.txt</code> presented
+      above tends to be too inflexible. So, if you wish to have more
+      control about targets the <code>DEAL_II_SETUP_TARGET</code> macro
+      might be of interest for you. Here is a full example
+      (<a href="CMakeLists.txt.sample3"
+          target="_top">plain text</a> version):
+      
+      TODO: Fix plain text after finalizing!
+
+      TODO: Do some nicer formatting of pre. Here and possibly
+      globally. Do not use indentation by hand for this.
+
+<pre class="sample">
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+
+FIND_PACKAGE(deal.II 8.0 REQUIRED
+  HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
+)
+
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+PROJECT(myproject CXX)
+
+ADD_EXECUTABLE(mycode mycode.cc)
+DEAL_II_SETUP_TARGET(mycode)
+</pre>
+
+      TODO: Explain the two macros!
+
+    <a name="cmakesimple.multiple"></a>
+    <h4>Adding multiple executable targets</h4>
+    
+    <p>In order to specify multiple executable targets, simply repeat the last two lines of the simple <code>CMakeLists.txt</code>:</p>
+<pre class="sample">
+ADD_EXECUTABLE(mycode2 mycode2.cc)
+DEAL_II_SETUP_TARGET(mycode2)
+
+ADD_EXECUTABLE(mycode3 mycode3.cc)
+DEAL_II_SETUP_TARGET(mycode3)
+</pre>
+
+If the list gets longer, consider using
+a <a href="#cmakeadvanced.foreach">loop</a>, possibly
+with <a href="#cmakeadvanced.glob">GLOB</a>.
+
+    <a name="cmakesimple.run"></a>
+    <h4>Adding a "run" target</h4>
+    
+    <p>
+      If you wish to have a "run" target for make, like in the deal.II
+      tutorial, specify one this way (obviously, a single "run" target
+      can only run a single executable):
+    </p>
+
+<pre class="sample">
+ADD_CUSTOM_TARGET(run COMMAND mycode
+  COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration")
+</pre>
+
+
     <a name="cmakesauto"></a>
     <h3>Autopilot style CMakeLists.txt</h3>
 
     <p>
-      The easiest way to write a <code>CMakeLists.txt</code> file is to use
+      If you want a make interface similar to the deal.II library and
+      its tutorial, namely maker targets for debug and release
+      versions, running the code and cleaning, the easiest way to
+      write a <code>CMakeLists.txt</code> file may be to use
       an "autopilot" style macro. Here is a minimalistic example for the
       step-1 tutorial program (<a href="CMakeLists.txt.sample1"
         target="_top">plain text</a> version) that can be used for simple
       projects:
-      <pre>
+    </p>
 
-    FIND_PACKAGE(deal.II 8.0 REQUIRED
-      HINTS
-        ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
-        # You can specify additional hints for search paths here, e.g.
-        # $ENV{HOME}/workspace/deal.II
-      )
+<pre class="sample">
+FIND_PACKAGE(deal.II 8.0 REQUIRED
+  HINTS
+    ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
+    # You can specify additional hints for search paths here, e.g.
+    # $ENV{HOME}/workspace/deal.II
+)
 
-    # Set the name of the project and target:
-    SET(TARGET "step-1")
+# Set the name of the project and target:
+SET(TARGET "step-1")
 
-    # Declare all source files the target consists of:
-    SET(TARGET_SRC
-      step-1.cc
-      # You can specify additional files here!
-      )
+# Declare all source files the target consists of:
+SET(TARGET_SRC
+  step-1.cc
+  # You can specify additional files here!
+)
 
-    CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-    DEAL_II_INITIALIZE_CACHED_VARIABLES()
-    PROJECT(${TARGET} CXX)
-    DEAL_II_INVOKE_AUTOPILOT()
-      </pre>
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+PROJECT(${TARGET} CXX)
+DEAL_II_INVOKE_AUTOPILOT()
+</pre>
 
 
       This <code>CMakeLists.txt</code> is intended for use with a small
@@ -96,109 +164,67 @@
       in the <a href="../readme.html#configuration" target="_body">readme
       file</a>). Using this input file, you can run <code>cmake</code> in the
       source directory as follows:
-      <pre>
 
-    $ cd step-1
-    $ cmake .
+<pre class="sample">
+$ cd step-1
+$ cmake .
 
-    [...]
+[...]
 
-    ###
-    #
-    #  Successfully set up project  step-1  with  deal.II-99.99.svn30300  found at
-    #      /usr
-    #
-    #  CMAKE_BUILD_TYPE:         Debug
-    #
-    #  You can now run
-    #      $ make                - to compile and link the program
-    #      $ make run            - to (compile, link and) run the program
-    #
-    #      $ make debug          - to switch the build type to Debug
-    #      $ make release        - to switch the build type to Release
-    #
-    #      $ make edit_cache     - to change (cached) configuration variables
-    #                              and rerun the configure and generate phases of CMake
-    #
-    #      $ make strip_comments - strip the source files in this
-    #                              directory off the documentation comments
-    #      $ make clean          - to remove the generated executable as well as
-    #                              all intermediate compilation files
-    #      $ make runclean       - to remove all output generated by the program
-    #      $ make distclean      - to clean the directory from _all_ generated
-    #                              files (includes clean, runclean and the removal
-    #                              of the generated build system)
-    #
-    #      $ make help           - to view this message again
-    #
-    #  Have a nice day!
-    #
-    ###
-      </pre>
+###
+#
+#  Successfully set up project  step-1  with  deal.II-99.99.svn30300  found at
+#      /usr
+#
+#  CMAKE_BUILD_TYPE:         Debug
+#
+#  You can now run
+#      $ make                - to compile and link the program
+#      $ make run            - to (compile, link and) run the program
+#
+#      $ make debug          - to switch the build type to Debug
+#      $ make release        - to switch the build type to Release
+#
+#      $ make edit_cache     - to change (cached) configuration variables
+#                              and rerun the configure and generate phases of CMake
+#
+#      $ make strip_comments - strip the source files in this
+#                              directory off the documentation comments
+#      $ make clean          - to remove the generated executable as well as
+#                              all intermediate compilation files
+#      $ make runclean       - to remove all output generated by the program
+#      $ make distclean      - to clean the directory from _all_ generated
+#                              files (includes clean, runclean and the removal
+#                              of the generated build system)
+#
+#      $ make help           - to view this message again
+#
+#  Have a nice day!
+#
+###
+</pre>
+
       There are two additional configuration options (in addition to
       <code>TARGET</code> and <code>TARGET_SRC</code>) that can be set via
       variables before <code>DEAL_II_INVOKE_AUTOPILOT()</code> is called
       (<a href="CMakeLists.txt.sample2" target="_top">plain text</a> version):
-      <pre>
 
-    # (Optional)
-    # Specify a list of files (file globs) that will be removed
-    # with the "make runclean" and "make distclean" targets.
-    # (If empty, sensible default values will be used.)
-    SET(CLEAN_UP_FILES
-      # a custom list of globs, e.g. *.log *.vtk
-      )
+<pre class="sample">
+# (Optional)
+# Specify a list of files (file globs) that will be removed
+# with the "make runclean" and "make distclean" targets.
+# (If empty, sensible default values will be used.)
+SET(CLEAN_UP_FILES
+  # a custom list of globs, e.g. *.log *.vtk
+)
 
-    # (Optional)
-    # A custom command line that should be invoked by "make run".
-    # (If empty, ./${TARGET} will be invoked.)
-    SET(TARGET_RUN
-      # a custom command line, e.g. mpirun -np 2 ${TARGET}
-      )
-      </pre>
-
-
-    </p>
-
-    <a name="cmakesimple"></a>
-    <h3>Simple CMakeLists.txt</h3>
-
-    <p>
-      For larger projects the simple <code>CMakeLists.txt</code> presented
-      above tends to be too inflexible. So, if you wish to have more
-      control about targets the <code>DEAL_II_SETUP_TARGET</code> macro
-      might be of interest for you. Here is a full example, again using the
-      step-1 tutorial program as a template (<a href="CMakeLists.txt.sample3"
-        target="_top">plain text</a> version):
-      <pre>
-
-    CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-
-    FIND_PACKAGE(deal.II 8.0 REQUIRED
-      HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
-      )
-
-    DEAL_II_INITIALIZE_CACHED_VARIABLES()
-    PROJECT(step-1 CXX)
-
-    ADD_EXECUTABLE(step-1 step-1.cc)
-    DEAL_II_SETUP_TARGET(step-1)
-      </pre>
-      TODO: Explain the two macros!
-
-      TODO: Optionally, specify a run target:
-      <pre>
-
-    # (Optional)
-    # If you wish to have a "run" target for make, specify one:
-    ADD_CUSTOM_TARGET(run COMMAND step-1
-      COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration"
-      )
-      </pre>
-      TODO: More in the next section
-   </p>
-
-
+# (Optional)
+# A custom command line that should be invoked by "make run".
+# (If empty, ./${TARGET} will be invoked.)
+SET(TARGET_RUN
+  # a custom command line, e.g. mpirun -np 2 ${TARGET}
+)
+</pre>
 
     <a name="cmakeadvanced"></a>
     <h3> Advanced <code>CMakeLists.txt</code></h3>
@@ -206,6 +232,8 @@
     <pre>
 
     TODO: A Subsection for each of the following:
+
+      - Common code for several targets. Library or adding to target definition
 
       - control statements (if and foreach)
 
@@ -236,6 +264,9 @@
       of the <code>deal.IIConfig.cmake</code> file.  Either by directly
       specifying <code>deal.II_DIR</code> to point to the path were the
       <code>deal.IIConfig.cmake</code> file is located:
+
+      TODO: is deal.II_DIR still accurate? We use different above
+
       <pre>
 
     cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;

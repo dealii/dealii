@@ -180,6 +180,16 @@ pre {
 	line-height: 1.1em;
 }
 	
+pre.sample {
+	padding: 1em;
+	text-align: left;
+	text-indent: 0;
+	border: 1px dashed #2f6fab;
+	color: Black;
+	background-color: #f9f9f9;
+	line-height: 1.1em;
+}
+	
 table.navbar { }
 table.tutorial {
     color: black;
