@@ -3119,7 +3119,7 @@ namespace hp
   {
     create_active_fe_table ();
 
-    // Remember if the cells have already
+    // Remember if the cells already have
     // children. That will make the transfer
     // of the active_fe_index to the finer
     // levels easier.
@@ -3148,7 +3148,7 @@ namespace hp
   {
     create_active_fe_table ();
 
-    // Remember if the cells have already
+    // Remember if the cells already have
     // children. That will make the transfer
     // of the active_fe_index to the finer
     // levels easier.
@@ -3309,11 +3309,6 @@ namespace hp
          children_level != has_children.end ();
          ++children_level)
       delete (*children_level);
-    /*
-      for_each (has_children.begin (),
-      has_children.end (),
-      delete());
-    */
     has_children.clear ();
   }
 

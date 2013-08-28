@@ -693,7 +693,7 @@ namespace hp
      *  the active_fe_indices in
      *  the
      *  dealii::internal::hp::DoFLevel. They
-     *  are initialized with the a
+     *  are initialized with a
      *  zero indicator, meaning
      *  that fe[0] is going to be
      *  used by default.  This
@@ -704,7 +704,6 @@ namespace hp
      *  cell has a valid
      *  active_fe_index.
      */
-
     void create_active_fe_table ();
 
     /**
@@ -791,7 +790,8 @@ namespace hp
      * <tt>levels[]</tt> tree of
      * the Triangulation objects.
      */
-    std::vector<dealii::internal::hp::DoFLevel<dim>*>    levels;
+    std::vector<dealii::internal::hp::DoFLevel<dim>*> levels;
+
     /**
      * Space to store the DoF
      * numbers for the faces.
@@ -837,7 +837,7 @@ namespace hp
      * actual data format used to
      * the present class.
      */
-    std::vector<types::global_dof_index>      vertex_dofs;
+    std::vector<types::global_dof_index> vertex_dofs;
 
     /**
      * For each vertex in the
@@ -866,10 +866,10 @@ namespace hp
 
     /**
      * Array to store the
-     * information, if a cell on
+     * information if a cell on
      * some level has children or
      * not. It is used by the
-     * refinement listeners as a
+     * signal slots as a
      * persistent buffer during the
      * refinement, i.e. from between
      * when pre_refinement_action is

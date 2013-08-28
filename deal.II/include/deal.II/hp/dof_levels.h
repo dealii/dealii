@@ -29,22 +29,21 @@ namespace internal
 {
   namespace hp
   {
+    template <int dim>
+    class DoFLevel;
 
     /**
-     * Store the indices of the degrees of freedom which are located on
-     * objects of dimension @p N. We declare this general template
-     * class, but do not actually use it. Rather, only specializations of
-     * this class are used.
+     * Store the indices of the degrees of freedom that are located on
+     * objects of dimension @p structdim.
      *
-     * The things we store here is very similar to what is stored in the
+     * The things we store here are very similar to what is stored in the
      * internal::DoFHandler::DoFLevel class hierarchy (see there for more
      * information, in particular on the layout of the class hierarchy,
      * and the use of file names). There are two main
      * differences, discussed in the following subsections. In addition to
      * the data already stored by the internal::DoFHandler::DoFLevel
      * classes, we also have to store which finite element each cell
-     * uses. This is done in the DoFLevel<0> class, where for each cell we
-     * have an entry within the active_fe_indices field.
+     * uses.
      *
      *
      * <h4>Offset computations</h4>
@@ -105,35 +104,14 @@ namespace internal
      * @ingroup hp
      * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
      */
-    template <int N>
+    template <int dim>
     class DoFLevel
-    {
-    private:
-      /**
-       * Make the constructor private
-       * to avoid that someone uses
-       * this class.
-       */
-      DoFLevel ();
-    };
-
-
-    /**
-     * Storage for degrees of freedom on cells. See the documentation of
-     * the DoFLevel class template for more complete information on the
-     * purpose and layout of this class.
-     *
-     * @ingroup hp
-     * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
-     */
-    template <>
-    class DoFLevel<0>
     {
     public:
       /**
        *  Indices specifying the finite
        *  element of hp::FECollection to use
-       *  for the different cells. The
+       *  for the different cells on the current level. The
        *  meaning what a cell is, is
        *  dimension specific, therefore also
        *  the length of this vector depends
@@ -141,35 +119,16 @@ namespace internal
        *  the length of this vector equals
        *  the length of the @p lines vector,
        *  in two dimensions that of the @p
-       *  quads vector, etc.
+       *  quads vector, etc. The vector stores one element per cell
+       *  since the actiev_fe_index is unique for cells.
        */
-
       std::vector<unsigned int> active_fe_indices;
-      /**
-       * Determine an estimate for the
-       * memory consumption (in bytes)
-       * of this object.
-       */
-      std::size_t memory_consumption () const;
-    };
 
-
-    /**
-     * Store the indices of the degrees of freedom which are located on
-     * the lines. See the general template DoFLevel for more information.
-     *
-     * @ingroup hp
-     * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
-     */
-    template <>
-    class DoFLevel<1> : public DoFLevel<0>
-    {
-    public:
       /**
-       *  store the dof-indices and related functions of
-       *  lines
+       *  Store the dof-indices and related data of
+       *  the cells on the current level corresponding to this object.
        */
-      internal::hp::DoFObjects<1> dof_object;
+      internal::hp::DoFObjects<dim> dof_object;
 
       /**
        * Determine an estimate for the
@@ -178,60 +137,6 @@ namespace internal
        */
       std::size_t memory_consumption () const;
     };
-
-
-    /**
-     * Store the indices of the degrees of freedom which are located on
-     * quads. See the general template DoFLevel for more information.
-     *
-     * @ingroup hp
-     * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
-     */
-    template <>
-    class DoFLevel<2> : public DoFLevel<0>
-    {
-    public:
-      /**
-       *  store the dof-indices and related functions of
-       *  quads
-       */
-      internal::hp::DoFObjects<2> dof_object;
-
-      /**
-       * Determine an estimate for the
-       * memory consumption (in bytes)
-       * of this object.
-       */
-      std::size_t memory_consumption () const;
-    };
-
-
-
-    /**
-     * Store the indices of the degrees of freedom which are located on
-     * hexhedra. See the general template DoFLevel for more information.
-     *
-     * @ingroup hp
-     * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
-     */
-    template <>
-    class DoFLevel<3> : public DoFLevel<0>
-    {
-    public:
-      /**
-       *  store the dof-indices and related functions of
-       *  hexes
-       */
-      internal::hp::DoFObjects<3> dof_object;
-
-      /**
-       * Determine an estimate for the
-       * memory consumption (in bytes)
-       * of this object.
-       */
-      std::size_t memory_consumption () const;
-    };
-
   } // namespace hp
 
 } // namespace internal
