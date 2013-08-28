@@ -15,27 +15,23 @@
     
     <h1>How to use CMake to configure your projects with <acronym>deal.II</acronym></h1>
     
-    <table class="tutorial" width="50%">
-      <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
-      <tr><td valign="top">
-	  <ul>
-            <li><a href="#cmakesimple">Simple <code>CMakeLists.txt</code></a>
-	      <ul>
-		<li><a href="#cmakesimple.multiple">Adding multiple executable targets</a>
-		<li><a href="#cmakesimple.libs">Adding libraries and common source files</a>
-		<li><a href="#cmakesimple.run">Adding a "run" target</a>
-	      </ul>
-            <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code>            <li><a href="#cmakeadvanced">Advanced <code>CMakeLists.txt</code></a>
-            <ul>
-              <li> TODO, see list</li>
-            </ul>
+    <div class="toc">
+      <ol>
+        <li><a href="#cmakesimple">Simple <code>CMakeLists.txt</code></a>
+	  <ol>
+	    <li><a href="#cmakesimple.multiple">Adding multiple executable targets</a>
+	    <li><a href="#cmakesimple.libs">Adding libraries and common source files</a>
+	    <li><a href="#cmakesimple.run">Adding a "run" target</a>
+	  </ol>
+        <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code>            <li><a href="#cmakeadvanced">Advanced <code>CMakeLists.txt</code></a>
+              <ol>
+		<li> TODO, see list</li>
+              </ol>
             <li><a href="#dealiiconfig"><code>deal.IIConfig.cmake</code></a>
             <li><a href="#legacy">Legacy
-              <code>Make.global_options</code></a>
-	  </ul>
-	</td>
-      </tr>
-    </table>
+		<code>Make.global_options</code></a>
+      </ol>
+    </div>
 
     <p>
       <code>cmake</code> is the configuration and build tool we use
@@ -58,7 +54,7 @@
     </p>
 
     <a name="cmakesimple"></a>
-    <h3>Simple CMakeLists.txt</h3>
+    <h2>Simple CMakeLists.txt</h2>
 
     <p>
       In this section, we start out with a
@@ -71,7 +67,7 @@
       (<a href="CMakeLists.txt.sample3" target="_top">plain text</a>
       version):
       
-      TODO: Fix plain text after finalizing!
+      <p class="todo"> Fix plain text after finalizing!</p>
 
 <pre class="cmake">
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
@@ -87,12 +83,13 @@ ADD_EXECUTABLE(mycode mycode.cc)
 DEAL_II_SETUP_TARGET(mycode)
 </pre>
 
-      TODO: Explain the two macros!
+      <p class="todo"> Explain the code!</p>
 
     <a name="cmakesimple.multiple"></a>
-    <h4>Adding multiple executable targets</h4>
+    <h3>Adding multiple executable targets</h3>
     
-    <p>In order to specify multiple executable targets, simply repeat the last two lines of the simple <code>CMakeLists.txt</code>:</p>
+    <p>In order to specify multiple executable targets, simply repeat
+    the last two lines of the simple <code>CMakeLists.txt</code>:</p>
 <pre class="cmake">
 ADD_EXECUTABLE(mycode2 mycode2.cc)
 DEAL_II_SETUP_TARGET(mycode2)
@@ -106,7 +103,7 @@ a <a href="#cmakeadvanced.foreach">loop</a>, possibly
 with <a href="#cmakeadvanced.glob">GLOB</a>.
 
     <a name="cmakesimple.libs"></a>
-    <h4>Adding libraries and common source files</h4>
+    <h3>Adding libraries and common source files</h3>
 
     <p>
       Adding a library is as simple as adding an executable target. We
@@ -142,11 +139,11 @@ DEAL_II_SETUP_TARGET(mycode2)
 <p>You should be aware though that <code>common.cc</code> will be
 compiled for each target, not only once.</p>
 
-TODO: Matthias, is this correct?
+<p class="todo"> Matthias, is this correct?</p>
 
 
     <a name="cmakesimple.run"></a>
-    <h4>Adding a "run" target</h4>
+    <h3>Adding a "run" target</h3>
     
     <p>
       If you wish to have a "run" target for make, like in the deal.II
@@ -161,7 +158,7 @@ ADD_CUSTOM_TARGET(run COMMAND mycode
 
 
     <a name="cmakesauto"></a>
-    <h3>Autopilot style CMakeLists.txt</h3>
+    <h2>Autopilot style CMakeLists.txt</h2>
 
     <p>
       If you want a make interface similar to the deal.II library and
@@ -267,11 +264,11 @@ SET(TARGET_RUN
 </pre>
 
     <a name="cmakeadvanced"></a>
-    <h3> Advanced <code>CMakeLists.txt</code></h3>
+    <h2> Advanced <code>CMakeLists.txt</code></h2>
 
-    <pre>
+    <pre class="todo">
 
-    TODO: A Subsection for each of the following:
+      A Subsection for each of the following:
 
       - Common code for several targets. Library or adding to target definition
 
@@ -292,7 +289,7 @@ SET(TARGET_RUN
     </pre>
 
     <a name="extfinding"></a>
-    <h4> Finding the deal.II library </h4>
+    <h3> Finding the deal.II library </h3>
 
     <p>
     Finding the <acronym>deal.II</acronym> library should be no more than
@@ -305,7 +302,7 @@ SET(TARGET_RUN
       specifying <code>deal.II_DIR</code> to point to the path were the
       <code>deal.IIConfig.cmake</code> file is located:
 
-      TODO: is deal.II_DIR still accurate? We use different above
+      <p class="todo"> is deal.II_DIR still accurate? We use different above
 
       <pre>
 
@@ -328,7 +325,7 @@ SET(TARGET_RUN
 
 
     <a name="dealiiconfig"></a>
-    <h3>  <code>deal.IIConfig.cmake</code> </h3>
+    <h2>  <code>deal.IIConfig.cmake</code> </h2>
 
     <p>
       Importing the deal.IIConfig.cmake file via <code>FIND_PACKAGE</code>
@@ -336,7 +333,7 @@ SET(TARGET_RUN
       <code>DEAL_II_*</code>:
       <pre>
 
-      TODO: A long list with detailed explanation...
+      <p class="todo"> A long list with detailed explanation...</p>
 
       </pre>
 
@@ -345,7 +342,7 @@ SET(TARGET_RUN
 
 
     <a name="legacy"></a>
-    <h3> Legacy Make.global_options </h3>
+    <h2> Legacy Make.global_options </h2>
 
     <p>
       Before version 8.0, <acronym>deal.II</acronym> used the
