@@ -104,6 +104,9 @@ namespace internal
        * Store the start index for
        * the degrees of freedom of each
        * object in the @p dofs array.
+       *
+       * The type we store is then obviously the type the @p dofs array
+       * uses for indexing.
        */
       std::vector<std::vector<types::global_dof_index>::size_type> dof_offsets;
 
