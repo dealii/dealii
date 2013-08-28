@@ -96,7 +96,6 @@ namespace internal
      * @ingroup hp
      * @author Tobias Leicht, 2006
      */
-
     template <int dim>
     class DoFObjects
     {
@@ -104,9 +103,9 @@ namespace internal
       /**
        * Store the start index for
        * the degrees of freedom of each
-       * hex in the @p hex_dofs array.
+       * object in the @p dofs array.
        */
-      std::vector<types::global_dof_index> dof_offsets;
+      std::vector<std::vector<types::global_dof_index>::size_type> dof_offsets;
 
       /**
        * Store the global indices of
@@ -114,16 +113,15 @@ namespace internal
        * DoFLevel() for detailed
        * information.
        */
-      std::vector<types::global_dof_index > dofs;
+      std::vector<types::global_dof_index> dofs;
 
       /**
        * Set the global index of
        * the @p local_index-th
        * degree of freedom located
-       * on the hex with number @p
-       * hex_index to the value
-       * given by the last
-       * argument. The @p
+       * on the object with number @p
+       * obj_index to the value
+       * given by @p global_index. The @p
        * dof_handler argument is
        * used to access the finite
        * element that is to be used
@@ -154,8 +152,8 @@ namespace internal
        * Return the global index of
        * the @p local_index-th
        * degree of freedom located
-       * on the hex with number @p
-       * hex_index. The @p
+       * on the object with number @p
+       * obj_index. The @p
        * dof_handler argument is
        * used to access the finite
        * element that is to be used
