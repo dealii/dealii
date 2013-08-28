@@ -40,9 +40,6 @@ namespace internal
   {
 
     /**
-     *
-     * <h4>DoFFaces</h4>
-     *
      * These classes are similar to the internal::hp::DoFLevel classes. We here store
      * information that is associated with faces, rather than cells, as this information is
      * independent of the hierarchical structure of cells, which are organized in levels. In 2D
@@ -66,27 +63,13 @@ namespace internal
      * @ingroup dofs
      * @author Tobias Leicht, 2006
      */
-
-
-
-
-
-
     template<int dim>
-    class DoFFaces
-    {
-      /**
-       * Make the constrctor private to prevent the use
-       * of this template, only the specializations
-       * should be used
-       */
-    private:
-      DoFFaces();
-    };
+    class DoFFaces;
+
 
     /**
      * Store the indices of degrees of freedom on faces in 1D. As these would be vertices, which
-     * are treted separately, don't do anything.
+     * are treated separately, don't do anything.
      *
      * @ingroup hp
      * @author Tobias Leicht, 2006
@@ -113,6 +96,9 @@ namespace internal
     class DoFFaces<2>
     {
     public:
+      /**
+       * Indices of DoFs on the lines that bound cells.
+       */
       internal::hp::DoFObjects<1> lines;
 
       /**
@@ -134,7 +120,14 @@ namespace internal
     class DoFFaces<3>
     {
     public:
+      /**
+       * Indices of DoFs on the lines that form the edges of cells.
+       */
       internal::hp::DoFObjects<1> lines;
+
+      /**
+       * Indices of DoFs on the quads that bound cells.
+       */
       internal::hp::DoFObjects<2> quads;
 
       /**
