@@ -126,7 +126,7 @@ So how large are the largest problems one can solve? At the time of writing
 this problem, the
 limiting factor is that the program uses the BoomerAMG algebraic
 multigrid method from the <a
-href="http://acts.nersc.gov/hypre/" target="_top">hypre package</a> as
+href="http://acts.nersc.gov/hypre/" target="_top">Hypre package</a> as
 a preconditioner, which unfortunately uses signed 32-bit integers to
 index the elements of a %distributed matrix. This limits the size of
 problems to $2^31-1=2,147,483,647$ degrees of freedom. From the graphs

@@ -142,7 +142,7 @@ namespace Step19
   // this program, I realized that there aren't all that many parameters this
   // program can usefully ask for, or better, it turned out: declaring and
   // querying these parameters was already done centralized in one place of
-  // the libray, namely the <code>DataOutInterface</code> class that handles
+  // the library, namely the <code>DataOutInterface</code> class that handles
   // exactly this -- managing parameters for input and output.
   //
   // So the second function call in this function is to let the
@@ -196,7 +196,7 @@ namespace Step19
     // with the subsection name, I like to use curly braces to force my editor
     // to indent everything that goes into this sub-section by one level of
     // indentation. In this sub-section, we shall have two entries, one that
-    // takes a boolean parameter and one that takes a selection list of
+    // takes a Boolean parameter and one that takes a selection list of
     // values, separated by the '|' character:
     prm.enter_subsection ("Dummy subsection");
     {
@@ -288,7 +288,7 @@ namespace Step19
             // Finally, let us note that if we were interested in the values
             // of the parameters declared above in the dummy subsection, we
             // would write something like this to extract the value of the
-            // boolean flag (the <code>prm.get</code> function returns the
+            // Boolean flag (the <code>prm.get</code> function returns the
             // value of a parameter as a string, whereas the
             // <code>prm.get_X</code> functions return a value already
             // converted to a different type):

@@ -77,7 +77,7 @@ sometimes, as in the case of rock minerals at temperatures close to their
 melting point, $\eta$ may change by orders of magnitude over the typical range
 of temperatures.
 
-We note that the Stokes equation above could be non-dimensionalized by
+We note that the Stokes equation above could be nondimensionalized by
 introducing the <a target="_top"
 href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
 number</a> $\mathrm{Ra}=\frac{\|g\| \beta \rho}{\eta \kappa} \delta T L^3$ using a
@@ -476,7 +476,7 @@ diffusion into the equations we would like to solve. Note that the
 numerical viscosity $\nu(T)$ is temperature-dependent, so the equation
 we want to solve is nonlinear in <i>T</i> &mdash; not what one desires from a
 simple method to stabilize an equation, and even less so if we realize
-that $\nu(T)$ is non-differentiable in <i>T</i>. However, there is no
+that $\nu(T)$ is nondifferentiable in <i>T</i>. However, there is no
 reason to despair: we still have to discretize in time and we can
 treat the term explicitly.
 
@@ -551,7 +551,7 @@ artificial diffusion operates on the extrapolated
 temperature at the current time in the same way as we have discussed
 the advection works in the section on time stepping.
 
-The form for non-uniform time steps that we will have to use in
+The form for nonuniform time steps that we will have to use in
 reality is a bit more complicated (which is why we showed the simpler
 form above first) and reads:
 @f{eqnarray*}
@@ -993,7 +993,7 @@ boundary, we will require no-normal flux for the velocity
 introduction of step-22 and fixes one component of the velocity
 while allowing flow to be %parallel to the boundary. There remain
 <code>dim-1</code> components to be fixed, namely the tangential components of
-the normal stress; for these, we choose homogenous conditions which means that
+the normal stress; for these, we choose homogeneous conditions which means that
 we do not have to anything special. Initial conditions are only necessary for
 the temperature field, and we choose it to be constant zero.
 
@@ -1005,6 +1005,6 @@ are allowed. We therefore choose three spherical heat sources unequally spaced
 close to the bottom of the domain, imitating three candles. The fluid located
 at these sources, initially at rest, is then heated up and as the temperature
 rises gains buoyancy, rising up; more fluid is dragged up and through the
-sources, leading to three hote plumes that rise up until they are captured by
+sources, leading to three hot plumes that rise up until they are captured by
 the recirculation of fluid that sinks down on the outside, replacing the air
 that rises due to heating.

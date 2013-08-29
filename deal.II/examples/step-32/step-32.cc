@@ -105,7 +105,7 @@ namespace Step32
 
   // In the following namespace, we define the various pieces of equation data
   // that describe the problem. This corresponds to the various aspects of
-  // making the problem at least slightly realistc and that were exhaustively
+  // making the problem at least slightly realistic and that were exhaustively
   // discussed in the description of the testcase in the introduction.
   //
   // We start with a few coefficients that have constant values (the comment
@@ -229,7 +229,7 @@ namespace Step32
   // block. The three code blocks of the <code>vmult</code> function implement
   // the multiplications with the three blocks of this preconditioner matrix
   // and should be self explanatory if you have read through step-31 or the
-  // discussion of compositing solvers in step-20.
+  // discussion of composing solvers in step-20.
   namespace LinearSolvers
   {
     template <class PreconditionerA, class PreconditionerMp>
@@ -2005,7 +2005,7 @@ namespace Step32
     }
 
     // Following this, we can compute constraints for the solution vectors,
-    // including hanging node constraints and homogenous and inhomogenous
+    // including hanging node constraints and homogeneous and inhomogeneous
     // boundary values for the Stokes and temperature fields. Note that as for
     // everything else, the constraint objects can not hold <i>all</i>
     // constraints on every processor. Rather, each processor needs to store
@@ -3242,7 +3242,7 @@ namespace Step32
   // dof on a cell, the joint finite element knows to which equation component
   // (velocity component, pressure, or temperature) it belongs – that's the
   // information we need! So we step through all cells (with iterators into
-  // all three DoFHandlers moving in synch), and for each joint cell dof, we
+  // all three DoFHandlers moving in sync), and for each joint cell dof, we
   // read out that component using the FiniteElement::system_to_base_index
   // function (see there for a description of what the various parts of its
   // return value contain). We also need to keep track whether we're on a

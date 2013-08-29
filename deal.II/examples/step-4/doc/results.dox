@@ -64,7 +64,7 @@ the domain. This is nice, but it has the drawback that it completely hides
 what is happening on the inside. The picture on the right is an attempt at
 visualizing the interior as well, by showing surfaces where the solution has
 constant values (as indicated by the legend at the top left). Isosurface
-pictures look best if one makes the individual surfaces slightly transparaent
+pictures look best if one makes the individual surfaces slightly transparent
 so that it is possible to see through them and see what's behind.
 
 <TABLE WIDTH="60%" ALIGN="center">

@@ -264,18 +264,18 @@ Secondly, let's look at the member functions. These, as well, already form the
 common structure that almost all following tutorial programs will use:
 <ul>
   <li> <code>make_grid()</code>: This is what one could call a
-       <i>pre-processing function</i>. As its name suggests, it sets up the
+       <i>preprocessing function</i>. As its name suggests, it sets up the
        object that stores the triangulation. In later examples, it could also
        deal with boundary conditions, geometries, etc.
   <li> <code>setup_system()</code>: This then is the function in which all the
        other data structures are set up that are needed to solve the
        problem. In particular, it will initialize the DoFHandler object and
        correctly size the various objects that have to do with the linear
-       algebra. This function is often separated from the pre-processing
+       algebra. This function is often separated from the preprocessing
        function above because, in a time dependent program, it may be called
        at least every few time steps whenever the mesh
        is adaptively refined (something we will see how to do in step-6). On
-       the other hand, setting up the mesh itself in the pre-processing
+       the other hand, setting up the mesh itself in the preprocessing
        function above is done only once at the beginning of the program and
        is, therefore, separated into its own function.
   <li> <code>assemble_system()</code>: This, then is where the contents of the

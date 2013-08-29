@@ -4,7 +4,7 @@ The program writes both graphical data for each time step as well as the
 values evaluated at each detector location to disk. We then 
 draw them in plots. Experimental data were also collected for comparison. 
 Currently our experiments have only been done in two dimensions by 
-circually scanning a single detector. The tissue sample here is a thin slice 
+circularly scanning a single detector. The tissue sample here is a thin slice 
 in the X-Y plane (Z=0), and we assume that signals from other Z directions 
 won't contribute to the data. Consequently, we only have to compare
 our experimental data with two dimensional simulated data.  
@@ -136,7 +136,7 @@ plots), but are bulged out in certain directions. To make things worse, the
 circular mesh we use (see for example step-6 for a view of the
 coarse mesh) is not isotropic either. The net result is that the signal fronts
 are not sinusoidal unless the mesh is sufficiently fine. The right image is a
-lot better in this respect, though artificts in the form of trailing spurious
+lot better in this respect, though artifacts in the form of trailing spurious
 waves can still be seen.
 
 

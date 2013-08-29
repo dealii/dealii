@@ -84,7 +84,7 @@ boundary condition of this problem. Assuming that $u^{n}$ already has the
 right boundary values, the Newton update $\delta u^{n}$ should have zero
 boundary conditions, in order to have the right boundary condition after
 adding both.  In the first Newton step, we are starting with the solution
-$u^{0}\equiv 0$, the Newton update still has to deliever the right boundary
+$u^{0}\equiv 0$, the Newton update still has to deliver the right boundary
 condition to the solution $u^{1}$.
 
 
@@ -113,7 +113,7 @@ Reducing this space to a finite dimensional space with basis $\left\{
 @f]
 
 Using the basis functions as test functions and defining $a_{n}:=\frac{1}
-{\sqrt{1+|\nabla u^{n}|^{2}}}$, we can rewrite the weak formualtion:
+{\sqrt{1+|\nabla u^{n}|^{2}}}$, we can rewrite the weak formulation:
 
 @f[
   \sum_{j=0}^{N-1}\left[ \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
@@ -122,7 +122,7 @@ Using the basis functions as test functions and defining $a_{n}:=\frac{1}
   \nabla u^{n}\right) \qquad \forall i=0,\dots ,N-1
 @f]
 
-where the solution $\delta u^{n}$ is given by the coefficents $\delta U^{n}_{j}$.
+where the solution $\delta u^{n}$ is given by the coefficients $\delta U^{n}_{j}$.
 This linear system of equations can be rewritten as:
 
 @f[

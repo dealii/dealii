@@ -13,7 +13,7 @@ The term "degree of freedom" is commonly used in the finite element community
 to indicate two slightly different, but related things. The first is that we'd
 like to represent the finite element solution as a linear combination of shape
 function, in the form $u_h(\mathbf x) = \sum_{j=0}^{N-1} U_j \varphi_j(\mathbf
-x)$. Here, $U_j$ is a vector of expension coefficients. Because we don't know
+x)$. Here, $U_j$ is a vector of expansion coefficients. Because we don't know
 their values yet (we will compute them as the solution of a linear or
 nonlinear system), they are called "unknowns" or "degrees of freedom". The
 second meaning of the term con be explained as follows: A mathematical
@@ -62,7 +62,7 @@ approximation of the Laplace equation leads to a sparse matrix since the
 number of nonzero entries per row is five, and therefore independent of the
 total size of the matrix.)  Sparsity is one of the distinguishing feature of
 the finite element method compared to, say, approximating the solution of a
-partial differential equation using a Taylor expension and matching
+partial differential equation using a Taylor expansion and matching
 coefficients, or using a Fourier basis.
 
 In practical terms, it is the sparsity of matrices that enables us to solve

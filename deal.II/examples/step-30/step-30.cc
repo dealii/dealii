@@ -106,7 +106,7 @@ namespace Step30
   // in the left part of the domain at a velocity that matches the one coming
   // in from the right. In the circular part the magnitude of the flow
   // velocity is proportional to the distance from the origin. This is a
-  // difference to step-12, where the magnitude was 1 evereywhere. the new
+  // difference to step-12, where the magnitude was 1 everywhere. the new
   // definition leads to a linear variation of $\beta$ along each given face
   // of a cell. On the other hand, the solution $u(x,y)$ is exactly the same
   // as before.
@@ -385,7 +385,7 @@ namespace Step30
     anisotropic(anisotropic),
     // As beta is a linear function, we can choose the degree of the
     // quadrature for which the resulting integration is correct. Thus, we
-    // choose to use <code>degree+1</code> gauss points, which enables us to
+    // choose to use <code>degree+1</code> Gauss points, which enables us to
     // integrate exactly polynomials of degree <code>2*degree+1</code>, enough
     // for all the integrals we will perform in this program.
     quadrature (degree+1),
@@ -507,7 +507,7 @@ namespace Step30
                 // Case b), we decide that there are finer cells as neighbors
                 // by asking the face, whether it has children. if so, then
                 // there must also be finer cells which are children or
-                // farther offsprings of our neighbor.
+                // farther offspring of our neighbor.
                 if (face->has_children())
                   {
                     // We need to know, which of the neighbors faces points in
@@ -576,7 +576,7 @@ namespace Step30
                          (neighbor->level() < cell->level() &&
                           neighbor->index() == cell->index())))
                       {
-                        // Here we know, that the neigbor is not coarser so we
+                        // Here we know, that the neighbor is not coarser so we
                         // can use the usual @p neighbor_of_neighbor
                         // function. However, we could also use the more
                         // general @p neighbor_face_no function.
@@ -684,9 +684,9 @@ namespace Step30
     triangulation.execute_coarsening_and_refinement ();
   }
 
-  // Once an error indicator has been evaluated and the cells with largerst
+  // Once an error indicator has been evaluated and the cells with largest
   // error are flagged for refinement we want to loop over the flagged cells
-  // again to decide whether they need isotropic refinemnt or whether
+  // again to decide whether they need isotropic refinement or whether
   // anisotropic refinement is more appropriate. This is the anisotropic jump
   // indicator explained in the introduction.
   template <int dim>
@@ -706,7 +706,7 @@ namespace Step30
                                                    endc=dof_handler.end();
 
     for (; cell!=endc; ++cell)
-      // We only need to consider cells which are flaged for refinement.
+      // We only need to consider cells which are flagged for refinement.
       if (cell->refine_flag_set())
         {
           Point<dim> jump;
@@ -724,7 +724,7 @@ namespace Step30
                   std::vector<double> u (fe_v_face.n_quadrature_points);
                   std::vector<double> u_neighbor (fe_v_face.n_quadrature_points);
 
-                  // The four cases of different neighbor relations senn in
+                  // The four cases of different neighbor relations seen in
                   // the assembly routines are repeated much in the same way
                   // here.
                   if (face->has_children())
@@ -741,7 +741,7 @@ namespace Step30
                           // present subface...
                           typename DoFHandler<dim>::cell_iterator neighbor_child = cell->neighbor_child_on_subface(face_no,subface_no);
                           Assert (!neighbor_child->has_children(), ExcInternalError());
-                          // ... and reinit the respective FEFaceValues und
+                          // ... and reinit the respective FEFaceValues and
                           // FESubFaceValues objects.
                           fe_v_subface.reinit (cell, face_no, subface_no);
                           fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
@@ -749,7 +749,7 @@ namespace Step30
                           fe_v_subface.get_function_values(solution2, u);
                           fe_v_face_neighbor.get_function_values(solution2, u_neighbor);
                           // as well as the quadrature weights, multiplied by
-                          // the jacobian determinant.
+                          // the Jacobian determinant.
                           const std::vector<double> &JxW = fe_v_subface.get_JxW_values ();
                           // Now we loop over all quadrature points
                           for (unsigned int x=0; x<fe_v_subface.n_quadrature_points; ++x)
@@ -763,7 +763,7 @@ namespace Step30
                               // first coordinate direction on the unit cell,
                               // the second two faces are orthogonal to the
                               // second coordinate direction and so on, so we
-                              // accumulate these values ito vectors with
+                              // accumulate these values into vectors with
                               // <code>dim</code> components.
                               jump[face_no/2]+=std::fabs(u[x]-u_neighbor[x])*JxW[x];
                               // We also sum up the scaled weights to obtain
@@ -844,8 +844,8 @@ namespace Step30
 
           // Now we loop over the <code>dim</code> coordinate directions of
           // the unit cell and compare the average jump over the faces
-          // orthogional to that direction with the average jumnps over faces
-          // orthogonal to the remining direction(s). If the first is larger
+          // orthogonal to that direction with the average jumps over faces
+          // orthogonal to the remaining direction(s). If the first is larger
           // than the latter by a given factor, we refine only along hat
           // axis. Otherwise we leave the refinement flag unchanged, resulting
           // in isotropic refinement.

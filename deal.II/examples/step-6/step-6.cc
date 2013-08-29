@@ -77,7 +77,7 @@
 #include <deal.II/grid/grid_refinement.h>
 
 // Finally, we need a simple way to actually compute the refinement indicators
-// based on some error estimat. While in general, adaptivity is very
+// based on some error estimate. While in general, adaptivity is very
 // problem-specific, the error indicator in the following file often yields
 // quite nicely adapted grids for a wide class of problems.
 #include <deal.II/numerics/error_estimator.h>
@@ -299,7 +299,7 @@ void Step6<dim>::setup_system ()
 
   // After setting up all the degrees of freedoms, here are now the
   // differences compared to step-5, all of which are related to constraints
-  // associated with the hanging nodes. In the class desclaration, we have
+  // associated with the hanging nodes. In the class declaration, we have
   // already allocated space for an object <code>constraints</code> that will
   // hold a list of these constraints (they form a matrix, which is reflected
   // in the name of the class, but that is immaterial for the moment). Now we
@@ -764,7 +764,7 @@ int main ()
   // approximately the same string as would be generated if the exception was
   // thrown using the <code>Assert</code> macro. You have seen the output of
   // such an exception in the previous example, and you then know that it
-  // contains the file and line number of where the exception occured, and
+  // contains the file and line number of where the exception occurred, and
   // some other information. This is also what the following statements would
   // print.
   //

@@ -59,14 +59,14 @@
 #include <fstream>
 #include <iostream>
 
-// We will use adaptive mesh refinement between Newton interations. To do so,
+// We will use adaptive mesh refinement between Newton iterations. To do so,
 // we need to be able to work with a solution on the new mesh, although it was
 // computed on the old one. The SolutionTransfer class transfers the solution
 // from the old to the new mesh:
 
 #include <deal.II/numerics/solution_transfer.h>
 
-// We then open a namepsace for this program and import everything from the
+// We then open a namespace for this program and import everything from the
 // dealii namespace into it, as in previous programs:
 namespace Step15
 {

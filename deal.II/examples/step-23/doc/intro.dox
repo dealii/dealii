@@ -63,7 +63,7 @@ one of the usual ODE solvers (this is called the method of lines).
 Both of these methods have advantages and disadvantages.
 Traditionally, people have preferred the method of lines, since it
 allows to use the very well developed machinery of high-order ODE
-solvers avaiable for the rather stiff ODEs resulting from this
+solvers available for the rather stiff ODEs resulting from this
 approach, including step length control and estimation of the temporal
 error.
 
@@ -388,7 +388,7 @@ $[-1,1]^2$ seven times uniformly, giving a mesh size of $h=\frac 1{64}$, which
 is what we set the time step to. The fact that we set the time step and mesh
 size individually in two different places is error prone: it is too easy to
 refine the mesh once more but forget to also adjust the time step. @ref
-step_24 "step-24" shows a better way how to keep these things in synch.
+step_24 "step-24" shows a better way how to keep these things in sync.
 
 
 <h3>The test case</h3>

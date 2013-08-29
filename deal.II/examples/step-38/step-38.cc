@@ -88,7 +88,7 @@ namespace Step38
   //   boundary of the domain -- this is what we did in step-11, for
   //   example. However, here we have a curved domain, not just a curved
   //   boundary, and while we can approximate it with bilinearly mapped cells,
-  //   it is really only prodent to use a higher order mapping for all
+  //   it is really only prudent to use a higher order mapping for all
   //   cells. Consequently, this class has a member variable of type MappingQ;
   //   we will choose the polynomial degree of the mapping equal to the
   //   polynomial degree of the finite element used in the computations to

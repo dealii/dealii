@@ -301,7 +301,7 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 // difference is the use of 3 different sets of <code>DoFHandler</code> and FE
 // objects, along with the <code>ChunkSparseMatrix</code> and the
 // corresponding solutions vectors. We also use WorkStream to enable a
-// multi-threaded local solution process which exploits the embarrassingly
+// multithreaded local solution process which exploits the embarrassingly
 // parallel nature of the local solver. For WorkStream, we define the local
 // operations on a cell and a copy function into the global matrix and
 // vector. We do this once for the assembly (which is run twice, once when we
@@ -360,7 +360,7 @@ private:
   Vector<double>       system_rhs;
 
   // As stated in the introduction, HDG solutions can be post-processed to
-  // attain superconvegence rates of $\mathcal{O}(h^{p+2})$.  The
+  // attain superconvergence rates of $\mathcal{O}(h^{p+2})$.  The
   // post-processed solution is a discontinuous finite element solution
   // representing the primal variable on the interior of each cell.  We define
   // a FE type of degree $p+1$ to represent this post-processed solution,

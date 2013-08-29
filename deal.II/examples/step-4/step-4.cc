@@ -164,7 +164,7 @@ public:
 // formulas above right away.
 //
 // The last thing to note is that a <code>Point@<dim@></code> denotes a point
-// in dim-dimensionsal space, and its individual components (i.e. $x$, $y$,
+// in dim-dimensional space, and its individual components (i.e. $x$, $y$,
 // ... coordinates) can be accessed using the () operator (in fact, the []
 // operator will work just as well) with indices starting at zero as usual in
 // C and C++.
@@ -456,7 +456,7 @@ void Step4<dim>::solve ()
 // <code>data_out.write_gnuplot</code> call by
 // <code>data_out.write_vtk</code>.
 //
-// Since the program will run both 2d and 3d versions of the laplace solver,
+// Since the program will run both 2d and 3d versions of the Laplace solver,
 // we use the dimension in the filename to generate distinct filenames for
 // each run (in a better program, one would check whether <code>dim</code> can
 // have other values than 2 or 3, but we neglect this here for the sake of

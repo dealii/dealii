@@ -40,7 +40,7 @@ flow first channels towards the center and then outward again. Consequently,
 the x-velocity has to increase to get the flow through the narrow part,
 something that can easily be seen in the left image. The middle image
 represents inward flow in y-direction at the left end of the domain, and
-outward flow in y-directino at the right end of the domain.
+outward flow in y-direction at the right end of the domain.
 
 
 
@@ -180,11 +180,11 @@ The result concerning the convergence order is the same here.
 Realistic flow computations for ground water or oil reservoir simulations will
 not use a constant permeability. Here's a first, rather simple way to change
 this situation: we use a permeability that decays very rapidly away from a
-central flowline until it hits a background value of 0.001. This is to mimick
+central flowline until it hits a background value of 0.001. This is to mimic
 the behavior of fluids in sandstone: in most of the domain, the sandstone is
-homogenous and, while permeably to fluids, not overly so; on the other stone,
+homogeneous and, while permeable to fluids, not overly so; on the other stone,
 the stone has cracked, or faulted, along one line, and the fluids flow much
-easier along this large crask. Here is how we could implement something like
+easier along this large crack. Here is how we could implement something like
 this:
 @code
 template <int dim>

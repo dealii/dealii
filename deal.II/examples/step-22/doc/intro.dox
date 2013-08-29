@@ -302,7 +302,7 @@ possibilities for imposing boundary conditions:
 </ol>
 
 Despite this wealth of possibilities, we will only use Dirichlet and
-(homogenous) Neumann boundary conditions in this tutorial program.
+(homogeneous) Neumann boundary conditions in this tutorial program.
 
 
 <h3>Discretization</h3>
@@ -539,7 +539,7 @@ matrix. It is therefore an operation that can efficiently also be computed in
 represent an exact inverse of the matrix $A$. Consequently, preconditioning
 with the ILU will still require more than one iteration, unlike
 preconditioning with the sparse direct solver. The inner solver will therefore
-take more time when multiplying with the Schur complement, a tradeoff
+take more time when multiplying with the Schur complement, a trade-off
 unavoidable.
 </ol>
 
@@ -678,7 +678,7 @@ conditions.
 </a>
 
 Frequently, a sparse matrix contains a substantial amount of elements that
-acutally are zero when we are about to start a linear solve. Such elements are
+actually are zero when we are about to start a linear solve. Such elements are
 introduced when we eliminate constraints or implement Dirichlet conditions,
 where we usually delete all entries in constrained rows and columns, i.e., we
 set them to zero. The fraction of elements that are present in the sparsity
@@ -751,7 +751,7 @@ removed this bottleneck at the price of a slightly higher memory
 consumption. Likewise, the implementation of the decomposition step in the
 SparseILU class was very inefficient and has been replaced by one that is
 about 10 times faster. Even the vmult function of the SparseILU has been
-improved to save about twenty precent of time. Small improvements were
+improved to save about twenty percent of time. Small improvements were
 applied here and there. Moreover, the ConstraintMatrix object has been used
 to eliminate a lot of entries in the sparse matrix that are eventually going
 to be zero, see <a href="#constraint-matrix">the section on using advanced

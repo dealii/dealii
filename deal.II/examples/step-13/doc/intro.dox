@@ -43,7 +43,7 @@ a different module if they were not cleanly separated.
 
 
 In previous examples, you have seen how the library itself is broken
-up into several complexes each building atop the underying ones, but
+up into several complexes each building atop the underlying ones, but
 relatively independent of the other ones:
 <ol>
 <li>the triangulation class complex, with associated iterator classes;
@@ -133,7 +133,7 @@ applications, there would of course be comments and class
 documentation, which would bring that to maybe 1200 lines. Yet, compared to
 the applications listed above, this is still small, as they are 20 to
 25 times as large. For programs as large, a proper design right from
-the start is thus indispensible. Otherwise, it will have to be
+the start is thus indispensable. Otherwise, it will have to be
 redesigned at one point in its life, once it becomes too large to be
 manageable.
 
@@ -149,7 +149,7 @@ dependent application, the major concern is when to store data to disk
 and when to reload it again; if this is not done in an organized
 fashion, then you end up with data released too early, loaded too
 late, or not released at all). Although the present example program
-thus draws from sevelar years of experience, it is certainly not
+thus draws from several years of experience, it is certainly not
 without flaws in its design, and in particular might not be suited for
 an application where the objective is different. It should serve as an
 inspiration for writing your own application in a modular way, to

@@ -286,7 +286,7 @@ like this:
     </td>
   </tr>
 </table>
-Note the assymetry of the grids compared with those we obtained for
+Note the asymmetry of the grids compared with those we obtained for
 the point evaluation, which is due to the directionality of the
 x-derivative for which we tailored the refinement criterion.
 

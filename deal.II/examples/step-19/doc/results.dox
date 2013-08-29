@@ -33,7 +33,7 @@ set Output format    = gnuplot
 
 
 subsection DX output parameters
-  # A boolean field indicating whether neighborship information between cells
+  # A Boolean field indicating whether neighborship information between cells
   # is to be written to the OpenDX output file
   set Write neighbors = true
 end
@@ -93,7 +93,7 @@ subsection Eps output parameters
 end
 
 subsection Povray output parameters
-  # Whether camera and lightling information should be put into an external
+  # Whether camera and lighting information should be put into an external
   # file "data.inc" or into the POVRAY input file
   set Include external file = true
 

@@ -73,7 +73,7 @@ In the images below, we show the grids for the first six refinement
 steps in the program.  Observe how the grid is refined in regions
 where the solution rapidly changes: On the upper boundary, we have
 Dirichlet boundary conditions that are -1 in the left half of the line
-and 1 in the right one, so there is an aprupt change at $x=0$. Likewise,
+and 1 in the right one, so there is an abrupt change at $x=0$. Likewise,
 there are changes from Dirichlet to Neumann data in the two upper
 corners, so there is need for refinement there as well:
 
@@ -226,7 +226,7 @@ interesting graph:
 
 <img src="http://www.dealii.org/images/steps/developer/step-22.3d.solution.png" alt="">
 
-The isocountours shown here as well are those of the pressure
+The isocontours shown here as well are those of the pressure
 variable, showing the singularity at the point of discontinuous
 velocity boundary conditions.
 
@@ -315,8 +315,8 @@ the number of iterations for applying the inverse pressure mass matrix is
 always around five, both in two and three dimensions.)  To summarize, most work
 is spent on solving linear systems with the same matrix $A$ over and over again.
 What makes this look even worse is the fact that we
-actually invert a matrix that is about 95 precent the size of the total system
-matrix and stands for 85 precent of the non-zero entries in the sparsity
+actually invert a matrix that is about 95 percent the size of the total system
+matrix and stands for 85 percent of the non-zero entries in the sparsity
 pattern. Hence, the natural question is whether it is reasonable to solve a
 linear system with matrix $A$ for about 15 times when calculating the solution
 to the block system.
@@ -357,7 +357,7 @@ unknowns.
 Another idea to improve the situation even more would be to choose a
 preconditioner that makes CG for the (0,0) matrix $A$ converge in a
 mesh-independent number of iterations, say 10 to 30. We have seen such a
-canditate in step-16: multigrid.
+candidate in step-16: multigrid.
 
 <h5>Block Schur complement preconditioner</h5>
 Even with a good preconditioner for $A$, we still
@@ -492,7 +492,7 @@ are problems where one of the two candidates clearly outperforms the other, and
 vice versa.
 <a href="http://en.wikipedia.org/wiki/GMRES#Comparison_with_other_solvers">Wikipedia</a>'s
 article on the GMRES method gives a comparative presentation.
-A more comprehensive and well-founded comparsion can be read e.g. in the book by
+A more comprehensive and well-founded comparison can be read e.g. in the book by
 J.W. Demmel (Applied Numerical Linear Algebra, SIAM, 1997, section 6.6.6).
 
 For our specific problem with the ILU preconditioner for $A$, we certainly need
@@ -756,7 +756,7 @@ example mid-ocean ridges). Of course, in such places, the geometry is more
 complicated than the examples shown above, but it is not hard to accommodate
 for that.
 
-For example, by using the folllowing modification of the boundary values
+For example, by using the following modification of the boundary values
 function
 @code
 template <int dim>

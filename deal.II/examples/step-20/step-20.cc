@@ -280,10 +280,10 @@ namespace Step20
   // binding simpler elements together into one larger element. In the present
   // case, we want to couple a single RT(degree) element with a single
   // DQ(degree) element. The constructor to <code>FESystem</code> that does
-  // this requires us to specity first the first base element (the
+  // this requires us to specify first the first base element (the
   // <code>FE_RaviartThomas</code> object of given degree) and then the number
   // of copies for this base element, and then similarly the kind and number
-  // of <code>FE_DGQ</code> elements. Note that the Raviart Thomas element
+  // of <code>FE_DGQ</code> elements. Note that the Raviart-Thomas element
   // already has <code>dim</code> vector components, so that the coupled
   // element will have <code>dim+1</code> vector components, the first
   // <code>dim</code> of which correspond to the velocity variable whereas the
@@ -806,7 +806,7 @@ namespace Step20
     // used here, the Gauss points happen to be superconvergence points in
     // which the pointwise error is much smaller (and converges with higher
     // order) than anywhere else. These are therefore not particularly good
-    // points for ingration. To avoid this problem, we simply use a
+    // points for integration. To avoid this problem, we simply use a
     // trapezoidal rule and iterate it <code>degree+2</code> times in each
     // coordinate direction (again as explained in step-7):
     QTrapez<1>     q_trapez;
@@ -913,7 +913,7 @@ namespace Step20
 // The main function we stole from step-6 instead of step-4. It is almost
 // equal to the one in step-6 (apart from the changed class names, of course),
 // the only exception is that we pass the degree of the finite element space
-// to the constructor of the mixed laplace problem (here, we use zero-th order
+// to the constructor of the mixed Laplace problem (here, we use zero-th order
 // elements).
 int main ()
 {

@@ -324,7 +324,7 @@ namespace Step8
 
   // @sect4{ElasticProblem::setup_system}
 
-  // Setting up the system of equations is identitical to the function used in
+  // Setting up the system of equations is identical to the function used in
   // the step-6 example. The <code>DoFHandler</code> class and all other
   // classes used here are fully aware that the finite element we want to use
   // is vector-valued, and take care of the vector-valuedness of the finite

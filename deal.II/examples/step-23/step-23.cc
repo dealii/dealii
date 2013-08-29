@@ -340,7 +340,7 @@ namespace Step23
     sparsity_pattern.compress();
 
     // Then comes a block where we have to initialize the 3 matrices we need
-    // in the course of the program: the mass matrix, the laplace matrix, and
+    // in the course of the program: the mass matrix, the Laplace matrix, and
     // the matrix $M+k^2\theta^2A$ used when solving for $U^n$ in each time
     // step.
     //

@@ -217,7 +217,7 @@ namespace Step37
   // would have to have two classes like the current one for each of the
   // operators (maybe with a common base class). However, in that case, we
   // would not store a MatrixFree object in this class to avoid doing the
-  // expensive work of pre-computing everything MatrixFree stores
+  // expensive work of precomputing everything MatrixFree stores
   // twice. Rather, we would keep this object in the main class and simply
   // store a reference.
   //
@@ -332,8 +332,8 @@ namespace Step37
 
   // @sect4{Initialization}
 
-  // Once we have created the multi-grid dof_handler and the constraints, we
-  // can call the reinit function for each level of the multi-grid routine
+  // Once we have created the multigrid dof_handler and the constraints, we
+  // can call the reinit function for each level of the multigrid routine
   // (and the active cells). The main purpose of the reinit function is to
   // setup the <code> MatrixFree </code> instance for the problem. Also, the
   // coefficient is evaluated. For this, we need to activate the update flag

@@ -200,7 +200,7 @@ like
 <img src="http://www.dealii.org/images/steps/developer/step-34_2d.png" alt="">
 
 while in three dimensions we show first the potential on the surface,
-together with a contur plot,
+together with a contour plot,
 
 <img src="http://www.dealii.org/images/steps/developer/step-34_3d.png" alt="">
 

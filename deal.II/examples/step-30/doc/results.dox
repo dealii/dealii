@@ -146,6 +146,6 @@ It might seem that the necessary alignment of anisotropic features and the
 coarse mesh can decrease performance significantly for real world
 problems. However, that is not always the case. Considering boundary layers in
 compressible viscous flows, for example, the mesh is always aligned with the
-anisotropic features, thus anisotropic refinement will almost alway increase the
+anisotropic features, thus anisotropic refinement will almost always increase the
 efficiency of computations on adapted grids for these cases.
 

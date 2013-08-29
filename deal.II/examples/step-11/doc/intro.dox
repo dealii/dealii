@@ -31,7 +31,7 @@ For this, there are various possibilities:
   solutions of Laplace's equation are only in $H^1$, which does not allow for
   the definition of point values because it is not a subset of the continuous
   functions. Therefore, even though fixing one node is allowed for
-  discretitized functions, it is not for continuous functions, and one can
+  discretized functions, it is not for continuous functions, and one can
   often see this in a resulting error spike at this point in the numerical
   solution. 
   
@@ -57,7 +57,7 @@ various places where we use it; in almost all conceivable cases, you will only
 consider the objects describing mappings as a black box which you need not
 worry about, because their only uses seem to be to be passed to places deep
 inside the library where functions know how to handle them (i.e. in the
-<code>FEValues</code> classes and their descendents).
+<code>FEValues</code> classes and their descendants).
 
 The tricky point in this program is the use of the mean value
 constraint. Fortunately, there is a class in the library which knows how to

@@ -156,7 +156,7 @@ namespace Step22
 
   // As in step-20 and most other example programs, the next task is to define
   // the data for the PDE: For the Stokes problem, we are going to use natural
-  // boundary values on parts of the boundary (i.e. homogenous Neumann-type)
+  // boundary values on parts of the boundary (i.e. homogeneous Neumann-type)
   // for which we won't have to do anything special (the homogeneity implies
   // that the corresponding terms in the weak form are simply zero), and
   // boundary conditions on the velocity (Dirichlet-type) on the rest of the
@@ -379,7 +379,7 @@ namespace Step22
   // Note that we initialize the triangulation with a MeshSmoothing argument,
   // which ensures that the refinement of cells is done in a way that the
   // approximation of the PDE solution remains well-behaved (problems arise if
-  // grids are too unstructered), see the documentation of
+  // grids are too unstructured), see the documentation of
   // <code>Triangulation::MeshSmoothing</code> for details.
   template <int dim>
   StokesProblem<dim>::StokesProblem (const unsigned int degree)
@@ -518,7 +518,7 @@ namespace Step22
     // require allocating more memory than necessary but isn't suitable for
     // use as a basis of SparseMatrix or BlockSparseMatrix objects; in a
     // second step we then copy this object into an object of
-    // BlockSparsityPattern. This is entirely analgous to what we already did
+    // BlockSparsityPattern. This is entirely analogous to what we already did
     // in step-11 and step-18.
     //
     // There is one snag again here, though: it turns out that using the
@@ -735,7 +735,7 @@ namespace Step22
 
   // After the discussion in the introduction and the definition of the
   // respective classes above, the implementation of the <code>solve</code>
-  // function is rather straigt-forward and done in a similar way as in
+  // function is rather straight-forward and done in a similar way as in
   // step-20. To start with, we need an object of the
   // <code>InverseMatrix</code> class that represents the inverse of the
   // matrix A. As described in the introduction, the inverse is generated with
@@ -790,7 +790,7 @@ namespace Step22
       // An alternative that is cheaper to build, but needs more iterations
       // afterwards, would be to choose a SSOR preconditioner with factor
       // 1.2. It needs about twice the number of iterations, but the costs for
-      // its generation are almost neglible.
+      // its generation are almost negligible.
       SparseILU<double> preconditioner;
       preconditioner.initialize (system_matrix.block(1,1),
                                  SparseILU<double>::AdditionalData());
@@ -820,7 +820,7 @@ namespace Step22
     // objects we already know - so we simply multiply $p$ by $B^T$, subtract
     // the right hand side and multiply by the inverse of $A$. At the end, we
     // need to distribute the constraints from hanging nodes in order to
-    // obtain a constistent flow field:
+    // obtain a consistent flow field:
     {
       system_matrix.block(0,1).vmult (tmp, solution.block(1));
       tmp *= -1;

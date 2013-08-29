@@ -21,7 +21,7 @@ the current example program, we will consider that under the membrane is a
 stair step obstacle against which gravity pushes the membrane.
 
 This problem is typically called the "obstacle problem" (see also <a
-href="http://en.wikipedia.org/wiki/Obstacle_problem">this wikipedia article</a>), and it results in a
+href="http://en.wikipedia.org/wiki/Obstacle_problem">this Wikipedia article</a>), and it results in a
 variational inequality, rather than a variational equation when put into the
 weak form. We will below derive it from the classical formulation, but before we
 go on to discuss the mathematics let us show how the solution of the problem we
@@ -98,7 +98,7 @@ We have to find a solution $u\in G$ of the following minimization problem:
 @f{equation*}
  E(u)\leq E(v)\quad \forall v\in G,
 @f}
-with the convex set of admissble displacements:
+with the convex set of admissible displacements:
 @f{equation*}
  G:=\lbrace v\in V: v\geq g \text{ a.e. in } \Omega\rbrace,\quad V:=H^1_0(\Omega).
 @f}
@@ -132,7 +132,7 @@ sides are in fact equal, i.e., we obtain a variational equality.
 On the other hand, if $u=g$ then $G$ only allows test functions $v$ so that in fact
 $v-u\ge 0$. This means that we can't test the equation with both $v-u$ and
 $-(v-u)$ as above, and so we can no longer conclude that the two sides are in
-fact equal. Thus, this mimicks the way we have discussed the complementarity
+fact equal. Thus, this mimics the way we have discussed the complementarity
 condition above.
 
 
@@ -222,7 +222,7 @@ penalty parameter which depends on the problem itself and needs to be chosen
 large enough; for example there is no convergence for $c = 1$ using the
 current program if we use 7 global refinements.)
 
-After some headscratching one can then convince oneself that the inequalities
+After some head-scratching one can then convince oneself that the inequalities
 above can equivalently be rewritten as
 @f{equation*}
  C([BU]_i,\Lambda_i) = 0, \qquad \forall i\in{\cal S}.

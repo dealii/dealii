@@ -942,7 +942,7 @@ namespace Step42
               locally_relevant_dofs);
         }
 
-      // setup hanging nodes and dirichlet constraints
+      // setup hanging nodes and Dirichlet constraints
         {
           TimerOutput::Scope t(computing_timer, "Setup: constraints");
           constraints_hanging_nodes.reinit(locally_relevant_dofs);
@@ -1461,7 +1461,7 @@ namespace Step42
 
 // This function defines the new ConstraintMatrix
 // constraints_dirichlet_hanging_nodes. It contains
-// the dirichlet boundary values as well as the
+// the Dirichlet boundary values as well as the
 // hanging nodes constraints.
   template <int dim>
     void

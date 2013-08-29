@@ -153,7 +153,7 @@ namespace Step46
   // The following classes do as their names suggest. The boundary values for
   // the velocity are $\mathbf u=(0, \sin(\pi x))^T$ in 2d and $\mathbf u=(0,
   // 0, \sin(\pi x)\sin(\pi y))^T$ in 3d, respectively. The remaining boundary
-  // conditions for this problem are all homogenous and have been discussed in
+  // conditions for this problem are all homogeneous and have been discussed in
   // the introduction. The right hand side forcing term is zero for both the
   // fluid and the solid.
   template <int dim>
@@ -374,7 +374,7 @@ namespace Step46
   // this end, we first have to set the active FE indices with the function
   // immediately above, then distribute degrees of freedom, and then determine
   // constraints on the linear system. The latter includes hanging node
-  // constraints as usual, but also the inhomogenous boundary values at the
+  // constraints as usual, but also the inhomogeneous boundary values at the
   // top fluid boundary, and zero boundary values along the perimeter of the
   // solid subdomain.
   template <int dim>

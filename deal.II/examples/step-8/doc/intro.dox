@@ -96,7 +96,7 @@ the $z$ direction; this is in contrast to many other two-dimensional equations
 that can be obtained by assuming that the body has infinite extent in
 $z$-direction and that the solution function does not depend on the $z$
 coordinate. On the other hand, there are equations for two-dimensional models
-of elasticity; see for example the wikipedia article on <a
+of elasticity; see for example the Wikipedia article on <a
 href="http://en.wikipedia.org/wiki/Infinitesimal_strain_theory#Special_cases">plane
 strain</a>, <a
 href="http://en.wikipedia.org/wiki/Antiplane_shear">antiplane shear</a> and <a

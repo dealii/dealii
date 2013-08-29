@@ -13,7 +13,7 @@ The subject of this tutorial is nonlinear solid mechanics.
 Classical single-field approaches (see e.g. step-18) can not correctly describe the response of quasi-incompressible materials. 
 The response is overly stiff; a phenomenon known as locking.
 Locking problems can be circumvented using a variety of alternative strategies. 
-One such straegy is the  three-field formulation.
+One such strategy is the  three-field formulation.
 It is used here  to model the three-dimensional, fully-nonlinear (geometrical and material) response of an isotropic continuum body.
 The material response is approximated as hyperelastic.
 Additionally, the three-field formulation employed is valid for quasi-incompressible as well as compressible materials.
@@ -573,7 +573,7 @@ where
 @f}
 
 There are no derivatives of the pressure and dilatation (primary) variables present in the formulation. 
-Thus the discontinuous finite element interpolation of the pressure ana dilatation yields a block
+Thus the discontinuous finite element interpolation of the pressure and dilatation yields a block
 diagonal matrix for
 $\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}$,
 $\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}$ and 

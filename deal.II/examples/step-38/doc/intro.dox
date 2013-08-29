@@ -224,7 +224,7 @@ looks. In essence, we will simply declare an appropriate object of type
 MappingQ that will automatically obtain the boundary description from the
 Triangulation. The mapping object will then be passed to the appropriate
 functions, and we will get a boundary description for half circles or half
-spheres that is pre-defined in the library.
+spheres that is predefined in the library.
 
 The rest of the program follows closely step-4 and, as far as computing the
 error, step-7. Some aspects of this program, in particular the use of two

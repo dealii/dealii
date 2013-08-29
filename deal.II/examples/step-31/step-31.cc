@@ -88,12 +88,12 @@ namespace Step31
   // same as in step-22. Regarding the details, though, there are some
   // differences.
 
-  // The first thing is that we don't set any non-homogenous boundary
+  // The first thing is that we don't set any nonhomogeneous boundary
   // conditions on the velocity, since as is explained in the introduction we
   // will use no-flux conditions $\mathbf{n}\cdot\mathbf{u}=0$. So what is
   // left are <code>dim-1</code> conditions for the tangential part of the
   // normal component of the stress tensor, $\textbf{n} \cdot [p \textbf{1} -
-  // \eta\varepsilon(\textbf{u})]$; we assume homogenous values for these
+  // \eta\varepsilon(\textbf{u})]$; we assume homogeneous values for these
   // components, i.e. a natural boundary condition that requires no specific
   // action (it appears as a zero term in the right hand side of the weak
   // form).
@@ -246,7 +246,7 @@ namespace Step31
     //
     // Secondly, we catch any exceptions that the solver may have thrown. The
     // reason is as follows: When debugging a program like this one
-    // occasionally makes a mistake of passing an indefinite or non-symmetric
+    // occasionally makes a mistake of passing an indefinite or nonsymmetric
     // matrix or preconditioner to the current class. The solver will, in that
     // case, not converge and throw a run-time exception. If not caught here
     // it will propagate up the call stack and may end up in
@@ -764,7 +764,7 @@ namespace Step31
   // detail in the results section of this tutorial program. The second is the
   // exponent $\alpha$; $\alpha=1$ appears to work fine for the current
   // program, even though some additional benefit might be expected from
-  // chosing $\alpha = 2$. Finally, there is one thing that requires special
+  // choosing $\alpha = 2$. Finally, there is one thing that requires special
   // casing: In the first time step, the velocity equals zero, and the formula
   // for $\nu|_K$ is not defined. In that case, we return $\nu|_K=5\cdot 10^3
   // \cdot h_K$, a choice admittedly more motivated by heuristics than
@@ -950,7 +950,7 @@ namespace Step31
     // dofs. Consequently, there will be no data written at positions of
     // constrained degrees of freedom, so we can let the
     // DoFTools::make_sparsity_pattern function omit these entries by setting
-    // the last boolean flag to <code>false</code>. Once the sparsity pattern
+    // the last Boolean flag to <code>false</code>. Once the sparsity pattern
     // is ready, we can use it to initialize the Trilinos matrices. Since the
     // Trilinos matrices store the sparsity pattern internally, there is no
     // need to keep the sparsity pattern around after the initialization of
@@ -1190,15 +1190,15 @@ namespace Step31
     // Next, we set some more options of the AMG preconditioner. In
     // particular, we need to tell the AMG setup that we use quadratic basis
     // functions for the velocity matrix (this implies more nonzero elements
-    // in the matrix, so that a more rubust algorithm needs to be chosen
+    // in the matrix, so that a more robust algorithm needs to be chosen
     // internally). Moreover, we want to be able to control how the coarsening
     // structure is build up. The way the Trilinos smoothed aggregation AMG
     // does this is to look which matrix entries are of similar size as the
     // diagonal entry in order to algebraically build a coarse-grid
     // structure. By setting the parameter <code>aggregation_threshold</code>
-    // to 0.02, we specify that all entries that are more than two precent of
+    // to 0.02, we specify that all entries that are more than two percent of
     // size of some diagonal pivots in that row should form one coarse grid
-    // point. This parameter is rather ad-hoc, and some fine-tuning of it can
+    // point. This parameter is rather ad hoc, and some fine-tuning of it can
     // influence the performance of the preconditioner. As a rule of thumb,
     // larger values of <code>aggregation_threshold</code> will decrease the
     // number of iterations, but increase the costs per iteration. A look at
@@ -1208,7 +1208,7 @@ namespace Step31
     //
     // Finally, we also initialize the preconditioner for the inversion of the
     // pressure mass matrix. This matrix is symmetric and well-behaved, so we
-    // can chose a simple preconditioner. We stick with an incomple Cholesky
+    // can chose a simple preconditioner. We stick with an incomplete Cholesky
     // (IC) factorization preconditioner, which is designed for symmetric
     // matrices. We could have also chosen an SSOR preconditioner with
     // relaxation factor around 1.2, but IC is cheaper for our example. We
@@ -1586,8 +1586,8 @@ namespace Step31
     // Next comes the declaration of vectors to hold the old and older
     // solution values (as a notation for time levels <i>n-1</i> and
     // <i>n-2</i>, respectively) and gradients at quadrature points of the
-    // current cell. We also declarate an object to hold the temperature right
-    // hande side values (<code>gamma_values</code>), and we again use
+    // current cell. We also declare an object to hold the temperature right
+    // hand side values (<code>gamma_values</code>), and we again use
     // shortcuts for the temperature basis functions. Eventually, we need to
     // find the temperature extrema and the diameter of the computational
     // domain which will be used for the definition of the stabilization
@@ -1665,7 +1665,7 @@ namespace Step31
         // according to the discussion in the introduction using the dedicated
         // function. With that at hand, we can get into the loop over
         // quadrature points and local rhs vector components. The terms here
-        // are quite lenghty, but their definition follows the time-discrete
+        // are quite lengthy, but their definition follows the time-discrete
         // system developed in the introduction of this program. The BDF-2
         // scheme needs one more term from the old time step (and involves
         // more complicated factors) than the backward Euler scheme that is
@@ -1824,7 +1824,7 @@ namespace Step31
     // There is a snatch here. The formula contains a division by the maximum
     // value of the velocity. However, at the start of the computation, we
     // have a constant temperature field (we start with a constant
-    // temperature, and it will be non-constant only after the first time step
+    // temperature, and it will be nonconstant only after the first time step
     // during which the source acts). Constant temperature means that no
     // buoyancy acts, and so the velocity is zero. Dividing by it will not
     // likely lead to anything good.
@@ -2024,7 +2024,7 @@ namespace Step31
     // SolutionTransfer class and we have to prepare the solution vectors that
     // should be transferred to the new grid (we will lose the old grid once
     // we have done the refinement so the transfer has to happen concurrently
-    // with refinement). What we definetely need are the current and the old
+    // with refinement). What we definitely need are the current and the old
     // temperature (BDF-2 time stepping requires two old solutions). Since the
     // SolutionTransfer objects only support to transfer one object per dof
     // handler, we need to collect the two temperature solutions in one data

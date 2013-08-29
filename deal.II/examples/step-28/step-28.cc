@@ -152,7 +152,7 @@ namespace Step28
   // arrays. It takes the number of energy groups as an argument (an throws an
   // error if that value is not equal to two, since at presently only data for
   // two energy groups is implemented; however, using this, the function
-  // remains flexible and extendible into the future). In the member
+  // remains flexible and extendable into the future). In the member
   // initialization part at the beginning, it also resizes the arrays to their
   // correct sizes.
   //
@@ -506,7 +506,7 @@ namespace Step28
     ConstraintMatrix              hanging_node_constraints;
 
 
-    // @sect5{Private member functionss}
+    // @sect5{Private member functions}
     //
     // There is one private member function in this class. It recursively
     // walks over cells of two meshes to compute the cross-group right hand
@@ -800,7 +800,7 @@ namespace Step28
   // groups. First we call <code>get_finest_common_cells</code> to obtain this
   // list of pairs of common cells from both meshes. Both cells in a pair may
   // not be active but at least one of them is. We then hand each of these
-  // cell pairs off to a function tha computes the right hand side terms
+  // cell pairs off to a function that computes the right hand side terms
   // recursively.
   //
   // Note that ingroup coupling is handled already before, so we exit the

@@ -416,7 +416,7 @@ namespace Step25
   // integrate these terms exactly. It is usually sufficient to just make sure
   // that the right hand side is integrated up to the same order of accuracy
   // as the discretization scheme is, but it may be possible to improve on the
-  // constant in the asympotitic statement of convergence by choosing a more
+  // constant in the asymptotic statement of convergence by choosing a more
   // accurate quadrature formula.
   template <int dim>
   void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
@@ -477,7 +477,7 @@ namespace Step25
   // @sect4{SineGordonProblem::compute_nl_matrix}
 
   // This is the second function dealing with the nonlinear scheme. It
-  // computes the matrix $N(\cdot,\cdot)$, whicih appears in the nonlinear
+  // computes the matrix $N(\cdot,\cdot)$, which appears in the nonlinear
   // term in the Jacobian of $F(\cdot)$. Just as <code>compute_nl_term</code>,
   // we must allow this function to receive as input an "old" and a "new"
   // solution, which we again call $w_{\mathrm{old}}$ and $w_{\mathrm{new}}$
@@ -610,7 +610,7 @@ namespace Step25
   {
     make_grid_and_dofs ();
 
-    // To aknowledge the initial condition, we must use the function $u_0(x)$
+    // To acknowledge the initial condition, we must use the function $u_0(x)$
     // to compute $U^0$. To this end, below we will create an object of type
     // <code>InitialValues</code>; note that when we create this object (which
     // is derived from the <code>Function</code> class), we set its internal
