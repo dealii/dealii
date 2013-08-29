@@ -33,7 +33,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
     IF( "${DEAL_II_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${DEAL_II_PICKUP_REGEX}" )
-      GET_FILENAME_COMPONENT(_test ${_test} NAME_WE)
+      GET_FILENAME_COMPONENT(_test ${_test} NAME)
 
       IF(_test MATCHES debug)
         SET(_configuration DEBUG)
@@ -49,4 +49,3 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   ENDFOREACH()
 
-ENDMACRO()
