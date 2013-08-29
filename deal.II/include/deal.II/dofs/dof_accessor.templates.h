@@ -476,7 +476,7 @@ namespace internal
                      const unsigned int       local_index,
                      const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.
+        return dof_handler.levels[obj_level]->
                get_dof_index (dof_handler,
                               obj_index,
                               fe_index,
@@ -496,7 +496,7 @@ namespace internal
                      const dealii::internal::int2type<1> &,
                      const types::global_dof_index       global_index)
       {
-        dof_handler.levels[obj_level]->dof_object.
+        dof_handler.levels[obj_level]->
         set_dof_index (dof_handler,
                        obj_index,
                        fe_index,
@@ -556,7 +556,7 @@ namespace internal
                      const unsigned int       local_index,
                      const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.
+        return dof_handler.levels[obj_level]->
                get_dof_index (dof_handler,
                               obj_index,
                               fe_index,
@@ -576,7 +576,7 @@ namespace internal
                      const dealii::internal::int2type<2> &,
                      const types::global_dof_index       global_index)
       {
-        dof_handler.levels[obj_level]->dof_object.
+        dof_handler.levels[obj_level]->
         set_dof_index (dof_handler,
                        obj_index,
                        fe_index,
@@ -676,7 +676,7 @@ namespace internal
                      const unsigned int       local_index,
                      const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.
+        return dof_handler.levels[obj_level]->
                get_dof_index (dof_handler,
                               obj_index,
                               fe_index,
@@ -696,7 +696,7 @@ namespace internal
                      const dealii::internal::int2type<3> &,
                      const types::global_dof_index       global_index)
       {
-        dof_handler.levels[obj_level]->dof_object.
+        dof_handler.levels[obj_level]->
         set_dof_index (dof_handler,
                        obj_index,
                        fe_index,
@@ -825,7 +825,7 @@ namespace internal
                           const unsigned int fe_index,
                           const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
+        return dof_handler.levels[obj_level]->fe_index_is_active(dof_handler,
                obj_index,
                fe_index,
                obj_level);
@@ -840,7 +840,7 @@ namespace internal
                            const unsigned int obj_index,
                            const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
+        return dof_handler.levels[obj_level]->n_active_fe_indices (dof_handler,
                obj_index);
       }
 
@@ -855,7 +855,7 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
+        return dof_handler.levels[obj_level]->nth_active_fe_index (dof_handler,
                obj_level,
                obj_index,
                n);
@@ -917,7 +917,7 @@ namespace internal
                           const unsigned int fe_index,
                           const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
+        return dof_handler.levels[obj_level]->fe_index_is_active(dof_handler,
                obj_index,
                fe_index,
                obj_level);
@@ -932,7 +932,7 @@ namespace internal
                            const unsigned int obj_index,
                            const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
+        return dof_handler.levels[obj_level]->n_active_fe_indices (dof_handler,
                obj_index);
       }
 
@@ -947,7 +947,7 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
+        return dof_handler.levels[obj_level]->nth_active_fe_index (dof_handler,
                obj_level,
                obj_index,
                n);
@@ -1026,7 +1026,7 @@ namespace internal
                           const unsigned int fe_index,
                           const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
+        return dof_handler.levels[obj_level]->fe_index_is_active(dof_handler,
                obj_index,
                fe_index,
                obj_level);
@@ -1072,7 +1072,7 @@ namespace internal
                            const unsigned int obj_index,
                            const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
+        return dof_handler.levels[obj_level]->n_active_fe_indices (dof_handler,
                obj_index);
       }
 
@@ -1087,7 +1087,7 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
+        return dof_handler.levels[obj_level]->nth_active_fe_index (dof_handler,
                obj_level,
                obj_index,
                n);

@@ -27,8 +27,9 @@ namespace internal
     std::size_t
     DoFLevel<dim>::memory_consumption () const
     {
-      return MemoryConsumption::memory_consumption (active_fe_indices) +
-             MemoryConsumption::memory_consumption (dof_object);
+      return (MemoryConsumption::memory_consumption (active_fe_indices) +
+	      MemoryConsumption::memory_consumption (dofs) +
+              MemoryConsumption::memory_consumption (dof_offsets));
     }
 
 

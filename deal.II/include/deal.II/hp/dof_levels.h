@@ -94,7 +94,7 @@ namespace internal
      *
      * Access to this kind of data, as well as the distinction between
      * cells and objects of lower dimensionality are encoded in the
-     * accessor functions, DoFObjects::set_dof_index() and
+     * accessor functions, DoFLevel::set_dof_index() and
      * DoFLevel::get_dof_index() They are able to traverse this
      * list and pick out or set a DoF index given the finite element index
      * and its location within the set of DoFs corresponding to this
@@ -125,10 +125,139 @@ namespace internal
       std::vector<unsigned int> active_fe_indices;
 
       /**
-       *  Store the dof-indices and related data of
-       *  the cells on the current level corresponding to this object.
+       * Store the start index for
+       * the degrees of freedom of each
+       * object in the @p dofs array.
+       *
+       * The type we store is then obviously the type the @p dofs array
+       * uses for indexing.
        */
-      internal::hp::DoFObjects<dim> dof_object;
+      std::vector<std::vector<types::global_dof_index>::size_type> dof_offsets;
+
+      /**
+       * Store the global indices of
+       * the degrees of freedom. See
+       * DoFLevel() for detailed
+       * information.
+       */
+      std::vector<types::global_dof_index> dofs;
+
+      /**
+       * Set the global index of
+       * the @p local_index-th
+       * degree of freedom located
+       * on the object with number @p
+       * obj_index to the value
+       * given by @p global_index. The @p
+       * dof_handler argument is
+       * used to access the finite
+       * element that is to be used
+       * to compute the location
+       * where this data is stored.
+       *
+       * The third argument, @p
+       * fe_index, denotes which of
+       * the finite elements
+       * associated with this
+       * object we shall
+       * access. Refer to the
+       * general documentation of
+       * the internal::hp::DoFLevel
+       * class template for more
+       * information.
+       */
+      template <int dimm, int spacedim>
+      void
+      set_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                     const unsigned int               obj_index,
+                     const unsigned int               fe_index,
+                     const unsigned int               local_index,
+                     const types::global_dof_index    global_index,
+                     const unsigned int               obj_level);
+
+      /**
+       * Return the global index of
+       * the @p local_index-th
+       * degree of freedom located
+       * on the object with number @p
+       * obj_index. The @p
+       * dof_handler argument is
+       * used to access the finite
+       * element that is to be used
+       * to compute the location
+       * where this data is stored.
+       *
+       * The third argument, @p
+       * fe_index, denotes which of
+       * the finite elements
+       * associated with this
+       * object we shall
+       * access. Refer to the
+       * general documentation of
+       * the internal::hp::DoFLevel
+       * class template for more
+       * information.
+       */
+      template <int dimm, int spacedim>
+      types::global_dof_index
+      get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                     const unsigned int               obj_index,
+                     const unsigned int               fe_index,
+                     const unsigned int               local_index,
+                     const unsigned int               obj_level) const;
+
+      /**
+       * Return the number of
+       * finite elements that are
+       * active on a given
+       * object. If this is a cell,
+       * the answer is of course
+       * one. If it is a face, the
+       * answer may be one or two,
+       * depending on whether the
+       * two adjacent cells use the
+       * same finite element or
+       * not. If it is an edge in
+       * 3d, the possible return
+       * value may be one or any
+       * other value larger than
+       * that.
+       *
+       * If the object is not part
+       * of an active cell, then no
+       * degrees of freedom have
+       * been distributed and zero
+       * is returned.
+       */
+      template <int dimm, int spacedim>
+      unsigned int
+      n_active_fe_indices (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                           const unsigned int               obj_index) const;
+
+      /**
+       * Return the fe_index of the
+       * n-th active finite element
+       * on this object.
+       */
+      template <int dimm, int spacedim>
+      types::global_dof_index
+      nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                           const unsigned int               obj_level,
+                           const unsigned int               obj_index,
+                           const unsigned int               n) const;
+
+      /**
+       * Check whether a given
+       * finite element index is
+       * used on the present
+       * object or not.
+       */
+      template <int dimm, int spacedim>
+      bool
+      fe_index_is_active (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                          const unsigned int               obj_index,
+                          const unsigned int               fe_index,
+                          const unsigned int               obj_level) const;
 
       /**
        * Determine an estimate for the
@@ -137,6 +266,258 @@ namespace internal
        */
       std::size_t memory_consumption () const;
     };
+
+
+    // -------------------- template functions --------------------------------
+
+    template <int dim>
+    template <int dimm, int spacedim>
+    inline
+    types::global_dof_index
+    DoFLevel<dim>::
+    get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                   const unsigned int                obj_index,
+                   const unsigned int                fe_index,
+                   const unsigned int                local_index,
+                   const unsigned int                obj_level) const
+    {
+      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
+              ExcMessage ("You need to specify a FE index when working "
+                          "with hp DoFHandlers"));
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+      Assert (local_index <
+              dof_handler.get_fe()[fe_index].template n_dofs_per_object<dim>(),
+              ExcIndexRange(local_index, 0,
+                            dof_handler.get_fe()[fe_index]
+                            .template n_dofs_per_object<dim>()));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+      // make sure we are on an
+      // object for which DoFs have
+      // been allocated at all
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      if (dim == dimm)
+        {
+          // if we are on a cell, then
+          // the only set of indices we
+          // store is the one for the
+          // cell, which is unique. then
+          // fe_index must be
+          // active_fe_index
+          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
+                  ExcMessage ("FE index does not match that of the present cell"));
+          return dofs[dof_offsets[obj_index]+local_index];
+        }
+      else
+        {
+    	  Assert (false, ExcInternalError());
+    	  return 0;
+        }
+    }
+
+
+
+    template <int dim>
+    template <int dimm, int spacedim>
+    inline
+    void
+    DoFLevel<dim>::
+    set_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                   const unsigned int                obj_index,
+                   const unsigned int                fe_index,
+                   const unsigned int                local_index,
+                   const types::global_dof_index     global_index,
+                   const unsigned int                obj_level)
+    {
+      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
+              ExcMessage ("You need to specify a FE index when working "
+                          "with hp DoFHandlers"));
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+      Assert (local_index <
+              dof_handler.get_fe()[fe_index].template n_dofs_per_object<dim>(),
+              ExcIndexRange(local_index, 0,
+                            dof_handler.get_fe()[fe_index]
+                            .template n_dofs_per_object<dim>()));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+      // make sure we are on an
+      // object for which DoFs have
+      // been allocated at all
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      if (dim == dimm)
+        {
+          // if we are on a cell, then
+          // the only set of indices we
+          // store is the one for the
+          // cell, which is unique. then
+          // fe_index must be
+          // active_fe_index
+          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
+                  ExcMessage ("FE index does not match that of the present cell"));
+          dofs[dof_offsets[obj_index]+local_index] = global_index;
+        }
+      else
+        {
+    	  Assert (false, ExcInternalError());
+        }
+    }
+
+
+
+    template <int dim>
+    template <int dimm, int spacedim>
+    inline
+    unsigned int
+    DoFLevel<dim>::
+    n_active_fe_indices (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                         const unsigned int                obj_index) const
+    {
+      Assert (dim <= dimm, ExcInternalError());
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+      // make sure we are on an
+      // object for which DoFs have
+      // been allocated at all
+      if (dof_offsets[obj_index] == numbers::invalid_dof_index)
+        return 0;
+
+      // if we are on a cell, then the
+      // only set of indices we store
+      // is the one for the cell,
+      // which is unique
+      if (dim == dimm)
+        return 1;
+      else
+        {
+    	  Assert (false, ExcInternalError());
+    	  return 0;
+        }
+    }
+
+
+
+    template <int dim>
+    template <int dimm, int spacedim>
+    inline
+    types::global_dof_index
+    DoFLevel<dim>::
+    nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                         const unsigned int                obj_level,
+                         const unsigned int                obj_index,
+                         const unsigned int                n) const
+    {
+      Assert (dim <= dimm, ExcInternalError());
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+      // make sure we are on an
+      // object for which DoFs have
+      // been allocated at all
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      if (dim == dimm)
+        {
+          // this is a cell, so there
+          // is only a single
+          // fe_index
+          Assert (n == 0, ExcIndexRange (n, 0, 1));
+
+          return dof_handler.levels[obj_level]->active_fe_indices[obj_index];
+        }
+      else
+        {
+    	  Assert (false, ExcInternalError());
+    	  return 0;
+        }
+    }
+
+
+
+    template <int dim>
+    template <int dimm, int spacedim>
+    inline
+    bool
+    DoFLevel<dim>::
+    fe_index_is_active (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
+                        const unsigned int                obj_index,
+                        const unsigned int                fe_index,
+                        const unsigned int                obj_level) const
+    {
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));
+      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
+              ExcMessage ("You need to specify a FE index when working "
+                          "with hp DoFHandlers"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+
+      // make sure we are on an
+      // object for which DoFs have
+      // been allocated at all
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      if (dim == dimm)
+        {
+          // if we are on a cell,
+          // then the only set of
+          // indices we store is the
+          // one for the cell, which
+          // is unique
+          Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
+                  ExcInternalError());
+          return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
+        }
+      else
+        {
+    	  Assert (false, ExcInternalError());
+    	  return false;
+        }
+    }
+
   } // namespace hp
 
 } // namespace internal
