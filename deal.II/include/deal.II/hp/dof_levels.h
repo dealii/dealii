@@ -29,9 +29,6 @@ namespace internal
 {
   namespace hp
   {
-    template <int dim>
-    class DoFLevel;
-
     /**
      * Store the indices of the degrees of freedom that are located on
      * objects of dimension @p structdim.
@@ -307,23 +304,9 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == dimm)
-        {
-          // if we are on a cell, then
-          // the only set of indices we
-          // store is the one for the
-          // cell, which is unique. then
-          // fe_index must be
-          // active_fe_index
-          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          return dofs[dof_offsets[obj_index]+local_index];
-        }
-      else
-        {
-    	  Assert (false, ExcInternalError());
-    	  return 0;
-        }
+      Assert (fe_index == active_fe_indices[obj_index],
+	      ExcMessage ("FE index does not match that of the present cell"));
+      return dofs[dof_offsets[obj_index]+local_index];
     }
 
 
@@ -366,22 +349,9 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == dimm)
-        {
-          // if we are on a cell, then
-          // the only set of indices we
-          // store is the one for the
-          // cell, which is unique. then
-          // fe_index must be
-          // active_fe_index
-          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          dofs[dof_offsets[obj_index]+local_index] = global_index;
-        }
-      else
-        {
-    	  Assert (false, ExcInternalError());
-        }
+      Assert (fe_index == active_fe_indices[obj_index],
+	      ExcMessage ("FE index does not match that of the present cell"));
+      dofs[dof_offsets[obj_index]+local_index] = global_index;
     }
 
 
@@ -409,17 +379,9 @@ namespace internal
       if (dof_offsets[obj_index] == numbers::invalid_dof_index)
         return 0;
 
-      // if we are on a cell, then the
-      // only set of indices we store
-      // is the one for the cell,
-      // which is unique
-      if (dim == dimm)
-        return 1;
-      else
-        {
-    	  Assert (false, ExcInternalError());
-    	  return 0;
-        }
+      // we are on a cell, so the only set of indices we store is the
+      // one for the cell, which is unique
+      return 1;
     }
 
 
@@ -451,20 +413,12 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == dimm)
-        {
-          // this is a cell, so there
-          // is only a single
-          // fe_index
-          Assert (n == 0, ExcIndexRange (n, 0, 1));
+      // this is a cell, so there
+      // is only a single
+      // fe_index
+      Assert (n == 0, ExcIndexRange (n, 0, 1));
 
-          return dof_handler.levels[obj_level]->active_fe_indices[obj_index];
-        }
-      else
-        {
-    	  Assert (false, ExcInternalError());
-    	  return 0;
-        }
+      return active_fe_indices[obj_index];
     }
 
 
@@ -500,22 +454,9 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == dimm)
-        {
-          // if we are on a cell,
-          // then the only set of
-          // indices we store is the
-          // one for the cell, which
-          // is unique
-          Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
-                  ExcInternalError());
-          return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
-        }
-      else
-        {
-    	  Assert (false, ExcInternalError());
-    	  return false;
-        }
+      Assert (obj_index < active_fe_indices.size(),
+	      ExcInternalError());
+      return (fe_index == active_fe_indices[obj_index]);
     }
 
   } // namespace hp
