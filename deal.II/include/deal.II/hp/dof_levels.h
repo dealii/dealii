@@ -163,10 +163,8 @@ namespace internal
        * class template for more
        * information.
        */
-      template <int dimm, int spacedim>
       void
-      set_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                     const unsigned int               obj_index,
+      set_dof_index (const unsigned int               obj_index,
                      const unsigned int               fe_index,
                      const unsigned int               local_index,
                      const types::global_dof_index    global_index,
@@ -195,10 +193,8 @@ namespace internal
        * class template for more
        * information.
        */
-      template <int dimm, int spacedim>
       types::global_dof_index
-      get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                     const unsigned int               obj_index,
+      get_dof_index (const unsigned int               obj_index,
                      const unsigned int               fe_index,
                      const unsigned int               local_index,
                      const unsigned int               obj_level) const;
@@ -226,20 +222,16 @@ namespace internal
        * been distributed and zero
        * is returned.
        */
-      template <int dimm, int spacedim>
       unsigned int
-      n_active_fe_indices (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                           const unsigned int               obj_index) const;
+      n_active_fe_indices (const unsigned int               obj_index) const;
 
       /**
        * Return the fe_index of the
        * n-th active finite element
        * on this object.
        */
-      template <int dimm, int spacedim>
       types::global_dof_index
-      nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                           const unsigned int               obj_level,
+      nth_active_fe_index (const unsigned int               obj_level,
                            const unsigned int               obj_index,
                            const unsigned int               n) const;
 
@@ -249,10 +241,8 @@ namespace internal
        * used on the present
        * object or not.
        */
-      template <int dimm, int spacedim>
       bool
-      fe_index_is_active (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                          const unsigned int               obj_index,
+      fe_index_is_active (const unsigned int               obj_index,
                           const unsigned int               fe_index,
                           const unsigned int               obj_level) const;
 
@@ -268,31 +258,14 @@ namespace internal
     // -------------------- template functions --------------------------------
 
     template <int dim>
-    template <int dimm, int spacedim>
     inline
     types::global_dof_index
     DoFLevel<dim>::
-    get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                   const unsigned int                obj_index,
+    get_dof_index (const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
                    const unsigned int                obj_level) const
     {
-      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
-              ExcMessage ("You need to specify a FE index when working "
-                          "with hp DoFHandlers"));
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
-      Assert (fe_index < dof_handler.get_fe().size(),
-              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
-      Assert (local_index <
-              dof_handler.get_fe()[fe_index].template n_dofs_per_object<dim>(),
-              ExcIndexRange(local_index, 0,
-                            dof_handler.get_fe()[fe_index]
-                            .template n_dofs_per_object<dim>()));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -312,32 +285,15 @@ namespace internal
 
 
     template <int dim>
-    template <int dimm, int spacedim>
     inline
     void
     DoFLevel<dim>::
-    set_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                   const unsigned int                obj_index,
+    set_dof_index (const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
                    const types::global_dof_index     global_index,
                    const unsigned int                obj_level)
     {
-      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
-              ExcMessage ("You need to specify a FE index when working "
-                          "with hp DoFHandlers"));
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
-      Assert (fe_index < dof_handler.get_fe().size(),
-              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
-      Assert (local_index <
-              dof_handler.get_fe()[fe_index].template n_dofs_per_object<dim>(),
-              ExcIndexRange(local_index, 0,
-                            dof_handler.get_fe()[fe_index]
-                            .template n_dofs_per_object<dim>()));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -357,19 +313,11 @@ namespace internal
 
 
     template <int dim>
-    template <int dimm, int spacedim>
     inline
     unsigned int
     DoFLevel<dim>::
-    n_active_fe_indices (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                         const unsigned int                obj_index) const
+    n_active_fe_indices (const unsigned int obj_index) const
     {
-      Assert (dim <= dimm, ExcInternalError());
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -387,21 +335,13 @@ namespace internal
 
 
     template <int dim>
-    template <int dimm, int spacedim>
     inline
     types::global_dof_index
     DoFLevel<dim>::
-    nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                         const unsigned int                obj_level,
+    nth_active_fe_index (const unsigned int                obj_level,
                          const unsigned int                obj_index,
                          const unsigned int                n) const
     {
-      Assert (dim <= dimm, ExcInternalError());
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -413,9 +353,7 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      // this is a cell, so there
-      // is only a single
-      // fe_index
+      // this is a cell, so there is only a single fe_index
       Assert (n == 0, ExcIndexRange (n, 0, 1));
 
       return active_fe_indices[obj_index];
@@ -424,27 +362,16 @@ namespace internal
 
 
     template <int dim>
-    template <int dimm, int spacedim>
     inline
     bool
     DoFLevel<dim>::
-    fe_index_is_active (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
-                        const unsigned int                obj_index,
+    fe_index_is_active (const unsigned int                obj_index,
                         const unsigned int                fe_index,
                         const unsigned int                obj_level) const
     {
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
-      Assert (obj_index < dof_offsets.size(),
-              ExcIndexRange (obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));
-      Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
+      Assert ((fe_index != dealii::hp::DoFHandler<1,1>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
-      Assert (fe_index < dof_handler.get_fe().size(),
-              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
 
       // make sure we are on an
       // object for which DoFs have
