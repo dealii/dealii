@@ -542,7 +542,8 @@ namespace internal
             std::vector<std::vector<unsigned int> >
             active_fe_backup(dof_handler.levels.size ());
             for (unsigned int level = 0; level<dof_handler.levels.size (); ++level)
-              std::swap (dof_handler.levels[level]->active_fe_indices, active_fe_backup[level]);
+              std::swap (dof_handler.levels[level]->active_fe_indices,
+			 active_fe_backup[level]);
 
             // delete all levels and set them up
             // newly, since vectors are

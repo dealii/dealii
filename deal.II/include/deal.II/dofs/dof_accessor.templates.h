@@ -2979,12 +2979,9 @@ namespace internal
       {
         Assert (static_cast<unsigned int>(accessor.level()) < accessor.dof_handler->levels.size(),
                 ExcMessage ("DoFHandler not initialized"));
-        Assert (static_cast<std::vector<unsigned int>::size_type>(accessor.present_index) <
-                accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size (),
-                ExcIndexRange (accessor.present_index, 0,
-                               accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size ()));
+
         return accessor.dof_handler->levels[accessor.level()]
-               ->active_fe_indices[accessor.present_index];
+	  ->active_fe_index(accessor.present_index);
       }
 
 
@@ -3022,12 +3019,9 @@ namespace internal
         Assert (static_cast<unsigned int>(accessor.level()) <
                 accessor.dof_handler->levels.size(),
                 ExcMessage ("DoFHandler not initialized"));
-        Assert (static_cast<std::vector<unsigned int>::size_type>(accessor.present_index) <
-                accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size (),
-                ExcIndexRange (accessor.present_index, 0,
-                               accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size ()));
+
         accessor.dof_handler->levels[accessor.level()]
-        ->active_fe_indices[accessor.present_index] = i;
+	  ->set_active_fe_index (accessor.present_index, i);
       }
 
 

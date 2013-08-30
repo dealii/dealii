@@ -25,6 +25,24 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace hp
+{
+  template <int, int> class DoFHandler;
+}
+
+
+namespace internal
+{
+  namespace hp
+  {
+    namespace DoFHandler
+    {
+      struct Implementation;
+    }
+  }
+}
+
+
 namespace internal
 {
   namespace hp
@@ -41,7 +59,7 @@ namespace internal
     template <int dim>
     class DoFLevel
     {
-    public:
+    private:
       /**
        *  Indices specifying the finite
        *  element of hp::FECollection to use
@@ -75,6 +93,8 @@ namespace internal
        * information.
        */
       std::vector<types::global_dof_index> dofs;
+
+    public:
 
       /**
        * Set the global index of
@@ -136,7 +156,7 @@ namespace internal
 
       /**
        * Return the fe_index of the
-       * n-th active finite element
+       * active finite element
        * on this object.
        */
       unsigned int
@@ -153,11 +173,27 @@ namespace internal
                           const unsigned int               fe_index) const;
 
       /**
+       * Set the fe_index of the
+       * active finite element
+       * on this object.
+       */
+      void
+      set_active_fe_index (const unsigned int obj_index,
+			   const unsigned int fe_index);
+
+      /**
        * Determine an estimate for the
        * memory consumption (in bytes)
        * of this object.
        */
       std::size_t memory_consumption () const;
+
+      /**
+       * Make hp::DoFHandler and its auxiliary class a friend since it
+       * is the class that needs to create these data structures.
+       */
+      template <int, int> friend class dealii::hp::DoFHandler;
+      friend class dealii::internal::hp::DoFHandler::Implementation;
     };
 
 
@@ -261,6 +297,28 @@ namespace internal
       Assert (obj_index < active_fe_indices.size(),
 	      ExcInternalError());
       return (fe_index == active_fe_indices[obj_index]);
+    }
+
+
+    template <int dim>
+    inline
+    void
+    DoFLevel<dim>::
+    set_active_fe_index (const unsigned int obj_index,
+			 const unsigned int fe_index)
+    {
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+      // make sure we are on an
+      // object for which DoFs have
+      // been allocated at all
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      active_fe_indices[obj_index] = fe_index;
     }
 
   } // namespace hp
