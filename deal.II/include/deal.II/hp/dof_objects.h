@@ -244,7 +244,7 @@ namespace internal
     };
 
 
-// --------------------- inline and template functions ------------------
+    // --------------------- inline and template functions ------------------
 
     template <int dim>
     template <int dimm, int spacedim>
@@ -283,47 +283,26 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == dimm)
-        {
-          // if we are on a cell, then
-          // the only set of indices we
-          // store is the one for the
-          // cell, which is unique. then
-          // fe_index must be
-          // active_fe_index
-          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          return dofs[dof_offsets[obj_index]+local_index];
-        }
-      else
-        {
-          // we are in higher space
-          // dimensions, so there may
-          // be multiple finite
-          // elements associated with
-          // this object. hop along
-          // the list of index sets
-          // until we find the one
-          // with the correct
-          // fe_index, and then poke
-          // into that part. trigger
-          // an exception if we can't
-          // find a set for this
-          // particular fe_index
-          const types::global_dof_index starting_offset = dof_offsets[obj_index];
-          const types::global_dof_index *pointer        = &dofs[starting_offset];
-          while (true)
-            {
-              Assert (*pointer != numbers::invalid_dof_index,
-                      ExcInternalError());
-              if (*pointer == fe_index)
-                return *(pointer + 1 + local_index);
-              else
-                pointer += static_cast<types::global_dof_index>(
-                             dof_handler.get_fe()[*pointer]
-                             .template n_dofs_per_object<dim>() + 1);
-            }
-        }
+      Assert (dim<dimm, ExcMessage ("This object can not be used for cells."));
+
+      // there may be multiple finite elements associated with
+      // this object. hop along the list of index sets until we
+      // find the one with the correct fe_index, and then poke
+      // into that part. trigger an exception if we can't find a
+      // set for this particular fe_index
+      const types::global_dof_index starting_offset = dof_offsets[obj_index];
+      const types::global_dof_index *pointer        = &dofs[starting_offset];
+      while (true)
+	{
+	  Assert (*pointer != numbers::invalid_dof_index,
+		  ExcInternalError());
+	  if (*pointer == fe_index)
+	    return *(pointer + 1 + local_index);
+	  else
+	    pointer += static_cast<types::global_dof_index>(
+	      dof_handler.get_fe()[*pointer]
+	      .template n_dofs_per_object<dim>() + 1);
+	}
     }
 
 
@@ -366,49 +345,28 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == dimm)
-        {
-          // if we are on a cell, then
-          // the only set of indices we
-          // store is the one for the
-          // cell, which is unique. then
-          // fe_index must be
-          // active_fe_index
-          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          dofs[dof_offsets[obj_index]+local_index] = global_index;
-        }
-      else
-        {
-          // we are in higher space
-          // dimensions, so there may
-          // be multiple finite
-          // elements associated with
-          // this object.  hop along
-          // the list of index sets
-          // until we find the one
-          // with the correct
-          // fe_index, and then poke
-          // into that part. trigger
-          // an exception if we can't
-          // find a set for this
-          // particular fe_index
-          const types::global_dof_index starting_offset = dof_offsets[obj_index];
-          types::global_dof_index      *pointer         = &dofs[starting_offset];
-          while (true)
-            {
-              Assert (*pointer != numbers::invalid_dof_index,
-                      ExcInternalError());
-              if (*pointer == fe_index)
-                {
-                  *(pointer + 1 + local_index) = global_index;
-                  return;
-                }
-              else
-                pointer += dof_handler.get_fe()[*pointer]
-                           .template n_dofs_per_object<dim>() + 1;
-            }
-        }
+      Assert (dim<dimm, ExcMessage ("This object can not be used for cells."));
+
+      // there may be multiple finite elements associated with
+      // this object.  hop along the list of index sets until we
+      // find the one with the correct fe_index, and then poke
+      // into that part. trigger an exception if we can't find a
+      // set for this particular fe_index
+      const types::global_dof_index starting_offset = dof_offsets[obj_index];
+      types::global_dof_index      *pointer         = &dofs[starting_offset];
+      while (true)
+	{
+	  Assert (*pointer != numbers::invalid_dof_index,
+		  ExcInternalError());
+	  if (*pointer == fe_index)
+	    {
+	      *(pointer + 1 + local_index) = global_index;
+	      return;
+	    }
+	  else
+	    pointer += dof_handler.get_fe()[*pointer]
+		       .template n_dofs_per_object<dim>() + 1;
+	}
     }
 
 
@@ -436,42 +394,28 @@ namespace internal
       if (dof_offsets[obj_index] == numbers::invalid_dof_index)
         return 0;
 
-      // if we are on a cell, then the
-      // only set of indices we store
-      // is the one for the cell,
-      // which is unique
-      if (dim == dimm)
-        return 1;
-      else
-        {
-          // otherwise, there may be
-          // multiple finite elements
-          // associated with this
-          // object. hop along the
-          // list of index sets until
-          // we find the one with the
-          // correct fe_index, and
-          // then poke into that
-          // part. trigger an
-          // exception if we can't
-          // find a set for this
-          // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const types::global_dof_index *pointer        = &dofs[starting_offset];
-          unsigned int counter = 0;
-          while (true)
-            {
-              if (*pointer == numbers::invalid_dof_index)
-                // end of list reached
-                return counter;
-              else
-                {
-                  ++counter;
-                  pointer += dof_handler.get_fe()[*pointer]
-                             .template n_dofs_per_object<dim>() + 1;
-                }
-            }
-        }
+      Assert (dim<dimm, ExcMessage ("This object can not be used for cells."));
+
+      // there may be multiple finite elements associated with this
+      // object. hop along the list of index sets until we find the
+      // one with the correct fe_index, and then poke into that
+      // part. trigger an exception if we can't find a set for this
+      // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const types::global_dof_index *pointer        = &dofs[starting_offset];
+      unsigned int counter = 0;
+      while (true)
+	{
+	  if (*pointer == numbers::invalid_dof_index)
+	    // end of list reached
+	    return counter;
+	  else
+	    {
+	      ++counter;
+	      pointer += dof_handler.get_fe()[*pointer]
+			 .template n_dofs_per_object<dim>() + 1;
+	    }
+	}
     }
 
 
@@ -503,55 +447,37 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == dimm)
-        {
-          // this is a cell, so there
-          // is only a single
-          // fe_index
-          Assert (n == 0, ExcIndexRange (n, 0, 1));
+      Assert (dim<dimm, ExcMessage ("This object can not be used for cells."));
 
-          return dof_handler.levels[obj_level]->active_fe_indices[obj_index];
-        }
-      else
-        {
-          Assert (n < n_active_fe_indices(dof_handler, obj_index),
-                  ExcIndexRange (n, 0,
-                                 n_active_fe_indices(dof_handler, obj_index)));
+      Assert (n < n_active_fe_indices(dof_handler, obj_index),
+	      ExcIndexRange (n, 0,
+			     n_active_fe_indices(dof_handler, obj_index)));
 
-          // we are in higher space
-          // dimensions, so there may
-          // be multiple finite
-          // elements associated with
-          // this object. hop along
-          // the list of index sets
-          // until we find the one
-          // with the correct
-          // fe_index, and then poke
-          // into that part. trigger
-          // an exception if we can't
-          // find a set for this
-          // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const types::global_dof_index *pointer = &dofs[starting_offset];
-          unsigned int counter = 0;
-          while (true)
-            {
-              Assert (*pointer != numbers::invalid_dof_index,
-                      ExcInternalError());
+      // there may be multiple finite elements associated with
+      // this object. hop along the list of index sets until we
+      // find the one with the correct fe_index, and then poke
+      // into that part. trigger an exception if we can't find a
+      // set for this particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const types::global_dof_index *pointer = &dofs[starting_offset];
+      unsigned int counter = 0;
+      while (true)
+	{
+	  Assert (*pointer != numbers::invalid_dof_index,
+		  ExcInternalError());
 
-              const unsigned int fe_index = *pointer;
+	  const unsigned int fe_index = *pointer;
 
-              Assert (fe_index < dof_handler.get_fe().size(),
-                      ExcInternalError());
+	  Assert (fe_index < dof_handler.get_fe().size(),
+		  ExcInternalError());
 
-              if (counter == n)
-                return fe_index;
+	  if (counter == n)
+	    return fe_index;
 
-              ++counter;
-              pointer += dof_handler.get_fe()[fe_index]
-                         .template n_dofs_per_object<dim>() + 1;
-            }
-        }
+	  ++counter;
+	  pointer += dof_handler.get_fe()[fe_index]
+		     .template n_dofs_per_object<dim>() + 1;
+	}
     }
 
 
@@ -587,47 +513,27 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      if (dim == dimm)
-        {
-          // if we are on a cell,
-          // then the only set of
-          // indices we store is the
-          // one for the cell, which
-          // is unique
-          Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
-                  ExcInternalError());
-          return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
-        }
-      else
-        {
-          // we are in higher space
-          // dimensions, so there may
-          // be multiple finite
-          // elements associated with
-          // this object. hop along
-          // the list of index sets
-          // until we find the one
-          // with the correct
-          // fe_index, and then poke
-          // into that part. trigger
-          // an exception if we can't
-          // find a set for this
-          // particular fe_index
-          const types::global_dof_index starting_offset = dof_offsets[obj_index];
-          const types::global_dof_index *pointer = &dofs[starting_offset];
-          while (true)
-            {
-              if (*pointer == numbers::invalid_dof_index)
-                // end of list reached
-                return false;
-              else if (*pointer == fe_index)
-                return true;
-              else
-                pointer += static_cast<types::global_dof_index>(
-                             dof_handler.get_fe()[*pointer]
-                             .template n_dofs_per_object<dim>()+1);
-            }
-        }
+      Assert (dim<dimm, ExcMessage ("This object can not be used for cells."));
+
+      // there may be multiple finite elements associated with
+      // this object. hop along the list of index sets until we
+      // find the one with the correct fe_index, and then poke
+      // into that part. trigger an exception if we can't find a
+      // set for this particular fe_index
+      const types::global_dof_index starting_offset = dof_offsets[obj_index];
+      const types::global_dof_index *pointer = &dofs[starting_offset];
+      while (true)
+	{
+	  if (*pointer == numbers::invalid_dof_index)
+	    // end of list reached
+	    return false;
+	  else if (*pointer == fe_index)
+	    return true;
+	  else
+	    pointer += static_cast<types::global_dof_index>(
+	      dof_handler.get_fe()[*pointer]
+	      .template n_dofs_per_object<dim>()+1);
+	}
     }
 
   }
