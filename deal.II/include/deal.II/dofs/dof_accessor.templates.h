@@ -820,20 +820,20 @@ namespace internal
                           const dealii::internal::int2type<1> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-               fe_index,
-               obj_level);
+               fe_index);
       }
 
 
       template <int spacedim>
       static
       unsigned int
-      n_active_fe_indices (const dealii::hp::DoFHandler<1,spacedim> &dof_handler,
+      n_active_fe_indices (const dealii::hp::DoFHandler<1,spacedim> &,
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->n_active_fe_indices (obj_index);
+	// on a cell, the number of active elements is one
+        return 1;
       }
 
 
@@ -847,9 +847,8 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->nth_active_fe_index (obj_level,
-               obj_index,
-               n);
+	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
 
@@ -909,20 +908,20 @@ namespace internal
                           const dealii::internal::int2type<2> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-               fe_index,
-               obj_level);
+               fe_index);
       }
 
 
       template <int spacedim>
       static
       unsigned int
-      n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+      n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &,
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->n_active_fe_indices (obj_index);
+	// on a cell, the number of active elements is one
+        return 1;
       }
 
 
@@ -936,9 +935,8 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->nth_active_fe_index (obj_level,
-               obj_index,
-               n);
+	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
 
@@ -1015,8 +1013,7 @@ namespace internal
                           const dealii::internal::int2type<3> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-               fe_index,
-               obj_level);
+               fe_index);
       }
 
 
@@ -1054,12 +1051,13 @@ namespace internal
       template <int spacedim>
       static
       unsigned int
-      n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+      n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &,
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->n_active_fe_indices (obj_index);
+	// on a cell, the number of active elements is one
+        return 1;
       }
 
 
@@ -1073,9 +1071,8 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->nth_active_fe_index (obj_level,
-               obj_index,
-               n);
+	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
       /**

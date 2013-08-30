@@ -200,40 +200,12 @@ namespace internal
                      const unsigned int               obj_level) const;
 
       /**
-       * Return the number of
-       * finite elements that are
-       * active on a given
-       * object. If this is a cell,
-       * the answer is of course
-       * one. If it is a face, the
-       * answer may be one or two,
-       * depending on whether the
-       * two adjacent cells use the
-       * same finite element or
-       * not. If it is an edge in
-       * 3d, the possible return
-       * value may be one or any
-       * other value larger than
-       * that.
-       *
-       * If the object is not part
-       * of an active cell, then no
-       * degrees of freedom have
-       * been distributed and zero
-       * is returned.
-       */
-      unsigned int
-      n_active_fe_indices (const unsigned int               obj_index) const;
-
-      /**
        * Return the fe_index of the
        * n-th active finite element
        * on this object.
        */
-      types::global_dof_index
-      nth_active_fe_index (const unsigned int               obj_level,
-                           const unsigned int               obj_index,
-                           const unsigned int               n) const;
+      unsigned int
+      active_fe_index (const unsigned int obj_index) const;
 
       /**
        * Check whether a given
@@ -243,8 +215,7 @@ namespace internal
        */
       bool
       fe_index_is_active (const unsigned int               obj_index,
-                          const unsigned int               fe_index,
-                          const unsigned int               obj_level) const;
+                          const unsigned int               fe_index) const;
 
       /**
        * Determine an estimate for the
@@ -316,31 +287,7 @@ namespace internal
     inline
     unsigned int
     DoFLevel<dim>::
-    n_active_fe_indices (const unsigned int obj_index) const
-    {
-      Assert (obj_index < dof_offsets.size(),
-              ExcIndexRange (obj_index, 0, dof_offsets.size()));
-
-      // make sure we are on an
-      // object for which DoFs have
-      // been allocated at all
-      if (dof_offsets[obj_index] == numbers::invalid_dof_index)
-        return 0;
-
-      // we are on a cell, so the only set of indices we store is the
-      // one for the cell, which is unique
-      return 1;
-    }
-
-
-
-    template <int dim>
-    inline
-    types::global_dof_index
-    DoFLevel<dim>::
-    nth_active_fe_index (const unsigned int                obj_level,
-                         const unsigned int                obj_index,
-                         const unsigned int                n) const
+    active_fe_index (const unsigned int obj_index) const
     {
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
@@ -353,9 +300,6 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-      // this is a cell, so there is only a single fe_index
-      Assert (n == 0, ExcIndexRange (n, 0, 1));
-
       return active_fe_indices[obj_index];
     }
 
@@ -366,8 +310,7 @@ namespace internal
     bool
     DoFLevel<dim>::
     fe_index_is_active (const unsigned int                obj_index,
-                        const unsigned int                fe_index,
-                        const unsigned int                obj_level) const
+                        const unsigned int                fe_index) const
     {
       Assert ((fe_index != dealii::hp::DoFHandler<1,1>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
