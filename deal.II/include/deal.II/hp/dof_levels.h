@@ -258,16 +258,8 @@ namespace internal
     DoFLevel<dim>::
     active_fe_index (const unsigned int obj_index) const
     {
-      Assert (obj_index < dof_offsets.size(),
-              ExcIndexRange (obj_index, 0, dof_offsets.size()));
-
-      // make sure we are on an
-      // object for which DoFs have
-      // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
-              ExcMessage ("You are trying to access degree of freedom "
-                          "information for an object on which no such "
-                          "information is available"));
+      Assert (obj_index < active_fe_indices.size(),
+              ExcIndexRange (obj_index, 0, active_fe_indices.size()));
 
       return active_fe_indices[obj_index];
     }
