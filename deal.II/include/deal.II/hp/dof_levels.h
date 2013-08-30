@@ -104,8 +104,7 @@ namespace internal
       set_dof_index (const unsigned int               obj_index,
                      const unsigned int               fe_index,
                      const unsigned int               local_index,
-                     const types::global_dof_index    global_index,
-                     const unsigned int               obj_level);
+                     const types::global_dof_index    global_index);
 
       /**
        * Return the global index of
@@ -133,8 +132,7 @@ namespace internal
       types::global_dof_index
       get_dof_index (const unsigned int               obj_index,
                      const unsigned int               fe_index,
-                     const unsigned int               local_index,
-                     const unsigned int               obj_level) const;
+                     const unsigned int               local_index) const;
 
       /**
        * Return the fe_index of the
@@ -171,8 +169,7 @@ namespace internal
     DoFLevel<dim>::
     get_dof_index (const unsigned int                obj_index,
                    const unsigned int                fe_index,
-                   const unsigned int                local_index,
-                   const unsigned int                obj_level) const
+                   const unsigned int                local_index) const
     {
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
@@ -199,8 +196,7 @@ namespace internal
     set_dof_index (const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
-                   const types::global_dof_index     global_index,
-                   const unsigned int                obj_level)
+                   const types::global_dof_index     global_index)
     {
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));

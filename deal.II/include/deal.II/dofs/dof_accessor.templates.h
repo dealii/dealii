@@ -479,8 +479,7 @@ namespace internal
         return dof_handler.levels[obj_level]->
                get_dof_index (obj_index,
                               fe_index,
-                              local_index,
-                              obj_level);
+                              local_index);
       }
 
 
@@ -499,8 +498,7 @@ namespace internal
         set_dof_index (obj_index,
                        fe_index,
                        local_index,
-                       global_index,
-                       obj_level);
+                       global_index);
       }
 
 
@@ -557,8 +555,7 @@ namespace internal
         return dof_handler.levels[obj_level]->
                get_dof_index (obj_index,
                               fe_index,
-                              local_index,
-                              obj_level);
+                              local_index);
       }
 
 
@@ -577,8 +574,7 @@ namespace internal
         set_dof_index (obj_index,
                        fe_index,
                        local_index,
-                       global_index,
-                       obj_level);
+                       global_index);
       }
 
 
@@ -675,8 +671,7 @@ namespace internal
         return dof_handler.levels[obj_level]->
                get_dof_index (obj_index,
                               fe_index,
-                              local_index,
-                              obj_level);
+                              local_index);
       }
 
 
@@ -695,8 +690,7 @@ namespace internal
         set_dof_index (obj_index,
                        fe_index,
                        local_index,
-                       global_index,
-                       obj_level);
+                       global_index);
       }
 
 
