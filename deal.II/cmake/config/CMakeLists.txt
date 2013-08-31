@@ -224,7 +224,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   # Boilerplate: The Make.global_options expects variables to be set to
   # yes, as is common for Makefiles.
   #
-  COND_SET_TO_YES(DEAL_II_WITH_TBB MAKEFILE_enablethreads)
+  COND_SET_TO_YES(DEAL_II_WITH_THREADS MAKEFILE_enablethreads)
   COND_SET_TO_YES(DEAL_II_WITH_FUNCTIONPARSER MAKEFILE_enableparser)
   COND_SET_TO_YES(BUILD_SHARED_LIBS MAKEFILE_enableshared)
 
