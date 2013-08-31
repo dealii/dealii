@@ -66,6 +66,15 @@ DEAL_II_USE_MPI      = @MAKEFILE_MPI@
 OBJEXT     = o
 EXEEXT     =
 
+shared-lib-suffix = .so
+static-lib-suffix = .a
+
+ifeq ($(enable-shared),yes)
+  lib-suffix = $(shared-lib-suffix)
+else
+  lib-suffix = $(static-lib-suffix)
+endif
+
 
 # set paths to all the libraries we need:
 lib-deal2.o     = @MAKEFILE_TARGETS_RELEASE@

@@ -69,9 +69,10 @@ inconvenience this causes.
 
 <ol>
   <li>
-  Fixed: The flag <code>DEAL_II_WITH_THREADS</code> that is exported into
-  the legacy file <code>common/Make.global_options</code> was not set
-  properly.
+  Fixed: <code>common/Make.global_options</code> now exports enable-threads
+  correctly, furthermore, <code>lib-suffix</code>, <code>shared-lib-suffix</code>
+  and <code>static-lib-suffix</code> are now exported as well for better legacy
+  support.
   <br>
   (Matthias Maier, 2013/08/30)
   </li>
