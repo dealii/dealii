@@ -69,7 +69,15 @@ inconvenience this causes.
 
 <ol>
   <li>
-  Fixed: The ParameterHandler class can now deal with including one parameter
+  Fixed: The flag <code>DEAL_II_WITH_THREADS</code> that is exported into
+  the legacy file <code>common/Make.global_options</code> was not set
+  properly.
+  <br>
+  (Matthias Maier, 2013/08/30)
+  </li>
+
+  <li>
+  New: The ParameterHandler class can now deal with including one parameter
   file from another.
   <br>
   (Wolfgang Bangerth, 2013/08/25)
