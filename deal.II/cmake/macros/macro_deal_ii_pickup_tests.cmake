@@ -43,7 +43,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
         SET(_configuration)
       ENDIF()
 
-      STRING(REGEX REPLACE "\\..*" "." _test ${_test})
+      STRING(REGEX REPLACE "\\..*" "" _test ${_test})
       DEAL_II_ADD_TEST(${_category} ${_test} ${_configuration})
     ENDIF()
 
