@@ -1084,7 +1084,7 @@ namespace GridTools
    *
    * This function tries to match all faces belonging to the first
    * boundary with faces belonging to the second boundary with the help
-   * of orthogonal_equality.
+   * of orthogonal_equality().
    *
    * The @p offset is a vector tangential to the faces that is added to the
    * location of vertices of the 'first' boundary when attempting to match
@@ -1099,7 +1099,7 @@ namespace GridTools
                                const typename identity<FaceIterator>::type &end,
                                const types::boundary_id                    b_id1,
                                const types::boundary_id                    b_id2,
-                               int                                         direction,
+                               const int                                   direction,
                                const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
 
 
@@ -1118,7 +1118,7 @@ namespace GridTools
   collect_periodic_face_pairs (const DH                 &container,
                                const types::boundary_id b_id1,
                                const types::boundary_id b_id2,
-                               int                      direction,
+                               const int                direction,
                                const dealii::Tensor<1,DH::space_dimension> &offset);
 
 
@@ -1146,7 +1146,7 @@ namespace GridTools
   std::map<typename DH::face_iterator, typename DH::face_iterator>
   collect_periodic_face_pairs (const DH                 &dof_handler, /*TODO: Name*/
                                const types::boundary_id b_id,
-                               int                      direction,
+                               const int                direction,
                                const dealii::Tensor<1,DH::space_dimension> &offset);
 
 
