@@ -12,16 +12,21 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   )
 
 IF("${_result_code}" STREQUAL "0")
+
+  MESSAGE("${TEST}: Test successful:")
+  MESSAGE("===============================   OUTPUT BEGIN  ===============================")
+  # Do not output everything, just that we are successful:
   MESSAGE("${TEST}: BUILD successful")
   MESSAGE("${TEST}: RUN successful")
   MESSAGE("${TEST}: DIFF successful")
+  MESSAGE("===============================    OUTPUT END   ===============================")
 
 ELSE()
 
-  MESSAGE("***      ***")
+  MESSAGE("${TEST}: Test failed:")
+  MESSAGE("===============================   OUTPUT BEGIN  ===============================")
   MESSAGE(${_output})
-  # TODO: Be a bit more verbose ;-)
-  MESSAGE("${TEST}: TEST failed")
-  MESSAGE("***      ***")
-  MESSAGE(FATAL_ERROR "*** Test aborted.")
+  MESSAGE("===============================    OUTPUT END   ===============================")
+  MESSAGE(FATAL_ERROR "*** abort")
+
 ENDIF()
