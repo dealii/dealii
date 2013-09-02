@@ -36,7 +36,7 @@
 MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
 
   IF(CMAKE_CROSSCOMPILING)
-    SET(_ei_exec native-expand_instantiations)
+    SET(_ei_exec exported-expand_instantiations)
   ELSE()
     SET(_ei_exec expand_instantiations)
   ENDIF()

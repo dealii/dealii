@@ -20,8 +20,8 @@ IF(NOT CMAKE_CROSSCOMPILING)
   # Export expand_instantiations for use in cross compilation:
   #
   EXPORT(TARGETS expand_instantiations
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/importExecutables.cmake
-    NAMESPACE native- # Prefix a namespace
+    FILE ${CMAKE_BINARY_DIR}/importExecutables.cmake
+    NAMESPACE exported- # Prefix a namespace
     )
 ENDIF()
 
