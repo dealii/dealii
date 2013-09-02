@@ -1105,7 +1105,8 @@ namespace GridTools
 
   /**
    * Same function as above, but accepts a Triangulation or DoFHandler
-   * object @p dof_handler instead of an explicit face iterator range.
+   * object @p container (a container is a collection of objects, here a
+   * collection of cells) instead of an explicit face iterator range.
    *
    * This function will collect periodic face pairs on the highest (i.e.
    * coarsest) mesh level.
@@ -1114,7 +1115,7 @@ namespace GridTools
    */
   template<typename DH>
   std::map<typename DH::face_iterator, std::pair<typename DH::face_iterator, std::bitset<3> > >
-  collect_periodic_face_pairs (const DH                 &dof_handler, /*TODO: Name*/
+  collect_periodic_face_pairs (const DH                 &container,
                                const types::boundary_id b_id1,
                                const types::boundary_id b_id2,
                                int                      direction,
