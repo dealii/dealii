@@ -30,10 +30,10 @@
 #
 # The following variables must be set:
 #
-# DEAL_II_TEST_DIFF
+# TEST_DIFF
 #   - specifying the executable and command line of the diff command to use
 #
-# DEAL_II_TEST_TIME_LIMIT
+# TEST_TIME_LIMIT
 #   - specifying the maximal wall clock time in seconds a test is allowed
 #     to run
 #
@@ -122,8 +122,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
 
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
         COMMAND
-          # TODO: Refactor...
-          ${DEAL_II_TEST_DIFF}
+          ${TEST_DIFF}
             ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
             ${_comparison}
             > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
@@ -154,7 +153,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         )
       SET_TESTS_PROPERTIES(${_category}/${_test} PROPERTIES
         LABEL "${_category}"
-        TIMEOUT ${DEAL_II_TEST_TIME_LIMIT}
+        TIMEOUT ${TEST_TIME_LIMIT}
         )
 
     ENDIF()
