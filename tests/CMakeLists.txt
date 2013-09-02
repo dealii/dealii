@@ -65,14 +65,7 @@ SET_IF_EMPTY(TEST_TIME_LIMIT 120)
 
 MESSAGE(STATUS "Proceed to test definitions")
 
-#$(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),mpi,),) \
-#$(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),gla,),) \
-#$(if $(USE_CONTRIB_P4EST:no=),    distributed_grids,) \
-#$(if $(USE_CONTRIB_PETSC:no=),    petsc,) \
-#$(if $(USE_CONTRIB_SLEPC:no=),    slepc,) \
-#$(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
-
-ADD_SUBDIRECTORY(a-framework) -- what do?
+ADD_SUBDIRECTORY(a-framework)
 ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(bits)
@@ -93,12 +86,12 @@ ADD_SUBDIRECTORY(serialization)
 #benchmarks
 #mesh_converter
 
-#distributed_grids
-#gla
-#mpi
-#petsc
-#slepc
-#trilinos
+#distributed_grids - WITH_P4EST
+#gla - WITH_MPI, ?? WITH_P4EST ??
+#mpi - WITH_MPI
+#petsc - WITH_PETSC
+#slepc - WITH_SLEPC
+#trilinos - WITH_TRILINOS
 
 IF(DEAL_II_WITH_LAPACK)
   ADD_SUBDIRECTORY(lapack)
