@@ -17,7 +17,7 @@
 #
 # A Macro to pick up all tests in a test subdirectory
 #
-# If DEAL_II_PICKUP_REGEX is set, only tests matching the regex will be
+# If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
 #
 # Usage:
@@ -31,8 +31,8 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   FOREACH(_test ${_tests})
 
-    IF( "${DEAL_II_PICKUP_REGEX}" STREQUAL "" OR
-        _test MATCHES "${DEAL_II_PICKUP_REGEX}" )
+    IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
+        _test MATCHES "${TEST_PICKUP_REGEX}" )
       GET_FILENAME_COMPONENT(_test ${_test} NAME)
 
       IF(_test MATCHES debug)

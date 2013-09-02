@@ -18,8 +18,8 @@
 # Setup and run the testsuite:
 #
 # TODO: Describe and document the following:
-# DEAL_II_TEST_DIFF
-# DEAL_II_TEST_TIME_LIMIT
+# TEST_DIFF
+# TEST_TIME_LIMIT
 # NUMDIFF_DIR
 #
 
@@ -52,15 +52,15 @@ IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND"
 ENDIF()
 
 IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-  SET_IF_EMPTY(DEAL_II_TEST_DIFF numdiff -a 1e-6 -q -s ' \t\n:')
+  SET_IF_EMPTY(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -q -s ' \t\n:')
 ELSE()
-  SET_IF_EMPTY(DEAL_II_TEST_DIFF diff)
+  SET_IF_EMPTY(TEST_DIFF ${DIFF_EXECUTABLE})
 ENDIF()
 
 #
 # Set a default time limit of 60 seconds:
 #
-SET_IF_EMPTY(DEAL_II_TEST_TIME_LIMIT 120)
+SET_IF_EMPTY(TEST_TIME_LIMIT 120)
 
 
 MESSAGE(STATUS "Proceed to test definitions")
@@ -72,13 +72,13 @@ MESSAGE(STATUS "Proceed to test definitions")
 #$(if $(USE_CONTRIB_SLEPC:no=),    slepc,) \
 #$(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
 
-ADD_SUBDIRECTORY(a-framework)
+ADD_SUBDIRECTORY(a-framework) -- what do?
 ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(bits)
 ADD_SUBDIRECTORY(codim_one)
 ADD_SUBDIRECTORY(deal.II)
-ADD_SUBDIRECTORY(fail)
+#ADD_SUBDIRECTORY(fail) -- the good old failing tests
 ADD_SUBDIRECTORY(fe)
 ADD_SUBDIRECTORY(grid)
 ADD_SUBDIRECTORY(hp)
