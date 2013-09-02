@@ -2836,9 +2836,8 @@ namespace internal
         std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
         get_dof_indices (accessor, local_dof_indices);
 
-        types::global_dof_index* local_indices_begin = &(local_dof_indices[0]);
-        values.extract_subvector_to (local_indices_begin,
-				     local_indices_begin + dofs_per_cell,
+        values.extract_subvector_to (local_dof_indices.begin(),
+				     local_dof_indices.end(),
 				     local_values_begin);
       }
 
