@@ -2803,8 +2803,10 @@ namespace internal
         types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
                                          ->cell_dof_indices_cache[accessor.present_index *
                                                                   accessor.get_fe().dofs_per_cell];
-        for ( ; local_values_begin != local_values_end; ++local_values_begin, ++cache)
-          *local_values_begin = values(*cache);
+
+        values.extract_subvector_to (cache,
+				     cache + accessor.get_fe().dofs_per_cell,
+				     local_values_begin);
       }
 
       /**
@@ -2834,8 +2836,10 @@ namespace internal
         std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
         get_dof_indices (accessor, local_dof_indices);
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i, ++local_values_begin)
-          *local_values_begin = values(local_dof_indices[i]);
+        types::global_dof_index* local_indices_begin = &(local_dof_indices[0]);
+        values.extract_subvector_to (local_indices_begin,
+				     local_indices_begin + dofs_per_cell,
+				     local_values_begin);
       }
 
 

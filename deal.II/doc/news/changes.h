@@ -69,6 +69,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: All vector classes now have functions <code>extract_subvector_to()</code>
+  that allow extracting not just a single value but a whole set.
+  <br>
+  (Fahad Alrasched, 2013/09/02)
+  </li>
+
+  <li>
   Fixed: <code>common/Make.global_options</code> now exports enable-threads
   correctly, furthermore, <code>lib-suffix</code>, <code>shared-lib-suffix</code>
   and <code>static-lib-suffix</code> are now exported as well for better legacy
