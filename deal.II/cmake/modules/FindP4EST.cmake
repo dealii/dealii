@@ -179,9 +179,18 @@ IF(P4EST_FOUND)
   STRING(REGEX REPLACE
     "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
     P4EST_VERSION_SUBMINOR "${P4EST_VERSION}")
+
+  # Now for the patch number such as in 0.3.4.1. If there
+  # is no patch number, then the REGEX REPLACE will fail,
+  # setting P4EST_VERSION_PATCH to P4EST_VERSION. If that
+  # is the case, then set the patch number to zero
   STRING(REGEX REPLACE
-    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
+    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.([0-9]+)?.*$" "\\1"
     P4EST_VERSION_PATCH "${P4EST_VERSION}")
+  IF(${P4EST_VERSION_PATCH} STREQUAL "${P4EST_VERSION}")
+    SET(P4EST_VERSION_PATCH "0")
+  ENDIF()
+
 
   MARK_AS_ADVANCED(P4EST_DIR)
 ELSE()
