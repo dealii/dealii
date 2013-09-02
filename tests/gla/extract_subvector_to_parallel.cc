@@ -86,9 +86,10 @@ int main (int argc, char **argv)
     IndexSet dense_local (10);
     dense_local.add_range(0,10);
 
+//TODO: yields an error because we apparently forget to import ghost elements
     // {
     //   deallog.push("deal.II");
-    //   parallel::distributed::Vector<double> w(local, dense_local, MPI_COMM_WORLD);
+    //   parallel::distributed::Vector<double> w(local, MPI_COMM_WORLD);
     //   set (w);
     //   parallel::distributed::Vector<double> v(local, dense_local, MPI_COMM_WORLD);
     //   v = w; // get copy of vector including ghost elements
@@ -148,6 +149,7 @@ int main (int argc, char **argv)
     }
 
 
+//TODO: does not currently compile
     // {
     //   deallog.push("deal.II");
     //   parallel::distributed::BlockVector<double> w(partitioning, MPI_COMM_WORLD);
