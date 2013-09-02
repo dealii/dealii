@@ -1200,11 +1200,11 @@ namespace DoFRenumbering
     if (tria)
       {
 #ifdef DEAL_II_WITH_P4EST
-        //this is a distributed Triangulation. We need to traverse the coarse
-        //cells in the order p4est does
+        // this is a distributed Triangulation. We need to traverse the coarse
+        // cells in the order p4est does
         for (unsigned int c = 0; c < tria->n_cells (0); ++c)
           {
-            unsigned int coarse_cell_index =
+            const unsigned int coarse_cell_index =
               tria->get_p4est_tree_to_coarse_cell_permutation() [c];
 
             const typename DoFHandler<dim>::level_cell_iterator
