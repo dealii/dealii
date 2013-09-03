@@ -1086,6 +1086,10 @@ namespace GridTools
    * boundary with faces belonging to the second boundary with the help
    * of orthogonal_equality().
    *
+   * The bitset that is returned together with the second face encodes the
+   * _relative_ orientation of the first face with respect to the second
+   * face, see the documentation of orthogonal_equality for further details.
+   *
    * The @p offset is a vector tangential to the faces that is added to the
    * location of vertices of the 'first' boundary when attempting to match
    * them to the corresponding vertices of the 'second' boundary. This can
