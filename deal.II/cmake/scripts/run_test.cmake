@@ -6,10 +6,13 @@
 #
 
 EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-  --build ${DEAL_II_BINARY_DIR} --target ${TEST}.diff
+  --build ${DEAL_II_BINARY_DIR} --target ${TEST}
   RESULT_VARIABLE _result_code
   OUTPUT_VARIABLE _output
   )
+
+# Remove the trailing ".diff" from the target name:
+STRING(REGEX REPLACE "\.diff$" "" TEST "${TEST}")
 
 IF("${_result_code}" STREQUAL "0")
 

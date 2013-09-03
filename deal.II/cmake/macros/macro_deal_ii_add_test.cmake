@@ -149,7 +149,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
 
       ADD_TEST(NAME ${_category}/${_test}
         COMMAND ${CMAKE_COMMAND}
-          -DTEST=${_full_test}
+          -DTEST=${_full_test}.diff
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
