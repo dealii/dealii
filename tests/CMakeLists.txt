@@ -83,11 +83,13 @@ ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(serialization)
 
 # These three are a little bit special
-#all-headers
 #benchmarks
 #mesh_converter
 
-#distributed_grids - WITH_P4EST
+IF(DEAL_II_WITH_P4EST)
+  ADD_SUBDIRECTORY(distributed_grids)
+ENDIF()
+
 #gla - WITH_MPI, ?? WITH_P4EST ??
 #mpi - WITH_MPI
 #petsc - WITH_PETSC
