@@ -2691,9 +2691,6 @@ namespace hp
       = std::vector<IndexSet> (1,
                                number_cache.locally_owned_dofs);
 
-    for (unsigned int level=0; level<levels.size(); ++level)
-      levels[level]->compress_data ();
-
     // finally restore the user flags
     const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);
   }
@@ -2731,9 +2728,6 @@ namespace hp
 #endif
 
     renumber_dofs_internal (new_numbers, dealii::internal::int2type<dim>());
-
-    for (unsigned int level=0; level<levels.size(); ++level)
-      levels[level]->compress_data ();
   }
 
 
