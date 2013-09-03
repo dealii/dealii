@@ -79,46 +79,45 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
         )
 
-      ADD_CUSTOM_TARGET(${_full_test}.build
-        COMMAND ${CMAKE_COMMAND} -E echo "${_full_test}: BUILD successful              -------------------"
-        DEPENDS ${_full_test}
-        )
-
 
       #
-      # Add a top level target to run the test...
+      # Determine correct file for comparison:
       #
-      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-        COMMAND
-          ${_full_test}
-          || (echo "Running the test failed with the following partial output:"
-              && cat output
-              && rm output
-              && exit 1)
-        COMMAND
-            ${PERL_EXECUTABLE} -pi
-            ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
-            ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
-        DEPENDS ${_full_test} ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
-        )
 
-      ADD_CUSTOM_TARGET(${_full_test}.run
-        COMMAND ${CMAKE_COMMAND} -E echo "${_full_test}: RUN successful                -------------------"
-        DEPENDS ${_full_test}.build
-                ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-        )
-
-
-      #
-      # and compare the output:
-      #
       SET(_comparison ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name})
       IF(EXISTS ${_comparison}.${_build_lowercase}.output)
         SET(_comparison ${_comparison}.${_build_lowercase}.output)
       ELSE()
         SET(_comparison ${_comparison}.output)
       ENDIF()
+
+
+      #
+      # Add a top level target to run and compare the test:
+      #
+
+      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+        COMMAND
+          # A this stage a build is always successful: :-)
+          ${CMAKE_COMMAND} -E echo "${_full_test}: BUILD successful"
+        COMMAND
+          ${_full_test}
+          || (echo "${_full_test}: RUN failed. Output:"
+              && cat output
+              && rm output
+              && exit 1)
+        COMMAND
+          ${PERL_EXECUTABLE} -pi
+          ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
+          ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+        COMMAND
+          ${CMAKE_COMMAND} -E echo "${_full_test}: RUN successful"
+        WORKING_DIRECTORY
+          ${CMAKE_CURRENT_BINARY_DIR}/${_test}
+        DEPENDS
+          ${_full_test}
+          ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
+        )
 
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
         COMMAND
@@ -128,22 +127,26 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
             > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
           || (mv ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
                  ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_diff
-              && echo ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_diff
+              && echo "${_full_test}: DIFF failed. Output:"
+              && cat ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_diff
               && exit 1)
+        COMMAND
+          ${CMAKE_COMMAND} -E echo "${_full_test}: DIFF successful"
+        WORKING_DIRECTORY
+          ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         DEPENDS
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
           ${_comparison}
         )
-      ADD_CUSTOM_TARGET(${_full_test}.diff
-        COMMAND ${CMAKE_COMMAND} -E echo "${_full_test}: DIFF successful               -------------------"
-        DEPENDS ${_full_test}.run
-                ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
-        )
 
+      ADD_CUSTOM_TARGET(${_full_test}.diff
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
+        )
 
       #
       # And finally add the test:
       #
+
       ADD_TEST(NAME ${_category}/${_test}
         COMMAND ${CMAKE_COMMAND}
           -DTEST=${_full_test}
