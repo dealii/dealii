@@ -13,8 +13,13 @@ FILE(GLOB_RECURSE _header
 
 FOREACH(_full_file ${_header})
   GET_FILENAME_COMPONENT(_file ${_full_file} NAME)
+
+  # TODO: A more sophisticated way to get the relative include path:
   GET_FILENAME_COMPONENT(_path ${_full_file} PATH)
   GET_FILENAME_COMPONENT(_path ${_path} NAME)
+  IF("${_path}" STREQUAL "std_cxx1x")
+    SET(_path "base/std_cxx1x")
+  ENDIF()
 
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${_build} _build_lowercase)
