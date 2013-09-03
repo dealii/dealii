@@ -580,7 +580,7 @@ namespace internal
               dof_handler.levels[level]->dof_offsets
                 = std::vector<std::vector<types::global_dof_index>::size_type> (
                     dof_handler.tria->n_raw_lines(level),
-                    DoFHandler<dim,spacedim>::invalid_dof_index);
+                    (std::vector<types::global_dof_index>::size_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -619,7 +619,7 @@ namespace internal
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   DoFHandler<dim,spacedim>::invalid_dof_index))
+                                   (std::vector<types::global_dof_index>::size_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_lines(level) - dof_handler.tria->n_active_lines(level),
                       ExcInternalError());
@@ -697,7 +697,7 @@ namespace internal
               dof_handler.levels[level]->dof_offsets
                 = std::vector<std::vector<types::global_dof_index>::size_type> (
                     dof_handler.tria->n_raw_quads(level),
-                    DoFHandler<dim,spacedim>::invalid_dof_index);
+                    (std::vector<types::global_dof_index>::size_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -736,7 +736,7 @@ namespace internal
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   DoFHandler<dim,spacedim>::invalid_dof_index))
+                                   (std::vector<types::global_dof_index>::size_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_quads(level) - dof_handler.tria->n_active_quads(level),
                       ExcInternalError());
@@ -849,7 +849,7 @@ namespace internal
             dof_handler.faces->lines.dof_offsets
               = std::vector<std::vector<types::global_dof_index>::size_type>
                                                      (dof_handler.tria->n_raw_lines(),
-                                                      DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                     (std::vector<types::global_dof_index>::size_type)(-1));
             dof_handler.faces->lines.dofs
               = std::vector<types::global_dof_index> (n_line_slots,
                                                       DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -1063,7 +1063,7 @@ namespace internal
               dof_handler.levels[level]->dof_offsets
                 = std::vector<std::vector<types::global_dof_index>::size_type>
                                                        (dof_handler.tria->n_raw_hexs(level),
-                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                       (std::vector<types::global_dof_index>::size_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -1102,7 +1102,7 @@ namespace internal
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   DoFHandler<dim,spacedim>::invalid_dof_index))
+                                   (std::vector<types::global_dof_index>::size_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_hexs(level) - dof_handler.tria->n_active_hexs(level),
                       ExcInternalError());
@@ -1219,7 +1219,7 @@ namespace internal
                 dof_handler.faces->quads.dof_offsets
                   = std::vector<std::vector<types::global_dof_index>::size_type>
                                                          (dof_handler.tria->n_raw_quads(),
-                                                          DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                         (std::vector<types::global_dof_index>::size_type)(-1));
                 dof_handler.faces->quads.dofs
                   = std::vector<types::global_dof_index> (n_quad_slots,
                                                           DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -2691,6 +2691,9 @@ namespace hp
       = std::vector<IndexSet> (1,
                                number_cache.locally_owned_dofs);
 
+    for (unsigned int level=0; level<levels.size(); ++level)
+      levels[level]->compress_data ();
+
     // finally restore the user flags
     const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);
   }
@@ -2728,6 +2731,9 @@ namespace hp
 #endif
 
     renumber_dofs_internal (new_numbers, dealii::internal::int2type<dim>());
+
+    for (unsigned int level=0; level<levels.size(); ++level)
+      levels[level]->compress_data ();
   }
 
 
