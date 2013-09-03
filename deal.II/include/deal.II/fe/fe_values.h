@@ -440,6 +440,17 @@ namespace FEValuesViews
    * this class should not be used for this
    * context.
    *
+   * This class allows to query the
+   * value, gradient and divergence of
+   * (components of) shape functions
+   * and solutions representing
+   * vectors. The
+   * gradient of a vector
+   * $d_{k}, 0\le k<\text{dim}$ is
+   * defined as
+   * $S_{ij} = \frac{\partial d_{i}}{\partial x_j},
+   * 0\le i,j<\text{dim}$.
+   *
    * You get an object of this type if you
    * apply a FEValuesExtractors::Vector to an
    * FEValues, FEFaceValues or
@@ -467,6 +478,9 @@ namespace FEValuesViews
      * <code>dim</code> components of the
      * finite element, the gradient is a
      * <code>Tensor@<2,spacedim@></code>.
+     *
+     * See the general documentation of this class for how exactly
+     * the gradient of a vector is defined.
      */
     typedef dealii::Tensor<2,spacedim>          gradient_type;
 
@@ -646,6 +660,9 @@ namespace FEValuesViews
      * selected by this view, for the shape
      * function and quadrature point
      * selected by the arguments.
+     *
+     * See the general documentation of this class for how exactly
+     * the gradient of a vector is defined.
      *
      * @note The meaning of the arguments
      * is as documented for the value()

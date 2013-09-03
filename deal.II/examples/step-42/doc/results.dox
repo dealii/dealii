@@ -347,7 +347,7 @@ Cycle 5:
 
 For each adaptive refinement cycle the iterations end if the active set doesn't
 change anymore and if the residual is accurate enough. In the tables
-at the end of each cycle you find informations about computing time and the
+at the end of each cycle you find information about computing time and the
 number of calls of different parts of the program like Assembling or calculating
 the residual. In the second cycle there are 12 calls for the residual function
 and only 10 calls for Solving or Assembling what means that two damping steps were
@@ -359,7 +359,7 @@ we used a pure elastic solution). That worked out well for the ball but for the
 Chinese symbol as obstacle it turns out that an elastic start solution for each
 cycle results in fewer Newton iterations.  
 
-In every refinement step you can observe that the acitve set - the contact points -
+In every refinement step you can observe that the active set - the contact points -
 are iterated out at first. After that the Newton method has only to struggle with the
 plasticity. For the finer meshes there is quadratic convergence not until the
 last 4 or 5 Newton iterations.
@@ -382,7 +382,7 @@ last 4 or 5 Newton iterations.
 </table>
 
 The picture shows the adaptive refinement and as well how much a cell is
-plastified druing the contact with the ball. Remember that we consider the
+plastified during the contact with the ball. Remember that we consider the
 norm of the deviator part of the stress in each quadrature point to
 see if there is elastic or plastic behavior. In the middle of the top - 
 where the mesh is finest - you can see the hollow caused by the ball. The blue
@@ -399,7 +399,7 @@ Problems, preprint.
 <h1>Possibilities for extensions</h1>
 
 Extend the program from a static to a quasi-static problem, perhaps by choosing a
-backward-euler-scheme for the time discretization (for theoretical results see Frohne: FEM-Simulation
+backward-Euler-scheme for the time discretization (for theoretical results see Frohne: FEM-Simulation
 der Umformtechnik metallischer Oberflächen im Mikrokosmos, Ph.D. thesis,
 University of Siegen, Germany, 2011).
 

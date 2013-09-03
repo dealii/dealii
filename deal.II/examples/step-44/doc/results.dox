@@ -89,7 +89,7 @@ Much of the code in the tutorial has been developed based on the optimisations d
 discussed and demonstrated in Step-18 and others.
 With over 93% of the time being spent in the linear solver, it is obvious that it may be necessary
 to invest in a better solver for large three-dimensional problems.
-The SSOR preconditioner is not multi-threaded but is effective for this class of solid problems.
+The SSOR preconditioner is not multithreaded but is effective for this class of solid problems.
 It may be beneficial to investigate the use of another solver such as those available through the Trilinos library.
 
 

@@ -103,7 +103,7 @@ To this end, we can use Newton's method. Given the nonlinear equation $F(u^n) = 
 \f}
 The iteration can be initialized with the old time step, i.e. $u^n_0 = u^{n-1}$, 
 and eventually it will produce a solution to the first equation of
-the split formulation (see above). For the time discretizaion of the
+the split formulation (see above). For the time discretization of the
 sine-Gordon equation under consideration here, we have that 
 \f{eqnarray*}
   F(u^n_l) &=&  \left[ 1-k^2\theta^2\Delta \right] u^n_l -  
@@ -147,7 +147,7 @@ terms of the nodal basis. Henceforth, we shall denote by a capital
 letter the vector of coefficients (in the nodal basis) of a function
 denoted by the same letter in lower case; e.g., $u^n = \sum_{i=1}^N
 U^n_i \varphi_i$ where $U^n \in {R}^N$ and $u^n \in
-H^1(\Omega)$. Thus, the finite-dimensional version of the variational fomulation requires that we solve the following matrix equations at each time step:
+H^1(\Omega)$. Thus, the finite-dimensional version of the variational formulation requires that we solve the following matrix equations at each time step:
 @f{eqnarray*}
   F_h'(U^{n,l})\delta U^{n,l} &=& -F_h(U^{n,l}), \qquad
         U^{n,l+1} = U^{n,l} + \delta U^{n,l}, \qquad U^{n,0} = U^{n-1}; \\
@@ -162,7 +162,7 @@ Above, the matrix $F_h'(\cdot)$ and the vector $F_h(\cdot)$ denote the discrete 
                                 - k^2\theta^2N(u^n_l,u^{n-1})
 \f}
 Again, note that the first matrix equation above is, in fact, the
-defition of an iterative procedure, so it is solved multiple times
+definition of an iterative procedure, so it is solved multiple times
 until a stopping criterion is met. Moreover, $M$ is the mass matrix,
 i.e. $M_{ij} = \left( \varphi_i,\varphi_j \right)_{\Omega}$, $A$ is
 the Laplace matrix, i.e. $A_{ij} = \left( \nabla \varphi_i, \nabla

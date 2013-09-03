@@ -6498,7 +6498,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
   MPI_Info info;
   MPI_Info_create(&info);
   MPI_File fh;
-  MPI_File_open(MPI_COMM_WORLD, const_cast<char *>(filename),
+  MPI_File_open(comm, const_cast<char *>(filename),
                 MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
   MPI_File_set_size(fh, 0); // delete the file contents
   // this barrier is necessary, because otherwise others might already

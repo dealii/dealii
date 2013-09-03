@@ -11,157 +11,155 @@
     <meta name="keywords" content="deal.II">
   </head>
 
-  <body>
+<body>
+<h1><acronym>Build system internals</h1>
 
+<p>
+  This page provides details about the CMake build system. Files
+  processed by the top level <code>CMakeLists.txt</code> script are
+  listed in the TOC in chronological order.
+</p>
 
-    <h1><acronym>Build system internals</h1>
+<div class="toc">
+  <ol>
+    <li><a href="#codingstyle">Coding convention</a></li>
+    <li>Configuration
+      <ol>
+	<li><a href="#setup"><code>./CMakeLists.txt</code> and
+	    <code>./cmake/setup_*.cmake</code></a></li>
+	<li><a href="#checks"><code>./cmake/checks/check_*.cmake</code></a></li>
+        <li><a href="#findmodules"><code>./cmake/modules/Find*.cmake</code></a></li>
+	<li><a href="#configure"><code>./cmake/configure/configure_*.cmake</code></a></li>
+	<li><a href="#variables">Global variables controlling the build process</a></li>
+      </ol>
+    </li>
+    <li>Target definition and installation
+      <ol>
+	<li><a href="#config.h.in"><code>./include/deal.II/base/config.h.in</code></a></li>
+        <li><a href="#source"><code>./source/CMakeLists.txt</code></a></li>
+        <li><a href="#projectconfig"><code>./cmake/config/CMakeLists.txt</code></a></li>
+      </ol>
+    </li>
+</div>
 
-    <p>
-      This page provides details about the CMake build system. Files
-      processed by the top level <code>CMakeLists.txt</code> script are
-      listed in the TOC in chronological order.
-    </p>
+<a name="codingstyle"></a>
+<h2> Coding convention </h2>
+<p>
+  Coding conventions are always a matter of choice. Nevertheless, the
+  following rules should be considered:
+  <ul>
+    <li>
+      Statements and keywords are written in all caps.
+    <li>
+      Indenting is done by two spaces; the usual indenting rules apply.
+    <li>
+      The <code>ELSE()</code>, <code>ENDIF()</code>,
+      <code>ENDFOREACH()</code>, etc. statements shall not repeat the
+      corresponding condition in <code>IF()</code>,
+      <code>FOREACH()</code>, etc.
+    <li>
+      To emphasize a comment it may be enclosed by a leading and
+      trailing empty comment line.
+  </ul>
+  An example:
+<pre class="cmake">
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+#
+# Set an appropriate keyword depending on target and build type:
+#
+  IF(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
+    SET(_keyword "general")
+  ELSE()
+    IF(_build MATCHES DEBUG)
+      SET(_keyword "debug")
+    ELSE()
+      SET(_keyword "optimized")
+    ENDIF()
+  ENDIF()
+ENDFOREACH()
+</pre>
 
-    <p>
-    <table class="tutorial" width="50%">
-      <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
-      <tr><td valign="top">
-	  <ul>
-	    <li><a href="#codingstyle">Coding convention</a>
-          </ul>
-          </br><b>Configuration:</b>
-	  <ul>
-	    <li><a href="#setup"><code>./CMakeLists.txt</code> and
-              <code>./cmake/setup_*.cmake</code></a>
-	    <li><a href="#checks"><code>./cmake/checks/check_*.cmake</code></a>
-            <li><a href="#findmodules"><code>./cmake/modules/Find*.cmake</code></a>
-	    <li><a href="#configure"><code>./cmake/configure/configure_*.cmake</code></a>
-	    <li><a href="#variables">Global variables controlling the build process</a>
-          </ul>
-          </br><b>Target definition and installation</b>
-	  <ul>
-	    <li><a href="#config.h.in"><code>./include/deal.II/base/config.h.in</code></a>
-            <li><a href="#source"><code>./source/CMakeLists.txt</code></a>
-            <li><a href="#projectconfig"><code>./cmake/config/CMakeLists.txt</code></a>
-          </ul>
-	</td>
-      </tr>
-    </table>
-    </p>
+<ul>
+  <li>
+    Line break is at 78 characters and should be obeyed whenever
+    reasonable.
+  <li>
+    Long statements should be broken into several lines at reasonable
+    places. Additional lines for a statement are indented by 2
+    spaces.
+  <li>
+    Multiline statements must end with the closing bracket at a
+    single line:
+</ul>
+<pre class="cmake">
+LIST(APPEND CONFIG_LIBRARIES
+  ${_keyword}
+  ${CONFIG_LIBRARIES_${_build}}
+)
 
-    <a name="codingstyle"></a>
-    <h3> Coding convention </h3>
-    <p>
-      Coding conventions are always a matter of choice. Nevertheless, the
-      following rules should be considered:
-      <ul>
-        <li>
-          Statements and keywords are written in all caps.
-        <li>
-          Indenting is done by two spaces; the usual indenting rules apply.
-        <li>
-          The <code>ELSE()</code>, <code>ENDIF()</code>,
-          <code>ENDFOREACH()</code>, etc. statements shall not repeat the
-          corresponding condition in <code>IF()</code>,
-          <code>FOREACH()</code>, etc.
-        <li>
-          To emphasize a comment it may be enclosed by a leading and
-          trailing empty comment line.
-      </ul>
-      An example:
-      <pre>
+SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+  PROPERTIES
+  VERSION ${VERSION}
+  SOVERSION ${VERSION}
+  LINK_FLAGS "${DEAL_II_LINKER_FLAGS_${build}}"
+  COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
+  COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
+)
+</pre>
 
-    FOREACH(_build ${DEAL_II_BUILD_TYPES})
-      #
-      # Set an appropriate keyword depending on target and build type:
-      #
-      IF(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
-        SET(_keyword "general")
-      ELSE()
-        IF(_build MATCHES DEBUG)
-          SET(_keyword "debug")
-        ELSE()
-          SET(_keyword "optimized")
-        ENDIF()
-      ENDIF()
-    ENDFOREACH()
-      </pre>
-      <ul>
-        <li>
-          Line break is at 78 characters and should be obeyed whenever
-          reasonable.
-        <li>
-          Long statements should be broken into several lines at reasonable
-          places. Additional lines for a statement are indented by 2
-          spaces.
-        <li>
-          Multiline statements must end with the closing bracket at a
-          single line:
-      </ul>
-      <pre>
+<p>
+  CMake operates almost always with variables in global state. To
+  guard against accidental overwrite of variables the following naming
+  conventions must be followed at all times:
+</p>
 
-    LIST(APPEND CONFIG_LIBRARIES
-      ${_keyword}
-      ${CONFIG_LIBRARIES_${_build}}
-      )
+<ul>
+  <li>
+    Global (configuration) variables are written in all caps. When
+    introducing a new one, ensure that the name isn't already used
+    somewhere else. Unrelated global variables must never be
+    overwritten.
+  <li>
+    Global variables can be prefixed by <code>DEAL_II_</code>.
+    (Global variables defined by CMake are usually prefixed by
+    <code>CMAKE_</code>.)
+  <li>
+    Local variables should always be named in all lowercase with a
+    leading "_". Local variables cannot be assumed to remain valid.
+    The may get overwritten at any time.
+</ul>
+</p>
 
-    SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
-      PROPERTIES
-      VERSION ${VERSION}
-      SOVERSION ${VERSION}
-      LINK_FLAGS "${DEAL_II_LINKER_FLAGS_${build}}"
-      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
-      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
-      )
-      </pre>
-      CMake operates almost always with variables in global state. To guard
-      against accidental overwrite of variables the following naming
-      conventions must be followed at all times:
-      <ul>
-        <li>
-          Global (configuration) variables are written in all caps. When
-          introducing a new one, ensure that the name isn't already used
-          somewhere else. Unrelated global variables must never be
-          overwritten.
-        <li>
-          Global variables can be prefixed by <code>DEAL_II_</code>.
-          (Global variables defined by CMake are usually prefixed by
-          <code>CMAKE_</code>.)
-        <li>
-          Local variables should always be named in all lowercase with a
-          leading "_". Local variables cannot be assumed to remain valid.
-          The may get overwritten at any time.
-      </ul>
-    </p>
+<h2>Configuration</h2>
 
+<a name="setup"></a>
+<h3> <code>./CMakeLists.txt</code> and <code>./cmake/setup_*.cmake</code> </h3>
 
-    <a name="setup"></a>
-    <h3> <code>./CMakeLists.txt</code> and <code>./cmake/setup_*.cmake</code> </h3>
+<p>
+  The very first configuration steps after some initial setup in
+  <code>./CMakeLists.txt</code> takes place in some
+  <code>./cmake/setup_*.cmake</code> files:
+  <ul>
+    <li> <code>setup_cached_variables.cmake</code>:
+      This sets up all cached variables prior to the call to
+      <code>PROJECT(deal.II)</code>. For details see the comment at the
+      top. Furthermore, some bookkeeping for compiler and linker flags
+      takes place, see <a href="cmake.html#configurebuild">the section
+        about compile flags</a>.
+    <li> <code>setup_deal_ii.cmake</code>:
+      This file is included immediately after the call to
+      <code>PROJECT(deal.II)</code> and will set up all <i>magic
+        numbers</i> such as names, definitions, relative and absolute
+      paths used in the build system. Most of the definitions are
+      guarded with the help of the <code>SET_IF_EMPTY</code> macro so
+      that it is possible to override the values from the command line.
+    <li> <code>setup_compiler_flags.cmake</code>
+      sets up a suitable set of default compile flag for a known
+      compiler by including the appropriate
+      <code>setup_compiler_flags_*.cmake</code> file. When adding new
+      flags or compiler support, please respect the following note
 
-    <p>
-      The very first configuration steps after some initial setup in
-      <code>./CMakeLists.txt</code> takes place in some
-      <code>./cmake/setup_*.cmake</code> files:
-      <ul>
-        <li> <code>setup_cached_variables.cmake</code>:
-          This sets up all cached variables prior to the call to
-          <code>PROJECT(deal.II)</code>. For details see the comment at the
-          top. Furthermore, some bookkeeping for compiler and linker flags
-          takes place, see <a href="cmake.html#configurebuild">the section
-          about compile flags</a>.
-        <li> <code>setup_deal_ii.cmake</code>:
-          This file is included immediately after the call to
-          <code>PROJECT(deal.II)</code> and will set up all <i>magic
-          numbers</i> such as names, definitions, relative and absolute
-          paths used in the build system. Most of the definitions are
-          guarded with the help of the <code>SET_IF_EMPTY</code> macro so
-          that it is possible to override the values from the command line.
-        <li> <code>setup_compiler_flags.cmake</code>
-          sets up a suitable set of default compile flag for a known
-          compiler by including the appropriate
-          <code>setup_compiler_flags_*.cmake</code> file. When adding new
-          flags or compiler support, please respect the following note
-          <pre>
+<pre>
 
     #
     # (./cmake/setup_compiler_flags.cmake)
@@ -208,20 +206,21 @@
     #   ./cmake/checks/check_01_system_features.cmake
     #   ./cmake/checks/check_02_compiler_bugs.cmake
     #
-          </pre>
-      </ul>
-    </p>
+</pre>
+  </ul>
+</p>
 
 
-    <a name="checks"></a>
-    <h3> <code>./cmake/checks/check_*.cmake</code> </h3>
+<a name="checks"></a>
+<h3> <code>./cmake/checks/check_*.cmake</code> </h3>
 
-    <p>
-      The next step in the configuration process is to include all
-      checks residing under <code>./cmake/checks</code>. Currently
-      there are:
-      <pre>
+<p>
+  The next step in the configuration process is to include all
+  checks residing under <code>./cmake/checks</code>. Currently
+  there are:
 
+<pre>
+    
     ./cmake/checks/check_01_compiler_features.cmake
       - Search for support for compiler dependent features such as stack
         trace support, demangler support, etc.
@@ -240,24 +239,27 @@
 
     ./cmake/checks/check_02_compiler_bugs.cmake
       - Check for compiler bugs
-      </pre>
-      <ul>
-        <li>
-          A check usually consists of a call to one of the macros below
-          that will set up a global variable. Please stick to the naming
-          convention <code>HAVE_&lt;..&gt;</code>, resp.
-          <code>DEAL_II_(HAVE|USE)_&lt;..&gt;</code>. <b>It is forbidden to
-          use a variable name starting with
-          <code>DEAL_II_WITH_&lt;..&gt;</code> because this prefix is
-          exclusively reserved for the feature mechanism described
-          below.</b> For some tests it might be necessary to manipulate <a
-          href="#variables">global variables</a>.
-        <li>
-          A platform check should have a prominent comment explaining what
-	  it does and why it is there, and should state author and year.
-        <li>
-          There are a number of readily available platform check macros:
-	 <pre>
+
+</pre>
+
+<ul>
+  <li>
+    A check usually consists of a call to one of the macros below
+    that will set up a global variable. Please stick to the naming
+    convention <code>HAVE_&lt;..&gt;</code>, resp.
+    <code>DEAL_II_(HAVE|USE)_&lt;..&gt;</code>. <b>It is forbidden to
+      use a variable name starting with
+      <code>DEAL_II_WITH_&lt;..&gt;</code> because this prefix is
+      exclusively reserved for the feature mechanism described
+      below.</b> For some tests it might be necessary to manipulate
+    <a href="#variables">global variables</a>.
+  <li>
+    A platform check should have a prominent comment explaining what
+    it does and why it is there, and should state author and year.
+  <li>
+    There are a number of readily available platform check macros:
+    
+<pre>
 
     CHECK_CXX_SOURCE_COMPILES(source variable)
       - Checks whether it is possible to compile _and_ link the code snippet
@@ -291,65 +293,67 @@
 
     CHECK_CXX_COMPILER_FLAG(flag variable)
       - Sets the variable to 1 if the compiler understands the flag.
-	  </pre>
 
-	<li> Necessary compiler flags can easily set in the string variable
-	  <code>CMAKE_REQUIRED_FLAGS</code>. There are two small macros
-	  that do this job nicely:
-	  <pre>
+</pre>
 
+  <li> Necessary compiler flags can easily set in the string variable
+    <code>CMAKE_REQUIRED_FLAGS</code>. There are two small macros
+    that do this job nicely:
+
+<pre>
+  
     PUSH_TEST_FLAG("-Werror")
     CHECK_CXX_SOURCE_COMPILES(...)
     POP_TEST_FLAG()
-	  </pre>
+</pre>
 
-        <li> Necessary include directories and libraries necessary for
-        linkage can be set in the list variables
-        <code>CMAKE_REQUIRED_INCLUDES</code> and
-        <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best to append these
-        lists and later on reset <code>CMAKE_REQUIRED_*</code> (including
-        <code>CMAKE_REQUIRED_FLAGS</code>) to their default values:
-	  <pre>
+  <li> Necessary include directories and libraries necessary for
+    linkage can be set in the list variables
+    <code>CMAKE_REQUIRED_INCLUDES</code> and
+    <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best to append these
+    lists and later on reset <code>CMAKE_REQUIRED_*</code> (including
+    <code>CMAKE_REQUIRED_FLAGS</code>) to their default values:
+    
+<pre>
 
     LIST(APPEND CMAKE_REQUIRED_INCLUDES &lt;a list of includes&gt;)
     LIST(APPEND CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;)
     CHECK_CXX_SOURCE_COMPILES(...)
     RESET_CMAKE_REQUIRED()
-	  </pre>
-      </ul>
-    </p>
+</pre>
+</ul>
+</p>
 
+<a name="findmodules"></a>
+<h3> <code>./cmake/modules/Find*.cmake</code> </h3>
 
+<p>
+  These are find modules for the <code>configure_*.cmake</code> files
+  and the <code>CONFIGURE_FEATURE</code> macro as will explained later.
+  It is crucial that a find module behaves correctly. Therefore, the
+  following rules are mandatory:
+  <ul>
+    <li>
+      The <i>sole</i> purpose of a find module is to find an external
+      library (no deal.II specific dependency checking, no
+      compatibility checking).
+    <li>
+      It should do so by appropriate <code>FIND_LIBRARY</code> and
+      <code>FIND_PATH</code> calls. The results of this calls should be the
+      only cached variables.
+    <li>
+      <code>FIND_PACKAGE_HANDLE_STANDARD_ARGS</code> should be used for
+      setting <code>FEATURE_FOUND</code> as this already respects the
+      <code>QUIET</code> and <code>REQUIRED</code> keywords.
+    <li>
+      A <code>WARNING</code>, <code>SEND_ERROR</code> or
+      <code>FATAL_ERROR</code> must be avoided (the only exception is
+      the <code>REQUIRED</code> keyword).
+    <li>
+      If successful, the following uncached variables might be set:
 
-    <a name="findmodules"></a>
-    <h3> <code>./cmake/modules/Find*.cmake</code> </h3>
-
-    <p>
-      These are find modules for the <code>configure_*.cmake</code> files
-      and the <code>CONFIGURE_FEATURE</code> macro as will explained later.
-      It is crucial that a find module behaves correctly. Therefore, the
-      following rules are mandatory:
-      <ul>
-        <li>
-          The <i>sole</i> purpose of a find module is to find an external
-          library (no deal.II specific dependency checking, no
-          compatibility checking).
-        <li>
-          It should do so by appropriate <code>FIND_LIBRARY</code> and
-          <code>FIND_PATH</code> calls. The results of this calls should be the
-          only cached variables.
-        <li>
-          <code>FIND_PACKAGE_HANDLE_STANDARD_ARGS</code> should be used for
-          setting <code>FEATURE_FOUND</code> as this already respects the
-          <code>QUIET</code> and <code>REQUIRED</code> keywords.
-        <li>
-          A <code>WARNING</code>, <code>SEND_ERROR</code> or
-          <code>FATAL_ERROR</code> must be avoided (the only exception is
-          the <code>REQUIRED</code> keyword).
-        <li>
-          If successful, the following uncached variables might be set:
-          <pre>
-
+<pre>
+	
     FEATURE_FOUND
     FEATURE_LIBRARIES
     FEATURE_INCLUDE_DIRS
@@ -359,41 +363,43 @@
     FEATURE_VERSION_MAJOR
     FEATURE_VERSION_MINOR
     FEATURE_VERSION_SUBMINOR
-          </pre>
-          There are obviously valid exceptions from this rule, though.
-        <li>
-          Only "local" variables "<code>_&lt;all lowercase&gt;</code>" or
-          "global" variables prefixed by <code>FEATURE_</code> may be
-          altered. Do not set <code>DEAL_II_*</code> or <code>CMAKE_*</code>
-          variables directly!
-        <li>
-          A hint with <code>FEATURE_DIR</code> can be set up for
-          convenience. It is best to start the <code>Find</code> module by
-          <pre>
+</pre>
+
+There are obviously valid exceptions from this rule, though.
+    <li>
+      Only "local" variables "<code>_&lt;all lowercase&gt;</code>" or
+      "global" variables prefixed by <code>FEATURE_</code> may be
+      altered. Do not set <code>DEAL_II_*</code> or <code>CMAKE_*</code>
+      variables directly!
+    <li>
+      A hint with <code>FEATURE_DIR</code> can be set up for
+      convenience. It is best to start the <code>Find</code> module by
+
+<pre>
 
     SET_IF_EMPTY(FEATURE_DIR "$ENV{FEATURE_DIR}")
-          </pre>
-          and use <code>FEATURE_DIR</code> as a hint. If the external
-          library could be found, hide it via
-          <code>MARK_AS_ADVANCED</code>, if the external library could not
-          be found, set a cache value:
-          <pre>
+</pre>
 
+and use <code>FEATURE_DIR</code> as a hint. If the external
+library could be found, hide it via
+<code>MARK_AS_ADVANCED</code>, if the external library could not
+be found, set a cache value:
+<pre>
+  
     SET(FEATURE_DIR "" CACHE PATH "An optional hint to a FEATURE directory")
-          </pre>
-      </ul>
+</pre>
+  </ul>
 
 
-
-    <a name="configure"></a>
-    <h3> <code>./cmake/configure/configure_*.cmake</code> </h3>
-
-    <p>
-      The final step in the configuration phase is the setup of features
-      (which refer to external or bundled libraries
-      <acronym>deal.II</acronym> can optionally interface with.)
-
-    </p>
+  <a name="configure"></a>
+  <h3> <code>./cmake/configure/configure_*.cmake</code> </h3>
+  
+<p>
+  The final step in the configuration phase is the setup of features
+  (which refer to external or bundled libraries
+  <acronym>deal.II</acronym> can optionally interface with.)
+  
+</p>
 
     <p>
       At bare minimum <code>configure_&lt;feature&gt;.cmake</code>
@@ -574,7 +580,8 @@
       </ul>
     </p>
 
-
+    
+    <h2>Target definition and installation</h2>
     <a name="config.h.in"></a>
     <h3> <code>./include/deal.II/base/config.h.in</code> </h3>
 

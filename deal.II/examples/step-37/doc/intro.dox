@@ -20,7 +20,7 @@ International Conference on e-Science, 2011.  </i>
 This example shows how to implement a matrix-free method, that is, a
 method that does not explicitly store the matrix elements, for a
 second-order Poisson equation with variable coefficients on a
-hypercube. The eliptic equation will be solved with a multigrid
+hypercube. The elliptic equation will be solved with a multigrid
 method.
 
 The major motivation for matrix-free methods is the fact that today
@@ -280,7 +280,7 @@ v_\mathrm{cell}.
 
       for (unsigned int q=0; q<n_q_points; ++q)
         {
-          // apply the tranpose inverse Jacobian of the mapping
+          // apply the transposed inverse Jacobian of the mapping
 	  Tensor<1,dim> temp;
 	  for (unsigned int d=0; d<dim; ++d)
 	    temp[d] = temp_vector(q*dim+d);
@@ -361,7 +361,7 @@ tutorial is slower than a matrix-vector product using a sparse matrix for
 linear elements, but faster for all higher order elements thanks to the
 reduced complexity due to the tensor product structure and due to less memory
 transfer during computations. The impact of reduced memory transfer is
-particularly beneficial when working on a multi-core processor where several
+particularly beneficial when working on a multicore processor where several
 processing units share access to memory. In that case, an algorithm which is
 computation bound will show almost perfect parallel speedup, whereas an
 algorithm that is bound by memory transfer might not achieve similar speedup

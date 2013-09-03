@@ -134,7 +134,7 @@ namespace Step10
             // will generate Gnuplot output, which consists of a set of lines
             // describing the mapped triangulation. By default, only one line
             // is drawn for each face of the triangulation, but since we want
-            // to explicitely see the effect of the mapping, we want to have
+            // to explicitly see the effect of the mapping, we want to have
             // the faces in more detail. This can be done by passing the
             // output object a structure which contains some flags. In the
             // present case, since Gnuplot can only draw straight lines, we

@@ -130,7 +130,7 @@ of the current program):
 
 <h3>Modifying a Mesh</h3>
 
-After aquiring one (or several) meshes in the ways described above, there are
+After acquiring one (or several) meshes in the ways described above, there are
 many ways to manipulate them before using them in a finite element
 computation.
 

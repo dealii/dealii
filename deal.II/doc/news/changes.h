@@ -69,6 +69,46 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: All vector classes now have functions <code>extract_subvector_to()</code>
+  that allow extracting not just a single value but a whole set.
+  <br>
+  (Fahad Alrasched, 2013/09/02)
+  </li>
+
+  <li>
+  Fixed: <code>common/Make.global_options</code> now exports enable-threads
+  correctly, furthermore, <code>lib-suffix</code>, <code>shared-lib-suffix</code>
+  and <code>static-lib-suffix</code> are now exported as well for better legacy
+  support.
+  <br>
+  (Matthias Maier, 2013/08/30)
+  </li>
+
+  <li>
+  New: The ParameterHandler class can now deal with including one parameter
+  file from another.
+  <br>
+  (Wolfgang Bangerth, 2013/08/25)
+  </li>
+
+  <li>
+  New: The method VectorTools::compute_normal_flux_constraints can be used to
+  force a vector finite element function to be normal to the boundary.
+  <br>
+  (Martin Kronbichler, 2013/08/23)
+  </li>
+
+  <li>
+  Improved: MappingQ now uses the points of the Gauss-Lobatto quadrature
+  formula as support points instead of equispaced ones. This allows its use
+  for high polynomial orders and also gives better interpolation of circular
+  boundaries. Beware that mappings of order three and higher will behave
+  slightly differently now (usually better).
+  <br>
+  (Martin Kronbichler, 2013/08/23)
+  </li>
+
+  <li>
   Improved: Several .cc files in the deal.II directory have been split in
   order to better utilize multiple processors when compiling in parallel and
   reduce memory requirements of the compilation stage.

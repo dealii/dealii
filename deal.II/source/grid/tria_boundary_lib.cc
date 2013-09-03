@@ -165,14 +165,14 @@ CylinderBoundary<dim,spacedim>::get_intermediate_points_between_points (
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
 
-  // Do a simple linear interpolation
-  // followed by projection, using
-  // the same algorithm as above
-  const Point<spacedim> ds = (v1-v0) / (n+1);
+  // Do a simple linear interpolation followed by projection, using the same
+  // algorithm as above
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(n);
 
   for (unsigned int i=0; i<n; ++i)
     {
-      const Point<spacedim> middle = v0 + (i+1)*ds;
+      const double x = line_points[i+1][0];
+      const Point<spacedim> middle = (1-x)*v0 + x*v1;
 
       const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
                                                ((middle-point_on_axis) * direction) * direction;
@@ -307,24 +307,23 @@ get_intermediate_points_between_points (const Point<dim> &p0,
 {
   const unsigned int n = points.size ();
   const Point<dim> axis = x_1 - x_0;
-  const Point<dim> dx = (p1 - p0) / (n + 1);
 
   Assert (n > 0, ExcInternalError ());
 
-  for (unsigned int i = 0; i < n; ++i)
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(n);
+
+  for (unsigned int i=0; i<n; ++i)
     {
+      const double x = line_points[i+1][0];
+
       // Compute the current point.
-      const Point<dim> x_i = p0 + (i + 1) * dx;
-      // To project this point on the
-      // boundary of the cone we first
-      // compute the orthogonal
-      // projection of this point onto
-      // the axis of the cone.
+      const Point<dim> x_i = (1-x)*p0 + x*p1;
+      // To project this point on the boundary of the cone we first compute
+      // the orthogonal projection of this point onto the axis of the cone.
       const double c = (x_i - x_0) * axis / axis.square ();
       const Point<dim> x_ip = x_0 + c * axis;
-      // Compute the projection of
-      // the middle point on the
-      // boundary of the cone.
+      // Compute the projection of the middle point on the boundary of the
+      // cone.
       points[i] = x_ip + get_radius (x_ip) *  (x_i - x_ip) / (x_i - x_ip).norm ();
     }
 }
@@ -337,16 +336,11 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
   const Point<dim> axis = x_1 - x_0;
   // Compute the middle point of the line.
   const Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
-  // To project it on the boundary of
-  // the cone we first compute the
-  // orthogonal projection of the
-  // middle point onto the axis of
-  // the cone.
+  // To project it on the boundary of the cone we first compute the orthogonal
+  // projection of the middle point onto the axis of the cone.
   const double c = (middle - x_0) * axis / axis.square ();
   const Point<dim> middle_p = x_0 + c * axis;
-  // Compute the projection of the
-  // middle point on the boundary
-  // of the cone.
+  // Compute the projection of the middle point on the boundary of the cone.
   return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
 }
 
@@ -360,20 +354,14 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
   const int dim = 3;
 
   const Point<dim> axis = x_1 - x_0;
-  // Compute the middle point of the
-  // quad.
+  // Compute the middle point of the quad.
   const Point<dim> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
-  // Same algorithm as above: To
-  // project it on the boundary of
-  // the cone we first compute the
-  // orthogonal projection of the
-  // middle point onto the axis of
-  // the cone.
+  // Same algorithm as above: To project it on the boundary of the cone we
+  // first compute the orthogonal projection of the middle point onto the axis
+  // of the cone.
   const double c = (middle - x_0) * axis / axis.square ();
   const Point<dim> middle_p = x_0 + c * axis;
-  // Compute the projection of the
-  // middle point on the boundary
-  // of the cone.
+  // Compute the projection of the middle point on the boundary of the cone.
   return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
 }
 
@@ -475,15 +463,12 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
   for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_cell; ++vertex)
     {
-      // Compute the orthogonal
-      // projection of the vertex onto
-      // the axis of the cone.
+      // Compute the orthogonal projection of the vertex onto the axis of the
+      // cone.
       const double c = (face->vertex (vertex) - x_0) * axis / axis.square ();
       const Point<dim> vertex_p = x_0 + c * axis;
-      // Then compute the vector
-      // pointing from the point
-      // <tt>vertex_p</tt> on the axis
-      // to the vertex.
+      // Then compute the vector pointing from the point <tt>vertex_p</tt> on
+      // the axis to the vertex.
       const Point<dim> axis_to_vertex = face->vertex (vertex) - vertex_p;
 
       face_vertex_normals[vertex] = axis_to_vertex / axis_to_vertex.norm ();
@@ -629,49 +614,28 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   Assert(std::fabs(v1.square()-r2)<eps*r2, ExcInternalError());
 
   const double alpha=std::acos((v0*v1)/std::sqrt(v0.square()*v1.square()));
-  const double d_alpha=alpha/(n+1);
   const Point<spacedim> pm=0.5*(v0+v1);
 
   const double h=std::sqrt(pm.square());
 
-  double beta=0;
-  unsigned int left_index=0, right_index=0;
-  if ((n+1)%2==0)
-    {
-      // if the number of
-      // parts is even insert
-      // the midpoint
-      left_index=(n-1)/2;
-      right_index=left_index;
-      points[left_index]=pm;
-      --left_index;
-      ++right_index;
-      beta=d_alpha;
-    }
-  else
-    {
-      beta=(n/2+1)*d_alpha-alpha/2.;
-      right_index=n/2;
-      left_index=n/2-1;
-    }
-
   // n even:  m=n/2,
   // n odd:   m=(n-1)/2
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(n);
   const unsigned int m=n/2;
-  for (unsigned int i=0; i<m ; ++i, ++right_index, --left_index, beta+=d_alpha)
+  for (unsigned int i=0; i<m ; ++i)
     {
-      Assert(right_index<n, ExcInternalError());
-      Assert(left_index+1>=1, ExcInternalError());
-
-      double d=h*std::tan(beta);
-      points[right_index]=pm+d/length*(v1-v0);
-      points[left_index]=pm-d/length*(v1-v0);
+      const double beta = alpha * (line_points[i+1][0]-0.5);
+      const double d=h*std::tan(beta);
+      points[i]=pm+d/length*(v1-v0);
+      points[n-1-i]=pm-d/length*(v1-v0);
     }
 
+  if ((n+1)%2==0)
+    // if the number of parts is even insert the midpoint
+    points[(n-1)/2]=pm;
 
-  // project the points from the
-  // straight line to the
-  // HyperBallBoundary
+
+  // project the points from the straight line to the HyperBallBoundary
   for (unsigned int i=0; i<n; ++i)
     {
       points[i] *= r / std::sqrt(points[i].square());
@@ -885,10 +849,8 @@ HalfHyperBallBoundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
                                  std::vector<Point<dim> > &points) const
 {
-  // check whether center of object is
-  // at x==0, since then it belongs
-  // to the plane part of the
-  // boundary
+  // check whether center of object is at x==0, since then it belongs to the
+  // plane part of the boundary
   const Point<dim> line_center = line->center();
   if (line_center(0) == this->center(0))
     return StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
@@ -908,10 +870,8 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
     points[0]=get_new_point_on_quad(quad);
   else
     {
-      // check whether center of
-      // object is at x==0, since
-      // then it belongs to the plane
-      // part of the boundary
+      // check whether center of object is at x==0, since then it belongs to
+      // the plane part of the boundary
       const Point<dim> quad_center = quad->center();
       if (quad_center(0) == this->center(0))
         StraightBoundary<dim>::get_intermediate_points_on_quad (quad, points);
@@ -950,10 +910,8 @@ HalfHyperBallBoundary<dim>::
 get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
                          typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
 {
-  // check whether center of object is
-  // at x==0, since then it belongs
-  // to the plane part of the
-  // boundary
+  // check whether center of object is at x==0, since then it belongs to the
+  // plane part of the boundary
   const Point<dim> quad_center = face->center();
   if (quad_center(0) == this->center(0))
     StraightBoundary<dim>::get_normals_at_vertices (face, face_vertex_normals);
@@ -1005,10 +963,8 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 {
   switch (dim)
     {
-      // in 2d, first check whether the two
-      // end points of the line are on the
-      // axis of symmetry. if so, then return
-      // the mid point
+      // in 2d, first check whether the two end points of the line are on the
+      // axis of symmetry. if so, then return the mid point
     case 2:
     {
       if ((line->vertex(0)(0) == this->center(0))
@@ -1016,17 +972,13 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
           (line->vertex(1)(0) == this->center(0)))
         return (line->vertex(0) + line->vertex(1))/2;
       else
-        // otherwise we are on the outer or
-        // inner part of the shell. proceed
+        // otherwise we are on the outer or inner part of the shell. proceed
         // as in the base class
         return HyperShellBoundary<dim>::get_new_point_on_line (line);
     }
 
-    // in 3d, a line is a straight
-    // line if it is on the symmetry
-    // plane and if not both of its
-    // end points are on either the
-    // inner or outer sphere
+    // in 3d, a line is a straight line if it is on the symmetry plane and if
+    // not both of its end points are on either the inner or outer sphere
     case 3:
     {
 
@@ -1047,8 +999,7 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
                          - outer_radius) < 1e-12 * outer_radius))))
         return (line->vertex(0) + line->vertex(1))/2;
       else
-        // otherwise we are on the outer or
-        // inner part of the shell. proceed
+        // otherwise we are on the outer or inner part of the shell. proceed
         // as in the base class
         return HyperShellBoundary<dim>::get_new_point_on_line (line);
     }
@@ -1079,10 +1030,8 @@ Point<dim>
 HalfHyperShellBoundary<dim>::
 get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
 {
-  // if this quad is on the symmetry plane,
-  // take the center point and project it
-  // outward to the same radius as the
-  // centers of the two radial lines
+  // if this quad is on the symmetry plane, take the center point and project
+  // it outward to the same radius as the centers of the two radial lines
   if ((quad->vertex(0)(0) == this->center(0)) &&
       (quad->vertex(1)(0) == this->center(0)) &&
       (quad->vertex(2)(0) == this->center(0)) &&
@@ -1119,9 +1068,8 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
         Assert (false, ExcInternalError());
     }
 
-  // otherwise we are on the outer or
-  // inner part of the shell. proceed
-  // as in the base class
+  // otherwise we are on the outer or inner part of the shell. proceed as in
+  // the base class
   return HyperShellBoundary<dim>::get_new_point_on_quad (quad);
 }
 
@@ -1135,10 +1083,8 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
 {
   switch (dim)
     {
-      // in 2d, first check whether the two
-      // end points of the line are on the
-      // axis of symmetry. if so, then return
-      // the mid point
+      // in 2d, first check whether the two end points of the line are on the
+      // axis of symmetry. if so, then return the mid point
     case 2:
     {
       if ((line->vertex(0)(0) == this->center(0))
@@ -1146,18 +1092,14 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
           (line->vertex(1)(0) == this->center(0)))
         StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
       else
-        // otherwise we are on the outer or
-        // inner part of the shell. proceed
+        // otherwise we are on the outer or inner part of the shell. proceed
         // as in the base class
         HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
       break;
     }
 
-    // in 3d, a line is a straight
-    // line if it is on the symmetry
-    // plane and if not both of its
-    // end points are on either the
-    // inner or outer sphere
+    // in 3d, a line is a straight line if it is on the symmetry plane and if
+    // not both of its end points are on either the inner or outer sphere
     case 3:
     {
       if (((line->vertex(0)(0) == this->center(0))
@@ -1177,8 +1119,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
                          - outer_radius) < 1e-12 * outer_radius))))
         StraightBoundary<dim>::get_intermediate_points_on_line (line, points);
       else
-        // otherwise we are on the outer or
-        // inner part of the shell. proceed
+        // otherwise we are on the outer or inner part of the shell. proceed
         // as in the base class
         HyperShellBoundary<dim>::get_intermediate_points_on_line (line, points);
 
@@ -1200,10 +1141,8 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 {
   Assert (dim < 3, ExcNotImplemented());
 
-  // check whether center of object is
-  // at x==0, since then it belongs
-  // to the plane part of the
-  // boundary
+  // check whether center of object is at x==0, since then it belongs to the
+  // plane part of the boundary
   const Point<dim> quad_center = quad->center();
   if (quad_center(0) == this->center(0))
     StraightBoundary<dim>::get_intermediate_points_on_quad (quad, points);
@@ -1350,9 +1289,9 @@ TorusBoundary<2,3>::get_new_point_on_line (const Triangulation<2,3>::line_iterat
 
   Point<2>  middle(0,0);
 
-  //Take care for periodic conditions,
-  //For instance phi0= 0, phi1= 3/2*Pi  middle has to be 7/4*Pi not 3/4*Pi
-  //This also works for -Pi/2 + Pi, middle is 5/4*Pi
+  //Take care for periodic conditions, For instance phi0= 0, phi1= 3/2*Pi
+  //middle has to be 7/4*Pi not 3/4*Pi. This also works for -Pi/2 + Pi, middle
+  //is 5/4*Pi
   for (unsigned int i=0; i<2; i++)
     if (std::abs(p0(i)-p1(i))> numbers::PI)
       middle(i)=2*numbers::PI;
@@ -1440,7 +1379,7 @@ TorusBoundary<2,3>::
 get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator   &line,
                                  std::vector< Point< 3 > > &points) const
 {
-  //Almost the same implementation as  StraightBoundary<2,3>
+  //Almost the same implementation as StraightBoundary<2,3>
   unsigned int npoints=points.size();
   if (npoints==0) return;
 
@@ -1453,10 +1392,10 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator   &lin
   offset[0]=0;
   offset[1]=0;
 
-  //Take care for periodic conditions & negative angles,
-  //see get_new_point_on_line() above
-  //Because we dont have a symmetric interpolation (just the middle) we need to
-  //add 2*Pi to each almost zero and negative angles.
+  //Take care for periodic conditions & negative angles, see
+  //get_new_point_on_line() above. Because we dont have a symmetric
+  //interpolation (just the middle) we need to add 2*Pi to each almost zero
+  //and negative angles.
   for (unsigned int i=0; i<2; i++)
     for (unsigned int j=1; j<2; j++)
       {
@@ -1473,11 +1412,11 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator   &lin
         p[j](i)+=2*numbers::PI*offset[i];
 
 
-  double dx=1.0/(npoints+1);
-  double x=dx;
   Point<2>  target;
-  for (unsigned int i=0; i<npoints; i++,x+=dx)
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(npoints);
+  for (unsigned int i=0; i<npoints; i++)
     {
+      const double x = line_points[i+1][0];
       target=  (1-x)*p[0] + x*p[1];
       points[i]=get_real_coord(target);
     }
@@ -1497,9 +1436,6 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
   // is n a square number
   Assert(m*m==n, ExcInternalError());
 
-  const double ds=1./(m+1);
-  double y=ds;
-
   Point<2>  p[4];
 
   for (unsigned int i=0; i<4; i++)
@@ -1510,10 +1446,10 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
   offset[0]=0;
   offset[1]=0;
 
-  //Take care for periodic conditions & negative angles,
-  //see get_new_point_on_line() above
-  //Because we dont have a symmetric interpolation (just the middle) we need to
-  //add 2*Pi to each almost zero and negative angles.
+  //Take care for periodic conditions & negative angles, see
+  //get_new_point_on_line() above.  Because we dont have a symmetric
+  //interpolation (just the middle) we need to add 2*Pi to each almost zero
+  //and negative angles.
   for (unsigned int i=0; i<2; i++)
     for (unsigned int j=1; j<4; j++)
       {
@@ -1529,11 +1465,13 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
       if (p[j](i)<1.E-12 ) //Take care for periodic conditions & negative angles
         p[j](i)+=2*numbers::PI*offset[i];
 
-  for (unsigned int i=0; i<m; ++i, y+=ds)
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(m);
+  for (unsigned int i=0; i<m; ++i)
     {
-      double x=ds;
-      for (unsigned int j=0; j<m; ++j, x+=ds)
+      const double y=line_points[i+1][0];
+      for (unsigned int j=0; j<m; ++j)
         {
+          const double x=line_points[j+1][0];
           target=((1-x) * p[0] +
                   x     * p[1]) * (1-y) +
                  ((1-x) * p[2] +

@@ -114,7 +114,7 @@ In summary, what we get are the following two equations:
 Here, $p=p(\mathbf x, t), S=S(\mathbf x, t)$ are now time dependent
 functions: while at every time instant the flow field is in
 equilibrium with the pressure (i.e. we neglect dynamic
-accellerations), the saturation is transported along with the flow and
+accelerations), the saturation is transported along with the flow and
 therefore changes over time, in turn affected the flow field again
 through the dependence of the first equation on $S$.
 
@@ -411,8 +411,8 @@ one is harder to justify: on a microscopic level, most rocks are isotropic,
 because they consist of a network of interconnected pores. However, this
 microscopic scale is out of the range of today's computer simulations, and we
 have to be content with simulating things on the scale of meters. On that
-scale, however, fluid transport typically happens through a network of crasks
-in the rock, rather than throuh pores. However, cracks often result from
+scale, however, fluid transport typically happens through a network of cracks
+in the rock, rather than through pores. However, cracks often result from
 external stress fields in the rock layer (for example from tectonic faulting)
 and the cracks are therefore roughly aligned. This leads to a situation where
 the permeability is often orders of magnitude larger in the direction parallel
@@ -499,7 +499,7 @@ functions introduced at the end of the results section of @ref step_20
 "step-20":
 <ul>
   <li>A function that models a single, winding crack that snakes through the
-  domain. In analgy to step-20, but taking care of the slightly
+  domain. In analogy to step-20, but taking care of the slightly
   different geometry we have here, we describe this by the following function:
   @f[
     k(\mathbf x)

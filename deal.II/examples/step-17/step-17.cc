@@ -750,7 +750,7 @@ namespace Step17
   // to the present process, but then we need to distribute the refinement
   // indicators into a distributed vector so that all processes have the
   // values of the refinement indicator for all cells. But then, in order for
-  // each process to refine its copy of the mesh, they need to have acces to
+  // each process to refine its copy of the mesh, they need to have access to
   // all refinement indicators locally, so they have to copy the global vector
   // back into a local one. That's a little convoluted, but thinking about it
   // quite straightforward nevertheless. So here's how we do it:
@@ -788,7 +788,7 @@ namespace Step17
     // <code>local_error_per_cell</code> vector. The elements of this vector
     // for cells not on the present process are zero. However, since all
     // processes have a copy of a copy of the entire triangulation and need to
-    // keep these copies in synch, they need the values of refinement
+    // keep these copies in sync, they need the values of refinement
     // indicators for all cells of the triangulation. Thus, we need to
     // distribute our results. We do this by creating a distributed vector
     // where each process has its share, and sets the elements it has

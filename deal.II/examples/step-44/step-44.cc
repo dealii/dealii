@@ -620,7 +620,7 @@ namespace Step44
     }
 
   protected:
-    // Define constitutive model paramaters $\kappa$ (bulk modulus) and the
+    // Define constitutive model parameters $\kappa$ (bulk modulus) and the
     // neo-Hookean model parameter $c_1$:
     const double kappa;
     const double c_1;
@@ -742,11 +742,11 @@ namespace Step44
     // \textrm{Grad}\ \mathbf{u}$: Since $I$ has data type SymmetricTensor,
     // just writing <code>I + Grad_u_n</code> would convert the second
     // argument to a symmetric tensor, perform the sum, and then cast the
-    // result to a Tensor (i.e., the type of a possibly non-symmetric
+    // result to a Tensor (i.e., the type of a possibly nonsymmetric
     // tensor). However, since <code>Grad_u_n</code> is nonsymmetric in
     // general, the conversion to SymmetricTensor will fail. We can avoid this
     // back and forth by converting $I$ to Tensor first, and then performing
-    // the addition as between non-symmetric tensors:
+    // the addition as between nonsymmetric tensors:
     void update_values (const Tensor<2, dim> &Grad_u_n,
                         const double p_tilde,
                         const double J_tilde)
@@ -885,7 +885,7 @@ namespace Step44
     determine_component_extractors();
 
     // Several functions to assemble the system and right hand side matrices
-    // using multi-threading. Each of them comes as a wrapper function, one
+    // using multithreading. Each of them comes as a wrapper function, one
     // that is executed to do the work in the WorkStream model on one cell,
     // and one that copies the work done on this one cell into the global
     // object that represents it:
@@ -981,7 +981,7 @@ namespace Step44
     std::vector<PointHistory<dim> >  quadrature_point_history;
 
     // A description of the finite-element system including the displacement
-    // polynomial degree, the degree-of-freedom handler, number of dof's per
+    // polynomial degree, the degree-of-freedom handler, number of DoFs per
     // cell and the extractor objects used to retrieve information from the
     // solution vectors:
     const unsigned int               degree;
@@ -1564,7 +1564,7 @@ namespace Step44
     block_component[J_component] = J_dof; // Dilatation
 
     // The DOF handler is then initialised and we renumber the grid in an
-    // efficient manner. We also record the number of DOF's per block.
+    // efficient manner. We also record the number of DOFs per block.
     dof_handler_ref.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler_ref);
     DoFRenumbering::component_wise(dof_handler_ref, block_component);
@@ -1739,7 +1739,7 @@ namespace Step44
 
 // @sect4{Solid::update_qph_incremental}
 // As the update of QP information occurs frequently and involves a number of
-// expensive operations, we define a multi-threaded approach to distributing
+// expensive operations, we define a multithreaded approach to distributing
 // the task across a number of CPU cores.
 //
 // To start this, we first we need to obtain the total solution as it stands
@@ -2562,7 +2562,7 @@ namespace Step44
 // @sect4{Solid::solve_linear_system}
 // Solving the entire block system is a bit problematic as there are no
 // contributions to the $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$
-// block, rendering it non-invertible.
+// block, rendering it noninvertible.
 // Since the pressure and dilatation variables DOFs are discontinuous, we can
 // condense them out to form a smaller displacement-only system which
 // we will then solve and subsequently post-process to retrieve the

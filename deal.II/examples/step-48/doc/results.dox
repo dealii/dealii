@@ -66,7 +66,7 @@ product.
 
 <h3>Parallel run in 3D</h3>
 
-To demonstrate how the example scales for a parallel run and to demsonstrate
+To demonstrate how the example scales for a parallel run and to demonstrate
 that hanging node constraints can be handled in an efficient way, we run the
 example in 3D with $\mathcal{Q}_4$ elements. First, we run it on a notebook
 with 2 cores (Sandy Bridge CPU) at 2.7 GHz.
@@ -106,7 +106,7 @@ cluster with 2 nodes and each node runs 8 threads, we get the following times:
 @endcode
 
 We observe a considerable speedup over the notebook (16 cores versus 2 cores;
-nonethess, one notebook core is considerably faster than one core of the
+nonetheless, one notebook core is considerably faster than one core of the
 cluster because of a newer processor architecture). If we run the same program
 on 4 nodes with 8 threads on each node, we get:
 @code

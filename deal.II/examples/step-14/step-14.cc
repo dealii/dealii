@@ -214,7 +214,7 @@ namespace Step14
       // afterwards...
       double point_derivative = 0;
 
-      // ...then have some objects of which the meaning wil become clear
+      // ...then have some objects of which the meaning will become clear
       // below...
       QTrapez<dim>  vertex_quadrature;
       FEValues<dim> fe_values (dof_handler.get_fe(),
@@ -1465,7 +1465,7 @@ namespace Step14
   // We will then implement two such classes, for the evaluation of a point
   // value and of the derivative of the solution at that point. For these
   // functionals we already have the corresponding evaluation objects, so they
-  // are comlementary.
+  // are complementary.
   namespace DualFunctional
   {
     // @sect4{The DualFunctionalBase class}
@@ -2371,7 +2371,7 @@ namespace Step14
 
     // Next we have the function that is called to estimate the error on a
     // subset of cells. The function may be called multiply if the library was
-    // configured to use multi-threading. Here it goes:
+    // configured to use multithreading. Here it goes:
     template <int dim>
     void
     WeightedResidual<dim>::
@@ -2400,7 +2400,7 @@ namespace Step14
 
       // Then calculate the start cell for this thread. We let the different
       // threads run on interleaved cells, i.e. for example if we have 4
-      // threads, then the first thread treates cells 0, 4, 8, etc, while the
+      // threads, then the first thread treats cells 0, 4, 8, etc, while the
       // second threads works on cells 1, 5, 9, and so on. The reason is that
       // it takes vastly more time to work on cells with hanging nodes than on
       // regular cells, but such cells are not evenly distributed across the
@@ -2582,7 +2582,7 @@ namespace Step14
       // element solution at the quadrature points on the other side of the
       // face, i.e. from the neighboring cell.
       //
-      // For this, do a sanity check before: make sure that the neigbor
+      // For this, do a sanity check before: make sure that the neighbor
       // actually exists (yes, we should not have come here if the neighbor
       // did not exist, but in complicated software there are bugs, so better
       // check this), and if this is not the case throw an error.
@@ -2595,7 +2595,7 @@ namespace Step14
       // the name <code>neighbor_neighbor</code>:
       const unsigned int
       neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
-      // Then define an abbreviation for the neigbor cell, initialize the
+      // Then define an abbreviation for the neighbor cell, initialize the
       // <code>FEFaceValues</code> object on that cell, and extract the
       // gradients on that cell:
       const active_cell_iterator neighbor = cell->neighbor(face_no);
@@ -2673,7 +2673,7 @@ namespace Step14
       // Then find out which neighbor the present cell is of the adjacent
       // cell. Note that we will operate on the children of this adjacent
       // cell, but that their orientation is the same as that of their mother,
-      // i.e. the neigbor direction is the same.
+      // i.e. the neighbor direction is the same.
       const unsigned int
       neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
 

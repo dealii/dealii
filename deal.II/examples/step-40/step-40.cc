@@ -238,7 +238,7 @@ namespace Step40
 
     dof_handler.distribute_dofs (fe);
 
-    // The next two lines extract some informatino we will need later on,
+    // The next two lines extract some information we will need later on,
     // namely two index sets that provide information about which degrees of
     // freedom are owned by the current processor (this information will be
     // used to initialize solution and right hand side vectors, and the system
@@ -544,7 +544,7 @@ namespace Step40
   // that stores, for each cell, the subdomain the cell belongs to. This is
   // slightly tricky, because of course not every processor knows about every
   // cell. The vector we attach therefore has an entry for every cell that the
-  // current processor has in its mesh (locally owned onces, ghost cells, and
+  // current processor has in its mesh (locally owned ones, ghost cells, and
   // artificial cells), but the DataOut class will ignore all entries that
   // correspond to cells that are not owned by the current processor. As a
   // consequence, it doesn't actually matter what values we write into these
@@ -672,12 +672,12 @@ namespace Step40
 
 // The final function, <code>main()</code>, again has the same structure as in
 // all other programs, in particular step-6. Like in the other programs that
-// use PETSc, we have to inialize and finalize PETSc, which is done using the
+// use PETSc, we have to initialize and finalize PETSc, which is done using the
 // helper object MPI_InitFinalize.
 //
 // Note how we enclose the use the use of the LaplaceProblem class in a pair
 // of braces. This makes sure that all member variables of the object are
-// destroyed by the time we destroy the mpi_intialization object. Not doing
+// destroyed by the time we destroy the mpi_initialization object. Not doing
 // this will lead to strange and hard to debug errors when
 // <code>PetscFinalize</code> first deletes all PETSc vectors that are still
 // around, and the destructor of the LaplaceProblem class then tries to delete

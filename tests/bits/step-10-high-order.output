@@ -1,0 +1,18 @@
+
+DEAL::Computation of Pi by the area:
+DEAL::==============================
+DEAL::Degree = 8
+DEAL::Evaluation of pi on 5 cells: 3.141592653589792
+DEAL::Evaluation of pi on 20 cells: 3.141592653589791
+DEAL::
+DEAL::Computation of Pi by the perimeter:
+DEAL::===================================
+DEAL::Degree = 20
+DEAL::Evaluation of pi on 5 cells: 3.141592653589791
+DEAL::Evaluation of pi on 20 cells: 3.141592653589791
+DEAL::
+DEAL::Computation of Pi by the area:
+DEAL::==============================
+DEAL::Degree = 7
+DEAL::Evaluation of pi on in 3D 56 cells: 3.141592653589096
+DEAL::

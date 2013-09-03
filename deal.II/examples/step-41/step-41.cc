@@ -494,7 +494,7 @@ namespace Step41
           // function given above and in the introduction.
           //
           // If we decide that the DoF should be part of the active set, we
-          // add its index to the active set, introduce a nonhomogeneous
+          // add its index to the active set, introduce an inhomogeneous
           // equality constraint in the ConstraintMatrix object, and reset the
           // solution value to the height of the obstacle. Finally, the
           // residual of the non-contact part of the system serves as an
@@ -576,7 +576,7 @@ namespace Step41
   // @sect4{ObstacleProblem::output_results}
 
   // We use the vtk-format for the output.  The file contains the displacement
-  // and a numerical represenation of the active set. The function looks
+  // and a numerical representation of the active set. The function looks
   // standard but note that we can add an IndexSet object to the DataOut
   // object in exactly the same way as a regular solution vector: it is simply
   // interpreted as a function that is either zero (when a degree of freedom

@@ -1,7 +1,7 @@
 <h1>Results</h1>
 
 <h2>Logfile output</h2>
-First, the program produces the usual logfile here stored in <tt>deallog</tt>. It reads (with ommission of intermediate steps)
+First, the program produces the usual logfile here stored in <tt>deallog</tt>. It reads (with omission of intermediate steps)
 
 @code
 DEAL::Element: FE_DGQ<2>(3)

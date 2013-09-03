@@ -970,8 +970,8 @@ namespace parallel
        * these variables at a
        * couple places anyway.
        */
-      std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
-      std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
+      std::vector<unsigned int> coarse_cell_to_p4est_tree_permutation;
+      std::vector<unsigned int> p4est_tree_to_coarse_cell_permutation;
 
       /**
        * dummy settings

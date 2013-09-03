@@ -41,7 +41,7 @@ Let us assume that tissues have heterogeneous dielectric properties but
 homogeneous acoustic properties. The basic acoustic generation equation in an
 acoustically homogeneous medium can be described as follows: if $u$ is the
 vector-valued displacement, then tissue certainly reacts to changes in
-pressure by accelleration:
+pressure by acceleration:
 @f[
 \rho \frac{\partial^2}{\partial t^2}u(t,\mathbf r) = 
 -\nabla p(t,\mathbf r).
@@ -168,7 +168,7 @@ boundary mass matrix
 results from the use of absorbing boundary conditions.
 
 Above two equations can be rewritten in a matrix form with the pressure and its derivative as
-an unknown vecotor:
+an unknown vector:
 @f[
 \left(\begin{array}{cc}
  M         &       -k\theta M \\

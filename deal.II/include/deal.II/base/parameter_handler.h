@@ -889,7 +889,7 @@ namespace Patterns
  *     set Geometry       = [0,1]x[0,3]
  *   @endcode
  *   Input may be sorted into subsection trees in order to give the input a
- *   logical structure.
+ *   logical structure, and input files may include other files.
  *
  *   The ParameterHandler class is discussed in detail in the @ref step_19
  *   "step-19" example program, and is used in more realistic situations in
@@ -1034,9 +1034,23 @@ namespace Patterns
  *   <tt>=</tt> sign.
  *
  *
+ *   <h3>Including other input files</h3>
+ *
+ *   An input file can include other include files using the syntax
+ *   @code
+ *     ...
+ *     include some_other_file.prm
+ *     ...
+ *   @endcode
+ *   The file so referenced is searched for relative to the current
+ *   directory (not relative to the directory in which the including
+ *   parameter file is located, since this is not known to all three
+ *   versions of the read_input() function).
+ *
+ *
  *   <h3>Reading data from input sources</h3>
  *
- *   In order to read input you can use three possibilities: reading from
+ *   In order to read input there are three possibilities: reading from
  *   an <tt>std::istream</tt> object, reading from a file of which the name
  *   is given and reading from a string in memory in which the lines are
  *   separated by <tt>@\n</tt> characters. These possibilities are used as
@@ -1575,12 +1589,15 @@ public:
   virtual ~ParameterHandler ();
 
   /**
-   * Read input from a stream until stream returns <tt>eof</tt> condition
-   * or error.
+   * Read input from a stream until the stream returns the <tt>eof</tt> condition
+   * or error. The second argument can be used to denote the name of the file
+   * (if that's what the input stream represents) we are reading from; this
+   * is only used when creating output for error messages.
    *
    * Return whether the read was successful.
    */
-  virtual bool read_input (std::istream &input);
+  virtual bool read_input (std::istream &input,
+                           const std::string &filename = "input file");
 
   /**
    * Read input from a file the name of which is given. The PathSearch
@@ -1945,7 +1962,8 @@ private:
   std::string get_current_full_path (const std::string &name) const;
 
   /**
-   * Scan one line of input. <tt>lineno</tt> is the number of the line
+   * Scan one line of input. <tt>input_filename</tt> and <tt>lineno</tt>
+   * are the name of the input file and the current number of the line
    * presently scanned (for the logs if there are messages). Return
    * <tt>false</tt> if line contained stuff that could not be understood,
    * the uppermost subsection was to be left by an <tt>END</tt> or
@@ -1957,6 +1975,7 @@ private:
    * caller's variable is not changed.
    */
   bool scan_line (std::string         line,
+                  const std::string  &input_filename,
                   const unsigned int  lineno);
 
   friend class MultipleParameterLoop;
@@ -2227,7 +2246,28 @@ public:
    */
   virtual ~MultipleParameterLoop ();
 
-  virtual bool read_input (std::istream &Input);
+  /**
+   * Read input from a stream until the stream returns the <tt>eof</tt> condition
+   * or error. The second argument can be used to denote the name of the file
+   * (if that's what the input stream represents) we are reading from; this
+   * is only used when creating output for error messages.
+   *
+   * Return whether the read was successful.
+   */
+  virtual bool read_input (std::istream &input,
+                           const std::string &filename = "input file");
+
+  /**
+   * Read input from a file the name of which is given. The PathSearch
+   * class "PARAMETERS" is used to find the file.
+   *
+   * Return whether the read was successful.
+   *
+   * Unless <tt>optional</tt> is <tt>true</tt>, this function will
+   * automatically generate the requested file with default values if the
+   * file did not exist. This file will not contain additional comments if
+   * <tt>write_stripped_file</tt> is <tt>true</tt>.
+   */
   virtual bool read_input (const std::string &FileName,
                            const bool optional = false,
                            const bool write_stripped_file = false);

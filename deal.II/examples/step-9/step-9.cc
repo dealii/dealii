@@ -46,7 +46,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/grid_out.h>
 
-// The following two files provide classes and information for multi-threaded
+// The following two files provide classes and information for multithreaded
 // programs. In the first one, the classes and functions are declared which we
 // need to start new threads and to wait for threads to return (i.e. the
 // <code>Thread</code> class and the <code>new_thread</code> functions). The
@@ -517,7 +517,7 @@ namespace Step9
     // information, we could use the value of the global variable
     // <code>multithread_info.n_cpus</code>, which is determined at start-up
     // time of your program automatically. (Note that if the library was not
-    // configured for multi-threading, then the number of CPUs is set to one.)
+    // configured for multithreading, then the number of CPUs is set to one.)
     // However, sometimes there might be reasons to use another value. For
     // example, you might want to use less processors than there are in your
     // system in order not to use too many computational resources. On the
@@ -555,7 +555,7 @@ namespace Step9
     // can be omitted. (However, you still need to write the angle brackets,
     // even if they are empty.)
     //
-    // If you did not configure for multi-threading, then the
+    // If you did not configure for multithreading, then the
     // <code>new_thread</code> function that is supposed to start a new thread
     // in parallel only executes the function which should be run in parallel,
     // waits for it to return (i.e. the function is executed sequentially),
@@ -569,7 +569,7 @@ namespace Step9
     // the same size. Each thread will then assemble the local contributions
     // of the cells within its chunk and transfer these contributions to the
     // global matrix. As splitting a range of cells is a rather common task
-    // when using multi-threading, there is a function in the
+    // when using multithreading, there is a function in the
     // <code>Threads</code> namespace that does exactly this. In fact, it does
     // this not only for a range of cell iterators, but for iterators in
     // general, so you could use it for <code>std::vector::iterator</code> or
@@ -596,7 +596,7 @@ namespace Step9
                                                     n_threads);
 
     // Finally, for each of the chunks of iterators we have computed, start
-    // one thread (or if not in multi-thread mode: execute assembly on these
+    // one thread (or if not in multithread mode: execute assembly on these
     // chunks sequentially). This is done using the following sequence of
     // function calls:
     for (unsigned int thread=0; thread<n_threads; ++thread)
@@ -605,7 +605,7 @@ namespace Step9
                                       thread_ranges[thread].first,
                                       thread_ranges[thread].second);
     // The reasons and internal workings of these functions can be found in
-    // the report on the subject of multi-threading, which is available online
+    // the report on the subject of multithreading, which is available online
     // as well. Suffice it to say that we create a new thread that calls the
     // <code>assemble_system_interval</code> function on the present object
     // (the <code>this</code> pointer), with the arguments following in the
@@ -626,7 +626,7 @@ namespace Step9
     // container, which just calls <code>join</code> on each of the thread
     // objects it stores.
     //
-    // Again, if the library was not configured to use multi-threading, then
+    // Again, if the library was not configured to use multithreading, then
     // no threads can run in parallel and the function returns immediately.
     threads.join_all ();
 
@@ -855,7 +855,7 @@ namespace Step9
         // i.e. other threads can now enter into the protected section by
         // acquiring the lock. Two final notes are in place here, however:
         //
-        // 1. If the library was not configured for multi-threading, then
+        // 1. If the library was not configured for multithreading, then
         // there can't be parallel threads and there is no need to
         // synchronize. Thus, the <code>lock</code> and <code>release</code>
         // functions are no-ops, i.e. they return without doing anything.
@@ -1283,7 +1283,7 @@ namespace Step9
         // can determine an approximation of the gradient for the present
         // cell, then we need to have passed over vectors <code>y</code> which
         // span the whole space, otherwise we would not have all components of
-        // the gradient. This is indicated by the invertability of the matrix.
+        // the gradient. This is indicated by the invertibility of the matrix.
         //
         // If the matrix should not be invertible, this means that the present
         // cell had an insufficient number of active neighbors. In contrast to

@@ -62,7 +62,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-// These, now, are the include necessary for the multi-level methods. The
+// These, now, are the include necessary for the multilevel methods. The
 // first two declare classes that allow us to enumerate degrees of freedom not
 // only on the finest mesh level, but also on intermediate levels (that's what
 // the MGDoFHandler class does) as well as allow to access this information
@@ -303,7 +303,7 @@ namespace Step16
 
 
     // Now for the things that concern the multigrid data structures. First,
-    // we resize the multi-level objects to hold matrices and sparsity
+    // we resize the multilevel objects to hold matrices and sparsity
     // patterns for every level. The coarse level is zero (this is mandatory
     // right now but may change in a future revision). Note that these
     // functions take a complete, inclusive range here (not a starting index
@@ -424,7 +424,7 @@ namespace Step16
   // integration core is the same as above, but the loop below will go over
   // all existing cells instead of just the active ones, and the results must
   // be entered into the correct matrix. Note also that since we only do
-  // multi-level preconditioning, no right-hand side needs to be assembled
+  // multilevel preconditioning, no right-hand side needs to be assembled
   // here.
   //
   // Before we go there, however, we have to take care of a significant amount
@@ -460,7 +460,7 @@ namespace Step16
     // that are located on interfaces between adaptively refined levels, and
     // those that lie on the interface but also on the exterior boundary of
     // the domain. As in many other parts of the library, we do this by using
-    // boolean masks, i.e. vectors of booleans each element of which indicates
+    // Boolean masks, i.e. vectors of Booleans each element of which indicates
     // whether the corresponding degree of freedom index is an interface DoF
     // or not. The <code>MGConstraints</code> already computed the information
     // for us when we called initialize in <code>setup_system()</code>.
@@ -615,7 +615,7 @@ namespace Step16
     MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints, mg_constrained_dofs);
     // Now the prolongation matrix has to be built.  This matrix needs to take
     // the boundary values on each level into account and needs to know about
-    // the indices at the refinement egdes. The <code>MGConstraints</code>
+    // the indices at the refinement edges. The <code>MGConstraints</code>
     // knows about that so pass it as an argument.
     mg_transfer.build_matrices(mg_dof_handler);
 

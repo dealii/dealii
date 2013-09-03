@@ -58,15 +58,15 @@ Furthermore we have to distinguish two cases.\\
 The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
 $$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0¸\quad\text{with}\quad \tau^D
 = \tau - \dfrac{1}{3}tr(\tau)I,$$
-$\sigma_0$ as yield stress and $\vert .\vert$ as the frobenius norm. If there
+$\sigma_0$ as yield stress and $\vert .\vert$ as the Frobenius norm. If there
 are no plastic deformations in a particular point - that is $\lambda=0$ - this yields $\vert\sigma^D\vert <
 \sigma_0$ and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$.
 That means if the stress is smaller than the yield stress there are only elastic
 deformations in that point.\\
 To consider it the other way around if the deviator stress $\sigma^D$ is in a
 norm bigger than the yield stress then $\sigma^D$ has to be projected back to the yield surface and there are plastic deformations which means $\lambda$
-would be positiv for that particular point. We refer that the stresses are
-computed by Hooke's law for isotorpic materials. You can find the description at the end of section 3. Else if the norm of the deviator stress tensor is smaller or equal the yield stress then $\lambda$ is zero and there are no plastic deformations in
+would be positive for that particular point. We refer that the stresses are
+computed by Hooke's law for isotropic materials. You can find the description at the end of section 3. Else if the norm of the deviator stress tensor is smaller or equal the yield stress then $\lambda$ is zero and there are no plastic deformations in
 that point.\\
 There the index $D$ denotes the deviator part of for example the stress where
 $tr(.)$ is the trace of a tensor. The definition shows an additive decomposition
@@ -77,7 +77,7 @@ The third equation is called equilibrium condition with a force of volume
 density $f$ which we will neglect in our example.
 The boundary of $\Omega$ separates as follows $\Gamma=\Gamma_D\bigcup\Gamma_C$ and $\Gamma_D\bigcap\Gamma_C=\emptyset$.
 At the boundary $\Gamma_D$ we have zero Dirichlet conditions. $\Gamma_C$ denotes the potential contact boundary.\\
-The last two lines decribe the so-called Signorini contact conditions. If there is no contact the normal  stress
+The last two lines describe the so-called Signorini contact conditions. If there is no contact the normal  stress
 $$ \sigma_n =  \sigma n\cdot n$$
 is zero with the outward normal $n$. If there is contact ($u_n = g$) the tangential stress $\sigma_t = \sigma\cdot n - \sigma_n n$
 vanishes, because we consider a frictionless situation and the normal stress is
@@ -95,10 +95,10 @@ $$W^{\textrm{div}}:=\lbrace \tau\in
 L^2(\Omega,\mathbb{R}^{\textrm{dim}\times\textrm{dim}}_{\textrm{sym}}):\textrm{div}(\tau)\in L^2(\Omega,\mathbb{R}^{\textrm{dim}})\rbrace$$ and
 $$\Pi \Sigma:=\lbrace \tau\in \Sigma, \mathcal{F}(\tau)\leq 0\rbrace$$
 as the set of admissible stresses which is defined
-by a continious, convex flow function $\mathcal{F}$.
+by a continuous, convex flow function $\mathcal{F}$.
 
 With the goal of deriving the dual formulation of the minimisation
-problem, we define a lagrange function:
+problem, we define a Lagrange function:
 $$L(\tau,\varphi) := E(\tau) + (\varphi, \textrm{div}(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{\textrm{div}}\times V^+$$
 with
 $$V^+ := \lbrace u\in V: u_n\leq g \text{ on } \Gamma_C \rbrace$$
@@ -220,7 +220,7 @@ tensor)},$$
 $$\tau^D := C\varepsilon^D(u^i).$$
 Remark that $a(.;.)$ is not differentiable in the common sense but it is
 slantly differentiable like the function for the contact problem and again we refer to
-Hintermueller, Ito, Kunisch: The primal-dual active set strategy as a semismooth newton method, SIAM J. OPTIM., 2003, Vol. 13, No. 3, pp. 865-888.
+Hintermueller, Ito, Kunisch: The primal-dual active set strategy as a semismooth Newton method, SIAM J. OPTIM., 2003, Vol. 13, No. 3, pp. 865-888.
 Again the first case is for elastic and the second for plastic deformation.
 
 \section{Formulation as a saddle point problem}
@@ -271,7 +271,7 @@ The linearized problem is essentially like a pure elastic problem with contact l
 in step-41. The only difference consists in the fact that the contact area
 is at the boundary instead of in the domain. But this has no further consequence
 so that we refer to the documentation of step-41 with the only hint that
-$\mathcal{S}$ containts all the vertices at the contact boundary $\Gamma_C$ this
+$\mathcal{S}$ contains all the vertices at the contact boundary $\Gamma_C$ this
 time.
 
 \section{The primal-dual active set algorithm combined with the inexact semi smooth
@@ -284,7 +284,7 @@ method for the contact. It sums up the results of the sections before and works 
  \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that
  $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap
  \mathcal{F}_k = \emptyset$ and set $k = 1$. The start value $\hat U^0 :=
- P_{\mathcal{A}_k}(0)$ fullfills our obstacle condition.
+ P_{\mathcal{A}_k}(0)$ fulfills our obstacle condition.
  \item[(1)] Assemble the Newton matrix $A := a'(\hat
  U^{k-1};\varphi_p,\varphi_q)$ and the right-hand-side $F(\hat U^{k-1})$.
  \item[(2)] Find the primal-dual pair $(\bar U^k,\Lambda^k)$ that satisfies
@@ -321,10 +321,10 @@ g_{h,p}, & \textrm{if}\quad
 p\in\mathcal{A}.
 \end{cases}$$\\
 The matrix $B\in\mathbb{R}^{n\times m}$, $n>m$ describes the coupling of the
-bases for the displacements and lagrange multiplier (contact forces)
+bases for the displacements and Lagrange multiplier (contact forces)
 and it is not quadratic in our situation since $\Lambda^k$ is only defined on
 $\Gamma_C$. Due to the ansatz functions $\psi_i$ (scalar valued) of the
-lagrange multiplier are fullfilling the following biorthogonal condition (see Hüeber, Wohlmuth: A primal–dual active
+Lagrange multiplier are fulfilling the following biorthogonal condition (see Hüeber, Wohlmuth: A primal–dual active
 set strategy for non-linear multibody contact problems, Comput. Methods Appl. Mech. Engrg.
 194, 2005, pp. 3147-3166)
 $$ \int\limits_{\Gamma_C}\psi_i(x)\varphi_j(x)dx =
@@ -335,8 +335,8 @@ $$B_{pq} = \begin{cases}
 p,q\in\mathcal{S}\\
 0I_3, & \text{if}\quad p\neq q,\quad p\textrm{ or }q\notin\mathcal{S}.
 \end{cases}$$
-Here $I_3$ denotes the threedimensional identity matrix.
-In our programm we use the structure of a quadratic sparse for
+Here $I_3$ denotes the three-dimensional identity matrix.
+In our program we use the structure of a quadratic sparse for
 $B\in\mathbb{R}^{n\times n}$ and for $\Lambda^k$ a vector with length $n$ where
 $\Lambda^k_p = 0$ for $p\notin \mathcal{S}$.
 The vector $G$ is defined by a suitable approximation $g_h$ of the gap $g$
@@ -344,8 +344,8 @@ $$G_p = \begin{cases}
 g_{h,p}\int\limits_{\Gamma_C}\varphi_p(x)dx, & \text{if}\quad p\in\mathcal{S}\\
 0, & \text{if}\quad p\notin\mathcal{S}.
 \end{cases}$$\\
-Note that $G_p$ is a threedimensional vector and that again we applied the
-biorthogonal property of the lagrange multiplier ansatz functions to the
+Note that $G_p$ is a three-dimensional vector and that again we applied the
+biorthogonal property of the Lagrange multiplier ansatz functions to the
 integral $\int\limits_{\Gamma_C}g_h(x)\varphi_p(x)dx$ with $g_h(x)=\sum\limits_i
 g_{h,p}\varphi_p(x)$ (see the reference mentioned above).\\
 Compared to step-41, step (1) is added but it should be clear from the sections
@@ -377,19 +377,19 @@ results it yields a quite reasonable adaptive mesh for the contact zone.
 
 \section{Implementation}
 
-This tutorial is essentailly a mixture of step-40 and step-41 but instead of
+This tutorial is essentially a mixture of step-40 and step-41 but instead of
 PETSc we let the Trilinos library deal with parallelizing the linear algebra
 (like in step-32). Since we are trying to solve a similar problem like in
 step-41 we will use the same methods but now in parallel.
 
 Another difficulty is the handling of the different constraints from
-(the dirichlet conditons), the hanging nodes and the inequality condition that
+(the Dirichlet conditions), the hanging nodes and the inequality condition that
 arises from the contact. For this purpose we create three objects of type
 ConstraintMatrix.
 
 Beside the ConstitutiveLaw class there is another new class called Input. This
 class allows us to read in an obstacle from a file. In our example the file
-'obstacle\_file.dat' containts data which describe an Chinese, Japanese or
+'obstacle\_file.dat' contains data which describe an Chinese, Japanese or
 Korean symbol for force or power. (See www.orientaloutpost.com/: ``This word can be used for motivation - it
 can also mean power / motion / propulsion / force. It can be anything
 internal or external that keeps you going. This is the safest way to express

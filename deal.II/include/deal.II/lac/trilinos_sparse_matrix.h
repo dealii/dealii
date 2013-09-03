@@ -3448,7 +3448,7 @@ namespace TrilinosWrappers
                                                      indices);
         for (TrilinosWrappers::types::int_type i=0; i<n_indices; ++i)
           std::cout << indices[i] << " ";
-        std::cout << endl << std::endl;
+        std::cout << std::endl << std::endl;
         Assert (ierr <= 0,
                 ExcAccessToNonPresentElement(row, col_index_ptr[0]));
       }

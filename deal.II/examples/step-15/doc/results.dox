@@ -72,7 +72,7 @@ solution. This yields the following set of images:
 
 It is clearly visible, that the solution minimizes the surface
 after each refinement. The solution converges to a picture one
-would imagine a soapbubble to be that is located inside a wire loop
+would imagine a soap bubble to be that is located inside a wire loop
 that is bent like
 the boundary. Also it is visible, how the boundary
 is smoothed out after each refinement. On the coarse mesh,

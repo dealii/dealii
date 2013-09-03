@@ -1404,300 +1404,173 @@ namespace VectorTools
 
 
   /**
-   * Compute the constraints that
-   * correspond to boundary conditions of
-   * the form $\vec n \cdot \vec u=0$,
-   * i.e. no normal flux if $\vec u$ is a
-   * vector-valued quantity. These
-   * conditions have exactly the form
-   * handled by the ConstraintMatrix class,
-   * so instead of creating a map between
-   * boundary degrees of freedom and
-   * corresponding value, we here create a
-   * list of constraints that are written
-   * into a ConstraintMatrix. This object
-   * may already have some content, for
-   * example from hanging node constraints,
-   * that remains untouched. These
-   * constraints have to be applied to the
-   * linear system like any other such
-   * constraints, i.e. you have to condense
-   * the linear system with the constraints
-   * before solving, and you have to
-   * distribute the solution vector
-   * afterwards.
+   * Compute the constraints that correspond to boundary conditions of the
+   * form $\vec n \cdot \vec u=0$, i.e. no normal flux if $\vec u$ is a
+   * vector-valued quantity. These conditions have exactly the form handled by
+   * the ConstraintMatrix class, so instead of creating a map between boundary
+   * degrees of freedom and corresponding value, we here create a list of
+   * constraints that are written into a ConstraintMatrix. This object may
+   * already have some content, for example from hanging node constraints,
+   * that remains untouched. These constraints have to be applied to the
+   * linear system like any other such constraints, i.e. you have to condense
+   * the linear system with the constraints before solving, and you have to
+   * distribute the solution vector afterwards.
    *
-   * The use of this function is
-   * explained in more detail in
-   * step-31. It
-   * doesn't make much sense in 1d,
-   * so the function throws an
-   * exception in that case.
+   * The use of this function is explained in more detail in step-31. It
+   * doesn't make much sense in 1d, so the function throws an exception in
+   * that case.
    *
-   * The second argument of this
-   * function denotes the first
-   * vector component in the finite
-   * element that corresponds to
-   * the vector function that you
-   * want to constrain. For
-   * example, if we were solving a
-   * Stokes equation in 2d and the
-   * finite element had components
-   * $(u,v,p)$, then @p
-   * first_vector_component would
-   * be zero. On the other hand, if
-   * we solved the Maxwell
-   * equations in 3d and the finite
-   * element has components
-   * $(E_x,E_y,E_z,B_x,B_y,B_z)$
-   * and we want the boundary
-   * condition $\vec n\cdot \vec
-   * B=0$, then @p
-   * first_vector_component would
-   * be 3. Vectors are implicitly
-   * assumed to have exactly
-   * <code>dim</code> components
-   * that are ordered in the same
-   * way as we usually order the
-   * coordinate directions,
-   * i.e. $x$-, $y$-, and finally
-   * $z$-component. The function
-   * assumes, but can't check, that
-   * the vector components in the
-   * range
-   * <code>[first_vector_component,first_vector_component+dim)</code>
-   * come from the same base finite
-   * element. For example, in the
-   * Stokes example above, it would
-   * not make sense to use a
-   * <code>FESystem@<dim@>(FE_Q@<dim@>(2),
-   * 1, FE_Q@<dim@>(1), dim)</code>
-   * (note that the first velocity
-   * vector component is a $Q_2$
-   * element, whereas all the other
-   * ones are $Q_1$ elements) as
-   * there would be points on the
-   * boundary where the
-   * $x$-velocity is defined but no
-   * corresponding $y$- or
-   * $z$-velocities.
+   * The second argument of this function denotes the first vector component
+   * in the finite element that corresponds to the vector function that you
+   * want to constrain. For example, if we were solving a Stokes equation in
+   * 2d and the finite element had components $(u,v,p)$, then @p
+   * first_vector_component would be zero. On the other hand, if we solved the
+   * Maxwell equations in 3d and the finite element has components
+   * $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want the boundary condition $\vec
+   * n\cdot \vec B=0$, then @p first_vector_component would be 3. Vectors are
+   * implicitly assumed to have exactly <code>dim</code> components that are
+   * ordered in the same way as we usually order the coordinate directions,
+   * i.e. $x$-, $y$-, and finally $z$-component. The function assumes, but
+   * can't check, that the vector components in the range
+   * <code>[first_vector_component,first_vector_component+dim)</code> come
+   * from the same base finite element. For example, in the Stokes example
+   * above, it would not make sense to use a
+   * <code>FESystem@<dim@>(FE_Q@<dim@>(2), 1, FE_Q@<dim@>(1), dim)</code>
+   * (note that the first velocity vector component is a $Q_2$ element,
+   * whereas all the other ones are $Q_1$ elements) as there would be points
+   * on the boundary where the $x$-velocity is defined but no corresponding
+   * $y$- or $z$-velocities.
    *
-   * The third argument denotes the set of
-   * boundary indicators on which the
-   * boundary condition is to be
-   * enforced. Note that, as explained
-   * below, this is one of the few
-   * functions where it makes a difference
-   * where we call the function multiple
-   * times with only one boundary
-   * indicator, or whether we call the
-   * function onces with the whole set of
-   * boundary indicators at once.
+   * The third argument denotes the set of boundary indicators on which the
+   * boundary condition is to be enforced. Note that, as explained below, this
+   * is one of the few functions where it makes a difference where we call the
+   * function multiple times with only one boundary indicator, or whether we
+   * call the function onces with the whole set of boundary indicators at
+   * once.
    *
-   * The mapping argument is used to
-   * compute the boundary points where the function
-   * needs to request the normal vector $\vec n$
-   * from the boundary description.
+   * The mapping argument is used to compute the boundary points where the
+   * function needs to request the normal vector $\vec n$ from the boundary
+   * description.
    *
-   * @note When combining adaptively
-   * refined meshes with hanging node
-   * constraints and boundary conditions
-   * like from the current function within
-   * one ConstraintMatrix object, the
-   * hanging node constraints should always
-   * be set first, and then the boundary
-   * conditions since boundary conditions
-   * are not set in the second operation on
-   * degrees of freedom that are already
-   * constrained. This makes sure that the
-   * discretization remains conforming as
-   * is needed. See the discussion on
-   * conflicting constraints in the module
-   * on @ref constraints .
+   * @note When combining adaptively refined meshes with hanging node
+   * constraints and boundary conditions like from the current function within
+   * one ConstraintMatrix object, the hanging node constraints should always
+   * be set first, and then the boundary conditions since boundary conditions
+   * are not set in the second operation on degrees of freedom that are
+   * already constrained. This makes sure that the discretization remains
+   * conforming as is needed. See the discussion on conflicting constraints in
+   * the module on @ref constraints .
    *
    *
    * <h4>Computing constraints in 2d</h4>
    *
-   * Computing these constraints requires
-   * some smarts. The main question
-   * revolves around the question what the
-   * normal vector is. Consider the
-   * following situation:
-   * <p ALIGN="center">
-   * @image html no_normal_flux_1.png
+   * Computing these constraints requires some smarts. The main question
+   * revolves around the question what the normal vector is. Consider the
+   * following situation: <p ALIGN="center"> @image html no_normal_flux_1.png
    * </p>
    *
-   * Here, we have two cells that use a
-   * bilinear mapping
-   * (i.e. MappingQ1). Consequently, for
-   * each of the cells, the normal vector
-   * is perpendicular to the straight
-   * edge. If the two edges at the top and
-   * right are meant to approximate a
-   * curved boundary (as indicated by the
-   * dashed line), then neither of the two
-   * computed normal vectors are equal to
-   * the exact normal vector (though they
-   * approximate it as the mesh is refined
-   * further). What is worse, if we
-   * constrain $\vec n \cdot \vec u=0$ at
-   * the common vertex with the normal
-   * vector from both cells, then we
-   * constrain the vector $\vec u$ with
-   * respect to two linearly independent
-   * vectors; consequently, the constraint
-   * would be $\vec u=0$ at this point
-   * (i.e. <i>all</i> components of the
-   * vector), which is not what we wanted.
+   * Here, we have two cells that use a bilinear mapping
+   * (i.e. MappingQ1). Consequently, for each of the cells, the normal vector
+   * is perpendicular to the straight edge. If the two edges at the top and
+   * right are meant to approximate a curved boundary (as indicated by the
+   * dashed line), then neither of the two computed normal vectors are equal
+   * to the exact normal vector (though they approximate it as the mesh is
+   * refined further). What is worse, if we constrain $\vec n \cdot \vec u=0$
+   * at the common vertex with the normal vector from both cells, then we
+   * constrain the vector $\vec u$ with respect to two linearly independent
+   * vectors; consequently, the constraint would be $\vec u=0$ at this point
+   * (i.e. <i>all</i> components of the vector), which is not what we wanted.
    *
-   * To deal with this situation, the
-   * algorithm works in the following way:
-   * at each point where we want to
-   * constrain $\vec u$, we first collect
-   * all normal vectors that adjacent cells
-   * might compute at this point. We then
-   * do not constrain $\vec n \cdot \vec
-   * u=0$ for <i>each</i> of these normal
-   * vectors but only for the
-   * <i>average</i> of the normal
-   * vectors. In the example above, we
-   * therefore record only a single
-   * constraint $\vec n \cdot \vec {\bar
-   * u}=0$, where $\vec {\bar u}$ is the
-   * average of the two indicated normal
-   * vectors.
+   * To deal with this situation, the algorithm works in the following way: at
+   * each point where we want to constrain $\vec u$, we first collect all
+   * normal vectors that adjacent cells might compute at this point. We then
+   * do not constrain $\vec n \cdot \vec u=0$ for <i>each</i> of these normal
+   * vectors but only for the <i>average</i> of the normal vectors. In the
+   * example above, we therefore record only a single constraint $\vec n \cdot
+   * \vec {\bar u}=0$, where $\vec {\bar u}$ is the average of the two
+   * indicated normal vectors.
    *
-   * Unfortunately, this is not quite
-   * enough. Consider the situation here:
+   * Unfortunately, this is not quite enough. Consider the situation here:
    *
    * <p ALIGN="center">
    * @image html no_normal_flux_2.png
    * </p>
    *
-   * If again the top and right edges
-   * approximate a curved boundary, and the
-   * left boundary a separate boundary (for
-   * example straight) so that the exact
-   * boundary has indeed a corner at the
-   * top left vertex, then the above
-   * construction would not work: here, we
-   * indeed want the constraint that $\vec
-   * u$ at this point (because the normal
-   * velocities with respect to both the
-   * left normal as well as the top normal
-   * vector should be zero), not that the
-   * velocity in the direction of the
-   * average normal vector is zero.
+   * If again the top and right edges approximate a curved boundary, and the
+   * left boundary a separate boundary (for example straight) so that the
+   * exact boundary has indeed a corner at the top left vertex, then the above
+   * construction would not work: here, we indeed want the constraint that
+   * $\vec u$ at this point (because the normal velocities with respect to
+   * both the left normal as well as the top normal vector should be zero),
+   * not that the velocity in the direction of the average normal vector is
+   * zero.
    *
-   * Consequently, we use the following
-   * heuristic to determine whether all
-   * normal vectors computed at one point
-   * are to be averaged: if two normal
-   * vectors for the same point are
-   * computed on <i>different</i> cells,
-   * then they are to be averaged. This
-   * covers the first example above. If
-   * they are computed from the same cell,
-   * then the fact that they are different
-   * is considered indication that they
-   * come from different parts of the
-   * boundary that might be joined by a
-   * real corner, and must not be averaged.
+   * Consequently, we use the following heuristic to determine whether all
+   * normal vectors computed at one point are to be averaged: if two normal
+   * vectors for the same point are computed on <i>different</i> cells, then
+   * they are to be averaged. This covers the first example above. If they are
+   * computed from the same cell, then the fact that they are different is
+   * considered indication that they come from different parts of the boundary
+   * that might be joined by a real corner, and must not be averaged.
    *
-   * There is one problem with this
-   * scheme. If, for example, the same
-   * domain we have considered above, is
-   * discretized with the following mesh,
-   * then we get into trouble:
+   * There is one problem with this scheme. If, for example, the same domain
+   * we have considered above, is discretized with the following mesh, then we
+   * get into trouble:
    *
    * <p ALIGN="center">
    * @image html no_normal_flux_3.png
    * </p>
    *
-   * Here, the algorithm assumes that the
-   * boundary does not have a corner at the
-   * point where faces $F1$ and $F2$ join
-   * because at that point there are two
-   * different normal vectors computed from
-   * different cells. If you intend for
-   * there to be a corner of the exact
-   * boundary at this point, the only way
-   * to deal with this is to assign the two
-   * parts of the boundary different
-   * boundary indicators and call this
-   * function twice, once for each boundary
-   * indicators; doing so will yield only
-   * one normal vector at this point per
-   * invocation (because we consider only
-   * one boundary part at a time), with the
-   * result that the normal vectors will
-   * not be averaged.
+   * Here, the algorithm assumes that the boundary does not have a corner at
+   * the point where faces $F1$ and $F2$ join because at that point there are
+   * two different normal vectors computed from different cells. If you intend
+   * for there to be a corner of the exact boundary at this point, the only
+   * way to deal with this is to assign the two parts of the boundary
+   * different boundary indicators and call this function twice, once for each
+   * boundary indicators; doing so will yield only one normal vector at this
+   * point per invocation (because we consider only one boundary part at a
+   * time), with the result that the normal vectors will not be averaged. This
+   * situation also needs to be taken into account when using this function
+   * around reentrant corners on Cartesian meshes. If no-normal-flux boundary
+   * conditions are to be enforced on non-Cartesian meshes around reentrant
+   * corners, one may even get cycles in the constraints as one will in
+   * general constrain different components from the two sides. In that case,
+   * set a no-slip constraint on the reentrant vertex first.
    *
    *
    * <h4>Computing constraints in 3d</h4>
    *
-   * The situation is more
-   * complicated in 3d. Consider
-   * the following case where we
-   * want to compute the
-   * constraints at the marked
-   * vertex:
+   * The situation is more complicated in 3d. Consider the following case
+   * where we want to compute the constraints at the marked vertex:
    *
    * <p ALIGN="center">
    * @image html no_normal_flux_4.png
    * </p>
    *
-   * Here, we get four different
-   * normal vectors, one from each
-   * of the four faces that meet at
-   * the vertex. Even though they
-   * may form a complete set of
-   * vectors, it is not our intent
-   * to constrain all components of
-   * the vector field at this
-   * point. Rather, we would like
-   * to still allow tangential
-   * flow, where the term
-   * "tangential" has to be
-   * suitably defined.
+   * Here, we get four different normal vectors, one from each of the four
+   * faces that meet at the vertex. Even though they may form a complete set
+   * of vectors, it is not our intent to constrain all components of the
+   * vector field at this point. Rather, we would like to still allow
+   * tangential flow, where the term "tangential" has to be suitably defined.
    *
-   * In a case like this, the
-   * algorithm proceeds as follows:
-   * for each cell that has
-   * computed two tangential
-   * vectors at this point, we
-   * compute the unconstrained
-   * direction as the outer product
-   * of the two tangential vectors
-   * (if necessary multiplied by
-   * minus one). We then average
-   * these tangential
-   * vectors. Finally, we compute
-   * constraints for the two
-   * directions perpendicular to
-   * this averaged tangential
-   * direction.
+   * In a case like this, the algorithm proceeds as follows: for each cell
+   * that has computed two tangential vectors at this point, we compute the
+   * unconstrained direction as the outer product of the two tangential
+   * vectors (if necessary multiplied by minus one). We then average these
+   * tangential vectors. Finally, we compute constraints for the two
+   * directions perpendicular to this averaged tangential direction.
    *
-   * There are cases where one cell
-   * contributes two tangential
-   * directions and another one
-   * only one; for example, this
-   * would happen if both top and
-   * front faces of the left cell
-   * belong to the boundary
-   * selected whereas only the top
-   * face of the right cell belongs
-   * to it. This case is not
-   * currently implemented.
+   * There are cases where one cell contributes two tangential directions and
+   * another one only one; for example, this would happen if both top and
+   * front faces of the left cell belong to the boundary selected whereas only
+   * the top face of the right cell belongs to it. This case is not currently
+   * implemented.
    *
    *
    * <h4>Results</h4>
    *
-   * Because it makes for good
-   * pictures, here are two images
-   * of vector fields on a circle
-   * and on a sphere to which the
-   * constraints computed by this
+   * Because it makes for good pictures, here are two images of vector fields
+   * on a circle and on a sphere to which the constraints computed by this
    * function have been applied:
    *
    * <p ALIGN="center">
@@ -1705,16 +1578,10 @@ namespace VectorTools
    * @image html no_normal_flux_6.png
    * </p>
    *
-   * The vectors fields are not
-   * physically reasonable but the
-   * tangentiality constraint is
-   * clearly enforced. The fact
-   * that the vector fields are
-   * zero at some points on the
-   * boundary is an artifact of the
-   * way it is created, it is not
-   * constrained to be zero at
-   * these points.
+   * The vectors fields are not physically reasonable but the tangentiality
+   * constraint is clearly enforced. The fact that the vector fields are zero
+   * at some points on the boundary is an artifact of the way it is created,
+   * it is not constrained to be zero at these points.
    *
    * @ingroup constraints
    *
@@ -1727,6 +1594,22 @@ namespace VectorTools
                                       const std::set<types::boundary_id> &boundary_ids,
                                       ConstraintMatrix      &constraints,
                                       const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
+
+  /**
+   * Compute the constraints that correspond to boundary conditions of the
+   * form $\vec n \times \vec u=0$, i.e. flow normal to the boundary if $\vec
+   * u$ is a vector-valued quantity. This function constrains exactly those
+   * vector-valued components that are left unconstrained by
+   * compute_no_normal_flux_constraints, and leaves the one component
+   * unconstrained that is constrained by compute_no_normal_flux_constraints.
+   */
+  template <int dim, template <int, int> class DH, int spacedim>
+  void
+  compute_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
+                                   const unsigned int     first_vector_component,
+                                   const std::set<types::boundary_id> &boundary_ids,
+                                   ConstraintMatrix      &constraints,
+                                   const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
 
 
   //@}

@@ -675,6 +675,28 @@ namespace TrilinosWrappers
     operator [] (const size_type index) const;
 
     /**
+     * A collective get operation: instead
+     * of getting individual elements of a
+     * vector, this function allows to get
+     * a whole set of elements at once. The
+     * indices of the elements to be read
+     * are stated in the first argument,
+     * the corresponding values are returned in the
+     * second.
+     */
+    void extract_subvector_to (const std::vector<size_type> &indices,
+                               std::vector<TrilinosScalar> &values) const;
+
+    /**
+     * Just as the above, but with pointers.
+     * Useful in minimizing copying of data around.
+     */
+    template <typename ForwardIterator, typename OutputIterator>
+    void extract_subvector_to (ForwardIterator          indices_begin,
+                               const ForwardIterator    indices_end,
+                               OutputIterator           values_begin) const;
+
+    /**
      * Return the value of the vector
      * entry <i>i</i>. Note that this
      * function does only work
@@ -1312,6 +1334,30 @@ namespace TrilinosWrappers
   VectorBase::operator [] (const size_type index) const
   {
     return operator() (index);
+  }
+
+
+
+  inline
+  void VectorBase::extract_subvector_to (const std::vector<size_type> &indices,
+                                         std::vector<TrilinosScalar>  &values) const
+  {
+    for (size_type i = 0; i < indices.size(); ++i)
+      values[i] = operator()(indices[i]);
+  }
+
+
+
+  template <typename ForwardIterator, typename OutputIterator>
+  inline
+  void VectorBase::extract_subvector_to (ForwardIterator          indices_begin,
+                                         const ForwardIterator    indices_end,
+                                         OutputIterator           values_begin) const
+  {
+    while (indices_begin != indices_end) {
+      *values_begin = operator()(*indices_begin);
+      indices_begin++; values_begin++;
+    }
   }
 
 

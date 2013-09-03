@@ -40,5 +40,5 @@ higher order mappings; it is therefore clearly advantageous in this
 case to use a higher order mapping, not because it improves the order
 of convergence but just to reduce the constant before the convergence
 order. On the other hand, using a cubic mapping only improves the
-result further insignicantly, except for the case of very coarse
+result further insignificantly, except for the case of very coarse
 grids.

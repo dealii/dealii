@@ -21,7 +21,7 @@
  */
 
 
-// parallel geometric multi-grid. work in progress!
+// parallel geometric multigrid. work in progress!
 
 // As discussed in the introduction, most of
 // this program is copied almost verbatim
@@ -82,7 +82,7 @@
 #include <deal.II/lac/trilinos_precondition.h>
 
 // These, now, are the include necessary for
-// the multi-level methods. The first two
+// the multilevel methods. The first two
 // declare classes that allow us to enumerate
 // degrees of freedom not only on the finest
 // mesh level, but also on intermediate
@@ -387,7 +387,7 @@ namespace Step50
 
     // Now for the things that concern the
     // multigrid data structures. First, we
-    // resize the multi-level objects to hold
+    // resize the multilevel objects to hold
     // matrices and sparsity patterns for every
     // level. The coarse level is zero (this is
     // mandatory right now but may change in a
@@ -456,7 +456,7 @@ namespace Step50
   // @sect4{LaplaceProblem::assemble_system}
 
   // The following function assembles the
-  // linear system on the finesh level of the
+  // linear system on the finest level of the
   // mesh. It is almost exactly the same as in
   // step-6, with the exception that we don't
   // eliminate hanging nodes and boundary
@@ -540,7 +540,7 @@ namespace Step50
   // over all existing cells instead of just
   // the active ones, and the results must be
   // entered into the correct matrix. Note also
-  // that since we only do multi-level
+  // that since we only do multilevel
   // preconditioning, no right-hand side needs
   // to be assembled here.
   //
@@ -579,8 +579,8 @@ namespace Step50
     // level that are located on interfaces between adaptively refined
     // levels, and those that lie on the interface but also on the
     // exterior boundary of the domain. As in many other parts of the
-    // library, we do this by using boolean masks, i.e. vectors of
-    // booleans each element of which indicates whether the
+    // library, we do this by using Boolean masks, i.e. vectors of
+    // Booleans each element of which indicates whether the
     // corresponding degree of freedom index is an interface DoF or
     // not. The <code>MGConstraints</code> already computed the
     // information for us when we called initialize in
@@ -755,7 +755,7 @@ namespace Step50
     MGTransferPrebuilt<vector_t> mg_transfer(hanging_node_constraints, mg_constrained_dofs);
     // Now the prolongation matrix has to be built.  This matrix needs
     // to take the boundary values on each level into account and
-    // needs to know about the indices at the refinement egdes. The
+    // needs to know about the indices at the refinement edges. The
     // <code>MGConstraints</code> knows about that so pass it as an
     // argument.
     mg_transfer.build_matrices(mg_dof_handler);

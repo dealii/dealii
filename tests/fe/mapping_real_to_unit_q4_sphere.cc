@@ -24,6 +24,9 @@
 // initial guess for the inverse Q4 mapping by running an inverse Q1
 // mapping, and we failed to find a solution in the latter.
 //
+// todo: this test used to fail before r30450 but the new mapping support
+// points seem to fix this
+//
 // a redux of this test is in the mapping_real_to_unit_q4_sphere_*
 // tests
 

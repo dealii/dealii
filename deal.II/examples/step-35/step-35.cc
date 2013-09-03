@@ -994,7 +994,7 @@ namespace Step35
 
   // The implementation of a diffusion step. Note that the expensive operation
   // is the diffusion solve at the end of the function, which we have to do
-  // once for each velocity component. To accellerate things a bit, we allow
+  // once for each velocity component. To accelerate things a bit, we allow
   // to do this in %parallel, using the Threads::new_task function which makes
   // sure that the <code>dim</code> solves are all taken care of and are
   // scheduled to available processors: if your machine has more than one

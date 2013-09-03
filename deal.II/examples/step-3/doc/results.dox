@@ -120,7 +120,7 @@ suggestions:
   values for those faces that have zero boundary indicator, and leave
   those faces alone that have a different boundary indicator. What
   this then does is to impose Dirichlet boundary conditions on the
-  former, and homogenous Neumann conditions on the latter (i.e. zero
+  former, and homogeneous Neumann conditions on the latter (i.e. zero
   normal derivative of the solution, unless one adds additional terms
   to the right hand side of the variational equality that deal with
   potentially non-zero Neumann conditions). You will see this if you

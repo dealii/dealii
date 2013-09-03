@@ -928,6 +928,29 @@ public:
   reference operator[] (const size_type i);
 
   /**
+   * A collective get operation: instead
+   * of getting individual elements of a
+   * vector, this function allows to get
+   * a whole set of elements at once. The
+   * indices of the elements to be read
+   * are stated in the first argument,
+   * the corresponding values are returned in the
+   * second.
+   */
+  template <typename OtherNumber>
+  void extract_subvector_to (const std::vector<size_type> &indices,
+                             std::vector<OtherNumber> &values) const;
+
+  /**
+   * Just as the above, but with pointers.
+   * Useful in minimizing copying of data around.
+   */
+  template <typename ForwardIterator, typename OutputIterator>
+  void extract_subvector_to (ForwardIterator          indices_begin,
+                             const ForwardIterator    indices_end,
+                             OutputIterator           values_begin) const;
+
+  /**
    * Copy operator: fill all components of
    * the vector with the given scalar
    * value.
@@ -2522,6 +2545,33 @@ typename BlockVectorBase<VectorType>::reference
 BlockVectorBase<VectorType>::operator[] (const size_type i)
 {
   return operator()(i);
+}
+
+
+
+template <typename VectorType>
+template <typename OtherNumber>
+inline
+void BlockVectorBase<VectorType>::extract_subvector_to (const std::vector<size_type> &indices,
+                                           std::vector<OtherNumber> &values) const
+{
+  for (size_type i = 0; i < indices.size(); ++i)
+    values[i] = operator()(indices[i]);
+}
+
+
+
+template <typename VectorType>
+template <typename ForwardIterator, typename OutputIterator>
+inline
+void BlockVectorBase<VectorType>::extract_subvector_to (ForwardIterator          indices_begin,
+                                                        const ForwardIterator    indices_end,
+                                                        OutputIterator           values_begin) const
+{
+  while (indices_begin != indices_end) {
+    *values_begin = operator()(*indices_begin);
+    indices_begin++; values_begin++;
+  }
 }
 
 #endif // DOXYGEN

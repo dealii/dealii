@@ -474,6 +474,28 @@ namespace PETScWrappers
               const std::vector<PetscScalar>  &values);
 
     /**
+     * A collective get operation: instead
+     * of getting individual elements of a
+     * vector, this function allows to get
+     * a whole set of elements at once. The
+     * indices of the elements to be read
+     * are stated in the first argument,
+     * the corresponding values are returned in the
+     * second.
+     */
+    void extract_subvector_to (const std::vector<size_type> &indices,
+                               std::vector<PetscScalar> &values) const;
+
+    /**
+     * Just as the above, but with pointers.
+     * Useful in minimizing copying of data around.
+     */
+    template <typename ForwardIterator, typename OutputIterator>
+    void extract_subvector_to (const ForwardIterator    indices_begin,
+                               const ForwardIterator    indices_end,
+                               OutputIterator           values_begin) const;
+
+    /**
      * A collective add operation: This
      * function adds a whole set of values
      * stored in @p values to the vector
@@ -1220,6 +1242,119 @@ namespace PETScWrappers
     static MPI_Comm comm;
     PetscObjectGetComm((PetscObject)vector, &comm);
     return comm;
+  }
+
+  inline
+  void VectorBase::extract_subvector_to (const std::vector<size_type> &indices,
+                                         std::vector<PetscScalar> &values) const
+  {
+    extract_subvector_to(&(indices[0]), &(indices[0]) + indices.size(),  &(values[0]));
+  }
+
+  template <typename ForwardIterator, typename OutputIterator>
+  inline
+  void VectorBase::extract_subvector_to (const ForwardIterator    indices_begin,
+                                         const ForwardIterator    indices_end,
+                                         OutputIterator           values_begin) const
+  {
+    const PetscInt n_idx = static_cast<PetscInt>(indices_end - indices_begin);
+    if (n_idx == 0)
+      return;
+
+    // if we are dealing
+    // with a parallel vector
+    if (ghosted )
+    {
+
+      int ierr;
+
+      // there is the possibility
+      // that the vector has
+      // ghost elements. in that
+      // case, we first need to
+      // figure out which
+      // elements we own locally,
+      // then get a pointer to
+      // the elements that are
+      // stored here (both the
+      // ones we own as well as
+      // the ghost elements). in
+      // this array, the locally
+      // owned elements come
+      // first followed by the
+      // ghost elements whose
+      // position we can get from
+      // an index set
+      PetscInt begin, end, i;
+      ierr = VecGetOwnershipRange (vector, &begin, &end);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      Vec locally_stored_elements = PETSC_NULL;
+      ierr = VecGhostGetLocalForm(vector, &locally_stored_elements);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      PetscInt lsize;
+      ierr = VecGetSize(locally_stored_elements, &lsize);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      PetscScalar *ptr;
+      ierr = VecGetArray(locally_stored_elements, &ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      for (i = 0; i < n_idx; i++) {
+        const unsigned int index = *(indices_begin+i);
+        if ( index>=static_cast<unsigned int>(begin)
+            && index<static_cast<unsigned int>(end) )
+        {
+          //local entry
+          *(values_begin+i) = *(ptr+index-begin);
+        }
+        else
+        {
+          //ghost entry
+          const unsigned int ghostidx
+          = ghost_indices.index_within_set(index);
+
+          Assert(ghostidx+end-begin<(unsigned int)lsize, ExcInternalError());
+          *(values_begin+i) = *(ptr+ghostidx+end-begin);
+        }
+      }
+
+      ierr = VecRestoreArray(locally_stored_elements, &ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      ierr = VecGhostRestoreLocalForm(vector, &locally_stored_elements);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    }
+    // if the vector is local or the
+    // caller, then simply access the
+    // element we are interested in
+    else
+    {
+      int ierr;
+
+      PetscInt begin, end;
+      ierr = VecGetOwnershipRange (vector, &begin, &end);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      PetscScalar *ptr;
+      ierr = VecGetArray(vector, &ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      for (PetscInt i = 0; i < n_idx; i++) {
+        const unsigned int index = *(indices_begin+i);
+
+        Assert(index>=static_cast<unsigned int>(begin)
+            && index<static_cast<unsigned int>(end), ExcInternalError());
+
+        *(values_begin+i) = *(ptr+index-begin);
+      }
+
+      ierr = VecRestoreArray(vector, &ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    }
   }
 
 #endif // DOXYGEN

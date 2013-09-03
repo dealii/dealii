@@ -1084,7 +1084,7 @@ namespace GridTools
    *
    * This function tries to match all faces belonging to the first
    * boundary with faces belonging to the second boundary with the help
-   * of orthogonal_equality.
+   * of orthogonal_equality().
    *
    * The bitset that is returned together with the second face encodes the
    * _relative_ orientation of the first face with respect to the second
@@ -1103,13 +1103,14 @@ namespace GridTools
                                const typename identity<FaceIterator>::type &end,
                                const types::boundary_id                    b_id1,
                                const types::boundary_id                    b_id2,
-                               int                                         direction,
+                               const int                                   direction,
                                const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
 
 
   /**
    * Same function as above, but accepts a Triangulation or DoFHandler
-   * object @p dof_handler instead of an explicit face iterator range.
+   * object @p container (a container is a collection of objects, here a
+   * collection of cells) instead of an explicit face iterator range.
    *
    * This function will collect periodic face pairs on the highest (i.e.
    * coarsest) mesh level.
@@ -1118,10 +1119,10 @@ namespace GridTools
    */
   template<typename DH>
   std::map<typename DH::face_iterator, std::pair<typename DH::face_iterator, std::bitset<3> > >
-  collect_periodic_face_pairs (const DH                 &dof_handler, /*TODO: Name*/
+  collect_periodic_face_pairs (const DH                 &container,
                                const types::boundary_id b_id1,
                                const types::boundary_id b_id2,
-                               int                      direction,
+                               const int                direction,
                                const dealii::Tensor<1,DH::space_dimension> &offset);
 
 
@@ -1149,7 +1150,7 @@ namespace GridTools
   std::map<typename DH::face_iterator, typename DH::face_iterator>
   collect_periodic_face_pairs (const DH                 &dof_handler, /*TODO: Name*/
                                const types::boundary_id b_id,
-                               int                      direction,
+                               const int                direction,
                                const dealii::Tensor<1,DH::space_dimension> &offset);
 
 

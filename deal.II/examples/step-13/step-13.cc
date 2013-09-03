@@ -800,7 +800,7 @@ namespace Step13
     // The second of this pair of functions takes a range of cell iterators,
     // and assembles the system matrix on this part of the domain. Since it's
     // actions have all been explained in previous programs, we do not comment
-    // on it any more, except for one pointe below.
+    // on it any more, except for one point below.
     template <int dim>
     void
     Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
@@ -861,7 +861,7 @@ namespace Step13
           // will always be unlocked when we exit this part of the program,
           // whether the operation completed successfully or not, whether the
           // exit path was something we implemented willfully or whether the
-          // function was exited by an exception that we did not forsee.
+          // function was exited by an exception that we did not foresee.
           //
           // deal.II implements the scoped locking pattern in the
           // Treads::Mutex::ScopedLock class: it takes the mutex in the
@@ -1120,7 +1120,7 @@ namespace Step13
     // @sect4{Local refinement by the Kelly error indicator}
 
     // The second class implementing refinement strategies uses the Kelly
-    // refinemet indicator used in various example programs before. Since this
+    // refinement indicator used in various example programs before. Since this
     // indicator is already implemented in a class of its own inside the
     // deal.II library, there is not much t do here except cal the function
     // computing the indicator, then using it to select a number of cells for

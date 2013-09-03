@@ -23,40 +23,20 @@ namespace internal
 {
   namespace hp
   {
-
+    template <int dim>
     std::size_t
-    DoFLevel<1>::memory_consumption () const
+    DoFLevel<dim>::memory_consumption () const
     {
-      return (DoFLevel<0>::memory_consumption() +
-              MemoryConsumption::memory_consumption (dof_object));
+      return (MemoryConsumption::memory_consumption (active_fe_indices) +
+	      MemoryConsumption::memory_consumption (dofs) +
+              MemoryConsumption::memory_consumption (dof_offsets));
     }
 
 
-
-    std::size_t
-    DoFLevel<2>::memory_consumption () const
-    {
-      return (DoFLevel<0>::memory_consumption () +
-              MemoryConsumption::memory_consumption (dof_object));
-    }
-
-
-
-    std::size_t
-    DoFLevel<3>::memory_consumption () const
-    {
-      return (DoFLevel<0>::memory_consumption () +
-              MemoryConsumption::memory_consumption (dof_object));
-    }
-
-
-
-    std::size_t
-    DoFLevel<0>::memory_consumption () const
-    {
-      return MemoryConsumption::memory_consumption (active_fe_indices);
-    }
-
+    // explicit instantiations
+    template std::size_t DoFLevel<1>::memory_consumption () const;
+    template std::size_t DoFLevel<2>::memory_consumption () const;
+    template std::size_t DoFLevel<3>::memory_consumption () const;
   }
 }
 

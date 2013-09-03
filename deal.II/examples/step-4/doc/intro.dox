@@ -20,7 +20,7 @@ a look at the code below - there are almost no distinctions between 2d
 and 3d!). We would have to write the same function twice, once
 working on <code>Triangulation2d</code> and once working with a
 <code>Triangulation3d</code>. This is an unnecessary obstacle in
-programming and leads to a nuisance to keep the two function in synch
+programming and leads to a nuisance to keep the two function in sync
 (at best) or difficult to find errors if the two versions get out of
 sync (at worst; this would probably the more common case).
 

@@ -192,7 +192,7 @@ affects some of the most fundamental assumptions. Consequently, some of the
 usual code found in application programs will need modifications to exploit
 the features of meshes which were created using anisotropic
 refinement. For those interested in how deal.II evolved, it may be of
-interest that the losening of such invariants required some
+interest that the loosening of such invariants required some
 incompatible changes. For example, the library used to have a member
 GeometryInfo<dim>::children_per_cell that specified how many children
 a cell has once it is refined. For isotropic refinement, this number
@@ -202,7 +202,7 @@ does not exist, as is can be either two or four in 2D and two, four or eight in
 consequently been removed. It has now been replaced by
 GeometryInfo<dim>::max_children_per_cell which specifies the
 <i>maximum</i> number of children a cell can have. How many children a
-refined cell has was previously available as static informtion, but
+refined cell has was previously available as static information, but
 now it depends on the actual refinement state of a cell and can be
 retrieved using the function call <code>cell-@>n_children()</code>,
 a call that works equally well for both isotropic and anisotropic

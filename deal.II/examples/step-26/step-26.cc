@@ -330,7 +330,7 @@ namespace Step26
     // SolutionTransfer class and we have to prepare the solution vectors that
     // should be transferred to the new grid (we will lose the old grid once
     // we have done the refinement so the transfer has to happen concurrently
-    // with refinement). What we definetely need are the current and the old
+    // with refinement). What we definitely need are the current and the old
     // temperature (BDF-2 time stepping requires two old solutions). Since the
     // SolutionTransfer objects only support to transfer one object per dof
     // handler, we need to collect the two temperature solutions in one data

@@ -60,6 +60,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 
+#include <deal.II/base/std_cxx1x/array.h>
 #include <numeric>
 #include <algorithm>
 #include <vector>
@@ -3183,19 +3184,10 @@ namespace VectorTools
                   }
             }
 
-          // Create the system
-          // matrix by
-          // multiplying the
-          // assembling matrix
-          // with its transposed
-          // and the right
-          // hand side vector
-          // by mutliplying
-          // the assembling
-          // matrix with the
-          // assembling vector.
-          // Invert the system
-          // matrix.
+          // Create the system matrix by multiplying the assembling matrix
+          // with its transposed and the right hand side vector by mutliplying
+          // the assembling matrix with the assembling vector.  Invert the
+          // system matrix.
           assembling_matrix.mTmult (cell_matrix, assembling_matrix);
           cell_matrix_inv.invert (cell_matrix);
           assembling_matrix.vmult (cell_rhs, assembling_vector);
@@ -3225,12 +3217,8 @@ namespace VectorTools
                 }
           }
 
-          // Now we do the
-          // same as above
-          // with the vertical
-          // shape functions
-          // instead of the
-          // horizontal ones.
+          // Now we do the same as above with the vertical shape functions
+          // instead of the horizontal ones.
           for (unsigned int q_point = 0;
                q_point < fe_values.n_quadrature_points; ++q_point)
             {
@@ -3335,32 +3323,18 @@ namespace VectorTools
                                            ConstraintMatrix &constraints,
                                            const Mapping<dim> &mapping)
   {
-    // Projection-based interpolation
-    // is performed in two (in 2D)
-    // respectively three (in 3D)
-    // steps. First the tangential
-    // component of the function is
-    // interpolated on each edge.  This
-    // gives the values for the degrees
-    // of freedom corresponding to the
-    // edge shape functions. Now we are
-    // done for 2D, but in 3D we possibly
-    // have also degrees of freedom, which
-    // are located in the interior of
-    // the faces. Therefore we compute
-    // the residual of the function
-    // describing the boundary values
-    // and the interpolated part, which
-    // we have computed in the last
-    // step. On the faces there are
-    // two kinds of shape functions,
-    // the horizontal and the vertical
-    // ones. Thus we have to solve two
-    // linear systems of equations of
-    // size <tt>degree * (degree +
-    // 1)<tt> to obtain the values for
-    // the  corresponding degrees of
-    // freedom.
+    // Projection-based interpolation is performed in two (in 2D) respectively
+    // three (in 3D) steps. First the tangential component of the function is
+    // interpolated on each edge.  This gives the values for the degrees of
+    // freedom corresponding to the edge shape functions. Now we are done for
+    // 2D, but in 3D we possibly have also degrees of freedom, which are
+    // located in the interior of the faces. Therefore we compute the residual
+    // of the function describing the boundary values and the interpolated
+    // part, which we have computed in the last step. On the faces there are
+    // two kinds of shape functions, the horizontal and the vertical
+    // ones. Thus we have to solve two linear systems of equations of size
+    // <tt>degree * (degree + 1)<tt> to obtain the values for the
+    // corresponding degrees of freedom.
     const unsigned int superdegree = dof_handler.get_fe ().degree;
     const QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
     const unsigned int dofs_per_face = dof_handler.get_fe ().dofs_per_face;
@@ -3603,19 +3577,12 @@ namespace VectorTools
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face (face)->boundary_indicator () == boundary_component)
                 {
-                  // if the FE is a
-                  // FE_Nothing object
-                  // there is no work to
-                  // do
+                  // if the FE is a FE_Nothing object there is no work to do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
                     return;
 
-                  // This is only
-                  // implemented, if the
-                  // FE is a Nedelec
-                  // element. If the FE is
-                  // a FESystem we cannot
-                  // check this.
+                  // This is only implemented, if the FE is a Nedelec
+                  // element. If the FE is a FESystem we cannot check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
                     {
                       typedef FiniteElement<dim> FEL;
@@ -3689,19 +3656,12 @@ namespace VectorTools
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face (face)->boundary_indicator () == boundary_component)
                 {
-                  // if the FE is a
-                  // FE_Nothing object
-                  // there is no work to
-                  // do
+                  // if the FE is a FE_Nothing object there is no work to do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
                     return;
 
-                  // This is only
-                  // implemented, if the
-                  // FE is a Nedelec
-                  // element. If the FE is
-                  // a FESystem we cannot
-                  // check this.
+                  // This is only implemented, if the FE is a Nedelec
+                  // element. If the FE is a FESystem we cannot check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
                     {
                       typedef FiniteElement<dim> FEL;
@@ -3731,11 +3691,8 @@ namespace VectorTools
                                                first_vector_component,
                                                dof_values, dofs_processed);
 
-                  // If there are higher
-                  // order shape
-                  // functions, there is
-                  // still some work
-                  // left.
+                  // If there are higher order shape functions, there is still
+                  // some work left.
                   if (degree > 0)
                     internals
                     ::compute_face_projection_curl_conforming (cell, face, fe_face_values,
@@ -3772,10 +3729,8 @@ namespace VectorTools
 
   namespace internals
   {
-    // This function computes the
-    // projection of the boundary
-    // function on the boundary
-    // in 2d.
+    // This function computes the projection of the boundary function on the
+    // boundary in 2d.
     template <typename cell_iterator>
     void
     compute_face_projection_div_conforming (const cell_iterator &cell,
@@ -3786,13 +3741,9 @@ namespace VectorTools
                                             const std::vector<DerivativeForm<1,2,2> > &jacobians,
                                             ConstraintMatrix &constraints)
     {
-      // Compute the intergral over
-      // the product of the normal
-      // components of the boundary
-      // function times the normal
-      // components of the shape
-      // functions supported on the
-      // boundary.
+      // Compute the intergral over the product of the normal components of
+      // the boundary function times the normal components of the shape
+      // functions supported on the boundary.
       const FEValuesExtractors::Vector vec (first_vector_component);
       const FiniteElement<2> &fe = cell->get_fe ();
       const std::vector<Point<2> > &normals = fe_values.get_normal_vectors ();
@@ -3802,9 +3753,7 @@ namespace VectorTools
       values (fe_values.n_quadrature_points, Vector<double> (2));
       Vector<double> dof_values (fe.dofs_per_face);
 
-      // Get the values of the
-      // boundary function at the
-      // quadrature points.
+      // Get the values of the boundary function at the quadrature points.
       {
         const std::vector<Point<2> > &
         quadrature_points = fe_values.get_quadrature_points ();
@@ -3834,10 +3783,8 @@ namespace VectorTools
 
       cell->face (face)->get_dof_indices (face_dof_indices, cell->active_fe_index ());
 
-      // Copy the computed values
-      // in the ConstraintMatrix only,
-      // if the degree of freedom is
-      // not already constrained.
+      // Copy the computed values in the ConstraintMatrix only, if the degree
+      // of freedom is not already constrained.
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
         if (!(constraints.is_constrained (face_dof_indices[i])))
           {
@@ -3848,9 +3795,7 @@ namespace VectorTools
           }
     }
 
-    // dummy implementation of above
-    // function for all other
-    // dimensions
+    // dummy implementation of above function for all other dimensions
     template<int dim, typename cell_iterator>
     void
     compute_face_projection_div_conforming (const cell_iterator &,
@@ -3864,10 +3809,8 @@ namespace VectorTools
       Assert (false, ExcNotImplemented ());
     }
 
-    // This function computes the
-    // projection of the boundary
-    // function on the boundary
-    // in 3d.
+    // This function computes the projection of the boundary function on the
+    // boundary in 3d.
     template<typename cell_iterator>
     void
     compute_face_projection_div_conforming (const cell_iterator &cell,
@@ -3879,13 +3822,9 @@ namespace VectorTools
                                             std::vector<double> &dof_values,
                                             std::vector<types::global_dof_index> &projected_dofs)
     {
-      // Compute the intergral over
-      // the product of the normal
-      // components of the boundary
-      // function times the normal
-      // components of the shape
-      // functions supported on the
-      // boundary.
+      // Compute the intergral over the product of the normal components of
+      // the boundary function times the normal components of the shape
+      // functions supported on the boundary.
       const FEValuesExtractors::Vector vec (first_vector_component);
       const FiniteElement<3> &fe = cell->get_fe ();
       const std::vector<Point<3> > &normals = fe_values.get_normal_vectors ();
@@ -4707,6 +4646,161 @@ namespace VectorTools
           }
           }
       }
+  }
+
+
+
+  namespace
+  {
+    template <int dim>
+    struct PointComparator
+    {
+      bool operator ()(const std_cxx1x::array<types::global_dof_index,dim> &p1,
+                       const std_cxx1x::array<types::global_dof_index,dim> &p2)
+      {
+        for (unsigned int d=0; d<dim; ++d)
+          if (p1[d] < p2[d])
+            return true;
+        return false;
+      }
+    };
+  }
+
+
+
+  template <int dim, template <int, int> class DH, int spacedim>
+  void
+  compute_normal_flux_constraints (const DH<dim,spacedim>&dof_handler,
+                                   const unsigned int     first_vector_component,
+                                   const std::set<types::boundary_id> &boundary_ids,
+                                   ConstraintMatrix      &constraints,
+                                   const Mapping<dim, spacedim> &mapping)
+  {
+    ConstraintMatrix no_normal_flux_constraints(constraints.get_local_lines());
+    compute_no_normal_flux_constraints (dof_handler,
+                                        first_vector_component,
+                                        boundary_ids,
+                                        no_normal_flux_constraints,
+                                        mapping);
+
+    // Extract a list that collects all vector components that belong to the
+    // same node (scalar basis function). When creating that list, we use an
+    // array of dim components that stores the global degree of freedom.
+    std::set<std_cxx1x::array<types::global_dof_index,dim>, PointComparator<dim> > vector_dofs;
+    std::vector<types::global_dof_index> face_dofs;
+
+    std::vector<std_cxx1x::array<types::global_dof_index,dim> > cell_vector_dofs;
+    for (typename DH<dim,spacedim>::active_cell_iterator cell =
+           dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
+      if (!cell->is_artificial())
+        for (unsigned int face_no=0; face_no < GeometryInfo<dim>::faces_per_cell;
+             ++face_no)
+          if (boundary_ids.find(cell->face(face_no)->boundary_indicator())
+              != boundary_ids.end())
+            {
+              const FiniteElement<dim> &fe = cell->get_fe();
+              typename DH<dim,spacedim>::face_iterator face=cell->face(face_no);
+
+              // get the indices of the dofs on this cell...
+              face_dofs.resize (fe.dofs_per_face);
+              face->get_dof_indices (face_dofs, cell->active_fe_index());
+
+              unsigned int n_scalar_indices = 0;
+              cell_vector_dofs.resize(fe.dofs_per_face);
+              for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+                if (fe.face_system_to_component_index(i).first >= first_vector_component &&
+                    fe.face_system_to_component_index(i).first < first_vector_component + dim)
+                  {
+                    n_scalar_indices =
+                      std::max(n_scalar_indices,
+                               fe.face_system_to_component_index(i).second+1);
+                    cell_vector_dofs[fe.face_system_to_component_index(i).second]
+                      [fe.face_system_to_component_index(i).first-first_vector_component]
+                      = face_dofs[i];
+                  }
+
+              // now we identified the vector indices on the cell, so next
+              // insert them into the set (it would be expensive to directly
+              // insert incomplete points into the set)
+              for (unsigned int i=0; i<n_scalar_indices; ++i)
+                vector_dofs.insert(cell_vector_dofs[i]);
+            }
+
+    // iterate over the list of all vector components we found and see if we
+    // can find constrained ones
+    unsigned int n_total_constraints_found = 0;
+    for (typename std::set<std_cxx1x::array<types::global_dof_index,dim>,
+           PointComparator<dim> >::const_iterator it=vector_dofs.begin(); 
+           it!=vector_dofs.end(); ++it)
+      {
+        unsigned int n_constraints = 0;
+        bool is_constrained[dim];
+        for (unsigned int d=0; d<dim; ++d)
+          if (no_normal_flux_constraints.is_constrained((*it)[d]))
+            {
+              is_constrained[d] = true;
+              ++n_constraints;
+              ++n_total_constraints_found;
+            }
+          else
+            is_constrained[d] = false;
+        if (n_constraints > 0)
+          {
+            // if more than one no-flux constraint is present, we need to
+            // constrain all vector degrees of freedom (we are in a corner
+            // where several faces meet and to get a continuous FE solution we
+            // need to set all conditions to zero).
+            if (n_constraints > 1)
+              {
+                for (unsigned int d=0; d<dim; ++d)
+                  constraints.add_line((*it)[d]);
+                continue;
+              }
+
+            // ok, this is a no-flux constraint, so get the index of the dof
+            // that is currently constrained and make it unconstrained. The
+            // constraint indices will get the normal that contain the other
+            // indices.
+            Tensor<1,dim> normal;
+            unsigned constrained_index = -1;
+            for (unsigned int d=0; d<dim; ++d)
+              if (is_constrained[d])
+                {
+                  constrained_index = d;
+                  normal[d] = 1.;
+                }
+            AssertIndexRange(constrained_index, dim);
+            const std::vector<std::pair<types::global_dof_index, double> >* constrained
+              = no_normal_flux_constraints.get_constraint_entries((*it)[constrained_index]);
+            // find components to which this index is constrained to
+            Assert(constrained != 0, ExcInternalError());
+            Assert(constrained->size() < dim, ExcInternalError());
+            for (unsigned int c=0; c<constrained->size(); ++c)
+              {
+                int index = -1;
+                for (unsigned int d=0; d<dim; ++d)
+                  if ((*constrained)[c].first == (*it)[d])
+                    index = d;
+                Assert (index != -1, ExcInternalError());
+                normal[index] = (*constrained)[c].second;
+              }
+            for (unsigned int d=0; d<dim; ++d)
+              {
+                if (is_constrained[d])
+                  continue;
+                const unsigned int new_index = (*it)[d];
+                if (!constraints.is_constrained(new_index))
+                  {
+                    constraints.add_line(new_index);
+                    if (std::abs(normal[d]) > 1e-13)
+                      constraints.add_entry(new_index, (*it)[constrained_index],
+                                            -normal[d]);
+                  }
+              }
+          }
+      }
+    AssertDimension(n_total_constraints_found,
+                    no_normal_flux_constraints.n_constraints());
   }
 
 

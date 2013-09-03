@@ -302,7 +302,7 @@ namespace Step34
 
   // @sect4{BEMProblem::BEMProblem and BEMProblem::read_parameters}
 
-  // The constructor initializes the variuous object in much the same way as
+  // The constructor initializes the various object in much the same way as
   // done in the finite element programs such as step-4 or step-6. The only
   // new ingredient here is the ParsedFunction object, which needs, at
   // construction time, the specification of the number of components.
@@ -609,7 +609,7 @@ namespace Step34
         // the current cell, a deviation from the usual finite element
         // integrals). The integral that we need to perform is singular if one
         // of the local degrees of freedom is the same as the support point
-        // $i$. A the beginning of the loop we therefore check wether this is
+        // $i$. A the beginning of the loop we therefore check whether this is
         // the case, and we store which one is the singular index:
         for (unsigned int i=0; i<dh.n_dofs() ; ++i)
           {
@@ -800,7 +800,7 @@ namespace Step34
 
   // Singular integration requires a careful selection of the quadrature
   // rules. In particular the deal.II library provides quadrature rules which
-  // are taylored for logarithmic singularities (QGaussLog, QGaussLogR), as
+  // are tailored for logarithmic singularities (QGaussLog, QGaussLogR), as
   // well as for 1/R singularities (QGaussOneOverR).
   //
   // Singular integration is typically obtained by constructing weighted
@@ -843,7 +843,7 @@ namespace Step34
   // consideration also the second part of the integral.
   //
   // A similar reasoning should be done in the three dimensional case, since
-  // the singular quadrature is taylored on the inverse of the radius $r$ in
+  // the singular quadrature is tailored on the inverse of the radius $r$ in
   // the reference cell, while our singular function lives in real space,
   // however in the three dimensional case everything is simpler because the
   // singularity scales linearly with the determinant of the

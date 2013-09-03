@@ -96,7 +96,7 @@ boundary condition will yield partial reflections, i.e. only parts of the wave
 will pass through the boundary as if it wasn't here whereas the remaining
 fraction of the wave will be reflected back into the domain.
 
-If we are willing to accept this as a suffient approximation to an absorbing boundary we finally arrive at the following problem for $u$: 
+If we are willing to accept this as a sufficient approximation to an absorbing boundary we finally arrive at the following problem for $u$: 
 @f{eqnarray*}
 -\omega^2 u - c^2\Delta u &=& 0, \qquad x\in\Omega,\\
 c (n\cdot\nabla u) + i\,\omega\,u &=&0, \qquad x\in\Gamma_2,\\

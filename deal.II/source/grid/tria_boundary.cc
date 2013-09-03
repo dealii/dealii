@@ -247,6 +247,33 @@ project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
 }
 
 
+
+template <int dim, int spacedim>
+const std::vector<Point<1> > &
+Boundary<dim,spacedim>::
+get_line_support_points (const unsigned int n_intermediate_points) const
+{
+  if (points.size() <= n_intermediate_points ||
+      points[n_intermediate_points].get() == 0)
+    {
+      Threads::Mutex::ScopedLock lock(mutex);
+      if (points.size() <= n_intermediate_points)
+        points.resize(n_intermediate_points+1);
+
+      // another thread might have created points in the meantime
+      if (points[n_intermediate_points].get() == 0)
+        {
+          std_cxx1x::shared_ptr<QGaussLobatto<1> >
+            quadrature (new QGaussLobatto<1>(n_intermediate_points+2));
+          points[n_intermediate_points] = quadrature;
+        }
+    }
+  return points[n_intermediate_points]->get_points();
+}
+
+
+
+
 /* -------------------------- StraightBoundary --------------------- */
 
 
@@ -394,15 +421,18 @@ get_intermediate_points_on_line (const Triangulation<1, 2>::line_iterator &line,
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
 
-  const double dx=1./(n+1);
-  double x=dx;
-
+  // Use interior points of QGaussLobatto quadrature formula support points
+  // for consistency with MappingQ
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(n);
   const Point<spacedim> vertices[2] = { line->vertex(0),
                                         line->vertex(1)
                                       };
 
-  for (unsigned int i=0; i<n; ++i, x+=dx)
-    points[i] = (1-x)*vertices[0] + x*vertices[1];
+  for (unsigned int i=0; i<n; ++i)
+    {
+      const double x = line_points[i+1][0];
+      points[i] = (1-x)*vertices[0] + x*vertices[1];
+    }
 }
 
 
@@ -417,15 +447,19 @@ get_intermediate_points_on_line (const typename Triangulation<dim, spacedim>::li
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
 
-  const double dx=1./(n+1);
-  double x=dx;
+  // Use interior points of QGaussLobatto quadrature formula support points
+  // for consistency with MappingQ
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(n);
 
   const Point<spacedim> vertices[2] = { line->vertex(0),
                                         line->vertex(1)
                                       };
 
-  for (unsigned int i=0; i<n; ++i, x+=dx)
-    points[i] = (1-x)*vertices[0] + x*vertices[1];
+  for (unsigned int i=0; i<n; ++i)
+    {
+      const double x = line_points[1+i][0];
+      points[i] = (1-x)*vertices[0] + x*vertices[1];
+    }
 }
 
 
@@ -455,8 +489,7 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
   // is n a square number
   Assert(m*m==n, ExcInternalError());
 
-  const double ds=1./(m+1);
-  double y=ds;
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(m);
 
   const Point<spacedim> vertices[4] = { quad->vertex(0),
                                         quad->vertex(1),
@@ -464,14 +497,17 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
                                         quad->vertex(3)
                                       };
 
-  for (unsigned int i=0; i<m; ++i, y+=ds)
+  for (unsigned int i=0; i<m; ++i)
     {
-      double x=ds;
-      for (unsigned int j=0; j<m; ++j, x+=ds)
-        points[i*m+j]=((1-x) * vertices[0] +
-                       x     * vertices[1]) * (1-y) +
-                      ((1-x) * vertices[2] +
-                       x     * vertices[3]) * y;
+      const double y=line_points[1+i][0];
+      for (unsigned int j=0; j<m; ++j)
+        {
+          const double x=line_points[1+j][0];
+          points[i*m+j]=((1-x) * vertices[0] +
+                         x     * vertices[1]) * (1-y) +
+                        ((1-x) * vertices[2] +
+                         x     * vertices[3]) * y;
+        }
     }
 }
 
@@ -490,8 +526,7 @@ get_intermediate_points_on_quad (const Triangulation<2,3>::quad_iterator &quad,
   // is n a square number
   Assert(m*m==n, ExcInternalError());
 
-  const double ds=1./(m+1);
-  double y=ds;
+  const std::vector<Point<1> > &line_points = this->get_line_support_points(m);
 
   const Point<spacedim> vertices[4] = { quad->vertex(0),
                                         quad->vertex(1),
@@ -499,14 +534,17 @@ get_intermediate_points_on_quad (const Triangulation<2,3>::quad_iterator &quad,
                                         quad->vertex(3)
                                       };
 
-  for (unsigned int i=0; i<m; ++i, y+=ds)
+  for (unsigned int i=0; i<m; ++i)
     {
-      double x=ds;
-      for (unsigned int j=0; j<m; ++j, x+=ds)
-        points[i*m+j]=((1-x) * vertices[0] +
-                       x     * vertices[1]) * (1-y) +
-                      ((1-x) * vertices[2] +
-                       x     * vertices[3]) * y;
+      const double y=line_points[1+i][0];
+      for (unsigned int j=0; j<m; ++j)
+        {
+          const double x=line_points[1+j][0];
+          points[i*m+j]=((1-x) * vertices[0] +
+                         x     * vertices[1]) * (1-y) +
+                        ((1-x) * vertices[2] +
+                         x     * vertices[3]) * y;
+        }
     }
 }
 

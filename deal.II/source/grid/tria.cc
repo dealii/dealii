@@ -11081,7 +11081,8 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::active_cell_iterator
 Triangulation<dim, spacedim>::end_active (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
+  Assert (level<n_global_levels() || level < levels.size(), ExcInvalidLevel(level));
+  return (level >= levels.size()-1 ?
           active_cell_iterator(end()) :
           begin_active (level+1));
 }

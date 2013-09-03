@@ -125,7 +125,7 @@ the <code>indices_local_to_global</code> variable contains the global
 indices of the DoFs that it is constrained to. Then, we have another
 variable <code>constraint_indicator</code> at hand that holds, for
 each cell, the local indices of DoFs that are constrained as well as
-the identifer of the type of constraint. Actually, you will not see
+the identifier of the type of constraint. Actually, you will not see
 these data structures in the example program since the class
 <code>FEEvaluationGL</code> takes care of the constraints without user
 interaction.

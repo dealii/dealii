@@ -160,7 +160,7 @@ and the effort to solve a banded linear system using LU decomposition
 is ${\cal O}(BN)$. This also explains why the program does run in 3d
 as well (after changing the dimension on the
 <code>UltrasoundProblem</code> object), but scales very badly and
-takes extraordinate patience before it finishes solving the linear
+takes extraordinary patience before it finishes solving the linear
 system on a mesh with appreciable resolution, even though all the
 other parts of the program scale very nicely.
 

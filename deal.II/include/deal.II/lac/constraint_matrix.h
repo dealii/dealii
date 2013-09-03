@@ -234,6 +234,14 @@ public:
   bool can_store_line (const size_type line_index) const;
 
   /**
+   * Returns the index set describing locally relevant lines if any are
+   * present. Note that if no local lines were given, this represents an empty
+   * IndexSet, whereas otherwise it contains the global problem size and the
+   * local range.
+   */
+  const IndexSet & get_local_lines() const;
+
+  /**
    * This function copies the content of @p
    * constraints_in with DoFs that are
    * element of the IndexSet @p
@@ -2046,6 +2054,15 @@ inline bool
 ConstraintMatrix::can_store_line (size_type line_index) const
 {
   return !local_lines.size() || local_lines.is_element(line_index);
+}
+
+
+
+inline
+const IndexSet &
+ConstraintMatrix::get_local_lines () const
+{
+  return local_lines;
 }
 
 

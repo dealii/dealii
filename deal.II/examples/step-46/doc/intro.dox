@@ -290,7 +290,7 @@ points:
 - Implementing the bilinear form, and in particular dealing with the
   interface term, both in the matrix and the sparsity pattern.
 - Implementing Dirichlet boundary conditions on the external and
-  internal parts of the boundaryies
+  internal parts of the boundaries
   $\partial\Omega_f,\partial\Omega_s$.
 
 

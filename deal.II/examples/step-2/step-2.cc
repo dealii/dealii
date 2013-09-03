@@ -151,7 +151,7 @@ void make_grid (Triangulation<2> &triangulation)
 // least as long as that of the <code>DoFHandler</code>; one way to make sure
 // this is so is to make it static as well, in order to prevent its preemptive
 // destruction. (However, the library would warn us if we forgot about this
-// and abort the program if that occured. You can check this, if you want, by
+// and abort the program if that occurred. You can check this, if you want, by
 // removing the 'static' declaration.)
 void distribute_dofs (DoFHandler<2> &dof_handler)
 {

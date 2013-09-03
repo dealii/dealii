@@ -476,12 +476,10 @@ namespace internal
                      const unsigned int       local_index,
                      const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.
-               get_dof_index (dof_handler,
-                              obj_index,
+        return dof_handler.levels[obj_level]->
+               get_dof_index (obj_index,
                               fe_index,
-                              local_index,
-                              obj_level);
+                              local_index);
       }
 
 
@@ -496,13 +494,11 @@ namespace internal
                      const dealii::internal::int2type<1> &,
                      const types::global_dof_index       global_index)
       {
-        dof_handler.levels[obj_level]->dof_object.
-        set_dof_index (dof_handler,
-                       obj_index,
+        dof_handler.levels[obj_level]->
+        set_dof_index (obj_index,
                        fe_index,
                        local_index,
-                       global_index,
-                       obj_level);
+                       global_index);
       }
 
 
@@ -518,7 +514,7 @@ namespace internal
       {
         return dof_handler.faces->lines.
                get_dof_index (dof_handler,
-                              obj_index,
+                       obj_index,
                               fe_index,
                               local_index,
                               obj_level);
@@ -556,12 +552,10 @@ namespace internal
                      const unsigned int       local_index,
                      const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.
-               get_dof_index (dof_handler,
-                              obj_index,
+        return dof_handler.levels[obj_level]->
+               get_dof_index (obj_index,
                               fe_index,
-                              local_index,
-                              obj_level);
+                              local_index);
       }
 
 
@@ -576,13 +570,11 @@ namespace internal
                      const dealii::internal::int2type<2> &,
                      const types::global_dof_index       global_index)
       {
-        dof_handler.levels[obj_level]->dof_object.
-        set_dof_index (dof_handler,
-                       obj_index,
+        dof_handler.levels[obj_level]->
+        set_dof_index (obj_index,
                        fe_index,
                        local_index,
-                       global_index,
-                       obj_level);
+                       global_index);
       }
 
 
@@ -676,12 +668,10 @@ namespace internal
                      const unsigned int       local_index,
                      const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.
-               get_dof_index (dof_handler,
-                              obj_index,
+        return dof_handler.levels[obj_level]->
+               get_dof_index (obj_index,
                               fe_index,
-                              local_index,
-                              obj_level);
+                              local_index);
       }
 
 
@@ -696,13 +686,11 @@ namespace internal
                      const dealii::internal::int2type<3> &,
                      const types::global_dof_index       global_index)
       {
-        dof_handler.levels[obj_level]->dof_object.
-        set_dof_index (dof_handler,
-                       obj_index,
+        dof_handler.levels[obj_level]->
+        set_dof_index (obj_index,
                        fe_index,
                        local_index,
-                       global_index,
-                       obj_level);
+                       global_index);
       }
 
 
@@ -825,23 +813,21 @@ namespace internal
                           const unsigned int fe_index,
                           const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
-               obj_index,
-               fe_index,
-               obj_level);
+        return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
+               fe_index);
       }
 
 
       template <int spacedim>
       static
       unsigned int
-      n_active_fe_indices (const dealii::hp::DoFHandler<1,spacedim> &dof_handler,
+      n_active_fe_indices (const dealii::hp::DoFHandler<1,spacedim> &,
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
-               obj_index);
+	// on a cell, the number of active elements is one
+        return 1;
       }
 
 
@@ -855,10 +841,8 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<1> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
-               obj_level,
-               obj_index,
-               n);
+	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
 
@@ -917,23 +901,21 @@ namespace internal
                           const unsigned int fe_index,
                           const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
-               obj_index,
-               fe_index,
-               obj_level);
+        return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
+               fe_index);
       }
 
 
       template <int spacedim>
       static
       unsigned int
-      n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
+      n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &,
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
-               obj_index);
+	// on a cell, the number of active elements is one
+        return 1;
       }
 
 
@@ -947,10 +929,8 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<2> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
-               obj_level,
-               obj_index,
-               n);
+	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
 
@@ -1026,10 +1006,8 @@ namespace internal
                           const unsigned int fe_index,
                           const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.fe_index_is_active(dof_handler,
-               obj_index,
-               fe_index,
-               obj_level);
+        return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
+               fe_index);
       }
 
 
@@ -1067,13 +1045,13 @@ namespace internal
       template <int spacedim>
       static
       unsigned int
-      n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
+      n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &,
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.n_active_fe_indices (dof_handler,
-               obj_index);
+	// on a cell, the number of active elements is one
+        return 1;
       }
 
 
@@ -1087,10 +1065,8 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<3> &)
       {
-        return dof_handler.levels[obj_level]->dof_object.nth_active_fe_index (dof_handler,
-               obj_level,
-               obj_index,
-               n);
+	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
       /**
@@ -2827,8 +2803,10 @@ namespace internal
         types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
                                          ->cell_dof_indices_cache[accessor.present_index *
                                                                   accessor.get_fe().dofs_per_cell];
-        for ( ; local_values_begin != local_values_end; ++local_values_begin, ++cache)
-          *local_values_begin = values(*cache);
+
+        values.extract_subvector_to (cache,
+				     cache + accessor.get_fe().dofs_per_cell,
+				     local_values_begin);
       }
 
       /**
@@ -2858,8 +2836,9 @@ namespace internal
         std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
         get_dof_indices (accessor, local_dof_indices);
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i, ++local_values_begin)
-          *local_values_begin = values(local_dof_indices[i]);
+        values.extract_subvector_to (local_dof_indices.begin(),
+				     local_dof_indices.end(),
+				     local_values_begin);
       }
 
 
@@ -3003,12 +2982,9 @@ namespace internal
       {
         Assert (static_cast<unsigned int>(accessor.level()) < accessor.dof_handler->levels.size(),
                 ExcMessage ("DoFHandler not initialized"));
-        Assert (static_cast<std::vector<unsigned int>::size_type>(accessor.present_index) <
-                accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size (),
-                ExcIndexRange (accessor.present_index, 0,
-                               accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size ()));
+
         return accessor.dof_handler->levels[accessor.level()]
-               ->active_fe_indices[accessor.present_index];
+	  ->active_fe_index(accessor.present_index);
       }
 
 
@@ -3046,12 +3022,9 @@ namespace internal
         Assert (static_cast<unsigned int>(accessor.level()) <
                 accessor.dof_handler->levels.size(),
                 ExcMessage ("DoFHandler not initialized"));
-        Assert (static_cast<std::vector<unsigned int>::size_type>(accessor.present_index) <
-                accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size (),
-                ExcIndexRange (accessor.present_index, 0,
-                               accessor.dof_handler->levels[accessor.level()]->active_fe_indices.size ()));
+
         accessor.dof_handler->levels[accessor.level()]
-        ->active_fe_indices[accessor.present_index] = i;
+	  ->set_active_fe_index (accessor.present_index, i);
       }
 
 

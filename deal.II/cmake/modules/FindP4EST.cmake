@@ -34,29 +34,14 @@ SET_IF_EMPTY(P4EST_DIR "$ENV{P4EST_DIR}")
 SET_IF_EMPTY(SC_DIR "$ENV{SC_DIR}")
 
 #
-# We used to recommend installing p4est with a custom script that
-# compiled p4est twice, once in debug and once in optimized mode.
-# the installation would then have happened into directories
-# $P4EST_DIR/DEBUG and $P4EST_DIR/FAST. If we can find these
-# two directories, then use the FAST directory rather than trying
-# to figure out how we can build deal.II against the two libraries
-# depending on whether we are in debug or optimized mode.
-#
-IF(P4EST_DIR
-   AND EXISTS ${P4EST_DIR}/DEBUG
-   AND EXISTS ${P4EST_DIR}/FAST)
-  MESSAGE(STATUS "Found old-style p4est directory layout")
-  SET (P4EST_DIR ${P4EST_DIR}/FAST)
-ENDIF()
-
-
-#
 # Search for the sc library, usually bundled with p4est. If no SC_DIR was
 # given, take what we chose for p4est.
 #
 
 FIND_PATH(P4EST_INCLUDE_DIR p4est_config.h
   HINTS
+    ${P4EST_DIR}/FAST
+    ${P4EST_DIR}/DEBUG
     ${P4EST_DIR}
   PATH_SUFFIXES
     p4est include/p4est include src
@@ -64,49 +49,99 @@ FIND_PATH(P4EST_INCLUDE_DIR p4est_config.h
 
 FIND_PATH(SC_INCLUDE_DIR sc.h
   HINTS
+    ${SC_DIR}/FAST
+    ${SC_DIR}/DEBUG
     ${SC_DIR}
+    ${P4EST_DIR}/FAST
+    ${P4EST_DIR}/DEBUG
     ${P4EST_DIR}
   PATH_SUFFIXES
     sc include/p4est include src sc/src
   )
 
-FIND_LIBRARY(P4EST_LIBRARY
+FIND_LIBRARY(P4EST_LIBRARY_OPTIMIZED
   NAMES p4est
   HINTS
+    ${P4EST_DIR}/FAST
+    ${P4EST_DIR}/DEBUG
     ${P4EST_DIR}
   PATH_SUFFIXES
     lib${LIB_SUFFIX} lib64 lib src
   )
 
-FIND_LIBRARY(SC_LIBRARY
+FIND_LIBRARY(P4EST_LIBRARY_DEBUG
+  NAMES p4est
+  HINTS
+    ${P4EST_DIR}/DEBUG
+  PATH_SUFFIXES
+    lib${LIB_SUFFIX} lib64 lib src
+  )
+
+FIND_LIBRARY(SC_LIBRARY_OPTIMIZED
   NAMES sc
   HINTS
+    ${SC_DIR}/FAST
+    ${SC_DIR}/DEBUG
     ${SC_DIR}
+    ${P4EST_DIR}/FAST
+    ${P4EST_DIR}/DEBUG
     ${P4EST_DIR}
   PATH_SUFFIXES
     lib${LIB_SUFFIX} lib64 lib src sc/src
   )
 
-SET(_output ${P4EST_LIBRARY} ${SC_LIBRARY})
+FIND_LIBRARY(SC_LIBRARY_DEBUG
+  NAMES sc
+  HINTS
+    ${SC_DIR}/DEBUG
+    ${P4EST_DIR}/DEBUG
+  PATH_SUFFIXES
+    lib${LIB_SUFFIX} lib64 lib src sc/src
+  )
+
+SET(_output ${P4EST_LIBRARY_OPTMIZED} ${SC_LIBRARY_OPTIMIZED})
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(P4EST DEFAULT_MSG
   _output # Cosmetic: Gives nice output
-  P4EST_LIBRARY
-  SC_LIBRARY
+  P4EST_LIBRARY_OPTIMIZED
+  SC_LIBRARY_OPTIMIZED
   P4EST_INCLUDE_DIR
   SC_INCLUDE_DIR
   )
 
 MARK_AS_ADVANCED(
-  P4EST_LIBRARY
+  P4EST_LIBRARY_OPTIMIZED
+  P4EST_LIBRARY_DEBUG
   P4EST_INCLUDE_DIR
-  SC_LIBRARY
+  SC_LIBRARY_OPTIMIZED
+  SC_LIBRARY_DEBUG
   SC_INCLUDE_DIR
   )
 
+
 IF(P4EST_FOUND)
-  SET(P4EST_LIBRARIES
-    ${P4EST_LIBRARY}
-    ${SC_LIBRARY}
+
+  IF( ( "${P4EST_LIBRARY_OPTIMIZED}" STREQUAL "${P4EST_LIBRARY_DEBUG}"
+        AND
+        "${SC_LIBRARY_OPTIMIZED}" STREQUAL "${SC_LIBRARY_DEBUG}" )
+      OR P4EST_LIBRARY_DEBUG MATCHES "-NOTFOUND"
+      OR SC_LIBRARY_DEBUG MATCHES "-NOTFOUND" )
+    SET(P4EST_LIBRARIES
+      ${P4EST_LIBRARY_OPTIMIZED}
+      ${SC_LIBRARY_OPTIMIZED}
+      )
+  ELSE()
+    SET(P4EST_LIBRARIES
+      optimized
+      ${P4EST_LIBRARY_OPTIMIZED}
+      ${SC_LIBRARY_OPTIMIZED}
+      debug
+      ${P4EST_LIBRARY_DEBUG}
+      ${SC_LIBRARY_DEBUG}
+      general
+      )
+  ENDIF()
+
+  LIST(APPEND P4EST_LIBRARIES
     ${LAPACK_LIBRARIES} # for good measure
     ${MPI_C_LIBRARIES} # for good measure
     )
@@ -123,6 +158,7 @@ IF(P4EST_FOUND)
   IF("${P4EST_MPI_STRING}" STREQUAL "")
     SET(P4EST_WITH_MPI FALSE)
   ELSE()
+
     SET(P4EST_WITH_MPI TRUE)
   ENDIF()
 
@@ -143,9 +179,18 @@ IF(P4EST_FOUND)
   STRING(REGEX REPLACE
     "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
     P4EST_VERSION_SUBMINOR "${P4EST_VERSION}")
+
+  # Now for the patch number such as in 0.3.4.1. If there
+  # is no patch number, then the REGEX REPLACE will fail,
+  # setting P4EST_VERSION_PATCH to P4EST_VERSION. If that
+  # is the case, then set the patch number to zero
   STRING(REGEX REPLACE
-    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
+    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.([0-9]+)?.*$" "\\1"
     P4EST_VERSION_PATCH "${P4EST_VERSION}")
+  IF(${P4EST_VERSION_PATCH} STREQUAL "${P4EST_VERSION}")
+    SET(P4EST_VERSION_PATCH "0")
+  ENDIF()
+
 
   MARK_AS_ADVANCED(P4EST_DIR)
 ELSE()

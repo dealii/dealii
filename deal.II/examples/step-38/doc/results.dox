@@ -144,11 +144,11 @@ void LaplaceBeltrami<spacedim>::make_grid_and_dofs ()
 
 Note that the only essential addition has been the three lines marked with
 asterisks. It is worth pointing out one other thing here, though: because we
-un-attach the manifold description from the surface mesh, whenever we use a
+detach the manifold description from the surface mesh, whenever we use a
 mapping object in the rest of the program, it has no curves boundary
 description to go on any more. Rather, it will have to use the implicit,
 StraightBoundary class that is used on all parts of the boundary not
-explicitly assigned a different mannifold object. Consequently, whether we use
+explicitly assigned a different manifold object. Consequently, whether we use
 MappingQ(2), MappingQ(15) or MappingQ1, each cell of our mesh will be mapped
 using a bilinear approximation.
 

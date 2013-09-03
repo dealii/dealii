@@ -237,7 +237,7 @@ So why is this an issue here, but not in step-31? The
 reason back there is that everything was nicely balanced: velocities
 were on the order of one, the pressure likewise, the viscosity was
 one, and the domain had a diameter of $\sqrt{2}$. As a result, while
-non-sensical, nothing bad happened. On the other hand, as we will explain
+nonsensical, nothing bad happened. On the other hand, as we will explain
 below, things here will not be that simply scaled: $\eta$ will be around
 $10^{21}$, velocities on the order of $10^{-8}$, pressure around $10^8$, and
 the diameter of the domain is $10^7$. In other words, the order of magnitude
@@ -293,7 +293,7 @@ $\frac{\eta}{L}$, and we will use this factor in the assembly of the system
 matrix and preconditioner. Because it is annoying and error prone, we will
 recover the unscaled pressure immediately following the solution of the linear
 system, i.e., the solution vector's pressure component will immediately be
-un-scaled to retrieve the physical pressure. Since the solver uses the fact that
+unscaled to retrieve the physical pressure. Since the solver uses the fact that
 we can use a good initial guess by extrapolating the previous solutions, we
 also have to scale the pressure immediately <i>before</i> solving.
 
@@ -521,8 +521,8 @@ becomes unstable? Looking at the graphical output, we can see that
 with the unreasonably coarse mesh chosen for these experiments, around
 time $t=10^{15}$ seconds the plumes of hot material that have been
 rising towards the cold outer boundary and have then spread sideways
-are starting to get close to each other, squezzing out the cold
-material inbetween. This creates a layer of cells into which fluids
+are starting to get close to each other, squeezing out the cold
+material in-between. This creates a layer of cells into which fluids
 flows from two opposite sides and flows out toward a third, apparently
 a scenario that then produce these instabilities without sufficient
 stabilization. Second: In step-31, we used
@@ -845,7 +845,7 @@ convection in the earth mantle: for that, more and more difficult
 physics would have to be implemented, and several other aspects are
 currently missing from this program as well. We will come back to this
 issue in the results section again, but state for now that providing a
-realistic description is a goal of the <i>Apect</i> code in
+realistic description is a goal of the <i>Aspect</i> code in
 development at the time of writing this.
 
 As a reminder, let us again state the equations we want to solve are these:
@@ -887,7 +887,7 @@ the following quantities:
   entry</a>). In Kelvin, we therefore choose $T_0=(4000+273)\text{K}$,
   $T_1=(500+273)\text{K}$ as boundary conditions at the inner and outer edge.
 
-  In addition to this, we also have to specifiy some initial conditions for
+  In addition to this, we also have to specify some initial conditions for
   the temperature field. The real temperature field of the earth is quite
   complicated as a consequence of the convection that has been going on for
   more than four billion years -- in fact, it is the properties of this
@@ -1081,7 +1081,7 @@ the following quantities:
   @f]
 
 
-  There are two problems with this, however: (i) The Earth is not homogenous,
+  There are two problems with this, however: (i) The Earth is not homogeneous,
   i.e. the density $\rho$ depends on $\mathbf x$; in fact it is not even a
   function that only depends on the radius $r=\|\mathbf x\|$. In reality, gravity therefore
   does not always decrease as we get deeper: because the earth core is so much
@@ -1152,7 +1152,7 @@ the following quantities:
   changes as temperature and pressure change: depending on temperature and
   pressure, different crystal configurations are thermodynamically favored
   over others, even if the chemical composition of the mantle were
-  homogenous. For example, the common mantle material MgSiO<sub>3</sub> exists
+  homogeneous. For example, the common mantle material MgSiO<sub>3</sub> exists
   in its <a target="_top"
   href="http://en.wikipedia.org/wiki/Perovskite_(structure)">perovskite
   structure</a> throughout most of the mantle, but in the lower mantle the
@@ -1213,7 +1213,7 @@ Compared to step-31, this program has a number of noteworthy differences:
   program just because one wants to play with a single parameter (think, for
   example, of parameter studies determining the best values of the
   stabilization constants discussed above), in particular given that it takes
-  a non-trivial amount of time to re-compile programs of the current size. To
+  a nontrivial amount of time to re-compile programs of the current size. To
   just give an overview of the kinds of parameters we have moved from fixed
   values into the input file, here is a listing of a typical
   <code>\step-32.prm</code> file:

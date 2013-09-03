@@ -36,13 +36,16 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
         "p4est has to be configured with MPI enabled.\n"
         )
 
-      UNSET(P4EST_LIBRARY CACHE)
+      UNSET(P4EST_LIBRARY_OPTIMIZED CACHE)
+      UNSET(P4EST_LIBRARY_DEBUG CACHE)
       UNSET(P4EST_INCLUDE_DIR CACHE)
-      UNSET(SC_LIBRARY CACHE)
+      UNSET(SC_LIBRARY_OPTIMIZED CACHE)
+      UNSET(SC_LIBRARY_DEBUG CACHE)
       UNSET(SC_INCLUDE_DIR CACHE)
       SET(P4EST_DIR "" CACHE PATH
         "An optional hint to a p4est installation/directory"
         )
+      MARK_AS_ADVANCED(CLEAR P4EST_DIR)
     ELSE()
       SET(${var} TRUE)
     ENDIF()

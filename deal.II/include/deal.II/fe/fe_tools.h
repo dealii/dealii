@@ -160,7 +160,12 @@ namespace FETools
    * indices of each local block. If it is false, then the block sizes are
    * returned.
    *
-   * @todo Which way does this vector map the numbers?
+   * The vector <tt>renumbering</tt> will be indexed by the standard
+   * numbering of local degrees of freedom, namely first first vertex,
+   * then second vertex, after vertices lines, quads, and hexes. For
+   * each index, the entry indicates the index which this degree of
+   * freedom receives in a numbering scheme, where the first block is
+   * numbered completely before the second.
    */
   template<int dim, int spacedim>
   void compute_block_renumbering (

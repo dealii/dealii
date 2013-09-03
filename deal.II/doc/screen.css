@@ -6,6 +6,7 @@ body {
 	margin: 10px;
 	padding: 0;
 	font-family: sans-serif;
+	counter-reset: section;
 }
 
 body.title {
@@ -26,6 +27,23 @@ body.navbar {
 	padding: 2px;
 	font-family: sans-serif;
 	font-size: 12px;
+}
+
+div.toc {
+    width: 50%;
+    color: black;
+    border: 1px solid #aaa;
+    background-color: #f9f9f9;
+    padding: 5px;
+    font-size: 88%;
+}
+
+div.toc:before {
+    display: block;
+    content: "Table of contents";
+    text-align: center;
+    font-size: 88%;
+    font-weight: bold;
 }
 
 frameset {
@@ -84,17 +102,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-	font-size: 175%;
+	font-size: 175%;    
+	counter-reset: section;
 }
 
 h2 {
 	font-size: 150%;
+	counter-reset: subsection;
 }
 
 h3 { font-size: 140%;
      padding-top: 1.5em;
      padding-bottom: 0.17em;
      border-bottom: 1px dashed #aaaaaa; }
+
 h4 { font-size: 110%; 
      border-bottom: none;
      font-weight: bold;
@@ -106,6 +127,16 @@ h5 { font-size: 100%;
 h6 { font-size: 80%;  
      border-bottom: none;
      font-weight: bold;
+}
+
+h2:before {
+    counter-increment: section;
+    content: counter(section) ". ";
+}
+
+h3:before {
+    counter-increment: subsection;
+    content: counter(section) "." counter(subsection) ". ";
 }
 
 div.right {
@@ -121,13 +152,18 @@ ul {
     margin: 0.3em 0 0 1.5em;
     padding:0;
 }
+
 ol {
     line-height: 1.5em;
     margin: 0.3em 0 0 3.2em;
     padding:0;
     list-style-image: none;
 }
-li { margin-bottom: 0.1em; }
+
+li {
+    margin-bottom: 0.1em;
+}
+
 dt {
     font-weight: bold;
     margin-bottom: 0.1em;
@@ -172,6 +208,26 @@ span.example {
 
 pre {
 	padding: 0em;
+	text-align: left;
+	text-indent: 0;
+	border: 1px dashed #2f6fab;
+	color: Black;
+	background-color: #f9f9f9;
+	line-height: 1.1em;
+}
+	
+pre.cmake {
+	padding: 1em;
+	text-align: left;
+	text-indent: 0;
+	border: 1px solid #d06fab;
+	color: Black;
+	background-color: #f9f9f9;
+	line-height: 1.1em;
+}
+	
+pre.sample {
+	padding: 1em;
 	text-align: left;
 	text-indent: 0;
 	border: 1px dashed #2f6fab;
@@ -237,6 +293,14 @@ td.build {
 .weak {
 	color: #808080;
 	text-decoration: line-through;
+}
+
+.todo:before {
+    content: "TODO: ";
+}
+
+.todo {
+    color: Red;
 }
 
 .deprecated {

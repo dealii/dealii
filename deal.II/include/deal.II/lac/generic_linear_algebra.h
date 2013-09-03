@@ -39,32 +39,6 @@ namespace LinearAlgebraDealII
 }
 
 
-// Dummy class. This used to check your program
-// to make sure it is compatible with all
-// linear algebra classes. In other words,
-// this is the minimal interface.
-// TODO: should we move this into tests/ only?
-namespace LinearAlgebraDummy
-{
-  class Vector
-  {
-    void compress();
-  };
-  class BlockVector
-  {
-    void compress();
-  };
-
-  class SparseMatrix
-  {
-    void compress();
-  };
-
-  class PreconditionSSOR {};
-
-}
-
-
 DEAL_II_NAMESPACE_CLOSE
 
 
@@ -89,7 +63,6 @@ namespace LinearAlgebraPETSc
   typedef PETScWrappers::BlockVector BlockVector;
 
   typedef PETScWrappers::SparseMatrix SparseMatrix;
-  typedef PETScWrappers::PreconditionSSOR PreconditionSSOR;
 
   typedef PETScWrappers::SolverCG SolverCG;
 
@@ -122,28 +95,29 @@ namespace LinearAlgebraPETSc
     typedef dealii::BlockCompressedSimpleSparsityPattern CompressedBlockSparsityPattern;
 
     /**
-     * Typedef for the AMG preconditioner type used for the
-     * top left block of the Stokes matrix.
+     * Typedef for the AMG preconditioner type.
      */
     typedef PETScWrappers::PreconditionBoomerAMG PreconditionAMG;
 
     /**
-     * Typedef for the Incomplete Cholesky preconditioner used
-     * for other blocks of the system matrix.
+     * Typedef for the Incomplete Cholesky preconditioner.
      */
     typedef PETScWrappers::PreconditionICC PreconditionIC;
 
     /**
-     * Typedef for the Incomplete LU decomposition preconditioner used
-     * for other blocks of the system matrix.
+     * Typedef for the Incomplete LU decomposition preconditioner.
      */
     typedef PETScWrappers::PreconditionILU PreconditionILU;
 
     /**
-     * Typedef for the Incomplete Jacobi decomposition preconditioner used
-     * for other blocks of the system matrix.
+     * Typedef for the Incomplete Jacobi decomposition preconditioner.
      */
     typedef PETScWrappers::PreconditionJacobi PreconditionJacobi;
+
+    /**
+     * Typedef for the SSOR preconditioner.
+     */
+    typedef PETScWrappers::PreconditionSSOR PreconditionSSOR;
 
   }
 
@@ -201,28 +175,29 @@ namespace LinearAlgebraTrilinos
     typedef TrilinosWrappers::BlockSparsityPattern CompressedBlockSparsityPattern;
 
     /**
-     * Typedef for the AMG preconditioner type used for the
-     * top left block of the Stokes matrix.
+     * Typedef for the AMG preconditioner type.
      */
     typedef TrilinosWrappers::PreconditionAMG PreconditionAMG;
 
     /**
-     * Typedef for the Incomplete Cholesky preconditioner used
-     * for other blocks of the system matrix.
+     * Typedef for the Incomplete Cholesky preconditioner.
      */
     typedef TrilinosWrappers::PreconditionIC PreconditionIC;
 
     /**
-     * Typedef for the Incomplete LU decomposition preconditioner used
-     * for other blocks of the system matrix.
+     * Typedef for the Incomplete LU decomposition preconditioner.
      */
     typedef TrilinosWrappers::PreconditionILU PreconditionILU;
 
     /**
-     * Typedef for the Incomplete Jacobi decomposition preconditioner used
-     * for other blocks of the system matrix.
+     * Typedef for the Incomplete Jacobi decomposition preconditioner.
      */
     typedef TrilinosWrappers::PreconditionJacobi PreconditionJacobi;
+
+    /**
+     * Typedef for the SSOR preconditioner
+     */
+    typedef TrilinosWrappers::PreconditionSSOR PreconditionSSOR;
 
 
   }

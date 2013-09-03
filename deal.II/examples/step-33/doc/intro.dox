@@ -270,7 +270,7 @@ main() {
 The output are the derivatives $\frac{\partial c(a,b)}{\partial a},
 \frac{\partial c(a,b)}{\partial b}$ of $c(a,b)=2a+\cos(ab)$ at $a=1,b=2$.
 
-It should be noted that Sacado provides more auto-differentation capabilities than the small subset
+It should be noted that Sacado provides more auto-differentiation capabilities than the small subset
 used in this program.  However, understanding the example above is
 enough to understand the use of Sacado in this Euler flow program.
 
@@ -285,7 +285,7 @@ on these vectors.  Please view the commented code for more details on how these 
 within the example.
 
 <h3> Adaptivity </h3>
-The example uses an ad-hoc refinement indicator that shows some usefulness in shock-type problems, and
+The example uses an ad hoc refinement indicator that shows some usefulness in shock-type problems, and
 in the downhill flow example included.  We refine according to the squared gradient of the density.
 Hanging nodes are handled by computing the numerical flux across cells that are of differing
 refinement levels, rather than using the ConstraintMatrix class as in

@@ -32,10 +32,11 @@ struct Comp
   template <int dim>
   bool operator() (const Point<dim> p, const Point<dim> q) const
   {
+    // avoid distinguishing points by roundoff
     for (unsigned int d=0; d<dim; ++d)
-      if (p(d) < q(d))
+      if (p(d) < q(d) - 1e-14)
         return true;
-      else if (p(d) > q(d))
+      else if (p(d) > q(d) + 1e-14)
         return false;
 
     return false;

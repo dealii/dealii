@@ -2,7 +2,7 @@
 	  "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
-    <title>How to interface with deal.II in your own project</title>
+    <title>How to use CMake to configure your projects with deal.II</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors @ dealii.org>">
     <meta name="copyright" content="Copyright (C) 2012, 2013 by the deal.II authors">
@@ -10,129 +10,287 @@
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
   </head>
+  
+<body>
+<h1>How to use CMake to configure your projects with <acronym>deal.II</acronym></h1>
 
-  <body>
+<div class="toc">
+  <ol>
+    <li><a href="#cmakesimple">Simple <code>CMakeLists.txt</code></a>
+      <ol>
+	<li><a href="#cmakesimple.multiple">Adding multiple executable targets</a></li>
+	<li><a href="#cmakesimple.libs">Adding libraries and common source files</a></li>
+	<li><a href="#cmakesimple.run">Adding a "run" target</a></li>
+      </ol>
+    </li>
+    <li><a href="#cmakeadvanced">Advanced <code>CMakeLists.txt</code></a>
+      <ol>
+	<li> TODO, see list</li>
+      </ol>
+    </li>
+    <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code></li>
+    <li><a href="#dealiiconfig"><code>deal.IIConfig.cmake</code></a></li>
+    <li><a href="#legacy">Legacy <code>Make.global_options</code></a></li>
+  </ol>
+</div>
 
-    <h1>How to interface with <acronym>deal.II</acronym> in your own
-      project</h1>
+<p>
+  <code>cmake</code> is the configuration and build tool we use
+  in <acronym>deal.II</acronym>. Its advantage is not only that it makes
+  configuration of <acronym>deal.II</acronym> itself simpler across
+  platforms (compared to the older <code>autoconf/make</code> combination)
+  but also that it <i>exports</i> information about the deal.II
+  configuration that makes it particularly simple for projects
+  using <acronym>deal.II</acronym> to configure and link against it.
+</p>
+
+<p>
+  <code>cmake</code> is controlled by input files that by convention are
+  called <code>CMakeLists.txt</code>, listing both configuration commands
+  as well as dependencies between source files and targets.
+  This page presents some <code>CMakeLists.txt</code> examples for
+  potential use in your projects. (A detailed description of the
+  <acronym>deal.II</acronym> project configuration is given in the
+  <a href="cmake.html" target="body">deal.II CMake ReadMe</a>.)
+</p>
+
+<a name="cmakesimple"></a>
+<h2>Simple CMakeLists.txt</h2>
+
+<p>
+  In this section, we start out with a
+  minimal <code>CMakeLists.txt</code> based on
+  the <code>DEAL_II_SETUP_TARGET</code> macro. This method gives
+  full control of what's happening and is easily extensible to
+  more complex projects, as exemplified in the subsections here an
+  later in the section on <a href="cmakeadvanced">advanced
+    topics</a>. Here is a full example
+  (<a href="CMakeLists.txt.sample3" target="_top">plain text</a>
+  version):
+  
+<p class="todo"> Fix plain text after finalizing!</p>
+
+<pre class="cmake">
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+
+FIND_PACKAGE(deal.II 8.0 REQUIRED
+  HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
+)
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+
+PROJECT(myproject CXX)
+
+ADD_EXECUTABLE(mycode mycode.cc)
+DEAL_II_SETUP_TARGET(mycode)
+</pre>
+
+<p>
+  The first line of this code makes sure that a sufficiently high
+  version of CMake is installed. 2.8.8 is the minimal version required
+  to set up <acronym>deal.II</acronym>, therefore it is safe to use this
+  number here.
+</p>
+
+<p>
+  Next, we find our deal.II installation, in this case requiring at
+  least version 8.0, which is the first version using
+  CMake. The <code>HINTS</code> are a list of directories where the
+  install directory of deal.II is likely to be found. Here, we check
+  whether we are in a subdirectory (first and second level) of the
+  deal.II installation and otherwise use the
+  variable <code>DEAL_II_DIR</code>.
+  <q class="todo">Matthias, what is the difference between the first
+  and the last entry?</q>  This list can be changed according to your
+  preferences. After finding the deal.II project, we fetch its chached
+  variables. You can inspect these for instance
+  with <code>ccmake</code>.
+</p>
+
+<p>
+  Every <code>CMAkeLists.txt</code> must contain a project definition,
+  which we do next. <q class="todo">Matthias, I have been happy
+  without the CXX...?</q>
+</p>
+
+<p>
+  Finally, the last two lines define the executable that is to be
+  produced and its source code.
+</p>
+
+
+<p class="todo"> Explain the macros or link to explanation below</p>
+
+<a name="cmakesimple.multiple"></a>
+<h3>Adding multiple executable targets</h3>
+
+<p>
+  In order to specify multiple executable targets, simply repeat
+  the last two lines of the simple <code>CMakeLists.txt</code>:
+</p>
+
+<pre class="cmake">
+ADD_EXECUTABLE(mycode2 mycode2.cc)
+DEAL_II_SETUP_TARGET(mycode2)
+
+ADD_EXECUTABLE(mycode3 mycode3.cc)
+DEAL_II_SETUP_TARGET(mycode3)
+</pre>
+
+If the list gets longer, consider using
+a <a href="#cmakeadvanced.foreach">loop</a>, possibly
+with <a href="#cmakeadvanced.glob">GLOB</a>.
+
+    <a name="cmakesimple.libs"></a>
+    <h3>Adding libraries and common source files</h3>
 
     <p>
-    <table class="tutorial" width="50%">
-      <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
-      <tr><td valign="top">
-	  <ul>
-            <li><a href="#cmake">Example <code>CMakeLists.txt</code> files</a>
-	      <ul>
-                <li><a href="#cmakesimple">Simple <code>CMakeLists.txt</code></a>
-                <li><a href="#cmakeadvanced">Advanced <code>CMakeLists.txt</code></a>
-              </ul>
-	    <li><a href="#ext">Advanced setup for <acronym>deal.II</acronym> in a CMake project</a>
-	      <ul>
-		<li><a href="#extfinding">Finding the deal.II library</a>
-		<li><a href="#extcmake">deal.IIConfig.cmake</a>
-		<li><a href="#extsetup">Setting up necessary configuration variables</a>
-	      </ul>
-            <li><a href="#legacy">Legacy
-              <code>Make.global_options</code></a>
-	  </ul>
-	</td>
-      </tr>
-    </table>
+      Adding a library is as simple as adding an executable target. We
+      specify the library name and then have to tell cmake that the
+      executables depend on it. The code in the simple file below the
+      project definition accordingly changes for instance to:
     </p>
 
+<pre class="cmake">
+ADD_LIBRARY(mylib libsrc1.cc libsrc2.cc libsrc3.cc)
 
-    <a name="cmake"></a>
-    <h3> Example <code>CMakeLists.txt</code> files </h3>
+ADD_EXECUTABLE(mycode mycode.cc)
+DEAL_II_SETUP_TARGET(mycode)
+TARGET_LINK_LIBRARIES(mycode mylib)
+</pre>
 
+<p>When you have <a href="#cmakesimple.multiple">multiple targets</a>,
+repeat the last line of code for each of them. Accordingly,
+a <a href="#cmakeadvanced.foreach">loop</a> becomes even more
+attractive.</p>
+
+<p>If you only have a single file or few files with common source
+code, an alternative to creating a library might be the option:</p>
+
+<pre class="cmake">
+ADD_EXECUTABLE(mycode mycode.cc common.cc)
+DEAL_II_SETUP_TARGET(mycode)
+
+ADD_EXECUTABLE(mycode2 mycode2.cc common.cc)
+DEAL_II_SETUP_TARGET(mycode2)
+</pre>
+
+<p>You should be aware though that <code>common.cc</code> will be
+compiled for each target, not only once.</p>
+
+<p class="todo"> Matthias, is this correct?</p>
+
+
+    <a name="cmakesimple.run"></a>
+    <h3>Adding a "run" target</h3>
+    
     <p>
-      <code>cmake</code> is the configuration and build tool we use
-      in <acronym>deal.II</acronym>. Its advantage is not only that it makes
-      configuration of <acronym>deal.II</acronym> itself simpler across
-      platforms (compared to the older <code>autoconf/make</code> combination)
-      but also that it <i>exports</i> information about the deal.II
-      configuration that makes it particularly simple for projects
-      using <acronym>deal.II</acronym> to configure and link against it.
+      If you wish to have a "run" target for make, like in the deal.II
+      tutorial, specify one this way (obviously, a single "run" target
+      can only run a single executable):
     </p>
 
-    <p>
-      <code>cmake</code> is controlled by input files that by convention are
-      called <code>CMakeLists.txt</code>, listing both configuration commands
-      as well as dependencies between source files and targets.
-      This page presents some <code>CMakeLists.txt</code> examples for
-      potential use in your projects. A detailed description of the
-      <acronym>deal.II</acronym> project configuration is given in the
-      <a href="cmake.html" target="body">deal.II CMake ReadMe</a>.
-    </p>
+<pre class="cmake">
+ADD_CUSTOM_TARGET(run COMMAND mycode
+  COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration")
+</pre>
 
-    <a name="cmakesimple"></a>
-    <h4>Simple CMakeLists.txt</h4>
 
-    <p>
-      The easiest way to write a <code>CMakeLists.txt</code> file is to use
-      an "autopilot" style macro. Here is an example for the step-1
-      tutorial program (<a href="CMakeLists.txt.sample"
-      target="_top">plain text</a> version) that can be used for simple
-      projects:
-      <pre>
+<a name="cmakeadvanced"></a>
+<h2> Advanced <code>CMakeLists.txt</code></h2>
 
-    #
-    # Set the name of the project and target:
-    #
-    SET(TARGET "step-1")
+<pre class="todo">
+  
+  A Subsection for each of the following:
+  
+  - control statements (if and foreach)
+  
+  - file glob to pick up sources
+  
+  - DEAL_II_SETUP_TARGET and DEAL_II_INITIALIZE_CACHED_VARIABLES
+  revisited
+  
+  - add include dirs and compile definitions to a directory or target
+  
+  - provide a ./run folder and target
+  
+  - custom targets to switch between release and debug
+  
+  - installation
+</pre>
 
-    #
-    # Declare all source files the target consists of:
-    #
-    SET(TARGET_SRC
-      ${TARGET}.cc
-      # You can specify additional files here!
-      )
+<a name="extfinding"></a>
+<h3> Finding the deal.II library </h3>
 
-    #
-    # (Optional)
-    # Specify a list of files (file globs) that will be removed
-    # with the "make runclean" and "make distclean" targets.
-    # If empty, sensible default values will be used.
-    #
-    SET(CLEAN_UP_FILES
-      # a custom list of globs, e.g. *.log *.vtk
-      )
+<p>
+  Finding the <acronym>deal.II</acronym> library should be no more than
+  <pre>
+    
+    FIND_PACKAGE(deal.II REQUIRED)
+  </pre>
+  in your CMakeLists.txt file.  You may have to hint for the location
+  of the <code>deal.IIConfig.cmake</code> file.  Either by directly
+  specifying <code>deal.II_DIR</code> to point to the path were the
+  <code>deal.IIConfig.cmake</code> file is located:
+  
+<p class="todo"> is deal.II_DIR still accurate? We use different
+above. BTW, that is an <b>UGLY</b> variable name.</p>
+  
+<pre>    
+cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;
 
-    #
-    # (Optional)
-    # A custom command line that should be invoked by "make run". If empty,
-    # ./${TARGET} will be invoked.
-    #
-    SET(TARGET_RUN
-      # a custom command line, e.g. mpirun -np 2 ${TARGET}
-      )
+</pre>
+  or by specifying a search path via <code>CMAKE_PREFIX_PATH</code>,
+  e.g.
+  <pre>
+    
+    cmake -DCMAKE_PREFIX_PATH=~/workspace/local
+  </pre>
+  In this case <code>deal.IIConfig.cmake</code> will be searched
+  for in
+  <pre>
+    
+    ~/workspace/local/
+    ~/workspace/local/lib/cmake/deal.II/
+  </pre>
+</p>
 
-    #
-    # It is good practice to specify a version requirement:
-    #
-    CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+<a name="cmakesauto"></a>
+<h2>Autopilot style CMakeLists.txt</h2>
 
-    #
-    # Find and import the deal.II project configuration:
-    #
-    FIND_PACKAGE(deal.II 8.0 REQUIRED
-      HINTS
-        ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
-      #
-      # If the deal.II library cannot be found (because it is not installed at a
-      # default location or your project resides at an uncommon place), you
-      # can specify additional hints for search paths here, e.g.
-      # "$ENV{HOME}/workspace/deal.II"
-      #
-      )
+<p>
+  If you want a make interface similar to the deal.II library and
+  its tutorial, namely maker targets for debug and release
+  versions, running the code and cleaning, the easiest way to
+  write a <code>CMakeLists.txt</code> file may be to use
+  an "autopilot" style macro. Here is a minimalistic example for the
+  step-1 tutorial program (<a href="CMakeLists.txt.sample1"
+			      target="_top">plain text</a> version) that can be used for simple
+  projects:
+</p>
 
-    #
-    # And let deal.II do the rest:
-    #
-    DEAL_II_INITIALIZE_CACHED_VARIABLES()
-    PROJECT(${TARGET})
-    DEAL_II_INVOKE_AUTOPILOT()
-      </pre>
+<pre class="cmake">
+FIND_PACKAGE(deal.II 8.0 REQUIRED
+  HINTS
+    ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
+    # You can specify additional hints for search paths here, e.g.
+    # $ENV{HOME}/workspace/deal.II
+)
+
+# Set the name of the project and target:
+SET(TARGET "step-1")
+
+# Declare all source files the target consists of:
+SET(TARGET_SRC
+  step-1.cc
+  # You can specify additional files here!
+)
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+PROJECT(${TARGET} CXX)
+DEAL_II_INVOKE_AUTOPILOT()
+</pre>
+
 
       This <code>CMakeLists.txt</code> is intended for use with a small
       project and <i>in-source</i> build (i.e., one does not create a separate
@@ -140,339 +298,86 @@
       in the <a href="../readme.html#configuration" target="_body">readme
       file</a>). Using this input file, you can run <code>cmake</code> in the
       source directory as follows:
-      <pre>
 
-    $ cd step-1
-    $ cmake .
+<pre class="sample">
+$ cd step-1
+$ cmake .
 
-    [...]
+[...]
 
-    ###
-    #
-    #  Successfully set up project  step-1  with  deal.II-8.0.pre  found at
-    #      /usr/local
-    #
-    #  CMAKE_BUILD_TYPE:   Debug
-    #  TARGET_SRC:         step-1.cc
-    #
-    #  You can now run
-    #      $ make            - to compile and link the program
-    #      $ make run        - to (compile, link and) run the program
-    #
-    #      $ make debug      - to switch the build type to "Debug"
-    #      $ make release    - to switch the build type to "Release"
-    #      $ make edit_cache - to change (cached) configuration variables
-    #                          and rerun the configure and generate phases of CMake
-    #
-    #      $ make clean      - to remove the generated executable as well as
-    #                          all intermediate compilation files
-    #      $ make runclean   - to remove all output generated by the program
-    #      $ make distclean  - to clean the directory from _all_ generated
-    #                          files (includes clean, runclean and the removal
-    #                          of the generated build system)
-    #
-    #  Have a nice day!
-    #
-    ###
-      </pre>
-    </p>
+###
+#
+#  Successfully set up project  step-1  with  deal.II-99.99.svn30300  found at
+#      /usr
+#
+#  CMAKE_BUILD_TYPE:         Debug
+#
+#  You can now run
+#      $ make                - to compile and link the program
+#      $ make run            - to (compile, link and) run the program
+#
+#      $ make debug          - to switch the build type to Debug
+#      $ make release        - to switch the build type to Release
+#
+#      $ make edit_cache     - to change (cached) configuration variables
+#                              and rerun the configure and generate phases of CMake
+#
+#      $ make strip_comments - strip the source files in this
+#                              directory off the documentation comments
+#      $ make clean          - to remove the generated executable as well as
+#                              all intermediate compilation files
+#      $ make runclean       - to remove all output generated by the program
+#      $ make distclean      - to clean the directory from _all_ generated
+#                              files (includes clean, runclean and the removal
+#                              of the generated build system)
+#
+#      $ make help           - to view this message again
+#
+#  Have a nice day!
+#
+###
+</pre>
 
-    <a name="cmakeadvanced"></a>
-    <h4>Advanced CMakeLists.txt</h4>
+      There are two additional configuration options (in addition to
+      <code>TARGET</code> and <code>TARGET_SRC</code>) that can be set via
+      variables before <code>DEAL_II_INVOKE_AUTOPILOT()</code> is called
+      (<a href="CMakeLists.txt.sample2" target="_top">plain text</a> version):
 
-    <p>
-      For large projects the simple <code>CMakeLists.txt</code> presented
-      above tends to be too inflexible.
-      So, if you wish to have more control about targets the
-      <code>DEAL_II_SETUP_TARGET</code> macro might be of interest for you.
-      Here is a full example, again using the step-1 tutorial program as a
-      template:
-      <pre>
+<pre class="cmake">
+# (Optional)
+# Specify a list of files (file globs) that will be removed
+# with the "make runclean" and "make distclean" targets.
+# (If empty, sensible default values will be used.)
+SET(CLEAN_UP_FILES
+  # a custom list of globs, e.g. *.log *.vtk
+)
 
-    #
-    # It is good practise to specify a version requirement:
-    #
-    CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-
-    #
-    # Find and import the deal.II project configuration:
-    #
-    FIND_PACKAGE(deal.II 8.0 REQUIRED
-      HINTS
-        ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
-      #
-      # If the deal.II library cannot be found (because it is not installed at a
-      # default location or your project resides at an uncommon place), you
-      # can specify additional hints for search paths here, e.g.
-      # "$ENV{HOME}/workspace/deal.II"
-      #
-      )
-
-    #
-    # Initialize cached variables: This will set the compiler and
-    # compiler flags to the values deal.II was configured with, as well as,
-    # CMAKE_BUILD_TYPE to "Debug".
-    # These values can be altered by editing the cache via
-    #   $ make edit_cache
-    #
-    DEAL_II_INITIALIZE_CACHED_VARIABLES()
-
-    #
-    # PROJECT has to be called after DEAL_II_INITIALIZE_CACHED_VARIABLES
-    # otherwise CMake will have already set the compiler and compiler
-    # flags.
-    #
-    PROJECT(step-1)
-
-    #
-    # Specify a target:
-    #
-    ADD_EXECUTABLE(step-1 step-1.cc)
-
-    #
-    # DEAL_II_SETUP_TARGET will set up all necessary include paths,
-    # preprocessor definitions and the link interface:
-    #
-    DEAL_II_SETUP_TARGET(step-1)
-
-    #
-    # (Optional)
-    # If you wish to have a "run" target for make, specify one:
-    #
-    ADD_CUSTOM_TARGET(run
-      COMMAND step-1
-      COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
-      )
-      </pre>
-   </p>
+# (Optional)
+# A custom command line that should be invoked by "make run".
+# (If empty, ./${TARGET} will be invoked.)
+SET(TARGET_RUN
+  # a custom command line, e.g. mpirun -np 2 ${TARGET}
+)
+</pre>
 
 
-    <a name="ext"></a>
-    <h3> Advanced setup for <acronym>deal.II</acronym> in a CMake project </h3>
+<a name="dealiiconfig"></a>
+<h2>  <code>deal.IIConfig.cmake</code> </h2>
 
-    <a name="extfinding"></a>
-    <h4> Finding the deal.II library </h4>
-
-    <p>
-    Finding the <acronym>deal.II</acronym> library should be no more than
-      <pre>
-
-    FIND_PACKAGE(deal.II REQUIRED)
-      </pre>
-      in your CMakeLists.txt file.  You may have to hint for the location
-      of the <code>deal.IIConfig.cmake</code> file.  Either by directly
-      specifying <code>deal.II_DIR</code> to point to the path were the
-      <code>deal.IIConfig.cmake</code> file is located:
-      <pre>
-
-    cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;
-      </pre>
-      or by specifying a search path via <code>CMAKE_PREFIX_PATH</code>,
-      e.g.
-      <pre>
-
-    cmake -DCMAKE_PREFIX_PATH=~/workspace/local
-      </pre>
-      In this case <code>deal.IIConfig.cmake</code> will be searched
-      for in
-      <pre>
-
-    ~/workspace/local/
-    ~/workspace/local/lib/cmake/deal.II/
-      </pre>
-    </p>
-
-
-    <a name="extcmake"></a>
-    <h4>  deal.IIConfig.cmake </h4>
-
-    <p>
-      Importing the deal.IIConfig.cmake file via <code>FIND_PACKAGE</code>
-      will set a bunch of variables and macros; all of the form
-      <code>DEAL_II_*</code>. There is the usual duplet:
-      <pre>
-
-    DEAL_II_INCLUDE_DIRS
-    DEAL_II_LIBRARIES
-      </pre>
-      (with <code>debug</code> and <code>optimized</code> keywords. For
-      compatibility there is also <code>DEAL_II_LIBRARIES_DEBUG</code>
-      and <code>DEAL_II_LIBRARIES_RELEASE</code> only specifying the
-      respective set of libraries.)
-    </p>
-
-    <p>
-      Interesting additional variables might be:
-      <pre>
-
-    DEAL_II_USER_DEFINITIONS
-    DEAL_II_USER_DEFINITIONS_DEBUG
-    DEAL_II_USER_DEFINITIONS_RELEASE
-    DEAL_II_LINKER_FLAGS
-    DEAL_II_LINKER_FLAGS_DEBUG
-    DEAL_II_LINKER_FLAGS_RELEASE
-    DEAL_II_CXX_FLAGS
-    DEAL_II_CXX_FLAGS_DEBUG
-    DEAL_II_CXX_FLAGS_RELEASE
-
-    DEAL_II_TARGET_CONFIG
-    DEAL_II_TARGET
-    DEAL_II_TARGET_DEBUG
-    DEAL_II_TARGET_RELEASE
-      </pre>
-    </p>
-
-
-
-    <a name="extsetup"></a>
-    <h4> Setting up necessary configuration variables </h4>
-
-    <p>
-    For actually using <acronym>deal.II</acronym> in your CMake
-    project some configuration steps are necessary.  These can be
-    either set via <a href="#extsetupmacro">macros</a> or by <a
-    href="#extsetuphand">hand</a>:
-      <ol>
-        <a name="extsetupmacro"></a><li> <b>Configuration with the help of
-          two convencience macros:</b>
-        <p>
-          <code>deal.IIConfig.cmake</code> includes some convenience macros
-          to automatically setup all necessary configuration. A fully
-          functional, minimal example for the step-1 tutorial program is:
-	  <pre>
-
-    FIND_PACKAGE(deal.II REQUIRED)
-
-    DEAL_II_INITIALIZE_CACHED_VARIABLES()
-
-    PROJECT(step-1)
-
-    ADD_EXECUTABLE(step-1 step-1.cc)
-    DEAL_II_SETUP_TARGET(step-1)
-	  </pre>
-        </p>
-
-
-        <a name="extsetuphand"></a><li> <b>Configuration by hand:</b>
-	  <ul>
-	    <li> Set up all include directories for header files:
-	      <pre>
-
-    INCLUDE_DIRECTORIES(${DEAL_II_INCLUDE_DIRS})
-	      </pre>
-
-	    <li>
-	      deal.II usually ships with an optimized Release and a Debug version
-              of the library. So it is a good idea to set up
-              <code>CMAKE_BUILD_TYPE</code> accordingly:
-	      <pre>
-
-    SET(CMAKE_BUILD_TYPE "Debug" CACHE
-      "Choose the type of build, options are: Debug, Release"
-      )
-	      </pre>
-
-	      A cached variable ensures that we can later switch the build type
-	      by editing the cache:
-	      <pre>
-
-    make edit_cache
-	      </pre>
-
-	    <li> Often, it is a good idea to use the same compiler and linker
-	      flags as the deal.II library.
-	      <pre>
-
-    SET(CMAKE_CXX_FLAGS ${DEAL_II_CXX_FLAGS})
-    SET(CMAKE_CXX_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
-    SET(CMAKE_CXX_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
-	      </pre>
-	      (Optionally you can set up the variables with the
-	      <code>CACHE</code> to be able to edit them via ccmake or
-	      make edit_cache.)
-
-	    <li>
-	      <i>After</i> this, specify your project name:
-	      <pre>
-
-    PROJECT(myProject)
-	      </pre>
-	      This ensures that the compiler detection and platform setup
-	      that is issued by calling <code>PROJECT(...)</code> will run
-	      after we have set up our cached variables. This way it is
-	      our choice of variables that will be set and not the default
-	      values determined by the <code>PROJECT(...)</code> call.
-
-	    <li>
-	      After defining your targets, e.g.
-	      <pre>
-
-    ADD_EXECUTABLE(step-1 step-1.cc)
-	      </pre>
-	      you have to specify to link against deal.II and all external
-	      libraries:
-	      <pre>
-
-    TARGET_LINK_LIBRARIES(step-1 ${DEAL_II_LIBRARIES})
-	      </pre>
-
-	    <li> as well as using some preprocessor definitions:
-	      <pre>
-
-    SET_TARGET_PROPERTIES(step-1 PROPERTIES
-      COMPILE_DEFINITIONS
-      "${DEAL_II_USER_DEFINITIONS}"
-      COMPILE_DEFINITIONS_DEBUG
-      "${DEAL_II_USER_DEFINITIONS_DEBUG}"
-      COMPILE_DEFINITIONS_RELEASE
-      "${DEAL_II_USER_DEFINITIONS_RELEASE}"
-      )
-	      </pre>
-
-	    <li> Optionally, you can set the link flags to the one used by the
-	      deal.II library:
-	      <pre>
-
-    SET_TARGET_PROPERTIES(step-1 PROPERTIES
-      LINK_FLAGS
-      "${DEAL_II_LINKER_FLAGS}"
-      LINK_FLAGS_DEBUG
-      "${DEAL_II_LINKER_FLAGS_DEBUG}"
-      LINK_FLAGS_RELEASE
-      "${DEAL_II_LINKER_FLAGS_RELEASE}"
-      )
-	      </pre>
-	      And this it is.
-
-	  </ul>
-
-          <li>
-            <b>Exported targets:</b>
-
-            <p>
-              For an advanced setup in a big CMake project
-              <code><a href="#extcmake">deal.IIConfig.cmake</a></code>
-              provides information about the <acronym>deal.II</acronym>
-              installation with traditional variables, see
-              <a href="#extcmake">here</a>, as well as <i>external CMake
-              targets</i> with link interface for direct inclusion:
-              <pre>
-
-    INCLUDE(${DEAL_II_TARGET_CONFIG})
-
-    ADD_EXECUTABLE(step-1
-      step-1.cc
-      ${DEAL_II_TARGET}
-      )
-              </pre>
-            </p>
-      </ol>
-    </p>
+<p>
+  Importing the deal.IIConfig.cmake file via <code>FIND_PACKAGE</code>
+  will set the following variables and macros; all of the form
+  <code>DEAL_II_*</code>:
+</p>
+<pre class="todo">  
+A long list with detailed explanation...  
+</pre>
+  
 
 
 
     <a name="legacy"></a>
-    <h3> Legacy Make.global_options </h3>
+    <h2> Legacy Make.global_options </h2>
 
     <p>
       Before version 8.0, <acronym>deal.II</acronym> used the

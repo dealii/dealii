@@ -99,7 +99,7 @@ gradient of a scalar function:
   \mathbf{\tilde{v}}=\nabla\phi,
 \f]
 and so the second part of Euler equations above can be rewritten
-as the homogenous Laplace equation for the unknown $\phi$:
+as the homogeneous Laplace equation for the unknown $\phi$:
 \f{align*}
 \label{laplace}
 \Delta\phi &= 0 \qquad &&\text{in}\ \mathbb{R}^n\backslash\Omega,
@@ -612,7 +612,7 @@ iterative solver, without providing any preconditioner.
 If this were a production code rather than a demonstration of principles,
 there are techniques that are available to not store full matrices but instead
 store only those entries that are large and/or relevant. In the literature on
-boundary element methods, a plethory of methods is available that allows to
+boundary element methods, a plethora of methods is available that allows to
 determine which elements are important and which are not, leading to a
 significantly sparser representation of these matrices that also facilitates
 rapid evaluations of the scalar product between vectors and matrices. This not

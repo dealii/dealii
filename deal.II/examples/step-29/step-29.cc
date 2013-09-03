@@ -330,7 +330,7 @@ namespace Step29
   {}
 
 
-  // The actual prostprocessing happens in the following function.  Its inputs
+  // The actual postprocessing happens in the following function.  Its inputs
   // are a vector representing values of the function (which is here
   // vector-valued) representing the data vector given to
   // DataOut::add_data_vector, evaluated at all evaluation points where we
@@ -634,7 +634,7 @@ namespace Step29
                 // At this point, it is important to keep in mind that we are
                 // dealing with a finite element system with two
                 // components. Due to the way we constructed this FESystem,
-                // namely as the cartesian product of two scalar finite
+                // namely as the Cartesian product of two scalar finite
                 // element fields, each shape function has only a single
                 // nonzero component (they are, in deal.II lingo, @ref
                 // GlossPrimitive "primitive").  Hence, each shape function

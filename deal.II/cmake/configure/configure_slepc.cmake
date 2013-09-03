@@ -50,6 +50,7 @@ MACRO(FEATURE_SLEPC_FIND_EXTERNAL var)
       SET(SLEPC_DIR "" CACHE PATH
         "An optional hint to a SLEPc directory"
         )
+      MARK_AS_ADVANCED(CLEAR SLEPC_DIR)
 
       SET(${var} FALSE)
     ENDIF()

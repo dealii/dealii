@@ -345,7 +345,7 @@ namespace Step48
   // dimensions of extent $[-15,15]$. We refine the mesh more in the center of
   // the domain since the solution is concentrated there. We first refine all
   // cells whose center is within a radius of 11, and then refine once more
-  // for a radius 6.  This is simple ad-hoc refinement could be done better by
+  // for a radius 6.  This simple ad hoc refinement could be done better by
   // adapting the mesh to the solution using error estimators during the time
   // stepping as done in other example programs, and using
   // parallel::distributed::SolutionTransfer to transfer the solution to the

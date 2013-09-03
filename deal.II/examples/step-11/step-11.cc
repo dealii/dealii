@@ -140,7 +140,7 @@ namespace Step11
     // the mean value of the degrees of freedom on the boundary shall be
     // zero. For this, we first want a list of those nodes which are actually
     // at the boundary. The <code>DoFTools</code> class has a function that
-    // returns an array of boolean values where <code>true</code> indicates
+    // returns an array of Boolean values where <code>true</code> indicates
     // that the node is at the boundary. The second argument denotes a mask
     // selecting which components of vector valued finite elements we want to
     // be considered. This sort of information is encoded using the

@@ -448,7 +448,7 @@ namespace Step47
 // To integrate the enriched elements we have to find the geometrical
 // decomposition of the original element in subelements. The subelements are
 // used to integrate the elements on both sides of the discontinuity. The
-// disontinuity line is approximated by a piece-wise linear interpolation
+// discontinuity line is approximated by a piece-wise linear interpolation
 // between the intersection of the discontinuity with the edges of the
 // elements. The vector level_set_values has the values of the level set
 // function at the vertices of the elements. From these values can be found by
@@ -476,7 +476,7 @@ namespace Step47
 
     // the sign of the level set function at the 4 nodes of the elements can
     // be positive + or negative - depending on the sign of the level set
-    // function we have the folloing three classes of decomposition type 1:
+    // function we have the following three classes of decomposition type 1:
     // ++++, ---- type 2: -+++, +-++, ++-+, +++-, +---, -+--, --+-, ---+ type
     // 3: +--+, ++--, +-+-, -++-, --++, -+-+
 
