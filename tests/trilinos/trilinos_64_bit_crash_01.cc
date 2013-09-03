@@ -51,7 +51,7 @@ void test ()
 
 int main(int argc, char **argv)
 {
-  std::ofstream logfile("trilinos_64_bit_crash_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog << std::setprecision(4);
   deallog.depth_console(0);

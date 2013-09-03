@@ -65,7 +65,7 @@ check_solve( SOLVER &solver, const MATRIX &A,
 
 int main(int argc, char **argv)
 {
-  std::ofstream logfile("deal_solver_04/output");
+  std::ofstream logfile("output");
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

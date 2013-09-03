@@ -325,7 +325,7 @@ void test ()
 
 int main (int argc,char **argv)
 {
-  std::ofstream logfile("block_vector_iterator_03/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);

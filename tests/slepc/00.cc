@@ -26,7 +26,7 @@
 #include <fstream>
 #include <iostream>
 
-std::ofstream logfile ("00/output");
+std::ofstream logfile ("output");
 
 int main (int argc,char **argv)
 {

@@ -58,7 +58,7 @@ check_solve( SOLVER &solver, const MATRIX &A,
 
 int main(int argc, char **argv)
 {
-  std::ofstream logfile("solver_03_precondition_ssor/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog << std::setprecision(4);
   deallog.depth_console(0);

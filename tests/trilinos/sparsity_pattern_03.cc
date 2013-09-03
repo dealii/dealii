@@ -25,7 +25,7 @@ int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv);
 
-  std::ofstream logfile("sparsity_pattern_03/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
