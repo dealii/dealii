@@ -12,7 +12,7 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   )
 
 # Remove the trailing ".diff" from the target name:
-STRING(REGEX REPLACE "\.diff$" "" TEST "${TEST}")
+STRING(REGEX REPLACE ".diff$" "" TEST "${TEST}")
 
 IF("${_result_code}" STREQUAL "0")
 
