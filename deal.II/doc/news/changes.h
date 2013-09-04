@@ -69,6 +69,15 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Changed: distributed::parallel:BlockVector::operator= now allows importing
+  of ghost values like all other vector types. Also added some new constructors
+  for BlockVector and Vector using IndexSets to mirror the other linear algebra
+  classes.
+  <br>
+  (Timo Heister, 2013/09/04)
+  </li>
+
+  <li>
   Fixed: VectorTools::compute_no_normal_flux_constraints had a bug that
   only manifested on complex meshes. This is now fixed.
   <br>
