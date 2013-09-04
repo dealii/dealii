@@ -2795,7 +2795,32 @@ namespace parallel
                 }
             }
 
+          //step 4: Special case: on each level we need all the face neighbors of our own level cells
+          // these are normally on the same level, unless the neighbor is active and coarser. It
+          // can end up on a different processor. Luckily, the level_subdomain_id can be figured out
+          // without communication, because the cell is active (and so level_subdomain_id=subdomain_id):
+          for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(); cell!=this->end(); ++cell)
+            {
+              if (cell->level_subdomain_id()!=this->locally_owned_subdomain())
+                continue;
 
+              for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+                {
+                  if (cell->face(f)->at_boundary())
+                    continue;
+                  if (cell->neighbor(f)->level() < cell->level()
+                      &&
+                      cell->neighbor(f)->level_subdomain_id()!=this->locally_owned_subdomain())
+                    {
+                      Assert(cell->neighbor(f)->active(), ExcInternalError());
+                      Assert(cell->neighbor(f)->subdomain_id() != numbers::artificial_subdomain_id, ExcInternalError());
+                      Assert(cell->neighbor(f)->level_subdomain_id() == numbers::artificial_subdomain_id
+                           || cell->neighbor(f)->level_subdomain_id() == cell->neighbor(f)->subdomain_id(), ExcInternalError());
+                      cell->neighbor(f)->set_level_subdomain_id(cell->neighbor(f)->subdomain_id());
+                    }
+                }
+
+            }
 
         }
 

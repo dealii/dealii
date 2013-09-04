@@ -1212,6 +1212,40 @@ namespace internal
                     }
                 }
 
+              //additionally (multigrid only), we can have the case that children of our neighbor
+              //have us as a neighbor. In this case we and the children are active.
+              if (dealii_cell->active())
+                {
+                  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+                    {
+                      if (dealii_cell->at_boundary(f))
+                        continue;
+                      typename DoFHandler<dim,spacedim>::level_cell_iterator neighbor = dealii_cell->neighbor(f);
+                      if (!neighbor->has_children())
+                        continue;
+
+                      for (unsigned int subface=0; subface<GeometryInfo<dim>::max_children_per_face; ++subface)
+                        {
+                          typename DoFHandler<dim,spacedim>::level_cell_iterator child = dealii_cell->neighbor_child_on_subface(f,subface);
+                          dealii::types::subdomain_id dest = child->subdomain_id();
+                          Assert(dest != dealii::numbers::artificial_subdomain_id, ExcInternalError());
+                          if (dest != tria.locally_owned_subdomain())
+                            {
+                              if (send_to.find(dest) == send_to.end())
+                                {
+                                  std::cout << "********" << std::endl;
+                                }
+                              send_to.insert(dest);
+
+                            }
+                        }
+
+                    }
+
+                }
+
+
+              // send if we have something to send
               if (send_to.size() > 0)
                 {
                   // this cell's dof_indices
@@ -2320,7 +2354,8 @@ namespace internal
               for (typename DoFHandler<dim,spacedim>::level_cell_iterator
                    cell = dof_handler.begin(level);
                    cell != dof_handler.end(level); ++cell)
-                if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id && cell->level_subdomain_id() != tr->locally_owned_subdomain())
+                if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
+                    && cell->level_subdomain_id() != tr->locally_owned_subdomain())
                   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
                     if (locally_active_vertices[cell->vertex_index(v)])
                       vertices_with_ghost_neighbors[cell->vertex_index(v)]
@@ -2364,7 +2399,7 @@ namespace internal
                                      local_dof_indices.end(),
                                      DoFHandler<dim,spacedim>::invalid_dof_index))
                         {
-                          Assert(false, ExcMessage ("not all dofs got distributed!"));
+                          Assert(false, ExcMessage ("not all DoFs got distributed!"));
                         }
                     }
               }
