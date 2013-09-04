@@ -488,7 +488,7 @@ GridOut::default_suffix (const OutputFormat output_format)
     default:
       Assert (false, ExcNotImplemented());
       return "";
-    };
+    }
 }
 
 
@@ -686,9 +686,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 
   for (unsigned int i=0; i<vertices.size(); ++i)
     if (vertex_used[i])
-      {
         out << '\t' << vertices[i] << '\n';
-      };
 
   // write cells or faces
   const bool write_cells = dx_flags.write_cells;
@@ -931,7 +929,7 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
         for (unsigned int d=spacedim+1; d<=3; ++d)
           out << " 0";             // fill with zeroes
         out << std::endl;
-      };
+      }
 
   // Write cells preamble
   out << "$ENDNOD" << std::endl
@@ -1008,7 +1006,7 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
            ++vertex)
         out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex])+1 << ' ';
       out << std::endl;
-    };
+    }
 
   // write faces and lines with
   // non-zero boundary indicator
@@ -1065,7 +1063,7 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
           << "# For a description of the UCD format see the AVS Developer's guide."
           << '\n'
           << "#" << '\n';
-    };
+    }
 
   // start with ucd data
   out << n_vertices << ' '
@@ -1088,7 +1086,7 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
         for (unsigned int d=spacedim+1; d<=3; ++d)
           out << " 0";             // fill with zeroes
         out << '\n';
-      };
+      }
 
   // write cells. Enumerate cells
   // consecutively, starting with 1
@@ -1112,7 +1110,7 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
           break;
         default:
           Assert (false, ExcNotImplemented());
-        };
+        }
 
       // it follows a list of the
       // vertices of each cell. in 1d
@@ -1133,7 +1131,7 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
            ++vertex)
         out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex])+1 << ' ';
       out << '\n';
-    };
+    }
 
   // write faces and lines with
   // non-zero boundary indicator
@@ -2284,7 +2282,7 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
       break;
     default:
       Assert (false, ExcNotImplemented ());
-    };
+    }
   out << "\n";
 
   // (iii) write vertex ordering
@@ -2308,7 +2306,7 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
       break;
     default:
       Assert (false, ExcNotImplemented ());
-    };
+    }
 
   // (iv) write a list of vertices of cells
   out << "\n#"
@@ -2553,7 +2551,7 @@ void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
             break;
           default:
             Assert (false, ExcNotImplemented());
-          };
+          }
         out << static_cast<unsigned int>(face->boundary_indicator())
             << ' '
             << static_cast<unsigned int>(face->boundary_indicator())
@@ -2565,7 +2563,7 @@ void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
         out << '\n';
 
         ++index;
-      };
+      }
 }
 
 
@@ -2709,14 +2707,14 @@ void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
             break;
           default:
             Assert (false, ExcNotImplemented());
-          };
+          }
         // note: vertex numbers are 1-base
         for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
           out << face->vertex_index(GeometryInfo<dim-1>::ucd_to_deal[vertex])+1 << ' ';
         out << '\n';
 
         ++index;
-      };
+      }
 }
 
 
@@ -3272,7 +3270,7 @@ namespace internal
         {
           Assert(false, ExcInternalError());
           break;
-        };
+        }
 
         case 2:
         {
@@ -3390,12 +3388,12 @@ namespace internal
                         line_list.push_back (LineEntry(p0, p1,
                                                        face->user_flag_set(),
                                                        cell->level()));
-                      };
-                  };
-            };
+                      }
+                  }
+            }
 
           break;
-        };
+        }
 
         case 3:
         {
@@ -3498,7 +3496,7 @@ namespace internal
           y_max = std::max (y_max, line->second(1));
 
           max_level = std::max (max_level,  line->level);
-        };
+        }
 
       // scale in x-direction such that
       // in the output 0 <= x <= 300.
@@ -3585,14 +3583,14 @@ namespace internal
                       "/MCshow { currentpoint stroke m\n"
                       "exch dup MFwidth -2 div 3 -1 roll R MFshow } def\n")
                   << '\n';
-            };
+            }
 
           out << "%%EndProlog" << '\n'
               << '\n';
 
           // set fine lines
           out << eps_flags_base.line_width << " setlinewidth" << '\n';
-        };
+        }
 
       // now write the lines
       const Point<2> offset(x_min, y_min);
@@ -3637,8 +3635,8 @@ namespace internal
               out << ")] "
                   << "] -6 MCshow"
                   << '\n';
-            };
-        };
+            }
+        }
 
       // and the vertex numbers
       if ((dim == 2) && (eps_flags_2.write_vertex_numbers == true))
@@ -3672,8 +3670,8 @@ namespace internal
                       << ")] "
                       << "] -6 MCshow"
                       << '\n';
-                };
-        };
+                }
+        }
 
       out << "showpage" << '\n';
 
