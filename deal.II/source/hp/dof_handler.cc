@@ -3161,11 +3161,9 @@ namespace hp
   {
     Assert (has_children.size () == levels.size (), ExcInternalError ());
 
-    // In each refinement at most one new
-    // new level may appear. If that happened
-    // it is appended to the DoFHandler
-    // levels.
-    if (levels.size () < tria->n_levels ())
+    // Normally only one level is added, but if this Triangulation
+    // is created by copy_triangulation, it can be more than one level.
+    while (levels.size () < tria->n_levels ())
       levels.push_back (new dealii::internal::hp::DoFLevel<dim>);
 
     // Coarsening can lead to the loss
@@ -3175,6 +3173,8 @@ namespace hp
         delete levels[levels.size ()-1];
         levels.pop_back ();
       }
+
+    Assert(levels.size () == tria->n_levels (), ExcInternalError());
 
     // Resize active_fe_indices
     // vectors. use zero indicator to

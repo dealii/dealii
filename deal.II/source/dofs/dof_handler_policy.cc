@@ -1888,15 +1888,15 @@ namespace internal
 
 
 #ifdef DEBUG
-          {
+          {MPI_Barrier(tr->get_communicator());
             //check all msgs got sent and received
             unsigned int sum_send=0;
             unsigned int sum_recv=0;
             unsigned int sent=needs_to_get_cells.size();
             unsigned int recv=senders.size();
 
-            MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
-            MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
+            MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 56345, tr->get_communicator());
+            MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 56346, tr->get_communicator());
             Assert(sum_send==sum_recv, ExcInternalError());
           }
 #endif
