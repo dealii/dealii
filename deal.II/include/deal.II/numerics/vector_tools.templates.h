@@ -4365,7 +4365,8 @@ namespace VectorTools
 		    // we ask the mapping after all for its normal vector,
 		    // but we only ask it so that we can possibly correct the
 		    // sign of the normal vector provided by the boundary
-		    // if they should point in different directions
+		    // if they should point in different directions. this is the
+		    // case in tests/deal.II/no_flux_11.
                     Point<dim> normal_vector
                       = (cell->face(face_no)->get_boundary()
                          .normal_vector (cell->face(face_no),
