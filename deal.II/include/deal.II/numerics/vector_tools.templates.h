@@ -4250,7 +4250,8 @@ namespace VectorTools
     hp::FEFaceValues<dim,spacedim> x_fe_face_values (mapping_collection,
                                                      fe_collection,
                                                      face_quadrature_collection,
-                                                     update_q_points);
+                                                     update_q_points |
+						     update_normal_vectors);
 
     // have a map that stores normal vectors for each vector-dof tuple we want
     // to constrain. since we can get at the same vector dof tuple more than
@@ -4347,17 +4348,37 @@ namespace VectorTools
                     // to check that they are small *relative to something
                     // else*). we do this and then normalize the length of the
                     // vector back to one, just to be on the safe side
+		    //
+		    // one more point: we would like to use the "real" normal
+		    // vector here, as provided by the boundary description
+		    // and as opposed to what we get from the FEValues object.
+		    // we do this in the immediately next line, but as is
+		    // obvious, the boundary only has a vague idea which side
+		    // of a cell it is on -- indicated by the face number. in
+		    // other words, it may provide the inner or outer normal.
+		    // by and large, there is no harm from this, since the
+		    // tangential vector we compute is still the same. however,
+		    // we do average over normal vectors from adjacent cells
+		    // and if they have recorded normal vectors from the inside
+		    // once and from the outside the other time, then this
+		    // averaging is going to run into trouble. as a consequence
+		    // we ask the mapping after all for its normal vector,
+		    // but we only ask it so that we can possibly correct the
+		    // sign of the normal vector provided by the boundary
+		    // if they should point in different directions
                     Point<dim> normal_vector
                       = (cell->face(face_no)->get_boundary()
                          .normal_vector (cell->face(face_no),
                                          fe_values.quadrature_point(i)));
+		    if (normal_vector * fe_values.normal_vector(i) < 0)
+		      normal_vector *= -1;
                     Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
                             ExcInternalError());
                     for (unsigned int d=0; d<dim; ++d)
                       if (std::fabs(normal_vector[d]) < 1e-13)
                         normal_vector[d] = 0;
                     normal_vector /= normal_vector.norm();
-
+		    
                     // now enter the (dofs,(normal_vector,cell)) entry into
                     // the map
                     dof_to_normals_map
