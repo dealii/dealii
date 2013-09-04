@@ -76,14 +76,14 @@ namespace internal
 
       /**
        * Store the start index for the degrees of freedom of each
-       * object in the @p dofs array. If the cell corresponding to
+       * object in the @p dof_indices array. If the cell corresponding to
        * a particular index in this array is not active on this level,
        * then we do not store any DoFs for it. In that case, the offset
        * we store here must be an invalid number and indeed we store
        * <code>(std::vector<types::global_dof_index>::size_type)(-1)</code>
        * for it.
        *
-       * The type we store is then obviously the type the @p dofs array
+       * The type we store is then obviously the type the @p dof_indices array
        * uses for indexing.
        */
       std::vector<std::vector<types::global_dof_index>::size_type> dof_offsets;
@@ -93,7 +93,7 @@ namespace internal
        * information. The dof_offsets field determines where each
        * (active) cell's data is stored.
        */
-      std::vector<types::global_dof_index> dofs;
+      std::vector<types::global_dof_index> dof_indices;
 
     public:
 
@@ -221,7 +221,7 @@ namespace internal
 
       Assert (fe_index == active_fe_indices[obj_index],
 	      ExcMessage ("FE index does not match that of the present cell"));
-      return dofs[dof_offsets[obj_index]+local_index];
+      return dof_indices[dof_offsets[obj_index]+local_index];
     }
 
 
@@ -248,7 +248,7 @@ namespace internal
 
       Assert (fe_index == active_fe_indices[obj_index],
 	      ExcMessage ("FE index does not match that of the present cell"));
-      dofs[dof_offsets[obj_index]+local_index] = global_index;
+      dof_indices[dof_offsets[obj_index]+local_index] = global_index;
     }
 
 

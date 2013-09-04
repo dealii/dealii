@@ -592,7 +592,7 @@ namespace internal
                     next_free_dof += cell->get_fe().dofs_per_line;
                   }
 
-              dof_handler.levels[level]->dofs
+              dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
@@ -614,7 +614,7 @@ namespace internal
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_line;
 
-              Assert (dof_handler.levels[level]->dofs.size() == counter,
+              Assert (dof_handler.levels[level]->dof_indices.size() == counter,
                       ExcInternalError());
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
@@ -709,7 +709,7 @@ namespace internal
                     next_free_dof += cell->get_fe().dofs_per_quad;
                   }
 
-              dof_handler.levels[level]->dofs
+              dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
@@ -731,7 +731,7 @@ namespace internal
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_quad;
 
-              Assert (dof_handler.levels[level]->dofs.size() == counter,
+              Assert (dof_handler.levels[level]->dof_indices.size() == counter,
                       ExcInternalError());
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
@@ -1075,7 +1075,7 @@ namespace internal
                     next_free_dof += cell->get_fe().dofs_per_hex;
                   }
 
-              dof_handler.levels[level]->dofs
+              dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
@@ -1097,7 +1097,7 @@ namespace internal
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_hex;
 
-              Assert (dof_handler.levels[level]->dofs.size() == counter,
+              Assert (dof_handler.levels[level]->dof_indices.size() == counter,
                       ExcInternalError());
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
