@@ -92,7 +92,6 @@ int main (int argc, char **argv)
       set (w);
       parallel::distributed::Vector<double> v(local, dense_local, MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
-      v.update_ghost_values(); // this is necessary for this kind of vector
       test (v);
       deallog.pop();
     }
@@ -155,7 +154,6 @@ int main (int argc, char **argv)
       set (w);
       parallel::distributed::BlockVector<double> v(partitioning, dense_partitioning, MPI_COMM_WORLD);
       v = w; // get copy of vector including ghost elements
-      v.update_ghost_values(); // this is necessary for this kind of vector
       test (v);
       deallog.pop();
     }
