@@ -1102,6 +1102,7 @@ namespace parallel
             reinit (c, true);
         }
       vector_view = c.vector_view;
+      update_ghost_values();
       return *this;
     }
 
