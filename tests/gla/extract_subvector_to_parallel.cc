@@ -86,16 +86,16 @@ int main (int argc, char **argv)
     IndexSet dense_local (10);
     dense_local.add_range(0,10);
 
-//TODO: does not currently compile
-    // {
-    //   deallog.push("deal.II");
-    //   parallel::distributed::Vector<double> w(local, MPI_COMM_WORLD);
-    //   set (w);
-    //   parallel::distributed::Vector<double> v(local, dense_local, MPI_COMM_WORLD);
-    //   v = w; // get copy of vector including ghost elements
-    //   test (v);
-    //   deallog.pop();
-    // }
+    {
+      deallog.push("deal.II");
+      parallel::distributed::Vector<double> w(local, MPI_COMM_WORLD);
+      set (w);
+      parallel::distributed::Vector<double> v(local, dense_local, MPI_COMM_WORLD);
+      v = w; // get copy of vector including ghost elements
+      v.update_ghost_values(); // this is necessary for this kind of vector
+      test (v);
+      deallog.pop();
+    }
 
     {
       deallog.push("PETSc");
@@ -149,16 +149,16 @@ int main (int argc, char **argv)
     }
 
 
-//TODO: does not currently compile
-    // {
-    //   deallog.push("deal.II");
-    //   parallel::distributed::BlockVector<double> w(partitioning, MPI_COMM_WORLD);
-    //   set (w);
-    //   parallel::distributed::BlockVector<double> v(partitioning, dense_partitioning, MPI_COMM_WORLD);
-    //   v = w; // get copy of vector including ghost elements
-    //   test (v);
-    //   deallog.pop();
-    // }
+    {
+      deallog.push("deal.II");
+      parallel::distributed::BlockVector<double> w(partitioning, MPI_COMM_WORLD);
+      set (w);
+      parallel::distributed::BlockVector<double> v(partitioning, dense_partitioning, MPI_COMM_WORLD);
+      v = w; // get copy of vector including ghost elements
+      v.update_ghost_values(); // this is necessary for this kind of vector
+      test (v);
+      deallog.pop();
+    }
 
     {
       deallog.push("PETSc");
