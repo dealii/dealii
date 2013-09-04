@@ -14,8 +14,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__hp_dof_levels_h
-#define __deal2__hp_dof_levels_h
+#ifndef __deal2__hp_dof_level_h
+#define __deal2__hp_dof_level_h
 
 
 #include <deal.II/base/config.h>

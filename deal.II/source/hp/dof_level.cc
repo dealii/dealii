@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/hp/dof_levels.h>
+#include <deal.II/hp/dof_level.h>
 
 DEAL_II_NAMESPACE_OPEN
 

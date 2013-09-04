@@ -23,7 +23,7 @@ FILE(GLOB _header
 SET(_src
   dof_faces.cc
   dof_handler.cc
-  dof_levels.cc
+  dof_level.cc
   dof_objects.cc
   fe_collection.cc
   fe_values.cc
