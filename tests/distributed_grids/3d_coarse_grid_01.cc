@@ -40,7 +40,7 @@ void test(std::ostream & /*out*/)
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
       GridGenerator::hyper_cube(tr);
-      write_vtk (tr, "3d_coarse_grid_01", "1");
+      write_vtk(tr, "1");
     }
 
 
@@ -51,7 +51,7 @@ void test(std::ostream & /*out*/)
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
       GridGenerator::hyper_ball(tr, Point<dim>(), 3.);
-      write_vtk (tr, "3d_coarse_grid_01", "2");
+      write_vtk(tr, "2");
     }
 
   if (true)
@@ -61,7 +61,7 @@ void test(std::ostream & /*out*/)
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
       GridGenerator::half_hyper_ball(tr, Point<dim>(), 3.);
-      write_vtk (tr, "3d_coarse_grid_01", "3");
+      write_vtk(tr, "3");
     }
 }
 

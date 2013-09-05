@@ -42,7 +42,7 @@ void test(std::ostream & /*out*/)
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement ();
 
-  write_vtk (tr, "2d_refinement_01", "2");
+  write_vtk(tr, "2");
 }
 
 

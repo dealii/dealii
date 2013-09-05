@@ -52,7 +52,7 @@ void test(std::ostream & /*out*/)
               << std::endl;
     }
 
-  write_vtk (tr, "2d_coarse_grid_02", "1");
+  write_vtk(tr, "1");
 }
 
 

@@ -50,7 +50,7 @@ void test(std::ostream & /*out*/)
       tr.begin(0)->child(c)->set_refine_flag();
     tr.execute_coarsening_and_refinement ();
 
-//    write_vtk (tr, "3d_refinement_07", "2");
+//    write_vtk(tr, "2");
     deallog << "cells test2: " << tr.n_active_cells() << std::endl;
 
     Assert (tr.n_active_cells() == 88, ExcInternalError());

@@ -44,7 +44,7 @@ void test(std::ostream & /*out*/)
     tr.begin(1)->child(c)->set_coarsen_flag();
   tr.execute_coarsening_and_refinement ();
 
-  write_vtk (tr, "3d_coarsening_01", "2");
+  write_vtk(tr, "2");
 }
 
 

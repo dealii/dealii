@@ -44,7 +44,7 @@ void test(const char *filename)
   std::ifstream in (filename);
   gi.read_xda (in);
 
-  write_vtk (tr, "3d_coarse_grid_02", "1");
+  write_vtk(tr, "1");
 
   deallog.pop ();
 }

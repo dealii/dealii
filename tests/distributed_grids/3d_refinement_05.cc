@@ -89,7 +89,7 @@ void test(std::ostream & /*out*/)
               << tr2.n_active_cells()
               << std::endl;
 
-      assert_tria_equal("3d_refinement_05", tr, tr2);
+      assert_tria_equal(tr, tr2);
 
     }
 }

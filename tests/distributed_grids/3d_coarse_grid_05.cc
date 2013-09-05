@@ -139,7 +139,7 @@ void test(std::ostream & /*out*/)
 
   create_disconnected_mesh (tr);
 
-  write_vtk (tr, "3d_coarse_grid_05", "1");
+  write_vtk(tr, "1");
 }
 
 

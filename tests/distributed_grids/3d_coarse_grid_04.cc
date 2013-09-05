@@ -38,7 +38,7 @@ void test(std::ostream & /*out*/)
   gi.attach_triangulation (tr);
   gi.read ("../bits/two_cubes.inp");
 
-  write_vtk (tr, "3d_coarse_grid_04", "1");
+  write_vtk(tr, "1");
 }
 
 

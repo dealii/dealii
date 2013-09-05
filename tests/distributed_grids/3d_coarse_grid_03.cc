@@ -40,7 +40,7 @@ void test(std::ostream & /*out*/)
   std::ifstream in ("../bits/gerold_1.inp");
   gi.read_ucd (in);
 
-  write_vtk (tr, "3d_coarse_grid_03", "1");
+  write_vtk(tr, "1");
 }
 
 

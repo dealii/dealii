@@ -104,7 +104,7 @@ void test(std::ostream & /*out*/)
     }
 
   deallog << tr.n_active_cells() << ' ' << tr2.n_active_cells() << std::endl;
-  assert_tria_equal("2d_coarsening_03", tr, tr2);
+  assert_tria_equal(tr, tr2);
 
   for (unsigned int i=0; i<1; ++i)
     {
@@ -174,7 +174,7 @@ void test(std::ostream & /*out*/)
               << tr.n_active_cells() << ' '
               << tr2.n_active_cells()
               << std::endl;
-      assert_tria_equal("2d_coarsening_03", tr, tr2);
+      assert_tria_equal(tr, tr2);
     }
 }
 
