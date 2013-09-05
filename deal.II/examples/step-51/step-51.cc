@@ -323,22 +323,32 @@ public:
 
 private:
 
+// Data for the assembly and solution of the primal variables.
   struct PerTaskData;
   struct ScratchData;
 
+// Post-processing the solution to obtain $u^*$ is an element-by-element
+// procedure; as such, we do not need to assemble any global data and do
+// not declare any `task data' for WorkStream to use.
   struct PostProcessScratchData;
 
   void setup_system ();
   void assemble_system (const bool reconstruct_trace = false);
+  void solve ();
+  void postprocess ();
+  
+// The following 3 functions are used by WorkStream to do the actual work of
+// the program.
   void assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                  ScratchData &scratch,
                                  PerTaskData &task_data);
+  
   void copy_local_to_global(const PerTaskData &data);
-  void solve ();
-  void postprocess ();
+
   void postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                              PostProcessScratchData &scratch,
                              unsigned int &empty_data);
+                             
   void refine_grid (const unsigned int cylce);
   void output_results (const unsigned int cycle);
 
@@ -391,8 +401,12 @@ private:
   ConvergenceTable     convergence_table;
 };
 
+// @sect3{The Step51 class implementation}
 
-
+// @sect4{Step51::Step51}
+// The constructor is similar to those in other examples, with the
+// exception of handling multiple <code>DoFHandler</code> and
+// <code>FiniteElement</code> objects.
 template <int dim>
 Step51<dim>::Step51 (const unsigned int degree,
                      const RefinementMode refinement_mode) :
@@ -407,7 +421,7 @@ Step51<dim>::Step51 (const unsigned int degree,
 {}
 
 
-
+// @sect4{Step51::PerTaskData}
 // First come the definition of the local data structures for the parallel
 // assembly. The first structure @p PerTaskData contains the local vector and
 // matrix that are written into the global matrix, whereas the ScratchData
@@ -435,8 +449,19 @@ struct Step51<dim>::PerTaskData
   }
 };
 
-
-
+// @sect4{Step51::ScratchData}
+// @p ScratchData contains persistent data for each thread within
+// <code>WorkStream</code>.  The <code>FEValues</code>,
+// matrix, and vector objects should be familiar by now.
+// There are two objects that need to be discussed:
+// @p std::vector<std::vector<unsigned int> > fe_local_support_on_face
+// and @p std::vector<std::vector<unsigned int> > fe_support_on_face.
+// These are used to indicate whether or not the finite elements chosen
+// have support (non-zero values) on a given face of the reference cell,
+// which is why we can store it once for all cells that we work on.
+// Had we not stored this information, we would be forced to assemble
+// a large number of zero terms on each cell, which would significantly
+// slow the program.
 template <int dim>
 struct Step51<dim>::ScratchData
 {
@@ -465,7 +490,6 @@ struct Step51<dim>::ScratchData
   RightHandSide<dim> right_hand_side;
   const Solution<dim> exact_solution;
 
-  // Full constructor
   ScratchData(const FiniteElement<dim> &fe,
               const FiniteElement<dim> &fe_local,
               const QGauss<dim>   &quadrature_formula,
@@ -507,7 +531,6 @@ struct Step51<dim>::ScratchData
         }
   }
 
-  // Copy constructor
   ScratchData(const ScratchData &sd)
     :
     fe_values_local (sd.fe_values_local.get_fe(),
@@ -543,6 +566,10 @@ struct Step51<dim>::ScratchData
 
 };
 
+// @sect4{Step51::PostProcessScratchData}
+// @p PostProcessScratchData contains the data used by <code>WorkStream</code>
+// when post-processing the local solution $u^*$.  It is similar, but much
+// simpler, than @p ScratchData.
 template <int dim>
 struct Step51<dim>::PostProcessScratchData
 {
@@ -556,7 +583,6 @@ struct Step51<dim>::PostProcessScratchData
   Vector<double> cell_rhs;
   Vector<double> cell_sol;
 
-  // Full constructor
   PostProcessScratchData(const FiniteElement<dim> &fe,
                          const FiniteElement<dim> &fe_local,
                          const QGauss<dim>   &quadrature_formula,
@@ -572,7 +598,6 @@ struct Step51<dim>::PostProcessScratchData
     cell_sol (fe.dofs_per_cell)
   {}
 
-  // Copy constructor
   PostProcessScratchData(const PostProcessScratchData &sd)
     :
     fe_values_local (sd.fe_values_local.get_fe(),
@@ -597,6 +622,10 @@ struct Step51<dim>::PostProcessScratchData
 
 };
 
+
+// @sect4{Step51::copy_local_to_global}
+// If we are in the first step of the solution, i.e. @p trace_reconstruct=false,
+// then we assemble the global system.
 template <int dim>
 void Step51<dim>::copy_local_to_global(const PerTaskData &data)
 {
@@ -607,6 +636,11 @@ void Step51<dim>::copy_local_to_global(const PerTaskData &data)
                                             system_matrix, system_rhs);
 }
 
+// @sect4{Step51::setup_system}
+// The system for an HDG solution is setup in an analogous manner to most
+// of the other tutorial programs.  We are careful to distribute dofs with
+// all of our <code>DoFHandler</code> objects.  The @p solution and @p system_matrix
+// objects go with the global skeleton solution.
 template <int dim>
 void
 Step51<dim>::setup_system ()
@@ -646,7 +680,12 @@ Step51<dim>::setup_system ()
 }
 
 
-
+// @sect4{Step51::assemble_system}
+// The @p assemble_system function is similar to <code>Step-32</code>, where a few
+// objects are setup, and then <code>WorkStream</code> is used to do the work in a
+// multi-threaded manner.  The @p trace_reconstruct input parameter is used 
+// to decide whether we are solving for the local solution (true) or the 
+// global skeleton solution (false).
 template <int dim>
 void
 Step51<dim>::assemble_system (const bool trace_reconstruct)
@@ -681,14 +720,17 @@ Step51<dim>::assemble_system (const bool trace_reconstruct)
                   task_data);
 }
 
-
+// @sect4{Step51::assemble_system_one_cell}
+// The real work of the Step51 program is done by @p assemble_system_one_cell.  
+// Assembling the local matrices $A, B, C$ is done here, along with the 
+// local contributions of the global matrix $D$.
 template <int dim>
 void
 Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                        ScratchData &scratch,
                                        PerTaskData &task_data)
 {
-  // Construct iterator for dof_handler_local
+// Construct iterator for dof_handler_local for FEValues reinit function.
   typename DoFHandler<dim>::active_cell_iterator
   loc_cell (&triangulation,
             cell->level(),
@@ -698,7 +740,6 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
   const unsigned int n_q_points    = scratch.fe_values_local.get_quadrature().size();
   const unsigned int n_face_q_points = scratch.fe_face_values_local.get_quadrature().size();
 
-  //  const unsigned int dofs_per_cell = scratch.fe_face_values.get_fe().dofs_per_cell;
   const unsigned int loc_dofs_per_cell = scratch.fe_values_local.get_fe().dofs_per_cell;
 
   // Choose stabilization parameter to be 5 * diffusion = 5
@@ -717,6 +758,13 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
     }
   scratch.fe_values_local.reinit (loc_cell);
 
+// We first compute the @p ll_matrix matrix 
+// (referred to as matrix $A$ in the introduction)
+// corresponding to local-local coupling, 
+// as well as the local right-hand-side vector.
+// We store the values at each quadrature point 
+// for the basis functions, the 
+// right-hand-side value, and the convection velocity.
   for (unsigned int q=0; q<n_q_points; ++q)
     {
       const double rhs_value
@@ -747,10 +795,16 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
         }
     }
 
+// Face terms are assembled on all faces of all elements.  This is in contrast to 
+// more traditional DG methods, where each face is only visited once in the assembly
+// procedure.
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
       scratch.fe_face_values_local.reinit(loc_cell, face);
       scratch.fe_face_values.reinit(cell, face);
+      
+// The already obtained $\hat{u}$ values are needed when solving for
+// the local variables. 
       if (task_data.trace_reconstruct)
         scratch.fe_face_values.get_function_values (solution, scratch.trace_values);
 
@@ -765,6 +819,8 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
           const double tau_stab = (tau_stab_diffusion +
                                    std::abs(convection * normal));
 
+// We store the non-zero flux and scalar values, making use of the 
+// support_on_face information we calculated in @p ScratchData.
           for (unsigned int k=0; k<scratch.fe_local_support_on_face[face].size(); ++k)
             {
               const unsigned int kk=scratch.fe_local_support_on_face[face][k];
@@ -772,6 +828,11 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
               scratch.u_phi[k] = scratch.fe_face_values_local[scalar].value(kk,q);
             }
 
+// When @ptrace_reconstruct=false, we are preparing to solve for the skeleton variable
+// $\lambda$.  If this is the case, we must assemble all local matrices associated
+// with the problem:  local-local, local-face, face-local, and face-face.
+// The face-face matrix is stored as @p TaskData::cell_matrix, so that it can be
+// assembled into the global system by @p copy_local_to_global.
           if (!task_data.trace_reconstruct)
             {
               for (unsigned int k=0; k<scratch.fe_support_on_face[face].size(); ++k)
@@ -831,7 +892,11 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
                 scratch.ll_matrix(ii,jj) += tau_stab * scratch.u_phi[i] * scratch.u_phi[j] * JxW;
               }
 
-          // compute the local right hand side contributions from trace
+// When @p trace_reconstruct=true, we are solving for the local solutions on an 
+// element by element basis.  The local right-hand-side is calculated by replacing
+// the basis functions @p tr_phi in the @p lf_matrix computation by the computed
+// values @p trace_values.  Of course, the sign of the matrix is now minus since
+// we have moved everything to the other side of the equation.
           if (task_data.trace_reconstruct)
             for (unsigned int i=0; i<scratch.fe_local_support_on_face[face].size(); ++i)
               {
@@ -844,7 +909,14 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
         }
     }
 
+// Once assembly of all of the local contributions is complete, we must either:
+// (1) assemble the global system, or (2) compute the local solution values and
+// save them.
+// In either case, the first step is to invert the local-local matrix.
   scratch.ll_matrix.gauss_jordan();
+  
+// For (1), we compute the Schur complement and store it as the 
+// @p cell_matrix.
   if (task_data.trace_reconstruct == false)
     {
       scratch.fl_matrix.mmult(scratch.tmp_matrix, scratch.ll_matrix);
@@ -852,6 +924,9 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
       scratch.tmp_matrix.mmult(task_data.cell_matrix, scratch.lf_matrix, true);
       cell->get_dof_indices(task_data.dof_indices);
     }
+// For (2), we are simply solving (ll_matrix).(solution_local) = (l_rhs).  Hence,
+// we simply multipy l_rhs by our already inverted local-local matrix and store the
+// result using the <code>set_dof_values</code> function.
   else
     {
       scratch.ll_matrix.vmult(scratch.tmp_rhs, scratch.l_rhs);
@@ -860,7 +935,9 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
 }
 
 
-
+// @sect4{Step51::solve}
+// The skeleton solution is solved for by using a BiCGStab solver with
+// identity preconditioner.  
 template <int dim>
 void Step51<dim>::solve ()
 {
@@ -878,7 +955,10 @@ void Step51<dim>::solve ()
 
   constraints.distribute(solution);
 
-  // update local values
+// Once we have solved for the skeleton solution,
+// we can solve for the local solutions in an element-by-element
+// fashion.  We do this by re-using the same @p assemble_system function
+// buy switching @p trace_reconstruct to true.
   assemble_system(true);
 }
 
@@ -1014,7 +1094,14 @@ Step51<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_i
   cell->distribute_local_to_global(scratch.cell_sol, solution_u_post);
 }
 
-
+// @sect4{Step51::output_results}
+// We have 3 sets of results that we would like to output:  the local solution,
+// the post-processed local solution, and the skeleton solution.  The former 2
+// both `live' on element volumes, wheras the latter lives on codimention-1 surfaces
+// of the triangulation.  Our @p output_results function writes all local solutions
+// to the same vtk file, even though they correspond to different <code>DoFHandler</code> 
+// objects.  The graphical output for the skeleton variable is done through
+// use of the <code>DataOutFaces</code> class.
 template <int dim>
 void Step51<dim>::output_results (const unsigned int cycle)
 {
@@ -1040,18 +1127,22 @@ void Step51<dim>::output_results (const unsigned int cycle)
   std::ofstream output (filename.c_str());
 
   DataOut<dim> data_out;
+  
+// We first define the names and types of the local solution,
+// and add the data to @p data_out.
   std::vector<std::string> names (dim, "gradient");
   names.push_back ("solution");
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
   component_interpretation
-  (dim+1, DataComponentInterpretation::component_is_part_of_vector);
+      (dim+1, DataComponentInterpretation::component_is_part_of_vector);
   component_interpretation[dim]
-  = DataComponentInterpretation::component_is_scalar;
+      = DataComponentInterpretation::component_is_scalar;
   data_out.add_data_vector (dof_handler_local, solution_local,
                             names, component_interpretation);
 
-  // Post-processed solution:  can now add more than 1 dof_handler to
-  // the DataOut object!
+// The second data item we add is the post-processed solution.  
+// In this case, it is a single scalar variable belonging to 
+// a different DoFHandler.
   std::vector<std::string> post_name(1,"u_post");
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
   post_comp_type(1, DataComponentInterpretation::component_is_scalar);
@@ -1066,6 +1157,10 @@ void Step51<dim>::output_results (const unsigned int cycle)
   face_out += ".vtk";
   std::ofstream face_output (face_out.c_str());
 
+// The <code>DataOutFaces</code> class works analagously to the <code>DataOut</code>
+// class when we have a <code>DoFHandler</code> that defines the solution on
+// the skeleton of the triangulation.  We treat it as such here, and the code is
+// similar to that above.
   DataOutFaces<dim> data_out_face(false);
   std::vector<std::string> face_name(1,"lambda");
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -1080,8 +1175,13 @@ void Step51<dim>::output_results (const unsigned int cycle)
   data_out_face.write_vtk (face_output);
 }
 
-
-
+// @sect4{Step51::refine_grid}
+// We implement two different refinement cases for Step51, just as in
+// <code>Step-7</code>:  adaptive_refinement and global_refinement.
+// The global_refinement option recreates the entire triangulation
+// every time.
+// The adaptive_refinement mode uses the <code>KellyErrorEstimator</code>
+// give a decent approximation of the non-regularity of the local solutions.
 template <int dim>
 void Step51<dim>::refine_grid (const unsigned int cycle)
 {
@@ -1145,10 +1245,10 @@ void Step51<dim>::refine_grid (const unsigned int cycle)
         cell->face(face)->set_boundary_indicator (1);
 }
 
-
-
-
-
+// @sect4{Step51::run}
+// The functionality here is basically the same as <code>Step-7</code>.
+// We loop over 10 cycles, refining the grid on each one.  At the end,
+// convergence tables are created.
 template <int dim>
 void Step51<dim>::run ()
 {
