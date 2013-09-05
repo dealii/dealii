@@ -194,7 +194,7 @@ namespace internal
        * is the class that needs to create these data structures.
        */
       template <int, int> friend class dealii::hp::DoFHandler;
-      friend class dealii::internal::hp::DoFHandler::Implementation;
+      friend struct dealii::internal::hp::DoFHandler::Implementation;
     };
 
 
