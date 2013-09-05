@@ -2787,7 +2787,7 @@ namespace VectorTools
                              std::vector<double> &dof_values,
                              std::vector<bool> &dofs_processed)
     {
-      const double tol = 0.5 * cell->get_fe ().degree * 1e-13 / cell->face (face)->line (line)->diameter ();
+      const double tol = 0.5 * cell->face (face)->line (line)->diameter () / cell->get_fe ().degree;
       const unsigned int dim = 3;
       const unsigned int spacedim = 3;
 
@@ -2991,6 +2991,7 @@ namespace VectorTools
         {
         case 2:
         {
+          const double tol = 0.5 * cell->face (face)->diameter () / cell->get_fe ().degree;
           std::vector<Point<dim> >
           tangentials (fe_values.n_quadrature_points);
 
@@ -3024,18 +3025,18 @@ namespace VectorTools
                 = reference_quadrature_points[q_point];
 
               shifted_reference_point_1 (face_coordinate_direction[face])
-              += 1e-13;
+              += tol;
               shifted_reference_point_2 (face_coordinate_direction[face])
-              -= 1e-13;
+              -= tol;
               tangentials[q_point]
-                = 2e13
-                  * (fe_values.get_mapping ()
+                = (fe_values.get_mapping ()
                      .transform_unit_to_real_cell (cell,
                                                    shifted_reference_point_1)
                      -
                      fe_values.get_mapping ()
                      .transform_unit_to_real_cell (cell,
-                                                   shifted_reference_point_2));
+                                                   shifted_reference_point_2))
+                  / tol;
               tangentials[q_point]
               /= std::sqrt (tangentials[q_point].square ());
               // Compute the degrees
@@ -3412,15 +3413,13 @@ namespace VectorTools
                   // if the degree of
                   // freedom is not
                   // already constrained.
-                  const double tol = 0.5 * cell->get_fe ().degree * 1e-13  / cell->face (face)->diameter ();
-
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (dofs_processed[dof] && constraints.can_store_line (face_dof_indices[dof])
                         && !(constraints.is_constrained (face_dof_indices[dof])))
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > tol)
+                        if (std::abs (dof_values[dof]) > 1e-13)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -3507,11 +3506,8 @@ namespace VectorTools
                   // Store the computed
                   // values in the global
                   // vector.
-
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
-
-                  const double tol = 0.5 * superdegree * 1e-13 / cell->face (face)->diameter ();
 
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (dofs_processed[dof] && constraints.can_store_line (face_dof_indices[dof])
@@ -3519,7 +3515,7 @@ namespace VectorTools
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > tol)
+                        if (std::abs (dof_values[dof]) > 1e-13)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -3611,15 +3607,13 @@ namespace VectorTools
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
 
-                  const double tol = 0.5 * cell->get_fe ().degree * 1e-13  / cell->face (face)->diameter ();
-
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (dofs_processed[dof] && constraints.can_store_line (face_dof_indices[dof])
                         && !(constraints.is_constrained (face_dof_indices[dof])))
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > tol)
+                        if (std::abs (dof_values[dof]) > 1e-13)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -3705,15 +3699,13 @@ namespace VectorTools
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
 
-                  const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
-
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (dofs_processed[dof] && constraints.can_store_line (face_dof_indices[dof])
                         && !(constraints.is_constrained (face_dof_indices[dof])))
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > tol)
+                        if (std::abs (dof_values[dof]) > 1e-13)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
