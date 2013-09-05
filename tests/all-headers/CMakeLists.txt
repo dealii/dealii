@@ -12,6 +12,7 @@ FILE(GLOB_RECURSE _header
   )
 
 FOREACH(_full_file ${_header})
+
   GET_FILENAME_COMPONENT(_file ${_full_file} NAME)
 
   # TODO: A more sophisticated way to get the relative include path:
@@ -27,37 +28,44 @@ FOREACH(_full_file ${_header})
     SET(_test ${_category}-${_path}-${_file}.${_build_lowercase})
 
     #
-    # Add an object library for each header file and build configuration:
+    # Respect TEST_PICKUP_REGEX:
     #
-    ADD_LIBRARY(${_test} OBJECT EXCLUDE_FROM_ALL test_header.cc)
-    SET_TARGET_PROPERTIES(${_test} PROPERTIES
-      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
-      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
-      )
-    SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
-      INCLUDE_DIRECTORIES
-        "${CMAKE_BINARY_DIR}/include"
-        "${CMAKE_SOURCE_DIR}/include"
-        "${CMAKE_SOURCE_DIR}/include/deal.II/"
-      )
-    SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
-      COMPILE_DEFINITIONS
-        HEADER=<deal.II/${_path}/${_file}>
-      )
+    IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
+        _test MATCHES "${TEST_PICKUP_REGEX}" )
 
-    #
-    # And finally add the test:
-    #
-    ADD_TEST(NAME ${_category}/${_path}/${_file}.${_build_lowercase}
-      COMMAND ${CMAKE_COMMAND}
-        -DTEST=${_test}
-        -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-        -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-      )
-    SET_TESTS_PROPERTIES(${_category}/${_path}/${_file}.${_build_lowercase} PROPERTIES
-      LABEL "${_category}"
-      TIMEOUT ${TEST_TIME_LIMIT}
-      )
+      #
+      # Add an object library for each header file and build configuration:
+      #
+      ADD_LIBRARY(${_test} OBJECT EXCLUDE_FROM_ALL test_header.cc)
+      SET_TARGET_PROPERTIES(${_test} PROPERTIES
+        COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
+        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
+        )
+      SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
+        INCLUDE_DIRECTORIES
+          "${CMAKE_BINARY_DIR}/include"
+          "${CMAKE_SOURCE_DIR}/include"
+          "${CMAKE_SOURCE_DIR}/include/deal.II/"
+        )
+      SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
+        COMPILE_DEFINITIONS
+          HEADER=<deal.II/${_path}/${_file}>
+        )
+
+      #
+      # And finally add the test:
+      #
+      ADD_TEST(NAME ${_category}/${_path}/${_file}.${_build_lowercase}
+        COMMAND ${CMAKE_COMMAND}
+          -DTEST=${_test}
+          -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
+          -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+      SET_TESTS_PROPERTIES(${_category}/${_path}/${_file}.${_build_lowercase} PROPERTIES
+        LABEL "${_category}"
+        TIMEOUT ${TEST_TIME_LIMIT}
+        )
+    ENDIF()
   ENDFOREACH()
 ENDFOREACH()
