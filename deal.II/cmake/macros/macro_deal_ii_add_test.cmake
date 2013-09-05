@@ -17,17 +17,6 @@
 #
 # A Macro to set up tests for thes testsuite
 #
-# This macro assumes that a test
-#
-#   ./tests/category/test_name.cc
-#   ./tests/category/test_name.*.output
-#
-# is available in the testsuite.
-#
-# [configurations] is a list of configurations against this test should be
-# run. Possible values are an empty list, DEBUG, RELEASE or
-# "DEBUG;RELEASE".
-#
 # The following variables must be set:
 #
 # TEST_DIFF
@@ -37,11 +26,25 @@
 #   - specifying the maximal wall clock time in seconds a test is allowed
 #     to run
 #
+#
 # Usage:
-#     DEAL_II_ADD_TEST(category test_name [configurations])
+#     DEAL_II_ADD_TEST(category test_name comparison_file [configurations])
+#
+# This macro assumes that a source file
+#
+#   ./tests/category/<test_name>.cc
+#
+# is available in the testsuite.
+#
+# [configurations] is a list of configurations against this test should be
+# run. Possible values are an empty list, DEBUG, RELEASE or
+# "DEBUG;RELEASE".
+#
+# The output of <test_name>.cc is compared against the file
+# <comparison_file>.
 #
 
-MACRO(DEAL_II_ADD_TEST _category _test_name)
+MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
@@ -81,18 +84,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
 
 
       #
-      # Determine correct file for comparison:
-      #
-
-      SET(_comparison ${CMAKE_CURRENT_SOURCE_DIR}/${_test_name})
-      IF(EXISTS ${_comparison}.${_build_lowercase}.output)
-        SET(_comparison ${_comparison}.${_build_lowercase}.output)
-      ELSE()
-        SET(_comparison ${_comparison}.output)
-      ENDIF()
-
-
-      #
       # Add a top level target to run and compare the test:
       #
 
@@ -123,7 +114,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
         COMMAND
           ${TEST_DIFF}
             ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-            ${_comparison}
+            ${_comparison_file}
             > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
           || (mv ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
                  ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_diff
@@ -136,7 +127,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name)
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         DEPENDS
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-          ${_comparison}
+          ${_comparison_file}
         )
 
       ADD_CUSTOM_TARGET(${_full_test}.diff

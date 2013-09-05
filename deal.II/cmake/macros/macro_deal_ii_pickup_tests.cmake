@@ -35,6 +35,10 @@ MACRO(DEAL_II_PICKUP_TESTS)
         _test MATCHES "${TEST_PICKUP_REGEX}" )
       GET_FILENAME_COMPONENT(_test ${_test} NAME)
 
+      #
+      # TODO: mpirun support
+      #
+
       IF(_test MATCHES debug)
         SET(_configuration DEBUG)
       ELSEIF(_test MATCHES release)
@@ -43,8 +47,9 @@ MACRO(DEAL_II_PICKUP_TESTS)
         SET(_configuration)
       ENDIF()
 
+      SET(_comparison ${_test})
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
-      DEAL_II_ADD_TEST(${_category} ${_test} ${_configuration})
+      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_configuration})
     ENDIF()
 
   ENDFOREACH()
