@@ -37,7 +37,7 @@ void test(std::ostream & /*out*/)
 
   GridIn<dim> gi;
   gi.attach_triangulation (tr);
-  std::ifstream in ("../deal.II/grid_in/2d.inp");
+  std::ifstream in (SOURCE_DIR "/../deal.II/grid_in/2d.inp");
   gi.read_ucd (in);
 
   write_vtk (tr, "2d_coarse_grid_03", "1");

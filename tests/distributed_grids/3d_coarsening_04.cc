@@ -44,7 +44,7 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr);
-    std::ifstream in ("../deal.II/grid_in_3d_02/747.ucd");
+    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_3d_02/747.ucd");
     gi.read (in);
     //tr.refine_global (1);
   }
@@ -52,7 +52,7 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr2);
-    std::ifstream in ("../deal.II/grid_in_3d_02/747.ucd");
+    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_3d_02/747.ucd");
     gi.read (in);
     //tr2.refine_global (1);
   }
