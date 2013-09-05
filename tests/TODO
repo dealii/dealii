@@ -1,0 +1,5 @@
+Issues:
+
+ - p4est's vtk write out may be with zlib support - independent of how
+   deal.II is actually configured. With this, a lot of tests under
+   distributed_grids fail.
