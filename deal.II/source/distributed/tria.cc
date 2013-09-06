@@ -1173,12 +1173,11 @@ namespace
                           const typename internal::p4est::types<dim>::forest   &forest,
                           const types::subdomain_id                           my_subdomain)
   {
-    ssize_t sidx;
     // check if this cell exists in
     // the local p4est cell
-    if ((sidx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
+    if (sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
                          &p4est_cell,
-                         internal::p4est::functions<dim>::quadrant_compare))
+                         internal::p4est::functions<dim>::quadrant_compare)
         != -1)
       {
         // yes, cell found in local part of p4est
