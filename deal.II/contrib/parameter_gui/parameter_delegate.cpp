@@ -102,7 +102,7 @@ namespace dealii
         {
           QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
 											// stored in the StatusLine
-          QRegExp  rx_string("\\b(Anything|MultipleSelection|List)\\b"),
+          QRegExp  rx_string("\\b(Anything|MultipleSelection|List|Map)\\b"),
                    rx_filename("\\b(FileName)\\b"),	
                    rx_dirname("\\b(DirectoryName)\\b"),	
                    rx_integer("\\b(Integer)\\b"),
