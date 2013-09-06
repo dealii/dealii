@@ -104,7 +104,7 @@ To enable the testsuite, configure deal.II in a build directory with
   # cmake -DBUILD_TESTING=ON .
 
 After you have build deal.II as usual (installation is not necessary) you
-can run the testsuite in the build directory via
+can run the testsuite in the _build directory_ via
 
   # ctest [-j x]
 
@@ -117,11 +117,19 @@ To get verbose output of tests (which is otherwise just logged into
 Testing/Temporary/LastTest.log) specify -V, alternatively if you're just
 interested in verbose output of failing test, --output-on-failure.
 
+Note: You can also invoke ctest under BUILD_DIR/tests or any subdirectory
+under BUILD_DIR/tests. This will only invoke the tests that are located
+under the subdirectory.
+
+Note: TODO: Get and install numdiff to minimize false positives.
+
 Note: The testsuite is huge (!) and will need around 12h on current
 computer running single threaded. Consider configuring only a subset of
 tests as discussed below.
 
-Note: TODO: Get and install numdiff to minimize false positives.
+
+CMake configuration variables for the testsuite
+-----------------------------------------------
 
 TODO: Document the following options:
   # TODO: Describe and document the following:
