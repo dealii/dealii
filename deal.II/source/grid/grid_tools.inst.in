@@ -271,9 +271,41 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                   int,
                                   const Tensor<1,deal_II_space_dimension> &);
 
+      template
+      void
+      identify_periodic_face_pairs
+        (const X &,
+         const types::boundary_id,
+         const types::boundary_id,
+         const unsigned int,
+         std::vector<std_cxx1x::tuple<typename X::cell_iterator, unsigned int,
+                                      typename X::cell_iterator, unsigned int> > &);
+
     #endif
 
   \}
 #endif
 }
+
+for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+   #if deal_II_dimension >= 2
+     namespace GridTools \{
+       template
+       void
+       identify_periodic_face_pairs
+         (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+          const types::boundary_id,
+          const types::boundary_id,
+          const unsigned int,
+          std::vector<std_cxx1x::tuple<typename parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator,
+                                       unsigned int,
+                                       typename parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator, 
+                                       unsigned int> > &);
+     \}
+   #endif
+#endif
+}
+
 

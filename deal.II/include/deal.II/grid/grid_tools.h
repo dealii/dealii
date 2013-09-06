@@ -24,6 +24,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/base/std_cxx1x/tuple.h>
 
 #include <bitset>
 #include <list>
@@ -1153,6 +1154,31 @@ namespace GridTools
                                const int                direction,
                                const dealii::Tensor<1,DH::space_dimension> &offset);
 
+  /**
+   * Add periodicity information to the @p periodicity_vector for the
+   * boundaries with boundary id @p b_id1 and  @p b_id2 in cartesian
+   * direction @p direction.
+   *
+   * This function tries to match all faces belonging to the first
+   * boundary with faces belonging to the second boundary
+   * by comparing the center of the cell faces. To find the correct
+   * corresponding faces, the direction argument indicates in which
+   * cartesian direction periodicity should be set.
+   * ((0,1,2) -> (x,y,z)-direction)
+   *
+   * The output of this function can be used in
+   * parallel::distributed::Triangulation::add_periodicity
+   */
+  template<typename DH>
+  void
+  identify_periodic_face_pairs
+    (const DH &dof_handler,
+     const types::boundary_id b_id1,
+     const types::boundary_id b_id2,
+     const unsigned int direction,
+     std::vector<std_cxx1x::tuple<typename DH::cell_iterator, unsigned int,
+                                  typename DH::cell_iterator, unsigned int> >
+       &periodicity_vector);
 
 
   /**

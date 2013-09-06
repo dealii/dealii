@@ -17,6 +17,7 @@
 #include <deal.II/base/std_cxx1x/array.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
@@ -2539,6 +2540,86 @@ next_cell:
     return return_value;
   }
 
+
+  template<typename DH>
+  void
+  identify_periodic_face_pairs
+    (const DH &dof_handler,
+     const types::boundary_id b_id1,
+     const types::boundary_id b_id2,
+     const unsigned int direction,
+     std::vector<std_cxx1x::tuple<typename DH::cell_iterator, unsigned int,
+                                  typename DH::cell_iterator, unsigned int> >
+       &periodicity_vector)
+  {
+    static const unsigned int dim = DH::dimension;
+    static const unsigned int spacedim = DH::space_dimension;
+
+    Assert (0<=direction && direction<spacedim,
+            ExcIndexRange(direction, 0, spacedim));
+
+    Assert (b_id1 != b_id2,
+            ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
+                        "different to denote different boundaries."));
+
+    typename std::map<std::pair<typename DH::cell_iterator,
+                                unsigned int>,
+                      Point<spacedim> > face_locations;
+
+    // Collect faces with boundary_indicator b_id1
+    typename DH::cell_iterator cell = dof_handler.begin();
+    typename DH::cell_iterator endc = dof_handler.end();
+    for (; cell != endc; ++cell)
+      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+        if(cell->face(f)->boundary_indicator() == b_id1)
+        {
+          Point<spacedim> face_center (cell->face(f)->center());
+          face_center(direction)=0.;
+          const std::pair<typename DH::cell_iterator, unsigned int>
+          cell_face_pair = std::make_pair(cell, f);
+          face_locations[cell_face_pair]=face_center;
+        }
+
+      // Match faces with boundary_indicator b_id2 to the ones in
+      //face_locations
+      cell = dof_handler.begin();
+      for (; cell != endc; ++cell)
+        for(unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+          if(cell->face(f)->boundary_indicator() == b_id2)
+          {
+            typename std::map<std::pair<typename DH::cell_iterator,
+                                        unsigned int>,
+                              Point<spacedim> >::const_iterator p
+              = face_locations.begin();
+
+            Point<spacedim> center2 (cell->face(f)->center());
+            center2(direction)=0.;
+
+            for (; p != face_locations.end(); ++p)
+            {
+              if (center2.distance(p->second) < 1e-4*cell->face(f)->diameter())
+              {
+                const std_cxx1x::tuple<typename DH::cell_iterator, unsigned int,
+                                       typename DH::cell_iterator, unsigned int>
+                  periodic_tuple
+                    = std::make_tuple(p->first.first,
+                                      p->first.second,
+                                      cell,
+                                      f);
+
+                periodicity_vector.push_back(periodic_tuple);
+
+                face_locations.erase(p);
+                break;
+              }
+              Assert (p != face_locations.end(),
+                      ExcMessage ("No corresponding face was found!"));
+            }
+          }
+
+          Assert (face_locations.size() == 0,
+                  ExcMessage ("There are unmatched faces!"));
+  }
 
 
 } /* namespace GridTools */
