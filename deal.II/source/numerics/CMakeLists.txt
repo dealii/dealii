@@ -19,63 +19,12 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/numerics/*.h
   )
-
-SET(_src
-  data_out.cc
-  data_out_dof_data.cc
-  data_out_faces.cc
-  data_out_rotation.cc
-  data_out_stack.cc
-  data_postprocessor.cc
-  derivative_approximation.cc
-  dof_output_operator.cc
-  error_estimator.cc
-  error_estimator_1d.cc
-  fe_field_function.cc
-  matrix_tools.cc
-  histogram.cc
-  point_value_history.cc
-  solution_transfer.cc
-  solution_transfer_inst2.cc
-  solution_transfer_inst3.cc
-  solution_transfer_inst4.cc
-  time_dependent.cc
-  vector_tools_boundary.cc
-  vector_tools_constraints.cc
-  vector_tools_integrate_difference.cc
-  vector_tools_interpolate.cc
-  vector_tools_mean_value.cc
-  vector_tools_point_value.cc
-  vector_tools_project.cc
-  vector_tools_rhs.cc
+FILE(GLOB _src
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
   )
-
-SET(_inst
-  data_out.inst.in
-  data_out_dof_data.inst.in
-  data_out_faces.inst.in
-  data_out_rotation.inst.in
-  data_out_stack.inst.in
-  data_postprocessor.inst.in
-  derivative_approximation.inst.in
-  dof_output_operator.inst.in
-  error_estimator.inst.in
-  error_estimator_1d.inst.in
-  fe_field_function.inst.in
-  matrix_tools.inst.in
-  point_value_history.inst.in
-  solution_transfer.inst.in
-  time_dependent.inst.in
-  vector_tools_boundary.inst.in
-  vector_tools_constraints.inst.in
-  vector_tools_integrate_difference.inst.in
-  vector_tools_interpolate.inst.in
-  vector_tools_mean_value.inst.in
-  vector_tools_point_value.inst.in
-  vector_tools_project.inst.in
-  vector_tools_rhs.inst.in
+FILE(GLOB _inst
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_numerics OBJECT ${_src} ${_header} ${_inst})
 EXPAND_INSTANTIATIONS(obj_numerics "${_inst}")
-
