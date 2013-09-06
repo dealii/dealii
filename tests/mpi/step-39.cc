@@ -391,7 +391,7 @@ namespace Step39
     dof_handler(triangulation),
     estimates(1)
   {
-    GridGenerator::hyper_cube_slit(triangulation, -1, 1);
+    GridGenerator::hyper_L(triangulation, -1, 1);
   }
 
 
