@@ -1,59 +1,176 @@
 DEAL.II TESTSUITE README
 ========================
 
-Subdirectories in this tree contain test programs for various features
-of base lac and deal.II libraries.
+TODO: Introduction
 
-All features of deal that should be available in future releases
-should be tested here.
 
-Run 
-    make 
-in this directory to do all tests.
+
+General test layout
+===================
+
+A test usually consists of a source file and an output file for
+comparison (Under SOURCE_DIR/tests):
+
+  category/test.cc
+  category/test.output
+
+test.cc must be a regular executable (i.e. having an int main() routine).
+It will be compiled, linked and run. The executable should not output
+anything to cout (at least under normal circumstances, i.e. no error
+condition), instead the executable should output to a file "output" under
+the current working directory.
+
+
+As a last stage the generated output during the run stage will be compared
+to category/test.output.
+
+The full file signature for a comparison file is
+
+  category/test.[with_<feature>=<on|off>.]*[mpirun=<x>.][<debug|release>.]output
+
+which is explained in detail below.
+
+
+Restrict tests for build configurations
+---------------------------------------
+
+Normally, a test will be set up for debug and release configuration (if
+deal.II was configured with combined DebugRelease configuration) or for the
+available build configuration (if deal.II was configured either with Debug
+or with Release only configuration).
+
+If a specific test can only be run in debug or release configurations but
+not in both it is possible to restrict the setup by prepeding ".debug" or
+".release" directly before ".output", e.g.:
+
+  category/test.debug.output
+
+This way, test will only be set up to build and run against the debug
+library.
+
+Note: It is possible to provide both configuration types at the same time:
+
+  category/test.debug.output
+  category/test.release.output
+
+This will set up two seperate tests, one for the debug configuration that
+will be tested against test.debug.output, and similarly one for release.
+
+
+Restrict tests for feature configurations
+-----------------------------------------
+
+In a similar vain as for build configurations, it is possible to restrict
+tests to specific feature configurations, e.g.:
+
+  category/test.with_umfpack=on.output, or
+  category/test.with_zlib=off.output
+
+These tests will be only set up if the specified feature was configured
+accordingly.
+
+Note: It is possible to provide different output files for disabled/enabled
+features, e.g.
+
+  category/test.with_64bit_indices=on.output
+  category/test.with_64bit_indices=off.output
+
+
+Note: It is possible to declare multiple constraints subsequently, e.g.
+
+  category/test.with_umfpack=on.with_zlib=on.output
+
+Note: Quite a number of test categories are already guarded so that the
+contained tests will only be set up if the feature is enabled. In this case
+a feature constraint in the output file name is redundant and should be
+avoided. (Folder with guards are distributed_grids, lapack, metis, petsc,
+slepc, trilinos, umfpack)
+
+
+Run mpi tests with mpirun
+-------------------------
+
+If a test should be run with mpirun in parallel, specify the number x of
+simultaneous processes in the following way:
+
+  category/test.mpirun=x.output
+
+
+How to set up and run the testsuite
+===================================
+
+To enable the testsuite, configure deal.II in a build directory with
+
+  # cmake -DBUILD_TESTING=ON .
+
+After you have build deal.II as usual (installation is not necessary) you
+can run the testsuite in the build directory via
+
+  # ctest [-j x]
+
+where x is the number of concurrent tests that should be run. If you only
+want to run a subset of tests matching a regular expression, you can use
+
+  # ctest [-j x] -R '<regular expression>'
+
+To get verbose output of tests (which is otherwise just logged into
+Testing/Temporary/LastTest.log) specify -V, alternatively if you're just
+interested in verbose output of failing test, --output-on-failure.
+
+Note: The testsuite is huge (!) and will need around 12h on current
+computer running single threaded. Consider configuring only a subset of
+tests as discussed below.
+
+Note: TODO: Get and install numdiff to minimize false positives.
+
+TODO: Document the following options:
+  # TODO: Describe and document the following:
+  # TEST_DIFF
+  # TEST_TIME_LIMIT
+  # TEST_PICKUP_REGEX
+  # NUMDIFF_DIR
+
+
+Setup only a subset of tests
+----------------------------
+
+It is possible to set up only a subset of tests that match a regular
+expression during configuration:
+
+  # cmake -DBUILD_TESTING=ON -DTEST_PICKUP_REGEX="<regular expression>" .
+
+Note: If you wish to disable this filter again, undefine TEST_PICKUP_REGEX
+in the Cache:
+
+  # cmake -UTEST_PICKUP_REGEX .
+
+
+Use Ninja as a (GNU) Make replacement to speedup test significantly
+-------------------------------------------------------------------
+
+TODO
 
 
 How to interpret the output?
-----------------------------
+============================
 
-Apart from several messages containing compiling and linking
-information, the output of make will contain lines like
+TODO: Write and document the following
 
-=====debug========== heavy.cc
-=====linking======== heavy/exe
-=====Running======== heavy/exe
-=====Checking======= heavy/output
-=====OK============= heavy/OK
+  - How a normal run looks like.
 
-If the second line doesn't read like this and instead has an error
-marker, then this test failed. This may be either due an assertion
-that was triggered, or because the output differed from what has been
-stored as the output that is stored in SVN and considered correct. To
-see the diffs between what you got and what is stored, call
-    make testname/OK verbose=on
-in the appropriate subdirectory, where testname is the name of the
-respective testcase without the .cc extension.
+  - Intermediate files generated under BUILD_DIR.
 
-To get an overview of all the tests, you can instead run
-    make report
-which prints a one-line summary of all tests instead of the five lines
-above. Furthermore, it doesn't stop when it finds that one test
-doesn't yield the right result or simply aborts. Instead, it continues
-with the other tests. You can run "make report" after running "make"
-and it will generate the summary by looking at the results of the
-previous "make" run by only re-running the tests that failed. This is
-a quick way to generate a summary if one has previously run all tests
-without generating the summary.
+    BUILD_DIR/tests/category/test[.mpirun=x].<debug|release>
 
-Finally, if you intend to run all tests with
-    make report
-you can instead as well run
-    make report+mail
-which in addition to running all tests and generating one-line
-summaries sends the results to a mail address at dealii.org. There, an
-agent munches these mails every half hour or so, and presents them on
-the deal.II web page so that everyone can always see which tests
-presently failed. Using report+mail is only useful, though, if you are
-working with the up-to-date SVN trunk; otherwise you may report test
-failures that are already fixed in the present SVN version and this is
-certain to confuse the one who fixed the bug.
+      output our failing_output
+      diff or failing_diff
 
+  - How to get verbose output for failing tests. -V and --output-on-failure
+
+  - how to interpet the output
+
+    test: BUILD successful - executable was compiled and linked successfully
+    test: RUN successful   - the executable run successfully returning no error
+                             condition
+    test: DIFF successful  - The output matches the stored result; test
+                             passed
