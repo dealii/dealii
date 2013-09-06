@@ -717,7 +717,7 @@ namespace parallel
       void
       add_periodicity
         (const std::vector<std_cxx1x::tuple<cell_iterator, unsigned int,
-                                            cell_iterator, unsigned int>>&);
+                                            cell_iterator, unsigned int> >&);
 
 
     private:
