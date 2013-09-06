@@ -1185,12 +1185,6 @@ namespace
         delete_all_children<dim,spacedim> (dealii_cell);
         if (!dealii_cell->has_children())
           dealii_cell->set_subdomain_id(my_subdomain);
-
-        typename internal::p4est::types<dim>::quadrant *match =
-          static_cast<typename internal::p4est::types<dim>::quadrant *>
-          (sc_array_index_ssize_t(const_cast<sc_array_t *>(&tree.quadrants),
-                                 sidx));
-        match->p.user_int = dealii_cell->index();
       }
     else
       {
