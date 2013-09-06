@@ -837,7 +837,7 @@ namespace
                             const std::vector<std::list<
                             std::pair<typename Triangulation<dim,spacedim>::active_cell_iterator,unsigned int> > >
                             & vertex_to_cell,
-                            const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
+                            const std::vector<types::global_dof_index> &coarse_cell_to_p4est_tree_permutation,
                             const bool set_vertex_info,
                             typename internal::p4est::types<dim>::connectivity *connectivity)
   {
@@ -1582,7 +1582,7 @@ namespace
   {
   public:
     RefineAndCoarsenList (const Triangulation<dim,spacedim> &triangulation,
-                          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
+                          const std::vector<types::global_dof_index> &p4est_tree_to_coarse_cell_permutation,
                           const types::subdomain_id                   my_subdomain,
                           typename internal::p4est::types<dim>::forest &forest);
 
@@ -1656,7 +1656,7 @@ namespace
   template <int dim, int spacedim>
   RefineAndCoarsenList<dim,spacedim>::
   RefineAndCoarsenList (const Triangulation<dim,spacedim>            &triangulation,
-                        const std::vector<unsigned int>             &p4est_tree_to_coarse_cell_permutation,
+                        const std::vector<types::global_dof_index>   &p4est_tree_to_coarse_cell_permutation,
                         const types::subdomain_id                    my_subdomain,
                         typename internal::p4est::types<dim>::forest &forest)
     :
@@ -3303,7 +3303,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     Triangulation<dim, spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
     {
       return p4est_tree_to_coarse_cell_permutation;
@@ -3870,8 +3870,8 @@ namespace parallel
     {
       int i, l = quad.level;
       int child_id;
-      const std::vector<unsigned int> perm = triangulation->get_p4est_tree_to_coarse_cell_permutation ();
-      unsigned int dealii_index = perm[treeidx];
+      const std::vector<types::global_dof_index> perm = triangulation->get_p4est_tree_to_coarse_cell_permutation ();
+      types::global_dof_index dealii_index = perm[treeidx];
 
       for (i = 0; i < l; i++) {
         typename dealii::Triangulation<dim,spacedim>::cell_iterator cell (triangulation, i, dealii_index);
@@ -3939,10 +3939,10 @@ namespace parallel
     }
 
     template <>
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     Triangulation<1,1>::get_p4est_tree_to_coarse_cell_permutation() const
     {
-      static std::vector<unsigned int> a;
+      static std::vector<types::global_dof_index> a;
       return a;
     }
 
