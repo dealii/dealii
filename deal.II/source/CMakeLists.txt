@@ -63,7 +63,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     deal_ii_objects_${build_lowercase}
     )
   ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
-    base/dummy.cc # Workaround for a bug in the Xcode generator
+    dummy.cc # Workaround for a bug in the Xcode generator
     ${deal_ii_objects_${build_lowercase}}
     )
 
