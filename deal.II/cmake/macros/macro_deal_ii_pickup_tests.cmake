@@ -46,12 +46,17 @@ MACRO(DEAL_II_PICKUP_TESTS)
     # Query configuration and check whether we support it. Otherwise
     # set _define_test to FALSE:
     #
-    STRING(REGEX MATCHALL "WITH_([0-9]|[A-Z]|_)*=(ON|OFF)" _matches ${_test})
+    STRING(REGEX MATCHALL
+      "with_([0-9]|[a-z]|_)*=(on|off|yes|no|true|false)" _matches ${_test}
+      )
     FOREACH(_match ${_matches})
-      STRING(REGEX REPLACE "^(WITH_([0-9]|[A-Z]|_)*)=(ON|OFF)$" "\\1"
+      STRING(REGEX REPLACE
+        "^(with_([0-9]|[a-z]|_)*)=(on|off|yes|no|true|false)$" "\\1"
         _feature ${_match}
         )
-      STRING(REGEX MATCH "(ON|OFF)$" _boolean ${_match})
+      STRING(TOUPPER ${_feature} _feature)
+
+      STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
 
       IF( (DEAL_II_${_feature} AND NOT ${_boolean}) OR
           (NOT DEAL_II_${_feature} AND ${_boolean}) )
