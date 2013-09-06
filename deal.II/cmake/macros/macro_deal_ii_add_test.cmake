@@ -28,13 +28,21 @@
 #
 #
 # Usage:
-#     DEAL_II_ADD_TEST(category test_name comparison_file [configurations])
+#     DEAL_II_ADD_TEST(category test_name comparison_file n_cpu [configurations])
 #
 # This macro assumes that a source file
 #
 #   ./tests/category/<test_name>.cc
 #
+# as well as the comparison file
+#
+#   ./tests/category/<comparison_file>
+#
 # is available in the testsuite.
+#
+# If <n_cpu> is equal to 0, the plain, generated executable will be run. If
+# <n_cpu> is a number larger than 0, the mpirun loader will be used to
+# launch the executable
 #
 # [configurations] is a list of configurations against this test should be
 # run. Possible values are an empty list, DEBUG, RELEASE or
@@ -44,7 +52,7 @@
 # <comparison_file>.
 #
 
-MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
+MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
 
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
@@ -82,17 +90,24 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
         )
 
+      #
+      # Build up the command line to run the test depending on _n_cpu:
+      #
+      IF("${_n_cpu}" STREQUAL "0")
+        SET(_run_command ${_full_test})
+      ELSE()
+        SET(_run_command mpirun -np ${_n_cpu} ${_full_test})
+      ENDIF()
 
       #
       # Add a top level target to run and compare the test:
       #
-
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         COMMAND
           # A this stage a build is always successful: :-)
           ${CMAKE_COMMAND} -E echo "${_full_test}: BUILD successful"
         COMMAND
-          ${_full_test}
+          ${_run_command}
           || (echo "${_full_test}: RUN failed. Output:"
               && cat output
               && rm output
@@ -109,7 +124,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           ${_full_test}
           ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
         )
-
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
         COMMAND
           ${TEST_DIFF}
@@ -137,7 +151,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
       # And finally add the test:
       #
-
       ADD_TEST(NAME ${_category}/${_test}
         COMMAND ${CMAKE_COMMAND}
           -DTEST=${_full_test}.diff
@@ -149,10 +162,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )
-
     ENDIF()
-
   ENDFOREACH()
-
 ENDMACRO()
-

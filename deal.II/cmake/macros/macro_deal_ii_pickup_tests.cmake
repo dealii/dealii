@@ -28,7 +28,6 @@ MACRO(DEAL_II_PICKUP_TESTS)
   GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
   FILE(GLOB _tests "*.output")
-
   FOREACH(_test ${_tests})
 
     #
@@ -44,8 +43,8 @@ MACRO(DEAL_II_PICKUP_TESTS)
     ENDIF()
 
     #
-    # Query configuration and check whether we support it. Otherwise do
-    # not define test:
+    # Query configuration and check whether we support it. Otherwise
+    # set _define_test to FALSE:
     #
     STRING(REGEX MATCHALL "WITH_([0-9]|[A-Z]|_)*=(ON|OFF)" _matches ${_test})
     FOREACH(_match ${_matches})
@@ -60,10 +59,19 @@ MACRO(DEAL_II_PICKUP_TESTS)
       ENDIF()
     ENDFOREACH()
 
+
     IF(_define_test)
+
       #
-      # TODO: mpirun support
+      # Determine whether the test should be run with mpirun:
       #
+      STRING(REGEX MATCH "mpirun=([0-9]*)" _n_cpu ${_test})
+      IF("${_n_cpu}" STREQUAL "")
+        # 0 indicates that no mpirun should be used
+        SET(_n_cpu 0)
+      ELSE()
+        STRING(REGEX REPLACE "^mpirun=([0-9]*)$" "\\1" _n_cpu ${_n_cpu})
+      ENDIF()
 
       IF(_test MATCHES debug)
         SET(_configuration DEBUG)
@@ -75,7 +83,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
       SET(_comparison ${_test})
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
-      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_configuration})
+      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_n_cpu} ${_configuration})
     ENDIF()
 
   ENDFOREACH()
