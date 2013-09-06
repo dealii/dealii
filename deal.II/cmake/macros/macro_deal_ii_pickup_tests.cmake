@@ -31,10 +31,36 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   FOREACH(_test ${_tests})
 
+    #
+    # Respect TEST_PICKUP_REGEX: Make sure we are allowed to pickup this
+    # test:
+    #
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${TEST_PICKUP_REGEX}" )
       GET_FILENAME_COMPONENT(_test ${_test} NAME)
+      SET(_define_test TRUE)
+    ELSE()
+      SET(_define_test FALSE)
+    ENDIF()
 
+    #
+    # Query configuration and check whether we support it. Otherwise do
+    # not define test:
+    #
+    STRING(REGEX MATCHALL "WITH_([0-9]|[A-Z]|_)*=(ON|OFF)" _matches ${_test})
+    FOREACH(_match ${_matches})
+      STRING(REGEX REPLACE "^(WITH_([0-9]|[A-Z]|_)*)=(ON|OFF)$" "\\1"
+        _feature ${_match}
+        )
+      STRING(REGEX MATCH "(ON|OFF)$" _boolean ${_match})
+
+      IF( (DEAL_II_${_feature} AND NOT ${_boolean}) OR
+          (NOT DEAL_II_${_feature} AND ${_boolean}) )
+        SET(_define_test FALSE)
+      ENDIF()
+    ENDFOREACH()
+
+    IF(_define_test)
       #
       # TODO: mpirun support
       #
