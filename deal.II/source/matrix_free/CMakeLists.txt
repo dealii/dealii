@@ -19,13 +19,11 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
-
-SET(_src
-  matrix_free.cc
+FILE(GLOB _src
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
   )
-
-SET(_inst
-  matrix_free.inst.in
+FILE(GLOB _inst
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_matrix_free OBJECT ${_src} ${_header} ${_inst})

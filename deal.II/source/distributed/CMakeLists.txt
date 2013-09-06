@@ -19,19 +19,12 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/distributed/*.h
   )
-
-SET(_src
-  grid_refinement.cc
-  solution_transfer.cc
-  tria.cc
+FILE(GLOB _src
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
   )
-
-SET(_inst
-  grid_refinement.inst.in
-  solution_transfer.inst.in
-  tria.inst.in
+FILE(GLOB _inst
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_distributed OBJECT ${_src} ${_header} ${_inst})
 EXPAND_INSTANTIATIONS(obj_distributed "${_inst}")
-

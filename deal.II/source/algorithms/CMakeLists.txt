@@ -19,14 +19,11 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/algorithms/*.h
   )
-
-SET(_src
-  operator.cc
-  timestep_control.cc
+FILE(GLOB _src
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
   )
-
-SET(_inst
-  operator.inst.in
+FILE(GLOB _inst
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_algorithms OBJECT ${_src} ${_header} ${_inst})

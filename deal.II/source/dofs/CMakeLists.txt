@@ -19,37 +19,12 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
   )
-
-SET(_src
-  block_info.cc
-  dof_accessor.cc
-  dof_accessor_get.cc
-  dof_accessor_set.cc
-  dof_faces.cc
-  dof_handler.cc
-  dof_handler_policy.cc
-  dof_objects.cc
-  dof_renumbering.cc
-  dof_tools.cc
-  dof_tools_constraints.cc
-  dof_tools_sparsity.cc
-  number_cache.cc
+FILE(GLOB _src
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
   )
-
-SET(_inst
-  block_info.inst.in
-  dof_accessor.inst.in
-  dof_accessor_get.inst.in
-  dof_accessor_set.inst.in
-  dof_handler.inst.in
-  dof_handler_policy.inst.in
-  dof_objects.inst.in
-  dof_renumbering.inst.in
-  dof_tools.inst.in
-  dof_tools_constraints.inst.in
-  dof_tools_sparsity.inst.in
+FILE(GLOB _inst
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${_src} ${_header} ${_inst})
 EXPAND_INSTANTIATIONS(obj_dofs "${_inst}")
-
