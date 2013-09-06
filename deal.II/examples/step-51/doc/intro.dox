@@ -20,13 +20,11 @@ for systems of equations in dim=2 or dim=3.
 To alleviate the computational cost of solving such large linear systems, 
 the hybridizable discontinuous Galerkin (HDG) methodology has recently been 
 developed by Cockburn and co-workers 
-(<b>
-   N.C. Nguyen and J. Peraire:
+(N.C. Nguyen and J. Peraire:
    <i>Hybridizable discontinuous Galerkin methods for partial differential 
    equations in continuum mechanics</i>, Journal of Computational Physics,
    2012, 231:18, 5955-5988.
-   <a href="http://dx.doi.org/10.1016/j.jcp.2012.02.033">[DOI]</a>
-</b>).
+   <a href="http://dx.doi.org/10.1016/j.jcp.2012.02.033">[DOI]</a>).
 The HDG method achieves
 this goal by formulating the mathematical problem using Dirichlet-to-Neumann
 mappings.  The partial differential equations are first written as a first
@@ -35,13 +33,13 @@ point the  single-valued ``trace'' values on the skeleton of the
 mesh, i.e. element edges, are taken to be independent unknown quantities.  
 The Dirichlet-to-Neumann map concept then permits the solution procedure:
 <ol>
-  <li> Solve a Dirichlet problem on each element individually, where the local/interior
-element solutions no longer couple to neighboring elements.  This is known as the
+  <li>  Use local element interior data to enforce a Neumann condition on the 
+skeleton of the triangulation.  The global problem is then to solve for the 
+trace values, which are the only globally coupled unknowns.
+  <li>  Use the known skeleton values as Dirichlet data for solving local
+element-level solutions.  This is known as the
 'local solver', and is an <i>embarrassingly parallel</i> element-by-element 
 solution process.
-  <li>  Use the local element equations to construct the global problem for the 
-trace values.  These are the only globally coupled unknowns.
-  <li>  Solve for the element-local solutions using the computed trace values.
 </ol>
 
 The above procedure also has a linear algebra interpretation and is referred to
@@ -79,9 +77,9 @@ problem) and subtract $CA^{-1}B$ from $D$.
 <h4> Solution quality and rates of convergence</h4>
 Another criticism of traditional DG methods is that the approximate fluxes
 converge suboptimally.  The local HDG solutions can be shown to converge
-as $\mathcal{O}(h^{p+1})$, i.e., at optimal order.  Additionally, a super-convergence property can 
-be used to post-process a new approximate solution that converges at the 
-rate $\mathcal{O}(h^{p+2})$.
+as $\mathcal{O}(h^{p+1})$, i.e., at optimal order.  Additionally, a 
+super-convergence property can be used to post-process a new approximate 
+solution that converges at the rate $\mathcal{O}(h^{p+2})$.
 
 
 
@@ -153,6 +151,7 @@ Eliminating $\hat{u}$ from the weak form in favor of $\lambda$, summing the elem
 contributions across all elements in the triangulation, and enforcing the normal
 component of the numerical flux, we arrive at the final form of the problem:  
 Find $(\mathbf{q}, u, \lambda)$ such that
+TODO:  update this equation!
 @f{eqnarray*}
   (\kappa^{-1} \mathbf{q}, \mathbf{v})_{\mathcal{T}}
     - (u, \nabla\cdot\mathbf{v})_{\mathcal{T}}
@@ -170,7 +169,6 @@ Find $(\mathbf{q}, u, \lambda)$ such that
     &=&
     <g_N, \mu>_{\partial\Omega_N}
 @f}
-
 
 
 <h3> Problem specific data </h3>
