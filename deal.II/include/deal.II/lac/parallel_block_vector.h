@@ -126,6 +126,20 @@ namespace parallel
       BlockVector (const std::vector<size_type> &block_sizes);
 
       /**
+       * Construct a block vector with an IndexSet for the local range
+       * and ghost entries for each block.
+       */
+      BlockVector (const std::vector<IndexSet> &local_ranges,
+                   const std::vector<IndexSet> &ghost_indices,
+                   const MPI_Comm  communicator);
+
+      /**
+       * Same as above but the ghost indicies are assumed to be empty.
+       */
+      BlockVector (const std::vector<IndexSet> &local_ranges,
+                   const MPI_Comm  communicator);
+
+      /**
        * Destructor. Clears memory.
        */
       ~BlockVector ();
@@ -356,6 +370,41 @@ namespace parallel
     }
 
 
+    template <typename Number>
+    inline
+    BlockVector<Number>::BlockVector (const std::vector<IndexSet> &local_ranges,
+        const std::vector<IndexSet> &ghost_indices,
+        const MPI_Comm  communicator)
+    {
+      std::vector<size_type> sizes(local_ranges.size());
+      for (unsigned int i=0; i<local_ranges.size(); ++i)
+        sizes[i] = local_ranges[i].size();
+
+      this->block_indices.reinit(sizes);
+      this->components.resize(this->n_blocks());
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        this->block(i).reinit(local_ranges[i], ghost_indices[i], communicator);
+    }
+
+
+    template <typename Number>
+    inline
+    BlockVector<Number>::BlockVector (const std::vector<IndexSet> &local_ranges,
+        const MPI_Comm  communicator)
+    {
+      std::vector<size_type> sizes(local_ranges.size());
+      for (unsigned int i=0; i<local_ranges.size(); ++i)
+        sizes[i] = local_ranges[i].size();
+
+      this->block_indices.reinit(sizes);
+      this->components.resize(this->n_blocks());
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        this->block(i).reinit(local_ranges[i], communicator);
+    }
+
+
 
     template <typename Number>
     inline
@@ -454,8 +503,18 @@ namespace parallel
     BlockVector<Number> &
     BlockVector<Number>::operator = (const BlockVector &v)
     {
-      reinit (v, true);
-      BaseClass::operator = (v);
+      // we only allow assignment to vectors with the same number of blocks
+      // or to an empty BlockVector
+      Assert (this->n_blocks() == 0 || this->n_blocks() == v.n_blocks(),
+                    ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
+
+      if (this->n_blocks() != v.n_blocks())
+        reinit(v.n_blocks(), true);
+
+      for (size_type i=0; i<this->n_blocks(); ++i)
+        this->components[i] = v.block(i);
+
+      this->collect_sizes();
       return *this;
     }
 

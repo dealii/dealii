@@ -25,7 +25,9 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx1x/tuple.h>
 
+#include <set>
 #include <vector>
 #include <list>
 #include <utility>
@@ -697,6 +699,27 @@ namespace parallel
       const std::vector<types::global_dof_index> &
       get_p4est_tree_to_coarse_cell_permutation() const;
 
+
+      /**
+       * Join faces in the p4est forest due to periodic boundary conditions.
+       *
+       * The entries in the std::vector should have the form
+       * std_cxx1x::tuple<cell1, face_no1, cell2, face_no2>.
+       *
+       * The vector can be filled by the function
+       * DoFTools::identify_periodic_face_pairs.
+       *
+       * @note Before this function can be used the triangulation has to be
+       * initialized and must not be refined.
+       * Calling this function more than once is possible, but not recommended:
+       * The function destroys and rebuilds the p4est forest each time it is called.
+       */
+      void
+      add_periodicity
+        (const std::vector<std_cxx1x::tuple<cell_iterator, unsigned int,
+                                            cell_iterator, unsigned int>>&);
+
+
     private:
       /**
        * MPI communicator to be
@@ -759,6 +782,11 @@ namespace parallel
        * triangulation.
        */
       typename dealii::internal::p4est::types<dim>::forest *parallel_forest;
+      /**
+       * A data structure that holds some
+       * information about the ghost cells of the triangulation.
+       */
+      typename dealii::internal::p4est::types<dim>::ghost  *parallel_ghost;
 
       /**
        * A flag that indicates
@@ -892,6 +920,15 @@ namespace parallel
        */
       void attach_mesh_data();
 
+      /**
+       * fills a map that, for each vertex, lists all the processors whose
+       * subdomains are adjacent to that vertex.  Used by
+       * DoFHandler::Policy::ParallelDistributed.
+       */
+      void
+      fill_vertices_with_ghost_neighbors
+        (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+         &vertices_with_ghost_neighbors);
 
       template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
     };
@@ -946,7 +983,7 @@ namespace parallel
        * in hierarchical ordering is the ith deal cell starting
        * from begin(0).
        */
-      const std::vector<unsigned int> &
+      const std::vector<types::global_dof_index> &
       get_p4est_tree_to_coarse_cell_permutation() const;
 
       /**
@@ -970,8 +1007,8 @@ namespace parallel
        * these variables at a
        * couple places anyway.
        */
-      std::vector<unsigned int> coarse_cell_to_p4est_tree_permutation;
-      std::vector<unsigned int> p4est_tree_to_coarse_cell_permutation;
+      std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
+      std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
 
       /**
        * dummy settings
@@ -989,6 +1026,15 @@ namespace parallel
        * dummy settings object
        */
       Settings settings;
+
+      /**
+       * Like above, this method, which is only implemented for dim = 2 or 3,
+       * needs a stub because it is used in dof_handler_policy.cc
+       */
+      void
+      fill_vertices_with_ghost_neighbors
+        (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+         &vertices_with_ghost_neighbors);
 
     };
   }

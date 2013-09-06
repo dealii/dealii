@@ -14,14 +14,15 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__hp_dof_levels_h
-#define __deal2__hp_dof_levels_h
+#ifndef __deal2__hp_dof_level_h
+#define __deal2__hp_dof_level_h
 
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 
 #include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -61,38 +62,38 @@ namespace internal
     {
     private:
       /**
-       *  Indices specifying the finite
-       *  element of hp::FECollection to use
-       *  for the different cells on the current level. The
-       *  meaning what a cell is, is
-       *  dimension specific, therefore also
-       *  the length of this vector depends
-       *  on the dimension: in one dimension,
-       *  the length of this vector equals
-       *  the length of the @p lines vector,
-       *  in two dimensions that of the @p
-       *  quads vector, etc. The vector stores one element per cell
-       *  since the actiev_fe_index is unique for cells.
+       * Indices specifying the finite element of hp::FECollection to
+       * use for the different cells on the current level. The vector
+       * stores one element per cell since the active_fe_index is
+       * unique for cells.
+       *
+       * If a cell is not active on the level corresponding to the
+       * current object (i.e., it has children on higher levels) then
+       * it does not have an associated fe index and we store
+       * an invalid fe index marker instead.
        */
       std::vector<unsigned int> active_fe_indices;
 
       /**
-       * Store the start index for
-       * the degrees of freedom of each
-       * object in the @p dofs array.
+       * Store the start index for the degrees of freedom of each
+       * object in the @p dof_indices array. If the cell corresponding to
+       * a particular index in this array is not active on this level,
+       * then we do not store any DoFs for it. In that case, the offset
+       * we store here must be an invalid number and indeed we store
+       * <code>(std::vector<types::global_dof_index>::size_type)(-1)</code>
+       * for it.
        *
-       * The type we store is then obviously the type the @p dofs array
+       * The type we store is then obviously the type the @p dof_indices array
        * uses for indexing.
        */
       std::vector<std::vector<types::global_dof_index>::size_type> dof_offsets;
 
       /**
-       * Store the global indices of
-       * the degrees of freedom. See
-       * DoFLevel() for detailed
-       * information.
+       * Store the global indices of the degrees of freedom.
+       * information. The dof_offsets field determines where each
+       * (active) cell's data is stored.
        */
-      std::vector<types::global_dof_index> dofs;
+      std::vector<types::global_dof_index> dof_indices;
 
     public:
 
@@ -193,7 +194,7 @@ namespace internal
        * is the class that needs to create these data structures.
        */
       template <int, int> friend class dealii::hp::DoFHandler;
-      friend class dealii::internal::hp::DoFHandler::Implementation;
+      friend struct dealii::internal::hp::DoFHandler::Implementation;
     };
 
 
@@ -220,7 +221,7 @@ namespace internal
 
       Assert (fe_index == active_fe_indices[obj_index],
 	      ExcMessage ("FE index does not match that of the present cell"));
-      return dofs[dof_offsets[obj_index]+local_index];
+      return dof_indices[dof_offsets[obj_index]+local_index];
     }
 
 
@@ -247,7 +248,7 @@ namespace internal
 
       Assert (fe_index == active_fe_indices[obj_index],
 	      ExcMessage ("FE index does not match that of the present cell"));
-      dofs[dof_offsets[obj_index]+local_index] = global_index;
+      dof_indices[dof_offsets[obj_index]+local_index] = global_index;
     }
 
 

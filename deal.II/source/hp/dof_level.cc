@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/hp/dof_levels.h>
+#include <deal.II/hp/dof_level.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -28,7 +28,7 @@ namespace internal
     DoFLevel<dim>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (active_fe_indices) +
-	      MemoryConsumption::memory_consumption (dofs) +
+	      MemoryConsumption::memory_consumption (dof_indices) +
               MemoryConsumption::memory_consumption (dof_offsets));
     }
 

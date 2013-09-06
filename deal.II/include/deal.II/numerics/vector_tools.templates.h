@@ -2787,7 +2787,7 @@ namespace VectorTools
                              std::vector<double> &dof_values,
                              std::vector<bool> &dofs_processed)
     {
-      const double tol = 0.5 * cell->get_fe ().degree * 1e-13 / cell->face (face)->line (line)->diameter ();
+      const double tol = 0.5 * cell->face (face)->line (line)->diameter () / cell->get_fe ().degree;
       const unsigned int dim = 3;
       const unsigned int spacedim = 3;
 
@@ -2991,6 +2991,7 @@ namespace VectorTools
         {
         case 2:
         {
+          const double tol = 0.5 * cell->face (face)->diameter () / cell->get_fe ().degree;
           std::vector<Point<dim> >
           tangentials (fe_values.n_quadrature_points);
 
@@ -3024,18 +3025,18 @@ namespace VectorTools
                 = reference_quadrature_points[q_point];
 
               shifted_reference_point_1 (face_coordinate_direction[face])
-              += 1e-13;
+              += tol;
               shifted_reference_point_2 (face_coordinate_direction[face])
-              -= 1e-13;
+              -= tol;
               tangentials[q_point]
-                = 2e13
-                  * (fe_values.get_mapping ()
+                = (fe_values.get_mapping ()
                      .transform_unit_to_real_cell (cell,
                                                    shifted_reference_point_1)
                      -
                      fe_values.get_mapping ()
                      .transform_unit_to_real_cell (cell,
-                                                   shifted_reference_point_2));
+                                                   shifted_reference_point_2))
+                  / tol;
               tangentials[q_point]
               /= std::sqrt (tangentials[q_point].square ());
               // Compute the degrees
@@ -3412,15 +3413,13 @@ namespace VectorTools
                   // if the degree of
                   // freedom is not
                   // already constrained.
-                  const double tol = 0.5 * cell->get_fe ().degree * 1e-13  / cell->face (face)->diameter ();
-
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (dofs_processed[dof] && constraints.can_store_line (face_dof_indices[dof])
                         && !(constraints.is_constrained (face_dof_indices[dof])))
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > tol)
+                        if (std::abs (dof_values[dof]) > 1e-13)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -3507,11 +3506,8 @@ namespace VectorTools
                   // Store the computed
                   // values in the global
                   // vector.
-
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
-
-                  const double tol = 0.5 * superdegree * 1e-13 / cell->face (face)->diameter ();
 
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (dofs_processed[dof] && constraints.can_store_line (face_dof_indices[dof])
@@ -3519,7 +3515,7 @@ namespace VectorTools
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > tol)
+                        if (std::abs (dof_values[dof]) > 1e-13)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -3611,15 +3607,13 @@ namespace VectorTools
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
 
-                  const double tol = 0.5 * cell->get_fe ().degree * 1e-13  / cell->face (face)->diameter ();
-
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (dofs_processed[dof] && constraints.can_store_line (face_dof_indices[dof])
                         && !(constraints.is_constrained (face_dof_indices[dof])))
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > tol)
+                        if (std::abs (dof_values[dof]) > 1e-13)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -3705,15 +3699,13 @@ namespace VectorTools
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
 
-                  const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
-
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (dofs_processed[dof] && constraints.can_store_line (face_dof_indices[dof])
                         && !(constraints.is_constrained (face_dof_indices[dof])))
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > tol)
+                        if (std::abs (dof_values[dof]) > 1e-13)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -4250,7 +4242,8 @@ namespace VectorTools
     hp::FEFaceValues<dim,spacedim> x_fe_face_values (mapping_collection,
                                                      fe_collection,
                                                      face_quadrature_collection,
-                                                     update_q_points);
+                                                     update_q_points |
+						     update_normal_vectors);
 
     // have a map that stores normal vectors for each vector-dof tuple we want
     // to constrain. since we can get at the same vector dof tuple more than
@@ -4347,17 +4340,38 @@ namespace VectorTools
                     // to check that they are small *relative to something
                     // else*). we do this and then normalize the length of the
                     // vector back to one, just to be on the safe side
+		    //
+		    // one more point: we would like to use the "real" normal
+		    // vector here, as provided by the boundary description
+		    // and as opposed to what we get from the FEValues object.
+		    // we do this in the immediately next line, but as is
+		    // obvious, the boundary only has a vague idea which side
+		    // of a cell it is on -- indicated by the face number. in
+		    // other words, it may provide the inner or outer normal.
+		    // by and large, there is no harm from this, since the
+		    // tangential vector we compute is still the same. however,
+		    // we do average over normal vectors from adjacent cells
+		    // and if they have recorded normal vectors from the inside
+		    // once and from the outside the other time, then this
+		    // averaging is going to run into trouble. as a consequence
+		    // we ask the mapping after all for its normal vector,
+		    // but we only ask it so that we can possibly correct the
+		    // sign of the normal vector provided by the boundary
+		    // if they should point in different directions. this is the
+		    // case in tests/deal.II/no_flux_11.
                     Point<dim> normal_vector
                       = (cell->face(face_no)->get_boundary()
                          .normal_vector (cell->face(face_no),
                                          fe_values.quadrature_point(i)));
+		    if (normal_vector * fe_values.normal_vector(i) < 0)
+		      normal_vector *= -1;
                     Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
                             ExcInternalError());
                     for (unsigned int d=0; d<dim; ++d)
                       if (std::fabs(normal_vector[d]) < 1e-13)
                         normal_vector[d] = 0;
                     normal_vector /= normal_vector.norm();
-
+		    
                     // now enter the (dofs,(normal_vector,cell)) entry into
                     // the map
                     dof_to_normals_map

@@ -19,7 +19,7 @@
 #include <deal.II/base/std_cxx1x/bind.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/dof_objects.h>
-#include <deal.II/hp/dof_levels.h>
+#include <deal.II/hp/dof_level.h>
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -580,7 +580,7 @@ namespace internal
               dof_handler.levels[level]->dof_offsets
                 = std::vector<std::vector<types::global_dof_index>::size_type> (
                     dof_handler.tria->n_raw_lines(level),
-                    DoFHandler<dim,spacedim>::invalid_dof_index);
+                    (std::vector<types::global_dof_index>::size_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -592,7 +592,7 @@ namespace internal
                     next_free_dof += cell->get_fe().dofs_per_line;
                   }
 
-              dof_handler.levels[level]->dofs
+              dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
@@ -614,12 +614,12 @@ namespace internal
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_line;
 
-              Assert (dof_handler.levels[level]->dofs.size() == counter,
+              Assert (dof_handler.levels[level]->dof_indices.size() == counter,
                       ExcInternalError());
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   DoFHandler<dim,spacedim>::invalid_dof_index))
+                                   (std::vector<types::global_dof_index>::size_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_lines(level) - dof_handler.tria->n_active_lines(level),
                       ExcInternalError());
@@ -697,7 +697,7 @@ namespace internal
               dof_handler.levels[level]->dof_offsets
                 = std::vector<std::vector<types::global_dof_index>::size_type> (
                     dof_handler.tria->n_raw_quads(level),
-                    DoFHandler<dim,spacedim>::invalid_dof_index);
+                    (std::vector<types::global_dof_index>::size_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -709,7 +709,7 @@ namespace internal
                     next_free_dof += cell->get_fe().dofs_per_quad;
                   }
 
-              dof_handler.levels[level]->dofs
+              dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
@@ -731,12 +731,12 @@ namespace internal
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_quad;
 
-              Assert (dof_handler.levels[level]->dofs.size() == counter,
+              Assert (dof_handler.levels[level]->dof_indices.size() == counter,
                       ExcInternalError());
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   DoFHandler<dim,spacedim>::invalid_dof_index))
+                                   (std::vector<types::global_dof_index>::size_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_quads(level) - dof_handler.tria->n_active_quads(level),
                       ExcInternalError());
@@ -849,7 +849,7 @@ namespace internal
             dof_handler.faces->lines.dof_offsets
               = std::vector<std::vector<types::global_dof_index>::size_type>
                                                      (dof_handler.tria->n_raw_lines(),
-                                                      DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                     (std::vector<types::global_dof_index>::size_type)(-1));
             dof_handler.faces->lines.dofs
               = std::vector<types::global_dof_index> (n_line_slots,
                                                       DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -1063,7 +1063,7 @@ namespace internal
               dof_handler.levels[level]->dof_offsets
                 = std::vector<std::vector<types::global_dof_index>::size_type>
                                                        (dof_handler.tria->n_raw_hexs(level),
-                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                       (std::vector<types::global_dof_index>::size_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -1075,7 +1075,7 @@ namespace internal
                     next_free_dof += cell->get_fe().dofs_per_hex;
                   }
 
-              dof_handler.levels[level]->dofs
+              dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
@@ -1097,12 +1097,12 @@ namespace internal
                 if (!cell->has_children())
                   counter += cell->get_fe().dofs_per_hex;
 
-              Assert (dof_handler.levels[level]->dofs.size() == counter,
+              Assert (dof_handler.levels[level]->dof_indices.size() == counter,
                       ExcInternalError());
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   DoFHandler<dim,spacedim>::invalid_dof_index))
+                                   (std::vector<types::global_dof_index>::size_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_hexs(level) - dof_handler.tria->n_active_hexs(level),
                       ExcInternalError());
@@ -1219,7 +1219,7 @@ namespace internal
                 dof_handler.faces->quads.dof_offsets
                   = std::vector<std::vector<types::global_dof_index>::size_type>
                                                          (dof_handler.tria->n_raw_quads(),
-                                                          DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                         (std::vector<types::global_dof_index>::size_type)(-1));
                 dof_handler.faces->quads.dofs
                   = std::vector<types::global_dof_index> (n_quad_slots,
                                                           DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -3161,11 +3161,9 @@ namespace hp
   {
     Assert (has_children.size () == levels.size (), ExcInternalError ());
 
-    // In each refinement at most one new
-    // new level may appear. If that happened
-    // it is appended to the DoFHandler
-    // levels.
-    if (levels.size () < tria->n_levels ())
+    // Normally only one level is added, but if this Triangulation
+    // is created by copy_triangulation, it can be more than one level.
+    while (levels.size () < tria->n_levels ())
       levels.push_back (new dealii::internal::hp::DoFLevel<dim>);
 
     // Coarsening can lead to the loss
@@ -3175,6 +3173,8 @@ namespace hp
         delete levels[levels.size ()-1];
         levels.pop_back ();
       }
+
+    Assert(levels.size () == tria->n_levels (), ExcInternalError());
 
     // Resize active_fe_indices
     // vectors. use zero indicator to

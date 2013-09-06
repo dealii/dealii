@@ -155,6 +155,12 @@ namespace parallel
               const MPI_Comm  communicator);
 
       /**
+       * Same constructor as above but without any ghost indices.
+       */
+      Vector (const IndexSet &local_range,
+              const MPI_Comm  communicator);
+
+      /**
        * Create the vector based on the parallel partitioning described in @p
        * partitioner. The input argument is a shared pointer, which store the
        * partitioner data only once and share it between several vectors with
@@ -202,6 +208,12 @@ namespace parallel
        */
       void reinit (const IndexSet &local_range,
                    const IndexSet &ghost_indices,
+                   const MPI_Comm  communicator);
+
+      /**
+       * Same as above, but without ghost entries.
+       */
+      void reinit (const IndexSet &local_range,
                    const MPI_Comm  communicator);
 
       /**
@@ -1004,6 +1016,22 @@ namespace parallel
 
     template <typename Number>
     inline
+    Vector<Number>::Vector (const IndexSet &local_range,
+                             const MPI_Comm  communicator)
+      :
+      allocated_size (0),
+      val (0),
+      import_data (0),
+      vector_view (0, static_cast<Number *>(0))
+    {
+      IndexSet ghost_indices(local_range.size());
+      reinit (local_range, ghost_indices, communicator);
+    }
+
+
+
+    template <typename Number>
+    inline
     Vector<Number>::Vector (const size_type size)
       :
       allocated_size (0),
@@ -1074,6 +1102,7 @@ namespace parallel
             reinit (c, true);
         }
       vector_view = c.vector_view;
+      update_ghost_values();
       return *this;
     }
 

@@ -1710,6 +1710,29 @@ namespace DoFTools
           face_1->get_dof_indices(dofs_1, face_1_index);
           face_2->get_dof_indices(dofs_2, face_2_index);
 
+          for (unsigned int i=0; i < dofs_per_face; i++) {
+            if (dofs_1[i] == numbers::invalid_dof_index ||
+                dofs_2[i] == numbers::invalid_dof_index) {
+              /* If either of these faces have no indices, stop.  This is so
+               * that there is no attempt to match artificial cells of
+               * parallel distributed triangulations.
+               *
+               * While it seems like we ought to be able to avoid even calling
+               * set_periodicity_constraints for artificial faces, this
+               * situation can arise when a face that is being made periodic
+               * is only partially touched by the local subdomain.
+               * make_periodicity_constraints will be called recursively even
+               * for the section of the face that is not touched by the local
+               * subdomain.
+               *
+               * Until there is a better way to determine if the cells that
+               * neighbor a face are artificial, we simply test to see if the
+               * face does not have a valid dof initialization.
+               */
+              return;
+            }
+          }
+
           // Well, this is a hack:
           //
           // There is no
@@ -1983,18 +2006,6 @@ namespace DoFTools
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
-#if defined(DEBUG) && defined(DEAL_II_WITH_P4EST)
-    // Check whether we run on a non parallel mesh or on a
-    // parallel::distributed::Triangulation in serial
-    {
-      typedef parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
-      const PTRIA *ptria_p = dynamic_cast<const PTRIA *> (&dof_handler.get_tria());
-      Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
-              ExcMessage ("This function can not be used with distributed triangulations."
-                          "See the documentation for more information."));
-    }
-#endif
-
     Assert (b_id1 != b_id2,
             ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
                         "different to denote different boundaries."));
@@ -2076,18 +2087,6 @@ namespace DoFTools
 
     Assert(dim == space_dim,
            ExcNotImplemented());
-
-#if defined(DEBUG) && defined(DEAL_II_WITH_P4EST)
-    // Check whether we run on a non parallel mesh or on a
-    // parallel::distributed::Triangulation in serial
-    {
-      typedef typename parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
-      const PTRIA *ptria_p = dynamic_cast<const PTRIA *> (&dof_handler.get_tria());
-      Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
-              ExcMessage ("This function can not be used with distributed triangulations."
-                          "See the documentation for more information."));
-    }
-#endif
 
     typedef typename DH::face_iterator FaceIterator;
     typedef std::map<FaceIterator, FaceIterator> FaceMap;
