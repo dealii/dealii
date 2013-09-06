@@ -1078,9 +1078,10 @@ namespace DoFTools
    * More information on the topic can be found in the
    * @ref GlossFaceOrientation "glossary" article.
    *
-   * @note This function will not work for DoFHandler objects that are
-   * built on a parallel::distributed::Triangulation object unless both
-   * faces (or their children) are owned by the current processor.
+   * @note For DoFHandler objects that are built on a
+   * parallel::distributed::Triangulation object
+   * parallel::distributed::Triangulation::add_periodicity has to be called
+   * before.
    *
    * @author Matthias Maier, 2012
    */
@@ -1131,8 +1132,10 @@ namespace DoFTools
    * function will be used for which the respective flag was set in the
    * component mask.
    *
-   * @note This function will not work for DoFHandler objects that are
-   * built on a parallel::distributed::Triangulation object.
+   @ note For DoFHandler objects that are built on a
+   * parallel::distributed::Triangulation object
+   * parallel::distributed::Triangulation::add_periodicity has to be called
+   * before.
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    *
@@ -1157,8 +1160,10 @@ namespace DoFTools
    * @p orthogonal_equality. This can be used to implement conditions such
    * as $u(0,y)=u(1,y+1)$.
    *
-   * @note This function will not work for DoFHandler objects that are
-   * built on a parallel::distributed::Triangulation object.
+   * @note For DoFHandler objects that are built on a
+   * parallel::distributed::Triangulation object
+   * parallel::distributed::Triangulation::add_periodicity has to be called
+   * before.
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    *
@@ -1190,8 +1195,10 @@ namespace DoFTools
    * meshes with cells not in @ref GlossFaceOrientation
    * "standard orientation".
    *
-   * @note This function will not work for DoFHandler objects that are
-   * built on a parallel::distributed::Triangulation object.
+   * @note For DoFHandler objects that are built on a
+   * parallel::distributed::Triangulation object
+   * parallel::distributed::Triangulation::add_periodicity has to be called
+   * before.
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -1217,8 +1224,10 @@ namespace DoFTools
    * meshes with cells not in @ref GlossFaceOrientation
    * "standard orientation".
    *
-   * @note This function will not work for DoFHandler objects that are
-   * built on a parallel::distributed::Triangulation object.
+   * @note For DoFHandler objects that are built on a
+   * parallel::distributed::Triangulation object
+   * parallel::distributed::Triangulation::add_periodicity has to be called
+   * before.
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */

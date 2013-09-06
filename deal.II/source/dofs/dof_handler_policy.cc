@@ -2092,25 +2092,14 @@ namespace internal
           if (!cell->is_artificial())
             cell->set_user_flag();
 
-        //mark the vertices we are interested
-        //in, i.e. belonging to own and marked cells
-        const std::vector<bool> locally_active_vertices
-          = mark_locally_active_vertices (*tr);
-
         // add each ghostcells'
         // subdomain to the vertex and
         // keep track of interesting
         // neighbors
         std::map<unsigned int, std::set<dealii::types::subdomain_id> >
         vertices_with_ghost_neighbors;
-        for (typename DoFHandler<dim,spacedim>::active_cell_iterator
-             cell = dof_handler.begin_active();
-             cell != dof_handler.end(); ++cell)
-          if (cell->is_ghost ())
-            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-              if (locally_active_vertices[cell->vertex_index(v)])
-                vertices_with_ghost_neighbors[cell->vertex_index(v)]
-                .insert (cell->subdomain_id());
+
+        tr->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
 
 
         /* Send and receive cells. After this,
@@ -2581,10 +2570,6 @@ namespace internal
           for (cell = dof_handler.begin_active(); cell != endc; ++cell)
             if (!cell->is_artificial())
               cell->set_user_flag();
-          //mark the vertices we are interested
-          //in, i.e. belonging to own and marked cells
-          const std::vector<bool> locally_active_vertices
-            = mark_locally_active_vertices (*tr);
 
           // add each ghostcells'
           // subdomain to the vertex and
@@ -2592,14 +2577,8 @@ namespace internal
           // neighbors
           std::map<unsigned int, std::set<dealii::types::subdomain_id> >
           vertices_with_ghost_neighbors;
-          for (typename DoFHandler<dim,spacedim>::active_cell_iterator
-               cell = dof_handler.begin_active();
-               cell != dof_handler.end(); ++cell)
-            if (cell->is_ghost ())
-              for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-                if (locally_active_vertices[cell->vertex_index(v)])
-                  vertices_with_ghost_neighbors[cell->vertex_index(v)]
-                  .insert (cell->subdomain_id());
+
+          tr->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
 
           // Send and receive cells. After this, only
           // the local cells are marked, that received

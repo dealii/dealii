@@ -32,12 +32,14 @@
 #  include <p4est_vtk.h>
 #  include <p4est_ghost.h>
 #  include <p4est_communication.h>
+#  include <p4est_iterate.h>
 
 #  include <p8est_bits.h>
 #  include <p8est_extended.h>
 #  include <p8est_vtk.h>
 #  include <p8est_ghost.h>
 #  include <p8est_communication.h>
+#  include <p8est_iterate.h>
 #endif
 
 #include <algorithm>
@@ -105,6 +107,10 @@ namespace internal
                                    const types<2>::quadrant *q2);
 
       static
+      int (&quadrant_ancestor_id) (const types<2>::quadrant *q,
+                                   int level);
+
+      static
       int (&comm_find_owner) (types<2>::forest *p4est,
                               const types<2>::locidx which_tree,
                               const types<2>::quadrant *q,
@@ -115,6 +121,16 @@ namespace internal
                                                    types<2>::topidx num_trees,
                                                    types<2>::topidx num_corners,
                                                    types<2>::topidx num_vtt);
+
+      static
+      void (&connectivity_join_faces) (types<2>::connectivity *conn,
+                                       types<2>::topidx tree_left,
+                                       types<2>::topidx tree_right,
+                                       int face_left,
+                                       int face_right,
+                                       int orientation);
+
+
 
       static
       void (&connectivity_destroy) (p4est_connectivity_t *connectivity);
@@ -170,6 +186,9 @@ namespace internal
       static
       void (&connectivity_save) (const char *filename,
                                  types<2>::connectivity *connectivity);
+
+      static
+      int (&connectivity_is_valid) (types<2>::connectivity *connectivity);
 
       static
       types<2>::connectivity *(&connectivity_load) (const char *filename,
@@ -233,6 +252,10 @@ namespace internal
                                                const types<2>::quadrant *q2)
       = p4est_quadrant_is_ancestor;
 
+    int (&functions<2>::quadrant_ancestor_id) (const types<2>::quadrant *q,
+                                               int level)
+      = p4est_quadrant_ancestor_id;
+
     int (&functions<2>::comm_find_owner) (types<2>::forest *p4est,
                                           const types<2>::locidx which_tree,
                                           const types<2>::quadrant *q,
@@ -244,6 +267,16 @@ namespace internal
                                                                types<2>::topidx num_corners,
                                                                types<2>::topidx num_vtt)
       = p4est_connectivity_new;
+
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
+    void (&functions<2>::connectivity_join_faces) (types<2>::connectivity *conn,
+                                                   types<2>::topidx tree_left,
+                                                   types<2>::topidx tree_right,
+                                                   int face_left,
+                                                   int face_right,
+                                                   int orientation)
+    = p4est_connectivity_join_faces;
+#endif
 
     void (&functions<2>::connectivity_destroy) (p4est_connectivity_t *connectivity)
       = p4est_connectivity_destroy;
@@ -300,6 +333,10 @@ namespace internal
     void (&functions<2>::connectivity_save) (const char *filename,
                                              types<2>::connectivity *connectivity)
       = p4est_connectivity_save;
+
+    int (&functions<2>::connectivity_is_valid) (types<2>::connectivity
+                                                 *connectivity)
+      = p4est_connectivity_is_valid;
 
     types<2>::connectivity *
     (&functions<2>::connectivity_load) (const char *filename,
@@ -366,6 +403,10 @@ namespace internal
                                    const types<3>::quadrant *q2);
 
       static
+      int (&quadrant_ancestor_id) (const types<3>::quadrant *q,
+                                   int level);
+
+      static
       int (&comm_find_owner) (types<3>::forest *p4est,
                               const types<3>::locidx which_tree,
                               const types<3>::quadrant *q,
@@ -378,6 +419,14 @@ namespace internal
                                                    types<3>::topidx num_ett,
                                                    types<3>::topidx num_corners,
                                                    types<3>::topidx num_ctt);
+
+      static
+      void (&connectivity_join_faces) (types<3>::connectivity *conn,
+                                       types<3>::topidx tree_left,
+                                       types<3>::topidx tree_right,
+                                       int face_left,
+                                       int face_right,
+                                       int orientation);
 
       static
       void (&connectivity_destroy) (p8est_connectivity_t *connectivity);
@@ -433,6 +482,9 @@ namespace internal
       static
       void (&connectivity_save) (const char *filename,
                                  types<3>::connectivity *connectivity);
+
+      static
+      int (&connectivity_is_valid) (types<3>::connectivity *connectivity);
 
       static
       types<3>::connectivity *(&connectivity_load) (const char *filename,
@@ -497,6 +549,10 @@ namespace internal
                                                const types<3>::quadrant *q2)
       = p8est_quadrant_is_ancestor;
 
+    int (&functions<3>::quadrant_ancestor_id) (const types<3>::quadrant *q,
+                                               int level)
+      = p8est_quadrant_ancestor_id;
+
     int (&functions<3>::comm_find_owner) (types<3>::forest *p4est,
                                           const types<3>::locidx which_tree,
                                           const types<3>::quadrant *q,
@@ -513,6 +569,16 @@ namespace internal
 
     void (&functions<3>::connectivity_destroy) (p8est_connectivity_t *connectivity)
       = p8est_connectivity_destroy;
+
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
+    void (&functions<3>::connectivity_join_faces) (types<3>::connectivity *conn,
+                                                   types<3>::topidx tree_left,
+                                                   types<3>::topidx tree_right,
+                                                   int face_left,
+                                                   int face_right,
+                                                   int orientation)
+      = p8est_connectivity_join_faces;
+#endif
 
     types<3>::forest *(&functions<3>::new_forest) (MPI_Comm mpicomm,
                                                    types<3>::connectivity *connectivity,
@@ -566,6 +632,10 @@ namespace internal
     void (&functions<3>::connectivity_save) (const char *filename,
                                              types<3>::connectivity *connectivity)
       = p8est_connectivity_save;
+
+    int (&functions<3>::connectivity_is_valid) (types<3>::connectivity
+                                                   *connectivity)
+      = p8est_connectivity_is_valid;
 
     types<3>::connectivity *
     (&functions<3>::connectivity_load) (const char *filename,
@@ -668,6 +738,37 @@ namespace internal
     {
       return functions<dim>::quadrant_is_ancestor(&q1, &q2);
     }
+
+    /**
+     * This struct templatizes the p4est iterate structs and function
+     * prototypes, which are used to execute callback functions for faces,
+     * edges, and corners that require local neighborhood information, i.e.
+     * the neighboring cells */
+    template <int dim> struct iter;
+
+    template <> struct iter<2>
+    {
+      typedef p4est_iter_corner_info_t corner_info;
+      typedef p4est_iter_corner_side_t corner_side;
+      typedef p4est_iter_corner_t      corner_iter;
+      typedef p4est_iter_face_info_t face_info;
+      typedef p4est_iter_face_side_t face_side;
+      typedef p4est_iter_face_t      face_iter;
+    };
+
+    template <> struct iter<3>
+    {
+      typedef p8est_iter_corner_info_t corner_info;
+      typedef p8est_iter_corner_side_t corner_side;
+      typedef p8est_iter_corner_t      corner_iter;
+      typedef p8est_iter_edge_info_t edge_info;
+      typedef p8est_iter_edge_side_t edge_side;
+      typedef p8est_iter_edge_t      edge_iter;
+      typedef p8est_iter_face_info_t face_info;
+      typedef p8est_iter_face_side_t face_side;
+      typedef p8est_iter_face_t      face_iter;
+    };
+
   }
 }
 
@@ -736,7 +837,7 @@ namespace
                             const std::vector<std::list<
                             std::pair<typename Triangulation<dim,spacedim>::active_cell_iterator,unsigned int> > >
                             & vertex_to_cell,
-                            const std::vector<types::global_dof_index> &coarse_cell_to_p4est_tree_permutation,
+                            const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
                             const bool set_vertex_info,
                             typename internal::p4est::types<dim>::connectivity *connectivity)
   {
@@ -1072,17 +1173,24 @@ namespace
                           const typename internal::p4est::types<dim>::forest   &forest,
                           const types::subdomain_id                           my_subdomain)
   {
+    ssize_t sidx;
     // check if this cell exists in
     // the local p4est cell
-    if (sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
+    if ((sidx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
                          &p4est_cell,
-                         internal::p4est::functions<dim>::quadrant_compare)
+                         internal::p4est::functions<dim>::quadrant_compare))
         != -1)
       {
         // yes, cell found in local part of p4est
         delete_all_children<dim,spacedim> (dealii_cell);
         if (!dealii_cell->has_children())
           dealii_cell->set_subdomain_id(my_subdomain);
+
+        typename internal::p4est::types<dim>::quadrant *match =
+          static_cast<typename internal::p4est::types<dim>::quadrant *>
+          (sc_array_index_ssize_t(const_cast<sc_array_t *>(&tree.quadrants),
+                                 sidx));
+        match->p.user_int = dealii_cell->index();
       }
     else
       {
@@ -1167,66 +1275,36 @@ namespace
 
   template <int dim, int spacedim>
   void
-  match_quadrant_recursively (const typename internal::p4est::types<dim>::quadrant &this_quadrant,
-                              const typename Triangulation<dim,spacedim>::cell_iterator &dealii_cell,
-                              const typename internal::p4est::types<dim>::quadrant &ghost_quadrant,
-                              const typename internal::p4est::types<dim>::forest &forest,
-                              unsigned int ghost_owner)
+  match_quadrant (const dealii::Triangulation<dim,spacedim> *tria,
+                  unsigned int dealii_index,
+                  typename internal::p4est::types<dim>::quadrant &ghost_quadrant,
+                  unsigned int ghost_owner)
   {
-    if (internal::p4est::functions<dim>::quadrant_is_equal(&this_quadrant, &ghost_quadrant))
-      {
-        // this is the ghostcell
+    int i, child_id;
+    int l = ghost_quadrant.level;
 
-        if (dealii_cell->has_children())
-          delete_all_children<dim,spacedim> (dealii_cell);
-        else
+    for (i = 0; i < l; i++)
+      {
+        typename Triangulation<dim,spacedim>::cell_iterator cell (tria, i, dealii_index);
+        if (cell->has_children () == false)
           {
-            dealii_cell->clear_coarsen_flag();
-            dealii_cell->set_subdomain_id(ghost_owner);
+            cell->clear_coarsen_flag();
+            cell->set_refine_flag ();
+            return;
           }
-        return;
+
+        child_id = internal::p4est::functions<dim>::quadrant_ancestor_id (&ghost_quadrant, i + 1);
+        dealii_index = cell->child_index(child_id);
       }
 
-    if (! internal::p4est::functions<dim>::quadrant_is_ancestor ( &this_quadrant, &ghost_quadrant))
+    typename Triangulation<dim,spacedim>::cell_iterator cell (tria, l, dealii_index);
+    if (cell->has_children())
+      delete_all_children<dim,spacedim> (cell);
+    else
       {
-        return;
+        cell->clear_coarsen_flag();
+        cell->set_subdomain_id(ghost_owner);
       }
-
-    if (dealii_cell->has_children () == false)
-      {
-        dealii_cell->clear_coarsen_flag();
-        dealii_cell->set_refine_flag ();
-        return;
-      }
-
-    typename internal::p4est::types<dim>::quadrant
-    p4est_child[GeometryInfo<dim>::max_children_per_cell];
-    for (unsigned int c=0;
-         c<GeometryInfo<dim>::max_children_per_cell; ++c)
-      switch (dim)
-        {
-        case 2:
-          P4EST_QUADRANT_INIT(&p4est_child[c]);
-          break;
-        case 3:
-          P8EST_QUADRANT_INIT(&p4est_child[c]);
-          break;
-        default:
-          Assert (false, ExcNotImplemented());
-        }
-
-
-    internal::p4est::functions<dim>::
-    quadrant_childrenv (&this_quadrant, p4est_child);
-
-    for (unsigned int c=0;
-         c<GeometryInfo<dim>::max_children_per_cell; ++c)
-
-      {
-        match_quadrant_recursively<dim,spacedim> (p4est_child[c], dealii_cell->child(c), ghost_quadrant, forest, ghost_owner);
-      }
-
-
   }
 
 
@@ -1504,7 +1582,7 @@ namespace
   {
   public:
     RefineAndCoarsenList (const Triangulation<dim,spacedim> &triangulation,
-                          const std::vector<types::global_dof_index> &p4est_tree_to_coarse_cell_permutation,
+                          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
                           const types::subdomain_id                   my_subdomain,
                           typename internal::p4est::types<dim>::forest &forest);
 
@@ -1578,8 +1656,8 @@ namespace
   template <int dim, int spacedim>
   RefineAndCoarsenList<dim,spacedim>::
   RefineAndCoarsenList (const Triangulation<dim,spacedim>            &triangulation,
-                        const std::vector<types::global_dof_index> &p4est_tree_to_coarse_cell_permutation,
-                        const types::subdomain_id                   my_subdomain,
+                        const std::vector<unsigned int>             &p4est_tree_to_coarse_cell_permutation,
+                        const types::subdomain_id                    my_subdomain,
                         typename internal::p4est::types<dim>::forest &forest)
     :
     forest(forest)
@@ -1943,6 +2021,8 @@ namespace parallel
       // for several different space dimensions
       dealii::internal::p4est::InitFinalize::do_initialize ();
 
+      parallel_ghost = 0;
+
       number_cache.n_locally_owned_active_cells
       .resize (Utilities::MPI::n_mpi_processes (mpi_communicator));
     }
@@ -2023,6 +2103,12 @@ namespace parallel
     Triangulation<dim,spacedim>::clear ()
     {
       triangulation_has_content = false;
+
+      if (parallel_ghost != 0)
+        {
+          dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
+          parallel_ghost = 0;
+        }
 
       if (parallel_forest != 0)
         {
@@ -2121,6 +2207,10 @@ namespace parallel
     Triangulation<dim,spacedim>::
     load(const char *filename)
     {
+      if (parallel_ghost != 0) {
+        dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
+        parallel_ghost = 0;
+      }
       dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
       parallel_forest = 0;
       dealii::internal::p4est::functions<dim>::connectivity_destroy (connectivity);
@@ -2557,8 +2647,12 @@ namespace parallel
 
 
       // query p4est for the ghost cells
-      typename dealii::internal::p4est::types<dim>::ghost *ghostlayer;
-      ghostlayer = dealii::internal::p4est::functions<dim>::ghost_new (parallel_forest,
+      if (parallel_ghost != 0)
+        {
+          dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
+          parallel_ghost = 0;
+        }
+      parallel_ghost = dealii::internal::p4est::functions<dim>::ghost_new (parallel_forest,
                    (dim == 2
                     ?
                     typename dealii::internal::p4est::types<dim>::
@@ -2567,7 +2661,7 @@ namespace parallel
                     typename dealii::internal::p4est::types<dim>::
                     balance_type(P8EST_BALANCE_CORNER)));
 
-      Assert (ghostlayer, ExcInternalError());
+      Assert (parallel_ghost, ExcInternalError());
 
 
       // set all cells to artificial. we will later set it to the correct
@@ -2632,26 +2726,22 @@ namespace parallel
           // and recurse.
           typename dealii::internal::p4est::types<dim>::quadrant *quadr;
           unsigned int ghost_owner=0;
+          typename dealii::internal::p4est::types<dim>::topidx ghost_tree=0;
 
-          for (unsigned int g_idx=0; g_idx<ghostlayer->ghosts.elem_count; ++g_idx)
+          for (unsigned int g_idx=0; g_idx<parallel_ghost->ghosts.elem_count; ++g_idx)
             {
-              while (g_idx >= (unsigned int)ghostlayer->proc_offsets[ghost_owner+1])
+              while (g_idx >= (unsigned int)parallel_ghost->proc_offsets[ghost_owner+1])
                 ++ghost_owner;
+              while (g_idx >= (unsigned int)parallel_ghost->tree_offsets[ghost_tree+1])
+                ++ghost_tree;
 
               quadr = static_cast<typename dealii::internal::p4est::types<dim>::quadrant *>
-                      ( sc_array_index(&ghostlayer->ghosts, g_idx) );
+                      ( sc_array_index(&parallel_ghost->ghosts, g_idx) );
 
               unsigned int coarse_cell_index =
-                p4est_tree_to_coarse_cell_permutation[quadr->p.piggy3.which_tree];
+                p4est_tree_to_coarse_cell_permutation[ghost_tree];
 
-              const typename Triangulation<dim,spacedim>::cell_iterator
-              cell (this, 0U, coarse_cell_index);
-
-              typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-              dealii::internal::p4est::init_coarse_quadrant<dim> (p4est_coarse_cell);
-
-              match_quadrant_recursively<dim,spacedim> (p4est_coarse_cell, cell, *quadr,
-                                                        *parallel_forest, ghost_owner);
+              match_quadrant<dim,spacedim> (this, coarse_cell_index, *quadr, ghost_owner);
             }
 
           // fix all the flags to make
@@ -2710,7 +2800,7 @@ namespace parallel
             ++num_ghosts;
         }
 
-      Assert( num_ghosts == ghostlayer->ghosts.elem_count, ExcInternalError());
+      Assert( num_ghosts == parallel_ghost->ghosts.elem_count, ExcInternalError());
 #endif
 
 
@@ -2866,8 +2956,6 @@ namespace parallel
 
       }
 
-      dealii::internal::p4est::functions<dim>::ghost_destroy (ghostlayer);
-
       this->smooth_grid = save_smooth;
     }
 
@@ -2950,6 +3038,11 @@ namespace parallel
               ExcInternalError());
       parallel_forest->user_pointer = &refine_and_coarsen_list;
 
+      if (parallel_ghost != 0)
+        {
+          dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
+          parallel_ghost = 0;
+        }
       dealii::internal::p4est::functions<dim>::
       refine (parallel_forest, /* refine_recursive */ false,
               &RefineAndCoarsenList<dim,spacedim>::refine_callback,
@@ -3216,7 +3309,307 @@ namespace parallel
       return p4est_tree_to_coarse_cell_permutation;
     }
 
+    namespace
+    {
+      /**
+       * This is the callback data structure used to fill
+       * vertices_with_ghost_neighbors via the p4est_iterate tool
+       */
+      template <int dim, int spacedim>
+      struct find_ghosts
+      {
+        typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation;
+        sc_array_t * subids;
+        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+        *vertices_with_ghost_neighbors;
+      };
 
+      /** At a corner (vertex), determine if any of the neighboring cells are
+       * ghosts.  If there are, find out their subdomain ids, and if this is a
+       * local vertex, then add these subdomain ids to the map
+       * vertices_with_ghost_neighbors of that index
+       */
+      template <int dim, int spacedim>
+      void
+      find_ghosts_corner
+      (typename dealii::internal::p4est::iter<dim>::corner_info * info,
+       void *user_data)
+      {
+        int i, j;
+        int nsides = info->sides.elem_count;
+        typename dealii::internal::p4est::iter<dim>::corner_side * sides =
+          (typename dealii::internal::p4est::iter<dim>::corner_side *)
+          (info->sides.array);
+        struct find_ghosts<dim,spacedim> *fg = static_cast<struct find_ghosts<dim,spacedim> *>(user_data);
+        sc_array_t *subids = fg->subids;
+        typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
+        int nsubs;
+        dealii::types::subdomain_id *subdomain_ids;
+        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+        *vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
+
+        subids->elem_count = 0;
+        for (i = 0; i < nsides; i++) {
+          if (sides[i].is_ghost) {
+            typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].quad));
+            Assert (cell->is_ghost(), ExcMessage ("ghost quad did not find ghost cell"));
+            dealii::types::subdomain_id *subid =
+              static_cast<dealii::types::subdomain_id *>(sc_array_push (subids));
+            *subid = cell->subdomain_id();
+          }
+        }
+
+        if (!subids->elem_count) {
+          return;
+        }
+
+        nsubs = (int) subids->elem_count;
+        subdomain_ids = (dealii::types::subdomain_id *) (subids->array);
+
+        for (i = 0; i < nsides; i++) {
+          if (!sides[i].is_ghost) {
+            typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].quad));
+
+            Assert (!cell->is_ghost(), ExcMessage ("local quad found ghost cell"));
+
+            for (j = 0; j < nsubs; j++) {
+              (*vertices_with_ghost_neighbors)[cell->vertex_index(sides[i].corner)]
+              .insert (subdomain_ids[j]);
+            }
+          }
+        }
+
+        subids->elem_count = 0;
+      }
+
+      /** Similar to find_ghosts_corner, but for the hanging vertex in the
+       * middle of an edge
+       */
+      template <int dim, int spacedim>
+      void
+      find_ghosts_edge
+      (typename dealii::internal::p4est::iter<dim>::edge_info * info,
+       void *user_data)
+      {
+        int i, j, k;
+        int nsides = info->sides.elem_count;
+        typename dealii::internal::p4est::iter<dim>::edge_side * sides =
+          (typename dealii::internal::p4est::iter<dim>::edge_side *)
+          (info->sides.array);
+        struct find_ghosts<dim,spacedim> *fg = static_cast<struct find_ghosts<dim,spacedim> *>(user_data);
+        sc_array_t *subids = fg->subids;
+        typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
+        int nsubs;
+        dealii::types::subdomain_id *subdomain_ids;
+        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+        *vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
+
+        subids->elem_count = 0;
+        for (i = 0; i < nsides; i++) {
+          if (sides[i].is_hanging) {
+            for (j = 0; j < 2; j++) {
+              if (sides[i].is.hanging.is_ghost[j]) {
+                typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].is.hanging.quad[j]));
+                dealii::types::subdomain_id *subid =
+                  static_cast<dealii::types::subdomain_id *>(sc_array_push (subids));
+                *subid = cell->subdomain_id();
+              }
+            }
+          }
+        }
+
+        if (!subids->elem_count) {
+          return;
+        }
+
+        nsubs = (int) subids->elem_count;
+        subdomain_ids = (dealii::types::subdomain_id *) (subids->array);
+
+        for (i = 0; i < nsides; i++) {
+          if (sides[i].is_hanging) {
+            for (j = 0; j < 2; j++) {
+              if (!sides[i].is.hanging.is_ghost[j]) {
+                typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].is.hanging.quad[j]));
+
+                for (k = 0; k < nsubs; k++) {
+                  (*vertices_with_ghost_neighbors)[cell->vertex_index(p8est_edge_corners[sides[i].edge][1^j])]
+                  .insert (subdomain_ids[k]);
+                }
+              }
+            }
+          }
+        }
+
+        subids->elem_count = 0;
+      }
+
+      /** Similar to find_ghosts_corner, but for the hanging vertex in the
+       * middle of a face
+       */
+      template <int dim, int spacedim>
+      void
+      find_ghosts_face
+      (typename dealii::internal::p4est::iter<dim>::face_info * info,
+       void *user_data)
+      {
+        int i, j, k;
+        int nsides = info->sides.elem_count;
+        typename dealii::internal::p4est::iter<dim>::face_side * sides =
+          (typename dealii::internal::p4est::iter<dim>::face_side *)
+          (info->sides.array);
+        struct find_ghosts<dim,spacedim> *fg = static_cast<struct find_ghosts<dim,spacedim> *>(user_data);
+        sc_array_t *subids = fg->subids;
+        typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
+        int nsubs;
+        dealii::types::subdomain_id *subdomain_ids;
+        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+        *vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
+        int limit = (dim == 2) ? 2 : 4;
+
+        subids->elem_count = 0;
+        for (i = 0; i < nsides; i++) {
+          if (sides[i].is_hanging) {
+            for (j = 0; j < limit; j++) {
+              if (sides[i].is.hanging.is_ghost[j]) {
+                typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].is.hanging.quad[j]));
+                dealii::types::subdomain_id *subid =
+                  static_cast<dealii::types::subdomain_id *>(sc_array_push (subids));
+                *subid = cell->subdomain_id();
+              }
+            }
+          }
+        }
+
+        if (!subids->elem_count) {
+          return;
+        }
+
+        nsubs = (int) subids->elem_count;
+        subdomain_ids = (dealii::types::subdomain_id *) (subids->array);
+
+        for (i = 0; i < nsides; i++) {
+          if (sides[i].is_hanging) {
+            for (j = 0; j < limit; j++) {
+              if (!sides[i].is.hanging.is_ghost[j]) {
+                typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].is.hanging.quad[j]));
+
+                for (k = 0; k < nsubs; k++) {
+                  if (dim == 2) {
+                    (*vertices_with_ghost_neighbors)[cell->vertex_index(p4est_face_corners[sides[i].face][(limit - 1)^j])]
+                    .insert (subdomain_ids[k]);
+                  }
+                  else {
+                    (*vertices_with_ghost_neighbors)[cell->vertex_index(p8est_face_corners[sides[i].face][(limit - 1)^j])]
+                    .insert (subdomain_ids[k]);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        subids->elem_count = 0;
+      }
+    }
+
+    template <>
+    void
+    Triangulation<1,1>::
+    fill_vertices_with_ghost_neighbors
+      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+    template <>
+    void
+    Triangulation<1,2>::
+    fill_vertices_with_ghost_neighbors
+      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+    template <>
+    void
+    Triangulation<1,3>::
+    fill_vertices_with_ghost_neighbors
+      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+    /**
+     * Determine the neighboring subdomains that are adjacent to each vertex.
+     * This is achieved via the p4est_iterate tool
+     */
+    template <>
+    void
+    Triangulation<2,2>::
+    fill_vertices_with_ghost_neighbors
+      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors)
+    {
+      struct find_ghosts<2,2> fg;
+
+      fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
+      fg.triangulation = this;
+      fg.vertices_with_ghost_neighbors = &(vertices_with_ghost_neighbors);
+
+      p4est_iterate (this->parallel_forest, this->parallel_ghost, static_cast<void *>(&fg),
+                     NULL, find_ghosts_face<2,2>, find_ghosts_corner<2,2>);
+
+      sc_array_destroy (fg.subids);
+    }
+
+    /**
+     * Determine the neighboring subdomains that are adjacent to each vertex.
+     * This is achieved via the p4est_iterate tool
+     */
+    template <>
+    void
+    Triangulation<2,3>::
+    fill_vertices_with_ghost_neighbors
+      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors)
+    {
+      struct find_ghosts<2,3> fg;
+
+      fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
+      fg.triangulation = this;
+      fg.vertices_with_ghost_neighbors = &(vertices_with_ghost_neighbors);
+
+      p4est_iterate (this->parallel_forest, this->parallel_ghost, static_cast<void *>(&fg),
+                     NULL, find_ghosts_face<2,3>, find_ghosts_corner<2,3>);
+
+      sc_array_destroy (fg.subids);
+    }
+
+    /**
+     * Determine the neighboring subdomains that are adjacent to each vertex.
+     * This is achieved via the p8est_iterate tool
+     */
+    template <>
+    void
+    Triangulation<3,3>::
+    fill_vertices_with_ghost_neighbors
+      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors)
+    {
+      struct find_ghosts<3,3> fg;
+
+      fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
+      fg.triangulation = this;
+      fg.vertices_with_ghost_neighbors = &(vertices_with_ghost_neighbors);
+
+      p8est_iterate (this->parallel_forest, this->parallel_ghost, static_cast<void *>(&fg),
+                     NULL, find_ghosts_face<3,3>, find_ghosts_edge<3,3>, find_ghosts_corner<3,3>);
+
+      sc_array_destroy (fg.subids);
+    }
 
     template <int dim, int spacedim>
     MPI_Comm
@@ -3225,6 +3618,89 @@ namespace parallel
       return mpi_communicator;
     }
 
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::add_periodicity
+       (const std::vector<std_cxx1x::tuple<cell_iterator, unsigned int,
+                                           cell_iterator, unsigned int>>&
+          periodicity_vector)
+    {
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
+      Assert (triangulation_has_content == true,
+              ExcMessage ("The triangulation is empty!"));
+      Assert (this->n_levels() == 1,
+              ExcMessage ("The triangulation is refined!"));
+
+      typename std::vector
+        <typename std_cxx1x::tuple
+          <cell_iterator, unsigned int,
+           cell_iterator, unsigned int> >::const_iterator periodic_tuple;
+      periodic_tuple = periodicity_vector.begin();
+
+      typename std::vector
+        <typename std_cxx1x::tuple
+          <cell_iterator, unsigned int,
+           cell_iterator, unsigned int> >::const_iterator periodic_end;
+      periodic_end = periodicity_vector.end();
+
+      for (; periodic_tuple<periodic_end; ++periodic_tuple)
+      {
+        const cell_iterator first_cell=std::get<0>(*periodic_tuple);
+        const cell_iterator second_cell=std::get<2>(*periodic_tuple);
+        const unsigned int face_right=std::get<3>(*periodic_tuple);
+        const unsigned int face_left=std::get<1>(*periodic_tuple);
+
+        //respective cells of the matching faces in p4est
+        const unsigned int tree_left
+          = coarse_cell_to_p4est_tree_permutation[std::distance(this->begin(),
+                                                                first_cell)];
+        const unsigned int tree_right
+          = coarse_cell_to_p4est_tree_permutation[std::distance(this->begin(),
+                                                                second_cell)];
+
+        dealii::internal::p4est::functions<dim>::
+          connectivity_join_faces (connectivity,
+                                   tree_left,
+                                   tree_right,
+                                   face_left,
+                                   face_right,
+                                   /* orientation */ 0);
+        /* The orientation parameter above describes the difference between
+         * the cell on the left and the cell on the right would number of the
+         * corners of the face.  In the periodic domains most users will want,
+         * this orientation will be 0, i.e. the two cells would number the
+         * corners the same way.  More exotic periodicity, like moebius strips
+         * or converting an unstructured quad/hex mesh into a periodic domain,
+         * are not supported right now, and undefined behavior will occur if
+         * users try to make them periodic.  This may be addressed at a later
+         * date.
+         */
+      }
+
+
+      Assert(dealii::internal::p4est::functions<dim>::connectivity_is_valid
+               (connectivity) == 1,
+             ExcInternalError());
+
+        // now create a forest out of the
+        // connectivity data structure
+      dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
+      parallel_forest
+        = dealii::internal::p4est::functions<dim>::
+            new_forest (mpi_communicator,
+                        connectivity,
+                        /* minimum initial number of quadrants per tree */ 0,
+                        /* minimum level of upfront refinement */ 0,
+                        /* use uniform upfront refinement */ 1,
+                        /* user_data_size = */ 0,
+                        /* user_data_constructor = */ NULL,
+                        /* user_pointer */ this);
+
+#else
+      Assert(false, ExcMessage ("Need p4est version >=0.3.4.1!"));
+#endif
+    }
 
 
     template <int dim, int spacedim>
@@ -3383,6 +3859,30 @@ namespace parallel
                                                      p4est_coarse_cell,
                                                      attached_data_pack_callbacks);
         }
+    }
+
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::cell_iterator
+    cell_from_quad
+    (typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation,
+     typename dealii::internal::p4est::types<dim>::topidx treeidx,
+     typename dealii::internal::p4est::types<dim>::quadrant &quad)
+    {
+      int i, l = quad.level;
+      int child_id;
+      const std::vector<unsigned int> perm = triangulation->get_p4est_tree_to_coarse_cell_permutation ();
+      unsigned int dealii_index = perm[treeidx];
+
+      for (i = 0; i < l; i++) {
+        typename dealii::Triangulation<dim,spacedim>::cell_iterator cell (triangulation, i, dealii_index);
+        child_id = internal::p4est::functions<dim>::quadrant_ancestor_id (&quad, i + 1);
+        Assert (cell->has_children (), ExcMessage ("p4est quadrant does not correspond to a cell!"));
+        dealii_index = cell->child_index(child_id);
+      }
+
+      typename dealii::Triangulation<dim,spacedim>::cell_iterator out_cell (triangulation, l, dealii_index);
+
+      return out_cell;
     }
 
 
