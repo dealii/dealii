@@ -108,9 +108,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
           ${CMAKE_COMMAND} -E echo "${_full_test}: BUILD successful"
         COMMAND
           ${_run_command}
-          || (echo "${_full_test}: RUN failed. Output:"
-              && cat output
-              && rm output
+          || (mv ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+                 ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_output
+              && echo "${_full_test}: RUN failed. Output:"
+              && cat ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_output
               && exit 1)
         COMMAND
           ${PERL_EXECUTABLE} -pi
