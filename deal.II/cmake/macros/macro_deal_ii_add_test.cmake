@@ -104,21 +104,17 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       #
       ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
         COMMAND
-          # A this stage a build is always successful: :-)
-          ${CMAKE_COMMAND} -E echo "${_full_test}: BUILD successful"
-        COMMAND
           ${_run_command}
           || (mv ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
                  ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_output
-              && echo "${_full_test}: RUN failed. Output:"
+              && echo "${_category}/${_test}: BUILD successful."
+              && echo "${_category}/${_test}: RUN failed. Output:"
               && cat ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_output
               && exit 1)
         COMMAND
           ${PERL_EXECUTABLE} -pi
           ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-        COMMAND
-          ${CMAKE_COMMAND} -E echo "${_full_test}: RUN successful"
         WORKING_DIRECTORY
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         DEPENDS
@@ -133,11 +129,16 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
             > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
           || (mv ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
                  ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_diff
-              && echo "${_full_test}: DIFF failed. Output:"
+              && echo "${_category}/${_test}: BUILD successful."
+              && echo "${_category}/${_test}: RUN successful."
+              && echo "${_category}/${_test}: DIFF failed. Output:"
               && cat ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_diff
               && exit 1)
         COMMAND
-          ${CMAKE_COMMAND} -E echo "${_full_test}: DIFF successful"
+             echo "${_category}/${_test}: BUILD successful."
+          && echo "${_category}/${_test}: RUN successful."
+          && echo "${_category}/${_test}: DIFF successful."
+          && echo "${_category}/${_test}: PASSED."
         WORKING_DIRECTORY
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         DEPENDS
@@ -154,7 +155,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       #
       ADD_TEST(NAME ${_category}/${_test}
         COMMAND ${CMAKE_COMMAND}
-          -DTEST=${_full_test}.diff
+          -DTRGT=${_full_test}.diff
+          -DTEST=${_category}/${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}

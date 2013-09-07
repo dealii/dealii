@@ -57,7 +57,8 @@ FOREACH(_full_file ${_header})
       #
       ADD_TEST(NAME ${_category}/${_path}/${_file}.${_build_lowercase}
         COMMAND ${CMAKE_COMMAND}
-          -DTEST=${_test}
+          -DTRGT=${_test}
+          -DTEST=${_category}/${_path}/${_file}.${_build_lowercase}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
