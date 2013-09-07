@@ -29,6 +29,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   FILE(GLOB _tests "*.output")
   FOREACH(_test ${_tests})
+    SET(_comparison ${_test})
 
     #
     # Respect TEST_PICKUP_REGEX: Make sure we are allowed to pickup this
@@ -86,7 +87,6 @@ MACRO(DEAL_II_PICKUP_TESTS)
         SET(_configuration)
       ENDIF()
 
-      SET(_comparison ${_test})
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
       DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_n_cpu} ${_configuration})
     ENDIF()
