@@ -3616,7 +3616,7 @@ namespace parallel
     void
     Triangulation<dim,spacedim>::add_periodicity
        (const std::vector<std_cxx1x::tuple<cell_iterator, unsigned int,
-                                           cell_iterator, unsigned int>>&
+                                           cell_iterator, unsigned int> >&
           periodicity_vector)
     {
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
