@@ -3639,10 +3639,10 @@ namespace parallel
 
       for (; periodic_tuple<periodic_end; ++periodic_tuple)
       {
-        const cell_iterator first_cell=std::get<0>(*periodic_tuple);
-        const cell_iterator second_cell=std::get<2>(*periodic_tuple);
-        const unsigned int face_right=std::get<3>(*periodic_tuple);
-        const unsigned int face_left=std::get<1>(*periodic_tuple);
+        const cell_iterator first_cell=std_cxx1x::get<0>(*periodic_tuple);
+        const cell_iterator second_cell=std_cxx1x::get<2>(*periodic_tuple);
+        const unsigned int face_right=std_cxx1x::get<3>(*periodic_tuple);
+        const unsigned int face_left=std_cxx1x::get<1>(*periodic_tuple);
 
         //respective cells of the matching faces in p4est
         const unsigned int tree_left
