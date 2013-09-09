@@ -2518,10 +2518,10 @@ namespace parallel
                    (dim == 2
                     ?
                     typename dealii::internal::p4est::types<dim>::
-                    balance_type(P4EST_BALANCE_CORNER)
+                    balance_type(P4EST_CONNECT_CORNER)
                     :
                     typename dealii::internal::p4est::types<dim>::
-                    balance_type(P8EST_BALANCE_CORNER)));
+                    balance_type(P8EST_CONNECT_CORNER)));
 
       Assert (parallel_ghost, ExcInternalError());
 
@@ -2897,10 +2897,10 @@ namespace parallel
                (dim == 2
                 ?
                 typename dealii::internal::p4est::types<dim>::
-                balance_type(P4EST_BALANCE_FULL)
+                balance_type(P4EST_CONNECT_FULL)
                 :
                 typename dealii::internal::p4est::types<dim>::
-                balance_type(P8EST_BALANCE_FULL)),
+                balance_type(P8EST_CONNECT_FULL)),
                /*init_callback=*/NULL);
 
 
