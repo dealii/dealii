@@ -3691,7 +3691,7 @@ namespace parallel
                         /* user_pointer */ this);
 
 #else
-      Assert(false, ExcMessage ("Need p4est version >=0.3.4.1!"));
+      Assert(false, ExcMessage ("Need p4est version >= 0.3.4.1!"));
 #endif
     }
 
