@@ -18,7 +18,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/std_cxx1x/bind.h>
 #include <deal.II/hp/dof_handler.h>
-#include <deal.II/hp/dof_objects.h>
 #include <deal.II/hp/dof_level.h>
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/dofs/dof_accessor.h>

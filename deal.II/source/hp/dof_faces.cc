@@ -23,6 +23,32 @@ namespace internal
 {
   namespace hp
   {
+// ---------------------- DoFObjects ----------------------------
+
+    template <int structdim>
+    std::size_t
+    DoFObjects<structdim>::memory_consumption () const
+    {
+      return (MemoryConsumption::memory_consumption (dofs) +
+              MemoryConsumption::memory_consumption (dof_offsets));
+    }
+
+
+    // explicit instantiations
+    template
+    std::size_t
+    DoFObjects<1>::memory_consumption () const;
+
+    template
+    std::size_t
+    DoFObjects<2>::memory_consumption () const;
+
+    template
+    std::size_t
+    DoFObjects<3>::memory_consumption () const;
+
+
+// ---------------------- DoFFaces ----------------------------
 
     std::size_t
     DoFFaces<1>::memory_consumption () const
@@ -43,7 +69,7 @@ namespace internal
     std::size_t
     DoFFaces<3>::memory_consumption () const
     {
-      return (MemoryConsumption::memory_consumption (quads) +
+      return (MemoryConsumption::memory_consumption (lines) +
               MemoryConsumption::memory_consumption (quads) );
     }
 
