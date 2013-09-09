@@ -480,7 +480,7 @@ namespace Step40
               (triangulation,reps,p1,p2,true);
 
             std::vector
-              <std::tuple
+              <std_cxx1x::tuple
                 <typename parallel::distributed::Triangulation<dim>::cell_iterator, unsigned int,
                  typename parallel::distributed::Triangulation<dim>::cell_iterator, unsigned int> >
               periodicity_vector;
