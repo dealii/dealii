@@ -102,10 +102,10 @@ void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::Integ
 
 
 template <int dim>
-void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim>& dinfo,
-				       typename MeshWorker::IntegrationInfo<dim>& info) const
+void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim>& /*dinfo*/,
+				  typename MeshWorker::IntegrationInfo<dim>& /*info*/) const
 {
-  const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
+//  const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
 //  Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0),
 //  			  Laplace::compute_penalty(dinfo, dinfo, deg, deg));
 }
@@ -113,10 +113,10 @@ void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim>& dinfo,
 
 template <int dim>
 void LaplaceMatrix<dim>::face(
-  MeshWorker::DoFInfo<dim>& dinfo1, MeshWorker::DoFInfo<dim>& dinfo2,
-  MeshWorker::IntegrationInfo<dim>& info1, MeshWorker::IntegrationInfo<dim>& info2) const
+  MeshWorker::DoFInfo<dim>& /*dinfo1*/, MeshWorker::DoFInfo<dim>& /*dinfo2*/,
+  MeshWorker::IntegrationInfo<dim>& /*info1*/, MeshWorker::IntegrationInfo<dim>& /*info2*/) const
 {
-  const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
+//  const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
 //  Laplace::ip_matrix(dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix, 
 //		     dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
 //		     info1.fe_values(0), info2.fe_values(0),
@@ -449,16 +449,6 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool& use_mw)
             mg_interface_in[cell->level()]);
     }
   }
-
-  const unsigned int nlevels = triangulation.n_levels();
-  for (unsigned int level=1;level<nlevels;++level)
-  {
-    std::cout << "cG in " << mg_interface_in[level].l1_norm() << std::endl;
-//    mg_interface_in[level].print(std::cout);
-    std::cout << "cG out " << mg_interface_out[level].l1_norm() << std::endl;
-//    mg_interface_out[level].print(std::cout);
-    std::cout << std::endl;
-  }
 }
 
 
@@ -474,7 +464,6 @@ void LaplaceProblem<dim>::solve ()
   coarse_grid_solver.initialize (coarse_matrix);
 
   typedef PreconditionSOR<SparseMatrix<double> > Smoother;
-  GrowingVectorMemory<>   vector_memory;
   MGSmootherRelaxation<SparseMatrix<double>, Smoother, Vector<double> >
   mg_smoother;
   mg_smoother.initialize(mg_matrices);
@@ -613,8 +602,6 @@ void LaplaceProblem<dim>::run ()
 int main ()
 {
   initlog(__FILE__, true);
-  deallog << std::setprecision(4);
-  deallog.threshold_double(1.e-10);
 
   try
     {
