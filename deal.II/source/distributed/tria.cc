@@ -2596,10 +2596,20 @@ namespace parallel
       // smoothing flag is used in the normal
       // refinement process.
       typename Triangulation<dim,spacedim>::MeshSmoothing
-      save_smooth = this->smooth_grid;
-      this->smooth_grid = dealii::Triangulation<dim,spacedim>::none;
-      bool mesh_changed = false;
+        save_smooth = this->smooth_grid;
 
+      // We will refine manually to match the p4est further down, which
+      // obeys a level difference of 2 at each vertex (see the balance call
+      // to p4est). We can disable this here so we store fewer artificial
+      // cells (in some cases). For geometric multigrid it turns out that
+      // we will miss level cells at shared vertices if we ignore this.
+      // See tests/mpi/mg_06.
+      if (settings & construct_multigrid_hierarchy)
+        this->smooth_grid = dealii::Triangulation<dim,spacedim>::none;
+      else
+        this->smooth_grid = dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices;
+
+      bool mesh_changed = false;
 
       // remove all deal.II refinements. Note that we could skip this and
       // start from our current state, because the algorithm later coarsens as
