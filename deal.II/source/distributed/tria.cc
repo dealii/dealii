@@ -2466,9 +2466,9 @@ namespace parallel
       // we will miss level cells at shared vertices if we ignore this.
       // See tests/mpi/mg_06.
       if (settings & construct_multigrid_hierarchy)
-        this->smooth_grid = dealii::Triangulation<dim,spacedim>::none;
-      else
         this->smooth_grid = dealii::Triangulation<dim,spacedim>::limit_level_difference_at_vertices;
+      else
+        this->smooth_grid = dealii::Triangulation<dim,spacedim>::none;
 
       bool mesh_changed = false;
 
