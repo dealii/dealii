@@ -106,7 +106,7 @@ namespace internal
        * The type we store is then obviously the type the @p dofs array
        * uses for indexing.
        */
-      std::vector<std::vector<types::global_dof_index>::size_type> dof_offsets;
+      std::vector<unsigned int> dof_offsets;
 
       /**
        * Store the global indices of

@@ -38,7 +38,7 @@ namespace internal
 {
   namespace hp
   {
-    template <int> class DoFLevel;
+    class DoFLevel;
     template <int> class DoFFaces;
     template <int> class DoFObjects;
 
@@ -790,7 +790,7 @@ namespace hp
      * <tt>levels[]</tt> tree of
      * the Triangulation objects.
      */
-    std::vector<dealii::internal::hp::DoFLevel<dim>*> levels;
+    std::vector<dealii::internal::hp::DoFLevel*> levels;
 
     /**
      * Space to store the DoF
@@ -900,7 +900,6 @@ namespace hp
      * the functions that set and
      * retrieve vertex dof indices.
      */
-    template <int> friend class dealii::internal::hp::DoFLevel;
     template <int> friend class dealii::internal::hp::DoFObjects;
     friend struct dealii::internal::hp::DoFHandler::Implementation;
   };
