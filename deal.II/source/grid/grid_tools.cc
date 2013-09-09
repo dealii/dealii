@@ -2602,10 +2602,10 @@ next_cell:
                 const std_cxx1x::tuple<typename DH::cell_iterator, unsigned int,
                                        typename DH::cell_iterator, unsigned int>
                   periodic_tuple
-                    = std::make_tuple(p->first.first,
-                                      p->first.second,
-                                      cell,
-                                      f);
+                    = std_cxx1x::make_tuple(p->first.first,
+					    p->first.second,
+					    cell,
+					    f);
 
                 periodicity_vector.push_back(periodic_tuple);
 
