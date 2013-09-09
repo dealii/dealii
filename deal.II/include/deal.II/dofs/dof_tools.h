@@ -1132,7 +1132,7 @@ namespace DoFTools
    * function will be used for which the respective flag was set in the
    * component mask.
    *
-   @ note For DoFHandler objects that are built on a
+   * @note For DoFHandler objects that are built on a
    * parallel::distributed::Triangulation object
    * parallel::distributed::Triangulation::add_periodicity has to be called
    * before.
