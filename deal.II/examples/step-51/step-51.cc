@@ -828,7 +828,7 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
               scratch.u_phi[k] = scratch.fe_face_values_local[scalar].value(kk,q);
             }
 
-// When @ptrace_reconstruct=false, we are preparing to solve for the skeleton variable
+// When @p trace_reconstruct=false, we are preparing to solve for the skeleton variable
 // $\lambda$.  If this is the case, we must assemble all local matrices associated
 // with the problem:  local-local, local-face, face-local, and face-face.
 // The face-face matrix is stored as @p TaskData::cell_matrix, so that it can be
