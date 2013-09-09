@@ -671,7 +671,7 @@ namespace internal
                 std::swap (active_fe_backup[level],
                            dof_handler.levels[level]->active_fe_indices);
               }
-            dof_handler.faces = new internal::hp::DoFFaces<2>;
+            dof_handler.faces = new internal::hp::DoFIndicesOnFaces<2>;
           }
 
 
@@ -1036,7 +1036,7 @@ namespace internal
                 std::swap (active_fe_backup[level],
                            dof_handler.levels[level]->active_fe_indices);
               }
-            dof_handler.faces = new internal::hp::DoFFaces<3>;
+            dof_handler.faces = new internal::hp::DoFIndicesOnFaces<3>;
           }
 
 

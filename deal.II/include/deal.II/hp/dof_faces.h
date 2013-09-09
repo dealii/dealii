@@ -101,7 +101,7 @@ namespace internal
      * @author Tobias Leicht, 2006
      */
     template <int structdim>
-    class DoFObjects
+    class DoFIndicesOnFacesOrEdges
     {
     public:
       /**
@@ -274,7 +274,7 @@ namespace internal
      * @author Tobias Leicht, 2006
      */
     template<int dim>
-    class DoFFaces;
+    class DoFIndicesOnFaces;
 
 
     /**
@@ -285,7 +285,7 @@ namespace internal
      * @author Tobias Leicht, 2006
      */
     template<>
-    class DoFFaces<1>
+    class DoFIndicesOnFaces<1>
     {
     public:
       /**
@@ -303,13 +303,13 @@ namespace internal
      * @author Tobias Leicht, 2006
      */
     template<>
-    class DoFFaces<2>
+    class DoFIndicesOnFaces<2>
     {
     public:
       /**
        * Indices of DoFs on the lines that bound cells.
        */
-      internal::hp::DoFObjects<1> lines;
+      internal::hp::DoFIndicesOnFacesOrEdges<1> lines;
 
       /**
        * Determine an estimate for the
@@ -327,18 +327,18 @@ namespace internal
      * @author Tobias Leicht, 2006
      */
     template<>
-    class DoFFaces<3>
+    class DoFIndicesOnFaces<3>
     {
     public:
       /**
        * Indices of DoFs on the lines that form the edges of cells.
        */
-      internal::hp::DoFObjects<1> lines;
+      internal::hp::DoFIndicesOnFacesOrEdges<1> lines;
 
       /**
        * Indices of DoFs on the quads that bound cells.
        */
-      internal::hp::DoFObjects<2> quads;
+      internal::hp::DoFIndicesOnFacesOrEdges<2> quads;
 
       /**
        * Determine an estimate for the
@@ -355,7 +355,7 @@ namespace internal
     template <int dim, int spacedim>
     inline
     types::global_dof_index
-    DoFObjects<structdim>::
+    DoFIndicesOnFacesOrEdges<structdim>::
     get_dof_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
@@ -416,7 +416,7 @@ namespace internal
     template <int dim, int spacedim>
     inline
     void
-    DoFObjects<structdim>::
+    DoFIndicesOnFacesOrEdges<structdim>::
     set_dof_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
@@ -480,7 +480,7 @@ namespace internal
     template <int dim, int spacedim>
     inline
     unsigned int
-    DoFObjects<structdim>::
+    DoFIndicesOnFacesOrEdges<structdim>::
     n_active_fe_indices (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                          const unsigned int                obj_index) const
     {
@@ -528,7 +528,7 @@ namespace internal
     template <int dim, int spacedim>
     inline
     types::global_dof_index
-    DoFObjects<structdim>::
+    DoFIndicesOnFacesOrEdges<structdim>::
     nth_active_fe_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                          const unsigned int                obj_level,
                          const unsigned int                obj_index,
@@ -589,7 +589,7 @@ namespace internal
     template <int dim, int spacedim>
     inline
     bool
-    DoFObjects<structdim>::
+    DoFIndicesOnFacesOrEdges<structdim>::
     fe_index_is_active (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                         const unsigned int                obj_index,
                         const unsigned int                fe_index,

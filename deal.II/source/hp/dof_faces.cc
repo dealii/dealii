@@ -27,7 +27,7 @@ namespace internal
 
     template <int structdim>
     std::size_t
-    DoFObjects<structdim>::memory_consumption () const
+    DoFIndicesOnFacesOrEdges<structdim>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (dofs) +
               MemoryConsumption::memory_consumption (dof_offsets));
@@ -37,21 +37,21 @@ namespace internal
     // explicit instantiations
     template
     std::size_t
-    DoFObjects<1>::memory_consumption () const;
+    DoFIndicesOnFacesOrEdges<1>::memory_consumption () const;
 
     template
     std::size_t
-    DoFObjects<2>::memory_consumption () const;
+    DoFIndicesOnFacesOrEdges<2>::memory_consumption () const;
 
     template
     std::size_t
-    DoFObjects<3>::memory_consumption () const;
+    DoFIndicesOnFacesOrEdges<3>::memory_consumption () const;
 
 
 // ---------------------- DoFFaces ----------------------------
 
     std::size_t
-    DoFFaces<1>::memory_consumption () const
+    DoFIndicesOnFaces<1>::memory_consumption () const
     {
       return 0;
     }
@@ -59,7 +59,7 @@ namespace internal
 
 
     std::size_t
-    DoFFaces<2>::memory_consumption () const
+    DoFIndicesOnFaces<2>::memory_consumption () const
     {
       return MemoryConsumption::memory_consumption (lines);
     }
@@ -67,7 +67,7 @@ namespace internal
 
 
     std::size_t
-    DoFFaces<3>::memory_consumption () const
+    DoFIndicesOnFaces<3>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (lines) +
               MemoryConsumption::memory_consumption (quads) );
