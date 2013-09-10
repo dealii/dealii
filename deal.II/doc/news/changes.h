@@ -54,12 +54,22 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: Like the usual DoFHandler class, the hp::DoFHandler class now also
+  has a cache that makes operations such as <code>cell-@>get_dof_indices(...)</code>
+  faster. This should accelerate many parts of the library that deal with
+  hp finite elements.
+  <br>
+  (Wolfgang Bangerth, 2013/09/10)
+  </li>
+
+  <li>
   New: parallel::distributed::Triangulation now supports periodic boundaries. 
   DoFTools::make_periodicity_constraints and similar functions are now working 
   on parallel::distributed::Triangulation objects.
   <br>
   (Tobin Isaac, Craig Michoski, Daniel Arndt, 2013/09/06)
   </li>
+
   <li>
   New: It is now possible to compile and link deal.II against LLVM's libcxx. For
   this, a few issues with C++ standard violations are resolved.
