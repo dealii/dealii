@@ -252,6 +252,20 @@ namespace internal
       set_active_fe_index (const unsigned int obj_index,
 			   const unsigned int fe_index);
 
+      /**
+       * Return a pointer to the beginning of the DoF indices cache
+       * for a given cell.
+       *
+       * @param obj_index The number of the cell we are looking at.
+       * @param dofs_per_cell The number of DoFs per cell for this cell. This
+       *   is not used for the hp case but necessary to keep the interface
+       *   the same as for the non-hp case.
+       * @return A pointer to the first DoF index for the current cell. The
+       *   next dofs_per_cell indices are for the current cell.
+       */
+      const types::global_dof_index *
+      get_cell_cache_start (const unsigned int obj_index,
+                               const unsigned int dofs_per_cell) const;
 
       /**
        * Determine an estimate for the
@@ -393,6 +407,22 @@ namespace internal
       active_fe_indices[obj_index] = fe_index;
     }
 
+
+
+    inline
+    const types::global_dof_index *
+    DoFLevel::get_cell_cache_start (const unsigned int obj_index,
+                                        const unsigned int dofs_per_cell) const
+    {
+      Assert (obj_index < cell_cache_offsets.size(),
+              ExcInternalError());
+      Assert (cell_cache_offsets[obj_index]+dofs_per_cell
+              <=
+              cell_dof_indices_cache.size(),
+              ExcInternalError());
+
+      return &cell_dof_indices_cache[cell_cache_offsets[obj_index]];
+    }
   } // namespace hp
 
 } // namespace internal

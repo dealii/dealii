@@ -2773,8 +2773,9 @@ namespace internal
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active."));
 
-        types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
-                                         ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
+        const types::global_dof_index *cache
+        = accessor.dof_handler->levels[accessor.level()]
+          ->get_cell_cache_start (accessor.present_index, accessor.get_fe().dofs_per_cell);
         for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
           dof_indices[i] = *cache;
       }
@@ -2797,8 +2798,9 @@ namespace internal
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active."));
 
-        types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
-                                         ->cell_dof_indices_cache[accessor.dof_handler->levels[accessor.level()]->cell_cache_offsets[accessor.present_index]];
+        const types::global_dof_index *cache
+        = accessor.dof_handler->levels[accessor.level()]
+          ->get_cell_cache_start (accessor.present_index, accessor.get_fe().dofs_per_cell);
         for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
           dof_indices[i] = *cache;
       }

@@ -90,6 +90,18 @@ namespace internal
        */
       DoFObjects<dim> dof_object;
 
+      /**
+       * Return a pointer to the beginning of the DoF indices cache
+       * for a given cell.
+       *
+       * @param obj_index The number of the cell we are looking at.
+       * @param dofs_per_cell The number of DoFs per cell for this cell.
+       * @return A pointer to the first DoF index for the current cell. The
+       *   next dofs_per_cell indices are for the current cell.
+       */
+      const types::global_dof_index *
+      get_cell_cache_start (const unsigned int obj_index,
+                               const unsigned int dofs_per_cell) const;
 
       /**
        * Determine an estimate for the
@@ -106,6 +118,23 @@ namespace internal
       void serialize(Archive &ar,
                      const unsigned int version);
     };
+
+
+
+    template <int dim>
+    inline
+    const types::global_dof_index *
+    DoFLevel<dim>::get_cell_cache_start (const unsigned int obj_index,
+                                             const unsigned int dofs_per_cell) const
+    {
+      Assert (obj_index*dofs_per_cell+dofs_per_cell
+              <=
+              cell_dof_indices_cache.size(),
+              ExcInternalError());
+
+      return &cell_dof_indices_cache[obj_index*dofs_per_cell];
+    }
+
 
 
     template <int dim>
