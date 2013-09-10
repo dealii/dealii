@@ -218,7 +218,9 @@ namespace internal
     {
       return (MemoryConsumption::memory_consumption (active_fe_indices) +
 	      MemoryConsumption::memory_consumption (dof_indices) +
-              MemoryConsumption::memory_consumption (dof_offsets));
+              MemoryConsumption::memory_consumption (dof_offsets) +
+              MemoryConsumption::memory_consumption (cell_cache_offsets) +
+              MemoryConsumption::memory_consumption(cell_dof_indices_cache));
     }
 
 
