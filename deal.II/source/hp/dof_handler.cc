@@ -580,8 +580,13 @@ namespace internal
                 = std::vector<DoFLevel::offset_type> (
                     dof_handler.tria->n_raw_lines(level),
                     (DoFLevel::offset_type)(-1));
+              dof_handler.levels[level]->cell_cache_offsets
+                = std::vector<DoFLevel::offset_type> (
+                    dof_handler.tria->n_raw_lines(level),
+                    (DoFLevel::offset_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
+              types::global_dof_index cache_size = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -589,10 +594,16 @@ namespace internal
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
                     next_free_dof += cell->get_fe().dofs_per_line;
+
+                    dof_handler.levels[level]->cell_cache_offsets[cell->index()] = cache_size;
+                    cache_size += cell->get_fe().dofs_per_cell;
                   }
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+              dof_handler.levels[level]->cell_dof_indices_cache
+                = std::vector<types::global_dof_index> (cache_size,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
@@ -697,8 +708,13 @@ namespace internal
                 = std::vector<DoFLevel::offset_type> (
                     dof_handler.tria->n_raw_quads(level),
                     (DoFLevel::offset_type)(-1));
+              dof_handler.levels[level]->cell_cache_offsets
+                = std::vector<DoFLevel::offset_type> (
+                    dof_handler.tria->n_raw_quads(level),
+                    (DoFLevel::offset_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
+              types::global_dof_index cache_size = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -706,10 +722,16 @@ namespace internal
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
                     next_free_dof += cell->get_fe().dofs_per_quad;
+
+                    dof_handler.levels[level]->cell_cache_offsets[cell->index()] = cache_size;
+                    cache_size += cell->get_fe().dofs_per_cell;
                   }
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+              dof_handler.levels[level]->cell_dof_indices_cache
+                = std::vector<types::global_dof_index> (cache_size,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
@@ -1059,11 +1081,16 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_offsets
-                = std::vector<DoFLevel::offset_type>
-                                                       (dof_handler.tria->n_raw_hexs(level),
-                                                       (DoFLevel::offset_type)(-1));
+                = std::vector<DoFLevel::offset_type> (
+                    dof_handler.tria->n_raw_hexs(level),
+                    (DoFLevel::offset_type)(-1));
+              dof_handler.levels[level]->cell_cache_offsets
+                = std::vector<DoFLevel::offset_type> (
+                    dof_handler.tria->n_raw_hexs(level),
+                    (DoFLevel::offset_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
+              types::global_dof_index cache_size = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -1071,10 +1098,16 @@ namespace internal
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
                     next_free_dof += cell->get_fe().dofs_per_hex;
+
+                    dof_handler.levels[level]->cell_cache_offsets[cell->index()] = cache_size;
+                    cache_size += cell->get_fe().dofs_per_cell;
                   }
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+              dof_handler.levels[level]->cell_dof_indices_cache
+                = std::vector<types::global_dof_index> (cache_size,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
@@ -2689,6 +2722,11 @@ namespace hp
       = std::vector<IndexSet> (1,
                                number_cache.locally_owned_dofs);
 
+    // update the cache used for cell dof indices and compress the data on the levels
+    for (active_cell_iterator cell = begin_active();
+         cell != end(); ++cell)
+      cell->update_cell_dof_indices_cache ();
+
     for (unsigned int level=0; level<levels.size(); ++level)
       levels[level]->compress_data (*finite_elements);
 
@@ -2735,6 +2773,11 @@ namespace hp
 
     // do the renumbering
     renumber_dofs_internal (new_numbers, dealii::internal::int2type<dim>());
+
+    // update the cache used for cell dof indices
+    for (active_cell_iterator cell = begin_active();
+         cell != end(); ++cell)
+      cell->update_cell_dof_indices_cache ();
 
     // now re-compress the dof indices
     for (unsigned int level=0; level<levels.size(); ++level)

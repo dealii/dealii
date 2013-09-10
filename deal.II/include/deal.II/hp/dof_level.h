@@ -42,6 +42,10 @@ namespace internal
       struct Implementation;
     }
   }
+  namespace DoFCellAccessor
+  {
+    struct Implementation;
+  }
 }
 
 
@@ -148,6 +152,18 @@ namespace internal
        * (active) cell's data is stored.
        */
       std::vector<types::global_dof_index> dof_indices;
+
+      /**
+       * The offsets for each cell of the cache that holds all DoF indices.
+       */
+      std::vector<offset_type> cell_cache_offsets;
+
+      /**
+       * Cache for the DoF indices
+       * on cells. The size of this
+       * array equals the sum over all cells of selected_fe[active_fe_index[cell]].dofs_per_cell.
+       */
+      std::vector<types::global_dof_index> cell_dof_indices_cache;
 
     public:
 
@@ -275,6 +291,7 @@ namespace internal
        */
       template <int, int> friend class dealii::hp::DoFHandler;
       friend struct dealii::internal::hp::DoFHandler::Implementation;
+      friend struct dealii::internal::DoFCellAccessor::Implementation;
     };
 
 

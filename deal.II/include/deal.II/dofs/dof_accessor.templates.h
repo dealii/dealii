@@ -2556,14 +2556,43 @@ namespace internal
       template <int dim, int spacedim, bool lda>
       static
       void
-      update_cell_dof_indices_cache (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &)
+      update_cell_dof_indices_cache (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &accessor)
       {
-//TODO[WB]: should implement a dof indices cache for hp as well
+        // caches are only for cells with DoFs, i.e., for active ones
+        if (accessor.has_children())
+          return;
 
-        // not implemented, but should also
-        // not be called
-        Assert (false, ExcNotImplemented());
+        const unsigned int dofs_per_cell   = accessor.get_fe().dofs_per_cell;
+
+        // make sure the cache is at least
+        // as big as we need it when
+        // writing to the last element of
+        // this cell
+        Assert (static_cast<unsigned int>(accessor.present_index)
+                <
+                accessor.dof_handler->levels[accessor.present_level]
+                                             ->cell_cache_offsets.size(),
+                ExcInternalError());
+        Assert (accessor.dof_handler->levels[accessor.present_level]
+                ->cell_cache_offsets[accessor.present_index]
+                <=
+                accessor.dof_handler->levels[accessor.present_level]
+                ->cell_dof_indices_cache.size(),
+                ExcInternalError());
+
+        std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
+        accessor.dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim>,lda>::get_dof_indices
+        (dof_indices, accessor.active_fe_index());
+
+        types::global_dof_index *next_dof_index
+        = &accessor.dof_handler->levels[accessor.present_level]
+           ->cell_dof_indices_cache[accessor.dof_handler->levels[accessor.present_level]
+                                                                 ->cell_cache_offsets[accessor.present_index]];
+        for (unsigned int i=0; i<dofs_per_cell; ++i, ++next_dof_index)
+          *next_dof_index = dof_indices[i];
       }
+
+
 
       /**
        * Implement setting dof
@@ -2763,14 +2792,15 @@ namespace internal
       get_dof_indices (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &accessor,
                        std::vector<types::global_dof_index>                            &dof_indices)
       {
-        // no caching for
-        // hp::DoFHandler
-        // implemented
-        typedef
-        dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim>, lda>
-        DoFAccessor;
-        accessor.DoFAccessor::get_dof_indices (dof_indices,
-                                               accessor.active_fe_index());
+        AssertDimension (dof_indices.size(), accessor.get_fe().dofs_per_cell);
+
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active."));
+
+        types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
+                                         ->cell_dof_indices_cache[accessor.dof_handler->levels[accessor.level()]->cell_cache_offsets[accessor.present_index]];
+        for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
+          dof_indices[i] = *cache;
       }
 
       /**
