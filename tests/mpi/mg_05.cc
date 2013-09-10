@@ -117,7 +117,7 @@ void test()
       {
 	for (unsigned int lvl=0; lvl<tr.n_levels(); ++lvl)
 	  {
-	    deallog << "level " << lvl << ": "<< std::endl;
+//	    deallog << "level " << lvl << ": "<< std::endl;
 	    typename DoFHandler<dim>::cell_iterator
 	      cell = dofh.begin(lvl),
 	      endc = dofh.end(lvl);
@@ -131,7 +131,7 @@ void test()
 		    if (cell->at_boundary(f))
 		      continue;
 
-		    deallog << cell->neighbor(f)->level_subdomain_id() << std::endl;
+//		    deallog << cell->neighbor(f)->level_subdomain_id() << std::endl;
 						     // is cell level-artificial?
 		    Assert(cell->neighbor(f)->level_subdomain_id()<100, ExcInternalError());
 		
