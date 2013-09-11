@@ -5126,7 +5126,6 @@ namespace VectorTools
       double exponent = exponent_1;
 
       const unsigned int        n_components = dof.get_fe().n_components();
-      const bool                fe_is_system = (n_components != 1);
 
       if (weight!=0)
         {
