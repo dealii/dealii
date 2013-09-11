@@ -86,6 +86,12 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: DoFTools::extract_locally_*_dofs now instantiated for hp::DofHandler.
+  <br>
+  (Jean-Paul Pelteret, 2013/09/11)
+  </li>
+
+  <li>
   Changed: distributed::parallel:BlockVector::operator= now allows importing
   of ghost values like all other vector types. Also added some new constructors
   for BlockVector and Vector using IndexSets to mirror the other linear algebra
