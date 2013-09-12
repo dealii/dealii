@@ -179,11 +179,11 @@ Find $(\mathbf{q}_h, u_h, \lambda_h) \in
     (w, f)_{\mathcal{T}},
     \quad \forall w \in \mathcal{W}_h^p,
 \\
-  < \mu, \mathbf{c} \lambda_h\cdot \mathbf{n} 
+  \left< \mu, \mathbf{c} \lambda_h\cdot \mathbf{n} 
   		+ \mathbf{q}_h\cdot \mathbf{n}
-  	    + \tau (u_h - \lambda_h)>_{\partial \mathcal{T}}
+  	    + \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
     &=&
-    <\mu, g_N>_{\partial\Omega_N},
+    \left<\mu, g_N\right>_{\partial\Omega_N},
     \quad \forall \mu \in \mathcal{M}_h^p.
 @f}
 
