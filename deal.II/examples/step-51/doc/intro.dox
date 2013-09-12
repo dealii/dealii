@@ -1,3 +1,9 @@
+<br>
+
+<i>
+This program was contributed by Martin Kronbichler and Scott Miller.
+</i>
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
@@ -14,7 +20,7 @@ each vertex <i>for each of the adjacent elements</i>, rather than just one,
 and similarly for edges and faces.  As another example,
 for the FE_DGP_Monomial basis, each 
 scalar solution component is represented by polynomials of degree $p$
-which yields $(1/dim!)*\prod_{i=1}^{dim}(k+i)$ degrees of freedom per
+which yields $(1/dim!)*\prod_{i=1}^{dim}(p+i)$ degrees of freedom per
 element.  Typically, all degrees of freedom in an element are coupled
 to all of the degrees of freedom in the adjacent elements.  The resulting
 discrete equations yield very large linear systems very quickly, especially
@@ -24,7 +30,8 @@ for systems of equations in dim=2 or dim=3.
 To alleviate the computational cost of solving such large linear systems, 
 the hybridizable discontinuous Galerkin (HDG) methodology was introduced
 by Cockburn and co-workers 
-(N.C. Nguyen and J. Peraire:
+(see the references in the recent HDG overview article by 
+ N.C. Nguyen and J. Peraire:
    <i>Hybridizable discontinuous Galerkin methods for partial differential 
    equations in continuum mechanics</i>, Journal of Computational Physics,
    2012, 231:18, 5955-5988.
@@ -120,11 +127,11 @@ the above equation as the first order system:
 We multiply these equations by the weight functions $\mathbf{v}, w$ 
 and integrate by parts over every element $K$ to obtain:
 @f{eqnarray*}
-  (\kappa^{-1} \mathbf{q}, \mathbf{v})_K - (u, \nabla\cdot\mathbf{v})_K
-    + \left<\hat{u}, \mathbf{v}\cdot\mathbf{n}\right>_{\partial K} &=& 0, \\
-  - (\mathbf{c} u + \mathbf{q}, \nabla w)_K 
-    + \left<(\hat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}, w\right>_{\partial K}
-    &=& (f,w)_K.
+  (\mathbf{v}, \kappa^{-1} \mathbf{q})_K - (\nabla\cdot\mathbf{v}, u)_K
+    + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}\right>_{\partial K} &=& 0, \\
+  - (\nabla w, \mathbf{c} u + \mathbf{q})_K 
+    + \left<(w, \hat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}\right>_{\partial K}
+    &=& (w,f)_K.
 @f}
 
 The terms decorated with a hat denote the numerical traces (also commonly referred
@@ -153,28 +160,51 @@ a new variable $\lambda$ such that
 @f} 
 
 Eliminating $\hat{u}$ from the weak form in favor of $\lambda$, summing the elemental
-contributions across all elements in the triangulation, and enforcing the normal
-component of the numerical flux, we arrive at the final form of the problem:  
-Find $(\mathbf{q}, u, \lambda)$ such that
-TODO:  update this equation!
+contributions across all elements in the triangulation, enforcing the normal
+component of the numerical flux, and integrating by parts
+on the equation weighted by $w$, we arrive at the final form of the problem:  
+Find $(\mathbf{q}_h, u_h, \lambda_h) \in 
+\mathcal{V}_h^p \times \mathcal{W}_h^p \times \mathcal{M}_h^p$ such that
 @f{eqnarray*}
-  (\kappa^{-1} \mathbf{q}, \mathbf{v})_{\mathcal{T}}
-    - (u, \nabla\cdot\mathbf{v})_{\mathcal{T}}
-    + \left<\lambda, \mathbf{v}\cdot\mathbf{n}\right>_{\partial\mathcal{T}}
+  (\mathbf{v}, \kappa^{-1} \mathbf{q}_h)_{\mathcal{T}}
+    - ( \nabla\cdot\mathbf{v}, u_h)_{\mathcal{T}}
+    + \left<\mathbf{v}\cdot\mathbf{n}, \lambda_h\right>_{\partial\mathcal{T}}
     &=&
-    - \left<g_D, \mathbf{v}\cdot\mathbf{n}\right>_{\partial\Omega_D},
+    - \left<\mathbf{v}\cdot\mathbf{n}, g_D\right>_{\partial\Omega_D},
+    \quad \forall \mathbf{v} \in \mathcal{V}_h^p,
 \\
-  - (\mathbf{c} u + \mathbf{q}, \nabla w)_{\mathcal{T}}
-    + \left<(\hat{\mathbf{c}u} + \hat{\mathbf{q}})\cdot\mathbf{n}, w\right>_{\partial \mathcal{T}}
+   (w, \mathbf{c}\nabla u_h + \nabla \cdot \mathbf{q}_h)_{\mathcal{T}}
+    + \left<(w, \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
     &=&
-    (f, w)_{\mathcal{T}},
+    (w, f)_{\mathcal{T}},
+    \quad \forall w \in \mathcal{W}_h^p,
 \\
-  < \left[ \negthinspace \left[ (\hat{\mathbf{c}u} + \hat{\mathbf{q}})\cdot\mathbf{n}
-    \right] \negthinspace \right], \mu>_{\partial \mathcal{T}}
+  < \mu, \mathbf{c} \lambda_h\cdot \mathbf{n} 
+  		+ \mathbf{q}_h\cdot \mathbf{n}
+  	    + \tau (u_h - \lambda_h)>_{\partial \mathcal{T}}
     &=&
-    <g_N, \mu>_{\partial\Omega_N}
+    <\mu, g_N>_{\partial\Omega_N},
+    \quad \forall \mu \in \mathcal{M}_h^p.
 @f}
-for all $(\mathbf{v}, w, \mu)$.
+
+The unknowns $(\mathbf{q}_h, u_h)$ are referred to as local variables; they are 
+represented as standard DG variables.  The unknown $\lambda_h$ is the skeleton 
+variable which has support on the codimension-1 surfaces (faces) of the mesh.
+In the weak form given above, we can note the following coupling patterns:
+<ol>
+  <li> The matrix $A$ consists of local-local coupling terms.  These arise when the
+  local weighting functions $(\mathbf{v}, w)$ multiply the local solution terms 
+  $(\mathbf{q}_h, u_h)$.
+  <li> The matrix $B$ represents the local-face coupling.  These are the terms 
+  with weighting functions $(\mathbf{v}, w)$ multiplying the skeleton variable 
+  $\lambda_h$.
+  <li> The matrix $C$ represents the face-local coupling, which involves the 
+  weighting function $\mu$ multiplying the local solutions $(\mathbf{q}_h, u_h)$.
+  <li>  The matrix $D$ is the face-face coupling; 
+  terms involve both $\mu$ and $\lambda_h$.
+</ol>
+
+<h4> Post-processing and super-convergence </h4>
 
 
 <h3> Problem specific data </h3>

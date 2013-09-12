@@ -80,6 +80,9 @@
 // the simulation.
 #include <deal.II/numerics/data_out_faces.h>
 
+namespace Step51
+{
+
 using namespace dealii;
 
 // @sect3{Equation data}
@@ -295,7 +298,7 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
                                                     * this->width);
 }
 
-// @sect3{The Step51 HDG solver class}
+// @sect3{The HDG HDG solver class}
 
 // The HDG solution procedure follows closely that of step-7. The major
 // difference is the use of 3 different sets of <code>DoFHandler</code> and FE
@@ -309,7 +312,7 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 // solutions from the skeleton values) and once for the postprocessing where
 // we extract a solution that converges at higher order.
 template <int dim>
-class Step51
+class HDG
 {
 public:
   enum RefinementMode
@@ -317,7 +320,7 @@ public:
     global_refinement, adaptive_refinement
   };
 
-  Step51 (const unsigned int degree,
+  HDG (const unsigned int degree,
           const RefinementMode refinement_mode);
   void run ();
 
@@ -401,14 +404,14 @@ private:
   ConvergenceTable     convergence_table;
 };
 
-// @sect3{The Step51 class implementation}
+// @sect3{The HDG class implementation}
 
-// @sect4{Step51::Step51}
+// @sect4{HDG::HDG}
 // The constructor is similar to those in other examples, with the
 // exception of handling multiple <code>DoFHandler</code> and
 // <code>FiniteElement</code> objects.
 template <int dim>
-Step51<dim>::Step51 (const unsigned int degree,
+HDG<dim>::HDG (const unsigned int degree,
                      const RefinementMode refinement_mode) :
   fe_local (FE_DGQ<dim>(degree), dim,
             FE_DGQ<dim>(degree), 1),
@@ -421,13 +424,13 @@ Step51<dim>::Step51 (const unsigned int degree,
 {}
 
 
-// @sect4{Step51::PerTaskData}
+// @sect4{HDG::PerTaskData}
 // First come the definition of the local data structures for the parallel
 // assembly. The first structure @p PerTaskData contains the local vector and
 // matrix that are written into the global matrix, whereas the ScratchData
 // contains all data that we need for the local assembly.
 template <int dim>
-struct Step51<dim>::PerTaskData
+struct HDG<dim>::PerTaskData
 {
   FullMatrix<double> cell_matrix;
   Vector<double>     cell_vector;
@@ -449,7 +452,7 @@ struct Step51<dim>::PerTaskData
   }
 };
 
-// @sect4{Step51::ScratchData}
+// @sect4{HDG::ScratchData}
 // @p ScratchData contains persistent data for each thread within
 // <code>WorkStream</code>.  The <code>FEValues</code>,
 // matrix, and vector objects should be familiar by now.
@@ -463,7 +466,7 @@ struct Step51<dim>::PerTaskData
 // a large number of zero terms on each cell, which would significantly
 // slow the program.
 template <int dim>
-struct Step51<dim>::ScratchData
+struct HDG<dim>::ScratchData
 {
   FEValues<dim>     fe_values_local;
   FEFaceValues<dim> fe_face_values_local;
@@ -566,12 +569,12 @@ struct Step51<dim>::ScratchData
 
 };
 
-// @sect4{Step51::PostProcessScratchData}
+// @sect4{HDG::PostProcessScratchData}
 // @p PostProcessScratchData contains the data used by <code>WorkStream</code>
 // when post-processing the local solution $u^*$.  It is similar, but much
 // simpler, than @p ScratchData.
 template <int dim>
-struct Step51<dim>::PostProcessScratchData
+struct HDG<dim>::PostProcessScratchData
 {
   FEValues<dim> fe_values_local;
   FEValues<dim> fe_values;
@@ -623,11 +626,11 @@ struct Step51<dim>::PostProcessScratchData
 };
 
 
-// @sect4{Step51::copy_local_to_global}
+// @sect4{HDG::copy_local_to_global}
 // If we are in the first step of the solution, i.e. @p trace_reconstruct=false,
 // then we assemble the global system.
 template <int dim>
-void Step51<dim>::copy_local_to_global(const PerTaskData &data)
+void HDG<dim>::copy_local_to_global(const PerTaskData &data)
 {
   if (data.trace_reconstruct == false)
     constraints.distribute_local_to_global (data.cell_matrix,
@@ -636,14 +639,14 @@ void Step51<dim>::copy_local_to_global(const PerTaskData &data)
                                             system_matrix, system_rhs);
 }
 
-// @sect4{Step51::setup_system}
+// @sect4{HDG::setup_system}
 // The system for an HDG solution is setup in an analogous manner to most
 // of the other tutorial programs.  We are careful to distribute dofs with
 // all of our <code>DoFHandler</code> objects.  The @p solution and @p system_matrix
 // objects go with the global skeleton solution.
 template <int dim>
 void
-Step51<dim>::setup_system ()
+HDG<dim>::setup_system ()
 {
   dof_handler_local.distribute_dofs(fe_local);
   dof_handler.distribute_dofs(fe);
@@ -680,7 +683,7 @@ Step51<dim>::setup_system ()
 }
 
 
-// @sect4{Step51::assemble_system}
+// @sect4{HDG::assemble_system}
 // The @p assemble_system function is similar to <code>Step-32</code>, where a few
 // objects are setup, and then <code>WorkStream</code> is used to do the work in a
 // multi-threaded manner.  The @p trace_reconstruct input parameter is used 
@@ -688,7 +691,7 @@ Step51<dim>::setup_system ()
 // global skeleton solution (false).
 template <int dim>
 void
-Step51<dim>::assemble_system (const bool trace_reconstruct)
+HDG<dim>::assemble_system (const bool trace_reconstruct)
 {
   const QGauss<dim>   quadrature_formula(fe.degree+1);
   const QGauss<dim-1> face_quadrature_formula(fe.degree+1);
@@ -714,19 +717,19 @@ Step51<dim>::assemble_system (const bool trace_reconstruct)
   WorkStream::run(dof_handler.begin_active(),
                   dof_handler.end(),
                   *this,
-                  &Step51<dim>::assemble_system_one_cell,
-                  &Step51<dim>::copy_local_to_global,
+                  &HDG<dim>::assemble_system_one_cell,
+                  &HDG<dim>::copy_local_to_global,
                   scratch,
                   task_data);
 }
 
-// @sect4{Step51::assemble_system_one_cell}
-// The real work of the Step51 program is done by @p assemble_system_one_cell.  
+// @sect4{HDG::assemble_system_one_cell}
+// The real work of the HDG program is done by @p assemble_system_one_cell.  
 // Assembling the local matrices $A, B, C$ is done here, along with the 
 // local contributions of the global matrix $D$.
 template <int dim>
 void
-Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                        ScratchData &scratch,
                                        PerTaskData &task_data)
 {
@@ -850,6 +853,10 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
                                                     tau_stab) * scratch.u_phi[i])
                                                   * scratch.tr_phi[j]
                                                 ) * JxW;
+                    
+// Note the sign of the face-local matrix.  We negate the sign during
+// assembly here so that we can use the FullMatrix::mmult with addition
+// when computing the Schur complement.
                     scratch.fl_matrix(jj,ii) -= (
                                                   (scratch.q_phi[i] * normal
                                                    +
@@ -935,11 +942,11 @@ Step51<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_ce
 }
 
 
-// @sect4{Step51::solve}
+// @sect4{HDG::solve}
 // The skeleton solution is solved for by using a BiCGStab solver with
 // identity preconditioner.  
 template <int dim>
-void Step51<dim>::solve ()
+void HDG<dim>::solve ()
 {
   SolverControl solver_control (system_matrix.m()*10,
                                 1e-11*system_rhs.l2_norm());
@@ -966,7 +973,7 @@ void Step51<dim>::solve ()
 
 template <int dim>
 void
-Step51<dim>::postprocess()
+HDG<dim>::postprocess()
 {
   // construct post-processed solution with (hopefully) higher order of
   // accuracy
@@ -983,7 +990,7 @@ Step51<dim>::postprocess()
 
     WorkStream::run(dof_handler_u_post.begin_active(),
                     dof_handler_u_post.end(),
-                    std_cxx1x::bind (&Step51<dim>::postprocess_one_cell,
+                    std_cxx1x::bind (&HDG<dim>::postprocess_one_cell,
                                      std_cxx1x::ref(*this),
                                      std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
                     std_cxx1x::function<void(const unsigned int&)>(),
@@ -1032,7 +1039,7 @@ Step51<dim>::postprocess()
 
 template <int dim>
 void
-Step51<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+HDG<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                    PostProcessScratchData &scratch,
                                    unsigned int &)
 {
@@ -1094,7 +1101,7 @@ Step51<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_i
   cell->distribute_local_to_global(scratch.cell_sol, solution_u_post);
 }
 
-// @sect4{Step51::output_results}
+// @sect4{HDG::output_results}
 // We have 3 sets of results that we would like to output:  the local solution,
 // the post-processed local solution, and the skeleton solution.  The former 2
 // both `live' on element volumes, wheras the latter lives on codimention-1 surfaces
@@ -1103,7 +1110,7 @@ Step51<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_i
 // objects.  The graphical output for the skeleton variable is done through
 // use of the <code>DataOutFaces</code> class.
 template <int dim>
-void Step51<dim>::output_results (const unsigned int cycle)
+void HDG<dim>::output_results (const unsigned int cycle)
 {
   std::string filename;
   switch (refinement_mode)
@@ -1175,15 +1182,15 @@ void Step51<dim>::output_results (const unsigned int cycle)
   data_out_face.write_vtk (face_output);
 }
 
-// @sect4{Step51::refine_grid}
-// We implement two different refinement cases for Step51, just as in
+// @sect4{HDG::refine_grid}
+// We implement two different refinement cases for HDG, just as in
 // <code>Step-7</code>:  adaptive_refinement and global_refinement.
 // The global_refinement option recreates the entire triangulation
 // every time.
 // The adaptive_refinement mode uses the <code>KellyErrorEstimator</code>
 // give a decent approximation of the non-regularity of the local solutions.
 template <int dim>
-void Step51<dim>::refine_grid (const unsigned int cycle)
+void HDG<dim>::refine_grid (const unsigned int cycle)
 {
   if (cycle == 0)
     {
@@ -1245,12 +1252,12 @@ void Step51<dim>::refine_grid (const unsigned int cycle)
         cell->face(face)->set_boundary_indicator (1);
 }
 
-// @sect4{Step51::run}
+// @sect4{HDG::run}
 // The functionality here is basically the same as <code>Step-7</code>.
 // We loop over 10 cycles, refining the grid on each one.  At the end,
 // convergence tables are created.
 template <int dim>
-void Step51<dim>::run ()
+void HDG<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<10; ++cycle)
     {
@@ -1285,6 +1292,7 @@ void Step51<dim>::run ()
   convergence_table.write_text(std::cout);
 }
 
+}//Step51
 
 int main (int argc, char **argv)
 {
@@ -1303,7 +1311,7 @@ int main (int argc, char **argv)
                   << "=============================================" << std::endl
                   << std::endl;
 
-        Step51<dim> hdg_problem (1, Step51<dim>::adaptive_refinement);
+        Step51::HDG<dim> hdg_problem (1, Step51::HDG<dim>::adaptive_refinement);
         hdg_problem.run ();
 
         std::cout << std::endl;
@@ -1314,7 +1322,7 @@ int main (int argc, char **argv)
                   << "===========================================" << std::endl
                   << std::endl;
 
-        Step51<dim> hdg_problem (1, Step51<dim>::global_refinement);
+        Step51::HDG<dim> hdg_problem (1, Step51::HDG<dim>::global_refinement);
         hdg_problem.run ();
 
         std::cout << std::endl;
@@ -1325,7 +1333,7 @@ int main (int argc, char **argv)
                   << "===========================================" << std::endl
                   << std::endl;
 
-        Step51<dim> hdg_problem (3, Step51<dim>::global_refinement);
+        Step51::HDG<dim> hdg_problem (3, Step51::HDG<dim>::global_refinement);
         hdg_problem.run ();
 
         std::cout << std::endl;
