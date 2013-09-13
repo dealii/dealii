@@ -102,7 +102,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/mpirun=${_n_cpu})
 
         # The command to issue:
-        SET(_run_command mpirun -np ${_n_cpu} ${_target})
+        SET(_run_command mpirun -np ${_n_cpu} ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/${_target})
       ENDIF()
 
       FILE(MAKE_DIRECTORY ${_test_directory})
@@ -181,9 +181,9 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
           && echo "${_test_full}: DIFF successful."
           && echo "${_test_full}: PASSED."
         WORKING_DIRECTORY
-          ${CMAKE_CURRENT_BINARY_DIR}/${_test}
+          ${_test_directory}
         DEPENDS
-          ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+          ${_test_directory}/output
           ${_comparison_file}
         )
 
