@@ -59,86 +59,127 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
     ITEM_MATCHES(_match "${_build}" ${ARGN})
     IF(_match OR "${ARGN}" STREQUAL "")
 
+      #
+      # Setup a bunch of variables describing the test:
+      #
+
       STRING(TOLOWER ${_build} _build_lowercase)
-      SET(_test ${_test_name}.${_build_lowercase})
-      SET(_full_test ${_category}-${_test_name}.${_build_lowercase})
+
+      # Short test name:
+      SET(_test_short ${_test_name}.${_build_lowercase})
+
+      # The target name for the executable:
+      SET(_target ${_category}-${_test_short})
+
+      # If _n_cpu is equal to "0", a normal, sequental test will be run,
+      # otherwise run the test with mpirun:
+      IF("${_n_cpu}" STREQUAL "0")
+        # Diff target name:
+        SET(_diff_target ${_target}.diff)
+
+        # Full test name:
+        SET(_test_full ${_category}/${_test_name}.${_build_lowercase})
+
+        # Directory to run the test in:
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_short})
+
+        # The command to issue:
+        SET(_run_command ${_target})
+
+        # Finally set it to one, we'll still occupy one processor to run a
+        # test ;-)
+        SET(_n_cpu 1)
+
+      ELSE()
+
+        # Diff target name:
+        SET(_diff_target ${_category}-${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}.diff)
+
+        # Full test name:
+        SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase})
+
+        # Directory to run the test in:
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/mpirun=${_n_cpu})
+
+        # The command to issue:
+        SET(_run_command mpirun -np ${_n_cpu} ${_target})
+      ENDIF()
+
+      FILE(MAKE_DIRECTORY ${_test_directory})
 
       #
       # Add an executable for the current test and set up compile
       # definitions and the full link interface:
       #
-      ADD_EXECUTABLE(${_full_test} EXCLUDE_FROM_ALL ${_test_name}.cc)
 
-      SET_TARGET_PROPERTIES(${_full_test} PROPERTIES
-        LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-        COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
-        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
-        LINKER_LANGUAGE "CXX"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_test}"
-        )
-      SET_PROPERTY(TARGET ${_full_test} APPEND PROPERTY
-        INCLUDE_DIRECTORIES
-          "${CMAKE_BINARY_DIR}/include"
-          "${CMAKE_SOURCE_DIR}/include"
-          "${CMAKE_SOURCE_DIR}/include/deal.II/"
-        )
-      SET_PROPERTY(TARGET ${_full_test} APPEND PROPERTY
-        COMPILE_DEFINITIONS
-          SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
-        )
-      TARGET_LINK_LIBRARIES(${_full_test}
-        ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
-        )
+      IF(NOT TARGET ${_target})
+        # only add the target once
 
-      #
-      # Build up the command line to run the test depending on _n_cpu:
-      #
-      IF("${_n_cpu}" STREQUAL "0")
-        SET(_run_command ${_full_test})
-      ELSE()
-        SET(_run_command mpirun -np ${_n_cpu} ${_full_test})
+        ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${_test_name}.cc)
+
+        SET_TARGET_PROPERTIES(${_target} PROPERTIES
+          LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+          COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
+          COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
+          LINKER_LANGUAGE "CXX"
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_test_short}"
+          )
+        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+          INCLUDE_DIRECTORIES
+            "${CMAKE_BINARY_DIR}/include"
+            "${CMAKE_SOURCE_DIR}/include"
+            "${CMAKE_SOURCE_DIR}/include/deal.II/"
+          )
+        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+          COMPILE_DEFINITIONS
+            SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+          )
+        TARGET_LINK_LIBRARIES(${_target}
+          ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
+          )
       ENDIF()
 
       #
       # Add a top level target to run and compare the test:
       #
-      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+
+      ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
         COMMAND
           ${_run_command}
-          || (mv ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
-                 ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_output
-              && echo "${_category}/${_test}: BUILD successful."
-              && echo "${_category}/${_test}: RUN failed. Output:"
-              && cat ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_output
+          || (mv ${_test_directory}/output
+                 ${_test_directory}/failing_output
+              && echo "${_test_full}: BUILD successful."
+              && echo "${_test_full}: RUN failed. Output:"
+              && cat ${_test_directory}/failing_output
               && exit 1)
         COMMAND
           ${PERL_EXECUTABLE} -pi
           ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
-          ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+          ${_test_directory}/output
         WORKING_DIRECTORY
-          ${CMAKE_CURRENT_BINARY_DIR}/${_test}
+          ${_test_directory}
         DEPENDS
-          ${_full_test}
+          ${_target}
           ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
         )
-      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
+      ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND
           ${TEST_DIFF}
-            ${CMAKE_CURRENT_BINARY_DIR}/${_test}/output
+            ${_test_directory}/output
             ${_comparison_file}
-            > ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
-          || (mv ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
-                 ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_diff
-              && echo "${_category}/${_test}: BUILD successful."
-              && echo "${_category}/${_test}: RUN successful."
-              && echo "${_category}/${_test}: DIFF failed. Output:"
-              && cat ${CMAKE_CURRENT_BINARY_DIR}/${_test}/failing_diff
+            > ${_test_directory}/diff
+          || (mv ${_test_directory}/diff
+                 ${_test_directory}/failing_diff
+              && echo "${_test_full}: BUILD successful."
+              && echo "${_test_full}: RUN successful."
+              && echo "${_test_full}: DIFF failed. Output:"
+              && cat ${_test_directory}/failing_diff
               && exit 1)
         COMMAND
-             echo "${_category}/${_test}: BUILD successful."
-          && echo "${_category}/${_test}: RUN successful."
-          && echo "${_category}/${_test}: DIFF successful."
-          && echo "${_category}/${_test}: PASSED."
+             echo "${_test_full}: BUILD successful."
+          && echo "${_test_full}: RUN successful."
+          && echo "${_test_full}: DIFF successful."
+          && echo "${_test_full}: PASSED."
         WORKING_DIRECTORY
           ${CMAKE_CURRENT_BINARY_DIR}/${_test}
         DEPENDS
@@ -146,24 +187,24 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
           ${_comparison_file}
         )
 
-      ADD_CUSTOM_TARGET(${_full_test}.diff
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_test}/diff
-        )
+      ADD_CUSTOM_TARGET(${_diff_target} DEPENDS ${_test_directory}/diff)
 
       #
       # And finally add the test:
       #
-      ADD_TEST(NAME ${_category}/${_test}
+
+      ADD_TEST(NAME ${_test_full}
         COMMAND ${CMAKE_COMMAND}
-          -DTRGT=${_full_test}.diff
-          -DTEST=${_category}/${_test}
+          -DTRGT=${_diff_target}
+          -DTEST=${_test_full}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_test}
+        WORKING_DIRECTORY ${_test_directory}
         )
-      SET_TESTS_PROPERTIES(${_category}/${_test} PROPERTIES
+      SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
+        PROCESSORS ${_n_cpu} # 0 was changed to 1 above.
         )
     ENDIF()
   ENDFOREACH()
