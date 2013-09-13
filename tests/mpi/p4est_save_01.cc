@@ -52,7 +52,7 @@ void test()
     deallog << "hyper_cube" << std::endl;
 
   std::string filename =
-    (std::string("p4est_save_01/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat");
+    (std::string("dat");
   {
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
