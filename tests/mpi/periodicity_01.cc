@@ -298,16 +298,16 @@ namespace Step40
   void LaplaceProblem<dim>::get_point_value
     (const Point<dim> point, const int proc, Vector<double> &value) const
   {
-    std::vector<double> tmp (value.size());
-    try
-    { 
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = GridTools::find_active_cell_around_point (dof_handler, point);
+
+    if (cell->is_locally_owned())
       VectorTools::point_value (dof_handler, locally_relevant_solution,
                                 point, value);
-      for (unsigned int i=0; i<value.size(); ++i)
-        tmp[i]=value[i];
-    }
-    catch (const VectorTools::ExcPointNotAvailableHere &)
-    {}
+
+    std::vector<double> tmp (value.size());
+    for (unsigned int i=0; i<value.size(); ++i)
+      tmp[i]=value[i];
 
     std::vector<double> tmp2 (value.size());
     MPI_Reduce(&(tmp[0]), &(tmp2[0]), value.size(), MPI_DOUBLE,
@@ -491,9 +491,9 @@ namespace Step40
                 (triangulation,
                  /*b_id1*/ 2*i, /*b_id2*/2*i+1, /*direction*/ i,
                  periodicity_vector);
-
+            
             triangulation.add_periodicity(periodicity_vector);
-
+            
             triangulation.refine_global (1);
           }
         else
