@@ -147,10 +147,9 @@ ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
+ADD_SUBDIRECTORY(build_tests)
 IF(BUILD_TESTING AND DEAL_II_HAVE_TESTS_DIRECTORY)
   ADD_SUBDIRECTORY(${TEST_DIR} ${CMAKE_BINARY_DIR}/tests)
-ELSE()
-  ADD_SUBDIRECTORY(tests)
 ENDIF()
 
 #
