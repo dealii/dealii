@@ -145,8 +145,17 @@ We eliminate the numerical trace $\hat{\mathbf{q}}$ by using traces of the form:
   \hat{\mathbf{c} u}+\hat{\mathbf{q}} = \mathbf{c}\hat{u} + \mathbf{q}
   + \tau(u - \hat{u})\mathbf{n} \quad \text{ on } \partial K.
 @f}
-The local stabilization parameter $\tau$ has effects on stability and accuracy of 
-HDG solutions; see the literature for a further discussion.
+The local stabilization parameter $\tau$ has effects on stability and accuracy
+of HDG solutions; see the literature for a further discussion. A stabilization
+parameter of unity is reported to be the choice which gives best results. A
+stabilization parameter $\tau$ that tends to infinity prohibits jumps in the
+solution over the element boundaries, making the HDG solution approach the
+approximation of continuous finite elements. In the program below, we choose
+the stabilization parameter as
+@f{eqnarray*}
+  \tau = \frac{\kappa}{\ell} + |\mathbf{c} \cdot \mathbf{n}|
+@f}
+where we set the diffusion length scale to $\ell = \frac{1}{5}$.
 
 The trace/skeleton variables in HDG methods are single-valued on element faces.  As such,
 they must strongly represent the Dirichlet data on $\partial\Omega_D$.  We introduce
@@ -174,7 +183,7 @@ Find $(\mathbf{q}_h, u_h, \lambda_h) \in
     \quad \forall \mathbf{v} \in \mathcal{V}_h^p,
 \\
    (w, \mathbf{c}\nabla u_h + \nabla \cdot \mathbf{q}_h)_{\mathcal{T}}
-    + \left<(w, \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
+    + \left<w, \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
     &=&
     (w, f)_{\mathcal{T}},
     \quad \forall w \in \mathcal{W}_h^p,

@@ -22,7 +22,7 @@
 // @sect3{Include files}
 //
 // Most of the deal.II include files have already been covered in previous
-// examples are are not commented on.
+// examples and are not commented on.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
@@ -298,18 +298,18 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
                                                     * this->width);
 }
 
-// @sect3{The HDG HDG solver class}
+// @sect3{The HDG solver class}
 
 // The HDG solution procedure follows closely that of step-7. The major
-// difference is the use of 3 different sets of <code>DoFHandler</code> and FE
+// difference is the use of three different sets of <code>DoFHandler</code> and FE
 // objects, along with the <code>ChunkSparseMatrix</code> and the
 // corresponding solutions vectors. We also use WorkStream to enable a
 // multithreaded local solution process which exploits the embarrassingly
 // parallel nature of the local solver. For WorkStream, we define the local
 // operations on a cell and a copy function into the global matrix and
-// vector. We do this once for the assembly (which is run twice, once when we
+// vector. We do this both for the assembly (which is run twice, once when we
 // generate the system matrix and once when we compute the element-interior
-// solutions from the skeleton values) and once for the postprocessing where
+// solutions from the skeleton values) and for the postprocessing where
 // we extract a solution that converges at higher order.
 template <int dim>
 class HDG
@@ -332,28 +332,29 @@ private:
 
 // Post-processing the solution to obtain $u^*$ is an element-by-element
 // procedure; as such, we do not need to assemble any global data and do
-// not declare any `task data' for WorkStream to use.
+// not declare any 'task data' for WorkStream to use.
   struct PostProcessScratchData;
 
   void setup_system ();
   void assemble_system (const bool reconstruct_trace = false);
   void solve ();
   void postprocess ();
-  
-// The following 3 functions are used by WorkStream to do the actual work of
+
+  void refine_grid (const unsigned int cylce);
+  void output_results (const unsigned int cycle);
+
+// The following three functions are used by WorkStream to do the actual work of
 // the program.
   void assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                  ScratchData &scratch,
                                  PerTaskData &task_data);
-  
+
   void copy_local_to_global(const PerTaskData &data);
 
   void postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                              PostProcessScratchData &scratch,
                              unsigned int &empty_data);
-                             
-  void refine_grid (const unsigned int cylce);
-  void output_results (const unsigned int cycle);
+
 
   Triangulation<dim>   triangulation;
 
@@ -365,7 +366,7 @@ private:
   Vector<double>       solution_local;
 
   // The new finite element type and corresponding <code>DoFHandler</code> are
-  // used for the global solution that couples the element-level local
+  // used for the global skeleton solution that couples the element-level local
   // solutions.
   FE_FaceQ<dim>        fe;
   DoFHandler<dim>      dof_handler;
@@ -406,10 +407,11 @@ private:
 
 // @sect3{The HDG class implementation}
 
-// @sect4{HDG::HDG}
-// The constructor is similar to those in other examples, with the
-// exception of handling multiple <code>DoFHandler</code> and
-// <code>FiniteElement</code> objects.
+// @sect4{Constructor} The constructor is similar to those in other examples,
+// with the exception of handling multiple <code>DoFHandler</code> and
+// <code>FiniteElement</code> objects. Note that we create a system of finite
+// elements for the local DG part, including the gradient/flux part and the
+// scalar part.
 template <int dim>
 HDG<dim>::HDG (const unsigned int degree,
                      const RefinementMode refinement_mode) :
@@ -424,11 +426,66 @@ HDG<dim>::HDG (const unsigned int degree,
 {}
 
 
-// @sect4{HDG::PerTaskData}
-// First come the definition of the local data structures for the parallel
-// assembly. The first structure @p PerTaskData contains the local vector and
-// matrix that are written into the global matrix, whereas the ScratchData
-// contains all data that we need for the local assembly.
+
+// @sect4{HDG::setup_system}
+// The system for an HDG solution is setup in an analogous manner to most
+// of the other tutorial programs.  We are careful to distribute dofs with
+// all of our <code>DoFHandler</code> objects.  The @p solution and @p system_matrix
+// objects go with the global skeleton solution.
+template <int dim>
+void
+HDG<dim>::setup_system ()
+{
+  dof_handler_local.distribute_dofs(fe_local);
+  dof_handler.distribute_dofs(fe);
+  dof_handler_u_post.distribute_dofs(fe_u_post);
+
+  std::cout << "   Number of degrees of freedom: "
+            << dof_handler.n_dofs()
+            << std::endl;
+
+  solution.reinit (dof_handler.n_dofs());
+  system_rhs.reinit (dof_handler.n_dofs());
+
+  solution_local.reinit (dof_handler_local.n_dofs());
+  solution_u_post.reinit (dof_handler_u_post.n_dofs());
+
+  constraints.clear ();
+  DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+  typename FunctionMap<dim>::type boundary_functions;
+  Solution<dim> solution_function;
+  boundary_functions[0] = &solution_function;
+  VectorTools::project_boundary_values (dof_handler,
+                                        boundary_functions,
+                                        QGauss<dim-1>(fe.degree+1),
+                                        constraints);
+  constraints.close ();
+
+  {
+    CompressedSimpleSparsityPattern csp (dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, csp,
+                                     constraints, false);
+    sparsity_pattern.copy_from(csp, fe.dofs_per_face);
+  }
+  system_matrix.reinit (sparsity_pattern);
+}
+
+
+
+// @sect4{HDG::PerTaskData} Next come the definition of the local data
+// structures for the parallel assembly. The first structure @p PerTaskData
+// contains the local vector and matrix that are written into the global
+// matrix, whereas the ScratchData contains all data that we need for the
+// local assembly. There is one variable worth noting here, namely the boolean
+// variable @p trace_reconstruct. As mentioned introdution, we solve the HDG
+// system in two steps. First, we create a linear system for the skeleton
+// system where we condense the local part into it by $D-CA^{-1}B$. Then, we
+// solve for the local part using the skeleton solution. For these two steps,
+// we need the same matrices on the elements twice, which we want to compute
+// by two assembly steps. Since most of the code is similar, we do this with
+// the same function but only switch between the two based on a flag that we
+// set when starting the assembly. Since we need to pass this information on
+// to the local worker routines, we store it once in the task data.
 template <int dim>
 struct HDG<dim>::PerTaskData
 {
@@ -444,27 +501,22 @@ struct HDG<dim>::PerTaskData
       dof_indices(n_dofs),
       trace_reconstruct(trace_reconstruct)
   {}
-
-  void reset()
-  {
-    cell_matrix = 0.0;
-    cell_vector = 0.0;
-  }
 };
 
-// @sect4{HDG::ScratchData}
-// @p ScratchData contains persistent data for each thread within
-// <code>WorkStream</code>.  The <code>FEValues</code>,
-// matrix, and vector objects should be familiar by now.
-// There are two objects that need to be discussed:
-// @p std::vector<std::vector<unsigned int> > fe_local_support_on_face
-// and @p std::vector<std::vector<unsigned int> > fe_support_on_face.
-// These are used to indicate whether or not the finite elements chosen
-// have support (non-zero values) on a given face of the reference cell,
-// which is why we can store it once for all cells that we work on.
-// Had we not stored this information, we would be forced to assemble
-// a large number of zero terms on each cell, which would significantly
-// slow the program.
+
+
+// @sect4{HDG::ScratchData} @p ScratchData contains persistent data for each
+// thread within <code>WorkStream</code>.  The <code>FEValues</code>, matrix,
+// and vector objects should be familiar by now.  There are two objects that
+// need to be discussed: @p std::vector<std::vector<unsigned int> >
+// fe_local_support_on_face and @p std::vector<std::vector<unsigned int> >
+// fe_support_on_face.  These are used to indicate whether or not the finite
+// elements chosen have support (non-zero values) on a given face of the
+// reference cell for the local part associated to @p fe_local and the
+// skeleton part @p f, which is why we can extract this information in the
+// constructor and store it once for all cells that we work on.  Had we not
+// stored this information, we would be forced to assemble a large number of
+// zero terms on each cell, which would significantly slow the program.
 template <int dim>
 struct HDG<dim>::ScratchData
 {
@@ -560,14 +612,9 @@ struct HDG<dim>::ScratchData
     fe_local_support_on_face(sd.fe_local_support_on_face),
     fe_support_on_face(sd.fe_support_on_face)
   {}
-
-  // We manually reset our matrices to zero in the assembly process,
-  // since certain matrices are only used in the reconstruction process.
-  // We therefore do not implement an methods in <code>reset()</code>, but
-  // need to have it for the WorkStream interface.
-  void reset() {}
-
 };
+
+
 
 // @sect4{HDG::PostProcessScratchData}
 // @p PostProcessScratchData contains the data used by <code>WorkStream</code>
@@ -615,15 +662,8 @@ struct HDG<dim>::PostProcessScratchData
     cell_rhs (sd.cell_rhs),
     cell_sol (sd.cell_sol)
   {}
-
-  void reset()
-  {
-    cell_matrix = 0.;
-    cell_rhs = 0.;
-    cell_sol = 0.;
-  }
-
 };
+
 
 
 // @sect4{HDG::copy_local_to_global}
@@ -639,56 +679,15 @@ void HDG<dim>::copy_local_to_global(const PerTaskData &data)
                                             system_matrix, system_rhs);
 }
 
-// @sect4{HDG::setup_system}
-// The system for an HDG solution is setup in an analogous manner to most
-// of the other tutorial programs.  We are careful to distribute dofs with
-// all of our <code>DoFHandler</code> objects.  The @p solution and @p system_matrix
-// objects go with the global skeleton solution.
-template <int dim>
-void
-HDG<dim>::setup_system ()
-{
-  dof_handler_local.distribute_dofs(fe_local);
-  dof_handler.distribute_dofs(fe);
-  dof_handler_u_post.distribute_dofs(fe_u_post);
-
-  std::cout << "   Number of degrees of freedom: "
-            << dof_handler.n_dofs()
-            << std::endl;
-
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
-
-  solution_local.reinit (dof_handler_local.n_dofs());
-  solution_u_post.reinit (dof_handler_u_post.n_dofs());
-
-  constraints.clear ();
-  DoFTools::make_hanging_node_constraints (dof_handler, constraints);
-  typename FunctionMap<dim>::type boundary_functions;
-  Solution<dim> solution_function;
-  boundary_functions[0] = &solution_function;
-  VectorTools::project_boundary_values (dof_handler,
-                                        boundary_functions,
-                                        QGauss<dim-1>(fe.degree+1),
-                                        constraints);
-  constraints.close ();
-
-  {
-    CompressedSimpleSparsityPattern csp (dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp,
-                                     constraints, false);
-    sparsity_pattern.copy_from(csp, fe.dofs_per_face);
-  }
-  system_matrix.reinit (sparsity_pattern);
-}
 
 
 // @sect4{HDG::assemble_system}
-// The @p assemble_system function is similar to <code>Step-32</code>, where a few
-// objects are setup, and then <code>WorkStream</code> is used to do the work in a
-// multi-threaded manner.  The @p trace_reconstruct input parameter is used 
-// to decide whether we are solving for the local solution (true) or the 
-// global skeleton solution (false).
+// The @p assemble_system function is similar to <code>Step-32</code>, where
+// the quadrature formula and the update flags are set up, and then
+// <code>WorkStream</code> is used to do the work in a multi-threaded manner.
+// The @p trace_reconstruct input parameter is used to decide whether we are
+// solving for the local solution (true) or the global skeleton solution
+// (false).
 template <int dim>
 void
 HDG<dim>::assemble_system (const bool trace_reconstruct)
@@ -723,9 +722,11 @@ HDG<dim>::assemble_system (const bool trace_reconstruct)
                   task_data);
 }
 
+
+
 // @sect4{HDG::assemble_system_one_cell}
-// The real work of the HDG program is done by @p assemble_system_one_cell.  
-// Assembling the local matrices $A, B, C$ is done here, along with the 
+// The real work of the HDG program is done by @p assemble_system_one_cell.
+// Assembling the local matrices $A, B, C$ is done here, along with the
 // local contributions of the global matrix $D$.
 template <int dim>
 void
@@ -745,9 +746,6 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
 
   const unsigned int loc_dofs_per_cell = scratch.fe_values_local.get_fe().dofs_per_cell;
 
-  // Choose stabilization parameter to be 5 * diffusion = 5
-  const double tau_stab_diffusion = 5.;
-
   const FEValuesExtractors::Vector fluxes (0);
   const FEValuesExtractors::Scalar scalar (dim);
 
@@ -757,17 +755,16 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
     {
       scratch.lf_matrix = 0;
       scratch.fl_matrix = 0;
-      task_data.reset();
+      task_data.cell_matrix = 0;
+      task_data.cell_rhs = 0;
     }
   scratch.fe_values_local.reinit (loc_cell);
 
-// We first compute the @p ll_matrix matrix 
-// (referred to as matrix $A$ in the introduction)
-// corresponding to local-local coupling, 
-// as well as the local right-hand-side vector.
-// We store the values at each quadrature point 
-// for the basis functions, the 
-// right-hand-side value, and the convection velocity.
+  // We first compute the cell-interior contribution to @p ll_matrix matrix
+  // (referred to as matrix $A$ in the introduction) corresponding to
+  // local-local coupling, as well as the local right-hand-side vector.  We
+  // store the values at each quadrature point for the basis functions, the
+  // right-hand-side value, and the convection velocity.
   for (unsigned int q=0; q<n_q_points; ++q)
     {
       const double rhs_value
@@ -798,16 +795,16 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
         }
     }
 
-// Face terms are assembled on all faces of all elements.  This is in contrast to 
-// more traditional DG methods, where each face is only visited once in the assembly
-// procedure.
+  // Face terms are assembled on all faces of all elements. This is in
+  // contrast to more traditional DG methods, where each face is only visited
+  // once in the assembly procedure.
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     {
       scratch.fe_face_values_local.reinit(loc_cell, face);
       scratch.fe_face_values.reinit(cell, face);
-      
-// The already obtained $\hat{u}$ values are needed when solving for
-// the local variables. 
+
+      // The already obtained $\hat{u}$ values are needed when solving for the
+      // local variables.
       if (task_data.trace_reconstruct)
         scratch.fe_face_values.get_function_values (solution, scratch.trace_values);
 
@@ -819,11 +816,18 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
           const Point<dim> normal = scratch.fe_face_values.normal_vector(q);
           const Tensor<1,dim> convection
           = scratch.convection_velocity.value(quadrature_point);
-          const double tau_stab = (tau_stab_diffusion +
+
+          // Here we compute the stabilization parameter discussed in the
+          // introduction: since the diffusion is one and the diffusion length
+          // scale is set to 1/5, it simply results in a contribution of 5 for
+          // the diffusion part and the magnitude of convection through the
+          // element boundary in a centered-like scheme for the convection
+          // part.
+          const double tau_stab = (5. +
                                    std::abs(convection * normal));
 
-// We store the non-zero flux and scalar values, making use of the 
-// support_on_face information we calculated in @p ScratchData.
+          // We store the non-zero flux and scalar values, making use of the
+          // support_on_face information we calculated in @p ScratchData.
           for (unsigned int k=0; k<scratch.fe_local_support_on_face[face].size(); ++k)
             {
               const unsigned int kk=scratch.fe_local_support_on_face[face][k];
@@ -831,11 +835,13 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
               scratch.u_phi[k] = scratch.fe_face_values_local[scalar].value(kk,q);
             }
 
-// When @p trace_reconstruct=false, we are preparing to solve for the skeleton variable
-// $\lambda$.  If this is the case, we must assemble all local matrices associated
-// with the problem:  local-local, local-face, face-local, and face-face.
-// The face-face matrix is stored as @p TaskData::cell_matrix, so that it can be
-// assembled into the global system by @p copy_local_to_global.
+          // When @p trace_reconstruct=false, we are preparing assemble the
+          // system for the skeleton variable $\lambda$. If this is the case,
+          // we must assemble all local matrices associated with the problem:
+          // local-local, local-face, face-local, and face-face.  The
+          // face-face matrix is stored as @p TaskData::cell_matrix, so that
+          // it can be assembled into the global system by @p
+          // copy_local_to_global.
           if (!task_data.trace_reconstruct)
             {
               for (unsigned int k=0; k<scratch.fe_support_on_face[face].size(); ++k)
@@ -853,10 +859,11 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
                                                     tau_stab) * scratch.u_phi[i])
                                                   * scratch.tr_phi[j]
                                                 ) * JxW;
-                    
-// Note the sign of the face-local matrix.  We negate the sign during
-// assembly here so that we can use the FullMatrix::mmult with addition
-// when computing the Schur complement.
+
+                    // Note the sign of the face-local matrix.  We negate the
+                    // sign during assembly here so that we can use the
+                    // FullMatrix::mmult with addition when computing the
+                    // Schur complement.
                     scratch.fl_matrix(jj,ii) -= (
                                                   (scratch.q_phi[i] * normal
                                                    +
@@ -891,6 +898,9 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
                 }
             }
 
+          // This last term adds the contribution of the term $\left<w,\tau
+          // u_h\right>_{\partial \mathcal T}$ to the local matrix. As opposed
+          // to the face matrices above, we need it in both assembly stages.
           for (unsigned int i=0; i<scratch.fe_local_support_on_face[face].size(); ++i)
             for (unsigned int j=0; j<scratch.fe_local_support_on_face[face].size(); ++j)
               {
@@ -899,11 +909,12 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
                 scratch.ll_matrix(ii,jj) += tau_stab * scratch.u_phi[i] * scratch.u_phi[j] * JxW;
               }
 
-// When @p trace_reconstruct=true, we are solving for the local solutions on an 
-// element by element basis.  The local right-hand-side is calculated by replacing
-// the basis functions @p tr_phi in the @p lf_matrix computation by the computed
-// values @p trace_values.  Of course, the sign of the matrix is now minus since
-// we have moved everything to the other side of the equation.
+          // When @p trace_reconstruct=true, we are solving for the local
+          // solutions on an element by element basis.  The local
+          // right-hand-side is calculated by replacing the basis functions @p
+          // tr_phi in the @p lf_matrix computation by the computed values @p
+          // trace_values.  Of course, the sign of the matrix is now minus
+          // since we have moved everything to the other side of the equation.
           if (task_data.trace_reconstruct)
             for (unsigned int i=0; i<scratch.fe_local_support_on_face[face].size(); ++i)
               {
@@ -916,14 +927,14 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
         }
     }
 
-// Once assembly of all of the local contributions is complete, we must either:
-// (1) assemble the global system, or (2) compute the local solution values and
-// save them.
-// In either case, the first step is to invert the local-local matrix.
+  // Once assembly of all of the local contributions is complete, we must either:
+  // (1) assemble the global system, or (2) compute the local solution values and
+  // save them.
+  // In either case, the first step is to invert the local-local matrix.
   scratch.ll_matrix.gauss_jordan();
-  
-// For (1), we compute the Schur complement and store it as the 
-// @p cell_matrix.
+
+  // For (1), we compute the Schur complement and add it to the @p
+  // cell_matrix, matrix $D$ in the introduction.
   if (task_data.trace_reconstruct == false)
     {
       scratch.fl_matrix.mmult(scratch.tmp_matrix, scratch.ll_matrix);
@@ -931,9 +942,9 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
       scratch.tmp_matrix.mmult(task_data.cell_matrix, scratch.lf_matrix, true);
       cell->get_dof_indices(task_data.dof_indices);
     }
-// For (2), we are simply solving (ll_matrix).(solution_local) = (l_rhs).  Hence,
-// we simply multipy l_rhs by our already inverted local-local matrix and store the
-// result using the <code>set_dof_values</code> function.
+  // For (2), we are simply solving (ll_matrix).(solution_local) = (l_rhs).
+  // Hence, we multiply @p l_rhs by our already inverted local-local matrix
+  // and store the result using the <code>set_dof_values</code> function.
   else
     {
       scratch.ll_matrix.vmult(scratch.tmp_rhs, scratch.l_rhs);
@@ -942,9 +953,10 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
 }
 
 
+
 // @sect4{HDG::solve}
 // The skeleton solution is solved for by using a BiCGStab solver with
-// identity preconditioner.  
+// identity preconditioner.
 template <int dim>
 void HDG<dim>::solve ()
 {
@@ -962,21 +974,41 @@ void HDG<dim>::solve ()
 
   constraints.distribute(solution);
 
-// Once we have solved for the skeleton solution,
-// we can solve for the local solutions in an element-by-element
-// fashion.  We do this by re-using the same @p assemble_system function
-// buy switching @p trace_reconstruct to true.
+  // Once we have solved for the skeleton solution,
+  // we can solve for the local solutions in an element-by-element
+  // fashion.  We do this by re-using the same @p assemble_system function
+  // but switching @p trace_reconstruct to true.
   assemble_system(true);
 }
 
 
 
+  // @sect4{HDG::postprocess}
+
+  // The postprocess method serves two purposes. First, we want to construct a
+  // post-processed scalar variables in the element space of degree $p+1$ that
+  // we hope will converge at order $p+2$. This is again an element-by-element
+  // process and only involves the scalar solution as well as the gradient on
+  // the local cell. To do this, we introduce the already defined scratch data
+  // together with some update flags and run the work stream to do this in
+  // parallel.
+  //
+  // Secondly, we want to compute discretization errors just as we did in
+  // step-7. The overall procedure is similar with calls to
+  // VectorTools::integrate_difference. The difference is in how we compute
+  // the errors for the scalar variable and the gradient variable. In step-7,
+  // we did this by computing @p L2_norm or @p H1_seminorm
+  // contributions. Here, we have a DoFHandler with these two contributions
+  // computed and sorted by their vector component, <code>[0, dim)</code> for the
+  // gradient and @p dim for the scalar. To compute their value, we hence use
+  // a ComponentSelectFunction with either of them, together with the @p
+  // SolutionAndGradient class introduced above that contains the analytic
+  // parts of either of them. Eventually, we also compute the L2-error of the
+  // post-processed solution and add the results into the convergence table.
 template <int dim>
 void
 HDG<dim>::postprocess()
 {
-  // construct post-processed solution with (hopefully) higher order of
-  // accuracy
   {
     const QGauss<dim>   quadrature_formula(fe_u_post.degree+1);
     const UpdateFlags local_flags (update_values);
@@ -998,7 +1030,6 @@ HDG<dim>::postprocess()
                     0U);
   }
 
-  // Compute some convergence rates, etc., and add to a table
   Vector<float> difference_per_cell (triangulation.n_active_cells());
 
   ComponentSelectFunction<dim> value_select (dim, dim+1);
@@ -1037,14 +1068,33 @@ HDG<dim>::postprocess()
   convergence_table.add_value("val L2-post", post_error);
 }
 
+
+
+  // @sect4{HDG::postprocess_one_cell}
+  //
+  // This is the actual work done for the postprocessing. According to the
+  // discussion in the introduction, we need to set up a system that projects
+  // the gradient part of the DG solution onto the gradient of the
+  // post-processed variable. Moreover, we need to set the average of the new
+  // post-processed variable to be equal the average of the scalar DG solution
+  // on the cell.
+  //
+  // More technically speaking, the projection of the gradient is a system
+  // that would potentially fills our @p dofs_per_cell times @p dofs_per_cell
+  // matrix but is singular (the sum of all rows would be zero because the
+  // constant function has zero gradient). Therefore, we take one row away and
+  // use it for imposing the average of the scalar value. We pick the first
+  // row for the scalar part, even though we could pick any row for $\mathcal
+  // Q_{-p}$ elements. However, had we used FE_DGP elements instead, the first
+  // row would correspond to the constant part already and deleting e.g. the
+  // last row would give us a singular system. This way, our program can also
+  // be used for those elements.
 template <int dim>
 void
 HDG<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                    PostProcessScratchData &scratch,
                                    unsigned int &)
 {
-  scratch.reset();
-
   typename DoFHandler<dim>::active_cell_iterator
   loc_cell (&triangulation,
             cell->level(),
@@ -1096,17 +1146,23 @@ HDG<dim>::postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iter
     scratch.cell_rhs(0) = sum;
   }
 
+  // Having assembled all terms, we can again go on and solve the linear
+  // system. We again invert the matrix and then multiply the inverse by the
+  // right hand side. An alternative (and more numerically stable) would have
+  // been to only factorize the matrix and apply the factorization.
   scratch.cell_matrix.gauss_jordan();
   scratch.cell_matrix.vmult(scratch.cell_sol, scratch.cell_rhs);
   cell->distribute_local_to_global(scratch.cell_sol, solution_u_post);
 }
+
+
 
 // @sect4{HDG::output_results}
 // We have 3 sets of results that we would like to output:  the local solution,
 // the post-processed local solution, and the skeleton solution.  The former 2
 // both `live' on element volumes, wheras the latter lives on codimention-1 surfaces
 // of the triangulation.  Our @p output_results function writes all local solutions
-// to the same vtk file, even though they correspond to different <code>DoFHandler</code> 
+// to the same vtk file, even though they correspond to different <code>DoFHandler</code>
 // objects.  The graphical output for the skeleton variable is done through
 // use of the <code>DataOutFaces</code> class.
 template <int dim>
@@ -1134,7 +1190,7 @@ void HDG<dim>::output_results (const unsigned int cycle)
   std::ofstream output (filename.c_str());
 
   DataOut<dim> data_out;
-  
+
 // We first define the names and types of the local solution,
 // and add the data to @p data_out.
   std::vector<std::string> names (dim, "gradient");
@@ -1147,8 +1203,8 @@ void HDG<dim>::output_results (const unsigned int cycle)
   data_out.add_data_vector (dof_handler_local, solution_local,
                             names, component_interpretation);
 
-// The second data item we add is the post-processed solution.  
-// In this case, it is a single scalar variable belonging to 
+// The second data item we add is the post-processed solution.
+// In this case, it is a single scalar variable belonging to
 // a different DoFHandler.
   std::vector<std::string> post_name(1,"u_post");
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -1183,12 +1239,17 @@ void HDG<dim>::output_results (const unsigned int cycle)
 }
 
 // @sect4{HDG::refine_grid}
+
 // We implement two different refinement cases for HDG, just as in
-// <code>Step-7</code>:  adaptive_refinement and global_refinement.
-// The global_refinement option recreates the entire triangulation
-// every time.
-// The adaptive_refinement mode uses the <code>KellyErrorEstimator</code>
-// give a decent approximation of the non-regularity of the local solutions.
+// <code>Step-7</code>: adaptive_refinement and global_refinement.  The
+// global_refinement option recreates the entire triangulation every
+// time. This is because we want to use a finer sequence of meshes than what
+// we would get with one refinement step, namely 2, 3, 4, 6, 8, 12, 16, ...
+// elements per direction.
+
+// The adaptive_refinement mode uses the <code>KellyErrorEstimator</code> to
+// give a decent indication of the non-regular regions in the scalar local
+// solutions.
 template <int dim>
 void HDG<dim>::refine_grid (const unsigned int cycle)
 {
@@ -1246,10 +1307,11 @@ void HDG<dim>::refine_grid (const unsigned int cycle)
   endc = triangulation.end();
   for (; cell!=endc; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12)
-          ||
-          (std::fabs(cell->face(face)->center()(1) - (-1)) < 1e-12))
-        cell->face(face)->set_boundary_indicator (1);
+      if (cell->face(face)->at_boundary())
+        if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12)
+            ||
+            (std::fabs(cell->face(face)->center()(1) - (-1)) < 1e-12))
+          cell->face(face)->set_boundary_indicator (1);
 }
 
 // @sect4{HDG::run}
@@ -1280,6 +1342,14 @@ void HDG<dim>::run ()
   convergence_table.set_precision("val L2-post", 3);
   convergence_table.set_scientific("val L2-post", true);
 
+  // There is one minor change for the convergence table compared to step-7:
+  // Since we did not refine our mesh by a factor two in each cycle (but
+  // rather used the sequence 2, 3, 4, 6, 8, 12, ...), we need to tell the
+  // convergence rate evaluation about this. We do this by setting the number
+  // of cells as a reference column and additionally specifying the dimension
+  // of the problem, which gives the computation the necessary information for
+  // how much the mesh was refinement given a certain increase in the number
+  // of cells.
   if (refinement_mode == global_refinement)
     {
       convergence_table
@@ -1292,7 +1362,7 @@ void HDG<dim>::run ()
   convergence_table.write_text(std::cout);
 }
 
-}//Step51
+} // end of namespace Step51
 
 int main (int argc, char **argv)
 {

@@ -48,12 +48,18 @@ cells dofs      val L2        grad L2      val L2-post
 
 
 One can see the error reduction upon grid refinement, and for the cases where
-global refinement was performed, also the convergence rates can be seen. The
-quadratic convergence rates of Q1 elements in the $L_2$ norm for both the
-scalar variable and the gradient variable can clearly be seen, as is the cubic
-rate for the postprocessed scalar variable in the $L_2$ norm. Likewise, the
-scalar variable and gradient for Q3 elements converge at fourth order and the
-postprocessed scalar variable at fifth order.
+global refinement was performed, also the convergence rates. The quadratic
+convergence rates of Q1 elements in the $L_2$ norm for both the scalar
+variable and the gradient variable is apparent, as is the cubic rate for the
+postprocessed scalar variable in the $L_2$ norm. Note that is is a distinctive
+feature of an HDG solution. In typical continuous finite element, the gradient
+of the solution of order <i>p</i> converges at rate <i>p</i> only, as opposed
+to <i>p</i>+1 for the actual solution. Even though superconvergence results
+for finite elements are also available (e.g. superconvergent patch recovery
+first introduced by Zienkiewicz and Zhu), these are typically limited to
+structured meshes and other special cases. Likewise, the scalar variable and
+gradient for Q3 elements converge at fourth order and the postprocessed scalar
+variable at fifth order.
 
 The same convergence rates are observed in 3d.
 @code
