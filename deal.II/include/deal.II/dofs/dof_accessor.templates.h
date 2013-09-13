@@ -2581,8 +2581,8 @@ namespace internal
                 ExcInternalError());
 
         std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
-        accessor.dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim>,lda>::get_dof_indices
-        (dof_indices, accessor.active_fe_index());
+        static_cast<const dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim>,lda> &>
+          (accessor).get_dof_indices (dof_indices, accessor.active_fe_index());
 
         types::global_dof_index *next_dof_index
         = &accessor.dof_handler->levels[accessor.present_level]
