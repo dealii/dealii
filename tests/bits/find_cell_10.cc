@@ -81,7 +81,7 @@ void test()
 
   GridIn<2> grid_in1;
   grid_in1.attach_triangulation (triangulation);
-  std::ifstream input_file1(SOURCE_DIR "/find_cell_10/mesh.msh");
+  std::ifstream input_file1(SOURCE_DIR "/grids/find_cell_10.msh");
   grid_in1.read_msh(input_file1);
 
   dof_handler.distribute_dofs (fe);

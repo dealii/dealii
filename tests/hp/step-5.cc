@@ -299,7 +299,7 @@ void LaplaceProblem<dim>::run ()
         {
           GridIn<dim> grid_in;
           grid_in.attach_triangulation (triangulation);
-          std::ifstream input_file(SOURCE_DIR "/step-5/circle-grid.inp");
+          std::ifstream input_file(SOURCE_DIR "/grids/circle-grid.inp");
           Assert (dim==2, ExcInternalError());
 
           grid_in.read_ucd (input_file);

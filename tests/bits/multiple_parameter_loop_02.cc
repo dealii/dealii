@@ -86,7 +86,7 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  check (SOURCE_DIR "/multiple_parameter_loop_02/prm");
+  check (SOURCE_DIR "/prm/multiple_parameter_loop_02.prm");
 
   return 0;
 }

@@ -131,7 +131,7 @@ int main ()
   Triangulation<3> triangulation;
   GridIn<3> grid_in;
   grid_in.attach_triangulation(triangulation);
-  std::ifstream inputStream(SOURCE_DIR "/mesh_3d_22/mesh.msh");
+  std::ifstream inputStream(SOURCE_DIR "/grids/mesh.msh");
   grid_in.read_msh (inputStream);
   test<3>(triangulation);
 }

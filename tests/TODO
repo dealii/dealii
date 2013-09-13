@@ -3,3 +3,17 @@ Issues:
  - p4est's vtk write out may be with zlib support - independent of how
    deal.II is actually configured. With this, a lot of tests under
    distributed_grids fail.
+
+ - Depending on the version of boost, a version number in the serialization
+   output changes and all tests just.. fail
+
+ - Mesh converter tests?
+
+ - Benchmark tests?
+
+ - What about the files in
+
+   ./base/data_out_base_dx
+   ./base/data_out_base_povray
+
+ - Relocate all meshes in ./deal.II/*/ to ./deal.II/grids

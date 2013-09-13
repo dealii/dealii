@@ -50,7 +50,7 @@ int main ()
       prm.leave_subsection ();
 
       // read and then write parameters
-      prm.read_input(SOURCE_DIR "/parameter_handler_3/prm");
+      prm.read_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
       prm.print_parameters (logfile, ParameterHandler::Text);
     }
   catch (std::exception &exc)

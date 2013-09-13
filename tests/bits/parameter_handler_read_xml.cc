@@ -76,7 +76,7 @@ int main ()
   prm.leave_subsection ();
 
   // read from XML
-  std::ifstream in (SOURCE_DIR "/parameter_handler_read_xml/prm");
+  std::ifstream in (SOURCE_DIR "/prm/parameter_handler_read_xml.prm");
   bool result = prm.read_input_from_xml (in);
   Assert (result == true, ExcInternalError());
 

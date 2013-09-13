@@ -73,7 +73,7 @@ int main ()
       // parameters. take same input file
       // as for parameter_handler_3, but
       // use different output format
-      prm.read_input(SOURCE_DIR "/parameter_handler_8/prm");
+      prm.read_input(SOURCE_DIR "/prm/parameter_handler_8.prm");
       prm.print_parameters (logfile, ParameterHandler::Text);
     }
   catch (std::exception &exc)

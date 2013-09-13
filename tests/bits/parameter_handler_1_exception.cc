@@ -52,7 +52,7 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  check (SOURCE_DIR "/parameter_handler_1_exception/prm");
+  check (SOURCE_DIR "/prm/parameter_handler_1_exception.prm");
 
   return 0;
 }

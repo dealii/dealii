@@ -39,7 +39,7 @@ int main ()
                      Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
   prm.leave_subsection ();
 
-  prm.read_input(SOURCE_DIR "/parameter_handler_2/prm");
+  prm.read_input(SOURCE_DIR "/prm/parameter_handler_2.prm");
 
   std::string list;
   prm.enter_subsection ("Testing");

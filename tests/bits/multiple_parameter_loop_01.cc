@@ -74,7 +74,7 @@ void check ()
   HelperClass h;
 
   h.declare_parameters (prm);
-  prm.read_input (SOURCE_DIR "/multiple_parameter_loop_01/prm");
+  prm.read_input (SOURCE_DIR "/prm/multiple_parameter_loop_01.prm");
   prm.loop (h);
 }
 

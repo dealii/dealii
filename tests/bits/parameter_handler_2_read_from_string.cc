@@ -39,7 +39,7 @@ int main ()
   prm.leave_subsection ();
 
   std::string input;
-  std::ifstream in(SOURCE_DIR "/parameter_handler_2_read_from_string/prm");
+  std::ifstream in(SOURCE_DIR "/prm/parameter_handler_2_read_from_string.prm");
   while (in)
     {
       std::string s;
