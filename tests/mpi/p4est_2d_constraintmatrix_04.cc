@@ -304,7 +304,7 @@ void test()
   data_out.add_data_vector(x_rel, solution_names);
 
   data_out.build_patches (1);
-  const std::string filename = ("p4est_2d_constraintmatrix_04/solution." +
+  const std::string filename = ("solution." +
                                 Utilities::int_to_string
                                 (tr.locally_owned_subdomain(), 4) +
                                 ".d2");

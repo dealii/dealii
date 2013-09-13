@@ -112,7 +112,7 @@ void test()
                   << checksum
                   << std::endl;
 
-          std::ofstream file("p4est_3d_ghost_01/1.gpl");
+          std::ofstream file("1.pl");
           GridOut().write_gnuplot (tr, file);
         }
 

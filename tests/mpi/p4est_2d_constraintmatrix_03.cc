@@ -193,7 +193,7 @@ void test()
                            DataOut<dim>::type_dof_data,
                            data_component_interpretation);
   data_out.build_patches (4);
-  const std::string filename = ("p4est_2d_constraintmatrix_03/solution." +
+  const std::string filename = ("solution." +
                                 Utilities::int_to_string
                                 (tr.locally_owned_subdomain(), 4) +
                                 ".d2");
