@@ -63,7 +63,7 @@ void test ()
 
   // write the info on ghost processors and import indices to file
   {
-    std::ofstream file(("dat." + Utilities::int_to_string(myid)).c_str());
+    std::ofstream file((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
     file << "**** proc " << myid << std::endl;
     file << "ghost targets: ";
     for (unsigned int i=0; i<v.ghost_targets().size(); ++i)
@@ -88,7 +88,7 @@ void test ()
     {
       for (unsigned int i=0; i<numproc; ++i)
         {
-          cat_file(("dat." + Utilities::int_to_string(i)).c_str());
+          cat_file((std::string("dat.") + Utilities::int_to_string(i)).c_str());
         }
 
     }

@@ -63,7 +63,7 @@ void test ()
   deallog << "size[1]: " << v.block(1).size() << std::endl;
 
   {
-    std::ofstream file (("dat." + Utilities::int_to_string(myid)).c_str());
+    std::ofstream file ((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
 
     file << "**** proc " << myid << std::endl;
     v.print(file);
@@ -75,7 +75,7 @@ void test ()
     {
       for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
         {
-          cat_file(("dat." + Utilities::int_to_string(i)).c_str());
+          cat_file((std::string("dat.") + Utilities::int_to_string(i)).c_str());
         }
     }
 

@@ -206,7 +206,7 @@ void test()
 
   if (myid==0)
     {
-      std::ofstream file((std::string("dat." + Utilities::int_to_string(myid)).c_str());
+      std::ofstream file((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
       file << "**** proc " << myid << std::endl;
       x_dub.print(file);
     }
@@ -215,7 +215,7 @@ void test()
 
   if (myid==0)
     {
-      cat_file((std::string("dat." + Utilities::int_to_string(0)).c_str());
+      cat_file((std::string("dat.") + Utilities::int_to_string(0)).c_str());
     }
 
   tr.set_boundary (0);
