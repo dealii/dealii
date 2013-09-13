@@ -224,7 +224,7 @@ A.reinit(sp);
 int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  MPILogInitAll log();
+  MPILogInitAll log;
 
   {
     deallog.push("PETSc");
