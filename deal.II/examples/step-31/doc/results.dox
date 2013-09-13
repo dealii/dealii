@@ -512,7 +512,7 @@ half the size for the $Q_1$ element, a fact that may not be surprising
 if we state the CFL condition as the requirement that the time step be
 small enough so that the distance transport advects in each time step
 is no longer than one <i>grid point</i> away (which for $Q_1$ elements
-is $h_K$, but for $Q_2$ elements is $h_K/2$). It turns out that $\beta$ 
+is $h_K$, but for $Q_2$ elements is $h_K/2$). It turns out that $\beta$
 needs to be slightly larger for obtaining stable results also late in
 the simulation at times larger than 60, so we actually choose it as
 $\beta = 0.034$ in the code.
@@ -593,7 +593,9 @@ There are various ways to extend the current program. Of particular interest
 is, of course, to make it faster and/or increase the resolution of the
 program, in particular in 3d. This is the topic of the step-32
 tutorial program which will implement strategies to solve this problem in
-%parallel on a cluster.
+%parallel on a cluster. It is also the basis of the much larger open
+source code Aspect (see http://aspect.dealii.org/ ) that can solve realistic
+problems and that constitutes the further development of step-32.
 
 Another direction would be to make the fluid flow more realistic. The program
 was initially written to simulate various cases simulating the convection of

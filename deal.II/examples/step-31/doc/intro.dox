@@ -117,6 +117,12 @@ shorter than for the same amount of heat to be distributed by thermal
 conductivity and a time scale of relevance to affect the evolution of the
 earth's interior and surface structure.
 
+@note If you are interested in using the program as the basis for your own
+experiments, you will also want to take a look at its continuation in
+step-32. Furthermore, step-32 later was developed into the much larger open
+source code Aspect (see http://aspect.dealii.org/ ) that can solve realistic
+problems and that you may want to investigate before trying to morph step-31
+into something that can solve whatever you want to solve.
 
 
 <h3>%Boundary and initial conditions</h3>
