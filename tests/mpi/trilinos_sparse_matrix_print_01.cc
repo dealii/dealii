@@ -94,7 +94,7 @@ int main (int argc, char **argv)
   // in parallel
   if ((n_procs == 1) || (myid == 1))
     {
-      std::ofstream logfile(output_file_for_mpi("trilinos_sparse_matrix_print_01").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);

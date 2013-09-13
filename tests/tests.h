@@ -97,30 +97,15 @@ initlog(bool console=false)
 }
 
 
-// append the directory name with an output file name that indicates
-// the number of MPI processes
-inline std::string
-output_file_for_mpi (const std::string &directory)
-{
-#ifdef DEAL_II_WITH_MPI
-  return (directory + "/ncpu_" +
-          Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) +
-          "/output");
-#else
-  return (directory + "/ncpu_1/output");
-#endif
-}
-
-
 inline
 void
-mpi_initlog(const char *filename, bool console=false)
+mpi_initlog(bool console=false)
 {
 #ifdef DEAL_II_WITH_MPI
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
     {
-      deallogname = output_file_for_mpi(JobIdentifier::base_name(filename));
+      deallogname = "output";
       deallogfile.open(deallogname.c_str());
       deallog.attach(deallogfile);
       if (!console)
@@ -139,15 +124,13 @@ mpi_initlog(const char *filename, bool console=false)
 
 /* helper class to include the deallogs of all processors
    on proc 0 */
-class MPILogInitAll
+struct MPILogInitAll
 {
-public:
-  MPILogInitAll(const char *filename, bool console=false)
-    : m_filename(filename)
+  MPILogInitAll(bool console=false)
   {
 #ifdef DEAL_II_WITH_MPI
     unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-    deallogname = output_file_for_mpi(JobIdentifier::base_name(filename));
+    deallogname = "output";
     if (myid != 0)
       deallogname = deallogname + Utilities::int_to_string(myid);
     deallogfile.open(deallogname.c_str());
@@ -184,13 +167,12 @@ public:
     check_petsc_allocations();
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
-  
+
     if (myid==0)
       {
         for (unsigned int i=1; i<nproc; ++i)
           {
-            std::string filename = output_file_for_mpi(JobIdentifier::base_name(m_filename.c_str()))
-                                   + Utilities::int_to_string(i);
+            std::string filename = "output" + Utilities::int_to_string(i);
             std::ifstream in(filename.c_str());
             Assert (in, ExcIO());
 
@@ -209,9 +191,6 @@ public:
     Assert (false, ExcInternalError());
 #endif
   }
-private:
-
-  std::string m_filename;
 
 };
 

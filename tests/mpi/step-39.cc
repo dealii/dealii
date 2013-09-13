@@ -756,7 +756,7 @@ namespace Step39
 int main(int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-  mpi_initlog(__FILE__, true);
+  mpi_initlog(true);
 
   using namespace dealii;
   using namespace Step39;

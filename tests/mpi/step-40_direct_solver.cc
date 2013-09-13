@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("step-40_direct_solver").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);

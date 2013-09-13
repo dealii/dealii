@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("trilinos_vector_ghosts_01").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       test ();
     }
