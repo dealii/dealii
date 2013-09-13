@@ -756,7 +756,7 @@ HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_
       scratch.lf_matrix = 0;
       scratch.fl_matrix = 0;
       task_data.cell_matrix = 0;
-      task_data.cell_rhs = 0;
+      task_data.cell_vector = 0;
     }
   scratch.fe_values_local.reinit (loc_cell);
 
