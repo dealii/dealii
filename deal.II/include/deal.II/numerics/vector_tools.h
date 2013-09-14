@@ -2030,6 +2030,11 @@ namespace VectorTools
    * using a Q1-mapping for cell
    * boundaries to call the other
    * point_difference() function.
+   *
+   * @note If the cell in which the point is found
+   * is not locally owned, an exception of type 
+   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * is thrown.
    */
   template <int dim, class InVector, int spacedim>
   void point_difference (const DoFHandler<dim,spacedim> &dof,
@@ -2054,6 +2059,11 @@ namespace VectorTools
    * this function uses an
    * arbitrary mapping to evaluate
    * the difference.
+   * 
+   * @note If the cell in which the point is found
+   * is not locally owned, an exception of type 
+   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * is thrown.
    */
   template <int dim, class InVector, int spacedim>
   void point_difference (const Mapping<dim, spacedim>   &mapping,
@@ -2077,6 +2087,11 @@ namespace VectorTools
    * using a Q1-mapping for cell
    * boundaries to call the other
    * point_difference() function.
+   *
+   * @note If the cell in which the point is found
+   * is not locally owned, an exception of type 
+   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * is thrown.
    */
   template <int dim, class InVector, int spacedim>
   void
@@ -2087,6 +2102,11 @@ namespace VectorTools
 
   /**
   * Same as above for hp.
+  *
+  * @note If the cell in which the point is found
+  * is not locally owned, an exception of type 
+  * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+  * is thrown.
   */
   template <int dim, class InVector, int spacedim>
   void
@@ -2112,6 +2132,11 @@ namespace VectorTools
    * "Possibilities for extensions" part of
    * the results section of @ref step_3
    * "step-3".
+   *
+   * @note If the cell in which the point is found
+   * is not locally owned, an exception of type 
+   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * is thrown.
    */
   template <int dim, class InVector, int spacedim>
   double
@@ -2121,6 +2146,11 @@ namespace VectorTools
 
   /**
   * Same as above for hp.
+  * 
+  * @note If the cell in which the point is found
+  * is not locally owned, an exception of type 
+  * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+  * is thrown.
   */
   template <int dim, class InVector, int spacedim>
   double
@@ -2142,6 +2172,11 @@ namespace VectorTools
    * function of the same name,
    * this function uses an arbitrary
    * mapping to evaluate the difference.
+   *
+   * @note If the cell in which the point is found
+   * is not locally owned, an exception of type 
+   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * is thrown.
    */
   template <int dim, class InVector, int spacedim>
   void
@@ -2153,6 +2188,11 @@ namespace VectorTools
 
   /**
   * Same as above for hp.
+  *
+  * @note If the cell in which the point is found
+  * is not locally owned, an exception of type 
+  * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+  * is thrown.
   */
   template <int dim, class InVector, int spacedim>
   void
@@ -2174,6 +2214,11 @@ namespace VectorTools
    * function of the same name,
    * this function uses an arbitrary
    * mapping to evaluate the difference.
+   *
+   * @note If the cell in which the point is found
+   * is not locally owned, an exception of type 
+   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * is thrown.
    */
   template <int dim, class InVector, int spacedim>
   double
@@ -2184,6 +2229,11 @@ namespace VectorTools
 
   /**
   * Same as above for hp.
+  *
+  * @note If the cell in which the point is found
+  * is not locally owned, an exception of type 
+  * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+  * is thrown.
   */
   template <int dim, class InVector, int spacedim>
   double
@@ -2301,6 +2351,11 @@ namespace VectorTools
    * Exception
    */
   DeclException0 (ExcNonInterpolatingFE);
+
+  /**
+  * Exception
+  */
+  DeclException0 (ExcPointNotAvailableHere);
 }
 
 

@@ -2562,9 +2562,9 @@ next_cell:
             ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
                         "different to denote different boundaries."));
 
-    typename std::map<std::pair<typename DH::cell_iterator,
-                                unsigned int>,
-                      Point<spacedim> > face_locations;
+    std::map<std::pair<typename DH::cell_iterator,
+		       unsigned int>,
+	     Point<spacedim> > face_locations;
 
     // Collect faces with boundary_indicator b_id1
     typename DH::cell_iterator cell = dof_handler.begin();
@@ -2589,7 +2589,7 @@ next_cell:
           {
             typename std::map<std::pair<typename DH::cell_iterator,
                                         unsigned int>,
-                              Point<spacedim> >::const_iterator p
+                              Point<spacedim> >::iterator p
               = face_locations.begin();
 
             Point<spacedim> center2 (cell->face(f)->center());
@@ -2601,11 +2601,10 @@ next_cell:
               {
                 const std_cxx1x::tuple<typename DH::cell_iterator, unsigned int,
                                        typename DH::cell_iterator, unsigned int>
-                  periodic_tuple
-                    = std::make_tuple(p->first.first,
-                                      p->first.second,
-                                      cell,
-                                      f);
+                  periodic_tuple (p->first.first,
+				  p->first.second,
+				  cell,
+				  f);
 
                 periodicity_vector.push_back(periodic_tuple);
 

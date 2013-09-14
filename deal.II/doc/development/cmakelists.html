@@ -10,7 +10,7 @@
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
   </head>
-  
+
 <body>
 <h1>How to use CMake to configure your projects with <acronym>deal.II</acronym></h1>
 
@@ -20,6 +20,7 @@
       <ol>
 	<li><a href="#cmakesimple.multiple">Adding multiple executable targets</a></li>
 	<li><a href="#cmakesimple.libs">Adding libraries and common source files</a></li>
+	<li><a href="#cmakesimple.build_type">Switching build types</a></li>
 	<li><a href="#cmakesimple.run">Adding a "run" target</a></li>
       </ol>
     </li>
@@ -58,16 +59,14 @@
 <h2>Simple CMakeLists.txt</h2>
 
 <p>
-  In this section, we start out with a
-  minimal <code>CMakeLists.txt</code> based on
-  the <code>DEAL_II_SETUP_TARGET</code> macro. This method gives
-  full control of what's happening and is easily extensible to
-  more complex projects, as exemplified in the subsections here an
-  later in the section on <a href="cmakeadvanced">advanced
-    topics</a>. Here is a full example
+  In this section, we start out with a minimal <code>CMakeLists.txt</code>
+  based on the <code>DEAL_II_SETUP_TARGET</code> macro. This method gives
+  full control of what's happening and is easily extensible to more complex
+  projects, as exemplified in the subsections here and later in the section
+  on <a href="cmakeadvanced">advanced topics</a>. Here is a full example
   (<a href="CMakeLists.txt.sample3" target="_top">plain text</a>
   version):
-  
+
 <p class="todo"> Fix plain text after finalizing!</p>
 
 <pre class="cmake">
@@ -75,10 +74,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 FIND_PACKAGE(deal.II 8.0 REQUIRED
   HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
-)
+  )
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
-PROJECT(myproject CXX)
+PROJECT(myproject)
 
 ADD_EXECUTABLE(mycode mycode.cc)
 DEAL_II_SETUP_TARGET(mycode)
@@ -92,33 +91,42 @@ DEAL_II_SETUP_TARGET(mycode)
 </p>
 
 <p>
-  Next, we find our deal.II installation, in this case requiring at
-  least version 8.0, which is the first version using
-  CMake. The <code>HINTS</code> are a list of directories where the
-  install directory of deal.II is likely to be found. Here, we check
-  whether we are in a subdirectory (first and second level) of the
-  deal.II installation and otherwise use the
-  variable <code>DEAL_II_DIR</code>.
-  <q class="todo">Matthias, what is the difference between the first
-  and the last entry?</q>  This list can be changed according to your
-  preferences. After finding the deal.II project, we fetch its chached
-  variables. You can inspect these for instance
-  with <code>ccmake</code>.
+  Next, we find our deal.II installation with the help of the
+  <code>FIND_PACKAGE</code> command. In this case requiring at least
+  version 8.0, which is the first version using CMake. The
+  <code>HINTS</code> are a list of directories where the install directory
+  of deal.II is likely to be found. First, the location possibly defined in
+  the CMake variable <code>DEAL_II_DIR</code> is considered. After that, we
+  check whether we are in a subdirectory (first and second level) of the
+  deal.II installation and otherwise use the environment variable
+  <code>DEAL_II_DIR</code>. If all of these hints fail the default system
+  locations <code>/usr/</code> and <code>/usr/local/</code> are considered.
+  The list after <code>HINTS</code> can be changed according to your
+  preferences.
 </p>
 
 <p>
-  Every <code>CMAkeLists.txt</code> must contain a project definition,
-  which we do next. <q class="todo">Matthias, I have been happy
-  without the CXX...?</q>
+  After finding the deal.II project, we fetch a set of cached variables
+  with the <code>DEAL_II_INITIALIZE_CACHED_VARIABLES()</code> macro. You
+  can inspect these for instance with <code>ccmake</code>.
+</p>
+
+<p class="todo"> link to detailed explanation of the macro below</p>
+
+<p>
+  Every <code>CMakeLists.txt</code> must contain a project definition,
+  which we do next.
 </p>
 
 <p>
   Finally, the last two lines define the executable that is to be
-  produced and its source code.
+  produced and its source code. The <code>DEAL_II_SETUP_TARGET</code> macro
+  will set up necessary incllude directories, compile defintions and the
+  link interface.
 </p>
 
 
-<p class="todo"> Explain the macros or link to explanation below</p>
+<p class="todo"> link to detailed explanation of the macro below</p>
 
 <a name="cmakesimple.multiple"></a>
 <h3>Adding multiple executable targets</h3>
@@ -152,6 +160,7 @@ with <a href="#cmakeadvanced.glob">GLOB</a>.
 
 <pre class="cmake">
 ADD_LIBRARY(mylib libsrc1.cc libsrc2.cc libsrc3.cc)
+DEAL_II_SETUP_TARGET(mylib)
 
 ADD_EXECUTABLE(mycode mycode.cc)
 DEAL_II_SETUP_TARGET(mycode)
@@ -174,85 +183,214 @@ ADD_EXECUTABLE(mycode2 mycode2.cc common.cc)
 DEAL_II_SETUP_TARGET(mycode2)
 </pre>
 
-<p>You should be aware though that <code>common.cc</code> will be
-compiled for each target, not only once.</p>
+<p>You should be aware though that in this case <code>common.cc</code> will
+be compiled for each target, not only once. If you want to avoid this and
+still don't want to use a shared library or static archive, another option
+is to create an <code>OBJECT</code> "library":</p>
 
-<p class="todo"> Matthias, is this correct?</p>
+<pre class="cmake">
+ADD_LIBRARY(common OBJECT common.cc)
+DEAL_II_SETUP_TARGET(common)
 
+ADD_EXECUTABLE(mycode mycode.cc $&lt;TARGET_OBJECTS:common&gt;)
+DEAL_II_SETUP_TARGET(mycode)
 
-    <a name="cmakesimple.run"></a>
-    <h3>Adding a "run" target</h3>
-    
-    <p>
-      If you wish to have a "run" target for make, like in the deal.II
-      tutorial, specify one this way (obviously, a single "run" target
-      can only run a single executable):
-    </p>
+ADD_EXECUTABLE(mycode2 mycode2.cc $&lt;TARGET_OBJECTS:common&gt;)
+DEAL_II_SETUP_TARGET(mycode2)
+</pre>
+This will compile <code>common.cc</code> once for the object target
+<code>common</code> and link the resulting object file into the two
+executables.
+
+<a name="cmakesimple.build_type"></a>
+<h3>Switching build types</h3>
+
+<p> The build type is controlled via the variable
+<code>CMAKE_BUILD_TYPE</code>. If it is set to <code>Debug</code>
+executables and libraries specified in your <code>CMakeLists.txt</code>
+file will be compiled in debug mode and linked against the debug version of
+the deal.II library. Contrary <code>Release</code> will build in optimized
+mode and link against the optimized release version of deal.II. You can set
+<code>CMAKE_BUILD_TYPE</code> with the help of <code>ccmake</code> or via
+<code>cmake</code> on the command line: </p>
+
+<pre class="cmake">
+$ cmake -DCMAKE_BUILD_TYPE="Debug" .
+
+$ cmake -DCMAKE_BUILD_TYPE="Release" .
+</pre>
+
+Alternatively, you can specify custom targets to switch the build type and
+compile automatically:
+
+<pre class="cmake">
+ADD_CUSTOM_TARGET(debug
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
+  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
+  COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
+  )
+
+ADD_CUSTOM_TARGET(release
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
+  COMMENT "Switch CMAKE_BUILD_TYPE to Release"
+  )
+</pre>
+With that, switching the build type and compiling the project can be done
+very conveniently via:
+<pre class="cmake">
+$ make debug
+
+$ make release
+</pre>
+
+<a name="cmakesimple.run"></a>
+<h3>Adding a "run" target</h3>
+
+<p> If you wish to have a "run" target for make, like in the deal.II
+tutorial, specify one this way (obviously, a single "run" target can only
+run a single executable): </p>
 
 <pre class="cmake">
 ADD_CUSTOM_TARGET(run COMMAND mycode
-  COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration")
+  COMMENT "Run with ${CMAKE_BUILD_TYPE} configuration"
+  )
 </pre>
 
 
 <a name="cmakeadvanced"></a>
 <h2> Advanced <code>CMakeLists.txt</code></h2>
 
-<pre class="todo">
-  
-  A Subsection for each of the following:
-  
-  - control statements (if and foreach)
-  
-  - file glob to pick up sources
-  
-  - DEAL_II_SETUP_TARGET and DEAL_II_INITIALIZE_CACHED_VARIABLES
-  revisited
-  
-  - add include dirs and compile definitions to a directory or target
-  
-  - provide a ./run folder and target
-  
-  - custom targets to switch between release and debug
-  
-  - installation
+<p class="todo">This section covers some advanced topics for a user
+<code>CMakeLIists.txt</code> file.</p>
+
+<a name="cmakeadvanced.control"></a>
+<h3>Control statements</h3>
+
+<p>Control statements in CMake take the following form:
+<pre class="cmake">
+IF(&lt;expression&gt;)
+  ...
+ENDIF()
+</pre>
+or in long form:
+<pre class="cmake">
+IF(&lt;expression1&gt;)
+  ...
+ELSEIF(&lt;expression2&gt;)
+  ...
+ELSE()
+  ...
+ENDIF()
+</pre>
+Please note the (somehow uncommon) empty, opening and closing brackets
+behind <code>ELSE()</code> and <code>ENDIF()</code>.
+<code>&lt;expression&gt;</code> can take a multitude of different forms,
+have a look at the
+<a href="http://cmake.org/cmake/help/v2.8.8/cmake.html">CMake
+documentation</a> for a complete list. Important examples are:
+<p class="todo">Link!</p>
+<pre class="cmake">
+IF(${variable})
+  - the body will be evaluated if the variable "variable" is defined and
+    synonymous to true, e.g. 1, TRUE, ON, YES (modulo case insensitivity)
+
+IF(variable MATCHES &lt;regular expression&gt;)
+  - the body will be evaluated if the variable "variable" is defined and
+    matches the specified regular expression
+
+IF("${variable}" STREQUAL "foobar")
+  - the body will be evaluated if both strings are equal. Note that
+    "${variable}" will be replaced by the content of the (string)
+    variable "variable"
+</pre>
+<p>An expression can be negated by prefixing <code>NOT</code>:</p>
+<pre class="cmake">
+IF(NOT &lt;expression&gt;)
+  ...
+ENDIF()
 </pre>
 
-<a name="extfinding"></a>
-<h3> Finding the deal.II library </h3>
-
-<p>
-  Finding the <acronym>deal.II</acronym> library should be no more than
-  <pre>
-    
-    FIND_PACKAGE(deal.II REQUIRED)
-  </pre>
-  in your CMakeLists.txt file.  You may have to hint for the location
-  of the <code>deal.IIConfig.cmake</code> file.  Either by directly
-  specifying <code>deal.II_DIR</code> to point to the path were the
-  <code>deal.IIConfig.cmake</code> file is located:
-  
-<p class="todo"> is deal.II_DIR still accurate? We use different
-above. BTW, that is an <b>UGLY</b> variable name.</p>
-  
-<pre>    
-cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;
-
+<p>Loops are implemented with the help of <code>WHILE</code> and
+<code>FOR</code> statements. The former takes the same
+<code>&lt;expression&gt;</code> as the <code>IF</code> statement:</p>
+<pre class="cmake">
+WHILE(&lt;expression&gt;)
+  ...
+ENDWHILE()
 </pre>
-  or by specifying a search path via <code>CMAKE_PREFIX_PATH</code>,
-  e.g.
-  <pre>
-    
-    cmake -DCMAKE_PREFIX_PATH=~/workspace/local
-  </pre>
-  In this case <code>deal.IIConfig.cmake</code> will be searched
-  for in
-  <pre>
-    
-    ~/workspace/local/
-    ~/workspace/local/lib/cmake/deal.II/
-  </pre>
-</p>
+Given a variable <code>list</code> containing a list, the individual
+elements <code>element</code> can be accessed with a <code>FOREACH</code>
+statement:
+<pre class="cmake">
+FOREACH(element ${list})
+  ...
+ENDFOREACH
+</pre>
+Note: It is also possible to specify the list directly:
+<pre class="cmake">
+FOREACH(element foo bar baz)
+  # The variable element will iterate through foo, bar and baz.
+ENDFOREACH
+</pre>
+
+
+<a name="cmakeadvanced.globs"></a>
+<h3>File globs</h3>
+
+<p>A very common task is to pick up a list of source files from a
+directory. You can either manage a list of source files in
+<code>CMakeLists.txt</code> by hand, e.g. by manually updating all source
+files for a given target, or you can use a glob to automate this process.
+The following example will pick up every source file under
+<code>SOURCE_DIR/sources/</code> and add it to an executable:</p>
+
+<pre class="cmake">
+FILE(GLOB sources ${CMAKE_SOURCE_DIR}/source/*.cc)
+ADD_EXECUTABLE(mycode ${sources})
+</pre>
+
+<p>Please be aware of one caveat of this approach: Due to the fact that
+CMake is a <i>build system generator</i> the resulting build configuration
+(for make) has no way to detect whether a new source file was added (or
+removed) and that it has to call back to cmake. So, after adding a new
+source file you have to touch a <code>CMakeLists.txt</code> file or to run
+<code>cmake .</code> again by hand.
+
+
+<a name="cmakeadvanced.setup_target"></a>
+<h3><code>DEAL_II_SETUP_TARGET</code> revisited</h3>
+
+<p class="todo"> Well, write this! </p>
+
+
+<a name="cmakeadvanced.cached_variables"></a>
+<h3><code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> revisited</h3>
+
+<p class="todo"> Well, write this! </p>
+
+
+<a name="cmakeadvanced.properties"></a>
+<h3>Customizing include directories and compile definitions</h3>
+
+<p class="todo"> Well, write this! </p>
+
+
+<a name="cmakeadvanced.external_libraries"></a>
+<h3>External libraries</h3>
+
+<p class="todo"> Well, write this! </p>
+
+
+<a name="cmakeadvanced.run"></a>
+<h3>The "run" target revisited</h3>
+
+<p class="todo"> Well, write this! </p>
+
+
+<a name="cmakeadvanced.install"></a>
+<h3>Install a project</h3>
+
 
 <a name="cmakesauto"></a>
 <h2>Autopilot style CMakeLists.txt</h2>

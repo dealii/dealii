@@ -52,7 +52,7 @@ inline void check_petsc_allocations()
 	  != stageLog->stageInfo->classLog->classInfo[i].creations)
 	{
 	  errors = true;
-	  cerr << "ERROR: PETSc objects leaking of type '"
+	  std::cerr << "ERROR: PETSc objects leaking of type '"
 	       <<  stageLog->classLog->classInfo[i].name << "'"
 	       << " with " << stageLog->stageInfo->classLog->classInfo[i].creations
 	       << " creations and only "

@@ -5126,7 +5126,6 @@ namespace VectorTools
       double exponent = exponent_1;
 
       const unsigned int        n_components = dof.get_fe().n_components();
-      const bool                fe_is_system = (n_components != 1);
 
       if (weight!=0)
         {
@@ -5326,6 +5325,8 @@ namespace VectorTools
     const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
     cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
 
+    AssertThrow(cell_point.first->is_locally_owned(),
+                ExcPointNotAvailableHere());
     Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
            ExcInternalError());
 
@@ -5426,6 +5427,8 @@ namespace VectorTools
     cell_point
       = GridTools::find_active_cell_around_point (mapping, dof, point);
 
+    AssertThrow(cell_point.first->is_locally_owned(),
+                ExcPointNotAvailableHere());
     Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
            ExcInternalError());
 
@@ -5463,6 +5466,8 @@ namespace VectorTools
     const std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
     cell_point =  GridTools::find_active_cell_around_point (mapping, dof, point);
 
+    AssertThrow(cell_point.first->is_locally_owned(),
+                ExcPointNotAvailableHere());
     Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
            ExcInternalError());
 
@@ -5499,6 +5504,8 @@ namespace VectorTools
     const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
     cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
 
+    AssertThrow(cell_point.first->is_locally_owned(),
+                ExcPointNotAvailableHere());
     Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
            ExcInternalError());
 
@@ -5534,6 +5541,8 @@ namespace VectorTools
     const std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
     cell_point =  GridTools::find_active_cell_around_point (mapping, dof, point);
 
+    AssertThrow(cell_point.first->is_locally_owned(),
+                ExcPointNotAvailableHere());
     Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
            ExcInternalError());
 

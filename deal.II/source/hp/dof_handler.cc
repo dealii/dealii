@@ -18,7 +18,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/std_cxx1x/bind.h>
 #include <deal.II/hp/dof_handler.h>
-#include <deal.II/hp/dof_objects.h>
 #include <deal.II/hp/dof_level.h>
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -539,7 +538,7 @@ namespace internal
           // active_fe_indices field which
           // we have to backup before
           {
-            std::vector<std::vector<unsigned int> >
+            std::vector<std::vector<DoFLevel::active_fe_index_type> >
             active_fe_backup(dof_handler.levels.size ());
             for (unsigned int level = 0; level<dof_handler.levels.size (); ++level)
               std::swap (dof_handler.levels[level]->active_fe_indices,
@@ -553,7 +552,7 @@ namespace internal
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
               {
-                dof_handler.levels.push_back (new internal::hp::DoFLevel<dim>);
+                dof_handler.levels.push_back (new internal::hp::DoFLevel);
                 std::swap (active_fe_backup[level],
                            dof_handler.levels[level]->active_fe_indices);
               }
@@ -578,11 +577,16 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_offsets
-                = std::vector<std::vector<types::global_dof_index>::size_type> (
+                = std::vector<DoFLevel::offset_type> (
                     dof_handler.tria->n_raw_lines(level),
-                    (std::vector<types::global_dof_index>::size_type)(-1));
+                    (DoFLevel::offset_type)(-1));
+              dof_handler.levels[level]->cell_cache_offsets
+                = std::vector<DoFLevel::offset_type> (
+                    dof_handler.tria->n_raw_lines(level),
+                    (DoFLevel::offset_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
+              types::global_dof_index cache_size = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -590,10 +594,16 @@ namespace internal
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
                     next_free_dof += cell->get_fe().dofs_per_line;
+
+                    dof_handler.levels[level]->cell_cache_offsets[cell->index()] = cache_size;
+                    cache_size += cell->get_fe().dofs_per_cell;
                   }
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+              dof_handler.levels[level]->cell_dof_indices_cache
+                = std::vector<types::global_dof_index> (cache_size,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
@@ -619,7 +629,7 @@ namespace internal
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   (std::vector<types::global_dof_index>::size_type)(-1)))
+                                   (DoFLevel::offset_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_lines(level) - dof_handler.tria->n_active_lines(level),
                       ExcInternalError());
@@ -654,7 +664,7 @@ namespace internal
           // active_fe_indices field which
           // we have to backup before
           {
-            std::vector<std::vector<unsigned int> >
+            std::vector<std::vector<DoFLevel::active_fe_index_type> >
             active_fe_backup(dof_handler.levels.size ());
             for (unsigned int level = 0; level<dof_handler.levels.size (); ++level)
               std::swap (dof_handler.levels[level]->active_fe_indices,
@@ -668,11 +678,11 @@ namespace internal
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
               {
-                dof_handler.levels.push_back (new internal::hp::DoFLevel<dim>);
+                dof_handler.levels.push_back (new internal::hp::DoFLevel);
                 std::swap (active_fe_backup[level],
                            dof_handler.levels[level]->active_fe_indices);
               }
-            dof_handler.faces = new internal::hp::DoFFaces<2>;
+            dof_handler.faces = new internal::hp::DoFIndicesOnFaces<2>;
           }
 
 
@@ -695,11 +705,16 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_offsets
-                = std::vector<std::vector<types::global_dof_index>::size_type> (
+                = std::vector<DoFLevel::offset_type> (
                     dof_handler.tria->n_raw_quads(level),
-                    (std::vector<types::global_dof_index>::size_type)(-1));
+                    (DoFLevel::offset_type)(-1));
+              dof_handler.levels[level]->cell_cache_offsets
+                = std::vector<DoFLevel::offset_type> (
+                    dof_handler.tria->n_raw_quads(level),
+                    (DoFLevel::offset_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
+              types::global_dof_index cache_size = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -707,10 +722,16 @@ namespace internal
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
                     next_free_dof += cell->get_fe().dofs_per_quad;
+
+                    dof_handler.levels[level]->cell_cache_offsets[cell->index()] = cache_size;
+                    cache_size += cell->get_fe().dofs_per_cell;
                   }
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+              dof_handler.levels[level]->cell_dof_indices_cache
+                = std::vector<types::global_dof_index> (cache_size,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
@@ -736,7 +757,7 @@ namespace internal
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   (std::vector<types::global_dof_index>::size_type)(-1)))
+                                   (DoFLevel::offset_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_quads(level) - dof_handler.tria->n_active_quads(level),
                       ExcInternalError());
@@ -750,7 +771,7 @@ namespace internal
           // then allocate as much space as
           // we need and prime the linked
           // list for lines (see the
-          // description in hp::DoFLevels)
+          // description in hp::DoFLevel)
           // with the indices we will
           // need. note that our task is
           // more complicated since two
@@ -847,9 +868,8 @@ namespace internal
             // active ones will have a
             // non-invalid value later on
             dof_handler.faces->lines.dof_offsets
-              = std::vector<std::vector<types::global_dof_index>::size_type>
-                                                     (dof_handler.tria->n_raw_lines(),
-                                                     (std::vector<types::global_dof_index>::size_type)(-1));
+              = std::vector<unsigned int> (dof_handler.tria->n_raw_lines(),
+                                             (unsigned int)(-1));
             dof_handler.faces->lines.dofs
               = std::vector<types::global_dof_index> (n_line_slots,
                                                       DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -1020,7 +1040,7 @@ namespace internal
           // active_fe_indices field which
           // we have to backup before
           {
-            std::vector<std::vector<unsigned int> >
+            std::vector<std::vector<DoFLevel::active_fe_index_type> >
             active_fe_backup(dof_handler.levels.size ());
             for (unsigned int level = 0; level<dof_handler.levels.size (); ++level)
               std::swap (dof_handler.levels[level]->active_fe_indices,
@@ -1034,11 +1054,11 @@ namespace internal
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
               {
-                dof_handler.levels.push_back (new internal::hp::DoFLevel<dim>);
+                dof_handler.levels.push_back (new internal::hp::DoFLevel);
                 std::swap (active_fe_backup[level],
                            dof_handler.levels[level]->active_fe_indices);
               }
-            dof_handler.faces = new internal::hp::DoFFaces<3>;
+            dof_handler.faces = new internal::hp::DoFIndicesOnFaces<3>;
           }
 
 
@@ -1061,11 +1081,16 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_offsets
-                = std::vector<std::vector<types::global_dof_index>::size_type>
-                                                       (dof_handler.tria->n_raw_hexs(level),
-                                                       (std::vector<types::global_dof_index>::size_type)(-1));
+                = std::vector<DoFLevel::offset_type> (
+                    dof_handler.tria->n_raw_hexs(level),
+                    (DoFLevel::offset_type)(-1));
+              dof_handler.levels[level]->cell_cache_offsets
+                = std::vector<DoFLevel::offset_type> (
+                    dof_handler.tria->n_raw_hexs(level),
+                    (DoFLevel::offset_type)(-1));
 
               types::global_dof_index next_free_dof = 0;
+              types::global_dof_index cache_size = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -1073,10 +1098,16 @@ namespace internal
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
                     next_free_dof += cell->get_fe().dofs_per_hex;
+
+                    dof_handler.levels[level]->cell_cache_offsets[cell->index()] = cache_size;
+                    cache_size += cell->get_fe().dofs_per_cell;
                   }
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+              dof_handler.levels[level]->cell_dof_indices_cache
+                = std::vector<types::global_dof_index> (cache_size,
                                                         DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
@@ -1102,7 +1133,7 @@ namespace internal
               Assert (static_cast<unsigned int>
                       (std::count (dof_handler.levels[level]->dof_offsets.begin(),
                                    dof_handler.levels[level]->dof_offsets.end(),
-                                   (std::vector<types::global_dof_index>::size_type)(-1)))
+                                   (DoFLevel::offset_type)(-1)))
                       ==
                       dof_handler.tria->n_raw_hexs(level) - dof_handler.tria->n_active_hexs(level),
                       ExcInternalError());
@@ -1116,7 +1147,7 @@ namespace internal
           // then allocate as much space as
           // we need and prime the linked
           // list for quad (see the
-          // description in hp::DoFLevels)
+          // description in hp::DoFLevel)
           // with the indices we will
           // need. note that our task is
           // more complicated since two
@@ -1217,9 +1248,9 @@ namespace internal
             if (true)
               {
                 dof_handler.faces->quads.dof_offsets
-                  = std::vector<std::vector<types::global_dof_index>::size_type>
+                  = std::vector<unsigned int>
                                                          (dof_handler.tria->n_raw_quads(),
-                                                         (std::vector<types::global_dof_index>::size_type)(-1));
+                                                         (unsigned int)(-1));
                 dof_handler.faces->quads.dofs
                   = std::vector<types::global_dof_index> (n_quad_slots,
                                                           DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -2691,6 +2722,14 @@ namespace hp
       = std::vector<IndexSet> (1,
                                number_cache.locally_owned_dofs);
 
+    // update the cache used for cell dof indices and compress the data on the levels
+    for (active_cell_iterator cell = begin_active();
+         cell != end(); ++cell)
+      cell->update_cell_dof_indices_cache ();
+
+    for (unsigned int level=0; level<levels.size(); ++level)
+      levels[level]->compress_data (*finite_elements);
+
     // finally restore the user flags
     const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);
   }
@@ -2727,7 +2766,22 @@ namespace hp
       }
 #endif
 
+    // uncompress the internal storage scheme of dofs on cells
+    // so that we can access dofs in turns
+    for (unsigned int level=0; level<levels.size(); ++level)
+      levels[level]->uncompress_data (*finite_elements);
+
+    // do the renumbering
     renumber_dofs_internal (new_numbers, dealii::internal::int2type<dim>());
+
+    // update the cache used for cell dof indices
+    for (active_cell_iterator cell = begin_active();
+         cell != end(); ++cell)
+      cell->update_cell_dof_indices_cache ();
+
+    // now re-compress the dof indices
+    for (unsigned int level=0; level<levels.size(); ++level)
+      levels[level]->compress_data (*finite_elements);
   }
 
 
@@ -3088,7 +3142,7 @@ namespace hp
     // Create sufficiently many
     // hp::DoFLevels.
     while (levels.size () < tria->n_levels ())
-      levels.push_back (new dealii::internal::hp::DoFLevel<dim>);
+      levels.push_back (new dealii::internal::hp::DoFLevel);
 
     // then make sure that on each
     // level we have the appropriate
@@ -3164,7 +3218,7 @@ namespace hp
     // Normally only one level is added, but if this Triangulation
     // is created by copy_triangulation, it can be more than one level.
     while (levels.size () < tria->n_levels ())
-      levels.push_back (new dealii::internal::hp::DoFLevel<dim>);
+      levels.push_back (new dealii::internal::hp::DoFLevel);
 
     // Coarsening can lead to the loss
     // of levels. Hence remove them.

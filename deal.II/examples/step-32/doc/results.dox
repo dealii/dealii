@@ -471,3 +471,12 @@ solution we are really interested in better than the criterion used
 here, namely the KellyErrorEstimator applied to the temperature, is
 able to.
 </ul>
+
+
+<h3> Possible extensions </h3>
+
+There are many ways to extend the current program. However, rather than
+discussing them here, let us point to the much larger open
+source code Aspect (see http://aspect.dealii.org/ ) that constitutes the
+further development of step-32 and that already includes many such possible
+extensions.

@@ -1230,14 +1230,7 @@ namespace internal
                           dealii::types::subdomain_id dest = child->subdomain_id();
                           Assert(dest != dealii::numbers::artificial_subdomain_id, ExcInternalError());
                           if (dest != tria.locally_owned_subdomain())
-                            {
-                              if (send_to.find(dest) == send_to.end())
-                                {
-                                  std::cout << "********" << std::endl;
-                                }
-                              send_to.insert(dest);
-
-                            }
+                            send_to.insert(dest);
                         }
 
                     }
@@ -1840,6 +1833,10 @@ namespace internal
               MPI_Get_count(&status, MPI_BYTE, &len);
               receive.resize(len);
 
+#ifdef DEBUG
+              Assert(senders.find(status.MPI_SOURCE)!=senders.end(), ExcInternalError());
+#endif
+
               char *ptr = &receive[0];
               MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                        tr->get_communicator(), &status);
@@ -1895,8 +1892,8 @@ namespace internal
             unsigned int sent=needs_to_get_cells.size();
             unsigned int recv=senders.size();
 
-            MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
-            MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
+            MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 56345, tr->get_communicator());
+            MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 56346, tr->get_communicator());
             Assert(sum_send==sum_recv, ExcInternalError());
           }
 #endif

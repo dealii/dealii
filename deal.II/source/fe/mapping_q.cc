@@ -558,7 +558,7 @@ MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const
   // this
   for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
     Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
-                                     lohvs[unit_point].end(),0.) - 1)<1e-12*this->degree*this->degree,
+                                     lohvs[unit_point].end(),0.) - 1)<1e-13*this->degree,
            ExcInternalError());
 }
 

@@ -48,12 +48,18 @@ cells dofs      val L2        grad L2      val L2-post
 
 
 One can see the error reduction upon grid refinement, and for the cases where
-global refinement was performed, also the convergence rates can be seen. The
-quadratic convergence rates of Q1 elements in the $L_2$ norm for both the
-scalar variable and the gradient variable can clearly be seen, as is the cubic
-rate for the postprocessed scalar variable in the $L_2$ norm. Likewise, the
-scalar variable and gradient for Q3 elements converge at fourth order and the
-postprocessed scalar variable at fifth order.
+global refinement was performed, also the convergence rates. The quadratic
+convergence rates of Q1 elements in the $L_2$ norm for both the scalar
+variable and the gradient variable is apparent, as is the cubic rate for the
+postprocessed scalar variable in the $L_2$ norm. Note that is is a distinctive
+feature of an HDG solution. In typical continuous finite element, the gradient
+of the solution of order <i>p</i> converges at rate <i>p</i> only, as opposed
+to <i>p</i>+1 for the actual solution. Even though superconvergence results
+for finite elements are also available (e.g. superconvergent patch recovery
+first introduced by Zienkiewicz and Zhu), these are typically limited to
+structured meshes and other special cases. Likewise, the scalar variable and
+gradient for Q3 elements converge at fourth order and the postprocessed scalar
+variable at fifth order.
 
 The same convergence rates are observed in 3d.
 @code
@@ -168,10 +174,10 @@ runtime of the program. This also gives a clear indication of where an
 improvement makes most sense.
 
 <ol>
-  <li> Better linear solvers: We use a GMRES iterative solver without
+  <li> Better linear solvers: We use a BiCGStab iterative solver without
   preconditioner, where the number of iteration increases with increasing
   problem size (the number of iterations for Q1 elements and global
-  refinements start at 8 for the small sizes but increase up to 2592 for the
+  refinements start at 35 for the small sizes but increase up to 701 for the
   largest size). To do better, one could for example use an algebraic
   multigrid preconditioner from Trilinos. For diffusion-dominated problems as
   the problem at hand with finer meshes, such a solver can be designed that
@@ -180,5 +186,5 @@ improvement makes most sense.
 
   <li> Speed up assembly by pre-assembling parts that do not change from one
   cell to another (those that do neither contain variable coefficients nor
-  mapping-dependent terms.
+  mapping-dependent terms).
 </ol>

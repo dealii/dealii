@@ -16,14 +16,28 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+SET(_src
+  mg_base.cc
+  mg_dof_handler.cc
+  mg_tools.cc
+  mg_transfer_block.cc
+  mg_transfer_component.cc
+  mg_transfer_prebuilt.cc
+  multigrid.cc
+  )
+
+SET(_inst
+  mg_base.inst.in
+  mg_dof_handler.inst.in
+  mg_tools.inst.in
+  mg_transfer_block.inst.in
+  mg_transfer_component.inst.in
+  mg_transfer_prebuilt.inst.in
+  multigrid.inst.in
+  )
+
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/multigrid/*.h
-  )
-FILE(GLOB _src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
-  )
-FILE(GLOB _inst RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_multigrid OBJECT ${_src} ${_header} ${_inst})

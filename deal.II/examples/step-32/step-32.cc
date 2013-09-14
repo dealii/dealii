@@ -113,7 +113,7 @@ namespace Step32
   namespace EquationData
   {
     const double eta                   = 1e21;    /* Pa s       */
-    const double kappa                 = 1e-6;    /* m / s      */
+    const double kappa                 = 1e-6;    /* m^2 / s    */
     const double reference_density     = 3300;    /* kg / m^3   */
     const double reference_temperature = 293;     /* K          */
     const double expansion_coefficient = 2e-5;    /* 1/K        */
@@ -3328,7 +3328,7 @@ namespace Step32
                 }
           }
     }
-    
+
     joint_solution.compress(VectorOperation::insert);
 
     IndexSet locally_relevant_joint_dofs(joint_dof_handler.n_dofs());

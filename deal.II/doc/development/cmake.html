@@ -419,15 +419,17 @@
     you may receive an error message of the form:</p>
 
 <pre>
-CMake Warning at source/CMakeLists.txt:65 (ADD_LIBRARY):
-  Cannot generate a safe runtime search path for target deal_II.g because
-  files in some directories may conflict with libraries in implicit
-  directories:
 
-    runtime library [libtbb.so.2] in /usr/lib may be hidden by files in:
-      /my/private/lib
+    CMake Warning at source/CMakeLists.txt:65 (ADD_LIBRARY):
+      Cannot generate a safe runtime search path for target deal_II.g because
+      files in some directories may conflict with libraries in implicit
+      directories:
 
-  Some of these libraries may not be found correctly.
+        runtime library [libtbb.so.2] in /usr/lib may be hidden by files in:
+          /my/private/lib
+
+      Some of these libraries may not be found correctly.
+
 </pre>
 
 <p>This is not a problem of CMake or deal.II, but rather a general

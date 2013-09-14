@@ -1,3 +1,9 @@
+<br>
+
+<i>
+This program was contributed by Martin Kronbichler and Scott Miller.
+</i>
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
@@ -8,9 +14,13 @@ discontinuous Galkerin method for the convection-diffusion equation.
 
 One common argument against the use of discontinuous Galerkin elements
 is the large number of globally coupled degrees of freedom that one
-must solve in an implicit system.  For the FE_DGP_Monomial basis, each 
-scalar solution component is represented by polynomials of degree p
-which yields $(1/dim!)*\prod_{i=1}^{dim}(k+i)$ degrees of freedom per
+must solve in an implicit system.  This is because, unlike continuous finite
+elements, in typical discontinuous elements there is one degree of freedom at
+each vertex <i>for each of the adjacent elements</i>, rather than just one,
+and similarly for edges and faces.  As another example,
+for the FE_DGP_Monomial basis, each 
+scalar solution component is represented by polynomials of degree $p$
+which yields $(1/dim!)*\prod_{i=1}^{dim}(p+i)$ degrees of freedom per
 element.  Typically, all degrees of freedom in an element are coupled
 to all of the degrees of freedom in the adjacent elements.  The resulting
 discrete equations yield very large linear systems very quickly, especially
@@ -18,9 +28,10 @@ for systems of equations in dim=2 or dim=3.
 
 <h4> Reducing the size of the linear system </h4>
 To alleviate the computational cost of solving such large linear systems, 
-the hybridizable discontinuous Galerkin (HDG) methodology has recently been 
-developed by Cockburn and co-workers 
-(N.C. Nguyen and J. Peraire:
+the hybridizable discontinuous Galerkin (HDG) methodology was introduced
+by Cockburn and co-workers 
+(see the references in the recent HDG overview article by 
+ N.C. Nguyen and J. Peraire:
    <i>Hybridizable discontinuous Galerkin methods for partial differential 
    equations in continuum mechanics</i>, Journal of Computational Physics,
    2012, 231:18, 5955-5988.
@@ -29,9 +40,9 @@ The HDG method achieves
 this goal by formulating the mathematical problem using Dirichlet-to-Neumann
 mappings.  The partial differential equations are first written as a first
 order system, and each field is then discretized via a DG method.  At this
-point the  single-valued ``trace'' values on the skeleton of the
-mesh, i.e. element edges, are taken to be independent unknown quantities.  
-The Dirichlet-to-Neumann map concept then permits the solution procedure:
+point the  single-valued "trace" values on the skeleton of the
+mesh, i.e. element faces, are taken to be independent unknown quantities.  
+The Dirichlet-to-Neumann map concept then permits the following solution procedure:
 <ol>
   <li>  Use local element interior data to enforce a Neumann condition on the 
 skeleton of the triangulation.  The global problem is then to solve for the 
@@ -58,21 +69,20 @@ approach similar to step-20, which results in the following two steps:
 (D - C A^{-1} B) \Lambda &=& G - C A^{-1} F \\
 A U &=& F - B \Lambda
 @f}
-The steps in the Dirichlet-to-Neumann map concept hence correspond to
+The point is that the presence of $A^{-1}$ is not a problem because $A$ is a
+block diagonal matrix where each block corresponds to one cell and is
+therefore easy enough to invert.
+The coupling to other cells is introduced by the matrices
+<i>B</i> and <i>C</i> over the skeleton variable. The block-diagonality of
+<i>A</i> and the structure in <i>B</i> and <i>C</i> allow us to invert the
+matrix <i>A</i> element by element (the local solution of the Dirichlet
+problem) and subtract $CA^{-1}B$ from $D$. The steps in the Dirichlet-to-Neumann map concept hence correspond to
 <ol>
   <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand side $G - C A^{-1} F$,
   <li> solving the Schur complement system for $\Lambda$, and
   <li> solving the equation for <i>U</i> using the second equation which uses $\Lambda$.
 </ol>
 
-The important ingredient from the linear algebra point of view is that the
-matrix <i>A</i> is block-diagonal with block size equal to the number of
-degrees of freedom of the interior DG variables which are always only related
-to a single cell. The coupling to other cells is introduced by the matrices
-<i>B</i> and <i>C</i> over the skeleton variable. The block-diagonality of
-<i>A</i> and the structure in <i>B</i> and <i>C</i> allow us to invert the
-matrix <i>A</i> element by element (the local solution of the Dirichlet
-problem) and subtract $CA^{-1}B$ from $D$.
 
 <h4> Solution quality and rates of convergence</h4>
 Another criticism of traditional DG methods is that the approximate fluxes
@@ -117,24 +127,35 @@ the above equation as the first order system:
 We multiply these equations by the weight functions $\mathbf{v}, w$ 
 and integrate by parts over every element $K$ to obtain:
 @f{eqnarray*}
-  (\kappa^{-1} \mathbf{q}, \mathbf{v})_K - (u, \nabla\cdot\mathbf{v})_K
-    + <\hat{u}, \mathbf{v}\cdot\mathbf{n}>_{\partial K} &=& 0, \\
-  - (\mathbf{c} u + \mathbf{q}, \nabla w)_K 
-    + <(\hat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}, w>_{\partial K}
-    &=& (f,w)_K.
+  (\mathbf{v}, \kappa^{-1} \mathbf{q})_K - (\nabla\cdot\mathbf{v}, u)_K
+    + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}\right>_{\partial K} &=& 0, \\
+  - (\nabla w, \mathbf{c} u + \mathbf{q})_K 
+    + \left<(w, \hat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}\right>_{\partial K}
+    &=& (w,f)_K.
 @f}
 
-The terms decorated with a $\hat{}$ denote the numerical traces (also commonly referred
+The terms decorated with a hat denote the numerical traces (also commonly referred
 to as numerical fluxes).   They are approximations
 to the interior values on the boundary of the element.  To ensure conservation, 
-these terms must be single-valued on any given element edge $\partial K$.
+these terms must be single-valued on any given element edge $\partial K$ even
+though, with discontinuous shape functions, there may of course be multiple
+values coming from the cells adjacent to an interface.
 We eliminate the numerical trace $\hat{\mathbf{q}}$ by using traces of the form:
 @f{eqnarray*}
   \hat{\mathbf{c} u}+\hat{\mathbf{q}} = \mathbf{c}\hat{u} + \mathbf{q}
   + \tau(u - \hat{u})\mathbf{n} \quad \text{ on } \partial K.
 @f}
-The local stabilization parameter $\tau$ has effects on stability and accuracy of 
-HDG solutions; see the literature for a further discussion.
+The local stabilization parameter $\tau$ has effects on stability and accuracy
+of HDG solutions; see the literature for a further discussion. A stabilization
+parameter of unity is reported to be the choice which gives best results. A
+stabilization parameter $\tau$ that tends to infinity prohibits jumps in the
+solution over the element boundaries, making the HDG solution approach the
+approximation of continuous finite elements. In the program below, we choose
+the stabilization parameter as
+@f{eqnarray*}
+  \tau = \frac{\kappa}{\ell} + |\mathbf{c} \cdot \mathbf{n}|
+@f}
+where we set the diffusion length scale to $\ell = \frac{1}{5}$.
 
 The trace/skeleton variables in HDG methods are single-valued on element faces.  As such,
 they must strongly represent the Dirichlet data on $\partial\Omega_D$.  We introduce
@@ -148,27 +169,51 @@ a new variable $\lambda$ such that
 @f} 
 
 Eliminating $\hat{u}$ from the weak form in favor of $\lambda$, summing the elemental
-contributions across all elements in the triangulation, and enforcing the normal
-component of the numerical flux, we arrive at the final form of the problem:  
-Find $(\mathbf{q}, u, \lambda)$ such that
-TODO:  update this equation!
+contributions across all elements in the triangulation, enforcing the normal
+component of the numerical flux, and integrating by parts
+on the equation weighted by $w$, we arrive at the final form of the problem:  
+Find $(\mathbf{q}_h, u_h, \lambda_h) \in 
+\mathcal{V}_h^p \times \mathcal{W}_h^p \times \mathcal{M}_h^p$ such that
 @f{eqnarray*}
-  (\kappa^{-1} \mathbf{q}, \mathbf{v})_{\mathcal{T}}
-    - (u, \nabla\cdot\mathbf{v})_{\mathcal{T}}
-    + <\lambda, \mathbf{v}\cdot\mathbf{n}>_{\partial\mathcal{T}}
+  (\mathbf{v}, \kappa^{-1} \mathbf{q}_h)_{\mathcal{T}}
+    - ( \nabla\cdot\mathbf{v}, u_h)_{\mathcal{T}}
+    + \left<\mathbf{v}\cdot\mathbf{n}, \lambda_h\right>_{\partial\mathcal{T}}
     &=&
-    - <g_D, \mathbf{v}\cdot\mathbf{n}>_{\partial\Omega_D},
+    - \left<\mathbf{v}\cdot\mathbf{n}, g_D\right>_{\partial\Omega_D},
+    \quad \forall \mathbf{v} \in \mathcal{V}_h^p,
 \\
-  - (\mathbf{c} u + \mathbf{q}, \nabla w)_{\mathcal{T}}
-    + <(\hat{\mathbf{c}u} + \hat{\mathbf{q}})\cdot\mathbf{n}, w>_{\partial \mathcal{T}}
+   (w, \mathbf{c}\nabla u_h + \nabla \cdot \mathbf{q}_h)_{\mathcal{T}}
+    + \left<w, \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
     &=&
-    (f, w)_{\mathcal{T}},
+    (w, f)_{\mathcal{T}},
+    \quad \forall w \in \mathcal{W}_h^p,
 \\
-  < \left[ \negthinspace \left[ (\hat{\mathbf{c}u} + \hat{\mathbf{q}})\cdot\mathbf{n}
-    \right] \negthinspace \right], \mu>_{\partial \mathcal{T}}
+  \left< \mu, \mathbf{c} \lambda_h\cdot \mathbf{n} 
+  		+ \mathbf{q}_h\cdot \mathbf{n}
+  	    + \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
     &=&
-    <g_N, \mu>_{\partial\Omega_N}
+    \left<\mu, g_N\right>_{\partial\Omega_N},
+    \quad \forall \mu \in \mathcal{M}_h^p.
 @f}
+
+The unknowns $(\mathbf{q}_h, u_h)$ are referred to as local variables; they are 
+represented as standard DG variables.  The unknown $\lambda_h$ is the skeleton 
+variable which has support on the codimension-1 surfaces (faces) of the mesh.
+In the weak form given above, we can note the following coupling patterns:
+<ol>
+  <li> The matrix $A$ consists of local-local coupling terms.  These arise when the
+  local weighting functions $(\mathbf{v}, w)$ multiply the local solution terms 
+  $(\mathbf{q}_h, u_h)$.
+  <li> The matrix $B$ represents the local-face coupling.  These are the terms 
+  with weighting functions $(\mathbf{v}, w)$ multiplying the skeleton variable 
+  $\lambda_h$.
+  <li> The matrix $C$ represents the face-local coupling, which involves the 
+  weighting function $\mu$ multiplying the local solutions $(\mathbf{q}_h, u_h)$.
+  <li>  The matrix $D$ is the face-face coupling; 
+  terms involve both $\mu$ and $\lambda_h$.
+</ol>
+
+<h4> Post-processing and super-convergence </h4>
 
 
 <h3> Problem specific data </h3>
@@ -203,3 +248,4 @@ Implementation notes:
 - Reconstructing the trace
 - Post-processing the solution for superconvergence
 - DataOutFaces:  direct output of the global solution
+

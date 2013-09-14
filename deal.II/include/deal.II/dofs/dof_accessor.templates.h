@@ -2556,14 +2556,43 @@ namespace internal
       template <int dim, int spacedim, bool lda>
       static
       void
-      update_cell_dof_indices_cache (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &)
+      update_cell_dof_indices_cache (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &accessor)
       {
-//TODO[WB]: should implement a dof indices cache for hp as well
+        // caches are only for cells with DoFs, i.e., for active ones
+        if (accessor.has_children())
+          return;
 
-        // not implemented, but should also
-        // not be called
-        Assert (false, ExcNotImplemented());
+        const unsigned int dofs_per_cell   = accessor.get_fe().dofs_per_cell;
+
+        // make sure the cache is at least
+        // as big as we need it when
+        // writing to the last element of
+        // this cell
+        Assert (static_cast<unsigned int>(accessor.present_index)
+                <
+                accessor.dof_handler->levels[accessor.present_level]
+                                             ->cell_cache_offsets.size(),
+                ExcInternalError());
+        Assert (accessor.dof_handler->levels[accessor.present_level]
+                ->cell_cache_offsets[accessor.present_index]
+                <=
+                accessor.dof_handler->levels[accessor.present_level]
+                ->cell_dof_indices_cache.size(),
+                ExcInternalError());
+
+        std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
+        static_cast<const dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim>,lda> &>
+          (accessor).get_dof_indices (dof_indices, accessor.active_fe_index());
+
+        types::global_dof_index *next_dof_index
+        = &accessor.dof_handler->levels[accessor.present_level]
+           ->cell_dof_indices_cache[accessor.dof_handler->levels[accessor.present_level]
+                                                                 ->cell_cache_offsets[accessor.present_index]];
+        for (unsigned int i=0; i<dofs_per_cell; ++i, ++next_dof_index)
+          *next_dof_index = dof_indices[i];
       }
+
+
 
       /**
        * Implement setting dof
@@ -2723,238 +2752,6 @@ namespace internal
         Assert (false, ExcNotImplemented());
       }
 
-
-      /**
-       * A function that collects the
-       * global indices of degrees of
-       * freedom. This function works
-       * for ::DoFHandler and all
-       * template arguments and copies
-       * the data out of the cache that
-       * we hold for each cell.
-       */
-      template <int dim, int spacedim, bool lda>
-      static
-      void
-      get_dof_indices (const DoFCellAccessor<DoFHandler<dim,spacedim>, lda> &accessor,
-                       std::vector<types::global_dof_index>                        &dof_indices)
-      {
-        AssertDimension (dof_indices.size(), accessor.get_fe().dofs_per_cell);
-
-        Assert (!accessor.has_children(),
-                ExcMessage ("Cell must be active."));
-
-        types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
-                                         ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
-        for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
-          dof_indices[i] = *cache;
-      }
-
-      /**
-       * Same function as above except
-       * that it works for
-       * hp::DoFHandler objects that do
-       * not have a cache for the local
-       * DoF indices.
-       */
-      template <int dim, int spacedim, bool lda>
-      static
-      void
-      get_dof_indices (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &accessor,
-                       std::vector<types::global_dof_index>                            &dof_indices)
-      {
-        // no caching for
-        // hp::DoFHandler
-        // implemented
-        typedef
-        dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim>, lda>
-        DoFAccessor;
-        accessor.DoFAccessor::get_dof_indices (dof_indices,
-                                               accessor.active_fe_index());
-      }
-
-      /**
-       * A function that collects the
-       * values of degrees of freedom. This
-       * function works for ::DoFHandler
-       * and all template arguments and
-       * uses the data from the cache of
-       * indices that we hold for each
-       * cell.
-       */
-      template <int dim, int spacedim, bool lda, class InputVector, typename ForwardIterator>
-      static
-      void
-      get_dof_values (const DoFCellAccessor<DoFHandler<dim,spacedim>, lda> &accessor,
-                      const InputVector &values,
-                      ForwardIterator    local_values_begin,
-                      ForwardIterator    local_values_end)
-      {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, lda> BaseClass;
-        Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
-                == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
-        Assert (values.size() == accessor.get_dof_handler().n_dofs(),
-                typename BaseClass::ExcVectorDoesNotMatch());
-
-        Assert (!accessor.has_children(),
-                ExcMessage ("Cell must be active."));
-
-        types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
-                                         ->cell_dof_indices_cache[accessor.present_index *
-                                                                  accessor.get_fe().dofs_per_cell];
-
-        values.extract_subvector_to (cache,
-				     cache + accessor.get_fe().dofs_per_cell,
-				     local_values_begin);
-      }
-
-      /**
-       * Same function as above except
-       * that it works for
-       * hp::DoFHandler objects that do
-       * not have a cache for the local
-       * DoF indices.
-       */
-      template <int dim, int spacedim, bool lda, class InputVector, typename ForwardIterator>
-      static
-      void
-      get_dof_values (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &accessor,
-                      const InputVector &values,
-                      ForwardIterator    local_values_begin,
-                      ForwardIterator    local_values_end)
-      {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, lda> BaseClass;
-
-        // no caching for hp::DoFHandler
-        // implemented
-        Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
-                == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
-        const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
-
-        std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-        get_dof_indices (accessor, local_dof_indices);
-
-        values.extract_subvector_to (local_dof_indices.begin(),
-				     local_dof_indices.end(),
-				     local_values_begin);
-      }
-
-
-      /**
-       * A function that collects the
-       * values of degrees of freedom. This
-       * function works for ::DoFHandler
-       * and all template arguments and
-       * uses the data from the cache of
-       * indices that we hold for each
-       * cell.
-       */
-      template <int dim, int spacedim, bool lda, class InputVector, typename ForwardIterator>
-      static
-      void
-      get_dof_values (const DoFCellAccessor<DoFHandler<dim,spacedim>, lda> &accessor,
-                      const ConstraintMatrix &constraints,
-                      const InputVector      &values,
-                      ForwardIterator         local_values_begin,
-                      ForwardIterator         local_values_end)
-      {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, lda> BaseClass;
-        Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
-                == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
-        Assert (values.size() == accessor.get_dof_handler().n_dofs(),
-                typename BaseClass::ExcVectorDoesNotMatch());
-
-        Assert (!accessor.has_children(),
-                ExcMessage ("Cell must be active."));
-
-        types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
-                                         ->cell_dof_indices_cache[accessor.present_index *
-                                                                  accessor.get_fe().dofs_per_cell];
-        constraints.get_dof_values(values, *cache, local_values_begin,
-                                   local_values_end);
-      }
-
-      /**
-       * Same function as above except
-       * that it works for
-       * hp::DoFHandler objects that do
-       * not have a cache for the local
-       * DoF indices.
-       */
-      template <int dim, int spacedim, bool lda, class InputVector, typename ForwardIterator>
-      static
-      void
-      get_dof_values (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &accessor,
-                      const ConstraintMatrix &constraints,
-                      const InputVector      &values,
-                      ForwardIterator         local_values_begin,
-                      ForwardIterator         local_values_end)
-      {
-        // no caching for hp::DoFHandler
-        // implemented
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, lda> BaseClass;
-        Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
-                == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
-        const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
-
-        std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-        get_dof_indices (accessor, local_dof_indices);
-
-        constraints.get_dof_values (values, local_dof_indices.begin(),
-                                    local_values_begin, local_values_end);
-      }
-
-
-      /**
-       * Same set of functions as above
-       * except that it sets rather than
-       * gets values
-       */
-      template <int dim, int spacedim, bool lda, class OutputVector, typename number>
-      static
-      void
-      set_dof_values (const DoFCellAccessor<DoFHandler<dim,spacedim>, lda> &accessor,
-                      const dealii::Vector<number> &local_values,
-                      OutputVector &values)
-      {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, lda> BaseClass;
-        Assert (local_values.size() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
-        Assert (values.size() == accessor.get_dof_handler().n_dofs(),
-                typename BaseClass::ExcVectorDoesNotMatch());
-
-        Assert (!accessor.has_children(),
-                ExcMessage ("Cell must be active."));
-
-        types::global_dof_index *cache = &accessor.dof_handler->levels[accessor.level()]
-                                         ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
-        for (unsigned int i=0; i<accessor.get_fe().dofs_per_cell; ++i, ++cache)
-          values(*cache) = local_values(i);
-      }
-
-
-
-      template <int dim, int spacedim, bool lda, class OutputVector, typename number>
-      static
-      void
-      set_dof_values (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &accessor,
-                      const dealii::Vector<number> &local_values,
-                      OutputVector &values)
-      {
-        // no caching for hp::DoFHandler
-        // implemented
-        const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
-
-        std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-        get_dof_indices (accessor, local_dof_indices);
-
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          values(local_dof_indices[i]) = local_values(i);
-      }
 
 
       /**
@@ -3489,7 +3286,11 @@ DoFCellAccessor<DH,lda>::get_dof_indices (std::vector<types::global_dof_index> &
           ExcMessage ("Can't ask for DoF indices on artificial cells."));
   AssertDimension (dof_indices.size(), this->get_fe().dofs_per_cell);
 
-  dealii::internal::DoFCellAccessor::Implementation::get_dof_indices (*this, dof_indices);
+  const types::global_dof_index *cache
+  = this->dof_handler->levels[this->present_level]
+    ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
+  for (unsigned int i=0; i<this->get_fe().dofs_per_cell; ++i, ++cache)
+    dof_indices[i] = *cache;
 }
 
 
@@ -3531,12 +3332,7 @@ void
 DoFCellAccessor<DH,lda>::get_dof_values (const InputVector &values,
                                          Vector<number>    &local_values) const
 {
-  Assert (this->is_artificial() == false,
-          ExcMessage ("Can't ask for DoF indices on artificial cells."));
-  AssertDimension (local_values.size(), this->get_fe().dofs_per_cell);
-
-  dealii::internal::DoFCellAccessor::Implementation
-  ::get_dof_values (*this, values, local_values.begin(), local_values.end());
+  get_dof_values (values, local_values.begin(), local_values.end());
 }
 
 
@@ -3551,8 +3347,22 @@ DoFCellAccessor<DH,lda>::get_dof_values (const InputVector &values,
 {
   Assert (this->is_artificial() == false,
           ExcMessage ("Can't ask for DoF indices on artificial cells."));
-  dealii::internal::DoFCellAccessor::Implementation
-  ::get_dof_values (*this, values, local_values_begin, local_values_end);
+  Assert (!this->has_children(),
+          ExcMessage ("Cell must be active."));
+
+  Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
+          == this->get_fe().dofs_per_cell,
+          typename DoFCellAccessor::ExcVectorDoesNotMatch());
+  Assert (values.size() == this->get_dof_handler().n_dofs(),
+          typename DoFCellAccessor::ExcVectorDoesNotMatch());
+
+  const types::global_dof_index *cache
+  = this->dof_handler->levels[this->present_level]
+    ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
+
+  values.extract_subvector_to (cache,
+                               cache + this->get_fe().dofs_per_cell,
+                               local_values_begin);
 }
 
 
@@ -3568,9 +3378,22 @@ DoFCellAccessor<DH,lda>::get_dof_values (const ConstraintMatrix &constraints,
 {
   Assert (this->is_artificial() == false,
           ExcMessage ("Can't ask for DoF indices on artificial cells."));
-  dealii::internal::DoFCellAccessor::Implementation
-  ::get_dof_values (*this, constraints, values,
-                    local_values_begin, local_values_end);
+  Assert (!this->has_children(),
+          ExcMessage ("Cell must be active."));
+
+  Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
+          == this->get_fe().dofs_per_cell,
+          typename DoFCellAccessor::ExcVectorDoesNotMatch());
+  Assert (values.size() == this->get_dof_handler().n_dofs(),
+      typename DoFCellAccessor::ExcVectorDoesNotMatch());
+
+
+  const types::global_dof_index *cache
+  = this->dof_handler->levels[this->present_level]
+    ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
+
+  constraints.get_dof_values(values, *cache, local_values_begin,
+                             local_values_end);
 }
 
 
@@ -3584,8 +3407,22 @@ DoFCellAccessor<DH,lda>::set_dof_values (const Vector<number> &local_values,
 {
   Assert (this->is_artificial() == false,
           ExcMessage ("Can't ask for DoF indices on artificial cells."));
-  dealii::internal::DoFCellAccessor::Implementation
-  ::set_dof_values (*this, local_values, values);
+  Assert (!this->has_children(),
+          ExcMessage ("Cell must be active."));
+
+  Assert (static_cast<unsigned int>(local_values.size())
+          == this->get_fe().dofs_per_cell,
+          typename DoFCellAccessor::ExcVectorDoesNotMatch());
+  Assert (values.size() == this->get_dof_handler().n_dofs(),
+      typename DoFCellAccessor::ExcVectorDoesNotMatch());
+
+
+  const types::global_dof_index *cache
+  = this->dof_handler->levels[this->present_level]
+    ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
+
+  for (unsigned int i=0; i<this->get_fe().dofs_per_cell; ++i, ++cache)
+    values(*cache) = local_values(i);
 }
 
 
