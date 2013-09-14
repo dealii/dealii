@@ -20,7 +20,8 @@
 
 INCLUDE(setup_testsuite)
 
-MESSAGE(STATUS "Proceed to test definitions")
+MESSAGE(STATUS "")
+MESSAGE(STATUS "Proceed to test definitions now:")
 
 ADD_SUBDIRECTORY(a-framework)
 ADD_SUBDIRECTORY(all-headers)

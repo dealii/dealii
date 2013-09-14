@@ -27,6 +27,8 @@
 MACRO(DEAL_II_PICKUP_TESTS)
   GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
+  MESSAGE(STATUS "Process ./tests/${_category}")
+
   FILE(GLOB _tests "*.output")
   FOREACH(_test ${_tests})
     SET(_comparison ${_test})
@@ -92,5 +94,8 @@ MACRO(DEAL_II_PICKUP_TESTS)
     ENDIF()
 
   ENDFOREACH()
+
+  MESSAGE(STATUS "Process ./tests/${_category} - Done")
+
 ENDMACRO()
 
