@@ -16,15 +16,11 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+SET(_src
+  )
+
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/integrators/*.h
   )
-FILE(GLOB _src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
-  )
-# FILE(GLOB _inst
-#   ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
-#    )
 
 DEAL_II_ADD_LIBRARY(obj_integrators OBJECT ${_src} ${_header})
-#EXPAND_INSTANTIATIONS(obj_hp "${_inst}")

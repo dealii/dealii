@@ -16,14 +16,40 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+SET(_src
+  grid_generator.cc
+  grid_in.cc
+  grid_out.cc
+  grid_refinement.cc
+  grid_reordering.cc
+  grid_tools.cc
+  intergrid_map.cc
+  persistent_tria.cc
+  tria_accessor.cc
+  tria_boundary.cc
+  tria_boundary_lib.cc
+  tria.cc
+  tria_faces.cc
+  tria_levels.cc
+  tria_objects.cc
+  )
+
+SET(_inst
+  grid_generator.inst.in
+  grid_in.inst.in
+  grid_out.inst.in
+  grid_refinement.inst.in
+  grid_tools.inst.in
+  intergrid_map.inst.in
+  tria_accessor.inst.in
+  tria_boundary.inst.in
+  tria_boundary_lib.inst.in
+  tria.inst.in
+  tria_objects.inst.in
+  )
+
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/grid/*.h
-  )
-FILE(GLOB _src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
-  )
-FILE(GLOB _inst RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_grid OBJECT ${_src} ${_header} ${_inst})

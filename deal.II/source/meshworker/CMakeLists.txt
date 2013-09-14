@@ -16,14 +16,19 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+SET(_src
+  mesh_worker.cc
+  mesh_worker_info.cc
+  mesh_worker_vector_selector.cc
+  )
+
+SET(_inst
+  mesh_worker_info.inst.in
+  mesh_worker_vector_selector.inst.in
+  )
+
 FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/meshworker/*.h
-  )
-FILE(GLOB _src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
-  )
-FILE(GLOB _inst RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.inst.in
   )
 
 DEAL_II_ADD_LIBRARY(obj_meshworker OBJECT ${_src} ${_header} ${_inst})
