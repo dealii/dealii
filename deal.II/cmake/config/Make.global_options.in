@@ -23,7 +23,7 @@
 #
 
 
-D                    = @CMAKE_INSTALL_PREFIX@
+D                    = @MAKEFILE_D@
 CXX                  = @CMAKE_CXX_COMPILER@
 CXX-ID               = @CMAKE_CXX_COMPILER_ID@
 CXX-VERSION          = @CMAKE_CXX_COMPILER_VERSION@

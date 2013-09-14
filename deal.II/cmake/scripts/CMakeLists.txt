@@ -15,6 +15,13 @@
 ## ---------------------------------------------------------------------
 
 ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
+
+IF(DEAL_II_COMPONENT_COMPAT_FILES)
+  SET_TARGET_PROPERTIES(expand_instantiations
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/common/scripts
+    )
+ENDIF()
+
 IF(NOT CMAKE_CROSSCOMPILING)
   #
   # Export expand_instantiations for use in cross compilation:
@@ -80,6 +87,10 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   IF(NOT CMAKE_CROSSCOMPILING)
     ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)
   ENDIF()
+
+  SET_TARGET_PROPERTIES(make_dependencies report_features
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/common/scripts
+    )
 
   INSTALL(TARGETS make_dependencies report_features expand_instantiations
     EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets

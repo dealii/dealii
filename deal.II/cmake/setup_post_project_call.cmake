@@ -51,11 +51,3 @@ IF(CMAKE_CROSSCOMPILING)
     )
   INCLUDE(${DEAL_II_NATIVE}/importExecutables.cmake)
 ENDIF()
-
-
-#
-# Cleanup importTargets.cmake
-#
-FILE(REMOVE
-  ${CMAKE_BINARY_DIR}/importTargets.cmake
-  )
