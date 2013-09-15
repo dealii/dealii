@@ -121,7 +121,10 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   #
   # Set up the link interface:
   #
-  TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET})
+  GET_PROPERTY(_type TARGET ${_target} PROPERTY TYPE)
+  IF(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
+    TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET})
+  ENDIF()
 
   #
   # If DEAL_II_STATIC_EXECUTABLE is set, switch the final link type to

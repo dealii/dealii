@@ -23,13 +23,9 @@
 #
 
 SET(_category all-headers)
-
-FILE(GLOB_RECURSE _header
-  ${CMAKE_SOURCE_DIR}/include/*.h
-  )
+FILE(GLOB_RECURSE _header ${CMAKE_SOURCE_DIR}/include/*.h)
 
 FOREACH(_full_file ${_header})
-
   GET_FILENAME_COMPONENT(_file ${_full_file} NAME)
 
   # TODO: A more sophisticated way to get the relative include path:
@@ -44,15 +40,12 @@ FOREACH(_full_file ${_header})
 
     SET(_test ${_category}/${_path}/${_file}.${_build_lowercase})
     SET(_target ${_category}-${_path}-${_file}.${_build_lowercase})
-    #
+
     # Respect TEST_PICKUP_REGEX:
-    #
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${TEST_PICKUP_REGEX}" )
 
-      #
       # Add an object library for each header file and build configuration:
-      #
       ADD_LIBRARY(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc)
       SET_TARGET_PROPERTIES(${_target} PROPERTIES
         COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
@@ -65,13 +58,10 @@ FOREACH(_full_file ${_header})
           "${CMAKE_SOURCE_DIR}/include/deal.II/"
         )
       SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-        COMPILE_DEFINITIONS
-          HEADER=<deal.II/${_path}/${_file}>
+        COMPILE_DEFINITIONS HEADER=<deal.II/${_path}/${_file}>
         )
 
-      #
       # And finally add the test:
-      #
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND}
           -DTRGT=${_target}

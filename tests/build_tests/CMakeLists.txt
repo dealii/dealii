@@ -27,7 +27,6 @@
 
 SET(_category build_tests)
 
-
 # Run a minimalistic set of steps in debug configuration:
 SET(_debug_steps
   step-1  step-2  step-3  step-4  step-5
@@ -44,7 +43,6 @@ SET(_release_steps
   step-47 step-48 step-49
   )
 
-
 FILE(GLOB _steps ${CMAKE_SOURCE_DIR}/examples/step-*)
 FOREACH(_step_full ${_steps})
   GET_FILENAME_COMPONENT(_step ${_step_full} NAME)
@@ -54,9 +52,7 @@ FOREACH(_step_full ${_steps})
 
     SET(_test ${_category}/${_step}.${_build_lowercase})
 
-    #
     # Respect TEST_PICKUP_REGEX:
-    #
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${TEST_PICKUP_REGEX}"  )
 
@@ -133,16 +129,16 @@ FOREACH(_step_full ${_steps})
 
       ITEM_MATCHES(_match ${_step} ${_${_build_lowercase}_steps})
       IF(_match)
+        # Add a full test (CONFIGURE, BUILD, RUN):
         SET(_target ${_category}-${_step}.${_build_lowercase}.run)
         ADD_CUSTOM_TARGET(${_target} DEPENDS ${_step_dir}/run_output)
       ELSE()
+        # Add a minimal test (CONFIGURE, BUILD):
         SET(_target ${_category}-${_step}.${_build_lowercase}.build)
         ADD_CUSTOM_TARGET(${_target} DEPENDS ${_step_dir}/build_output)
       ENDIF()
 
-      #
       # And finally add the test:
-      #
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND}
           -DTRGT=${_target}

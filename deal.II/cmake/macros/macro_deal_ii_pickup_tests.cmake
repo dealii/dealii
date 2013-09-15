@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# A Macro to pick up all tests in a test subdirectory
+# A macro to pick up all tests in a test subdirectory
 #
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
