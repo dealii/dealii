@@ -72,6 +72,17 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${_build_lowercase}
     )
 ENDFOREACH()
+FILE(WRITE
+  ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
+  ""
+  )
+
+#
+# Cleanup deal.IITargets.cmake in the build directory:
+#
+FILE(REMOVE
+  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}BuildTargets.cmake
+  )
 
 
 ########################################################################

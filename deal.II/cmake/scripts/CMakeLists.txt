@@ -14,14 +14,22 @@
 ##
 ## ---------------------------------------------------------------------
 
-ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
 IF(NOT CMAKE_CROSSCOMPILING)
-  #
-  # Export expand_instantiations for use in cross compilation:
-  #
+  ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
+
+  IF(DEAL_II_COMPONENT_COMPAT_FILES)
+    SET_TARGET_PROPERTIES(expand_instantiations
+      PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/common/scripts
+      )
+    INSTALL(TARGETS expand_instantiations
+      EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+      DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
+      COMPONENT compat_files
+      )
+  ENDIF()
+
   EXPORT(TARGETS expand_instantiations
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/importExecutables.cmake
-    NAMESPACE native- # Prefix a namespace
+    FILE ${CMAKE_BINARY_DIR}/importExecutables.cmake
     )
 ENDIF()
 
@@ -30,10 +38,14 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   # Build and install the old dependency_resolution and report_features
   # executables:
   #
+
   INCLUDE_DIRECTORIES(
     BEFORE # Ensure deal.II include directories come first
-    ${CMAKE_BINARY_DIR}/include/
+    #
+    # Reverse order due to BEFORE:
+    #
     ${CMAKE_SOURCE_DIR}/include/
+    ${CMAKE_BINARY_DIR}/include/
     )
 
   ADD_EXECUTABLE(make_dependencies make_dependencies.cc)
@@ -81,7 +93,11 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)
   ENDIF()
 
-  INSTALL(TARGETS make_dependencies report_features expand_instantiations
+  SET_TARGET_PROPERTIES(make_dependencies report_features
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/common/scripts
+    )
+
+  INSTALL(TARGETS make_dependencies report_features
     EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
     DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
     COMPONENT compat_files

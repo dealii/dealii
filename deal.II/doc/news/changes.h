@@ -86,6 +86,16 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Enhancement: It is now possible to use the build directory directly without
+  the need to install first. For this, a second copy of all necessary project
+  configuration files (deal.IIConfig.cmake, ..., Make.global_options) are
+  generated and deployed in the build directory. (This is fully compatible with
+  the old possibility to install into the build dir.)
+  <br>
+  (Matthias Maier, 2013/09/15)
+  </li>
+
+  <li>
   Fixed: DoFTools::extract_locally_*_dofs now instantiated for hp::DofHandler.
   <br>
   (Jean-Paul Pelteret, 2013/09/11)

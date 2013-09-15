@@ -35,21 +35,15 @@
 
 MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
 
-  IF(CMAKE_CROSSCOMPILING)
-    SET(_ei_exec native-expand_instantiations)
-  ELSE()
-    SET(_ei_exec expand_instantiations)
-  ENDIF()
-
   FOREACH (_inst_in_file ${_inst_in_files})
     STRING(REGEX REPLACE "\\.in$" "" _inst_file "${_inst_in_file}" )
 
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
-      DEPENDS ${_ei_exec}
+      DEPENDS expand_instantiations
               ${CMAKE_BINARY_DIR}/cmake/config/template-arguments
               ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
-      COMMAND ${_ei_exec}
+      COMMAND expand_instantiations
       ARGS ${CMAKE_BINARY_DIR}/cmake/config/template-arguments
            < ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
            > ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}

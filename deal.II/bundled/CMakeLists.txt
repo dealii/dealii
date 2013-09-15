@@ -35,6 +35,9 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     COMPONENT library
     PATTERN ".svn" EXCLUDE
     )
+  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
+    "${BOOST_FOLDER}/include\n"
+    )
 
   ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
 
@@ -87,6 +90,9 @@ IF(FEATURE_THREADS_BUNDLED_CONFIGURED)
     COMPONENT library
     FILES_MATCHING PATTERN "*.h"
     PATTERN ".svn" EXCLUDE
+    )
+  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
+    "${TBB_FOLDER}/include\n"
     )
 
   ADD_SUBDIRECTORY(${TBB_FOLDER}/src)
