@@ -41,10 +41,10 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
       DEPENDS expand_instantiations
-              ${CMAKE_BINARY_DIR}/cmake/config/template-arguments
+              ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/template-arguments
               ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
       COMMAND expand_instantiations
-      ARGS ${CMAKE_BINARY_DIR}/cmake/config/template-arguments
+      ARGS ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/template-arguments
            < ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
            > ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
       )
