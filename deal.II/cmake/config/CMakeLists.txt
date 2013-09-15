@@ -152,17 +152,13 @@ SET(_file
 FILE(APPEND ${_file}
   "\n\n#\n# Feature configuration:\n#\n\n"
   )
-  FILE(APPEND ${_file}
-    "\n\n#\n# Feature configuration:\n#\n\n"
-    )
-  GET_CMAKE_PROPERTY(res VARIABLES)
-  FOREACH(var ${res})
-    IF(var MATCHES "DEAL_II_WITH")
-      FILE(APPEND ${_file}
-        "SET(${var} ${${var}})\n"
-        )
-    ENDIF()
-  ENDFOREACH()
+GET_CMAKE_PROPERTY(res VARIABLES)
+FOREACH(var ${res})
+  IF(var MATCHES "DEAL_II_WITH")
+    FILE(APPEND ${_file}
+      "SET(${var} ${${var}})\n"
+      )
+  ENDIF()
 ENDFOREACH()
 
 CONFIGURE_FILE(
