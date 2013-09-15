@@ -94,6 +94,13 @@ OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
   OFF
   )
 
+If(DEAL_II_HAVE_TESTS_DIRECTORY)
+  OPTION(DEAL_II_COMPONENT_TESTSUITE
+    "Enable the full regression testsuite."
+    OFF
+    )
+ENDIF()
+
 OPTION(DEAL_II_ALLOW_AUTODETECTION
   "Allow to automatically setup features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
   ON
@@ -111,12 +118,6 @@ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     "Install path prefix, prepended onto install directories."
     )
 ENDIF()
-
-
-OPTION(BUILD_TESTING
-  "This option will enable the configuration of the build tests"
-  OFF
-  )
 
 
 ########################################################################
@@ -321,7 +322,7 @@ FOREACH(_var ${_res})
   #
   # Same for components:
   #
-  IF(_var MATCHES "^(COMPAT_FILES|DOCUMENTATION|EXAMPLES|MESH_CONVERTER|PARAMETER_GUI)")
+  IF(_var MATCHES "^(COMPAT_FILES|DOCUMENTATION|EXAMPLES|MESH_CONVERTER|PARAMETER_GUI|TESTSUITE)")
     SET(DEAL_II_COMPONENT_${_var} ${${_var}} CACHE BOOL "" FORCE)
     UNSET(${_var} CACHE)
   ENDIF()

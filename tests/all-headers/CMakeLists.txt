@@ -47,16 +47,7 @@ FOREACH(_full_file ${_header})
 
       # Add an object library for each header file and build configuration:
       ADD_LIBRARY(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc)
-      SET_TARGET_PROPERTIES(${_target} PROPERTIES
-        COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
-        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
-        )
-      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-        INCLUDE_DIRECTORIES
-          "${CMAKE_BINARY_DIR}/include"
-          "${CMAKE_SOURCE_DIR}/include"
-          "${CMAKE_SOURCE_DIR}/include/deal.II/"
-        )
+      DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
       SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
         COMPILE_DEFINITIONS HEADER=<deal.II/${_path}/${_file}>
         )

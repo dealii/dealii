@@ -62,47 +62,23 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       #
       # Setup a bunch of variables describing the test:
       #
-
       STRING(TOLOWER ${_build} _build_lowercase)
-
-      # Short test name:
-      SET(_test_short ${_test_name}.${_build_lowercase})
-
-      # The target name for the executable:
-      SET(_target ${_category}-${_test_short})
+      SET(_test_short ${_test_name}.${_build_lowercase}) # short test name
+      SET(_target ${_category}-${_test_short}) # the target name for the executable
 
       # If _n_cpu is equal to "0", a normal, sequental test will be run,
       # otherwise run the test with mpirun:
       IF("${_n_cpu}" STREQUAL "0")
-        # Diff target name:
-        SET(_diff_target ${_target}.diff)
-
-        # Full test name:
-        SET(_test_full ${_category}/${_test_name}.${_build_lowercase})
-
-        # Directory to run the test in:
-        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_short})
-
-        # The command to issue:
-        SET(_run_command ${_target})
-
-        # Finally set it to one, we'll still occupy one processor to run a
-        # test ;-)
-        SET(_n_cpu 1)
-
+        SET(_diff_target ${_target}.diff) # diff target name
+        SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}) # directory to run the test in
+        SET(_run_command ${_target}) # the command to issue
+        SET(_n_cpu 1) # set it to one, we'll still occupy one processor to run a test ;-)
       ELSE()
-
-        # Diff target name:
-        SET(_diff_target ${_category}-${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}.diff)
-
-        # Full test name:
-        SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase})
-
-        # Directory to run the test in:
-        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/mpirun=${_n_cpu})
-
-        # The command to issue:
-        SET(_run_command mpirun -np ${_n_cpu} ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/${_target})
+        SET(_diff_target ${_category}-${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}.diff) # diff target name
+        SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/mpirun=${_n_cpu}) # directory to run the test in
+        SET(_run_command mpirun -np ${_n_cpu} ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/${_target}) # the command to issue
       ENDIF()
 
       FILE(MAKE_DIRECTORY ${_test_directory})
@@ -111,31 +87,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       # Add an executable for the current test and set up compile
       # definitions and the full link interface:
       #
-
       IF(NOT TARGET ${_target})
         # only add the target once
 
         ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${_test_name}.cc)
-
-        SET_TARGET_PROPERTIES(${_target} PROPERTIES
-          LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-          COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
-          COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
-          LINKER_LANGUAGE "CXX"
-          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_test_short}"
-          )
-        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-          INCLUDE_DIRECTORIES
-            "${CMAKE_BINARY_DIR}/include"
-            "${CMAKE_SOURCE_DIR}/include"
-            "${CMAKE_SOURCE_DIR}/include/deal.II/"
-          )
+        DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
         SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
           COMPILE_DEFINITIONS
             SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
-          )
-        TARGET_LINK_LIBRARIES(${_target}
-          ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
           )
       ENDIF()
 
