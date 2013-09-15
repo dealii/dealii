@@ -35,7 +35,7 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     COMPONENT library
     PATTERN ".svn" EXCLUDE
     )
-  FILE(APPEND ${CMAKE_BINARY_DIR}${C\n"MAKE_FILES_DIRECTORY}/deal_ii_source_includes
+  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
     "${BOOST_FOLDER}/include\n"
     )
 
@@ -91,7 +91,7 @@ IF(FEATURE_THREADS_BUNDLED_CONFIGURED)
     FILES_MATCHING PATTERN "*.h"
     PATTERN ".svn" EXCLUDE
     )
-  FILE(APPEND ${CMAKE_BINARY_DIR}${C\n"MAKE_FILES_DIRECTORY}/deal_ii_source_includes
+  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
     "${TBB_FOLDER}/include\n"
     )
 

@@ -49,5 +49,10 @@ IF(CMAKE_CROSSCOMPILING)
   SET(DEAL_II_NATIVE "DEAL_II_NATIVE-NOTFOUND" CACHE FILEPATH
     "A pointer to a native deal.Ii build directory"
     )
+  IF(DEAL_II_NATIVE MATCHES "-NOTFOUND")
+    MESSAGE(FATAL_ERROR
+      "Please set the CMake variable DEAL_II_NATIVE to a valid path that points to a native deal.II build directory"
+      )
+  ENDIF()
   INCLUDE(${DEAL_II_NATIVE}/importExecutables.cmake)
 ENDIF()
