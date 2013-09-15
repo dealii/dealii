@@ -65,10 +65,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     COMMAND ${_target} > ${_target}-OK 2>&1
-      || (mv ${_target}-OK ${_target}-FAILED
-          && echo "${_target}: FAILED":
-          && cat ${_target}-FAILED
-          && exit 1)
+      || (rm ${_target}-OK && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   ADD_CUSTOM_TARGET(${_target}.run DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK)
