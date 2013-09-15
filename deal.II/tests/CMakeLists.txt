@@ -64,14 +64,13 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
 
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND ${_target} > ${_target}-OK 2>&1
-      || (rm ${_target}-OK && exit 1)
+    COMMAND ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   ADD_CUSTOM_TARGET(${_target}.run DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK)
 
   ADD_TEST(NAME ${_target}
-    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_target}
+    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
       -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
       -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
