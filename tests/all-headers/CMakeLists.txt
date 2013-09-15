@@ -23,6 +23,8 @@
 #
 
 SET(_category all-headers)
+MESSAGE(STATUS "Process ./tests/${_category}")
+
 FILE(GLOB_RECURSE _header ${CMAKE_SOURCE_DIR}/include/*.h)
 
 FOREACH(_full_file ${_header})
@@ -68,3 +70,5 @@ FOREACH(_full_file ${_header})
     ENDIF()
   ENDFOREACH()
 ENDFOREACH()
+
+MESSAGE(STATUS "Process ./tests/${_category} - Done")

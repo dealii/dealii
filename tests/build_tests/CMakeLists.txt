@@ -26,6 +26,7 @@
 #
 
 SET(_category build_tests)
+MESSAGE(STATUS "Process ./tests/${_category}")
 
 # Run a minimalistic set of steps in debug configuration:
 SET(_debug_steps
@@ -155,3 +156,5 @@ FOREACH(_step_full ${_steps})
     ENDIF()
   ENDFOREACH()
 ENDFOREACH()
+
+MESSAGE(STATUS "Process ./tests/${_category} - Done")

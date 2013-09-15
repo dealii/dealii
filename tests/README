@@ -101,7 +101,7 @@ How to set up and run the testsuite
 
 To enable the testsuite, configure deal.II in a build directory with
 
-  # cmake -DBUILD_TESTING=ON .
+  # cmake -DTESTSUITE=ON .
 
 After you have build deal.II as usual (installation is not necessary) you
 can run the testsuite in the _build directory_ via
@@ -145,7 +145,7 @@ Setup only a subset of tests
 It is possible to set up only a subset of tests that match a regular
 expression during configuration:
 
-  # cmake -DBUILD_TESTING=ON -DTEST_PICKUP_REGEX="<regular expression>" .
+  # cmake -DTESTSUITE=ON -DTEST_PICKUP_REGEX="<regular expression>" .
 
 Note: If you wish to disable this filter again, undefine TEST_PICKUP_REGEX
 in the Cache:
