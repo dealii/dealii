@@ -42,8 +42,8 @@ FOREACH(_full_file ${_header})
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${_build} _build_lowercase)
 
-    SET(_test ${_category}-${_path}-${_file}.${_build_lowercase})
-
+    SET(_test ${_category}/${_path}/${_file}.${_build_lowercase})
+    SET(_target ${_category}-${_path}-${_file}.${_build_lowercase})
     #
     # Respect TEST_PICKUP_REGEX:
     #
@@ -53,18 +53,18 @@ FOREACH(_full_file ${_header})
       #
       # Add an object library for each header file and build configuration:
       #
-      ADD_LIBRARY(${_test} OBJECT EXCLUDE_FROM_ALL test_header.cc)
-      SET_TARGET_PROPERTIES(${_test} PROPERTIES
+      ADD_LIBRARY(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc)
+      SET_TARGET_PROPERTIES(${_target} PROPERTIES
         COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
         COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
         )
-      SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
+      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
         INCLUDE_DIRECTORIES
           "${CMAKE_BINARY_DIR}/include"
           "${CMAKE_SOURCE_DIR}/include"
           "${CMAKE_SOURCE_DIR}/include/deal.II/"
         )
-      SET_PROPERTY(TARGET ${_test} APPEND PROPERTY
+      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
         COMPILE_DEFINITIONS
           HEADER=<deal.II/${_path}/${_file}>
         )
@@ -72,15 +72,15 @@ FOREACH(_full_file ${_header})
       #
       # And finally add the test:
       #
-      ADD_TEST(NAME ${_category}/${_path}/${_file}.${_build_lowercase}
+      ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND}
-          -DTRGT=${_test}
+          -DTRGT=${_target}
           -DTEST=${_category}/${_path}/${_file}.${_build_lowercase}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
-      SET_TESTS_PROPERTIES(${_category}/${_path}/${_file}.${_build_lowercase} PROPERTIES
+      SET_TESTS_PROPERTIES(${_test} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )

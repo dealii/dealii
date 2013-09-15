@@ -15,19 +15,23 @@
 ## ---------------------------------------------------------------------
 
 #
-# Setup and run the testsuite:
+# Setup the testsuite:
 #
-
 INCLUDE(setup_testsuite)
 
+#
+# And include all subdirectories:
+#
 MESSAGE(STATUS "")
 MESSAGE(STATUS "Proceed to test definitions now:")
 
-ADD_SUBDIRECTORY(a-framework)
+#ADD_SUBDIRECTORY(a-framework) -- no idea what to do with that ...
+
 ADD_SUBDIRECTORY(all-headers)
 ADD_SUBDIRECTORY(aniso)
 ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(bits)
+ADD_SUBDIRECTORY(build_tests)
 ADD_SUBDIRECTORY(codim_one)
 ADD_SUBDIRECTORY(deal.II)
 
@@ -53,6 +57,7 @@ IF(DEAL_II_WITH_METIS)
   ADD_SUBDIRECTORY(metis)
 ENDIF()
 
+# TODO: Really with P4EST?
 IF(DEAL_II_WITH_MPI AND DEAL_II_WITH_P4EST)
   ADD_SUBDIRECTORY(gla)
   ADD_SUBDIRECTORY(mpi)

@@ -16,7 +16,6 @@
 
  */
 
-
 // @sect3{Include files}
 
 // The most fundamental class in the library is the Triangulation class, which
