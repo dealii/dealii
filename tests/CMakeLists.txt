@@ -14,72 +14,91 @@
 ##
 ## ---------------------------------------------------------------------
 
-#
 # Setup the testsuite:
-#
-INCLUDE(setup_testsuite)
+INCLUDE(cmake/setup_testsuite.cmake)
 
 #
-# And include all subdirectories:
+# This is a bloody hack to avoid a severe performance regression with
+# GNU Make that really does not like 12k top level targets at once...
 #
-MESSAGE(STATUS "")
-MESSAGE(STATUS "Proceed to test definitions now:")
+# The only choice we have is to set up every test subdirectory as an
+# independent project. Unfortunately this adds quite a significant amount
+# of complexity :-(
+#
 
-#ADD_SUBDIRECTORY(a-framework) -- no idea what to do with that ...
+MESSAGE(STATUS "Proceed to test definitions now.")
 
-ADD_SUBDIRECTORY(all-headers)
-ADD_SUBDIRECTORY(aniso)
-ADD_SUBDIRECTORY(base)
-ADD_SUBDIRECTORY(bits)
-ADD_SUBDIRECTORY(build_tests)
-ADD_SUBDIRECTORY(codim_one)
-ADD_SUBDIRECTORY(deal.II)
+ADD_CUSTOM_TARGET(setup_test)
+ADD_CUSTOM_TARGET(cleanup_test)
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/deal.IITestfile.cmake "")
 
-IF(DEAL_II_WITH_P4EST)
-  ADD_SUBDIRECTORY(distributed_grids)
-ENDIF()
-
-#ADD_SUBDIRECTORY(fail) -- the good old failing tests
-
-ADD_SUBDIRECTORY(fe)
-ADD_SUBDIRECTORY(grid)
-ADD_SUBDIRECTORY(hp)
-ADD_SUBDIRECTORY(integrators)
-ADD_SUBDIRECTORY(lac)
-
+SET(_categories
+  all-headers aniso base bits build_tests codim_one deal.II fe grid hp integrators lac matrix_free multigrid serialization
+  )
 IF(DEAL_II_WITH_LAPACK)
-  ADD_SUBDIRECTORY(lapack)
+  LIST(APPEND _categories lapack)
 ENDIF()
-
-ADD_SUBDIRECTORY(matrix_free)
-
 IF(DEAL_II_WITH_METIS)
-  ADD_SUBDIRECTORY(metis)
+  LIST(APPEND _categories metis)
 ENDIF()
-
-# TODO: Really with P4EST?
 IF(DEAL_II_WITH_MPI AND DEAL_II_WITH_P4EST)
-  ADD_SUBDIRECTORY(gla)
-  ADD_SUBDIRECTORY(mpi)
+  LIST(APPEND _categories gla mpi)
 ENDIF()
-
-ADD_SUBDIRECTORY(multigrid)
-
+IF(DEAL_II_WITH_P4EST)
+  LIST(APPEND _categories distributed_grids)
+ENDIF()
 IF(DEAL_II_WITH_PETSC)
-  ADD_SUBDIRECTORY(petsc)
+  LIST(APPEND _categories petsc)
 ENDIF()
-
-ADD_SUBDIRECTORY(serialization)
-
 IF(DEAL_II_WITH_SLEPC)
-  ADD_SUBDIRECTORY(slepc)
+  LIST(APPEND _categories slepc)
 ENDIF()
-
 IF(DEAL_II_WITH_TRILINOS)
-  ADD_SUBDIRECTORY(trilinos)
+  LIST(APPEND _categories trilinos)
 ENDIF()
-
 IF(DEAL_II_WITH_UMFPACK)
-  ADD_SUBDIRECTORY(umfpack)
+  LIST(APPEND _categories umfpack)
 ENDIF()
 
+FOREACH(_category ${_categories})
+  # avoid stale test definitions:
+  FILE(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${_category}/CTestTestfile.cmake)
+
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_category}
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+    )
+  ADD_CUSTOM_TARGET(setup_test_${_category}
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+    COMMAND ${CMAKE_COMMAND}
+      -G${CMAKE_GENERATOR}
+      -DDEAL_II_DIR=${CMAKE_BINARY_DIR}
+      -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR}
+      -DTEST_CMAKE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/cmake # TODO: Refactor
+      -DTEST_DIFF="${TEST_DIFF}" # TODO: Refactor
+      -DTEST_PICKUP_REGEX=${TEST_PICKUP_REGEX} # TODO: Refactor
+      -DTEST_TIME_LIMIT=${TEST_TIME_LIMIT} # TODO: Refactor
+      ${CMAKE_CURRENT_SOURCE_DIR}/${_category}
+      > /dev/null # Shoo!
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_category}
+    COMMENT "Processing ./tests/${_category}"
+    )
+  ADD_DEPENDENCIES(setup_test_${_category} library)
+  ADD_DEPENDENCIES(setup_test setup_test_${_category})
+
+  ADD_CUSTOM_TARGET(cleanup_test_${_category}
+    COMMAND ${CMAKE_COMMAND} -E remove_directory
+      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+    )
+  ADD_DEPENDENCIES(cleanup_test cleanup_test_${_category})
+
+  FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/deal.IITestfile.cmake
+    "SUBDIRS(${_category})\n"
+    )
+ENDFOREACH()
+
+SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  APPEND PROPERTY TEST_INCLUDE_FILE deal.IITestfile.cmake
+  )

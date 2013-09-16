@@ -14,6 +14,16 @@
 ##
 ## ---------------------------------------------------------------------
 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+FIND_PACKAGE(deal.II 8.1 REQUIRED HINTS ${DEAL_II_DIR})
+FIND_PACKAGE(Perl REQUIRED)
+INCLUDE(${TEST_CMAKE_DIR}/setup_macros.cmake)
+ENABLE_TESTING()
+
+SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
+
+SET(TEST_DIFF) # avoid a bogus warning
+
 #
 # Header tests are special:
 #
@@ -23,9 +33,9 @@
 #
 
 SET(_category all-headers)
-MESSAGE(STATUS "Process ./tests/${_category}")
 
-FILE(GLOB_RECURSE _header ${CMAKE_SOURCE_DIR}/include/*.h)
+SET(_count "0")
+FILE(GLOB_RECURSE _header ${DEAL_II_SOURCE_DIR}/include/*.h)
 
 FOREACH(_full_file ${_header})
   GET_FILENAME_COMPONENT(_file ${_full_file} NAME)
@@ -49,7 +59,15 @@ FOREACH(_full_file ${_header})
 
       # Add an object library for each header file and build configuration:
       ADD_LIBRARY(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc)
-      DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
+
+      SET_TARGET_PROPERTIES(${_target} PROPERTIES
+        LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+        COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
+        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+        )
+      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+        INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
+        )
       SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
         COMPILE_DEFINITIONS HEADER=<deal.II/${_path}/${_file}>
         )
@@ -60,15 +78,21 @@ FOREACH(_full_file ${_header})
           -DTRGT=${_target}
           -DTEST=${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-          -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
+          -P ${TEST_CMAKE_DIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
       SET_TESTS_PROPERTIES(${_test} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )
+      MATH(EXPR _count "${_count}+1")
     ENDIF()
   ENDFOREACH()
 ENDFOREACH()
 
-MESSAGE(STATUS "Process ./tests/${_category} - Done")
+MESSAGE(STATUS
+  "Testsuite: Set up ${_count} regression tests in category ${_category}."
+  )
+MESSAGE(STATUS
+  "  (Timeout: ${TEST_TIME_LIMIT}, Diff: "${_test_diff}")"
+  )

@@ -25,18 +25,7 @@
 #
 
 #
-# We need perl for the testsuite:
-#
-
-FIND_PACKAGE(Perl)
-IF(NOT PERL_FOUND)
-  MESSAGE(FATAL_ERROR
-    "Could not find a perl installation which is required for running the test suite"
-    )
-ENDIF()
-
-#
-# And a diff tool, preferably numdiff:
+# Wee need a diff tool, preferably numdiff:
 #
 
 FIND_PROGRAM(NUMDIFF_EXECUTABLE
@@ -55,16 +44,19 @@ IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND"
 ENDIF()
 
 IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-  SET_IF_EMPTY(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -q -s ' \t\n:')
+  SET_IF_EMPTY(TEST_DIFF "${NUMDIFF_EXECUTABLE} -a 1e-6 -q")
 ELSE()
-  SET_IF_EMPTY(TEST_DIFF ${DIFF_EXECUTABLE})
+  SET_IF_EMPTY(TEST_DIFF "${DIFF_EXECUTABLE}")
 ENDIF()
+#
+# Son, we have to talk about quotings:
+#
+SEPARATE_ARGUMENTS(TEST_DIFF UNIX_COMMAND ${TEST_DIFF})
 
 MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
 
 #
-# Set a default time limit of 60 seconds:
+# Set a default time limit of 120 seconds:
 #
-
 SET_IF_EMPTY(TEST_TIME_LIMIT 120)
 

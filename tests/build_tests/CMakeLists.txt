@@ -14,6 +14,19 @@
 ##
 ## ---------------------------------------------------------------------
 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+FIND_PACKAGE(deal.II 8.1 REQUIRED HINTS ${DEAL_II_DIR})
+FIND_PACKAGE(Perl REQUIRED)
+INCLUDE(${TEST_CMAKE_DIR}/setup_macros.cmake)
+ENABLE_TESTING()
+
+SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
+
+#
+# avoid bogus warnings:
+#
+SET(TEST_DIFF)
+
 #
 # build_tests tests are special:
 #
@@ -26,7 +39,6 @@
 #
 
 SET(_category build_tests)
-MESSAGE(STATUS "Process ./tests/${_category}")
 
 # Run a minimalistic set of steps in debug configuration:
 SET(_debug_steps
@@ -44,7 +56,8 @@ SET(_release_steps
   step-47 step-48 step-49
   )
 
-FILE(GLOB _steps ${CMAKE_SOURCE_DIR}/examples/step-*)
+SET(_count "0")
+FILE(GLOB _steps ${DEAL_II_SOURCE_DIR}/examples/step-*)
 FOREACH(_step_full ${_steps})
   GET_FILENAME_COMPONENT(_step ${_step_full} NAME)
 
@@ -145,16 +158,22 @@ FOREACH(_step_full ${_steps})
           -DTRGT=${_target}
           -DTEST=${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-          -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
+          -P ${TEST_CMAKE_DIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
       SET_TESTS_PROPERTIES(${_test} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )
+      MATH(EXPR _count "${_count}+1")
 
     ENDIF()
   ENDFOREACH()
 ENDFOREACH()
 
-MESSAGE(STATUS "Process ./tests/${_category} - Done")
+MESSAGE(STATUS
+  "Testsuite: Set up ${_count} regression tests in category ${_category}."
+  )
+MESSAGE(STATUS
+  "  (Timeout: ${TEST_TIME_LIMIT}, Diff: "${_test_diff}")"
+  )

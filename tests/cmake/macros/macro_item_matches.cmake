@@ -15,11 +15,21 @@
 ## ---------------------------------------------------------------------
 
 #
-# If 'variable' is empty it will be set to 'value'
+# A small macro to test whether a given list contains an element.
 #
-MACRO(SET_IF_EMPTY _variable)
-  IF("${${_variable}}" STREQUAL "")
-    SET(${_variable} ${ARGN})
-  ENDIF()
+# Usage:
+#     ITEM_MATCHES(var regex list)
+#
+# var is set to true if list contains an item that matches regex.
+#
+
+MACRO(ITEM_MATCHES _var _regex)
+  SET(${_var})
+  FOREACH (_item ${ARGN})
+    IF("${_item}" MATCHES ${_regex})
+      SET(${_var} TRUE)
+      BREAK()
+    ENDIF()
+  ENDFOREACH()
 ENDMACRO()
 

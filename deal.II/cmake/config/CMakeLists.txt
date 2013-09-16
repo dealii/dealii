@@ -315,6 +315,7 @@ ADD_CUSTOM_TARGET(setup_build_dir ALL
     ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/binary
   COMMAND ${CMAKE_COMMAND} -E touch
     ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  COMMENT "Update build configuration"
   )
 ADD_DEPENDENCIES(library setup_build_dir)
 

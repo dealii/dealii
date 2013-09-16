@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,11 +15,10 @@
 ## ---------------------------------------------------------------------
 
 #
-# If 'variable' is empty it will be set to 'value'
+# Load all macros:
 #
-MACRO(SET_IF_EMPTY _variable)
-  IF("${${_variable}}" STREQUAL "")
-    SET(${_variable} ${ARGN})
-  ENDIF()
-ENDMACRO()
 
+FILE(GLOB _macro_files "${CMAKE_CURRENT_LIST_DIR}/macros/*.cmake")
+FOREACH(_file ${_macro_files})
+  INCLUDE(${_file})
+ENDFOREACH()

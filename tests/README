@@ -99,12 +99,13 @@ simultaneous processes in the following way:
 How to set up and run the testsuite
 ===================================
 
-To enable the testsuite, configure deal.II in a build directory with
+To enable the testsuite, configure and build deal.II in a build directory
+as normal (installation is not necessary). After that you can setup the
+tests via the "setup_test" target:
 
-  # cmake -DTESTSUITE=ON .
+  # make setup_test
 
-After you have build deal.II as usual (installation is not necessary) you
-can run the testsuite in the _build directory_ via
+Now, the testsuite can be run in the _build directory_ via
 
   # ctest [-j x]
 
@@ -143,12 +144,17 @@ Setup only a subset of tests
 ----------------------------
 
 It is possible to set up only a subset of tests that match a regular
-expression during configuration:
+expression during test setup.
 
-  # cmake -DTESTSUITE=ON -DTEST_PICKUP_REGEX="<regular expression>" .
+  # make setup_test TEST_PICKUP_REGEX="<regular expression>"
 
-Note: If you wish to disable this filter again, undefine TEST_PICKUP_REGEX
-in the Cache:
+Alternatively, you can specify TEST_PICKUP_REGEX upon configuration:
+
+  # cmake -DTEST_PICKUP_REGEX="<regular expression"
+
+Note: A TEST_PICKUP_REGEX set via cmake always _overrides_ one set via
+environment. If you wish to disable this filter again, undefine
+TEST_PICKUP_REGEX in the Cache:
 
   # cmake -UTEST_PICKUP_REGEX .
 

@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# A Macro to set up tests for thes testsuite
+# A Macro to set up tests for the testsuite
 #
 # The following variables must be set:
 #
@@ -25,6 +25,10 @@
 # TEST_TIME_LIMIT
 #   - specifying the maximal wall clock time in seconds a test is allowed
 #     to run
+#
+# TEST_CMAKE_DIR
+#   - pointing to a cmake folder where normalize.pl and run_test.cmake are
+#     located
 #
 #
 # Usage:
@@ -53,6 +57,14 @@
 #
 
 MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
+
+  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
+    MESSAGE(FATAL_ERROR
+      "\nDEAL_II_ADD_TEST can only be called in external test subprojects after "
+      "the inclusion of deal.IIConfig.cmake. It is not intended for "
+      "internal use.\n\n"
+      )
+  ENDIF()
 
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
@@ -91,11 +103,22 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
         # only add the target once
 
         ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${_test_name}.cc)
-        DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
+
+        SET_TARGET_PROPERTIES(${_target} PROPERTIES
+          LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+          COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
+          COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+          LINKER_LANGUAGE "CXX"
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_test_short}"
+          )
+        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+          INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
+          )
         SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
           COMPILE_DEFINITIONS
             SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
           )
+        TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET})
       ENDIF()
 
       #
@@ -113,13 +136,13 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
               && exit 1)
         COMMAND
           ${PERL_EXECUTABLE} -pi
-          ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
+          ${TEST_CMAKE_DIR}/scripts/normalize.pl
           ${_test_directory}/output
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
           ${_target}
-          ${CMAKE_SOURCE_DIR}/cmake/scripts/normalize.pl
+          ${TEST_CMAKE_DIR}/scripts/normalize.pl
         )
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND
@@ -157,7 +180,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
           -DTRGT=${_diff_target}
           -DTEST=${_test_full}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-          -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
+          -P ${TEST_CMAKE_DIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
       SET_TESTS_PROPERTIES(${_test_full} PROPERTIES

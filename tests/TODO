@@ -17,3 +17,5 @@ Issues:
    ./base/data_out_base_povray
 
  - Relocate all meshes in ./deal.II/*/ to ./deal.II/grids
+
+ - Fixup this big mess w.r.t. TEST_DIFF
