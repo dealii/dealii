@@ -24,7 +24,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
-inline
 bool Histogram::logarithmic_less (const number n1,
                                   const number n2)
 {
@@ -120,14 +119,14 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
                                                   values[i].end(),
                                                   logarithmic_less_function),
                                 logarithmic_less_function);
-        };
+        }
 
       break;
-    };
+    }
 
     default:
       Assert (false, ExcInternalError());
-    };
+    }
 
   // move right bound arbitrarily if
   // necessary. sometimes in logarithmic
