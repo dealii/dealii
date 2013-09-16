@@ -421,7 +421,7 @@ template <int dim>
 void Step6<dim>::assemble_system ()
 {
   system_matrix = 0;
-  const QGauss<dim>  qformula(3);
+  const QGauss<dim>  qformula(fe.degree+1);
   
   FEValues<dim> fe_values (fe, qformula,
                            update_values    |  update_gradients |
@@ -494,7 +494,7 @@ void Step6<dim>::assemble_system_hp ()
 
   //  const QGauss<dim>  quadrature_formula(3);
   hp::QCollection<dim> qformulas;
-  qformulas.push_back(QGauss<dim>(2));
+  qformulas.push_back(QGauss<dim>(fe.degree+1));
   
   hp::FEValues<dim> hp_fe_values (hpfe, qformulas,
                            update_values    |  update_gradients |
