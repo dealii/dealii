@@ -71,7 +71,7 @@ FOREACH(_full_file ${_header})
           -DTRGT=${_target}
           -DTEST=${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-          -P ${TEST_CMAKE_DIR}/scripts/run_test.cmake
+          -P ${TEST_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
       SET_TESTS_PROPERTIES(${_test} PROPERTIES

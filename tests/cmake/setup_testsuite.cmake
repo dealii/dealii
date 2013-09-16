@@ -107,10 +107,10 @@ ENDIF()
 SEPARATE_ARGUMENTS(TEST_DIFF UNIX_COMMAND ${TEST_DIFF})
 
 #
-# Set a default time limit of 120 seconds:
+# Set a default time limit of 180 seconds:
 #
 
-SET_IF_EMPTY(TEST_TIME_LIMIT 120)
+SET_IF_EMPTY(TEST_TIME_LIMIT 180)
 
 #
 # And finally, enable testing:

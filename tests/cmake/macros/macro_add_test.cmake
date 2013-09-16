@@ -136,13 +136,13 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
               && exit 1)
         COMMAND
           ${PERL_EXECUTABLE} -pi
-          ${TEST_DIR}/scripts/normalize.pl
+          ${TEST_DIR}/cmake/scripts/normalize.pl
           ${_test_directory}/output
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
           ${_target}
-          ${TEST_DIR}/scripts/normalize.pl
+          ${TEST_DIR}/cmake/scripts/normalize.pl
         )
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND
@@ -180,7 +180,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
           -DTRGT=${_diff_target}
           -DTEST=${_test_full}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-          -P ${TEST_DIR}/scripts/run_test.cmake
+          -P ${TEST_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
       SET_TESTS_PROPERTIES(${_test_full} PROPERTIES

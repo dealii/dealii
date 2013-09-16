@@ -135,12 +135,41 @@ tests as discussed below.
 CMake configuration variables for the testsuite
 -----------------------------------------------
 
-TODO: Document the following options:
-  # TODO: Describe and document the following:
-  # TEST_DIFF
-  # TEST_TIME_LIMIT
-  # TEST_PICKUP_REGEX
-  # NUMDIFF_DIR
+The testsuite has the following options:
+
+  TEST_DIFF
+    - the diff tool and command line to use for comparison. If numdiff is
+      available it defaults to "numdiff -a 1e-6 -q", otherwise plain diff
+      is used.
+
+  TEST_TIME_LIMIT
+    - The time limit (in seconds) a single test is allowed to run. Defaults
+      to 180 seconds
+
+  TEST_PICKUP_REGEX
+    - A regular expression to filter tests. If this is a nonempty string
+      only tests that match the regular expression will be set up. An empty
+      string is interpreted as a catchall.
+
+These options can be set as environment variables prior to the call to the
+setup_test target:
+
+  TEST_PICKUP_REGEX="build_tests/" TEST_TIME_LIMIT="120" make setup_test
+
+Note: Specifying these options via environment variables is volatile, i.e.
+if $ make setup_test is invoked a second time without the variables set in
+environment, the option will be reset to the default value.
+
+If you want to set these options permanently, set them via cmake as CMake
+variable in the build directory:
+
+  # cmake -DTEST_PICKUP_REGEX="<regular expression" .
+
+Please note that a variable set via cmake always _overrides_ one set via
+environment. If you wish to reset such a variable again, undefine it in the
+cache:
+
+  # cmake -UTEST_PICKUP_REGEX .
 
 
 Setup only a subset of tests
@@ -153,7 +182,7 @@ expression during test setup.
 
 Alternatively, you can specify TEST_PICKUP_REGEX upon configuration:
 
-  # cmake -DTEST_PICKUP_REGEX="<regular expression"
+  # cmake -DTEST_PICKUP_REGEX="<regular expression" .
 
 Note: A TEST_PICKUP_REGEX set via cmake always _overrides_ one set via
 environment. If you wish to disable this filter again, undefine
