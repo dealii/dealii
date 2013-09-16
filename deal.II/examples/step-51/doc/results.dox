@@ -106,8 +106,13 @@ cells   dofs       val L2        grad L2      val L2-post
 
 <h3>Possibilities for improvements</h3>
 
-This tutorial program shows the a basic implementation of an HDG method
-without particular focus on a high performance implementation. Let us look at
+As already mentioned in the introduction, one possibility is to implement
+another post-processing technique as discussed in the literature.
+
+A second thing that is not done optimally relates to the performance of this
+program, which is of course an issue in practical applications (weighting in
+also the better solution quality of (H)DG methods for transport-dominated
+problems). Let us look at
 the computing time of the tutorial program and the share of the individual
 components:
 
