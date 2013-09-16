@@ -318,6 +318,9 @@ ADD_CUSTOM_TARGET(setup_build_dir ALL
   COMMENT "Update build configuration"
   )
 ADD_DEPENDENCIES(library setup_build_dir)
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  ADD_DEPENDENCIES(setup_build_dir ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+ENDFOREACH()
 
 #
 # And a script to remove it upon installation from the install prefix:

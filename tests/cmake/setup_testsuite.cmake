@@ -15,27 +15,76 @@
 ## ---------------------------------------------------------------------
 
 #
-# Setup testsuite:
+# Setup necessary configuration for a testsuite sub project.
 #
-# TODO: Describe and document the following:
+# A testsuite subproject assumes the following cached variables to be set:
 #
-# TEST_DIFF
-# TEST_TIME_LIMIT
-# NUMDIFF_DIR
+#    DEAL_II_BINARY_DIR
+#    DEAL_II_SOURCE_DIR
+#      - pointing to a source and binary directory of a deal.II build
+#
+# This file sets up the following options, that can be overwritten by
+# environment or command line:
+#
+#     TEST_DIFF
+#     TEST_TIME_LIMIT
+#     TEST_PICKUP_REGEX
+#
 #
 
 #
-# Wee need a diff tool, preferably numdiff:
+# Load all macros:
 #
+
+FILE(GLOB _macro_files "${CMAKE_CURRENT_LIST_DIR}/macros/*.cmake")
+FOREACH(_file ${_macro_files})
+  INCLUDE(${_file})
+ENDFOREACH()
+
+#
+# Pick up values from environment:
+#
+
+SET_IF_EMPTY(DEAL_II_BINARY_DIR $ENV{DEAL_II_BINARY_DIR})
+SET_IF_EMPTY(DEAL_II_BINARY_DIR $ENV{DEAL_II_DIR})
+SET_IF_EMPTY(DEAL_II_SOURCE_DIR $ENV{DEAL_II_SOURCE_DIR})
+SET_IF_EMPTY(TEST_DIFF $ENV{TEST_DIFF})
+SET_IF_EMPTY(TEST_TIME_LIMIT $ENV{TEST_TIME_LIMIT})
+SET_IF_EMPTY(TEST_PICKUP_REGEX $ENV{TEST_PICKUP_REGEX})
+
+IF("${DEAL_II_BINARY_DIR}" STREQUAL "")
+  MESSAGE(FATAL_ERROR "DEAL_II_BINARY_DIR must be set for this test subproject to configure correctly")
+ENDIF()
+IF("${DEAL_II_SOURCE_DIR}" STREQUAL "")
+  MESSAGE(FATAL_ERROR "DEAL_II_SOURCE_DIR must be set for this test subproject to configure correctly")
+ENDIF()
+
+#
+# We need deal.II and Perl as external packages:
+#
+
+FIND_PACKAGE(deal.II 8.1 REQUIRED
+  HINTS ${DEAL_II_BINARY_DIR} ${DEAL_II_DIR}
+  )
+
+FIND_PACKAGE(Perl REQUIRED)
+
+#
+# We need a diff tool, preferably numdiff:
+#
+
+FIND_PROGRAM(DIFF_EXECUTABLE
+  NAMES diff
+  )
 
 FIND_PROGRAM(NUMDIFF_EXECUTABLE
   NAMES numdiff
   HINTS ${NUMDIFF_DIR}
   PATH_SUFFIXES bin
   )
-FIND_PROGRAM(DIFF_EXECUTABLE
-  NAMES diff
-  )
+
+MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
+
 IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND"
     AND DIFF_EXECUTABLE MATCHES "-NOTFOUND" )
   MESSAGE(FATAL_ERROR
@@ -48,15 +97,24 @@ IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
 ELSE()
   SET_IF_EMPTY(TEST_DIFF "${DIFF_EXECUTABLE}")
 ENDIF()
-#
-# Son, we have to talk about quotings:
-#
-SEPARATE_ARGUMENTS(TEST_DIFF UNIX_COMMAND ${TEST_DIFF})
 
-MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
+#
+# "Son, we have to talk about quotings". Avoid overquoting. Due to the fact
+# that TEST_DIFF might be passed to the command line as a string, we have
+# to set it up this way :-/
+#
+
+SEPARATE_ARGUMENTS(TEST_DIFF UNIX_COMMAND ${TEST_DIFF})
 
 #
 # Set a default time limit of 120 seconds:
 #
+
 SET_IF_EMPTY(TEST_TIME_LIMIT 120)
+
+#
+# And finally, enable testing:
+#
+
+ENABLE_TESTING()
 

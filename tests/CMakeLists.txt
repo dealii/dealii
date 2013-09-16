@@ -14,12 +14,9 @@
 ##
 ## ---------------------------------------------------------------------
 
-# Setup the testsuite:
-INCLUDE(cmake/setup_testsuite.cmake)
-
 #
-# This is a bloody hack to avoid a severe performance regression with
-# GNU Make that really does not like 12k top level targets at once...
+# This is a bloody hack to avoid a severe performance penalty when using
+# 12k top level targets with GNU Make that really does not like that...
 #
 # The only choice we have is to set up every test subdirectory as an
 # independent project. Unfortunately this adds quite a significant amount
@@ -28,9 +25,16 @@ INCLUDE(cmake/setup_testsuite.cmake)
 
 MESSAGE(STATUS "Proceed to test definitions now.")
 
+#
+# Two custom targets to setup and cleanup the testsuite:
+#
+
 ADD_CUSTOM_TARGET(setup_test)
 ADD_CUSTOM_TARGET(cleanup_test)
-FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/deal.IITestfile.cmake "")
+
+#
+# The list of subfolders to set up:
+#
 
 SET(_categories
   all-headers aniso base bits build_tests codim_one deal.II fe grid hp integrators lac matrix_free multigrid serialization
@@ -60,22 +64,41 @@ IF(DEAL_II_WITH_UMFPACK)
   LIST(APPEND _categories umfpack)
 ENDIF()
 
-FOREACH(_category ${_categories})
-  # avoid stale test definitions:
-  FILE(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${_category}/CTestTestfile.cmake)
+#
+# Pass all variables starting with "TEST_" down to the subprojects:
+#
 
+GET_CMAKE_PROPERTY(_variables VARIABLES)
+SET(_options)
+FOREACH(_var ${_variables})
+  IF(_var MATCHES "^TEST_")
+    LIST(APPEND _options -D${_var}="${${_var}}")
+  ENDIF()
+ENDFOREACH()
+
+#
+# The hook into CTest so that the tests from the suprojects get picked up
+# by the main project:
+#
+
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/deal.IITestfile.cmake "")
+SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  APPEND PROPERTY TEST_INCLUDE_FILE deal.IITestfile.cmake
+  )
+
+#
+# Define a subproject for every enabled category:
+#
+
+FOREACH(_category ${_categories})
   ADD_CUSTOM_TARGET(setup_test_${_category}
     COMMAND ${CMAKE_COMMAND} -E make_directory
       ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/${_category} &&
-      ${CMAKE_COMMAND}
-      -G${CMAKE_GENERATOR}
-      -DDEAL_II_DIR=${CMAKE_BINARY_DIR}
+      ${CMAKE_COMMAND} -G${CMAKE_GENERATOR}
+      -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
       -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR}
-      -DTEST_CMAKE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/cmake # TODO: Refactor
-      -DTEST_DIFF="${TEST_DIFF}" # TODO: Refactor
-      -DTEST_PICKUP_REGEX=${TEST_PICKUP_REGEX} # TODO: Refactor
-      -DTEST_TIME_LIMIT=${TEST_TIME_LIMIT} # TODO: Refactor
+      ${_options}
       ${CMAKE_CURRENT_SOURCE_DIR}/${_category}
       > /dev/null # Shoo!
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_category}
@@ -94,7 +117,3 @@ FOREACH(_category ${_categories})
     "SUBDIRS(${_category})\n"
     )
 ENDFOREACH()
-
-SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  APPEND PROPERTY TEST_INCLUDE_FILE deal.IITestfile.cmake
-  )

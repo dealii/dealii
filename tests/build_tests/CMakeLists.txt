@@ -15,17 +15,7 @@
 ## ---------------------------------------------------------------------
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-FIND_PACKAGE(deal.II 8.1 REQUIRED HINTS ${DEAL_II_DIR})
-FIND_PACKAGE(Perl REQUIRED)
-INCLUDE(${TEST_CMAKE_DIR}/setup_macros.cmake)
-ENABLE_TESTING()
-
-SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
-
-#
-# avoid bogus warnings:
-#
-SET(TEST_DIFF)
+INCLUDE(${TEST_DIR}/cmake/setup_testsuite.cmake)
 
 #
 # build_tests tests are special:

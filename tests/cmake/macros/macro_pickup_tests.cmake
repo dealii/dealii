@@ -41,7 +41,6 @@ MACRO(DEAL_II_PICKUP_TESTS)
   # Strip the quoting from TEST_DIFF:
   #
   SET(_test_diff ${TEST_DIFF})
-  SEPARATE_ARGUMENTS(TEST_DIFF UNIX_COMMAND ${TEST_DIFF})
 
   SET(DEAL_II_SOURCE_DIR) # avoid a bogus warning
 

@@ -9,7 +9,7 @@ General test layout
 ===================
 
 A test usually consists of a source file and an output file for
-comparison (Under SOURCE_DIR/tests):
+comparison (under SOURCE_DIR/tests):
 
   category/test.cc
   category/test.output
@@ -35,9 +35,9 @@ Restrict tests for build configurations
 ---------------------------------------
 
 Normally, a test will be set up for debug and release configuration (if
-deal.II was configured with combined DebugRelease configuration) or for the
+deal.II was configured with combined DebugRelease build type) or for the
 available build configuration (if deal.II was configured either with Debug
-or with Release only configuration).
+or with Release only build type).
 
 If a specific test can only be run in debug or release configurations but
 not in both it is possible to restrict the setup by prepeding ".debug" or
@@ -66,7 +66,7 @@ tests to specific feature configurations, e.g.:
   category/test.with_umfpack=on.output, or
   category/test.with_zlib=off.output
 
-These tests will be only set up if the specified feature was configured
+These tests will only be set up if the specified feature was configured
 accordingly.
 
 Note: It is possible to provide different output files for disabled/enabled
@@ -84,7 +84,7 @@ Note: Quite a number of test categories are already guarded so that the
 contained tests will only be set up if the feature is enabled. In this case
 a feature constraint in the output file name is redundant and should be
 avoided. (Folder with guards are distributed_grids, lapack, metis, petsc,
-slepc, trilinos, umfpack)
+slepc, trilinos, umfpack, gla, mpi)
 
 
 Run mpi tests with mpirun
@@ -95,13 +95,16 @@ simultaneous processes in the following way:
 
   category/test.mpirun=x.output
 
+Note: It is possible to provide multiple output files for different mpirun
+values.
+
 
 How to set up and run the testsuite
 ===================================
 
 To enable the testsuite, configure and build deal.II in a build directory
 as normal (installation is not necessary). After that you can setup the
-tests via the "setup_test" target:
+testsuite via the "setup_test" target:
 
   # make setup_test
 
@@ -154,7 +157,7 @@ Alternatively, you can specify TEST_PICKUP_REGEX upon configuration:
 
 Note: A TEST_PICKUP_REGEX set via cmake always _overrides_ one set via
 environment. If you wish to disable this filter again, undefine
-TEST_PICKUP_REGEX in the Cache:
+TEST_PICKUP_REGEX in the cache:
 
   # cmake -UTEST_PICKUP_REGEX .
 
