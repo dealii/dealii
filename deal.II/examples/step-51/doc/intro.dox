@@ -18,21 +18,21 @@ must solve in an implicit system.  This is because, unlike continuous finite
 elements, in typical discontinuous elements there is one degree of freedom at
 each vertex <i>for each of the adjacent elements</i>, rather than just one,
 and similarly for edges and faces.  As another example,
-for the FE_DGP_Monomial basis, each 
+for the FE_DGP_Monomial basis, each
 scalar solution component is represented by polynomials of degree $p$
 which yields $(1/dim!)*\prod_{i=1}^{dim}(p+i)$ degrees of freedom per
 element.  Typically, all degrees of freedom in an element are coupled
 to all of the degrees of freedom in the adjacent elements.  The resulting
 discrete equations yield very large linear systems very quickly, especially
-for systems of equations in dim=2 or dim=3.  
+for systems of equations in dim=2 or dim=3.
 
 <h4> Reducing the size of the linear system </h4>
-To alleviate the computational cost of solving such large linear systems, 
+To alleviate the computational cost of solving such large linear systems,
 the hybridizable discontinuous Galerkin (HDG) methodology was introduced
-by Cockburn and co-workers 
-(see the references in the recent HDG overview article by 
+by Cockburn and co-workers
+(see the references in the recent HDG overview article by
  N.C. Nguyen and J. Peraire:
-   <i>Hybridizable discontinuous Galerkin methods for partial differential 
+   <i>Hybridizable discontinuous Galerkin methods for partial differential
    equations in continuum mechanics</i>, Journal of Computational Physics,
    2012, 231:18, 5955-5988.
    <a href="http://dx.doi.org/10.1016/j.jcp.2012.02.033">[DOI]</a>).
@@ -41,15 +41,15 @@ this goal by formulating the mathematical problem using Dirichlet-to-Neumann
 mappings.  The partial differential equations are first written as a first
 order system, and each field is then discretized via a DG method.  At this
 point the  single-valued "trace" values on the skeleton of the
-mesh, i.e. element faces, are taken to be independent unknown quantities.  
+mesh, i.e. element faces, are taken to be independent unknown quantities.
 The Dirichlet-to-Neumann map concept then permits the following solution procedure:
 <ol>
-  <li>  Use local element interior data to enforce a Neumann condition on the 
-skeleton of the triangulation.  The global problem is then to solve for the 
+  <li>  Use local element interior data to enforce a Neumann condition on the
+skeleton of the triangulation.  The global problem is then to solve for the
 trace values, which are the only globally coupled unknowns.
   <li>  Use the known skeleton values as Dirichlet data for solving local
 element-level solutions.  This is known as the
-'local solver', and is an <i>embarrassingly parallel</i> element-by-element 
+'local solver', and is an <i>embarrassingly parallel</i> element-by-element
 solution process.
 </ol>
 
@@ -87,21 +87,21 @@ problem) and subtract $CA^{-1}B$ from $D$. The steps in the Dirichlet-to-Neumann
 <h4> Solution quality and rates of convergence</h4>
 Another criticism of traditional DG methods is that the approximate fluxes
 converge suboptimally.  The local HDG solutions can be shown to converge
-as $\mathcal{O}(h^{p+1})$, i.e., at optimal order.  Additionally, a 
-super-convergence property can be used to post-process a new approximate 
+as $\mathcal{O}(h^{p+1})$, i.e., at optimal order.  Additionally, a
+super-convergence property can be used to post-process a new approximate
 solution that converges at the rate $\mathcal{O}(h^{p+2})$.
 
 
 
 <h3> HDG applied to the convection-diffusion problem </h3>
 
-The HDG formulation used for this example is taken from 
+The HDG formulation used for this example is taken from
 <br>
 <b>
   N.C. Nguyen, J. Peraire, B. Cockburn:
-  <i>An implicit high-order hybridizable discontinuous Galerkin method 
-  for linear convection–diffusion equations</i>, 
-  Journal of Computational Physics, 2009, 228:9, 3232-3254. 
+  <i>An implicit high-order hybridizable discontinuous Galerkin method
+  for linear convection–diffusion equations</i>,
+  Journal of Computational Physics, 2009, 228:9, 3232-3254.
   <a href="http://dx.doi.org/10.1016/j.jcp.2009.01.030">[DOI]</a>
 </b>
 
@@ -110,7 +110,7 @@ We consider the convection-diffusion equation:
 	\nabla \cdot (\mathbf{c} u) - \nabla \cdot (\kappa \nabla u) &=& f,
 	\quad \text{ in } \Omega, \\
 	u &=& g_D, \quad \text{ on } \partial \Omega_D, \\
-	(\mathbf{c} u - \kappa \nabla u)\cdot \mathbf{n} &=& g_N, 
+	(\mathbf{c} u - \kappa \nabla u)\cdot \mathbf{n} &=& g_N,
 	\quad \text{ on }  \partial \Omega_N.
 @f}
 
@@ -120,23 +120,23 @@ the above equation as the first order system:
   \mathbf{q} + \kappa \nabla u &=& 0, \quad \text{ in } \Omega, \\
   \nabla \cdot (\mathbf{c} u + \mathbf{q}) &=& f, \quad \text{ in } \Omega, \\
   u &=& g_D, \quad \text{ on } \partial \Omega_D, \\
-  (\mathbf{q} + \mathbf{c}u)\cdot\mathbf{n}  &=& g_N, 
+  (\mathbf{q} + \mathbf{c}u)\cdot\mathbf{n}  &=& g_N,
 	\quad \text{ on }  \partial \Omega_N.
 @f}
 
-We multiply these equations by the weight functions $\mathbf{v}, w$ 
+We multiply these equations by the weight functions $\mathbf{v}, w$
 and integrate by parts over every element $K$ to obtain:
 @f{eqnarray*}
   (\mathbf{v}, \kappa^{-1} \mathbf{q})_K - (\nabla\cdot\mathbf{v}, u)_K
     + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}\right>_{\partial K} &=& 0, \\
-  - (\nabla w, \mathbf{c} u + \mathbf{q})_K 
+  - (\nabla w, \mathbf{c} u + \mathbf{q})_K
     + \left<(w, \hat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}\right>_{\partial K}
     &=& (w,f)_K.
 @f}
 
 The terms decorated with a hat denote the numerical traces (also commonly referred
 to as numerical fluxes).   They are approximations
-to the interior values on the boundary of the element.  To ensure conservation, 
+to the interior values on the boundary of the element.  To ensure conservation,
 these terms must be single-valued on any given element edge $\partial K$ even
 though, with discontinuous shape functions, there may of course be multiple
 values coming from the cells adjacent to an interface.
@@ -161,18 +161,18 @@ The trace/skeleton variables in HDG methods are single-valued on element faces. 
 they must strongly represent the Dirichlet data on $\partial\Omega_D$.  We introduce
 a new variable $\lambda$ such that
 @f{equation*}
-  \hat{u} = 
+  \hat{u} =
   \begin{cases}
      g_D  & \text{ on } \partial \Omega_D, \\
      \lambda & \text{otherwise}.
 \end{cases}
-@f} 
+@f}
 
 Eliminating $\hat{u}$ from the weak form in favor of $\lambda$, summing the elemental
 contributions across all elements in the triangulation, enforcing the normal
 component of the numerical flux, and integrating by parts
-on the equation weighted by $w$, we arrive at the final form of the problem:  
-Find $(\mathbf{q}_h, u_h, \lambda_h) \in 
+on the equation weighted by $w$, we arrive at the final form of the problem:
+Find $(\mathbf{q}_h, u_h, \lambda_h) \in
 \mathcal{V}_h^p \times \mathcal{W}_h^p \times \mathcal{M}_h^p$ such that
 @f{eqnarray*}
   (\mathbf{v}, \kappa^{-1} \mathbf{q}_h)_{\mathcal{T}}
@@ -188,7 +188,7 @@ Find $(\mathbf{q}_h, u_h, \lambda_h) \in
     (w, f)_{\mathcal{T}},
     \quad \forall w \in \mathcal{W}_h^p,
 \\
-  \left< \mu, \mathbf{c} \lambda_h\cdot \mathbf{n} 
+  \left< \mu, \mathbf{c} \lambda_h\cdot \mathbf{n}
   		+ \mathbf{q}_h\cdot \mathbf{n}
   	    + \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
     &=&
@@ -196,8 +196,8 @@ Find $(\mathbf{q}_h, u_h, \lambda_h) \in
     \quad \forall \mu \in \mathcal{M}_h^p.
 @f}
 
-The unknowns $(\mathbf{q}_h, u_h)$ are referred to as local variables; they are 
-represented as standard DG variables.  The unknown $\lambda_h$ is the skeleton 
+The unknowns $(\mathbf{q}_h, u_h)$ are referred to as local variables; they are
+represented as standard DG variables.  The unknown $\lambda_h$ is the skeleton
 variable which has support on the codimension-1 surfaces (faces) of the mesh.
 
 In the equation above, the space $\mathcal {W}_h^{p}$ for the scalar variable
@@ -219,14 +219,14 @@ section below for an illustration.
 In the weak form given above, we can note the following coupling patterns:
 <ol>
   <li> The matrix $A$ consists of local-local coupling terms.  These arise when the
-  local weighting functions $(\mathbf{v}, w)$ multiply the local solution terms 
+  local weighting functions $(\mathbf{v}, w)$ multiply the local solution terms
   $(\mathbf{q}_h, u_h)$.
-  <li> The matrix $B$ represents the local-face coupling.  These are the terms 
-  with weighting functions $(\mathbf{v}, w)$ multiplying the skeleton variable 
+  <li> The matrix $B$ represents the local-face coupling.  These are the terms
+  with weighting functions $(\mathbf{v}, w)$ multiplying the skeleton variable
   $\lambda_h$.
-  <li> The matrix $C$ represents the face-local coupling, which involves the 
+  <li> The matrix $C$ represents the face-local coupling, which involves the
   weighting function $\mu$ multiplying the local solutions $(\mathbf{q}_h, u_h)$.
-  <li>  The matrix $D$ is the face-face coupling; 
+  <li>  The matrix $D$ is the face-face coupling;
   terms involve both $\mu$ and $\lambda_h$.
 </ol>
 
@@ -250,7 +250,7 @@ ingredients above, we immediately deduce the following layout for
 post-processing on each element:
 @f{eqnarray*}
 \left(1, u_h^*\right)_K &=& \left(1, u_h\right)_K\\
-\left(\nabla w_h^*, \nabla u_h^*\right)_K &=& -\left(\nabla w_h^*, \mathbf{q}_h\right)_K \quad \text{for all } w_h^* \in \mathcal Q^{p+1}
+\left(\nabla w_h^*, \kappa \nabla u_h^*\right)_K &=& -\left(\nabla w_h^*, \mathbf{q}_h\right)_K \quad \text{for all } w_h^* \in \mathcal Q^{p+1}.
 @f}
 
 Since the second set of equations is already equal to the cell-wise dimension
@@ -258,22 +258,39 @@ of the new function space $|\mathcal Q^{p+1}|$, there is one more equation in
 the above than unknown, which we fix in the code below by omitting one of
 these equations (since the Laplacian is singular on the constant function). As
 we will see below, this form of the post-processing already gives the desired
-super-convergence result with rate $\mathcal {O}(h^{p+2})$. It should be noted
-that there is some freedom in constructing $u_h^*$ and this approach using the
-local Poisson operator to extract the information from the gradient is not the
-only one (and indeed it has been motivated for Poisson-like problems in the
-literature). For example, the paper by Nguyen, Peraire and Cockburn cited
-above suggests another somewhat more involved formula for convection-diffusion
-that can also post-process the flux variable into an
-$H(\Omega,\mathrm{div})$-conforming variant and better represents the local
-convection-diffusion operator when the diffusion is small. We leave the
-implementation of a more sophisticated post-processing as a possible extension
-to the user.
+super-convergence result with rate $\mathcal {O}(h^{p+2})$. The motivation for
+the above equation is the minimization of the expression $|\kappa \nabla u_h^*
++ \mathbf{q}_h|^2$ over the cell <i>K</i>. It should be noted that there is
+some freedom in constructing $u_h^*$ and this approach to extract the
+information from the gradient is not the only one. For example, the paper by
+Nguyen, Peraire and Cockburn cited above suggests another somewhat more
+involved formula for convection-diffusion that can also post-process the flux
+variable into an $H(\Omega,\mathrm{div})$-conforming variant and better
+represents the local convection-diffusion operator when the diffusion is
+small. We leave the implementation of a more sophisticated post-processing as
+a possible extension to the user.
 
 <h3> Problem specific data </h3>
-Example specific data:
-$\Omega := [-1,1]^d$
 
+For this tutorial program, we consider almost the same test case as in
+step-7. The computational domain is $\Omega := [-1,1]^d$ and the exact
+solution corresponds to the one in step-7, except for a scaling. We use the following source centers <i>x<sub>i</sub></i> for the exponentials
+<ul>
+  <li> 1D:  $\{x_i\}_1^1 = \{ -\frac{1}{3}, 0, \frac{1}{3} \}$,
+  <li> 2D: $\{\mathbf{x}_i\}_1^2 = \{ (-\frac{1}{2},\frac{1}{2})
+                        		 (-\frac{1}{2},-\frac{1}{2})
+  					 (\frac{1}{2},-\frac{1}{2})
+  				   \}$,
+  <li> 3D: $\{\mathbf{x}_i\}_1^3 = \{ (-\frac{1}{2},\frac{1}{2}, \frac{1}{4})
+  				      (-\frac{3}{5},-\frac{1}{2}, -\frac{1}{8})
+  				      (\frac{1}{2},-\frac{1}{2}, \frac{1}{2})
+  				   \}$.
+</ul>
+
+With the exact solution given, we then choose the forcing on the right hand
+side and the Neumann boundary condition such that we obtain this solution
+(manufactured solution technique). In this example, we choose the diffusion
+equal to one and the convection as
 \f[
 \mathbf{c} = \begin{cases}
 1, & \textrm{dim}=1 \\
@@ -282,17 +299,6 @@ $\Omega := [-1,1]^d$
 \end{cases}
 \f]
 
-the centers $x_i$ of the exponentials are 
-  $\{x_i\}_1^3 = \{ -\frac{1}{3}, 0, \frac{1}{3} \}$
-  $\{\mathbf{x}_i\}_1^3 = \{ (-\frac{1}{2},\frac{1}{2})
-  							 (-\frac{1}{2},-\frac{1}{2})
-  							 (\frac{1}{2},-\frac{1}{2})
-  						  \}$
-  $\{\mathbf{x}_i\}_1^3 = \{ (-\frac{1}{2},\frac{1}{2}, \frac{1}{4})
-  							 (-\frac{3}{5},-\frac{1}{2}, -\frac{1}{8})
-  							 (\frac{1}{2},-\frac{1}{2}, \frac{1}{2})
-  						  \}$
-   
 
 <h3> Implementation </h3>
 
@@ -302,4 +308,3 @@ Implementation notes:
 - Reconstructing the trace
 - Post-processing the solution for superconvergence
 - DataOutFaces:  direct output of the global solution
-
