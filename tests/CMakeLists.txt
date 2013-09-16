@@ -64,14 +64,11 @@ FOREACH(_category ${_categories})
   # avoid stale test definitions:
   FILE(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${_category}/CTestTestfile.cmake)
 
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_category}
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-      ${CMAKE_CURRENT_BINARY_DIR}/${_category}
-    )
   ADD_CUSTOM_TARGET(setup_test_${_category}
     COMMAND ${CMAKE_COMMAND} -E make_directory
       ${CMAKE_CURRENT_BINARY_DIR}/${_category}
-    COMMAND ${CMAKE_COMMAND}
+    COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/${_category} &&
+      ${CMAKE_COMMAND}
       -G${CMAKE_GENERATOR}
       -DDEAL_II_DIR=${CMAKE_BINARY_DIR}
       -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR}
@@ -81,7 +78,6 @@ FOREACH(_category ${_categories})
       -DTEST_TIME_LIMIT=${TEST_TIME_LIMIT} # TODO: Refactor
       ${CMAKE_CURRENT_SOURCE_DIR}/${_category}
       > /dev/null # Shoo!
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_category}
     COMMENT "Processing ./tests/${_category}"
     )
