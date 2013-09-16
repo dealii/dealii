@@ -95,7 +95,7 @@ void test()
                                                    MappingQ<dim>(degree));
   constraints.close();
 
-  std::string base = output_file_for_mpi("no_flux_constraints_03");
+  std::string base = "";
 
   MPI_Barrier(MPI_COMM_WORLD);
 
