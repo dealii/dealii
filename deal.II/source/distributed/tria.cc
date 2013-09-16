@@ -23,8 +23,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/distributed/tria.h>
 
 #ifdef DEAL_II_WITH_P4EST
 #  include <p4est_bits.h>
@@ -3436,39 +3436,30 @@ namespace parallel
       return mpi_communicator;
     }
 
-
-    template <int dim, int spacedim>
+    template<int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::add_periodicity
-       (const std::vector<std_cxx1x::tuple<cell_iterator, unsigned int,
-                                           cell_iterator, unsigned int> >&
-          periodicity_vector)
+      (const std::vector<GridTools::PeriodicFacePair<cell_iterator> >&
+        periodicity_vector)
     {
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
+      #if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
       Assert (triangulation_has_content == true,
               ExcMessage ("The triangulation is empty!"));
       Assert (this->n_levels() == 1,
               ExcMessage ("The triangulation is refined!"));
-
-      typename std::vector
-        <typename std_cxx1x::tuple
-          <cell_iterator, unsigned int,
-           cell_iterator, unsigned int> >::const_iterator periodic_tuple;
-      periodic_tuple = periodicity_vector.begin();
-
-      typename std::vector
-        <typename std_cxx1x::tuple
-          <cell_iterator, unsigned int,
-           cell_iterator, unsigned int> >::const_iterator periodic_end;
-      periodic_end = periodicity_vector.end();
-
-      for (; periodic_tuple<periodic_end; ++periodic_tuple)
+      
+      typedef std::vector<GridTools::PeriodicFacePair<cell_iterator> >
+        FaceVector;
+      typename FaceVector::const_iterator it, periodic_end;
+      it = periodicity_vector.begin();
+      
+      for (; it<periodic_end; ++it)
       {
-        const cell_iterator first_cell=std_cxx1x::get<0>(*periodic_tuple);
-        const cell_iterator second_cell=std_cxx1x::get<2>(*periodic_tuple);
-        const unsigned int face_right=std_cxx1x::get<3>(*periodic_tuple);
-        const unsigned int face_left=std_cxx1x::get<1>(*periodic_tuple);
-
+        const cell_iterator first_cell = it->cell[0];
+        const cell_iterator second_cell = it->cell[1];
+        const unsigned int face_left = it->face_idx[0];
+        const unsigned int face_right = it->face_idx[1];
+        
         //respective cells of the matching faces in p4est
         const unsigned int tree_left
           = coarse_cell_to_p4est_tree_permutation[std::distance(this->begin(),
@@ -3477,6 +3468,12 @@ namespace parallel
           = coarse_cell_to_p4est_tree_permutation[std::distance(this->begin(),
                                                                 second_cell)];
 
+        //TODO Add support for non default orientation.
+        Assert(it->orientation == 1,
+               ExcMessage("Found a face match with non standard orientation. "
+                          "This function is only suitable for meshes with "
+                          "cells in default orientation"));
+
         dealii::internal::p4est::functions<dim>::
           connectivity_join_faces (connectivity,
                                    tree_left,
@@ -3484,6 +3481,7 @@ namespace parallel
                                    face_left,
                                    face_right,
                                    /* orientation */ 0);
+
         /* The orientation parameter above describes the difference between
          * the cell on the left and the cell on the right would number of the
          * corners of the face.  In the periodic domains most users will want,
@@ -3495,25 +3493,60 @@ namespace parallel
          * date.
          */
       }
-
-
+      
+      
       Assert(dealii::internal::p4est::functions<dim>::connectivity_is_valid
-               (connectivity) == 1,
-             ExcInternalError());
-
-        // now create a forest out of the connectivity data structure
+               (connectivity) == 1, ExcInternalError());
+      
+      // now create a forest out of the connectivity data structure
       dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
       parallel_forest
         = dealii::internal::p4est::functions<dim>::
             new_forest (mpi_communicator,
                         connectivity,
-                        /* minimum initial number of quadrants per tree */ 0,
-                        /* minimum level of upfront refinement */ 0,
-                        /* use uniform upfront refinement */ 1,
-                        /* user_data_size = */ 0,
-                        /* user_data_constructor = */ NULL,
-                        /* user_pointer */ this);
+                       /* minimum initial number of quadrants per tree */ 0,
+                       /* minimum level of upfront refinement */ 0,
+                       /* use uniform upfront refinement */ 1,
+                       /* user_data_size = */ 0,
+                       /* user_data_constructor = */ NULL,
+                       /* user_pointer */ this);
+      
+      #else
+      Assert(false, ExcMessage ("Need p4est version >= 0.3.4.1!"));
+      #endif
+    }
 
+    
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::add_periodicity
+       (const std::vector<std_cxx1x::tuple<cell_iterator, unsigned int,
+                                           cell_iterator, unsigned int> >&
+          periodicity_vector)
+    {
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
+      typedef std::vector<std_cxx1x::tuple <cell_iterator, unsigned int,
+                                            cell_iterator, unsigned int> >
+        FaceVector;
+
+      typename FaceVector::const_iterator it, end_periodic;
+      it = periodicity_vector.begin();
+      end_periodic = periodicity_vector.end();
+
+      std::vector<GridTools::PeriodicFacePair<cell_iterator> > periodic_faces;
+
+      for(; it!=end_periodic; ++it)
+      {
+        const cell_iterator cell1 = std::get<0> (*it);
+        const cell_iterator cell2 = std::get<2> (*it);
+        const unsigned int face_idx1 = std::get<1> (*it);
+        const unsigned int face_idx2 = std::get<3> (*it);
+        const GridTools::PeriodicFacePair<cell_iterator> matched_face
+          = {{cell1, cell2},{face_idx1, face_idx2}, 1};
+        periodic_faces.push_back(matched_face);
+      }
+
+      add_periodicity(periodic_faces);
 #else
       Assert(false, ExcMessage ("Need p4est version >= 0.3.4.1!"));
 #endif

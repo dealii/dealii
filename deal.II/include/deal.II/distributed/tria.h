@@ -158,7 +158,8 @@ namespace internal
   }
 }
 
-
+//forward declaration of the data type for periodic face pairs
+namespace GridTools {template <typename CellIterator> struct PeriodicFacePair;}
 
 namespace parallel
 {
@@ -700,15 +701,36 @@ namespace parallel
       get_p4est_tree_to_coarse_cell_permutation() const;
 
 
+
       /**
        * Join faces in the p4est forest due to periodic boundary conditions.
+       *
+       * The vector can be filled by the function
+       * GridTools::collect_periodic_faces.
+       *
+       * @todo At the moment just default orientation is implemented.
+       *
+       * @note Before this function can be used the triangulation has to be
+       * initialized and must not be refined.
+       * Calling this function more than once is possible, but not recommended:
+       * The function destroys and rebuilds the p4est forest each time it is called.
+       */
+      void
+      add_periodicity
+      (const std::vector<GridTools::PeriodicFacePair<cell_iterator> >&);
+
+      /**
+       * Same as the function above, but takes a different argument.
        *
        * The entries in the std::vector should have the form
        * std_cxx1x::tuple<cell1, face_no1, cell2, face_no2>.
        *
        * The vector can be filled by the function
-       * DoFTools::identify_periodic_face_pairs.
-       *
+       * GridTools::identify_periodic_face_pairs.
+       * 
+       * @note This function can only be used if the faces are in
+       * default orientation.
+       * 
        * @note Before this function can be used the triangulation has to be
        * initialized and must not be refined.
        * Calling this function more than once is possible, but not recommended:
@@ -718,6 +740,7 @@ namespace parallel
       add_periodicity
         (const std::vector<std_cxx1x::tuple<cell_iterator, unsigned int,
                                             cell_iterator, unsigned int> >&);
+
 
 
     private:

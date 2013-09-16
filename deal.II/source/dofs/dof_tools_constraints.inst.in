@@ -68,6 +68,14 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
                                          dealii::Tensor<1,DH::space_dimension> &,
                                          dealii::ConstraintMatrix &,
                                          const ComponentMask &);
+
+  template
+  void
+  DoFTools::make_periodicity_constraints<DH>
+  (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> > &,
+   dealii::ConstraintMatrix &,
+   const ComponentMask &);
+  
 #endif
 }
 

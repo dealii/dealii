@@ -1970,7 +1970,7 @@ namespace DoFTools
   }
 
 
-
+  
   template<typename DH>
   void
   make_periodicity_constraints (const DH                       &dof_handler,
@@ -2010,24 +2010,23 @@ namespace DoFTools
             ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
                         "different to denote different boundaries."));
 
-    typedef typename DH::face_iterator FaceIterator;
-    typedef std::map<FaceIterator, std::pair<FaceIterator, std::bitset<3> > > FaceMap;
+    typedef std::vector<GridTools::PeriodicFacePair
+                          <typename DH::cell_iterator> > FaceVector;
 
     // Collect matching periodic cells on the coarsest level:
-    FaceMap matched_cells =
-      GridTools::collect_periodic_face_pairs(dof_handler,
-                                             b_id1, b_id2,
-                                             direction, offset);
+    FaceVector matched_cells =
+      GridTools::collect_periodic_faces(dof_handler, b_id1, b_id2,
+                                        direction, offset);
 
     // And apply the low level make_periodicity_constraints function to
     // every matching pair:
-    for (typename FaceMap::iterator it = matched_cells.begin();
+    for (typename FaceVector::iterator it = matched_cells.begin();
          it != matched_cells.end(); ++it)
       {
         typedef typename DH::face_iterator FaceIterator;
-        const FaceIterator &face_1 = it->first;
-        const FaceIterator &face_2 = it->second.first;
-        const std::bitset<3> &orientation = it->second.second;
+        const FaceIterator &face_1 = it->cell[0]->face(it->face_idx[0]);
+        const FaceIterator &face_2 = it->cell[1]->face(it->face_idx[1]);
+        const std::bitset<3> &orientation = it->orientation;
 
         Assert(face_1->at_boundary() && face_2->at_boundary(),
                ExcInternalError());
@@ -2088,23 +2087,22 @@ namespace DoFTools
     Assert(dim == space_dim,
            ExcNotImplemented());
 
-    typedef typename DH::face_iterator FaceIterator;
-    typedef std::map<FaceIterator, FaceIterator> FaceMap;
+    typedef std::vector<GridTools::PeriodicFacePair
+                          <typename DH::cell_iterator> > FaceVector;
 
     // Collect matching periodic cells on the coarsest level:
-    FaceMap matched_cells =
-      GridTools::collect_periodic_face_pairs(dof_handler,
-                                             b_id,
-                                             direction, offset);
+    const FaceVector matched_cells =
+      GridTools::collect_periodic_faces(dof_handler, b_id,
+                                        direction, offset);
 
     // And apply the low level make_periodicity_constraints function to
     // every matching pair:
-    for (typename FaceMap::iterator it = matched_cells.begin();
+    for (typename FaceVector::const_iterator it = matched_cells.begin();
          it != matched_cells.end(); ++it)
       {
         typedef typename DH::face_iterator FaceIterator;
-        const FaceIterator &face_1 = it->first;
-        const FaceIterator &face_2 = it->second;
+        const FaceIterator &face_1 = it->cell[0]->face(it->face_idx[0]);
+        const FaceIterator &face_2 = it->cell[1]->face(it->face_idx[1]);
 
         Assert(face_1->at_boundary() && face_2->at_boundary(),
                ExcInternalError());
@@ -2122,6 +2120,38 @@ namespace DoFTools
                                      component_mask
                                      /* standard orientation */);
       }
+  }
+
+
+
+  template<typename DH>
+  void
+  make_periodicity_constraints
+  (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> >
+    &periodic_faces,
+   dealii::ConstraintMatrix &constraint_matrix,
+   const ComponentMask      &component_mask)
+  {
+    typedef std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> >
+    FaceVector;
+    typename FaceVector::const_iterator it, end_periodic;
+    it = periodic_faces.begin();
+    end_periodic = periodic_faces.end();
+    
+    for(; it!=end_periodic; ++it)
+    {
+      typedef typename DH::face_iterator FaceIterator;
+      const FaceIterator face_1 = it->cell[0]->face(it->face_idx[0]);
+      const FaceIterator face_2 = it->cell[1]->face(it->face_idx[1]);
+      
+      make_periodicity_constraints(face_1,
+                                   face_2,
+                                   constraint_matrix,
+                                   component_mask,
+                                   it->orientation[0],
+                                   it->orientation[1],
+                                   it->orientation[2]);
+    }
   }
 
 
