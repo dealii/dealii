@@ -93,6 +93,8 @@ IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND"
     )
 ENDIF()
 
+# TODO: we really want numdiff -a 1e-6 -q -s ' \t\n'
+# but quotings will break
 IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
   SET_IF_EMPTY(TEST_DIFF "${NUMDIFF_EXECUTABLE} -a 1e-6 -q")
 ELSE()
