@@ -93,21 +93,17 @@ IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND"
     )
 ENDIF()
 
-# TODO: we really want numdiff -a 1e-6 -q -s ' \t\n'
-# but quotings will break
-IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-  SET_IF_EMPTY(TEST_DIFF "${NUMDIFF_EXECUTABLE} -a 1e-6 -q")
+IF("${TEST_DIFF}" STREQUAL "")
+  IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
+      SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -q -s ' \\t\\n')
+  ELSE()
+      SET(TEST_DIFF ${DIFF_EXECUTABLE})
+  ENDIF()
 ELSE()
-  SET_IF_EMPTY(TEST_DIFF "${DIFF_EXECUTABLE}")
+  # TODO: I have no idea how to prepare a custom string comming possibly
+  # through two layers of command line into a list...
+  SEPARATE_ARGUMENTS(TEST_DIFF UNIX_COMMAND ${TEST_DIFF})
 ENDIF()
-
-#
-# "Son, we have to talk about quotings". Avoid overquoting. Due to the fact
-# that TEST_DIFF might be passed to the command line as a string, we have
-# to set it up this way :-/
-#
-
-SEPARATE_ARGUMENTS(TEST_DIFF UNIX_COMMAND ${TEST_DIFF})
 
 #
 # Set a default time limit of 180 seconds:
