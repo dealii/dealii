@@ -22,7 +22,7 @@
 // calculated interpolation points wrongly
 
 #include "../tests.h"
-#include "../bits/mesh_3d.h"
+#include "../grid/mesh_3d.h"
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>

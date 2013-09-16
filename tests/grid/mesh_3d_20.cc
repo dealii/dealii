@@ -20,7 +20,7 @@
 // and check on all faces that quadrature points match up. based on mesh_3d_7
 
 #include "../tests.h"
-#include "../bits/mesh_3d.h"
+#include "../grid/mesh_3d.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
