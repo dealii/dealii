@@ -227,7 +227,7 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
               const MDt &Dt,
               const MC &C,
               VectorMemory<BlockVector<double> > &mem,
-              const std::vector<types::global_dof_index> &signature)
+              const std::vector<unsigned int> &signature)
   : Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
     mem(mem),
     signature(signature),
