@@ -18,7 +18,6 @@
 # A minimalistic set of tests:
 #
 
-
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${_build} _build_lowercase)
 
@@ -53,7 +52,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
       -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  SET_TESTS_PROPERTIES(${_test} PROPERTIES LABEL "${_category}")
+  SET_TESTS_PROPERTIES(${_test} PROPERTIES LABEL "sanity checks")
 
   #
   # Test whether thread affinity is well behaved:
