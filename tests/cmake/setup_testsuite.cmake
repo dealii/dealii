@@ -36,7 +36,7 @@
 # Load all macros:
 #
 
-FILE(GLOB _macro_files "${CMAKE_CURRENT_LIST_DIR}/macros/*.cmake")
+FILE(GLOB _macro_files ${CMAKE_CURRENT_LIST_DIR}/macros/*.cmake)
 FOREACH(_file ${_macro_files})
   INCLUDE(${_file})
 ENDFOREACH()
@@ -66,6 +66,7 @@ ENDIF()
 FIND_PACKAGE(deal.II 8.1 REQUIRED
   HINTS ${DEAL_II_BINARY_DIR} ${DEAL_II_DIR}
   )
+INCLUDE(${DEAL_II_TARGET_CONFIG})
 
 FIND_PACKAGE(Perl REQUIRED)
 
