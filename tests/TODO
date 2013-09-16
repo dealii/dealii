@@ -1,21 +1,70 @@
 Issues:
 
- - p4est's vtk write out may be with zlib support - independent of how
-   deal.II is actually configured. With this, a lot of tests under
-   distributed_grids fail.
+ - PORTING:
+   The big part. Bruno and I have converted all the tests, but there a a
+   lot that need some love. It would be very nice if anybody who has a
+   spare minute
+  
+     - installs numdiff (http://www.nongnu.org/numdiff/)
+     - sets up the testsuite to a category
+         TEST_PICKUP_REGEX="category/"
+     - fixes all the failing tests :-]
+     - marks the category as done in ./tests/TODO
 
- - Depending on the version of boost, a version number in the serialization
-   output changes and all tests just.. fail
+        all-headers
+        aniso
+        base
+        benchmarks
+        bits
+        build_tests
+        codim_one
+        deal.II
+        distributed_grids
+        dof_tools_frame.h
+        fe
+        gla
+        grid
+        hp
+        integrators
+        lac
+        lapack
+        matrix_free
+        mesh_converter
+        metis
+        mpi
+        multigrid
+        petsc
+        serialization
+        slepc
+        trilinos
+        umfpack
+
+ - CLEANUP:
+   Clean up tests under deal.II/ and bits/ - rearrange category:
+   For somehow decent performance with GNU make there shouldn't be more
+   than 300 .output-files in a given category. Some of the tests under
+   deal.II and bits really look like they belong to somewhere else?
+   We now have the opportunity to rearrange this a bit. Opinions?
+
+ - ISSUE:
+   p4est's vtk write out may be with zlib support - independent of how
+   deal.II is actually configured. With this, a lot of tests under
+   distributed_grids/ fail.
+
+ - ISSUE:
+   Depending on the version of boost, a version number in the serialization
+   output changes and all tests just under serialization/ just fail
+
+ - Write a ctest configuration file (I'll do this sometime this week)
+
+ - and setup a cdash test server 
 
  - Mesh converter tests?
 
- - Benchmark tests?
+ - Benchmark should be extra, am I right?
 
  - What about the files in
 
    ./base/data_out_base_dx
-   ./base/data_out_base_povray
+   ./base/data_out_base_povray?
 
- - Relocate all meshes in ./deal.II/*/ to ./deal.II/grids
-
- - Fixup this big mess w.r.t. TEST_DIFF
