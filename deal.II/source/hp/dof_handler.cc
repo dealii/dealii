@@ -1458,7 +1458,7 @@ namespace internal
               // line_dofs_offsets field
               dof_handler.faces->lines.dof_offsets
               .resize (dof_handler.tria->n_raw_lines(),
-                       numbers::invalid_dof_index);
+                       numbers::invalid_unsigned_int);
 
               unsigned int line_slots_needed = 0;
               for (unsigned int line=0; line<dof_handler.tria->n_raw_lines(); ++line)
