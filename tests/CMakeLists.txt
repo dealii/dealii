@@ -65,13 +65,15 @@ IF(DEAL_II_WITH_UMFPACK)
 ENDIF()
 
 #
-# Pass all variables starting with "TEST_" down to the subprojects:
+# Pass all relevant "TEST_" variables down to the subprojects:
 #
 
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 SET(_options)
 FOREACH(_var ${_variables})
-  IF(_var MATCHES "^TEST_")
+  IF(_var MATCHES
+      "^(TEST_DIR|TEST_DIFF|TEST_TIME_LIMIT|TEST_PICKUP_REGEX|NUMDIFF_DIR)$"
+      )
     LIST(APPEND _options -D${_var}="${${_var}}")
   ENDIF()
 ENDFOREACH()
