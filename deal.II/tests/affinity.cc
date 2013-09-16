@@ -1,4 +1,5 @@
 #include <deal.II/grid/tria.h>
+#include <stdio.h>
 #include <sched.h>
 
 int main ()
@@ -18,7 +19,9 @@ int main ()
       return -1;
     }
 
-  unsigned int bits_set = CPU_COUNT(&my_set);
+  unsigned int bits_set = 0;//not supported on old kernels: CPU_COUNT(&my_set);
+  for (int i=0;i<CPU_SETSIZE;++i)
+    bits_set += CPU_ISSET(i,&my_set);
 
   if (bits_set==1)
     {
