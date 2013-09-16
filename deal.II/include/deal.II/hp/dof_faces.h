@@ -495,7 +495,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      if (dof_offsets[obj_index] == numbers::invalid_dof_index)
+      if (dof_offsets[obj_index] == numbers::invalid_unsigned_int)
         return 0;
 
       Assert (structdim<dim, ExcMessage ("This object can not be used for cells."));
