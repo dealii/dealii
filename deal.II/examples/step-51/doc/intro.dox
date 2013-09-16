@@ -262,13 +262,19 @@ super-convergence result with rate $\mathcal {O}(h^{p+2})$. The motivation for
 the above equation is the minimization of the expression $|\kappa \nabla u_h^*
 + \mathbf{q}_h|^2$ over the cell <i>K</i>. It should be noted that there is
 some freedom in constructing $u_h^*$ and this approach to extract the
-information from the gradient is not the only one. For example, the paper by
-Nguyen, Peraire and Cockburn cited above suggests another somewhat more
-involved formula for convection-diffusion that can also post-process the flux
-variable into an $H(\Omega,\mathrm{div})$-conforming variant and better
-represents the local convection-diffusion operator when the diffusion is
-small. We leave the implementation of a more sophisticated post-processing as
-a possible extension to the user.
+information from the gradient is not the only one. In particular, the
+post-processed solution defined here does not satisfy the convection-diffusion
+equation in any sense. As an alternative, the paper by Nguyen, Peraire and
+Cockburn cited above suggests another somewhat more involved formula for
+convection-diffusion that can also post-process the flux variable into an
+$H(\Omega,\mathrm{div})$-conforming variant and better represents the local
+convection-diffusion operator when the diffusion is small. We leave the
+implementation of a more sophisticated post-processing as a possible extension
+to the interested reader.
+
+Note that for vector-valued problem, the approach is very similar. One simply
+sets the constraint for the mean value of each vector component separately and
+uses the gradient for the main work.
 
 <h3> Problem specific data </h3>
 
