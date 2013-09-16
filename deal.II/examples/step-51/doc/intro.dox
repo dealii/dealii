@@ -276,13 +276,13 @@ For this tutorial program, we consider almost the same test case as in
 step-7. The computational domain is $\Omega := [-1,1]^d$ and the exact
 solution corresponds to the one in step-7, except for a scaling. We use the following source centers <i>x<sub>i</sub></i> for the exponentials
 <ul>
-  <li> 1D:  $\{x_i\}_1^1 = \{ -\frac{1}{3}, 0, \frac{1}{3} \}$,
-  <li> 2D: $\{\mathbf{x}_i\}_1^2 = \{ (-\frac{1}{2},\frac{1}{2})
-                        		 (-\frac{1}{2},-\frac{1}{2})
+  <li> 1D:  $\{x_i\}^1 = \{ -\frac{1}{3}, 0, \frac{1}{3} \}$,
+  <li> 2D: $\{\mathbf{x}_i\}^2 = \{ (-\frac{1}{2},\frac{1}{2}),
+                        		 (-\frac{1}{2},-\frac{1}{2}),
   					 (\frac{1}{2},-\frac{1}{2})
   				   \}$,
-  <li> 3D: $\{\mathbf{x}_i\}_1^3 = \{ (-\frac{1}{2},\frac{1}{2}, \frac{1}{4})
-  				      (-\frac{3}{5},-\frac{1}{2}, -\frac{1}{8})
+  <li> 3D: $\{\mathbf{x}_i\}^3 = \{ (-\frac{1}{2},\frac{1}{2}, \frac{1}{4}),
+  				      (-\frac{3}{5},-\frac{1}{2}, -\frac{1}{8}),
   				      (\frac{1}{2},-\frac{1}{2}, \frac{1}{2})
   				   \}$.
 </ul>
@@ -298,13 +298,13 @@ equal to one and the convection as
 (y, -x, 1), & \textrm{dim}=3
 \end{cases}
 \f]
-
+Note that the convection is divergence-free, $\nabla \cdot c = 0$.
 
 <h3> Implementation </h3>
 
-Implementation notes:
+Besides implementing the above equations, the implementation below provides the following features:
 
-- WorkStream to parallelize local solvers.  Workstream is already used in step-32, step-44.
-- Reconstructing the trace
+- WorkStream to parallelize local solvers. Workstream is already used in step-32, step-44.
+- Reconstruct the local DG solution from the trace trace
 - Post-processing the solution for superconvergence
-- DataOutFaces:  direct output of the global solution
+- DataOutFaces for direct output of the global skeleton solution
