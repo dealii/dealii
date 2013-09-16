@@ -199,6 +199,23 @@ Find $(\mathbf{q}_h, u_h, \lambda_h) \in
 The unknowns $(\mathbf{q}_h, u_h)$ are referred to as local variables; they are 
 represented as standard DG variables.  The unknown $\lambda_h$ is the skeleton 
 variable which has support on the codimension-1 surfaces (faces) of the mesh.
+
+In the equation above, the space $\mathcal {W}_h^{p}$ for the scalar variable
+<i>u<sub>h</sub></i> is defined as the space of functions that are tensor
+product polynomials of degree $p$ on each cell and discontinuous over the
+element boundaries $\mathcal Q_{-p}$, i.e., the space described by
+<code>FE_DGQ<dim>(p)</code>. The space for the gradient or flux variable
+<b>q</b><i><sub>h</sub></i> is a vector element space where each component is
+a locally polynomial and discontinuous $\mathcal Q_{-p}$. In the code below,
+we collect these two local parts together in one FESystem where the first @p
+dim components denote the gradient part and the last scalar component
+corresponds to the scalar variable. For the skeleton component $\lambda_h$, we
+define a space that consists of discontinuous tensor product polynomials that
+live on the element faces, which in deal.II is implemented by the class
+FE_FaceQ. This space is otherwise similar to FE_DGQ, i.e., the solution
+function is not continuous between two neighboring faces, see also the results
+section below for an illustration.
+
 In the weak form given above, we can note the following coupling patterns:
 <ol>
   <li> The matrix $A$ consists of local-local coupling terms.  These arise when the
@@ -215,6 +232,43 @@ In the weak form given above, we can note the following coupling patterns:
 
 <h4> Post-processing and super-convergence </h4>
 
+One special feature of the HDG methods is that they typically allow for
+constructing an enriched solution that gains accuracy. This post-processing
+takes the HDG solution in an element-by-element fashion and combines it such
+that one can get $\mathcal O(h^{p+2})$ order of accuracy when using
+polynomials of degree <i>p</i>. For this to happen, there are two necessary
+ingredients:
+<ol>
+  <li> The computed solution gradient $\mathbf{q}_h$ converges at optimal rate,
+   i.e., $\mathcal{O}(h^{p+1})$.
+  <li> The average of the scalar part of the solution, <i>u<sub>h</sub></i>,
+   on each cell <i>K</i> super-converges at rate $\mathcal{O}(h^{p+2})$.
+</ol>
+
+We now introduce a new variable $u_h^* \in \mathcal{V}_h^{p+1}$. With the two
+ingredients above, we immediately deduce the following layout for
+post-processing on each element:
+@f{eqnarray*}
+\left(1, u_h^*\right)_K &=& \left(1, u_h\right)_K\\
+\left(\nabla w_h^*, \nabla u_h^*\right)_K &=& -\left(\nabla w_h^*, \mathbf{q}_h\right)_K \quad \text{for all } w_h^* \in \mathcal Q^{p+1}
+@f}
+
+Since the second set of equations is already equal to the cell-wise dimension
+of the new function space $|\mathcal Q^{p+1}|$, there is one more equation in
+the above than unknown, which we fix in the code below by omitting one of
+these equations (since the Laplacian is singular on the constant function). As
+we will see below, this form of the post-processing already gives the desired
+super-convergence result with rate $\mathcal {O}(h^{p+2})$. It should be noted
+that there is some freedom in constructing $u_h^*$ and this approach using the
+local Poisson operator to extract the information from the gradient is not the
+only one (and indeed it has been motivated for Poisson-like problems in the
+literature). For example, the paper by Nguyen, Peraire and Cockburn cited
+above suggests another somewhat more involved formula for convection-diffusion
+that can also post-process the flux variable into an
+$H(\Omega,\mathrm{div})$-conforming variant and better represents the local
+convection-diffusion operator when the diffusion is small. We leave the
+implementation of a more sophisticated post-processing as a possible extension
+to the user.
 
 <h3> Problem specific data </h3>
 Example specific data:
