@@ -51,8 +51,7 @@ void test()
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "hyper_cube" << std::endl;
 
-  std::string filename =
-    (std::string("dat");
+  std::string filename = "dat";
   {
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
