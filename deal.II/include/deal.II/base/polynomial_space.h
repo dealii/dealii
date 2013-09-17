@@ -236,7 +236,7 @@ protected:
    * p<sub>i</sub>(x)p<sub>j</sub>(y)p<sub>k</sub>(z)</i>.
    */
   void compute_index (const unsigned int n,
-                      unsigned int      (&index)[dim]) const;
+                      unsigned int      (&index)[dim>0?dim:1]) const;
 
 private:
   /**
