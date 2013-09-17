@@ -281,7 +281,7 @@ test(const FiniteElement<dim> &fe)
 int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
-  MPILogInitAll i();
+  MPILogInitAll log;
 
   FE_DGP<2> p0(0);
   FE_Q<2>   q1(1);
