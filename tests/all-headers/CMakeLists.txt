@@ -29,7 +29,7 @@ SET(_category all-headers)
 
 SET(_count "0")
 
-IF(NOT"${DEAL_II_SOURCE_DIR}" STREQUAL "")
+IF(NOT "${DEAL_II_SOURCE_DIR}" STREQUAL "")
   # The testsuite was configured as part of a deal.II project, so pick up
   # the headers from the corresponding source directory:
   FILE(GLOB_RECURSE _header ${DEAL_II_SOURCE_DIR}/include/deal.II/*.h)
@@ -42,7 +42,6 @@ ELSE()
     LIST(GET DEAL_II_INCLUDE_DIRS 0 _header_dir)
   ENDIF()
   FILE(GLOB_RECURSE _header ${_header_dir}/deal.II/*.h)
-  MESSAGE(FATAL_ERROR ${_header_dir})
 ENDIF()
 
 FOREACH(_full_file ${_header})
