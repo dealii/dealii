@@ -441,6 +441,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
       for (unsigned int k = 0; k < face_quadrature.size(); ++k)
         {
           const Point<dim-1> p =
+            subface == numbers::invalid_unsigned_int ?
+            face_quadrature.point(k) :
             GeometryInfo<dim-1>::child_to_cell_coordinates (face_quadrature.point(k),
                                                             subface);
 
@@ -459,7 +461,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
         {
           for (unsigned int k = 0; k < face_quadrature.size(); ++k)
             {
-              const Point<dim-1> p =
+              const Point<dim-1> p = numbers::invalid_unsigned_int ?
+                face_quadrature.point(k) :
                 GeometryInfo<dim-1>::child_to_cell_coordinates (face_quadrature.point(k),
                                                                 subface);
               v_in(k) = source_fe->poly_space.compute_value(i, p);
