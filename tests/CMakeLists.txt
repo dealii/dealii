@@ -65,11 +65,17 @@ FOREACH(_var ${_variables})
 ENDFOREACH()
 
 #
-# Two custom targets to setup and cleanup the testsuite:
+# Custom targets to set and clean up the testsuite:
 #
 
+# Setup tests:
 ADD_CUSTOM_TARGET(setup_test)
-ADD_CUSTOM_TARGET(cleanup_test)
+
+# Clean all tests
+ADD_CUSTOM_TARGET(clean_test)
+
+# Remove all tests:
+ADD_CUSTOM_TARGET(prune_test)
 
 #
 # The list of subfolders to set up:
@@ -132,11 +138,17 @@ FOREACH(_category ${_categories})
   ADD_DEPENDENCIES(setup_test_${_category} library)
   ADD_DEPENDENCIES(setup_test setup_test_${_category})
 
-  ADD_CUSTOM_TARGET(cleanup_test_${_category}
+  ADD_CUSTOM_TARGET(clean_test_${_category}
+    COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
+      --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target clean
+    )
+  ADD_DEPENDENCIES(clean_test clean_test_${_category})
+
+  ADD_CUSTOM_TARGET(prune_test_${_category}
     COMMAND ${CMAKE_COMMAND} -E remove_directory
       ${CMAKE_CURRENT_BINARY_DIR}/${_category}
     )
-  ADD_DEPENDENCIES(cleanup_test cleanup_test_${_category})
+  ADD_DEPENDENCIES(prune_test prune_test_${_category})
 
   FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/deal.IITestfile.cmake
     "SUBDIRS(${_category})\n"
