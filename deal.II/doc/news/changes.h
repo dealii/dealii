@@ -86,6 +86,12 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Changed: we now call MPI_Init_thread instead of MPI_Init.
+  <br>
+  (Timo Heister, 2013/09/17)
+  </li>
+
+  <li>
   Enhancement: It is now possible to use the build directory directly without
   the need to install first. For this, a second copy of all necessary project
   configuration files (deal.IIConfig.cmake, ..., Make.global_options) are
