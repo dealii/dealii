@@ -46,7 +46,7 @@ SET(_release_steps
   step-47 step-48 step-49
   )
 
-IF(NOT"${DEAL_II_SOURCE_DIR}" STREQUAL "")
+IF(NOT "${DEAL_II_SOURCE_DIR}" STREQUAL "")
   # The testsuite was configured as part of a deal.II project, so pick up
   # the steps rom the corresponding source directory:
   FILE(GLOB _steps ${DEAL_II_SOURCE_DIR}/examples/step-*)
