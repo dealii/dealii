@@ -52,18 +52,11 @@ SET_IF_EMPTY(TEST_DIFF $ENV{TEST_DIFF})
 SET_IF_EMPTY(TEST_TIME_LIMIT $ENV{TEST_TIME_LIMIT})
 SET_IF_EMPTY(TEST_PICKUP_REGEX $ENV{TEST_PICKUP_REGEX})
 
-IF("${DEAL_II_BINARY_DIR}" STREQUAL "")
-  MESSAGE(FATAL_ERROR "DEAL_II_BINARY_DIR must be set for this test subproject to configure correctly")
-ENDIF()
-IF("${DEAL_II_SOURCE_DIR}" STREQUAL "")
-  MESSAGE(FATAL_ERROR "DEAL_II_SOURCE_DIR must be set for this test subproject to configure correctly")
-ENDIF()
-
 #
 # We need deal.II and Perl as external packages:
 #
 
-FIND_PACKAGE(deal.II 8.1 REQUIRED
+FIND_PACKAGE(deal.II 8.0 REQUIRED
   HINTS ${DEAL_II_BINARY_DIR} ${DEAL_II_DIR}
   )
 INCLUDE(${DEAL_II_TARGET_CONFIG})

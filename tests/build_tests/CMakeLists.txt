@@ -46,8 +46,18 @@ SET(_release_steps
   step-47 step-48 step-49
   )
 
+IF(NOT"${DEAL_II_SOURCE_DIR}" STREQUAL "")
+  # The testsuite was configured as part of a deal.II project, so pick up
+  # the steps rom the corresponding source directory:
+  FILE(GLOB _steps ${DEAL_II_SOURCE_DIR}/examples/step-*)
+ELSE()
+  # The testsuite was configured as an independent project, so pick up
+  # headers from an external deal.II build directory, or installation:
+  FILE(GLOB _steps ${DEAL_II_PATH}/${DEAL_II_EXAMPLES_RELDIR}/step-*)
+  # TODO: What do in case of a build dir?
+ENDIF()
+
 SET(_count "0")
-FILE(GLOB _steps ${DEAL_II_SOURCE_DIR}/examples/step-*)
 FOREACH(_step_full ${_steps})
   GET_FILENAME_COMPONENT(_step ${_step_full} NAME)
 
