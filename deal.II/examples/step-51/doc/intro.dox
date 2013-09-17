@@ -309,8 +309,10 @@ Note that the convection is divergence-free, $\nabla \cdot c = 0$.
 <h3> Implementation </h3>
 
 Besides implementing the above equations, the implementation below provides the following features:
-
-- WorkStream to parallelize local solvers. Workstream is already used in step-32, step-44.
-- Reconstruct the local DG solution from the trace trace
-- Post-processing the solution for superconvergence
-- DataOutFaces for direct output of the global skeleton solution
+<ul>
+  <li> WorkStream to parallelize local solvers. Workstream is already used in
+  step-32, step-44.
+  <li> Reconstruct the local DG solution from the trace trace.
+  <li> Post-processing the solution for superconvergence.
+  <li> DataOutFaces for direct output of the global skeleton solution.
+</ul>
