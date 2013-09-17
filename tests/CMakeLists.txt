@@ -24,6 +24,14 @@
 #
 
 MESSAGE(STATUS "Proceed to test definitions now.")
+ENABLE_TESTING()
+
+#
+# Write a minimalistic CTestTestfile.cmake file to CMAKE_BINARY_DIR:
+#
+FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
+  "SUBDIRS(tests)"
+  )
 
 #
 # Two custom targets to setup and cleanup the testsuite:

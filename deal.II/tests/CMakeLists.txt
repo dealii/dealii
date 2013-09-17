@@ -18,6 +18,8 @@
 # A minimalistic set of tests:
 #
 
+ENABLE_TESTING()
+
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${_build} _build_lowercase)
 
@@ -77,3 +79,15 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
 
 ENDFOREACH()
+
+#
+# A custom test target:
+#
+# @TIMO: TODO, write a little script to be run after ctest that queries for
+# (affinity|project|etc).(debug|release)-OK and outputs an appropriate
+# message.
+#
+ADD_CUSTOM_TARGET(test
+  COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  )

@@ -80,8 +80,6 @@ PROJECT(deal.II CXX)
 ENABLE_LANGUAGE_OPTIONAL(C)
 ENABLE_LANGUAGE_OPTIONAL(Fortran)
 
-ENABLE_TESTING()
-
 INCLUDE(setup_post_project_call)
 
 INCLUDE(setup_deal_ii)
