@@ -19,7 +19,7 @@
 #include <deal.II/fe/fe_face.h>
 
 // check
-//   FE_FaceQ::subface_interpolation
+//   FE_FaceQ/P::subface_interpolation
 
 
 std::string output_file_name = "faceq_subface_interpolation/output";
@@ -128,12 +128,22 @@ void
 check (const unsigned int degree1,
        const unsigned int degree2)
 {
-  deallog << "Checking FE_FaceQ in " << dim << "d:"
-          << std::endl;
+  {
+    deallog << "Checking FE_FaceQ in " << dim << "d:"
+            << std::endl;
 
-  FE_FaceQ<dim> fe1 (degree1), fe2 (degree2);
+    FE_FaceQ<dim> fe1 (degree1), fe2 (degree2);
 
-  check_this (fe1, fe2);
+    check_this (fe1, fe2);
+  }
+  {
+    deallog << "Checking FE_FaceP in " << dim << "d:"
+            << std::endl;
+
+    FE_FaceP<dim> fe1 (degree1), fe2 (degree2);
+
+    check_this (fe1, fe2);
+  }
 }
 
 
