@@ -327,12 +327,10 @@ namespace internal
 {
   namespace Vector
   {
-    typedef types::global_dof_index size_type;
-
-    template<typename T>
+    template <typename T>
     void set_subrange (const T            s,
-                       const size_type begin,
-                       const size_type end,
+                       const typename dealii::Vector<T>::size_type begin,
+                       const typename dealii::Vector<T>::size_type end,
                        dealii::Vector<T> &dst)
     {
       if (s == T())
@@ -341,9 +339,10 @@ namespace internal
         std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
     }
 
-    template<typename T>
-    void copy_subrange (const size_type         begin,
-                        const size_type         end,
+    
+    template <typename T>
+    void copy_subrange (const typename dealii::Vector<T>::size_type         begin,
+                        const typename dealii::Vector<T>::size_type         end,
                         const dealii::Vector<T> &src,
                         dealii::Vector<T>       &dst)
     {
@@ -351,9 +350,10 @@ namespace internal
              (end-begin)*sizeof(T));
     }
 
-    template<typename T, typename U>
-    void copy_subrange (const size_type         begin,
-                        const size_type         end,
+    
+    template <typename T, typename U>
+    void copy_subrange (const typename dealii::Vector<T>::size_type         begin,
+                        const typename dealii::Vector<T>::size_type         end,
                         const dealii::Vector<T> &src,
                         dealii::Vector<U>       &dst)
     {
@@ -364,15 +364,17 @@ namespace internal
         *p = *q;
     }
 
+
     template<typename T, typename U>
-    void copy_subrange_wrap (const size_type         begin,
-                             const size_type         end,
+    void copy_subrange_wrap (const typename dealii::Vector<T>::size_type         begin,
+                             const typename dealii::Vector<T>::size_type         end,
                              const dealii::Vector<T> &src,
                              dealii::Vector<U>       &dst)
     {
       copy_subrange (begin, end, src, dst);
     }
 
+    
     template <typename T, typename U>
     void copy_vector (const dealii::Vector<T> &src,
                       dealii::Vector<U>       &dst)
@@ -380,8 +382,8 @@ namespace internal
       if (PointerComparison::equal(&src, &dst))
         return;
 
-      const size_type vec_size = src.size();
-      const size_type dst_size = dst.size();
+      const typename dealii::Vector<T>::size_type vec_size = src.size();
+      const typename dealii::Vector<U>::size_type dst_size = dst.size();
       if (dst_size != vec_size)
         dst.reinit (vec_size, true);
       if (vec_size>internal::Vector::minimum_parallel_grain_size)
@@ -578,7 +580,7 @@ namespace internal
     // The code returns the result as the last argument in order to make
     // spawning tasks simpler and use automatic template deduction.
     template <typename Operation, typename Number, typename Number2,
-             typename ResultType>
+	      typename ResultType, typename size_type>
     void accumulate (const Operation   &op,
                      const Number      *X,
                      const Number2     *Y,
@@ -679,18 +681,18 @@ namespace internal
           ResultType r0, r1, r2, r3;
           Threads::TaskGroup<> task_group;
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
-                                          ResultType>,
+                                          ResultType,size_type>,
                                           op, X, Y, power, new_size, r0);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
-                                          ResultType>,
+                                          ResultType,size_type>,
                                           op, X+new_size, Y+new_size, power,
                                           new_size, r1);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
-                                          ResultType>,
+                                          ResultType,size_type>,
                                           op, X+2*new_size, Y+2*new_size, power,
                                           new_size, r2);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
-                                          ResultType>,
+                                          ResultType,size_type>,
                                           op, X+3*new_size, Y+3*new_size, power,
                                           vec_size-3*new_size, r3);
           task_group.join_all();

@@ -53,6 +53,7 @@ class ConstraintMatrix;
 template <class GridClass> class InterGridMap;
 template <int dim, int spacedim> class Mapping;
 
+namespace GridTools {template <typename CellIterator> struct PeriodicFacePair;}
 
 //TODO: map_support_points_to_dofs should generate a multimap, rather than just a map, since several dofs may be located at the same support point
 
@@ -1087,13 +1088,15 @@ namespace DoFTools
    */
   template<typename FaceIterator>
   void
-  make_periodicity_constraints (const FaceIterator                          &face_1,
-                                const typename identity<FaceIterator>::type &face_2,
-                                dealii::ConstraintMatrix                    &constraint_matrix,
-                                const ComponentMask                         &component_mask = ComponentMask(),
-                                const bool face_orientation = true,
-                                const bool face_flip = false,
-                                const bool face_rotation = false);
+  make_periodicity_constraints
+  (const FaceIterator                          &face_1,
+   const typename identity<FaceIterator>::type &face_2,
+   dealii::ConstraintMatrix                    &constraint_matrix,
+   const ComponentMask                         &component_mask = ComponentMask(),
+   const bool                                  face_orientation = true,
+   const bool                                  face_flip = false,
+   const bool                                  face_rotation = false);
+
 
 
   /**
@@ -1143,12 +1146,13 @@ namespace DoFTools
    */
   template<typename DH>
   void
-  make_periodicity_constraints (const DH                 &dof_handler,
-                                const types::boundary_id b_id1,
-                                const types::boundary_id b_id2,
-                                const int                direction,
-                                dealii::ConstraintMatrix &constraint_matrix,
-                                const ComponentMask      &component_mask = ComponentMask());
+  make_periodicity_constraints
+  (const DH                 &dof_handler,
+   const types::boundary_id b_id1,
+   const types::boundary_id b_id2,
+   const int                direction,
+   dealii::ConstraintMatrix &constraint_matrix,
+   const ComponentMask      &component_mask = ComponentMask());
 
 
   /**
@@ -1167,17 +1171,18 @@ namespace DoFTools
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    *
-   * @author Matthias Maier, 2012
+   * @author Daniel Arndt, 2013, Matthias Maier, 2012
    */
   template<typename DH>
   void
-  make_periodicity_constraints (const DH                 &dof_handler,
-                                const types::boundary_id b_id1,
-                                const types::boundary_id b_id2,
-                                const int                direction,
-                                dealii::Tensor<1,DH::space_dimension> &offset,
-                                dealii::ConstraintMatrix &constraint_matrix,
-                                const ComponentMask      &component_mask = ComponentMask());
+  make_periodicity_constraints
+  (const DH                              &dof_handler,
+   const types::boundary_id              b_id1,
+   const types::boundary_id              b_id2,
+   const int                             direction,
+   dealii::Tensor<1,DH::space_dimension> &offset,
+   dealii::ConstraintMatrix              &constraint_matrix,
+   const ComponentMask                   &component_mask = ComponentMask());
 
 
   /**
@@ -1204,11 +1209,12 @@ namespace DoFTools
    */
   template<typename DH>
   void
-  make_periodicity_constraints (const DH                 &dof_handler,
-                                const types::boundary_id b_id,
-                                const int                direction,
-                                dealii::ConstraintMatrix &constraint_matrix,
-                                const ComponentMask      &component_mask = ComponentMask());
+  make_periodicity_constraints
+  (const DH                 &dof_handler,
+   const types::boundary_id b_id,
+   const int                direction,
+   dealii::ConstraintMatrix &constraint_matrix,
+   const ComponentMask      &component_mask = ComponentMask());
 
 
   /**
@@ -1233,12 +1239,31 @@ namespace DoFTools
    */
   template<typename DH>
   void
-  make_periodicity_constraints (const DH                 &dof_handler,
-                                const types::boundary_id b_id,
-                                const int                direction,
-                                dealii::Tensor<1,DH::space_dimension> &offset,
-                                dealii::ConstraintMatrix &constraint_matrix,
-                                const ComponentMask      &component_mask = ComponentMask());
+  make_periodicity_constraints
+  (const DH                              &dof_handler,
+   const types::boundary_id              b_id,
+   const int                             direction,
+   dealii::Tensor<1,DH::space_dimension> &offset,
+   dealii::ConstraintMatrix              &constraint_matrix,
+   const ComponentMask                   &component_mask = ComponentMask());
+
+  /**
+   * Same as above but the periodicity information is given by
+   * @p periodic_faces. This std::vector can be created by
+   * GridTools::collect_periodic_faces.
+   *
+   * @note For DoFHandler objects that are built on a
+   * parallel::distributed::Triangulation object
+   * parallel::distributed::Triangulation::add_periodicity has to be called
+   * before.
+   */
+  template<typename DH>
+  void
+  make_periodicity_constraints
+  (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> > 
+     &periodic_faces,
+   dealii::ConstraintMatrix &constraint_matrix,
+   const ComponentMask      &component_mask = ComponentMask());
 
 
   //@}

@@ -324,7 +324,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
+      Assert (dof_offsets[obj_index] != (offset_type)(-1),
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -356,7 +356,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
+      Assert (dof_offsets[obj_index] != (offset_type)(-1),
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));

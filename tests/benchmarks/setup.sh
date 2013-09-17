@@ -13,6 +13,10 @@ cmake -DCMAKE_BUILD_TYPE=Release -DDEAL_II_WITH_THREADS=OFF -DCMAKE_INSTALL_PREF
 make install -j 10
 cd ..
 
+cd gettimes
+make
+cd ..
+
 source testlist.sh
 for test in $TESTS ; do
       cd $test
