@@ -550,83 +550,12 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 template <class POLY, int dim, int spacedim>
 void
 FE_Q_Base<POLY,dim,spacedim>::
-get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
+get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source_fe,
                                FullMatrix<double>       &interpolation_matrix) const
 {
   Assert (dim > 1, ExcImpossibleInDim(1));
-
-  // this is only implemented, if the source FE is also a Q element
-  AssertThrow ((dynamic_cast<const FE_Q_Base<POLY,dim,spacedim> *>(&x_source_fe) != 0),
-               (typename FiniteElement<dim,spacedim>::
-                ExcInterpolationNotImplemented()));
-
-  Assert (interpolation_matrix.n() == this->dofs_per_face,
-          ExcDimensionMismatch (interpolation_matrix.n(),
-                                this->dofs_per_face));
-  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
-          ExcDimensionMismatch (interpolation_matrix.m(),
-                                x_source_fe.dofs_per_face));
-
-  // ok, source is a Q element, so we will be able to do the work
-  const FE_Q_Base<POLY,dim,spacedim> &source_fe
-    = dynamic_cast<const FE_Q_Base<POLY,dim,spacedim>&>(x_source_fe);
-
-  // Make sure that the element for which the DoFs should be constrained is
-  // the one with the higher polynomial degree.  Actually the procedure will
-  // work also if this assertion is not satisfied. But the matrices produced
-  // in that case might lead to problems in the hp procedures, which use this
-  // method.
-  Assert (this->dofs_per_face <= source_fe.dofs_per_face,
-          (typename FiniteElement<dim,spacedim>::
-           ExcInterpolationNotImplemented ()));
-
-  // generate a quadrature with the unit support points.  This is later based
-  // as a basis for the QProjector, which returns the support points on the
-  // face.
-  Quadrature<dim-1> quad_face_support (source_fe.get_unit_face_support_points ());
-
-  // Rule of thumb for FP accuracy, that can be expected for a given
-  // polynomial degree.  This value is used to cut off values close to zero.
-  const double eps = 2e-13*this->degree*(dim-1);
-
-  // compute the interpolation matrix by simply taking the value at the
-  // support points.
-//TODO: Verify that all faces are the same with respect to
-// these support points. Furthermore, check if something has to
-// be done for the face orientation flag in 3D.
-  const Quadrature<dim> face_quadrature
-    = QProjector<dim>::project_to_face (quad_face_support, 0);
-  for (unsigned int i=0; i<source_fe.dofs_per_face; ++i)
-    {
-      const Point<dim> &p = face_quadrature.point (i);
-
-      for (unsigned int j=0; j<this->dofs_per_face; ++j)
-        {
-          double matrix_entry = this->poly_space.compute_value (this->face_to_cell_index(j, 0), p);
-
-          // Correct the interpolated value. I.e. if it is close to 1 or 0,
-          // make it exactly 1 or 0. Unfortunately, this is required to avoid
-          // problems with higher order elements.
-          if (std::fabs (matrix_entry - 1.0) < eps)
-            matrix_entry = 1.0;
-          if (std::fabs (matrix_entry) < eps)
-            matrix_entry = 0.0;
-
-          interpolation_matrix(i,j) = matrix_entry;
-        }
-    }
-
-  // make sure that the row sum of each of the matrices is 1 at this
-  // point. this must be so since the shape functions sum up to 1
-  for (unsigned int j=0; j<source_fe.dofs_per_face; ++j)
-    {
-      double sum = 0.;
-
-      for (unsigned int i=0; i<this->dofs_per_face; ++i)
-        sum += interpolation_matrix(j,i);
-
-      Assert (std::fabs(sum-1) < eps, ExcInternalError());
-    }
+  get_subface_interpolation_matrix (source_fe, numbers::invalid_unsigned_int,
+                                    interpolation_matrix);
 }
 
 
@@ -676,7 +605,11 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
 // these support points. Furthermore, check if something has to
 // be done for the face orientation flag in 3D.
       const Quadrature<dim> subface_quadrature
-        = QProjector<dim>::project_to_subface (quad_face_support, 0, subface);
+        = subface == numbers::invalid_unsigned_int
+        ?
+        QProjector<dim>::project_to_face (quad_face_support, 0)
+        :
+        QProjector<dim>::project_to_subface (quad_face_support, 0, subface);
       for (unsigned int i=0; i<source_fe->dofs_per_face; ++i)
         {
           const Point<dim> &p = subface_quadrature.point (i);
