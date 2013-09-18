@@ -30,8 +30,9 @@ int main()
 
   // Open with full debugging
   PathSearch cc("CC", 3);
-  cc.add_path("../");
-  cc.add_path("../scripts/", PathSearch::front);
+  cc.add_path(SOURCE_DIR "/");
+  cc.add_path(SOURCE_DIR "/../");
+  cc.add_path(SOURCE_DIR "/../scripts/", PathSearch::front);
   cc.add_suffix(".c");
   cc.add_suffix(".cc");
 
@@ -42,7 +43,7 @@ int main()
   cc.show(deallog);
 
   PathSearch mesh("MESH", 3);
-  mesh.add_path("../bits/");
+  mesh.add_path(SOURCE_DIR "/../bits/");
   mesh.show(deallog);
   std::ifstream in(mesh.find("grid_in_msh_01.2d").c_str());
   std::string line;
