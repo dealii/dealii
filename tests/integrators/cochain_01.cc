@@ -19,7 +19,7 @@
 // the standard Hilbert space sequence
 
 #include "../tests.h"
-#include "../lib/test_grids.h"
+#include "../test_grids.h"
 
 #include <deal.II/base/logstream.h>
 
