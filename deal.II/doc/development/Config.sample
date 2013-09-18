@@ -563,6 +563,42 @@
 
 ###########################################################################
 #                                                                         #
+#                 Configuration Options for the Testsuite:                #
+#                                                                         #
+###########################################################################
+
+
+
+#
+# You can limit the tests that will be set up by the setup_test target by
+# setting TEST_PICKUP_REGEX:
+#
+# SET(TEST_PICKUP_REGEX "" CACHE STRING
+#   "A regular expression to control which tests will be configured"
+#   )
+#
+#
+# If numdiff is found, the TEST_DIFF defaults to 'numdiff -a 1e-6 -s ' \t\n:'
+# otherwise pure diff will be used. You can set your own diff command via
+#
+# SET(TEST_DIFF "" CACHE STRING
+#   "The diff tool and command line to use"
+#   )
+#
+#
+# SET(TEST_TIME_LIMITTEST_DIFF "180" CACHE STRING
+#   "The time limit (in seconds) a single test (build, run, diff) is allowed to run"
+#   )
+#
+#
+# An optional hint to the numdiff executable:
+# SET(NUMDIFF_DIR "/.../..." CACHE PATH "")
+#
+
+
+
+###########################################################################
+#                                                                         #
 #                         Advanced Configuration:                         #
 #                                                                         #
 ###########################################################################
