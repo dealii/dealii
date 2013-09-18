@@ -99,10 +99,10 @@ ELSE()
 ENDIF()
 
 #
-# Set a default time limit of 180 seconds:
+# Set a default time limit of 600 seconds:
 #
 
-SET_IF_EMPTY(TEST_TIME_LIMIT 180)
+SET_IF_EMPTY(TEST_TIME_LIMIT 600)
 
 #
 # And finally, enable testing:
