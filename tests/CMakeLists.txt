@@ -136,6 +136,7 @@ FOREACH(_category ${_categories})
     COMMENT "Processing ./tests/${_category}"
     )
   ADD_DEPENDENCIES(setup_test setup_test_${_category})
+  ADD_DEPENDENCIES(setup_test_${_category} library)
 
   ADD_CUSTOM_TARGET(clean_test_${_category}
     COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}

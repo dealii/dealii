@@ -208,8 +208,12 @@ IF("${TRACK}" STREQUAL "Experimental")
     CTEST_CONFIGURE()
   ENDIF()
 
-  CTEST_BUILD(TARGET) # run all
-  CTEST_BUILD(TARGET setup_test APPEND) # setup tests
+  CTEST_BUILD(TARGET) # run all target
+
+  # TODO: Run this during the BUILD stage...
+  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
+    --build ${CTEST_BINARY_DIRECTORY} --target setup_test
+    )
 
   CTEST_TEST(PARALLEL_LEVEL ${NO_JOBS})
 
