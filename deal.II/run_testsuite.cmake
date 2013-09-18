@@ -52,9 +52,9 @@ IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "")
   # If CTEST_BINARY_DIRECTORY is not set we just use the current directory
   # except it is equal to CTEST_SOURCE_DIRECTORY in which case we fail.
   #
-  SET(CTEST_BINARY_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+  SET(CTEST_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-  IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+  IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "${CTEST_SOURCE_DIR}")
     MESSAGE(FATAL_ERROR "
 ctest was invoked in the source directory and CTEST_BINARY_DIRECTORY is not set.
 Please either call ctest from within a designated build directory, or set CTEST_BINARY_DIRECTORY accordingly."
