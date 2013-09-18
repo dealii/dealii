@@ -118,9 +118,9 @@ MESSAGE("-- DEAL_II_NO_JOBS: ${DEAL_II_NO_JOBS}")
 # Finalize:
 #
 
-SET(CMAKE_EXTRA_SUBMIT_FILES
+SET(CTEST_NOTES_FILES
+  ${CTEST_BINARY_DIRECTORY}/summary.log
   ${CTEST_BINARY_DIRECTORY}/detailed.log
-  # TODO
   )
 
 
@@ -143,23 +143,23 @@ IF("${TRACK}" STREQUAL "Experimental")
   # - No cleanup is done prior to test run
   #
 
-
-
   CTEST_START(Experimental TRACK Experimental)
-  CTEST_CONFIGURE() # just reconfigure (without any options)
+
+  IF(NOT "${DEAL_II_CONFIG_FILE}" STREQUAL "")
+    CTEST_CONFIGURE(OPTIONS -C"${DEAL_II_CONFIG_FILE}")
+  ELSE()
+    CTEST_CONFIGURE()
+  ENDIF()
+
   CTEST_BUILD(TARGET setup_test) # setup tests
   CTEST_BUILD(TARGET) # builds the "all" target
+
   CTEST_TEST(PARALLEL_LEVEL ${DEAL_II_NO_JOBS})
-  #CTEST_SUBMIT()
+
+  CTEST_SUBMIT()
 
 ELSE()
 
   MESSAGE(FATAL_ERROR "TRACK has to be set TODO")
 
 ENDIF()
-
-#IF(NOT "${DEAL_II_CONFIG_FILE}" STREQUAL "")
-#  CTEST_CONFIGURE(OPTIONS -C"${DEAL_II_CONFIG_FILE}")
-#ELSE()
-#  CTEST_CONFIGURE()
-#ENDIF()

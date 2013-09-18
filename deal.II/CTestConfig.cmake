@@ -21,11 +21,18 @@
 #                                                                      #
 ########################################################################
 
+#
+# Dashboard configuration:
+#
+
 SET(CTEST_PROJECT_NAME "deal.II")
 
 SET(CTEST_NIGHTLY_START_TIME "1:00:00 UTC")
 
-# TODO Drop method
+SET(CTEST_DROP_METHOD "http")
+SET(CTEST_DROP_SITE "my.cdash.org")
+SET(CTEST_DROP_LOCATION "/submit.php?project=deal.II")
+SET(CTEST_DROP_SITE_CDASH TRUE)
 
 #
 # Coverage options:
