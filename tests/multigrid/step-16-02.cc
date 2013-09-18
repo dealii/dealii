@@ -601,7 +601,7 @@ void LaplaceProblem<dim>::run ()
 
 int main ()
 {
-  initlog(__FILE__, true);
+  initlog();
 
   try
     {
