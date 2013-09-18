@@ -211,6 +211,14 @@ The unknowns $(\mathbf{q}_h, u_h)$ are referred to as local variables; they are
 represented as standard DG variables.  The unknown $\hat{u}_h$ is the skeleton
 variable which has support on the codimension-1 surfaces (faces) of the mesh.
 
+We use the notation $(\cdot, \cdot)_{\mathcal{T}} = \sum_K (\cdot, \cdot)_K$
+to denote the sum of integrals over all cells and $\left<\cdot,
+\cdot\right>_{\partial \mathcal{T}} = \sum_K \left<\cdot,
+\cdot\right>_{\partial K}$ to denote integration over all faces of all cells,
+i.e., interior faces are visited twice. When combining the contribution from
+both elements sharing a face, the above equation yields terms familiar for DG
+with jumps of the solution over the cell boundaries.
+
 In the equation above, the space $\mathcal {W}_h^{p}$ for the scalar variable
 <i>u<sub>h</sub></i> is defined as the space of functions that are tensor
 product polynomials of degree <i>p</i> on each cell and discontinuous over the
