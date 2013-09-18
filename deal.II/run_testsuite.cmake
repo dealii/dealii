@@ -21,20 +21,22 @@
 ########################################################################
 
 #
+# CTEST_SOURCE_DIRECTORY
+# CTEST_BINARY_DIRECTORY
+# CTEST_CMAKE_GENERATOR
+#
 # TRACK
 #
 # DEAL_II_NO_JOBS
 # DEAL_II_CONFIG_FILE
 #
-# CTEST_SOURCE_DIRECTORY
-# CTEST_BINARY_DIRECTORY
-#
-# CTEST_CMAKE_GENERATOR
-#
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 MESSAGE("-- This is CTest ${CTEST_VERSION}")
 
+#
+# CTEST_SOURCE_DIR:
+#
 
 IF("${CTEST_SOURCE_DIRECTORY}" STREQUAL "")
   #
@@ -46,6 +48,9 @@ ENDIF()
 
 MESSAGE("-- CTEST_SOURCE_DIRECTORY: ${CTEST_SOURCE_DIRECTORY}")
 
+#
+# CTEST_BINARY_DIR:
+#
 
 IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "")
   #
@@ -64,6 +69,44 @@ ENDIF()
 
 MESSAGE("-- CTEST_BINARY_DIRECTORY: ${CTEST_BINARY_DIRECTORY}")
 
+#
+# CTEST_CMAKE_GENERATOR:
+#
+
+# Query Generator from build directory (if possible):
+IF(EXISTS ${CTEST_BINARY_DIRECTORY}/CMakeCache.txt)
+  FILE(STRINGS ${CTEST_BINARY_DIRECTORY}/CMakeCache.txt _generator
+    REGEX "^CMAKE_GENERATOR:"
+    )
+  STRING(REGEX REPLACE "^.*=" "" _generator ${_generator})
+ENDIF()
+
+IF("${CTEST_CMAKE_GENERATOR}" STREQUAL "")
+  IF(NOT "${_generator}" STREQUAL "")
+    SET(CTEST_CMAKE_GENERATOR ${_generator})
+  ELSE()
+    MESSAGE(FATAL_ERROR "
+The build directory is not configured and CTEST_CMAKE_GENERATOR is not set.
+different Generator \"${CTEST_CMAKE_GENERATOR}\".
+"
+     )
+  ENDIF()
+ELSE()
+  # ensure that CTEST_CMAKE_GENERATOR (that was apparantly set) is
+  # compatible with the build directory:
+  IF( NOT "${CTEST_CMAKE_GENERATOR}" STREQUAL "${_generator}"
+      AND NOT "${_generator}" STREQUAL "" )
+    MESSAGE(FATAL_ERROR "
+The build directory is already set up with Generator \"${_generator}\", but
+CTEST_CMAKE_GENERATOR was set to a different Generator \"${CTEST_CMAKE_GENERATOR}\".
+"
+     )
+  ENDIF()
+ENDIF()
+
+#
+# DEAL_II_NO_JOBS:
+#
 
 IF("${DEAL_II_NO_JOBS}" STREQUAL "")
   SET(DEAL_II_NO_JOBS "1")
@@ -71,11 +114,14 @@ ENDIF()
 
 MESSAGE("-- DEAL_II_NO_JOBS: ${DEAL_II_NO_JOBS}")
 
+#
+# Finalize:
+#
+
 SET(CMAKE_EXTRA_SUBMIT_FILES
   ${CTEST_BINARY_DIRECTORY}/detailed.log
   # TODO
   )
-
 
 
 ########################################################################
@@ -97,12 +143,14 @@ IF("${TRACK}" STREQUAL "Experimental")
   # - No cleanup is done prior to test run
   #
 
+
+
   CTEST_START(Experimental TRACK Experimental)
   CTEST_CONFIGURE() # just reconfigure (without any options)
   CTEST_BUILD(TARGET setup_test) # setup tests
   CTEST_BUILD(TARGET) # builds the "all" target
   CTEST_TEST(PARALLEL_LEVEL ${DEAL_II_NO_JOBS})
-  CTEST_SUBMIT()
+  #CTEST_SUBMIT()
 
 ELSE()
 
