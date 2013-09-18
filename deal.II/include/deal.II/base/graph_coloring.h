@@ -1,8 +1,8 @@
 
 // ---------------------------------------------------------------------
-// $Id: work_stream.h 30494 2013-08-26 10:04:44Z kronbichler $
+// $Id: graph_coloring.h 30494 2013-08-26 10:04:44Z kronbichler $
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2013 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Currently graph_coloring only works only for continuous FE and without hp.
+// Currently graph_coloring only works only for continuous FE.
 namespace graph_coloring {
 
   /**
