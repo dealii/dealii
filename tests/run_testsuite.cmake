@@ -32,6 +32,12 @@
 # NO_JOBS
 # CONFIG_FILE
 #
+# TEST_DIFF
+# TEST_TIME_LIMIT
+# TEST_PICKUP_REGEX
+# NUMDIFF_DIR
+#
+#
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 MESSAGE("-- This is CTest ${CTEST_VERSION}")
@@ -43,9 +49,21 @@ MESSAGE("-- This is CTest ${CTEST_VERSION}")
 IF("${CTEST_SOURCE_DIRECTORY}" STREQUAL "")
   #
   # If CTEST_SOURCE_DIRECTORY is not set we just assume that this script
-  # was called residing in the source directory.
+  # was called residing under ../tests relative to the source directory.
   #
-  SET(CTEST_SOURCE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+  GET_FILENAME_COMPONENT(_path "${CMAKE_CURRENT_LIST_DIR}" PATH)
+  SET(CTEST_SOURCE_DIRECTORY ${_path}/deal.II)
+
+  IF(NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/CMakeLists.txt)
+    MESSAGE(FATAL_ERROR "
+Could not find a suitable source directory. Either the run_testsuite.cmake
+script was called residing outside of \"tests\", or there is no source
+directory \"../deal.II\" relative to the tests directory.
+Please, set CTEST_SOURCE_DIRECTORY manually to the appropriate source
+directory.
+"
+      )
+  ENDIF()
 ENDIF()
 
 MESSAGE("-- CTEST_SOURCE_DIRECTORY: ${CTEST_SOURCE_DIRECTORY}")
@@ -64,7 +82,8 @@ IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "")
   IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "${CTEST_SOURCE_DIR}")
     MESSAGE(FATAL_ERROR "
 ctest was invoked in the source directory and CTEST_BINARY_DIRECTORY is not set.
-Please either call ctest from within a designated build directory, or set CTEST_BINARY_DIRECTORY accordingly."
+Please either call ctest from within a designated build directory, or set CTEST_BINARY_DIRECTORY accordingly.
+"
       )
   ENDIF()
 ENDIF()
@@ -89,7 +108,7 @@ IF("${CTEST_CMAKE_GENERATOR}" STREQUAL "")
   ELSE()
     MESSAGE(FATAL_ERROR "
 The build directory is not configured and CTEST_CMAKE_GENERATOR is not set.
-different Generator \"${CTEST_CMAKE_GENERATOR}\".
+Please set CTEST_CMAKE_GENERATOR to the generator that should be used.
 "
      )
   ENDIF()
@@ -161,11 +180,14 @@ IF(NOT TRACK MATCHES "Foobar") #TODO: Exclude Continuous TRACKS
   #Append subversion revision:
   IF(SUBVERSION_FOUND)
     EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} info
-      ${CTEST_SOURCE_DIRECTORY} OUTPUT_VARIABLE _tmp RESULT_VARIABLE _result
+      ${CTEST_SOURCE_DIRECTORY} RESULT_VARIABLE _result
       )
     IF(${_result} EQUAL 0)
       Subversion_WC_INFO(${CTEST_SOURCE_DIRECTORY} _svn)
-      SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-r${_svn_WC_REVISION}")
+      STRING(REGEX REPLACE "^${_svn_WC_ROOT}/" "" _branch ${_svn_WC_URL})
+      STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
+      STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
+      SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}-r${_svn_WC_REVISION}")
     ENDIF()
   ENDIF()
 ENDIF()
@@ -180,6 +202,19 @@ SET(CTEST_NOTES_FILES
   ${CTEST_BINARY_DIRECTORY}/detailed.log
   )
 
+IF(NOT "${CONFIG_FILE}" STREQUAL "")
+  SET(_options "-C${CONFIG_FILE}")
+ENDIF()
+
+# Pass all relevant "TEST_" variables down to configure:
+GET_CMAKE_PROPERTY(_variables VARIABLES)
+FOREACH(_var ${_variables})
+  IF(_var MATCHES
+      "^(TEST_DIFF|TEST_TIME_LIMIT|TEST_PICKUP_REGEX|NUMDIFF_DIR)$"
+      )
+    LIST(APPEND _options "-D${_var}=${${_var}}")
+  ENDIF()
+ENDFOREACH()
 
 ########################################################################
 #                                                                      #
@@ -202,11 +237,7 @@ IF("${TRACK}" STREQUAL "Experimental")
 
   CTEST_START(Experimental TRACK Experimental)
 
-  IF(NOT "${CONFIG_FILE}" STREQUAL "")
-    CTEST_CONFIGURE(OPTIONS -C"${CONFIG_FILE}")
-  ELSE()
-    CTEST_CONFIGURE()
-  ENDIF()
+  CTEST_CONFIGURE(OPTIONS "${_options}")
 
   CTEST_BUILD(TARGET) # run all target
 
