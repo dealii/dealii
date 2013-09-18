@@ -351,7 +351,7 @@ namespace Step40
         {
           std::cout<<point1<< "\t" << value1[0] << std::endl;
           std::cout<<point2<< "\t" << value2[0] << std::endl;
-          ExcInternalError();
+          Assert(false, ExcInternalError());
         }
       }
     }
@@ -401,14 +401,14 @@ namespace Step40
         {
           std::cout<<point1<< "\t" << value1[0] << std::endl;
           std::cout<<point2<< "\t" << value2[0] << std::endl;
-          ExcInternalError();
+          Assert(false, ExcInternalError());
         }
         pcout << point3 << "\t" << value3[0] << std::endl;
         if (std::abs(value4[0]-value3[0])>1e-8)
         {
           std::cout<<point3<< "\t" << value3[0] << std::endl;
           std::cout<<point4<< "\t" << value4[0] << std::endl;
-          ExcInternalError();
+          Assert(false, ExcInternalError());
         }
       }
     }
