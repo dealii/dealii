@@ -71,6 +71,12 @@ ENDIF()
 
 MESSAGE("-- DEAL_II_NO_JOBS: ${DEAL_II_NO_JOBS}")
 
+SET(CMAKE_EXTRA_SUBMIT_FILES
+  ${CTEST_BINARY_DIRECTORY}/detailed.log
+  # TODO
+  )
+
+
 
 ########################################################################
 #                                                                      #

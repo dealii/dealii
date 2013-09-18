@@ -132,11 +132,6 @@ FOREACH(_step_full ${_steps})
               && rm -f ${_step_dir}/failing_run_output
               && echo "${_test}: RUN stage not invoked due to failing BUILD"
               && exit 1)
-        COMMAND
-             echo "${_test}: CONFIGURE successful."
-          && echo "${_test}: BUILD successful."
-          && echo "${_test}: RUN successful."
-          && echo "${_test}: PASSED."
         WORKING_DIRECTORY ${_step_dir}
         DEPENDS ${_step_dir}/build_output
         )
@@ -145,11 +140,24 @@ FOREACH(_step_full ${_steps})
       IF(_match)
         # Add a full test (CONFIGURE, BUILD, RUN):
         SET(_target ${_category}-${_step}.${_build_lowercase}.run)
-        ADD_CUSTOM_TARGET(${_target} DEPENDS ${_step_dir}/run_output)
+        ADD_CUSTOM_TARGET(${_target}
+          COMMAND
+               echo "${_test}: CONFIGURE successful."
+            && echo "${_test}: BUILD successful."
+            && echo "${_test}: RUN successful."
+            && echo "${_test}: PASSED."
+          DEPENDS ${_step_dir}/run_output
+          )
       ELSE()
         # Add a minimal test (CONFIGURE, BUILD):
         SET(_target ${_category}-${_step}.${_build_lowercase}.build)
-        ADD_CUSTOM_TARGET(${_target} DEPENDS ${_step_dir}/build_output)
+        ADD_CUSTOM_TARGET(${_target}
+          COMMAND
+               echo "${_test}: CONFIGURE successful."
+            && echo "${_test}: BUILD successful."
+            && echo "${_test}: PASSED."
+          DEPENDS ${_step_dir}/build_output
+          )
       ENDIF()
 
       # And finally add the test:

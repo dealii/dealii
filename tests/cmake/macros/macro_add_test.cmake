@@ -157,11 +157,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
               && echo "${_test_full}: DIFF failed. Output:"
               && cat ${_test_directory}/failing_diff
               && exit 1)
-        COMMAND
-             echo "${_test_full}: BUILD successful."
-          && echo "${_test_full}: RUN successful."
-          && echo "${_test_full}: DIFF successful."
-          && echo "${_test_full}: PASSED."
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
@@ -169,7 +164,13 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
           ${_comparison_file}
         )
 
-      ADD_CUSTOM_TARGET(${_diff_target} DEPENDS ${_test_directory}/diff)
+      ADD_CUSTOM_TARGET(${_diff_target} DEPENDS ${_test_directory}/diff
+        COMMAND
+             echo "${_test_full}: BUILD successful."
+          && echo "${_test_full}: RUN successful."
+          && echo "${_test_full}: DIFF successful."
+          && echo "${_test_full}: PASSED."
+        )
 
       #
       # And finally add the test:
