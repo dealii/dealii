@@ -105,7 +105,9 @@ The HDG formulation used for this example is taken from
   <a href="http://dx.doi.org/10.1016/j.jcp.2009.01.030">[DOI]</a>
 </b>
 
-We consider the convection-diffusion equation:
+We consider the convection-diffusion equation over the domain $\Omega$
+with Dirichlet boundary $\partial \Omega_D$ and Neumann boundary
+$\partial \Omega_N$:
 @f{eqnarray*}
 	\nabla \cdot (\mathbf{c} u) - \nabla \cdot (\kappa \nabla u) &=& f,
 	\quad \text{ in } \Omega, \\
@@ -150,6 +152,9 @@ The variable $\hat {u}$ is introduced as an additional independent variable
 and is the one for which we finally set up a globally coupled linear
 system. As mentioned above, it is defined on the element faces and
 discontinuous from one face to another.
+Values for $u$ and $\mathbf{q}$ appearing in the numerical trace function
+are taken to be the cell's interior solution restricted
+to the boundary $\partial K$.  
 
 The local stabilization parameter $\tau$ has effects on stability and accuracy
 of HDG solutions; see the literature for a further discussion. A stabilization

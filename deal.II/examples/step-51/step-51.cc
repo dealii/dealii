@@ -361,7 +361,7 @@ namespace Step51
 
     // The 'local' solutions are interior to each element.  These
     // represent the primal solution field $u$ as well as the auxiliary
-    // field $\mathbf{q} = -\nabla u$.
+    // field $\mathbf{q}$.
     FESystem<dim>        fe_local;
     DoFHandler<dim>      dof_handler_local;
     Vector<double>       solution_local;
@@ -831,7 +831,7 @@ namespace Step51
               }
 
             // When @p trace_reconstruct=false, we are preparing assembling the
-            // system for the skeleton variable $\lambda$. If this is the case,
+            // system for the skeleton variable $\hat{u}$. If this is the case,
             // we must assemble all local matrices associated with the problem:
             // local-local, local-face, face-local, and face-face.  The
             // face-face matrix is stored as @p TaskData::cell_matrix, so that
@@ -903,7 +903,7 @@ namespace Step51
                   const unsigned int jj=scratch.fe_local_support_on_face[face][j];
                   scratch.ll_matrix(ii,jj) += tau_stab * scratch.u_phi[i] * scratch.u_phi[j] * JxW;
                 }
-
+  
             // When @p trace_reconstruct=true, we are solving for the local
             // solutions on an element by element basis.  The local
             // right-hand-side is calculated by replacing the basis functions @p
@@ -1235,7 +1235,7 @@ namespace Step51
 // the skeleton of the triangulation.  We treat it as such here, and the code is
 // similar to that above.
     DataOutFaces<dim> data_out_face(false);
-    std::vector<std::string> face_name(1,"lambda");
+    std::vector<std::string> face_name(1,"u_hat");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     face_component_type(1, DataComponentInterpretation::component_is_scalar);
 
