@@ -357,9 +357,12 @@ namespace Utilities
       // we might use several threads but never call two MPI functions at the
       // same time. For an explanation see on why we do this see
       // http://www.open-mpi.org/community/lists/users/2010/03/12244.php
-      mpi_err = MPI_Init_thread(&argc, &argv, MPI_THREAD_SERIALIZED, &provided);
+      int wanted = MPI_THREAD_SERIALIZED;
+      mpi_err = MPI_Init_thread(&argc, &argv, wanted, &provided);
       AssertThrow (mpi_err == 0,
                    ExcMessage ("MPI could not be initialized."));
+      Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
+          ExcMessage("MPI reports that we are not allowed to use multiple threads."));
 #else
       // make sure the compiler doesn't warn
       // about these variables
@@ -372,10 +375,10 @@ namespace Utilities
       // detect this. This allows us to use MPI_Init_thread instead.
 #ifdef DEAL_II_WITH_PETSC
 #  ifdef DEAL_II_WITH_SLEPC
-      // Initialise SLEPc (with PETSc):
+      // Initialize SLEPc (with PETSc):
       SlepcInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
 #  else
-      // or just initialise PETSc alone:
+      // or just initialize PETSc alone:
       PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
 #  endif
 #endif
@@ -434,11 +437,11 @@ namespace Utilities
 #endif
 
 
-      // only MPI_Finalize if we are running with MPI and we are not using PETSc
-      // (otherwise we called it above already):
+      // only MPI_Finalize if we are running with MPI. We also need to do this
+      // when running PETSc, because we initialize MPI ourselves before calling
+      // PetscInitialize
 #ifdef DEAL_II_WITH_MPI
-#ifndef DEAL_II_WITH_PETSC
-      int mpi_err = 0;
+     int mpi_err = 0;
 
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
@@ -459,7 +462,6 @@ namespace Utilities
 
       AssertThrow (mpi_err == 0,
                    ExcMessage ("An error occurred while calling MPI_Finalize()"));
-#endif
 #endif
     }
 
