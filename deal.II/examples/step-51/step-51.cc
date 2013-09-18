@@ -328,25 +328,24 @@ namespace Step51
 
   private:
 
-// Data for the assembly and solution of the primal variables.
-    struct PerTaskData;
-    struct ScratchData;
-
-// Post-processing the solution to obtain $u^*$ is an element-by-element
-// procedure; as such, we do not need to assemble any global data and do
-// not declare any 'task data' for WorkStream to use.
-    struct PostProcessScratchData;
-
     void setup_system ();
     void assemble_system (const bool reconstruct_trace = false);
     void solve ();
     void postprocess ();
-
     void refine_grid (const unsigned int cylce);
     void output_results (const unsigned int cycle);
 
-// The following three functions are used by WorkStream to do the actual work of
-// the program.
+    // Data for the assembly and solution of the primal variables.
+    struct PerTaskData;
+    struct ScratchData;
+
+    // Post-processing the solution to obtain $u^*$ is an element-by-element
+    // procedure; as such, we do not need to assemble any global data and do
+    // not declare any 'task data' for WorkStream to use.
+    struct PostProcessScratchData;
+
+    // The following three functions are used by WorkStream to do the actual
+    // work of the program.
     void assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                    ScratchData &scratch,
                                    PerTaskData &task_data);
@@ -407,14 +406,14 @@ namespace Step51
     ConvergenceTable     convergence_table;
   };
 
-// @sect3{The HDG class implementation}
+  // @sect3{The HDG class implementation}
 
-// @sect4{Constructor} 
-// The constructor is similar to those in other examples,
-// with the exception of handling multiple <code>DoFHandler</code> and
-// <code>FiniteElement</code> objects. Note that we create a system of finite
-// elements for the local DG part, including the gradient/flux part and the
-// scalar part.
+  // @sect4{Constructor}
+  // The constructor is similar to those in other examples,
+  // with the exception of handling multiple <code>DoFHandler</code> and
+  // <code>FiniteElement</code> objects. Note that we create a system of finite
+  // elements for the local DG part, including the gradient/flux part and the
+  // scalar part.
   template <int dim>
   HDG<dim>::HDG (const unsigned int degree,
                  const RefinementMode refinement_mode) :
@@ -430,11 +429,11 @@ namespace Step51
 
 
 
-// @sect4{HDG::setup_system}
-// The system for an HDG solution is setup in an analogous manner to most
-// of the other tutorial programs.  We are careful to distribute dofs with
-// all of our <code>DoFHandler</code> objects.  The @p solution and @p system_matrix
-// objects go with the global skeleton solution.
+  // @sect4{HDG::setup_system}
+  // The system for an HDG solution is setup in an analogous manner to most
+  // of the other tutorial programs.  We are careful to distribute dofs with
+  // all of our <code>DoFHandler</code> objects.  The @p solution and @p system_matrix
+  // objects go with the global skeleton solution.
   template <int dim>
   void
   HDG<dim>::setup_system ()
@@ -464,6 +463,10 @@ namespace Step51
                                           constraints);
     constraints.close ();
 
+    // When creating the chunk sparsity pattern, we first create the usual
+    // compressed sparsity pattern and then set the chunk size, which is equal
+    // to the number of dofs on a face, when copying this into the final
+    // sparsity pattern.
     {
       CompressedSimpleSparsityPattern csp (dof_handler.n_dofs());
       DoFTools::make_sparsity_pattern (dof_handler, csp,
@@ -475,21 +478,22 @@ namespace Step51
 
 
 
-// @sect4{HDG::PerTaskData} 
-// Next come the definition of the local data
-// structures for the parallel assembly. The first structure @p PerTaskData
-// contains the local vector and matrix that are written into the global
-// matrix, whereas the ScratchData contains all data that we need for the
-// local assembly. There is one variable worth noting here, namely the boolean
-// variable @p trace_reconstruct. As mentioned introdution, we solve the HDG
-// system in two steps. First, we create a linear system for the skeleton
-// system where we condense the local part into it by $D-CA^{-1}B$. Then, we
-// solve for the local part using the skeleton solution. For these two steps,
-// we need the same matrices on the elements twice, which we want to compute
-// by two assembly steps. Since most of the code is similar, we do this with
-// the same function but only switch between the two based on a flag that we
-// set when starting the assembly. Since we need to pass this information on
-// to the local worker routines, we store it once in the task data.
+  // @sect4{HDG::PerTaskData}
+  // Next come the definition of the local data structures for the parallel
+  // assembly. The first structure @p PerTaskData contains the local vector
+  // and matrix that are written into the global matrix, whereas the
+  // ScratchData contains all data that we need for the local assembly. There
+  // is one variable worth noting here, namely the boolean variable @p
+  // trace_reconstruct. As mentioned in the introdution, we solve the HDG
+  // system in two steps. First, we create a linear system for the skeleton
+  // system where we condense the local part into it via the Schur complement
+  // $D-CA^{-1}B$. Then, we solve for the local part using the skeleton
+  // solution. For these two steps, we need the same matrices on the elements
+  // twice, which we want to compute by two assembly steps. Since most of the
+  // code is similar, we do this with the same function but only switch
+  // between the two based on a flag that we set when starting the
+  // assembly. Since we need to pass this information on to the local worker
+  // routines, we store it once in the task data.
   template <int dim>
   struct HDG<dim>::PerTaskData
   {
@@ -509,19 +513,19 @@ namespace Step51
 
 
 
-// @sect4{HDG::ScratchData}
-// @p ScratchData contains persistent data for each
-// thread within <code>WorkStream</code>.  The <code>FEValues</code>, matrix,
-// and vector objects should be familiar by now.  There are two objects that
-// need to be discussed: @p std::vector<std::vector<unsigned int> >
-// fe_local_support_on_face and @p std::vector<std::vector<unsigned int> >
-// fe_support_on_face.  These are used to indicate whether or not the finite
-// elements chosen have support (non-zero values) on a given face of the
-// reference cell for the local part associated to @p fe_local and the
-// skeleton part @p f, which is why we can extract this information in the
-// constructor and store it once for all cells that we work on.  Had we not
-// stored this information, we would be forced to assemble a large number of
-// zero terms on each cell, which would significantly slow the program.
+  // @sect4{HDG::ScratchData}
+  // @p ScratchData contains persistent data for each
+  // thread within <code>WorkStream</code>.  The <code>FEValues</code>, matrix,
+  // and vector objects should be familiar by now.  There are two objects that
+  // need to be discussed: @p std::vector<std::vector<unsigned int> >
+  // fe_local_support_on_face and @p std::vector<std::vector<unsigned int> >
+  // fe_support_on_face.  These are used to indicate whether or not the finite
+  // elements chosen have support (non-zero values) on a given face of the
+  // reference cell for the local part associated to @p fe_local and the
+  // skeleton part @p fe. We extract this information in the
+  // constructor and store it once for all cells that we work on.  Had we not
+  // stored this information, we would be forced to assemble a large number of
+  // zero terms on each cell, which would significantly slow the program.
   template <int dim>
   struct HDG<dim>::ScratchData
   {
@@ -621,10 +625,10 @@ namespace Step51
 
 
 
-// @sect4{HDG::PostProcessScratchData}
-// @p PostProcessScratchData contains the data used by <code>WorkStream</code>
-// when post-processing the local solution $u^*$.  It is similar, but much
-// simpler, than @p ScratchData.
+  // @sect4{HDG::PostProcessScratchData}
+  // @p PostProcessScratchData contains the data used by <code>WorkStream</code>
+  // when post-processing the local solution $u^*$.  It is similar, but much
+  // simpler, than @p ScratchData.
   template <int dim>
   struct HDG<dim>::PostProcessScratchData
   {
@@ -671,28 +675,13 @@ namespace Step51
 
 
 
-// @sect4{HDG::copy_local_to_global}
-// If we are in the first step of the solution, i.e. @p trace_reconstruct=false,
-// then we assemble the global system.
-  template <int dim>
-  void HDG<dim>::copy_local_to_global(const PerTaskData &data)
-  {
-    if (data.trace_reconstruct == false)
-      constraints.distribute_local_to_global (data.cell_matrix,
-                                              data.cell_vector,
-                                              data.dof_indices,
-                                              system_matrix, system_rhs);
-  }
-
-
-
-// @sect4{HDG::assemble_system}
-// The @p assemble_system function is similar to <code>Step-32</code>, where
-// the quadrature formula and the update flags are set up, and then
-// <code>WorkStream</code> is used to do the work in a multi-threaded manner.
-// The @p trace_reconstruct input parameter is used to decide whether we are
-// solving for the local solution (true) or the global skeleton solution
-// (false).
+  // @sect4{HDG::assemble_system}
+  // The @p assemble_system function is similar to <code>Step-32</code>, where
+  // the quadrature formula and the update flags are set up, and then
+  // <code>WorkStream</code> is used to do the work in a multi-threaded
+  // manner.  The @p trace_reconstruct input parameter is used to decide
+  // whether we are solving for the global skeleton solution (false) or the
+  // local solution (true).
   template <int dim>
   void
   HDG<dim>::assemble_system (const bool trace_reconstruct)
@@ -729,17 +718,17 @@ namespace Step51
 
 
 
-// @sect4{HDG::assemble_system_one_cell}
-// The real work of the HDG program is done by @p assemble_system_one_cell.
-// Assembling the local matrices $A, B, C$ is done here, along with the
-// local contributions of the global matrix $D$.
+  // @sect4{HDG::assemble_system_one_cell}
+  // The real work of the HDG program is done by @p assemble_system_one_cell.
+  // Assembling the local matrices $A, B, C$ is done here, along with the
+  // local contributions of the global matrix $D$.
   template <int dim>
   void
   HDG<dim>::assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
                                       ScratchData &scratch,
                                       PerTaskData &task_data)
   {
-// Construct iterator for dof_handler_local for FEValues reinit function.
+    // Construct iterator for dof_handler_local for FEValues reinit function.
     typename DoFHandler<dim>::active_cell_iterator
     loc_cell (&triangulation,
               cell->level(),
@@ -769,7 +758,8 @@ namespace Step51
     // (referred to as matrix $A$ in the introduction) corresponding to
     // local-local coupling, as well as the local right-hand-side vector.  We
     // store the values at each quadrature point for the basis functions, the
-    // right-hand-side value, and the convection velocity.
+    // right-hand-side value, and the convection velocity, in order to have
+    // quick access to these fields.
     for (unsigned int q=0; q<n_q_points; ++q)
       {
         const double rhs_value
@@ -823,16 +813,16 @@ namespace Step51
             = scratch.convection_velocity.value(quadrature_point);
 
             // Here we compute the stabilization parameter discussed in the
-            // introduction: since the diffusion is one and the diffusion length
-            // scale is set to 1/5, it simply results in a contribution of 5 for
-            // the diffusion part and the magnitude of convection through the
-            // element boundary in a centered-like scheme for the convection
-            // part.
+            // introduction: since the diffusion is one and the diffusion
+            // length scale is set to 1/5, it simply results in a contribution
+            // of 5 for the diffusion part and the magnitude of convection
+            // through the element boundary in a centered scheme for the
+            // convection part.
             const double tau_stab = (5. +
                                      std::abs(convection * normal));
 
             // We store the non-zero flux and scalar values, making use of the
-            // support_on_face information we calculated in @p ScratchData.
+            // support_on_face information we created in @p ScratchData.
             for (unsigned int k=0; k<scratch.fe_local_support_on_face[face].size(); ++k)
               {
                 const unsigned int kk=scratch.fe_local_support_on_face[face][k];
@@ -840,7 +830,7 @@ namespace Step51
                 scratch.u_phi[k] = scratch.fe_face_values_local[scalar].value(kk,q);
               }
 
-            // When @p trace_reconstruct=false, we are preparing assemble the
+            // When @p trace_reconstruct=false, we are preparing assembling the
             // system for the skeleton variable $\lambda$. If this is the case,
             // we must assemble all local matrices associated with the problem:
             // local-local, local-face, face-local, and face-face.  The
@@ -959,9 +949,24 @@ namespace Step51
 
 
 
-// @sect4{HDG::solve}
-// The skeleton solution is solved for by using a BiCGStab solver with
-// identity preconditioner.
+  // @sect4{HDG::copy_local_to_global}
+  // If we are in the first step of the solution, i.e. @p trace_reconstruct=false,
+  // then we assemble the local matrices into the global system.
+  template <int dim>
+  void HDG<dim>::copy_local_to_global(const PerTaskData &data)
+  {
+    if (data.trace_reconstruct == false)
+      constraints.distribute_local_to_global (data.cell_matrix,
+                                              data.cell_vector,
+                                              data.dof_indices,
+                                              system_matrix, system_rhs);
+  }
+
+
+
+  // @sect4{HDG::solve}
+  // The skeleton solution is solved for by using a BiCGStab solver with
+  // identity preconditioner.
   template <int dim>
   void HDG<dim>::solve ()
   {
@@ -1152,7 +1157,7 @@ namespace Step51
     }
 
     // Having assembled all terms, we can again go on and solve the linear
-    // system. We again invert the matrix and then multiply the inverse by the
+    // system. We invert the matrix and then multiply the inverse by the
     // right hand side. An alternative (and more numerically stable) would have
     // been to only factorize the matrix and apply the factorization.
     scratch.cell_matrix.gauss_jordan();
@@ -1162,14 +1167,14 @@ namespace Step51
 
 
 
-// @sect4{HDG::output_results}
-// We have 3 sets of results that we would like to output:  the local solution,
-// the post-processed local solution, and the skeleton solution.  The former 2
-// both `live' on element volumes, wheras the latter lives on codimention-1 surfaces
-// of the triangulation.  Our @p output_results function writes all local solutions
-// to the same vtk file, even though they correspond to different <code>DoFHandler</code>
-// objects.  The graphical output for the skeleton variable is done through
-// use of the <code>DataOutFaces</code> class.
+  // @sect4{HDG::output_results}
+  // We have 3 sets of results that we would like to output:  the local solution,
+  // the post-processed local solution, and the skeleton solution.  The former 2
+  // both 'live' on element volumes, wheras the latter lives on codimention-1 surfaces
+  // of the triangulation.  Our @p output_results function writes all local solutions
+  // to the same vtk file, even though they correspond to different <code>DoFHandler</code>
+  // objects.  The graphical output for the skeleton variable is done through
+  // use of the <code>DataOutFaces</code> class.
   template <int dim>
   void HDG<dim>::output_results (const unsigned int cycle)
   {
@@ -1196,8 +1201,8 @@ namespace Step51
 
     DataOut<dim> data_out;
 
-// We first define the names and types of the local solution,
-// and add the data to @p data_out.
+    // We first define the names and types of the local solution,
+    // and add the data to @p data_out.
     std::vector<std::string> names (dim, "gradient");
     names.push_back ("solution");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -1208,9 +1213,9 @@ namespace Step51
     data_out.add_data_vector (dof_handler_local, solution_local,
                               names, component_interpretation);
 
-// The second data item we add is the post-processed solution.
-// In this case, it is a single scalar variable belonging to
-// a different DoFHandler.
+    // The second data item we add is the post-processed solution.
+    // In this case, it is a single scalar variable belonging to
+    // a different DoFHandler.
     std::vector<std::string> post_name(1,"u_post");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     post_comp_type(1, DataComponentInterpretation::component_is_scalar);
@@ -1302,7 +1307,7 @@ namespace Step51
         }
         }
 
-    // Just as in step-7, we set the boundary indicator of one of the faces to 1
+    // Just as in step-7, we set the boundary indicator of two of the faces to 1
     // where we want to specify Neumann boundary conditions instead of Dirichlet
     // conditions. Since we re-create the triangulation every time for global
     // refinement, the flags are set in every refinement step, not just at the
@@ -1319,10 +1324,10 @@ namespace Step51
             cell->face(face)->set_boundary_indicator (1);
   }
 
-// @sect4{HDG::run}
-// The functionality here is basically the same as <code>Step-7</code>.
-// We loop over 10 cycles, refining the grid on each one.  At the end,
-// convergence tables are created.
+  // @sect4{HDG::run}
+  // The functionality here is basically the same as <code>Step-7</code>.
+  // We loop over 10 cycles, refining the grid on each one.  At the end,
+  // convergence tables are created.
   template <int dim>
   void HDG<dim>::run ()
   {
@@ -1350,11 +1355,10 @@ namespace Step51
     // There is one minor change for the convergence table compared to step-7:
     // Since we did not refine our mesh by a factor two in each cycle (but
     // rather used the sequence 2, 3, 4, 6, 8, 12, ...), we need to tell the
-    // convergence rate evaluation about this. We do this by setting the number
-    // of cells as a reference column and additionally specifying the dimension
-    // of the problem, which gives the computation the necessary information for
-    // how much the mesh was refinement given a certain increase in the number
-    // of cells.
+    // convergence rate evaluation about this. We do this by setting the
+    // number of cells as a reference column and additionally specifying the
+    // dimension of the problem, which gives the necessary information for the
+    // relation between number of cells and mesh size.
     if (refinement_mode == global_refinement)
       {
         convergence_table
@@ -1368,6 +1372,8 @@ namespace Step51
   }
 
 } // end of namespace Step51
+
+
 
 int main (int argc, char **argv)
 {
