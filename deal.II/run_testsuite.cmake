@@ -21,6 +21,8 @@
 ########################################################################
 
 #
+# Configuration options:
+#
 # CTEST_SOURCE_DIRECTORY
 # CTEST_BINARY_DIRECTORY
 # CTEST_CMAKE_GENERATOR
@@ -114,7 +116,6 @@ ENDIF()
 
 MESSAGE("-- NO_JOBS: ${NO_JOBS}")
 
-
 #
 # CTEST_SITE:
 #
@@ -140,7 +141,7 @@ SET(CTEST_BUILD_NAME
   "${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM_NAME}"
   )
 
-# Append compiler information:
+# Append compiler information if available...
 IF(EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
   FILE(STRINGS ${CTEST_BINARY_DIRECTORY}/detailed.log _compiler_id
     REGEX "CMAKE_CXX_COMPILER:"
@@ -169,16 +170,15 @@ IF(NOT TRACK MATCHES "Foobar") #TODO: Exclude Continuous TRACKS
   ENDIF()
 ENDIF()
 
-
 #
 # Finalize:
 #
 
 SET(CTEST_NOTES_FILES
+  ${CTEST_BINARY_DIRECTORY}/revision.log
   ${CTEST_BINARY_DIRECTORY}/summary.log
   ${CTEST_BINARY_DIRECTORY}/detailed.log
   )
-
 
 
 ########################################################################
@@ -197,15 +197,10 @@ IF("${TRACK}" STREQUAL "Experimental")
   # - Run the configure, build and test stages and submit the results to
   #   the "Experimental" track
   #
-  # - No cleanup is done prior to test run
+  # - No cleanup is done
   #
 
   CTEST_START(Experimental TRACK Experimental)
-
-  # quick test:
-  #IF(NOT "${CTEST_UPDATE_COMMAND}" STREQUAL "")
-  #  CTEST_UPDATE()
-  #ENDIF()
 
   IF(NOT "${CONFIG_FILE}" STREQUAL "")
     CTEST_CONFIGURE(OPTIONS -C"${CONFIG_FILE}")
