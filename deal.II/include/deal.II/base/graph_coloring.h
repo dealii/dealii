@@ -28,8 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Currently graph_coloring only works for on uniform mesh, with a uniform
-// order for the polynomials, and only for continuous FE.
+// Currently graph_coloring only works only for continuous FE and without hp.
 namespace graph_coloring {
 
   /**

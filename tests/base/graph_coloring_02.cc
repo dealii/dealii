@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// $Id: graph_coloring_01.cc 30045 2013-07-18 19:18:00Z maier $
+// $Id: graph_coloring_02.cc 30045 2013-07-18 19:18:00Z maier $
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -16,7 +16,7 @@
 
 
 
-// Check that graph coloring works on uniform mesh with a uniform polynomial
+// Check that graph coloring works on adapted mesh with a uniform polynomial
 // order.
 
 
@@ -44,6 +44,17 @@ void check()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
+  // Create an adapted mesh
+  typename DoFHandler<dim>::active_cell_iterator
+  cell = dof_handler.begin_active();
+  for (; cell<dof_handler.end(); ++cell)
+  {
+    if ((cell->center()[0]==0.625) && (cell->center()[1]==0.625))
+    cell->set_refine_flag();
+  }
+  triangulation.execute_coarsening_and_refinement();
+  dof_handler.distribute_dofs(fe);
+
   // Create the coloring
   std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator> > coloring(
       graph_coloring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end()));      
@@ -61,7 +72,7 @@ void check()
 
 int main()
 {
-  std::ofstream logfile("graph_coloring_01/output");
+  std::ofstream logfile("graph_coloring_02/output");
   deallog<<std::setprecision(4);
   deallog<<std::fixed;
   deallog.attach(logfile);
