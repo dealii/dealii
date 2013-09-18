@@ -208,8 +208,8 @@ IF("${TRACK}" STREQUAL "Experimental")
     CTEST_CONFIGURE()
   ENDIF()
 
-  CTEST_BUILD(TARGET setup_test) # setup tests
-  CTEST_BUILD(TARGET) # builds the "all" target
+  CTEST_BUILD(TARGET) # run all
+  CTEST_BUILD(TARGET setup_test APPEND) # setup tests
 
   CTEST_TEST(PARALLEL_LEVEL ${NO_JOBS})
 
