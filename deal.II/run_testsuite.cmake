@@ -114,6 +114,62 @@ ENDIF()
 
 MESSAGE("-- NO_JOBS: ${NO_JOBS}")
 
+
+#
+# CTEST_SITE:
+#
+
+FIND_PROGRAM(HOSTNAME_COMMAND NAMES hostname)
+EXEC_PROGRAM(${HOSTNAME_COMMAND} OUTPUT_VARIABLE _hostname)
+SET(CTEST_SITE "${_hostname}")
+
+#
+# CTEST_UPDATE_COMMAND
+#
+
+FIND_PACKAGE(Subversion QUIET)
+IF(SUBVERSION_FOUND)
+  SET(CTEST_UPDATE_COMMAND ${Subversion_SVN_EXECUTABLE})
+ENDIF()
+
+#
+# CTEST_BUILD_NAME
+#
+
+SET(CTEST_BUILD_NAME
+  "${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM_NAME}"
+  )
+
+# Append compiler information:
+IF(EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
+  FILE(STRINGS ${CTEST_BINARY_DIRECTORY}/detailed.log _compiler_id
+    REGEX "CMAKE_CXX_COMPILER:"
+    )
+  STRING(REGEX REPLACE
+    "^.*CMAKE_CXX_COMPILER:     \(.*\) on platform.*$" "\\1"
+    _compiler_id ${_compiler_id}
+    )
+  STRING(REGEX REPLACE " " "-" _compiler_id ${_compiler_id})
+  IF( NOT "${_compiler_id}" STREQUAL "" OR
+      _compiler_id MATCHES "CMAKE_CXX_COMPILER" )
+    SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_compiler_id}")
+  ENDIF()
+ENDIF()
+
+IF(NOT TRACK MATCHES "Foobar") #TODO: Exclude Continuous TRACKS
+  #Append subversion revision:
+  IF(SUBVERSION_FOUND)
+    EXECUTE_PROCESS(COMMAND ${Subversion_SVN_EXECUTABLE} info
+      ${CTEST_SOURCE_DIRECTORY} OUTPUT_VARIABLE _tmp RESULT_VARIABLE _result
+      )
+    IF(${_result} EQUAL 0)
+      Subversion_WC_INFO(${CTEST_SOURCE_DIRECTORY} _svn)
+      SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-r${_svn_WC_REVISION}")
+    ENDIF()
+  ENDIF()
+ENDIF()
+
+
 #
 # Finalize:
 #
@@ -122,6 +178,7 @@ SET(CTEST_NOTES_FILES
   ${CTEST_BINARY_DIRECTORY}/summary.log
   ${CTEST_BINARY_DIRECTORY}/detailed.log
   )
+
 
 
 ########################################################################
@@ -145,6 +202,11 @@ IF("${TRACK}" STREQUAL "Experimental")
 
   CTEST_START(Experimental TRACK Experimental)
 
+  # quick test:
+  #IF(NOT "${CTEST_UPDATE_COMMAND}" STREQUAL "")
+  #  CTEST_UPDATE()
+  #ENDIF()
+
   IF(NOT "${CONFIG_FILE}" STREQUAL "")
     CTEST_CONFIGURE(OPTIONS -C"${CONFIG_FILE}")
   ELSE()
@@ -154,7 +216,7 @@ IF("${TRACK}" STREQUAL "Experimental")
   CTEST_BUILD(TARGET setup_test) # setup tests
   CTEST_BUILD(TARGET) # builds the "all" target
 
-  CTEST_TEST(PARALLEL_LEVEL ${DEAL_II_NO_JOBS})
+  CTEST_TEST(PARALLEL_LEVEL ${NO_JOBS})
 
   CTEST_SUBMIT()
 

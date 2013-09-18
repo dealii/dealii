@@ -44,18 +44,3 @@ SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "/contrib"
   )
 
-SET(CTEST_USE_LAUNCHERS 1)
-
-
-########################################################################
-#                                                                      #
-#                    Site and Build configuration:                     #
-#                                                                      #
-########################################################################
-
-FIND_PROGRAM(HOSTNAME_COMMAND NAMES hostname)
-EXEC_PROGRAM(${HOSTNAME_COMMAND} OUTPUT_VARIABLE _hostname)
-SET(CTEST_SITE "${_hostname}")
-
-SET(CTEST_BUILD_NAME "${CMAKE_SYSTEM}-${CMAKE_SYSTEM_PROCESSOR}-todo")
-
