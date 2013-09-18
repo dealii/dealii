@@ -86,7 +86,7 @@ FOREACH(_step_full ${_steps})
       # And a rule on how to configure the example step:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/configure_output
         COMMAND ${CMAKE_COMMAND}
-          -DDEAL_II_DIR=${CMAKE_BINARY_DIR} -DCMAKE_BUILD_TYPE=${_build} .
+          -DDEAL_II_DIR=${DEAL_II_BINARY_DIR} -DCMAKE_BUILD_TYPE=${_build} .
           > ${_step_dir}/configure_output 2>&1
           || (mv ${_step_dir}/configure_output
                  ${_step_dir}/failing_configure_output
