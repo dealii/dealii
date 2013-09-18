@@ -409,7 +409,8 @@ namespace Step51
 
 // @sect3{The HDG class implementation}
 
-// @sect4{Constructor} The constructor is similar to those in other examples,
+// @sect4{Constructor} 
+// The constructor is similar to those in other examples,
 // with the exception of handling multiple <code>DoFHandler</code> and
 // <code>FiniteElement</code> objects. Note that we create a system of finite
 // elements for the local DG part, including the gradient/flux part and the
@@ -474,7 +475,8 @@ namespace Step51
 
 
 
-// @sect4{HDG::PerTaskData} Next come the definition of the local data
+// @sect4{HDG::PerTaskData} 
+// Next come the definition of the local data
 // structures for the parallel assembly. The first structure @p PerTaskData
 // contains the local vector and matrix that are written into the global
 // matrix, whereas the ScratchData contains all data that we need for the
@@ -507,7 +509,8 @@ namespace Step51
 
 
 
-// @sect4{HDG::ScratchData} @p ScratchData contains persistent data for each
+// @sect4{HDG::ScratchData}
+// @p ScratchData contains persistent data for each
 // thread within <code>WorkStream</code>.  The <code>FEValues</code>, matrix,
 // and vector objects should be familiar by now.  There are two objects that
 // need to be discussed: @p std::vector<std::vector<unsigned int> >
