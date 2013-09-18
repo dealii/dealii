@@ -361,8 +361,10 @@ namespace Utilities
       mpi_err = MPI_Init_thread(&argc, &argv, wanted, &provided);
       AssertThrow (mpi_err == 0,
                    ExcMessage ("MPI could not be initialized."));
-      Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
-          ExcMessage("MPI reports that we are not allowed to use multiple threads."));
+
+      // disable for now because at least some implementations always return MPI_THREAD_SINGLE.
+      //Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
+      //    ExcMessage("MPI reports that we are not allowed to use multiple threads."));
 #else
       // make sure the compiler doesn't warn
       // about these variables
