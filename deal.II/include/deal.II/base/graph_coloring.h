@@ -28,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Currently graph_coloring only works only for continuous FE.
+/// This namespace contains the functions necessary to color a graph.
 namespace graph_coloring {
 
   /**
@@ -37,38 +37,38 @@ namespace graph_coloring {
    */
   template <typename Iterator>
   std::vector<std::vector<Iterator> > create_partitioning(Iterator const &begin,
-      typename identity<Iterator>::type const &end)
+      typename identity<Iterator>::type const &end,
+      std::vector<types::global_dof_index> (*get_conflict_indices) (Iterator &))
   {
     std::vector<std::vector<Iterator> > partitioning(1,std::vector<Iterator> (1,begin));
-    // Create a map from dofs to cells
-    boost::unordered_map<types::global_dof_index,std::vector<Iterator> > dof_to_cell;
+    // Number of iterators.
+    unsigned int n_iterators(0);
+    // Create a map from conflict indices to iterators
+    boost::unordered_map<types::global_dof_index,std::vector<Iterator> > indices_to_iterators;
     for (Iterator it=begin; it!=end; ++it)
     {
-      // Need to check that it works with hp
-      const unsigned int dofs_per_cell(it->get_fe().dofs_per_cell);
-      std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-      it->get_dof_indices(local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_to_cell[local_dof_indices[i]].push_back(it);
+      std::vector<types::global_dof_index> conflict_indices = (*get_conflict_indices)(it);
+      const unsigned int n_conflict_indices(conflict_indices.size());
+      for (unsigned int i=0; i<n_conflict_indices; ++i)
+        indices_to_iterators[conflict_indices[i]].push_back(it);
+      ++n_iterators;
     }
 
-    bool done(false);
-    // TO CHANGE: std::set is slow
+    // Create the partitioning.
     std::set<Iterator> used_it;
     used_it.insert(begin);
-    while (!done)
+    while (used_it.size()!=n_iterators)
     {
       typename std::vector<Iterator>::iterator vector_it(partitioning.back().begin());
       typename std::vector<Iterator>::iterator vector_end(partitioning.back().end());
       std::vector<Iterator> new_zone;
       for (; vector_it!=vector_end; ++vector_it)
       {
-        const unsigned int dofs_per_cell((*vector_it)->get_fe().dofs_per_cell);
-        std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-        (*vector_it)->get_dof_indices(local_dof_indices);
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        std::vector<types::global_dof_index> conflict_indices = (*get_conflict_indices)(*vector_it);
+        const unsigned int n_conflict_indices(conflict_indices.size());
+        for (unsigned int i=0; i<n_conflict_indices; ++i)
         {
-          std::vector<Iterator> iterator_vector(dof_to_cell[local_dof_indices[i]]);
+          std::vector<Iterator> iterator_vector(indices_to_iterators[conflict_indices[i]]);
           for (unsigned int j=0; j<iterator_vector.size(); ++j)
           {
             // Check that the iterator is not associated to a zone yet.
@@ -81,18 +81,27 @@ namespace graph_coloring {
         }
       }
       // If there are iterators in the new zone, then the zone is added to the
-      // partition. Otherwise, we are done and exit the while.
+      // partition. Otherwise, the graph is disconnected and we need to find
+      // an iterator on the other part of the graph.
       if (new_zone.size()!=0)
         partitioning.push_back(new_zone);
       else
-        done = true;
+        for (Iterator it=begin; it!=end; ++it)
+          if (used_it.count(it)==0)
+          {
+            partitioning.push_back(std::vector<Iterator> (1,it));
+            break;
+          }
     }
 
     return partitioning;
   }
 
+
+
   /**
-   * This function uses DSATUR (Degree SATURation) to color the graph:
+   * This function uses DSATUR (Degree SATURation) to color one zone of the
+   * partition. DSATUR works as follows:
    *   -# Arrange the vertices by decreasing order of degrees.
    *   -# Color a vertex of maximal degree with color 1.
    *   -# Choose a vertex with a maximal saturation degree. If there is equality,
@@ -101,39 +110,40 @@ namespace graph_coloring {
    *   -# If all the vertices are colored, stop. Otherwise, return to 3.
    */
   template <typename Iterator>
-  std::vector<std::vector<Iterator> > make_dsatur_coloring(std::vector<Iterator> const &partition)
+  std::vector<std::vector<Iterator> > make_dsatur_coloring(std::vector<Iterator> &partition,
+      std::vector<types::global_dof_index> (*get_conflict_indices)(Iterator &))
   {
     std::vector<std::vector<Iterator> > partition_coloring;
     // Number of zones composing the partitioning.
     const unsigned int partition_size(partition.size());
     std::vector<unsigned int> sorted_vertices(partition_size);
     std::vector<unsigned int> degrees(partition_size);
-    std::vector<std::vector<types::global_dof_index> > local_dof_indices(partition_size);
+    std::vector<std::vector<types::global_dof_index> > conflict_indices(partition_size);
     std::vector<std::vector<unsigned int> > graph(partition_size);
 
-    // Get the dofs associated to each cell. The dof_indices have to be sorted so
+    // Get the conflict indices associated to each iterator. The conflict_indices have to be sorted so
     // set_intersection can be used later.
     for (unsigned int i=0; i<partition_size; ++i)
     {
-      local_dof_indices[i].resize(partition[i]->get_fe().dofs_per_cell);
-      partition[i]->get_dof_indices(local_dof_indices[i]);
-      std::sort(local_dof_indices[i].begin(),local_dof_indices[i].end());
+      conflict_indices[i] = (*get_conflict_indices)(partition[i]);
+      std::sort(conflict_indices[i].begin(),conflict_indices[i].end());
     }
 
-    // Compute the degree of each vertex of the graph (cell) using the
-    // intersection of dofs
-    std::vector<types::global_dof_index> dofs_intersection;
+    // Compute the degree of each vertex of the graph  using the
+    // intersection of the conflict indices.
+    std::vector<types::global_dof_index> conflict_indices_intersection;
     std::vector<types::global_dof_index>::iterator intersection_it;
     for (unsigned int i=0; i<partition_size; ++i)
       for (unsigned int j=i+1; j<partition_size; ++j)
       {
-        dofs_intersection.resize(std::max(local_dof_indices[i].size(),local_dof_indices[j].size()));
-        intersection_it = std::set_intersection(local_dof_indices[i].begin(),
-            local_dof_indices[i].end(),local_dof_indices[j].begin(),
-            local_dof_indices[j].end(),dofs_intersection.begin());
-        // If the two cells share dofs then we increase the degree of the
+        conflict_indices_intersection.resize(std::max(conflict_indices[i].size(),
+              conflict_indices[j].size()));
+        intersection_it = std::set_intersection(conflict_indices[i].begin(),
+            conflict_indices[i].end(),conflict_indices[j].begin(),
+            conflict_indices[j].end(),conflict_indices_intersection.begin());
+        // If the two iterators share indices then we increase the degree of the
         // vertices and create an ''edge'' in the graph.
-        if (intersection_it!=dofs_intersection.begin())
+        if (intersection_it!=conflict_indices_intersection.begin())
         {
           ++degrees[i];
           ++degrees[j];
@@ -196,6 +206,8 @@ namespace graph_coloring {
     return partition_coloring;
   }
 
+
+
   /**
    * Given a partition-coloring graph, gather the colors together. All the
    * colors on even (resp. odd) partition can be executed simultaneously. This
@@ -242,18 +254,18 @@ namespace graph_coloring {
         for (unsigned int j=0; j<colors_counter[i].size(); ++j)
         {
           // Find the color in the current partition with the largest number of
-          // cells.
+          // iterators.
           std::vector<unsigned int>::iterator it;
           it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
-          unsigned int min_cells(-1);
+          unsigned int min_iterators(-1);
           unsigned int pos(0);
           // Find the color of coloring with the least number of colors among
           // the colors that have not been used yet.
           for (unsigned int k=0; k<max_even_n_colors; ++k)
             if (used_k.count(k)==0)
-              if (colors_counter[i_color][k]<min_cells)
+              if (colors_counter[i_color][k]<min_iterators)
               {
-                min_cells = colors_counter[i_color][k];
+                min_iterators = colors_counter[i_color][k];
                 pos = k;
               }
           colors_counter[i_color][pos] += *it;
@@ -262,7 +274,7 @@ namespace graph_coloring {
               partition_coloring[i][it-colors_counter[i].begin()].begin(),
               partition_coloring[i][it-colors_counter[i].begin()].end());
           used_k.insert(pos);
-          // Put the number of cells to the current color to zero.
+          // Put the number of iterators to the current color to zero.
           *it = 0;
         }
       }
@@ -291,18 +303,18 @@ namespace graph_coloring {
         for (unsigned int j=0; j<colors_counter[i].size(); ++j)
         {
           // Find the color in the current partition with the largest number of
-          // cells.
+          // iterators.
           std::vector<unsigned int>::iterator it;
           it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
-          unsigned int min_cells(-1);
+          unsigned int min_iterators(-1);
           unsigned int pos(0);
           // Find the color of coloring with the least number of colors among
           // the colors that have not been used yet.
           for (unsigned int k=0; k<max_odd_n_colors; ++k)
             if (used_k.count(k)==0)
-              if (colors_counter[i_color][k]<min_cells)
+              if (colors_counter[i_color][k]<min_iterators)
               {
-                min_cells = colors_counter[i_color][k];
+                min_iterators = colors_counter[i_color][k];
                 pos = k;
               }
           colors_counter[i_color][pos] += *it;
@@ -311,7 +323,7 @@ namespace graph_coloring {
               partition_coloring[i][it-colors_counter[i].begin()].begin(),
               partition_coloring[i][it-colors_counter[i].begin()].end());
           used_k.insert(pos);
-          // Put the number of cells to the current color to zero.
+          // Put the number of iterators to the current color to zero.
           *it = 0;
         }
       }
@@ -320,24 +332,31 @@ namespace graph_coloring {
     return coloring;
   }
 
+
+
   /**
-   * This function creates a coloring given two iterators on the DoFHandler.
+   * This function creates a coloring given two iterators on the DoFHandler
+   * and a function that return the conflict indices given an iterator. When
+   * using continuous finite elements, the conflict_indices can be the dofs
+   * indices.
    */
   template <typename Iterator>
   std::vector<std::vector<Iterator> > 
-  make_graph_coloring(Iterator const &begin,typename identity<Iterator>::type const &end) 
+  make_graph_coloring(Iterator const &begin,typename identity<Iterator>::type const &end,
+      std::vector<types::global_dof_index> (*get_conflict_indices)(Iterator &)) 
   {
     // Create the partitioning.
-    std::vector<std::vector<Iterator> > partitioning = create_partitioning(begin,end);
+    std::vector<std::vector<Iterator> > partitioning = create_partitioning(begin,end,
+        get_conflict_indices);
 
-    // Color the cells within each partition.
+    // Color the iterators within each partition.
     const unsigned int partitioning_size(partitioning.size());
     std::vector<std::vector<std::vector<Iterator> > > partition_coloring(
         partitioning_size);
     for (unsigned int i=0; i<partitioning_size; ++i)
     {
       // Compute the coloring of the graph using the DSATUR algorithm
-      partition_coloring[i] = make_dsatur_coloring(partitioning[i]);
+      partition_coloring[i] = make_dsatur_coloring(partitioning[i],get_conflict_indices);
     }
 
     // Gather the colors together. 
