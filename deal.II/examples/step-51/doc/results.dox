@@ -7,8 +7,8 @@ the four images below, we show the solution for polynomial degree <i>p</i>=1
 and cycles 2, 3, 4, and 8 of the program. In the plots, we overlay the data
 generated from the internal data (DG part) with the skeleton part ($\hat{u}$)
 into the same plot. We had to generate two different data sets because cells
-and faces represent different geometric entities, the combination of which in
-the same file are not supported in the VTK output of deal.II.
+and faces represent different geometric entities, the combination of which (in
+the same file) is not supported in the VTK output of deal.II.
 
 The images show the distinctive features of HDG: The cell solution (colored
 surfaces) is discontinuous between the cells. The solution on the skeleton
@@ -284,7 +284,7 @@ and CG are of similar quality, whereas HDG is again more efficient for sixth
 order polynomials. One can alternatively also use the combination of FE_DGP
 and FE_FaceP instead of (FE_DGQ, FE_FaceQ), which do not use tensor product
 polynomials of degree <i>p</i> but Legendre polynomials of <i>complete</i>
-degree <i>p</i>. There are less degrees of freedom on the skeleton variable
+degree <i>p</i>. There are fewer degrees of freedom on the skeleton variable
 for FE_FaceP for a given mesh size, but the solution quality (error vs. number
 of DoFs) is very similar to the results for FE_FaceQ.
 
@@ -332,8 +332,8 @@ the tutorial whether similar improvements could be made for HDG.
 As already mentioned in the introduction, one possibility is to implement
 another post-processing technique as discussed in the literature.
 
-A second thing that is not done optimally relates to the performance of this
-program, which is of course an issue in practical applications (weighting in
+A second item that is not done optimally relates to the performance of this
+program, which is of course an issue in practical applications (weighing in
 also the better solution quality of (H)DG methods for transport-dominated
 problems). Let us look at
 the computing time of the tutorial program and the share of the individual

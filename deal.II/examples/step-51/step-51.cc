@@ -388,8 +388,8 @@ namespace Step51
     // Dirichlet boundary conditions, just as in a continuous Galerkin finite
     // element method.  We can enforce the boundary conditions in an analogous
     // manner through the use of <code>ConstrainMatrix</code> constructs. In
-    // addition, hanging nodes where cells of different refinement levels meet
-    // are set as for continuous finite elements: For the face elements which
+    // addition, hanging nodes are handled in the same way as for 
+    // continuous finite elements: For the face elements which
     // only define degrees of freedom on the face, this process sets the
     // solution on the refined to be the one from the coarse side.
     ConstraintMatrix     constraints;
@@ -479,7 +479,7 @@ namespace Step51
 
 
   // @sect4{HDG::PerTaskData}
-  // Next come the definition of the local data structures for the parallel
+  // Next comes the definition of the local data structures for the parallel
   // assembly. The first structure @p PerTaskData contains the local vector
   // and matrix that are written into the global matrix, whereas the
   // ScratchData contains all data that we need for the local assembly. There
@@ -830,7 +830,7 @@ namespace Step51
                 scratch.u_phi[k] = scratch.fe_face_values_local[scalar].value(kk,q);
               }
 
-            // When @p trace_reconstruct=false, we are preparing assembling the
+            // When @p trace_reconstruct=false, we are preparing to assemble the
             // system for the skeleton variable $\hat{u}$. If this is the case,
             // we must assemble all local matrices associated with the problem:
             // local-local, local-face, face-local, and face-face.  The
@@ -1086,7 +1086,7 @@ namespace Step51
   // discussion in the introduction, we need to set up a system that projects
   // the gradient part of the DG solution onto the gradient of the
   // post-processed variable. Moreover, we need to set the average of the new
-  // post-processed variable to be equal the average of the scalar DG solution
+  // post-processed variable to equal the average of the scalar DG solution
   // on the cell.
   //
   // More technically speaking, the projection of the gradient is a system
@@ -1158,7 +1158,7 @@ namespace Step51
 
     // Having assembled all terms, we can again go on and solve the linear
     // system. We invert the matrix and then multiply the inverse by the
-    // right hand side. An alternative (and more numerically stable) would have
+    // right hand side. An alternative (and more numerically stable) method would have
     // been to only factorize the matrix and apply the factorization.
     scratch.cell_matrix.gauss_jordan();
     scratch.cell_matrix.vmult(scratch.cell_sol, scratch.cell_rhs);
