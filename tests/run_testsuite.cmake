@@ -52,13 +52,10 @@
 #     - The CMake Generator to use (e.g. "Unix Makefiles", or "Ninja", see
 #       $ man cmake)
 #     - If unspecified the generator of a configured build directory will
-#       be used. If this information is not available, an error is thrown.
+#       be used, otherwise "Unix Makefiles".
 #
 #   TRACK
 #     - TODO (defaults to "Experimental")
-#
-#   NO_JOBS
-#     - The number of concurrent build and test jobs (defaults to 1).
 #
 #   CONFIG_FILE
 #     - A configuration file (see ../deal.II/docs/development/Config.sample)
@@ -172,11 +169,8 @@ IF("${CTEST_CMAKE_GENERATOR}" STREQUAL "")
   IF(NOT "${_generator}" STREQUAL "")
     SET(CTEST_CMAKE_GENERATOR ${_generator})
   ELSE()
-    MESSAGE(FATAL_ERROR "
-The build directory is not configured and CTEST_CMAKE_GENERATOR is not set.
-Please set CTEST_CMAKE_GENERATOR to the generator that should be used.
-"
-     )
+    # default to "Unix Makefiles"
+    SET(CTEST_CMAKE_GENERATOR "Unix Makefiles")
   ENDIF()
 ELSE()
   # ensure that CTEST_CMAKE_GENERATOR (that was apparantly set) is
@@ -325,16 +319,6 @@ ELSE()
 ENDIF()
 
 #
-# NO_JOBS:
-#
-
-IF("${NO_JOBS}" STREQUAL "")
-  SET(NO_JOBS "1")
-ENDIF()
-
-MESSAGE("-- NO_JOBS:                ${NO_JOBS}")
-
-#
 # Declare files that should be submitted as notes:
 #
 
@@ -362,6 +346,6 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   --build ${CTEST_BINARY_DIRECTORY} --target setup_test
   )
 
-CTEST_TEST(PARALLEL_LEVEL ${NO_JOBS})
+CTEST_TEST()
 
 CTEST_SUBMIT()
