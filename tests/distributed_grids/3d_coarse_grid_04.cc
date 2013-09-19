@@ -36,7 +36,7 @@ void test(std::ostream & /*out*/)
 
   GridIn<dim> gi;
   gi.attach_triangulation (tr);
-  gi.read ("../bits/two_cubes.inp");
+  gi.read (SOURCE_DIR "../bits/two_cubes.inp");
 
   write_vtk(tr, "1");
 }
