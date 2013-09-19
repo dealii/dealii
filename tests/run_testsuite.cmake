@@ -308,7 +308,7 @@ IF(DEFINED _svn_WC_REVISION)
 "###
 #
 #  SVN information:
-#        SVN_WC_URL:               ${SVN_WC_URL}
+#        SVN_WC_URL:               ${_svn_WC_URL}
 #        SVN_WC_REVISION:          ${_svn_WC_REVISION}
 #        SVN_WC_LAST_CHANGED_DATE: ${_svn_WC_LAST_CHANGED_DATE}
 #
