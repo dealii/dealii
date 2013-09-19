@@ -63,13 +63,19 @@ FOREACH(_step_full ${_steps})
       SET(_step_dir ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_build_lowercase})
 
       FILE(GLOB _files ${_step_full}/*)
-      LIST(REMOVE_ITEM _files ${_step_full}/doc)
+      SET(_command)
+      FOREACH(_file ${_files})
+        IF(NOT _file MATCHES "/(doc|.svn)")
+          LIST(APPEND _command
+            COMMAND ${CMAKE_COMMAND} -E copy ${_file} ${_step_dir}
+            )
+        ENDIF()
+      ENDFOREACH()
 
       # A rule how to copy the example step to the current directory:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/CMakeLists.txt
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${_step_full} ${_step_dir}
-        # Todo: Refactor:
-        COMMAND ${CMAKE_COMMAND} -E remove_directory ${_step_dir}/doc
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${_step_dir}
+        ${_command}
         DEPENDS ${_files}
         )
 
