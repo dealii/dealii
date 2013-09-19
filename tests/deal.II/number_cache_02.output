@@ -1,5 +1,4 @@
 
-DEAL::Reading grid_in/2d.xda
 DEAL::25 cells are distorted.
 DEAL::  29037
 DEAL::  29037
@@ -30,7 +29,6 @@ DEAL::  44
 DEAL::  44
 DEAL::  44
 DEAL::  44
-DEAL::Reading grid_in_3d/1.in
 DEAL::  16480
 DEAL::  16480
 DEAL::  54668
@@ -60,7 +58,6 @@ DEAL::  88
 DEAL::  88
 DEAL::  88
 DEAL::  88
-DEAL::Reading grid_in_3d/2.in
 DEAL::  360
 DEAL::  360
 DEAL::  1390
@@ -90,7 +87,6 @@ DEAL::  88
 DEAL::  88
 DEAL::  88
 DEAL::  88
-DEAL::Reading grid_in_3d/3.in
 DEAL::  2
 DEAL::  2
 DEAL::  20
@@ -120,7 +116,6 @@ DEAL::  8
 DEAL::  8
 DEAL::  8
 DEAL::  8
-DEAL::Reading grid_in_3d/4.in
 DEAL::  13824
 DEAL::  13824
 DEAL::  44210
@@ -150,7 +145,6 @@ DEAL::  88
 DEAL::  88
 DEAL::  88
 DEAL::  88
-DEAL::Reading grid_in_3d/evil_0.in
 DEAL::  10
 DEAL::  10
 DEAL::  80
@@ -180,7 +174,6 @@ DEAL::  32
 DEAL::  32
 DEAL::  32
 DEAL::  32
-DEAL::Reading grid_in_3d/evil_1.in
 DEAL::  10
 DEAL::  10
 DEAL::  80
@@ -210,7 +203,6 @@ DEAL::  32
 DEAL::  32
 DEAL::  32
 DEAL::  32
-DEAL::Reading grid_in_3d/evil_2.in
 DEAL::  10
 DEAL::  10
 DEAL::  80
@@ -240,7 +232,6 @@ DEAL::  32
 DEAL::  32
 DEAL::  32
 DEAL::  32
-DEAL::Reading grid_in_3d/evil_3.in
 DEAL::  10
 DEAL::  10
 DEAL::  80
@@ -270,7 +261,6 @@ DEAL::  32
 DEAL::  32
 DEAL::  32
 DEAL::  32
-DEAL::Reading grid_in_3d/evil_4.in
 DEAL::  10
 DEAL::  10
 DEAL::  80

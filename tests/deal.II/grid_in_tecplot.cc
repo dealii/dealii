@@ -37,8 +37,7 @@ void test (const std::string &infilename)
   gi.attach_triangulation (tria);
   gi.read (infilename);
 
-  logfile<<"------------------------------------------"<<std::endl
-         <<"output for grid in "<<infilename<<std::endl;
+  logfile<<"------------------------------------------"<<std::endl;
 
   GridOut grid_out;
   grid_out.set_flags (GridOutFlags::Ucd(true));
