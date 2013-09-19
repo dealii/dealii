@@ -307,7 +307,7 @@ under Subversion version control.
 ELSE()
   # if not on trunk, append branch to track:
   IF(NOT "${_branch}" STREQUAL "trunk")
-    SET("${TRACK} - ${_branch}")
+    SET(TRACK "${TRACK} - ${_branch}")
   ENDIF()
 ENDIF()
 
