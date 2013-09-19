@@ -294,6 +294,24 @@ ENDIF()
 MESSAGE("-- CTEST_BUILD_NAME:       ${CTEST_BUILD_NAME}")
 
 #
+# We require valid svn information for build tests:
+#
+
+IF( "${TRACK}" STREQUAL "Build Tests"
+    AND NOT DEFINED _svn_WC_REVISION )
+  MESSAGE(FATAL_ERROR "
+TRACK was set to \"Build Tests\" which requires the source directory to be
+under Subversion version control.
+"
+    )
+ELSE()
+  # if not on trunk, append branch to track:
+  IF(NOT "${_branch}" STREQUAL "trunk")
+    SET("${TRACK} - ${_branch}")
+  ENDIF()
+ENDIF()
+
+#
 # Write revision log:
 #
 
