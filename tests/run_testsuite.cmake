@@ -149,7 +149,7 @@ IF( "${TRACK}" STREQUAL "Build Tests"
     AND NOT "${_test}" STREQUAL "" )
     MESSAGE(FATAL_ERROR "
 TRACK was set to \"Build Tests\" which require an empty build directory.
-But files werer found in \"${CTEST_BINARY_DIRECTORY}\"
+But files were found in \"${CTEST_BINARY_DIRECTORY}\"
 "
       )
 ENDIF()
