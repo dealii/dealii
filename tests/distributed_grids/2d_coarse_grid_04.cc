@@ -36,7 +36,7 @@ void test(std::ostream & /*out*/)
 
   GridIn<dim> gi;
   gi.attach_triangulation (tr);
-  gi.read (SOURCE_DIR "../grid/grids/circle-grid.inp");
+  gi.read (SOURCE_DIR "/../grid/grids/circle-grid.inp");
 
   write_vtk(tr, "1");
 }
