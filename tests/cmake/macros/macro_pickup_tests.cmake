@@ -24,34 +24,19 @@
 #     DEAL_II_PICKUP_TESTS()
 #
 
-IF(NOT DEFINED SET_IF_EMPTY)
-  MACRO(SET_IF_EMPTY _variable)
-    IF("${${_variable}}" STREQUAL "")
-      SET(${_variable} ${ARGN})
-    ENDIF()
-  ENDMACRO()
-ENDIF()
-
 MACRO(DEAL_II_PICKUP_TESTS)
   SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
 
   GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-  #
-  # Strip the quoting from TEST_DIFF:
-  #
-  SET(_test_diff ${TEST_DIFF})
-
   SET(DEAL_II_SOURCE_DIR) # avoid a bogus warning
 
-  SET(_count "0")
   FILE(GLOB _tests "*.output")
   FOREACH(_test ${_tests})
     SET(_comparison ${_test})
 
     #
-    # Respect TEST_PICKUP_REGEX: Make sure we are allowed to pickup this
-    # test:
+    # Respect TEST_PICKUP_REGEX:
     #
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${TEST_PICKUP_REGEX}" )
@@ -74,7 +59,6 @@ MACRO(DEAL_II_PICKUP_TESTS)
         _feature ${_match}
         )
       STRING(TOUPPER ${_feature} _feature)
-
       STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
 
       IF( (DEAL_II_${_feature} AND NOT ${_boolean}) OR
@@ -97,24 +81,14 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
       IF(_test MATCHES debug)
         SET(_configuration DEBUG)
-        MATH(EXPR _count "${_count}+1")
       ELSEIF(_test MATCHES release)
         SET(_configuration RELEASE)
-        MATH(EXPR _count "${_count}+1")
       ELSE()
         SET(_configuration)
-        MATH(EXPR _count "${_count}+2")
       ENDIF()
 
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
       DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_n_cpu} ${_configuration})
     ENDIF()
   ENDFOREACH()
-
-  MESSAGE(STATUS
-    "Testsuite: Set up ${_count} regression tests in category ${_category}."
-    )
-  MESSAGE(STATUS
-    "  (Timeout: ${TEST_TIME_LIMIT}, Diff: "${_test_diff}")"
-    )
 ENDMACRO()

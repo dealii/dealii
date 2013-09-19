@@ -135,9 +135,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
               && cat ${_test_directory}/failing_output
               && exit 1)
         COMMAND
-          ${PERL_EXECUTABLE} -pi
-          ${TEST_DIR}/cmake/scripts/normalize.pl
-          ${_test_directory}/output
+          ${PERL_EXECUTABLE} -pi ${TEST_DIR}/cmake/scripts/normalize.pl
+                                 ${_test_directory}/output
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS

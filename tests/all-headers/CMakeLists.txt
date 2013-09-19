@@ -29,22 +29,7 @@ INCLUDE(${DEAL_II_TARGET_CONFIG})
 
 SET(_category all-headers)
 
-SET(_count "0")
-
-IF(NOT "${DEAL_II_SOURCE_DIR}" STREQUAL "")
-  # The testsuite was configured as part of a deal.II project, so pick up
-  # the headers from the corresponding source directory:
-  FILE(GLOB_RECURSE _header ${DEAL_II_SOURCE_DIR}/include/deal.II/*.h)
-ELSE()
-  # The testsuite was configured as an independent project, so pick up
-  # headers from an external deal.II build directory, or installation:
-  IF(DEAL_II_BUILD_DIR)
-    LIST(GET DEAL_II_INCLUDE_DIRS 2 _header_dir)
-  ELSE()
-    LIST(GET DEAL_II_INCLUDE_DIRS 0 _header_dir)
-  ENDIF()
-  FILE(GLOB_RECURSE _header ${_header_dir}/deal.II/*.h)
-ENDIF()
+FILE(GLOB_RECURSE _header ${DEAL_II_SOURCE_DIR}/include/deal.II/*.h)
 
 FOREACH(_full_file ${_header})
   GET_FILENAME_COMPONENT(_file ${_full_file} NAME)
@@ -94,14 +79,6 @@ FOREACH(_full_file ${_header})
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )
-      MATH(EXPR _count "${_count}+1")
     ENDIF()
   ENDFOREACH()
 ENDFOREACH()
-
-MESSAGE(STATUS
-  "Testsuite: Set up ${_count} regression tests in category ${_category}."
-  )
-MESSAGE(STATUS
-  "  (Timeout: ${TEST_TIME_LIMIT}, Diff: "${_test_diff}")"
-  )

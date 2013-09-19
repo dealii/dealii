@@ -25,8 +25,13 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 MESSAGE(STATUS "Proceed to test definitions now.")
-PROJECT(deal.II-testsuite NONE)
 ENABLE_TESTING()
+
+IF(NOT "${CMAKE_PROJECT_NAME}" STREQUAL "deal.II")
+  MESSAGE(FATAL_ERROR
+    "The testsuite cannot be set up as an independent project. Please configure \"deal.II\" instead."
+    )
+ENDIF()
 
 SET(_options)
 IF("${CMAKE_PROJECT_NAME}" STREQUAL "deal.II")

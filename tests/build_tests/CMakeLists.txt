@@ -46,18 +46,8 @@ SET(_release_steps
   step-47 step-48 step-49
   )
 
-IF(NOT "${DEAL_II_SOURCE_DIR}" STREQUAL "")
-  # The testsuite was configured as part of a deal.II project, so pick up
-  # the steps rom the corresponding source directory:
-  FILE(GLOB _steps ${DEAL_II_SOURCE_DIR}/examples/step-*)
-ELSE()
-  # The testsuite was configured as an independent project, so pick up
-  # headers from an external deal.II build directory, or installation:
-  FILE(GLOB _steps ${DEAL_II_PATH}/${DEAL_II_EXAMPLES_RELDIR}/step-*)
-  # TODO: What do in case of a build dir?
-ENDIF()
+FILE(GLOB _steps ${DEAL_II_SOURCE_DIR}/examples/step-*)
 
-SET(_count "0")
 FOREACH(_step_full ${_steps})
   GET_FILENAME_COMPONENT(_step ${_step_full} NAME)
 
@@ -173,15 +163,7 @@ FOREACH(_step_full ${_steps})
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )
-      MATH(EXPR _count "${_count}+1")
 
     ENDIF()
   ENDFOREACH()
 ENDFOREACH()
-
-MESSAGE(STATUS
-  "Testsuite: Set up ${_count} regression tests in category ${_category}."
-  )
-MESSAGE(STATUS
-  "  (Timeout: ${TEST_TIME_LIMIT}, Diff: "${_test_diff}")"
-  )
