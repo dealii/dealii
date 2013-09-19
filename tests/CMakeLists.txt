@@ -25,7 +25,7 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 MESSAGE(STATUS "Proceed to test definitions now.")
-PROJECT(deal.II-testsuite)
+PROJECT(deal.II-testsuite NONE)
 ENABLE_TESTING()
 
 SET(_options)
@@ -60,7 +60,7 @@ FOREACH(_var ${_variables})
   IF(_var MATCHES
       "^(TEST_DIR|TEST_DIFF|TEST_TIME_LIMIT|TEST_PICKUP_REGEX|NUMDIFF_DIR)$"
       )
-    LIST(APPEND _options -D${_var}="${${_var}}")
+    LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
 ENDFOREACH()
 
