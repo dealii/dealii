@@ -76,12 +76,19 @@ void test_fe_datas()
   // Check vector elements in 2d and higher only
   if (dim>1)
     {
-      // Face elements
+      // Face Q elements
       fe_datas.push_back(new FE_FaceQ<dim> (0));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(new FE_FaceQ<dim> (1));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(new FE_FaceQ<dim> (3));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      // Face P elements
+      fe_datas.push_back(new FE_FaceP<dim> (0));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(new FE_FaceP<dim> (1));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(new FE_FaceP<dim> (3));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       // Vector DG elements
       fe_datas.push_back(

@@ -1050,7 +1050,7 @@ namespace
      */
     std::vector<double> vertices;
     std::vector<unsigned int> cells;
-    unsigned int cell_offset;
+    unsigned int node_offset;
   };
 
 
@@ -1556,7 +1556,7 @@ namespace
 
     vertices.resize(local_points_cell_count[0]*dim);
     cells.resize(local_points_cell_count[1]*entries_per_cell);
-    cell_offset = global_points_cell_offsets[1]*entries_per_cell;
+    node_offset = global_points_cell_offsets[0];
   }
 
   template<int dim>
@@ -1577,18 +1577,18 @@ namespace
     unsigned int d3)
   {
     unsigned int base_entry = index * GeometryInfo<dim>::vertices_per_cell;
-    cells[base_entry+0] = cell_offset+start;
-    cells[base_entry+1] = cell_offset+start+d1;
+    cells[base_entry+0] = node_offset+start;
+    cells[base_entry+1] = node_offset+start+d1;
     if (dim>=2)
       {
-        cells[base_entry+2] = cell_offset+start+d2+d1;
-        cells[base_entry+3] = cell_offset+start+d2;
+        cells[base_entry+2] = node_offset+start+d2+d1;
+        cells[base_entry+3] = node_offset+start+d2;
         if (dim>=3)
           {
-            cells[base_entry+4] = cell_offset+start+d3;
-            cells[base_entry+5] = cell_offset+start+d3+d1;
-            cells[base_entry+6] = cell_offset+start+d3+d2+d1;
-            cells[base_entry+7] = cell_offset+start+d3+d2;
+            cells[base_entry+4] = node_offset+start+d3;
+            cells[base_entry+5] = node_offset+start+d3+d1;
+            cells[base_entry+6] = node_offset+start+d3+d2+d1;
+            cells[base_entry+7] = node_offset+start+d3+d2;
           }
       }
   }
@@ -6768,7 +6768,7 @@ XDMFEntry DataOutBase::create_xdmf_entry (const std::vector<Patch<dim,spacedim> 
           while (n_th_vector < vector_data_ranges.size() && std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) < data_set) n_th_vector++;
 
           // Determine whether the data is multiple dimensions or one
-          if (std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) == data_set)
+          if (n_th_vector < vector_data_ranges.size() && std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) == data_set)
             {
               // Multiple dimensions
               pt_data_vector_dim = std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) - std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1;
@@ -7124,7 +7124,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
       while (n_th_vector < vector_data_ranges.size() && std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) < data_set) n_th_vector++;
 
       // Determine the dimension of this data
-      if (std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) == data_set)
+      if (n_th_vector < vector_data_ranges.size() && std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) == data_set)
         {
           // Multiple dimensions
           pt_data_vector_dim = std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) - std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1;

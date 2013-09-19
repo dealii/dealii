@@ -965,7 +965,7 @@ next_cell:
           }
       }
 
-    Assert (best_cell.first.state() == IteratorState::valid,
+    AssertThrow (best_cell.first.state() == IteratorState::valid,
             ExcPointNotFound<spacedim>(p));
 
     return best_cell;
@@ -1088,7 +1088,7 @@ next_cell:
           }
       }
 
-    Assert (best_cell.first.state() == IteratorState::valid,
+    AssertThrow (best_cell.first.state() == IteratorState::valid,
             ExcPointNotFound<spacedim>(p));
 
     return best_cell;

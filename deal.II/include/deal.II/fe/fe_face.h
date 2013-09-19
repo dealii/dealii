@@ -33,8 +33,9 @@ DEAL_II_NAMESPACE_OPEN
  * and two, the polynomials hence correspond to the usual Lagrange polynomials
  * on equidistant points.
  *
- * This finite element is the trace space of FE_RaviartThomas on the
- * faces and serves in hybridized methods.
+ * This finite element is the trace space of FE_RaviartThomas on the faces and
+ * serves in hybridized methods, e.g. in combination with the FE_DGQ
+ * element. Its use is demonstrated in the step-51 tutorial program.
  *
  * @note Since these are only finite elements on faces, only
  * FEFaceValues and FESubfaceValues will be able to extract reasonable
@@ -135,6 +136,9 @@ private:
  * A finite element, which is a Legendre on each face (i.e., FE_DGP)
  * and undefined in the interior of the cells. The basis functions on
  * the faces are from Polynomials::Legendre.
+ *
+ * This element is used in a hybridized method together with the FE_DGP
+ * element for the interior degrees of freedom.
  *
  * @note Since these are only finite elements on faces, only
  * FEFaceValues and FESubfaceValues will be able to extract reasonable

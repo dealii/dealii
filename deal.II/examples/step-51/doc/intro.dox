@@ -17,14 +17,15 @@ is the large number of globally coupled degrees of freedom that one
 must solve in an implicit system.  This is because, unlike continuous finite
 elements, in typical discontinuous elements there is one degree of freedom at
 each vertex <i>for each of the adjacent elements</i>, rather than just one,
-and similarly for edges and faces.  As another example,
-for the FE_DGP_Monomial basis, each
+and similarly for edges and faces.  As an example of how fast the number of 
+unknowns grows,
+consider the <code>FE_DGP_Monomial</code> basis:  each
 scalar solution component is represented by polynomials of degree $p$
-which yields $(1/dim!)*\prod_{i=1}^{dim}(p+i)$ degrees of freedom per
-element.  Typically, all degrees of freedom in an element are coupled
+with $(1/dim!)*\prod_{i=1}^{dim}(p+i)$ degrees of freedom per
+element. Typically, all degrees of freedom in an element are coupled
 to all of the degrees of freedom in the adjacent elements.  The resulting
 discrete equations yield very large linear systems very quickly, especially
-for systems of equations in dim=2 or dim=3.
+for systems of equations in 2 or 3 dimensions.
 
 <h4> Reducing the size of the linear system </h4>
 To alleviate the computational cost of solving such large linear systems,
@@ -61,13 +62,13 @@ first block and the skeleton variables $\Lambda$ as the second block:
 \begin{pmatrix} A & B \\ C & D \end{pmatrix}
 \begin{pmatrix} U \\ \Lambda \end{pmatrix}
 =
-\begin{pmatrix} F \\ G \end{pmatrix}
+\begin{pmatrix} F \\ G \end{pmatrix}.
 @f}
 Our aim is now to eliminate the <i>U</i> block with a Schur complement
 approach similar to step-20, which results in the following two steps:
 @f{eqnarray*}
-(D - C A^{-1} B) \Lambda &=& G - C A^{-1} F \\
-A U &=& F - B \Lambda
+(D - C A^{-1} B) \Lambda &=& G - C A^{-1} F, \\
+A U &=& F - B \Lambda.
 @f}
 The point is that the presence of $A^{-1}$ is not a problem because $A$ is a
 block diagonal matrix where each block corresponds to one cell and is
@@ -78,9 +79,10 @@ The coupling to other cells is introduced by the matrices
 matrix <i>A</i> element by element (the local solution of the Dirichlet
 problem) and subtract $CA^{-1}B$ from $D$. The steps in the Dirichlet-to-Neumann map concept hence correspond to
 <ol>
-  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand side $G - C A^{-1} F$,
+  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand side $G - C A^{-1} F$  <i>locally on each cell</i> 
+  and inserting the contribution into the global trace matrix in the usual way,
   <li> solving the Schur complement system for $\Lambda$, and
-  <li> solving the equation for <i>U</i> using the second equation which uses $\Lambda$.
+  <li> solving for <i>U</i> using the second equation, given $\Lambda$.
 </ol>
 
 
@@ -105,7 +107,9 @@ The HDG formulation used for this example is taken from
   <a href="http://dx.doi.org/10.1016/j.jcp.2009.01.030">[DOI]</a>
 </b>
 
-We consider the convection-diffusion equation:
+We consider the convection-diffusion equation over the domain $\Omega$
+with Dirichlet boundary $\partial \Omega_D$ and Neumann boundary
+$\partial \Omega_N$:
 @f{eqnarray*}
 	\nabla \cdot (\mathbf{c} u) - \nabla \cdot (\kappa \nabla u) &=& f,
 	\quad \text{ in } \Omega, \\
@@ -130,86 +134,103 @@ and integrate by parts over every element $K$ to obtain:
   (\mathbf{v}, \kappa^{-1} \mathbf{q})_K - (\nabla\cdot\mathbf{v}, u)_K
     + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}\right>_{\partial K} &=& 0, \\
   - (\nabla w, \mathbf{c} u + \mathbf{q})_K
-    + \left<(w, \hat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}\right>_{\partial K}
+    + \left<(w, \widehat{\mathbf{c} u}+\hat{\mathbf{q}})\cdot\mathbf{n}\right>_{\partial K}
     &=& (w,f)_K.
 @f}
 
 The terms decorated with a hat denote the numerical traces (also commonly referred
-to as numerical fluxes).   They are approximations
+to as numerical fluxes).  They are approximations
 to the interior values on the boundary of the element.  To ensure conservation,
 these terms must be single-valued on any given element edge $\partial K$ even
 though, with discontinuous shape functions, there may of course be multiple
 values coming from the cells adjacent to an interface.
 We eliminate the numerical trace $\hat{\mathbf{q}}$ by using traces of the form:
 @f{eqnarray*}
-  \hat{\mathbf{c} u}+\hat{\mathbf{q}} = \mathbf{c}\hat{u} + \mathbf{q}
+  \widehat{\mathbf{c} u}+\hat{\mathbf{q}} = \mathbf{c}\hat{u} + \mathbf{q}
   + \tau(u - \hat{u})\mathbf{n} \quad \text{ on } \partial K.
 @f}
+
+The variable $\hat {u}$ is introduced as an additional independent variable
+and is the one for which we finally set up a globally coupled linear
+system. As mentioned above, it is defined on the element faces and
+discontinuous from one face to another.
+Values for $u$ and $\mathbf{q}$ appearing in the numerical trace function
+are taken to be the cell's interior solution restricted
+to the boundary $\partial K$.  
+
 The local stabilization parameter $\tau$ has effects on stability and accuracy
 of HDG solutions; see the literature for a further discussion. A stabilization
 parameter of unity is reported to be the choice which gives best results. A
 stabilization parameter $\tau$ that tends to infinity prohibits jumps in the
 solution over the element boundaries, making the HDG solution approach the
-approximation of continuous finite elements. In the program below, we choose
+approximation with continuous finite elements. In the program below, we choose
 the stabilization parameter as
 @f{eqnarray*}
   \tau = \frac{\kappa}{\ell} + |\mathbf{c} \cdot \mathbf{n}|
 @f}
 where we set the diffusion length scale to $\ell = \frac{1}{5}$.
 
-The trace/skeleton variables in HDG methods are single-valued on element faces.  As such,
-they must strongly represent the Dirichlet data on $\partial\Omega_D$.  We introduce
-a new variable $\lambda$ such that
+The trace/skeleton variables in HDG methods are single-valued on element
+faces.  As such, they must strongly represent the Dirichlet data on
+$\partial\Omega_D$.  This means that
 @f{equation*}
-  \hat{u} =
-  \begin{cases}
-     g_D  & \text{ on } \partial \Omega_D, \\
-     \lambda & \text{otherwise}.
-\end{cases}
+  \hat{u}|_{\partial \Omega_D} = g_D,
 @f}
+where the equal sign actually means an $L_2$ projection of the boundary
+function $g$ onto the space of the face variables (e.g. linear functions on
+the faces). This constraint is then applied to the skeleton variable $\hat{u}$
+using inhomogeneous constraints by the method
+VectorTools::project_boundary_values.
 
-Eliminating $\hat{u}$ from the weak form in favor of $\lambda$, summing the elemental
+Summing the elemental
 contributions across all elements in the triangulation, enforcing the normal
 component of the numerical flux, and integrating by parts
 on the equation weighted by $w$, we arrive at the final form of the problem:
-Find $(\mathbf{q}_h, u_h, \lambda_h) \in
+Find $(\mathbf{q}_h, u_h, \hat{u}_h) \in
 \mathcal{V}_h^p \times \mathcal{W}_h^p \times \mathcal{M}_h^p$ such that
 @f{eqnarray*}
   (\mathbf{v}, \kappa^{-1} \mathbf{q}_h)_{\mathcal{T}}
     - ( \nabla\cdot\mathbf{v}, u_h)_{\mathcal{T}}
-    + \left<\mathbf{v}\cdot\mathbf{n}, \lambda_h\right>_{\partial\mathcal{T}}
-    &=&
-    - \left<\mathbf{v}\cdot\mathbf{n}, g_D\right>_{\partial\Omega_D},
+    + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}_h\right>_{\partial\mathcal{T}}
+    &=& 0,
     \quad \forall \mathbf{v} \in \mathcal{V}_h^p,
 \\
    (w, \mathbf{c}\nabla u_h + \nabla \cdot \mathbf{q}_h)_{\mathcal{T}}
-    + \left<w, \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
+    + \left<w, \tau (u_h - \hat{u}_h)\right>_{\partial \mathcal{T}}
     &=&
     (w, f)_{\mathcal{T}},
     \quad \forall w \in \mathcal{W}_h^p,
 \\
-  \left< \mu, \mathbf{c} \lambda_h\cdot \mathbf{n}
+  \left< \mu, \hat{u}_h\mathbf{c} \cdot \mathbf{n}
   		+ \mathbf{q}_h\cdot \mathbf{n}
-  	    + \tau (u_h - \lambda_h)\right>_{\partial \mathcal{T}}
+  	    + \tau (u_h - \hat{u}_h)\right>_{\partial \mathcal{T}}
     &=&
     \left<\mu, g_N\right>_{\partial\Omega_N},
     \quad \forall \mu \in \mathcal{M}_h^p.
 @f}
 
 The unknowns $(\mathbf{q}_h, u_h)$ are referred to as local variables; they are
-represented as standard DG variables.  The unknown $\lambda_h$ is the skeleton
+represented as standard DG variables.  The unknown $\hat{u}_h$ is the skeleton
 variable which has support on the codimension-1 surfaces (faces) of the mesh.
+
+We use the notation $(\cdot, \cdot)_{\mathcal{T}} = \sum_K (\cdot, \cdot)_K$
+to denote the sum of integrals over all cells and $\left<\cdot,
+\cdot\right>_{\partial \mathcal{T}} = \sum_K \left<\cdot,
+\cdot\right>_{\partial K}$ to denote integration over all faces of all cells,
+i.e., interior faces are visited twice. When combining the contribution from
+both elements sharing a face, the above equation yields terms familiar for DG
+with jumps of the solution over the cell boundaries.
 
 In the equation above, the space $\mathcal {W}_h^{p}$ for the scalar variable
 <i>u<sub>h</sub></i> is defined as the space of functions that are tensor
-product polynomials of degree $p$ on each cell and discontinuous over the
+product polynomials of degree <i>p</i> on each cell and discontinuous over the
 element boundaries $\mathcal Q_{-p}$, i.e., the space described by
 <code>FE_DGQ<dim>(p)</code>. The space for the gradient or flux variable
 <b>q</b><i><sub>h</sub></i> is a vector element space where each component is
 a locally polynomial and discontinuous $\mathcal Q_{-p}$. In the code below,
 we collect these two local parts together in one FESystem where the first @p
 dim components denote the gradient part and the last scalar component
-corresponds to the scalar variable. For the skeleton component $\lambda_h$, we
+corresponds to the scalar variable. For the skeleton component $\hat{u}_h$, we
 define a space that consists of discontinuous tensor product polynomials that
 live on the element faces, which in deal.II is implemented by the class
 FE_FaceQ. This space is otherwise similar to FE_DGQ, i.e., the solution
@@ -223,11 +244,11 @@ In the weak form given above, we can note the following coupling patterns:
   $(\mathbf{q}_h, u_h)$.
   <li> The matrix $B$ represents the local-face coupling.  These are the terms
   with weighting functions $(\mathbf{v}, w)$ multiplying the skeleton variable
-  $\lambda_h$.
+  $\hat{u}_h$.
   <li> The matrix $C$ represents the face-local coupling, which involves the
   weighting function $\mu$ multiplying the local solutions $(\mathbf{q}_h, u_h)$.
   <li>  The matrix $D$ is the face-face coupling;
-  terms involve both $\mu$ and $\lambda_h$.
+  terms involve both $\mu$ and $\hat{u}_h$.
 </ol>
 
 <h4> Post-processing and super-convergence </h4>
@@ -245,42 +266,45 @@ ingredients:
    on each cell <i>K</i> super-converges at rate $\mathcal{O}(h^{p+2})$.
 </ol>
 
-We now introduce a new variable $u_h^* \in \mathcal{V}_h^{p+1}$. With the two
-ingredients above, we immediately deduce the following layout for
-post-processing on each element:
+We now introduce a new variable $u_h^* \in \mathcal{V}_h^{p+1}$, which we find
+by the expression $|\kappa \nabla u_h^* + \mathbf{q}_h|^2$ over the cell
+<i>K</i> under the constraint $\left(1, u_h^*\right)_K &=& \left(1,
+u_h\right)_K$. This translates to the following system of equations:
 @f{eqnarray*}
 \left(1, u_h^*\right)_K &=& \left(1, u_h\right)_K\\
-\left(\nabla w_h^*, \kappa \nabla u_h^*\right)_K &=& -\left(\nabla w_h^*, \mathbf{q}_h\right)_K \quad \text{for all } w_h^* \in \mathcal Q^{p+1}.
+\left(\nabla w_h^*, \kappa \nabla u_h^*\right)_K &=& 
+-\left(\nabla w_h^*, \mathbf{q}_h\right)_K
+\quad \text{for all } w_h^* \in \mathcal Q^{p+1}.
 @f}
 
-Since the second set of equations is already equal to the cell-wise dimension
-of the new function space $|\mathcal Q^{p+1}|$, there is one more equation in
-the above than unknown, which we fix in the code below by omitting one of
-these equations (since the Laplacian is singular on the constant function). As
-we will see below, this form of the post-processing already gives the desired
-super-convergence result with rate $\mathcal {O}(h^{p+2})$. The motivation for
-the above equation is the minimization of the expression $|\kappa \nabla u_h^*
-+ \mathbf{q}_h|^2$ over the cell <i>K</i>. It should be noted that there is
-some freedom in constructing $u_h^*$ and this approach to extract the
-information from the gradient is not the only one. In particular, the
-post-processed solution defined here does not satisfy the convection-diffusion
-equation in any sense. As an alternative, the paper by Nguyen, Peraire and
-Cockburn cited above suggests another somewhat more involved formula for
-convection-diffusion that can also post-process the flux variable into an
-$H(\Omega,\mathrm{div})$-conforming variant and better represents the local
-convection-diffusion operator when the diffusion is small. We leave the
-implementation of a more sophisticated post-processing as a possible extension
-to the interested reader.
+Since we test by the whole set of basis functions in the space of tensor
+product polynomials of degree <i>p</i>+1 in the second set of equations, this
+is an overdetermined system with one more equation than unknowns. We fix this
+in the code below by omitting one of these equations (since the rows in the
+Laplacian are linearly dependent when representing a constant function). As we
+will see below, this form of the post-processing gives the desired
+super-convergence result with rate $\mathcal {O}(h^{p+2})$.  It should be
+noted that there is some freedom in constructing $u_h^*$ and this minimization
+approach to extract the information from the gradient is not the only one. In
+particular, the post-processed solution defined here does not satisfy the
+convection-diffusion equation in any sense. As an alternative, the paper by
+Nguyen, Peraire and Cockburn cited above suggests another somewhat more
+involved formula for convection-diffusion that can also post-process the flux
+variable into an $H(\Omega,\mathrm{div})$-conforming variant and better
+represents the local convection-diffusion operator when the diffusion is
+small. We leave the implementation of a more sophisticated post-processing as
+a possible extension to the interested reader.
 
-Note that for vector-valued problem, the approach is very similar. One simply
-sets the constraint for the mean value of each vector component separately and
-uses the gradient for the main work.
+Note that for vector-valued problems, the post-processing works similarly. One
+simply sets the constraint for the mean value of each vector component
+separately and uses the gradient as the main source of information.
 
 <h3> Problem specific data </h3>
 
 For this tutorial program, we consider almost the same test case as in
 step-7. The computational domain is $\Omega := [-1,1]^d$ and the exact
-solution corresponds to the one in step-7, except for a scaling. We use the following source centers <i>x<sub>i</sub></i> for the exponentials
+solution corresponds to the one in step-7, except for a scaling. We use the
+following source centers <i>x<sub>i</sub></i> for the exponentials
 <ul>
   <li> 1D:  $\{x_i\}^1 = \{ -\frac{1}{3}, 0, \frac{1}{3} \}$,
   <li> 2D: $\{\mathbf{x}_i\}^2 = \{ (-\frac{1}{2},\frac{1}{2}),
@@ -312,7 +336,7 @@ Besides implementing the above equations, the implementation below provides the 
 <ul>
   <li> WorkStream to parallelize local solvers. Workstream is already used in
   step-32, step-44.
-  <li> Reconstruct the local DG solution from the trace trace.
+  <li> Reconstruct the local DG solution from the trace.
   <li> Post-processing the solution for superconvergence.
   <li> DataOutFaces for direct output of the global skeleton solution.
 </ul>

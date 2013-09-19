@@ -436,38 +436,41 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
       // zero.
       const double eps = 2e-13*(this->degree+1)*(dim-1);
 
-      FullMatrix<double> mass (face_quadrature.size(), this->dofs_per_face);
+      FullMatrix<double> mass (face_quadrature.size(), source_fe->dofs_per_face);
  
       for (unsigned int k = 0; k < face_quadrature.size(); ++k)
         {
           const Point<dim-1> p =
+            subface == numbers::invalid_unsigned_int ?
+            face_quadrature.point(k) :
             GeometryInfo<dim-1>::child_to_cell_coordinates (face_quadrature.point(k),
                                                             subface);
 
-          for (unsigned int j = 0; j < this->dofs_per_face; ++j)
-            mass (k , j) = this->poly_space.compute_value(j, p);
+          for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)
+            mass (k , j) = source_fe->poly_space.compute_value(j, p);
         }
 
       Householder<double> H(mass);
       Vector<double> v_in(face_quadrature.size());
-      Vector<double> v_out(this->dofs_per_face);
+      Vector<double> v_out(source_fe->dofs_per_face);
 
 
       // compute the interpolation matrix by evaluating on the fine side and
       // then solving the least squares problem
-      for (unsigned int i=0; i<source_fe->dofs_per_face; ++i)
+      for (unsigned int i=0; i<this->dofs_per_face; ++i)
         {
           for (unsigned int k = 0; k < face_quadrature.size(); ++k)
             {
-              const Point<dim-1> p =
+              const Point<dim-1> p = numbers::invalid_unsigned_int ?
+                face_quadrature.point(k) :
                 GeometryInfo<dim-1>::child_to_cell_coordinates (face_quadrature.point(k),
                                                                 subface);
-              v_in(k) = source_fe->poly_space.compute_value(i, p);
+              v_in(k) = this->poly_space.compute_value(i, p);
             }
           const double result = H.least_squares(v_out, v_in);
           Assert(result < 1e-12, FETools::ExcLeastSquaresError (result));
 
-          for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+          for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)
             {
               double matrix_entry = v_out(j);
 
@@ -479,20 +482,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
               if (std::fabs (matrix_entry) < eps)
                 matrix_entry = 0.0;
 
-              interpolation_matrix(i,j) = matrix_entry;
+              interpolation_matrix(j,i) = matrix_entry;
             }
-        }
-
-      // make sure that the row sum of each of the matrices is 1 at this
-      // point. this must be so since the shape functions sum up to 1
-      for (unsigned int j=0; j<source_fe->dofs_per_face; ++j)
-        {
-          double sum = 0.;
-
-          for (unsigned int i=0; i<this->dofs_per_face; ++i)
-            sum += interpolation_matrix(j,i);
-
-          Assert (std::fabs(sum-1) < eps, ExcInternalError());
         }
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != 0)

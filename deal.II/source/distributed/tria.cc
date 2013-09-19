@@ -3452,6 +3452,7 @@ namespace parallel
         FaceVector;
       typename FaceVector::const_iterator it, periodic_end;
       it = periodicity_vector.begin();
+      periodic_end = periodicity_vector.end();
       
       for (; it<periodic_end; ++it)
       {
