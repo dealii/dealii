@@ -28,17 +28,6 @@
 
 // test DataOutReader::merge
 
-void cat_file(const char *filename)
-{
-  std::ifstream in(filename);
-  while (in)
-    {
-      std::string s;
-      std::getline(in, s);
-      deallog.get_file_stream() << s << "\n";
-    }
-}
-
 template <int dim, int spacedim>
 void check()
 {
@@ -80,7 +69,6 @@ void check()
   }
 
   cat_file("data_out_reader_01/outfile");
-  std::remove ("data_out_reader_01/outfile");
 }
 
 
