@@ -220,6 +220,10 @@ IF(NOT "${CONFIG_FILE}" STREQUAL "")
   SET(_options "-C${CONFIG_FILE}")
 ENDIF()
 
+IF("${TRACK}" STREQUAL "Build Tests")
+  SET(TEST_PICKUP_REGEX "^build_tests")
+ENDIF()
+
 # Pass all relevant "TEST_" variables down to configure:
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
