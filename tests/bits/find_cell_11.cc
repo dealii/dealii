@@ -72,7 +72,7 @@ void test()
 
 int main (int argc, char **argv)
 {
-  initlog(__FILE__);
+  initlog();
 
   test();
 
