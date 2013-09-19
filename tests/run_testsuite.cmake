@@ -304,7 +304,9 @@ TRACK was set to \"Build Tests\" which requires the source directory to be
 under Subversion version control.
 "
     )
-ELSE()
+ENDIF()
+
+IF("${TRACK}" STREQUAL "Build Tests")
   # if not on trunk, append branch to track:
   IF(NOT "${_branch}" STREQUAL "trunk")
     SET(TRACK "${TRACK} - ${_branch}")
