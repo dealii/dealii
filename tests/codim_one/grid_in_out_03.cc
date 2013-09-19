@@ -35,7 +35,7 @@ template <int dim, int spacedim>
 void test(std::string filename)
 {
   logfile << " Tria<" << dim << "," << spacedim << ">: "
-          << filename << std::endl;
+          << std::endl;
   Triangulation<dim, spacedim> tria;
   GridIn<dim, spacedim> gi;
   gi.attach_triangulation (tria);
