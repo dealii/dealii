@@ -20,7 +20,7 @@
 // functions
 
 #include "../tests.h"
-#include "mesh_3d.h"
+#include "../grid/mesh_3d.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
