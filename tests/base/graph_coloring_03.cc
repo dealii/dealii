@@ -53,13 +53,13 @@ void check()
   for (cell=dof_handler.begin_active(); cell<dof_handler.end(); ++cell)
     if ((cell->center()[0]==0.625) && (cell->center()[1]==0.625))
       cell->set_refine_flag();
-  
+
   triangulation.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe_collection);
 
   // Create the coloring
   std::vector<std::vector<typename hp::DoFHandler<dim>::active_cell_iterator> > coloring(
-      graph_coloring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end()));      
+      graph_coloring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end()));
 
   // Output the coloring
   for (unsigned int color=0; color<coloring.size(); ++color)
@@ -74,7 +74,7 @@ void check()
 
 int main()
 {
-  std::ofstream logfile("graph_coloring_03/output");
+  std::ofstream logfile("output");
   deallog<<std::setprecision(4);
   deallog<<std::fixed;
   deallog.attach(logfile);
