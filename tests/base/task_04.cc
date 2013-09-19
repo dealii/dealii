@@ -59,4 +59,8 @@ int main()
   t2.join ();
 
   deallog << "OK" << std::endl;
+
+  deallog.detach ();
+  logfile.close ();
+  sort_file_contents ("output");
 }

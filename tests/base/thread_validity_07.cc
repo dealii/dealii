@@ -61,4 +61,8 @@ int main()
 
   waiter_threads.join_all ();
   deallog << "All waiting threads finished." << std::endl;
+
+  deallog.detach ();
+  logfile.close ();
+  sort_file_contents ("output");
 }

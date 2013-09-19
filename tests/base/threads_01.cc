@@ -22,1623 +22,1623 @@
 template <int> struct X {};
 struct U {
   virtual ~U () {}
-  X<0> foo_0 () { 
+  X<0> foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_0 () { 
+  static X<0> static_foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_0 () { 
+  X<0> & ref_foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_0 () { 
+  static X<0> & static_ref_foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_0 () { 
+  static const X<0> & static_const_ref_foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_0 () { 
+  X<0> foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_0 () { 
+  static X<0> static_foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_0 () { 
+  X<0> & ref_foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_0 () { 
+  const X<0> & const_ref_foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_0 () { 
+  const X<0> & const_ref_foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_0 () { 
+  const X<0> & const_ref_foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_0_const ()const { 
+  const X<0> & const_ref_foo_0_const ()const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_0_const ()const { 
+  const X<0> & const_ref_foo_ref_0_const ()const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_0_const ()const { 
+  const X<0> & const_ref_foo_const_ref_0_const ()const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_0 () { 
+  virtual const X<0> & virtual_const_ref_foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_0 () { 
+  virtual const X<0> & virtual_const_ref_foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_0 () { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_0_const ()const { 
+  virtual const X<0> & virtual_const_ref_foo_0_const ()const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_0_const ()const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_0_const ()const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_0_const ()const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_0_const ()const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_0 () { 
+  static X<0> & static_ref_foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_0 () { 
+  static const X<0> & static_const_ref_foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_0 () { 
+  X<0> foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_0 () { 
+  static X<0> static_foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_0 () { 
+  X<0> & ref_foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_0 () { 
+  static X<0> & static_ref_foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_0 () { 
+  static const X<0> & static_const_ref_foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_0_const () const { 
+  X<0> foo_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_0_const () const { 
+  X<0> & ref_foo_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_0_const () const { 
+  X<0> foo_ref_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_0_const () const { 
+  X<0> & ref_foo_ref_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_0_const () const { 
+  X<0> foo_const_ref_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_0_const () const { 
+  X<0> & ref_foo_const_ref_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_0_const () const { 
+  virtual X<0> virtual_foo_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_0_const () const { 
+  virtual X<0> & virtual_ref_foo_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_0_const () const { 
+  virtual X<0> virtual_foo_ref_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_0_const () const { 
+  virtual X<0> & virtual_ref_foo_ref_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_0_const () const { 
+  virtual X<0> virtual_foo_const_ref_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_0_const () const { 
+  virtual X<0> & virtual_ref_foo_const_ref_0_const () const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_0 () { 
+  virtual X<0> virtual_foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_0 () { 
+  virtual X<0> & virtual_ref_foo_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_0 () { 
+  virtual X<0> virtual_foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_0 () { 
+  virtual X<0> & virtual_ref_foo_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_0 () { 
+  virtual X<0> virtual_foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_0 () { 
+  virtual X<0> & virtual_ref_foo_const_ref_0 () {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_1 (X<1>) { 
+  X<0> foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_1 (X<1>) { 
+  static X<0> static_foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_1 (X<1>) { 
+  X<0> & ref_foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_1 (X<1>) { 
+  static X<0> & static_ref_foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_1 (X<1>) { 
+  static const X<0> & static_const_ref_foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_1 (X<1>&) { 
+  X<0> foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_1 (X<1>&) { 
+  static X<0> static_foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_1 (X<1>&) { 
+  X<0> & ref_foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_1 (X<1>) { 
+  const X<0> & const_ref_foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_1 (X<1>&) { 
+  const X<0> & const_ref_foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_1 (X<1>&) { 
+  const X<0> & const_ref_foo_const_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_1_const (X<1>)const { 
+  const X<0> & const_ref_foo_1_const (X<1>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_1_const (X<1>&)const { 
+  const X<0> & const_ref_foo_ref_1_const (X<1>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_1_const (X<1>&)const { 
+  const X<0> & const_ref_foo_const_ref_1_const (X<1>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_1 (X<1>) { 
+  virtual const X<0> & virtual_const_ref_foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_1 (X<1>&) { 
+  virtual const X<0> & virtual_const_ref_foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_1 (X<1>&) { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_1_const (X<1>)const { 
+  virtual const X<0> & virtual_const_ref_foo_1_const (X<1>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_1_const (X<1>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_1_const (X<1>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_1_const (X<1>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_1_const (X<1>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_1 (X<1>&) { 
+  static X<0> & static_ref_foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_1 (X<1>&) { 
+  static const X<0> & static_const_ref_foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_1 (const X<1>&) { 
+  X<0> foo_const_ref_1 (const X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_1 (const X<1>&) { 
+  static X<0> static_foo_const_ref_1 (const X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_1 (const X<1>&) { 
+  X<0> & ref_foo_const_ref_1 (const X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_1 (const X<1>&) { 
+  static X<0> & static_ref_foo_const_ref_1 (const X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_1 (const X<1>&) { 
+  static const X<0> & static_const_ref_foo_const_ref_1 (const X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_1_const (X<1>) const { 
+  X<0> foo_1_const (X<1>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_1_const (X<1>) const { 
+  X<0> & ref_foo_1_const (X<1>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_1_const (X<1>&) const { 
+  X<0> foo_ref_1_const (X<1>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_1_const (X<1>&) const { 
+  X<0> & ref_foo_ref_1_const (X<1>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_1_const (const X<1>&) const { 
+  X<0> foo_const_ref_1_const (const X<1>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_1_const (const X<1>&) const { 
+  X<0> & ref_foo_const_ref_1_const (const X<1>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_1_const (X<1>) const { 
+  virtual X<0> virtual_foo_1_const (X<1>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_1_const (X<1>) const { 
+  virtual X<0> & virtual_ref_foo_1_const (X<1>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_1_const (X<1>&) const { 
+  virtual X<0> virtual_foo_ref_1_const (X<1>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_1_const (X<1>&) const { 
+  virtual X<0> & virtual_ref_foo_ref_1_const (X<1>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_1_const (const X<1>&) const { 
+  virtual X<0> virtual_foo_const_ref_1_const (const X<1>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_1_const (const X<1>&) const { 
+  virtual X<0> & virtual_ref_foo_const_ref_1_const (const X<1>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_1 (X<1>) { 
+  virtual X<0> virtual_foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_1 (X<1>) { 
+  virtual X<0> & virtual_ref_foo_1 (X<1>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_1 (X<1>&) { 
+  virtual X<0> virtual_foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_1 (X<1>&) { 
+  virtual X<0> & virtual_ref_foo_ref_1 (X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_1 (const X<1>&) { 
+  virtual X<0> virtual_foo_const_ref_1 (const X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_1 (const X<1>&) { 
+  virtual X<0> & virtual_ref_foo_const_ref_1 (const X<1>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_2 (X<1>,X<2>) { 
+  X<0> foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_2 (X<1>,X<2>) { 
+  static X<0> static_foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_2 (X<1>,X<2>) { 
+  X<0> & ref_foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_2 (X<1>,X<2>) { 
+  static X<0> & static_ref_foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_2 (X<1>,X<2>) { 
+  static const X<0> & static_const_ref_foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_2 (X<1>&,X<2>&) { 
+  X<0> foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_2 (X<1>&,X<2>&) { 
+  static X<0> static_foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_2 (X<1>&,X<2>&) { 
+  X<0> & ref_foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_2 (X<1>,X<2>) { 
+  const X<0> & const_ref_foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_2 (X<1>&,X<2>&) { 
+  const X<0> & const_ref_foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_2 (X<1>&,X<2>&) { 
+  const X<0> & const_ref_foo_const_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_2_const (X<1>,X<2>)const { 
+  const X<0> & const_ref_foo_2_const (X<1>,X<2>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_2_const (X<1>&,X<2>&)const { 
+  const X<0> & const_ref_foo_ref_2_const (X<1>&,X<2>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_2_const (X<1>&,X<2>&)const { 
+  const X<0> & const_ref_foo_const_ref_2_const (X<1>&,X<2>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_2 (X<1>,X<2>) { 
+  virtual const X<0> & virtual_const_ref_foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_2 (X<1>&,X<2>&) { 
+  virtual const X<0> & virtual_const_ref_foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_2 (X<1>&,X<2>&) { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_2_const (X<1>,X<2>)const { 
+  virtual const X<0> & virtual_const_ref_foo_2_const (X<1>,X<2>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_2_const (X<1>&,X<2>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_2_const (X<1>&,X<2>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_2_const (X<1>&,X<2>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_2_const (X<1>&,X<2>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_2 (X<1>&,X<2>&) { 
+  static X<0> & static_ref_foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_2 (X<1>&,X<2>&) { 
+  static const X<0> & static_const_ref_foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_2 (const X<1>&,const X<2>&) { 
+  X<0> foo_const_ref_2 (const X<1>&,const X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_2 (const X<1>&,const X<2>&) { 
+  static X<0> static_foo_const_ref_2 (const X<1>&,const X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_2 (const X<1>&,const X<2>&) { 
+  X<0> & ref_foo_const_ref_2 (const X<1>&,const X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_2 (const X<1>&,const X<2>&) { 
+  static X<0> & static_ref_foo_const_ref_2 (const X<1>&,const X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_2 (const X<1>&,const X<2>&) { 
+  static const X<0> & static_const_ref_foo_const_ref_2 (const X<1>&,const X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_2_const (X<1>,X<2>) const { 
+  X<0> foo_2_const (X<1>,X<2>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_2_const (X<1>,X<2>) const { 
+  X<0> & ref_foo_2_const (X<1>,X<2>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_2_const (X<1>&,X<2>&) const { 
+  X<0> foo_ref_2_const (X<1>&,X<2>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_2_const (X<1>&,X<2>&) const { 
+  X<0> & ref_foo_ref_2_const (X<1>&,X<2>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_2_const (const X<1>&,const X<2>&) const { 
+  X<0> foo_const_ref_2_const (const X<1>&,const X<2>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_2_const (const X<1>&,const X<2>&) const { 
+  X<0> & ref_foo_const_ref_2_const (const X<1>&,const X<2>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_2_const (X<1>,X<2>) const { 
+  virtual X<0> virtual_foo_2_const (X<1>,X<2>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_2_const (X<1>,X<2>) const { 
+  virtual X<0> & virtual_ref_foo_2_const (X<1>,X<2>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_2_const (X<1>&,X<2>&) const { 
+  virtual X<0> virtual_foo_ref_2_const (X<1>&,X<2>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_2_const (X<1>&,X<2>&) const { 
+  virtual X<0> & virtual_ref_foo_ref_2_const (X<1>&,X<2>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_2_const (const X<1>&,const X<2>&) const { 
+  virtual X<0> virtual_foo_const_ref_2_const (const X<1>&,const X<2>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_2_const (const X<1>&,const X<2>&) const { 
+  virtual X<0> & virtual_ref_foo_const_ref_2_const (const X<1>&,const X<2>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_2 (X<1>,X<2>) { 
+  virtual X<0> virtual_foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_2 (X<1>,X<2>) { 
+  virtual X<0> & virtual_ref_foo_2 (X<1>,X<2>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_2 (X<1>&,X<2>&) { 
+  virtual X<0> virtual_foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_2 (X<1>&,X<2>&) { 
+  virtual X<0> & virtual_ref_foo_ref_2 (X<1>&,X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_2 (const X<1>&,const X<2>&) { 
+  virtual X<0> virtual_foo_const_ref_2 (const X<1>&,const X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_2 (const X<1>&,const X<2>&) { 
+  virtual X<0> & virtual_ref_foo_const_ref_2 (const X<1>&,const X<2>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_3 (X<1>,X<2>,X<3>) { 
+  X<0> foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_3 (X<1>,X<2>,X<3>) { 
+  static X<0> static_foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_3 (X<1>,X<2>,X<3>) { 
+  X<0> & ref_foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_3 (X<1>,X<2>,X<3>) { 
+  static X<0> & static_ref_foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_3 (X<1>,X<2>,X<3>) { 
+  static const X<0> & static_const_ref_foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  X<0> foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  static X<0> static_foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  X<0> & ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_3 (X<1>,X<2>,X<3>) { 
+  const X<0> & const_ref_foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  const X<0> & const_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  const X<0> & const_ref_foo_const_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_3_const (X<1>,X<2>,X<3>)const { 
+  const X<0> & const_ref_foo_3_const (X<1>,X<2>,X<3>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_3_const (X<1>&,X<2>&,X<3>&)const { 
+  const X<0> & const_ref_foo_ref_3_const (X<1>&,X<2>&,X<3>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_3_const (X<1>&,X<2>&,X<3>&)const { 
+  const X<0> & const_ref_foo_const_ref_3_const (X<1>&,X<2>&,X<3>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_3 (X<1>,X<2>,X<3>) { 
+  virtual const X<0> & virtual_const_ref_foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  virtual const X<0> & virtual_const_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_3_const (X<1>,X<2>,X<3>)const { 
+  virtual const X<0> & virtual_const_ref_foo_3_const (X<1>,X<2>,X<3>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_3_const (X<1>&,X<2>&,X<3>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_3_const (X<1>&,X<2>&,X<3>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_3_const (X<1>&,X<2>&,X<3>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_3_const (X<1>&,X<2>&,X<3>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  static X<0> & static_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  static const X<0> & static_const_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) { 
+  X<0> foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) { 
+  static X<0> static_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) { 
+  X<0> & ref_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) { 
+  static X<0> & static_ref_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) { 
+  static const X<0> & static_const_ref_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_3_const (X<1>,X<2>,X<3>) const { 
+  X<0> foo_3_const (X<1>,X<2>,X<3>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_3_const (X<1>,X<2>,X<3>) const { 
+  X<0> & ref_foo_3_const (X<1>,X<2>,X<3>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_3_const (X<1>&,X<2>&,X<3>&) const { 
+  X<0> foo_ref_3_const (X<1>&,X<2>&,X<3>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_3_const (X<1>&,X<2>&,X<3>&) const { 
+  X<0> & ref_foo_ref_3_const (X<1>&,X<2>&,X<3>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_3_const (const X<1>&,const X<2>&,const X<3>&) const { 
+  X<0> foo_const_ref_3_const (const X<1>&,const X<2>&,const X<3>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_3_const (const X<1>&,const X<2>&,const X<3>&) const { 
+  X<0> & ref_foo_const_ref_3_const (const X<1>&,const X<2>&,const X<3>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_3_const (X<1>,X<2>,X<3>) const { 
+  virtual X<0> virtual_foo_3_const (X<1>,X<2>,X<3>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_3_const (X<1>,X<2>,X<3>) const { 
+  virtual X<0> & virtual_ref_foo_3_const (X<1>,X<2>,X<3>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_3_const (X<1>&,X<2>&,X<3>&) const { 
+  virtual X<0> virtual_foo_ref_3_const (X<1>&,X<2>&,X<3>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_3_const (X<1>&,X<2>&,X<3>&) const { 
+  virtual X<0> & virtual_ref_foo_ref_3_const (X<1>&,X<2>&,X<3>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_3_const (const X<1>&,const X<2>&,const X<3>&) const { 
+  virtual X<0> virtual_foo_const_ref_3_const (const X<1>&,const X<2>&,const X<3>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_3_const (const X<1>&,const X<2>&,const X<3>&) const { 
+  virtual X<0> & virtual_ref_foo_const_ref_3_const (const X<1>&,const X<2>&,const X<3>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_3 (X<1>,X<2>,X<3>) { 
+  virtual X<0> virtual_foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_3 (X<1>,X<2>,X<3>) { 
+  virtual X<0> & virtual_ref_foo_3 (X<1>,X<2>,X<3>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  virtual X<0> virtual_foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) { 
+  virtual X<0> & virtual_ref_foo_ref_3 (X<1>&,X<2>&,X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) { 
+  virtual X<0> virtual_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) { 
+  virtual X<0> & virtual_ref_foo_const_ref_3 (const X<1>&,const X<2>&,const X<3>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  X<0> foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  static X<0> static_foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  X<0> & ref_foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  static X<0> & static_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  static const X<0> & static_const_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  X<0> foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  static X<0> static_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  X<0> & ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  const X<0> & const_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  const X<0> & const_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  const X<0> & const_ref_foo_const_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_4_const (X<1>,X<2>,X<3>,X<4>)const { 
+  const X<0> & const_ref_foo_4_const (X<1>,X<2>,X<3>,X<4>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&)const { 
+  const X<0> & const_ref_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&)const { 
+  const X<0> & const_ref_foo_const_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  virtual const X<0> & virtual_const_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  virtual const X<0> & virtual_const_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_4_const (X<1>,X<2>,X<3>,X<4>)const { 
+  virtual const X<0> & virtual_const_ref_foo_4_const (X<1>,X<2>,X<3>,X<4>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  static X<0> & static_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  static const X<0> & static_const_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) { 
+  X<0> foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) { 
+  static X<0> static_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) { 
+  X<0> & ref_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) { 
+  static X<0> & static_ref_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) { 
+  static const X<0> & static_const_ref_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_4_const (X<1>,X<2>,X<3>,X<4>) const { 
+  X<0> foo_4_const (X<1>,X<2>,X<3>,X<4>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_4_const (X<1>,X<2>,X<3>,X<4>) const { 
+  X<0> & ref_foo_4_const (X<1>,X<2>,X<3>,X<4>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&) const { 
+  X<0> foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&) const { 
+  X<0> & ref_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_4_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&) const { 
+  X<0> foo_const_ref_4_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_4_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&) const { 
+  X<0> & ref_foo_const_ref_4_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_4_const (X<1>,X<2>,X<3>,X<4>) const { 
+  virtual X<0> virtual_foo_4_const (X<1>,X<2>,X<3>,X<4>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_4_const (X<1>,X<2>,X<3>,X<4>) const { 
+  virtual X<0> & virtual_ref_foo_4_const (X<1>,X<2>,X<3>,X<4>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&) const { 
+  virtual X<0> virtual_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&) const { 
+  virtual X<0> & virtual_ref_foo_ref_4_const (X<1>&,X<2>&,X<3>&,X<4>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_4_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&) const { 
+  virtual X<0> virtual_foo_const_ref_4_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_4_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&) const { 
+  virtual X<0> & virtual_ref_foo_const_ref_4_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  virtual X<0> virtual_foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) { 
+  virtual X<0> & virtual_ref_foo_4 (X<1>,X<2>,X<3>,X<4>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  virtual X<0> virtual_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) { 
+  virtual X<0> & virtual_ref_foo_ref_4 (X<1>&,X<2>&,X<3>&,X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) { 
+  virtual X<0> virtual_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) { 
+  virtual X<0> & virtual_ref_foo_const_ref_4 (const X<1>&,const X<2>&,const X<3>&,const X<4>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  X<0> foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  static X<0> static_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  X<0> & ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  static X<0> & static_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  static const X<0> & static_const_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  X<0> foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  static X<0> static_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  X<0> & ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  const X<0> & const_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  const X<0> & const_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  const X<0> & const_ref_foo_const_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>)const { 
+  const X<0> & const_ref_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&)const { 
+  const X<0> & const_ref_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&)const { 
+  const X<0> & const_ref_foo_const_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  virtual const X<0> & virtual_const_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  virtual const X<0> & virtual_const_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>)const { 
+  virtual const X<0> & virtual_const_ref_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  static X<0> & static_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  static const X<0> & static_const_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) { 
+  X<0> foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) { 
+  static X<0> static_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) { 
+  X<0> & ref_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) { 
+  static X<0> & static_ref_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) { 
+  static const X<0> & static_const_ref_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>) const { 
+  X<0> foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>) const { 
+  X<0> & ref_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) const { 
+  X<0> foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) const { 
+  X<0> & ref_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_5_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) const { 
+  X<0> foo_const_ref_5_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_5_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) const { 
+  X<0> & ref_foo_const_ref_5_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>) const { 
+  virtual X<0> virtual_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>) const { 
+  virtual X<0> & virtual_ref_foo_5_const (X<1>,X<2>,X<3>,X<4>,X<5>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) const { 
+  virtual X<0> virtual_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) const { 
+  virtual X<0> & virtual_ref_foo_ref_5_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_5_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) const { 
+  virtual X<0> virtual_foo_const_ref_5_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_5_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) const { 
+  virtual X<0> & virtual_ref_foo_const_ref_5_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  virtual X<0> virtual_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) { 
+  virtual X<0> & virtual_ref_foo_5 (X<1>,X<2>,X<3>,X<4>,X<5>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  virtual X<0> virtual_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) { 
+  virtual X<0> & virtual_ref_foo_ref_5 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) { 
+  virtual X<0> virtual_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) { 
+  virtual X<0> & virtual_ref_foo_const_ref_5 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  X<0> foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  static X<0> static_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  X<0> & ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  static X<0> & static_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  static const X<0> & static_const_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  X<0> foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  static X<0> static_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  X<0> & ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  const X<0> & const_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  const X<0> & const_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  const X<0> & const_ref_foo_const_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>)const { 
+  const X<0> & const_ref_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&)const { 
+  const X<0> & const_ref_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&)const { 
+  const X<0> & const_ref_foo_const_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  virtual const X<0> & virtual_const_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  virtual const X<0> & virtual_const_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>)const { 
+  virtual const X<0> & virtual_const_ref_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  static X<0> & static_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  static const X<0> & static_const_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) { 
+  X<0> foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) { 
+  static X<0> static_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) { 
+  X<0> & ref_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) { 
+  static X<0> & static_ref_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) { 
+  static const X<0> & static_const_ref_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) const { 
+  X<0> foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) const { 
+  X<0> & ref_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) const { 
+  X<0> foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) const { 
+  X<0> & ref_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_6_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) const { 
+  X<0> foo_const_ref_6_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_6_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) const { 
+  X<0> & ref_foo_const_ref_6_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) const { 
+  virtual X<0> virtual_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) const { 
+  virtual X<0> & virtual_ref_foo_6_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) const { 
+  virtual X<0> virtual_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) const { 
+  virtual X<0> & virtual_ref_foo_ref_6_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_6_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) const { 
+  virtual X<0> virtual_foo_const_ref_6_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_6_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) const { 
+  virtual X<0> & virtual_ref_foo_const_ref_6_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  virtual X<0> virtual_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) { 
+  virtual X<0> & virtual_ref_foo_6 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  virtual X<0> virtual_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) { 
+  virtual X<0> & virtual_ref_foo_ref_6 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) { 
+  virtual X<0> virtual_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) { 
+  virtual X<0> & virtual_ref_foo_const_ref_6 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  X<0> foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  static X<0> static_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  X<0> & ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  static X<0> & static_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  static const X<0> & static_const_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  X<0> foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  static X<0> static_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  X<0> & ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  const X<0> & const_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  const X<0> & const_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  const X<0> & const_ref_foo_const_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>)const { 
+  const X<0> & const_ref_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&)const { 
+  const X<0> & const_ref_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&)const { 
+  const X<0> & const_ref_foo_const_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  virtual const X<0> & virtual_const_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  virtual const X<0> & virtual_const_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>)const { 
+  virtual const X<0> & virtual_const_ref_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  static X<0> & static_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  static const X<0> & static_const_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) { 
+  X<0> foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) { 
+  static X<0> static_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) { 
+  X<0> & ref_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) { 
+  static X<0> & static_ref_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) { 
+  static const X<0> & static_const_ref_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) const { 
+  X<0> foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) const { 
+  X<0> & ref_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) const { 
+  X<0> foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) const { 
+  X<0> & ref_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_7_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) const { 
+  X<0> foo_const_ref_7_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_7_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) const { 
+  X<0> & ref_foo_const_ref_7_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) const { 
+  virtual X<0> virtual_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) const { 
+  virtual X<0> & virtual_ref_foo_7_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) const { 
+  virtual X<0> virtual_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) const { 
+  virtual X<0> & virtual_ref_foo_ref_7_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_7_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) const { 
+  virtual X<0> virtual_foo_const_ref_7_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_7_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) const { 
+  virtual X<0> & virtual_ref_foo_const_ref_7_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  virtual X<0> virtual_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) { 
+  virtual X<0> & virtual_ref_foo_7 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  virtual X<0> virtual_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) { 
+  virtual X<0> & virtual_ref_foo_ref_7 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) { 
+  virtual X<0> virtual_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) { 
+  virtual X<0> & virtual_ref_foo_const_ref_7 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  X<0> foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  static X<0> static_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  X<0> & ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  static X<0> & static_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  static const X<0> & static_const_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  X<0> foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  static X<0> static_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  X<0> & ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  const X<0> & const_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  const X<0> & const_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  const X<0> & const_ref_foo_const_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>)const { 
+  const X<0> & const_ref_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&)const { 
+  const X<0> & const_ref_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  const X<0> & const_ref_foo_const_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&)const { 
+  const X<0> & const_ref_foo_const_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  virtual const X<0> & virtual_const_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  virtual const X<0> & virtual_const_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>)const { 
+  virtual const X<0> & virtual_const_ref_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual const X<0> & virtual_const_ref_foo_const_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&)const { 
+  virtual const X<0> & virtual_const_ref_foo_const_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&)const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  static X<0> & static_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  static const X<0> & static_const_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) { 
+  X<0> foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> static_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) { 
+  static X<0> static_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) { 
+  X<0> & ref_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static X<0> & static_ref_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) { 
+  static X<0> & static_ref_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  static const X<0> & static_const_ref_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) { 
+  static const X<0> & static_const_ref_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) const { 
+  X<0> foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) const { 
+  X<0> & ref_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) const { 
+  X<0> foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) const { 
+  X<0> & ref_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> foo_const_ref_8_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) const { 
+  X<0> foo_const_ref_8_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  X<0> & ref_foo_const_ref_8_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) const { 
+  X<0> & ref_foo_const_ref_8_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) const { 
+  virtual X<0> virtual_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) const { 
+  virtual X<0> & virtual_ref_foo_8_const (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) const { 
+  virtual X<0> virtual_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) const { 
+  virtual X<0> & virtual_ref_foo_ref_8_const (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_8_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) const { 
+  virtual X<0> virtual_foo_const_ref_8_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_8_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) const { 
+  virtual X<0> & virtual_ref_foo_const_ref_8_const (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) const {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  virtual X<0> virtual_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) { 
+  virtual X<0> & virtual_ref_foo_8 (X<1>,X<2>,X<3>,X<4>,X<5>,X<6>,X<7>,X<8>) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  virtual X<0> virtual_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) { 
+  virtual X<0> & virtual_ref_foo_ref_8 (X<1>&,X<2>&,X<3>&,X<4>&,X<5>&,X<6>&,X<7>&,X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> virtual_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) { 
+  virtual X<0> virtual_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
-  virtual X<0> & virtual_ref_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) { 
+  virtual X<0> & virtual_ref_foo_const_ref_8 (const X<1>&,const X<2>&,const X<3>&,const X<4>&,const X<5>&,const X<6>&,const X<7>&,const X<8>&) {
     deallog << __PRETTY_FUNCTION__ << std::endl;
     static X<0> x; return x;
   }
@@ -2077,4 +2077,8 @@ X<8> x8;
   tg.join_all();
   tgr.join_all();
   tgcr.join_all();
+
+  deallog.detach ();
+  logfile.close ();
+  sort_file_contents ("output");
 }

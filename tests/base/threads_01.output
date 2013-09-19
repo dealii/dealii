@@ -1,4 +1,3 @@
-
 DEAL::const X<0>& U::const_ref_foo_0()
 DEAL::const X<0>& U::const_ref_foo_0_const() const
 DEAL::const X<0>& U::const_ref_foo_1_const(X<1>) const
@@ -404,3 +403,4 @@ DEAL::X<0>& U::ref_foo_ref_7_const(X<1>&, X<2>&, X<3>&, X<4>&, X<5>&, X<6>&, X<7
 DEAL::X<0>& U::ref_foo_ref_7(X<1>&, X<2>&, X<3>&, X<4>&, X<5>&, X<6>&, X<7>&)
 DEAL::X<0>& U::ref_foo_ref_8_const(X<1>&, X<2>&, X<3>&, X<4>&, X<5>&, X<6>&, X<7>&, X<8>&) const
 DEAL::X<0>& U::ref_foo_ref_8(X<1>&, X<2>&, X<3>&, X<4>&, X<5>&, X<6>&, X<7>&, X<8>&)
+

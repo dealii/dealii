@@ -196,6 +196,20 @@ struct MPILogInitAll
 
 
 
+/*
+ * Some tests (notably base/thread*, base/task*) create output that
+ * comes out in random order. To make the output of these tests comparable,
+ * we need to sort them.
+ *
+ * This function does just that with the file given. All streams writing
+ * to this should be closed when calling this function.
+ */
+void sort_file_contents (const std::string &filename)
+{
+  std::system ((std::string ("sort ") + filename + " -o " + filename).c_str());
+}
+
+
 
 
 
