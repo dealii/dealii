@@ -9,8 +9,16 @@ DEAL::PathSearch[CC] 3 directories 3 suffixes
 DEAL::PathSearch[CC] 3 directories 
 DEAL::PathSearch[CC] trying ../scripts/path_search
 DEAL::PathSearch[CC] trying path_search
-DEAL::PathSearch[CC] opened path_search
-DEAL::path_search
+DEAL::PathSearch[CC] trying ../path_search
+DEAL::PathSearch[CC] 3 directories 
+DEAL::PathSearch[CC] trying ../scripts/path_search.c
+DEAL::PathSearch[CC] trying path_search.c
+DEAL::PathSearch[CC] trying ../path_search.c
+DEAL::PathSearch[CC] 3 directories 
+DEAL::PathSearch[CC] trying ../scripts/path_search.cc
+DEAL::PathSearch[CC] trying path_search.cc
+DEAL::PathSearch[CC] opened path_search.cc
+DEAL::path_search.cc
 DEAL::PathSearch[CC] 3 directories 4 suffixes
 DEAL::PathSearch[CC] 3 directories 
 DEAL::PathSearch[CC] trying ../scripts/tests

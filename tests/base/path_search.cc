@@ -19,9 +19,15 @@
 #include <deal.II/base/path_search.h>
 #include <deal.II/base/logstream.h>
 
+#include <string>
+
 int main()
 {
-  std::ofstream logfile("output");
+  char tmp[1000];
+  getcwd(tmp,1000);
+  std::string path(tmp);
+  chdir(SOURCE_DIR);
+  std::ofstream logfile(path+"/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -30,9 +36,8 @@ int main()
 
   // Open with full debugging
   PathSearch cc("CC", 3);
-  cc.add_path(SOURCE_DIR "/");
-  cc.add_path(SOURCE_DIR "/../");
-  cc.add_path(SOURCE_DIR "/../scripts/", PathSearch::front);
+  cc.add_path("../");
+  cc.add_path("../scripts/", PathSearch::front);
   cc.add_suffix(".c");
   cc.add_suffix(".cc");
 
@@ -43,7 +48,7 @@ int main()
   cc.show(deallog);
 
   PathSearch mesh("MESH", 3);
-  mesh.add_path(SOURCE_DIR "/../bits/");
+  mesh.add_path("../bits/");
   mesh.show(deallog);
   std::ifstream in(mesh.find("grid_in_msh_01.2d").c_str());
   std::string line;
