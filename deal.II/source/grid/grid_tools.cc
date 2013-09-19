@@ -2547,15 +2547,15 @@ next_cell:
            if (face_1->at_boundary() && face_1->boundary_indicator() == b_id)
            {
              const std::pair<typename DH::cell_iterator, unsigned int> pair1
-             = std::make_pair(cell, 2*direction);
+               = std::make_pair(cell, 2*direction);
              pairs1.insert(pair1);
            }
            
            if (face_2->at_boundary() && face_2->boundary_indicator() == b_id)
            {
-             const std::pair<typename DH::cell_iterator, unsigned int> pair1
-             = std::make_pair(cell, 2*direction+1);
-             pairs1.insert(pair1);
+             const std::pair<typename DH::cell_iterator, unsigned int> pair2
+               = std::make_pair(cell, 2*direction+1);
+             pairs2.insert(pair2);
            }
          }
          

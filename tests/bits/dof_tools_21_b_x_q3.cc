@@ -86,7 +86,7 @@ using namespace dealii;
 
 /*
  * Generate a grid consisting of two disjoint cells, colorize the two
- * outermost faces. They will be matched via collect_periodic_face_pairs
+ * outermost faces. They will be matched via collect_periodic_faces
  *
  * The integer orientation determines the orientation of the second cell
  * to get something else than the boring default orientation.
