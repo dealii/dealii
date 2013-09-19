@@ -1,3 +1,4 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 INCLUDE(${TEST_DIR}/cmake/setup_testsuite.cmake)
+PROJECT(testsuite)
 DEAL_II_PICKUP_TESTS()
