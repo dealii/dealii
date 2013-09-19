@@ -27,23 +27,6 @@
 #include <unistd.h>
 
 
-// given the name of a file, copy it to deallog
-// and then delete it
-void cat_file(const char *filename)
-{
-  std::ifstream in(filename);
-  Assert (in, ExcIO());
-
-  while (in)
-    {
-      std::string s;
-      std::getline(in, s);
-      deallog.get_file_stream() << s << "\n";
-    }
-  in.close();
-
-  std::remove (filename);
-}
 
 
 template <int dim>

@@ -33,6 +33,25 @@
 #include <iomanip>
 
 
+// given the name of a file, copy it to deallog
+// and then delete it
+inline void cat_file(const char *filename)
+{
+  std::ifstream in(filename);
+  Assert (in, dealii::ExcIO());
+
+  while (in)
+    {
+      std::string s;
+      std::getline(in, s);
+      dealii::deallog.get_file_stream() << s << "\n";
+    }
+  in.close();
+
+  std::remove (filename);
+}
+
+
 #ifdef DEAL_II_WITH_PETSC
 #include <petscsys.h>
 
