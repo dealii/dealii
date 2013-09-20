@@ -144,11 +144,11 @@ ENDIF()
 FILE(GLOB _test ${CTEST_BINARY_DIRECTORY}/*)
 IF( "${TRACK}" STREQUAL "Build Tests"
     AND NOT "${_test}" STREQUAL "" )
-    MESSAGE(FATAL_ERROR "
+      MESSAGE(FATAL_ERROR "
 TRACK was set to \"Build Tests\" which require an empty build directory.
 But files were found in \"${CTEST_BINARY_DIRECTORY}\"
 "
-      )
+        )
 ENDIF()
 
 MESSAGE("-- CTEST_BINARY_DIRECTORY: ${CTEST_BINARY_DIRECTORY}")
@@ -276,19 +276,17 @@ ENDIF()
 # Append subversion information to CTEST_BUILD_NAME:
 #
 
-IF(NOT TRACK MATCHES "Foobar" AND SUBVERSION_FOUND) #TODO: Exclude Continuous TRACKS
-  EXECUTE_PROCESS(
-    COMMAND ${Subversion_SVN_EXECUTABLE} info ${CTEST_SOURCE_DIRECTORY}
-    OUTPUT_QUIET ERROR_QUIET
-    RESULT_VARIABLE _result
-    )
-  IF(${_result} EQUAL 0)
-    Subversion_WC_INFO(${CTEST_SOURCE_DIRECTORY} _svn)
-    STRING(REGEX REPLACE "^${_svn_WC_ROOT}/" "" _branch ${_svn_WC_URL})
-    STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
-    STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
-    SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}-r${_svn_WC_REVISION}")
-  ENDIF()
+EXECUTE_PROCESS(
+  COMMAND ${Subversion_SVN_EXECUTABLE} info ${CTEST_SOURCE_DIRECTORY}
+  OUTPUT_QUIET ERROR_QUIET
+  RESULT_VARIABLE _result
+  )
+IF(${_result} EQUAL 0)
+  Subversion_WC_INFO(${CTEST_SOURCE_DIRECTORY} _svn)
+  STRING(REGEX REPLACE "^${_svn_WC_ROOT}/" "" _branch ${_svn_WC_URL})
+  STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
+  STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
+  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}-r${_svn_WC_REVISION}")
 ENDIF()
 
 MESSAGE("-- CTEST_BUILD_NAME:       ${CTEST_BUILD_NAME}")
@@ -304,13 +302,6 @@ TRACK was set to \"Build Tests\" which requires the source directory to be
 under Subversion version control.
 "
     )
-ENDIF()
-
-IF("${TRACK}" STREQUAL "Build Tests")
-  # if not on trunk, append branch to track:
-  IF(NOT "${_branch}" STREQUAL "trunk")
-    SET(TRACK "${TRACK} - ${_branch}")
-  ENDIF()
 ENDIF()
 
 #
@@ -355,11 +346,24 @@ SET(CTEST_NOTES_FILES
 #                                                                      #
 ########################################################################
 
+#
+# We submit Build and Regression Tests to subprojects according to the svn
+# branch:
+#
+
+IF(NOT "${_branch}" STREQUAL "")
+  SET_PROPERTY(GLOBAL PROPERTY SubProject ${_branch})
+ENDIF()
+
 CTEST_START(Experimental TRACK ${TRACK})
 
+CTEST_SUBMIT(PARTS Notes)
+
 CTEST_CONFIGURE(OPTIONS "${_options}")
+CTEST_SUBMIT(PARTS Configure)
 
 CTEST_BUILD(TARGET) # run all target
+CTEST_SUBMIT(PARTS Build)
 
 # TODO: Run this during the BUILD stage...
 EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
@@ -367,5 +371,4 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   )
 
 CTEST_TEST()
-
-CTEST_SUBMIT()
+CTEST_SUBMIT(PARTS Test)
