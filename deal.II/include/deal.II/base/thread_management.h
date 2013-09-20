@@ -1507,7 +1507,7 @@ namespace Threads
         // descriptor
         // object. if all
         // Threads::Thread
-        // object that
+        // objects that
         // pointed here
         // should have gone
         // out of scope

@@ -344,6 +344,11 @@ namespace GridTools
    * a hanging node located on a face or an
    * edge of it.
    *
+   * @note If the point requested does not lie in any of the cells of
+   * the mesh given, then this function throws an exception of type
+   * GridTools::ExcPointNotFound. You can catch this exception and
+   * decide what to do in that case.
+   *
    * @note It isn't entirely clear at this time whether the function
    * does the right thing with anisotropically refined meshes. It needs
    * to be checked for this case.
@@ -355,32 +360,23 @@ namespace GridTools
 
 
   /**
-   * Find and return an iterator to
-   * the active cell that surrounds
-   * a given point @p ref. The
-   * type of the first parameter
-   * may be either
-   * Triangulation,
-   * DoFHandler, or
-   * MGDoFHandler, i.e. we
-   * can find the cell around a
-   * point for iterators into each
-   * of these classes.
+   * Find and return an iterator to the active cell that surrounds a
+   * given point @p ref. The type of the first parameter may be either
+   * Triangulation, or one of the DoF handler classes, i.e. we can find the
+   * cell around a point for iterators into each of these classes.
    *
-   * This is solely a wrapper function
-   * for the @p interpolate function
-   * given below,
-   * providing backward compatibility.
-   * A Q1 mapping is used for the
-   * boundary, and the iterator to
-   * the cell in which the point
-   * resides is returned.
+   * This is solely a wrapper function for the function of same name
+   * below.  A Q1 mapping is used for the boundary, and the iterator
+   * to the cell in which the point resides is returned.
    *
-   * It is recommended to use the
-   * other version of this function,
-   * as it simultaneously delivers the
-   * local coordinate of the given point
-   * without additional computational cost.
+   * It is recommended to use the other version of this function, as
+   * it simultaneously delivers the local coordinate of the given
+   * point without additional computational cost.
+   *
+   * @note If the point requested does not lie in any of the cells of
+   * the mesh given, then this function throws an exception of type
+   * GridTools::ExcPointNotFound. You can catch this exception and
+   * decide what to do in that case.
    *
    * @note When applied to a triangulation or DoF handler object based
    * on a parallel::distributed::Triangulation object, the cell
@@ -396,58 +392,39 @@ namespace GridTools
                                  const Point<spacedim> &p);
 
   /**
-   * Find and return an iterator to
-   * the active cell that surrounds
-   * a given point @p p. The
-   * type of the first parameter
-   * may be either
-   * Triangulation,
-   * DoFHandler, hp::DoFHandler, or
-   * MGDoFHandler, i.e., we
-   * can find the cell around a
-   * point for iterators into each
-   * of these classes.
+   * Find and return an iterator to the active cell that surrounds a
+   * given point @p p. The type of the first parameter may be either
+   * Triangulation, DoFHandler, hp::DoFHandler, or MGDoFHandler, i.e.,
+   * we can find the cell around a point for iterators into each of
+   * these classes.
    *
-   * The algorithm used in this
-   * function proceeds by first
-   * looking for vertex located
-   * closest to the given point, see
-   * find_closest_vertex(). Secondly,
-   * all adjacent cells to this point
-   * are found in the mesh, see
-   * find_cells_adjacent_to_vertex().
-   * Lastly, for each of these cells,
-   * it is tested whether the point is
-   * inside. This check is performed
-   * using arbitrary boundary mappings.
-   * Still, it is possible that due
-   * to roundoff errors, the point
-   * cannot be located exactly inside
-   * the unit cell. In this case,
-   * even points at a very small
-   * distance outside the unit cell
+   * The algorithm used in this function proceeds by first looking for
+   * vertex located closest to the given point, see
+   * find_closest_vertex(). Secondly, all adjacent cells to this point
+   * are found in the mesh, see find_cells_adjacent_to_vertex().
+   * Lastly, for each of these cells, it is tested whether the point
+   * is inside. This check is performed using arbitrary boundary
+   * mappings.  Still, it is possible that due to roundoff errors, the
+   * point cannot be located exactly inside the unit cell. In this
+   * case, even points at a very small distance outside the unit cell
    * are allowed.
    *
-   * If a point lies on the
-   * boundary of two or more cells,
-   * then the algorithm tries to identify
-   * the cell that is of highest
+   * If a point lies on the boundary of two or more cells, then the
+   * algorithm tries to identify the cell that is of highest
    * refinement level.
    *
-   * The function returns an
-   * iterator to the cell, as well
-   * as the local position of the
-   * point inside the unit
-   * cell. This local position
-   * might be located slightly
-   * outside an actual unit cell,
-   * due to numerical roundoff.
-   * Therefore, the point returned
-   * by this function should
-   * be projected onto the unit cell,
-   * using GeometryInfo::project_to_unit_cell.
-   * This is not automatically performed
-   * by the algorithm.
+   * The function returns an iterator to the cell, as well as the
+   * local position of the point inside the unit cell. This local
+   * position might be located slightly outside an actual unit cell,
+   * due to numerical roundoff.  Therefore, the point returned by this
+   * function should be projected onto the unit cell, using
+   * GeometryInfo::project_to_unit_cell.  This is not automatically
+   * performed by the algorithm.
+   *
+   * @note If the point requested does not lie in any of the cells of
+   * the mesh given, then this function throws an exception of type
+   * GridTools::ExcPointNotFound. You can catch this exception and
+   * decide what to do in that case.
    *
    * @note When applied to a triangulation or DoF handler object based
    * on a parallel::distributed::Triangulation object, the cell
@@ -464,14 +441,16 @@ namespace GridTools
                                  const Point<spacedim>     &p);
 
   /**
-   * A version of the previous function
-   * where we use that mapping on a given
-   * cell that corresponds to the active
-   * finite element index of that
-   * cell. This is obviously only useful
-   * for hp problems, since the active
-   * finite element index for all other DoF
-   * handlers is always zero.
+   * A version of the previous function where we use that mapping on a
+   * given cell that corresponds to the active finite element index of
+   * that cell. This is obviously only useful for hp problems, since
+   * the active finite element index for all other DoF handlers is
+   * always zero.
+   *
+   * @note If the point requested does not lie in any of the cells of
+   * the mesh given, then this function throws an exception of type
+   * GridTools::ExcPointNotFound. You can catch this exception and
+   * decide what to do in that case.
    *
    * @note When applied to a triangulation or DoF handler object based
    * on a parallel::distributed::Triangulation object, the cell
@@ -1162,7 +1141,7 @@ namespace GridTools
    *
    * @note The returned data type is not compatible with
    * DoFTools::make_periodicity_constraints
-   * 
+   *
    * @deprecated
    */
   template<typename DH>
@@ -1226,8 +1205,8 @@ namespace GridTools
    * parallel::distributed::Triangulation::add_periodicity
    *
    * @note Use collect_periodic_faces instead.
-   * 
-   * @deprecated 
+   *
+   * @deprecated
    */
   template<typename DH>
   void

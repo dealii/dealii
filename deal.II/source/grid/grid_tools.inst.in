@@ -28,7 +28,7 @@ for (deal_II_dimension : DIMENSIONS)
 
 for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
 {
-  
+
 #if deal_II_dimension <= deal_II_space_dimension
   namespace GridTools \{
 
@@ -69,6 +69,23 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 }
 
 
+
+for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+
+#if deal_II_dimension <= deal_II_space_dimension
+  namespace GridTools \{
+  template
+    bool
+    have_same_coarse_mesh (const MGDoFHandler<deal_II_dimension,deal_II_space_dimension> &mesh_1,
+			   const MGDoFHandler<deal_II_dimension,deal_II_space_dimension> &mesh_2);
+
+  \}
+
+  #endif
+}
+
+
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
@@ -84,7 +101,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       volume
       (const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
-    
+
     template
       void delete_unused_vertices (std::vector<Point<deal_II_space_dimension> > &,
 				   std::vector<CellData<deal_II_dimension> > &,
@@ -119,7 +136,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     template
       void partition_triangulation (const unsigned int,
 			       Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-    
+
     template
       void partition_triangulation (const unsigned int,
 				    const SparsityPattern &,
@@ -132,9 +149,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       (const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension> &,
        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
        const Point<deal_II_space_dimension> &);
-    
 
-    
+
+
     template
       void get_subdomain_association (const Triangulation<deal_II_dimension, deal_II_space_dimension>  &,
 				      std::vector<types::subdomain_id> &);
@@ -143,11 +160,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     unsigned int count_cells_with_subdomain_association(
       const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
       const types::subdomain_id);
-    
+
     template
       double
       minimal_cell_diameter (const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation);
-    
+
     template
       double
       maximal_cell_diameter (const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation);
@@ -158,7 +175,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation_1,
 	const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation_2,
 	Triangulation<deal_II_dimension, deal_II_space_dimension>       &result);
-#if deal_II_dimension == deal_II_space_dimension  
+#if deal_II_dimension == deal_II_space_dimension
     template
     void
     laplace_transform (const std::map<unsigned int,Point<deal_II_dimension> > &new_points,
@@ -171,12 +188,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
        Triangulation<deal_II_dimension,deal_II_space_dimension> &triangulation);
 
 #endif
-    
+
     \}
 #endif
 
 
-    
+
   }
 
 
@@ -317,7 +334,7 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
           const unsigned int,
           std::vector<std_cxx1x::tuple<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator,
                                        unsigned int,
-                                       parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator, 
+                                       parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator,
                                        unsigned int> > &);
      \}
    #endif

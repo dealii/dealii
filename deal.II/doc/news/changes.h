@@ -63,8 +63,8 @@ inconvenience this causes.
   </li>
 
   <li>
-  New: parallel::distributed::Triangulation now supports periodic boundaries. 
-  DoFTools::make_periodicity_constraints and similar functions are now working 
+  New: parallel::distributed::Triangulation now supports periodic boundaries.
+  DoFTools::make_periodicity_constraints and similar functions are now working
   on parallel::distributed::Triangulation objects.
   <br>
   (Tobin Isaac, Craig Michoski, Daniel Arndt, 2013/09/06)
@@ -85,9 +85,16 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>
+  Changed: GridTools::have_same_coarse_mesh was only instantiated for
+  MGDoFHandler arguments in debug mode. This is now fixed.
+  <br>
+  (Timo Heister, 2013/09/20)
+  </li>
 
   <li>
-  Changed: find_active_cell_around_point now throws the exception ExcPointNotFound
+  Changed: GridTools::find_active_cell_around_point now throws the exception
+  GridTools::ExcPointNotFound
   if the point is outside the Triangulation. This exception can be caught.
   <br>
   (Timo Heister, 2013/09/18)
