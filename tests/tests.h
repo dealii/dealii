@@ -206,7 +206,9 @@ struct MPILogInitAll
  */
 void sort_file_contents (const std::string &filename)
 {
-  std::system ((std::string ("sort ") + filename + " -o " + filename).c_str());
+  int error = std::system ((std::string ("sort ") + filename + " -o " + filename).c_str());
+  Assert (error == 0,
+	  ExcInternalError());
 }
 
 
