@@ -346,11 +346,6 @@ SET(CTEST_NOTES_FILES
 #                                                                      #
 ########################################################################
 
-#
-# We submit Build and Regression Tests to subprojects according to the svn
-# branch:
-#
-
 IF(NOT "${_branch}" STREQUAL "")
   SET_PROPERTY(GLOBAL PROPERTY SubProject ${_branch})
 ENDIF()
@@ -358,10 +353,8 @@ ENDIF()
 CTEST_START(Experimental TRACK ${TRACK})
 
 CTEST_CONFIGURE(OPTIONS "${_options}")
-CTEST_SUBMIT(PARTS Notes Configure)
 
 CTEST_BUILD(TARGET) # run all target
-CTEST_SUBMIT(PARTS Build)
 
 # TODO: Run this during the BUILD stage...
 EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
@@ -369,4 +362,4 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   )
 
 CTEST_TEST()
-CTEST_SUBMIT(PARTS Test)
+CTEST_SUBMIT()
