@@ -261,7 +261,7 @@ IF(EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
   STRING(REGEX REPLACE " " "-" _compiler_id ${_compiler_id})
   IF( NOT "${_compiler_id}" STREQUAL "" OR
       _compiler_id MATCHES "CMAKE_CXX_COMPILER" )
-    SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_compiler_id}")
+    SET(CTEST_BUILD_NAME "${_compiler_id}")
   ENDIF()
 ENDIF()
 
@@ -288,7 +288,8 @@ ENDIF()
 
 IF(NOT "${CONFIG_FILE}" STREQUAL "")
   GET_FILENAME_COMPONENT(_conf ${CONFIG_FILE} NAME_WE)
-  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${conf}")
+  STRING(REGEX REPLACE "#.*$" "" _conf ${_conf})
+  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_conf}")
 ENDIF()
 
 MESSAGE("-- CTEST_BUILD_NAME:       ${CTEST_BUILD_NAME}")
