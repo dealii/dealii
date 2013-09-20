@@ -40,8 +40,6 @@ std::ofstream logfile("output");
 
 void test (const char *filename)
 {
-  deallog << "Reading " << filename << std::endl;
-
   Triangulation<3> tria;
   GridIn<3> gi;
   gi.attach_triangulation (tria);
