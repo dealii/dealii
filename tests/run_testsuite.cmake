@@ -232,14 +232,7 @@ ENDFOREACH()
 # CTEST_BUILD_NAME:
 #
 
-SET(CTEST_BUILD_NAME
-  "${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM_NAME}"
-  )
-
-#
 # Append compiler information to CTEST_BUILD_NAME:
-#
-
 IF(NOT EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
   # Apparently, ${CTEST_BINARY_DIRECTORY} is not a configured build
   # directory. In this case we need a trick: set up a dummy project and
@@ -287,6 +280,15 @@ IF(${_result} EQUAL 0)
   STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
   STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
   SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}-r${_svn_WC_REVISION}")
+ENDIF()
+
+#
+# Append config file name to CTEST_BUILD_NAME:
+#
+
+IF(NOT "${CONFIG_FILE}" STREQUAL "")
+  GET_FILENAME_COMPONENT(_conf ${CONFIG_FILE} NAME_WE)
+  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${conf}")
 ENDIF()
 
 MESSAGE("-- CTEST_BUILD_NAME:       ${CTEST_BUILD_NAME}")
