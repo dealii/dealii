@@ -222,7 +222,7 @@ int main()
 
       generate_grid(triangulation, i);
 
-      typedef typename Triangulation<2>::cell_iterator CellIterator;
+      typedef Triangulation<2>::cell_iterator CellIterator;
       typedef std::vector<GridTools::PeriodicFacePair<CellIterator> >
         FaceVector;
       FaceVector test = GridTools::collect_periodic_faces
@@ -245,7 +245,7 @@ int main()
 
       generate_grid(triangulation, i);
 
-      typedef typename Triangulation<3>::cell_iterator CellIterator;
+      typedef Triangulation<3>::cell_iterator CellIterator;
       typedef std::vector<GridTools::PeriodicFacePair<CellIterator> >
         FaceVector;
       FaceVector test = GridTools::collect_periodic_faces
