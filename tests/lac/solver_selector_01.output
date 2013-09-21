@@ -1,0 +1,18 @@
+
+DEAL::Size 37 Unknowns 1296
+DEAL:cg::Starting value 36.00
+DEAL:cg::Convergence step 21 value 0.003095
+DEAL:Bicgstab::Starting value 36.00
+DEAL:Bicgstab::Convergence step 16 value 0.003278
+DEAL:GMRES::Starting value 34.45
+DEAL:GMRES::Convergence step 21 value 0.001416
+DEAL:FGMRES::Starting value 36.00
+DEAL:FGMRES::Convergence step 21 value 0.002535
+DEAL:cg::Starting value 36.00
+DEAL:cg::Convergence step 39 value 7.335e-08
+DEAL:Bicgstab::Starting value 36.00
+DEAL:Bicgstab::Convergence step 28 value 9.087e-08
+DEAL:GMRES::Starting value 34.45
+DEAL:GMRES::Convergence step 39 value 6.627e-08
+DEAL:FGMRES::Starting value 36.00
+DEAL:FGMRES::Convergence step 39 value 7.890e-08

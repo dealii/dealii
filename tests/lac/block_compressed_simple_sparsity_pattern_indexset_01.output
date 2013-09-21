@@ -1,0 +1,15 @@
+
+DEAL::blocks: 3x3
+DEAL::size: 13x13
+DEAL::size block(1,0):3x5
+DEAL::blocks: 2x2
+DEAL::size: 8x8
+DEAL::size block(1,0):3x5
+[0,0]
+[1]
+[2]
+[3,0,3]
+[4]
+[5,0,5]
+[6]
+[7]

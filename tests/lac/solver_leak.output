@@ -1,0 +1,19 @@
+
+DEAL::Size 4 Unknowns 9
+DEAL:alreadydone:cg::Starting value 0
+DEAL:alreadydone:cg::Convergence step 0 value 0
+DEAL:alreadydone:GMRES::Starting value 0
+DEAL:alreadydone:GMRES::Convergence step 0 value 0
+DEAL:alreadydone:Bicgstab::Starting value 0
+DEAL:alreadydone:Bicgstab::Convergence step 0 value 0
+DEAL:alreadydone:QMRS::Starting value 0
+DEAL:alreadydone:QMRS::Convergence step 0 value 0
+DEAL::Size 12 Unknowns 121
+DEAL:alreadydone:cg::Starting value 0
+DEAL:alreadydone:cg::Convergence step 0 value 0
+DEAL:alreadydone:GMRES::Starting value 0
+DEAL:alreadydone:GMRES::Convergence step 0 value 0
+DEAL:alreadydone:Bicgstab::Starting value 0
+DEAL:alreadydone:Bicgstab::Convergence step 0 value 0
+DEAL:alreadydone:QMRS::Starting value 0
+DEAL:alreadydone:QMRS::Convergence step 0 value 0

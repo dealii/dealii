@@ -1,0 +1,58 @@
+
+DEAL::Element: FE_Q<2>(3)
+DEAL::Triangulation 16 cells, 3 levels
+DEAL::New cell
+DEAL::New cell
+DEAL:: v2 f0 o3 d1 l5 g7 rhs  1 17 3 40 6 41 42
+DEAL::New cell
+DEAL:: v1 f2 o1 d0 l9 g11 rhs  2 3 29 40 10 43 44
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g32 rhs  3 1 29 3 6 33 7
+DEAL:: v2 f0 o3 d1 l5 g33 rhs  3 40 29 103 32 104 105
+DEAL:: v0 f2 o0 d0 l8 g22 rhs  3 2 17 3 10 23 11
+DEAL:: v1 f2 o1 d0 l9 g23 rhs  3 17 40 73 22 76 77
+DEAL::New cell
+DEAL:: v2 f0 o3 d1 l5 g19 rhs  16 50 17 73 18 74 75
+DEAL::New cell
+DEAL:: v2 f0 o3 d1 l5 g52 rhs  49 62 50 82 51 83 84
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g41 rhs  17 16 40 17 18 42 19
+DEAL:: v2 f0 o3 d1 l5 g42 rhs  17 73 40 133 41 134 135
+DEAL:: v0 f2 o0 d0 l8 g55 rhs  17 3 50 17 22 56 23
+DEAL:: v1 f2 o1 d0 l9 g56 rhs  17 50 73 82 55 85 86
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g74 rhs  50 49 73 50 51 75 52
+DEAL:: v2 f0 o3 d1 l5 g75 rhs  50 82 73 142 74 143 144
+DEAL:: v0 f2 o0 d0 l8 g67 rhs  50 17 62 50 55 68 56
+DEAL::New cell
+DEAL:: v1 f2 o1 d0 l9 g35 rhs  28 29 92 103 34 106 107
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g95 rhs  29 3 92 29 32 96 33
+DEAL:: v2 f0 o3 d1 l5 g96 rhs  29 103 92 124 95 125 126
+DEAL:: v0 f2 o0 d0 l8 g43 rhs  29 28 40 29 34 44 35
+DEAL:: v1 f2 o1 d0 l9 g44 rhs  29 40 103 133 43 136 137
+DEAL::New cell
+DEAL:: v1 f2 o1 d0 l9 g98 rhs  91 92 113 124 97 127 128
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g116 rhs  92 29 113 92 95 117 96
+DEAL:: v0 f2 o0 d0 l8 g106 rhs  92 91 103 92 97 107 98
+DEAL:: v1 f2 o1 d0 l9 g107 rhs  92 103 124 151 106 154 155
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g104 rhs  40 17 103 40 41 105 42
+DEAL:: v2 f0 o3 d1 l5 g105 rhs  40 133 103 151 104 152 153
+DEAL:: v0 f2 o0 d0 l8 g76 rhs  40 29 73 40 43 77 44
+DEAL:: v1 f2 o1 d0 l9 g77 rhs  40 73 133 142 76 145 146
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g134 rhs  73 50 133 73 74 135 75
+DEAL:: v2 f0 o3 d1 l5 g135 rhs  73 142 133 160 134 161 162
+DEAL:: v0 f2 o0 d0 l8 g85 rhs  73 40 82 73 76 86 77
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g125 rhs  103 40 124 103 104 126 105
+DEAL:: v0 f2 o0 d0 l8 g136 rhs  103 92 133 103 106 137 107
+DEAL:: v1 f2 o1 d0 l9 g137 rhs  103 133 151 160 136 163 164
+DEAL::New cell
+DEAL:: v0 f0 o2 d1 l4 g152 rhs  133 73 151 133 134 153 135
+DEAL:: v0 f2 o0 d0 l8 g145 rhs  133 103 142 133 136 146 137
+DEAL::Closing
+DEAL::ExcMessage("Cycle in constraints detected!")
+DEAL::Closed

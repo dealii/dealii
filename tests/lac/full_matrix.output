@@ -1,0 +1,91 @@
+
+11. 12. 13. 
+21. 22. 23. 
+31. 32. 33. 
+DEAL::Row 0	Col 0	Val 11.000
+DEAL::Row 0	Col 1	Val 12.000
+DEAL::Row 0	Col 2	Val 13.000
+DEAL::Row 1	Col 0	Val 21.000
+DEAL::Row 1	Col 1	Val 22.000
+DEAL::Row 1	Col 2	Val 23.000
+DEAL::Row 2	Col 0	Val 31.000
+DEAL::Row 2	Col 1	Val 32.000
+DEAL::Row 2	Col 2	Val 33.000
+DEAL::Row 1	Col 0	Val 21.000
+DEAL::Row 1	Col 1	Val 22.000
+DEAL::Row 1	Col 2	Val 23.000
+DEAL::Inverse(dim=1):
+DEAL::Inverse(dim=2):
+DEAL::Inverse(dim=3):
+DEAL::Inverse(dim=4):
+DEAL::Inverse(dim=5):
+DEAL::Inverse(dim=6):
+DEAL::Inverse(dim=7):
+DEAL::Inverse(dim=8):
+DEAL::Inverse(dim=9):
+0.540 -0.841                   
+0.841 0.540                   
+            1.000             
+                  1.000       
+                        1.000 
+DEAL::l1-norm: 1.382
+0.540 0.841                   
+-0.841 0.540                   
+            1.000             
+                  1.000       
+                        1.000 
+DEAL::linfty-norm: 1.382
+DEAL::Frobenius-norm: 2.236
+1.000                         
+      -0.416 -0.909             
+      0.909 -0.416             
+                  1.000       
+                        1.000 
+DEAL::l1-norm: 1.325
+1.000                         
+      -0.416 0.909             
+      -0.909 -0.416             
+                  1.000       
+                        1.000 
+DEAL::linfty-norm: 1.325
+DEAL::Frobenius-norm: 2.236
+1.000                         
+      1.000                   
+            -0.990 -0.141       
+            0.141 -0.990       
+                        1.000 
+DEAL::l1-norm: 1.131
+1.000                         
+      1.000                   
+            -0.990 0.141       
+            -0.141 -0.990       
+                        1.000 
+DEAL::linfty-norm: 1.131
+DEAL::Frobenius-norm: 2.236
+1.000                         
+      1.000                   
+            1.000             
+                  -0.654 0.757 
+                  -0.757 -0.654 
+DEAL::l1-norm: 1.410
+1.000                         
+      1.000                   
+            1.000             
+                  -0.654 -0.757 
+                  0.757 -0.654 
+DEAL::linfty-norm: 1.410
+DEAL::Frobenius-norm: 2.236
+1.708 -0.189 0.409 -0.038 0.044 
+-0.189 2.704 0.640 -0.060 0.069 
+0.409 0.640 1.636 0.220 -0.255 
+-0.038 -0.060 0.220 4.552 0.518 
+0.044 0.069 -0.255 0.518 4.400 
+DEAL::Eigenvalue: 5.000
+DEAL::Eigenvalue: 1.000
+0.646 0.095 -0.205 0.019 -0.022 
+0.095 0.424 -0.195 0.018 -0.021 
+-0.205 -0.195 0.754 -0.047 0.054 
+0.019 0.018 -0.047 0.226 -0.030 
+-0.022 -0.021 0.054 -0.030 0.234 
+DEAL::Eigenvalue: 1.000
+DEAL::Eigenvalue: 0.200

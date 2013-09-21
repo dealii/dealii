@@ -1,0 +1,19 @@
+
+DEAL::FullMatrix<float>::copy_from  SparseMatrixEZ<double>
+2.    ~     3.    4.    
+5.    6.    ~     7.    
+8.    9.    10.   11.   
+~     ~     ~     ~     
+12.   ~     13.   14.   
+DEAL::LAPACKFullMatrix<double>::copy_from  SparseMatrixEZ<double>
+2.    ~     3.    4.    
+5.    6.    ~     7.    
+8.    9.    10.   11.   
+~     ~     ~     ~     
+12.   ~     13.   14.   
+DEAL::LAPACKFullMatrix<double>::fill  SparseMatrixEZ<double>
+9.    10.   11.   
+~     ~     ~     
+DEAL::LAPACKFullMatrix<double>::fill  SparseMatrixEZ<double>
+9.    10.   11.   
+~     13.   14.   

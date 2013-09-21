@@ -1,0 +1,4 @@
+
+DEAL::Closing
+DEAL::ExcMessage("Cycle in constraints detected!")
+DEAL::Closed

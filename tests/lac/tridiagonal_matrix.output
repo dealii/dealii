@@ -1,0 +1,118 @@
+
+DEAL::all_zero 1 0
+DEAL::Matrix [-1,2,-1]
+DEAL::        2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. 
+DEAL::u      1.     2.     4.     8.     16.   
+DEAL::u^TMw  0      -2.    -4.    -8.    48.   
+DEAL::vmult  0      -1.    -2.    -4.    24.   
+DEAL::+Tvm   0      -2.    -4.    -8.    48.   
+DEAL::Tvmult 0      -1.    -2.    -4.    24.   
+DEAL::+vm    0      -2.    -4.    -8.    48.   
+DEAL::Matrix [-1,2,-3]
+DEAL::        2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. 
+DEAL::u      1.     2.     4.     8.     16.   
+DEAL::u^TMw  0      -6.    -12.   -24.   16.   
+DEAL::vmult  -4.    -9.    -18.   -36.   24.   
+DEAL::+Tvm   -4.    -12.   -24.   -48.   32.   
+DEAL::Tvmult 0      -3.    -6.    -12.   8.    
+DEAL::+vm    -4.    -12.   -24.   -48.   32.   
+DEAL::Matrix increasing symmetric rows
+DEAL::        2. -1.    
+DEAL::-2.     3. -2.    
+DEAL::-3.     4. -3.    
+DEAL::-4.     5. -4.    
+DEAL::-5.     6. 
+DEAL::u      1.     2.     4.     8.     16.   
+DEAL::u^TMw  -4.    -14.   -40.   -104.  128.  
+DEAL::vmult  0      -4.    -14.   -40.   56.   
+DEAL::+Tvm   -2.    -11.   -34.   -92.   120.  
+DEAL::Tvmult -2.    -7.    -20.   -52.   64.   
+DEAL::+vm    -2.    -11.   -34.   -92.   120.  
+DEAL::Matrix increasing symmetric
+DEAL::        2. -1.    
+DEAL::-1.     3. -2.    
+DEAL::-2.     4. -3.    
+DEAL::-3.     5. -4.    
+DEAL::-4.     6. 
+DEAL::u      1.     2.     4.     8.     16.   
+DEAL::u^TMw  0      -6.    -24.   -72.   128.  
+DEAL::vmult  0      -3.    -12.   -36.   64.   
+DEAL::+Tvm   0      -6.    -24.   -72.   128.  
+DEAL::Tvmult 0      -3.    -12.   -36.   64.   
+DEAL::+vm    0      -6.    -24.   -72.   128.  
+DEAL::Matrix increasing nonsymmetric
+DEAL::        2. 5.     
+DEAL::-2.     3. 3.     
+DEAL::-3.     4. 1.     
+DEAL::-4.     5. -1.    
+DEAL::-5.     6. 
+DEAL::u      1.     2.     4.     8.     16.   
+DEAL::u^TMw  -4.    -2.    -20.   -72.   176.  
+DEAL::vmult  12.    16.    18.    8.     56.   
+DEAL::+Tvm   10.    15.    8.     -28.   144.  
+DEAL::Tvmult -2.    -1.    -10.   -36.   88.   
+DEAL::+vm    10.    15.    8.     -28.   144.  
+DEAL::all_zero 1 0
+DEAL::Matrix [-1,2,-1]
+DEAL::        2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. 
+DEAL::u      1.     2.     4.     8.    
+DEAL::u^TMw  0.     -2.    -4.    24.   
+DEAL::vmult  0.     -1.    -2.    12.   
+DEAL::+Tvm   0.     -2.    -4.    24.   
+DEAL::Tvmult 0.     -1.    -2.    12.   
+DEAL::+vm    0.     -2.    -4.    24.   
+DEAL::Matrix [-1,2,-3]
+DEAL::        2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. 
+DEAL::u      1.     2.     4.     8.    
+DEAL::u^TMw  0.     -6.    -12.   8.    
+DEAL::vmult  -4.    -9.    -18.   12.   
+DEAL::+Tvm   -4.    -12.   -24.   16.   
+DEAL::Tvmult 0.     -3.    -6.    4.    
+DEAL::+vm    -4.    -12.   -24.   16.   
+DEAL::Matrix increasing symmetric rows
+DEAL::        2. -1.    
+DEAL::-2.     3. -2.    
+DEAL::-3.     4. -3.    
+DEAL::-4.     5. 
+DEAL::u      1.     2.     4.     8.    
+DEAL::u^TMw  -4.    -14.   -40.   56.   
+DEAL::vmult  0.     -4.    -14.   24.   
+DEAL::+Tvm   -2.    -11.   -34.   52.   
+DEAL::Tvmult -2.    -7.    -20.   28.   
+DEAL::+vm    -2.    -11.   -34.   52.   
+DEAL::Matrix increasing symmetric
+DEAL::        2. -1.    
+DEAL::-1.     3. -2.    
+DEAL::-2.     4. -3.    
+DEAL::-3.     5. 
+DEAL::u      1.     2.     4.     8.    
+DEAL::u^TMw  0.     -6.    -24.   56.   
+DEAL::vmult  0.     -3.    -12.   28.   
+DEAL::+Tvm   0.     -6.    -24.   56.   
+DEAL::Tvmult 0.     -3.    -12.   28.   
+DEAL::+vm    0.     -6.    -24.   56.   
+DEAL::Matrix increasing nonsymmetric
+DEAL::        2. 5.     
+DEAL::-2.     3. 3.     
+DEAL::-3.     4. 1.     
+DEAL::-4.     5. 
+DEAL::u      1.     2.     4.     8.    
+DEAL::u^TMw  -4.    -2.    -20.   88.   
+DEAL::vmult  12.    16.    18.    24.   
+DEAL::+Tvm   10.    15.    8.     68.   
+DEAL::Tvmult -2.    -1.    -10.   44.   
+DEAL::+vm    10.    15.    8.     68.   

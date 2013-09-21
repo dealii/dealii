@@ -1,0 +1,11 @@
+
+DEAL::blocks: 2x2
+DEAL::size: 3x3
+DEAL::size block(1,0):1x2
+[0,0]
+[1,0,1,2]
+[2,2]
+DEAL::
+DEAL::row 0: 0 
+DEAL::row 1: 0 1 2 
+DEAL::row 2: 2 

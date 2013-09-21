@@ -1,0 +1,11 @@
+
+DEAL::GrowingVectorMemory:Overall allocated vectors: 10
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 6
+An error occurred in file <vector_memory.cc> in function
+    dealii::GrowingVectorMemory<VECTOR>::~GrowingVectorMemory() [with VECTOR = dealii::Vector<double>]
+The violated condition was: 
+    current_alloc == 0
+The name and call sequence of the exception was:
+    StandardExceptions::ExcMemoryLeak(current_alloc)
+Additional Information: 
+Destroying memory handler while 1 objects are still allocated
