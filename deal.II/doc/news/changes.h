@@ -86,6 +86,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: Added write_visit_record that allows writing .visit files with multiple blocks
+  and multiple time steps.
+  <br>
+  (Fahad Alrashed, 2013/09/21)
+  </li>
+
+  <li>
   Changed: GridTools::have_same_coarse_mesh was only instantiated for
   MGDoFHandler arguments in debug mode. This is now fixed.
   <br>
