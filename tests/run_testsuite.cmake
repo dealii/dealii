@@ -357,12 +357,17 @@ CTEST_START(Experimental TRACK ${TRACK})
 
 CTEST_CONFIGURE(OPTIONS "${_options}")
 
-CTEST_BUILD(TARGET) # run all target
+CTEST_BUILD(TARGET RETURN_VALUE _res) # run all target
 
-# TODO: Run this during the BUILD stage...
-EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-  --build ${CTEST_BINARY_DIRECTORY} --target setup_test
-  )
+IF("${_res}" STREQUAL "0")
+  # Only run tests if the build succeeded:
 
-CTEST_TEST()
+  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
+    --build ${CTEST_BINARY_DIRECTORY} --target setup_test
+    OUTPUT_QUIET
+    )
+
+  CTEST_TEST()
+ENDIF()
+
 CTEST_SUBMIT()
