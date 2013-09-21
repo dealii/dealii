@@ -470,6 +470,16 @@ triangle {
 1 sg 142.64 2383.8 m 190.19 2750.4 l 217.64 2964.4 l 170.1 2597.7 lf
 0 sg 142.64 2383.8 m 190.19 2750.4 l 217.64 2964.4 l 170.1 2597.7 lx
 showpage
+!NBLOCKS 2
+subdomain-01.time_step_0.vtk
+subdomain-02.time_step_0.vtk
+subdomain-01.time_step_1.vtk
+subdomain-02.time_step_1.vtk
+subdomain-01.time_step_2.vtk
+subdomain-02.time_step_2.vtk
+!NBLOCKS 2
+subdomain-01.time_step_1.vtk
+subdomain-02.time_step_1.vtk
 object "vertices" class array type float rank 1 shape 3 items 240 data follows
 0.5	0	0	
 0.5	0.5	0	

@@ -134,6 +134,17 @@ void LaplaceProblem<2>::output_results () const
       data_out.write_ucd (logfile);
       data_out.write_povray (logfile);
       data_out.write_eps (logfile);
+
+      const unsigned int number_of_time_steps = 3;
+      std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
+      piece_names[0].push_back("subdomain-01.time_step_0.vtk");
+      piece_names[0].push_back("subdomain-02.time_step_0.vtk");
+      piece_names[1].push_back("subdomain-01.time_step_1.vtk");
+      piece_names[1].push_back("subdomain-02.time_step_1.vtk");
+      piece_names[2].push_back("subdomain-01.time_step_2.vtk");
+      piece_names[2].push_back("subdomain-02.time_step_2.vtk");
+      data_out.write_visit_record(logfile, piece_names);
+      data_out.write_visit_record(logfile, piece_names[01]);
     };
 
   // test DataOutRotation in 2d
