@@ -536,10 +536,10 @@ public:
      </ul>
 
      @note It would have been more reasonable to make this transform a template function
-     with the rank in DerivativeForm<1, dim, rank>. Unfortunately C++ does not
-     allow templatized virtual functions. This is why we identified
-     DerivativeForm<1, dim, 1> with a Tensor<1,dim> when using  mapping_covariant
-     in the function transform above this one.
+     with the rank in <code>DerivativeForm@<1, dim, rank@></code>. Unfortunately C++ does not
+     allow templatized virtual functions. This is why we identify
+     <code>DerivativeForm@<1, dim, 1@></code> with a <code>Tensor@<1,dim@></code>
+     when using  mapping_covariant() in the function transform above this one.
   */
 
   virtual
@@ -587,12 +587,11 @@ public:
      @f]
      </ul>
 
-     @todo The formulas for @p mapping_covariant_gradient,
-     @p mapping_contravariant_gradient and @p mapping_piola_gradient
-     are only true as stated for linear mappings,
-     if the mapping is bilinear for example then there is a missing
+     @todo The formulas for mapping_covariant_gradient(),
+     mapping_contravariant_gradient() and mapping_piola_gradient()
+     are only true as stated for linear mappings.
+     If, for example, the mapping is bilinear then there is a missing
      term associated with the derivative of of J.
-
   */
   virtual
   void
@@ -600,14 +599,6 @@ public:
              VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
              const InternalDataBase &internal,
              const MappingType type) const = 0;
-
-
-
-
-
-
-
-
 
   /**
    * @deprecated Use transform() instead.
