@@ -2314,8 +2314,8 @@ public:
 
   /**
    * This function is the exact equivalent of the write_pvtu_record()
-   * function but for the VisIt visualization program. See there for
-   * the purpose of this function.
+   * function but for the VisIt visualization program and for one visualization graph
+   * (or one time step only). See there for the purpose of this function.
    *
    * This function is documented in the "Creating a master file for
    * parallel" section (section 5.7) of the "Getting data into VisIt"
@@ -2324,6 +2324,37 @@ public:
    */
   void write_visit_record (std::ostream &out,
                            const std::vector<std::string> &piece_names) const;
+
+  /**
+   * This function is equivalent to the write_visit_record() above but for multiple
+   * time steps. Here is an example of how the function would be used:
+   * @code
+   *  DataOut<dim> data_out;
+   *
+   *  const unsigned int number_of_time_steps = 3;
+   *  std::vector<std::vector<std::string > > piece_names(number_of_time_steps);
+   *
+   *  piece_names[0].push_back("subdomain_01.time_step_0.vtk");
+   *  piece_names[0].push_back("subdomain_02.time_step_0.vtk");
+   *
+   *  piece_names[1].push_back("subdomain_01.time_step_1.vtk");
+   *  piece_names[1].push_back("subdomain_02.time_step_1.vtk");
+   *
+   *  piece_names[2].push_back("subdomain_01.time_step_2.vtk");
+   *  piece_names[2].push_back("subdomain_02.time_step_2.vtk");
+   *
+   *  std::ofstream visit_output ("master_file.visit");
+   *
+   *  data_out.write_visit_record(visit_output, piece_names);
+   * @endcode
+   *
+   * This function is documented in the "Creating a master file for
+   * parallel" section (section 5.7) of the "Getting data into VisIt"
+   * report that can be found here:
+   * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+   */
+  void write_visit_record (std::ostream &out,
+                           const std::vector<std::vector<std::string> > &piece_names) const;
 
   /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in
