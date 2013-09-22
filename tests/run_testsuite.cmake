@@ -355,19 +355,23 @@ ENDIF()
 
 CTEST_START(Experimental TRACK ${TRACK})
 
-CTEST_CONFIGURE(OPTIONS "${_options}")
+CTEST_CONFIGURE(OPTIONS "${_options}" RETURN_VALUE _res)
 
-CTEST_BUILD(TARGET RETURN_VALUE _res) # run all target
+IF("${_res}" STEQUAL "0")
+  # Only run the build stage if configure was successful:
 
-IF("${_res}" STREQUAL "0")
-  # Only run tests if the build succeeded:
+  CTEST_BUILD(TARGET RETURN_VALUE _res)
 
-  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-    --build ${CTEST_BINARY_DIRECTORY} --target setup_test
-    OUTPUT_QUIET
-    )
+  IF("${_res}" STREQUAL "0")
+    # Only run tests if the build was successful:
 
-  CTEST_TEST()
+    EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
+      --build ${CTEST_BINARY_DIRECTORY} --target setup_test
+      OUTPUT_QUIET
+      )
+
+    CTEST_TEST()
+  ENDIF()
 ENDIF()
 
 CTEST_SUBMIT()
