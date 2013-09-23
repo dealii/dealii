@@ -94,7 +94,7 @@ namespace Step42
 //
 // The data which we read in by the
 // function read_obstacle () from the file
-// "obstacle_file.pbm" will be stored
+// will be stored
 // in a double std::vector named
 // obstacle_data.
 // This vector composes the base
@@ -103,142 +103,57 @@ namespace Step42
 // This will be done by obstacle_function ().
 //
 // In the function run () of the class
-// PlasticityContactProblem we create
-// an object of the class Input which will
+// <code>PlasticityContactProblem</code> we create
+// an object of the this class which will
 // be used in the class Obstacle to
 // supply the obstacle function in
 // update_solution_and_constraints () of
 // the class PlasticityContactProblem.
-
+//
+// The <code>hx,hy</code> variables denote the spacing between
+// pixels in $x$ and $y$ directions. <code>nx,ny</code> are
+// the numbers of pixels in each of these directions.
+// <code>get_value()</code> returns the value of the
+// image at a given location, interpolated from the adjacent
+// pixel values.
   template <int dim>
   class Input
   {
   public:
-    Input (const std::string &name)
-      :
-      pcout(std::cout,
-            (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)),
-      obstacle_data(0),
-      hx(0),
-      hy(0),
-      nx(0),
-      ny(0)
-    {
-      read_obstacle(name);
-    }
-
-    double hv (const int i,
-               const int j);
+    Input (const std::string &name);
 
     double
-    obstacle_function (const double x,
-                       const double y);
-
-    void
-    read_obstacle (const std::string name);
+    get_value (const double x,
+               const double y);
 
   private:
-    ConditionalOStream pcout;
     std::vector<double> obstacle_data;
     double hx, hy;
     int nx, ny;
+
+    double get_pixel_value (const int i,
+                            const int j);
   };
 
-// This function is used in obstacle_function ()
-// to provide the proper value of the obstacle.
-  template <int dim>
-  double
-  Input<dim>::hv (const int i,
-                  const int j)
-  {
-    assert(i >= 0 && i < nx);
-    assert(j >= 0 && j < ny);
-    return obstacle_data[nx * (ny - 1 - j) + i]; // i indiziert x-werte, j indiziert y-werte
-  }
 
-// obstacle_function () calculates the bilinear interpolated
-// value in the point (x,y).
-  template <int dim>
-  double
-  Input<dim>::obstacle_function (const double x,
-                                 const double y)
-  {
-    int ix = (int) (x / hx);
-    int iy = (int) (y / hy);
-
-    if (ix < 0)
-      ix = 0;
-
-    if (iy < 0)
-      iy = 0;
-
-    if (ix >= nx - 1)
-      ix = nx - 2;
-
-    if (iy >= ny - 1)
-      iy = ny - 2;
-
-    double val = 0.0;
-    {
-      FullMatrix<double> H(4, 4);
-      Vector<double> X(4);
-      Vector<double> b(4);
-
-      double xx, yy;
-
-      xx = ix * hx;
-      yy = iy * hy;
-      H(0, 0) = xx;
-      H(0, 1) = yy;
-      H(0, 2) = xx * yy;
-      H(0, 3) = 1.0;
-      b(0) = hv(ix, iy);
-
-      xx = (ix + 1) * hx;
-      yy = iy * hy;
-      H(1, 0) = xx;
-      H(1, 1) = yy;
-      H(1, 2) = xx * yy;
-      H(1, 3) = 1.0;
-      b(1) = hv(ix + 1, iy);
-
-      xx = (ix + 1) * hx;
-      yy = (iy + 1) * hy;
-      H(2, 0) = xx;
-      H(2, 1) = yy;
-      H(2, 2) = xx * yy;
-      H(2, 3) = 1.0;
-      b(2) = hv(ix + 1, iy + 1);
-
-      xx = ix * hx;
-      yy = (iy + 1) * hy;
-      H(3, 0) = xx;
-      H(3, 1) = yy;
-      H(3, 2) = xx * yy;
-      H(3, 3) = 1.0;
-      b(3) = hv(ix, iy + 1);
-
-      H.gauss_jordan();
-      H.vmult(X, b);
-
-      val = X(0) * x + X(1) * y + X(2) * x * y + X(3);
-    }
-
-    return val;
-  }
-
-// As mentioned above this function reads in the
-// obstacle data and stores them in the std::vector
-// obstacle_data. It will be used only in run ().
-  template <int dim>
-  void
-  Input<dim>::read_obstacle (const std::string name)
+  // The constructor of this class reads in the data that describes
+  // the obstacle from the given file name.
+  template<int dim>
+  Input<dim>::Input(const std::string &name)
+    :
+    obstacle_data(0),
+    hx(0),
+    hy(0),
+    nx(0),
+    ny(0)
   {
     std::ifstream f(name.c_str());
 
     std::string temp;
     f >> temp >> nx >> ny;
-    assert(nx > 0 && ny > 0);
+
+    AssertThrow(nx > 0 && ny > 0,
+                ExcMessage ("Invalid file format."));
 
     for (int k = 0; k < nx * ny; k++)
       {
@@ -250,14 +165,80 @@ namespace Step42
     hx = 1.0 / (nx - 1);
     hy = 1.0 / (ny - 1);
 
-    pcout << "Resolution of the scanned obstacle picture: " << nx << " x "
-          << ny << std::endl;
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+      std::cout << "Resolution of the scanned obstacle picture: " << nx << " x " << ny
+                << std::endl;
   }
+
+  template <int dim>
+  double
+  Input<dim>::get_pixel_value (const int i,
+                               const int j)
+  {
+    assert(i >= 0 && i < nx);
+    assert(j >= 0 && j < ny);
+    return obstacle_data[nx * (ny - 1 - j) + i];
+  }
+
+
+  template <int dim>
+  double
+  Input<dim>::get_value (const double x,
+                         const double y)
+  {
+    const int ix = std::min(std::max((int) (x / hx), 0), nx-2);
+    const int iy = std::min(std::max((int) (y / hy), 0), ny-2);
+
+    FullMatrix<double> H(4, 4);
+    Vector<double> X(4);
+    Vector<double> b(4);
+
+    double xx, yy;
+
+    xx = ix * hx;
+    yy = iy * hy;
+    H(0, 0) = xx;
+    H(0, 1) = yy;
+    H(0, 2) = xx * yy;
+    H(0, 3) = 1.0;
+    b(0) = get_value(ix, iy);
+
+    xx = (ix + 1) * hx;
+    yy = iy * hy;
+    H(1, 0) = xx;
+    H(1, 1) = yy;
+    H(1, 2) = xx * yy;
+    H(1, 3) = 1.0;
+    b(1) = get_pixel_value(ix + 1, iy);
+
+    xx = (ix + 1) * hx;
+    yy = (iy + 1) * hy;
+    H(2, 0) = xx;
+    H(2, 1) = yy;
+    H(2, 2) = xx * yy;
+    H(2, 3) = 1.0;
+    b(2) = get_pixel_value(ix + 1, iy + 1);
+
+    xx = ix * hx;
+    yy = (iy + 1) * hy;
+    H(3, 0) = xx;
+    H(3, 1) = yy;
+    H(3, 2) = xx * yy;
+    H(3, 3) = 1.0;
+    b(3) = get_pixel_value(ix, iy + 1);
+
+    H.gauss_jordan();
+    H.vmult(X, b);
+
+    return (X(0) * x + X(1) * y + X(2) * x * y + X(3));
+  }
+
 
 // @sect3{The <code>ConstitutiveLaw</code> class template}
 
 // This class provides an interface
-// for a constitutive law. In this
+// for a constitutive law, i.e., for the relationship between strain
+// $\varepsilon(\mathbf u)$ and stress $\sigma$. In this
 // example we are using an elastoplastic
 // material behavior with linear,
 // isotropic hardening.
@@ -273,18 +254,13 @@ namespace Step42
                      const double _gamma);
 
     bool
-    plast_linear_hardening (SymmetricTensor<4, dim> &stress_strain_tensor,
-                            const SymmetricTensor<2, dim> &strain_tensor) const;
+    get_stress_strain_tensor (const SymmetricTensor<2, dim> &strain_tensor,
+                              SymmetricTensor<4, dim> &stress_strain_tensor) const;
 
     void
-    linearized_plast_linear_hardening (SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
-      SymmetricTensor<4, dim> &stress_strain_tensor,
-      const SymmetricTensor<2, dim> &strain_tensor) const;
-
-    SymmetricTensor<2, dim>
-    get_strain (const FEValues<dim> &fe_values,
-      const unsigned int shape_func,
-      const unsigned int q_point) const;
+    get_linearized_stress_strain_tensors (const SymmetricTensor<2, dim> &strain_tensor,
+                                          SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
+                                          SymmetricTensor<4, dim> &stress_strain_tensor) const;
 
     void
     set_sigma_0 (double sigma_zero)
@@ -293,64 +269,47 @@ namespace Step42
     }
 
   private:
-    const double E;
-    const double nu;
     double       sigma_0;
     const double gamma;
-    const double mu;
     const double kappa;
+    const double mu;
 
     const SymmetricTensor<4, dim> stress_strain_tensor_kappa;
     const SymmetricTensor<4, dim> stress_strain_tensor_mu;
   };
 
 // The constructor of the ConstitutiveLaw class sets the
-// required material parameter for our deformable body:
-// E -> elastic modulus
-// nu -> Passion's number
-// sigma_0 -> yield stress
-// gamma -> hardening parameter.
-// Also it supplies the stress strain tensor of forth order
-// of the volumetric and deviator part. For further details
-// see the documentation above.
+// required material parameter for our deformable body. Material
+// parameters for elastic isotropic media can be defined in a
+// variety of ways, such as the pair $E, \nu$ (elastic modulus and
+// Poisson's number), using the Lame parameters $\lambda,mu$ or
+// several other commonly used conventions. Here, the constructor takes a description of material parameters in the form of $E,\nu$, but since this turns out to these are not the coefficients that appear in the equations of the plastic projector, we immediately convert them into the more suitable set $\kappa,\mu$ of bulk and shear moduli.
+// In addition, the constructor takes $\sigma_0$ (the yield stress absent any plastic strain) and
+// $\gamma$ (the hardening parameter) as arguments. In this constructor, we also compute the two principal components of the
+// stress-strain relation and its linearization.
   template <int dim>
-  ConstitutiveLaw<dim>::ConstitutiveLaw (double _E,
-                                         double _nu,
-                                         double _sigma_0,
-                                         double _gamma)
+  ConstitutiveLaw<dim>::ConstitutiveLaw (double E,
+                                         double nu,
+                                         double sigma_0,
+                                         double gamma)
     :
-    E(_E),
-    nu(_nu),
-    sigma_0(_sigma_0),
-    gamma(_gamma),
-    mu (E / (2 * (1 + nu))),
+    sigma_0(sigma_0),
+    gamma(gamma),
     kappa (E / (3 * (1 - 2 * nu))),
+    mu (E / (2 * (1 + nu))),
     stress_strain_tensor_kappa (kappa
-                                 * outer_product(unit_symmetric_tensor<dim>(),
-                                                 unit_symmetric_tensor<dim>())),
+                                * outer_product(unit_symmetric_tensor<dim>(),
+                                                unit_symmetric_tensor<dim>())),
     stress_strain_tensor_mu (2 * mu
-                              * (identity_tensor<dim>()
-                                 - outer_product(unit_symmetric_tensor<dim>(),
-                                                 unit_symmetric_tensor<dim>()) / 3.0))
+                             * (identity_tensor<dim>()
+                                - outer_product(unit_symmetric_tensor<dim>(),
+                                                unit_symmetric_tensor<dim>()) / 3.0))
   {}
 
-// @sect4{ConstitutiveLaw::ConstitutiveLaw}
 
-// Calculates the strain $\varepsilon(\varphi)=\dfrac{1}{2}\left(\nabla\varphi + \nabla\varphi^T$
-// for the shape functions $\varphi$.
-  template <int dim>
-  SymmetricTensor<2, dim>
-  ConstitutiveLaw<dim>::get_strain (const FEValues<dim> &fe_values,
-                                    const unsigned int shape_func,
-                                    const unsigned int q_point) const
-  {
-    const FEValuesExtractors::Vector displacement(0);
-    return fe_values[displacement].symmetric_gradient(shape_func, q_point);
-  }
+// @sect4{ConstitutiveLaw::get_stress_strain_tensor}
 
-// @sect4{ConstitutiveLaw::plast_linear_hardening}
-
-// This is the implemented constitutive law. It projects the
+// This is the principal component of the constitutive law. It projects the
 // deviatoric part of the stresses in a quadrature point back to
 // the yield stress (i.e., the original yield stress $\sigma_0$ plus
 // the term that describes linear isotropic hardening).
@@ -364,8 +323,8 @@ namespace Step42
   template <int dim>
   bool
   ConstitutiveLaw<dim>::
-  plast_linear_hardening (SymmetricTensor<4, dim> &stress_strain_tensor,
-		                  const SymmetricTensor<2, dim> &strain_tensor) const
+  get_stress_strain_tensor (const SymmetricTensor<2, dim> &strain_tensor,
+                            SymmetricTensor<4, dim> &stress_strain_tensor) const
   {
     Assert (dim == 3, ExcNotImplemented());
 
@@ -388,24 +347,25 @@ namespace Step42
     return (deviator_stress_tensor_norm > sigma_0);
   }
 
-// @sect4{ConstitutiveLaw::linearized_plast_linear_hardening}
+
+// @sect4{ConstitutiveLaw::get_linearized_stress_strain_tensors}
 
 // This function returns the linearized stress strain tensor, linearized
 // around the solution $u^{i-1}$ of the previous Newton step $i-1$.
-// The parameter strain_tensor $\varepsilon(u^{i-1})$ is calculated
-// by $u^{i-1}$. It contains the derivative of the nonlinear
-// constitutive law. As the result this function returns
-// the stress_strain_tensor of the nonlinear problem as well as
-// the stress_strain_tensor_linearized of the linearized problem.
+// The parameter <code>strain_tensor</code> (commonly denoted $\varepsilon(u^{i-1})$) must be passed as an argument,
+// and serves as the linearization point. The function returns the derivative of the nonlinear
+// constitutive law in
+// the variable stress_strain_tensor, as well as
+// the stress-strain tensor of the linearized problem in stress_strain_tensor_linearized.
 // See
 // PlasticityContactProblem::assemble_nl_system(TrilinosWrappers::MPI::Vector &u)
 // where this function is used.
   template <int dim>
   void
   ConstitutiveLaw<dim>::
-  linearized_plast_linear_hardening (SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
-                                     SymmetricTensor<4, dim> &stress_strain_tensor,
-                                     const SymmetricTensor<2, dim> &strain_tensor) const
+  get_linearized_stress_strain_tensors (const SymmetricTensor<2, dim> &strain_tensor,
+                                        SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
+                                        SymmetricTensor<4, dim> &stress_strain_tensor) const
   {
     Assert (dim == 3, ExcNotImplemented());
 
@@ -434,98 +394,89 @@ namespace Step42
     stress_strain_tensor_linearized += stress_strain_tensor_kappa;
   }
 
+  // <h3>Equation data: right hand side and boundary values</h3>
+  //
+  // The following should be relatively standard. We need classes for
+  // the right hand side forcing term (which we here choose to be zero)
+  // and boundary values on those part of the boundary that are not part
+  // of the contact surface (also chosen to be zero here).
   namespace EquationData
   {
-// It possible to apply an additional body force
-// but in here it is set to zero.
     template <int dim>
     class RightHandSide : public Function<dim>
     {
     public:
-      RightHandSide ()
-        :
-        Function<dim>(dim)
-      {
-      }
+      RightHandSide ();
 
-      virtual double
-      value (
-        const Point<dim> &p, const unsigned int component = 0) const;
+      virtual
+      double value (const Point<dim> &p,
+                    const unsigned int component = 0) const;
 
-      virtual void
-      vector_value (
-        const Point<dim> &p, Vector<double> &values) const;
+      virtual
+      void vector_value (const Point<dim> &p,
+                         Vector<double> &values) const;
     };
 
     template <int dim>
+    RightHandSide<dim>::RightHandSide ()
+      :
+      Function<dim>(dim)
+    {}
+
+
+    template <int dim>
     double
-    RightHandSide<dim>::value (
-      const Point<dim> &p, const unsigned int component) const
+    RightHandSide<dim>::value (const Point<dim> &,
+                               const unsigned int) const
     {
-      double return_value = 0.0;
-
-      if (component == 0)
-        return_value = 0.0;
-      if (component == 1)
-        return_value = 0.0;
-      if (component == 2)
-        return_value = 0.0;
-
-      return return_value;
+      return 0.;
     }
 
     template <int dim>
     void
-    RightHandSide<dim>::vector_value (
-      const Point<dim> &p, Vector<double> &values) const
+    RightHandSide<dim>::vector_value (const Point<dim> &p,
+                                      Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = RightHandSide<dim>::value(p, c);
     }
 
-// This function class is used to describe the prescribed displacements
-// at the boundary. But again we set this to zero.
+
+
     template <int dim>
     class BoundaryValues : public Function<dim>
     {
     public:
-      BoundaryValues ()
-        :
-        Function<dim>(dim)
-      {
-      }
-      ;
+      BoundaryValues ();
 
-      virtual double
-      value (
-        const Point<dim> &p, const unsigned int component = 0) const;
+      virtual double value (const Point<dim> &p,
+                            const unsigned int component = 0) const;
 
-      virtual void
-      vector_value (
-        const Point<dim> &p, Vector<double> &values) const;
+      virtual
+      void vector_value (const Point<dim> &p,
+                         Vector<double> &values) const;
     };
+
+
+    template <int dim>
+    BoundaryValues<dim>::BoundaryValues ()
+      :
+      Function<dim>(dim)
+    {}
+
 
     template <int dim>
     double
-    BoundaryValues<dim>::value (
-      const Point<dim> &p, const unsigned int component) const
+    BoundaryValues<dim>::value (const Point<dim> &,
+                                const unsigned int) const
     {
-      double return_value = 0;
-
-      if (component == 0)
-        return_value = 0.0;
-      if (component == 1)
-        return_value = 0.0;
-      if (component == 2)
-        return_value = 0.0;
-
-      return return_value;
+      return 0.;
     }
 
     template <int dim>
     void
-    BoundaryValues<dim>::vector_value (
-      const Point<dim> &p, Vector<double> &values) const
+    BoundaryValues<dim>::vector_value (const Point<dim> &p,
+                                       Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = BoundaryValues<dim>::value(p, c);
@@ -546,7 +497,7 @@ namespace Step42
         bool _use_read_obstacle, double z_max_domain)
         :
         Function<dim>(dim),
-        input_obstacle_copy(_input),
+        input_obstacle(_input),
         use_read_obstacle(_use_read_obstacle),
         z_max_domain(z_max_domain)
       {
@@ -561,7 +512,7 @@ namespace Step42
         const Point<dim> &p, Vector<double> &values) const;
 
     private:
-      std_cxx1x::shared_ptr<Input<dim> > const &input_obstacle_copy;
+      const std_cxx1x::shared_ptr<Input<dim> > &input_obstacle;
       bool use_read_obstacle;
       double z_max_domain;
     };
@@ -581,7 +532,7 @@ namespace Step42
         {
           if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
             return z_max_domain + 0.999
-                   - input_obstacle_copy->obstacle_function(p(0), p(1));
+                   - input_obstacle->get_value(p(0), p(1));
           else
             return 10000.0;
         }
@@ -1039,19 +990,19 @@ namespace Step42
               SymmetricTensor<4, dim> stress_strain_tensor;
               SymmetricTensor<2, dim> stress_tensor;
 
-              plast_lin_hard->linearized_plast_linear_hardening(
-                stress_strain_tensor_linearized, stress_strain_tensor,
-                strain_tensor[q_point]);
+              plast_lin_hard->get_linearized_stress_strain_tensors(strain_tensor[q_point],
+                                                                   stress_strain_tensor_linearized,
+                                                                   stress_strain_tensor);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   stress_tensor = stress_strain_tensor_linearized
-                                  * plast_lin_hard->get_strain(fe_values, i, q_point);
+                                  * fe_values[displacement].symmetric_gradient(i, q_point);
 
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
                       cell_matrix(i, j) += (stress_tensor
-                                            * plast_lin_hard->get_strain(fe_values, j, q_point)
+                                            * fe_values[displacement].symmetric_gradient(i, q_point)
                                             * fe_values.JxW(q_point));
                     }
 
@@ -1062,7 +1013,7 @@ namespace Step42
                   // the residual part a(v^i;v) of the rhs
                   cell_rhs(i) -= (strain_tensor[q_point]
                                   * stress_strain_tensor
-                                  * plast_lin_hard->get_strain(fe_values, i, q_point)
+                                  * fe_values[displacement].symmetric_gradient(i, q_point)
                                   * fe_values.JxW(q_point));
 
                   // the residual part F(v) of the rhs
@@ -1169,22 +1120,21 @@ namespace Step42
               SymmetricTensor<2, dim> stress_tensor;
 
               const bool q_point_is_plastic
-              = plast_lin_hard->plast_linear_hardening(stress_strain_tensor,
-                                                     strain_tensor[q_point]);
+                = plast_lin_hard->get_stress_strain_tensor(strain_tensor[q_point],
+                                                           stress_strain_tensor);
               if (q_point_is_plastic)
-              {
-            	  ++plast_points;
+                {
+                  ++plast_points;
                   ++cell_constitution(cell_number);
-              }
+                }
               else
-            	  ++elast_points;
+                ++elast_points;
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   cell_rhs(i) -= (strain_tensor[q_point]
                                   * stress_strain_tensor
-                                  * //(stress_tensor) *
-                                  plast_lin_hard->get_strain(fe_values, i, q_point)
+                                  * fe_values[displacement].symmetric_gradient(i, q_point)
                                   * fe_values.JxW(q_point));
 
                   Tensor<1, dim> rhs_values;
@@ -1203,7 +1153,7 @@ namespace Step42
                   fe_values_face.reinit(cell, face);
 
                   right_hand_side.vector_value_list(fe_values_face.get_quadrature_points(),
-                		  right_hand_side_values_face);
+                                                    right_hand_side_values_face);
 
                   for (unsigned int q_point = 0; q_point < n_face_q_points;
                        ++q_point)
@@ -1241,9 +1191,9 @@ namespace Step42
 //    constraints_hanging_nodes.condense(system_rhs_lambda);
 
     const unsigned int sum_elast_points = Utilities::MPI::sum(elast_points,
-                                                        mpi_communicator);
+                                                              mpi_communicator);
     const unsigned int sum_plast_points = Utilities::MPI::sum(plast_points,
-                                                        mpi_communicator);
+                                                              mpi_communicator);
     pcout << "      Number of elastic quadrature points: " << sum_elast_points
           << " and plastic quadrature points: " << sum_plast_points
           << std::endl;
