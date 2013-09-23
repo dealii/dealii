@@ -22,34 +22,23 @@
  */
 
 // @sect3{Include files}
-// We are using the the same
-// include files as in step-41:
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_values.h>
+// The set of include files is not much of a surprise any more at this time:
+#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/base/timer.h>
+
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
-
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -57,27 +46,38 @@
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
 
-#include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/utilities.h>
-#include <deal.II/base/index_set.h>
-#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/solution_transfer.h>
 
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/fe_field_function.h>
-#include <deal.II/distributed/solution_transfer.h>
-#include <deal.II/base/timer.h>
+
 #include <fstream>
 #include <iostream>
-#include <list>
-#include <time.h>
 
+// This final include file provides the <code>mkdir</code> function
+// that we will use to create a directory for output files, if necessary:
 #include <sys/stat.h>
-
-#include <deal.II/base/logstream.h>
 
 namespace Step42
 {
@@ -87,8 +87,8 @@ namespace Step42
 
 // This class has the the only purpose
 // to read in data from a picture file
-// that has to be stored in pbm ascii
-// format. This data will be bilinear
+// stored in pbm ascii
+// format. This data will be bilinearly
 // interpolated and provides in this way
 // a function which describes an obstacle.
 //
@@ -116,9 +116,8 @@ namespace Step42
   public:
     Input (const std::string &name)
       :
-      mpi_communicator(MPI_COMM_WORLD),
       pcout(std::cout,
-            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
+            (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)),
       obstacle_data(0),
       hx(0),
       hy(0),
@@ -128,9 +127,8 @@ namespace Step42
       read_obstacle(name);
     }
 
-    double
-    hv (
-      int i, int j);
+    double hv (const int i,
+               const int j);
 
     double
     obstacle_function (const double x,
@@ -140,7 +138,6 @@ namespace Step42
     read_obstacle (const std::string name);
 
   private:
-    MPI_Comm mpi_communicator;
     ConditionalOStream pcout;
     std::vector<double> obstacle_data;
     double hx, hy;
@@ -187,8 +184,7 @@ namespace Step42
       Vector<double> X(4);
       Vector<double> b(4);
 
-      double xx = 0.0;
-      double yy = 0.0;
+      double xx, yy;
 
       xx = ix * hx;
       yy = iy * hy;
@@ -265,49 +261,47 @@ namespace Step42
 // example we are using an elastoplastic
 // material behavior with linear,
 // isotropic hardening.
-// For gamma = 0 we obtain perfect elastoplastic
+// For $\gamma = 0$ we obtain perfect elastoplastic
 // behavior.
   template <int dim>
   class ConstitutiveLaw
   {
   public:
-    ConstitutiveLaw (
-      double _E, double _nu, double _sigma_0, double _gamma,
-      MPI_Comm _mpi_communicator, ConditionalOStream _pcout);
+    ConstitutiveLaw (const double _E,
+                     const double _nu,
+                     const double _sigma_0,
+                     const double _gamma);
+
+    bool
+    plast_linear_hardening (SymmetricTensor<4, dim> &stress_strain_tensor,
+                            const SymmetricTensor<2, dim> &strain_tensor) const;
 
     void
-    plast_linear_hardening (
+    linearized_plast_linear_hardening (SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
       SymmetricTensor<4, dim> &stress_strain_tensor,
-      const SymmetricTensor<2, dim> &strain_tensor,
-      unsigned int &elast_points, unsigned int &plast_points,
-      double &yield);
-    void
-    linearized_plast_linear_hardening (
-      SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
-      SymmetricTensor<4, dim> &stress_strain_tensor,
-      const SymmetricTensor<2, dim> &strain_tensor);
-    inline SymmetricTensor<2, dim>
-    get_strain (
-      const FEValues<dim> &fe_values, const unsigned int shape_func,
+      const SymmetricTensor<2, dim> &strain_tensor) const;
+
+    SymmetricTensor<2, dim>
+    get_strain (const FEValues<dim> &fe_values,
+      const unsigned int shape_func,
       const unsigned int q_point) const;
+
     void
-    set_sigma_0 (
-      double sigma_hlp)
+    set_sigma_0 (double sigma_zero)
     {
-      sigma_0 = sigma_hlp;
+      sigma_0 = sigma_zero;
     }
 
   private:
-    SymmetricTensor<4, dim> stress_strain_tensor_mu;
-    SymmetricTensor<4, dim> stress_strain_tensor_kappa;
-    double E;
-    double nu;
-    double sigma_0;
-    double gamma;
-    double mu;
-    double kappa;
-    MPI_Comm mpi_communicator;
-    ConditionalOStream pcout;
+    const double E;
+    const double nu;
+    double       sigma_0;
+    const double gamma;
+    const double mu;
+    const double kappa;
+
+    const SymmetricTensor<4, dim> stress_strain_tensor_kappa;
+    const SymmetricTensor<4, dim> stress_strain_tensor_mu;
   };
 
 // The constructor of the ConstitutiveLaw class sets the
@@ -320,94 +314,84 @@ namespace Step42
 // of the volumetric and deviator part. For further details
 // see the documentation above.
   template <int dim>
-  ConstitutiveLaw<dim>::ConstitutiveLaw (
-    double _E, double _nu, double _sigma_0, double _gamma,
-    MPI_Comm _mpi_communicator, ConditionalOStream _pcout)
+  ConstitutiveLaw<dim>::ConstitutiveLaw (double _E,
+                                         double _nu,
+                                         double _sigma_0,
+                                         double _gamma)
     :
     E(_E),
     nu(_nu),
     sigma_0(_sigma_0),
     gamma(_gamma),
-    mpi_communicator(_mpi_communicator),
-    pcout(_pcout)
-  {
-    mu = E / (2 * (1 + nu));
-    kappa = E / (3 * (1 - 2 * nu));
-    stress_strain_tensor_kappa = kappa
+    mu (E / (2 * (1 + nu))),
+    kappa (E / (3 * (1 - 2 * nu))),
+    stress_strain_tensor_kappa (kappa
                                  * outer_product(unit_symmetric_tensor<dim>(),
-                                                 unit_symmetric_tensor<dim>());
-    stress_strain_tensor_mu = 2 * mu
+                                                 unit_symmetric_tensor<dim>())),
+    stress_strain_tensor_mu (2 * mu
                               * (identity_tensor<dim>()
                                  - outer_product(unit_symmetric_tensor<dim>(),
-                                                 unit_symmetric_tensor<dim>()) / 3.0);
-  }
+                                                 unit_symmetric_tensor<dim>()) / 3.0))
+  {}
 
-// @sect3{ConstitutiveLaw::ConstitutiveLaw}
+// @sect4{ConstitutiveLaw::ConstitutiveLaw}
 
 // Calculates the strain $\varepsilon(\varphi)=\dfrac{1}{2}\left(\nabla\varphi + \nabla\varphi^T$
 // for the shape functions $\varphi$.
   template <int dim>
-  inline SymmetricTensor<2, dim>
-  ConstitutiveLaw<dim>::get_strain (
-    const FEValues<dim> &fe_values, const unsigned int shape_func,
-    const unsigned int q_point) const
+  SymmetricTensor<2, dim>
+  ConstitutiveLaw<dim>::get_strain (const FEValues<dim> &fe_values,
+                                    const unsigned int shape_func,
+                                    const unsigned int q_point) const
   {
     const FEValuesExtractors::Vector displacement(0);
-    SymmetricTensor<2, dim> tmp;
-
-    tmp = fe_values[displacement].symmetric_gradient(shape_func, q_point);
-
-    return tmp;
+    return fe_values[displacement].symmetric_gradient(shape_func, q_point);
   }
 
-// @sect3{ConstitutiveLaw::plast_linear_hardening}
+// @sect4{ConstitutiveLaw::plast_linear_hardening}
 
 // This is the implemented constitutive law. It projects the
-// deviator part of the stresses in a quadrature point back to
-// the yield stress plus the linear isotropic hardening.
-// Also we sum up the elastic and the plastic quadrature
-// points. We need this function to calculate the nonlinear
+// deviatoric part of the stresses in a quadrature point back to
+// the yield stress (i.e., the original yield stress $\sigma_0$ plus
+// the term that describes linear isotropic hardening).
+// We need this function to calculate the nonlinear
 // residual in
 // PlasticityContactProblem::residual_nl_system(TrilinosWrappers::MPI::Vector &u).
+//
+// The function returns whether the quadrature point is plastic to allow for
+// some statistics downstream on how many of the quadrature points are
+// plastic and how many are elastic.
   template <int dim>
-  void
-  ConstitutiveLaw<dim>::plast_linear_hardening (
-    SymmetricTensor<4, dim> &stress_strain_tensor,
-    const SymmetricTensor<2, dim> &strain_tensor,
-    unsigned int &elast_points, unsigned int &plast_points, double &yield)
+  bool
+  ConstitutiveLaw<dim>::
+  plast_linear_hardening (SymmetricTensor<4, dim> &stress_strain_tensor,
+		                  const SymmetricTensor<2, dim> &strain_tensor) const
   {
-    if (dim == 3)
+    Assert (dim == 3, ExcNotImplemented());
+
+    SymmetricTensor<2, dim> stress_tensor;
+    stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)
+                    * strain_tensor;
+
+    const SymmetricTensor<2, dim> deviator_stress_tensor = deviator(stress_tensor);
+    const double deviator_stress_tensor_norm = deviator_stress_tensor.norm();
+
+    stress_strain_tensor = stress_strain_tensor_mu;
+    if (deviator_stress_tensor_norm > sigma_0)
       {
-        SymmetricTensor<2, dim> stress_tensor;
-        stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)
-                        * strain_tensor;
-
-        SymmetricTensor<2, dim> deviator_stress_tensor = deviator(
-                                                           stress_tensor);
-
-        double deviator_stress_tensor_norm = deviator_stress_tensor.norm();
-
-        yield = 0;
-        stress_strain_tensor = stress_strain_tensor_mu;
-        double beta = 1.0;
-        if (deviator_stress_tensor_norm > sigma_0)
-          {
-            beta = sigma_0 / deviator_stress_tensor_norm;
-            stress_strain_tensor *= (gamma + (1 - gamma) * beta);
-            yield = 1;
-            plast_points += 1;
-          }
-        else
-          elast_points += 1;
-
-        stress_strain_tensor += stress_strain_tensor_kappa;
+        const double beta = sigma_0 / deviator_stress_tensor_norm;
+        stress_strain_tensor *= (gamma + (1 - gamma) * beta);
       }
+
+    stress_strain_tensor += stress_strain_tensor_kappa;
+
+    return (deviator_stress_tensor_norm > sigma_0);
   }
 
-// @sect3{ConstitutiveLaw::linearized_plast_linear_hardening}
+// @sect4{ConstitutiveLaw::linearized_plast_linear_hardening}
 
-// This function returns the linearized stress strain tensor
-// in the solution $u^{i-1}$ of the previous Newton $i-1$ step.
+// This function returns the linearized stress strain tensor, linearized
+// around the solution $u^{i-1}$ of the previous Newton step $i-1$.
 // The parameter strain_tensor $\varepsilon(u^{i-1})$ is calculated
 // by $u^{i-1}$. It contains the derivative of the nonlinear
 // constitutive law. As the result this function returns
@@ -418,39 +402,36 @@ namespace Step42
 // where this function is used.
   template <int dim>
   void
-  ConstitutiveLaw<dim>::linearized_plast_linear_hardening (
-    SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
-    SymmetricTensor<4, dim> &stress_strain_tensor,
-    const SymmetricTensor<2, dim> &strain_tensor)
+  ConstitutiveLaw<dim>::
+  linearized_plast_linear_hardening (SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
+                                     SymmetricTensor<4, dim> &stress_strain_tensor,
+                                     const SymmetricTensor<2, dim> &strain_tensor) const
   {
-    if (dim == 3)
+    Assert (dim == 3, ExcNotImplemented());
+
+    SymmetricTensor<2, dim> stress_tensor;
+    stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)
+                    * strain_tensor;
+
+    stress_strain_tensor = stress_strain_tensor_mu;
+    stress_strain_tensor_linearized = stress_strain_tensor_mu;
+
+    SymmetricTensor<2, dim> deviator_stress_tensor = deviator(stress_tensor);
+    const double deviator_stress_tensor_norm = deviator_stress_tensor.norm();
+
+    if (deviator_stress_tensor_norm > sigma_0)
       {
-        SymmetricTensor<2, dim> stress_tensor;
-        stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)
-                        * strain_tensor;
-
-        SymmetricTensor<2, dim> deviator_stress_tensor = deviator(
-                                                           stress_tensor);
-
-        double deviator_stress_tensor_norm = deviator_stress_tensor.norm();
-
-        stress_strain_tensor = stress_strain_tensor_mu;
-        stress_strain_tensor_linearized = stress_strain_tensor_mu;
-        double beta = 1.0;
-        if (deviator_stress_tensor_norm > sigma_0)
-          {
-            beta = sigma_0 / deviator_stress_tensor_norm;
-            stress_strain_tensor *= (gamma + (1 - gamma) * beta);
-            stress_strain_tensor_linearized *= (gamma + (1 - gamma) * beta);
-            deviator_stress_tensor /= deviator_stress_tensor_norm;
-            stress_strain_tensor_linearized -= (1 - gamma) * beta * 2 * mu
-                                               * outer_product(deviator_stress_tensor,
-                                                               deviator_stress_tensor);
-          }
-
-        stress_strain_tensor += stress_strain_tensor_kappa;
-        stress_strain_tensor_linearized += stress_strain_tensor_kappa;
+        const double beta = sigma_0 / deviator_stress_tensor_norm;
+        stress_strain_tensor *= (gamma + (1 - gamma) * beta);
+        stress_strain_tensor_linearized *= (gamma + (1 - gamma) * beta);
+        deviator_stress_tensor /= deviator_stress_tensor_norm;
+        stress_strain_tensor_linearized -= (1 - gamma) * beta * 2 * mu
+                                           * outer_product(deviator_stress_tensor,
+                                                           deviator_stress_tensor);
       }
+
+    stress_strain_tensor += stress_strain_tensor_kappa;
+    stress_strain_tensor_linearized += stress_strain_tensor_kappa;
   }
 
   namespace EquationData
@@ -784,9 +765,7 @@ namespace Step42
                     TimerOutput::wall_times)
   {
     // double _E, double _nu, double _sigma_0, double _gamma
-    plast_lin_hard.reset(
-      new ConstitutiveLaw<dim>(e_modul, nu, sigma_0, gamma,
-                               mpi_communicator, pcout));
+    plast_lin_hard.reset(new ConstitutiveLaw<dim>(e_modul, nu, sigma_0, gamma));
 
     degree = prm.get_integer("polynomial degree");
     n_initial_refinements = prm.get_integer("number of initial refinements");
@@ -1189,10 +1168,17 @@ namespace Step42
               SymmetricTensor<4, dim> stress_strain_tensor;
               SymmetricTensor<2, dim> stress_tensor;
 
-              plast_lin_hard->plast_linear_hardening(stress_strain_tensor,
-                                                     strain_tensor[q_point], elast_points, plast_points, yield);
+              const bool q_point_is_plastic
+              = plast_lin_hard->plast_linear_hardening(stress_strain_tensor,
+                                                     strain_tensor[q_point]);
+              if (q_point_is_plastic)
+              {
+            	  ++plast_points;
+                  ++cell_constitution(cell_number);
+              }
+              else
+            	  ++elast_points;
 
-              cell_constitution(cell_number) += yield;
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   cell_rhs(i) -= (strain_tensor[q_point]
@@ -1205,8 +1191,8 @@ namespace Step42
                   rhs_values = 0;
                   cell_rhs(i) += ((fe_values[displacement].value(i, q_point)
                                    * rhs_values) * fe_values.JxW(q_point));
-                };
-            };
+                }
+            }
 
           for (unsigned int face = 0;
                face < GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1216,9 +1202,8 @@ namespace Step42
                 {
                   fe_values_face.reinit(cell, face);
 
-                  right_hand_side.vector_value_list(
-                    fe_values_face.get_quadrature_points(),
-                    right_hand_side_values_face);
+                  right_hand_side.vector_value_list(fe_values_face.get_quadrature_points(),
+                		  right_hand_side_values_face);
 
                   for (unsigned int q_point = 0; q_point < n_face_q_points;
                        ++q_point)
@@ -1246,7 +1231,7 @@ namespace Step42
         {
           cell_constitution(cell_number) = 0;
           cell_number += 1;
-        };
+        }
 
     cell_constitution /= n_q_points;
     cell_constitution.compress(VectorOperation::add);
@@ -1255,9 +1240,9 @@ namespace Step42
 
 //    constraints_hanging_nodes.condense(system_rhs_lambda);
 
-    unsigned int sum_elast_points = Utilities::MPI::sum(elast_points,
+    const unsigned int sum_elast_points = Utilities::MPI::sum(elast_points,
                                                         mpi_communicator);
-    unsigned int sum_plast_points = Utilities::MPI::sum(plast_points,
+    const unsigned int sum_plast_points = Utilities::MPI::sum(plast_points,
                                                         mpi_communicator);
     pcout << "      Number of elastic quadrature points: " << sum_elast_points
           << " and plastic quadrature points: " << sum_plast_points
