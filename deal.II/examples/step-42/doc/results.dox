@@ -367,16 +367,16 @@ last 4 or 5 Newton iterations.
 <table align="center">
   <tr>
     <td>
-    @image html step-42.CellConstitutionColorbar.png
+    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionColorbar.png" alt="">
     </td>
     <td>
-    @image html step-42.CellConstitutionBall2.png
+    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionBall2.png" alt="">
     </td>
     <td valign="top">
       &nbsp;
     </td>
     <td>
-    @image html step-42.CellConstitutionLi2.png
+    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="">
     </td>
   </tr>
 </table>
