@@ -6699,6 +6699,32 @@ DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
 
 
 template <int dim, int spacedim>
+void
+DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
+                                                    const std::vector<std::vector<std::string> > &piece_names) const
+{
+  AssertThrow (out, ExcIO());
+
+  if (piece_names.size() == 0)
+    return;
+
+  const double nblocks = piece_names[0].size();
+  Assert(nblocks > 0, ExcMessage("piece_names should be a vector of nonempty vectors.") )
+
+  out << "!NBLOCKS " << nblocks << '\n';
+  for (std::vector<std::vector<std::string> >::const_iterator domain = piece_names.begin(); domain != piece_names.end(); ++domain)
+  {
+    Assert(domain->size() == nblocks, ExcMessage("piece_names should be a vector of equal sized vectors.") )
+    for (std::vector<std::string>::const_iterator subdomain = domain->begin(); subdomain != domain->end(); ++subdomain)
+      out << *subdomain << '\n';
+  }
+
+  out << std::flush;
+}
+
+
+
+template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
 write_deal_II_intermediate (std::ostream &out) const
 {

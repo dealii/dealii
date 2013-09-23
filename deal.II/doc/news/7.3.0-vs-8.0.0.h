@@ -149,7 +149,7 @@ this function.
     <li>We no longer link with different versions of the p4est library
         in debug and optimized mode. Rather, we now link with the same
 	library in both modes. The p4est installation instructions have
-	been updated. <blink>TODO TODO TODO</blink>
+	been updated.
   </ul>
   <br>
   (Matthias Maier, 2013/03/07)

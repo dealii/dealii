@@ -103,7 +103,7 @@ ADD_CUSTOM_COMMAND(
     images
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${_doxygen_input}
-  COMMENT "Generating documentation via doxygen (This may take a _really_ long time)"
+  COMMENT "Generating documentation via doxygen. This may take a _really_ long time..."
   VERBATIM
   )
 ADD_CUSTOM_TARGET(doxygen ALL
