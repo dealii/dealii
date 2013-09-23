@@ -114,10 +114,8 @@ namespace Step42
     class Input
     {
       public:
-        Input (
-            const char* _name)
+        Input (const std::string &name)
             :
-                name(_name),
                 mpi_communicator(MPI_COMM_WORLD),
                 pcout(std::cout,
                     (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
@@ -135,15 +133,13 @@ namespace Step42
             int i, int j);
 
         double
-        obstacle_function (
-            double x, double y);
+        obstacle_function (const double x,
+        		            const double y);
 
         void
-        read_obstacle (
-            const char* name);
+        read_obstacle (const std::string name);
 
       private:
-        const char* name;
         MPI_Comm mpi_communicator;
         ConditionalOStream pcout;
         std::vector<double> obstacle_data;
@@ -155,8 +151,8 @@ namespace Step42
 // to provide the proper value of the obstacle.
   template <int dim>
     double
-    Input<dim>::hv (
-        int i, int j)
+    Input<dim>::hv (const int i,
+    		        const int j)
     {
       assert(i >= 0 && i < nx);
       assert(j >= 0 && j < ny);
@@ -167,8 +163,8 @@ namespace Step42
 // value in the point (x,y).
   template <int dim>
     double
-    Input<dim>::obstacle_function (
-        double x, double y)
+    Input<dim>::obstacle_function (const double x,
+    		                       const double y)
     {
       int ix = (int) (x / hx);
       int iy = (int) (y / hy);
@@ -240,10 +236,9 @@ namespace Step42
 // obstacle_data. It will be used only in run ().
   template <int dim>
     void
-    Input<dim>::read_obstacle (
-        const char* name)
+    Input<dim>::read_obstacle (const std::string name)
     {
-      std::ifstream f(name);
+      std::ifstream f(name.c_str());
 
       std::string temp;
       f >> temp >> nx >> ny;
