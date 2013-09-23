@@ -367,16 +367,16 @@ last 4 or 5 Newton iterations.
 <table align="center">
   <tr>
     <td>
-    @image html step-42-CellConstitutionColorbar.png
+    @image html step-42.CellConstitutionColorbar.png
     </td>
     <td>
-    @image html step-42-CellConstitutionBall2.png
+    @image html step-42.CellConstitutionBall2.png
     </td>
     <td valign="top">
       &nbsp;
     </td>
     <td>
-    @image html step-42-CellConstitutionLi2.png
+    @image html step-42.CellConstitutionLi2.png
     </td>
   </tr>
 </table>

@@ -29,7 +29,7 @@ solution will look like (the deformable body is a cube - only half of
 which is actually shown -, the obstacle corresponds 
 to a Chinese character that is discussed below):
 
-@image html step-42-CellConstitutionLi2.png
+@image html step-42.CellConstitutionLi2.png
 
 
 This problem description implies that we have to take care of an additional
@@ -373,7 +373,8 @@ and <code>Input</code> is responsible for the parameters that describe
 the overall setup. In particular, the latter
 class allows us to read in an obstacle from a file. In the example we
 will show in the results section, this file will be
-'obstacle_file.dat' and will correspond to data that shows the Chinese, Japanese or
+<code>'obstacle_file.dat'</code> and will correspond to data that shows the
+Chinese, Japanese or
 Korean symbol for force or power (see http://www.orientaloutpost.com/ :
 "This word can be used for motivation - it
 can also mean power/motion/propulsion/force. It can be anything
@@ -383,5 +384,8 @@ for motivation. This is a word in Japanese and Korean, but it means "motive
 power" or "kinetic energy" (without the motivation meaning that you are
 probably looking for)"). In essence, we will pretend that we have a stamp
 (i.e., a mask that corresponds to a flat bottomed obstacle with no pieces
-of intermediate height) that we press into the body - see the picture at
-the top of this section.
+of intermediate height) that we press into the body. The symbol in question
+looks as follows (see also the picture at
+the top of this section on how the end result looks like):
+
+@image html step-42.symbol.png
