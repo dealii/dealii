@@ -85,37 +85,25 @@ namespace Step42
 
 // @sect3{The <code>Input</code> class template}
 
-// This class has the the only purpose
-// to read in data from a picture file
-// stored in pbm ascii
-// format. This data will be bilinearly
-// interpolated and provides in this way
-// a function which describes an obstacle.
+// This class has the the only purpose to read in data from a picture file
+// stored in pbm ascii format. This data will be bilinearly interpolated and
+// provides in this way a function which describes an obstacle.
 //
-// The data which we read in by the
-// function read_obstacle () from the file
-// will be stored
-// in a double std::vector named
-// obstacle_data.
-// This vector composes the base
-// to calculate a piecewise bilinear
-// function as a polynomial interpolation.
-// This will be done by obstacle_function ().
+// The data which we read from the file will be stored in a double std::vector
+// named obstacle_data.  This vector composes the base to calculate a
+// piecewise bilinear function as a polynomial interpolation.  This will be
+// done by obstacle_function ().
 //
-// In the function run () of the class
-// <code>PlasticityContactProblem</code> we create
-// an object of the this class which will
-// be used in the class Obstacle to
-// supply the obstacle function in
-// update_solution_and_constraints () of
-// the class PlasticityContactProblem.
+// In the function <code>run()</code> of the class
+// <code>PlasticityContactProblem</code> we create an object of the this class
+// which will be used in the class Obstacle to supply the obstacle function in
+// <code>update_solution_and_constraints()</code> of the class
+// <code>PlasticityContactProblem</code>.
 //
-// The <code>hx,hy</code> variables denote the spacing between
-// pixels in $x$ and $y$ directions. <code>nx,ny</code> are
-// the numbers of pixels in each of these directions.
-// <code>get_value()</code> returns the value of the
-// image at a given location, interpolated from the adjacent
-// pixel values.
+// The <code>hx,hy</code> variables denote the spacing between pixels in $x$
+// and $y$ directions. <code>nx,ny</code> are the numbers of pixels in each of
+// these directions.  <code>get_value()</code> returns the value of the image
+// at a given location, interpolated from the adjacent pixel values.
   template <int dim>
   class Input
   {
@@ -128,8 +116,8 @@ namespace Step42
 
   private:
     std::vector<double> obstacle_data;
-    double hx, hy;
-    int nx, ny;
+    double              hx, hy;
+    int                 nx, ny;
 
     double get_pixel_value (const int i,
                             const int j);
@@ -236,22 +224,35 @@ namespace Step42
 
 // @sect3{The <code>ConstitutiveLaw</code> class template}
 
-// This class provides an interface
-// for a constitutive law, i.e., for the relationship between strain
-// $\varepsilon(\mathbf u)$ and stress $\sigma$. In this
-// example we are using an elastoplastic
-// material behavior with linear,
-// isotropic hardening.
-// For $\gamma = 0$ we obtain perfect elastoplastic
-// behavior.
+// This class provides an interface for a constitutive law, i.e., for the
+// relationship between strain $\varepsilon(\mathbf u)$ and stress
+// $\sigma$. In this example we are using an elastoplastic material behavior
+// with linear, isotropic hardening. Such materials are characterized by
+// Young's modulus $E$, Poisson's ratio $\nu$, the initial yield stress
+// $\sigma_0$ and the isotropic hardening parameter $\gamma$.  For $\gamma =
+// 0$ we obtain perfect elastoplastic behavior.
+//
+// As explained in the paper that describes this program, the first Newton
+// steps are solved with a completely elastic material model to avoid having
+// to deal with both nonlinearities (plasticity and contact) at once. To this
+// end, this class has a function <code>set_sigma_0()</code> that we use later
+// on to simply set $\sigma_0$ to a very large value -- essentially
+// guaranteeing that the actual stress will not exceed it, and thereby
+// producing an elastic material. When we are ready to use a plastic model, we
+// set $\sigma_0$ back to its proper value, using the same function.  As a
+// result of this approach, we need to leave <code>sigma_0</code> as the only
+// non-const member variable of this class.
   template <int dim>
   class ConstitutiveLaw
   {
   public:
-    ConstitutiveLaw (const double _E,
-                     const double _nu,
-                     const double _sigma_0,
-                     const double _gamma);
+    ConstitutiveLaw (const double E,
+                     const double nu,
+                     const double sigma_0,
+                     const double gamma);
+
+    void
+    set_sigma_0 (double sigma_zero);
 
     bool
     get_stress_strain_tensor (const SymmetricTensor<2, dim> &strain_tensor,
@@ -262,17 +263,11 @@ namespace Step42
                                           SymmetricTensor<4, dim> &stress_strain_tensor_linearized,
                                           SymmetricTensor<4, dim> &stress_strain_tensor) const;
 
-    void
-    set_sigma_0 (double sigma_zero)
-    {
-      sigma_0 = sigma_zero;
-    }
-
   private:
-    double       sigma_0;
-    const double gamma;
     const double kappa;
     const double mu;
+    double       sigma_0;
+    const double gamma;
 
     const SymmetricTensor<4, dim> stress_strain_tensor_kappa;
     const SymmetricTensor<4, dim> stress_strain_tensor_mu;
@@ -293,10 +288,10 @@ namespace Step42
                                          double sigma_0,
                                          double gamma)
     :
-    sigma_0(sigma_0),
-    gamma(gamma),
     kappa (E / (3 * (1 - 2 * nu))),
     mu (E / (2 * (1 + nu))),
+    sigma_0(sigma_0),
+    gamma(gamma),
     stress_strain_tensor_kappa (kappa
                                 * outer_product(unit_symmetric_tensor<dim>(),
                                                 unit_symmetric_tensor<dim>())),
@@ -305,6 +300,14 @@ namespace Step42
                                 - outer_product(unit_symmetric_tensor<dim>(),
                                                 unit_symmetric_tensor<dim>()) / 3.0))
   {}
+
+
+  template <int dim>
+  void
+  ConstitutiveLaw<dim>::set_sigma_0 (double sigma_zero)
+  {
+    sigma_0 = sigma_zero;
+  }
 
 
 // @sect4{ConstitutiveLaw::get_stress_strain_tensor}
