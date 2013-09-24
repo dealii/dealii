@@ -3511,6 +3511,18 @@ namespace parallel
                        /* user_data_size = */ 0,
                        /* user_data_constructor = */ NULL,
                        /* user_pointer */ this);
+
+
+      try
+      {
+        copy_local_forest_to_triangulation ();
+      }
+      catch (const typename Triangulation<dim>::DistortedCellList &)
+      {
+        // the underlying triangulation should not be checking for distorted
+        // cells
+        AssertThrow (false, ExcInternalError());
+      }
       
       #else
       Assert(false, ExcMessage ("Need p4est version >= 0.3.4.1!"));
