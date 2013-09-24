@@ -47,7 +47,7 @@ plot_diff(const Vector<double> &v1, const Vector<double> &v2, const Tensor<1,2> 
   double p1 = v1(0)*n[1] - v1(1)*n[0];
   double p2 = v2(0)*n[1] - v2(1)*n[0];
 
-  deallog << " tangential  diff " << p1-p2 << " (" << p1 << '-' << p2 << ')' << std::endl;
+  deallog << " tangential  diff " << p1-p2 << " (" << p1 << " - " << p2 << ')' << std::endl;
 }
 
 
@@ -67,7 +67,7 @@ plot_diff(const Vector<double> &v1, const Vector<double> &v2, const Tensor<1,3> 
       p2[d] = v2(d1)*n[d2] - v2(d2)*n[d1];
     }
 
-  deallog << " tangential  diff " << p1-p2 << " (" << p1 << '-' << p2 << ')' << std::endl;
+  deallog << " tangential  diff " << p1-p2 << " (" << p1 << " - " << p2 << ')' << std::endl;
 }
 
 
