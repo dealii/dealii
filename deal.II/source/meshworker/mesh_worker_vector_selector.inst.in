@@ -29,6 +29,8 @@ for (VECTOR : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
   namespace MeshWorker
   \{
     template class VectorData<VECTOR,deal_II_dimension>;
+    template class VectorData<const VECTOR,deal_II_dimension>;
     template class MGVectorData<VECTOR,deal_II_dimension>;
+    template class MGVectorData<const VECTOR,deal_II_dimension>;
   \}
 }
