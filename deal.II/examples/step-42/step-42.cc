@@ -222,26 +222,26 @@ namespace Step42
   }
 
 
-// @sect3{The <code>ConstitutiveLaw</code> class template}
+  // @sect3{The <code>ConstitutiveLaw</code> class template}
 
-// This class provides an interface for a constitutive law, i.e., for the
-// relationship between strain $\varepsilon(\mathbf u)$ and stress
-// $\sigma$. In this example we are using an elastoplastic material behavior
-// with linear, isotropic hardening. Such materials are characterized by
-// Young's modulus $E$, Poisson's ratio $\nu$, the initial yield stress
-// $\sigma_0$ and the isotropic hardening parameter $\gamma$.  For $\gamma =
-// 0$ we obtain perfect elastoplastic behavior.
-//
-// As explained in the paper that describes this program, the first Newton
-// steps are solved with a completely elastic material model to avoid having
-// to deal with both nonlinearities (plasticity and contact) at once. To this
-// end, this class has a function <code>set_sigma_0()</code> that we use later
-// on to simply set $\sigma_0$ to a very large value -- essentially
-// guaranteeing that the actual stress will not exceed it, and thereby
-// producing an elastic material. When we are ready to use a plastic model, we
-// set $\sigma_0$ back to its proper value, using the same function.  As a
-// result of this approach, we need to leave <code>sigma_0</code> as the only
-// non-const member variable of this class.
+  // This class provides an interface for a constitutive law, i.e., for the
+  // relationship between strain $\varepsilon(\mathbf u)$ and stress
+  // $\sigma$. In this example we are using an elastoplastic material behavior
+  // with linear, isotropic hardening. Such materials are characterized by
+  // Young's modulus $E$, Poisson's ratio $\nu$, the initial yield stress
+  // $\sigma_0$ and the isotropic hardening parameter $\gamma$.  For $\gamma =
+  // 0$ we obtain perfect elastoplastic behavior.
+  //
+  // As explained in the paper that describes this program, the first Newton
+  // steps are solved with a completely elastic material model to avoid having
+  // to deal with both nonlinearities (plasticity and contact) at once. To this
+  // end, this class has a function <code>set_sigma_0()</code> that we use later
+  // on to simply set $\sigma_0$ to a very large value -- essentially
+  // guaranteeing that the actual stress will not exceed it, and thereby
+  // producing an elastic material. When we are ready to use a plastic model, we
+  // set $\sigma_0$ back to its proper value, using the same function.  As a
+  // result of this approach, we need to leave <code>sigma_0</code> as the only
+  // non-const member variable of this class.
   template <int dim>
   class ConstitutiveLaw
   {
@@ -273,15 +273,19 @@ namespace Step42
     const SymmetricTensor<4, dim> stress_strain_tensor_mu;
   };
 
-// The constructor of the ConstitutiveLaw class sets the
-// required material parameter for our deformable body. Material
-// parameters for elastic isotropic media can be defined in a
-// variety of ways, such as the pair $E, \nu$ (elastic modulus and
-// Poisson's number), using the Lame parameters $\lambda,mu$ or
-// several other commonly used conventions. Here, the constructor takes a description of material parameters in the form of $E,\nu$, but since this turns out to these are not the coefficients that appear in the equations of the plastic projector, we immediately convert them into the more suitable set $\kappa,\mu$ of bulk and shear moduli.
-// In addition, the constructor takes $\sigma_0$ (the yield stress absent any plastic strain) and
-// $\gamma$ (the hardening parameter) as arguments. In this constructor, we also compute the two principal components of the
-// stress-strain relation and its linearization.
+  // The constructor of the ConstitutiveLaw class sets the required material
+  // parameter for our deformable body. Material parameters for elastic
+  // isotropic media can be defined in a variety of ways, such as the pair $E,
+  // \nu$ (elastic modulus and Poisson's number), using the Lame parameters
+  // $\lambda,mu$ or several other commonly used conventions. Here, the
+  // constructor takes a description of material parameters in the form of
+  // $E,\nu$, but since this turns out to these are not the coefficients that
+  // appear in the equations of the plastic projector, we immediately convert
+  // them into the more suitable set $\kappa,\mu$ of bulk and shear moduli.  In
+  // addition, the constructor takes $\sigma_0$ (the yield stress absent any
+  // plastic strain) and $\gamma$ (the hardening parameter) as arguments. In
+  // this constructor, we also compute the two principal components of the
+  // stress-strain relation and its linearization.
   template <int dim>
   ConstitutiveLaw<dim>::ConstitutiveLaw (double E,
                                          double nu,
@@ -310,19 +314,18 @@ namespace Step42
   }
 
 
-// @sect4{ConstitutiveLaw::get_stress_strain_tensor}
+  // @sect4{ConstitutiveLaw::get_stress_strain_tensor}
 
-// This is the principal component of the constitutive law. It projects the
-// deviatoric part of the stresses in a quadrature point back to
-// the yield stress (i.e., the original yield stress $\sigma_0$ plus
-// the term that describes linear isotropic hardening).
-// We need this function to calculate the nonlinear
-// residual in
-// PlasticityContactProblem::residual_nl_system(TrilinosWrappers::MPI::Vector &u).
-//
-// The function returns whether the quadrature point is plastic to allow for
-// some statistics downstream on how many of the quadrature points are
-// plastic and how many are elastic.
+  // This is the principal component of the constitutive law. It projects the
+  // deviatoric part of the stresses in a quadrature point back to the yield
+  // stress (i.e., the original yield stress $\sigma_0$ plus the term that
+  // describes linear isotropic hardening).  We need this function to calculate
+  // the nonlinear residual in PlasticityContactProblem::residual_nl_system. The
+  // computations follow the formulas laid out in the introduction.
+  //
+  // The function returns whether the quadrature point is plastic to allow for
+  // some statistics downstream on how many of the quadrature points are
+  // plastic and how many are elastic.
   template <int dim>
   bool
   ConstitutiveLaw<dim>::
@@ -351,18 +354,17 @@ namespace Step42
   }
 
 
-// @sect4{ConstitutiveLaw::get_linearized_stress_strain_tensors}
+  // @sect4{ConstitutiveLaw::get_linearized_stress_strain_tensors}
 
-// This function returns the linearized stress strain tensor, linearized
-// around the solution $u^{i-1}$ of the previous Newton step $i-1$.
-// The parameter <code>strain_tensor</code> (commonly denoted $\varepsilon(u^{i-1})$) must be passed as an argument,
-// and serves as the linearization point. The function returns the derivative of the nonlinear
-// constitutive law in
-// the variable stress_strain_tensor, as well as
-// the stress-strain tensor of the linearized problem in stress_strain_tensor_linearized.
-// See
-// PlasticityContactProblem::assemble_nl_system(TrilinosWrappers::MPI::Vector &u)
-// where this function is used.
+  // This function returns the linearized stress strain tensor, linearized
+  // around the solution $u^{i-1}$ of the previous Newton step $i-1$.  The
+  // parameter <code>strain_tensor</code> (commonly denoted
+  // $\varepsilon(u^{i-1})$) must be passed as an argument, and serves as the
+  // linearization point. The function returns the derivative of the nonlinear
+  // constitutive law in the variable stress_strain_tensor, as well as the
+  // stress-strain tensor of the linearized problem in
+  // stress_strain_tensor_linearized.  See
+  // PlasticityContactProblem::assemble_nl_system where this function is used.
   template <int dim>
   void
   ConstitutiveLaw<dim>::
@@ -397,7 +399,7 @@ namespace Step42
     stress_strain_tensor_linearized += stress_strain_tensor_kappa;
   }
 
-  // <h3>Equation data: right hand side and boundary values</h3>
+  // <h3>Equation data: right hand side, boundary values, obstacles</h3>
   //
   // The following should be relatively standard. We need classes for
   // the right hand side forcing term (which we here choose to be zero)
@@ -485,34 +487,33 @@ namespace Step42
         values(c) = BoundaryValues<dim>::value(p, c);
     }
 
-// This function is obviously implemented to
-// define the obstacle that penetrates our deformable
-// body. You can choose between two ways to define
-// your obstacle: to read it from a file or to use
-// a function (here a ball).
-// z_max_domain is the z value of the surface of the work piece
+    // This function is obviously implemented to
+    // define the obstacle that penetrates our deformable
+    // body. You can choose between two ways to define
+    // your obstacle: to read it from a file or to use
+    // a function (here a ball).
+    // z_max_domain is the z value of the surface of the work piece
     template <int dim>
     class Obstacle : public Function<dim>
     {
     public:
-      Obstacle (
-        std_cxx1x::shared_ptr<Input<dim> > const &_input,
-        bool _use_read_obstacle, double z_max_domain)
+      Obstacle (const std_cxx1x::shared_ptr<Input<dim> > &input,
+                const bool use_read_obstacle,
+                const double z_max_domain)
         :
         Function<dim>(dim),
-        input_obstacle(_input),
-        use_read_obstacle(_use_read_obstacle),
+        input_obstacle(input),
+        use_read_obstacle(use_read_obstacle),
         z_max_domain(z_max_domain)
-      {
-      }
+      {}
 
-      virtual double
-      value (
-        const Point<dim> &p, const unsigned int component = 0) const;
+      virtual
+      double value (const Point<dim> &p,
+                    const unsigned int component = 0) const;
 
-      virtual void
-      vector_value (
-        const Point<dim> &p, Vector<double> &values) const;
+      virtual
+      void vector_value (const Point<dim> &p,
+                         Vector<double> &values) const;
 
     private:
       const std_cxx1x::shared_ptr<Input<dim> > &input_obstacle;
@@ -520,10 +521,11 @@ namespace Step42
       double z_max_domain;
     };
 
+
     template <int dim>
     double
-    Obstacle<dim>::value (
-      const Point<dim> &p, const unsigned int component) const
+    Obstacle<dim>::value (const Point<dim> &p,
+                          const unsigned int component) const
     {
       if (component == 0)
         return p(0);
@@ -542,85 +544,61 @@ namespace Step42
       else
         {
           //sphere:
-          return -std::sqrt(
-                   0.36 - (p(0) - 0.5) * (p(0) - 0.5)
-                   - (p(1) - 0.5) * (p(1) - 0.5)) + z_max_domain + 0.59;
+          return -std::sqrt(0.36 - (p(0) - 0.5) * (p(0) - 0.5)
+                            - (p(1) - 0.5) * (p(1) - 0.5)) + z_max_domain + 0.59;
         }
     }
 
     template <int dim>
     void
-    Obstacle<dim>::vector_value (
-      const Point<dim> &p, Vector<double> &values) const
+    Obstacle<dim>::vector_value (const Point<dim> &p,
+                                 Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = Obstacle<dim>::value(p, c);
     }
   }
 
-// @sect3{The <code>PlasticityContactProblem</code> class template}
+  // @sect3{The <code>PlasticityContactProblem</code> class template}
 
-// This class supplies all function
-// and variables needed to describe
-// the nonlinear contact problem. It is
-// close to step-41 but with some additional
-// features like: handling hanging nodes,
-// a newton method, using Trilinos and p4est
-// for parallel distributed computing.
-// To deal with hanging nodes makes
-// life a bit more complicated since
-// we need an other ConstraintMatrix now.
-// We create a newton method for the
-// active set method for the contact
-// situation and to handle the nonlinear
-// operator for the constitutive law.
-
+  // This class supplies all function
+  // and variables needed to describe
+  // the nonlinear contact problem. It is
+  // close to step-41 but with some additional
+  // features like: handling hanging nodes,
+  // a newton method, using Trilinos and p4est
+  // for parallel distributed computing.
+  // To deal with hanging nodes makes
+  // life a bit more complicated since
+  // we need an other ConstraintMatrix now.
+  // We create a newton method for the
+  // active set method for the contact
+  // situation and to handle the nonlinear
+  // operator for the constitutive law.
   template <int dim>
   class PlasticityContactProblem
   {
   public:
-    PlasticityContactProblem (
-      const ParameterHandler &prm);
-    void
-    run ();
+    PlasticityContactProblem (const ParameterHandler &prm);
 
-    static void
-    declare (
-      ParameterHandler &prm);
+    void run ();
+
+    static void declare (ParameterHandler &prm);
 
   private:
-    void
-    make_grid ();
-    void
-    setup_system ();
-    void
-    assemble_nl_system (
-      TrilinosWrappers::MPI::Vector &u);
-    void
-    residual_nl_system (
-      TrilinosWrappers::MPI::Vector &u);
-    void
-    assemble_mass_matrix_diagonal (
-      TrilinosWrappers::SparseMatrix &mass_matrix);
-    void
-    update_solution_and_constraints ();
-    void
-    dirichlet_constraints ();
-    void
-    solve ();
-    void
-    solve_newton ();
-    void
-    refine_grid ();
-    void
-    move_mesh (
-      const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
-    void
-    output_results (
-      const std::string &title);
-    void
-    output_contact_force (
-      const unsigned int cycle);
+    void make_grid ();
+    void setup_system ();
+    void assemble_nl_system (TrilinosWrappers::MPI::Vector &u);
+    void residual_nl_system (TrilinosWrappers::MPI::Vector &u);
+    void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
+    void update_solution_and_constraints ();
+    void dirichlet_constraints ();
+    void solve ();
+    void solve_newton ();
+    void refine_grid ();
+    void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
+    void output_results (const std::string &title);
+    void output_contact_force (const unsigned int cycle);
 
     double to_refine_factor;
     double to_coarsen_factor;
@@ -670,7 +648,7 @@ namespace Step42
 
     double sigma_0; // Yield stress
     double gamma; // Parameter for the linear isotropic hardening
-    double e_modul; // E-Modul
+    double e_modulus; // E-Modul
     double nu; // Poisson ratio
 
     TimerOutput computing_timer;
@@ -713,13 +691,13 @@ namespace Step42
           (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
     sigma_0(400.0),
     gamma(0.01),
-    e_modul(2.0e+5),
+    e_modulus(2.0e+5),
     nu(0.3),
     computing_timer(MPI_COMM_WORLD, pcout, TimerOutput::never,
                     TimerOutput::wall_times)
   {
     // double _E, double _nu, double _sigma_0, double _gamma
-    plast_lin_hard.reset(new ConstitutiveLaw<dim>(e_modul, nu, sigma_0, gamma));
+    plast_lin_hard.reset(new ConstitutiveLaw<dim>(e_modulus, nu, sigma_0, gamma));
 
     degree = prm.get_integer("polynomial degree");
     n_initial_refinements = prm.get_integer("number of initial refinements");
@@ -1281,7 +1259,7 @@ namespace Step42
     active_set.clear();
     IndexSet active_set_locally_owned;
     active_set_locally_owned.set_size(locally_owned_dofs.size());
-    const double c = 100.0 * e_modul;
+    const double c = 100.0 * e_modulus;
 
     Quadrature<dim - 1> face_quadrature(fe.get_unit_face_support_points());
     FEFaceValues<dim> fe_values_face(fe, face_quadrature,
