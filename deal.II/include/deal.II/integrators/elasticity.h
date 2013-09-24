@@ -215,6 +215,60 @@ namespace LocalIntegrators
     }
 
     /**
+     * Homogeneous weak boundary condition for the elasticity operator by Nitsche,
+     * namely on the face <i>F</i> the vector
+     * @f[
+     * \int_F \Bigl(\gamma u \cdot v - n^T \epsilon(u) v - u \epsilon(v) n^T\Bigr)\;ds.
+     * @f]
+     *
+     * Here, <i>u</i> is the finite element function whose values and
+     * gradient are given in the arguments <tt>input</tt> and
+     * <tt>Dinput</tt>, respectively. $n$ is the outer
+     * normal vector and $\gamma$ is the usual penalty parameter.
+     *
+     * @author Guido Kanschat
+     * @date 2013
+     */
+    template <int dim, typename number>
+    void nitsche_residual_homogeneous (
+      Vector<number> &result,
+      const FEValuesBase<dim> &fe,
+      const VectorSlice<const std::vector<std::vector<double> > > &input,
+      const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &Dinput,
+      double penalty,
+      double factor = 1.)
+    {
+      const unsigned int n_dofs = fe.dofs_per_cell;
+      AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
+      AssertVectorVectorDimension(Dinput, dim, fe.n_quadrature_points);
+
+      for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
+        {
+          const double dx = factor * fe.JxW(k);
+          const Point<dim> &n = fe.normal_vector(k);
+          for (unsigned int i=0; i<n_dofs; ++i)
+            for (unsigned int d1=0; d1<dim; ++d1)
+              {
+                const double u= input[d1][k];
+                const double v= fe.shape_value_component(i,k,d1);
+                result(i) += dx + 2.*penalty * u * v;
+
+                for (unsigned int d2=0; d2<dim; ++d2)
+                  {
+                    // v . nabla u n
+                    result(i) -= .5*dx* v * Dinput[d1][k][d2] * n(d2);
+                    // v . (nabla u)^T n
+                    result(i) -= .5*dx* v * Dinput[d2][k][d1] * n(d2);
+                    // u  nabla v n
+                    result(i) -= .5*dx * u * fe.shape_grad_component(i,k,d1)[d2] * n(d2);
+                    // u  (nabla v)^T n
+                    result(i) -= .5*dx * u * fe.shape_grad_component(i,k,d2)[d1] * n(d2);
+                  }
+              }
+        }
+    }
+
+    /**
      * The interior penalty flux
      * for symmetric gradients.
      */
