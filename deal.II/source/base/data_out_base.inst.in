@@ -31,5 +31,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
   std::istream &
   operator >> (std::istream                     &in,
                DataOutBase::Patch<deal_II_dimension, deal_II_space_dimension> &patch);
+
+  template
+  void
+  DataOutBase::write_vtu (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+                        const std::vector<std::string>          &data_names,
+                        const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                        const VtkFlags                          &flags,
+                        std::ostream                            &out);
 #endif
 }
