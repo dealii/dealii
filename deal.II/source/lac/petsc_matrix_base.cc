@@ -358,13 +358,16 @@ namespace PETScWrappers
     ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
     AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
-    // then restore the matrix and return the
-    // number of columns in this row as
-    // queried previously
+    // then restore the matrix and return the number of columns in this row as
+    // queried previously. Starting with PETSc 3.4, MatRestoreRow actually
+    // resets the last three arguments to zero/NULL, to avoid abuse of pointers
+    // now dangling. as a consequence, we need to save the size of the array
+    // and return the saved value.
+    const PetscInt ncols_saved = ncols;
     ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);
     AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
-    return ncols;
+    return ncols_saved;
   }
 
 
