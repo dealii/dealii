@@ -46,6 +46,23 @@ div.toc:before {
     font-weight: bold;
 }
 
+div.quick {
+    width: 30%;
+    color: black;
+    border: 1px solid #aaa;
+    background-color: #f9f9f9;
+    padding: 5px;
+    font-size: 88%;
+}
+
+div.quick:before {
+    display: block;
+    content: "Quick links";
+    text-align: center;
+    font-size: 88%;
+    font-weight: bold;
+}
+
 frameset {
 	background-color: white;
 	border-color: black;
