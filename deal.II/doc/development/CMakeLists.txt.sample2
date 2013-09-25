@@ -14,19 +14,6 @@ SET(TARGET_SRC
   # You can specify additional files here!
   )
 
-# Specify a list of files (file globs) that will be removed
-# with the "make runclean" and "make distclean" targets.
-# (If empty, sensible default values will be used.)
-SET(CLEAN_UP_FILES
-  # a custom list of globs, e.g. *.log *.vtk
-  )
-
-# A custom command line that should be invoked by "make run".
-# (If empty, ./${TARGET} will be invoked.)
-SET(TARGET_RUN
-  # a custom command line, e.g. mpirun -np 2 ${TARGET}
-  )
-
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET} CXX)
