@@ -44,7 +44,7 @@ int main ()
   // build up a map of vertex indices
   // of boundary vertices to the new
   // boundary points
-  std::map<types::global_dof_index,Point<dim> > new_points;
+  std::map<unsigned int,Point<dim> > new_points;
 
   Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),
                                            endc=tria.end();
