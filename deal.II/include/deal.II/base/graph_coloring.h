@@ -38,7 +38,7 @@ namespace graph_coloring {
   template <typename Iterator>
   std::vector<std::vector<Iterator> > create_partitioning(Iterator const &begin,
       typename identity<Iterator>::type const &end,
-      std::vector<types::global_dof_index> (*get_conflict_indices) (Iterator &))
+      std::vector<types::global_dof_index> (*get_conflict_indices) (Iterator const&))
   {
     std::vector<std::vector<Iterator> > partitioning(1,std::vector<Iterator> (1,begin));
     // Number of iterators.
@@ -111,7 +111,7 @@ namespace graph_coloring {
    */
   template <typename Iterator>
   std::vector<std::vector<Iterator> > make_dsatur_coloring(std::vector<Iterator> &partition,
-      std::vector<types::global_dof_index> (*get_conflict_indices)(Iterator &))
+      std::vector<types::global_dof_index> (*get_conflict_indices)(Iterator const&))
   {
     std::vector<std::vector<Iterator> > partition_coloring;
     // Number of zones composing the partitioning.
@@ -343,7 +343,7 @@ namespace graph_coloring {
   template <typename Iterator>
   std::vector<std::vector<Iterator> > 
   make_graph_coloring(Iterator const &begin,typename identity<Iterator>::type const &end,
-      std::vector<types::global_dof_index> (*get_conflict_indices)(Iterator &)) 
+      std::vector<types::global_dof_index> (*get_conflict_indices)(Iterator const&)) 
   {
     // Create the partitioning.
     std::vector<std::vector<Iterator> > partitioning = create_partitioning(begin,end,
