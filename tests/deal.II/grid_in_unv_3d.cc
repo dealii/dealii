@@ -47,8 +47,7 @@ void check_file (const std::string name,
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   gi.read(name, format);
-  deallog << name
-          << '\t' << tria.n_vertices()
+  deallog << '\t' << tria.n_vertices()
           << '\t' << tria.n_cells()
           << std::endl;
 

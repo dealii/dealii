@@ -129,8 +129,7 @@ void check_file (const std::string name,
               << std::endl;
     }
 
-  deallog << name
-          << '\t' << tria.n_vertices()
+  deallog << '\t' << tria.n_vertices()
           << '\t' << tria.n_cells()
           << std::endl;
 }

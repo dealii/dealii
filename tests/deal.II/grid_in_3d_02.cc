@@ -47,8 +47,6 @@ void test (const char *filename)
 {
   const unsigned int dim = 3;
 
-  deallog << "Reading " << filename << std::endl;
-
   Triangulation<3> tria;
   GridIn<3> gi;
   gi.attach_triangulation (tria);
@@ -97,6 +95,6 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test ("747.ucd");
+  test (SOURCE_DIR "/grid_in_3d_02/747.ucd");
 }
 
