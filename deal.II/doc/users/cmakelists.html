@@ -26,7 +26,15 @@
     </li>
     <li><a href="#cmakeadvanced">Advanced <code>CMakeLists.txt</code></a>
       <ol>
-	<li> TODO, see list</li>
+        <li><a href="#cmakeadvanced.layout">Source directory layout</a></li>
+        <li><a href="#cmakeadvanced.control">Control statements</a></li>
+        <li><a href="#cmakeadvanced.globs">File globs</a></li>
+        <li><a href="#cmakeadvanced.setup_target"><code>DEAL_II_SETUP_TARGET</code> revisited</a></li>
+        <li><a href="#cmakeadvanced.cached_variables"><code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> revisited</a></li>
+        <li><a href="#cmakeadvanced.properties">Customizing include directories and compile definitions</a></li>
+        <li><a href="#cmakeadvanced.external_libraries">External libraries</a></li>
+        <li><a href="#cmakeadvanced.run">The "run" target revisited</a></li>
+        <li><a href="#cmakeadvanced.install">Install a project</a></li>
       </ol>
     </li>
     <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code></li>
@@ -64,10 +72,8 @@
   full control of what's happening and is easily extensible to more complex
   projects, as exemplified in the subsections here and later in the section
   on <a href="cmakeadvanced">advanced topics</a>. Here is a full example
-  (<a href="CMakeLists.txt.sample3" target="_top">plain text</a>
+  (<a href="CMakeLists.txt.sample" target="_top">plain text</a>
   version):
-
-<p class="todo"> Fix plain text after finalizing!</p>
 
 <pre class="cmake">
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
@@ -107,11 +113,10 @@ DEAL_II_SETUP_TARGET(mycode)
 
 <p>
   After finding the deal.II project, we fetch a set of cached variables
-  with the <code>DEAL_II_INITIALIZE_CACHED_VARIABLES()</code> macro. You
+  with the <a href="#cmakeadvanced.cached_variables">
+  <code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code></a> macro. You
   can inspect these for instance with <code>ccmake</code>.
 </p>
-
-<p class="todo"> link to detailed explanation of the macro below</p>
 
 <p>
   Every <code>CMakeLists.txt</code> must contain a project definition,
@@ -119,14 +124,11 @@ DEAL_II_SETUP_TARGET(mycode)
 </p>
 
 <p>
-  Finally, the last two lines define the executable that is to be
-  produced and its source code. The <code>DEAL_II_SETUP_TARGET</code> macro
-  will set up necessary incllude directories, compile defintions and the
-  link interface.
+  Finally, the last two lines define the executable that is to be produced
+  and its source code. The <a href="#cmakeadvanced.setup_target">
+  <code>DEAL_II_SETUP_TARGET</code></a> macro will set up necessary
+  incllude directories, compile defintions and the link interface.
 </p>
-
-
-<p class="todo"> link to detailed explanation of the macro below</p>
 
 <a name="cmakesimple.multiple"></a>
 <h3>Adding multiple executable targets</h3>
@@ -261,8 +263,102 @@ ADD_CUSTOM_TARGET(run COMMAND mycode
 <a name="cmakeadvanced"></a>
 <h2> Advanced <code>CMakeLists.txt</code></h2>
 
-<p class="todo">This section covers some advanced topics for a user
-<code>CMakeLIists.txt</code> file.</p>
+<p>This section covers some advanced topics for a user
+<code>CMakeLists.txt</code> file.</p>
+
+<a name="cmakeadvanced.layout"></a>
+<h3>Source directory layout</h3>
+
+<p>For complex projects it is desirable to organize source code and header
+files in subdirectories. Assume the following project structure with a
+library "mylib" and an executable "mycode":
+
+<pre class="cmake">
+mylib/source/*.cc
+mylib/include/*.h
+
+mycode/source/*.cc
+mycode/include/*.h
+</pre>
+
+In this case the top level <code>CMakeLists.txt</code> file may be:
+<pre class="cmake">
+# top level CMakeLists.txt
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+FIND_PACKAGE(deal.II 8.0 REQUIRED)
+
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+PROJECT(myproject)
+
+ADD_SUBDIRECTORY(mylib)
+ADD_SUBDIRECTORY(mycode)
+</pre>
+The <code>ADD_SUBDIRECTORY</code> statement will include the CMakeLists.txt
+file in the specified subdirectory. In our case:
+
+<pre class="cmake">
+# mylib/CMakeLists.txt
+
+INCLUDE_DIRECTORIES(include)
+
+ADD_LIBRARY(mylib
+  source/mylib1.cc
+  source/mylib2.cc
+  )
+
+DEAL_II_SETUP_TARGET(mylib)
+</pre>
+
+We have to add the directory <code>include</code> for the header files to
+the current include directories with the <code>INCLUDE_DIRECTORIES</code>
+statement (see <a href="#cmakeadvanced.properties">this section</a> for
+details). The corresponding configuration file for the executable looks
+like:
+
+<pre class="cmake">
+# mycode/CMakeLists.txt
+
+INCLUDE_DIRECTORIES(
+  include
+  ${CMAKE_SOURCE_DIR}/mylib/include
+  )
+
+ADD_EXECUTABLE(mycode source/mycode.cc)
+DEAL_II_SETUP_TARGET(mycode)
+
+TARGET_LINK_LIBRARIES(mycode mylib)
+</pre>
+
+<p>
+Please note that <code>CMakeLists.txt</code> files have directory scope.
+Any manipulation of properties and variables have only effect in the
+current directory (and subdirectories, included with
+<code>ADD_SUBDIRECTORY</code>. The level above will not be affected.
+Therefore, we have to specify the include directories for "mylib" again in
+the subdirectory <code>mycode</code> - this time with full path
+<code>${CMAKE_SOURCE_DIR}/mylib/include</code>.
+</p>
+
+<p>
+CMake defines the following variables for access to important directories:
+
+<pre class="cmake">
+CMAKE_SOURCE_DIR
+  - the source directory (i.e. the directory of the top level
+    CMakeLists.txt file)
+
+CMAKE_BINARY_DIR
+  - the (top level) build directory
+
+CMAKE_CURRENT_SOURCE_DIR
+  - the current source directory, i.e. location of the currently processed
+    CMakeLists.txt file (top level or included via ADD_SUBDIRECTORY)
+
+CMAKE_CURRENT_BINARY_DIR
+  - the build (sub)directory corresponding to CMAKE_CURRENT_SOURCE_DIR
+</pre>
+
+</p>
 
 <a name="cmakeadvanced.control"></a>
 <h3>Control statements</h3>
@@ -289,7 +385,6 @@ behind <code>ELSE()</code> and <code>ENDIF()</code>.
 have a look at the
 <a href="http://cmake.org/cmake/help/v2.8.8/cmake.html">CMake
 documentation</a> for a complete list. Important examples are:
-<p class="todo">Link!</p>
 <pre class="cmake">
 IF(${variable})
   - the body will be evaluated if the variable "variable" is defined and
@@ -360,37 +455,148 @@ source file you have to touch a <code>CMakeLists.txt</code> file or to run
 
 <a name="cmakeadvanced.setup_target"></a>
 <h3><code>DEAL_II_SETUP_TARGET</code> revisited</h3>
-
-<p class="todo"> Well, write this! </p>
+<p>
+The <code>DEAL_II_SETUP_TARGET</code> macro is responsible for setting up a
+target to compile and link against deal.II. It will <i>append</i> the
+<code>INCLUDE_DIRECTORIES</code> property with the location of the deal.II
+include directories, and the compile definitions and linker flags property
+<code>COMPILE_DEFINITIONS</code> and <code>LINK_FLAGS</code> by their
+respective values (depending on build type and available debug and/or
+optimized flavor of the library).
+</p>
+<p>
+Except in the case of an object library, the specified target will be set
+up to link against deal.II (and its transitive link interface) as well.
+</p>
 
 
 <a name="cmakeadvanced.cached_variables"></a>
 <h3><code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> revisited</h3>
 
-<p class="todo"> Well, write this! </p>
+<p>
+The <code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> macro is responsible
+for setting up cached variables and has to invoked before the
+<code>PROJECT</code> call:
+<pre class="cmake">
+FIND_PACKAGE(deal.II 8.0 REQUIRED)
 
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+
+PROJECT(myproject)
+</pre>
+The macro will set an uninitialized <code>CMAKE_BUILD_TYPE</code> variable
+to <code>Debug</code> (or <code>Release</code> if the debug library is not
+available). If <code>CMAKE_BUILD_TYPE</code> is specified it will
+automatically be reset if the given value is unsupported by the deal.II
+installation.
+</p>
+<p>
+Furthermore, this macro sets the C++ compiler and the compile flags to
+default values (the same values that were used to compile deal.II itself).
+These are <code>CMAKE_CXX_COMPILER</code> and <code>CMAKE_CXX_FLAGS</code>,
+as well as - depending on the configuration -
+<code>DEAL_II_FLAGS_DEBUG</code>, or <code>DEAL_II_FLAGS_RELEASE</code>, or
+both.
+</p>
 
 <a name="cmakeadvanced.properties"></a>
 <h3>Customizing include directories and compile definitions</h3>
 
-<p class="todo"> Well, write this! </p>
+<p>
+You can specify custom include directories and compile definitions prior to
+a target definition on a per directory basis (have a look at the <a
+href="http://cmake.org/cmake/help/v2.8.8/cmake.html">CMake
+documentation</a> for further details):
 
+<pre class="cmake">
+INCLUDE_DIRECTORIES(include1 include2)
+
+ADD_DEFINITIONS(-DFOO -DBAR="BAZ")
+
+ADD_EXECUTABLE(...) # or ADD_LIBRARY(...)
+</pre>
+</p>
 
 <a name="cmakeadvanced.external_libraries"></a>
 <h3>External libraries</h3>
 
-<p class="todo"> Well, write this! </p>
+<p>
+For external libraries that provide a CMake project configuration or where
+a CMake find module is available, including this external library in your
+project is more or less straightforward. E.g. to require an external
+project "foo" at least of version 8.0 write:
+<pre class="cmake">
+FIND_PACKAGE(foo 8.0 REQUIRED)
+</pre>
+Alternatively, the version number and <code>REQUIRED</code> keyword can be
+omitted. (Depending on the external library) the project configuration or
+find macro will usually define variables like <code>FOO_INCLUDE_DIRS</code>
+and <code>FOO_LIBRARIES</code> that can be directly used in your
+<code>CMakeLists.txt</code> file:
 
+<pre class="cmake">
+INCLUDE_DIRECTORIES(${FOO_INCLUDE_DIRS})
+
+ADD_EXECUTABLE(mycode mycode.cc)
+DEAL_II_SETUP_TARGET(mycode)
+
+TARGET_LINK_LIBRARIES(mycode ${FOO_LIBRARIES})
+</pre>
+The first statement will set up the include directories for the following
+targets as explained above. The last statement with
+<code>TARGET_LINK_LIBRARIES</code> will <i>add</i> the libraries in the
+<code>FOO_LIBRARIES</code> variable to the link interface of the target
+<code>mycode</code>.
+</p>
 
 <a name="cmakeadvanced.run"></a>
 <h3>The "run" target revisited</h3>
 
-<p class="todo"> Well, write this! </p>
+<p>The simple run statement as explained <a
+href="#cmakesimple.run">above</a> will run the generated executable in the
+build directory. Sometimes it is more desirable to run the executable in a
+dedicated <code>run</code> directory within in the build directory which is
+a copy of a skeleton <code>run</code> folder from the source directory:
 
+<pre class="cmake">
+# Copy folder run from the source to the build directory:
+FILE(COPY ${CMAKE_SOURCE_DIR}/run DESTINATION ${CMAKE_BINARY_DIR})
+
+ADD_EXECUTABLE(mycode mycode.cc)
+SET_PROPERTY(TARGET mycode
+  PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/run
+  )
+ADD_CUSTOM_TARGET(run
+  COMMAND mycode
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/run
+  )
+</pre>
+Here, we modify the <code>RUNTIME_OUTPUT_DIRECTORY</code> property of our
+target so that the executable is linked inside our designated
+<code>run</code> folder, so that it is conveniently available as an
+executable inside the run folder. Furthermore, we specify a
+<code>WORKING_DIRECTORY</code> for the <code>run</code> target, so that
+<code>make run</code> invokes the executable inside the intendet run
+directory.
+</p>
 
 <a name="cmakeadvanced.install"></a>
 <h3>Install a project</h3>
 
+<p>If you want the <code>make install</code> to install your project to
+<code>CMAKE_INSTALL_PREFIX</code> (that may be set on command line or in
+the cache during the configuration stage), add appropriate
+<code>INSTALL</code> statements. To install e.g. a project consisting of a
+library and an executable as well as a run folder:
+
+<pre class="cmake">
+# [...] all the target definitions
+
+INSTALL(TARGETS mylib DESTINATION lib)
+INSTALL(TARGETS mycode DESTINATION bin)
+
+INSTALL(DIRECTORY run DESTINATION share/mycode/run)
+</pre>
 
 <a name="cmakesauto"></a>
 <h2>Autopilot style CMakeLists.txt</h2>
@@ -401,7 +607,7 @@ source file you have to touch a <code>CMakeLists.txt</code> file or to run
   versions, running the code and cleaning, the easiest way to
   write a <code>CMakeLists.txt</code> file may be to use
   an "autopilot" style macro. Here is a minimalistic example for the
-  step-1 tutorial program (<a href="CMakeLists.txt.sample1"
+  step-1 tutorial program (<a href="CMakeLists.txt.sample2"
 			      target="_top">plain text</a> version) that can be used for simple
   projects:
 </p>
@@ -479,7 +685,7 @@ $ cmake .
       There are two additional configuration options (in addition to
       <code>TARGET</code> and <code>TARGET_SRC</code>) that can be set via
       variables before <code>DEAL_II_INVOKE_AUTOPILOT()</code> is called
-      (<a href="CMakeLists.txt.sample2" target="_top">plain text</a> version):
+      (<a href="CMakeLists.txt.sample3" target="_top">plain text</a> version):
 
 <pre class="cmake">
 # (Optional)
@@ -507,12 +713,107 @@ SET(TARGET_RUN
   will set the following variables and macros; all of the form
   <code>DEAL_II_*</code>:
 </p>
-<pre class="todo">  
-A long list with detailed explanation...  
+<pre class="cmake">
+#
+# General package information:
+#
+
+DEAL_II_PACKAGE_NAME
+DEAL_II_PACKAGE_VERSION     - the full package version string, e.g. "8.1.pre"
+DEAL_II_PACKAGE_VENDOR
+DEAL_II_PACKAGE_DESCRIPTION
+
+DEAL_II_VERSION             - version string without suffix, e.g. "8.1"
+DEAL_II_VERSION_MAJOR       - the major number, e.g. "8"
+DEAL_II_VERSION_MINOR       - the minor version number, e.g. "1"
+
+DEAL_II_BUILD_TYPE          - the configured build type, e.g. "DebugRelease"
+DEAL_II_BUILD_TYPES         - an all caps list of available configurations,
+                              e.g. "DEBUG;RELEASE"
+
+#
+# Information about component locations:
+#
+
+DEAL_II_PATH
+DEAL_II_CMAKE_MACROS_RELDIR
+DEAL_II_COMMON_RELDIR
+DEAL_II_DOCREADME_RELDIR
+DEAL_II_DOCHTML_RELDIR
+DEAL_II_EXAMPLES_RELDIR
+DEAL_II_EXECUTABLE_RELDIR
+DEAL_II_INCLUDE_RELDIR
+DEAL_II_LIBRARY_RELDIR
+DEAL_II_PROJECT_CONFIG_RELDIR
+
+DEAL_II_BUILD_DIR             - true if deal.II was picked up from a build
+                                dir, false if the configuration is from an installation
+
+#
+# Compiler and linker configuration
+#
+
+DEAL_II_CXX_COMPILER             - the compiler used to compile deal.II
+
+DEAL_II_CXX_FLAGS                - compile flags for all configurations
+DEAL_II_CXX_FLAGS_DEBUG          - _additional_ compile flags for the debug configuration
+DEAL_II_CXX_FLAGS_RELEASE        - _additional_ compile flags for the release configuration
+
+DEAL_II_LINKER_FLAGS             - link flags for all configurations
+DEAL_II_LINKER_FLAGS_DEBUG       - _additional_ link flags for debug configuration
+DEAL_II_LINKER_FLAGS_RELEASE     - _additional_ link flags for release configuration
+
+DEAL_II_USER_DEFINITIONS         - compile definitions for all configurations
+DEAL_II_USER_DEFINITIONS_DEBUG   - _additional_ compile definitions for debug configuration
+DEAL_II_USER_DEFINITIONS_RELEASE - _additional_ compile definitions for release configuration
+
+DEAL_II_STATIC_EXECUTABLE        - true if the link interface is set up to
+                                   compile resulting executables statically
+
+#
+# Information about include directories and libraries
+#
+
+DEAL_II_INCLUDE_DIRS
+
+DEAL_II_LIBRARIES_DEBUG   - a list of the full link interface for the debug configuration
+DEAL_II_LIBRARIES_RELEASE - a list of the full link interface for the release configuration
+DEAL_II_LIBRARIES         - full list of libraries with "debug" and "optimized" keywords
+
+#
+# Information about library targets
+#
+
+DEAL_II_TARGET_CONFIG  - the target config file
+
+DEAL_II_TARGET_DEBUG   - the name of the debug target that is available after inclusion
+                         of the target config file
+DEAL_II_TARGET_RELEASE - the name of the release target
+DEAL_II_TARGET         - full list of targets with "debug" and "optimized" keywords
+
+#
+# Feature configuration: The following booleans are set to "ON" or "OFF" depending
+# on the current feature configuration:
+#
+
+DEAL_II_WITH_64BIT_INDICES
+DEAL_II_WITH_ARPACK
+DEAL_II_WITH_BOOST
+DEAL_II_WITH_FUNCTIONPARSER
+DEAL_II_WITH_HDF5
+DEAL_II_WITH_LAPACK
+DEAL_II_WITH_METIS
+DEAL_II_WITH_MPI
+DEAL_II_WITH_MUMPS
+DEAL_II_WITH_NETCDF
+DEAL_II_WITH_P4EST
+DEAL_II_WITH_PETSC
+DEAL_II_WITH_SLEPC
+DEAL_II_WITH_THREADS
+DEAL_II_WITH_TRILINOS
+DEAL_II_WITH_UMFPACK
+DEAL_II_WITH_ZLIB
 </pre>
-  
-
-
 
     <a name="legacy"></a>
     <h2> Legacy Make.global_options </h2>
@@ -546,13 +847,17 @@ A long list with detailed explanation...
       <acronym>deal.II</acronym> was installed to).
     </p>
 
-
-
-    <hr>
-
+    <hr />
     <address>
-      <a href="../mail.html" target="body">The deal.II Group</a>
+      <a href="../authors.html" target="body">The deal.II Authors</a>
       $Date$
     </address>
+    <div class="right">
+      <a href="http://validator.w3.org/check?uri=referer" target="_top">
+        <img style="border:0" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"></a>
+      <a href="http://jigsaw.w3.org/css-validator/check/referer" target="_top">
+        <img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!"></a>
+    </div>
+
   </body>
 </html>

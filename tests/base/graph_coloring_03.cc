@@ -34,7 +34,7 @@
 
 template <int dim>
 std::vector<types::global_dof_index> get_conflict_indices_cfem(
-    typename hp::DoFHandler<dim>::active_cell_iterator &it)
+    typename hp::DoFHandler<dim>::active_cell_iterator const &it)
 {
   std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);

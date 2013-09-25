@@ -86,6 +86,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: PetscWrappers::MatrixBase::row_length() no longer worked after recent changes
+  to PETSc (around PETSc release 3.4). This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/09/24)
+  </li>
+
+  <li>
   New: Added write_visit_record that allows writing .visit files with multiple blocks
   and multiple time steps.
   <br>
