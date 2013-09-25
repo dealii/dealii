@@ -1154,7 +1154,8 @@ namespace WorkStream
                           std_cxx1x::_1),
          sample_scratch_data,
          sample_copy_data,
-         get_conflict_indices,
+         std_cxx1x::bind(get_conflict_indices,
+                         std_cxx1x::ref (main_object)),
          queue_length,
          chunk_size);
   }
