@@ -258,6 +258,8 @@ IF(EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
     "^.*CMAKE_CXX_COMPILER:     \(.*\) on platform.*$" "\\1"
     _compiler_id ${_compiler_id}
     )
+  STRING(REGEX REPLACE "^\(.*\) .*$" "\\1" _compiler_name ${_compiler_id})
+  STRING(REGEX REPLACE "^.* " "" _compiler_version ${_compiler_id})
   STRING(REGEX REPLACE " " "-" _compiler_id ${_compiler_id})
   IF( NOT "${_compiler_id}" STREQUAL "" OR
       _compiler_id MATCHES "CMAKE_CXX_COMPILER" )
@@ -266,7 +268,7 @@ IF(EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
 ENDIF()
 
 #
-# Append subversion information to CTEST_BUILD_NAME:
+# Append subversion branch to CTEST_BUILD_NAME:
 #
 
 EXECUTE_PROCESS(
@@ -279,7 +281,7 @@ IF(${_result} EQUAL 0)
   STRING(REGEX REPLACE "^${_svn_WC_ROOT}/" "" _branch ${_svn_WC_URL})
   STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
   STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
-  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}-r${_svn_WC_REVISION}")
+  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}")
 ENDIF()
 
 #
@@ -366,12 +368,38 @@ IF("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
 
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-      --build ${CTEST_BINARY_DIRECTORY} --target setup_test
-      OUTPUT_QUIET
+     --build ${CTEST_BINARY_DIRECTORY} --target setup_test
+      OUTPUT_QUIET RESULT_VARIABLE _res
       )
+    IF(NOT "${_res}" STREQUAL "0")
+      MESSAGE(FATAL_ERROR "\"setup_test\" target exited with an error. Bailing out.")
+    ENDIF()
 
     CTEST_TEST()
   ENDIF()
 ENDIF()
+
+#
+# Inject compiler information and svn revision into xml files:
+#
+
+FILE(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
+SET(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
+IF(NOT EXISTS ${_path})
+  MESSAGE(FATAL_ERROR "Unable to determine test submission files from TAG. Bailing out.")
+ENDIF()
+FILE(GLOB _xml_files ${_path}/*.xml)
+EXECUTE_PROCESS(COMMAND sed -i -e
+  s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"\\n\\tSVNRevision=\"${_svn_WC_REVISION}\"/g
+  ${_xml_files}
+  OUTPUT_QUIET RESULT_VARIABLE  _res
+  )
+IF(NOT "${_res}" STREQUAL "0")
+  MESSAGE(FATAL_ERROR "\"sed\" failed. Bailing out.")
+ENDIF()
+
+#
+# And finally submit:
+#
 
 CTEST_SUBMIT()
