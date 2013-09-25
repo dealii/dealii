@@ -27,7 +27,7 @@ int main()
   getcwd(tmp,1000);
   std::string path(tmp);
   chdir(SOURCE_DIR);
-  std::ofstream logfile(path+"/output");
+  std::ofstream logfile((path+"/output").c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
