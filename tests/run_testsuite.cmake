@@ -211,7 +211,7 @@ SET(CTEST_SITE "${_hostname}")
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
 
 IF( "${TRACK}" STREQUAL "Regression Tests"
-    AND NOT CTEST_SITE MATCHES "foobar" )
+    AND NOT CTEST_SITE MATCHES "c0541" )
   MESSAGE(FATAL_ERROR "
 I'm sorry ${CTEST_SITE}, I'm afraid I can't do that.
 The TRACK \"Regression Tests\" is not for you.
