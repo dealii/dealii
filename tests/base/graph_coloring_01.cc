@@ -58,7 +58,8 @@ void check()
   typename DoFHandler<dim>::active_cell_iterator cell(dof_handler.begin_active());
   std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator> > coloring(
       graph_coloring::make_graph_coloring(cell,dof_handler.end(),
-      get_conflict_indices_cfem<dim>));      
+      std_cxx1x::function<std::vector<types::global_dof_index> (typename 
+        DoFHandler<dim>::active_cell_iterator const &)> (get_conflict_indices_cfem<dim>)));      
 
   // Output the coloring
   for (unsigned int color=0; color<coloring.size(); ++color)

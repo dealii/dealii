@@ -936,7 +936,8 @@ namespace WorkStream
        Copier                                   copier,
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       std::vector<types::global_dof_index> (*get_conflict_indices) (const Iterator &),
+       const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> 
+                                               &get_conflict_indices,
        const unsigned int queue_length = 2*multithread_info.n_default_threads,
        const unsigned int                       chunk_size = 8)
   {
