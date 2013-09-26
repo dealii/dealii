@@ -943,7 +943,7 @@ namespace Step42
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double> cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_indices> local_dof_indices(dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator cell =
       dof_handler.begin_active(), endc = dof_handler.end();
@@ -1069,7 +1069,7 @@ namespace Step42
 
     Vector<double> cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_indices> local_dof_indices(dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const FEValuesExtractors::Vector displacement(0);
 
@@ -1198,7 +1198,7 @@ namespace Step42
     for (unsigned i = 0; i < dim; i++)
       ones[i] = 1.0;
 
-    std::vector<types::global_dof_indices> local_dof_indices(dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const FEValuesExtractors::Vector displacement(0);
 
