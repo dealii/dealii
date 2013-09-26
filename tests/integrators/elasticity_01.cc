@@ -22,7 +22,7 @@
 #include "../lib/test_grids.h"
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/integrators/laplace.h>
+#include <deal.II/integrators/elasticity.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
@@ -31,7 +31,7 @@
 
 #include "tbb/task_scheduler_init.h"
 
-using namespace LocalIntegrators::Laplace;
+using namespace LocalIntegrators::Elasticity;
 
 template <int dim>
 void test_cell(const FEValuesBase<dim> &fev)
@@ -106,13 +106,6 @@ void test_boundary(const FEValuesBase<dim> &fev)
         M.vmult(v,u);
         w.add(-1., v);
         deallog << ' ' << w.l2_norm();
-        if (d==1)
-          {
-            nitsche_residual(w, fev, uval[0], ugrad[0], null_val[0], 17);
-            M.vmult(v,u);
-            w.add(-1., v);
-            deallog << " e" << w.l2_norm();
-          }
       }
     deallog << std::endl;
   }
