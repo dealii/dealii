@@ -221,7 +221,7 @@ void compute_pi_by_perimeter ()
 
 int main ()
 {
-  logfile.precision(2);
+  logfile.precision(6);
 
   deallog.attach(logfile);
   deallog.depth_console(0);
