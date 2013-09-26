@@ -8,6 +8,8 @@ class Group:
         self.n_fail = 0
         self.fail = []
         self.fail_text = {}
+        self.fail_status = {}
+        self.n_status = [0,0,0,0,0]
 
 class Revision:
     def __init__(self):
@@ -42,25 +44,38 @@ def parse_revision(dirname):
     testing = root.find('Testing')
 
     for test in testing.findall("Test"):
-        status = test.attrib['Status']
         fail=False
-        if status=="failed": fail=True
+        if test.attrib['Status']=="failed": fail=True
         name = test.find('Name').text
         group = name.split('/')[0]
+        status = 4
+        if fail:
+            failtext = test.find('Results').find('Measurement').find('Value').text.encode('utf-8')
+            failtextlines = failtext.replace('"','').split('\n')
+            failstatustxt = failtextlines[0].split(' ')[-1]
+            for i in range(0,len(failtextlines)):
+                failtextlines[i] = failtextlines[i][0:80]
+                if failtextlines[i].startswith('FAILED: '): failtextlines[i]='FAILED: ...';
+            failtext = '\n'.join(failtextlines[4:min(25,len(failtext))])
+            statuslist=['CONFIGURE','BUILD','RUN','DIFF']
+            if failstatustxt in statuslist:
+                status = statuslist.index(failstatustxt)
+            else:
+                print "unknown status '%s'"%failstatustxt
+                status=0           
 
         if not group in rev.groups:
             rev.groups[group]= Group(group)
             
         rev.groups[group].n_tests += 1
         rev.n_tests += 1
+        rev.groups[group].n_status[status] += 1
         if fail: 
             rev.groups[group].n_fail += 1
             rev.n_fail += 1
             rev.groups[group].fail.append(name)
-            failtext = test.find('Results').find('Measurement').find('Value').text.encode('utf-8')
-            failtext = failtext.replace('"','').split('\n')
-            failtext = '\n'.join(failtext[4:min(20,len(failtext))])
             rev.groups[group].fail_text[name]=failtext
+            rev.groups[group].fail_status[name]=status
         
     for g in sorted(rev.groups):
         g = rev.groups[g]
@@ -76,6 +91,7 @@ def parse_revision(dirname):
 
 n=glob.glob("*/Build.xml")
 n.sort(reverse=True)
+numberofrevisions=10
 n = n[0:min(10,len(n))]
 
 revs = []
@@ -100,11 +116,47 @@ f.write("""<style type="text/css">
 table {
 border-collapse:collapse;
 }
-table,td,th {
-border:1px solid black; 
-}
 .fail {background-color:red;}
-.togglebody tr {background-color:#eeeeee}
+.togglebody tr {background-color:#CCC}
+.test4 {
+    background-color: #90ff80;
+text-align: right;
+}
+
+.test3 {
+    background-color: #FFFF00;
+text-align: right;
+}
+
+.test2 {
+    background-color: #FFA000;
+text-align: right;
+}
+
+.test1 {
+    background-color: #FF2020;
+text-align: right;
+}
+
+.test0 {
+    background-color: #C030D0;
+text-align: right;
+}
+
+thead{
+border: 2px solid;
+}
+
+.groupALL {
+text-align: center;
+}
+
+.colgroup {
+border: 2px solid;
+}
+
+.onerow {background: #FFE}
+.otherrow {background: #EEE}
 
 </style>""")
 f.write("""<script>
@@ -120,25 +172,46 @@ else
 <body>""")
 f.write('<table>')
 
+f.write('<colgroup span="1" class="colgroup""/>')
+for rev in revs:    
+    f.write('<colgroup span="5" class="colgroup"/>')
+f.write('\n')
+
+
 f.write('<thead><tr>')
 f.write('<th style="width:250px">&nbsp;</th>')
 
 for rev in revs:
-    f.write('<th>r'+rev.number+'</th>')
+    f.write('<th colspan="5">r'+rev.number+'</th>')
 f.write('</tr></thead>\n')
 
 f.write('<tbody><tr>')
 f.write('<td>ALL</td>')
 for rev in revs:
     if (rev.n_fail>0):
-        f.write('<td><span class="fail">' + str(rev.n_fail) + '</span> / ' + str(rev.n_tests) + '</td>')
+        f.write('<td colspan="5" class="groupALL"><span class="fail">' + str(rev.n_fail) + '</span> / ' + str(rev.n_tests) + '</td>')
     else:
-        f.write('<td>' + str(rev.n_fail) + ' / ' + str(rev.n_tests) + '</td>')
+        f.write('<td colspan="5" class="groupALL">' + str(rev.n_fail) + ' / ' + str(rev.n_tests) + '</td>')
 f.write('</tr></tbody>\n')
 
+#second header
+f.write('<tbody><tr style="border-bottom: 2px solid">')
+f.write('<td></td>')
+for rev in revs:
+    for c in range(0,5):
+        
+        titles=['Configure','Build','Run','Diff','Pass']
+        caption=['C','B','R','D','P']
+        f.write('<td title="%s" class="test%d">%s</td>'%(titles[c],c,caption[c]))
+f.write('</tr></tbody>\n')
 
+counter=0
 for group in allgroups:
-    f.write('<tbody><tr>')
+    counter+=1
+    if counter % 2==0:
+        f.write('<tbody class="onerow"><tr>')
+    else:
+        f.write('<tbody class="otherrow"><tr>')
 
     failing = set()
     for rev in revs:
@@ -153,13 +226,15 @@ for group in allgroups:
 
     for rev in revs:
         if group not in rev.groups:
-            f.write('<td>-</td>')
+            for c in range(0,5):
+                f.write('<td></td>')
         else:
             gr = rev.groups[group]
-            if (gr.n_fail>0):
-                f.write('<td><span class="fail">' + str(gr.n_fail) + '</span> / ' + str(gr.n_tests) + '</td>')
-            else:
-                f.write('<td>' + str(gr.n_fail) + ' / ' + str(gr.n_tests) + '</td>')
+            for c in range(0,5):
+                if gr.n_status[c]==0:
+                    f.write('<td></td>')
+                else:
+                    f.write('<td class="test%d">%d</td>'%(c,gr.n_status[c]))
 
     f.write('</tr></tbody>\n')
 
@@ -173,9 +248,16 @@ for group in allgroups:
             f.write('<td>&nbsp;' + name + '</td>')
             for rev in revs:
                 if group in rev.groups and fail in rev.groups[group].fail:
-                    f.write('<td><span class="fail" title="%s">1</span></td>'%rev.groups[group].fail_text[fail])
+                    status=rev.groups[group].fail_status[fail]
+                    text=rev.groups[group].fail_text[fail]
+                    for c in range(0,5):
+                        if c==status:
+                            f.write('<td class="test%d" title="%s">X</td>'%(c,text))
+                        else:
+                            f.write('<td></td>')
+
                 else:
-                    f.write('<td>-</td>')
+                    f.write('<td colspan="5"></td>')
 
             f.write('</tr>\n')
         f.write('</tbody>\n')
