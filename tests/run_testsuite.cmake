@@ -186,17 +186,6 @@ CTEST_CMAKE_GENERATOR was set to a different Generator \"${CTEST_CMAKE_GENERATOR
 ENDIF()
 
 #
-# CTEST_UPDATE_COMMAND:
-#
-
-FIND_PACKAGE(Subversion QUIET)
-IF(SUBVERSION_FOUND)
-  SET(CTEST_UPDATE_COMMAND ${Subversion_SVN_EXECUTABLE})
-ENDIF()
-
-MESSAGE("-- CTEST_UPDATE_COMMAND:   ${CTEST_UPDATE_COMMAND}")
-
-#
 # CTEST_SITE:
 #
 
@@ -270,7 +259,7 @@ ENDIF()
 #
 # Append subversion branch to CTEST_BUILD_NAME:
 #
-
+FIND_PACKAGE(Subversion QUIET)
 EXECUTE_PROCESS(
   COMMAND ${Subversion_SVN_EXECUTABLE} info ${CTEST_SOURCE_DIRECTORY}
   OUTPUT_QUIET ERROR_QUIET
@@ -281,7 +270,7 @@ IF(${_result} EQUAL 0)
   STRING(REGEX REPLACE "^${_svn_WC_ROOT}/" "" _branch ${_svn_WC_URL})
   STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
   STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
-  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}-r${_svn_WC_REVISION}")
+  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}")
 ENDIF()
 
 #
@@ -368,7 +357,7 @@ IF("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
 
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-     --build ${CTEST_BINARY_DIRECTORY} --target setup_test
+      --build ${CTEST_BINARY_DIRECTORY} --target setup_test
       OUTPUT_QUIET RESULT_VARIABLE _res
       )
     IF(NOT "${_res}" STREQUAL "0")
@@ -390,12 +379,26 @@ IF(NOT EXISTS ${_path})
 ENDIF()
 FILE(GLOB _xml_files ${_path}/*.xml)
 EXECUTE_PROCESS(COMMAND sed -i -e
-  s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"\\n\\tSVNBranch=\"${_branch}\"\\n\\tSVNRevision=\"${_svn_WC_REVISION}\"/g
+  s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"/g
   ${_xml_files}
   OUTPUT_QUIET RESULT_VARIABLE  _res
   )
 IF(NOT "${_res}" STREQUAL "0")
   MESSAGE(FATAL_ERROR "\"sed\" failed. Bailing out.")
+ENDIF()
+
+IF(NOT "${_svn_WC_REVISION}" STREQUAL "")
+  FILE(WRITE ${_path}/Update.xml
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Update mode=\"Client\" Generator=\"${CTEST_GENERATOR}\">
+    <Site>${CTEST_SITE}</Site>
+      <BuildName>${CTEST_BUILD_NAME}</BuildName>
+        <BuildStamp>${_tag}-Experimental</BuildStamp>
+	<UpdateType>SVN</UpdateType>
+	<Revision>${_svn_WC_REVISION}</Revision>
+        <SVNPath>${_branch}</SVNPath>
+</Update>"
+    )
 ENDIF()
 
 #
