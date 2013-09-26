@@ -120,10 +120,10 @@ namespace LocalIntegrators
     }
 
     /**
-     * Advection residual operator in weak form
+     * Advection residual operator in strong form
      *
      * \f[
-     * r_i = \int_Z  u\,(\mathbf w \cdot \nabla) v_i \, dx.
+     * r_i = \int_Z  (\mathbf w \cdot \nabla)u\, v_i \, dx.
      * \f]
      */
     template <int dim>
@@ -152,18 +152,18 @@ namespace LocalIntegrators
           const double dx = factor * fe.JxW(k);
           for (unsigned i=0; i<n_dofs; ++i)
             for (unsigned int d=0; d<dim; ++d)
-              result(i) += dx * input[k]
-                           * fe.shape_grad(i,k)[d] * velocity[d][k * v_increment];
+              result(i) += dx * input[k][d]
+                           * fe.shape_value(i,k) * velocity[d][k * v_increment];
         }
     }
 
 
     /**
-     * Vector-valued advection residual operator in weak form
+     * Vector-valued advection residual operator in strong form
      *
      *
      * \f[
-     * r_i = \int_Z  \mathbf u\cdot\bigl((\mathbf w \cdot \nabla) \mathbf v_i\bigr) \, dx.
+     * r_i = \int_Z \bigl((\mathbf w \cdot \nabla) \mathbf u\bigr) \cdot\mathbf v_i \, dx.
      * \f]
      */
     template <int dim>
@@ -195,8 +195,8 @@ namespace LocalIntegrators
           for (unsigned i=0; i<n_dofs; ++i)
             for (unsigned int c=0; c<n_comp; ++c)
               for (unsigned int d=0; d<dim; ++d)
-                result(i) += dx * input[c][k]
-                             * fe.shape_grad_component(i,k,c)[d] * velocity[d][k * v_increment];
+                result(i) += dx * input[c][k][d]
+                             * fe.shape_value_component(i,k,c) * velocity[d][k * v_increment];
         }
     }
 
