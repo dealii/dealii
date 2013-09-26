@@ -357,7 +357,7 @@ ENDIF()
 
 CTEST_START(Experimental TRACK ${TRACK})
 
-CTEST_CONFIGURE(OPTIONS "${_options}" NUMBER_ERRORS _res)
+CTEST_CONFIGURE(OPTIONS "${_options}" RETURN_VALUE _res)
 
 IF("${_res}" STREQUAL "0")
   # Only run the build stage if configure was successful:
