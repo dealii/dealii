@@ -438,14 +438,6 @@ ENDIF()
 # And finally submit:
 #
 
-CTEST_SUBMIT(RETRY_COUNT 2 RETRY_DELAY 30 RETURN_VALUE _res)
-IF("${_res}" STREQUAL "0")
-  MESSAGE("-- Test submission successful.")
-ELSE()
-  MESSAGE(FATAL_ERROR "
-Test submission failed.
-"
-    )
-ENDIF()
+CTEST_SUBMIT()
 
-# .oO( This script is freaky 451 lines long... )
+# .oO( This script is freaky 443 lines long... )
