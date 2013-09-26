@@ -281,7 +281,7 @@ IF(${_result} EQUAL 0)
   STRING(REGEX REPLACE "^${_svn_WC_ROOT}/" "" _branch ${_svn_WC_URL})
   STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
   STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
-  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}")
+  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}-r${_svn_WC_REVISION}")
 ENDIF()
 
 #
@@ -390,7 +390,7 @@ IF(NOT EXISTS ${_path})
 ENDIF()
 FILE(GLOB _xml_files ${_path}/*.xml)
 EXECUTE_PROCESS(COMMAND sed -i -e
-  s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"\\n\\tSVNRevision=\"${_svn_WC_REVISION}\"/g
+  s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"\\n\\tSVNBranch=\"${_branch}\"\\n\\tSVNRevision=\"${_svn_WC_REVISION}\"/g
   ${_xml_files}
   OUTPUT_QUIET RESULT_VARIABLE  _res
   )
