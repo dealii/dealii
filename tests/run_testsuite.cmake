@@ -396,7 +396,7 @@ IF(NOT "${_svn_WC_REVISION}" STREQUAL "")
         <BuildStamp>${_tag}-Experimental</BuildStamp>
 	<UpdateType>SVN</UpdateType>
 	<Revision>${_svn_WC_REVISION}</Revision>
-        <SVNPath>${_branch}</SVNPath>
+        <Path>${_branch}</Path>
 </Update>"
     )
 ENDIF()
