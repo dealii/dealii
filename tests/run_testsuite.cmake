@@ -393,7 +393,7 @@ IF(NOT "${_svn_WC_REVISION}" STREQUAL "")
 <Update mode=\"Client\" Generator=\"${CTEST_GENERATOR}\">
     <Site>${CTEST_SITE}</Site>
       <BuildName>${CTEST_BUILD_NAME}</BuildName>
-        <BuildStamp>${_tag}-Experimental</BuildStamp>
+        <BuildStamp>${_tag}-${TRACK}</BuildStamp>
 	<UpdateType>SVN</UpdateType>
 	<Revision>${_svn_WC_REVISION}</Revision>
         <Path>${_branch}</Path>
