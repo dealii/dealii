@@ -19,11 +19,21 @@ class Revision:
 
 def parse_revision(dirname):
     rev = Revision()
-    #first Notes.xml:
-    tree = ET.parse(dirname+'/Notes.xml')
-    rev.name = tree.getroot().attrib['BuildName']
-    rev.number = rev.name.split('-')[-1]
-    
+
+    if len(glob.glob(dirname+'/Update.xml'))>0:
+        #new format
+        tree = ET.parse(dirname+'/Update.xml')
+        rev.name = tree.getroot().find('BuildName').text
+        rev.number = tree.getroot().find('Revision').text
+    elif len(glob.glob(dirname+'/Notes.xml'))>0:
+        #old format
+        tree = ET.parse(dirname+'/Notes.xml')
+        rev.name = tree.getroot().attrib['BuildName']
+        number = rev.name.split('-')[-1]
+        rev.number = number[1:]
+    else:
+        return None
+        
     print dirname, "BUILD: ", rev.name
 
     #now Test.xml:
@@ -64,7 +74,7 @@ def parse_revision(dirname):
 #from xml.dom import minidom
 
 
-n=glob.glob("*/Notes.xml")
+n=glob.glob("*/Build.xml")
 n.sort(reverse=True)
 n = n[0:min(10,len(n))]
 
@@ -73,12 +83,12 @@ revs = []
 allgroups = set()
 
 for f in n:
-    dirname = f.replace('/Notes.xml','')
+    dirname = f.replace('/Build.xml','')
     rev = parse_revision(dirname)
-    revs.append(rev)
-
-    for gr in rev.groups:
-        allgroups.add(gr)
+    if rev!=None:
+        revs.append(rev)
+        for gr in rev.groups:
+            allgroups.add(gr)
 
 revs.sort(key=lambda x: x.number, reverse=True)
     
@@ -94,7 +104,8 @@ table,td,th {
 border:1px solid black; 
 }
 .fail {background-color:red;}
-.togglebody {}
+.togglebody tr {background-color:#eeeeee}
+
 </style>""")
 f.write("""<script>
 function toggle_id(obj)
@@ -113,7 +124,7 @@ f.write('<thead><tr>')
 f.write('<th style="width:250px">&nbsp;</th>')
 
 for rev in revs:
-    f.write('<th>'+rev.number+'</th>')
+    f.write('<th>r'+rev.number+'</th>')
 f.write('</tr></thead>\n')
 
 f.write('<tbody><tr>')
