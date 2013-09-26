@@ -147,19 +147,58 @@ namespace LocalIntegrators
               result(i) += dx * input[d][k][d] * fetest.shape_value(i,k);
         }
     }
+
+
     /**
-     * Cell matrix for gradient. The derivative is on the trial
-     * function.
+     * The residual of the divergence operator in weak form.
      * \f[
-     * \int_Z \nabla u \cdot \mathbf v\,dx
+     * - \int_Z \nabla v \cdot \mathbf u \,dx
      * \f]
-     * This is the strong gradient and the trial space
-     * should be at least in <i>H</i><sup>1</sup>. The test functions can
-     * be discontinuous.
+     * This is the weak divergence operator and the test
+     * space should be at least <b>H</b><sup>1</sup>. The trial functions
+     * may be discontinuous.
+     *
+     * @todo Verify: The function cell_matrix() is the Frechet derivative of this function with respect
+     * to the test functions.
      *
      * @author Guido Kanschat
-     * @date 2011
+     * @date 2013
      */
+    template <int dim, typename number>
+    void cell_residual(
+      Vector<number> &result,
+      const FEValuesBase<dim> &fetest,
+      const VectorSlice<const std::vector<std::vector<double> > > &input,
+      const double factor = 1.)
+    {
+      AssertDimension(fetest.get_fe().n_components(), 1);
+      AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
+      const unsigned int t_dofs = fetest.dofs_per_cell;
+      Assert (result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
+
+      for (unsigned int k=0; k<fetest.n_quadrature_points; ++k)
+        {
+          const double dx = factor * fetest.JxW(k);
+
+          for (unsigned int i=0; i<t_dofs; ++i)
+            for (unsigned int d=0; d<dim; ++d)
+              result(i) -= dx * input[d][k] * fetest.shape_grad(i,k)[d];
+        }
+    }
+
+
+/**
+ * Cell matrix for gradient. The derivative is on the trial function.
+ * \f[
+ * \int_Z \nabla u \cdot \mathbf v\,dx
+ * \f]
+ *
+ * This is the strong gradient and the trial space should be at least
+ * in <i>H</i><sup>1</sup>. The test functions can be discontinuous.
+ *
+ * @author Guido Kanschat
+ * @date 2011
+ */
     template <int dim>
     void gradient_matrix(
       FullMatrix<double> &M,
@@ -225,6 +264,42 @@ namespace LocalIntegrators
           for (unsigned int i=0; i<t_dofs; ++i)
             for (unsigned int d=0; d<dim; ++d)
               result(i) += dx * input[k][d] * fetest.shape_value_component(i,k,d);
+        }
+    }
+
+    /**
+     * The residual of the gradient operator in weak form.
+     * \f[
+     * -\int_Z \nabla\cdot \mathbf v u \,dx
+     * \f]
+     * This is the weak gradient operator and the test
+     * space should be at least <b>H</b><sup>div</sup>. The trial functions
+     * may be discontinuous.
+     *
+     * @todo Verify: The function gradient_matrix() is the Frechet derivative of this function with respect to the test functions.
+     *
+     * @author Guido Kanschat
+     * @date 2013
+     */
+    template <int dim, typename number>
+    void gradient_residual(
+      Vector<number> &result,
+      const FEValuesBase<dim> &fetest,
+      const std::vector<double> &input,
+      const double factor = 1.)
+    {
+      AssertDimension(fetest.get_fe().n_components(), dim);
+      AssertDimension(input.size(), fetest.n_quadrature_points);
+      const unsigned int t_dofs = fetest.dofs_per_cell;
+      Assert (result.size() == t_dofs, ExcDimensionMismatch(result.size(), t_dofs));
+
+      for (unsigned int k=0; k<fetest.n_quadrature_points; ++k)
+        {
+          const double dx = factor * fetest.JxW(k);
+
+          for (unsigned int i=0; i<t_dofs; ++i)
+            for (unsigned int d=0; d<dim; ++d)
+              result(i) -= dx * input[k] * fetest.shape_grad_component(i,k,d)[d];
         }
     }
 
