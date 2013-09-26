@@ -423,7 +423,7 @@ ENDIF()
 IF(NOT "${_svn_WC_REVISION}" STREQUAL "")
   FILE(WRITE ${_path}/Update.xml
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<Update mode=\"Client\" Generator=\"${CTEST_GENERATOR}\">
+<Update mode=\"Client\" Generator=\"ctest-${CTEST_VERSION}\">
     <Site>${CTEST_SITE}</Site>
       <BuildName>${CTEST_BUILD_NAME}</BuildName>
         <BuildStamp>${_tag}-${TRACK}</BuildStamp>
