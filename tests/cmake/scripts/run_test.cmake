@@ -34,27 +34,8 @@ IF("${_result_code}" STREQUAL "0")
 
   MESSAGE("Test ${TEST}: PASSED")
   MESSAGE("===============================   OUTPUT BEGIN  ===============================")
-  #
   # Do not output everything, just that we are successful:
-  #
-  IF(TRGT MATCHES "\\.diff$") # ordinary test:
-    MESSAGE("${TEST}: BUILD successful.")
-    MESSAGE("${TEST}: RUN successful.")
-    MESSAGE("${TEST}: DIFF successful.")
-    MESSAGE("${TEST}: PASSED.")
-  ELSEIF(TRGT MATCHES "\\.run$") # build_test for steps:
-    MESSAGE("${TEST}: CONFIGURE successful.")
-    MESSAGE("${TEST}: BUILD successful.")
-    MESSAGE("${TEST}: RUN successful.")
-    MESSAGE("${TEST}: PASSED.")
-  ELSEIF(TRGT MATCHES "\\.build$") # build_test for steps:
-    MESSAGE("${TEST}: CONFIGURE successful.")
-    MESSAGE("${TEST}: BUILD successful.")
-    MESSAGE("${TEST}: PASSED.")
-  ELSE() # all-headers test:
-    MESSAGE("${TEST}: BUILD successful.")
-    MESSAGE("${TEST}: PASSED.")
-  ENDIF()
+  MESSAGE("${TEST}: PASSED.")
   MESSAGE("===============================    OUTPUT END   ===============================")
 
 ELSE()

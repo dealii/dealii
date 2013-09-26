@@ -55,16 +55,6 @@ Issues:
    Depending on the version of boost, a version number in the serialization
    output changes and all tests just under serialization/ just fail
 
- - Write a ctest configuration file (I'll do this sometime this week)
-
- - and setup a cdash test server 
-
  - Mesh converter tests?
 
  - Benchmark should be extra, am I right?
-
- - What about the files in
-
-   ./base/data_out_base_dx
-   ./base/data_out_base_povray?
-

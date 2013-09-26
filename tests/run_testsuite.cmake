@@ -22,13 +22,14 @@
 ########################################################################
 
 #
-# This is the test script for running the testsuite.
+# This is the ctest script for running and submitting build and regression
+# tests.
 #
 # Invoke it in a _build directory_ (or designated build directory) via:
 #
 #   ctest -S <...>/run_testsuite.cmake
 #
-# The following configuration variables can be overriden with
+# The following configuration variables can be overwritten with
 #
 #   ctest -D<variable>=<value> [...]
 #
@@ -55,7 +56,17 @@
 #       be used, otherwise "Unix Makefiles".
 #
 #   TRACK
-#     - TODO (defaults to "Experimental")
+#     - The track the test should be submitted to. Defaults to
+#       "Experimental". Possible values are:
+#
+#       "Experimental"     - all tests that are not specifically "build" or
+#                            "regression" tests should go into this track
+#
+#       "Build Tests"      - Build tests that configure and build in a
+#                            clean directory and run the build tests
+#                            "build_tests/*"
+#
+#       "Regression Tests" - Reserved for the Regression tester
 #
 #   CONFIG_FILE
 #     - A configuration file (see ../deal.II/docs/development/Config.sample)
@@ -87,8 +98,12 @@ IF("${TRACK}" STREQUAL "")
 ENDIF()
 
 IF( NOT "${TRACK}" STREQUAL "Experimental"
-    AND NOT "${TRACK}" STREQUAL "Build Tests" )
-  MESSAGE(FATAL_ERROR "TODO: Unknown TRACK \"${TRACK}\"")
+    AND NOT "${TRACK}" STREQUAL "Build Tests"
+    AND NOT "${TRACK}" STREQUAL "Regression Tests" )
+  MESSAGE(FATAL_ERROR "
+Unknown TRACK \"${TRACK}\" - see the manual for valid values.
+"
+    )
 ENDIF()
 
 MESSAGE("-- TRACK:                  ${TRACK}")
@@ -194,6 +209,15 @@ EXEC_PROGRAM(${HOSTNAME_COMMAND} OUTPUT_VARIABLE _hostname)
 SET(CTEST_SITE "${_hostname}")
 
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
+
+IF( "${TRACK}" STREQUAL "Regression Tests"
+    AND NOT CTEST_SITE MATCHES "foobar" )
+  MESSAGE(FATAL_ERROR "
+I'm sorry ${CTEST_SITE}, I'm afraid I can't do that.
+The TRACK \"Regression Tests\" is not for you.
+"
+    )
+ENDIF()
 
 #
 # Assemble configuration options, we need it now:
@@ -361,7 +385,10 @@ IF("${_res}" STREQUAL "0")
       OUTPUT_QUIET RESULT_VARIABLE _res
       )
     IF(NOT "${_res}" STREQUAL "0")
-      MESSAGE(FATAL_ERROR "\"setup_test\" target exited with an error. Bailing out.")
+      MESSAGE(FATAL_ERROR "
+\"setup_test\" target exited with an error. Bailing out.
+"
+        )
     ENDIF()
 
     CTEST_TEST()
@@ -375,7 +402,10 @@ ENDIF()
 FILE(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
 SET(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
 IF(NOT EXISTS ${_path})
-  MESSAGE(FATAL_ERROR "Unable to determine test submission files from TAG. Bailing out.")
+  MESSAGE(FATAL_ERROR "
+Unable to determine test submission files from TAG. Bailing out.
+"
+    )
 ENDIF()
 FILE(GLOB _xml_files ${_path}/*.xml)
 EXECUTE_PROCESS(COMMAND sed -i -e
@@ -384,7 +414,10 @@ EXECUTE_PROCESS(COMMAND sed -i -e
   OUTPUT_QUIET RESULT_VARIABLE  _res
   )
 IF(NOT "${_res}" STREQUAL "0")
-  MESSAGE(FATAL_ERROR "\"sed\" failed. Bailing out.")
+  MESSAGE(FATAL_ERROR "
+\"sed\" failed. Bailing out.
+"
+    )
 ENDIF()
 
 IF(NOT "${_svn_WC_REVISION}" STREQUAL "")
@@ -405,4 +438,14 @@ ENDIF()
 # And finally submit:
 #
 
-CTEST_SUBMIT()
+CTEST_SUBMIT(RETRY_COUNT 2 RETRY_DELAY 30 RETURN_VALUE _res)
+IF("${_res}" STREQUAL "0")
+  MESSAGE("-- Test submission successful.")
+ELSE()
+  MESSAGE(FATAL_ERROR "
+Test submission failed.
+"
+    )
+ENDIF()
+
+# .oO( This script is freaky 451 lines long... )
