@@ -251,7 +251,7 @@ namespace LocalIntegrators
               {
                 const double u= input[d1][k];
                 const double v= fe.shape_value_component(i,k,d1);
-                result(i) += dx + 2.*penalty * u * v;
+                result(i) += dx * 2.*penalty * u * v;
 
                 for (unsigned int d2=0; d2<dim; ++d2)
                   {
