@@ -1276,7 +1276,12 @@ namespace Step42
   void
   PlasticityContactProblem<dim>::update_solution_and_constraints ()
   {
-    const EquationData::SphereObstacle<dim> obstacle((base_mesh == "box" ? 1.0 : 0.5));
+    Function<dim> *obstacle;
+
+    if (obstacle_filename != "")
+      obstacle = new EquationData::ChineseObstacle<dim>(input_obstacle, (base_mesh == "box" ? 1.0 : 0.5));
+    else
+      obstacle = new EquationData::SphereObstacle<dim>((base_mesh == "box" ? 1.0 : 0.5));
 
 //    const EquationData::ChineseObstacle<dim> obstacle(input_obstacle, (base_mesh == "box" ? 1.0 : 0.5));
 
@@ -1339,7 +1344,7 @@ namespace Step42
                       Point<dim> point(
                         fe_values_face.quadrature_point(q_point));
 
-                      double obstacle_value = obstacle.value(point, 2);
+                      double obstacle_value = obstacle->value(point, 2);
                       double solution_index_z = solution(index_z);
                       double gap = obstacle_value - point(2);
 
@@ -1402,6 +1407,7 @@ namespace Step42
 
     constraints.merge(constraints_dirichlet_hanging_nodes);
 
+    delete obstacle;
     //constraints.print (std::cout);
   }
 
