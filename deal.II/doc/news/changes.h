@@ -86,6 +86,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: ConstraintMatrix would not compress() the IndexSet in the constructor
+  leading to crashes that only happen in release mode. This is now fixed.
+  <br>
+  (Timo Heister, 2013/09/27)
+  </li>
+
+  <li>
   Fixed: PetscWrappers::MatrixBase::row_length() no longer worked after recent changes
   to PETSc (around PETSc release 3.4). This is now fixed.
   <br>

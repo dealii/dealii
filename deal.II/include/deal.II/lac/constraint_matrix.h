@@ -1850,7 +1850,12 @@ ConstraintMatrix::ConstraintMatrix (const IndexSet &local_constraints)
   lines (),
   local_lines (local_constraints),
   sorted (false)
-{}
+{
+  // make sure the IndexSet is compressed. Otherwise this can lead to crashes
+  // that are hard to find (only happen in release mode).
+  // see tests/mpi/constraint_matrix_crash_01
+  local_lines.compress();
+}
 
 
 

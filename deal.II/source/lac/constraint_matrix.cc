@@ -631,6 +631,12 @@ void ConstraintMatrix::clear ()
 void ConstraintMatrix::reinit (const IndexSet &local_constraints)
 {
   local_lines = local_constraints;
+
+  // make sure the IndexSet is compressed. Otherwise this can lead to crashes
+  // that are hard to find (only happen in release mode).
+  // see tests/mpi/constraint_matrix_crash_01
+  local_lines.compress();
+
   clear();
 }
 
