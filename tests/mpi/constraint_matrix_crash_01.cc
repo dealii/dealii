@@ -16,7 +16,7 @@
 
 
 
-// ConstraintMatrix::add_line crashes in release mode
+// ConstraintMatrix::add_line crashes in release mode (missing compress inside ConstraintMatrix)
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -34,9 +34,9 @@ void test ()
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   IndexSet local_active_together(3);
-  local_active_together.add_range(0,1);
-  local_active_together.add_range(1,3);
-
+  local_active_together.add_range(0,3);
+  //local_active_together.compress();
+  
   ConstraintMatrix cm(local_active_together);
   cm.add_line(1);
   cm.close();
