@@ -702,7 +702,6 @@ namespace Step42
     };
     typename RefinementStrategy::value refinement_strategy;
     unsigned int n_cycles;
-    std::string obstacle_filename;
     std::string output_dir;
     bool transfer_solution;
     std::string base_mesh;
@@ -715,8 +714,8 @@ namespace Step42
 // above. As before, we will write everything
 
   template <int dim>
-  PlasticityContactProblem<dim>::PlasticityContactProblem (
-    const ParameterHandler &prm)
+  PlasticityContactProblem<dim>::
+  PlasticityContactProblem (const ParameterHandler &prm)
     :
     mpi_communicator(MPI_COMM_WORLD),
     triangulation(mpi_communicator),
@@ -746,7 +745,12 @@ namespace Step42
       throw ExcNotImplemented();
 
     n_cycles = prm.get_integer("number of cycles");
-    obstacle_filename = prm.get("obstacle filename");
+    const std::string obstacle_filename = prm.get("obstacle filename");
+    if (obstacle_filename != "")
+      obstacle.reset (new EquationData::ChineseObstacle<dim>(obstacle_filename, (base_mesh == "box" ? 1.0 : 0.5)));
+    else
+      obstacle.reset (new EquationData::SphereObstacle<dim>((base_mesh == "box" ? 1.0 : 0.5)));
+
     output_dir = prm.get("output directory");
     if (output_dir != "" && *(output_dir.rbegin()) != '/')
       output_dir += "/";
@@ -1944,13 +1948,6 @@ namespace Step42
   void
   PlasticityContactProblem<dim>::run ()
   {
-    if (obstacle_filename != "")
-      obstacle.reset (new EquationData::ChineseObstacle<dim>(obstacle_filename, (base_mesh == "box" ? 1.0 : 0.5)));
-    else
-      obstacle.reset (new EquationData::SphereObstacle<dim>((base_mesh == "box" ? 1.0 : 0.5)));
-
-
-
     computing_timer.reset();
     for (cycle = 0; cycle < n_cycles; ++cycle)
       {
