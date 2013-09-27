@@ -112,7 +112,7 @@ namespace Step42
 
     double
     get_value (const double x,
-               const double y);
+               const double y) const;
 
   private:
     std::vector<double> obstacle_data;
@@ -120,7 +120,7 @@ namespace Step42
     int                 nx, ny;
 
     double get_pixel_value (const int i,
-                            const int j);
+                            const int j) const;
   };
 
 
@@ -154,14 +154,15 @@ namespace Step42
     hy = 1.0 / (ny - 1);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      std::cout << "Resolution of the scanned obstacle picture: " << nx << " x " << ny
+      std::cout << "Read obstacle from file <" << name << ">" << std::endl
+                << "Resolution of the scanned obstacle picture: " << nx << " x " << ny
                 << std::endl;
   }
 
   template <int dim>
   double
   Input<dim>::get_pixel_value (const int i,
-                               const int j)
+                               const int j) const
   {
     assert(i >= 0 && i < nx);
     assert(j >= 0 && j < ny);
@@ -172,7 +173,7 @@ namespace Step42
   template <int dim>
   double
   Input<dim>::get_value (const double x,
-                         const double y)
+                         const double y) const
   {
     const int ix = std::min(std::max((int) (x / hx), 0), nx-2);
     const int iy = std::min(std::max((int) (y / hy), 0), ny-2);
@@ -544,11 +545,11 @@ namespace Step42
     class ChineseObstacle : public Function<dim>
     {
     public:
-      ChineseObstacle (const std_cxx1x::shared_ptr<Input<dim> > &input,
+      ChineseObstacle (const std::string &filename,
                 const double z_max_domain)
         :
         Function<dim>(dim),
-        input_obstacle(input),
+        input_obstacle(filename),
         z_max_domain(z_max_domain)
       {}
 
@@ -561,7 +562,7 @@ namespace Step42
                          Vector<double> &values) const;
 
     private:
-      const std_cxx1x::shared_ptr<Input<dim> > &input_obstacle;
+      const Input<dim> input_obstacle;
       double z_max_domain;
     };
 
@@ -578,7 +579,7 @@ namespace Step42
 
       //component==2:
         if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
-          return z_max_domain + 0.999 - input_obstacle->get_value(p(0), p(1));
+          return z_max_domain + 0.999 - input_obstacle.get_value(p(0), p(1));
         else
         return 10000.0;
 
@@ -678,7 +679,7 @@ namespace Step42
     TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
     TrilinosWrappers::PreconditionAMG preconditioner_u;
 
-    std_cxx1x::shared_ptr<Input<dim> > input_obstacle;
+    std_cxx1x::shared_ptr<Function<dim> > obstacle;
     std_cxx1x::shared_ptr<ConstitutiveLaw<dim> > plast_lin_hard;
 
     double sigma_0; // Yield stress
@@ -1276,15 +1277,6 @@ namespace Step42
   void
   PlasticityContactProblem<dim>::update_solution_and_constraints ()
   {
-    Function<dim> *obstacle;
-
-    if (obstacle_filename != "")
-      obstacle = new EquationData::ChineseObstacle<dim>(input_obstacle, (base_mesh == "box" ? 1.0 : 0.5));
-    else
-      obstacle = new EquationData::SphereObstacle<dim>((base_mesh == "box" ? 1.0 : 0.5));
-
-//    const EquationData::ChineseObstacle<dim> obstacle(input_obstacle, (base_mesh == "box" ? 1.0 : 0.5));
-
     std::vector<bool> vertex_touched(dof_handler.n_dofs(), false);
 
     typename DoFHandler<dim>::active_cell_iterator cell =
@@ -1406,9 +1398,6 @@ namespace Step42
     //    constraints_dirichlet_hanging_nodes.print (std::cout);
 
     constraints.merge(constraints_dirichlet_hanging_nodes);
-
-    delete obstacle;
-    //constraints.print (std::cout);
   }
 
 // @sect4{PlasticityContactProblem::dirichlet_constraints}
@@ -1955,14 +1944,12 @@ namespace Step42
   void
   PlasticityContactProblem<dim>::run ()
   {
-
     if (obstacle_filename != "")
-      {
-        pcout << "Read the obstacle from '" << obstacle_filename << "' ... "
-              << std::flush;
-        input_obstacle.reset(new Input<dim>(obstacle_filename.c_str()));
-        pcout << "done." << std::endl;
-      }
+      obstacle.reset (new EquationData::ChineseObstacle<dim>(obstacle_filename, (base_mesh == "box" ? 1.0 : 0.5)));
+    else
+      obstacle.reset (new EquationData::SphereObstacle<dim>((base_mesh == "box" ? 1.0 : 0.5)));
+
+
 
     computing_timer.reset();
     for (cycle = 0; cycle < n_cycles; ++cycle)
