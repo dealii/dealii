@@ -378,16 +378,16 @@ namespace Step42
 
     template <int dim>
     SphereObstacle<dim>::SphereObstacle (const double z_surface)
-    :
-    Function<dim>(dim),
-    z_surface(z_surface)
+      :
+      Function<dim>(dim),
+      z_surface(z_surface)
     {}
 
 
     template <int dim>
     double
     SphereObstacle<dim>::value (const Point<dim> &p,
-                          const unsigned int component) const
+                                const unsigned int component) const
     {
       if (component == 0)
         return p(0);
@@ -395,9 +395,9 @@ namespace Step42
         return p(1);
       else if (component == 2)
         return (-std::sqrt(0.36
-                            - (p(0) - 0.5) * (p(0) - 0.5)
-                            - (p(1) - 0.5) * (p(1) - 0.5))
-                 + z_surface + 0.59);
+                           - (p(0) - 0.5) * (p(0) - 0.5)
+                           - (p(1) - 0.5) * (p(1) - 0.5))
+                + z_surface + 0.59);
 
       Assert (false, ExcNotImplemented());
       return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
@@ -407,7 +407,7 @@ namespace Step42
     template <int dim>
     void
     SphereObstacle<dim>::vector_value (const Point<dim> &p,
-                                 Vector<double> &values) const
+                                       Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = SphereObstacle<dim>::value(p, c);
@@ -431,116 +431,116 @@ namespace Step42
     // these directions.  <code>get_value()</code> returns the value of the image
     // at a given location, interpolated from the adjacent pixel values.
     template <int dim>
-      class BitmapFile
-      {
-      public:
-        BitmapFile(const std::string &name);
+    class BitmapFile
+    {
+    public:
+      BitmapFile(const std::string &name);
 
-        double
-        get_value(const double x, const double y) const;
+      double
+      get_value(const double x, const double y) const;
 
-      private:
-        std::vector<double> obstacle_data;
-        double hx, hy;
-        int nx, ny;
+    private:
+      std::vector<double> obstacle_data;
+      double hx, hy;
+      int nx, ny;
 
-        double
-        get_pixel_value(const int i, const int j) const;
-      };
+      double
+      get_pixel_value(const int i, const int j) const;
+    };
 
     // The constructor of this class reads in the data that describes
     // the obstacle from the given file name.
     template <int dim>
-      BitmapFile<dim>::BitmapFile(const std::string &name)
-          :
-            obstacle_data(0),
-            hx(0),
-            hy(0),
-            nx(0),
-            ny(0)
-      {
-        std::ifstream f(name.c_str());
+    BitmapFile<dim>::BitmapFile(const std::string &name)
+      :
+      obstacle_data(0),
+      hx(0),
+      hy(0),
+      nx(0),
+      ny(0)
+    {
+      std::ifstream f(name.c_str());
 
-        std::string temp;
-        f >> temp >> nx >> ny;
+      std::string temp;
+      f >> temp >> nx >> ny;
 
-        AssertThrow(nx > 0 && ny > 0, ExcMessage("Invalid file format."));
+      AssertThrow(nx > 0 && ny > 0, ExcMessage("Invalid file format."));
 
-        for (int k = 0; k < nx * ny; k++)
-          {
-            double val;
-            f >> val;
-            obstacle_data.push_back(val);
-          }
+      for (int k = 0; k < nx * ny; k++)
+        {
+          double val;
+          f >> val;
+          obstacle_data.push_back(val);
+        }
 
-        hx = 1.0 / (nx - 1);
-        hy = 1.0 / (ny - 1);
+      hx = 1.0 / (nx - 1);
+      hy = 1.0 / (ny - 1);
 
-        if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-          std::cout << "Read obstacle from file <" << name << ">" << std::endl
-                    << "Resolution of the scanned obstacle picture: " << nx
-                    << " x " << ny << std::endl;
-      }
-
-    template <int dim>
-      double
-      BitmapFile<dim>::get_pixel_value(const int i, const int j) const
-      {
-        assert(i >= 0 && i < nx);
-        assert(j >= 0 && j < ny);
-        return obstacle_data[nx * (ny - 1 - j) + i];
-      }
+      if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+        std::cout << "Read obstacle from file <" << name << ">" << std::endl
+                  << "Resolution of the scanned obstacle picture: " << nx
+                  << " x " << ny << std::endl;
+    }
 
     template <int dim>
-      double
-      BitmapFile<dim>::get_value(const double x, const double y) const
-      {
-        const int ix = std::min(std::max((int) (x / hx), 0), nx - 2);
-        const int iy = std::min(std::max((int) (y / hy), 0), ny - 2);
+    double
+    BitmapFile<dim>::get_pixel_value(const int i, const int j) const
+    {
+      assert(i >= 0 && i < nx);
+      assert(j >= 0 && j < ny);
+      return obstacle_data[nx * (ny - 1 - j) + i];
+    }
 
-        FullMatrix<double> H(4, 4);
-        Vector<double> X(4);
-        Vector<double> b(4);
+    template <int dim>
+    double
+    BitmapFile<dim>::get_value(const double x, const double y) const
+    {
+      const int ix = std::min(std::max((int) (x / hx), 0), nx - 2);
+      const int iy = std::min(std::max((int) (y / hy), 0), ny - 2);
 
-        double xx, yy;
+      FullMatrix<double> H(4, 4);
+      Vector<double> X(4);
+      Vector<double> b(4);
 
-        xx = ix * hx;
-        yy = iy * hy;
-        H(0, 0) = xx;
-        H(0, 1) = yy;
-        H(0, 2) = xx * yy;
-        H(0, 3) = 1.0;
-        b(0) = get_pixel_value(ix, iy);
+      double xx, yy;
 
-        xx = (ix + 1) * hx;
-        yy = iy * hy;
-        H(1, 0) = xx;
-        H(1, 1) = yy;
-        H(1, 2) = xx * yy;
-        H(1, 3) = 1.0;
-        b(1) = get_pixel_value(ix + 1, iy);
+      xx = ix * hx;
+      yy = iy * hy;
+      H(0, 0) = xx;
+      H(0, 1) = yy;
+      H(0, 2) = xx * yy;
+      H(0, 3) = 1.0;
+      b(0) = get_pixel_value(ix, iy);
 
-        xx = (ix + 1) * hx;
-        yy = (iy + 1) * hy;
-        H(2, 0) = xx;
-        H(2, 1) = yy;
-        H(2, 2) = xx * yy;
-        H(2, 3) = 1.0;
-        b(2) = get_pixel_value(ix + 1, iy + 1);
+      xx = (ix + 1) * hx;
+      yy = iy * hy;
+      H(1, 0) = xx;
+      H(1, 1) = yy;
+      H(1, 2) = xx * yy;
+      H(1, 3) = 1.0;
+      b(1) = get_pixel_value(ix + 1, iy);
 
-        xx = ix * hx;
-        yy = (iy + 1) * hy;
-        H(3, 0) = xx;
-        H(3, 1) = yy;
-        H(3, 2) = xx * yy;
-        H(3, 3) = 1.0;
-        b(3) = get_pixel_value(ix, iy + 1);
+      xx = (ix + 1) * hx;
+      yy = (iy + 1) * hy;
+      H(2, 0) = xx;
+      H(2, 1) = yy;
+      H(2, 2) = xx * yy;
+      H(2, 3) = 1.0;
+      b(2) = get_pixel_value(ix + 1, iy + 1);
 
-        H.gauss_jordan();
-        H.vmult(X, b);
+      xx = ix * hx;
+      yy = (iy + 1) * hy;
+      H(3, 0) = xx;
+      H(3, 1) = yy;
+      H(3, 2) = xx * yy;
+      H(3, 3) = 1.0;
+      b(3) = get_pixel_value(ix, iy + 1);
 
-        return (X(0) * x + X(1) * y + X(2) * x * y + X(3));
-      }
+      H.gauss_jordan();
+      H.vmult(X, b);
+
+      return (X(0) * x + X(1) * y + X(2) * x * y + X(3));
+    }
 
     // Finally, this is the class that actually uses the class above. It
     // has a BitmapFile object as a member that describes the height of the
@@ -557,7 +557,7 @@ namespace Step42
     {
     public:
       ChineseObstacle(const std::string &filename,
-          const double z_surface);
+                      const double z_surface);
 
       virtual
       double value (const Point<dim> &p,
@@ -575,7 +575,7 @@ namespace Step42
 
     template <int dim>
     ChineseObstacle<dim>::ChineseObstacle(const std::string &filename,
-        const double z_surface)
+                                          const double z_surface)
       :
       Function<dim>(dim),
       input_obstacle(filename),
@@ -586,17 +586,17 @@ namespace Step42
     template <int dim>
     double
     ChineseObstacle<dim>::value (const Point<dim> &p,
-                          const unsigned int component) const
+                                 const unsigned int component) const
     {
       if (component == 0)
         return p(0);
       if (component == 1)
         return p(1);
       else if (component==2)
-    {
-        if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
-          return z_surface + 0.999 - input_obstacle.get_value(p(0), p(1));
-    }
+        {
+          if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
+            return z_surface + 0.999 - input_obstacle.get_value(p(0), p(1));
+        }
 
       Assert (false, ExcNotImplemented());
       return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
@@ -605,7 +605,7 @@ namespace Step42
     template <int dim>
     void
     ChineseObstacle<dim>::vector_value (const Point<dim> &p,
-                                 Vector<double> &values) const
+                                        Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
         values(c) = ChineseObstacle<dim>::value(p, c);
@@ -1029,8 +1029,8 @@ namespace Step42
               SymmetricTensor<2, dim> stress_tensor;
 
               constitutive_law->get_linearized_stress_strain_tensors(strain_tensor[q_point],
-                                                                   stress_strain_tensor_linearized,
-                                                                   stress_strain_tensor);
+                                                                     stress_strain_tensor_linearized,
+                                                                     stress_strain_tensor);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
@@ -1160,7 +1160,7 @@ namespace Step42
 
               const bool q_point_is_plastic
                 = constitutive_law->get_stress_strain_tensor(strain_tensor[q_point],
-                                                           stress_strain_tensor);
+                                                             stress_strain_tensor);
               if (q_point_is_plastic)
                 {
                   ++plast_points;
