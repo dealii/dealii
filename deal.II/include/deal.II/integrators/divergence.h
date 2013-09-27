@@ -381,6 +381,43 @@ namespace LocalIntegrators
     }
 
     /**
+     * The trace of the gradient
+     * operator, namely the product
+     * of the normal component of the
+     * vector valued test space and
+     * the trial space.
+     * @f[
+     * \int_F u (\mathbf v\cdot \mathbf n) \,ds
+     * @f]
+     *
+     * @author Guido Kanschat
+     * @date 2013
+     */
+    template<int dim, typename number>
+    void
+    u_times_n_residual (
+      Vector<number> &result,
+      const FEValuesBase<dim> &fetest,
+      const std::vector<double> &data,
+      double factor = 1.)
+    {
+      const unsigned int t_dofs = fetest.dofs_per_cell;
+
+      AssertDimension(fetest.get_fe().n_components(), dim);
+      AssertDimension(result.size(), t_dofs);
+      AssertDimension(data.size(), fetest.n_quadrature_points);
+
+      for (unsigned int k=0; k<fetest.n_quadrature_points; ++k)
+        {
+          const Tensor<1,dim> ndx = factor * fetest.normal_vector(k) * fetest.JxW(k);
+
+          for (unsigned int i=0; i<t_dofs; ++i)
+            for (unsigned int d=0; d<dim; ++d)
+              result(i) += ndx[d] * fetest.shape_value_component(i,k,d) * data[k];
+        }
+    }
+
+    /**
      * The trace of the divergence
      * operator, namely the product
      * of the jump of the normal component of the

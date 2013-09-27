@@ -189,7 +189,7 @@ namespace Step42
     H(0, 1) = yy;
     H(0, 2) = xx * yy;
     H(0, 3) = 1.0;
-    b(0) = get_value(ix, iy);
+    b(0) = get_pixel_value(ix, iy);
 
     xx = (ix + 1) * hx;
     yy = iy * hy;
@@ -494,16 +494,61 @@ namespace Step42
     // a function (here a ball).
     // z_max_domain is the z value of the surface of the work piece
     template <int dim>
-    class Obstacle : public Function<dim>
+    class SphereObstacle : public Function<dim>
     {
     public:
-      Obstacle (const std_cxx1x::shared_ptr<Input<dim> > &input,
-                const bool use_read_obstacle,
+      SphereObstacle (const double z_max_domain)
+        :
+        Function<dim>(dim),
+        z_max_domain(z_max_domain)
+      {}
+
+      virtual
+      double value (const Point<dim> &p,
+                    const unsigned int component = 0) const;
+
+      virtual
+      void vector_value (const Point<dim> &p,
+                         Vector<double> &values) const;
+
+    private:
+      double z_max_domain;
+    };
+
+
+    template <int dim>
+    double
+    SphereObstacle<dim>::value (const Point<dim> &p,
+                          const unsigned int component) const
+    {
+      if (component == 0)
+        return p(0);
+      if (component == 1)
+        return p(1);
+
+      //component==2:
+      return -std::sqrt(0.36 - (p(0) - 0.5) * (p(0) - 0.5)
+          - (p(1) - 0.5) * (p(1) - 0.5)) + z_max_domain + 0.59;
+    }
+
+    template <int dim>
+    void
+    SphereObstacle<dim>::vector_value (const Point<dim> &p,
+                                 Vector<double> &values) const
+    {
+      for (unsigned int c = 0; c < this->n_components; ++c)
+        values(c) = SphereObstacle<dim>::value(p, c);
+    }
+
+    template <int dim>
+    class ChineseObstacle : public Function<dim>
+    {
+    public:
+      ChineseObstacle (const std_cxx1x::shared_ptr<Input<dim> > &input,
                 const double z_max_domain)
         :
         Function<dim>(dim),
         input_obstacle(input),
-        use_read_obstacle(use_read_obstacle),
         z_max_domain(z_max_domain)
       {}
 
@@ -517,14 +562,13 @@ namespace Step42
 
     private:
       const std_cxx1x::shared_ptr<Input<dim> > &input_obstacle;
-      bool use_read_obstacle;
       double z_max_domain;
     };
 
 
     template <int dim>
     double
-    Obstacle<dim>::value (const Point<dim> &p,
+    ChineseObstacle<dim>::value (const Point<dim> &p,
                           const unsigned int component) const
     {
       if (component == 0)
@@ -533,29 +577,20 @@ namespace Step42
         return p(1);
 
       //component==2:
-      if (use_read_obstacle)
-        {
-          if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
-            return z_max_domain + 0.999
-                   - input_obstacle->get_value(p(0), p(1));
-          else
-            return 10000.0;
-        }
-      else
-        {
-          //sphere:
-          return -std::sqrt(0.36 - (p(0) - 0.5) * (p(0) - 0.5)
-                            - (p(1) - 0.5) * (p(1) - 0.5)) + z_max_domain + 0.59;
-        }
+        if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
+          return z_max_domain + 0.999 - input_obstacle->get_value(p(0), p(1));
+        else
+        return 10000.0;
+
     }
 
     template <int dim>
     void
-    Obstacle<dim>::vector_value (const Point<dim> &p,
+    ChineseObstacle<dim>::vector_value (const Point<dim> &p,
                                  Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = Obstacle<dim>::value(p, c);
+        values(c) = ChineseObstacle<dim>::value(p, c);
     }
   }
 
@@ -983,7 +1018,7 @@ namespace Step42
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
                       cell_matrix(i, j) += (stress_tensor
-                                            * fe_values[displacement].symmetric_gradient(i, q_point)
+                                            * fe_values[displacement].symmetric_gradient(j, q_point)
                                             * fe_values.JxW(q_point));
                     }
 
@@ -1241,8 +1276,15 @@ namespace Step42
   void
   PlasticityContactProblem<dim>::update_solution_and_constraints ()
   {
-    const EquationData::Obstacle<dim> obstacle(input_obstacle,
-                                               (obstacle_filename != ""), (base_mesh == "box" ? 1.0 : 0.5));
+    Function<dim> *obstacle;
+
+    if (obstacle_filename != "")
+      obstacle = new EquationData::ChineseObstacle<dim>(input_obstacle, (base_mesh == "box" ? 1.0 : 0.5));
+    else
+      obstacle = new EquationData::SphereObstacle<dim>((base_mesh == "box" ? 1.0 : 0.5));
+
+//    const EquationData::ChineseObstacle<dim> obstacle(input_obstacle, (base_mesh == "box" ? 1.0 : 0.5));
+
     std::vector<bool> vertex_touched(dof_handler.n_dofs(), false);
 
     typename DoFHandler<dim>::active_cell_iterator cell =
@@ -1302,7 +1344,7 @@ namespace Step42
                       Point<dim> point(
                         fe_values_face.quadrature_point(q_point));
 
-                      double obstacle_value = obstacle.value(point, 2);
+                      double obstacle_value = obstacle->value(point, 2);
                       double solution_index_z = solution(index_z);
                       double gap = obstacle_value - point(2);
 
@@ -1365,6 +1407,7 @@ namespace Step42
 
     constraints.merge(constraints_dirichlet_hanging_nodes);
 
+    delete obstacle;
     //constraints.print (std::cout);
   }
 

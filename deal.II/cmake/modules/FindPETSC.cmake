@@ -46,11 +46,47 @@ FIND_LIBRARY(PETSC_LIBRARY
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
+#
+# Search for the first part of the includes:
+#
+
+FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
+  HINTS
+    # petsc is special. Account for that
+    ${PETSC_DIR}
+    ${PETSC_DIR}/${PETSC_ARCH}
+    ${PETSC_INCLUDE_DIRS}
+  PATH_SUFFIXES petsc include include/petsc
+)
+
+#
+# Sometimes, this is not enough...
+# If petsc is not installed but in source tree layout, there will be
+#   ${PETSC_DIR}/${PETSC_ARCH}/include - which we should have found by now.
+#   ${PETSC_DIR}/include               - which we still have to find.
+#
+# Or it is installed in a non standard layout in the system (e.g. in
+# Gentoo), where there will be
+#   ${PETSC_DIR}/${PETSC_ARCH}/include
+#   /usr/include/petsc ...
+#
+# Either way, we must be able to find petscversion.h:
+#
+
+FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
+  HINTS
+    ${PETSC_DIR}
+    ${PETSC_DIR}/${PETSC_ARCH}
+    ${PETSC_INCLUDE_DIRS}
+  PATH_SUFFIXES petsc include include/petsc
+)
 
 #
 # So, up to this point it was easy. Now, the tricky part. Search for
-# petscvariables and determine the link interface from that file:
+# petscvariables and determine the includes and the link interface from
+# that file:
 #
+
 FIND_FILE(PETSC_PETSCVARIABLES
   NAMES petscvariables
   HINTS
@@ -61,11 +97,37 @@ FIND_FILE(PETSC_PETSCVARIABLES
 
 IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
 
+  #
+  # Includes:
+  #
+
+  FILE(STRINGS "${PETSC_PETSCVARIABLES}" _external_includes
+    REGEX "^PETSC_CC_INCLUDES =.*")
+  SEPARATE_ARGUMENTS(_external_includes)
+
+  SET(_petsc_includes)
+  FOREACH(_token ${_external_includes})
+    IF(_token MATCHES "^-I")
+      STRING(REGEX REPLACE "^-I" "" _token "${_token}")
+      LIST(APPEND _petsc_includes ${_token})
+    ENDIF()
+  ENDFOREACH()
+
+  # Remove petsc's own include directories:
+  IF(NOT "${_petsc_includes}" STREQUAL "")
+    LIST(REMOVE_AT _petsc_includes 0 1)
+  ENDIF()
+
+  #
+  # Link line:
+  #
+
   FILE(STRINGS "${PETSC_PETSCVARIABLES}" _external_link_line
     REGEX "^PETSC_WITH_EXTERNAL_LIB =.*")
   SEPARATE_ARGUMENTS(_external_link_line)
 
   SET(_hints)
+  SET(_petsc_libraries)
   FOREACH(_token ${_external_link_line}})
     IF(_token MATCHES "^-L")
       # Build up hints with the help of all tokens passed with -L:
@@ -90,41 +152,10 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
       ENDIF()
     ENDIF()
   ENDFOREACH()
+
 ENDIF()
 
 
-#
-# Search for the first part of the includes:
-#
-FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
-  HINTS
-    # petsc is special. Account for that
-    ${PETSC_DIR}
-    ${PETSC_DIR}/${PETSC_ARCH}
-    ${PETSC_INCLUDE_DIRS}
-  PATH_SUFFIXES petsc include include/petsc
-)
-
-#
-# Sometimes, this is not enough...
-# If petsc is not installed but in source tree layout, there will be
-#   ${PETSC_DIR}/${PETSC_ARCH}/include - which we should have found by now.
-#   ${PETSC_DIR}/include               - which we still have to find.
-#
-# Or it is installed in a non standard layout in the system (e.g. in
-# Gentoo), where there will be
-#   ${PETSC_DIR}/${PETSC_ARCH}/include
-#   /usr/include/petsc ...
-#
-# Either way, we must be able to find petscversion.h:
-#
-FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
-  HINTS
-    ${PETSC_DIR}
-    ${PETSC_DIR}/${PETSC_ARCH}
-    ${PETSC_INCLUDE_DIRS}
-  PATH_SUFFIXES petsc include include/petsc
-)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(PETSC DEFAULT_MSG
   PETSC_LIBRARY
@@ -146,8 +177,9 @@ IF(PETSC_FOUND)
     ${_petsc_libraries}
     )
   SET(PETSC_INCLUDE_DIRS
-    ${PETSC_INCLUDE_DIR_ARCH}
     ${PETSC_INCLUDE_DIR_COMMON}
+    ${PETSC_INCLUDE_DIR_ARCH}
+    ${_petsc_includes}
     )
 
   SET(PETSC_PETSCCONF_H "${PETSC_INCLUDE_DIR_ARCH}/petscconf.h")

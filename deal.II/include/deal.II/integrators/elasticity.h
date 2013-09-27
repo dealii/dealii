@@ -140,7 +140,7 @@ namespace LocalIntegrators
                 {
                   const double u = fe.shape_value_component(j,k,d1);
                   const double v = fe.shape_value_component(i,k,d1);
-                  M(i,j) += dx * penalty * u * v;
+                  M(i,j) += dx * 2. * penalty * u * v;
                   for (unsigned int d2=0; d2<dim; ++d2)
                     {
                       // v . nabla u n
@@ -197,7 +197,7 @@ namespace LocalIntegrators
                 const double u= input[d1][k];
                 const double v= fe.shape_value_component(i,k,d1);
                 const double g= data[d1][k];
-                result(i) += dx + 2.*penalty * (u-g) * v;
+                result(i) += dx * 2.*penalty * (u-g) * v;
 
                 for (unsigned int d2=0; d2<dim; ++d2)
                   {
@@ -251,7 +251,7 @@ namespace LocalIntegrators
               {
                 const double u= input[d1][k];
                 const double v= fe.shape_value_component(i,k,d1);
-                result(i) += dx + 2.*penalty * u * v;
+                result(i) += dx * 2.*penalty * u * v;
 
                 for (unsigned int d2=0; d2<dim; ++d2)
                   {
@@ -401,11 +401,11 @@ namespace LocalIntegrators
                 for (unsigned int d2=0; d2<dim; ++d2)
                   {
                     // v . nabla u n
-                    result1(i) -= .25*dx* (nu1*Dinput1[d1][k][d2]+nu2*Dinput1[d1][k][d2]) * n(d2) * v1;
-                    result2(i) += .25*dx* (nu1*Dinput1[d1][k][d2]+nu2*Dinput1[d1][k][d2]) * n(d2) * v1;
+                    result1(i) -= .25*dx* (nu1*Dinput1[d1][k][d2]+nu2*Dinput2[d1][k][d2]) * n(d2) * v1;
+                    result2(i) += .25*dx* (nu1*Dinput1[d1][k][d2]+nu2*Dinput2[d1][k][d2]) * n(d2) * v2;
                     // v . (nabla u)^T n
-                    result1(i) -= .25*dx* (nu1*Dinput1[d2][k][d1]+nu2*Dinput1[d2][k][d1]) * n(d2) * v1;
-                    result2(i) += .25*dx* (nu1*Dinput1[d2][k][d1]+nu2*Dinput1[d2][k][d1]) * n(d2) * v1;
+                    result1(i) -= .25*dx* (nu1*Dinput1[d2][k][d1]+nu2*Dinput2[d2][k][d1]) * n(d2) * v1;
+                    result2(i) += .25*dx* (nu1*Dinput1[d2][k][d1]+nu2*Dinput2[d2][k][d1]) * n(d2) * v2;
                     // u  nabla v n
                     result1(i) -= .25*dx* nu1*fe1.shape_grad_component(i,k,d1)[d2] * n(d2) * (u1-u2);
                     result2(i) -= .25*dx* nu2*fe2.shape_grad_component(i,k,d1)[d2] * n(d2) * (u1-u2);
