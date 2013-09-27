@@ -106,7 +106,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
   SEPARATE_ARGUMENTS(_external_includes)
 
   SET(_petsc_includes)
-  FOREACH(_token ${_external_includes}})
+  FOREACH(_token ${_external_includes})
     IF(_token MATCHES "^-I")
       STRING(REGEX REPLACE "^-I" "" _token "${_token}")
       LIST(APPEND _petsc_includes ${_token})
@@ -115,8 +115,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
 
   # Remove petsc's own include directories:
   IF(NOT "${_petsc_includes}" STREQUAL "")
-    LIST(REMOVE_ITEM _petsc_includes "${PETSC_INCLUDE_DIR_COMMON}")
-    LIST(REMOVE_ITEM _petsc_includes "${PETSC_INCLUDE_DIR_ARCH}")
+    LIST(REMOVE_AT _petsc_includes 0 1)
   ENDIF()
 
   #
