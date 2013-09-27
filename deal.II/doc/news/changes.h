@@ -54,6 +54,29 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: The DataOutBase::XDMFEntry class now has a proper serialization
+  function to allow for checkpointing.
+  <br>
+  (Eric Heien, 2013/09/27)
+  </li>
+  
+  <li>
+  New: DataOutBase::DataOutFilter provides a way to remove duplicate vertices
+  and values from a solution vector when generating output. Currently it only
+  supports HDF5/XDMF output.
+  <br>
+  (Eric Heien, 2013/09/27)
+  </li>
+
+  <li>
+  Removed: DataOutBase::HDF5MemStream was removed and the functionality replaced
+  by DataOutBase::DataOutFilter. The user only manipulates these through
+  DataOutBase::write_hdf5_parallel so this change should be transparent.
+  <br>
+  (Eric Heien, 2013/09/27)
+  </li>
+
+  <li>
   New: Like the usual DoFHandler class, the hp::DoFHandler class now also
   has a cache that makes operations such as <code>cell-@>get_dof_indices(...)</code>
   faster. This should accelerate many parts of the library that deal with
