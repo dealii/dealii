@@ -69,6 +69,7 @@ void test()
   Vector<float> indicators (tr.dealii::Triangulation<2>::n_active_cells());
   {
     std::ifstream in(SOURCE_DIR "/refine_and_coarsen_fixed_fraction_06/indicators");
+    Assert(in, ExcMessage("File missing"));
     for (unsigned int i=0; i<indicators.size(); ++i)
       in >> indicators(i);
   }
