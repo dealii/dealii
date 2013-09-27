@@ -636,13 +636,13 @@ namespace Step42
 
     void run ();
 
-    static void declare (ParameterHandler &prm);
+    static void declare_parameters (ParameterHandler &prm);
 
   private:
     void make_grid ();
     void setup_system ();
-    void assemble_nl_system (TrilinosWrappers::MPI::Vector &u);
-    void residual_nl_system (TrilinosWrappers::MPI::Vector &u);
+    void assemble_nl_system (const TrilinosWrappers::MPI::Vector &u);
+    void residual_nl_system (const TrilinosWrappers::MPI::Vector &u);
     void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
     void update_solution_and_constraints ();
     void dirichlet_constraints ();
@@ -697,7 +697,7 @@ namespace Step42
     TrilinosWrappers::PreconditionAMG preconditioner_u;
 
     std_cxx1x::shared_ptr<Function<dim> > obstacle;
-    std_cxx1x::shared_ptr<ConstitutiveLaw<dim> > plast_lin_hard;
+    std_cxx1x::shared_ptr<ConstitutiveLaw<dim> > constitutive_law;
 
     double sigma_0; // Yield stress
     double gamma; // Parameter for the linear isotropic hardening
@@ -749,7 +749,7 @@ namespace Step42
                     TimerOutput::wall_times)
   {
     // double _E, double _nu, double _sigma_0, double _gamma
-    plast_lin_hard.reset(new ConstitutiveLaw<dim>(e_modulus, nu, sigma_0, gamma));
+    constitutive_law.reset(new ConstitutiveLaw<dim>(e_modulus, nu, sigma_0, gamma));
 
     degree = prm.get_integer("polynomial degree");
     n_initial_refinements = prm.get_integer("number of initial refinements");
@@ -788,7 +788,7 @@ namespace Step42
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::declare (
+  PlasticityContactProblem<dim>::declare_parameters (
     ParameterHandler &prm)
   {
     prm.declare_entry("polynomial degree", "1", Patterns::Integer(),
@@ -972,8 +972,7 @@ namespace Step42
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::assemble_nl_system (
-    TrilinosWrappers::MPI::Vector &u)
+  PlasticityContactProblem<dim>::assemble_nl_system (const TrilinosWrappers::MPI::Vector &u)
   {
     TimerOutput::Scope t(computing_timer, "Assembling");
 
@@ -1029,7 +1028,7 @@ namespace Step42
               SymmetricTensor<4, dim> stress_strain_tensor;
               SymmetricTensor<2, dim> stress_tensor;
 
-              plast_lin_hard->get_linearized_stress_strain_tensors(strain_tensor[q_point],
+              constitutive_law->get_linearized_stress_strain_tensors(strain_tensor[q_point],
                                                                    stress_strain_tensor_linearized,
                                                                    stress_strain_tensor);
 
@@ -1099,10 +1098,11 @@ namespace Step42
     system_rhs_newton.compress(VectorOperation::add);
   }
 
+
+
   template <int dim>
   void
-  PlasticityContactProblem<dim>::residual_nl_system (
-    TrilinosWrappers::MPI::Vector &u)
+  PlasticityContactProblem<dim>::residual_nl_system (const TrilinosWrappers::MPI::Vector &u)
   {
     QGauss<dim> quadrature_formula(fe.degree + 1);
     QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
@@ -1159,7 +1159,7 @@ namespace Step42
               SymmetricTensor<2, dim> stress_tensor;
 
               const bool q_point_is_plastic
-                = plast_lin_hard->get_stress_strain_tensor(strain_tensor[q_point],
+                = constitutive_law->get_stress_strain_tensor(strain_tensor[q_point],
                                                            stress_strain_tensor);
               if (q_point_is_plastic)
                 {
@@ -1588,16 +1588,16 @@ namespace Step42
         if (transfer_solution)
           {
             if (transfer_solution && j == 1 && cycle == 0)
-              plast_lin_hard->set_sigma_0(1e+10);
+              constitutive_law->set_sigma_0(1e+10);
             else if (transfer_solution && (j == 2 || cycle > 0))
-              plast_lin_hard->set_sigma_0(sigma_hlp);
+              constitutive_law->set_sigma_0(sigma_hlp);
           }
         else
           {
             if (j == 1)
-              plast_lin_hard->set_sigma_0(1e+10);
+              constitutive_law->set_sigma_0(1e+10);
             else
-              plast_lin_hard->set_sigma_0(sigma_hlp);
+              constitutive_law->set_sigma_0(sigma_hlp);
           }
 
         pcout << " " << std::endl;
@@ -2044,7 +2044,7 @@ main (
 
   deallog.depth_console(0);
   ParameterHandler prm;
-  PlasticityContactProblem<3>::declare(prm);
+  PlasticityContactProblem<3>::declare_parameters(prm);
   if (argc != 2)
     {
       prm.print_parameters(std::cout, ParameterHandler::Text);
