@@ -83,146 +83,6 @@ namespace Step42
 {
   using namespace dealii;
 
-// @sect3{The <code>Input</code> class template}
-
-// This class has the the only purpose to read in data from a picture file
-// stored in pbm ascii format. This data will be bilinearly interpolated and
-// provides in this way a function which describes an obstacle.
-//
-// The data which we read from the file will be stored in a double std::vector
-// named obstacle_data.  This vector composes the base to calculate a
-// piecewise bilinear function as a polynomial interpolation.  This will be
-// done by obstacle_function ().
-//
-// In the function <code>run()</code> of the class
-// <code>PlasticityContactProblem</code> we create an object of the this class
-// which will be used in the class Obstacle to supply the obstacle function in
-// <code>update_solution_and_constraints()</code> of the class
-// <code>PlasticityContactProblem</code>.
-//
-// The <code>hx,hy</code> variables denote the spacing between pixels in $x$
-// and $y$ directions. <code>nx,ny</code> are the numbers of pixels in each of
-// these directions.  <code>get_value()</code> returns the value of the image
-// at a given location, interpolated from the adjacent pixel values.
-  template <int dim>
-  class Input
-  {
-  public:
-    Input (const std::string &name);
-
-    double
-    get_value (const double x,
-               const double y) const;
-
-  private:
-    std::vector<double> obstacle_data;
-    double              hx, hy;
-    int                 nx, ny;
-
-    double get_pixel_value (const int i,
-                            const int j) const;
-  };
-
-
-  // The constructor of this class reads in the data that describes
-  // the obstacle from the given file name.
-  template<int dim>
-  Input<dim>::Input(const std::string &name)
-    :
-    obstacle_data(0),
-    hx(0),
-    hy(0),
-    nx(0),
-    ny(0)
-  {
-    std::ifstream f(name.c_str());
-
-    std::string temp;
-    f >> temp >> nx >> ny;
-
-    AssertThrow(nx > 0 && ny > 0,
-                ExcMessage ("Invalid file format."));
-
-    for (int k = 0; k < nx * ny; k++)
-      {
-        double val;
-        f >> val;
-        obstacle_data.push_back(val);
-      }
-
-    hx = 1.0 / (nx - 1);
-    hy = 1.0 / (ny - 1);
-
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-      std::cout << "Read obstacle from file <" << name << ">" << std::endl
-                << "Resolution of the scanned obstacle picture: " << nx << " x " << ny
-                << std::endl;
-  }
-
-  template <int dim>
-  double
-  Input<dim>::get_pixel_value (const int i,
-                               const int j) const
-  {
-    assert(i >= 0 && i < nx);
-    assert(j >= 0 && j < ny);
-    return obstacle_data[nx * (ny - 1 - j) + i];
-  }
-
-
-  template <int dim>
-  double
-  Input<dim>::get_value (const double x,
-                         const double y) const
-  {
-    const int ix = std::min(std::max((int) (x / hx), 0), nx-2);
-    const int iy = std::min(std::max((int) (y / hy), 0), ny-2);
-
-    FullMatrix<double> H(4, 4);
-    Vector<double> X(4);
-    Vector<double> b(4);
-
-    double xx, yy;
-
-    xx = ix * hx;
-    yy = iy * hy;
-    H(0, 0) = xx;
-    H(0, 1) = yy;
-    H(0, 2) = xx * yy;
-    H(0, 3) = 1.0;
-    b(0) = get_pixel_value(ix, iy);
-
-    xx = (ix + 1) * hx;
-    yy = iy * hy;
-    H(1, 0) = xx;
-    H(1, 1) = yy;
-    H(1, 2) = xx * yy;
-    H(1, 3) = 1.0;
-    b(1) = get_pixel_value(ix + 1, iy);
-
-    xx = (ix + 1) * hx;
-    yy = (iy + 1) * hy;
-    H(2, 0) = xx;
-    H(2, 1) = yy;
-    H(2, 2) = xx * yy;
-    H(2, 3) = 1.0;
-    b(2) = get_pixel_value(ix + 1, iy + 1);
-
-    xx = ix * hx;
-    yy = (iy + 1) * hy;
-    H(3, 0) = xx;
-    H(3, 1) = yy;
-    H(3, 2) = xx * yy;
-    H(3, 3) = 1.0;
-    b(3) = get_pixel_value(ix, iy + 1);
-
-    H.gauss_jordan();
-    H.vmult(X, b);
-
-    return (X(0) * x + X(1) * y + X(2) * x * y + X(3));
-  }
-
-
   // @sect3{The <code>ConstitutiveLaw</code> class template}
 
   // This class provides an interface for a constitutive law, i.e., for the
@@ -488,21 +348,20 @@ namespace Step42
         values(c) = BoundaryValues<dim>::value(p, c);
     }
 
-    // This function is obviously implemented to
-    // define the obstacle that penetrates our deformable
-    // body. You can choose between two ways to define
-    // your obstacle: to read it from a file or to use
-    // a function (here a ball).
-    // z_max_domain is the z value of the surface of the work piece
+
+    // @sect4{The <code>SphereObstacle</code> class}
+
+    // The following class is the first of two obstacles that can be
+    // selected from the input file. It describes a sphere centered
+    // at position $x=y=0.5, z=z_{\text{surface}}+0.59$ and radius $r=0.6$,
+    // where $z_{\text{surface}}$ is the vertical position of the (flat)
+    // surface of the deformable body. The function's <code>value</code>
+    // returns the location of the obstacle for a given $x,y$ value.
     template <int dim>
     class SphereObstacle : public Function<dim>
     {
     public:
-      SphereObstacle (const double z_max_domain)
-        :
-        Function<dim>(dim),
-        z_max_domain(z_max_domain)
-      {}
+      SphereObstacle (const double z_surface);
 
       virtual
       double value (const Point<dim> &p,
@@ -513,8 +372,16 @@ namespace Step42
                          Vector<double> &values) const;
 
     private:
-      double z_max_domain;
+      const double z_surface;
     };
+
+
+    template <int dim>
+    SphereObstacle<dim>::SphereObstacle (const double z_surface)
+    :
+    Function<dim>(dim),
+    z_surface(z_surface)
+    {}
 
 
     template <int dim>
@@ -524,13 +391,18 @@ namespace Step42
     {
       if (component == 0)
         return p(0);
-      if (component == 1)
+      else if (component == 1)
         return p(1);
+      else if (component == 2)
+        return (-std::sqrt(0.36
+                            - (p(0) - 0.5) * (p(0) - 0.5)
+                            - (p(1) - 0.5) * (p(1) - 0.5))
+                 + z_surface + 0.59);
 
-      //component==2:
-      return -std::sqrt(0.36 - (p(0) - 0.5) * (p(0) - 0.5)
-          - (p(1) - 0.5) * (p(1) - 0.5)) + z_max_domain + 0.59;
+      Assert (false, ExcNotImplemented());
+      return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
     }
+
 
     template <int dim>
     void
@@ -541,17 +413,151 @@ namespace Step42
         values(c) = SphereObstacle<dim>::value(p, c);
     }
 
+    // @sect4{The <code>BitmapFile</code> and <code>ChineseObstacle</code> classes}
+
+    // The following two classes describe the obstacle outlined in the introduction,
+    // i.e., the Chinese character. The first of the two, <code>BitmapFile</code>
+    // is responsible for reading in data from a picture file
+    // stored in pbm ascii format. This data will be bilinearly interpolated and
+    // provides in this way a function which describes an obstacle.
+    //
+    // The data which we read from the file will be stored in a double std::vector
+    // named obstacle_data.  This vector composes the base to calculate a
+    // piecewise bilinear function as a polynomial interpolation. The data we will
+    // read from a file consists of zeros (white) and ones (black).
+    //
+    // The <code>hx,hy</code> variables denote the spacing between pixels in $x$
+    // and $y$ directions. <code>nx,ny</code> are the numbers of pixels in each of
+    // these directions.  <code>get_value()</code> returns the value of the image
+    // at a given location, interpolated from the adjacent pixel values.
+    template <int dim>
+      class BitmapFile
+      {
+      public:
+        BitmapFile(const std::string &name);
+
+        double
+        get_value(const double x, const double y) const;
+
+      private:
+        std::vector<double> obstacle_data;
+        double hx, hy;
+        int nx, ny;
+
+        double
+        get_pixel_value(const int i, const int j) const;
+      };
+
+    // The constructor of this class reads in the data that describes
+    // the obstacle from the given file name.
+    template <int dim>
+      BitmapFile<dim>::BitmapFile(const std::string &name)
+          :
+            obstacle_data(0),
+            hx(0),
+            hy(0),
+            nx(0),
+            ny(0)
+      {
+        std::ifstream f(name.c_str());
+
+        std::string temp;
+        f >> temp >> nx >> ny;
+
+        AssertThrow(nx > 0 && ny > 0, ExcMessage("Invalid file format."));
+
+        for (int k = 0; k < nx * ny; k++)
+          {
+            double val;
+            f >> val;
+            obstacle_data.push_back(val);
+          }
+
+        hx = 1.0 / (nx - 1);
+        hy = 1.0 / (ny - 1);
+
+        if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+          std::cout << "Read obstacle from file <" << name << ">" << std::endl
+                    << "Resolution of the scanned obstacle picture: " << nx
+                    << " x " << ny << std::endl;
+      }
+
+    template <int dim>
+      double
+      BitmapFile<dim>::get_pixel_value(const int i, const int j) const
+      {
+        assert(i >= 0 && i < nx);
+        assert(j >= 0 && j < ny);
+        return obstacle_data[nx * (ny - 1 - j) + i];
+      }
+
+    template <int dim>
+      double
+      BitmapFile<dim>::get_value(const double x, const double y) const
+      {
+        const int ix = std::min(std::max((int) (x / hx), 0), nx - 2);
+        const int iy = std::min(std::max((int) (y / hy), 0), ny - 2);
+
+        FullMatrix<double> H(4, 4);
+        Vector<double> X(4);
+        Vector<double> b(4);
+
+        double xx, yy;
+
+        xx = ix * hx;
+        yy = iy * hy;
+        H(0, 0) = xx;
+        H(0, 1) = yy;
+        H(0, 2) = xx * yy;
+        H(0, 3) = 1.0;
+        b(0) = get_pixel_value(ix, iy);
+
+        xx = (ix + 1) * hx;
+        yy = iy * hy;
+        H(1, 0) = xx;
+        H(1, 1) = yy;
+        H(1, 2) = xx * yy;
+        H(1, 3) = 1.0;
+        b(1) = get_pixel_value(ix + 1, iy);
+
+        xx = (ix + 1) * hx;
+        yy = (iy + 1) * hy;
+        H(2, 0) = xx;
+        H(2, 1) = yy;
+        H(2, 2) = xx * yy;
+        H(2, 3) = 1.0;
+        b(2) = get_pixel_value(ix + 1, iy + 1);
+
+        xx = ix * hx;
+        yy = (iy + 1) * hy;
+        H(3, 0) = xx;
+        H(3, 1) = yy;
+        H(3, 2) = xx * yy;
+        H(3, 3) = 1.0;
+        b(3) = get_pixel_value(ix, iy + 1);
+
+        H.gauss_jordan();
+        H.vmult(X, b);
+
+        return (X(0) * x + X(1) * y + X(2) * x * y + X(3));
+      }
+
+    // Finally, this is the class that actually uses the class above. It
+    // has a BitmapFile object as a member that describes the height of the
+    // obstacle. As mentioned above, the BitmapFile class will provide us
+    // with a mask, i.e., values that are either zero or one (and, if you
+    // ask for locations between pixels, values that are interpolated between
+    // zero and one). This class translates this to heights that are either
+    // 0.001 below the surface of the deformable body (if the BitmapFile
+    // class reports a one at this location) or 0.999 above the obstacle (if
+    // the BitmapFile class reports a zero). The following function should then
+    // be self-explanatory.
     template <int dim>
     class ChineseObstacle : public Function<dim>
     {
     public:
-      ChineseObstacle (const std::string &filename,
-                const double z_max_domain)
-        :
-        Function<dim>(dim),
-        input_obstacle(filename),
-        z_max_domain(z_max_domain)
-      {}
+      ChineseObstacle(const std::string &filename,
+          const double z_surface);
 
       virtual
       double value (const Point<dim> &p,
@@ -562,9 +568,19 @@ namespace Step42
                          Vector<double> &values) const;
 
     private:
-      const Input<dim> input_obstacle;
-      double z_max_domain;
+      const BitmapFile<dim> input_obstacle;
+      double z_surface;
     };
+
+
+    template <int dim>
+    ChineseObstacle<dim>::ChineseObstacle(const std::string &filename,
+        const double z_surface)
+      :
+      Function<dim>(dim),
+      input_obstacle(filename),
+      z_surface(z_surface)
+    {}
 
 
     template <int dim>
@@ -576,13 +592,14 @@ namespace Step42
         return p(0);
       if (component == 1)
         return p(1);
-
-      //component==2:
+      else if (component==2)
+    {
         if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
-          return z_max_domain + 0.999 - input_obstacle.get_value(p(0), p(1));
-        else
-        return 10000.0;
+          return z_surface + 0.999 - input_obstacle.get_value(p(0), p(1));
+    }
 
+      Assert (false, ExcNotImplemented());
+      return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
     }
 
     template <int dim>
@@ -601,13 +618,13 @@ namespace Step42
   // and variables needed to describe
   // the nonlinear contact problem. It is
   // close to step-41 but with some additional
-  // features like: handling hanging nodes,
-  // a newton method, using Trilinos and p4est
+  // features like handling hanging nodes,
+  // a Newton method, using Trilinos and p4est
   // for parallel distributed computing.
   // To deal with hanging nodes makes
   // life a bit more complicated since
-  // we need an other ConstraintMatrix now.
-  // We create a newton method for the
+  // we need another ConstraintMatrix now.
+  // We create a Newton method for the
   // active set method for the contact
   // situation and to handle the nonlinear
   // operator for the constitutive law.
@@ -745,7 +762,9 @@ namespace Step42
       throw ExcNotImplemented();
 
     n_cycles = prm.get_integer("number of cycles");
+    base_mesh = prm.get("base mesh");
     const std::string obstacle_filename = prm.get("obstacle filename");
+
     if (obstacle_filename != "")
       obstacle.reset (new EquationData::ChineseObstacle<dim>(obstacle_filename, (base_mesh == "box" ? 1.0 : 0.5)));
     else
@@ -757,7 +776,6 @@ namespace Step42
     mkdir(output_dir.c_str(), 0777);
 
     transfer_solution = prm.get_bool("transfer solution");
-    base_mesh = prm.get("base mesh");
 
     pcout << "    Using output directory '" << output_dir << "'" << std::endl;
     pcout << "    FE degree " << degree << std::endl;
