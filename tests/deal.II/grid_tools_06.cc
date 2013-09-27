@@ -29,7 +29,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <fstream>
-std::ofstream logfile("grid_tools_06/output");
+std::ofstream logfile("output");
 
 using namespace dealii;
 
