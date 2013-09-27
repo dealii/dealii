@@ -1018,7 +1018,7 @@ namespace Step42
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
                       cell_matrix(i, j) += (stress_tensor
-                                            * fe_values[displacement].symmetric_gradient(i, q_point)
+                                            * fe_values[displacement].symmetric_gradient(j, q_point)
                                             * fe_values.JxW(q_point));
                     }
 
