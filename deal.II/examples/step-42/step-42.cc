@@ -189,7 +189,7 @@ namespace Step42
     H(0, 1) = yy;
     H(0, 2) = xx * yy;
     H(0, 3) = 1.0;
-    b(0) = get_value(ix, iy);
+    b(0) = get_pixel_value(ix, iy);
 
     xx = (ix + 1) * hx;
     yy = iy * hy;
