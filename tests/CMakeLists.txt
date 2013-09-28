@@ -60,11 +60,9 @@ ENDIF()
 #
 # Pass all relevant "TEST_" variables down to the subprojects:
 #
-GET_CMAKE_PROPERTY(_variables VARIABLES)
-FOREACH(_var ${_variables})
-  IF(_var MATCHES
-      "^(TEST_DIR|TEST_DIFF|TEST_TIME_LIMIT|TEST_PICKUP_REGEX|NUMDIFF_DIR)$"
-      )
+FOREACH(_var TEST_DIR TEST_DIFF TEST_TIME_LIMIT TEST_PICKUP_REGEX NUMDIFF_DIR)
+  LIST(APPEND _options "-U${_var}")
+  IF(DEFINED ${_var})
     LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
 ENDFOREACH()
