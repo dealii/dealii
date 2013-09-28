@@ -123,6 +123,10 @@ _both(
 #                                ${CMAKE_CXX_COMPILER}
 "
   )
+_detailed(
+"#        CMAKE_GENERATOR:        ${CMAKE_GENERATOR}
+"
+  )
 IF(CMAKE_CROSSCOMPILING)
   _both(
     "#\n#        CROSSCOMPILING!\n"
