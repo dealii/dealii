@@ -87,7 +87,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
         SET(_run_command ${_target}) # the command to issue
         SET(_n_cpu 1) # set it to one, we'll still occupy one processor to run a test ;-)
       ELSE()
-        SET(_diff_target ${_category}-${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}.diff) # diff target name
+        SET(_diff_target ${_category}-${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/mpirun=${_n_cpu}) # directory to run the test in
         SET(_run_command mpirun -np ${_n_cpu} ${CMAKE_CURRENT_BINARY_DIR}/${_test_short}/${_target}) # the command to issue
