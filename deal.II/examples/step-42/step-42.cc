@@ -614,7 +614,7 @@ namespace Step42
 
   // @sect3{The <code>PlasticityContactProblem</code> class template}
 
-  // This class supplies all function
+  // This is the main class of this program and supplies all functions
   // and variables needed to describe
   // the nonlinear contact problem. It is
   // close to step-41 but with some additional
@@ -628,6 +628,17 @@ namespace Step42
   // active set method for the contact
   // situation and to handle the nonlinear
   // operator for the constitutive law.
+  //
+  // The general layout of this class is very much like for most other tutorial programs.
+  // To make our life a bit easier, this class reads a set of input parameters from an input file. These
+  // parameters, using the ParameterHandler class, are declared in the <code>declare_parameters</code>
+  // function (which is static so that it can be called before we even create an object of the current
+  // type), and a ParameterHandler object that has been used to read an input file will then be passed
+  // to the constructor of this class.
+  //
+  // The remaining member functions are by and large as we have seen in several of the other tutorial
+  // programs, though with additions for the current nonlinear system. We will comment on their purpose
+  // as we get to them further below.
   template <int dim>
   class PlasticityContactProblem
   {
@@ -642,7 +653,7 @@ namespace Step42
     void make_grid ();
     void setup_system ();
     void assemble_nl_system (const TrilinosWrappers::MPI::Vector &u);
-    void residual_nl_system (const TrilinosWrappers::MPI::Vector &u);
+    void compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &current_solution);
     void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
     void update_solution_and_constraints ();
     void dirichlet_constraints ();
@@ -1102,18 +1113,18 @@ namespace Step42
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::residual_nl_system (const TrilinosWrappers::MPI::Vector &u)
+  PlasticityContactProblem<dim>::compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &current_solution)
   {
     QGauss<dim> quadrature_formula(fe.degree + 1);
-    QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
+    QGauss<dim-1> face_quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
-                            UpdateFlags(
-                              update_values | update_gradients | update_q_points
-                              | update_JxW_values));
+                            update_values | update_gradients |
+                            		update_q_points  | update_JxW_values);
 
     FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
-                                     update_values | update_quadrature_points | update_JxW_values);
+                                     update_values | update_quadrature_points |
+                                     update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points = quadrature_formula.size();
@@ -1140,7 +1151,7 @@ namespace Step42
     unsigned int cell_number = 0;
     cell_constitution = 0;
 
-    for (; cell != endc; ++cell)
+    for (; cell != endc; ++cell, ++cell_number)
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1150,7 +1161,7 @@ namespace Step42
                                             right_hand_side_values);
 
           std::vector<SymmetricTensor<2, dim> > strain_tensor(n_q_points);
-          fe_values[displacement].get_function_symmetric_gradients(u,
+          fe_values[displacement].get_function_symmetric_gradients(current_solution,
                                                                    strain_tensor);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
@@ -1178,8 +1189,8 @@ namespace Step42
 
                   Tensor<1, dim> rhs_values;
                   rhs_values = 0;
-                  cell_rhs(i) += ((fe_values[displacement].value(i, q_point)
-                                   * rhs_values) * fe_values.JxW(q_point));
+                  cell_rhs(i) += (fe_values[displacement].value(i, q_point)
+                                   * rhs_values * fe_values.JxW(q_point));
                 }
             }
 
@@ -1200,34 +1211,25 @@ namespace Step42
                       Tensor<1, dim> rhs_values;
                       rhs_values[2] = right_hand_side_values[q_point][2];
                       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                        cell_rhs(i) += (fe_values_face[displacement].value(i,
-                                                                           q_point) * rhs_values
+                        cell_rhs(i) += (fe_values_face[displacement].value(i, q_point) * rhs_values
                                         * fe_values_face.JxW(q_point));
                     }
                 }
             }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints_dirichlet_hanging_nodes.distribute_local_to_global(
-            cell_rhs, local_dof_indices, system_rhs_newton);
+          constraints_dirichlet_hanging_nodes.distribute_local_to_global(cell_rhs,
+        		  local_dof_indices,
+        		  system_rhs_newton);
 
           for (unsigned int i = 0; i < dofs_per_cell; i++)
             system_rhs_lambda(local_dof_indices[i]) += cell_rhs(i);
-
-          cell_number += 1;
-        }
-      else
-        {
-          cell_constitution(cell_number) = 0;
-          cell_number += 1;
         }
 
     cell_constitution /= n_q_points;
     cell_constitution.compress(VectorOperation::add);
     system_rhs_newton.compress(VectorOperation::add);
     system_rhs_lambda.compress(VectorOperation::add);
-
-//    constraints_hanging_nodes.condense(system_rhs_lambda);
 
     const unsigned int sum_elast_points = Utilities::MPI::sum(elast_points,
                                                               mpi_communicator);
@@ -1237,6 +1239,8 @@ namespace Step42
           << " and plastic quadrature points: " << sum_plast_points
           << std::endl;
   }
+
+
 
   template <int dim>
   void
@@ -1646,7 +1650,7 @@ namespace Step42
             system_rhs_lambda = 0;
 
             solution = old_solution;
-            residual_nl_system(solution);
+            compute_nonlinear_residual(solution);
             res = system_rhs_newton;
 
             const unsigned int start_res = (res.local_range().first),
@@ -1998,7 +2002,7 @@ namespace Step42
               distributed_solution = solution;
               soltrans->interpolate(distributed_solution);
               solution = distributed_solution;
-              residual_nl_system(solution);
+              compute_nonlinear_residual(solution);
               resid_vector = system_rhs_lambda;
               resid_vector.compress(VectorOperation::insert);
             }
