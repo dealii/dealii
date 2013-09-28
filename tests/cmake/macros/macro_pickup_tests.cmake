@@ -34,13 +34,13 @@ MACRO(DEAL_II_PICKUP_TESTS)
   FILE(GLOB _tests "*.output")
   FOREACH(_test ${_tests})
     SET(_comparison ${_test})
+    GET_FILENAME_COMPONENT(_test ${_test} NAME)
 
     #
     # Respect TEST_PICKUP_REGEX:
     #
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${TEST_PICKUP_REGEX}" )
-      GET_FILENAME_COMPONENT(_test ${_test} NAME)
       SET(_define_test TRUE)
     ELSE()
       SET(_define_test FALSE)
