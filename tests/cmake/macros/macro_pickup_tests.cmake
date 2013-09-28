@@ -40,7 +40,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
     # Respect TEST_PICKUP_REGEX:
     #
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
-        _test MATCHES "${TEST_PICKUP_REGEX}" )
+        "${_category}/${_test}" MATCHES "${TEST_PICKUP_REGEX}" )
       SET(_define_test TRUE)
     ELSE()
       SET(_define_test FALSE)
