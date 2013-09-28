@@ -74,28 +74,26 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       #
       # Setup a bunch of variables describing the test:
       #
-
       STRING(TOLOWER ${_build} _build_lowercase)
+      SET(_target ${_test_name}.${_build_lowercase}) # target name
 
       # If _n_cpu is equal to "0", a normal, sequental test will be run,
       # otherwise run the test with mpirun:
       IF("${_n_cpu}" STREQUAL "0")
-        SET(_target ${_test_name}.${_build_lowercase}) # the target name for the executable
-        SET(_run_command) # the first part of the command to issue
-        SET(_processors 1)
+
+        SET(_diff_target ${_target}.diff) # diff target name
+        SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}) # directory to run the test in
+        SET(_run_command ${_target}) # the command to issue
+
       ELSE()
-        SET(_target ${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # the target name for the executable
-        SET(_run_command mpirun -np ${_n_cpu}) # the first part of the command to issue
-        SET(_processors 2) # heuristically...
+
+        SET(_diff_target ${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
+        SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}/mpirun=${_n_cpu}) # directory to run the test in
+        SET(_run_command mpirun -np ${_n_cpu} ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target}) # the command to issue
+
       ENDIF()
-
-      SET(_test_full ${_category}/${_target}) # full test name
-      SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}) # directory to run the test in
-
-      # avoid "=" in target names:
-      STRING(REGEX REPLACE "=" "" _target "${_target}")
-      LIST(APPEND _run_command ${_target}) # the second part of the command to issue
-      SET(_diff_target ${_target}.diff) # diff target name
 
       FILE(MAKE_DIRECTORY ${_test_directory})
 
@@ -103,24 +101,27 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       # Add an executable for the current test and set up compile
       # definitions and the full link interface:
       #
+      IF(NOT TARGET ${_target})
+        # only add the target once
 
-      ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${_test_name}.cc)
+        ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${_test_name}.cc)
 
-      SET_TARGET_PROPERTIES(${_target} PROPERTIES
-        LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-        COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
-        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-        LINKER_LANGUAGE "CXX"
-        RUNTIME_OUTPUT_DIRECTORY "${_test_directory}"
-        )
-      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-        INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
-        )
-      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-        COMPILE_DEFINITIONS
-          SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
-        )
-      TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET_${_build}})
+        SET_TARGET_PROPERTIES(${_target} PROPERTIES
+          LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+          COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
+          COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+          LINKER_LANGUAGE "CXX"
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target}"
+          )
+        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+          INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
+          )
+        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+          COMPILE_DEFINITIONS
+            SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+          )
+        TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET_${_build}})
+      ENDIF()
 
       #
       # Add a top level target to run and compare the test:
@@ -187,7 +188,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
-        PROCESSORS ${_processors}
         )
     ENDIF()
   ENDFOREACH()
