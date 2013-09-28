@@ -795,12 +795,11 @@ namespace Step42
           << (transfer_solution ? "true" : "false") << std::endl;
   }
 
-// @sect4{PlasticityContactProblem::declare}
+// @sect4{PlasticityContactProblem::declare_parameters}
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::declare_parameters (
-    ParameterHandler &prm)
+  PlasticityContactProblem<dim>::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry("polynomial degree", "1", Patterns::Integer(),
                       "polynomial degree of the FE_Q finite element space, typically 1 or 2");
@@ -811,7 +810,7 @@ namespace Step42
                       Patterns::Selection("global|percentage|fix dofs"),
                       "refinement strategy for each cycle:\n"
                       " global: one global refinement\n"
-                      "percentage: fixed percentage gets refined using kelly\n"
+                      " percentage: fixed percentage gets refined using kelly\n"
                       " fix dofs: tries to achieve 2^initial_refinement*300 dofs after cycle 1 (only use 2 cycles!). Changes the coarse mesh!");
     prm.declare_entry("number of cycles", "5", Patterns::Integer(),
                       "number of adaptive cycles to run");
@@ -824,23 +823,21 @@ namespace Step42
     prm.declare_entry("base mesh", "box",
                       Patterns::Selection("box|half sphere"),
                       "select the shape of the work piece: 'box' or 'half sphere'");
-
   }
 
+
+// @sect4{PlasticityContactProblem::make_grid}
+
   Point<3>
-  rotate_half_sphere (
-    const Point<3> &in)
+  rotate_half_sphere (const Point<3> &in)
   {
     return Point<3>(in(2), in(1), -in(0));
   }
-
-// @sect4{PlasticityContactProblem::make_grid}
 
   template <int dim>
   void
   PlasticityContactProblem<dim>::make_grid ()
   {
-
     if (base_mesh == "half sphere")
       {
         Point<dim> center(0, 0, 0);
@@ -853,54 +850,55 @@ namespace Step42
           Point<dim>(0.5, 0.5, 0.5), radius);
         triangulation.set_boundary(0, boundary_description);
 
-        triangulation.refine_global(n_initial_refinements);
-
         to_refine_factor = 0.3;
         to_coarsen_factor = 0.03;
-        return;
       }
+    else
+      {
+        Point<dim> p1(0, 0, 0);
+        Point<dim> p2(1.0, 1.0, 1.0);
 
-    Point<dim> p1(0, 0, 0);
-    Point<dim> p2(1.0, 1.0, 1.0);
+        GridGenerator::hyper_rectangle(triangulation, p1, p2);
+        to_refine_factor = 0.3;
+        to_coarsen_factor = 0.03;
 
-    GridGenerator::hyper_rectangle(triangulation, p1, p2);
-    to_refine_factor = 0.3;
-    to_coarsen_factor = 0.03;
+        Triangulation<3>::active_cell_iterator cell =
+          triangulation.begin_active(), endc = triangulation.end();
 
-    Triangulation<3>::active_cell_iterator cell =
-      triangulation.begin_active(), endc = triangulation.end();
+        /* boundary_indicators:
+             _______
+           /  1    /|
+          /______ / |
+         |       | 8|
+         |   8   | /
+         |_______|/
+             6
 
-    /* boundary_indicators:
-         _______
-       /  1    /|
-      /______ / |
-     |       | 8|
-     |   8   | /
-     |_______|/
-         6
+         The boundary indicators of the sides of the cube are 8.
+         The boundary indicator of the bottom is indicated with 6
+         and the top with 1.
+         */
 
-     The boundary indicators of the sides of the cube are 8.
-     The boundary indicator of the bottom is indicated with 6
-     and the top with 1.
-     */
-
-    for (; cell != endc; ++cell)
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
-        {
-          if (cell->face(face)->center()[2] == p2(2))
-            cell->face(face)->set_boundary_indicator(1);
-          if (cell->face(face)->center()[0] == p1(0)
-              || cell->face(face)->center()[0] == p2(0)
-              || cell->face(face)->center()[1] == p1(1)
-              || cell->face(face)->center()[1] == p2(1))
-            cell->face(face)->set_boundary_indicator(8);
-          if (cell->face(face)->center()[2] == p1(2))
-            cell->face(face)->set_boundary_indicator(6);
-        }
+        for (; cell != endc; ++cell)
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+               ++face)
+            {
+              if (cell->face(face)->center()[2] == p2(2))
+                cell->face(face)->set_boundary_indicator(1);
+              if (cell->face(face)->center()[0] == p1(0)
+                  || cell->face(face)->center()[0] == p2(0)
+                  || cell->face(face)->center()[1] == p1(1)
+                  || cell->face(face)->center()[1] == p2(1))
+                cell->face(face)->set_boundary_indicator(8);
+              if (cell->face(face)->center()[2] == p1(2))
+                cell->face(face)->set_boundary_indicator(6);
+            }
+      }
 
     triangulation.refine_global(n_initial_refinements);
   }
+
+
 
   template <int dim>
   void
@@ -1120,7 +1118,7 @@ namespace Step42
 
     FEValues<dim> fe_values(fe, quadrature_formula,
                             update_values | update_gradients |
-                            		update_q_points  | update_JxW_values);
+                            update_q_points  | update_JxW_values);
 
     FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
                                      update_values | update_quadrature_points |
@@ -1190,7 +1188,7 @@ namespace Step42
                   Tensor<1, dim> rhs_values;
                   rhs_values = 0;
                   cell_rhs(i) += (fe_values[displacement].value(i, q_point)
-                                   * rhs_values * fe_values.JxW(q_point));
+                                  * rhs_values * fe_values.JxW(q_point));
                 }
             }
 
@@ -1219,8 +1217,8 @@ namespace Step42
 
           cell->get_dof_indices(local_dof_indices);
           constraints_dirichlet_hanging_nodes.distribute_local_to_global(cell_rhs,
-        		  local_dof_indices,
-        		  system_rhs_newton);
+              local_dof_indices,
+              system_rhs_newton);
 
           for (unsigned int i = 0; i < dofs_per_cell; i++)
             system_rhs_lambda(local_dof_indices[i]) += cell_rhs(i);
