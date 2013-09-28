@@ -385,23 +385,28 @@ namespace Step42
 
 
     template <int dim>
-    double
-    SphereObstacle<dim>::value (const Point<dim> &p,
-                                const unsigned int component) const
-    {
-      if (component == 0)
-        return p(0);
-      else if (component == 1)
-        return p(1);
-      else if (component == 2)
-        return (-std::sqrt(0.36
-                           - (p(0) - 0.5) * (p(0) - 0.5)
-                           - (p(1) - 0.5) * (p(1) - 0.5))
-                + z_surface + 0.59);
+      double
+      SphereObstacle<dim>::value (
+          const Point<dim> &p, const unsigned int component) const
+      {
+        if (component == 0)
+          return p(0);
+        else if (component == 1)
+          return p(1);
+        else if (component == 2)
+          {
+            double return_value = 1000.0;
+            if ((p(0) - 0.5) * (p(0) - 0.5) + (p(1) - 0.5) * (p(1) - 0.5)
+                < 0.36)
+              return_value = (-std::sqrt(
+                  0.36 - (p(0) - 0.5) * (p(0) - 0.5)
+                      - (p(1) - 0.5) * (p(1) - 0.5)) + z_surface + 0.59);
+            return return_value;
+          }
 
-      Assert (false, ExcNotImplemented());
-      return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
-    }
+        Assert(false, ExcNotImplemented());
+        return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
+      }
 
 
     template <int dim>
