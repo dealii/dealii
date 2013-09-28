@@ -5,10 +5,10 @@ Germany) while on a long-term visit to Texas A&amp;M University, with significan
 contributions by Timo Heister and Wolfgang Bangerth.
 <br>
 <br>
-The code described here provides the basis for the numerical experiments shown 
+The code described here provides the basis for the numerical experiments shown
 in the following paper:
 <br>
-  J. Frohne, T. Heister, W. Bangerth: <b>Efficient numerical methods for the large-scale, parallel 
+  J. Frohne, T. Heister, W. Bangerth: <b>Efficient numerical methods for the large-scale, parallel
                   solution of elastoplastic contact problems</b>. Submitted, 2013.
 </em>
 </i>
@@ -26,7 +26,7 @@ by an elasto-plastic material law (a material that can only accommodate a certai
 maximal stress) that hardens as deformation accumulates. To show we we intend to
 do before going into too many details, let us just show a picture of what the
 solution will look like (the deformable body is a cube - only half of
-which is actually shown -, the obstacle corresponds 
+which is actually shown -, the obstacle corresponds
 to a Chinese character that is discussed below):
 
 <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="">
@@ -81,17 +81,17 @@ complementarity condition in the third line implies that $\varepsilon^p=0$ if
 $\mathcal{F}(\sigma)< 0$ but that $\varepsilon^p$ may be a nonzero tensor if and
 only if $\mathcal{F}(\sigma) = 0$, and in particular that in this case
 $\varepsilon^p$ must point in the direction $\partial
-\mathcal{F}(\sigma)/\partial \sigma$. The inequality $\mathcal{F}(\sigma)\le 0$ is 
+\mathcal{F}(\sigma)/\partial \sigma$. The inequality $\mathcal{F}(\sigma)\le 0$ is
 a statement of the fact that plastic materials can only support a finite amount
 of stress; in other words, they react with plastic deformations $\varepsilon^p$
 if external forces would result in a stress $\sigma$ for which $\mathcal{F}(\sigma)> 0$
-would result. A typical form for this <i>yield function</i> is 
+would result. A typical form for this <i>yield function</i> is
 $\mathcal{F}(\sigma)=|\sigma^D|-\sigma_{\text{yield}}$ where $\tau^D
 = \tau - \dfrac{1}{3}tr(\tau)I$ is the deviatoric part of a tensor
-and $|\cdot|$ denotes the Frobenius norm. 
+and $|\cdot|$ denotes the Frobenius norm.
 
 Further equations describe a
-fixed, zero displacement on $\Gamma_D$ and 
+fixed, zero displacement on $\Gamma_D$ and
 that on the surface $\Gamma_C=\partial\Omega\backslash\Gamma_D$ where contact may appear, the normal
 force $\sigma_n=\mathbf n \cdot (\sigma(\mathbf u) \cdot
   \mathbf n)$ exerted by the obstacle is inward (no "pull" by the obstacle on our
@@ -104,13 +104,13 @@ second part describes the impenetrability of the obstacle and the body.
 The last two equations are commonly referred to as the Signorini contact
 conditions.
 
-Most materials - especially metals - have the property that they show some hardening as a result of 
+Most materials - especially metals - have the property that they show some hardening as a result of
 deformation. In other words, $\sigma_{\text{yield}}$ increases with deformation.
 In practice, it is not the elastic deformation that results in hardening,
 but the plastic component.
 There are different constitutive laws to describe those material behaviors. The
 simplest one is called linear isotropic hardening described by the flow function
-$\mathcal{F}(\sigma,\varepsilon^p) = \vert\sigma^D\vert - (\sigma_0 + 
+$\mathcal{F}(\sigma,\varepsilon^p) = \vert\sigma^D\vert - (\sigma_0 +
 \gamma^{\text{iso}}|\varepsilon^p|)$.
 
 
@@ -173,7 +173,7 @@ Given this formulation, we will apply two techniques:
 - Run a Newton method to iterate out the nonlinearity in the projector.
 - Run an active set method for the contact condition, in much the same
   way as we did in step-41.
-  
+
 A strict approach would keep the active set fixed while we iterate
 the Newton method to convergence (or maybe the other way around: find the
 final active set before moving on to the next Newton iteration).
@@ -254,7 +254,7 @@ time. As there, what we need to do is keep a subset of degrees of freedom fixed,
 leading to additional constraints that one can write as a saddle point problem.
 However, as discussed in the paper, by writing these constraints in an
 appropriate way that removes the coupling between degrees of freedom,
-we end up with a set of nodes that essentially just have Dirichlet values 
+we end up with a set of nodes that essentially just have Dirichlet values
 attached to them.
 
 
@@ -272,12 +272,12 @@ method for the contact. It works as follows:
  The start value $\hat U^0 :=
  P_{\mathcal{A}_k}(0)$ fulfills our obstacle condition, i.e., we project an
  initial zero displacement onto the set of feasible displacements.
- 
+
  <li> Assemble the Newton matrix $A_{pq} := a'(
- U^{i-1};\varphi_p,\varphi_q)$ and the right-hand-side $F(\hat U^{i-1})$. 
+ U^{i-1};\varphi_p,\varphi_q)$ and the right-hand-side $F(\hat U^{i-1})$.
  These correspond to the linearized Newton step, ignoring for the moment
- the contact inequality. 
- 
+ the contact inequality.
+
  <li> Find the primal-dual pair $(\tilde U^i,\Lambda^i)$ that satisfies
  @f{align*}
  A\tilde U^i + B\Lambda^i & = F, &\\
@@ -285,11 +285,11 @@ method for the contact. It works as follows:
  \Lambda^i_p & = 0 & \forall p\in\mathcal{F}_i.
  @f}
  As in step-41, we can obtain the solution to this problem by eliminating
- those degrees of freedom in ${\cal A}_i$ from the first equation and 
+ those degrees of freedom in ${\cal A}_i$ from the first equation and
  obtain a linear system $\hat {\hat A}(U^{i-1}) \tilde U^i = \hat {\hat H}(U^{i-1})$.
- 
- 
- 
+
+
+
  <li> Damp the Newton iteration for $i>2$ by applying a line search and
  calculating a linear combination of $U^{i-1}$ and $\tilde U^i$. This
  requires finding an
@@ -300,13 +300,13 @@ method for the contact. It works as follows:
  @f{gather*}
    \vert F\left(U^{i}\right) \vert < \vert F\left(U^{i-1}\right) \vert.
  \f}
- 
+
  <li> Define the new active and inactive sets by
  @f{gather*}\mathcal{A}_{i+1}:=\lbrace p\in\mathcal{S}:\Lambda^i_p +
  c\left(\left[B^TU^i\right]_p - G_p\right) > 0\rbrace,@f}
  @f{gather*}\mathcal{F}_{i+1}:=\lbrace p\in\mathcal{S}:\Lambda^i_p +
  c\left(\left[B^TU^i\right]_p - G_p\right) \leq 0\rbrace.@f}
- 
+
  <li>Project $U^i$ so that it satisfies the contact inequality,
  @f{gather*}\hat U^i := P_{\mathcal{A}_{i+1}}(U^i).@f}
  Here,
@@ -319,12 +319,12 @@ method for the contact. It works as follows:
  \end{cases}@f}
  where $g_{h,p}$ is the <i>gap</i> denoting the distance of the obstacle
  from the undisplaced configuration of the body.
- 
+
  <li> If $\mathcal{A}_{i+1} = \mathcal{A}_k$ and $\vert
  F\left(U^{i}\right) \vert < \delta$ then stop, else set $i=i+1$ and go to
  step (1). This step ensures that we only stop iterations if both the correct
  active set has been found and the plasticity has been iterated to sufficient
- accuracy. 
+ accuracy.
 </ol>
 
 In step 3 of this algorithm,
@@ -335,7 +335,7 @@ $\Gamma_C$, i.e., the surface where contact may happen. As shown in the paper,
 we can choose $B$ to be a matrix that has only one entry per row,
 (see also H&uuml;eber, Wohlmuth: A primal-dual active
 set strategy for non-linear multibody contact problems, Comput. Methods Appl. Mech. Engrg.
-194, 2005, pp. 3147-3166). 
+194, 2005, pp. 3147-3166).
 The vector $G$ is defined by a suitable approximation $g_h$ of the gap $g$
 @f{gather*}G_p = \begin{cases}
 g_{h,p}, & \text{if}\quad p\in\mathcal{S}\\
@@ -367,15 +367,19 @@ arises from the contact. For this purpose we create three objects of type
 ConstraintMatrix that describe the various constraints and that we will
 combine as appropriate in each iteration.
 
-Compared to step-41, the programs has two new classes:
+Compared to step-41, the programs has a few new classes:
 
 <ul>
 <li> <code>ConstitutiveLaw</code> describes the plastic behavior of the
   material
 
-<li> <code>Input</code> is responsible for the parameters that describe
-  the overall setup. In particular, this
-  class allows us to read in an obstacle from a file. In the example we
+<li> <code>SphereObstacle</code> describes a sphere that serves as the
+  obstacle that is pushed into the deformable, elastoplastic body.
+  Whether this or the next class is used to describe the obstacle is
+  determined from the input parameter file.
+
+<li> <code>ChineseObstacle</code> (and a helper class) is a class that
+  allows us to read in an obstacle from a file. In the example we
   will show in the results section, this file will be
   <code>'obstacle_file.dat'</code> and will correspond to data that shows the
   Chinese, Japanese or
@@ -394,3 +398,4 @@ Compared to step-41, the programs has two new classes:
 
   <img src="http://www.dealii.org/images/steps/developer/step-42.character.png" alt="" width="25%">
 </ul>
+
