@@ -24,6 +24,22 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
   FIND_PACKAGE(P4EST)
 
   IF(P4EST_FOUND)
+    SET(${var} TRUE)
+
+    #
+    # We require at least version 0.3.4.1
+    #
+    IF(P4EST_VERSION VERSION_LESS  "0.3.4.1")
+      MESSAGE(STATUS "Insufficient p4est installation found: "
+        "At least version 0.3.4.1 is required."
+        )
+      SET(P4EST_ADDITIONAL_ERROR_STRING
+        "Insufficient p4est installation found!\n"
+        "At least version 0.3.4.1 is required.\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
     #
     # Check whether p4est supports mpi:
     #
@@ -32,10 +48,17 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
         "p4est has to be configured with MPI enabled."
         )
       SET(P4EST_ADDITIONAL_ERROR_STRING
+        ${P4EST_ADDITIONAL_ERROR_STRING}
         "Insufficient p4est installation found!\n"
         "p4est has to be configured with MPI enabled.\n"
         )
+      SET(${var} FALSE)
+    ENDIF()
 
+    #
+    # Reset configuration:
+    #
+    IF(NOT ${var})
       UNSET(P4EST_LIBRARY_OPTIMIZED CACHE)
       UNSET(P4EST_LIBRARY_DEBUG CACHE)
       UNSET(P4EST_INCLUDE_DIR CACHE)
@@ -46,11 +69,11 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
         "An optional hint to a p4est installation/directory"
         )
       MARK_AS_ADVANCED(CLEAR P4EST_DIR)
-    ELSE()
-      SET(${var} TRUE)
     ENDIF()
+
   ENDIF()
 ENDMACRO()
+
 
 MACRO(FEATURE_P4EST_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES(${P4EST_INCLUDE_DIRS})

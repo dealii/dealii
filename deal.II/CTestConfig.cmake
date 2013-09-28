@@ -34,6 +34,6 @@ SET(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_WARNINGS 300)
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "/bundled"
-  "/CMakeFiles/CMakeTmp/"
   "/contrib"
+  "/cmake/scripts/"
   )
