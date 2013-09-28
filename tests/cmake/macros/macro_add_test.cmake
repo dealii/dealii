@@ -82,10 +82,11 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       IF("${_n_cpu}" STREQUAL "0")
         SET(_target ${_test_name}.${_build_lowercase}) # the target name for the executable
         SET(_run_command) # the first part of the command to issue
-        SET(_n_cpu 1) # set it to one, we'll still occupy one processor to run a test ;-)
+        SET(_processors 1)
       ELSE()
         SET(_target ${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # the target name for the executable
         SET(_run_command mpirun -np ${_n_cpu}) # the first part of the command to issue
+        SET(_processors 2) # heuristically...
       ENDIF()
 
       SET(_test_full ${_category}/${_target}) # full test name
@@ -186,7 +187,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
-        PROCESSORS ${_n_cpu} # 0 was changed to 1 above.
+        PROCESSORS ${_processors}
         )
     ENDIF()
   ENDFOREACH()
