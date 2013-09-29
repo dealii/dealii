@@ -258,7 +258,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                   const types::boundary_id,
                                   const types::boundary_id,
                                   unsigned int,
-                                  const Tensor<1,deal_II_space_dimension> &);
+                                  const Tensor<1,X::space_dimension> &);
     
       template<typename DH>
       std::vector<PeriodicFacePair<X::cell_iterator> >
@@ -266,7 +266,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                  (const X &,
                                   const types::boundary_id,
                                   unsigned int,
-                                  const Tensor<1,deal_II_space_dimension> &);
+                                  const Tensor<1,X::space_dimension> &);
 
       template
       std::map<X::face_iterator, std::pair<X::face_iterator, std::bitset<3> > >
@@ -276,7 +276,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                   const types::boundary_id,
                                   const types::boundary_id,
                                   int,
-                                  const Tensor<1,deal_II_space_dimension> &);
+                                  const Tensor<1,X::space_dimension> &);
       template
       std::map<X::active_face_iterator, std::pair<X::active_face_iterator, std::bitset<3> > >
       collect_periodic_face_pairs
@@ -285,7 +285,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                   const types::boundary_id,
                                   const types::boundary_id,
                                   int,
-                                  const Tensor<1,deal_II_space_dimension> &);
+                                  const Tensor<1,X::active_face_iterator::AccessorType::space_dimension> &);
 
       template
       std::map<X::face_iterator, std::pair<X::face_iterator, std::bitset<3> > >
@@ -294,7 +294,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                   const types::boundary_id,
                                   const types::boundary_id,
                                   int,
-                                  const Tensor<1,deal_II_space_dimension> &);
+                                  const Tensor<1,X::space_dimension> &);
 
       template
       std::map<X::face_iterator, X::face_iterator>
