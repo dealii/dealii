@@ -764,13 +764,12 @@ namespace Step42
         refine_fix_dofs
       };
     };
-    typename RefinementStrategy::value refinement_strategy;
+    typename RefinementStrategy::value                 refinement_strategy;
 
-    const bool transfer_solution;
-    std::string output_dir;
-    const unsigned int n_cycles;
-
-    unsigned int cycle;
+    const bool                                         transfer_solution;
+    std::string                                        output_dir;
+    const unsigned int                                 n_refinement_cycles;
+    unsigned int                                       current_refinement_cycle;
   };
 
 
@@ -815,7 +814,7 @@ namespace Step42
               (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
 
     transfer_solution (prm.get_bool("transfer solution")),
-    n_cycles (prm.get_integer("number of cycles"))
+    n_refinement_cycles (prm.get_integer("number of cycles"))
   {
     std::string strat = prm.get("refinement strategy");
     if (strat == "global")
@@ -852,7 +851,7 @@ namespace Step42
                       "refinement strategy for each cycle:\n"
                       " global: one global refinement\n"
                       " percentage: fixed percentage gets refined using kelly\n"
-                      " fix dofs: tries to achieve 2^initial_refinement*300 dofs after cycle 1 (only use 2 cycles!). Changes the coarse mesh!");
+                      " fix dofs: tries to achieve 2^initial_refinement*300 dofs after refinement cycle 1 (only use 2 cycles!). Changes the coarse mesh!");
     prm.declare_entry("number of cycles", "5", Patterns::Integer(),
                       "number of adaptive cycles to run");
     prm.declare_entry("obstacle filename", "", Patterns::Anything(),
@@ -1592,9 +1591,9 @@ namespace Step42
       {
         if (transfer_solution)
           {
-            if (transfer_solution && j == 1 && cycle == 0)
+            if (transfer_solution && j == 1 && current_refinement_cycle == 0)
               constitutive_law.set_sigma_0(1e+10);
-            else if (transfer_solution && (j == 2 || cycle > 0))
+            else if (transfer_solution && (j == 2 || current_refinement_cycle > 0))
               constitutive_law.set_sigma_0(sigma_hlp);
           }
         else
@@ -1677,7 +1676,7 @@ namespace Step42
             // since the elastic solution is not in the convex set of the plastic solution.
             if (!transfer_solution && j == 2)
               break;
-            if (transfer_solution && j == 2 && cycle == 0)
+            if (transfer_solution && j == 2 && current_refinement_cycle == 0)
               break;
           }
 
@@ -1986,15 +1985,15 @@ namespace Step42
   PlasticityContactProblem<dim>::run ()
   {
     computing_timer.reset();
-    for (cycle = 0; cycle < n_cycles; ++cycle)
+    for (current_refinement_cycle = 0; current_refinement_cycle < n_refinement_cycles; ++current_refinement_cycle)
       {
         {
           TimerOutput::Scope t(computing_timer, "Setup");
 
           pcout << std::endl;
-          pcout << "Cycle " << cycle << ':' << std::endl;
+          pcout << "Cycle " << current_refinement_cycle << ':' << std::endl;
 
-          if (cycle == 0)
+          if (current_refinement_cycle == 0)
             {
               make_grid();
               setup_system();
@@ -2008,24 +2007,21 @@ namespace Step42
 
         solve_newton();
 
-        if (true) //Utilities::MPI::n_mpi_processes(mpi_communicator) <= 64)
-          {
-            pcout << "      Writing graphical output... " << std::flush;
+        {
+          pcout << "      Writing graphical output... " << std::flush;
 
-            TimerOutput::Scope t(computing_timer, "Graphical output");
+          TimerOutput::Scope t(computing_timer, "Graphical output");
 
-            std::ostringstream filename_solution;
-            filename_solution << "solution-";
-            filename_solution << Utilities::int_to_string(cycle, 2);
-            output_results(filename_solution.str());
-          }
+          output_results((std::string("solution-") +
+                          Utilities::int_to_string(current_refinement_cycle, 2)).c_str());
+        }
 
         computing_timer.print_summary();
         computing_timer.reset();
 
         Utilities::System::MemoryStats stats;
         Utilities::System::get_memory_stats(stats);
-        pcout << "VMPEAK, Resident in kB: " << stats.VmSize << " "
+        pcout << "Peak virtual memory used, resident in kB: " << stats.VmSize << " "
               << stats.VmRSS << std::endl;
 
         if (base_mesh == "box")
@@ -2036,28 +2032,53 @@ namespace Step42
 
 // @sect3{The <code>main</code> function}
 
-int
-main (
-  int argc, char *argv[])
+int main (int argc, char *argv[])
 {
   using namespace dealii;
   using namespace Step42;
 
-  deallog.depth_console(0);
-  ParameterHandler prm;
-  PlasticityContactProblem<3>::declare_parameters(prm);
-  if (argc != 2)
+  try
     {
-      prm.print_parameters(std::cout, ParameterHandler::Text);
-      return 0;
-    }
+      deallog.depth_console(0);
+      ParameterHandler prm;
+      PlasticityContactProblem<3>::declare_parameters(prm);
+      if (argc != 2)
+        {
+          std::cerr << "*** Call this program as <./step-42 input.prm>" << std::endl;
+          return 1;
+        }
 
-  prm.read_input(argv[1]);
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-  {
-    PlasticityContactProblem<3> problem(prm);
-    problem.run();
-  }
+      prm.read_input(argv[1]);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+      {
+        PlasticityContactProblem<3> problem(prm);
+        problem.run();
+      }
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      return 1;
+    }
 
   return 0;
 }
