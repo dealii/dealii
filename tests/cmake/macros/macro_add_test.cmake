@@ -128,6 +128,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       #
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
+        COMMAND touch ${_test_directory}/output
         COMMAND
           ${_run_command}
           || (mv ${_test_directory}/output
@@ -146,6 +147,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
           ${TEST_DIR}/cmake/scripts/normalize.pl
         )
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
+        COMMAND touch ${_test_directory}/diff
         COMMAND
           ${TEST_DIFF}
             ${_test_directory}/output
