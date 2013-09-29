@@ -670,46 +670,90 @@ namespace Step42
     void refine_grid ();
     void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
     void output_results (const std::string &title);
-    void output_contact_force (const unsigned int cycle);
+    void output_contact_force () const;
 
+    // As far as member variables are concerned, we start with ones that we use to
+    // indicate the MPI universe this program runs on, a stream we use to let
+    // exactly one processor produce output to the console (see step-17) and
+    // a variable that is used to time the various sections of the program:
     MPI_Comm           mpi_communicator;
     ConditionalOStream pcout;
     TimerOutput        computing_timer;
 
-    const unsigned int                        n_initial_refinements;
+    // The next group describes the mesh and the finite element space.
+    // In particular, for this parallel program, the finite element
+    // space has associated with it variables that indicate which degrees
+    // of freedom live on the current processor (the index sets, see
+    // also step-40 and the @ref distributed documentation module) as
+    // well as a variety of constraints: those imposed by hanging nodes,
+    // by Dirichlet boundary conditions, and by the active set of
+    // contact nodes. Of the three ConstraintMatrix variables defined
+    // here, the first only contains hanging node constraints, the
+    // second also those associated with Dirichlet boundary conditions,
+    // and the third these plus the contact constraints.
+    //
+    // The variable <code>active_set</code> consists of those degrees
+    // of freedom constrained by the contact, and we use
+    // <code>fraction_of_plastic_q_points_per_cell</code> to keep
+    // track of the fraction of quadrature points on each cell where
+    // the stress equals the yield stress. The latter is only used to
+    // create graphical output showing the plastic zone, but not for
+    // any further computation; the variable is a member variable of
+    // this class since the information is computed as a by-product
+    // of computing the residual, but is used only much later. (Note
+    // that the vector is a vector of length equal to the number of
+    // active cells on the <i>local mesh</i>; it is never used to
+    // exchange information between processors and can therefore be
+    // a regular deal.II vector.)
+    const unsigned int                        n_initial_global_refinements;
     parallel::distributed::Triangulation<dim> triangulation;
 
-    const unsigned int degree;
+    const unsigned int fe_degree;
     FESystem<dim>      fe;
     DoFHandler<dim>    dof_handler;
 
     IndexSet           locally_owned_dofs;
     IndexSet           locally_relevant_dofs;
 
-    ConstraintMatrix   constraints;
     ConstraintMatrix   constraints_hanging_nodes;
-    ConstraintMatrix   constraints_dirichlet_hanging_nodes;
+    ConstraintMatrix   constraints_dirichlet_and_hanging_nodes;
+    ConstraintMatrix   all_constraints;
 
     IndexSet           active_set;
     Vector<float>      fraction_of_plastic_q_points_per_cell;
 
 
-    TrilinosWrappers::SparseMatrix system_matrix_newton;
+    // The next block of variables corresponds to the solution
+    // and the linear systems we need to form. In particular, this
+    // includes the Newton matrix and right hand side; the vector
+    // that corresponds to the residual (i.e., the Newton right hand
+    // side) but from which we have not eliminated the various
+    // constraints and that is used to determine which degrees of
+    // freedom need to be constrained in the next iteration; and
+    // a vector that corresponds to the diagonal of the $B$ matrix
+    // briefly mentioned in the introduction and discussed in the
+    // accompanying paper.
+    TrilinosWrappers::SparseMatrix    system_matrix_newton;
 
     TrilinosWrappers::MPI::Vector     solution;
     TrilinosWrappers::MPI::Vector     system_rhs_newton;
     TrilinosWrappers::MPI::Vector     system_rhs_lambda;
     TrilinosWrappers::MPI::Vector     resid_vector;
     TrilinosWrappers::MPI::Vector     diag_mass_matrix_vector;
-    TrilinosWrappers::PreconditionAMG preconditioner_u;
 
-    const std::string                                  base_mesh;
-    const std_cxx1x::shared_ptr<const Function<dim> >  obstacle;
-
+    // The next block contains the variables that describe the material
+    // response:
     const double         e_modulus, nu, gamma, sigma_0;
     ConstitutiveLaw<dim> constitutive_law;
 
-    unsigned int cycle;
+    // And then there is an assortment of other variables that are used
+    // to identify the mesh we are asked to build as selected by the
+    // parameter file, the obstacle that is being pushed into the
+    // deformable body, the mesh refinement strategy, whether to transfer
+    // the solution from one mesh to the next, and how many mesh
+    // refinement cycles to perform.
+    const std::string                                  base_mesh;
+    const std_cxx1x::shared_ptr<const Function<dim> >  obstacle;
 
     struct RefinementStrategy
     {
@@ -722,9 +766,11 @@ namespace Step42
     };
     typename RefinementStrategy::value refinement_strategy;
 
-    const unsigned int n_cycles;
     const bool transfer_solution;
     std::string output_dir;
+    const unsigned int n_cycles;
+
+    unsigned int cycle;
   };
 
 
@@ -743,19 +789,13 @@ namespace Step42
           (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
     computing_timer(MPI_COMM_WORLD, pcout, TimerOutput::never,
                     TimerOutput::wall_times),
-    n_initial_refinements (prm.get_integer("number of initial refinements")),
+
+    n_initial_global_refinements (prm.get_integer("number of initial refinements")),
     triangulation(mpi_communicator),
-    degree (prm.get_integer("polynomial degree")),
-    fe(FE_Q<dim>(QGaussLobatto<1>(degree+1)), dim),
+    fe_degree (prm.get_integer("polynomial degree")),
+    fe(FE_Q<dim>(QGaussLobatto<1>(fe_degree+1)), dim),
     dof_handler(triangulation),
-    base_mesh (prm.get("base mesh")),
-    obstacle (prm.get("obstacle filename") != ""
-              ?
-              static_cast<const Function<dim>*>
-              (new EquationData::ChineseObstacle<dim>(prm.get("obstacle filename"), (base_mesh == "box" ? 1.0 : 0.5)))
-              :
-              static_cast<const Function<dim>*>
-              (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
+
     e_modulus (200000),
     nu (0.3),
     gamma (0.01),
@@ -764,8 +804,18 @@ namespace Step42
                       nu,
                       sigma_0,
                       gamma),
-    n_cycles (prm.get_integer("number of cycles")),
-    transfer_solution (prm.get_bool("transfer solution"))
+
+    base_mesh (prm.get("base mesh")),
+    obstacle (prm.get("obstacle filename") != ""
+              ?
+              static_cast<const Function<dim>*>
+              (new EquationData::ChineseObstacle<dim>(prm.get("obstacle filename"), (base_mesh == "box" ? 1.0 : 0.5)))
+              :
+              static_cast<const Function<dim>*>
+              (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
+
+    transfer_solution (prm.get_bool("transfer solution")),
+    n_cycles (prm.get_integer("number of cycles"))
   {
     std::string strat = prm.get("refinement strategy");
     if (strat == "global")
@@ -781,7 +831,7 @@ namespace Step42
     mkdir(output_dir.c_str(), 0777);
 
     pcout << "    Using output directory '" << output_dir << "'" << std::endl;
-    pcout << "    FE degree " << degree << std::endl;
+    pcout << "    FE degree " << fe_degree << std::endl;
     pcout << "    transfer solution "
           << (transfer_solution ? "true" : "false") << std::endl;
   }
@@ -879,7 +929,7 @@ namespace Step42
             }
       }
 
-    triangulation.refine_global(n_initial_refinements);
+    triangulation.refine_global(n_initial_global_refinements);
   }
 
 
@@ -935,7 +985,7 @@ namespace Step42
                                            mpi_communicator);
 
       DoFTools::make_sparsity_pattern(dof_handler, sp,
-                                      constraints_dirichlet_hanging_nodes, false,
+                                      constraints_dirichlet_and_hanging_nodes, false,
                                       Utilities::MPI::this_mpi_process(mpi_communicator));
 
       sp.compress();
@@ -1024,11 +1074,9 @@ namespace Step42
                                   * fe_values[displacement].symmetric_gradient(i, q_point);
 
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    {
-                      cell_matrix(i, j) += (stress_tensor
-                                            * fe_values[displacement].symmetric_gradient(j, q_point)
-                                            * fe_values.JxW(q_point));
-                    }
+                    cell_matrix(i, j) += (stress_tensor
+                                          * fe_values[displacement].symmetric_gradient(j, q_point)
+                                          * fe_values.JxW(q_point));
 
                   // the linearized part a(v^i;v^i,v) of the rhs
                   cell_rhs(i) += (stress_tensor * strain_tensor[q_point]
@@ -1073,9 +1121,11 @@ namespace Step42
             }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix, cell_rhs,
-                                                 local_dof_indices, system_matrix_newton, system_rhs_newton,
-                                                 true);
+          all_constraints.distribute_local_to_global(cell_matrix, cell_rhs,
+                                                     local_dof_indices,
+                                                     system_matrix_newton,
+                                                     system_rhs_newton,
+                                                     true);
 
         }
 
@@ -1136,8 +1186,6 @@ namespace Step42
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {
               SymmetricTensor<4, dim> stress_strain_tensor;
-              SymmetricTensor<2, dim> stress_tensor;
-
               const bool q_point_is_plastic
                 = constitutive_law.get_stress_strain_tensor(strain_tensor[q_point],
                                                             stress_strain_tensor);
@@ -1187,7 +1235,7 @@ namespace Step42
             }
 
           cell->get_dof_indices(local_dof_indices);
-          constraints_dirichlet_hanging_nodes.distribute_local_to_global(cell_rhs,
+          constraints_dirichlet_and_hanging_nodes.distribute_local_to_global(cell_rhs,
               local_dof_indices,
               system_rhs_newton);
 
@@ -1212,8 +1260,7 @@ namespace Step42
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::assemble_mass_matrix_diagonal (
-    TrilinosWrappers::SparseMatrix &mass_matrix)
+  PlasticityContactProblem<dim>::assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
   {
     QGaussLobatto<dim - 1> face_quadrature_formula(fe.degree + 1);
 
@@ -1253,9 +1300,6 @@ namespace Step42
 
               cell->get_dof_indices(local_dof_indices);
 
-//          constraints_dirichlet_hanging_nodes.distribute_local_to_global(
-//              cell_matrix, local_dof_indices, mass_matrix);
-
               for (unsigned int i = 0; i < dofs_per_cell; i++)
                 mass_matrix.add(local_dof_indices[i], local_dof_indices[i],
                                 cell_matrix(i, i));
@@ -1273,8 +1317,9 @@ namespace Step42
   {
     std::vector<bool> vertex_touched(dof_handler.n_dofs(), false);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-      dof_handler.begin_active(), endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
     TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
     distributed_solution = solution;
@@ -1283,7 +1328,7 @@ namespace Step42
     TrilinosWrappers::MPI::Vector diag_mass_matrix_vector_relevant(solution);
     diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
 
-    constraints.reinit(locally_relevant_dofs);
+    all_constraints.reinit(locally_relevant_dofs);
     active_set.clear();
     IndexSet active_set_locally_owned;
     active_set_locally_owned.set_size(locally_owned_dofs.size());
@@ -1337,11 +1382,10 @@ namespace Step42
                       if (lambda(index_z)
                           / diag_mass_matrix_vector_relevant(index_z)
                           + c * (solution_index_z - gap) > 0
-                          && !(constraints_hanging_nodes.is_constrained(
-                                 index_z)))
+                          && !(constraints_hanging_nodes.is_constrained(index_z)))
                         {
-                          constraints.add_line(index_z);
-                          constraints.set_inhomogeneity(index_z, gap);
+                          all_constraints.add_line(index_z);
+                          all_constraints.set_inhomogeneity(index_z, gap);
                           distributed_solution(index_z) = gap;
 
                           if (locally_owned_dofs.is_element(index_z))
@@ -1355,8 +1399,7 @@ namespace Step42
                       else if (lambda(index_z)
                                / diag_mass_matrix_vector_relevant(index_z)
                                + c * (solution_index_z - gap) > 0
-                               && constraints_hanging_nodes.is_constrained(
-                                 index_z))
+                               && constraints_hanging_nodes.is_constrained(index_z))
                         {
                           if (locally_owned_dofs.is_element(index_z))
                             counter_hanging_nodes += 1;
@@ -1366,22 +1409,21 @@ namespace Step42
             }
     distributed_solution.compress(VectorOperation::insert);
 
-    unsigned int sum_contact_constraints = Utilities::MPI::sum(
-                                             active_set_locally_owned.n_elements(), mpi_communicator);
+    const unsigned int sum_contact_constraints
+      = Utilities::MPI::sum(active_set_locally_owned.n_elements(),
+                            mpi_communicator);
     pcout << "         Size of active set: " << sum_contact_constraints
           << std::endl;
-    unsigned int sum_contact_hanging_nodes = Utilities::MPI::sum(
-                                               counter_hanging_nodes, mpi_communicator);
+    const unsigned int sum_contact_hanging_nodes
+      = Utilities::MPI::sum(counter_hanging_nodes,
+                            mpi_communicator);
     pcout << "         Number of hanging nodes in contact: "
           << sum_contact_hanging_nodes << std::endl;
 
     solution = distributed_solution;
 
-    constraints.close();
-
-    //    constraints_dirichlet_hanging_nodes.print (std::cout);
-
-    constraints.merge(constraints_dirichlet_hanging_nodes);
+    all_constraints.close();
+    all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
   }
 
 // @sect4{PlasticityContactProblem::dirichlet_constraints}
@@ -1404,24 +1446,24 @@ namespace Step42
      6
      */
 
-    constraints_dirichlet_hanging_nodes.reinit(locally_relevant_dofs);
-    constraints_dirichlet_hanging_nodes.merge(constraints_hanging_nodes);
+    constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
+    constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
 
     // interpolate all components of the solution
     VectorTools::interpolate_boundary_values(dof_handler,
                                              base_mesh == "box" ? 6 : 0, EquationData::BoundaryValues<dim>(),
-                                             constraints_dirichlet_hanging_nodes, ComponentMask());
+                                             constraints_dirichlet_and_hanging_nodes, ComponentMask());
 
     // interpolate x- and y-components of the
     // solution (this is a bit mask, so apply
     // operator| )
-    FEValuesExtractors::Scalar x_displacement(0);
-    FEValuesExtractors::Scalar y_displacement(1);
+    const FEValuesExtractors::Scalar x_displacement(0);
+    const FEValuesExtractors::Scalar y_displacement(1);
     VectorTools::interpolate_boundary_values(dof_handler, 8,
                                              EquationData::BoundaryValues<dim>(),
-                                             constraints_dirichlet_hanging_nodes,
+                                             constraints_dirichlet_and_hanging_nodes,
                                              (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
-    constraints_dirichlet_hanging_nodes.close();
+    constraints_dirichlet_and_hanging_nodes.close();
   }
 
 // @sect4{PlasticityContactProblem::solve}
@@ -1464,6 +1506,7 @@ namespace Step42
     distributed_solution.compress(VectorOperation::insert);
     system_rhs_newton.compress(VectorOperation::insert);
 
+    TrilinosWrappers::PreconditionAMG preconditioner;
     {
       TimerOutput::Scope t(computing_timer, "Solve: setup preconditioner");
 
@@ -1480,7 +1523,7 @@ namespace Step42
       additional_data.smoother_sweeps = 2;
       additional_data.aggregation_threshold = 1e-2;
 
-      preconditioner_u.initialize(system_matrix_newton, additional_data);
+      preconditioner.initialize(system_matrix_newton, additional_data);
     }
 
     {
@@ -1505,7 +1548,7 @@ namespace Step42
                SolverFGMRES<TrilinosWrappers::MPI::Vector>::
                AdditionalData(30, true)*/);
       solver.solve(system_matrix_newton, distributed_solution,
-                   system_rhs_newton, preconditioner_u);
+                   system_rhs_newton, preconditioner);
 
       pcout << "         Error: " << solver_control.initial_value()
             << " -> " << solver_control.last_value() << " in "
@@ -1513,7 +1556,7 @@ namespace Step42
             << std::endl;
     }
 
-    constraints.distribute(distributed_solution);
+    all_constraints.distribute(distributed_solution);
 
     solution = distributed_solution;
   }
@@ -1614,7 +1657,7 @@ namespace Step42
             const unsigned int start_res = (res.local_range().first),
                                end_res = (res.local_range().second);
             for (unsigned int n = start_res; n < end_res; ++n)
-              if (constraints.is_inhomogeneously_constrained(n))
+              if (all_constraints.is_inhomogeneously_constrained(n))
                 res(n) = 0;
 
             res.compress(VectorOperation::insert);
@@ -1641,12 +1684,9 @@ namespace Step42
         resid_old = resid;
 
         resid_vector = system_rhs_lambda;
-        resid_vector.compress(VectorOperation::insert);
 
-        int is_my_set_changed = (active_set == active_set_old) ? 0 : 1;
-        int num_changed = Utilities::MPI::sum(is_my_set_changed,
-                                              MPI_COMM_WORLD);
-        if (num_changed == 0)
+        if (Utilities::MPI::sum((active_set == active_set_old) ? 0 : 1,
+                                mpi_communicator) == 0)
           {
             pcout << "      Active set did not change!" << std::endl;
             if (output_dir.compare("its/") != 0 && resid < 1e-7)
@@ -1669,40 +1709,44 @@ namespace Step42
   {
     if (refinement_strategy == RefinementStrategy::refine_global)
       {
-        triangulation.refine_global(1);
+        for (typename Triangulation<dim>::active_cell_iterator
+             cell = triangulation.begin_active();
+             cell != triangulation.end(); ++cell)
+          if (cell->is_locally_owned())
+            cell->set_refine_flag ();
       }
     else
       {
-        Vector<float> estimated_error_per_cell(
-          triangulation.n_active_cells());
+        Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
         KellyErrorEstimator<dim>::estimate(dof_handler,
-                                           QGauss<dim - 1>(fe.degree + 2), typename FunctionMap<dim>::type(),
-                                           solution, estimated_error_per_cell);
+                                           QGauss<dim - 1>(fe.degree + 2),
+                                           typename FunctionMap<dim>::type(),
+                                           solution,
+                                           estimated_error_per_cell);
 
         parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
           triangulation, estimated_error_per_cell, 0.3, 0.03);
+      }
 
-        triangulation.prepare_coarsening_and_refinement();
+    triangulation.prepare_coarsening_and_refinement();
 
-        parallel::distributed::SolutionTransfer<dim,
-                 TrilinosWrappers::MPI::Vector> solution_transfer(dof_handler);
-        if (transfer_solution)
-          solution_transfer.prepare_for_coarsening_and_refinement(solution);
+    parallel::distributed::SolutionTransfer<dim,
+             TrilinosWrappers::MPI::Vector> solution_transfer(dof_handler);
+    if (transfer_solution)
+      solution_transfer.prepare_for_coarsening_and_refinement(solution);
 
-        triangulation.execute_coarsening_and_refinement();
+    triangulation.execute_coarsening_and_refinement();
 
-        setup_system();
+    setup_system();
 
-        if (transfer_solution)
-          {
-            TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
-            distributed_solution = solution;
-            solution_transfer.interpolate(distributed_solution);
-            solution = distributed_solution;
-            compute_nonlinear_residual(solution);
-            resid_vector = system_rhs_lambda;
-            resid_vector.compress(VectorOperation::insert);
-          }
+    if (transfer_solution)
+      {
+        TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
+        distributed_solution = solution;
+        solution_transfer.interpolate(distributed_solution);
+        solution = distributed_solution;
+        compute_nonlinear_residual(solution);
+        resid_vector = system_rhs_lambda;
       }
   }
 
@@ -1754,7 +1798,7 @@ namespace Step42
     const unsigned int start_res = (resid_vector.local_range().first),
                        end_res = (resid_vector.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
-      if (constraints.is_inhomogeneously_constrained(n))
+      if (all_constraints.is_inhomogeneously_constrained(n))
         distributed_lambda(n) = resid_vector(n) / diag_mass_matrix_vector(n);
     distributed_lambda.compress(VectorOperation::insert);
     constraints_hanging_nodes.distribute(distributed_lambda);
@@ -1838,8 +1882,7 @@ namespace Step42
 // catch these cases.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::output_contact_force (
-    const unsigned int cycle)
+  PlasticityContactProblem<dim>::output_contact_force () const
   {
     Functions::FEFieldFunction<dim, DoFHandler<dim>,
               TrilinosWrappers::MPI::Vector> solution_function(dof_handler,
@@ -1859,7 +1902,7 @@ namespace Step42
     const unsigned int start_res = (resid_vector.local_range().first),
                        end_res = (resid_vector.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
-      if (constraints.is_inhomogeneously_constrained(n))
+      if (all_constraints.is_inhomogeneously_constrained(n))
         distributed_lambda(n) = resid_vector(n) / diag_mass_matrix_vector(n);
       else
         distributed_lambda(n) = 0;
@@ -1986,7 +2029,7 @@ namespace Step42
               << stats.VmRSS << std::endl;
 
         if (base_mesh == "box")
-          output_contact_force(cycle);
+          output_contact_force();
       }
   }
 }
