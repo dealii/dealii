@@ -367,6 +367,7 @@ SET(CTEST_NOTES_FILES
   ${CTEST_BINARY_DIRECTORY}/revision.log
   ${CTEST_BINARY_DIRECTORY}/summary.log
   ${CTEST_BINARY_DIRECTORY}/detailed.log
+  ${CTEST_BINARY_DIRECTORY}/include/deal.II/base/config.h
   )
 
 
