@@ -260,19 +260,19 @@ namespace Step42
     stress_strain_tensor_linearized += stress_strain_tensor_kappa;
   }
 
-  // <h3>Equation data: right hand side, boundary values, obstacles</h3>
+  // <h3>Equation data: boundary forces, boundary values, obstacles</h3>
   //
   // The following should be relatively standard. We need classes for
-  // the right hand side forcing term (which we here choose to be zero)
+  // the boundary forcing term (which we here choose to be zero)
   // and boundary values on those part of the boundary that are not part
   // of the contact surface (also chosen to be zero here).
   namespace EquationData
   {
     template <int dim>
-    class RightHandSide : public Function<dim>
+    class BoundaryForce : public Function<dim>
     {
     public:
-      RightHandSide ();
+      BoundaryForce ();
 
       virtual
       double value (const Point<dim> &p,
@@ -284,7 +284,7 @@ namespace Step42
     };
 
     template <int dim>
-    RightHandSide<dim>::RightHandSide ()
+    BoundaryForce<dim>::BoundaryForce ()
       :
       Function<dim>(dim)
     {}
@@ -292,7 +292,7 @@ namespace Step42
 
     template <int dim>
     double
-    RightHandSide<dim>::value (const Point<dim> &,
+    BoundaryForce<dim>::value (const Point<dim> &,
                                const unsigned int) const
     {
       return 0.;
@@ -300,11 +300,11 @@ namespace Step42
 
     template <int dim>
     void
-    RightHandSide<dim>::vector_value (const Point<dim> &p,
+    BoundaryForce<dim>::vector_value (const Point<dim> &p,
                                       Vector<double> &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = RightHandSide<dim>::value(p, c);
+        values(c) = BoundaryForce<dim>::value(p, c);
     }
 
 
@@ -356,7 +356,10 @@ namespace Step42
     // at position $x=y=0.5, z=z_{\text{surface}}+0.59$ and radius $r=0.6$,
     // where $z_{\text{surface}}$ is the vertical position of the (flat)
     // surface of the deformable body. The function's <code>value</code>
-    // returns the location of the obstacle for a given $x,y$ value.
+    // returns the location of the obstacle for a given $x,y$ value if the
+    // point actually lies below the sphere, or a large positive value that
+    // can't possibly interfere with the deformation if it lies outside
+    // the "shadow" of the sphere.
     template <int dim>
     class SphereObstacle : public Function<dim>
     {
@@ -385,28 +388,28 @@ namespace Step42
 
 
     template <int dim>
-      double
-      SphereObstacle<dim>::value (
-          const Point<dim> &p, const unsigned int component) const
-      {
-        if (component == 0)
-          return p(0);
-        else if (component == 1)
-          return p(1);
-        else if (component == 2)
-          {
-            double return_value = 1000.0;
-            if ((p(0) - 0.5) * (p(0) - 0.5) + (p(1) - 0.5) * (p(1) - 0.5)
-                < 0.36)
-              return_value = (-std::sqrt(
-                  0.36 - (p(0) - 0.5) * (p(0) - 0.5)
+    double
+    SphereObstacle<dim>::value (
+      const Point<dim> &p, const unsigned int component) const
+    {
+      if (component == 0)
+        return p(0);
+      else if (component == 1)
+        return p(1);
+      else if (component == 2)
+        {
+          if ((p(0) - 0.5) * (p(0) - 0.5) + (p(1) - 0.5) * (p(1) - 0.5)
+              < 0.36)
+            return (-std::sqrt(
+                      0.36 - (p(0) - 0.5) * (p(0) - 0.5)
                       - (p(1) - 0.5) * (p(1) - 0.5)) + z_surface + 0.59);
-            return return_value;
-          }
+          else
+            return 1000;
+        }
 
-        Assert(false, ExcNotImplemented());
-        return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
-      }
+      Assert(false, ExcNotImplemented());
+      return 1e9; // an unreasonable value; ignored in debug mode because of the preceding Assert
+    }
 
 
     template <int dim>
@@ -1005,11 +1008,9 @@ namespace Step42
     const unsigned int n_q_points = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
-    const EquationData::RightHandSide<dim> right_hand_side;
-    std::vector<Vector<double> > right_hand_side_values(n_q_points,
-                                                        Vector<double>(dim));
-    std::vector<Vector<double> > right_hand_side_values_face(n_face_q_points,
-                                                             Vector<double>(dim));
+    const EquationData::BoundaryForce<dim> boundary_force;
+    std::vector<Vector<double> > boundary_force_values(n_face_q_points,
+                                                       Vector<double>(dim));
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double> cell_rhs(dofs_per_cell);
@@ -1028,9 +1029,6 @@ namespace Step42
           fe_values.reinit(cell);
           cell_matrix = 0;
           cell_rhs = 0;
-
-          right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-                                            right_hand_side_values);
 
           std::vector<SymmetricTensor<2, dim> > strain_tensor(n_q_points);
           fe_values[displacement].get_function_symmetric_gradients(u,
@@ -1084,15 +1082,14 @@ namespace Step42
                 {
                   fe_values_face.reinit(cell, face);
 
-                  right_hand_side.vector_value_list(
-                    fe_values_face.get_quadrature_points(),
-                    right_hand_side_values_face);
+                  boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
+                                                   boundary_force_values);
 
                   for (unsigned int q_point = 0; q_point < n_face_q_points;
                        ++q_point)
                     {
                       Tensor<1, dim> rhs_values;
-                      rhs_values[2] = right_hand_side_values[q_point][2];
+                      rhs_values[2] = boundary_force_values[q_point][2];
                       for (unsigned int i = 0; i < dofs_per_cell; ++i)
                         cell_rhs(i) += (fe_values_face[displacement].value(i,
                                                                            q_point) * rhs_values
@@ -1106,7 +1103,7 @@ namespace Step42
                                                  local_dof_indices, system_matrix_newton, system_rhs_newton,
                                                  true);
 
-        };
+        }
 
     system_matrix_newton.compress(VectorOperation::add);
     system_rhs_newton.compress(VectorOperation::add);
@@ -1133,11 +1130,9 @@ namespace Step42
     const unsigned int n_q_points = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
-    const EquationData::RightHandSide<dim> right_hand_side;
-    std::vector<Vector<double> > right_hand_side_values(n_q_points,
-                                                        Vector<double>(dim));
-    std::vector<Vector<double> > right_hand_side_values_face(n_face_q_points,
-                                                             Vector<double>(dim));
+    const EquationData::BoundaryForce<dim> boundary_force;
+    std::vector<Vector<double> > boundary_force_values(n_face_q_points,
+                                                       Vector<double>(dim));
 
     Vector<double> cell_rhs(dofs_per_cell);
 
@@ -1159,9 +1154,6 @@ namespace Step42
         {
           fe_values.reinit(cell);
           cell_rhs = 0;
-
-          right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-                                            right_hand_side_values);
 
           std::vector<SymmetricTensor<2, dim> > strain_tensor(n_q_points);
           fe_values[displacement].get_function_symmetric_gradients(current_solution,
@@ -1205,14 +1197,14 @@ namespace Step42
                 {
                   fe_values_face.reinit(cell, face);
 
-                  right_hand_side.vector_value_list(fe_values_face.get_quadrature_points(),
-                                                    right_hand_side_values_face);
+                  boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
+                                                   boundary_force_values);
 
                   for (unsigned int q_point = 0; q_point < n_face_q_points;
                        ++q_point)
                     {
                       Tensor<1, dim> rhs_values;
-                      rhs_values[2] = right_hand_side_values[q_point][2];
+                      rhs_values[2] = boundary_force_values[q_point][2];
                       for (unsigned int i = 0; i < dofs_per_cell; ++i)
                         cell_rhs(i) += (fe_values_face[displacement].value(i, q_point) * rhs_values
                                         * fe_values_face.JxW(q_point));
