@@ -672,61 +672,45 @@ namespace Step42
     void output_results (const std::string &title);
     void output_contact_force (const unsigned int cycle);
 
-    double to_refine_factor;
-    double to_coarsen_factor;
-    unsigned int cycle;
+    MPI_Comm           mpi_communicator;
+    ConditionalOStream pcout;
+    TimerOutput        computing_timer;
 
-    MPI_Comm mpi_communicator;
-
+    const unsigned int                        n_initial_refinements;
     parallel::distributed::Triangulation<dim> triangulation;
 
-    FE_Q<dim> u;
-    FESystem<dim> fe;
-    DoFHandler<dim> dof_handler;
+    const unsigned int degree;
+    FESystem<dim>      fe;
+    DoFHandler<dim>    dof_handler;
 
-    // We are using the SolutionTransfer class to interpolate the
-    // solution on the new refined mesh. It appears in th refine_grid()
-    // and the run() function.
-    std_cxx1x::shared_ptr<
-    parallel::distributed::SolutionTransfer<dim,
-             TrilinosWrappers::MPI::Vector> > soltrans;
+    IndexSet           locally_owned_dofs;
+    IndexSet           locally_relevant_dofs;
 
-    IndexSet locally_owned_dofs;
-    IndexSet locally_relevant_dofs;
+    ConstraintMatrix   constraints;
+    ConstraintMatrix   constraints_hanging_nodes;
+    ConstraintMatrix   constraints_dirichlet_hanging_nodes;
 
-    unsigned int number_iterations;
+    IndexSet           active_set;
+    Vector<float>      fraction_of_plastic_q_points_per_cell;
 
-    ConstraintMatrix constraints;
-    ConstraintMatrix constraints_hanging_nodes;
-    ConstraintMatrix constraints_dirichlet_hanging_nodes;
 
     TrilinosWrappers::SparseMatrix system_matrix_newton;
 
-    TrilinosWrappers::MPI::Vector solution;
-    TrilinosWrappers::MPI::Vector system_rhs_newton;
-    TrilinosWrappers::MPI::Vector system_rhs_lambda;
-    TrilinosWrappers::MPI::Vector resid_vector;
-    TrilinosWrappers::MPI::Vector diag_mass_matrix_vector;
-    Vector<float> cell_constitution;
-    IndexSet active_set;
-
-    ConditionalOStream pcout;
-
-    TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
+    TrilinosWrappers::MPI::Vector     solution;
+    TrilinosWrappers::MPI::Vector     system_rhs_newton;
+    TrilinosWrappers::MPI::Vector     system_rhs_lambda;
+    TrilinosWrappers::MPI::Vector     resid_vector;
+    TrilinosWrappers::MPI::Vector     diag_mass_matrix_vector;
     TrilinosWrappers::PreconditionAMG preconditioner_u;
 
-    std_cxx1x::shared_ptr<Function<dim> > obstacle;
-    std_cxx1x::shared_ptr<ConstitutiveLaw<dim> > constitutive_law;
+    const std::string                                  base_mesh;
+    const std_cxx1x::shared_ptr<const Function<dim> >  obstacle;
 
-    double sigma_0; // Yield stress
-    double gamma; // Parameter for the linear isotropic hardening
-    double e_modulus; // E-Modul
-    double nu; // Poisson ratio
+    const double         e_modulus, nu, gamma, sigma_0;
+    ConstitutiveLaw<dim> constitutive_law;
 
-    TimerOutput computing_timer;
+    unsigned int cycle;
 
-    unsigned int degree;
-    unsigned int n_initial_refinements;
     struct RefinementStrategy
     {
       enum value
@@ -737,11 +721,12 @@ namespace Step42
       };
     };
     typename RefinementStrategy::value refinement_strategy;
-    unsigned int n_cycles;
+
+    const unsigned int n_cycles;
+    const bool transfer_solution;
     std::string output_dir;
-    bool transfer_solution;
-    std::string base_mesh;
   };
+
 
 // @sect3{Implementation of the <code>PlasticityContactProblem</code> class}
 
@@ -754,51 +739,49 @@ namespace Step42
   PlasticityContactProblem (const ParameterHandler &prm)
     :
     mpi_communicator(MPI_COMM_WORLD),
-    triangulation(mpi_communicator),
-    u(QGaussLobatto<1>(prm.get_integer("polynomial degree") + 1)),
-    fe(u, dim),
-    dof_handler(triangulation),
     pcout(std::cout,
           (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
-    sigma_0(400.0),
-    gamma(0.01),
-    e_modulus(2.0e+5),
-    nu(0.3),
     computing_timer(MPI_COMM_WORLD, pcout, TimerOutput::never,
-                    TimerOutput::wall_times)
+                    TimerOutput::wall_times),
+    n_initial_refinements (prm.get_integer("number of initial refinements")),
+    triangulation(mpi_communicator),
+    degree (prm.get_integer("polynomial degree")),
+    fe(FE_Q<dim>(QGaussLobatto<1>(degree+1)), dim),
+    dof_handler(triangulation),
+    base_mesh (prm.get("base mesh")),
+    obstacle (prm.get("obstacle filename") != ""
+              ?
+              static_cast<const Function<dim>*>
+              (new EquationData::ChineseObstacle<dim>(prm.get("obstacle filename"), (base_mesh == "box" ? 1.0 : 0.5)))
+              :
+              static_cast<const Function<dim>*>
+              (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
+    e_modulus (200000),
+    nu (0.3),
+    gamma (0.01),
+    sigma_0(400.0),
+    constitutive_law (e_modulus,
+                      nu,
+                      sigma_0,
+                      gamma),
+    n_cycles (prm.get_integer("number of cycles")),
+    transfer_solution (prm.get_bool("transfer solution"))
   {
-    // double _E, double _nu, double _sigma_0, double _gamma
-    constitutive_law.reset(new ConstitutiveLaw<dim>(e_modulus, nu, sigma_0, gamma));
-
-    degree = prm.get_integer("polynomial degree");
-    n_initial_refinements = prm.get_integer("number of initial refinements");
     std::string strat = prm.get("refinement strategy");
     if (strat == "global")
       refinement_strategy = RefinementStrategy::refine_global;
     else if (strat == "percentage")
       refinement_strategy = RefinementStrategy::refine_percentage;
     else
-      throw ExcNotImplemented();
-
-    n_cycles = prm.get_integer("number of cycles");
-    base_mesh = prm.get("base mesh");
-    const std::string obstacle_filename = prm.get("obstacle filename");
-
-    if (obstacle_filename != "")
-      obstacle.reset (new EquationData::ChineseObstacle<dim>(obstacle_filename, (base_mesh == "box" ? 1.0 : 0.5)));
-    else
-      obstacle.reset (new EquationData::SphereObstacle<dim>((base_mesh == "box" ? 1.0 : 0.5)));
+      AssertThrow (false, ExcNotImplemented());
 
     output_dir = prm.get("output directory");
     if (output_dir != "" && *(output_dir.rbegin()) != '/')
       output_dir += "/";
     mkdir(output_dir.c_str(), 0777);
 
-    transfer_solution = prm.get_bool("transfer solution");
-
     pcout << "    Using output directory '" << output_dir << "'" << std::endl;
     pcout << "    FE degree " << degree << std::endl;
-    pcout << "    Obstacle '" << obstacle_filename << "'" << std::endl;
     pcout << "    transfer solution "
           << (transfer_solution ? "true" : "false") << std::endl;
   }
@@ -854,12 +837,8 @@ namespace Step42
         GridTools::transform(&rotate_half_sphere, triangulation);
         Point<dim> shift(0.5, 0.5, 0.5);
         GridTools::shift(shift, triangulation);
-        static HyperBallBoundary<dim> boundary_description(
-          Point<dim>(0.5, 0.5, 0.5), radius);
+        static HyperBallBoundary<dim> boundary_description(Point<dim>(0.5, 0.5, 0.5), radius);
         triangulation.set_boundary(0, boundary_description);
-
-        to_refine_factor = 0.3;
-        to_coarsen_factor = 0.03;
       }
     else
       {
@@ -867,11 +846,6 @@ namespace Step42
         Point<dim> p2(1.0, 1.0, 1.0);
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
-        to_refine_factor = 0.3;
-        to_coarsen_factor = 0.03;
-
-        Triangulation<3>::active_cell_iterator cell =
-          triangulation.begin_active(), endc = triangulation.end();
 
         /* boundary_indicators:
              _______
@@ -886,7 +860,9 @@ namespace Step42
          The boundary indicator of the bottom is indicated with 6
          and the top with 1.
          */
-
+        Triangulation<3>::active_cell_iterator
+        cell = triangulation.begin_active(),
+        endc = triangulation.end();
         for (; cell != endc; ++cell)
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
                ++face)
@@ -947,7 +923,7 @@ namespace Step42
       system_rhs_lambda.reinit(system_rhs_newton);
       resid_vector.reinit(system_rhs_newton);
       diag_mass_matrix_vector.reinit(system_rhs_newton);
-      cell_constitution.reinit(triangulation.n_active_cells());
+      fraction_of_plastic_q_points_per_cell.reinit(triangulation.n_active_cells());
       active_set.clear();
       active_set.set_size(locally_relevant_dofs.size());
     }
@@ -977,8 +953,6 @@ namespace Step42
                          end = (system_rhs_newton.local_range().second);
       for (unsigned int j = start; j < end; j++)
         diag_mass_matrix_vector(j) = mass_matrix.diag_element(j);
-
-      number_iterations = 0;
 
       diag_mass_matrix_vector.compress(VectorOperation::insert);
 
@@ -1040,9 +1014,9 @@ namespace Step42
               SymmetricTensor<4, dim> stress_strain_tensor;
               SymmetricTensor<2, dim> stress_tensor;
 
-              constitutive_law->get_linearized_stress_strain_tensors(strain_tensor[q_point],
-                                                                     stress_strain_tensor_linearized,
-                                                                     stress_strain_tensor);
+              constitutive_law.get_linearized_stress_strain_tensors(strain_tensor[q_point],
+                                                                    stress_strain_tensor_linearized,
+                                                                    stress_strain_tensor);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
@@ -1147,7 +1121,7 @@ namespace Step42
     unsigned int plast_points = 0;
     double yield = 0;
     unsigned int cell_number = 0;
-    cell_constitution = 0;
+    fraction_of_plastic_q_points_per_cell = 0;
 
     for (; cell != endc; ++cell, ++cell_number)
       if (cell->is_locally_owned())
@@ -1165,12 +1139,12 @@ namespace Step42
               SymmetricTensor<2, dim> stress_tensor;
 
               const bool q_point_is_plastic
-                = constitutive_law->get_stress_strain_tensor(strain_tensor[q_point],
-                                                             stress_strain_tensor);
+                = constitutive_law.get_stress_strain_tensor(strain_tensor[q_point],
+                                                            stress_strain_tensor);
               if (q_point_is_plastic)
                 {
                   ++plast_points;
-                  ++cell_constitution(cell_number);
+                  ++fraction_of_plastic_q_points_per_cell(cell_number);
                 }
               else
                 ++elast_points;
@@ -1221,8 +1195,7 @@ namespace Step42
             system_rhs_lambda(local_dof_indices[i]) += cell_rhs(i);
         }
 
-    cell_constitution /= n_q_points;
-    cell_constitution.compress(VectorOperation::add);
+    fraction_of_plastic_q_points_per_cell /= quadrature_formula.size();
     system_rhs_newton.compress(VectorOperation::add);
     system_rhs_lambda.compress(VectorOperation::add);
 
@@ -1386,17 +1359,7 @@ namespace Step42
                                  index_z))
                         {
                           if (locally_owned_dofs.is_element(index_z))
-                            {
-                              counter_hanging_nodes += 1;
-
-//              std::cout << "index_z = " << index_z
-//                << ", lambda = " << lambda (index_z)
-//                  << ", solution_index_z - gap = " << solution_index_z - gap
-//                << ", diag_mass_matrix_vector_relevant = " << diag_mass_matrix_vector_relevant (index_z)
-//                  << ", x = " << point(0)
-//                  << ", y = " << point(1)
-//                  << std::endl;
-                            }
+                            counter_hanging_nodes += 1;
                         }
                     }
                 }
@@ -1503,6 +1466,20 @@ namespace Step42
 
     {
       TimerOutput::Scope t(computing_timer, "Solve: setup preconditioner");
+
+      std::vector < std::vector<bool> > constant_modes;
+      DoFTools::extract_constant_modes(dof_handler, ComponentMask(),
+                                       constant_modes);
+
+      TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
+      additional_data.constant_modes = constant_modes;
+      additional_data.elliptic = true;
+      additional_data.n_cycles = 1;
+      additional_data.w_cycle = false;
+      additional_data.output_details = false;
+      additional_data.smoother_sweeps = 2;
+      additional_data.aggregation_threshold = 1e-2;
+
       preconditioner_u.initialize(system_matrix_newton, additional_data);
     }
 
@@ -1534,8 +1511,6 @@ namespace Step42
             << " -> " << solver_control.last_value() << " in "
             << solver_control.last_step() << " Bicgstab iterations."
             << std::endl;
-
-      number_iterations += solver_control.last_step();
     }
 
     constraints.distribute(distributed_solution);
@@ -1562,19 +1537,7 @@ namespace Step42
     TrilinosWrappers::MPI::Vector res(system_rhs_newton);
     TrilinosWrappers::MPI::Vector tmp_vector(system_rhs_newton);
 
-    std::vector < std::vector<bool> > constant_modes;
-    DoFTools::extract_constant_modes(dof_handler, ComponentMask(),
-                                     constant_modes);
-
     double sigma_hlp = sigma_0;
-
-    additional_data.constant_modes = constant_modes;
-    additional_data.elliptic = true;
-    additional_data.n_cycles = 1;
-    additional_data.w_cycle = false;
-    additional_data.output_details = false;
-    additional_data.smoother_sweeps = 2;
-    additional_data.aggregation_threshold = 1e-2;
 
     IndexSet active_set_old(active_set);
 
@@ -1587,16 +1550,16 @@ namespace Step42
         if (transfer_solution)
           {
             if (transfer_solution && j == 1 && cycle == 0)
-              constitutive_law->set_sigma_0(1e+10);
+              constitutive_law.set_sigma_0(1e+10);
             else if (transfer_solution && (j == 2 || cycle > 0))
-              constitutive_law->set_sigma_0(sigma_hlp);
+              constitutive_law.set_sigma_0(sigma_hlp);
           }
         else
           {
             if (j == 1)
-              constitutive_law->set_sigma_0(1e+10);
+              constitutive_law.set_sigma_0(1e+10);
             else
-              constitutive_law->set_sigma_0(sigma_hlp);
+              constitutive_law.set_sigma_0(sigma_hlp);
           }
 
         pcout << " " << std::endl;
@@ -1695,9 +1658,7 @@ namespace Step42
       }
 
     pcout << "" << std::endl << "      Number of assembled systems = "
-          << number_assemble_system << std::endl
-          << "      Number of Solver-Iterations = " << number_iterations
-          << std::endl;
+          << number_assemble_system << std::endl;
   }
 
 // @sect3{The <code>refine_grid</code> function}
@@ -1722,10 +1683,26 @@ namespace Step42
           triangulation, estimated_error_per_cell, 0.3, 0.03);
 
         triangulation.prepare_coarsening_and_refinement();
+
+        parallel::distributed::SolutionTransfer<dim,
+                 TrilinosWrappers::MPI::Vector> solution_transfer(dof_handler);
         if (transfer_solution)
-          soltrans->prepare_for_coarsening_and_refinement(solution);
+          solution_transfer.prepare_for_coarsening_and_refinement(solution);
 
         triangulation.execute_coarsening_and_refinement();
+
+        setup_system();
+
+        if (transfer_solution)
+          {
+            TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
+            distributed_solution = solution;
+            solution_transfer.interpolate(distributed_solution);
+            solution = distributed_solution;
+            compute_nonlinear_residual(solution);
+            resid_vector = system_rhs_lambda;
+            resid_vector.compress(VectorOperation::insert);
+          }
       }
   }
 
@@ -1811,7 +1788,7 @@ namespace Step42
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector(subdomain, "subdomain");
 
-    data_out.add_data_vector(cell_constitution, "CellConstitution");
+    data_out.add_data_vector(fraction_of_plastic_q_points_per_cell, "FractionOfPlasticQPoints");
 
     data_out.build_patches();
 
@@ -1977,31 +1954,13 @@ namespace Step42
           if (cycle == 0)
             {
               make_grid();
+              setup_system();
             }
           else
             {
               TimerOutput::Scope t(computing_timer, "Setup: refine mesh");
-              if (transfer_solution)
-                soltrans.reset(
-                  new parallel::distributed::SolutionTransfer<dim,
-                  TrilinosWrappers::MPI::Vector>(dof_handler));
               refine_grid();
             }
-
-          setup_system();
-
-          if (transfer_solution && cycle > 0)
-            {
-              TrilinosWrappers::MPI::Vector distributed_solution(
-                system_rhs_newton);
-              distributed_solution = solution;
-              soltrans->interpolate(distributed_solution);
-              solution = distributed_solution;
-              compute_nonlinear_residual(solution);
-              resid_vector = system_rhs_lambda;
-              resid_vector.compress(VectorOperation::insert);
-            }
-
         }
 
         solve_newton();
