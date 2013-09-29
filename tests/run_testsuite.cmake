@@ -135,6 +135,12 @@ ENDIF()
 MESSAGE("-- CTEST_SOURCE_DIRECTORY: ${CTEST_SOURCE_DIRECTORY}")
 
 #
+# Read in custom config files:
+#
+
+CTEST_READ_CUSTOM_FILES(${CTEST_SOURCE_DIRECTORY})
+
+#
 # CTEST_BINARY_DIRECTORY:
 #
 
@@ -154,6 +160,12 @@ Please either call ctest from within a designated build directory, or set CTEST_
       )
   ENDIF()
 ENDIF()
+
+#
+# Read in custom config files:
+#
+
+CTEST_READ_CUSTOM_FILES(${CTEST_BINARY_DIRECTORY})
 
 # Make sure that for a build test the directory is empty:
 FILE(GLOB _test ${CTEST_BINARY_DIRECTORY}/*)
