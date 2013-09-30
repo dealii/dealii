@@ -1373,6 +1373,8 @@ namespace Step42
     const unsigned int dofs_per_face = fe.dofs_per_face;
     const unsigned int n_face_q_points = face_quadrature.size();
 
+    std::vector<types::global_dof_index> dof_indices(dofs_per_face);
+
     // pcout<< "dofs_per_face = " << dofs_per_face
     //      << "n_face_q_points = " << n_face_q_points
     //      <<std::endl;
@@ -1385,7 +1387,6 @@ namespace Step42
               && cell->face(face)->boundary_indicator() == 1)
             {
               fe_values_face.reinit(cell, face);
-              std::vector<types::global_dof_index> dof_indices(dofs_per_face);
               cell->face(face)->get_dof_indices(dof_indices);
 
               for (unsigned int q_point = 0; q_point < n_face_q_points;
