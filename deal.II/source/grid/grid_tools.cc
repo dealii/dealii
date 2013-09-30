@@ -2419,8 +2419,8 @@ next_cell:
      const int                direction,
      const dealii::Tensor<1,DH::space_dimension> &offset)
   {
-    static const unsigned int dim = DH::dimension;
-    static const unsigned int space_dim = DH::space_dimension;
+    static const int dim = DH::dimension;
+    static const int space_dim = DH::space_dimension;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
@@ -2468,8 +2468,8 @@ next_cell:
                           const int                direction,
                           const dealii::Tensor<1,DH::space_dimension> &offset)
   {
-    static const unsigned int dim = DH::dimension;
-    static const unsigned int space_dim = DH::space_dimension;
+    static const int dim = DH::dimension;
+    static const int space_dim = DH::space_dimension;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
