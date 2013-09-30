@@ -64,6 +64,11 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-w2")
 #   -w175  subscript out of range
 #   -w177  declared but not referenced
 #   -w279  controlling expression is constant
+#   -w327  NULL reference is not allowed
+#          (the compiler is correct here in that statements like
+#           *static_cast<int*>(0) are not allowed to initialize
+#           references; however, it's the only useful way to do
+#           so if you need an invalid value for a reference)
 #   -w383  value copied to temporary, reference to temporary used
 #   -w981  operands are evaluated in unspecified order
 #   -w1418 external function definition with no prior declaration
@@ -75,6 +80,7 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd68")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd175")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd177")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd279")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd327")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd383")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd981")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1418")
