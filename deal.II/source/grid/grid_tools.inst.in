@@ -227,26 +227,26 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
     bool orthogonal_equality<X::active_face_iterator> (std::bitset<3> &,
                                                        const X::active_face_iterator&,
                                                        const X::active_face_iterator&,
-                                                       const int,
+                                                       const unsigned int,
                                                        const Tensor<1,deal_II_space_dimension> &);
 
     template
     bool orthogonal_equality<X::face_iterator> (std::bitset<3> &,
                                                 const X::face_iterator&,
                                                 const X::face_iterator&,
-                                                const int,
+                                                const unsigned int,
                                                 const Tensor<1,deal_II_space_dimension> &);
 
     template
     bool orthogonal_equality<X::active_face_iterator> (const X::active_face_iterator&,
                                                        const X::active_face_iterator&,
-                                                       const int,
+                                                       const unsigned int,
                                                        const Tensor<1,deal_II_space_dimension> &);
 
     template
     bool orthogonal_equality<X::face_iterator> (const X::face_iterator&,
                                                 const X::face_iterator&,
-                                                const int,
+                                                const unsigned int,
                                                 const Tensor<1,deal_II_space_dimension> &);
 
     #if deal_II_dimension >= 2
@@ -257,62 +257,16 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                  (const X &,
                                   const types::boundary_id,
                                   const types::boundary_id,
-                                  unsigned int,
+                                  const unsigned int,
                                   const Tensor<1,X::space_dimension> &);
-    
+
       template<typename DH>
       std::vector<PeriodicFacePair<X::cell_iterator> >
       collect_periodic_faces
                                  (const X &,
                                   const types::boundary_id,
-                                  unsigned int,
+                                  const unsigned int,
                                   const Tensor<1,X::space_dimension> &);
-
-      template
-      std::map<X::face_iterator, std::pair<X::face_iterator, std::bitset<3> > >
-      collect_periodic_face_pairs
-                                 (const X::face_iterator &,
-                                  const X::face_iterator &,
-                                  const types::boundary_id,
-                                  const types::boundary_id,
-                                  int,
-                                  const Tensor<1,X::space_dimension> &);
-      template
-      std::map<X::active_face_iterator, std::pair<X::active_face_iterator, std::bitset<3> > >
-      collect_periodic_face_pairs
-                                 (const X::active_face_iterator &,
-                                  const X::active_face_iterator &,
-                                  const types::boundary_id,
-                                  const types::boundary_id,
-                                  int,
-                                  const Tensor<1,X::active_face_iterator::AccessorType::space_dimension> &);
-
-      template
-      std::map<X::face_iterator, std::pair<X::face_iterator, std::bitset<3> > >
-      collect_periodic_face_pairs
-                                 (const X &,
-                                  const types::boundary_id,
-                                  const types::boundary_id,
-                                  int,
-                                  const Tensor<1,X::space_dimension> &);
-
-      template
-      std::map<X::face_iterator, X::face_iterator>
-      collect_periodic_face_pairs
-                                 (const X &,
-                                  const types::boundary_id,
-                                  int,
-                                  const Tensor<1,deal_II_space_dimension> &);
- 
-      template
-      void
-      identify_periodic_face_pairs
-        (const X &,
-         const types::boundary_id,
-         const types::boundary_id,
-         const unsigned int,
-         std::vector<std_cxx1x::tuple<X::cell_iterator, unsigned int,
-                                      X::cell_iterator, unsigned int> > &);
 
     #endif
 
