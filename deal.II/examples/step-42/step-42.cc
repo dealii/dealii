@@ -888,8 +888,15 @@ namespace Step42
 
 
 
-// @sect4{PlasticityContactProblem::make_grid}
+  // @sect4{PlasticityContactProblem::make_grid}
 
+  // The next block deals with constructing the starting mesh.
+  // We will use the following helper function and the first
+  // block of the <code>make_grid()</code> to construct a
+  // mesh that corresponds to a half sphere. deal.II has a function
+  // that creates such a mesh, but it is in the wrong location
+  // and facing the wrong direction, so we need to shift and rotate
+  // it a bit before using it:
   Point<3>
   rotate_half_sphere (const Point<3> &in)
   {
@@ -902,34 +909,38 @@ namespace Step42
   {
     if (base_mesh == "half sphere")
       {
-        Point<dim> center(0, 0, 0);
-        double radius = 0.8;
+        const Point<dim> center(0, 0, 0);
+        const double radius = 0.8;
         GridGenerator::half_hyper_ball(triangulation, center, radius);
+
         GridTools::transform(&rotate_half_sphere, triangulation);
-        Point<dim> shift(0.5, 0.5, 0.5);
-        GridTools::shift(shift, triangulation);
+        GridTools::shift(Point<dim>(0.5, 0.5, 0.5), triangulation);
+
         static HyperBallBoundary<dim> boundary_description(Point<dim>(0.5, 0.5, 0.5), radius);
         triangulation.set_boundary(0, boundary_description);
       }
+    // Alternatively, create a hypercube mesh. After creating it,
+    // assign boundary indicators as follows:
+    // @code
+    //    _______
+    //   /  1    /|
+    //  /______ / |
+    // |       | 8|
+    // |   8   | /
+    // |_______|/
+    //     6
+    // @endcode
+    // In other words, the boundary indicators of the sides of the cube are 8.
+    // The boundary indicator of the bottom is 6 and the top has indicator 1.
     else
       {
-        Point<dim> p1(0, 0, 0);
-        Point<dim> p2(1.0, 1.0, 1.0);
+        const Point<dim> p1(0, 0, 0);
+        const Point<dim> p2(1.0, 1.0, 1.0);
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
         /* boundary_indicators:
-             _______
-           /  1    /|
-          /______ / |
-         |       | 8|
-         |   8   | /
-         |_______|/
-             6
 
-         The boundary indicators of the sides of the cube are 8.
-         The boundary indicator of the bottom is indicated with 6
-         and the top with 1.
          */
         Triangulation<3>::active_cell_iterator
         cell = triangulation.begin_active(),
