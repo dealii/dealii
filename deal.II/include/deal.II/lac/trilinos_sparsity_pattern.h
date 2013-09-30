@@ -88,6 +88,11 @@ namespace TrilinosWrappers
                 const size_type        index);
 
       /**
+       * Copy constructor.
+       */
+      Accessor (const Accessor &a);
+
+      /**
        * Row number of the element
        * represented by this object.
        */
@@ -202,6 +207,11 @@ namespace TrilinosWrappers
       Iterator (const SparsityPattern *sparsity_pattern,
                 const size_type        row,
                 const size_type        index);
+
+      /**
+       * Copy constructor.
+       */
+      Iterator (const Iterator &i);
 
       /**
        * Prefix increment.
@@ -1413,6 +1423,16 @@ namespace TrilinosWrappers
 
 
     inline
+    Accessor::Accessor (const Accessor &a)
+      :
+      sparsity_pattern(a.sparsity_pattern),
+      a_row(a.a_row),
+      a_index(a.a_index),
+      colnum_cache (a.colnum_cache)
+    {}
+
+
+    inline
     Accessor::size_type
     Accessor::row() const
     {
@@ -1448,6 +1468,13 @@ namespace TrilinosWrappers
                        const size_type        index)
       :
       accessor(sp, row, index)
+    {}
+
+
+    inline
+    Iterator::Iterator(const Iterator &i)
+      :
+      accessor(i.accessor)
     {}
 
 

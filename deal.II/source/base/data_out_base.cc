@@ -7043,7 +7043,7 @@ write_hdf5_parallel (const DataOutFilter &data_filter, const std::string &filena
 
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
-write_hdf5_parallel (const DataOutFilter &data_filter, const bool &write_mesh_file, const std::string &mesh_filename, const std::string &solution_filename, MPI_Comm comm) const
+write_hdf5_parallel (const DataOutFilter &data_filter, const bool write_mesh_file, const std::string &mesh_filename, const std::string &solution_filename, MPI_Comm comm) const
 {
   DataOutBase::write_hdf5_parallel(get_patches(), data_filter, write_mesh_file, mesh_filename, solution_filename, comm);
 }
@@ -7060,7 +7060,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 template <int dim, int spacedim>
 void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
                                        const DataOutFilter &data_filter,
-                                       const bool &write_mesh_file,
+                                       const bool write_mesh_file,
                                        const std::string &mesh_filename,
                                        const std::string &solution_filename,
                                        MPI_Comm comm)
@@ -7093,7 +7093,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // are no patches
   Assert (data_filter.n_nodes() > 0, ExcNoPatches());
 #else
-  hid_t           h5_mesh_file_id, h5_solution_file_id, file_plist_id, plist_id;
+  hid_t           h5_mesh_file_id=-1, h5_solution_file_id, file_plist_id, plist_id;
   hid_t           node_dataspace, node_dataset, node_file_dataspace, node_memory_dataspace;
   hid_t           cell_dataspace, cell_dataset, cell_file_dataspace, cell_memory_dataspace;
   hid_t           pt_data_dataspace, pt_data_dataset, pt_data_file_dataspace, pt_data_memory_dataspace;

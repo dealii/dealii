@@ -1907,7 +1907,7 @@ public:
   template <int dim, int spacedim>
   static void write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
                                    const DataOutFilter &data_filter,
-                                   const bool &write_mesh_file,
+                                   const bool write_mesh_file,
                                    const std::string &mesh_filename,
                                    const std::string &solution_filename,
                                    MPI_Comm comm);
@@ -2698,7 +2698,7 @@ public:
    * is true and the filenames are the same, the resulting file will
    * contain both mesh data and solution values.
    */
-  void write_hdf5_parallel (const DataOutFilter &data_filter, const bool &write_mesh_file, const std::string &mesh_filename, const std::string &solution_filename, MPI_Comm comm) const;
+  void write_hdf5_parallel (const DataOutFilter &data_filter, const bool write_mesh_file, const std::string &mesh_filename, const std::string &solution_filename, MPI_Comm comm) const;
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
