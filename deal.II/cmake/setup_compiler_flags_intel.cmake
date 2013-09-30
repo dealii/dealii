@@ -91,6 +91,11 @@ IF(DEAL_II_STATIC_EXECUTABLE)
   ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static-intel")
   ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static-gcc")
   ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-pthread")
+ELSE()
+  #
+  # Explicitly link intel support libraries dynamically:
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-shared-intel")
 ENDIF()
 
 
