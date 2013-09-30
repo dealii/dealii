@@ -187,6 +187,10 @@ namespace WorkStream
             currently_in_use (in_use)
           {}
 
+//TODO:	when we push back an object to the list of scratch objects, in
+//	Worker::operator(), we first create an object and then copy
+//	it to the end of this list. We should avoid the copy operations
+//	since it is expensive
           ScratchDataObject (const ScratchDataObject &o)
             :
   	    scratch_data (new ScratchData(*o.scratch_data)),
