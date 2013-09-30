@@ -669,7 +669,7 @@ namespace Step42
     void solve_newton ();
     void refine_grid ();
     void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
-    void output_results (const std::string &title);
+    void output_results (const std::string &filename_base);
     void output_contact_force () const;
 
     // As far as member variables are concerned, we start with ones that we use to
@@ -751,7 +751,14 @@ namespace Step42
     // parameter file, the obstacle that is being pushed into the
     // deformable body, the mesh refinement strategy, whether to transfer
     // the solution from one mesh to the next, and how many mesh
-    // refinement cycles to perform.
+    // refinement cycles to perform. As possible, we mark these kinds
+    // of variables as <code>const</code> to help the reader identify
+    // which ones may or may not be modified later on (the output directory
+    // being an exception -- it is never modified outside the constructor
+    // but it is awkward to initialize in the member-initializer-list
+    // following the colon in the constructor since there we have only
+    // one shot at setting it; the same is true for the mesh refinement
+    // criterion):
     const std::string                                  base_mesh;
     const std_cxx1x::shared_ptr<const Function<dim> >  obstacle;
 
@@ -773,12 +780,56 @@ namespace Step42
   };
 
 
-// @sect3{Implementation of the <code>PlasticityContactProblem</code> class}
+  // @sect3{Implementation of the <code>PlasticityContactProblem</code> class}
 
-// Next for the implementation of the class
-// template that makes use of the functions
-// above. As before, we will write everything
+  // @sect4{PlasticityContactProblem::declare_parameters}
 
+  // Let us start with the declaration of run-time parameters that can be
+  // selected in the input file. These values will be read back in the
+  // constructor of this class to initialize the member variables of this
+  // class:
+  template <int dim>
+  void
+  PlasticityContactProblem<dim>::declare_parameters (ParameterHandler &prm)
+  {
+    prm.declare_entry("polynomial degree", "1", Patterns::Integer(),
+                      "Polynomial degree of the FE_Q finite element space, typically 1 or 2.");
+    prm.declare_entry("number of initial refinements", "2",
+                      Patterns::Integer(),
+                      "Number of initial global mesh refinement steps before "
+                      "the first computation.");
+    prm.declare_entry("refinement strategy", "percentage",
+                      Patterns::Selection("global|percentage|fix dofs"),
+                      "Mesh refinement strategy:\n"
+                      " global: one global refinement\n"
+                      " percentage: fixed percentage gets refined using the Kelly estimator\n"
+                      " fix dofs: tries to achieve 2^initial_refinement*300 dofs after "
+                      "refinement cycle 1 (only use 2 cycles!). This requires the code to "
+                      "make some changes to the coarse mesh as well.");
+    prm.declare_entry("number of cycles", "5", Patterns::Integer(),
+                      "Number of adaptive mesh refinement cycles to run.");
+    prm.declare_entry("obstacle filename", "", Patterns::Anything(),
+                      "Obstacle file to read, use 'obstacle_file.pbm' or leave empty to use a sphere.");
+    prm.declare_entry("output directory", "", Patterns::Anything(),
+                      "Directory for output files (graphical output and benchmark "
+                      "statistics). If empty, use the current directory.");
+    prm.declare_entry("transfer solution", "false", Patterns::Bool(),
+                      "Whether the solution should be used as a starting guess "
+                      "for the next finer mesh. If false, then the iteration starts at "
+                      "zero on every mesh.");
+    prm.declare_entry("base mesh", "box",
+                      Patterns::Selection("box|half sphere"),
+                      "Select the shape of the domain: 'box' or 'half sphere'");
+  }
+
+
+  // @sect4{The <code>PlasticityContactProblem</code> constructor}
+
+  // Given the declarations of member variables as well as the
+  // declarations of run-time parameters that are read from the input
+  // file, there is nothing surprising in this constructor. In the body
+  // we initialize the mesh refinement strategy and the output directory,
+  // creating such a directory if necessary.
   template <int dim>
   PlasticityContactProblem<dim>::
   PlasticityContactProblem (const ParameterHandler &prm)
@@ -835,35 +886,6 @@ namespace Step42
           << (transfer_solution ? "true" : "false") << std::endl;
   }
 
-// @sect4{PlasticityContactProblem::declare_parameters}
-
-  template <int dim>
-  void
-  PlasticityContactProblem<dim>::declare_parameters (ParameterHandler &prm)
-  {
-    prm.declare_entry("polynomial degree", "1", Patterns::Integer(),
-                      "polynomial degree of the FE_Q finite element space, typically 1 or 2");
-    prm.declare_entry("number of initial refinements", "2",
-                      Patterns::Integer(),
-                      "number of initial global refinements before the first computation");
-    prm.declare_entry("refinement strategy", "percentage",
-                      Patterns::Selection("global|percentage|fix dofs"),
-                      "refinement strategy for each cycle:\n"
-                      " global: one global refinement\n"
-                      " percentage: fixed percentage gets refined using kelly\n"
-                      " fix dofs: tries to achieve 2^initial_refinement*300 dofs after refinement cycle 1 (only use 2 cycles!). Changes the coarse mesh!");
-    prm.declare_entry("number of cycles", "5", Patterns::Integer(),
-                      "number of adaptive cycles to run");
-    prm.declare_entry("obstacle filename", "", Patterns::Anything(),
-                      "obstacle file to read, use 'obstacle_file.pbm' or leave empty to use a sphere");
-    prm.declare_entry("output directory", "", Patterns::Anything(),
-                      "directory to put output files (graphical output and benchmark statistics), leave empty to put into current directory");
-    prm.declare_entry("transfer solution", "false", Patterns::Bool(),
-                      "decide if the solution should be used as a starting guess for the finer mesh, use 0 otherwise.");
-    prm.declare_entry("base mesh", "box",
-                      Patterns::Selection("box|half sphere"),
-                      "select the shape of the work piece: 'box' or 'half sphere'");
-  }
 
 
 // @sect4{PlasticityContactProblem::make_grid}
@@ -1786,9 +1808,12 @@ namespace Step42
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::output_results (
-    const std::string &title)
+  PlasticityContactProblem<dim>::output_results (const std::string &filename_base)
   {
+    TimerOutput::Scope t(computing_timer, "Graphical output");
+
+    pcout << "      Writing graphical output... " << std::flush;
+
     move_mesh(solution);
 
     // Calculation of the contact forces
@@ -1836,13 +1861,12 @@ namespace Step42
     data_out.build_patches();
 
     const std::string filename =
-      (output_dir + title + "-"
-       + Utilities::int_to_string(
-         triangulation.locally_owned_subdomain(), 4));
+      (output_dir + filename_base + "-"
+       + Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
 
     std::ofstream output_vtu((filename + ".vtu").c_str());
     data_out.write_vtu(output_vtu);
-    pcout << output_dir + title << ".pvtu" << std::endl;
+    pcout << output_dir + filename_base << ".pvtu" << std::endl;
 
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
@@ -1850,9 +1874,9 @@ namespace Step42
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
           filenames.push_back(
-            title + "-" + Utilities::int_to_string(i, 4) + ".vtu");
+            filename_base + "-" + Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream master_output((output_dir + title + ".pvtu").c_str());
+        std::ofstream master_output((output_dir + filename_base + ".pvtu").c_str());
         data_out.write_pvtu_record(master_output, filenames);
       }
 
@@ -1978,14 +2002,25 @@ namespace Step42
     MPI_Barrier(MPI_COMM_WORLD);
   }
 
-// @sect4{PlasticityContactProblem::run}
 
+  // @sect4{PlasticityContactProblem::run}
+
+  // As in all other tutorial programs, the <code>run()</code> function contains
+  // the overall logic. There is not very much to it here: in essence, it
+  // performs the loops over all mesh refinement cycles, and within each, hands
+  // things over to the Newton solver in <code>solve_newton()</code> on the
+  // current mesh and calls the function that creates graphical output for
+  // the so-computed solution. It then outputs some statistics concerning both
+  // run times and memory consumption that has been collected over the course of
+  // computations on this mesh.
   template <int dim>
   void
   PlasticityContactProblem<dim>::run ()
   {
     computing_timer.reset();
-    for (current_refinement_cycle = 0; current_refinement_cycle < n_refinement_cycles; ++current_refinement_cycle)
+    for (current_refinement_cycle = 0;
+         current_refinement_cycle < n_refinement_cycles;
+         ++current_refinement_cycle)
       {
         {
           TimerOutput::Scope t(computing_timer, "Setup");
@@ -2007,14 +2042,8 @@ namespace Step42
 
         solve_newton();
 
-        {
-          pcout << "      Writing graphical output... " << std::flush;
-
-          TimerOutput::Scope t(computing_timer, "Graphical output");
-
-          output_results((std::string("solution-") +
-                          Utilities::int_to_string(current_refinement_cycle, 2)).c_str());
-        }
+        output_results((std::string("solution-") +
+                        Utilities::int_to_string(current_refinement_cycle, 2)).c_str());
 
         computing_timer.print_summary();
         computing_timer.reset();
@@ -2032,6 +2061,8 @@ namespace Step42
 
 // @sect3{The <code>main</code> function}
 
+// There really isn't much to the <code>main()</code> function. It looks
+// like they always do:
 int main (int argc, char *argv[])
 {
   using namespace dealii;
