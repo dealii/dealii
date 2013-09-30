@@ -227,26 +227,26 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
     bool orthogonal_equality<X::active_face_iterator> (std::bitset<3> &,
                                                        const X::active_face_iterator&,
                                                        const X::active_face_iterator&,
-                                                       const unsigned int,
+                                                       const int,
                                                        const Tensor<1,deal_II_space_dimension> &);
 
     template
     bool orthogonal_equality<X::face_iterator> (std::bitset<3> &,
                                                 const X::face_iterator&,
                                                 const X::face_iterator&,
-                                                const unsigned int,
+                                                const int,
                                                 const Tensor<1,deal_II_space_dimension> &);
 
     template
     bool orthogonal_equality<X::active_face_iterator> (const X::active_face_iterator&,
                                                        const X::active_face_iterator&,
-                                                       const unsigned int,
+                                                       const int,
                                                        const Tensor<1,deal_II_space_dimension> &);
 
     template
     bool orthogonal_equality<X::face_iterator> (const X::face_iterator&,
                                                 const X::face_iterator&,
-                                                const unsigned int,
+                                                const int,
                                                 const Tensor<1,deal_II_space_dimension> &);
 
     #if deal_II_dimension >= 2
@@ -257,7 +257,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                  (const X &,
                                   const types::boundary_id,
                                   const types::boundary_id,
-                                  const unsigned int,
+                                  const int,
                                   const Tensor<1,X::space_dimension> &);
 
       template
@@ -265,7 +265,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
       collect_periodic_faces<X>
                                  (const X &,
                                   const types::boundary_id,
-                                  const unsigned int,
+                                  const int,
                                   const Tensor<1,X::space_dimension> &);
 
     #endif

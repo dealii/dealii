@@ -2199,10 +2199,10 @@ next_cell:
   template<int spacedim>
   inline bool orthogonal_equality (const dealii::Point<spacedim> &point1,
                                    const dealii::Point<spacedim> &point2,
-                                   const unsigned int direction,
+                                   const int                     direction,
                                    const dealii::Tensor<1,spacedim> &offset)
   {
-    Assert (direction<spacedim,
+    Assert (0<=direction && direction<spacedim,
             ExcIndexRange (direction, 0, spacedim));
     for (int i = 0; i < spacedim; ++i)
       {
@@ -2300,7 +2300,7 @@ next_cell:
   orthogonal_equality (std::bitset<3>     &orientation,
                        const FaceIterator &face1,
                        const FaceIterator &face2,
-                       const unsigned int direction,
+                       const int          direction,
                        const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
   {
     static const int dim = FaceIterator::AccessorType::dimension;
@@ -2343,7 +2343,7 @@ next_cell:
   inline bool
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
-                       const unsigned int direction,
+                       const int          direction,
                        const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
   {
     // Call the function above with a dummy orientation array
@@ -2361,11 +2361,11 @@ next_cell:
   match_periodic_face_pairs 
     (std::set<std::pair<CellIterator, unsigned int> > &pairs1,
      std::set<std::pair<typename identity<CellIterator>::type, unsigned int> > &pairs2,
-     const unsigned int direction,
+     const int direction,
      const dealii::Tensor<1,CellIterator::AccessorType::space_dimension> &offset)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
-    Assert (direction<space_dim,
+    Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
     Assert (pairs1.size() == pairs2.size(),
@@ -2416,12 +2416,12 @@ next_cell:
     (const DH                 &dof_handler,
      const types::boundary_id b_id1,
      const types::boundary_id b_id2,
-     const unsigned int       direction,
+     const int                direction,
      const dealii::Tensor<1,DH::space_dimension> &offset)
   {
     static const unsigned int dim = DH::dimension;
     static const unsigned int space_dim = DH::space_dimension;
-    Assert (direction<space_dim,
+    Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
     // Loop over all cells on the highest level and collect all boundary
@@ -2465,12 +2465,12 @@ next_cell:
   std::vector<PeriodicFacePair<typename DH::cell_iterator> >
   collect_periodic_faces (const DH                 &dof_handler,
                           const types::boundary_id b_id,
-                          const unsigned int       direction,
+                          const int                direction,
                           const dealii::Tensor<1,DH::space_dimension> &offset)
   {
     static const unsigned int dim = DH::dimension;
     static const unsigned int space_dim = DH::space_dimension;
-    Assert (direction<space_dim,
+    Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
     Assert(dim == space_dim,

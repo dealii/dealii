@@ -1050,7 +1050,7 @@ namespace GridTools
   orthogonal_equality (std::bitset<3>     &orientation,
                        const FaceIterator &face1,
                        const FaceIterator &face2,
-                       const unsigned int direction,
+                       const int          direction,
                        const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
 
 
@@ -1061,7 +1061,7 @@ namespace GridTools
   bool
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
-                       const unsigned int direction,
+                       const int          direction,
                        const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
 
 
@@ -1102,7 +1102,7 @@ namespace GridTools
   (const DH                 &dof_handler,
    const types::boundary_id b_id1,
    const types::boundary_id b_id2,
-   const unsigned int       direction,
+   const int                direction,
    const dealii::Tensor<1,DH::space_dimension> &offset);
 
 
@@ -1131,7 +1131,7 @@ namespace GridTools
   collect_periodic_faces
   (const DH                 &dof_handler,
    const types::boundary_id b_id,
-   const unsigned int       direction,
+   const int                direction,
    const dealii::Tensor<1,DH::space_dimension> &offset);
 
 
