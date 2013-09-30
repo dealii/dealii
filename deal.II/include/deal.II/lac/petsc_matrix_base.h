@@ -84,6 +84,11 @@ namespace PETScWrappers
                   const size_type   row,
                   const size_type   index);
 
+	/**
+	 * Copy constructor.
+	 */
+	Accessor (const Accessor &a);
+
         /**
          * Row number of the element
          * represented by this
@@ -1362,6 +1367,18 @@ namespace PETScWrappers
     {
       visit_present_row ();
     }
+
+
+    inline
+    const_iterator::Accessor::
+    Accessor (const Accessor &a)
+      :
+      matrix(a.matrix),
+      a_row(a.a_row),
+      a_index(a.a_index),
+      colnum_cache (a.colnum_cache),
+      value_cache (a.value_cache)
+    {}
 
 
     inline
