@@ -253,92 +253,24 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 
       template
       std::vector<PeriodicFacePair<X::cell_iterator> >
-      collect_periodic_faces
+      collect_periodic_faces<X>
                                  (const X &,
                                   const types::boundary_id,
                                   const types::boundary_id,
-                                  unsigned int,
+                                  const int,
                                   const Tensor<1,X::space_dimension> &);
-    
-      template<typename DH>
+
+      template
       std::vector<PeriodicFacePair<X::cell_iterator> >
-      collect_periodic_faces
+      collect_periodic_faces<X>
                                  (const X &,
                                   const types::boundary_id,
-                                  unsigned int,
+                                  const int,
                                   const Tensor<1,X::space_dimension> &);
-
-      template
-      std::map<X::face_iterator, std::pair<X::face_iterator, std::bitset<3> > >
-      collect_periodic_face_pairs
-                                 (const X::face_iterator &,
-                                  const X::face_iterator &,
-                                  const types::boundary_id,
-                                  const types::boundary_id,
-                                  int,
-                                  const Tensor<1,X::space_dimension> &);
-      template
-      std::map<X::active_face_iterator, std::pair<X::active_face_iterator, std::bitset<3> > >
-      collect_periodic_face_pairs
-                                 (const X::active_face_iterator &,
-                                  const X::active_face_iterator &,
-                                  const types::boundary_id,
-                                  const types::boundary_id,
-                                  int,
-                                  const Tensor<1,X::active_face_iterator::AccessorType::space_dimension> &);
-
-      template
-      std::map<X::face_iterator, std::pair<X::face_iterator, std::bitset<3> > >
-      collect_periodic_face_pairs
-                                 (const X &,
-                                  const types::boundary_id,
-                                  const types::boundary_id,
-                                  int,
-                                  const Tensor<1,X::space_dimension> &);
-
-      template
-      std::map<X::face_iterator, X::face_iterator>
-      collect_periodic_face_pairs
-                                 (const X &,
-                                  const types::boundary_id,
-                                  int,
-                                  const Tensor<1,deal_II_space_dimension> &);
- 
-      template
-      void
-      identify_periodic_face_pairs
-        (const X &,
-         const types::boundary_id,
-         const types::boundary_id,
-         const unsigned int,
-         std::vector<std_cxx1x::tuple<X::cell_iterator, unsigned int,
-                                      X::cell_iterator, unsigned int> > &);
 
     #endif
 
   \}
 #endif
 }
-
-for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
-{
-#if deal_II_dimension <= deal_II_space_dimension
-   #if deal_II_dimension >= 2
-     namespace GridTools \{
-       template
-       void
-       identify_periodic_face_pairs
-         (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-          const types::boundary_id,
-          const types::boundary_id,
-          const unsigned int,
-          std::vector<std_cxx1x::tuple<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator,
-                                       unsigned int,
-                                       parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator,
-                                       unsigned int> > &);
-     \}
-   #endif
-#endif
-}
-
 

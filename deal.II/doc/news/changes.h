@@ -25,6 +25,14 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Removed: GridTools::collect_periodic_face_pairs. This function is superseded
+  by GridTools::collect_periodic_faces which exports an
+  std::vector<PeriodicFacepair<...>> instead.
+  <br>
+  (Matthias Maier, 2013/09/30)
+  </li>
+
+  <li>
   Removed: The member function face_to_equivalent_cell_index() in
   FiniteElementData has been removed. It had been deprecated a while
   back already. Please use FiniteElement::face_to_cell_index() instead.

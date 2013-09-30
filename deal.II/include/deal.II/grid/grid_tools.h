@@ -1061,7 +1061,7 @@ namespace GridTools
   bool
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
-                       const int direction,
+                       const int          direction,
                        const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
 
 
@@ -1094,7 +1094,7 @@ namespace GridTools
    * parallel::distributed::Triangulation::add_periodicity to enforce
    * periodicity algebraically.
    *
-   * @author Daniel Arndt, 2013
+   * @author Daniel Arndt, Matthias Maier, 2013
    */
   template<typename DH>
   std::vector<PeriodicFacePair<typename DH::cell_iterator> >
@@ -1102,8 +1102,9 @@ namespace GridTools
   (const DH                 &dof_handler,
    const types::boundary_id b_id1,
    const types::boundary_id b_id2,
-   const unsigned int       direction,
+   const int                direction,
    const dealii::Tensor<1,DH::space_dimension> &offset);
+
 
   /**
    * This compatibility version of collect_periodic_face_pairs only works
@@ -1123,101 +1124,15 @@ namespace GridTools
    * meshes with cells not in @ref GlossFaceOrientation
    * "standard orientation".
    *
-   * @author Daniel Arndt, 2013
+   * @author Daniel Arndt, Matthias Maier, 2013
    */
   template<typename DH>
   std::vector<PeriodicFacePair<typename DH::cell_iterator> >
   collect_periodic_faces
   (const DH                 &dof_handler,
    const types::boundary_id b_id,
-   const unsigned int       direction,
+   const int                direction,
    const dealii::Tensor<1,DH::space_dimension> &offset);
-
-  /**
-   * This function does the same as collect_periodic_faces but returns a
-   * different data type.
-   *
-   * @author Matthias Maier, 2012
-   *
-   * @note The returned data type is not compatible with
-   * DoFTools::make_periodicity_constraints
-   *
-   * @deprecated
-   */
-  template<typename DH>
-  std::map<typename DH::face_iterator, std::pair<typename DH::face_iterator, std::bitset<3> > >
-  collect_periodic_face_pairs
-  (const DH                 &container,
-   const types::boundary_id b_id1,
-   const types::boundary_id b_id2,
-   int                      direction,
-   const dealii::Tensor<1,DH::space_dimension> &offset) DEAL_II_DEPRECATED;
-
-  /**
-   * This compatibility version of collect_periodic_face_pairs only works
-   * on grids with cells in @ref GlossFaceOrientation "standard orientation".
-   *
-   * @author Matthias Maier, 2012
-   *
-   * @note The returned data type is not compatible with
-   * DoFTools::make_periodicity_constraints
-   *
-   * @deprecated
-   */
-  template<typename DH>
-  std::map<typename DH::face_iterator, typename DH::face_iterator>
-  collect_periodic_face_pairs
-  (const DH                 &dof_handler, /*TODO: Name*/
-   const types::boundary_id b_id,
-   int                      direction,
-   const dealii::Tensor<1,DH::space_dimension> &offset) DEAL_II_DEPRECATED;
-
-  /**
-   * This version loops over all faces from @p begin to @p end
-   * instead of accepting a DoFHandler or a Triangulation.
-   *
-   * @author Matthias Maier, 2012
-   *
-   * @note This function cannot produce the return as the other
-   * collect_periodic_faces functions.
-   *
-   * @deprecated
-   */
-  template<typename FaceIterator>
-  std::map<FaceIterator, std::pair<FaceIterator, std::bitset<3> > >
-  collect_periodic_face_pairs
-  (const FaceIterator                          &begin,
-   const typename identity<FaceIterator>::type &end,
-   const types::boundary_id                    b_id1,
-   const types::boundary_id                    b_id2,
-   const int                                   direction,
-   const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
-  DEAL_II_DEPRECATED;
-
-  /**
-   * This function does the same as collect_periodic_faces but returns a
-   * different data type.
-   *
-   * @author Daniel Arndt, 2013
-   *
-   * @note The returned data type is not compatible with
-   * DoFTools::make_periodicity_constraints, but with a version of
-   * parallel::distributed::Triangulation::add_periodicity
-   *
-   * @note Use collect_periodic_faces instead.
-   *
-   * @deprecated
-   */
-  template<typename DH>
-  void
-  identify_periodic_face_pairs
-  (const DH &dof_handler,
-   const types::boundary_id b_id1,
-   const types::boundary_id b_id2,
-   const unsigned int direction,
-   std::vector<std_cxx1x::tuple<typename DH::cell_iterator, unsigned int,
-                                typename DH::cell_iterator, unsigned int> >
-     &periodicity_vector) DEAL_II_DEPRECATED;
 
 
   /**

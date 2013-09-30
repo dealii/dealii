@@ -3529,41 +3529,6 @@ namespace parallel
       #endif
     }
 
-    
-    template <int dim, int spacedim>
-    void
-    Triangulation<dim,spacedim>::add_periodicity
-       (const std::vector<std_cxx1x::tuple<cell_iterator, unsigned int,
-                                           cell_iterator, unsigned int> >&
-          periodicity_vector)
-    {
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
-      typedef std::vector<std_cxx1x::tuple <cell_iterator, unsigned int,
-                                            cell_iterator, unsigned int> >
-        FaceVector;
-
-      typename FaceVector::const_iterator it, end_periodic;
-      it = periodicity_vector.begin();
-      end_periodic = periodicity_vector.end();
-
-      std::vector<GridTools::PeriodicFacePair<cell_iterator> > periodic_faces;
-
-      for(; it!=end_periodic; ++it)
-      {
-        const cell_iterator cell1 = std_cxx1x::get<0> (*it);
-        const cell_iterator cell2 = std_cxx1x::get<2> (*it);
-        const unsigned int face_idx1 = std_cxx1x::get<1> (*it);
-        const unsigned int face_idx2 = std_cxx1x::get<3> (*it);
-        const GridTools::PeriodicFacePair<cell_iterator> matched_face
-          = {{cell1, cell2},{face_idx1, face_idx2}, 1};
-        periodic_faces.push_back(matched_face);
-      }
-
-      add_periodicity(periodic_faces);
-#else
-      Assert(false, ExcMessage ("Need p4est version >= 0.3.4.1!"));
-#endif
-    }
 
 
     template <int dim, int spacedim>
