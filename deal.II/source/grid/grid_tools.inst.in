@@ -253,7 +253,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 
       template
       std::vector<PeriodicFacePair<X::cell_iterator> >
-      collect_periodic_faces
+      collect_periodic_faces<X>
                                  (const X &,
                                   const types::boundary_id,
                                   const types::boundary_id,
@@ -262,7 +262,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 
       template
       std::vector<PeriodicFacePair<X::cell_iterator> >
-      collect_periodic_faces
+      collect_periodic_faces<X>
                                  (const X &,
                                   const types::boundary_id,
                                   const unsigned int,
