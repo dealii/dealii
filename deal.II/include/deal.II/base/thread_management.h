@@ -4406,12 +4406,12 @@ namespace Threads
   template <typename RT = void>
   class Task
   {
+  public:
     /**
      * Construct a task object
      * given a function object to
      * execute on the task.
      */
-  public:
     Task (const std_cxx1x::function<RT ()> &function_object)
     {
       // create a task descriptor and tell it
@@ -4422,6 +4422,16 @@ namespace Threads
         (new internal::TaskDescriptor<RT>(function_object));
       task_descriptor->queue_task ();
     }
+
+
+    /**
+     * Copy constructor.
+     */
+    Task (const Task<RT> &t)
+    :
+    task_descriptor (t.task_descriptor)
+    {}
+
 
     /**
      * Default constructor. You
