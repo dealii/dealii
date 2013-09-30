@@ -4423,6 +4423,16 @@ namespace Threads
       task_descriptor->queue_task ();
     }
 
+
+    /**
+     * Copy constructor.
+     */
+    Task (const Task<RT> &t)
+    :
+    task_descriptor (t.task_descriptor)
+    {}
+
+
     /**
      * Default constructor. You
      * can't do much with a task
