@@ -260,7 +260,7 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                   const unsigned int,
                                   const Tensor<1,X::space_dimension> &);
 
-      template<typename DH>
+      template
       std::vector<PeriodicFacePair<X::cell_iterator> >
       collect_periodic_faces
                                  (const X &,
