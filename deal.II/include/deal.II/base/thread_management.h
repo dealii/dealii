@@ -1639,6 +1639,14 @@ namespace Threads
     Thread () {}
 
     /**
+     * Copy constructor.
+     */
+    Thread (const Thread<RT> &t)
+    :
+    thread_descriptor (t.thread_descriptor)
+    {}
+
+    /**
      * Join the thread represented by this
      * object, i.e. wait for it to
      * finish. If you have used the default
