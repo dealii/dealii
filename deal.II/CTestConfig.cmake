@@ -25,12 +25,23 @@ SET(CTEST_DROP_SITE "cdash.kyomu.43-1.org")
 SET(CTEST_DROP_LOCATION "/submit.php?project=deal.II")
 SET(CTEST_DROP_SITE_CDASH TRUE)
 
-SET(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS   250)
+SET(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS   100)
 SET(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_WARNINGS 300)
+
+# number of lines to submit before an error:
+SET(CTEST_CUSTOM_ERROR_PRE_CONTEXT            5)
+# number of lines to submit after an error:
+SET(CTEST_CUSTOM_ERROR_POST_CONTEXT          20)
 
 #
 # Coverage options:
 #
+
+SET(CTEST_EXTRA_COVERAGE_GLOB
+  \${CTEST_SOURCE_DIRECTORY}/include/**/*.h
+  \${CTEST_SOURCE_DIRECTORY}/source/**/*.cc
+  \${CTEST_SOURCE_DIRECTORY}/source/**/*.inst.in
+  )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "/bundled"
