@@ -279,6 +279,7 @@ int main()
   logfile << std::setprecision(3);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
+  deallog.depth_console (0);
 
   // Switch between regression test
   // and benchmark
