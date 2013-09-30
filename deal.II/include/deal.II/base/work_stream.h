@@ -186,6 +186,16 @@ namespace WorkStream
             scratch_data (p),
             currently_in_use (in_use)
           {}
+
+//TODO:	when we push back an object to the list of scratch objects, in
+//	Worker::operator(), we first create an object and then copy
+//	it to the end of this list. We should avoid the copy operations
+//	since it is expensive
+          ScratchDataObject (const ScratchDataObject &o)
+            :
+  	    scratch_data (new ScratchData(*o.scratch_data)),
+            currently_in_use (false)
+          {}
         };
 
 
@@ -455,7 +465,7 @@ namespace WorkStream
 
       /**
        * This flag is used to know if graph coloring is used or not.
-       */      
+       */
       bool               color;
 
       /**
@@ -513,9 +523,9 @@ namespace WorkStream
     template <typename Iterator,
              typename ScratchData,
              typename CopyData>
-               class Worker : public tbb::filter
-             {
-               public:
+    class Worker : public tbb::filter
+    {
+    public:
                  /**
                   * Constructor. Takes a
                   * reference to the object on
@@ -936,7 +946,7 @@ namespace WorkStream
        Copier                                   copier,
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> 
+       const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)>
                                                &get_conflict_indices,
        const unsigned int queue_length = 2*multithread_info.n_default_threads,
        const unsigned int                       chunk_size = 8)
