@@ -25,7 +25,9 @@
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
+#include <set>
 #include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -120,7 +122,7 @@ namespace graph_coloring {
     // Number of zones composing the partitioning.
     const unsigned int partition_size(partition.size());
     std::vector<unsigned int> sorted_vertices(partition_size);
-    std::vector<unsigned int> degrees(partition_size);
+    std::vector<int> degrees(partition_size);
     std::vector<std::vector<types::global_dof_index> > conflict_indices(partition_size);
     std::vector<std::vector<unsigned int> > graph(partition_size);
 
@@ -132,7 +134,7 @@ namespace graph_coloring {
       std::sort(conflict_indices[i].begin(),conflict_indices[i].end());
     }
 
-    // Compute the degree of each vertex of the graph  using the
+    // Compute the degree of each vertex of the graph using the
     // intersection of the conflict indices.
     std::vector<types::global_dof_index> conflict_indices_intersection;
     std::vector<types::global_dof_index>::iterator intersection_it;
@@ -156,14 +158,14 @@ namespace graph_coloring {
       }
 
     // Sort the vertices by decreasing degree.
-    std::vector<unsigned int>::iterator degrees_it;
+    std::vector<int>::iterator degrees_it;
     for (unsigned int i=0; i<partition_size; ++i)
     {
       // Find the largest element.
       degrees_it = std::max_element(degrees.begin(),degrees.end());
       sorted_vertices[i] = degrees_it-degrees.begin();
-      // Zero the largest element.
-      *degrees_it = 0;
+      // Put the largest element to -1 so it cannot be chosen again.
+      *degrees_it = -1;
     }
 
     // Color the graph.
