@@ -1103,7 +1103,7 @@ namespace GridTools
    const types::boundary_id b_id1,
    const types::boundary_id b_id2,
    const int                direction,
-   const dealii::Tensor<1,DH::space_dimension> &offset);
+   const dealii::Tensor<1,DH::space_dimension> &offset = dealii::Tensor<1,DH::space_dimension>());
 
 
   /**
@@ -1132,7 +1132,7 @@ namespace GridTools
   (const DH                 &dof_handler,
    const types::boundary_id b_id,
    const int                direction,
-   const dealii::Tensor<1,DH::space_dimension> &offset);
+   const dealii::Tensor<1,DH::space_dimension> &offset = dealii::Tensor<1,DH::space_dimension>());
 
 
   /**

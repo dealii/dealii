@@ -480,20 +480,14 @@ namespace Step40
             GridGenerator::subdivided_hyper_rectangle
               (triangulation,reps,p1,p2,true);
 
-            std::vector
-              <std_cxx1x::tuple
-                <typename parallel::distributed::Triangulation<dim>::cell_iterator, unsigned int,
-                 typename parallel::distributed::Triangulation<dim>::cell_iterator, unsigned int> >
-              periodicity_vector;
 
             for(int i=1; i<dim; ++i)
-              GridTools::identify_periodic_face_pairs
-                (triangulation,
-                 /*b_id1*/ 2*i, /*b_id2*/2*i+1, /*direction*/ i,
-                 periodicity_vector);
-            
-            triangulation.add_periodicity(periodicity_vector);
-            
+              {
+                std::vector<GridTools::PeriodicFacePair<typename parallel::distributed::Triangulation<dim>::cell_iterator> >
+                  periodicity_vector = GridTools::collect_periodic_faces
+                    ( triangulation, /*b_id1*/ 2*i, /*b_id2*/ 2*i+1, /*direction*/ i);
+                triangulation.add_periodicity(periodicity_vector);
+              }
             triangulation.refine_global (1);
           }
         else
