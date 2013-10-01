@@ -17,7 +17,7 @@
 
 
 //
-// check collect_periodic_face_pairs for correct return values
+// check collect_periodic_faces for correct return values
 //
 
 
@@ -222,30 +222,18 @@ int main()
 
       generate_grid(triangulation, i);
 
-      typedef Triangulation<2>::face_iterator FaceIterator;
-      typedef std::map<FaceIterator, std::pair<FaceIterator, std::bitset<3> > > FaceMap;
-      FaceMap test = GridTools::collect_periodic_face_pairs (triangulation, 42, 43, 1,
-                                                             dealii::Tensor<1,2>());
+      typedef std::vector<GridTools::PeriodicFacePair<typename Triangulation<2>::cell_iterator> > FaceMap;
+
+      FaceMap test = GridTools::collect_periodic_faces (triangulation, 42, 43, 1,
+                                                        dealii::Tensor<1,2>());
 
       deallog << "Triangulation: " << i << std::endl;
       deallog << "Coarse match: " << test.size() << std::endl;
 
       for (FaceMap::iterator facepair = test.begin(); facepair != test.end(); ++facepair)
-        print_match(facepair->first, facepair->second.first, facepair->second.second);
-
-
-      typedef Triangulation<2>::active_face_iterator FaceIterator2;
-      typedef std::map<FaceIterator2, std::pair<FaceIterator2, std::bitset<3> > > FaceMap2;
-      FaceMap2 test2 = GridTools::collect_periodic_face_pairs (triangulation.begin_active_face(),
-                                                               triangulation.end_face(),
-                                                               42, 43,
-                                                               1,
-                                                               dealii::Tensor<1,2>());
-
-      deallog << "Fine match: " << test2.size() << std::endl;
-
-      for (FaceMap2::iterator facepair = test2.begin(); facepair != test2.end(); ++facepair)
-        print_match(facepair->first, facepair->second.first, facepair->second.second);
+        print_match(facepair->cell[0]->face(facepair->face_idx[0]),
+                    facepair->cell[1]->face(facepair->face_idx[1]),
+                    facepair->orientation);
     }
 
   deallog << "Test for 3D: Hypercube" << std::endl << std::endl;
@@ -257,30 +245,17 @@ int main()
 
       generate_grid(triangulation, i);
 
-      typedef Triangulation<3>::face_iterator FaceIterator;
-      typedef std::map<FaceIterator, std::pair<FaceIterator, std::bitset<3> > > FaceMap;
-      FaceMap test = GridTools::collect_periodic_face_pairs (triangulation, 42, 43, 2,
-                                                             dealii::Tensor<1,3>());
+      typedef std::vector<GridTools::PeriodicFacePair<typename Triangulation<3>::cell_iterator> > FaceMap;
+      FaceMap test = GridTools::collect_periodic_faces (triangulation, 42, 43, 2,
+                                                        dealii::Tensor<1,3>());
 
       deallog << "Triangulation: " << i << std::endl;
       deallog << "Coarse match: " << test.size() << std::endl;
 
       for (FaceMap::iterator facepair = test.begin(); facepair != test.end(); ++facepair)
-        print_match(facepair->first, facepair->second.first, facepair->second.second);
-
-
-      typedef Triangulation<3>::active_face_iterator FaceIterator2;
-      typedef std::map<FaceIterator2, std::pair<FaceIterator2, std::bitset<3> > > FaceMap2;
-      FaceMap2 test2 = GridTools::collect_periodic_face_pairs (triangulation.begin_active_face(),
-                                                               triangulation.end_face(),
-                                                               42, 43,
-                                                               2,
-                                                               dealii::Tensor<1,3>());
-
-      deallog << "Fine match: " << test2.size() << std::endl;
-
-      for (FaceMap2::iterator facepair = test2.begin(); facepair != test2.end(); ++facepair)
-        print_match(facepair->first, facepair->second.first, facepair->second.second);
+        print_match(facepair->cell[0]->face(facepair->face_idx[0]),
+                    facepair->cell[1]->face(facepair->face_idx[1]),
+                    facepair->orientation);
     }
 
   return 0;
