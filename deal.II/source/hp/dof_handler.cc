@@ -16,6 +16,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/base/std_cxx1x/bind.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/dof_level.h>
@@ -2722,13 +2723,20 @@ namespace hp
       = std::vector<IndexSet> (1,
                                number_cache.locally_owned_dofs);
 
-    // update the cache used for cell dof indices and compress the data on the levels
+    // update the cache used for cell dof indices and compress the data on the levels. do
+    // the latter on separate tasks to gain parallelism, starting with the highest
+    // level (there is most to do there, so start it first)
     for (active_cell_iterator cell = begin_active();
          cell != end(); ++cell)
       cell->update_cell_dof_indices_cache ();
 
-    for (unsigned int level=0; level<levels.size(); ++level)
-      levels[level]->compress_data (*finite_elements);
+    {
+      Threads::TaskGroup<> tg;
+      for (int level=levels.size()-1; level>=0; --level)
+        tg += Threads::new_task (&dealii::internal::hp::DoFLevel::compress_data<dim,spacedim>,
+                                 *levels[level], *finite_elements);
+      tg.join_all ();
+    }
 
     // finally restore the user flags
     const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);
@@ -2767,9 +2775,15 @@ namespace hp
 #endif
 
     // uncompress the internal storage scheme of dofs on cells
-    // so that we can access dofs in turns
-    for (unsigned int level=0; level<levels.size(); ++level)
-      levels[level]->uncompress_data (*finite_elements);
+    // so that we can access dofs in turns. uncompress in parallel, starting
+    // with the most expensive levels (the highest ones)
+    {
+      Threads::TaskGroup<> tg;
+      for (int level=levels.size()-1; level>=0; --level)
+        tg += Threads::new_task (&dealii::internal::hp::DoFLevel::uncompress_data<dim,spacedim>,
+                                 *levels[level], *finite_elements);
+      tg.join_all ();
+    }
 
     // do the renumbering
     renumber_dofs_internal (new_numbers, dealii::internal::int2type<dim>());
@@ -2780,8 +2794,13 @@ namespace hp
       cell->update_cell_dof_indices_cache ();
 
     // now re-compress the dof indices
-    for (unsigned int level=0; level<levels.size(); ++level)
-      levels[level]->compress_data (*finite_elements);
+    {
+      Threads::TaskGroup<> tg;
+      for (int level=levels.size()-1; level>=0; --level)
+        tg += Threads::new_task (&dealii::internal::hp::DoFLevel::compress_data<dim,spacedim>,
+                                 *levels[level], *finite_elements);
+      tg.join_all ();
+    }
   }
 
 
