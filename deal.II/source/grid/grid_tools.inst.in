@@ -274,3 +274,32 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 #endif
 }
 
+for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+   #if deal_II_dimension >= 2
+
+     namespace GridTools \{
+
+      template
+      std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> >
+      collect_periodic_faces<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >
+                                 (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+                                  const types::boundary_id,
+                                  const types::boundary_id,
+                                  const int,
+                                  const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
+
+      template
+      std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> >
+      collect_periodic_faces<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >
+                                 (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+                                  const types::boundary_id,
+                                  const int,
+                                  const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
+
+     \}
+   #endif
+#endif
+}
+
