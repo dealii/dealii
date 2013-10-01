@@ -62,6 +62,21 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: step-51 demonstrates the use of hybridized discontinuous Galerkin
+  methods in deal.II, using the face elements FE_FaceQ. The programs solves a
+  scalar convection-diffusion equation.
+  <br>
+  (Martin Kronbichler and Scott Miller, 2013/10/01)
+  </li>
+
+  <li>
+  New: There is now an element FE_FaceP that can be combined with FE_DGP in
+  hybridized DG methods.
+  <br>
+  (Martin Kronbichler, 2013/09/17)
+  </li>
+
+  <li>
   Fixed: The DataOutBase::XDMFEntry class now has a proper serialization
   function to allow for checkpointing.
   <br>
