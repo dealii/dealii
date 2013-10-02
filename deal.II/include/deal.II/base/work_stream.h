@@ -832,48 +832,52 @@ namespace WorkStream
     if (!(begin != end))
       return;
 
+    // we want to use TBB if we have support and if it is not disabled at
+    // runtime:
 #ifdef DEAL_II_WITH_THREADS
-    // create the three stages of the
-    // pipeline
-    internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
-      iterator_range_to_item_stream (begin, end,
-          queue_length,
-          chunk_size,
-          sample_scratch_data,
-          sample_copy_data);
-
-
-    internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-    internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,true);
-
-    // now create a pipeline from
-    // these stages
-    tbb::pipeline assembly_line;
-    assembly_line.add_filter (iterator_range_to_item_stream);
-    assembly_line.add_filter (worker_filter);
-    assembly_line.add_filter (copier_filter);
-
-    // and run it
-    assembly_line.run (queue_length);
-
-    assembly_line.clear ();
-
-#else
-
-    // need to copy the sample since it is
-    // marked const
-    ScratchData scratch_data = sample_scratch_data;
-    CopyData    copy_data    = sample_copy_data;
-
-    for (Iterator i=begin; i!=end; ++i)
+    if (multithread_info.n_threads()==1)
+#endif
       {
-        if (static_cast<const std_cxx1x::function<void (const Iterator &,
-                                                        ScratchData &,
-                                                        CopyData &)> >(worker))
-          worker (i, scratch_data, copy_data);
-        if (static_cast<const std_cxx1x::function<void (const CopyData &)> >
-            (copier))
-          copier (copy_data);
+        // need to copy the sample since it is marked const
+        ScratchData scratch_data = sample_scratch_data;
+        CopyData    copy_data    = sample_copy_data;
+
+        for (Iterator i=begin; i!=end; ++i)
+          {
+            if (static_cast<const std_cxx1x::function<void (const Iterator &,
+                                                            ScratchData &,
+                                                            CopyData &)> >(worker))
+              worker (i, scratch_data, copy_data);
+            if (static_cast<const std_cxx1x::function<void (const CopyData &)> >
+                (copier))
+              copier (copy_data);
+          }
+      }
+#ifdef DEAL_II_WITH_THREADS
+    else // have TBB and use more than one thread
+      {
+        // create the three stages of the pipeline
+        internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
+        iterator_range_to_item_stream (begin, end,
+            queue_length,
+            chunk_size,
+            sample_scratch_data,
+            sample_copy_data);
+
+
+        internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
+        internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,true);
+
+        // now create a pipeline from these stages
+        tbb::pipeline assembly_line;
+        assembly_line.add_filter (iterator_range_to_item_stream);
+        assembly_line.add_filter (worker_filter);
+        assembly_line.add_filter (copier_filter);
+
+        // and run it
+        assembly_line.run (queue_length);
+
+        assembly_line.clear ();
       }
 #endif
   }
@@ -974,89 +978,97 @@ namespace WorkStream
     if (!(begin != end))
       return;
 
+    // we want to use TBB if we have support and if it is not disabled at
+    // runtime:
+ #ifdef DEAL_II_WITH_THREADS
+     if (multithread_info.n_threads()==1)
+ #endif
+       {
+         // need to copy the sample since it is
+         // marked const
+         ScratchData scratch_data = sample_scratch_data;
+         CopyData    copy_data    = sample_copy_data;
+
+         for (Iterator i=begin; i!=end; ++i)
+           {
+             if (static_cast<const std_cxx1x::function<void (const Iterator &,
+                                                             ScratchData &,
+                                                             CopyData &)> >(worker))
+               worker (i, scratch_data, copy_data);
+             if (static_cast<const std_cxx1x::function<void (const CopyData &)> >
+                 (copier))
+               copier (copy_data);
+           }
+       }
 #ifdef DEAL_II_WITH_THREADS
-    // color the graph
-    std::vector<std::vector<Iterator> > coloring = graph_coloring::make_graph_coloring(
-        begin,end,get_conflict_indices);
-    
-    // colors that do not have cells, i.e., less than chunk_size times 
-    // multithread_info.n_default_threads, are gathered and the copier is
-    // called serially.
-    const unsigned int serial_limit(chunk_size*multithread_info.n_default_threads);
-    std::vector<Iterator> serial_copying;
+     else
+       {
+         // color the graph
+         std::vector<std::vector<Iterator> > coloring = graph_coloring::make_graph_coloring(
+             begin,end,get_conflict_indices);
 
-    for (unsigned int color=0; color<coloring.size(); ++color)
-    {
-      if (coloring[color].size()<serial_limit)
-        serial_copying.insert(serial_copying.end(),coloring[color].begin(),coloring[color].end());
-      else
-      {
-        // create the three stages of the
-        // pipeline
-        internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
-          iterator_range_to_item_stream (coloring[color].begin(), coloring[color].end(),
-              queue_length,
-              chunk_size,
-              sample_scratch_data,
-              sample_copy_data);
+         // colors that do not have cells, i.e., less than chunk_size times
+         // multithread_info.n_default_threads, are gathered and the copier is
+         // called serially.
+         const unsigned int serial_limit(chunk_size*multithread_info.n_default_threads);
+         std::vector<Iterator> serial_copying;
 
-        internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-        internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,false);
+         for (unsigned int color=0; color<coloring.size(); ++color)
+           {
+             if (coloring[color].size()<serial_limit)
+               serial_copying.insert(serial_copying.end(),coloring[color].begin(),coloring[color].end());
+             else
+               {
+                 // create the three stages of the
+                 // pipeline
+                 internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
+                 iterator_range_to_item_stream (coloring[color].begin(), coloring[color].end(),
+                     queue_length,
+                     chunk_size,
+                     sample_scratch_data,
+                     sample_copy_data);
 
-        // now create a pipeline from
-        // these stages
-        tbb::pipeline assembly_line;
-        assembly_line.add_filter (iterator_range_to_item_stream);
-        assembly_line.add_filter (worker_filter);
-        assembly_line.add_filter (copier_filter);
+                 internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
+                 internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,false);
 
-        // and run it
-        assembly_line.run (queue_length);
+                 // now create a pipeline from
+                 // these stages
+                 tbb::pipeline assembly_line;
+                 assembly_line.add_filter (iterator_range_to_item_stream);
+                 assembly_line.add_filter (worker_filter);
+                 assembly_line.add_filter (copier_filter);
 
-        assembly_line.clear ();
-      }
-    }
+                 // and run it
+                 assembly_line.run (queue_length);
 
-    // use the serial copier for all the colors that do not have enough cells
-    if (serial_copying.size()!=0)
-    {
-      internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
-        iterator_range_to_item_stream (serial_copying.begin(), serial_copying.end(),
-            queue_length,
-            chunk_size,
-            sample_scratch_data,
-            sample_copy_data);
+                 assembly_line.clear ();
+               }
+           }
 
-      internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-      internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,true);
+         // use the serial copier for all the colors that do not have enough cells
+         if (serial_copying.size()!=0)
+           {
+             internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
+             iterator_range_to_item_stream (serial_copying.begin(), serial_copying.end(),
+                 queue_length,
+                 chunk_size,
+                 sample_scratch_data,
+                 sample_copy_data);
 
-      tbb::pipeline assembly_line;
-      assembly_line.add_filter (iterator_range_to_item_stream);
-      assembly_line.add_filter (worker_filter);
-      assembly_line.add_filter (copier_filter);
+             internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
+             internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,false);
 
-      // and run it
-      assembly_line.run (queue_length);
+             tbb::pipeline assembly_line;
+             assembly_line.add_filter (iterator_range_to_item_stream);
+             assembly_line.add_filter (worker_filter);
+             assembly_line.add_filter (copier_filter);
 
-      assembly_line.clear ();
-    }
-#else
+             // and run it
+             assembly_line.run (queue_length);
 
-    // need to copy the sample since it is
-    // marked const
-    ScratchData scratch_data = sample_scratch_data;
-    CopyData    copy_data    = sample_copy_data;
-
-    for (Iterator i=begin; i!=end; ++i)
-      {
-        if (static_cast<const std_cxx1x::function<void (const Iterator &,
-                                                        ScratchData &,
-                                                        CopyData &)> >(worker))
-          worker (i, scratch_data, copy_data);
-        if (static_cast<const std_cxx1x::function<void (const CopyData &)> >
-            (copier))
-          copier (copy_data);
-      }
+             assembly_line.clear ();
+           }
+       }
 #endif
   }
 
