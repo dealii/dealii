@@ -62,6 +62,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Changed: multithreadinfo::n_default_threads is now deprecated. Use the
+  new n_threads() function instead, which works correctly with TBB.
+  <br>
+  (Timo Heister, 2013/10/02)
+  </li>
+
+  <li>
   Changed: if configured with TBB but the number of threads is set to 1,
   do not bother to use TBB in workstream.
   <br>
