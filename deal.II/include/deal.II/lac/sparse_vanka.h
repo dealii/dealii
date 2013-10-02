@@ -55,7 +55,7 @@ template <typename number> class SparseBlockVanka;
  * Objects of this class are constructed by passing a vector of indices
  * of the degrees of freedom of the Lagrange multiplier. In the actual
  * preconditioning method, these rows are traversed in the order in which
- * the appear in the matrix. Since this is a Gauß-Seidel like procedure,
+ * the appear in the matrix. Since this is a Gauï¿½-Seidel like procedure,
  * remember to have a good ordering in advance (for transport dominated
  * problems, Cuthill-McKee algorithms are a good means for this, if points
  * on the inflow boundary are chosen as starting points for the renumbering).
@@ -189,15 +189,12 @@ public:
    * building the inverses of the
    * diagonal blocks. This
    * parameter is ignored if not in
-   * multithreaded mode. By
-   * default, this variable is set
-   * to the value of
-   * <tt>multithread_info.n_default_threads</tt>.
+   * multithreaded mode.
    */
   SparseVanka(const SparseMatrix<number> &M,
               const std::vector<bool>    &selected,
               const bool                  conserve_memory = false,
-              const unsigned int          n_threads       = multithread_info.n_default_threads);
+              const unsigned int          n_threads       = multithread_info.n_threads());
 
   /**
    * Destructor.
@@ -546,7 +543,7 @@ public:
                     const unsigned int          n_blocks,
                     const BlockingStrategy      blocking_strategy,
                     const bool                  conserve_memory = false,
-                    const unsigned int          n_threads       = multithread_info.n_default_threads);
+                    const unsigned int          n_threads       = multithread_info.n_threads());
 
   /**
    * Apply the preconditioner.

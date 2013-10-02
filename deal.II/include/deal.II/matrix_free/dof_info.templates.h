@@ -796,7 +796,7 @@ no_constraint:
           // we would like to have enough work to do, so as first guess, try
           // to get 50 times as many chunks as we have threads on the system.
           task_info.block_size =
-            size_info.n_macro_cells / (multithread_info.n_default_threads * 50);
+            size_info.n_macro_cells / (multithread_info.n_threads() * 50);
 
           // if there are too few degrees of freedom per cell, need to
           // increase the block size

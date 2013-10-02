@@ -2285,7 +2285,7 @@ namespace DoFTools
         std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
         cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
                          coarse_grid.end(),
-                         multithread_info.n_default_threads);
+                         multithread_info.n_threads());
 
         // TODO: use WorkStream here
 
@@ -2299,7 +2299,7 @@ namespace DoFTools
                          const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &,
                          const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &)
           = &compute_intergrid_weights_3<dim>;
-        for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
+        for (unsigned int i=0; i<multithread_info.n_threads(); ++i)
           tasks += Threads::new_task (fun_ptr,
                                       coarse_grid, coarse_component,
                                       coarse_to_fine_grid_map, parameter_dofs,

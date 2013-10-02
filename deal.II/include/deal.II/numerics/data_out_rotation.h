@@ -150,10 +150,7 @@ public:
    * The function supports
    * multithreading, if deal.II is
    * compiled in multithreading
-   * mode. The default number of
-   * threads to be used to build
-   * the patches is set to
-   * <tt>multithread_info.n_default_threads</tt>.
+   * mode.
    */
   virtual void build_patches (const unsigned int n_patches_per_circle,
                               const unsigned int n_subdivisions = 0);
