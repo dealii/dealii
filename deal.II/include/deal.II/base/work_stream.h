@@ -918,7 +918,11 @@ namespace WorkStream
    *
    * The @p get_conflict_indices argument, is a function
    * that given an iterator computes the conflict indices
-   * necessary for the graph_coloring.
+   * necessary for the graph_coloring. Graph coloring is 
+   * necessary to be able to copy the data in parallel. If 
+   * the number of elements in some colors is less than 
+   * @p chunk_size time multithread_info.n_default_threads,
+   * these elements are aggregated and copied serially.
    *
    * The @p queue_length argument indicates
    * the number of items that can be live
@@ -974,23 +978,58 @@ namespace WorkStream
     // color the graph
     std::vector<std::vector<Iterator> > coloring = graph_coloring::make_graph_coloring(
         begin,end,get_conflict_indices);
+    
+    // colors that do not have cells, i.e., less than chunk_size times 
+    // multithread_info.n_default_threads, are gathered and the copier is
+    // called serially.
+    const unsigned int serial_limit(chunk_size*multithread_info.n_default_threads);
+    std::vector<Iterator> serial_copying;
 
     for (unsigned int color=0; color<coloring.size(); ++color)
     {
-      // create the three stages of the
-      // pipeline
+      if (coloring[color].size()<serial_limit)
+        serial_copying.insert(serial_copying.end(),coloring[color].begin(),coloring[color].end());
+      else
+      {
+        // create the three stages of the
+        // pipeline
+        internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
+          iterator_range_to_item_stream (coloring[color].begin(), coloring[color].end(),
+              queue_length,
+              chunk_size,
+              sample_scratch_data,
+              sample_copy_data);
+
+        internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
+        internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,false);
+
+        // now create a pipeline from
+        // these stages
+        tbb::pipeline assembly_line;
+        assembly_line.add_filter (iterator_range_to_item_stream);
+        assembly_line.add_filter (worker_filter);
+        assembly_line.add_filter (copier_filter);
+
+        // and run it
+        assembly_line.run (queue_length);
+
+        assembly_line.clear ();
+      }
+    }
+
+    // use the serial copier for all the colors that do not have enough cells
+    if (serial_copying.size()!=0)
+    {
       internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
-        iterator_range_to_item_stream (coloring[color].begin(), coloring[color].end(),
+        iterator_range_to_item_stream (serial_copying.begin(), serial_copying.end(),
             queue_length,
             chunk_size,
             sample_scratch_data,
             sample_copy_data);
 
       internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-      internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,false);
+      internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,true);
 
-      // now create a pipeline from
-      // these stages
       tbb::pipeline assembly_line;
       assembly_line.add_filter (iterator_range_to_item_stream);
       assembly_line.add_filter (worker_filter);
@@ -1121,7 +1160,11 @@ namespace WorkStream
    *
    * The @p get_conflict_indices argument, is a function
    * that given an iterator computes the conflict indices
-   * necessary for the graph_coloring.
+   * necessary for the graph_coloring. Graph coloring is 
+   * necessary to be able to copy the data in parallel. If 
+   * the number of elements in some colors is less than 
+   * @p chunk_size time multithread_info.n_default_threads,
+   * these elements are aggregated and copied serially.
    *
    * The @p queue_length argument indicates
    * the number of items that can be live
