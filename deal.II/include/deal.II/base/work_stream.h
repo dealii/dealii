@@ -814,7 +814,7 @@ namespace WorkStream
        Copier                                   copier,
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       const unsigned int queue_length = 2*multithread_info.n_default_threads,
+       const unsigned int queue_length = 2*multithread_info.n_threads(),
        const unsigned int                       chunk_size = 8)
   {
     Assert (queue_length > 0,
@@ -925,7 +925,7 @@ namespace WorkStream
    * necessary for the graph_coloring. Graph coloring is 
    * necessary to be able to copy the data in parallel. If 
    * the number of elements in some colors is less than 
-   * @p chunk_size time multithread_info.n_default_threads,
+   * @p chunk_size time multithread_info.n_threads(),
    * these elements are aggregated and copied serially.
    *
    * The @p queue_length argument indicates
@@ -960,7 +960,7 @@ namespace WorkStream
        const CopyData                          &sample_copy_data,
        const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)>
                                                &get_conflict_indices,
-       const unsigned int queue_length = 2*multithread_info.n_default_threads,
+       const unsigned int queue_length = 2*multithread_info.n_threads(),
        const unsigned int                       chunk_size = 8)
   {
     Assert (queue_length > 0,
@@ -1008,9 +1008,9 @@ namespace WorkStream
              begin,end,get_conflict_indices);
 
          // colors that do not have cells, i.e., less than chunk_size times
-         // multithread_info.n_default_threads, are gathered and the copier is
+         // multithread_info.n_threads(), are gathered and the copier is
          // called serially.
-         const unsigned int serial_limit(chunk_size*multithread_info.n_default_threads);
+         const unsigned int serial_limit(chunk_size*multithread_info.n_threads());
          std::vector<Iterator> serial_copying;
 
          for (unsigned int color=0; color<coloring.size(); ++color)
@@ -1128,7 +1128,7 @@ namespace WorkStream
        void (MainClass::*copier) (const CopyData &),
        const ScratchData                    &sample_scratch_data,
        const CopyData                       &sample_copy_data,
-       const unsigned int queue_length = 2*multithread_info.n_default_threads,
+       const unsigned int queue_length = 2*multithread_info.n_threads(),
        const unsigned int chunk_size = 8)
   {
     // forward to the other function
@@ -1175,7 +1175,7 @@ namespace WorkStream
    * necessary for the graph_coloring. Graph coloring is 
    * necessary to be able to copy the data in parallel. If 
    * the number of elements in some colors is less than 
-   * @p chunk_size time multithread_info.n_default_threads,
+   * @p chunk_size time multithread_info.n_threads(),
    * these elements are aggregated and copied serially.
    *
    * The @p queue_length argument indicates
@@ -1211,7 +1211,7 @@ namespace WorkStream
        const ScratchData                    &sample_scratch_data,
        const CopyData                       &sample_copy_data,
        std::vector<types::global_dof_index> (MainClass::*get_conflict_indices)(const Iterator &),
-       const unsigned int queue_length = 2*multithread_info.n_default_threads,
+       const unsigned int queue_length = 2*multithread_info.n_threads(),
        const unsigned int chunk_size = 8)
   {
     // forward to the other function
