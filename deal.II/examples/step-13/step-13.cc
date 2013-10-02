@@ -743,7 +743,7 @@ namespace Step13
       // of equal size. The number of blocks is set to the default number of
       // threads to be used, which by default is set to the number of
       // processors found in your computer at startup of the program:
-      const unsigned int n_threads = multithread_info.n_default_threads;
+      const unsigned int n_threads = multithread_info.n_threads();
       std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
       thread_ranges
         = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),

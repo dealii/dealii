@@ -543,7 +543,7 @@ namespace Step14
       typename DoFHandler<dim>::active_cell_iterator
       active_cell_iterator;
 
-      const unsigned int n_threads = multithread_info.n_default_threads;
+      const unsigned int n_threads = multithread_info.n_threads();
       std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
       thread_ranges
         = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
@@ -2329,7 +2329,7 @@ namespace Step14
       // Now start a number of threads which compute the error formula on
       // parts of all the cells, and once they are all started wait until they
       // have all finished:
-      const unsigned int n_threads = multithread_info.n_default_threads;
+      const unsigned int n_threads = multithread_info.n_threads();
       Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
         threads += Threads::new_thread (&WeightedResidual<dim>::estimate_some,

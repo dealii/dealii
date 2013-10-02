@@ -780,7 +780,7 @@ namespace Step17
                                         local_error_per_cell,
                                         ComponentMask(),
                                         0,
-                                        multithread_info.n_default_threads,
+                                        multithread_info.n_threads(),
                                         this_mpi_process);
 
     // Now all processes have computed error indicators for their own cells
