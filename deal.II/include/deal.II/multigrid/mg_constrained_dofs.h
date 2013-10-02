@@ -75,7 +75,7 @@ public:
 
   /**
    * Determine whether a dof index is subject to a boundary
-   * constraint.
+   * constraint. (is on boundary of domain)
    */
   bool is_boundary_index (const unsigned int level,
                           const types::global_dof_index index) const;
@@ -84,6 +84,7 @@ public:
    * Determine whether a dof index is at an edge that is not a
    * refinement edge.
    */
+// TODO: remove
   bool non_refinement_edge_index (const unsigned int level,
                                   const types::global_dof_index index) const;
 
@@ -96,6 +97,7 @@ public:
   /**
    * Determine whether a dof index is at the refinement edge and
    * subject to a boundary constraint .
+   * = is_boundary_index() && at_refinement_edge()
    */
   bool at_refinement_edge_boundary (const unsigned int level,
                                     const types::global_dof_index index) const;
@@ -104,6 +106,7 @@ public:
    * Return the indices of dofs for each level that lie on the
    * boundary of the domain.
    */
+// TODO: remove
   const std::vector<std::set<types::global_dof_index> > &
   get_boundary_indices () const;
 
@@ -111,6 +114,7 @@ public:
    * Return the indices of dofs for each level that lie on the
    * boundary of the domain.
    */
+  // TODO: remove
   const std::vector<std::set<types::global_dof_index> > &
   get_non_refinement_edge_indices () const;
 
@@ -119,6 +123,7 @@ public:
    * refinement edge (i.e. are on faces between cells of this level
    * and cells on the level below).
    */
+  // TODO: remove
   const std::vector<std::vector<bool> > &
   get_refinement_edge_indices () const;
 
@@ -127,6 +132,7 @@ public:
    * intersection of the sets returned by get_boundary_indices() and
    * get_refinement_edge_indices().
    */
+  // TODO: remove
   const std::vector<std::vector<bool> > &
   get_refinement_edge_boundary_indices () const;
 
