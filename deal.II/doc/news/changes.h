@@ -62,6 +62,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Changed: if configured with TBB but the number of threads is set to 1,
+  do not bother to use TBB in workstream.
+  <br>
+  (Timo Heister, 2013/10/02)
+  </li>
+
+  <li>
   New: step-51 demonstrates the use of hybridized discontinuous Galerkin
   methods in deal.II, using the face elements FE_FaceQ. The programs solves a
   scalar convection-diffusion equation.
