@@ -664,7 +664,7 @@ namespace Step42
     void compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &current_solution);
     void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
     void update_solution_and_constraints ();
-    void dirichlet_constraints ();
+    void compute_dirichlet_constraints ();
     void solve ();
     void solve_newton ();
     void refine_grid ();
@@ -896,7 +896,12 @@ namespace Step42
   // mesh that corresponds to a half sphere. deal.II has a function
   // that creates such a mesh, but it is in the wrong location
   // and facing the wrong direction, so we need to shift and rotate
-  // it a bit before using it:
+  // it a bit before using it.
+  //
+  // For later reference, as described in the documentation of
+  // GridGenerator::half_hyper_ball(), the flat surface of the halfsphere
+  // has boundary indicator zero, while the remainder has boundary
+  // indicator one.
   Point<3>
   rotate_half_sphere (const Point<3> &in)
   {
@@ -932,6 +937,9 @@ namespace Step42
     // @endcode
     // In other words, the boundary indicators of the sides of the cube are 8.
     // The boundary indicator of the bottom is 6 and the top has indicator 1.
+    // We will make use of these indicators later when evaluating which
+    // boundary will carry Dirichlet boundary conditions or will be
+    // subject to potential contact.
     else
       {
         const Point<dim> p1(0, 0, 0);
@@ -966,11 +974,22 @@ namespace Step42
 
 
 
+  // @sect4{PlasticityContactProblem::make_grid}
+
+  // The next piece in the puzzle is to set up the DoFHandler, resize
+  // vectors and take care of various other status variables such as
+  // index sets and constraint matrices.
+  //
+  // In the following, each group of operations is put into a brace-enclosed
+  // block that is being timed by the variable declared at the top of the
+  // block (the constructor of the TimerOutput::Scope variable starts the
+  // timed section, the destructor that is called at the end of the block
+  // stops it again).
   template <int dim>
   void
   PlasticityContactProblem<dim>::setup_system ()
   {
-    // setup dofs
+    /* setup dofs and get index sets for locally owned and relevant dofs */
     {
       TimerOutput::Scope t(computing_timer, "Setup: distribute DoFs");
       dof_handler.distribute_dofs(fe);
@@ -981,7 +1000,7 @@ namespace Step42
                                               locally_relevant_dofs);
     }
 
-    // setup hanging nodes and Dirichlet constraints
+    /* setup hanging nodes and Dirichlet constraints */
     {
       TimerOutput::Scope t(computing_timer, "Setup: constraints");
       constraints_hanging_nodes.reinit(locally_relevant_dofs);
@@ -994,10 +1013,10 @@ namespace Step42
             << "   Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
 
-      dirichlet_constraints();
+      compute_dirichlet_constraints();
     }
 
-    // Initialization for matrices and vectors
+    /* initialization of vectors and the active set */
     {
       TimerOutput::Scope t(computing_timer, "Setup: vectors");
       solution.reinit(locally_relevant_dofs, mpi_communicator);
@@ -1010,7 +1029,11 @@ namespace Step42
       active_set.set_size(locally_relevant_dofs.size());
     }
 
-    // setup sparsity pattern
+    // Finally, we set up sparsity patterns and matrices.
+    // We temporarily (ab)use the system matrix to also build the (diagonal)
+    // matrix that we use in eliminating degrees of freedom that are in contact
+    // with the obstacle, but we then immediately set the Newton matrix back
+    // to zero.
     {
       TimerOutput::Scope t(computing_timer, "Setup: matrix");
       TrilinosWrappers::SparsityPattern sp(locally_owned_dofs,
@@ -1019,29 +1042,76 @@ namespace Step42
       DoFTools::make_sparsity_pattern(dof_handler, sp,
                                       constraints_dirichlet_and_hanging_nodes, false,
                                       Utilities::MPI::this_mpi_process(mpi_communicator));
-
       sp.compress();
-
       system_matrix_newton.reinit(sp);
 
-      // we are going to reuse the system
-      // matrix for assembling the diagonal
-      // of the mass matrix so that we do not
-      // need to allocate two sparse matrices
-      // at the same time:
+
       TrilinosWrappers::SparseMatrix &mass_matrix = system_matrix_newton;
+
       assemble_mass_matrix_diagonal(mass_matrix);
+
       const unsigned int start = (system_rhs_newton.local_range().first),
                          end = (system_rhs_newton.local_range().second);
       for (unsigned int j = start; j < end; j++)
         diag_mass_matrix_vector(j) = mass_matrix.diag_element(j);
-
       diag_mass_matrix_vector.compress(VectorOperation::insert);
 
-      // remove the mass matrix entries from the matrix:
       mass_matrix = 0;
     }
   }
+
+
+  // @sect4{PlasticityContactProblem::compute_dirichlet_constraints}
+
+  // This function, broken out of the preceding one, computes the constraints
+  // associated with Dirichlet-type boundary conditions and puts them into the
+  // <code>constraints_dirichlet_and_hanging_nodes</code> variable by merging
+  // with the constraints that come from hanging nodes.
+  //
+  // As laid out in the introduction, we need to distinguish between two
+  // cases:
+  // - If the domain is a box, we set the displacement to zero at the bottom,
+  //   and allow vertical movement in z-direction along the sides. As
+  //   shown in the <code>make_grid()</code> function, the former corresponds
+  //   to boundary indicator 6, the latter to 8.
+  // - If the domain is a half sphere, then we impose zero displacement along
+  //   the curved part of the boundary, associated with boundary indicator zero.
+  template <int dim>
+  void
+  PlasticityContactProblem<dim>::compute_dirichlet_constraints ()
+  {
+      constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
+      constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
+
+      if (base_mesh == box)
+      {
+        // interpolate all components of the solution
+        VectorTools::interpolate_boundary_values(dof_handler,
+            6,
+            EquationData::BoundaryValues<dim>(),
+            constraints_dirichlet_and_hanging_nodes,
+            ComponentMask());
+
+        // interpolate x- and y-components of the
+        // solution (this is a bit mask, so apply
+        // operator| )
+        const FEValuesExtractors::Scalar x_displacement(0);
+        const FEValuesExtractors::Scalar y_displacement(1);
+        VectorTools::interpolate_boundary_values(dof_handler,
+            8,
+            EquationData::BoundaryValues<dim>(),
+            constraints_dirichlet_and_hanging_nodes,
+            (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
+      }
+      else
+        VectorTools::interpolate_boundary_values(dof_handler,
+            0,
+            EquationData::BoundaryValues<dim>(),
+            constraints_dirichlet_and_hanging_nodes,
+            ComponentMask());
+
+      constraints_dirichlet_and_hanging_nodes.close();
+    }
 
   template <int dim>
   void
@@ -1459,45 +1529,6 @@ namespace Step42
     all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
   }
 
-// @sect4{PlasticityContactProblem::dirichlet_constraints}
-
-// This function defines the new ConstraintMatrix
-// constraints_dirichlet_hanging_nodes. It contains
-// the Dirichlet boundary values as well as the
-// hanging nodes constraints.
-  template <int dim>
-  void
-  PlasticityContactProblem<dim>::dirichlet_constraints ()
-  {
-    /* boundary_indicators:
-     _______
-     /  1    /|
-     /______ / |
-     8|       | 8|
-     |   8   | /
-     |_______|/
-     6
-     */
-
-    constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
-    constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
-
-    // interpolate all components of the solution
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             base_mesh == "box" ? 6 : 0, EquationData::BoundaryValues<dim>(),
-                                             constraints_dirichlet_and_hanging_nodes, ComponentMask());
-
-    // interpolate x- and y-components of the
-    // solution (this is a bit mask, so apply
-    // operator| )
-    const FEValuesExtractors::Scalar x_displacement(0);
-    const FEValuesExtractors::Scalar y_displacement(1);
-    VectorTools::interpolate_boundary_values(dof_handler, 8,
-                                             EquationData::BoundaryValues<dim>(),
-                                             constraints_dirichlet_and_hanging_nodes,
-                                             (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
-    constraints_dirichlet_and_hanging_nodes.close();
-  }
 
 // @sect4{PlasticityContactProblem::solve}
 

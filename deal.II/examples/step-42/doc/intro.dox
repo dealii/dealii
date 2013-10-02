@@ -399,3 +399,11 @@ Compared to step-41, the programs has a few new classes:
   <img src="http://www.dealii.org/images/steps/developer/step-42.character.png" alt="" width="25%">
 </ul>
 
+two different coarse meshes
+parameter file
+
+modify obstacle file -- no filename, just select sphere or character
+
+boundary conditions: dirichlet at bottom, tangential at sides for box
+      dirichlet at curved part for half sphere
+      contact at top
