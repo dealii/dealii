@@ -314,7 +314,7 @@ public:
                         Vector<float>           &error,
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
-                        const unsigned int       n_threads = multithread_info.n_default_threads,
+                        const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
@@ -340,7 +340,7 @@ public:
                         std::vector<Vector<float>*> &errors,
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
-                        const unsigned int           n_threads = multithread_info.n_default_threads,
+                        const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
@@ -356,7 +356,7 @@ public:
                         std::vector<Vector<float>*> &errors,
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
-                        const unsigned int           n_threads = multithread_info.n_default_threads,
+                        const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id          material_id = numbers::invalid_material_id);
 
@@ -374,7 +374,7 @@ public:
                         Vector<float>           &error,
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
-                        const unsigned int       n_threads = multithread_info.n_default_threads,
+                        const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
@@ -391,7 +391,7 @@ public:
                         Vector<float>           &error,
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
-                        const unsigned int       n_threads = multithread_info.n_default_threads,
+                        const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
@@ -409,7 +409,7 @@ public:
                         std::vector<Vector<float>*> &errors,
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
-                        const unsigned int           n_threads = multithread_info.n_default_threads,
+                        const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
@@ -426,7 +426,7 @@ public:
                         std::vector<Vector<float>*> &errors,
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>    *coefficients   = 0,
-                        const unsigned int           n_threads = multithread_info.n_default_threads,
+                        const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
@@ -498,10 +498,8 @@ public:
    * bit-vector with all-set entries, or an empty bit-vector. All the other
    * parameters are as in the general case used for 2d and higher.
    *
-   * The estimator supports multithreading and splits the cells to
-   * <tt>multithread_info.n_default_threads</tt> (default) threads. The number
-   * of threads to be used in multithreaded mode can be set with the last
-   * parameter of the error estimator.  Multithreading is not presently
+   * The parameter n_threads is no longer used and will be ignored.
+   * Multithreading is not presently
    * implemented for 1d, but we retain the respective parameter for
    * compatibility with the function signature in the general case.
    */
@@ -514,7 +512,7 @@ public:
                         Vector<float>           &error,
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
-                        const unsigned int       n_threads = multithread_info.n_default_threads,
+                        const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
@@ -530,7 +528,7 @@ public:
                         Vector<float>           &error,
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
-                        const unsigned int       n_threads = multithread_info.n_default_threads,
+                        const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
@@ -556,7 +554,7 @@ public:
                         std::vector<Vector<float>*> &errors,
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
-                        const unsigned int           n_threads = multithread_info.n_default_threads,
+                        const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
@@ -572,7 +570,7 @@ public:
                         std::vector<Vector<float>*> &errors,
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
-                        const unsigned int           n_threads = multithread_info.n_default_threads,
+                        const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
@@ -590,7 +588,7 @@ public:
                         Vector<float>           &error,
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
-                        const unsigned int       n_threads = multithread_info.n_default_threads,
+                        const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
@@ -607,7 +605,7 @@ public:
                         Vector<float>           &error,
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
-                        const unsigned int       n_threads = multithread_info.n_default_threads,
+                        const unsigned int       n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
@@ -625,7 +623,7 @@ public:
                         std::vector<Vector<float>*> &errors,
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
-                        const unsigned int           n_threads = multithread_info.n_default_threads,
+                        const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
@@ -642,7 +640,7 @@ public:
                         std::vector<Vector<float>*> &errors,
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
-                        const unsigned int           n_threads = multithread_info.n_default_threads,
+                        const unsigned int           n_threads = numbers::invalid_unsigned_int,
                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
