@@ -1083,7 +1083,7 @@ namespace Step42
       constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
       constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
 
-      if (base_mesh == box)
+      if (base_mesh == "box")
       {
         // interpolate all components of the solution
         VectorTools::interpolate_boundary_values(dof_handler,
