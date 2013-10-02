@@ -17,7 +17,7 @@
 
 
 //
-// check collect_periodic_faces for correct return values
+// check collect_periodic_faces(b_id) for correct return values
 //
 
 
@@ -36,14 +36,13 @@ using namespace dealii;
 
 /*
  * Generate a grid consisting of two disjoint cells, colorize the two
- * outermost faces. They will be matched via collect_periodic_face_pairs
+ * outermost faces. They will be matched via collect_periodic_faces.
+ * Only default orientation is available for this function.
  *
- * The integer orientation determines the orientation of the second cell
- * (to get something else than the boring default orientation).
  */
 
 /* The 2D case */
-void generate_grid(Triangulation<2> &triangulation, int orientation)
+void generate_grid(Triangulation<2> &triangulation)
 {
   Point<2> vertices_1[]
   =
@@ -62,20 +61,15 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
   std::vector<CellData<2> > cells (2, CellData<2>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1,  2,  3};
+  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
 
   /* cell 1 */
-  int cell_vertices_1[2][GeometryInfo<2>::vertices_per_cell]
-  =
-  {
-    {4,5,6,7},
-    {7,6,5,4},
-  };
+  int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {4, 5, 6, 7};
 
   for (unsigned int j=0; j<GeometryInfo<2>::vertices_per_cell; ++j)
     {
       cells[0].vertices[j] = cell_vertices_0[j];
-      cells[1].vertices[j] = cell_vertices_1[orientation][j];
+      cells[1].vertices[j] = cell_vertices_1[j];
     }
   cells[0].material_id = 0;
   cells[1].material_id = 0;
@@ -96,14 +90,14 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_indicator(42);
-  face_2->set_boundary_indicator(43);
+  face_2->set_boundary_indicator(42);
 
   triangulation.refine_global(1);
 }
 
 
 /* The 3D case */
-void generate_grid(Triangulation<3> &triangulation, int orientation)
+void generate_grid(Triangulation<3> &triangulation)
 {
   Point<3> vertices_1[]
   =
@@ -133,23 +127,12 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
   int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {0, 1,  2,  3,  4,  5,  6,  7};
 
   /* cell 1 */
-  int cell_vertices_1[8][GeometryInfo<3>::vertices_per_cell]
-  =
-  {
-    {8,9,10,11,12,13,14,15},
-    {9,11,8,10,13,15,12,14},
-    {11,10,9,8,15,14,13,12},
-    {10,8,11,9,14,12,15,13},
-    {13,12,15,14,9,8,11,10},
-    {12,14,13,15,8,10,9,11},
-    {14,15,12,13,10,11,8,9},
-    {15,13,14,12,11,9,10,8},
-  };
+  int cell_vertices_1[GeometryInfo<3>::vertices_per_cell] = {8, 9, 10, 11, 12, 13, 14, 15};
 
   for (unsigned int j=0; j<GeometryInfo<3>::vertices_per_cell; ++j)
     {
       cells[0].vertices[j] = cell_vertices_0[j];
-      cells[1].vertices[j] = cell_vertices_1[orientation][j];
+      cells[1].vertices[j] = cell_vertices_1[j];
     }
   cells[0].material_id = 0;
   cells[1].material_id = 0;
@@ -171,7 +154,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_indicator(42);
-  face_2->set_boundary_indicator(43);
+  face_2->set_boundary_indicator(42);
 
   triangulation.refine_global(1);
 }
@@ -209,54 +192,44 @@ int main()
 {
   deallog << std::setprecision(4);
   logfile << std::setprecision(4);
-  deallog.attach(logfile);
+  deallog.attach(logfile, false);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   deallog << "Test for 2D: Hypercube" << std::endl << std::endl;
 
-  for (int i = 0; i < 2; ++i)
-    {
-      // Generate a triangulation and match:
-      Triangulation<2> triangulation;
+  // Generate a triangulation and match:
+  Triangulation<2> triangulation2;
 
-      generate_grid(triangulation, i);
+  generate_grid(triangulation2);
 
-      typedef std::vector<GridTools::PeriodicFacePair<typename Triangulation<2>::cell_iterator> > FaceMap;
+  typedef Triangulation<2>::cell_iterator CellIterator2;
+  typedef std::vector<GridTools::PeriodicFacePair<CellIterator2> > FaceVector2;
+  FaceVector2 test2 = GridTools::collect_periodic_faces
+                        (triangulation2, 42, 1, dealii::Tensor<1,2>());
 
-      FaceMap test = GridTools::collect_periodic_faces (triangulation, 42, 43, 1,
-                                                        dealii::Tensor<1,2>());
-
-      deallog << "Triangulation: " << i << std::endl;
-      deallog << "Coarse match: " << test.size() << std::endl;
-
-      for (FaceMap::iterator facepair = test.begin(); facepair != test.end(); ++facepair)
-        print_match(facepair->cell[0]->face(facepair->face_idx[0]),
-                    facepair->cell[1]->face(facepair->face_idx[1]),
-                    facepair->orientation);
-    }
+  for (FaceVector2::iterator it = test2.begin(); it != test2.end(); ++it)
+    print_match(it->cell[0]->face(it->face_idx[0]),
+                it->cell[1]->face(it->face_idx[1]),
+                it->orientation);
 
   deallog << "Test for 3D: Hypercube" << std::endl << std::endl;
 
-  for (int i = 0; i < 8; ++i)
-    {
-      // Generate a triangulation and match:
-      Triangulation<3> triangulation;
 
-      generate_grid(triangulation, i);
+  // Generate a triangulation and match:
+  Triangulation<3> triangulation3;
 
-      typedef std::vector<GridTools::PeriodicFacePair<typename Triangulation<3>::cell_iterator> > FaceMap;
-      FaceMap test = GridTools::collect_periodic_faces (triangulation, 42, 43, 2,
-                                                        dealii::Tensor<1,3>());
+  generate_grid(triangulation3);
 
-      deallog << "Triangulation: " << i << std::endl;
-      deallog << "Coarse match: " << test.size() << std::endl;
+  typedef Triangulation<3>::cell_iterator CellIterator3;
+  typedef std::vector<GridTools::PeriodicFacePair<CellIterator3> > FaceVector3;
+  FaceVector3 test3 = GridTools::collect_periodic_faces
+                       (triangulation3, 42, 2, dealii::Tensor<1,3>());
 
-      for (FaceMap::iterator facepair = test.begin(); facepair != test.end(); ++facepair)
-        print_match(facepair->cell[0]->face(facepair->face_idx[0]),
-                    facepair->cell[1]->face(facepair->face_idx[1]),
-                    facepair->orientation);
-    }
+  for (FaceVector3::iterator it = test3.begin(); it != test3.end(); ++it)
+    print_match(it->cell[0]->face(it->face_idx[0]),
+                it->cell[1]->face(it->face_idx[1]),
+                it->orientation);
 
   return 0;
 }
