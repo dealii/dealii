@@ -733,11 +733,11 @@ namespace Step42
     // a vector that corresponds to the diagonal of the $B$ matrix
     // briefly mentioned in the introduction and discussed in the
     // accompanying paper.
-    TrilinosWrappers::SparseMatrix    system_matrix_newton;
+    TrilinosWrappers::SparseMatrix    newton_matrix;
 
     TrilinosWrappers::MPI::Vector     solution;
-    TrilinosWrappers::MPI::Vector     system_rhs_newton;
-    TrilinosWrappers::MPI::Vector     system_rhs_lambda;
+    TrilinosWrappers::MPI::Vector     newton_rhs;
+    TrilinosWrappers::MPI::Vector     newton_rhs_uncondensed;
     TrilinosWrappers::MPI::Vector     diag_mass_matrix_vector;
 
     // The next block contains the variables that describe the material
@@ -1019,9 +1019,9 @@ namespace Step42
     {
       TimerOutput::Scope t(computing_timer, "Setup: vectors");
       solution.reinit(locally_relevant_dofs, mpi_communicator);
-      system_rhs_newton.reinit(locally_owned_dofs, mpi_communicator);
-      system_rhs_lambda.reinit(system_rhs_newton);
-      diag_mass_matrix_vector.reinit(system_rhs_newton);
+      newton_rhs.reinit(locally_owned_dofs, mpi_communicator);
+      newton_rhs_uncondensed.reinit(locally_relevant_dofs, mpi_communicator);
+      diag_mass_matrix_vector.reinit(locally_relevant_dofs, mpi_communicator);
       fraction_of_plastic_q_points_per_cell.reinit(triangulation.n_active_cells());
       active_set.clear();
       active_set.set_size(locally_relevant_dofs.size());
@@ -1041,15 +1041,15 @@ namespace Step42
                                       constraints_dirichlet_and_hanging_nodes, false,
                                       Utilities::MPI::this_mpi_process(mpi_communicator));
       sp.compress();
-      system_matrix_newton.reinit(sp);
+      newton_matrix.reinit(sp);
 
 
-      TrilinosWrappers::SparseMatrix &mass_matrix = system_matrix_newton;
+      TrilinosWrappers::SparseMatrix &mass_matrix = newton_matrix;
 
       assemble_mass_matrix_diagonal(mass_matrix);
 
-      const unsigned int start = (system_rhs_newton.local_range().first),
-                         end = (system_rhs_newton.local_range().second);
+      const unsigned int start = (newton_rhs.local_range().first),
+                         end = (newton_rhs.local_range().second);
       for (unsigned int j = start; j < end; j++)
         diag_mass_matrix_vector(j) = mass_matrix.diag_element(j);
       diag_mass_matrix_vector.compress(VectorOperation::insert);
@@ -1141,8 +1141,9 @@ namespace Step42
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-      dof_handler.begin_active(), endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
     const FEValuesExtractors::Vector displacement(0);
 
@@ -1223,14 +1224,14 @@ namespace Step42
           cell->get_dof_indices(local_dof_indices);
           all_constraints.distribute_local_to_global(cell_matrix, cell_rhs,
                                                      local_dof_indices,
-                                                     system_matrix_newton,
-                                                     system_rhs_newton,
+                                                     newton_matrix,
+                                                     newton_rhs,
                                                      true);
 
         }
 
-    system_matrix_newton.compress(VectorOperation::add);
-    system_rhs_newton.compress(VectorOperation::add);
+    newton_matrix.compress(VectorOperation::add);
+    newton_rhs.compress(VectorOperation::add);
   }
 
 
@@ -1337,15 +1338,15 @@ namespace Step42
           cell->get_dof_indices(local_dof_indices);
           constraints_dirichlet_and_hanging_nodes.distribute_local_to_global(cell_rhs,
               local_dof_indices,
-              system_rhs_newton);
+              newton_rhs);
 
           for (unsigned int i = 0; i < dofs_per_cell; i++)
-            system_rhs_lambda(local_dof_indices[i]) += cell_rhs(i);
+            newton_rhs_uncondensed(local_dof_indices[i]) += cell_rhs(i);
         }
 
     fraction_of_plastic_q_points_per_cell /= quadrature_formula.size();
-    system_rhs_newton.compress(VectorOperation::add);
-    system_rhs_lambda.compress(VectorOperation::add);
+    newton_rhs.compress(VectorOperation::add);
+    newton_rhs_uncondensed.compress(VectorOperation::add);
 
     const unsigned int sum_elast_points = Utilities::MPI::sum(elast_points,
                                                               mpi_communicator);
@@ -1421,10 +1422,10 @@ namespace Step42
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-    TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
+    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
     distributed_solution = solution;
     TrilinosWrappers::MPI::Vector lambda(solution);
-    lambda = system_rhs_lambda;
+    lambda = newton_rhs_uncondensed;
     TrilinosWrappers::MPI::Vector diag_mass_matrix_vector_relevant(solution);
     diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
 
@@ -1443,9 +1444,6 @@ namespace Step42
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_face);
 
-    // pcout<< "dofs_per_face = " << dofs_per_face
-    //      << "n_face_q_points = " << n_face_q_points
-    //      <<std::endl;
     unsigned int counter_hanging_nodes = 0;
     for (; cell != endc; ++cell)
       if (!cell->is_artificial())
@@ -1537,7 +1535,7 @@ namespace Step42
 // creating the vector distributed_solution.
 //
 // For the hanging nodes we have to apply
-// the set_zero function to system_rhs_newton.
+// the set_zero function to newton_rhs.
 // This is necessary if a hanging node value x_0
 // has one neighbor which is in contact with
 // value x_0 and one neighbor which is not with
@@ -1560,13 +1558,13 @@ namespace Step42
   {
     TimerOutput::Scope t(computing_timer, "Solve");
 
-    TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
+    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
     distributed_solution = solution;
 
     constraints_hanging_nodes.set_zero(distributed_solution);
-    constraints_hanging_nodes.set_zero(system_rhs_newton);
+    constraints_hanging_nodes.set_zero(newton_rhs);
     distributed_solution.compress(VectorOperation::insert);
-    system_rhs_newton.compress(VectorOperation::insert);
+    newton_rhs.compress(VectorOperation::insert);
 
     TrilinosWrappers::PreconditionAMG preconditioner;
     {
@@ -1585,14 +1583,14 @@ namespace Step42
       additional_data.smoother_sweeps = 2;
       additional_data.aggregation_threshold = 1e-2;
 
-      preconditioner.initialize(system_matrix_newton, additional_data);
+      preconditioner.initialize(newton_matrix, additional_data);
     }
 
     {
       TimerOutput::Scope t(computing_timer, "Solve: iterate");
 
       PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
-      TrilinosWrappers::MPI::Vector tmp(system_rhs_newton);
+      TrilinosWrappers::MPI::Vector tmp(locally_owned_dofs, mpi_communicator);
       // 1e-4 seems to be the fasted option altogether, but to get more
       // reproducible parallel benchmark results, we use a small residual:
       double relative_accuracy = 1e-8;
@@ -1600,17 +1598,17 @@ namespace Step42
         relative_accuracy = 1e-4;
 
       const double solver_tolerance = relative_accuracy
-                                      * system_matrix_newton.residual(tmp, distributed_solution,
-                                          system_rhs_newton);
+                                      * newton_matrix.residual(tmp, distributed_solution,
+                                          newton_rhs);
 
-      SolverControl solver_control(system_matrix_newton.m(),
+      SolverControl solver_control(newton_matrix.m(),
                                    solver_tolerance);
       SolverBicgstab<TrilinosWrappers::MPI::Vector> solver(solver_control,
                                                            mem/*,
                SolverFGMRES<TrilinosWrappers::MPI::Vector>::
                AdditionalData(30, true)*/);
-      solver.solve(system_matrix_newton, distributed_solution,
-                   system_rhs_newton, preconditioner);
+      solver.solve(newton_matrix, distributed_solution,
+                   newton_rhs, preconditioner);
 
       pcout << "         Error: " << solver_control.initial_value()
             << " -> " << solver_control.last_value() << " in "
@@ -1638,9 +1636,9 @@ namespace Step42
 
     double resid = 0;
     double resid_old = 100000;
-    TrilinosWrappers::MPI::Vector old_solution(system_rhs_newton);
-    TrilinosWrappers::MPI::Vector res(system_rhs_newton);
-    TrilinosWrappers::MPI::Vector tmp_vector(system_rhs_newton);
+    TrilinosWrappers::MPI::Vector old_solution(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector res(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector tmp_vector(locally_owned_dofs, mpi_communicator);
 
     double sigma_hlp = sigma_0;
 
@@ -1677,8 +1675,8 @@ namespace Step42
         }
 
         pcout << "      Assembling system... " << std::endl;
-        system_matrix_newton = 0;
-        system_rhs_newton = 0;
+        newton_matrix = 0;
+        newton_rhs = 0;
         assemble_nl_system(solution); //compute Newton-Matrix
 
         number_assemble_system += 1;
@@ -1686,7 +1684,7 @@ namespace Step42
         pcout << "      Solving system... " << std::endl;
         solve();
 
-        TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
+        TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
         distributed_solution = solution;
 
         // We handle a highly nonlinear problem so we have to damp
@@ -1709,12 +1707,12 @@ namespace Step42
 
             TimerOutput::Scope t(computing_timer, "Residual and lambda");
 
-            system_rhs_newton = 0;
-            system_rhs_lambda = 0;
+            newton_rhs = 0;
+            newton_rhs_uncondensed = 0;
 
             solution = old_solution;
             compute_nonlinear_residual(solution);
-            res = system_rhs_newton;
+            res = newton_rhs;
 
             const unsigned int start_res = (res.local_range().first),
                                end_res = (res.local_range().second);
@@ -1801,7 +1799,7 @@ namespace Step42
 
     if (transfer_solution)
       {
-        TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
+        TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
         distributed_solution = solution;
         solution_transfer.interpolate(distributed_solution);
         solution = distributed_solution;
@@ -1855,18 +1853,18 @@ namespace Step42
     move_mesh(solution);
 
     // Calculation of the contact forces
-    TrilinosWrappers::MPI::Vector lambda(solution);
-    TrilinosWrappers::MPI::Vector distributed_lambda(system_rhs_newton);
-    const unsigned int start_res = (system_rhs_lambda.local_range().first),
-                       end_res = (system_rhs_lambda.local_range().second);
+    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
+    const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
+                       end_res = (newton_rhs_uncondensed.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
-        distributed_lambda(n) = system_rhs_lambda(n) / diag_mass_matrix_vector(n);
+        distributed_lambda(n) = newton_rhs_uncondensed(n) / diag_mass_matrix_vector(n);
     distributed_lambda.compress(VectorOperation::insert);
     constraints_hanging_nodes.distribute(distributed_lambda);
     lambda = distributed_lambda;
-    TrilinosWrappers::MPI::Vector resid_vector_relevant(solution);
-    TrilinosWrappers::MPI::Vector distributed_resid_vector(system_rhs_lambda);
+    TrilinosWrappers::MPI::Vector resid_vector_relevant(locally_relevant_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector distributed_resid_vector(locally_owned_dofs, mpi_communicator);
     constraints_hanging_nodes.distribute(distributed_resid_vector);
     resid_vector_relevant = distributed_resid_vector;
 
@@ -1930,7 +1928,7 @@ namespace Step42
 // over the contact area. For this purpose we set the contact
 // pressure lambda to 0 for all inactive dofs. For all
 // active dofs we lambda contains the quotient of the nonlinear
-// residual (system_rhs_lambda) and corresponding diagonal entry
+// residual (newton_rhs_uncondensed) and corresponding diagonal entry
 // of the mass matrix (diag_mass_matrix_vector). Because it is
 // not unlikely that hanging nodes shows up in the contact area
 // it is important to apply contraints_hanging_nodes.distribute
@@ -1958,13 +1956,13 @@ namespace Step42
     // nonlinear residual this dof divided by the according entry
     // of the mass matrix. In all other dofs lambda will be set to
     // zero.
-    TrilinosWrappers::MPI::Vector lambda(solution);
-    TrilinosWrappers::MPI::Vector distributed_lambda(system_rhs_newton);
-    const unsigned int start_res = (system_rhs_lambda.local_range().first),
-                       end_res = (system_rhs_lambda.local_range().second);
+    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
+    const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
+                       end_res = (newton_rhs_uncondensed.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
-        distributed_lambda(n) = system_rhs_lambda(n) / diag_mass_matrix_vector(n);
+        distributed_lambda(n) = newton_rhs_uncondensed(n) / diag_mass_matrix_vector(n);
       else
         distributed_lambda(n) = 0;
     distributed_lambda.compress(VectorOperation::insert);
