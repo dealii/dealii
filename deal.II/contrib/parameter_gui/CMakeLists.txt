@@ -35,7 +35,7 @@ QT4_ADD_RESOURCES(SOURCE_RCC
   application.qrc
   )
 
-ADD_EXECUTABLE(parameter_gui
+ADD_EXECUTABLE(parameter_gui_exe
   browse_lineedit.cpp
   info_message.cpp
   main.cpp
@@ -46,16 +46,17 @@ ADD_EXECUTABLE(parameter_gui
   ${SOURCE_MOC}
   ${SOURCE_RCC}
   )
+SET_TARGET_PROPERTIES(parameter_gui_exe PROPERTIES OUTPUT_NAME parameter_gui)
+TARGET_LINK_LIBRARIES(parameter_gui_exe ${QT_LIBRARIES})
 
-TARGET_LINK_LIBRARIES(parameter_gui ${QT_LIBRARIES})
+ADD_DEPENDENCIES(parameter_gui parameter_gui_exe)
 
 IF("${DEAL_II_EXECUTABLE_RELDIR}" STREQUAL "")
   SET(DEAL_II_EXECUTABLE_RELDIR "bin")
 ENDIF()
 
-INSTALL(TARGETS parameter_gui
-  RUNTIME
-  DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
+INSTALL(TARGETS parameter_gui_exe
+  RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
   COMPONENT parameter_gui
   )
 

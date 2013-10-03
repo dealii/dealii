@@ -117,6 +117,7 @@ ENDFOREACH()
 #
 # Finalize the configuration:
 #
+INCLUDE(setup_custom_targets)
 INCLUDE(setup_finalize)
 
 

@@ -50,7 +50,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   #
   # A custom target with the same name as the component:
   #
-  ADD_CUSTOM_TARGET(documentation DEPENDS doxygen)
+  ADD_DEPENDENCIES(documentation doxygen)
 
   #
   # Install the static elements of the html documentation:
