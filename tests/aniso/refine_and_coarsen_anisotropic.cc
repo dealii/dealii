@@ -144,5 +144,10 @@ int main ()
 
   *logfile<<"HyperBall:"<<std::endl;
   test_isotropic<3> (1,logfile);
+
+  // clear whatever is in the buffer
+  *logfile << std::flush;
+  if (single_file)
+    delete logfile;
 }
 
