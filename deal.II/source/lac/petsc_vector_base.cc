@@ -411,12 +411,11 @@ namespace PETScWrappers
     return d*d;
   }
 
-  // @todo does not build with PETSc complex scalar types.
-  // :425:25: error: no match for ‘operator/’ in ‘sum / dealii::PETScWrappers::VectorBase::size()’
+
+
   PetscScalar
   VectorBase::mean_value () const
   {
-#ifndef PETSC_USE_COMPLEX
     int ierr;
 
     // We can only use our more efficient
@@ -426,7 +425,7 @@ namespace PETScWrappers
         PetscScalar sum;
         ierr = VecSum(vector, &sum);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
-        return sum/size();
+        return sum/static_cast<PetscReal>(size());
       }
 
     // get a representation of the vector and
@@ -458,7 +457,7 @@ namespace PETScWrappers
       while (ptr != start_ptr+size())
         sum0 += *ptr++;
 
-      mean = (sum0+sum1+sum2+sum3)/static_cast<PetscScalar>(size());
+      mean = (sum0+sum1+sum2+sum3)/static_cast<PetscReal>(size());
     }
 
     // restore the representation of the
@@ -467,16 +466,6 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return mean;
-
-#else // PETSC_USE_COMPLEX
-    Assert ((false),
-            ExcMessage ("Your PETSc/SLEPc installation was configured with scalar-type complex "
-                        "but this function is not defined for complex types."));
-
-    // Prevent compiler warning about no return value
-    PetscScalar dummy;
-    return dummy;
-#endif
   }
 
 

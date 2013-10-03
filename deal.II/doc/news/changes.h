@@ -62,6 +62,35 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Changed: multithreadinfo::n_default_threads is now deprecated. Use the
+  new n_threads() function instead, which works correctly with TBB.
+  <br>
+  (Timo Heister, 2013/10/02)
+  </li>
+
+  <li>
+  Changed: if configured with TBB but the number of threads is set to 1,
+  do not bother to use TBB in workstream.
+  <br>
+  (Timo Heister, 2013/10/02)
+  </li>
+
+  <li>
+  New: step-51 demonstrates the use of hybridized discontinuous Galerkin
+  methods in deal.II, using the face elements FE_FaceQ. The programs solves a
+  scalar convection-diffusion equation.
+  <br>
+  (Martin Kronbichler and Scott Miller, 2013/10/01)
+  </li>
+
+  <li>
+  New: There is now an element FE_FaceP that can be combined with FE_DGP in
+  hybridized DG methods.
+  <br>
+  (Martin Kronbichler, 2013/09/17)
+  </li>
+
+  <li>
   Fixed: The DataOutBase::XDMFEntry class now has a proper serialization
   function to allow for checkpointing.
   <br>

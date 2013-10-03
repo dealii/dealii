@@ -520,17 +520,13 @@ namespace Step9
     // configured for multithreading, then the number of CPUs is set to one.)
     // However, sometimes there might be reasons to use another value. For
     // example, you might want to use less processors than there are in your
-    // system in order not to use too many computational resources. On the
-    // other hand, if there are several jobs running on a computer and you
-    // want to get a higher percentage of CPU time, it might be worth to start
-    // more threads than there are CPUs, as most operating systems assign
-    // roughly the same CPU resources to all threads presently running. For
-    // this reason, the <code>MultithreadInfo</code> class contains a
-    // read-write variable <code>n_default_threads</code> which is set to
-    // <code>n_cpus</code> by default, but can be set to another value. This
-    // variable is also queried by functions inside the library to determine
+    // system in order not to use too many computational resources. For
+    // this reason, the number of threads can be set by
+    // <code>MultithreadInfo::set_thread_limit</code> and the current value
+    // is returned by n_threads(). This
+    // is also queried by functions inside the library to determine
     // how many threads they shall create.
-    const unsigned int n_threads = multithread_info.n_default_threads;
+    const unsigned int n_threads = multithread_info.n_threads();
     // It is worth noting, however, that this setup determines the load
     // distribution onto processor in a static way: it does not take into
     // account that some other part of our program may also be running
@@ -1004,7 +1000,7 @@ namespace Step9
     // as we have used the function <code>Threads::split_range</code> when
     // assembling above, there is a function that computes intervals of
     // roughly equal size from a larger interval. This is used here:
-    const unsigned int n_threads = multithread_info.n_default_threads;
+    const unsigned int n_threads = multithread_info.n_threads();
     std::vector<IndexInterval> index_intervals
       = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
                                  n_threads);
@@ -1038,7 +1034,7 @@ namespace Step9
     // finish their work:
     threads.join_all ();
     // Note that if the value of the variable
-    // <code>multithread_info.n_default_threads</code> was one, or if the
+    // <code>multithread_info.n_threads()</code> was one, or if the
     // library was not configured to use threads, then the sequence of
     // commands above reduced to a complicated way to simply call the
     // <code>estimate_interval</code> function with the whole range of cells

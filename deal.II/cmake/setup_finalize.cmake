@@ -262,7 +262,7 @@ FOREACH(_var ${_components})
 ENDFOREACH()
 
 _summary(
-  "#\n# Detailed information (compiler flags, feature configuration) can be found in detailed.log\n"
+  "#\n#  Detailed information (compiler flags, feature configuration) can be found in detailed.log\n"
   )
 
 _both("#\n###")

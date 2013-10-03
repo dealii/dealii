@@ -626,7 +626,7 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
   Assert (component < dof_handler.get_fe().n_components(),
           ExcIndexRange (component, 0, dof_handler.get_fe().n_components()));
 
-  const unsigned int n_threads = multithread_info.n_default_threads;
+  const unsigned int n_threads = multithread_info.n_threads();
   std::vector<IndexInterval> index_intervals
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
                                n_threads);

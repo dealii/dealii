@@ -52,7 +52,7 @@ namespace SLEPcWrappers
     mpi_communicator (mpi_communicator),
     target_eigenvalue (0.),
     set_which (EPS_LARGEST_MAGNITUDE),
-    set_problem (EPS_NHEP),
+    set_problem (EPS_GNHEP),
     opA (NULL),
     opB (NULL),
     initial_vector (NULL),
@@ -111,7 +111,7 @@ namespace SLEPcWrappers
 
   void
   SolverBase::solve (const unsigned int  n_eigenpairs,
-                     unsigned int *n_converged)
+                     unsigned int       *n_converged)
   {
     int ierr;
 
@@ -136,6 +136,10 @@ namespace SLEPcWrappers
         // set runtime options
         set_solver_type (solver_data->eps);
       }
+
+    // set the problem type
+    ierr = EPSSetProblemType (solver_data->eps, set_problem);
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // set the initial vector(s) if any
     if (initial_vector && initial_vector->size() != 0)

@@ -75,6 +75,7 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-w2")
 #          (happens in boost)
 #   -w1478 deprecation warning
 #   -w1572 floating-point equality and inequality comparisons are unreliable
+#   -w2536 type qualifiers are meaningless here
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd68")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd175")
@@ -86,6 +87,7 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd981")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1418")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1478")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1572")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd2536")
 
 
 IF(DEAL_II_STATIC_EXECUTABLE)

@@ -1184,7 +1184,7 @@ namespace MatrixCreator
     else
       AssertDimension (n_components, component_mapping.size());
 
-    const unsigned int n_threads = multithread_info.n_default_threads;
+    const unsigned int n_threads = multithread_info.n_threads();
     Threads::ThreadGroup<> threads;
 
     // define starting and end point
@@ -1660,7 +1660,7 @@ namespace MatrixCreator
     else
       AssertDimension (n_components, component_mapping.size());
 
-    const unsigned int n_threads = multithread_info.n_default_threads;
+    const unsigned int n_threads = multithread_info.n_threads();
     Threads::ThreadGroup<> threads;
 
     // define starting and end point

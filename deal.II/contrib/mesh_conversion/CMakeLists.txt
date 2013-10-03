@@ -17,18 +17,22 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 #PROJECT(mesh_converter)
 
-ADD_EXECUTABLE(mesh_converter
+ADD_EXECUTABLE(mesh_converter_exe
   Main.cc
   MeshConversion.cc
   )
+SET_TARGET_PROPERTIES(mesh_converter_exe
+  PROPERTIES OUTPUT_NAME mesh_converter
+  )
+
+ADD_DEPENDENCIES(mesh_converter mesh_converter_exe)
 
 IF("${DEAL_II_EXECUTABLE_RELDIR}" STREQUAL "")
   SET(DEAL_II_EXECUTABLE_RELDIR "bin")
 ENDIF()
 
-INSTALL(TARGETS mesh_converter
+INSTALL(TARGETS mesh_converter_exe
   RUNTIME
   DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
   COMPONENT mesh_converter
   )
-

@@ -101,6 +101,9 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 {
+  Assert(n_max_threads==numbers::invalid_unsigned_int,
+      ExcMessage("Calling set_thread_limit() more than once is not supported!"));
+
   unsigned int max_threads_env = numbers::invalid_unsigned_int;
   char *penv;
   penv = getenv ("DEAL_II_NUM_THREADS");
@@ -117,11 +120,13 @@ void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
     }
 }
 
-bool MultithreadInfo::is_running_single_threaded()
+
+unsigned int MultithreadInfo::n_threads() const
 {
   if (n_max_threads == numbers::invalid_unsigned_int)
-    n_max_threads = tbb::task_scheduler_init::default_num_threads();
-  return n_max_threads == 1;
+    return tbb::task_scheduler_init::default_num_threads();
+  else
+    return n_max_threads;
 }
 
 
@@ -132,9 +137,9 @@ unsigned int MultithreadInfo::get_n_cpus()
   return 1;
 }
 
-bool MultithreadInfo::is_running_single_threaded()
+unsigned int MultithreadInfo::n_threads() const
 {
-  return true;
+  return 1;
 }
 
 void MultithreadInfo::set_thread_limit(const unsigned int)
@@ -144,10 +149,17 @@ void MultithreadInfo::set_thread_limit(const unsigned int)
 #endif
 
 
+bool MultithreadInfo::is_running_single_threaded()
+{
+  return n_threads() == 1;
+}
+
+
 MultithreadInfo::MultithreadInfo ()
   :
   n_cpus (get_n_cpus()),
-  n_default_threads (n_cpus)
+  n_default_threads (n_cpus),
+  n_max_threads (numbers::invalid_unsigned_int)
 {}
 
 
