@@ -34,28 +34,14 @@ IF(NOT "${CMAKE_PROJECT_NAME}" STREQUAL "deal.II")
 ENDIF()
 
 SET(_options)
-IF("${CMAKE_PROJECT_NAME}" STREQUAL "deal.II")
-  #
-  # Setup for the case that this folder is included as a subfolder in a
-  # deal.II project:
-  #
 
-  # Write a minimalistic CTestTestfile.cmake file to CMAKE_BINARY_DIR:
-  FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
-    "SUBDIRS(tests)"
-    )
+# Write a minimalistic CTestTestfile.cmake file to CMAKE_BINARY_DIR:
+FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
+  "SUBDIRS(tests)"
+  )
 
-  LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
-  LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
-
-ELSE()
-
-  #
-  # Set up a top level test suite project:
-  #
-
-  SET(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-ENDIF()
+LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
+LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
 
 #
 # Pass all relevant "TEST_" variables down to the subprojects:
