@@ -49,27 +49,39 @@ else:
     number = number[1:]
     date = datetime.strptime(dirname,"%Y%m%d-%H%M")
 
-print "Revision: %s"%number
-print "Date: %s"%(date.strftime("%Y %j  %F  %U-%w"))
-#print "Id:  %s"%name
+header = "Revision: %s"%number + "\n"
+header += "Date: %s"%(date.strftime("%Y %j  %F  %U-%w")) + '\n'
 id = subprocess.check_output(["id","-un"])+'@'+subprocess.check_output(["hostname"])
 id=id.replace('\n','')
-print "Id:  %s"%id
+header += "Id:  %s"%id
 
 #now Test.xml:
 tree = ET.parse(dirname+'/Test.xml')
 root = tree.getroot()
 testing = root.find('Testing')
 
+tests={}
+
 for test in testing.findall("Test"):
     status = test.attrib['Status']
     fail=False
     if status=="failed": fail=True
     name = test.find('Name').text
+    group = name.split('/')[0]
 
     if fail:
-        print "%s  3   %s%s"%(date,branch,name)
+        line = "%s  3   %s%s"%(date,branch,name)
     else:
-        print "%s   +  %s%s"%(date,branch,name)
+        line = "%s   +  %s%s"%(date,branch,name)
+
+    if group not in tests: tests[group]=[]
+    tests[group].append( line )
+
+for g in sorted(tests):
+    group = tests[g]
+    print header
+    for l in group:
+        print l
+
 
 
