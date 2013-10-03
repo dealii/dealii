@@ -738,7 +738,6 @@ namespace Step42
     TrilinosWrappers::MPI::Vector     solution;
     TrilinosWrappers::MPI::Vector     system_rhs_newton;
     TrilinosWrappers::MPI::Vector     system_rhs_lambda;
-    TrilinosWrappers::MPI::Vector     resid_vector;
     TrilinosWrappers::MPI::Vector     diag_mass_matrix_vector;
 
     // The next block contains the variables that describe the material
@@ -1022,7 +1021,6 @@ namespace Step42
       solution.reinit(locally_relevant_dofs, mpi_communicator);
       system_rhs_newton.reinit(locally_owned_dofs, mpi_communicator);
       system_rhs_lambda.reinit(system_rhs_newton);
-      resid_vector.reinit(system_rhs_newton);
       diag_mass_matrix_vector.reinit(system_rhs_newton);
       fraction_of_plastic_q_points_per_cell.reinit(triangulation.n_active_cells());
       active_set.clear();
@@ -1426,7 +1424,7 @@ namespace Step42
     TrilinosWrappers::MPI::Vector distributed_solution(system_rhs_newton);
     distributed_solution = solution;
     TrilinosWrappers::MPI::Vector lambda(solution);
-    lambda = resid_vector;
+    lambda = system_rhs_lambda;
     TrilinosWrappers::MPI::Vector diag_mass_matrix_vector_relevant(solution);
     diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
 
@@ -1747,8 +1745,6 @@ namespace Step42
 
         resid_old = resid;
 
-        resid_vector = system_rhs_lambda;
-
         if (Utilities::MPI::sum((active_set == active_set_old) ? 0 : 1,
                                 mpi_communicator) == 0)
           {
@@ -1810,7 +1806,6 @@ namespace Step42
         solution_transfer.interpolate(distributed_solution);
         solution = distributed_solution;
         compute_nonlinear_residual(solution);
-        resid_vector = system_rhs_lambda;
       }
   }
 
@@ -1818,8 +1813,8 @@ namespace Step42
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::move_mesh (
-    const TrilinosWrappers::MPI::Vector &_complete_displacement) const
+  PlasticityContactProblem<dim>::
+  move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const
   {
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
 
@@ -1862,16 +1857,16 @@ namespace Step42
     // Calculation of the contact forces
     TrilinosWrappers::MPI::Vector lambda(solution);
     TrilinosWrappers::MPI::Vector distributed_lambda(system_rhs_newton);
-    const unsigned int start_res = (resid_vector.local_range().first),
-                       end_res = (resid_vector.local_range().second);
+    const unsigned int start_res = (system_rhs_lambda.local_range().first),
+                       end_res = (system_rhs_lambda.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
-        distributed_lambda(n) = resid_vector(n) / diag_mass_matrix_vector(n);
+        distributed_lambda(n) = system_rhs_lambda(n) / diag_mass_matrix_vector(n);
     distributed_lambda.compress(VectorOperation::insert);
     constraints_hanging_nodes.distribute(distributed_lambda);
     lambda = distributed_lambda;
     TrilinosWrappers::MPI::Vector resid_vector_relevant(solution);
-    TrilinosWrappers::MPI::Vector distributed_resid_vector(resid_vector);
+    TrilinosWrappers::MPI::Vector distributed_resid_vector(system_rhs_lambda);
     constraints_hanging_nodes.distribute(distributed_resid_vector);
     resid_vector_relevant = distributed_resid_vector;
 
@@ -1935,7 +1930,7 @@ namespace Step42
 // over the contact area. For this purpose we set the contact
 // pressure lambda to 0 for all inactive dofs. For all
 // active dofs we lambda contains the quotient of the nonlinear
-// residual (resid_vector) and corresponding diagonal entry
+// residual (system_rhs_lambda) and corresponding diagonal entry
 // of the mass matrix (diag_mass_matrix_vector). Because it is
 // not unlikely that hanging nodes shows up in the contact area
 // it is important to apply contraints_hanging_nodes.distribute
@@ -1965,11 +1960,11 @@ namespace Step42
     // zero.
     TrilinosWrappers::MPI::Vector lambda(solution);
     TrilinosWrappers::MPI::Vector distributed_lambda(system_rhs_newton);
-    const unsigned int start_res = (resid_vector.local_range().first),
-                       end_res = (resid_vector.local_range().second);
+    const unsigned int start_res = (system_rhs_lambda.local_range().first),
+                       end_res = (system_rhs_lambda.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
-        distributed_lambda(n) = resid_vector(n) / diag_mass_matrix_vector(n);
+        distributed_lambda(n) = system_rhs_lambda(n) / diag_mass_matrix_vector(n);
       else
         distributed_lambda(n) = 0;
     distributed_lambda.compress(VectorOperation::insert);
