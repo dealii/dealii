@@ -20,14 +20,17 @@ class Revision:
         self.n_tests = 0
         self.n_fail = 0
 
+branch=''
+args=sys.argv
+args.pop(0)
 
-
-if len(sys.argv)==2:
-    dirname=sys.argv[1].replace('/','')
-else:
-    n=glob.glob("*/Build.xml")
-    n.sort(reverse=True)
-    dirname = n[0].replace('/Build.xml','')
+dirname=""
+while len(args)>0:
+    if args[0].startswith("20"): #I hope this script is not used in the year 2100
+        dirname=args[0].replace('/','')
+    else:
+        branch=args[0].replace('/','')+'/'
+    args.pop(0)
 
 if len(glob.glob(dirname+'/Update.xml'))>0:
     #new format
@@ -62,8 +65,8 @@ for test in testing.findall("Test"):
     name = test.find('Name').text
 
     if fail:
-        print "%s  3   %s"%(date,name)
+        print "%s  3   %s%s"%(date,branch,name)
     else:
-        print "%s   +  %s"%(date,name)
+        print "%s   +  %s%s"%(date,branch,name)
 
 
