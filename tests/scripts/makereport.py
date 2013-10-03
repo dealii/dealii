@@ -1,3 +1,6 @@
+# accepts 0,1, or 2 arguments. If a string starting with a number is handed in, it is assumed to be a subdirectory of the current directory to run on. If not specified, the newest build is used. Any other string is taken as the branch name for this test (or treated as mainline). Order of the arguments does not matter.
+# for questions: Timo Heister
+
 import xml.etree.ElementTree as ET
 import glob
 import sys
