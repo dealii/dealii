@@ -35,6 +35,11 @@ while len(args)>0:
         branch=args[0].replace('/','')+'/'
     args.pop(0)
 
+if dirname=="":
+    n=glob.glob("*/Build.xml")
+    n.sort(reverse=True)
+    dirname = n[0].replace('/Build.xml','')
+
 if len(glob.glob(dirname+'/Update.xml'))>0:
     #new format
     tree = ET.parse(dirname+'/Update.xml')
@@ -48,6 +53,7 @@ else:
     number = name.split('-')[-1]
     number = number[1:]
     date = datetime.strptime(dirname,"%Y%m%d-%H%M")
+
 
 header = "Revision: %s"%number + "\n"
 header += "Date: %s"%(date.strftime("%Y %j  %F  %U-%w")) + '\n'
