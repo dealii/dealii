@@ -78,7 +78,14 @@ MARK_AS_ADVANCED(
 
 IF(METIS_FOUND)
 
-  IF(NOT PARMETIS_LIBRARY MATCHES "-NOTFOUND")
+  #
+  # Sanity check: Only include parmetis library if it is in the same
+  # directory as the metis library...
+  #
+  GET_FILENAME_COMPONENT(_path1 "${PARMETIS_LIBRARY}" PATH)
+  GET_FILENAME_COMPONENT(_path2 "${ETIS_LIBRARY}" PATH)
+  IF( NOT PARMETIS_LIBRARY MATCHES "-NOTFOUND"
+      AND "${_path1}" STREQUAL "${_path2}" )
     SET(METIS_LIBRARIES ${PARMETIS_LIBRARY})
   ENDIF()
 
