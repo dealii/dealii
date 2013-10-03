@@ -18,7 +18,7 @@
 # Add convenience targets that build and install only a specific component:
 #
 
-FOREACH(_component library examples)
+FOREACH(_component library)
   ADD_CUSTOM_TARGET(${_component}
     COMMAND ${CMAKE_COMMAND}
       -DCOMPONENT="${_component}" -P cmake_install.cmake
@@ -27,7 +27,7 @@ FOREACH(_component library examples)
     )
 ENDFOREACH()
 
-FOREACH(_component compat_files documentation mesh_converter parameter_gui)
+FOREACH(_component compat_files documentation examples mesh_converter parameter_gui)
   STRING(TOUPPER "${_component}" _component_uppercase)
   IF(DEAL_II_COMPONENT_${_component_uppercase})
 
