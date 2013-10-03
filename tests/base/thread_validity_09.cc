@@ -34,9 +34,15 @@ int spin_lock = 0;
 
 int worker ()
 {
+  // wait till the main thread has actually done its work -- we will
+  // hang in the 'acquire' line until the main thread releases the
+  // mutex. release the mutex again at the end of this function since
+  // mutices can only be relased on the same thread as they are
+  // acquired on.
   mutex.acquire ();
   deallog << "OK." << std::endl;
   spin_lock = 1;
+  mutex.release ();
   return 42;
 }
 
@@ -60,11 +66,12 @@ int main()
   for (unsigned int i=0; i<sz; ++i)
     p[i] = 0;
 
+  // make sure the worker thread can actually start
   mutex.release ();
 
+  // wait for the worker thread to do its work
   while (spin_lock == 0)
     ;
-  mutex.release ();
 
   for (unsigned int i=0; i<sz; ++i)
     Assert (p[i] == 0, ExcInternalError());
