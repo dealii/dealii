@@ -18,7 +18,8 @@
 # Set up deal.II specific definitions
 #
 # This file defines a long list of uncached variables, used throughout the
-# configuration to determine paths, locations and names.
+# configuration to determine paths, locations and names. Some linkage and
+# crosscompilation setup happens also in here.
 #
 # Definitions marked with *) can be overriden by defining them to cache
 # prior to the call of this file. This is done with the help of the
@@ -135,7 +136,6 @@ ELSE()
   SET_IF_EMPTY(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
 ENDIF()
 
-
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   LIST(APPEND DEAL_II_BUILD_TYPES "DEBUG")
 ENDIF()
@@ -144,3 +144,37 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
   LIST(APPEND DEAL_II_BUILD_TYPES "RELEASE")
 ENDIF()
 
+
+########################################################################
+#                                                                      #
+#              Setup static linkage and crosscompilation:              #
+#                                                                      #
+########################################################################
+
+#
+# Library search order:
+#
+IF(DEAL_II_PREFER_STATIC_LIBS)
+  # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS
+  # is set. This will prefer static archives instead of shared libraries:
+  LIST(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
+ENDIF()
+
+#
+# Cross compilation stuff:
+#
+IF(CMAKE_CROSSCOMPILING)
+  # Disable platform introspection when cross compiling
+  SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION OFF CACHE BOOL "" FORCE)
+
+  # Import native expand_instantiations for use in cross compilation:
+  SET(DEAL_II_NATIVE "DEAL_II_NATIVE-NOTFOUND" CACHE FILEPATH
+    "A pointer to a native deal.Ii build directory"
+    )
+  IF(DEAL_II_NATIVE MATCHES "-NOTFOUND")
+    MESSAGE(FATAL_ERROR
+      "Please set the CMake variable DEAL_II_NATIVE to a valid path that points to a native deal.II build directory"
+      )
+  ENDIF()
+  INCLUDE(${DEAL_II_NATIVE}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Executables.cmake)
+ENDIF()

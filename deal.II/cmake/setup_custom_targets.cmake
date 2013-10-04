@@ -17,6 +17,13 @@
 #
 # Add convenience targets that build and install only a specific component:
 #
+#   library
+#   compat_files
+#   documentation
+#   examples
+#   mesh_converter
+#   parameter_gui
+#
 
 # The library can always be installed ;-)
 ADD_CUSTOM_TARGET(library

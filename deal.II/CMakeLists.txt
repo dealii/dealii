@@ -80,9 +80,8 @@ PROJECT(deal.II CXX)
 ENABLE_LANGUAGE_OPTIONAL(C)
 ENABLE_LANGUAGE_OPTIONAL(Fortran)
 
-INCLUDE(setup_post_project_call)
-
 INCLUDE(setup_deal_ii)
+
 INCLUDE(setup_compiler_flags)
 
 #
@@ -146,7 +145,7 @@ ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
-ADD_SUBDIRECTORY(tests ${CMAKE_BINARY_DIR}/quick_tests)
+ADD_SUBDIRECTORY(tests ${CMAKE_BINARY_DIR}/tests/quick_tests)
 
 IF(DEAL_II_HAVE_TESTS_DIRECTORY)
   ADD_SUBDIRECTORY(${TEST_DIR} ${CMAKE_BINARY_DIR}/tests)
