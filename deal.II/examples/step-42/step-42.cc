@@ -973,7 +973,7 @@ namespace Step42
 
 
 
-  // @sect4{PlasticityContactProblem::make_grid}
+  // @sect4{PlasticityContactProblem::setup_system}
 
   // The next piece in the puzzle is to set up the DoFHandler, resize
   // vectors and take care of various other status variables such as
@@ -1023,8 +1023,9 @@ namespace Step42
       newton_rhs_uncondensed.reinit(locally_owned_dofs, mpi_communicator);
       diag_mass_matrix_vector.reinit(locally_owned_dofs, mpi_communicator);
       fraction_of_plastic_q_points_per_cell.reinit(triangulation.n_active_cells());
+
       active_set.clear();
-      active_set.set_size(locally_relevant_dofs.size());
+      active_set.set_size(dof_handler.n_dofs());
     }
 
     // Finally, we set up sparsity patterns and matrices.
@@ -1110,6 +1111,223 @@ namespace Step42
 
       constraints_dirichlet_and_hanging_nodes.close();
     }
+
+
+
+  // @sect4{PlasticityContactProblem::assemble_mass_matrix_diagonal}
+
+  // The next helper function computes the (diagonal) mass matrix that
+  // is used to determine the active set of the active set method we use in
+  // the contact algorithm. This matrix is of mass matrix type, but unlike
+  // the standard mass matrix, we can make it diagonal (even in the case of
+  // higher order elements) by using a quadrature formula that has its
+  // quadrature points at exactly the same locations as the interpolation points
+  // for the finite element are located. We achieve this by using a
+  // QGaussLobatto quadrature formula here, along with initializing the finite
+  // element with a set of interpolation points derived from the same quadrature
+  // formula. The remainder of the function is relatively straightfoward: we
+  // put the resulting matrix into the given argument; because we know the
+  // matrix is diagonal, it is sufficient to have a loop over only $i$ not
+  // not over $j$. Strictly speaking, we could even avoid multiplying the
+  // shape function's values at quadrature point <code>q_point</code> by itself
+  // because we know the shape value to be a vector with exactly one one which
+  // when dotted with itself yields one. Since this function is not time
+  // critical we add this term for clarity.
+  template <int dim>
+  void
+  PlasticityContactProblem<dim>::
+  assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
+  {
+    QGaussLobatto<dim-1> face_quadrature_formula(fe.degree + 1);
+
+    FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
+                                     update_values | update_JxW_values);
+
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_face_q_points = face_quadrature_formula.size();
+
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    const FEValuesExtractors::Vector displacement(0);
+
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+    for (; cell != endc; ++cell)
+      if (cell->is_locally_owned())
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell;
+             ++face)
+          if (cell->face(face)->at_boundary()
+              &&
+              cell->face(face)->boundary_indicator() == 1)
+            {
+              fe_values_face.reinit(cell, face);
+              cell_matrix = 0;
+
+              for (unsigned int q_point = 0; q_point<n_face_q_points; ++q_point)
+                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                  cell_matrix(i, i) += (fe_values_face[displacement].value(i, q_point) *
+                                        fe_values_face[displacement].value(i, q_point) *
+                                        fe_values_face.JxW(q_point));
+
+              cell->get_dof_indices(local_dof_indices);
+
+              for (unsigned int i = 0; i < dofs_per_cell; i++)
+                mass_matrix.add(local_dof_indices[i],
+                                local_dof_indices[i],
+                                cell_matrix(i, i));
+            }
+    mass_matrix.compress(VectorOperation::add);
+  }
+
+
+  // @sect4{PlasticityContactProblem::update_solution_and_constraints}
+
+  // The following function is the first function we call in each Newton
+  // iteration in the <code>solve_newton()</code> function. What it does is
+  // to project the solution onto the feasible set and update the active set
+  // for the degrees of freedom that touch or penetrate the obstacle.
+  //
+  // In order to function, we first need to do some bookkeeping: We need
+  // to write into the solution vector (which we can only do with fully
+  // distributed vectors without ghost elements) and we need to read
+  // the Lagrange multiplier and the elements of the diagonal mass matrix
+  // from their respective vectors (which we can only do with vectors that
+  // do have ghost elements), so we create the respective vectors. We then
+  // also initialize the constraints object that will contain constraints
+  // from contact and all other sources, as well as an object that contains
+  // an index set of all locally owned degrees of freedom that are part of
+  // the contact:
+  template <int dim>
+  void
+  PlasticityContactProblem<dim>::update_solution_and_constraints ()
+  {
+    std::vector<bool> dof_touched(dof_handler.n_dofs(), false);
+
+    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
+    distributed_solution = solution;
+
+    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
+    lambda = newton_rhs_uncondensed;
+
+    TrilinosWrappers::MPI::Vector diag_mass_matrix_vector_relevant(locally_relevant_dofs, mpi_communicator);
+    diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
+
+
+    all_constraints.reinit(locally_relevant_dofs);
+    active_set.clear();
+    IndexSet active_set_locally_owned;
+    active_set_locally_owned.set_size(locally_owned_dofs.size());
+
+
+    // The second part is a loop over all cells in which we look at each
+    // point where a degree of freedom is defined whether the active set
+    // condition is true and we need to add this degree of freedom to
+    // the active set of contact nodes. As we always do, if we want to
+    // evaluate functions at individual points, we do this with an
+    // FEValues object (or, here, an FEFaceValues object since we need to
+    // check contact at the surface) with an appropriately chosen quadrature
+    // object. We create this face quadrature object by choosing the
+    // "support points" of the shape functions defined on the faces
+    // of cells (for more on support points, see this
+    // @ref GlossSupport "glossary entry"). As a consequence, we have as
+    // many quadrature points as there are shape functions per face and
+    // looping over quadrature points is equivalent to looping over shape
+    // functions defined on a face. With this, the code looks as follows:
+    Quadrature<dim-1> face_quadrature(fe.get_unit_face_support_points());
+    FEFaceValues<dim> fe_values_face(fe, face_quadrature,
+                                     update_quadrature_points);
+
+    const unsigned int dofs_per_face = fe.dofs_per_face;
+    const unsigned int n_face_q_points = face_quadrature.size();
+
+    std::vector<types::global_dof_index> dof_indices(dofs_per_face);
+
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+    for (; cell != endc; ++cell)
+      if (!cell->is_artificial())
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+          if (cell->face(face)->at_boundary()
+              &&
+              cell->face(face)->boundary_indicator() == 1)
+            {
+              fe_values_face.reinit(cell, face);
+              cell->face(face)->get_dof_indices(dof_indices);
+
+              for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+                {
+                  // At each quadrature point (i.e., at each support point of a degree
+                  // of freedom located on the contact boundary), we then ask whether
+                  // it is part of the z-displacement degrees of freedom and if we
+                  // haven't encountered this degree of freedom yet (which can happen
+                  // for those on the edges between faces), we need to evaluate the gap
+                  // between the deformed object and the obstacle. If the active set
+                  // condition is true, then we add a constraint to the ConstraintMatrix
+                  // object that the next Newton update needs to satisfy, set the solution
+                  // vector's corresponding element to the correct value, and add the
+                  // index to the IndexSet object that stores which degree of freedom is
+                  // part of the contact:
+                  const unsigned int
+                  component = fe.face_system_to_component_index(q_point).first;
+
+                  const unsigned int index_z = dof_indices[q_point];
+
+                  if ((component == 2) && (dof_touched[index_z] == false))
+                    {
+                      dof_touched[index_z] = true;
+
+                      const Point<dim> this_support_point = fe_values_face.quadrature_point(q_point);
+
+                      const double obstacle_value = obstacle->value(this_support_point, 2);
+                      const double solution_here = solution(index_z);
+                      const double undeformed_gap = obstacle_value - this_support_point(2);
+
+                      const double c = 100.0 * e_modulus;
+                      if ((lambda(index_z) / diag_mass_matrix_vector_relevant(index_z)
+                           +
+                           c * (solution_here - undeformed_gap)
+                           > 0)
+                          &&
+                          !constraints_hanging_nodes.is_constrained(index_z))
+                        {
+                          all_constraints.add_line(index_z);
+                          all_constraints.set_inhomogeneity(index_z, undeformed_gap);
+                          distributed_solution(index_z) = undeformed_gap;
+
+                          if (locally_owned_dofs.is_element(index_z))
+                            {
+                              active_set_locally_owned.add_index(index_z);
+                              if (locally_relevant_dofs.is_element(index_z))
+                                active_set.add_index(index_z);
+                            }
+                        }
+                    }
+                }
+            }
+
+    // At the end of this function, we exchange data between processors updating
+    // those ghost elements in the <code>solution</code> variable that have been
+    // written by other processors. We then merge the Dirichlet constraints and
+    // those from hanging nodes into the ConstraintMatrix object that already
+    // contains the active set. We finish the function by outputting the total
+    // number of actively constrained degrees of freedom:
+    distributed_solution.compress(VectorOperation::insert);
+    solution = distributed_solution;
+
+    all_constraints.close();
+    all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
+
+    pcout << "         Size of active set: "
+          << Utilities::MPI::sum(active_set_locally_owned.n_elements(),
+                                 mpi_communicator)
+        << std::endl;
+  }
+
 
   template <int dim>
   void
@@ -1359,171 +1577,6 @@ namespace Step42
 
 
 
-  template <int dim>
-  void
-  PlasticityContactProblem<dim>::assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
-  {
-    QGaussLobatto<dim - 1> face_quadrature_formula(fe.degree + 1);
-
-    FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
-                                     update_values | update_quadrature_points | update_JxW_values);
-
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int n_face_q_points = face_quadrature_formula.size();
-
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    Tensor<1, dim, double> ones(dim);
-    for (unsigned i = 0; i < dim; i++)
-      ones[i] = 1.0;
-
-    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-
-    const FEValuesExtractors::Vector displacement(0);
-
-    typename DoFHandler<dim>::active_cell_iterator cell =
-      dof_handler.begin_active(), endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
-      if (cell->is_locally_owned())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary()
-              && cell->face(face)->boundary_indicator() == 1)
-            {
-              fe_values_face.reinit(cell, face);
-              cell_matrix = 0;
-
-              for (unsigned int q_point = 0; q_point < n_face_q_points;
-                   ++q_point)
-                for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                  cell_matrix(i, i) += (fe_values_face[displacement].value(i,
-                                                                           q_point) * ones * fe_values_face.JxW(q_point));
-
-              cell->get_dof_indices(local_dof_indices);
-
-              for (unsigned int i = 0; i < dofs_per_cell; i++)
-                mass_matrix.add(local_dof_indices[i], local_dof_indices[i],
-                                cell_matrix(i, i));
-            }
-    mass_matrix.compress(VectorOperation::add);
-  }
-
-// @sect4{PlasticityContactProblem::update_solution_and_constraints}
-
-// Projection and updating of the active set
-// for the dofs which penetrates the obstacle.
-  template <int dim>
-  void
-  PlasticityContactProblem<dim>::update_solution_and_constraints ()
-  {
-    std::vector<bool> vertex_touched(dof_handler.n_dofs(), false);
-
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-
-    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
-    distributed_solution = solution;
-    TrilinosWrappers::MPI::Vector lambda(solution);
-    lambda = newton_rhs_uncondensed;
-    TrilinosWrappers::MPI::Vector diag_mass_matrix_vector_relevant(solution);
-    diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
-
-    all_constraints.reinit(locally_relevant_dofs);
-    active_set.clear();
-    IndexSet active_set_locally_owned;
-    active_set_locally_owned.set_size(locally_owned_dofs.size());
-    const double c = 100.0 * e_modulus;
-
-    Quadrature<dim - 1> face_quadrature(fe.get_unit_face_support_points());
-    FEFaceValues<dim> fe_values_face(fe, face_quadrature,
-                                     update_quadrature_points);
-
-    const unsigned int dofs_per_face = fe.dofs_per_face;
-    const unsigned int n_face_q_points = face_quadrature.size();
-
-    std::vector<types::global_dof_index> dof_indices(dofs_per_face);
-
-    unsigned int counter_hanging_nodes = 0;
-    for (; cell != endc; ++cell)
-      if (!cell->is_artificial())
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
-          if (cell->face(face)->at_boundary()
-              && cell->face(face)->boundary_indicator() == 1)
-            {
-              fe_values_face.reinit(cell, face);
-              cell->face(face)->get_dof_indices(dof_indices);
-
-              for (unsigned int q_point = 0; q_point < n_face_q_points;
-                   ++q_point)
-                {
-                  unsigned int component = fe.face_system_to_component_index(
-                                             q_point).first;
-
-                  if (component == 2)
-                    {
-                      unsigned int index_z = dof_indices[q_point];
-
-                      if (vertex_touched[index_z] == false)
-                        vertex_touched[index_z] = true;
-                      else
-                        continue;
-
-                      // the local row where
-                      Point<dim> point(
-                        fe_values_face.quadrature_point(q_point));
-
-                      double obstacle_value = obstacle->value(point, 2);
-                      double solution_index_z = solution(index_z);
-                      double gap = obstacle_value - point(2);
-
-                      if (lambda(index_z)
-                          / diag_mass_matrix_vector_relevant(index_z)
-                          + c * (solution_index_z - gap) > 0
-                          && !(constraints_hanging_nodes.is_constrained(index_z)))
-                        {
-                          all_constraints.add_line(index_z);
-                          all_constraints.set_inhomogeneity(index_z, gap);
-                          distributed_solution(index_z) = gap;
-
-                          if (locally_owned_dofs.is_element(index_z))
-                            {
-                              active_set_locally_owned.add_index(index_z);
-                              if (locally_relevant_dofs.is_element(index_z))
-                                active_set.add_index(index_z);
-                            }
-
-                        }
-                      else if (lambda(index_z)
-                               / diag_mass_matrix_vector_relevant(index_z)
-                               + c * (solution_index_z - gap) > 0
-                               && constraints_hanging_nodes.is_constrained(index_z))
-                        {
-                          if (locally_owned_dofs.is_element(index_z))
-                            counter_hanging_nodes += 1;
-                        }
-                    }
-                }
-            }
-    distributed_solution.compress(VectorOperation::insert);
-
-    const unsigned int sum_contact_constraints
-      = Utilities::MPI::sum(active_set_locally_owned.n_elements(),
-                            mpi_communicator);
-    pcout << "         Size of active set: " << sum_contact_constraints
-          << std::endl;
-    const unsigned int sum_contact_hanging_nodes
-      = Utilities::MPI::sum(counter_hanging_nodes,
-                            mpi_communicator);
-    pcout << "         Number of hanging nodes in contact: "
-          << sum_contact_hanging_nodes << std::endl;
-
-    solution = distributed_solution;
-
-    all_constraints.close();
-    all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
-  }
 
 
 // @sect4{PlasticityContactProblem::solve}
@@ -1642,7 +1695,7 @@ namespace Step42
 
     double sigma_hlp = sigma_0;
 
-    IndexSet active_set_old(active_set);
+    IndexSet old_active_set(active_set);
 
     t.stop(); // stop newton setup timer
 
@@ -1743,19 +1796,19 @@ namespace Step42
 
         resid_old = resid;
 
-        if (Utilities::MPI::sum((active_set == active_set_old) ? 0 : 1,
+        if (Utilities::MPI::sum((active_set == old_active_set) ? 0 : 1,
                                 mpi_communicator) == 0)
           {
             pcout << "      Active set did not change!" << std::endl;
-            if (output_dir.compare("its/") != 0 && resid < 1e-7)
-              break;
-            else if (output_dir.compare("its/") == 0 && resid < 1e-10)
+            if (resid < 1e-10)
               break;
           }
-        active_set_old = active_set;
+
+        old_active_set = active_set;
       }
 
-    pcout << "" << std::endl << "      Number of assembled systems = "
+    pcout << std::endl
+          << "      Number of assembled systems = "
           << number_assemble_system << std::endl;
   }
 
