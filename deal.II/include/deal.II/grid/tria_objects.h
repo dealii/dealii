@@ -771,11 +771,10 @@ namespace internal
     void *&
     TriaObjects<G>::user_pointer (const unsigned int i)
     {
-#ifdef DEBUG
       Assert(user_data_type == data_unknown || user_data_type == data_pointer,
              ExcPointerIndexClash());
       user_data_type = data_pointer;
-#endif
+
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
       return user_data[i].p;
     }
@@ -786,11 +785,10 @@ namespace internal
     const void *
     TriaObjects<G>::user_pointer (const unsigned int i) const
     {
-#ifdef DEBUG
       Assert(user_data_type == data_unknown || user_data_type == data_pointer,
              ExcPointerIndexClash());
       user_data_type = data_pointer;
-#endif
+
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
       return user_data[i].p;
     }
@@ -801,11 +799,10 @@ namespace internal
     unsigned int &
     TriaObjects<G>::user_index (const unsigned int i)
     {
-#ifdef DEBUG
       Assert(user_data_type == data_unknown || user_data_type == data_index,
              ExcPointerIndexClash());
       user_data_type = data_index;
-#endif
+
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
       return user_data[i].i;
     }
@@ -834,11 +831,10 @@ namespace internal
     inline
     unsigned int TriaObjects<G>::user_index (const unsigned int i) const
     {
-#ifdef DEBUG
       Assert(user_data_type == data_unknown || user_data_type == data_index,
              ExcPointerIndexClash());
       user_data_type = data_index;
-#endif
+
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
       return user_data[i].i;
     }
