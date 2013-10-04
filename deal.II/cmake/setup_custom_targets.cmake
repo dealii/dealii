@@ -20,10 +20,10 @@
 
 FOREACH(_component library)
   ADD_CUSTOM_TARGET(${_component}
-    COMMAND ${CMAKE_COMMAND}
-      -DCOMPONENT="${_component}" -P cmake_install.cmake
-    COMMENT "Build and install component \"${_component}\"."
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    # COMMAND ${CMAKE_COMMAND}
+    #   -DCOMPONENT="${_component}" -P cmake_install.cmake
+    # COMMENT "Build and install component \"${_component}\"."
+    # WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 ENDFOREACH()
 
