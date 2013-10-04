@@ -660,7 +660,7 @@ namespace Step42
   private:
     void make_grid ();
     void setup_system ();
-    void assemble_nl_system (const TrilinosWrappers::MPI::Vector &u);
+    void assemble_newton_system (const TrilinosWrappers::MPI::Vector &linearization_point);
     void compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &current_solution);
     void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
     void update_solution_and_constraints ();
@@ -1329,9 +1329,20 @@ namespace Step42
   }
 
 
+  // @sect4{PlasticityContactProblem::assemble_newton_system}
+
+  // Given the complexity of the problem, it may come as a bit of a surprise
+  // that assembling the linear system we have to solve in each Newton iteration
+  // is actually fairly straightforward. The following function builds the Newton
+  // right hand side and Newton matrix. It looks fairly innocent because the
+  // heavy lifting happens in the call to
+  // <code>ConstitutiveLaw::get_linearized_stress_strain_tensors()</code> and in
+  // particular in ConstraintMatrix::distribute_local_to_global(), using the
+  // constraints we have previously computed.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::assemble_nl_system (const TrilinosWrappers::MPI::Vector &u)
+  PlasticityContactProblem<dim>::
+  assemble_newton_system (const TrilinosWrappers::MPI::Vector &linearization_point)
   {
     TimerOutput::Scope t(computing_timer, "Assembling");
 
@@ -1339,25 +1350,23 @@ namespace Step42
     QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
-                            UpdateFlags(
-                              update_values | update_gradients | update_q_points
-                              | update_JxW_values));
+                            update_values | update_gradients | update_JxW_values);
 
     FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
                                      update_values | update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int n_q_points = quadrature_formula.size();
+    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     const EquationData::BoundaryForce<dim> boundary_force;
-    std::vector<Vector<double> > boundary_force_values(n_face_q_points,
+    std::vector<Vector<double> >           boundary_force_values(n_face_q_points,
                                                        Vector<double>(dim));
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double> cell_rhs(dofs_per_cell);
+    FullMatrix<double>                     cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>                         cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+    std::vector<types::global_dof_index>   local_dof_indices(dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -1365,7 +1374,6 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement(0);
 
-    const double kappa = 1.0;
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -1374,70 +1382,74 @@ namespace Step42
           cell_rhs = 0;
 
           std::vector<SymmetricTensor<2, dim> > strain_tensor(n_q_points);
-          fe_values[displacement].get_function_symmetric_gradients(u,
+          fe_values[displacement].get_function_symmetric_gradients(linearization_point,
                                                                    strain_tensor);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {
               SymmetricTensor<4, dim> stress_strain_tensor_linearized;
               SymmetricTensor<4, dim> stress_strain_tensor;
-              SymmetricTensor<2, dim> stress_tensor;
-
               constitutive_law.get_linearized_stress_strain_tensors(strain_tensor[q_point],
                                                                     stress_strain_tensor_linearized,
                                                                     stress_strain_tensor);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  stress_tensor = stress_strain_tensor_linearized
+                  // Having computed the stress-strain tensor and its linearization,
+                  // we can now put together the parts of the matrix and right hand side.
+                  // In both, we need the linearized stress-strain tensor times the
+                  // symmetric gradient of $\varphi_i$, $I_\Pi\varepsilon(\varphi_i)$,
+                  // so we introduce an abbreviation of this term. Recall that the
+                  // matrix corresponds to the bilinear form
+                  // $A_{ij}=(I_\Pi\varepsilon(\varphi_i),\varepsilon(\varphi_j))$ in the
+                  // notation of the accompanying publication, whereas the right
+                  // hand side is $F_i=([I_\Pi-P_\Pi]\varepsilon(\varphi_i),\varepsilon(\mathbf u))$
+                  // where $u$ is the current linearization points (typically the last solution).
+                  // This might suggest that the right hand side will be zero if the material
+                  // is completely elastic (where $I_\Pi=P_\Pi$) but this ignores the fact
+                  // that the right hand side will also contain contributions from
+                  // non-homogeneous constraints due to the contact.
+                  //
+                  // The code block that follows this adds contributions that are due to
+                  // boundary forces, should there be any.
+                  const SymmetricTensor<2, dim>
+                  stress_phi_i = stress_strain_tensor_linearized
                                   * fe_values[displacement].symmetric_gradient(i, q_point);
 
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    cell_matrix(i, j) += (stress_tensor
+                    cell_matrix(i, j) += (stress_phi_i
                                           * fe_values[displacement].symmetric_gradient(j, q_point)
                                           * fe_values.JxW(q_point));
 
-                  // the linearized part a(v^i;v^i,v) of the rhs
-                  cell_rhs(i) += (stress_tensor * strain_tensor[q_point]
+                  cell_rhs(i) += ((stress_phi_i
+                                   -
+                                   stress_strain_tensor
+                                   * fe_values[displacement].symmetric_gradient(i, q_point))
+                                  * strain_tensor[q_point]
                                   * fe_values.JxW(q_point));
-
-                  // the residual part a(v^i;v) of the rhs
-                  cell_rhs(i) -= (strain_tensor[q_point]
-                                  * stress_strain_tensor
-                                  * fe_values[displacement].symmetric_gradient(i, q_point)
-                                  * fe_values.JxW(q_point));
-
-                  // the residual part F(v) of the rhs
-                  Tensor<1, dim> rhs_values;
-                  rhs_values = 0;
-                  cell_rhs(i) += (fe_values[displacement].value(i, q_point)
-                                  * rhs_values * fe_values.JxW(q_point));
                 }
             }
 
-          for (unsigned int face = 0;
-               face < GeometryInfo<dim>::faces_per_cell; ++face)
-            {
+          for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face(face)->at_boundary()
-                  && cell->face(face)->boundary_indicator() == 1)
+                  &&
+                  cell->face(face)->boundary_indicator() == 1)
                 {
                   fe_values_face.reinit(cell, face);
 
                   boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
                                                    boundary_force_values);
 
-                  for (unsigned int q_point = 0; q_point < n_face_q_points;
-                       ++q_point)
+                  for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
                     {
                       Tensor<1, dim> rhs_values;
                       rhs_values[2] = boundary_force_values[q_point][2];
                       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                        cell_rhs(i) += (fe_values_face[displacement].value(i,
-                                                                           q_point) * rhs_values
+                        cell_rhs(i) += (fe_values_face[displacement].value(i, q_point)
+                                        * rhs_values
                                         * fe_values_face.JxW(q_point));
                     }
                 }
-            }
 
           cell->get_dof_indices(local_dof_indices);
           all_constraints.distribute_local_to_global(cell_matrix, cell_rhs,
@@ -1456,7 +1468,8 @@ namespace Step42
 
   template <int dim>
   void
-  PlasticityContactProblem<dim>::compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &current_solution)
+  PlasticityContactProblem<dim>::
+  compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &current_solution)
   {
     QGauss<dim> quadrature_formula(fe.degree + 1);
     QGauss<dim-1> face_quadrature_formula(fe.degree + 1);
@@ -1730,7 +1743,7 @@ namespace Step42
         pcout << "      Assembling system... " << std::endl;
         newton_matrix = 0;
         newton_rhs = 0;
-        assemble_nl_system(solution); //compute Newton-Matrix
+        assemble_newton_system(solution); //compute Newton-Matrix
 
         number_assemble_system += 1;
 
@@ -1750,12 +1763,12 @@ namespace Step42
         // At most we apply 10 damping steps.
         bool damped = false;
         tmp_vector = old_solution;
-        double a = 0;
+
         for (unsigned int i = 0; (i < 5) && (!damped); i++)
           {
-            a = std::pow(0.5, static_cast<double>(i));
+            const double alpha = std::pow(0.5, static_cast<double>(i));
             old_solution = tmp_vector;
-            old_solution.sadd(1 - a, a, distributed_solution);
+            old_solution.sadd(1 - alpha, alpha, distributed_solution);
             old_solution.compress(VectorOperation::add);
 
             TimerOutput::Scope t(computing_timer, "Residual and lambda");
@@ -1782,7 +1795,7 @@ namespace Step42
 
             pcout << "      Residual of the non-contact part of the system: "
                   << resid << std::endl
-                  << "         with a damping parameter alpha = " << a
+                  << "         with a damping parameter alpha = " << alpha
                   << std::endl;
 
             // The previous iteration of step 0 is the solution of an elastic problem.
