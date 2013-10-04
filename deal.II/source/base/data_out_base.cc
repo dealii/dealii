@@ -6974,7 +6974,7 @@ void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &
   // all vector data, then handle the
   // scalar data sets that have been
   // left over
-  unsigned int    i, n, q, r, n_th_vector, data_set, pt_data_vector_dim, mem_vector_dim;
+  unsigned int    i, n_th_vector, data_set, pt_data_vector_dim;
   std::string     vector_name;
   for (n_th_vector=0,data_set=0; data_set<n_data_sets;)
     {
