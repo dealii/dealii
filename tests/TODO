@@ -1,44 +1,5 @@
 Issues:
 
- - PORTING:
-   The big part. Bruno and I have converted all the tests, but there a a
-   lot that need some love. It would be very nice if anybody who has a
-   spare minute
-  
-     - installs numdiff (http://www.nongnu.org/numdiff/)
-     - sets up the testsuite to a category
-         TEST_PICKUP_REGEX="category/"
-     - fixes all the failing tests :-]
-     - marks the category as done in ./tests/TODO
-
-        all-headers
-        aniso
-        base
-        benchmarks
-        bits
-        build_tests
-        codim_one
-        deal.II
-        distributed_grids
-        dof_tools_frame.h
-        fe
-        gla
-        grid
-        hp
-        integrators
-        lac
-        lapack
-        matrix_free
-        mesh_converter
-        metis
-        mpi
-        multigrid
-        petsc
-        serialization
-        slepc
-        trilinos
-        umfpack
-
  - CLEANUP:
    Clean up tests under deal.II/ and bits/ - rearrange category:
    For somehow decent performance with GNU make there shouldn't be more
