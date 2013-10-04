@@ -54,17 +54,17 @@ void test ()
   {
     Threads::Thread<int> t;
     t = Threads::new_thread (&X::f, x);
-    Assert (t.return_value() == 10,
+    AssertThrow (t.return_value() == 10,
             ExcInternalError());
   }
   {
     Threads::Thread<int> t;
     t = Threads::new_thread (&X::f, x);
-    Assert (t.return_value() == 11,
+    AssertThrow (t.return_value() == 11,
             ExcInternalError());
   }
 
-  Assert (counter == 12, ExcInternalError());
+  AssertThrow (counter == 12, ExcInternalError());
 }
 
 
