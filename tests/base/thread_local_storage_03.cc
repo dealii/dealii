@@ -53,7 +53,7 @@ void test ()
 
   int value = t.return_value();
   
-  Assert (value,
+  Assert (value == 42,
           ExcInternalError());
 }
 
