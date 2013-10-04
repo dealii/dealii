@@ -3686,9 +3686,9 @@ inline
 FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::FEEvaluationGeneral (const MatrixFree<dim,Number> &data_in,
                        const unsigned int fe_no,
-                       const unsigned int quad_no_in)
+                       const unsigned int quad_no)
   :
-  BaseClass (data_in, fe_no, quad_no_in)
+  BaseClass (data_in, fe_no, quad_no)
 {
 #ifdef DEBUG
   // print error message when the dimensions do not match. Propose a possible
@@ -3701,34 +3701,49 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
       message += "Illegal arguments in constructor/wrong template arguments!\n";
       message += "    Called -->   FEEvaluation<dim,";
       message += Utilities::int_to_string(fe_degree) + ",";
-      message += Utilities::int_to_string(n_q_points_1d) + ",Number>(data, ";
+      message += Utilities::int_to_string(n_q_points_1d);
+      message += "," + Utilities::int_to_string(n_components);
+      message += ",Number>(data, ";
       message += Utilities::int_to_string(fe_no) + ", ";
-      message += Utilities::int_to_string(quad_no_in) + ")\n";
+      message += Utilities::int_to_string(quad_no) + ")\n";
 
       // check whether some other vector component has the correct number of
       // points
       unsigned int proposed_dof_comp = numbers::invalid_unsigned_int,
                    proposed_quad_comp = numbers::invalid_unsigned_int;
-      for (unsigned int no=0; no<this->matrix_info.n_components(); ++no)
-        if (this->matrix_info.get_dof_info(no).dofs_per_cell[0] ==
-            dofs_per_cell)
-          {
-            proposed_dof_comp = no;
-            break;
-          }
-      for (unsigned int no=0; no<this->mapping_info.mapping_data_gen.size(); ++no)
-        if (this->mapping_info.mapping_data_gen[no].n_q_points[this->active_quad_index] == n_q_points)
-          {
-            proposed_quad_comp = no;
-            break;
-          }
+      if (dofs_per_cell == this->matrix_info.get_dof_info(fe_no).dofs_per_cell[this->active_fe_index])
+        proposed_dof_comp = fe_no;
+      else
+        for (unsigned int no=0; no<this->matrix_info.n_components(); ++no)
+          if (this->matrix_info.get_dof_info(no).dofs_per_cell[this->active_fe_index]
+              == dofs_per_cell)
+            {
+              proposed_dof_comp = no;
+              break;
+            }
+      if (n_q_points ==
+          this->mapping_info.mapping_data_gen[quad_no].n_q_points[this->active_quad_index])
+        proposed_quad_comp = quad_no;
+      else
+        for (unsigned int no=0; no<this->mapping_info.mapping_data_gen.size(); ++no)
+          if (this->mapping_info.mapping_data_gen[no].n_q_points[this->active_quad_index]
+              == n_q_points)
+            {
+              proposed_quad_comp = no;
+              break;
+           }
       if (proposed_dof_comp  != numbers::invalid_unsigned_int &&
           proposed_quad_comp != numbers::invalid_unsigned_int)
         {
-          message += "Wrong vector component selection:\n";
-          message += "    Did you mean FEEvaluation<dim,Number,";
+          if (proposed_dof_comp != fe_no)
+            message += "Wrong vector component selection:\n";
+          else
+            message += "Wrong quadrature formula selection:\n";
+          message += "    Did you mean FEEvaluation<dim,";
           message += Utilities::int_to_string(fe_degree) + ",";
-          message += Utilities::int_to_string(n_q_points_1d) + ">(data, ";
+          message += Utilities::int_to_string(n_q_points_1d);
+          message += "," + Utilities::int_to_string(n_components);
+          message += ",Number>(data, ";
           message += Utilities::int_to_string(proposed_dof_comp) + ", ";
           message += Utilities::int_to_string(proposed_quad_comp) + ")?\n";
           std::string correct_pos;
@@ -3736,11 +3751,11 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
             correct_pos = " ^ ";
           else
             correct_pos = "   ";
-          if (proposed_quad_comp != quad_no_in)
+          if (proposed_quad_comp != quad_no)
             correct_pos += " ^\n";
           else
             correct_pos += "  \n";
-          message += "                                                   " + correct_pos;
+          message += "                                                     " + correct_pos;
         }
       // ok, did not find the numbers specified by the template arguments in
       // the given list. Suggest correct template arguments
@@ -3750,9 +3765,10 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
       message += "    Did you mean FEEvaluation<dim,";
       message += Utilities::int_to_string(proposed_fe_degree) + ",";
       message += Utilities::int_to_string(proposed_n_q_points_1d);
+      message += "," + Utilities::int_to_string(n_components);
       message += ",Number>(data, ";
       message += Utilities::int_to_string(fe_no) + ", ";
-      message += Utilities::int_to_string(quad_no_in) + ")?\n";
+      message += Utilities::int_to_string(quad_no) + ")?\n";
       std::string correct_pos;
       if (proposed_fe_degree != fe_degree)
         correct_pos = " ^";
