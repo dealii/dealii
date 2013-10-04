@@ -1020,8 +1020,8 @@ namespace Step42
       TimerOutput::Scope t(computing_timer, "Setup: vectors");
       solution.reinit(locally_relevant_dofs, mpi_communicator);
       newton_rhs.reinit(locally_owned_dofs, mpi_communicator);
-      newton_rhs_uncondensed.reinit(locally_relevant_dofs, mpi_communicator);
-      diag_mass_matrix_vector.reinit(locally_relevant_dofs, mpi_communicator);
+      newton_rhs_uncondensed.reinit(locally_owned_dofs, mpi_communicator);
+      diag_mass_matrix_vector.reinit(locally_owned_dofs, mpi_communicator);
       fraction_of_plastic_q_points_per_cell.reinit(triangulation.n_active_cells());
       active_set.clear();
       active_set.set_size(locally_relevant_dofs.size());
