@@ -660,12 +660,12 @@ namespace Step42
   private:
     void make_grid ();
     void setup_system ();
-    void assemble_newton_system (const TrilinosWrappers::MPI::Vector &linearization_point);
-    void compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &current_solution);
-    void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
-    void update_solution_and_constraints ();
     void compute_dirichlet_constraints ();
-    void solve ();
+    void update_solution_and_constraints ();
+    void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
+    void assemble_newton_system (const TrilinosWrappers::MPI::Vector &linearization_point);
+    void compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &linearization_point);
+    void solve_newton_system ();
     void solve_newton ();
     void refine_grid ();
     void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
@@ -1466,28 +1466,52 @@ namespace Step42
 
 
 
+  // @sect4{PlasticityContactProblem::compute_nonlinear_residual}
+
+  // The following function computes the nonlinear residual of the equation
+  // given the current solution (or any other linearization point). This
+  // is needed in the linear search algorithm where we need to try various
+  // linear combinations of previous and current (trial) solution to
+  // compute the (real, globalized) solution of the current Newton step.
+  //
+  // That said, in a slight abuse of the name of the function, it actually
+  // does significantly more. For example, it also computes the vector
+  // that corresponds to the Newton residual but without eliminating
+  // constrained degrees of freedom. We need this vector to compute contact
+  // forces and, ultimately, to compute the next active set. Likewise, by
+  // keeping track of how many quadrature points we encounter on each cell
+  // that show plastic yielding, we also compute the
+  // <code>fraction_of_plastic_q_points_per_cell</code> vector that we
+  // can later output to visualize the plastic zone. In both of these cases,
+  // the results are not necessary as part of the line search, and so we may
+  // be wasting a small amount of time computing them. At the same time, this
+  // information appears as a natural by-product of what we need to do here
+  // anyway, and we want to collect it once at the end of each Newton
+  // step, so we may as well do it here.
+  //
+  // The actual implementation of this function should be rather obvious:
   template <int dim>
   void
   PlasticityContactProblem<dim>::
-  compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &current_solution)
+  compute_nonlinear_residual (const TrilinosWrappers::MPI::Vector &linearization_point)
   {
-    QGauss<dim> quadrature_formula(fe.degree + 1);
+    QGauss<dim>   quadrature_formula(fe.degree + 1);
     QGauss<dim-1> face_quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe, quadrature_formula,
                             update_values | update_gradients |
-                            update_q_points  | update_JxW_values);
+                            update_JxW_values);
 
     FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
                                      update_values | update_quadrature_points |
                                      update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int n_q_points = quadrature_formula.size();
+    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     const EquationData::BoundaryForce<dim> boundary_force;
-    std::vector<Vector<double> > boundary_force_values(n_face_q_points,
+    std::vector<Vector<double> >           boundary_force_values(n_face_q_points,
                                                        Vector<double>(dim));
 
     Vector<double> cell_rhs(dofs_per_cell);
@@ -1496,42 +1520,34 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement(0);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-      dof_handler.begin_active(), endc = dof_handler.end();
-
-    unsigned int elast_points = 0;
-    unsigned int plast_points = 0;
-    double yield = 0;
-    unsigned int cell_number = 0;
     fraction_of_plastic_q_points_per_cell = 0;
 
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    unsigned int cell_number = 0;
     for (; cell != endc; ++cell, ++cell_number)
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
           cell_rhs = 0;
 
-          std::vector<SymmetricTensor<2, dim> > strain_tensor(n_q_points);
-          fe_values[displacement].get_function_symmetric_gradients(current_solution,
-                                                                   strain_tensor);
+          std::vector<SymmetricTensor<2, dim> > strain_tensors(n_q_points);
+          fe_values[displacement].get_function_symmetric_gradients(linearization_point,
+                                                                   strain_tensors);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {
               SymmetricTensor<4, dim> stress_strain_tensor;
               const bool q_point_is_plastic
-                = constitutive_law.get_stress_strain_tensor(strain_tensor[q_point],
+                = constitutive_law.get_stress_strain_tensor(strain_tensors[q_point],
                                                             stress_strain_tensor);
               if (q_point_is_plastic)
-                {
-                  ++plast_points;
-                  ++fraction_of_plastic_q_points_per_cell(cell_number);
-                }
-              else
-                ++elast_points;
+                ++fraction_of_plastic_q_points_per_cell(cell_number);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  cell_rhs(i) -= (strain_tensor[q_point]
+                  cell_rhs(i) -= (strain_tensors[q_point]
                                   * stress_strain_tensor
                                   * fe_values[displacement].symmetric_gradient(i, q_point)
                                   * fe_values.JxW(q_point));
@@ -1539,13 +1555,12 @@ namespace Step42
                   Tensor<1, dim> rhs_values;
                   rhs_values = 0;
                   cell_rhs(i) += (fe_values[displacement].value(i, q_point)
-                                  * rhs_values * fe_values.JxW(q_point));
+                                  * rhs_values
+                                  * fe_values.JxW(q_point));
                 }
             }
 
-          for (unsigned int face = 0;
-               face < GeometryInfo<dim>::faces_per_cell; ++face)
-            {
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face(face)->at_boundary()
                   && cell->face(face)->boundary_indicator() == 1)
                 {
@@ -1564,63 +1579,55 @@ namespace Step42
                                         * fe_values_face.JxW(q_point));
                     }
                 }
-            }
 
           cell->get_dof_indices(local_dof_indices);
           constraints_dirichlet_and_hanging_nodes.distribute_local_to_global(cell_rhs,
               local_dof_indices,
               newton_rhs);
 
-          for (unsigned int i = 0; i < dofs_per_cell; i++)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             newton_rhs_uncondensed(local_dof_indices[i]) += cell_rhs(i);
         }
 
     fraction_of_plastic_q_points_per_cell /= quadrature_formula.size();
     newton_rhs.compress(VectorOperation::add);
     newton_rhs_uncondensed.compress(VectorOperation::add);
-
-    const unsigned int sum_elast_points = Utilities::MPI::sum(elast_points,
-                                                              mpi_communicator);
-    const unsigned int sum_plast_points = Utilities::MPI::sum(plast_points,
-                                                              mpi_communicator);
-    pcout << "      Number of elastic quadrature points: " << sum_elast_points
-          << " and plastic quadrature points: " << sum_plast_points
-          << std::endl;
   }
 
 
 
 
 
-// @sect4{PlasticityContactProblem::solve}
+  // @sect4{PlasticityContactProblem::solve_newton_system}
 
-// In addition to step-41 we have
-// to deal with the hanging node
-// constraints. Again we also consider
-// the locally_owned_dofs only by
-// creating the vector distributed_solution.
-//
-// For the hanging nodes we have to apply
-// the set_zero function to newton_rhs.
-// This is necessary if a hanging node value x_0
-// has one neighbor which is in contact with
-// value x_0 and one neighbor which is not with
-// value x_1. This leads to an inhomogeneity
-// constraint with value x_1/2 = gap/2 in the
-// ConstraintMatrix.
-// So the corresponding entries in the
-// ride-hang-side are non-zero with a
-// meaningless value. These values have to
-// to set to zero.
-
-// The rest of the function is similar to
-// step-41 except that we use a FGMRES-solver
-// instead of CG. For a very small hardening
-// value gamma the linear system becomes
-// almost semi definite but still symmetric.
+  // The last piece before we can discuss the actual Newton iteration
+  // on a single mesh is the solver for the linear systems. There are
+  // a couple of complications that slightly obscure the code, but
+  // mostly it is just setup then solve. Among the complications are:
+  //
+  // - For the hanging nodes we have to apply
+  //   the ConstraintMatrix::set_zero function to newton_rhs.
+  //   This is necessary if a hanging node with solution value $x_0$
+  //   has one neighbor with value $x_1$ which is in contact with the
+  //   obstacle and one neighbor $x_2$ which is not in contact. Because
+  //   the update for the former will be prescribed, the hanging node constraint
+  //   will have an inhomogeneity and will look like $x_0 = x_1/2 + \text{gap}/2$.
+  //   So the corresponding entries in the
+  //   ride-hang-side are non-zero with a
+  //   meaningless value. These values we have to
+  //   to set to zero.
+  // - Like in step-40, we need to shuffle between vectors that do and do
+  //   do not have ghost elements when solving or using the solution.
+  //
+  // The rest of the function is similar to step-40 and
+  // step-41 except that we use a BiCGStab solver
+  // instead of CG. This is due to the fact that for very small hardening
+  // parameters $\gamma$, the linear system becomes almost semidefinite though
+  // still symmetric. BiCGStab appears to have an easier time with such linear
+  // systems.
   template <int dim>
   void
-  PlasticityContactProblem<dim>::solve ()
+  PlasticityContactProblem<dim>::solve_newton_system ()
   {
     TimerOutput::Scope t(computing_timer, "Solve");
 
@@ -1636,7 +1643,7 @@ namespace Step42
     {
       TimerOutput::Scope t(computing_timer, "Solve: setup preconditioner");
 
-      std::vector < std::vector<bool> > constant_modes;
+      std::vector<std::vector<bool> > constant_modes;
       DoFTools::extract_constant_modes(dof_handler, ComponentMask(),
                                        constant_modes);
 
@@ -1748,7 +1755,7 @@ namespace Step42
         number_assemble_system += 1;
 
         pcout << "      Solving system... " << std::endl;
-        solve();
+        solve_newton_system();
 
         TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
         distributed_solution = solution;
