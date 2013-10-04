@@ -18,34 +18,28 @@
 # Add convenience targets that build and install only a specific component:
 #
 
-FOREACH(_component library)
-  ADD_CUSTOM_TARGET(${_component}
-    # COMMAND ${CMAKE_COMMAND}
-    #   -DCOMPONENT="${_component}" -P cmake_install.cmake
-    # COMMENT "Build and install component \"${_component}\"."
-    # WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-ENDFOREACH()
+# The library can always be installed ;-)
+ADD_CUSTOM_TARGET(library
+  COMMAND ${CMAKE_COMMAND}
+    -DCOMPONENT="library" -P cmake_install.cmake
+  COMMENT "Build and install component \"library\"."
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
 
 FOREACH(_component compat_files documentation examples mesh_converter parameter_gui)
   STRING(TOUPPER "${_component}" _component_uppercase)
   IF(DEAL_II_COMPONENT_${_component_uppercase})
-
     ADD_CUSTOM_TARGET(${_component}
       COMMAND ${CMAKE_COMMAND}
         -DCOMPONENT="${_component}" -P cmake_install.cmake
       COMMENT "Build and install component \"${_component}\"."
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       )
-
   ELSE()
-
     ADD_CUSTOM_TARGET(${_component}
       COMMAND ${CMAKE_COMMAND} -E echo "Error: Could not build and install disabled component \"${_component}\"."
         && ${CMAKE_COMMAND} -E echo "Please reconfigure with -DDEAL_II_COMPONENT_${_component}=yes"
         && false
       )
-
   ENDIF()
 ENDFOREACH()
-

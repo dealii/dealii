@@ -33,19 +33,32 @@ IF(NOT "${CMAKE_PROJECT_NAME}" STREQUAL "deal.II")
     )
 ENDIF()
 
-SET(_options)
-
+#
 # Write a minimalistic CTestTestfile.cmake file to CMAKE_BINARY_DIR:
+#
 FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
   "SUBDIRS(tests)"
   )
 
+#
+# The hook into CTest so that the tests from the suprojects get picked up
+# by the main project:
+#
+
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/deal.IITestfile.cmake "")
+SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  APPEND PROPERTY TEST_INCLUDE_FILE deal.IITestfile.cmake
+  )
+
+#
+# Pass all relevant "TEST_" and "_DIR" variables down to the subprojects:
+#
+
+SET(_options)
+
 LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
 LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
 
-#
-# Pass all relevant "TEST_" variables down to the subprojects:
-#
 FOREACH(_var TEST_DIR TEST_DIFF TEST_TIME_LIMIT TEST_PICKUP_REGEX NUMDIFF_DIR)
   LIST(APPEND _options "-U${_var}")
   IF(DEFINED ${_var})
@@ -99,16 +112,6 @@ IF(DEAL_II_WITH_UMFPACK)
 ENDIF()
 
 #
-# The hook into CTest so that the tests from the suprojects get picked up
-# by the main project:
-#
-
-FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/deal.IITestfile.cmake "")
-SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  APPEND PROPERTY TEST_INCLUDE_FILE deal.IITestfile.cmake
-  )
-
-#
 # Define a subproject for every enabled category:
 #
 
@@ -125,7 +128,9 @@ FOREACH(_category ${_categories})
     COMMENT "Processing ./tests/${_category}"
     )
   ADD_DEPENDENCIES(setup_test setup_test_${_category})
-  ADD_DEPENDENCIES(setup_test_${_category} library)
+
+  # depend on a valid build directory (libraries built, config in place):
+  ADD_DEPENDENCIES(setup_test_${_category} setup_build_dir)
 
   ADD_CUSTOM_TARGET(clean_test_${_category}
     COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
