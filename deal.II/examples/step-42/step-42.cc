@@ -1079,17 +1079,17 @@ namespace Step42
   void
   PlasticityContactProblem<dim>::compute_dirichlet_constraints ()
   {
-      constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
-      constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
+    constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
+    constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
 
-      if (base_mesh == "box")
+    if (base_mesh == "box")
       {
         // interpolate all components of the solution
         VectorTools::interpolate_boundary_values(dof_handler,
-            6,
-            EquationData::BoundaryValues<dim>(),
-            constraints_dirichlet_and_hanging_nodes,
-            ComponentMask());
+                                                 6,
+                                                 EquationData::BoundaryValues<dim>(),
+                                                 constraints_dirichlet_and_hanging_nodes,
+                                                 ComponentMask());
 
         // interpolate x- and y-components of the
         // solution (this is a bit mask, so apply
@@ -1097,20 +1097,20 @@ namespace Step42
         const FEValuesExtractors::Scalar x_displacement(0);
         const FEValuesExtractors::Scalar y_displacement(1);
         VectorTools::interpolate_boundary_values(dof_handler,
-            8,
-            EquationData::BoundaryValues<dim>(),
-            constraints_dirichlet_and_hanging_nodes,
-            (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
+                                                 8,
+                                                 EquationData::BoundaryValues<dim>(),
+                                                 constraints_dirichlet_and_hanging_nodes,
+                                                 (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
       }
-      else
-        VectorTools::interpolate_boundary_values(dof_handler,
-            0,
-            EquationData::BoundaryValues<dim>(),
-            constraints_dirichlet_and_hanging_nodes,
-            ComponentMask());
+    else
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               0,
+                                               EquationData::BoundaryValues<dim>(),
+                                               constraints_dirichlet_and_hanging_nodes,
+                                               ComponentMask());
 
-      constraints_dirichlet_and_hanging_nodes.close();
-    }
+    constraints_dirichlet_and_hanging_nodes.close();
+  }
 
 
 
@@ -1325,7 +1325,7 @@ namespace Step42
     pcout << "         Size of active set: "
           << Utilities::MPI::sum(active_set_locally_owned.n_elements(),
                                  mpi_communicator)
-        << std::endl;
+          << std::endl;
   }
 
 
@@ -1361,7 +1361,7 @@ namespace Step42
 
     const EquationData::BoundaryForce<dim> boundary_force;
     std::vector<Vector<double> >           boundary_force_values(n_face_q_points,
-                                                       Vector<double>(dim));
+        Vector<double>(dim));
 
     FullMatrix<double>                     cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>                         cell_rhs(dofs_per_cell);
@@ -1414,7 +1414,7 @@ namespace Step42
                   // boundary forces, should there be any.
                   const SymmetricTensor<2, dim>
                   stress_phi_i = stress_strain_tensor_linearized
-                                  * fe_values[displacement].symmetric_gradient(i, q_point);
+                                 * fe_values[displacement].symmetric_gradient(i, q_point);
 
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     cell_matrix(i, j) += (stress_phi_i
@@ -1431,25 +1431,25 @@ namespace Step42
             }
 
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face(face)->at_boundary()
-                  &&
-                  cell->face(face)->boundary_indicator() == 1)
-                {
-                  fe_values_face.reinit(cell, face);
+            if (cell->face(face)->at_boundary()
+                &&
+                cell->face(face)->boundary_indicator() == 1)
+              {
+                fe_values_face.reinit(cell, face);
 
-                  boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
-                                                   boundary_force_values);
+                boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
+                                                 boundary_force_values);
 
-                  for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-                    {
-                      Tensor<1, dim> rhs_values;
-                      rhs_values[2] = boundary_force_values[q_point][2];
-                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                        cell_rhs(i) += (fe_values_face[displacement].value(i, q_point)
-                                        * rhs_values
-                                        * fe_values_face.JxW(q_point));
-                    }
-                }
+                for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+                  {
+                    Tensor<1, dim> rhs_values;
+                    rhs_values[2] = boundary_force_values[q_point][2];
+                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                      cell_rhs(i) += (fe_values_face[displacement].value(i, q_point)
+                                      * rhs_values
+                                      * fe_values_face.JxW(q_point));
+                  }
+              }
 
           cell->get_dof_indices(local_dof_indices);
           all_constraints.distribute_local_to_global(cell_matrix, cell_rhs,
@@ -1512,7 +1512,7 @@ namespace Step42
 
     const EquationData::BoundaryForce<dim> boundary_force;
     std::vector<Vector<double> >           boundary_force_values(n_face_q_points,
-                                                       Vector<double>(dim));
+        Vector<double>(dim));
 
     Vector<double> cell_rhs(dofs_per_cell);
 
@@ -1561,24 +1561,24 @@ namespace Step42
             }
 
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face(face)->at_boundary()
-                  && cell->face(face)->boundary_indicator() == 1)
-                {
-                  fe_values_face.reinit(cell, face);
+            if (cell->face(face)->at_boundary()
+                && cell->face(face)->boundary_indicator() == 1)
+              {
+                fe_values_face.reinit(cell, face);
 
-                  boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
-                                                   boundary_force_values);
+                boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
+                                                 boundary_force_values);
 
-                  for (unsigned int q_point = 0; q_point < n_face_q_points;
-                       ++q_point)
-                    {
-                      Tensor<1, dim> rhs_values;
-                      rhs_values[2] = boundary_force_values[q_point][2];
-                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                        cell_rhs(i) += (fe_values_face[displacement].value(i, q_point) * rhs_values
-                                        * fe_values_face.JxW(q_point));
-                    }
-                }
+                for (unsigned int q_point = 0; q_point < n_face_q_points;
+                     ++q_point)
+                  {
+                    Tensor<1, dim> rhs_values;
+                    rhs_values[2] = boundary_force_values[q_point][2];
+                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                      cell_rhs(i) += (fe_values_face[displacement].value(i, q_point) * rhs_values
+                                      * fe_values_face.JxW(q_point));
+                  }
+              }
 
           cell->get_dof_indices(local_dof_indices);
           constraints_dirichlet_and_hanging_nodes.distribute_local_to_global(cell_rhs,
@@ -1672,7 +1672,7 @@ namespace Step42
 
       const double solver_tolerance = relative_accuracy
                                       * newton_matrix.residual(tmp, distributed_solution,
-                                          newton_rhs);
+                                                               newton_rhs);
 
       SolverControl solver_control(newton_matrix.m(),
                                    solver_tolerance);
