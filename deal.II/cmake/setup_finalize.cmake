@@ -263,7 +263,7 @@ ENDFOREACH()
 
 _summary(
 "#\n#  Detailed information (compiler flags, feature configuration) can be found in detailed.log
-#\n#  Run  $ make info  to print a help messa, or  $ make help  for a list of top level targets\n"
+#\n#  Run  $ make info  to print a help message with a list of top level targets\n"
   )
 
 _both("#\n###")
