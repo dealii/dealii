@@ -1,7 +1,7 @@
 DEAL.II TESTSUITE README
 ========================
 
-TODO: Introduction
+TODO: Merge into testsuite.html
 
 
 
@@ -99,107 +99,6 @@ Note: It is possible to provide multiple output files for different mpirun
 values.
 
 
-How to set up and run the testsuite
-===================================
-
-To enable the testsuite, configure and build deal.II in a build directory
-as normal (installation is not necessary). After that you can setup the
-testsuite via the "setup_test" target:
-
-  # make setup_test
-
-Now, the testsuite can be run in the _build directory_ via
-
-  # ctest [-j x]
-
-where x is the number of concurrent tests that should be run. If you only
-want to run a subset of tests matching a regular expression, you can use
-
-  # ctest [-j x] -R '<regular expression>'
-
-To get verbose output of tests (which is otherwise just logged into
-Testing/Temporary/LastTest.log) specify -V, alternatively if you're just
-interested in verbose output of failing test, --output-on-failure.
-
-Note: You can also invoke ctest under BUILD_DIR/tests or any subdirectory
-under BUILD_DIR/tests. This will only invoke the tests that are located
-under the subdirectory.
-
-Note: TODO: Get and install numdiff to minimize false positives.
-
-Note: The testsuite is huge (!) and will need around 12h on current
-computer running single threaded. Consider configuring only a subset of
-tests as discussed below.
-
-
-CMake configuration variables for the testsuite
------------------------------------------------
-
-The testsuite has the following options:
-
-  TEST_PICKUP_REGEX
-    - A regular expression to filter tests. If this is a nonempty string
-      only tests that match the regular expression will be set up. An empty
-      string is interpreted as a catchall.
-
-  TEST_DIFF
-    - the diff tool and command line to use for comparison. If numdiff is
-      available it defaults to "numdiff -a 1e-6 -q", otherwise plain diff
-      is used.
-
-  TEST_TIME_LIMIT
-    - The time limit (in seconds) a single test is allowed to run. Defaults
-      to 180 seconds
-
-These options can be set as environment variables prior to the call to the
-setup_test target:
-
-  TEST_PICKUP_REGEX="build_tests/" TEST_TIME_LIMIT="120" make setup_test
-
-Note: Specifying these options via environment variables is volatile, i.e.
-if $ make setup_test is invoked a second time without the variables set in
-environment, the option will be reset to the default value.
-
-If you want to set these options permanently, set them via cmake as CMake
-variable in the build directory:
-
-  # cmake -DTEST_PICKUP_REGEX="<regular expression" .
-
-Please note that a variable set via cmake always _overrides_ one set via
-environment. If you wish to reset such a variable again, undefine it in the
-cache:
-
-  # cmake -UTEST_PICKUP_REGEX .
-
-
-Setup only a subset of tests
-----------------------------
-
-It is possible to set up only a subset of tests that match a regular
-expression during test setup.
-
-  # make setup_test TEST_PICKUP_REGEX="<regular expression>"
-
-Alternatively, you can specify TEST_PICKUP_REGEX upon configuration:
-
-  # cmake -DTEST_PICKUP_REGEX="<regular expression" .
-
-Note: A TEST_PICKUP_REGEX set via cmake always _overrides_ one set via
-environment. If you wish to disable this filter again, undefine
-TEST_PICKUP_REGEX in the cache:
-
-  # cmake -UTEST_PICKUP_REGEX .
-
-
-Use Ninja as a (GNU) Make replacement to speedup test significantly
--------------------------------------------------------------------
-
-TODO
-
-
-How to interpret the output?
-============================
-
 TODO: Write and document the following
 
   - How a normal run looks like.
@@ -210,13 +109,3 @@ TODO: Write and document the following
 
       output our failing_output
       diff or failing_diff
-
-  - How to get verbose output for failing tests. -V and --output-on-failure
-
-  - how to interpet the output
-
-    test: BUILD successful - executable was compiled and linked successfully
-    test: RUN successful   - the executable run successfully returning no error
-                             condition
-    test: DIFF successful  - The output matches the stored result; test
-                             passed

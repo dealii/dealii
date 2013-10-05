@@ -17,6 +17,7 @@
 
     <h1>The deal.II Testsuite</h1>
 
+    TODO: Das ist nicht mehr aktuell
     <p>The deal.II testsuite consists of two parts, the
     <a href="#build_tests">build tests</a> and the
     <a href="#regression_tests">regression tests</a>. While the build tests
@@ -26,6 +27,282 @@
     compared with previously stored. These two testsuites are
     described below.</p>
 
+    <div class="toc">
+      <ol>
+        <li><a href="#setup">Set up the testsuite</a></li>
+        <ol>
+          <li><a href="#setupdownload">Download the testsuite</a></li>
+          <li><a href="#setupconfigure">Prepare the testsuite</a></li>
+        </ol>
+        <li><a href="#run">Run the testsuite</a></li>
+        <ol>
+          <li><a href="#runoutput">Interpreting the output</a></li>
+        </ol>
+        <li><a href="#build_tests">The build tests</a></li>
+        <li><a href="#regression_tests">The regression tests</a></li>
+      </ol>
+    </div>
+
+    <a name="setup"></a>
+    <h2>Set up the testsuite</h2>
+
+    <a name="setupdownload"></a>
+    <h3>Download the testsuite</h3>
+
+    <p>
+      In order to run the testsuite you have to download it first. The
+      easiest way is to directly check out the testsuite along with deal.II
+      from the subversion repository. Go to an empty directory where you
+      want to test deal.II and do this:
+      <pre>
+
+    $ svn checkout https://svn.dealii.org/trunk .
+      </pre>
+      (Do not forget the dot "." at the end.) This should leave you with
+      two folders:
+      <pre>
+
+    ./deal.II
+    ./tests
+      </pre>
+    </p>
+
+    <p>
+      <b>Note:</b> If you want to check out the testsuite separately, you
+      can do so with
+      <pre>
+
+    $ svn checkout https://svn.dealii.org/trunk/tests
+      </pre>
+    </p>
+
+    <p>
+      <b>Note:</b> CMake will pick up any testsuite that is located in a
+      <code>tests</code> folder next to the source directory
+      (<code>../tests</code>). If your test directory is at a different
+      location you have to hint during configuration by specifying
+      <code>TEST_DIR</code>:
+      <pre>
+
+    $ cmake -DTEST_DIR=&lt;...&gt;
+      </pre>
+    </p>
+
+    <a name="setupconfigure"></a>
+    <h3>Prepare the testsuite</h3>
+
+    <p>
+      To enable the testsuite, configure and build deal.II in a build
+      directory as normal (installation is not necessary). After that you
+      can setup the testsuite via the "setup_test" target:
+      <pre>
+
+    $ make setup_test
+      </pre>
+      This will set up all tests supported by the current configuration
+      (and not otherwise disabled due to <code>TEST_PICKUP_REGEX</code>).
+      Now, the testsuite can be run in the _build directory_ via the
+      <code>ctest</code> command (as will be explained in the next
+      section).
+    </p>
+    Additionally there are also the following targets available:
+      <pre>
+
+    $ make clean_test - runs the 'clean' target in every testsuite subproject
+
+    $ make prune_test - removes all testsuite subprojects
+      </pre>
+
+    <p>
+      The testsuite uses the following CMake variables:
+      <pre>
+
+    TEST_PICKUP_REGEX
+      - A regular expression to filter tests. If this is a nonempty string
+        only tests that match the regular expression will be set up. An empty
+        string is interpreted as a catchall.
+
+    TEST_DIFF
+      - the diff tool and command line to use for comparison. If numdiff is
+        available it defaults to "numdiff -a 1e-6 -q", otherwise plain diff
+        is used.
+
+    TEST_TIME_LIMIT
+      - The time limit (in seconds) a single test is allowed to run. Defaults
+        to 180 seconds
+      </pre>
+      These options can be set as environment variables prior to the call to the
+      setup_test target:
+      <pre>
+
+    $ TEST_PICKUP_REGEX="^build_tests/" TEST_TIME_LIMIT="120" make setup_test
+      </pre>
+    </p>
+
+    <p>
+      <b>Note:</b> Specifying these options via environment variables is
+      volatile, i.e. if <code>$ make setup_test</code> is invoked a second
+      time without the variables set in environment, the option will be
+      reset to the default value. If you want to set these options
+      permanently, set them via cmake as CMake variable in the build
+      directory:
+      <pre>
+
+    $ cmake -DTEST_PICKUP_REGEX="&lt;regular expression&gt;" .
+      </pre>
+      Please also note that a variable set via cmake always _overrides_ one
+      set via environment. If you wish to reset such a variable again,
+      undefine it in the cache:
+      <pre>
+
+    $ cmake -UTEST_PICKUP_REGEX .
+      </pre>
+    </p>
+
+    <a name="run"></a>
+    <h2>Run the testsuite</h2>
+
+    <p>
+      Now, the testsuite can be run in the _build directory_ via
+      <pre>
+
+    $ ctest [-j x]
+      </pre>
+      where x is the number of concurrent tests that should be run. The
+      testsuite is huge (!) and will need around 12h on current computer
+      running single threaded. If you only want to run a subset of tests
+      matching a regular expression, you can use
+      <pre>
+
+    $ ctest [-j x] -R '&lt;regular expression&gt;'
+      </pre>
+    </p>
+
+    <p>
+      <b>Note:</b> You can also invoke <code>ctest</code> under
+      <code>BUILD_DIR/tests</code> or any subdirectory under
+      <code>BUILD_DIR/tests</code>. This will only invoke the tests that
+      are located under the subdirectory.
+    </p>
+
+    <p>
+      To get verbose output of tests (which is otherwise just logged into
+      <code>Testing/Temporary/LastTest.log</code>) specify
+      <pre>
+
+    $ ctest -V [...]
+      </pre>
+      Alternatively, if you're just interested in verbose output of failing
+      tests, <code>--output-on-failure</code>.
+    </p>
+
+    <p>
+      <b>Note:</b>
+      Not all tests succeed on every machine even if all computations are
+      correct, because your machine generates slightly different floating
+      point outputs. To increase the number of tests that work correctly,
+      install the
+      <a href="http://www.nongnu.org/numdiff/">numdiff</a> tool that compares
+      stored and newly created output files based on floating point
+      tolerances. To use it, simply export it via the <code>PATH</code>
+      environment variable so that it can be found during
+      <code>make setup_test</code>.
+    </p>
+
+    <p>
+      In a similar vain, there is also an option to disable tests matching a
+      regular exression:
+      <pre>
+
+    $ ctest -E '&lt;regular expression&gt;' [...]
+      </pre>
+    </p>
+
+    <a name="runoutput"></a>
+    <h3>Interpreting the output</h3>
+
+    <p>
+      A typical output of a <code>ctest</code> invocation looks like:
+      <pre>
+
+    $ ctest -j4 -R "base/thread_validity"
+    Test project /tmp/trunk/build
+          Start 747: base/thread_validity_01.debug
+          Start 748: base/thread_validity_01.release
+          Start 775: base/thread_validity_05.debug
+          Start 776: base/thread_validity_05.release
+     1/24 Test #776: base/thread_validity_05.release ...   Passed    1.89 sec
+     2/24 Test #748: base/thread_validity_01.release ...   Passed    1.89 sec
+          Start 839: base/thread_validity_03.debug
+          Start 840: base/thread_validity_03.release
+     3/24 Test #747: base/thread_validity_01.debug .....   Passed    2.68 sec
+    [...]
+          Start 1077: base/thread_validity_08.debug
+          Start 1078: base/thread_validity_08.release
+    16/24 Test #1078: base/thread_validity_08.release ...***Failed    2.86 sec
+    18/24 Test #1077: base/thread_validity_08.debug .....***Failed    3.97 sec
+    [...]
+
+    92% tests passed, 2 tests failed out of 24
+
+    Total Test time (real) =  20.43 sec
+
+    The following tests FAILED:
+            1077 - base/thread_validity_08.debug (Failed)
+            1078 - base/thread_validity_08.release (Failed)
+    Errors while running CTest
+      </pre>
+      If a test failed (like <code>base/thread_validity_08.debug</code> in above
+      example output), you might want to find out what exactly went wrong.
+      So, invoke <code>ctest</code> to just run the above test with verbose
+      output:
+    <pre>
+
+      $ ctest -V -R "base/thread_validity_08.debug"
+      [...]
+      test 1077
+          Start 1077: base/thread_validity_08.debug
+
+      1077: Test command: [...]
+      1077: Test timeout computed to be: 600
+      1077: Test base/thread_validity_08.debug: RUN
+      1077: ===============================   OUTPUT BEGIN  ===============================
+      1077: Built target thread_validity_08.debug
+      1077: Generating thread_validity_08.debug/output
+      1077: terminate called without an active exception
+      1077: /bin/sh: line 1: 18030 Aborted [...]/thread_validity_08.debug
+      1077: base/thread_validity_08.debug: BUILD successful.
+      1077: base/thread_validity_08.debug: RUN failed. Output:
+      1077: DEAL::OK.
+      1077: gmake[3]: *** [thread_validity_08.debug/output] Error 1
+      1077: gmake[2]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/all] Error 2
+      1077: gmake[1]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/rule] Error 2
+      1077: gmake: *** [thread_validity_08.debug.diff] Error 2
+      1077:
+      1077:
+      1077: base/thread_validity_08.debug: ******    RUN failed    *******
+      1077:
+      1077: ===============================    OUTPUT END   ===============================
+    </pre>
+      So this specific test aborted in the <code>RUN</code> stage.
+
+
+
+
+
+
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <hr />
+    <hr />
+    <hr />
+    <hr />
     <a name="build_tests"></a>
     <h2>The build tests</h2>
 
@@ -89,258 +366,44 @@
       periodically, but not immediately after a mail has been received).
     </p>
 
-
     <h3>Dedicated build tests</h3>
 
-    There is a detailed example for dedicated build tests on the <a
-      href="https://code.google.com/p/dealii/wiki/BuildTests">wiki</a>.
+    <p>
+      There is a detailed example for dedicated build tests on the <a
+        href="https://code.google.com/p/dealii/wiki/BuildTests">wiki</a>.
+    </p>
+
+
 
     <a name="regression_tests"></a>
     <h2>The regression tests</h2>
 
     <p>
-    deal.II has a testsuite that, at the time this article is written (mid-2013),
-    has some 2,900 small programs (growing by roughly one per day) that we run
-    every time we make a
-    change to make sure that no existing functionality is broken. The
-    expected output is also stored in our subversion archive, and when you
-    run a test you are notified if a test fails. These days, every
-    time we add a significant piece of functionality, we add at least
-    one new test to the testsuite, and we also do so if we fix a bug,
-    in both cases to make sure that future changes do not break what
-    we have just checked in. In addition, some machines run the tests
-    every night and send the results back home; this is then converted
-    into <a href="http://dealii.mathsim.eu/cgi-bin/regression_quick.pl"
-    target="body">a webpage showing the status of our regression
-    tests</a>.
+      deal.II has a testsuite that, at the time this article is written
+      (mid-2013), has some 2,900 small programs (growing by roughly one per
+      day) that we run every time we make a change to make sure that no
+      existing functionality is broken. The expected output is also stored in
+      our subversion archive, and when you run a test you are notified if a
+      test fails. These days, every time we add a significant piece of
+      functionality, we add at least one new test to the testsuite, and we
+      also do so if we fix a bug, in both cases to make sure that future
+      changes do not break what we have just checked in. In addition, some
+      machines run the tests every night and send the results back home; this
+      is then converted into
+      <a href="http://dealii.mathsim.eu/cgi-bin/regression_quick.pl"
+      target="body">a webpage showing the status of our regression tests</a>.
     </p>
 
     <p>
-    If you develop parts of deal.II, want to add something, or fix a
-    bug in it, we encourage you to use our testsuite. This page
-    documents some aspects of it.
+      If you develop parts of deal.II, want to add something, or fix a bug
+      in it, we encourage you to use our testsuite. This page documents
+      some aspects of it.
     </p>
+
 
 
     <h3>Running it</h3>
 
-    <p>
-    To run the testsuite, go to the directory where you want to test deal.II
-    and do this:
-    <pre>
-
-       svn checkout https://svn.dealii.org/trunk/tests
-       cd tests
-       DEAL_II_DIR=/a/b/c ./configure
-    </pre>
-    where <code>/a/b/c</code> is the installation directory you have told
-    CMake to install deal.II into previously.
-    </p>
-
-    <p>
-    Not all tests succeed on every machine even if all computations are
-    correct, because you might not have configured with all the required
-    packages (for example PETSc or Trilinos), or because your machine
-    generates slightly different floating point outputs.  To increase the
-    number of tests that work correctly, install the
-    <a href="http://www.nongnu.org/numdiff/">numdiff</a> toold that compares
-    stored and newly created output files based on floating point
-    tolerances. To use it, simply export the environment variable
-    <code>export DEAL_II_DIFF="numdiff -a 1e-6 -q"</code>
-    before running the testsuite.
-    </p>
-
-    <p>
-    Once you have done this, you may simply type
-    <code>make</code>. This runs all the tests there are, but stops at
-    the first one that fails to either execute properly or for which
-    the output does not match the expected output found in the subversion
-    archive. This is helpful if you want to figure out if any test is
-    failing at all. Typical output looks like this:
-    <pre>
-
-      deal.II/tests> make
-      cd base ; make
-      make[1]: Entering directory `/ices/bangerth/p/deal.II/1/deal.II/tests/base'
-      =====linking======= logtest.exe
-      =====Running======= logtest.exe
-      =====Checking====== logtest.output
-      =====OK============ logtest.OK
-      =====linking======= reference.exe
-      =====Running======= reference.exe
-      =====Checking====== reference.output
-      =====OK============ reference.OK
-      =====linking======= quadrature_test.exe
-      ...
-    </pre>
-    Be aware that because of the number of tests we have, running the entire
-    testsuite takes approximately 10 hours (as of early 2013), even on a fast
-    system. (On the other hand, of couse only a large testsuite can offer
-    comprehensive coverage of a software as big as deal.II.) This time can be
-    reduced, however, on multicore machines if you use the command
-    <code>make -jN</code> where <code>N</code> is an integer equal to or
-    slightly larger than the number of processor cores you have, as this
-    instructs <code>make</code> to run several tests at the same time.
-    </p>
-
-    <p>
-    Sometimes, you know that for whatever reason one test
-    always fails on your system, or has already failed before you made
-    any changes to the library that could have caused tests to
-    fail. We also sometimes check in tests that we know presently
-    fail, just to remind us that we need to work on a fix, if we don't
-    have the time to debug the problem properly right away. In this
-    case, you will not want the testsuite to stop at the first test
-    that fails, but will want to run all tests first and then inspect
-    the output to find any fails. There are make targets for this
-    as well. The usual way we use the testsuite is to run all tests
-    like this
-    (the same applies as above: <code>make -jN</code> can be used on multicore
-    machines):
-    <pre>
-
-      deal.II/tests> make report | tee report
-    </pre>
-    which produces the file report ( here in the test directory <tt>a-framework</tt>)
-    <pre>
-
-      =====Checking====== miscompare/output
-      +++++Error+++++++++ miscompare/OK (miscompare/cmp/generic) Use make verbose=on for the diffs
-      =====linking======= compile/exe
-      =====Running======= link/exe
-      =====debug========= fail.cc
-      make[1]: Leaving directory `/home/kanschat/deal/tests/a-framework'
-      Revision: 21455
-      Date:  2010 187 2010-07-06 27-2
-      Id:  kanschat@odin
-      2010-07-06 16:39  1   a-framework/compile
-      2010-07-06 16:39  0   a-framework/fail
-      2010-07-06 16:39  2   a-framework/link
-      2010-07-06 16:39  3   a-framework/miscompare
-      2010-07-06 16:39   +  a-framework/run
-    </pre>
-    The last lines are the ones we are looking for: they show the time at which
-    the tests was run, an indicator of success, and the name of a
-    test. The indicator is either a plus, which means that the test
-    compiled and linked successfully and that the output compared
-    successfully against the stored results. Otherwise, it is any of the
-    numbers 0 to 3, indicating failure at different levels:
-    <ul>
-      <li> 0: compiling failed
-      <li> 1: linking failed
-      <li> 2: the program crashed
-      <li> 3: output differs from stored result
-      <li> +: test succeeded
-    </ul>
-    If you only want to see the tests that failed, after the previous command,
-    issue
-    <pre>
-
-      grep -v + report
-    </pre>
-    </p>
-
-    <p>
-    If you want to do a little more than just that, you should
-    consider running
-    <pre>
-
-      make report+mail | tee report
-    </pre>
-    instead. This does all the same stuff, but also mails the test
-    result to our central mail result server which will in regular
-    intervals (at least once a day) munge these mails and present them
-    on our <a href="http://www.dealii.org/~archiver/cgi-bin/regression_quick.pl"
-    target="body">test site</a>. This way, people can
-    get an overview of what tests fail. You may even consider running
-    tests nightly through a cron-job with this command, to have
-    regular test runs.
-    </p>
-
-    <p>
-    To get a quick overview you can run
-    <pre>
-
-      make report+summary
-    </pre>
-    instead. This runs all the tests and outputs a table in the following format
-    at the end:
-    <pre>
-
-                Compiling Linking Running   Check      OK     all
-         a-framework	1	1	1	1	1	5
-                base	0	0	0	2	185	187
-                 lac	0	0	0	0	117	117
-                  fe	0	0	0	4	114	118
-             deal.II	0	0	0	2	291	293
-         integrators	0	0	0	0	15	15
-           multigrid	0	0	0	0	35	35
-		 ...
-    </pre>
-    </p>
-
-    <p>
-    If a test failed, you have to find out what exactly went
-    wrong. For this, you will want to go into the directory of that
-    test, and figure out in more detail what went wrong. For example,
-    if above test <code>hierarchical</code> would have failed, you
-    would want to go into the <code>base</code> directory (this is
-    given in the line with the equals signs; there are tests in other
-    directories as well) and then type
-    <pre>
-
-      make hierarchical/exe
-    </pre>
-    to compile and link the executable. (For each test there is a not
-    only a file with suffic <code>.cc</code> but also a subdirectory with the
-    same name, in which we store among other things the executable for that
-    test, under the name <code>exe</code>.) If this fails, i.e. if
-    you can't compile or link, then you probably already know where
-    the problem is, and how to fix it. If you could compile and link
-    the test, you will want to make sure that it executes correctly
-    and produces an output file:
-    <pre>
-
-      make hierarchical/output
-    </pre>
-    (As you see, the output file is also stored in the subdirectory with the
-    test's name.) If this produces errors or triggers assertions, then you will
-    want to use a debugger on the executable to figure out what happens. On
-    the other hand, if you are sure that this also worked, you will
-    want to compare the output with the stored output from subversion:
-    <pre>
-
-      make hierarchical/OK
-    </pre>
-    If the output isn't equal, then you'll see something like
-    this:
-    <pre>
-
-      =====Checking====== hierarchical/output
-      +++++Error+++++++++ hierarchical/OK. Use make verbose=on for the diffs
-    </pre>
-    Because the diffs between the output we get and the output we
-    expected can sometimes be very large, you don't get to see it by
-    default. However, following the suggestion printed, if you type
-    <pre>
-
-      make hierarchical/OK verbose=on
-    </pre>
-    you get to see it all:
-    <pre>
-
-      =====Checking====== hierarchical/output
-      12c12
-      < DEAL::0.333 1.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
-      ---
-      > DEAL::0.333 0.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
-      +++++Error+++++++++ hierarchical/OK
-    </pre>
-    In this case, the second number on line 12 is off by one. To find
-    the reason for this, you again should use a debugger or other
-    suitable means, but that of course depends on what changes you
-    have made last and that could have caused this discrepancy.
-    </p>
 
 
 
