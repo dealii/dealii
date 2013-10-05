@@ -31,14 +31,12 @@
 
 template <int dim>
 void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
-                const char                                *dirname,
                 const char                                *filename)
 {
   deallog << "Checksum: "
           << tria.get_checksum ()
           << std::endl;
 
-  chdir (dirname);
   tria.write_mesh_vtk (filename);
 
   if (false)
@@ -71,20 +69,17 @@ void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
             }
         }
     }
-
-
-  chdir ("..");
 }
 
 
 template <int dim>
-void assert_tria_equal(const char *testdir, const Triangulation<dim> &a, const Triangulation<dim> &b)
+void assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
 {
   Assert (a.n_active_cells() == b.n_active_cells(),
           ExcInternalError());
 
-  std::string file1=std::string(testdir)+"/tmp_grid1";
-  std::string file2=std::string(testdir)+"/tmp_grid2";
+  std::string file1 = "tmp_grid1";
+  std::string file2 = "tmp_grid2";
 
   std::ofstream out1(file1.c_str());
   GridOut().write_gnuplot (a, out1);
@@ -107,6 +102,17 @@ void assert_tria_equal(const char *testdir, const Triangulation<dim> &a, const T
 template <typename T>
 LogStream &
 operator << (LogStream &out,
+             const std::vector<T> &v)
+{
+  for (unsigned int i=0; i<v.size(); ++i)
+    out << v[i] << (i == v.size()-1 ? "" : " ");
+  return out;
+}
+
+
+template <typename T>
+std::ostringstream &
+operator << (std::ostringstream &out,
              const std::vector<T> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
