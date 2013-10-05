@@ -50,3 +50,42 @@ FOREACH(_component compat_files documentation examples mesh_converter parameter_
       )
   ENDIF()
 ENDFOREACH()
+
+#
+# Provide an "info" target to print a help message:
+#
+
+FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+"MESSAGE(
+\"###
+#
+#  The following targets are available (invoke by $ make <target>):
+#
+#    all            - compiles the library and all enabled components
+#    clean          - removes all generated files
+#    install        - installs into CMAKE_INSTALL_PREFIX
+#    help           - prints a list of valid top level targets
+#    info           - prints this help message
+#
+#    edit_cache     - runs ccmake for changing (cached) configuration variables
+#                     and reruns the configure and generate phases of CMake
+#    rebuild_cache  - reruns the configure and generate phases of CMake
+#
+#    compat_files   - builds and installs the 'compat_files' component
+#    documentation  - builds and installs the 'documentation' component
+#    examples       - builds and installs the 'examples' component
+#    library        - builds and installs the 'library' component
+#    mesh_converter - builds and installs the 'mesh_converter' component
+#    parameter_gui  - builds and installs the 'parameter_gui' component
+#
+#    test           - runs a minimal set of tests
+#
+#    setup_test     - sets up the testsuite subprojects
+#    clean_test     - runs the 'clean' target in every testsuite subproject
+#    prune_test     - removes all testsuite subprojects
+#
+###\")"
+  )
+ADD_CUSTOM_TARGET(info
+  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+  )
