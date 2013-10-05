@@ -1398,7 +1398,7 @@ namespace Step42
                   // Having computed the stress-strain tensor and its linearization,
                   // we can now put together the parts of the matrix and right hand side.
                   // In both, we need the linearized stress-strain tensor times the
-                  // symmetric gradient of $\varphi_i$, $I_\Pi\varepsilon(\varphi_i)$,
+                  // symmetric gradient of $\varphi_i$, i.e. the term $I_\Pi\varepsilon(\varphi_i)$,
                   // so we introduce an abbreviation of this term. Recall that the
                   // matrix corresponds to the bilinear form
                   // $A_{ij}=(I_\Pi\varepsilon(\varphi_i),\varepsilon(\varphi_j))$ in the
@@ -1662,24 +1662,16 @@ namespace Step42
     {
       TimerOutput::Scope t(computing_timer, "Solve: iterate");
 
-      PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
       TrilinosWrappers::MPI::Vector tmp(locally_owned_dofs, mpi_communicator);
-      // 1e-4 seems to be the fasted option altogether, but to get more
-      // reproducible parallel benchmark results, we use a small residual:
-      double relative_accuracy = 1e-8;
-      if (output_dir.compare("its/") == 0)
-        relative_accuracy = 1e-4;
 
-      const double solver_tolerance = relative_accuracy
-                                      * newton_matrix.residual(tmp, distributed_solution,
-                                                               newton_rhs);
+      const double relative_accuracy = 1e-8;
+      const double solver_tolerance  = relative_accuracy
+                                       * newton_matrix.residual(tmp, distributed_solution,
+                                                                newton_rhs);
 
       SolverControl solver_control(newton_matrix.m(),
                                    solver_tolerance);
-      SolverBicgstab<TrilinosWrappers::MPI::Vector> solver(solver_control,
-                                                           mem/*,
-               SolverFGMRES<TrilinosWrappers::MPI::Vector>::
-               AdditionalData(30, true)*/);
+      SolverBicgstab<TrilinosWrappers::MPI::Vector> solver(solver_control);
       solver.solve(newton_matrix, distributed_solution,
                    newton_rhs, preconditioner);
 
@@ -1694,52 +1686,50 @@ namespace Step42
     solution = distributed_solution;
   }
 
-// @sect4{PlasticityContactProblem::solve_newton}
 
-// In this function the damped Newton method is implemented.
-// That means two nested loops: the outer loop for the newton
-// iteration and the inner loop for the damping steps which
-// will be used only if necessary. To obtain a good and reasonable
-// starting value we solve an elastic problem in very first step (j=1).
+  // @sect4{PlasticityContactProblem::solve_newton}
+
+  // This is, finally, the function that implements the damped Newton method
+  // on the current mesh. There are two nested loops: the outer loop for the Newton
+  // iteration and the inner loop for the line search which
+  // will be used only if necessary. To obtain a good and reasonable
+  // starting value we solve an elastic problem in very first Newton step on each
+  // mesh (or only on the first mesh if we transfer solutions between meshes). We
+  // do so by setting the yield stress to an unreasonably large value in these
+  // iterations and then setting it back to the correct value in subsequent
+  // iterations.
+  //
+  // Other than this, the top part of this function should be reasonably
+  // obvious:
   template <int dim>
   void
   PlasticityContactProblem<dim>::solve_newton ()
   {
-    TimerOutput::Scope t(computing_timer, "solve newton setup");
-
-    double resid = 0;
-    double resid_old = 100000;
     TrilinosWrappers::MPI::Vector old_solution(locally_owned_dofs, mpi_communicator);
-    TrilinosWrappers::MPI::Vector res(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector residual(locally_owned_dofs, mpi_communicator);
     TrilinosWrappers::MPI::Vector tmp_vector(locally_owned_dofs, mpi_communicator);
 
-    double sigma_hlp = sigma_0;
+    const double correct_sigma = sigma_0;
 
     IndexSet old_active_set(active_set);
 
-    t.stop(); // stop newton setup timer
-
-    unsigned int j = 1;
-    unsigned int number_assemble_system = 0;
-    for (; j <= 100; j++)
+    for (unsigned int newton_step = 1; newton_step <= 100; ++newton_step)
       {
-        if (transfer_solution)
-          {
-            if (transfer_solution && j == 1 && current_refinement_cycle == 0)
-              constitutive_law.set_sigma_0(1e+10);
-            else if (transfer_solution && (j == 2 || current_refinement_cycle > 0))
-              constitutive_law.set_sigma_0(sigma_hlp);
-          }
-        else
-          {
-            if (j == 1)
-              constitutive_law.set_sigma_0(1e+10);
-            else
-              constitutive_law.set_sigma_0(sigma_hlp);
-          }
+        if (newton_step == 1
+            &&
+            ((transfer_solution && current_refinement_cycle == 0)
+             ||
+             !transfer_solution))
+          constitutive_law.set_sigma_0(1e+10);
+        else if (newton_step == 2
+                 ||
+                 current_refinement_cycle > 0
+                 ||
+                 !transfer_solution)
+          constitutive_law.set_sigma_0(correct_sigma);
 
         pcout << " " << std::endl;
-        pcout << "   Newton iteration " << j << std::endl;
+        pcout << "   Newton iteration " << newton_step << std::endl;
         pcout << "      Updating active set..." << std::endl;
 
         {
@@ -1750,9 +1740,7 @@ namespace Step42
         pcout << "      Assembling system... " << std::endl;
         newton_matrix = 0;
         newton_rhs = 0;
-        assemble_newton_system(solution); //compute Newton-Matrix
-
-        number_assemble_system += 1;
+        assemble_newton_system(solution);
 
         pcout << "      Solving system... " << std::endl;
         solve_newton_system();
@@ -1760,15 +1748,19 @@ namespace Step42
         TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
         distributed_solution = solution;
 
+        // It gets a bit more hairy after we have computed the
+        // trial solution $\tilde{\mathbf u}$ of the current Newton step.
         // We handle a highly nonlinear problem so we have to damp
-        // the Newtons method. We refer that we iterate the new solution
-        // in each Newton step and not only the solution update.
-        // Since the solution set is a convex set and not a space we
-        // compute for the damping a linear combination of the
-        // previous and the current solution to guarantee that the
+        // Newton's method using a line search. To understand how we do this,
+        // recall that in our formulation, we compute a trial solution
+        // in each Newton step and not the update between old and new solution.
+        // Since the solution set is a convex set, we will use a line
+        // search that tries linear combinations of the
+        // previous and the trial solution to guarantee that the
         // damped solution is in our solution set again.
-        // At most we apply 10 damping steps.
+        // At most we apply 5 damping steps.
         bool damped = false;
+        double residual_norm, previous_residual_norm;
         tmp_vector = old_solution;
 
         for (unsigned int i = 0; (i < 5) && (!damped); i++)
@@ -1785,51 +1777,51 @@ namespace Step42
 
             solution = old_solution;
             compute_nonlinear_residual(solution);
-            res = newton_rhs;
+            residual = newton_rhs;
 
-            const unsigned int start_res = (res.local_range().first),
-                               end_res = (res.local_range().second);
+            const unsigned int start_res = (residual.local_range().first),
+                               end_res = (residual.local_range().second);
             for (unsigned int n = start_res; n < end_res; ++n)
               if (all_constraints.is_inhomogeneously_constrained(n))
-                res(n) = 0;
+                residual(n) = 0;
 
-            res.compress(VectorOperation::insert);
+            residual.compress(VectorOperation::insert);
 
-            resid = res.l2_norm();
+            residual_norm = residual.l2_norm();
 
-            if (resid < resid_old)
+            if (newton_step==0 || residual_norm < previous_residual_norm)
               damped = true;
 
             pcout << "      Residual of the non-contact part of the system: "
-                  << resid << std::endl
+                  << residual_norm << std::endl
                   << "         with a damping parameter alpha = " << alpha
                   << std::endl;
 
             // The previous iteration of step 0 is the solution of an elastic problem.
             // So a linear combination of a plastic and an elastic solution makes no sense
             // since the elastic solution is not in the convex set of the plastic solution.
-            if (!transfer_solution && j == 2)
+            if (!transfer_solution && newton_step == 2)
               break;
-            if (transfer_solution && j == 2 && current_refinement_cycle == 0)
+            if (transfer_solution && newton_step == 2 && current_refinement_cycle == 0)
               break;
           }
 
-        resid_old = resid;
+        previous_residual_norm = residual_norm;
 
+        // The final step is to check for convergence. If the active set
+        // has not changed across all processors and the residual is
+        // less than a threshold of $10^{-10}$, then we terminate
+        // the iteration on the current mesh:
         if (Utilities::MPI::sum((active_set == old_active_set) ? 0 : 1,
                                 mpi_communicator) == 0)
           {
             pcout << "      Active set did not change!" << std::endl;
-            if (resid < 1e-10)
+            if (residual_norm < 1e-10)
               break;
           }
 
         old_active_set = active_set;
       }
-
-    pcout << std::endl
-          << "      Number of assembled systems = "
-          << number_assemble_system << std::endl;
   }
 
 // @sect3{The <code>refine_grid</code> function}
