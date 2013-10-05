@@ -21,6 +21,9 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/solver_control.h>
 
+#include <cstring>
+
+
 #ifdef DEAL_II_WITH_ARPACK
 
 DEAL_II_NAMESPACE_OPEN
@@ -284,31 +287,31 @@ void ArpackSolver::solve (
   switch (additional_data.eigenvalue_of_interest)
     {
     case algebraically_largest:
-      strcpy (which, "LA");
+      std::strcpy (which, "LA");
       break;
     case algebraically_smallest:
-      strcpy (which, "SA");
+      std::strcpy (which, "SA");
       break;
     case largest_magnitude:
-      strcpy (which, "LM");
+      std::strcpy (which, "LM");
       break;
     case smallest_magnitude:
-      strcpy (which, "SM");
+      std::strcpy (which, "SM");
       break;
     case largest_real_part:
-      strcpy (which, "LR");
+      std::strcpy (which, "LR");
       break;
     case smallest_real_part:
-      strcpy (which, "SR");
+      std::strcpy (which, "SR");
       break;
     case largest_imaginary_part:
-      strcpy (which, "LI");
+      std::strcpy (which, "LI");
       break;
     case smallest_imaginary_part:
-      strcpy (which, "SI");
+      std::strcpy (which, "SI");
       break;
     case both_ends:
-      strcpy (which, "BE");
+      std::strcpy (which, "BE");
       break;
     }
 

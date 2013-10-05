@@ -45,11 +45,14 @@ namespace PETScWrappers
 
     SparseMatrix::~SparseMatrix ()
     {
+      int ierr;
+
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
-      const int ierr = MatDestroy (matrix);
+      ierr = MatDestroy (matrix);
 #else
-      const int ierr = MatDestroy (&matrix);
+      ierr = MatDestroy (&matrix);
 #endif
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
     }
 
     SparseMatrix::SparseMatrix (const MPI_Comm  &communicator,
