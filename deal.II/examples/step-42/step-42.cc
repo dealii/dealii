@@ -1789,7 +1789,7 @@ namespace Step42
 
             residual_norm = residual.l2_norm();
 
-            if (newton_step==0 || residual_norm < previous_residual_norm)
+            if (newton_step==1 || residual_norm < previous_residual_norm)
               damped = true;
 
             pcout << "      Residual of the non-contact part of the system: "
