@@ -1520,6 +1520,9 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement(0);
 
+    newton_rhs                            = 0;
+    newton_rhs_uncondensed                = 0;
+
     fraction_of_plastic_q_points_per_cell = 0;
 
     typename DoFHandler<dim>::active_cell_iterator
@@ -1708,6 +1711,9 @@ namespace Step42
     TrilinosWrappers::MPI::Vector old_solution(locally_owned_dofs, mpi_communicator);
     TrilinosWrappers::MPI::Vector residual(locally_owned_dofs, mpi_communicator);
     TrilinosWrappers::MPI::Vector tmp_vector(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
+
+    double residual_norm, previous_residual_norm;
 
     const double correct_sigma = sigma_0;
 
@@ -1745,9 +1751,6 @@ namespace Step42
         pcout << "      Solving system... " << std::endl;
         solve_newton_system();
 
-        TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
-        distributed_solution = solution;
-
         // It gets a bit more hairy after we have computed the
         // trial solution $\tilde{\mathbf u}$ of the current Newton step.
         // We handle a highly nonlinear problem so we have to damp
@@ -1759,26 +1762,32 @@ namespace Step42
         // previous and the trial solution to guarantee that the
         // damped solution is in our solution set again.
         // At most we apply 5 damping steps.
-        bool damped = false;
-        double residual_norm, previous_residual_norm;
-        tmp_vector = old_solution;
-
-        for (unsigned int i = 0; (i < 5) && (!damped); i++)
+        //
+        // There are exceptions to when we use a line search. First,
+        // if this is the first Newton step on any mesh, then we don't have
+        // any point to compare the residual to, so we always accept a full
+        // step. Likewise, if this is the second Newton step on the first mesh (or
+        // the second on any mesh if we don't transfer solutions from
+        // mesh to mesh), then we have computed the first of these steps using
+        // just an elastic model (see how we set the yield stress sigma to
+        // an unreasonably large value above). In this case, the first Newton
+        // solution was a purely elastic one, the second one a plastic one,
+        // and any linear combination would not necessarily be expected to
+        // lie in the feasible set -- so we just accept the solution we just
+        // got.
+        //
+        // In either of these two cases, we bypass the line search and just
+        // update residual and other vectors as necessary.
+        if ((newton_step==1)
+            ||
+            (transfer_solution && newton_step == 2 && current_refinement_cycle == 0)
+            ||
+            (!transfer_solution && newton_step == 2))
           {
-            const double alpha = std::pow(0.5, static_cast<double>(i));
-            old_solution = tmp_vector;
-            old_solution.sadd(1 - alpha, alpha, distributed_solution);
-            old_solution.compress(VectorOperation::add);
-
-            TimerOutput::Scope t(computing_timer, "Residual and lambda");
-
-            newton_rhs = 0;
-            newton_rhs_uncondensed = 0;
-
-            solution = old_solution;
             compute_nonlinear_residual(solution);
-            residual = newton_rhs;
+            old_solution = solution;
 
+            residual = newton_rhs;
             const unsigned int start_res = (residual.local_range().first),
                                end_res = (residual.local_range().second);
             for (unsigned int n = start_res; n < end_res; ++n)
@@ -1789,24 +1798,51 @@ namespace Step42
 
             residual_norm = residual.l2_norm();
 
-            if (newton_step==1 || residual_norm < previous_residual_norm)
-              damped = true;
+            pcout << "      Accepting Newton solution with residual: "
+                  << residual_norm << std::endl;
+          }
+        else
+          {
+            for (unsigned int i = 0; i < 5; i++)
+              {
+                distributed_solution = solution;
 
-            pcout << "      Residual of the non-contact part of the system: "
-                  << residual_norm << std::endl
-                  << "         with a damping parameter alpha = " << alpha
-                  << std::endl;
+                const double alpha = std::pow(0.5, static_cast<double>(i));
+                tmp_vector = old_solution;
+                tmp_vector.sadd(1 - alpha, alpha, distributed_solution);
+                tmp_vector.compress(VectorOperation::add);
 
-            // The previous iteration of step 0 is the solution of an elastic problem.
-            // So a linear combination of a plastic and an elastic solution makes no sense
-            // since the elastic solution is not in the convex set of the plastic solution.
-            if (!transfer_solution && newton_step == 2)
-              break;
-            if (transfer_solution && newton_step == 2 && current_refinement_cycle == 0)
-              break;
+                TimerOutput::Scope t(computing_timer, "Residual and lambda");
+
+                compute_nonlinear_residual(tmp_vector);
+                residual = newton_rhs;
+
+                const unsigned int start_res = (residual.local_range().first),
+                                   end_res = (residual.local_range().second);
+                for (unsigned int n = start_res; n < end_res; ++n)
+                  if (all_constraints.is_inhomogeneously_constrained(n))
+                    residual(n) = 0;
+
+                residual.compress(VectorOperation::insert);
+
+                residual_norm = residual.l2_norm();
+
+                pcout << "      Residual of the non-contact part of the system: "
+                      << residual_norm << std::endl
+                      << "         with a damping parameter alpha = " << alpha
+                      << std::endl;
+
+                if (residual_norm < previous_residual_norm)
+                  break;
+              }
+
+            old_solution = solution;
+            solution = tmp_vector;
           }
 
+        old_active_set = active_set;
         previous_residual_norm = residual_norm;
+
 
         // The final step is to check for convergence. If the active set
         // has not changed across all processors and the residual is
@@ -1819,13 +1855,18 @@ namespace Step42
             if (residual_norm < 1e-10)
               break;
           }
-
-        old_active_set = active_set;
       }
   }
 
-// @sect3{The <code>refine_grid</code> function}
+  // @sect3{The <code>refine_grid</code> function}
 
+  // If you've made it this far into the deal.II tutorial, the following
+  // function refining the mesh should not pose any challenges to you
+  // any more. It refines the mesh, either globally or using the Kelly
+  // error estimator, and if so asked also transfers the solution from
+  // the previous to the next mesh. In the latter case, we also need
+  // to compute the active set and other quantities again, for which we
+  // need the information computed by <code>compute_nonlinear_residual()</code>.
   template <int dim>
   void
   PlasticityContactProblem<dim>::refine_grid ()
@@ -1847,8 +1888,10 @@ namespace Step42
                                            solution,
                                            estimated_error_per_cell);
 
-        parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
-          triangulation, estimated_error_per_cell, 0.3, 0.03);
+        parallel::distributed::GridRefinement
+        ::refine_and_coarsen_fixed_number(triangulation,
+                                          estimated_error_per_cell,
+                                          0.3, 0.03);
       }
 
     triangulation.prepare_coarsening_and_refinement();
@@ -2065,42 +2108,41 @@ namespace Step42
     // in z-direction over the whole contact area. To be accurate enough we use the
     // Gaussian quadrature rule with fe.degree + 1.
     double contact_force = 0.0;
-    {
-      QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
-      FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
-                                       update_values | update_quadrature_points | update_JxW_values);
+    QGauss<dim-1> face_quadrature_formula(fe.degree + 1);
 
-      const unsigned int n_face_q_points = face_quadrature_formula.size();
+    FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
+                                     update_values | update_quadrature_points | update_JxW_values);
 
-      const FEValuesExtractors::Vector displacement(0);
+    const unsigned int n_face_q_points = face_quadrature_formula.size();
 
-      typename DoFHandler<dim>::active_cell_iterator cell =
-        dof_handler.begin_active(), endc = dof_handler.end();
-      for (; cell != endc; ++cell)
-        if (cell->is_locally_owned())
-          for (unsigned int face = 0;
-               face < GeometryInfo<dim>::faces_per_cell; ++face)
-            if (cell->face(face)->at_boundary()
-                && cell->face(face)->boundary_indicator() == 1)
-              {
-                fe_values_face.reinit(cell, face);
+    const FEValuesExtractors::Vector displacement(0);
 
-                std::vector<Tensor<1, dim> > lambda_values(n_face_q_points);
-                fe_values_face[displacement].get_function_values(lambda,
-                                                                 lambda_values);
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell != endc; ++cell)
+      if (cell->is_locally_owned())
+        for (unsigned int face = 0;
+             face < GeometryInfo<dim>::faces_per_cell; ++face)
+          if (cell->face(face)->at_boundary()
+              && cell->face(face)->boundary_indicator() == 1)
+            {
+              fe_values_face.reinit(cell, face);
 
-                for (unsigned int q_point = 0; q_point < n_face_q_points;
-                     ++q_point)
-                  {
-                    contact_force += lambda_values[q_point][2]
-                                     * fe_values_face.JxW(q_point);
-                  }
-              }
-      contact_force = Utilities::MPI::sum(contact_force, MPI_COMM_WORLD);
-      pcout << "Contact force = " << contact_force << std::endl;
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
+              std::vector<Tensor<1, dim> > lambda_values(n_face_q_points);
+              fe_values_face[displacement].get_function_values(lambda,
+                                                               lambda_values);
+
+              for (unsigned int q_point = 0; q_point < n_face_q_points;
+                   ++q_point)
+                {
+                  contact_force += lambda_values[q_point][2]
+                                   * fe_values_face.JxW(q_point);
+                }
+            }
+    contact_force = Utilities::MPI::sum(contact_force, MPI_COMM_WORLD);
+    pcout << "Contact force = " << contact_force << std::endl;
   }
 
 
