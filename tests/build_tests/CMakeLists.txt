@@ -16,6 +16,8 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 INCLUDE(${TEST_DIR}/cmake/setup_testsuite.cmake)
+PROJECT(testsuite CXX)
+INCLUDE(${DEAL_II_TARGET_CONFIG})
 
 #
 # build_tests tests are special:
@@ -76,8 +78,11 @@ FOREACH(_step_full ${_steps})
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/CMakeLists.txt
         COMMAND ${CMAKE_COMMAND} -E make_directory ${_step_dir}
         ${_command}
-        DEPENDS ${_files}
-        )
+        DEPENDS
+          ${_files}
+          ${DEAL_II_TARGET_DEBUG}
+          ${DEAL_II_TARGET_RELEASE}
+          )
 
       # And a rule on how to configure the example step:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/configure_output
