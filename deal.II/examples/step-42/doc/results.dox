@@ -1,12 +1,12 @@
 <h1>Results</h1>
 
-The directory that contains this program contains a number of input
+The directory that contains this program also contains a number of input
 parameter files that can be used to create various different
 simulations. For example, running the program with the
 <code>p1_adaptive.prm</code> parameter file (using a ball as obstacle and the
 box as domain) on 16 cores produces output like this:
 @code
-   Using output directory 'p1adaptive/'
+    Using output directory 'p1adaptive/'
     FE degree 1
     transfer solution false
 
@@ -155,13 +155,13 @@ inequality is active):
     <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionColorbar.png">
     </td>
     <td>
-    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionBall2.png" alt="" width="40%">
+    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionBall2.png" alt="" width="70%">
     </td>
     <td valign="top">
       &nbsp;
     </td>
     <td>
-    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="" alt="" width="40%">
+    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="" alt="" width="70%">
     </td>
   </tr>
 </table>
