@@ -1218,9 +1218,6 @@ namespace Step42
 
     all_constraints.reinit(locally_relevant_dofs);
     active_set.clear();
-    IndexSet active_set_locally_owned;
-    active_set_locally_owned.set_size(locally_owned_dofs.size());
-
 
     // The second part is a loop over all cells in which we look at each
     // point where a degree of freedom is defined whether the active set
@@ -1299,12 +1296,7 @@ namespace Step42
                           all_constraints.set_inhomogeneity(index_z, undeformed_gap);
                           distributed_solution(index_z) = undeformed_gap;
 
-                          if (locally_owned_dofs.is_element(index_z))
-                            {
-                              active_set_locally_owned.add_index(index_z);
-                              if (locally_relevant_dofs.is_element(index_z))
-                                active_set.add_index(index_z);
-                            }
+                          active_set.add_index(index_z);
                         }
                     }
                 }
@@ -1315,7 +1307,12 @@ namespace Step42
     // written by other processors. We then merge the Dirichlet constraints and
     // those from hanging nodes into the ConstraintMatrix object that already
     // contains the active set. We finish the function by outputting the total
-    // number of actively constrained degrees of freedom:
+    // number of actively constrained degrees of freedom for which we sum over
+    // the number of actively constrained degrees of freedom owned by each
+    // of the processors. This number of locally owned constrained degrees of
+    // freedom is of course the number of elements of the intersection of the
+    // active set and the set of locally owned degrees of freedom, which
+    // we can get by using <code>operator&</code> on two IndexSets:
     distributed_solution.compress(VectorOperation::insert);
     solution = distributed_solution;
 
@@ -1323,7 +1320,7 @@ namespace Step42
     all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
 
     pcout << "         Size of active set: "
-          << Utilities::MPI::sum(active_set_locally_owned.n_elements(),
+          << Utilities::MPI::sum((active_set & locally_owned_dofs).n_elements(),
                                  mpi_communicator)
           << std::endl;
   }
