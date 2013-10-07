@@ -146,6 +146,12 @@ inconvenience this causes.
 
 <ol>
   <li>
+  New: GridIn::read_vtk() reads 2d and 3d meshes in VTK format.
+  <br>
+  (Mayank Sabharwal, Andreas Putz, 2013/10/07)
+  </li>
+
+  <li>
   Fixed: ConstraintMatrix would not compress() the IndexSet in the constructor
   leading to crashes that only happen in release mode. This is now fixed.
   <br>
