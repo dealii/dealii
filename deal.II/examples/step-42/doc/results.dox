@@ -1,10 +1,17 @@
 <h1>Results</h1>
 
-Running the program (with a ball as obstacle) on 12 cores produces output like this:
+The directory that contains this program contains a number of input
+parameter files that can be used to create various different
+simulations. For example, running the program with the
+<code>p1_adaptive.prm</code> parameter file (using a ball as obstacle and the
+box as domain) on 16 cores produces output like this:
 @code
+   Using output directory 'p1adaptive/'
+    FE degree 1
+    transfer solution false
+
 Cycle 0:
-   Number of active cells: 218
-   Total number of cells: 249
+   Number of active cells: 512
    Number of degrees of freedom: 2187
  
    Newton iteration 1
@@ -12,371 +19,149 @@ Cycle 0:
          Size of active set: 1
       Assembling system... 
       Solving system... 
-         Error: 173.076 -> 0.157131 in 8 FGMRES iterations.
-      Number of elastic quadrature points: 4096 and plastic quadrature points: 0
-      Residual of the non-contact part of the system: 0.157131
-         with a damping parameter alpha = 1
+         Error: 173.076 -> 3.06875e-07 in 8 Bicgstab iterations.
+      Accepting Newton solution with residual: 3.06875e-07
+      Active set did not change!
  
    Newton iteration 2
       Updating active set...
          Size of active set: 1
       Assembling system... 
       Solving system... 
-         Error: 57.3852 -> 0.0426777 in 9 FGMRES iterations.
-      Number of elastic quadrature points: 3944 and plastic quadrature points: 152
-      Residual of the non-contact part of the system: 24.9209
-         with a damping parameter alpha = 1
+         Error: 57.3622 -> 2.46266e-07 in 8 Bicgstab iterations.
+      Accepting Newton solution with residual: 24.9028
+      Active set did not change!
  
    Newton iteration 3
       Updating active set...
          Size of active set: 1
       Assembling system... 
       Solving system... 
-         Error: 24.9209 -> 0.0157852 in 8 FGMRES iterations.
-      Number of elastic quadrature points: 3960 and plastic quadrature points: 136
-      Residual of the non-contact part of the system: 1.63601
+         Error: 24.9028 -> 1.83021e-07 in 7 Bicgstab iterations.
+      Residual of the non-contact part of the system: 1.63333
          with a damping parameter alpha = 1
- 
-   Newton iteration 4
-      Updating active set...
-         Size of active set: 1
-      Assembling system... 
-      Solving system... 
-         Error: 1.63601 -> 0.00131281 in 8 FGMRES iterations.
-      Number of elastic quadrature points: 3960 and plastic quadrature points: 136
-      Residual of the non-contact part of the system: 0.00479668
-         with a damping parameter alpha = 1
- 
-   Newton iteration 5
-      Updating active set...
-         Size of active set: 1
-      Assembling system... 
-      Solving system... 
-         Error: 0.00479668 -> 2.27976e-06 in 9 FGMRES iterations.
-      Number of elastic quadrature points: 3960 and plastic quadrature points: 136
-      Residual of the non-contact part of the system: 2.29051e-06
-         with a damping parameter alpha = 1
- 
-   Newton iteration 6
-      Updating active set...
-         Size of active set: 1
-      Assembling system... 
-      Solving system... 
-         Error: 2.29051e-06 -> 1.31066e-09 in 9 FGMRES iterations.
-      Number of elastic quadrature points: 3960 and plastic quadrature points: 136
-      Residual of the non-contact part of the system: 1.31067e-09
-         with a damping parameter alpha = 1
+      Active set did not change!
 
-      Number of assembled systems = 6
-      Number of Solver-Iterations = 51
-      Writing graphical output...
+...
+
+  Newton iteration 6
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+         Error: 1.43188e-07 -> 4.61326e-16 in 8 Bicgstab iterations.
+      Residual of the non-contact part of the system: 5.67016e-14
+         with a damping parameter alpha = 1
+      Active set did not change!
+      Writing graphical output... p1adaptive/solution-00.pvtu
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |      6.23s |            |
+| Total wallclock time elapsed since start    |      1.13s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assembling                      |         6 |     0.859s |        14% |
-| Graphical output                |         1 |      0.22s |       3.5% |
-| Residual and lambda             |         6 |     0.189s |         3% |
-| Setup                           |         1 |     0.265s |       4.3% |
-| Setup: distribute DoFs          |         1 |    0.0549s |      0.88% |
-| Setup: matrix                   |         1 |    0.0142s |      0.23% |
-| Solve                           |         6 |      4.51s |        72% |
-| Solve: iterate                  |         6 |      1.79s |        29% |
-| Solve: setup preconditioner     |         6 |       2.7s |        43% |
-| Update solution and constraints |         6 |    0.0246s |       0.4% |
+| Assembling                      |         6 |     0.463s |        41% |
+| Graphical output                |         1 |    0.0257s |       2.3% |
+| Residual and lambda             |         4 |    0.0754s |       6.7% |
+| Setup                           |         1 |     0.227s |        20% |
+| Setup: constraints              |         1 |    0.0347s |       3.1% |
+| Setup: distribute DoFs          |         1 |    0.0441s |       3.9% |
+| Setup: matrix                   |         1 |    0.0119s |       1.1% |
+| Setup: vectors                  |         1 |   0.00155s |      0.14% |
+| Solve                           |         6 |     0.246s |        22% |
+| Solve: iterate                  |         6 |    0.0631s |       5.6% |
+| Solve: setup preconditioner     |         6 |     0.167s |        15% |
+| update active set               |         6 |    0.0401s |       3.6% |
 +---------------------------------+-----------+------------+------------+
 
+Peak virtual memory used, resident in kB: 541884 77464
+Contact force = 37.3058
 
-Cycle 1:
-   Number of active cells: 463
-   Total number of cells: 529
-   Number of degrees of freedom: 6294
-
-   Newton iteration 1
-      Updating active set...
-         Size of active set: 8
-      Assembling system... 
-      Solving system... 
-         Error: 69.7055 -> 0.0512854 in 11 FGMRES iterations.
-      Number of elastic quadrature points: 11400 and plastic quadrature points: 984
-      Residual of the non-contact part of the system: 16.4859
-         with a damping parameter alpha = 1
- 
-   Newton iteration 2
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-         Error: 142.778 -> 0.0754216 in 8 FGMRES iterations.
-      Number of elastic quadrature points: 11252 and plastic quadrature points: 1132
-      Residual of the non-contact part of the system: 17.2965
-         with a damping parameter alpha = 1
- 
-   Newton iteration 3
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-         Error: 17.2965 -> 0.0126474 in 10 FGMRES iterations.
-      Number of elastic quadrature points: 11032 and plastic quadrature points: 1352
-      Residual of the non-contact part of the system: 14.2312
-         with a damping parameter alpha = 1
- 
-   Newton iteration 4
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-         Error: 14.2312 -> 0.0130557 in 10 FGMRES iterations.
-      Number of elastic quadrature points: 11189 and plastic quadrature points: 1195
-      Residual of the non-contact part of the system: 12.6684
-         with a damping parameter alpha = 1
- 
-   Newton iteration 5
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-               Error: 12.6684 -> 0.00951713 in 10 FGMRES iterations.
-      Number of elastic quadrature points: 10987 and plastic quadrature points: 1397
-      Residual of the non-contact part of the system: 13.9042
-         with a damping parameter alpha = 1
-      Number of elastic quadrature points: 11161 and plastic quadrature points: 1223
-      Residual of the non-contact part of the system: 8.7982
-         with a damping parameter alpha = 0.5
- 
-   Newton iteration 6
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-         Error: 8.7982 -> 0.0057014 in 10 FGMRES iterations.
-      Number of elastic quadrature points: 11068 and plastic quadrature points: 1316
-      Residual of the non-contact part of the system: 9.05367
-         with a damping parameter alpha = 1
-      Number of elastic quadrature points: 11160 and plastic quadrature points: 1224
-      Residual of the non-contact part of the system: 4.7814
-         with a damping parameter alpha = 0.5
- 
-   Newton iteration 7
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-         Error: 4.7814 -> 0.00316863 in 10 FGMRES iterations.
-      Number of elastic quadrature points: 11152 and plastic quadrature points: 1232
-      Residual of the non-contact part of the system: 1.71796
-         with a damping parameter alpha = 1
- 
-   Newton iteration 8
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-         Error: 1.71796 -> 0.00104906 in 7 FGMRES iterations.
-      Number of elastic quadrature points: 11144 and plastic quadrature points: 1240
-      Residual of the non-contact part of the system: 0.013944
-         with a damping parameter alpha = 1
- 
-   Newton iteration 9
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-         Error: 0.013944 -> 1.26708e-05 in 11 FGMRES iterations.
-      Number of elastic quadrature points: 11144 and plastic quadrature points: 1240
-      Residual of the non-contact part of the system: 1.38354e-05
-         with a damping parameter alpha = 1
- 
-   Newton iteration 10
-      Updating active set...
-         Size of active set: 9
-      Assembling system... 
-      Solving system... 
-         Error: 1.38354e-05 -> 7.16927e-09 in 14 FGMRES iterations.
-      Number of elastic quadrature points: 11144 and plastic quadrature points: 1240
-      Residual of the non-contact part of the system: 7.16925e-09
-         with a damping parameter alpha = 1
-
-      Number of assembled systems = 10
-      Number of Solver-Iterations = 101
-      Writing graphical output...
-
-
-+---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |      12.1s |            |
-|                                             |            |            |
-| Section                         | no. calls |  wall time | % of total |
-+---------------------------------+-----------+------------+------------+
-| Assembling                      |        10 |      4.07s |        34% |
-| Graphical output                |         1 |     0.282s |       2.3% |
-| Residual and lambda             |        12 |     0.819s |       6.8% |
-| Setup                           |         1 |     0.895s |       7.4% |
-| Setup: distribute DoFs          |         1 |     0.139s |       1.1% |
-| Setup: matrix                   |         1 |    0.0272s |      0.22% |
-| Setup: refine mesh              |         1 |     0.579s |       4.8% |
-| Solve                           |        10 |      5.68s |        47% |
-| Solve: iterate                  |        10 |      3.44s |        28% |
-| Solve: setup preconditioner     |        10 |      2.18s |        18% |
-| Update solution and constraints |        10 |    0.0952s |      0.79% |
-+---------------------------------+-----------+------------+------------+
-
-
-Cycle 2:
-   Number of active cells: 1170
-   Total number of cells: 1337
-   Number of degrees of freedom: 18207
-
-   .
-   .
-   .
- 
+...
 
 Cycle 3:
-   Number of active cells: 2955
-   Total number of cells: 3377
+   Number of active cells: 14652
    Number of degrees of freedom: 52497
-
-   .
-   .
-   .
-
-
-Cycle 4:
-   Number of active cells: 7400
-   Total number of cells: 8457
-   Number of degrees of freedom: 154647
-
-   .
-   .
-   .
-
-
-Cycle 5:
-   Number of active cells: 19279
-   Total number of cells: 22033
-   Number of degrees of freedom: 461106
-
+ 
    Newton iteration 1
       Updating active set...
-         Size of active set: 1672
+         Size of active set: 145
       Assembling system... 
       Solving system... 
-         Error: 3.36904 -> 0.00314153 in 28 FGMRES iterations.
-      Number of elastic quadrature points: 57144 and plastic quadrature points: 1065608
-      Residual of the non-contact part of the system: 0.174753
-         with a damping parameter alpha = 1
+         Error: 296.309 -> 2.45532e-06 in 9 Bicgstab iterations.
+      Accepting Newton solution with residual: 2.45532e-06
+      Active set did not change!
  
-   Newton iteration 2
-      Updating active set...
-         Size of active set: 2335
-      Assembling system... 
-      Solving system... 
-         Error: 2.84616 -> 0.00266184 in 25 FGMRES iterations.
-      Number of elastic quadrature points: 56415 and plastic quadrature points: 1066337
-      Residual of the non-contact part of the system: 0.0845109
-         with a damping parameter alpha = 1
- 
-   Newton iteration 3
-      Updating active set...
-         Size of active set: 2313
-      Assembling system... 
-      Solving system... 
-         Error: 0.0870898 -> 8.60248e-05 in 97 FGMRES iterations.
-      Number of elastic quadrature points: 56802 and plastic quadrature points: 1065950
-      Residual of the non-contact part of the system: 0.0148214
-         with a damping parameter alpha = 1
- 
-   Newton iteration 4
-      Updating active set...
-         Size of active set: 2313
-      Assembling system... 
-      Solving system... 
-         Error: 0.0148214 -> 1.46054e-05 in 72 FGMRES iterations.
-      Number of elastic quadrature points: 56828 and plastic quadrature points: 1065924
-      Residual of the non-contact part of the system: 0.00125281
-         with a damping parameter alpha = 1
- 
-   Newton iteration 5
-      Updating active set...
-         Size of active set: 2313
-      Assembling system... 
-      Solving system... 
-         Error: 0.00125281 -> 1.22184e-06 in 68 FGMRES iterations.
-      Number of elastic quadrature points: 56828 and plastic quadrature points: 1065924
-      Residual of the non-contact part of the system: 4.38909e-06
-         with a damping parameter alpha = 1
-         
-   Newton iteration 6
-      Updating active set...
-         Size of active set: 2313
-      Assembling system... 
-      Solving system... 
-         Error: 4.38909e-06 -> 4.30005e-09 in 189 FGMRES iterations.
-      Number of elastic quadrature points: 56828 and plastic quadrature points: 1065924
-      Residual of the non-contact part of the system: 4.30364e-09
-         with a damping parameter alpha = 1
+...
 
-      Number of assembled systems = 6
-      Number of Solver-Iterations = 479
-      Writing graphical output...
+  Newton iteration 10
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 2.71542e-07 -> 2.69366e-15 in 21 Bicgstab iterations.
+      Residual of the non-contact part of the system: 1.73713e-13
+         with a damping parameter alpha = 1
+      Active set did not change!
+      Writing graphical output... p1adaptive/solution-03.pvtu
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |       445s |            |
+| Total wallclock time elapsed since start    |      38.4s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assembling                      |         6 |       218s |        49% |
-| Graphical output                |         1 |      4.47s |         1% |
-| Residual and lambda             |         6 |      31.9s |       7.2% |
-| Setup                           |         1 |        33s |       7.4% |
-| Setup: distribute DoFs          |         1 |      4.69s |       1.1% |
-| Setup: matrix                   |         1 |      1.29s |      0.29% |
-| Setup: refine mesh              |         1 |      22.4s |         5% |
-| Solve                           |         6 |       154s |        35% |
-| Solve: iterate                  |         6 |       145s |        33% |
-| Solve: setup preconditioner     |         6 |      9.12s |       2.1% |
-| Update solution and constraints |         6 |      1.24s |      0.28% |
+| Assembling                      |        10 |      22.5s |        58% |
+| Graphical output                |         1 |     0.327s |      0.85% |
+| Residual and lambda             |         9 |      3.75s |       9.8% |
+| Setup                           |         1 |      4.83s |        13% |
+| Setup: constraints              |         1 |     0.578s |       1.5% |
+| Setup: distribute DoFs          |         1 |      0.71s |       1.8% |
+| Setup: matrix                   |         1 |     0.111s |      0.29% |
+| Setup: refine mesh              |         1 |      4.83s |        13% |
+| Setup: vectors                  |         1 |   0.00548s |     0.014% |
+| Solve                           |        10 |      5.49s |        14% |
+| Solve: iterate                  |        10 |       3.5s |       9.1% |
+| Solve: setup preconditioner     |        10 |      1.84s |       4.8% |
+| update active set               |        10 |     0.662s |       1.7% |
 +---------------------------------+-----------+------------+------------+
 
+Peak virtual memory used, resident in kB: 566052 105788
+Contact force = 56.794
+
+...
 @endcode
 
-For each adaptive refinement cycle the iterations end if the active set doesn't
-change anymore and if the residual is accurate enough. In the tables
-at the end of each cycle you find information about computing time and the
-number of calls of different parts of the program like Assembling or calculating
-the residual. In the second cycle there are 12 calls for the residual function
-and only 10 calls for Solving or Assembling what means that two damping steps were
-necessary in this cycle.
+The tables at the end of each cycle show information about computing time
+and the number of calls of different parts of the program like assembly or
+calculating the residual, for the most recent mesh refinement cycle. Some of
+the numbers above can be improved by transfering the solution from one mesh to
+the next, an option we have not exercised here.
 
-For this simulation we used the SolutionTranfer class to interpolate the solution
-of the previous cycle to new mesh of the current cycle (for the start solution of cycle 0
-we used a pure elastic solution). That worked out well for the ball but for the
-Chinese symbol as obstacle it turns out that an elastic start solution for each
-cycle results in fewer Newton iterations.  
+In a typical run, you can observe that for every refinement step, the active
+set - the contact points - are iterated out at first. After that the Newton
+method has only to resolve the plasticity. For the finer meshes,
+quadratic convergence can be observed for the last 4 or 5 Newton iterations.
 
-In every refinement step you can observe that the active set - the contact points -
-are iterated out at first. After that the Newton method has only to struggle with the
-plasticity. For the finer meshes there is quadratic convergence not until the
-last 4 or 5 Newton iterations.
+We will not discuss here in all detail what happens with each of the input
+files. Rather, let us just show pictures of the solution (the left half of the
+domain is omitted if cells have zero quadrature points at which the plastic
+inequality is active):
 
 <table align="center">
   <tr>
     <td>
-    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionColorbar.png" alt="">
+    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionColorbar.png">
     </td>
     <td>
-    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionBall2.png" alt="">
+    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionBall2.png" alt="" width="40%">
     </td>
     <td valign="top">
       &nbsp;
     </td>
     <td>
-    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="">
+    <img src="http://www.dealii.org/images/steps/developer/step-42.CellConstitutionLi2.png" alt="" alt="" width="40%">
     </td>
   </tr>
 </table>
@@ -384,35 +169,50 @@ last 4 or 5 Newton iterations.
 The picture shows the adaptive refinement and as well how much a cell is
 plastified during the contact with the ball. Remember that we consider the
 norm of the deviator part of the stress in each quadrature point to
-see if there is elastic or plastic behavior. In the middle of the top - 
-where the mesh is finest - you can see the hollow caused by the ball. The blue
+see if there is elastic or plastic behavior. 
+The blue
 color means that this cell contains only elastic quadrature points in
 contrast to the red cells in which all quadrature points are plastified.
-Since we used trilinear ansatz functions each cell contains eight
-of these points which may or may not be elastic or plastic.
-For further details see Frohne, Heister, Bangerth: Efficient
-Numerical Methods For The Large-Scale, Parallel Solution Of Elastoplastic Contact
-Problems, preprint.
+In the middle of the top surface - 
+where the mesh is finest - a very close look shows the dimple caused by the
+obstacle. This is the result of the <code>move_mesh()</code>
+function. However, because the indentation of the obstacles we consider here
+is so small, it is hard to discern this effect; one could play with displacing
+vertices of the mesh by a multiple of the computed displacement.
+
+Further discussion of results that can be obtained using this program is
+provided in the publication mentioned at the very top of this page.
 
 
 <a name="extensions"></a>
 <h1>Possibilities for extensions</h1>
 
-Extend the program from a static to a quasi-static problem, perhaps by choosing a
-backward-Euler-scheme for the time discretization (for theoretical results see Frohne: FEM-Simulation
-der Umformtechnik metallischer Oberflächen im Mikrokosmos, Ph.D. thesis,
-University of Siegen, Germany, 2011).
+There are, as always, multiple possibilities for extending this program. From
+an algorithmic perspective, this program goes about as far as one can at the
+time of writing, using the best available algorithms for the contact
+inequality, the plastic nonlinearity, and the linear solvers. However, there
+are things one would like to do with this program as far as more realistic
+situations are concerned:
+<ul>
+<li> Extend the program from a static to a quasi-static situation, perhaps by
+choosing a backward-Euler-scheme for the time discretization. Some theoretical
+results can be found in the PhD thesis by J&ouml;rg Frohne, <i>FEM-Simulation
+der Umformtechnik metallischer Oberfl&auml;chen im Mikrokosmos</i>, University
+of Siegen, Germany, 2011.
 
-Like mentioned in step-41 it would be an interesting advance to consider a contact
-problem with friction. In almost every mechanical process friction has a big influence.
-For the modelling we have to take into account tangential stresses at the contact
-surface. Also we have to observe that friction adds another nonlinearity to
-our problem.
+<li> It would also be an interesting advance to consider a contact problem
+with friction. In almost every mechanical process friction has a big
+influence.  To model this situation, we have to take into account tangential
+stresses at the contact surface. Friction also adds another inequality to
+our problem since body and obstacle will typically stick together as long as
+the tangential stress does not exceed a certain limit, beyond which the two
+bodies slide past each other.
 
-If we simulate a frictional contact the next step to consider heat development
-over the contact zone is not too far away. The heat that is caused by friction
-between two bodies rises up the temperature in the deformable body and entails an
-change of some material parameters.
+<li> If we already simulate a frictional contact, the next step to consider
+is heat generation over the contact zone. The heat that is
+caused by friction between two bodies raises the temperature in the
+deformable body and entails an change of some material parameters.
 
-It might be of interest to implement more accurate, problem-adapted error
+<li> It might be of interest to implement more accurate, problem-adapted error
 estimators for contact as well as for the plasticity.
+</ul>
