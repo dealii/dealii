@@ -1994,10 +1994,6 @@ namespace Step42
     TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
     lambda = distributed_lambda;
 
-    TrilinosWrappers::MPI::Vector distributed_resid_vector(locally_owned_dofs, mpi_communicator);
-    constraints_hanging_nodes.distribute(distributed_resid_vector);
-    TrilinosWrappers::MPI::Vector resid_vector_relevant(locally_relevant_dofs, mpi_communicator);
-    resid_vector_relevant = distributed_resid_vector;
 
     DataOut<dim> data_out;
 
@@ -2013,9 +2009,6 @@ namespace Step42
                              DataOut<dim>::type_dof_data, data_component_interpretation);
     data_out.add_data_vector(active_set,
                              std::vector<std::string> (dim, "active_set"),
-                             DataOut<dim>::type_dof_data, data_component_interpretation);
-    data_out.add_data_vector(resid_vector_relevant,
-                             std::vector<std::string> (dim, "residual"),
                              DataOut<dim>::type_dof_data, data_component_interpretation);
 
     Vector<float> subdomain(triangulation.n_active_cells());
