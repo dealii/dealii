@@ -6514,15 +6514,19 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
   write_vtu (f);
 #else
 
-  int myrank, nproc;
+  int myrank, nproc, err;
   MPI_Comm_rank(comm, &myrank);
   MPI_Comm_size(comm, &nproc);
 
   MPI_Info info;
   MPI_Info_create(&info);
   MPI_File fh;
-  MPI_File_open(comm, const_cast<char *>(filename),
+  err = MPI_File_open(comm, const_cast<char *>(filename),
                 MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
+  std::cout << err << std::endl;
+  AssertThrow(err==0, ExcMessage("Unable to open file with MPI_File_open!"));
+  
+
   MPI_File_set_size(fh, 0); // delete the file contents
   // this barrier is necessary, because otherwise others might already
   // write while one core is still setting the size to zero.
