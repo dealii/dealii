@@ -490,9 +490,21 @@ namespace Step42
                   << " x " << ny << std::endl;
     }
 
+    // The following two functions return the value of a given pixel with
+    // coordinates $i,j$, which we identify with the values of a function
+    // defined at positions <code>i*hx, j*hy</code>, and at arbitrary
+    // coordinates $x,y$ where we do a bilinear interpolation between
+    // point values returned by the first of the two functions. In the
+    // second function, for each $x,y$, we first compute the (integer)
+    // location of the nearest pixel coordinate to the bottom left of
+    // $x,y$, and then compute the coordinates $\xi,\eta$ within this
+    // pixel. We truncate both kinds of variables from both below
+    // and above to avoid problems when evaluating the function outside
+    // of its defined range as may happen due to roundoff errors.
     template <int dim>
     double
-    BitmapFile<dim>::get_pixel_value(const int i, const int j) const
+    BitmapFile<dim>::get_pixel_value(const int i,
+                                     const int j) const
     {
       assert(i >= 0 && i < nx);
       assert(j >= 0 && j < ny);
@@ -501,53 +513,22 @@ namespace Step42
 
     template <int dim>
     double
-    BitmapFile<dim>::get_value(const double x, const double y) const
+    BitmapFile<dim>::get_value(const double x,
+                               const double y) const
     {
       const int ix = std::min(std::max((int) (x / hx), 0), nx - 2);
       const int iy = std::min(std::max((int) (y / hy), 0), ny - 2);
 
-      FullMatrix<double> H(4, 4);
-      Vector<double> X(4);
-      Vector<double> b(4);
+      const double xi  = std::min(std::max((x-ix*hx)/hx, 1.), 0.);
+      const double eta = std::min(std::max((y-iy*hy)/hy, 1.), 0.);
 
-      double xx, yy;
-
-      xx = ix * hx;
-      yy = iy * hy;
-      H(0, 0) = xx;
-      H(0, 1) = yy;
-      H(0, 2) = xx * yy;
-      H(0, 3) = 1.0;
-      b(0) = get_pixel_value(ix, iy);
-
-      xx = (ix + 1) * hx;
-      yy = iy * hy;
-      H(1, 0) = xx;
-      H(1, 1) = yy;
-      H(1, 2) = xx * yy;
-      H(1, 3) = 1.0;
-      b(1) = get_pixel_value(ix + 1, iy);
-
-      xx = (ix + 1) * hx;
-      yy = (iy + 1) * hy;
-      H(2, 0) = xx;
-      H(2, 1) = yy;
-      H(2, 2) = xx * yy;
-      H(2, 3) = 1.0;
-      b(2) = get_pixel_value(ix + 1, iy + 1);
-
-      xx = ix * hx;
-      yy = (iy + 1) * hy;
-      H(3, 0) = xx;
-      H(3, 1) = yy;
-      H(3, 2) = xx * yy;
-      H(3, 3) = 1.0;
-      b(3) = get_pixel_value(ix, iy + 1);
-
-      H.gauss_jordan();
-      H.vmult(X, b);
-
-      return (X(0) * x + X(1) * y + X(2) * x * y + X(3));
+      return ((1-xi)*(1-eta)*get_pixel_value(ix,iy)
+              +
+              xi*(1-eta)*get_pixel_value(ix+1,iy)
+              +
+              (1-xi)*eta*get_pixel_value(ix,iy+1)
+              +
+              xi*eta*get_pixel_value(ix+1,iy+1));
     }
 
     // Finally, this is the class that actually uses the class above. It
@@ -668,7 +649,7 @@ namespace Step42
     void solve_newton_system ();
     void solve_newton ();
     void refine_grid ();
-    void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
+    void move_mesh (const TrilinosWrappers::MPI::Vector &displacement) const;
     void output_results (const std::string &filename_base);
     void output_contact_force () const;
 
@@ -1079,17 +1060,17 @@ namespace Step42
   void
   PlasticityContactProblem<dim>::compute_dirichlet_constraints ()
   {
-      constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
-      constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
+    constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
+    constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
 
-      if (base_mesh == "box")
+    if (base_mesh == "box")
       {
         // interpolate all components of the solution
         VectorTools::interpolate_boundary_values(dof_handler,
-            6,
-            EquationData::BoundaryValues<dim>(),
-            constraints_dirichlet_and_hanging_nodes,
-            ComponentMask());
+                                                 6,
+                                                 EquationData::BoundaryValues<dim>(),
+                                                 constraints_dirichlet_and_hanging_nodes,
+                                                 ComponentMask());
 
         // interpolate x- and y-components of the
         // solution (this is a bit mask, so apply
@@ -1097,20 +1078,20 @@ namespace Step42
         const FEValuesExtractors::Scalar x_displacement(0);
         const FEValuesExtractors::Scalar y_displacement(1);
         VectorTools::interpolate_boundary_values(dof_handler,
-            8,
-            EquationData::BoundaryValues<dim>(),
-            constraints_dirichlet_and_hanging_nodes,
-            (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
+                                                 8,
+                                                 EquationData::BoundaryValues<dim>(),
+                                                 constraints_dirichlet_and_hanging_nodes,
+                                                 (fe.component_mask(x_displacement) | fe.component_mask(y_displacement)));
       }
-      else
-        VectorTools::interpolate_boundary_values(dof_handler,
-            0,
-            EquationData::BoundaryValues<dim>(),
-            constraints_dirichlet_and_hanging_nodes,
-            ComponentMask());
+    else
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               0,
+                                               EquationData::BoundaryValues<dim>(),
+                                               constraints_dirichlet_and_hanging_nodes,
+                                               ComponentMask());
 
-      constraints_dirichlet_and_hanging_nodes.close();
-    }
+    constraints_dirichlet_and_hanging_nodes.close();
+  }
 
 
 
@@ -1218,9 +1199,6 @@ namespace Step42
 
     all_constraints.reinit(locally_relevant_dofs);
     active_set.clear();
-    IndexSet active_set_locally_owned;
-    active_set_locally_owned.set_size(locally_owned_dofs.size());
-
 
     // The second part is a loop over all cells in which we look at each
     // point where a degree of freedom is defined whether the active set
@@ -1299,12 +1277,7 @@ namespace Step42
                           all_constraints.set_inhomogeneity(index_z, undeformed_gap);
                           distributed_solution(index_z) = undeformed_gap;
 
-                          if (locally_owned_dofs.is_element(index_z))
-                            {
-                              active_set_locally_owned.add_index(index_z);
-                              if (locally_relevant_dofs.is_element(index_z))
-                                active_set.add_index(index_z);
-                            }
+                          active_set.add_index(index_z);
                         }
                     }
                 }
@@ -1315,7 +1288,12 @@ namespace Step42
     // written by other processors. We then merge the Dirichlet constraints and
     // those from hanging nodes into the ConstraintMatrix object that already
     // contains the active set. We finish the function by outputting the total
-    // number of actively constrained degrees of freedom:
+    // number of actively constrained degrees of freedom for which we sum over
+    // the number of actively constrained degrees of freedom owned by each
+    // of the processors. This number of locally owned constrained degrees of
+    // freedom is of course the number of elements of the intersection of the
+    // active set and the set of locally owned degrees of freedom, which
+    // we can get by using <code>operator&</code> on two IndexSets:
     distributed_solution.compress(VectorOperation::insert);
     solution = distributed_solution;
 
@@ -1323,9 +1301,9 @@ namespace Step42
     all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
 
     pcout << "         Size of active set: "
-          << Utilities::MPI::sum(active_set_locally_owned.n_elements(),
+          << Utilities::MPI::sum((active_set & locally_owned_dofs).n_elements(),
                                  mpi_communicator)
-        << std::endl;
+          << std::endl;
   }
 
 
@@ -1361,7 +1339,7 @@ namespace Step42
 
     const EquationData::BoundaryForce<dim> boundary_force;
     std::vector<Vector<double> >           boundary_force_values(n_face_q_points,
-                                                       Vector<double>(dim));
+        Vector<double>(dim));
 
     FullMatrix<double>                     cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>                         cell_rhs(dofs_per_cell);
@@ -1398,7 +1376,7 @@ namespace Step42
                   // Having computed the stress-strain tensor and its linearization,
                   // we can now put together the parts of the matrix and right hand side.
                   // In both, we need the linearized stress-strain tensor times the
-                  // symmetric gradient of $\varphi_i$, $I_\Pi\varepsilon(\varphi_i)$,
+                  // symmetric gradient of $\varphi_i$, i.e. the term $I_\Pi\varepsilon(\varphi_i)$,
                   // so we introduce an abbreviation of this term. Recall that the
                   // matrix corresponds to the bilinear form
                   // $A_{ij}=(I_\Pi\varepsilon(\varphi_i),\varepsilon(\varphi_j))$ in the
@@ -1414,7 +1392,7 @@ namespace Step42
                   // boundary forces, should there be any.
                   const SymmetricTensor<2, dim>
                   stress_phi_i = stress_strain_tensor_linearized
-                                  * fe_values[displacement].symmetric_gradient(i, q_point);
+                                 * fe_values[displacement].symmetric_gradient(i, q_point);
 
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     cell_matrix(i, j) += (stress_phi_i
@@ -1431,25 +1409,25 @@ namespace Step42
             }
 
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face(face)->at_boundary()
-                  &&
-                  cell->face(face)->boundary_indicator() == 1)
-                {
-                  fe_values_face.reinit(cell, face);
+            if (cell->face(face)->at_boundary()
+                &&
+                cell->face(face)->boundary_indicator() == 1)
+              {
+                fe_values_face.reinit(cell, face);
 
-                  boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
-                                                   boundary_force_values);
+                boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
+                                                 boundary_force_values);
 
-                  for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-                    {
-                      Tensor<1, dim> rhs_values;
-                      rhs_values[2] = boundary_force_values[q_point][2];
-                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                        cell_rhs(i) += (fe_values_face[displacement].value(i, q_point)
-                                        * rhs_values
-                                        * fe_values_face.JxW(q_point));
-                    }
-                }
+                for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+                  {
+                    Tensor<1, dim> rhs_values;
+                    rhs_values[2] = boundary_force_values[q_point][2];
+                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                      cell_rhs(i) += (fe_values_face[displacement].value(i, q_point)
+                                      * rhs_values
+                                      * fe_values_face.JxW(q_point));
+                  }
+              }
 
           cell->get_dof_indices(local_dof_indices);
           all_constraints.distribute_local_to_global(cell_matrix, cell_rhs,
@@ -1512,13 +1490,16 @@ namespace Step42
 
     const EquationData::BoundaryForce<dim> boundary_force;
     std::vector<Vector<double> >           boundary_force_values(n_face_q_points,
-                                                       Vector<double>(dim));
+        Vector<double>(dim));
 
     Vector<double> cell_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const FEValuesExtractors::Vector displacement(0);
+
+    newton_rhs                            = 0;
+    newton_rhs_uncondensed                = 0;
 
     fraction_of_plastic_q_points_per_cell = 0;
 
@@ -1561,24 +1542,24 @@ namespace Step42
             }
 
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face(face)->at_boundary()
-                  && cell->face(face)->boundary_indicator() == 1)
-                {
-                  fe_values_face.reinit(cell, face);
+            if (cell->face(face)->at_boundary()
+                && cell->face(face)->boundary_indicator() == 1)
+              {
+                fe_values_face.reinit(cell, face);
 
-                  boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
-                                                   boundary_force_values);
+                boundary_force.vector_value_list(fe_values_face.get_quadrature_points(),
+                                                 boundary_force_values);
 
-                  for (unsigned int q_point = 0; q_point < n_face_q_points;
-                       ++q_point)
-                    {
-                      Tensor<1, dim> rhs_values;
-                      rhs_values[2] = boundary_force_values[q_point][2];
-                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                        cell_rhs(i) += (fe_values_face[displacement].value(i, q_point) * rhs_values
-                                        * fe_values_face.JxW(q_point));
-                    }
-                }
+                for (unsigned int q_point = 0; q_point < n_face_q_points;
+                     ++q_point)
+                  {
+                    Tensor<1, dim> rhs_values;
+                    rhs_values[2] = boundary_force_values[q_point][2];
+                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                      cell_rhs(i) += (fe_values_face[displacement].value(i, q_point) * rhs_values
+                                      * fe_values_face.JxW(q_point));
+                  }
+              }
 
           cell->get_dof_indices(local_dof_indices);
           constraints_dirichlet_and_hanging_nodes.distribute_local_to_global(cell_rhs,
@@ -1662,24 +1643,16 @@ namespace Step42
     {
       TimerOutput::Scope t(computing_timer, "Solve: iterate");
 
-      PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
       TrilinosWrappers::MPI::Vector tmp(locally_owned_dofs, mpi_communicator);
-      // 1e-4 seems to be the fasted option altogether, but to get more
-      // reproducible parallel benchmark results, we use a small residual:
-      double relative_accuracy = 1e-8;
-      if (output_dir.compare("its/") == 0)
-        relative_accuracy = 1e-4;
 
-      const double solver_tolerance = relative_accuracy
-                                      * newton_matrix.residual(tmp, distributed_solution,
-                                          newton_rhs);
+      const double relative_accuracy = 1e-8;
+      const double solver_tolerance  = relative_accuracy
+                                       * newton_matrix.residual(tmp, distributed_solution,
+                                                                newton_rhs);
 
       SolverControl solver_control(newton_matrix.m(),
                                    solver_tolerance);
-      SolverBicgstab<TrilinosWrappers::MPI::Vector> solver(solver_control,
-                                                           mem/*,
-               SolverFGMRES<TrilinosWrappers::MPI::Vector>::
-               AdditionalData(30, true)*/);
+      SolverBicgstab<TrilinosWrappers::MPI::Vector> solver(solver_control);
       solver.solve(newton_matrix, distributed_solution,
                    newton_rhs, preconditioner);
 
@@ -1694,52 +1667,54 @@ namespace Step42
     solution = distributed_solution;
   }
 
-// @sect4{PlasticityContactProblem::solve_newton}
 
-// In this function the damped Newton method is implemented.
-// That means two nested loops: the outer loop for the newton
-// iteration and the inner loop for the damping steps which
-// will be used only if necessary. To obtain a good and reasonable
-// starting value we solve an elastic problem in very first step (j=1).
+  // @sect4{PlasticityContactProblem::solve_newton}
+
+  // This is, finally, the function that implements the damped Newton method
+  // on the current mesh. There are two nested loops: the outer loop for the Newton
+  // iteration and the inner loop for the line search which
+  // will be used only if necessary. To obtain a good and reasonable
+  // starting value we solve an elastic problem in very first Newton step on each
+  // mesh (or only on the first mesh if we transfer solutions between meshes). We
+  // do so by setting the yield stress to an unreasonably large value in these
+  // iterations and then setting it back to the correct value in subsequent
+  // iterations.
+  //
+  // Other than this, the top part of this function should be reasonably
+  // obvious:
   template <int dim>
   void
   PlasticityContactProblem<dim>::solve_newton ()
   {
-    TimerOutput::Scope t(computing_timer, "solve newton setup");
-
-    double resid = 0;
-    double resid_old = 100000;
     TrilinosWrappers::MPI::Vector old_solution(locally_owned_dofs, mpi_communicator);
-    TrilinosWrappers::MPI::Vector res(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector residual(locally_owned_dofs, mpi_communicator);
     TrilinosWrappers::MPI::Vector tmp_vector(locally_owned_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector locally_relevant_tmp_vector(locally_relevant_dofs, mpi_communicator);
+    TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
 
-    double sigma_hlp = sigma_0;
+    double residual_norm, previous_residual_norm;
+
+    const double correct_sigma = sigma_0;
 
     IndexSet old_active_set(active_set);
 
-    t.stop(); // stop newton setup timer
-
-    unsigned int j = 1;
-    unsigned int number_assemble_system = 0;
-    for (; j <= 100; j++)
+    for (unsigned int newton_step = 1; newton_step <= 100; ++newton_step)
       {
-        if (transfer_solution)
-          {
-            if (transfer_solution && j == 1 && current_refinement_cycle == 0)
-              constitutive_law.set_sigma_0(1e+10);
-            else if (transfer_solution && (j == 2 || current_refinement_cycle > 0))
-              constitutive_law.set_sigma_0(sigma_hlp);
-          }
-        else
-          {
-            if (j == 1)
-              constitutive_law.set_sigma_0(1e+10);
-            else
-              constitutive_law.set_sigma_0(sigma_hlp);
-          }
+        if (newton_step == 1
+            &&
+            ((transfer_solution && current_refinement_cycle == 0)
+             ||
+             !transfer_solution))
+          constitutive_law.set_sigma_0(1e+10);
+        else if (newton_step == 2
+                 ||
+                 current_refinement_cycle > 0
+                 ||
+                 !transfer_solution)
+          constitutive_law.set_sigma_0(correct_sigma);
 
         pcout << " " << std::endl;
-        pcout << "   Newton iteration " << j << std::endl;
+        pcout << "   Newton iteration " << newton_step << std::endl;
         pcout << "      Updating active set..." << std::endl;
 
         {
@@ -1750,90 +1725,128 @@ namespace Step42
         pcout << "      Assembling system... " << std::endl;
         newton_matrix = 0;
         newton_rhs = 0;
-        assemble_newton_system(solution); //compute Newton-Matrix
-
-        number_assemble_system += 1;
+        assemble_newton_system(solution);
 
         pcout << "      Solving system... " << std::endl;
         solve_newton_system();
 
-        TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
-        distributed_solution = solution;
-
+        // It gets a bit more hairy after we have computed the
+        // trial solution $\tilde{\mathbf u}$ of the current Newton step.
         // We handle a highly nonlinear problem so we have to damp
-        // the Newtons method. We refer that we iterate the new solution
-        // in each Newton step and not only the solution update.
-        // Since the solution set is a convex set and not a space we
-        // compute for the damping a linear combination of the
-        // previous and the current solution to guarantee that the
+        // Newton's method using a line search. To understand how we do this,
+        // recall that in our formulation, we compute a trial solution
+        // in each Newton step and not the update between old and new solution.
+        // Since the solution set is a convex set, we will use a line
+        // search that tries linear combinations of the
+        // previous and the trial solution to guarantee that the
         // damped solution is in our solution set again.
-        // At most we apply 10 damping steps.
-        bool damped = false;
-        tmp_vector = old_solution;
-
-        for (unsigned int i = 0; (i < 5) && (!damped); i++)
+        // At most we apply 5 damping steps.
+        //
+        // There are exceptions to when we use a line search. First,
+        // if this is the first Newton step on any mesh, then we don't have
+        // any point to compare the residual to, so we always accept a full
+        // step. Likewise, if this is the second Newton step on the first mesh (or
+        // the second on any mesh if we don't transfer solutions from
+        // mesh to mesh), then we have computed the first of these steps using
+        // just an elastic model (see how we set the yield stress sigma to
+        // an unreasonably large value above). In this case, the first Newton
+        // solution was a purely elastic one, the second one a plastic one,
+        // and any linear combination would not necessarily be expected to
+        // lie in the feasible set -- so we just accept the solution we just
+        // got.
+        //
+        // In either of these two cases, we bypass the line search and just
+        // update residual and other vectors as necessary.
+        if ((newton_step==1)
+            ||
+            (transfer_solution && newton_step == 2 && current_refinement_cycle == 0)
+            ||
+            (!transfer_solution && newton_step == 2))
           {
-            const double alpha = std::pow(0.5, static_cast<double>(i));
-            old_solution = tmp_vector;
-            old_solution.sadd(1 - alpha, alpha, distributed_solution);
-            old_solution.compress(VectorOperation::add);
-
-            TimerOutput::Scope t(computing_timer, "Residual and lambda");
-
-            newton_rhs = 0;
-            newton_rhs_uncondensed = 0;
-
-            solution = old_solution;
             compute_nonlinear_residual(solution);
-            res = newton_rhs;
+            old_solution = solution;
 
-            const unsigned int start_res = (res.local_range().first),
-                               end_res = (res.local_range().second);
+            residual = newton_rhs;
+            const unsigned int start_res = (residual.local_range().first),
+                               end_res = (residual.local_range().second);
             for (unsigned int n = start_res; n < end_res; ++n)
               if (all_constraints.is_inhomogeneously_constrained(n))
-                res(n) = 0;
+                residual(n) = 0;
 
-            res.compress(VectorOperation::insert);
+            residual.compress(VectorOperation::insert);
 
-            resid = res.l2_norm();
+            residual_norm = residual.l2_norm();
 
-            if (resid < resid_old)
-              damped = true;
+            pcout << "      Accepting Newton solution with residual: "
+                  << residual_norm << std::endl;
+          }
+        else
+          {
+            for (unsigned int i = 0; i < 5; i++)
+              {
+                distributed_solution = solution;
 
-            pcout << "      Residual of the non-contact part of the system: "
-                  << resid << std::endl
-                  << "         with a damping parameter alpha = " << alpha
-                  << std::endl;
+                const double alpha = std::pow(0.5, static_cast<double>(i));
+                tmp_vector = old_solution;
+                tmp_vector.sadd(1 - alpha, alpha, distributed_solution);
+                tmp_vector.compress(VectorOperation::add);
 
-            // The previous iteration of step 0 is the solution of an elastic problem.
-            // So a linear combination of a plastic and an elastic solution makes no sense
-            // since the elastic solution is not in the convex set of the plastic solution.
-            if (!transfer_solution && j == 2)
-              break;
-            if (transfer_solution && j == 2 && current_refinement_cycle == 0)
-              break;
+                TimerOutput::Scope t(computing_timer, "Residual and lambda");
+
+                locally_relevant_tmp_vector = tmp_vector;
+                compute_nonlinear_residual(locally_relevant_tmp_vector);
+                residual = newton_rhs;
+
+                const unsigned int start_res = (residual.local_range().first),
+                                   end_res = (residual.local_range().second);
+                for (unsigned int n = start_res; n < end_res; ++n)
+                  if (all_constraints.is_inhomogeneously_constrained(n))
+                    residual(n) = 0;
+
+                residual.compress(VectorOperation::insert);
+
+                residual_norm = residual.l2_norm();
+
+                pcout << "      Residual of the non-contact part of the system: "
+                      << residual_norm << std::endl
+                      << "         with a damping parameter alpha = " << alpha
+                      << std::endl;
+
+                if (residual_norm < previous_residual_norm)
+                  break;
+              }
+
+            old_solution = solution;
+            solution = tmp_vector;
           }
 
-        resid_old = resid;
+        old_active_set = active_set;
+        previous_residual_norm = residual_norm;
 
+
+        // The final step is to check for convergence. If the active set
+        // has not changed across all processors and the residual is
+        // less than a threshold of $10^{-10}$, then we terminate
+        // the iteration on the current mesh:
         if (Utilities::MPI::sum((active_set == old_active_set) ? 0 : 1,
                                 mpi_communicator) == 0)
           {
             pcout << "      Active set did not change!" << std::endl;
-            if (resid < 1e-10)
+            if (residual_norm < 1e-10)
               break;
           }
-
-        old_active_set = active_set;
       }
-
-    pcout << std::endl
-          << "      Number of assembled systems = "
-          << number_assemble_system << std::endl;
   }
 
-// @sect3{The <code>refine_grid</code> function}
+  // @sect4{PlasticityContactProblem::refine_grid}
 
+  // If you've made it this far into the deal.II tutorial, the following
+  // function refining the mesh should not pose any challenges to you
+  // any more. It refines the mesh, either globally or using the Kelly
+  // error estimator, and if so asked also transfers the solution from
+  // the previous to the next mesh. In the latter case, we also need
+  // to compute the active set and other quantities again, for which we
+  // need the information computed by <code>compute_nonlinear_residual()</code>.
   template <int dim>
   void
   PlasticityContactProblem<dim>::refine_grid ()
@@ -1855,8 +1868,10 @@ namespace Step42
                                            solution,
                                            estimated_error_per_cell);
 
-        parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
-          triangulation, estimated_error_per_cell, 0.3, 0.03);
+        parallel::distributed::GridRefinement
+        ::refine_and_coarsen_fixed_number(triangulation,
+                                          estimated_error_per_cell,
+                                          0.3, 0.03);
       }
 
     triangulation.prepare_coarsening_and_refinement();
@@ -1880,41 +1895,62 @@ namespace Step42
       }
   }
 
-// @sect3{The <code>move_mesh</code> function}
 
+  // @sect4{PlasticityContactProblem::move_mesh}
+
+  // The remaining three functions before we get to <code>run()</code>
+  // have to do with generating output. The following one is an attempt
+  // at showing the deformed body in its deformed configuration. To this
+  // end, this function takes a displacement vector field and moves every
+  // vertex of the (local part) of the mesh by the previously computed
+  // displacement. We will call this function with the current
+  // displacement field before we generate graphical output, and we will
+  // call it again after generating graphical output with the negative
+  // displacement field to undo the changes to the mesh so made.
+  //
+  // The function itself is pretty straightforward. All we have to do
+  // is keep track which vertices we have already touched, as we
+  // encounter the same vertices multiple times as we loop over cells.
   template <int dim>
   void
   PlasticityContactProblem<dim>::
-  move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const
+  move_mesh (const TrilinosWrappers::MPI::Vector &displacement) const
   {
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
 
     for (typename DoFHandler<dim>::active_cell_iterator cell =
-           dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
+           dof_handler.begin_active();
+         cell != dof_handler.end(); ++cell)
       if (cell->is_locally_owned())
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-             ++v)
-          {
-            if (vertex_touched[cell->vertex_index(v)] == false)
-              {
-                vertex_touched[cell->vertex_index(v)] = true;
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+          if (vertex_touched[cell->vertex_index(v)] == false)
+            {
+              vertex_touched[cell->vertex_index(v)] = true;
 
-                Point<dim> vertex_displacement;
-                for (unsigned int d = 0; d < dim; ++d)
-                  {
-                    if (_complete_displacement(cell->vertex_dof_index(v, d))
-                        != 0)
-                      vertex_displacement[d] = _complete_displacement(
-                                                 cell->vertex_dof_index(v, d));
-                  }
+              Point<dim> vertex_displacement;
+              for (unsigned int d = 0; d < dim; ++d)
+                vertex_displacement[d] = displacement(cell->vertex_dof_index(v, d));
 
-                cell->vertex(v) += vertex_displacement;
-              }
-          }
+              cell->vertex(v) += vertex_displacement;
+            }
   }
 
-// @sect4{PlasticityContactProblem::output_results}
 
+
+  // @sect4{PlasticityContactProblem::output_results}
+
+  // Next is the function we use to actually generate graphical output. The
+  // function is a bit tedious, but not actually particularly complicated.
+  // It moves the mesh at the top (and moves it back at the end), then
+  // computes the contact forces along the contact surface. We can do
+  // so (as shown in the accompanying paper) by taking the untreated
+  // residual vector and identifying which degrees of freedom
+  // correspond to those with contact by asking whether they have an
+  // inhomogeneous constraints associated with them. As always, we need
+  // to be mindful that we can only write into completely distributed
+  // vectors (i.e., vectors without ghost elements) but that when we
+  // want to generate output, we need vectors that do indeed have
+  // ghost entries for all locally relevant degrees of freedom.
   template <int dim>
   void
   PlasticityContactProblem<dim>::output_results (const std::string &filename_base)
@@ -1926,38 +1962,34 @@ namespace Step42
     move_mesh(solution);
 
     // Calculation of the contact forces
-    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
     TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
     const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
                        end_res = (newton_rhs_uncondensed.local_range().second);
     for (unsigned int n = start_res; n < end_res; ++n)
       if (all_constraints.is_inhomogeneously_constrained(n))
-        distributed_lambda(n) = newton_rhs_uncondensed(n) / diag_mass_matrix_vector(n);
+        distributed_lambda(n) = newton_rhs_uncondensed(n) /
+                                diag_mass_matrix_vector(n);
     distributed_lambda.compress(VectorOperation::insert);
     constraints_hanging_nodes.distribute(distributed_lambda);
+
+    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
     lambda = distributed_lambda;
-    TrilinosWrappers::MPI::Vector resid_vector_relevant(locally_relevant_dofs, mpi_communicator);
-    TrilinosWrappers::MPI::Vector distributed_resid_vector(locally_owned_dofs, mpi_communicator);
-    constraints_hanging_nodes.distribute(distributed_resid_vector);
-    resid_vector_relevant = distributed_resid_vector;
+
 
     DataOut<dim> data_out;
 
     data_out.attach_dof_handler(dof_handler);
 
-    const std::vector<DataComponentInterpretation::DataComponentInterpretation> data_component_interpretation(
-      dim, DataComponentInterpretation::component_is_part_of_vector);
+    const std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    data_component_interpretation(dim, DataComponentInterpretation::component_is_part_of_vector);
     data_out.add_data_vector(solution,
-                             std::vector < std::string > (dim, "Displacement"),
+                             std::vector<std::string> (dim, "displacement"),
                              DataOut<dim>::type_dof_data, data_component_interpretation);
     data_out.add_data_vector(lambda,
-                             std::vector < std::string > (dim, "ContactForce"),
+                             std::vector<std::string> (dim, "contact_force"),
                              DataOut<dim>::type_dof_data, data_component_interpretation);
     data_out.add_data_vector(active_set,
-                             std::vector < std::string > (dim, "ActiveSet"),
-                             DataOut<dim>::type_dof_data, data_component_interpretation);
-    data_out.add_data_vector(resid_vector_relevant,
-                             std::vector < std::string > (dim, "Residual"),
+                             std::vector<std::string> (dim, "active_set"),
                              DataOut<dim>::type_dof_data, data_component_interpretation);
 
     Vector<float> subdomain(triangulation.n_active_cells());
@@ -1965,10 +1997,20 @@ namespace Step42
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector(subdomain, "subdomain");
 
-    data_out.add_data_vector(fraction_of_plastic_q_points_per_cell, "FractionOfPlasticQPoints");
+    data_out.add_data_vector(fraction_of_plastic_q_points_per_cell,
+                             "fraction_of_plastic_q_points");
 
     data_out.build_patches();
 
+    // In the remainder of the function, we generate one VTU file on
+    // every processor, indexed by the subdomain id of this processor.
+    // On the first processor, we then also create a <code>.pvtu</code>
+    // file that indexes <i>all</i> of the VTU files so that the entire
+    // set of output files can be read at once. These <code>.pvtu</code>
+    // are used by Paraview to describe an entire parallel computation's
+    // output files. We then do the same again for the competitor of
+    // Paraview, the Visit visualization program, by creating a matching
+    // <code>.visit</code> file.
     const std::string filename =
       (output_dir + filename_base + "-"
        + Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
@@ -1979,14 +2021,18 @@ namespace Step42
 
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
-        std::vector < std::string > filenames;
+        std::vector<std::string> filenames;
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator); ++i)
-          filenames.push_back(
-            filename_base + "-" + Utilities::int_to_string(i, 4) + ".vtu");
+          filenames.push_back(filename_base + "-" +
+                              Utilities::int_to_string(i, 4) +
+                              ".vtu");
 
-        std::ofstream master_output((output_dir + filename_base + ".pvtu").c_str());
-        data_out.write_pvtu_record(master_output, filenames);
+        std::ofstream pvtu_master_output((output_dir + filename_base + ".pvtu").c_str());
+        data_out.write_pvtu_record(pvtu_master_output, filenames);
+
+        std::ofstream visit_master_output((output_dir + filename_base + ".visit").c_str());
+        data_out.write_visit_record(visit_master_output, filenames);
       }
 
     TrilinosWrappers::MPI::Vector tmp(solution);
@@ -1994,42 +2040,25 @@ namespace Step42
     move_mesh(tmp);
   }
 
-// @sect4{PlasticityContactProblem::output_contact_force}
 
-// This function provides the contact force by calculating
-// an integral over the contact pressure in z-directions
-// over the contact area. For this purpose we set the contact
-// pressure lambda to 0 for all inactive dofs. For all
-// active dofs we lambda contains the quotient of the nonlinear
-// residual (newton_rhs_uncondensed) and corresponding diagonal entry
-// of the mass matrix (diag_mass_matrix_vector). Because it is
-// not unlikely that hanging nodes shows up in the contact area
-// it is important to apply contraints_hanging_nodes.distribute
-// to the distributed_lambda vector.
-// To calculate the contact pressure in a certain point in the
-// contact area, we apply the Functions::FEFieldFunction.
-// In parallel this is a little tricky because we have to find the
-// process with the right cell which contains this point. If
-// a processor does not own the cell with the point we have to
-// catch these cases.
+  // @sect4{PlasticityContactProblem::output_contact_force}
+
+  // This last auxiliary function computes the contact force by
+  // calculating an integral over the contact pressure in z-direction
+  // over the contact area. For this purpose we set the contact
+  // pressure lambda to 0 for all inactive dofs (whether a degree
+  // of freedom is part of the contact is determined just as
+  // we did in the previous function). For all
+  // active dofs, lambda contains the quotient of the nonlinear
+  // residual (newton_rhs_uncondensed) and corresponding diagonal entry
+  // of the mass matrix (diag_mass_matrix_vector). Because it is
+  // not unlikely that hanging nodes show up in the contact area
+  // it is important to apply contraints_hanging_nodes.distribute
+  // to the distributed_lambda vector.
   template <int dim>
   void
   PlasticityContactProblem<dim>::output_contact_force () const
   {
-    Functions::FEFieldFunction<dim, DoFHandler<dim>,
-              TrilinosWrappers::MPI::Vector> solution_function(dof_handler,
-                                                               solution);
-    std::cout.precision(10);
-
-    Vector<double> solution_p1(dim);
-    std::vector<Tensor<1, dim> > solution_gradient_p1(dim);
-
-    // Here we calculate the contact pressure as a vector lambda.
-    // If a dof is element of the active set lambda contains the
-    // nonlinear residual this dof divided by the according entry
-    // of the mass matrix. In all other dofs lambda will be set to
-    // zero.
-    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
     TrilinosWrappers::MPI::Vector distributed_lambda(locally_owned_dofs, mpi_communicator);
     const unsigned int start_res = (newton_rhs_uncondensed.local_range().first),
                        end_res = (newton_rhs_uncondensed.local_range().second);
@@ -2040,75 +2069,43 @@ namespace Step42
         distributed_lambda(n) = 0;
     distributed_lambda.compress(VectorOperation::insert);
     constraints_hanging_nodes.distribute(distributed_lambda);
+
+    TrilinosWrappers::MPI::Vector lambda(locally_relevant_dofs, mpi_communicator);
     lambda = distributed_lambda;
-    Functions::FEFieldFunction<dim, DoFHandler<dim>,
-              TrilinosWrappers::MPI::Vector> lambda_function(dof_handler, lambda);
 
-    // Here we try to find the MPI-process which owns the cell
-    // with the point_of_interest. If it is the wrong MPI-process
-    // we catch this case and set point_found to false.
-    const Point<dim> point_of_interest(0.49, 0.5001, 1.0);
-    Vector<double> contact_pressure_in_point(dim);
-    bool point_found = true;
-
-    MPI_Barrier(MPI_COMM_WORLD);
-    try
-      {
-        lambda_function.vector_value(point_of_interest,
-                                     contact_pressure_in_point);
-      }
-    catch (const typename Functions::FEFieldFunction<dim, DoFHandler<dim>,
-             TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere &)
-      {
-        point_found = false;
-      }
-
-    if (point_found == true)
-      {
-        std::cout << "PoI contact pressure: " << contact_pressure_in_point(2)
-                  << std::endl;
-      }
-
-    // To obtain the contact force we have to compute an integral of the contact pressure
-    // in z-direction over the whole contact area. To be accurate enough we use the
-    // Gaussian quadrature rule with fe.degree + 1.
     double contact_force = 0.0;
-    {
-      QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
-      FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
-                                       update_values | update_quadrature_points | update_JxW_values);
+    QGauss<dim-1> face_quadrature_formula(fe.degree + 1);
+    FEFaceValues<dim> fe_values_face(fe, face_quadrature_formula,
+                                     update_values | update_JxW_values);
 
-      const unsigned int n_face_q_points = face_quadrature_formula.size();
+    const unsigned int n_face_q_points = face_quadrature_formula.size();
 
-      const FEValuesExtractors::Vector displacement(0);
+    const FEValuesExtractors::Vector displacement(0);
 
-      typename DoFHandler<dim>::active_cell_iterator cell =
-        dof_handler.begin_active(), endc = dof_handler.end();
-      for (; cell != endc; ++cell)
-        if (cell->is_locally_owned())
-          for (unsigned int face = 0;
-               face < GeometryInfo<dim>::faces_per_cell; ++face)
-            if (cell->face(face)->at_boundary()
-                && cell->face(face)->boundary_indicator() == 1)
-              {
-                fe_values_face.reinit(cell, face);
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+    for (; cell != endc; ++cell)
+      if (cell->is_locally_owned())
+        for (unsigned int face = 0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+          if (cell->face(face)->at_boundary()
+              &&
+              cell->face(face)->boundary_indicator() == 1)
+            {
+              fe_values_face.reinit(cell, face);
 
-                std::vector<Tensor<1, dim> > lambda_values(n_face_q_points);
-                fe_values_face[displacement].get_function_values(lambda,
-                                                                 lambda_values);
+              std::vector<Tensor<1, dim> > lambda_values(n_face_q_points);
+              fe_values_face[displacement].get_function_values(lambda,
+                                                               lambda_values);
 
-                for (unsigned int q_point = 0; q_point < n_face_q_points;
-                     ++q_point)
-                  {
-                    contact_force += lambda_values[q_point][2]
-                                     * fe_values_face.JxW(q_point);
-                  }
-              }
-      contact_force = Utilities::MPI::sum(contact_force, MPI_COMM_WORLD);
-      pcout << "Contact force = " << contact_force << std::endl;
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
+              for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+                contact_force += lambda_values[q_point][2]
+                                 * fe_values_face.JxW(q_point);
+            }
+    contact_force = Utilities::MPI::sum(contact_force, MPI_COMM_WORLD);
+
+    pcout << "Contact force = " << contact_force << std::endl;
   }
 
 

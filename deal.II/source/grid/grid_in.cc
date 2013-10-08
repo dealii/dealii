@@ -17,6 +17,7 @@
 
 #include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/exceptions.h>
 
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria.h>
@@ -51,9 +52,294 @@ void GridIn<dim, spacedim>::attach_triangulation (Triangulation<dim, spacedim> &
 
 
 
-// ---          ---
-// --- read_unv ---
-// ---          ---
+template<int dim, int spacedim>
+void GridIn<dim, spacedim>::read_vtk(std::istream &in)
+{
+  Assert((dim == 2)||(dim == 3), ExcNotImplemented());
+  std::string line;
+  std::string text[4];
+  text[0] = "# vtk DataFile Version 3.0";
+  text[1] = "vtk output";
+  text[2] = "ASCII";
+  text[3] = "DATASET UNSTRUCTURED_GRID";
+
+  for(unsigned int i = 0;i < 4;i++)//Checking for the match between initial strings/text in the file.
+    {
+      getline(in,line);
+
+      AssertThrow (line.compare(text[i]) == 0,
+                   ExcMessage(std::string("While reading VTK file, failed to find <") +
+                              text[i] + ">"));
+    }
+
+  ///////////////////Declaring storage and mappings//////////////////
+
+  std::vector< Point<spacedim> > vertices;//vector of vertices
+  std::vector< CellData<dim> > cells;//vector of cells
+  SubCellData subcelldata;//subcell data that includes bounds and material IDs.
+  std::map<int, int> vertex_indices; // # vert in unv (key) ---> # vert in deal.II (value)
+  std::map<int, int> cell_indices; // # cell in unv (key) ---> # cell in deal.II (value)
+  std::map<int, int> quad_indices; // # quad in unv (key) ---> # quad in deal.II (value)
+  std::map<int, int> line_indices; // # line in unv(key) ---> # line in deal.II (value)
+
+  unsigned int no_vertices, no_quads=0,no_lines=0;
+
+  char keyword_1[7],keyword_2[6],keyword_3[10] ;//keywords for the three types of data
+
+  in.get(keyword_1, 7);
+
+  //////////////////Processing the POINTS section///////////////
+
+  if (std::strcmp(keyword_1,"POINTS") == 0)//comparing the keyword points
+    {
+      in>>no_vertices;// taking the no. of vertices
+      in.ignore(256, '\n');//ignoring the number beside the total no. of points.
+
+      for(unsigned int count = 0; count < no_vertices; count++)//loop to read three values till the no . vertices is satisfied
+        {
+	  // VTK format always specifies vertex coordinates with 3 components
+	  Point<3> x;
+          in >> x(0) >> x(1) >> x(2);
+
+          vertices.push_back(Point<spacedim>());
+	  for (unsigned int d=0; d<spacedim; ++d)
+	    vertices.back()(d) = x(d);
+
+          vertex_indices[count] = count;
+        }
+    }
+
+  else
+    AssertThrow (false,
+                 ExcMessage ("While reading VTK file, failed to find POINTS section"));
+
+
+  //////////////////ignoring space between points and cells sections////////////////////
+  std::string checkline;
+  int no;
+  in.ignore(256, '\n');//this move pointer to the next line ignoring unwanted no.
+  no = in.tellg();
+  getline(in,checkline);
+  if (checkline.compare("") == 0)
+    {
+      in.get(keyword_2, 6);
+    }
+  else
+    {
+      in.seekg(no);
+      in.get(keyword_2, 6);
+    }
+
+
+  unsigned int total_cells, no_cells = 0, type, j = 0;// declaring counters, refer to the order of declaring variables for an idea of what is what!
+
+  ///////////////////Processing the CELLS section that contains cells(cells) and bound_quads(subcelldata)///////////////////////
+
+  if (std::strcmp(keyword_2,"CELLS") == 0)//comparing the keyword cells.
+    {
+
+      in>>total_cells;
+      in.ignore(256,'\n');
+
+      if (dim == 3)
+        {
+          for(unsigned int count = 0; count < total_cells; count++)
+            {
+              in>>type;
+
+              if(type == 8)
+                {
+
+                  cells.push_back(CellData<dim>());
+
+                  for(j = 0; j < type; j++)//loop to feed data
+                    in >> cells.back().vertices[j];
+
+                  cells.back().material_id = 0;
+
+                  for(j = 0; j < type; j++)//loop to feed the data of the vertices to the cell
+                    {
+                      cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
+                    }
+                  cell_indices[count] = count;
+                  no_cells++;
+                }
+
+              else if ( type == 4)
+                {
+
+                  subcelldata.boundary_quads.push_back(CellData<2>());
+                  int no_quads = 0;
+
+                  for(j = 0; j < type; j++)//loop to feed the data to the boundary
+                    {
+                      in >> subcelldata.boundary_quads.back().vertices[j];
+                    }
+                  subcelldata.boundary_quads.back().material_id = 0;
+                  for(unsigned int j = 0; j < type; j++)
+                    {
+                      subcelldata.boundary_quads.back().vertices[j] = vertex_indices[subcelldata.boundary_quads.back().vertices[j]];
+                    }
+                  quad_indices[count] = count + 1;
+                  no_quads++;
+                }
+
+              else
+                AssertThrow (false,
+                             ExcMessage ("While reading VTK file, unknown file type encountered"));
+            }
+        }
+
+      else if (dim == 2)
+        {
+          for(unsigned int count = 0; count < total_cells; count++)
+            {
+              in>>type;
+
+              if(type == 4)
+                {
+                  cells.push_back(CellData<dim>());
+
+                  for(j = 0; j < type; j++)//loop to feed data
+                    in >> cells.back().vertices[j];
+
+                  cells.back().material_id = 0;
+
+                  for(j = 0; j < type; j++)//loop to feed the data of the vertices to the cell
+                    {
+                      cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
+                    }
+                  cell_indices[count] = count;
+                  no_cells++;
+                }
+
+              else if(type == 2)
+                {
+                  //If this is encountered, the pointer comes out of the loop
+                  //and starts processing boundaries.
+                  subcelldata.boundary_lines.push_back(CellData<1>());
+                  int no_lines = 0;
+
+                  for(j = 0; j < type; j++)//loop to feed the data to the boundary
+                    {
+                      in >> subcelldata.boundary_lines.back().vertices[j];
+                    }
+                  subcelldata.boundary_lines.back().material_id = 0;
+                  for(unsigned int j = 0; j < type; j++)
+                    {
+                      subcelldata.boundary_lines.back().vertices[j] = vertex_indices[subcelldata.boundary_lines.back().vertices[j]];
+                    }
+                  line_indices[count] = count + 1;
+                  no_lines++;
+                }
+
+              else
+                AssertThrow (false,
+                             ExcMessage ("While reading VTK file, unknown file type encountered"));
+            }
+        }
+      else
+        AssertThrow (false,
+                     ExcMessage ("While reading VTK file, failed to find CELLS section"));
+
+      /////////////////////Processing the CELL_TYPES section////////////////////////
+
+      in>>keyword_3;
+
+      if (std::strcmp(keyword_3,"CELL_TYPES") == 0)//Entering the cell_types section and ignoring data.
+        {
+          in.ignore(256, '\n');
+
+          while(!in.eof())
+            {
+              in>>keyword_3;
+              if(std::strcmp(keyword_3,"12") && std::strcmp(keyword_3,"9"))
+                {
+                  break;
+                }
+            }
+        }
+
+      ////////////////////////Processing the CELL_DATA section/////////////////////////////
+
+      if (std::strcmp(keyword_3,"CELL_DATA") == 0)
+        {
+          int no_ids;
+          in>>no_ids;
+
+          std::string linenew;
+          std::string textnew[2];
+          textnew[0] = "SCALARS MaterialID double";
+          textnew[1] = "LOOKUP_TABLE default";
+
+          in.ignore(256, '\n');
+
+          for(unsigned int i = 0;i < 2;i++)
+            {
+              getline(in,linenew);
+
+              if(linenew.compare(textnew[i]) == 0)
+                {}
+              else
+                AssertThrow (false,
+                             ExcMessage (std::string("While reading VTK file, failed to find <") +
+                                         textnew[i] + "> section"));
+            }
+
+          for(unsigned int i = 0; i < no_cells; i++)//assigning IDs to cells.
+            {
+              int id;
+              in>>id;
+              cells[cell_indices[i]].material_id = id;
+            }
+
+          if (dim == 3)
+            {
+              for(unsigned int i = 0; i < no_quads; i++)//assigning IDs to bounds.
+                {
+                  int id;
+                  in>>id;
+                  subcelldata.boundary_quads[quad_indices[i]].material_id = id;
+                }
+            }
+          else if (dim == 2)
+            {
+              for(unsigned int i = 0; i < no_lines; i++)//assigning IDs to bounds.
+                {
+                  int id;
+                  in>>id;
+                  subcelldata.boundary_lines[line_indices[i]].material_id = id;
+                }
+            }
+        }
+      else
+        AssertThrow (false,
+                     ExcMessage ("While reading VTK file, failed to find CELL_DATA section"));
+
+
+      Assert(subcelldata.check_consistency(dim), ExcInternalError());
+
+      GridTools::delete_unused_vertices(vertices,
+                                        cells,
+                                        subcelldata);
+
+      if(dim == spacedim)
+        GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
+                                                                         cells);
+
+      GridReordering<dim, spacedim>::reorder_cells(cells);
+      tria->create_triangulation_compatibility(vertices,
+                                               cells,
+                                               subcelldata);
+
+      return;
+    }
+  else
+    AssertThrow (false,
+                 ExcMessage ("While reading VTK file, failed to find CELLS section"));
+}
+
+
 
 template<int dim, int spacedim>
 void GridIn<dim, spacedim>::read_unv(std::istream &in)
@@ -230,18 +516,18 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
           AssertThrow(in, ExcIO());
           in >> id;
 
-          int n_lines = (n_entities%2 == 0)?(n_entities/2):((n_entities+1)/2);
+          const unsigned int n_lines = (n_entities%2 == 0)?(n_entities/2):((n_entities+1)/2);
 
-          for (int no_line = 0; no_line < n_lines; no_line++)
+          for (unsigned int no_line = 0; no_line < n_lines; no_line++)
             {
-              int n_fragments;
+              unsigned int n_fragments;
 
               if (no_line == n_lines-1)
                 n_fragments = (n_entities%2 == 0)?(2):(1);
               else
                 n_fragments = 2;
 
-              for (int no_fragment = 0; no_fragment < n_fragments; no_fragment++)
+              for (unsigned int no_fragment = 0; no_fragment < n_fragments; no_fragment++)
                 {
                   AssertThrow(in, ExcIO());
                   in >> dummy >> no >> dummy >> dummy;
@@ -2355,6 +2641,10 @@ void GridIn<dim, spacedim>::read (std::istream &in,
       read_msh (in);
       return;
 
+    case vtk:
+         read_vtk (in);
+         return;
+
     case unv:
       read_unv (in);
       return;
@@ -2395,6 +2685,8 @@ GridIn<dim, spacedim>::default_suffix (const Format format)
       return ".dbmesh";
     case msh:
       return ".msh";
+    case vtk:
+      return ".vtk";
     case unv:
       return ".unv";
     case ucd:
@@ -2425,6 +2717,9 @@ GridIn<dim, spacedim>::parse_format (const std::string &format_name)
 
   if (format_name == "unv")
     return unv;
+
+  if (format_name == "vtk")
+    return vtk;
 
   if (format_name == "inp")
     return ucd;
@@ -2469,7 +2764,7 @@ GridIn<dim, spacedim>::parse_format (const std::string &format_name)
 template <int dim, int spacedim>
 std::string GridIn<dim, spacedim>::get_format_names ()
 {
-  return "dbmesh|msh|unv|ucd|xda|netcdf|tecplot";
+  return "dbmesh|msh|unv|vtk|ucd|xda|netcdf|tecplot";
 }
 
 

@@ -335,7 +335,8 @@ namespace SparsityPatternIterators
  * the elements of a row of a SparsityPattern with the help of iterators into
  * this object (using SparsityPattern::begin and SparsityPattern::end) you
  * will find that the elements are not sorted by column index within each row
- * whenever the matrix is square.
+ * whenever the matrix is square (the first item will be the diagonal, followed
+ * by the other entries sorted by column index).
  *
  * @note While this class forms the basis upon which SparseMatrix
  * objects base their storage format, and thus plays a central role in
