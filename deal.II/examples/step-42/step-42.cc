@@ -490,9 +490,21 @@ namespace Step42
                   << " x " << ny << std::endl;
     }
 
+    // The following two functions return the value of a given pixel with
+    // coordinates $i,j$, which we identify with the values of a function
+    // defined at positions <code>i*hx, j*hy</code>, and at arbitrary
+    // coordinates $x,y$ where we do a bilinear interpolation between
+    // point values returned by the first of the two functions. In the
+    // second function, for each $x,y$, we first compute the (integer)
+    // location of the nearest pixel coordinate to the bottom left of
+    // $x,y$, and then compute the coordinates $\xi,\eta$ within this
+    // pixel. We truncate both kinds of variables from both below
+    // and above to avoid problems when evaluating the function outside
+    // of its defined range as may happen due to roundoff errors.
     template <int dim>
     double
-    BitmapFile<dim>::get_pixel_value(const int i, const int j) const
+    BitmapFile<dim>::get_pixel_value(const int i,
+                                     const int j) const
     {
       assert(i >= 0 && i < nx);
       assert(j >= 0 && j < ny);
@@ -501,53 +513,22 @@ namespace Step42
 
     template <int dim>
     double
-    BitmapFile<dim>::get_value(const double x, const double y) const
+    BitmapFile<dim>::get_value(const double x,
+                               const double y) const
     {
       const int ix = std::min(std::max((int) (x / hx), 0), nx - 2);
       const int iy = std::min(std::max((int) (y / hy), 0), ny - 2);
 
-      FullMatrix<double> H(4, 4);
-      Vector<double> X(4);
-      Vector<double> b(4);
+      const double xi  = std::min(std::max((x-ix*hx)/hx, 1.), 0.);
+      const double eta = std::min(std::max((y-iy*hy)/hy, 1.), 0.);
 
-      double xx, yy;
-
-      xx = ix * hx;
-      yy = iy * hy;
-      H(0, 0) = xx;
-      H(0, 1) = yy;
-      H(0, 2) = xx * yy;
-      H(0, 3) = 1.0;
-      b(0) = get_pixel_value(ix, iy);
-
-      xx = (ix + 1) * hx;
-      yy = iy * hy;
-      H(1, 0) = xx;
-      H(1, 1) = yy;
-      H(1, 2) = xx * yy;
-      H(1, 3) = 1.0;
-      b(1) = get_pixel_value(ix + 1, iy);
-
-      xx = (ix + 1) * hx;
-      yy = (iy + 1) * hy;
-      H(2, 0) = xx;
-      H(2, 1) = yy;
-      H(2, 2) = xx * yy;
-      H(2, 3) = 1.0;
-      b(2) = get_pixel_value(ix + 1, iy + 1);
-
-      xx = ix * hx;
-      yy = (iy + 1) * hy;
-      H(3, 0) = xx;
-      H(3, 1) = yy;
-      H(3, 2) = xx * yy;
-      H(3, 3) = 1.0;
-      b(3) = get_pixel_value(ix, iy + 1);
-
-      H.gauss_jordan();
-      H.vmult(X, b);
-
-      return (X(0) * x + X(1) * y + X(2) * x * y + X(3));
+      return ((1-xi)*(1-eta)*get_pixel_value(ix,iy)
+              +
+              xi*(1-eta)*get_pixel_value(ix+1,iy)
+              +
+              (1-xi)*eta*get_pixel_value(ix,iy+1)
+              +
+              xi*eta*get_pixel_value(ix+1,iy+1));
     }
 
     // Finally, this is the class that actually uses the class above. It
@@ -2119,8 +2100,8 @@ namespace Step42
                                                                lambda_values);
 
               for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-                  contact_force += lambda_values[q_point][2]
-                                   * fe_values_face.JxW(q_point);
+                contact_force += lambda_values[q_point][2]
+                                 * fe_values_face.JxW(q_point);
             }
     contact_force = Utilities::MPI::sum(contact_force, MPI_COMM_WORLD);
 
