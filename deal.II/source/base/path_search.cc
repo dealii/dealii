@@ -146,22 +146,24 @@ PathSearch::find (const std::string &filename,
 	  }
       }
 
-      // try again with the suffix appended
-      {
-	real_name = *path + filename + suffix;
-	if (debug > 1)
-	  deallog << "PathSearch[" << cls << "] trying "
-		  << real_name << std::endl;
-	FILE *fp = fopen(real_name.c_str(), open_mode);
-	if (fp != 0)
-	  {
-	    if (debug > 0)
-	      deallog << "PathSearch[" << cls << "] opened "
-		      << real_name << std::endl;
-	    fclose(fp);
-	    return real_name;
-	  }
-      }
+      // try again with the suffix appended, unless there is
+      // no suffix
+      if (suffix != "")
+        {
+          real_name = *path + filename + suffix;
+          if (debug > 1)
+            deallog << "PathSearch[" << cls << "] trying "
+            << real_name << std::endl;
+          FILE *fp = fopen(real_name.c_str(), open_mode);
+          if (fp != 0)
+            {
+              if (debug > 0)
+                deallog << "PathSearch[" << cls << "] opened "
+                << real_name << std::endl;
+              fclose(fp);
+              return real_name;
+            }
+        }
     }
   AssertThrow(false, ExcFileNotFound(filename, cls));
   return std::string("");
