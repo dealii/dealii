@@ -40,9 +40,17 @@ FOREACH(_component compat_files documentation examples mesh_converter parameter_
 
   ELSE()
 
+    STRING(TOUPPER ${_component} _componentuppercase)
     ADD_CUSTOM_TARGET(${_component}
-      COMMAND ${CMAKE_COMMAND} -E echo "Error: Could not build and install disabled component \"${_component}\"."
-        && ${CMAKE_COMMAND} -E echo "Please reconfigure with -DDEAL_II_COMPONENT_${_component}=yes"
+      COMMAND
+           ${CMAKE_COMMAND} -E echo ''
+        && ${CMAKE_COMMAND} -E echo ''
+        && ${CMAKE_COMMAND} -E echo '***************************************************************************'
+        && ${CMAKE_COMMAND} -E echo "**  Error: Could not build and install disabled component \"${_component}\"."
+        && ${CMAKE_COMMAND} -E echo "**  Please reconfigure with -DDEAL_II_COMPONENT_${_componentuppercase}=ON"
+        && ${CMAKE_COMMAND} -E echo '***************************************************************************'
+        && ${CMAKE_COMMAND} -E echo ''
+        && ${CMAKE_COMMAND} -E echo ''
         && false
       )
 
