@@ -16,16 +16,16 @@
   <body>
 
 
-    <h2 align="center" style="color: red">
-     <strong class="red">Note: <acronym>deal.II</acronym> uses
+    <h4 align="center" style="color: red">
+     <strong class="red">Note: Since version 8.0, deal.II uses
        <a href="http://www.cmake.org" target="_top">CMake</a> to
        configure and build. For using the previous build
-       system used until <acronym>deal.II</acronym> version 7.3, see
+       system used until deal.II version 7.3, see
        <a href="http://www.dealii.org/7.3.0/readme.html"
        target="_top">the old ReadMe file</a>.
      </strong>
      <br />
-    </h2>
+    </h4>
 
 
 <h1>Installation instructions and further information
@@ -118,7 +118,7 @@
       <li>
         <a href="http://www.cmake.org/" target="_top">CMake</a> version 2.8.8 or later
       </li>
-      
+
       <li>
         <a href="http://www.gnu.org/software/make/" target="_top">GNU make</a>, version
         3.78 or later (or any other generator supported by CMake)
@@ -158,7 +158,7 @@
 	<a href="http://www.povray.org" target="_top">Povray</a>,
         and directly to Encapsulated Postscript.
 	</p>
-	
+
         <p>
           <code>gnuplot</code>
           and a postscript viewer (for <code>eps</code>) should be
@@ -186,7 +186,7 @@
 
     <a name="installation"/>
     <h2>Installation</h2>
-    
+
     <a name="unpacking"/>
     <h3>Unpacking</h3>
 
@@ -240,7 +240,7 @@
 	<li> <code>/path/to/install/dir</code> is the directory which deal.II
 	  should be installed into. This can be a directory in your home
 	  directory (e.g., <code>~/bin/deal.II</code>) or a directory
-	  such as <code>/usr/local</code> if you have root privileges. 
+	  such as <code>/usr/local</code> if you have root privileges.
 	  Another option is to use something like <code>`pwd`/../installed/</code> (note the
 	  backticks). Make sure the installation directory is not the same
 	  as the location where you unpacked <tt>deal.II/</tt>.
@@ -296,7 +296,7 @@
 	  library is compiled with compiler flags so
 	  that the library contains information that can be used by debuggers.
 	</p>
-	
+
 	<p>
 	  In addition, this library contains a great number of safety
 	  checks on most arguments of all functions you could possibly call.
@@ -309,7 +309,7 @@
 	  name and line number of where the problem occurred.
 	</p>
 	</li>
-	
+
 	<li> <i>Optimized mode</i>: You will want to link with this version of
 	    the library once you know that your program is working as
 	    expected. It does not contain the safety checks any more
@@ -335,7 +335,7 @@
       http://www.dealii.org/</a> domain  can also be generated locally. To do
       so, invoke <code>cmake</code> in the build instructions above as follows:
     </p>
-    
+
 <pre>
   cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
 </pre>
@@ -435,7 +435,7 @@
     <i>64bit indices</i>: By default, deal.II use unsigned int (32bit)
     indices for degrees of freedom, using
     the <code>types::global_dof_index</code> type. This limits the number of
-    unknowns to approximately four 
+    unknowns to approximately four
     billions. If larger problem must be solved, pass the
     <code>-DDEAL_II_WITH_64BIT_INDICES=ON</code> argument to
     <code>cmake</code>. You will not be able to solve problems of this size on
@@ -565,7 +565,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="HDF5"></a><a href="http://www.hdfgroup.org/HDF5/">HDF5</a></dt>
       <dd>
 	<p>
@@ -580,7 +580,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="metis"></a><a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview"
 	     target="_top">METIS</a></dt>
       <dd>
@@ -603,7 +603,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="mumps"></a><a href="http://mumps.enseeiht.fr" target="_top">MUMPS</a></dt>
       <dd>
 	<p>
@@ -622,7 +622,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="netcdf"></a><a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a></dt>
       <dd>
 	<a href="http://www.unidata.ucar.edu/software/netcdf/"
@@ -637,7 +637,7 @@
 	<code>-DNETCDF_DIR=/path/to/netcdf</code> to <code>cmake</code>.
       </dd>
 
-      
+
       <dt><a name="p4est"></a><a href="http://www.p4est.org/" target="_top">p4est</a></dt>
       <dd>
 	<p>
@@ -653,7 +653,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="petsc"></a><a href="http://www.mcs.anl.gov/petsc/"
 		 target="_top">PETSc</a></dt>
       <dd>
@@ -679,7 +679,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="slepc"></a><a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a></dt>
       <dd>
 	<p>
@@ -700,7 +700,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="tbb"></a><a href="http://www.threadingbuildingblocks.org/"
 	     target="_top">Threading Building Blocks (TBB)</a></dt>
       <dd>
@@ -717,7 +717,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="trilinos"></a><a href="http://trilinos.sandia.gov" target="_top">Trilinos</a></dt>
       <dd>
 	<p>
@@ -742,7 +742,7 @@
 	</p>
       </dd>
 
-      
+
       <dt><a name="umfpack"></a><a href="http://www.cise.ufl.edu/research/sparse/umfpack/"
 	     target="_top">UMFPACK</a></dt>
       <dd>
