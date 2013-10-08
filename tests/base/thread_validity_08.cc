@@ -31,7 +31,11 @@ int spin_lock = 0;
 
 void worker ()
 {
+  // wait for the mutex to make sure the main
+  // thread has already moved on. we can immediately
+  // release the mutex again.
   mutex.acquire ();
+  mutex.release ();
   deallog << "OK." << std::endl;
   spin_lock = 1;
 }
@@ -70,8 +74,4 @@ int main()
   // wait for thread to finish
   while (spin_lock == 0)
     ;
-
-  // release the lock that the thread
-  // acquired to avoid pthread errors
-  mutex.release ();
 }
