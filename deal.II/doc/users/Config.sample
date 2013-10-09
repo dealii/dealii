@@ -597,7 +597,7 @@
 
 
 #
-# Obnoxiously adavanced configuration about paths, install locations and
+# Obnoxiously advanced configuration about paths, install locations and
 # names:
 #
 # SET(DEAL_II_PACKAGE_NAME "deal.II" CACHE STRING
