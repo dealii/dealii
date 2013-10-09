@@ -55,7 +55,7 @@ void check_file (const std::string name,
 
 void filename_resolution()
 {
-  check_file<2> (std::string(SOURCE_DIR "grid_in_vtk_2d/mesh"), GridIn<2>::vtk);
+  check_file<2> (std::string(SOURCE_DIR "/grid_in_vtk_2d/mesh"), GridIn<2>::vtk);
 }
 
 
