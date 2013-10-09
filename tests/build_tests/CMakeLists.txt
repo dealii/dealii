@@ -95,6 +95,7 @@ FOREACH(_step_full ${_steps})
               && cat ${_step_dir}/failing_configure_output) # succeed anyway!
         WORKING_DIRECTORY ${_step_dir}
         DEPENDS ${_step_dir}/CMakeLists.txt
+          ${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PACKAGE_NAME}Config.cmake
         )
 
       # And a rule on how to build the example step:
