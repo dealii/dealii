@@ -27,7 +27,7 @@
 #
 SOURCEDIR=$(CURDIR)
 LOGDIR=$(PWD)
-TMPDIR=/tmp
+TMPDIR?=/tmp
 CMAKE=cmake
 SVN=svn info $(SOURCEDIR)
 
