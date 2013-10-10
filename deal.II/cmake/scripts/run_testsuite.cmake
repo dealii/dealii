@@ -66,7 +66,10 @@
 #                            clean directory and run the build tests
 #                            "build_tests/*"
 #
-#       "Regression Tests" - Reserved for the Regression tester
+#       "Nightly"          - Reserved for nightly regression tests for
+#                            build bots on various architectures
+#
+#       "Regression Tests" - Reserved for the regression tester
 #
 #   CONFIG_FILE
 #     - A configuration file (see ../deal.II/docs/development/Config.sample)
@@ -98,6 +101,7 @@ ENDIF()
 
 IF( NOT "${TRACK}" STREQUAL "Experimental"
     AND NOT "${TRACK}" STREQUAL "Build Tests"
+    AND NOT "${TRACK}" STREQUAL "Nightly"
     AND NOT "${TRACK}" STREQUAL "Regression Tests" )
   MESSAGE(FATAL_ERROR "
 Unknown TRACK \"${TRACK}\" - see the manual for valid values.
@@ -226,6 +230,7 @@ SET(CTEST_SITE "${_hostname}")
 
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
 
+ENDIF()
 IF( "${TRACK}" STREQUAL "Regression Tests"
     AND NOT CTEST_SITE MATCHES "c0541" )
   MESSAGE(FATAL_ERROR "
