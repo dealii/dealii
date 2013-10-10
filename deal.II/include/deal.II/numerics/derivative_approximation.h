@@ -665,21 +665,19 @@ private:
 
   /**
    * Compute the derivative
-   * approximation on the cells in
-   * the range given by the third
-   * parameter.
+   * approximation on a given cell.
    * Fill the @p derivative_norm vector with
    * the norm of the computed derivative
-   * tensors on each cell.
+   * tensors on the cell.
    */
   template <class DerivativeDescription, int dim,
            template <int, int> class DH, class InputVector, int spacedim>
   static void
-  approximate (const Mapping<dim,spacedim>    &mapping,
+  approximate (const typename DH<dim,spacedim>::active_cell_iterator &cell,
+               const Mapping<dim,spacedim>    &mapping,
                const DH<dim,spacedim>         &dof,
                const InputVector     &solution,
                const unsigned int     component,
-               const IndexInterval   &index_interval,
                Vector<float>         &derivative_norm);
 
   /**
