@@ -15,8 +15,8 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/parallel_vector.h>
@@ -27,6 +27,7 @@
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe.h>
@@ -61,6 +62,27 @@ const UpdateFlags DerivativeApproximation::SecondDerivative<dim>::update_flags =
 
 template <int dim>
 const UpdateFlags DerivativeApproximation::ThirdDerivative<dim>::update_flags = update_hessians;
+
+
+
+// Dummy structures and dummy function used for WorkStream
+namespace internal
+{
+  namespace Assembler
+  {
+    struct Scratch
+    {
+      Scratch() {}
+    };
+
+    struct CopyData
+    {
+      CopyData() {}
+    };
+
+    void copier(CopyData const &) {}
+  }
+}
 
 
 
@@ -626,30 +648,25 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
   Assert (component < dof_handler.get_fe().n_components(),
           ExcIndexRange (component, 0, dof_handler.get_fe().n_components()));
 
-  const unsigned int n_threads = multithread_info.n_threads();
-  std::vector<IndexInterval> index_intervals
-    = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
-                               n_threads);
+  // Only act on the locally owned cells
+  typedef FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator> CellFilter;
 
-  typedef void (*FunPtr) (const Mapping<dim,spacedim> &,
-                          const DH<dim,spacedim> &,
-                          const InputVector &,
-                          const unsigned int     ,
-                          const IndexInterval &,
-                          Vector<float> &);
-  FunPtr fun_ptr = &DerivativeApproximation::
-                   template approximate<DerivativeDescription,dim,
-                   DH,InputVector>;
-
-//TODO: Use WorkStream here
-  Threads::TaskGroup<> tasks;
-  for (unsigned int i=0; i<n_threads; ++i)
-    tasks += Threads::new_task (fun_ptr,
-                                mapping, dof_handler,
-                                solution, component,
-                                index_intervals[i],
-                                derivative_norm);
-  tasks.join_all ();
+  // There is no need for a copier because there is no conflict between threads
+  // to write in derivative_norm. Scratch and CopyData are also useless.
+  WorkStream::run(CellFilter(IteratorFilters::LocallyOwnedCell(),dof_handler.begin_active()),
+      CellFilter(IteratorFilters::LocallyOwnedCell(),dof_handler.end()),
+      static_cast<std_cxx1x::function<void (typename DH<dim,spacedim>::active_cell_iterator const&,
+        internal::Assembler::Scratch const&,internal::Assembler::CopyData &)> >
+      (std_cxx1x::bind(DerivativeApproximation::template approximate<DerivativeDescription,dim,DH,
+                       InputVector,spacedim>,
+                       std_cxx1x::_1,
+                       std_cxx1x::cref(mapping),
+                       std_cxx1x::cref(dof_handler),
+                       std_cxx1x::cref(solution),component,
+                       std_cxx1x::ref(derivative_norm))),
+    static_cast<std_cxx1x::function<void (internal::Assembler::CopyData const &)> >
+      (internal::Assembler::copier),internal::Assembler::Scratch (),
+      internal::Assembler::CopyData ());
 }
 
 
@@ -657,46 +674,29 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
 template <class DerivativeDescription, int dim,
          template <int, int> class DH, class InputVector, int spacedim>
 void
-DerivativeApproximation::approximate (const Mapping<dim,spacedim>    &mapping,
-                                      const DH<dim,spacedim>         &dof_handler,
-                                      const InputVector     &solution,
-                                      const unsigned int     component,
-                                      const IndexInterval   &index_interval,
-                                      Vector<float>         &derivative_norm)
+DerivativeApproximation::approximate (const typename DH<dim,spacedim>::active_cell_iterator &cell,
+                                      const Mapping<dim,spacedim>                  &mapping,
+                                      const DH<dim,spacedim>                       &dof_handler,
+                                      const InputVector                            &solution,
+                                      const unsigned int                            component,
+                                      Vector<float>                                &derivative_norm)
 {
   // iterators over all cells and the
   // respective entries in the output
   // vector:
-  Vector<float>::iterator
-  derivative_norm_on_this_cell
-    = derivative_norm.begin() + index_interval.first;
+  Vector<float>::iterator derivative_norm_on_this_cell = derivative_norm.begin() + 
+    std::distance(dof_handler.begin_active(),cell);
 
-  typename DH<dim,spacedim>::active_cell_iterator cell, endc;
-  cell = endc = dof_handler.begin_active();
-  // (static_cast to avoid warnings
-  // about unsigned int always >=0)
-  std::advance (cell, static_cast<int>(index_interval.first));
-  std::advance (endc, static_cast<int>(index_interval.second));
-
-  for (; cell!=endc; ++cell, ++derivative_norm_on_this_cell)
-    if (cell->is_locally_owned())
-      {
-        typename DerivativeDescription::Derivative derivative;
-        // call the function doing the actual
-        // work on this cell
-        DerivativeApproximation::
-        template approximate_cell<DerivativeDescription,dim,DH,InputVector>
-        (mapping,
-         dof_handler,
-         solution,
-         component,
-         cell,
-         derivative);
-        // evaluate the norm and fill the vector
-        *derivative_norm_on_this_cell
-          = DerivativeDescription::derivative_norm (derivative);
-      }
+  typename DerivativeDescription::Derivative derivative;
+  // call the function doing the actual
+  // work on this cell
+  DerivativeApproximation::template approximate_cell<DerivativeDescription,dim,DH,InputVector>
+    (mapping,dof_handler,solution,component,cell,derivative);
+  // evaluate the norm and fill the vector
+  *derivative_norm_on_this_cell
+    = DerivativeDescription::derivative_norm (derivative);
 }
+
 
 
 template <class DerivativeDescription, int dim,

@@ -19,6 +19,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/tria.h>
@@ -2118,29 +2119,67 @@ namespace DoFTools
 
   namespace internal
   {
+    namespace Assembler
+    {
+      struct Scratch
+      {
+        Scratch() {};
+      };
+
+
+      template <int dim,int spacedim>
+      struct CopyData
+      {
+        CopyData(unsigned int const &coarse_component,
+                 std::vector<types::global_dof_index> const &weight_mapping);
+
+        CopyData(CopyData const &data);
+
+        unsigned int coarse_component;
+        unsigned int dofs_per_cell;
+        std::vector<types::global_dof_index> parameter_dof_indices;
+        std::vector<types::global_dof_index> weight_mapping;
+        std::vector<dealii::Vector<double> > global_parameter_representation;
+      };
+      
+
+
+      template <int dim,int spacedim>
+      CopyData<dim,spacedim>::CopyData(unsigned int const &coarse_component,
+                                       std::vector<types::global_dof_index> const &weight_mapping) :
+        coarse_component(coarse_component),
+        weight_mapping(weight_mapping)
+      {}
+
+
+
+      template <int dim,int spacedim>
+      CopyData<dim,spacedim>::CopyData(CopyData const &data) :
+        coarse_component(data.coarse_component),
+        dofs_per_cell(data.dofs_per_cell),
+        parameter_dof_indices(data.parameter_dof_indices),
+        weight_mapping(data.weight_mapping),
+        global_parameter_representation(data.global_parameter_representation)
+      {}
+    }
+
     namespace
     {
       /**
        * This is a function that is called by the _2 function and that
-       * operates on a range of cells only. It is used to split up the
-       * whole range of cells into chunks which are then worked on in
-       * parallel, if multithreading is available.
+       * operates on one cell only. It is worked in parallel if 
+       * multhithreading is available.
        */
       template <int dim, int spacedim>
-      void
-      compute_intergrid_weights_3 (
-        const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
-        const unsigned int                  coarse_component,
-        const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-        const std::vector<dealii::Vector<double> > &parameter_dofs,
-        const std::vector<types::global_dof_index>             &weight_mapping,
-        std::vector<std::map<types::global_dof_index, float> > &weights,
-        const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &begin,
-        const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &end)
-      {
-        // aliases to the finite elements used by the dof handlers:
-        const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe();
+      void compute_intergrid_weights_3 (
+          typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator const &cell,
+          Assembler::Scratch const                                              &scratch,
+          Assembler::CopyData<dim,spacedim>                                     &copy_data,
+          FiniteElement<dim,spacedim> const                                     &coarse_fe,
+          InterGridMap<dealii::DoFHandler<dim,spacedim> > const                 &coarse_to_fine_grid_map,
+          std::vector<dealii::Vector<double> > const                            &parameter_dofs)
 
+      {
         // for each cell on the parameter grid: find out which degrees of
         // freedom on the fine grid correspond in which way to the degrees
         // of freedom on the parameter grid
@@ -2187,82 +2226,101 @@ namespace DoFTools
 
         // vector to hold the representation of a single degree of freedom
         // on the coarse grid (for the selected fe) on the fine grid
-        const types::global_dof_index n_fine_dofs = weight_mapping.size();
-        dealii::Vector<double> global_parameter_representation (n_fine_dofs);
+        const types::global_dof_index n_fine_dofs = copy_data.weight_mapping.size();
 
-        typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator cell;
-        std::vector<types::global_dof_index> parameter_dof_indices (coarse_fe.dofs_per_cell);
+        copy_data.dofs_per_cell = coarse_fe.dofs_per_cell;
+        copy_data.parameter_dof_indices.resize(copy_data.dofs_per_cell);
 
-        for (cell=begin; cell!=end; ++cell)
-          {
-            // get the global indices of the parameter dofs on this
-            // parameter grid cell
-            cell->get_dof_indices (parameter_dof_indices);
+       
+        // get the global indices of the parameter dofs on this
+        // parameter grid cell
+        cell->get_dof_indices (copy_data.parameter_dof_indices);
 
-            // loop over all dofs on this cell and check whether they are
-            // interesting for us
-            for (unsigned int local_dof=0;
-                 local_dof<coarse_fe.dofs_per_cell;
-                 ++local_dof)
-              if (coarse_fe.system_to_component_index(local_dof).first
-                  ==
-                  coarse_component)
-                {
-                  // the how-many-th parameter is this on this cell?
-                  const unsigned int local_parameter_dof
-                    = coarse_fe.system_to_component_index(local_dof).second;
+        // loop over all dofs on this cell and check whether they are
+        // interesting for us
+        for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)
+          if (coarse_fe.system_to_component_index(local_dof).first
+              ==
+              copy_data.coarse_component)
+            {
+              // the how-many-th parameter is this on this cell?
+              const unsigned int local_parameter_dof
+                = coarse_fe.system_to_component_index(local_dof).second;
 
-                  global_parameter_representation = 0;
+              copy_data.global_parameter_representation.push_back(
+                  dealii::Vector<double> (n_fine_dofs));
 
-                  // distribute the representation of
-                  // @p{local_parameter_dof} on the parameter grid cell
-                  // @p{cell} to the global data space
-                  coarse_to_fine_grid_map[cell]->
-                  set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
-                                                   global_parameter_representation);
-                  // now that we've got the global representation of each
-                  // parameter dof, we've only got to clobber the non-zero
-                  // entries in that vector and store the result
-                  //
-                  // what we have learned: if entry @p{i} of the global
-                  // vector holds the value @p{v[i]}, then this is the
-                  // weight with which the present dof contributes to
-                  // @p{i}. there may be several such @p{i}s and their
-                  // weights' sum should be one. Then, @p{v[i]} should be
-                  // equal to @p{\sum_j w_{ij} p[j]} with @p{p[j]} be the
-                  // values of the degrees of freedom on the coarse grid.
-                  // we can thus compute constraints which link the degrees
-                  // of freedom @p{v[i]} on the fine grid to those on the
-                  // coarse grid, @p{p[j]}. Now to use these as real
-                  // constraints, rather than as additional equations, we
-                  // have to identify representants among the @p{i} for
-                  // each @p{j}. this will be done by simply taking the
-                  // first @p{i} for which @p{w_{ij}==1}.
-                  //
-                  // guard modification of the weights array by a Mutex.
-                  // since it should happen rather rarely that there are
-                  // several threads operating on different intergrid
-                  // weights, have only one mutex for all of them
-                  static Threads::Mutex mutex;
-                  Threads::Mutex::ScopedLock lock (mutex);
-                  for (types::global_dof_index i=0; i<global_parameter_representation.size(); ++i)
-                    // set this weight if it belongs to a parameter dof.
-                    if (weight_mapping[i] != numbers::invalid_dof_index)
-                      {
-                        // only overwrite old value if not by zero
-                        if (global_parameter_representation(i) != 0)
-                          {
-                            const types::global_dof_index wi = parameter_dof_indices[local_dof],
-                                                          wj = weight_mapping[i];
-                            weights[wi][wj] = global_parameter_representation(i);
-                          };
-                      }
-                    else
-                      Assert (global_parameter_representation(i) == 0,
-                              ExcInternalError());
-                }
-          }
+              // distribute the representation of
+              // @p{local_parameter_dof} on the parameter grid cell
+              // @p{cell} to the global data space
+              coarse_to_fine_grid_map[cell]->
+              set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
+                                               copy_data.global_parameter_representation.back());
+            }
       }
+
+
+
+      /**
+       * This is a function that is called by the _2 function and that
+       * operates on one cell only. It is worked in parallel if 
+       * multhithreading is available.
+       */
+      template <int dim,int spacedim>
+      void copy_intergrid_weights_3(Assembler::CopyData<dim,spacedim> const                &copy_data,
+                                    FiniteElement<dim,spacedim> const                      &coarse_fe,
+                                    std::vector<std::map<types::global_dof_index, float> > &weights)
+      {
+        unsigned int pos(0);
+        for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)
+          if (coarse_fe.system_to_component_index(local_dof).first
+              ==
+              copy_data.coarse_component)
+          {
+              // now that we've got the global representation of each
+              // parameter dof, we've only got to clobber the non-zero
+              // entries in that vector and store the result
+              //
+              // what we have learned: if entry @p{i} of the global
+              // vector holds the value @p{v[i]}, then this is the
+              // weight with which the present dof contributes to
+              // @p{i}. there may be several such @p{i}s and their
+              // weights' sum should be one. Then, @p{v[i]} should be
+              // equal to @p{\sum_j w_{ij} p[j]} with @p{p[j]} be the
+              // values of the degrees of freedom on the coarse grid.
+              // we can thus compute constraints which link the degrees
+              // of freedom @p{v[i]} on the fine grid to those on the
+              // coarse grid, @p{p[j]}. Now to use these as real
+              // constraints, rather than as additional equations, we
+              // have to identify representants among the @p{i} for
+              // each @p{j}. this will be done by simply taking the
+              // first @p{i} for which @p{w_{ij}==1}.
+              //
+              // guard modification of the weights array by a Mutex.
+              // since it should happen rather rarely that there are
+              // several threads operating on different intergrid
+              // weights, have only one mutex for all of them
+              for (types::global_dof_index i=0; i<copy_data.global_parameter_representation[pos].size(); 
+                  ++i)
+                // set this weight if it belongs to a parameter dof.
+                if (copy_data.weight_mapping[i] != numbers::invalid_dof_index)
+                  {
+                    // only overwrite old value if not by zero
+                    if (copy_data.global_parameter_representation[pos](i) != 0)
+                      {
+                        const types::global_dof_index wi = copy_data.parameter_dof_indices[local_dof],
+                                                      wj = copy_data.weight_mapping[i];
+                        weights[wi][wj] = copy_data.global_parameter_representation[pos](i);
+                      };
+                  }
+                else
+                  Assert (copy_data.global_parameter_representation[pos](i) == 0,
+                          ExcInternalError());
+              ++pos;
+            }
+       
+      }
+
 
 
       /**
@@ -2273,42 +2331,25 @@ namespace DoFTools
       template <int dim, int spacedim>
       void
       compute_intergrid_weights_2 (
-        const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
-        const unsigned int                  coarse_component,
+        const dealii::DoFHandler<dim,spacedim>                &coarse_grid,
+        const unsigned int                                     coarse_component,
         const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-        const std::vector<dealii::Vector<double> > &parameter_dofs,
-        const std::vector<types::global_dof_index>             &weight_mapping,
+        const std::vector<dealii::Vector<double> >            &parameter_dofs,
+        const std::vector<types::global_dof_index>            &weight_mapping,
         std::vector<std::map<types::global_dof_index,float> > &weights)
       {
-        // simply distribute the range of cells to different threads
-        typedef typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
-        std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-        cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
-                         coarse_grid.end(),
-                         multithread_info.n_threads());
+        Assembler::Scratch scratch;
+        Assembler::CopyData<dim,spacedim> copy_data(coarse_component,weight_mapping);
 
-        // TODO: use WorkStream here
-
-        Threads::TaskGroup<> tasks;
-        void (*fun_ptr) (const dealii::DoFHandler<dim,spacedim> &,
-                         const unsigned int                  ,
-                         const InterGridMap<dealii::DoFHandler<dim,spacedim> > &,
-                         const std::vector<dealii::Vector<double> > &,
-                         const std::vector<types::global_dof_index> &,
-                         std::vector<std::map<types::global_dof_index, float> > &,
-                         const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &,
-                         const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &)
-          = &compute_intergrid_weights_3<dim>;
-        for (unsigned int i=0; i<multithread_info.n_threads(); ++i)
-          tasks += Threads::new_task (fun_ptr,
-                                      coarse_grid, coarse_component,
-                                      coarse_to_fine_grid_map, parameter_dofs,
-                                      weight_mapping, weights,
-                                      cell_intervals[i].first,
-                                      cell_intervals[i].second);
-
-        // wait for the tasks to finish
-        tasks.join_all ();
+        WorkStream::run(coarse_grid.begin_active(),coarse_grid.end(),
+            static_cast<std_cxx1x::function<void (typename dealii::DoFHandler<dim,spacedim>
+            ::active_cell_iterator const &,Assembler::Scratch const &,Assembler::CopyData<dim,spacedim> 
+            &)> > (std_cxx1x::bind(compute_intergrid_weights_3<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
+            std_cxx1x::_3,std_cxx1x::cref(coarse_grid.get_fe()),std_cxx1x::cref(coarse_to_fine_grid_map),
+            std_cxx1x::cref(parameter_dofs))), static_cast<std_cxx1x::function<void (Assembler
+            ::CopyData<dim,spacedim> const &)> > (std_cxx1x::bind(copy_intergrid_weights_3<dim,spacedim>,
+            std_cxx1x::_1,std_cxx1x::cref(coarse_grid.get_fe()),std_cxx1x::ref(weights))),scratch,
+            copy_data);
       }
 
 
