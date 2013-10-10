@@ -13,8 +13,8 @@ Issues:
    distributed_grids/ fail.
 
  - ISSUE:
-   Depending on the version of boost, a version number in the serialization
-   output changes and all tests just under serialization/ just fail
+   Quite some tests that use PETSc depend on specific external packages,
+   e.g. hypre and mumps
 
  - Mesh converter tests?
 

@@ -15,79 +15,101 @@
 ## ---------------------------------------------------------------------
 
 #
-# A minimalistic set of tests:
+# This is a bloody hack to avoid a severe performance penalty when using
+# 12k top level targets with GNU Make that really does not like that...
+#
+# The only choice we have is to set up every test subdirectory as an
+# independent project. Unfortunately this adds quite a significant amount
+# of complexity :-(
 #
 
-ENABLE_TESTING()
+ADD_SUBDIRECTORY(quick_tests)
 
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${_build} _build_lowercase)
+#
+# Custom targets to set and clean up the testsuite:
+#
 
-  #
-  # Test whether it is possible to configure, build and run a simplistic
-  # project, we use step 1:
-  #
+# Setup tests:
+ADD_CUSTOM_TARGET(setup_test)
 
-  SET(_target project.${_build_lowercase})
-  SET(_project_src ${CMAKE_SOURCE_DIR}/examples/step-1)
-  SET(_project ${CMAKE_CURRENT_BINARY_DIR}/${_target})
+# Clean all tests
+ADD_CUSTOM_TARGET(clean_test)
 
-  ADD_CUSTOM_COMMAND(OUTPUT ${_project}/CMakeLists.txt
-    COMMAND ${CMAKE_COMMAND} -E copy ${_project_src}/step-1.cc ${_project}/step-1.cc
-    COMMAND ${CMAKE_COMMAND} -E copy ${_project_src}/CMakeLists.txt ${_project}/CMakeLists.txt
-    DEPENDS ${_project_src}/step-1.cc ${_project_src}/CMakeLists.txt
-    )
-  ADD_CUSTOM_COMMAND(OUTPUT ${_project}-OK
-    COMMAND ${CMAKE_COMMAND} -DDEAL_II_DIR=${CMAKE_BINARY_DIR} -DCMAKE_BUILD_TYPE=${_build} .
-      || (rm ${_project}-OK && exit 1)
-    COMMAND ${CMAKE_COMMAND} --build ${_project} --target run > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-      || (rm ${_project}-OK && exit 1)
-    COMMAND touch ${_project}-OK
-    WORKING_DIRECTORY ${_project}
-    DEPENDS ${_project}/CMakeLists.txt
-    )
-  ADD_CUSTOM_TARGET(${_target} DEPENDS ${_project}-OK)
+# Remove all tests:
+ADD_CUSTOM_TARGET(prune_test)
 
-  ADD_TEST(NAME ${_target}
-    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_target}
-      -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-      -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-  SET_TESTS_PROPERTIES(${_test} PROPERTIES LABEL "sanity checks")
+#
+# Write a minimalistic CTestTestfile.cmake file to CMAKE_BINARY_DIR and
+# CMAKE_CURRENT_BINARY_DIR:
+#
+FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
+  "SUBDIRS(tests)"
+  )
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 
-  #
-  # Test whether thread affinity is well behaved:
-  #
-  SET(_target affinity.${_build_lowercase})
-
-  ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL affinity.cc)
-  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
-
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK && exit 1)
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-  ADD_CUSTOM_TARGET(${_target}.run DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK)
-
-  ADD_TEST(NAME ${_target}
-    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
-      -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-      -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-  SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
-
+#
+# Pass all relevant "TEST_" and "_DIR" variables down to the subprojects:
+#
+SET(_options)
+LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
+LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
+FOREACH(_var TEST_DIFF TEST_TIME_LIMIT TEST_PICKUP_REGEX NUMDIFF_DIR)
+  LIST(APPEND _options "-U${_var}")
+  IF(DEFINED ${_var})
+    LIST(APPEND _options "-D${_var}=${${_var}}")
+  ENDIF()
 ENDFOREACH()
 
 #
-# A custom test target:
+# Glob together a list of all subfolders to set up:
 #
-# @TIMO: TODO, write a little script to be run after ctest that queries for
-# (affinity|project|etc).(debug|release)-OK and outputs an appropriate
-# message.
+FILE(GLOB _categories RELATIVE ${TEST_DIR} ${TEST_DIR}/*)
+SET(_categories all-headers build_tests ${_categories})
+
 #
-ADD_CUSTOM_TARGET(test
-  COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  )
+# Define a subproject for every enabled category:
+#
+
+FOREACH(_category ${_categories})
+  IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_category}/CMakeLists.txt)
+    SET(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
+  ELSEIF(EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt)
+    SET(_category_dir ${TEST_DIR}/${_category})
+  ELSE()
+    SET(_category_dir)
+  ENDIF()
+
+  IF(NOT "${_category_dir}" STREQUAL "")
+
+    ADD_CUSTOM_TARGET(setup_test_${_category}
+      COMMAND ${CMAKE_COMMAND} -E make_directory
+        ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+      COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/${_category} &&
+        ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
+        > /dev/null # Shoo!
+      DEPENDS ${_category_dir}
+      COMMENT "Processing tests/${_category}"
+      )
+    ADD_DEPENDENCIES(setup_test setup_test_${_category})
+
+    # depend on a valid build directory (libraries built, config in place):
+    ADD_DEPENDENCIES(setup_test_${_category} setup_build_dir)
+
+    ADD_CUSTOM_TARGET(clean_test_${_category}
+      COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
+        --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target clean
+      )
+    ADD_DEPENDENCIES(clean_test clean_test_${_category})
+
+    ADD_CUSTOM_TARGET(prune_test_${_category}
+      COMMAND ${CMAKE_COMMAND} -E remove_directory
+        ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+      )
+    ADD_DEPENDENCIES(prune_test prune_test_${_category})
+
+    FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
+      "SUBDIRS(${_category})\n"
+      )
+
+  ENDIF()
+ENDFOREACH()

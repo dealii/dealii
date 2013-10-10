@@ -26,11 +26,6 @@
 #   - specifying the maximal wall clock time in seconds a test is allowed
 #     to run
 #
-# TEST_DIR
-#   - pointing to the ./tests folder where normalize.pl and run_test.cmake are
-#     located under cmake/scripts
-#
-#
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name comparison_file n_cpu [configurations])
 #
@@ -138,13 +133,13 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
               && cat ${_test_directory}/failing_output
               && exit 1)
         COMMAND
-          ${PERL_EXECUTABLE} -pi ${TEST_DIR}/cmake/scripts/normalize.pl
+          ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
                                  ${_test_directory}/output
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
           ${_target}
-          ${TEST_DIR}/cmake/scripts/normalize.pl
+          ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
         )
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND touch ${_test_directory}/diff
@@ -184,7 +179,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
           -DTRGT=${_diff_target}
           -DTEST=${_test_full}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-          -P ${TEST_DIR}/cmake/scripts/run_test.cmake
+          -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
       SET_TESTS_PROPERTIES(${_test_full} PROPERTIES

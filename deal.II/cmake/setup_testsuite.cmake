@@ -15,9 +15,11 @@
 ## ---------------------------------------------------------------------
 
 #
-# Setup necessary configuration for a testsuite sub project.
+# Setup necessary configuration in the testsuite subprojects.
+# This file is directly included by the test subprojects and not by the
+# main project.
 #
-# A testsuite subproject assumes the following cached variables to be set:
+# It is assumed that the following variables are set:
 #
 #    DEAL_II_BINARY_DIR
 #    DEAL_II_SOURCE_DIR
@@ -34,8 +36,7 @@
 #
 # Load all macros:
 #
-
-FILE(GLOB _macro_files ${CMAKE_CURRENT_LIST_DIR}/macros/*.cmake)
+FILE(GLOB _macro_files ${DEAL_II_SOURCE_DIR}/cmake/macros/*.cmake)
 FOREACH(_file ${_macro_files})
   INCLUDE(${_file})
 ENDFOREACH()
@@ -43,7 +44,6 @@ ENDFOREACH()
 #
 # Pick up values from environment:
 #
-
 SET_IF_EMPTY(DEAL_II_BINARY_DIR $ENV{DEAL_II_BINARY_DIR})
 SET_IF_EMPTY(DEAL_II_BINARY_DIR $ENV{DEAL_II_DIR})
 SET_IF_EMPTY(DEAL_II_SOURCE_DIR $ENV{DEAL_II_SOURCE_DIR})
@@ -54,7 +54,6 @@ SET_IF_EMPTY(TEST_PICKUP_REGEX $ENV{TEST_PICKUP_REGEX})
 #
 # We need deal.II and Perl as external packages:
 #
-
 FIND_PACKAGE(deal.II 8.0 REQUIRED
   HINTS ${DEAL_II_BINARY_DIR} ${DEAL_II_DIR}
   )
@@ -65,7 +64,6 @@ FIND_PACKAGE(Perl REQUIRED)
 #
 # We need a diff tool, preferably numdiff:
 #
-
 FIND_PROGRAM(DIFF_EXECUTABLE
   NAMES diff
   )
@@ -94,17 +92,15 @@ IF("${TEST_DIFF}" STREQUAL "")
 ELSE()
   # TODO: I have no idea how to prepare a custom string comming possibly
   # through two layers of command line into a list...
-  SEPARATE_ARGUMENTS(TEST_DIFF UNIX_COMMAND ${TEST_DIFF})
+  SEPARATE_ARGUMENTS(TEST_DIFF ${TEST_DIFF})
 ENDIF()
 
 #
 # Set a default time limit of 600 seconds:
 #
-
 SET_IF_EMPTY(TEST_TIME_LIMIT 600)
 
 #
 # And finally, enable testing:
 #
-
 ENABLE_TESTING()
