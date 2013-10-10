@@ -790,5 +790,11 @@ template
 void ChunkSparsityPattern::copy_from<double> (const FullMatrix<double> &,
                                               const size_type ,
                                               const bool);
+template
+void ChunkSparsityPattern::copy_from<float> (const FullMatrix<float> &,
+                                             const size_type);
+template
+void ChunkSparsityPattern::copy_from<double> (const FullMatrix<double> &,
+                                              const size_type);
 
 DEAL_II_NAMESPACE_CLOSE
