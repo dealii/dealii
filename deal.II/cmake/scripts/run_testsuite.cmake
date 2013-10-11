@@ -403,12 +403,12 @@ IF("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
 
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-      --build ${CTEST_BINARY_DIRECTORY} --target setup_test
+      --build ${CTEST_BINARY_DIRECTORY} --target setup_tests
       OUTPUT_QUIET RESULT_VARIABLE _res
       )
     IF(NOT "${_res}" STREQUAL "0")
       MESSAGE(FATAL_ERROR "
-\"setup_test\" target exited with an error. Bailing out.
+\"setup_tests\" target exited with an error. Bailing out.
 "
         )
     ENDIF()

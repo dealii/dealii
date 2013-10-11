@@ -86,7 +86,7 @@
     $ cd build
     $ cmake ../deal.II
     $ make -j16
-    $ make -j16 setup_test
+    $ make -j16 setup_tests
     $ ctest -j16
       </pre>
       The exact meaning of all of these commands will be explained in much
@@ -140,10 +140,10 @@
     <p>
       To enable the testsuite, configure and build deal.II in a build
       directory as normal (installation is not necessary). After that you
-      can setup the testsuite via the "setup_test" target:
+      can setup the testsuite via the "setup_tests" target:s
       <pre>
 
-    $ make setup_test
+    $ make setup_tests
       </pre>
       This will set up all tests supported by the current configuration.
       The testsuite can now be run in the current <i>build directory</i> as
@@ -154,15 +154,15 @@
       Setup can be fine-tuned using the following commands:
       <pre>
 
-    $ make clean_test - runs the 'clean' target in every testsuite subproject
+    $ make clean_tests - runs the 'clean' target in every testsuite subproject
 
-    $ make prune_test - removes all testsuite subprojects
+    $ make prune_tests - removes all testsuite subprojects
       </pre>
 
     <p>
       In addition, when setting up the testsuite, the following environment
       variables can be used to override default behavior when
-      calling <code>make setup_test</code>:
+      calling <code>make setup_tests</code>:
       <pre>
 
     TEST_PICKUP_REGEX
@@ -182,7 +182,7 @@
 
     <p>
       <b>Note:</b> Specifying these options via environment variables is
-      volatile, i.e. if <code>make setup_test</code> is invoked a second
+      volatile, i.e. if <code>make setup_tests</code> is invoked a second
       time without the variables set in environment, the option will be
       reset to the default value. If you want to set these options
       permanently, set them via cmake as CMake variable in the build
@@ -232,7 +232,7 @@
       tolerances. To use it, simply export where the <code>numdiff</code>
       executable can be found via the <code>PATH</code> 
       environment variable so that it can be found during
-      <code>make setup_test</code>.
+      <code>make setup_tests</code>.
     </p>
 
     <a name="runoutput"></a>
@@ -600,7 +600,7 @@ int main ()
       Now, rerun
       <pre>
 
-    $ make setup_test
+    $ make setup_tests
       </pre>
       so that your new test is picked up. After that it is possible to
       invoke it with

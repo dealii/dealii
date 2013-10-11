@@ -88,9 +88,9 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #
 #    test           - runs a minimal set of tests
 #
-#    setup_test     - sets up the testsuite subprojects
-#    clean_test     - runs the 'clean' target in every testsuite subproject
-#    prune_test     - removes all testsuite subprojects
+#    setup_tests    - sets up the testsuite subprojects
+#    clean_tests    - runs the 'clean' target in every testsuite subproject
+#    prune_tests    - removes all testsuite subprojects
 #
 ###\")"
   )

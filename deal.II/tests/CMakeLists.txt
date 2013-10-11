@@ -30,13 +30,13 @@ ADD_SUBDIRECTORY(quick_tests)
 #
 
 # Setup tests:
-ADD_CUSTOM_TARGET(setup_test)
+ADD_CUSTOM_TARGET(setup_tests)
 
 # Clean all tests
-ADD_CUSTOM_TARGET(clean_test)
+ADD_CUSTOM_TARGET(clean_tests)
 
 # Remove all tests:
-ADD_CUSTOM_TARGET(prune_test)
+ADD_CUSTOM_TARGET(prune_tests)
 
 #
 # Write a minimalistic CTestTestfile.cmake file to CMAKE_BINARY_DIR and
@@ -81,7 +81,7 @@ FOREACH(_category ${_categories})
 
   IF(NOT "${_category_dir}" STREQUAL "")
 
-    ADD_CUSTOM_TARGET(setup_test_${_category}
+    ADD_CUSTOM_TARGET(setup_tests_${_category}
       COMMAND ${CMAKE_COMMAND} -E make_directory
         ${CMAKE_CURRENT_BINARY_DIR}/${_category}
       COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/${_category} &&
@@ -90,22 +90,22 @@ FOREACH(_category ${_categories})
       DEPENDS ${_category_dir}
       COMMENT "Processing tests/${_category}"
       )
-    ADD_DEPENDENCIES(setup_test setup_test_${_category})
+    ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
 
     # depend on a valid build directory (libraries built, config in place):
-    ADD_DEPENDENCIES(setup_test_${_category} setup_build_dir)
+    ADD_DEPENDENCIES(setup_tests_${_category} setup_build_dir)
 
-    ADD_CUSTOM_TARGET(clean_test_${_category}
+    ADD_CUSTOM_TARGET(clean_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
         --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target clean
       )
-    ADD_DEPENDENCIES(clean_test clean_test_${_category})
+    ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
 
-    ADD_CUSTOM_TARGET(prune_test_${_category}
+    ADD_CUSTOM_TARGET(prune_tests_${_category}
       COMMAND ${CMAKE_COMMAND} -E remove_directory
         ${CMAKE_CURRENT_BINARY_DIR}/${_category}
       )
-    ADD_DEPENDENCIES(prune_test prune_test_${_category})
+    ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
     FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
       "SUBDIRS(${_category})\n"
