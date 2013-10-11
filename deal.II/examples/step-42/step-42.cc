@@ -772,28 +772,30 @@ namespace Step42
   void
   PlasticityContactProblem<dim>::declare_parameters (ParameterHandler &prm)
   {
-    prm.declare_entry("polynomial degree", "1", Patterns::Integer(),
+    prm.declare_entry("polynomial degree", "1",
+                      Patterns::Integer(),
                       "Polynomial degree of the FE_Q finite element space, typically 1 or 2.");
     prm.declare_entry("number of initial refinements", "2",
                       Patterns::Integer(),
                       "Number of initial global mesh refinement steps before "
                       "the first computation.");
     prm.declare_entry("refinement strategy", "percentage",
-                      Patterns::Selection("global|percentage|fix dofs"),
+                      Patterns::Selection("global|percentage"),
                       "Mesh refinement strategy:\n"
                       " global: one global refinement\n"
-                      " percentage: fixed percentage gets refined using the Kelly estimator\n"
-                      " fix dofs: tries to achieve 2^initial_refinement*300 dofs after "
-                      "refinement cycle 1 (only use 2 cycles!). This requires the code to "
-                      "make some changes to the coarse mesh as well.");
-    prm.declare_entry("number of cycles", "5", Patterns::Integer(),
+                      " percentage: a fixed percentage of cells gets refined using the Kelly estimator.");
+    prm.declare_entry("number of cycles", "5",
+                      Patterns::Integer(),
                       "Number of adaptive mesh refinement cycles to run.");
-    prm.declare_entry("obstacle filename", "", Patterns::Anything(),
+    prm.declare_entry("obstacle filename", "",
+                      Patterns::Anything(),
                       "Obstacle file to read, use 'obstacle_file.pbm' or leave empty to use a sphere.");
-    prm.declare_entry("output directory", "", Patterns::Anything(),
+    prm.declare_entry("output directory", "",
+                      Patterns::Anything(),
                       "Directory for output files (graphical output and benchmark "
                       "statistics). If empty, use the current directory.");
-    prm.declare_entry("transfer solution", "false", Patterns::Bool(),
+    prm.declare_entry("transfer solution", "false",
+                      Patterns::Bool(),
                       "Whether the solution should be used as a starting guess "
                       "for the next finer mesh. If false, then the iteration starts at "
                       "zero on every mesh.");
