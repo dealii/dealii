@@ -468,6 +468,8 @@ namespace Step42
       ny(0)
     {
       std::ifstream f(name.c_str());
+      AssertThrow (f, ExcMessage (std::string("Can't read from file <") +
+                                  name + ">!"));
 
       std::string temp;
       f >> temp >> nx >> ny;
@@ -787,9 +789,12 @@ namespace Step42
     prm.declare_entry("number of cycles", "5",
                       Patterns::Integer(),
                       "Number of adaptive mesh refinement cycles to run.");
-    prm.declare_entry("obstacle filename", "",
-                      Patterns::Anything(),
-                      "Obstacle file to read, use 'obstacle_file.pbm' or leave empty to use a sphere.");
+    prm.declare_entry("obstacle", "sphere",
+                      Patterns::Selection("sphere|read from file"),
+                      "The name of the obstacle to use. This may either be 'sphere' if we should "
+                      "use a spherical obstacle, or 'read from file' in which case the obstacle "
+                      "will be read from a file named 'obstacle.pbm' that is supposed to be in "
+                      "ASCII PBM format.");
     prm.declare_entry("output directory", "",
                       Patterns::Anything(),
                       "Directory for output files (graphical output and benchmark "
@@ -838,10 +843,10 @@ namespace Step42
                       gamma),
 
     base_mesh (prm.get("base mesh")),
-    obstacle (prm.get("obstacle filename") != ""
+    obstacle (prm.get("obstacle") == "read from file"
               ?
               static_cast<const Function<dim>*>
-              (new EquationData::ChineseObstacle<dim>(prm.get("obstacle filename"), (base_mesh == "box" ? 1.0 : 0.5)))
+              (new EquationData::ChineseObstacle<dim>("obstacle.pbm", (base_mesh == "box" ? 1.0 : 0.5)))
               :
               static_cast<const Function<dim>*>
               (new EquationData::SphereObstacle<dim>(base_mesh == "box" ? 1.0 : 0.5))),
