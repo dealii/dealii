@@ -204,6 +204,8 @@ FOREACH(_var ${_features})
       #
       IF(DEFINED ${_feature}_VERSION)
         _detailed("#            ${_feature}_VERSION = ${${_feature}_VERSION}\n")
+      ELSEIF(_feature MATCHES "THREADS" AND DEFINED TBB_VERSION)
+        _detailed("#            TBB_VERSION = ${TBB_VERSION}\n")
       ENDIF()
 
       #
@@ -220,9 +222,9 @@ FOREACH(_var ${_features})
         IF( # MPI:
             _var2 MATCHES "^${_feature}_CXX_(COMPILER|COMPILE_FLAGS|LINK_FLAGS|LIBRARIES|INCLUDE_PATH)$" OR
             # Boost:
-            ( _feature MATCHES "BOOST" AND _var2 MATCHES "^Boost(_LIBRARIES|_INCLUDE_DIRS)$" ) OR
+            ( _feature MATCHES "BOOST" AND _var2 MATCHES "^Boost_(LIBRARIES|INCLUDE_DIRS)$" ) OR
             # TBB:
-            ( _feature MATCHES "THREADS" AND _var2 MATCHES "^TBB(_LIBRARIES|_INCLUDE_DIRS)$" ) OR
+            ( _feature MATCHES "THREADS" AND _var2 MATCHES "^TBB_(LIBRARIES|INCLUDE_DIRS)$" ) OR
             # Generic:
             ( (NOT _var2 MATCHES "^(MPI|Boost)") AND
               _var2 MATCHES "^${_feature}_(INCLUDE_DIRS|LIBRARIES|LINKER_FLAGS)$" )
