@@ -85,7 +85,7 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   #
   # Manually assemble some version information:
   #
-  IF(EXISTS ${MPI_INCLUDE_PATH}/mpi.h)
+  IF(EXISTS ${MPI_INCLUDE_PATH}/mpi.h AND NOT DEFINED MPI_VERSION)
     FILE(STRINGS "${MPI_INCLUDE_PATH}/mpi.h" MPI_VERSION_MAJOR_STRING
       REGEX "#define.*MPI_VERSION")
     STRING(REGEX REPLACE "^.*MPI_VERSION.*([0-9]+).*" "\\1"
