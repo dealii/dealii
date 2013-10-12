@@ -208,6 +208,10 @@ FOREACH(_var ${_features})
         _detailed("#            TBB_VERSION = ${TBB_VERSION}\n")
       ENDIF()
 
+      IF(_feature MATCHES "MPI" AND DEFINED OMPI_VERSION)
+        _detailed("#            OMPI_VERSION = ${OMPI_VERSION}\n")
+      ENDIF()
+
       #
       # Print out ${_feature}_DIR:
       #
