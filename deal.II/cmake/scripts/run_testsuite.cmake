@@ -118,16 +118,10 @@ MESSAGE("-- TRACK:                  ${TRACK}")
 IF("${CTEST_SOURCE_DIRECTORY}" STREQUAL "")
   #
   # If CTEST_SOURCE_DIRECTORY is not set we just assume that this script
-  # was called residing under (a) ../tests relative to the source directory
-  # or (b) cmake/scipts in the source directory
+  # was called residing under cmake/scipts in the source directory
   #
   GET_FILENAME_COMPONENT(_path "${CMAKE_CURRENT_LIST_DIR}" PATH)
-  SET(CTEST_SOURCE_DIRECTORY ${_path}/deal.II)
-
-  IF(NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/CMakeLists.txt)
-    GET_FILENAME_COMPONENT(_path "${_path}" PATH)
-    SET(CTEST_SOURCE_DIRECTORY ${_path})
-  ENDIF()
+  GET_FILENAME_COMPONENT(CTEST_SOURCE_DIRECTORY "${_path}" PATH)
 
   IF(NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/CMakeLists.txt)
     MESSAGE(FATAL_ERROR "
@@ -159,8 +153,7 @@ IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "")
   #
   SET(CTEST_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-  IF( "${CTEST_BINARY_DIRECTORY}" STREQUAL "${CTEST_SOURCE_DIR}"
-      OR "${CTEST_BINARY_DIRECTORY}" STREQUAL "${CMAKE_CURRENT_LIST_DIR}" )
+  IF( "${CTEST_BINARY_DIRECTORY}" STREQUAL "${CTEST_SOURCE_DIRECTORY}")
     MESSAGE(FATAL_ERROR "
 ctest was invoked in the source directory (or test source directory) and CTEST_BINARY_DIRECTORY is not set.
 Please either call ctest from within a designated build directory, or set CTEST_BINARY_DIRECTORY accordingly.
@@ -230,7 +223,6 @@ SET(CTEST_SITE "${_hostname}")
 
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
 
-ENDIF()
 IF( "${TRACK}" STREQUAL "Regression Tests"
     AND NOT CTEST_SITE MATCHES "c0541" )
   MESSAGE(FATAL_ERROR "
@@ -462,4 +454,4 @@ ENDIF()
 
 CTEST_SUBMIT()
 
-# .oO( This script is freaky 461 lines long... )
+# .oO( This script is freaky 457 lines long... )

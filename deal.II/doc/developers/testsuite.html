@@ -79,6 +79,7 @@
     <p>
       If you're impatient, use the following commands:
       <pre>
+
     $ mkdir new_directory
     $ cd new_directory
     $ svn checkout https://svn.dealii.org/trunk .
@@ -526,6 +527,7 @@
       and modify it to where it does what we'd like to test. Alternatively,
       you can also start from a template like this:
     <pre>
+
 // ---------------------------------------------------------------------
 // $Id$
 //
@@ -661,9 +663,82 @@ int main ()
     <a name="submit"></a>
     <h2>Submitting test results</h2>
 
-    <p class="todo">
-      Explain how to use <code>run_testsuite.cmake</code> in all imaginable
-      ways...
+    <p>
+      To submit test results to our <a
+        href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash</a>
+      instance just invoke ctest within a build directory (or designated
+      build directory) with the <code>-S</code> option pointing to the
+      <code>run_testsuite.cmake</code> script: <pre>
+
+      $ ctest [...] -V -S ../tests/run_testsuite.cmake
+      </pre>
+      The script will run configure, build and ctest and submit the results
+      to the CDash server. It does not matter whether the configure, build
+      or ctest stages were run before that. Also in script mode, you can
+      specify the same options for <code>ctest</code> as explained above.
+    </p>
+
+    <p>
+      <b>Note:</b> The default output in script mode is very minimal.
+      Therefore, it is recommended to specify <code>-V</code> which will
+      give the same level of verbosity as the non-script mode.
+    </p>
+
+    <p>
+      <b>Note:</b> The following variables can be set to via
+      <pre>
+
+    ctest -D&lt;variable&gt;=&lt;value&gt; [...]
+      </pre>
+      to control the behaviour of the <code>run_testsuite.cmake</code>
+      script:
+      <pre>
+
+    CTEST_SOURCE_DIRECTORY
+      - The source directory of deal.II (usually ending in "[...]/deal.II"
+        (equivalent to https://svn.dealii.org/trunk/deal.II)
+        Note: This is _not_ the test directory ending in "[...]/tests"
+      - If unspecified, "../deal.II" and "../../$ relative to the location
+        of this script is used. If this is not a source directory, an error
+        thrown.
+
+    CTEST_BINARY_DIRECTORY
+      - The designated build directory (already configured, empty, or non
+        existent - see the information about TRACKs what will happen)
+      - If unspecified the current directory is used. If the current
+        directory is equal to CTEST_SOURCE_DIRECTORY or the "tests"
+        directory, an error is thrown.
+
+    CTEST_CMAKE_GENERATOR
+      - The CMake Generator to use (e.g. "Unix Makefiles", or "Ninja", see
+        $ man cmake)
+      - If unspecified the current generator of a configured build directory
+        will be used, otherwise "Unix Makefiles".
+
+    TRACK
+      - The track the test should be submitted to. Defaults to "Experimental".
+        Possible values are:
+
+        "Experimental"     - all tests that are not specifically "build" or
+                             "regression" tests should go into this track
+
+        "Build Tests"      - Build tests that configure and build in a
+                             clean directory and run the build tests
+                             "build_tests/*"
+
+        "Nightly"          - Reserved for nightly regression tests for
+                             build bots on various architectures
+
+        "Regression Tests" - Reserved for the regression tester
+
+    CONFIG_FILE
+      - A configuration file (see docs/development/Config.sample)
+        that will be used during the configuration stage (invokes
+        $ cmake -C ${CONFIG_FILE}). This only has an effect if
+        CTEST_BINARY_DIRECTORY is empty.
+      </pre>
+      Furthermore, the variables described <a href="#setupconfigure">above</a> can also be
+      set and will be handed automatically down to <code>cmake</code>.
     </p>
 
 
@@ -674,70 +749,43 @@ int main ()
     <p>
       Build tests are used to check that deal.II can be compiled on
       different systems and with different compilers as well as
-      different configuration options. Results are collected in a
-      database and can be accessed <a
-      href="http://www.dealii.org/testsuite.html">online</a>.<p>
+      different configuration options. Results are collected in the "Build
+      Tests" track in <a
+      href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash</a>.<p>
 
       <p>Running the build test suite is simple and we encourage deal.II
       users with configurations not found on the <a
       href="http://www.dealii.org/testsuite.html">test suite page</a> to
       participate. Assuming you checked out deal.II into the directory
-      <code>dealtest</code>, running it is as simple as:
+      <code>deal.II</code>, running it is as simple as:
       <pre>
 
-    cd dealtest
-    svn update
-    ./contrib/utilities/build_test
-    mail build-tests@dealii.org &lt; *.log
-  ( rm *.log )
+    cd deal.II
+    mkdir build
+    cd build
+    ctest -j4 -S ../cmake/scripts/run_buildtest.cmake
       </pre>
     </p>
 
     <p>
-      What this does is to create a temporary directory, compile and build
-      deal.II in it, and for good measure also build the tutorial
-      programs. The fourth of the commands above then sends the resulting
-      status files to a daemon that presents this information on the website
-      linked to above.
+      What this does is to compile and build deal.II in the directory
+      <code>build</code>, try to configure, build (and run a subset) of all
+      tutorial programs supported by the current configuration and send the
+      results to the CDash instance.
     </p>
 
     <p>
-      The <code>build_test</code> script supports the following options:
+      <b>Note:</b> Build tests require the designated build directory to be
+      completely empty and the source directory to be under subversion
+      version control. If you want to specify a build configuration for
+      cmake use a <a href="../users/Config.sample">configuration file</a>
+      to preseed the cache as explained <a href="#submit">above</a>:
       <pre>
 
-    SOURCEDIR     - the source directory to use (otherwise the current directory is used)
-    CONFIGFILE    - A cmake configuration file for the build test
-    LOGDIR        - directory for the log file
-    LOGFILE       - the logfile to use, defaults to
-                        $LOGDIR/$BRANCH.$CONFIGFILE.<unix time>.log
-
-    CMAKE         - the cmake executable to use
-    SVN           - svn info command to use, defaults to
-                        svn info $(SOURCEDIR)
-    TMPDIR        - defaults to "/tmp"
-    CLEAN_TMPDIR  - defaults to "true"
-    RUN_EXAMPLES  - defaults to "true"
-      </pre>
-      An example configuration file can be found <a
-      href="../users/Config.sample">here</a>. Options can be passed either via
-    environment variables
-      <pre>
-
-    export CONFIGFILE=MyConfiguration.conf
-    ./contrib/utilities/build_test
-      </pre>
-      or directly on the command line:
-      <pre>
-
-    ./contrib/utilities/build_test CONFIGFILE=myConfiguration.conf
+    $ ctest -DCONFIG_FILE="[...]/Config.sample" [...]
       </pre>
     </p>
 
-    <p>
-      A status indicator should appear on the build test website after some
-      time (results are collected and processed by a program that is run
-      periodically, but not immediately after a mail has been received).
-    </p>
 
 
     <a name="dedicatedbuilds"></a>
