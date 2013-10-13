@@ -2353,7 +2353,7 @@ RefinementCase<1>::cut_axis (const unsigned int i)
   const unsigned int dim = 1;
   Assert (i < dim, ExcIndexRange(i, 0, dim));
 
-  static const RefinementCase options[dim] = { cut_x };
+  static const RefinementCase options[dim] = { RefinementPossibilities<1>::cut_x };
   return options[i];
 }
 
@@ -2367,7 +2367,8 @@ RefinementCase<2>::cut_axis (const unsigned int i)
   const unsigned int dim = 2;
   Assert (i < dim, ExcIndexRange(i, 0, dim));
 
-  static const RefinementCase options[dim] = { cut_x, cut_y };
+  static const RefinementCase options[dim] = { RefinementPossibilities<2>::cut_x,
+					       RefinementPossibilities<2>::cut_y };
   return options[i];
 }
 
@@ -2381,7 +2382,9 @@ RefinementCase<3>::cut_axis (const unsigned int i)
   const unsigned int dim = 3;
   Assert (i < dim, ExcIndexRange(i, 0, dim));
 
-  static const RefinementCase options[dim] = { cut_x, cut_y, cut_z };
+  static const RefinementCase options[dim] = { RefinementPossibilities<3>::cut_x,
+					       RefinementPossibilities<3>::cut_y,
+					       RefinementPossibilities<3>::cut_z };
   return options[i];
 }
 

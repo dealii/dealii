@@ -1189,6 +1189,7 @@ partition (const unsigned int         n_partitions,
 
 
 // explicit instantiations
+template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &, bool);
 template void SparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &, bool);
 template void SparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &, bool);
 template void SparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const CompressedSimpleSparsityPattern &, bool);

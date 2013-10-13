@@ -137,7 +137,10 @@ The tables at the end of each cycle show information about computing time
 and the number of calls of different parts of the program like assembly or
 calculating the residual, for the most recent mesh refinement cycle. Some of
 the numbers above can be improved by transfering the solution from one mesh to
-the next, an option we have not exercised here.
+the next, an option we have not exercised here. Of course, you can also make
+the program run faster, especially on the later refinement cycles, by just
+using more processors: the accompanying paper shows good scaling to at least
+1000 cores.
 
 In a typical run, you can observe that for every refinement step, the active
 set - the contact points - are iterated out at first. After that the Newton
