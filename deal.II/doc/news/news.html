@@ -38,6 +38,18 @@
 
     <dl>
       <dt>
+          <strong>2013/10/01: step-51 implements an HDG method </strong>
+      </dt>
+      <dd>
+          step-51, contributed by Martin Kronbichler and Scott Miller,
+          implements a hybridized discontinuous Galerkin method for the scalar
+          convection-diffusion equation. The method uses standard DG terms for
+          describing the element interior but couples the local sub-problems
+          using face elements. The local contribution is eliminated from the
+          global linear system by a static condensation process.
+      </dd>
+
+      <dt>
           <strong style="color:red">2013/07/24: Version 8.0 released</strong>
       </dt>
       <dd>
