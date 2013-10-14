@@ -38,6 +38,8 @@ void
 check_this (const FiniteElement<dim> &fe,
             const FiniteElement<dim> &/*fe2*/)
 {
+  deallog << std::setprecision (8);
+
   // only check if both elements have
   // support points. otherwise,
   // interpolation doesn't really
