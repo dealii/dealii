@@ -23,8 +23,10 @@
 #include <deal.II/lac/solver_selector.h>
 #include <fstream>
 
+DEAL_II_NAMESPACE_OPEN
 // instantiation here
 template class SolverSelector<>;
+DEAL_II_NAMESPACE_CLOSE
 
 int main ()
 {
