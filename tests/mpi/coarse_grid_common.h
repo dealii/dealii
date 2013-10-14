@@ -99,21 +99,24 @@ void assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
 }
 
 
-template <typename T>
+/*
+ * Do not use a template here to work around an overload resolution issue with clang and
+ * enabled  C++11 mode.
+ *
+ * - Maier 2013
+ */
 LogStream &
 operator << (LogStream &out,
-             const std::vector<T> &v)
+             const std::vector<unsigned int> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     out << v[i] << (i == v.size()-1 ? "" : " ");
   return out;
 }
 
-
-template <typename T>
-std::ostringstream &
-operator << (std::ostringstream &out,
-             const std::vector<T> &v)
+LogStream &
+operator << (LogStream &out,
+             const std::vector<double> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     out << v[i] << (i == v.size()-1 ? "" : " ");
