@@ -83,4 +83,8 @@ int main()
   deallog.threshold_double(1.e-10);
 
   test ();
+
+  deallog.detach();
+  logfile.close();
+  unify_pretty_function ("output");
 }

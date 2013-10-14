@@ -231,6 +231,18 @@ void sort_file_contents (const std::string &filename)
 }
 
 
+/*
+ * Replace all occurences of ' &' by '& ' from the given file to hopefully be more compiler
+ * independent with respect to __PRETTY_FUNCTION__
+ */
+void unify_pretty_function (const std::string &filename)
+{
+  int error = std::system ((std::string ("sed -i -e 's/ \\&/ \\& /g' -e 's/ & ,/\\&,/g' -e 's/ \\& )/\\&)/g' -e 's/ \\& /\\& /g' ") + filename).c_str());
+  Assert (error == 0,
+	  ExcInternalError());
+}
+
+
 
 
 
