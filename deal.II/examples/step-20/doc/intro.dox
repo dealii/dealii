@@ -400,10 +400,10 @@ also a full matrix. On the other hand, the CG algorithm doesn't require
 us to actually have a representation of $S$, it is sufficient to form
 matrix-vector products with it. We can do so in steps: to compute $Sv=B^TM^{-1}Bv=B^T(M^{-1}(Bv))$, we
 <ol>
- <li> form $w = T v$;
+ <li> form $w = B v$;
  <li> solve $My = w$ for $y=M^{-1}w$, using the CG method applied to the
   positive definite and symmetric mass matrix $M$;
- <li> form $z=B^Ty$ to obtain $Sv=z$.
+ <li> form $z=B^Ty$ to obtain $z=Sv$.
 </ol>
 Note how we evaluate the expression $B^TM^{-1}Bv$ right to left to
 avoid matrix-matrix products; this way, all we have to do is evaluate
