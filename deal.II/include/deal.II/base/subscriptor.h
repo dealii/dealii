@@ -75,7 +75,11 @@ public:
    * Destructor, asserting that the counter
    * is zero.
    */
+#ifdef DEAL_II_USE_CXX11
+  virtual ~Subscriptor() noexcept(false);
+#else
   virtual ~Subscriptor();
+#endif
 
   /**
    * Assignment operator.
