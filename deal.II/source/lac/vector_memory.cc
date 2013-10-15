@@ -102,7 +102,7 @@ GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const size_type initial_size,
 
 template<typename VECTOR>
 inline
-GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
+GrowingVectorMemory<VECTOR>::~GrowingVectorMemory() noexcept(false)
 {
   AssertThrow(current_alloc == 0,
               StandardExceptions::ExcMemoryLeak(current_alloc));
