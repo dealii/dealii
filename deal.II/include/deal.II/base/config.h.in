@@ -121,6 +121,11 @@
 # define DEAL_II_CAN_USE_CXX1X
 #endif
 
+/* Defined if C++11 is enabled and the standard library supports
+ * template<typename T> std::is_trivially_copyable<T>
+ */
+#cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+
 /* Defined if isnan is available */
 #cmakedefine HAVE_ISNAN
 

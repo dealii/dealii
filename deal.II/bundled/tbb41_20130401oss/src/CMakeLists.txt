@@ -118,10 +118,3 @@ ELSE()
     DEAL_II_ADD_DEFINITIONS(obj_tbb "DO_ITT_NOTIFY")
   ENDIF()
 ENDIF()
-
-#
-# Workaround for clang to compile in C++11 mode:
-#
-IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  DEAL_II_ADD_DEFINITIONS(obj_tbb "TBB_IMPLEMENT_CPP0X=1")
-ENDIF()
