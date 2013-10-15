@@ -119,49 +119,22 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   # Shared library handling:
   #
   IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    #
     # With MinGW we're lucky:
-    #
     ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--export-all-symbols")
     ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--enable-auto-import")
     ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--allow-multiple-definition")
-
-    #
-    # Workaround for a miscompilation and linkage issue with shared libraries
-    # with MinGW. Replacing -O0 with -O1 seems to help..
-    #
-    REPLACE_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-O0" "-O1")
-
   ELSE()
-
-    #
     # Otherwise disable shared libraries:
-    #
     MESSAGE(WARNING "\n"
       "BUILD_SHARED_LIBS forced to OFF\n\n"
       )
     SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
   ENDIF()
 
-  #
-  # Disable -ggdb and -g on Windows/MinGW targets for the moment until the
-  # compilation issues with too big files are resolved
-  #
-  # - Matthias Maier, 2012
-  #
-  STRIP_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-ggdb")
-  STRIP_FLAG(DEAL_II_LINKER_FLAGS_DEBUG "-ggdb")
-  STRIP_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-g")
-  STRIP_FLAG(DEAL_II_LINKER_FLAGS_DEBUG "-g")
 ENDIF()
 
 
-IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
-  #
-  # Workaround for a miscompilation and linkage issue with shared libraries
-  # under Cygwin. Replacing -O0 with -O1 helps.
-  #
-  # - Matthias Maier, 2013
-  #
-  REPLACE_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-O0" "-O1")
+IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
+    OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
+  # TODO: Bailout if current compiler is not gcc-4.8.1 or newer
 ENDIF()

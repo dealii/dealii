@@ -31,7 +31,13 @@ GeometryInfo<0>::n_children(const RefinementCase<0> &)
 template <int dim> const unsigned int GeometryInfo<dim>::max_children_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::faces_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::max_children_per_face;
-template <int dim> const unsigned int GeometryInfo<dim>::vertices_per_cell;
+#ifdef DEAL_II_USE_CXX11
+  // Workaround for some versions of gcc-4.8.1 (notably on Cygwin and Mac)
+  // that incorrectly fail to deduce the second version as a constexpr
+  template <int dim> constexpr unsigned int GeometryInfo<dim>::vertices_per_cell;
+#else
+  template <int dim> const unsigned int GeometryInfo<dim>::vertices_per_cell;
+#endif
 template <int dim> const unsigned int GeometryInfo<dim>::vertices_per_face;
 template <int dim> const unsigned int GeometryInfo<dim>::lines_per_face;
 template <int dim> const unsigned int GeometryInfo<dim>::quads_per_face;

@@ -1457,7 +1457,13 @@ struct GeometryInfo
   /**
    * Number of vertices of a cell.
    */
+#ifdef DEAL_II_USE_CXX11
+  // Workaround for some versions of gcc-4.8.1 (notably on Cygwin and Mac)
+  // that incorrectly fail to deduce the second version as a constexpr
+  static constexpr unsigned int vertices_per_cell = 1 << dim;
+#else
   static const unsigned int vertices_per_cell = 1 << dim;
+#endif
 
   /**
    * Number of vertices on each
