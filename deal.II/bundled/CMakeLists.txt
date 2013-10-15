@@ -41,7 +41,7 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
 
   ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
 
-  IF( DEAL_II_WITH_THREADS AND NOT DEAL_II_CAN_USE_CXX11)
+  IF( DEAL_II_WITH_THREADS AND NOT DEAL_II_USE_CXX11)
     #
     # If the C++ compiler doesn't completely support the C++11 standard
     # (and consequently we can't use std::thread, std::mutex, etc), then

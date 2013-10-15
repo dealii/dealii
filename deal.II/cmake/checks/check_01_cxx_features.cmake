@@ -21,7 +21,7 @@
 #
 #   DEAL_II_HAVE_CXX11_FLAG
 #   DEAL_II_CXX11_FLAG
-#   DEAL_II_CAN_USE_CXX11
+#   DEAL_II_USE_CXX11
 #   HAVE_ISNAN
 #   HAVE_UNDERSCORE_ISNAN
 #   DEAL_II_HAVE_ISFINITE
@@ -168,7 +168,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
 
     MESSAGE(STATUS "Sufficient C++11 support. Enabling ${DEAL_II_CXX11_FLAG}.")
 
-    SET(DEAL_II_CAN_USE_CXX11 TRUE)
+    SET(DEAL_II_USE_CXX11 TRUE)
 
     ADD_FLAGS(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
 
@@ -179,7 +179,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
 #
 # Currently unused
 #
-#  IF(DEAL_II_CAN_USE_CXX11)
+#  IF(DEAL_II_USE_CXX11)
 #    #
 #    # Also test for a couple of C++11 things that we don't use in the
 #    # library but that users may want to use in their applications and that
