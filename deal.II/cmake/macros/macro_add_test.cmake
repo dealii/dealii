@@ -152,7 +152,9 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
                  ${_test_directory}/failing_diff
               && echo "${_test_full}: BUILD successful."
               && echo "${_test_full}: RUN successful."
-              && echo "${_test_full}: DIFF failed. Output:"
+              && echo "${_test_full}: DIFF failed. ------ Source: ${_comparison_file}"
+              && echo "${_test_full}: DIFF failed. ------ Result: ${_test_directory}/output"
+              && echo "${_test_full}: DIFF failed. ------ Diffs as follows:"
               && cat ${_test_directory}/failing_diff
               && exit 1)
         WORKING_DIRECTORY
