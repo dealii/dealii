@@ -253,7 +253,8 @@ private:
   void build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
                         internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
                         ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
-                        const CurvedCellRegion curved_cell_region);
+                        const CurvedCellRegion curved_cell_region,
+                        std::vector<dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches);
 };
 
 

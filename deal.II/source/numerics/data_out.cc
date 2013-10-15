@@ -59,17 +59,11 @@ namespace internal
 
 
     /**
-     * In a WorkStream context, use this function to append the patch computed
-     * by the parallel stage to the array of patches.
+     * Dummy function used for WorkStream.
      */
     template <int dim, int spacedim>
     void
-    append_patch_to_list (const DataOutBase::Patch<dim,spacedim> &patch,
-                          std::vector<DataOutBase::Patch<dim,spacedim> > &patches)
-    {
-      patches.push_back (patch);
-      patches.back().patch_index = patches.size()-1;
-    }
+    copy(const DataOutBase::Patch<dim,spacedim> &patch) {}
   }
 }
 
@@ -81,7 +75,8 @@ DataOut<dim,DH>::
 build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
                  internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
                  DataOutBase::Patch<DH::dimension, DH::space_dimension> &patch,
-                 const CurvedCellRegion curved_cell_region)
+                 const CurvedCellRegion curved_cell_region,
+                 std::vector<DataOutBase::Patch<DH::dimension, DH::space_dimension> > &patches)
 {
   // use ucd_to_deal map as patch vertices are in the old, unnatural
   // ordering. if the mapping does not preserve locations
@@ -306,6 +301,10 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
       patch.neighbors[f]
         = (*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()];
     }
+
+  // Put the patch in the patches vector
+  patches[cell_and_index->second] = patch;
+  patches[cell_and_index->second].patch_index = cell_and_index->second;
 }
 
 
@@ -398,8 +397,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   }
 
   this->patches.clear ();
-  this->patches.reserve (all_cells.size());
-  Assert (this->patches.size() == 0, ExcInternalError());
+  this->patches.resize(all_cells.size());
 
   // now create a default object for the WorkStream object to work with
   unsigned int n_datasets=this->cell_data.size();
@@ -449,9 +447,9 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                      &all_cells[0]+all_cells.size(),
                      std_cxx1x::bind(&DataOut<dim,DH>::build_one_patch,
                                      *this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3,
-                                     curved_cell_region),
-                     std_cxx1x::bind(&internal::DataOut::append_patch_to_list<dim,DH::space_dimension>,
-                                     std_cxx1x::_1, std_cxx1x::ref(this->patches)),
+                                     curved_cell_region,std_cxx1x::ref(this->patches)),
+                     std_cxx1x::bind(&internal::DataOut::copy<dim,DH::space_dimension>,
+                                     std_cxx1x::_1),
                      thread_data,
                      sample_patch);
 }
