@@ -301,66 +301,6 @@ struct SetGrainSizes
 }
 set_grain_sizes;
 
-
-
-// spawn a thread that terminates the program after a certain time
-// given by the environment variable WALLTIME. this makes
-// sure we don't let jobs that deadlock on some mutex hang around
-// forever. note that this is orthogonal to using "ulimit" in
-// Makefile.rules, which only affects CPU time and consequently works
-// on infinite loops but not deadlocks
-//
-// the actual sleep time isn't all that important. the point is that
-// we need to kill deadlocked threads at one point, whenever that is
-#ifdef DEAL_II_WITH_THREADS
-
-struct DeadlockKiller
-{
-private:
-  static void nuke_it ()
-  {
-    char *env = std::getenv("WALLTIME");
-
-    if (env != 0)
-      {
-        std::istringstream conv (env);
-        int delay;
-        conv >> delay;
-        if (conv)
-          {
-            sleep (delay);
-            std::cerr << "Time's up: Killing job after "
-                      << delay
-                      << " seconds because it overran its allowed walltime."
-                      << std::endl;
-            std::abort ();
-          }
-        else
-          {
-            std::cerr << "Invalid value for WALLTIME environment variable."
-                      << std::endl;
-            std::abort ();
-          }
-      }
-    else
-      // environment variable is not set, so assume infinite wait time
-      // and simply quit this thread
-      {
-      }
-  }
-
-public:
-  DeadlockKiller ()
-  {
-    dealii::Threads::new_thread (&nuke_it);
-  }
-};
-
-#endif
-
 DEAL_II_NAMESPACE_CLOSE
-
-
-
 
 #endif // __tests_tests_h

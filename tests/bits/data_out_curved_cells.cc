@@ -256,14 +256,6 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  // this test, for reasons unknown
-  // to me, appears to deadlock at
-  // times. make sure we kill it
-  // after some time
-#ifdef DEAL_II_WITH_THREADS
-  DeadlockKiller killer;
-#endif
-
   curved_grid (logfile);
 }
 
