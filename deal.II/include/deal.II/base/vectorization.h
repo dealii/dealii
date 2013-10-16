@@ -1952,10 +1952,8 @@ DEAL_II_NAMESPACE_CLOSE
 namespace std
 {
   /**
-   * Computes the sine of a vectorized
-   * data field. The result is return as
-   * vectorized array in the form
-   * <tt>{sin(x[0]), sin(x[1]), ...,
+   * Computes the sine of a vectorized data field. The result is return as
+   * vectorized array in the form <tt>{sin(x[0]), sin(x[1]), ...,
    * sin(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -1974,10 +1972,8 @@ namespace std
 
 
   /**
-   * Computes the tangent of a vectorized
-   * data field. The result is return as
-   * vectorized array in the form
-   * <tt>{tan(x[0]), tan(x[1]), ...,
+   * Computes the tangent of a vectorized data field. The result is return as
+   * vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
    * tan(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -1995,10 +1991,8 @@ namespace std
 
 
   /**
-   * Computes the cosine of a vectorized
-   * data field. The result is return as
-   * vectorized array in the form
-   * <tt>{cos(x[0]), cos(x[1]), ...,
+   * Computes the cosine of a vectorized data field. The result is return as
+   * vectorized array in the form <tt>{cos(x[0]), cos(x[1]), ...,
    * cos(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -2016,10 +2010,8 @@ namespace std
 
 
   /**
-   * Computes the exponential of a vectorized
-   * data field. The result is return as
-   * vectorized array in the form
-   * <tt>{exp(x[0]), exp(x[1]), ...,
+   * Computes the exponential of a vectorized data field. The result is return
+   * as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
    * exp(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -2037,10 +2029,8 @@ namespace std
 
 
   /**
-   * Computes the natural logarithm of a
-   * vectorized data field. The result is return
-   * as vectorized array in the form
-   * <tt>{log(x[0]), log(x[1]), ...,
+   * Computes the natural logarithm of a vectorized data field. The result is
+   * return as vectorized array in the form <tt>{log(x[0]), log(x[1]), ...,
    * log(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -2059,10 +2049,8 @@ namespace std
 
 
   /**
-   * Computes the square root of a vectorized
-   * data field. The result is return as
-   * vectorized array in the form
-   * <tt>{sqrt(x[0]), sqrt(x[1]), ...,
+   * Computes the square root of a vectorized data field. The result is return
+   * as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]), ...,
    * sqrt(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -2078,11 +2066,9 @@ namespace std
 
 
   /**
-   * Computes the absolute value (modulus) of a
-   * vectorized data field. The result is return
-   * as vectorized array in the form
-   * <tt>{abs(x[0]), abs(x[1]), ...,
-   * abs(x[n_array_elements-1])}</tt>.
+   * Computes the absolute value (modulus) of a vectorized data field. The
+   * result is return as vectorized array in the form <tt>{abs(x[0]),
+   * abs(x[1]), ..., abs(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
    */
@@ -2097,11 +2083,9 @@ namespace std
 
 
   /**
-   * Computes the componentwise maximum of two
-   * vectorized data fields. The result is
-   * return as vectorized array in the form
-   * <tt>{max(x[0],y[0]), max(x[1],y[1]),
-   * ...}</tt>.
+   * Computes the componentwise maximum of two vectorized data fields. The
+   * result is return as vectorized array in the form <tt>{max(x[0],y[0]),
+   * max(x[1],y[1]), ...}</tt>.
    *
    * @relates VectorizedArray
    */
@@ -2117,11 +2101,9 @@ namespace std
 
 
   /**
-   * Computes the componentwise minimum of two
-   * vectorized data fields. The result is
-   * return as vectorized array in the form
-   * <tt>{min(x[0],y[0]), min(x[1],y[1]),
-   * ...}</tt>.
+   * Computes the componentwise minimum of two vectorized data fields. The
+   * result is return as vectorized array in the form <tt>{min(x[0],y[0]),
+   * min(x[1],y[1]), ...}</tt>.
    *
    * @relates VectorizedArray
    */
