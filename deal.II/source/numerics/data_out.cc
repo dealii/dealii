@@ -465,7 +465,7 @@ typename DataOut<dim,DH>::cell_iterator
 DataOut<dim,DH>::first_locally_owned_cell ()
 {
   typename DataOut<dim,DH>::cell_iterator
-  cell = this->triangulation->begin_active ();
+    cell = first_cell();
 
   // skip cells if the current one has no children (is active) and is a ghost
   // or artificial cell
