@@ -2080,6 +2080,6 @@ X<8> x8;
 
   deallog.detach ();
   logfile.close ();
-  sort_file_contents ("output");
   unify_pretty_function ("output");
+  sort_file_contents ("output");
 }
