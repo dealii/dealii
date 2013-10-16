@@ -191,7 +191,7 @@
 
 
 /****************************************
- * Configured in check_2_compiler_bugs: *
+ * Configured in check_3_compiler_bugs: *
  ****************************************/
 
 /* Defined if we have to work around a bug with some compilers that will not
@@ -226,6 +226,12 @@
  * involves boost::bind
  */
 #cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
+
+/* Defined if the compiler incorrectly deduces a constexpr as not being a
+ * constant integral expression under certain optimization (notably
+ * gcc-4.8.1 on Windows and Mac)
+ */
+#cmakedefine DEAL_II_CONSTEXPR_BUG
 
 
 /*****************************************

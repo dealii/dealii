@@ -1557,8 +1557,8 @@ next_cell:
         for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
           parent_vertices[i] = object->vertex(i);
 
-        GeometryInfo<structdim>::template alternating_form_at_vertices<spacedim>
-          (parent_vertices, parent_alternating_forms);
+        GeometryInfo<structdim>::alternating_form_at_vertices (parent_vertices,
+                                                               parent_alternating_forms);
 
         const Tensor<spacedim-structdim,spacedim>
         average_parent_alternating_form
@@ -1595,8 +1595,8 @@ next_cell:
             = object_mid_point;
 
         for (unsigned int c=0; c<object->n_children(); ++c)
-          GeometryInfo<structdim>::template alternating_form_at_vertices<spacedim>
-            (child_vertices[c], child_alternating_forms[c]);
+          GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
+                                                                 child_alternating_forms[c]);
 
         // on a uniformly refined
         // hypercube object, the child
@@ -1893,8 +1893,8 @@ next_cell:
 
         Tensor<spacedim-structdim,spacedim> parent_alternating_forms
         [GeometryInfo<structdim>::vertices_per_cell];
-        GeometryInfo<structdim>::template alternating_form_at_vertices<spacedim>
-          (parent_vertices, parent_alternating_forms);
+        GeometryInfo<structdim>::alternating_form_at_vertices (parent_vertices,
+                                                               parent_alternating_forms);
 
         Point<spacedim> child_vertices
         [GeometryInfo<structdim>::max_children_per_cell]
@@ -1909,8 +1909,8 @@ next_cell:
         [GeometryInfo<structdim>::vertices_per_cell];
 
         for (unsigned int c=0; c<object->n_children(); ++c)
-          GeometryInfo<structdim>::template alternating_form_at_vertices<spacedim>
-            (child_vertices[c], child_alternating_forms[c]);
+          GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
+                                                                 child_alternating_forms[c]);
 
         old_min_product = child_alternating_forms[0][0] * parent_alternating_forms[0];
         for (unsigned int c=0; c<object->n_children(); ++c)
@@ -1931,8 +1931,8 @@ next_cell:
             = object_mid_point;
 
         for (unsigned int c=0; c<object->n_children(); ++c)
-          GeometryInfo<structdim>::template alternating_form_at_vertices<spacedim>
-            (child_vertices[c], child_alternating_forms[c]);
+          GeometryInfo<structdim>::alternating_form_at_vertices (child_vertices[c],
+                                                                 child_alternating_forms[c]);
 
         new_min_product = child_alternating_forms[0][0] * parent_alternating_forms[0];
         for (unsigned int c=0; c<object->n_children(); ++c)

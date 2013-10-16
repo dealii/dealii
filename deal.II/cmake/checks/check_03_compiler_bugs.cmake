@@ -323,3 +323,18 @@ IF(DEAL_II_ICC_NUMERICLIMITS_BUG)
   SET(DEAL_II_USE_CXX11 FALSE)
 ENDIF()
 
+#
+# gcc-4.8.1 has some problems with the constexpr "vertices_per_cell" in the
+# definition of alternating_form_at_vertices.
+#
+# TODO: Write a unit test.
+#
+# For now, just enable the workaround for Windows targets
+#
+# - Matthias Maier, 2013
+#
+
+IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
+    OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
+  SET(DEAL_II_CONSTEXPR_BUG TRUE)
+ENDIF()
