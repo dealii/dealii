@@ -302,6 +302,9 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
         = (*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()];
     }
 
+  // did we mess up the indices?
+  Assert(cell_and_index->second < patches.size(), ExcInternalError());
+  
   // Put the patch in the patches vector
   patches[cell_and_index->second] = patch;
   patches[cell_and_index->second].patch_index = cell_and_index->second;
