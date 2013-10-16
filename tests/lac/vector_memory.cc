@@ -86,7 +86,6 @@ main()
     }
   catch (StandardExceptions::ExcMemoryLeak e)
     {
-      e.print_exc_data(logfile);
-      e.print_info(logfile);
+      deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 }
