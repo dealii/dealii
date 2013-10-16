@@ -146,6 +146,12 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: When deriving from DataOut to filter the cells where output is generated, there were two different bugs that result in segmentation faults or wrong cells written (example, step-18).
+  <br>
+  (Timo Heister, 2013/10/16)
+  </li>
+
+  <li>
   New: GridIn::read_vtk() reads 2d and 3d meshes in VTK format.
   <br>
   (Mayank Sabharwal, Andreas Putz, 2013/10/07)
