@@ -591,7 +591,7 @@ public:
      mapping_contravariant_gradient() and mapping_piola_gradient()
      are only true as stated for linear mappings.
      If, for example, the mapping is bilinear then there is a missing
-     term associated with the derivative of of J.
+     term associated with the derivative of J.
   */
   virtual
   void
