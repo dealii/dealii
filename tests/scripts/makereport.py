@@ -75,6 +75,9 @@ for test in testing.findall("Test"):
     name = test.find('Name').text
     group = name.split('/')[0]
 
+    if group=="all-headers":
+        name = group + "/" + "-".join(name.split('/')[1:])
+
     if fail:
         line = "%s  3   %s%s"%(date,branch,name)
     else:
