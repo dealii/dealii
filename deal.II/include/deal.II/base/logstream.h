@@ -362,13 +362,6 @@ public:
 
 
   /**
-   * Output a constant something through this stream.
-   */
-  template <typename T>
-  LogStream &operator << (const T &t);
-
-
-  /**
    * Output double precision numbers through this stream.
    *
    * If they are set, this function applies the methods for making floating
@@ -557,10 +550,29 @@ private:
    * for every thread that sends log messages.
    */
   Threads::ThreadLocalStorage<std_cxx1x::shared_ptr<std::ostringstream> > outstreams;
+
+  template <typename T> friend LogStream &operator << (LogStream & log, const T &t);
 };
 
 
 /* ----------------------------- Inline functions and templates ---------------- */
+
+
+/**
+ * Output a constant something through LogStream:
+ *
+ * @note We declare this operator as a non-member function so that it is
+ * possible to overload it with more specialized templated versions under
+ * C++11 overload resolution rules
+ */
+template <typename T>
+inline
+LogStream & operator<< (LogStream &log, const T &t)
+{
+  // print to the internal stringstream
+  log.get_stream() << t;
+  return log;
+}
 
 
 inline
@@ -585,17 +597,6 @@ LogStream::get_stream()
   return *outstreams.get();
 }
 
-
-template <class T>
-inline
-LogStream &
-LogStream::operator<< (const T &t)
-{
-  // print to the internal stringstream
-  get_stream() << t;
-
-  return *this;
-}
 
 
 
