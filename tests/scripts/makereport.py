@@ -78,10 +78,21 @@ for test in testing.findall("Test"):
     if group=="all-headers":
         name = group + "/" + "-".join(name.split('/')[1:])
 
+    status = 4
     if fail:
-        line = "%s  3   %s%s"%(date,branch,name)
-    else:
-        line = "%s   +  %s%s"%(date,branch,name)
+        failtext = test.find('Results').find('Measurement').find('Value').text.encode('utf-8')
+        failtextlines = failtext.replace('"','').split('\n')
+        failstatustxt = failtextlines[0].split(' ')[-1]
+        for i in range(0,len(failtextlines)):
+            statuslist=['CONFIGURE','BUILD','RUN','DIFF']
+            if failstatustxt in statuslist:
+                status = statuslist.index(failstatustxt)
+            else:
+                print "unknown status '%s'"%failstatustxt
+                status=0           
+
+    stati = [" 0  "," 1  "," 2  "," 3  ","  + "]
+    line = "%s %s %s%s"%(date,stati[status],branch,name)
 
     if group not in tests: tests[group]=[]
     tests[group].append( line )
