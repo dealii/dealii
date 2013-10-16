@@ -70,6 +70,9 @@ namespace types
    *
    * The data type always indicates an
    * unsigned integer type.
+   *
+   * See the @ref GlobalDoFIndex page for guidance on when this
+   * type should or should not be used.
    */
   // TODO: we should check that unsigned long long int
   // has the same size as uint64_t

@@ -54,7 +54,7 @@
 // <code>multithread_info</code> of that type) which can be used to query the
 // number of processors in your system, which is often useful when deciding
 // how many threads to start in parallel.
-#include <deal.II/base/thread_management.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/base/multithread_info.h>
 
 // The next new include file declares a base class <code>TensorFunction</code>
@@ -73,6 +73,25 @@
 namespace Step9
 {
   using namespace dealii;
+
+  namespace Assembler
+  {
+    struct Scratch
+    {
+      Scratch() {};
+    };
+
+    struct CopyData
+    {
+      CopyData() {};
+
+      unsigned int dofs_per_cell;
+      std::vector<types::global_dof_index> local_dof_indices;
+      // We declare cell matrix and cell right hand side...
+      FullMatrix<double> cell_matrix;
+      Vector<double>  cell_rhs;
+    };
+  }
 
   // @sect3{AdvectionProblem class declaration}
 
@@ -107,8 +126,10 @@ namespace Step9
     // in the module, there are other, and possibly better suited, ways to
     // achieve the same goal.
     void assemble_system ();
-    void assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
-                                   const typename DoFHandler<dim>::active_cell_iterator &end);
+    void build_local_system (typename DoFHandler<dim>::active_cell_iterator const &cell,
+        Assembler::Scratch &scratch,Assembler::CopyData &copy_data);
+    void copy_local_to_global (Assembler::CopyData const &copy_data);
+                                   
 
     // The following functions again are as in previous examples, as are the
     // subsequent variables.
@@ -128,23 +149,6 @@ namespace Step9
 
     Vector<double>       solution;
     Vector<double>       system_rhs;
-
-    // When assembling the matrix in parallel, we have to synchronize when
-    // several threads attempt to write the local contributions of a cell to
-    // the global matrix at the same time. This is done using a
-    // <code>Mutex</code>, which is an object that can be owned by only one
-    // thread at a time. If a thread wants to write to the matrix, it has to
-    // acquire this lock (if it is presently owned by another thread, then it
-    // has to wait), then write to the matrix and finally release the
-    // lock. Note that if the library was not compiled to support
-    // multithreading (which you have to specify at the time you call the
-    // <code>./configure</code> script in the top-level directory), then
-    // the actual data type of the typedef
-    // <code>Threads::Mutex</code> is a dummy class that provides all the
-    // functions needed for a mutex, but does nothing when they are called;
-    // this is reasonable, of course, since if only one thread is running at a
-    // time, there is no need to synchronize with other threads.
-    Threads::Mutex     assembler_lock;
   };
 
 
@@ -526,7 +530,7 @@ namespace Step9
     // is returned by n_threads(). This
     // is also queried by functions inside the library to determine
     // how many threads they shall create.
-    const unsigned int n_threads = multithread_info.n_threads();
+    
     // It is worth noting, however, that this setup determines the load
     // distribution onto processor in a static way: it does not take into
     // account that some other part of our program may also be running
@@ -559,7 +563,6 @@ namespace Step9
     // object. Likewise, the function <code>join</code> that is supposed to
     // wait for all spawned threads to return, returns immediately, as there
     // can't be any threads running.
-    Threads::ThreadGroup<> threads;
 
     // Now we have to split the range of cells into chunks of approximately
     // the same size. Each thread will then assemble the local contributions
@@ -584,22 +587,21 @@ namespace Step9
     // <code>raw_iterator</code>), and in this case the C++ language requires
     // us to specify the template type explicitly. For brevity, we first
     // typedef this data type to an alias.
+
     typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
-    std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-    thread_ranges
-      = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
-                                                    dof_handler.end (),
-                                                    n_threads);
 
     // Finally, for each of the chunks of iterators we have computed, start
     // one thread (or if not in multithread mode: execute assembly on these
     // chunks sequentially). This is done using the following sequence of
     // function calls:
-    for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::new_thread (&AdvectionProblem<dim>::assemble_system_interval,
-                                      *this,
-                                      thread_ranges[thread].first,
-                                      thread_ranges[thread].second);
+
+    Assembler::Scratch scratch;
+    Assembler::CopyData copy_data;
+    WorkStream::run(dof_handler.begin_active(),dof_handler.end(),*this,
+        &AdvectionProblem::build_local_system,&AdvectionProblem::copy_local_to_global,
+        scratch,copy_data);
+
+
     // The reasons and internal workings of these functions can be found in
     // the report on the subject of multithreading, which is available online
     // as well. Suffice it to say that we create a new thread that calls the
@@ -624,7 +626,6 @@ namespace Step9
     //
     // Again, if the library was not configured to use multithreading, then
     // no threads can run in parallel and the function returns immediately.
-    threads.join_all ();
 
 
     // After the matrix has been assembled in parallel, we still have to
@@ -647,8 +648,9 @@ namespace Step9
   template <int dim>
   void
   AdvectionProblem<dim>::
-  assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
-                            const typename DoFHandler<dim>::active_cell_iterator &end)
+  build_local_system (typename DoFHandler<dim>::active_cell_iterator const &cell,
+      Assembler::Scratch &scratch,
+      Assembler::CopyData &copy_data)
   {
     // First of all, we will need some objects that describe boundary values,
     // right hand side function and the advection field. As we will only
@@ -681,17 +683,17 @@ namespace Step9
                                       update_JxW_values | update_normal_vectors);
 
     // Then we define some abbreviations to avoid unnecessarily long lines:
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+    copy_data.dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points      = quadrature_formula.size();
     const unsigned int   n_face_q_points = face_quadrature_formula.size();
 
     // We declare cell matrix and cell right hand side...
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs (dofs_per_cell);
+    copy_data.cell_matrix = FullMatrix<double> (copy_data.dofs_per_cell, copy_data.dofs_per_cell);
+    copy_data.cell_rhs = Vector<double> (copy_data.dofs_per_cell);
 
     // ... an array to hold the global indices of the degrees of freedom of
     // the cell on which we are presently working...
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    copy_data.local_dof_indices.resize(copy_data.dofs_per_cell);
 
     // ... and array in which the values of right hand side, advection
     // direction, and boundary values will be stored, for cell and face
@@ -701,117 +703,118 @@ namespace Step9
     std::vector<double>         face_boundary_values (n_face_q_points);
     std::vector<Tensor<1,dim> > face_advection_directions (n_face_q_points);
 
-    // Then we start the main loop over the cells:
-    typename DoFHandler<dim>::active_cell_iterator cell;
-    for (cell=begin; cell!=end; ++cell)
-      {
-        // First clear old contents of the cell contributions...
-        cell_matrix = 0;
-        cell_rhs = 0;
 
-        // ... then initialize the <code>FEValues</code> object...
-        fe_values.reinit (cell);
+    // ... then initialize the <code>FEValues</code> object...
+    fe_values.reinit (cell);
 
-        // ... obtain the values of right hand side and advection directions
-        // at the quadrature points...
-        advection_field.value_list (fe_values.get_quadrature_points(),
-                                    advection_directions);
-        right_hand_side.value_list (fe_values.get_quadrature_points(),
-                                    rhs_values);
+    // ... obtain the values of right hand side and advection directions
+    // at the quadrature points...
+    advection_field.value_list (fe_values.get_quadrature_points(),
+                                advection_directions);
+    right_hand_side.value_list (fe_values.get_quadrature_points(),
+                                rhs_values);
 
-        // ... set the value of the streamline diffusion parameter as
-        // described in the introduction...
-        const double delta = 0.1 * cell->diameter ();
+    // ... set the value of the streamline diffusion parameter as
+    // described in the introduction...
+    const double delta = 0.1 * cell->diameter ();
 
-        // ... and assemble the local contributions to the system matrix and
-        // right hand side as also discussed above:
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += ((advection_directions[q_point] *
-                                      fe_values.shape_grad(j,q_point)   *
-                                      (fe_values.shape_value(i,q_point) +
-                                       delta *
-                                       (advection_directions[q_point] *
-                                        fe_values.shape_grad(i,q_point)))) *
-                                     fe_values.JxW(q_point));
+    // ... and assemble the local contributions to the system matrix and
+    // right hand side as also discussed above:
+    for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+      for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+        {
+          for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+            copy_data.cell_matrix(i,j) += ((advection_directions[q_point] *
+                                            fe_values.shape_grad(j,q_point)   *
+                                            (fe_values.shape_value(i,q_point) +
+                                             delta *
+                                             (advection_directions[q_point] *
+                                              fe_values.shape_grad(i,q_point)))) *
+                                           fe_values.JxW(q_point));
 
-              cell_rhs(i) += ((fe_values.shape_value(i,q_point) +
-                               delta *
-                               (advection_directions[q_point] *
-                                fe_values.shape_grad(i,q_point))        ) *
-                              rhs_values[q_point] *
-                              fe_values.JxW (q_point));
-            };
+          copy_data.cell_rhs(i) += ((fe_values.shape_value(i,q_point) +
+                                     delta *
+                                     (advection_directions[q_point] *
+                                      fe_values.shape_grad(i,q_point))        ) *
+                                    rhs_values[q_point] *
+                                    fe_values.JxW (q_point));
+        };
 
-        // Besides the cell terms which we have build up now, the bilinear
-        // form of the present problem also contains terms on the boundary of
-        // the domain. Therefore, we have to check whether any of the faces of
-        // this cell are on the boundary of the domain, and if so assemble the
-        // contributions of this face as well. Of course, the bilinear form
-        // only contains contributions from the <code>inflow</code> part of
-        // the boundary, but to find out whether a certain part of a face of
-        // the present cell is part of the inflow boundary, we have to have
-        // information on the exact location of the quadrature points and on
-        // the direction of flow at this point; we obtain this information
-        // using the FEFaceValues object and only decide within the main loop
-        // whether a quadrature point is on the inflow boundary.
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-          if (cell->face(face)->at_boundary())
-            {
-              // Ok, this face of the present cell is on the boundary of the
-              // domain. Just as for the usual FEValues object which we have
-              // used in previous examples and also above, we have to
-              // reinitialize the FEFaceValues object for the present face:
-              fe_face_values.reinit (cell, face);
+    // Besides the cell terms which we have build up now, the bilinear
+    // form of the present problem also contains terms on the boundary of
+    // the domain. Therefore, we have to check whether any of the faces of
+    // this cell are on the boundary of the domain, and if so assemble the
+    // contributions of this face as well. Of course, the bilinear form
+    // only contains contributions from the <code>inflow</code> part of
+    // the boundary, but to find out whether a certain part of a face of
+    // the present cell is part of the inflow boundary, we have to have
+    // information on the exact location of the quadrature points and on
+    // the direction of flow at this point; we obtain this information
+    // using the FEFaceValues object and only decide within the main loop
+    // whether a quadrature point is on the inflow boundary.
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if (cell->face(face)->at_boundary())
+        {
+          // Ok, this face of the present cell is on the boundary of the
+          // domain. Just as for the usual FEValues object which we have
+          // used in previous examples and also above, we have to
+          // reinitialize the FEFaceValues object for the present face:
+          fe_face_values.reinit (cell, face);
 
-              // For the quadrature points at hand, we ask for the values of
-              // the inflow function and for the direction of flow:
-              boundary_values.value_list (fe_face_values.get_quadrature_points(),
-                                          face_boundary_values);
-              advection_field.value_list (fe_face_values.get_quadrature_points(),
-                                          face_advection_directions);
+          // For the quadrature points at hand, we ask for the values of
+          // the inflow function and for the direction of flow:
+          boundary_values.value_list (fe_face_values.get_quadrature_points(),
+                                      face_boundary_values);
+          advection_field.value_list (fe_face_values.get_quadrature_points(),
+                                      face_advection_directions);
 
-              // Now loop over all quadrature points and see whether it is on
-              // the inflow or outflow part of the boundary. This is
-              // determined by a test whether the advection direction points
-              // inwards or outwards of the domain (note that the normal
-              // vector points outwards of the cell, and since the cell is at
-              // the boundary, the normal vector points outward of the domain,
-              // so if the advection direction points into the domain, its
-              // scalar product with the normal vector must be negative):
-              for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-                if (fe_face_values.normal_vector(q_point) *
-                    face_advection_directions[q_point]
-                    < 0)
-                  // If the is part of the inflow boundary, then compute the
-                  // contributions of this face to the global matrix and right
-                  // hand side, using the values obtained from the
-                  // FEFaceValues object and the formulae discussed in the
-                  // introduction:
-                  for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    {
-                      for (unsigned int j=0; j<dofs_per_cell; ++j)
-                        cell_matrix(i,j) -= (face_advection_directions[q_point] *
-                                             fe_face_values.normal_vector(q_point) *
-                                             fe_face_values.shape_value(i,q_point) *
-                                             fe_face_values.shape_value(j,q_point) *
-                                             fe_face_values.JxW(q_point));
+          // Now loop over all quadrature points and see whether it is on
+          // the inflow or outflow part of the boundary. This is
+          // determined by a test whether the advection direction points
+          // inwards or outwards of the domain (note that the normal
+          // vector points outwards of the cell, and since the cell is at
+          // the boundary, the normal vector points outward of the domain,
+          // so if the advection direction points into the domain, its
+          // scalar product with the normal vector must be negative):
+          for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+            if (fe_face_values.normal_vector(q_point) *
+                face_advection_directions[q_point]
+                < 0)
+              // If the is part of the inflow boundary, then compute the
+              // contributions of this face to the global matrix and right
+              // hand side, using the values obtained from the
+              // FEFaceValues object and the formulae discussed in the
+              // introduction:
+              for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+                {
+                  for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+                    copy_data.cell_matrix(i,j) -= (face_advection_directions[q_point] *
+                                                   fe_face_values.normal_vector(q_point) *
+                                                   fe_face_values.shape_value(i,q_point) *
+                                                   fe_face_values.shape_value(j,q_point) *
+                                                   fe_face_values.JxW(q_point));
 
-                      cell_rhs(i) -= (face_advection_directions[q_point] *
-                                      fe_face_values.normal_vector(q_point) *
-                                      face_boundary_values[q_point]         *
-                                      fe_face_values.shape_value(i,q_point) *
-                                      fe_face_values.JxW(q_point));
-                    };
-            };
+                  copy_data.cell_rhs(i) -= (face_advection_directions[q_point] *
+                                            fe_face_values.normal_vector(q_point) *
+                                            face_boundary_values[q_point]         *
+                                            fe_face_values.shape_value(i,q_point) *
+                                            fe_face_values.JxW(q_point));
+                };
+        };
 
 
-        // Now go on by transferring the local contributions to the system of
-        // equations into the global objects. The first step was to obtain the
-        // global indices of the degrees of freedom on this cell.
-        cell->get_dof_indices (local_dof_indices);
+    // Now go on by transferring the local contributions to the system of
+    // equations into the global objects. The first step was to obtain the
+    // global indices of the degrees of freedom on this cell.
+    cell->get_dof_indices (copy_data.local_dof_indices);
+  }
+
+
+  
+  template <int dim>
+  void
+  AdvectionProblem<dim>::copy_local_to_global (Assembler::CopyData const &copy_data)
+  {
 
         // Up until now we have not taken care of the fact that this function
         // might run more than once in parallel, as the operations above only
@@ -836,17 +839,15 @@ namespace Step9
         // matrix, and can do so freely. When finished, we release the lock
         // again so as to allow other threads to acquire it and write to the
         // matrix.
-        assembler_lock.acquire ();
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
           {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              system_matrix.add (local_dof_indices[i],
-                                 local_dof_indices[j],
-                                 cell_matrix(i,j));
+            for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+              system_matrix.add (copy_data.local_dof_indices[i],
+                                 copy_data.local_dof_indices[j],
+                                 copy_data.cell_matrix(i,j));
 
-            system_rhs(local_dof_indices[i]) += cell_rhs(i);
+            system_rhs(copy_data.local_dof_indices[i]) += copy_data.cell_rhs(i);
           };
-        assembler_lock.release ();
         // At this point, the locked operations on the global matrix are done,
         // i.e. other threads can now enter into the protected section by
         // acquiring the lock. Two final notes are in place here, however:
@@ -863,8 +864,8 @@ namespace Step9
         // class; since all threads execute member functions of the same
         // object, they have the same <code>this</code> pointer and therefore
         // also operate on the same <code>lock</code>.
-      };
   }
+  
 
 
 

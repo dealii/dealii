@@ -16,7 +16,6 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/geometry_info.h>
@@ -603,6 +602,41 @@ namespace MatrixCreator
                                                      data.dof_indices,
                                                      *matrix);
     }
+
+
+
+    namespace AssemblerBoundary
+    {
+      struct Scratch
+      {
+        Scratch() {}
+      };
+
+      template <typename DH>
+      struct CopyData
+      {
+        CopyData() {};
+
+        CopyData(CopyData const &data);
+
+        unsigned int dofs_per_cell;
+        std::vector<types::global_dof_index> dofs;
+        std::vector<std::vector<bool> > dof_is_on_face;
+        typename DH::active_cell_iterator cell;
+        std::vector<FullMatrix<double> > cell_matrix;
+        std::vector<Vector<double> > cell_vector;
+      };
+
+      template <typename DH>
+      CopyData<DH>::CopyData(CopyData const &data) :
+       dofs_per_cell(data.dofs_per_cell),
+       dofs(data.dofs),
+       dof_is_on_face(data.dof_is_on_face),
+       cell(data.cell),
+       cell_matrix(data.cell_matrix),
+       cell_vector(data.cell_vector)
+      {}
+    }
   }
 }
 
@@ -834,37 +868,30 @@ namespace MatrixCreator
   {
     template <int dim, int spacedim>
     void
-    create_boundary_mass_matrix_1 (std_cxx1x::tuple<const Mapping<dim, spacedim> &,
-                                   const DoFHandler<dim,spacedim> &,
-                                   const Quadrature<dim-1> & >  commons,
-                                   SparseMatrix<double>      &matrix,
-                                   const typename FunctionMap<spacedim>::type &boundary_functions,
-                                   Vector<double>            &rhs_vector,
-                                   std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                   const Function<spacedim> *const coefficient,
-                                   const std::vector<unsigned int> &component_mapping,
-                                   const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
-                                   Threads::Mutex      &mutex)
+    create_boundary_mass_matrix_1 (typename DoFHandler<dim,spacedim>::active_cell_iterator const &cell,
+                                   MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch,
+                                   MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,
+                                   spacedim> > &copy_data,
+                                   Mapping<dim, spacedim> const &mapping,
+                                   FiniteElement<dim,spacedim> const &fe,
+                                   Quadrature<dim-1> const &q,
+                                   typename FunctionMap<spacedim>::type const &boundary_functions,
+                                   Function<spacedim> const *const coefficient,
+                                   std::vector<unsigned int> const &component_mapping)
+                                   
     {
       // All assertions for this function
       // are in the calling function
       // before creating threads.
-      const Mapping<dim,spacedim> &mapping = std_cxx1x::get<0>(commons);
-      const DoFHandler<dim,spacedim> &dof = std_cxx1x::get<1>(commons);
-      const Quadrature<dim-1>& q = std_cxx1x::get<2>(commons);
-
-      const FiniteElement<dim,spacedim> &fe = dof.get_fe();
-      const unsigned int n_components  = fe.n_components();
+      const unsigned int n_components = fe.n_components();
       const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
-      const bool         fe_is_system  = (n_components != 1);
+      const bool         fe_is_system = (n_components != 1);
       const bool         fe_is_primitive = fe.is_primitive();
 
-      const unsigned int dofs_per_cell = fe.dofs_per_cell,
-                         dofs_per_face = fe.dofs_per_face;
-
-      FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-      Vector<double>     cell_vector(dofs_per_cell);
-
+      const unsigned int dofs_per_face = fe.dofs_per_face;
+      
+      copy_data.cell = cell;
+      copy_data.dofs_per_cell = fe.dofs_per_cell;
 
       UpdateFlags update_flags = UpdateFlags (update_values     |
                                               update_JxW_values |
@@ -883,236 +910,246 @@ namespace MatrixCreator
 
       std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
       std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
-                                                      Vector<double>(n_function_components));
+          Vector<double>(n_function_components));
 
-      std::vector<types::global_dof_index> dofs (dofs_per_cell);
+      copy_data.dofs.resize(copy_data.dofs_per_cell);
+      cell->get_dof_indices (copy_data.dofs);
+
       std::vector<types::global_dof_index> dofs_on_face_vector (dofs_per_face);
 
-      // for each dof on the cell, have a
-      // flag whether it is on the face
-      std::vector<bool>         dof_is_on_face(dofs_per_cell);
+      // Because CopyData objects are reused and that push_back is used,
+      // dof_is_on_face, cell_matrix, and cell_vector must be cleared before
+      // they are reused
+      copy_data.dof_is_on_face.clear();
+      copy_data.cell_matrix.clear();
+      copy_data.cell_vector.clear();
 
-      typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-      for (; cell!=range.second; ++cell)
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-          // check if this face is on that part of
-          // the boundary we are interested in
-          if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
-              boundary_functions.end())
-            {
-              cell_matrix = 0;
-              cell_vector = 0;
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+        // check if this face is on that part of
+        // the boundary we are interested in
+        if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+            boundary_functions.end())
+          {
+            copy_data.cell_matrix.push_back(FullMatrix<double> (copy_data.dofs_per_cell,
+                  copy_data.dofs_per_cell));
+            copy_data.cell_vector.push_back(Vector<double> (copy_data.dofs_per_cell));
+            fe_values.reinit (cell, face);
 
-              fe_values.reinit (cell, face);
+            if (fe_is_system)
+              // FE has several components
+              {
+                boundary_functions.find(cell->face(face)->boundary_indicator())
+                ->second->vector_value_list (fe_values.get_quadrature_points(),
+                                             rhs_values_system);
 
-              if (fe_is_system)
-                // FE has several components
-                {
-                  boundary_functions.find(cell->face(face)->boundary_indicator())
-                  ->second->vector_value_list (fe_values.get_quadrature_points(),
-                                               rhs_values_system);
+                if (coefficient_is_vector)
+                  // If coefficient is
+                  // vector valued, fill
+                  // all components
+                  coefficient->vector_value_list (fe_values.get_quadrature_points(),
+                                                  coefficient_vector_values);
+                else
+                  {
+                    // If a scalar
+                    // function is
+                    // given, update
+                    // the values, if
+                    // not, use the
+                    // default one set
+                    // in the
+                    // constructor above
+                    if (coefficient != 0)
+                      coefficient->value_list (fe_values.get_quadrature_points(),
+                                               coefficient_values);
+                    // Copy scalar
+                    // values into vector
+                    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                      coefficient_vector_values[point] = coefficient_values[point];
+                  }
 
-                  if (coefficient_is_vector)
-                    // If coefficient is
-                    // vector valued, fill
-                    // all components
-                    coefficient->vector_value_list (fe_values.get_quadrature_points(),
-                                                    coefficient_vector_values);
-                  else
-                    {
-                      // If a scalar
-                      // function is
-                      // geiven, update
-                      // the values, if
-                      // not, use the
-                      // default one set
-                      // in the
-                      // constructor above
-                      if (coefficient != 0)
-                        coefficient->value_list (fe_values.get_quadrature_points(),
-                                                 coefficient_values);
-                      // Copy scalar
-                      // values into vector
+                // Special treatment
+                // for Hdiv and Hcurl
+                // elements, where only
+                // the normal or
+                // tangential component
+                // should be projected.
+                std::vector<std::vector<double> > normal_adjustment(fe_values.n_quadrature_points,
+                                                                    std::vector<double>(n_components, 1.));
+
+                for (unsigned int comp = 0; comp<n_components; ++comp)
+                  {
+                    const FiniteElement<dim,spacedim> &base = fe.base_element(fe.component_to_base_index(comp).first);
+                    const unsigned int bcomp = fe.component_to_base_index(comp).second;
+
+                    if (!base.conforms(FiniteElementData<dim>::H1) &&
+                        base.conforms(FiniteElementData<dim>::Hdiv))
                       for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                        coefficient_vector_values[point] = coefficient_values[point];
-                    }
+                        normal_adjustment[point][comp] = fe_values.normal_vector(point)(bcomp)
+                                                         * fe_values.normal_vector(point)(bcomp);
+                  }
 
-                  // Special treatment
-                  // for Hdiv and Hcurl
-                  // elements, where only
-                  // the normal or
-                  // tangential component
-                  // should be projected.
-                  std::vector<std::vector<double> > normal_adjustment(fe_values.n_quadrature_points,
-                                                                      std::vector<double>(n_components, 1.));
-
-                  for (unsigned int comp = 0; comp<n_components; ++comp)
-                    {
-                      const FiniteElement<dim,spacedim> &base = fe.base_element(fe.component_to_base_index(comp).first);
-                      const unsigned int bcomp = fe.component_to_base_index(comp).second;
-
-                      if (!base.conforms(FiniteElementData<dim>::H1) &&
-                          base.conforms(FiniteElementData<dim>::Hdiv))
-                        for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                          normal_adjustment[point][comp] = fe_values.normal_vector(point)(bcomp)
-                                                           * fe_values.normal_vector(point)(bcomp);
-                    }
-
-                  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                    {
-                      const double weight = fe_values.JxW(point);
-                      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-                        if (fe_is_primitive)
-                          {
-                            for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                              {
-                                if (fe.system_to_component_index(j).first
-                                    == fe.system_to_component_index(i).first)
-                                  {
-                                    cell_matrix(i,j)
-                                    += weight
-                                       * fe_values.shape_value(j,point)
-                                       * fe_values.shape_value(i,point)
-                                       * coefficient_vector_values[point](fe.system_to_component_index(i).first);
-                                  }
-                              }
-                            cell_vector(i) += fe_values.shape_value(i,point)
-                                              * rhs_values_system[point](component_mapping[fe.system_to_component_index(i).first])
-                                              * weight;
-                          }
-                        else
-                          {
-                            for (unsigned int comp=0; comp<n_components; ++comp)
-                              {
-                                for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                                  cell_matrix(i,j)
-                                  += fe_values.shape_value_component(j,point,comp)
-                                     * fe_values.shape_value_component(i,point,comp)
-                                     * normal_adjustment[point][comp]
-                                     * weight * coefficient_vector_values[point](comp);
-                                cell_vector(i) += fe_values.shape_value_component(i,point,comp) *
-                                                  rhs_values_system[point](component_mapping[comp])
-                                                  * normal_adjustment[point][comp]
-                                                  * weight;
-                              }
-                          }
-                    }
-                }
-              else
-                // FE is a scalar one
-                {
-                  boundary_functions.find(cell->face(face)->boundary_indicator())
-                  ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
-
-                  if (coefficient != 0)
-                    coefficient->value_list (fe_values.get_quadrature_points(),
-                                             coefficient_values);
-                  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                    {
-                      const double weight = fe_values.JxW(point);
-                      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                  {
+                    const double weight = fe_values.JxW(point);
+                    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                      if (fe_is_primitive)
                         {
-                          const double v = fe_values.shape_value(i,point);
                           for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
                             {
-                              const double u = fe_values.shape_value(j,point);
-                              cell_matrix(i,j) += (u * v * weight * coefficient_values[point]);
+                              if (fe.system_to_component_index(j).first
+                                  == fe.system_to_component_index(i).first)
+                                {
+                                  copy_data.cell_matrix.back()(i,j)
+                                  += weight
+                                     * fe_values.shape_value(j,point)
+                                     * fe_values.shape_value(i,point)
+                                     * coefficient_vector_values[point](fe.system_to_component_index(i).first);
+                                }
                             }
-                          cell_vector(i) += v * rhs_values_scalar[point] *weight;
+                          copy_data.cell_vector.back()(i) += fe_values.shape_value(i,point)
+                                            * rhs_values_system[point](component_mapping[fe.system_to_component_index(i).first])
+                                            * weight;
                         }
-                    }
-                }
-              // now transfer cell matrix and vector
-              // to the whole boundary matrix
-              //
-              // in the following: dof[i] holds the
-              // global index of the i-th degree of
-              // freedom on the present cell. If it
-              // is also a dof on the boundary, it
-              // must be a nonzero entry in the
-              // dof_to_boundary_mapping and then
-              // the boundary index of this dof is
-              // dof_to_boundary_mapping[dof[i]].
-              //
-              // if dof[i] is not on the boundary,
-              // it should be zero on the boundary
-              // therefore on all quadrature
-              // points and finally all of its
-              // entries in the cell matrix and
-              // vector should be zero. If not, we
-              // throw an error (note: because of
-              // the evaluation of the shape
-              // functions only up to machine
-              // precision, the term "must be zero"
-              // really should mean: "should be
-              // very small". since this is only an
-              // assertion and not part of the
-              // code, we may choose "very small"
-              // quite arbitrarily)
-              //
-              // the main problem here is that the
-              // matrix or vector entry should also
-              // be zero if the degree of freedom
-              // dof[i] is on the boundary, but not
-              // on the present face, i.e. on
-              // another face of the same cell also
-              // on the boundary. We can therefore
-              // not rely on the
-              // dof_to_boundary_mapping[dof[i]]
-              // being !=-1, we really have to
-              // determine whether dof[i] is a
-              // dof on the present face. We do so
-              // by getting the dofs on the
-              // face into @p{dofs_on_face_vector},
-              // a vector as always. Usually,
-              // searching in a vector is
-              // inefficient, so we copy the dofs
-              // into a set, which enables binary
-              // searches.
-              cell->get_dof_indices (dofs);
-              cell->face(face)->get_dof_indices (dofs_on_face_vector);
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
-                                               dofs_on_face_vector.end(),
-                                               dofs[i])
-                                     !=
-                                     dofs_on_face_vector.end());
+                      else
+                        {
+                          for (unsigned int comp=0; comp<n_components; ++comp)
+                            {
+                              for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+                                copy_data.cell_matrix.back()(i,j)
+                                += fe_values.shape_value_component(j,point,comp)
+                                   * fe_values.shape_value_component(i,point,comp)
+                                   * normal_adjustment[point][comp]
+                                   * weight * coefficient_vector_values[point](comp);
+                              copy_data.cell_vector.back()(i) += fe_values.shape_value_component(i,point,comp) *
+                                                rhs_values_system[point](component_mapping[comp])
+                                                * normal_adjustment[point][comp]
+                                                * weight;
+                            }
+                        }
+                  }
+              }
+            else
+              // FE is a scalar one
+              {
+                boundary_functions.find(cell->face(face)->boundary_indicator())
+                ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
-              // lock the matrix
-              Threads::Mutex::ScopedLock lock (mutex);
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                {
-                  if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_dof_index)
-                    {
-                      for (unsigned int j=0; j<dofs_per_cell; ++j)
-                        if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_dof_index)
+                if (coefficient != 0)
+                  coefficient->value_list (fe_values.get_quadrature_points(),
+                                           coefficient_values);
+                for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                  {
+                    const double weight = fe_values.JxW(point);
+                    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                      {
+                        const double v = fe_values.shape_value(i,point);
+                        for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
                           {
-                            Assert(numbers::is_finite(cell_matrix(i,j)), ExcNumberNotFinite());
-                            matrix.add(dof_to_boundary_mapping[dofs[i]],
-                                       dof_to_boundary_mapping[dofs[j]],
-                                       cell_matrix(i,j));
+                            const double u = fe_values.shape_value(j,point);
+                            copy_data.cell_matrix.back()(i,j) += (u*v*weight*coefficient_values[point]);
                           }
-                      Assert(numbers::is_finite(cell_vector(i)), ExcNumberNotFinite());
-                      rhs_vector(dof_to_boundary_mapping[dofs[i]]) += cell_vector(i);
-                    }
-                }
-            }
+                        copy_data.cell_vector.back()(i) += v * rhs_values_scalar[point] *weight;
+                      }
+                  }
+              }
+
+
+            cell->face(face)->get_dof_indices (dofs_on_face_vector);
+            // for each dof on the cell, have a
+            // flag whether it is on the face
+            copy_data.dof_is_on_face.push_back(std::vector<bool> (copy_data.dofs_per_cell));
+            // check for each of the dofs on this cell
+            // whether it is on the face
+            for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+              copy_data.dof_is_on_face.back()[i] = (std::find(dofs_on_face_vector.begin(),
+                                                              dofs_on_face_vector.end(),
+                                                              copy_data.dofs[i])
+                                                    !=
+                                                    dofs_on_face_vector.end());
+          }   
     }
+
+    template <int dim,int spacedim>
+    void copy_boundary_mass_matrix_1(MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,
+                                     spacedim> > const &copy_data,
+                                     typename FunctionMap<spacedim>::type const &boundary_functions,
+                                     std::vector<types::global_dof_index> const &dof_to_boundary_mapping,
+                                     SparseMatrix<double> &matrix,
+                                     Vector<double> &rhs_vector)
+    {
+      // now transfer cell matrix and vector to the whole boundary matrix
+      //
+      // in the following: dof[i] holds the global index of the i-th degree of
+      // freedom on the present cell. If it is also a dof on the boundary, it
+      // must be a nonzero entry in the dof_to_boundary_mapping and then
+      // the boundary index of this dof is dof_to_boundary_mapping[dof[i]].
+      //
+      // if dof[i] is not on the boundary, it should be zero on the boundary
+      // therefore on all quadrature points and finally all of its
+      // entries in the cell matrix and vector should be zero. If not, we
+      // throw an error (note: because of the evaluation of the shape
+      // functions only up to machine precision, the term "must be zero"
+      // really should mean: "should be very small". since this is only an
+      // assertion and not part of the code, we may choose "very small"
+      // quite arbitrarily)
+      //
+      // the main problem here is that the matrix or vector entry should also
+      // be zero if the degree of freedom dof[i] is on the boundary, but not
+      // on the present face, i.e. on another face of the same cell also
+      // on the boundary. We can therefore not rely on the
+      // dof_to_boundary_mapping[dof[i]] being !=-1, we really have to
+      // determine whether dof[i] is a dof on the present face. We do so
+      // by getting the dofs on the face into @p{dofs_on_face_vector},
+      // a vector as always. Usually, searching in a vector is
+      // inefficient, so we copy the dofs into a set, which enables binary
+      // searches.
+      unsigned int pos(0);
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      {
+        // check if this face is on that part of
+        // the boundary we are interested in
+        if (boundary_functions.find(copy_data.cell->face(face)->boundary_indicator()) !=
+            boundary_functions.end())
+          {
+            for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+              {
+                if (copy_data.dof_is_on_face[pos][i] && 
+                    dof_to_boundary_mapping[copy_data.dofs[i]] != numbers::invalid_dof_index)
+                  {
+                    for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+                      if (copy_data.dof_is_on_face[pos][j] && 
+                          dof_to_boundary_mapping[copy_data.dofs[j]] != numbers::invalid_dof_index)
+                        {
+                          Assert(numbers::is_finite(copy_data.cell_matrix[pos](i,j)),
+                              ExcNumberNotFinite());
+                          matrix.add(dof_to_boundary_mapping[copy_data.dofs[i]],
+                                     dof_to_boundary_mapping[copy_data.dofs[j]],
+                                     copy_data.cell_matrix[pos](i,j));
+                        }
+                    Assert(numbers::is_finite(copy_data.cell_vector[pos](i)), ExcNumberNotFinite());
+                    rhs_vector(dof_to_boundary_mapping[copy_data.dofs[i]]) += copy_data.cell_vector[pos](i);
+                  }
+              }
+            ++pos;
+          }
+      }
+    }
+
 
 
     template <>
     void
-    create_boundary_mass_matrix_1<2,3> (std_cxx1x::tuple<const Mapping<2,3> &,
-                                        const DoFHandler<2,3> &,
-                                        const Quadrature<1> & > ,
-                                        SparseMatrix<double> &,
-                                        const FunctionMap<3>::type &,
-                                        Vector<double> &,
-                                        std::vector<types::global_dof_index> &,
-                                        const Function<3> *const ,
-                                        const std::vector<unsigned int> &,
-                                        const MatrixCreator::internal::IteratorRange<DoFHandler<2,3> > ,
-                                        Threads::Mutex &)
+    create_boundary_mass_matrix_1<2,3> (DoFHandler<2,3>::active_cell_iterator const &cell,
+                                        MatrixCreator::internal::AssemblerBoundary::Scratch const 
+                                        &scratch,                                                 
+                                        MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<2,
+                                        3> > &copy_data,                                               
+                                        Mapping<2,3> const &mapping,                              
+                                        FiniteElement<2,3> const &fe,                             
+                                        Quadrature<1> const &q,                                   
+                                        FunctionMap<3>::type const &boundary_functions,  
+                                        Function<3> const *const coefficient,                     
+                                        std::vector<unsigned int> const &component_mapping)       
     {
       Assert(false,ExcNotImplemented());
     }
@@ -1121,17 +1158,17 @@ namespace MatrixCreator
 
     template <>
     void
-    create_boundary_mass_matrix_1<1,3> (std_cxx1x::tuple<const Mapping<1,3> &,
-                                        const DoFHandler<1,3> &,
-                                        const Quadrature<0> & > ,
-                                        SparseMatrix<double> &,
-                                        const FunctionMap<3>::type &,
-                                        Vector<double> &,
-                                        std::vector<types::global_dof_index> &,
-                                        const Function<3> *const ,
-                                        const std::vector<unsigned int> &,
-                                        const MatrixCreator::internal::IteratorRange<DoFHandler<1,3> > ,
-                                        Threads::Mutex &)
+    create_boundary_mass_matrix_1<1,3> (DoFHandler<1,3>::active_cell_iterator const &cell,
+                                        MatrixCreator::internal::AssemblerBoundary::Scratch const 
+                                        &scratch,
+                                        MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<1,
+                                        3> > &copy_data,                             
+                                        Mapping<1,3> const &mapping,
+                                        FiniteElement<1,3> const &fe,
+                                        Quadrature<0> const &q,
+                                        FunctionMap<3>::type const &boundary_functions,
+                                        Function<3> const *const coefficient,
+                                        std::vector<unsigned int> const &component_mapping)                
     {
       Assert(false,ExcNotImplemented());
     }
@@ -1184,47 +1221,24 @@ namespace MatrixCreator
     else
       AssertDimension (n_components, component_mapping.size());
 
-    const unsigned int n_threads = multithread_info.n_threads();
-    Threads::ThreadGroup<> threads;
+    MatrixCreator::internal::AssemblerBoundary::Scratch scratch;
+    MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,spacedim> > copy_data;
 
-    // define starting and end point
-    // for each thread
-    typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
-    std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-      = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-                                                    dof.end(), n_threads);
-
-    // mutex to synchronise access to
-    // the matrix
-    Threads::Mutex mutex;
-
-    typedef std_cxx1x::tuple<const Mapping<dim,spacedim> &,
-            const DoFHandler<dim,spacedim> &,
-            const Quadrature<dim-1>&> Commons;
-
-    // then assemble in parallel
-    typedef void (*create_boundary_mass_matrix_1_t)
-    (Commons,
-     SparseMatrix<double>      &matrix,
-     const typename FunctionMap<spacedim>::type &boundary_functions,
-     Vector<double>            &rhs_vector,
-     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-     const Function<spacedim> *const coefficient,
-     const std::vector<unsigned int> &component_mapping,
-     const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
-     Threads::Mutex      &mutex);
-    create_boundary_mass_matrix_1_t p
-      = &create_boundary_mass_matrix_1<dim,spacedim>;
-
-//TODO: Use WorkStream here
-    for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::new_thread (p,
-                                      Commons(mapping, dof, q), matrix,
-                                      boundary_functions, rhs_vector,
-                                      dof_to_boundary_mapping, coefficient,
-                                      component_mapping,
-                                      thread_ranges[thread], mutex);
-    threads.join_all ();
+    WorkStream::run(dof.begin_active(),dof.end(),
+        static_cast<std_cxx1x::function<void (typename DoFHandler<dim,spacedim>::active_cell_iterator
+          const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
+          MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,spacedim> > &)> > 
+        (std_cxx1x::bind(create_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
+                         std_cxx1x::_3,
+                         std_cxx1x::cref(mapping),std_cxx1x::cref(fe),std_cxx1x::cref(q),
+                         std_cxx1x::cref(boundary_functions),coefficient,
+                         std_cxx1x::cref(component_mapping))), 
+        static_cast<std_cxx1x::function<void (MatrixCreator::internal::AssemblerBoundary
+          ::CopyData<DoFHandler<dim,spacedim> > const &)> > (std_cxx1x::bind(
+              copy_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,
+            std_cxx1x::cref(boundary_functions),std_cxx1x::cref(dof_to_boundary_mapping),
+            std_cxx1x::ref(matrix),std_cxx1x::ref(rhs_vector))),
+        scratch,copy_data);
   }
 
 
@@ -1234,37 +1248,28 @@ namespace MatrixCreator
 
     template <int dim, int spacedim>
     void
-    create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim> &,
-                                   const hp::DoFHandler<dim,spacedim> &,
-                                   const hp::QCollection<dim-1> &> commons,
-                                   SparseMatrix<double>      &matrix,
-                                   const typename FunctionMap<spacedim>::type &boundary_functions,
-                                   Vector<double>            &rhs_vector,
-                                   std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                   const Function<spacedim> *const coefficient,
-                                   const std::vector<unsigned int> &component_mapping,
-                                   const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
-                                   Threads::Mutex      &mutex)
+    create_hp_boundary_mass_matrix_1 (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator const 
+                                      &cell,
+                                      MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch,
+                                      MatrixCreator::internal::AssemblerBoundary
+                                      ::CopyData<hp::DoFHandler<dim,spacedim> > &copy_data,
+                                      hp::MappingCollection<dim,spacedim> const &mapping,
+                                      hp::FECollection<dim,spacedim> const &fe_collection,
+                                      hp::QCollection<dim-1> const &q,
+                                      const typename FunctionMap<spacedim>::type &boundary_functions,
+                                      Function<spacedim> const *const coefficient,
+                                      std::vector<unsigned int> const &component_mapping)
     {
-      const hp::MappingCollection<dim,spacedim> &mapping = std_cxx1x::get<0>(commons);
-      const hp::DoFHandler<dim,spacedim> &dof = std_cxx1x::get<1>(commons);
-      const hp::QCollection<dim-1>& q = std_cxx1x::get<2>(commons);
-      const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
       const unsigned int n_components  = fe_collection.n_components();
       const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
       const bool         fe_is_system  = (n_components != 1);
-#ifdef DEBUG
-      if (true)
-        {
-          types::global_dof_index max_element = static_cast<types::global_dof_index>(0);
-          for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
-               i!=dof_to_boundary_mapping.end(); ++i)
-            if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
-                (*i > max_element))
-              max_element = *i;
-          Assert (max_element  == matrix.n()-1, ExcInternalError());
-        };
-#endif
+      const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+      const unsigned int dofs_per_face = fe.dofs_per_face;
+
+      copy_data.cell = cell;
+      copy_data.dofs_per_cell = fe.dofs_per_cell;
+      copy_data.dofs.resize(copy_data.dofs_per_cell);
+      cell->get_dof_indices (copy_data.dofs);
 
       const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell(),
                          max_dofs_per_face = fe_collection.max_dofs_per_face();
@@ -1287,148 +1292,131 @@ namespace MatrixCreator
       std::vector<double>          rhs_values_scalar;
       std::vector<Vector<double> > rhs_values_system;
 
-      std::vector<types::global_dof_index> dofs (max_dofs_per_cell);
-      std::vector<types::global_dof_index> dofs_on_face_vector (max_dofs_per_face);
+      std::vector<types::global_dof_index> dofs_on_face_vector (dofs_per_face);
 
-      // for each dof on the cell, have a
-      // flag whether it is on the face
-      std::vector<bool>         dof_is_on_face(max_dofs_per_cell);
+      copy_data.dofs.resize(copy_data.dofs_per_cell);
+      cell->get_dof_indices (copy_data.dofs);
+
+      // Because CopyData objects are reused and that push_back is used,
+      // dof_is_on_face, cell_matrix, and cell_vector must be cleared before
+      // they are reused
+      copy_data.dof_is_on_face.clear();
+      copy_data.cell_matrix.clear();
+      copy_data.cell_vector.clear();
 
 
-      typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-      for (; cell!=range.second; ++cell)
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-          // check if this face is on that part of
-          // the boundary we are interested in
-          if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
-              boundary_functions.end())
-            {
-              x_fe_values.reinit (cell, face);
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+        // check if this face is on that part of
+        // the boundary we are interested in
+        if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+            boundary_functions.end())
+          {
+            x_fe_values.reinit (cell, face);
 
-              const FEFaceValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
+            const FEFaceValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
 
-              const FiniteElement<dim,spacedim> &fe = cell->get_fe();
-              const unsigned int dofs_per_cell = fe.dofs_per_cell;
-              const unsigned int dofs_per_face = fe.dofs_per_face;
+            copy_data.cell_matrix.push_back(FullMatrix<double> (copy_data.dofs_per_cell,
+                  copy_data.dofs_per_cell));
+            copy_data.cell_vector.push_back(Vector<double> (copy_data.dofs_per_cell));
 
-              cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
-              cell_vector.reinit (dofs_per_cell);
-              cell_matrix = 0;
-              cell_vector = 0;
+            if (fe_is_system)
+              // FE has several components
+              {
+                rhs_values_system.resize (fe_values.n_quadrature_points,
+                                          Vector<double>(n_function_components));
+                boundary_functions.find(cell->face(face)->boundary_indicator())
+                ->second->vector_value_list (fe_values.get_quadrature_points(),
+                                             rhs_values_system);
 
-              if (fe_is_system)
-                // FE has several components
-                {
-                  rhs_values_system.resize (fe_values.n_quadrature_points,
-                                            Vector<double>(n_function_components));
-                  boundary_functions.find(cell->face(face)->boundary_indicator())
-                  ->second->vector_value_list (fe_values.get_quadrature_points(),
-                                               rhs_values_system);
-
-                  if (coefficient != 0)
-                    {
-                      if (coefficient->n_components==1)
-                        {
-                          coefficient_values.resize (fe_values.n_quadrature_points);
-                          coefficient->value_list (fe_values.get_quadrature_points(),
-                                                   coefficient_values);
-                          for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                            {
-                              const double weight = fe_values.JxW(point);
-                              for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-                                {
-                                  const double v = fe_values.shape_value(i,point);
-                                  for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                                    if (fe.system_to_component_index(i).first ==
-                                        fe.system_to_component_index(j).first)
-                                      {
-                                        const double u = fe_values.shape_value(j,point);
-                                        cell_matrix(i,j)
-                                        += (u * v * weight * coefficient_values[point]);
-                                      }
-
-                                  cell_vector(i) += v *
-                                                    rhs_values_system[point](
-                                                      component_mapping[fe.system_to_component_index(i).first]) * weight;
-                                }
-                            }
-                        }
-                      else
-                        {
-                          coefficient_vector_values.resize (fe_values.n_quadrature_points,
-                                                            Vector<double>(n_components));
-                          coefficient->vector_value_list (fe_values.get_quadrature_points(),
-                                                          coefficient_vector_values);
-                          for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                            {
-                              const double weight = fe_values.JxW(point);
-                              for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-                                {
-                                  const double v = fe_values.shape_value(i,point);
-                                  const unsigned int component_i=
-                                    fe.system_to_component_index(i).first;
-                                  for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                                    if (fe.system_to_component_index(j).first ==
-                                        component_i)
-                                      {
-                                        const double u = fe_values.shape_value(j,point);
-                                        cell_matrix(i,j) +=
-                                          (u * v * weight * coefficient_vector_values[point](component_i));
-                                      }
-                                  cell_vector(i) += v * rhs_values_system[point](component_mapping[component_i]) * weight;
-                                }
-                            }
-                        }
-                    }
-                  else  //      if (coefficient == 0)
-                    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                if (coefficient != 0)
+                  {
+                    if (coefficient->n_components==1)
                       {
-                        const double weight = fe_values.JxW(point);
-                        for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                        coefficient_values.resize (fe_values.n_quadrature_points);
+                        coefficient->value_list (fe_values.get_quadrature_points(),
+                                                 coefficient_values);
+                        for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
                           {
-                            const double v = fe_values.shape_value(i,point);
-                            for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                              if (fe.system_to_component_index(i).first ==
-                                  fe.system_to_component_index(j).first)
-                                {
-                                  const double u = fe_values.shape_value(j,point);
-                                  cell_matrix(i,j) += (u * v * weight);
-                                }
-                            cell_vector(i) += v *
-                                              rhs_values_system[point](
-                                                fe.system_to_component_index(i).first) *
-                                              weight;
+                            const double weight = fe_values.JxW(point);
+                            for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                              {
+                                const double v = fe_values.shape_value(i,point);
+                                for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+                                  if (fe.system_to_component_index(i).first ==
+                                      fe.system_to_component_index(j).first)
+                                    {
+                                      const double u = fe_values.shape_value(j,point);
+                                      copy_data.cell_matrix.back()(i,j)
+                                      += (u * v * weight * coefficient_values[point]);
+                                    }
+
+                                copy_data.cell_vector.back()(i) += v *
+                                                  rhs_values_system[point](
+                                                    component_mapping[fe.system_to_component_index(i).first]) * weight;
+                              }
                           }
                       }
-                }
-              else
-                // FE is a scalar one
-                {
-                  rhs_values_scalar.resize (fe_values.n_quadrature_points);
-                  boundary_functions.find(cell->face(face)->boundary_indicator())
-                  ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
-
-                  if (coefficient != 0)
+                    else
+                      {
+                        coefficient_vector_values.resize (fe_values.n_quadrature_points,
+                                                          Vector<double>(n_components));
+                        coefficient->vector_value_list (fe_values.get_quadrature_points(),
+                                                        coefficient_vector_values);
+                        for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                          {
+                            const double weight = fe_values.JxW(point);
+                            for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                              {
+                                const double v = fe_values.shape_value(i,point);
+                                const unsigned int component_i=
+                                  fe.system_to_component_index(i).first;
+                                for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+                                  if (fe.system_to_component_index(j).first ==
+                                      component_i)
+                                    {
+                                      const double u = fe_values.shape_value(j,point);
+                                      copy_data.cell_matrix.back()(i,j) +=
+                                        (u * v * weight * coefficient_vector_values[point](component_i));
+                                    }
+                                copy_data.cell_vector.back()(i) += v * 
+                                  rhs_values_system[point](component_mapping[component_i]) * weight;
+                              }
+                          }
+                      }
+                  }
+                else  //      if (coefficient == 0)
+                  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
                     {
-                      coefficient_values.resize (fe_values.n_quadrature_points);
-                      coefficient->value_list (fe_values.get_quadrature_points(),
-                                               coefficient_values);
-                      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                      const double weight = fe_values.JxW(point);
+                      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
                         {
-                          const double weight = fe_values.JxW(point);
-                          for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-                            {
-                              const double v = fe_values.shape_value(i,point);
-                              for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                                {
-                                  const double u = fe_values.shape_value(j,point);
-                                  cell_matrix(i,j) += (u * v * weight * coefficient_values[point]);
-                                }
-                              cell_vector(i) += v * rhs_values_scalar[point] *weight;
-                            }
+                          const double v = fe_values.shape_value(i,point);
+                          for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+                            if (fe.system_to_component_index(i).first ==
+                                fe.system_to_component_index(j).first)
+                              {
+                                const double u = fe_values.shape_value(j,point);
+                                copy_data.cell_matrix.back()(i,j) += (u * v * weight);
+                              }
+                          copy_data.cell_vector.back()(i) += v *
+                                            rhs_values_system[point](
+                                              fe.system_to_component_index(i).first) *
+                                            weight;
                         }
                     }
-                  else
+              }
+            else
+              // FE is a scalar one
+              {
+                rhs_values_scalar.resize (fe_values.n_quadrature_points);
+                boundary_functions.find(cell->face(face)->boundary_indicator())
+                ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
+
+                if (coefficient != 0)
+                  {
+                    coefficient_values.resize (fe_values.n_quadrature_points);
+                    coefficient->value_list (fe_values.get_quadrature_points(),
+                                             coefficient_values);
                     for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
                       {
                         const double weight = fe_values.JxW(point);
@@ -1438,164 +1426,154 @@ namespace MatrixCreator
                             for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
                               {
                                 const double u = fe_values.shape_value(j,point);
-                                cell_matrix(i,j) += (u * v * weight);
+                                copy_data.cell_matrix.back()(i,j) += (u * v * weight * 
+                                    coefficient_values[point]);
                               }
-                            cell_vector(i) += v * rhs_values_scalar[point] * weight;
+                            copy_data.cell_vector.back()(i) += v * rhs_values_scalar[point] *weight;
                           }
                       }
-                }
-
-              // now transfer cell matrix and vector
-              // to the whole boundary matrix
-              //
-              // in the following: dof[i] holds the
-              // global index of the i-th degree of
-              // freedom on the present cell. If it
-              // is also a dof on the boundary, it
-              // must be a nonzero entry in the
-              // dof_to_boundary_mapping and then
-              // the boundary index of this dof is
-              // dof_to_boundary_mapping[dof[i]].
-              //
-              // if dof[i] is not on the boundary,
-              // it should be zero on the boundary
-              // therefore on all quadrature
-              // points and finally all of its
-              // entries in the cell matrix and
-              // vector should be zero. If not, we
-              // throw an error (note: because of
-              // the evaluation of the shape
-              // functions only up to machine
-              // precision, the term "must be zero"
-              // really should mean: "should be
-              // very small". since this is only an
-              // assertion and not part of the
-              // code, we may choose "very small"
-              // quite arbitrarily)
-              //
-              // the main problem here is that the
-              // matrix or vector entry should also
-              // be zero if the degree of freedom
-              // dof[i] is on the boundary, but not
-              // on the present face, i.e. on
-              // another face of the same cell also
-              // on the boundary. We can therefore
-              // not rely on the
-              // dof_to_boundary_mapping[dof[i]]
-              // being !=-1, we really have to
-              // determine whether dof[i] is a
-              // dof on the present face. We do so
-              // by getting the dofs on the
-              // face into @p{dofs_on_face_vector},
-              // a vector as always. Usually,
-              // searching in a vector is
-              // inefficient, so we copy the dofs
-              // into a set, which enables binary
-              // searches.
-              dofs.resize (dofs_per_cell);
-              dofs_on_face_vector.resize (dofs_per_face);
-              dof_is_on_face.resize (dofs_per_cell);
-
-              cell->get_dof_indices (dofs);
-              cell->face(face)->get_dof_indices (dofs_on_face_vector,
-                                                 cell->active_fe_index());
-
-              // check for each of the
-              // dofs on this cell
-              // whether it is on the
-              // face
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
-                                               dofs_on_face_vector.end(),
-                                               dofs[i])
-                                     !=
-                                     dofs_on_face_vector.end());
-
-              // in debug mode: compute an element
-              // in the matrix which is
-              // guaranteed to belong to a boundary
-              // dof. We do this to check that the
-              // entries in the cell matrix are
-              // guaranteed to be zero if the
-              // respective dof is not on the
-              // boundary. Since because of
-              // round-off, the actual
-              // value of the matrix entry may be
-              // only close to zero, we assert that
-              // it is small relative to an element
-              // which is guaranteed to be nonzero.
-              // (absolute smallness does not
-              // suffice since the size of the
-              // domain scales in here)
-              //
-              // for this purpose we seek the
-              // diagonal of the matrix, where there
-              // must be an element belonging to
-              // the boundary. we take the maximum
-              // diagonal entry.
-#ifdef DEBUG
-              double max_diag_entry = 0;
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                if (std::fabs(cell_matrix(i,i)) > max_diag_entry)
-                  max_diag_entry = std::fabs(cell_matrix(i,i));
-#endif
-
-              // lock the matrix
-              Threads::Mutex::ScopedLock lock (mutex);
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                for (unsigned int j=0; j<dofs_per_cell; ++j)
-                  if (dof_is_on_face[i] && dof_is_on_face[j])
-                    matrix.add(dof_to_boundary_mapping[dofs[i]],
-                               dof_to_boundary_mapping[dofs[j]],
-                               cell_matrix(i,j));
-                  else
-                    {
-                      // assume that all
-                      // shape functions
-                      // that are nonzero
-                      // on the boundary
-                      // are also listed
-                      // in the
-                      // @p{dof_to_boundary}
-                      // mapping. if that
-                      // is not the case,
-                      // then the
-                      // boundary mass
-                      // matrix does not
-                      // make that much
-                      // sense anyway, as
-                      // it only contains
-                      // entries for
-                      // parts of the
-                      // functions living
-                      // on the boundary
-                      //
-                      // these, we may
-                      // compare here for
-                      // relative
-                      // smallness of all
-                      // entries in the
-                      // local matrix
-                      // which are not
-                      // taken over to
-                      // the global one
-                      Assert (std::fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
-                              ExcInternalError ());
-                    };
-
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                if (dof_is_on_face[j])
-                  rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
-                else
-                  {
-                    // compare here for relative
-                    // smallness
-                    Assert (std::fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
-                            ExcInternalError());
                   }
-            }
+                else
+                  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                    {
+                      const double weight = fe_values.JxW(point);
+                      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                        {
+                          const double v = fe_values.shape_value(i,point);
+                          for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+                            {
+                              const double u = fe_values.shape_value(j,point);
+                              copy_data.cell_matrix.back()(i,j) += (u * v * weight);
+                            }
+                          copy_data.cell_vector.back()(i) += v * rhs_values_scalar[point] * weight;
+                        }
+                    }
+              }
+
+            cell->face(face)->get_dof_indices (dofs_on_face_vector,
+                                               cell->active_fe_index());
+            // for each dof on the cell, have a
+            // flag whether it is on the face
+            copy_data.dof_is_on_face.push_back(std::vector<bool> (copy_data.dofs_per_cell));
+            // check for each of the dofs on this cell
+            // whether it is on the face
+            for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+              copy_data.dof_is_on_face.back()[i] = (std::find(dofs_on_face_vector.begin(),
+                                                              dofs_on_face_vector.end(),
+                                                              copy_data.dofs[i])
+                                                    !=
+                                                    dofs_on_face_vector.end());
+          }
     }
 
+
+
+    template <int dim,int spacedim>
+    void copy_hp_boundary_mass_matrix_1(MatrixCreator::internal::AssemblerBoundary
+                                        ::CopyData<hp::DoFHandler<dim,spacedim> > const &copy_data,
+                                        typename FunctionMap<spacedim>::type const &boundary_functions,
+                                        std::vector<types::global_dof_index> const &dof_to_boundary_mapping,
+                                        SparseMatrix<double> &matrix,
+                                        Vector<double> &rhs_vector)
+    {
+      // now transfer cell matrix and vector to the whole boundary matrix
+      //
+      // in the following: dof[i] holds the  global index of the i-th degree of
+      // freedom on the present cell. If it is also a dof on the boundary, it
+      // must be a nonzero entry in the dof_to_boundary_mapping and then
+      // the boundary index of this dof is dof_to_boundary_mapping[dof[i]].
+      //
+      // if dof[i] is not on the boundary, it should be zero on the boundary
+      // therefore on all quadrature points and finally all of its
+      // entries in the cell matrix and vector should be zero. If not, we
+      // throw an error (note: because of the evaluation of the shape
+      // functions only up to machine precision, the term "must be zero"
+      // really should mean: "should be very small". since this is only an
+      // assertion and not part of the code, we may choose "very small"
+      // quite arbitrarily)
+      //
+      // the main problem here is that the matrix or vector entry should also
+      // be zero if the degree of freedom dof[i] is on the boundary, but not
+      // on the present face, i.e. on another face of the same cell also
+      // on the boundary. We can therefore not rely on the
+      // dof_to_boundary_mapping[dof[i]] being !=-1, we really have to
+      // determine whether dof[i] is a dof on the present face. We do so
+      // by getting the dofs on the face into @p{dofs_on_face_vector},
+      // a vector as always. Usually, searching in a vector is
+      // inefficient, so we copy the dofs into a set, which enables binary
+      // searches.
+      unsigned int pos(0);
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      {
+        // check if this face is on that part of
+        // the boundary we are interested in
+        if (boundary_functions.find(copy_data.cell->face(face)->boundary_indicator()) !=
+            boundary_functions.end())
+          {
+#ifdef DEBUG
+            // in debug mode: compute an element in the matrix which is
+            // guaranteed to belong to a boundary dof. We do this to check that the
+            // entries in the cell matrix are guaranteed to be zero if the
+            // respective dof is not on the boundary. Since because of
+            // round-off, the actual value of the matrix entry may be
+            // only close to zero, we assert that it is small relative to an element
+            // which is guaranteed to be nonzero. (absolute smallness does not
+            // suffice since the size of the domain scales in here)
+            //
+            // for this purpose we seek the diagonal of the matrix, where there
+            // must be an element belonging to the boundary. we take the maximum
+            // diagonal entry.
+            types::global_dof_index max_element = static_cast<types::global_dof_index>(0);
+            for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
+                 i!=dof_to_boundary_mapping.end(); ++i)
+              if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
+                  (*i > max_element))
+                max_element = *i;
+            Assert (max_element  == matrix.n()-1, ExcInternalError());
+
+            double max_diag_entry = 0;
+            for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+              if (std::fabs(copy_data.cell_matrix[pos](i,i)) > max_diag_entry)
+                max_diag_entry = std::fabs(copy_data.cell_matrix[pos](i,i));
+#endif
+
+            for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+              for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+              {
+                if (copy_data.dof_is_on_face[pos][i] && copy_data.dof_is_on_face[pos][j])
+                  matrix.add(dof_to_boundary_mapping[copy_data.dofs[i]],
+                             dof_to_boundary_mapping[copy_data.dofs[j]],
+                             copy_data.cell_matrix[pos](i,j));
+                else
+                  {
+                    // assume that all shape functions that are nonzero on the boundary
+                    // are also listed in the @p{dof_to_boundary} mapping. if that
+                    // is not the case, then the boundary mass matrix does not
+                    // make that much sense anyway, as it only contains entries for
+                    // parts of the functions living on the boundary
+                    //
+                    // these, we may compare here for relative smallness of all
+                    // entries in the local matrix which are not taken over to
+                    // the global one
+                    Assert (std::fabs(copy_data.cell_matrix[pos](i,j)) <= 1e-10 * max_diag_entry,
+                            ExcInternalError ());
+                  }
+              }
+
+            for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+              if (copy_data.dof_is_on_face[pos][j])
+                rhs_vector(dof_to_boundary_mapping[copy_data.dofs[j]]) += copy_data.cell_vector[pos](j);
+              else
+                {
+                  // compare here for relative
+                  // smallness
+                  Assert (std::fabs(copy_data.cell_vector[pos](j)) <= 1e-10 * max_diag_entry,
+                          ExcInternalError());
+                }
+            ++pos;
+          }
+      }
+    }
   }
 
 
@@ -1660,46 +1638,24 @@ namespace MatrixCreator
     else
       AssertDimension (n_components, component_mapping.size());
 
-    const unsigned int n_threads = multithread_info.n_threads();
-    Threads::ThreadGroup<> threads;
+    MatrixCreator::internal::AssemblerBoundary::Scratch scratch;
+    MatrixCreator::internal::AssemblerBoundary::CopyData<hp::DoFHandler<dim,spacedim> > copy_data;
 
-    // define starting and end point
-    // for each thread
-    typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
-    std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-      = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-                                                    dof.end(), n_threads);
-
-    typedef std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim> &,
-            const hp::DoFHandler<dim,spacedim> &,
-            const hp::QCollection<dim-1>&> Commons;
-
-    // mutex to synchronise access to
-    // the matrix
-    Threads::Mutex mutex;
-
-    // then assemble in parallel
-    typedef void (*create_boundary_mass_matrix_1_t)
-    (Commons,
-     SparseMatrix<double>      &matrix,
-     const typename FunctionMap<spacedim>::type &boundary_functions,
-     Vector<double>            &rhs_vector,
-     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-     const Function<spacedim> *const coefficient,
-     const std::vector<unsigned int> &component_mapping,
-     const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
-     Threads::Mutex      &mutex);
-    create_boundary_mass_matrix_1_t p = &create_boundary_mass_matrix_1<dim,spacedim>;
-
-//TODO: Use WorkStream here
-    for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::new_thread (p,
-                                      Commons(mapping, dof, q), matrix,
-                                      boundary_functions, rhs_vector,
-                                      dof_to_boundary_mapping, coefficient,
-                                      component_mapping,
-                                      thread_ranges[thread], mutex);
-    threads.join_all ();
+    WorkStream::run(dof.begin_active(),dof.end(),
+        static_cast<std_cxx1x::function<void (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+          const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
+          MatrixCreator::internal::AssemblerBoundary::CopyData<hp::DoFHandler<dim,spacedim> > &)> > 
+        (std_cxx1x::bind(create_hp_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
+                         std_cxx1x::_3,
+                         std_cxx1x::cref(mapping),std_cxx1x::cref(fe_collection),std_cxx1x::cref(q),
+                         std_cxx1x::cref(boundary_functions),coefficient,
+                         std_cxx1x::cref(component_mapping))), 
+        static_cast<std_cxx1x::function<void (MatrixCreator::internal::AssemblerBoundary
+          ::CopyData<hp::DoFHandler<dim,spacedim> > const &)> > (std_cxx1x::bind(
+              copy_hp_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,
+            std_cxx1x::cref(boundary_functions),std_cxx1x::cref(dof_to_boundary_mapping),
+            std_cxx1x::ref(matrix),std_cxx1x::ref(rhs_vector))),
+        scratch,copy_data);
   }
 
 

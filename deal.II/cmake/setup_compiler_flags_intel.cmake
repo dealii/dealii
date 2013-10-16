@@ -62,6 +62,14 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-w2")
 #   -w68   integer conversion resulted in a change of sign
 #          (triggers a lot in functionparser)
 #   -w175  subscript out of range
+#   -w135  class template "dealii::FE_Q_Base<POLY, dim, spacedim>"
+#          has no member "Implementation"
+#          (the compiler is objectively wrong since the warning
+#           triggers also on code of the form
+#           class FE_Q_Base {
+#             struct Implementation; // forward declaration
+#             friend struct Implementation;
+#           };)
 #   -w177  declared but not referenced
 #   -w279  controlling expression is constant
 #   -w327  NULL reference is not allowed
@@ -78,6 +86,7 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-w2")
 #   -w2536 type qualifiers are meaningless here
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd68")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd135")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd175")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd177")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd279")

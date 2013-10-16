@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx1x/tuple.h>
+#include <deal.II/base/synchronous_iterator.h>
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/mapping.h>
 #include <utility>
@@ -673,12 +675,12 @@ private:
   template <class DerivativeDescription, int dim,
            template <int, int> class DH, class InputVector, int spacedim>
   static void
-  approximate (const typename DH<dim,spacedim>::active_cell_iterator &cell,
+  approximate (SynchronousIterators<std_cxx1x::tuple<typename DH<dim,spacedim>
+               ::active_cell_iterator,Vector<float>::iterator> > const &cell,              
                const Mapping<dim,spacedim>    &mapping,
                const DH<dim,spacedim>         &dof,
                const InputVector     &solution,
-               const unsigned int     component,
-               Vector<float>         &derivative_norm);
+               const unsigned int     component);
 
   /**
    * Compute the derivative approximation on
