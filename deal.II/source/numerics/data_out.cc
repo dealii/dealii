@@ -302,9 +302,13 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
         = (*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()];
     }
 
+  const unsigned int patch_idx = cell_and_index->second;
+  // did we mess up the indices?
+  Assert(patch_idx < patches.size(), ExcInternalError());
+  
   // Put the patch in the patches vector
-  patches[cell_and_index->second] = patch;
-  patches[cell_and_index->second].patch_index = cell_and_index->second;
+  patches[patch_idx] = patch;
+  patches[patch_idx].patch_index = patch_idx;
 }
 
 
@@ -356,19 +360,8 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 
   std::vector<std::pair<cell_iterator, unsigned int> > all_cells;
   {
-    // set the index of the first cell. if first_locally_owned_cell /
-    // next_locally_owned_cell returns non-active cells, then the index is not
-    // usable anyway, but otherwise we should keep track where we are
-    unsigned int index;
     cell_iterator cell = first_locally_owned_cell();
-    if ((cell == this->triangulation->end())
-        ||
-        (cell->has_children()))
-      index = 0;
-    else
-      index = std::distance (this->triangulation->begin_active(),
-                             active_cell_iterator(cell));
-    for ( ; cell != this->triangulation->end(); )
+    for (unsigned int index = 0; cell != this->triangulation->end(); ++index)
       {
         Assert (static_cast<unsigned int>(cell->level()) <
                 cell_to_patch_index_map.size(),
@@ -380,19 +373,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
         cell_to_patch_index_map[cell->level()][cell->index()] = all_cells.size();
 
         all_cells.push_back (std::make_pair(cell, index));
-
-        // if both this and the next cell are active, then increment the index
-        // that keeps track on which active cell we are sitting correctly. if
-        // one of the cells is not active, then this index doesn't mean
-        // anything anyway, so just ignore it. same if we are at the end of
-        // the range
-        cell_iterator next = next_locally_owned_cell(cell);
-        if (!cell->has_children() &&
-            next != this->triangulation->end() &&
-            !next->has_children())
-          index += std::distance (active_cell_iterator(cell),
-                                  active_cell_iterator(next));
-        cell = next;
+        cell = next_locally_owned_cell(cell);
       }
   }
 
@@ -484,7 +465,7 @@ typename DataOut<dim,DH>::cell_iterator
 DataOut<dim,DH>::first_locally_owned_cell ()
 {
   typename DataOut<dim,DH>::cell_iterator
-  cell = this->triangulation->begin_active ();
+    cell = first_cell();
 
   // skip cells if the current one has no children (is active) and is a ghost
   // or artificial cell
