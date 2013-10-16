@@ -1115,16 +1115,17 @@ next_cell:
                               +
                               1);
 
-    // next we have to build a mapping from the
-    // list of cells to their indices. for
-    // this, use the user_index field
-    std::vector<unsigned int> saved_user_indices;
-    triangulation.save_user_indices (saved_user_indices);
+    // create a map pair<lvl,idx> -> SparsityPattern index
+    // TODO: we are no longer using user_indices for this because we can get
+    // pointer/index clashes when saving/restoring them. The following approach
+    // works, but this map can get quite big. Not sure about more efficient solutions.
+    std::map< std::pair<unsigned int,unsigned int>, unsigned int >
+      indexmap;
     unsigned int index = 0;
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell, ++index)
-      cell->set_user_index (index);
+      indexmap[std::pair<unsigned int,unsigned int>(cell->level(),cell->index())] = index;
 
     // next loop over all cells and
     // their neighbors to build the
@@ -1153,21 +1154,15 @@ next_cell:
               &&
               (cell->neighbor(f)->has_children() == false))
             {
-              cell_connectivity.add (index,
-                                     cell->neighbor(f)->user_index());
-              cell_connectivity.add (cell->neighbor(f)->user_index(),
-                                     index);
+              unsigned int other_index = indexmap.find(
+                  std::pair<unsigned int,unsigned int>(cell->neighbor(f)->level(),cell->neighbor(f)->index()))->second;
+              cell_connectivity.add (index, other_index);
+              cell_connectivity.add (other_index, index);
             }
       }
 
-    // now compress the so-built connectivity
-    // pattern and restore user indices. the
-    // const-cast is necessary since we treat
-    // the triangulation as constant (we here
-    // return it to its original state)
+    // now compress the so-built connectivity pattern
     cell_connectivity.compress ();
-    const_cast<Triangulation<dim,spacedim>&>(triangulation)
-    .load_user_indices (saved_user_indices);
   }
 
 
