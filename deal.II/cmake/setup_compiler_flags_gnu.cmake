@@ -167,5 +167,14 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-g")
     ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_DEBUG "-g")
   ENDIF()
+
+  IF(DEAL_II_SETUP_COVERAGE)
+    #
+    # Enable test coverage
+    #
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
+    ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
+  ENDIF()
+
 ENDIF()
 

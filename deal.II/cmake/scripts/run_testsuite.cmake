@@ -77,6 +77,11 @@
 #       # cmake -C ${CONFIG_FILE}). This only has an effect if
 #       CTEST_BINARY_DIRECTORY is empty.
 #
+#   COVERAGE
+#     - If set to TRUE deal.II will be configured with
+#       DEAL_II_SETUP_COVERAGE=TRUE and the CTEST_COVERAGE() stage will
+#       be run. Test results must go into the "Experimental" section
+#
 # Furthermore, the following variables controlling the testsuite can be set
 # and will be automatically handed down to cmake:
 #
@@ -254,6 +259,11 @@ FOREACH(_var ${_variables})
   ENDIF()
 ENDFOREACH()
 
+IF(COVERAGE)
+  LIST(APPEND _options "-DDEAL_II_SETUP_COVERAGE=TRUE")
+  LIST(APPEND _options "-DCMAKE_BUILD_TYPE=Debug")
+ENDIF()
+
 #
 # CTEST_BUILD_NAME:
 #
@@ -371,6 +381,23 @@ SET(CTEST_NOTES_FILES
   ${CTEST_BINARY_DIRECTORY}/include/deal.II/base/config.h
   )
 
+#
+# Setup coverage:
+#
+IF(COVERAGE)
+  FIND_PROGRAM(GCOV_COMMAND NAMES gcov)
+
+  IF(GCOV_COMMAND MATCHES "-NOTFOUND")
+    MESSAGE(FATAL_ERROR "
+TRACK was set to \"Build Tests\" which requires the source directory to be
+under Subversion version control.
+"
+      )
+  ENDIF()
+
+  SET(CTEST_COVERAGE_COMMAND "${GCOV_COMMAND}")
+ENDIF()
+
 
 ########################################################################
 #                                                                      #
@@ -406,6 +433,11 @@ IF("${_res}" STREQUAL "0")
     ENDIF()
 
     CTEST_TEST()
+
+    IF(COVERAGE)
+      CTEST_COVERAGE()
+    ENDIF(COVERAGE)
+
   ENDIF()
 ENDIF()
 

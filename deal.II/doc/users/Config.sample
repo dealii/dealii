@@ -75,6 +75,10 @@
 #   "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
 #   )
 #
+# SET(DEAL_II_SETUP_COVERAGE OFF CACHE BOOL
+#   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
+#   )
+#
 # SET(CMAKE_CXX_COMPILER "" CACHE STRING
 #   "CXX Compiler."
 #   )
