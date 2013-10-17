@@ -38,9 +38,9 @@ SET(CTEST_CUSTOM_ERROR_POST_CONTEXT          20)
 #
 
 SET(CTEST_EXTRA_COVERAGE_GLOB
-  \${CTEST_SOURCE_DIRECTORY}/include/**/*.h
-  \${CTEST_SOURCE_DIRECTORY}/source/**/*.cc
-  \${CTEST_SOURCE_DIRECTORY}/source/**/*.inst.in
+  # already relative to source dir:
+  include/**/*.h
+  source/**/*.cc
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
