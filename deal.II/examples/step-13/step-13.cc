@@ -29,6 +29,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/table_handler.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -60,6 +61,23 @@
 namespace Step13
 {
   using namespace dealii;
+
+  namespace Assembler
+  {
+    struct Scratch
+    {
+      Scratch() {}
+    };
+
+    struct CopyData
+    {
+      CopyData() {}
+
+      unsigned int dofs_per_cell;
+      FullMatrix<double> cell_matrix;
+      std::vector<types::global_dof_index> local_dof_indices;
+    };
+  }
 
   // @sect3{Evaluation of the solution}
 
@@ -646,10 +664,14 @@ namespace Step13
       assemble_linear_system (LinearSystem &linear_system);
 
       void
-      assemble_matrix (LinearSystem                                         &linear_system,
-                       const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
-                       const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-                       Threads::Mutex                                       &mutex) const;
+      assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                       Assembler::Scratch                                   &scratch,
+                       Assembler::CopyData                                  &copy_data);
+          
+
+      void
+      copy_local_to_global(Assembler::CopyData const &copy_data,
+                           LinearSystem              &linear_system);
     };
 
 
@@ -743,27 +765,19 @@ namespace Step13
       // of equal size. The number of blocks is set to the default number of
       // threads to be used, which by default is set to the number of
       // processors found in your computer at startup of the program:
-      const unsigned int n_threads = multithread_info.n_threads();
-      std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-      thread_ranges
-        = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
-                                                      dof_handler.end (),
-                                                      n_threads);
 
       // These ranges are then assigned to a number of threads which we create
       // next. Each will assemble the local cell matrices on the assigned
       // cells, and fill the matrix object with it. Since there is need for
       // synchronization when filling the same matrix from different threads,
       // we need a mutex here:
-      Threads::Mutex         mutex;
-      Threads::ThreadGroup<> threads;
-      for (unsigned int thread=0; thread<n_threads; ++thread)
-        threads += Threads::new_thread (&Solver<dim>::assemble_matrix,
-                                        *this,
-                                        linear_system,
-                                        thread_ranges[thread].first,
-                                        thread_ranges[thread].second,
-                                        mutex);
+
+      Assembler::Scratch scratch;
+      Assembler::CopyData copy_data;
+      WorkStream::run(dof_handler.begin_active(),dof_handler.end(),
+          std::bind(&Solver<dim>::assemble_matrix,this,std_cxx1x::_1,std_cxx1x::_2,std_cxx1x::_3),
+          std::bind(&Solver<dim>::copy_local_to_global,this,std_cxx1x::_1,std_cxx1x::ref(linear_system)),
+          scratch,copy_data);
 
       // While the new threads assemble the system matrix, we can already
       // compute the right hand side vector in the main thread, and condense
@@ -783,7 +797,6 @@ namespace Step13
 
       // If this is done, wait for the matrix assembling threads, and condense
       // the constraints in the matrix as well:
-      threads.join_all ();
       linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
       // Now that we have the linear system, we can also treat boundary
@@ -803,38 +816,39 @@ namespace Step13
     // on it any more, except for one point below.
     template <int dim>
     void
-    Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
-                                  const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
-                                  const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-                                  Threads::Mutex                                       &mutex) const
+    Solver<dim>::assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,            
+                                  Assembler::Scratch                                   &scratch,         
+                                  Assembler::CopyData                                  &copy_data) 
     {
       FEValues<dim> fe_values (*fe, *quadrature,
                                update_gradients | update_JxW_values);
 
-      const unsigned int   dofs_per_cell = fe->dofs_per_cell;
+      copy_data.dofs_per_cell = fe->dofs_per_cell;
       const unsigned int   n_q_points    = quadrature->size();
 
-      FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+      copy_data.cell_matrix = FullMatrix<double> (copy_data.dofs_per_cell, copy_data.dofs_per_cell);
 
-      std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+      copy_data.local_dof_indices.resize(copy_data.dofs_per_cell);
 
-      for (typename DoFHandler<dim>::active_cell_iterator cell=begin_cell;
-           cell!=end_cell; ++cell)
-        {
-          cell_matrix = 0;
+      fe_values.reinit (cell);
 
-          fe_values.reinit (cell);
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+          for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+            copy_data.cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
+                fe_values.shape_grad(j,q_point) *
+                fe_values.JxW(q_point));
 
-          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                                     fe_values.shape_grad(j,q_point) *
-                                     fe_values.JxW(q_point));
+      cell->get_dof_indices (copy_data.local_dof_indices);
+    }
 
 
-          cell->get_dof_indices (local_dof_indices);
 
+    template <int dim>
+    void
+    Solver<dim>::copy_local_to_global(Assembler::CopyData const &copy_data,
+                                      LinearSystem              &linear_system) 
+    {
           // In the step-9 program, we have shown that you have to use the
           // mutex to lock the matrix when copying the elements from the local
           // to the global matrix. This was necessary to avoid that two
@@ -862,21 +876,11 @@ namespace Step13
           // whether the operation completed successfully or not, whether the
           // exit path was something we implemented willfully or whether the
           // function was exited by an exception that we did not foresee.
-          //
-          // deal.II implements the scoped locking pattern in the
-          // Treads::Mutex::ScopedLock class: it takes the mutex in the
-          // constructor and locks it; in its destructor, it unlocks it
-          // again. So here is how it is used:
-          Threads::Mutex::ScopedLock lock (mutex);
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              linear_system.matrix.add (local_dof_indices[i],
-                                        local_dof_indices[j],
-                                        cell_matrix(i,j));
-          // Here, at the brace, the current scope ends, so the
-          // <code>lock</code> variable goes out of existence and its
-          // destructor the mutex is unlocked.
-        };
+          for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+            for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+              linear_system.matrix.add (copy_data.local_dof_indices[i],
+                                        copy_data.local_dof_indices[j],
+                                        copy_data.cell_matrix(i,j));
     }
 
 
