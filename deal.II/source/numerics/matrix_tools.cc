@@ -1271,12 +1271,6 @@ namespace MatrixCreator
       copy_data.dofs.resize(copy_data.dofs_per_cell);
       cell->get_dof_indices (copy_data.dofs);
 
-      const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell(),
-                         max_dofs_per_face = fe_collection.max_dofs_per_face();
-
-      FullMatrix<double> cell_matrix(max_dofs_per_cell, max_dofs_per_cell);
-      Vector<double>     cell_vector(max_dofs_per_cell);
-
 
       UpdateFlags update_flags = UpdateFlags (update_values     |
                                               update_JxW_values |
