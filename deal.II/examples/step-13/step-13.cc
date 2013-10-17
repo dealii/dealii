@@ -666,12 +666,12 @@ namespace Step13
       void
       assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
                        Assembler::Scratch                                   &scratch,
-                       Assembler::CopyData                                  &copy_data);
+                       Assembler::CopyData                                  &copy_data) const;
           
 
       void
       copy_local_to_global(Assembler::CopyData const &copy_data,
-                           LinearSystem              &linear_system);
+                           LinearSystem              &linear_system) const;
     };
 
 
@@ -818,7 +818,7 @@ namespace Step13
     void
     Solver<dim>::assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,            
                                   Assembler::Scratch                                   &scratch,         
-                                  Assembler::CopyData                                  &copy_data) 
+                                  Assembler::CopyData                                  &copy_data) const
     {
       FEValues<dim> fe_values (*fe, *quadrature,
                                update_gradients | update_JxW_values);
@@ -847,7 +847,7 @@ namespace Step13
     template <int dim>
     void
     Solver<dim>::copy_local_to_global(Assembler::CopyData const &copy_data,
-                                      LinearSystem              &linear_system) 
+                                      LinearSystem              &linear_system) const
     {
           // In the step-9 program, we have shown that you have to use the
           // mutex to lock the matrix when copying the elements from the local
