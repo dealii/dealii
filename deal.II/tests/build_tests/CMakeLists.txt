@@ -86,6 +86,7 @@ FOREACH(_step_full ${_steps})
 
       # And a rule on how to configure the example step:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/configure_output
+        COMMAND rm -f ${_step_dir}/failing_configure_output
         COMMAND ${CMAKE_COMMAND}
           -DDEAL_II_DIR=${DEAL_II_BINARY_DIR} -DCMAKE_BUILD_TYPE=${_build} .
           > ${_step_dir}/configure_output 2>&1
@@ -101,8 +102,9 @@ FOREACH(_step_full ${_steps})
       # And a rule on how to build the example step:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/build_output
         COMMAND [ ! -f ${_step_dir}/configure_output ]
-          || ${CMAKE_COMMAND} --build ${_step_dir} --target all
-             > ${_step_dir}/build_output 2>&1
+          || (rm -f ${_step_dir}/failing_build_output
+              &&${CMAKE_COMMAND} --build ${_step_dir} --target all
+              > ${_step_dir}/build_output 2>&1)
           || (mv ${_step_dir}/build_output
                  ${_step_dir}/failing_build_output
               && echo "${_test}: CONFIGURE successful."
@@ -120,8 +122,9 @@ FOREACH(_step_full ${_steps})
       # And a rule on how to run the example step:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/run_output
         COMMAND [ ! -f ${_step_dir}/build_output ]
-          || ${CMAKE_COMMAND} --build ${_step_dir} --target run
-             > ${_step_dir}/run_output 2>&1
+          || (rm -f ${_step_dir}/failing_run_output
+             && ${CMAKE_COMMAND} --build ${_step_dir} --target run
+             > ${_step_dir}/run_output 2>&1)
           || (mv ${_step_dir}/run_output
                  ${_step_dir}/failing_run_output
               && echo "${_test}: CONFIGURE successful."

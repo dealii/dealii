@@ -24,7 +24,7 @@ INCLUDE(${DEAL_II_TARGET_CONFIG})
 #
 # Construct a list of all header files and build up a test that just tries
 # to compile a simple worker (test_header.cc) that only includes the given
-# header file. We omit linking to safe some time.
+# header file. We omit linking to save some time.
 #
 
 SET(_category all-headers)
