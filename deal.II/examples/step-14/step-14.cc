@@ -24,6 +24,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -58,6 +59,23 @@
 namespace Step14
 {
   using namespace dealii;
+
+  namespace Assembler
+  {
+    struct Scratch
+    {
+      Scratch() {}
+    };
+
+    struct CopyData
+    {
+      CopyData() {}
+
+      unsigned int dofs_per_cell;
+      FullMatrix<double> cell_matrix;
+      std::vector<types::global_dof_index> local_dof_indices;
+    };
+  }
 
   // @sect3{Evaluating the solution}
 
@@ -474,10 +492,14 @@ namespace Step14
       assemble_linear_system (LinearSystem &linear_system);
 
       void
-      assemble_matrix (LinearSystem                                         &linear_system,
-                       const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
-                       const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-                       Threads::Mutex                                       &mutex) const;
+      assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                       Assembler::Scratch                                   &scratch,
+                       Assembler::CopyData                                  &copy_data) const;
+          
+
+      void
+      copy_local_to_global(Assembler::CopyData const &copy_data,
+                           LinearSystem              &linear_system) const;
     };
 
 
@@ -550,15 +572,13 @@ namespace Step14
                                                       dof_handler.end (),
                                                       n_threads);
 
-      Threads::Mutex         mutex;
-      Threads::ThreadGroup<> threads;
-      for (unsigned int thread=0; thread<n_threads; ++thread)
-        threads += Threads::new_thread (&Solver<dim>::assemble_matrix,
-                                        *this,
-                                        linear_system,
-                                        thread_ranges[thread].first,
-                                        thread_ranges[thread].second,
-                                        mutex);
+      Assembler::Scratch scratch;
+      Assembler::CopyData copy_data;
+      WorkStream::run(dof_handler.begin_active(),dof_handler.end(),
+          std::bind(&Solver<dim>::assemble_matrix,this,std_cxx1x::_1,std_cxx1x::_2,std_cxx1x::_3),
+          std::bind(&Solver<dim>::copy_local_to_global,this,std_cxx1x::_1,std_cxx1x::ref(linear_system)),
+          scratch,copy_data);
+      
 
       assemble_rhs (linear_system.rhs);
       linear_system.hanging_node_constraints.condense (linear_system.rhs);
@@ -569,7 +589,6 @@ namespace Step14
                                                 *boundary_values,
                                                 boundary_value_map);
 
-      threads.join_all ();
       linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
       MatrixTools::apply_boundary_values (boundary_value_map,
@@ -581,47 +600,77 @@ namespace Step14
 
     template <int dim>
     void
-    Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
-                                  const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
-                                  const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-                                  Threads::Mutex                                       &mutex) const
+    Solver<dim>::assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,            
+                                  Assembler::Scratch                                   &scratch,         
+                                  Assembler::CopyData                                  &copy_data) const
     {
       FEValues<dim> fe_values (*fe, *quadrature,
                                update_gradients | update_JxW_values);
 
-      const unsigned int   dofs_per_cell = fe->dofs_per_cell;
+      copy_data.dofs_per_cell = fe->dofs_per_cell;
       const unsigned int   n_q_points    = quadrature->size();
 
-      FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+      copy_data.cell_matrix = FullMatrix<double> (copy_data.dofs_per_cell, copy_data.dofs_per_cell);
 
-      std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+      copy_data.local_dof_indices.resize(copy_data.dofs_per_cell);
 
-      for (typename DoFHandler<dim>::active_cell_iterator cell=begin_cell;
-           cell!=end_cell; ++cell)
-        {
-          cell_matrix = 0;
+      fe_values.reinit (cell);
 
-          fe_values.reinit (cell);
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+          for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+            copy_data.cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
+                fe_values.shape_grad(j,q_point) *
+                fe_values.JxW(q_point));
 
-          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                                     fe_values.shape_grad(j,q_point) *
-                                     fe_values.JxW(q_point));
-
-
-          cell->get_dof_indices (local_dof_indices);
-          Threads::Mutex::ScopedLock lock (mutex);
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              linear_system.matrix.add (local_dof_indices[i],
-                                        local_dof_indices[j],
-                                        cell_matrix(i,j));
-        }
+      cell->get_dof_indices (copy_data.local_dof_indices);
     }
 
 
+
+    template <int dim>
+    void
+    Solver<dim>::copy_local_to_global(Assembler::CopyData const &copy_data,
+                                      LinearSystem              &linear_system) const
+    {
+          for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+            for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+              linear_system.matrix.add (copy_data.local_dof_indices[i],
+                                        copy_data.local_dof_indices[j],
+                                        copy_data.cell_matrix(i,j));
+    }
+
+
+    // Now for the functions that implement actions in the linear system
+    // class. First, the constructor initializes all data elements to their
+    // correct sizes, and sets up a number of additional data structures, such
+    // as constraints due to hanging nodes. Since setting up the hanging nodes
+    // and finding out about the nonzero elements of the matrix is
+    // independent, we do that in parallel (if the library was configured to
+    // use concurrency, at least; otherwise, the actions are performed
+    // sequentially). Note that we start only one thread, and do the second
+    // action in the main thread. Since only one thread is generated, we don't
+    // use the <code>Threads::ThreadGroup</code> class here, but rather use
+    // the one created thread object directly to wait for this particular
+    // thread's exit.
+    //
+    // Note that taking up the address of the
+    // <code>DoFTools::make_hanging_node_constraints</code> function is a
+    // little tricky, since there are actually three of them, one for each
+    // supported space dimension. Taking addresses of overloaded functions is
+    // somewhat complicated in C++, since the address-of operator
+    // <code>&</code> in that case returns more like a set of values (the
+    // addresses of all functions with that name), and selecting the right one
+    // is then the next step. If the context dictates which one to take (for
+    // example by assigning to a function pointer of known type), then the
+    // compiler can do that by itself, but if this set of pointers shall be
+    // given as the argument to a function that takes a template, the compiler
+    // could choose all without having a preference for one. We therefore have
+    // to make it clear to the compiler which one we would like to have; for
+    // this, we could use a cast, but for more clarity, we assign it to a
+    // temporary <code>mhnc_p</code> (short for <code>pointer to
+    // make_hanging_node_constraints</code>) with the right type, and using
+    // this pointer instead.
     template <int dim>
     Solver<dim>::LinearSystem::
     LinearSystem (const DoFHandler<dim> &dof_handler)
