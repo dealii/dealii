@@ -218,6 +218,8 @@ CTEST_CMAKE_GENERATOR was set to a different Generator \"${CTEST_CMAKE_GENERATOR
   ENDIF()
 ENDIF()
 
+MESSAGE("-- CTEST_CMAKE_GENERATOR:  ${CTEST_CMAKE_GENERATOR}")
+
 #
 # CTEST_SITE:
 #
@@ -398,6 +400,8 @@ under Subversion version control.
   SET(CTEST_COVERAGE_COMMAND "${GCOV_COMMAND}")
 ENDIF()
 
+MESSAGE("-- COVERAGE:               ${COVERAGE}")
+
 
 ########################################################################
 #                                                                      #
@@ -411,16 +415,19 @@ ENDIF()
 
 CTEST_START(Experimental TRACK ${TRACK})
 
+MESSAGE("-- Running CTEST_CONFIGURE()")
 CTEST_CONFIGURE(OPTIONS "${_options}" RETURN_VALUE _res)
 
 IF("${_res}" STREQUAL "0")
   # Only run the build stage if configure was successful:
 
+  MESSAGE("-- Running CTEST_BUILD()")
   CTEST_BUILD(TARGET NUMBER_ERRORS _res)
 
   IF("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
 
+    MESSAGE("-- Running make setup_tests")
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
       --build ${CTEST_BINARY_DIRECTORY} --target setup_tests
       OUTPUT_QUIET RESULT_VARIABLE _res
@@ -432,9 +439,11 @@ IF("${_res}" STREQUAL "0")
         )
     ENDIF()
 
+    MESSAGE("-- Running CTEST_TESTS()")
     CTEST_TEST()
 
     IF(COVERAGE)
+      MESSAGE("-- Running CTEST_COVERAGE()")
       CTEST_COVERAGE()
     ENDIF(COVERAGE)
 
@@ -484,6 +493,11 @@ ENDIF()
 # And finally submit:
 #
 
-CTEST_SUBMIT()
+MESSAGE("-- Running CTEST_SUBMIT()")
+CTEST_SUBMIT(RETURN_VALUE _res)
 
-# .oO( This script is freaky 457 lines long... )
+IF("${_res}" STREQUAL "0")
+  MESSAGE("-- Submission successful. Goodbye!")
+ENDIF()
+
+# .oO( This script is freaky 503 lines long... )
