@@ -21,8 +21,9 @@
 IF( "${CTEST_BINARY_DIRECTORY}" STREQUAL ""
     AND "${CMAKE_CURRENT_BINARY_DIR}" STREQUAL "${CMAKE_CURRENT_LIST_DIR}" )
   MESSAGE(FATAL_ERROR "
-ctest was invoked in the source directory (or test source directory) and CTEST_BINARY_DIRECTORY is not set.
-Please either call ctest from within a designated build directory, or set CTEST_BINARY_DIRECTORY accordingly.
+ctest was invoked in the source directory (or test source directory) and
+CTEST_BINARY_DIRECTORY is not set. Please either call ctest from within a
+designated build directory, or set CTEST_BINARY_DIRECTORY accordingly.
 "
     )
 ENDIF()
@@ -42,8 +43,9 @@ ENDIF()
 IF(NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/cmake/scripts/run_testsuite.cmake)
   MESSAGE(FATAL_ERROR "
 Could not find a suitable source directory.
-There is no source directory \"../deal.II\" relative to the location of this script.
-Please, set CTEST_SOURCE_DIRECTORY manually to the appropriate source directory.
+There is no source directory \"../deal.II\" relative to the location of
+this script. Please, set CTEST_SOURCE_DIRECTORY manually to the appropriate
+source directory.
 "
     )
 ENDIF()
