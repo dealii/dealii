@@ -79,8 +79,9 @@
 #
 #   COVERAGE
 #     - If set to TRUE deal.II will be configured with
-#       DEAL_II_SETUP_COVERAGE=TRUE and the CTEST_COVERAGE() stage will
-#       be run. Test results must go into the "Experimental" section
+#     DEAL_II_SETUP_COVERAGE=TRUE, CMAKE_BUILD_TYPE=Debug and the
+#     CTEST_COVERAGE() stage will be run. Test results must go into the
+#     "Experimental" section.
 #
 # Furthermore, the following variables controlling the testsuite can be set
 # and will be automatically handed down to cmake:
@@ -387,12 +388,20 @@ SET(CTEST_NOTES_FILES
 # Setup coverage:
 #
 IF(COVERAGE)
+  IF(NOT TRACK MATCHES "Experimental")
+    MESSAGE(FATAL_ERROR "
+TRACK must be set to  \"Experimental\" if Coverage is enabled via
+COVERAGE=TRUE.
+"
+      )
+  ENDIF()
+
   FIND_PROGRAM(GCOV_COMMAND NAMES gcov)
 
   IF(GCOV_COMMAND MATCHES "-NOTFOUND")
     MESSAGE(FATAL_ERROR "
-TRACK was set to \"Build Tests\" which requires the source directory to be
-under Subversion version control.
+Coverage enabled but could not find the gcov executable. Please install
+gcov, which is part of the GNU Compiler Collection.
 "
       )
   ENDIF()
@@ -500,4 +509,4 @@ IF("${_res}" STREQUAL "0")
   MESSAGE("-- Submission successful. Goodbye!")
 ENDIF()
 
-# .oO( This script is freaky 503 lines long... )
+# .oO( This script is freaky 511 lines long... )
