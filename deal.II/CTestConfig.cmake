@@ -39,8 +39,7 @@ SET(CTEST_CUSTOM_ERROR_POST_CONTEXT          20)
 
 SET(CTEST_EXTRA_COVERAGE_GLOB
   # These files should have executable lines and therefore coverage:
-  include/**/*.h
-  source/**/*.cc
+  # source/**/*.cc
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
