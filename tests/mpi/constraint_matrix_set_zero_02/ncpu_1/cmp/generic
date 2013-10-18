@@ -4,14 +4,10 @@ Process #0
 Local range: [0, 1), global size: 1
 Vector data:
 1.000e+00 
-Ghost entries (global index / value):
-
 Process #0
 Local range: [0, 2), global size: 2
 Vector data:
 2.000e+00 3.000e+00 
-Ghost entries (global index / value):
-
 DEAL:0::
 DEAL:0::CM:
     1 = 0
@@ -20,12 +16,8 @@ Process #0
 Local range: [0, 1), global size: 1
 Vector data:
 1.000e+00 
-Ghost entries (global index / value):
-
 Process #0
 Local range: [0, 2), global size: 2
 Vector data:
 0.000e+00 3.000e+00 
-Ghost entries (global index / value):
-
 DEAL:0::OK
