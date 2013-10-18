@@ -38,8 +38,8 @@ SET(CTEST_CUSTOM_ERROR_POST_CONTEXT          20)
 #
 
 SET(CTEST_EXTRA_COVERAGE_GLOB
-  # already relative to source dir:
-  include/**/*.h
+  # These files should have executable lines and therefore coverage:
+  include/**/*.template.h
   source/**/*.cc
   )
 
