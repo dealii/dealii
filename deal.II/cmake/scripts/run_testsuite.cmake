@@ -412,6 +412,33 @@ ENDIF()
 MESSAGE("-- COVERAGE:               ${COVERAGE}")
 
 
+MACRO(CREATE_TARGETDIRECTORIES_TXT)
+  #
+  # It gets tricky: Fake a TargetDirectories.txt containing _all_ target
+  # directories (of the main project and all subprojects) so that the
+  # CTEST_COVERAGE() actually picks everything up...
+  #
+  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy
+    ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt
+    ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt.bck
+    )
+  FILE(GLOB _subprojects ${CTEST_BINARY_DIRECTORY}/tests/*)
+  FOREACH(_subproject ${_subprojects})
+    IF(EXISTS ${_subproject}/CMakeFiles/TargetDirectories.txt)
+      FILE(READ ${_subproject}/CMakeFiles/TargetDirectories.txt _var)
+      FILE(APPEND ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt ${_var})
+    ENDIF()
+  ENDFOREACH()
+ENDMACRO()
+
+MACRO(CLEAR_TARGETDIRECTORIES_TXT)
+  EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E rename
+    ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt.bck
+    ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt
+    )
+ENDMACRO()
+
+
 ########################################################################
 #                                                                      #
 #                          Run the testsuite:                          #
@@ -452,8 +479,10 @@ IF("${_res}" STREQUAL "0")
     CTEST_TEST()
 
     IF(COVERAGE)
+      CREATE_TARGETDIRECTORIES_TXT()
       MESSAGE("-- Running CTEST_COVERAGE()")
       CTEST_COVERAGE()
+      CLEAR_TARGETDIRECTORIES_TXT()
     ENDIF(COVERAGE)
 
   ENDIF()
@@ -509,4 +538,4 @@ IF("${_res}" STREQUAL "0")
   MESSAGE("-- Submission successful. Goodbye!")
 ENDIF()
 
-# .oO( This script is freaky 511 lines long... )
+# .oO( This script is freaky 541 lines long... )
