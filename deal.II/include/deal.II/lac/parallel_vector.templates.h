@@ -92,6 +92,8 @@ namespace parallel
       // set entries to zero if so requested
       if (fast == false)
         this->operator = (Number());
+
+      vector_is_ghosted = false;
     }
 
 
@@ -134,6 +136,8 @@ namespace parallel
           // call these methods and hence do not need to have the storage.
           import_data = 0;
         }
+
+      vector_is_ghosted = false;
     }
 
 
@@ -194,6 +198,8 @@ namespace parallel
           // call these methods and hence do not need to have the storage.
           import_data = 0;
         }
+
+      vector_is_ghosted = false;
     }
 
 
@@ -209,6 +215,8 @@ namespace parallel
       vector_view = c.vector_view;
       if (call_update_ghost_values == true)
         update_ghost_values();
+      else
+        vector_is_ghosted = false;
     }
 
 
@@ -218,10 +226,12 @@ namespace parallel
     Vector<Number>::compress_start (const unsigned int counter,
                                     ::dealii::VectorOperation::values operation)
     {
-#ifdef DEAL_II_WITH_MPI
+      Assert (vector_is_ghosted == false,
+              ExcMessage ("Cannot call compress() on a ghosted vector"));
 
+#ifdef DEAL_II_WITH_MPI
       // nothing to do for insert (only need to zero ghost entries in
-      // compress_finish(). in debug mode we still want to check consistency
+      // compress_finish()). in debug mode we want to check consistency
       // of the inserted data, therefore the communication is still
       // initialized. Having different code in debug and optimized mode is
       // somewhat dangerous, but it really saves communication so it seems
@@ -244,20 +254,17 @@ namespace parallel
       const size_type n_import_targets = part.import_targets().size();
       const size_type n_ghost_targets  = part.ghost_targets().size();
 
-      // Need to send and receive the data. Use
-      // non-blocking communication, where it is
-      // generally less overhead to first initiate
-      // the receive and then actually send the data
+      // Need to send and receive the data. Use non-blocking communication,
+      // where it is generally less overhead to first initiate the receive and
+      // then actually send the data
       if (compress_requests.size() == 0)
         {
-          // set channels in different range from
-          // update_ghost_values channels
+          // set channels in different range from update_ghost_values channels
           const unsigned int channel = counter + 400;
           unsigned int current_index_start = 0;
           compress_requests.resize (n_import_targets + n_ghost_targets);
 
-          // allocate import_data in case it is not set
-          // up yet
+          // allocate import_data in case it is not set up yet
           if (import_data == 0)
             import_data = new Number[part.n_import_indices()];
           for (size_type i=0; i<n_import_targets; i++)
@@ -296,8 +303,7 @@ namespace parallel
                       compress_requests.size());
       if (compress_requests.size() > 0)
         {
-          int ierr;
-          ierr = MPI_Startall(compress_requests.size(),&compress_requests[0]);
+          int ierr = MPI_Startall(compress_requests.size(),&compress_requests[0]);
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
 
@@ -305,7 +311,6 @@ namespace parallel
       (void)counter;
       (void)operation;
 #endif
-
     }
 
 
@@ -328,8 +333,7 @@ namespace parallel
 
       const Utilities::MPI::Partitioner &part = *partitioner;
 
-      // nothing to do when we neither have import
-      // nor ghost indices.
+      // nothing to do when we neither have import nor ghost indices.
       if (part.n_ghost_indices()==0 && part.n_import_indices()==0)
         return;
 
@@ -346,9 +350,8 @@ namespace parallel
       // first wait for the receive to complete
       if (compress_requests.size() > 0 && n_import_targets > 0)
         {
-          int ierr;
-          ierr = MPI_Waitall (n_import_targets, &compress_requests[0],
-                              MPI_STATUSES_IGNORE);
+          int ierr = MPI_Waitall (n_import_targets, &compress_requests[0],
+                                  MPI_STATUSES_IGNORE);
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
 
           Number *read_position = import_data;
@@ -377,10 +380,9 @@ namespace parallel
 
       if (compress_requests.size() > 0 && n_ghost_targets > 0)
         {
-          int ierr;
-          ierr = MPI_Waitall (n_ghost_targets,
-                              &compress_requests[n_import_targets],
-                              MPI_STATUSES_IGNORE);
+          int ierr = MPI_Waitall (n_ghost_targets,
+                                  &compress_requests[n_import_targets],
+                                  MPI_STATUSES_IGNORE);
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
       else
@@ -401,8 +403,7 @@ namespace parallel
 #ifdef DEAL_II_WITH_MPI
       const Utilities::MPI::Partitioner &part = *partitioner;
 
-      // nothing to do when we neither have import
-      // nor ghost indices.
+      // nothing to do when we neither have import nor ghost indices.
       if (part.n_ghost_indices()==0 && part.n_import_indices()==0)
         return;
 
@@ -412,10 +413,9 @@ namespace parallel
       const size_type n_import_targets = part.import_targets().size();
       const size_type n_ghost_targets = part.ghost_targets().size();
 
-      // Need to send and receive the data. Use
-      // non-blocking communication, where it is
-      // generally less overhead to first initiate
-      // the receive and then actually send the data
+      // Need to send and receive the data. Use non-blocking communication,
+      // where it is generally less overhead to first initiate the receive and
+      // then actually send the data
       if (update_ghost_values_requests.size() == 0)
         {
           Assert (part.local_size() == vector_view.size(),
@@ -424,8 +424,8 @@ namespace parallel
           update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
           for (size_type i=0; i<n_ghost_targets; i++)
             {
-              // allow writing into ghost indices even
-              // though we are in a const function
+              // allow writing into ghost indices even though we are in a
+              // const function
               MPI_Recv_init (const_cast<Number *>(&val[current_index_start]),
                              part.ghost_targets()[i].second*sizeof(Number),
                              MPI_BYTE,
@@ -439,8 +439,7 @@ namespace parallel
           AssertDimension (current_index_start,
                            part.local_size()+part.n_ghost_indices());
 
-          // allocate import_data in case it is not set
-          // up yet
+          // allocate import_data in case it is not set up yet
           if (import_data == 0 && part.n_import_indices() > 0)
             import_data = new Number[part.n_import_indices()];
           current_index_start = 0;
@@ -458,8 +457,7 @@ namespace parallel
           AssertDimension (current_index_start, part.n_import_indices());
         }
 
-      // copy the data that is actually to be send
-      // to the import_data field
+      // copy the data that is actually to be send to the import_data field
       if (part.n_import_indices() > 0)
         {
           Assert (import_data != 0, ExcInternalError());
@@ -475,9 +473,8 @@ namespace parallel
                        update_ghost_values_requests.size());
       if (update_ghost_values_requests.size() > 0)
         {
-          int ierr;
-          ierr = MPI_Startall(update_ghost_values_requests.size(),
-                              &update_ghost_values_requests[0]);
+          int ierr = MPI_Startall(update_ghost_values_requests.size(),
+                                  &update_ghost_values_requests[0]);
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
 #else
@@ -492,10 +489,8 @@ namespace parallel
     Vector<Number>::update_ghost_values_finish () const
     {
 #ifdef DEAL_II_WITH_MPI
-      // wait for both sends and receives to
-      // complete, even though only receives are
-      // really necessary. this gives (much) better
-      // performance
+      // wait for both sends and receives to complete, even though only
+      // receives are really necessary. this gives (much) better performance
       AssertDimension (partitioner->ghost_targets().size() +
                        partitioner->import_targets().size(),
                        update_ghost_values_requests.size());
@@ -504,13 +499,13 @@ namespace parallel
           // make this function thread safe
           Threads::Mutex::ScopedLock lock (mutex);
 
-          int ierr;
-          ierr = MPI_Waitall (update_ghost_values_requests.size(),
-                              &update_ghost_values_requests[0],
-                              MPI_STATUSES_IGNORE);
+          int ierr = MPI_Waitall (update_ghost_values_requests.size(),
+                                  &update_ghost_values_requests[0],
+                                  MPI_STATUSES_IGNORE);
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
 #endif
+      vector_is_ghosted = true;
     }
 
 
@@ -520,28 +515,38 @@ namespace parallel
     Vector<Number>::swap (Vector<Number> &v)
     {
 #ifdef DEAL_II_WITH_MPI
-      // introduce a Barrier over all MPI processes
-      // to make sure that the compress request are
-      // no longer used before changing the owner
-      if (v.partitioner->n_mpi_processes() > 1)
-        MPI_Barrier (v.partitioner->get_communicator());
-      if (partitioner->n_mpi_processes() > 1 &&
-          v.partitioner->n_mpi_processes() !=
-          partitioner->n_mpi_processes())
-        MPI_Barrier (partitioner->get_communicator());
+
+#ifdef DEBUG
+      // make sure that there are not outstanding requests from updating ghost
+      // values or compress
+      int flag = 1;
+      int ierr = MPI_Testall (update_ghost_values_requests.size(),
+                              &update_ghost_values_requests[0],
+                              &flag, MPI_STATUSES_IGNORE);
+      Assert (ierr == MPI_SUCCESS, ExcInternalError());
+      Assert (flag == 1,
+              ExcMessage("MPI found unfinished update_ghost_values() requests"
+                         "when calling swap, which is not allowed"));
+      ierr = MPI_Testall (compress_requests.size(), &compress_requests[0],
+                          &flag, MPI_STATUSES_IGNORE);
+      Assert (ierr == MPI_SUCCESS, ExcInternalError());
+      Assert (flag == 1,
+              ExcMessage("MPI found unfinished compress() requests "
+                         "when calling swap, which is not allowed"));
+#endif
 
       std::swap (compress_requests, v.compress_requests);
       std::swap (update_ghost_values_requests, v.update_ghost_values_requests);
 #endif
 
-      std::swap (partitioner,    v.partitioner);
-      std::swap (allocated_size, v.allocated_size);
-      std::swap (val,            v.val);
-      std::swap (import_data,    v.import_data);
+      std::swap (partitioner,       v.partitioner);
+      std::swap (allocated_size,    v.allocated_size);
+      std::swap (val,               v.val);
+      std::swap (import_data,       v.import_data);
+      std::swap (vector_is_ghosted, v.vector_is_ghosted);
 
-      // vector view cannot be swapped so reset it
-      // manually (without touching the vector
-      // elements)
+      // vector view cannot be swapped so reset it manually (without touching
+      // the vector elements)
       vector_view.reinit (partitioner->local_size(), val);
       v.vector_view.reinit (v.partitioner->local_size(), v.val);
     }
@@ -555,10 +560,9 @@ namespace parallel
       std::size_t memory = sizeof(*this);
       memory += sizeof (Number) * static_cast<std::size_t>(allocated_size);
 
-      // if the partitioner is shared between more
-      // processors, just count a fraction of that
-      // memory, since we're not actually using more
-      // memory for it.
+      // if the partitioner is shared between more processors, just count a
+      // fraction of that memory, since we're not actually using more memory
+      // for it.
       if (partitioner.use_count() > 0)
         memory += partitioner->memory_consumption()/partitioner.use_count()+1;
       if (import_data != 0)
@@ -587,10 +591,9 @@ namespace parallel
       else
         out.setf (std::ios::fixed, std::ios::floatfield);
 
-      // to make the vector write out all the
-      // information in order, use as many barriers
-      // as there are processors and start writing
-      // when it's our turn
+      // to make the vector write out all the information in order, use as
+      // many barriers as there are processors and start writing when it's our
+      // turn
 #ifdef DEAL_II_WITH_MPI
       if (partitioner->n_mpi_processes() > 1)
         for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
@@ -609,17 +612,22 @@ namespace parallel
         for (size_type i=0; i<partitioner->local_size(); ++i)
           out << local_element(i) << std::endl;
       out << std::endl;
-      out << "Ghost entries (global index / value):" << std::endl;
-      if (across)
-        for (size_type i=0; i<partitioner->n_ghost_indices(); ++i)
-          out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
-              << '/' << local_element(partitioner->local_size()+i) << ") ";
-      else
-        for (size_type i=0; i<partitioner->n_ghost_indices(); ++i)
-          out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
-              << '/' << local_element(partitioner->local_size()+i) << ")"
-              << std::endl;
-      out << std::endl << std::flush;
+
+      if (vector_is_ghosted)
+        {
+          out << "Ghost entries (global index / value):" << std::endl;
+          if (across)
+            for (size_type i=0; i<partitioner->n_ghost_indices(); ++i)
+              out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
+                  << '/' << local_element(partitioner->local_size()+i) << ") ";
+          else
+            for (size_type i=0; i<partitioner->n_ghost_indices(); ++i)
+              out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
+                  << '/' << local_element(partitioner->local_size()+i) << ")"
+                  << std::endl;
+          out << std::endl;
+        }
+      out << std::flush;
 
 #ifdef DEAL_II_WITH_MPI
       if (partitioner->n_mpi_processes() > 1)

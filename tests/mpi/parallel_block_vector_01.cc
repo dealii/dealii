@@ -47,7 +47,8 @@ void test ()
   local_relevant = local_owned;
   local_relevant.add_range(1,2);
 
-  parallel::distributed::Vector<double> v(local_owned, local_owned, MPI_COMM_WORLD);
+  parallel::distributed::Vector<double> v(local_owned, local_relevant,
+                                          MPI_COMM_WORLD);
 
   // set local values
   if (myid < 8)

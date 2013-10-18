@@ -188,8 +188,6 @@ void test ()
 
   for (unsigned int parallel_option = 0; parallel_option < 3; ++parallel_option)
     {
-      out -= ref;
-      const double diff_norm = out.linfty_norm();
       const QGauss<1> quad (fe_degree+1);
       typename MatrixFree<dim,number>::AdditionalData data;
       data.mpi_communicator = MPI_COMM_WORLD;

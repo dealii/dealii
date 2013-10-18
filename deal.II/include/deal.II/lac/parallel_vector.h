@@ -83,6 +83,22 @@ namespace parallel
      * - Of course, reduction operations (like norms) make use of collective
      *   all-to-all MPI communications.
      *
+     * This vector can take two different states with respect to ghost
+     * elements:
+     * - After creation and whenever zero_out_ghosts() is called (or
+     *   <code>operator = (0.)</code>), the vector does only allow writing
+     *   into ghost elements but not reading from ghost elements.
+     * - After a call to update_ghost_values(), the vector does not allow
+     *   writing into ghost elements but only reading from them. This is in
+     *   order to avoid undesired ghost data artifacts when calling compress()
+     *   after modifying some vector entries.
+     * The current statues of the ghost entries (read mode or write mode) can
+     * be queried by the method has_ghost_elements(), which returns
+     * <code>true</code> exactly when ghost elements have been updated and
+     * <code>false</code> otherwise, irrespective of the actual number of
+     * ghost entries in the vector layout (for that information, use
+     * n_ghost_entries() instead).
+     *
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      */
     template <typename Number>
@@ -307,6 +323,16 @@ namespace parallel
        * ghost data is changed. This is needed to allow functions with a @p
        * const vector to perform the data exchange without creating
        * temporaries.
+       *
+       * After calling this method, write access to ghost elements of the
+       * vector is forbidden and an exception is thrown. Only read access to
+       * ghost elements is allowed in this state. Note that all subsequent
+       * operations on this vector, like global vector addition, etc., will
+       * also update the ghost values by a call to this method after the
+       * operation. However, global reduction operations like norms or the
+       * inner product will always ignore ghost elements in order to avoid
+       * counting the ghost data more than once. To allow writing to ghost
+       * elements again, call zero_out_ghosts().
        */
       void update_ghost_values () const;
 
@@ -332,7 +358,14 @@ namespace parallel
        * the communication to finish. Once it is finished, add or set the data
        * (depending on the flag operation) to the respective positions in the
        * owning processor, and clear the contents in the ghost data
-       * fields. The meaning of this argument is the same as in compress().
+       * fields. The meaning of this argument is the same as in
+       * compress().
+       *
+       * This function should be called exactly once per vector after calling
+       * compress_start, otherwise the result is undefined. In particular, it
+       * is not well-defined to call compress_start on the same vector again
+       * before compress_finished has been called. However, there is no
+       * warning to prevent this situation.
        *
        * Must follow a call to the @p compress_start function.
        */
@@ -372,8 +405,22 @@ namespace parallel
       /**
        * This method zeros the entries on ghost dofs, but does not touch
        * locally owned DoFs.
+       *
+       * After calling this method, read access to ghost elements of the
+       * vector is forbidden and an exception is thrown. Only write access to
+       * ghost elements is allowed in this state.
        */
       void zero_out_ghosts ();
+
+      /**
+       * Returns whether the vector currently is in a state where ghost values
+       * can be read or not. This is the same functionality as other parallel
+       * vectors have. If this method returns false, this only means that
+       * read-access to ghost elements is prohibited whereas write access is
+       * still possible (to those entries specified as ghosts during
+       * initialization), not that there are no ghost elements at all.
+       */
+      bool has_ghost_elements() const;
 
       /**
        * Return whether the vector contains only elements with value
@@ -910,6 +957,15 @@ namespace parallel
       mutable Number *import_data;
 
       /**
+       * Stores whether the vector currently allows for reading ghost elements
+       * or not. Note that this is to ensure consistent ghost data and does
+       * not indicate whether the vector actually can store ghost elements. In
+       * particular, when assembling a vector we do not allow reading
+       * elements, only writing them.
+       */
+      mutable bool vector_is_ghosted;
+
+      /**
        * Provide this class with all functionality of ::dealii::Vector by
        * creating a VectorView object.
        */
@@ -977,6 +1033,7 @@ namespace parallel
       allocated_size (0),
       val (0),
       import_data (0),
+      vector_is_ghosted (false),
       vector_view (0, static_cast<Number *>(0))
     {}
 
@@ -990,6 +1047,7 @@ namespace parallel
       allocated_size (0),
       val (0),
       import_data (0),
+      vector_is_ghosted (false),
       vector_view (0, static_cast<Number *>(0))
     {
       reinit (v, true);
@@ -1007,6 +1065,7 @@ namespace parallel
       allocated_size (0),
       val (0),
       import_data (0),
+      vector_is_ghosted (false),
       vector_view (0, static_cast<Number *>(0))
     {
       reinit (local_range, ghost_indices, communicator);
@@ -1017,11 +1076,12 @@ namespace parallel
     template <typename Number>
     inline
     Vector<Number>::Vector (const IndexSet &local_range,
-                             const MPI_Comm  communicator)
+                            const MPI_Comm  communicator)
       :
       allocated_size (0),
       val (0),
       import_data (0),
+      vector_is_ghosted (false),
       vector_view (0, static_cast<Number *>(0))
     {
       IndexSet ghost_indices(local_range.size());
@@ -1037,6 +1097,7 @@ namespace parallel
       allocated_size (0),
       val (0),
       import_data (0),
+      vector_is_ghosted (false),
       vector_view (0, static_cast<Number *>(0))
     {
       reinit (size, false);
@@ -1052,6 +1113,7 @@ namespace parallel
       allocated_size (0),
       val (0),
       import_data (0),
+      vector_is_ghosted (false),
       vector_view (0, static_cast<Number *>(0))
     {
       reinit (partitioner);
@@ -1083,11 +1145,14 @@ namespace parallel
     {
       Assert (c.partitioner.get() != 0, ExcNotInitialized());
 
-      // check whether the two vectors use the same
-      // parallel partitioner. if not, check if all
-      // local ranges are the same (that way, we can
-      // exchange data between different parallel
-      // layouts)
+      // we update ghost values whenever one of the input or output vector
+      // already held ghost values or when we import data from a vector with
+      // the same local range but different ghost layout
+      bool must_update_ghost_values = true;
+
+      // check whether the two vectors use the same parallel partitioner. if
+      // not, check if all local ranges are the same (that way, we can
+      // exchange data between different parallel layouts)
       if (partitioner.get() == 0)
         reinit (c, true);
       else if (partitioner.get() != c.partitioner.get())
@@ -1101,8 +1166,12 @@ namespace parallel
               local_ranges_different_loc)
             reinit (c, true);
         }
+      else
+        must_update_ghost_values = vector_is_ghosted || c.vector_is_ghosted;
+
       vector_view = c.vector_view;
-      update_ghost_values();
+      if (must_update_ghost_values)
+        update_ghost_values();
       return *this;
     }
 
@@ -1135,8 +1204,12 @@ namespace parallel
             reinit (c, true);
         }
       vector_view.reinit (partitioner->local_size(), val);
-      if (partitioner->local_size() > 0)
+
+      if (partitioner->local_size())
         vector_view.equ (1., c.vector_view);
+
+      if (vector_is_ghosted || c.vector_is_ghosted)
+        update_ghost_values();
       return *this;
     }
 
@@ -1195,6 +1268,17 @@ namespace parallel
       std::fill_n (&val[partitioner->local_size()],
                    partitioner->n_ghost_indices(),
                    Number());
+      vector_is_ghosted = false;
+    }
+
+
+
+    template <typename Number>
+    inline
+    bool
+    Vector<Number>::has_ghost_elements () const
+    {
+      return vector_is_ghosted;
     }
 
 
@@ -1360,7 +1444,7 @@ namespace parallel
     Vector<Number>::mean_value_local () const
     {
       Assert (partitioner->size()!=0, ExcEmptyObject());
-      return (partitioner->local_size()>0 ?
+      return (partitioner->local_size() ?
               vector_view.mean_value()
               : Number());
     }
@@ -1389,7 +1473,7 @@ namespace parallel
     typename Vector<Number>::real_type
     Vector<Number>::l1_norm_local () const
     {
-      return partitioner->local_size()>0 ? vector_view.l1_norm() : real_type();
+      return partitioner->local_size() ? vector_view.l1_norm() : real_type();
     }
 
 
@@ -1424,7 +1508,7 @@ namespace parallel
     typename Vector<Number>::real_type
     Vector<Number>::lp_norm_local (const real_type p) const
     {
-      return partitioner->local_size()>0 ? vector_view.lp_norm(p) : real_type();
+      return partitioner->local_size() ? vector_view.lp_norm(p) : real_type();
     }
 
 
@@ -1450,7 +1534,7 @@ namespace parallel
     typename Vector<Number>::real_type
     Vector<Number>::linfty_norm_local () const
     {
-      return partitioner->local_size()>0 ? vector_view.linfty_norm() : real_type();
+      return partitioner->local_size() ? vector_view.linfty_norm() : real_type();
     }
 
 
@@ -1519,8 +1603,7 @@ namespace parallel
     {
       IndexSet is (size());
 
-      const std::pair<types::global_dof_index,types::global_dof_index> x = local_range();
-      is.add_range (x.first, x.second);
+      is.add_range (local_range().first, local_range().second);
 
       return is;
     }
@@ -1602,6 +1685,10 @@ namespace parallel
     Number
     Vector<Number>::operator() (const size_type global_index) const
     {
+      // do not allow reading a vector which is not in ghost mode
+      Assert (in_local_range (global_index) || vector_is_ghosted == true,
+              ExcMessage("You tried to read a ghost element of this vector, "
+                         "but it has not imported its ghost values."));
       return val[partitioner->global_to_local(global_index)];
     }
 
@@ -1612,6 +1699,12 @@ namespace parallel
     Number &
     Vector<Number>::operator() (const size_type global_index)
     {
+      // we would like to prevent reading ghosts from a vector that does not
+      // have them imported, but this is not possible because we might be in a
+      // part of the code where the vector has enabled ghosts but is non-const
+      // (then, the compiler picks this method according to the C++ rule book
+      // even if a human would pick the const method when this subsequent use
+      // is just a read)
       return val[partitioner->global_to_local (global_index)];
     }
 
@@ -1656,10 +1749,11 @@ namespace parallel
                                                const ForwardIterator    indices_end,
                                                OutputIterator           values_begin) const
     {
-      while (indices_begin != indices_end) {
-        *values_begin = operator()(*indices_begin);
-        indices_begin++; values_begin++;
-      }
+      while (indices_begin != indices_end)
+        {
+          *values_begin = operator()(*indices_begin);
+          indices_begin++; values_begin++;
+        }
     }
 
 
@@ -1672,6 +1766,10 @@ namespace parallel
       AssertIndexRange (local_index,
                         partitioner->local_size()+
                         partitioner->n_ghost_indices());
+      // do not allow reading a vector which is not in ghost mode
+      Assert (local_index < local_size() || vector_is_ghosted == true,
+              ExcMessage("You tried to read a ghost element of this vector, "
+                         "but it has not imported its ghost values."));
       return val[local_index];
     }
 
@@ -1695,8 +1793,8 @@ namespace parallel
     Vector<Number> &
     Vector<Number>::operator = (const Number s)
     {
-      // if we call Vector::operator=0, we want to
-      // zero out all the entries plus ghosts.
+      // if we call Vector::operator=0, we want to zero out all the entries
+      // plus ghosts.
       if (partitioner->local_size() > 0)
         vector_view.dealii::template Vector<Number>::operator= (s);
       if (s==Number())
@@ -1713,11 +1811,15 @@ namespace parallel
     Vector<Number>::operator += (const Vector<Number> &v)
     {
       AssertDimension (local_size(), v.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
+
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
       if (local_size()>0)
         vector_view += v.vector_view;
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+
       return *this;
     }
 
@@ -1729,11 +1831,15 @@ namespace parallel
     Vector<Number>::operator -= (const Vector<Number> &v)
     {
       AssertDimension (local_size(), v.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
+
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
       if (local_size()>0)
         vector_view -= v.vector_view;
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+
       return *this;
     }
 
@@ -1771,7 +1877,7 @@ namespace parallel
     void
     Vector<Number>::add (const size_type    n_indices,
                          const size_type   *indices,
-                         const OtherNumber  *values)
+                         const OtherNumber *values)
     {
       for (size_type i=0; i<n_indices; ++i)
         {
@@ -1788,11 +1894,13 @@ namespace parallel
     void
     Vector<Number>::add (const Number a)
     {
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.add (a);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1802,12 +1910,13 @@ namespace parallel
     void
     Vector<Number>::add (const Vector<Number> &v)
     {
-      AssertDimension (local_size(), v.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.add (v.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1818,12 +1927,13 @@ namespace parallel
     Vector<Number>::add (const Number a,
                          const Vector<Number> &v)
     {
-      AssertDimension (local_size(), v.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.add (a, v.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1836,13 +1946,13 @@ namespace parallel
                          const Number b,
                          const Vector<Number> &w)
     {
-      AssertDimension (local_size(), v.local_size());
-      AssertDimension (local_size(), w.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.add (a, v.vector_view, b, w.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1853,12 +1963,13 @@ namespace parallel
     Vector<Number>::sadd (const Number x,
                           const Vector<Number> &v)
     {
-      AssertDimension (local_size(), v.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.sadd (x, v.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1870,12 +1981,13 @@ namespace parallel
                           const Number a,
                           const Vector<Number> &v)
     {
-      AssertDimension (local_size(), v.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.sadd (x, a, v.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1889,13 +2001,13 @@ namespace parallel
                           const Number b,
                           const Vector<Number> &w)
     {
-      AssertDimension (local_size(), v.local_size());
-      AssertDimension (local_size(), w.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.sadd (x, a, v.vector_view, b, w.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1911,15 +2023,14 @@ namespace parallel
                           const Number c,
                           const Vector<Number> &x)
     {
-      AssertDimension (local_size(), v.local_size());
-      AssertDimension (local_size(), w.local_size());
-      AssertDimension (local_size(), x.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.sadd (s, a, v.vector_view, b, w.vector_view,
                           c, x.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1929,11 +2040,7 @@ namespace parallel
     void
     Vector<Number>::scale (const Number factor)
     {
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
-        vector_view *= factor;
+      operator *=(factor);
     }
 
 
@@ -1943,11 +2050,14 @@ namespace parallel
     Vector<Number> &
     Vector<Number>::operator *= (const Number factor)
     {
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
-        vector_view.operator *= (factor);
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
+        vector_view *= factor;
+
+      if (vector_is_ghosted)
+        update_ghost_values();
+
       return *this;
     }
 
@@ -1958,11 +2068,7 @@ namespace parallel
     Vector<Number> &
     Vector<Number>::operator /= (const Number factor)
     {
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
-        vector_view.operator /= (factor);
+      operator *= (1./factor);
       return *this;
     }
 
@@ -1973,11 +2079,13 @@ namespace parallel
     void
     Vector<Number>::scale (const Vector<Number> &scaling_factors)
     {
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.scale (scaling_factors.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1988,7 +2096,11 @@ namespace parallel
     void
     Vector<Number>::scale (const Vector<Number2> &scaling_factors)
     {
-      vector_view.template scale<Number2> (scaling_factors.vector_view);
+      if (local_size())
+        vector_view.template scale<Number2> (scaling_factors.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -1999,12 +2111,13 @@ namespace parallel
     Vector<Number>::equ (const Number a,
                          const Vector<Number> &v)
     {
-      AssertDimension (local_size(), v.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.equ (a, v.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -2016,12 +2129,13 @@ namespace parallel
     Vector<Number>::equ (const Number a,
                          const Vector<Number2> &v)
     {
-      AssertDimension (local_size(), v.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.equ (a, v.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -2034,13 +2148,13 @@ namespace parallel
                          const Number b,
                          const Vector<Number> &w)
     {
-      AssertDimension (local_size(), v.local_size());
-      AssertDimension (local_size(), w.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.equ (a, v.vector_view, b, w.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -2055,15 +2169,14 @@ namespace parallel
                          const Number c,
                          const Vector<Number> &x)
     {
-      AssertDimension (local_size(), v.local_size());
-      AssertDimension (local_size(), w.local_size());
-      AssertDimension (local_size(), w.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.equ (a, v.vector_view, b, w.vector_view,
                          c, x.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 
@@ -2074,13 +2187,13 @@ namespace parallel
     Vector<Number>::ratio (const Vector<Number> &a,
                            const Vector<Number> &b)
     {
-      AssertDimension (local_size(), a.local_size());
-      AssertDimension (local_size(), b.local_size());
-      // dealii::Vector does not allow empty fields
-      // but this might happen on some processors
-      // for parallel implementation
-      if (local_size()>0)
+      // dealii::Vector does not allow empty fields but this might happen on
+      // some processors for parallel implementation
+      if (local_size())
         vector_view.ratio (a.vector_view, b.vector_view);
+
+      if (vector_is_ghosted)
+        update_ghost_values();
     }
 
 

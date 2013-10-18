@@ -262,6 +262,21 @@ namespace parallel
       void update_ghost_values () const;
 
       /**
+       * This method zeros the entries on ghost dofs, but does not touch
+       * locally owned DoFs.
+       *
+       * After calling this method, read access to ghost elements of the
+       * vector is forbidden and an exception is thrown. Only write access to
+       * ghost elements is allowed in this state.
+       */
+      void zero_out_ghosts ();
+
+      /**
+       * Returns if this Vector contains ghost elements.
+       */
+      bool has_ghost_elements() const;
+
+      /**
        * Return whether the vector contains only elements with value
        * zero. This function is mainly for internal consistency checks and
        * should seldom be used when not in debug mode since it uses quite some
@@ -584,8 +599,12 @@ namespace parallel
     void
     BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
     {
+      // start all requests for all blocks before finishing the transfers as
+      // this saves repeated synchronizations
       for (unsigned int block=0; block<this->n_blocks(); ++block)
-        this->block(block).compress(operation);
+        this->block(block).compress_start(block*10 + 8273, operation);
+      for (unsigned int block=0; block<this->n_blocks(); ++block)
+        this->block(block).compress_finish(operation);
     }
 
 
@@ -596,7 +615,34 @@ namespace parallel
     BlockVector<Number>::update_ghost_values () const
     {
       for (unsigned int block=0; block<this->n_blocks(); ++block)
-        this->block(block).update_ghost_values();
+        this->block(block).update_ghost_values_start(block*10 + 9923);
+      for (unsigned int block=0; block<this->n_blocks(); ++block)
+        this->block(block).update_ghost_values_finish();
+    }
+
+
+
+    template <typename Number>
+    inline
+    void
+    BlockVector<Number>::zero_out_ghosts ()
+    {
+      for (unsigned int block=0; block<this->n_blocks(); ++block)
+        this->block(block).zero_out_ghosts();
+    }
+
+
+
+    template <typename Number>
+    inline
+    bool
+    BlockVector<Number>::has_ghost_elements () const
+    {
+      bool has_ghost_elements = false;
+      for (unsigned int block=0; block<this->n_blocks(); ++block)
+        if (this->block(block).has_ghost_elements() == true)
+          has_ghost_elements = true;
+      return has_ghost_elements;
     }
 
 
