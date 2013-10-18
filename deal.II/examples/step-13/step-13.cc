@@ -775,8 +775,8 @@ namespace Step13
       Assembler::Scratch scratch;
       Assembler::CopyData copy_data;
       WorkStream::run(dof_handler.begin_active(),dof_handler.end(),
-          std::bind(&Solver<dim>::assemble_matrix,this,std_cxx1x::_1,std_cxx1x::_2,std_cxx1x::_3),
-          std::bind(&Solver<dim>::copy_local_to_global,this,std_cxx1x::_1,std_cxx1x::ref(linear_system)),
+          std_cxx1x::bind(&Solver<dim>::assemble_matrix,this,std_cxx1x::_1,std_cxx1x::_2,std_cxx1x::_3),
+          std_cxx1x::bind(&Solver<dim>::copy_local_to_global,this,std_cxx1x::_1,std_cxx1x::ref(linear_system)),
           scratch,copy_data);
 
       // While the new threads assemble the system matrix, we can already
