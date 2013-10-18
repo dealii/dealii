@@ -45,6 +45,8 @@ SET(CTEST_EXTRA_COVERAGE_GLOB
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "/bundled"
-  "/contrib"
   "/cmake/scripts/"
+  "/contrib"
+  "/examples"
+  "/tests"
   )
