@@ -133,7 +133,6 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-felide-constructors")
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused")
 ENDIF()
@@ -172,6 +171,7 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     #
     # Enable test coverage
     #
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fno-elide-constructors")
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
     ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
   ENDIF()
