@@ -50,7 +50,9 @@ def parse_revision(dirname):
         group = name.split('/')[0]
         status = 4
         if fail:
-            failtext = test.find('Results').find('Measurement').find('Value').text.encode('utf-8')
+            text = test.find('Results').find('Measurement').find('Value').text
+            if text == None: text=""
+            failtext = text.encode('utf-8')
             failtextlines = failtext.replace('"','').split('\n')
             failstatustxt = failtextlines[0].split(' ')[-1]
             for i in range(0,len(failtextlines)):
@@ -61,7 +63,7 @@ def parse_revision(dirname):
             if failstatustxt in statuslist:
                 status = statuslist.index(failstatustxt)
             else:
-                print "unknown status '%s'"%failstatustxt
+                print "unknown status '%s' in test %s "% (failstatustxt,name)
                 status=0           
 
         if not group in rev.groups:
