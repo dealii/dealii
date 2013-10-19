@@ -1643,16 +1643,21 @@ reinit(const Mapping<dim>                         &mapping,
 
 // internal helper functions that define how to call MPI data exchange
 // functions: for generic vectors, do nothing at all. For distributed vectors,
-// can call update_ghost_values_start function and so on. If we have
-// collections of vectors, just do the individual functions of the
-// components. this is a bit messy for block vectors, which use some
-// additional helper functions to select the blocks
+// call update_ghost_values_start function and so on. If we have collections
+// of vectors, just do the individual functions of the components. In order to
+// keep ghost values consistent (whether we are in read or write mode). the whole situation is a bit complicated by the fact
+// that we need to treat block vectors differently, which use some additional
+// helper functions to select the blocks and template magic.
 namespace internal
 {
   template<typename VectorStruct>
-  void update_ghost_values_start_block (const VectorStruct &vec,
+  bool update_ghost_values_start_block (const VectorStruct &vec,
                                         const unsigned int channel,
                                         internal::bool2type<true>);
+  template<typename VectorStruct>
+  void reset_ghost_values_block (const VectorStruct &vec,
+                                 const bool          zero_out_ghosts,
+                                 internal::bool2type<true>);
   template<typename VectorStruct>
   void update_ghost_values_finish_block (const VectorStruct &vec,
                                          internal::bool2type<true>);
@@ -1665,9 +1670,16 @@ namespace internal
                               internal::bool2type<true>);
 
   template<typename VectorStruct>
-  void update_ghost_values_start_block (const VectorStruct &,
+  bool update_ghost_values_start_block (const VectorStruct &,
                                         const unsigned int,
                                         internal::bool2type<false>)
+  {
+    return false;
+  }
+  template<typename VectorStruct>
+  void reset_ghost_values_block (const VectorStruct &,
+                                 const bool,
+                                 internal::bool2type<false>)
   {}
   template<typename VectorStruct>
   void update_ghost_values_finish_block (const VectorStruct &,
@@ -1685,55 +1697,125 @@ namespace internal
 
 
 
+  // returns true if the vector was in a state without ghost values before,
+  // i.e., we need to zero out ghosts in the very end
   template<typename VectorStruct>
   inline
-  void update_ghost_values_start (const VectorStruct &vec,
+  bool update_ghost_values_start (const VectorStruct &vec,
                                   const unsigned int channel = 0)
   {
-    update_ghost_values_start_block(vec, channel,
-                                    internal::bool2type<IsBlockVector<VectorStruct>::value>());
+    return
+      update_ghost_values_start_block(vec, channel,
+                                      internal::bool2type<IsBlockVector<VectorStruct>::value>());
   }
 
 
 
   template<typename Number>
   inline
-  void update_ghost_values_start (const parallel::distributed::Vector<Number> &vec,
+  bool update_ghost_values_start (const parallel::distributed::Vector<Number> &vec,
                                   const unsigned int                  channel = 0)
   {
+    bool return_value = !vec.has_ghost_elements();
     vec.update_ghost_values_start(channel);
+    return return_value;
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_start (const std::vector<VectorStruct> &vec)
+  bool update_ghost_values_start (const std::vector<VectorStruct> &vec)
   {
+    bool return_value = false;
     for (unsigned int comp=0; comp<vec.size(); comp++)
-      update_ghost_values_start(vec[comp], comp);
+      return_value = update_ghost_values_start(vec[comp], comp);
+    return return_value;
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_start (const std::vector<VectorStruct *> &vec)
+  bool update_ghost_values_start (const std::vector<VectorStruct *> &vec)
   {
+    bool return_value = false;
     for (unsigned int comp=0; comp<vec.size(); comp++)
-      update_ghost_values_start(*vec[comp], comp);
+      return_value = update_ghost_values_start(*vec[comp], comp);
+    return return_value;
   }
 
 
 
   template<typename VectorStruct>
   inline
-  void update_ghost_values_start_block (const VectorStruct &vec,
+  bool update_ghost_values_start_block (const VectorStruct &vec,
                                         const unsigned int channel,
                                         internal::bool2type<true>)
   {
+    bool return_value = false;
     for (unsigned int i=0; i<vec.n_blocks(); ++i)
-      update_ghost_values_start(vec.block(i), channel+500*i);
+      return_value = update_ghost_values_start(vec.block(i), channel+509*i);
+    return return_value;
+  }
+
+
+
+  // if the input vector did not have ghosts imported, clear them here again
+  // in order to avoid subsequent operations e.g. in linear solvers to work
+  // with ghosts all the time
+  template<typename VectorStruct>
+  inline
+  void reset_ghost_values (const VectorStruct &vec,
+                           const bool          zero_out_ghosts)
+  {
+    reset_ghost_values_block(vec, zero_out_ghosts,
+                             internal::bool2type<IsBlockVector<VectorStruct>::value>());
+  }
+
+
+
+  template<typename Number>
+  inline
+  void reset_ghost_values (const parallel::distributed::Vector<Number> &vec,
+                           const bool zero_out_ghosts)
+  {
+    if (zero_out_ghosts)
+      const_cast<parallel::distributed::Vector<Number>&>(vec).zero_out_ghosts();
+  }
+
+
+
+  template <typename VectorStruct>
+  inline
+  void reset_ghost_values (const std::vector<VectorStruct> &vec,
+                           const bool zero_out_ghosts)
+  {
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      reset_ghost_values(vec[comp], zero_out_ghosts);
+  }
+
+
+
+  template <typename VectorStruct>
+  inline
+  void reset_ghost_values (const std::vector<VectorStruct *> &vec,
+                           const bool zero_out_ghosts)
+  {
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      reset_ghost_values(*vec[comp], zero_out_ghosts);
+  }
+
+
+
+  template<typename VectorStruct>
+  inline
+  void reset_ghost_values_block (const VectorStruct &vec,
+                                 const bool          zero_out_ghosts,
+                                 internal::bool2type<true>)
+  {
+    for (unsigned int i=0; i<vec.n_blocks(); ++i)
+      reset_ghost_values(vec.block(i), zero_out_ghosts);
   }
 
 
@@ -2161,6 +2243,9 @@ MatrixFree<dim, Number>::cell_loop
  OutVector       &dst,
  const InVector  &src) const
 {
+  // in any case, need to start the ghost import at the beginning
+  bool ghosts_were_not_set = internal::update_ghost_values_start (src);
+
 #ifdef DEAL_II_WITH_THREADS
 
   // Use multithreading if so requested and if there is enough work to do in
@@ -2181,7 +2266,6 @@ MatrixFree<dim, Number>::cell_loop
 
       if (task_info.use_partition_partition == true)
         {
-          internal::update_ghost_values_start(src);
           tbb::empty_task *root = new( tbb::task::allocate_root() )
           tbb::empty_task;
           unsigned int evens = task_info.evens;
@@ -2252,11 +2336,9 @@ MatrixFree<dim, Number>::cell_loop
 
           root->wait_for_all();
           root->destroy(*root);
-          internal::compress_finish(dst);
         }
       else // end of partition-partition, start of partition-color
         {
-          internal::update_ghost_values_start(src);
           unsigned int evens = task_info.evens;
           unsigned int odds  = task_info.odds;
 
@@ -2387,7 +2469,6 @@ MatrixFree<dim, Number>::cell_loop
 
               internal::compress_start(dst);
             }
-          internal::compress_finish(dst);
         }
     }
   else
@@ -2395,8 +2476,6 @@ MatrixFree<dim, Number>::cell_loop
     // serial loop
     {
       std::pair<unsigned int,unsigned int> cell_range;
-
-      internal::update_ghost_values_start (src);
 
       // First operate on cells where no ghost data is needed (inner cells)
       {
@@ -2426,9 +2505,11 @@ MatrixFree<dim, Number>::cell_loop
           cell_range.second = size_info.n_macro_cells;
           cell_operation (*this, dst, src, cell_range);
         }
-
-      internal::compress_finish(dst);
     }
+
+  // In every case, we need to finish transfers at the very end
+  internal::compress_finish(dst);
+  internal::reset_ghost_values(src, ghosts_were_not_set);
 }
 
 

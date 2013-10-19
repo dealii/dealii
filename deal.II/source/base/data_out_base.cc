@@ -379,7 +379,7 @@ void DataOutBase::DataOutFilter::write_data_set(const std::string &name, const u
         {
           r = filtered_points[i];
           if (d < dimension) data_sets.back()[r*new_dim+d] = data_vectors(set_num+d, i);
-          else data_sets.back()[r] = 0;
+          else data_sets.back()[r*new_dim+d] = 0;
         }
     }
 }

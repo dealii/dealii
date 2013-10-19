@@ -25,6 +25,23 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Changed: The ghost handling of the parallel::distributed::Vector class has
+  been reworked: The vector now carries a global state that stores whether
+  ghost elements have been updated or not. If a vector has ghost elements, it
+  does not allow calls to compress() any more. Instead, a compress operation
+  can now only be done when the ghost entries have been cleared before by
+  calling zero_out_ghosts() or operator=0. The state can be queried by the new
+  method has_ghost_elements(). This change avoids spurious entries to be
+  inserted with compress(), but requires some change in user codes. The
+  behavior of a ghosted vector is now very similar to ghosted PETSc and
+  Trilinos vectors. The only difference is that the <i>same</i> vector can
+  also be used as a non-ghosted vector which is designed for use in assembly
+  routines.
+  <br>
+  (Martin Kronbichler, 2013/10/18)
+  </li>
+
+  <li>
   Removed: GridTools::collect_periodic_face_pairs. This function is superseded
   by GridTools::collect_periodic_faces which exports an
   std::vector<PeriodicFacepair<...>> instead.
@@ -145,6 +162,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>
+  New: parallel::distributed::BlockVector has now methods update_ghost_values, 
+  compress, set_out_ghosts, and has_ghost_elements that do the respective
+  operation on each block of parallel::distributed::Vector.
+  <br>
+  (Martin Kronbichler, 2013/10/18)
+  </li>
+
   <li>
   Fixed: When deriving from DataOut to filter the cells where output is generated, there were two different bugs that result in segmentation faults or wrong cells written (example, step-18).
   <br>

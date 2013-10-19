@@ -1660,7 +1660,7 @@ namespace internal
                       VectorType         &vec,
                       Number             &res) const
     {
-      res = vector_access (vec, index);
+      res = vector_access (const_cast<const VectorType&>(vec), index);
     }
 
     void pre_constraints (const Number &,
@@ -1675,7 +1675,7 @@ namespace internal
                              VectorType        &vec,
                              Number            &res) const
     {
-      res += weight * vector_access (vec, index);
+      res += weight * vector_access (const_cast<const VectorType&>(vec), index);
     }
 
     void post_constraints (const Number &sum,
