@@ -60,11 +60,11 @@ int main ()
 
   try
     {
-      gmsh_grid<2> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.2d.msh");
-      gmsh_grid<2> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.2da.msh");
-      gmsh_grid<3> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.3d.msh");
-      gmsh_grid<3> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.3da.msh");
-      gmsh_grid<3> (SOURCE_DIR "/grid_in_msh_01/grid_in_msh_01.3d_neg.msh");
+      gmsh_grid<2> (SOURCE_DIR "/grids/grid_in_msh_01.2d.msh");
+      gmsh_grid<2> (SOURCE_DIR "/grids/grid_in_msh_01.2da.msh");
+      gmsh_grid<3> (SOURCE_DIR "/grids/grid_in_msh_01.3d.msh");
+      gmsh_grid<3> (SOURCE_DIR "/grids/grid_in_msh_01.3da.msh");
+      gmsh_grid<3> (SOURCE_DIR "/grids/grid_in_msh_01.3d_neg.msh");
     }
   catch (std::exception &exc)
     {

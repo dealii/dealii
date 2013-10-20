@@ -41,8 +41,8 @@ void check ()
   Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
 
   GridIn<dim> gi;
-  std::ifstream in (dim == 2 ? SOURCE_DIR "/distorted_cells_02/2d" : 
-      SOURCE_DIR "/distorted_cells_02/3d");
+  std::ifstream in (dim == 2 ? SOURCE_DIR "/grids/2d" :
+      SOURCE_DIR "/grids/3d");
 
   gi.attach_triangulation (coarse_grid);
 
