@@ -45,11 +45,11 @@ check_solve( SOLVER &solver, const MATRIX &A,
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception &e)
+  catch (dealii::SolverControl::NoConvergence &e)
     {
-      deallog << e.what() << std::endl;
-      // just like for Richardson: we end up
-      // here normally for this solver
+      // just like for Richardson: expect to
+      // get here, don't abort the program
+      deallog << "Catched exception dealii::SolverControl::NoConvergence" << std::endl;
     }
 
   deallog << "Solver stopped after " << solver.control().last_step()
