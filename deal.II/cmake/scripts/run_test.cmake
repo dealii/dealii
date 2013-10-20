@@ -54,10 +54,10 @@ STRING(REGEX MATCH "${TEST}: PASSED\\." _passed_regex ${_output})
 
 IF(NOT "${_passed_regex}" STREQUAL "")
   SET(_stage PASSED)
-ELSEIF(NOT "${_run_regex}" STREQUAL "")
-  SET(_stage RUN)
 ELSEIF(NOT "${_diff_regex}" STREQUAL "")
   SET(_stage DIFF)
+ELSEIF(NOT "${_run_regex}" STREQUAL "")
+  SET(_stage RUN)
 ELSEIF(NOT "${_configure_regex}" STREQUAL "")
   SET(_stage CONFIGURE)
 ELSE() # unconditionally, because "BUILD failed." doesn't have to be printed...
