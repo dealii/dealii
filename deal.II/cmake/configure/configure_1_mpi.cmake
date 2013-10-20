@@ -54,23 +54,21 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   ENDIF()
   FIND_PACKAGE(MPI)
 
-  IF(NOT MPI_CXX_FOUND)
+  IF(NOT MPI_CXX_FOUND AND DEAL_II_WITH_MPI)
     #
     # CMAKE_CXX_COMPILER is apparently not an mpi wrapper.
-    # So, let's be a bit more aggressive in finding MPI if DEAL_II_WITH_MPI
-    # is set.
+    # So, let's be a bit more aggressive in finding MPI (and if
+    # DEAL_II_WITH_MPI is set).
     #
-    IF(DEAL_II_WITH_MPI)
-      MESSAGE(STATUS
-        "MPI not found but DEAL_II_WITH_MPI is set to TRUE."
-        " Try again with more aggressive search paths:"
-        )
-      SET(MPI_FOUND) # clear this value so that FIND_PACKAGE runs again.
-      UNSET(MPI_CXX_COMPILER CACHE)
-      UNSET(MPI_C_COMPILER CACHE)
-      UNSET(MPI_Fortran_COMPILER CACHE)
-      FIND_PACKAGE(MPI)
-    ENDIF()
+    MESSAGE(STATUS
+      "MPI not found but DEAL_II_WITH_MPI is set to TRUE."
+      " Try again with more aggressive search paths:"
+      )
+    SET(MPI_FOUND) # clear this value so that FIND_PACKAGE runs again.
+    UNSET(MPI_CXX_COMPILER CACHE)
+    UNSET(MPI_C_COMPILER CACHE)
+    UNSET(MPI_Fortran_COMPILER CACHE)
+    FIND_PACKAGE(MPI)
   ENDIF()
 
   #
@@ -82,62 +80,65 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
     ENDIF()
   ENDFOREACH()
 
-  #
-  # Manually assemble some version information:
-  #
-  IF(EXISTS ${MPI_INCLUDE_PATH}/mpi.h AND NOT DEFINED MPI_VERSION)
-    FILE(STRINGS "${MPI_INCLUDE_PATH}/mpi.h" MPI_VERSION_MAJOR_STRING
-      REGEX "#define.*MPI_VERSION")
-    STRING(REGEX REPLACE "^.*MPI_VERSION.*([0-9]+).*" "\\1"
-      MPI_VERSION_MAJOR "${MPI_VERSION_MAJOR_STRING}"
-      )
-    FILE(STRINGS "${MPI_INCLUDE_PATH}/mpi.h" MPI_VERSION_MINOR_STRING
-      REGEX "#define.*MPI_SUBVERSION")
-    STRING(REGEX REPLACE "^.*MPI_SUBVERSION.*([0-9]+).*" "\\1"
-      MPI_VERSION_MINOR "${MPI_VERSION_MINOR_STRING}"
-      )
-    SET(MPI_VERSION "${MPI_VERSION_MAJOR}.${MPI_VERSION_MINOR}")
-    IF("${MPI_VERSION}" STREQUAL ".")
-      SET(MPI_VERSION)
-      SET(MPI_VERSION_MAJOR)
-      SET(MPI_VERSION_MINOR)
-    ENDIF()
-
-    # OMPI specific version number:
-    FILE(STRINGS "${MPI_INCLUDE_PATH}/mpi.h" OMPI_VERSION_MAJOR_STRING
-      REGEX "#define.*OMPI_MAJOR_VERSION")
-    STRING(REGEX REPLACE "^.*OMPI_MAJOR_VERSION.*([0-9]+).*" "\\1"
-      OMPI_VERSION_MAJOR "${OMPI_VERSION_MAJOR_STRING}"
-      )
-    FILE(STRINGS "${MPI_INCLUDE_PATH}/mpi.h" OMPI_VERSION_MINOR_STRING
-      REGEX "#define.*OMPI_MINOR_VERSION")
-    STRING(REGEX REPLACE "^.*OMPI_MINOR_VERSION.*([0-9]+).*" "\\1"
-      OMPI_VERSION_MINOR "${OMPI_VERSION_MINOR_STRING}"
-      )
-    FILE(STRINGS "${MPI_INCLUDE_PATH}/mpi.h" OMPI_VERSION_RELEASE_STRING
-      REGEX "#define.*OMPI_RELEASE_VERSION")
-    STRING(REGEX REPLACE "^.*OMPI_RELEASE_VERSION.*([0-9]+).*" "\\1"
-      OMPI_VERSION_SUBMINOR "${OMPI_VERSION_RELEASE_STRING}"
-      )
-    SET(OMPI_VERSION
-      "${OMPI_VERSION_MAJOR}.${OMPI_VERSION_MINOR}.${OMPI_VERSION_SUBMINOR}"
-      )
-    IF("${OMPI_VERSION}" STREQUAL "..")
-      SET(OMPI_VERSION)
-      SET(OMPI_VERSION_MAJOR)
-      SET(OMPI_VERSION_MINOR)
-      SET(OMPI_VERSION_SUBMINOR)
-    ENDIF()
-
-  ENDIF()
-
-
-  # Hide some variables:
-  MARK_AS_ADVANCED(MPI_EXTRA_LIBRARY MPI_LIBRARY)
-
   IF(MPI_CXX_FOUND)
+    #
+    # Manually assemble some version information:
+    #
+    FIND_FILE(MPI_MPI_H NAMES mpi.h
+      HINTS ${MPI_INCLUDE_PATH}
+      )
+
+    IF(NOT MPI_MPI_H MATCHES "-NOTFOUND" AND NOT DEFINED MPI_VERSION)
+      FILE(STRINGS "${MPI_MPI_H}" MPI_VERSION_MAJOR_STRING
+        REGEX "#define.*MPI_VERSION")
+      STRING(REGEX REPLACE "^.*MPI_VERSION.*([0-9]+).*" "\\1"
+        MPI_VERSION_MAJOR "${MPI_VERSION_MAJOR_STRING}"
+        )
+      FILE(STRINGS ${MPI_MPI_H} MPI_VERSION_MINOR_STRING
+        REGEX "#define.*MPI_SUBVERSION")
+      STRING(REGEX REPLACE "^.*MPI_SUBVERSION.*([0-9]+).*" "\\1"
+        MPI_VERSION_MINOR "${MPI_VERSION_MINOR_STRING}"
+        )
+      SET(MPI_VERSION "${MPI_VERSION_MAJOR}.${MPI_VERSION_MINOR}")
+      IF("${MPI_VERSION}" STREQUAL ".")
+        SET(MPI_VERSION)
+        SET(MPI_VERSION_MAJOR)
+        SET(MPI_VERSION_MINOR)
+      ENDIF()
+
+      # OMPI specific version number:
+      FILE(STRINGS ${MPI_MPI_H} OMPI_VERSION_MAJOR_STRING
+        REGEX "#define.*OMPI_MAJOR_VERSION")
+      STRING(REGEX REPLACE "^.*OMPI_MAJOR_VERSION.*([0-9]+).*" "\\1"
+        OMPI_VERSION_MAJOR "${OMPI_VERSION_MAJOR_STRING}"
+        )
+      FILE(STRINGS ${MPI_MPI_H} OMPI_VERSION_MINOR_STRING
+        REGEX "#define.*OMPI_MINOR_VERSION")
+      STRING(REGEX REPLACE "^.*OMPI_MINOR_VERSION.*([0-9]+).*" "\\1"
+        OMPI_VERSION_MINOR "${OMPI_VERSION_MINOR_STRING}"
+        )
+      FILE(STRINGS ${MPI_MPI_H} OMPI_VERSION_RELEASE_STRING
+        REGEX "#define.*OMPI_RELEASE_VERSION")
+      STRING(REGEX REPLACE "^.*OMPI_RELEASE_VERSION.*([0-9]+).*" "\\1"
+        OMPI_VERSION_SUBMINOR "${OMPI_VERSION_RELEASE_STRING}"
+        )
+      SET(OMPI_VERSION
+        "${OMPI_VERSION_MAJOR}.${OMPI_VERSION_MINOR}.${OMPI_VERSION_SUBMINOR}"
+        )
+      IF("${OMPI_VERSION}" STREQUAL "..")
+        SET(OMPI_VERSION)
+        SET(OMPI_VERSION_MAJOR)
+        SET(OMPI_VERSION_MINOR)
+        SET(OMPI_VERSION_SUBMINOR)
+      ENDIF()
+    ENDIF()
+
     SET(${var} TRUE)
   ENDIF()
+
+  # Hide some variables:
+  MARK_AS_ADVANCED(MPI_EXTRA_LIBRARY MPI_LIBRARY MPI_MPI_H)
+
 ENDMACRO()
 
 
