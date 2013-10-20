@@ -80,8 +80,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
     SET(_add_output)
     IF(EXISTS ${TEST_OVERRIDE_LOCATION}/${_category}/${_test})
       SET(_add_output
-        "Note: Default comparison file ${_comparison} overriden by"
-        "${TEST_OVERRIDE_LOCATION}/${_category}/${_test}"
+        "!!NOTE!! Comparison file overriden by ${TEST_OVERRIDE_LOCATION}/${_category}/${_test}"
         )
       SET(_comparison "${TEST_OVERRIDE_LOCATION}/${_category}/${_test}")
     ENDIF()
