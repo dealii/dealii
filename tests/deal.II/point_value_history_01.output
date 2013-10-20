@@ -1,0 +1,253 @@
+
+***PointValueHistory status output***
+
+Closed: 1
+Cleared: 0
+Triangulation_changed: 0
+Have_dof_handler: 1
+Geometric Data
+# Requested location: 1.0 0.20
+# DoF_index : Support location (for each component)
+138 : 1.0 0.25
+139 : 1.0 0.25
+181 : 1.0 0.25
+
+
+Independent value(s): 1 : 1
+Mnemonic: data set size (mask size, n true components) : n data sets
+Solution: 3 (3, 3) : 1
+
+***end of status output***
+
+***PointValueHistory status output***
+
+Closed: 1
+Cleared: 0
+Triangulation_changed: 0
+Have_dof_handler: 1
+Geometric Data
+# Requested location: 0.0 0.0
+# DoF_index : Support location (for each component)
+0 : 0.0 0.0
+1 : 0.0 0.0
+162 : 0.0 0.0
+
+# Requested location: 0.25 0.0
+# DoF_index : Support location (for each component)
+8 : 0.25 0.0
+9 : 0.25 0.0
+163 : 0.25 0.0
+
+# Requested location: 0.25 0.45
+# DoF_index : Support location (for each component)
+46 : 0.25 0.50
+47 : 0.25 0.50
+169 : 0.25 0.50
+
+# Requested location: 0.45 0.45
+# DoF_index : Support location (for each component)
+48 : 0.50 0.50
+49 : 0.50 0.50
+170 : 0.50 0.50
+
+# Requested location: 0.80 0.80
+# DoF_index : Support location (for each component)
+96 : 0.75 0.75
+97 : 0.75 0.75
+177 : 0.75 0.75
+
+# Requested location: 1.0 0.20
+# DoF_index : Support location (for each component)
+138 : 1.0 0.25
+139 : 1.0 0.25
+181 : 1.0 0.25
+
+
+Independent value(s): 1 : 10
+Mnemonic: data set size (mask size, n true components) : n data sets
+Post Processed Vector: 18 (3, 3) : 10
+Solution: 18 (3, 3) : 10
+
+***end of status output***
+
+***PointValueHistory status output***
+
+Closed: 1
+Cleared: 0
+Triangulation_changed: 0
+Have_dof_handler: 0
+Geometric Data
+No points stored currently
+
+Independent value(s): 1 : 10
+
+***end of status output***
+
+DEAL::Starting data files
+DEAL::Copying output file node_00.gpl
+DEAL::# Requested location: 0 0
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 0 : 0 0
+DEAL::# 1 : 0 0
+DEAL::# 162 : 0 0
+DEAL::#
+DEAL::# <Key> <Indep_0> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Solution_0> <Solution_1> <Solution_2> 
+DEAL::0 1 3 3 3 1 1 1
+DEAL::1e-06 1 3 3 2.9 1 1 0.9
+DEAL::2e-06 1 3 3 2.81 1 1 0.81
+DEAL::3e-06 1 3 3 2.729 1 1 0.729
+DEAL::4e-06 1 3 3 2.6561 1 1 0.6561
+DEAL::5e-06 1 3 3 2.59049 1 1 0.59049
+DEAL::6e-06 1 3 3 2.53144 1 1 0.531441
+DEAL::7e-06 1 3 3 2.4783 1 1 0.478297
+DEAL::8e-06 1 3 3 2.43047 1 1 0.430467
+DEAL::9e-06 1 3 3 2.38742 1 1 0.38742
+DEAL::
+DEAL::
+DEAL::Copying output file node_01.gpl
+DEAL::# Requested location: 0.25 0
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 8 : 0.25 0
+DEAL::# 9 : 0.25 0
+DEAL::# 163 : 0.25 0
+DEAL::#
+DEAL::# <Key> <Indep_0> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Solution_0> <Solution_1> <Solution_2> 
+DEAL::0 1 3 3 3 1 1 1
+DEAL::1e-06 1 2.94444 3 2.9 0.944444 1 0.9
+DEAL::2e-06 1 2.89198 3 2.81 0.891975 1 0.81
+DEAL::3e-06 1 2.84242 3 2.729 0.842421 1 0.729
+DEAL::4e-06 1 2.79562 3 2.6561 0.79562 1 0.6561
+DEAL::5e-06 1 2.75142 3 2.59049 0.751419 1 0.59049
+DEAL::6e-06 1 2.70967 3 2.53144 0.709673 1 0.531441
+DEAL::7e-06 1 2.67025 3 2.4783 0.670247 1 0.478297
+DEAL::8e-06 1 2.63301 3 2.43047 0.633011 1 0.430467
+DEAL::9e-06 1 2.59784 3 2.38742 0.597844 1 0.38742
+DEAL::
+DEAL::
+DEAL::Copying output file node_02.gpl
+DEAL::# Requested location: 0.25 0.45
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 46 : 0.25 0.5
+DEAL::# 47 : 0.25 0.5
+DEAL::# 169 : 0.25 0.5
+DEAL::#
+DEAL::# <Key> <Indep_0> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Solution_0> <Solution_1> <Solution_2> 
+DEAL::0 1 3 3 3 1 1 1
+DEAL::1e-06 1 2.88889 2.77778 2.9 0.888889 0.777778 0.9
+DEAL::2e-06 1 2.79012 2.60494 2.81 0.790123 0.604938 0.81
+DEAL::3e-06 1 2.70233 2.47051 2.729 0.702332 0.470508 0.729
+DEAL::4e-06 1 2.6243 2.36595 2.6561 0.624295 0.36595 0.6561
+DEAL::5e-06 1 2.55493 2.28463 2.59049 0.554929 0.284628 0.59049
+DEAL::6e-06 1 2.49327 2.22138 2.53144 0.49327 0.221377 0.531441
+DEAL::7e-06 1 2.43846 2.17218 2.4783 0.438462 0.172182 0.478297
+DEAL::8e-06 1 2.38974 2.13392 2.43047 0.389744 0.13392 0.430467
+DEAL::9e-06 1 2.34644 2.10416 2.38742 0.346439 0.10416 0.38742
+DEAL::
+DEAL::
+DEAL::Copying output file node_03.gpl
+DEAL::# Requested location: 0.45 0.45
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 48 : 0.5 0.5
+DEAL::# 49 : 0.5 0.5
+DEAL::# 170 : 0.5 0.5
+DEAL::#
+DEAL::# <Key> <Indep_0> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Solution_0> <Solution_1> <Solution_2> 
+DEAL::0 1 3 3 3 1 1 1
+DEAL::1e-06 1 2.77778 2.77778 2.9 0.777778 0.777778 0.9
+DEAL::2e-06 1 2.60494 2.60494 2.81 0.604938 0.604938 0.81
+DEAL::3e-06 1 2.47051 2.47051 2.729 0.470508 0.470508 0.729
+DEAL::4e-06 1 2.36595 2.36595 2.6561 0.36595 0.36595 0.6561
+DEAL::5e-06 1 2.28463 2.28463 2.59049 0.284628 0.284628 0.59049
+DEAL::6e-06 1 2.22138 2.22138 2.53144 0.221377 0.221377 0.531441
+DEAL::7e-06 1 2.17218 2.17218 2.4783 0.172182 0.172182 0.478297
+DEAL::8e-06 1 2.13392 2.13392 2.43047 0.13392 0.13392 0.430467
+DEAL::9e-06 1 2.10416 2.10416 2.38742 0.10416 0.10416 0.38742
+DEAL::
+DEAL::
+DEAL::Copying output file node_04.gpl
+DEAL::# Requested location: 0.8 0.8
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 96 : 0.75 0.75
+DEAL::# 97 : 0.75 0.75
+DEAL::# 177 : 0.75 0.75
+DEAL::#
+DEAL::# <Key> <Indep_0> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Solution_0> <Solution_1> <Solution_2> 
+DEAL::0 1 3 3 3 1 1 1
+DEAL::1e-06 1 2.66667 2.66667 2.9 0.666667 0.666667 0.9
+DEAL::2e-06 1 2.44444 2.44444 2.81 0.444444 0.444444 0.81
+DEAL::3e-06 1 2.2963 2.2963 2.729 0.296296 0.296296 0.729
+DEAL::4e-06 1 2.19753 2.19753 2.6561 0.197531 0.197531 0.6561
+DEAL::5e-06 1 2.13169 2.13169 2.59049 0.131687 0.131687 0.59049
+DEAL::6e-06 1 2.08779 2.08779 2.53144 0.0877915 0.0877915 0.531441
+DEAL::7e-06 1 2.05853 2.05853 2.4783 0.0585277 0.0585277 0.478297
+DEAL::8e-06 1 2.03902 2.03902 2.43047 0.0390184 0.0390184 0.430467
+DEAL::9e-06 1 2.02601 2.02601 2.38742 0.0260123 0.0260123 0.38742
+DEAL::
+DEAL::
+DEAL::Copying output file node_05.gpl
+DEAL::# Requested location: 1 0.2
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 138 : 1 0.25
+DEAL::# 139 : 1 0.25
+DEAL::# 181 : 1 0.25
+DEAL::#
+DEAL::# <Key> <Indep_0> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Solution_0> <Solution_1> <Solution_2> 
+DEAL::0 1 3 3 3 1 1 1
+DEAL::1e-06 1 2.77778 2.94444 2.9 0.777778 0.944444 0.9
+DEAL::2e-06 1 2.60494 2.89198 2.81 0.604938 0.891975 0.81
+DEAL::3e-06 1 2.47051 2.84242 2.729 0.470508 0.842421 0.729
+DEAL::4e-06 1 2.36595 2.79562 2.6561 0.36595 0.79562 0.6561
+DEAL::5e-06 1 2.28463 2.75142 2.59049 0.284628 0.751419 0.59049
+DEAL::6e-06 1 2.22138 2.70967 2.53144 0.221377 0.709673 0.531441
+DEAL::7e-06 1 2.17218 2.67025 2.4783 0.172182 0.670247 0.478297
+DEAL::8e-06 1 2.13392 2.63301 2.43047 0.13392 0.633011 0.430467
+DEAL::9e-06 1 2.10416 2.59784 2.38742 0.10416 0.597844 0.38742
+DEAL::
+DEAL::
+DEAL::Copying output file node_indep.gpl
+DEAL::# Data independent of mesh location
+DEAL::# <Key> <Indep_0> 
+DEAL::0 1
+DEAL::1e-06 1
+DEAL::2e-06 1
+DEAL::3e-06 1
+DEAL::4e-06 1
+DEAL::5e-06 1
+DEAL::6e-06 1
+DEAL::7e-06 1
+DEAL::8e-06 1
+DEAL::9e-06 1
+DEAL::
+DEAL::
+DEAL::Copying output file Test_Copy_00.gpl
+DEAL::# Requested location: 1 0.2
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 138 : 1 0.25
+DEAL::# 139 : 1 0.25
+DEAL::# 181 : 1 0.25
+DEAL::#
+DEAL::# <Key> <Indep_0> <Solution_0> <Solution_1> <Solution_2> 
+DEAL::0.1 1 1 1 1
+DEAL::
+DEAL::
+DEAL::Copying output file Test_Copy_indep.gpl
+DEAL::# Data independent of mesh location
+DEAL::# <Key> <Indep_0> 
+DEAL::0.1 1
+DEAL::
+DEAL::
+DEAL::Copying output file no_dof_indep.gpl
+DEAL::# Data independent of mesh location
+DEAL::# <Key> <Indep_0> 
+DEAL::0 1
+DEAL::1e-06 1
+DEAL::2e-06 1
+DEAL::3e-06 1
+DEAL::4e-06 1
+DEAL::5e-06 1
+DEAL::6e-06 1
+DEAL::7e-06 1
+DEAL::8e-06 1
+DEAL::9e-06 1
+DEAL::
+DEAL::

@@ -111,7 +111,7 @@ void test(FiniteElement<dim> &fe)
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
 
   FE_DGP<2> p0(0);
   FE_DGP<2> p1(1);

@@ -23,7 +23,7 @@
 
 
 
-char logname[] = "q_iso_q1_projection_01/output";
+char logname[] = "output";
 #include "deformed_projection.h"
 #include <deal.II/fe/fe_q_iso_q1.h>
 

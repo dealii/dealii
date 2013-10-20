@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <string>
 
-std::ofstream logfile("grid_in_tecplot/output");
+std::ofstream logfile("output");
 
 
 template <int dim>
@@ -37,8 +37,7 @@ void test (const std::string &infilename)
   gi.attach_triangulation (tria);
   gi.read (infilename);
 
-  logfile<<"------------------------------------------"<<std::endl
-         <<"output for grid in "<<infilename<<std::endl;
+  logfile<<"------------------------------------------"<<std::endl;
 
   GridOut grid_out;
   grid_out.set_flags (GridOutFlags::Ucd(true));
@@ -47,9 +46,9 @@ void test (const std::string &infilename)
 
 int main ()
 {
-  test<2> ("grid_in_tecplot/1.dat");
-  test<2> ("grid_in_tecplot/2.dat");
-  test<2> ("grid_in_tecplot/3.dat");
-  test<2> ("grid_in_tecplot/4.dat");
+  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/1.dat"));
+  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/2.dat"));
+  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/3.dat"));
+  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/4.dat"));
 }
 

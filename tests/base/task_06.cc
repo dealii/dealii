@@ -42,16 +42,22 @@ void test (int i)
 
 int main()
 {
-  std::ofstream logfile("task_06/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Threads::Thread<> t1 = Threads::new_thread (test, 1);
-  Threads::Thread<> t2 = Threads::new_thread (test, 2);
+  {
+    Threads::Thread<> t1 = Threads::new_thread (test, 1);
+    Threads::Thread<> t2 = Threads::new_thread (test, 2);
 
-  t1.join ();
-  t2.join ();
+    t1.join ();
+    t2.join ();
 
-  deallog << "OK" << std::endl;
+    deallog << "OK" << std::endl;
+  }
+
+  deallog.detach ();
+  logfile.close ();
+  sort_file_contents ("output");
 }

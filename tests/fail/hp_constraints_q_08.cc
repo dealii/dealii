@@ -18,7 +18,7 @@
 
 // check that computation of hp constraints works for Q elements correctly
 
-char logname[] = "hp_constraints_q_08/output";
+char logname[] = "output";
 
 
 #include "../hp/hp_constraints_common.h"

@@ -26,7 +26,7 @@
 #include <deal.II/base/function.h>
 #include "create_mesh.h"
 
-std::ofstream logfile("matrix_vector_06/output");
+std::ofstream logfile("output");
 
 #include "matrix_vector_common.h"
 

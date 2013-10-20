@@ -27,7 +27,7 @@
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
 
   std::vector<types::global_dof_index> row_blocks(2);
   row_blocks[0] = 10;

@@ -64,17 +64,18 @@ void check()
   data.merge (additional_data);
 
   {
-    std::ofstream out2( "data_out_reader_01/outfile");
+    std::ofstream out2( "outfile");
     data.write_deal_II_intermediate (out2);
   }
 
-  cat_file("data_out_reader_01/outfile");
+  cat_file("outfile");
+  std::remove ("outfile");
 }
 
 
 int main()
 {
-  std::ofstream logfile("data_out_reader_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
   check<1,1>();

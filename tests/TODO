@@ -1,4 +1,0 @@
-DoFTools::count_dofs_per_block
-FiniteElement:: blocks
-MGTools::compute_row_length_vector
-MGTools::count_dofs_per_block

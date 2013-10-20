@@ -35,7 +35,7 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("number_cache_02/output");
+std::ofstream logfile("output");
 
 
 
@@ -80,8 +80,6 @@ void output (const Triangulation<dim> &tria)
 template <int dim>
 void test (const char *filename)
 {
-  deallog << "Reading " << filename << std::endl;
-
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
@@ -129,17 +127,17 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test<2> ("grid_in/2d.xda");
+  test<2> (SOURCE_DIR "/grid_in/2d.xda");
 
-  test<3> ("grid_in_3d/1.in");
-  test<3> ("grid_in_3d/2.in");
-  test<3> ("grid_in_3d/3.in");
-  test<3> ("grid_in_3d/4.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/1.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/2.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/3.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/4.in");
 
-  test<3> ("grid_in_3d/evil_0.in");
-  test<3> ("grid_in_3d/evil_1.in");
-  test<3> ("grid_in_3d/evil_2.in");
-  test<3> ("grid_in_3d/evil_3.in");
-  test<3> ("grid_in_3d/evil_4.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/evil_0.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/evil_1.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/evil_2.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/evil_3.in");
+  test<3> (SOURCE_DIR "/grid_in_3d/evil_4.in");
 }
 

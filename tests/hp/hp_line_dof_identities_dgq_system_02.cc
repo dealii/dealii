@@ -86,7 +86,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_line_dof_identities_dgq_system_02/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

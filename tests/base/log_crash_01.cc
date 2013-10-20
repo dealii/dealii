@@ -32,7 +32,7 @@ int main()
 
   try
     {
-      std::ofstream logfile("log_crash_01/output");
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog << "OK" << std::endl;
       deallog << "no newline here!";

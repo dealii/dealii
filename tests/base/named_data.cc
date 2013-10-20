@@ -80,7 +80,7 @@ test_shared_pointer()
 
 int main ()
 {
-  std::ofstream logfile("named_data/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 //  deallog.log_cerr();

@@ -22,7 +22,7 @@
 
 
 #
-# Set up genereal threading:
+# Set up general threading:
 # The macro will be included in CONFIGURE_FEATURE_THREADS_EXTERNAL/BUNDLED.
 #
 MACRO(SETUP_THREADING)
@@ -164,6 +164,16 @@ MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL)
 
   ENDIF()
 
+  #
+  # Workaround for an issue with C++11 mode, non gcc-compilers and missing
+  # template<typename T> std::ist_trivially_copyable<T>
+  #
+  IF( DEAL_II_USE_CXX11 AND
+      NOT DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE AND
+      NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
+    LIST(APPEND DEAL_II_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
+    LIST(APPEND DEAL_II_USER_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
+  ENDIF()
 
   SETUP_THREADING()
 ENDMACRO()
@@ -188,6 +198,17 @@ MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED)
     LIST(APPEND DEAL_II_DEFINITIONS_DEBUG
       "TBB_DO_DEBUG=1" "TBB_DO_ASSERT=1"
       )
+  ENDIF()
+
+  #
+  # Workaround for an issue with C++11 mode, non gcc-compilers and missing
+  # template<typename T> std::ist_trivially_copyable<T>
+  #
+  IF( DEAL_II_USE_CXX11 AND
+      NOT DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE AND
+      NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
+    LIST(APPEND DEAL_II_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
+    LIST(APPEND DEAL_II_USER_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
   ENDIF()
 
   #

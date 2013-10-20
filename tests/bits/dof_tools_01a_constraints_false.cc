@@ -27,7 +27,7 @@
 //                          true);
 
 
-std::string output_file_name = "dof_tools_01a_constraints_false/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

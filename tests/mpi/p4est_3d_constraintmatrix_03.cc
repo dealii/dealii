@@ -299,7 +299,7 @@ void test()
   data_out.add_data_vector(x_rel, solution_names);
 
   data_out.build_patches (1);
-  const std::string filename = ("p4est_3d_constraintmatrix_03/solution." +
+  const std::string filename = ("solution." +
                                 Utilities::int_to_string
                                 (tr.locally_owned_subdomain(), 4) +
                                 ".vtu");
@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("p4est_3d_constraintmatrix_03").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);

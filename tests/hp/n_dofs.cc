@@ -95,7 +95,7 @@ void test (const FiniteElement<dim> &fe)
 
 int main ()
 {
-  std::ofstream logfile("n_dofs/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

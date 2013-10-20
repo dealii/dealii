@@ -29,7 +29,7 @@ int main ()
 {
   try
     {
-      std::ofstream logfile("parameter_handler_6/output");
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
@@ -50,7 +50,7 @@ int main ()
                          "docs 3");
       prm.leave_subsection ();
 
-      prm.read_input("parameter_handler_3/prm");
+      prm.read_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
 
       // now set some of the entries to
       // different values

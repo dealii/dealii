@@ -25,7 +25,7 @@
 #include "full_matrix_common.h"
 
 
-std::string output_file_name = "complex_complex_full_matrix_43/output";
+std::string output_file_name = "output";
 
 
 template <typename number>

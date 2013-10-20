@@ -35,7 +35,7 @@
 #include <iomanip>
 
 
-std::ofstream logfile("grid_out_02/output");
+std::ofstream logfile("output");
 
 
 template <int dim>

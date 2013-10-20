@@ -98,7 +98,7 @@ void check ()
 
 int main (int argc, char *argv[])
 {
-  std::ofstream logfile("graph_coloring_04/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console (0);
 

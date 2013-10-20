@@ -23,7 +23,7 @@
 #include "full_matrix_common.h"
 
 
-std::string output_file_name = "full_matrix_06/output";
+std::string output_file_name = "output";
 
 
 template <typename number>

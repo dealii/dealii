@@ -38,12 +38,18 @@ void test (int i)
 
 int main()
 {
-  std::ofstream logfile("task_08/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Threads::new_task (test, 1);
+  {
+    Threads::new_task (test, 1);
 
-  deallog << "OK" << std::endl;
+    deallog << "OK" << std::endl;
+  }
+
+  deallog.detach ();
+  logfile.close ();
+  sort_file_contents ("output");
 }

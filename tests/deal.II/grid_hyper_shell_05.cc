@@ -40,7 +40,7 @@
 #include <iostream>
 #include <iomanip>
 
-std::ofstream logfile("grid_hyper_shell_05/output");
+std::ofstream logfile("output");
 
 
 template<int dim>

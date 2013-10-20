@@ -144,7 +144,7 @@ check(unsigned int size)
 
 int main()
 {
-  std::ofstream logfile("tridiagonal_matrix_sym/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(0);
   deallog.attach(logfile);

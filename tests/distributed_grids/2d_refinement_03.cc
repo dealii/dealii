@@ -44,7 +44,7 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr);
-    std::ifstream in ("../deal.II/grid_in_02/2d.xda");
+    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_02/2d.xda");
     try
       {
         gi.read_xda (in);
@@ -61,7 +61,7 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr2);
-    std::ifstream in ("../deal.II/grid_in_02/2d.xda");
+    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_02/2d.xda");
     try
       {
         gi.read_xda (in);
@@ -123,7 +123,7 @@ void test(std::ostream & /*out*/)
                   << std::endl;
         }
 
-//      write_vtk (tr, "2d_refinement_03", "1");
+//      write_vtk(tr, "1");
       deallog << std::endl;
 
       deallog << i << " Number of cells: "
@@ -131,7 +131,7 @@ void test(std::ostream & /*out*/)
               << tr2.n_active_cells()
               << std::endl;
 
-      assert_tria_equal("2d_refinement_03", tr, tr2);
+      assert_tria_equal(tr, tr2);
 
     }
 }
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("2d_refinement_03/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

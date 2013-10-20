@@ -109,7 +109,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("interpolate_dgq_01/output");
+  std::ofstream logfile("output");
   logfile.precision (3);
   deallog << std::setprecision(3);
 

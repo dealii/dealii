@@ -40,12 +40,12 @@ void check (const char *p)
 
 int main ()
 {
-  std::ofstream logfile("parameter_handler_13a/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  check ("parameter_handler_13a/prm");
+  check (SOURCE_DIR "/prm/parameter_handler_13a.prm");
 
   return 0;
 }

@@ -177,7 +177,7 @@ void check(Quadrature<1> &q)
 
 int main()
 {
-  std::ofstream logfile("qprojector/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog << std::setprecision(2);

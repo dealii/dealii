@@ -74,7 +74,7 @@ void test (Vector &vector)
 int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  MPILogInitAll log(__FILE__);
+  MPILogInitAll log;
   const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   {
     IndexSet local (10);

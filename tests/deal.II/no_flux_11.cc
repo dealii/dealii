@@ -45,7 +45,7 @@ void run()
 
   GridIn<dim> gridin;
   gridin.attach_triangulation(triangulation);
-  std::ifstream f("no_flux_11.msh");
+  std::ifstream f(SOURCE_DIR "/no_flux_11.msh");
   Assert (f, ExcIO());
   gridin.read_msh(f);
 
@@ -141,7 +141,7 @@ void run()
 
 int main ()
 {
-  std::ofstream logfile ("no_flux_11/output");
+  std::ofstream logfile ("output");
   logfile.precision (4);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);

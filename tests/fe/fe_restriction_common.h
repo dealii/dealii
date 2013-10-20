@@ -68,7 +68,7 @@ check_restriction (FiniteElement<dim> &fe, const char *name)
     {
       deallog << name << '<' << dim << '>' << " restriction " << i << std::endl;
       if (fe.isotropic_restriction_is_implemented())
-        print_formatted (fe.get_restriction_matrix(i), 6, 8);
+        print_formatted (fe.get_restriction_matrix(i), 7, 8);
     }
 }
 

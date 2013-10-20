@@ -30,7 +30,7 @@
 
 int main()
 {
-  std::ofstream logfile("block_sparsity_pattern_02/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(2);
   deallog.attach(logfile);

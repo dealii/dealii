@@ -7955,28 +7955,6 @@ operator >> (std::istream                     &in,
 
 
 // explicit instantiations
-#define INSTANTIATE(dim,spacedim) \
-  template class DataOutInterface<dim,spacedim>;                \
-  template class DataOutReader<dim,spacedim>;                   \
-  template struct DataOutBase::Patch<dim,spacedim>;              \
-  template                                                      \
-  std::ostream &                                                \
-  operator << (std::ostream                           &out,     \
-               const DataOutBase::Patch<dim,spacedim> &patch);  \
-  template                                                      \
-  std::istream &                                                \
-  operator >> (std::istream                     &in,            \
-               DataOutBase::Patch<dim,spacedim> &patch)
-
-INSTANTIATE(1,1);
-INSTANTIATE(2,2);
-INSTANTIATE(3,3);
-INSTANTIATE(4,4);
-INSTANTIATE(1,2);
-INSTANTIATE(1,3);
-INSTANTIATE(2,3);
-INSTANTIATE(3,4);
-
-#undef INSTANTIATE
+#include "data_out_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -21,7 +21,7 @@
 // do because these elements only have dofs on edges, not on faces, but we
 // should test anyway that there is nothing that actively goes wrong.
 
-char logname[] = "face_orientation_and_fe_nedelec_01/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

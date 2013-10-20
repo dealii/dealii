@@ -26,7 +26,7 @@
 
 int main()
 {
-  std::ofstream logfile("fe_q_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deal_II_exceptions::disable_abort_on_exception();

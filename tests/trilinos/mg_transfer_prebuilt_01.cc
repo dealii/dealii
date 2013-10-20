@@ -145,8 +145,7 @@ int main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
-  std::ofstream logfile(logname.c_str());
+  std::ofstream logfile("output");
   deallog << std::setprecision(6);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

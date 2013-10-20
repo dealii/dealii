@@ -65,7 +65,7 @@ void check ()
 
 int main ()
 {
-  std::ofstream logfile("is_finite_complex/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

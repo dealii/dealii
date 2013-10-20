@@ -23,7 +23,7 @@
 #include "full_matrix_common.h"
 
 
-std::string output_file_name = "full_matrix_57/output";
+std::string output_file_name = "output";
 
 const double ints[9] = { 0, -1., 1., -2., 2., -3., 3., -4., 4.};
 

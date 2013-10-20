@@ -66,7 +66,7 @@ Triangulation<2,2> create_grid()
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
 
   GridOut grid_out;
   GridOutFlags::Svg svg_flags;

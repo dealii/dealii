@@ -58,7 +58,7 @@ void plot(const PolynomialsBDM<dim> &poly)
 
 int main()
 {
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog << std::setprecision(3);
   deallog.attach(logfile);

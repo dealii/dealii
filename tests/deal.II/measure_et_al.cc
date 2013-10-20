@@ -104,7 +104,7 @@ void test()
 
 int main()
 {
-  std::ofstream logfile ("measure_et_al/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (PRECISION);
   deallog.attach(logfile);
   deallog.depth_console(0);

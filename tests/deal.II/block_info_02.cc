@@ -89,7 +89,7 @@ void test_fe (const FiniteElement<dim> &fe)
 
 int main ()
 {
-  initlog(__FILE__);
+  initlog();
 
   FE_Q<2> q21(1);
   FE_Q<2> q22(2);

@@ -27,7 +27,7 @@
 #include <iomanip>
 
 
-std::ofstream logfile("minimal_cell_diameter/output");
+std::ofstream logfile("output");
 
 
 

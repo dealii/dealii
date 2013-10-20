@@ -33,7 +33,7 @@
 #include <cmath>
 
 
-std::ofstream logfile("filtered_iterator/output");
+std::ofstream logfile("output");
 
 
 DeclException2 (ExcNumberMismatch,

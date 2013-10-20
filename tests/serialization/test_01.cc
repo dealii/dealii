@@ -71,7 +71,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("test_01/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

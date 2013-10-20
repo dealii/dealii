@@ -16,7 +16,7 @@
 
 
 
-char logname[] = "injection_nedelec/output";
+char logname[] = "output";
 
 
 #include "../fe/injection_common.h"

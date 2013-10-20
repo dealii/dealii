@@ -29,7 +29,7 @@
 
 #include <fstream>
 
-std::ofstream logfile ("rt_distorted_01/output");
+std::ofstream logfile ("output");
 
 #include <fstream>
 

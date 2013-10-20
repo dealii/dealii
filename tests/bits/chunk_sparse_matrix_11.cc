@@ -65,7 +65,7 @@ void test (const unsigned int chunk_size)
 
 int main ()
 {
-  std::ofstream logfile("chunk_sparse_matrix_11/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -36,12 +36,12 @@
 
 int main ()
 {
-  std::ofstream logfile("mesh_bug/output");
+  std::ofstream logfile("output");
 
   Triangulation<2,3> tria;
   GridIn<2,3> gi;
   gi.attach_triangulation(tria);
-  std::ifstream infile("mesh_bug/cmp/generic");
+  std::ifstream infile(SOURCE_DIR "/mesh_bug.output");
   gi.read(infile);
 
   const std::vector<Point<3> > &vertices = tria.get_vertices();

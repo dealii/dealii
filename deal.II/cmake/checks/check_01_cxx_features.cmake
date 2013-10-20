@@ -21,7 +21,7 @@
 #
 #   DEAL_II_HAVE_CXX11_FLAG
 #   DEAL_II_CXX11_FLAG
-#   DEAL_II_CAN_USE_CXX11
+#   DEAL_II_USE_CXX11
 #   HAVE_ISNAN
 #   HAVE_UNDERSCORE_ISNAN
 #   DEAL_II_HAVE_ISFINITE
@@ -168,7 +168,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
 
     MESSAGE(STATUS "Sufficient C++11 support. Enabling ${DEAL_II_CXX11_FLAG}.")
 
-    SET(DEAL_II_CAN_USE_CXX11 TRUE)
+    SET(DEAL_II_USE_CXX11 TRUE)
 
     ADD_FLAGS(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
 
@@ -176,17 +176,15 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     MESSAGE(STATUS "Insufficient C++11 support. Disabling ${DEAL_II_CXX11_FLAG}.")
   ENDIF()
 
-#
-# Currently unused
-#
-#  IF(DEAL_II_CAN_USE_CXX11)
-#    #
-#    # Also test for a couple of C++11 things that we don't use in the
-#    # library but that users may want to use in their applications and that
-#    # we might want to test in the testsuite
-#    #
-#    # TODO: Actually we have to export the test results somehow. :-]
-#    #
+ IF(DEAL_II_USE_CXX11)
+   CHECK_CXX_SOURCE_COMPILES(
+     "
+     #include <type_traits>
+     int main(){ std::is_trivially_copyable<int> bob; }
+     "
+     DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+
+# Currently unused:
 #
 #    CHECK_CXX_SOURCE_COMPILES(
 #      "
@@ -212,7 +210,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
 #      SET(DEAL_II_CAN_USE_ADDITIONAL_CXX1X_FEATURES)
 #    ENDIF()
 #
-#  ENDIF()
+  ENDIF()
 
   POP_TEST_FLAG()
 

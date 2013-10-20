@@ -23,7 +23,7 @@
 #include "../tests.h"
 #include <deal.II/base/function.h>
 
-std::ofstream logfile("copy/output");
+std::ofstream logfile("output");
 
 #include "matrix_vector_common.h"
 

@@ -17,347 +17,537 @@
 
     <h1>The deal.II Testsuite</h1>
 
-    <p>The deal.II testsuite consists of two parts, the
-    <a href="#build_tests">build tests</a> and the
-    <a href="#regression_tests">regression tests</a>. While the build tests
-    just check if the
-    library can be compiled on different systems and with different (versions
-    of) compilers, the regression tests are actually run and their output
-    compared with previously stored. These two testsuites are
-    described below.</p>
-
-    <a name="build_tests"></a>
-    <h2>The build tests</h2>
+    <p>
+      The deal.II testsuite consists of two parts: 
+      <i>build tests</i> and the
+      <i>regression testsuite</i>. While the build tests
+      are used to check that the
+      library can be compiled on different systems and with different (versions
+      of) compilers, the regression tests are actually run and their output
+      compared with previously stored output files to verify that what
+      worked yesterday still works today. These two testsuites are
+      described below.
+    </p>
 
     <p>
-      With our build tests, we check if deal.II can be compiled on
-      different systems and with different compilers as well as
-      different configuration options. Results are collected in a
-      database and can be accessed <a
-      href="http://www.dealii.org/testsuite.html">online</a>.<p>
+      deal.II has a testsuite that has, at the time this article is written
+      (mid-2013), some 2,900 small programs (growing by roughly one per day)
+      that we run every time we make a change to make sure that no existing
+      functionality is broken. The expected output for every test is stored in
+      our subversion archive, and when you run a test you are notified if a
+      test produces different output. These days, every time we add a
+      significant piece of functionality, we add at least one new test to the
+      testsuite, and we also do so if we fix a bug, in both cases to make sure
+      that future changes do not break what we have just checked in. Machines
+      running tests send results
+      back home and these are then converted into
+      <a href="http://dealii.mathsim.eu/cgi-bin/regression_quick.pl"
+      target="body">a webpage showing the status of our regression tests</a>.
+    </p>
 
-      <p>Running the build test suite is simple and we encourage deal.II
-      users with configurations not found on the <a
-      href="http://www.dealii.org/testsuite.html">test suite page</a> to
-      participate. Assuming you checked out deal.II into the directory
-      <code>dealtest</code>, running it is as simple as:
+    <div class="toc">
+      <ol>
+        <li><a href="#quick">Quick instructions</a></li>
+        <li><a href="#setup">Setting up the testsuite</a></li>
+        <ol>
+          <li><a href="#setupdownload">Downloading the testsuite</a></li>
+          <li><a href="#setupconfigure">Preparing the testsuite</a></li>
+        </ol>
+        <li><a href="#run">Running the testsuite</a></li>
+        <ol>
+          <li><a href="#runoutput">How to interpret the output</a></li>
+        </ol>
+        <li><a href="#layout">Testsuite development</a></li>
+        <ol>
+          <li><a href="#layoutgeneral">General layout</a></li>
+          <li><a href="#restrictbuild">Restricting tests for build configurations</a></li>
+          <li><a href="#restrictfeature">Restricting tests for feature configurations</a></li>
+          <li><a href="#mpi">Running tests with MPI</a></li>
+          <li><a href="#expect">Changing condition for success</a></li>
+          <li><a href="#layoutaddtests">Adding new tests</a></li>
+        </ol>
+        <li><a href="#submit">Submitting test results</a></li>
+        <li><a href="#build_tests">Build tests</a></li>
+	  <ol>
+	    <li><a href="#dedicatedbuilds">Dedicated build tests</a></li>
+          </ol>
+      </ol>
+    </div>
+
+    <a name="quick"></a>
+    <h2>Quick instructions</h2>
+
+    <p>
+      If you're impatient, use the following commands:
       <pre>
 
-    cd dealtest
-    svn update
-    ./contrib/utilities/build_test
-    mail build-tests@dealii.org &lt; *.log
-  ( rm *.log )
+    $ mkdir new_directory
+    $ cd new_directory
+    $ svn checkout https://svn.dealii.org/trunk .
+    $ mkdir build
+    $ cd build
+    $ cmake ../deal.II
+    $ make -j16
+    $ make -j16 setup_tests
+    $ ctest -j16
+      </pre>
+      The exact meaning of all of these commands will be explained in much
+      greater detail below.
+    </p>
+
+    <a name="setup"></a>
+    <h2>Setting up the testsuite</h2>
+
+    <p> In order to run it, you need to download and set up the testsuite
+      first. The following paragraphs detail how to do that.
+    </p>
+
+    <a name="setupdownload"></a>
+    <h3>Downloading the testsuite</h3>
+
+    <p>
+      To download the testsuite, check it out from the subversion repository,
+      along with deal.II. To this end, go to an empty directory where you
+      want to test deal.II and do this:
+      <pre>
+
+    $ svn checkout https://svn.dealii.org/trunk .
+      </pre>
+      (The period at the end puts everything from under <code>trunk/</code>
+      into the current directory, rather than creating a
+      new <code>trunk/</code> directory.) You will then have
+      two folders:
+      <pre>
+
+    ./deal.II
+    ./tests
       </pre>
     </p>
 
     <p>
-      The <code>build_test</code> script supports the following options:
+      <b>Note:</b> CMake will pick up any testsuite that is located in a
+      <code>tests</code> folder next to the source directory
+      (<code>../tests</code>). If your test directory is at a different
+      location you have to hint during configuration by specifying
+      <code>TEST_DIR</code>:
       <pre>
 
-    SOURCEDIR     - the source directory to use (otherwise the current directory is used)
-    CONFIGFILE    - A cmake configuration file for the build test
-    LOGDIR        - directory for the log file
-    LOGFILE       - the logfile to use, defaults to
-                        $LOGDIR/$BRANCH.$CONFIGFILE.<unix time>.log
-
-    CMAKE         - the cmake executable to use
-    SVN           - svn info command to use, defaults to
-                        svn info $(SOURCEDIR)
-    TMPDIR        - defaults to "/tmp"
-    CLEAN_TMPDIR  - defaults to "true"
-    RUN_EXAMPLES  - defaults to "true"
-      </pre>
-      An example configuration file can be found <a
-      href="../users/Config.sample">here</a>. Options can be passed either via
-    environment
-      <pre>
-
-    export CONFIGFILE=MyConfiguration.conf
-    ./contrib/utilities/build_test
-      </pre>
-      or directly on the command line:
-      <pre>
-
-    ./contrib/utilities/build_test CONFIGFILE=myConfiguration.conf
+    $ cmake -DTEST_DIR=&lt;...&gt;
       </pre>
     </p>
 
-    <p>
-      A status indicator should appear on the build test website after some
-      time (results are collected and processed by a program that is run
-      periodically, but not immediately after a mail has been received).
-    </p>
-
-
-    <h3>Dedicated build tests</h3>
-
-    There is a detailed example for dedicated build tests on the <a
-      href="https://code.google.com/p/dealii/wiki/BuildTests">wiki</a>.
-
-    <a name="regression_tests"></a>
-    <h2>The regression tests</h2>
+    <a name="setupconfigure"></a>
+    <h3>Preparing the testsuite</h3>
 
     <p>
-    deal.II has a testsuite that, at the time this article is written (mid-2013),
-    has some 2,900 small programs (growing by roughly one per day) that we run
-    every time we make a
-    change to make sure that no existing functionality is broken. The
-    expected output is also stored in our subversion archive, and when you
-    run a test you are notified if a test fails. These days, every
-    time we add a significant piece of functionality, we add at least
-    one new test to the testsuite, and we also do so if we fix a bug,
-    in both cases to make sure that future changes do not break what
-    we have just checked in. In addition, some machines run the tests
-    every night and send the results back home; this is then converted
-    into <a href="http://dealii.mathsim.eu/cgi-bin/regression_quick.pl"
-    target="body">a webpage showing the status of our regression
-    tests</a>.
+      To enable the testsuite, configure and build deal.II in a build
+      directory as normal (installation is not necessary). After that you
+      can setup the testsuite via the "setup_tests" target:s
+      <pre>
+
+    $ make setup_tests
+      </pre>
+      This will set up all tests supported by the current configuration.
+      The testsuite can now be run in the current <i>build directory</i> as
+      described below.
     </p>
 
     <p>
-    If you develop parts of deal.II, want to add something, or fix a
-    bug in it, we encourage you to use our testsuite. This page
-    documents some aspects of it.
-    </p>
+      Setup can be fine-tuned using the following commands:
+      <pre>
 
+    $ make clean_tests - runs the 'clean' target in every testsuite subproject
 
-    <h3>Running it</h3>
-
-    <p>
-    To run the testsuite, go to the directory where you want to test deal.II
-    and do this:
-    <pre>
-
-       svn checkout https://svn.dealii.org/trunk/tests
-       cd tests
-       DEAL_II_DIR=/a/b/c ./configure
-    </pre>
-    where <code>/a/b/c</code> is the installation directory you have told
-    CMake to install deal.II into previously.
-    </p>
+    $ make prune_tests - removes all testsuite subprojects
+      </pre>
 
     <p>
-    Not all tests succeed on every machine even if all computations are
-    correct, because you might not have configured with all the required
-    packages (for example PETSc or Trilinos), or because your machine
-    generates slightly different floating point outputs.  To increase the
-    number of tests that work correctly, install the
-    <a href="http://www.nongnu.org/numdiff/">numdiff</a> toold that compares
-    stored and newly created output files based on floating point
-    tolerances. To use it, simply export the environment variable
-    <code>export DEAL_II_DIFF="numdiff -a 1e-6 -q"</code>
-    before running the testsuite.
-    </p>
+      In addition, when setting up the testsuite, the following environment
+      variables can be used to override default behavior when
+      calling <code>make setup_tests</code>:
+      <pre>
 
-    <p>
-    Once you have done this, you may simply type
-    <code>make</code>. This runs all the tests there are, but stops at
-    the first one that fails to either execute properly or for which
-    the output does not match the expected output found in the subversion
-    archive. This is helpful if you want to figure out if any test is
-    failing at all. Typical output looks like this:
-    <pre>
+    TEST_DIFF
+      - The diff tool and command line to use for comparison. If numdiff is
+        available it defaults to "numdiff -a 1e-6 -q", otherwise plain diff
+        is used.
 
-      deal.II/tests> make
-      cd base ; make
-      make[1]: Entering directory `/ices/bangerth/p/deal.II/1/deal.II/tests/base'
-      =====linking======= logtest.exe
-      =====Running======= logtest.exe
-      =====Checking====== logtest.output
-      =====OK============ logtest.OK
-      =====linking======= reference.exe
-      =====Running======= reference.exe
-      =====Checking====== reference.output
-      =====OK============ reference.OK
-      =====linking======= quadrature_test.exe
-      ...
-    </pre>
-    Be aware that because of the number of tests we have, running the entire
-    testsuite takes approximately 10 hours (as of early 2013), even on a fast
-    system. (On the other hand, of couse only a large testsuite can offer
-    comprehensive coverage of a software as big as deal.II.) This time can be
-    reduced, however, on multicore machines if you use the command
-    <code>make -jN</code> where <code>N</code> is an integer equal to or
-    slightly larger than the number of processor cores you have, as this
-    instructs <code>make</code> to run several tests at the same time.
+    TEST_TIME_LIMIT
+      - The time limit (in seconds) a single test is allowed to take. Defaults
+        to 180 seconds
+
+    TEST_PICKUP_REGEX
+      - A regular expression to select only a subset of tests during setup.
+        An empty string is interpreted as a catchall (this is the default).
+
+    TEST_OVERRIDE_LOCATION
+      - If TEST_OVERRIDE_LOCATION is set, a comparison file category/test.output
+        will be substituted by ${TEST_OVERRIDE_LOCATION}/category/test.output if
+        the latter exists.
+      </pre>
     </p>
 
     <p>
-    Sometimes, you know that for whatever reason one test
-    always fails on your system, or has already failed before you made
-    any changes to the library that could have caused tests to
-    fail. We also sometimes check in tests that we know presently
-    fail, just to remind us that we need to work on a fix, if we don't
-    have the time to debug the problem properly right away. In this
-    case, you will not want the testsuite to stop at the first test
-    that fails, but will want to run all tests first and then inspect
-    the output to find any fails. There are make targets for this
-    as well. The usual way we use the testsuite is to run all tests
-    like this
-    (the same applies as above: <code>make -jN</code> can be used on multicore
-    machines):
-    <pre>
+      <b>Note:</b> Specifying these options via environment variables is
+      volatile, i.e. if <code>make setup_tests</code> is invoked a second
+      time without the variables set in environment, the option will be
+      reset to the default value. If you want to set these options
+      permanently, set them via cmake as CMake variable in the build
+      directory:
+      <pre>
 
-      deal.II/tests> make report | tee report
-    </pre>
-    which produces the file report ( here in the test directory <tt>a-framework</tt>)
-    <pre>
+    $ cmake -DTEST_PICKUP_REGEX="&lt;regular expression&gt;" .
+      </pre>
+      A variable set via cmake always <i>overrides</i> one
+      set via environment.
+    </p>
 
-      =====Checking====== miscompare/output
-      +++++Error+++++++++ miscompare/OK (miscompare/cmp/generic) Use make verbose=on for the diffs
-      =====linking======= compile/exe
-      =====Running======= link/exe
-      =====debug========= fail.cc
-      make[1]: Leaving directory `/home/kanschat/deal/tests/a-framework'
-      Revision: 21455
-      Date:  2010 187 2010-07-06 27-2
-      Id:  kanschat@odin
-      2010-07-06 16:39  1   a-framework/compile
-      2010-07-06 16:39  0   a-framework/fail
-      2010-07-06 16:39  2   a-framework/link
-      2010-07-06 16:39  3   a-framework/miscompare
-      2010-07-06 16:39   +  a-framework/run
-    </pre>
-    The last lines are the ones we are looking for: they show the time at which
-    the tests was run, an indicator of success, and the name of a
-    test. The indicator is either a plus, which means that the test
-    compiled and linked successfully and that the output compared
-    successfully against the stored results. Otherwise, it is any of the
-    numbers 0 to 3, indicating failure at different levels:
-    <ul>
-      <li> 0: compiling failed
-      <li> 1: linking failed
-      <li> 2: the program crashed
-      <li> 3: output differs from stored result
-      <li> +: test succeeded
-    </ul>
-    If you only want to see the tests that failed, after the previous command,
-    issue
-    <pre>
+    <a name="run"></a>
+    <h2>Running the testsuite</h2>
 
-      grep -v + report
-    </pre>
+    <p>
+      The testsuite can now be run in the <i>build directory</i> via
+      <pre>
+
+    $ ctest [-j N]
+      </pre>
+      Here, <code>N</code> is the number of concurrent tests that should be
+      run, in the same way as you can say <code>make -jN</code>. The testsuite
+      is huge and will need around 12h on current computers 
+      running single threaded.
     </p>
 
     <p>
-    If you want to do a little more than just that, you should
-    consider running
-    <pre>
+      If you only want to run a subset of tests
+      matching a regular expression, or if you want to exclude tests matching
+      a regular expression, you can use
+      <pre>
 
-      make report+mail | tee report
-    </pre>
-    instead. This does all the same stuff, but also mails the test
-    result to our central mail result server which will in regular
-    intervals (at least once a day) munge these mails and present them
-    on our <a href="http://www.dealii.org/~archiver/cgi-bin/regression_quick.pl"
-    target="body">test site</a>. This way, people can
-    get an overview of what tests fail. You may even consider running
-    tests nightly through a cron-job with this command, to have
-    regular test runs.
+    $ ctest [-j N] -R '&lt;positive regular expression&gt;'
+    $ ctest [-j N] -E '&lt;negative regular expression&gt;'
+      </pre>
     </p>
 
     <p>
-    To get a quick overview you can run
-    <pre>
+      <b>Note:</b>
+      Not all tests succeed on every machine even if all computations are
+      correct, because your machine generates slightly different floating
+      point outputs. To increase the number of tests that work correctly,
+      install the
+      <a href="http://www.nongnu.org/numdiff/">numdiff</a> tool that compares
+      stored and newly created output files based on floating point
+      tolerances. To use it, simply export where the <code>numdiff</code>
+      executable can be found via the <code>PATH</code> 
+      environment variable so that it can be found during
+      <code>make setup_tests</code>.
+    </p>
 
-      make report+summary
-    </pre>
-    instead. This runs all the tests and outputs a table in the following format
-    at the end:
-    <pre>
+    <a name="runoutput"></a>
+    <h3>How to interpret the output</h3>
 
-                Compiling Linking Running   Check      OK     all
-         a-framework	1	1	1	1	1	5
-                base	0	0	0	2	185	187
-                 lac	0	0	0	0	117	117
-                  fe	0	0	0	4	114	118
-             deal.II	0	0	0	2	291	293
-         integrators	0	0	0	0	15	15
-           multigrid	0	0	0	0	35	35
-		 ...
-    </pre>
+    <p>
+      A typical output of a <code>ctest</code> invocation looks like:
+      <pre>
+
+    $ ctest -j4 -R "base/thread_validity"
+    Test project /tmp/trunk/build
+          Start 747: base/thread_validity_01.debug
+          Start 748: base/thread_validity_01.release
+          Start 775: base/thread_validity_05.debug
+          Start 776: base/thread_validity_05.release
+     1/24 Test #776: base/thread_validity_05.release ...   Passed    1.89 sec
+     2/24 Test #748: base/thread_validity_01.release ...   Passed    1.89 sec
+          Start 839: base/thread_validity_03.debug
+          Start 840: base/thread_validity_03.release
+     3/24 Test #747: base/thread_validity_01.debug .....   Passed    2.68 sec
+    [...]
+          Start 1077: base/thread_validity_08.debug
+          Start 1078: base/thread_validity_08.release
+    16/24 Test #1078: base/thread_validity_08.release ...***Failed    2.86 sec
+    18/24 Test #1077: base/thread_validity_08.debug .....***Failed    3.97 sec
+    [...]
+
+    92% tests passed, 2 tests failed out of 24
+
+    Total Test time (real) =  20.43 sec
+
+    The following tests FAILED:
+            1077 - base/thread_validity_08.debug (Failed)
+            1078 - base/thread_validity_08.release (Failed)
+    Errors while running CTest
+      </pre>
+      If a test failed (like <code>base/thread_validity_08.debug</code> in above
+      example output), you might want to find out what exactly went wrong. To
+      this end, you can search
+      through <code>Testing/Temporary/LastTest.log</code> for the exact output
+      of the test, or you can rerun this one test, specifying <code>-V</code>
+      to select verbose output of tests:
+      <pre>
+
+    $ ctest -V -R "base/thread_validity_08.debug"
+    [...]
+    test 1077
+        Start 1077: base/thread_validity_08.debug
+
+    1077: Test command: [...]
+    1077: Test timeout computed to be: 600
+    1077: Test base/thread_validity_08.debug: RUN
+    1077: ===============================   OUTPUT BEGIN  ===============================
+    1077: Built target thread_validity_08.debug
+    1077: Generating thread_validity_08.debug/output
+    1077: terminate called without an active exception
+    1077: /bin/sh: line 1: 18030 Aborted [...]/thread_validity_08.debug
+    1077: base/thread_validity_08.debug: BUILD successful.
+    1077: base/thread_validity_08.debug: RUN failed. Output:
+    1077: DEAL::OK.
+    1077: gmake[3]: *** [thread_validity_08.debug/output] Error 1
+    1077: gmake[2]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/all] Error 2
+    1077: gmake[1]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/rule] Error 2
+    1077: gmake: *** [thread_validity_08.debug.diff] Error 2
+    1077:
+    1077:
+    1077: base/thread_validity_08.debug: ******    RUN failed    *******
+    1077:
+    1077: ===============================    OUTPUT END   ===============================
+      </pre>
+      So this specific test aborted in the <code>RUN</code> stage.
     </p>
 
     <p>
-    If a test failed, you have to find out what exactly went
-    wrong. For this, you will want to go into the directory of that
-    test, and figure out in more detail what went wrong. For example,
-    if above test <code>hierarchical</code> would have failed, you
-    would want to go into the <code>base</code> directory (this is
-    given in the line with the equals signs; there are tests in other
-    directories as well) and then type
-    <pre>
+      The general output for a successful test <code>&lt;test&gt;</code> in
+      category <code>&lt;category&gt;</code> for build type
+      <code>&lt;build&gt;</code> is
+      <pre>
 
-      make hierarchical/exe
-    </pre>
-    to compile and link the executable. (For each test there is a not
-    only a file with suffic <code>.cc</code> but also a subdirectory with the
-    same name, in which we store among other things the executable for that
-    test, under the name <code>exe</code>.) If this fails, i.e. if
-    you can't compile or link, then you probably already know where
-    the problem is, and how to fix it. If you could compile and link
-    the test, you will want to make sure that it executes correctly
-    and produces an output file:
-    <pre>
+    xx: Test &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: PASSED
+    xx: ===============================   OUTPUT BEGIN  ===============================
+    xx: [...]
+    xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: PASSED.
+    xx: ===============================    OUTPUT END   ===============================
+      </pre>
+      And for a test that fails in stage <code>&lt;stage&gt;</code>:
+      <pre>
 
-      make hierarchical/output
-    </pre>
-    (As you see, the output file is also stored in the subdirectory with the
-    test's name.) If this produces errors or triggers assertions, then you will
-    want to use a debugger on the executable to figure out what happens. On
-    the other hand, if you are sure that this also worked, you will
-    want to compare the output with the stored output from subversion:
-    <pre>
+    xx: Test &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: &lt;stage&gt;
+    xx: ===============================   OUTPUT BEGIN  ===============================
+    xx: [...]
+    xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: &lt;stage&gt; failed. [...]
+    xx:
+    xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: ******    &lt;stage&gt; failed    *******
+    xx: ===============================    OUTPUT END   ===============================
+      </pre>
+      Hereby, <code>&lt;stage&gt;</code> indicates the stage in which the
+      test failed:
+      <ul>
+        <li>
+          <code>CONFIGURE</code>: only for test in the "build_tests"
+          category: The test project failed in the configuration stage
+        </li>
+        <li>
+          <code>BUILD</code>: compilation error occured
+        </li>
+        <li>
+          <code>RUN</code>: the test executable could not be run / aborted
+        </li>
+        <li>
+          <code>DIFF</code>: the test output differs from the reference output
+        </li>
+        <li>
+          <code>PASSED</code>: the test run successful
+        </li>
+      </ul>
+      Typically, tests fail because the output has changed, and you will see
+      this in the DIFF phase of the test.
+    </p>
 
-      make hierarchical/OK
-    </pre>
-    If the output isn't equal, then you'll see something like
-    this:
-    <pre>
 
-      =====Checking====== hierarchical/output
-      +++++Error+++++++++ hierarchical/OK. Use make verbose=on for the diffs
-    </pre>
-    Because the diffs between the output we get and the output we
-    expected can sometimes be very large, you don't get to see it by
-    default. However, following the suggestion printed, if you type
-    <pre>
+    <a name="layout"></a>
+    <h2>Testsuite development</h2>
 
-      make hierarchical/OK verbose=on
-    </pre>
-    you get to see it all:
-    <pre>
-
-      =====Checking====== hierarchical/output
-      12c12
-      < DEAL::0.333 1.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
-      ---
-      > DEAL::0.333 0.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
-      +++++Error+++++++++ hierarchical/OK
-    </pre>
-    In this case, the second number on line 12 is off by one. To find
-    the reason for this, you again should use a debugger or other
-    suitable means, but that of course depends on what changes you
-    have made last and that could have caused this discrepancy.
+    <p>
+      The following outlines what you need to know if you want to understand
+      how the testsuite actually works, for example because you may want to
+      add tests along with the functionality you are currently developing.
     </p>
 
 
 
+    <a name="layoutgeneral"></a>
+    <h3>General layout</h3>
+
+    <p>
+      A test usually consists of a source file and an output file for
+      comparison (under the testsuite directory <code>tests</code>):
+      <pre>
+
+    category/test.cc
+    category/test.output
+      </pre>
+      <code>category</code> will be one of the existing subdirectory
+      under <code>tests/</code>, e.g., <code>lac/</code>, <code>base/</code>,
+      or <code>mpi/</code>. Historically, we have grouped tests into the
+      directories <code>base/, lac/, deal.II/</code> depending on their
+      functionality, and <code>bits/</code> if they were small unit tests, but
+      in practice we have not always followed this rigidly. There are also
+      more specialized directories <code>trilinos/, petsc/,
+      serialization/, mpi/</code> etc, whose meaning is more obvious.
+      <code>test.cc</code> must be a regular executable (i.e. having an
+      <code>int main()</code> routine). It will be compiled, linked and
+      run. The executable should not output anything to <code>cout</code>
+      (at least under normal circumstances, i.e. no error condition),
+      instead the executable should output to a file <code>output</code>
+      in the current working directory. In practice, we rarely write the
+      source files completely from scratch, but we find an existing test that
+      already does something similar and copy/modify it to fit our needs.
+    </p>
+    <p>
+      For a normal test, <code>ctest</code> will typically run the following 3
+      stages:
+      <ul>
+        <li>
+          <code>BUILD</code>: The build stage generates an executable in
+          <code>BUILD_DIR/tests/&lt;category&gt;/&lt;test&gt;</code>.
+        </li>
+        <li>
+          <code>RUN</code>: The run stage then invokes the executable in the
+          directory where it is located. By convention, each test puts its
+          output into a file simply called <code>output</code>, which will
+          then be located in
+          <code>BUILD_DIR/tests/&lt;category&gt;/&lt;test&gt;/output</code>.
+          If the run fails (e.g. because the program aborts with an error
+          code) the file <code>output</code> is renamed to
+          <code>failing_output</code>.
+        </li>
+        <li>
+          <code>DIFF</code>: As a last stage the generated output file will
+          be compared to
+          <code>SOURCE_DIR/tests/&lt;category&gt;/&lt;test&gt;[...].output</code>.
+          and stored in
+          <code>BUILD_DIR/tests/&lt;category&gt;/&lt;test&gt;/diff</code>.
+          If the diff fails  the file <code>diff</code> is renamed to
+          <code>failing_diff</code>.
+        </li>
+      </ul>
+    </p>
+
+
+    <a name="restrictbuild"></a>
+    <h3>Restricting tests for build configurations</h3>
+
+    <p>
+      Comparison file can actually be named in a more complex way than
+      just <code>category/test.output</code>:
+      <pre>
+
+    category/test.[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][&lt;debug|release&gt;.]output
+      </pre>
+      Normally, a test will be set up so that it runs twice, once in debug and
+      once in release configuration.
+      If a specific test can only be run in debug or release configurations but
+      not in both it is possible to restrict the setup by prepeding
+      <code>.debug</code> or <code>.release</code> directly before
+      <code>.output</code>, e.g.:
+      <pre>
+
+    category/test.debug.output
+      </pre>
+      This way, the test will only be set up to build and run against the debug
+      library. If a test should run in both configurations but, for some
+      reason, produces different output (e.g., because it triggers an
+      assertion in debug mode), then you can just provide two different output
+      files:
+      <pre>
+
+    category/test.debug.output
+    category/test.release.output
+      </pre>
+    </p>
+
+
+    <a name="restrictfeature"></a>
+    <h3>Restricting tests for feature configurations</h3>
+    <p>
+      In a similar vain as for build configurations, it is possible to restrict
+      tests to specific feature configurations, e.g.:
+      <pre>
+
+    category/test.with_umfpack=on.output, or
+    category/test.with_zlib=off.output
+      </pre>
+      These tests will only be set up if the specified feature was configured.
+      It is possible to provide different output files for disabled/enabled
+      features, e.g.
+      <pre>
+
+    category/test.with_64bit_indices=on.output
+    category/test.with_64bit_indices=off.output
+      </pre>
+      It is also possible to declare multiple constraints subsequently, e.g.
+      <pre>
+
+    category/test.with_umfpack=on.with_zlib=on.output
+      </pre>
+    </p>
+    <p>
+      <b>Note:</b> The tests in some subdirectories of <code>tests/</code> are
+      automatically run only if some feature is enabled. In this case a
+      feature constraint encoded in the output file name is 
+      redundant and should be avoided. In particular, this holds for
+      subdirectories 
+      <code>distributed_grids</code>, <code>lapack</code>,
+      <code>metis</code>, <code>petsc</code>, <code>slepc</code>,
+      <code>trilinos</code>, <code>umfpack</code>, <code>gla</code>, and
+      <code>mpi</code>
+    </p>
+
+
+    <a name="mpi"></a>
+    <h3>Running tests with MPI</h3>
+    <p>
+      If a test should be run with MPI in parallel, the number of MPI
+      processes <code>N</code> with which a program needs to be run for
+      comparison with a given output file is specified as follows:
+      <pre>
+
+    category/test.mpirun=N.output
+      </pre>
+      It is quite typical for an MPI-enabled test to have multiple output
+      files for different numbers of MPI processes.
+    </p>
+
+    <a name="expect"></a>
+    <h3>Changing condition for success</h3>
+    <p>
+      Normally a test is considered to be successful if all test stages
+      could be run and the test reached the <code>PASSED</code> stage (see
+      the <a href="#runoutput">output description</a> section for details).
+      If (for some reason) the test should succeed ending at a specific
+      test stage different than <code>PASSED</code> you can specify it via
+      <code>expect=&lt;stage&gt;</code>, e.g.:
+      <pre>
+
+    category/test.expect=run.output
+      </pre>
+    </p>
+
+
+
+    <a name="layoutaddtests"></a>
     <h3>Adding new tests</h3>
 
     <p>
-    As mentioned above, we add a new test every
-    time we add new functionality to the library or fix a bug. If you
-    want to contribute code to the library, you should do this
-    as well. Here's how: you need a testcase,
-    a subdirectory with the same name as the test, and a file with the
-    expected output.
+      We typically add one or more new tests every
+      time we add new functionality to the library or fix a bug. If you
+      want to contribute code to the library, you should do this
+      as well. Here's how: you need a testcase and a file with the
+      expected output.
     </p>
 
     <h4>The testcase</h4>
     <p>
-    For the testcase, we usually start from a template like this:
+      For the testcase, we usually start from one of the existing tests, copy
+      and modify it to where it does what we'd like to test. Alternatively,
+      you can also start from a template like this:
     <pre>
 
 // ---------------------------------------------------------------------
@@ -380,15 +570,15 @@
 // a short (a few lines) description of what the program does
 
 #include "../tests.h"
-#include <iostream>
-#include <fstream>
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
 
 // all include files you need here
 
 
 int main ()
 {
-  std::ofstream logfile("my_new_test/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
@@ -400,17 +590,14 @@ int main ()
 }
     </pre>
 
-    <p>You open an output file in a directory with the same
-    name as your test, and then write
-    all output you generate to it,
-    through the <code>deallog</code> stream.   The <code>deallog</code>
-    stream works like any
-    other <code>std::ostream</code> except that it does a few more
-    things behind the scenes that are helpful in this context. In
-    above case, we only write a zero to the output
-    file. Most tests actually write computed data to the output file
-    to make sure that whatever we compute is what we got when the
-    test was first written.
+    <p>This code opens an output file <code>output</code> in the current working
+    directory and then writes all output you generate to it, through the
+    <code>deallog</code> stream. The <code>deallog</code> stream works like
+    any other <code>std::ostream</code> except that it does a few more
+    things behind the scenes that are helpful in this context. In above
+    case, we only write a zero to the output file. Most tests of course
+    write computed data to the output file to make sure that whatever we
+    compute is what we got when the test was first written.
     </p>
 
     <p>
@@ -419,180 +606,219 @@ int main ()
     have traditionally been into the <code>base/</code>,
     <code>lac/</code>, <code>deal.II/</code>, <code>fe/</code>,
     <code>hp/</code>, or <code>multigrid/</code> directories, depending on
-    where the classes that are tested are located.
-    </p>
-
-    <p>
-    We have started to create more atomic tests which
-    are usually very small and test only a single aspect of the
-    library, often only a single function. These tests go into the
-    <code>bits/</code> directory and often have names that are
-    composed of the name of the class being tested and a two-digit
-    number, e.g., <code>dof_tools_11</code>. There are
+    where the classes that are tested are located. More atomic tests often go
+    into <code>bits/</code>. There are also
     directories for PETSc and Trilinos wrapper functionality.
     </p>
-
-    <h4>A directory with the same name as the test</h4>
-
-    <p> You have to create a subdirectory
-    with the same name as your test to hold the output from the test.
-
-    <p> One convenient way to create this subdirectory with the correct
-    properties is to use svn copy.
-    <pre>
-
-    svn copy existing_test_directory my_new_test
-    </pre>
-
-    <p>
-    Once you have done this, you can try to run
-    <pre>
-
-      make my_new_test/output
-    </pre>
-    This should compile, link, and run your test. Running your test
-    should generate the desired output file.
-    </p>
-
-
 
     <h4>An expected output</h4>
 
     <p>
-    If you run your new test executable, you will get an output file
-    <code>mytestname/output</code> that should be used to compare all future
-    runs with. If the test
-    is relatively simple, it is often a good idea to look at the
-    output and make sure that the output is actually what you had
-    expected. However, if you do complex operations, this may
-    sometimes be impossible, and in this case we are quite happy with
-    any reasonable output file just to make sure that future
-    invokations of the test yield the same results.
+      In order to run your new test, copy it to an appropriate category and
+      create an empty comparison file for it:
+      <pre>
+
+    category/my_new_test.cc
+    category/my_new_test.output
+      </pre>
+      Now, rerun
+      <pre>
+
+    $ make setup_tests
+      </pre>
+      so that your new test is picked up. After that it is possible to
+      invoke it with
+      <pre>
+
+    $ ctest -V -R "category/my_new_test"
+      </pre>
     </p>
 
     <p>
-    The next step is to copy this output file to the place where the
-    scripts can find it when they compare with newer runs. For this, you first
-    have to understand how correct results are verified. It works in the
-    following way: for each test, we have subdirectories
-    <code>testname/cmp</code> where we store the expected results in a file
-    <code>testname/cmp/generic</code>. If you create a new test, you should
-    therefore create this directory, and copy the output of your program,
-    <code>testname/output</code> to <code>testname/cmp/generic</code>.
+      If you run your new test executable this way, the test should compile
+      and run successfully but fail in the diff stage (because of the empty
+      comparison file). You will get an output file
+      <code>BUILD_DIR/category/my_new_test/output</code>. Take a look at it to
+      make sure that the output is what you had expected. (For complex tests,
+      it may sometimes be impossible to say whether the output is correct, and
+      in this case we sometimes just take it to make
+      sure that future invokations of the test yield the same results.)
     </p>
 
     <p>
-    Why <code>generic</code>? The reason is that sometimes test results
-    differ slightly from platform to platform, for example because numerical
-    roundoff is different due to different floating point implementations on
-    different CPUs. What this means is that sometimes a single stored output is
-    not enough to verify that a test functioned properly: if you happen to be
-    on a platform different from the one on which the generic output was
-    created, your test will always fail even though it produces almost exactly
-    the same output.
+      The next step is to copy and rename this output file to the source
+      directory and replace the original comparison file with it:
+      <pre>
+
+    category/my_new_test.output
+      </pre>
+      At this point running the test again should be successful:
+      <pre>
+
+    $ ctest -V -R "category/my_new_test"
+      </pre>
     </p>
-
-    <p>
-    To avoid this, what the makefiles do is to first check whether an output
-    file is stored for this test and your particular configuration (platform
-    and compiler). If this isn't the case, it goes through a hierarchy of files
-    with related configurations, and only if none of them does it take the
-    generic output file. It then compares the output of your test run with the
-    first file it found in this process. To make things a bit clearer, if you
-    are, for example, on a <code>i686-pc-linux-gnu</code> box and use
-    <code>gcc4.0</code> as your compiler, then the following files will be
-    sought (in this order):
-    <pre>
-
-testname/cmp/i686-pc-linux-gnu+gcc4.0
-testname/cmp/i686-pc-linux-gnu+gcc3.4
-testname/cmp/i686-pc-linux-gnu+gcc3.3
-testname/cmp/generic
-    </pre>
-    (This list is generated by the <code>tests/hierarchy.pl</code> script.)
-    Your output will then be compared with the first one that is actually
-    found. The virtue of this is that we don't have to store the output files
-    from all possible platforms (this would amount to gigabytes of data), but
-    that we only have store an output file for gcc4.0 if it differs from that
-    of gcc3.4, and for gcc3.4 if it differs from gcc3.3. If all of them are the
-    same, we would only have the generic output file.
-    </p>
-
-    <p>
-    Most of the time, you will be able to generate output files only
-    for your own platform and compiler, and that's alright: someone
-    else will create the output files for other platforms
-    eventually. You only have to copy your output file to
-    <code>testname/cmp/generic</code>.
-    </p>
-
-    <p>
-    At this point you can run
-    <pre>
-
-      make my_new_test/OK
-    </pre>
-    which should compare the present output with what you have just
-    copied into the compare directory. This should, of course,
-    succeed, since the two files should be identical.
-    </p>
-
-    <p>
-    On the other hand, if you realize that an existing test fails on your
-    system, but that the differences (as shown when running with
-    <code>verbose=on</code>, see above) are only marginal and around the 6th or
-    8th digit, then you should check in your output file for the platform you
-    work on. For this, you could copy <code>testname/output</code> to
-    <code>testname/cmp/myplatform+compiler</code>, but your life can be easier
-    if you simply type
-    <pre>
-
-      make my_new_test/ref
-    </pre>
-    which takes your output and copies it to the right place automatically.
-    </p>
-
-
 
 
     <h4>Checking in</h4>
 
     <p>
-    Tests are a way to make sure everything keeps working. If they
-    aren't automated, they are no good. We are therefore very
-    interested in getting new tests. If you have subversion write access
-    already, you can add the new test and the expected output
-    file:
-    <pre>
+      Tests are a way to make sure everything keeps working. If they
+      aren't automated, they are no good. We are therefore very
+      interested in getting new tests. If you have subversion write access
+      already, you can add the new test and the expected output
+      file:
+      <pre>
 
-      svn add bits/my_new_test.cc
-      svn add bits/my_new_test
-      svn add bits/my_new_test/cmp
-      svn add bits/my_new_test/cmp/generic
-      svn commit -m "New test" bits/my_new_test*
-    </pre>
-    In addition, you should do the following in order to avoid that the files
-    generated while running the testsuite show up in the output of <code>svn
-    status</code> commands:
-    <pre>
+    svn add category/my_new_test.cc
+    svn add category/my_new_test.output
+    svn commit -m "New test"
+      </pre>
+      If you don't have subversion write access, talk to us in the
+      discussion group; writing testcases is a worthy and laudable task,
+      and we would like to encourage it by giving people the opportunity to
+      contribute!
+    </p>
 
-      svn propset svn:ignore "obj.*
-        exe
-        output
-        status
-        OK" bits/my_new_test
-      svn commit -m "Ignore generated files." bits/my_new_test
-    </pre>
-    Note that the list of files given in quotes to the propset command extends
-    over several lines.
+
+
+    <a name="submit"></a>
+    <h2>Submitting test results</h2>
+
+    <p>
+      To submit test results to our <a
+        href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash</a>
+      instance just invoke ctest within a build directory (or designated
+      build directory) with the <code>-S</code> option pointing to the
+      <code>run_testsuite.cmake</code> script: <pre>
+
+      $ ctest [...] -V -S ../tests/run_testsuite.cmake
+      </pre>
+      The script will run configure, build and ctest and submit the results
+      to the CDash server. It does not matter whether the configure, build
+      or ctest stages were run before that. Also in script mode, you can
+      specify the same options for <code>ctest</code> as explained above.
     </p>
 
     <p>
-    If you don't have subversion write access, talk to us in the discussion group;
-    writing testcases is a worthy and laudable task, and we would
-    like to encourage it by giving people the opportunity to
-    contribute!
+      <b>Note:</b> The default output in script mode is very minimal.
+      Therefore, it is recommended to specify <code>-V</code> which will
+      give the same level of verbosity as the non-script mode.
     </p>
+
+    <p>
+      <b>Note:</b> The following variables can be set to via
+      <pre>
+
+    ctest -D&lt;variable&gt;=&lt;value&gt; [...]
+      </pre>
+      to control the behaviour of the <code>run_testsuite.cmake</code>
+      script:
+      <pre>
+
+    CTEST_SOURCE_DIRECTORY
+      - The source directory of deal.II (usually ending in "[...]/deal.II"
+        (equivalent to https://svn.dealii.org/trunk/deal.II)
+        Note: This is _not_ the test directory ending in "[...]/tests"
+      - If unspecified, "../deal.II" and "../../$ relative to the location
+        of this script is used. If this is not a source directory, an error
+        thrown.
+
+    CTEST_BINARY_DIRECTORY
+      - The designated build directory (already configured, empty, or non
+        existent - see the information about TRACKs what will happen)
+      - If unspecified the current directory is used. If the current
+        directory is equal to CTEST_SOURCE_DIRECTORY or the "tests"
+        directory, an error is thrown.
+
+    CTEST_CMAKE_GENERATOR
+      - The CMake Generator to use (e.g. "Unix Makefiles", or "Ninja", see
+        $ man cmake)
+      - If unspecified the current generator of a configured build directory
+        will be used, otherwise "Unix Makefiles".
+
+    TRACK
+      - The track the test should be submitted to. Defaults to "Experimental".
+        Possible values are:
+
+        "Experimental"     - all tests that are not specifically "build" or
+                             "regression" tests should go into this track
+
+        "Build Tests"      - Build tests that configure and build in a
+                             clean directory and run the build tests
+                             "build_tests/*"
+
+        "Nightly"          - Reserved for nightly regression tests for
+                             build bots on various architectures
+
+        "Regression Tests" - Reserved for the regression tester
+
+    CONFIG_FILE
+      - A configuration file (see docs/development/Config.sample)
+        that will be used during the configuration stage (invokes
+        $ cmake -C ${CONFIG_FILE}). This only has an effect if
+        CTEST_BINARY_DIRECTORY is empty.
+      </pre>
+      Furthermore, the variables described <a href="#setupconfigure">above</a> can also be
+      set and will be handed automatically down to <code>cmake</code>.
+    </p>
+
+
+
+    <a name="build_tests"></a>
+    <h2>Build tests</h2>
+
+    <p>
+      Build tests are used to check that deal.II can be compiled on
+      different systems and with different compilers as well as
+      different configuration options. Results are collected in the "Build
+      Tests" track in <a
+      href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash</a>.<p>
+
+      <p>Running the build test suite is simple and we encourage deal.II
+      users with configurations not found on the <a
+      href="http://www.dealii.org/testsuite.html">test suite page</a> to
+      participate. Assuming you checked out deal.II into the directory
+      <code>deal.II</code>, running it is as simple as:
+      <pre>
+
+    cd deal.II
+    mkdir build
+    cd build
+    ctest -j4 -S ../cmake/scripts/run_buildtest.cmake
+      </pre>
+    </p>
+
+    <p>
+      What this does is to compile and build deal.II in the directory
+      <code>build</code>, try to configure, build (and run a subset) of all
+      tutorial programs supported by the current configuration and send the
+      results to the CDash instance.
+    </p>
+
+    <p>
+      <b>Note:</b> Build tests require the designated build directory to be
+      completely empty and the source directory to be under subversion
+      version control. If you want to specify a build configuration for
+      cmake use a <a href="../users/Config.sample">configuration file</a>
+      to preseed the cache as explained <a href="#submit">above</a>:
+      <pre>
+
+    $ ctest -DCONFIG_FILE="[...]/Config.sample" [...]
+      </pre>
+    </p>
+
+
+
+    <a name="dedicatedbuilds"></a>
+    <h3>Dedicated build tests</h3>
+
+    <p>
+      Build tests work best if they run automatically and periodically.
+      There is a detailed example for such dedicated build tests on the <a
+        href="https://code.google.com/p/dealii/wiki/BuildTests">wiki</a>.
+    </p>
+
 
     <hr />
     <address>

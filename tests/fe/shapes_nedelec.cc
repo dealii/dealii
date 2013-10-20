@@ -41,7 +41,7 @@ void plot_FE_Nedelec_shape_functions()
 int
 main()
 {
-  std::ofstream logfile ("shapes_nedelec/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);

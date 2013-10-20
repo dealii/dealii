@@ -46,7 +46,7 @@ int main ()
   // build up a map of vertex indices
   // of boundary vertices to the new
   // boundary points
-  std::map<types::global_dof_index,Point<dim> > new_points;
+  std::map<unsigned int,Point<dim> > new_points;
 
   // new center and new radius
   // of the inner circle.
@@ -101,7 +101,7 @@ int main ()
   tria.set_boundary(1, inner_ball);
 
   GridOut grid_out;
-  std::ofstream eps_stream2("grid_transform/output");
+  std::ofstream eps_stream2("output");
   grid_out.write_eps(tria, eps_stream2, &mapping);
 
   tria.clear();

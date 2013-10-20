@@ -44,7 +44,7 @@ void test(std::ostream & /*out*/)
     tr.begin(1)->child(c)->set_coarsen_flag();
   tr.execute_coarsening_and_refinement ();
 
-  write_vtk (tr, "2d_coarsening_01", "2");
+  write_vtk(tr, "2");
 }
 
 
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("2d_coarsening_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

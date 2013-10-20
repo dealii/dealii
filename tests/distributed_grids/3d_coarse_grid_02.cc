@@ -35,7 +35,8 @@
 template<int dim>
 void test(const char *filename)
 {
-  deallog.push (filename);
+  const char * p = strrchr(filename,'/');
+  deallog.push (p);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -44,7 +45,7 @@ void test(const char *filename)
   std::ifstream in (filename);
   gi.read_xda (in);
 
-  write_vtk (tr, "3d_coarse_grid_02", "1");
+  write_vtk(tr, "1");
 
   deallog.pop ();
 }
@@ -54,23 +55,23 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("3d_coarse_grid_02/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   deallog.push("3d");
 
-  test<3> ("../deal.II/grid_in_3d/1.in");
-  test<3> ("../deal.II/grid_in_3d/2.in");
-  test<3> ("../deal.II/grid_in_3d/3.in");
-  test<3> ("../deal.II/grid_in_3d/4.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/1.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/2.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/3.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/4.in");
 
-  test<3> ("../deal.II/grid_in_3d/evil_0.in");
-  test<3> ("../deal.II/grid_in_3d/evil_1.in");
-  test<3> ("../deal.II/grid_in_3d/evil_2.in");
-  test<3> ("../deal.II/grid_in_3d/evil_3.in");
-  test<3> ("../deal.II/grid_in_3d/evil_4.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/evil_0.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/evil_1.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/evil_2.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/evil_3.in");
+  test<3> (SOURCE_DIR "/../deal.II/grid_in_3d/evil_4.in");
 
   deallog.pop();
 

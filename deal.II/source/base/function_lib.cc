@@ -2218,13 +2218,13 @@ namespace Functions
     const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
     const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
 
+#ifdef HAVE_JN
     const double dJn = (order==0)
                        ? (-jn(1, r*wave_number))
                        : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));
     Tensor<1,dim> result;
     result[0] = wave_number * co * dJn;
     result[1] = wave_number * si * dJn;
-#ifdef HAVE_JN
     return result;
 #else
     Assert(false, ExcMessage("Bessel function jn was not found by configure"));

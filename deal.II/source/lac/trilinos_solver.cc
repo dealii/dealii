@@ -264,8 +264,8 @@ namespace TrilinosWrappers
     solver_control.check (solver.NumIters(), solver.TrueResidual());
 
     if (solver_control.last_check() != SolverControl::success)
-      throw SolverControl::NoConvergence (solver_control.last_step(),
-                                          solver_control.last_value());
+      AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
+                                                       solver_control.last_value()));
   }
 
 
@@ -458,8 +458,8 @@ namespace TrilinosWrappers
     solver_control.check (0, 0);
 
     if (solver_control.last_check() != SolverControl::success)
-      throw SolverControl::NoConvergence (solver_control.last_step(),
-                                          solver_control.last_value());
+      AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
+                                                       solver_control.last_value()));
   }
 
 
@@ -523,8 +523,8 @@ namespace TrilinosWrappers
     solver_control.check (0, 0);
 
     if (solver_control.last_check() != SolverControl::success)
-      throw SolverControl::NoConvergence (solver_control.last_step(),
-                                          solver_control.last_value());
+      AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
+                                                       solver_control.last_value()));
   }
 
 

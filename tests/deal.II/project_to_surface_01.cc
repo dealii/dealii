@@ -128,7 +128,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile ("project_to_surface_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
   deallog << std::fixed;
   deallog.attach(logfile);

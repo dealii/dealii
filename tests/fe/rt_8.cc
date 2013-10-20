@@ -40,7 +40,7 @@
 #define PRECISION 5
 
 
-std::ofstream logfile ("rt_8/output");
+std::ofstream logfile ("output");
 
 template<int dim>
 void

@@ -37,7 +37,7 @@
 #include <fstream>
 #include <string>
 
-std::ofstream logfile("mapping_q1_eulerian/output");
+std::ofstream logfile("output");
 
 template <int dim, int spacedim>
 void test(std::string filename)
@@ -91,9 +91,9 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  test<1,2>("grids/circle_1.inp");
-  test<2,3>("grids/square.inp");
-  test<2,3>("grids/sphere_1.inp");
+  test<1,2>(SOURCE_DIR "/grids/circle_1.inp");
+  test<2,3>(SOURCE_DIR "/grids/square.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp");
 
   return 0;
 }

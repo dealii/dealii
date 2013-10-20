@@ -68,11 +68,8 @@ class SolverControl : public Subscriptor
 public:
 
   /**
-   * Enum denoting the different
-   * states a solver can be in. See
-   * the general documentation of
-   * this class for more
-   * information.
+   * Enum denoting the different states a solver can be in. See the general
+   * documentation of this class for more information.
    */
   enum State
   {
@@ -84,42 +81,36 @@ public:
     failure
   };
 
+
+
   /**
-   * Class to be thrown upon
-   * failing convergence of an
-   * iterative solver, when either
-   * the number of iterations
-   * exceeds the limit or the
-   * residual fails to reach the
-   * desired limit, e.g. in the
-   * case of a break-down.
+   * Class to be thrown upon failing convergence of an iterative solver,
+   * when either the number of iterations exceeds the limit or the residual
+   * fails to reach the desired limit, e.g. in the case of a break-down.
    *
-   * The residual in the last
-   * iteration, as well as the
-   * iteration number of the last
-   * step are stored in this object
-   * and can be recovered upon
-   * catching an exception of this
-   * class.
+   * The residual in the last iteration, as well as the iteration number of
+   * the last step are stored in this object and can be recovered upon
+   * catching an exception of this class.
    */
-  class NoConvergence : public std::exception
+
+  class NoConvergence : public dealii::ExceptionBase
   {
   public:
-    /**
-     * Constructor.
-     */
     NoConvergence (const unsigned int last_step,
-                   const double       last_residual);
+                   const double       last_residual)
+      : last_step (last_step), last_residual(last_residual)
+    {}
+
+    virtual ~NoConvergence () throw () {}
+
+    virtual void print_info (std::ostream &out) const
+    {
+      out << "Iterative method reported convergence failure in step "
+          << last_step << " with residual " << last_residual << std::endl;
+    }
 
     /**
-     * Standardized output for
-     * catch handlers.
-     */
-    virtual const char *what () const throw ();
-
-    /**
-     * Iteration number of the
-     * last step.
+     * Iteration number of the last step.
      */
     const unsigned int last_step;
 
@@ -130,25 +121,17 @@ public:
   };
 
 
+
   /**
-   * Constructor. The parameters
-   * @p n and @p tol are the
-   * maximum number of iteration
-   * steps before failure and the
-   * tolerance to determine success
+   * Constructor. The parameters @p n and @p tol are the maximum number of
+   * iteration steps before failure and the tolerance to determine success
    * of the iteration.
    *
-   * @p log_history specifies
-   * whether the history (i.e. the
-   * value to be checked and the
-   * number of the iteration step)
-   * shall be printed to
-   * @p deallog stream.  Default
-   * is: do not print. Similarly,
-   * @p log_result specifies the
-   * whether the final result is
-   * logged to @p deallog. Default
-   * is yes.
+   * @p log_history specifies whether the history (i.e. the value to be
+   * checked and the number of the iteration step) shall be printed to @p
+   * deallog stream.  Default is: do not print. Similarly, @p log_result
+   * specifies the whether the final result is logged to @p deallog.
+   * Default is yes.
    */
   SolverControl (const unsigned int n           = 100,
                  const double       tol         = 1.e-10,
@@ -156,9 +139,8 @@ public:
                  const bool         log_result  = true);
 
   /**
-   * Virtual destructor is needed
-   * as there are virtual functions
-   * in this class.
+   * Virtual destructor is needed as there are virtual functions in this
+   * class.
    */
   virtual ~SolverControl();
 
@@ -173,48 +155,26 @@ public:
   void parse_parameters (ParameterHandler &param);
 
   /**
-   * Decide about success or failure
-   * of an iteration.  This function
-   * gets the current iteration step
-   * to determine, whether the
-   * allowed number of steps has
-   * been exceeded and returns
-   * @p failure in this case. If
-   * @p check_value is below the
-   * prescribed tolerance, it
-   * returns @p success. In all
-   * other cases @p iterate is
-   * returned to suggest
-   * continuation of the iterative
-   * procedure.
+   * Decide about success or failure of an iteration.  This function gets
+   * the current iteration step to determine, whether the allowed number of
+   * steps has been exceeded and returns @p failure in this case. If @p
+   * check_value is below the prescribed tolerance, it returns @p success.
+   * In all other cases @p iterate is returned to suggest continuation of
+   * the iterative procedure.
    *
-   * The iteration is also aborted
-   * if the residual becomes a
-   * denormalized value
-   * (@p NaN). Note, however, that
-   * this check is only performed
-   * if the @p isnan function is
-   * provided by the operating
-   * system, which is not always
-   * true. The @p configure
-   * scripts checks for this and
-   * sets the flag @p HAVE_ISNAN
-   * in the file
-   * <tt>Make.global_options</tt> if
-   * this function was found.
+   * The iteration is also aborted if the residual becomes a denormalized
+   * value (@p NaN). Note, however, that this check is only performed if
+   * the @p isnan function is provided by the operating system, which is
+   * not always true. The @p configure scripts checks for this and sets the
+   * flag @p HAVE_ISNAN in the file <tt>Make.global_options</tt> if this
+   * function was found.
    *
-   * <tt>check()</tt> additionally
-   * preserves @p step and
-   * @p check_value. These
-   * values are accessible by
-   * <tt>last_value()</tt> and
+   * <tt>check()</tt> additionally preserves @p step and @p check_value.
+   * These values are accessible by <tt>last_value()</tt> and
    * <tt>last_step()</tt>.
    *
-   * Derived classes may overload
-   * this function, e.g. to log the
-   * convergence indicators
-   * (@p check_value) or to do
-   * other computations.
+   * Derived classes may overload this function, e.g. to log the
+   * convergence indicators (@p check_value) or to do other computations.
    */
   virtual State check (const unsigned int step,
                        const double   check_value);
@@ -225,15 +185,13 @@ public:
   State last_check() const;
 
   /**
-   * Return the initial convergence
-   * criterion.
+   * Return the initial convergence criterion.
    */
   double initial_value() const;
 
   /**
-   * Return the convergence value of last
-   * iteration step for which @p check was
-   * called by the solver.
+   * Return the convergence value of last iteration step for which @p check
+   * was called by the solver.
    */
   double last_value() const;
 
@@ -253,20 +211,15 @@ public:
   unsigned int set_max_steps (const unsigned int);
 
   /**
-   * Enables the failure
-   * check. Solving is stopped with
-   * @p ReturnState @p failure if
-   * <tt>residual>failure_residual</tt> with
+   * Enables the failure check. Solving is stopped with @p ReturnState @p
+   * failure if <tt>residual>failure_residual</tt> with
    * <tt>failure_residual:=rel_failure_residual*first_residual</tt>.
    */
   void set_failure_criterion (const double rel_failure_residual);
 
   /**
-   * Disables failure check and
-   * resets
-   * @p relative_failure_residual
-   * and @p failure_residual to
-   * zero.
+   * Disables failure check and resets @p relative_failure_residual and @p
+   * failure_residual to zero.
    */
   void clear_failure_criterion ();
 
@@ -281,45 +234,34 @@ public:
   double set_tolerance (const double);
 
   /**
-   * Enables writing residuals of
-   * each step into a vector for
-   * later analysis.
+   * Enables writing residuals of each step into a vector for later
+   * analysis.
    */
   void enable_history_data();
 
   /**
-   * Average error reduction over
-   * all steps.
+   * Average error reduction over all steps.
    *
-   * Requires
-   * enable_history_data()
+   * Requires enable_history_data()
    */
   double average_reduction() const;
   /**
-   * Error reduction of the last
-   * step; for stationary
-   * iterations, this approximates
-   * the norm of the iteration
-   * matrix.
+   * Error reduction of the last step; for stationary iterations, this
+   * approximates the norm of the iteration matrix.
    *
-   * Requires
-   * enable_history_data()
+   * Requires enable_history_data()
    */
   double final_reduction() const;
 
   /**
-   * Error reduction of any
-   * iteration step.
+   * Error reduction of any iteration step.
    *
-   * Requires
-   * enable_history_data()
+   * Requires enable_history_data()
    */
   double step_reduction(unsigned int step) const;
 
   /**
-   * Log each iteration step. Use
-   * @p log_frequency for skipping
-   * steps.
+   * Log each iteration step. Use @p log_frequency for skipping steps.
    */
   void log_history (const bool);
 
@@ -344,13 +286,9 @@ public:
   bool log_result () const;
 
   /**
-   * This exception is thrown if a
-   * function operating on the
-   * vector of history data of a
-   * SolverControl object id
-   * called, but storage of history
-   * data was not enabled by
-   * enable_history_data().
+   * This exception is thrown if a function operating on the vector of
+   * history data of a SolverControl object id called, but storage of
+   * history data was not enabled by enable_history_data().
    */
   DeclException0(ExcHistoryDataRequired);
 
@@ -386,33 +324,26 @@ protected:
   unsigned int lstep;
 
   /**
-   * Is set to @p true by
-   * @p set_failure_criterion and
-   * enables failure checking.
+   * Is set to @p true by @p set_failure_criterion and enables failure
+   * checking.
    */
   bool         check_failure;
 
   /**
-   * Stores the
-   * @p rel_failure_residual set by
-   * @p set_failure_criterion
+   * Stores the @p rel_failure_residual set by @p set_failure_criterion
    */
   double       relative_failure_residual;
 
   /**
-   * @p failure_residual equals the
-   * first residual multiplied by
-   * @p relative_crit set by
-   * @p set_failure_criterion (see there).
+   * @p failure_residual equals the first residual multiplied by @p
+   * relative_crit set by @p set_failure_criterion (see there).
    *
-   * Until the first residual is
-   * known it is 0.
+   * Until the first residual is known it is 0.
    */
   double       failure_residual;
 
   /**
-   * Log convergence history to
-   * @p deallog.
+   * Log convergence history to @p deallog.
    */
   bool         m_log_history;
 
@@ -422,29 +353,23 @@ protected:
   unsigned int m_log_frequency;
 
   /**
-   * Log iteration result to
-   * @p deallog.  If true, after
-   * finishing the iteration, a
-   * statement about failure or
-   * success together with @p lstep
+   * Log iteration result to @p deallog.  If true, after finishing the
+   * iteration, a statement about failure or success together with @p lstep
    * and @p lvalue are logged.
    */
   bool         m_log_result;
 
   /**
-   * Control over the storage of
-   * history data. Set by
+   * Control over the storage of history data. Set by
    * enable_history_data().
    */
   bool         history_data_enabled;
 
   /**
-   * Vector storing the result
-   * after each iteration step for
-   * later statistical analysis.
+   * Vector storing the result after each iteration step for later
+   * statistical analysis.
    *
-   * Use of this vector is enabled
-   * by enable_history_data().
+   * Use of this vector is enabled by enable_history_data().
    */
   std::vector<double> history_data;
 };
@@ -468,11 +393,8 @@ class ReductionControl : public SolverControl
 {
 public:
   /**
-   * Constructor.  Provide the
-   * reduction factor in addition
-   * to arguments that have the
-   * same meaning as those of the
-   * constructor of the
+   * Constructor.  Provide the reduction factor in addition to arguments
+   * that have the same meaning as those of the constructor of the
    * SolverControl constructor.
    */
   ReductionControl (const unsigned int maxiter = 100,
@@ -482,27 +404,20 @@ public:
                     const bool     log_result  = true);
 
   /**
-   * Initialize with a
-   * SolverControl object. The
-   * result will emulate
-   * SolverControl by setting
-   * #reduce to zero.
+   * Initialize with a SolverControl object. The result will emulate
+   * SolverControl by setting #reduce to zero.
    */
   ReductionControl (const SolverControl &c);
 
   /**
-   * Assign a SolverControl object
-   * to ReductionControl. The
-   * result of the assignment will
-   * emulate SolverControl by
-   * setting #reduce to zero.
+   * Assign a SolverControl object to ReductionControl. The result of the
+   * assignment will emulate SolverControl by setting #reduce to zero.
    */
   ReductionControl &operator= (const SolverControl &c);
 
   /**
-   * Virtual destructor is needed
-   * as there are virtual functions
-   * in this class.
+   * Virtual destructor is needed as there are virtual functions in this
+   * class.
    */
   virtual ~ReductionControl();
 
@@ -517,12 +432,9 @@ public:
   void parse_parameters (ParameterHandler &param);
 
   /**
-   * Decide about success or failure
-   * of an iteration.  This function
-   * calls the one in the base
-   * class, but sets the tolerance
-   * to <tt>reduction * initial value</tt>
-   * upon the first iteration.
+   * Decide about success or failure of an iteration.  This function calls
+   * the one in the base class, but sets the tolerance to <tt>reduction *
+   * initial value</tt> upon the first iteration.
    */
   virtual State check (const unsigned int step,
                        const double   check_value);
@@ -544,10 +456,8 @@ protected:
   double reduce;
 
   /**
-   * Reduced tolerance. Stop iterations
-   * if either this value is achieved
-   * or if the base class indicates
-   * success.
+   * Reduced tolerance. Stop iterations if either this value is achieved or
+   * if the base class indicates success.
    */
   double reduced_tol;
 };

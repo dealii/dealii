@@ -49,7 +49,7 @@ void check (const number &x)
 
 int main ()
 {
-  std::ofstream logfile("number_traits_real/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

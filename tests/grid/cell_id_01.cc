@@ -54,7 +54,7 @@ int main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
-  initlog(__FILE__);
+  initlog();
   deal_II_exceptions::disable_abort_on_exception();
 
   {

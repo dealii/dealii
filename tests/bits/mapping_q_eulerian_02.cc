@@ -118,7 +118,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("mapping_q_eulerian_02/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog << std::setprecision (4);
   logfile << std::setprecision (4);

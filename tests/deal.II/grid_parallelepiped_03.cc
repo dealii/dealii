@@ -33,7 +33,7 @@
 #include <iomanip>
 
 // Output
-std::ofstream logfile ("grid_parallelepiped_03/output");
+std::ofstream logfile ("output");
 
 // The simplest test case is to create a parallelepiped grid with a
 // number of subdivisions and output the result.

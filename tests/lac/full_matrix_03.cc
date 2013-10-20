@@ -38,7 +38,7 @@ const double entries_Z[9] = { 0,0,0,0,0,0,0,0,0 };
 int
 main ()
 {
-  std::ofstream logfile("full_matrix_03/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(3);
   deallog.attach(logfile);

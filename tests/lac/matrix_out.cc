@@ -25,7 +25,7 @@
 
 int main ()
 {
-  std::ofstream logfile("matrix_out/output");
+  std::ofstream logfile("output");
   logfile << std::fixed;
   logfile << std::setprecision(2);
   deallog << std::fixed;

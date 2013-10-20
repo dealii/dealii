@@ -82,7 +82,7 @@ void check_all(std::ostream &log)
 #endif
 
   char name[100];
-  const char *format = "data_out_base_dx/%d%d%s.dx";
+  const char *format = "%d%d%s.dx";
   DataOutBase::DXFlags flags(false, false, false, false);
   if (dim == 2 && spacedim == 2)
     {
@@ -164,7 +164,7 @@ void check_all(std::ostream &log)
 
 int main()
 {
-  std::ofstream logfile("data_out_base_dx/output");
+  std::ofstream logfile("output");
   check_all<1,1>(logfile);
   check_all<1,2>(logfile);
   check_all<2,2>(logfile);

@@ -115,10 +115,16 @@
  * to allow using the standard library classes instead of the corresponding
  * BOOST classes.
  */
-#cmakedefine DEAL_II_CAN_USE_CXX11
-#ifdef DEAL_II_CAN_USE_CXX11
+#cmakedefine DEAL_II_USE_CXX11
+#ifdef DEAL_II_USE_CXX11
+# define DEAL_II_CAN_USE_CXX11
 # define DEAL_II_CAN_USE_CXX1X
 #endif
+
+/* Defined if C++11 is enabled and the standard library supports
+ * template<typename T> std::is_trivially_copyable<T>
+ */
+#cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
 
 /* Defined if isnan is available */
 #cmakedefine HAVE_ISNAN
@@ -185,7 +191,7 @@
 
 
 /****************************************
- * Configured in check_2_compiler_bugs: *
+ * Configured in check_3_compiler_bugs: *
  ****************************************/
 
 /* Defined if we have to work around a bug with some compilers that will not
@@ -220,6 +226,12 @@
  * involves boost::bind
  */
 #cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
+
+/* Defined if the compiler incorrectly deduces a constexpr as not being a
+ * constant integral expression under certain optimization (notably
+ * gcc-4.8.1 on Windows and Mac)
+ */
+#cmakedefine DEAL_II_CONSTEXPR_BUG
 
 
 /*****************************************

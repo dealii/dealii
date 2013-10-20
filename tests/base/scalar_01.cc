@@ -34,7 +34,7 @@ void compare (const U &u, const V &v)
 
 int main ()
 {
-  std::ofstream logfile("scalar_01/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

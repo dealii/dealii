@@ -29,7 +29,7 @@ using namespace std;
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
 
   mg::SparseMatrixCollection<float> smc;
   smc.resize(0, 5);

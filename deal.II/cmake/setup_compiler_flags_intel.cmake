@@ -108,6 +108,11 @@ IF(DEAL_II_STATIC_EXECUTABLE)
   ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static-intel")
   ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static-gcc")
   ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-pthread")
+ELSE()
+  #
+  # Explicitly link intel support libraries dynamically:
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-shared-intel")
 ENDIF()
 
 
@@ -122,9 +127,7 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   # General optimization flags:
   #
 
-  IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13.0" )
-    ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
-  ELSE()
+  IF(CMAKE_CXX_COMPILER_VERSION MATCHES "^13\\.")
     #
     # Disable aggressive optimization for intel-13* compilers, until we
     # resolve a lot of funny miscompilations...
@@ -132,13 +135,16 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
     # - Maier, 2013
     #
     ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O1")
+  ELSE()
+    ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
   ENDIF()
+
+  # equivalent to -fno-strict-aliasing:
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-ip")
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
-  # equivalent to -fno-strict-aliasing:
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")
 ENDIF()
 
 

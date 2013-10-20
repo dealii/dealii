@@ -316,11 +316,10 @@ EigenPower<VECTOR>::solve (double       &value,
 
   deallog.pop();
 
-  // in case of failure: throw
-  // exception
+  // in case of failure: throw exception
   if (this->control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (this->control().last_step(),
-                                        this->control().last_value());
+    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
+                                                     this->control().last_value()));
   // otherwise exit as normal
 }
 

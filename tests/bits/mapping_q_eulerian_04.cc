@@ -38,7 +38,7 @@
 #include <fstream>
 #include <string>
 
-std::ofstream logfile("mapping_q_eulerian_04/output");
+std::ofstream logfile("output");
 
 template <int dim, int spacedim>
 void test()

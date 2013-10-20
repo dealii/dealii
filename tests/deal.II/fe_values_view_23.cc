@@ -102,7 +102,7 @@ void test_hyper_sphere()
 
 int main()
 {
-  std::ofstream logfile ("fe_values_view_23/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);

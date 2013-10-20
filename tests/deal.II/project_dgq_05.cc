@@ -18,7 +18,7 @@
 
 // check that VectorTools::project works for DGQ elements correctly
 
-char logname[] = "project_dgq_05/output";
+char logname[] = "output";
 
 
 #include "project_common.h"

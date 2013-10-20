@@ -76,7 +76,7 @@ void test_hyper_sphere()
 
 int main()
 {
-  std::ofstream logfile ("normal_flux_03/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
 
   deallog.attach(logfile);

@@ -35,13 +35,11 @@
 #include <iomanip>
 
 
-std::ofstream logfile("face_orientations_3d/output");
+std::ofstream logfile("output");
 
 
 void test (const char *filename)
 {
-  deallog << "Reading " << filename << std::endl;
-
   Triangulation<3> tria;
   GridIn<3> gi;
   gi.attach_triangulation (tria);
@@ -82,12 +80,12 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test ("grid_in_3d/1.in");
-  test ("grid_in_3d/2.in");
-  test ("grid_in_3d/3.in");
-  test ("grid_in_3d/4.in");
+  test (SOURCE_DIR "/grid_in_3d/1.in");
+  test (SOURCE_DIR "/grid_in_3d/2.in");
+  test (SOURCE_DIR "/grid_in_3d/3.in");
+  test (SOURCE_DIR "/grid_in_3d/4.in");
 
-  test ("grid_in_3d/evil_0.in");
-  test ("grid_in_3d/evil_4.in");
+  test (SOURCE_DIR "/grid_in_3d/evil_0.in");
+  test (SOURCE_DIR "/grid_in_3d/evil_4.in");
 }
 

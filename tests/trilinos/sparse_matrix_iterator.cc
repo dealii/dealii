@@ -22,8 +22,7 @@
 
 int main(int argc, char **argv)
 {
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
-  std::ofstream logfile(logname.c_str());
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console (0);
 

@@ -51,7 +51,7 @@ void test(std::ostream & /*out*/)
   GridGenerator::hyper_cube(tr2);
   tr2.refine_global (1);
 
-  assert_tria_equal("2d_refinement_05", tr, tr2);
+  assert_tria_equal(tr, tr2);
 
   while (tr.n_active_cells() < 50000)
     {
@@ -88,7 +88,7 @@ void test(std::ostream & /*out*/)
               << tr2.n_active_cells()
               << std::endl;
 
-      assert_tria_equal("2d_refinement_05", tr, tr2);
+      assert_tria_equal(tr, tr2);
 
     }
 }
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("2d_refinement_05/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

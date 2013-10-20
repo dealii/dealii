@@ -50,7 +50,7 @@
 
 
 
-std::ofstream logfile("gradients_1/output");
+std::ofstream logfile("output");
 
 template <int dim, int spacedim>
 void test(std::string filename, unsigned int degree = 1)
@@ -122,16 +122,16 @@ int main ()
   deallog.threshold_double(1.e-12);
 
   deallog<<"Test <1,2>, Q1, Q2, Q3"<<std::endl;
-  test<1,2>("grids/circle_4.inp",1);
-  test<1,2>("grids/circle_4.inp",2);
-  test<1,2>("grids/circle_4.inp",3);
+  test<1,2>(SOURCE_DIR "/grids/circle_4.inp",1);
+  test<1,2>(SOURCE_DIR "/grids/circle_4.inp",2);
+  test<1,2>(SOURCE_DIR "/grids/circle_4.inp",3);
 
   deallog<<std::endl;
 
   deallog<<"Test <2,3>, Q1, Q2, Q3"<<std::endl;
-  test<2,3>("grids/sphere_1.inp",1);
-  test<2,3>("grids/sphere_1.inp",2);
-  test<2,3>("grids/sphere_1.inp",3);
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp",1);
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp",2);
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp",3);
 
 
   return 0;

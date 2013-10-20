@@ -22,7 +22,7 @@
 //   DoFTools::extract_dofs_with_support_on_boundary
 
 
-std::string output_file_name = "dof_tools_20/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

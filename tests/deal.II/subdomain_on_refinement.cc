@@ -34,7 +34,7 @@
 #include <cmath>
 
 
-std::ofstream logfile("subdomain_on_refinement/output");
+std::ofstream logfile("output");
 
 
 DeclException2 (ExcNumberMismatch,

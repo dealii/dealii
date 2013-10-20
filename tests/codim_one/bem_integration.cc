@@ -56,7 +56,7 @@
 
 using namespace std;
 
-ofstream logfile("bem_integration/output");
+ofstream logfile("output");
 
 
 template <int dim>

@@ -18,7 +18,7 @@
 
 // check that computation of hp constraints works for DGP_Monomial elements correctly
 
-char logname[] = "hp_constraints_dgp_monomial_08/output";
+char logname[] = "output";
 
 
 #include "../hp/hp_constraints_common.h"

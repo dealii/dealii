@@ -186,7 +186,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("complex_block_vector/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(3);
   deallog.attach(logfile);

@@ -2169,11 +2169,15 @@ struct GeometryInfo
    * in the glossary).
    */
   template <int spacedim>
-  static
-  void
+  static void
   alternating_form_at_vertices
-  (const Point<spacedim> (&vertices)[vertices_per_cell],
-   Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell]);
+#ifndef DEAL_II_CONSTEXPR_BUG
+    (const Point<spacedim> (&vertices)[vertices_per_cell],
+     Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell]);
+#else
+    (const Point<spacedim> *vertices,
+     Tensor<spacedim-dim,spacedim> *forms);
+#endif
 
   /**
    * For each face of the reference

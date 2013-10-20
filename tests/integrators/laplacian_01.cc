@@ -19,7 +19,7 @@
 // Output matrices and assert consistency of residuals
 
 #include "../tests.h"
-#include "../lib/test_grids.h"
+#include "../test_grids.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/integrators/laplace.h>
@@ -279,7 +279,7 @@ test(Triangulation<dim> &tr)
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   Triangulation<2> tr2;

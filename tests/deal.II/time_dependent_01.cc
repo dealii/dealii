@@ -27,7 +27,7 @@
 #include <cmath>
 
 
-std::ofstream logfile("time_dependent_01/output");
+std::ofstream logfile("output");
 
 
 std::vector<bool> end_sweep_flags;

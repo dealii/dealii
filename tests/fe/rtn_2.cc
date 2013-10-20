@@ -75,7 +75,7 @@ plot_shape_functions(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("rtn_2/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -23,7 +23,7 @@
 // convergence, which we have to specify in the last argument to the
 // call below
 
-char logname[] = "project_dgp_05/output";
+char logname[] = "output";
 
 
 #include "project_common.h"

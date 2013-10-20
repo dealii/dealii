@@ -37,10 +37,10 @@ void test(std::ostream & /*out*/)
 
   GridIn<dim> gi;
   gi.attach_triangulation (tr);
-  std::ifstream in ("../bits/gerold_1.inp");
+  std::ifstream in (SOURCE_DIR "/../bits/gerold_1.inp");
   gi.read_ucd (in);
 
-  write_vtk (tr, "3d_coarse_grid_03", "1");
+  write_vtk(tr, "1");
 }
 
 
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("3d_coarse_grid_03/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -22,7 +22,7 @@
 #   deal.IIVersionConfig.cmake
 #
 # and copies it (a) to the build directory and (b) prepares it for later
-# installation (the copy in CMAKE_CURRENT_BINARY_DIR).
+# installation.
 #
 
 #
@@ -308,18 +308,23 @@ ENDIF()
 
 #
 # Finally, add a target to create the "binary" file in
-# ${DEAL_II_PROJECT_CONFIG_RELDIR} and add it to the library target:
+# ${DEAL_II_PROJECT_CONFIG_RELDIR} and add it to the "all" target:
 #
 ADD_CUSTOM_TARGET(setup_build_dir ALL
   COMMAND ${CMAKE_COMMAND} -E touch
     ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/binary
   COMMAND ${CMAKE_COMMAND} -E touch
     ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  COMMENT "Update build directory"
   )
-ADD_DEPENDENCIES(library setup_build_dir)
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  ADD_DEPENDENCIES(setup_build_dir ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+ENDFOREACH()
 
 #
 # And a script to remove it upon installation from the install prefix:
+# This is necessary if somebody wants to install into the build directory
+# (yes this is a valid use case...).
 #
 INSTALL(CODE
   "

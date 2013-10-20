@@ -57,7 +57,11 @@ Subscriptor::Subscriptor (const Subscriptor &)
 {}
 
 
+#ifdef DEAL_II_USE_CXX11
+Subscriptor::~Subscriptor () noexcept(false)
+#else
 Subscriptor::~Subscriptor ()
+#endif
 {
   // check whether there are still
   // subscriptions to this object. if

@@ -120,7 +120,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("crash_15/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

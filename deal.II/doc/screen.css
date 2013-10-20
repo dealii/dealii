@@ -118,30 +118,27 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid #aaaaaa;
 }
 
-h1 {
-	font-size: 175%;    
-	counter-reset: section;
-}
+h1 { font-size: 175%;
+     counter-reset: section; }
 
-h2 {
-	font-size: 150%;
-	counter-reset: subsection;
-}
+h2 { font-size: 150%;
+     padding-top: 1.5em;
+     counter-reset: subsection; }
 
 h3 { font-size: 140%;
-     padding-top: 1.5em;
+     padding-top: 0.5em;
      padding-bottom: 0.17em;
      border-bottom: 1px dashed #aaaaaa; }
 
-h4 { font-size: 110%; 
+h4 { font-size: 110%;
      border-bottom: none;
      font-weight: bold;
 }
-h5 { font-size: 100%; 
+h5 { font-size: 100%;
      border-bottom: none;
      font-weight: bold;
 }
-h6 { font-size: 80%;  
+h6 { font-size: 80%;
      border-bottom: none;
      font-weight: bold;
 }

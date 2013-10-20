@@ -64,7 +64,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_line_dof_identities_dgp/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

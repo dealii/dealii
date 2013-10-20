@@ -25,7 +25,7 @@
 #include <deal.II/numerics/data_out_stack.h>
 
 
-std::string output_file_name = "data_out_stack_02/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

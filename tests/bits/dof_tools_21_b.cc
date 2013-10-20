@@ -31,7 +31,7 @@
 #include <utility>
 
 #include <fstream>
-std::ofstream logfile("dof_tools_21_b/output");
+std::ofstream logfile("output");
 
 using namespace dealii;
 

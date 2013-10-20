@@ -41,7 +41,7 @@
 using namespace dealii;
 
 
-std::ofstream logfile("interpolate_boundary_values_1d_closed_ring/output");
+std::ofstream logfile("output");
 
 void test()
 {

@@ -1,0 +1,4 @@
+
+DEAL::GrowingVectorMemory:Overall allocated vectors: 10
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 6
+DEAL::Exception: StandardExceptions::ExcMemoryLeak(current_alloc)

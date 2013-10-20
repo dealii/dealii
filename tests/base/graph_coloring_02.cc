@@ -84,7 +84,7 @@ void check()
 
 int main()
 {
-  std::ofstream logfile("graph_coloring_02/output");
+  std::ofstream logfile("output");
   deallog<<std::setprecision(4);
   deallog<<std::fixed;
   deallog.attach(logfile);

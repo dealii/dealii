@@ -42,7 +42,7 @@
 #include <string>
 
 
-std::ofstream logfile("mean_value/output");
+std::ofstream logfile("output");
 
 
 template <int dim, int spacedim>

@@ -30,7 +30,7 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("tria_iterator_with_one_header/output");
+std::ofstream logfile("output");
 
 
 template <int dim>

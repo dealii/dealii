@@ -24,7 +24,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <fstream>
-std::ofstream logfile("step-10-high-order/output");
+std::ofstream logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>

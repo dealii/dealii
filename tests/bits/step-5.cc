@@ -22,7 +22,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <fstream>
-std::ofstream logfile("step-5/output");
+std::ofstream logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -300,7 +300,8 @@ void LaplaceProblem<dim>::run ()
         {
           GridIn<dim> grid_in;
           grid_in.attach_triangulation (triangulation);
-          std::ifstream input_file("step-5/circle-grid.inp");
+
+          std::ifstream input_file(SOURCE_DIR "/../grid/grids/circle-grid.inp");
           Assert (dim==2, ExcInternalError());
 
           grid_in.read_ucd (input_file);

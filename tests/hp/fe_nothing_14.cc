@@ -135,7 +135,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("fe_nothing_14/output");
+  std::ofstream logfile("output");
   logfile.precision(3);
 
   deallog.attach(logfile);

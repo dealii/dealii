@@ -18,7 +18,7 @@
 
 // check that VectorTools::project works for QHierarchical elements correctly
 
-char logname[] = "project_q_hierarchical_03/output";
+char logname[] = "output";
 
 
 #include "project_common.h"

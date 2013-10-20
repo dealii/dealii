@@ -31,7 +31,7 @@
 // matrix is the unit matrix
 
 
-std::string output_file_name = "fe_tools_cpfqpm_04/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

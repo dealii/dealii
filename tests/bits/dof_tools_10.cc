@@ -25,7 +25,7 @@
 //                   std::vector<Point<dim> > &)
 
 
-std::string output_file_name = "dof_tools_10/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

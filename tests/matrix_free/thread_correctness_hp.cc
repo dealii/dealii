@@ -22,7 +22,7 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("thread_correctness_hp/output");
+std::ofstream logfile("output");
 
 #include "create_mesh.h"
 #include "matrix_vector_common.h"

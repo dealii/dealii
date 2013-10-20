@@ -35,14 +35,12 @@
 #include <fstream>
 #include <iomanip>
 
-std::ofstream logfile("grid_in_3d/output");
+std::ofstream logfile("output");
 
 
 void test (const char *filename)
 {
   const unsigned int dim = 3;
-
-  deallog << "Reading " << filename << std::endl;
 
   Triangulation<3> tria;
   GridIn<3> gi;
@@ -77,7 +75,7 @@ void test1()
   Triangulation<3> tria;
   GridIn<3> gi;
   gi.attach_triangulation (tria);
-  gi.read ("grid_in_3d/1.nc");
+  gi.read ("1.nc");
 
   GridOut grid_out;
   std::ofstream gnufile("square.gnuplot");
@@ -94,16 +92,16 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test ("grid_in_3d/1.in");
-  test ("grid_in_3d/2.in");
-  test ("grid_in_3d/3.in");
-  test ("grid_in_3d/4.in");
+  test (SOURCE_DIR "/grid_in_3d/1.in");
+  test (SOURCE_DIR "/grid_in_3d/2.in");
+  test (SOURCE_DIR "/grid_in_3d/3.in");
+  test (SOURCE_DIR "/grid_in_3d/4.in");
 
-  test ("grid_in_3d/evil_0.in");
-  test ("grid_in_3d/evil_1.in");
-  test ("grid_in_3d/evil_2.in");
-  test ("grid_in_3d/evil_3.in");
-  test ("grid_in_3d/evil_4.in");
+  test (SOURCE_DIR "/grid_in_3d/evil_0.in");
+  test (SOURCE_DIR "/grid_in_3d/evil_1.in");
+  test (SOURCE_DIR "/grid_in_3d/evil_2.in");
+  test (SOURCE_DIR "/grid_in_3d/evil_3.in");
+  test (SOURCE_DIR "/grid_in_3d/evil_4.in");
 
   // test1 needs NetCDF
 //    test1 ();

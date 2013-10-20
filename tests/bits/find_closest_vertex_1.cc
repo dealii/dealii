@@ -46,7 +46,7 @@ void check (Triangulation<3> &tria)
 
 int main ()
 {
-  std::ofstream logfile("find_closest_vertex_1/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -103,7 +103,7 @@ void test_real_to_unit_cell()
 int
 main()
 {
-  std::ofstream logfile ("mapping_real_to_unit_q4_sphere/output");
+  std::ofstream logfile ("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

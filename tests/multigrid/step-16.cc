@@ -600,7 +600,7 @@ void LaplaceProblem<dim>::run ()
 // in step-6:
 int main ()
 {
-  std::ofstream logfile("step-16/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

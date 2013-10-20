@@ -40,7 +40,7 @@
 #include <iomanip>
 #include <string>
 
-std::ofstream logfile("grid_in_02/output");
+std::ofstream logfile("output");
 
 
 template <int dim>
@@ -56,7 +56,7 @@ void test2 ()
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("grid_in_02/2d.xda");
+  std::ifstream in (SOURCE_DIR "/grid_in_02/2d.xda");
   try
     {
       gi.read_xda (in);

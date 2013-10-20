@@ -74,14 +74,14 @@ void check ()
   HelperClass h;
 
   h.declare_parameters (prm);
-  prm.read_input ("multiple_parameter_loop_01/prm");
+  prm.read_input (SOURCE_DIR "/prm/multiple_parameter_loop_01.prm");
   prm.loop (h);
 }
 
 
 int main ()
 {
-  std::ofstream logfile("multiple_parameter_loop_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

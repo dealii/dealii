@@ -57,7 +57,7 @@ void test (Vector<double> &v)
 
 int main ()
 {
-  std::ofstream logfile("vector_21_negative/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

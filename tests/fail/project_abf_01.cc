@@ -18,7 +18,7 @@
 
 // check that VectorTools::project works for ABF elements correctly
 
-char logname[] = "project_abf_01/output";
+char logname[] = "output";
 
 
 #include "../deal.II/project_common.h"

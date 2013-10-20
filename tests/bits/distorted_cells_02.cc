@@ -41,7 +41,8 @@ void check ()
   Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
 
   GridIn<dim> gi;
-  std::ifstream in (dim == 2 ? "distorted_cells_02/2d" : "distorted_cells_02/3d");
+  std::ifstream in (dim == 2 ? SOURCE_DIR "/grids/2d" :
+      SOURCE_DIR "/grids/3d");
 
   gi.attach_triangulation (coarse_grid);
 
@@ -69,7 +70,7 @@ void check ()
 
 int main ()
 {
-  std::ofstream logfile("distorted_cells_02/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

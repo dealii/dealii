@@ -1,0 +1,271 @@
+
+***PointValueHistory status output***
+
+Closed: 1
+Cleared: 0
+Triangulation_changed: 0
+Have_dof_handler: 1
+Geometric Data
+# Requested location: 1.0 0.20
+# DoF_index : Support location (for each component)
+138 : 1.0 0.25
+139 : 1.0 0.25
+181 : 1.0 0.25
+
+
+Independent value(s): 1 : 1
+Mnemonic: data set size (mask size, n true components) : n data sets
+Solution: 3 (3, 3) : 1
+
+***end of status output***
+
+***PointValueHistory status output***
+
+Closed: 1
+Cleared: 0
+Triangulation_changed: 1
+Have_dof_handler: 1
+Geometric Data
+# Requested location: 0.0 0.0
+# DoF_index : Support location (for each component)
+0 : 0.0 0.0
+1 : 0.0 0.0
+162 : 0.0 0.0
+
+# Requested location: 0.25 0.0
+# DoF_index : Support location (for each component)
+8 : 0.25 0.0
+9 : 0.25 0.0
+163 : 0.25 0.0
+
+# Requested location: 0.25 0.45
+# DoF_index : Support location (for each component)
+46 : 0.25 0.50
+47 : 0.25 0.50
+169 : 0.25 0.50
+
+# Requested location: 0.45 0.45
+# DoF_index : Support location (for each component)
+48 : 0.50 0.50
+49 : 0.50 0.50
+170 : 0.50 0.50
+
+# Requested location: 0.80 0.80
+# DoF_index : Support location (for each component)
+96 : 0.75 0.75
+97 : 0.75 0.75
+177 : 0.75 0.75
+
+# Requested location: 1.0 0.20
+# DoF_index : Support location (for each component)
+138 : 1.0 0.25
+139 : 1.0 0.25
+181 : 1.0 0.25
+
+
+Independent value(s): 1 : 10
+Names: <Input>
+Mnemonic: data set size (mask size, n true components) : n data sets
+Post Processed Vector: 18 (3, 3) : 10
+Pressure: 6 (3, 1) : 10
+Req_sol: 6 (3, 1) : 10
+Scalar_out: 6 (4, 1) : 10
+Solution: 18 (3, 3) : 10
+<X velocity> <Y velocity> <Z velocity>
+Vector_out: 18 (4, 3) : 10
+
+***end of status output***
+
+***PointValueHistory status output***
+
+Closed: 1
+Cleared: 0
+Triangulation_changed: 0
+Have_dof_handler: 0
+Geometric Data
+No points stored currently
+
+Independent value(s): 1 : 10
+
+***end of status output***
+
+DEAL::Starting data files
+DEAL::Copying output file node_00.gpl
+DEAL::# Requested location: 0 0
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 0 : 0 0
+DEAL::# 1 : 0 0
+DEAL::# 162 : 0 0
+DEAL::# (Original components and locations, may be invalidated by mesh change.)
+DEAL::# Postprocessor location: 0.0528312 0.0528312 (may be approximate)
+DEAL::#
+DEAL::# <Key> <Input> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Pressure_0> <Req_sol_0> <Scalar_out_0> <X velocity> <Y velocity> <Z velocity> <Vector_out_0> <Vector_out_1> <Vector_out_2>
+DEAL::0 1 3 3 3 1 1 1.73205 1 1 1 0 1.19736e-08 1.19736e-08
+DEAL::1e-06 1 3 3 2.9 0.9 1 1.61377 1 1 0.9 1 1.16159e-08 1
+DEAL::2e-06 1 3 3 2.81 0.81 1 1.50525 1 1 0.81 1.89434 2 3.89434
+DEAL::3e-06 1 3 3 2.729 0.729 1 1.40644 1 1 0.729 2.69139 5.25 7.94139
+DEAL::4e-06 1 3 3 2.6561 0.6561 1 1.31707 1 1 0.6561 3.39968 9.21875 12.6184
+DEAL::5e-06 1 3 3 2.59049 0.59049 1 1.23666 1 1 0.59049 4.0276 13.5352 17.5628
+DEAL::6e-06 1 3 3 2.53144 0.531441 1 1.16468 1 1 0.531441 4.58314 17.9448 22.528
+DEAL::7e-06 1 3 3 2.4783 0.478297 1 1.10053 1 1 0.478297 5.07383 22.2779 27.3517
+DEAL::8e-06 1 3 3 2.43047 0.430467 1 1.04356 1 1 0.430467 5.50663 26.4253 31.9319
+DEAL::9e-06 1 3 3 2.38742 0.38742 1 0.99314 1 1 0.38742 5.88791 30.3212 36.2091
+DEAL::
+DEAL::
+DEAL::Copying output file node_01.gpl
+DEAL::# Requested location: 0.25 0
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 8 : 0.25 0
+DEAL::# 9 : 0.25 0
+DEAL::# 163 : 0.25 0
+DEAL::# (Original components and locations, may be invalidated by mesh change.)
+DEAL::# Postprocessor location: 0.197169 0.0528312 (may be approximate)
+DEAL::#
+DEAL::# <Key> <Input> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Pressure_0> <Req_sol_0> <Scalar_out_0> <X velocity> <Y velocity> <Z velocity> <Vector_out_0> <Vector_out_1> <Vector_out_2>
+DEAL::0 1 3 3 3 1 1 1.73205 1 1 1 0 9.00988e-09 9.00988e-09
+DEAL::1e-06 1 2.75 3 2.9 0.9 1 1.53351 0.75 1 0.9 1 8.79108e-09 1
+DEAL::2e-06 1 2.5625 3 2.81 0.81 1 1.36981 0.5625 1 0.81 1.60566 2 3.60566
+DEAL::3e-06 1 2.42188 3 2.729 0.729 1 1.23359 0.421875 1 0.729 1.93361 5.25 7.18361
+DEAL::4e-06 1 2.31641 3 2.6561 0.6561 1 1.11938 0.316406 1 0.6561 2.06907 9.21875 11.2878
+DEAL::5e-06 1 2.2373 3 2.59049 0.59049 1 1.02303 0.237305 1 0.59049 2.07397 13.5352 15.6091
+DEAL::6e-06 1 2.17798 3 2.53144 0.531441 1 0.941352 0.177979 1 0.531441 1.99303 17.9448 19.9379
+DEAL::7e-06 1 2.13348 3 2.4783 0.478297 1 0.871889 0.133484 1 0.478297 1.8583 22.2779 24.1362
+DEAL::8e-06 1 2.10011 3 2.43047 0.430467 1 0.812685 0.100113 1 0.430467 1.69247 26.4253 28.1178
+DEAL::9e-06 1 2.07508 3 2.38742 0.38742 1 0.762164 0.0750847 1 0.38742 1.51142 30.3212 31.8326
+DEAL::
+DEAL::
+DEAL::Copying output file node_02.gpl
+DEAL::# Requested location: 0.25 0.45
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 46 : 0.25 0.5
+DEAL::# 47 : 0.25 0.5
+DEAL::# 169 : 0.25 0.5
+DEAL::# (Original components and locations, may be invalidated by mesh change.)
+DEAL::# Postprocessor location: 0.197169 0.447169 (may be approximate)
+DEAL::#
+DEAL::# <Key> <Input> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Pressure_0> <Req_sol_0> <Scalar_out_0> <X velocity> <Y velocity> <Z velocity> <Vector_out_0> <Vector_out_1> <Vector_out_2>
+DEAL::0 1 3 3 3 1 1 1.73205 1 1 1 8.88178e-16 4.35771e-09 4.35771e-09
+DEAL::1e-06 1 2.75 2.5 2.9 0.9 0.55 1.32671 0.75 0.5 0.9 1 2.51837e-09 1
+DEAL::2e-06 1 2.5625 2.25 2.81 0.81 0.3025 1.07932 0.5625 0.25 0.81 1.60566 2 3.60566
+DEAL::3e-06 1 2.42188 2.125 2.729 0.729 0.165625 0.90924 0.421875 0.125 0.729 1.93361 3.75 5.68361
+DEAL::4e-06 1 2.31641 2.0625 2.6561 0.6561 0.0896875 0.780577 0.316406 0.0625 0.6561 2.06907 4.71875 6.78782
+DEAL::5e-06 1 2.2373 2.03125 2.59049 0.59049 0.0475586 0.677229 0.237305 0.03125 0.59049 2.07397 4.98047 7.05443
+DEAL::6e-06 1 2.17798 2.01562 2.53144 0.531441 0.0242896 0.591391 0.177979 0.015625 0.531441 1.99303 4.76123 6.75426
+DEAL::7e-06 1 2.13348 2.00781 2.4783 0.478297 0.0115738 0.51879 0.133484 0.0078125 0.478297 1.8583 4.2746 6.13289
+DEAL::8e-06 1 2.10011 2.00391 2.43047 0.430467 0.00476261 0.45676 0.100113 0.00390625 0.430467 1.69247 3.67699 5.36946
+DEAL::9e-06 1 2.07508 2.00195 2.38742 0.38742 0.00124056 0.40346 0.0750847 0.00195312 0.38742 1.51142 3.06777 4.57919
+DEAL::
+DEAL::
+DEAL::Copying output file node_03.gpl
+DEAL::# Requested location: 0.45 0.45
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 48 : 0.5 0.5
+DEAL::# 49 : 0.5 0.5
+DEAL::# 170 : 0.5 0.5
+DEAL::# (Original components and locations, may be invalidated by mesh change.)
+DEAL::# Postprocessor location: 0.447169 0.447169 (may be approximate)
+DEAL::#
+DEAL::# <Key> <Input> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Pressure_0> <Req_sol_0> <Scalar_out_0> <X velocity> <Y velocity> <Z velocity> <Vector_out_0> <Vector_out_1> <Vector_out_2>
+DEAL::0 1 3 3 3 1 1 1.73205 1 1 1 8.88178e-16 4.35771e-09 4.35771e-09
+DEAL::1e-06 1 2.5 2.5 2.9 0.9 0.55 1.19216 0.5 0.5 0.9 1 2.51837e-09 1
+DEAL::2e-06 1 2.25 2.25 2.81 0.81 0.3025 0.918101 0.25 0.25 0.81 1.10566 2 3.10566
+DEAL::3e-06 1 2.125 2.125 2.729 0.729 0.165625 0.766829 0.125 0.125 0.729 0.916867 3.75 4.66687
+DEAL::4e-06 1 2.0625 2.0625 2.6561 0.6561 0.0896875 0.668761 0.0625 0.0625 0.6561 0.675079 4.71875 5.39383
+DEAL::5e-06 1 2.03125 2.03125 2.59049 0.59049 0.0475586 0.594518 0.03125 0.03125 0.59049 0.464784 4.98047 5.44525
+DEAL::6e-06 1 2.01562 2.01562 2.53144 0.531441 0.0242896 0.532629 0.015625 0.015625 0.531441 0.305802 4.76123 5.06703
+DEAL::7e-06 1 2.00781 2.00781 2.4783 0.478297 0.0115738 0.478603 0.0078125 0.0078125 0.478297 0.194193 4.2746 4.46879
+DEAL::8e-06 1 2.00391 2.00391 2.43047 0.430467 0.00476261 0.430527 0.00390625 0.00390625 0.430467 0.119462 3.67699 3.79646
+DEAL::9e-06 1 2.00195 2.00195 2.38742 0.38742 0.00124056 0.387426 0.00195312 0.00195312 0.38742 0.0711287 3.06777 3.1389
+DEAL::
+DEAL::
+DEAL::Copying output file node_04.gpl
+DEAL::# Requested location: 0.8 0.8
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 96 : 0.75 0.75
+DEAL::# 97 : 0.75 0.75
+DEAL::# 177 : 0.75 0.75
+DEAL::# (Original components and locations, may be invalidated by mesh change.)
+DEAL::# Postprocessor location: 0.802831 0.802831 (may be approximate)
+DEAL::#
+DEAL::# <Key> <Input> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Pressure_0> <Req_sol_0> <Scalar_out_0> <X velocity> <Y velocity> <Z velocity> <Vector_out_0> <Vector_out_1> <Vector_out_2>
+DEAL::0 1 3 3 3 1 1 1.73205 1 1 1 0 1.19736e-08 1.19736e-08
+DEAL::1e-06 1 2.25 2.25 2.9 0.9 0.2 0.942205 0.25 0.25 0.9 1 2.64669e-09 1
+DEAL::2e-06 1 2.0625 2.0625 2.81 0.81 0.04 0.811864 0.0625 0.0625 0.81 0.394338 2 2.39434
+DEAL::3e-06 1 2.01562 2.01562 2.729 0.729 0.00875 0.729097 0.015625 0.015625 0.729 0.116627 0.75 0.866627
+DEAL::4e-06 1 2.00391 2.00391 2.6561 0.6561 0.00203125 0.656106 0.00390625 0.00390625 0.6561 0.0314119 0.21875 0.250162
+DEAL::5e-06 1 2.00098 2.00098 2.59049 0.59049 0.000488281 0.59049 0.000976562 0.000976562 0.59049 0.00813489 0.0585937 0.0667286
+DEAL::6e-06 1 2.00024 2.00024 2.53144 0.531441 0.000119629 0.531441 0.000244141 0.000244141 0.531441 0.00206896 0.0151367 0.0172057
+DEAL::7e-06 1 2.00006 2.00006 2.4783 0.478297 2.96021e-05 0.478297 6.10352e-05 6.10352e-05 0.478297 0.000521645 0.00384521 0.00436686
+DEAL::8e-06 1 2.00002 2.00002 2.43047 0.430467 7.36237e-06 0.430467 1.52588e-05 1.52588e-05 0.430467 0.000130962 0.000968933 0.00109989
+DEAL::9e-06 1 2 2 2.38742 0.38742 1.83582e-06 0.38742 3.8147e-06 3.8147e-06 0.38742 3.28093e-05 0.000243187 0.000275996
+DEAL::
+DEAL::
+DEAL::Copying output file node_05.gpl
+DEAL::# Requested location: 1 0.2
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 138 : 1 0.25
+DEAL::# 139 : 1 0.25
+DEAL::# 181 : 1 0.25
+DEAL::# (Original components and locations, may be invalidated by mesh change.)
+DEAL::# Postprocessor location: 0.947169 0.197169 (may be approximate)
+DEAL::#
+DEAL::# <Key> <Input> <Post Processed Vector_0> <Post Processed Vector_1> <Post Processed Vector_2> <Pressure_0> <Req_sol_0> <Scalar_out_0> <X velocity> <Y velocity> <Z velocity> <Vector_out_0> <Vector_out_1> <Vector_out_2>
+DEAL::0 1 3 3 3 1 1 1.73205 1 1 1 8.88178e-16 4.35771e-09 4.35771e-09
+DEAL::1e-06 1 2 2.75 2.9 0.9 0.8 1.2072 0 0.75 0.9 1 3.606e-09 1
+DEAL::2e-06 1 2 2.5625 2.81 0.81 0.64 1.03515 0 0.5625 0.81 0.105662 2 2.10566
+DEAL::3e-06 1 2 2.42188 2.729 0.729 0.51125 0.893546 0 0.421875 0.729 0.00837341 5.25 5.25837
+DEAL::4e-06 1 2 2.31641 2.6561 0.6561 0.407031 0.775187 0 0.316406 0.6561 0.000161921 9.21875 9.21891
+DEAL::5e-06 1 2 2.2373 2.59049 0.59049 0.322168 0.675465 0 0.237305 0.59049 0.00032239 13.5352 13.5355
+DEAL::6e-06 1 2 2.17798 2.53144 0.531441 0.252659 0.590857 0 0.177979 0.531441 0.000115836 17.9448 17.9449
+DEAL::7e-06 1 2 2.13348 2.4783 0.478297 0.195398 0.518648 0 0.133484 0.478297 3.33639e-05 22.2779 22.2779
+DEAL::8e-06 1 2 2.10011 2.43047 0.430467 0.147964 0.456732 0 0.100113 0.430467 8.89157e-06 26.4253 26.4253
+DEAL::9e-06 1 2 2.07508 2.38742 0.38742 0.108462 0.403457 0 0.0750847 0.38742 2.29172e-06 30.3212 30.3212
+DEAL::
+DEAL::
+DEAL::Copying output file node_indep.gpl
+DEAL::# Data independent of mesh location
+DEAL::# <Key> <Input>
+DEAL::0 1
+DEAL::1e-06 1
+DEAL::2e-06 1
+DEAL::3e-06 1
+DEAL::4e-06 1
+DEAL::5e-06 1
+DEAL::6e-06 1
+DEAL::7e-06 1
+DEAL::8e-06 1
+DEAL::9e-06 1
+DEAL::
+DEAL::
+DEAL::Copying output file Test_Copy_00.gpl
+DEAL::# Requested location: 1 0.2
+DEAL::# DoF_index : Support location (for each component)
+DEAL::# 138 : 1 0.25
+DEAL::# 139 : 1 0.25
+DEAL::# 181 : 1 0.25
+DEAL::#
+DEAL::# <Key> <Indep_0> <Solution_0> <Solution_1> <Solution_2>
+DEAL::0.1 1 1 1 1
+DEAL::
+DEAL::
+DEAL::Copying output file Test_Copy_indep.gpl
+DEAL::# Data independent of mesh location
+DEAL::# <Key> <Indep_0>
+DEAL::0.1 1
+DEAL::
+DEAL::
+DEAL::Copying output file no_dof_indep.gpl
+DEAL::# Data independent of mesh location
+DEAL::# <Key> <Indep_0>
+DEAL::0 1
+DEAL::1e-06 1
+DEAL::2e-06 1
+DEAL::3e-06 1
+DEAL::4e-06 1
+DEAL::5e-06 1
+DEAL::6e-06 1
+DEAL::7e-06 1
+DEAL::8e-06 1
+DEAL::9e-06 1
+DEAL::
+DEAL::

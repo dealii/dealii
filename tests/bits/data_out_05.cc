@@ -30,7 +30,7 @@
 #include <deal.II/numerics/data_out.h>
 
 
-std::string output_file_name = "data_out_05/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

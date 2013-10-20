@@ -175,7 +175,7 @@ void test_hyper_cube(const FiniteElement<dim> &fe)
 
 int main()
 {
-  std::ofstream logfile ("project_boundary_rt_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);

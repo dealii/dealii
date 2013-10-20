@@ -112,7 +112,7 @@ void test()
                   << checksum
                   << std::endl;
 
-          std::ofstream file("p4est_3d_ghost_01/1.gpl");
+          std::ofstream file("1.pl");
           GridOut().write_gnuplot (tr, file);
         }
 
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("p4est_3d_ghost_01").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);

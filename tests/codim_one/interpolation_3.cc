@@ -44,7 +44,7 @@
 #include <string>
 
 
-std::ofstream logfile("interpolation_3/output");
+std::ofstream logfile("output");
 
 // Test interpolation on system of finite elements.
 
@@ -93,10 +93,10 @@ int main ()
   deallog.depth_console(0);
 
   deallog << "Test<1,2>" << std::endl;
-  test<1,2>("grids/circle_2.inp");
+  test<1,2>(SOURCE_DIR "/grids/circle_2.inp");
 
   deallog << "Test<1,2>" << std::endl;
-  test<2,3>("grids/sphere_2.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_2.inp");
 
   return 0;
 }

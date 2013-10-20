@@ -25,7 +25,7 @@
 #include <fstream>
 #include <string>
 
-std::ofstream logfile("grid_invert/output");
+std::ofstream logfile("output");
 
 template <int dim>
 void test (bool second_case=false)

@@ -33,7 +33,7 @@ const double compare[9] = { 66,78,90,78,93,108,90,108,126 };
 int
 main ()
 {
-  std::ofstream logfile("full_matrix_08/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(3);
   deallog.attach(logfile);

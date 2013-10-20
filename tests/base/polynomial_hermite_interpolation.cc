@@ -54,7 +54,7 @@ void interpolation_conditions(const std::vector<Polynomial<double> > &polynomial
 
 int main()
 {
-  std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -25,7 +25,7 @@
 #include <deal.II/fe/mapping_q_eulerian.h>
 
 
-std::ofstream logfile("update_mapping_only/output");
+std::ofstream logfile("output");
 
 #include "get_functions_common.h"
 

@@ -52,7 +52,7 @@
 #include <fstream>
 #include <iostream>
 
-std::ofstream logfile("step-3c/output");
+std::ofstream logfile("output");
 
 
 

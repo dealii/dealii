@@ -150,7 +150,7 @@ void check()
 int
 main()
 {
-  std::ofstream logfile ("system_index/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

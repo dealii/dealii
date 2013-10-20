@@ -20,7 +20,7 @@
 // akin to what happens in crash_15. (it turned out to be bogus index
 // computations.)
 
-char logname[] = "crash_16/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

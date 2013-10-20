@@ -22,7 +22,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <fstream>
-std::ofstream logfile("step-10/output");
+std::ofstream logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -221,7 +221,7 @@ void compute_pi_by_perimeter ()
 
 int main ()
 {
-  logfile.precision(2);
+  logfile.precision(6);
 
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -43,7 +43,7 @@ void test(std::ostream &out)
   CylinderBoundary<dim> boundary(.3, 2);
   tr.set_boundary(1, boundary);
   {
-    std::ofstream grid_file("grid_output_input/coarse_grid.inp");
+    std::ofstream grid_file("coarse_grid.inp");
     go.write_ucd(tr, grid_file);
     grid_file.close();
   }
@@ -58,7 +58,7 @@ void test(std::ostream &out)
   gi.attach_triangulation(tr);
   {
     deallog << "Read coarse grid" << std::endl;
-    std::ifstream grid_file("grid_output_input/coarse_grid.inp");
+    std::ifstream grid_file("coarse_grid.inp");
     gi.read_ucd(grid_file);
     grid_file.close();
   }
@@ -69,7 +69,7 @@ void test(std::ostream &out)
   go.write_ucd(tr, out);
 
   {
-    std::ofstream grid_file("grid_output_input/grid.msh");
+    std::ofstream grid_file("grid.msh");
     go.write_msh(tr, grid_file);
     grid_file.close();
   }
@@ -80,7 +80,7 @@ void test(std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("grid_output_input/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

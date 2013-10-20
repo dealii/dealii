@@ -34,7 +34,7 @@
 
 #include "create_mesh.h"
 
-std::ofstream logfile("compress_mapping/output");
+std::ofstream logfile("output");
 
 
 

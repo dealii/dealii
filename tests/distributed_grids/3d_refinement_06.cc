@@ -59,7 +59,7 @@ void test(std::ostream & /*out*/)
       tr.begin(1)->child(c)->set_refine_flag();
     tr.execute_coarsening_and_refinement ();
 
-//    write_vtk (tr, "3d_refinement_06", "1");
+//    write_vtk(tr, "1");
     deallog << "cells test1: " << tr.n_active_cells() << std::endl;
 
     Assert (tr.n_active_cells() == 120, ExcInternalError());
@@ -74,7 +74,7 @@ void test(std::ostream & /*out*/)
       tr.begin(0)->child(c)->set_refine_flag();
     tr.execute_coarsening_and_refinement ();
 
-//    write_vtk (tr, "3d_refinement_06", "2");
+//    write_vtk(tr, "2");
     deallog << "cells test2: " << tr.n_active_cells() << std::endl;
 
     Assert (tr.n_active_cells() == 120, ExcInternalError());
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  std::ofstream logfile("3d_refinement_06/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

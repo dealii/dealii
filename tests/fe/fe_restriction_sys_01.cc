@@ -23,7 +23,7 @@
 int
 main()
 {
-  initlog(__FILE__);
+  initlog();
   deallog.threshold_double(1.e-10);
 
   CHECK_SYS1(FE_Q<2>(1),3,2);

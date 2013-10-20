@@ -88,7 +88,7 @@ void test()
 
 int main()
 {
-  std::ofstream logfile ("recursively_set_material_id/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
 
   deallog.attach(logfile);

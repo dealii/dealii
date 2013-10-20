@@ -24,7 +24,7 @@
 // set of elements
 
 
-std::string output_file_name = "fe_tools_14/output";
+std::string output_file_name = "output";
 
 
 

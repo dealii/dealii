@@ -70,7 +70,7 @@ check_vmult()
 
 int main()
 {
-  std::ofstream logfile("identity_matrix_03/output");
+  std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(0);
   deallog.attach(logfile);

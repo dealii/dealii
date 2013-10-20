@@ -73,6 +73,6 @@ void check(std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("data_out_base_pvtu/output");
+  std::ofstream logfile("output");
   check<2,2>(logfile);
 }

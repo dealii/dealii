@@ -49,7 +49,7 @@ void test(std::ostream & /*out*/)
     tr.begin(1)->child(3)->set_refine_flag();
     tr.execute_coarsening_and_refinement ();
 
-//    write_vtk (tr, "2d_refinement_06", "1");
+//    write_vtk(tr, "1");
     deallog << "cells test1: " << tr.n_active_cells() << std::endl;
   }
   {
@@ -61,7 +61,7 @@ void test(std::ostream & /*out*/)
     tr.begin(0)->child(3)->set_refine_flag();
     tr.execute_coarsening_and_refinement ();
 
-//    write_vtk (tr, "2d_refinement_06", "2");
+//    write_vtk(tr, "2");
     deallog << "cells test2: " << tr.n_active_cells() << std::endl;
 
   }
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("2d_refinement_06/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

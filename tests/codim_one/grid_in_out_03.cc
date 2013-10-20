@@ -29,13 +29,13 @@
 
 #include <string>
 
-std::ofstream logfile("grid_in_out_03/output");
+std::ofstream logfile("output");
 
 template <int dim, int spacedim>
 void test(std::string filename)
 {
   logfile << " Tria<" << dim << "," << spacedim << ">: "
-          << filename << std::endl;
+          << std::endl;
   Triangulation<dim, spacedim> tria;
   GridIn<dim, spacedim> gi;
   gi.attach_triangulation (tria);
@@ -62,8 +62,8 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  test<2,3>("grids/square.inp");
-  test<2,3>("grids/sphere_1.inp");
+  test<2,3>(SOURCE_DIR "/grids/square.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp");
 
   return 0;
 }

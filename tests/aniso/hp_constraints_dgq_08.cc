@@ -18,7 +18,7 @@
 
 // check that computation of hp constraints works for DGQ elements correctly
 
-char logname[] = "hp_constraints_dgq_08/output";
+char logname[] = "output";
 
 
 #include "../hp/hp_constraints_common.h"

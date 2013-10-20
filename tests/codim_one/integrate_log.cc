@@ -45,7 +45,7 @@
 
 #include <math.h>
 
-std::ofstream logfile("integrate_log/output");
+std::ofstream logfile("output");
 
 double test(const unsigned int n,
             const unsigned int exponent,

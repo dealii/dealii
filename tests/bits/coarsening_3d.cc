@@ -20,7 +20,7 @@
 // functions
 
 #include "../tests.h"
-#include "mesh_3d.h"
+#include "../grid/mesh_3d.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
@@ -34,7 +34,7 @@
 
 int main ()
 {
-  std::ofstream logfile("coarsening_3d/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

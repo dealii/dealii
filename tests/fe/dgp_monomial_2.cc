@@ -64,7 +64,7 @@ test(const unsigned int degree1,
 int
 main()
 {
-  std::ofstream logfile ("dgp_monomial_2/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

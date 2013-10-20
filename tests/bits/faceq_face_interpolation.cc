@@ -22,7 +22,7 @@
 //   FE_FaceQ/P::face_interpolation
 
 
-std::string output_file_name = "faceq_face_interpolation/output";
+std::string output_file_name = "output";
 
 
 void

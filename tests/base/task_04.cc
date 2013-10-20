@@ -47,7 +47,7 @@ void test (int i)
 
 int main()
 {
-  std::ofstream logfile("task_04/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -59,4 +59,8 @@ int main()
   t2.join ();
 
   deallog << "OK" << std::endl;
+
+  deallog.detach ();
+  logfile.close ();
+  sort_file_contents ("output");
 }

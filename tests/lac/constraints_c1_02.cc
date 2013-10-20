@@ -80,7 +80,7 @@ int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);

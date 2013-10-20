@@ -38,7 +38,6 @@
 #include <fstream>
 #include <vector>
 
-char logname[] = "work_stream_03/output";
 
 template<int dim>
 double
@@ -164,7 +163,7 @@ do_project()
 
 int main()
 {
-  std::ofstream logfile(logname);
+  std::ofstream logfile("output");
   deallog << std::setprecision(3);
 
   deallog.attach(logfile);

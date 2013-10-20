@@ -40,7 +40,7 @@
 #include <string>
 
 
-std::string output_file_name = "count_dofs_per_block_02/output";
+std::string output_file_name = "output";
 
 
 

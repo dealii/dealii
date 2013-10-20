@@ -52,7 +52,7 @@
 // DoF 4. this was previously missing
 
 
-std::string output_file_name = "dof_tools_18a_1d/output";
+std::string output_file_name = "output";
 
 
 template <int dim>

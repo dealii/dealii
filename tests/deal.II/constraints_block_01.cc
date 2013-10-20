@@ -67,7 +67,7 @@
 #include <cstdlib>
 
 
-std::ofstream logfile("constraints_block_01/output");
+std::ofstream logfile("output");
 
 
 int main ()

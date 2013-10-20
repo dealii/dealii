@@ -25,7 +25,7 @@
 
 int main ()
 {
-  std::ofstream logfile("get_boundary_indicators_1d/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

@@ -69,7 +69,7 @@ int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile ("component_mask_14/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (4);
 
   deallog.attach(logfile);

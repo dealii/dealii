@@ -27,7 +27,7 @@
 #include<deal.II/lac/full_matrix.h>
 #include<deal.II/base/tensor.h>
 
-std::ofstream logfile("tensor_matrix_conversion/output");
+std::ofstream logfile("output");
 
 
 template <typename number>

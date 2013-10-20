@@ -273,7 +273,7 @@ int main (int argc, char **argv)
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("matrix_free_04").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);

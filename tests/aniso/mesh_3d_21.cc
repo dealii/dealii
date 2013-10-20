@@ -20,7 +20,7 @@
 // correct for anisotropic refinement
 
 #include "../tests.h"
-#include "../bits/mesh_3d.h"
+#include "../grid/mesh_3d.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -181,7 +181,7 @@ void check2 (Triangulation<3> &orig_tria)
 
 int main ()
 {
-  std::ofstream logfile("mesh_3d_21/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

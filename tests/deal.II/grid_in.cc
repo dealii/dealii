@@ -32,7 +32,7 @@
 #include <iomanip>
 #include <string>
 
-std::ofstream logfile("grid_in/output");
+std::ofstream logfile("output");
 
 
 template <int dim>
@@ -41,7 +41,7 @@ void test1 ()
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("grid_in/2d.inp");
+  std::ifstream in (SOURCE_DIR "/grid_in/2d.inp");
   gi.read_ucd (in);
 
   GridOut grid_out;
@@ -72,7 +72,7 @@ void test2 ()
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("grid_in/2d.xda");
+  std::ifstream in (SOURCE_DIR "/grid_in/2d.xda");
   try
     {
       gi.read_xda (in);
@@ -103,7 +103,7 @@ void test3 ()
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  gi.read ("grid_in/2d.nc");
+  gi.read (SOURCE_DIR "/grid_in/2d.nc");
 
   GridOut grid_out;
   std::ofstream gnufile("grid_in_2d.gnuplot");
@@ -129,16 +129,15 @@ void check_file (const std::string name,
               << std::endl;
     }
 
-  deallog << name
-          << '\t' << tria.n_vertices()
+  deallog << '\t' << tria.n_vertices()
           << '\t' << tria.n_cells()
           << std::endl;
 }
 
 void filename_resolution()
 {
-  check_file<2> (std::string("grid_in/2d"), GridIn<2>::ucd);
-  check_file<2> (std::string("grid_in/2d"), GridIn<2>::xda);
+  check_file<2> (std::string(SOURCE_DIR "/grid_in/2d"), GridIn<2>::ucd);
+  check_file<2> (std::string(SOURCE_DIR "/grid_in/2d"), GridIn<2>::xda);
 }
 
 

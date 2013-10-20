@@ -60,7 +60,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
   deallog.push("2D");
   test_global_refinement<2>(&test_block_list<2>);
   deallog.pop();

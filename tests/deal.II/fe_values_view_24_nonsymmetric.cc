@@ -64,7 +64,7 @@ void test (const Triangulation<dim> &tr,
   .get_function_divergences (fe_function, divergences);
 
   // now do the same "by hand"
-  std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
   dof.begin_active()->get_dof_indices (local_dof_indices);
 
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -96,7 +96,7 @@ void test_hyper_sphere()
 
 int main()
 {
-  std::ofstream logfile ("fe_values_view_24_nonsymmetric/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);

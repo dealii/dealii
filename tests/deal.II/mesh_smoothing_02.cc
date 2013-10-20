@@ -38,7 +38,7 @@
 // function
 
 
-char logname[] = "mesh_smoothing_02/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

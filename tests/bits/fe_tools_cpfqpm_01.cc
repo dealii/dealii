@@ -30,7 +30,7 @@
 // characteristics
 
 
-std::string output_file_name = "fe_tools_cpfqpm_01/output";
+std::string output_file_name = "output";
 
 
 template <int dim>
@@ -38,6 +38,8 @@ void
 check_this (const FiniteElement<dim> &fe,
             const FiniteElement<dim> &/*fe2*/)
 {
+  deallog << std::setprecision (9);
+
   // only check if both elements have
   // support points. otherwise,
   // interpolation doesn't really

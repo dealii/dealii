@@ -26,7 +26,7 @@
 
 int main ()
 {
-  std::ofstream logfile("parameter_handler_2_read_from_string/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -39,7 +39,7 @@ int main ()
   prm.leave_subsection ();
 
   std::string input;
-  std::ifstream in("parameter_handler_2_read_from_string/prm");
+  std::ifstream in(SOURCE_DIR "/prm/parameter_handler_2_read_from_string.prm");
   while (in)
     {
       std::string s;

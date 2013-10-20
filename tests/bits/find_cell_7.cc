@@ -56,7 +56,7 @@ void check2 ()
   Triangulation<3> tria;
   GridIn<3> gridIn;
   gridIn.attach_triangulation (tria);
-  std::ifstream inputFile("find_cell_7/grid.inp");
+  std::ifstream inputFile(SOURCE_DIR "/grids/grid.inp");
   gridIn.read_ucd (inputFile);
 
   Point<3> p2(304.767,-57.0113,254.766);
@@ -88,7 +88,7 @@ void check2 ()
 
 int main ()
 {
-  std::ofstream logfile("find_cell_7/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

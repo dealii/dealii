@@ -36,7 +36,7 @@
 #include <iomanip>
 #include <string>
 
-std::ofstream logfile("grid_in_unv_3d/output");
+std::ofstream logfile("output");
 
 
 template<int dim>
@@ -47,8 +47,7 @@ void check_file (const std::string name,
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   gi.read(name, format);
-  deallog << name
-          << '\t' << tria.n_vertices()
+  deallog << '\t' << tria.n_vertices()
           << '\t' << tria.n_cells()
           << std::endl;
 
@@ -58,7 +57,7 @@ void check_file (const std::string name,
 
 void filename_resolution()
 {
-  check_file<3> (std::string("grid_in_unv_3d/3D"), GridIn<3>::unv);
+  check_file<3> (std::string(SOURCE_DIR "/grid_in_unv_3d/3D"), GridIn<3>::unv);
 }
 
 

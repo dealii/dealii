@@ -26,7 +26,7 @@
 
 int main ()
 {
-  std::ofstream logfile("parameter_handler_read_xml/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -76,7 +76,7 @@ int main ()
   prm.leave_subsection ();
 
   // read from XML
-  std::ifstream in ("parameter_handler_read_xml/prm");
+  std::ifstream in (SOURCE_DIR "/prm/parameter_handler_read_xml.prm");
   bool result = prm.read_input_from_xml (in);
   Assert (result == true, ExcInternalError());
 

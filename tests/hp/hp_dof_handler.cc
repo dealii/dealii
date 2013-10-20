@@ -33,7 +33,7 @@
 
 int main ()
 {
-  std::ofstream logfile("hp_dof_handler/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

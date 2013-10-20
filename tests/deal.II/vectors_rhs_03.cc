@@ -107,7 +107,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("vectors_rhs_03/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (4);
   deallog << std::fixed;
   deallog.attach(logfile);

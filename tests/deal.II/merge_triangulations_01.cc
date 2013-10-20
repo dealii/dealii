@@ -32,7 +32,7 @@
 #include <iomanip>
 #include <cstdio>
 
-std::ofstream logfile("merge_triangulations_01/output");
+std::ofstream logfile("output");
 
 
 

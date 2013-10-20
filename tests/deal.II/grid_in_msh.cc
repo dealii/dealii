@@ -33,7 +33,7 @@
 #include <iomanip>
 #include <string>
 
-std::ofstream logfile("grid_in_msh/output");
+std::ofstream logfile("output");
 
 
 template<int dim>
@@ -44,8 +44,7 @@ void check_file (const std::string name,
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
   gi.read(name, format);
-  deallog << name
-          << '\t' << tria.n_vertices()
+  deallog << '\t' << tria.n_vertices()
           << '\t' << tria.n_cells()
           << std::endl;
 
@@ -55,7 +54,7 @@ void check_file (const std::string name,
 
 void filename_resolution()
 {
-  check_file<2> (std::string("grid_in_msh/mesh"), GridIn<2>::msh);
+  check_file<2> (std::string(SOURCE_DIR "/grid_in_msh/mesh"), GridIn<2>::msh);
 }
 
 

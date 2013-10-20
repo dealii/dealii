@@ -36,7 +36,7 @@
 
 #include <fstream>
 
-std::ofstream logfile("crash_10/output");
+std::ofstream logfile("output");
 
 
 template <int dim>

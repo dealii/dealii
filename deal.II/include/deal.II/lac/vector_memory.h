@@ -80,7 +80,11 @@ public:
    * as there are virtual functions
    * in this class.
    */
-  virtual ~VectorMemory() {}
+#ifdef DEAL_II_USE_CXX11
+  virtual ~VectorMemory () noexcept(false) {}
+#else
+  virtual ~VectorMemory () {}
+#endif
 
   /**
    * Return a pointer to a new
@@ -283,7 +287,11 @@ public:
    * a warning message, if there
    * are allocated vectors left.
    */
-  ~GrowingVectorMemory();
+#ifdef DEAL_II_USE_CXX11
+  virtual ~GrowingVectorMemory() noexcept(false);
+#else
+  virtual ~GrowingVectorMemory();
+#endif
 
   /**
    * Return a pointer to a new

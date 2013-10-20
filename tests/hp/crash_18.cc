@@ -21,7 +21,7 @@
 // we have dofs that are constrained against itself, and we don't
 // currently detect this...
 
-char logname[] = "crash_18/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

@@ -54,7 +54,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("vertex_as_face_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

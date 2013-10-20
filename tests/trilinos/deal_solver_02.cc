@@ -66,7 +66,7 @@ check_solve( SOLVER &solver, const MATRIX &A,
 
 int main(int argc, char **argv)
 {
-  std::ofstream logfile("deal_solver_02/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog << std::setprecision(4);
   deallog.depth_console(0);
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
 
   {
-    SolverControl control(200, 1.e-10);
+    SolverControl control(200, 1.1.e-10);
 
     const unsigned int size = 32;
     unsigned int dim = (size-1)*(size-1);

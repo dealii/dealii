@@ -52,7 +52,7 @@
 #include <fstream>
 #include <iostream>
 
-std::ofstream logfile("hp_hanging_nodes_02/output");
+std::ofstream logfile("output");
 
 
 template <int dim>

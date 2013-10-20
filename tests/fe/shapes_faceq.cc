@@ -56,7 +56,7 @@ void plot_FE_FaceQ_shape_functions()
 int
 main()
 {
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);

@@ -45,7 +45,7 @@ void test()
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
       GridIn<dim> gi;
       gi.attach_triangulation (tr);
-      std::ifstream in ("../deal.II/grid_in_02/2d.xda");
+      std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_02/2d.xda");
       try
         {
           gi.read_xda (in);
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("p4est_2d_coarse_01").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);

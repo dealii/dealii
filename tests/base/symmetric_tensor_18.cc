@@ -70,7 +70,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("symmetric_tensor_18/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

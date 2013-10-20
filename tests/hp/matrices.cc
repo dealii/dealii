@@ -219,7 +219,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("matrices/output");
+  std::ofstream logfile ("output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);

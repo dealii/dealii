@@ -29,7 +29,7 @@ int main ()
 {
   try
     {
-      std::ofstream logfile("parameter_handler_9/output");
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
@@ -71,7 +71,7 @@ int main ()
       // parameters. take same input file
       // as for parameter_handler_3, but
       // use different output format
-      prm.read_input("parameter_handler_8/prm");
+      prm.read_input(SOURCE_DIR "/prm/parameter_handler_8.prm");
       prm.log_parameters (deallog);
     }
   catch (std::exception &exc)

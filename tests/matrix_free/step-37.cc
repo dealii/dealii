@@ -637,7 +637,7 @@ namespace Step37
 
 int main ()
 {
-  std::ofstream logfile("step-37/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog << std::setprecision (3);
   deallog.threshold_double(1e-10);

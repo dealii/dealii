@@ -48,7 +48,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("fe_collection_01/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);

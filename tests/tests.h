@@ -93,7 +93,7 @@ using namespace dealii;
 // Function for initialize deallog. Normally, it should be called at
 // the beginning of main() like
 //
-// initlog(__FILE__);
+// initlog();
 //
 // This will open the correct output file, divert log output there and
 // switch off screen output. If screen output is desired, provide the
@@ -103,9 +103,9 @@ std::ofstream deallogfile;
 
 inline
 void
-initlog(const char *filename, bool console=false)
+initlog(bool console=false)
 {
-  deallogname = JobIdentifier::base_name(filename) + std::string("/output");
+  deallogname = "output";
   deallogfile.open(deallogname.c_str());
   deallog.attach(deallogfile);
   if (!console)
@@ -116,30 +116,15 @@ initlog(const char *filename, bool console=false)
 }
 
 
-// append the directory name with an output file name that indicates
-// the number of MPI processes
-inline std::string
-output_file_for_mpi (const std::string &directory)
-{
-#ifdef DEAL_II_WITH_MPI
-  return (directory + "/ncpu_" +
-          Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) +
-          "/output");
-#else
-  return (directory + "/ncpu_1/output");
-#endif
-}
-
-
 inline
 void
-mpi_initlog(const char *filename, bool console=false)
+mpi_initlog(bool console=false)
 {
 #ifdef DEAL_II_WITH_MPI
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
     {
-      deallogname = output_file_for_mpi(JobIdentifier::base_name(filename));
+      deallogname = "output";
       deallogfile.open(deallogname.c_str());
       deallog.attach(deallogfile);
       if (!console)
@@ -158,15 +143,13 @@ mpi_initlog(const char *filename, bool console=false)
 
 /* helper class to include the deallogs of all processors
    on proc 0 */
-class MPILogInitAll
+struct MPILogInitAll
 {
-public:
-  MPILogInitAll(const char *filename, bool console=false)
-    : m_filename(filename)
+  MPILogInitAll(bool console=false)
   {
 #ifdef DEAL_II_WITH_MPI
     unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-    deallogname = output_file_for_mpi(JobIdentifier::base_name(filename));
+    deallogname = "output";
     if (myid != 0)
       deallogname = deallogname + Utilities::int_to_string(myid);
     deallogfile.open(deallogname.c_str());
@@ -203,13 +186,12 @@ public:
     check_petsc_allocations();
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
-  
+
     if (myid==0)
       {
         for (unsigned int i=1; i<nproc; ++i)
           {
-            std::string filename = output_file_for_mpi(JobIdentifier::base_name(m_filename.c_str()))
-                                   + Utilities::int_to_string(i);
+            std::string filename = "output" + Utilities::int_to_string(i);
             std::ifstream in(filename.c_str());
             Assert (in, ExcIO());
 
@@ -228,12 +210,37 @@ public:
     Assert (false, ExcInternalError());
 #endif
   }
-private:
-
-  std::string m_filename;
 
 };
 
+
+
+/*
+ * Some tests (notably base/thread*, base/task*) create output that
+ * comes out in random order. To make the output of these tests comparable,
+ * we need to sort them.
+ *
+ * This function does just that with the file given. All streams writing
+ * to this should be closed when calling this function.
+ */
+void sort_file_contents (const std::string &filename)
+{
+  int error = std::system ((std::string ("LC_ALL=C sort ") + filename + " -o " + filename).c_str());
+  Assert (error == 0,
+	  ExcInternalError());
+}
+
+
+/*
+ * Replace all occurences of ' &' by '& ' from the given file to hopefully be more compiler
+ * independent with respect to __PRETTY_FUNCTION__
+ */
+void unify_pretty_function (const std::string &filename)
+{
+  int error = std::system ((std::string ("sed -i -e 's/ \\&/ \\& /g' -e 's/ & ,/\\&,/g' -e 's/ \\& )/\\&)/g' -e 's/ \\& /\\& /g' ") + filename).c_str());
+  Assert (error == 0,
+	  ExcInternalError());
+}
 
 
 
@@ -294,66 +301,6 @@ struct SetGrainSizes
 }
 set_grain_sizes;
 
-
-
-// spawn a thread that terminates the program after a certain time
-// given by the environment variable WALLTIME. this makes
-// sure we don't let jobs that deadlock on some mutex hang around
-// forever. note that this is orthogonal to using "ulimit" in
-// Makefile.rules, which only affects CPU time and consequently works
-// on infinite loops but not deadlocks
-//
-// the actual sleep time isn't all that important. the point is that
-// we need to kill deadlocked threads at one point, whenever that is
-#ifdef DEAL_II_WITH_THREADS
-
-struct DeadlockKiller
-{
-private:
-  static void nuke_it ()
-  {
-    char *env = std::getenv("WALLTIME");
-
-    if (env != 0)
-      {
-        std::istringstream conv (env);
-        int delay;
-        conv >> delay;
-        if (conv)
-          {
-            sleep (delay);
-            std::cerr << "Time's up: Killing job after "
-                      << delay
-                      << " seconds because it overran its allowed walltime."
-                      << std::endl;
-            std::abort ();
-          }
-        else
-          {
-            std::cerr << "Invalid value for WALLTIME environment variable."
-                      << std::endl;
-            std::abort ();
-          }
-      }
-    else
-      // environment variable is not set, so assume infinite wait time
-      // and simply quit this thread
-      {
-      }
-  }
-
-public:
-  DeadlockKiller ()
-  {
-    dealii::Threads::new_thread (&nuke_it);
-  }
-};
-
-#endif
-
 DEAL_II_NAMESPACE_CLOSE
-
-
-
 
 #endif // __tests_tests_h

@@ -52,8 +52,7 @@ void test()
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "hyper_cube" << std::endl;
 
-  std::string filename =
-    (std::string ("p4est_save_03/ncpu_") + Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat");
+  std::string filename = "dat";
   {
     parallel::distributed::Triangulation<dim> tr (MPI_COMM_WORLD);
 
@@ -184,7 +183,7 @@ int main (int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile (output_file_for_mpi ("p4est_save_03").c_str());
+      std::ofstream logfile ("output");
       deallog.attach (logfile);
       deallog.depth_console (0);
       deallog.threshold_double (1.e-10);

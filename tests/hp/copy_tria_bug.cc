@@ -53,7 +53,7 @@ void test1()
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
 
   test1<2>();
   return 0;

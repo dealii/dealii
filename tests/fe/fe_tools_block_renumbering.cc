@@ -93,7 +93,7 @@ void test_renumbering()
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
 //  test_renumbering<1>();
   test_renumbering<2>();
   test_renumbering<3>();

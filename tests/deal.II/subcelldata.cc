@@ -111,7 +111,7 @@ void test()
 
 int main ()
 {
-  std::ofstream logfile("subcelldata/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

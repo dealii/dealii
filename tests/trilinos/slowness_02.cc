@@ -82,7 +82,7 @@ void test ()
 
 int main (int argc,char **argv)
 {
-  std::ofstream logfile("slowness_02/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

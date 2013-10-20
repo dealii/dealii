@@ -29,7 +29,7 @@ int main ()
 {
   try
     {
-      std::ofstream logfile("parameter_handler_6_bool/output");
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
@@ -43,7 +43,7 @@ int main ()
                          "docs 1");
       prm.leave_subsection ();
 
-      prm.read_input("parameter_handler_6_bool/prm");
+      prm.read_input("prm");
 
       // now set the parameter to a different
       // value

@@ -88,18 +88,23 @@ IF(LAPACK_FOUND)
   # Well, in case of static archives we have to manually pick up the
   # complete link interface. *sigh*
   #
-  # Do this unconditionally for the most common case:
-  # TODO: Non-GNU setups...
+  # If CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES is not available, do it
+  # unconditionally for the most common case (gfortran).
   #
   # Switch the library preference back to prefer dynamic libraries if
   # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
   # this case system libraries should be linked dynamically.
   #
+  SET(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
+  SET_IF_EMPTY(_fortran_libs gfortran m quadmath c)
+
   SWITCH_LIBRARY_PREFERENCE()
-  FOREACH(_lib gfortran m quadmath)
+  FOREACH(_lib ${_fortran_libs})
     FIND_LIBRARY(${_lib}_LIBRARY
       NAMES ${_lib}
-      HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
+      HINTS
+        ${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}
+        ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
     MARK_AS_ADVANCED(${_lib}_LIBRARY)
 
     IF(NOT ${_lib}_LIBRARY MATCHES "-NOTFOUND")

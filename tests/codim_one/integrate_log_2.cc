@@ -46,7 +46,7 @@
 
 using namespace std;
 
-std::ofstream logfile("integrate_log_2/output");
+std::ofstream logfile("output");
 
 
 // Returns the following integral: /int_0^1 x^N * ln(|x-point|/alpha) dx

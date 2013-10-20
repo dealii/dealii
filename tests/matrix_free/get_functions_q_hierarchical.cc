@@ -27,7 +27,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/function.h>
 
-std::ofstream logfile("get_functions_q_hierarchical/output");
+std::ofstream logfile("output");
 
 #include "get_functions_common.h"
 

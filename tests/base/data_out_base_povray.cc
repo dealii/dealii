@@ -80,12 +80,12 @@ void check_all(std::ostream &log)
 #endif
 
   char name[100];
-//  const char* format = "data_out_base_povray/%d%d%d%s.pov";
+//  const char* format = "%d%d%d%s.pov";
   DataOutBase::PovrayFlags flags;
 
   if (true)
     {
-      sprintf(name, "data_out_base_povray/cont%d%d%d.pov", dim, 4, 4);
+      sprintf(name, "cont%d%d%d.pov", dim, 4, 4);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else
@@ -99,7 +99,7 @@ void check_all(std::ostream &log)
   flags.external_data = true;
   if (true)
     {
-      sprintf(name, "data_out_base_povray/cont%d%d%dtri.pov", dim, 4, 4);
+      sprintf(name, "cont%d%d%dtri.pov", dim, 4, 4);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else
@@ -113,7 +113,7 @@ void check_all(std::ostream &log)
   flags.smooth = true;
   if (true)
     {
-      sprintf(name, "data_out_base_povray/cont%d%d%dsmooth.pov", dim, 4, 4);
+      sprintf(name, "cont%d%d%dsmooth.pov", dim, 4, 4);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else
@@ -127,7 +127,7 @@ void check_all(std::ostream &log)
   flags.bicubic_patch = true;
   if (true)
     {
-      sprintf(name, "data_out_base_povray/cont%d%d%dbic.pov", dim, 4, 3);
+      sprintf(name, "cont%d%d%dbic.pov", dim, 4, 3);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else
@@ -141,7 +141,7 @@ void check_all(std::ostream &log)
 
 int main()
 {
-  std::ofstream logfile("data_out_base_povray/output");
+  std::ofstream logfile("output");
 //  check_all<1,1>(logfile);
 //  check_all<1,2>(logfile);
   check_all<2,2>(logfile);

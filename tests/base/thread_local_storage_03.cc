@@ -51,7 +51,7 @@ void test ()
   Threads::Thread<int> t;
   t = Threads::new_thread (&X::f, x);
 
-  Assert (t.return_value() == 42,
+  AssertThrow (t.return_value() == 42,
           ExcInternalError());
 }
 
@@ -60,7 +60,7 @@ void test ()
 
 int main()
 {
-  std::ofstream logfile("thread_local_storage_03/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

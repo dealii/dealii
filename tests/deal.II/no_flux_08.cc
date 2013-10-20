@@ -70,7 +70,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("no_flux_08/output");
+  std::ofstream logfile ("output");
   logfile.precision (4);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);

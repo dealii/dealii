@@ -123,6 +123,10 @@ _both(
 #                                ${CMAKE_CXX_COMPILER}
 "
   )
+_detailed(
+"#        CMAKE_GENERATOR:        ${CMAKE_GENERATOR}
+"
+  )
 IF(CMAKE_CROSSCOMPILING)
   _both(
     "#\n#        CROSSCOMPILING!\n"
@@ -200,6 +204,12 @@ FOREACH(_var ${_features})
       #
       IF(DEFINED ${_feature}_VERSION)
         _detailed("#            ${_feature}_VERSION = ${${_feature}_VERSION}\n")
+      ELSEIF(_feature MATCHES "THREADS" AND DEFINED TBB_VERSION)
+        _detailed("#            TBB_VERSION = ${TBB_VERSION}\n")
+      ENDIF()
+
+      IF(_feature MATCHES "MPI" AND DEFINED OMPI_VERSION)
+        _detailed("#            OMPI_VERSION = ${OMPI_VERSION}\n")
       ENDIF()
 
       #
@@ -216,9 +226,9 @@ FOREACH(_var ${_features})
         IF( # MPI:
             _var2 MATCHES "^${_feature}_CXX_(COMPILER|COMPILE_FLAGS|LINK_FLAGS|LIBRARIES|INCLUDE_PATH)$" OR
             # Boost:
-            ( _feature MATCHES "BOOST" AND _var2 MATCHES "^Boost(_LIBRARIES|_INCLUDE_DIRS)$" ) OR
+            ( _feature MATCHES "BOOST" AND _var2 MATCHES "^Boost_(LIBRARIES|INCLUDE_DIRS)$" ) OR
             # TBB:
-            ( _feature MATCHES "THREADS" AND _var2 MATCHES "^TBB(_LIBRARIES|_INCLUDE_DIRS)$" ) OR
+            ( _feature MATCHES "THREADS" AND _var2 MATCHES "^TBB_(LIBRARIES|INCLUDE_DIRS)$" ) OR
             # Generic:
             ( (NOT _var2 MATCHES "^(MPI|Boost)") AND
               _var2 MATCHES "^${_feature}_(INCLUDE_DIRS|LIBRARIES|LINKER_FLAGS)$" )
@@ -258,7 +268,8 @@ FOREACH(_var ${_components})
 ENDFOREACH()
 
 _summary(
-  "#\n#  Detailed information (compiler flags, feature configuration) can be found in detailed.log\n"
+"#\n#  Detailed information (compiler flags, feature configuration) can be found in detailed.log
+#\n#  Run  $ make info  to print a help message with a list of top level targets\n"
   )
 
 _both("#\n###")

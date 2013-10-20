@@ -225,8 +225,8 @@ namespace SLEPcWrappers
 
       // and in case of failure: throw exception
       if (solver_control.last_check () != SolverControl::success)
-        throw SolverControl::NoConvergence (solver_control.last_step (),
-                                            solver_control.last_value ());
+        AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
+                                                         solver_control.last_value()));
     }
   }
 

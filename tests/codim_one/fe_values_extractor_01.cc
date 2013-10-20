@@ -39,7 +39,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/numerics/data_out.h>
 
-std::ofstream logfile("fe_values_extractor_01/output");
+std::ofstream logfile("output");
 
 
 int main ()
@@ -57,7 +57,7 @@ int main ()
 
   GridIn<dim,dim+1> grid_in;
   grid_in.attach_triangulation (triangulation);
-  std::ifstream fname("data_out_02/square.msh");
+  std::ifstream fname(SOURCE_DIR "/grids/square.msh");
   grid_in.read_msh (fname);
 
   dof_handler.distribute_dofs (fe);

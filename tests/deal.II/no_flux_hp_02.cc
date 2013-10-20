@@ -82,7 +82,7 @@ void test_hyper_cube()
 
 int main()
 {
-  std::ofstream logfile ("no_flux_hp_02/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);

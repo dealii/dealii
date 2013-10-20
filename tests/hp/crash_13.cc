@@ -20,7 +20,7 @@
 // can deal with FESystem(FE_Q(p),FE_DGQ(q)) for different p,q. note that for
 // fixed p but varying q, neither of the two elements will dominate the other
 
-char logname[] = "crash_13/output";
+char logname[] = "output";
 
 
 #include "hp_constraints_common.h"

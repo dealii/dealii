@@ -60,7 +60,7 @@ void test()
 
 int main()
 {
-  std::ofstream logfile("solver_02/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -93,7 +93,7 @@ void test(std::ostream & /*out*/)
       tr.execute_coarsening_and_refinement ();
       tr2.execute_coarsening_and_refinement ();
 
-      write_vtk (tr, "3d_refinement_02", "1");
+      write_vtk(tr, "1");
       deallog << std::endl;
 
       deallog << i << " Number of cells: "
@@ -101,7 +101,7 @@ void test(std::ostream & /*out*/)
               << tr2.n_active_cells()
               << std::endl;
 
-      assert_tria_equal("3d_refinement_02", tr, tr2);
+      assert_tria_equal(tr, tr2);
 
     }
 }
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("3d_refinement_02/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

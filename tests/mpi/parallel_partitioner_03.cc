@@ -63,7 +63,7 @@ void test ()
 
   // write the info on ghost processors and import indices to file
   {
-    std::ofstream file((std::string("parallel_partitioner_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
+    std::ofstream file((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
     file << "**** proc " << myid << std::endl;
     file << "ghost targets: ";
     for (unsigned int i=0; i<v.ghost_targets().size(); ++i)
@@ -88,7 +88,7 @@ void test ()
     {
       for (unsigned int i=0; i<numproc; ++i)
         {
-          cat_file((std::string("parallel_partitioner_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
+          cat_file((std::string("dat.") + Utilities::int_to_string(i)).c_str());
         }
 
     }
@@ -106,7 +106,7 @@ int main (int argc, char **argv)
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("parallel_partitioner_03").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);

@@ -94,7 +94,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("vectors_point_source_01/output");
+  std::ofstream logfile ("output");
   logfile.precision (4);
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4) << std::fixed;

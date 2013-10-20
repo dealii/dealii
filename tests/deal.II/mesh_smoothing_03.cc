@@ -26,7 +26,7 @@
 // also investigate all its neighbors as well
 
 
-char logname[] = "mesh_smoothing_03/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

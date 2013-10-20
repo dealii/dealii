@@ -120,7 +120,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("create_mass_matrix_04b/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);

@@ -206,7 +206,7 @@ void loop ()
 
 int main ()
 {
-  std::ofstream logfile ("derivatives/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);

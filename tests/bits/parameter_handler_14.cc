@@ -34,7 +34,7 @@ void check ()
 
   try
     {
-      foo.read_input("parameter_handler_14/tmp.prm");
+      foo.read_input("tmp.prm");
     }
   catch (...)
     {
@@ -47,13 +47,13 @@ void check ()
   foo.leave_subsection();
 
   // delete tmp file again
-  std::remove("parameter_handler_14/tmp.prm");
+  std::remove("tmp.prm");
 }
 
 
 int main ()
 {
-  std::ofstream logfile("parameter_handler_14/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

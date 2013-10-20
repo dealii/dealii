@@ -209,7 +209,7 @@ test(const FiniteElement<dim> &fe)
   if (numprocs==1) // renumber DoFs
     {
       std::map<std::string,std::vector<types::global_dof_index> > dofmap;
-      std::ifstream f("mesh_worker_matrix_01/ordering.2");
+      std::ifstream f(SOURCE_DIR "/mesh_worker_matrix_01/ordering.2");
       while (!f.eof())
         {
           CellId id;
@@ -281,7 +281,7 @@ test(const FiniteElement<dim> &fe)
 int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
-  MPILogInitAll i(__FILE__);
+  MPILogInitAll log;
 
   FE_DGP<2> p0(0);
   FE_Q<2>   q1(1);

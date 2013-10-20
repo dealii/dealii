@@ -111,7 +111,7 @@ void test ()
 
 int main (int argc,char **argv)
 {
-  std::ofstream logfile("slowness_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

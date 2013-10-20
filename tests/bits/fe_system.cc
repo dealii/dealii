@@ -44,11 +44,6 @@
 template<int dim>
 void test()
 {
-#ifdef DEAL_II_WITH_THREADS
-
-  DeadlockKiller killer;
-#endif
-
   // 0 components is not okay
   FESystem<dim> fe(FE_Q<dim>(1), 1, FE_Q<dim>(2), 0);
   Triangulation<dim> tria;
@@ -82,7 +77,7 @@ void test()
 int
 main()
 {
-  std::ofstream logfile ("fe_system/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

@@ -50,7 +50,7 @@ void check (Triangulation<3> &tria)
 
 int main ()
 {
-  std::ofstream logfile("find_cells_adjacent_to_vertex_5/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

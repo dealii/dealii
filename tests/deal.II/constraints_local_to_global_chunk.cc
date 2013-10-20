@@ -44,7 +44,7 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("constraints_local_to_global_chunk/output");
+std::ofstream logfile("output");
 
 template <int dim>
 void test (unsigned int chunk_size)

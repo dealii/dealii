@@ -129,7 +129,7 @@ void transfer(std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("solution_transfer/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision (4);
   logfile << std::setprecision (4);
   deallog.attach(logfile);

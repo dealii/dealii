@@ -42,7 +42,7 @@
 
 
 
-std::ofstream logfile("intergrid_constraints/output");
+std::ofstream logfile("output");
 
 
 template <int dim>

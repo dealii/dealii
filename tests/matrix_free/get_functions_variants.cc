@@ -41,7 +41,7 @@
 #include <fstream>
 #include <iostream>
 
-std::ofstream logfile("get_functions_variants/output");
+std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>

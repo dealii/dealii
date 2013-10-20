@@ -19,7 +19,7 @@
 // like all the hp_constraint_*_03 tests that produced a crash at one point,
 // except that we don't refine the mesh that much
 
-char logname[] = "crash_06/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

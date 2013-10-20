@@ -70,7 +70,7 @@ void check_all(std::ostream &log)
 
   if (true)
     {
-      sprintf(name, "data_out_base_vtu_cycle/%d%d.vtu", dim, spacedim);
+      sprintf(name, "%d%d.vtu", dim, spacedim);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else
@@ -84,7 +84,7 @@ void check_all(std::ostream &log)
 
 int main()
 {
-  std::ofstream logfile("data_out_base_vtu_cycle/output");
+  std::ofstream logfile("output");
   check_all<1,1>(logfile);
   check_all<1,2>(logfile);
   check_all<2,2>(logfile);

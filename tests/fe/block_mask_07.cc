@@ -76,7 +76,7 @@ int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile ("block_mask_07/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (4);
 
   deallog.attach(logfile);

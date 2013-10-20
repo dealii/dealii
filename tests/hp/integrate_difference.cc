@@ -101,7 +101,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("integrate_difference/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
   deallog << std::setprecision(2);
 

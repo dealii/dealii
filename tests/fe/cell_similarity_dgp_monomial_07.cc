@@ -166,7 +166,7 @@ void test()
 
 int main()
 {
-  std::ofstream logfile ("cell_similarity_dgp_monomial_07/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (4);
 
   deallog.attach(logfile);

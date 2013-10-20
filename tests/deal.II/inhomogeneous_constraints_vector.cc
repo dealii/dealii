@@ -50,7 +50,7 @@
 #include <fstream>
 #include <sstream>
 
-std::ofstream logfile("inhomogeneous_constraints_vector/output");
+std::ofstream logfile("output");
 
 using namespace dealii;
 

@@ -34,7 +34,7 @@
 #include <iomanip>
 
 // Output
-std::ofstream logfile ("grid_parallelepiped_02/output");
+std::ofstream logfile ("output");
 
 // This test creates a parallelepiped (one element) and the same
 // parallelepiped (one element); because the code that makes the two

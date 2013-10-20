@@ -108,7 +108,7 @@ void test()
 
 int main()
 {
-  std::ofstream logfile ("extent_in_direction/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (PRECISION);
   deallog.attach(logfile);
   deallog.depth_console(0);

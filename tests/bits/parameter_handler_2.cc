@@ -27,7 +27,7 @@
 
 int main ()
 {
-  std::ofstream logfile("parameter_handler_2/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -39,7 +39,7 @@ int main ()
                      Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")));
   prm.leave_subsection ();
 
-  prm.read_input("parameter_handler_2/prm");
+  prm.read_input(SOURCE_DIR "/prm/parameter_handler_2.prm");
 
   std::string list;
   prm.enter_subsection ("Testing");

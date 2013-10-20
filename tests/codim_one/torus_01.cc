@@ -32,7 +32,7 @@
 #include <fstream>
 #include <string>
 
-std::ofstream logfile("torus_01/output");
+std::ofstream logfile("output");
 
 
 int main ()

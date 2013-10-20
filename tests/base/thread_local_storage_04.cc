@@ -54,17 +54,17 @@ void test ()
   {
     Threads::Thread<int> t;
     t = Threads::new_thread (&X::f, x);
-    Assert (t.return_value() == 10,
+    AssertThrow (t.return_value() == 10,
             ExcInternalError());
   }
   {
     Threads::Thread<int> t;
     t = Threads::new_thread (&X::f, x);
-    Assert (t.return_value() == 11,
+    AssertThrow (t.return_value() == 11,
             ExcInternalError());
   }
 
-  Assert (counter == 12, ExcInternalError());
+  AssertThrow (counter == 12, ExcInternalError());
 }
 
 
@@ -72,7 +72,7 @@ void test ()
 
 int main()
 {
-  std::ofstream logfile("thread_local_storage_04/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

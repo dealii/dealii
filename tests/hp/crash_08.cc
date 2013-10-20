@@ -20,7 +20,7 @@
 // constraint between degrees of freedom 3->14->17->6->3 with the algorithm
 // that is presently in make_hanging_node_constraints
 
-char logname[] = "crash_08/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

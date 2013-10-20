@@ -23,7 +23,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <fstream>
-std::ofstream logfile("step-11/output");
+std::ofstream logfile("output");
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>

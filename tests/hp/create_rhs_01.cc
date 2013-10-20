@@ -116,7 +116,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("create_rhs_01/output");
+  std::ofstream logfile("output");
   logfile.precision(2);
   deallog << std::setprecision(2);
 

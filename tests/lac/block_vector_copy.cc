@@ -66,7 +66,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("block_vector_copy/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(3);
   deallog.attach(logfile);

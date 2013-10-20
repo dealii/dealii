@@ -1,8 +1,8 @@
 ##                                                                       ##
-#                       Example configuration file                        #
+#                      Example configuration file                         #
 #                                                                         #
-#     See doc/readme.html and doc/development/cmake.html for further      #
-#     details on how to use the cmake build system of deal.II.            #
+#        See doc/readme.html and doc/users/cmake.html for further         #
+#        details on how to use the cmake build system of deal.II.         #
 ##                                                                       ##
 
 
@@ -73,6 +73,10 @@
 #
 # SET(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS ON CACHE BOOL
 #   "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
+#   )
+#
+# SET(DEAL_II_SETUP_COVERAGE OFF CACHE BOOL
+#   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
 #   )
 #
 # SET(CMAKE_CXX_COMPILER "" CACHE STRING
@@ -334,6 +338,9 @@
 # SET(MPI_CXX_INCLUDE_PATH "include directory for mpi" CACHE STRING "")
 # SET(MPI_CXX_COMPILE_FLAGS "..." CACHE STRING "")
 # SET(MPI_CXX_LINK_FLAGS "..." CACHE STRING "")
+# SET(MPI_VERSION "x.y" CACHE STRING "")
+# SET(MPI_VERSION_MAJOR "x" CACHE STRING "")
+# SET(MPI_VERSION_MINOR "y" CACHE STRING "")
 #
 # Additionally:
 #
@@ -362,6 +369,10 @@
 # SET(MUMPS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(MUMPS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
 # SET(MUMPS_LINKER_FLAGS "..." CACHE STRING "")
+# SET(MUMPS_VERSION "x.y.z" CACHE STRING "")
+# SET(MUMPS_VERSION_MAJOR "x" CACHE STRING "")
+# SET(MUMPS_VERSION_MINOR "y" CACHE STRING "")
+# SET(MUMPS_VERSION_SUBMINOR "z" CACHE STRING "")
 #
 
 
@@ -430,11 +441,11 @@
 # SET(PETSC_FOUND TRUE CACHE BOOL "")
 # SET(PETSC_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(PETSC_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(PETSC_VERSION "x.y.z." CACHE STRING "")
+# SET(PETSC_VERSION "x.y.z.p" CACHE STRING "")
 # SET(PETSC_VERSION_MAJOR "x" CACHE STRING "")
 # SET(PETSC_VERSION_MINOR "y" CACHE STRING "")
 # SET(PETSC_VERSION_SUBMINOR "z" CACHE STRING "")
-# SET(PETSC_VERSION_PATCH "" CACHE STRING "")
+# SET(PETSC_VERSION_PATCH "p" CACHE STRING "")
 # SET(PETSC_WITH_MPI_UNI FALSE CACHE BOOL "")
 #
 
@@ -456,11 +467,11 @@
 # SET(SLEPC_FOUND TRUE CACHE BOOL "")
 # SET(SLEPC_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(SLEPC_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(SLEPC_VERSION "x.y.z." CACHE STRING "")
+# SET(SLEPC_VERSION "x.y.z.p" CACHE STRING "")
 # SET(SLEPC_VERSION_MAJOR "x" CACHE STRING "")
 # SET(SLEPC_VERSION_MINOR "y" CACHE STRING "")
 # SET(SLEPC_VERSION_SUBMINOR "z" CACHE STRING "")
-# SET(SLEPC_VERSION_PATCH "" CACHE STRING "")
+# SET(SLEPC_VERSION_PATCH "p" CACHE STRING "")
 # SET(SLEPC_WITH_MPI_UNI FALSE CACHE BOOL "")
 #
 
@@ -487,6 +498,9 @@
 # SET(TBB_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(TBB_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
 # SET(TBB_WITH_DEBUGLIB TRUE CACHE BOOL "")
+# SET(TBB_VERSION "x.y" CACHE STRING "")
+# SET(TBB_VERSION_MAJOR "x" CACHE STRING "")
+# SET(TBB_VERSION_MINOR "y" CACHE STRING "")
 #
 
 
@@ -507,6 +521,7 @@
 # SET(TRILINOS_FOUND TRUE CACHE BOOL "")
 # SET(TRILINOS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(TRILINOS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
+# SET(TRILINOS_VERSION "x.y.z" CACHE STRING "")
 # SET(TRILINOS_VERSION_MAJOR "x" CACHE STRING "")
 # SET(TRILINOS_VERSION_MINOR "y" CACHE STRING "")
 # SET(TRILINOS_VERSION_SUBMINOR "z" CACHE STRING "")
@@ -537,6 +552,10 @@
 # SET(UMFPACK_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(UMFPACK_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
 # SET(UMFPACK_LINKER_FLAGS "..." CACHE STRING "")
+# SET(UMFPACK_VERSION "x.y.z" CACHE STRING "")
+# SET(UMFPACK_VERSION_MAJOR "x" CACHE STRING "")
+# SET(UMFPACK_VERSION_MINOR "y" CACHE STRING "")
+# SET(UMFPACK_VERSION_SUBMINOR "z" CACHE STRING "")
 #
 
 
@@ -597,7 +616,7 @@
 
 
 #
-# Obnoxiously adavanced configuration about paths, install locations and
+# Obnoxiously advanced configuration about paths, install locations and
 # names:
 #
 # SET(DEAL_II_PACKAGE_NAME "deal.II" CACHE STRING

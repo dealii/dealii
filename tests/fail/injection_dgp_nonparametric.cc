@@ -16,7 +16,7 @@
 
 
 
-char logname[] = "injection_dgp_nonparametric/output";
+char logname[] = "output";
 
 
 #include "../fe/injection_common.h"

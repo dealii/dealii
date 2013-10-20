@@ -15,7 +15,7 @@ For the impatient:
   $ make install    (alternatively $ make -j<N> install)
 
   A detailed ReadME can be found at ./doc/readme.html and
-  ./doc/development/cmake.html or at http://www.dealii.org/.
+  ./doc/users/cmake.html or at http://www.dealii.org/.
 
 Getting started:
 
@@ -29,5 +29,5 @@ License:
 
 Further information:
 
-  For further information have a look at ./doc/readme.html or at
+  For further information have a look at ./doc/index.html or at
   http://www.dealii.org.

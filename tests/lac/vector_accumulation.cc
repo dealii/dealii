@@ -51,7 +51,7 @@ void check_norms ()
 
 int main()
 {
-  std::ofstream logfile("vector_accumulation/output");
+  std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);

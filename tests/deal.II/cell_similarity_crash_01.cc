@@ -71,7 +71,7 @@ void test()
 
 int main()
 {
-  initlog(__FILE__);
+  initlog();
   deallog << std::setprecision (4);
   deallog.threshold_double(1.e-7);
 

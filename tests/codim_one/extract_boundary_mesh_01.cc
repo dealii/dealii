@@ -95,7 +95,7 @@ void save_mesh(const Triangulation<dim,spacedim> &tria)
 int main ()
 {
 
-  ofstream logfile("extract_boundary_mesh_01/output");
+  ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
@@ -119,8 +119,8 @@ int main ()
     surface_to_volume_mapping
       = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
 
-    Assert (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping,2),
-            ExcInternalError());
+    if (!test_vertices_orientation(boundary_mesh, surface_to_volume_mapping,2))
+      Assert (false, ExcInternalError());
     save_mesh(boundary_mesh);
   }
 

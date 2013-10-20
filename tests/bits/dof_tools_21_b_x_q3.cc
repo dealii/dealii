@@ -78,7 +78,7 @@
 #include <utility>
 
 #include <fstream>
-std::ofstream logfile("dof_tools_21_b_x_q3/output");
+std::ofstream logfile("output");
 
 using namespace dealii;
 

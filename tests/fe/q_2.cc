@@ -62,7 +62,7 @@ test(const FE_Q<dim> &fe_q)
 int
 main()
 {
-  std::ofstream logfile ("q_2/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);

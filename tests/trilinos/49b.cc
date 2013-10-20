@@ -65,7 +65,7 @@ void test (TrilinosWrappers::MPI::BlockVector &v)
 
 int main (int argc,char **argv)
 {
-  std::ofstream logfile("49b/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

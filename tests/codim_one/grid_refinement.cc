@@ -32,7 +32,7 @@
 #include <fstream>
 #include <string>
 
-std::ofstream logfile("grid_refinement/output");
+std::ofstream logfile("output");
 
 template <int dim, int spacedim>
 void test(std::string filename)
@@ -60,10 +60,10 @@ int main ()
   deallog.depth_console(0);
 
   deallog << "Test<1,2>" << std::endl;
-  test<1,2>("grids/circle_1.inp");
+  test<1,2>(SOURCE_DIR "/grids/circle_1.inp");
 
   deallog << std::endl << "Test<1,2>" << std::endl;
-  test<2,3>("grids/sphere_1.inp");
+  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp");
 
   return 0;
 }

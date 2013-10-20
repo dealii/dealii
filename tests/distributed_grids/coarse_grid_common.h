@@ -28,14 +28,12 @@
 
 template <int dim>
 void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
-                const char                                *dirname,
                 const char                                *filename)
 {
   deallog << "Checksum: "
           << tria.get_checksum ()
           << std::endl;
 
-  chdir (dirname);
   tria.write_mesh_vtk (filename);
 
   // copy the .pvtu and .vtu files
@@ -59,19 +57,17 @@ void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
         deallog.get_file_stream() << s << "\n";
       }
   }
-
-  chdir ("..");
 }
 
 
 template <int dim>
-void assert_tria_equal(const char *testdir, const Triangulation<dim> &a, const Triangulation<dim> &b)
+void assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
 {
   Assert (a.n_active_cells() == b.n_active_cells(),
           ExcInternalError());
 
-  std::string file1=std::string(testdir)+"/tmp_grid1";
-  std::string file2=std::string(testdir)+"/tmp_grid2";
+  std::string file1 = "tmp_grid1";
+  std::string file2 = "tmp_grid2";
 
   std::ofstream out1(file1.c_str());
   GridOut().write_gnuplot (a, out1);

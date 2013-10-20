@@ -32,7 +32,7 @@ int main (int argc,char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
-  std::ofstream logfile("sparse_matrix_07/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

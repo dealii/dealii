@@ -22,7 +22,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <fstream>
-std::ofstream logfile("step-4/output");
+std::ofstream logfile("output");
 
 
 #include <deal.II/grid/tria.h>

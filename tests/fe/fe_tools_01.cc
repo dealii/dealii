@@ -46,7 +46,7 @@ void test_fe(const char *name)
 int
 main()
 {
-  std::ofstream logfile("fe_tools_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

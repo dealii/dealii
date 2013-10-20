@@ -175,7 +175,7 @@ check ()
 
 int main ()
 {
-  initlog(__FILE__);
+  initlog();
   deallog << std::setprecision (2);
   deallog << std::fixed;
 

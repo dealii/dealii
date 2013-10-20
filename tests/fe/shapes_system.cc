@@ -84,7 +84,7 @@ void plot_FE_System_shape_functions()
 int
 main()
 {
-  std::ofstream logfile ("shapes_system/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);

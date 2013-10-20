@@ -116,7 +116,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("dof_renumbering_03/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);

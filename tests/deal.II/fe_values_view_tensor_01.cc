@@ -105,7 +105,7 @@ void MixedElastoPlasticity<dim>::make_grid_and_dofs()
   DoFRenumbering::component_wise(dof_handler);
 
   // total number of dof per block component
-  std::vector<unsigned int> dofs_per_block(2);
+  std::vector<types::global_dof_index> dofs_per_block(2);
   DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
 
   const unsigned int n_stress_dof = dofs_per_block[0];
@@ -232,7 +232,7 @@ void check()
 
 int main()
 {
-  std::ofstream logfile ("fe_values_view_tensor_01/output");
+  std::ofstream logfile ("output");
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);

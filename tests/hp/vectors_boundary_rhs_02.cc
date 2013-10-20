@@ -116,7 +116,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("vectors_boundary_rhs_02/output");
+  std::ofstream logfile ("output");
   logfile.precision (4);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);

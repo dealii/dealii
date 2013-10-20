@@ -30,7 +30,7 @@
 //
 // the problem was fixed by fixing the code
 
-char logname[] = "kelly_crash_02/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

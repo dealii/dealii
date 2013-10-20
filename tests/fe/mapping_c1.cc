@@ -34,7 +34,7 @@
 
 int main ()
 {
-  std::ofstream logfile ("mapping_c1/output");
+  std::ofstream logfile ("output");
   deallog << std::fixed;
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);

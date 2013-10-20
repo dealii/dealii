@@ -44,7 +44,7 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr);
-    std::ifstream in ("../deal.II/grid_in_3d_02/747.ucd");
+    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_3d_02/747.ucd");
     gi.read (in);
     //tr.refine_global (1);
   }
@@ -52,7 +52,7 @@ void test(std::ostream & /*out*/)
   {
     GridIn<dim> gi;
     gi.attach_triangulation (tr2);
-    std::ifstream in ("../deal.II/grid_in_3d_02/747.ucd");
+    std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_3d_02/747.ucd");
     gi.read (in);
     //tr2.refine_global (1);
   }
@@ -112,7 +112,7 @@ void test(std::ostream & /*out*/)
               << tr2.n_active_cells()
               << std::endl;
 
-      assert_tria_equal("3d_coarsening_04", tr, tr2);
+      assert_tria_equal(tr, tr2);
 
     }
 }
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  std::ofstream logfile("3d_coarsening_04/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

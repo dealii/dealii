@@ -65,7 +65,7 @@ int main (int argc, char *argv[])
   deal_II_exceptions::disable_abort_on_exception();
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  std::ofstream logfile("subdomain_id_01/output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

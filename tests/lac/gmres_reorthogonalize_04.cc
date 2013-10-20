@@ -76,7 +76,7 @@ void test ()
 
 int main()
 {
-  std::ofstream logfile("gmres_reorthogonalize_04/output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

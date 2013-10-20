@@ -18,7 +18,7 @@
 
 // a modified version of step-27 that crashes due to circular constraints
 
-char logname[] = "circular_01/output";
+char logname[] = "output";
 
 
 #include "../tests.h"

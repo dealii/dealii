@@ -32,7 +32,7 @@
 
 #include <string>
 
-std::ofstream logfile("interpolate_boundary_values_02_vector_valued/output");
+std::ofstream logfile("output");
 
 template <int dim>
 class X : public Function<dim>

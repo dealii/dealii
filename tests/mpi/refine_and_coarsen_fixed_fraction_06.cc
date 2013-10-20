@@ -68,7 +68,8 @@ void test()
   // now read indicators
   Vector<float> indicators (tr.dealii::Triangulation<2>::n_active_cells());
   {
-    std::ifstream in("refine_and_coarsen_fixed_fraction_06/indicators");
+    std::ifstream in(SOURCE_DIR "/refine_and_coarsen_fixed_fraction_06/indicators");
+    Assert(in, ExcMessage("File missing"));
     for (unsigned int i=0; i<indicators.size(); ++i)
       in >> indicators(i);
   }
@@ -159,7 +160,7 @@ int main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("refine_and_coarsen_fixed_fraction_06").c_str());
+      std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);

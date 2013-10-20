@@ -18,7 +18,6 @@
 
 // test FE_Q_DG0 (modified step-22)
 
-
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/logstream.h>
@@ -928,7 +927,7 @@ int main ()
   using namespace dealii;
   using namespace Step22;
 
-  initlog(__FILE__);
+  initlog();
 
   deallog.depth_file (1);
 
