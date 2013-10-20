@@ -44,26 +44,24 @@ ELSE()
   # Determine whether the CONFIGURE, BUILD or RUN stages were run successfully:
   #
 
-  # CONFIGURE is special because it only exists in build tests:
-  STRING(REGEX MATCH "${TEST}: CONFIGURE successful\\." _configure_regex ${_output})
-  STRING(REGEX MATCH "${TEST}: CONFIGURE failed\\." _configure_regex_fail ${_output})
-  STRING(REGEX MATCH "${TEST}: BUILD successful\\." _build_regex ${_output})
-  STRING(REGEX MATCH "${TEST}: RUN failed\\." _run_regex_fail ${_output})
-  STRING(REGEX MATCH "${TEST}: RUN successful\\." _run_regex ${_output})
-  IF(NOT "${_configure_regex_fail}" STREQUAL "")
+  STRING(REGEX MATCH "${TEST}: CONFIGURE failed\\." _configure_regex ${_output})
+  STRING(REGEX MATCH "${TEST}: BUILD failed\\." _build_regex ${_output})
+  STRING(REGEX MATCH "${TEST}: RUN failed\\." _run_regex ${_output})
+  STRING(REGEX MATCH "${TEST}: DIFF failed\\." _diff_regex ${_output})
+
+  IF(NOT "${_configure_regex}" STREQUAL "")
     SET(_stage CONFIGURE)
-  ELSEIF("${_build_regex}" STREQUAL "" AND "${_run_regex_fail}" STREQUAL "")
-    SET(_stage BUILD)
-  ELSEIF("${_run_regex}" STREQUAL "")
+  ELSEIF(NOT "${_run_regex}" STREQUAL "")
     SET(_stage RUN)
-  ELSE()
+  ELSEIF(NOT "${_diff_regex}" STREQUAL "")
     SET(_stage DIFF)
+  ELSE() # unconditionally, because "BUILD failed." doesn't have to be printed...
+    SET(_stage BUILD)
   ENDIF()
 
   MESSAGE("Test ${TEST}: ${_stage}")
   MESSAGE("===============================   OUTPUT BEGIN  ===============================")
-  IF( "${_build_regex}" STREQUAL "" AND
-      "${_configure_regex}" STREQUAL "" )
+  IF( "${_stage}" STREQUAL "BUILD" AND "${_build_regex}" STREQUAL "" )
     # Some special output in case the BUILD stage failed in a regression test:
     MESSAGE("${TEST}: BUILD failed. Output:")
   ENDIF()
