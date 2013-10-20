@@ -824,8 +824,8 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   deallog.pop();
   // in case of failure: throw exception
   if (this->control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (this->control().last_step(),
-                                        this->control().last_value());
+    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
+                                                     this->control().last_value()));
   // otherwise exit as normal
 }
 
@@ -959,8 +959,8 @@ SolverFGMRES<VECTOR>::solve (
   deallog.pop();
   // in case of failure: throw exception
   if (this->control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (this->control().last_step(),
-                                        this->control().last_value());
+    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
+                                                     this->control().last_value()));
 }
 
 #endif // DOXYGEN

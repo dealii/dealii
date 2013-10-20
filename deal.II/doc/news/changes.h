@@ -163,6 +163,13 @@ inconvenience this causes.
 
 <ol>
   <li>
+  dealii::SolverControl::NoConvergence now inherits dealii::ExceptionBase and
+  is thrown via AssertThrow(false, ... ).
+  <br>
+  (Matthias Maier, 2013/10/20)
+  </li>
+
+  <li>
   New: parallel::distributed::BlockVector has now methods update_ghost_values, 
   compress, set_out_ghosts, and has_ghost_elements that do the respective
   operation on each block of parallel::distributed::Vector.

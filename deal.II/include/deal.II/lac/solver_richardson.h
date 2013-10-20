@@ -285,11 +285,10 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
   this->memory.free(Vd);
   deallog.pop();
 
-  // in case of failure: throw
-  // exception
+  // in case of failure: throw exception
   if (this->control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (this->control().last_step(),
-                                        this->control().last_value());
+    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
+                                                     this->control().last_value()));
   // otherwise exit as normal
 }
 
@@ -345,11 +344,10 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
   this->memory.free(Vr);
   this->memory.free(Vd);
   deallog.pop();
-  // in case of failure: throw
-  // exception
+  // in case of failure: throw exception
   if (this->control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (this->control().last_step(),
-                                        this->control().last_value());
+    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
+                                                     this->control().last_value()));
   // otherwise exit as normal
 }
 

@@ -45,9 +45,9 @@ check_solve( SOLVER &solver, const MATRIX &A,
     {
       solver.solve(A,u,f,P);
     }
-  catch (std::exception &e)
+  catch (dealii::SolverControl::NoConvergence &e)
     {
-      deallog << e.what() << std::endl;
+      deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 }
 
@@ -62,9 +62,9 @@ check_Tsolve(SOLVER &solver, const MATRIX &A,
     {
       solver.Tsolve(A,u,f,P);
     }
-  catch (std::exception &e)
+  catch (dealii::SolverControl::NoConvergence &e)
     {
-      deallog << e.what() << std::endl;
+      deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 }
 

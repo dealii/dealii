@@ -26,41 +26,6 @@ DEAL_II_NAMESPACE_OPEN
 /*----------------------- SolverControl ---------------------------------*/
 
 
-SolverControl::NoConvergence::NoConvergence (const unsigned int last_step,
-                                             const double       last_residual)
-  :
-  last_step (last_step),
-  last_residual (last_residual)
-{}
-
-
-const char *
-SolverControl::NoConvergence::what () const throw ()
-{
-  // have a place where to store the
-  // description of the exception as a char *
-  //
-  // this thing obviously is not multi-threading
-  // safe, but we don't care about that for now
-  //
-  // we need to make this object static, since
-  // we want to return the data stored in it
-  // and therefore need a lifetime which is
-  // longer than the execution time of this
-  // function
-  static std::string description;
-  // convert the messages printed by the
-  // exceptions into a std::string
-  std::ostringstream out;
-  out << "Iterative method reported convergence failure in step "
-      << last_step << " with residual " << last_residual;
-
-  description = out.str();
-  return description.c_str();
-}
-
-
-
 SolverControl::SolverControl (const unsigned int maxiter,
                               const double tolerance,
                               const bool m_log_history,

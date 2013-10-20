@@ -47,9 +47,7 @@ check_solve( SOLVER &solver, const MATRIX &A,
     }
   catch (dealii::SolverControl::NoConvergence &e)
     {
-      // just like for Richardson: expect to
-      // get here, don't abort the program
-      deallog << "Catched exception dealii::SolverControl::NoConvergence" << std::endl;
+      deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 
   deallog << "Solver stopped after " << solver.control().last_step()
