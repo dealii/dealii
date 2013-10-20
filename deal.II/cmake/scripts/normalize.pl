@@ -16,6 +16,10 @@
 
 s/JobId.*//;
 
+# Remove Input File Name:
+
+s/# Input file name:.*//;
+
 # Several date and time strings
 
 s/%%Creation Date:.*//;

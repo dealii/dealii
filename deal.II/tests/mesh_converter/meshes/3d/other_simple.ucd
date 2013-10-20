@@ -1,6 +1,6 @@
 # FEM Mesh Converter
 # Mesh type: AVS UCD
-# Input file name: meshes/3d/other_simple.inp
+
 8	1	0	0	0
 1	  0.00000000e+00	  0.00000000e+00	  0.00000000e+00	
 2	  0.00000000e+00	  0.00000000e+00	  5.00000000e+01	

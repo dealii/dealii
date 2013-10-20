@@ -64,7 +64,7 @@ ENDFOREACH()
 # Glob together a list of all subfolders to set up:
 #
 FILE(GLOB _categories RELATIVE ${TEST_DIR} ${TEST_DIR}/*)
-SET(_categories all-headers build_tests ${_categories})
+SET(_categories all-headers build_tests mesh_converter ${_categories})
 
 #
 # Define a subproject for every enabled category:

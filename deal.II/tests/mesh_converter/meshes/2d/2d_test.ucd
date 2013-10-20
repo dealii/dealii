@@ -1,6 +1,6 @@
 # FEM Mesh Converter
 # Mesh type: AVS UCD
-# Input file name: meshes/2d/2d_test.inp
+
 133	114	0	0	0
 1	 -1.00000000e+00	  0.00000000e+00	0.00000000e+00	
 2	 -1.00000000e+00	 -1.66666700e-01	0.00000000e+00	

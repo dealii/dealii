@@ -17,7 +17,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsuite.cmake)
 PROJECT(testsuite CXX)
-INCLUDE(${DEAL_II_TARGET_CONFIG})
+INCLUDE(${DEAL_II_EXECUTABLE_CONFIG})
 
 #
 # Tests for the mesh_converter executable
@@ -25,17 +25,17 @@ INCLUDE(${DEAL_II_TARGET_CONFIG})
 
 SET(_category mesh_converter)
 
-FILE(GLOB _meshes ${CMAKE_CURRENT_SOURCE_DIR}/meshes/?d/*.ucd)
+FILE(GLOB _meshes ${CMAKE_CURRENT_SOURCE_DIR}/meshes/?d/*.inp)
 
 FOREACH(_full_file ${_meshes})
-  GET_FILENAME_COMPONENT(_mesh ${_full_file} NAME)
+  GET_FILENAME_COMPONENT(_mesh ${_full_file} NAME_WE)
 
   SET(_test_full ${_category}/${_mesh})
   SET(_target ${_mesh})
   SET(_diff_target ${_target}.diff)
   SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}) # directory to run the test in
 
-  STRING(REGEX REPLACE "\\.ucd$" ".inp" _comparison_file ${_full_file})
+  STRING(REGEX REPLACE "\\.inp$" ".ucd" _comparison_file ${_full_file})
 
   SET(_dim 3)
   IF(_full_file MATCHES "meshes/2d")
@@ -56,15 +56,18 @@ FOREACH(_full_file ${_meshes})
       COMMAND rm -f ${_test_directory}/failing_output
       COMMAND touch ${_test_directory}/output
       COMMAND
-        mesh_converter ${_dim} < ${_full_file} > output
+        mesh_converter_exe ${_dim} ${_full_file} output
         || (mv ${_test_directory}/output
                ${_test_directory}/failing_output
             && echo "${_test_full}: RUN failed. ------ Result: ${_test_directory}/failing_output"
             && echo "${_test_full}: RUN failed. ------ Partial output:"
             && cat ${_test_directory}/failing_output
             && exit 1)
+      COMMAND
+        ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
+                               ${_test_directory}/output
       WORKING_DIRECTORY ${_test_directory}
-      DEPENDS mesh_converter
+      DEPENDS mesh_converter_exe ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
       )
     ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
       COMMAND rm -f ${_test_directory}/failing_diff
