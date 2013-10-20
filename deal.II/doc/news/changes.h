@@ -78,6 +78,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: The testsuite is now ported to <a href="http://www.cmake.org/">
+  CMake</a> and uses CTest as test driver.
+  <br>
+  (Wolfgang Bangerth, Timo Heister, Matthias Maier, Bruno Turcksin, 2013/10/20)
+  </li>
+
   <li>
   Changed: multithreadinfo::n_default_threads is now deprecated. Use the
   new n_threads() function instead, which works correctly with TBB.
