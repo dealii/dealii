@@ -16,7 +16,7 @@
 
 
 
-// this is equivalent to the petsc_vector_assign_02 test, except that we use
+// this is equivalent to the petsc_vector_assign_01 test, except that we use
 // operator+= instead of operator=. Now, this does not present a problem,
 // since the compiler does not automatically generate a version of this
 // operator, but simply performs the conversion to PetscScalar, i.e. the
