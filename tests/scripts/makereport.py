@@ -85,13 +85,17 @@ for test in testing.findall("Test"):
         failtext = text.encode('utf-8')
         failtextlines = failtext.replace('"','').split('\n')
         failstatustxt = failtextlines[0].split(' ')[-1]
-        for i in range(0,len(failtextlines)):
-            statuslist=['CONFIGURE','BUILD','RUN','DIFF']
-            if failstatustxt in statuslist:
-                status = statuslist.index(failstatustxt)
-            else:
+        statuslist=['CONFIGURE','BUILD','RUN','DIFF']
+        if failstatustxt in statuslist:
+            status = statuslist.index(failstatustxt)
+        else:
+            for meas in test.find('Results').findall('NamedMeasurement'):
+                if (meas.attrib["name"]=="Exit Code" and meas.find('Value').text=="Timeout"):
+                    status=3
+
+            if status==4:
                 print >>sys.stderr, "unknown status '%s' in test %s "% (failstatustxt,name)
-                status=0           
+                status=0
 
     stati = [" 0  "," 1  "," 2  "," 3  ","  + "]
     line = "%s %s %s%s"%(date,stati[status],branch,name)
