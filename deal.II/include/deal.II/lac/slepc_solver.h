@@ -86,7 +86,7 @@ DEAL_II_NAMESPACE_OPEN
   void
   SolverBase::solve (const PETScWrappers::MatrixBase &A,
                      const PETScWrappers::MatrixBase &B,
-                     std::vector<double>             &eigenvalues,
+                     std::vector<PetscScalar>        &eigenvalues,
                      std::vector<OutputVector>       &eigenvectors,
                      const unsigned int               n_eigenpairs)
   { ... }
@@ -154,7 +154,7 @@ namespace SLEPcWrappers
     template <typename OutputVector>
     void
     solve (const PETScWrappers::MatrixBase &A,
-           std::vector<double>             &eigenvalues,
+           std::vector<PetscScalar>        &eigenvalues,
            std::vector<OutputVector>       &eigenvectors,
            const unsigned int               n_eigenpairs = 1);
 
@@ -167,7 +167,7 @@ namespace SLEPcWrappers
     void
     solve (const PETScWrappers::MatrixBase &A,
            const PETScWrappers::MatrixBase &B,
-           std::vector<double>             &eigenvalues,
+           std::vector<PetscScalar>        &eigenvalues,
            std::vector<OutputVector>       &eigenvectors,
            const unsigned int               n_eigenpairs = 1);
 
@@ -204,7 +204,7 @@ namespace SLEPcWrappers
      * default, no target is set.
      */
     void
-    set_target_eigenvalue (const double &this_target);
+    set_target_eigenvalue (const PetscScalar &this_target);
 
     /**
      * Indicate which part of the spectrum is to be computed. By
@@ -748,7 +748,7 @@ namespace SLEPcWrappers
   template <typename OutputVector>
   void
   SolverBase::solve (const PETScWrappers::MatrixBase &A,
-                     std::vector<double>             &eigenvalues,
+                     std::vector<PetscScalar>        &eigenvalues,
                      std::vector<OutputVector>       &eigenvectors,
                      const unsigned int               n_eigenpairs)
   {
@@ -780,7 +780,7 @@ namespace SLEPcWrappers
   void
   SolverBase::solve (const PETScWrappers::MatrixBase &A,
                      const PETScWrappers::MatrixBase &B,
-                     std::vector<double>             &eigenvalues,
+                     std::vector<PetscScalar>        &eigenvalues,
                      std::vector<OutputVector>       &eigenvectors,
                      const unsigned int                  n_eigenpairs)
   {

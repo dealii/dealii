@@ -92,7 +92,7 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::set_target_eigenvalue (const double &this_target)
+  SolverBase::set_target_eigenvalue (const PetscScalar &this_target)
   {
     target_eigenvalue = this_target;
   }
