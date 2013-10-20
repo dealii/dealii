@@ -20,6 +20,10 @@
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
 #
+# If TEST_OVERRIDE_LOCATION is set, a comparison file category/test.output
+# will be substituted by ${TEST_OVERRIDE_LOCATION}/category/test.output if
+# the latter exists.
+#
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
 #
@@ -69,9 +73,22 @@ MACRO(DEAL_II_PICKUP_TESTS)
       ENDIF()
     ENDFOREACH()
 
+    #
+    # Respect TEST_OVERRIDE_LOCATION:
+    #
+
+    SET(_add_output)
+    IF(EXISTS ${TEST_OVERRIDE_LOCATION}/${_category}/${_test})
+      SET(_add_output
+        "Note: Default comparison file ${_comparison} overriden by"
+        "${TEST_OVERRIDE_LOCATION}/${_category}/${_test}"
+        )
+      SET(_comparison "${TEST_OVERRIDE_LOCATION}/${_category}/${_test}")
+    ENDIF()
+
     IF(_define_test)
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
-      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison})
+      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_add_output})
     ENDIF()
 
   ENDFOREACH()

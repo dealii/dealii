@@ -28,6 +28,8 @@
 #            (return value 0)
 #            Possible values are CONFIGURE, BUILD, RUN, DIFF, PASSED
 #
+#   ADDITIONAL_OUTPUT - A list of additional output lines that should be printed
+#
 
 IF("${EXPECT}" STREQUAL "")
   SET(EXPECT "PASSED")
@@ -65,6 +67,10 @@ ENDIF()
 #
 # Print out the test result:
 #
+
+FOREACH(_line ${ADDITIONAL_OUTPUT})
+  MESSAGE("Test ${TEST}: ${_line}")
+ENDFOREACH()
 
 MESSAGE("Test ${TEST}: ${_stage}")
 MESSAGE("===============================   OUTPUT BEGIN  ===============================")

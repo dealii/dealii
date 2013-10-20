@@ -167,10 +167,6 @@
       calling <code>make setup_tests</code>:
       <pre>
 
-    TEST_PICKUP_REGEX
-      - A regular expression to select only a subset of tests during setup.
-        An empty string is interpreted as a catchall (this is the default).
-
     TEST_DIFF
       - The diff tool and command line to use for comparison. If numdiff is
         available it defaults to "numdiff -a 1e-6 -q", otherwise plain diff
@@ -179,6 +175,15 @@
     TEST_TIME_LIMIT
       - The time limit (in seconds) a single test is allowed to take. Defaults
         to 180 seconds
+
+    TEST_PICKUP_REGEX
+      - A regular expression to select only a subset of tests during setup.
+        An empty string is interpreted as a catchall (this is the default).
+
+    TEST_OVERRIDE_LOCATION
+      - If TEST_OVERRIDE_LOCATION is set, a comparison file category/test.output
+        will be substituted by ${TEST_OVERRIDE_LOCATION}/category/test.output if
+        the latter exists.
       </pre>
     </p>
 
