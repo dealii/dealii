@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// $Id$
+// $Id: miscompare.cc 30508 2013-08-27 17:01:42Z turcksin $
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -16,8 +16,8 @@
 
 
 
-// test the testsuite framework. this test is supposed to compile successfully
-// but not run
+// test the testsuite framework. this test is supposed to run succesfully
+// but to miscompare
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>

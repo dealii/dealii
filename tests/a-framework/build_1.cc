@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// $Id$
+// $Id: fail.cc 30508 2013-08-27 17:01:42Z turcksin $
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -16,8 +16,7 @@
 
 
 
-// test the testsuite framework. this test is supposed to compile and link
-// successfully but not run
+// test the testsuite framework. this test is supposed to miscompile
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -31,7 +30,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  std::abort ();
+  compile error;
 
   deallog << "OK" << std::endl;
 }

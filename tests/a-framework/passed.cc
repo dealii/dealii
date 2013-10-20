@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// $Id$
+// $Id: run.cc 30508 2013-08-27 17:01:42Z turcksin $
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -16,13 +16,11 @@
 
 
 
-// test the testsuite framework. this test is supposed to compile and link
-// successfully but not run
+// test the testsuite framework. this test is supposed to run successfully
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <fstream>
-#include <cstdlib>
 
 
 int main ()
@@ -30,8 +28,6 @@ int main ()
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-
-  compile error;
 
   deallog << "OK" << std::endl;
 }

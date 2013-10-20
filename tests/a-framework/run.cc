@@ -16,11 +16,13 @@
 
 
 
-// test the testsuite framework. this test is supposed to run successfully
+// test the testsuite framework. this test is supposed to compile and link
+// successfully but not run
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <fstream>
+#include <cstdlib>
 
 
 int main ()
@@ -28,6 +30,8 @@ int main ()
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+
+  std::abort ();
 
   deallog << "OK" << std::endl;
 }
