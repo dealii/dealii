@@ -31,12 +31,10 @@ FOREACH(_full_file ${_meshes})
   GET_FILENAME_COMPONENT(_mesh ${_full_file} NAME_WE)
 
   SET(_test_full ${_category}/${_mesh})
-  SET(_target ${_mesh})
-  SET(_diff_target ${_target}.diff)
-  SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}) # directory to run the test in
-
+  SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_mesh}) # directory to run the test in
   STRING(REGEX REPLACE "\\.inp$" ".ucd" _comparison_file ${_full_file})
 
+  # Is this a 3D or 2D mesh?
   SET(_dim 3)
   IF(_full_file MATCHES "meshes/2d")
     SET(_dim 2)
@@ -47,10 +45,6 @@ FOREACH(_full_file ${_meshes})
       _test_full MATCHES "${TEST_PICKUP_REGEX}" )
 
     FILE(MAKE_DIRECTORY ${_test_directory})
-
-    #
-    # Add a top level target to run and compare the test:
-    #
 
     ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
       COMMAND rm -f ${_test_directory}/failing_output
@@ -73,10 +67,7 @@ FOREACH(_full_file ${_meshes})
       COMMAND rm -f ${_test_directory}/failing_diff
       COMMAND touch ${_test_directory}/diff
       COMMAND
-        ${TEST_DIFF}
-          ${_test_directory}/output
-          ${_comparison_file}
-          > ${_test_directory}/diff
+        ${TEST_DIFF} ${_test_directory}/output ${_comparison_file} > ${_test_directory}/diff
         || (mv ${_test_directory}/diff
                ${_test_directory}/failing_diff
             && echo "${_test_full}: RUN successful."
@@ -92,20 +83,16 @@ FOREACH(_full_file ${_meshes})
         ${_comparison_file}
       )
 
-    ADD_CUSTOM_TARGET(${_diff_target} DEPENDS ${_test_directory}/diff
+    ADD_CUSTOM_TARGET(${_mesh}.diff DEPENDS ${_test_directory}/diff
       COMMAND
            echo "${_test_full}: RUN successful."
         && echo "${_test_full}: DIFF successful."
         && echo "${_test_full}: PASSED."
       )
 
-    #
-    # And finally add the test:
-    #
-
     ADD_TEST(NAME ${_test_full}
       COMMAND ${CMAKE_COMMAND}
-        -DTRGT=${_diff_target}
+        -DTRGT=${_mesh}.diff
         -DTEST=${_test_full}
         -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
         -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
