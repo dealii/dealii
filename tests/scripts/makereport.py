@@ -90,7 +90,7 @@ for test in testing.findall("Test"):
             if failstatustxt in statuslist:
                 status = statuslist.index(failstatustxt)
             else:
-                print "unknown status '%s' in test %s "% (failstatustxt,name)
+                print >>sys.stderr, "unknown status '%s' in test %s "% (failstatustxt,name)
                 status=0           
 
     stati = [" 0  "," 1  "," 2  "," 3  ","  + "]
