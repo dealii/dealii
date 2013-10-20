@@ -63,6 +63,7 @@
           <li><a href="#restrictbuild">Restricting tests for build configurations</a></li>
           <li><a href="#restrictfeature">Restricting tests for feature configurations</a></li>
           <li><a href="#mpi">Running tests with MPI</a></li>
+          <li><a href="#expect">Changing condition for success</a></li>
           <li><a href="#layoutaddtests">Adding new tests</a></li>
         </ol>
         <li><a href="#submit">Submitting test results</a></li>
@@ -433,7 +434,7 @@
       just <code>category/test.output</code>:
       <pre>
 
-    category/test.[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][&lt;debug|release&gt;.]output
+    category/test.[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][&lt;debug|release&gt;.]output
       </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
@@ -508,6 +509,22 @@
       It is quite typical for an MPI-enabled test to have multiple output
       files for different numbers of MPI processes.
     </p>
+
+    <a name="expect"></a>
+    <h3>Changing condition for success</h3>
+    <p>
+      Normally a test is considered to be successful if all test stages
+      could be run and the test reached the <code>PASSED</code> stage (see
+      the <a href="#runoutput">output description</a> section for details).
+      If (for some reason) the test should succeed ending at a specific
+      test stage different than <code>PASSED</code> you can specify it via
+      <code>expect=&lt;stage&gt;</code>, e.g.:
+      <pre>
+
+    category/test.expect=run.output
+      </pre>
+    </p>
+
 
 
     <a name="layoutaddtests"></a>
