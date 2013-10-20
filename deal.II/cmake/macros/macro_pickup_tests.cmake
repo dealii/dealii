@@ -39,6 +39,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
     #
     # Respect TEST_PICKUP_REGEX:
     #
+
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         "${_category}/${_test}" MATCHES "${TEST_PICKUP_REGEX}" )
       SET(_define_test TRUE)
@@ -50,6 +51,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
     # Query configuration and check whether we support it. Otherwise
     # set _define_test to FALSE:
     #
+
     STRING(REGEX MATCHALL
       "with_([0-9]|[a-z]|_)*=(on|off|yes|no|true|false)" _matches ${_test}
       )
@@ -68,27 +70,9 @@ MACRO(DEAL_II_PICKUP_TESTS)
     ENDFOREACH()
 
     IF(_define_test)
-      #
-      # Determine whether the test should be run with mpirun:
-      #
-      STRING(REGEX MATCH "mpirun=([0-9]*)" _n_cpu ${_test})
-      IF("${_n_cpu}" STREQUAL "")
-        # 0 indicates that no mpirun should be used
-        SET(_n_cpu 0)
-      ELSE()
-        STRING(REGEX REPLACE "^mpirun=([0-9]*)$" "\\1" _n_cpu ${_n_cpu})
-      ENDIF()
-
-      IF(_test MATCHES debug)
-        SET(_configuration DEBUG)
-      ELSEIF(_test MATCHES release)
-        SET(_configuration RELEASE)
-      ELSE()
-        SET(_configuration)
-      ENDIF()
-
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
-      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_n_cpu} ${_configuration})
+      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison})
     ENDIF()
+
   ENDFOREACH()
 ENDMACRO()

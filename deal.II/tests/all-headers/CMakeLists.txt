@@ -45,7 +45,7 @@ FOREACH(_full_file ${_header})
     STRING(TOLOWER ${_build} _build_lowercase)
 
     SET(_test ${_category}/${_path}/${_file}.${_build_lowercase})
-    SET(_target ${_category}-${_path}-${_file}.${_build_lowercase})
+    STRING(REGEX REPLACE "\\/" "-" _target ${_test})
 
     # Respect TEST_PICKUP_REGEX:
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
@@ -66,9 +66,16 @@ FOREACH(_full_file ${_header})
         COMPILE_DEFINITIONS HEADER=<deal.II/${_path}/${_file}>
         )
 
+      ADD_CUSTOM_TARGET(${_target}.build
+        COMMAND
+             echo "${_test}: BUILD successful."
+          && echo "${_test}: PASSED."
+        )
+      ADD_DEPENDENCIES(${_target}.build ${_target})
+
       # And finally add the test:
       ADD_TEST(NAME ${_test}
-        COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_test}
+        COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.build -DTEST=${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

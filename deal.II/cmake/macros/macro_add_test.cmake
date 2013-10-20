@@ -26,32 +26,23 @@
 #   - specifying the maximal wall clock time in seconds a test is allowed
 #     to run
 #
+#
 # Usage:
-#     DEAL_II_ADD_TEST(category test_name comparison_file n_cpu [configurations])
+#     DEAL_II_ADD_TEST(category test_name comparison_file)
 #
-# This macro assumes that a source file
+# This macro assumes that a source file "./tests/category/<test_name>.cc"
+# as well as the comparison file "./tests/category/<comparison_file>" is
+# available in the testsuite. The output of compiled source file is
+# compared against the file comparison file.
 #
-#   ./tests/category/<test_name>.cc
-#
-# as well as the comparison file
-#
-#   ./tests/category/<comparison_file>
-#
-# is available in the testsuite.
-#
-# If <n_cpu> is equal to 0, the plain, generated executable will be run. If
-# <n_cpu> is a number larger than 0, the mpirun loader will be used to
-# launch the executable
-#
-# [configurations] is a list of configurations against this test should be
-# run. Possible values are an empty list, DEBUG, RELEASE or
-# "DEBUG;RELEASE".
-#
-# The output of <test_name>.cc is compared against the file
-# <comparison_file>.
+# This macro gets the following options from the comparison file name (have
+# a look at the testsuite documentation for details):
+#  - usage of mpirun and number of simultaneous processes
+#  - valid build configurations
+#  - expected test stage
 #
 
-MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
+MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
@@ -61,10 +52,47 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
       )
   ENDIF()
 
+  GET_FILENAME_COMPONENT(_file ${_comparison_file} NAME)
+
+  #
+  # Determine valid build configurations for this test:
+  #
+
+  SET(_configuration)
+  IF(_file MATCHES "debug")
+    SET(_configuration DEBUG)
+  ELSEIF(_file MATCHES "release")
+    SET(_configuration RELEASE)
+  ENDIF()
+
+  #
+  # Determine whether the test should be run with mpirun:
+  #
+
+  STRING(REGEX MATCH "mpirun=([0-9]*)" _n_cpu ${_file})
+  IF("${_n_cpu}" STREQUAL "")
+    SET(_n_cpu 0) # 0 indicates that no mpirun should be used
+  ELSE()
+    STRING(REGEX REPLACE "^mpirun=([0-9]*)$" "\\1" _n_cpu ${_n_cpu})
+  ENDIF()
+
+  #
+  # Determine the expected build stage of this test:
+  #
+
+  STRING(REGEX MATCH "expect=([a-z]*)" _expect ${_file})
+  IF("${_expect}" STREQUAL "")
+    SET(_expect "PASSED")
+  ELSE()
+    STRING(REGEX REPLACE "^expect=([a-z]*)$" "\\1" _expect ${_expect})
+    STRING(TOUPPER ${_expect} _expect)
+  ENDIF()
+
+
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
-    ITEM_MATCHES(_match "${_build}" ${ARGN})
-    IF(_match OR "${ARGN}" STREQUAL "")
+    ITEM_MATCHES(_match "${_build}" ${_configuration})
+    IF(_match OR "${_configuration}" STREQUAL "")
 
       #
       # Setup a bunch of variables describing the test:
@@ -184,6 +212,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file _n_cpu)
         COMMAND ${CMAKE_COMMAND}
           -DTRGT=${_diff_target}
           -DTEST=${_test_full}
+          -DEXPECT=${_expect}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
