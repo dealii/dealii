@@ -69,31 +69,26 @@ testing = root.find('Testing')
 tests={}
 
 for test in testing.findall("Test"):
-    status = test.attrib['Status']
-    fail=False
-    if status=="failed": fail=True
     name = test.find('Name').text
     group = name.split('/')[0]
 
     if group=="all-headers":
         name = group + "/" + "-".join(name.split('/')[1:])
 
-    status = 4
-    if fail:
-        text = test.find('Results').find('Measurement').find('Value').text
-        if text == None: text=""
-        failtext = text.encode('utf-8')
-        failtextlines = failtext.replace('"','').split('\n')
-        failstatustxt = failtextlines[0].split(' ')[-1]
-        statuslist=['CONFIGURE','BUILD','RUN','DIFF']
-        if failstatustxt in statuslist:
-            status = statuslist.index(failstatustxt)
-        else:
-            for meas in test.find('Results').findall('NamedMeasurement'):
-                if (meas.attrib["name"]=="Exit Code" and meas.find('Value').text=="Timeout"):
-                    status=3
+    text = test.find('Results').find('Measurement').find('Value').text
+    if text == None: text=""
+    failtext = text.encode('utf-8')
+    failtextlines = failtext.replace('"','').split('\n')
+    failstatustxt = failtextlines[0].split(' ')[-1]
 
-            if status==4:
+    statuslist=['CONFIGURE','BUILD','RUN','DIFF','PASSED']
+    if failstatustxt in statuslist:
+        status = statuslist.index(failstatustxt)
+    else:
+        for meas in test.find('Results').findall('NamedMeasurement'):
+            if (meas.attrib["name"]=="Exit Code" and meas.find('Value').text=="Timeout"):
+                status=3
+            else:
                 print >>sys.stderr, "unknown status '%s' in test %s "% (failstatustxt,name)
                 status=0
 
