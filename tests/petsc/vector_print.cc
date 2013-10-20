@@ -26,25 +26,6 @@
 #include <vector>
 
 
-void test (PETScWrappers::Vector &v,
-           PETScWrappers::Vector &w)
-{
-  // set the first vector
-  for (unsigned int i=0; i<v.size(); ++i)
-    v(i) = i;
-
-  // copy elements by reference
-  for (unsigned int i=0; i<v.size(); ++i)
-    w(i) = v(i);
-
-  // check that they're equal
-  Assert (v==w, ExcInternalError());
-
-  deallog << "OK" << std::endl;
-}
-
-
-
 int main (int argc, char **argv)
 {
   std::ofstream logfile("output");
