@@ -68,11 +68,12 @@ ENDIF()
 # Print out the test result:
 #
 
+MESSAGE("Test ${TEST}: ${_stage}")
+
 FOREACH(_line ${ADDITIONAL_OUTPUT})
   MESSAGE("Test ${TEST}: ${_line}")
 ENDFOREACH()
 
-MESSAGE("Test ${TEST}: ${_stage}")
 MESSAGE("===============================   OUTPUT BEGIN  ===============================")
 
 IF("${_stage}" STREQUAL "PASSED")
