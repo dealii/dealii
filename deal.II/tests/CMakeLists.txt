@@ -71,6 +71,7 @@ ENDFOREACH()
 #
 FILE(GLOB _categories RELATIVE ${TEST_DIR} ${TEST_DIR}/*)
 SET(_categories all-headers build_tests mesh_converter ${_categories})
+LIST(REMOVE_DUPLICATES _categories)
 
 #
 # Define a subproject for every enabled category:
