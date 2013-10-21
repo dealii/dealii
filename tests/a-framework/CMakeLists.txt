@@ -11,7 +11,7 @@ DEAL_II_PICKUP_TESTS()
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${_build} _build_lowercase)
 
-  SET(_target a-framework-configure)
+  SET(_target a-framework-configure.${_build_lowercase})
   SET(_test a-framework/configure.${_build_lowercase})
 
   # Respect TEST_PICKUP_REGEX:
@@ -22,7 +22,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
       )
     ADD_TEST(NAME ${_test}
       COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_test}
-        -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR} -DEXPECT=configure
+        -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR} -DEXPECT=CONFIGURE
         -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       )
