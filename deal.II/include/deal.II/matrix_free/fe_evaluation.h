@@ -3804,9 +3804,9 @@ namespace internal
            int direction, bool dof_to_quad, bool add>
   inline
   void
-  apply_tensor_product (const VectorizedArray<Number> *shape_data,
-                        const VectorizedArray<Number> in [],
-                        VectorizedArray<Number>       out [])
+  apply_tensor_product (const Number *shape_data,
+                        const Number in [],
+                        Number       out [])
   {
     AssertIndexRange (direction, dim);
     const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
@@ -3822,12 +3822,12 @@ namespace internal
           {
             for (int col=0; col<nn; ++col)
               {
-                VectorizedArray<Number> val0;
+                Number val0;
                 if (dof_to_quad == true)
                   val0 = shape_data[col];
                 else
                   val0 = shape_data[col*n_q_points_1d];
-                VectorizedArray<Number> res0 = val0 * in[0];
+                Number res0 = val0 * in[0];
                 for (int ind=1; ind<mm; ++ind)
                   {
                     if (dof_to_quad == true)
@@ -3895,9 +3895,9 @@ namespace internal
            int direction, bool dof_to_quad, bool add>
   inline
   void
-  apply_tensor_product_values (const VectorizedArray<Number> *shape_values,
-                               const VectorizedArray<Number> in [],
-                               VectorizedArray<Number>       out [])
+  apply_tensor_product_values (const Number *shape_values,
+                               const Number in [],
+                               Number       out [])
   {
     AssertIndexRange (direction, dim);
     const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
@@ -3915,7 +3915,7 @@ namespace internal
           {
             for (int col=0; col<n_cols; ++col)
               {
-                VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
+                Number val0, val1, in0, in1, res0, res1;
                 if (dof_to_quad == true)
                   {
                     val0 = shape_values[col];
@@ -3955,7 +3955,7 @@ namespace internal
                       }
                   }
                 else
-                  res0 = res1 = VectorizedArray<Number>();
+                  res0 = res1 = Number();
                 if (dof_to_quad == true)
                   {
                     if (mm % 2 == 1)
@@ -3996,8 +3996,8 @@ namespace internal
               }
             else if (dof_to_quad == true && nn%2==1)
               {
-                VectorizedArray<Number> res0;
-                VectorizedArray<Number> val0  = shape_values[n_cols];
+                Number res0;
+                Number val0  = shape_values[n_cols];
                 if (mid > 0)
                   {
                     res0  = in[0] + in[stride*(mm-1)];
@@ -4005,13 +4005,13 @@ namespace internal
                     for (int ind=1; ind<mid; ++ind)
                       {
                         val0  = shape_values[ind*n_q_points_1d+n_cols];
-                        VectorizedArray<Number> val1  = in[stride*ind] + in[stride*(mm-1-ind)];
+                        Number val1  = in[stride*ind] + in[stride*(mm-1-ind)];
                         val1 *= val0;
                         res0 += val1;
                       }
                   }
                 else
-                  res0 = VectorizedArray<Number>();
+                  res0 = Number();
                 if (add == false)
                   out[stride*n_cols]  = res0;
                 else
@@ -4019,16 +4019,16 @@ namespace internal
               }
             else if (dof_to_quad == false && nn%2 == 1)
               {
-                VectorizedArray<Number> res0;
+                Number res0;
                 if (mid > 0)
                   {
-                    VectorizedArray<Number> val0 = shape_values[n_cols*n_q_points_1d];
+                    Number val0 = shape_values[n_cols*n_q_points_1d];
                     res0 = in[0] + in[stride*(mm-1)];
                     res0 *= val0;
                     for (int ind=1; ind<mid; ++ind)
                       {
                         val0  = shape_values[n_cols*n_q_points_1d+ind];
-                        VectorizedArray<Number> val1 = in[stride*ind] + in[stride*(mm-1-ind)];
+                        Number val1 = in[stride*ind] + in[stride*(mm-1-ind)];
                         val1 *= val0;
                         res0 += val1;
                       }
@@ -4098,9 +4098,9 @@ namespace internal
            int direction, bool dof_to_quad, bool add>
   inline
   void
-  apply_tensor_product_gradients (const VectorizedArray<Number> *shape_gradients,
-                                  const VectorizedArray<Number> in [],
-                                  VectorizedArray<Number>       out [])
+  apply_tensor_product_gradients (const Number *shape_gradients,
+                                  const Number in [],
+                                  Number       out [])
   {
     AssertIndexRange (direction, dim);
     const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
@@ -4118,7 +4118,7 @@ namespace internal
           {
             for (int col=0; col<n_cols; ++col)
               {
-                VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
+                Number val0, val1, in0, in1, res0, res1;
                 if (dof_to_quad == true)
                   {
                     val0 = shape_gradients[col];
@@ -4158,7 +4158,7 @@ namespace internal
                       }
                   }
                 else
-                  res0 = res1 = VectorizedArray<Number>();
+                  res0 = res1 = Number();
                 if (mm % 2 == 1)
                   {
                     if (dof_to_quad == true)
@@ -4182,7 +4182,7 @@ namespace internal
               }
             if ( nn%2 == 1 )
               {
-                VectorizedArray<Number> val0, res0;
+                Number val0, res0;
                 if (dof_to_quad == true)
                   val0 = shape_gradients[n_cols];
                 else
@@ -4195,7 +4195,7 @@ namespace internal
                       val0 = shape_gradients[ind*n_q_points_1d+n_cols];
                     else
                       val0 = shape_gradients[n_cols*n_q_points_1d+ind];
-                    VectorizedArray<Number> val1  = in[stride*ind] - in[stride*(mm-1-ind)];
+                    Number val1  = in[stride*ind] - in[stride*(mm-1-ind)];
                     val1 *= val0;
                     res0 += val1;
                   }
@@ -4242,9 +4242,9 @@ namespace internal
            int direction, bool dof_to_quad, bool add>
   inline
   void
-  apply_tensor_product_hessians (const VectorizedArray<Number> *shape_hessians,
-                                 const VectorizedArray<Number> in [],
-                                 VectorizedArray<Number>       out [])
+  apply_tensor_product_hessians (const Number *shape_hessians,
+                                 const Number in [],
+                                 Number       out [])
   {
     AssertIndexRange (direction, dim);
     const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
@@ -4262,7 +4262,7 @@ namespace internal
           {
             for (int col=0; col<n_cols; ++col)
               {
-                VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
+                Number val0, val1, in0, in1, res0, res1;
                 if (dof_to_quad == true)
                   {
                     val0 = shape_hessians[col];
@@ -4302,7 +4302,7 @@ namespace internal
                       }
                   }
                 else
-                  res0 = res1 = VectorizedArray<Number>();
+                  res0 = res1 = Number();
                 if (mm % 2 == 1)
                   {
                     if (dof_to_quad == true)
@@ -4326,7 +4326,7 @@ namespace internal
               }
             if ( nn%2 == 1 )
               {
-                VectorizedArray<Number> val0, res0;
+                Number val0, res0;
                 if (dof_to_quad == true)
                   val0 = shape_hessians[n_cols];
                 else
@@ -4341,13 +4341,13 @@ namespace internal
                           val0 = shape_hessians[ind*n_q_points_1d+n_cols];
                         else
                           val0 = shape_hessians[n_cols*n_q_points_1d+ind];
-                        VectorizedArray<Number> val1  = in[stride*ind] + in[stride*(mm-1-ind)];
+                        Number val1  = in[stride*ind] + in[stride*(mm-1-ind)];
                         val1 *= val0;
                         res0 += val1;
                       }
                   }
                 else
-                  res0 = VectorizedArray<Number>();
+                  res0 = Number();
                 if (mm % 2 == 1)
                   {
                     if (dof_to_quad == true)
@@ -4416,9 +4416,9 @@ namespace internal
            int direction, bool dof_to_quad, bool add>
   inline
   void
-  apply_tensor_product_gradients_gl (const VectorizedArray<Number> *shape_gradients,
-                                     const VectorizedArray<Number> in [],
-                                     VectorizedArray<Number>       out [])
+  apply_tensor_product_gradients_gl (const Number *shape_gradients,
+                                     const Number in [],
+                                     Number       out [])
   {
     AssertIndexRange (direction, dim);
     const int mm     = fe_degree+1;
@@ -4436,7 +4436,7 @@ namespace internal
           {
             for (int col=0; col<n_cols; ++col)
               {
-                VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
+                Number val0, val1, in0, in1, res0, res1;
                 if (mid > 0)
                   {
                     if (dof_to_quad == true)
@@ -4506,7 +4506,7 @@ namespace internal
                       }
                   }
                 else
-                  res0 = res1 = VectorizedArray<Number>();
+                  res0 = res1 = Number();
                 if (mm % 2 == 1)
                   {
                     if (dof_to_quad == true)
@@ -4530,7 +4530,7 @@ namespace internal
               }
             if ( nn%2 == 1 )
               {
-                VectorizedArray<Number> val0, res0;
+                Number val0, res0;
                 if (dof_to_quad == true)
                   val0 = shape_gradients[n_cols];
                 else
@@ -4545,13 +4545,13 @@ namespace internal
                           val0 = shape_gradients[ind*mm+n_cols];
                         else
                           val0 = shape_gradients[n_cols*mm+ind];
-                        VectorizedArray<Number> val1  = in[stride*ind] - in[stride*(mm-1-ind)];
+                        Number val1  = in[stride*ind] - in[stride*(mm-1-ind)];
                         val1 *= val0;
                         res0 += val1;
                       }
                   }
                 else
-                  res0 = VectorizedArray<Number>();
+                  res0 = Number();
                 if (add == false)
                   out[stride*n_cols]  = res0;
                 else
@@ -4986,8 +4986,8 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_values(const VectorizedArray<Number> in [],
                VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product<dim,fe_degree,n_q_points_1d,Number,
-           direction, dof_to_quad, add>
+  internal::apply_tensor_product<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
            (this->data.shape_values.begin(), in, out);
 }
 
@@ -5002,8 +5002,8 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_gradients(const VectorizedArray<Number> in [],
                   VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product<dim,fe_degree,n_q_points_1d,Number,
-           direction, dof_to_quad, add>
+  internal::apply_tensor_product<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
            (this->data.shape_gradients.begin(), in, out);
 }
 
@@ -5018,8 +5018,8 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_hessians(const VectorizedArray<Number> in [],
                  VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product<dim,fe_degree,n_q_points_1d,Number,
-           direction, dof_to_quad, add>
+  internal::apply_tensor_product<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
            (this->data.shape_hessians.begin(), in, out);
 }
 
@@ -5129,8 +5129,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_values (const VectorizedArray<Number> in [],
                 VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product_values<dim,fe_degree,n_q_points_1d,Number,
-           direction, dof_to_quad, add>
+  internal::apply_tensor_product_values<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
            (this->data.shape_values.begin(), in, out);
 }
 
@@ -5145,8 +5145,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_gradients (const VectorizedArray<Number> in [],
                    VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product_gradients<dim,fe_degree,n_q_points_1d,Number,
-           direction, dof_to_quad, add>
+  internal::apply_tensor_product_gradients<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
            (this->data.shape_gradients.begin(), in, out);
 }
 
@@ -5164,8 +5164,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_hessians (const VectorizedArray<Number> in [],
                   VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product_hessians<dim,fe_degree,n_q_points_1d,Number,
-           direction, dof_to_quad, add>
+  internal::apply_tensor_product_hessians<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
            (this->data.shape_hessians.begin(), in, out);
 }
 
@@ -5407,8 +5407,8 @@ FEEvaluationGL<dim,fe_degree,n_components_,Number>
 ::apply_gradients (const VectorizedArray<Number> in [],
                    VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product_gradients_gl<dim,fe_degree,Number,
-           direction, dof_to_quad, add>
+  internal::apply_tensor_product_gradients_gl<dim,fe_degree,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
            (this->data.shape_gradients.begin(), in, out);
 }
 
