@@ -184,7 +184,6 @@ void test ()
     }
 
   mf.vmult (ref, in);
-  MPI_Barrier (MPI_COMM_WORLD);
 
   for (unsigned int parallel_option = 0; parallel_option < 3; ++parallel_option)
     {
@@ -213,7 +212,6 @@ void test ()
       data.tasks_block_size = 3;
       mf_data.reinit (dof, constraints, quad, data);
       MatrixFreeTest<dim, fe_degree, number> mf (mf_data);
-      MPI_Barrier(MPI_COMM_WORLD);
       deallog << "Norm of difference:";
 
       // run 10 times to make a possible error more

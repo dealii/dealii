@@ -2305,10 +2305,7 @@ MatrixFree<dim, Number>::cell_loop
                   internal::MPIComDistribute<InVector> *worker_dist =
                     new (worker[j]->allocate_child())
                   internal::MPIComDistribute<InVector>(src);
-                  if (odds == 0)
-                    break;
-                  else
-                    worker_dist->spawn(*worker_dist);
+                  worker_dist->spawn(*worker_dist);
                 }
               if (j<evens-1)
                 {
