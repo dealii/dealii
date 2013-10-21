@@ -17,7 +17,7 @@
 
 
 // this tests the correctness of matrix free matrix-vector products for two
-// vectors on the same DoFHandler. Otherwise the same as matrix_free_01
+// vectors on the same DoFHandler. Otherwise the same as matrix_vector_10.cc
 
 #include "../tests.h"
 

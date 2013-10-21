@@ -12,8 +12,7 @@
 
 #include "../tests.h"
 
-#include <deal.II/matrix_free/matrix_free.h>
-#include <deal.II/matrix_free/fe_evaluation.h>
+#include "matrix_vector_mf.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -36,62 +35,6 @@
 // forward declare this function. will be implemented in .cc files
 template <int dim, int fe_degree>
 void test ();
-
-
-
-template <int dim, int fe_degree, typename Number>
-void
-helmholtz_operator (const MatrixFree<dim,Number>  &data,
-                    Vector<Number>       &dst,
-                    const Vector<Number> &src,
-                    const std::pair<unsigned int,unsigned int> &cell_range)
-{
-  FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
-  const unsigned int n_q_points = fe_eval.n_q_points;
-
-  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
-    {
-      fe_eval.reinit (cell);
-      fe_eval.read_dof_values (src);
-      fe_eval.evaluate (true, true, false);
-      for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
-          fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
-        }
-      fe_eval.integrate (true,true);
-      fe_eval.distribute_local_to_global (dst);
-    }
-}
-
-
-
-template <int dim, int fe_degree, typename Number>
-class MatrixFreeTest
-{
-public:
-  typedef VectorizedArray<Number> vector_t;
-
-  MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
-    data (data_in)
-  {};
-
-  void vmult (Vector<Number>       &dst,
-              const Vector<Number> &src) const
-  {
-    dst = 0;
-    const std_cxx1x::function<void(const MatrixFree<dim,Number> &,
-                                   Vector<Number> &,
-                                   const Vector<Number> &,
-                                   const std::pair<unsigned int,unsigned int> &)>
-    wrap = helmholtz_operator<dim,fe_degree,Number>;
-    data.cell_loop (wrap, dst, src);
-  };
-
-private:
-  const MatrixFree<dim,Number> &data;
-};
-
 
 
 
@@ -147,8 +90,7 @@ void do_test (const DoFHandler<dim> &dof,
   mf.vmult (out_dist, in_dist);
 
 
-  // assemble sparse matrix with (\nabla v,
-  // \nabla u) + (v, 10 * u)
+  // assemble sparse matrix with (\nabla v, \nabla u) + (v, 10 * u)
   SparsityPattern sparsity;
   {
     CompressedSimpleSparsityPattern csp(dof.n_dofs(), dof.n_dofs());

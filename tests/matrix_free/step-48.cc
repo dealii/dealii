@@ -211,7 +211,11 @@ namespace Step48
     void assemble_system ();
     void output_results (const unsigned int timestep_number);
 
+#ifdef DEAL_II_WITH_P4EST
     parallel::distributed::Triangulation<dim>   triangulation;
+#else
+    Triangulation<dim>   triangulation;
+#endif
     FE_Q<dim>            fe;
     DoFHandler<dim>      dof_handler;
     ConstraintMatrix     constraints;
@@ -233,7 +237,9 @@ namespace Step48
   template <int dim>
   SineGordonProblem<dim>::SineGordonProblem ()
     :
+#ifdef DEAL_II_WITH_P4EST
     triangulation (MPI_COMM_WORLD),
+#endif
     fe (QGaussLobatto<1>(fe_degree+1)),
     dof_handler (triangulation),
     n_global_refinements (8-2*dim),
@@ -269,7 +275,11 @@ namespace Step48
     }
 
     deallog << "   Number of global active cells: "
+#ifdef DEAL_II_WITH_P4EST
             << triangulation.n_global_active_cells()
+#else
+            << triangulation.n_active_cells()
+#endif
             << std::endl;
 
     dof_handler.distribute_dofs (fe);

@@ -18,12 +18,11 @@
 
 // this tests the correctness of matrix free matrix-vector products when
 // threads are additionally used to MPI by comparing the result with a
-// non-parallel version. Otherwise same problem as matrix_free_01.cc
+// non-parallel version. Otherwise same problem as matrix_vector_10.cc
 
 #include "../tests.h"
 
-#include <deal.II/matrix_free/matrix_free.h>
-#include <deal.II/matrix_free/fe_evaluation.h>
+#include "matrix_vector_mf.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -39,63 +38,6 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
-
-
-template <int dim, int fe_degree, typename Number>
-void
-helmholtz_operator (const MatrixFree<dim,Number>  &data,
-                    parallel::distributed::Vector<Number>       &dst,
-                    const parallel::distributed::Vector<Number> &src,
-                    const std::pair<unsigned int,unsigned int>  &cell_range)
-{
-  FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
-  const unsigned int n_q_points = fe_eval.n_q_points;
-
-  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
-    {
-      fe_eval.reinit (cell);
-
-      fe_eval.read_dof_values (src);
-      fe_eval.evaluate (true, true, false);
-      for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
-          fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
-        }
-      fe_eval.integrate (true,true);
-      fe_eval.distribute_local_to_global (dst);
-    }
-}
-
-
-
-template <int dim, int fe_degree, typename Number>
-class MatrixFreeTest
-{
-public:
-  typedef VectorizedArray<Number> vector_t;
-  static const std::size_t n_vectors = VectorizedArray<Number>::n_array_elements;
-
-  MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
-    data (data_in)
-  {};
-
-  void vmult (parallel::distributed::Vector<Number>       &dst,
-              const parallel::distributed::Vector<Number> &src) const
-  {
-    dst = 0;
-    const std_cxx1x::function<void(const MatrixFree<dim,Number> &,
-                                   parallel::distributed::Vector<Number> &,
-                                   const parallel::distributed::Vector<Number> &,
-                                   const std::pair<unsigned int,unsigned int> &)>
-    wrap = helmholtz_operator<dim,fe_degree,Number>;
-    data.cell_loop (wrap, dst, src);
-  };
-
-private:
-  const MatrixFree<dim,Number> &data;
-};
-
 
 
 
@@ -168,7 +110,7 @@ void test ()
     mf_data.reinit (dof, constraints, quad, data);
   }
 
-  MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,number,parallel::distributed::Vector<number> > mf (mf_data);
   parallel::distributed::Vector<number> in, out, ref;
   mf_data.initialize_dof_vector (in);
   out.reinit (in);
@@ -211,7 +153,7 @@ void test ()
 
       data.tasks_block_size = 3;
       mf_data.reinit (dof, constraints, quad, data);
-      MatrixFreeTest<dim, fe_degree, number> mf (mf_data);
+      MatrixFreeTest<dim, fe_degree, number,parallel::distributed::Vector<number> > mf (mf_data);
       deallog << "Norm of difference:";
 
       // run 10 times to make a possible error more
