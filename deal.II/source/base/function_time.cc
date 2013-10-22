@@ -26,11 +26,7 @@ FunctionTime::FunctionTime(const double initial_time)
 
 
 
-#ifdef DEAL_II_USE_CXX11
-FunctionTime::~FunctionTime() noexcept(false)
-#else
 FunctionTime::~FunctionTime()
-#endif
 {}
 
 
