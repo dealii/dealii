@@ -10,7 +10,8 @@ DEAL::u const
 DEAL::Construct C
 DEAL::Construct D
 DEAL::Destruct D
+DEAL::Exception: ExcInUse (counter, object_info->name(), infostring)
 DEAL::Destruct C
 DEAL::Destruct B
 DEAL::Destruct A
-DEAL::ExcInUse (counter, object_info->name(), infostring)
+DEAL::ExcNoSubscriber(object_info->name(), name)
