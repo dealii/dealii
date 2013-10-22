@@ -46,7 +46,7 @@ void test(std::ostream & /*out*/)
     gi.attach_triangulation (tr);
     std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_3d/4.in");
     gi.read_xda (in);
-    tr.refine_global (1);
+				     //tr.refine_global (1);
   }
 
   {
@@ -54,18 +54,18 @@ void test(std::ostream & /*out*/)
     gi.attach_triangulation (tr2);
     std::ifstream in (SOURCE_DIR "/../deal.II/grid_in_3d/4.in");
     gi.read_xda (in);
-    tr2.refine_global (1);
+				     //tr2.refine_global (1);
   }
 
   Assert (tr.n_active_cells() == tr2.n_active_cells(),
           ExcInternalError());
 
 
-  for (unsigned int i=0; i<1; ++i)
+  for (unsigned int i=0; i<2; ++i)
     {
-      // refine one-fifth of cells randomly
+      // refine 10% of cells randomly
       std::vector<bool> flags (tr.n_active_cells(), false);
-      for (unsigned int k=0; k<flags.size()/5 + 1; ++k)
+      for (unsigned int k=0; k<flags.size()/10 + 1; ++k)
         flags[rand() % flags.size()] = true;
       // make sure there's at least one that
       // will be refined
@@ -103,7 +103,7 @@ void test(std::ostream & /*out*/)
       tr.execute_coarsening_and_refinement ();
       tr2.execute_coarsening_and_refinement ();
 
-//write_vtk(tr, "1");
+//      write_vtk(tr, "1");
       deallog << std::endl;
 
       deallog << i << " Number of cells: "
