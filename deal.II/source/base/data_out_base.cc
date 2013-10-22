@@ -428,8 +428,11 @@ namespace
 //----------------------------------------------------------------------//
 //For a given patch, compute the node interpolating the corner nodes
 //linearly at the point (xstep, ystep, zstep)*1./n_subdivisions.
-//If the popints are saved in the patch->data member, return the
+//If the points are saved in the patch->data member, return the
 //saved point instead
+
+//TODO: Make this function return its value, rather than using a reference
+// as first argument; take a reference for 'patch', not a pointer
   template <int dim, int spacedim>
   inline
   void
