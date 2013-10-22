@@ -108,8 +108,8 @@ GrowingVectorMemory<VECTOR>::~GrowingVectorMemory() noexcept(false)
 GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
 #endif
 {
-  AssertThrow(current_alloc == 0,
-              StandardExceptions::ExcMemoryLeak(current_alloc));
+  AssertNothrow(current_alloc == 0,
+                StandardExceptions::ExcMemoryLeak(current_alloc));
   if (log_statistics)
     {
       deallog << "GrowingVectorMemory:Overall allocated vectors: "

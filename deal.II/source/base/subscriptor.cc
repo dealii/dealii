@@ -57,11 +57,7 @@ Subscriptor::Subscriptor (const Subscriptor &)
 {}
 
 
-#ifdef DEAL_II_USE_CXX11
-Subscriptor::~Subscriptor () noexcept(false)
-#else
 Subscriptor::~Subscriptor ()
-#endif
 {
   // check whether there are still
   // subscriptions to this object. if
@@ -109,8 +105,8 @@ Subscriptor::~Subscriptor ()
           if (infostring == "")
             infostring = "<none>";
 
-          Assert (counter == 0,
-                  ExcInUse (counter, object_info->name(), infostring));
+          AssertNothrow (counter == 0,
+                         ExcInUse (counter, object_info->name(), infostring));
         }
       else
         {

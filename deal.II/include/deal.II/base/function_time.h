@@ -77,11 +77,7 @@ public:
   /**
    * Virtual destructor.
    */
-#ifdef DEAL_II_USE_CXX11
-  virtual ~FunctionTime() noexcept(false);
-#else
   virtual ~FunctionTime();
-#endif
 
   /**
    * Return the value of the time variable/

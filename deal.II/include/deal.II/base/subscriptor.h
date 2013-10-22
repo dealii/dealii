@@ -75,17 +75,7 @@ public:
    * Destructor, asserting that the counter
    * is zero.
    */
-#ifdef DEAL_II_USE_CXX11
-  // According to the C++11 standard [class.dtor] 3 in combination with
-  // [except.spec] 14 and [except.spec] 9---as explained in detail in
-  // [1]---we're guilty of just terminating in case of throwing an
-  // exception in ~Subscriptor if we do not annotate it with
-  // "noexcept(false)"
-  // [1] http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3204.htm
-  virtual ~Subscriptor() noexcept(false);
-#else
   virtual ~Subscriptor();
-#endif
 
   /**
    * Assignment operator.

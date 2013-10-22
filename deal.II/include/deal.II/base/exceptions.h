@@ -198,12 +198,30 @@ namespace deal_II_exceptions
   {
 
     /**
-     * Conditionally abort the program. Depending on whether
-     * disable_abort_on_exception was called, this function either aborts
-     * the program flow by printing the error message provided by @p exc
-     * and calling <tt>std::abort()</tt>, or throws @p exc instead.
+     * Conditionally abort the program.
+     *
+     * Depending on whether disable_abort_on_exception was called, this
+     * function either aborts the program flow by printing the error
+     * message provided by @p exc and calling <tt>std::abort()</tt>, or
+     * throws @p exc instead (if @p nothrow is set to <tt>false</tt>).
+     *
+     * If the boolean @p nothrow is set to true and
+     * disable_abort_on_exception was called, the exception type is just
+     * printed to deallog and program flow continues. This is useful if
+     * throwing an exception is prohibited (e.g. in a destructor with
+     * <tt>noexcept(true)</tt> or <tt>throw()</tt>).
      */
-    void abort (const ExceptionBase &exc);
+    void abort (const ExceptionBase &exc, bool nothrow = false);
+
+    /**
+     * An enum describing how to treat an exception in issue_error
+     */
+    enum ExceptionHandling
+    {
+      abort_on_exception,
+      throw_on_exception,
+      abort_nothrow_on_exception
+    };
 
     /**
      * This routine does the main work for the exception generation
@@ -212,27 +230,8 @@ namespace deal_II_exceptions
      * @ref ExceptionBase
      */
     template <class exc>
-    void issue_error_abort (const char *file,
-                            int         line,
-                            const char *function,
-                            const char *cond,
-                            const char *exc_name,
-                            exc         e)
-    {
-      // Fill the fields of the exception object
-      e.set_fields (file, line, function, cond, exc_name);
-
-      dealii::deal_II_exceptions::internals::abort(e);
-    }
-
-    /**
-     * This routine does the main work for the exception generation
-     * mechanism used in the <tt>AssertThrow</tt> macro.
-     *
-     * @ref ExceptionBase
-     */
-    template <class exc>
-    void issue_error (const char *file,
+    void issue_error (ExceptionHandling handling,
+                      const char *file,
                       int         line,
                       const char *function,
                       const char *cond,
@@ -241,7 +240,18 @@ namespace deal_II_exceptions
     {
       // Fill the fields of the exception object
       e.set_fields (file, line, function, cond, exc_name);
-      throw e;
+
+      switch(handling)
+        {
+        case abort_on_exception:
+          dealii::deal_II_exceptions::internals::abort(e);
+          break;
+        case abort_nothrow_on_exception:
+          dealii::deal_II_exceptions::internals::abort(e, /*nothrow =*/ true);
+          break;
+        case throw_on_exception:
+          throw e;
+        }
     }
 
   } /*namespace internals*/
@@ -261,18 +271,45 @@ namespace deal_II_exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEBUG
-#define Assert(cond, exc)                                                 \
-  {                                                                       \
-    if (!(cond))                                                          \
-      ::dealii::deal_II_exceptions::internals::                           \
-      issue_error_abort (__FILE__,                                        \
-                         __LINE__,                                        \
-                         __PRETTY_FUNCTION__, #cond, #exc, exc);          \
-  }
-
+#define Assert(cond, exc)                                                   \
+{                                                                           \
+  if (!(cond))                                                              \
+    ::dealii::deal_II_exceptions::internals::                               \
+    issue_error(::dealii::deal_II_exceptions::internals::abort_on_exception,\
+                __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+}
 #else
-#define Assert(cond, exc)                                                 \
-  { }
+#define Assert(cond, exc)                                                   \
+{}
+#endif
+
+
+
+/**
+ * A variant of the <tt>Assert</tt> macro above that exhibits the same
+ * runtime behaviour as long as disable_abort_on_exception was not called.
+ *
+ * However, if disable_abort_on_exception was called, this macro merely
+ * prints the exception that would be thrown to deallog and continues
+ * normally without throwing an exception.
+ *
+ * See the <tt>ExceptionBase</tt> class for more information.
+ *
+ * @ingroup Exceptions
+ * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
+ */
+#ifdef DEBUG
+#define AssertNothrow(cond, exc)                                            \
+{                                                                           \
+  if (!(cond))                                                              \
+    ::dealii::deal_II_exceptions::internals::                               \
+    issue_error(                                                            \
+      ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,  \
+      __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);           \
+}
+#else
+#define AssertNothrow(cond, exc)                                            \
+{}
 #endif
 
 
@@ -289,24 +326,21 @@ namespace deal_II_exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef HAVE_BUILTIN_EXPECT
-#define AssertThrow(cond, exc)                                            \
-  {                                                                       \
-    if (__builtin_expect(!(cond), false))                                 \
-      ::dealii::deal_II_exceptions::internals::                           \
-      issue_error (__FILE__,                                              \
-                   __LINE__,                                              \
-                   __PRETTY_FUNCTION__, #cond, #exc, exc);                \
-  }
-
+#define AssertThrow(cond, exc)                                              \
+{                                                                           \
+  if (__builtin_expect(!(cond), false))                                     \
+    ::dealii::deal_II_exceptions::internals::                               \
+    issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
+                __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+}
 #else /*ifdef HAVE_BUILTIN_EXPECT*/
-#define AssertThrow(cond, exc)                                            \
-  {                                                                       \
-    if (!(cond))                                                          \
-      ::dealii::deal_II_exceptions::internals::                           \
-      issue_error (__FILE__,                                              \
-                   __LINE__,                                              \
-                   __PRETTY_FUNCTION__, #cond, #exc, exc);                \
-  }
+#define AssertThrow(cond, exc)                                              \
+{                                                                           \
+  if (!(cond))                                                              \
+    ::dealii::deal_II_exceptions::internals::                               \
+    issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
+                __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+}
 #endif /*ifdef HAVE_BUILTIN_EXPECT*/
 
 

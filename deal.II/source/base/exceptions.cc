@@ -281,16 +281,26 @@ namespace deal_II_exceptions
   namespace internals
   {
 
-    void abort (const ExceptionBase &exc)
+    void abort (const ExceptionBase &exc, bool nothrow /*= false*/)
     {
       if (dealii::deal_II_exceptions::abort_on_exception)
         {
-          //* Print the error message and bail out:
+          // Print the error message and bail out:
           std::cerr << exc.what() << std::endl;
           std::abort();
         }
+      else if (nothrow)
+        {
+          // We are not allowed to throw, and not allowed to abort.
+          // Just print the exception name to deallog and continue
+          // normally:
+          deallog << "Exception: " << e.get_exc_name() << std::endl;
+        }
       else
         {
+          // We are not allowed to abort, so just throw the error so just
+          // throw the error so just throw the error so just throw the
+          // error:
           throw exc;
         }
     }
