@@ -294,7 +294,7 @@ namespace deal_II_exceptions
           // We are not allowed to throw, and not allowed to abort.
           // Just print the exception name to deallog and continue
           // normally:
-          deallog << "Exception: " << e.get_exc_name() << std::endl;
+          deallog << "Exception: " << exc.get_exc_name() << std::endl;
         }
       else
         {

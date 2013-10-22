@@ -169,6 +169,15 @@ inconvenience this causes.
 
 <ol>
   <li>
+  ~Subscriptor and ~GrowingVectorMemory no longer throw an exception (the
+  former if disable_abort_on_exception was called) to be compatible with the
+  C++11 standard which otherwise requires the program to immediately call
+  std::terminate. This was done with a new macro "AssertNothrow".
+  <br>
+  (Wolfgang Bangerth, Matthias Maier, Bruno Turcksin 2013/10/22)
+  </li>
+
+  <li>
   dealii::SolverControl::NoConvergence now inherits dealii::ExceptionBase and
   is thrown via AssertThrow(false, ... ).
   <br>
