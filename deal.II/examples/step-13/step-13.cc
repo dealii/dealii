@@ -28,7 +28,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/table_handler.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -57,6 +56,11 @@
 #include <list>
 #include <sstream>
 
+#ifdef DEAL_II_WITH_THREADS
+#  include <tbb/task.h>
+#  include <tbb/task_scheduler_init.h>
+#endif
+
 // The last step is as in all previous programs:
 namespace Step13
 {
@@ -64,6 +68,7 @@ namespace Step13
 
   namespace Assembler
   {
+    // Dummy structure
     struct Scratch
     {
       Scratch() {}
@@ -643,7 +648,7 @@ namespace Step13
       // various subobjects, and there is a function that implements a
       // conjugate gradient method as solver.
     private:
-      struct LinearSystem
+      struct LinearSystem 
       {
         LinearSystem (const DoFHandler<dim> &dof_handler);
 
@@ -654,6 +659,53 @@ namespace Step13
         SparseMatrix<double> matrix;
         Vector<double>       rhs;
       };
+
+#ifdef DEAL_II_WITH_THREADS
+
+      // Tasks in TBB must be derived from tbb::task and override tbb::task*
+      // execute.
+      // The purpose of HangingNodeTask is to apply execute DoFTools::make_hanging_node_constraints.
+      struct HangingNodeTask : public tbb::task
+      {
+        HangingNodeTask (const DoFHandler<dim> &dof_handler,ConstraintMatrix &hanging_node_constraints) :
+          dof_handler(&dof_handler),
+          hanging_node_constraints(& hanging_node_constraints) {}
+
+        tbb::task* execute()
+        {
+          DoFTools::make_hanging_node_constraints(*dof_handler,*hanging_node_constraints);
+
+          return NULL;
+        }
+
+        const DoFHandler<dim>* dof_handler;
+        ConstraintMatrix* hanging_node_constraints;
+      };                
+
+
+
+      // The purpose of SparsityPatternTask is to create the sparsity pattern.
+      struct SparsityPatternTask : public tbb::task
+      {
+        SparsityPatternTask (const DoFHandler<dim> &dof_handler,SparsityPattern &sparsity_pattern) :
+          dof_handler(&dof_handler),
+          sparsity_pattern(&sparsity_pattern) {}
+
+        tbb::task* execute()
+        {
+          sparsity_pattern->reinit (dof_handler->n_dofs(),
+                                   dof_handler->n_dofs(),
+                                   dof_handler->max_couplings_between_dofs());
+          DoFTools::make_sparsity_pattern (*dof_handler, *sparsity_pattern);
+
+          return NULL;
+        }
+
+        const DoFHandler<dim>* dof_handler;
+        SparsityPattern* sparsity_pattern;
+      };
+
+#endif
 
       // Finally, there is a pair of functions which will be used to assemble
       // the actual system matrix. It calls the virtual function assembling
@@ -920,23 +972,36 @@ namespace Step13
     {
       hanging_node_constraints.clear ();
 
-      void (*mhnc_p) (const DoFHandler<dim> &,
-                      ConstraintMatrix &)
-        = &DoFTools::make_hanging_node_constraints;
+#ifdef DEAL_II_WITH_THREADS
+      tbb::task_scheduler_init init;
+      // Create an empty task to be the parent of the two tasks that we need.
+      tbb::empty_task* empty_task = new (tbb::task::allocate_root()) tbb::empty_task;
+      // Set the reference count to 3 (number of children+1 because
+      // wati_for_all returns when ref_count is one).
+      empty_task->set_ref_count(3);
+      
+      HangingNodeTask* hanging_node_task = 
+        new (empty_task->allocate_child()) HangingNodeTask(dof_handler,hanging_node_constraints);
+      SparsityPatternTask* sparsity_pattern_task =
+        new (empty_task->allocate_child()) SparsityPatternTask(dof_handler,sparsity_pattern);
 
-      Threads::Thread<>
-      mhnc_thread = Threads::new_thread (mhnc_p,
-                                         dof_handler,
-                                         hanging_node_constraints);
+      // Spawn the two tasks
+      empty_task->spawn(*hanging_node_task);
+      empty_task->spawn(*sparsity_pattern_task);
+
+      // Wait for children to finish
+      empty_task->wait_for_all();
+      // empty_task must be destroy manually because it does not return.
+      empty_task->destroy(*empty_task);
+#else
+      DoFTools::make_hanging_node_constraints(dof_handler,hanging_node_constraints);
 
       sparsity_pattern.reinit (dof_handler.n_dofs(),
                                dof_handler.n_dofs(),
                                dof_handler.max_couplings_between_dofs());
       DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+#endif
 
-      // Wait until the <code>hanging_node_constraints</code> object is fully
-      // set up, then close it and use it to condense the sparsity pattern:
-      mhnc_thread.join ();
       hanging_node_constraints.close ();
       hanging_node_constraints.condense (sparsity_pattern);
 
