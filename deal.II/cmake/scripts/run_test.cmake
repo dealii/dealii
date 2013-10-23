@@ -30,6 +30,26 @@
 #
 #   ADDITIONAL_OUTPUT - A list of additional output lines that should be printed
 #
+#   GUARD_FILE - used to detect a forced interruption of this script: On
+#                startup the backed up file ${GUARD_FILE}_back is put back
+#                in place as ${GUARD_FILE} and on exit ${GUARD_FILE} is
+#                backed up as ${GUARD_FILE}_back. If on startup a stale
+#                ${GUARD_FILE} is found, it is deleted.
+#
+
+IF(NOT "${GUARD_FILE}" STREQUAL "" AND EXISTS ${GUARD_FILE})
+  #
+  # Guard file still exists, so this script must have been interrupted.
+  # Remove guard file to force a complete rerun:
+  #
+  EXECUTE_PROCESS(COMMAND rm -f ${GUARD_FILE})
+ELSEIF(NOT "${GUARD_FILE}" STREQUAL "" AND EXISTS ${GUARD_FILE}_bck)
+  #
+  # A backed up guard file exists. Put it back in place:
+  #
+  EXECUTE_PROCESS(COMMAND mv ${GUARD_FILE}_bck ${GUARD_FILE})
+ENDIF()
+
 
 IF("${EXPECT}" STREQUAL "")
   SET(EXPECT "PASSED")
@@ -77,7 +97,8 @@ ENDFOREACH()
 MESSAGE("===============================   OUTPUT BEGIN  ===============================")
 
 IF("${_stage}" STREQUAL "PASSED")
-  MESSAGE("${TEST}: PASSED.")
+  #MESSAGE("${TEST}: PASSED.")
+  MESSAGE(${_output})
 
 ELSE()
 
@@ -92,6 +113,14 @@ ELSE()
 ENDIF()
 
 MESSAGE("===============================    OUTPUT END   ===============================")
+
+#
+# Back up guard file:
+#
+
+IF(NOT "${GUARD_FILE}" STREQUAL "" AND EXISTS ${GUARD_FILE})
+  EXECUTE_PROCESS(COMMAND mv ${GUARD_FILE} ${GUARD_FILE}_bck)
+ENDIF()
 
 #
 # Bail out:
