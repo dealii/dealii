@@ -97,8 +97,7 @@ ENDFOREACH()
 MESSAGE("===============================   OUTPUT BEGIN  ===============================")
 
 IF("${_stage}" STREQUAL "PASSED")
-  #MESSAGE("${TEST}: PASSED.")
-  MESSAGE(${_output})
+  MESSAGE("${TEST}: PASSED.")
 
 ELSE()
 
