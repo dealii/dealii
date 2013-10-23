@@ -64,7 +64,7 @@ public:
   /**
    * Set the file name and line of where the exception appeared as
    * well as the violated condition and the name of the exception as
-   * a char pointer.
+   * a char pointer. This function also populates the stacktrace.
    */
   void set_fields (const char *file,
                    const int   line,
@@ -131,6 +131,14 @@ protected:
    * variable. Zero if the system does not support stack traces.
    */
   int n_stacktrace_frames;
+
+private:
+  /**
+   * Internal function that generates the c_string that gets printed by
+   * exception::what(). Called by the ExceptionBase constructor and
+   * set_fields.
+   */
+  void generate_message();
 };
 
 
