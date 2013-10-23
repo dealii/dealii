@@ -65,7 +65,7 @@ namespace LinearAlgebraPETSc
   typedef PETScWrappers::SparseMatrix SparseMatrix;
 
   typedef PETScWrappers::SolverCG SolverCG;
-
+  typedef PETScWrappers::SolverGMRES SolverGMRES;
 
   namespace MPI
   {
@@ -146,6 +146,7 @@ namespace LinearAlgebraTrilinos
   typedef TrilinosWrappers::Vector Vector;
 
   typedef TrilinosWrappers::SolverCG SolverCG;
+  typedef TrilinosWrappers::SolverGMRES SolverGMRES;
 
   namespace MPI
   {
