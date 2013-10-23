@@ -2033,7 +2033,7 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found
    * is not locally owned, an exception of type 
-   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * VectorTools::ExcPointNotAvailableHere
    * is thrown.
    */
   template <int dim, class InVector, int spacedim>
@@ -2062,7 +2062,7 @@ namespace VectorTools
    * 
    * @note If the cell in which the point is found
    * is not locally owned, an exception of type 
-   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * VectorTools::ExcPointNotAvailableHere
    * is thrown.
    */
   template <int dim, class InVector, int spacedim>
@@ -2090,7 +2090,7 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found
    * is not locally owned, an exception of type 
-   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * VectorTools::ExcPointNotAvailableHere
    * is thrown.
    */
   template <int dim, class InVector, int spacedim>
@@ -2105,7 +2105,7 @@ namespace VectorTools
   *
   * @note If the cell in which the point is found
   * is not locally owned, an exception of type 
-  * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+  * VectorTools::ExcPointNotAvailableHere
   * is thrown.
   */
   template <int dim, class InVector, int spacedim>
@@ -2135,7 +2135,7 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found
    * is not locally owned, an exception of type 
-   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * VectorTools::ExcPointNotAvailableHere
    * is thrown.
    */
   template <int dim, class InVector, int spacedim>
@@ -2149,7 +2149,7 @@ namespace VectorTools
   * 
   * @note If the cell in which the point is found
   * is not locally owned, an exception of type 
-  * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+  * VectorTools::ExcPointNotAvailableHere
   * is thrown.
   */
   template <int dim, class InVector, int spacedim>
@@ -2175,7 +2175,7 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found
    * is not locally owned, an exception of type 
-   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * VectorTools::ExcPointNotAvailableHere
    * is thrown.
    */
   template <int dim, class InVector, int spacedim>
@@ -2191,7 +2191,7 @@ namespace VectorTools
   *
   * @note If the cell in which the point is found
   * is not locally owned, an exception of type 
-  * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+  * VectorTools::ExcPointNotAvailableHere
   * is thrown.
   */
   template <int dim, class InVector, int spacedim>
@@ -2217,7 +2217,7 @@ namespace VectorTools
    *
    * @note If the cell in which the point is found
    * is not locally owned, an exception of type 
-   * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+   * VectorTools::ExcPointNotAvailableHere
    * is thrown.
    */
   template <int dim, class InVector, int spacedim>
@@ -2232,7 +2232,7 @@ namespace VectorTools
   *
   * @note If the cell in which the point is found
   * is not locally owned, an exception of type 
-  * VectorTools<dim, InVector, spacedim>::ExcPointNotAvailableHere
+  * VectorTools::ExcPointNotAvailableHere
   * is thrown.
   */
   template <int dim, class InVector, int spacedim>
