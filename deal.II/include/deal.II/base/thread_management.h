@@ -67,7 +67,7 @@ namespace Threads
    * This class is used instead of a true lock class when not using
    * multithreading. It allows to write programs such that they start new
    * threads and/or lock objects in multithreading mode, and use dummy thread
-   * management and synchronisation classes instead when running in
+   * management and synchronization classes instead when running in
    * single-thread mode. Specifically, the <tt>new_thread</tt> functions only
    * call the function but wait for it to return instead of running in on
    * another thread, and the mutices do nothing really. The only reason to
@@ -226,7 +226,7 @@ namespace Threads
    * waiting for some other part of the program to reach a certain point
    * of execution), the constructor of this class throws an exception if
    * the <tt>count</tt> argument denoting the number of threads that need to
-   * be synchronised is not equal to one.
+   * be synchronized is not equal to one.
    *
    * @author Wolfgang Bangerth, 2001
    */
@@ -1026,7 +1026,7 @@ namespace Threads
      * function based on the template
      * arguments, and whether the
      * second argument is a const or
-     * non-const class, dependening on
+     * non-const class, depending on
      * which the member function will
      * also me const or
      * non-const. There are
@@ -1297,7 +1297,7 @@ namespace Threads
      * by having the descriptor keep
      * a pointer to itself and reset
      * it to zero once it is done --
-     * effectly keeping the use
+     * effectively keeping the use
      * pointer above zero as long as
      * work is going on.
      *
@@ -1732,7 +1732,7 @@ namespace Threads
      * having the descriptor keep a
      * pointer to itself and reset
      * it to zero once it is done
-     * -- effectly keeping the use
+     * -- effectively keeping the use
      * pointer above zero as long
      * as work is going on.
      */
