@@ -397,6 +397,8 @@ namespace ChunkSparseMatrixIterators
  * importantly one can associate more than one matrix with the same
  * sparsity pattern.
  *
+ * The use of this class is demonstrated in step-51.
+ *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).

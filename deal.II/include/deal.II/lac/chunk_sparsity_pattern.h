@@ -216,10 +216,10 @@ namespace ChunkSparsityPatternIterators
 
 /**
  * Structure representing the sparsity pattern of a sparse matrix.
- *
  * This class is an example of the "static" type of @ref Sparsity.
- *
  * It uses the compressed row storage (CSR) format to store data.
+ *
+ * The use of this class is demonstrated in step-51.
  *
  * @author Wolfgang Bangerth, 2008
  */
