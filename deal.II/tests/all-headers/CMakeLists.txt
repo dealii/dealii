@@ -51,14 +51,20 @@ FOREACH(_full_file ${_header})
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${TEST_PICKUP_REGEX}" )
 
+      #
+      # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
+      # force a complete rerun of this test (BUILD stage) if
+      # interrupt_guard.cc is removed by run_test.cmake due to an
+      # interruption.
+      #
       ADD_CUSTOM_COMMAND(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}_timeout_guard.cc
-        COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}_timeout_guard.cc
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
+        COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
         )
 
       # Add an object library for each header file and build configuration:
       ADD_LIBRARY(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc
-        ${CMAKE_CURRENT_BINARY_DIR}/${_target}_timeout_guard.cc
+        ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
         )
 
       SET_TARGET_PROPERTIES(${_target} PROPERTIES
@@ -84,7 +90,7 @@ FOREACH(_full_file ${_header})
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.build -DTEST=${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-          -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}_timeout_guard.cc
+          -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
           -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )

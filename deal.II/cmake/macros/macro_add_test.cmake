@@ -130,13 +130,19 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       IF(NOT TARGET ${_target})
         # only add the target once
 
+        #
+        # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
+        # force a complete rerun of this test (BUILD, RUN and DIFF stage)
+        # if interrupt_guard.cc is removed by run_test.cmake due to an
+        # interruption.
+        #
         ADD_CUSTOM_COMMAND(
-          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}/timeout_guard.cc
-          COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}/timeout_guard.cc
+          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
+          COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
           )
 
         ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${_test_name}.cc
-          ${CMAKE_CURRENT_BINARY_DIR}/${_target}/timeout_guard.cc
+          ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
           )
 
         SET_TARGET_PROPERTIES(${_target} PROPERTIES
@@ -225,7 +231,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           -DEXPECT=${_expect}
           -DADDITIONAL_OUTPUT=${ARGN}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-          -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}/timeout_guard.cc
+          -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
           -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )

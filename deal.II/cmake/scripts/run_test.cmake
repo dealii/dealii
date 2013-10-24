@@ -31,9 +31,9 @@
 #   ADDITIONAL_OUTPUT - A list of additional output lines that should be printed
 #
 #   GUARD_FILE - used to detect a forced interruption of this script: On
-#                startup the backed up file ${GUARD_FILE}_back is put back
+#                startup the backed up file ${GUARD_FILE}_bck is put back
 #                in place as ${GUARD_FILE} and on exit ${GUARD_FILE} is
-#                backed up as ${GUARD_FILE}_back. If on startup a stale
+#                backed up as ${GUARD_FILE}_bck. If on startup a stale
 #                ${GUARD_FILE} is found, it is deleted.
 #
 
