@@ -17,7 +17,7 @@ is the large number of globally coupled degrees of freedom that one
 must solve in an implicit system.  This is because, unlike continuous finite
 elements, in typical discontinuous elements there is one degree of freedom at
 each vertex <i>for each of the adjacent elements</i>, rather than just one,
-and similarly for edges and faces.  As an example of how fast the number of 
+and similarly for edges and faces.  As an example of how fast the number of
 unknowns grows,
 consider the <code>FE_DGP_Monomial</code> basis:  each
 scalar solution component is represented by polynomials of degree $p$
@@ -79,7 +79,7 @@ The coupling to other cells is introduced by the matrices
 matrix <i>A</i> element by element (the local solution of the Dirichlet
 problem) and subtract $CA^{-1}B$ from $D$. The steps in the Dirichlet-to-Neumann map concept hence correspond to
 <ol>
-  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand side $G - C A^{-1} F$  <i>locally on each cell</i> 
+  <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand side $G - C A^{-1} F$  <i>locally on each cell</i>
   and inserting the contribution into the global trace matrix in the usual way,
   <li> solving the Schur complement system for $\Lambda$, and
   <li> solving for <i>U</i> using the second equation, given $\Lambda$.
@@ -153,10 +153,11 @@ We eliminate the numerical trace $\hat{\mathbf{q}}$ by using traces of the form:
 The variable $\hat {u}$ is introduced as an additional independent variable
 and is the one for which we finally set up a globally coupled linear
 system. As mentioned above, it is defined on the element faces and
-discontinuous from one face to another.
+discontinuous from one face to another wherever faces meet (at
+vertices in 2d, and at edges and vertices in 3d).
 Values for $u$ and $\mathbf{q}$ appearing in the numerical trace function
 are taken to be the cell's interior solution restricted
-to the boundary $\partial K$.  
+to the boundary $\partial K$.
 
 The local stabilization parameter $\tau$ has effects on stability and accuracy
 of HDG solutions; see the literature for a further discussion. A stabilization
@@ -168,7 +169,7 @@ the stabilization parameter as
 @f{eqnarray*}
   \tau = \frac{\kappa}{\ell} + |\mathbf{c} \cdot \mathbf{n}|
 @f}
-where we set the diffusion $\kappa=1$ and the diffusion length scale to 
+where we set the diffusion $\kappa=1$ and the diffusion length scale to
 $\ell = \frac{1}{5}$.
 
 The trace/skeleton variables in HDG methods are single-valued on element
@@ -194,7 +195,7 @@ Find $(\mathbf{q}_h, u_h, \hat{u}_h) \in
     - ( \nabla\cdot\mathbf{v}, u_h)_{\mathcal{T}}
     + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}_h\right>_{\partial\mathcal{T}}
     &=& 0,
-    \quad \forall \mathbf{v} \in \mathcal{V}_h^p,
+    \quad &&\forall \mathbf{v} \in \mathcal{V}_h^p,
 \\
    - (\nabla w, \mathbf{c} u_h)_{\mathcal{T}}
    + (w, \nabla \cdot \mathbf{q}_h)_{\mathcal{T}}
@@ -202,14 +203,14 @@ Find $(\mathbf{q}_h, u_h, \hat{u}_h) \in
     + \left<w, \tau (u_h - \hat{u}_h)\right>_{\partial \mathcal{T}}
     &=&
     (w, f)_{\mathcal{T}},
-    \quad \forall w \in \mathcal{W}_h^p,
+    \quad &&\forall w \in \mathcal{W}_h^p,
 \\
   \left< \mu, \hat{u}_h\mathbf{c} \cdot \mathbf{n}
   		+ \mathbf{q}_h\cdot \mathbf{n}
   	    + \tau (u_h - \hat{u}_h)\right>_{\partial \mathcal{T}}
     &=&
     \left<\mu, g_N\right>_{\partial\Omega_N},
-    \quad \forall \mu \in \mathcal{M}_h^p.
+    \quad &&\forall \mu \in \mathcal{M}_h^p.
 @f}
 
 The unknowns $(\mathbf{q}_h, u_h)$ are referred to as local variables; they are
@@ -220,9 +221,10 @@ We use the notation $(\cdot, \cdot)_{\mathcal{T}} = \sum_K (\cdot, \cdot)_K$
 to denote the sum of integrals over all cells and $\left<\cdot,
 \cdot\right>_{\partial \mathcal{T}} = \sum_K \left<\cdot,
 \cdot\right>_{\partial K}$ to denote integration over all faces of all cells,
-i.e., interior faces are visited twice. When combining the contribution from
-both elements sharing a face, the above equation yields terms familiar for DG
-with jumps of the solution over the cell boundaries.
+i.e., interior faces are visited twice, once from each side and with
+the corresponding normal vectors. When combining the contribution from
+both elements sharing a face, the above equation yields terms familiar
+from the DG method, with jumps of the solution over the cell boundaries.
 
 In the equation above, the space $\mathcal {W}_h^{p}$ for the scalar variable
 <i>u<sub>h</sub></i> is defined as the space of functions that are tensor
@@ -244,7 +246,8 @@ In the weak form given above, we can note the following coupling patterns:
 <ol>
   <li> The matrix $A$ consists of local-local coupling terms.  These arise when the
   local weighting functions $(\mathbf{v}, w)$ multiply the local solution terms
-  $(\mathbf{q}_h, u_h)$.
+  $(\mathbf{q}_h, u_h)$. Because the elements are discontinuous, $A$
+  is block diagonal.
   <li> The matrix $B$ represents the local-face coupling.  These are the terms
   with weighting functions $(\mathbf{v}, w)$ multiplying the skeleton variable
   $\hat{u}_h$.
@@ -270,12 +273,14 @@ ingredients:
 </ol>
 
 We now introduce a new variable $u_h^* \in \mathcal{V}_h^{p+1}$, which we find
-by the expression $|\kappa \nabla u_h^* + \mathbf{q}_h|^2$ over the cell
+by minimizing the expression $|\kappa \nabla u_h^* + \mathbf{q}_h|^2$ over the cell
 <i>K</i> under the constraint $\left(1, u_h^*\right)_K &=& \left(1,
-u_h\right)_K$. This translates to the following system of equations:
+u_h\right)_K$. The constraint is necessary because the minimization
+functional does not determine the constant part of $u_h^*$. This
+translates to the following system of equations:
 @f{eqnarray*}
 \left(1, u_h^*\right)_K &=& \left(1, u_h\right)_K\\
-\left(\nabla w_h^*, \kappa \nabla u_h^*\right)_K &=& 
+\left(\nabla w_h^*, \kappa \nabla u_h^*\right)_K &=&
 -\left(\nabla w_h^*, \mathbf{q}_h\right)_K
 \quad \text{for all } w_h^* \in \mathcal Q^{p+1}.
 @f}
