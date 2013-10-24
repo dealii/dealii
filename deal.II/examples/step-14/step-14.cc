@@ -23,6 +23,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -492,46 +493,6 @@ namespace Step14
         Vector<double>       rhs;
       };
 
-#ifdef DEAL_II_WITH_THREADS
-
-      struct HangingNodeTask : public tbb::task
-      {
-        HangingNodeTask (const DoFHandler<dim> &dof_handler,ConstraintMatrix &hanging_node_constraints) :
-          dof_handler(&dof_handler),
-          hanging_node_constraints(& hanging_node_constraints) {}
-
-        tbb::task* execute()
-        {
-          DoFTools::make_hanging_node_constraints(*dof_handler,*hanging_node_constraints);
-
-          return NULL;
-        }
-
-        const DoFHandler<dim>* dof_handler;
-        ConstraintMatrix* hanging_node_constraints;
-      };                
-
-      struct SparsityPatternTask : public tbb::task
-      {
-        SparsityPatternTask (const DoFHandler<dim> &dof_handler,SparsityPattern &sparsity_pattern) :
-          dof_handler(&dof_handler),
-          sparsity_pattern(&sparsity_pattern) {}
-
-        tbb::task* execute()
-        {
-          sparsity_pattern->reinit (dof_handler->n_dofs(),
-                                   dof_handler->n_dofs(),
-                                   dof_handler->max_couplings_between_dofs());
-          DoFTools::make_sparsity_pattern (*dof_handler, *sparsity_pattern);
-
-          return NULL;
-        }
-
-        const DoFHandler<dim>* dof_handler;
-        SparsityPattern* sparsity_pattern;
-      };
-
-#endif
 
       void
       assemble_linear_system (LinearSystem &linear_system);
@@ -722,32 +683,19 @@ namespace Step14
     {
       hanging_node_constraints.clear ();
 
-#ifdef DEAL_II_WITH_THREADS
-      tbb::task_scheduler_init init;
-      // Create an empty task to be the parent of the two tasks that we need.
-      tbb::empty_task* empty_task = new (tbb::task::allocate_root()) tbb::empty_task;
-      // Set the reference count to 3 (number of children+1)
-      empty_task->set_ref_count(3);
-      
-      HangingNodeTask* hanging_node_task = 
-        new (empty_task->allocate_child()) HangingNodeTask(dof_handler,hanging_node_constraints);
-      SparsityPatternTask* sparsity_pattern_task =
-        new (empty_task->allocate_child()) SparsityPatternTask(dof_handler,sparsity_pattern);
+      void (*mhnc_p) (const DoFHandler<dim> &,
+          ConstraintMatrix &)
+        = &DoFTools::make_hanging_node_constraints;
 
-      empty_task->spawn(*hanging_node_task);
-      empty_task->spawn(*sparsity_pattern_task);
-
-      // Wait for children to finish
-      empty_task->wait_for_all();
-      empty_task->destroy(*empty_task);
-#else
-      DoFTools::make_hanging_node_constraints(dof_handler,hanging_node_constraints);
+      Threads::Task<> side_task(std_cxx1x::bind(mhnc_p,std_cxx1x::cref(dof_handler),
+            std_cxx1x::ref(hanging_node_constraints)));
 
       sparsity_pattern.reinit (dof_handler.n_dofs(),
-                               dof_handler.n_dofs(),
-                               dof_handler.max_couplings_between_dofs());
+                                dof_handler.n_dofs(),
+                                dof_handler.max_couplings_between_dofs());
       DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-#endif
+
+      side_task.join();
 
       hanging_node_constraints.close ();
       hanging_node_constraints.condense (sparsity_pattern);
@@ -2180,12 +2128,12 @@ namespace Step14
     void
     WeightedResidual<dim>::solve_problem ()
     {
-      Threads::ThreadGroup<> threads;
-      threads += Threads::new_thread (&WeightedResidual<dim>::solve_primal_problem,
-                                      *this);
-      threads += Threads::new_thread (&WeightedResidual<dim>::solve_dual_problem,
-                                      *this);
-      threads.join_all ();
+      Threads::TaskGroup<> tasks;
+      tasks += Threads::Task<> (std_cxx1x::bind(&WeightedResidual<dim>::solve_primal_problem,
+            std_cxx1x::ref(*this)));
+      tasks += Threads::Task<> (std_cxx1x::bind(&WeightedResidual<dim>::solve_dual_problem,
+            std_cxx1x::ref(*this)));
+      tasks.join_all();
     }
 
 
