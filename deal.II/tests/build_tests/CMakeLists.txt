@@ -62,12 +62,6 @@ FOREACH(_step_full ${_steps})
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
         _test MATCHES "${TEST_PICKUP_REGEX}"  )
 
-      ADD_CUSTOM_COMMAND(
-        OUTPUT ${_step_dir}/timeout_guard
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${_step_dir}
-        COMMAND touch ${_step_dir}/timeout_guard
-        )
-
       SET(_step_dir ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_build_lowercase})
 
       FILE(GLOB _files ${_step_full}/*)
@@ -79,6 +73,12 @@ FOREACH(_step_full ${_steps})
             )
         ENDIF()
       ENDFOREACH()
+
+      ADD_CUSTOM_COMMAND(
+        OUTPUT ${_step_dir}/timeout_guard
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${_step_dir}
+        COMMAND touch ${_step_dir}/timeout_guard
+        )
 
       # A rule how to copy the example step to the current directory:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/CMakeLists.txt
