@@ -10,21 +10,23 @@ with presenting methods of writing modular and extensible finite
 element programs. The main reason for this is the size and complexity
 of modern research software: applications implementing modern error
 estimation concepts and adaptive solution methods tend to become
-rather large. For example, the three largest applications by the main
+rather large. For example, when this program was written in 2002, the
+three largest applications by the main
 authors of deal.II, are at the time of writing of this example
 program:
 <ol>
 <li> a program for solving conservation hyperbolic equations by the
      Discontinuous Galerkin Finite Element method: 33,775 lines of
-     code; 
+     code;
 <li> a parameter estimation program: 28,980 lines of code;
 <li> a wave equation solver: 21,020 lines of code.
 </ol>
 (The library proper - without example programs and
-test suite - has slightly more than 150,000 lines of code as of spring 2002.)
+test suite - has slightly more than 150,000 lines of code as of spring
+2002. It is of course several times larger now.)
 In the opinion of the author of this example program, the sizes of these
 applications are at the edge of what one person, even an experienced
-programmer, can manage. 
+programmer, can manage.
 
 
 
@@ -55,12 +57,13 @@ relatively independent of the other ones:
     mappings.
 </ol>
 Besides these, and a large number of smaller classes, there are of
-course the following ``tool'' modules:
+course the following "tool" modules:
 <ol>
 <li>output in various graphical formats;
 <li>linear algebra classes.
 </ol>
-
+These complexes can also be found as a flow chart on the front page of
+the deal.II manual website.
 
 
 
@@ -79,7 +82,7 @@ number of differences compared to previous example programs:
 <ol>
 <li>The classes that implement the process of numerically solving the
     equation are no more responsible for driving the process of
-    ``solving-estimating error-refining-solving again'', but we delegate
+    "solving-estimating error-refining-solving again", but we delegate
     this to external functions. This allows first to use it as a
     building block in a larger context, where the solution of a
     Laplace equation might only be one part (for example, in a
@@ -105,6 +108,10 @@ number of differences compared to previous example programs:
     classes that compute the solution.
 <li>Separate the description of the test case with which we will
     present the program, from the rest of the program.
+<li>Parallelize the assembly of linear systems using the WorkStream
+    facilities. This follows the extensive description that can be
+    found in the @ref "Parallel computing with multiple processors accessing shared memory" threads
+    documentation module.
 </ol>
 
 
@@ -117,7 +124,7 @@ design techniques used in the program to achieve the goal of
 implementing the desired mathematical method. However, we must
 stress that software design is in part also a subjective matter:
 different persons have different programming backgrounds and have
-different opinions about the ``right'' style of programming; this
+different opinions about the "right" style of programming; this
 program therefore expresses only what the author considers useful
 practice, and is not necessarily a style that you have to adopt in
 order to write successful numerical software if you feel uncomfortable
@@ -163,7 +170,7 @@ avoid the pitfalls of too closely coupled codes.
 What the program actually does is not even the main point of this
 program, the structure of the program is more important. However, in a
 few words, a description would be: solve the Laplace equation for a
-given right hand side such that the solution is the function 
+given right hand side such that the solution is the function
 $u(x,t)=\exp(x+\sin(10y+5x^2))$. The goal of the
 computation is to get the value of the solution at the point
 $x_0=(0.5,0.5)$, and to compare the accuracy with
