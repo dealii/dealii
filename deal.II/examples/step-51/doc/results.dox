@@ -17,7 +17,13 @@ solution is not continuous on the vertices where the faces meet, even though
 its values are quite close along lines in the same coordinate direction. The
 skeleton solution can be interpreted as a rubber spring between the two sides
 that balances the jumps in the solution (or rather, the flux $\kappa \nabla u
-+ \mathbf{c} u$). As the mesh is refined, the jumps between the cells get
++ \mathbf{c} u$). From the picture at the top left, it is clear that
+the bulk solution frequently over- and undershoots and that the
+skeleton variable in indeed a better approximation to the exact
+solution; this explains why we can get a better solution using a
+postprocessing step.
+
+As the mesh is refined, the jumps between the cells get
 small (we represent a smooth solution), and the skeleton solution approaches
 the interior parts. For cycle 8, there is no visible difference in the two
 variables. We also see how boundary conditions are implemented weakly and that
@@ -122,16 +128,16 @@ cells dofs      val L2        grad L2      val L2-post
 
 Q3 elements, global refinement:
 cells dofs      val L2        grad L2      val L2-post
-   16   160 3.613e-01    - 1.891e+00    - 3.020e-01    - 
-   36   336 6.411e-02 4.26 5.081e-01 3.24 3.238e-02 5.51 
-   64   576 3.480e-02 2.12 2.533e-01 2.42 5.277e-03 6.31 
-  144  1248 8.297e-03 3.54 5.924e-02 3.58 6.330e-04 5.23 
-  256  2176 2.254e-03 4.53 1.636e-02 4.47 1.403e-04 5.24 
-  576  4800 4.558e-04 3.94 3.277e-03 3.96 1.844e-05 5.01 
- 1024  8448 1.471e-04 3.93 1.052e-03 3.95 4.378e-06 5.00 
- 2304 18816 2.956e-05 3.96 2.104e-04 3.97 5.750e-07 5.01 
- 4096 33280 9.428e-06 3.97 6.697e-05 3.98 1.362e-07 5.01 
- 9216 74496 1.876e-06 3.98 1.330e-05 3.99 1.788e-08 5.01 
+   16   160 3.613e-01    - 1.891e+00    - 3.020e-01    -
+   36   336 6.411e-02 4.26 5.081e-01 3.24 3.238e-02 5.51
+   64   576 3.480e-02 2.12 2.533e-01 2.42 5.277e-03 6.31
+  144  1248 8.297e-03 3.54 5.924e-02 3.58 6.330e-04 5.23
+  256  2176 2.254e-03 4.53 1.636e-02 4.47 1.403e-04 5.24
+  576  4800 4.558e-04 3.94 3.277e-03 3.96 1.844e-05 5.01
+ 1024  8448 1.471e-04 3.93 1.052e-03 3.95 4.378e-06 5.00
+ 2304 18816 2.956e-05 3.96 2.104e-04 3.97 5.750e-07 5.01
+ 4096 33280 9.428e-06 3.97 6.697e-05 3.98 1.362e-07 5.01
+ 9216 74496 1.876e-06 3.98 1.330e-05 3.99 1.788e-08 5.01
 @endcode
 
 
@@ -153,41 +159,41 @@ The same convergence rates are observed in 3d.
 @code
 Q1 elements, adaptive refinement:
 cells   dofs    val L2    grad L2  val L2-post
-     8     144 7.122e+00 1.941e+01   6.102e+00 
-    29     500 3.309e+00 1.023e+01   2.145e+00 
-   113    1792 2.204e+00 1.023e+01   1.912e+00 
-   379    5732 6.085e-01 5.008e+00   2.233e-01 
-  1317   19412 1.543e-01 1.464e+00   4.196e-02 
-  4579   64768 5.058e-02 5.611e-01   9.521e-03 
- 14596  199552 2.129e-02 3.122e-01   4.569e-03 
- 46180  611400 1.033e-02 1.622e-01   1.684e-03 
-144859 1864212 5.007e-03 8.371e-02   7.364e-04 
-451060 5684508 2.518e-03 4.562e-02   3.070e-04 
+     8     144 7.122e+00 1.941e+01   6.102e+00
+    29     500 3.309e+00 1.023e+01   2.145e+00
+   113    1792 2.204e+00 1.023e+01   1.912e+00
+   379    5732 6.085e-01 5.008e+00   2.233e-01
+  1317   19412 1.543e-01 1.464e+00   4.196e-02
+  4579   64768 5.058e-02 5.611e-01   9.521e-03
+ 14596  199552 2.129e-02 3.122e-01   4.569e-03
+ 46180  611400 1.033e-02 1.622e-01   1.684e-03
+144859 1864212 5.007e-03 8.371e-02   7.364e-04
+451060 5684508 2.518e-03 4.562e-02   3.070e-04
 
 Q1 elements, global refinement:
 cells   dofs       val L2          grad L2       val L2-post
-     8     144 7.122e+00    - 1.941e+01     - 6.102e+00    - 
-    27     432 5.491e+00 0.64 2.184e+01 -0.29 4.448e+00 0.78 
-    64     960 3.646e+00 1.42 1.299e+01  1.81 3.306e+00 1.03 
-   216    3024 1.595e+00 2.04 8.550e+00  1.03 1.441e+00 2.05 
-   512    6912 6.922e-01 2.90 5.306e+00  1.66 2.511e-01 6.07 
-  1728   22464 2.915e-01 2.13 2.490e+00  1.87 8.588e-02 2.65 
-  4096   52224 1.684e-01 1.91 1.453e+00  1.87 4.055e-02 2.61 
- 13824  172800 7.972e-02 1.84 6.861e-01  1.85 1.335e-02 2.74 
- 32768  405504 4.637e-02 1.88 3.984e-01  1.89 5.932e-03 2.82 
-110592 1354752 2.133e-02 1.92 1.830e-01  1.92 1.851e-03 2.87 
+     8     144 7.122e+00    - 1.941e+01     - 6.102e+00    -
+    27     432 5.491e+00 0.64 2.184e+01 -0.29 4.448e+00 0.78
+    64     960 3.646e+00 1.42 1.299e+01  1.81 3.306e+00 1.03
+   216    3024 1.595e+00 2.04 8.550e+00  1.03 1.441e+00 2.05
+   512    6912 6.922e-01 2.90 5.306e+00  1.66 2.511e-01 6.07
+  1728   22464 2.915e-01 2.13 2.490e+00  1.87 8.588e-02 2.65
+  4096   52224 1.684e-01 1.91 1.453e+00  1.87 4.055e-02 2.61
+ 13824  172800 7.972e-02 1.84 6.861e-01  1.85 1.335e-02 2.74
+ 32768  405504 4.637e-02 1.88 3.984e-01  1.89 5.932e-03 2.82
+110592 1354752 2.133e-02 1.92 1.830e-01  1.92 1.851e-03 2.87
 
 Q3 elements, global refinement:
 cells   dofs       val L2        grad L2      val L2-post
-     8     576 5.670e+00    - 1.868e+01    - 5.462e+00    - 
-    27    1728 1.048e+00 4.16 6.988e+00 2.42 8.011e-01 4.73 
-    64    3840 2.831e-01 4.55 2.710e+00 3.29 1.363e-01 6.16 
-   216   12096 7.883e-02 3.15 7.721e-01 3.10 2.158e-02 4.55 
-   512   27648 3.642e-02 2.68 3.305e-01 2.95 5.231e-03 4.93 
-  1728   89856 8.546e-03 3.58 7.581e-02 3.63 7.640e-04 4.74 
-  4096  208896 2.598e-03 4.14 2.313e-02 4.13 1.783e-04 5.06 
- 13824  691200 5.314e-04 3.91 4.697e-03 3.93 2.355e-05 4.99 
- 32768 1622016 1.723e-04 3.91 1.517e-03 3.93 5.602e-06 4.99 
+     8     576 5.670e+00    - 1.868e+01    - 5.462e+00    -
+    27    1728 1.048e+00 4.16 6.988e+00 2.42 8.011e-01 4.73
+    64    3840 2.831e-01 4.55 2.710e+00 3.29 1.363e-01 6.16
+   216   12096 7.883e-02 3.15 7.721e-01 3.10 2.158e-02 4.55
+   512   27648 3.642e-02 2.68 3.305e-01 2.95 5.231e-03 4.93
+  1728   89856 8.546e-03 3.58 7.581e-02 3.63 7.640e-04 4.74
+  4096  208896 2.598e-03 4.14 2.313e-02 4.13 1.783e-04 5.06
+ 13824  691200 5.314e-04 3.91 4.697e-03 3.93 2.355e-05 4.99
+ 32768 1622016 1.723e-04 3.91 1.517e-03 3.93 5.602e-06 4.99
 110592 5419008 3.482e-05 3.94 3.055e-04 3.95 7.374e-07 5.00
 @endcode
 
@@ -319,13 +325,14 @@ One final note on the efficiency comparison: We tried to use general-purpose
 sparse matrix structures and similar solvers (optimal AMG preconditioners for
 both without particular tuning of the AMG parameters on any of them) to give a
 fair picture of the cost versus accuracy of two methods, on a toy example. It
-should be noted however that GMG for continuous finite elements is about a
+should be noted however that geometric multigrid (GMG) for continuous finite elements is about a
 factor four to five faster for <i>p</i>=3 and <i>p</i>=6. The authors of this
 tutorial have not seen similarly advanced solvers for the HDG linear
 systems. Also, there are other implementation aspects for CG available such as
 fast matrix-free approaches as shown in step-37 that make higher order
 continuous elements more competitive. Again, it is not clear to the authors of
 the tutorial whether similar improvements could be made for HDG.
+
 
 <h3>Possibilities for improvements</h3>
 
@@ -398,16 +405,17 @@ components:
 </table>
 
 As can be seen from the table, the solver and assembly calls dominate the
-runtime of the program. This also gives a clear indication of where an
-improvement makes most sense.
+runtime of the program. This also gives a clear indication of where
+improvements would make the most sense:
 
 <ol>
   <li> Better linear solvers: We use a BiCGStab iterative solver without
   preconditioner, where the number of iteration increases with increasing
   problem size (the number of iterations for Q1 elements and global
-  refinements start at 35 for the small sizes but increase up to 701 for the
+  refinements starts at 35 for the small sizes but increase up to 701 for the
   largest size). To do better, one could for example use an algebraic
-  multigrid preconditioner from Trilinos. For diffusion-dominated problems as
+  multigrid preconditioner from Trilinos. For diffusion-dominated
+  problems such as
   the problem at hand with finer meshes, such a solver can be designed that
   uses the matrix-vector products from the more efficient ChunkSparseMatrix on
   the finest level, as long as we are not working in parallel with MPI. For
