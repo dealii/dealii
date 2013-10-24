@@ -59,7 +59,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     "EXECUTE_PROCESS(COMMAND ${TARGET_RUN}\n"
     "  RESULT_VARIABLE _return_value\n"
     "  )\n"
-    "IF(NOT \"\${_return_value}\" STREQUAL "0")\n"
+    "IF(NOT \"\${_return_value}\" STREQUAL \"0\")\n"
     "  MESSAGE(SEND_ERROR \"\nProgram terminated with exit code: \${_return_value}\")\n"
     "ENDIF()\n"
     )
