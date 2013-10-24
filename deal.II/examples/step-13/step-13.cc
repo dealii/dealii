@@ -57,11 +57,6 @@
 #include <list>
 #include <sstream>
 
-#ifdef DEAL_II_WITH_THREADS
-#  include <tbb/task.h>
-#  include <tbb/task_scheduler_init.h>
-#endif
-
 // The last step is as in all previous programs:
 namespace Step13
 {
