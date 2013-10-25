@@ -12,9 +12,10 @@ In this example, our aims are the following:
 While the second aim is difficult to describe in general terms without
 reference to the code, we will discuss the other two aims in the
 following. The use of multiple threads will then be detailed at the
-relevant places within the program. Furthermore, there exists a report on this
-subject, which is also available online from the ``Documentation'' section of
-the deal.II homepage.
+relevant places within the program. We will, however, follow the
+general discussion of the WorkStream approach detailed in the
+@ref "Parallel computing with multiple processors accessing shared memory" threads
+documentation module.
 
 
 <h3>Discretizing the advection equation</h3>
