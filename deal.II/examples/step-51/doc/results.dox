@@ -274,7 +274,7 @@ somewhat higher order, usually around <i>p</i>=3. This is because of a
 volume-to-surface effect for discontinuous solutions with too much of the
 solution living on the surfaces and hence duplicating work when the elements
 are linear. Put in other words, DG methods are often most efficient when used
-at relatively high order, despite their focus on discontinuous (and hence,
+at relatively high order, despite their focus on a discontinuous (and hence,
 seemingly low accurate) representation of solutions.
 
 <h4>Resuls for 3D</h4>
