@@ -110,8 +110,9 @@ number of differences compared to previous example programs:
     present the program, from the rest of the program.
 <li>Parallelize the assembly of linear systems using the WorkStream
     facilities. This follows the extensive description that can be
-    found in the @ref "Parallel computing with multiple processors accessing shared memory" threads
-    documentation module.
+    found in the @ref threads "Parallel computing with multiple processors accessing shared memory"
+    documentation module. The implementation essentially follows what
+    has already been described in step-9.
 </ol>
 
 
