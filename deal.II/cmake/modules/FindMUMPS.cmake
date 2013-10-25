@@ -37,7 +37,6 @@ INCLUDE(FindPackageHandleStandardArgs)
 # (We'll rely on the user of FindMUMPS, setting up mpi *cough*)
 #
 FIND_PACKAGE(SCALAPACK) # which will also include lapack and blas
-FIND_PACKAGE(METIS)
 
 
 FIND_PATH(MUMPS_INCLUDE_DIR dmumps_c.h

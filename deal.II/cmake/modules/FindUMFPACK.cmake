@@ -34,15 +34,6 @@ FOREACH(_comp SUITESPARSE SUITESPARSE_CONFIG UMFPACK AMD CHOLMOD COLAMD)
   SET_IF_EMPTY(${_comp}_DIR "$ENV{${_comp}_DIR}")
 ENDFOREACH()
 
-
-#
-# UMFPACK depends on BLAS and LAPACK, so search for them:
-# TODO: There might be an external dependency for metis, ignore this for
-# now.
-#
-FIND_PACKAGE(DEALII_LAPACK)
-FIND_PACKAGE(METIS)
-
 #
 # Two macros to make life easier:
 #

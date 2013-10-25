@@ -31,11 +31,6 @@ INCLUDE(FindPackageHandleStandardArgs)
 
 SET_IF_EMPTY(ARPACK_DIR "$ENV{ARPACK_DIR}")
 
-#
-# ARPACK needs LAPACK and BLAS as dependencies:
-#
-FIND_PACKAGE(DEALII_LAPACK)
-
 FIND_LIBRARY(ARPACK_LIBRARY
   NAMES arpack
   HINTS

@@ -38,12 +38,6 @@ FIND_LIBRARY(SCALAPACK_LIBRARY NAMES scalapack
   )
 
 #
-# SCALAPACK needs LAPACK and BLAS as dependency, search for them with the help
-# of the LAPACK find module:
-#
-FIND_PACKAGE(DEALII_LAPACK)
-
-#
 # Well, depending on the version of scalapack and the distribution it might
 # be necessary to search for blacs, too. So we do this in a very
 # probabilistic way...
