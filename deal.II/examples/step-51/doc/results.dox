@@ -145,7 +145,7 @@ One can see the error reduction upon grid refinement, and for the cases where
 global refinement was performed, also the convergence rates. The quadratic
 convergence rates of Q1 elements in the $L_2$ norm for both the scalar
 variable and the gradient variable is apparent, as is the cubic rate for the
-postprocessed scalar variable in the $L_2$ norm. Note that is is a distinctive
+postprocessed scalar variable in the $L_2$ norm. Note this distinctive
 feature of an HDG solution. In typical continuous finite elements, the
 gradient of the solution of order <i>p</i> converges at rate <i>p</i> only, as
 opposed to <i>p</i>+1 for the actual solution. Even though superconvergence
