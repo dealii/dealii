@@ -302,7 +302,8 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
         = (*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()];
     }
 
-  const unsigned int patch_idx = cell_and_index->second;
+  const unsigned int patch_idx =
+      (*data.cell_to_patch_index_map)[cell_and_index->first->level()][cell_and_index->first->index()];
   // did we mess up the indices?
   Assert(patch_idx < patches.size(), ExcInternalError());
   
@@ -340,13 +341,24 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   Assert (n_subdivisions >= 1,
           ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  // first count the cells we want to create patches of. also fill the object
+  // First count the cells we want to create patches of. Also fill the object
   // that maps the cell indices to the patch numbers, as this will be needed
-  // for generation of neighborship information
+  // for generation of neighborship information.
+  // Note, there is a confusing mess of different indices here at play:
+  // patch_index - the index of a patch in all_cells
+  // cell->index - only unique on each level, used in cell_to_patch_index_map
+  // active_index - index for a cell when counting from begin_active() using ++cell
+  // cell_index - unique index of a cell counted using next_locally_owned_cell()
+  //              starting from first_locally_owned_cell()
+  //
+  // It turns out that we create one patch for each selected cell, so patch_index==cell_index.
+  //
+  // will be cell_to_patch_index_map[cell->level][cell->index] = patch_index
   std::vector<std::vector<unsigned int> > cell_to_patch_index_map;
   cell_to_patch_index_map.resize (this->triangulation->n_levels());
   for (unsigned int l=0; l<this->triangulation->n_levels(); ++l)
     {
+      // max_index is the largest cell->index on level l
       unsigned int max_index = 0;
       for (cell_iterator cell=first_locally_owned_cell(); cell != this->triangulation->end();
            cell = next_locally_owned_cell(cell))
@@ -358,22 +370,41 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                                          dealii::DataOutBase::Patch<DH::dimension,DH::space_dimension>::no_neighbor);
     }
 
+  // will be all_cells[patch_index] = pair(cell, active_index)
   std::vector<std::pair<cell_iterator, unsigned int> > all_cells;
   {
+    // important: we need to compute the active_index of the cell in the range
+    // 0..n_active_cells() because this is where we need to look up cell
+    // data from (cell data vectors do not have the length distance computed by
+    // first_locally_owned_cell/next_locally_owned_cell because this might skip
+    // some values (FilteredIterator).
+    active_cell_iterator active_cell = this->triangulation->begin_active();
+    unsigned int active_index = 0;
     cell_iterator cell = first_locally_owned_cell();
-    for (unsigned int index = 0; cell != this->triangulation->end(); ++index)
+    for (; cell != this->triangulation->end();
+        cell = next_locally_owned_cell(cell))
       {
+        // move forward until active_cell points at the cell (cell) we are looking
+        // at to compute the current active_index
+        while (active_cell!=this->triangulation->end()
+            && cell->active()
+            && active_cell_iterator(cell) != active_cell)
+          {
+            ++active_cell;
+            ++active_index;
+          }
+
         Assert (static_cast<unsigned int>(cell->level()) <
                 cell_to_patch_index_map.size(),
                 ExcInternalError());
         Assert (static_cast<unsigned int>(cell->index()) <
                 cell_to_patch_index_map[cell->level()].size(),
                 ExcInternalError());
-
+        Assert (active_index < this->triangulation->n_active_cells(),
+                        ExcInternalError());
         cell_to_patch_index_map[cell->level()][cell->index()] = all_cells.size();
 
-        all_cells.push_back (std::make_pair(cell, index));
-        cell = next_locally_owned_cell(cell);
+        all_cells.push_back (std::make_pair(cell, active_index));
       }
   }
 
