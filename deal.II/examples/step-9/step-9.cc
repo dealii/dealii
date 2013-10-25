@@ -48,8 +48,8 @@
 
 // The following two files provide classes and information for multithreaded
 // programs. In the first one, the classes and functions are declared which we
-// need to start new threads and to wait for threads to return (i.e. the
-// <code>Thread</code> class and the <code>new_thread</code> functions). The
+// need to do assembly in parallel (i.e. the
+// <code>WorkStream</code> namespace). The
 // second file has a class <code>MultithreadInfo</code> (and a global object
 // <code>multithread_info</code> of that type) which can be used to query the
 // number of processors in your system, which is often useful when deciding
@@ -112,13 +112,33 @@ namespace Step9
     // <code>AssemblyScratchData</code> and
     // <code>AssemblyCopyData</code> structures is). Rather, we will
     // only discuss the specific implementation.
+    //
+    // If you read the page mentioned above, you will find that in
+    // order to parallelize assembly, we need two data structures --
+    // one that corresponds to data that we need during local
+    // integration ("scratch data", i.e., things we only need as
+    // temporary storage), and one that carries information from the
+    // local integration to the function that then adds the local
+    // contributions to the corresponding elements of the global
+    // matrix. The former of these typically contains the FEValues and
+    // FEFaceValues objects, whereas the latter has the local matrix,
+    // local right hand side, and information about which degrees of
+    // freedom live on the cell for which we are assembling a local
+    // contribution. With this information, the following should be
+    // relatively self-explanatory:
     struct AssemblyScratchData
-    {};
+    {
+      AssemblyScratchData (const FiniteElement<dim> &fe);
+      AssemblyScratchData (const AssemblyScratchData &scratch_data);
+
+      FEValues<dim>     fe_values;
+      FEFaceValues<dim> fe_face_values;
+    };
 
     struct AssemblyCopyData
     {
-      FullMatrix<double> cell_matrix;
-      Vector<double>     cell_rhs;
+      FullMatrix<double>                   cell_matrix;
+      Vector<double>                       cell_rhs;
       std::vector<types::global_dof_index> local_dof_indices;
     };
 
@@ -508,135 +528,86 @@ namespace Step9
   // In the following function, the matrix and right hand side are
   // assembled. As stated in the documentation of the main class above, it
   // does not do this itself, but rather delegates to the function following
-  // next, by splitting up the range of cells into chunks of approximately the
-  // same size and assembling on each of these chunks in parallel.
+  // next, utilizing the WorkStream concept discussed in @ref threads .
+  //
+  // If you have looked through the @ref threads module, you will have
+  // seen that assembling in parallel does not take an incredible
+  // amount of extra code as long as you diligently describe what the
+  // scratch and copy data objects are, and if you define suitable
+  // functios for the local assembly and the copy operation from local
+  // contributions to global objects. This done, the following will do
+  // all the heavy lifting to get these operations done on multiple
+  // threads on as many cores as you have in your system:
   template <int dim>
   void AdvectionProblem<dim>::assemble_system ()
   {
-    // First, we want to find out how many threads shall assemble the matrix
-    // in parallel. A reasonable choice would be that each processor in your
-    // system processes one chunk of cells; if we were to use this
-    // information, we could use the value of the global variable
-    // <code>multithread_info.n_cpus</code>, which is determined at start-up
-    // time of your program automatically. (Note that if the library was not
-    // configured for multithreading, then the number of CPUs is set to one.)
-    // However, sometimes there might be reasons to use another value. For
-    // example, you might want to use less processors than there are in your
-    // system in order not to use too many computational resources. For
-    // this reason, the number of threads can be set by
-    // <code>MultithreadInfo::set_thread_limit</code> and the current value
-    // is returned by n_threads(). This
-    // is also queried by functions inside the library to determine
-    // how many threads they shall create.
-
-    // It is worth noting, however, that this setup determines the load
-    // distribution onto processor in a static way: it does not take into
-    // account that some other part of our program may also be running
-    // something in parallel at the same time as we get here (this is not the
-    // case in the current program, but may easily be the case in more complex
-    // applications). A discussion of how to deal with this case can be found
-    // in the @ref threads module.
-    //
-    // Next, we need an object which is capable of keeping track of the
-    // threads we created, and allows us to wait until they all have finished
-    // (to <code>join</code> them in the language of threads). The
-    // Threads::ThreadGroup class does this, which is basically just a
-    // container for objects of type Threads::Thread that represent a single
-    // thread; Threads::Thread is what the Threads::new_thread function below
-    // will return when we start a new thread.
-    //
-    // Note that both Threads::ThreadGroup and Threads::Thread have a template
-    // argument that represents the return type of the function being called
-    // on a separate thread. Since most of the functions that we will call on
-    // different threads have return type <code>void</code>, the template
-    // argument has a default value <code>void</code>, so that in that case it
-    // can be omitted. (However, you still need to write the angle brackets,
-    // even if they are empty.)
-    //
-    // If you did not configure for multithreading, then the
-    // <code>new_thread</code> function that is supposed to start a new thread
-    // in parallel only executes the function which should be run in parallel,
-    // waits for it to return (i.e. the function is executed sequentially),
-    // and puts the return value into the <code>Thread</code>
-    // object. Likewise, the function <code>join</code> that is supposed to
-    // wait for all spawned threads to return, returns immediately, as there
-    // can't be any threads running.
-
-    // Now we have to split the range of cells into chunks of approximately
-    // the same size. Each thread will then assemble the local contributions
-    // of the cells within its chunk and transfer these contributions to the
-    // global matrix. As splitting a range of cells is a rather common task
-    // when using multithreading, there is a function in the
-    // <code>Threads</code> namespace that does exactly this. In fact, it does
-    // this not only for a range of cell iterators, but for iterators in
-    // general, so you could use it for <code>std::vector::iterator</code> or
-    // usual pointers as well.
-    //
-    // The function returns a vector of pairs of iterators, where the first
-    // denotes the first cell of each chunk, while the second denotes the one
-    // past the last (this half-open interval is the usual convention in the
-    // C++ standard library, so we keep to it). Note that we have to specify
-    // the actual data type of the iterators in angle brackets to the
-    // function. This is necessary, since it is a template function which
-    // takes the data type of the iterators as template argument; in the
-    // present case, however, the data types of the two first parameters
-    // differ (<code>begin_active</code> returns an
-    // <code>active_iterator</code>, while <code>end</code> returns a
-    // <code>raw_iterator</code>), and in this case the C++ language requires
-    // us to specify the template type explicitly. For brevity, we first
-    // typedef this data type to an alias.
-
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
-
-    // Finally, for each of the chunks of iterators we have computed, start
-    // one thread (or if not in multithread mode: execute assembly on these
-    // chunks sequentially). This is done using the following sequence of
-    // function calls:
     WorkStream::run(dof_handler.begin_active(),
 		    dof_handler.end(),
 		    *this,
 		    &AdvectionProblem::local_assemble_system,
 		    &AdvectionProblem::copy_local_to_global,
-		    AssemblyScratchData(),
+		    AssemblyScratchData(fe),
 		    AssemblyCopyData());
-
-
-    // The reasons and internal workings of these functions can be found in
-    // the report on the subject of multithreading, which is available online
-    // as well. Suffice it to say that we create a new thread that calls the
-    // <code>assemble_system_interval</code> function on the present object
-    // (the <code>this</code> pointer), with the arguments following in the
-    // second set of parentheses passed as parameters. The Threads::new_thread
-    // function returns an object of type Threads::Thread, which we put into
-    // the <code>threads</code> container. If a thread exits, the return value
-    // of the function being called is put into a place such that the thread
-    // objects can access it using their <code>return_value</code> function;
-    // since the function we call doesn't have a return value, this does not
-    // apply here. Note that you can copy around thread objects freely, and
-    // that of course they will still represent the same thread.
-
-    // When all the threads are running, the only thing we have to do is wait
-    // for them to finish. This is necessary of course, as we can't proceed
-    // with our tasks before the matrix and right hand side are
-    // assembled. Waiting for all the threads to finish can be done using the
-    // <code>join_all</code> function in the <code>ThreadGroup</code>
-    // container, which just calls <code>join</code> on each of the thread
-    // objects it stores.
-    //
-    // Again, if the library was not configured to use multithreading, then
-    // no threads can run in parallel and the function returns immediately.
 
 
     // After the matrix has been assembled in parallel, we still have to
     // eliminate hanging node constraints. This is something that can't be
     // done on each of the threads separately, so we have to do it now.
-    hanging_node_constraints.condense (system_matrix);
-    hanging_node_constraints.condense (system_rhs);
     // Note also, that unlike in previous examples, there are no boundary
     // conditions to be applied to the system of equations. This, of course,
     // is due to the fact that we have included them into the weak formulation
     // of the problem.
+    hanging_node_constraints.condense (system_matrix);
+    hanging_node_constraints.condense (system_rhs);
   }
+
+
+
+  // As already mentioned above, we need to have scratch objects for
+  // the parallel computation of local contributions. These objects
+  // contain FEValues and FEFaceValues objects, and so we will need to
+  // have constructors and copy constructors that allow us to create
+  // them. In initializing them, note first that we use bilinear
+  // elements, soGauss formulae with two points in each space
+  // direction are sufficient.  For the cell terms we need the values
+  // and gradients of the shape functions, the quadrature points in
+  // order to determine the source density and the advection field at
+  // a given point, and the weights of the quadrature points times the
+  // determinant of the Jacobian at these points. In contrast, for the
+  // boundary integrals, we don't need the gradients, but rather the
+  // normal vectors to the cells. This determines which update flags
+  // we will have to pass to the constructors of the members of the
+  // class:
+  template <int dim>
+  AdvectionProblem<dim>::AssemblyScratchData::
+  AssemblyScratchData (const FiniteElement<dim> &fe)
+  :
+  fe_values (fe,
+	     QGauss<dim>(2),
+	     update_values   | update_gradients |
+	     update_quadrature_points | update_JxW_values),
+  fe_face_values (fe,
+		  QGauss<dim-1>(2),
+		  update_values     | update_quadrature_points   |
+		  update_JxW_values | update_normal_vectors)
+  {}
+
+
+
+  template <int dim>
+  AdvectionProblem<dim>::AssemblyScratchData::
+  AssemblyScratchData (const AssemblyScratchData &scratch_data)
+  :
+  fe_values (scratch_data.fe_values.get_fe(),
+	     scratch_data.fe_values.get_quadrature(),
+	     update_values   | update_gradients |
+	     update_quadrature_points | update_JxW_values),
+  fe_face_values (scratch_data.fe_face_values.get_fe(),
+		  scratch_data.fe_face_values.get_quadrature(),
+		  update_values     | update_quadrature_points   |
+		  update_JxW_values | update_normal_vectors)
+  {}
+
 
 
 
@@ -644,11 +615,40 @@ namespace Step9
   // different from the <code>assemble_system</code> functions of previous
   // example programs, so we will again only comment on the differences. The
   // mathematical stuff follows closely what we have said in the introduction.
+  //
+  // There are a number of points worth mentioning here, though. The
+  // first one is that we have moved the FEValues and FEFaceValues
+  // objects into the ScratchData object. We have done so because the
+  // alternative would have been to simply create one every time we
+  // get into this function -- i.e., on every cell. It now turns out
+  // that the FEValues classes were written with the explicit goal of
+  // moving everything that remains the same from cell to cell into
+  // the construction of the object, and only do as little work as
+  // possible in FEValues::reinit() whenever we move to a new
+  // cell. What this means is that it would be very expensive to
+  // create a new object of this kind in this function as we would
+  // have to do it for every cell -- exactly the thing we wanted to
+  // avoid with the FEValues class. Instead, what we do is create it
+  // only once (or a small number of times) in the scratch objects and
+  // then re-use it as often as we can.
+  //
+  // This begs the question of whether there are other objects we
+  // create in this function whose creation is expensive compared to
+  // its use. Indeed, at the top of the function, we declare all sorts
+  // of objects. The <code>AdvectionField</code>,
+  // <code>RightHandSide</code> and <code>BoundaryValues</code> do not
+  // cost much to create, so there is no harm here. However,
+  // allocating memory in creating the <code>rhs_values</code> and
+  // similar variables below typically costs a significant amount of
+  // time, compared to just accessing the (temporary) values we store
+  // in them. Consequently, these would be candidates for moving into
+  // the <code>AssemblyScratchData</code> class. We will leave this as
+  // an exercise.
   template <int dim>
   void
   AdvectionProblem<dim>::
   local_assemble_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
-			 AssemblyScratchData                                  &scratch,
+			 AssemblyScratchData                                  &scratch_data,
 			 AssemblyCopyData                                     &copy_data)
   {
     // First of all, we will need some objects that describe boundary values,
@@ -660,35 +660,14 @@ namespace Step9
     const RightHandSide<dim>  right_hand_side;
     const BoundaryValues<dim> boundary_values;
 
-    // Next we need quadrature formula for the cell terms, but also for the
-    // integral over the inflow boundary, which will be a face integral. As we
-    // use bilinear elements, Gauss formulae with two points in each space
-    // direction are sufficient.
-    QGauss<dim>   quadrature_formula(2);
-    QGauss<dim-1> face_quadrature_formula(2);
-
-    // Finally, we need objects of type <code>FEValues</code> and
-    // <code>FEFaceValues</code>. For the cell terms we need the values and
-    // gradients of the shape functions, the quadrature points in order to
-    // determine the source density and the advection field at a given point,
-    // and the weights of the quadrature points times the determinant of the
-    // Jacobian at these points. In contrast, for the boundary integrals, we
-    // don't need the gradients, but rather the normal vectors to the cells.
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values   | update_gradients |
-                             update_quadrature_points | update_JxW_values);
-    FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
-                                      update_values     | update_quadrature_points   |
-                                      update_JxW_values | update_normal_vectors);
-
     // Then we define some abbreviations to avoid unnecessarily long lines:
     const unsigned int dofs_per_cell   = fe.dofs_per_cell;
-    const unsigned int n_q_points      = quadrature_formula.size();
-    const unsigned int n_face_q_points = face_quadrature_formula.size();
+    const unsigned int n_q_points      = scratch_data.fe_values.get_quadrature().size();
+    const unsigned int n_face_q_points = scratch_data.fe_face_values.get_quadrature().size();
 
     // We declare cell matrix and cell right hand side...
-    copy_data.cell_matrix = FullMatrix<double> (dofs_per_cell, dofs_per_cell);
-    copy_data.cell_rhs = Vector<double> (dofs_per_cell);
+    copy_data.cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+    copy_data.cell_rhs.reinit (dofs_per_cell);
 
     // ... an array to hold the global indices of the degrees of freedom of
     // the cell on which we are presently working...
@@ -704,13 +683,13 @@ namespace Step9
 
 
     // ... then initialize the <code>FEValues</code> object...
-    fe_values.reinit (cell);
+    scratch_data.fe_values.reinit (cell);
 
     // ... obtain the values of right hand side and advection directions
     // at the quadrature points...
-    advection_field.value_list (fe_values.get_quadrature_points(),
+    advection_field.value_list (scratch_data.fe_values.get_quadrature_points(),
                                 advection_directions);
-    right_hand_side.value_list (fe_values.get_quadrature_points(),
+    right_hand_side.value_list (scratch_data.fe_values.get_quadrature_points(),
                                 rhs_values);
 
     // ... set the value of the streamline diffusion parameter as
@@ -724,22 +703,22 @@ namespace Step9
         {
           for (unsigned int j=0; j<dofs_per_cell; ++j)
             copy_data.cell_matrix(i,j) += ((advection_directions[q_point] *
-                                            fe_values.shape_grad(j,q_point)   *
-                                            (fe_values.shape_value(i,q_point) +
+                                            scratch_data.fe_values.shape_grad(j,q_point)   *
+                                            (scratch_data.fe_values.shape_value(i,q_point) +
                                              delta *
                                              (advection_directions[q_point] *
-                                              fe_values.shape_grad(i,q_point)))) *
-                                           fe_values.JxW(q_point));
+                                              scratch_data.fe_values.shape_grad(i,q_point)))) *
+                                           scratch_data.fe_values.JxW(q_point));
 
-          copy_data.cell_rhs(i) += ((fe_values.shape_value(i,q_point) +
+          copy_data.cell_rhs(i) += ((scratch_data.fe_values.shape_value(i,q_point) +
                                      delta *
                                      (advection_directions[q_point] *
-                                      fe_values.shape_grad(i,q_point))        ) *
+                                      scratch_data.fe_values.shape_grad(i,q_point))        ) *
                                     rhs_values[q_point] *
-                                    fe_values.JxW (q_point));
+                                    scratch_data.fe_values.JxW (q_point));
         }
 
-    // Besides the cell terms which we have build up now, the bilinear
+    // Besides the cell terms which we have built up now, the bilinear
     // form of the present problem also contains terms on the boundary of
     // the domain. Therefore, we have to check whether any of the faces of
     // this cell are on the boundary of the domain, and if so assemble the
@@ -758,13 +737,13 @@ namespace Step9
           // domain. Just as for the usual FEValues object which we have
           // used in previous examples and also above, we have to
           // reinitialize the FEFaceValues object for the present face:
-          fe_face_values.reinit (cell, face);
+          scratch_data.fe_face_values.reinit (cell, face);
 
           // For the quadrature points at hand, we ask for the values of
           // the inflow function and for the direction of flow:
-          boundary_values.value_list (fe_face_values.get_quadrature_points(),
+          boundary_values.value_list (scratch_data.fe_face_values.get_quadrature_points(),
                                       face_boundary_values);
-          advection_field.value_list (fe_face_values.get_quadrature_points(),
+          advection_field.value_list (scratch_data.fe_face_values.get_quadrature_points(),
                                       face_advection_directions);
 
           // Now loop over all quadrature points and see whether it is on
@@ -776,7 +755,7 @@ namespace Step9
           // so if the advection direction points into the domain, its
           // scalar product with the normal vector must be negative):
           for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-            if (fe_face_values.normal_vector(q_point) *
+            if (scratch_data.fe_face_values.normal_vector(q_point) *
                 face_advection_directions[q_point]
                 < 0)
               // If the is part of the inflow boundary, then compute the
@@ -788,18 +767,18 @@ namespace Step9
                 {
                   for (unsigned int j=0; j<dofs_per_cell; ++j)
                     copy_data.cell_matrix(i,j) -= (face_advection_directions[q_point] *
-                                                   fe_face_values.normal_vector(q_point) *
-                                                   fe_face_values.shape_value(i,q_point) *
-                                                   fe_face_values.shape_value(j,q_point) *
-                                                   fe_face_values.JxW(q_point));
+                                                   scratch_data.fe_face_values.normal_vector(q_point) *
+                                                   scratch_data.fe_face_values.shape_value(i,q_point) *
+                                                   scratch_data.fe_face_values.shape_value(j,q_point) *
+                                                   scratch_data.fe_face_values.JxW(q_point));
 
                   copy_data.cell_rhs(i) -= (face_advection_directions[q_point] *
-                                            fe_face_values.normal_vector(q_point) *
+                                            scratch_data.fe_face_values.normal_vector(q_point) *
                                             face_boundary_values[q_point]         *
-                                            fe_face_values.shape_value(i,q_point) *
-                                            fe_face_values.JxW(q_point));
-                };
-        };
+                                            scratch_data.fe_face_values.shape_value(i,q_point) *
+                                            scratch_data.fe_face_values.JxW(q_point));
+                }
+        }
 
 
     // Now go on by transferring the local contributions to the system of
@@ -810,33 +789,16 @@ namespace Step9
 
 
 
+  // The second function we needed to write was the one that copies
+  // the local contributions the previous function has computed and
+  // put into the copy data object, into the global matrix and right
+  // hand side vector objects. This is essentially what we always had
+  // as the last block of code when assembling something on every
+  // cell. The following should therefore be pretty obvious:
   template <int dim>
   void
   AdvectionProblem<dim>::copy_local_to_global (const AssemblyCopyData &copy_data)
   {
-    // Up until now we have not taken care of the fact that this function
-    // might run more than once in parallel, as the operations above only
-    // work on variables that are local to this function, or if they are
-    // global (such as the information on the grid, the DoF handler, or
-    // the DoF numbers) they are only read. Thus, the different threads do
-    // not disturb each other.
-    //
-    // On the other hand, we would now like to write the local
-    // contributions to the global system of equations into the global
-    // objects. This needs some kind of synchronization, as if we would
-    // not take care of the fact that multiple threads write into the
-    // matrix at the same time, we might be surprised that one threads
-    // reads data from the matrix that another thread is presently
-    // overwriting, or similar things. Thus, to make sure that only one
-    // thread operates on these objects at a time, we have to lock
-    // it. This is done using a <code>Mutex</code>, which is short for
-    // <code>mutually exclusive</code>: a thread that wants to write to
-    // the global objects acquires this lock, but has to wait if it is
-    // presently owned by another thread. If it has acquired the lock, it
-    // can be sure that no other thread is presently writing to the
-    // matrix, and can do so freely. When finished, we release the lock
-    // again so as to allow other threads to acquire it and write to the
-    // matrix.
     for (unsigned int i=0; i<copy_data.local_dof_indices.size(); ++i)
       {
 	for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
@@ -846,22 +808,6 @@ namespace Step9
 
 	system_rhs(copy_data.local_dof_indices[i]) += copy_data.cell_rhs(i);
       }
-    // At this point, the locked operations on the global matrix are done,
-    // i.e. other threads can now enter into the protected section by
-    // acquiring the lock. Two final notes are in place here, however:
-    //
-    // 1. If the library was not configured for multithreading, then
-    // there can't be parallel threads and there is no need to
-    // synchronize. Thus, the <code>lock</code> and <code>release</code>
-    // functions are no-ops, i.e. they return without doing anything.
-    //
-    // 2. In order to work properly, it is essential that all threads try
-    // to acquire the same lock. This, of course, can not be achieved if
-    // the lock is a local variable, as then each thread would acquire its
-    // own lock. Therefore, the lock variable is a member variable of the
-    // class; since all threads execute member functions of the same
-    // object, they have the same <code>this</code> pointer and therefore
-    // also operate on the same <code>lock</code>.
   }
 
 
@@ -944,7 +890,7 @@ namespace Step9
         else
           {
             refine_grid ();
-          };
+          }
 
 
         std::cout << "   Number of active cells:       "
@@ -960,7 +906,7 @@ namespace Step9
         assemble_system ();
         solve ();
         output_results (cycle);
-      };
+      }
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
@@ -1211,8 +1157,8 @@ namespace Step9
                     for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
                       active_neighbors.push_back (
                         cell->neighbor_child_on_subface(face_no, subface_no));
-                };
-            };
+                }
+            }
 
         // OK, now that we have all the neighbors, lets start the computation
         // on each of them. First we do some preliminaries: find out about the
@@ -1272,7 +1218,7 @@ namespace Step9
                                    this_midpoint_value[0]) /
                                   distance *
                                   y;
-          };
+          }
 
         // If now, after collecting all the information from the neighbors, we
         // can determine an approximation of the gradient for the present
@@ -1310,7 +1256,7 @@ namespace Step9
         *error_on_this_cell = (std::pow(cell->diameter(),
                                         1+1.0*dim/2) *
                                std::sqrt(gradient.square()));
-      };
+      }
   }
 }
 
@@ -1351,7 +1297,7 @@ int main ()
                 << "----------------------------------------------------"
                 << std::endl;
       return 1;
-    };
+    }
 
   return 0;
 }
