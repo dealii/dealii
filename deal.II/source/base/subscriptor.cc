@@ -171,7 +171,7 @@ void Subscriptor::do_unsubscribe (const char *id) const
 {
 #ifdef DEBUG
   const char *name = (id != 0) ? id : unknown_subscriber;
-  Assert (counter>0, ExcNoSubscriber(object_info->name(), name));
+  AssertNothrow (counter>0, ExcNoSubscriber(object_info->name(), name));
   // This is for the case that we do
   // not abort after the exception
   if (counter == 0)
@@ -182,8 +182,8 @@ void Subscriptor::do_unsubscribe (const char *id) const
 
 #ifndef DEAL_II_WITH_THREADS
   map_iterator it = counter_map.find(name);
-  Assert (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
-  Assert (it->second > 0, ExcNoSubscriber(object_info->name(), name));
+  AssertNothrow (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
+  AssertNothrow (it->second > 0, ExcNoSubscriber(object_info->name(), name));
 
   it->second--;
 #endif
