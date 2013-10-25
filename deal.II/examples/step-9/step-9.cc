@@ -74,25 +74,6 @@ namespace Step9
 {
   using namespace dealii;
 
-  namespace Assembler
-  {
-    struct Scratch
-    {
-      Scratch() {};
-    };
-
-    struct CopyData
-    {
-      CopyData() {};
-
-      unsigned int dofs_per_cell;
-      std::vector<types::global_dof_index> local_dof_indices;
-      // We declare cell matrix and cell right hand side...
-      FullMatrix<double> cell_matrix;
-      Vector<double>  cell_rhs;
-    };
-  }
-
   // @sect3{AdvectionProblem class declaration}
 
   // Following we declare the main class of this program. It is very much
@@ -108,28 +89,45 @@ namespace Step9
 
   private:
     void setup_system ();
-    // The next function will be used to assemble the matrix. However, unlike
-    // in the previous examples, the function will not do the work itself, but
-    // rather it will split the range of active cells into several chunks and
-    // then call the following function on each of these chunks. The rationale
-    // is that matrix assembly can be parallelized quite well, as the
+
+    // The next set of functions will be used to assemble the
+    // matrix. However, unlike in the previous examples, the
+    // <code>assemble_system()</code> function will not do the work
+    // itself, but rather will delegate the actual assembly to helper
+    // functions <code>assemble_local_system()</code> and
+    // <code>copy_local_to_global()</code>. The rationale is that
+    // matrix assembly can be parallelized quite well, as the
     // computation of the local contributions on each cell is entirely
-    // independent of other cells, and we only have to synchronize when we add
-    // the contribution of a cell to the global matrix. The second function,
-    // doing the actual work, accepts two parameters which denote the first
-    // cell on which it shall operate, and the one past the last.
+    // independent of other cells, and we only have to synchronize
+    // when we add the contribution of a cell to the global
+    // matrix.
     //
     // The strategy for parallelization we choose here is one of the
-    // possibilities mentioned in detail in the @ref threads module in the
-    // documentation. While it is a straightforward way to distribute the work
-    // for assembling the system onto multiple processor cores. As mentioned
-    // in the module, there are other, and possibly better suited, ways to
-    // achieve the same goal.
+    // possibilities mentioned in detail in the @ref threads module in
+    // the documentation. Specifically, we will use the WorkStream
+    // approach discussed there. Since there is so much documentation
+    // in this module, we will not repeat the rationale for the design
+    // choices here (for example, if you read through the module
+    // mentioned above, you will understand what the purpose of the
+    // <code>AssemblyScratchData</code> and
+    // <code>AssemblyCopyData</code> structures is). Rather, we will
+    // only discuss the specific implementation.
+    struct AssemblyScratchData
+    {};
+
+    struct AssemblyCopyData
+    {
+      FullMatrix<double> cell_matrix;
+      Vector<double>     cell_rhs;
+      std::vector<types::global_dof_index> local_dof_indices;
+    };
+
     void assemble_system ();
-    void build_local_system (typename DoFHandler<dim>::active_cell_iterator const &cell,
-        Assembler::Scratch &scratch,Assembler::CopyData &copy_data);
-    void copy_local_to_global (Assembler::CopyData const &copy_data);
-                                   
+    void local_assemble_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
+				AssemblyScratchData                                  &scratch,
+				AssemblyCopyData                                     &copy_data);
+    void copy_local_to_global (const AssemblyCopyData &copy_data);
+
 
     // The following functions again are as in previous examples, as are the
     // subsequent variables.
@@ -530,7 +528,7 @@ namespace Step9
     // is returned by n_threads(). This
     // is also queried by functions inside the library to determine
     // how many threads they shall create.
-    
+
     // It is worth noting, however, that this setup determines the load
     // distribution onto processor in a static way: it does not take into
     // account that some other part of our program may also be running
@@ -594,12 +592,13 @@ namespace Step9
     // one thread (or if not in multithread mode: execute assembly on these
     // chunks sequentially). This is done using the following sequence of
     // function calls:
-
-    Assembler::Scratch scratch;
-    Assembler::CopyData copy_data;
-    WorkStream::run(dof_handler.begin_active(),dof_handler.end(),*this,
-        &AdvectionProblem::build_local_system,&AdvectionProblem::copy_local_to_global,
-        scratch,copy_data);
+    WorkStream::run(dof_handler.begin_active(),
+		    dof_handler.end(),
+		    *this,
+		    &AdvectionProblem::local_assemble_system,
+		    &AdvectionProblem::copy_local_to_global,
+		    AssemblyScratchData(),
+		    AssemblyCopyData());
 
 
     // The reasons and internal workings of these functions can be found in
@@ -648,9 +647,9 @@ namespace Step9
   template <int dim>
   void
   AdvectionProblem<dim>::
-  build_local_system (typename DoFHandler<dim>::active_cell_iterator const &cell,
-      Assembler::Scratch &scratch,
-      Assembler::CopyData &copy_data)
+  local_assemble_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
+			 AssemblyScratchData                                  &scratch,
+			 AssemblyCopyData                                     &copy_data)
   {
     // First of all, we will need some objects that describe boundary values,
     // right hand side function and the advection field. As we will only
@@ -683,17 +682,17 @@ namespace Step9
                                       update_JxW_values | update_normal_vectors);
 
     // Then we define some abbreviations to avoid unnecessarily long lines:
-    copy_data.dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points      = quadrature_formula.size();
-    const unsigned int   n_face_q_points = face_quadrature_formula.size();
+    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int n_q_points      = quadrature_formula.size();
+    const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     // We declare cell matrix and cell right hand side...
-    copy_data.cell_matrix = FullMatrix<double> (copy_data.dofs_per_cell, copy_data.dofs_per_cell);
-    copy_data.cell_rhs = Vector<double> (copy_data.dofs_per_cell);
+    copy_data.cell_matrix = FullMatrix<double> (dofs_per_cell, dofs_per_cell);
+    copy_data.cell_rhs = Vector<double> (dofs_per_cell);
 
     // ... an array to hold the global indices of the degrees of freedom of
     // the cell on which we are presently working...
-    copy_data.local_dof_indices.resize(copy_data.dofs_per_cell);
+    copy_data.local_dof_indices.resize(dofs_per_cell);
 
     // ... and array in which the values of right hand side, advection
     // direction, and boundary values will be stored, for cell and face
@@ -721,9 +720,9 @@ namespace Step9
     // ... and assemble the local contributions to the system matrix and
     // right hand side as also discussed above:
     for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-      for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
         {
-          for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
             copy_data.cell_matrix(i,j) += ((advection_directions[q_point] *
                                             fe_values.shape_grad(j,q_point)   *
                                             (fe_values.shape_value(i,q_point) +
@@ -738,7 +737,7 @@ namespace Step9
                                       fe_values.shape_grad(i,q_point))        ) *
                                     rhs_values[q_point] *
                                     fe_values.JxW (q_point));
-        };
+        }
 
     // Besides the cell terms which we have build up now, the bilinear
     // form of the present problem also contains terms on the boundary of
@@ -785,9 +784,9 @@ namespace Step9
               // hand side, using the values obtained from the
               // FEFaceValues object and the formulae discussed in the
               // introduction:
-              for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
+              for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
-                  for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+                  for (unsigned int j=0; j<dofs_per_cell; ++j)
                     copy_data.cell_matrix(i,j) -= (face_advection_directions[q_point] *
                                                    fe_face_values.normal_vector(q_point) *
                                                    fe_face_values.shape_value(i,q_point) *
@@ -810,62 +809,61 @@ namespace Step9
   }
 
 
-  
+
   template <int dim>
   void
-  AdvectionProblem<dim>::copy_local_to_global (Assembler::CopyData const &copy_data)
+  AdvectionProblem<dim>::copy_local_to_global (const AssemblyCopyData &copy_data)
   {
+    // Up until now we have not taken care of the fact that this function
+    // might run more than once in parallel, as the operations above only
+    // work on variables that are local to this function, or if they are
+    // global (such as the information on the grid, the DoF handler, or
+    // the DoF numbers) they are only read. Thus, the different threads do
+    // not disturb each other.
+    //
+    // On the other hand, we would now like to write the local
+    // contributions to the global system of equations into the global
+    // objects. This needs some kind of synchronization, as if we would
+    // not take care of the fact that multiple threads write into the
+    // matrix at the same time, we might be surprised that one threads
+    // reads data from the matrix that another thread is presently
+    // overwriting, or similar things. Thus, to make sure that only one
+    // thread operates on these objects at a time, we have to lock
+    // it. This is done using a <code>Mutex</code>, which is short for
+    // <code>mutually exclusive</code>: a thread that wants to write to
+    // the global objects acquires this lock, but has to wait if it is
+    // presently owned by another thread. If it has acquired the lock, it
+    // can be sure that no other thread is presently writing to the
+    // matrix, and can do so freely. When finished, we release the lock
+    // again so as to allow other threads to acquire it and write to the
+    // matrix.
+    for (unsigned int i=0; i<copy_data.local_dof_indices.size(); ++i)
+      {
+	for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
+	  system_matrix.add (copy_data.local_dof_indices[i],
+			     copy_data.local_dof_indices[j],
+			     copy_data.cell_matrix(i,j));
 
-        // Up until now we have not taken care of the fact that this function
-        // might run more than once in parallel, as the operations above only
-        // work on variables that are local to this function, or if they are
-        // global (such as the information on the grid, the DoF handler, or
-        // the DoF numbers) they are only read. Thus, the different threads do
-        // not disturb each other.
-        //
-        // On the other hand, we would now like to write the local
-        // contributions to the global system of equations into the global
-        // objects. This needs some kind of synchronization, as if we would
-        // not take care of the fact that multiple threads write into the
-        // matrix at the same time, we might be surprised that one threads
-        // reads data from the matrix that another thread is presently
-        // overwriting, or similar things. Thus, to make sure that only one
-        // thread operates on these objects at a time, we have to lock
-        // it. This is done using a <code>Mutex</code>, which is short for
-        // <code>mutually exclusive</code>: a thread that wants to write to
-        // the global objects acquires this lock, but has to wait if it is
-        // presently owned by another thread. If it has acquired the lock, it
-        // can be sure that no other thread is presently writing to the
-        // matrix, and can do so freely. When finished, we release the lock
-        // again so as to allow other threads to acquire it and write to the
-        // matrix.
-        for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
-          {
-            for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
-              system_matrix.add (copy_data.local_dof_indices[i],
-                                 copy_data.local_dof_indices[j],
-                                 copy_data.cell_matrix(i,j));
-
-            system_rhs(copy_data.local_dof_indices[i]) += copy_data.cell_rhs(i);
-          };
-        // At this point, the locked operations on the global matrix are done,
-        // i.e. other threads can now enter into the protected section by
-        // acquiring the lock. Two final notes are in place here, however:
-        //
-        // 1. If the library was not configured for multithreading, then
-        // there can't be parallel threads and there is no need to
-        // synchronize. Thus, the <code>lock</code> and <code>release</code>
-        // functions are no-ops, i.e. they return without doing anything.
-        //
-        // 2. In order to work properly, it is essential that all threads try
-        // to acquire the same lock. This, of course, can not be achieved if
-        // the lock is a local variable, as then each thread would acquire its
-        // own lock. Therefore, the lock variable is a member variable of the
-        // class; since all threads execute member functions of the same
-        // object, they have the same <code>this</code> pointer and therefore
-        // also operate on the same <code>lock</code>.
+	system_rhs(copy_data.local_dof_indices[i]) += copy_data.cell_rhs(i);
+      }
+    // At this point, the locked operations on the global matrix are done,
+    // i.e. other threads can now enter into the protected section by
+    // acquiring the lock. Two final notes are in place here, however:
+    //
+    // 1. If the library was not configured for multithreading, then
+    // there can't be parallel threads and there is no need to
+    // synchronize. Thus, the <code>lock</code> and <code>release</code>
+    // functions are no-ops, i.e. they return without doing anything.
+    //
+    // 2. In order to work properly, it is essential that all threads try
+    // to acquire the same lock. This, of course, can not be achieved if
+    // the lock is a local variable, as then each thread would acquire its
+    // own lock. Therefore, the lock variable is a member variable of the
+    // class; since all threads execute member functions of the same
+    // object, they have the same <code>this</code> pointer and therefore
+    // also operate on the same <code>lock</code>.
   }
-  
+
 
 
 
