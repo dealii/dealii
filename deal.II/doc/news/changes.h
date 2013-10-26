@@ -78,6 +78,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: step-9, step-13 and step-14 have been converted to use the
+  more modern WorkStream concept for assembling linear systems in parallel.
+  <br>
+  (Bruno Turcksin, Wolfgang Bangerth, 2013/10/26)
+  </li>
+
   <li> New: The testsuite is now ported to <a href="http://www.cmake.org/">
   CMake</a> and uses CTest as test driver.
   <br>
@@ -119,7 +125,7 @@ inconvenience this causes.
   <br>
   (Eric Heien, 2013/09/27)
   </li>
-  
+
   <li>
   New: DataOutBase::DataOutFilter provides a way to remove duplicate vertices
   and values from a solution vector when generating output. Currently it only
@@ -185,7 +191,7 @@ inconvenience this causes.
   </li>
 
   <li>
-  New: parallel::distributed::BlockVector has now methods update_ghost_values, 
+  New: parallel::distributed::BlockVector has now methods update_ghost_values,
   compress, set_out_ghosts, and has_ghost_elements that do the respective
   operation on each block of parallel::distributed::Vector.
   <br>
