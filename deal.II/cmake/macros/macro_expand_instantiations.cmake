@@ -38,9 +38,14 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
   FOREACH (_inst_in_file ${_inst_in_files})
     STRING(REGEX REPLACE "\\.in$" "" _inst_file "${_inst_in_file}" )
 
+    SET(_dependency)
+    IF(TARGET expand_instantiations)
+      SET(_dependency expand_instantiations)
+    ENDIF()
+
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
-      DEPENDS expand_instantiations
+      DEPENDS ${_dependency}
               ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/template-arguments
               ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
       COMMAND expand_instantiations

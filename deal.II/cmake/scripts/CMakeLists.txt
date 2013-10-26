@@ -26,10 +26,6 @@ IF(NOT CMAKE_CROSSCOMPILING)
       COMPONENT compat_files
       )
   ENDIF()
-
-  EXPORT(TARGETS expand_instantiations
-    FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Executables.cmake
-    )
 ENDIF()
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
@@ -95,9 +91,5 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   INSTALL(TARGETS make_dependencies report_features
     DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
     COMPONENT compat_files
-    )
-  EXPORT(TARGETS make_dependencies report_features
-    FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Executables.cmake
-    APPEND
     )
 ENDIF()

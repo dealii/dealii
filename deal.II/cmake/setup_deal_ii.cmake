@@ -141,30 +141,17 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
-#
-# Library search order:
-#
 IF(DEAL_II_PREFER_STATIC_LIBS)
+  #
   # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS
   # is set. This will prefer static archives instead of shared libraries:
+  #
   LIST(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
 ENDIF()
 
-#
-# Cross compilation stuff:
-#
 IF(CMAKE_CROSSCOMPILING)
+  #
   # Disable platform introspection when cross compiling
+  #
   SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION OFF CACHE BOOL "" FORCE)
-
-  # Import native expand_instantiations for use in cross compilation:
-  SET(DEAL_II_NATIVE "DEAL_II_NATIVE-NOTFOUND" CACHE FILEPATH
-    "A pointer to a native deal.Ii build directory"
-    )
-  IF(DEAL_II_NATIVE MATCHES "-NOTFOUND")
-    MESSAGE(FATAL_ERROR
-      "Please set the CMake variable DEAL_II_NATIVE to a valid path that points to a native deal.II build directory"
-      )
-  ENDIF()
-  INCLUDE(${DEAL_II_NATIVE}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Executables.cmake)
 ENDIF()

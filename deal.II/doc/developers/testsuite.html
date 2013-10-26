@@ -187,19 +187,23 @@
       </pre>
     </p>
 
-    <p>
-      <b>Note:</b> Specifying these options via environment variables is
-      volatile, i.e. if <code>make setup_tests</code> is invoked a second
-      time without the variables set in environment, the option will be
-      reset to the default value. If you want to set these options
-      permanently, set them via cmake as CMake variable in the build
-      directory:
+    Alternatively, you can also set them as CMake variables when
+    configuring the build directory:
       <pre>
 
     $ cmake -DTEST_PICKUP_REGEX="&lt;regular expression&gt;" .
       </pre>
-      A variable set via cmake always <i>overrides</i> one
-      set via environment.
+      The variables will be passed down to the subprojects. A variable set
+      via cmake always <i>overrides</i> one set via environment.
+    </p>
+
+    <p>
+      <b>Note:</b> The subprojects cache these options (regardless of set
+      via environment variables or as cmake variable). So, if you want to
+      disable an option again, you have to explicitly set it to an empty
+      string. Furthermore, if you have set the option as a CMake variable
+      in the build directory configuration you have to overwrite it in the
+      build directory cache.
     </p>
 
     <a name="run"></a>
