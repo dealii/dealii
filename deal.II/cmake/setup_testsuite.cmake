@@ -55,7 +55,7 @@ FOREACH(_var
   )
   SET_IF_EMPTY(${_var} $ENV{${_var}})
   IF(NOT "${_var}" STREQUAL "")
-    SET(_var "${_var}" CACHE STRING "")
+    SET(${_var} "${${_var}}" CACHE STRING "")
   ENDIF()
 ENDFOREACH()
 
