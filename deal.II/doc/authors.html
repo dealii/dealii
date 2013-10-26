@@ -15,13 +15,20 @@
     <h1>deal.II Authors</h1>
 
     <p>
-      The <acronym>deal.II</acronym> project was initially started by
-      members of the Numerical Methods group at the Heidelberg University,
-      Germany but has since become a global, open source project.
+      <acronym>deal.II</acronym> is today a global project. It
+      administered by a group of <i>principal
+      developers</i>. Technical decisions are made by the principal
+      developers and a group of <i>developers</i> consisting of
+      long-term contributors with a global overview of the library. A
+      large number of <i>contributors</i> have provided substantial
+      patches over the years.
     </p>
     <p>
-      The current maintainers of the library are:
+      These three groups are listed below.
     </p>
+
+
+    <h2>Principal developers</h2>
     <ul>
       <li>
 	<a href="http://www.math.tamu.edu/~bangerth"
@@ -38,9 +45,44 @@
       <li>
 	<a href="http://www.iwr.uni-heidelberg.de/groups/MathSim/"
 	   target="_top">Guido Kanschat</a>,
-	Texas A&amp;M University, TX, USA and Universit&auml;t Heidelberg, Germany
+	Universit&auml;t Heidelberg, Germany
       </li>
     </ul>
+
+
+    <h2>Developers</h2>
+    <ul>
+      <li>
+	<a href="http://people.sissa.it/~heltai/">Luca Heltai</a>,
+	SISSA, Trieste, Italy
+      </li>
+
+      <li>
+	<a href="http://www.lnm.mw.tum.de/en/staff/martin-kronbichler/">Martin Kronbichler</a>,
+	Technische Universit&auml;t M&uuml;nchen, Germany
+      </li>
+
+      <li>
+	Matthias Maier,
+	Universit&auml;t Heidelberg, Germany
+      </li>
+
+      <li>
+	Bruno Turcksin,
+	Texas A&amp;M University, TX, USA
+      </li>
+
+      <li>
+	<a href="http://bluebox.ippt.pan.pl/~tyoung/">Toby Young</a>,
+	Polish Academy of Sciences, Poland
+      </li>
+
+    </ul>
+
+
+
+
+    <h2>Contributors</h2>
 
     <p>Many people have contributed to deal.II over the years, some of them very
       substantial parts of the library. Their work
@@ -125,19 +167,6 @@
       <li><em>Eric Heien:</em>
 	HDF5 output.
 
-      <li><em>Luca Heltai:</em>
-	Gmsh format mesh reader and writer; &nbsp;
-	some of the meshes in the GridGenerator class; &nbsp;
-	generalization of FilteredMatrix; &nbsp;
-	integration of the function parser library; &nbsp;
-	cubit journal file to export to ucd mesh format; &nbsp;
-	FEFieldFunction and ParsedFunction classes; &nbsp;
-	work on the codimension-one meshes, DoFHandler, and finite
-	elements; &nbsp;
-	singular integration; &nbsp;
-	Step-34 tutorial program; &nbsp;
-	random bug fixes and enhancements.
-
       <li><em>B&auml;rbel Janssen:</em>
 	Lots of work on multigrid for adaptive meshes; &nbsp; multigrid in the
 	MeshWorker framework; &nbsp; step-16. Various fixes.
@@ -163,12 +192,6 @@
       <li><em>Oleh Krehel:</em>
 	Many documentation fixes.
 
-      <li><em>Martin Kronbichler:</em>
-	step-22, step-31, step-32, step-37, step-48, interfaces to
-	Trilinos, significant parts of ConstraintMatrix, matrix-free
-	computations, support for massively parallel computations, and
-	many enhancements in random places.
-
       <li><em>Tobias Leicht:</em>
 	Lots of work on internal data structures: anisotropic refinement
 	(including step-30), faces
@@ -185,10 +208,6 @@
       <li><em>Vijay Mahadevan:</em>
 	Enhancements in the interface to PETSc. Support for reading GMSH
 	2.5 format.
-
-      <li><em>Matthias Maier:</em>
-	CMake build system for the library and the testsuite. Periodic
-	boundary conditions. Enhancements throughout the library.
 
       <li><em>Cataldo Manigrasso:</em>
 	Work on the codimension-one meshes, DoFHandler, and finite
@@ -276,10 +295,6 @@
       <li><em>Christophe Trophime:</em>
 	Packaging and configuration issues.
 
-      <li><em>Bruno Turcksin:</em>
-	Extending deal.ii for 64-bit integer support. Converting the
-	testsuite to CMake. Various other changes.
-
       <li><em>Kainan Wang:</em>
 	Extending deal.ii for 64-bit integer support.
 
@@ -296,11 +311,6 @@
 
       <li><em>Christian W&uuml;lker:</em>
 	GridOut::write_svg.
-
-      <li><em>Toby D. Young:</em>
-	Interfaces to SLEPc; &nbsp; many changes in the interfaces to PETSc;
-	&nbsp; MUMPS interface;
-	&nbsp; METIS interface.
 
       <li><em>Yuhan Zhou:</em>
 	Input to the curved boundary example in step-49.
