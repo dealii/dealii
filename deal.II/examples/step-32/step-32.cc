@@ -2179,23 +2179,26 @@ namespace Step32
   // i.e., it returns true exactly if the cell is owned by the current
   // processor. The resulting iterator range is then exactly what we need.
   //
-  // With this obstacle out of the way, we call the WorkStream::run function
-  // with this set of cells, scratch and copy objects, and with pointers to
-  // two functions: the local assembly and copy-local-to-global
-  // function. These functions need to have very specific signatures: three
-  // arguments in the first and one argument in the latter case (see the
-  // documentation of the WorkStream::run function for the meaning of these
-  // arguments).  Note how we use the construct <code>std_cxx1x::bind</code>
-  // to create a function object that satisfies this requirement. It uses
-  // placeholders <code>_1, std_cxx1x::_2, _3</code> for the local assembly
-  // function that specify cell, scratch data, and copy data, as well as the
-  // placeholder <code>_1</code> for the copy function that expects the data
-  // to be written into the global matrix. On the other hand, the implicit
-  // zeroth argument of member functions (namely the <code>this</code> pointer
-  // of the object on which that member function is to operate on) is
-  // <i>bound</i> to the <code>this</code> pointer of the current
-  // function. The WorkStream::run function, as a consequence, does not need
-  // to know anything about the object these functions work on.
+  // With this obstacle out of the way, we call the WorkStream::run
+  // function with this set of cells, scratch and copy objects, and
+  // with pointers to two functions: the local assembly and
+  // copy-local-to-global function. These functions need to have very
+  // specific signatures: three arguments in the first and one
+  // argument in the latter case (see the documentation of the
+  // WorkStream::run function for the meaning of these arguments).
+  // Note how we use the construct <code>std_cxx1x::bind</code> to
+  // create a function object that satisfies this requirement. It uses
+  // placeholders <code>std_cxx1x::_1, std_cxx1x::_2,
+  // std_cxx1x::_3</code> for the local assembly function that specify
+  // cell, scratch data, and copy data, as well as the placeholder
+  // <code>std_cxx1x::_1</code> for the copy function that expects the
+  // data to be written into the global matrix. On the other hand, the
+  // implicit zeroth argument of member functions (namely the
+  // <code>this</code> pointer of the object on which that member
+  // function is to operate on) is <i>bound</i> to the
+  // <code>this</code> pointer of the current function. The
+  // WorkStream::run function, as a consequence, does not need to know
+  // anything about the object these functions work on.
   //
   // When the WorkStream is executed, it will create several local assembly
   // routines of the first kind for several cells and let some available
