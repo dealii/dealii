@@ -156,6 +156,8 @@
       Setup can be fine-tuned using the following commands:
       <pre>
 
+    $ make regen_tests - reruns configure stage in every testsuite subproject
+
     $ make clean_tests - runs the 'clean' target in every testsuite subproject
 
     $ make prune_tests - removes all testsuite subprojects
@@ -185,14 +187,6 @@
         will be substituted by ${TEST_OVERRIDE_LOCATION}/category/test.output if
         the latter exists.
       </pre>
-    </p>
-
-    <p>
-      <b>Note:</b> The subprojects cache these options (regardless of set
-      via environment variables or as cmake variable). So, if you want to
-      disable an option again, you have to either explicitly set it to an
-      empty string or first remove the subprojects via
-      <code>make prune_tests</code>.
     </p>
 
     <a name="run"></a>

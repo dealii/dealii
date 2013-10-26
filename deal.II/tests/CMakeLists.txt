@@ -32,6 +32,9 @@ ADD_SUBDIRECTORY(quick_tests)
 # Setup tests:
 ADD_CUSTOM_TARGET(setup_tests)
 
+# Regenerate tests (run "make rebuild_cache" in subprojects):
+ADD_CUSTOM_TARGET(regen_tests)
+
 # Clean all tests
 ADD_CUSTOM_TARGET(clean_tests)
 
@@ -60,6 +63,8 @@ FOREACH(_var
     TEST_PICKUP_REGEX
     TEST_TIME_LIMIT
     )
+  # always undefine:
+  LIST(APPEND _options "-U${_var}")
   IF(DEFINED ${_var})
     LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
@@ -103,6 +108,13 @@ FOREACH(_category ${_categories})
 
     # depend on a valid build directory:
     ADD_DEPENDENCIES(setup_tests_${_category} setup_build_dir)
+
+    ADD_CUSTOM_TARGET(regen_tests_${_category}
+      COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
+        --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target regenerate
+        > /dev/null # Shoo!
+      )
+    ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
     ADD_CUSTOM_TARGET(clean_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}

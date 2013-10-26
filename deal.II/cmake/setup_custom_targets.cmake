@@ -89,6 +89,7 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    test           - runs a minimal set of tests
 #
 #    setup_tests    - sets up the testsuite subprojects
+#    regen_tests    - rerun configure stage in every testsuite subprojects
 #    clean_tests    - runs the 'clean' target in every testsuite subproject
 #    prune_tests    - removes all testsuite subprojects
 #
