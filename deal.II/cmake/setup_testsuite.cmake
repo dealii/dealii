@@ -112,3 +112,9 @@ SET_IF_EMPTY(TEST_TIME_LIMIT 600)
 # And finally, enable testing:
 #
 ENABLE_TESTING()
+
+#
+# A custom target that does absolutely nothing. It is used in the main
+# project to trigger a "make rebuild_cache" if necessary.
+#
+ADD_CUSTOM_TARGET(regenerate)

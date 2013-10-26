@@ -76,6 +76,9 @@ LIST(REMOVE_DUPLICATES _categories)
 # Define a subproject for every enabled category:
 #
 
+MESSAGE(STATUS "")
+MESSAGE(STATUS "Regenerating testsuite subprojects")
+
 FOREACH(_category ${_categories})
   IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_category}/CMakeLists.txt)
     SET(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
@@ -98,12 +101,13 @@ FOREACH(_category ${_categories})
       )
     ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
 
-    # depend on a valid build directory (libraries built, config in place):
+    # depend on a valid build directory:
     ADD_DEPENDENCIES(setup_tests_${_category} setup_build_dir)
 
     ADD_CUSTOM_TARGET(clean_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
         --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target clean
+        > /dev/null # Shoo!
       )
     ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
 
@@ -117,5 +121,23 @@ FOREACH(_category ${_categories})
       "SUBDIRS(${_category})\n"
       )
 
+    #
+    # Regenerate subprojects: The "regenerate" target of the subproject
+    # depends on "rebuild_cache" so that the subprojects rerun cmake if
+    # necessary.
+    # (TODO: Unfortunately this is sequential - due to the fact that we
+    # cannot call back into the main build system)
+    #
+
+    IF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${_category}/CMakeCache.txt)
+      EXECUTE_PROCESS(
+        COMMAND ${CMAKE_COMMAND}
+        --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target regenerate
+        OUTPUT_QUIET
+        )
+    ENDIF()
+
   ENDIF()
 ENDFOREACH()
+
+MESSAGE(STATUS "Regenerating testsuite subprojects - Done")
