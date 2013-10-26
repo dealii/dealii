@@ -60,7 +60,6 @@ FOREACH(_var
     TEST_PICKUP_REGEX
     TEST_TIME_LIMIT
     )
-  LIST(APPEND _options "-U${_var}")
   IF(DEFINED ${_var})
     LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
