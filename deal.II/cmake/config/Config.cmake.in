@@ -67,18 +67,12 @@ WHILE(NOT "${_path}" STREQUAL "")
 ENDWHILE()
 
 #
-# Is this project reside in a build directory or at an installed location?
-#
-
-IF(EXISTS ${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/binary)
-  SET(DEAL_II_BUILD_DIR TRUE)
-ENDIF()
-
-#
 # Print a message after inclusion of this file:
 #
 
 SET(DEAL_II_PROJECT_CONFIG_INCLUDED TRUE)
+
+SET(DEAL_II_BUILD_DIR @CONFIG_BUILD_DIR@)
 
 IF(NOT ${DEAL_II_PACKAGE_NAME}_FIND_QUIETLY)
   IF(DEAL_II_BUILD_DIR)
@@ -152,11 +146,9 @@ SET(DEAL_II_STATIC_EXECUTABLE "@DEAL_II_STATIC_EXECUTABLE@")
 #
 # Information about include directories and libraries
 #
-IF(DEAL_II_BUILD_DIR)
-  SET(DEAL_II_INCLUDE_DIRS "@CONFIG_INCLUDE_DIRS_BINARY@")
-ELSE()
-  SET(DEAL_II_INCLUDE_DIRS "@CONFIG_INCLUDE_DIRS_INSTALLATION@")
-ENDIF()
+
+# Full list of include directories:
+SET(DEAL_II_INCLUDE_DIRS "@CONFIG_INCLUDE_DIRS@")
 
 # Full list of libraries for the debug target:
 SET(DEAL_II_LIBRARIES_DEBUG "@CONFIG_LIBRARIES_DEBUG@")
@@ -172,12 +164,8 @@ SET(DEAL_II_LIBRARIES "@CONFIG_LIBRARIES@")
 # Information about library targets
 #
 
-IF(DEAL_II_BUILD_DIR)
-  SET(DEAL_II_EXECUTABLE_CONFIG "${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Executables.cmake")
-  SET(DEAL_II_TARGET_CONFIG "${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}BuildTargets.cmake")
-ELSE()
-  SET(DEAL_II_TARGET_CONFIG "${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake")
-ENDIF()
+# The library targets file:
+SET(DEAL_II_TARGET_CONFIG "${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake")
 
 # The Debug target:
 SET(DEAL_II_TARGET_DEBUG "@CONFIG_TARGET_DEBUG@")
@@ -187,3 +175,6 @@ SET(DEAL_II_TARGET_RELEASE "@CONFIG_TARGET_RELEASE@")
 
 # Full list of targets with "debug" and "optimized" keywords for easy use with TARGET_LINK_LIBRARIES:
 SET(DEAL_II_TARGET "@CONFIG_TARGET@")
+
+# Executable targets (such as mesh_converter, expand_instantiations, etc):
+SET(DEAL_II_EXECUTABLE_CONFIG "${DEAL_II_PATH}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Executables.cmake")

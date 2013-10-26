@@ -23,11 +23,7 @@
 #
 
 
-ifeq ($(wildcard $(D)/@DEAL_II_PROJECT_CONFIG_RELDIR@/binary),)
-  D                    = @MAKEFILE_D_INSTALLATION@
-else
-  D                    = @MAKEFILE_D_BINARY@
-endif
+D                    = @MAKEFILE_D@
 
 CXX                  = @CMAKE_CXX_COMPILER@
 CXX-ID               = @CMAKE_CXX_COMPILER_ID@
@@ -87,11 +83,7 @@ lib-deal2.g     = @MAKEFILE_TARGETS_DEBUG@
 
 
 # Include paths as command line flags
-ifeq ($(wildcard $(D)/@DEAL_II_PROJECT_CONFIG_RELDIR@/binary),)
-  INCLUDE = @MAKEFILE_INCLUDE_DIRS_INSTALLATION@
-else
-  INCLUDE = @MAKEFILE_INCLUDE_DIRS_BINARY@
-endif
+INCLUDE = @MAKEFILE_INCLUDE_DIRS@
 
 
 # compiler flags for debug and optimized mode

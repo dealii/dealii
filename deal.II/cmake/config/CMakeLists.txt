@@ -21,8 +21,9 @@
 #   deal.IIConfig.cmake
 #   deal.IIVersionConfig.cmake
 #
-# and copies it (a) to the build directory and (b) prepares it for later
-# installation.
+# We support two configurations out of which deal.II can be used - directly
+# from the build directory or after installation. So we have to prepare
+# two distinct set ups.
 #
 
 #
@@ -121,7 +122,9 @@ ENDFOREACH()
 #
 # For binary dir:
 #
-SET(CONFIG_INCLUDE_DIRS_BINARY
+
+SET(CONFIG_BUILD_DIR TRUE)
+SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/include
   \${DEAL_II_PATH}/include/deal.II
   ${CMAKE_SOURCE_DIR}/include/
@@ -129,10 +132,23 @@ SET(CONFIG_INCLUDE_DIRS_BINARY
   ${deal_ii_source_includes}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  @ONLY
+  )
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
+  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
+  @ONLY
+  )
+
 #
 # For installation:
 #
-SET(CONFIG_INCLUDE_DIRS_INSTALLATION
+
+SET(CONFIG_BUILD_DIR FALSE)
+SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
@@ -140,39 +156,44 @@ SET(CONFIG_INCLUDE_DIRS_INSTALLATION
   )
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   @ONLY
   )
-#
-# Append feature configuration:
-#
-SET(_file
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-  )
-FILE(APPEND ${_file}
-  "\n\n#\n# Feature configuration:\n#\n\n"
-  )
-GET_CMAKE_PROPERTY(res VARIABLES)
-FOREACH(var ${res})
-  IF(var MATCHES "DEAL_II_WITH")
-    FILE(APPEND ${_file}
-      "SET(${var} ${${var}})\n"
-      )
-  ENDIF()
-ENDFOREACH()
-
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
   )
-
 INSTALL(FILES
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )
+
+#
+# Append feature configuration to both configuration files:
+#
+
+SET(_files
+  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  )
+FOREACH(_file ${_files})
+  FILE(APPEND ${_file}
+    "\n\n#\n# Feature configuration:\n#\n\n"
+    )
+ENDFOREACH()
+GET_CMAKE_PROPERTY(res VARIABLES)
+FOREACH(var ${res})
+  IF(var MATCHES "DEAL_II_WITH")
+    FOREACH(_file ${_files})
+      FILE(APPEND ${_file}
+        "SET(${var} ${${var}})\n"
+        )
+    ENDFOREACH()
+  ENDIF()
+ENDFOREACH()
 
 
 ########################################################################
@@ -180,7 +201,6 @@ INSTALL(FILES
 #         Configure and install the old Makefile configuration:        #
 #                                                                      #
 ########################################################################
-
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
@@ -274,8 +294,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
   # For binary dir:
   #
-  SET(MAKEFILE_D_BINARY ${CMAKE_BINARY_DIR})
-  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS_BINARY "${CMAKE_INCLUDE_FLAG_CXX}"
+  SET(MAKEFILE_D ${CMAKE_BINARY_DIR})
+  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
     $(D)/install
     $(D)/install/deal.II
     ${CMAKE_SOURCE_DIR}/include/
@@ -283,11 +303,15 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     ${deal_ii_source_includes}
     ${DEAL_II_USER_INCLUDE_DIRS}
     )
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
+    ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/Make.global_options
+    )
   #
   # For installation:
   #
-  SET(MAKEFILE_D_INSTALLATION ${CMAKE_INSTALL_PREFIX})
-  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS_INSTALLATION "${CMAKE_INCLUDE_FLAG_CXX}"
+  SET(MAKEFILE_D ${CMAKE_INSTALL_PREFIX})
+  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
     $(D)/${DEAL_II_INCLUDE_RELDIR}
     $(D)/${DEAL_II_INCLUDE_RELDIR}/deal.II
     $(D)/${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
@@ -295,25 +319,12 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     )
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
-    ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/Make.global_options
+    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
     )
-
   INSTALL(FILES
     ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/template-arguments
-    ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/Make.global_options
+    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
     DESTINATION ${DEAL_II_COMMON_RELDIR}
     COMPONENT compat_files
     )
 ENDIF()
-
-FILE(WRITE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/binary "")
-
-#
-# And a script to remove it upon installation from the install prefix:
-# This is necessary if somebody wants to install into the build directory
-# (yes this is a valid use case...).
-#
-INSTALL(CODE
-  "FILE(REMOVE ${CMAKE_INSTALL_PREFIX}/${DEAL_II_PROJECT_CONFIG_RELDIR}/binary)"
-  COMPONENT library
-  )
