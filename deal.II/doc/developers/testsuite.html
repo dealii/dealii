@@ -187,23 +187,12 @@
       </pre>
     </p>
 
-    Alternatively, you can also set them as CMake variables when
-    configuring the build directory:
-      <pre>
-
-    $ cmake -DTEST_PICKUP_REGEX="&lt;regular expression&gt;" .
-      </pre>
-      The variables will be passed down to the subprojects. A variable set
-      via cmake always <i>overrides</i> one set via environment.
-    </p>
-
     <p>
       <b>Note:</b> The subprojects cache these options (regardless of set
       via environment variables or as cmake variable). So, if you want to
-      disable an option again, you have to explicitly set it to an empty
-      string. Furthermore, if you have set the option as a CMake variable
-      in the build directory configuration you have to overwrite it in the
-      build directory cache.
+      disable an option again, you have to either explicitly set it to an
+      empty string or first remove the subprojects via
+      <code>make prune_tests</code>.
     </p>
 
     <a name="run"></a>

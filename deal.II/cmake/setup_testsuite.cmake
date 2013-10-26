@@ -53,7 +53,10 @@ FOREACH(_var
   TEST_PICKUP_REGEX
   TEST_OVERRIDE_LOCATION
   )
-  SET_IF_EMPTY(${_var} $ENV{${_var}})
+  IF(NOT "$ENV{${_var}}" STREQUAL "")
+    # Environment always wins:
+    SET(${_var} $ENV{${_var}})
+  ENDIF()
   IF(NOT "${_var}" STREQUAL "")
     SET(${_var} "${${_var}}" CACHE STRING "")
   ENDIF()
