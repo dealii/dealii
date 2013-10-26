@@ -42,13 +42,14 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * A class whose main template function supports running multiple
+ * A namespace whose main template function supports running multiple
  * threads each of which operates on a subset of the given range of
  * objects. The class uses the Intel Threading Building Blocks (TBB)
  * to load balance the individual subranges onto the available
  * threads. For a lengthy discussion of the rationale of this class,
  * see the @ref threads "Parallel computing with multiple processors"
- * module.
+ * module. It is used in the tutorial first in step-9, and again in
+ * step-13, step-14, step-32 and others.
  *
  * The class is built on the following premise: One frequently has some work
  * that needs to be done on a sequence of objects; a prototypical example is
@@ -129,7 +130,7 @@ DEAL_II_NAMESPACE_OPEN
  * sequentially.
  *
  * @ingroup threads
- * @author Wolfgang Bangerth, 2007, 2008, 2009
+ * @author Wolfgang Bangerth, 2007, 2008, 2009, 2013. Bruno Turcksin, 2013.
  */
 namespace WorkStream
 {
@@ -922,9 +923,9 @@ namespace WorkStream
    *
    * The @p get_conflict_indices argument, is a function
    * that given an iterator computes the conflict indices
-   * necessary for the graph_coloring. Graph coloring is 
-   * necessary to be able to copy the data in parallel. If 
-   * the number of elements in some colors is less than 
+   * necessary for the graph_coloring. Graph coloring is
+   * necessary to be able to copy the data in parallel. If
+   * the number of elements in some colors is less than
    * @p chunk_size time multithread_info.n_threads(),
    * these elements are aggregated and copied serially.
    *
@@ -1172,9 +1173,9 @@ namespace WorkStream
    *
    * The @p get_conflict_indices argument, is a function
    * that given an iterator computes the conflict indices
-   * necessary for the graph_coloring. Graph coloring is 
-   * necessary to be able to copy the data in parallel. If 
-   * the number of elements in some colors is less than 
+   * necessary for the graph_coloring. Graph coloring is
+   * necessary to be able to copy the data in parallel. If
+   * the number of elements in some colors is less than
    * @p chunk_size time multithread_info.n_threads(),
    * these elements are aggregated and copied serially.
    *
