@@ -148,7 +148,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         SET_TARGET_PROPERTIES(${_target} PROPERTIES
           LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
           COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
-          COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+          COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
           LINKER_LANGUAGE "CXX"
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target}"
           )
