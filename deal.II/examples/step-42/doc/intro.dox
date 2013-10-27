@@ -23,7 +23,7 @@ elasto-plastic material behavior with isotropic hardening in three dimensions.
 In other words, it considers how a three-dimensional body deforms if one pushes
 into it a rigid obstacle (the contact problem) where deformation is governed
 by an elasto-plastic material law (a material that can only accommodate a certain
-maximal stress) that hardens as deformation accumulates. To show we we intend to
+maximal stress) that hardens as deformation accumulates. To show what we intend to
 do before going into too many details, let us just show a picture of what the
 solution will look like (the deformable body is a cube - only half of
 which is actually shown -, the obstacle corresponds
@@ -197,7 +197,11 @@ the following equation (still an inequality, but linearized):
 @f{align*}
   \label{eq:linearization}
   \left(I_{\Pi}\varepsilon(\tilde {\mathbf u}^{i}),
-    \varepsilon(\varphi) - \varepsilon(\tilde {\mathbf u}^{i})\right) \geq 0,
+    \varepsilon(\varphi) - \varepsilon(\tilde {\mathbf u}^{i})\right) \geq
+  \left(\left(I_{\Pi}\varepsilon(\tilde {\mathbf u}^{i-1}),
+    \varepsilon(\varphi) - \varepsilon(\tilde {\mathbf u}^{i})\right) -
+  \left(P_{\Pi}(C\varepsilon(\tilde {\mathbf u}^{i-1})),
+    \varepsilon(\varphi) - \varepsilon(\tilde {\mathbf u}^{i})\right)\right),
   \quad \forall \varphi\in V^+,
 @f}
 where the rank-4 tensor $I_\Pi=I_\Pi(\varepsilon^D(\mathbf u^{i-1}))$ given by
