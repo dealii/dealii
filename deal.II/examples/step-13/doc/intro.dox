@@ -21,12 +21,11 @@ program:
 <li> a parameter estimation program: 28,980 lines of code;
 <li> a wave equation solver: 21,020 lines of code.
 </ol>
-(The library proper - without example programs and
-test suite - has slightly more than 150,000 lines of code as of spring
-2002. It is of course several times larger now.)
-In the opinion of the author of this example program, the sizes of these
-applications are at the edge of what one person, even an experienced
-programmer, can manage.
+
+(The library proper - without example programs and test suite - has slightly
+more than 150,000 lines of code as of spring 2002. It is of course several
+times larger now.) The sizes of these applications are at the edge of what
+one person, even an experienced programmer, can manage.
 
 
 
