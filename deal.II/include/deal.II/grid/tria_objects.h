@@ -74,6 +74,7 @@ namespace internal
        *  equals the index in this container.
        */
       std::vector<G> cells;
+
       /**
        *  Index of the even children of an object.
        *  Since when objects are refined, all
@@ -231,19 +232,19 @@ namespace internal
        * function is only used by
        * dealii::Triangulation::execute_refinement()
        * in 3D.
-      *
-      * @warning Interestingly,
-      * this function is not used
-      * for 1D or 2D
-      * triangulations, where it
-      * seems the authors of the
-      * refinement function insist
-      * on reimplementing its
-      * contents.
-      *
-      * @todo This function is
-      * not instantiated for the
-      * codim-one case
+       *
+       * @warning Interestingly,
+       * this function is not used
+       * for 1D or 2D
+       * triangulations, where it
+       * seems the authors of the
+       * refinement function insist
+       * on reimplementing its
+       * contents.
+       *
+       * @todo This function is
+       * not instantiated for the
+       * codim-one case
        */
       template <int dim, int spacedim>
       dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
@@ -256,19 +257,19 @@ namespace internal
        * function is only used by
        * dealii::Triangulation::execute_refinement()
        * in 3D.
-      *
-      * @warning Interestingly,
-      * this function is not used
-      * for 1D or 2D
-      * triangulations, where it
-      * seems the authors of the
-      * refinement function insist
-      * on reimplementing its
-      * contents.
-      *
-      * @todo This function is
-      * not instantiated for the
-      * codim-one case
+       *
+       * @warning Interestingly,
+       * this function is not used
+       * for 1D or 2D
+       * triangulations, where it
+       * seems the authors of the
+       * refinement function insist
+       * on reimplementing its
+       * contents.
+       *
+       * @todo This function is
+       * not instantiated for the
+       * codim-one case
        */
       template <int dim, int spacedim>
       dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
@@ -495,6 +496,7 @@ namespace internal
        * a line/quad/etc.
        */
       std::vector<UserData> user_data;
+
       /**
        * In order to avoid
        * confusion between user
@@ -509,11 +511,10 @@ namespace internal
     };
 
     /**
-     * For hexahedrons the data of TriaObjects needs to be extended, as we can obtain faces
+     * For hexahedra the data of TriaObjects needs to be extended, as we can obtain faces
      * (quads) in non-standard-orientation, therefore we declare a class TriaObjectsHex, which
      * additionally contains a bool-vector of the face-orientations.
      */
-
     class TriaObjectsHex : public TriaObjects<TriaObject<3> >
     {
     public:
@@ -579,10 +580,12 @@ namespace internal
        * has.
        */
       std::vector<bool> face_orientations;
+
       /**
        * flip = rotation by 180 degrees
        */
       std::vector<bool> face_flips;
+
       /**
        * rotation by 90 degrees
        */
@@ -637,7 +640,6 @@ namespace internal
      * declare a class TriaObjectsQuad3D, which additionally contains a bool-vector
      * of the line-orientations.
      */
-
     class TriaObjectsQuad3D: public TriaObjects<TriaObject<2> >
     {
     public:
