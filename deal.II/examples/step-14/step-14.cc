@@ -665,36 +665,41 @@ namespace Step14
     }
 
 
-    // Now for the functions that implement actions in the linear system
-    // class. First, the constructor initializes all data elements to their
-    // correct sizes, and sets up a number of additional data structures, such
-    // as constraints due to hanging nodes. Since setting up the hanging nodes
-    // and finding out about the nonzero elements of the matrix is
-    // independent, we do that in parallel (if the library was configured to
-    // use concurrency, at least; otherwise, the actions are performed
-    // sequentially). Note that we start only one thread, and do the second
-    // action in the main thread. Since only one thread is generated, we don't
-    // use the <code>Threads::ThreadGroup</code> class here, but rather use
-    // the one created thread object directly to wait for this particular
-    // thread's exit.
+    // Now for the functions that implement actions in the linear
+    // system class. First, the constructor initializes all data
+    // elements to their correct sizes, and sets up a number of
+    // additional data structures, such as constraints due to hanging
+    // nodes. Since setting up the hanging nodes and finding out about
+    // the nonzero elements of the matrix is independent, we do that
+    // in parallel (if the library was configured to use concurrency,
+    // at least; otherwise, the actions are performed
+    // sequentially). Note that we start only one thread, and do the
+    // second action in the main thread. Since only one thread is
+    // generated, we don't use the <code>Threads::ThreadGroup</code>
+    // class here, but rather use the one created thread object
+    // directly to wait for this particular thread's exit. The
+    // approach is generally the same as the one we have used in
+    // <code>Solver::assemble_linear_system()</code> above.
     //
-    // Note that taking up the address of the
-    // <code>DoFTools::make_hanging_node_constraints</code> function is a
-    // little tricky, since there are actually three of them, one for each
-    // supported space dimension. Taking addresses of overloaded functions is
-    // somewhat complicated in C++, since the address-of operator
-    // <code>&</code> in that case returns more like a set of values (the
-    // addresses of all functions with that name), and selecting the right one
-    // is then the next step. If the context dictates which one to take (for
-    // example by assigning to a function pointer of known type), then the
-    // compiler can do that by itself, but if this set of pointers shall be
-    // given as the argument to a function that takes a template, the compiler
-    // could choose all without having a preference for one. We therefore have
-    // to make it clear to the compiler which one we would like to have; for
-    // this, we could use a cast, but for more clarity, we assign it to a
-    // temporary <code>mhnc_p</code> (short for <code>pointer to
-    // make_hanging_node_constraints</code>) with the right type, and using
-    // this pointer instead.
+    // Note that taking the address of the
+    // <code>DoFTools::make_hanging_node_constraints</code> function
+    // is a little tricky, since there are actually three functions of
+    // this name, one for each supported space dimension. Taking
+    // addresses of overloaded functions is somewhat complicated in
+    // C++, since the address-of operator <code>&</code> in that case
+    // returns a set of values (the addresses of all
+    // functions with that name), and selecting the right one is then
+    // the next step. If the context dictates which one to take (for
+    // example by assigning to a function pointer of known type), then
+    // the compiler can do that by itself, but if this set of pointers
+    // shall be given as the argument to a function that takes a
+    // template, the compiler could choose all without having a
+    // preference for one. We therefore have to make it clear to the
+    // compiler which one we would like to have; for this, we could
+    // use a cast, but for more clarity, we assign it to a temporary
+    // <code>mhnc_p</code> (short for <code>pointer to
+    // make_hanging_node_constraints</code>) with the right type, and
+    // using this pointer instead.
     template <int dim>
     Solver<dim>::LinearSystem::
     LinearSystem (const DoFHandler<dim> &dof_handler)
@@ -702,15 +707,17 @@ namespace Step14
       hanging_node_constraints.clear ();
 
       void (*mhnc_p) (const DoFHandler<dim> &,
-          ConstraintMatrix &)
+		      ConstraintMatrix &)
         = &DoFTools::make_hanging_node_constraints;
 
-      Threads::Task<> side_task(std_cxx1x::bind(mhnc_p,std_cxx1x::cref(dof_handler),
-            std_cxx1x::ref(hanging_node_constraints)));
+      Threads::Task<> side_task
+	= Threads::new_task (mhnc_p,
+			     dof_handler,
+			     hanging_node_constraints);
 
       sparsity_pattern.reinit (dof_handler.n_dofs(),
-                                dof_handler.n_dofs(),
-                                dof_handler.max_couplings_between_dofs());
+			       dof_handler.n_dofs(),
+			       dof_handler.max_couplings_between_dofs());
       DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
       side_task.join();
