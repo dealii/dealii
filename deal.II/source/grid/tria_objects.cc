@@ -192,15 +192,8 @@ namespace internal
                                        RefinementCase<G::dimension>::no_refinement);
             }
 
-          boundary_or_material_id.reserve (new_size);
-          boundary_or_material_id.insert (boundary_or_material_id.end(),
-                                          new_size-boundary_or_material_id.size(),
-                                          BoundaryOrMaterialId());
-
-          user_data.reserve (new_size);
-          user_data.insert (user_data.end(),
-                            new_size-user_data.size(),
-                            UserData());
+	  boundary_or_material_id.resize (new_size);
+          user_data.resize (new_size);
         }
 
       if (n_unused_singles==0)
@@ -272,15 +265,8 @@ namespace internal
                            4*new_size-children.size(),
                            -1);
 
-          boundary_or_material_id.reserve (new_size);
-          boundary_or_material_id.insert (boundary_or_material_id.end(),
-                                          new_size-boundary_or_material_id.size(),
-                                          BoundaryOrMaterialId());
-
-          user_data.reserve (new_size);
-          user_data.insert (user_data.end(),
-                            new_size-user_data.size(),
-                            UserData());
+          boundary_or_material_id.resize (new_size);
+          user_data.resize (new_size);
 
           face_orientations.reserve (new_size * GeometryInfo<3>::faces_per_cell);
           face_orientations.insert (face_orientations.end(),
