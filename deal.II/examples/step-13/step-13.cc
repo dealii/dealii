@@ -667,7 +667,7 @@ namespace Step13
 
       void
       local_assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
-			     AssemblyScratchData                                  &scratch,
+			     AssemblyScratchData                                  &scratch_data,
 			     AssemblyCopyData                                     &copy_data) const;
 
       void
