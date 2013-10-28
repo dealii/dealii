@@ -56,6 +56,7 @@
 // how many threads to start in parallel.
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/thread_management.h>
 
 // The next new include file declares a base class <code>TensorFunction</code>
 // not unlike the <code>Function</code> class, but with the difference that
@@ -964,20 +965,20 @@ namespace Step9
     // or the other compiler, but have to take a temporary variable for that
     // purpose. Here, in this case, Compaq's <code>cxx</code> compiler choked
     // on the code so we use this workaround with the function pointer:
-    Threads::ThreadGroup<> threads;
+    Threads::TaskGroup<> tasks;
     void (*estimate_interval_ptr) (const DoFHandler<dim> &,
                                    const Vector<double> &,
                                    const IndexInterval &,
                                    Vector<float> &)
       = &GradientEstimation::template estimate_interval<dim>;
     for (unsigned int i=0; i<n_threads; ++i)
-      threads += Threads::new_thread (estimate_interval_ptr,
-                                      dof_handler, solution,
-                                      index_intervals[i],
-                                      error_per_cell);
+      tasks += Threads::new_task (estimate_interval_ptr,
+                                  dof_handler, solution,
+                                  index_intervals[i],
+                                  error_per_cell);
     // Ok, now the threads are at work, and we only have to wait for them to
     // finish their work:
-    threads.join_all ();
+    tasks.join_all ();
     // Note that if the value of the variable
     // <code>multithread_info.n_threads()</code> was one, or if the
     // library was not configured to use threads, then the sequence of
