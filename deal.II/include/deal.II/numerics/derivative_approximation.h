@@ -24,6 +24,8 @@
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/grid/filtered_iterator.h>
+
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN
@@ -676,8 +678,8 @@ private:
   template <class DerivativeDescription, int dim,
            template <int, int> class DH, class InputVector, int spacedim>
   static void
-  approximate (SynchronousIterators<std_cxx1x::tuple<typename DH<dim,spacedim>
-               ::active_cell_iterator,Vector<float>::iterator> > const &cell,
+  approximate (SynchronousIterators<std_cxx1x::tuple<FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator>,
+                Vector<float>::iterator> > const &cell,
                const Mapping<dim,spacedim>    &mapping,
                const DH<dim,spacedim>         &dof,
                const InputVector     &solution,

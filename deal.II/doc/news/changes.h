@@ -175,6 +175,12 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Fixed: the DerivativeApproximation class was not working correctly when
+  used with parallel vectors.
+  (Timo Heister, 2013/10/28)
+  </li>
+
+  <li>
   ~Subscriptor and ~GrowingVectorMemory no longer throw an exception (the
   former if disable_abort_on_exception was called) to be compatible with the
   C++11 standard which otherwise requires the program to immediately call

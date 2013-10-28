@@ -651,7 +651,7 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
   // Only act on the locally owned cells
   typedef FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator> CellFilter;
   
-  typedef std_cxx1x::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator>
+  typedef std_cxx1x::tuple<CellFilter,Vector<float>::iterator>
     Iterators;
   SynchronousIterators<Iterators> begin(Iterators (CellFilter(IteratorFilters::LocallyOwnedCell(),
             dof_handler.begin_active()),derivative_norm.begin())),
@@ -679,8 +679,7 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
 template <class DerivativeDescription, int dim,
          template <int, int> class DH, class InputVector, int spacedim>
 void
-DerivativeApproximation::approximate (SynchronousIterators<std_cxx1x::tuple<typename DH<dim,spacedim>
-                                      ::active_cell_iterator,Vector<float>::iterator> > const &cell,
+DerivativeApproximation::approximate (SynchronousIterators<std_cxx1x::tuple<FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator>,Vector<float>::iterator> > const &cell,
                                       const Mapping<dim,spacedim>                  &mapping,
                                       const DH<dim,spacedim>                       &dof_handler,
                                       const InputVector                            &solution,
@@ -759,7 +758,6 @@ approximate_cell (const Mapping<dim,spacedim>                   &mapping,
                                                        component);
   // ...and the place where it lives
   const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
-
 
   // loop over all neighbors and
   // accumulate the difference
