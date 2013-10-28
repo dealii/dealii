@@ -3,10 +3,10 @@
 
 <h3>The maths</h3>
 
-The Heidelberg group of Professor Rolf Rannacher, to which the three main
+The Heidelberg group of Professor Rolf Rannacher, to which the three initial
 authors of the deal.II library belonged during their PhD time and partly also
 afterwards, has been involved with adaptivity and error estimation for finite
-element discretizations since the mid-90ies. The main achievement is the
+element discretizations since the mid-1990ies. The main achievement is the
 development of error estimates for arbitrary functionals of the solution, and
 of optimal mesh refinement for its computation.
 
