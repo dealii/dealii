@@ -60,23 +60,6 @@ namespace Step14
 {
   using namespace dealii;
 
-  namespace Assembler
-  {
-    struct Scratch
-    {
-      Scratch() {}
-    };
-
-    struct CopyData
-    {
-      CopyData() {}
-
-      unsigned int dofs_per_cell;
-      FullMatrix<double> cell_matrix;
-      std::vector<types::global_dof_index> local_dof_indices;
-    };
-  }
-
   // @sect3{Evaluating the solution}
 
   // As mentioned in the introduction, significant parts of the program have
@@ -489,18 +472,38 @@ namespace Step14
       };
 
 
+      // The remainder of the class is essentially a copy of step-13
+      // as well, including the data structures and functions
+      // necessary to compute the linear system in parallel using the
+      // WorkStream framework:
+      struct AssemblyScratchData
+      {
+	AssemblyScratchData (const FiniteElement<dim> &fe,
+			     const Quadrature<dim>    &quadrature);
+	AssemblyScratchData (const AssemblyScratchData &scratch_data);
+
+	FEValues<dim>     fe_values;
+      };
+
+      struct AssemblyCopyData
+      {
+	FullMatrix<double> cell_matrix;
+	std::vector<types::global_dof_index> local_dof_indices;
+      };
+
+
       void
       assemble_linear_system (LinearSystem &linear_system);
 
       void
-      assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                       Assembler::Scratch                                   &scratch,
-                       Assembler::CopyData                                  &copy_data) const;
-          
+      local_assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
+			     AssemblyScratchData                                  &scratch_data,
+			     AssemblyCopyData                                     &copy_data) const;
+
 
       void
-      copy_local_to_global(Assembler::CopyData const &copy_data,
-                           LinearSystem              &linear_system) const;
+      copy_local_to_global(const AssemblyCopyData &copy_data,
+                           LinearSystem           &linear_system) const;
     };
 
 
@@ -558,30 +561,30 @@ namespace Step14
     }
 
 
+    // The following few functions and constructors are verbatim
+    // copies taken from step-13:
     template <int dim>
     void
     Solver<dim>::assemble_linear_system (LinearSystem &linear_system)
     {
-      typedef
-      typename DoFHandler<dim>::active_cell_iterator
-      active_cell_iterator;
+      Threads::Task<> rhs_task = Threads::new_task (&Solver<dim>::assemble_rhs,
+						    *this,
+						    linear_system.rhs);
 
-      const unsigned int n_threads = multithread_info.n_threads();
-      std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-      thread_ranges
-        = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
-                                                      dof_handler.end (),
-                                                      n_threads);
+      WorkStream::run(dof_handler.begin_active(),
+		      dof_handler.end(),
+		      std_cxx1x::bind(&Solver<dim>::local_assemble_matrix,
+				      this,
+				      std_cxx1x::_1,
+				      std_cxx1x::_2,
+				      std_cxx1x::_3),
+		      std_cxx1x::bind(&Solver<dim>::copy_local_to_global,
+				      this,
+				      std_cxx1x::_1,
+				      std_cxx1x::ref(linear_system)),
+		      AssemblyScratchData(*fe, *quadrature),
+		      AssemblyCopyData());
 
-      Assembler::Scratch scratch;
-      Assembler::CopyData copy_data;
-      WorkStream::run(dof_handler.begin_active(),dof_handler.end(),
-          std_cxx1x::bind(&Solver<dim>::assemble_matrix,this,std_cxx1x::_1,std_cxx1x::_2,std_cxx1x::_3),
-          std_cxx1x::bind(&Solver<dim>::copy_local_to_global,this,std_cxx1x::_1,std_cxx1x::ref(linear_system)),
-          scratch,copy_data);
-      
-
-      assemble_rhs (linear_system.rhs);
       linear_system.hanging_node_constraints.condense (linear_system.rhs);
 
       std::map<types::global_dof_index,double> boundary_value_map;
@@ -589,6 +592,8 @@ namespace Step14
                                                 0,
                                                 *boundary_values,
                                                 boundary_value_map);
+
+      rhs_task.join ();
 
       linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
@@ -600,29 +605,47 @@ namespace Step14
 
 
     template <int dim>
+    Solver<dim>::AssemblyScratchData::
+    AssemblyScratchData (const FiniteElement<dim> &fe,
+			 const Quadrature<dim>    &quadrature)
+    :
+    fe_values (fe,
+	       quadrature,
+	       update_gradients | update_JxW_values)
+    {}
+
+
+    template <int dim>
+    Solver<dim>::AssemblyScratchData::
+    AssemblyScratchData (const AssemblyScratchData &scratch_data)
+    :
+    fe_values (scratch_data.fe_values.get_fe(),
+	       scratch_data.fe_values.get_quadrature(),
+	       update_gradients | update_JxW_values)
+    {}
+
+
+    template <int dim>
     void
-    Solver<dim>::assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,            
-                                  Assembler::Scratch                                   &scratch,         
-                                  Assembler::CopyData                                  &copy_data) const
+    Solver<dim>::local_assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
+					AssemblyScratchData                                  &scratch_data,
+					AssemblyCopyData                                     &copy_data) const
     {
-      FEValues<dim> fe_values (*fe, *quadrature,
-                               update_gradients | update_JxW_values);
+      const unsigned int dofs_per_cell = fe->dofs_per_cell;
+      const unsigned int n_q_points    = quadrature->size();
 
-      copy_data.dofs_per_cell = fe->dofs_per_cell;
-      const unsigned int   n_q_points    = quadrature->size();
+      copy_data.cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
 
-      copy_data.cell_matrix = FullMatrix<double> (copy_data.dofs_per_cell, copy_data.dofs_per_cell);
+      copy_data.local_dof_indices.resize(dofs_per_cell);
 
-      copy_data.local_dof_indices.resize(copy_data.dofs_per_cell);
-
-      fe_values.reinit (cell);
+      scratch_data.fe_values.reinit (cell);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-        for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
-          for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
-            copy_data.cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                fe_values.shape_grad(j,q_point) *
-                fe_values.JxW(q_point));
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            copy_data.cell_matrix(i,j) += (scratch_data.fe_values.shape_grad(i,q_point) *
+					   scratch_data.fe_values.shape_grad(j,q_point) *
+					   scratch_data.fe_values.JxW(q_point));
 
       cell->get_dof_indices (copy_data.local_dof_indices);
     }
@@ -631,14 +654,14 @@ namespace Step14
 
     template <int dim>
     void
-    Solver<dim>::copy_local_to_global(Assembler::CopyData const &copy_data,
-                                      LinearSystem              &linear_system) const
+    Solver<dim>::copy_local_to_global(const AssemblyCopyData &copy_data,
+                                      LinearSystem           &linear_system) const
     {
-          for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
-            for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
-              linear_system.matrix.add (copy_data.local_dof_indices[i],
-                                        copy_data.local_dof_indices[j],
-                                        copy_data.cell_matrix(i,j));
+      for (unsigned int i=0; i<copy_data.local_dof_indices.size(); ++i)
+	for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
+	  linear_system.matrix.add (copy_data.local_dof_indices[i],
+				    copy_data.local_dof_indices[j],
+				    copy_data.cell_matrix(i,j));
     }
 
 
@@ -2124,10 +2147,10 @@ namespace Step14
     WeightedResidual<dim>::solve_problem ()
     {
       Threads::TaskGroup<> tasks;
-      tasks += Threads::Task<> (std_cxx1x::bind(&WeightedResidual<dim>::solve_primal_problem,
-            std_cxx1x::ref(*this)));
-      tasks += Threads::Task<> (std_cxx1x::bind(&WeightedResidual<dim>::solve_dual_problem,
-            std_cxx1x::ref(*this)));
+      tasks += Threads::new_task (&WeightedResidual<dim>::solve_primal_problem,
+				  *this);
+      tasks += Threads::new_task (&WeightedResidual<dim>::solve_dual_problem,
+				  *this);
       tasks.join_all();
     }
 
