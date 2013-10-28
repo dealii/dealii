@@ -17,7 +17,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsuite.cmake)
 PROJECT(testsuite CXX)
-INCLUDE(${DEAL_II_EXECUTABLE_CONFIG})
+INCLUDE(${DEAL_II_TARGET_CONFIG})
 
 #
 # Tests for the mesh_converter executable

@@ -80,8 +80,9 @@ FILE(WRITE
 #
 # Cleanup deal.IITargets.cmake in the build directory:
 #
-FILE(REMOVE
+FILE(WRITE
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
+  ""
   )
 
 
