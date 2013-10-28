@@ -62,20 +62,6 @@ void test()
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  if (myid==0)
-    {
-      typename Triangulation<dim>::active_cell_iterator it = tr.begin_active();
-      ++it;
-      ++it;
-      ++it;
-      for (unsigned int i=0; i<5; ++i)
-        {
-          it->set_refine_flag();
-          ++it;
-        }
-    }
-  tr.execute_coarsening_and_refinement();
-
   const FE_Q<dim> fe(1);
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs (fe);
