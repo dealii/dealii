@@ -778,8 +778,9 @@ at the same time read an existing matrix element, add their contribution, and
 write the sum back into memory without danger of producing a <a
 href="http://en.wikipedia.org/wiki/Race_condition">race condition</a>.
 
-deal.II has a class that is made for exactly this workflow: WorkStream. Its
-use is extensively documented in the module on @ref threads (in the section
+deal.II has a class that is made for exactly this workflow: WorkStream, first
+discussed in step-9 and step-13. Its
+use is also extensively documented in the module on @ref threads (in the section
 on @ref MTWorkStream "the WorkStream class") and we won't repeat here the
 rationale and detailed instructions laid out there, though you will want to
 read through this module to understand the distinction between scratch space
