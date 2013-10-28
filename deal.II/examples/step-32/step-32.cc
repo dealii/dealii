@@ -2192,9 +2192,11 @@ namespace Step32
   // std_cxx1x::_3</code> for the local assembly function that specify
   // cell, scratch data, and copy data, as well as the placeholder
   // <code>std_cxx1x::_1</code> for the copy function that expects the
-  // data to be written into the global matrix. On the other hand, the
-  // implicit zeroth argument of member functions (namely the
-  // <code>this</code> pointer of the object on which that member
+  // data to be written into the global matrix (for placeholder
+  // arguments, also see the discussion in step-13's
+  // <code>assemble_linear_system()</code> function). On the other
+  // hand, the implicit zeroth argument of member functions (namely
+  // the <code>this</code> pointer of the object on which that member
   // function is to operate on) is <i>bound</i> to the
   // <code>this</code> pointer of the current function. The
   // WorkStream::run function, as a consequence, does not need to know
