@@ -199,6 +199,9 @@ public:
    * elements, this is the only valid choice; for vector-valued ones, any
    * component between zero and the number of vector components can be given
    * here.
+   *
+   * In a parallel computation the @p solution vector needs to contain the
+   * locally relevant unknowns.
    */
   template <int dim, template <int, int> class DH, class InputVector, int spacedim>
   static void
@@ -232,6 +235,9 @@ public:
    * elements, this is the only valid choice; for vector-valued ones, any
    * component between zero and the number of vector components can be given
    * here.
+   *
+   * In a parallel computation the @p solution vector needs to contain the
+   * locally relevant unknowns.
    */
   template <int dim, template <int, int> class DH, class InputVector, int spacedim>
   static void
@@ -261,6 +267,9 @@ public:
    * elements, this is the only valid choice; for vector-valued ones, any
    * component between zero and the number of vector components can be given
    * here.
+   *
+   * In a parallel computation the @p solution vector needs to contain the
+   * locally relevant unknowns.
    */
 
   template <int dim, template <int, int> class DH, class InputVector, int order, int spacedim>
