@@ -56,7 +56,6 @@
 // how many threads to start in parallel.
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/multithread_info.h>
-#include <deal.II/base/thread_management.h>
 
 // The next new include file declares a base class <code>TensorFunction</code>
 // not unlike the <code>Function</code> class, but with the difference that
@@ -466,13 +465,33 @@ namespace Step9
     DeclException0 (ExcInsufficientDirections);
 
   private:
-    typedef std::pair<unsigned int,unsigned int> IndexInterval;
+    template <int dim>
+    struct EstimateScratchData 
+    {
+      EstimateScratchData (const FiniteElement<dim> &fe,
+                           const Vector<double>     &solution);
+      EstimateScratchData (const EstimateScratchData &data);
+
+      FEValues<dim> fe_midpoint_value;
+      Vector<double> solution;
+    };
+
+    // There is nothing to copy but WorkStream requires a CopyData structure
+    template <int dim>
+    struct EstimateCopyData 
+    {
+      EstimateCopyData () {}
+    };
 
     template <int dim>
-    static void estimate_interval (const DoFHandler<dim> &dof,
-                                   const Vector<double>  &solution,
-                                   const IndexInterval   &index_interval,
-                                   Vector<float>         &error_per_cell);
+    static void estimate_cell (
+        const SynchronousIterators<std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,
+        Vector<float>::iterator> >     &cell,
+        EstimateScratchData<dim>       &scratch_data,
+        const EstimateCopyData<dim>    &copy_data);
+    // There is nothing to copy but WorkStream required a copy function
+    template <int dim>
+    static void dummy_copy(const EstimateCopyData<dim> &copy_data) {}
   };
 
 
@@ -922,6 +941,32 @@ namespace Step9
 
   // @sect3{GradientEstimation class implementation}
 
+  // ScratchData used by estimate_cell
+  template <int dim>
+  GradientEstimation::EstimateScratchData<dim>
+  ::EstimateScratchData (const FiniteElement<dim> &fe,
+                         const Vector<double>     &solution)
+  :
+  fe_midpoint_value(fe,
+      QMidpoint<dim> (),
+      update_values | update_quadrature_points),
+  solution(solution)
+  {}
+
+
+
+  // ScratchData used by estimate_cell
+  template <int dim>
+  GradientEstimation::EstimateScratchData<dim>
+  ::EstimateScratchData(const EstimateScratchData &scratch_data)
+  :
+  fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
+      scratch_data.fe_midpoint_value.get_quadrature(),
+      update_values | update_quadrature_points),
+  solution(scratch_data.solution)
+  {}
+
+
   // Now for the implementation of the <code>GradientEstimation</code>
   // class. The first function does not much except for delegating work to the
   // other function:
@@ -942,15 +987,6 @@ namespace Step9
             ExcInvalidVectorLength (error_per_cell.size(),
                                     dof_handler.get_tria().n_active_cells()));
 
-    // Next, we subdivide the range of cells into chunks of equal size. Just
-    // as we have used the function <code>Threads::split_range</code> when
-    // assembling above, there is a function that computes intervals of
-    // roughly equal size from a larger interval. This is used here:
-    const unsigned int n_threads = multithread_info.n_threads();
-    std::vector<IndexInterval> index_intervals
-      = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
-                                 n_threads);
-
     // In the same way as before, we use a <code>Threads::ThreadGroup</code>
     // object to collect the descriptor objects of different threads. Note
     // that as the function called is not a member function, but rather a
@@ -965,20 +1001,27 @@ namespace Step9
     // or the other compiler, but have to take a temporary variable for that
     // purpose. Here, in this case, Compaq's <code>cxx</code> compiler choked
     // on the code so we use this workaround with the function pointer:
-    Threads::TaskGroup<> tasks;
-    void (*estimate_interval_ptr) (const DoFHandler<dim> &,
-                                   const Vector<double> &,
-                                   const IndexInterval &,
-                                   Vector<float> &)
-      = &GradientEstimation::template estimate_interval<dim>;
-    for (unsigned int i=0; i<n_threads; ++i)
-      tasks += Threads::new_task (estimate_interval_ptr,
-                                  dof_handler, solution,
-                                  index_intervals[i],
-                                  error_per_cell);
-    // Ok, now the threads are at work, and we only have to wait for them to
-    // finish their work:
-    tasks.join_all ();
+    void (*estimate_cell_ptr) (const SynchronousIterators<std_cxx1x::tuple<
+      typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator> > &cell,          
+      EstimateScratchData<dim>                                                  &scratch_data,  
+      const EstimateCopyData<dim>                                               &copy_data)
+      = &GradientEstimation::template estimate_cell<dim>;
+
+    void (*dummy_copy) (const EstimateCopyData<dim> &copy_data)
+      = &GradientEstimation::template dummy_copy<dim>;
+
+    typedef std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
+      Iterators;
+    SynchronousIterators<Iterators> begin_sync_it(Iterators(dof_handler.begin_active(),
+          error_per_cell.begin()));
+    SynchronousIterators<Iterators> end_sync_it(Iterators(dof_handler.end(),error_per_cell.end()));
+
+    WorkStream::run(begin_sync_it,end_sync_it,
+                    estimate_cell_ptr,
+                    dummy_copy,
+                    EstimateScratchData<dim> (dof_handler.get_fe(),solution),
+                    EstimateCopyData<dim> ());
+
     // Note that if the value of the variable
     // <code>multithread_info.n_threads()</code> was one, or if the
     // library was not configured to use threads, then the sequence of
@@ -1005,50 +1048,14 @@ namespace Step9
   // Now for the details:
   template <int dim>
   void
-  GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
-                                         const Vector<double>  &solution,
-                                         const IndexInterval   &index_interval,
-                                         Vector<float>         &error_per_cell)
-  {
-    // First we need a way to extract the values of the given finite element
-    // function at the center of the cells. As usual with values of finite
-    // element functions, we use an object of type <code>FEValues</code>, and
-    // we use (or mis-use in this case) the midpoint quadrature rule to get at
-    // the values at the center. Note that the <code>FEValues</code> object
-    // only needs to compute the values at the centers, and the location of
-    // the quadrature points in real space in order to get at the vectors
-    // <code>y</code>.
-    QMidpoint<dim> midpoint_rule;
-    FEValues<dim>  fe_midpoint_value (dof_handler.get_fe(),
-                                      midpoint_rule,
-                                      update_values | update_quadrature_points);
-
-    // Then we need space foe the tensor <code>Y</code>, which is the sum of
+  GradientEstimation::estimate_cell (const SynchronousIterators<std_cxx1x::tuple<
+      typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator> > &cell,          
+      EstimateScratchData<dim>                                                  &scratch_data,  
+      const EstimateCopyData<dim>                                               &copy_data)
+   {
+    // We need space for the tensor <code>Y</code>, which is the sum of
     // outer products of the y-vectors.
     Tensor<2,dim> Y;
-
-    // Then define iterators into the cells and into the output vector, which
-    // are to be looped over by the present instance of this function. We get
-    // start and end iterators over cells by setting them to the first active
-    // cell and advancing them using the given start and end index. Note that
-    // we can use the <code>advance</code> function of the standard C++
-    // library, but that we have to cast the distance by which the iterator is
-    // to be moved forward to a signed quantity in order to avoid warnings by
-    // the compiler.
-    typename DoFHandler<dim>::active_cell_iterator cell, endc;
-
-    cell = dof_handler.begin_active();
-    advance (cell, static_cast<signed int>(index_interval.first));
-
-    endc = dof_handler.begin_active();
-    advance (endc, static_cast<signed int>(index_interval.second));
-
-    // Getting an iterator into the output array is simpler. We don't need an
-    // end iterator, as we always move this iterator forward by one element
-    // for each cell we are on, but stop the loop when we hit the end cell, so
-    // we need not have an end element for this iterator.
-    Vector<float>::iterator
-    error_on_this_cell = error_per_cell.begin() + index_interval.first;
 
 
     // Then we allocate a vector to hold iterators to all active neighbors of
@@ -1059,205 +1066,203 @@ namespace Step9
     active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
                               GeometryInfo<dim>::max_children_per_face);
 
-    // Well then, after all these preliminaries, lets start the computations:
-    for (; cell!=endc; ++cell, ++error_on_this_cell)
-      {
-        // First initialize the <code>FEValues</code> object, as well as the
-        // <code>Y</code> tensor:
-        fe_midpoint_value.reinit (cell);
-        Y.clear ();
+    typename DoFHandler<dim>::active_cell_iterator cell_it(std_cxx1x::get<0>(cell.iterators));
+    
+    // First initialize the <code>FEValues</code> object, as well as the
+    // <code>Y</code> tensor:
+    scratch_data.fe_midpoint_value.reinit (cell_it);
 
-        // Then allocate the vector that will be the sum over the y-vectors
-        // times the approximate directional derivative:
-        Tensor<1,dim> projected_gradient;
+    // Then allocate the vector that will be the sum over the y-vectors
+    // times the approximate directional derivative:
+    Tensor<1,dim> projected_gradient;
 
 
-        // Now before going on first compute a list of all active neighbors of
-        // the present cell. We do so by first looping over all faces and see
-        // whether the neighbor there is active, which would be the case if it
-        // is on the same level as the present cell or one level coarser (note
-        // that a neighbor can only be once coarser than the present cell, as
-        // we only allow a maximal difference of one refinement over a face in
-        // deal.II). Alternatively, the neighbor could be on the same level
-        // and be further refined; then we have to find which of its children
-        // are next to the present cell and select these (note that if a child
-        // of of neighbor of an active cell that is next to this active cell,
-        // needs necessarily be active itself, due to the one-refinement rule
-        // cited above).
-        //
-        // Things are slightly different in one space dimension, as there the
-        // one-refinement rule does not exist: neighboring active cells may
-        // differ in as many refinement levels as they like. In this case, the
-        // computation becomes a little more difficult, but we will explain
-        // this below.
-        //
-        // Before starting the loop over all neighbors of the present cell, we
-        // have to clear the array storing the iterators to the active
-        // neighbors, of course.
-        active_neighbors.clear ();
-        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-          if (! cell->at_boundary(face_no))
+    // Now before going on first compute a list of all active neighbors of
+    // the present cell. We do so by first looping over all faces and see
+    // whether the neighbor there is active, which would be the case if it
+    // is on the same level as the present cell or one level coarser (note
+    // that a neighbor can only be once coarser than the present cell, as
+    // we only allow a maximal difference of one refinement over a face in
+    // deal.II). Alternatively, the neighbor could be on the same level
+    // and be further refined; then we have to find which of its children
+    // are next to the present cell and select these (note that if a child
+    // of of neighbor of an active cell that is next to this active cell,
+    // needs necessarily be active itself, due to the one-refinement rule
+    // cited above).
+    //
+    // Things are slightly different in one space dimension, as there the
+    // one-refinement rule does not exist: neighboring active cells may
+    // differ in as many refinement levels as they like. In this case, the
+    // computation becomes a little more difficult, but we will explain
+    // this below.
+    //
+    // Before starting the loop over all neighbors of the present cell, we
+    // have to clear the array storing the iterators to the active
+    // neighbors, of course.
+    active_neighbors.clear ();
+    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+      if (! std_cxx1x::get<0>(cell.iterators)->at_boundary(face_no))
+        {
+          // First define an abbreviation for the iterator to the face and
+          // the neighbor
+          const typename DoFHandler<dim>::face_iterator
+          face = std_cxx1x::get<0>(cell.iterators)->face(face_no);
+          const typename DoFHandler<dim>::cell_iterator
+          neighbor = std_cxx1x::get<0>(cell.iterators)->neighbor(face_no);
+
+          // Then check whether the neighbor is active. If it is, then it
+          // is on the same level or one level coarser (if we are not in
+          // 1D), and we are interested in it in any case.
+          if (neighbor->active())
+            active_neighbors.push_back (neighbor);
+          else
             {
-              // First define an abbreviation for the iterator to the face and
-              // the neighbor
-              const typename DoFHandler<dim>::face_iterator
-              face = cell->face(face_no);
-              const typename DoFHandler<dim>::cell_iterator
-              neighbor = cell->neighbor(face_no);
-
-              // Then check whether the neighbor is active. If it is, then it
-              // is on the same level or one level coarser (if we are not in
-              // 1D), and we are interested in it in any case.
-              if (neighbor->active())
-                active_neighbors.push_back (neighbor);
-              else
+              // If the neighbor is not active, then check its children.
+              if (dim == 1)
                 {
-                  // If the neighbor is not active, then check its children.
-                  if (dim == 1)
-                    {
-                      // To find the child of the neighbor which bounds to the
-                      // present cell, successively go to its right child if
-                      // we are left of the present cell (n==0), or go to the
-                      // left child if we are on the right (n==1), until we
-                      // find an active cell.
-                      typename DoFHandler<dim>::cell_iterator
-                      neighbor_child = neighbor;
-                      while (neighbor_child->has_children())
-                        neighbor_child = neighbor_child->child (face_no==0 ? 1 : 0);
+                  // To find the child of the neighbor which bounds to the
+                  // present cell, successively go to its right child if
+                  // we are left of the present cell (n==0), or go to the
+                  // left child if we are on the right (n==1), until we
+                  // find an active cell.
+                  typename DoFHandler<dim>::cell_iterator
+                  neighbor_child = neighbor;
+                  while (neighbor_child->has_children())
+                    neighbor_child = neighbor_child->child (face_no==0 ? 1 : 0);
 
-                      // As this used some non-trivial geometrical intuition,
-                      // we might want to check whether we did it right,
-                      // i.e. check whether the neighbor of the cell we found
-                      // is indeed the cell we are presently working
-                      // on. Checks like this are often useful and have
-                      // frequently uncovered errors both in algorithms like
-                      // the line above (where it is simple to involuntarily
-                      // exchange <code>n==1</code> for <code>n==0</code> or
-                      // the like) and in the library (the assumptions
-                      // underlying the algorithm above could either be wrong,
-                      // wrongly documented, or are violated due to an error
-                      // in the library). One could in principle remove such
-                      // checks after the program works for some time, but it
-                      // might be a good things to leave it in anyway to check
-                      // for changes in the library or in the algorithm above.
-                      //
-                      // Note that if this check fails, then this is certainly
-                      // an error that is irrecoverable and probably qualifies
-                      // as an internal error. We therefore use a predefined
-                      // exception class to throw here.
-                      Assert (neighbor_child->neighbor(face_no==0 ? 1 : 0)==cell,
-                              ExcInternalError());
+                  // As this used some non-trivial geometrical intuition,
+                  // we might want to check whether we did it right,
+                  // i.e. check whether the neighbor of the cell we found
+                  // is indeed the cell we are presently working
+                  // on. Checks like this are often useful and have
+                  // frequently uncovered errors both in algorithms like
+                  // the line above (where it is simple to involuntarily
+                  // exchange <code>n==1</code> for <code>n==0</code> or
+                  // the like) and in the library (the assumptions
+                  // underlying the algorithm above could either be wrong,
+                  // wrongly documented, or are violated due to an error
+                  // in the library). One could in principle remove such
+                  // checks after the program works for some time, but it
+                  // might be a good things to leave it in anyway to check
+                  // for changes in the library or in the algorithm above.
+                  //
+                  // Note that if this check fails, then this is certainly
+                  // an error that is irrecoverable and probably qualifies
+                  // as an internal error. We therefore use a predefined
+                  // exception class to throw here.
+                  Assert (neighbor_child->neighbor(face_no==0 ? 1 : 0)
+                      ==std_cxx1x::get<0>(cell.iterators),ExcInternalError());
 
-                      // If the check succeeded, we push the active neighbor
-                      // we just found to the stack we keep:
-                      active_neighbors.push_back (neighbor_child);
-                    }
-                  else
-                    // If we are not in 1d, we collect all neighbor children
-                    // `behind' the subfaces of the current face
-                    for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
-                      active_neighbors.push_back (
-                        cell->neighbor_child_on_subface(face_no, subface_no));
+                  // If the check succeeded, we push the active neighbor
+                  // we just found to the stack we keep:
+                  active_neighbors.push_back (neighbor_child);
                 }
+              else
+                // If we are not in 1d, we collect all neighbor children
+                // `behind' the subfaces of the current face
+                for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
+                  active_neighbors.push_back (
+                    std_cxx1x::get<0>(cell.iterators)->neighbor_child_on_subface(face_no,subface_no));
             }
+        }
 
-        // OK, now that we have all the neighbors, lets start the computation
-        // on each of them. First we do some preliminaries: find out about the
-        // center of the present cell and the solution at this point. The
-        // latter is obtained as a vector of function values at the quadrature
-        // points, of which there are only one, of course. Likewise, the
-        // position of the center is the position of the first (and only)
-        // quadrature point in real space.
-        const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
+    // OK, now that we have all the neighbors, lets start the computation
+    // on each of them. First we do some preliminaries: find out about the
+    // center of the present cell and the solution at this point. The
+    // latter is obtained as a vector of function values at the quadrature
+    // points, of which there are only one, of course. Likewise, the
+    // position of the center is the position of the first (and only)
+    // quadrature point in real space.
+    const Point<dim> this_center = scratch_data.fe_midpoint_value.quadrature_point(0);
 
-        std::vector<double> this_midpoint_value(1);
-        fe_midpoint_value.get_function_values (solution, this_midpoint_value);
+    std::vector<double> this_midpoint_value(1);
+    scratch_data.fe_midpoint_value.get_function_values (scratch_data.solution, this_midpoint_value);
 
 
-        // Now loop over all active neighbors and collect the data we
-        // need. Allocate a vector just like <code>this_midpoint_value</code>
-        // which we will use to store the value of the solution in the
-        // midpoint of the neighbor cell. We allocate it here already, since
-        // that way we don't have to allocate memory repeatedly in each
-        // iteration of this inner loop (memory allocation is a rather
-        // expensive operation):
-        std::vector<double> neighbor_midpoint_value(1);
-        typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
-        neighbor_ptr = active_neighbors.begin();
-        for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
-          {
-            // First define an abbreviation for the iterator to the active
-            // neighbor cell:
-            const typename DoFHandler<dim>::active_cell_iterator
-            neighbor = *neighbor_ptr;
+    // Now loop over all active neighbors and collect the data we
+    // need. Allocate a vector just like <code>this_midpoint_value</code>
+    // which we will use to store the value of the solution in the
+    // midpoint of the neighbor cell. We allocate it here already, since
+    // that way we don't have to allocate memory repeatedly in each
+    // iteration of this inner loop (memory allocation is a rather
+    // expensive operation):
+    std::vector<double> neighbor_midpoint_value(1);
+    typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
+    neighbor_ptr = active_neighbors.begin();
+    for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
+      {
+        // First define an abbreviation for the iterator to the active
+        // neighbor cell:
+        const typename DoFHandler<dim>::active_cell_iterator
+        neighbor = *neighbor_ptr;
 
-            // Then get the center of the neighbor cell and the value of the
-            // finite element function thereon. Note that for this information
-            // we have to reinitialize the <code>FEValues</code> object for
-            // the neighbor cell.
-            fe_midpoint_value.reinit (neighbor);
-            const Point<dim> neighbor_center = fe_midpoint_value.quadrature_point(0);
+        // Then get the center of the neighbor cell and the value of the
+        // finite element function thereon. Note that for this information
+        // we have to reinitialize the <code>FEValues</code> object for
+        // the neighbor cell.
+        scratch_data.fe_midpoint_value.reinit (neighbor);
+        const Point<dim> neighbor_center = scratch_data.fe_midpoint_value.quadrature_point(0);
 
-            fe_midpoint_value.get_function_values (solution,
-                                                   neighbor_midpoint_value);
+        scratch_data.fe_midpoint_value.get_function_values (scratch_data.solution,
+                                               neighbor_midpoint_value);
 
-            // Compute the vector <code>y</code> connecting the centers of the
-            // two cells. Note that as opposed to the introduction, we denote
-            // by <code>y</code> the normalized difference vector, as this is
-            // the quantity used everywhere in the computations.
-            Point<dim>   y        = neighbor_center - this_center;
-            const double distance = std::sqrt(y.square());
-            y /= distance;
+        // Compute the vector <code>y</code> connecting the centers of the
+        // two cells. Note that as opposed to the introduction, we denote
+        // by <code>y</code> the normalized difference vector, as this is
+        // the quantity used everywhere in the computations.
+        Point<dim>   y        = neighbor_center - this_center;
+        const double distance = std::sqrt(y.square());
+        y /= distance;
 
-            // Then add up the contribution of this cell to the Y matrix...
-            for (unsigned int i=0; i<dim; ++i)
-              for (unsigned int j=0; j<dim; ++j)
-                Y[i][j] += y[i] * y[j];
+        // Then add up the contribution of this cell to the Y matrix...
+        for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int j=0; j<dim; ++j)
+            Y[i][j] += y[i] * y[j];
 
-            // ... and update the sum of difference quotients:
-            projected_gradient += (neighbor_midpoint_value[0] -
-                                   this_midpoint_value[0]) /
-                                  distance *
-                                  y;
-          }
-
-        // If now, after collecting all the information from the neighbors, we
-        // can determine an approximation of the gradient for the present
-        // cell, then we need to have passed over vectors <code>y</code> which
-        // span the whole space, otherwise we would not have all components of
-        // the gradient. This is indicated by the invertibility of the matrix.
-        //
-        // If the matrix should not be invertible, this means that the present
-        // cell had an insufficient number of active neighbors. In contrast to
-        // all previous cases, where we raised exceptions, this is, however,
-        // not a programming error: it is a runtime error that can happen in
-        // optimized mode even if it ran well in debug mode, so it is
-        // reasonable to try to catch this error also in optimized mode. For
-        // this case, there is the <code>AssertThrow</code> macro: it checks
-        // the condition like the <code>Assert</code> macro, but not only in
-        // debug mode; it then outputs an error message, but instead of
-        // terminating the program as in the case of the <code>Assert</code>
-        // macro, the exception is thrown using the <code>throw</code> command
-        // of C++. This way, one has the possibility to catch this error and
-        // take reasonable counter actions. One such measure would be to
-        // refine the grid globally, as the case of insufficient directions
-        // can not occur if every cell of the initial grid has been refined at
-        // least once.
-        AssertThrow (determinant(Y) != 0,
-                     ExcInsufficientDirections());
-
-        // If, on the other hand the matrix is invertible, then invert it,
-        // multiply the other quantity with it and compute the estimated error
-        // using this quantity and the right powers of the mesh width:
-        const Tensor<2,dim> Y_inverse = invert(Y);
-
-        Point<dim> gradient;
-        contract (gradient, Y_inverse, projected_gradient);
-
-        *error_on_this_cell = (std::pow(cell->diameter(),
-                                        1+1.0*dim/2) *
-                               std::sqrt(gradient.square()));
+        // ... and update the sum of difference quotients:
+        projected_gradient += (neighbor_midpoint_value[0] -
+                               this_midpoint_value[0]) /
+                              distance *
+                              y;
       }
+
+    // If now, after collecting all the information from the neighbors, we
+    // can determine an approximation of the gradient for the present
+    // cell, then we need to have passed over vectors <code>y</code> which
+    // span the whole space, otherwise we would not have all components of
+    // the gradient. This is indicated by the invertibility of the matrix.
+    //
+    // If the matrix should not be invertible, this means that the present
+    // cell had an insufficient number of active neighbors. In contrast to
+    // all previous cases, where we raised exceptions, this is, however,
+    // not a programming error: it is a runtime error that can happen in
+    // optimized mode even if it ran well in debug mode, so it is
+    // reasonable to try to catch this error also in optimized mode. For
+    // this case, there is the <code>AssertThrow</code> macro: it checks
+    // the condition like the <code>Assert</code> macro, but not only in
+    // debug mode; it then outputs an error message, but instead of
+    // terminating the program as in the case of the <code>Assert</code>
+    // macro, the exception is thrown using the <code>throw</code> command
+    // of C++. This way, one has the possibility to catch this error and
+    // take reasonable counter actions. One such measure would be to
+    // refine the grid globally, as the case of insufficient directions
+    // can not occur if every cell of the initial grid has been refined at
+    // least once.
+    AssertThrow (determinant(Y) != 0,
+                 ExcInsufficientDirections());
+
+    // If, on the other hand the matrix is invertible, then invert it,
+    // multiply the other quantity with it and compute the estimated error
+    // using this quantity and the right powers of the mesh width:
+    const Tensor<2,dim> Y_inverse = invert(Y);
+
+    Point<dim> gradient;
+    contract (gradient, Y_inverse, projected_gradient);
+
+    *(std_cxx1x::get<1>(cell.iterators)) = (std::pow(std_cxx1x::get<0>(cell.iterators)->diameter(),
+                                           1+1.0*dim/2) *
+                                           std::sqrt(gradient.square()));
+    
   }
 }
 
