@@ -62,24 +62,6 @@ namespace Step13
 {
   using namespace dealii;
 
-  namespace Assembler
-  {
-    // Dummy structure
-    struct Scratch
-    {
-      Scratch() {}
-    };
-
-    struct CopyData
-    {
-      CopyData() {}
-
-      unsigned int dofs_per_cell;
-      FullMatrix<double> cell_matrix;
-      std::vector<types::global_dof_index> local_dof_indices;
-    };
-  }
-
   // @sect3{Evaluation of the solution}
 
   // As for the program itself, we first define classes that evaluate the
@@ -644,7 +626,7 @@ namespace Step13
       // various subobjects, and there is a function that implements a
       // conjugate gradient method as solver.
     private:
-      struct LinearSystem 
+      struct LinearSystem
       {
         LinearSystem (const DoFHandler<dim> &dof_handler);
 
@@ -657,23 +639,40 @@ namespace Step13
       };
 
 
-      // Finally, there is a pair of functions which will be used to assemble
-      // the actual system matrix. It calls the virtual function assembling
-      // the right hand side, and installs a number threads each running the
-      // second function which assembles part of the system matrix. The
-      // mechanism for doing so is the same as in the step-9 example program.
+      // Finally, there is a set of functions which will be used to
+      // assemble the actual system matrix. The main function of this
+      // group, <code>assemble_linear_system()</code> computes the
+      // matrix in parallel on multicore systems, using the following
+      // two helper functions. The mechanism for doing so is the same
+      // as in the step-9 example program and follows the WorkStream
+      // concept outlined in @ref threads . The main function also
+      // calls the virtual function assembling the right hand side.
+      struct AssemblyScratchData
+      {
+	AssemblyScratchData (const FiniteElement<dim> &fe,
+			     const Quadrature<dim>    &quadrature);
+	AssemblyScratchData (const AssemblyScratchData &scratch_data);
+
+	FEValues<dim>     fe_values;
+      };
+
+      struct AssemblyCopyData
+      {
+	FullMatrix<double> cell_matrix;
+	std::vector<types::global_dof_index> local_dof_indices;
+      };
+
       void
       assemble_linear_system (LinearSystem &linear_system);
 
       void
-      assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                       Assembler::Scratch                                   &scratch,
-                       Assembler::CopyData                                  &copy_data) const;
-          
+      local_assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
+			     AssemblyScratchData                                  &scratch,
+			     AssemblyCopyData                                     &copy_data) const;
 
       void
-      copy_local_to_global(Assembler::CopyData const &copy_data,
-                           LinearSystem              &linear_system) const;
+      copy_local_to_global(const AssemblyCopyData &copy_data,
+                           LinearSystem           &linear_system) const;
     };
 
 
@@ -748,62 +747,179 @@ namespace Step13
     }
 
 
-    // The following function assembles matrix and right hand side of the
-    // linear system to be solved in each step. It goes along the same lines
-    // as used in previous examples, so we explain it only briefly. Note that
-    // we do a number of things in parallel, a process described in more
-    // detail in the @ref threads module.
+    // The following function assembles matrix and right hand side of
+    // the linear system to be solved in each step. We will do things
+    // in parallel at a couple of levels. First, note that we need to
+    // assemble both the matrix and the right hand side. These are
+    // independent operations, and we should do this in parallel. To
+    // this end, we use the concept of "tasks" that is discussed in
+    // the @ref threads documentation module. In essence, what we want
+    // to say "here is something that needs to be worked on, go do it
+    // whenever a CPU core is available", then do something else, and
+    // when we need the result of the first operation wait for its
+    // completion. At the second level, we want to assemble the matrix
+    // using the exact same strategy we have already used in step-9,
+    // namely the WorkStream concept.
+    //
+    // While we could consider either assembling the right hand side
+    // or assembling the matrix as the thing to do in the background
+    // while doing the other, we will opt for the former approach
+    // simply because the call to <code>Solver::assemble_rhs</code> is
+    // so much simpler to write than the call to WorkStream::run with
+    // its many arguments. In any case, the code then looks like this
+    // to assemble the entire linear system:
     template <int dim>
     void
     Solver<dim>::assemble_linear_system (LinearSystem &linear_system)
     {
-      // First define a convenience abbreviation for these lengthy iterator
-      // names...
-      typedef
-      typename DoFHandler<dim>::active_cell_iterator
-      active_cell_iterator;
+      Threads::Task<> rhs_task = Threads::new_task (&Solver<dim>::assemble_rhs,
+						    *this,
+						    linear_system.rhs);
 
-      // ... and use it to split up the set of cells into a number of pieces
-      // of equal size. The number of blocks is set to the default number of
-      // threads to be used, which by default is set to the number of
-      // processors found in your computer at startup of the program:
+      WorkStream::run(dof_handler.begin_active(),
+		      dof_handler.end(),
+		      std_cxx1x::bind(&Solver<dim>::local_assemble_matrix,
+				      this,
+				      std_cxx1x::_1,
+				      std_cxx1x::_2,
+				      std_cxx1x::_3),
+		      std_cxx1x::bind(&Solver<dim>::copy_local_to_global,
+				      this,
+				      std_cxx1x::_1,
+				      std_cxx1x::ref(linear_system)),
+		      AssemblyScratchData(*fe, *quadrature),
+		      AssemblyCopyData());
+      linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
-      // These ranges are then assigned to a number of threads which we create
-      // next. Each will assemble the local cell matrices on the assigned
-      // cells, and fill the matrix object with it. Since there is need for
-      // synchronization when filling the same matrix from different threads,
-      // we need a mutex here:
+      // The syntax above using <code>std_cxx1x::bind</code> requires
+      // some explanation. There are multiple version of
+      // WorkStream::run that expect different arguments. In step-9,
+      // we used one version that took a pair of iterators, a pair of
+      // pointers to member functions with very specific argument
+      // lists, a pointer or reference to the object on which these
+      // member functions have to work, and a scratch and copy data
+      // object. This is a bit restrictive since the member functions
+      // called this way have to have an argument list that exactly
+      // matches what WorkStream::run expects: the local assembly
+      // function needs to take an iterator, a scratch object and a
+      // copy object; and the copy-local-to-global function needs to
+      // take exactly a copy object. But, what if we want something
+      // that's slightly more general? For example, in the current
+      // program, the copy-local-to-global function needs to know
+      // which linear system object to write the local contributions
+      // into, i.e., it also has to take a <code>LinearSystem</code>
+      // argument. That won't work with the approach using member
+      // function pointers.
+      //
+      // Fortunately, C++ offers a way out. These are called function
+      // objects. In essence, what WorkStream::run wants to do is not
+      // call a member function. It wants to call some function that
+      // takes an iterator, a scratch object and a copy object in the
+      // first case, and a copy object in the second case. Whether
+      // these are member functions, global functions, or something
+      // else, is really not of much concern to
+      // WorkStream. Consequently, there is a second version of the
+      // function that just takes function objects -- objects that
+      // have an <code>operator()</code> and that consequently can be
+      // called like functions, whatever they really represent. The
+      // typical way to generate such function objects is using
+      // <code>std::bind</code> (or, if the compiler is too old, a
+      // replacement for it, which we generically call
+      // <code>std_cxx1x::bind</code>) which takes a pointer to a
+      // (member) function and then <i>binds</i> individual arguments
+      // to fixed values. For example, you can create a function that
+      // takes an iterator, a scratch object and a copy object by
+      // taking the address of a member function and binding the
+      // (implicit) argument to the object on which it is to work to
+      // <code>*this</code>. This is what we do in the first call
+      // above. In the second call, we need to create a function
+      // object that takes a copy object, and we do so by taking the
+      // address of a member function that takes an implicit pointer
+      // to <code>*this</code>, a reference to a copy object, and a
+      // reference to a linear system, and binding the first and third
+      // of these, leaving something that has only one open argument
+      // that can then be filled by WorkStream::run().
+      //
+      // There remains the question of what the
+      // <code>std_cxx1x::_1</code>, <code>std_cxx1x::_2</code>, etc.,
+      // mean. (These arguments are called <i>placeholders</i>.) The
+      // idea of using <code>std_cxx1x::bind</code> in the first of
+      // the two cases above is that it produces an object that can be
+      // called with three arguments. But how are the three arguments
+      // the function object is being called with going to be
+      // distributed to the four arguments
+      // <code>local_assemble_matrix()</code> (including the implicit
+      // <code>this</code> pointer)? As specified, the first argument
+      // given to the function object will become the first argument
+      // given to <code>local_assemble_matrix()</code>, the second the
+      // second, etc. This is trivial here, but allows for interesting
+      // games in other circumstances. Consider, for example, having a
+      // function <code>void f(double x, double y)</code>. Then,
+      // creating a variable <code>p</code> of type
+      // <code>std_cxx1x::function@<void f(double,double)@></code> and
+      // initializing <code>p=std_cxx1x::bind(&f, std_cxx1x::_2,
+      // std_cxx1x::_1)</code> then calling <code>p(1,2)</code> will
+      // result in calling <code>f(2,1)</code>.
+      //
+      // @note Once deal.II can rely on every compiler being able to
+      // fully understand the syntax of the C++11 standard, one can
+      // use C++'s version of <a
+      // href="http://en.wikipedia.org/wiki/Anonymous_function">lambda
+      // functions</a> to achieve the same goal. In essence, a lambda
+      // function is a function without a name that is defined right
+      // at the one place where it is going to be used -- i.e., where
+      // we pass the third and fourth argument to WorkStream::run. The
+      // functions one would define in these locations would take 3
+      // and 1 arguments, respectively, and all they do is call
+      // <code>Solver::local_assemble_matrix</code> and
+      // <code>Solver::copy_local_to_global</code> with the required
+      // number of arguments, utilizing what the lambda function has
+      // gotten as arguments itself. We won't show the syntax this
+      // would require since it is no less confusing than the one used
+      // above.
 
-      Assembler::Scratch scratch;
-      Assembler::CopyData copy_data;
-      WorkStream::run(dof_handler.begin_active(),dof_handler.end(),
-          std_cxx1x::bind(&Solver<dim>::assemble_matrix,this,std_cxx1x::_1,std_cxx1x::_2,std_cxx1x::_3),
-          std_cxx1x::bind(&Solver<dim>::copy_local_to_global,this,std_cxx1x::_1,std_cxx1x::ref(linear_system)),
-          scratch,copy_data);
-
-      // While the new threads assemble the system matrix, we can already
-      // compute the right hand side vector in the main thread, and condense
-      // away the constraints due to hanging nodes:
-      assemble_rhs (linear_system.rhs);
-      linear_system.hanging_node_constraints.condense (linear_system.rhs);
-
-      // And while we're already computing things in parallel, interpolating
-      // boundary values is one more thing that can be done independently, so
-      // we do it here:
+      // At this point, we have assembled the matrix and condensed
+      // it. The right hand side may or may not have been completely
+      // assembled, but we would like to condense the right hand side
+      // vector next. We can only do this if the assembly of this
+      // vector has finished, so we have to wait for the task to
+      // finish; in computer science, waiting for a task is typically
+      // called "joining" the task, explaining the name of the
+      // function we call below.
+      //
+      // Since that task may or may not have finished, and since we
+      // may have to wait for it to finish, we may as well try to pack
+      // other things that need to be done anyway into this
+      // gap. Consequently, we first interpolate boundary values
+      // before we wait for the right hand side. Of course, another
+      // possibility would have been to also interpolate the boundary
+      // values on a separate task since doing so is independent of
+      // the other things we have done in this function so far. Feel
+      // free to find the correct syntax to also create a task for
+      // this interpolation and start it at the top of this function,
+      // along with the assembly of the right hand side. (You will
+      // find that this is slightly more complicated since there are
+      // multiple versions of
+      // VectorTools::interpolate_boundary_values(), and so simply
+      // taking the address
+      // <code>&VectorTools::interpolate_boundary_values</code>
+      // produces a set of overloaded functions that can't be passed
+      // to Threads::new_task() right away -- you have to select which
+      // element of this overload set you want by casting the address
+      // expression to a function pointer type that is specific to the
+      // version of the function that you want to call on the task.)
       std::map<types::global_dof_index,double> boundary_value_map;
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 0,
                                                 *boundary_values,
                                                 boundary_value_map);
 
+      rhs_task.join ();
+      linear_system.hanging_node_constraints.condense (linear_system.rhs);
 
-      // If this is done, wait for the matrix assembling threads, and condense
-      // the constraints in the matrix as well:
-      linear_system.hanging_node_constraints.condense (linear_system.matrix);
-
-      // Now that we have the linear system, we can also treat boundary
-      // values, which need to be eliminated from both the matrix and the
-      // right hand side:
+      // Now that we have the complete linear system, we can also
+      // treat boundary values, which need to be eliminated from both
+      // the matrix and the right hand side:
       MatrixTools::apply_boundary_values (boundary_value_map,
                                           linear_system.matrix,
                                           solution,
@@ -812,34 +928,52 @@ namespace Step13
     }
 
 
-    // The second of this pair of functions takes a range of cell iterators,
-    // and assembles the system matrix on this part of the domain. Since it's
-    // actions have all been explained in previous programs, we do not comment
-    // on it any more, except for one point below.
+    // The second half of this set of functions deals with the local
+    // assembly on each cell and copying local contributions into the
+    // global matrix object. This works in exactly the same way as
+    // described in step-9:
+    template <int dim>
+    Solver<dim>::AssemblyScratchData::
+    AssemblyScratchData (const FiniteElement<dim> &fe,
+			 const Quadrature<dim>    &quadrature)
+    :
+    fe_values (fe,
+	       quadrature,
+	       update_gradients | update_JxW_values)
+    {}
+
+
+    template <int dim>
+    Solver<dim>::AssemblyScratchData::
+    AssemblyScratchData (const AssemblyScratchData &scratch_data)
+    :
+    fe_values (scratch_data.fe_values.get_fe(),
+	       scratch_data.fe_values.get_quadrature(),
+	       update_gradients | update_JxW_values)
+    {}
+
+
     template <int dim>
     void
-    Solver<dim>::assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,            
-                                  Assembler::Scratch                                   &scratch,         
-                                  Assembler::CopyData                                  &copy_data) const
+    Solver<dim>::local_assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
+					AssemblyScratchData                                  &scratch_data,
+					AssemblyCopyData                                     &copy_data) const
     {
-      FEValues<dim> fe_values (*fe, *quadrature,
-                               update_gradients | update_JxW_values);
+      const unsigned int dofs_per_cell = fe->dofs_per_cell;
+      const unsigned int n_q_points    = quadrature->size();
 
-      copy_data.dofs_per_cell = fe->dofs_per_cell;
-      const unsigned int   n_q_points    = quadrature->size();
+      copy_data.cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
 
-      copy_data.cell_matrix = FullMatrix<double> (copy_data.dofs_per_cell, copy_data.dofs_per_cell);
+      copy_data.local_dof_indices.resize(dofs_per_cell);
 
-      copy_data.local_dof_indices.resize(copy_data.dofs_per_cell);
-
-      fe_values.reinit (cell);
+      scratch_data.fe_values.reinit (cell);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-        for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
-          for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
-            copy_data.cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                fe_values.shape_grad(j,q_point) *
-                fe_values.JxW(q_point));
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            copy_data.cell_matrix(i,j) += (scratch_data.fe_values.shape_grad(i,q_point) *
+					   scratch_data.fe_values.shape_grad(j,q_point) *
+					   scratch_data.fe_values.JxW(q_point));
 
       cell->get_dof_indices (copy_data.local_dof_indices);
     }
@@ -848,41 +982,14 @@ namespace Step13
 
     template <int dim>
     void
-    Solver<dim>::copy_local_to_global(Assembler::CopyData const &copy_data,
-                                      LinearSystem              &linear_system) const
+    Solver<dim>::copy_local_to_global(const AssemblyCopyData &copy_data,
+                                      LinearSystem           &linear_system) const
     {
-          // In the step-9 program, we have shown that you have to use the
-          // mutex to lock the matrix when copying the elements from the local
-          // to the global matrix. This was necessary to avoid that two
-          // threads access it at the same time, eventually overwriting their
-          // respective work. Previously, we have used the
-          // <code>acquire</code> and <code>release</code> functions of the
-          // mutex to lock and unlock the mutex, respectively. While this is
-          // valid, there is one possible catch: if between the locking
-          // operation and the unlocking operation an exception is thrown, the
-          // mutex remains in the locked state, and in some cases this might
-          // lead to deadlocks. A similar situation arises, when one changes
-          // the code to have a return statement somewhere in the middle of
-          // the locked block, and forgets that before we call
-          // <code>return</code>, we also have to unlock the mutex. All this
-          // is no problem here, but we want to show the general
-          // technique to cope with these problems nevertheless: have an
-          // object that upon initialization (i.e. in its constructor) locks
-          // the mutex, and on running the destructor unlocks it again. This
-          // is called the <code>scoped lock</code> pattern (apparently
-          // invented by Doug Schmidt originally), and it works because
-          // destructors of local objects are also run when we exit the
-          // function either through a <code>return</code> statement, or when
-          // an exception is raised. Thus, it is guaranteed that the mutex
-          // will always be unlocked when we exit this part of the program,
-          // whether the operation completed successfully or not, whether the
-          // exit path was something we implemented willfully or whether the
-          // function was exited by an exception that we did not foresee.
-          for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
-            for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
-              linear_system.matrix.add (copy_data.local_dof_indices[i],
-                                        copy_data.local_dof_indices[j],
-                                        copy_data.cell_matrix(i,j));
+      for (unsigned int i=0; i<copy_data.local_dof_indices.size(); ++i)
+	for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
+	  linear_system.matrix.add (copy_data.local_dof_indices[i],
+				    copy_data.local_dof_indices[j],
+				    copy_data.cell_matrix(i,j));
     }
 
 
