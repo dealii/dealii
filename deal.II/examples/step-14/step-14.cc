@@ -2409,16 +2409,16 @@ namespace Step14
       // parts of all the cells, and once they are all started wait until they
       // have all finished:
       const unsigned int n_threads = multithread_info.n_threads();
-      Threads::ThreadGroup<> threads;
+      Threads::TaskGroup<> tasks;
       for (unsigned int i=0; i<n_threads; ++i)
-        threads += Threads::new_thread (&WeightedResidual<dim>::estimate_some,
+        tasks += Threads::new_task<> (&WeightedResidual<dim>::estimate_some,
                                         *this,
                                         primal_solution,
                                         dual_weights,
                                         n_threads, i,
                                         error_indicators,
                                         face_integrals);
-      threads.join_all();
+      tasks.join_all();
 
       // Once the error contributions are computed, sum them up. For this,
       // note that the cell terms are already set, and that only the edge
