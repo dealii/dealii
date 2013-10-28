@@ -339,7 +339,7 @@ namespace internal
         std::fill (&*(dst.begin()+begin), &*(dst.begin()+end), s);
     }
 
-    
+
     template <typename T>
     void copy_subrange (const typename dealii::Vector<T>::size_type         begin,
                         const typename dealii::Vector<T>::size_type         end,
@@ -350,7 +350,7 @@ namespace internal
              (end-begin)*sizeof(T));
     }
 
-    
+
     template <typename T, typename U>
     void copy_subrange (const typename dealii::Vector<T>::size_type         begin,
                         const typename dealii::Vector<T>::size_type         end,
@@ -374,7 +374,7 @@ namespace internal
       copy_subrange (begin, end, src, dst);
     }
 
-    
+
     template <typename T, typename U>
     void copy_vector (const dealii::Vector<T> &src,
                       dealii::Vector<U>       &dst)
@@ -1070,7 +1070,7 @@ void Vector<Number>::scale (const Vector<Number2> &s)
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
 
   for (size_type i=0; i<vec_size; ++i)
-    val[i] *= s.val[i];
+    val[i] *= Number(s.val[i]);
 }
 
 
