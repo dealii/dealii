@@ -198,9 +198,9 @@ the following equation (still an inequality, but linearized):
   \label{eq:linearization}
   \left(I_{\Pi}\varepsilon(\tilde {\mathbf u}^{i}),
     \varepsilon(\varphi) - \varepsilon(\tilde {\mathbf u}^{i})\right) \geq
-  \left(\left(I_{\Pi}\varepsilon(\tilde {\mathbf u}^{i-1}),
+  \left(\left(I_{\Pi}\varepsilon({\mathbf u}^{i-1}),
     \varepsilon(\varphi) - \varepsilon(\tilde {\mathbf u}^{i})\right) -
-  \left(P_{\Pi}(C\varepsilon(\tilde {\mathbf u}^{i-1})),
+  \left(P_{\Pi}(C\varepsilon({\mathbf u}^{i-1})),
     \varepsilon(\varphi) - \varepsilon(\tilde {\mathbf u}^{i})\right)\right),
   \quad \forall \varphi\in V^+,
 @f}
@@ -302,8 +302,11 @@ method for the contact. It works as follows:
  (1-\alpha^i_l)U^{i-1}@f}
  satisfies
  @f{gather*}
-   \vert F\left(U^{i}\right) \vert < \vert F\left(U^{i-1}\right) \vert.
+   \vert {\hat R}\left({\mathbf u}^{i}\right) \vert < \vert {\hat R}\left({\mathbf u}^{i-1}\right) \vert.
  \f}
+ with ${\hat R}\left({\mathbf u}\right)=\left(P_{Pi}(C\varepsilon(u)),\varepsilon(\varphi^{i}_p\right)$ with
+ the exceptions of (i) elements $p\in\mathcal{A}_i$ where we set ${\hat R}\left({\mathbf u}\right)=0$,
+ and (ii) elements that correpond to hanging nodes, which we eliminate in the usual manner.
 
  <li> Define the new active and inactive sets by
  @f{gather*}\mathcal{A}_{i+1}:=\lbrace p\in\mathcal{S}:\Lambda^i_p +
@@ -324,8 +327,8 @@ method for the contact. It works as follows:
  where $g_{h,p}$ is the <i>gap</i> denoting the distance of the obstacle
  from the undisplaced configuration of the body.
 
- <li> If $\mathcal{A}_{i+1} = \mathcal{A}_k$ and $\vert
- F\left(U^{i}\right) \vert < \delta$ then stop, else set $i=i+1$ and go to
+ <li> If $\mathcal{A}_{i+1} = \mathcal{A}_k$ and $\left\|
+ {\hat R}\left({\mathbf u}^{i}\right)\right) \right\|_{\ell_2} < \delta$ then stop, else set $i=i+1$ and go to
  step (1). This step ensures that we only stop iterations if both the correct
  active set has been found and the plasticity has been iterated to sufficient
  accuracy.
