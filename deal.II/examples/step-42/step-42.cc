@@ -1388,7 +1388,7 @@ namespace Step42
                   // matrix corresponds to the bilinear form
                   // $A_{ij}=(I_\Pi\varepsilon(\varphi_i),\varepsilon(\varphi_j))$ in the
                   // notation of the accompanying publication, whereas the right
-                  // hand side is $F_i=([I_\Pi-P_\Pi]\varepsilon(\varphi_i),\varepsilon(\mathbf u))$
+                  // hand side is $F_i=([I_\Pi-P_\Pi C]\varepsilon(\varphi_i),\varepsilon(\mathbf u))$
                   // where $u$ is the current linearization points (typically the last solution).
                   // This might suggest that the right hand side will be zero if the material
                   // is completely elastic (where $I_\Pi=P_\Pi$) but this ignores the fact
