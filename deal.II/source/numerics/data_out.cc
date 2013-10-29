@@ -458,7 +458,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
     WorkStream::run (&all_cells[0],
                      &all_cells[0]+all_cells.size(),
                      std_cxx1x::bind(&DataOut<dim,DH>::build_one_patch,
-                                     *this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3,
+                                     this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3,
                                      curved_cell_region,std_cxx1x::ref(this->patches)),
                      std_cxx1x::bind(&internal::DataOut::copy<dim,DH::space_dimension>,
                                      std_cxx1x::_1),
