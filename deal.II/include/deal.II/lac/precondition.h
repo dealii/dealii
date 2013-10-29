@@ -41,7 +41,6 @@ namespace parallel
     template <typename number> class Vector;
   }
 }
-template <typename> class SolverCG;
 
 
 
