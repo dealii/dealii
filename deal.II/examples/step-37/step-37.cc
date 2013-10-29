@@ -845,8 +845,6 @@ namespace Step37
     const unsigned int   n_q_points    = quadrature_formula.size();
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-    const Coefficient<dim> coefficient;
-    std::vector<double>    coefficient_values (n_q_points);
 
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end();
