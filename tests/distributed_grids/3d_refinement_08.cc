@@ -55,17 +55,15 @@ void test(std::ostream & /*out*/)
     gi.read (in);
   }
 
-  while (tr.n_active_cells() < 150000)
+  while (tr.n_active_cells() < 70000)
     {
       std::vector<bool> flags (tr.n_active_cells(), false);
 
-      // refine one tenth of all cells each
-      // time (but at least one)
-      deallog << "Refining cells: ";
-      for (unsigned int i=0; i<tr.n_active_cells() / 10 + 1; ++i)
+      // refine one 1/50 of all cells each time (but at least one)
+      deallog << "Refining cells ... " << std::endl;
+      for (unsigned int i=0; i<tr.n_active_cells() / 50 + 1; ++i)
         {
           const unsigned int x = rand() % flags.size();
-          deallog << x << std::endl;
           flags[x] = true;
         }
 
