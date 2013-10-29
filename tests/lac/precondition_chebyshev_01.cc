@@ -64,6 +64,11 @@ check()
   data.degree = 3;
   prec.initialize(m, data);
 
+  deallog << "Exact inverse:     ";
+  for (unsigned int i=0; i<size; ++i)
+    deallog << in(i)/m(i,i) << " ";
+  deallog << std::endl;
+
   deallog << "Check  vmult orig: ";
   prec.vmult(out, in);
   for (unsigned int i=0; i<size; ++i)
@@ -100,7 +105,7 @@ int main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
-  deallog << std::setprecision(0);
+  deallog << std::setprecision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
