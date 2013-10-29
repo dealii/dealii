@@ -126,8 +126,8 @@ ENDIF()
 #
 
 IF(NOT "${_stage}" STREQUAL "${EXPECT}")
-  MESSAGE("Excpected stage ${EXPECT} - aborting")
+  MESSAGE("Expected stage ${EXPECT} - aborting")
   MESSAGE(FATAL_ERROR "*** abort")
 ELSEIF(NOT "${_stage}" STREQUAL "PASSED")
-  MESSAGE("Excpected stage ${EXPECT} - test considered successful.")
+  MESSAGE("Expected stage ${EXPECT} - test considered successful.")
 ENDIF()
