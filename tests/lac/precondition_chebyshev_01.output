@@ -1,0 +1,5 @@
+
+DEAL::Check  vmult orig: 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 
+DEAL::Check Tvmult orig: 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 
+DEAL::Check  vmult diag: 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 
+DEAL::Check Tvmult diag: 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 

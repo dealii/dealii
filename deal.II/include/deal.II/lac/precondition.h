@@ -1818,11 +1818,16 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
           cg_message.erase(0, pos+5);
           std::string first = cg_message;
 
-          first.erase(cg_message.find_first_of(" "), std::string::npos);
+          if (cg_message.find_first_of(" ") != std::string::npos)
+            first.erase(cg_message.find_first_of(" "), std::string::npos);
           std::istringstream(first)      >> min_eigenvalue;
 
-          cg_message.erase(0, cg_message.find_last_of(" ")+1);
-          std::istringstream(cg_message) >> max_eigenvalue;
+          if (cg_message.find_last_of(" ") != std::string::npos)
+            {
+              cg_message.erase(0, cg_message.find_last_of(" ")+1);
+              std::istringstream(cg_message) >> max_eigenvalue;
+            }
+          else max_eigenvalue = min_eigenvalue;
         }
       else
         min_eigenvalue = max_eigenvalue = 1;
@@ -1910,7 +1915,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
     (src, data.matrix_diagonal_inverse, true, 0., 1./theta, update1,
      update2, dst);
 
-  for (unsigned int k=0; k<data.degree-1; ++k)
+  for (unsigned int k=0; k<data.degree; ++k)
     {
       matrix_ptr->Tvmult (update2, dst);
       const double rhokp = 1./(2.*sigma-rhok);
