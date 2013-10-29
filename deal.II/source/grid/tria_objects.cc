@@ -265,7 +265,14 @@ namespace internal
                            4*new_size-children.size(),
                            -1);
 
+	  // for the following two fields, we know exactly how many elements
+	  // we need, so first reserve then resize (resize itself, at least
+	  // with some compiler libraries, appears to round up the size it
+	  // actually reserves)
+          boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.resize (new_size);
+
+          user_data.reserve (new_size);
           user_data.resize (new_size);
 
           face_orientations.reserve (new_size * GeometryInfo<3>::faces_per_cell);
