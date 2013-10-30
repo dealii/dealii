@@ -58,7 +58,7 @@ check()
     in(i) = (double)rand()/RAND_MAX;
 
   PreconditionChebyshev<FullMatrixModified,Vector<double> > prec;
-  typename PreconditionChebyshev<FullMatrixModified,Vector<double> >::AdditionalData
+  PreconditionChebyshev<FullMatrixModified,Vector<double> >::AdditionalData
     data;
   data.smoothing_range = 2 * size;
   data.degree = 3;
