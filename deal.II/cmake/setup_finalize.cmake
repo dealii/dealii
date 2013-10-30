@@ -131,7 +131,6 @@ _detailed(
 IF(CMAKE_CROSSCOMPILING)
   _both(
     "#\n#        CROSSCOMPILING!\n"
-    "#        DEAL_II_NATIVE:         ${DEAL_II_NATIVE}\n"
     )
 ENDIF()
 
