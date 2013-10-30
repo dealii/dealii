@@ -192,7 +192,11 @@ namespace internal
                                        RefinementCase<G::dimension>::no_refinement);
             }
 
-	  boundary_or_material_id.resize (new_size);
+          // first reserve, then resize. Otherwise the std library can decide to allocate
+	  // more entries.
+	  boundary_or_material_id.reserve (new_size);
+	  boundary_or_material_id.resize (new_size);	  
+          user_data.reserve (new_size);
           user_data.resize (new_size);
         }
 
