@@ -91,10 +91,12 @@ namespace internal
       this->shape_values.resize_fast (array_size);
       this->shape_hessians.resize_fast (array_size);
 
+      this->face_value[0].resize(n_dofs_1d);
       this->face_gradient[0].resize(n_dofs_1d);
-      this->face_value[0].resize(array_size);
+      this->subface_value[0].resize(array_size);
+      this->face_value[1].resize(n_dofs_1d);
       this->face_gradient[1].resize(n_dofs_1d);
-      this->face_value[1].resize(array_size);
+      this->subface_value[1].resize(array_size);
       this->shape_values_number.resize (array_size);
       this->shape_gradient_number.resize (array_size);
 
@@ -120,13 +122,15 @@ namespace internal
               shape_hessians[i*n_q_points_1d+q] =
                 fe.shape_grad_grad(my_i,q_point)[0][0];
               q_point[0] *= 0.5;
-              face_value[0][i*n_q_points_1d+q] = fe.shape_value(my_i,q_point);
+              subface_value[0][i*n_q_points_1d+q] = fe.shape_value(my_i,q_point);
               q_point[0] += 0.5;
-              face_value[1][i*n_q_points_1d+q] = fe.shape_value(my_i,q_point);
+              subface_value[1][i*n_q_points_1d+q] = fe.shape_value(my_i,q_point);
             }
           Point<dim> q_point;
+          this->face_value[0][i] = fe.shape_value(my_i,q_point);
           this->face_gradient[0][i] = fe.shape_grad(my_i,q_point)[0];
           q_point[0] = 1;
+          this->face_value[1][i] = fe.shape_value(my_i,q_point);
           this->face_gradient[1][i] = fe.shape_grad(my_i,q_point)[0];
         }
 

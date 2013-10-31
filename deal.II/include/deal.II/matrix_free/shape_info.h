@@ -115,20 +115,22 @@ namespace internal
       Table<2,unsigned int>  face_indices;
 
       /**
-       * Stores one-dimensional values of shape
-       * functions on subface. Since there are two
-       * subfaces, store two variants. Not
-       * vectorized.
+       * Stores one-dimensional values of shape functions evaluated in zero
+       * and one, i.e., on the one-dimensional faces. Not vectorized.
        */
       std::vector<Number>    face_value[2];
 
       /**
-       * Stores one-dimensional gradients of shape
-       * functions on subface. Since there are two
-       * subfaces, store two variants. Not
-       * vectorized.
+       * Stores one-dimensional gradients of shape functions evaluated in zero
+       * and one, i.e., on the one-dimensional faces. Not vectorized.
        */
       std::vector<Number>    face_gradient[2];
+
+      /**
+       * Stores one-dimensional values of shape functions on subface. Since
+       * there are two subfaces, store two variants. Not vectorized.
+       */
+      std::vector<Number>    subface_value[2];
 
       /**
        * Non-vectorized version of shape

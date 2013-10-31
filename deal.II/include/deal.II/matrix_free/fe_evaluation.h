@@ -3841,9 +3841,9 @@ namespace internal
                     res0 += val0 * in[stride*ind];
                   }
                 if (add == false)
-                  out[stride*col]         = res0;
+                  out[stride*col]  = res0;
                 else
-                  out[stride*col]        += res0;
+                  out[stride*col] += res0;
               }
 
             // increment: in regular case, just go to the next point in
@@ -3867,6 +3867,79 @@ namespace internal
         if (direction == 1)
           {
             in += nn*(mm-1);
+            out += nn*(nn-1);
+          }
+      }
+  }
+
+
+
+  // This method applies the tensor product operation to produce face values
+  // out from cell values. As opposed to the apply_tensor_product method, this
+  // method assumes that the directions orthogonal to the face have
+  // fe_degree+1 degrees of freedom per direction and not n_q_points_1d for
+  // those directions lower than the one currently applied
+  template <int dim, int fe_degree, typename Number, int face_direction,
+           bool dof_to_quad, bool add>
+  inline
+  void
+  apply_tensor_product_face (const Number *shape_data,
+                             const Number in [],
+                             Number       out [])
+  {
+    const int n_blocks1 = dim > 1 ? (fe_degree+1) : 1;
+    const int n_blocks2 = dim > 2 ? (fe_degree+1) : 1;
+
+    AssertIndexRange (face_direction, dim);
+    const int mm     = dof_to_quad ? (fe_degree+1) : 1,
+              nn     = dof_to_quad ? 1 : (fe_degree+1);
+
+    const int stride = Utilities::fixed_int_power<fe_degree+1,face_direction>::value;
+
+    for (int i2=0; i2<n_blocks2; ++i2)
+      {
+        for (int i1=0; i1<n_blocks1; ++i1)
+          {
+            if (dof_to_quad == true)
+              {
+                Number res0 = shape_data[0] * in[0];
+                for (int ind=1; ind<mm; ++ind)
+                  res0 += shape_data[ind] * in[stride*ind];
+                if (add == false)
+                  out[0]  = res0;
+                else
+                  out[0] += res0;
+              }
+            else
+              {
+                for (int col=0; col<nn; ++col)
+                  if (add == false)
+                    out[col*stride]  = shape_data[col] * in[0];
+                  else
+                    out[col*stride] += shape_data[col] * in[0];
+              }
+
+            // increment: in regular case, just go to the next point in
+            // x-direction. If we are at the end of one chunk in x-dir, need
+            // to jump over to the next layer in z-direction
+            switch (face_direction)
+              {
+              case 0:
+                in += mm;
+                out += nn;
+                break;
+              case 1:
+              case 2:
+                ++in;
+                ++out;
+                break;
+              default:
+                Assert (false, ExcNotImplemented());
+              }
+          }
+        if (face_direction == 1)
+          {
+            in += mm*(mm-1);
             out += nn*(nn-1);
           }
       }
