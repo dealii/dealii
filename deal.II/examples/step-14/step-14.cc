@@ -478,17 +478,17 @@ namespace Step14
       // WorkStream framework:
       struct AssemblyScratchData
       {
-	AssemblyScratchData (const FiniteElement<dim> &fe,
-			     const Quadrature<dim>    &quadrature);
-	AssemblyScratchData (const AssemblyScratchData &scratch_data);
+        AssemblyScratchData (const FiniteElement<dim> &fe,
+                             const Quadrature<dim>    &quadrature);
+        AssemblyScratchData (const AssemblyScratchData &scratch_data);
 
-	FEValues<dim>     fe_values;
+        FEValues<dim>     fe_values;
       };
 
       struct AssemblyCopyData
       {
-	FullMatrix<double> cell_matrix;
-	std::vector<types::global_dof_index> local_dof_indices;
+        FullMatrix<double> cell_matrix;
+        std::vector<types::global_dof_index> local_dof_indices;
       };
 
 
@@ -585,6 +585,8 @@ namespace Step14
 		      AssemblyScratchData(*fe, *quadrature),
 		      AssemblyCopyData());
 
+      rhs_task.join ();
+
       linear_system.hanging_node_constraints.condense (linear_system.rhs);
 
       std::map<types::global_dof_index,double> boundary_value_map;
@@ -592,8 +594,6 @@ namespace Step14
                                                 0,
                                                 *boundary_values,
                                                 boundary_value_map);
-
-      rhs_task.join ();
 
       linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
@@ -2007,6 +2007,7 @@ namespace Step14
         CellData (const FiniteElement<dim> &fe,
                   const Quadrature<dim>    &quadrature,
                   const Function<dim>      &right_hand_side);
+        CellData (const CellData &cell_data);
       };
 
       struct FaceData
@@ -2021,6 +2022,31 @@ namespace Step14
         typename std::vector<Tensor<1,dim> > neighbor_grads;
         FaceData (const FiniteElement<dim> &fe,
                   const Quadrature<dim-1>  &face_quadrature);
+        FaceData (const FaceData &face_data);
+      };
+
+
+
+      struct WeightedResidualScratchData
+      {
+        WeightedResidualScratchData(const PrimalSolver<dim> &primal_solver,
+                                    const DualSolver<dim>   &dual_solver,
+                                    const Vector<double>    &primal_solution,
+                                    const Vector<double>    &dual_weights);
+
+        WeightedResidualScratchData(const WeightedResidualScratchData &scratch_data);
+
+        CellData       cell_data;
+        FaceData       face_data;
+        Vector<double> primal_solution;
+        Vector<double> dual_weights;
+      };
+
+
+      // Dummy structure
+      struct WeightedResidualCopyData
+      {
+        WeightedResidualCopyData() {}
       };
 
 
@@ -2032,24 +2058,24 @@ namespace Step14
       // second for each of these threads:
       void estimate_error (Vector<float> &error_indicators) const;
 
-      void estimate_some (const Vector<double> &primal_solution,
-                          const Vector<double> &dual_weights,
-                          const unsigned int    n_threads,
-                          const unsigned int    this_thread,
-                          Vector<float>        &error_indicators,
-                          FaceIntegrals        &face_integrals) const;
+      void estimate_some (const SynchronousIterators<std_cxx1x::tuple<
+          active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
+          WeightedResidualScratchData                     &scratch_data,
+          WeightedResidualCopyData                        &copy_data,
+          FaceIntegrals                                   &face_integrals) const;
+
+      void dummy_copy(const WeightedResidualCopyData &copy_data) const {};
 
       // Then we have functions that do the actual integration of the error
       // representation formula. They will treat the terms on the cell
       // interiors, on those faces that have no hanging nodes, and on those
       // faces with hanging nodes, respectively:
       void
-      integrate_over_cell (const active_cell_iterator &cell,
-                           const unsigned int          cell_index,
-                           const Vector<double>       &primal_solution,
-                           const Vector<double>       &dual_weights,
-                           CellData                   &cell_data,
-                           Vector<float>              &error_indicators) const;
+      integrate_over_cell (const SynchronousIterators<std_cxx1x::tuple<
+                           active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
+                           const Vector<double>                            &primal_solution,
+                           const Vector<double>                            &dual_weights,
+                           CellData                                        &cell_data) const;
 
       void
       integrate_over_regular_face (const active_cell_iterator &cell,
@@ -2095,6 +2121,25 @@ namespace Step14
 
 
     template <int dim>
+    WeightedResidual<dim>::CellData::
+    CellData (const CellData &cell_data) 
+      :
+      fe_values (cell_data.fe_values.get_fe(),
+                 cell_data.fe_values.get_quadrature(),
+                 update_values   |
+                 update_hessians |
+                 update_quadrature_points |
+                 update_JxW_values),
+      right_hand_side (cell_data.right_hand_side),
+      cell_residual (cell_data.cell_residual),
+      rhs_values (cell_data.rhs_values),
+      dual_weights (cell_data.dual_weights),
+      cell_laplacians (cell_data.cell_laplacians)
+    {}
+
+
+
+    template <int dim>
     WeightedResidual<dim>::FaceData::
     FaceData (const FiniteElement<dim> &fe,
               const Quadrature<dim-1>  &face_quadrature)
@@ -2121,6 +2166,60 @@ namespace Step14
       neighbor_grads.resize(n_face_q_points);
     }
 
+
+
+    template <int dim>
+    WeightedResidual<dim>::FaceData::
+    FaceData (const FaceData &face_data)
+      :
+      fe_face_values_cell (face_data.fe_face_values_cell.get_fe(),
+                           face_data.fe_face_values_cell.get_quadrature(),
+                           update_values        |
+                           update_gradients     |
+                           update_JxW_values    |
+                           update_normal_vectors),
+      fe_face_values_neighbor (face_data.fe_face_values_neighbor.get_fe(),
+                               face_data.fe_face_values_neighbor.get_quadrature(),
+                               update_values     |
+                               update_gradients  |
+                               update_JxW_values |
+                               update_normal_vectors),
+      fe_subface_values_cell (face_data.fe_subface_values_cell.get_fe(),
+                              face_data.fe_subface_values_cell.get_quadrature(),
+                              update_gradients),
+      jump_residual (face_data.jump_residual),
+      dual_weights (face_data.dual_weights),
+      cell_grads (face_data.cell_grads),
+      neighbor_grads (face_data.neighbor_grads)
+    {}
+
+
+
+    template <int dim>
+    WeightedResidual<dim>::WeightedResidualScratchData::
+    WeightedResidualScratchData (const PrimalSolver<dim> &primal_solver,
+                                 const DualSolver<dim>   &dual_solver,
+                                 const Vector<double>    &primal_solution,
+                                 const Vector<double>    &dual_weights)
+    :
+    cell_data (*dual_solver.fe,
+               *dual_solver.quadrature,
+               *primal_solver.rhs_function),
+    face_data (*dual_solver.fe,
+               *dual_solver.face_quadrature),
+    primal_solution(primal_solution),
+    dual_weights(dual_weights)    
+    {}
+
+    template <int dim>
+    WeightedResidual<dim>::WeightedResidualScratchData::
+    WeightedResidualScratchData (const WeightedResidualScratchData &scratch_data)
+    :
+    cell_data(scratch_data.cell_data),
+    face_data(scratch_data.face_data),
+    primal_solution(scratch_data.primal_solution),
+    dual_weights(scratch_data.dual_weights)
+    {}
 
 
 
@@ -2405,20 +2504,21 @@ namespace Step14
       error_indicators.reinit (dual_solver.dof_handler
                                .get_tria().n_active_cells());
 
-      // Now start a number of threads which compute the error formula on
-      // parts of all the cells, and once they are all started wait until they
-      // have all finished:
-      const unsigned int n_threads = multithread_info.n_threads();
-      Threads::TaskGroup<> tasks;
-      for (unsigned int i=0; i<n_threads; ++i)
-        tasks += Threads::new_task<> (&WeightedResidual<dim>::estimate_some,
-                                        *this,
-                                        primal_solution,
-                                        dual_weights,
-                                        n_threads, i,
-                                        error_indicators,
-                                        face_integrals);
-      tasks.join_all();
+      typedef std_cxx1x::tuple<active_cell_iterator,Vector<float>::iterator> Iterators;
+      SynchronousIterators<Iterators> cell_and_error_begin(Iterators (
+            dual_solver.dof_handler.begin_active(),error_indicators.begin()));
+      SynchronousIterators<Iterators> cell_and_error_end(Iterators (
+            dual_solver.dof_handler.end(),error_indicators.begin()));
+     
+      WeightedResidualScratchData scratch_data(primal_solver,dual_solver,primal_solution,dual_weights);
+      WeightedResidualCopyData copy_data;
+
+      // Compute the error formula on all the cells
+      WorkStream::run(cell_and_error_begin,cell_and_error_end,
+          std_cxx1x::bind(&WeightedResidual<dim>::estimate_some,this,std_cxx1x::_1,
+            std_cxx1x::_2,std_cxx1x::_3,std_cxx1x::ref(face_integrals)),
+        std_cxx1x::bind(&WeightedResidual<dim>::dummy_copy,this,std_cxx1x::_1),
+        scratch_data,copy_data);
 
       // Once the error contributions are computed, sum them up. For this,
       // note that the cell terms are already set, and that only the edge
@@ -2449,143 +2549,89 @@ namespace Step14
     // @sect4{Estimating on a subset of cells}
 
     // Next we have the function that is called to estimate the error on a
-    // subset of cells. The function may be called multiply if the library was
+    // subset of cells. The function may be called multiple times if the library was
     // configured to use multithreading. Here it goes:
     template <int dim>
     void
     WeightedResidual<dim>::
-    estimate_some (const Vector<double> &primal_solution,
-                   const Vector<double> &dual_weights,
-                   const unsigned int    n_threads,
-                   const unsigned int    this_thread,
-                   Vector<float>        &error_indicators,
-                   FaceIntegrals        &face_integrals) const
+    estimate_some (const SynchronousIterators<std_cxx1x::tuple<
+        active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
+        WeightedResidualScratchData                       &scratch_data,
+        WeightedResidualCopyData                          &copy_data,
+        FaceIntegrals                                     &face_integrals) const
     {
-      const PrimalSolver<dim> &primal_solver = *this;
-      const DualSolver<dim>   &dual_solver   = *this;
-
-      // At the beginning, we initialize two variables for each thread which
-      // may be running this function. The reason for these functions was
-      // discussed above, when the respective classes were discussed, so we
-      // here only point out that since they are local to the function that is
-      // spawned when running more than one thread, the data of these objects
-      // exists actually once per thread, so we don't have to take care about
-      // synchronising access to them.
-      CellData cell_data (*dual_solver.fe,
-                          *dual_solver.quadrature,
-                          *primal_solver.rhs_function);
-      FaceData face_data (*dual_solver.fe,
-                          *dual_solver.face_quadrature);
-
-      // Then calculate the start cell for this thread. We let the different
-      // threads run on interleaved cells, i.e. for example if we have 4
-      // threads, then the first thread treats cells 0, 4, 8, etc, while the
-      // second threads works on cells 1, 5, 9, and so on. The reason is that
-      // it takes vastly more time to work on cells with hanging nodes than on
-      // regular cells, but such cells are not evenly distributed across the
-      // range of cell iterators, so in order to have the different threads do
-      // approximately the same amount of work, we have to let them work
-      // interleaved to the effect of a pseudorandom distribution of the
-      // `hard' cells to the different threads.
-      active_cell_iterator cell=dual_solver.dof_handler.begin_active();
-      for (unsigned int t=0;
-           (t<this_thread) && (cell!=dual_solver.dof_handler.end());
-           ++t, ++cell)
-        ;
-
-      // If there are no cells for this thread (for example if there are a
-      // total of less cells than there are threads), then go back right now
-      if (cell == dual_solver.dof_handler.end())
-        return;
-
-      // Next loop over all cells. The check for loop end is done at the end
-      // of the loop, along with incrementing the loop index.
-      for (unsigned int cell_index=this_thread; true; )
+      // First task on each cell is to compute the cell residual
+      // contributions of this cell, and put them into the
+      // <code>error_indicators</code> variable:
+      active_cell_iterator cell = std_cxx1x::get<0>(cell_and_error.iterators);
+      
+      integrate_over_cell (cell_and_error,
+                           scratch_data.primal_solution,
+                           scratch_data.dual_weights,
+                           scratch_data.cell_data);
+      
+      // After computing the cell terms, turn to the face terms. For this,
+      // loop over all faces of the present cell, and see whether
+      // something needs to be computed on it:
+      for (unsigned int face_no=0;
+           face_no<GeometryInfo<dim>::faces_per_cell;
+           ++face_no)
         {
-          // First task on each cell is to compute the cell residual
-          // contributions of this cell, and put them into the
-          // <code>error_indicators</code> variable:
-          integrate_over_cell (cell, cell_index,
-                               primal_solution,
-                               dual_weights,
-                               cell_data,
-                               error_indicators);
-
-          // After computing the cell terms, turn to the face terms. For this,
-          // loop over all faces of the present cell, and see whether
-          // something needs to be computed on it:
-          for (unsigned int face_no=0;
-               face_no<GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
+          // First, if this face is part of the boundary, then there is
+          // nothing to do. However, to make things easier when summing up
+          // the contributions of the faces of cells, we enter this face
+          // into the list of faces with a zero contribution to the error.
+          if (cell->face(face_no)->at_boundary())
             {
-              // First, if this face is part of the boundary, then there is
-              // nothing to do. However, to make things easier when summing up
-              // the contributions of the faces of cells, we enter this face
-              // into the list of faces with a zero contribution to the error.
-              if (cell->face(face_no)->at_boundary())
-                {
-                  face_integrals[cell->face(face_no)] = 0;
-                  continue;
-                }
-
-              // Next, note that since we want to compute the jump terms on
-              // each face only once although we access it twice (if it is not
-              // at the boundary), we have to define some rules who is
-              // responsible for computing on a face:
-              //
-              // First, if the neighboring cell is on the same level as this
-              // one, i.e. neither further refined not coarser, then the one
-              // with the lower index within this level does the work. In
-              // other words: if the other one has a lower index, then skip
-              // work on this face:
-              if ((cell->neighbor(face_no)->has_children() == false) &&
-                  (cell->neighbor(face_no)->level() == cell->level()) &&
-                  (cell->neighbor(face_no)->index() < cell->index()))
-                continue;
-
-              // Likewise, we always work from the coarser cell if this and
-              // its neighbor differ in refinement. Thus, if the neighboring
-              // cell is less refined than the present one, then do nothing
-              // since we integrate over the subfaces when we visit the coarse
-              // cell.
-              if (cell->at_boundary(face_no) == false)
-                if (cell->neighbor(face_no)->level() < cell->level())
-                  continue;
-
-
-              // Now we know that we are in charge here, so actually compute
-              // the face jump terms. If the face is a regular one, i.e.  the
-              // other side's cell is neither coarser not finer than this
-              // cell, then call one function, and if the cell on the other
-              // side is further refined, then use another function. Note that
-              // the case that the cell on the other side is coarser cannot
-              // happen since we have decided above that we handle this case
-              // when we pass over that other cell.
-              if (cell->face(face_no)->has_children() == false)
-                integrate_over_regular_face (cell, face_no,
-                                             primal_solution,
-                                             dual_weights,
-                                             face_data,
-                                             face_integrals);
-              else
-                integrate_over_irregular_face (cell, face_no,
-                                               primal_solution,
-                                               dual_weights,
-                                               face_data,
-                                               face_integrals);
+              face_integrals[cell->face(face_no)] = 0;
+              continue;
             }
 
-          // After computing the cell contributions and looping over the
-          // faces, go to the next cell for this thread. Note again that the
-          // cells for each of the threads are interleaved.  If we are at the
-          // end of our workload, jump out of the loop.
-          for (unsigned int t=0;
-               ((t<n_threads) && (cell!=dual_solver.dof_handler.end()));
-               ++t, ++cell, ++cell_index)
-            ;
+          // Next, note that since we want to compute the jump terms on
+          // each face only once although we access it twice (if it is not
+          // at the boundary), we have to define some rules who is
+          // responsible for computing on a face:
+          //
+          // First, if the neighboring cell is on the same level as this
+          // one, i.e. neither further refined not coarser, then the one
+          // with the lower index within this level does the work. In
+          // other words: if the other one has a lower index, then skip
+          // work on this face:
+          if ((cell->neighbor(face_no)->has_children() == false) &&
+              (cell->neighbor(face_no)->level() == cell->level()) &&
+              (cell->neighbor(face_no)->index() < cell->index()))
+            continue;
 
-          if (cell == dual_solver.dof_handler.end())
-            break;
+          // Likewise, we always work from the coarser cell if this and
+          // its neighbor differ in refinement. Thus, if the neighboring
+          // cell is less refined than the present one, then do nothing
+          // since we integrate over the subfaces when we visit the coarse
+          // cell.
+          if (cell->at_boundary(face_no) == false)
+            if (cell->neighbor(face_no)->level() < cell->level())
+              continue;
+
+
+          // Now we know that we are in charge here, so actually compute
+          // the face jump terms. If the face is a regular one, i.e.  the
+          // other side's cell is neither coarser not finer than this
+          // cell, then call one function, and if the cell on the other
+          // side is further refined, then use another function. Note that
+          // the case that the cell on the other side is coarser cannot
+          // happen since we have decided above that we handle this case
+          // when we pass over that other cell.
+          if (cell->face(face_no)->has_children() == false)
+            integrate_over_regular_face (cell, face_no,
+                                         scratch_data.primal_solution,
+                                         scratch_data.dual_weights,
+                                         scratch_data.face_data,
+                                         face_integrals);
+          else
+            integrate_over_irregular_face (cell, face_no,
+                                           scratch_data.primal_solution,
+                                           scratch_data.dual_weights,
+                                           scratch_data.face_data,
+                                           face_integrals);
         }
     }
 
@@ -2596,18 +2642,17 @@ namespace Step14
     // the cell terms:
     template <int dim>
     void WeightedResidual<dim>::
-    integrate_over_cell (const active_cell_iterator &cell,
-                         const unsigned int          cell_index,
-                         const Vector<double>       &primal_solution,
-                         const Vector<double>       &dual_weights,
-                         CellData                   &cell_data,
-                         Vector<float>              &error_indicators) const
+    integrate_over_cell (const SynchronousIterators<std_cxx1x::tuple<
+                         active_cell_iterator,Vector<float>::iterator> >   &cell_and_error,
+                         const Vector<double>                              &primal_solution,
+                         const Vector<double>                              &dual_weights,
+                         CellData                                          &cell_data) const
     {
       // The tasks to be done are what appears natural from looking at the
       // error estimation formula: first get the right hand side and Laplacian
       // of the numerical solution at the quadrature points for the cell
       // residual,
-      cell_data.fe_values.reinit (cell);
+      cell_data.fe_values.reinit (std_cxx1x::get<0>(cell_and_error.iterators));
       cell_data.right_hand_side
       ->value_list (cell_data.fe_values.get_quadrature_points(),
                     cell_data.rhs_values);
@@ -2625,7 +2670,7 @@ namespace Step14
         sum += ((cell_data.rhs_values[p]+cell_data.cell_laplacians[p]) *
                 cell_data.dual_weights[p] *
                 cell_data.fe_values.JxW (p));
-      error_indicators(cell_index) += sum;
+      *(std_cxx1x::get<1>(cell_and_error.iterators)) += sum;
     }
 
 
