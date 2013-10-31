@@ -1,9 +1,21 @@
 #! /bin/bash
-
 #
-# Copyright 2010 - 2013 Carsten Burstedde
+# This file is part of p4est [1].
+# p4est is a C library to manage a collection (a forest) of multiple
+# connected adaptive quadtrees or octrees in parallel.
+#
+# Copyright (C) 2010 The University of Texas System
+# Written by Carsten Burstedde, Lucas C. Wilcox, and Tobin Isaac
 # Modified 2010 by Wolfgang Bangerth
 # Modified 2010 by Timo Heister
+# Modified 2013 by Matthias Maier
+#
+# p4est is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# [1] http://www.p4est.org
 #
 
 # This program comes with ABSOLUTELY NO WARRANTY.
