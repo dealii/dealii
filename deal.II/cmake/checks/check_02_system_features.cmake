@@ -109,7 +109,54 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
+
+IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
+    OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
+  IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8" )
+
+    #
+    # Print a warning if we have a gcc port that is older than gcc-4.8:
+    #
+
+    MESSAGE(WARNING "\n"
+      "GCC ports (Cygwin or MinGW) older than version 4.8 are unsupported on Windows\n\n"
+      )
+
+  ELSE()
+
+    #
+    # Workaround for a compiler bug on Windows platforms with modern gcc:
+    #
+    # GCC seems to have a hard time with
+    #
+    #   next_free_pair_object and next_free_single_object
+    #
+    # defined in tria_objects.h. It might explode in one ot the following ways:
+    #  a) Internal compiler error
+    #  b) emition of a truncated external symbol
+    #  c) "template <...>::dimension could not be converted to 'int'"
+    #
+    # It seems to help to specify "-ggdb" also for optimized mode.
+    #
+    # TODO: Track down bug and fix properly (just kidding).
+    #
+    # Maier, 2013
+    #
+
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-ggdb")
+    ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_RELEASE "-ggdb")
+    IF(NOT DEAL_II_HAVE_FLAG_ggdb)
+      ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-g")
+      ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_RELEASE "-g")
+    ENDIF()
+
+  ENDIF()
+ENDIF()
+
+
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+
   #
   # Export DEAL_II_MSVC if we are on a Windows platform:
   #
@@ -118,6 +165,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   #
   # Shared library handling:
   #
+
   IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # With MinGW we're lucky:
     ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--export-all-symbols")
@@ -131,10 +179,4 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
     SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
   ENDIF()
 
-ENDIF()
-
-
-IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
-    OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
-  # TODO: Bailout if current compiler is not gcc-4.8.1 or newer
 ENDIF()
