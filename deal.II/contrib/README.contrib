@@ -37,5 +37,5 @@ later. See parameter_gui/README, parameter_gui/lgpl-2.1.txt.
 utilities
 =========
 
-A collection of small programs for various purposes.
-
+A collection of small programs for various purposes. Distributed under the
+same license as the deal.II library.

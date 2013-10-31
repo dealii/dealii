@@ -1,6 +1,15 @@
 #!/bin/bash
-
-make
+# ======================================================
+# MESH CONVERSION TOOL
+# v. 1.2
+#
+# This program is distributed under the terms of the
+# GNU GPL v2.0 license.
+#
+# Author: Jean-Paul Pelteret
+#         jppelteret.uct@gmail.com
+#         modified by: Timo Heister, heister@clemson.edu
+# ======================================================
 
 mesh=mesh/2d/2d_test
 ./convert_mesh 2 $mesh.inp test/`basename $mesh.ucd` >/dev/null

@@ -1,3 +1,14 @@
+// ======================================================
+// MESH CONVERSION TOOL
+//
+// This program is distributed under the terms of the
+// GNU GPL v2.0 license.
+//
+// Author: Jean-Paul Pelteret
+//         jppelteret.uct@gmail.com
+//         modified by: Timo Heister, heister@clemson.edu
+// ======================================================
+
 #include "MeshConversion.h"
 #include <iostream>
 #include <stdlib.h>

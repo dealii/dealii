@@ -1,0 +1,13 @@
+This folder contains the html documentation of deal.II
+
+With the exception of the content under publications/* and reports/* the
+documentation is covered by the same license as the deal.II library itself,
+namely LGPL-2.1+.
+
+Unclear license status:
+
+  external-libraries/p4est-setup.sh
+  doxygen/doxygen.sty
+  doxygen/options.dox.in
+  reports/*
+

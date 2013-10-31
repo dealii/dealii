@@ -14,7 +14,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-#---------------------------------------------------------------------------
+#
 # This perl script translates lapack_templates.h.in to lapack_templates.h
 #
 # In the *.in file, every BLAS/LAPACK function which is defined for

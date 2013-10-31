@@ -1,5 +1,11 @@
 #! /bin/bash
 
+#
+# Copyright 2010 - 2013 Carsten Burstedde
+# Modified 2010 by Wolfgang Bangerth
+# Modified 2010 by Timo Heister
+#
+
 # This program comes with ABSOLUTELY NO WARRANTY.
 
 # unpack under current directory
