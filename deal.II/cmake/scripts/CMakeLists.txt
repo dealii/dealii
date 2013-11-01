@@ -14,21 +14,13 @@
 ##
 ## ---------------------------------------------------------------------
 
-IF(NOT CMAKE_CROSSCOMPILING)
-  ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
-
-  IF(DEAL_II_COMPONENT_COMPAT_FILES)
-    SET_TARGET_PROPERTIES(expand_instantiations
-      PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/scripts
-      )
-    INSTALL(TARGETS expand_instantiations
-      DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
-      COMPONENT compat_files
-      )
-  ENDIF()
-ENDIF()
+ADD_EXECUTABLE(expand_instantiations_exe expand_instantiations.cc)
+SET_TARGET_PROPERTIES(expand_instantiations_exe
+  PROPERTIES OUTPUT_NAME expand_instantiations
+  )
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
+
   #
   # Build and install the old dependency_resolution and report_features
   # executables:
@@ -74,21 +66,20 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
       )
   ENDIF()
 
-  ADD_DEPENDENCIES(compat_files
-    expand_instantiations
-    make_dependencies
-    report_features
-    )
-
   IF(NOT CMAKE_CROSSCOMPILING)
     ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)
   ENDIF()
 
-  SET_TARGET_PROPERTIES(make_dependencies report_features
-    PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/scripts
+  ADD_DEPENDENCIES(compat_files
+    expand_instantiations_exe
+    make_dependencies
+    report_features
     )
 
-  INSTALL(TARGETS make_dependencies report_features
+  SET_TARGET_PROPERTIES(expand_instantiations_exe make_dependencies report_features
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/scripts
+    )
+  INSTALL(TARGETS expand_instantiations_exe make_dependencies report_features
     DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
     COMPONENT compat_files
     )
