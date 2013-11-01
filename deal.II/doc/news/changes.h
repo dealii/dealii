@@ -94,6 +94,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Added support for Windows: It is now possible again to use gcc on Windows
+  in order to compile the library. We support gcc-4.8.1 on Cygwin64 and MinGW-w64.
+  <br>
+  (Matthias Maier, 2013/11/1)
+  </li>
+
   <li> Changed: step-9, step-13 and step-14 have been converted to use the
   more modern WorkStream concept for assembling linear systems in parallel.
   <br>

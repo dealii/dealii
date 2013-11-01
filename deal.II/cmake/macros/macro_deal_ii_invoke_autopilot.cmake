@@ -50,22 +50,31 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     SET(TARGET_RUN ${TARGET})
   ENDIF()
 
-  #
-  # Hack for Cygwin targets: Export PATH to point to the dynamic library.
-  # This is more or less harmless, so do this unconditionally.
-  #
-  FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
-    "SET(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR}:${DEAL_II_PATH}/${DEAL_II_LIBRARY_RELDIR}:\$ENV{PATH}\")\n"
-    "EXECUTE_PROCESS(COMMAND ${TARGET_RUN}\n"
-    "  RESULT_VARIABLE _return_value\n"
-    "  )\n"
-    "IF(NOT \"\${_return_value}\" STREQUAL \"0\")\n"
-    "  MESSAGE(SEND_ERROR \"\nProgram terminated with exit code: \${_return_value}\")\n"
-    "ENDIF()\n"
-    )
+  IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
+      OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
+    #
+    # Hack for Cygwin and Windows targets: Export PATH to point to the
+    # dynamic library.
+    #
+    FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
+      "SET(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR};${DEAL_II_PATH}/${DEAL_II_EXECUTABLE_RELDIR};\$ENV{PATH}\")\n"
+      "EXECUTE_PROCESS(COMMAND ${TARGET_RUN}\n"
+      "  RESULT_VARIABLE _return_value\n"
+      "  )\n"
+      "IF(NOT \"\${_return_value}\" STREQUAL \"0\")\n"
+      "  MESSAGE(SEND_ERROR \"\nProgram terminated with exit code: \${_return_value}\")\n"
+      "ENDIF()\n"
+      )
+    SET(_command
+      ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
+      )
+  ELSE()
+    SET(_command ${TARGET_RUN})
+  ENDIF()
+
   IF(NOT "${TARGET_RUN}" STREQUAL "")
     ADD_CUSTOM_TARGET(run
-      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
+      COMMAND ${_command}
       DEPENDS ${TARGET}
       COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
       )

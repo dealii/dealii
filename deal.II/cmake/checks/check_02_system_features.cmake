@@ -120,7 +120,7 @@ IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
     #
 
     MESSAGE(WARNING "\n"
-      "GCC ports (Cygwin or MinGW) older than version 4.8 are unsupported on Windows\n\n"
+      "GCC ports (Cygwin, MinGW-w64, or MinGW) older than version 4.8 are unsupported on Windows\n\n"
       )
 
   ELSE()
