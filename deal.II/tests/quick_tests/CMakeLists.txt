@@ -93,7 +93,7 @@ ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL mpi.cc)
 DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
 
 ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND mpirun -n 2 ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 && echo "${_target}: PASSED." || (rm ${_target}-OK  && exit 1)
+    COMMAND mpirun -n 2 ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 ADD_CUSTOM_TARGET(${_target}.run 
@@ -119,7 +119,7 @@ ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL p4est.cc)
 DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
 
 ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND mpirun -n 10 ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 && echo "${_target}: PASSED." || (rm ${_target}-OK  && exit 1)
+    COMMAND mpirun -n 10 ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 ADD_CUSTOM_TARGET(${_target}.run 

@@ -45,7 +45,7 @@ int main(int argc, char *argv[] )
   if (myrank==1)
     err = MPI_Send(&value, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
   else if (myrank==0)
-    err = MPI_Recv(&value, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, NULL);
+    err = MPI_Recv(&value, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
   if (myrank==0 && value!=1)
     {
