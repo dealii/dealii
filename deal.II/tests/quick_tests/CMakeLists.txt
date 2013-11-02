@@ -23,7 +23,7 @@ ENABLE_TESTING()
 # use debug mode if possible
 LIST(FIND DEAL_II_BUILD_TYPES "DEBUG" hasdebug)
 IF (NOT hasdebug EQUAL -1)
-set(_mybuild "debug")
+set(_mybuild "DEBUG")
 set(_mybuild_lowercase "debug")
 ELSE()
     set(_mybuild_lowercase "release")
