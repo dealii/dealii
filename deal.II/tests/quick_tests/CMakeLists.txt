@@ -17,23 +17,22 @@
 #
 # A minimalistic set of tests:
 #
-
 ENABLE_TESTING()
 
-# use debug mode if possible
+# use debug mode if possible:
 LIST(FIND DEAL_II_BUILD_TYPES "DEBUG" hasdebug)
 IF (NOT hasdebug EQUAL -1)
-set(_mybuild "DEBUG")
-set(_mybuild_lowercase "debug")
+  set(_mybuild "DEBUG")
+  set(_mybuild_lowercase "debug")
 ELSE()
-    set(_mybuild_lowercase "release")
-    set(_mybuild "RELEASE")
+  set(_mybuild_lowercase "release")
+  set(_mybuild "RELEASE")
 ENDIF()
 MESSAGE(" we are using build type ${_mybuild}...")
 
 
 # simple assembly/solver test
-# run this in debug and release mode
+# (run this in debug and release mode)
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${_build} _build_lowercase)
 
@@ -61,78 +60,78 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 ENDFOREACH()
 
 
-  #
-  # Test whether thread affinity is well behaved:
-  #
-  SET(_target affinity.${_mybuild_lowercase})
+#
+# Test whether thread affinity is well behaved:
+#
+SET(_target affinity.${_mybuild_lowercase})
 
-  ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL affinity.cc)
-  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
+ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL affinity.cc)
+DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
 
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     COMMAND ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  ADD_CUSTOM_TARGET(${_target}.run 
+ADD_CUSTOM_TARGET(${_target}.run 
 	DEPENDS ${_target}
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
 	COMMAND echo "${_target}: PASSED.")
 
-  ADD_TEST(NAME ${_target}
+ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
       -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
       -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
+SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
 
 
-  # test MPI
-  SET(_target mpi.${_mybuild_lowercase})
+# test if MPI is configured correctly
+SET(_target mpi.${_mybuild_lowercase})
 
-  ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL mpi.cc)
-  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
+ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL mpi.cc)
+DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
 
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     COMMAND mpirun -n 2 ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 && echo "${_target}: PASSED." || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  ADD_CUSTOM_TARGET(${_target}.run 
+ADD_CUSTOM_TARGET(${_target}.run 
 	DEPENDS ${_target}
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
 	COMMAND echo "${_target}: PASSED.")
 
-  ADD_TEST(NAME ${_target}
+ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
       -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
       -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
+SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
 
-  # test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
-  # Update to OpenMPI 1.5 or newer.
-  SET(_target p4est.${_mybuild_lowercase})
+# test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
+# Update to OpenMPI 1.5 or newer.
+SET(_target p4est.${_mybuild_lowercase})
 
-  ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL p4est.cc)
-  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
+ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL p4est.cc)
+DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
 
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     COMMAND mpirun -n 10 ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 && echo "${_target}: PASSED." || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  ADD_CUSTOM_TARGET(${_target}.run 
+ADD_CUSTOM_TARGET(${_target}.run 
 	DEPENDS ${_target}
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
 	COMMAND echo "${_target}: PASSED.")
 
-  ADD_TEST(NAME ${_target}
+ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
       -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
       -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
+SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
 
 
 #
