@@ -1,0 +1,99 @@
+
+DEAL:0::writing with 3
+DEAL:0::[0] 0.00000
+DEAL:0::[1] 1.00000
+DEAL:0::[2] 2.00000
+DEAL:0::[3] 3.00000
+DEAL:0::[4] 4.00000
+DEAL:0::[5] 5.00000
+DEAL:0::[6] 6.00000
+DEAL:0::[7] 7.00000
+DEAL:0::[8] 8.00000
+DEAL:0::[9] 9.00000
+DEAL:0::[10] 10.0000
+DEAL:0::[11] 11.0000
+DEAL:0::[12] 12.0000
+DEAL:0::#cells = 19 norm= 92.4932
+DEAL:0::Checksum: 136119115
+DEAL:0::reading with 5
+DEAL:0::[0] 7.00000
+DEAL:0::[1] 8.00000
+DEAL:0::[2] 9.00000
+DEAL:0::[3] 10.0000
+DEAL:0::[4] 0.00000
+DEAL:0::[5] 11.0000
+DEAL:0::[6] 4.00000
+DEAL:0::[7] 12.0000
+DEAL:0::[8] 2.00000
+DEAL:0::#cells = 19
+DEAL:0::Checksum: 136119115
+DEAL:0::norm: 92.4932
+DEAL:0::OK
+
+DEAL:1::writing with 3
+DEAL:1::[13] 13.0000
+DEAL:1::[14] 14.0000
+DEAL:1::[15] 15.0000
+DEAL:1::[16] 16.0000
+DEAL:1::[17] 17.0000
+DEAL:1::[18] 18.0000
+DEAL:1::[19] 19.0000
+DEAL:1::#cells = 19 norm= 92.4932
+DEAL:1::Checksum: 0
+DEAL:1::reading with 5
+DEAL:1::[9] 1.00000
+DEAL:1::[10] 3.00000
+DEAL:1::[11] 5.00000
+DEAL:1::[12] 6.00000
+DEAL:1::[13] 13.0000
+DEAL:1::#cells = 19
+DEAL:1::Checksum: 0
+DEAL:1::norm: 92.4932
+
+
+DEAL:2::writing with 3
+DEAL:2::[20] 20.0000
+DEAL:2::[21] 21.0000
+DEAL:2::[22] 22.0000
+DEAL:2::[23] 23.0000
+DEAL:2::[24] 24.0000
+DEAL:2::[25] 25.0000
+DEAL:2::[26] 26.0000
+DEAL:2::[27] 27.0000
+DEAL:2::[28] 28.0000
+DEAL:2::[29] 29.0000
+DEAL:2::#cells = 19 norm= 92.4932
+DEAL:2::Checksum: 0
+DEAL:2::reading with 5
+DEAL:2::[14] 14.0000
+DEAL:2::[15] 15.0000
+DEAL:2::[16] 16.0000
+DEAL:2::[17] 17.0000
+DEAL:2::[18] 18.0000
+DEAL:2::[19] 19.0000
+DEAL:2::#cells = 19
+DEAL:2::Checksum: 0
+DEAL:2::norm: 92.4932
+
+
+DEAL:3::reading with 5
+DEAL:3::[20] 20.0000
+DEAL:3::[21] 21.0000
+DEAL:3::[22] 22.0000
+DEAL:3::[23] 23.0000
+DEAL:3::[24] 24.0000
+DEAL:3::[25] 25.0000
+DEAL:3::#cells = 19
+DEAL:3::Checksum: 0
+DEAL:3::norm: 92.4932
+
+
+DEAL:4::reading with 5
+DEAL:4::[26] 26.0000
+DEAL:4::[27] 27.0000
+DEAL:4::[28] 28.0000
+DEAL:4::[29] 29.0000
+DEAL:4::#cells = 19
+DEAL:4::Checksum: 0
+DEAL:4::norm: 92.4932
+
