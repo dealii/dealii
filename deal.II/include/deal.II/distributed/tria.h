@@ -633,7 +633,7 @@ namespace parallel
        * notify_ready_to_unpack() how the
        * cell with the given cell_iterator
        * is going to change.  Note that
-       * this may me different then the
+       * this may me different than the
        * refine_flag() and coarsen_flag()
        * in the cell_iterator because of
        * refinement constraints that this
