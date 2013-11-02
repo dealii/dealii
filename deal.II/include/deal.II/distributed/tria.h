@@ -622,8 +622,8 @@ namespace parallel
 
       /**
        * Load the refinement information saved with save() back in. The mesh
-       * must contain the same coarse mesh that was used in save(). You need
-       * to load with the same number of CPUs that you saved with.
+       * must contain the same coarse mesh that was used in save(). You no
+       * longer need to load with the same number of CPUs that you saved with.
        */
       void load(const char *filename);
 

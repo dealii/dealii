@@ -2096,8 +2096,6 @@ namespace parallel
         std::string fname=std::string(filename)+".info";
         std::ifstream f(fname.c_str());
         f >> numcpus >> attached_size >> attached_count;
-        if (numcpus != Utilities::MPI::n_mpi_processes (mpi_communicator))
-          throw ExcInternalError();
       }
 
       attached_data_size = 0;
@@ -2109,6 +2107,21 @@ namespace parallel
                           attached_size, attached_size>0,
                           this,
                           &connectivity);
+
+      if (numcpus != Utilities::MPI::n_mpi_processes (mpi_communicator))
+        {
+          // We are changing the number of CPUs so we need to repartition.
+          // Note that p4est actually distributes the cells between the changed
+          // number of CPUs and so everything works without this call, but
+          // this command changes the distribution for some reason, so we
+          // will leave it in here.
+          dealii::internal::p4est::functions<dim>::
+                partition (parallel_forest,
+                           /* prepare coarsening */ 1,
+                           /* weight_callback */ NULL);
+
+
+        }
 
       try
         {
