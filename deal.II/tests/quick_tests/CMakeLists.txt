@@ -20,17 +20,24 @@
 
 ENABLE_TESTING()
 
-
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${_build} _build_lowercase)
+# use debug mode if possible
+LIST(FIND DEAL_II_BUILD_TYPES "DEBUG" hasdebug)
+IF (NOT hasdebug EQUAL -1)
+set(_mybuild "debug")
+set(_mybuild_lowercase "debug")
+ELSE()
+    set(_mybuild_lowercase "release")
+    set(_mybuild "RELEASE")
+ENDIF()
+MESSAGE(" we are using build type ${_mybuild}...")
 
   #
   # Test whether thread affinity is well behaved:
   #
-  SET(_target affinity.${_build_lowercase})
+  SET(_target affinity.${_mybuild})
 
   ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL affinity.cc)
-  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
+  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
 
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     COMMAND ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
@@ -51,10 +58,10 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
 
   # test MPI
-  SET(_target mpi.${_build_lowercase})
+  SET(_target mpi.${_mybuild_lowercase})
 
   ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL mpi.cc)
-  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
+  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
 
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     COMMAND mpirun -n 2 ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 && echo "${_target}: PASSED." || (rm ${_target}-OK  && exit 1)
@@ -75,10 +82,10 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
   # test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
   # Update to OpenMPI 1.5 or newer.
-  SET(_target p4est.${_build_lowercase})
+  SET(_target p4est.${_mybuild_lowercase})
 
   ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL p4est.cc)
-  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
+  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
 
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     COMMAND mpirun -n 10 ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 && echo "${_target}: PASSED." || (rm ${_target}-OK  && exit 1)
@@ -97,8 +104,6 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     )
   SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
 
-
-ENDFOREACH()
 
 #
 # A custom test target:
