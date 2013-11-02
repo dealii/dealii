@@ -49,19 +49,10 @@ extern "C" {
 
 #ifndef UF_long
 
-#ifdef _WIN64
-
-#define UF_long __int64
-#define UF_long_max _I64_MAX
-#define UF_long_id "%I64d"
-
-#else
-
 #define UF_long long
 #define UF_long_max LONG_MAX
 #define UF_long_id "%ld"
 
-#endif
 #endif
 
 /* ========================================================================== */

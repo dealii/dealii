@@ -19,7 +19,7 @@
 # variable.
 #
 # Usage:
-#     STRIP_FLAG(variable flag replacement)
+#     REPLACE_FLAG(variable flag replacement)
 #
 
 MACRO(REPLACE_FLAG _variable _flag _replacement)
