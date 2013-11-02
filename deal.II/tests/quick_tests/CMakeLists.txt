@@ -32,7 +32,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
 
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK && exit 1)
+    COMMAND ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 && echo "${_target}: PASSED." || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   ADD_CUSTOM_TARGET(${_target}.run DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK)
