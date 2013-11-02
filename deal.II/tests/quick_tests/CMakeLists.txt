@@ -101,6 +101,7 @@ ADD_CUSTOM_TARGET(${_target}.run
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
 	COMMAND echo "${_target}: PASSED.")
 
+IF (DEAL_II_WITH_MPI)
 ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
       -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
@@ -108,6 +109,7 @@ ADD_TEST(NAME ${_target}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
+ENDIF()
 
 # test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
 # Update to OpenMPI 1.5 or newer.
@@ -125,6 +127,7 @@ ADD_CUSTOM_TARGET(${_target}.run
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
 	COMMAND echo "${_target}: PASSED.")
 
+IF (DEAL_II_WITH_P4EST)
 ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
       -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
@@ -132,7 +135,7 @@ ADD_TEST(NAME ${_target}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
-
+ENDIF()
 
 #
 # A custom test target:
