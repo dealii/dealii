@@ -622,8 +622,11 @@ namespace parallel
 
       /**
        * Load the refinement information saved with save() back in. The mesh
-       * must contain the same coarse mesh that was used in save(). You no
-       * longer need to load with the same number of CPUs that you saved with.
+       * must contain the same coarse mesh that was used in save(). You do not
+       * need to load with the same number of MPI processes that you saved
+       * with. Rather, if a mesh is loaded with a different number of MPI
+       * processes than used at the time of saving, the mesh is repartitioned
+       * appropriately.
        */
       void load(const char *filename);
 
