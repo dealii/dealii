@@ -258,12 +258,16 @@ IF("${TRACK}" STREQUAL "Build Tests")
   SET(TEST_PICKUP_REGEX "^build_tests")
 ENDIF()
 
-# Pass all relevant "TEST_" variables down to configure:
+# Pass all relevant variables down to configure:
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
-  IF(_var MATCHES
-      "^(TEST_DIFF|TEST_TIME_LIMIT|TEST_PICKUP_REGEX|TEST_OVERRIDE_LOCATION|NUMDIFF_DIR)$"
-      )
+  IF( _var MATCHES "^(TEST|DEAL_II)_" OR
+      _var MATCHES "^(ARPACK|BOOST|FUNCTIONPARSER|HDF5|METIS|MPI|MUMPS)_" OR
+      _var MATCHES "^(NETCDF|P4EST|PETSC|SLEPC|THREADS|TBB|TRILINOS)_" OR
+      _var MATCHES "^(UMFPACK|ZLIB|LAPACK)_" OR
+      _var MATCHES "^(CMAKE|DEAL_II)_(C|CXX|Fortran|BUILD)_(COMPILER|FLAGS)" OR
+      _var MATCHES "^CMAKE_BUILD_TYPE$" OR
+      ( NOT _var MATCHES "^[_]*CMAKE" AND _var MATCHES "_DIR$" ) )
     LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
 ENDFOREACH()
@@ -482,6 +486,8 @@ MACRO(CLEAR_TARGETDIRECTORIES_TXT)
     ${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt
     )
 ENDMACRO()
+
+MESSAGE("-- CMake Options: ${_options}")
 
 
 ########################################################################
