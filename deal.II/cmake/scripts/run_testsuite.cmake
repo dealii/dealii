@@ -77,6 +77,9 @@
 #       # cmake -C ${CONFIG_FILE}). This only has an effect if
 #       CTEST_BINARY_DIRECTORY is empty.
 #
+#   DESCRIPTION
+#     - A string that is appended to CTEST_BUILD_NAME
+#
 #   COVERAGE
 #     - If set to TRUE deal.II will be configured with
 #     DEAL_II_SETUP_COVERAGE=TRUE, CMAKE_BUILD_TYPE=Debug and the
@@ -419,6 +422,14 @@ IF(NOT "${CONFIG_FILE}" STREQUAL "")
   GET_FILENAME_COMPONENT(_conf ${CONFIG_FILE} NAME_WE)
   STRING(REGEX REPLACE "#.*$" "" _conf ${_conf})
   SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_conf}")
+ENDIF()
+
+#
+# Append DESCRIPTION string to CTEST_BUILD_NAME:
+#
+
+IF(NOT "${DESCRIPTION}" STREQUAL "")
+  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${DESCRIPTION}")
 ENDIF()
 
 MESSAGE("-- CTEST_BUILD_NAME:       ${CTEST_BUILD_NAME}")
