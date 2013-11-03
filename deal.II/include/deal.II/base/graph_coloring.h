@@ -1,6 +1,6 @@
 
 // ---------------------------------------------------------------------
-// $Id: graph_coloring.h 30494 2013-08-26 10:04:44Z kronbichler $
+// $Id$
 //
 // Copyright (C) 2013 by the deal.II authors
 //
