@@ -127,17 +127,7 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   # General optimization flags:
   #
 
-  IF(CMAKE_CXX_COMPILER_VERSION MATCHES "^13\\.")
-    #
-    # Disable aggressive optimization for intel-13* compilers, until we
-    # resolve a lot of funny miscompilations...
-    #
-    # - Maier, 2013
-    #
-    ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O1")
-  ELSE()
-    ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
-  ENDIF()
+  ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
 
   # equivalent to -fno-strict-aliasing:
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")
