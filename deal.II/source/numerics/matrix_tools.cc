@@ -1228,17 +1228,21 @@ namespace MatrixCreator
         static_cast<std_cxx1x::function<void (typename DoFHandler<dim,spacedim>::active_cell_iterator
           const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
           MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,spacedim> > &)> > 
-        (std_cxx1x::bind(create_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
+        (std_cxx1x::bind(&create_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
                          std_cxx1x::_3,
                          std_cxx1x::cref(mapping),std_cxx1x::cref(fe),std_cxx1x::cref(q),
                          std_cxx1x::cref(boundary_functions),coefficient,
                          std_cxx1x::cref(component_mapping))), 
         static_cast<std_cxx1x::function<void (MatrixCreator::internal::AssemblerBoundary
           ::CopyData<DoFHandler<dim,spacedim> > const &)> > (std_cxx1x::bind(
-              copy_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,
-            std_cxx1x::cref(boundary_functions),std_cxx1x::cref(dof_to_boundary_mapping),
-            std_cxx1x::ref(matrix),std_cxx1x::ref(rhs_vector))),
-        scratch,copy_data);
+              &copy_boundary_mass_matrix_1<dim,spacedim>,
+	      std_cxx1x::_1,
+	      std_cxx1x::cref(boundary_functions),
+	      std_cxx1x::cref(dof_to_boundary_mapping),
+	      std_cxx1x::ref(matrix),
+	      std_cxx1x::ref(rhs_vector))),
+		    scratch,
+		    copy_data);
   }
 
 
@@ -1639,17 +1643,21 @@ namespace MatrixCreator
         static_cast<std_cxx1x::function<void (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
           const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
           MatrixCreator::internal::AssemblerBoundary::CopyData<hp::DoFHandler<dim,spacedim> > &)> > 
-        (std_cxx1x::bind(create_hp_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
+        (std_cxx1x::bind( &create_hp_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
                          std_cxx1x::_3,
                          std_cxx1x::cref(mapping),std_cxx1x::cref(fe_collection),std_cxx1x::cref(q),
                          std_cxx1x::cref(boundary_functions),coefficient,
                          std_cxx1x::cref(component_mapping))), 
-        static_cast<std_cxx1x::function<void (MatrixCreator::internal::AssemblerBoundary
-          ::CopyData<hp::DoFHandler<dim,spacedim> > const &)> > (std_cxx1x::bind(
-              copy_hp_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,
-            std_cxx1x::cref(boundary_functions),std_cxx1x::cref(dof_to_boundary_mapping),
-            std_cxx1x::ref(matrix),std_cxx1x::ref(rhs_vector))),
-        scratch,copy_data);
+		    static_cast<std_cxx1x::function<void (MatrixCreator::internal::AssemblerBoundary
+							  ::CopyData<hp::DoFHandler<dim,spacedim> > const &)> > (
+		       std_cxx1x::bind( &copy_hp_boundary_mass_matrix_1<dim,spacedim>,
+					std_cxx1x::_1,
+					std_cxx1x::cref(boundary_functions),
+					std_cxx1x::cref(dof_to_boundary_mapping),
+					std_cxx1x::ref(matrix),
+					std_cxx1x::ref(rhs_vector))),
+		    scratch,
+		    copy_data);
   }
 
 
@@ -1700,17 +1708,14 @@ namespace MatrixCreator
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
-    void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
-                                  SparseMatrix<double> *,
-                                  Vector<double> *)
-      = &MatrixCreator::internal::
-        copy_local_to_global<SparseMatrix<double>, Vector<double> >;
-
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (copy_local_to_global,
-                                      std_cxx1x::_1, &matrix, (Vector<double> *)0),
+                     std_cxx1x::bind (&MatrixCreator::internal::
+				      copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+                                      std_cxx1x::_1, 
+				      &matrix, 
+				      (Vector<double> *)NULL),
                      assembler_data,
                      copy_data);
   }
@@ -1760,17 +1765,14 @@ namespace MatrixCreator
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
-    void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
-                                  SparseMatrix<double> *,
-                                  Vector<double> *)
-      = &MatrixCreator::internal::
-        copy_local_to_global<SparseMatrix<double>, Vector<double> >;
-
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (copy_local_to_global,
-                                      std_cxx1x::_1, &matrix, &rhs_vector),
+                     std_cxx1x::bind (&MatrixCreator::internal::
+				      copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+                                      std_cxx1x::_1, 
+				      &matrix, 
+				      &rhs_vector),
                      assembler_data,
                      copy_data);
   }
@@ -1818,17 +1820,14 @@ namespace MatrixCreator
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
-    void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
-                                  SparseMatrix<double> *,
-                                  Vector<double> *)
-      = &MatrixCreator::internal::
-        copy_local_to_global<SparseMatrix<double>, Vector<double> >;
-
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (copy_local_to_global,
-                                      std_cxx1x::_1, &matrix, (Vector<double> *)0),
+                     std_cxx1x::bind (&MatrixCreator::internal::
+				      copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+                                      std_cxx1x::_1, 
+				      &matrix, 
+				      (Vector<double> *)0),
                      assembler_data,
                      copy_data);
   }
@@ -1875,17 +1874,14 @@ namespace MatrixCreator
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
-    void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
-                                  SparseMatrix<double> *,
-                                  Vector<double> *)
-      = &MatrixCreator::internal::
-        copy_local_to_global<SparseMatrix<double>, Vector<double> >;
-
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (copy_local_to_global,
-                                      std_cxx1x::_1, &matrix, &rhs_vector),
+                     std_cxx1x::bind (&MatrixCreator::internal::
+				      copy_local_to_global<SparseMatrix<double>, Vector<double> >,
+                                      std_cxx1x::_1, 
+				      &matrix, 
+				      &rhs_vector),
                      assembler_data,
                      copy_data);
   }

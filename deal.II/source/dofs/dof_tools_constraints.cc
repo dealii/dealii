@@ -2344,12 +2344,22 @@ namespace DoFTools
         WorkStream::run(coarse_grid.begin_active(),coarse_grid.end(),
             static_cast<std_cxx1x::function<void (typename dealii::DoFHandler<dim,spacedim>
             ::active_cell_iterator const &,Assembler::Scratch const &,Assembler::CopyData<dim,spacedim> 
-            &)> > (std_cxx1x::bind(compute_intergrid_weights_3<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
-            std_cxx1x::_3,std_cxx1x::cref(coarse_grid.get_fe()),std_cxx1x::cref(coarse_to_fine_grid_map),
-            std_cxx1x::cref(parameter_dofs))), static_cast<std_cxx1x::function<void (Assembler
-            ::CopyData<dim,spacedim> const &)> > (std_cxx1x::bind(copy_intergrid_weights_3<dim,spacedim>,
-            std_cxx1x::_1,std_cxx1x::cref(coarse_grid.get_fe()),std_cxx1x::ref(weights))),scratch,
-            copy_data);
+            &)> > (
+		   std_cxx1x::bind(&compute_intergrid_weights_3<dim,spacedim>,
+				   std_cxx1x::_1,
+				   std_cxx1x::_2,
+				   std_cxx1x::_3,
+				   std_cxx1x::cref(coarse_grid.get_fe()),
+				   std_cxx1x::cref(coarse_to_fine_grid_map),
+				   std_cxx1x::cref(parameter_dofs))),
+			static_cast<std_cxx1x::function<void (Assembler
+            ::CopyData<dim,spacedim> const &)> > (
+						  std_cxx1x::bind(&copy_intergrid_weights_3<dim,spacedim>,
+								  std_cxx1x::_1,
+								  std_cxx1x::cref(coarse_grid.get_fe()),
+								  std_cxx1x::ref(weights))),
+			scratch,
+			copy_data);
       }
 
 

@@ -663,7 +663,7 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
   WorkStream::run(begin,end,
       static_cast<std_cxx1x::function<void (SynchronousIterators<Iterators> const&,
         internal::Assembler::Scratch const&,internal::Assembler::CopyData &)> >
-      (std_cxx1x::bind(DerivativeApproximation::template approximate<DerivativeDescription,dim,DH,
+      (std_cxx1x::bind(&DerivativeApproximation::template approximate<DerivativeDescription,dim,DH,
                        InputVector,spacedim>,
                        std_cxx1x::_1,
                        std_cxx1x::cref(mapping),
