@@ -50,14 +50,17 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     SET(TARGET_RUN ${TARGET})
   ENDIF()
 
-  IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
-      OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
+  IF(CMAKE_SYSTEM_NAME MATCHES "(CYGWIN|Windows)")
     #
     # Hack for Cygwin and Windows targets: Export PATH to point to the
     # dynamic library.
     #
+    SET(_delim ":")
+    IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+      SET(_delim ";")
+    ENDIF()
     FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
-      "SET(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR};${DEAL_II_PATH}/${DEAL_II_EXECUTABLE_RELDIR};\$ENV{PATH}\")\n"
+      "SET(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR}${_delim}${DEAL_II_PATH}/${DEAL_II_EXECUTABLE_RELDIR}${_delim}\$ENV{PATH}\")\n"
       "EXECUTE_PROCESS(COMMAND ${TARGET_RUN}\n"
       "  RESULT_VARIABLE _return_value\n"
       "  )\n"
