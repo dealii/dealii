@@ -116,6 +116,15 @@ operator << (LogStream &out,
 
 LogStream &
 operator << (LogStream &out,
+             const std::vector<long long unsigned int> &v)
+{
+  for (unsigned int i=0; i<v.size(); ++i)
+    out << v[i] << (i == v.size()-1 ? "" : " ");
+  return out;
+}
+
+LogStream &
+operator << (LogStream &out,
              const std::vector<double> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
