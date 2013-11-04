@@ -565,7 +565,7 @@ Unable to determine test submission files from TAG. Bailing out.
 ENDIF()
 FILE(GLOB _xml_files ${_path}/*.xml)
 EXECUTE_PROCESS(COMMAND sed -i -e
-  s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"/g
+  s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\" CompilerVersion=\"${_compiler_version}\"/g
   ${_xml_files}
   OUTPUT_QUIET RESULT_VARIABLE  _res
   )
