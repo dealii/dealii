@@ -1058,8 +1058,6 @@ namespace DoFRenumbering
         all_dof_counts(fe_collection.n_components() *
                        Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
-        Assert (sizeof(types::global_dof_index) == sizeof(unsigned int),
-                ExcNotImplemented());
         MPI_Allgather ( &local_dof_count[0],
                         n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
                         &all_dof_counts[0],
@@ -1073,7 +1071,7 @@ namespace DoFRenumbering
                   ExcInternalError());
 
         //calculate shifts
-        unsigned int cumulated = 0;
+        types::global_dof_index cumulated = 0;
         for (unsigned int c=0; c<n_buckets; ++c)
           {
             shifts[c]=cumulated;
