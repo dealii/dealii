@@ -1624,8 +1624,6 @@ namespace Step42
 
     constraints_hanging_nodes.set_zero(distributed_solution);
     constraints_hanging_nodes.set_zero(newton_rhs);
-    distributed_solution.compress(VectorOperation::insert);
-    newton_rhs.compress(VectorOperation::insert);
 
     TrilinosWrappers::PreconditionAMG preconditioner;
     {
@@ -1796,7 +1794,6 @@ namespace Step42
                 const double alpha = std::pow(0.5, static_cast<double>(i));
                 tmp_vector = old_solution;
                 tmp_vector.sadd(1 - alpha, alpha, distributed_solution);
-                tmp_vector.compress(VectorOperation::add);
 
                 TimerOutput::Scope t(computing_timer, "Residual and lambda");
 
