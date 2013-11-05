@@ -221,32 +221,34 @@ namespace dealii
 
     void MainWindow::create_actions()
     {
+      QStyle * style = tree_widget->style();
+
       open_act = new QAction(tr("&Open..."), this);				// create actions
-      open_act->setIcon(QIcon(":/icons/fileopen.png"));				// and set icons
+      open_act->setIcon(style->standardPixmap(QStyle::SP_DialogOpenButton));    // and set icons
       open_act->setShortcut(Qt::CTRL + Qt::Key_O);				// set a short cut
       open_act->setStatusTip(tr("Open a XML file"));				// set a status tip
       connect(open_act, SIGNAL(triggered()), this, SLOT(open()));		// and connect
 
       save_act = new QAction(tr("&Save ..."), this);
-      save_act->setIcon(QIcon(":/icons/filesave.png"));
+      save_act->setIcon(style->standardPixmap(QStyle::SP_DialogSaveButton));
       save_act->setShortcut(Qt::CTRL + Qt::Key_S);
       save_act->setStatusTip(tr("Save the current XML file"));
       connect(save_act, SIGNAL(triggered()), this, SLOT(save()));
 
       save_as_act = new QAction(tr("&Save As..."), this);
-      save_as_act->setIcon(QIcon(":/icons/filesaveas.png"));
+      save_as_act->setIcon(style->standardPixmap(QStyle::SP_DialogSaveButton));
       save_as_act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Q);
       save_as_act->setStatusTip(tr("Save the current XML file as"));
       connect(save_as_act, SIGNAL(triggered()), this, SLOT(save_as()));
 
       exit_act = new QAction(tr("E&xit"), this);
-      exit_act->setIcon(QIcon(":/icons/exit.png"));
+      exit_act->setIcon(style->standardPixmap(QStyle::SP_DialogCloseButton));
       exit_act->setShortcut(Qt::CTRL + Qt::Key_Q);
       exit_act->setStatusTip(tr("Exit the parameterGUI application"));
       connect(exit_act, SIGNAL(triggered()), this, SLOT(close()));
 
       about_act = new QAction(tr("&About"), this);
-      about_act->setIcon(QIcon(":/icons/idea.png"));
+      about_act->setIcon(style->standardPixmap(QStyle::SP_FileDialogInfoView));
       about_act->setStatusTip(tr("Show the parameterGUI About box"));
       connect(about_act, SIGNAL(triggered()), this, SLOT(about()));
 
