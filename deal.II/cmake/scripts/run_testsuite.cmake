@@ -571,7 +571,6 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
   # TODO: Come up with a more robust way to inject this that also works on
   # BSD and Mac
   #
-  MESSAGE(FATAL_ERROR "Success")
   FILE(GLOB _xml_files ${_path}/*.xml)
   EXECUTE_PROCESS(COMMAND sed -i -e
     s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"/g
