@@ -37,11 +37,13 @@ MACRO(make_quicktest test_basename build_name mpi_run)
 
   IF(NOT ${mpi_run} EQUAL "")
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+    DEPENDS ${_target}
     COMMAND mpirun -n ${mpi_run} ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   ELSE()
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+    DEPENDS ${_target}
     COMMAND ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
@@ -74,6 +76,11 @@ make_quicktest("affinity" ${_mybuild} "")
 # Test if MPI is configured correctly
 IF (DEAL_II_WITH_MPI)
   make_quicktest("mpi" ${_mybuild} 2)
+ENDIF()
+
+# Test if TBB works correctly
+IF (DEAL_II_WITH_THREADS)
+  make_quicktest("tbb" ${_mybuild} "")
 ENDIF()
 
 # Test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
