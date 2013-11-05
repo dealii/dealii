@@ -65,10 +65,20 @@ MACRO(DEAL_II_PICKUP_TESTS)
         _feature ${_match}
         )
       STRING(TOUPPER ${_feature} _feature)
-      STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
 
-      IF( (DEAL_II_${_feature} AND NOT ${_boolean}) OR
-          (NOT DEAL_II_${_feature} AND ${_boolean}) )
+      # Make sure that _match is a valid feature constraint:
+      IF(DEFINED DEAL_II_${_feature})
+        STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
+        IF( (DEAL_II_${_feature} AND NOT ${_boolean}) OR
+            (NOT DEAL_II_${_feature} AND ${_boolean}) )
+          SET(_define_test FALSE)
+        ENDIF()
+      ELSE()
+        MESSAGE(WARNING "
+Invalid feature constraint \"${_match}\" in file
+\"${_comparison}\":
+The feature \"DEAL_II_${_feature}\" does not exist.\n"
+          )
         SET(_define_test FALSE)
       ENDIF()
     ENDFOREACH()
