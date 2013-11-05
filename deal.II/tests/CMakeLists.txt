@@ -81,7 +81,6 @@ LIST(REMOVE_DUPLICATES _categories)
 # Define a subproject for every enabled category:
 #
 
-MESSAGE(STATUS "")
 MESSAGE(STATUS "Regenerating testsuite subprojects")
 
 FOREACH(_category ${_categories})

@@ -19,14 +19,10 @@
 #
 ENABLE_TESTING()
 
-# use debug mode if possible:
-LIST(FIND DEAL_II_BUILD_TYPES "DEBUG" hasdebug)
-IF (NOT hasdebug EQUAL -1)
-  set(_mybuild "DEBUG")
-ELSE()
-  set(_mybuild "RELEASE")
-ENDIF()
-MESSAGE(" we are using build type ${_mybuild}...")
+# Use the first available build type (this prefers debug mode if available):
+LIST(GET DEAL_II_BUILD_TYPES 0 _mybuild)
+MESSAGE(STATUS "")
+MESSAGE(STATUS "Setup quick_tests in ${_mybuild} mode")
 
 # define a macro to set up a quick test:
 MACRO(make_quicktest test_basename build_name mpi_run)
@@ -95,3 +91,5 @@ ADD_CUSTOM_TARGET(test
   COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   )
+
+MESSAGE(STATUS "Setup quick_tests in ${_mybuild} mode - Done")
