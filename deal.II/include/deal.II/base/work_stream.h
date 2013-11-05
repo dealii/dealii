@@ -1001,7 +1001,7 @@ namespace WorkStream
                  sample_copy_data);
 
              internal::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-             internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,false);
+             internal::Copier<Iterator, ScratchData, CopyData> copier_filter (copier,true);
 
              tbb::pipeline assembly_line;
              assembly_line.add_filter (iterator_range_to_item_stream);
