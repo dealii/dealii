@@ -77,7 +77,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
         MESSAGE(WARNING "
 Invalid feature constraint \"${_match}\" in file
 \"${_comparison}\":
-The feature \"DEAL_II_${_feature}\" does not exist.\n"
+The feature \"DEAL_II_${_feature}\" does not exist. Test dropped.\n"
           )
         SET(_define_test FALSE)
       ENDIF()
