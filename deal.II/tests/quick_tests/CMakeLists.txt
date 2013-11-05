@@ -23,28 +23,30 @@ ENABLE_TESTING()
 LIST(FIND DEAL_II_BUILD_TYPES "DEBUG" hasdebug)
 IF (NOT hasdebug EQUAL -1)
   set(_mybuild "DEBUG")
-  set(_mybuild_lowercase "debug")
 ELSE()
-  set(_mybuild_lowercase "release")
   set(_mybuild "RELEASE")
 ENDIF()
 MESSAGE(" we are using build type ${_mybuild}...")
 
+# define a macro to set up a quick test:
+MACRO(make_quicktest test_basename build_name mpi_run)
+  STRING(TOLOWER ${build_name} _build_lowercase)
+  SET(_target ${test_basename}.${_build_lowercase})
+  ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${test_basename}.cc)
+  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${build_name})
 
-# simple assembly/solver test
-# (run this in debug and release mode)
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${_build} _build_lowercase)
-
-  SET(_target step.${_build_lowercase})
-
-  ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL step.cc)
-  DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_build})
-
+  IF(NOT ${mpi_run} EQUAL "")
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
+    COMMAND mpirun -n ${mpi_run} ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
+  ELSE()
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+    COMMAND ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+  ENDIF()
+
   ADD_CUSTOM_TARGET(${_target}.run 
 	DEPENDS ${_target}
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
@@ -57,90 +59,31 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
+ENDMACRO()
+
+
+# simple assembly/solver test. This makes sure we can compile and link correctly
+# in debug and release.
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  make_quicktest("step" ${_build} "")
 ENDFOREACH()
 
+# Test whether thread affinity is well behaved
+make_quicktest("affinity" ${_mybuild} "")
 
-#
-# Test whether thread affinity is well behaved:
-#
-SET(_target affinity.${_mybuild_lowercase})
-
-ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL affinity.cc)
-DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
-
-ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND ${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-ADD_CUSTOM_TARGET(${_target}.run 
-	DEPENDS ${_target}
-	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-	COMMAND echo "${_target}: PASSED.")
-
-IF(NOT APPLE)
-ADD_TEST(NAME ${_target}
-    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
-      -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-      -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
-ENDIF()
-
-# test if MPI is configured correctly
-SET(_target mpi.${_mybuild_lowercase})
-
-ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL mpi.cc)
-DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
-
-ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND mpirun -n 2 ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-ADD_CUSTOM_TARGET(${_target}.run 
-	DEPENDS ${_target}
-	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-	COMMAND echo "${_target}: PASSED.")
-
+# Test if MPI is configured correctly
 IF (DEAL_II_WITH_MPI)
-ADD_TEST(NAME ${_target}
-    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
-      -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-      -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
+  make_quicktest("mpi" ${_mybuild} 2)
 ENDIF()
 
-# test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
+# Test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
 # Update to OpenMPI 1.5 or newer.
-SET(_target p4est.${_mybuild_lowercase})
-
-ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL p4est.cc)
-DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${_mybuild})
-
-ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-    COMMAND mpirun -n 10 ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-ADD_CUSTOM_TARGET(${_target}.run 
-	DEPENDS ${_target}
-	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
-	COMMAND echo "${_target}: PASSED.")
-
 IF (DEAL_II_WITH_P4EST)
-ADD_TEST(NAME ${_target}
-    COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
-      -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-      -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
+  make_quicktest("p4est" ${_mybuild} 10)
 ENDIF()
 
-#
+
 # A custom test target:
-#
 ADD_CUSTOM_TARGET(test
   COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
