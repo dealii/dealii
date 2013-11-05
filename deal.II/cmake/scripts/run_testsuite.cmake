@@ -563,17 +563,27 @@ Unable to determine test submission files from TAG. Bailing out.
 "
     )
 ENDIF()
-FILE(GLOB _xml_files ${_path}/*.xml)
-EXECUTE_PROCESS(COMMAND sed -i -e
-  s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"/g
-  ${_xml_files}
-  OUTPUT_QUIET RESULT_VARIABLE  _res
-  )
-IF(NOT "${_res}" STREQUAL "0")
-  MESSAGE(FATAL_ERROR "
-\"sed\" failed. Bailing out.
-"
+
+IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  #
+  # Only use the following sed command on GNU userlands:
+  #
+  # TODO: Come up with a more robust way to inject this that also works on
+  # BSD and Mac
+  #
+  MESSAGE(FATAL_ERROR "Success")
+  FILE(GLOB _xml_files ${_path}/*.xml)
+  EXECUTE_PROCESS(COMMAND sed -i -e
+    s/CompilerName=\"\"/CompilerName=\"${_compiler_name}\"\\n\\tCompilerVersion=\"${_compiler_version}\"/g
+    ${_xml_files}
+    OUTPUT_QUIET RESULT_VARIABLE  _res
     )
+  IF(NOT "${_res}" STREQUAL "0")
+    MESSAGE(FATAL_ERROR "
+  \"sed\" failed. Bailing out.
+  "
+      )
+  ENDIF()
 ENDIF()
 
 IF(NOT "${_svn_WC_REVISION}" STREQUAL "")
