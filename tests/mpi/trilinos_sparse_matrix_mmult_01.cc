@@ -142,7 +142,7 @@ void test ()
   if ((n_procs == 1) || (my_id == 1))
     Assert(AtA.el(1, 1) == 2, ExcMessage("Wrong element in AtA!"));
 
-  deallog << "OK" << endl;
+  deallog << "OK" << std::endl;
 }
 
 

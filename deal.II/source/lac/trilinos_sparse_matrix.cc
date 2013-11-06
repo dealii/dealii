@@ -1040,6 +1040,9 @@ namespace TrilinosWrappers
                         const VectorBase   &V,
                         const bool          transpose_left)
     {
+#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+      Assert(false,ExcNotImplemented())
+#endif
       const bool use_vector = (V.size() == inputright.m() ? true : false);
       if (transpose_left == false)
         {
@@ -1254,6 +1257,9 @@ namespace TrilinosWrappers
                        const SparseMatrix &B,
                        const VectorBase   &V) const
   {
+#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+    Assert(false,ExcNotImplemented())
+#endif
     internals::perform_mmult (*this, B, C, V, false);
   }
 
@@ -1264,6 +1270,9 @@ namespace TrilinosWrappers
                         const SparseMatrix &B,
                         const VectorBase   &V) const
   {
+#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+    Assert(false,ExcNotImplemented())
+#endif
     internals::perform_mmult (*this, B, C, V, true);
   }
 
