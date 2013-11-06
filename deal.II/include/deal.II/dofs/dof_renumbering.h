@@ -428,14 +428,11 @@ namespace DoFRenumbering
 
 
   /**
-   * Point based comparator for downstream
-   * directions: it returns @p true if the
-   * second point is downstream of the first
-   * one with respect to the direction given
-   * to the constructor. If the points are
-   * the same with respect to the downstream
-   * direction, the point with the lower DoF
-   * number is considered smaller.
+   * Point based comparator for downstream directions: it returns @p true if
+   * the second point is downstream of the first one with respect to the
+   * direction given to the constructor. If the points are the same with
+   * respect to the downstream direction, the point with the lower DoF number
+   * is considered smaller.
    */
   template <int dim>
   struct ComparePointwiseDownstream
@@ -465,48 +462,29 @@ namespace DoFRenumbering
   };
 
   /**
-   * A namespace for the
-   * implementation of some
-   * renumbering algorithms based
-   * on algorithms implemented in
-   * the Boost Graph Library (BGL)
-   * by Jeremy Siek and others.
+   * A namespace for the implementation of some renumbering algorithms based
+   * on algorithms implemented in the Boost Graph Library (BGL) by Jeremy Siek
+   * and others.
    *
-   * While often slighty slower to
-   * compute, the algorithms using
-   * BOOST often lead to matrices
-   * with smaller bandwidths and
-   * sparse ILUs based on this
-   * numbering are therefore more
-   * efficient.
+   * While often slighty slower to compute, the algorithms using BOOST often
+   * lead to matrices with smaller bandwidths and sparse ILUs based on this
+   * numbering are therefore more efficient.
    *
-   * For a comparison of these
-   * algorithms with the ones
-   * defined in DoFRenumbering, see
-   * the comparison section in the
-   * documentation of the
+   * For a comparison of these algorithms with the ones defined in
+   * DoFRenumbering, see the comparison section in the documentation of the
    * DoFRenumbering namespace.
    */
   namespace boost
   {
     /**
-     * Renumber the degrees of
-     * freedom according to the
-     * Cuthill-McKee method,
-     * eventually using the reverse
-     * numbering scheme.
+     * Renumber the degrees of freedom according to the Cuthill-McKee method,
+     * eventually using the reverse numbering scheme.
      *
-     * See the general
-     * documentation of the
-     * parent class for details
-     * on the different methods.
+     * See the general documentation of the parent class for details on the
+     * different methods.
      *
-     * As an example of the
-     * results of this algorithm,
-     * take a look at the
-     * comparison of various
-     * algorithms in the
-     * documentation of the
+     * As an example of the results of this algorithm, take a look at the
+     * comparison of various algorithms in the documentation of the
      * DoFRenumbering namespace.
      */
     template <class DH>
@@ -516,13 +494,9 @@ namespace DoFRenumbering
                    const bool                       use_constraints    = false);
 
     /**
-     * Computes the renumbering
-     * vector needed by the
-     * Cuthill_McKee() function. Does
-     * not perform the renumbering on
-     * the DoFHandler dofs but
-     * returns the renumbering
-     * vector.
+     * Computes the renumbering vector needed by the Cuthill_McKee()
+     * function. Does not perform the renumbering on the DoFHandler dofs but
+     * returns the renumbering vector.
      */
     template <class DH>
     void
@@ -532,29 +506,16 @@ namespace DoFRenumbering
                            const bool use_constraints    = false);
 
     /**
-     * Renumber the degrees of
-     * freedom based on the BOOST
-     * implementation of the King
-     * algorithm. This often
-     * results in slightly larger
-     * (by a few percent)
-     * bandwidths than the
-     * Cuthill-McKee algorithm,
-     * but sparse ILUs are often
-     * slightly (also by a few
-     * percent) better
-     * preconditioners.
+     * Renumber the degrees of freedom based on the BOOST implementation of
+     * the King algorithm. This often results in slightly larger (by a few
+     * percent) bandwidths than the Cuthill-McKee algorithm, but sparse ILUs
+     * are often slightly (also by a few percent) better preconditioners.
      *
-     * As an example of the
-     * results of this algorithm,
-     * take a look at the
-     * comparison of various
-     * algorithms in the
-     * documentation of the
+     * As an example of the results of this algorithm, take a look at the
+     * comparison of various algorithms in the documentation of the
      * DoFRenumbering namespace.
      *
-     * This algorithm is used in
-     * step-22.
+     * This algorithm is used in step-22.
      */
     template <class DH>
     void
@@ -563,11 +524,8 @@ namespace DoFRenumbering
                    const bool                       use_constraints    = false);
 
     /**
-     * Compute the renumbering
-     * for the King algorithm but
-     * do not actually renumber
-     * the degrees of freedom in
-     * the DoF handler argument.
+     * Compute the renumbering for the King algorithm but do not actually
+     * renumber the degrees of freedom in the DoF handler argument.
      */
     template <class DH>
     void
@@ -577,28 +535,14 @@ namespace DoFRenumbering
                            const bool use_constraints    = false);
 
     /**
-     * Renumber the degrees of
-     * freedom based on the BOOST
-     * implementation of the
-     * minimum degree
-     * algorithm. Unlike the
-     * Cuthill-McKee algorithm,
-     * this algorithm does not
-     * attempt to minimize the
-     * bandwidth of a matrix but
-     * to minimize the amount of
-     * fill-in when doing an LU
-     * decomposition. It may
-     * sometimes yield better
-     * ILUs because of this
-     * property.
+     * Renumber the degrees of freedom based on the BOOST implementation of
+     * the minimum degree algorithm. Unlike the Cuthill-McKee algorithm, this
+     * algorithm does not attempt to minimize the bandwidth of a matrix but to
+     * minimize the amount of fill-in when doing an LU decomposition. It may
+     * sometimes yield better ILUs because of this property.
      *
-     * As an example of the
-     * results of this algorithm,
-     * take a look at the
-     * comparison of various
-     * algorithms in the
-     * documentation of the
+     * As an example of the results of this algorithm, take a look at the
+     * comparison of various algorithms in the documentation of the
      * DoFRenumbering namespace.
      */
     template <class DH>
@@ -608,12 +552,8 @@ namespace DoFRenumbering
                     const bool                       use_constraints    = false);
 
     /**
-     * Compute the renumbering
-     * for the minimum degree
-     * algorithm but do not
-     * actually renumber the
-     * degrees of freedom in the
-     * DoF handler argument.
+     * Compute the renumbering for the minimum degree algorithm but do not
+     * actually renumber the degrees of freedom in the DoF handler argument.
      */
     template <class DH>
     void
@@ -624,21 +564,14 @@ namespace DoFRenumbering
   }
 
   /**
-   * Renumber the degrees of
-   * freedom according to the
-   * Cuthill-McKee method,
-   * eventually using the reverse
-   * numbering scheme.
+   * Renumber the degrees of freedom according to the Cuthill-McKee method,
+   * eventually using the reverse numbering scheme.
    *
-   * See the general documentation
-   * of this class for details on
-   * the different methods.
+   * See the general documentation of this class for details on the different
+   * methods.
    *
-   * As an example of the results
-   * of this algorithm, take a look
-   * at the comparison of various
-   * algorithms in the
-   * documentation of the
+   * As an example of the results of this algorithm, take a look at the
+   * comparison of various algorithms in the documentation of the
    * DoFRenumbering namespace.
    */
   template <class DH>
@@ -649,13 +582,9 @@ namespace DoFRenumbering
                  const std::vector<types::global_dof_index> &starting_indices   = std::vector<types::global_dof_index>());
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * Cuthill_McKee() function. Does
-   * not perform the renumbering on
-   * the DoFHandler dofs but
-   * returns the renumbering
-   * vector.
+   * Computes the renumbering vector needed by the Cuthill_McKee()
+   * function. Does not perform the renumbering on the DoFHandler dofs but
+   * returns the renumbering vector.
    */
   template <class DH>
   void
@@ -666,27 +595,17 @@ namespace DoFRenumbering
                          const std::vector<types::global_dof_index> &starting_indices   = std::vector<types::global_dof_index>());
 
   /**
-   * Renumber the degrees of
-   * freedom according to the
-   * Cuthill-McKee method,
-   * eventually using the reverse
-   * numbering scheme, in this case
-   * for a multigrid numbering of
-   * degrees of freedom.
+   * Renumber the degrees of freedom according to the Cuthill-McKee method,
+   * eventually using the reverse numbering scheme, in this case for a
+   * multigrid numbering of degrees of freedom.
    *
-   * You can give a triangulation
-   * level to which this function
-   * is to be applied.  Since with
-   * a level-wise numbering there
-   * are no hanging nodes, no
-   * constraints can be used, so
-   * the respective parameter of
-   * the previous function is
-   * ommitted.
+   * You can give a triangulation level to which this function is to be
+   * applied.  Since with a level-wise numbering there are no hanging nodes,
+   * no constraints can be used, so the respective parameter of the previous
+   * function is ommitted.
    *
-   * See the general documentation
-   * of this class for details on
-   * the different methods.
+   * See the general documentation of this class for details on the different
+   * methods.
    */
   template <class DH>
   void
@@ -701,67 +620,34 @@ namespace DoFRenumbering
    */
 
   /**
-   * Sort the degrees of freedom by
-   * vector component. The
-   * numbering within each
-   * component is not touched, so a
-   * degree of freedom with index
-   * $i$, belonging to some
-   * component, and another degree
-   * of freedom with index $j$
-   * belonging to the same
-   * component will be assigned new
-   * indices $n(i)$ and $n(j)$ with
-   * $n(i)<n(j)$ if $i<j$ and
-   * $n(i)>n(j)$ if $i>j$.
+   * Sort the degrees of freedom by vector component. The numbering within
+   * each component is not touched, so a degree of freedom with index $i$,
+   * belonging to some component, and another degree of freedom with index $j$
+   * belonging to the same component will be assigned new indices $n(i)$ and
+   * $n(j)$ with $n(i)<n(j)$ if $i<j$ and $n(i)>n(j)$ if $i>j$.
    *
-   * You can specify that the
-   * components are ordered in a
-   * different way than suggested
-   * by the FESystem object you
-   * use. To this end, set up the
-   * vector @p target_component
-   * such that the entry at index
-   * @p i denotes the number of the
-   * target component for dofs with
-   * component @p i in the
-   * FESystem. Naming the same
-   * target component more than once is
-   * possible and results in a
-   * blocking of several components
-   * into one. This is discussed in
-   * step-22. If you
-   * omit this argument, the same
-   * order as given by the finite
-   * element is used.
+   * You can specify that the components are ordered in a different way than
+   * suggested by the FESystem object you use. To this end, set up the vector
+   * @p target_component such that the entry at index @p i denotes the number
+   * of the target component for dofs with component @p i in the
+   * FESystem. Naming the same target component more than once is possible and
+   * results in a blocking of several components into one. This is discussed
+   * in step-22. If you omit this argument, the same order as given by the
+   * finite element is used.
    *
-   * If one of the base finite
-   * elements from which the global
-   * finite element under
-   * consideration here, is a
-   * non-primitive one, i.e. its
-   * shape functions have more than
-   * one non-zero component, then
-   * it is not possible to
-   * associate these degrees of
-   * freedom with a single vector
-   * component. In this case, they
-   * are associated with the first
-   * vector component to which they
-   * belong.
+   * If one of the base finite elements from which the global finite element
+   * under consideration here, is a non-primitive one, i.e. its shape
+   * functions have more than one non-zero component, then it is not possible
+   * to associate these degrees of freedom with a single vector component. In
+   * this case, they are associated with the first vector component to which
+   * they belong.
    *
-   * For finite elements with only
-   * one component, or a single
-   * non-primitive base element,
-   * this function is the identity
-   * operation.
+   * For finite elements with only one component, or a single non-primitive
+   * base element, this function is the identity operation.
   *
-  * @note A similar function, which
-  * renumbered all levels existed
-  * for MGDoFHandler. This function
-  * was deleted. Thus, you have to
-  * call the level function for each
-  * level now.
+  * @note A similar function, which renumbered all levels existed for
+  * MGDoFHandler. This function was deleted. Thus, you have to call the level
+  * function for each level now.
    */
   template <int dim, int spacedim>
   void
@@ -771,9 +657,8 @@ namespace DoFRenumbering
 
 
   /**
-   * Sort the degrees of freedom by
-   * component. It does the same
-   * thing as the above function.
+   * Sort the degrees of freedom by component. It does the same thing as the
+   * above function.
    */
   template <int dim>
   void
@@ -781,14 +666,10 @@ namespace DoFRenumbering
                   const std::vector<unsigned int> &target_component = std::vector<unsigned int> ());
 
   /**
-   * Sort the degrees of freedom by
-   * component. It does the same
-   * thing as the above function,
-   * only that it does this for one
-   * single level of a multi-level
-   * discretization. The
-   * non-multigrid part of the
-   * MGDoFHandler is not touched.
+   * Sort the degrees of freedom by component. It does the same thing as the
+   * above function, only that it does this for one single level of a
+   * multi-level discretization. The non-multigrid part of the MGDoFHandler is
+   * not touched.
    */
   template <class DH>
   void
@@ -798,14 +679,9 @@ namespace DoFRenumbering
 
 
   /**
-   * Sort the degrees of freedom by
-   * component. It does the same
-   * thing as the previous
-   * functions, but more: it
-   * renumbers not only every level
-   * of the multigrid part, but
-   * also the global,
-   * i.e. non-multigrid components.
+   * Sort the degrees of freedom by component. It does the same thing as the
+   * previous functions, but more: it renumbers not only every level of the
+   * multigrid part, but also the global, i.e. non-multigrid components.
    */
   template <int dim>
   void
@@ -813,13 +689,9 @@ namespace DoFRenumbering
                   const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * component_wise()
-   * functions. Does not perform
-   * the renumbering on the
-   * DoFHandler dofs but returns
-   * the renumbering vector.
+   * Computes the renumbering vector needed by the component_wise()
+   * functions. Does not perform the renumbering on the DoFHandler dofs but
+   * returns the renumbering vector.
    */
   template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
   types::global_dof_index
@@ -839,19 +711,11 @@ namespace DoFRenumbering
    */
 
   /**
-   * Sort the degrees of freedom by
-   * vector block. The
-   * numbering within each
-   * block is not touched, so a
-   * degree of freedom with index
-   * $i$, belonging to some
-   * block, and another degree
-   * of freedom with index $j$
-   * belonging to the same
-   * block will be assigned new
-   * indices $n(i)$ and $n(j)$ with
-   * $n(i)<n(j)$ if $i<j$ and
-   * $n(i)>n(j)$ if $i>j$.
+   * Sort the degrees of freedom by vector block. The numbering within each
+   * block is not touched, so a degree of freedom with index $i$, belonging to
+   * some block, and another degree of freedom with index $j$ belonging to the
+   * same block will be assigned new indices $n(i)$ and $n(j)$ with
+   * $n(i)<n(j)$ if $i<j$ and $n(i)>n(j)$ if $i>j$.
    */
   template <int dim, int spacedim>
   void
@@ -859,41 +723,29 @@ namespace DoFRenumbering
 
 
   /**
-   * Sort the degrees of freedom by
-   * block. It does the same
-   * thing as the above function.
-  *
-  * This function only succeeds if each of
-  * the elements in the hp::FECollection
-  * attached to the hp::DoFHandler argument
-  * has exactly the same number of blocks
-  * (see @ref GlossBlock "the glossary" for
-  * more information). Note that this is not
-  * always given: while the hp::FECollection
-  * class ensures that all of its elements
-  * have the same number of vector
-  * components, they need not have the same
-  * number of blocks. At the same time, this
-  * function here needs to match individual
-  * blocks across elements and therefore
-  * requires that elements have the same
-  * number of blocks and that subsequent
-  * blocks in one element have the same
-  * meaning as in another element.
+   * Sort the degrees of freedom by block. It does the same thing as the above
+   * function.
+   *
+   * This function only succeeds if each of the elements in the
+   * hp::FECollection attached to the hp::DoFHandler argument has exactly the
+   * same number of blocks (see @ref GlossBlock "the glossary" for more
+   * information). Note that this is not always given: while the
+   * hp::FECollection class ensures that all of its elements have the same
+   * number of vector components, they need not have the same number of
+   * blocks. At the same time, this function here needs to match individual
+   * blocks across elements and therefore requires that elements have the same
+   * number of blocks and that subsequent blocks in one element have the same
+   * meaning as in another element.
    */
   template <int dim>
   void
   block_wise (hp::DoFHandler<dim> &dof_handler);
 
   /**
-   * Sort the degrees of freedom by
-   * block. It does the same
-   * thing as the above function,
-   * only that it does this for one
-   * single level of a multi-level
-   * discretization. The
-   * non-multigrid part of the
-   * MGDoFHandler is not touched.
+   * Sort the degrees of freedom by block. It does the same thing as the above
+   * function, only that it does this for one single level of a multi-level
+   * discretization. The non-multigrid part of the MGDoFHandler is not
+   * touched.
    */
   template <int dim>
   void
@@ -902,27 +754,18 @@ namespace DoFRenumbering
 
 
   /**
-   * Sort the degrees of freedom by
-   * block. It does the same
-   * thing as the previous
-   * functions, but more: it
-   * renumbers not only every level
-   * of the multigrid part, but
-   * also the global,
-   * i.e. non-multigrid components.
+   * Sort the degrees of freedom by block. It does the same thing as the
+   * previous functions, but more: it renumbers not only every level of the
+   * multigrid part, but also the global, i.e. non-multigrid components.
    */
   template <int dim>
   void
   block_wise (MGDoFHandler<dim> &dof_handler);
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * block_wise()
-   * functions. Does not perform
-   * the renumbering on the
-   * DoFHandler dofs but returns
-   * the renumbering vector.
+   * Computes the renumbering vector needed by the block_wise()
+   * functions. Does not perform the renumbering on the DoFHandler dofs but
+   * returns the renumbering vector.
    */
   template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
   types::global_dof_index
@@ -940,10 +783,9 @@ namespace DoFRenumbering
    */
 
   /**
-   * Renumber the degrees cell by cell in hierarchical order
-   * (also known as z-order). The main usage is that this
-   * guarantees the same ordering independent of the
-   * number of processors involved in a parallel
+   * Renumber the degrees cell by cell in hierarchical order (also known as
+   * z-order). The main usage is that this guarantees the same ordering
+   * independent of the number of processors involved in a parallel
    * distributed computation.
    */
   template <int dim>
@@ -951,16 +793,11 @@ namespace DoFRenumbering
   hierarchical (DoFHandler<dim> &dof_handler);
 
   /**
-   * Cell-wise renumbering. This function takes
-   * the ordered set of cells in
-   * <tt>cell_order</tt>, and makes
-   * sure that all degrees of
-   * freedom in a cell with higher
-   * index are behind all degrees
-   * of freedom of a cell with
-   * lower index. The order inside
-   * a cell block will be the same
-   * as before this renumbering.
+   * Cell-wise renumbering. This function takes the ordered set of cells in
+   * <tt>cell_order</tt>, and makes sure that all degrees of freedom in a cell
+   * with higher index are behind all degrees of freedom of a cell with lower
+   * index. The order inside a cell block will be the same as before this
+   * renumbering.
    */
   template <class DH>
   void
@@ -968,13 +805,9 @@ namespace DoFRenumbering
              const std::vector<typename DH::active_cell_iterator> &cell_order);
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * cell_wise() function. Does
-   * not perform the renumbering on
-   * the DoFHandler dofs but
-   * returns the renumbering
-   * vector.
+   * Computes the renumbering vector needed by the cell_wise() function. Does
+   * not perform the renumbering on the DoFHandler dofs but returns the
+   * renumbering vector.
    */
   template <class DH>
   void
@@ -984,9 +817,8 @@ namespace DoFRenumbering
                      const std::vector<typename DH::active_cell_iterator> &cell_order);
 
   /**
-   * Cell-wise renumbering on one
-   * level. See the other function
-   * with the same name.
+   * Cell-wise renumbering on one level. See the other function with the same
+   * name.
    */
   template <class DH>
   void
@@ -995,13 +827,9 @@ namespace DoFRenumbering
              const std::vector<typename DH::level_cell_iterator> &cell_order);
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * cell_wise() level renumbering function. Does
-   * not perform the renumbering on
-   * the DoFHandler dofs but
-   * returns the renumbering
-   * vector.
+   * Computes the renumbering vector needed by the cell_wise() level
+   * renumbering function. Does not perform the renumbering on the DoFHandler
+   * dofs but returns the renumbering vector.
    */
   template <class DH>
   void
@@ -1021,47 +849,29 @@ namespace DoFRenumbering
    */
 
   /**
-   * Downstream numbering with respect to a
-   * constant flow direction. If the
-   * additional argument @p
-   * dof_wise_renumbering is set to @p false,
-   * the numbering is performed cell-wise,
-   * otherwise it is performed based on the
+   * Downstream numbering with respect to a constant flow direction. If the
+   * additional argument @p dof_wise_renumbering is set to @p false, the
+   * numbering is performed cell-wise, otherwise it is performed based on the
    * location of the support points.
    *
-   * The cells are sorted such that
-   * the centers of higher numbers
-   * are further downstream with
-   * respect to the constant vector
-   * @p direction than the centers
-   * of lower numbers. Even if this
-   * yields a downstream numbering
-   * with respect to the flux on
-   * the edges for fairly general
-   * grids, this might not be
-   * guaranteed for all meshes.
+   * The cells are sorted such that the centers of higher numbers are further
+   * downstream with respect to the constant vector @p direction than the
+   * centers of lower numbers. Even if this yields a downstream numbering with
+   * respect to the flux on the edges for fairly general grids, this might not
+   * be guaranteed for all meshes.
    *
-   * If the @p dof_wise_renumbering argument
-   * is set to @p false, this function
-   * produces a downstream ordering of the
-   * mesh cells and calls
-   * cell_wise(). Therefore, the output only
-   * makes sense for Discontinuous Galerkin
-   * Finite Elements (all degrees of freedom
-   * have to be associated with the interior
-   * of the cell in that case) in that case.
+   * If the @p dof_wise_renumbering argument is set to @p false, this function
+   * produces a downstream ordering of the mesh cells and calls
+   * cell_wise(). Therefore, the output only makes sense for Discontinuous
+   * Galerkin Finite Elements (all degrees of freedom have to be associated
+   * with the interior of the cell in that case) in that case.
    *
-   * If @p dof_wise_renumbering is set to @p
-   * true, the degrees of freedom are
-   * renumbered based on the support point
-   * location of the individual degrees of
-   * freedom (obviously, the finite element
-   * needs to define support points for this
-   * to work). The numbering of points with
-   * the same position in downstream location
-   * (e.g. those parallel to the flow
-   * direction, or several dofs within a
-   * FESystem) will be unaffected.
+   * If @p dof_wise_renumbering is set to @p true, the degrees of freedom are
+   * renumbered based on the support point location of the individual degrees
+   * of freedom (obviously, the finite element needs to define support points
+   * for this to work). The numbering of points with the same position in
+   * downstream location (e.g. those parallel to the flow direction, or
+   * several dofs within a FESystem) will be unaffected.
    */
   template <class DH>
   void
@@ -1071,11 +881,8 @@ namespace DoFRenumbering
 
 
   /**
-   * Cell-wise downstream numbering
-   * with respect to a constant
-   * flow direction on one
-   * level. See the other function
-   * with the same name.
+   * Cell-wise downstream numbering with respect to a constant flow direction
+   * on one level. See the other function with the same name.
    */
   template <class DH>
   void
@@ -1085,12 +892,11 @@ namespace DoFRenumbering
               const bool         dof_wise_renumbering = false);
 
   /**
-   * This function does the downstream numbering for the individual
-   * levels of a multigrid hierarchy, but not for the global degrees
-   * of freedom.
+   * This function does the downstream numbering for the individual levels of
+   * a multigrid hierarchy, but not for the global degrees of freedom.
    *
-   * @deprecated Call downstream() function that takes a level
-   * argument for each of the levels of the multigrid hierarchy.
+   * @deprecated Call downstream() function that takes a level argument for
+   * each of the levels of the multigrid hierarchy.
    */
   template <int dim, int spacedim>
   void
@@ -1134,13 +940,9 @@ namespace DoFRenumbering
   }
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * downstream() function. Does
-   * not perform the renumbering on
-   * the DoFHandler dofs but
-   * returns the renumbering
-   * vector.
+   * Computes the renumbering vector needed by the downstream() function. Does
+   * not perform the renumbering on the DoFHandler dofs but returns the
+   * renumbering vector.
    */
   template <class DH>
   void
@@ -1151,13 +953,9 @@ namespace DoFRenumbering
                       const bool                 dof_wise_renumbering);
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * downstream() function. Does
-   * not perform the renumbering on
-   * the DoFHandler dofs but
-   * returns the renumbering
-   * vector.
+   * Computes the renumbering vector needed by the downstream() function. Does
+   * not perform the renumbering on the DoFHandler dofs but returns the
+   * renumbering vector.
    */
   template <class DH>
   void
@@ -1171,16 +969,10 @@ namespace DoFRenumbering
   /**
    * Cell-wise clockwise numbering.
    *
-   * This function produces a
-   * (counter)clockwise ordering of
-   * the mesh cells with respect to
-   * the hub @p center and calls
-   * cell_wise().  Therefore, it
-   * only works with Discontinuous
-   * Galerkin Finite Elements,
-   * i.e. all degrees of freedom
-   * have to be associated with the
-   * interior of the cell.
+   * This function produces a (counter)clockwise ordering of the mesh cells
+   * with respect to the hub @p center and calls cell_wise().  Therefore, it
+   * only works with Discontinuous Galerkin Finite Elements, i.e. all degrees
+   * of freedom have to be associated with the interior of the cell.
    */
   template <class DH>
   void
@@ -1189,9 +981,8 @@ namespace DoFRenumbering
                 const bool        counter = false);
 
   /**
-   * Cell-wise clockwise numbering
-   * on one level. See the other
-   * function with the same name.
+   * Cell-wise clockwise numbering on one level. See the other function with
+   * the same name.
    */
   template <class DH>
   void
@@ -1201,13 +992,9 @@ namespace DoFRenumbering
                 const bool counter = false);
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * clockwise_dg() functions. Does
-   * not perform the renumbering on
-   * the DoFHandler dofs but
-   * returns the renumbering
-   * vector.
+   * Computes the renumbering vector needed by the clockwise_dg()
+   * functions. Does not perform the renumbering on the DoFHandler dofs but
+   * returns the renumbering vector.
    */
   template <class DH>
   void
@@ -1226,22 +1013,13 @@ namespace DoFRenumbering
    */
 
   /**
-   * Sort those degrees of freedom
-   * which are tagged with @p true
-   * in the @p selected_dofs array
-   * to the back of the DoF
-   * numbers. The sorting is
-   * stable, i.e. the relative
-   * order within the tagged
-   * degrees of freedom is
-   * preserved, as is the relative
-   * order within the untagged
-   * ones.
+   * Sort those degrees of freedom which are tagged with @p true in the @p
+   * selected_dofs array to the back of the DoF numbers. The sorting is
+   * stable, i.e. the relative order within the tagged degrees of freedom is
+   * preserved, as is the relative order within the untagged ones.
    *
-   * @pre The @p selected_dofs
-   * array must have as many elements as
-   * the @p dof_handler has degrees of
-   * freedom.
+   * @pre The @p selected_dofs array must have as many elements as the @p
+   * dof_handler has degrees of freedom.
    */
   template <class DH>
   void
@@ -1249,14 +1027,14 @@ namespace DoFRenumbering
                            const std::vector<bool> &selected_dofs);
 
   /**
-   * Sort those degrees of freedom which are tagged with @p true in
-   * the @p selected_dofs array on the level @p level to the back of
-   * the DoF numbers. The sorting is stable, i.e. the relative order
-   * within the tagged degrees of freedom is preserved, as is the
-   * relative order within the untagged ones.
+   * Sort those degrees of freedom which are tagged with @p true in the @p
+   * selected_dofs array on the level @p level to the back of the DoF
+   * numbers. The sorting is stable, i.e. the relative order within the tagged
+   * degrees of freedom is preserved, as is the relative order within the
+   * untagged ones.
    *
-   * @pre The @p selected_dofs array must have as many elements as the
-   * @p dof_handler has degrees of freedom on the given level.
+   * @pre The @p selected_dofs array must have as many elements as the @p
+   * dof_handler has degrees of freedom on the given level.
    */
   template <class DH>
   void
@@ -1265,18 +1043,12 @@ namespace DoFRenumbering
                            const unsigned int       level);
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * sort_selected_dofs_back()
-   * function. Does not perform the
-   * renumbering on the DoFHandler
-   * dofs but returns the
-   * renumbering vector.
+   * Computes the renumbering vector needed by the sort_selected_dofs_back()
+   * function. Does not perform the renumbering on the DoFHandler dofs but
+   * returns the renumbering vector.
    *
-   * @pre The @p selected_dofs
-   * array must have as many elements as
-   * the @p dof_handler has degrees of
-   * freedom.
+   * @pre The @p selected_dofs array must have as many elements as the @p
+   * dof_handler has degrees of freedom.
    */
   template <class DH>
   void
@@ -1285,19 +1057,12 @@ namespace DoFRenumbering
                                    const std::vector<bool>   &selected_dofs);
 
   /**
-   * Computes the renumbering
-   * vector on each level
-   * needed by the
-   * sort_selected_dofs_back()
-   * function. Does not perform the
-   * renumbering on the MGDoFHandler
-   * dofs but returns the
-   * renumbering vector.
+   * Computes the renumbering vector on each level needed by the
+   * sort_selected_dofs_back() function. Does not perform the renumbering on
+   * the MGDoFHandler dofs but returns the renumbering vector.
    *
-   * @pre The @p selected_dofs
-   * array must have as many elements as
-   * the @p dof_handler has degrees of
-   * freedom on the given level.
+   * @pre The @p selected_dofs array must have as many elements as the @p
+   * dof_handler has degrees of freedom on the given level.
    */
   template <class DH>
   void
@@ -1307,19 +1072,15 @@ namespace DoFRenumbering
                                    const unsigned int         level);
 
   /**
-   * Renumber the degrees of
-   * freedom in a random way.
+   * Renumber the degrees of freedom in a random way.
    */
   template <class DH>
   void
   random (DH &dof_handler);
 
   /**
-   * Computes the renumbering
-   * vector needed by the random()
-   * function. Does not perform the
-   * renumbering on the DoFHandler
-   * dofs but returns the
+   * Computes the renumbering vector needed by the random() function. Does not
+   * perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
   template <class DH>
@@ -1337,38 +1098,21 @@ namespace DoFRenumbering
    */
 
   /**
-   * Renumber the degrees of
-   * freedom such that they are
-   * associated with the subdomain
-   * id of the cells they are
-   * living on, i.e. first all
-   * degrees of freedom that belong
-   * to cells with subdomain zero,
-   * then all with subdomain one,
-   * etc. This is useful when doing
-   * parallel computations after
-   * assigning subdomain ids using
-   * a partitioner (see the
-   * GridTools::partition_triangulation
-   * function for this).
+   * Renumber the degrees of freedom such that they are associated with the
+   * subdomain id of the cells they are living on, i.e. first all degrees of
+   * freedom that belong to cells with subdomain zero, then all with subdomain
+   * one, etc. This is useful when doing parallel computations after assigning
+   * subdomain ids using a partitioner (see the
+   * GridTools::partition_triangulation function for this).
    *
-   * Note that degrees of freedom
-   * associated with faces, edges,
-   * and vertices may be associated
-   * with multiple subdomains if
-   * they are sitting on partition
-   * boundaries. It would therefore
-   * be undefined with which
-   * subdomain they have to be
-   * associated. For this, we use
-   * what we get from the
-   * DoFTools::get_subdomain_association
-   * function.
+   * Note that degrees of freedom associated with faces, edges, and vertices
+   * may be associated with multiple subdomains if they are sitting on
+   * partition boundaries. It would therefore be undefined with which
+   * subdomain they have to be associated. For this, we use what we get from
+   * the DoFTools::get_subdomain_association function.
    *
-   * The algorithm is stable, i.e. if
-   * two dofs i,j have <tt>i<j</tt> and belong
-   * to the same subdomain, then they
-   * will be in this order also after
+   * The algorithm is stable, i.e. if two dofs i,j have <tt>i<j</tt> and
+   * belong to the same subdomain, then they will be in this order also after
    * reordering.
    */
   template <class DH>
@@ -1376,13 +1120,9 @@ namespace DoFRenumbering
   subdomain_wise (DH &dof_handler);
 
   /**
-   * Computes the renumbering
-   * vector needed by the
-   * subdomain_wise()
-   * function. Does not perform the
-   * renumbering on the @p
-   * DoFHandler dofs but returns
-   * the renumbering vector.
+   * Computes the renumbering vector needed by the subdomain_wise()
+   * function. Does not perform the renumbering on the @p DoFHandler dofs but
+   * returns the renumbering vector.
    */
   template <class DH>
   void
