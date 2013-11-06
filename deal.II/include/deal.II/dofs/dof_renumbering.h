@@ -120,7 +120,7 @@ DEAL_II_NAMESPACE_OPEN
  * results.  However, after all there is no algorithm that
  * accomplishes this within reasonable time. There are situations
  * where the lack of optimality even leads to worse results than with
- * the original, crude, levelwise numering scheme; one of these
+ * the original, crude, levelwise numbering scheme; one of these
  * examples is a mesh of four cells of which always those cells are
  * refined which are neighbors to the center (you may call this mesh a
  * `zoom in' mesh). In one such example the bandwidth was increased by
@@ -345,7 +345,7 @@ DEAL_II_NAMESPACE_OPEN
  *     after DoFHandler::distribute_dofs. The minimum degree algorithm does not
  *     attempt to minimize the bandwidth of a matrix but to minimize the amount
  *     of fill-in a LU decomposition would produce, i.e. the number of places in
- *     the matrix that would be occupied by elements of an LU decompisition that
+ *     the matrix that would be occupied by elements of an LU decomposition that
  *     are not already occupied by elements of the original matrix. The resulting
  *     sparsity pattern obviously has an entirely different structure than the
  *     ones produced by algorithms trying to minimize the bandwidth.
@@ -466,7 +466,7 @@ namespace DoFRenumbering
    * on algorithms implemented in the Boost Graph Library (BGL) by Jeremy Siek
    * and others.
    *
-   * While often slighty slower to compute, the algorithms using BOOST often
+   * While often slightly slower to compute, the algorithms using BOOST often
    * lead to matrices with smaller bandwidths and sparse ILUs based on this
    * numbering are therefore more efficient.
    *
@@ -602,7 +602,7 @@ namespace DoFRenumbering
    * You can give a triangulation level to which this function is to be
    * applied.  Since with a level-wise numbering there are no hanging nodes,
    * no constraints can be used, so the respective parameter of the previous
-   * function is ommitted.
+   * function is omitted.
    *
    * See the general documentation of this class for details on the different
    * methods.
