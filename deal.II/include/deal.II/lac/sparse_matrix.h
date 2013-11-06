@@ -1492,7 +1492,9 @@ public:
    * elements in a row are written in ascending column order.
    */
   template <class STREAM>
-  void print (STREAM &out, bool across=false, bool diagonal_first=true) const;
+  void print (STREAM &out,
+	      const bool across = false,
+	      const bool diagonal_first = true) const;
 
   /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
@@ -2474,13 +2476,15 @@ SparseMatrix<number>::end (const size_type r)
 template <typename number>
 template <class STREAM>
 inline
-void SparseMatrix<number>::print (STREAM &out, bool across, bool diagonal_first) const
+void SparseMatrix<number>::print (STREAM &out,
+				  const bool across,
+				  const bool diagonal_first) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
 
   bool hanging_diagonal = false;
-  number diagonal;
+  number diagonal = number();
 
   for (size_type i=0; i<cols->rows; ++i)
     {
