@@ -85,6 +85,10 @@ IF (DEAL_II_WITH_P4EST)
   make_quicktest("p4est" ${_mybuild} 10)
 ENDIF()
 
+# Test slepc
+IF (DEAL_II_WITH_SLEPC)
+  make_quicktest("step-slepc" ${_mybuild} "")
+ENDIF()
 
 # A custom test target:
 ADD_CUSTOM_TARGET(test
