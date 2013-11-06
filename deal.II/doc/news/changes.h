@@ -203,6 +203,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There is now a framework for coloring graphs, with functions
+  in namespace GraphColoring.
+  <br>
+  (Bruno Turcksin, Martin Kronbichler, 2013/11/06)
+  </li>
+
   <li>
   Fixed: the DerivativeApproximation class was not working correctly when
   used with parallel vectors.
