@@ -31,60 +31,29 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/// This namespace contains the functions necessary to color graphs.
-namespace graph_coloring
+/**
+ * A namespace containing functions that can color graphs.
+ */
+namespace GraphColoring
 {
   namespace internal
   {
     /**
      * Create a partitioning of the given range of iterators using a simplified
      * version of the Cuthill-McKee algorithm (Breadth First Search algorithm).
-     * Any pair of two iterators that point to conflicting objects will be placed
-     * into different partitions, where the question whether two objects conflict
-     * is determined by a user-provided function.
+     * The function creates partitions that contain "zones" of iterators
+     * where the first partition contains the first iterator, the second
+     * zone contains all those iterators that have conflicts with the single
+     * element in the first zone, the third zone contains those iterators that
+     * have conflicts with the iterators of the second zone and have not previously
+     * been assigned to a zone, etc. If the iterators represent cells, then this
+     * generates partitions that are like onion shells around the very first
+     * cell. Note that elements in each zone may conflict with other elements in
+     * the same zone.
      *
-     * This function can also be considered as a graph coloring: each object
-     * pointed to by an iterator is considered to be a node and there is an
-     * edge between each two nodes that conflict. The graph coloring algorithm
-     * then assigns a color to each node in such a way that two nodes connected
-     * by an edge do not have the same color.
-     *
-     * A typical use case for this function is in assembling a matrix in parallel.
-     * There, one would like to assemble local contributions on different cells
-     * at the same time (an operation that is purely local and so requires
-     * no synchronization) but then we need to add these local contributions
-     * to the global matrix. In general, the contributions from different cells
-     * may be to the same matrix entries if the cells share degrees of freedom
-     * and, consequently, can not happen at the same time unless we want to
-     * risk a race condition (see http://en.wikipedia.org/wiki/Race_condition ).
-     * Thus, we call these two cells in conflict, and we can only allow operations
-     * in parallel from cells that do not conflict. In other words, two cells
-     * are in conflict if the set of matrix entries (for example characterized
-     * by the rows) have a nonempty intersection.
-     *
-     * In this generality, computing the graph of conflicts would require calling
-     * a function that determines whether two iterators (or the two objects they
-     * represent) conflict, and calling it for every pair of iterators, i.e.,
-     * $\frac 12 N (N-1)$ times. This is too expensive in general. A better
-     * approach is to require a user-defined function that returns for every
-     * iterator it is called for a set of indicators of some kind that characterize
-     * a conflict; two iterators are in conflict if their conflict indicator sets
-     * have a nonempty intersection. In the example of assembling a matrix,
-     * the conflict indicator set would contain the indices of all degrees of
-     * freedom on the cell pointed to (in the case of continuous Galerkin methods)
-     * or the union of indices of degree of freedom on the current cell and all
-     * cells adjacent to the faces of the current cell (in the case of
-     * discontinuous Galerkin methods, because there one computes face integrals
-     * coupling the degrees of freedom connected by a common face -- see step-12).
-     * However, in other situations, these conflict indicator sets may represent
-     * something different altogether -- it is up to the caller of this function
-     * to describe what it means for two iterators to conflict. Given this,
-     * computing conflict graph edges can be done significantly more cheaply
-     * than with ${\cal O}(N^2)$ operations.
-     *
-     * In any case, the result of the function will be so that iterators whose
-     * conflict indicator sets have overlap will not be assigned to the same
-     * partition (i.e., they will have a different color).
+     * The question whether two iterators conflict is determined by a user-provided
+     * function. The meaning of this function is discussed in the documentation of
+     * the GraphColoring::make_graph_coloring() function.
      *
      * @param[in] begin The first element of a range of iterators for which a
      *      partitioning is sought.
@@ -95,8 +64,7 @@ namespace graph_coloring
      * @return A set of sets of iterators (where sets are represented by
      *      std::vector for efficiency). Each element of the outermost set
      *      corresponds to the iterators pointing to objects that are in the
-     *      same partition (have the same color) and consequently do not
-     *      conflict. The elements of different sets may conflict.
+     *      same partition (i.e., the same zone).
      *
      * @author Martin Kronbichler, Bruno Turcksin
      */
@@ -106,8 +74,6 @@ namespace graph_coloring
                         const typename identity<Iterator>::type &end,
                         const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices)
     {
-      std::vector<std::vector<Iterator> > partitioning(1,std::vector<Iterator> (1,begin));
-
       // Number of iterators.
       unsigned int n_iterators = 0;
 
@@ -115,67 +81,93 @@ namespace graph_coloring
       boost::unordered_map<types::global_dof_index,std::vector<Iterator> > indices_to_iterators;
       for (Iterator it=begin; it!=end; ++it)
         {
-          std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(it);
+          const std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(it);
           const unsigned int n_conflict_indices = conflict_indices.size();
           for (unsigned int i=0; i<n_conflict_indices; ++i)
             indices_to_iterators[conflict_indices[i]].push_back(it);
           ++n_iterators;
         }
 
-      // Create the partitioning.
+      // create the very first zone which contains only the first
+      // iterator. then create the other zones. keep track of all the
+      // iterators that have already been assigned to a zone
+      std::vector<std::vector<Iterator> > zones(1,std::vector<Iterator> (1,begin));
       std::set<Iterator> used_it;
       used_it.insert(begin);
       while (used_it.size()!=n_iterators)
         {
-          typename std::vector<Iterator>::iterator vector_it(partitioning.back().begin());
-          typename std::vector<Iterator>::iterator vector_end(partitioning.back().end());
+          // loop over the elements of the previous zone. for each element of
+          // the previous zone, get the conflict indices and from there get
+          // those iterators that are conflicting with the current element
+          typename std::vector<Iterator>::iterator previous_zone_it(zones.back().begin());
+          typename std::vector<Iterator>::iterator previous_zone_end(zones.back().end());
           std::vector<Iterator> new_zone;
-          for (; vector_it!=vector_end; ++vector_it)
+          for (; previous_zone_it!=previous_zone_end; ++previous_zone_it)
             {
-              std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(*vector_it);
+              std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(*previous_zone_it);
               const unsigned int n_conflict_indices(conflict_indices.size());
               for (unsigned int i=0; i<n_conflict_indices; ++i)
                 {
-                  std::vector<Iterator> iterator_vector(indices_to_iterators[conflict_indices[i]]);
-                  for (unsigned int j=0; j<iterator_vector.size(); ++j)
+                  const std::vector<Iterator> &conflicting_elements
+                  = indices_to_iterators[conflict_indices[i]];
+                  for (unsigned int j=0; j<conflicting_elements.size(); ++j)
                     {
-                      // Check that the iterator is not associated to a zone yet.
-                      if (used_it.count(iterator_vector[j])==0)
+                      // check that the iterator conflicting with the current one is not
+                      // associated to a zone yet and if so, assign it to the current
+                      // zone. mark it as used
+                      //
+                      // we can shortcut this test if the conflicting iterator is the
+                      // current iterator
+                      if ((conflicting_elements[j] != *previous_zone_it)
+                          &&
+                          (used_it.count(conflicting_elements[j])==0))
                         {
-                          new_zone.push_back(iterator_vector[j]);
-                          used_it.insert(iterator_vector[j]);
+                          new_zone.push_back(conflicting_elements[j]);
+                          used_it.insert(conflicting_elements[j]);
                         }
                     }
                 }
             }
+
           // If there are iterators in the new zone, then the zone is added to the
           // partition. Otherwise, the graph is disconnected and we need to find
-          // an iterator on the other part of the graph.
+          // an iterator on the other part of the graph. start the whole process again
+          // with the first iterator that hasn't been assigned to a zone yet
           if (new_zone.size()!=0)
-            partitioning.push_back(new_zone);
+            zones.push_back(new_zone);
           else
             for (Iterator it=begin; it!=end; ++it)
               if (used_it.count(it)==0)
                 {
-                  partitioning.push_back(std::vector<Iterator> (1,it));
+                  zones.push_back(std::vector<Iterator> (1,it));
                   break;
                 }
         }
 
-      return partitioning;
+      return zones;
     }
 
 
 
     /**
-     * This function uses DSATUR (Degree SATURation) to color one zone of the
-     * partition. DSATUR works as follows:
+     * This function uses DSATUR (Degree SATURation) to color the elements of
+     * a set. DSATUR works as follows:
      *   -# Arrange the vertices by decreasing order of degrees.
      *   -# Color a vertex of maximal degree with color 1.
      *   -# Choose a vertex with a maximal saturation degree. If there is equality,
      *      choose any vertex of maximal degree in the uncolored subgraph.
      *   -# Color the chosen vertex with the least possible (lowest numbered) color.
      *   -# If all the vertices are colored, stop. Otherwise, return to 3.
+     *
+     * @param[in] partition The set of iterators that should be colored.
+     * @param[in] get_conflict_indices A user defined function object returning
+     *      a set of indicators that are descriptive of what represents a
+     *      conflict. See above for a more thorough discussion.
+     * @return A set of sets of iterators (where sets are represented by
+     *      std::vector for efficiency). Each element of the outermost set
+     *      corresponds to the iterators pointing to objects that are in the
+     *      same partition (have the same color) and consequently do not
+     *      conflict. The elements of different sets may conflict.
      */
     template <typename Iterator>
     std::vector<std::vector<Iterator> >
@@ -208,8 +200,10 @@ namespace graph_coloring
             conflict_indices_intersection.resize(std::max(conflict_indices[i].size(),
                                                           conflict_indices[j].size()));
             intersection_it = std::set_intersection(conflict_indices[i].begin(),
-                                                    conflict_indices[i].end(),conflict_indices[j].begin(),
-                                                    conflict_indices[j].end(),conflict_indices_intersection.begin());
+                                                    conflict_indices[i].end(),
+                                                    conflict_indices[j].begin(),
+                                                    conflict_indices[j].end(),
+                                                    conflict_indices_intersection.begin());
             // If the two iterators share indices then we increase the degree of the
             // vertices and create an ''edge'' in the graph.
             if (intersection_it!=conflict_indices_intersection.begin())

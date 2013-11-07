@@ -949,8 +949,8 @@ namespace WorkStream
      else
        {
          // color the graph
-         std::vector<std::vector<Iterator> > coloring = graph_coloring::make_graph_coloring(
-             begin,end,get_conflict_indices);
+         std::vector<std::vector<Iterator> > coloring
+         = GraphColoring::make_graph_coloring(begin, end, get_conflict_indices);
 
          // For colors that do not have enough cells, i.e., less than chunk_size times
          // multithread_info.n_threads(), the copier is called serially.
