@@ -80,7 +80,7 @@ void check ()
       cell != stokes_dof_handler.end(); ++cell)
     cell->clear_user_flag ();
   std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator> > coloring 
-    = graph_coloring::make_graph_coloring(stokes_dof_handler.begin_active(),
+    = GraphColoring::make_graph_coloring(stokes_dof_handler.begin_active(),
         stokes_dof_handler.end(),
         std_cxx1x::function<std::vector<types::global_dof_index> (
           const typename DoFHandler<dim>::active_cell_iterator &)>(&get_conflict_indices<dim>));
