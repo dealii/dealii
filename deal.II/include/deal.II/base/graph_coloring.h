@@ -20,6 +20,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <boost/unordered_map.hpp>
@@ -163,18 +164,20 @@ namespace GraphColoring
      * @param[in] get_conflict_indices A user defined function object returning
      *      a set of indicators that are descriptive of what represents a
      *      conflict. See above for a more thorough discussion.
-     * @return A set of sets of iterators (where sets are represented by
+     * @param[out] partition_coloring A set of sets of iterators (where sets are represented by
      *      std::vector for efficiency). Each element of the outermost set
      *      corresponds to the iterators pointing to objects that are in the
      *      same partition (have the same color) and consequently do not
      *      conflict. The elements of different sets may conflict.
      */
     template <typename Iterator>
-    std::vector<std::vector<Iterator> >
+    void
     make_dsatur_coloring(std::vector<Iterator> &partition,
-                         const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices)
+                         const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices,
+                         std::vector<std::vector<Iterator> > &partition_coloring)
     {
-      std::vector<std::vector<Iterator> > partition_coloring;
+      partition_coloring.clear ();
+
       // Number of zones composing the partitioning.
       const unsigned int partition_size(partition.size());
       std::vector<unsigned int> sorted_vertices(partition_size);
@@ -265,16 +268,17 @@ namespace GraphColoring
               colors_used.push_back(tmp);
             }
         }
-
-      return partition_coloring;
     }
 
 
 
     /**
-     * Given a partition-coloring graph, gather the colors together. All the
-     * colors on even (resp. odd) partition can be executed simultaneously. This
-     * function tries to create colors of similar number of elements.
+     * Given a partition-coloring graph, i.e., a set of zones (partitions) each
+     * of which is colored, produce a combined coloring for the entire set of
+     * iterators. This is possible because any color on an
+     * even (resp. odd) zone does not conflict with any color of any other even
+     * (resp. odd) zone. Consequently, we can combine colors from all even and all
+     * odd zones. This function tries to create colors of similar number of elements.
      */
     template <typename Iterator>
     std::vector<std::vector<Iterator> >
@@ -473,17 +477,18 @@ namespace GraphColoring
                                                   get_conflict_indices);
 
     // Color the iterators within each partition.
+    // Run the coloring algorithm on each zone in parallel
     const unsigned int partitioning_size(partitioning.size());
     std::vector<std::vector<std::vector<Iterator> > >
     partition_coloring(partitioning_size);
 
-    // TODO: run these in parallel
+    Threads::TaskGroup<> tasks;
     for (unsigned int i=0; i<partitioning_size; ++i)
-      {
-        // Compute the coloring of the graph using the DSATUR algorithm
-        partition_coloring[i] = internal::make_dsatur_coloring (partitioning[i],
-                                                                get_conflict_indices);
-      }
+      tasks += Threads::new_task (&internal::make_dsatur_coloring<Iterator>,
+                                  partitioning[i],
+                                  get_conflict_indices,
+                                  partition_coloring[i]);
+    tasks.join_all();
 
     // Gather the colors together.
     return internal::gather_colors(partition_coloring);
