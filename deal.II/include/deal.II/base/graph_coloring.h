@@ -110,7 +110,7 @@ namespace GraphColoring
               for (unsigned int i=0; i<n_conflict_indices; ++i)
                 {
                   const std::vector<Iterator> &conflicting_elements
-                  = indices_to_iterators[conflict_indices[i]];
+                    = indices_to_iterators[conflict_indices[i]];
                   for (unsigned int j=0; j<conflicting_elements.size(); ++j)
                     {
                       // check that the iterator conflicting with the current one is not
@@ -347,51 +347,54 @@ namespace GraphColoring
             }
         }
 
-      // Do the same thing that we did for the even partitions to the odd
-      // partitions
-      unsigned int max_odd_n_colors(0);
-      for (unsigned int i=1; i<partition_size; i+=2)
+      // If there is more than one partition, do the same thing that we did for the even partitions 
+      // to the odd partitions
+      if (partition_size>1)
         {
-          if (max_odd_n_colors<colors_counter[i].size())
+          unsigned int max_odd_n_colors(0);
+          for (unsigned int i=1; i<partition_size; i+=2)
             {
-              max_odd_n_colors = colors_counter[i].size();
-              i_color = i;
-            }
-        }
-      coloring.resize(max_even_n_colors+max_odd_n_colors);
-      for (unsigned int j=0; j<colors_counter[i_color].size(); ++j)
-        coloring[max_even_n_colors+j] = partition_coloring[i_color][j];
-
-      for (unsigned int i=1; i<partition_size; i+=2)
-        {
-          if (i!=i_color)
-            {
-              boost::unordered_set<unsigned int> used_k;
-              for (unsigned int j=0; j<colors_counter[i].size(); ++j)
+              if (max_odd_n_colors<colors_counter[i].size())
                 {
-                  // Find the color in the current partition with the largest number of
-                  // iterators.
-                  std::vector<unsigned int>::iterator it;
-                  it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
-                  unsigned int min_iterators(-1);
-                  unsigned int pos(0);
-                  // Find the color of coloring with the least number of colors among
-                  // the colors that have not been used yet.
-                  for (unsigned int k=0; k<max_odd_n_colors; ++k)
-                    if (used_k.count(k)==0)
-                      if (colors_counter[i_color][k]<min_iterators)
-                        {
-                          min_iterators = colors_counter[i_color][k];
-                          pos = k;
-                        }
-                  colors_counter[i_color][pos] += *it;
-                  // Concatenate the current color with the existing coloring.
-                  coloring[max_even_n_colors+pos].insert(coloring[max_even_n_colors+pos].end(),
-                                                         partition_coloring[i][it-colors_counter[i].begin()].begin(),
-                                                         partition_coloring[i][it-colors_counter[i].begin()].end());
-                  used_k.insert(pos);
-                  // Put the number of iterators to the current color to zero.
-                  *it = 0;
+                  max_odd_n_colors = colors_counter[i].size();
+                  i_color = i;
+                }
+            }
+          coloring.resize(max_even_n_colors+max_odd_n_colors);
+          for (unsigned int j=0; j<colors_counter[i_color].size(); ++j)
+            coloring[max_even_n_colors+j] = partition_coloring[i_color][j];
+
+          for (unsigned int i=1; i<partition_size; i+=2)
+            {
+              if (i!=i_color)
+                {
+                  boost::unordered_set<unsigned int> used_k;
+                  for (unsigned int j=0; j<colors_counter[i].size(); ++j)
+                    {
+                      // Find the color in the current partition with the largest number of
+                      // iterators.
+                      std::vector<unsigned int>::iterator it;
+                      it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
+                      unsigned int min_iterators(-1);
+                      unsigned int pos(0);
+                      // Find the color of coloring with the least number of colors among
+                      // the colors that have not been used yet.
+                      for (unsigned int k=0; k<max_odd_n_colors; ++k)
+                        if (used_k.count(k)==0)
+                          if (colors_counter[i_color][k]<min_iterators)
+                            {
+                              min_iterators = colors_counter[i_color][k];
+                              pos = k;
+                            }
+                      colors_counter[i_color][pos] += *it;
+                      // Concatenate the current color with the existing coloring.
+                      coloring[max_even_n_colors+pos].insert(coloring[max_even_n_colors+pos].end(),
+                                                             partition_coloring[i][it-colors_counter[i].begin()].begin(),
+                                                             partition_coloring[i][it-colors_counter[i].begin()].end());
+                      used_k.insert(pos);
+                      // Put the number of iterators to the current color to zero.
+                      *it = 0;
+                    }
                 }
             }
         }
