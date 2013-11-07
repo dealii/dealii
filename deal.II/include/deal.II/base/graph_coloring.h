@@ -404,10 +404,67 @@ namespace graph_coloring
 
 
   /**
-   * This function creates a coloring given two iterators on the DoFHandler
-   * and a function that return the conflict indices given an iterator. When
-   * using continuous finite elements, the conflict_indices can be the dofs
-   * indices.
+   * Create a partitioning of the given range of iterators so that
+   * iterators that point to conflicting objects will be placed
+   * into different partitions, where the question whether two objects conflict
+   * is determined by a user-provided function.
+   *
+   * This function can also be considered as a graph coloring: each object
+   * pointed to by an iterator is considered to be a node and there is an
+   * edge between each two nodes that conflict. The graph coloring algorithm
+   * then assigns a color to each node in such a way that two nodes connected
+   * by an edge do not have the same color.
+   *
+   * A typical use case for this function is in assembling a matrix in parallel.
+   * There, one would like to assemble local contributions on different cells
+   * at the same time (an operation that is purely local and so requires
+   * no synchronization) but then we need to add these local contributions
+   * to the global matrix. In general, the contributions from different cells
+   * may be to the same matrix entries if the cells share degrees of freedom
+   * and, consequently, can not happen at the same time unless we want to
+   * risk a race condition (see http://en.wikipedia.org/wiki/Race_condition ).
+   * Thus, we call these two cells in conflict, and we can only allow operations
+   * in parallel from cells that do not conflict. In other words, two cells
+   * are in conflict if the set of matrix entries (for example characterized
+   * by the rows) have a nonempty intersection.
+   *
+   * In this generality, computing the graph of conflicts would require calling
+   * a function that determines whether two iterators (or the two objects they
+   * represent) conflict, and calling it for every pair of iterators, i.e.,
+   * $\frac 12 N (N-1)$ times. This is too expensive in general. A better
+   * approach is to require a user-defined function that returns for every
+   * iterator it is called for a set of indicators of some kind that characterize
+   * a conflict; two iterators are in conflict if their conflict indicator sets
+   * have a nonempty intersection. In the example of assembling a matrix,
+   * the conflict indicator set would contain the indices of all degrees of
+   * freedom on the cell pointed to (in the case of continuous Galerkin methods)
+   * or the union of indices of degree of freedom on the current cell and all
+   * cells adjacent to the faces of the current cell (in the case of
+   * discontinuous Galerkin methods, because there one computes face integrals
+   * coupling the degrees of freedom connected by a common face -- see step-12).
+   * However, in other situations, these conflict indicator sets may represent
+   * something different altogether -- it is up to the caller of this function
+   * to describe what it means for two iterators to conflict. Given this,
+   * computing conflict graph edges can be done significantly more cheaply
+   * than with ${\cal O}(N^2)$ operations.
+   *
+   * In any case, the result of the function will be so that iterators whose
+   * conflict indicator sets have overlap will not be assigned to the same
+   * partition (i.e., they will have a different color).
+   *
+   * @param[in] begin The first element of a range of iterators for which a
+   *      partitioning is sought.
+   * @param[in] end The element past the end of the range of iterators.
+   * @param[in] get_conflict_indices A user defined function object returning
+   *      a set of indicators that are descriptive of what represents a
+   *      conflict. See above for a more thorough discussion.
+   * @return A set of sets of iterators (where sets are represented by
+   *      std::vector for efficiency). Each element of the outermost set
+   *      corresponds to the iterators pointing to objects that are in the
+   *      same partition (have the same color) and consequently do not
+   *      conflict. The elements of different sets may conflict.
+   *
+   * @author Martin Kronbichler, Bruno Turcksin
    */
   template <typename Iterator>
   std::vector<std::vector<Iterator> >
@@ -430,8 +487,8 @@ namespace graph_coloring
     for (unsigned int i=0; i<partitioning_size; ++i)
       {
         // Compute the coloring of the graph using the DSATUR algorithm
-        partition_coloring[i] = make_dsatur_coloring(partitioning[i],
-                                                     get_conflict_indices);
+        partition_coloring[i] = internal::make_dsatur_coloring (partitioning[i],
+                                                                get_conflict_indices);
       }
 
     // Gather the colors together.
