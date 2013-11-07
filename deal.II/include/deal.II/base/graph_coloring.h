@@ -282,7 +282,7 @@ namespace GraphColoring
      */
     template <typename Iterator>
     std::vector<std::vector<Iterator> >
-    gather_colors(std::vector<std::vector<std::vector<Iterator> > > const &partition_coloring)
+    gather_colors(const std::vector<std::vector<std::vector<Iterator> > > &partition_coloring)
     {
       std::vector<std::vector<Iterator> > coloring;
 
