@@ -31,374 +31,376 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/// This namespace contains the functions necessary to color a graph.
+/// This namespace contains the functions necessary to color graphs.
 namespace graph_coloring
 {
-  /**
-   * Create a partitioning of the given range of iterators using a simplified
-   * version of the Cuthill-McKee algorithm (Breadth First Search algorithm).
-   * Any pair of two iterators that point to conflicting objects will be placed
-   * into different partitions, where the question whether two objects conflict
-   * is determined by a user-provided function.
-   *
-   * This function can also be considered as a graph coloring: each object
-   * pointed to by an iterator is considered to be a node and there is an
-   * edge between each two nodes that conflict. The graph coloring algorithm
-   * then assigns a color to each node in such a way that two nodes connected
-   * by an edge do not have the same color.
-   *
-   * A typical use case for this function is in assembling a matrix in parallel.
-   * There, one would like to assemble local contributions on different cells
-   * at the same time (an operation that is purely local and so requires
-   * no synchronization) but then we need to add these local contributions
-   * to the global matrix. In general, the contributions from different cells
-   * may be to the same matrix entries if the cells share degrees of freedom
-   * and, consequently, can not happen at the same time unless we want to
-   * risk a race condition (see http://en.wikipedia.org/wiki/Race_condition ).
-   * Thus, we call these two cells in conflict, and we can only allow operations
-   * in parallel from cells that do not conflict. In other words, two cells
-   * are in conflict if the set of matrix entries (for example characterized
-   * by the rows) have a nonempty intersection.
-   *
-   * In this generality, computing the graph of conflicts would require calling
-   * a function that determines whether two iterators (or the two objects they
-   * represent) conflict, and calling it for every pair of iterators, i.e.,
-   * $\frac 12 N (N-1)$ times. This is too expensive in general. A better
-   * approach is to require a user-defined function that returns for every
-   * iterator it is called for a set of indicators of some kind that characterize
-   * a conflict; two iterators are in conflict if their conflict indicator sets
-   * have a nonempty intersection. In the example of assembling a matrix,
-   * the conflict indicator set would contain the indices of all degrees of
-   * freedom on the cell pointed to (in the case of continuous Galerkin methods)
-   * or the union of indices of degree of freedom on the current cell and all
-   * cells adjacent to the faces of the current cell (in the case of
-   * discontinuous Galerkin methods, because there one computes face integrals
-   * coupling the degrees of freedom connected by a common face -- see step-12).
-   * However, in other situations, these conflict indicator sets may represent
-   * something different altogether -- it is up to the caller of this function
-   * to describe what it means for two iterators to conflict. Given this,
-   * computing conflict graph edges can be done significantly more cheaply
-   * than with ${\cal O}(N^2)$ operations.
-   *
-   * In any case, the result of the function will be so that iterators whose
-   * conflict indicator sets have overlap will not be assigned to the same
-   * partition (i.e., they will have a different color).
-   *
-   * @param[in] begin The first element of a range of iterators for which a
-   *      partitioning is sought.
-   * @param[in] end The element past the end of the range of iterators.
-   * @param[in] get_conflict_indices A user defined function object returning
-   *      a set of indicators that are descriptive of what represents a
-   *      conflict. See above for a more thorough discussion.
-   * @return A set of sets of iterators (where sets are represented by
-   *      std::vector for efficiency). Each element of the outermost set
-   *      corresponds to the iterators pointing to objects that are in the
-   *      same partition (have the same color) and consequently do not
-   *      conflict. The elements of different sets may conflict.
-   *
-   * @author Martin Kronbichler, Bruno Turcksin
-   */
-  template <typename Iterator>
-  std::vector<std::vector<Iterator> >
-  create_partitioning(const Iterator &begin,
-      const typename identity<Iterator>::type &end,
-      const std_cxx1x::function<std::vector<types::global_dof_index> (Iterator const &)> &get_conflict_indices)
+  namespace internal
   {
-    std::vector<std::vector<Iterator> > partitioning(1,std::vector<Iterator> (1,begin));
-
-    // Number of iterators.
-    unsigned int n_iterators = 0;
-
-    // Create a map from conflict indices to iterators
-    boost::unordered_map<types::global_dof_index,std::vector<Iterator> > indices_to_iterators;
-    for (Iterator it=begin; it!=end; ++it)
+    /**
+     * Create a partitioning of the given range of iterators using a simplified
+     * version of the Cuthill-McKee algorithm (Breadth First Search algorithm).
+     * Any pair of two iterators that point to conflicting objects will be placed
+     * into different partitions, where the question whether two objects conflict
+     * is determined by a user-provided function.
+     *
+     * This function can also be considered as a graph coloring: each object
+     * pointed to by an iterator is considered to be a node and there is an
+     * edge between each two nodes that conflict. The graph coloring algorithm
+     * then assigns a color to each node in such a way that two nodes connected
+     * by an edge do not have the same color.
+     *
+     * A typical use case for this function is in assembling a matrix in parallel.
+     * There, one would like to assemble local contributions on different cells
+     * at the same time (an operation that is purely local and so requires
+     * no synchronization) but then we need to add these local contributions
+     * to the global matrix. In general, the contributions from different cells
+     * may be to the same matrix entries if the cells share degrees of freedom
+     * and, consequently, can not happen at the same time unless we want to
+     * risk a race condition (see http://en.wikipedia.org/wiki/Race_condition ).
+     * Thus, we call these two cells in conflict, and we can only allow operations
+     * in parallel from cells that do not conflict. In other words, two cells
+     * are in conflict if the set of matrix entries (for example characterized
+     * by the rows) have a nonempty intersection.
+     *
+     * In this generality, computing the graph of conflicts would require calling
+     * a function that determines whether two iterators (or the two objects they
+     * represent) conflict, and calling it for every pair of iterators, i.e.,
+     * $\frac 12 N (N-1)$ times. This is too expensive in general. A better
+     * approach is to require a user-defined function that returns for every
+     * iterator it is called for a set of indicators of some kind that characterize
+     * a conflict; two iterators are in conflict if their conflict indicator sets
+     * have a nonempty intersection. In the example of assembling a matrix,
+     * the conflict indicator set would contain the indices of all degrees of
+     * freedom on the cell pointed to (in the case of continuous Galerkin methods)
+     * or the union of indices of degree of freedom on the current cell and all
+     * cells adjacent to the faces of the current cell (in the case of
+     * discontinuous Galerkin methods, because there one computes face integrals
+     * coupling the degrees of freedom connected by a common face -- see step-12).
+     * However, in other situations, these conflict indicator sets may represent
+     * something different altogether -- it is up to the caller of this function
+     * to describe what it means for two iterators to conflict. Given this,
+     * computing conflict graph edges can be done significantly more cheaply
+     * than with ${\cal O}(N^2)$ operations.
+     *
+     * In any case, the result of the function will be so that iterators whose
+     * conflict indicator sets have overlap will not be assigned to the same
+     * partition (i.e., they will have a different color).
+     *
+     * @param[in] begin The first element of a range of iterators for which a
+     *      partitioning is sought.
+     * @param[in] end The element past the end of the range of iterators.
+     * @param[in] get_conflict_indices A user defined function object returning
+     *      a set of indicators that are descriptive of what represents a
+     *      conflict. See above for a more thorough discussion.
+     * @return A set of sets of iterators (where sets are represented by
+     *      std::vector for efficiency). Each element of the outermost set
+     *      corresponds to the iterators pointing to objects that are in the
+     *      same partition (have the same color) and consequently do not
+     *      conflict. The elements of different sets may conflict.
+     *
+     * @author Martin Kronbichler, Bruno Turcksin
+     */
+    template <typename Iterator>
+    std::vector<std::vector<Iterator> >
+    create_partitioning(const Iterator &begin,
+                        const typename identity<Iterator>::type &end,
+                        const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices)
     {
-      std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(it);
-      const unsigned int n_conflict_indices = conflict_indices.size();
-      for (unsigned int i=0; i<n_conflict_indices; ++i)
-        indices_to_iterators[conflict_indices[i]].push_back(it);
-      ++n_iterators;
-    }
+      std::vector<std::vector<Iterator> > partitioning(1,std::vector<Iterator> (1,begin));
 
-    // Create the partitioning.
-    std::set<Iterator> used_it;
-    used_it.insert(begin);
-    while (used_it.size()!=n_iterators)
-    {
-      typename std::vector<Iterator>::iterator vector_it(partitioning.back().begin());
-      typename std::vector<Iterator>::iterator vector_end(partitioning.back().end());
-      std::vector<Iterator> new_zone;
-      for (; vector_it!=vector_end; ++vector_it)
-      {
-        std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(*vector_it);
-        const unsigned int n_conflict_indices(conflict_indices.size());
-        for (unsigned int i=0; i<n_conflict_indices; ++i)
+      // Number of iterators.
+      unsigned int n_iterators = 0;
+
+      // Create a map from conflict indices to iterators
+      boost::unordered_map<types::global_dof_index,std::vector<Iterator> > indices_to_iterators;
+      for (Iterator it=begin; it!=end; ++it)
         {
-          std::vector<Iterator> iterator_vector(indices_to_iterators[conflict_indices[i]]);
-          for (unsigned int j=0; j<iterator_vector.size(); ++j)
-          {
-            // Check that the iterator is not associated to a zone yet.
-            if (used_it.count(iterator_vector[j])==0)
+          std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(it);
+          const unsigned int n_conflict_indices = conflict_indices.size();
+          for (unsigned int i=0; i<n_conflict_indices; ++i)
+            indices_to_iterators[conflict_indices[i]].push_back(it);
+          ++n_iterators;
+        }
+
+      // Create the partitioning.
+      std::set<Iterator> used_it;
+      used_it.insert(begin);
+      while (used_it.size()!=n_iterators)
+        {
+          typename std::vector<Iterator>::iterator vector_it(partitioning.back().begin());
+          typename std::vector<Iterator>::iterator vector_end(partitioning.back().end());
+          std::vector<Iterator> new_zone;
+          for (; vector_it!=vector_end; ++vector_it)
             {
-              new_zone.push_back(iterator_vector[j]);
-              used_it.insert(iterator_vector[j]);
+              std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(*vector_it);
+              const unsigned int n_conflict_indices(conflict_indices.size());
+              for (unsigned int i=0; i<n_conflict_indices; ++i)
+                {
+                  std::vector<Iterator> iterator_vector(indices_to_iterators[conflict_indices[i]]);
+                  for (unsigned int j=0; j<iterator_vector.size(); ++j)
+                    {
+                      // Check that the iterator is not associated to a zone yet.
+                      if (used_it.count(iterator_vector[j])==0)
+                        {
+                          new_zone.push_back(iterator_vector[j]);
+                          used_it.insert(iterator_vector[j]);
+                        }
+                    }
+                }
             }
-          }
+          // If there are iterators in the new zone, then the zone is added to the
+          // partition. Otherwise, the graph is disconnected and we need to find
+          // an iterator on the other part of the graph.
+          if (new_zone.size()!=0)
+            partitioning.push_back(new_zone);
+          else
+            for (Iterator it=begin; it!=end; ++it)
+              if (used_it.count(it)==0)
+                {
+                  partitioning.push_back(std::vector<Iterator> (1,it));
+                  break;
+                }
         }
-      }
-      // If there are iterators in the new zone, then the zone is added to the
-      // partition. Otherwise, the graph is disconnected and we need to find
-      // an iterator on the other part of the graph.
-      if (new_zone.size()!=0)
-        partitioning.push_back(new_zone);
-      else
-        for (Iterator it=begin; it!=end; ++it)
-          if (used_it.count(it)==0)
+
+      return partitioning;
+    }
+
+
+
+    /**
+     * This function uses DSATUR (Degree SATURation) to color one zone of the
+     * partition. DSATUR works as follows:
+     *   -# Arrange the vertices by decreasing order of degrees.
+     *   -# Color a vertex of maximal degree with color 1.
+     *   -# Choose a vertex with a maximal saturation degree. If there is equality,
+     *      choose any vertex of maximal degree in the uncolored subgraph.
+     *   -# Color the chosen vertex with the least possible (lowest numbered) color.
+     *   -# If all the vertices are colored, stop. Otherwise, return to 3.
+     */
+    template <typename Iterator>
+    std::vector<std::vector<Iterator> >
+    make_dsatur_coloring(std::vector<Iterator> &partition,
+                         const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices)
+    {
+      std::vector<std::vector<Iterator> > partition_coloring;
+      // Number of zones composing the partitioning.
+      const unsigned int partition_size(partition.size());
+      std::vector<unsigned int> sorted_vertices(partition_size);
+      std::vector<int> degrees(partition_size);
+      std::vector<std::vector<types::global_dof_index> > conflict_indices(partition_size);
+      std::vector<std::vector<unsigned int> > graph(partition_size);
+
+      // Get the conflict indices associated to each iterator. The conflict_indices have to be sorted so
+      // set_intersection can be used later.
+      for (unsigned int i=0; i<partition_size; ++i)
+        {
+          conflict_indices[i] = get_conflict_indices(partition[i]);
+          std::sort(conflict_indices[i].begin(),conflict_indices[i].end());
+        }
+
+      // Compute the degree of each vertex of the graph using the
+      // intersection of the conflict indices.
+      std::vector<types::global_dof_index> conflict_indices_intersection;
+      std::vector<types::global_dof_index>::iterator intersection_it;
+      for (unsigned int i=0; i<partition_size; ++i)
+        for (unsigned int j=i+1; j<partition_size; ++j)
           {
-            partitioning.push_back(std::vector<Iterator> (1,it));
-            break;
-          }
-    }
-
-    return partitioning;
-  }
-
-
-
-  /**
-   * This function uses DSATUR (Degree SATURation) to color one zone of the
-   * partition. DSATUR works as follows:
-   *   -# Arrange the vertices by decreasing order of degrees.
-   *   -# Color a vertex of maximal degree with color 1.
-   *   -# Choose a vertex with a maximal saturation degree. If there is equality,
-   *      choose any vertex of maximal degree in the uncolored subgraph.
-   *   -# Color the chosen vertex with the least possible (lowest numbered) color.
-   *   -# If all the vertices are colored, stop. Otherwise, return to 3.
-   */
-  template <typename Iterator>
-  std::vector<std::vector<Iterator> > make_dsatur_coloring(std::vector<Iterator> &partition,
-      std_cxx1x::function<std::vector<types::global_dof_index> (Iterator const &)> 
-      const &get_conflict_indices)
-  {
-    std::vector<std::vector<Iterator> > partition_coloring;
-    // Number of zones composing the partitioning.
-    const unsigned int partition_size(partition.size());
-    std::vector<unsigned int> sorted_vertices(partition_size);
-    std::vector<int> degrees(partition_size);
-    std::vector<std::vector<types::global_dof_index> > conflict_indices(partition_size);
-    std::vector<std::vector<unsigned int> > graph(partition_size);
-
-    // Get the conflict indices associated to each iterator. The conflict_indices have to be sorted so
-    // set_intersection can be used later.
-    for (unsigned int i=0; i<partition_size; ++i)
-    {
-      conflict_indices[i] = get_conflict_indices(partition[i]);
-      std::sort(conflict_indices[i].begin(),conflict_indices[i].end());
-    }
-
-    // Compute the degree of each vertex of the graph using the
-    // intersection of the conflict indices.
-    std::vector<types::global_dof_index> conflict_indices_intersection;
-    std::vector<types::global_dof_index>::iterator intersection_it;
-    for (unsigned int i=0; i<partition_size; ++i)
-      for (unsigned int j=i+1; j<partition_size; ++j)
-      {
-        conflict_indices_intersection.resize(std::max(conflict_indices[i].size(),
-              conflict_indices[j].size()));
-        intersection_it = std::set_intersection(conflict_indices[i].begin(),
-            conflict_indices[i].end(),conflict_indices[j].begin(),
-            conflict_indices[j].end(),conflict_indices_intersection.begin());
-        // If the two iterators share indices then we increase the degree of the
-        // vertices and create an ''edge'' in the graph.
-        if (intersection_it!=conflict_indices_intersection.begin())
-        {
-          ++degrees[i];
-          ++degrees[j];
-          graph[i].push_back(j);
-          graph[j].push_back(i);
-        }
-      }
-
-    // Sort the vertices by decreasing degree.
-    std::vector<int>::iterator degrees_it;
-    for (unsigned int i=0; i<partition_size; ++i)
-    {
-      // Find the largest element.
-      degrees_it = std::max_element(degrees.begin(),degrees.end());
-      sorted_vertices[i] = degrees_it-degrees.begin();
-      // Put the largest element to -1 so it cannot be chosen again.
-      *degrees_it = -1;
-    }
-
-    // Color the graph.
-    std::vector<boost::unordered_set<unsigned int> > colors_used;
-    for (unsigned int i=0; i<partition_size; ++i)
-    {
-      const unsigned int current_vertex(sorted_vertices[i]);
-      bool new_color(true);
-      // Try to use an existing color, i.e., try to find a color which is not
-      // associated to one of the vertices linked to current_vertex.
-      // Loop over the color.
-      for (unsigned int j=0; j<partition_coloring.size(); ++j)
-      {
-        // Loop on the vertices linked to current_vertex. If one vertex linked
-        // to current_vertex is already using the color j, this color cannot
-        // be used anymore.
-        bool unused_color(true);
-        for (unsigned int k=0; k<graph[current_vertex].size(); ++k)
-          if (colors_used[j].count(graph[current_vertex][k])==1) 
-          {
-            unused_color = false;
-            break;
-          }
-        if (unused_color)
-        {
-          partition_coloring[j].push_back(partition[current_vertex]);
-          colors_used[j].insert(current_vertex);
-          new_color = false;
-          break;
-        }
-      }
-      // Add a new color.
-      if (new_color)
-      {
-        partition_coloring.push_back(std::vector<Iterator> (1,
-              partition[current_vertex]));
-        boost::unordered_set<unsigned int> tmp;
-        tmp.insert(current_vertex);
-        colors_used.push_back(tmp);
-      }
-    }
-
-    return partition_coloring;
-  }
-
-
-
-  /**
-   * Given a partition-coloring graph, gather the colors together. All the
-   * colors on even (resp. odd) partition can be executed simultaneously. This
-   * function tries to create colors of similar number of elements.
-   */
-  template <typename Iterator>
-  std::vector<std::vector<Iterator> >
-  gather_colors(std::vector<std::vector<std::vector<Iterator> > > const &partition_coloring)
-  {
-    std::vector<std::vector<Iterator> > coloring;
-
-    // Count the number of iterators in each color.
-    const unsigned int partition_size(partition_coloring.size());
-    std::vector<std::vector<unsigned int> > colors_counter(partition_size);
-    for (unsigned int i=0; i<partition_size; ++i)
-    {
-      const unsigned int n_colors(partition_coloring[i].size());
-      colors_counter[i].resize(n_colors);
-      for (unsigned int j=0; j<n_colors; ++j)
-        colors_counter[i][j] = partition_coloring[i][j].size();
-    }
-
-    // Find the partition with the largest number of colors for the even partition.
-    unsigned int i_color(0);
-    unsigned int max_even_n_colors(0);
-    const unsigned int colors_size(colors_counter.size());
-    for (unsigned int i=0; i<colors_size; i+=2)
-    {
-      if (max_even_n_colors<colors_counter[i].size())
-      {
-        max_even_n_colors = colors_counter[i].size();
-        i_color = i;
-      }
-    }
-    coloring.resize(max_even_n_colors);
-    for (unsigned int j=0; j<colors_counter[i_color].size(); ++j)
-      coloring[j] = partition_coloring[i_color][j];
-
-    for (unsigned int i=0; i<partition_size; i+=2)
-    {
-      if (i!=i_color)
-      {
-        boost::unordered_set<unsigned int> used_k;
-        for (unsigned int j=0; j<colors_counter[i].size(); ++j)
-        {
-          // Find the color in the current partition with the largest number of
-          // iterators.
-          std::vector<unsigned int>::iterator it;
-          it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
-          unsigned int min_iterators(-1);
-          unsigned int pos(0);
-          // Find the color of coloring with the least number of colors among
-          // the colors that have not been used yet.
-          for (unsigned int k=0; k<max_even_n_colors; ++k)
-            if (used_k.count(k)==0)
-              if (colors_counter[i_color][k]<min_iterators)
+            conflict_indices_intersection.resize(std::max(conflict_indices[i].size(),
+                                                          conflict_indices[j].size()));
+            intersection_it = std::set_intersection(conflict_indices[i].begin(),
+                                                    conflict_indices[i].end(),conflict_indices[j].begin(),
+                                                    conflict_indices[j].end(),conflict_indices_intersection.begin());
+            // If the two iterators share indices then we increase the degree of the
+            // vertices and create an ''edge'' in the graph.
+            if (intersection_it!=conflict_indices_intersection.begin())
               {
-                min_iterators = colors_counter[i_color][k];
-                pos = k;
+                ++degrees[i];
+                ++degrees[j];
+                graph[i].push_back(j);
+                graph[j].push_back(i);
               }
-          colors_counter[i_color][pos] += *it;
-          // Concatenate the current color with the existing coloring.
-          coloring[pos].insert(coloring[pos].end(),
-              partition_coloring[i][it-colors_counter[i].begin()].begin(),
-              partition_coloring[i][it-colors_counter[i].begin()].end());
-          used_k.insert(pos);
-          // Put the number of iterators to the current color to zero.
-          *it = 0;
-        }
-      }
-    }
+          }
 
-    // Do the same thing that we did for the even partitions to the odd
-    // partitions
-    unsigned int max_odd_n_colors(0);
-    for (unsigned int i=1; i<partition_size; i+=2)
-    {
-      if (max_odd_n_colors<colors_counter[i].size())
-      {
-        max_odd_n_colors = colors_counter[i].size();
-        i_color = i;
-      }
-    }
-    coloring.resize(max_even_n_colors+max_odd_n_colors);
-    for (unsigned int j=0; j<colors_counter[i_color].size(); ++j)
-      coloring[max_even_n_colors+j] = partition_coloring[i_color][j];
-
-    for (unsigned int i=1; i<partition_size; i+=2)
-    {
-      if (i!=i_color)
-      {
-        boost::unordered_set<unsigned int> used_k;
-        for (unsigned int j=0; j<colors_counter[i].size(); ++j)
+      // Sort the vertices by decreasing degree.
+      std::vector<int>::iterator degrees_it;
+      for (unsigned int i=0; i<partition_size; ++i)
         {
-          // Find the color in the current partition with the largest number of
-          // iterators.
-          std::vector<unsigned int>::iterator it;
-          it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
-          unsigned int min_iterators(-1);
-          unsigned int pos(0);
-          // Find the color of coloring with the least number of colors among
-          // the colors that have not been used yet.
-          for (unsigned int k=0; k<max_odd_n_colors; ++k)
-            if (used_k.count(k)==0)
-              if (colors_counter[i_color][k]<min_iterators)
-              {
-                min_iterators = colors_counter[i_color][k];
-                pos = k;
-              }
-          colors_counter[i_color][pos] += *it;
-          // Concatenate the current color with the existing coloring.
-          coloring[max_even_n_colors+pos].insert(coloring[max_even_n_colors+pos].end(),
-              partition_coloring[i][it-colors_counter[i].begin()].begin(),
-              partition_coloring[i][it-colors_counter[i].begin()].end());
-          used_k.insert(pos);
-          // Put the number of iterators to the current color to zero.
-          *it = 0;
+          // Find the largest element.
+          degrees_it = std::max_element(degrees.begin(),degrees.end());
+          sorted_vertices[i] = degrees_it-degrees.begin();
+          // Put the largest element to -1 so it cannot be chosen again.
+          *degrees_it = -1;
         }
-      }
+
+      // Color the graph.
+      std::vector<boost::unordered_set<unsigned int> > colors_used;
+      for (unsigned int i=0; i<partition_size; ++i)
+        {
+          const unsigned int current_vertex(sorted_vertices[i]);
+          bool new_color(true);
+          // Try to use an existing color, i.e., try to find a color which is not
+          // associated to one of the vertices linked to current_vertex.
+          // Loop over the color.
+          for (unsigned int j=0; j<partition_coloring.size(); ++j)
+            {
+              // Loop on the vertices linked to current_vertex. If one vertex linked
+              // to current_vertex is already using the color j, this color cannot
+              // be used anymore.
+              bool unused_color(true);
+              for (unsigned int k=0; k<graph[current_vertex].size(); ++k)
+                if (colors_used[j].count(graph[current_vertex][k])==1)
+                  {
+                    unused_color = false;
+                    break;
+                  }
+              if (unused_color)
+                {
+                  partition_coloring[j].push_back(partition[current_vertex]);
+                  colors_used[j].insert(current_vertex);
+                  new_color = false;
+                  break;
+                }
+            }
+          // Add a new color.
+          if (new_color)
+            {
+              partition_coloring.push_back(std::vector<Iterator> (1,
+                                                                  partition[current_vertex]));
+              boost::unordered_set<unsigned int> tmp;
+              tmp.insert(current_vertex);
+              colors_used.push_back(tmp);
+            }
+        }
+
+      return partition_coloring;
     }
 
-    return coloring;
-  }
 
+
+    /**
+     * Given a partition-coloring graph, gather the colors together. All the
+     * colors on even (resp. odd) partition can be executed simultaneously. This
+     * function tries to create colors of similar number of elements.
+     */
+    template <typename Iterator>
+    std::vector<std::vector<Iterator> >
+    gather_colors(std::vector<std::vector<std::vector<Iterator> > > const &partition_coloring)
+    {
+      std::vector<std::vector<Iterator> > coloring;
+
+      // Count the number of iterators in each color.
+      const unsigned int partition_size(partition_coloring.size());
+      std::vector<std::vector<unsigned int> > colors_counter(partition_size);
+      for (unsigned int i=0; i<partition_size; ++i)
+        {
+          const unsigned int n_colors(partition_coloring[i].size());
+          colors_counter[i].resize(n_colors);
+          for (unsigned int j=0; j<n_colors; ++j)
+            colors_counter[i][j] = partition_coloring[i][j].size();
+        }
+
+      // Find the partition with the largest number of colors for the even partition.
+      unsigned int i_color(0);
+      unsigned int max_even_n_colors(0);
+      const unsigned int colors_size(colors_counter.size());
+      for (unsigned int i=0; i<colors_size; i+=2)
+        {
+          if (max_even_n_colors<colors_counter[i].size())
+            {
+              max_even_n_colors = colors_counter[i].size();
+              i_color = i;
+            }
+        }
+      coloring.resize(max_even_n_colors);
+      for (unsigned int j=0; j<colors_counter[i_color].size(); ++j)
+        coloring[j] = partition_coloring[i_color][j];
+
+      for (unsigned int i=0; i<partition_size; i+=2)
+        {
+          if (i!=i_color)
+            {
+              boost::unordered_set<unsigned int> used_k;
+              for (unsigned int j=0; j<colors_counter[i].size(); ++j)
+                {
+                  // Find the color in the current partition with the largest number of
+                  // iterators.
+                  std::vector<unsigned int>::iterator it;
+                  it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
+                  unsigned int min_iterators(-1);
+                  unsigned int pos(0);
+                  // Find the color of coloring with the least number of colors among
+                  // the colors that have not been used yet.
+                  for (unsigned int k=0; k<max_even_n_colors; ++k)
+                    if (used_k.count(k)==0)
+                      if (colors_counter[i_color][k]<min_iterators)
+                        {
+                          min_iterators = colors_counter[i_color][k];
+                          pos = k;
+                        }
+                  colors_counter[i_color][pos] += *it;
+                  // Concatenate the current color with the existing coloring.
+                  coloring[pos].insert(coloring[pos].end(),
+                                       partition_coloring[i][it-colors_counter[i].begin()].begin(),
+                                       partition_coloring[i][it-colors_counter[i].begin()].end());
+                  used_k.insert(pos);
+                  // Put the number of iterators to the current color to zero.
+                  *it = 0;
+                }
+            }
+        }
+
+      // Do the same thing that we did for the even partitions to the odd
+      // partitions
+      unsigned int max_odd_n_colors(0);
+      for (unsigned int i=1; i<partition_size; i+=2)
+        {
+          if (max_odd_n_colors<colors_counter[i].size())
+            {
+              max_odd_n_colors = colors_counter[i].size();
+              i_color = i;
+            }
+        }
+      coloring.resize(max_even_n_colors+max_odd_n_colors);
+      for (unsigned int j=0; j<colors_counter[i_color].size(); ++j)
+        coloring[max_even_n_colors+j] = partition_coloring[i_color][j];
+
+      for (unsigned int i=1; i<partition_size; i+=2)
+        {
+          if (i!=i_color)
+            {
+              boost::unordered_set<unsigned int> used_k;
+              for (unsigned int j=0; j<colors_counter[i].size(); ++j)
+                {
+                  // Find the color in the current partition with the largest number of
+                  // iterators.
+                  std::vector<unsigned int>::iterator it;
+                  it = std::max_element(colors_counter[i].begin(),colors_counter[i].end());
+                  unsigned int min_iterators(-1);
+                  unsigned int pos(0);
+                  // Find the color of coloring with the least number of colors among
+                  // the colors that have not been used yet.
+                  for (unsigned int k=0; k<max_odd_n_colors; ++k)
+                    if (used_k.count(k)==0)
+                      if (colors_counter[i_color][k]<min_iterators)
+                        {
+                          min_iterators = colors_counter[i_color][k];
+                          pos = k;
+                        }
+                  colors_counter[i_color][pos] += *it;
+                  // Concatenate the current color with the existing coloring.
+                  coloring[max_even_n_colors+pos].insert(coloring[max_even_n_colors+pos].end(),
+                                                         partition_coloring[i][it-colors_counter[i].begin()].begin(),
+                                                         partition_coloring[i][it-colors_counter[i].begin()].end());
+                  used_k.insert(pos);
+                  // Put the number of iterators to the current color to zero.
+                  *it = 0;
+                }
+            }
+        }
+
+      return coloring;
+    }
+  }
 
 
   /**
@@ -408,29 +410,32 @@ namespace graph_coloring
    * indices.
    */
   template <typename Iterator>
-  std::vector<std::vector<Iterator> > 
-  make_graph_coloring(Iterator const &begin,typename identity<Iterator>::type const &end,
-      std_cxx1x::function<std::vector<types::global_dof_index> (Iterator const &)> 
-      const &get_conflict_indices)
+  std::vector<std::vector<Iterator> >
+  make_graph_coloring(const Iterator &begin,
+                      const typename identity<Iterator>::type &end,
+                      const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices)
   {
     // Create the partitioning.
-    std::vector<std::vector<Iterator> > partitioning = create_partitioning(begin,end,
-        get_conflict_indices);
+    std::vector<std::vector<Iterator> >
+    partitioning = internal::create_partitioning (begin,
+                                                  end,
+                                                  get_conflict_indices);
 
     // Color the iterators within each partition.
     const unsigned int partitioning_size(partitioning.size());
-    std::vector<std::vector<std::vector<Iterator> > > partition_coloring(
-        partitioning_size);
+    std::vector<std::vector<std::vector<Iterator> > >
+    partition_coloring(partitioning_size);
+
+    // TODO: run these in parallel
     for (unsigned int i=0; i<partitioning_size; ++i)
-    {
-      // Compute the coloring of the graph using the DSATUR algorithm
-      partition_coloring[i] = make_dsatur_coloring(partitioning[i],get_conflict_indices);
-    }
+      {
+        // Compute the coloring of the graph using the DSATUR algorithm
+        partition_coloring[i] = make_dsatur_coloring(partitioning[i],
+                                                     get_conflict_indices);
+      }
 
-    // Gather the colors together. 
-    std::vector<std::vector<Iterator> > coloring = gather_colors(partition_coloring);
-
-    return coloring;
+    // Gather the colors together.
+    return internal::gather_colors(partition_coloring);
   }
 
 } // End graph_coloring namespace
