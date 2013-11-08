@@ -347,7 +347,7 @@ namespace GraphColoring
             }
         }
 
-      // If there is more than one partition, do the same thing that we did for the even partitions 
+      // If there is more than one partition, do the same thing that we did for the even partitions
       // to the odd partitions
       if (partition_size>1)
         {
@@ -479,7 +479,7 @@ namespace GraphColoring
   std::vector<std::vector<Iterator> >
   make_graph_coloring(const Iterator &begin,
                       const typename identity<Iterator>::type &end,
-                      const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices)
+                      const std_cxx1x::function<std::vector<types::global_dof_index> (const typename identity<Iterator>::type &)> &get_conflict_indices)
   {
     // Create the partitioning.
     std::vector<std::vector<Iterator> >
