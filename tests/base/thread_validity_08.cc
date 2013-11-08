@@ -26,7 +26,7 @@
 
 
 Threads::Mutex mutex;
-int spin_lock = 0;
+volatile int spin_lock = 0;
 
 
 void worker ()
