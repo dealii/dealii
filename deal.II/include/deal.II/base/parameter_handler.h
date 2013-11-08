@@ -34,7 +34,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 //TODO: Allow long input lines to be broken by appending a backslash character
-//TODO: Provide an "include" command for parameter files
 
 
 // public classes; to be declared below
