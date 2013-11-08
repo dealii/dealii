@@ -443,7 +443,15 @@ namespace GraphColoring
    * cells adjacent to the faces of the current cell (in the case of
    * discontinuous Galerkin methods, because there one computes face integrals
    * coupling the degrees of freedom connected by a common face -- see step-12).
-   * However, in other situations, these conflict indicator sets may represent
+   * More generally, however, the conflict set needs to contain all degrees of
+   * freedom for which anything is written into the matrix or right hand side;
+   * in other words, if the writing happens through a function like
+   * ConstraintMatrix::copy_local_to_global(), then the set of conflict indices
+   * must actually contain not only the degrees of freedom on the current
+   * cell, but also those they are linked to by constraints such as hanging
+   * nodes.
+   *
+   * In other situations, the conflict indicator sets may represent
    * something different altogether -- it is up to the caller of this function
    * to describe what it means for two iterators to conflict. Given this,
    * computing conflict graph edges can be done significantly more cheaply
@@ -451,10 +459,10 @@ namespace GraphColoring
    *
    * In any case, the result of the function will be so that iterators whose
    * conflict indicator sets have overlap will not be assigned to the same
-   * partition (i.e., they will have a different color).
+   * color.
    *
    * @param[in] begin The first element of a range of iterators for which a
-   *      partitioning is sought.
+   *      coloring is sought.
    * @param[in] end The element past the end of the range of iterators.
    * @param[in] get_conflict_indices A user defined function object returning
    *      a set of indicators that are descriptive of what represents a
