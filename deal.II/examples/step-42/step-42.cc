@@ -1820,8 +1820,8 @@ namespace Step42
                   break;
               }
 
-            old_solution = solution;
             solution = tmp_vector;
+            old_solution = solution;
           }
 
         old_active_set = active_set;
