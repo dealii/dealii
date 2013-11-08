@@ -13,6 +13,7 @@ For the impatient:
   $ cd build
   $ cmake -DCMAKE_INSTALL_PREFIX=/path/where/deal.II/should/be/intalled/to ..
   $ make install    (alternatively $ make -j<N> install)
+  $ make test
 
   A detailed ReadME can be found at ./doc/readme.html and
   ./doc/users/cmake.html or at http://www.dealii.org/.

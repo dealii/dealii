@@ -94,6 +94,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: introduced "make test" that runs a minimal set of tests. We
+  encourage every user to run this, especially if they run in to problems.
+  The tests are automatically picked depending on the configuration and
+  will be shipped with every release.
+  <br>
+  (Timo Heister, Matthias Maier, 2013/11/08)
+  </li>
+
   <li> Changed: It is now possible to restore a parallel Triangulation
   (and solutions) with a different number of processors it was saved with
   using Triangulation::save() and Triangulation::load().
