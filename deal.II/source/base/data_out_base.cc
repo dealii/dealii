@@ -5629,6 +5629,16 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
   AssertThrow (out, ExcIO());
 }
 
+template <>
+void DataOutBase::write_svg<1,1> (const std::vector<Patch<1,1> > &patches,
+                             const std::vector<std::string> &data_names,
+                             const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                             const SvgFlags &flags,
+                             std::ostream &out)
+{
+  AssertThrow (false, ExcNotImplemented());
+}
+
 
 template <int dim, int spacedim>
 void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
@@ -5648,9 +5658,7 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
   if (flags.margin) margin_in_percent = 5;
 
 
-// determine the bounding box in the model space
-  double x_min, y_min, z_min;
-  double x_max, y_max, z_max;
+  // determine the bounding box in the model space
   double x_dimension, y_dimension, z_dimension;
 
   typename std::vector<Patch<dim,spacedim> >::const_iterator patch = patches.begin();
@@ -5672,12 +5680,12 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
           patch->data.n_rows() == 0,
           ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
 
-  x_min = projected_point[0];
-  x_max = x_min;
-  y_min = projected_point[1];
-  y_max = y_min;
-  z_min = patch->data.n_rows() != 0 ? patch->data(flags.height_vector,0) : 0;
-  z_max = z_min;
+  double x_min = projected_point[0];
+  double x_max = x_min;
+  double y_min = projected_point[1];
+  double y_max = y_min;
+  double z_min = patch->data.n_rows() != 0 ? patch->data(flags.height_vector,0) : 0;
+  double z_max = z_min;
 
   // iterate over the patches
   for (; patch != patches.end(); ++patch)
@@ -5757,9 +5765,9 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
 
   camera_focus = .5 * z_dimension;
 
-  Point<3> camera_position_temp(true);
-  Point<3> camera_direction_temp(true);
-  Point<3> camera_horizontal_temp(true);
+  Point<3> camera_position_temp;
+  Point<3> camera_direction_temp;
+  Point<3> camera_horizontal_temp;
 
   const float angle_factor = 3.14159265 / 180.;
 
