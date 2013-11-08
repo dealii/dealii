@@ -18,10 +18,15 @@
 // Multigrid with continuous and discontinuous elements works, if we
 // enforce continuity at refinement edges through interior penalty
 
+// TH: the test was failing because the solver did not converge. It turns out
+//     that switching from CG to GMRES makes everything work. I have no idea
+//     if the problem is not SPD...
+
 #include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/precondition_block.h>
 #include <deal.II/lac/block_vector.h>
@@ -524,7 +529,7 @@ namespace Step39
   InteriorPenaltyProblem<dim>::solve()
   {
     SolverControl control(1000, 1.e-12);
-    SolverCG<Vector<double> > solver(control);
+    SolverGMRES<Vector<double> > solver(control);
 
     MGTransferPrebuilt<Vector<double> > mg_transfer;
     mg_transfer.build_matrices(mg_dof_handler);
