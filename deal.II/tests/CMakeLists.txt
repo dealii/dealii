@@ -105,8 +105,8 @@ FOREACH(_category ${_categories})
       )
     ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
 
-    # depend on a valid build directory:
-    ADD_DEPENDENCIES(setup_tests_${_category} setup_build_dir)
+    # depend on a compiled library:
+    ADD_DEPENDENCIES(setup_tests_${_category} build_library)
 
     ADD_CUSTOM_TARGET(regen_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
