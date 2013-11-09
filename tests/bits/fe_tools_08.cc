@@ -31,7 +31,7 @@ void
 check_this (const FiniteElement<dim> &fe1,
             const FiniteElement<dim> &fe2)
 {
-  deallog << std::setprecision (9);
+  deallog << std::setprecision (10);
 
   // only check if both elements have
   // support points. otherwise,
