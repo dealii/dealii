@@ -33,7 +33,7 @@ void test (PETScWrappers::FullMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-  m.compress ();
+  m.compress (VectorOperation::add);
 
   // then make sure we retrieve the same ones
   for (unsigned int i=0; i<m.m(); ++i)

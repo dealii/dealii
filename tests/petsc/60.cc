@@ -38,7 +38,7 @@ void test (PETScWrappers::Vector &v)
       pattern[i] = true;
     }
 
-  v.compress ();
+  v.compress (VectorOperation::add);
 
   Vector<double> w;
   w=v;

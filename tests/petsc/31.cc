@@ -34,7 +34,7 @@ void test (PETScWrappers::Vector &v)
       v(i) = i;
       norm += std::fabs(1.*i)*std::fabs(1.*i);
     }
-  v.compress ();
+  v.compress (VectorOperation::add);
 
   // then check the norm
   const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;

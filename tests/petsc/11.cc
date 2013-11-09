@@ -30,7 +30,7 @@ void test (PETScWrappers::Vector &v)
   for (unsigned int i=0; i<v.size(); i+=1+i)
     v(i) = i;
 
-  v.compress ();
+  v.compress (VectorOperation::add);
 
   Assert (v.size() == 100, ExcInternalError());
 

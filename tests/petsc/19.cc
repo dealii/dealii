@@ -34,7 +34,7 @@ void test (PETScWrappers::Vector &v)
       v(i) = i;
       norm = std::max(norm,fabs(i));
     }
-  v.compress ();
+  v.compress (VectorOperation::add);
 
   // then check the norm
   Assert (v.linfty_norm() == norm, ExcInternalError());

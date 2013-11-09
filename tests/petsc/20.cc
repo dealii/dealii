@@ -36,7 +36,7 @@ void test (PETScWrappers::Vector &v)
       v(i) = i;
       pattern[i] = true;
     }
-  v.compress ();
+  v.compress (VectorOperation::add);
 
   // multiply v with 5/4
   v *= 5./4.;

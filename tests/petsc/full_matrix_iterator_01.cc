@@ -30,7 +30,7 @@ void test ()
   m.set (0,0,1);
   m.set (1,1,2);
   m.set (1,2,3);
-  m.compress ();
+  m.compress (VectorOperation::add);
   PETScWrappers::FullMatrix::const_iterator i = m.begin();
   deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
   ++i;

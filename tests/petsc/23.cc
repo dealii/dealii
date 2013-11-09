@@ -43,8 +43,8 @@ void test (PETScWrappers::Vector &v,
         }
     }
 
-  v.compress ();
-  w.compress ();
+  v.compress (VectorOperation::add);
+  w.compress (VectorOperation::add);
 
   // make sure the scalar product is zero
   Assert (v*w == product, ExcInternalError());

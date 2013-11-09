@@ -32,7 +32,7 @@ void test (PETScWrappers::FullMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-  m.compress ();
+  m.compress (VectorOperation::add);
 
   // then divide everything by 4/3 and
   // make sure we retrieve the values we

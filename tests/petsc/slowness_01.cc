@@ -63,7 +63,7 @@ void test ()
             sparsity.add(global, global+N);
           }
       }
-  sparsity.compress();
+  sparsity.compress (VectorOperation::add);
 
 
   // next build the sparse matrix itself

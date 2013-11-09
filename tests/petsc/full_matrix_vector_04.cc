@@ -40,9 +40,9 @@ void test (PETScWrappers::Vector &v,
       w(i) = i;
     }
 
-  m.compress ();
-  v.compress ();
-  w.compress ();
+  m.compress (VectorOperation::add);
+  v.compress (VectorOperation::add);
+  w.compress (VectorOperation::add);
 
   // w:=Mv
   m.Tvmult_add (w,v);

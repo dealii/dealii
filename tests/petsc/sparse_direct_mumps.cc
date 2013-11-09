@@ -80,9 +80,9 @@ int main(int argc, char **argv)
     PETScWrappers::Vector  u(dim);
     u = 0.;
     f = 1.;
-    A.compress ();
-    f.compress ();
-    u.compress ();
+    A.compress (VectorOperation::add);
+    f.compress (VectorOperation::add);
+    u.compress (VectorOperation::add);
 
     SolverControl cn;
     PETScWrappers::SparseDirectMUMPS solver(cn);

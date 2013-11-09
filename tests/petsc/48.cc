@@ -36,9 +36,9 @@ void test (PETScWrappers::Vector &v,
       x(i) = i+2.;
     }
 
-  v.compress ();
-  w.compress ();
-  x.compress ();
+  v.compress (VectorOperation::add);
+  w.compress (VectorOperation::add);
+  x.compress (VectorOperation::add);
 
   v.ratio (w, x);
 

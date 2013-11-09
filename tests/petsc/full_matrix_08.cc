@@ -38,7 +38,7 @@ void test (PETScWrappers::FullMatrix &m)
         }
   norm = std::sqrt(norm);
 
-  m.compress ();
+  m.compress (VectorOperation::add);
 
   // compare against the exact value of the
   // l2-norm (max row-sum)

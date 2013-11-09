@@ -35,7 +35,7 @@ void test ()
       m.set (i,j, i+2*j);
 
 
-  m.compress();
+  m.compress (VectorOperation::add);
 
   {
 

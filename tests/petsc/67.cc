@@ -61,7 +61,7 @@ void test (PETScWrappers::MatrixBase &m)
       norm_sqr += s*s;
       ++nnz;
     }
-  m.compress ();
+  m.compress (VectorOperation::add);
 
   deallog << m.frobenius_norm() << ' ' << std::sqrt (norm_sqr)
           << std::endl;

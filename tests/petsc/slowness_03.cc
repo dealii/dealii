@@ -66,7 +66,7 @@ void test ()
             matrix.add(global, global+N, -1);
           }
       }
-  matrix.compress ();
+  matrix.compress (VectorOperation::add);
 
   // then do a single matrix-vector
   // multiplication with subsequent formation

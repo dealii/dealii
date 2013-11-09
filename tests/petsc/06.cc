@@ -33,7 +33,7 @@ void test (PETScWrappers::SparseMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-  m.compress ();
+  m.compress (VectorOperation::add);
 
   // compare against the exact value of the
   // l1-norm (max col-sum)

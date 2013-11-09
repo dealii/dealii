@@ -112,7 +112,7 @@ void test ()
     for (unsigned int j=0; j<csp.row_length(i); ++j)
       m.add (i, csp.column_number(i,j), 1.);
 
-  m.compress ();
+  m.compress (VectorOperation::add);
 
   deallog << "OK" << std::endl;
 }

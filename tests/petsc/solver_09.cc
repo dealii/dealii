@@ -85,9 +85,9 @@ int main(int argc, char **argv)
     PETScWrappers::Vector  f(dim);
     PETScWrappers::Vector  u(dim);
     f = 1.;
-    A.compress ();
-    f.compress ();
-    u.compress ();
+    A.compress (VectorOperation::add);
+    f.compress (VectorOperation::add);
+    u.compress (VectorOperation::add);
 
     PETScWrappers::SolverTCQMR solver(control);
     PETScWrappers::PreconditionJacobi preconditioner(A);
