@@ -111,6 +111,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const TecplotFlags                          &flags,
                         std::ostream                            &out);
+
+#if deal_II_space_dimension >1
   template
   void
   DataOutBase::write_svg (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
@@ -118,6 +120,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const SvgFlags                          &flags,
                         std::ostream                            &out);
+#endif
   template
   void
   DataOutBase::write_deal_II_intermediate (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
