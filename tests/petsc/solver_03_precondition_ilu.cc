@@ -81,9 +81,8 @@ int main(int argc, char **argv)
     PETScWrappers::Vector  f(dim);
     PETScWrappers::Vector  u(dim);
     f = 1.;
-    A.compress (VectorOperation::add);
-    f.compress (VectorOperation::add);
-    u.compress (VectorOperation::add);
+    A.compress (VectorOperation::insert);
+    f.compress (VectorOperation::insert);
 
     PETScWrappers::SolverCG solver(control);
     PETScWrappers::PreconditionILU preconditioner(A);

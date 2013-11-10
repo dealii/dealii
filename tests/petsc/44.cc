@@ -38,10 +38,10 @@ void test (PETScWrappers::Vector &v,
       y(i) = i+3.;
     }
 
-  v.compress (VectorOperation::add);
-  w.compress (VectorOperation::add);
-  x.compress (VectorOperation::add);
-  y.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
+  w.compress (VectorOperation::insert);
+  x.compress (VectorOperation::insert);
+  y.compress (VectorOperation::insert);
 
   v.sadd (1.5, 2, w, 3, x, 4, y);
 
