@@ -204,7 +204,7 @@ namespace DoFRenumbering
 
     template void
       downstream<DoFHandler<deal_II_dimension> >
-      (DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&,
+      (DoFHandler<deal_II_dimension>&, const Point<DoFHandler<deal_II_dimension>::space_dimension>&,
        const bool);
 
     template void
@@ -240,13 +240,13 @@ namespace DoFRenumbering
     template void
       downstream<hp::DoFHandler<deal_II_dimension> >
       (hp::DoFHandler<deal_II_dimension>&,
-       const Point<deal_II_dimension>&,
+       const Point<hp::DoFHandler<deal_II_dimension>::space_dimension>&,
        const bool);
 
     template void
       downstream<MGDoFHandler<deal_II_dimension> >
       (MGDoFHandler<deal_II_dimension>&,
-       const Point<deal_II_dimension>&,
+       const Point<MGDoFHandler<deal_II_dimension>::space_dimension>&,
        const bool);
 
     template void
@@ -281,7 +281,8 @@ namespace DoFRenumbering
 
     template
       void downstream
-      (DoFHandler<deal_II_dimension>&, const unsigned int,
+      (DoFHandler<deal_II_dimension>&, 
+       const unsigned int,
        const Point<deal_II_dimension>&,
        const bool);
 
