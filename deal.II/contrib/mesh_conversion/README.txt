@@ -54,3 +54,13 @@ Copyright:
 ----------
 This program is distributed under the GNU GPL v2.0 copyright. Details can be found at:
 http://www.gnu.org/licenses/gpl-2.0.html
+
+This copyright is extended to the example mesh files distributed with this program, namely
+./mesh/2d/2d_test.*
+./mesh/2d/quad.*
+./mesh/3d/CC.*
+./mesh/3d/CC_cubit_new.*
+./mesh/3d/CC_cubit_old.*
+./mesh/3d/test_cube_1.*
+./mesh/3d/test_cube_pave_1.*
+./mesh/3d/test_cube_two_materials.*
