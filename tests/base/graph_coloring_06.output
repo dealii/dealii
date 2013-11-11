@@ -1,0 +1,37 @@
+
+DEAL::dim=1
+DEAL::Total number of cells = 22
+DEAL::11
+DEAL::11
+DEAL::dim=2
+DEAL::Total number of cells = 100
+DEAL::12
+DEAL::12
+DEAL::10
+DEAL::13
+DEAL::13
+DEAL::13
+DEAL::13
+DEAL::14
+DEAL::dim=3
+DEAL::Total number of cells = 1184
+DEAL::67
+DEAL::58
+DEAL::46
+DEAL::45
+DEAL::64
+DEAL::67
+DEAL::63
+DEAL::57
+DEAL::55
+DEAL::55
+DEAL::65
+DEAL::69
+DEAL::54
+DEAL::65
+DEAL::59
+DEAL::64
+DEAL::63
+DEAL::64
+DEAL::54
+DEAL::50
