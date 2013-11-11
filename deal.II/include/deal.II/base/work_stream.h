@@ -1128,10 +1128,11 @@ namespace WorkStream
 
 
   /**
-   * This is the main function of the WorkStream concept, doing work as
-   * described in the introduction to this namespace.
+   * This is one of two main functions of the WorkStream concept, doing work as
+   * described in the introduction to this namespace. It corresponds to
+   * implementation 2 of the paper by Turcksin, Kronbichler and Bangerth.
    *
-   * This is the function that can be used for worker and copier objects that
+   * This function that can be used for worker and copier objects that
    * are either pointers to non-member functions or objects that allow to be
    * called with an operator(), for example objects created by std::bind.
    *
@@ -1239,6 +1240,39 @@ namespace WorkStream
   }
 
 
+  /**
+   * This is one of two main functions of the WorkStream concept, doing work as
+   * described in the introduction to this namespace. It corresponds to
+   * implementation 3 of the paper by Turcksin, Kronbichler and Bangerth.
+   * As such, it takes not a range of iterators described by a begin
+   * and end iterator, but a "colored" graph of iterators where each
+   * color represents cells for which writing the cell contributions into
+   * the global object does not conflict (in other words, these cells
+   * are not neighbors). Each "color" is represented by std::vectors of cells.
+   * The first argument to this function, a set of sets of cells (which are
+   * represent as a vector of vectors, for efficiency), is typically
+   * constructed by calling GraphColoring::make_graph_coloring().
+   *
+   * This function that can be used for worker and copier objects that
+   * are either pointers to non-member functions or objects that allow to be
+   * called with an operator(), for example objects created by std::bind.
+   *
+   * The two data types <tt>ScratchData</tt> and <tt>CopyData</tt> need to
+   * have a working copy constructor. <tt>ScratchData</tt> is only used in the
+   * <tt>worker</tt> function, while <tt>CopyData</tt> is the object passed
+   * from the <tt>worker</tt> to the <tt>copier</tt>.
+   *
+   * The @p queue_length argument indicates the number of items that can be
+   * live at any given time. Each item consists of @p chunk_size elements of
+   * the input stream that will be worked on by the worker and copier
+   * functions one after the other on the same thread.
+   *
+   * @note If your data objects are large, or their constructors are
+   * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
+   * copies of the <tt>ScratchData</tt> object and
+   * <tt>queue_length*chunk_size</tt> copies of the <tt>CopyData</tt> object
+   * are generated.
+   */
   template <typename Worker,
            typename Copier,
            typename Iterator,
@@ -1324,8 +1358,10 @@ namespace WorkStream
 
 
   /**
-   * This is the main function of the WorkStream concept, doing work as
-   * described in the introduction to this namespace.
+   * This is a variant of one of the two main functions of the WorkStream
+   * concept, doing work as described in the introduction to this namespace.
+   * It corresponds to implementation 2 of the paper by Turcksin, Kronbichler
+   * and Bangerth.
    *
    * This is the function that can be used for worker and copier functions
    * that are member functions of a class.
