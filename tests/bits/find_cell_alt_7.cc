@@ -40,7 +40,7 @@ void check (Triangulation<2> &tria)
   // Test for a number of points, every ten degrees
   for (unsigned int i=0; i<200; i++)
     {
-      Point<2> p(std::sin((double)i/100.*M_PI), std::cos((double)i/100.*M_PI));
+      Point<2> p(std::sin((double)i/100.*numbers::PI), std::cos((double)i/100.*PI));
       p *= 1.-1e-8;
 
       std::pair<Triangulation<2>::active_cell_iterator, Point<2> > cell

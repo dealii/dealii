@@ -38,7 +38,7 @@ int main ()
 
   // Define some constants that will be used by the function parser
   std::map<std::string, double> constants;
-  constants["pi"] = M_PI;
+  constants["pi"] = numbers::PI;
 
   // Define the variables that will be used inside the expressions
   std::string variables = "x,y";

@@ -82,7 +82,7 @@ void Test()
               double delta=0.;
               for (unsigned int di=0; di<i; ++di)
                 {
-                  delta = values[j](di) - std::cos(M_PI*(i+1)*vertices[j][di])*t;
+                  delta = values[j](di) - std::cos(numbers::PI*(i+1)*vertices[j][di])*t;
                   if (std::abs(delta) > 1e-10)
                     deallog << "p(" << di << "): " << vertices[j] << ", delta: "
                             << delta << std::endl;

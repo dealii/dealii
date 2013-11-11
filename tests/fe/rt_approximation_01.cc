@@ -490,7 +490,7 @@ int main ()
     MappingQ1Eulerian<2> mapping_euler (deformation, *dof_handler_def);
 
     // Try rotating the elements
-    for (double rotat = 0; rotat < 2 * M_PI; rotat += 0.25 * M_PI)
+    for (double rotat = 0; rotat < 2 * numbers::PI; rotat += 0.25 * numbers::PI)
       {
         // Rotate element
         VectorTools::project (*dof_handler_def, hn_constraints_def,

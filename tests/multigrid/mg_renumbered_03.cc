@@ -385,7 +385,7 @@ void LaplaceProblem<dim>::refine_local ()
                                      Point<dim>(0,0) :
                                      Point<dim>(0,0,0));
           const double dist = p.distance(origin);
-          if (dist<0.25/M_PI)
+          if (dist<0.25/numbers::PI)
             {
               cell->set_refine_flag ();
               cell_refined = true;
