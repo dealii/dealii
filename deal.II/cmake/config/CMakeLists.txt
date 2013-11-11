@@ -218,6 +218,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
 
   FOREACH(build ${DEAL_II_BUILD_TYPES})
+
     TO_STRING_AND_ADD_PREFIX(MAKEFILE_DEFINITIONS_${build}
       "-D"
       ${DEAL_II_USER_DEFINITIONS}
@@ -227,14 +228,16 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     #
     # Ideally, DEAL_II_EXTERNAL_LIBRARIES should just contain a list of
     # full library paths. Nevertheless, filter out all elements that are
-    # not a full path starting with "/".
+    # not a full path starting with "/" or that happen to be a "framework"
+    # - we won't deal with that in Make.global_options.
     #
+
     SET(_libs)
     FOREACH(_lib
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
         ${DEAL_II_EXTERNAL_LIBRARIES}
         )
-      IF(_lib MATCHES "^/")
+      IF(_lib MATCHES "^\\s*\\/" AND NOT _lib MATCHES "\\.framework$")
         LIST(APPEND _libs "${_lib}")
       ENDIF()
     ENDFOREACH()
@@ -250,14 +253,51 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
         ${DEAL_II_EXTERNAL_LIBRARIES}
         )
-      LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
+
       #
-      # Extract library paths where possible:
+      # Strip leading and trailing whitespace
       #
-      IF(_lib MATCHES "^(/|\\$\\(D\\))")
+      STRING(STRIP "${_lib}" _lib)
+
+      IF(_lib MATCHES "^\\/.*\\.framework$")
+        #
+        # We have a MacOSX framework
+        #
+        # TODO: What do?
+        #
+
+      ELSEIF(_lib MATCHES "^(\\/|\\$\\(D\\))")
+        #
+        # Full path: /path/to/libfoo.(so|dylib|etc):
+        #
+
+        # Extract library paths:
         GET_FILENAME_COMPONENT(_path ${_lib} PATH)
         LIST(APPEND _paths ${_path})
+
+        LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
+
+      ELSEIF(_lib MATCHES "^-l")
+        #
+        # Library is of the form "-lfoo":
+        #
+        LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
+
+      ELSEIF(NOT _lib MATCHES "^\\s*$" AND NOT _lib MATCHES "\\.so(\\.[0-9]+)*$")
+        #
+        # Well in this case we just assume that we have to append a "-l"
+        #
+
+        LIST(APPEND MAKEFILE_LIBS_${build} "-l${_lib}")
+
+      ELSE()
+        #
+        # For now, ignore the rest.
+        #
+        # TODO: What do?
+        #
       ENDIF()
+
     ENDFOREACH()
 
     #
