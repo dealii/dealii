@@ -21,5 +21,5 @@
  * the generated Xcode project.
  */
 
-const int _global_symbol_42 = 42;
+const int global_symbol_42 = 42;
 
