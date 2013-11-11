@@ -26,6 +26,10 @@
 #  include <sys/sysctl.h>
 #endif
 
+#if defined(__FreeBSD__)
+#include <stdlib.h>
+#endif
+
 #ifdef DEAL_II_WITH_THREADS
 
 #  include <deal.II/base/thread_management.h>
