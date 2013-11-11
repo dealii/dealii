@@ -141,6 +141,7 @@ namespace GraphColoring
               if (used_it.count(it)==0)
                 {
                   zones.push_back(std::vector<Iterator> (1,it));
+                  used_it.insert(it);
                   break;
                 }
         }
