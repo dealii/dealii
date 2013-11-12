@@ -76,15 +76,11 @@ using namespace dealii;
 void test()
 {
   Triangulation<2>     triangulation;
-  FE_Q<2>              fe(1);
-  DoFHandler<2> dof_handler(triangulation);
 
   GridIn<2> grid_in1;
   grid_in1.attach_triangulation (triangulation);
   std::ifstream input_file1(SOURCE_DIR "/grids/mesh.msh");
   grid_in1.read_msh(input_file1);
-
-  dof_handler.distribute_dofs (fe);
 
   Point< 2 > ePos;
   ePos(0) = 0.0653630060373507487669897386695;
@@ -93,10 +89,10 @@ void test()
   MappingQ<2> mapping(1);
   MappingQ1<2> &mapping2 = StaticMappingQ1< 2 >::mapping;
   deallog << "1:" << std::endl;
-  GridTools::find_active_cell_around_point (mapping, dof_handler, ePos);
+  GridTools::find_active_cell_around_point (mapping, triangulation, ePos);
   deallog << "2:" << std::endl;
   //this second call seems to hang/crash:
-  GridTools::find_active_cell_around_point (mapping2, dof_handler, ePos);
+  GridTools::find_active_cell_around_point (mapping2, triangulation, ePos);
   deallog << "done" << std::endl;
 }
 
