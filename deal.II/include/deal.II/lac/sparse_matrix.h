@@ -453,6 +453,10 @@ namespace SparseMatrixIterators
 
 }
 
+/**
+ * @}
+ */
+
 
 //TODO: Add multithreading to the other vmult functions.
 
@@ -1654,10 +1658,6 @@ private:
   template <typename,bool> friend class SparseMatrixIterators::Iterator;
   template <typename,bool> friend class SparseMatrixIterators::Accessor;
 };
-
-/**
- * @}
- */
 
 #ifndef DOXYGEN
 /*---------------------- Inline functions -----------------------------------*/
