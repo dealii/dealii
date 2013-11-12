@@ -715,7 +715,7 @@ namespace WorkStream
         struct ItemType
         {
           /**
-           * A structure that contains a pointer to scratch  and copy data objects along
+           * A structure that contains a pointer to scratch and copy data objects along
            * with a flag that indicates whether this object is currently in use.
            */
           struct ScratchAndCopyDataObjects
@@ -796,6 +796,11 @@ namespace WorkStream
            */
           const CopyData *sample_copy_data;
 
+          /**
+           * Flag is true if the buffer is used and false if the buffer can be
+           * used.
+           */
+          bool currently_in_use;
 
           /**
            * Default constructor.
@@ -806,7 +811,8 @@ namespace WorkStream
             :
             n_items (0),
             sample_scratch_data (0),
-            sample_copy_data (0)
+            sample_copy_data (0),
+            currently_in_use (false)
           {}
         };
 
@@ -818,7 +824,7 @@ namespace WorkStream
          * to each worker and copier function invokation.
          */
         IteratorRangeToItemStream (const typename std::vector<Iterator>::const_iterator &begin,
-                                   const typename std::vector<Iterator>::const_iterator       &end,
+                                   const typename std::vector<Iterator>::const_iterator &end,
                                    const unsigned int    buffer_size,
                                    const unsigned int    chunk_size,
                                    const ScratchData    &sample_scratch_data,
@@ -826,23 +832,27 @@ namespace WorkStream
           :
           tbb::filter (/*is_serial=*/true),
           remaining_iterator_range (begin, end),
-          ring_buffer (buffer_size),
+          item_buffer (buffer_size),
           sample_scratch_data (sample_scratch_data),
           sample_copy_data (sample_copy_data),
-          n_emitted_items (0),
           chunk_size (chunk_size)
         {
-          // initialize the elements of the ring buffer
-          for (unsigned int element=0; element<ring_buffer.size(); ++element)
+          Assert (begin != end, ExcMessage ("This class is not prepared to deal with empty ranges!"));
+          // initialize the elements of the item_buffer
+          for (unsigned int element=0; element<item_buffer.size(); ++element)
             {
-              Assert (ring_buffer[element].n_items == 0,
+              Assert (item_buffer[element].n_items == 0,
                       ExcInternalError());
 
-              ring_buffer[element].work_items.resize (chunk_size,
-                                                      *remaining_iterator_range.second);
-              ring_buffer[element].scratch_and_copy_data = &thread_local_scratch_and_copy;
-              ring_buffer[element].sample_scratch_data = &sample_scratch_data;
-              ring_buffer[element].sample_copy_data = &sample_copy_data;
+              // resize the item_buffer. we have to initialize the new
+              // elements with something and because we can't rely on there
+              // being a default constructor for 'Iterator', we take the first
+              // element in the range [begin,end) pointed to.
+              item_buffer[element].work_items.resize (chunk_size,*begin);
+              item_buffer[element].scratch_and_copy_data = &thread_local_scratch_and_copy;
+              item_buffer[element].sample_scratch_data = &sample_scratch_data;
+              item_buffer[element].sample_copy_data = &sample_copy_data;
+              item_buffer[element].currently_in_use = false;
             }
         }
 
@@ -853,10 +863,21 @@ namespace WorkStream
          */
         virtual void *operator () (void *)
         {
-          // store the current
-          // position of the pointer
-          ItemType *current_item
-            = &ring_buffer[n_emitted_items % ring_buffer.size()];
+          // find first unused item. we know that there must be one
+          // because we have set the maximal number of tokens in flight
+          // and have set the ring buffer to have exactly this size. so
+          // if this function is called, we know that less than the
+          // maximal number of items in currently in flight
+          ItemType *current_item = 0;
+          for (unsigned int i=0; i<item_buffer.size(); ++i)
+            if (item_buffer[i].currently_in_use == false)
+              {
+                item_buffer[i].currently_in_use = true;
+                current_item = &item_buffer[i];
+                break;
+              }
+          Assert (current_item != 0, ExcMessage ("This can't be. There must be a free item!"));
+
 
           // initialize the next item. it may
           // consist of at most chunk_size
@@ -882,10 +903,7 @@ namespace WorkStream
             // left. terminate the pipeline
             return 0;
           else
-            {
-              ++n_emitted_items;
-              return current_item;
-            }
+            return current_item;
         }
 
       private:
@@ -899,7 +917,7 @@ namespace WorkStream
         /**
          * A ring buffer that will store items.
          */
-        std::vector<ItemType>        ring_buffer;
+        std::vector<ItemType>        item_buffer;
 
         /**
          * Pointer to a thread local variable identifying the scratch and
@@ -925,13 +943,6 @@ namespace WorkStream
         const CopyData &sample_copy_data;
 
         /**
-         * Counter for the number of emitted
-         * items. Each item may consist of up
-         * to chunk_size iterator elements.
-         */
-        unsigned int       n_emitted_items;
-
-        /**
          * Number of elements of the
          * iterator range that each
          * thread should work on
@@ -948,20 +959,20 @@ namespace WorkStream
         /**
          * Initialize the pointers and vector
          * elements in the specified entry of
-         * the ring buffer.
+         * the item_buffer.
          */
         void init_buffer_elements (const unsigned int element)
         {
-          Assert (ring_buffer[element].n_items == 0,
+          Assert (item_buffer[element].n_items == 0,
                   ExcInternalError());
 
-          ring_buffer[element].work_items
+          item_buffer[element].work_items
           .resize (chunk_size, remaining_iterator_range.second);
-          ring_buffer[element].scratch_and_copy_data
+          item_buffer[element].scratch_and_copy_data
             = &thread_local_scratch_and_copy;
-          ring_buffer[element].sample_scratch_data
+          item_buffer[element].sample_scratch_data
             = &sample_scratch_data;
-          ring_buffer[element].sample_copy_data
+          item_buffer[element].sample_copy_data
             = &sample_copy_data;
         }
       };
@@ -1097,6 +1108,9 @@ namespace WorkStream
                   p->currently_in_use = false;
                 }
           }
+
+          // mark current item as usable again
+          current_item->currently_in_use = false;
 
           // return an invalid item since we are at the end of the
           // pipeline
