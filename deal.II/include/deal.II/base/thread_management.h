@@ -1487,7 +1487,7 @@ namespace Threads
       void start (const std_cxx1x::function<RT ()> &function)
       {
         ret_val.reset(new return_value<RT>());
-        call (function, ret_val);
+        call (function, *ret_val);
       }
 
       /**
