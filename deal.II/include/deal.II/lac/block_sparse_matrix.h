@@ -186,8 +186,11 @@ public:
    * sparsity patterns of the
    * parameter.
    *
-   * The elements of the matrix are
-   * set to zero by this function.
+   * You have to make sure that the lifetime of the sparsity structure is at
+   * least as long as that of this matrix or as long as reinit(const
+   * SparsityPattern &) is not called with a new sparsity structure.
+   *
+   * The elements of the matrix are set to zero by this function.
    */
   virtual void reinit (const BlockSparsityPattern &sparsity);
 //@}
