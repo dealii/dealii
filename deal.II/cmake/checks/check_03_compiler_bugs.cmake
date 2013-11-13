@@ -314,14 +314,41 @@ CHECK_CXX_COMPILER_BUG(
   "
   DEAL_II_ICC_NUMERICLIMITS_BUG)
 
-IF(DEAL_II_ICC_NUMERICLIMITS_BUG)
+#
+# icc-14.0.0 has an astonishing bug [1] where it hits an internal compiler
+# error when run in C++11 mode with libstdc++-4.7 (from gcc).
+#
+# We just disable C++11 mode in this case
+#
+# [1] http://software.intel.com/en-us/forums/topic/472385
+#
+# - Matthias Maier, 2013
+#
+CHECK_CXX_COMPILER_BUG(
+  "
+  #include <vector>
+  template<typename T> void foo()
+  {
+    std::vector<double> data(100);
+  }
+  int main()
+  {
+    foo<int>();
+  }
+  "
+  DEAL_II_ICC_LIBSTDCPP47CXX11_BUG)
+
+
+IF( DEAL_II_ICC_NUMERICLIMITS_BUG OR
+    DEAL_II_ICC_LIBSTDCPP47CXX11_BUG )
   MESSAGE(STATUS
-    "DEAL_II_ICC_NUMERICLIMITS_BUG found, disabling c++11 support"
+    "Intel C++11 bug found, disabling C++11 support"
     )
   STRIP_FLAG(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
   SET(DEAL_II_CAN_USE_CXX1X FALSE)
   SET(DEAL_II_USE_CXX11 FALSE)
 ENDIF()
+
 
 #
 # gcc-4.8.1 has some problems with the constexpr "vertices_per_cell" in the
