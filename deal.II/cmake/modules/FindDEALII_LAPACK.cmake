@@ -114,6 +114,14 @@ IF(LAPACK_FOUND)
   ENDFOREACH()
   SWITCH_LIBRARY_PREFERENCE()
 
+  #
+  # Filter out spurious "FALSE" in the library lists:
+  #
+  IF(DEFINED BLAS_LIBRARIES)
+    LIST(REMOVE_ITEM BLAS_LIBRARIES "FALSE")
+  ENDIF()
+  LIST(REMOVE_ITEM LAPACK_LIBRARIES "FALSE")
+
   MARK_AS_ADVANCED(
     BLAS_DIR
     LAPACK_DIR
@@ -130,14 +138,10 @@ ELSE()
     )
 
   #
-  # If we couldn't find LAPACK, clean up the library variables:
+  # Clean up the library variables in case we couldn't find the libraries
+  # to avoid spurious inclusions of "-NOTFOUND" or "FALSE":
   #
-
-  IF("${BLAS_LIBRARIES}" STREQUAL "FALSE")
-    SET(BLAS_LIBRARIES "")
-  ENDIF()
-  IF("${LAPACK_LIBRARIES}" STREQUAL "FALSE")
-    SET(LAPACK_LIBRARIES "")
-  ENDIF()
+  SET(BLAS_LIBRARIES)
+  SET(LAPACK_LIBRARIES)
 
 ENDIF()
