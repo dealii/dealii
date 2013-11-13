@@ -120,6 +120,12 @@ struct CellData
     types::boundary_id boundary_id;
     types::material_id material_id;
   };
+
+  /**
+   * Default constructor. Sets the vertex indices to invalid values and the boundary or material
+   * id the default value (zero).
+   */
+  CellData ();
 };
 
 
@@ -3640,6 +3646,19 @@ private:
 
 
 #ifndef DOXYGEN
+
+
+template <int structdim>
+inline
+CellData<structdim>::CellData ()
+{
+  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+    vertices[i] = numbers::invalid_unsigned_int;
+
+  material_id = 0;
+}
+
+
 
 namespace internal
 {

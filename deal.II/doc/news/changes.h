@@ -211,6 +211,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The CellData class now has a default constructor that
+  sets the material and boundary indicators to zero. This fixes certain
+  internal errors with the Intel ICC compiler.
+  <br>
+  (Wolfgang Bangerth, 2013/11/13)
+  </li>
+
   <li> New: There is now a framework for coloring graphs, with functions
   in namespace GraphColoring.
   <br>
