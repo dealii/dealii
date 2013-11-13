@@ -134,22 +134,6 @@ MACRO(FEATURE_FIND_EXTERNAL _feature _var)
 ENDMACRO()
 
 
-#
-# Default macro for basic external setup:
-#
-MACRO(FEATURE_CONFIGURE_EXTERNAL _feature)
-  IF(DEFINED ${_feature}_INCLUDE_DIRS)
-    INCLUDE_DIRECTORIES(${${_feature}_INCLUDE_DIRS})
-  ENDIF()
-  IF(DEFINED ${_feature}_LIBRARIES)
-    DEAL_II_APPEND_LIBRARIES(${${_feature}_LIBRARIES})
-  ENDIF()
-  IF(DEFINED ${_feature}_LINKER_FLAGS)
-    ADD_FLAGS(DEAL_II_LINKER_FLAGS "${${_feature}_LINKER_FLAGS}")
-  ENDIF()
-ENDMACRO()
-
-
 ########################################################################
 #                                                                      #
 #                          CONFIGURE_FEATURE:                          #
@@ -249,7 +233,7 @@ MACRO(CONFIGURE_FEATURE _feature)
           IF(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
             RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
           ELSE()
-            FEATURE_CONFIGURE_EXTERNAL(${_feature})
+            REGISTER_FEATURE(${_feature})
           ENDIF()
 
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")

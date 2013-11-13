@@ -114,10 +114,8 @@ ENDMACRO()
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES(${PETSC_INCLUDE_DIRS})
 
-  # The user has to know the location of the petsc headers as well:
-  LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${PETSC_INCLUDE_DIRS})
-
-  DEAL_II_APPEND_LIBRARIES(${PETSC_LIBRARIES})
+  SET(PETSC_ADD_TO_USER_INCLUDE_DIRS TRUE)
+  REGISTER_FEATURE(PETSC)
 
   #
   # Disable a bunch of warnings when compiling with petsc:

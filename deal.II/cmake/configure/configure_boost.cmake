@@ -74,21 +74,33 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 
   MARK_AS_ADVANCED(Boost_DIR)
 
-  SET(BOOST_VERSION_MAJOR "${Boost_MAJOR_VERSION}")
-  SET(BOOST_VERSION_MINOR "${Boost_MINOR_VERSION}")
-  SET(BOOST_VERSION_SUBMINOR "${Boost_SUBMINOR_VERSION}")
-  SET(BOOST_VERSION
-    "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR}"
-    )
-
 
   IF( Boost_SERIALIZATION_FOUND AND
       Boost_SYSTEM_FOUND AND
-      (NOT DEAL_II_WITH_THREADS OR Boost_THREAD_FOUND)
-    )
+      (NOT DEAL_II_WITH_THREADS OR Boost_THREAD_FOUND) )
+
+    SET(BOOST_VERSION_MAJOR "${Boost_MAJOR_VERSION}")
+    SET(BOOST_VERSION_MINOR "${Boost_MINOR_VERSION}")
+    SET(BOOST_VERSION_SUBMINOR "${Boost_SUBMINOR_VERSION}")
+    SET(BOOST_VERSION
+      "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR}"
+      )
+
+    #
+    # Remove "pthread" from Boost_LIBRARIES. Threading, if necessary, is
+    # already set up via configure_1_threads.cmake.
+    #
+    LIST(REMOVE_ITEM Boost_LIBRARIES "pthread")
+
+    SET(BOOST_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+    SET(BOOST_LIBRARIES ${Boost_LIBRARIES})
+
     MARK_AS_ADVANCED(BOOST_DIR)
+
     SET(${var} TRUE)
+
   ELSE()
+
     SET(BOOST_DIR "" CACHE PATH
       "An optional hint to a boost directory"
       )
@@ -96,21 +108,10 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
-  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
-
-  # The user has to know the location of the boost headers as well:
-  LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
-
-  #
-  # Remove "pthread" from Boost_LIBRARIES. Threading, if necessary, is
-  # already set up via configure_1_threads.cmake.
-  #
-  LIST(REMOVE_ITEM Boost_LIBRARIES "pthread")
-
-  DEAL_II_APPEND_LIBRARIES(${Boost_LIBRARIES})
-
-ENDMACRO()
+#
+# The user has to know the location of the boost headers as well:
+#
+SET(BOOST_ADD_TO_USER_INCLUDE_DIRS TRUE)
 
 
 MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
