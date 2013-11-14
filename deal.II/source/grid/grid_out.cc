@@ -368,6 +368,7 @@ namespace GridOutFlags
     label_cell_index(label_cell_index),
     label_material_id(label_material_id),
     label_subdomain_id(label_subdomain_id),
+    label_level_subdomain_id(false),
     draw_colorbar(draw_colorbar),
     draw_legend(draw_legend)
   {}
