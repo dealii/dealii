@@ -72,6 +72,13 @@ FOREACH(_var
   ENDIF()
 ENDFOREACH()
 
+# Be as quiet as possible:
+IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  SET(_shoo)
+ELSE()
+  SET(_shoo >/dev/null)
+ENDIF()
+
 #
 # Glob together a list of all subfolders to set up:
 #
@@ -101,7 +108,7 @@ FOREACH(_category ${_categories})
         ${CMAKE_CURRENT_BINARY_DIR}/${_category}
       COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/${_category} &&
         ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
-        > /dev/null # Shoo!
+        ${_shoo}
       DEPENDS ${_category_dir}
       COMMENT "Processing tests/${_category}"
       )
@@ -113,14 +120,14 @@ FOREACH(_category ${_categories})
     ADD_CUSTOM_TARGET(regen_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
         --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target regenerate
-        > /dev/null # Shoo!
+        ${_shoo}
       )
     ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
     ADD_CUSTOM_TARGET(clean_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
         --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target clean
-        > /dev/null # Shoo!
+        ${_shoo}
       )
     ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
 
@@ -154,3 +161,4 @@ FOREACH(_category ${_categories})
 ENDFOREACH()
 
 MESSAGE(STATUS "Regenerating testsuite subprojects - Done")
+MESSAGE(STATUS "")
