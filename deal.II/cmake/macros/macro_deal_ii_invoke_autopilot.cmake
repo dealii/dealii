@@ -152,7 +152,7 @@ ${_switch_targets}#
 #      $ make edit_cache     - to change (cached) configuration variables
 #                              and rerun the configure and generate phases of CMake
 #
-#      $ make strip_comments - strip the source files in this
+#      $ make strip_comments - to strip the source files in this
 #                              directory off the documentation comments
 #      $ make clean          - to remove the generated executable as well as
 #                              all intermediate compilation files
