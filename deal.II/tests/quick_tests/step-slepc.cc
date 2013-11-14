@@ -16,6 +16,7 @@
  */
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/table_handler.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
@@ -60,9 +61,10 @@ private:
   
   PETScWrappers::SparseMatrix        A, B;
   std::vector<PETScWrappers::Vector> x;
-  std::vector<double>                lambda;
-  
-  ConstraintMatrix constraints;
+  std::vector<double>                lambda;  
+  ConstraintMatrix                   constraints;
+
+  TableHandler output_table;
 };
 
 LaplaceEigenspectrumProblem::LaplaceEigenspectrumProblem ()
@@ -73,10 +75,9 @@ LaplaceEigenspectrumProblem::LaplaceEigenspectrumProblem ()
 
 void LaplaceEigenspectrumProblem::setup_system ()
 {
-  GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (3);
   dof_handler.distribute_dofs (fe);
   
+  constraints.clear ();
   DoFTools::make_zero_boundary_constraints (dof_handler, constraints);
   constraints.close ();
   
@@ -89,6 +90,10 @@ void LaplaceEigenspectrumProblem::setup_system ()
   x[0].reinit (dof_handler.n_dofs ());
   lambda.resize (1);
   lambda[0] = 0.;
+
+  // some output
+  output_table.add_value ("cells", triangulation.n_active_cells());
+  output_table.add_value ("dofs",  dof_handler.n_dofs());
 }
 
 void LaplaceEigenspectrumProblem::assemble_system ()
@@ -150,16 +155,46 @@ void LaplaceEigenspectrumProblem::assemble_system ()
 
 void LaplaceEigenspectrumProblem::solve ()
 {
-  SolverControl solver_control (1., 1e-03);
-  SLEPcWrappers::SolverLAPACK eigensolver (solver_control);
+  SolverControl solver_control (1000, 1e-03);
+  SLEPcWrappers::SolverArnoldi eigensolver (solver_control);
+  eigensolver.set_which_eigenpairs (EPS_SMALLEST_REAL);
   eigensolver.solve (A, B, lambda, x, x.size());
+
+  // some output
+  output_table.add_value ("lambda", lambda[0]);
+  output_table.add_value ("error", std::fabs(2.-lambda[0]));
 }
 
 void LaplaceEigenspectrumProblem::run ()
 {
-  setup_system ();
-  assemble_system ();
-  solve ();
+  const double radius = dealii::numbers::PI/2.;
+  GridGenerator::hyper_cube (triangulation, -radius, radius);
+
+  // set the old eigenvalue to a silly number.
+  double old_lambda = 1000;
+
+  for (unsigned int c=0; c<5; ++c)
+    {
+      // obtain numerical result
+      triangulation.refine_global (1);
+      setup_system ();
+      assemble_system ();
+      solve ();
+
+      // check energy convergence with previous result
+      AssertThrow (lambda[0]<old_lambda, ExcMessage("solution is not converging"));
+      old_lambda = lambda[0];
+    }
+
+  // push back analytic result
+  output_table.add_value ("cells", "inf");
+  output_table.add_value ("dofs",  "inf");
+  output_table.add_value ("lambda", 2.);
+  output_table.add_value ("error", "-");
+
+  // finialise output
+  output_table.write_text (std::cout);
+  deallog << std::endl;
 }
 
 
@@ -172,7 +207,6 @@ int main (int argc, char **argv)
         deallog.depth_console (0);
         LaplaceEigenspectrumProblem problem;
         problem.run ();
-	deallog << "OK" << std::endl;
       }
     }
 
