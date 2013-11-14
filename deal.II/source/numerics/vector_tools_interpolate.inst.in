@@ -22,7 +22,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
 
       template
         void interpolate
-        (const Mapping<deal_II_dimension,deal_II_space_dimension>&,
+        (const Mapping<DoFHandler<deal_II_dimension,deal_II_space_dimension>::dimension,DoFHandler<deal_II_dimension,deal_II_space_dimension>::space_dimension>&,
          const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
          const Function<deal_II_space_dimension>&,
          VEC&);
@@ -120,5 +120,3 @@ for (deal_II_dimension : DIMENSIONS)
 
   \}
 }
-
-
