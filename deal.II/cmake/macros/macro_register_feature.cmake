@@ -23,8 +23,7 @@
 # This macro will
 #
 #   - add ${feature}_INCLUDE_DIRS and ${feature}_INCLUDE_PATH
-#     to the list of (internal) include
-#     directories
+#     to the list of (internal) include directories
 #   - and if ${feature}_ADD_TO_USER_INCLUDE_DIRS is defined also to
 #     DEAL_II_USER_INCLUDE_DIRS
 #
@@ -40,12 +39,9 @@
 
 
 MACRO(REGISTER_FEATURE _feature)
-  MESSAGE(STATUS "Register enabled external feature ${_feature}:")
-
   # variables for include directories:
   FOREACH(_var ${_feature}_INCLUDE_DIRS ${_feature}_INCLUDE_PATH)
     IF(DEFINED ${_var})
-      MESSAGE(STATUS "  ${_var}")
       INCLUDE_DIRECTORIES(${${_var}})
       IF(${_feature}_ADD_TO_USER_INCLUDE_DIRS)
         LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${${_var}})
@@ -56,7 +52,6 @@ MACRO(REGISTER_FEATURE _feature)
   # variables for linker flags:
   FOREACH(_var ${_feature}_LINKER_FLAGS ${_feature}_LINK_FLAGS)
     IF(DEFINED ${_var})
-      MESSAGE(STATUS "  ${_var}")
       ADD_FLAGS(DEAL_II_LINKER_FLAGS "${${_var}}")
     ENDIF()
   ENDFOREACH()
@@ -64,13 +59,11 @@ MACRO(REGISTER_FEATURE _feature)
   # variables for compiler flags:
   FOREACH(_var ${_feature}_CXX_FLAGS ${_feature}_COMPILE_FLAGS)
     IF(DEFINED ${_var})
-      MESSAGE(STATUS "  ${_var}")
       ADD_FLAGS(CMAKE_CXX_FLAGS "${${_var}}")
     ENDIF()
   ENDFOREACH()
 
   IF(DEFINED ${_feature}_LIBRARIES)
-    MESSAGE(STATUS "  ${_feature}_LIBRARIES")
     #
     # Add ${_feature}_LIBRARIES to
     #   DEAL_II_EXTERNAL_LIBRARIES
