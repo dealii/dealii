@@ -40,6 +40,42 @@ namespace GraphColoring
   namespace internal
   {
     /**
+     * Given two sets of indices that are assumed to be sorted, determine
+     * whether they will have a nonempty intersection. The actual intersection is
+     * not computed.
+     * @param indices1 A set of indices, assumed sorted.
+     * @param indices2 A set of indices, assumed sorted.
+     * @return Whether the two sets of indices do have a nonempty intersection.
+     */
+    inline
+    bool
+    have_nonempty_intersection (const std::vector<types::global_dof_index> &indices1,
+                                const std::vector<types::global_dof_index> &indices2)
+    {
+      // we assume that both arrays are sorted, so we can walk
+      // them in lockstep and see if we encounter an index that's
+      // in both arrays. once we reach the end of either array,
+      // we know that there is no intersection
+      std::vector<types::global_dof_index>::const_iterator
+      p = indices1.begin(),
+      q = indices2.begin();
+      while ((p != indices1.end()) && (q != indices2.end()))
+        {
+          if (*p < *q)
+            ++p;
+          else if (*p > *q)
+            ++q;
+          else
+            // conflict found!
+            return true;
+        }
+
+      // no conflict found!
+      return false;
+    }
+
+
+    /**
      * Create a partitioning of the given range of iterators using a simplified
      * version of the Cuthill-McKee algorithm (Breadth First Search algorithm).
      * The function creates partitions that contain "zones" of iterators
@@ -105,7 +141,9 @@ namespace GraphColoring
           std::vector<Iterator> new_zone;
           for (; previous_zone_it!=previous_zone_end; ++previous_zone_it)
             {
-              std::vector<types::global_dof_index> conflict_indices = get_conflict_indices(*previous_zone_it);
+              const std::vector<types::global_dof_index>
+              conflict_indices = get_conflict_indices(*previous_zone_it);
+
               const unsigned int n_conflict_indices(conflict_indices.size());
               for (unsigned int i=0; i<n_conflict_indices; ++i)
                 {
@@ -186,38 +224,27 @@ namespace GraphColoring
       std::vector<std::vector<types::global_dof_index> > conflict_indices(partition_size);
       std::vector<std::vector<unsigned int> > graph(partition_size);
 
-      // Get the conflict indices associated to each iterator. The conflict_indices have to be sorted so
-      // set_intersection can be used later.
+      // Get the conflict indices associated to each iterator. The conflict_indices have to
+      // be sorted so we can more easily find conflicts later on
       for (unsigned int i=0; i<partition_size; ++i)
         {
           conflict_indices[i] = get_conflict_indices(partition[i]);
-          std::sort(conflict_indices[i].begin(),conflict_indices[i].end());
+          std::sort(conflict_indices[i].begin(), conflict_indices[i].end());
         }
 
       // Compute the degree of each vertex of the graph using the
       // intersection of the conflict indices.
-      std::vector<types::global_dof_index> conflict_indices_intersection;
-      std::vector<types::global_dof_index>::iterator intersection_it;
       for (unsigned int i=0; i<partition_size; ++i)
         for (unsigned int j=i+1; j<partition_size; ++j)
-          {
-            conflict_indices_intersection.resize(std::max(conflict_indices[i].size(),
-                                                          conflict_indices[j].size()));
-            intersection_it = std::set_intersection(conflict_indices[i].begin(),
-                                                    conflict_indices[i].end(),
-                                                    conflict_indices[j].begin(),
-                                                    conflict_indices[j].end(),
-                                                    conflict_indices_intersection.begin());
             // If the two iterators share indices then we increase the degree of the
             // vertices and create an ''edge'' in the graph.
-            if (intersection_it!=conflict_indices_intersection.begin())
+            if (have_nonempty_intersection (conflict_indices[i], conflict_indices[j]))
               {
                 ++degrees[i];
                 ++degrees[j];
                 graph[i].push_back(j);
                 graph[j].push_back(i);
               }
-          }
 
       // Sort the vertices by decreasing degree.
       std::vector<int>::iterator degrees_it;
