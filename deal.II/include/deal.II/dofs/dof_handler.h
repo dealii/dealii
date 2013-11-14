@@ -1306,8 +1306,12 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
                ExcMessage ("The finite element associated with this DoFHandler does not match "
                            "the one that was associated with the DoFHandler previously stored."));
   AssertThrow (policy_name == typeid(*policy).name(),
-               ExcMessage ("The policy associated with this DoFHandler does not match "
-                           "the one that was associated with the DoFHandler previously stored."));
+               ExcMessage (std::string ("The policy currently associated with this DoFHandler (")
+			   + typeid(*policy).name()
+			   +std::string(") does not match the one that was associated with the "
+				       "DoFHandler previously stored (")
+			   + policy_name
+			   + ")."));
 }
 
 
