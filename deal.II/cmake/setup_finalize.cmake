@@ -124,10 +124,15 @@ _both(
 #                                ${CMAKE_CXX_COMPILER}
 "
   )
-_detailed(
-"#        CMAKE_GENERATOR:        ${CMAKE_GENERATOR}
-"
-  )
+
+IF(CMAKE_C_COMPILER_WORKS)
+  _detailed("#        CMAKE_C_COMPILER:       ${CMAKE_C_COMPILER}\n")
+ENDIF()
+IF(CMAKE_Fortran_COMPILER_WORKS)
+  _detailed("#        CMAKE_Fortran_COMPILER: ${CMAKE_Fortran_COMPILER}\n")
+ENDIF()
+_detailed("#        CMAKE_GENERATOR:        ${CMAKE_GENERATOR}\n")
+
 IF(CMAKE_CROSSCOMPILING)
   _both(
     "#\n#        CROSSCOMPILING!\n"
