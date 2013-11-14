@@ -57,7 +57,9 @@ void test_real_to_unit_cell()
     vertices[v] *= radius/vertices[v].norm();
   std::vector<CellData<dim> > cells;
   {
-    CellData<dim> d = {{0,1,2,3,4,5,6,7},{0}};
+    CellData<dim> d;
+    for (unsigned int i=0; i<8; ++i)
+      d.vertices[i] = i;
     cells.push_back(d);
   }
   Triangulation<dim> triangulation;
