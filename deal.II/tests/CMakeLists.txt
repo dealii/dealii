@@ -23,6 +23,8 @@
 # of complexity :-(
 #
 
+MESSAGE(STATUS "")
+MESSAGE(STATUS "Setup testsuite with TEST_DIR ${TEST_DIR}")
 ADD_SUBDIRECTORY(quick_tests)
 
 #
