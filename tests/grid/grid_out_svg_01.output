@@ -24,212 +24,212 @@
  <rect class="background" width="5600" height="4000"/>
   <!-- cells -->
   <path class="p1" d="M 3680 2000 L 3680 1160 L 3198 1432 L 3260 2000 L 3680 2000"/>
-  <text x="3455" y="1648" style="font-size:126">1,0,0,0</text>
+  <text x="3455" y="1648" style="font-size:126">1,0,0</text>
   <line x1="3680" y1="2000" x2="3680" y2="1160"/>
   <path class="p1" d="M 3680 1160 L 3680 320 L 3137 863 L 3198 1432 L 3680 1160"/>
-  <text x="3424" y="944" style="font-size:123">1,1,0,0</text>
+  <text x="3424" y="944" style="font-size:123">1,1,0</text>
   <line x1="3680" y1="1160" x2="3680" y2="320"/>
   <path class="p1" d="M 3680 320 L 2840 320 L 2568 802 L 3137 863 L 3680 320"/>
-  <text x="3056" y="576" style="font-size:123">1,4,0,0</text>
+  <text x="3056" y="576" style="font-size:123">1,4,0</text>
   <line x1="3680" y1="320" x2="2840" y2="320"/>
   <path class="p1" d="M 2840 320 L 2000 320 L 2000 740 L 2568 802 L 2840 320"/>
-  <text x="2352" y="545" style="font-size:126">1,5,0,0</text>
+  <text x="2352" y="545" style="font-size:126">1,5,0</text>
   <line x1="2840" y1="320" x2="2000" y2="320"/>
   <path class="p1" d="M 2000 320 L 1160 320 L 1432 802 L 2000 740 L 2000 320"/>
-  <text x="1648" y="545" style="font-size:126">1,8,0,0</text>
+  <text x="1648" y="545" style="font-size:126">1,8,0</text>
   <line x1="2000" y1="320" x2="1160" y2="320"/>
   <path class="p1" d="M 1160 320 L 320 320 L 863 863 L 1432 802 L 1160 320"/>
-  <text x="944" y="576" style="font-size:123">1,9,0,0</text>
+  <text x="944" y="576" style="font-size:123">1,9,0</text>
   <line x1="1160" y1="320" x2="320" y2="320"/>
   <path class="p1" d="M 320 320 L 320 1160 L 802 1432 L 863 863 L 320 320"/>
-  <text x="576" y="944" style="font-size:123">1,12,0,0</text>
+  <text x="576" y="944" style="font-size:123">1,12,0</text>
   <line x1="320" y1="320" x2="320" y2="1160"/>
   <path class="p1" d="M 320 1160 L 320 2000 L 740 2000 L 802 1432 L 320 1160"/>
-  <text x="545" y="1648" style="font-size:126">1,13,0,0</text>
+  <text x="545" y="1648" style="font-size:126">1,13,0</text>
   <line x1="320" y1="1160" x2="320" y2="2000"/>
   <path class="p1" d="M 320 2000 L 320 2840 L 802 2568 L 740 2000 L 320 2000"/>
-  <text x="545" y="2352" style="font-size:126">1,16,0,0</text>
+  <text x="545" y="2352" style="font-size:126">1,16,0</text>
   <line x1="320" y1="2000" x2="320" y2="2840"/>
   <path class="p1" d="M 320 2840 L 320 3680 L 863 3137 L 802 2568 L 320 2840"/>
-  <text x="576" y="3056" style="font-size:123">1,17,0,0</text>
+  <text x="576" y="3056" style="font-size:123">1,17,0</text>
   <line x1="320" y1="2840" x2="320" y2="3680"/>
   <path class="p1" d="M 320 3680 L 1160 3680 L 1432 3198 L 863 3137 L 320 3680"/>
-  <text x="944" y="3424" style="font-size:123">1,20,0,0</text>
+  <text x="944" y="3424" style="font-size:123">1,20,0</text>
   <line x1="320" y1="3680" x2="1160" y2="3680"/>
   <path class="p1" d="M 1160 3680 L 2000 3680 L 2000 3260 L 1432 3198 L 1160 3680"/>
-  <text x="1648" y="3455" style="font-size:126">1,21,0,0</text>
+  <text x="1648" y="3455" style="font-size:126">1,21,0</text>
   <line x1="1160" y1="3680" x2="2000" y2="3680"/>
   <path class="p1" d="M 2000 3680 L 2840 3680 L 2568 3198 L 2000 3260 L 2000 3680"/>
-  <text x="2352" y="3455" style="font-size:126">1,24,0,0</text>
+  <text x="2352" y="3455" style="font-size:126">1,24,0</text>
   <line x1="2000" y1="3680" x2="2840" y2="3680"/>
   <path class="p1" d="M 2840 3680 L 3680 3680 L 3137 3137 L 2568 3198 L 2840 3680"/>
-  <text x="3056" y="3424" style="font-size:123">1,25,0,0</text>
+  <text x="3056" y="3424" style="font-size:123">1,25,0</text>
   <line x1="2840" y1="3680" x2="3680" y2="3680"/>
   <path class="p1" d="M 3680 3680 L 3680 2840 L 3198 2568 L 3137 3137 L 3680 3680"/>
-  <text x="3424" y="3056" style="font-size:123">1,28,0,0</text>
+  <text x="3424" y="3056" style="font-size:123">1,28,0</text>
   <line x1="3680" y1="3680" x2="3680" y2="2840"/>
   <path class="p1" d="M 3680 2840 L 3680 2000 L 3260 2000 L 3198 2568 L 3680 2840"/>
-  <text x="3455" y="2352" style="font-size:126">1,29,0,0</text>
+  <text x="3455" y="2352" style="font-size:126">1,29,0</text>
   <line x1="3680" y1="2840" x2="3680" y2="2000"/>
   <path class="p2" d="M 3260 2000 L 3229 1716 L 3004 1784 L 3050 2000 L 3260 2000"/>
-  <text x="3136" y="1875" style="font-size:65">2,0,0,0</text>
+  <text x="3136" y="1875" style="font-size:65">2,0,0</text>
   <path class="p2" d="M 3229 1716 L 3198 1432 L 2958 1567 L 3004 1784 L 3229 1716"/>
-  <text x="3097" y="1625" style="font-size:64">2,1,0,0</text>
+  <text x="3097" y="1625" style="font-size:64">2,1,0</text>
   <path class="p2" d="M 3050 2000 L 3004 1784 L 2778 1852 L 2840 2000 L 3050 2000"/>
-  <text x="2918" y="1909" style="font-size:65">2,2,0,0</text>
+  <text x="2918" y="1909" style="font-size:65">2,2,0</text>
   <line x1="2840" y1="2000" x2="2778" y2="1852"/>
   <path class="p2" d="M 3004 1784 L 2958 1567 L 2717 1703 L 2778 1852 L 3004 1784"/>
-  <text x="2864" y="1726" style="font-size:65">2,3,0,0</text>
+  <text x="2864" y="1726" style="font-size:65">2,3,0</text>
   <line x1="2778" y1="1852" x2="2717" y2="1703"/>
   <path class="p2" d="M 3198 1432 L 3168 1147 L 2912 1351 L 2958 1567 L 3198 1432"/>
-  <text x="3059" y="1374" style="font-size:64">2,4,0,0</text>
+  <text x="3059" y="1374" style="font-size:64">2,4,0</text>
   <path class="p2" d="M 3168 1147 L 3137 863 L 2865 1135 L 2912 1351 L 3168 1147"/>
-  <text x="3020" y="1124" style="font-size:64">2,5,0,0</text>
+  <text x="3020" y="1124" style="font-size:64">2,5,0</text>
   <path class="p2" d="M 2958 1567 L 2912 1351 L 2655 1555 L 2717 1703 L 2958 1567"/>
-  <text x="2810" y="1544" style="font-size:65">2,6,0,0</text>
+  <text x="2810" y="1544" style="font-size:65">2,6,0</text>
   <line x1="2717" y1="1703" x2="2655" y2="1555"/>
   <path class="p2" d="M 2912 1351 L 2865 1135 L 2594 1406 L 2655 1555 L 2912 1351"/>
-  <text x="2757" y="1361" style="font-size:65">2,7,0,0</text>
+  <text x="2757" y="1361" style="font-size:65">2,7,0</text>
   <line x1="2655" y1="1555" x2="2594" y2="1406"/>
   <path class="p2" d="M 3137 863 L 2853 832 L 2649 1088 L 2865 1135 L 3137 863"/>
-  <text x="2876" y="980" style="font-size:64">2,8,0,0</text>
+  <text x="2876" y="980" style="font-size:64">2,8,0</text>
   <path class="p2" d="M 2853 832 L 2568 802 L 2433 1042 L 2649 1088 L 2853 832"/>
-  <text x="2626" y="941" style="font-size:64">2,9,0,0</text>
+  <text x="2626" y="941" style="font-size:64">2,9,0</text>
   <path class="p2" d="M 2865 1135 L 2649 1088 L 2445 1345 L 2594 1406 L 2865 1135"/>
-  <text x="2639" y="1243" style="font-size:65">2,10,0,0</text>
+  <text x="2639" y="1243" style="font-size:65">2,10,0</text>
   <line x1="2594" y1="1406" x2="2445" y2="1345"/>
   <path class="p2" d="M 2649 1088 L 2433 1042 L 2297 1283 L 2445 1345 L 2649 1088"/>
-  <text x="2456" y="1190" style="font-size:65">2,11,0,0</text>
+  <text x="2456" y="1190" style="font-size:65">2,11,0</text>
   <line x1="2445" y1="1345" x2="2297" y2="1283"/>
   <path class="p2" d="M 2568 802 L 2284 771 L 2216 996 L 2433 1042 L 2568 802"/>
-  <text x="2375" y="903" style="font-size:64">2,12,0,0</text>
+  <text x="2375" y="903" style="font-size:64">2,12,0</text>
   <path class="p2" d="M 2284 771 L 2000 740 L 2000 950 L 2216 996 L 2284 771"/>
-  <text x="2125" y="864" style="font-size:65">2,13,0,0</text>
+  <text x="2125" y="864" style="font-size:65">2,13,0</text>
   <path class="p2" d="M 2433 1042 L 2216 996 L 2148 1222 L 2297 1283 L 2433 1042"/>
-  <text x="2274" y="1136" style="font-size:65">2,14,0,0</text>
+  <text x="2274" y="1136" style="font-size:65">2,14,0</text>
   <line x1="2297" y1="1283" x2="2148" y2="1222"/>
   <path class="p2" d="M 2216 996 L 2000 950 L 2000 1160 L 2148 1222 L 2216 996"/>
-  <text x="2091" y="1082" style="font-size:65">2,15,0,0</text>
+  <text x="2091" y="1082" style="font-size:65">2,15,0</text>
   <line x1="2148" y1="1222" x2="2000" y2="1160"/>
   <path class="p2" d="M 2000 740 L 1716 771 L 1784 996 L 2000 950 L 2000 740"/>
-  <text x="1875" y="864" style="font-size:65">2,16,0,0</text>
+  <text x="1875" y="864" style="font-size:65">2,16,0</text>
   <path class="p2" d="M 1716 771 L 1432 802 L 1567 1042 L 1784 996 L 1716 771"/>
-  <text x="1625" y="903" style="font-size:64">2,17,0,0</text>
+  <text x="1625" y="903" style="font-size:64">2,17,0</text>
   <path class="p2" d="M 2000 950 L 1784 996 L 1852 1222 L 2000 1160 L 2000 950"/>
-  <text x="1909" y="1082" style="font-size:65">2,18,0,0</text>
+  <text x="1909" y="1082" style="font-size:65">2,18,0</text>
   <line x1="2000" y1="1160" x2="1852" y2="1222"/>
   <path class="p2" d="M 1784 996 L 1567 1042 L 1703 1283 L 1852 1222 L 1784 996"/>
-  <text x="1726" y="1136" style="font-size:65">2,19,0,0</text>
+  <text x="1726" y="1136" style="font-size:65">2,19,0</text>
   <line x1="1852" y1="1222" x2="1703" y2="1283"/>
   <path class="p2" d="M 1432 802 L 1147 832 L 1351 1088 L 1567 1042 L 1432 802"/>
-  <text x="1374" y="941" style="font-size:64">2,20,0,0</text>
+  <text x="1374" y="941" style="font-size:64">2,20,0</text>
   <path class="p2" d="M 1147 832 L 863 863 L 1135 1135 L 1351 1088 L 1147 832"/>
-  <text x="1124" y="980" style="font-size:64">2,21,0,0</text>
+  <text x="1124" y="980" style="font-size:64">2,21,0</text>
   <path class="p2" d="M 1567 1042 L 1351 1088 L 1555 1345 L 1703 1283 L 1567 1042"/>
-  <text x="1544" y="1190" style="font-size:65">2,22,0,0</text>
+  <text x="1544" y="1190" style="font-size:65">2,22,0</text>
   <line x1="1703" y1="1283" x2="1555" y2="1345"/>
   <path class="p2" d="M 1351 1088 L 1135 1135 L 1406 1406 L 1555 1345 L 1351 1088"/>
-  <text x="1361" y="1243" style="font-size:65">2,23,0,0</text>
+  <text x="1361" y="1243" style="font-size:65">2,23,0</text>
   <line x1="1555" y1="1345" x2="1406" y2="1406"/>
   <path class="p2" d="M 863 863 L 832 1147 L 1088 1351 L 1135 1135 L 863 863"/>
-  <text x="980" y="1124" style="font-size:64">2,24,0,0</text>
+  <text x="980" y="1124" style="font-size:64">2,24,0</text>
   <path class="p2" d="M 832 1147 L 802 1432 L 1042 1567 L 1088 1351 L 832 1147"/>
-  <text x="941" y="1374" style="font-size:64">2,25,0,0</text>
+  <text x="941" y="1374" style="font-size:64">2,25,0</text>
   <path class="p2" d="M 1135 1135 L 1088 1351 L 1345 1555 L 1406 1406 L 1135 1135"/>
-  <text x="1243" y="1361" style="font-size:65">2,26,0,0</text>
+  <text x="1243" y="1361" style="font-size:65">2,26,0</text>
   <line x1="1406" y1="1406" x2="1345" y2="1555"/>
   <path class="p2" d="M 1088 1351 L 1042 1567 L 1283 1703 L 1345 1555 L 1088 1351"/>
-  <text x="1190" y="1544" style="font-size:65">2,27,0,0</text>
+  <text x="1190" y="1544" style="font-size:65">2,27,0</text>
   <line x1="1345" y1="1555" x2="1283" y2="1703"/>
   <path class="p2" d="M 802 1432 L 771 1716 L 996 1784 L 1042 1567 L 802 1432"/>
-  <text x="903" y="1625" style="font-size:64">2,28,0,0</text>
+  <text x="903" y="1625" style="font-size:64">2,28,0</text>
   <path class="p2" d="M 771 1716 L 740 2000 L 950 2000 L 996 1784 L 771 1716"/>
-  <text x="864" y="1875" style="font-size:65">2,29,0,0</text>
+  <text x="864" y="1875" style="font-size:65">2,29,0</text>
   <path class="p2" d="M 1042 1567 L 996 1784 L 1222 1852 L 1283 1703 L 1042 1567"/>
-  <text x="1136" y="1726" style="font-size:65">2,30,0,0</text>
+  <text x="1136" y="1726" style="font-size:65">2,30,0</text>
   <line x1="1283" y1="1703" x2="1222" y2="1852"/>
   <path class="p2" d="M 996 1784 L 950 2000 L 1160 2000 L 1222 1852 L 996 1784"/>
-  <text x="1082" y="1909" style="font-size:65">2,31,0,0</text>
+  <text x="1082" y="1909" style="font-size:65">2,31,0</text>
   <line x1="1222" y1="1852" x2="1160" y2="2000"/>
   <path class="p2" d="M 740 2000 L 771 2284 L 996 2216 L 950 2000 L 740 2000"/>
-  <text x="864" y="2125" style="font-size:65">2,32,0,0</text>
+  <text x="864" y="2125" style="font-size:65">2,32,0</text>
   <path class="p2" d="M 771 2284 L 802 2568 L 1042 2433 L 996 2216 L 771 2284"/>
-  <text x="903" y="2375" style="font-size:64">2,33,0,0</text>
+  <text x="903" y="2375" style="font-size:64">2,33,0</text>
   <path class="p2" d="M 950 2000 L 996 2216 L 1222 2148 L 1160 2000 L 950 2000"/>
-  <text x="1082" y="2091" style="font-size:65">2,34,0,0</text>
+  <text x="1082" y="2091" style="font-size:65">2,34,0</text>
   <line x1="1160" y1="2000" x2="1222" y2="2148"/>
   <path class="p2" d="M 996 2216 L 1042 2433 L 1283 2297 L 1222 2148 L 996 2216"/>
-  <text x="1136" y="2274" style="font-size:65">2,35,0,0</text>
+  <text x="1136" y="2274" style="font-size:65">2,35,0</text>
   <line x1="1222" y1="2148" x2="1283" y2="2297"/>
   <path class="p2" d="M 802 2568 L 832 2853 L 1088 2649 L 1042 2433 L 802 2568"/>
-  <text x="941" y="2626" style="font-size:64">2,36,0,0</text>
+  <text x="941" y="2626" style="font-size:64">2,36,0</text>
   <path class="p2" d="M 832 2853 L 863 3137 L 1135 2865 L 1088 2649 L 832 2853"/>
-  <text x="980" y="2876" style="font-size:64">2,37,0,0</text>
+  <text x="980" y="2876" style="font-size:64">2,37,0</text>
   <path class="p2" d="M 1042 2433 L 1088 2649 L 1345 2445 L 1283 2297 L 1042 2433"/>
-  <text x="1190" y="2456" style="font-size:65">2,38,0,0</text>
+  <text x="1190" y="2456" style="font-size:65">2,38,0</text>
   <line x1="1283" y1="2297" x2="1345" y2="2445"/>
   <path class="p2" d="M 1088 2649 L 1135 2865 L 1406 2594 L 1345 2445 L 1088 2649"/>
-  <text x="1243" y="2639" style="font-size:65">2,39,0,0</text>
+  <text x="1243" y="2639" style="font-size:65">2,39,0</text>
   <line x1="1345" y1="2445" x2="1406" y2="2594"/>
   <path class="p2" d="M 863 3137 L 1147 3168 L 1351 2912 L 1135 2865 L 863 3137"/>
-  <text x="1124" y="3020" style="font-size:64">2,40,0,0</text>
+  <text x="1124" y="3020" style="font-size:64">2,40,0</text>
   <path class="p2" d="M 1147 3168 L 1432 3198 L 1567 2958 L 1351 2912 L 1147 3168"/>
-  <text x="1374" y="3059" style="font-size:64">2,41,0,0</text>
+  <text x="1374" y="3059" style="font-size:64">2,41,0</text>
   <path class="p2" d="M 1135 2865 L 1351 2912 L 1555 2655 L 1406 2594 L 1135 2865"/>
-  <text x="1361" y="2757" style="font-size:65">2,42,0,0</text>
+  <text x="1361" y="2757" style="font-size:65">2,42,0</text>
   <line x1="1406" y1="2594" x2="1555" y2="2655"/>
   <path class="p2" d="M 1351 2912 L 1567 2958 L 1703 2717 L 1555 2655 L 1351 2912"/>
-  <text x="1544" y="2810" style="font-size:65">2,43,0,0</text>
+  <text x="1544" y="2810" style="font-size:65">2,43,0</text>
   <line x1="1555" y1="2655" x2="1703" y2="2717"/>
   <path class="p2" d="M 1432 3198 L 1716 3229 L 1784 3004 L 1567 2958 L 1432 3198"/>
-  <text x="1625" y="3097" style="font-size:64">2,44,0,0</text>
+  <text x="1625" y="3097" style="font-size:64">2,44,0</text>
   <path class="p2" d="M 1716 3229 L 2000 3260 L 2000 3050 L 1784 3004 L 1716 3229"/>
-  <text x="1875" y="3136" style="font-size:65">2,45,0,0</text>
+  <text x="1875" y="3136" style="font-size:65">2,45,0</text>
   <path class="p2" d="M 1567 2958 L 1784 3004 L 1852 2778 L 1703 2717 L 1567 2958"/>
-  <text x="1726" y="2864" style="font-size:65">2,46,0,0</text>
+  <text x="1726" y="2864" style="font-size:65">2,46,0</text>
   <line x1="1703" y1="2717" x2="1852" y2="2778"/>
   <path class="p2" d="M 1784 3004 L 2000 3050 L 2000 2840 L 1852 2778 L 1784 3004"/>
-  <text x="1909" y="2918" style="font-size:65">2,47,0,0</text>
+  <text x="1909" y="2918" style="font-size:65">2,47,0</text>
   <line x1="1852" y1="2778" x2="2000" y2="2840"/>
   <path class="p2" d="M 2000 3260 L 2284 3229 L 2216 3004 L 2000 3050 L 2000 3260"/>
-  <text x="2125" y="3136" style="font-size:65">2,48,0,0</text>
+  <text x="2125" y="3136" style="font-size:65">2,48,0</text>
   <path class="p2" d="M 2284 3229 L 2568 3198 L 2433 2958 L 2216 3004 L 2284 3229"/>
-  <text x="2375" y="3097" style="font-size:64">2,49,0,0</text>
+  <text x="2375" y="3097" style="font-size:64">2,49,0</text>
   <path class="p2" d="M 2000 3050 L 2216 3004 L 2148 2778 L 2000 2840 L 2000 3050"/>
-  <text x="2091" y="2918" style="font-size:65">2,50,0,0</text>
+  <text x="2091" y="2918" style="font-size:65">2,50,0</text>
   <line x1="2000" y1="2840" x2="2148" y2="2778"/>
   <path class="p2" d="M 2216 3004 L 2433 2958 L 2297 2717 L 2148 2778 L 2216 3004"/>
-  <text x="2274" y="2864" style="font-size:65">2,51,0,0</text>
+  <text x="2274" y="2864" style="font-size:65">2,51,0</text>
   <line x1="2148" y1="2778" x2="2297" y2="2717"/>
   <path class="p2" d="M 2568 3198 L 2853 3168 L 2649 2912 L 2433 2958 L 2568 3198"/>
-  <text x="2626" y="3059" style="font-size:64">2,52,0,0</text>
+  <text x="2626" y="3059" style="font-size:64">2,52,0</text>
   <path class="p2" d="M 2853 3168 L 3137 3137 L 2865 2865 L 2649 2912 L 2853 3168"/>
-  <text x="2876" y="3020" style="font-size:64">2,53,0,0</text>
+  <text x="2876" y="3020" style="font-size:64">2,53,0</text>
   <path class="p2" d="M 2433 2958 L 2649 2912 L 2445 2655 L 2297 2717 L 2433 2958"/>
-  <text x="2456" y="2810" style="font-size:65">2,54,0,0</text>
+  <text x="2456" y="2810" style="font-size:65">2,54,0</text>
   <line x1="2297" y1="2717" x2="2445" y2="2655"/>
   <path class="p2" d="M 2649 2912 L 2865 2865 L 2594 2594 L 2445 2655 L 2649 2912"/>
-  <text x="2639" y="2757" style="font-size:65">2,55,0,0</text>
+  <text x="2639" y="2757" style="font-size:65">2,55,0</text>
   <line x1="2445" y1="2655" x2="2594" y2="2594"/>
   <path class="p2" d="M 3137 3137 L 3168 2853 L 2912 2649 L 2865 2865 L 3137 3137"/>
-  <text x="3020" y="2876" style="font-size:64">2,56,0,0</text>
+  <text x="3020" y="2876" style="font-size:64">2,56,0</text>
   <path class="p2" d="M 3168 2853 L 3198 2568 L 2958 2433 L 2912 2649 L 3168 2853"/>
-  <text x="3059" y="2626" style="font-size:64">2,57,0,0</text>
+  <text x="3059" y="2626" style="font-size:64">2,57,0</text>
   <path class="p2" d="M 2865 2865 L 2912 2649 L 2655 2445 L 2594 2594 L 2865 2865"/>
-  <text x="2757" y="2639" style="font-size:65">2,58,0,0</text>
+  <text x="2757" y="2639" style="font-size:65">2,58,0</text>
   <line x1="2594" y1="2594" x2="2655" y2="2445"/>
   <path class="p2" d="M 2912 2649 L 2958 2433 L 2717 2297 L 2655 2445 L 2912 2649"/>
-  <text x="2810" y="2456" style="font-size:65">2,59,0,0</text>
+  <text x="2810" y="2456" style="font-size:65">2,59,0</text>
   <line x1="2655" y1="2445" x2="2717" y2="2297"/>
   <path class="p2" d="M 3198 2568 L 3229 2284 L 3004 2216 L 2958 2433 L 3198 2568"/>
-  <text x="3097" y="2375" style="font-size:64">2,60,0,0</text>
+  <text x="3097" y="2375" style="font-size:64">2,60,0</text>
   <path class="p2" d="M 3229 2284 L 3260 2000 L 3050 2000 L 3004 2216 L 3229 2284"/>
-  <text x="3136" y="2125" style="font-size:65">2,61,0,0</text>
+  <text x="3136" y="2125" style="font-size:65">2,61,0</text>
   <path class="p2" d="M 2958 2433 L 3004 2216 L 2778 2148 L 2717 2297 L 2958 2433"/>
-  <text x="2864" y="2274" style="font-size:65">2,62,0,0</text>
+  <text x="2864" y="2274" style="font-size:65">2,62,0</text>
   <line x1="2717" y1="2297" x2="2778" y2="2148"/>
   <path class="p2" d="M 3004 2216 L 3050 2000 L 2840 2000 L 2778 2148 L 3004 2216"/>
-  <text x="2918" y="2091" style="font-size:65">2,63,0,0</text>
+  <text x="2918" y="2091" style="font-size:65">2,63,0</text>
   <line x1="2778" y1="2148" x2="2840" y2="2000"/>
 
  <!-- legend -->
@@ -237,8 +237,7 @@
  <text x="4050" y="425" style="text-anchor:start; font-weight:bold; font-size:70">cell label</text>
   <text x="4080" y="530" style="text-anchor:start; font-style:oblique; font-size:70">level_number,</text>
   <text x="4080" y="635" style="text-anchor:start; font-style:oblique; font-size:70">cell_index,</text>
-  <text x="4080" y="740" style="text-anchor:start; font-style:oblique; font-size:70">material_id,</text>
-  <text x= "4080" y="845" style="text-anchor:start; font-style:oblique; font-size:70">level_subdomain_id</text>
+  <text x="4080" y="740" style="text-anchor:start; font-style:oblique; font-size:70">material_id</text>
   <text x="4000" y="1073" style="text-anchor:start; font-size:70">azimuth: 0°, polar: 0°</text>
 
  <!-- colorbar -->
