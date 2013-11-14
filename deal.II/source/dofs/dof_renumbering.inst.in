@@ -17,7 +17,7 @@
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension 
+#if deal_II_dimension <= deal_II_space_dimension
     namespace DoFRenumbering
       \{
       namespace boost
@@ -56,6 +56,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	  void subdomain_wise<DoFHandler<deal_II_dimension,deal_II_space_dimension> >
 	  (DoFHandler<deal_II_dimension,deal_II_space_dimension> &);
 
+        template
+        void
+        compute_subdomain_wise (std::vector<types::global_dof_index> &new_dof_indices,
+                          const DoFHandler<deal_II_dimension,deal_II_space_dimension> &dof_handler);
+
 	\}  // namespace DoFRenumbering
 #endif
   }
@@ -64,7 +69,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 // where applicable and move to codimension cases above also when applicable
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-#if deal_II_dimension == deal_II_space_dimension 
+#if deal_II_dimension == deal_II_space_dimension
 namespace DoFRenumbering
   \{
   namespace boost
@@ -125,10 +130,10 @@ namespace DoFRenumbering
     compute_minimum_degree (std::vector<dealii::types::global_dof_index> &,
 			    const hp::DoFHandler<deal_II_dimension> &, bool, bool);
     \}
-    
-    
+
+
 // non-boost functions:
-    
+
     template
       void Cuthill_McKee<hp::DoFHandler<deal_II_dimension> >
       (hp::DoFHandler<deal_II_dimension>&,
@@ -281,7 +286,7 @@ namespace DoFRenumbering
 
     template
       void downstream
-      (DoFHandler<deal_II_dimension>&, 
+      (DoFHandler<deal_II_dimension>&,
        const unsigned int,
        const Point<deal_II_dimension>&,
        const bool);
@@ -352,7 +357,7 @@ namespace DoFRenumbering
        const hp::DoFHandler<deal_II_dimension> &,
        const std::vector<bool> &);
 
-  
+
     template
       void subdomain_wise<hp::DoFHandler<deal_II_dimension> >
       (hp::DoFHandler<deal_II_dimension> &);
@@ -374,7 +379,3 @@ namespace DoFRenumbering
     \}  // namespace DoFRenumbering
 #endif
   }
-
-
-
-   
