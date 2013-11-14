@@ -85,8 +85,13 @@ IF (DEAL_II_WITH_P4EST)
   make_quicktest("p4est" ${_mybuild} 10)
 ENDIF()
 
+# Test petsc
+IF (DEAL_II_WITH_PETSC)
+  make_quicktest("step-petsc" ${_mybuild} "")
+ENDIF()
+
 # Test slepc
-IF (DEAL_II_WITH_SLEPC)
+IF (DEAL_II_WITH_PETSC AND DEAL_II_WITH_SLEPC)
   make_quicktest("step-slepc" ${_mybuild} "")
 ENDIF()
 
