@@ -93,7 +93,6 @@
 #   TEST_TIME_LIMIT
 #   TEST_PICKUP_REGEX
 #   TEST_OVERRIDE_LOCATION
-#   NUMDIFF_DIR
 #
 # For details, consult the ./README file.
 #

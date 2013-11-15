@@ -62,6 +62,7 @@
           <li><a href="#restrictbuild">Restricting tests for build configurations</a></li>
           <li><a href="#restrictfeature">Restricting tests for feature configurations</a></li>
           <li><a href="#mpi">Running tests with MPI</a></li>
+          <li><a href="#binary">Tests with binary output</a></li>
           <li><a href="#expect">Changing condition for success</a></li>
           <li><a href="#layoutaddtests">Adding new tests</a></li>
         </ol>
@@ -425,7 +426,7 @@
       just <code>category/test.output</code>:
       <pre>
 
-    category/test.[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][&lt;debug|release&gt;.]output
+    category/test.[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
       </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
@@ -499,6 +500,21 @@
       </pre>
       It is quite typical for an MPI-enabled test to have multiple output
       files for different numbers of MPI processes.
+    </p>
+
+    <a name="binary"></a>
+    <h3>Tests with binary output</h3>
+    <p>
+      If a test produces binary output add <code>binary</code> to the
+      output file to indicate this:
+      <pre>
+
+    category/test.binary.output
+      </pre>
+      The testsuite ensures that a diff tool suitable for comparing binary
+      output files is used instead of the default diff tool, which (as in
+      the case of <code>numdiff</code>) might be unable to compare binary
+      files.
     </p>
 
     <a name="expect"></a>

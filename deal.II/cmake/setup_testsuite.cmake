@@ -65,6 +65,7 @@ ENDFOREACH()
 #
 # We need deal.II and Perl as external packages:
 #
+
 FIND_PACKAGE(deal.II 8.0 REQUIRED
   HINTS ${DEAL_II_BINARY_DIR} ${DEAL_II_DIR}
   )
@@ -75,8 +76,11 @@ FIND_PACKAGE(Perl REQUIRED)
 #
 # We need a diff tool, preferably numdiff:
 #
+
 FIND_PROGRAM(DIFF_EXECUTABLE
   NAMES diff
+  HINTS ${DIFF_DIR}
+  PATH_SUFFIXES bin
   )
 
 FIND_PROGRAM(NUMDIFF_EXECUTABLE
@@ -87,37 +91,38 @@ FIND_PROGRAM(NUMDIFF_EXECUTABLE
 
 MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
 
-IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND"
-    AND DIFF_EXECUTABLE MATCHES "-NOTFOUND" )
-  MESSAGE(FATAL_ERROR
-    "Could not find diff or numdiff. One of those are required for running the testsuite."
-    )
-ENDIF()
-
 IF("${TEST_DIFF}" STREQUAL "")
+  #
+  # No TEST_DIFF is set, specify one:
+  #
+
   IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-      SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \\t\\n:')
+    SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \\t\\n:')
+  ELSEIF(NOT DIFF_EXECUTABLE MATCHES "-NOTFOUND")
+    SET(TEST_DIFF ${DIFF_EXECUTABLE})
   ELSE()
-      SET(TEST_DIFF ${DIFF_EXECUTABLE})
+    MESSAGE(FATAL_ERROR
+      "Could not find diff or numdiff. One of those are required for running the testsuite.\n"
+      "Please specify TEST_DIFF by hand."
+      )
   ENDIF()
-ELSE()
-  # TODO: I have no idea how to prepare a custom string comming possibly
-  # through two layers of command line into a list...
-  SEPARATE_ARGUMENTS(TEST_DIFF ${TEST_DIFF})
 ENDIF()
 
 #
 # Set a default time limit of 600 seconds:
 #
+
 SET_IF_EMPTY(TEST_TIME_LIMIT 600)
 
 #
 # And finally, enable testing:
 #
+
 ENABLE_TESTING()
 
 #
 # A custom target that does absolutely nothing. It is used in the main
 # project to trigger a "make rebuild_cache" if necessary.
 #
+
 ADD_CUSTOM_TARGET(regenerate)

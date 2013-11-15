@@ -62,10 +62,27 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   #
 
   SET(_configuration)
-  IF(_file MATCHES "debug")
+  IF(_file MATCHES "\\.debug\\.")
     SET(_configuration DEBUG)
-  ELSEIF(_file MATCHES "release")
+  ELSEIF(_file MATCHES "\\.release\\.")
     SET(_configuration RELEASE)
+  ENDIF()
+
+  #
+  # A "binary" in the output file indicates binary output. In this case we
+  # have to switch to plain diff instead of (possibly) numdiff, which can
+  # only work on plain text files.
+  #
+  # TODO: The indirection with ${${_test_diff_variable}} is necessary to
+  # avoid quoting issues with the command line :-/ - come up with a fix for
+  # that
+  #
+
+  SET(_test_diff_variable TEST_DIFF)
+  IF(_file MATCHES "\\.binary\\.")
+    IF(NOT DIFF_EXECUTABLE MATCHES "-NOTFOUND")
+      SET(_test_diff_variable DIFF_EXECUTABLE)
+    ENDIF()
   ENDIF()
 
   #
@@ -191,7 +208,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         COMMAND rm -f ${_test_directory}/failing_diff
         COMMAND touch ${_test_directory}/diff
         COMMAND
-          ${TEST_DIFF}
+          ${${_test_diff_variable}} # see comment in line 72
             ${_test_directory}/output
             ${_comparison_file}
             > ${_test_directory}/diff
