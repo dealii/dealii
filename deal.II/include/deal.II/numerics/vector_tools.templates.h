@@ -4295,8 +4295,8 @@ namespace VectorTools
                     vector_dofs.dof_indices[0] = face_dofs[i];
 
                     Assert(first_vector_component+dim<=fe.n_components(),
-                        ExcMessage("Error: the finite element has not enough components "
-                            "to define a normal direction."));
+			   ExcMessage("Error: the finite element does not have enough components "
+				      "to define a normal direction."));
 
                     for (unsigned int k=0; k<fe.dofs_per_face; ++k)
                       if ((k != i)
@@ -4375,7 +4375,7 @@ namespace VectorTools
                       if (std::fabs(normal_vector[d]) < 1e-13)
                         normal_vector[d] = 0;
                     normal_vector /= normal_vector.norm();
-		    
+
                     // now enter the (dofs,(normal_vector,cell)) entry into
                     // the map
                     dof_to_normals_map
@@ -4748,7 +4748,7 @@ namespace VectorTools
     // can find constrained ones
     unsigned int n_total_constraints_found = 0;
     for (typename std::set<std_cxx1x::array<types::global_dof_index,dim>,
-           PointComparator<dim> >::const_iterator it=vector_dofs.begin(); 
+           PointComparator<dim> >::const_iterator it=vector_dofs.begin();
            it!=vector_dofs.end(); ++it)
       {
         unsigned int n_constraints = 0;
