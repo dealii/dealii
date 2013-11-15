@@ -15,18 +15,8 @@
 // ---------------------------------------------------------------------
 
 // bug report from mailing list from 11/15/2013 (simplified). no_normal_flux throws
-// an exception:
-/*
---------------------------------------------------------
-An error occurred in line <4314> of file </scratch/deal-trunk/deal.II/include/deal.II/numerics/vector_tools.templates.h> in function
-    void dealii::VectorTools::compute_no_normal_flux_constraints(const DH<dim, spacedim>&, unsigned int, const std::set<unsigned char>&, dealii::ConstraintMatrix&, const dealii::Mapping<dim, spacedim>&) [with int dim = 3; DH = dealii::DoFHandler; int spacedim = 3]
-The violated condition was: 
-    vector_dofs.dof_indices[d] < dof_handler.n_dofs()
-The name and call sequence of the exception was:
-    ExcInternalError()
-Additional Information: 
-(none)
-*/  
+// an ExcInternalError when handing it an FE with less than dim components. This
+// is now fixed (throws ExcMessage).
 
 #include "../tests.h"
 
