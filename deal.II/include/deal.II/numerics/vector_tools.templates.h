@@ -4294,6 +4294,10 @@ namespace VectorTools
                     internal::VectorDoFTuple<dim> vector_dofs;
                     vector_dofs.dof_indices[0] = face_dofs[i];
 
+                    Assert(first_vector_component+dim<=fe.n_components(),
+                        ExcMessage("Error: the finite element has not enough components "
+                            "to define a normal direction."));
+
                     for (unsigned int k=0; k<fe.dofs_per_face; ++k)
                       if ((k != i)
                           &&
