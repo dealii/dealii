@@ -26,3 +26,6 @@ DEAL_II_ADD_LIBRARY(obj_functionparser OBJECT
   fpoptimizer.cc
   )
 
+IF(DEAL_II_WITH_THREADS)
+  DEAL_II_ADD_DEFINITIONS(obj_functionparser "FP_USE_THREAD_SAFE_EVAL")
+ENDIF()

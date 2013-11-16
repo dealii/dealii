@@ -211,6 +211,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Bundled fparser is now compiled with FP_USE_THREAD_SAFE_EVAL in
+  case of enabled threading support so that it is thread safe.
+  <br>
+  (Matthias Maier, reported by Francesco Cattoglio 2013/11/16)
+  </li>
+
   <li> Fixed: The CellData class now has a default constructor that
   sets the material and boundary indicators to zero. This fixes certain
   internal errors with the Intel ICC compiler.
