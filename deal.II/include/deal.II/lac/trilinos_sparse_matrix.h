@@ -3404,7 +3404,7 @@ namespace TrilinosWrappers
 
       }
 
-    // If the calling matrix owns the row to which we want to add values, we
+    // If the calling processor owns the row to which we want to add values, we
     // can directly call the Epetra_CrsMatrix input function, which is much
     // faster than the Epetra_FECrsMatrix function.
     if (row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == true)
