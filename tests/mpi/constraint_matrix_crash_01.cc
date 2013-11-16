@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// $Id: constraint_matrix_set_zero_02.cc 30694 2013-09-13 17:22:08Z maier $
+// $Id$
 //
 // Copyright (C) 2013 by the deal.II authors
 //
