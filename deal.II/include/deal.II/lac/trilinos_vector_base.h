@@ -1051,6 +1051,13 @@ namespace TrilinosWrappers
      * consumption in bytes.
      */
     std::size_t memory_consumption () const;
+
+    /**
+     * Return a reference to the MPI
+     * communicator object in use with this
+     * object.
+     */
+    const MPI_Comm &get_mpi_communicator () const;
     //@}
 
     /**
@@ -2185,6 +2192,32 @@ namespace TrilinosWrappers
   }
 
 
+
+  inline
+  const MPI_Comm &
+  VectorBase::get_mpi_communicator () const
+  {
+    static MPI_Comm comm;
+
+#ifdef DEAL_II_WITH_MPI
+
+    const Epetra_MpiComm *mpi_comm
+      = dynamic_cast<const Epetra_MpiComm *>(&vector->Map().Comm());
+    comm = mpi_comm->Comm();
+
+#else
+
+    const Epetra_SerialComm *serial_comm
+      = dynamic_cast<const Epetra_SerialComm *>(&vector->Map().Comm());
+    comm = serial_comm->Comm();
+
+#endif
+
+    return comm;
+  }
+
+
+  
 #endif // DOXYGEN
 
 }

@@ -211,6 +211,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: dealii::FETools::interpolation_difference was
+  not working for TrilinosWrappers::MPI::Vectors with ghost
+  entries. The TrilinosWrappers::VectorBase class has now a
+  get_mpi_communicator method similar to the PETSc vector
+  classes.
+  <br>
+  (Martin Steigemann, Martin Kronbichler, 2013/11/17)
+  </li>
+
   <li> Fixed: Bundled fparser is now compiled with FP_USE_THREAD_SAFE_EVAL in
   case of enabled threading support so that it is thread safe.
   <br>
