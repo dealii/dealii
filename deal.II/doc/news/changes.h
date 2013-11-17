@@ -94,6 +94,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li>
+  Fixed: VectorTools::compute_no_normal_flux_constraints had a bug that
+  only appeared in rare cases at vertices of the domain if one adjacent
+  cell had two boundary indicators selected for no normal flux and another
+  had only one. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/11/17)
+  </li>
+
   <li> New: introduced "make test" that runs a minimal set of tests. We
   encourage every user to run this, especially if they run in to problems.
   The tests are automatically picked depending on the configuration and
@@ -359,7 +368,7 @@ inconvenience this causes.
   New: All vector classes now have functions <code>extract_subvector_to()</code>
   that allow extracting not just a single value but a whole set.
   <br>
-  (Fahad Alrasched, 2013/09/02)
+  (Fahad Alrashed, 2013/09/02)
   </li>
 
   <li>

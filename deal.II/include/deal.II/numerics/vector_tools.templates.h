@@ -2404,6 +2404,16 @@ namespace VectorTools
     };
 
 
+    template <int dim>
+    std::ostream & operator << (std::ostream &out,
+				const VectorDoFTuple<dim> &vdt)
+    {
+      for (unsigned int d=0; d<dim; ++d)
+	out << vdt.dof_indices[d] << (d < dim-1 ? " " : "");
+      return out;
+    }
+
+
 
     /**
      * Add the constraint
@@ -4382,6 +4392,12 @@ namespace VectorTools
                     .insert (std::make_pair (vector_dofs,
                                              std::make_pair (normal_vector,
                                                              cell)));
+#ifdef DEBUG_NO_NORMAL_FLUX
+		    std::cout << "Adding normal vector:" << std::endl
+			      << "   dofs=" << vector_dofs << std::endl
+			      << "   cell=" << cell << " at " << cell->center() << std::endl
+			      << "   normal=" << normal_vector << std::endl;
+#endif
                   }
             }
 
@@ -4408,6 +4424,18 @@ namespace VectorTools
             }
         if (p == dof_to_normals_map.end())
           same_dof_range[1] = dof_to_normals_map.end();
+
+#ifdef DEBUG_NO_NORMAL_FLUX
+	std::cout << "For dof indices <" << p->first << ">, found the following normals"
+		  << std::endl;
+        for (typename DoFToNormalsMap::const_iterator
+             q = same_dof_range[0];
+             q != same_dof_range[1]; ++q)
+	  std::cout << "   " << q->second.first
+		    << " from cell " << q->second.second
+		    << std::endl;
+#endif
+
 
         // now compute the reverse mapping: for each of the cells that
         // contributed to the current set of vector dofs, add up the normal
@@ -4442,8 +4470,17 @@ namespace VectorTools
                 = std::make_pair ((old_normal * old_count + q->second.first) / (old_count + 1),
                                   old_count + 1);
             }
-
         Assert (cell_to_normals_map.size() >= 1, ExcInternalError());
+
+#ifdef DEBUG_NO_NORMAL_FLUX
+	std::cout << "   cell_to_normals_map:" << std::endl;
+        for (typename CellToNormalsMap::const_iterator
+             x = cell_to_normals_map.begin();
+             x != cell_to_normals_map.end(); ++x)
+	  std::cout << "      " << x->first << " -> ("
+		    << x->second.first << ',' << x->second.second << ')'
+		    << std::endl;
+#endif
 
         // count the maximum number of contributions from each cell
         unsigned int max_n_contributions_per_cell = 1;
@@ -4467,6 +4504,11 @@ namespace VectorTools
             // encountered this vector dof exactly once while looping over all
             // their faces. as stated in the documentation, this is the case
             // where we want to simply average over all normal vectors
+	    //
+	    // the typical case is in 2d where multiple cells meet at one
+	    // vertex sitting on the boundary. same in 3d for a vertex that
+	    // is associated with only one of the boundary indicators passed
+	    // to this function
           case 1:
           {
 
@@ -4576,7 +4618,22 @@ namespace VectorTools
             // normal vectors it has contributed. we currently only implement
             // if this is dim-1 for all cells (if a single cell has
             // contributed dim, or if all adjacent cells have contributed 1
-            // normal vector, this is already handled above)
+            // normal vector, this is already handled above).
+	    //
+	    // we only implement the case that all cells contribute
+	    // dim-1 because we assume that we are following an edge
+	    // of the domain (think: we are looking at a vertex
+	    // located on one of the edges of a refined cube where the
+	    // boundary indicators of the two adjacent faces of the
+	    // cube are both listed in the set of boundary indicators
+	    // passed to this function). in that case, all cells along
+	    // that edge of the domain are assumed to have contributed
+	    // dim-1 normal vectors. however, there are cases where
+	    // this assumption is not justified (see the lengthy
+	    // explanation in test no_flux_12.cc) and in those cases
+	    // we simply ignore the cell that contributes only
+	    // once. this is also discussed at length in the
+	    // documentation of this function.
             //
             // for each contributing cell compute the tangential vector that
             // remains unconstrained
@@ -4586,7 +4643,22 @@ namespace VectorTools
                  contribution != cell_contributions.end();
                  ++contribution)
               {
-                Assert (contribution->second.size() == dim-1, ExcNotImplemented());
+#ifdef DEBUG_NO_NORMAL_FLUX
+		std::cout << "   Treating edge case with dim-1 contributions." << std::endl
+			  << "   Looking at cell " << contribution->first
+			  << " which has contributed these normal vectors:"
+			  << std::endl;
+		for (typename std::list<Tensor<1,dim> >::const_iterator
+                       t = contribution->second.begin();
+		     t != contribution->second.end();
+		     ++t)
+		  std::cout << "      " << *t << std::endl;
+#endif
+
+		// as mentioned above, simply ignore cells that only
+		// contribute once
+                if (contribution->second.size() < dim-1)
+		  continue;
 
                 Tensor<1,dim> normals[dim-1];
                 {
