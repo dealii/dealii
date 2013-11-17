@@ -2207,9 +2207,7 @@ namespace TrilinosWrappers
 
 #else
 
-    const Epetra_SerialComm *serial_comm
-      = dynamic_cast<const Epetra_SerialComm *>(&vector->Map().Comm());
-    comm = serial_comm->Comm();
+    comm = MPI_COMM_SELF;
 
 #endif
 
