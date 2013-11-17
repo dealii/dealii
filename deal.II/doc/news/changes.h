@@ -263,7 +263,7 @@ inconvenience this causes.
 
   <li>
   New: parallel::distributed::BlockVector has now methods update_ghost_values,
-  compress, set_out_ghosts, and has_ghost_elements that do the respective
+  compress, zero_out_ghosts, and has_ghost_elements that do the respective
   operation on each block of parallel::distributed::Vector.
   <br>
   (Martin Kronbichler, 2013/10/18)
