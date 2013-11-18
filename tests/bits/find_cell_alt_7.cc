@@ -49,7 +49,7 @@ void check (Triangulation<2> &tria)
 
       deallog << cell.first << std::endl;
       for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-        deallog << "<" << cell.first->vertex(v) << "> ";
+        deallog << "< " << cell.first->vertex(v) << " > ";
       deallog << "[ " << cell.second << " ] ";
 
       // Now transform back and check distance
@@ -68,7 +68,8 @@ int main ()
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog << std::scientific;
+  deallog.precision(8);
 
   {
     Triangulation<2> coarse_grid;
