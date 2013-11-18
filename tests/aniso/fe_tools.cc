@@ -93,7 +93,7 @@ void test_embedding (const FiniteElement<dim> &fe)
          ++c)
       {
         deallog << fe.get_name() << " embedding, RefinementCase<dim>:: " << refine_case_names[ref_case] << ", child " << c << std::endl;
-        print_formatted(P[ref_case-1][c], 4, 6);
+        print_formatted(P[ref_case-1][c], 8, 6);
       }
 }
 
@@ -116,7 +116,7 @@ void test_projection (const FiniteElement<dim> &fe1,
     for (unsigned int j=0; j<n1; ++j)
       if (std::fabs(P(i,j)) < 1e-12)
         P(i,j) = 0;
-  P.print_formatted(out, 3, false, 5);
+  P.print_formatted(out, 8, false, 5);
 }
 
 
@@ -173,7 +173,7 @@ int main()
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog << std::setprecision(5);
+  deallog << std::setprecision(8);
   deallog.threshold_double(1.e-8);
 
   test_projection<2>(logfile);
