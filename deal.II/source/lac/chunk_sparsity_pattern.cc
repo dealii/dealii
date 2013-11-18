@@ -755,6 +755,15 @@ void ChunkSparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const Com
     const size_type ,
     const bool);
 template
+void ChunkSparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &,
+    const size_type);
+template
+void ChunkSparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &,
+    const size_type);
+template
+void ChunkSparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const CompressedSimpleSparsityPattern &,
+    const size_type);
+template
 void ChunkSparsityPattern::create_from<SparsityPattern>
 (const unsigned int,
  const unsigned int,
