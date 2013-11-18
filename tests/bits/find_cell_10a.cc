@@ -17,6 +17,10 @@
 
 
 // transform_real_to_unit_cell works for MappingQ(1) but fails for MappingQ1.
+//
+// this is a case where a cell is extremely elongated, and just taking the l2
+// norm to measure progress in a Newton search is inadequate. we need to take a
+// variable norm that keeps the elongation of the cell in mind.
 
 #include "../tests.h"
 
