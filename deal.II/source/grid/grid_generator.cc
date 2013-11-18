@@ -629,11 +629,30 @@ namespace GridGenerator
   }
 
 
+
+  template<>
+  void
+  parallelogram (Triangulation<3>  &tria,
+                 const Point<3> corners[3],
+                 const bool         colorize)
+  {
+    Assert (false, ExcNotImplemented());
+  }
+
+  template<>
+  void
+  parallelogram (Triangulation<1>  &tria,
+                 const Point<1> corners[1],
+                 const bool         colorize)
+  {
+    Assert (false, ExcNotImplemented());
+  }
+
 // Implementation for 2D only
   template<>
   void
   parallelogram (Triangulation<2>  &tria,
-                 const Point<2> (&corners)[2],
+                 const Point<2> corners[2],
                  const bool         colorize)
   {
     std::vector<Point<2> > vertices (GeometryInfo<2>::vertices_per_cell);
@@ -652,6 +671,25 @@ namespace GridGenerator
     // Assign boundary indicators
     if (colorize)
       colorize_hyper_rectangle (tria);
+  }
+
+
+  template<>
+  void
+  parallelogram (Triangulation<1>  &tria,
+                 const Tensor<2,1> &corners,
+                 const bool         colorize)
+  {
+    Assert (false, ExcNotImplemented());
+  }
+
+  template<>
+  void
+  parallelogram (Triangulation<3>  &tria,
+                 const Tensor<2,3> &corners,
+                 const bool         colorize)
+  {
+    Assert (false, ExcNotImplemented());
   }
 
 

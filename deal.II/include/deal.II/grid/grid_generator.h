@@ -205,7 +205,7 @@ namespace GridGenerator
   template <int dim>
   void
   parallelogram (Triangulation<dim> &tria,
-                 const Point<dim>  (&corners) [dim],
+                 const Point<dim>  corners[dim],
                  const bool          colorize=false);
 
   /**
