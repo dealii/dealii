@@ -1566,7 +1566,7 @@ namespace VectorTools
    * the top face of the right cell belongs to it, maybe indicating the the entire
    * front part of the domain is a smooth manifold whereas the top really forms
    * two separate manifolds that meet in a ridge, and that no-flux boundary
-   * conditions are only desired on the fron manifold and the right one on top.
+   * conditions are only desired on the front manifold and the right one on top.
    * In cases like these, it's difficult to define what should happen. The
    * current implementation simply ignores the one contribution from the
    * cell that only contributes one normal vector. In the example shown, this
