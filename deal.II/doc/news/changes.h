@@ -94,15 +94,6 @@ inconvenience this causes.
 
 
 <ol>
-  <li>
-  Fixed: VectorTools::compute_no_normal_flux_constraints had a bug that
-  only appeared in rare cases at vertices of the domain if one adjacent
-  cell had two boundary indicators selected for no normal flux and another
-  had only one. This is now fixed.
-  <br>
-  (Wolfgang Bangerth, 2013/11/17)
-  </li>
-
   <li> New: introduced "make test" that runs a minimal set of tests. We
   encourage every user to run this, especially if they run in to problems.
   The tests are automatically picked depending on the configuration and
@@ -220,6 +211,24 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>
+  Fixed: MappingQ1::transform_real_to_unit_cell() could fail in some
+  cases with very elongated and twisted cells. This should now be fixed
+  with an algorithm that uses a better method of computing the Newton
+  convergence.
+  <br>
+  (Wolfgang Bangerth, 2013/11/17)
+  </li>
+
+  <li>
+  Fixed: VectorTools::compute_no_normal_flux_constraints had a bug that
+  only appeared in rare cases at vertices of the domain if one adjacent
+  cell had two boundary indicators selected for no normal flux and another
+  had only one. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/11/17)
+  </li>
+
   <li> Fixed: dealii::FETools::interpolation_difference was
   not working for TrilinosWrappers::MPI::Vectors with ghost
   entries. The TrilinosWrappers::VectorBase class has now a
