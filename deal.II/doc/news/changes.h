@@ -211,6 +211,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: GridGenerator::parallelogram was not instantiated properly
+  on intel compilers.
+  <br>
+  (Timo Heister, 2013/11/17)
+  </li>
+
   <li>
   Fixed: MappingQ1::transform_real_to_unit_cell() could fail in some
   cases with very elongated and twisted cells. This should now be fixed
