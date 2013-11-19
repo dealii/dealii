@@ -97,11 +97,15 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
 
   IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     IF(DEFINED OSX_CERTIFICATE_NAME)
-      ADD_CUSTOM_TARGET(sign ALL
+      ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/${TARGET}.signed
         COMMAND codesign -f -s ${OSX_CERTIFICATE_NAME} ${TARGET}
+        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/${TARGET}.signed
         COMMENT "Digitally signing ${TARGET}"
         DEPENDS ${TARGET}
         VERBATIM
+        )
+      ADD_CUSTOM_TARGET(sign ALL
+        DEPENDS ${CMAKE_BINARY_DIR}/${TARGET}.signed
         )
       ADD_DEPENDENCIES(run sign)
     ELSE()
