@@ -866,8 +866,16 @@ namespace internal
       PolicyBase<dim,spacedim>::~PolicyBase ()
       {}
 
-
       /* --------------------- class Sequential ---------------- */
+	
+      template <int dim, int spacedim>
+      std::string 
+      Sequential<dim,spacedim>::to_string () const
+      {
+	return "Policy::Sequential<"+Utilities::int_to_string(dim)+
+	  ","+Utilities::int_to_string(spacedim)+">";
+      }
+
 
 
       template <int dim, int spacedim>
@@ -1926,6 +1934,13 @@ namespace internal
 
 #endif // DEAL_II_WITH_P4EST
 
+      template <int dim, int spacedim>
+      std::string 
+      ParallelDistributed<dim,spacedim>::to_string () const
+      {
+	return "Policy::ParallelDistributed<"+Utilities::int_to_string(dim)+
+	  ","+Utilities::int_to_string(spacedim)+">";
+      }
 
 
       template <int dim, int spacedim>

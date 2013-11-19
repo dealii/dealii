@@ -1264,7 +1264,7 @@ void DoFHandler<dim,spacedim>::save (Archive &ar,
   // identifies the FE and the policy
   unsigned int n_cells = tria->n_cells();
   std::string  fe_name = selected_fe->get_name();
-  std::string  policy_name = typeid(*policy).name();
+  std::string  policy_name = policy->to_string();
 
   ar &n_cells &fe_name &policy_name;
 }
@@ -1305,9 +1305,9 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   AssertThrow (fe_name == selected_fe->get_name(),
                ExcMessage ("The finite element associated with this DoFHandler does not match "
                            "the one that was associated with the DoFHandler previously stored."));
-  AssertThrow (policy_name == typeid(*policy).name(),
+  AssertThrow (policy_name == policy->to_string(),
                ExcMessage (std::string ("The policy currently associated with this DoFHandler (")
-			   + typeid(*policy).name()
+			   + policy->to_string()
 			   +std::string(") does not match the one that was associated with the "
 				       "DoFHandler previously stored (")
 			   + policy_name
