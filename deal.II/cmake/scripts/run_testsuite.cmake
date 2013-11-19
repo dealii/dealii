@@ -162,10 +162,12 @@ IF("${CTEST_BINARY_DIRECTORY}" STREQUAL "")
   #
   SET(CTEST_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-  IF( "${CTEST_BINARY_DIRECTORY}" STREQUAL "${CTEST_SOURCE_DIRECTORY}")
+  IF( "${CTEST_BINARY_DIRECTORY}" STREQUAL "${CTEST_SOURCE_DIRECTORY}"
+      AND NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/CMakeCache.txt )
     MESSAGE(FATAL_ERROR "
-ctest was invoked in the source directory (or test source directory) and CTEST_BINARY_DIRECTORY is not set.
-Please either call ctest from within a designated build directory, or set CTEST_BINARY_DIRECTORY accordingly.
+ctest was invoked in the source directory and CTEST_BINARY_DIRECTORY is not
+set. Please either call ctest from within a designated build directory, or
+set CTEST_BINARY_DIRECTORY accordingly.
 "
       )
   ENDIF()

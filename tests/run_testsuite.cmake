@@ -21,9 +21,9 @@
 IF( "${CTEST_BINARY_DIRECTORY}" STREQUAL ""
     AND "${CMAKE_CURRENT_BINARY_DIR}" STREQUAL "${CMAKE_CURRENT_LIST_DIR}" )
   MESSAGE(FATAL_ERROR "
-ctest was invoked in the source directory (or test source directory) and
-CTEST_BINARY_DIRECTORY is not set. Please either call ctest from within a
-designated build directory, or set CTEST_BINARY_DIRECTORY accordingly.
+ctest was invoked in the test directory and CTEST_BINARY_DIRECTORY is not
+set. Please either call ctest from within a designated build directory, or
+set CTEST_BINARY_DIRECTORY accordingly.
 "
     )
 ENDIF()
