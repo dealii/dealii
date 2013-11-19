@@ -2031,15 +2031,16 @@ public:
 
   /**
    * Compute the gradient of the
-   * <tt>i</tt>th shape function at the
-   * <tt>j</tt>th quadrature point with
+   * <tt>function_no</tt>th shape function at the
+   * <tt>quadrature_point</tt>th quadrature point with
    * respect to real cell
    * coordinates.  If you want to
    * get the derivative in one of
    * the coordinate directions, use
    * the appropriate function of
    * the Tensor class to
-   * extract one component. Since
+   * extract one component of the Tensor returned by this
+   * function. Since
    * only a reference to the
    * gradient's value is returned,
    * there should be no major
@@ -2051,7 +2052,7 @@ public:
    * component. If the shape
    * function has more than one
    * non-zero component (i.e. it is
-   * not primitive), then throw an
+   * not primitive), then it will throw an
    * exception of type
    * ExcShapeFunctionNotPrimitive. In
    * that case, use the
@@ -2063,7 +2064,7 @@ public:
    * shape_value() function.
    */
   const Tensor<1,spacedim> &
-  shape_grad (const unsigned int function,
+  shape_grad (const unsigned int function_no,
               const unsigned int quadrature_point) const;
 
   /**
