@@ -115,23 +115,40 @@ void ExceptionBase::set_fields (const char *f,
   exc  = e;
 
   // If the system supports this, get a stacktrace how we got here:
-
   if (stacktrace != 0)
     {
       free (stacktrace);
       stacktrace = 0;
     }
 
+  // Note that we defer the symbol lookup done by backtrace_symbols()
+  // to when we need it (see what() below). This is for performance
+  // reasons, as this requires loading libraries and can take in the
+  // order of seconds on some machines.
 #ifdef HAVE_GLIBC_STACKTRACE
-  void *array[25];
-  n_stacktrace_frames = backtrace(array, 25);
-  stacktrace = backtrace_symbols(array, n_stacktrace_frames);
+  n_stacktrace_frames = backtrace(raw_stacktrace, 25);
 #endif
 
-  // And finally populate the underlying std::runtime_error:
-  generate_message();
+  // set the message to the empty string so that what() will compute
+  // a new error message with the new information.
+  std::runtime_error * base = static_cast<std::runtime_error *>(this);
+  *base = std::runtime_error("");
 }
 
+const char* ExceptionBase::what() const throw()
+{
+  // We override the what() function to be able to look up the symbols
+  // of the stack trace.
+  if (std::runtime_error::what()[0]=='\0')
+    {
+#ifdef HAVE_GLIBC_STACKTRACE
+      stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
+#endif
+
+      generate_message();
+    }
+  return std::runtime_error::what();
+}
 
 
 const char *ExceptionBase::get_exc_name () const
@@ -262,7 +279,7 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 
 
 
-void ExceptionBase::generate_message ()
+void ExceptionBase::generate_message () const
 {
   // build up a string with the error message...
 
@@ -289,8 +306,10 @@ void ExceptionBase::generate_message ()
   converter << "--------------------------------------------------------"
             << std::endl;
 
-  // ... and set up std::runtime_error with it:
-  static_cast<std::runtime_error &>(*this) = std::runtime_error(converter.str());
+  // ... and set up std::runtime_error with it. We need to do a const
+  // cast so we can change the what message even though our method is const.
+  const std::runtime_error * base = static_cast<const std::runtime_error *>(this);
+  const_cast<std::runtime_error &>(*base) = std::runtime_error(converter.str());
 }
 
 

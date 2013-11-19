@@ -72,6 +72,12 @@ public:
                    const char *cond,
                    const char *exc_name);
 
+
+  /**
+   * Override the standard function that returns the description of the error.
+   */
+  virtual const char* what() const throw();
+
   /**
    * Get exception name.
    */
@@ -124,7 +130,7 @@ protected:
    * A backtrace to the position where the problem happened, if the
    * system supports this.
    */
-  char **stacktrace;
+  mutable char **stacktrace;
 
   /**
    * The number of stacktrace frames that are stored in the previous
@@ -132,13 +138,20 @@ protected:
    */
   int n_stacktrace_frames;
 
+#ifdef HAVE_GLIBC_STACKTRACE
+  /**
+   * array of pointers that contains the raw stack trace
+   */
+  void *raw_stacktrace[25];
+#endif
+
 private:
   /**
    * Internal function that generates the c_string that gets printed by
    * exception::what(). Called by the ExceptionBase constructor and
    * set_fields.
    */
-  void generate_message();
+  void generate_message() const;
 };
 
 

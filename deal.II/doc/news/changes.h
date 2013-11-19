@@ -211,6 +211,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: when a dealii::Exception is thrown, defer the symbol lookup of the
+  stack trace to when it is needed. This improves performance if what() is never
+  called.
+  <br>
+  (Timo Heister, 2013/11/17)
+  </li>
+
   <li> Fixed: GridGenerator::parallelogram was not instantiated properly
   on intel compilers.
   <br>
