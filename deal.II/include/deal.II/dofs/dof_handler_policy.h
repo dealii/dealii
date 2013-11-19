@@ -64,13 +64,6 @@ namespace internal
          */
         virtual ~PolicyBase ();
 
-	/**
-	 * Convert type of policy to a string. This is used as a
-	 * workaround in serialization because the intel compiler can
-	 * not handle typeid correctly.
-	 */
-	virtual std::string to_string () const = 0;
-
         /**
          * Distribute degrees of freedom on
          * the object given as last argument.
@@ -115,14 +108,6 @@ namespace internal
         virtual
         NumberCache
         distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
-	
-	/**
-	 * Convert type of policy to a string. This is used as a
-	 * workaround in serialization because the intel compiler can
-	 * not handle typeid correctly.
-	 */
-	virtual std::string to_string () const;
-
 
         /**
          * Distribute multigrid DoFs.
@@ -161,13 +146,6 @@ namespace internal
         virtual
         NumberCache
         distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
-
-	/**
-	 * Convert type of policy to a string. This is used as a
-	 * workaround in serialization because the intel compiler can
-	 * not handle typeid correctly.
-	 */
-	virtual std::string to_string () const;
 
         /**
          * Distribute multigrid DoFs.

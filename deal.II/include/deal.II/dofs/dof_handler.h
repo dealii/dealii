@@ -1248,6 +1248,32 @@ DoFHandler<dim,spacedim>::block_info () const
 }
 
 
+namespace internal
+{
+  /**
+   * returns a string representing the dynamic type of the given argument. This is
+   * basically the same what typeid(...).name() does, but it turns out this is broken
+   * on Intel 13+.
+   */
+    template<int dim, int spacedim>
+    std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> & policy)
+    {
+      std::string policy_name;
+      if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dim,spacedim>*>(&policy))
+          policy_name = "Policy::Sequential<";
+      else
+        if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
+            policy_name = "Policy::ParallelDistributed<";
+        else
+          AssertThrow(false, ExcNotImplemented());
+      policy_name += Utilities::int_to_string(dim)+
+              ","+Utilities::int_to_string(spacedim)+">";
+      return policy_name;
+    }
+
+}
+
+
 template <int dim, int spacedim>
 template <class Archive>
 void DoFHandler<dim,spacedim>::save (Archive &ar,
@@ -1264,7 +1290,7 @@ void DoFHandler<dim,spacedim>::save (Archive &ar,
   // identifies the FE and the policy
   unsigned int n_cells = tria->n_cells();
   std::string  fe_name = selected_fe->get_name();
-  std::string  policy_name = policy->to_string();
+  std::string  policy_name = internal::policy_to_string(*policy);
 
   ar &n_cells &fe_name &policy_name;
 }
@@ -1305,9 +1331,9 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   AssertThrow (fe_name == selected_fe->get_name(),
                ExcMessage ("The finite element associated with this DoFHandler does not match "
                            "the one that was associated with the DoFHandler previously stored."));
-  AssertThrow (policy_name == policy->to_string(),
+  AssertThrow (policy_name == internal::policy_to_string(*policy),
                ExcMessage (std::string ("The policy currently associated with this DoFHandler (")
-			   + policy->to_string()
+			   + internal::policy_to_string(*policy)
 			   +std::string(") does not match the one that was associated with the "
 				       "DoFHandler previously stored (")
 			   + policy_name
