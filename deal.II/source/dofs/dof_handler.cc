@@ -65,6 +65,23 @@ namespace internal
 
 namespace internal
 {
+  template<int dim, int spacedim>
+  std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> & policy)
+  {
+    std::string policy_name;
+    if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dim,spacedim>*>(&policy))
+        policy_name = "Policy::Sequential<";
+    else
+      if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
+          policy_name = "Policy::ParallelDistributed<";
+      else
+        AssertThrow(false, ExcNotImplemented());
+    policy_name += Utilities::int_to_string(dim)+
+            ","+Utilities::int_to_string(spacedim)+">";
+    return policy_name;
+  }
+
+
   namespace DoFHandler
   {
     // access class

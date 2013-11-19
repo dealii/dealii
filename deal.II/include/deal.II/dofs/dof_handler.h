@@ -28,7 +28,6 @@
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
 #include <deal.II/dofs/function_map.h>
-#include <deal.II/dofs/dof_handler_policy.h>
 
 #include <boost/serialization/split_member.hpp>
 
@@ -46,6 +45,12 @@ namespace internal
     template <int dim> class DoFFaces;
 
     struct Implementation;
+
+    namespace Policy
+    {
+      template <int dim, int spacedim> class PolicyBase;
+      struct Implementation;
+    }
   }
 
   namespace DoFAccessor
@@ -1254,22 +1259,11 @@ namespace internal
    * returns a string representing the dynamic type of the given argument. This is
    * basically the same what typeid(...).name() does, but it turns out this is broken
    * on Intel 13+.
+   *
+   * Defined in dof_handler.cc.
    */
     template<int dim, int spacedim>
-    std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> & policy)
-    {
-      std::string policy_name;
-      if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dim,spacedim>*>(&policy))
-          policy_name = "Policy::Sequential<";
-      else
-        if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
-            policy_name = "Policy::ParallelDistributed<";
-        else
-          AssertThrow(false, ExcNotImplemented());
-      policy_name += Utilities::int_to_string(dim)+
-              ","+Utilities::int_to_string(spacedim)+">";
-      return policy_name;
-    }
+    std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> & policy);
 
 }
 

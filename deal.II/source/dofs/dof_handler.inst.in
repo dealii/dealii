@@ -21,8 +21,13 @@ for (deal_II_dimension : DIMENSIONS)
     namespace internal
     \{
       template const types::global_dof_index * dummy<deal_II_dimension,deal_II_dimension> ();
+      template std::string policy_to_string(const dealii::internal::DoFHandler::Policy::
+      PolicyBase<deal_II_dimension,deal_II_dimension> &);
+      
 #if deal_II_dimension < 3
       template const types::global_dof_index * dummy<deal_II_dimension,deal_II_dimension+1> ();
+      template std::string policy_to_string(const dealii::internal::DoFHandler::Policy::
+      PolicyBase<deal_II_dimension,deal_II_dimension+1> &);
 #endif
     \}
 
