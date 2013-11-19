@@ -71,7 +71,9 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     SET(_command
       ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
       )
+
   ELSE()
+
     SET(_command ${TARGET_RUN})
   ENDIF()
 
@@ -83,6 +85,40 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       )
     SET(_run_targets
       "#      $ make run            - to (compile, link and) run the program\n"
+      )
+  ENDIF()
+
+
+  #
+  # Provide a target to sign the generated executable with a Mac OSX
+  # developer key. This avoids problems with an enabled firewall and MPI
+  # tasks that need networking.
+  #
+
+  IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    IF(DEFINED OSX_CERTIFICATE_NAME)
+      ADD_CUSTOM_TARGET(sign ALL
+        COMMAND codesign -f -s ${OSX_CERTIFICATE_NAME} ${TARGET}
+        COMMENT "Digitally signing ${TARGET}"
+        DEPENDS ${TARGET}
+        VERBATIM
+        )
+      ADD_DEPENDENCIES(run sign)
+    ELSE()
+      ADD_CUSTOM_TARGET(sign
+        COMMAND
+           ${CMAKE_COMMAND} -E echo ''
+        && ${CMAKE_COMMAND} -E echo '***************************************************************************'
+        && ${CMAKE_COMMAND} -E echo '**  Error: No Mac OSX developer certificate specified'
+        && ${CMAKE_COMMAND} -E echo '**  Please reconfigure with -DOSX_CERTIFICATE_NAME="<...>"'
+        && ${CMAKE_COMMAND} -E echo '***************************************************************************'
+        && ${CMAKE_COMMAND} -E echo ''
+        COMMENT "Digitally signing ${TARGET}"
+        )
+    ENDIF()
+
+    SET(_run_targets
+      "${_run_targets}#\n#      $ make sign           - to sign the executable with the supplied OSX developer key\n"
       )
   ENDIF()
 
