@@ -1296,6 +1296,17 @@ Article{JK10,
  *   @note The usual warning about the missing type safety of @p void pointers are
  *   obviously in place here; responsibility for correctness of types etc
  *   lies entirely with the user of the pointer.
+ *
+ *
+ * <dt class="glossary">@anchor workstream_paper <b>%WorkStream paper</b></dt>
+ * <dd>The "%WorkStream paper" is a paper by B. Turcksin, M. Kronbichler and W. Bangerth
+ *   that discusses the design and implementation of WorkStream. WorkStream is, at its
+ *   core, a design pattern, i.e., something that is used over and over in finite element
+ *   codes and that can, consequently, be implemented generically. In particular, the
+ *   paper lays out the motivation for this pattern and then proposes different ways
+ *   of implementing it. It also compares the performance of different implementations.
+ *
+ *   The paper is currently in preparation.
  * </dd>
  *
  * </dl>

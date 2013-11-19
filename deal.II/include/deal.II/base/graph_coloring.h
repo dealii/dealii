@@ -491,6 +491,9 @@ namespace GraphColoring
    * conflict indicator sets have overlap will not be assigned to the same
    * color.
    *
+   * @note The algorithm used in this function is described in a paper by
+   * Turcksin, Kronbichler and Bangerth, see @ref workstream_paper .
+   *
    * @param[in] begin The first element of a range of iterators for which a
    *      coloring is sought.
    * @param[in] end The element past the end of the range of iterators.
