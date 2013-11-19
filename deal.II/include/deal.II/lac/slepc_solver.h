@@ -830,7 +830,7 @@ namespace SLEPcWrappers
     // and incompatible eigenvalue/eigenvector sizes
     AssertThrow (real_eigenvalues.size() == imag_eigenvalues.size(),
                  ExcDimensionMismatch(real_eigenvalues.size(), imag_eigenvalues.size()));
-    AssertThrow (real_eigenvectors.size() == imag_eigenvectors.n (),
+    AssertThrow (real_eigenvectors.size() == imag_eigenvectors.size (),
                  ExcDimensionMismatch(real_eigenvectors.size(), imag_eigenvectors.size()));
 
     // Panic if the number of eigenpairs wanted is out of bounds.
