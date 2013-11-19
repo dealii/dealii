@@ -65,6 +65,7 @@
           <li><a href="#binary">Tests with binary output</a></li>
           <li><a href="#expect">Changing condition for success</a></li>
           <li><a href="#layoutaddtests">Adding new tests</a></li>
+          <li><a href="#layoutaddcategory">Adding new categories</a></li>
         </ol>
         <li><a href="#submit">Submitting test results</a></li>
         <li><a href="#build_tests">Build tests</a></li>
@@ -681,6 +682,25 @@ int main ()
       and we would like to encourage it by giving people the opportunity to
       contribute!
     </p>
+
+
+
+    <a name="layoutaddcategory"></a>
+    <h2>Adding new categories</h2>
+
+    <p>
+      If you want to create a new category in the testsuite, create an new
+      folder under <cmake>./tests</cmake> that is named accordingly and put
+      a <code>CMakeLists.txt</code> file into it containing
+    </p>
+    <pre>
+
+    CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+    INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsuite.cmake)
+    PROJECT(testsuite CXX)
+    INCLUDE(${DEAL_II_TARGET_CONFIG})
+    DEAL_II_PICKUP_TESTS()
+    </pre>
 
 
 
