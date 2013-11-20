@@ -5218,9 +5218,11 @@ namespace VectorTools
         case H1_norm:
           exponent = 2.;
           break;
+	  
         case L1_norm:
           exponent = 1.;
           break;
+	  
         default:
           break;
         }
@@ -5233,15 +5235,19 @@ namespace VectorTools
         case W1p_seminorm:
         case W1infty_seminorm:
           update_flags |= UpdateFlags (update_gradients);
-          if (spacedim == dim+1) update_flags |= UpdateFlags (update_normal_vectors);
+          if (spacedim == dim+1)
+	    update_flags |= UpdateFlags (update_normal_vectors);
 
           break;
+
         case H1_norm:
         case W1p_norm:
         case W1infty_norm:
           update_flags |= UpdateFlags (update_gradients);
-          if (spacedim == dim+1) update_flags |= UpdateFlags (update_normal_vectors);
+          if (spacedim == dim+1)
+	    update_flags |= UpdateFlags (update_normal_vectors);
           // no break!
+	  
         default:
           update_flags |= UpdateFlags (update_values);
           break;
