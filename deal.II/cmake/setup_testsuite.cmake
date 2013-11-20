@@ -56,6 +56,9 @@ FILE(WRITE ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake "")
 # Setup tests:
 ADD_CUSTOM_TARGET(setup_tests)
 
+# Remove all tests:
+ADD_CUSTOM_TARGET(prune_tests)
+
 # Regenerate tests (run "make rebuild_cache" in subprojects):
 ADD_CUSTOM_TARGET(regen_tests
   COMMAND ${CMAKE_COMMAND}
@@ -70,24 +73,14 @@ ADD_CUSTOM_TARGET(clean_tests
     -- ${MAKEOPTS}
   )
 
-# Remove all tests:
-ADD_CUSTOM_TARGET(prune_tests
-  COMMAND ${CMAKE_COMMAND}
-    --build ${CMAKE_BINARY_DIR}/tests --target prune_tests
-    -- ${MAKEOPTS}
-  )
-
 MESSAGE(STATUS "Setup testsuite")
 
 #
-# Setup the testsuite project: It is merely a wrapper around the individual
-# regen_tests_*, clean_tests_* and prune_tests_* targets.
-# down to it:
+# Provide custom targets to setup and prune the testsuite subproject:
 #
 
 EXECUTE_PROCESS(
   COMMAND ${CMAKE_COMMAND} -G${CMAKE_GENERATOR}
-    -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
     -DTEST_DIR=${TEST_DIR}
     ${CMAKE_SOURCE_DIR}/tests
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests
@@ -98,11 +91,7 @@ SET(_options)
 LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
 LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
 FOREACH(_var
-    DIFF_DIR
-    NUMDIFF_DIR
-    TEST_DIFF
-    TEST_OVERRIDE_LOCATION
-    TEST_PICKUP_REGEX
+    DIFF_DIR NUMDIFF_DIR TEST_DIFF TEST_OVERRIDE_LOCATION TEST_PICKUP_REGEX
     TEST_TIME_LIMIT
     )
   # always undefine:
@@ -144,6 +133,12 @@ FOREACH(_category ${_categories})
       COMMENT "Processing tests/${_category}"
       )
     ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
+
+    ADD_CUSTOM_TARGET(prune_tests_${_category}
+      COMMAND ${CMAKE_COMMAND} -E remove_directory
+        ${CMAKE_BINARY_DIR}/tests/${_category}
+      )
+    ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
     FILE(APPEND ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake
       "SUBDIRS(${_category})\n"

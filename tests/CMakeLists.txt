@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-PROJECT(TESTSUITE NONE)
+PROJECT(testsuite NONE)
 
 MESSAGE(FATAL_ERROR "\n
 The testsuite cannot be set up as an independent project.

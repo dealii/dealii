@@ -14,7 +14,13 @@
 ##
 ## ---------------------------------------------------------------------
 
-IF(NOT DEFINED DEAL_II_BINARY_DIR)
+#
+# This is a small project that provides some custom targets that need a
+# working, independent subproject because they are called back during
+# configure phase.
+#
+
+IF(NOT DEFINED TEST_DIR)
   MESSAGE(FATAL_ERROR "\n
   The testsuite cannot be set up as an independent project.
   Please configure \"deal.II\" directly instead.\n\n"
@@ -24,38 +30,15 @@ ENDIF()
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 PROJECT(testsuite NONE)
 
-#
-# This is a small project that provides some custom targets that need a
-# working, independent subproject because they are called back during
-# configure phase.
-#
-
-# Setup tests:
-ADD_CUSTOM_TARGET(setup_tests
-  COMMAND ${CMAKE_COMMAND}
-    --build ${DEAL_II_BINARY_DIR} --target setup_tests
-  )
-
 # Regenerate tests (run "make rebuild_cache" in subprojects):
 ADD_CUSTOM_TARGET(regen_tests)
 
 # Clean all tests
 ADD_CUSTOM_TARGET(clean_tests)
 
-# Remove all tests:
-ADD_CUSTOM_TARGET(prune_tests)
-
-#
-# Glob together a list of all subfolders to set up:
-#
-
 FILE(GLOB _categories RELATIVE ${TEST_DIR} ${TEST_DIR}/*)
 SET(_categories all-headers build_tests mesh_converter ${_categories})
 LIST(REMOVE_DUPLICATES _categories)
-
-#
-# Define a subproject for every enabled category:
-#
 
 FOREACH(_category ${_categories})
   IF( EXISTS ${CMAKE_SOURCE_DIR}/${_category}/CMakeLists.txt OR
@@ -72,12 +55,6 @@ FOREACH(_category ${_categories})
         --build ${CMAKE_BINARY_DIR}/${_category} --target clean
       )
     ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
-
-    ADD_CUSTOM_TARGET(prune_tests_${_category}
-      COMMAND ${CMAKE_COMMAND} -E remove_directory
-        ${CMAKE_BINARY_DIR}/${_category}
-      )
-    ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
   ENDIF()
 ENDFOREACH()
