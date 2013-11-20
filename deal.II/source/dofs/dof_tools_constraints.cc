@@ -2854,22 +2854,32 @@ namespace DoFTools
     Assert (component_mask.n_selected_components(n_components) > 0,
             ComponentMask::ExcNoComponentSelected());
 
-    // a field to store the indices
+    // a field to store the indices on the face
     std::vector<types::global_dof_index> face_dofs;
     face_dofs.reserve (max_dofs_per_face(dof));
+    // a field to store the indices on the cell
+    std::vector<types::global_dof_index> cell_dofs;
+    cell_dofs.reserve (max_dofs_per_cell(dof));
 
     typename DH<dim,spacedim>::active_cell_iterator
     cell = dof.begin_active(),
     endc = dof.end();
     for (; cell!=endc; ++cell)
-      if (!cell->is_artificial())
+      if (!cell->is_artificial()
+          &&
+          cell->at_boundary ())
+      {
+        const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+        
+        // get global indices of dofs on the cell
+        cell_dofs.resize (fe.dofs_per_cell);
+        cell->get_dof_indices (cell_dofs);
+        
         for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           {
-            const FiniteElement<dim,spacedim> &fe = cell->get_fe();
-
             const typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
-
+          
             // if face is on the boundary and satisfies the correct
             // boundary id property
             if (face->at_boundary ()
@@ -2888,8 +2898,13 @@ namespace DoFTools
                   {
                     // Find out if a dof has a contribution in this
                     // component, and if so, add it to the list
+                    const std::vector<types::global_dof_index>::iterator it_index_on_cell 
+                      = std::find (cell_dofs.begin(), cell_dofs.end(), face_dofs[i]);
+                    Assert (it_index_on_cell != cell_dofs.end(), ExcInvalidIterator());
+                    const unsigned int index_on_cell = std::distance(cell_dofs.begin(),
+                                                                     it_index_on_cell);
                     const ComponentMask &nonzero_component_array
-                      = cell->get_fe().get_nonzero_components (i);
+                      = cell->get_fe().get_nonzero_components (index_on_cell);
                     bool nonzero = false;
                     for (unsigned int c=0; c<n_components; ++c)
                       if (nonzero_component_array[c] && component_mask[c])
@@ -2903,6 +2918,7 @@ namespace DoFTools
                   }
               }
           }
+      }
   }
 
 
