@@ -2889,7 +2889,7 @@ namespace DoFTools
                     // Find out if a dof has a contribution in this
                     // component, and if so, add it to the list
                     const ComponentMask &nonzero_component_array
-                      = cell->get_fe().get_nonzero_components (face_dofs[i]);
+                      = cell->get_fe().get_nonzero_components (i);
                     bool nonzero = false;
                     for (unsigned int c=0; c<n_components; ++c)
                       if (nonzero_component_array[c] && component_mask[c])
