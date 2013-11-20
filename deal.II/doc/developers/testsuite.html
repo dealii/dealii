@@ -55,6 +55,7 @@
         <li><a href="#run">Running the testsuite</a></li>
         <ol>
           <li><a href="#runoutput">How to interpret the output</a></li>
+          <li><a href="#runmakeopts">Parallelize testsuite configuration</a></li>
         </ol>
         <li><a href="#layout">Testsuite development</a></li>
         <ol>
@@ -347,6 +348,26 @@
       Typically, tests fail because the output has changed, and you will see
       this in the DIFF phase of the test.
     </p>
+
+
+    <a name="runmakeopts"></a>
+    <h3>Parallelize testsuite configuration</h3>
+
+    <p>
+      If you have set up a good portion of the testsuite you'll notice that a
+      reconfiguration of the build directory takes a noticeable time (in the
+      order of minutes instead of seconds) with
+      <code>Reconfiguring testsuite subprojects</code>.
+      By default (with the "Unix Makefiles" generator) this is due to the
+      fact that the reconfiguration processes the subprojects sequentally.
+      If you want to increase the parallelism, specify e.g.
+      <code>MAKEOPTS="-j8"</code> as environment variable or as CMake
+      variable.
+    </p>
+    <p>
+      Alternatively, you can use <code>Ninja</code>.
+    </p>
+
 
 
     <a name="layout"></a>
@@ -696,7 +717,7 @@ int main ()
     <pre>
 
     CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-    INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsuite.cmake)
+    INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsubproject.cmake)
     PROJECT(testsuite CXX)
     INCLUDE(${DEAL_II_TARGET_CONFIG})
     DEAL_II_PICKUP_TESTS()
@@ -780,6 +801,9 @@ int main ()
         that will be used during the configuration stage (invokes
         $ cmake -C ${CONFIG_FILE}). This only has an effect if
         CTEST_BINARY_DIRECTORY is empty.
+
+    MAKEOPTS
+      - Additional options that will be passed directly to make (or ninja).
       </pre>
       Furthermore, the variables described <a href="#setupconfigure">above</a> can also be
       set and will be handed automatically down to <code>cmake</code>.

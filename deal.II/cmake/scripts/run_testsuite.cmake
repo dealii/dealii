@@ -86,6 +86,9 @@
 #     CTEST_COVERAGE() stage will be run. Test results must go into the
 #     "Experimental" section.
 #
+#   MAKEOPTS
+#     - Additional options that will be passed directly to make (or ninja).
+#
 # Furthermore, the following variables controlling the testsuite can be set
 # and will be automatically handed down to cmake:
 #
@@ -254,6 +257,10 @@ ENDIF()
 # Assemble configuration options, we need it now:
 #
 
+IF("${MAKEOPTS}" STREQUAL "")
+  SET(MAKEOPTS $ENV{MAKEOPTS})
+ENDIF()
+
 IF(NOT "${CONFIG_FILE}" STREQUAL "")
   SET(_options "-C${CONFIG_FILE}")
 ENDIF()
@@ -272,6 +279,7 @@ FOREACH(_var ${_variables})
       _var MATCHES "^(UMFPACK|ZLIB|LAPACK)_" OR
       _var MATCHES "^(CMAKE|DEAL_II)_(C|CXX|Fortran|BUILD)_(COMPILER|FLAGS)" OR
       _var MATCHES "^CMAKE_BUILD_TYPE$" OR
+      _var MATCHES "MAKEOPTS" OR
       ( NOT _var MATCHES "^[_]*CMAKE" AND _var MATCHES "_DIR$" ) )
     LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
@@ -500,7 +508,11 @@ MACRO(CLEAR_TARGETDIRECTORIES_TXT)
     )
 ENDMACRO()
 
-MESSAGE("-- CMake Options: ${_options}")
+MESSAGE("-- CMake Options:          ${_options}")
+
+IF(NOT "${MAKEOPTS}" STREQUAL "")
+  MESSAGE("-- MAKEOPTS:               ${MAKEOPTS}")
+ENDIF()
 
 
 ########################################################################
@@ -522,7 +534,7 @@ IF("${_res}" STREQUAL "0")
   # Only run the build stage if configure was successful:
 
   MESSAGE("-- Running CTEST_BUILD()")
-  CTEST_BUILD(TARGET NUMBER_ERRORS _res)
+  CTEST_BUILD(TARGET ${MAKEOPTS} NUMBER_ERRORS _res)
 
   IF("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
@@ -530,6 +542,7 @@ IF("${_res}" STREQUAL "0")
     MESSAGE("-- Running make setup_tests")
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
       --build ${CTEST_BINARY_DIRECTORY} --target setup_tests
+      -- ${MAKEOPTS}
       OUTPUT_QUIET RESULT_VARIABLE _res
       )
     IF(NOT "${_res}" STREQUAL "0")

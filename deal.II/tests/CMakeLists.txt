@@ -14,6 +14,16 @@
 ##
 ## ---------------------------------------------------------------------
 
+IF(NOT DEFINED DEAL_II_SOURCE_DIR OR NOT DEFINED DEAL_II_BINARY_DIR)
+  MESSAGE(FATAL_ERROR "\n
+  The testsuite cannot be set up as an independent project.
+  Please configure \"deal.II\" directly instead.\n\n"
+    )
+ENDIF()
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+PROJECT(testsuite NONE)
+
 #
 # This is a bloody hack to avoid a severe performance penalty when using
 # 12k top level targets with GNU Make that really does not like that...
@@ -21,11 +31,6 @@
 # The only choice we have is to set up every test subdirectory as an
 # independent project. Unfortunately this adds quite a significant amount
 # of complexity :-(
-#
-
-MESSAGE(STATUS "")
-MESSAGE(STATUS "Setup testsuite with TEST_DIR ${TEST_DIR}")
-ADD_SUBDIRECTORY(quick_tests)
 
 #
 # Custom targets to set and clean up the testsuite:
@@ -44,27 +49,23 @@ ADD_CUSTOM_TARGET(clean_tests)
 ADD_CUSTOM_TARGET(prune_tests)
 
 #
-# Write a minimalistic CTestTestfile.cmake file to CMAKE_BINARY_DIR and
-# CMAKE_CURRENT_BINARY_DIR:
+# Be as quiet as possible:
 #
-FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
-  "SUBDIRS(tests)"
-  )
-FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
+
+IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  SET(_shoo)
+ELSE()
+  SET(_shoo >/dev/null)
+ENDIF()
 
 #
-# Pass all relevant "TEST_" and "_DIR" variables down to the subprojects:
+# Pass down all relevant configuration:
 #
+
 SET(_options)
-LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
-LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
 FOREACH(_var
-    DIFF_DIR
-    NUMDIFF_DIR
-    TEST_DIFF
-    TEST_OVERRIDE_LOCATION
-    TEST_PICKUP_REGEX
-    TEST_TIME_LIMIT
+    DEAL_II_SOURCE_DIR DEAL_II_BINARY_DIR DIFF_DIR NUMDIFF_DIR
+    TEST_DIFF TEST_OVERRIDE_LOCATION TEST_PICKUP_REGEX TEST_TIME_LIMIT
     )
   # always undefine:
   LIST(APPEND _options "-U${_var}")
@@ -73,16 +74,10 @@ FOREACH(_var
   ENDIF()
 ENDFOREACH()
 
-# Be as quiet as possible:
-IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  SET(_shoo)
-ELSE()
-  SET(_shoo >/dev/null)
-ENDIF()
-
 #
 # Glob together a list of all subfolders to set up:
 #
+
 FILE(GLOB _categories RELATIVE ${TEST_DIR} ${TEST_DIR}/*)
 SET(_categories all-headers build_tests mesh_converter ${_categories})
 LIST(REMOVE_DUPLICATES _categories)
@@ -91,11 +86,9 @@ LIST(REMOVE_DUPLICATES _categories)
 # Define a subproject for every enabled category:
 #
 
-MESSAGE(STATUS "Regenerating testsuite subprojects")
-
 FOREACH(_category ${_categories})
-  IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_category}/CMakeLists.txt)
-    SET(_category_dir ${CMAKE_CURRENT_SOURCE_DIR}/${_category})
+  IF(EXISTS ${CMAKE_SOURCE_DIR}/${_category}/CMakeLists.txt)
+    SET(_category_dir ${CMAKE_SOURCE_DIR}/${_category})
   ELSEIF(EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt)
     SET(_category_dir ${TEST_DIR}/${_category})
   ELSE()
@@ -106,8 +99,8 @@ FOREACH(_category ${_categories})
 
     ADD_CUSTOM_TARGET(setup_tests_${_category}
       COMMAND ${CMAKE_COMMAND} -E make_directory
-        ${CMAKE_CURRENT_BINARY_DIR}/${_category}
-      COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/${_category} &&
+        ${CMAKE_BINARY_DIR}/${_category}
+      COMMAND cd ${CMAKE_BINARY_DIR}/${_category} &&
         ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
         ${_shoo}
       DEPENDS ${_category_dir}
@@ -115,51 +108,30 @@ FOREACH(_category ${_categories})
       )
     ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
 
-    # depend on a compiled library:
-    ADD_DEPENDENCIES(setup_tests_${_category} build_library)
-
     ADD_CUSTOM_TARGET(regen_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
-        --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target regenerate
+        --build ${CMAKE_BINARY_DIR}/${_category} --target regenerate
         ${_shoo}
       )
     ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
     ADD_CUSTOM_TARGET(clean_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
-        --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target clean
+        --build ${CMAKE_BINARY_DIR}/${_category} --target clean
         ${_shoo}
       )
     ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
 
     ADD_CUSTOM_TARGET(prune_tests_${_category}
       COMMAND ${CMAKE_COMMAND} -E remove_directory
-        ${CMAKE_CURRENT_BINARY_DIR}/${_category}
+        ${CMAKE_BINARY_DIR}/${_category}
       )
     ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
-    FILE(APPEND ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake
+    FILE(APPEND ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
       "SUBDIRS(${_category})\n"
       )
-
-    #
-    # Regenerate subprojects: The "regenerate" target of the subproject
-    # depends on "rebuild_cache" so that the subprojects rerun cmake if
-    # necessary.
-    # (TODO: Unfortunately this is sequential - due to the fact that we
-    # cannot call back into the main build system)
-    #
-
-    IF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${_category}/CMakeCache.txt)
-      EXECUTE_PROCESS(
-        COMMAND ${CMAKE_COMMAND}
-        --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target regenerate
-        OUTPUT_QUIET
-        )
-    ENDIF()
 
   ENDIF()
 ENDFOREACH()
 
-MESSAGE(STATUS "Regenerating testsuite subprojects - Done")
-MESSAGE(STATUS "")

@@ -15,114 +15,103 @@
 ## ---------------------------------------------------------------------
 
 #
-# Setup necessary configuration in the testsuite subprojects.
-# This file is directly included by the test subprojects and not by the
-# main project.
-#
-# It is assumed that the following variables are set:
-#
-#    DEAL_II_BINARY_DIR
-#    DEAL_II_SOURCE_DIR
-#      - pointing to a source and binary directory of a deal.II build
-#
-# This file sets up the following options, that can be overwritten by
-# environment or command line:
-#
-#     TEST_DIFF
-#     TEST_OVERRIDE_LOCATION
-#     TEST_PICKUP_REGEX
-#     TEST_TIME_LIMIT
+# Setup the testsuite. The top level targets defined here merely act as a
+# multiplexer for the ./tets/ project where all the actual work is
+# done...
 #
 
-#
-# Load all macros:
-#
-FILE(GLOB _macro_files ${DEAL_II_SOURCE_DIR}/cmake/macros/*.cmake)
-FOREACH(_file ${_macro_files})
-  INCLUDE(${_file})
-ENDFOREACH()
+SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
+
+MESSAGE(STATUS "")
+MESSAGE(STATUS "Setup testsuite with TEST_DIR ${TEST_DIR}")
+
+ADD_SUBDIRECTORY(
+  ${CMAKE_SOURCE_DIR}/tests/quick_tests
+  ${CMAKE_BINARY_DIR}/tests/quick_tests
+  )
 
 #
-# Pick up values from environment:
+# Write a minimalistic CTestTestfile.cmake file to CMAKE_BINARY_DIR and
+# CMAKE_BINARY_DIR/tests:
 #
+
+FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
+  "SUBDIRS(tests)"
+  )
+
+FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+FILE(WRITE ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake "")
+
+#
+# Custom targets to set and clean up the testsuite:
+#
+
+# Setup tests:
+ADD_CUSTOM_TARGET(setup_tests
+  COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_BINARY_DIR}/tests --target setup_tests
+    -- ${MAKEOPTS}
+  )
+
+# Depend on a compiled library:
+ADD_DEPENDENCIES(setup_tests build_library)
+
+# Regenerate tests (run "make rebuild_cache" in subprojects):
+ADD_CUSTOM_TARGET(regen_tests
+  COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_BINARY_DIR}/tests --target regen_tests
+    -- ${MAKEOPTS}
+  )
+
+# Clean all tests
+ADD_CUSTOM_TARGET(clean_tests
+  COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_BINARY_DIR}/tests --target clean_tests
+    -- ${MAKEOPTS}
+  )
+
+# Remove all tests:
+ADD_CUSTOM_TARGET(prune_tests
+  COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_BINARY_DIR}/tests --target prune_tests
+    -- ${MAKEOPTS}
+  )
+
+#
+# Setup the testsuite and pass all relevant "TEST_" and "_DIR" variables
+# down to it:
+#
+
+MESSAGE(STATUS "Setup testsuite")
+
+SET(_options)
+LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
+LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
 FOREACH(_var
-  DEAL_II_BINARY_DIR
-  DEAL_II_SOURCE_DIR
-  TEST_DIFF
-  TEST_TIME_LIMIT
-  TEST_PICKUP_REGEX
-  TEST_OVERRIDE_LOCATION
-  )
-  # Environment wins:
-  IF(DEFINED ENV{${_var}})
-    SET(${_var} $ENV{${_var}})
-  ENDIF()
-  IF(NOT "${_var}" STREQUAL "")
-    SET(${_var} "${${_var}}" CACHE STRING "")
+    DIFF_DIR NUMDIFF_DIR TEST_DIR TEST_DIFF TEST_OVERRIDE_LOCATION
+    TEST_PICKUP_REGEX TEST_TIME_LIMIT
+    )
+  # always undefine:
+  LIST(APPEND _options "-U${_var}")
+  IF(DEFINED ${_var})
+    LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
 ENDFOREACH()
 
-#
-# We need deal.II and Perl as external packages:
-#
-
-FIND_PACKAGE(deal.II 8.0 REQUIRED
-  HINTS ${DEAL_II_BINARY_DIR} ${DEAL_II_DIR}
+EXECUTE_PROCESS(
+  COMMAND ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options}
+    ${CMAKE_SOURCE_DIR}/tests
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+  OUTPUT_QUIET
   )
-SET(CMAKE_CXX_COMPILER ${DEAL_II_CXX_COMPILER} CACHE STRING "CXX Compiler.")
+MESSAGE(STATUS "Setup testsuite - Done")
 
-FIND_PACKAGE(Perl REQUIRED)
-
-#
-# We need a diff tool, preferably numdiff:
-#
-
-FIND_PROGRAM(DIFF_EXECUTABLE
-  NAMES diff
-  HINTS ${DIFF_DIR}
-  PATH_SUFFIXES bin
+MESSAGE(STATUS "Regenerating testsuite subprojects")
+EXECUTE_PROCESS(
+  COMMAND ${CMAKE_COMMAND}
+    --build ${CMAKE_BINARY_DIR}/tests --target regen_tests
+    -- ${MAKEOPTS}
+  OUTPUT_QUIET
   )
-
-FIND_PROGRAM(NUMDIFF_EXECUTABLE
-  NAMES numdiff
-  HINTS ${NUMDIFF_DIR}
-  PATH_SUFFIXES bin
-  )
-
-MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
-
-IF("${TEST_DIFF}" STREQUAL "")
-  #
-  # No TEST_DIFF is set, specify one:
-  #
-
-  IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-    SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \\t\\n:')
-  ELSEIF(NOT DIFF_EXECUTABLE MATCHES "-NOTFOUND")
-    SET(TEST_DIFF ${DIFF_EXECUTABLE})
-  ELSE()
-    MESSAGE(FATAL_ERROR
-      "Could not find diff or numdiff. One of those are required for running the testsuite.\n"
-      "Please specify TEST_DIFF by hand."
-      )
-  ENDIF()
-ENDIF()
-
-#
-# Set a default time limit of 600 seconds:
-#
-
-SET_IF_EMPTY(TEST_TIME_LIMIT 600)
-
-#
-# And finally, enable testing:
-#
-
-ENABLE_TESTING()
-
-#
-# A custom target that does absolutely nothing. It is used in the main
-# project to trigger a "make rebuild_cache" if necessary.
-#
-
-ADD_CUSTOM_TARGET(regenerate)
+MESSAGE(STATUS "Regenerating testsuite subprojects - Done")
+MESSAGE(STATUS "")
