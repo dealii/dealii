@@ -53,9 +53,6 @@ ADD_CUSTOM_TARGET(setup_tests
     -- ${MAKEOPTS}
   )
 
-# Depend on a compiled library:
-ADD_DEPENDENCIES(setup_tests build_library)
-
 # Regenerate tests (run "make rebuild_cache" in subprojects):
 ADD_CUSTOM_TARGET(regen_tests
   COMMAND ${CMAKE_COMMAND}
