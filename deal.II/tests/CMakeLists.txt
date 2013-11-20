@@ -14,7 +14,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-IF(NOT DEFINED DEAL_II_SOURCE_DIR OR NOT DEFINED DEAL_II_BINARY_DIR)
+IF(NOT DEFINED DEAL_II_BINARY_DIR)
   MESSAGE(FATAL_ERROR "\n
   The testsuite cannot be set up as an independent project.
   Please configure \"deal.II\" directly instead.\n\n"
@@ -25,19 +25,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 PROJECT(testsuite NONE)
 
 #
-# This is a bloody hack to avoid a severe performance penalty when using
-# 12k top level targets with GNU Make that really does not like that...
-#
-# The only choice we have is to set up every test subdirectory as an
-# independent project. Unfortunately this adds quite a significant amount
-# of complexity :-(
-
-#
-# Custom targets to set and clean up the testsuite:
+# This is a small project that provides some custom targets that need a
+# working, independent subproject because they are called back during
+# configure phase.
 #
 
 # Setup tests:
-ADD_CUSTOM_TARGET(setup_tests)
+ADD_CUSTOM_TARGET(setup_tests
+  COMMAND ${CMAKE_COMMAND}
+    --build ${DEAL_II_BINARY_DIR} --target setup_tests
+  )
 
 # Regenerate tests (run "make rebuild_cache" in subprojects):
 ADD_CUSTOM_TARGET(regen_tests)
@@ -47,32 +44,6 @@ ADD_CUSTOM_TARGET(clean_tests)
 
 # Remove all tests:
 ADD_CUSTOM_TARGET(prune_tests)
-
-#
-# Be as quiet as possible:
-#
-
-IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  SET(_shoo)
-ELSE()
-  SET(_shoo >/dev/null)
-ENDIF()
-
-#
-# Pass down all relevant configuration:
-#
-
-SET(_options)
-FOREACH(_var
-    DEAL_II_SOURCE_DIR DEAL_II_BINARY_DIR DIFF_DIR NUMDIFF_DIR
-    TEST_DIFF TEST_OVERRIDE_LOCATION TEST_PICKUP_REGEX TEST_TIME_LIMIT
-    )
-  # always undefine:
-  LIST(APPEND _options "-U${_var}")
-  IF(DEFINED ${_var})
-    LIST(APPEND _options "-D${_var}=${${_var}}")
-  ENDIF()
-ENDFOREACH()
 
 #
 # Glob together a list of all subfolders to set up:
@@ -87,38 +58,18 @@ LIST(REMOVE_DUPLICATES _categories)
 #
 
 FOREACH(_category ${_categories})
-  IF(EXISTS ${CMAKE_SOURCE_DIR}/${_category}/CMakeLists.txt)
-    SET(_category_dir ${CMAKE_SOURCE_DIR}/${_category})
-  ELSEIF(EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt)
-    SET(_category_dir ${TEST_DIR}/${_category})
-  ELSE()
-    SET(_category_dir)
-  ENDIF()
-
-  IF(NOT "${_category_dir}" STREQUAL "")
-
-    ADD_CUSTOM_TARGET(setup_tests_${_category}
-      COMMAND ${CMAKE_COMMAND} -E make_directory
-        ${CMAKE_BINARY_DIR}/${_category}
-      COMMAND cd ${CMAKE_BINARY_DIR}/${_category} &&
-        ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
-        ${_shoo}
-      DEPENDS ${_category_dir}
-      COMMENT "Processing tests/${_category}"
-      )
-    ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
+  IF( EXISTS ${CMAKE_SOURCE_DIR}/${_category}/CMakeLists.txt OR
+      EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt )
 
     ADD_CUSTOM_TARGET(regen_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
         --build ${CMAKE_BINARY_DIR}/${_category} --target regenerate
-        ${_shoo}
       )
     ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
     ADD_CUSTOM_TARGET(clean_tests_${_category}
       COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
         --build ${CMAKE_BINARY_DIR}/${_category} --target clean
-        ${_shoo}
       )
     ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
 
@@ -128,10 +79,5 @@ FOREACH(_category ${_categories})
       )
     ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
-    FILE(APPEND ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
-      "SUBDIRS(${_category})\n"
-      )
-
   ENDIF()
 ENDFOREACH()
-

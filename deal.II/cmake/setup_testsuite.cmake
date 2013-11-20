@@ -15,9 +15,16 @@
 ## ---------------------------------------------------------------------
 
 #
-# Setup the testsuite. The top level targets defined here merely act as a
-# multiplexer for the ./tets/ project where all the actual work is
-# done...
+# This is a bloody hack to avoid a severe performance penalty when using
+# 12k top level targets with GNU Make that really does not like that...
+#
+# The only choice we have is to set up every test subdirectory as an
+# independent project. Unfortunately this adds quite a significant amount
+# of complexity :-(
+#
+
+#
+# Setup the testsuite.
 #
 
 SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
@@ -47,11 +54,7 @@ FILE(WRITE ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake "")
 #
 
 # Setup tests:
-ADD_CUSTOM_TARGET(setup_tests
-  COMMAND ${CMAKE_COMMAND}
-    --build ${CMAKE_BINARY_DIR}/tests --target setup_tests
-    -- ${MAKEOPTS}
-  )
+ADD_CUSTOM_TARGET(setup_tests)
 
 # Regenerate tests (run "make rebuild_cache" in subprojects):
 ADD_CUSTOM_TARGET(regen_tests
@@ -74,19 +77,33 @@ ADD_CUSTOM_TARGET(prune_tests
     -- ${MAKEOPTS}
   )
 
+MESSAGE(STATUS "Setup testsuite")
+
 #
-# Setup the testsuite and pass all relevant "TEST_" and "_DIR" variables
+# Setup the testsuite project: It is merely a wrapper around the individual
+# regen_tests_*, clean_tests_* and prune_tests_* targets.
 # down to it:
 #
 
-MESSAGE(STATUS "Setup testsuite")
+EXECUTE_PROCESS(
+  COMMAND ${CMAKE_COMMAND} -G${CMAKE_GENERATOR}
+    -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
+    -DTEST_DIR=${TEST_DIR}
+    ${CMAKE_SOURCE_DIR}/tests
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+  OUTPUT_QUIET
+  )
 
 SET(_options)
 LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
 LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
 FOREACH(_var
-    DIFF_DIR NUMDIFF_DIR TEST_DIR TEST_DIFF TEST_OVERRIDE_LOCATION
-    TEST_PICKUP_REGEX TEST_TIME_LIMIT
+    DIFF_DIR
+    NUMDIFF_DIR
+    TEST_DIFF
+    TEST_OVERRIDE_LOCATION
+    TEST_PICKUP_REGEX
+    TEST_TIME_LIMIT
     )
   # always undefine:
   LIST(APPEND _options "-U${_var}")
@@ -95,12 +112,44 @@ FOREACH(_var
   ENDIF()
 ENDFOREACH()
 
-EXECUTE_PROCESS(
-  COMMAND ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options}
-    ${CMAKE_SOURCE_DIR}/tests
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests
-  OUTPUT_QUIET
-  )
+#
+# Glob together a list of all subfolders to set up:
+#
+
+FILE(GLOB _categories RELATIVE ${TEST_DIR} ${TEST_DIR}/*)
+SET(_categories all-headers build_tests mesh_converter ${_categories})
+LIST(REMOVE_DUPLICATES _categories)
+
+#
+# Define a subproject for every enabled category:
+#
+
+FOREACH(_category ${_categories})
+  IF(EXISTS ${CMAKE_SOURCE_DIR}/${_category}/CMakeLists.txt)
+    SET(_category_dir ${CMAKE_SOURCE_DIR}/tests/${_category})
+  ELSEIF(EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt)
+    SET(_category_dir ${TEST_DIR}/${_category})
+  ELSE()
+    SET(_category_dir)
+  ENDIF()
+
+  IF(NOT "${_category_dir}" STREQUAL "")
+    ADD_CUSTOM_TARGET(setup_tests_${_category}
+      COMMAND ${CMAKE_COMMAND} -E make_directory
+        ${CMAKE_BINARY_DIR}/tests/${_category}
+      COMMAND cd ${CMAKE_BINARY_DIR}/tests/${_category} &&
+        ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
+        > /dev/null
+      DEPENDS ${_category_dir}
+      COMMENT "Processing tests/${_category}"
+      )
+    ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
+
+    FILE(APPEND ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake
+      "SUBDIRS(${_category})\n"
+      )
+  ENDIF()
+ENDFOREACH()
 MESSAGE(STATUS "Setup testsuite - Done")
 
 MESSAGE(STATUS "Regenerating testsuite subprojects")
@@ -111,4 +160,5 @@ EXECUTE_PROCESS(
   OUTPUT_QUIET
   )
 MESSAGE(STATUS "Regenerating testsuite subprojects - Done")
+
 MESSAGE(STATUS "")
