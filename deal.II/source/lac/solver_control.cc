@@ -303,4 +303,41 @@ ReductionControl::parse_parameters (ParameterHandler &param)
   set_reduction (param.get_double("Reduction"));
 }
 
+
+/*---------------------- IterationNumberControl -----------------------------*/
+
+
+IterationNumberControl::IterationNumberControl(const unsigned int n,
+                                               const double       tolerance,
+                                               const bool m_log_history,
+                                               const bool m_log_result)
+  :
+  SolverControl (n, tolerance, m_log_history, m_log_result){}
+
+
+IterationNumberControl::~IterationNumberControl()
+{}
+
+
+SolverControl::State
+IterationNumberControl::check (const unsigned int step,
+                               const double check_value)
+{
+  // check whether the given number of iterations was reached, and return
+  // success in that case. Otherwise, go on to the check of the base class.
+  if (step >= this->maxsteps)
+    {
+      if (m_log_result)
+        deallog << "Convergence step " << step
+                << " value " << check_value << std::endl;
+      lstep  = step;
+      lvalue = check_value;
+
+      lcheck = success;
+      return success;
+    }
+  else
+    return SolverControl::check(step, check_value);
+}
+
 DEAL_II_NAMESPACE_CLOSE

@@ -462,6 +462,58 @@ protected:
   double reduced_tol;
 };
 
+/**
+ * Specialization of @p SolverControl which returns @p success if a given
+ * number of iteration was performed, irrespective of the actual
+ * residual. This is useful in cases where you don't want to solve exactly,
+ * but rather want to perform a fixed number of iterations, e.g. in an inner
+ * solver. The arguments given to this class are exactly the same as for the
+ * SolverControl class and the solver terminates similarly when one of the
+ * given tolerance or the maximum iteration count were reached. The only
+ * difference to SolverControl is that the solver returns success in the
+ * latter case.
+ *
+ * @author Martin Kronbichler
+ */
+class IterationNumberControl : public SolverControl
+{
+public:
+  /**
+   * Constructor.  Provide exactly the same arguments as the constructor of
+   * the SolverControl class.
+   */
+  IterationNumberControl (const unsigned int maxiter = 100,
+                          const double       tolerance = 1e-12,
+                          const bool     log_history = false,
+                          const bool     log_result  = true);
+
+  /**
+   * Initialize with a SolverControl object. The result will emulate
+   * SolverControl by setting #reduce to zero.
+   */
+  IterationNumberControl (const SolverControl &c);
+
+  /**
+   * Assign a SolverControl object to ReductionControl. The result of the
+   * assignment will emulate SolverControl by setting #reduce to zero.
+   */
+  IterationNumberControl &operator= (const SolverControl &c);
+
+  /**
+   * Virtual destructor is needed as there are virtual functions in this
+   * class.
+   */
+  virtual ~IterationNumberControl();
+
+  /**
+   * Decide about success or failure of an iteration. This function bases
+   * success solely on the fact if a given number of iterations was reached or
+   * the check value reached exactly zero.
+   */
+  virtual State check (const unsigned int step,
+                       const double   check_value);
+};
+
 /*@}*/
 //---------------------------------------------------------------------------
 
