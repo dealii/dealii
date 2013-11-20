@@ -62,31 +62,28 @@ namespace deal_II_exceptions
 
 ExceptionBase::ExceptionBase ()
   :
-  std::runtime_error(""),
   file(""),
   line(0),
   function(""),
   cond(""),
   exc(""),
   stacktrace (0),
-  n_stacktrace_frames (0)
-{
-  // Construct a minimalistic error message:
-  generate_message();
-}
+  n_stacktrace_frames (0),
+  what_str(0)
+{}
 
 
 
 ExceptionBase::ExceptionBase (const ExceptionBase &exc)
   :
-  std::runtime_error (exc),
   file(exc.file),
   line(exc.line),
   function(exc.function),
   cond(exc.cond),
   exc(exc.exc),
   stacktrace (0), // don't copy stacktrace to avoid double de-allocation problem
-  n_stacktrace_frames (0)
+  n_stacktrace_frames (0),
+  what_str(0) // don't copy the error message, it gets generated dynamically by what()
 {}
 
 
@@ -97,6 +94,11 @@ ExceptionBase::~ExceptionBase () throw ()
     {
       free (stacktrace);
       stacktrace = 0;
+    }
+  if (what_str != 0)
+    {
+      delete[] what_str;
+      what_str = 0;
     }
 }
 
@@ -128,26 +130,24 @@ void ExceptionBase::set_fields (const char *f,
 #ifdef HAVE_GLIBC_STACKTRACE
   n_stacktrace_frames = backtrace(raw_stacktrace, 25);
 #endif
-
-  // set the message to the empty string so that what() will compute
-  // a new error message with the new information.
-  std::runtime_error * base = static_cast<std::runtime_error *>(this);
-  *base = std::runtime_error("");
 }
 
 const char* ExceptionBase::what() const throw()
 {
-  // We override the what() function to be able to look up the symbols
-  // of the stack trace.
-  if (std::runtime_error::what()[0]=='\0')
+  // If no error c_string was generated so far, do it now:
+  if (what_str == 0)
     {
 #ifdef HAVE_GLIBC_STACKTRACE
+      // We have deferred the symbol lookup to this point to avoid costly
+      // runtime penalties due to linkage of external libraries by
+      // backtrace_symbols.
       stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
 #endif
 
       generate_message();
     }
-  return std::runtime_error::what();
+
+  return what_str;
 }
 
 
@@ -281,35 +281,43 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 
 void ExceptionBase::generate_message () const
 {
-  // build up a string with the error message...
-
-  std::ostringstream converter;
-
-  converter << std::endl
-            << "--------------------------------------------------------"
-            << std::endl;
-
-  // print out general data
-  print_exc_data (converter);
-  // print out exception specific data
-  print_info (converter);
-  print_stack_trace (converter);
-
-  if (!deal_II_exceptions::additional_assert_output.empty())
+  // build up a c_string with the error message.
+  // Guard this procedure with a try block, we shall not throw at this
+  // place...
+  try
     {
-      converter << "--------------------------------------------------------"
-                << std::endl
-                << deal_II_exceptions::additional_assert_output
+      std::ostringstream converter;
+
+      converter << std::endl
+                << "--------------------------------------------------------"
                 << std::endl;
+
+      // print out general data
+      print_exc_data (converter);
+      // print out exception specific data
+      print_info (converter);
+      print_stack_trace (converter);
+
+      if (!deal_II_exceptions::additional_assert_output.empty())
+        {
+          converter << "--------------------------------------------------------"
+                    << std::endl
+                    << deal_II_exceptions::additional_assert_output
+                    << std::endl;
+        }
+
+      converter << "--------------------------------------------------------"
+                << std::endl;
+
+      if (what_str != 0)
+        delete[] what_str;
+      what_str = new char[converter.str().size()+1]; // beware of the terminating \0 character
+      strcpy(what_str, converter.str().c_str());
     }
-
-  converter << "--------------------------------------------------------"
-            << std::endl;
-
-  // ... and set up std::runtime_error with it. We need to do a const
-  // cast so we can change the what message even though our method is const.
-  const std::runtime_error * base = static_cast<const std::runtime_error *>(this);
-  const_cast<std::runtime_error &>(*base) = std::runtime_error(converter.str());
+  catch (...)
+    {
+      // On error, resume next. There is nothing better we can do...
+    }
 }
 
 

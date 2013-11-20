@@ -24,7 +24,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <stdexcept>
+#include <exception>
 #include <string>
 #include <ostream>
 
@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
-class ExceptionBase : public std::runtime_error
+class ExceptionBase : public std::exception
 {
 public:
   /**
@@ -147,11 +147,15 @@ protected:
 
 private:
   /**
-   * Internal function that generates the c_string that gets printed by
-   * exception::what(). Called by the ExceptionBase constructor and
-   * set_fields.
+   * Internal function that generates the c_string. Called by what().
    */
   void generate_message() const;
+
+  /**
+   * A pointer to the c_string that will be printed by what(). It is
+   * populated by generate_message()
+   */
+  mutable char* what_str;
 };
 
 
