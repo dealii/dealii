@@ -211,6 +211,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: CMake: Added a configuration check for incompatible ninja
+  + icc setup, fixed several setup and performance issues with the
+  testsuite
+  <br>
+  (Matthias Maier, 2013/11/20)
+  </li>
+
   <li> Changed: when a dealii::Exception is thrown, defer the symbol lookup of the
   stack trace to when it is needed. This improves performance if what() is never
   called.
@@ -262,6 +269,13 @@ inconvenience this causes.
   internal errors with the Intel ICC compiler.
   <br>
   (Wolfgang Bangerth, 2013/11/13)
+  </li>
+
+  <li> Cleanup: Removed obsolete files and files with unknown licensing
+  status from the source tree. Along the way, parameter_gui now uses
+  default icons from the desktop environment instead of bundled ones.
+  <br>
+  (Matthias Maier, 2013/11/11)
   </li>
 
   <li> New: There is now a framework for coloring graphs, with functions
