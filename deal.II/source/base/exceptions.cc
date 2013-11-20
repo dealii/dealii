@@ -67,9 +67,9 @@ ExceptionBase::ExceptionBase ()
   function(""),
   cond(""),
   exc(""),
-  stacktrace (0),
+  stacktrace (NULL),
   n_stacktrace_frames (0),
-  what_str(0)
+  what_str("")
 {}
 
 
@@ -81,25 +81,17 @@ ExceptionBase::ExceptionBase (const ExceptionBase &exc)
   function(exc.function),
   cond(exc.cond),
   exc(exc.exc),
-  stacktrace (0), // don't copy stacktrace to avoid double de-allocation problem
+  stacktrace (NULL), // don't copy stacktrace to avoid double de-allocation problem
   n_stacktrace_frames (0),
-  what_str(0) // don't copy the error message, it gets generated dynamically by what()
+  what_str("") // don't copy the error message, it gets generated dynamically by what()
 {}
 
 
 
 ExceptionBase::~ExceptionBase () throw ()
 {
-  if (stacktrace != 0)
-    {
-      free (stacktrace);
-      stacktrace = 0;
-    }
-  if (what_str != 0)
-    {
-      delete[] what_str;
-      what_str = 0;
-    }
+  free (stacktrace); // free(NULL) is allowed
+  stacktrace = NULL;
 }
 
 
@@ -117,12 +109,6 @@ void ExceptionBase::set_fields (const char *f,
   exc  = e;
 
   // If the system supports this, get a stacktrace how we got here:
-  if (stacktrace != 0)
-    {
-      free (stacktrace);
-      stacktrace = 0;
-    }
-
   // Note that we defer the symbol lookup done by backtrace_symbols()
   // to when we need it (see what() below). This is for performance
   // reasons, as this requires loading libraries and can take in the
@@ -135,19 +121,22 @@ void ExceptionBase::set_fields (const char *f,
 const char* ExceptionBase::what() const throw()
 {
   // If no error c_string was generated so far, do it now:
-  if (what_str == 0)
+  if (what_str == "")
     {
 #ifdef HAVE_GLIBC_STACKTRACE
       // We have deferred the symbol lookup to this point to avoid costly
       // runtime penalties due to linkage of external libraries by
       // backtrace_symbols.
+
+      // first delete old stacktrace if necessary
+      free (stacktrace); // free(NULL) is allowed
       stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
 #endif
 
       generate_message();
     }
 
-  return what_str;
+  return what_str.c_str();
 }
 
 
@@ -309,14 +298,12 @@ void ExceptionBase::generate_message () const
       converter << "--------------------------------------------------------"
                 << std::endl;
 
-      if (what_str != 0)
-        delete[] what_str;
-      what_str = new char[converter.str().size()+1]; // beware of the terminating \0 character
-      strcpy(what_str, converter.str().c_str());
+      what_str = converter.str();
     }
   catch (...)
     {
       // On error, resume next. There is nothing better we can do...
+      what_str = "ExceptionBase::generate_message () failed";
     }
 }
 

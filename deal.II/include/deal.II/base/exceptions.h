@@ -155,7 +155,7 @@ private:
    * A pointer to the c_string that will be printed by what(). It is
    * populated by generate_message()
    */
-  mutable char* what_str;
+  mutable std::string what_str;
 };
 
 
