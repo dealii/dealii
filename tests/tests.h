@@ -36,7 +36,7 @@
 // Cygwin has a different implementation for rand() which causes many tests to fail.
 // This here is a reimplementation that gives the same sequence of numbers as a program
 // that uses rand() on a typical linux machine.
-int myrand(bool reseed=false, int seed=1)
+int myrand(bool reseed=false, int seed=1) throw()
 {
   static int r[32];
   static int k;
@@ -76,20 +76,17 @@ int myrand(bool reseed=false, int seed=1)
 }
 
 // reseed our random number generator
-void mysrand(int seed)
+void mysrand(int seed) throw()
 {
   myrand(true, seed);
 }
 
-
-// I hope this is safe to just override the standard
-// rand() functions here.
-int rand()
+int rand() throw()
 {
   return myrand();
 }
 
-void srand(int seed)
+void srand(int seed) throw()
 {
   mysrand(seed);
 }
