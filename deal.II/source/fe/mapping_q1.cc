@@ -1742,8 +1742,8 @@ transform_real_to_unit_cell_internal
   const double eps = 1.e-11;
   const unsigned int newton_iteration_limit = 20;
 
-  unsigned int newton_iteration=0;
-  double last_f_weighted_norm = -1./0.;
+  unsigned int newton_iteration = 0;
+  double last_f_weighted_norm;
   do
     {
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
