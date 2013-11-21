@@ -1240,6 +1240,9 @@ void MappingQ1<dim,spacedim>::transform_fields(
       Assert (data.update_flags & update_volume_elements,
               typename FEValuesBase<dim>::ExcAccessToUninitializedField());
       Assert (rank==1, ExcMessage("Only for rank 1"));
+      if (rank!=1)
+        return;
+
       for (unsigned int i=0; i<output.size(); ++i)
         {
           output[i] = apply_transformation(data.contravariant[i], input[i]);
