@@ -1,0 +1,35 @@
+
+DEAL:0::ok
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="108 2" NumberType="Float" Precision="8" Format="HDF">
+            out.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Quadrilateral" NumberOfElements="48">
+          <DataItem Dimensions="48 4" NumberType="UInt" Format="HDF">
+            out.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="linear" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="108 1" NumberType="Float" Precision="8" Format="HDF">
+            out.h5:/linear
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
+
+DEAL:1::ok
+
+
+DEAL:2::ok
+
