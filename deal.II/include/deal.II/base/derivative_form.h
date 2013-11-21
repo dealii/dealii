@@ -178,9 +178,9 @@ DerivativeForm<order, dim, spacedim>::DerivativeForm(const Tensor<2,dim> &T)
 {
   Assert( (dim == spacedim) && (order==1),
           ExcMessage("Only allowed for square tensors."));
-
-  for (unsigned int j=0; j<dim; ++j)
-    (*this)[j] = T[j];
+  if ((dim == spacedim) && (order==1))
+    for (unsigned int j=0; j<dim; ++j)
+      (*this)[j] = T[j];
 }
 
 
