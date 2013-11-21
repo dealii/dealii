@@ -1,0 +1,21 @@
+
+DEAL::Number of cells: 1
+DEAL::Number of dofs: 22
+DEAL::ComponentMask 011
+DEAL::Number of Constraints: 16
+DEAL::DoF 1, copy 0, base element 1, index 0, position -1.00000 -1.00000
+DEAL::DoF 2, copy 1, base element 1, index 0, position -1.00000 -1.00000
+DEAL::DoF 4, copy 0, base element 1, index 1, position 1.00000 -1.00000
+DEAL::DoF 5, copy 1, base element 1, index 1, position 1.00000 -1.00000
+DEAL::DoF 7, copy 0, base element 1, index 2, position -1.00000 1.00000
+DEAL::DoF 8, copy 1, base element 1, index 2, position -1.00000 1.00000
+DEAL::DoF 10, copy 0, base element 1, index 3, position 1.00000 1.00000
+DEAL::DoF 11, copy 1, base element 1, index 3, position 1.00000 1.00000
+DEAL::DoF 12, copy 0, base element 1, index 4, position -1.00000 0.00000
+DEAL::DoF 13, copy 1, base element 1, index 4, position -1.00000 0.00000
+DEAL::DoF 14, copy 0, base element 1, index 5, position 1.00000 0.00000
+DEAL::DoF 15, copy 1, base element 1, index 5, position 1.00000 0.00000
+DEAL::DoF 16, copy 0, base element 1, index 6, position 0.00000 -1.00000
+DEAL::DoF 17, copy 1, base element 1, index 6, position 0.00000 -1.00000
+DEAL::DoF 18, copy 0, base element 1, index 7, position 0.00000 1.00000
+DEAL::DoF 19, copy 1, base element 1, index 7, position 0.00000 1.00000
