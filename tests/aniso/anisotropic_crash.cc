@@ -19,7 +19,7 @@
 // GridTools::find_cells_adjacent_to_vertex had a problem in that it
 // wasn't prepared to deal with anisotropic refinement
 
-
+#include "../tests.h"
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
