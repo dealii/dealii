@@ -105,7 +105,7 @@ int main()
           for (unsigned int i=0; i<3; ++i)
             {
               for (unsigned int j=0; j<dim; ++j)
-                v(j) = 1. * std::rand()/RAND_MAX;
+                v(j) = 1. * rand()/RAND_MAX;
 
               A.vmult (tmp1, v);
               mic.vmult (tmp2, tmp1);

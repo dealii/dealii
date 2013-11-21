@@ -291,7 +291,7 @@ int main (int /*argc*/, char **/*argv*/)
 
   // Fill solution vector with random values between 0 and 1.
   for (unsigned int i = 0; i < dof_handler->n_dofs (); ++i)
-    solution(i) = (double) rand () / (double) RAND_MAX;
+    solution(i) = (double) rand() / (double) RAND_MAX;
 
   // Now check if the function is continuous in normal
   // direction.

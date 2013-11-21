@@ -1073,8 +1073,8 @@ void LaplaceProblem<dim>::run ()
   // points inside a radius of 0.9)
   for (int i=0; i<1000; i++)
     {
-      double r = sqrt((0.9*std::rand()/RAND_MAX));
-      double phi = 2*3.14*(1.0*std::rand()/RAND_MAX);
+      double r = sqrt((0.9*rand()/RAND_MAX));
+      double phi = 2*3.14*(1.0*rand()/RAND_MAX);
       double x = r*cos(phi);
       double y = r*sin(phi);
       Point<2> p(x,y);

@@ -44,7 +44,7 @@ main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  std::srand(3391466);
+  srand(3391466);
 
   FullMatrix<double> A(3,3,entries_A);
   FullMatrix<double> B(3,3,entries_B);

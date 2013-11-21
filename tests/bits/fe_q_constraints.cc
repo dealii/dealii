@@ -78,7 +78,7 @@ TestFunction<dim>::TestFunction (const unsigned int p_order) :
   for (unsigned int d = 0; d < dim; ++d)
     {
       for (unsigned int c = 0; c < p_order; ++c)
-        coeff[c] = (double) rand () / (double) RAND_MAX;
+        coeff[c] = (double) rand() / (double) RAND_MAX;
       base.push_back (Polynomials::Polynomial<double> (coeff));
     }
 }
@@ -138,7 +138,7 @@ void TestFEQConstraints<dim>::refine_grid_random ()
   Vector<double> estimated_error_per_cell (n_cells);
 
   for (unsigned int i = 0; i < n_cells; ++i)
-    estimated_error_per_cell(i) = (double) rand () / (double) RAND_MAX;
+    estimated_error_per_cell(i) = (double) rand() / (double) RAND_MAX;
 
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                    estimated_error_per_cell,

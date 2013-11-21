@@ -52,16 +52,16 @@ void test (const unsigned int n, const unsigned int m)
   for (unsigned int i=0; i<n; ++i)
     {
       for (unsigned int j=0; j<n; ++j)
-        A(i,j) = std::rand();
+        A(i,j) = rand();
       for (unsigned int j=0; j<m; ++j)
         {
-          B(i,j) = Bt(j,i) = std::rand();
-          D(j,i) = Dt(i,j) = std::rand();
+          B(i,j) = Bt(j,i) = rand();
+          D(j,i) = Dt(i,j) = rand();
         }
     }
   for (unsigned int i=0; i<m; ++i)
     for (unsigned int j=0; j<m; ++j)
-      C(i,j) = std::rand();
+      C(i,j) = rand();
 
   // Compare first Schur complement
   // with mmult.
@@ -123,7 +123,7 @@ main ()
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);
-  std::srand(3391466);
+  srand(3391466);
 
   test(3,4);
   test(4,7);

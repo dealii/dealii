@@ -159,7 +159,7 @@ void test()
         endc = tr.end();
 
         for (; cell!=endc; ++cell)
-          if (std::rand()%42==1)
+          if (rand()%42==1)
             cell->set_refine_flag ();
 
         tr.execute_coarsening_and_refinement ();
@@ -199,9 +199,9 @@ void test()
         for (; cell!=endc; ++cell)
           if (!cell->is_artificial() && !cell->is_ghost())
             {
-              if (std::rand()%12==1)
+              if (rand()%12==1)
                 cell->set_refine_flag ();
-              else if (std::rand()%7==1)
+              else if (rand()%7==1)
                 cell->set_coarsen_flag ();
             }
       }

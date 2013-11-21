@@ -33,6 +33,69 @@
 #include <iomanip>
 
 
+// Cygwin has a different implementation for rand() which causes many tests to fail.
+// This here is a reimplementation that gives the same sequence of numbers as a program
+// that uses rand() on a typical linux machine.
+int myrand(bool reseed=false, int seed=1)
+{
+  static int r[32];
+  static int k;
+  static bool inited=false;
+  if (!inited || reseed)
+    {
+      //srand treats a seed 0 as 1 for some reason
+      r[0]=(seed==0)?1:seed;
+
+      for (int i=1; i<31; i++)
+        {
+          r[i] = (16807LL * r[i-1]) % 2147483647;
+          if (r[i] < 0)
+            r[i] += 2147483647;
+        }
+      k=31;
+      for (int i=31; i<34; i++)
+        {
+          r[k%32] = r[(k+32-31)%32];
+          k=(k+1)%32;
+        }
+
+      for (int i=34; i<344; i++)
+        {
+          r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
+          k=(k+1)%32;
+        }
+      inited=true;
+      if (reseed==true)
+        return 0;// do not generate new no
+    }
+
+  r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
+  int ret = r[k%32];
+  k=(k+1)%32;
+  return (unsigned int)ret >> 1;
+}
+
+// reseed our random number generator
+void mysrand(int seed)
+{
+  myrand(true, seed);
+}
+
+
+// I hope this is safe to just override the standard
+// rand() functions here.
+int rand()
+{
+  return myrand();
+}
+
+void srand(int seed)
+{
+  mysrand(seed);
+}
+
+
+
 // given the name of a file, copy it to deallog
 // and then delete it
 inline void cat_file(const char *filename)

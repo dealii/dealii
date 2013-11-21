@@ -123,7 +123,7 @@ check ()
   endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
-      cell->set_active_fe_index (std::rand() % fe.size());
+      cell->set_active_fe_index (rand() % fe.size());
     }
 
   dof_handler.distribute_dofs (fe);

@@ -37,7 +37,7 @@ void random_matrix(FullMatrix<double> &A)
   for (unsigned int i=0; i<A.m(); ++i)
     for (unsigned int j=0; j<A.n(); ++j)
       {
-        double rnd = std::rand();
+        double rnd = rand();
         rnd /= RAND_MAX;
         A(i,j) = (i==j) ? A.m()+rnd : rnd;
       }
@@ -52,7 +52,7 @@ main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  std::srand(3391466);
+  srand(3391466);
 
   FullMatrix<double> T(3,3,entries);
   T.print_formatted(logfile, 0, false);
