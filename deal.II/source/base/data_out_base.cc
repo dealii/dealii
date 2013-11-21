@@ -6996,7 +6996,9 @@ void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &
       while (n_th_vector < vector_data_ranges.size() && std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) < data_set) n_th_vector++;
 
       // Determine the dimension of this data
-      if (std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) == data_set)
+      // TODO: is this new logic correct here?
+      // please see https://code.google.com/p/dealii/issues/detail?id=148
+      if (n_th_vector < vector_data_ranges.size() && std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) == data_set)
         {
           // Multiple dimensions
           pt_data_vector_dim = std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) - std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1;
