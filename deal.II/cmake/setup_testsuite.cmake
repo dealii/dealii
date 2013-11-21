@@ -114,7 +114,7 @@ LIST(REMOVE_DUPLICATES _categories)
 #
 
 FOREACH(_category ${_categories})
-  IF(EXISTS ${CMAKE_SOURCE_DIR}/${_category}/CMakeLists.txt)
+  IF(EXISTS ${CMAKE_SOURCE_DIR}/tests/${_category}/CMakeLists.txt)
     SET(_category_dir ${CMAKE_SOURCE_DIR}/tests/${_category})
   ELSEIF(EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt)
     SET(_category_dir ${TEST_DIR}/${_category})
