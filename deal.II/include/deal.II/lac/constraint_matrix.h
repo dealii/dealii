@@ -31,6 +31,7 @@
 #include <set>
 #include <utility>
 #include <complex>
+#include <algorithm>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -659,6 +660,12 @@ public:
    * object.
    */
   std::size_t memory_consumption () const;
+
+  /**
+   * Add the constraint indices associated to the indices in the given vector. 
+   * The indices in the vector are not repeated.
+   */
+  void resolve_indices(std::vector<types::global_dof_index> &indices) const;
 
   /**
    * @}

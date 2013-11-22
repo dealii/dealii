@@ -1549,7 +1549,7 @@ bool ConstraintMatrix::is_identity_constrained (const size_type index) const
 
 
 bool ConstraintMatrix::are_identity_constrained (const size_type index1,
-                                                       const size_type index2) const
+                                                 const size_type index2) const
 {
   if (is_constrained(index1) == true)
     {
@@ -1559,8 +1559,8 @@ bool ConstraintMatrix::are_identity_constrained (const size_type index1,
       // return if an entry for this line was found and if it has only one
       // entry equal to 1.0 and that one is index2
       return ((p.entries.size() == 1) &&
-          (p.entries[0].first == index2) &&
-          (p.entries[0].second == 1.0));
+              (p.entries[0].first == index2) &&
+              (p.entries[0].second == 1.0));
     }
   else if (is_constrained(index2) == true)
     {
@@ -1570,8 +1570,8 @@ bool ConstraintMatrix::are_identity_constrained (const size_type index1,
       // return if an entry for this line was found and if it has only one
       // entry equal to 1.0 and that one is index1
       return ((p.entries.size() == 1) &&
-          (p.entries[0].first == index1) &&
-          (p.entries[0].second == 1.0));
+              (p.entries[0].first == index1) &&
+              (p.entries[0].second == 1.0));
     }
   else
     return false;
@@ -1674,6 +1674,31 @@ ConstraintMatrix::memory_consumption () const
 }
 
 
+
+void
+ConstraintMatrix::resolve_indices (std::vector<types::global_dof_index> &indices) const
+{
+  const unsigned int indices_size = indices.size();
+  const std::vector<std::pair<types::global_dof_index,double> > * line_ptr;
+  for (unsigned int i=0; i<indices_size; ++i)
+    {
+      line_ptr = get_constraint_entries(indices[i]);
+      // if the index is constraint, the constraints indices are added to the
+      // indices vector
+      if (line_ptr!=NULL)
+        {
+          const unsigned int line_size = line_ptr->size();
+          for (unsigned int j=0; j<line_size; ++j)
+            indices.push_back((*line_ptr)[j].first);
+        }
+    }
+
+  // keep only the unique elements
+  std::sort(indices.begin(),indices.end());
+  std::vector<types::global_dof_index>::iterator it;
+  it = std::unique(indices.begin(),indices.end());
+  indices.resize(it-indices.begin());
+}
 
 
 
