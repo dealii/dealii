@@ -55,15 +55,6 @@ namespace internal
                                       false),
       cell_to_patch_index_map (&cell_to_patch_index_map)
     {}
-
-
-
-    /**
-     * Dummy function used for WorkStream.
-     */
-    template <int dim, int spacedim>
-    void
-    copy(const DataOutBase::Patch<dim,spacedim> &patch) {}
   }
 }
 
@@ -306,7 +297,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
       (*data.cell_to_patch_index_map)[cell_and_index->first->level()][cell_and_index->first->index()];
   // did we mess up the indices?
   Assert(patch_idx < patches.size(), ExcInternalError());
-  
+
   // Put the patch in the patches vector
   patches[patch_idx] = patch;
   patches[patch_idx].patch_index = patch_idx;
@@ -460,8 +451,8 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                      std_cxx1x::bind(&DataOut<dim,DH>::build_one_patch,
                                      this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3,
                                      curved_cell_region,std_cxx1x::ref(this->patches)),
-                     std_cxx1x::bind(&internal::DataOut::copy<dim,DH::space_dimension>,
-                                     std_cxx1x::_1),
+		     // no copy-local-to-global function needed here
+		     std_cxx1x::function<void (const ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &)>(),
                      thread_data,
                      sample_patch);
 }
