@@ -77,7 +77,7 @@ namespace Step9
   // @sect3{AdvectionProblem class declaration}
 
   // Following we declare the main class of this program. It is very much
-  // alike the main classes of previous examples, so we again only comment on
+  // like the main classes of previous examples, so we again only comment on
   // the differences.
   template <int dim>
   class AdvectionProblem
@@ -144,8 +144,8 @@ namespace Step9
 
     void assemble_system ();
     void local_assemble_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
-				AssemblyScratchData                                  &scratch,
-				AssemblyCopyData                                     &copy_data);
+                                AssemblyScratchData                                  &scratch,
+                                AssemblyCopyData                                     &copy_data);
     void copy_local_to_global (const AssemblyCopyData &copy_data);
 
 
@@ -407,21 +407,15 @@ namespace Step9
   // of the mesh size, as described in the introduction.  This class is a
   // simple version of the <code>DerivativeApproximation</code> class in the
   // library, that uses similar techniques to obtain finite difference
-  // approximations of the gradient of a finite element field, or if higher
+  // approximations of the gradient of a finite element field, or of higher
   // derivatives.
   //
   // The class has one public static function <code>estimate</code> that is
-  // called to compute a vector of error indicators, and one private function
-  // that does the actual work on an interval of all active cells. The latter
-  // is called by the first one in order to be able to do the computations in
-  // parallel if your computer has more than one processor. While the first
-  // function accepts as parameter a vector into which the error indicator is
-  // written for each cell. This vector is passed on to the second function
-  // that actually computes the error indicators on some cells, and the
-  // respective elements of the vector are written. By the way, we made it
-  // somewhat of a convention to use vectors of floats for error indicators
-  // rather than the common vectors of doubles, as the additional accuracy is
-  // not necessary for estimated values.
+  // called to compute a vector of error indicators, and a few private functions
+  // that do the actual work on all active cells. As in other parts of the
+  // library, we follow an informal convention to use vectors of floats for
+  // error indicators rather than the common vectors of doubles, as the
+  // additional accuracy is not necessary for estimated values.
   //
   // In addition to these two functions, the class declares two exceptions
   // which are raised when a cell has no neighbors in each of the space
@@ -430,26 +424,66 @@ namespace Step9
   // more common case of invalid parameters to a function, namely a vector of
   // wrong size.
   //
-  // Two annotations to this class are still in order: the first is that the
-  // class has no non-static member functions or variables, so this is not
-  // really a class, but rather serves the purpose of a <code>namespace</code>
-  // in C++. The reason that we chose a class over a namespace is that this
-  // way we can declare functions that are private, i.e. visible to the
-  // outside world but not callable. This can be done with namespaces as well,
-  // if one declares some functions in header files in the namespace and
-  // implements these and other functions in the implementation file. The
-  // functions not declared in the header file are still in the namespace but
-  // are not callable from outside. However, as we have only one file here, it
-  // is not possible to hide functions in the present case.
+  // Two other comments: first, the class has no non-static member functions
+  // or variables, so this is not really a class, but rather serves the
+  // purpose of a <code>namespace</code> in C++. The reason that we chose a
+  // class over a namespace is that this way we can declare functions that are
+  // private. This can be done with namespaces as well, if one declares some
+  // functions in header files in the namespace and implements these and other
+  // functions in the implementation file. The functions not declared in the
+  // header file are still in the namespace but are not callable from
+  // outside. However, as we have only one file here, it is not possible to
+  // hide functions in the present case.
   //
-  // The second is that the dimension template parameter is attached to the
-  // function rather than to the class itself. This way, you don't have to
-  // specify the template parameter yourself as in most other cases, but the
-  // compiler can figure its value out itself from the dimension of the DoF
-  // handler object that one passes as first argument.
+  // The second comment is that the dimension template parameter is attached
+  // to the function rather than to the class itself. This way, you don't have
+  // to specify the template parameter yourself as in most other cases, but
+  // the compiler can figure its value out itself from the dimension of the
+  // DoF handler object that one passes as first argument.
   //
-  // Finally note that the <code>IndexInterval</code> typedef is introduced as
-  // a convenient abbreviation for an otherwise lengthy type name.
+  // Before jumping into the fray with the implementation, let us also comment
+  // on the parallelization strategy. We have already introduced the necessary
+  // framework for using the WorkStream concept in the declaration of the main
+  // class of this program above. We will use it again here. In the current
+  // context, this means that we have to define (i) classes for scratch and
+  // copy objects, (ii) a function that does the local computation on one
+  // cell, and (iii) a function that copies the local result into a global
+  // object. Given this general framework, we will, however, deviate from it a
+  // bit. In particular, WorkStream was generally invented for cases where
+  // each local computation on a cell <i>adds</i> to a global object -- for
+  // example, when assembling linear systems where we add local contributions
+  // into a global matrix and right hand side. Here, however, the situation is
+  // slightly different: we compute contributions from every cell
+  // individually, but then all we need to do is put them into an element of
+  // an output vector that is unique to each cell. Consequently, there is no
+  // risk that the write operations from two cells might conflict, and the
+  // elaborate machinery of WorkStream to avoid conflicting writes is not
+  // necessary. Consequently, what we will do is this: We still need a scratch
+  // object that holds, for example, the FEValues object.  However, we only
+  // create an fake, empty copy data structure. Likewise, we do need the
+  // function that computes local contributions, but since it can already put
+  // the result into its final location, we do not need a copy-local-to-global
+  // function and will instead give the WorkStream::run function an empty
+  // function object -- the equivalent to a NULL function pointer.
+  //
+  // The second idea to make this approach work is this: If we want to write
+  // the result into its final destination right away, then the local worker
+  // function needs to already know where this destination is. Here, this is
+  // an element of a vector -- but which element is something that the local
+  // worker function (or, if we wanted to use one, a copy-local-to-global
+  // function) can not determine easily just knowing an iterator to a cell it
+  // is supposed to work on. Consequently, in addition to a cell, we need to
+  // pass a second piece of identifying information along: the element of the
+  // output vector to write into. What this means is that the work items are
+  // identified by two iterators: to a cell, and to an output vector
+  // element. Moving from one work item to the next requires incrementing both
+  // iterators. deal.II has a class for this, called SynchronousIterators,
+  // that takes a tuple of iterator types as arguments and stores an iterator
+  // of each type. Whenever the SynchronousIterators object is incremented, it
+  // increments the stored iterators in turn. Thus, this class is exactly what
+  // we need to do our work, and we consequently use it as the first argument
+  // of the worker function. We will further down below show how to create
+  // such an object.
   class GradientEstimation
   {
   public:
@@ -466,7 +500,7 @@ namespace Step9
 
   private:
     template <int dim>
-    struct EstimateScratchData 
+    struct EstimateScratchData
     {
       EstimateScratchData (const FiniteElement<dim> &fe,
                            const Vector<double>     &solution);
@@ -476,22 +510,15 @@ namespace Step9
       Vector<double> solution;
     };
 
-    // There is nothing to copy but WorkStream requires a CopyData structure
-    template <int dim>
-    struct EstimateCopyData 
-    {
-      EstimateCopyData () {}
-    };
+    struct EstimateCopyData
+    {};
 
     template <int dim>
-    static void estimate_cell (
-        const SynchronousIterators<std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,
-        Vector<float>::iterator> >     &cell,
-        EstimateScratchData<dim>       &scratch_data,
-        const EstimateCopyData<dim>    &copy_data);
-    // There is nothing to copy but WorkStream required a copy function
-    template <int dim>
-    static void dummy_copy(const EstimateCopyData<dim> &copy_data) {}
+    static
+    void estimate_cell (const SynchronousIterators<std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,
+                        Vector<float>::iterator> >     &cell,
+                        EstimateScratchData<dim>       &scratch_data,
+                        const EstimateCopyData         &copy_data);
   };
 
 
@@ -503,7 +530,8 @@ namespace Step9
   // the function <code>setup_system</code> follow the same pattern that was
   // used previously, so we need not comment on these three function:
   template <int dim>
-  AdvectionProblem<dim>::AdvectionProblem () :
+  AdvectionProblem<dim>::AdvectionProblem ()
+    :
     dof_handler (triangulation),
     fe(1)
   {}
@@ -562,12 +590,12 @@ namespace Step9
   void AdvectionProblem<dim>::assemble_system ()
   {
     WorkStream::run(dof_handler.begin_active(),
-		    dof_handler.end(),
-		    *this,
-		    &AdvectionProblem::local_assemble_system,
-		    &AdvectionProblem::copy_local_to_global,
-		    AssemblyScratchData(fe),
-		    AssemblyCopyData());
+                    dof_handler.end(),
+                    *this,
+                    &AdvectionProblem::local_assemble_system,
+                    &AdvectionProblem::copy_local_to_global,
+                    AssemblyScratchData(fe),
+                    AssemblyCopyData());
 
 
     // After the matrix has been assembled in parallel, we still have to
@@ -601,15 +629,15 @@ namespace Step9
   template <int dim>
   AdvectionProblem<dim>::AssemblyScratchData::
   AssemblyScratchData (const FiniteElement<dim> &fe)
-  :
-  fe_values (fe,
-	     QGauss<dim>(2),
-	     update_values   | update_gradients |
-	     update_quadrature_points | update_JxW_values),
-  fe_face_values (fe,
-		  QGauss<dim-1>(2),
-		  update_values     | update_quadrature_points   |
-		  update_JxW_values | update_normal_vectors)
+    :
+    fe_values (fe,
+               QGauss<dim>(2),
+               update_values   | update_gradients |
+               update_quadrature_points | update_JxW_values),
+    fe_face_values (fe,
+                    QGauss<dim-1>(2),
+                    update_values     | update_quadrature_points   |
+                    update_JxW_values | update_normal_vectors)
   {}
 
 
@@ -617,15 +645,15 @@ namespace Step9
   template <int dim>
   AdvectionProblem<dim>::AssemblyScratchData::
   AssemblyScratchData (const AssemblyScratchData &scratch_data)
-  :
-  fe_values (scratch_data.fe_values.get_fe(),
-	     scratch_data.fe_values.get_quadrature(),
-	     update_values   | update_gradients |
-	     update_quadrature_points | update_JxW_values),
-  fe_face_values (scratch_data.fe_face_values.get_fe(),
-		  scratch_data.fe_face_values.get_quadrature(),
-		  update_values     | update_quadrature_points   |
-		  update_JxW_values | update_normal_vectors)
+    :
+    fe_values (scratch_data.fe_values.get_fe(),
+               scratch_data.fe_values.get_quadrature(),
+               update_values   | update_gradients |
+               update_quadrature_points | update_JxW_values),
+    fe_face_values (scratch_data.fe_face_values.get_fe(),
+                    scratch_data.fe_face_values.get_quadrature(),
+                    update_values     | update_quadrature_points   |
+                    update_JxW_values | update_normal_vectors)
   {}
 
 
@@ -668,8 +696,8 @@ namespace Step9
   void
   AdvectionProblem<dim>::
   local_assemble_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
-			 AssemblyScratchData                                  &scratch_data,
-			 AssemblyCopyData                                     &copy_data)
+                         AssemblyScratchData                                  &scratch_data,
+                         AssemblyCopyData                                     &copy_data)
   {
     // First of all, we will need some objects that describe boundary values,
     // right hand side function and the advection field. As we will only
@@ -821,12 +849,12 @@ namespace Step9
   {
     for (unsigned int i=0; i<copy_data.local_dof_indices.size(); ++i)
       {
-	for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
-	  system_matrix.add (copy_data.local_dof_indices[i],
-			     copy_data.local_dof_indices[j],
-			     copy_data.cell_matrix(i,j));
+        for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
+          system_matrix.add (copy_data.local_dof_indices[i],
+                             copy_data.local_dof_indices[j],
+                             copy_data.cell_matrix(i,j));
 
-	system_rhs(copy_data.local_dof_indices[i]) += copy_data.cell_rhs(i);
+        system_rhs(copy_data.local_dof_indices[i]) += copy_data.cell_rhs(i);
       }
   }
 
@@ -946,11 +974,11 @@ namespace Step9
   GradientEstimation::EstimateScratchData<dim>
   ::EstimateScratchData (const FiniteElement<dim> &fe,
                          const Vector<double>     &solution)
-  :
-  fe_midpoint_value(fe,
-      QMidpoint<dim> (),
-      update_values | update_quadrature_points),
-  solution(solution)
+    :
+    fe_midpoint_value(fe,
+                      QMidpoint<dim> (),
+                      update_values | update_quadrature_points),
+    solution(solution)
   {}
 
 
@@ -959,11 +987,11 @@ namespace Step9
   template <int dim>
   GradientEstimation::EstimateScratchData<dim>
   ::EstimateScratchData(const EstimateScratchData &scratch_data)
-  :
-  fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
-      scratch_data.fe_midpoint_value.get_quadrature(),
-      update_values | update_quadrature_points),
-  solution(scratch_data.solution)
+    :
+    fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
+                      scratch_data.fe_midpoint_value.get_quadrature(),
+                      update_values | update_quadrature_points),
+    solution(scratch_data.solution)
   {}
 
 
@@ -1002,23 +1030,20 @@ namespace Step9
     // purpose. Here, in this case, Compaq's <code>cxx</code> compiler choked
     // on the code so we use this workaround with the function pointer:
     void (*estimate_cell_ptr) (const SynchronousIterators<std_cxx1x::tuple<
-      typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator> > &cell,          
-      EstimateScratchData<dim>                                                  &scratch_data,  
-      const EstimateCopyData<dim>                                               &copy_data)
+                               typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator> > &cell,
+                               EstimateScratchData<dim>                                                  &scratch_data,
+                               const EstimateCopyData                                                    &copy_data)
       = &GradientEstimation::template estimate_cell<dim>;
 
-    void (*dummy_copy) (const EstimateCopyData<dim> &copy_data)
-      = &GradientEstimation::template dummy_copy<dim>;
-
     typedef std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
-      Iterators;
+    Iterators;
     SynchronousIterators<Iterators> begin_sync_it(Iterators(dof_handler.begin_active(),
-          error_per_cell.begin()));
+                                                            error_per_cell.begin()));
     SynchronousIterators<Iterators> end_sync_it(Iterators(dof_handler.end(),error_per_cell.end()));
 
     WorkStream::run(begin_sync_it,end_sync_it,
                     estimate_cell_ptr,
-                    dummy_copy,
+                    std_cxx1x::function<void (const EstimateCopyData &)> (),
                     EstimateScratchData<dim> (dof_handler.get_fe(),solution),
                     EstimateCopyData<dim> ());
 
@@ -1049,10 +1074,10 @@ namespace Step9
   template <int dim>
   void
   GradientEstimation::estimate_cell (const SynchronousIterators<std_cxx1x::tuple<
-      typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator> > &cell,          
-      EstimateScratchData<dim>                                                  &scratch_data,  
-      const EstimateCopyData<dim>                                               &copy_data)
-   {
+                                     typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator> > &cell,
+                                     EstimateScratchData<dim>                                                  &scratch_data,
+                                     const EstimateCopyData<dim>                                               &copy_data)
+  {
     // We need space for the tensor <code>Y</code>, which is the sum of
     // outer products of the y-vectors.
     Tensor<2,dim> Y;
@@ -1067,7 +1092,7 @@ namespace Step9
                               GeometryInfo<dim>::max_children_per_face);
 
     typename DoFHandler<dim>::active_cell_iterator cell_it(std_cxx1x::get<0>(cell.iterators));
-    
+
     // First initialize the <code>FEValues</code> object, as well as the
     // <code>Y</code> tensor:
     scratch_data.fe_midpoint_value.reinit (cell_it);
@@ -1151,7 +1176,7 @@ namespace Step9
                   // as an internal error. We therefore use a predefined
                   // exception class to throw here.
                   Assert (neighbor_child->neighbor(face_no==0 ? 1 : 0)
-                      ==std_cxx1x::get<0>(cell.iterators),ExcInternalError());
+                          ==std_cxx1x::get<0>(cell.iterators),ExcInternalError());
 
                   // If the check succeeded, we push the active neighbor
                   // we just found to the stack we keep:
@@ -1204,7 +1229,7 @@ namespace Step9
         const Point<dim> neighbor_center = scratch_data.fe_midpoint_value.quadrature_point(0);
 
         scratch_data.fe_midpoint_value.get_function_values (scratch_data.solution,
-                                               neighbor_midpoint_value);
+                                                            neighbor_midpoint_value);
 
         // Compute the vector <code>y</code> connecting the centers of the
         // two cells. Note that as opposed to the introduction, we denote
@@ -1260,9 +1285,9 @@ namespace Step9
     contract (gradient, Y_inverse, projected_gradient);
 
     *(std_cxx1x::get<1>(cell.iterators)) = (std::pow(std_cxx1x::get<0>(cell.iterators)->diameter(),
-                                           1+1.0*dim/2) *
-                                           std::sqrt(gradient.square()));
-    
+                                                     1+1.0*dim/2) *
+                                            std::sqrt(gradient.square()));
+
   }
 }
 
