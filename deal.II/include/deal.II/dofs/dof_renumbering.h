@@ -892,19 +892,6 @@ namespace DoFRenumbering
               const bool         dof_wise_renumbering = false);
 
   /**
-   * This function does the downstream numbering for the individual levels of
-   * a multigrid hierarchy, but not for the global degrees of freedom.
-   *
-   * @deprecated Call downstream() function that takes a level argument for
-   * each of the levels of the multigrid hierarchy.
-   */
-  template <int dim, int spacedim>
-  void
-  downstream (MGDoFHandler<dim,spacedim>               &dof_handler,
-              const Point<spacedim> &direction,
-              const bool        dof_wise_renumbering = false) DEAL_II_DEPRECATED;
-
-  /**
    * @deprecated Use downstream() instead.
    */
   template <class DH>
@@ -1154,6 +1141,29 @@ namespace DoFRenumbering
    */
   DeclException0 (ExcNotDGFEM);
 }
+
+/* ------------------------- inline functions -------------- */
+
+#ifndef DOXYGEN
+namespace DoFRenumbering
+{
+  template <class DH>
+  void
+  inline
+  downstream (DH &dof,
+              const Point<DH::space_dimension> &direction,
+              const bool dof_wise_renumbering)
+  {
+    std::vector<types::global_dof_index> renumbering(dof.n_dofs());
+    std::vector<types::global_dof_index> reverse(dof.n_dofs());
+    compute_downstream(renumbering, reverse, dof, direction,
+                       dof_wise_renumbering);
+
+    dof.renumber_dofs(renumbering);
+  }
+}
+#endif
+
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -1515,30 +1515,8 @@ namespace DoFRenumbering
 
 
 
-  template <class DH>
-  void
-  downstream (DH &dof,
-              const Point<DH::space_dimension> &direction,
-              const bool dof_wise_renumbering)
-  {
-    std::vector<types::global_dof_index> renumbering(dof.n_dofs());
-    std::vector<types::global_dof_index> reverse(dof.n_dofs());
-    compute_downstream(renumbering, reverse, dof, direction,
-                       dof_wise_renumbering);
-
-    dof.renumber_dofs(renumbering);
-  }
 
 
-  template <int dim, int spacedim>
-  void
-  downstream (MGDoFHandler<dim,spacedim>               &dof_handler,
-              const Point<spacedim> &direction,
-              const bool        dof_wise_renumbering)
-  {
-    for (unsigned int level=0; level<dof_handler.n_levels(); ++level)
-      downstream(dof_handler, level, direction, dof_wise_renumbering);
-  }
 
 
   template <class DH>
