@@ -107,9 +107,9 @@ operator () (const MatrixFree<dim,Number> &data,
           // and their gradients
           for (unsigned int q=0; q<n_q_points; ++q)
             {
-              values[q][j] = myrand()/(double)RAND_MAX;
+              values[q][j] = Testing::rand()/(double)RAND_MAX;
               for (unsigned int d=0; d<dim; ++d)
-                gradients[q*dim+d][j] = -1. + 2. * (myrand()/(double)RAND_MAX);
+                gradients[q*dim+d][j] = -1. + 2. * (Testing::rand()/(double)RAND_MAX);
             }
           fe_val.reinit (data.get_cell_iterator(cell,j));
           data.get_cell_iterator(cell,j)->get_dof_indices(dof_indices);

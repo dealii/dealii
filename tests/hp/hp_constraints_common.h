@@ -67,7 +67,7 @@ void do_check (const Triangulation<dim> &triangulation,
   for (typename hp::DoFHandler<dim>::active_cell_iterator
        cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
-    cell->set_active_fe_index (rand() % fe.size());
+    cell->set_active_fe_index (Testing::rand() % fe.size());
   dof_handler.distribute_dofs (fe);
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
@@ -125,7 +125,7 @@ void test_with_hanging_nodes_random (const hp::FECollection<dim> &fe)
            cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
-        if (rand() % 4 == 0)
+        if (Testing::rand() % 4 == 0)
           cell->set_refine_flag ();
       triangulation.execute_coarsening_and_refinement ();
     }
@@ -148,8 +148,8 @@ void test_with_hanging_nodes_random_aniso (const hp::FECollection<dim> &fe)
            cell = triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
-        if (rand() % 4 == 0)
-          cell->set_refine_flag (RefinementCase<dim>(rand() % RefinementCase<dim>::isotropic_refinement + 1));
+        if (Testing::rand() % 4 == 0)
+          cell->set_refine_flag (RefinementCase<dim>(Testing::rand() % RefinementCase<dim>::isotropic_refinement + 1));
       triangulation.execute_coarsening_and_refinement ();
     }
 

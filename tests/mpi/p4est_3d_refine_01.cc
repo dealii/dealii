@@ -60,7 +60,7 @@ void test()
           // will be refined.
           for (unsigned int i=0; i<tr.n_active_cells() / 5 + 1; ++i)
             {
-              const unsigned int x = myrand() % flags.size();
+              const unsigned int x = Testing::rand() % flags.size();
               flags[x] = true;
             }
 

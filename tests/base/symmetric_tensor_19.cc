@@ -112,7 +112,7 @@ void test ()
         for (unsigned int j=0; j<3; ++j)
           for (unsigned int k=0; k<3; ++k)
             for (unsigned int l=0; l<3; ++l)
-              A[i][j][k][l] = 1.*myrand()/RAND_MAX;
+              A[i][j][k][l] = 1.*Testing::rand()/RAND_MAX;
       break;
 
     default:

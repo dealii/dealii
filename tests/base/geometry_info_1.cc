@@ -27,7 +27,7 @@
 
 double rand_2 ()
 {
-  return 1.*myrand()/RAND_MAX*4-2.;
+  return 1.*Testing::rand()/RAND_MAX*4-2.;
 }
 
 

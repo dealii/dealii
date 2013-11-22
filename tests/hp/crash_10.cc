@@ -71,7 +71,7 @@ void test ()
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active (),
                                                      endc = dof_handler.end ();
   for (; cell != endc; ++cell)
-    cell->set_active_fe_index (myrand() % fe.size());
+    cell->set_active_fe_index (Testing::rand() % fe.size());
 
   dof_handler.distribute_dofs (fe);
 
@@ -113,7 +113,7 @@ int main ()
   // same value it has in
   // hp_hanging_nodes_02
   for (unsigned int i=0; i<64; ++i)
-    myrand();
+    Testing::rand();
   test<3> ();
 
   return 0;

@@ -82,7 +82,7 @@ check ()
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
   for (; cell!=endc; ++cell)
-    cell->set_active_fe_index (myrand() % fe.size());
+    cell->set_active_fe_index (Testing::rand() % fe.size());
 
   dof_handler.distribute_dofs (fe);
 

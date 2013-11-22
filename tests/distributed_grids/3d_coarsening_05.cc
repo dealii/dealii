@@ -64,7 +64,7 @@ void test(std::ostream & /*out*/)
       // refine one fifth of all cells each
       // time (but at least one)
       for (unsigned int i=0; i<tr.n_active_cells() / 5 + 1; ++i)
-        flags[myrand() % flags.size()] = true;
+        flags[Testing::rand() % flags.size()] = true;
 
       // refine tr and tr2
       unsigned int index=0;

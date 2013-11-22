@@ -63,7 +63,7 @@ void test(std::ostream & /*out*/)
     {
       std::vector<bool> flags (tr.n_active_cells());
       for (unsigned int j=0; j<flags.size(); ++j)
-        flags[j] = (myrand() < 0.2*RAND_MAX);
+        flags[j] = (Testing::rand() < 0.2*RAND_MAX);
 
       InterGridMap<Triangulation<dim> > intergrid_map;
       intergrid_map.make_mapping (tr, tr2);

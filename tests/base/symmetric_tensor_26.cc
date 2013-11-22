@@ -30,11 +30,11 @@ void check ()
 {
   SymmetricTensor<2,dim> S;
   for (unsigned int i=0; i<S.n_independent_components; ++i)
-    S[S.unrolled_to_component_indices (i)] = myrand() % 10;
+    S[S.unrolled_to_component_indices (i)] = Testing::rand() % 10;
 
   Tensor<1,dim> x;
   for (unsigned int i=0; i<dim; ++i)
-    x[i] = myrand() % 10;
+    x[i] = Testing::rand() % 10;
 
   deallog << "S = " << S << std::endl;
   deallog << "x = " << x << std::endl;

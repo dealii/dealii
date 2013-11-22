@@ -92,7 +92,7 @@ void run (bool random_p,
     {
       for (; cell != endc; ++cell)
         {
-          cell->set_active_fe_index ((int)(4.0 * (double) myrand() / (double) RAND_MAX));
+          cell->set_active_fe_index ((int)(4.0 * (double) Testing::rand() / (double) RAND_MAX));
         }
     }
   else

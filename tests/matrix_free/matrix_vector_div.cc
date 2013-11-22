@@ -243,7 +243,7 @@ void test ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<system_rhs.block(i).size(); ++j)
       {
-        const double val = -1. + 2.*(double)myrand()/double(RAND_MAX);
+        const double val = -1. + 2.*(double)Testing::rand()/double(RAND_MAX);
         system_rhs.block(i)(j) = val;
       }
   constraints.condense(system_rhs);

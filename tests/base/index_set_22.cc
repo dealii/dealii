@@ -35,7 +35,7 @@ void test ()
   // set, some of which may be
   // repetitions of previous ones
   for (unsigned int i=0; i<9*is1.size()/10; ++i)
-    is1.add_index (myrand() % is1.size());
+    is1.add_index (Testing::rand() % is1.size());
 
   std::vector<bool> zeros_and_ones(is1.size());
   is1.fill_binary_vector (zeros_and_ones);

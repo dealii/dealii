@@ -86,8 +86,8 @@ void test()
       IndexSet b(size);
       for (unsigned int i=0; i<9*a.size()/10; ++i)
         {
-          a.add_index (myrand() % a.size());
-          b.add_index (myrand() % a.size());
+          a.add_index (Testing::rand() % a.size());
+          b.add_index (Testing::rand() % a.size());
         }
       testor(a, b, false);
     }

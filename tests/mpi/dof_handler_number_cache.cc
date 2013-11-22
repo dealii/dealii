@@ -62,7 +62,7 @@ void test()
       // refine one-fifth of cells randomly
       std::vector<bool> flags (triangulation.n_active_cells(), false);
       for (unsigned int k=0; k<flags.size()/5 + 1; ++k)
-        flags[myrand() % flags.size()] = true;
+        flags[Testing::rand() % flags.size()] = true;
       // make sure there's at least one that
       // will be refined
       flags[0] = true;

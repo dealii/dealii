@@ -75,7 +75,7 @@ check ()
   for (typename hp::DoFHandler<dim>::active_cell_iterator
        cell = dof.begin_active();
        cell != dof.end(); ++cell)
-    cell->set_active_fe_index (myrand() % element.size());
+    cell->set_active_fe_index (Testing::rand() % element.size());
 
   dof.distribute_dofs(element);
 

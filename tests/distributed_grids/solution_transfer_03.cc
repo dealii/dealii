@@ -85,7 +85,7 @@ void test(std::ostream & /*out*/)
            cell = tr.begin();
            cell != tr.end(); ++cell)
         {
-          if (cell->has_children() && !(myrand() % 3))
+          if (cell->has_children() && !(Testing::rand() % 3))
             for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
               if (!cell->child(c)->has_children())
                 cell->child(c)->set_coarsen_flag();
@@ -94,7 +94,7 @@ void test(std::ostream & /*out*/)
            cell = tr.begin_active();
            cell != tr.end(); ++cell)
         {
-          if (!(myrand() % 3))
+          if (!(Testing::rand() % 3))
             {
               cell->clear_coarsen_flag();
               cell->set_refine_flag();

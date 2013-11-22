@@ -78,7 +78,7 @@ void check1 ()
     {
       for (int j=0; j<1000; ++j)
         {
-          Point<3> p ((myrand()%1000)/1000.0,(rand()%1000)/1000.0,(rand()%1000)/1000.0);
+          Point<3> p ((Testing::rand()%1000)/1000.0,(rand()%1000)/1000.0,(rand()%1000)/1000.0);
           if (!inside(tria, p))
             deallog << "NOT INSIDE" << std::endl;
           GridTools::find_active_cell_around_point(tria, p);
@@ -88,7 +88,7 @@ void check1 ()
            cell != tria.end(); ++cell)
         for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
           {
-            if (cell->face(f)->at_boundary() && (myrand()%5)==1)
+            if (cell->face(f)->at_boundary() && (Testing::rand()%5)==1)
               cell->set_refine_flag();
           }
 

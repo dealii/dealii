@@ -36,7 +36,7 @@ void test (unsigned int variant)
   FullMatrix<number> matrix(n, n);
   for (unsigned int i=0; i<n; ++i)
     for (unsigned int j=0; j<n; ++j)
-      matrix(i,j) = -0.1 + 0.2 * myrand()/RAND_MAX;
+      matrix(i,j) = -0.1 + 0.2 * Testing::rand()/RAND_MAX;
 
   // put diagonal entries of different strengths. these are very challenging
   // for GMRES and will usually take a lot of iterations until the Krylov

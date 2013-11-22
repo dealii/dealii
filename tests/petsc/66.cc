@@ -40,7 +40,7 @@ void test (PETScWrappers::MatrixBase &m)
     {
       if (i>=5)
         {
-          const double s = myrand();
+          const double s = Testing::rand();
           m.add (i,i-5, s);
           norm_sqr += s*s;
           ++nnz;
@@ -48,13 +48,13 @@ void test (PETScWrappers::MatrixBase &m)
 
       if (i<N-5)
         {
-          const double s = myrand();
+          const double s = Testing::rand();
           m.add (i,i+5, s);
           norm_sqr += s*s;
           ++nnz;
         }
 
-      const double s = myrand();
+      const double s = Testing::rand();
       m.add (i,i,s);
       norm_sqr += s*s;
       ++nnz;

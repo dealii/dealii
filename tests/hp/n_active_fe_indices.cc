@@ -136,7 +136,7 @@ void test ()
   for (typename hp::DoFHandler<dim>::active_cell_iterator
        cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
-    cell->set_active_fe_index (myrand() % fe_collection.size());
+    cell->set_active_fe_index (Testing::rand() % fe_collection.size());
 
   dof_handler.distribute_dofs(fe_collection);
 

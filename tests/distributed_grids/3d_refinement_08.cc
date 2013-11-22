@@ -63,7 +63,7 @@ void test(std::ostream & /*out*/)
       deallog << "Refining cells ... " << std::endl;
       for (unsigned int i=0; i<tr.n_active_cells() / 50 + 1; ++i)
         {
-          const unsigned int x = myrand() % flags.size();
+          const unsigned int x = Testing::rand() % flags.size();
           flags[x] = true;
         }
 

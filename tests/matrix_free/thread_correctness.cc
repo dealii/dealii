@@ -110,7 +110,7 @@ void sub_test()
         {
           if (constraints.is_constrained(i))
             continue;
-          const double entry = myrand()/(double)RAND_MAX;
+          const double entry = Testing::rand()/(double)RAND_MAX;
           in_dist(i) = entry;
         }
 

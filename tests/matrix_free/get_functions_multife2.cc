@@ -300,7 +300,7 @@ void test ()
       {
         if (constraints[no]->is_constrained(i))
           continue;
-        const double entry = myrand()/(double)RAND_MAX;
+        const double entry = Testing::rand()/(double)RAND_MAX;
         src[no](i) = entry;
       }
 

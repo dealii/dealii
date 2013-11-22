@@ -55,7 +55,7 @@ int main()
   Triangulation<2>::active_cell_iterator cell = tri.begin_active(), end = tri.end();
   for ( ; cell != end; ++cell )
     {
-      switch (myrand()%4)
+      switch (Testing::rand()%4)
         {
           /// If a randomly drawn
           /// number is 0 or 1 we

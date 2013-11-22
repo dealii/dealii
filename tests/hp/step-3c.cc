@@ -109,7 +109,7 @@ void LaplaceProblem::make_grid_and_dofs ()
   unsigned int cell_no = 0;
   for (; cell != endc; ++cell)
     {
-      cell->set_active_fe_index (myrand() % fe.size());
+      cell->set_active_fe_index (Testing::rand() % fe.size());
       deallog << "Cell " << cell << " has fe_index=" << cell->active_fe_index()
               << std::endl;
       ++cell_no;
