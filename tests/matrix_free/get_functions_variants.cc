@@ -169,7 +169,7 @@ void test ()
   // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      const double entry = rand()/(double)RAND_MAX;
+      const double entry = myrand()/(double)RAND_MAX;
       solution_dist(i) = entry;
     }
 

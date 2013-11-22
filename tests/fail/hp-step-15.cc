@@ -86,7 +86,7 @@ double InitializationValues::value (const Point<1> &p,
                                     const unsigned int) const
 {
   const double base = std::pow(p(0), 1./3.);
-  const double random = 2.*rand()/RAND_MAX-1;
+  const double random = 2.*myrand()/RAND_MAX-1;
   return std::max (base+.1*random, 0.);
 }
 

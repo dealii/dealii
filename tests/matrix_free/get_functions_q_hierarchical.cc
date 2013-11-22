@@ -123,7 +123,7 @@ void test ()
     {
       if (constraints.is_constrained(i))
         continue;
-      const double entry = rand()/(double)RAND_MAX;
+      const double entry = myrand()/(double)RAND_MAX;
       solution(i) = entry;
     }
   constraints.distribute(solution);

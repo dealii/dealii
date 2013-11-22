@@ -103,7 +103,7 @@ void test()
         endc = tr.end();
       
       for (; cell!=endc; ++cell)
-	if (rand()%42==1)
+	if (myrand()%42==1)
 	  cell->set_refine_flag ();
       
       tr.execute_coarsening_and_refinement ();

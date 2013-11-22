@@ -66,7 +66,7 @@ void test(std::ostream & /*out*/)
       // refine 10% of cells randomly
       std::vector<bool> flags (tr.n_active_cells(), false);
       for (unsigned int k=0; k<flags.size()/10 + 1; ++k)
-        flags[rand() % flags.size()] = true;
+        flags[myrand() % flags.size()] = true;
       // make sure there's at least one that
       // will be refined
       flags[0] = true;

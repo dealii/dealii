@@ -1197,7 +1197,7 @@ namespace Step22
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
     srand (0);
     for (unsigned int i=0; i<estimated_error_per_cell.size(); ++i)
-      estimated_error_per_cell(i) = 1.0*(rand() % 1000);
+      estimated_error_per_cell(i) = 1.0*(myrand() % 1000);
     /*
         std::vector<bool> component_mask (dim+1, false);
         component_mask[dim] = true;

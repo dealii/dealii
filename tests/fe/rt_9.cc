@@ -78,7 +78,7 @@ test (const unsigned int degree)
 
   Vector<double> tmp1(dofs_per_cell), tmp2(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
-    tmp1(i) = 1.*rand()/RAND_MAX;
+    tmp1(i) = 1.*myrand()/RAND_MAX;
   cg.solve (mass_matrix, tmp2, tmp1, PreconditionIdentity());
 
   deallog << "Degree=" << degree

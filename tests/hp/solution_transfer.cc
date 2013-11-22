@@ -105,11 +105,11 @@ void transfer(std::ostream &out)
         if (counter < 15)
           cell->set_active_fe_index(1);
         else
-          cell->set_active_fe_index(rand()%max_degree);
+          cell->set_active_fe_index(myrand()%max_degree);
         if (counter < 15)
           celldg->set_active_fe_index(1);
         else
-          celldg->set_active_fe_index(rand()%max_degree);
+          celldg->set_active_fe_index(myrand()%max_degree);
       }
   }
 
@@ -140,9 +140,9 @@ void transfer(std::ostream &out)
     {
       if (counter > 120)
         cell->set_coarsen_flag();
-      else if (rand() % 3 == 0)
+      else if (myrand() % 3 == 0)
         cell->set_refine_flag();
-      else if (rand() % 3 == 3)
+      else if (myrand() % 3 == 3)
         cell->set_coarsen_flag();
     }
 
@@ -164,11 +164,11 @@ void transfer(std::ostream &out)
         if (counter > 20 && counter < 90)
           cell->set_active_fe_index(0);
         else
-          cell->set_active_fe_index(rand()%max_degree);
+          cell->set_active_fe_index(myrand()%max_degree);
         if (counter > 20 && counter < 90)
           celldg->set_active_fe_index(0);
         else
-          celldg->set_active_fe_index(rand()%max_degree);
+          celldg->set_active_fe_index(myrand()%max_degree);
       }
   }
 

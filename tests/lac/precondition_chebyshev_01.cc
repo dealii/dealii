@@ -55,7 +55,7 @@ check()
 
   Vector<double> in (size), out(size);
   for (unsigned int i=0; i<size; ++i)
-    in(i) = (double)rand()/RAND_MAX;
+    in(i) = (double)myrand()/RAND_MAX;
 
   PreconditionChebyshev<FullMatrixModified,Vector<double> > prec;
   PreconditionChebyshev<FullMatrixModified,Vector<double> >::AdditionalData

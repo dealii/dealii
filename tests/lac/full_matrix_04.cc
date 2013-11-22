@@ -52,16 +52,16 @@ void test (const unsigned int n, const unsigned int m)
   for (unsigned int i=0; i<n; ++i)
     {
       for (unsigned int j=0; j<n; ++j)
-        A(i,j) = rand();
+        A(i,j) = myrand();
       for (unsigned int j=0; j<m; ++j)
         {
-          B(i,j) = Bt(j,i) = rand();
-          D(j,i) = Dt(i,j) = rand();
+          B(i,j) = Bt(j,i) = myrand();
+          D(j,i) = Dt(i,j) = myrand();
         }
     }
   for (unsigned int i=0; i<m; ++i)
     for (unsigned int j=0; j<m; ++j)
-      C(i,j) = rand();
+      C(i,j) = myrand();
 
   // Compare first Schur complement
   // with mmult.

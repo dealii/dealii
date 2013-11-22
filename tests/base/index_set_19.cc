@@ -35,7 +35,7 @@ void test ()
   // set, some of which may be
   // repetitions of previous ones
   for (unsigned int i=0; i<9*is1.size()/10; ++i)
-    is1.add_index (rand() % is1.size());
+    is1.add_index (myrand() % is1.size());
 
   std::vector<types::global_dof_index> indices;
   is1.fill_index_vector (indices);

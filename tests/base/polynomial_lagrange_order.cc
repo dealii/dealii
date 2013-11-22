@@ -68,7 +68,7 @@ void check_constant (const std::vector<Polynomial<double> > &p)
   deallog << "Representation of one at random points";
   for (unsigned int j=0; j<12; ++j)
     {
-      double x = (double)rand()/RAND_MAX;
+      double x = (double)myrand()/RAND_MAX;
       double value = 0;
       for (unsigned int i=0; i<p.size(); ++i)
         {

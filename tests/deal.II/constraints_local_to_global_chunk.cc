@@ -94,7 +94,7 @@ void test (unsigned int chunk_size)
           if (counter % 42 == 0)
             local_mat(i,j) = 0;
           else
-            local_mat (i,j) = (double)rand() / RAND_MAX;
+            local_mat (i,j) = (double)myrand() / RAND_MAX;
       cell->get_dof_indices (local_dof_indices);
       constraints.distribute_local_to_global (local_mat, local_dof_indices,
                                               sparse);

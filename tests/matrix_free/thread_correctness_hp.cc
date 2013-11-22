@@ -107,7 +107,7 @@ void do_test (const unsigned int parallel_option)
       cell = tria.begin_active (),
       endc = tria.end();
       for (; cell!=endc; ++cell)
-        if (rand() % (7-i) == 0)
+        if (myrand() % (7-i) == 0)
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
@@ -131,7 +131,7 @@ void do_test (const unsigned int parallel_option)
     endc = dof.end();
     for (; cell!=endc; ++cell)
       {
-        const unsigned int fe_index = rand() % max_degree;
+        const unsigned int fe_index = myrand() % max_degree;
         cell->set_active_fe_index (fe_index);
       }
   }
@@ -189,7 +189,7 @@ void do_test (const unsigned int parallel_option)
       for (unsigned int i=0; i<dof.n_dofs(); ++i)
         {
           if (constraints.is_constrained(i) == false)
-            src(i) = (double)rand()/RAND_MAX;
+            src(i) = (double)myrand()/RAND_MAX;
         }
 
       // now perform 30 matrix-vector products in

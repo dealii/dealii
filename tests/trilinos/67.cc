@@ -41,7 +41,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
     {
       if (i>=5)
         {
-          const double s = rand();
+          const double s = myrand();
           m.set (i,i-5, s);
           norm_sqr += s*s;
           ++nnz;
@@ -49,13 +49,13 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
       if (i<N-5)
         {
-          const double s = rand();
+          const double s = myrand();
           m.set (i,i+5, s);
           norm_sqr += s*s;
           ++nnz;
         }
 
-      const double s = rand();
+      const double s = myrand();
       m.set (i,i,s);
       norm_sqr += s*s;
       ++nnz;

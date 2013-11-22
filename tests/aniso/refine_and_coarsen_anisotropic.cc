@@ -81,10 +81,10 @@ void test_isotropic (int type, std::ostream *logfile)
     {
       cell = tria.begin_active();
       for (; cell!=endc; ++cell)
-        if (rand()%5==0)
+        if (myrand()%5==0)
           {
-            if (rand()%2==0)
-              cell->set_refine_flag(ref_cases[rand()%
+            if (myrand()%2==0)
+              cell->set_refine_flag(ref_cases[myrand()%
                                               RefinementCase<dim>::isotropic_refinement]);
           }
         else

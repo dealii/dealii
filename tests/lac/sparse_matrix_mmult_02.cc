@@ -56,14 +56,14 @@ void test (const unsigned int n)
   for (unsigned int i=0; i<n; ++i)
     {
       for (unsigned int j=0; j<n; ++j)
-        A.set(i,j,rand());
+        A.set(i,j,myrand());
       for (unsigned int j=0; j<n; ++j)
-        B.set(i,j,rand());
+        B.set(i,j,myrand());
     }
 
   Vector<double> v(n);
   for (unsigned int j=0; j<n; ++j)
-    v(j) = rand();
+    v(j) = myrand();
 
   // now form the matrix-matrix product and
   // initialize a test rhs
@@ -71,7 +71,7 @@ void test (const unsigned int n)
 
   Vector<double> x(n), y(n), z(n), tmp(n);
   for (unsigned int j=0; j<n; ++j)
-    x(j) = rand();
+    x(j) = myrand();
 
   // then test for correctness
   C.vmult (y, x);

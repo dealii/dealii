@@ -81,16 +81,6 @@ void mysrand(int seed) throw()
   myrand(true, seed);
 }
 
-int rand() throw()
-{
-  return myrand();
-}
-
-void srand(int seed) throw()
-{
-  mysrand(seed);
-}
-
 
 
 // given the name of a file, copy it to deallog

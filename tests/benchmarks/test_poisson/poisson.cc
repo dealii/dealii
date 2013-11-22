@@ -177,7 +177,7 @@ void HelmholtzProblem<dim>::solve ()
   for (unsigned int i=0; i<tri_rhs.size(); i++)
     if (hanging_node_constraints.is_constrained(i)==false)
       {
-        const double value = (double)rand()/RAND_MAX;
+        const double value = (double)myrand()/RAND_MAX;
         tri_rhs(i) = value;
       }
 

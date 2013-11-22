@@ -100,7 +100,7 @@ void test ()
   for (unsigned int i=0; i<row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
-      dy(global_index) = (double)rand()/RAND_MAX;
+      dy(global_index) = (double)myrand()/RAND_MAX;
       y(global_index)  = dy(global_index);
     }
   dx = 1.;

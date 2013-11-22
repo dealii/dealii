@@ -36,7 +36,7 @@ void test()
   for (unsigned int i=0; i<(M+1)/2; ++i)
     for (unsigned int j=0; j<N; ++j)
       {
-        shape[i][j] = -1. + 2. * (double)rand()/RAND_MAX;
+        shape[i][j] = -1. + 2. * (double)myrand()/RAND_MAX;
         if (type == 1)
           shape[M-1-i][N-1-j] = -shape[i][j];
         else
@@ -53,7 +53,7 @@ void test()
 
   double x[N], x_ref[N], y[M], y_ref[M];
   for (unsigned int i=0; i<N; ++i)
-    x[i] = (double)rand()/RAND_MAX;
+    x[i] = (double)myrand()/RAND_MAX;
 
   // compute reference
   for (unsigned int i=0; i<M; ++i)
@@ -82,7 +82,7 @@ void test()
 
 
   for (unsigned int i=0; i<M; ++i)
-    y[i] = (double)rand()/RAND_MAX;
+    y[i] = (double)myrand()/RAND_MAX;
 
   // compute reference
   for (unsigned int i=0; i<N; ++i)

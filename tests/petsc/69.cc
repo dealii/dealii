@@ -42,7 +42,7 @@ void test (PETScWrappers::MatrixBase &m)
     {
       if (i>=5)
         {
-          const double s = rand();
+          const double s = myrand();
           m.add (i,i-5, s);
           norm_sqr += s*s;
           ++nnz;
@@ -50,13 +50,13 @@ void test (PETScWrappers::MatrixBase &m)
 
       if (i<N-5)
         {
-          const double s = rand();
+          const double s = myrand();
           m.add (i,i+5, s);
           norm_sqr += s*s;
           ++nnz;
         }
 
-      const double s = rand();
+      const double s = myrand();
       m.add (i,i,s);
       norm_sqr += s*s;
       ++nnz;
@@ -74,7 +74,7 @@ void test (PETScWrappers::MatrixBase &m)
 
   // now remove the entries of rows N/2 and
   // N/3. set diagonal entries to rnd
-  const double rnd = rand();
+  const double rnd = myrand();
   for (size_type i=0; i<N; ++i)
     {
       const double s = m.el(N/2,i);

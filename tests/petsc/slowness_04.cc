@@ -53,7 +53,7 @@ void test ()
       {
         // pick a random element among the
         // unused indices
-        const unsigned int k = rand() % (N-i);
+        const unsigned int k = myrand() % (N-i);
         permutation[i] = unused_indices[k];
 
         // then swap this used element to the
@@ -75,26 +75,26 @@ void test ()
         const unsigned int j=permutation[j_];
 
         const unsigned int global = i*N+j;
-        matrix.add(global, global, rand());
+        matrix.add(global, global, myrand());
         if (j>0)
           {
-            matrix.add(global-1, global, rand());
-            matrix.add(global, global-1, rand());
+            matrix.add(global-1, global, myrand());
+            matrix.add(global, global-1, myrand());
           }
         if (j<N-1)
           {
-            matrix.add(global+1, global, rand());
-            matrix.add(global, global+1, rand());
+            matrix.add(global+1, global, myrand());
+            matrix.add(global, global+1, myrand());
           }
         if (i>0)
           {
-            matrix.add(global-N, global, rand());
-            matrix.add(global, global-N, rand());
+            matrix.add(global-N, global, myrand());
+            matrix.add(global, global-N, myrand());
           }
         if (i<N-1)
           {
-            matrix.add(global+N, global, rand());
-            matrix.add(global, global+N, rand());
+            matrix.add(global+N, global, myrand());
+            matrix.add(global, global+N, myrand());
           }
       }
   matrix.compress (VectorOperation::add);

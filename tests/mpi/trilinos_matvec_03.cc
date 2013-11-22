@@ -94,7 +94,7 @@ void test ()
   for (unsigned int i=0; i<col_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = col_partitioning.nth_index_in_set(i);
-      dx(global_index) = (double)rand()/RAND_MAX;
+      dx(global_index) = (double)myrand()/RAND_MAX;
       x(global_index)  = dx(global_index);
     }
   dy = 1.;

@@ -37,7 +37,7 @@ void random_matrix(FullMatrix<double> &A)
   for (unsigned int i=0; i<A.m(); ++i)
     for (unsigned int j=0; j<A.n(); ++j)
       {
-        double rnd = rand();
+        double rnd = myrand();
         rnd /= RAND_MAX;
         A(i,j) = (i==j) ? A.m()+rnd : rnd;
       }
