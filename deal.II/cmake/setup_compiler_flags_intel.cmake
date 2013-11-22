@@ -128,6 +128,12 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   #
 
   ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
+  # in intel (at least 13.1 and 14), vectorization causes
+  # wrong code. See https://code.google.com/p/dealii/issues/detail?id=156
+  # or tests/hp/solution_transfer.cc
+  # A work-around is to disable all vectorization.
+  ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-no-vec")
+
 
   # equivalent to -fno-strict-aliasing:
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")
