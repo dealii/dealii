@@ -351,6 +351,19 @@ ENDIF()
 
 
 #
+# in intel (at least 13.1 and 14), vectorization causes
+# wrong code. See https://code.google.com/p/dealii/issues/detail?id=156
+# or tests/hp/solution_transfer.cc
+# A work-around is to disable all vectorization.
+#
+# - Timo Heister, 2013
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-vec")
+ENDIF()
+
+
+#
 # gcc-4.8.1 has some problems with the constexpr "vertices_per_cell" in the
 # definition of alternating_form_at_vertices.
 #
