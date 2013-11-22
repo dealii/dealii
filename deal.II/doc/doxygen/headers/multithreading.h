@@ -673,15 +673,23 @@
  * so until we run out of tasks and the ones that were created have been
  * worked on.
  *
- * This is essentially what the WorkStream class does: You give it an iterator
+ * This is essentially what the WorkStream::run function does: You give it an iterator
  * range from which it can draw objects to work on (in the above case it is
  * the interval given by <code>dof_handler.begin_active()</code> to
  * <code>dof_handler.end()</code>), and a function that would do the work on
  * each item (the function <code>MyClass::assemble_on_one_cell</code>)
  * together with an object if it is a member function.
  *
- * Essentially, the way the <code>MyClass::assemble_system</code>
- * function could be written then is like this (note that this is not quite
+ * In the following, let us lay out a rationale for why the functions in the
+ * WorkStream namespace are implemented the way they are. More information on
+ * their implementation can be found in the @ref workstream_paper .
+ * To see the WorkStream class used in practice on tasks like the ones
+ * outlined above, take a look at the step-9, step-13, step-14, step-32, step-35 or step-37
+ * tutorial programs.
+ *
+ * To begin with, given the brief description above,
+ * the way the <code>MyClass::assemble_system</code>
+ * function could then be written is like this (note that this is not quite
  * the correct syntax, as will be described below):
  * @code
    template <int dim>
@@ -1071,9 +1079,19 @@
  * function with the cell and scratch and per task objects which will be filled
  * in at the positions indicated by <code>std_cxx1x::_1, std_cxx1x::_2</code> and <code>std_cxx1x::_3</code>.
  *
- * To see the WorkStream class used in practice on tasks like the ones
- * outlined above, take a look at the step-32, step-35 or step-37
- * tutorial programs.
+ * There are refinements to the WorkStream::run function shown above.
+ * For example, one may realize that the basic idea above can only scale
+ * if the copy-local-to-global function is much quicker than the
+ * local assembly function because the former has to run sequentially.
+ * This limitation can only be improved upon by scheduling more work
+ * in parallel. This leads to the notion of coloring the graph of
+ * cells (or, more generally, iterators) we work on by recording
+ * which write operations conflict with each other. Consequently, there
+ * is a third version of WorkStream::run that doesn't just take a
+ * range of iterators, but instead a vector of vectors consisting of
+ * elements that can be worked on at the same time. This concept
+ * is explained in great detail in the @ref workstream_paper , along
+ * with performance evaluations for common examples.
  *
  *
  * @anchor MTTaskSynchronization
