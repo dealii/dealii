@@ -454,7 +454,13 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 		     // no copy-local-to-global function needed here
 		     std_cxx1x::function<void (const ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &)>(),
                      thread_data,
-                     sample_patch);
+                     sample_patch,
+		     2*multithread_info.n_threads(),
+		     // experimenting shows that we can make things run a bit
+		     // faster if we increase the number of items in flight at
+		     // any given time (about 10% on the testcase discussed in
+		     // @ref workstream_paper, on 32 cores)
+		     64);
 }
 
 
