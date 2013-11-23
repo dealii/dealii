@@ -972,7 +972,10 @@ namespace DoFTools
                 //TODO[TL]: think about this and the following in case of anisotropic refinement
 
                 dofs_on_mother.resize (n_dofs_on_mother);
-                dofs_on_children.resize (n_dofs_on_children);
+                // we might not use all of those in case of artificial cells,
+                // so do not resize(), but reserve() and use push_back later.
+                dofs_on_children.clear();
+                dofs_on_children.reserve (n_dofs_on_children);
 
                 Assert(n_dofs_on_mother == fe.constraints().n(),
                        ExcDimensionMismatch(n_dofs_on_mother,
@@ -998,9 +1001,7 @@ namespace DoFTools
                   dofs_on_mother[next_index++] = this_face->dof_index(dof, fe_index);
                 AssertDimension (next_index, dofs_on_mother.size());
 
-                next_index = 0;
-
-                // assert some consistency assumptions
+                //TODO: assert some consistency assumptions
 
                 //TODO[TL]: think about this in case of anisotropic
                 //refinement
@@ -1013,46 +1014,56 @@ namespace DoFTools
                          (this_face->child(0)->vertex_index(3) ==
                           this_face->child(3)->vertex_index(0))),
                         ExcInternalError());
+
                 for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                  dofs_on_children[next_index++]
-                    = this_face->child(0)->vertex_dof_index(3,dof);
+                  dofs_on_children.push_back(
+                    this_face->child(0)->vertex_dof_index(3,dof));
 
                 // dof numbers on the centers of the lines bounding this
                 // face
                 for (unsigned int line=0; line<4; ++line)
                   for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                    dofs_on_children[next_index++]
-                      = this_face->line(line)->child(0)->vertex_dof_index(1,dof, fe_index);
+                    dofs_on_children.push_back(
+                      this_face->line(line)->child(0)->vertex_dof_index(1,dof, fe_index));
 
                 // next the dofs on the lines interior to the face; the
                 // order of these lines is laid down in the FiniteElement
                 // class documentation
                 for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                  dofs_on_children[next_index++]
-                    = this_face->child(0)->line(1)->dof_index(dof, fe_index);
+                  dofs_on_children.push_back(
+                    this_face->child(0)->line(1)->dof_index(dof, fe_index));
                 for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                  dofs_on_children[next_index++]
-                    = this_face->child(2)->line(1)->dof_index(dof, fe_index);
+                  dofs_on_children.push_back(
+                    this_face->child(2)->line(1)->dof_index(dof, fe_index));
                 for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                  dofs_on_children[next_index++]
-                    = this_face->child(0)->line(3)->dof_index(dof, fe_index);
+                  dofs_on_children.push_back(
+                    this_face->child(0)->line(3)->dof_index(dof, fe_index));
                 for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                  dofs_on_children[next_index++]
-                    = this_face->child(1)->line(3)->dof_index(dof, fe_index);
+                  dofs_on_children.push_back(
+                    this_face->child(1)->line(3)->dof_index(dof, fe_index));
 
                 // dofs on the bordering lines
                 for (unsigned int line=0; line<4; ++line)
                   for (unsigned int child=0; child<2; ++child)
-                    for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-                      dofs_on_children[next_index++]
-                        = this_face->line(line)->child(child)->dof_index(dof, fe_index);
+                    {
+                      for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+                        dofs_on_children.push_back(
+                          this_face->line(line)->child(child)->dof_index(dof, fe_index));
+                    }
 
                 // finally, for the dofs interior to the four child faces
                 for (unsigned int child=0; child<4; ++child)
-                  for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
-                    dofs_on_children[next_index++]
-                      = this_face->child(child)->dof_index(dof, fe_index);
-                AssertDimension (next_index, dofs_on_children.size());
+                  {
+                    // skip artificial cells
+                    if (cell->neighbor_child_on_subface (face, child)->is_artificial())
+                      continue;
+                    for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
+                        dofs_on_children.push_back(
+                          this_face->child(child)->dof_index(dof, fe_index));
+                  }
+
+                // note: can get fewer DoFs when we have artificial cells:
+                Assert(dofs_on_children.size() <= n_dofs_on_children, ExcInternalError());
 
                 // for each row in the constraint matrix for this line:
                 for (unsigned int row=0; row!=dofs_on_children.size(); ++row)
