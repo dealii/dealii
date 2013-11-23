@@ -230,7 +230,9 @@ namespace LocalIntegrators
      * valued version, namely on the face <i>F</i>
      * the vector
      * @f[
-     * \int_F \Bigl(\gamma (u-g) v - \partial_n u v - (u-g) \partial_n v\Bigr)\;ds.
+     * \int_F \Bigl(\gamma (\mathbf u- \mathbf g) \cdot \mathbf v
+     - \partial_n \mathbf u \cdot \mathbf v
+     - (\mathbf u-\mathbf g) \cdot \partial_n \mathbf v\Bigr)\;ds.
      * @f]
      *
      * Here, <i>u</i> is the finite element function whose values and
@@ -349,6 +351,20 @@ namespace LocalIntegrators
         }
     }
 
+    /**
+     * Flux for the interior penalty method for the Laplacian applied
+     * to the tangential components of a vector field, namely on
+     * the face <i>F</i> the matrices associated with the bilinear form
+     * @f[
+     * \int_F \Bigl( \gamma [u_\tau][v_\tau] - \{\nabla u_\tau\}[v_\tau\mathbf n] - [u_\tau\mathbf
+     * n]\{\nabla v_\tau\} \Bigr) \; ds.
+     * @f]
+     *
+     * @warning This function is still under development!
+     *
+     * @author Bärbel Janssen, Guido Kanschat
+     * @date 2013
+     */
     template <int dim>
     void ip_tangential_matrix (
       FullMatrix<double> &M11,
@@ -421,7 +437,11 @@ namespace LocalIntegrators
     }
 
     /**
-     * Residual term for the symmetric interior penalty method.
+     * Residual term for the symmetric interior penalty method:
+     * @f[
+     * \int_F \Bigl( \gamma [u][v] - \{\nabla u\}[v\mathbf n] - [u\mathbf
+     * n]\{\nabla v\} \Bigr) \; ds.
+     * @f]
      *
      * @author Guido Kanschat
      * @date 2012
@@ -483,7 +503,12 @@ namespace LocalIntegrators
 
 
     /**
-     * Vector-valued residual term for the symmetric interior penalty method.
+     * Vector-valued residual term for the symmetric interior penalty method:
+     * @f[
+     * \int_F \Bigl( \gamma [\mathbf u]\cdot[\mathbf v]
+     - \{\nabla \mathbf u\}[\mathbf v\otimes \mathbf n]
+     - [\mathbf u\otimes \mathbf n]\{\nabla \mathbf v\} \Bigr) \; ds.
+     * @f]
      *
      * @author Guido Kanschat
      * @date 2012
