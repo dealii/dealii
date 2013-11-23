@@ -455,11 +455,13 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 		     std_cxx1x::function<void (const ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &)>(),
                      thread_data,
                      sample_patch,
-		     2*multithread_info.n_threads(),
 		     // experimenting shows that we can make things run a bit
-		     // faster if we increase the number of items in flight at
-		     // any given time (about 10% on the testcase discussed in
-		     // @ref workstream_paper, on 32 cores)
+		     // faster if we increase the number of cells we work on
+		     // per item (i.e., WorkStream's chunk_size argument,
+		     // about 10% improvement) and the items in flight at any
+		     // given time (another 5% on the testcase discussed in
+		     // @ref workstream_paper, on 32 cores) and if
+		     8*multithread_info.n_threads(),
 		     64);
 }
 
