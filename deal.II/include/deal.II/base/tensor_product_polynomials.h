@@ -320,7 +320,7 @@ private:
   unsigned int n_tensor_pols;
 
   /**
-   * Each tensor product polynomial @þ{i} is a product of one-dimensional
+   * Each tensor product polynomial @Ã¾{i} is a product of one-dimensional
    * polynomials in each space direction. Compute the indices of these
    * one-dimensional polynomials for each space direction, given the index
    * <tt>i</tt>.
