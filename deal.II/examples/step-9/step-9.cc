@@ -961,18 +961,21 @@ namespace Step9
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
 
-    std::ofstream output ("final-solution.gmv");
-    data_out.write_gmv (output);
+    std::ofstream output ("final-solution.vtk");
+    data_out.write_vtk (output);
   }
 
 
 
   // @sect3{GradientEstimation class implementation}
 
-  // ScratchData used by estimate_cell
+  // Now for the implementation of the <code>GradientEstimation</code> class.
+  // Let us start by defining constructors for the
+  // <code>EstimateScratchData</code> class used by the
+  // <code>estimate_cell()</code> function:
   template <int dim>
-  GradientEstimation::EstimateScratchData<dim>
-  ::EstimateScratchData (const FiniteElement<dim> &fe,
+  GradientEstimation::EstimateScratchData<dim>::
+  EstimateScratchData (const FiniteElement<dim> &fe,
                          const Vector<double>     &solution)
     :
     fe_midpoint_value(fe,
@@ -982,11 +985,9 @@ namespace Step9
   {}
 
 
-
-  // ScratchData used by estimate_cell
   template <int dim>
-  GradientEstimation::EstimateScratchData<dim>
-  ::EstimateScratchData(const EstimateScratchData &scratch_data)
+  GradientEstimation::EstimateScratchData<dim>::
+  EstimateScratchData(const EstimateScratchData &scratch_data)
     :
     fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
                       scratch_data.fe_midpoint_value.get_quadrature(),
@@ -995,88 +996,108 @@ namespace Step9
   {}
 
 
-  // Now for the implementation of the <code>GradientEstimation</code>
+  // Next for the implementation of the <code>GradientEstimation</code>
   // class. The first function does not much except for delegating work to the
-  // other function:
+  // other function, but there is a bit of setup at the top.
+  //
+  // Before starting with the work, we check that the vector into which the
+  // results are written has the right size. It is a common error that such
+  // parameters have the wrong size, but the resulting damage by not
+  // catching these errors are very subtle as they are usually corruption of
+  // data somewhere in memory. Often, the problems emerging from this are
+  // not reproducible, and it is well worth the effort to
+  // check for such things.
+  //
+  // The second piece is to set up the iterator that goes in lockstep over the
+  // cells of the domain and the corresponding elements of the output vector
+  // (see above where we introduced the <code>SynchronousIterators</code>
+  // class). We can abbreviate the process slightly by introducing a
+  // <code>typedef</code> that denotes a pair of iterators. This being set up,
+  // we can hand the whole thing off to WorkStream::run, keeping in mind that
+  // we do not need a copy-local-to-global function here but can get away by
+  // simply using a default-constructed function object (the equivalent to a
+  // NULL function pointer).
   template <int dim>
   void
   GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
                                 const Vector<double>  &solution,
                                 Vector<float>         &error_per_cell)
   {
-    // Before starting with the work, we check that the vector into which the
-    // results are written, has the right size. It is a common error that such
-    // parameters have the wrong size, but the resulting damage by not
-    // catching these errors are very subtle as they are usually corruption of
-    // data somewhere in memory. Often, the problems emerging from this are
-    // not reproducible, and we found that it is well worth the effort to
-    // check for such things.
     Assert (error_per_cell.size() == dof_handler.get_tria().n_active_cells(),
             ExcInvalidVectorLength (error_per_cell.size(),
                                     dof_handler.get_tria().n_active_cells()));
 
-    // In the same way as before, we use a <code>Threads::ThreadGroup</code>
-    // object to collect the descriptor objects of different threads. Note
-    // that as the function called is not a member function, but rather a
-    // static function, we need not (and can not) pass a <code>this</code>
-    // pointer to the <code>new_thread</code> function in this case.
-    //
-    // Taking pointers to templated functions seems to be notoriously
-    // difficult for many compilers (since there are several functions with
-    // the same name -- just as with overloaded functions). It therefore
-    // happens quite frequently that we can't directly insert taking the
-    // address of a function in the call to <code>encapsulate</code> for one
-    // or the other compiler, but have to take a temporary variable for that
-    // purpose. Here, in this case, Compaq's <code>cxx</code> compiler choked
-    // on the code so we use this workaround with the function pointer:
-    void (*estimate_cell_ptr) (const SynchronousIterators<std_cxx1x::tuple<
-                               typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator> > &cell,
-                               EstimateScratchData<dim>                                                  &scratch_data,
-                               const EstimateCopyData                                                    &copy_data)
-      = &GradientEstimation::template estimate_cell<dim>;
-
     typedef std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
-    Iterators;
-    SynchronousIterators<Iterators> begin_sync_it(Iterators(dof_handler.begin_active(),
-                                                            error_per_cell.begin()));
-    SynchronousIterators<Iterators> end_sync_it(Iterators(dof_handler.end(),error_per_cell.end()));
+    IteratorTuple;
 
-    WorkStream::run(begin_sync_it,end_sync_it,
-                    estimate_cell_ptr,
-                    std_cxx1x::function<void (const EstimateCopyData &)> (),
-                    EstimateScratchData<dim> (dof_handler.get_fe(),solution),
-                    EstimateCopyData<dim> ());
+    SynchronousIterators<IteratorTuple>
+    begin_sync_it (IteratorTuple (dof_handler.begin_active(),
+                                  error_per_cell.begin())),
+    end_sync_it (IteratorTuple (dof_handler.end(),
+                                error_per_cell.end()));
 
-    // Note that if the value of the variable
-    // <code>multithread_info.n_threads()</code> was one, or if the
-    // library was not configured to use threads, then the sequence of
-    // commands above reduced to a complicated way to simply call the
-    // <code>estimate_interval</code> function with the whole range of cells
-    // to work on. However, using the way above, we are able to write the
-    // program such that it makes no difference whether we presently work with
-    // multiple threads or in single-threaded mode, thus eliminating the need
-    // to write code included in conditional preprocessor sections.
+    WorkStream::run (begin_sync_it,
+                     end_sync_it,
+                     &GradientEstimation::template estimate_cell<dim>,
+                     std_cxx1x::function<void (const EstimateCopyData &)> (),
+                     EstimateScratchData<dim> (dof_handler.get_fe(),
+                                               solution),
+                     EstimateCopyData ());
   }
 
 
   // Following now the function that actually computes the finite difference
   // approximation to the gradient. The general outline of the function is to
-  // loop over all the cells in the range of iterators designated by the third
-  // argument, and on each cell first compute the list of active neighbors of
-  // the present cell and then compute the quantities described in the
-  // introduction for each of the neighbors. The reason for this order is that
-  // it is not a one-liner to find a given neighbor with locally refined
-  // meshes. In principle, an optimized implementation would find neighbors
-  // and the quantities depending on them in one step, rather than first
-  // building a list of neighbors and in a second step their contributions.
+  // first compute the list of active neighbors of the present cell and then
+  // compute the quantities described in the introduction for each of the
+  // neighbors. The reason for this order is that it is not a one-liner to
+  // find a given neighbor with locally refined meshes. In principle, an
+  // optimized implementation would find neighbors and the quantities
+  // depending on them in one step, rather than first building a list of
+  // neighbors and in a second step their contributions but we will gladly
+  // leave this as an exercise. As discussed before, the worker function
+  // passed to WorkStream::run works on "scratch" objects that keep all
+  // temporary objects. This way, we do not need to create and initialize
+  // objects that are expensive to initialize within the function that does
+  // the work, every time it is called for a given cell. Such an argument is
+  // passed as the second argument. The third argument would be a "copy-data"
+  // object (see @ref threads for more information) but we do not actually use
+  // any of these here. Because WorkStream::run insists on passing three
+  // arguments, we declare this function with three arguments, but simply
+  // ignore the last one.
+  //
+  // (This is unsatisfactory from an esthetic perspective. It can be avoided,
+  // at the cost of some other trickery. If you allow, let us here show
+  // how. First, assume that we had declared this function to only take two
+  // arguments by omitting the unused last one. Now, WorkStream::run still
+  // wants to call this function with three arguments, so we need to find a
+  // way to "forget" the third argument in the call. Simply passing
+  // WorkStream::run the pointer to the function as we do above will not do
+  // this -- the compiler will complain that a function declared to have two
+  // arguments is called with three arguments.  However, we can do this by
+  // passing the following as the third argument when calling WorkStream::run
+  // above:
+  // @code
+  //    std_cxx1x::function<void (const SynchronousIterators<IteratorTuple> &,
+  //                              EstimateScratchData<dim>                  &,
+  //                              EstimateCopyData                          &)>
+  //      (std_cxx1x::bind (&GradientEstimation::template estimate_cell<dim>,
+  //                        std_cxx1x::_1,
+  //                        std_cxx1x::_2))
+  // @endcode
+  // This creates a function object taking three arguments, but when it calls
+  // the underlying function object, it simply only uses the first and second
+  // argument -- we simply "forget" to use the third argument :-)
+  // In the end, this isn't completely obvious either, and so we didn't implement
+  // it, but hey -- it can be done!)
   //
   // Now for the details:
   template <int dim>
   void
-  GradientEstimation::estimate_cell (const SynchronousIterators<std_cxx1x::tuple<
-                                     typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator> > &cell,
-                                     EstimateScratchData<dim>                                                  &scratch_data,
-                                     const EstimateCopyData<dim>                                               &copy_data)
+  GradientEstimation::estimate_cell (const SynchronousIterators<std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,
+                                                                                 Vector<float>::iterator> > &cell,
+                                     EstimateScratchData<dim>                                               &scratch_data,
+                                     const EstimateCopyData                                                 &)
   {
     // We need space for the tensor <code>Y</code>, which is the sum of
     // outer products of the y-vectors.
@@ -1284,6 +1305,12 @@ namespace Step9
     Point<dim> gradient;
     contract (gradient, Y_inverse, projected_gradient);
 
+    // The last part of this function is the one where we
+    // write into the element of the output vector what
+    // we have just computed. As above, we need to get
+    // at the second element of the pair of iterators, which requires
+    // slightly awkward syntax but is not otherwise particularly
+    // difficult:
     *(std_cxx1x::get<1>(cell.iterators)) = (std::pow(std_cxx1x::get<0>(cell.iterators)->diameter(),
                                                      1+1.0*dim/2) *
                                             std::sqrt(gradient.square()));

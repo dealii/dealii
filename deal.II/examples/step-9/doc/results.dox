@@ -12,17 +12,17 @@ Cycle 1:
    Number of active cells:       643
    Number of degrees of freedom: 793
 Cycle 2:
-   Number of active cells:       1663
-   Number of degrees of freedom: 1946
+   Number of active cells:       1669
+   Number of degrees of freedom: 1950
 Cycle 3:
-   Number of active cells:       4219
-   Number of degrees of freedom: 4905
+   Number of active cells:       4231
+   Number of degrees of freedom: 4923
 Cycle 4:
-   Number of active cells:       10708
-   Number of degrees of freedom: 12128
+   Number of active cells:       10753
+   Number of degrees of freedom: 12175
 Cycle 5:
-   Number of active cells:       26908
-   Number of degrees of freedom: 29698
+   Number of active cells:       27004
+   Number of degrees of freedom: 29810
 @endcode
 As can be seen, quite a number of cells is used on the finest level to
 resolve the features of the solution. The final grid showing this is
@@ -42,7 +42,7 @@ solution itself:
 
 
 Note that the solution is created by that part that is transported
-along the wiggled advection field from the left and lower boundaries
+along the wiggly advection field from the left and lower boundaries
 to the top right, and the part that is created by the source in the
 lower left corner, and the results of which are also transported
 along. The grid shown above is well-adapted to resolve these
