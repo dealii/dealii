@@ -68,13 +68,20 @@ void test()
     triangulation.execute_coarsening_and_refinement();
     deallog << "n_cells: " << triangulation.n_global_active_cells() << std::endl;
     FE_RaviartThomas<dim> fe(0); // crashing
-    //FESystem<dim> fe(FE_Q<dim>(1), 2); // working
+    //FESystem<dim> fe(FE_Q<dim>(2), 1); // working
     DoFHandler<dim> dof_handler(triangulation);
 
     dof_handler.distribute_dofs(fe);
 	
     ConstraintMatrix constraints;
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+
+    IndexSet relevant_set;
+    DoFTools::extract_locally_relevant_dofs (dof_handler, relevant_set);
+    deallog << "relevant set:" << std::endl;
+    relevant_set.print(deallog.get_file_stream());
+    deallog << "constraints:" << std::endl;
+    constraints.print(deallog.get_file_stream());
     
     if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
       deallog << "OK" << std::endl;
