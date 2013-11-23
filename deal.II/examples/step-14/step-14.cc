@@ -497,8 +497,8 @@ namespace Step14
 
       void
       local_assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
-			     AssemblyScratchData                                  &scratch_data,
-			     AssemblyCopyData                                     &copy_data) const;
+                             AssemblyScratchData                                  &scratch_data,
+                             AssemblyCopyData                                     &copy_data) const;
 
 
       void
@@ -568,22 +568,22 @@ namespace Step14
     Solver<dim>::assemble_linear_system (LinearSystem &linear_system)
     {
       Threads::Task<> rhs_task = Threads::new_task (&Solver<dim>::assemble_rhs,
-						    *this,
-						    linear_system.rhs);
+                                                    *this,
+                                                    linear_system.rhs);
 
       WorkStream::run(dof_handler.begin_active(),
-		      dof_handler.end(),
-		      std_cxx1x::bind(&Solver<dim>::local_assemble_matrix,
-				      this,
-				      std_cxx1x::_1,
-				      std_cxx1x::_2,
-				      std_cxx1x::_3),
-		      std_cxx1x::bind(&Solver<dim>::copy_local_to_global,
-				      this,
-				      std_cxx1x::_1,
-				      std_cxx1x::ref(linear_system)),
-		      AssemblyScratchData(*fe, *quadrature),
-		      AssemblyCopyData());
+                      dof_handler.end(),
+                      std_cxx1x::bind(&Solver<dim>::local_assemble_matrix,
+                                      this,
+                                      std_cxx1x::_1,
+                                      std_cxx1x::_2,
+                                      std_cxx1x::_3),
+                      std_cxx1x::bind(&Solver<dim>::copy_local_to_global,
+                                      this,
+                                      std_cxx1x::_1,
+                                      std_cxx1x::ref(linear_system)),
+                      AssemblyScratchData(*fe, *quadrature),
+                      AssemblyCopyData());
 
       rhs_task.join ();
 
@@ -607,29 +607,29 @@ namespace Step14
     template <int dim>
     Solver<dim>::AssemblyScratchData::
     AssemblyScratchData (const FiniteElement<dim> &fe,
-			 const Quadrature<dim>    &quadrature)
-    :
-    fe_values (fe,
-	       quadrature,
-	       update_gradients | update_JxW_values)
+                         const Quadrature<dim>    &quadrature)
+      :
+      fe_values (fe,
+                 quadrature,
+                 update_gradients | update_JxW_values)
     {}
 
 
     template <int dim>
     Solver<dim>::AssemblyScratchData::
     AssemblyScratchData (const AssemblyScratchData &scratch_data)
-    :
-    fe_values (scratch_data.fe_values.get_fe(),
-	       scratch_data.fe_values.get_quadrature(),
-	       update_gradients | update_JxW_values)
+      :
+      fe_values (scratch_data.fe_values.get_fe(),
+                 scratch_data.fe_values.get_quadrature(),
+                 update_gradients | update_JxW_values)
     {}
 
 
     template <int dim>
     void
     Solver<dim>::local_assemble_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
-					AssemblyScratchData                                  &scratch_data,
-					AssemblyCopyData                                     &copy_data) const
+                                        AssemblyScratchData                                  &scratch_data,
+                                        AssemblyCopyData                                     &copy_data) const
     {
       const unsigned int dofs_per_cell = fe->dofs_per_cell;
       const unsigned int n_q_points    = quadrature->size();
@@ -644,8 +644,8 @@ namespace Step14
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
             copy_data.cell_matrix(i,j) += (scratch_data.fe_values.shape_grad(i,q_point) *
-					   scratch_data.fe_values.shape_grad(j,q_point) *
-					   scratch_data.fe_values.JxW(q_point));
+                                           scratch_data.fe_values.shape_grad(j,q_point) *
+                                           scratch_data.fe_values.JxW(q_point));
 
       cell->get_dof_indices (copy_data.local_dof_indices);
     }
@@ -658,10 +658,10 @@ namespace Step14
                                       LinearSystem           &linear_system) const
     {
       for (unsigned int i=0; i<copy_data.local_dof_indices.size(); ++i)
-	for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
-	  linear_system.matrix.add (copy_data.local_dof_indices[i],
-				    copy_data.local_dof_indices[j],
-				    copy_data.cell_matrix(i,j));
+        for (unsigned int j=0; j<copy_data.local_dof_indices.size(); ++j)
+          linear_system.matrix.add (copy_data.local_dof_indices[i],
+                                    copy_data.local_dof_indices[j],
+                                    copy_data.cell_matrix(i,j));
     }
 
 
@@ -707,17 +707,17 @@ namespace Step14
       hanging_node_constraints.clear ();
 
       void (*mhnc_p) (const DoFHandler<dim> &,
-		      ConstraintMatrix &)
+                      ConstraintMatrix &)
         = &DoFTools::make_hanging_node_constraints;
 
       Threads::Task<> side_task
-	= Threads::new_task (mhnc_p,
-			     dof_handler,
-			     hanging_node_constraints);
+        = Threads::new_task (mhnc_p,
+                             dof_handler,
+                             hanging_node_constraints);
 
       sparsity_pattern.reinit (dof_handler.n_dofs(),
-			       dof_handler.n_dofs(),
-			       dof_handler.max_couplings_between_dofs());
+                               dof_handler.n_dofs(),
+                               dof_handler.max_couplings_between_dofs());
       DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
       side_task.join();
@@ -1970,31 +1970,28 @@ namespace Step14
       // variables of this class; third, as arguments passed to that function.
       //
       // These three alternatives all have drawbacks: the third that their
-      // number is not neglectable and would make calling these functions a
+      // number is not negligible and would make calling these functions a
       // lengthy enterprise. The second has the drawback that it disallows
       // parallelization, since the threads that will compute the error
       // estimate have to have their own copies of these variables each, so
       // member variables of the enclosing class will not work. The first
       // approach, although straightforward, has a subtle but important
       // drawback: we will call these functions over and over again, many
-      // thousands of times maybe; it has now turned out that allocating
+      // thousands of times maybe; it now turns out that allocating
       // vectors and other objects that need memory from the heap is an
       // expensive business in terms of run-time, since memory allocation is
-      // expensive when several threads are involved. In our experience, more
-      // than 20 per cent of the total run time of error estimation functions
-      // are due to memory allocation, if done on a per-call level. It is thus
+      // expensive when several threads are involved. It is thus
       // significantly better to allocate the memory only once, and recycle
       // the objects as often as possible.
       //
-      // What to do? Our answer is to use a variant of the third strategy,
-      // namely generating these variables once in the main function of each
-      // thread, and passing them down to the functions that do the actual
-      // work. To avoid that we have to give these functions a dozen or so
+      // What to do? Our answer is to use a variant of the third strategy.
+      // In fact, this is exactly what the WorkStream concept is supposed to
+      // do (we have already introduced it above, but see also @ref threads).
+      // To avoid that we have to give these functions a dozen or so
       // arguments, we pack all these variables into two structures, one which
       // is used for the computations on cells, the other doing them on the
-      // faces. Instead of many individual objects, we will then only pass one
-      // such object to these functions, making their calling sequence
-      // simpler.
+      // faces. Both are then joined into the WeightedResidualScratchData class
+      // that will serve as the "scratch data" class of the WorkStream concept:
       struct CellData
       {
         FEValues<dim>    fe_values;
@@ -2025,8 +2022,6 @@ namespace Step14
         FaceData (const FaceData &face_data);
       };
 
-
-
       struct WeightedResidualScratchData
       {
         WeightedResidualScratchData(const PrimalSolver<dim> &primal_solver,
@@ -2043,28 +2038,28 @@ namespace Step14
       };
 
 
-      // Dummy structure
+      // WorkStream::run generally wants both a scratch object and a copy object.
+      // Here, for reasons similar to what we had in step-9 when discussing the
+      // computation of an approximation of the gradient, we don't actually
+      // need a "copy data" structure. Since WorkStream insists on having one of
+      // these, we just declare an empty structure that does nothing other than
+      // being there.
       struct WeightedResidualCopyData
-      {
-        WeightedResidualCopyData() {}
-      };
+      {};
 
 
 
-      // Regarding the evaluation of the error estimator, we have two driver
-      // functions that do this: the first is called to generate the cell-wise
-      // estimates, and splits up the task in a number of threads each of
-      // which work on a subset of the cells. The first function will run the
-      // second for each of these threads:
+      // Regarding the evaluation of the error estimator, we have one driver
+      // function that uses WorkStream::run to call the second function on every
+      // cell. The concept of using SynchronousIterators was already explained
+      // in step-9:
       void estimate_error (Vector<float> &error_indicators) const;
 
-      void estimate_some (const SynchronousIterators<std_cxx1x::tuple<
-          active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
-          WeightedResidualScratchData                     &scratch_data,
-          WeightedResidualCopyData                        &copy_data,
-          FaceIntegrals                                   &face_integrals) const;
-
-      void dummy_copy(const WeightedResidualCopyData &copy_data) const {};
+      void estimate_on_one_cell (const SynchronousIterators<std_cxx1x::tuple<
+                                 active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
+                                 WeightedResidualScratchData                     &scratch_data,
+                                 WeightedResidualCopyData                        &copy_data,
+                                 FaceIntegrals                                   &face_integrals) const;
 
       // Then we have functions that do the actual integration of the error
       // representation formula. They will treat the terms on the cell
@@ -2098,8 +2093,8 @@ namespace Step14
     // In the implementation of this class, we first have the constructors of
     // the <code>CellData</code> and <code>FaceData</code> member classes, and
     // the <code>WeightedResidual</code> constructor. They only initialize
-    // fields to their correct lengths, so we do not have to discuss them to
-    // length.
+    // fields to their correct lengths, so we do not have to discuss them in
+    // too much detail:
     template <int dim>
     WeightedResidual<dim>::CellData::
     CellData (const FiniteElement<dim> &fe,
@@ -2122,7 +2117,7 @@ namespace Step14
 
     template <int dim>
     WeightedResidual<dim>::CellData::
-    CellData (const CellData &cell_data) 
+    CellData (const CellData &cell_data)
       :
       fe_values (cell_data.fe_values.get_fe(),
                  cell_data.fe_values.get_quadrature(),
@@ -2201,24 +2196,24 @@ namespace Step14
                                  const DualSolver<dim>   &dual_solver,
                                  const Vector<double>    &primal_solution,
                                  const Vector<double>    &dual_weights)
-    :
-    cell_data (*dual_solver.fe,
-               *dual_solver.quadrature,
-               *primal_solver.rhs_function),
-    face_data (*dual_solver.fe,
-               *dual_solver.face_quadrature),
-    primal_solution(primal_solution),
-    dual_weights(dual_weights)    
+      :
+      cell_data (*dual_solver.fe,
+                 *dual_solver.quadrature,
+                 *primal_solver.rhs_function),
+      face_data (*dual_solver.fe,
+                 *dual_solver.face_quadrature),
+      primal_solution(primal_solution),
+      dual_weights(dual_weights)
     {}
 
     template <int dim>
     WeightedResidual<dim>::WeightedResidualScratchData::
     WeightedResidualScratchData (const WeightedResidualScratchData &scratch_data)
-    :
-    cell_data(scratch_data.cell_data),
-    face_data(scratch_data.face_data),
-    primal_solution(scratch_data.primal_solution),
-    dual_weights(scratch_data.dual_weights)
+      :
+      cell_data(scratch_data.cell_data),
+      face_data(scratch_data.face_data),
+      primal_solution(scratch_data.primal_solution),
+      dual_weights(scratch_data.dual_weights)
     {}
 
 
@@ -2254,9 +2249,9 @@ namespace Step14
     {
       Threads::TaskGroup<> tasks;
       tasks += Threads::new_task (&WeightedResidual<dim>::solve_primal_problem,
-				  *this);
+                                  *this);
       tasks += Threads::new_task (&WeightedResidual<dim>::solve_dual_problem,
-				  *this);
+                                  *this);
       tasks.join_all();
     }
 
@@ -2294,7 +2289,7 @@ namespace Step14
 
 
 
-    // Now, it is becoming more interesting: the <code>refine_grid</code>
+    // Now, it is becoming more interesting: the <code>refine_grid()</code>
     // function asks the error estimator to compute the cell-wise error
     // indicators, then uses their absolute values for mesh refinement.
     template <int dim>
@@ -2415,7 +2410,6 @@ namespace Step14
     // As for the actual computation of error estimates, let's start with the
     // function that drives all this, i.e. calls those functions that actually
     // do the work, and finally collects the results.
-
     template <int dim>
     void
     WeightedResidual<dim>::
@@ -2482,12 +2476,14 @@ namespace Step14
       // afterwards when looping over all cells a second time.
       //
       // We initialize this map already with a value of -1e20 for all faces,
-      // since this value will strike in the results if something should go
+      // since this value will stand out in the results if something should go
       // wrong and we fail to compute the value for a face for some
-      // reason. Secondly, we initialize the map once before we branch to
-      // different threads since this way the map's structure is no more
-      // modified by the individual threads, only existing entries are set to
-      // new values. This relieves us from the necessity to synchronise the
+      // reason. Secondly, this initialization already makes the std::map
+      // object allocate all objects it may possibly need. This is important
+      // since we will write into this structure from parallel threads,
+      // and doing so would not be thread-safe if the map needed to allocate
+      // memory and thereby reshape its data structures. In other words, the
+      // initial initialization relieves us from the necessity to synchronize the
       // threads through a mutex each time they write to (and modify the
       // structure of) this map.
       FaceIntegrals face_integrals;
@@ -2499,26 +2495,39 @@ namespace Step14
              ++face_no)
           face_integrals[cell->face(face_no)] = -1e20;
 
-      // Then set up a vector with error indicators.  Reserve one slot for
-      // each cell and set it to zero.
+      // Then set up a vector with error indicators and reserve one slot for
+      // each cell and set it to zero. With this, we can then set up the
+      // parallel iterator range just as we did in step-9, and hand it
+      // all off to WorkStream::run to compute the estimators for all
+      // cells in parallel:
       error_indicators.reinit (dual_solver.dof_handler
                                .get_tria().n_active_cells());
 
-      typedef std_cxx1x::tuple<active_cell_iterator,Vector<float>::iterator> Iterators;
-      SynchronousIterators<Iterators> cell_and_error_begin(Iterators (
-            dual_solver.dof_handler.begin_active(),error_indicators.begin()));
-      SynchronousIterators<Iterators> cell_and_error_end(Iterators (
-            dual_solver.dof_handler.end(),error_indicators.begin()));
-     
-      WeightedResidualScratchData scratch_data(primal_solver,dual_solver,primal_solution,dual_weights);
-      WeightedResidualCopyData copy_data;
+      typedef
+      std_cxx1x::tuple<active_cell_iterator,Vector<float>::iterator>
+      IteratorTuple;
 
-      // Compute the error formula on all the cells
-      WorkStream::run(cell_and_error_begin,cell_and_error_end,
-          std_cxx1x::bind(&WeightedResidual<dim>::estimate_some,this,std_cxx1x::_1,
-            std_cxx1x::_2,std_cxx1x::_3,std_cxx1x::ref(face_integrals)),
-        std_cxx1x::bind(&WeightedResidual<dim>::dummy_copy,this,std_cxx1x::_1),
-        scratch_data,copy_data);
+      SynchronousIterators<IteratorTuple>
+      cell_and_error_begin(IteratorTuple (dual_solver.dof_handler.begin_active(),
+                                          error_indicators.begin()));
+      SynchronousIterators<IteratorTuple>
+      cell_and_error_end  (IteratorTuple (dual_solver.dof_handler.end(),
+                                          error_indicators.begin()));
+
+      WorkStream::run(cell_and_error_begin,
+                      cell_and_error_end,
+                      std_cxx1x::bind(&WeightedResidual<dim>::estimate_on_one_cell,
+                                      this,
+                                      std_cxx1x::_1,
+                                      std_cxx1x::_2,
+                                      std_cxx1x::_3,
+                                      std_cxx1x::ref(face_integrals)),
+                      std_cxx1x::function<void (const WeightedResidualCopyData &)>(),
+                      WeightedResidualScratchData (primal_solver,
+                                                   dual_solver,
+                                                   primal_solution,
+                                                   dual_weights),
+                      WeightedResidualCopyData());
 
       // Once the error contributions are computed, sum them up. For this,
       // note that the cell terms are already set, and that only the edge
@@ -2546,30 +2555,30 @@ namespace Step14
     }
 
 
-    // @sect4{Estimating on a subset of cells}
+    // @sect4{Estimating on a single cell}
 
     // Next we have the function that is called to estimate the error on a
-    // subset of cells. The function may be called multiple times if the library was
+    // single cell. The function may be called multiple times if the library was
     // configured to use multithreading. Here it goes:
     template <int dim>
     void
     WeightedResidual<dim>::
-    estimate_some (const SynchronousIterators<std_cxx1x::tuple<
-        active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
-        WeightedResidualScratchData                       &scratch_data,
-        WeightedResidualCopyData                          &copy_data,
-        FaceIntegrals                                     &face_integrals) const
+    estimate_on_one_cell (const SynchronousIterators<std_cxx1x::tuple<
+                          active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
+                          WeightedResidualScratchData                       &scratch_data,
+                          WeightedResidualCopyData                          &copy_data,
+                          FaceIntegrals                                     &face_integrals) const
     {
       // First task on each cell is to compute the cell residual
       // contributions of this cell, and put them into the
       // <code>error_indicators</code> variable:
       active_cell_iterator cell = std_cxx1x::get<0>(cell_and_error.iterators);
-      
+
       integrate_over_cell (cell_and_error,
                            scratch_data.primal_solution,
                            scratch_data.dual_weights,
                            scratch_data.cell_data);
-      
+
       // After computing the cell terms, turn to the face terms. For this,
       // loop over all faces of the present cell, and see whether
       // something needs to be computed on it:

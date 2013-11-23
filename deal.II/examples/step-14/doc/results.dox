@@ -30,20 +30,20 @@ Refinement cycle: 4
    Point value=0.0333675
    Estimated error=7.4912e-05
 Refinement cycle: 5
-   Number of degrees of freedom=1691
-   Point value=0.0334104
-   Estimated error=3.47976e-05
+   Number of degrees of freedom=1665
+   Point value=0.0334083
+   Estimated error=3.69111e-05
 Refinement cycle: 6
-   Number of degrees of freedom=4065
-   Point value=0.0334315
-   Estimated error=1.49476e-05
+   Number of degrees of freedom=3975
+   Point value=0.033431
+   Estimated error=1.54218e-05
 Refinement cycle: 7
-   Number of degrees of freedom=9113
-   Point value=0.0334407
-   Estimated error=6.23712e-06
+   Number of degrees of freedom=8934
+   Point value=0.0334406
+   Estimated error=6.28359e-06
 Refinement cycle: 8
-   Number of degrees of freedom=22303
-   Point value=0.0334445
+   Number of degrees of freedom=21799
+   Point value=0.0334444
 @endcode
 
 
