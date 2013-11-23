@@ -212,6 +212,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: make_hanging_node_constraints failed with an exception in a
+  parallel::distributed computation if the element is
+  RaviartThomas (and probably others).
+  <br>
+  (Timo Heister, 2013/11/23)
+  </li>
+
   <li> Improved: CMake: Added a configuration check for incompatible ninja
   + icc setup, fixed several setup and performance issues with the
   testsuite

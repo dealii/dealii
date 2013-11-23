@@ -809,7 +809,10 @@ namespace DoFTools
                 n_dofs_on_children = fe.dofs_per_vertex + 2*fe.dofs_per_line;
 
                 dofs_on_mother.resize (n_dofs_on_mother);
-                dofs_on_children.resize (n_dofs_on_children);
+                // we might not use all of those in case of artificial cells,
+                // so do not resize(), but reserve() and use push_back later.
+                dofs_on_children.clear();
+                dofs_on_children.reserve (n_dofs_on_children);
 
                 Assert(n_dofs_on_mother == fe.constraints().n(),
                        ExcDimensionMismatch(n_dofs_on_mother,
@@ -831,15 +834,20 @@ namespace DoFTools
                   dofs_on_mother[next_index++] = this_face->dof_index(dof, fe_index);
                 AssertDimension (next_index, dofs_on_mother.size());
 
-                next_index = 0;
                 for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                  dofs_on_children[next_index++]
-                    = this_face->child(0)->vertex_dof_index(1,dof,fe_index);
+                  dofs_on_children.push_back(
+                    this_face->child(0)->vertex_dof_index(1,dof,fe_index));
                 for (unsigned int child=0; child<2; ++child)
-                  for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-                    dofs_on_children[next_index++]
-                      = this_face->child(child)->dof_index(dof, fe_index);
-                AssertDimension (next_index, dofs_on_children.size());
+                  {
+                    // skip artificial cells
+                    if (cell->neighbor_child_on_subface (face, child)->is_artificial())
+                      continue;
+                    for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+                      dofs_on_children.push_back(
+                          this_face->child(child)->dof_index(dof, fe_index));
+                  }
+                // note: can get fewer DoFs when we have artificial cells
+                Assert(dofs_on_children.size() <= n_dofs_on_children, ExcInternalError());
 
                 // for each row in the constraint matrix for this line:
                 for (unsigned int row=0; row!=dofs_on_children.size(); ++row)
