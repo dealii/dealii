@@ -116,7 +116,8 @@ inconvenience this causes.
   </li>
 
   <li> Changed: step-9, step-13 and step-14 have been converted to use the
-  more modern WorkStream concept for assembling linear systems in parallel.
+  more modern WorkStream concept for assembling linear systems and computing
+  error indicators in parallel.
   <br>
   (Bruno Turcksin, Wolfgang Bangerth, 2013/10/26)
   </li>
