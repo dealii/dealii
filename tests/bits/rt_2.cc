@@ -118,11 +118,11 @@ void evaluate_normal (DoFHandler<2>  &dof_handler,
                   double v_n = this_value_n[q_point](1);
 
                   deallog << "quadrature point " << q_point
-                          << " (u-u_n)*nx+(v-v_n)*ny="
+                          << " (u-u_n)*nx+(v-v_n)*ny = "
                           << (u-u_n) * nx + (v-v_n) * ny
-                          << ", u*nx+v*ny="
+                          << ", u*nx+v*ny = "
                           << u *nx + v *ny
-                          << ", u_n*nx+v_n*ny="
+                          << ", u_n*nx+v_n*ny = "
                           << u_n *nx + v_n *ny
                           << std::endl;
                 }

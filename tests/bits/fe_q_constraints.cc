@@ -250,7 +250,7 @@ int main ()
   // Initialise the random generator with an
   // arbitrary number. This should ensure
   // reproducible results.
-  Testing::srand (4375384);
+  Testing::srand(4375384);
 
   // With these parameters, the elements are
   // tested up to a polynomial degree of
