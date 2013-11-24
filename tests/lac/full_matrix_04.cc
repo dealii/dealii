@@ -123,7 +123,7 @@ main ()
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);
-  srand(3391466);
+  Testing::srand(3391466);
 
   test(3,4);
   test(4,7);

@@ -60,7 +60,7 @@ check ()
 //  deallog.attach(logfile);
   deallog.depth_console(0);
 //  deallog.threshold_double(1.e-10);
-  srand(3391466);
+  Testing::srand(3391466);
 
   FullMatrix<double> T2(2,2,entries2), S2(2,2), R2(2,2);
   FullMatrix<double>T3(3,3,entries3), S3(3,3), R3(3,3);
