@@ -263,7 +263,8 @@ internal_reinit(const Mapping<dim>                            &mapping,
       // initialize the basic multithreading information that needs to be
       // passed to the DoFInfo structure
 #ifdef DEAL_II_WITH_THREADS
-      if (additional_data.tasks_parallel_scheme != AdditionalData::none)
+      if (additional_data.tasks_parallel_scheme != AdditionalData::none &&
+          multithread_info.n_threads() > 1)
         {
           task_info.use_multithreading = true;
           task_info.block_size = additional_data.tasks_block_size;
