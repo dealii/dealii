@@ -782,7 +782,7 @@ namespace WorkStream
            * and copy data objects this thread will use. The same considerations
            * apply as documented in the Implementation2::IteratorRangeToItemStream
            * class as well as in the paper by Turcksin, Kronbichler and Bangerth
-	   * (see @ref workstream_paper).
+          * (see @ref workstream_paper).
            */
           Threads::ThreadLocalStorage<ScratchAndCopyDataList> *scratch_and_copy_data;
 
@@ -1169,6 +1169,9 @@ namespace WorkStream
    * the input stream that will be worked on by the worker and copier
    * functions one after the other on the same thread.
    *
+   * The last argument @p empty_copier can be set to true when the copier is
+   * empty. In this case, the copier is not used which can improve speed.
+   *
    * @note If your data objects are large, or their constructors are
    * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
    * copies of the <tt>ScratchData</tt> object and
@@ -1188,7 +1191,8 @@ namespace WorkStream
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
        const unsigned int queue_length = 2*multithread_info.n_threads(),
-       const unsigned int                       chunk_size = 8)
+       const unsigned int                       chunk_size = 8,
+       const bool                               empty_copier = false)
   {
     Assert (queue_length > 0,
             ExcMessage ("The queue length must be at least one, and preferably "
@@ -1238,19 +1242,36 @@ namespace WorkStream
                                        sample_copy_data);
 
 
-        internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-        internal::Implementation2::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
+        if (empty_copier==false)
+          {
+            internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
+            internal::Implementation2::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
 
-        // now create a pipeline from these stages
-        tbb::pipeline assembly_line;
-        assembly_line.add_filter (iterator_range_to_item_stream);
-        assembly_line.add_filter (worker_filter);
-        assembly_line.add_filter (copier_filter);
+            // now create a pipeline from these stages
+            tbb::pipeline assembly_line;
+            assembly_line.add_filter (iterator_range_to_item_stream);
+            assembly_line.add_filter (worker_filter);
+            assembly_line.add_filter (copier_filter);
 
-        // and run it
-        assembly_line.run (queue_length);
+            // and run it
+            assembly_line.run (queue_length);
 
-        assembly_line.clear ();
+            assembly_line.clear ();
+          }
+        else
+          {
+            internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
+
+            // now create a pipeline from these stages
+            tbb::pipeline assembly_line;
+            assembly_line.add_filter (iterator_range_to_item_stream);
+            assembly_line.add_filter (worker_filter);
+
+            // and run it
+            assembly_line.run (queue_length);
+
+            assembly_line.clear ();
+          }
       }
 #endif
   }
@@ -1396,6 +1417,9 @@ namespace WorkStream
    * the input stream that will be worked on by the worker and copier
    * functions one after the other on the same thread.
    *
+   * The last argument @p empty_copier can be set to true when the copier is
+   * empty. In this case, the copier is not used which can improve speed.
+   *
    * @note If your data objects are large, or their constructors are
    * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
    * copies of the <tt>ScratchData</tt> object and
@@ -1414,10 +1438,11 @@ namespace WorkStream
                                   ScratchData &,
                                   CopyData &),
        void (MainClass::*copier) (const CopyData &),
-       const ScratchData                    &sample_scratch_data,
-       const CopyData                       &sample_copy_data,
-       const unsigned int queue_length = 2*multithread_info.n_threads(),
-       const unsigned int chunk_size = 8)
+       const ScratchData                       &sample_scratch_data,
+       const CopyData                          &sample_copy_data,
+       const unsigned int queue_length =        2*multithread_info.n_threads(),
+       const unsigned int chunk_size =          8,
+       const bool                               empty_copier = false)
   {
     // forward to the other function
     run (begin, end,
@@ -1430,7 +1455,8 @@ namespace WorkStream
          sample_scratch_data,
          sample_copy_data,
          queue_length,
-         chunk_size);
+         chunk_size,
+         empty_copier);
   }
 
 }

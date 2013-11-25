@@ -671,7 +671,8 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
                        std_cxx1x::cref(solution),component)),
     static_cast<std_cxx1x::function<void (internal::Assembler::CopyData const &)> >
       (internal::Assembler::copier),internal::Assembler::Scratch (),
-      internal::Assembler::CopyData ());
+      internal::Assembler::CopyData (),
+      2*multithread_info.n_threads(),8,true);
 }
 
 
