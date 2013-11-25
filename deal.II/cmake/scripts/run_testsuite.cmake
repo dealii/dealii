@@ -521,7 +521,12 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
-IF(NOT "${_branch}" STREQUAL "")
+IF("${_branch}" STREQUAL "")
+  #
+  # If we have no branch information, just use "generic" as a subproject:
+  #
+  SET_PROPERTY(GLOBAL PROPERTY SubProject "no_svn_info")
+ELSE()
   SET_PROPERTY(GLOBAL PROPERTY SubProject ${_branch})
 ENDIF()
 
@@ -624,4 +629,4 @@ IF("${_res}" STREQUAL "0")
   MESSAGE("-- Submission successful. Goodbye!")
 ENDIF()
 
-# .oO( This script is freaky 627 lines long... )
+# .oO( This script is freaky 632 lines long... )
