@@ -346,7 +346,7 @@ private:
 #endif // DEAL_II_WITH_MUMPS
 
   double   *a;
-  double   *rhs;
+  std::vector<double> rhs;
   int      *irn;
   int      *jcn;
   types::global_dof_index n;
@@ -363,6 +363,11 @@ private:
    * Copy the computed solution into the solution vector.
    */
   void copy_solution (Vector<double> &vector);
+
+  /**
+   *
+   */
+  void copy_rhs_to_mumps(const Vector<double> &rhs);
 
   /**
    * Flags storing whether the function <tt>initialize ()</tt> has already
@@ -409,7 +414,8 @@ public:
 
   /**
    * A function in which the linear system is solved and the solution
-   * vector is copied into the given <tt>vector</tt>.
+   * vector is copied into the given <tt>vector</tt>. The right-hand side
+   * need to be supplied in initialize(matrix, vector);
    */
   void solve (Vector<double> &vector);
 

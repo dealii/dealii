@@ -94,6 +94,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: Missing instantiations of SparseDirectMUMPS have been added.
+  <br>
+  (Timo Heister, 2013/11/25)
+  </li>
+
   <li> New: introduced "make test" that runs a minimal set of tests. We
   encourage every user to run this, especially if they run in to problems.
   The tests are automatically picked depending on the configuration and

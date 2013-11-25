@@ -25,6 +25,7 @@
 #include <iostream>
 #include <list>
 #include <typeinfo>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -513,6 +514,9 @@ SparseDirectMUMPS::~SparseDirectMUMPS ()
 template <class Matrix>
 void SparseDirectMUMPS::initialize_matrix (const Matrix &matrix)
 {
+    Assert(matrix.n() == matrix.m(), ExcMessage("Matrix needs to be square."));
+
+
   // Check we haven't been here before:
   Assert (initialize_called == false, ExcInitializeAlreadyCalled());
 
@@ -586,27 +590,35 @@ void SparseDirectMUMPS::initialize (const Matrix &matrix,
   // Hand over matrix and right-hand side
   initialize_matrix (matrix);
 
+  copy_rhs_to_mumps(vector);
+}
+
+void SparseDirectMUMPS::copy_rhs_to_mumps(const Vector<double> &new_rhs)
+{
+  Assert(n == new_rhs.size(), ExcMessage("Matrix size and rhs length must be equal."));
+
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      // Object denoting a MUMPS data structure
-      rhs = new double[n];
-
+      rhs.resize(n);
       for (size_type i = 0; i < n; ++i)
-        rhs[i] = vector (i);
+        rhs[i] = new_rhs (i);
 
-      id.rhs = rhs;
+      id.rhs = &rhs[0];
     }
 }
 
 void SparseDirectMUMPS::copy_solution (Vector<double> &vector)
 {
+  Assert(n == vector.size(), ExcMessage("Matrix size and solution vector length must be equal."));
+  Assert(n == rhs.size(), ExcMessage("Class not initialized with a rhs vector."));
+
   // Copy solution into the given vector
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       for (size_type i=0; i<n; ++i)
         vector(i) = rhs[i];
 
-      delete[] rhs;
+      rhs.resize(0); // remove rhs again
     }
 }
 
@@ -622,6 +634,10 @@ void SparseDirectMUMPS::initialize (const Matrix &matrix)
 
 void SparseDirectMUMPS::solve (Vector<double> &vector)
 {
+  //TODO: this could be implemented similar to SparseDirectUMFPACK where
+  // the given vector will be used as the RHS. Sadly, there is no easy
+  // way to do this without breaking the interface.
+
   // Check that the solver has been initialized by the routine above:
   Assert (initialize_called == true, ExcNotInitialized());
 
@@ -629,7 +645,7 @@ void SparseDirectMUMPS::solve (Vector<double> &vector)
   Assert (nz != 0, ExcNotInitialized());
 
   // Start solver
-  id.job = 6;
+  id.job = 6; // 6 = analysis, factorization, and solve
   dmumps_c (&id);
   copy_solution (vector);
 }
@@ -643,17 +659,11 @@ void SparseDirectMUMPS::vmult (Vector<double>       &dst,
   // and that the matrix has at least one nonzero element:
   Assert (nz != 0, ExcNotInitialized());
 
+  Assert(n == dst.size(), ExcMessage("Destination vector has the wrong size."));
+  Assert(n == src.size(), ExcMessage("Source vector has the wrong size."));
+
   // Hand over right-hand side
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-    {
-      // Object denoting a MUMPS data structure:
-      rhs = new double[n];
-
-      for (size_type i = 0; i < n; ++i)
-        rhs[i] = src (i);
-
-      id.rhs = rhs;
-    }
+  copy_rhs_to_mumps(src);
 
   // Start solver
   id.job = 3;
@@ -691,7 +701,9 @@ InstantiateUMFPACK(BlockSparseMatrix<float>)
 #ifdef DEAL_II_WITH_MUMPS
 #define InstantiateMUMPS(MATRIX)                          \
   template                                                \
-  void SparseDirectMUMPS::initialize (const MATRIX &, const Vector<double> &);
+  void SparseDirectMUMPS::initialize (const MATRIX &, const Vector<double> &);\
+  template                                                \
+  void SparseDirectMUMPS::initialize (const MATRIX &);
 
 InstantiateMUMPS(SparseMatrix<double>)
 InstantiateMUMPS(SparseMatrix<float>)
