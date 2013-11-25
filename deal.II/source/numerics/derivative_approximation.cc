@@ -79,8 +79,6 @@ namespace internal
     {
       CopyData() {}
     };
-
-    void copier(CopyData const &) {}
   }
 }
 
@@ -669,10 +667,8 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
                        std_cxx1x::cref(mapping),
                        std_cxx1x::cref(dof_handler),
                        std_cxx1x::cref(solution),component)),
-    static_cast<std_cxx1x::function<void (internal::Assembler::CopyData const &)> >
-      (internal::Assembler::copier),internal::Assembler::Scratch (),
-      internal::Assembler::CopyData (),
-      2*multithread_info.n_threads(),8,true);
+    std_cxx1x::function<void (internal::Assembler::CopyData const &)> (),
+    internal::Assembler::Scratch (),internal::Assembler::CopyData ());
 }
 
 

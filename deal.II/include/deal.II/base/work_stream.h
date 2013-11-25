@@ -1150,7 +1150,8 @@ namespace WorkStream
    *
    * This function that can be used for worker and copier objects that
    * are either pointers to non-member functions or objects that allow to be
-   * called with an operator(), for example objects created by std::bind.
+   * called with an operator(), for example objects created by std::bind. If
+   * the copier is an empty function, it is ignore in the pipeline. 
    *
    * The argument passed as @p end must be convertible to the same type as @p
    * begin, but doesn't have to be of the same type itself. This allows to
@@ -1168,9 +1169,6 @@ namespace WorkStream
    * live at any given time. Each item consists of @p chunk_size elements of
    * the input stream that will be worked on by the worker and copier
    * functions one after the other on the same thread.
-   *
-   * The last argument @p empty_copier can be set to true when the copier is
-   * empty. In this case, the copier is not used which can improve speed.
    *
    * @note If your data objects are large, or their constructors are
    * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
@@ -1191,8 +1189,7 @@ namespace WorkStream
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
        const unsigned int queue_length = 2*multithread_info.n_threads(),
-       const unsigned int                       chunk_size = 8,
-       const bool                               empty_copier = false)
+       const unsigned int                       chunk_size = 8)
   {
     Assert (queue_length > 0,
             ExcMessage ("The queue length must be at least one, and preferably "
@@ -1241,37 +1238,20 @@ namespace WorkStream
                                        sample_scratch_data,
                                        sample_copy_data);
 
+        internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
+        internal::Implementation2::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
 
-        if (empty_copier==false)
-          {
-            internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-            internal::Implementation2::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
+        // now create a pipeline from these stages
+        tbb::pipeline assembly_line;
+        assembly_line.add_filter (iterator_range_to_item_stream);
+        assembly_line.add_filter (worker_filter);
+        if (static_cast<const std_cxx1x::function<void (const CopyData &)>& >(copier))
+          assembly_line.add_filter (copier_filter);
 
-            // now create a pipeline from these stages
-            tbb::pipeline assembly_line;
-            assembly_line.add_filter (iterator_range_to_item_stream);
-            assembly_line.add_filter (worker_filter);
-            assembly_line.add_filter (copier_filter);
+        // and run it
+        assembly_line.run (queue_length);
 
-            // and run it
-            assembly_line.run (queue_length);
-
-            assembly_line.clear ();
-          }
-        else
-          {
-            internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-
-            // now create a pipeline from these stages
-            tbb::pipeline assembly_line;
-            assembly_line.add_filter (iterator_range_to_item_stream);
-            assembly_line.add_filter (worker_filter);
-
-            // and run it
-            assembly_line.run (queue_length);
-
-            assembly_line.clear ();
-          }
+        assembly_line.clear ();
       }
 #endif
   }
@@ -1403,7 +1383,8 @@ namespace WorkStream
    * and Bangerth (see @ref workstream_paper).
    *
    * This is the function that can be used for worker and copier functions
-   * that are member functions of a class.
+   * that are member functions of a class. If the copier is an empty function, 
+   * it is ignore in the pipeline. 
    *
    * The argument passed as @p end must be convertible to the same type as @p
    * begin, but doesn't have to be of the same type itself. This allows to
@@ -1416,9 +1397,6 @@ namespace WorkStream
    * live at any given time. Each item consists of @p chunk_size elements of
    * the input stream that will be worked on by the worker and copier
    * functions one after the other on the same thread.
-   *
-   * The last argument @p empty_copier can be set to true when the copier is
-   * empty. In this case, the copier is not used which can improve speed.
    *
    * @note If your data objects are large, or their constructors are
    * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
@@ -1441,8 +1419,7 @@ namespace WorkStream
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
        const unsigned int queue_length =        2*multithread_info.n_threads(),
-       const unsigned int chunk_size =          8,
-       const bool                               empty_copier = false)
+       const unsigned int chunk_size =          8)
   {
     // forward to the other function
     run (begin, end,
@@ -1455,8 +1432,7 @@ namespace WorkStream
          sample_scratch_data,
          sample_copy_data,
          queue_length,
-         chunk_size,
-         empty_copier);
+         chunk_size);
   }
 
 }
