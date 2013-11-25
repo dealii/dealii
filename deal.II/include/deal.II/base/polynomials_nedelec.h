@@ -34,10 +34,10 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class implements the first family <i>H<sup>curl</sup></i>-conforming,
- * vector-valued polynomials, proposed by J.-C. Nédélec in 1980
+ * vector-valued polynomials, proposed by J.-C. NÃ©dÃ©lec in 1980
  * (Numer. Math. 35).
  *
- * The Nédélec polynomials are constructed such that the curl
+ * The NÃ©dÃ©lec polynomials are constructed such that the curl
  * is in the tensor product polynomial space <i>Q<sub>k</sub></i>.
  * Therefore, the polynomial order of each component must be one
  * order higher in the corresponding two directions,
@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k+1,k,k+1</sub>, Q<sub>k+1,k+1,k</sub>)</i> in 2D and 3D, resp.
  *
  * @ingroup Polynomials
- * @author Markus Bürg
+ * @author Markus BÃ¼rg
  * @date 2009, 2010
  */
 template <int dim>
@@ -55,11 +55,11 @@ class PolynomialsNedelec
 public:
   /**
    * Constructor. Creates all basis
-   * functions for Nédélec polynomials
+   * functions for NÃ©dÃ©lec polynomials
    * of given degree.
    *
    * @arg k: the degree of the
-   * Nédélec space, which is the degree
+   * NÃ©dÃ©lec space, which is the degree
    * of the largest tensor product
    * polynomial space
    * <i>Q<sub>k</sub></i> contained.
@@ -69,7 +69,7 @@ public:
   /**
    * Computes the value and the
    * first and second derivatives
-   * of each Nédélec
+   * of each NÃ©dÃ©lec
    * polynomial at @p unit_point.
    *
    * The size of the vectors must
@@ -93,13 +93,13 @@ public:
   void compute (const Point<dim> &unit_point, std::vector<Tensor<1, dim> > &values, std::vector<Tensor<2, dim> > &grads, std::vector<Tensor<3, dim> > &grad_grads) const;
 
   /**
-   * Returns the number of Nédélec
+   * Returns the number of NÃ©dÃ©lec
      * polynomials.
    */
   unsigned int n () const;
 
   /**
-   * Returns the degree of the Nédélec
+   * Returns the degree of the NÃ©dÃ©lec
    * space, which is one less than
    * the highest polynomial degree.
    */
@@ -139,7 +139,7 @@ private:
   const AnisotropicPolynomials<dim> polynomial_space;
 
   /**
-   * Number of Nédélec polynomials.
+   * Number of NÃ©dÃ©lec polynomials.
    */
   const unsigned int n_pols;
 

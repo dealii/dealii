@@ -61,10 +61,10 @@ template <int dim, int spacedim> class MappingQ;
  *   DGQ_{k}
  * @f]
  * Consequently, approximation order of
- * the Nedelec space equals the value <i>degree</i> given to the constructor.
+ * the Nédélec space equals the value <i>degree</i> given to the constructor.
  * In this scheme, the lowest order element would be created by the call
  * FE_Nedelec<dim>(0). Note that this follows the convention of Brezzi and
- * Raviart, though not the one used in the original paper by Nedelec.
+ * Raviart, though not the one used in the original paper by Nédélec.
  *
  * This class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
@@ -82,14 +82,14 @@ template <int dim, int spacedim> class MappingQ;
  * inverse) is needed already to generate the values of the shape
  * functions on the cells in real space. This is in contrast to most
  * other elements, where you only need the Jacobian for the
- * gradients. Thus, to generate the gradients of Nedelec shape
+ * gradients. Thus, to generate the gradients of Nédélec shape
  * functions, one would need to have the derivatives of the inverse of
  * the Jacobian matrix.
  *
- * Basically, the Nedelec shape functions can be understood as the
+ * Basically, the Nédélec shape functions can be understood as the
  * gradients of scalar shape functions on the real cell. They are thus
  * the inverse Jacobian matrix times the gradients of scalar shape
- * functions on the unit cell. The gradient of Nedelec shape functions
+ * functions on the unit cell. The gradient of Nédélec shape functions
  * is then, by the product rule, the sum of first the derivative (with
  * respect to true coordinates) of the inverse Jacobian times the
  * gradient (in unit coordinates) of the scalar shape function, plus
@@ -106,7 +106,7 @@ template <int dim, int spacedim> class MappingQ;
  * drop this first term.
  *
  * What this means for the present case: first the computation of
- * gradients of Nedelec shape functions is wrong in general. Second,
+ * gradients of Nédélec shape functions is wrong in general. Second,
  * in the following two cases you will not notice this:
  *
  * - If the cell is a parallelogram, then the usual bi-/trilinear mapping
@@ -114,7 +114,7 @@ template <int dim, int spacedim> class MappingQ;
  *   and the gradient of the shape functions is computed exactly, since the
  *   first term is zero.
  *
- * - With the Nedelec elements, you will usually want to compute
+ * - With the Nédélec elements, you will usually want to compute
  *   the curl, not the general derivative tensor. However, the curl of the
  *   Jacobian vanishes, so for the curl of shape functions the first term
  *   is irrelevant, and the curl will always be computed correctly even on
@@ -323,7 +323,7 @@ private:
    * cells onto the father
    * cell. According to the
    * philosophy of the
-   * N�d�lec element, this
+   * Nédélec element, this
    * restriction operator preserves
    * the curl of a function
    * weakly.
