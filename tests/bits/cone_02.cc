@@ -16,7 +16,8 @@
 
 
 
-// document bug in GridGenerator::truncated_cone (no cells returned if half_length < 0.5*radius)
+// document bug in GridGenerator::truncated_cone
+// (no cells are returned if half_length < 0.5*radius for dim=3)
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -40,11 +41,12 @@ template <int dim>
 void check ()
 {
   Triangulation<dim> triangulation;
-  GridGenerator::truncated_cone (triangulation, 0.5, 1.0, 0.25);
+  double r1 = 0.5, r2 = 1.0, halfl = 0.25;
+  GridGenerator::truncated_cone (triangulation, r1, r2, halfl);
   Point<dim> p1, p2;
-  p1[0] = -1;
-  p2[0] = 1;
-  static const ConeBoundary<dim> boundary (1, 0.5, p1, p2);
+  p1[0] = -halfl;
+  p2[0] = halfl;
+  static const ConeBoundary<dim> boundary (r1, r2, p1, p2);
   triangulation.set_boundary (0, boundary);
 
   triangulation.refine_global (2);

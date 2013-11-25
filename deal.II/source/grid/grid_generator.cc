@@ -2499,10 +2499,9 @@ namespace GridGenerator
   {
     // Determine number of cells and vertices
     const unsigned int
-    n_cells = static_cast<unsigned int>(std::floor (half_length /
+    n_cells = static_cast<unsigned int>(std::ceil (half_length /
                                                     std::max (radius_0,
-                                                              radius_1) +
-                                                    0.5));
+                                                              radius_1)));
     const unsigned int n_vertices = 4 * (n_cells + 1);
     std::vector<Point<3> > vertices_tmp(n_vertices);
 

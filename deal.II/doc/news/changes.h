@@ -212,6 +212,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: GridGenerator::truncated_cone() failed if half_length < 0.5*radius in 3d.
+  <br>
+  (Timo Heister, 2013/11/25)
+  </li>
+
   <li> Fixed: make_hanging_node_constraints failed with an exception in a
   parallel::distributed computation if the element is
   RaviartThomas (and probably others).
@@ -221,7 +226,7 @@ inconvenience this causes.
 
   <li> Improved: CMake: Added a configuration check for incompatible ninja
   + icc setup, fixed several setup and performance issues with the
-  testsuite
+  testsuite.
   <br>
   (Matthias Maier, 2013/11/20)
   </li>
@@ -234,7 +239,7 @@ inconvenience this causes.
   </li>
 
   <li> Fixed: GridGenerator::parallelogram was not instantiated properly
-  on intel compilers.
+  when using intel compilers.
   <br>
   (Timo Heister, 2013/11/17)
   </li>
