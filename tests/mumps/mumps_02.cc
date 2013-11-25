@@ -16,7 +16,6 @@
 
 
 // test the mumps sparse direct solver on a mass matrix
-// - check several ways to solve
 
 #include "../tests.h"
 #include <iostream>
@@ -41,30 +40,6 @@
 
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
-
-
-void solve_and_check(const SparseMatrix<double> & M,
-		     const Vector<double> & rhs,
-		     const Vector<double> & solution)
-{
-  {
-    SparseDirectMUMPS solver;
-    solver.initialize (M);
-    Vector<double> dst(rhs.size());
-    solver.vmult(dst, rhs);
-    dst -= solution;
-    Assert(dst.l2_norm() < 1e-9, ExcInternalError());
-  }
-  {
-    SparseDirectMUMPS solver;
-    solver.initialize (M, rhs);
-    Vector<double> dst(rhs.size());
-    solver.solve(dst);
-    dst -= solution;
-    Assert(dst.l2_norm() < 1e-9, ExcInternalError());
-  }
-}
-
 
 
 template <int dim>
@@ -101,13 +76,9 @@ void test ()
   QGauss<dim> qr (2);
   MatrixTools::create_mass_matrix (dof_handler, qr, B);
 
-  // compute a decomposition of the matrix
-  SparseDirectMUMPS Binv;
-  Binv.initialize (B);
-
   // for a number of different solution
   // vectors, make up a matching rhs vector
-  // and check what the solver finds
+  // and check what the  solver finds
   for (unsigned int i=0; i<3; ++i)
     {
       Vector<double> solution (dof_handler.n_dofs());
@@ -119,8 +90,10 @@ void test ()
 
       B.vmult (b, solution);
 
-      Binv.vmult (x,b);
-
+      SparseDirectMUMPS solver;
+      solver.initialize(B, b);
+      solver.solve(x);
+      
       x -= solution;
       deallog << "relative norm distance = "
               << x.l2_norm() / solution.l2_norm()
@@ -130,10 +103,6 @@ void test ()
               << std::endl;
       Assert (x.l2_norm() / solution.l2_norm() < 1e-8,
               ExcInternalError());
-
-      
-				       //also check solving in different ways:
-      solve_and_check(B, b, solution);
     }
 }
 
@@ -141,9 +110,12 @@ void test ()
 int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
-
-  initlog();
   
+  std::ofstream logfile("output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-9);
+
   test<1> ();
   test<2> ();
   test<3> ();
