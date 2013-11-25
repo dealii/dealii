@@ -177,7 +177,7 @@ public:
 
 /**
  * Milne-rule. Closed Newton-Cotes formula, exact for polynomials of degree 5.
- * See Stoer: Einführung in die Numerische Mathematik I, p. 102
+ * See Stoer: EinfÃ¼hrung in die Numerische Mathematik I, p. 102
  */
 template <int dim>
 class QMilne : public Quadrature<dim>
@@ -189,7 +189,7 @@ public:
 
 /**
  * Weddle-rule. Closed Newton-Cotes formula, exact for polynomials of degree 7.
- * See Stoer: Einführung in die Numerische Mathematik I, p. 102
+ * See Stoer: EinfÃ¼hrung in die Numerische Mathematik I, p. 102
  */
 template <int dim>
 class QWeddle : public Quadrature<dim>
