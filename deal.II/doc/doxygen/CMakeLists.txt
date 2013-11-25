@@ -36,20 +36,23 @@ CONFIGURE_FILE(
   )
 
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/header.html.in
-  ${CMAKE_CURRENT_BINARY_DIR}/header.html
-  )
-
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/footer.html
-  ${CMAKE_CURRENT_BINARY_DIR}/footer.html
-  COPYONLY
-  )
-
-CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/deal.css
   ${CMAKE_CURRENT_BINARY_DIR}/deal.II/deal.css
   COPYONLY
+  )
+
+#
+# Generate header, footer and style files for doxygen
+#
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/header.html
+  ${CMAKE_CURRENT_BINARY_DIR}/footer.html
+  ${CMAKE_CURRENT_BINARY_DIR}/style.css
+  COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html style.css options.dox
+  COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/mod_header.pl header.html
+  COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/mod_footer.pl footer.html
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/options.dox
   )
 
 #
@@ -102,6 +105,8 @@ ADD_CUSTOM_COMMAND(
     tutorial
     images
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
+    ${CMAKE_CURRENT_BINARY_DIR}/header.html
+    ${CMAKE_CURRENT_BINARY_DIR}/footer.html
     ${_doxygen_input}
   COMMENT "Generating documentation via doxygen. This may take a _really_ long time..."
   VERBATIM
