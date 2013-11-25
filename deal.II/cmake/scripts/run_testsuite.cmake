@@ -523,9 +523,9 @@ ENDIF()
 
 IF("${_branch}" STREQUAL "")
   #
-  # If we have no branch information, just use "generic" as a subproject:
+  # If we have no branch information, just assume we are on trunk:
   #
-  SET_PROPERTY(GLOBAL PROPERTY SubProject "no_svn_info")
+  SET_PROPERTY(GLOBAL PROPERTY SubProject "trunk")
 ELSE()
   SET_PROPERTY(GLOBAL PROPERTY SubProject ${_branch})
 ENDIF()
