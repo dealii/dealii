@@ -206,8 +206,9 @@ operator = (const Tensor<2,dim> &ta)
   Assert( (dim == spacedim) && (order==1),
           ExcMessage("Only allowed for square tensors."));
 
-  for (unsigned int j=0; j<dim; ++j)
-    (*this)[j] = ta[j];
+  if ((dim == spacedim) && (order==1))
+    for (unsigned int j=0; j<dim; ++j)
+      (*this)[j] = ta[j];
   return *this;
 
 }
@@ -274,10 +275,13 @@ DerivativeForm<order, dim, spacedim>::operator Tensor<2,dim>() const
   Assert( (dim == spacedim) && (order==1),
           ExcMessage("Only allowed for square tensors."));
 
+
+
   Tensor<2,dim> t;
 
-  for (unsigned int j=0; j<dim; ++j)
-    t[j] = (*this)[j];
+  if ((dim == spacedim) && (order==1))
+    for (unsigned int j=0; j<dim; ++j)
+      t[j] = (*this)[j];
 
   return t;
 
