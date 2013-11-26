@@ -456,7 +456,7 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF1,
 
 
 /**
-   Traspose of  a rectangular DerivativeForm DF,
+   Transpose of a rectangular DerivativeForm DF,
    mostly for compatibility reasons.
    @relates DerivativeForm
    @author Sebastian Pauletti, 2011
