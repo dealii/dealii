@@ -56,7 +56,7 @@ solution process.
 
 The above procedure also has a linear algebra interpretation and is referred to
 as static condensation. Let us write the complete linear system associated to
-the HDG problem as a block system with the discrete DG variables <i>U</i> as
+the HDG problem as a block system with the discrete DG variables $U$ as
 first block and the skeleton variables $\Lambda$ as the second block:
 @f{eqnarray*}
 \begin{pmatrix} A & B \\ C & D \end{pmatrix}
@@ -64,7 +64,7 @@ first block and the skeleton variables $\Lambda$ as the second block:
 =
 \begin{pmatrix} F \\ G \end{pmatrix}.
 @f}
-Our aim is now to eliminate the <i>U</i> block with a Schur complement
+Our aim is now to eliminate the $U$ block with a Schur complement
 approach similar to step-20, which results in the following two steps:
 @f{eqnarray*}
 (D - C A^{-1} B) \Lambda &=& G - C A^{-1} F, \\
@@ -74,15 +74,15 @@ The point is that the presence of $A^{-1}$ is not a problem because $A$ is a
 block diagonal matrix where each block corresponds to one cell and is
 therefore easy enough to invert.
 The coupling to other cells is introduced by the matrices
-<i>B</i> and <i>C</i> over the skeleton variable. The block-diagonality of
-<i>A</i> and the structure in <i>B</i> and <i>C</i> allow us to invert the
-matrix <i>A</i> element by element (the local solution of the Dirichlet
+$B$ and $C$ over the skeleton variable. The block-diagonality of
+$A$ and the structure in $B$ and $C$ allow us to invert the
+matrix $A$ element by element (the local solution of the Dirichlet
 problem) and subtract $CA^{-1}B$ from $D$. The steps in the Dirichlet-to-Neumann map concept hence correspond to
 <ol>
   <li> constructing the Schur complement matrix $D-C A^{-1} B$ and right hand side $G - C A^{-1} F$  <i>locally on each cell</i>
   and inserting the contribution into the global trace matrix in the usual way,
   <li> solving the Schur complement system for $\Lambda$, and
-  <li> solving for <i>U</i> using the second equation, given $\Lambda$.
+  <li> solving for $U$ using the second equation, given $\Lambda$.
 </ol>
 
 
@@ -227,11 +227,11 @@ both elements sharing a face, the above equation yields terms familiar
 from the DG method, with jumps of the solution over the cell boundaries.
 
 In the equation above, the space $\mathcal {W}_h^{p}$ for the scalar variable
-<i>u<sub>h</sub></i> is defined as the space of functions that are tensor
-product polynomials of degree <i>p</i> on each cell and discontinuous over the
+$u_h$ is defined as the space of functions that are tensor
+product polynomials of degree $p$ on each cell and discontinuous over the
 element boundaries $\mathcal Q_{-p}$, i.e., the space described by
 <code>FE_DGQ<dim>(p)</code>. The space for the gradient or flux variable
-<b>q</b><i><sub>h</sub></i> is a vector element space where each component is
+$\mathbf{q}_i$ is a vector element space where each component is
 a locally polynomial and discontinuous $\mathcal Q_{-p}$. In the code below,
 we collect these two local parts together in one FESystem where the first @p
 dim components denote the gradient part and the last scalar component
@@ -263,18 +263,18 @@ One special feature of the HDG methods is that they typically allow for
 constructing an enriched solution that gains accuracy. This post-processing
 takes the HDG solution in an element-by-element fashion and combines it such
 that one can get $\mathcal O(h^{p+2})$ order of accuracy when using
-polynomials of degree <i>p</i>. For this to happen, there are two necessary
+polynomials of degree $p$. For this to happen, there are two necessary
 ingredients:
 <ol>
   <li> The computed solution gradient $\mathbf{q}_h$ converges at optimal rate,
    i.e., $\mathcal{O}(h^{p+1})$.
   <li> The average of the scalar part of the solution, <i>u<sub>h</sub></i>,
-   on each cell <i>K</i> super-converges at rate $\mathcal{O}(h^{p+2})$.
+   on each cell $K$ super-converges at rate $\mathcal{O}(h^{p+2})$.
 </ol>
 
 We now introduce a new variable $u_h^* \in \mathcal{V}_h^{p+1}$, which we find
 by minimizing the expression $|\kappa \nabla u_h^* + \mathbf{q}_h|^2$ over the cell
-<i>K</i> under the constraint $\left(1, u_h^*\right)_K &=& \left(1,
+$K$ under the constraint $\left(1, u_h^*\right)_K = \left(1,
 u_h\right)_K$. The constraint is necessary because the minimization
 functional does not determine the constant part of $u_h^*$. This
 translates to the following system of equations:
@@ -286,7 +286,7 @@ translates to the following system of equations:
 @f}
 
 Since we test by the whole set of basis functions in the space of tensor
-product polynomials of degree <i>p</i>+1 in the second set of equations, this
+product polynomials of degree $p+1$ in the second set of equations, this
 is an overdetermined system with one more equation than unknowns. We fix this
 in the code below by omitting one of these equations (since the rows in the
 Laplacian are linearly dependent when representing a constant function). As we
@@ -312,7 +312,7 @@ separately and uses the gradient as the main source of information.
 For this tutorial program, we consider almost the same test case as in
 step-7. The computational domain is $\Omega := [-1,1]^d$ and the exact
 solution corresponds to the one in step-7, except for a scaling. We use the
-following source centers <i>x<sub>i</sub></i> for the exponentials
+following source centers $x_i$ for the exponentials
 <ul>
   <li> 1D:  $\{x_i\}^1 = \{ -\frac{1}{3}, 0, \frac{1}{3} \}$,
   <li> 2D: $\{\mathbf{x}_i\}^2 = \{ (-\frac{1}{2},\frac{1}{2}),
