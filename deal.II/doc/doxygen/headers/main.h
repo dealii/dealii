@@ -18,8 +18,6 @@
 /**
  * @mainpage
  *
- * @image html logo200.png
- *
  * This is the main starting page for the deal.II class and function
  * documentation.  Documentation on other aspects, such as the build system,
  * can be found elsewhere. In addition, there are <a

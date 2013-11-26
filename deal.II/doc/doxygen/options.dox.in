@@ -1,8 +1,9 @@
 # This file contains project-specific configurations for the 
 # deal.II documentation.
 
-PROJECT_NAME           = "The deal.II library"
+PROJECT_NAME           = "The deal.II Library"
 PROJECT_NUMBER         = "Reference documentation for deal.II version @DEAL_II_PACKAGE_VERSION@"
+PROJECT_LOGO           = "logo200.png"
 OUTPUT_DIRECTORY       = .
 
 # The doxygen documentation says this about the following flag:
@@ -100,6 +101,9 @@ HTML_FOOTER            = footer.html
 USE_MATHJAX            = YES
 MATHJAX_RELPATH        = http://cdn.mathjax.org/mathjax/latest
 MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
+HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_SAT    = 200
+HTML_EXTRA_STYLESHEET  = stylesheet.css
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------

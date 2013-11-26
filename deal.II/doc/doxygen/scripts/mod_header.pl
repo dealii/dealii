@@ -12,3 +12,5 @@ if (m'</head>')
     print '<meta name="copyright" content="Copyright (C) 1998 - ', $year, ' by the deal.II authors"></meta>', "\n";
     print '<meta name="deal.II-version" content="', $version, '"></meta>', "\n";
 }
+
+s/\$projectname// unless (m/<title>/);

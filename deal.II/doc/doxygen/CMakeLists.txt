@@ -41,18 +41,31 @@ CONFIGURE_FILE(
   COPYONLY
   )
 
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/stylesheet.css
+  ${CMAKE_CURRENT_BINARY_DIR}/stylesheet.css
+  COPYONLY
+  )
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/images/logo200.png
+  ${CMAKE_CURRENT_BINARY_DIR}/logo200.png
+  COPYONLY
+  )
+
 #
 # Generate header, footer and style files for doxygen
 #
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/header.html
   ${CMAKE_CURRENT_BINARY_DIR}/footer.html
-  ${CMAKE_CURRENT_BINARY_DIR}/style.css
   COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html style.css options.dox
   COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/mod_header.pl header.html
   COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/mod_footer.pl footer.html
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/options.dox
+  ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/mod_header.pl
+  ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/mod_footer.pl
   )
 
 #
