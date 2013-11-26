@@ -97,7 +97,9 @@ HTML_OUTPUT            = deal.II
 HTML_FILE_EXTENSION    = .html
 HTML_HEADER            = header.html
 HTML_FOOTER            = footer.html
-
+USE_MATHJAX            = YES
+MATHJAX_RELPATH        = http://cdn.mathjax.org/mathjax/latest
+MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
@@ -184,8 +186,8 @@ CALL_GRAPH             = NO
 CALLER_GRAPH           = NO
 GRAPHICAL_HIERARCHY    = NO
 DIRECTORY_GRAPH        = YES
-DOT_IMAGE_FORMAT       = png
-MAX_DOT_GRAPH_DEPTH    = 3
+DOT_IMAGE_FORMAT       = svg
+MAX_DOT_GRAPH_DEPTH    = 5
 DOT_TRANSPARENT        = NO
 GENERATE_LEGEND        = YES
 
