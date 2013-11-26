@@ -280,6 +280,12 @@ namespace WorkStream
            */
           const ScratchData *sample_scratch_data;
 
+          /**
+           * Flag is true if the buffer is used and false if the buffer can be
+           * used.
+           */
+          bool currently_in_use;
+
 
           /**
            * Default constructor.
@@ -290,7 +296,8 @@ namespace WorkStream
             :
             n_items (0),
             scratch_data (0),
-            sample_scratch_data (0)
+            sample_scratch_data (0),
+            currently_in_use (false)
           {}
         };
 
@@ -309,23 +316,23 @@ namespace WorkStream
           :
           tbb::filter (/*is_serial=*/true),
           remaining_iterator_range (begin, end),
-          ring_buffer (buffer_size),
+          item_buffer (buffer_size),
           sample_scratch_data (sample_scratch_data),
-          n_emitted_items (0),
           chunk_size (chunk_size)
         {
           // initialize the elements of the ring buffer
-          for (unsigned int element=0; element<ring_buffer.size(); ++element)
+          for (unsigned int element=0; element<item_buffer.size(); ++element)
             {
-              Assert (ring_buffer[element].n_items == 0,
+              Assert (item_buffer[element].n_items == 0,
                       ExcInternalError());
 
-              ring_buffer[element].work_items.resize (chunk_size,
+              item_buffer[element].work_items.resize (chunk_size,
                                                       remaining_iterator_range.second);
-              ring_buffer[element].scratch_data = &thread_local_scratch;
-              ring_buffer[element].sample_scratch_data = &sample_scratch_data;
-              ring_buffer[element].copy_datas.resize (chunk_size,
+              item_buffer[element].scratch_data = &thread_local_scratch;
+              item_buffer[element].sample_scratch_data = &sample_scratch_data;
+              item_buffer[element].copy_datas.resize (chunk_size,
                                                       sample_copy_data);
+              item_buffer[element].currently_in_use = false;
             }
         }
 
@@ -336,10 +343,20 @@ namespace WorkStream
          */
         virtual void *operator () (void *)
         {
-          // store the current
-          // position of the pointer
-          ItemType *current_item
-            = &ring_buffer[n_emitted_items % ring_buffer.size()];
+          // find first unused item. we know that there must be one
+          // because we have set the maximal number of tokens in flight
+          // and have set the ring buffer to have exactly this size. so
+          // if this function is called, we know that less than the
+          // maximal number of items in currently in flight
+          ItemType *current_item = 0;
+          for (unsigned int i=0; i<item_buffer.size(); ++i)
+            if (item_buffer[i].currently_in_use == false)
+              {
+                item_buffer[i].currently_in_use = true;
+                current_item = &item_buffer[i];
+                break;
+              }
+          Assert (current_item != 0, ExcMessage ("This can't be. There must be a free item!"));
 
           // initialize the next item. it may
           // consist of at most chunk_size
@@ -362,10 +379,7 @@ namespace WorkStream
             // left. terminate the pipeline
             return 0;
           else
-            {
-              ++n_emitted_items;
-              return current_item;
-            }
+            return current_item;
         }
 
       private:
@@ -377,9 +391,9 @@ namespace WorkStream
         std::pair<Iterator,Iterator> remaining_iterator_range;
 
         /**
-         * A ring buffer that will store items.
+         * A buffer that will store items.
          */
-        std::vector<ItemType>        ring_buffer;
+        std::vector<ItemType>        item_buffer;
 
         /**
          * Pointer to a thread local variable identifying the scratch data objects
@@ -422,13 +436,6 @@ namespace WorkStream
         const ScratchData &sample_scratch_data;
 
         /**
-         * Counter for the number of emitted
-         * items. Each item may consist of up
-         * to chunk_size iterator elements.
-         */
-        unsigned int       n_emitted_items;
-
-        /**
          * Number of elements of the
          * iterator range that each
          * thread should work on
@@ -445,21 +452,21 @@ namespace WorkStream
         /**
          * Initialize the pointers and vector
          * elements in the specified entry of
-         * the ring buffer.
+         * the item_buffer.
          */
         void init_buffer_elements (const unsigned int element,
                                    const CopyData    &sample_copy_data)
         {
-          Assert (ring_buffer[element].n_items == 0,
+          Assert (item_buffer[element].n_items == 0,
                   ExcInternalError());
 
-          ring_buffer[element].work_items
+          item_buffer[element].work_items
           .resize (chunk_size, remaining_iterator_range.second);
-          ring_buffer[element].scratch_data
+          item_buffer[element].scratch_data
             = &thread_local_scratch;
-          ring_buffer[element].sample_scratch_data
+          item_buffer[element].sample_scratch_data
             = &sample_scratch_data;
-          ring_buffer[element].copy_datas
+          item_buffer[element].copy_datas
           .resize (chunk_size, sample_copy_data);
         }
       };
@@ -489,10 +496,12 @@ namespace WorkStream
          */
         Worker (const std_cxx1x::function<void (const Iterator &,
                                                 ScratchData &,
-                                                CopyData &)> &worker)
+                                                CopyData &)> &worker,
+                bool copier_exist=true)
           :
           tbb::filter (/* is_serial= */ false),
-          worker (worker)
+          worker (worker),
+          copier_exist (copier_exist)
         {}
 
 
@@ -587,6 +596,9 @@ namespace WorkStream
                 }
           }
 
+          // if there is no copier, mark current item as usable again
+          if (copier_exist==false)
+            current_item->currently_in_use = false;
 
 
           // then return the original pointer
@@ -604,6 +616,12 @@ namespace WorkStream
         const std_cxx1x::function<void (const Iterator &,
                                         ScratchData &,
                                         CopyData &)> worker;
+
+        /**
+         * This flag is true if the copier stage exist. If it does not,
+         * the worker has to free the buffer. Otherwise the copier will do it.
+         */
+        bool copier_exist;
       };
 
 
@@ -671,6 +689,9 @@ namespace WorkStream
                   Threads::internal::handle_unknown_exception ();
                 }
             }
+
+          // mark current item as useable again
+          current_item->currently_in_use = false;
 
 
           // return an invalid item since we are at the end of the
@@ -916,7 +937,7 @@ namespace WorkStream
         std::pair<typename std::vector<Iterator>::const_iterator,typename std::vector<Iterator>::const_iterator> remaining_iterator_range;
 
         /**
-         * A ring buffer that will store items.
+         * A buffer that will store items.
          */
         std::vector<ItemType>        item_buffer;
 
@@ -1238,20 +1259,37 @@ namespace WorkStream
                                        sample_scratch_data,
                                        sample_copy_data);
 
-        internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
-        internal::Implementation2::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
-
-        // now create a pipeline from these stages
-        tbb::pipeline assembly_line;
-        assembly_line.add_filter (iterator_range_to_item_stream);
-        assembly_line.add_filter (worker_filter);
+        // Check that the copier exist
         if (static_cast<const std_cxx1x::function<void (const CopyData &)>& >(copier))
-          assembly_line.add_filter (copier_filter);
+          {
+            internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
+            internal::Implementation2::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
 
-        // and run it
-        assembly_line.run (queue_length);
+            // now create a pipeline from these stages
+            tbb::pipeline assembly_line;
+            assembly_line.add_filter (iterator_range_to_item_stream);
+            assembly_line.add_filter (worker_filter);
+            assembly_line.add_filter (copier_filter);
 
-        assembly_line.clear ();
+            // and run it
+            assembly_line.run (queue_length);
+
+            assembly_line.clear ();
+          }
+        else
+          {
+            internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker,false);
+
+            // now create a pipeline from these stages
+            tbb::pipeline assembly_line;
+            assembly_line.add_filter (iterator_range_to_item_stream);
+            assembly_line.add_filter (worker_filter);
+
+            // and run it
+            assembly_line.run (queue_length);
+
+            assembly_line.clear ();
+          }
       }
 #endif
   }
