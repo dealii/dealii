@@ -1990,7 +1990,7 @@ namespace DoFTools
   }
 
 
-  
+
   template<typename DH>
   void
   make_periodicity_constraints (const DH                       &dof_handler,
@@ -2140,64 +2140,35 @@ namespace DoFTools
   {
     namespace Assembler
     {
-      struct Scratch
-      {
-        Scratch() {};
-      };
+      struct Scratch {};
 
 
       template <int dim,int spacedim>
       struct CopyData
       {
-        CopyData(unsigned int const &coarse_component,
-                 std::vector<types::global_dof_index> const &weight_mapping);
-
-        CopyData(CopyData const &data);
-
-        unsigned int coarse_component;
-        unsigned int dofs_per_cell;
+        unsigned int                         dofs_per_cell;
         std::vector<types::global_dof_index> parameter_dof_indices;
-        std::vector<types::global_dof_index> weight_mapping;
         std::vector<dealii::Vector<double> > global_parameter_representation;
       };
-      
-
-
-      template <int dim,int spacedim>
-      CopyData<dim,spacedim>::CopyData(unsigned int const &coarse_component,
-                                       std::vector<types::global_dof_index> const &weight_mapping) :
-        coarse_component(coarse_component),
-        weight_mapping(weight_mapping)
-      {}
-
-
-
-      template <int dim,int spacedim>
-      CopyData<dim,spacedim>::CopyData(CopyData const &data) :
-        coarse_component(data.coarse_component),
-        dofs_per_cell(data.dofs_per_cell),
-        parameter_dof_indices(data.parameter_dof_indices),
-        weight_mapping(data.weight_mapping),
-        global_parameter_representation(data.global_parameter_representation)
-      {}
     }
 
     namespace
     {
       /**
        * This is a function that is called by the _2 function and that
-       * operates on one cell only. It is worked in parallel if 
+       * operates on one cell only. It is worked in parallel if
        * multhithreading is available.
        */
       template <int dim, int spacedim>
       void compute_intergrid_weights_3 (
-          typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator const &cell,
-          Assembler::Scratch const                                              &scratch,
+          const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &cell,
+          const Assembler::Scratch                                              &,
           Assembler::CopyData<dim,spacedim>                                     &copy_data,
-          FiniteElement<dim,spacedim> const                                     &coarse_fe,
-          InterGridMap<dealii::DoFHandler<dim,spacedim> > const                 &coarse_to_fine_grid_map,
-          std::vector<dealii::Vector<double> > const                            &parameter_dofs)
-
+	  const unsigned int                                                     coarse_component,
+          const FiniteElement<dim,spacedim>                                     &coarse_fe,
+          const InterGridMap<dealii::DoFHandler<dim,spacedim> >                 &coarse_to_fine_grid_map,
+          const std::vector<dealii::Vector<double> >                            &parameter_dofs,
+	  const std::vector<types::global_dof_index>                            &weight_mapping)
       {
         // for each cell on the parameter grid: find out which degrees of
         // freedom on the fine grid correspond in which way to the degrees
@@ -2245,12 +2216,12 @@ namespace DoFTools
 
         // vector to hold the representation of a single degree of freedom
         // on the coarse grid (for the selected fe) on the fine grid
-        const types::global_dof_index n_fine_dofs = copy_data.weight_mapping.size();
+        const types::global_dof_index n_fine_dofs = weight_mapping.size();
 
         copy_data.dofs_per_cell = coarse_fe.dofs_per_cell;
         copy_data.parameter_dof_indices.resize(copy_data.dofs_per_cell);
 
-       
+
         // get the global indices of the parameter dofs on this
         // parameter grid cell
         cell->get_dof_indices (copy_data.parameter_dof_indices);
@@ -2260,7 +2231,7 @@ namespace DoFTools
         for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)
           if (coarse_fe.system_to_component_index(local_dof).first
               ==
-              copy_data.coarse_component)
+              coarse_component)
             {
               // the how-many-th parameter is this on this cell?
               const unsigned int local_parameter_dof
@@ -2282,19 +2253,21 @@ namespace DoFTools
 
       /**
        * This is a function that is called by the _2 function and that
-       * operates on one cell only. It is worked in parallel if 
+       * operates on one cell only. It is worked in parallel if
        * multhithreading is available.
        */
       template <int dim,int spacedim>
-      void copy_intergrid_weights_3(Assembler::CopyData<dim,spacedim> const                &copy_data,
-                                    FiniteElement<dim,spacedim> const                      &coarse_fe,
+      void copy_intergrid_weights_3(const Assembler::CopyData<dim,spacedim>                &copy_data,
+				    const unsigned int                                      coarse_component,
+                                    const FiniteElement<dim,spacedim>                      &coarse_fe,
+				    const std::vector<types::global_dof_index>             &weight_mapping,
                                     std::vector<std::map<types::global_dof_index, float> > &weights)
       {
         unsigned int pos(0);
         for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)
           if (coarse_fe.system_to_component_index(local_dof).first
               ==
-              copy_data.coarse_component)
+              coarse_component)
           {
               // now that we've got the global representation of each
               // parameter dof, we've only got to clobber the non-zero
@@ -2319,32 +2292,32 @@ namespace DoFTools
               // since it should happen rather rarely that there are
               // several threads operating on different intergrid
               // weights, have only one mutex for all of them
-              for (types::global_dof_index i=0; i<copy_data.global_parameter_representation[pos].size(); 
+              for (types::global_dof_index i=0; i<copy_data.global_parameter_representation[pos].size();
                   ++i)
                 // set this weight if it belongs to a parameter dof.
-                if (copy_data.weight_mapping[i] != numbers::invalid_dof_index)
+                if (weight_mapping[i] != numbers::invalid_dof_index)
                   {
                     // only overwrite old value if not by zero
                     if (copy_data.global_parameter_representation[pos](i) != 0)
                       {
                         const types::global_dof_index wi = copy_data.parameter_dof_indices[local_dof],
-                                                      wj = copy_data.weight_mapping[i];
+                                                      wj = weight_mapping[i];
                         weights[wi][wj] = copy_data.global_parameter_representation[pos](i);
-                      };
+                      }
                   }
                 else
                   Assert (copy_data.global_parameter_representation[pos](i) == 0,
                           ExcInternalError());
               ++pos;
             }
-       
+
       }
 
 
 
       /**
        * This is a helper function that is used in the computation of
-       * integrid constraints. See the function for a thorough description
+       * intergrid constraints. See the function for a thorough description
        * of how it works.
        */
       template <int dim, int spacedim>
@@ -2358,25 +2331,25 @@ namespace DoFTools
         std::vector<std::map<types::global_dof_index,float> > &weights)
       {
         Assembler::Scratch scratch;
-        Assembler::CopyData<dim,spacedim> copy_data(coarse_component,weight_mapping);
+        Assembler::CopyData<dim,spacedim> copy_data;
 
-        WorkStream::run(coarse_grid.begin_active(),coarse_grid.end(),
-            static_cast<std_cxx1x::function<void (typename dealii::DoFHandler<dim,spacedim>
-            ::active_cell_iterator const &,Assembler::Scratch const &,Assembler::CopyData<dim,spacedim> 
-            &)> > (
-		   std_cxx1x::bind(&compute_intergrid_weights_3<dim,spacedim>,
-				   std_cxx1x::_1,
-				   std_cxx1x::_2,
-				   std_cxx1x::_3,
-				   std_cxx1x::cref(coarse_grid.get_fe()),
-				   std_cxx1x::cref(coarse_to_fine_grid_map),
-				   std_cxx1x::cref(parameter_dofs))),
-			static_cast<std_cxx1x::function<void (Assembler
-            ::CopyData<dim,spacedim> const &)> > (
-						  std_cxx1x::bind(&copy_intergrid_weights_3<dim,spacedim>,
-								  std_cxx1x::_1,
-								  std_cxx1x::cref(coarse_grid.get_fe()),
-								  std_cxx1x::ref(weights))),
+        WorkStream::run(coarse_grid.begin_active(),
+			coarse_grid.end(),
+			std_cxx1x::bind(&compute_intergrid_weights_3<dim,spacedim>,
+					std_cxx1x::_1,
+					std_cxx1x::_2,
+					std_cxx1x::_3,
+					coarse_component,
+					std_cxx1x::cref(coarse_grid.get_fe()),
+					std_cxx1x::cref(coarse_to_fine_grid_map),
+					std_cxx1x::cref(parameter_dofs),
+					std_cxx1x::cref(weight_mapping)),
+			std_cxx1x::bind(&copy_intergrid_weights_3<dim,spacedim>,
+					std_cxx1x::_1,
+					coarse_component,
+					std_cxx1x::cref(coarse_grid.get_fe()),
+					std_cxx1x::cref(weight_mapping),
+					std_cxx1x::ref(weights)),
 			scratch,
 			copy_data);
       }
@@ -2889,16 +2862,16 @@ namespace DoFTools
           cell->at_boundary ())
       {
         const FiniteElement<dim,spacedim> &fe = cell->get_fe();
-        
+
         // get global indices of dofs on the cell
         cell_dofs.resize (fe.dofs_per_cell);
         cell->get_dof_indices (cell_dofs);
-        
+
         for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           {
             const typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
-          
+
             // if face is on the boundary and satisfies the correct
             // boundary id property
             if (face->at_boundary ()
@@ -2917,7 +2890,7 @@ namespace DoFTools
                   {
                     // Find out if a dof has a contribution in this
                     // component, and if so, add it to the list
-                    const std::vector<types::global_dof_index>::iterator it_index_on_cell 
+                    const std::vector<types::global_dof_index>::iterator it_index_on_cell
                       = std::find (cell_dofs.begin(), cell_dofs.end(), face_dofs[i]);
                     Assert (it_index_on_cell != cell_dofs.end(), ExcInvalidIterator());
                     const unsigned int index_on_cell = std::distance(cell_dofs.begin(),
