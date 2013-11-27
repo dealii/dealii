@@ -2221,10 +2221,12 @@ namespace DoFTools
         copy_data.dofs_per_cell = coarse_fe.dofs_per_cell;
         copy_data.parameter_dof_indices.resize(copy_data.dofs_per_cell);
 
-
         // get the global indices of the parameter dofs on this
         // parameter grid cell
         cell->get_dof_indices (copy_data.parameter_dof_indices);
+
+	// reset the output array to a pristine state
+	copy_data.global_parameter_representation.clear ();
 
         // loop over all dofs on this cell and check whether they are
         // interesting for us
@@ -2263,7 +2265,7 @@ namespace DoFTools
 				    const std::vector<types::global_dof_index>             &weight_mapping,
                                     std::vector<std::map<types::global_dof_index, float> > &weights)
       {
-        unsigned int pos(0);
+        unsigned int pos = 0;
         for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)
           if (coarse_fe.system_to_component_index(local_dof).first
               ==
