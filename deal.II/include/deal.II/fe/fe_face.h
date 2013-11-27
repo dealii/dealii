@@ -57,7 +57,7 @@ public:
    * shape functions created using this constructor correspond to Lagrange
    * polynomials in each coordinate direction.
    */
-  FE_FaceQ(unsigned int p);
+  FE_FaceQ (const unsigned int p);
 
   virtual FiniteElement<dim,spacedim> *clone() const;
 
