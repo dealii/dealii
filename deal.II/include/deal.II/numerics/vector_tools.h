@@ -451,11 +451,11 @@ namespace VectorTools
    * replaced by a hp::MappingCollection in
    * case of a hp::DoFHandler.
    */
-  template <class VECTOR, class DH>
-  void interpolate (const Mapping<DH::dimension,DH::space_dimension>    &mapping,
-                    const DH              &dof,
-                    const Function<DH::space_dimension>   &function,
-                    VECTOR                &vec);
+  template <class VECTOR, int dim, int spacedim, template <int,int> class DH>
+  void interpolate (const Mapping<dim,spacedim>    &mapping,
+                    const DH<dim,spacedim>         &dof,
+                    const Function<spacedim>       &function,
+                    VECTOR                         &vec);
 
   /**
    * Calls the @p interpolate()

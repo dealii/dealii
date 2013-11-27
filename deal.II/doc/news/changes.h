@@ -41,6 +41,19 @@ inconvenience this causes.
 
 <ol>
   <li>
+  Changed: The kinds of template arguments for the VectorTools::interpolate
+  function taking a Mapping as first argument has changed. This was done to
+  work around a bug in the Intel ICC compiler which led to linker errors. Since
+  the actual function argument list remains unchanged, the only way you will
+  notice this change is if you <i>explicitly</i> specify template arguments.
+  The only place one would typically do that is if you take the address of
+  a template function. Since this is not a common operation, the impact of this
+  change is probably limited.
+  <br>
+  (Wolfgang Bangerth, 2013/11/27)
+  </li>
+
+  <li>
   Changed: The ghost handling of the parallel::distributed::Vector class has
   been reworked: The vector now carries a global state that stores whether
   ghost elements have been updated or not. If a vector has ghost elements, it

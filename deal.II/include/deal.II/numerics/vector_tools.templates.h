@@ -74,24 +74,22 @@ DEAL_II_NAMESPACE_OPEN
 namespace VectorTools
 {
 
-  template <class VECTOR, class DH>
-  void interpolate (const Mapping<DH::dimension,DH::space_dimension>    &mapping,
-                    const DH              &dof,
-                    const Function<DH::space_dimension>   &function,
-                    VECTOR                &vec)
+  template <class VECTOR, int dim, int spacedim, template <int,int> class DH>
+  void interpolate (const Mapping<dim,spacedim>    &mapping,
+                    const DH<dim,spacedim>         &dof,
+                    const Function<spacedim>       &function,
+                    VECTOR                         &vec)
   {
-    const unsigned int dim=DH::dimension;
-
     Assert (dof.get_fe().n_components() == function.n_components,
             ExcDimensionMismatch(dof.get_fe().n_components(),
                                  function.n_components));
 
-    const hp::FECollection<DH::dimension,DH::space_dimension> fe (dof.get_fe());
+    const hp::FECollection<dim,spacedim> fe (dof.get_fe());
     const unsigned int          n_components = fe.n_components();
     const bool                  fe_is_system = (n_components != 1);
 
-    typename DH::active_cell_iterator cell = dof.begin_active(),
-                                      endc = dof.end();
+    typename DH<dim,spacedim>::active_cell_iterator cell = dof.begin_active(),
+						    endc = dof.end();
 
     // For FESystems many of the
     // unit_support_points will appear
@@ -180,7 +178,7 @@ namespace VectorTools
     const unsigned int max_rep_points = *std::max_element (n_rep_points.begin(),
                                                            n_rep_points.end());
     std::vector<types::global_dof_index> dofs_on_cell (fe.max_dofs_per_cell());
-    std::vector<Point<DH::space_dimension> >  rep_points (max_rep_points);
+    std::vector<Point<spacedim> >  rep_points (max_rep_points);
 
     // get space for the values of the
     // function at the rep support points.
@@ -199,9 +197,9 @@ namespace VectorTools
 
     // Transformed support points are computed by
     // FEValues
-    hp::MappingCollection<dim,DH::space_dimension> mapping_collection (mapping);
+    hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
 
-    hp::FEValues<dim, DH::space_dimension> fe_values (mapping_collection,
+    hp::FEValues<dim,spacedim> fe_values (mapping_collection,
                                                       fe, support_quadrature, update_quadrature_points);
 
     for (; cell!=endc; ++cell)
@@ -213,7 +211,7 @@ namespace VectorTools
           // get location of finite element
           // support_points
           fe_values.reinit(cell);
-          const std::vector<Point<DH::space_dimension> > &support_points =
+          const std::vector<Point<spacedim> > &support_points =
             fe_values.get_present_fe_values().get_quadrature_points();
 
           // pick out the representative
@@ -5218,11 +5216,11 @@ namespace VectorTools
         case H1_norm:
           exponent = 2.;
           break;
-	  
+
         case L1_norm:
           exponent = 1.;
           break;
-	  
+
         default:
           break;
         }
@@ -5247,7 +5245,7 @@ namespace VectorTools
           if (spacedim == dim+1)
 	    update_flags |= UpdateFlags (update_normal_vectors);
           // no break!
-	  
+
         default:
           update_flags |= UpdateFlags (update_values);
           break;
