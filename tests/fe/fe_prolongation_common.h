@@ -66,13 +66,13 @@ inline void
 check_prolongation (FiniteElement<dim> &fe, const char *name)
 {
   deallog << name << '<' << dim << '>' << " constraint " << std::endl;
-  print_formatted (fe.constraints(), 7, 10);
+  print_formatted (fe.constraints(), 8, 10);
 
   for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_cell; ++i)
     {
       deallog << name << '<' << dim << '>' << " prolongation " << i << std::endl;
       if (fe.isotropic_prolongation_is_implemented())
-        print_formatted (fe.get_prolongation_matrix(i), 6, 8);
+        print_formatted (fe.get_prolongation_matrix(i), 8, 8);
     }
 }
 
