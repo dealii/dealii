@@ -16,6 +16,20 @@
  download the development version of the library.
 */
 
+#include <algorithm>
+#include <assert.h>
+#include <cctype>
+#include <iostream>
+#include <limits>
+#include <list>
+#include <map>
+#include <set>
+#include <sstream>
+#include <stdint.h>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "fpconfig.hh"
 #ifdef FP_SUPPORT_OPTIMIZER
 #include "fparser.hh"
@@ -1181,7 +1195,6 @@ x83
 int
 lI2;
 #else
-#include <stdint.h>
 typedef
 uint_least32_t
 lI2;
@@ -1296,7 +1309,6 @@ Birth(){Have(p);}
 nG
 Set(Ref*p2){Have(p2);iC2;p=p2;}
 #endif
-#include <utility>
 e72
 Compare2ndRev{nN1
 T>inline
@@ -1344,7 +1356,6 @@ long
 xE1;
 #define FPHASH_CONST(x) x##ULL
 #else
-#include <stdint.h>
 typedef
 uint_fast64_t
 xE1;
@@ -1369,8 +1380,6 @@ fphash_t&yZ1!=e82?hash1<e82:hash2<e92}
 #ifndef FPOptimizer_CodeTreeHH
 #define FPOptimizer_CodeTreeHH
 #ifdef FP_SUPPORT_OPTIMIZER
-#include <vector>
-#include <utility>
 l33
 lA1{e72
 Grammar;}
@@ -1644,7 +1653,6 @@ eM3&indent="\\"
 #endif
 #ifndef FPOptimizer_GrammarHH
 #define FPOptimizer_GrammarHH
-#include <iostream>
 t5{tK1
 class
 c02;}
@@ -1768,9 +1776,6 @@ fp_const_negativezero()yP-Epsilon
 xF::value;}
 }
 #ifdef FP_SUPPORT_OPTIMIZER
-#include <vector>
-#include <utility>
-#include <iostream>
 nG1{using
 l33
 lA1;using
@@ -1946,16 +1951,11 @@ FPoptimizer_Optimize::tC
 info,e32
 tO3,std::ostream&o=cV2);}
 #endif
-#include <string>
 e42
 lA1::nZ2
 yT1=false);e42
 iU1
 yT1=false);
-#include <string>
-#include <sstream>
-#include <assert.h>
-#include <iostream>
 using
 l33
 lA1;using
@@ -2163,8 +2163,6 @@ tmp.str();
 #endif
 }
 #ifdef FP_SUPPORT_OPTIMIZER
-#include <vector>
-#include <utility>
 #ifndef FP_GENERATING_POWI_TABLE
 enum{MAX_POWI_BYTECODE_LENGTH=20}
 ;
@@ -3226,9 +3224,6 @@ ConstantFolding_MulLogicItems(iM3(tree.GetOpcode()==cMul)i1
 nI
 iH2,false);}
 }
-#include <vector>
-#include <map>
-#include <algorithm>
 l33{using
 l33
 FUNCTIONPARSERTYPES;using
@@ -4209,7 +4204,6 @@ c81
 cM1)n4
 eE3
 t23}
-#include <limits>
 l33{using
 l33
 FUNCTIONPARSERTYPES;using
@@ -4605,8 +4599,6 @@ break;yF3
 xY3
 return
 t23}
-#include <list>
-#include <algorithm>
 #ifdef FP_SUPPORT_OPTIMIZER
 using
 l33
@@ -4959,11 +4951,6 @@ eB1
 }
 #endif
 #ifdef FP_SUPPORT_OPTIMIZER
-#include <sstream>
-#include <string>
-#include <map>
-#include <set>
-#include <iostream>
 using
 l33
 FUNCTIONPARSERTYPES;
@@ -5057,7 +5044,6 @@ l33
 lA1;using
 l33
 FUNCTIONPARSERTYPES;
-#include <cctype>
 l33
 lA1{x83
 ParamSpec_GetDepCode
@@ -5191,7 +5177,6 @@ depcode=ParamSpec_GetDepCode(param);if(depcode!=0)o<<"@D"
 <<depcode;}
 }
 }
-#include <algorithm>
 using
 l33
 lA1;using
