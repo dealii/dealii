@@ -120,7 +120,7 @@ void do_check (const FiniteElement<dim> &coarse_fe,
 int main ()
 {
   std::ofstream logfile(logname);
-  deallog << std::setprecision (3);
+  deallog << std::setprecision (6);
 
   deallog.attach(logfile);
   deallog.depth_console(0);
