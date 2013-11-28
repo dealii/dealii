@@ -14,6 +14,16 @@
 <body>
 <h1>How to use CMake to configure your projects with <acronym>deal.II</acronym></h1>
 
+<p>
+  <code>cmake</code> is controlled by input files that by convention are
+  called <code>CMakeLists.txt</code>, listing both configuration commands
+  as well as dependencies between source files and targets.
+  This page presents some <code>CMakeLists.txt</code> examples for
+  potential use in your projects. (A detailed description of the
+  <acronym>deal.II</acronym> project configuration is given in the
+  <a href="cmake.html" target="body">deal.II CMake ReadMe</a>.)
+</p>
+
 <div class="toc">
   <ol>
     <li><a href="#cmakesimple">Simple <code>CMakeLists.txt</code></a>
@@ -42,26 +52,6 @@
     <li><a href="#legacy">Legacy <code>Make.global_options</code></a></li>
   </ol>
 </div>
-
-<p>
-  <code>cmake</code> is the configuration and build tool we use
-  in <acronym>deal.II</acronym>. Its advantage is not only that it makes
-  configuration of <acronym>deal.II</acronym> itself simpler across
-  platforms (compared to the older <code>autoconf/make</code> combination)
-  but also that it <i>exports</i> information about the deal.II
-  configuration that makes it particularly simple for projects
-  using <acronym>deal.II</acronym> to configure and link against it.
-</p>
-
-<p>
-  <code>cmake</code> is controlled by input files that by convention are
-  called <code>CMakeLists.txt</code>, listing both configuration commands
-  as well as dependencies between source files and targets.
-  This page presents some <code>CMakeLists.txt</code> examples for
-  potential use in your projects. (A detailed description of the
-  <acronym>deal.II</acronym> project configuration is given in the
-  <a href="cmake.html" target="body">deal.II CMake ReadMe</a>.)
-</p>
 
 <a name="cmakesimple"></a>
 <h2>Simple CMakeLists.txt</h2>
@@ -827,21 +817,19 @@ DEAL_II_WITH_ZLIB
       the <acronym>deal.II</acronym> directory tree.
       The CMake build system sets up the following compatibility files (if
       <code>DEAL_II_COMPONENT_COMPAT_FILES</code> is set, which is default):
-      <pre>
-
-    ${CMAKE_INSTALL_PREFIX}
-        ./common/Make.global_options
-        ./common/scripts/expand_instantiations
-        ./common/scripts/make_dependencies
-        ./common/scripts/report_features
-      </pre>
+<pre>
+${CMAKE_INSTALL_PREFIX}/
+    common/Make.global_options
+    common/scripts/expand_instantiations
+    common/scripts/make_dependencies
+    common/scripts/report_features
+</pre>
 
       Therefore, it should be sufficient to set <code>D</code> in the old
       user Makefiles to:
-      <pre>
-
-    D=/path/install/dir
-      </pre>
+<pre>
+D=/path/install/dir
+</pre>
       where <code>/path/install/dir</code> is the directory set up via
       <code>CMAKE_INSTALL_PREFIX</code> (the path
       <acronym>deal.II</acronym> was installed to).

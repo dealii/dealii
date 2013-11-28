@@ -3,33 +3,33 @@
 //
 
 body {
-	background-image: none;
-	background-color: #ECF0F4; 
-	color: Black;
-	margin: 10px;
-	padding: 0;
-	font-family: sans-serif;
-	counter-reset: section;
+    background-image: none;
+    background-color: #ECF0F4; 
+    color: Black;
+    margin: 10px;
+    padding: 0;
+    font-family: sans-serif;
+    counter-reset: section;
 }
 
 body.title {
-	background-color: #CCD8E8; 
-	margin: 0;
-	padding: 2px;
+    background-color: #CCD8E8; 
+    margin: 0;
+    padding: 2px;
 }
 
 body.gallery {
-	background-color: #CCD8E8; 
-	margin: 0;
-	padding: 2px;
+    background-color: #CCD8E8; 
+    margin: 0;
+    padding: 2px;
 }
 
 body.navbar {
-	background-color: #CCD8E8; 
-	margin: 2px;
-	padding: 2px;
-	font-family: sans-serif;
-	font-size: 12px;
+    background-color: #CCD8E8; 
+    margin: 2px;
+    padding: 2px;
+    font-family: sans-serif;
+    font-size: 12px;
 }
 
 div.toc {
@@ -67,9 +67,9 @@ div.quick:before {
 }
 
 frameset {
-	background-color: white;
-	border-color: black;
-	border: 2px;
+    background-color: white;
+    border-color: black;
+    border: 2px;
 }
 
 a:hover { text-decoration: underline; }
@@ -102,13 +102,13 @@ div.fixedhead {
 }
 
 h1.head {
-	position:relative;
+    position:relative;
         text-align:center;
-	font-weight: bold;
-	color:black;
-	padding-top: 0;
-	padding-bottom: 0;
-	border-bottom: 0;
+    font-weight: bold;
+    color:black;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -207,52 +207,52 @@ q {
 }
 
 .figure     { font-weight: bold;
-	      font-size: larger;
-	    }
+          font-size: larger;
+        }
 
 .pagetoc    {}
 
 .chapter_title {}
 
 span.parhead {
-	font-weight: bold;
-} 	
+    font-weight: bold;
+}     
 
 span.example {
-	font-weight: bold;
-	font-style: italic;
+    font-weight: bold;
+    font-style: italic;
 }
 
 pre {
-	padding: 0em;
-	text-align: left;
-	text-indent: 0;
-	border: 1px dashed #2f6fab;
-	color: Black;
-	background-color: #f9f9f9;
-	line-height: 1.1em;
+    padding: 1em;
+    text-align: left;
+    text-indent: 0;
+    border: 1px dashed #2f6fab;
+    color: Black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
 }
-	
+    
 pre.cmake {
-	padding: 1em;
-	text-align: left;
-	text-indent: 0;
-	border: 1px solid #d06fab;
-	color: Black;
-	background-color: #f9f9f9;
-	line-height: 1.1em;
+    padding: 1em;
+    text-align: left;
+    text-indent: 0;
+    border: 1px solid #d06fab;
+    color: Black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
 }
-	
+    
 pre.sample {
-	padding: 1em;
-	text-align: left;
-	text-indent: 0;
-	border: 1px dashed #2f6fab;
-	color: Black;
-	background-color: #f9f9f9;
-	line-height: 1.1em;
+    padding: 1em;
+    text-align: left;
+    text-indent: 0;
+    border: 1px dashed #2f6fab;
+    color: Black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
 }
-	
+    
 table.navbar { }
 table.tutorial {
     color: black;
@@ -281,9 +281,9 @@ code {
 }
 
 td.build {
-	text-align: center;
-	vertical-align: middle;
-	font-size: small;
+    text-align: center;
+    vertical-align: middle;
+    font-size: small;
 }
 
 
@@ -308,8 +308,8 @@ td.build {
 }
 
 .weak {
-	color: #808080;
-	text-decoration: line-through;
+    color: #808080;
+    text-decoration: line-through;
 }
 
 .todo:before {
@@ -321,16 +321,30 @@ td.build {
 }
 
 .deprecated {
-	text-decoration: line-through;
+    text-decoration: line-through;
 }
 
 .attention {
-	color: #f00080;
-	font-weight: bold;
+    color: #f00080;
+    font-weight: bold;
 }
 
 .shout {
-	color: #e000ff;
-	text-decoration: blink;
-	font-weight: bold;
+    color: #e000ff;
+    text-decoration: blink;
+    font-weight: bold;
+}
+
+div.border {
+    clear: both;
+    margin: auto;
+}
+
+div.infobox {
+    float: left;
+    width: 250px;
+    text-align: center;
+    margin-top: 1em;
+    margin-left: 20px;
+    margin-right: 20px;
 }

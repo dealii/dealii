@@ -74,31 +74,31 @@
     function/variable declaration, global function or namespace, may
     be preceded by a comment of the following form:
     </p>
-    <pre>
-      /**
-       * This is an example documentation.
-       *
-       * @author Wolfgang Bangerth, 2000
-       */
-      class TestClass
-      {
-        public:
-                 /**
-                  * Constructor
-                  */
-          TestClass ();
+<pre>
+/**
+ * This is an example documentation.
+ *
+ * @author Wolfgang Bangerth, 2000
+ */
+class TestClass
+{
+  public:
+           /**
+            * Constructor
+            */
+    TestClass ();
 
-                 /**
-                  * Example function
-                  */
-          virtual void test () const = 0;
+           /**
+            * Example function
+            */
+    virtual void test () const = 0;
 
-                 /**
-                  * Member variable
-                  */
-          const unsigned int abc;
-      };
-    </pre>
+           /**
+            * Member variable
+            */
+    const unsigned int abc;
+};
+</pre>
     <p>
     <acronym>doxygen</acronym> will then generate a page for the class
     <code>TestClass</code> and document each of the member functions
@@ -128,14 +128,14 @@
 
     <li> <em>Itemized lists:</em>
          By writing comments like the following,
-         <pre>
-           /**
-            * &lt;ul&gt;
-            *   &lt;li&gt; foo
-            *   &lt;li&gt; bar
-            * &lt;/ul&gt;
-            */
-         </pre>
+<pre>
+/**
+ * &lt;ul&gt;
+ *   &lt;li&gt; foo
+ *   &lt;li&gt; bar
+ * &lt;/ul&gt;
+ */
+</pre>
          you can get itemized lists both in the online and printed
          documentation:
          <ul>
@@ -153,24 +153,24 @@
          <p>
          If you write comments like this,
          </p>
-         <pre>
-           /**
-            * @verbatim
-            *   void foobar ()
-            *   {
-            *     i = 0;
-            *   }
-            * @endverbatim
-            */
-         </pre>
+<pre>
+/**
+ * @verbatim
+ *   void foobar ()
+ *   {
+ *     i = 0;
+ *   }
+ * @endverbatim
+ */
+</pre>
          you will get the lines between the verbatim environment with
          the same formatting and in typewriter font:
-         <pre>
-     void foobar ()
-     {
-       i = 0;
-     }
-         </pre>
+<pre>
+void foobar ()
+{
+  i = 0;
+}
+</pre>
          This is useful if you want to include small sample code snippets
          into your documentation. In particular, it is important that
          the formatting is preserved, which is not the case for all
@@ -232,15 +232,15 @@
          preprocessor symbol <tt>DOXYGEN</tt> when running
          <acronym>doxygen</acronym>. Therefore, the following template can be
          used to avoid documentation:</p>
-         <pre>
-         documented code here
+<pre>
+/* documented code here */
 
-         #ifndef DOXYGEN
+#ifndef DOXYGEN
 
-         code here is compiled, but ignored by doxygen
+/* code here is compiled, but ignored by doxygen */
 
-         #endif // DOXYGEN
-         </pre>
+#endif // DOXYGEN
+</pre>
     </ul>
 
     <h3>Code examples for the usage of single classes</h3>

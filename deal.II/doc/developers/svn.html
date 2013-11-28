@@ -60,23 +60,22 @@
 
       <ol>
 	<li> Create the branch using
-	  <pre>
-	    svn copy https://svn.dealii.org/trunk/ https://svn.dealii.org/branches/new-branch-name
-	  </pre>
+<pre>
+$ svn copy https://svn.dealii.org/trunk/ https://svn.dealii.org/branches/new-branch-name
+</pre>
 
 	<li> Either check out the new branch or switch your working copy by
-	  <pre>
-	    svn switch https://svn.dealii.org/branches/new-branch-name
-	  </pre>
+<pre>
+$ svn switch https://svn.dealii.org/branches/new-branch-name
+</pre>
 	  This command assumes you are in the top level directory, the one
 	  containing <tt>deal.II</tt> and <tt>tests</tt>
 
 	<li> After some development of the branch, if you want to merge changes
 	  that have been made on mainline in the meantime, you can use this command:
-	  <pre>
-
-	    svn merge ^/trunk
-	  </pre>
+<pre>
+$ svn merge ^/trunk
+</pre>
 	  This command will only run if you have no local changes in your working
 	  directory for the branch, and will modify all of your files by merging
 	  the changes made on mainline. If there are no conflicts that need to be
