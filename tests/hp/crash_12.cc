@@ -115,7 +115,7 @@ void test ()
 int main ()
 {
   std::ofstream logfile(logname);
-  logfile.precision (4);
+  logfile.precision (7);
 
   deallog.attach(logfile);
   deallog.depth_console(0);

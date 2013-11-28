@@ -114,7 +114,7 @@ void compute_pi_by_area ()
 
       ConvergenceTable table;
 
-      for (unsigned int refinement=0; refinement<6;
+      for (unsigned int refinement=0; refinement < (degree != 4 ? 6 : 4);
            ++refinement, triangulation.refine_global (1))
         {
           table.add_value("cells", triangulation.n_active_cells());
@@ -179,7 +179,7 @@ void compute_pi_by_perimeter ()
                                               update_JxW_values);
       ConvergenceTable table;
 
-      for (unsigned int refinement=0; refinement<6;
+      for (unsigned int refinement=0; refinement < (degree != 4 ? 6 : 4);
            ++refinement, triangulation.refine_global (1))
         {
           table.add_value("cells", triangulation.n_active_cells());

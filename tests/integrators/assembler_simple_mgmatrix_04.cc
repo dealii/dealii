@@ -168,7 +168,7 @@ void test(FiniteElement<dim> &fe)
 
   for (unsigned int level=0;level<tr.n_levels();++level)
   {
-    const unsigned int prec = 1;
+    const unsigned int prec = 6;
     const unsigned int wd = 5;
     
     deallog << "Level " << level << std::endl << "mg" << std::endl;
