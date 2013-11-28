@@ -69,6 +69,20 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 }
 
 
+for (deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+  
+    parallel::distributed::Triangulation<deal_II_space_dimension>::active_cell_iterator
+    find_active_cell_around_point (const parallel::distributed::Triangulation<deal_II_space_dimension> &,
+				   const Point<deal_II_space_dimension> &p);
+
+  
+    std::pair<parallel::distributed::Triangulation<deal_II_space_dimension>::active_cell_iterator, Point<deal_II_space_dimension> >
+    find_active_cell_around_point (const Mapping<deal_II_space_dimension> &,
+				   const parallel::distributed::Triangulation<deal_II_space_dimension> &,
+				   const Point<deal_II_space_dimension> &);
+}
+
 
 for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
 {
