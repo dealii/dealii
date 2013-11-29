@@ -25,7 +25,7 @@ char logname[] = "output";
 template <int dim>
 void test ()
 {
-  deallog << std::setprecision (4);
+  deallog << std::setprecision (6);
   for (unsigned int i=1; i<4; ++i)
     for (unsigned int j=i; j<4; ++j)
       if (j%i == 0)
