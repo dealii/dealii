@@ -5442,9 +5442,17 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_values (const VectorizedArray<Number> in [],
                 VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
+  // for linear elements, the even-odd decomposition is slower than the plain
+  // evaluation (additions to create the symmetric and anti-symmetric part),
+  // for all other orders, we choose even-odd
+  if (fe_degree > 1 || n_q_points_1d > 3)
+    internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
            VectorizedArray<Number>, direction, dof_to_quad, add, 0>
            (shape_val_evenodd, in, out);
+  else
+    internal::apply_tensor_product_values<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
+           (this->data.shape_values.begin(), in, out);
 }
 
 
@@ -5458,9 +5466,14 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_gradients (const VectorizedArray<Number> in [],
                    VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
+  if (fe_degree > 1 || n_q_points_1d > 3)
+    internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
            VectorizedArray<Number>, direction, dof_to_quad, add, 1>
            (shape_gra_evenodd, in, out);
+  else
+    internal::apply_tensor_product_gradients<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
+           (this->data.shape_gradients.begin(), in, out);
 }
 
 
@@ -5477,9 +5490,14 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_hessians (const VectorizedArray<Number> in [],
                   VectorizedArray<Number>       out [])
 {
-  internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
+  if (fe_degree > 1 || n_q_points_1d > 3)
+    internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
            VectorizedArray<Number>, direction, dof_to_quad, add, 2>
            (shape_hes_evenodd, in, out);
+  else
+    internal::apply_tensor_product_hessians<dim,fe_degree,n_q_points_1d,
+           VectorizedArray<Number>, direction, dof_to_quad, add>
+           (this->data.shape_hessians.begin(), in, out);
 }
 
 
