@@ -69,14 +69,14 @@ CONFIGURE_FILE(
 #
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/header.html
-  ${CMAKE_CURRENT_BINARY_DIR}/footer.html
+    ${CMAKE_CURRENT_BINARY_DIR}/footer.html
   COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html style.css options.dox
   COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl header.html
   COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl footer.html
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/options.dox
-  ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
-  ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl
+    ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
+    ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl
   )
 
 #
@@ -132,7 +132,7 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html
     ${_doxygen_input}
-  COMMENT "Generating documentation via doxygen. This may take a _really_ long time..."
+  COMMENT "Generating documentation via doxygen."
   VERBATIM
   )
 ADD_CUSTOM_TARGET(doxygen ALL
