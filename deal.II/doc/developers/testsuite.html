@@ -81,18 +81,17 @@
 
     <p>
       If you're impatient, use the following commands:
-      <pre>
-
-    $ mkdir new_directory
-    $ cd new_directory
-    $ svn checkout https://svn.dealii.org/trunk .
-    $ mkdir build
-    $ cd build
-    $ cmake ../deal.II
-    $ make -j16
-    $ make -j16 setup_tests
-    $ ctest -j16
-      </pre>
+<pre>
+$ mkdir new_directory
+$ cd new_directory
+$ svn checkout https://svn.dealii.org/trunk .
+$ mkdir build
+$ cd build
+$ cmake ../deal.II
+$ make -j16
+$ make -j16 setup_tests
+$ ctest -j16
+</pre>
       The exact meaning of all of these commands will be explained in much
       greater detail below.
     </p>
@@ -111,19 +110,17 @@
       To download the testsuite, check it out from the subversion repository,
       along with deal.II. To this end, go to an empty directory where you
       want to test deal.II and do this:
-      <pre>
-
-    $ svn checkout https://svn.dealii.org/trunk .
-      </pre>
+<pre>
+$ svn checkout https://svn.dealii.org/trunk .
+</pre>
       (The period at the end puts everything from under <code>trunk/</code>
       into the current directory, rather than creating a
       new <code>trunk/</code> directory.) You will then have
       two folders:
-      <pre>
-
-    ./deal.II
-    ./tests
-      </pre>
+<pre>
+./deal.II
+./tests
+</pre>
     </p>
 
     <p>
@@ -132,10 +129,9 @@
       (<code>../tests</code>). If your test directory is at a different
       location you have to hint during configuration by specifying
       <code>TEST_DIR</code>:
-      <pre>
-
-    $ cmake -DTEST_DIR=&lt;...&gt;
-      </pre>
+<pre>
+$ cmake -DTEST_DIR=&lt;...&gt;
+</pre>
     </p>
 
     <a name="setupconfigure"></a>
@@ -145,10 +141,9 @@
       To enable the testsuite, configure and build deal.II in a build
       directory as normal (installation is not necessary). After that you
       can setup the testsuite via the "setup_tests" target:s
-      <pre>
-
-    $ make setup_tests
-      </pre>
+<pre>
+$ make setup_tests
+</pre>
       This will set up all tests supported by the current configuration.
       The testsuite can now be run in the current <i>build directory</i> as
       described below.
@@ -156,39 +151,37 @@
 
     <p>
       Setup can be fine-tuned using the following commands:
-      <pre>
+<pre>
+$ make regen_tests - reruns configure stage in every testsuite subproject
 
-    $ make regen_tests - reruns configure stage in every testsuite subproject
+$ make clean_tests - runs the 'clean' target in every testsuite subproject
 
-    $ make clean_tests - runs the 'clean' target in every testsuite subproject
-
-    $ make prune_tests - removes all testsuite subprojects
-      </pre>
+$ make prune_tests - removes all testsuite subprojects
+</pre>
 
     <p>
       In addition, when setting up the testsuite, the following environment
       variables can be used to override default behavior when
       calling <code>make setup_tests</code>:
-      <pre>
+<pre>
+TEST_DIFF
+  - The diff tool and command line to use for comparison. If numdiff is
+    available it defaults to "numdiff -a 1e-6 -q", otherwise plain diff
+    is used.
 
-    TEST_DIFF
-      - The diff tool and command line to use for comparison. If numdiff is
-        available it defaults to "numdiff -a 1e-6 -q", otherwise plain diff
-        is used.
+TEST_TIME_LIMIT
+  - The time limit (in seconds) a single test is allowed to take. Defaults
+    to 180 seconds
 
-    TEST_TIME_LIMIT
-      - The time limit (in seconds) a single test is allowed to take. Defaults
-        to 180 seconds
+TEST_PICKUP_REGEX
+  - A regular expression to select only a subset of tests during setup.
+    An empty string is interpreted as a catchall (this is the default).
 
-    TEST_PICKUP_REGEX
-      - A regular expression to select only a subset of tests during setup.
-        An empty string is interpreted as a catchall (this is the default).
-
-    TEST_OVERRIDE_LOCATION
-      - If TEST_OVERRIDE_LOCATION is set, a comparison file category/test.output
-        will be substituted by ${TEST_OVERRIDE_LOCATION}/category/test.output if
-        the latter exists.
-      </pre>
+TEST_OVERRIDE_LOCATION
+  - If TEST_OVERRIDE_LOCATION is set, a comparison file category/test.output
+    will be substituted by ${TEST_OVERRIDE_LOCATION}/category/test.output if
+    the latter exists.
+</pre>
     </p>
 
     <a name="run"></a>
@@ -196,10 +189,9 @@
 
     <p>
       The testsuite can now be run in the <i>build directory</i> via
-      <pre>
-
-    $ ctest [-j N]
-      </pre>
+<pre>
+$ ctest [-j N]
+</pre>
       Here, <code>N</code> is the number of concurrent tests that should be
       run, in the same way as you can say <code>make -jN</code>. The testsuite
       is huge and will need around 12h on current computers 
@@ -210,11 +202,10 @@
       If you only want to run a subset of tests
       matching a regular expression, or if you want to exclude tests matching
       a regular expression, you can use
-      <pre>
-
-    $ ctest [-j N] -R '&lt;positive regular expression&gt;'
-    $ ctest [-j N] -E '&lt;negative regular expression&gt;'
-      </pre>
+<pre>
+$ ctest [-j N] -R '&lt;positive regular expression&gt;'
+$ ctest [-j N] -E '&lt;negative regular expression&gt;'
+</pre>
     </p>
 
     <p>
@@ -236,69 +227,67 @@
 
     <p>
       A typical output of a <code>ctest</code> invocation looks like:
-      <pre>
+<pre>
+$ ctest -j4 -R "base/thread_validity"
+Test project /tmp/trunk/build
+      Start 747: base/thread_validity_01.debug
+      Start 748: base/thread_validity_01.release
+      Start 775: base/thread_validity_05.debug
+      Start 776: base/thread_validity_05.release
+ 1/24 Test #776: base/thread_validity_05.release ...   Passed    1.89 sec
+ 2/24 Test #748: base/thread_validity_01.release ...   Passed    1.89 sec
+      Start 839: base/thread_validity_03.debug
+      Start 840: base/thread_validity_03.release
+ 3/24 Test #747: base/thread_validity_01.debug .....   Passed    2.68 sec
+[...]
+      Start 1077: base/thread_validity_08.debug
+      Start 1078: base/thread_validity_08.release
+16/24 Test #1078: base/thread_validity_08.release ...***Failed    2.86 sec
+18/24 Test #1077: base/thread_validity_08.debug .....***Failed    3.97 sec
+[...]
 
-    $ ctest -j4 -R "base/thread_validity"
-    Test project /tmp/trunk/build
-          Start 747: base/thread_validity_01.debug
-          Start 748: base/thread_validity_01.release
-          Start 775: base/thread_validity_05.debug
-          Start 776: base/thread_validity_05.release
-     1/24 Test #776: base/thread_validity_05.release ...   Passed    1.89 sec
-     2/24 Test #748: base/thread_validity_01.release ...   Passed    1.89 sec
-          Start 839: base/thread_validity_03.debug
-          Start 840: base/thread_validity_03.release
-     3/24 Test #747: base/thread_validity_01.debug .....   Passed    2.68 sec
-    [...]
-          Start 1077: base/thread_validity_08.debug
-          Start 1078: base/thread_validity_08.release
-    16/24 Test #1078: base/thread_validity_08.release ...***Failed    2.86 sec
-    18/24 Test #1077: base/thread_validity_08.debug .....***Failed    3.97 sec
-    [...]
+92% tests passed, 2 tests failed out of 24
 
-    92% tests passed, 2 tests failed out of 24
+Total Test time (real) =  20.43 sec
 
-    Total Test time (real) =  20.43 sec
-
-    The following tests FAILED:
-            1077 - base/thread_validity_08.debug (Failed)
-            1078 - base/thread_validity_08.release (Failed)
-    Errors while running CTest
-      </pre>
+The following tests FAILED:
+        1077 - base/thread_validity_08.debug (Failed)
+        1078 - base/thread_validity_08.release (Failed)
+Errors while running CTest
+</pre>
       If a test failed (like <code>base/thread_validity_08.debug</code> in above
       example output), you might want to find out what exactly went wrong. To
       this end, you can search
       through <code>Testing/Temporary/LastTest.log</code> for the exact output
       of the test, or you can rerun this one test, specifying <code>-V</code>
       to select verbose output of tests:
-      <pre>
+<pre>
+$ ctest -V -R "base/thread_validity_08.debug"
+[...]
+test 1077
+    Start 1077: base/thread_validity_08.debug
 
-    $ ctest -V -R "base/thread_validity_08.debug"
-    [...]
-    test 1077
-        Start 1077: base/thread_validity_08.debug
-
-    1077: Test command: [...]
-    1077: Test timeout computed to be: 600
-    1077: Test base/thread_validity_08.debug: RUN
-    1077: ===============================   OUTPUT BEGIN  ===============================
-    1077: Built target thread_validity_08.debug
-    1077: Generating thread_validity_08.debug/output
-    1077: terminate called without an active exception
-    1077: /bin/sh: line 1: 18030 Aborted [...]/thread_validity_08.debug
-    1077: base/thread_validity_08.debug: BUILD successful.
-    1077: base/thread_validity_08.debug: RUN failed. Output:
-    1077: DEAL::OK.
-    1077: gmake[3]: *** [thread_validity_08.debug/output] Error 1
-    1077: gmake[2]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/all] Error 2
-    1077: gmake[1]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/rule] Error 2
-    1077: gmake: *** [thread_validity_08.debug.diff] Error 2
-    1077:
-    1077:
-    1077: base/thread_validity_08.debug: ******    RUN failed    *******
-    1077:
-    1077: ===============================    OUTPUT END   ===============================
-      </pre>
+1077: Test command: [...]
+1077: Test timeout computed to be: 600
+1077: Test base/thread_validity_08.debug: RUN
+1077: ===============================   OUTPUT BEGIN  ===============================
+1077: Built target thread_validity_08.debug
+1077: Generating thread_validity_08.debug/output
+1077: terminate called without an active exception
+1077: /bin/sh: line 1: 18030 Aborted [...]/thread_validity_08.debug
+1077: base/thread_validity_08.debug: BUILD successful.
+1077: base/thread_validity_08.debug: RUN failed. Output:
+1077: DEAL::OK.
+1077: gmake[3]: *** [thread_validity_08.debug/output] Error 1
+1077: gmake[2]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/all] Error 2
+1077: gmake[1]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/rule] Error 2
+1077: gmake: *** [thread_validity_08.debug.diff] Error 2
+1077:
+1077:
+1077: base/thread_validity_08.debug: ******    RUN failed    *******
+1077:
+1077: ===============================    OUTPUT END   ===============================
+</pre>
       So this specific test aborted in the <code>RUN</code> stage.
     </p>
 
@@ -306,25 +295,23 @@
       The general output for a successful test <code>&lt;test&gt;</code> in
       category <code>&lt;category&gt;</code> for build type
       <code>&lt;build&gt;</code> is
-      <pre>
-
-    xx: Test &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: PASSED
-    xx: ===============================   OUTPUT BEGIN  ===============================
-    xx: [...]
-    xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: PASSED.
-    xx: ===============================    OUTPUT END   ===============================
-      </pre>
+<pre>
+xx: Test &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: PASSED
+xx: ===============================   OUTPUT BEGIN  ===============================
+xx: [...]
+xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: PASSED.
+xx: ===============================    OUTPUT END   ===============================
+</pre>
       And for a test that fails in stage <code>&lt;stage&gt;</code>:
-      <pre>
-
-    xx: Test &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: &lt;stage&gt;
-    xx: ===============================   OUTPUT BEGIN  ===============================
-    xx: [...]
-    xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: &lt;stage&gt; failed. [...]
-    xx:
-    xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: ******    &lt;stage&gt; failed    *******
-    xx: ===============================    OUTPUT END   ===============================
-      </pre>
+<pre>
+xx: Test &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: &lt;stage&gt;
+xx: ===============================   OUTPUT BEGIN  ===============================
+xx: [...]
+xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: &lt;stage&gt; failed. [...]
+xx:
+xx: &lt;category&gt;/&lt;test&gt;.&lt;build&gt;: ******    &lt;stage&gt; failed    *******
+xx: ===============================    OUTPUT END   ===============================
+</pre>
       Hereby, <code>&lt;stage&gt;</code> indicates the stage in which the
       test failed:
       <ul>
@@ -387,11 +374,10 @@
     <p>
       A test usually consists of a source file and an output file for
       comparison (under the testsuite directory <code>tests</code>):
-      <pre>
-
-    category/test.cc
-    category/test.output
-      </pre>
+<pre>
+category/test.cc
+category/test.output
+</pre>
       <code>category</code> will be one of the existing subdirectory
       under <code>tests/</code>, e.g., <code>lac/</code>, <code>base/</code>,
       or <code>mpi/</code>. Historically, we have grouped tests into the
@@ -446,30 +432,27 @@
     <p>
       Comparison file can actually be named in a more complex way than
       just <code>category/test.output</code>:
-      <pre>
-
-    category/test.[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
-      </pre>
+<pre>
+category/test.[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
+</pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
       If a specific test can only be run in debug or release configurations but
       not in both it is possible to restrict the setup by prepeding
       <code>.debug</code> or <code>.release</code> directly before
       <code>.output</code>, e.g.:
-      <pre>
-
-    category/test.debug.output
-      </pre>
+<pre>
+category/test.debug.output
+</pre>
       This way, the test will only be set up to build and run against the debug
       library. If a test should run in both configurations but, for some
       reason, produces different output (e.g., because it triggers an
       assertion in debug mode), then you can just provide two different output
       files:
-      <pre>
-
-    category/test.debug.output
-    category/test.release.output
-      </pre>
+<pre>
+category/test.debug.output
+category/test.release.output
+</pre>
     </p>
 
 
@@ -478,24 +461,21 @@
     <p>
       In a similar vain as for build configurations, it is possible to restrict
       tests to specific feature configurations, e.g.:
-      <pre>
-
-    category/test.with_umfpack=on.output, or
-    category/test.with_zlib=off.output
-      </pre>
+<pre>
+category/test.with_umfpack=on.output, or
+category/test.with_zlib=off.output
+</pre>
       These tests will only be set up if the specified feature was configured.
       It is possible to provide different output files for disabled/enabled
       features, e.g.
-      <pre>
-
-    category/test.with_64bit_indices=on.output
-    category/test.with_64bit_indices=off.output
-      </pre>
+<pre>
+category/test.with_64bit_indices=on.output
+category/test.with_64bit_indices=off.output
+</pre>
       It is also possible to declare multiple constraints subsequently, e.g.
-      <pre>
-
-    category/test.with_umfpack=on.with_zlib=on.output
-      </pre>
+<pre>
+category/test.with_umfpack=on.with_zlib=on.output
+</pre>
     </p>
     <p>
       <b>Note:</b> The tests in some subdirectories of <code>tests/</code> are
@@ -516,10 +496,9 @@
       If a test should be run with MPI in parallel, the number of MPI
       processes <code>N</code> with which a program needs to be run for
       comparison with a given output file is specified as follows:
-      <pre>
-
-    category/test.mpirun=N.output
-      </pre>
+<pre>
+category/test.mpirun=N.output
+</pre>
       It is quite typical for an MPI-enabled test to have multiple output
       files for different numbers of MPI processes.
     </p>
@@ -529,10 +508,9 @@
     <p>
       If a test produces binary output add <code>binary</code> to the
       output file to indicate this:
-      <pre>
-
-    category/test.binary.output
-      </pre>
+<pre>
+category/test.binary.output
+</pre>
       The testsuite ensures that a diff tool suitable for comparing binary
       output files is used instead of the default diff tool, which (as in
       the case of <code>numdiff</code>) might be unable to compare binary
@@ -548,10 +526,9 @@
       If (for some reason) the test should succeed ending at a specific
       test stage different than <code>PASSED</code> you can specify it via
       <code>expect=&lt;stage&gt;</code>, e.g.:
-      <pre>
-
-    category/test.expect=run.output
-      </pre>
+<pre>
+category/test.expect=run.output
+</pre>
     </p>
 
 
@@ -572,8 +549,7 @@
       For the testcase, we usually start from one of the existing tests, copy
       and modify it to where it does what we'd like to test. Alternatively,
       you can also start from a template like this:
-    <pre>
-
+<pre>
 // ---------------------------------------------------------------------
 // $Id$
 //
@@ -590,7 +566,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // a short (a few lines) description of what the program does
 
 #include "../tests.h"
@@ -598,7 +573,6 @@
 #include &lt;fstream&gt;
 
 // all include files you need here
-
 
 int main ()
 {
@@ -612,7 +586,7 @@ int main ()
 
   return 0;
 }
-    </pre>
+</pre>
 
     <p>This code opens an output file <code>output</code> in the current working
     directory and then writes all output you generate to it, through the
@@ -640,22 +614,19 @@ int main ()
     <p>
       In order to run your new test, copy it to an appropriate category and
       create an empty comparison file for it:
-      <pre>
-
-    category/my_new_test.cc
-    category/my_new_test.output
-      </pre>
+<pre>
+category/my_new_test.cc
+category/my_new_test.output
+</pre>
       Now, rerun
-      <pre>
-
-    $ make setup_tests
-      </pre>
+<pre>
+$ make setup_tests
+</pre>
       so that your new test is picked up. After that it is possible to
       invoke it with
-      <pre>
-
-    $ ctest -V -R "category/my_new_test"
-      </pre>
+<pre>
+$ ctest -V -R "category/my_new_test"
+</pre>
     </p>
 
     <p>
@@ -672,15 +643,13 @@ int main ()
     <p>
       The next step is to copy and rename this output file to the source
       directory and replace the original comparison file with it:
-      <pre>
-
-    category/my_new_test.output
-      </pre>
+<pre>
+category/my_new_test.output
+</pre>
       At this point running the test again should be successful:
-      <pre>
-
-    $ ctest -V -R "category/my_new_test"
-      </pre>
+<pre>
+$ ctest -V -R "category/my_new_test"
+</pre>
     </p>
 
 
@@ -692,12 +661,11 @@ int main ()
       interested in getting new tests. If you have subversion write access
       already, you can add the new test and the expected output
       file:
-      <pre>
-
-    svn add category/my_new_test.cc
-    svn add category/my_new_test.output
-    svn commit -m "New test"
-      </pre>
+<pre>
+svn add category/my_new_test.cc
+svn add category/my_new_test.output
+svn commit -m "New test"
+</pre>
       If you don't have subversion write access, talk to us in the
       discussion group; writing testcases is a worthy and laudable task,
       and we would like to encourage it by giving people the opportunity to
@@ -714,14 +682,13 @@ int main ()
       folder under <cmake>./tests</cmake> that is named accordingly and put
       a <code>CMakeLists.txt</code> file into it containing
     </p>
-    <pre>
-
-    CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-    INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsubproject.cmake)
-    PROJECT(testsuite CXX)
-    INCLUDE(${DEAL_II_TARGET_CONFIG})
-    DEAL_II_PICKUP_TESTS()
-    </pre>
+<pre>
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsubproject.cmake)
+PROJECT(testsuite CXX)
+INCLUDE(${DEAL_II_TARGET_CONFIG})
+DEAL_II_PICKUP_TESTS()
+</pre>
 
 
 
@@ -733,10 +700,9 @@ int main ()
         href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash</a>
       instance just invoke ctest within a build directory (or designated
       build directory) with the <code>-S</code> option pointing to the
-      <code>run_testsuite.cmake</code> script: <pre>
-
-      $ ctest [...] -V -S ../tests/run_testsuite.cmake
-      </pre>
+<pre>
+$ ctest [...] -V -S ../tests/run_testsuite.cmake
+</pre>
       The script will run configure, build and ctest and submit the results
       to the CDash server. It does not matter whether the configure, build
       or ctest stages were run before that. Also in script mode, you can
@@ -751,60 +717,58 @@ int main ()
 
     <p>
       <b>Note:</b> The following variables can be set to via
-      <pre>
-
-    ctest -D&lt;variable&gt;=&lt;value&gt; [...]
-      </pre>
+<pre>
+ctest -D&lt;variable&gt;=&lt;value&gt; [...]
+</pre>
       to control the behaviour of the <code>run_testsuite.cmake</code>
       script:
-      <pre>
+<pre>
+CTEST_SOURCE_DIRECTORY
+  - The source directory of deal.II (usually ending in "[...]/deal.II"
+    (equivalent to https://svn.dealii.org/trunk/deal.II)
+    Note: This is _not_ the test directory ending in "[...]/tests"
+  - If unspecified, "../deal.II" and "../../$ relative to the location
+    of this script is used. If this is not a source directory, an error
+    thrown.
 
-    CTEST_SOURCE_DIRECTORY
-      - The source directory of deal.II (usually ending in "[...]/deal.II"
-        (equivalent to https://svn.dealii.org/trunk/deal.II)
-        Note: This is _not_ the test directory ending in "[...]/tests"
-      - If unspecified, "../deal.II" and "../../$ relative to the location
-        of this script is used. If this is not a source directory, an error
-        thrown.
+CTEST_BINARY_DIRECTORY
+  - The designated build directory (already configured, empty, or non
+    existent - see the information about TRACKs what will happen)
+  - If unspecified the current directory is used. If the current
+    directory is equal to CTEST_SOURCE_DIRECTORY or the "tests"
+    directory, an error is thrown.
 
-    CTEST_BINARY_DIRECTORY
-      - The designated build directory (already configured, empty, or non
-        existent - see the information about TRACKs what will happen)
-      - If unspecified the current directory is used. If the current
-        directory is equal to CTEST_SOURCE_DIRECTORY or the "tests"
-        directory, an error is thrown.
+CTEST_CMAKE_GENERATOR
+  - The CMake Generator to use (e.g. "Unix Makefiles", or "Ninja", see
+    $ man cmake)
+  - If unspecified the current generator of a configured build directory
+    will be used, otherwise "Unix Makefiles".
 
-    CTEST_CMAKE_GENERATOR
-      - The CMake Generator to use (e.g. "Unix Makefiles", or "Ninja", see
-        $ man cmake)
-      - If unspecified the current generator of a configured build directory
-        will be used, otherwise "Unix Makefiles".
+TRACK
+  - The track the test should be submitted to. Defaults to "Experimental".
+    Possible values are:
 
-    TRACK
-      - The track the test should be submitted to. Defaults to "Experimental".
-        Possible values are:
+    "Experimental"     - all tests that are not specifically "build" or
+                         "regression" tests should go into this track
 
-        "Experimental"     - all tests that are not specifically "build" or
-                             "regression" tests should go into this track
+    "Build Tests"      - Build tests that configure and build in a
+                         clean directory and run the build tests
+                         "build_tests/*"
 
-        "Build Tests"      - Build tests that configure and build in a
-                             clean directory and run the build tests
-                             "build_tests/*"
+    "Nightly"          - Reserved for nightly regression tests for
+                         build bots on various architectures
 
-        "Nightly"          - Reserved for nightly regression tests for
-                             build bots on various architectures
+    "Regression Tests" - Reserved for the regression tester
 
-        "Regression Tests" - Reserved for the regression tester
+CONFIG_FILE
+  - A configuration file (see docs/development/Config.sample)
+    that will be used during the configuration stage (invokes
+    $ cmake -C ${CONFIG_FILE}). This only has an effect if
+    CTEST_BINARY_DIRECTORY is empty.
 
-    CONFIG_FILE
-      - A configuration file (see docs/development/Config.sample)
-        that will be used during the configuration stage (invokes
-        $ cmake -C ${CONFIG_FILE}). This only has an effect if
-        CTEST_BINARY_DIRECTORY is empty.
-
-    MAKEOPTS
-      - Additional options that will be passed directly to make (or ninja).
-      </pre>
+MAKEOPTS
+  - Additional options that will be passed directly to make (or ninja).
+</pre>
       Furthermore, the variables described <a href="#setupconfigure">above</a> can also be
       set and will be handed automatically down to <code>cmake</code>.
     </p>
@@ -826,13 +790,12 @@ int main ()
       href="http://www.dealii.org/testsuite.html">test suite page</a> to
       participate. Assuming you checked out deal.II into the directory
       <code>deal.II</code>, running it is as simple as:
-      <pre>
-
-    cd deal.II
-    mkdir build
-    cd build
-    ctest -j4 -S ../cmake/scripts/run_buildtest.cmake
-      </pre>
+<pre>
+cd deal.II
+mkdir build
+cd build
+ctest -j4 -S ../cmake/scripts/run_buildtest.cmake
+</pre>
     </p>
 
     <p>
@@ -848,10 +811,9 @@ int main ()
       version control. If you want to specify a build configuration for
       cmake use a <a href="../users/Config.sample">configuration file</a>
       to preseed the cache as explained <a href="#submit">above</a>:
-      <pre>
-
-    $ ctest -DCONFIG_FILE="[...]/Config.sample" [...]
-      </pre>
+<pre>
+$ ctest -DCONFIG_FILE="[...]/Config.sample" [...]
+</pre>
     </p>
 
 

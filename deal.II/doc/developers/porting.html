@@ -40,12 +40,11 @@
           To start porting for an unkown compiler, specify
           <code>-DDEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF</code> and set all
           necessary compiler flags by hand via
-          <pre>
-
-    CMAKE_CXX_FLAGS           - used during all builds
-    DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
-    DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
-          </pre>
+<pre>
+CMAKE_CXX_FLAGS           - used during all builds
+DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
+DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
+</pre>
           After that try to compile the library with minimal external
           dependencies (<code>-DDEAL_II_ALLOW_AUTODETECTION=OFF</code>, for
           further information see the <a href="cmake.html">deal.II CMake
@@ -53,23 +52,21 @@
         <li>
           For adding permanent support for the unknown compiler to the
           build system, have a look at
-          <pre>
-
-    cmake/setup_compiler_flags.cmake
-    cmake/setup_compiler_flags_gnu.cmake
-    cmake/setup_compiler_flags_icc.cmake
-          </pre>
+<pre>
+cmake/setup_compiler_flags.cmake
+cmake/setup_compiler_flags_gnu.cmake
+cmake/setup_compiler_flags_icc.cmake
+</pre>
           Patches are highly welcome! See <a href="../mail.html">here</a>
           for information on how to get in contact with us.
         <li>
           You might want to have a look at
-          <pre>
-
-    cmake/checks/check_for_compiler_bugs.cmake
-    cmake/checks/check_for_compiler_features.cmake
-    cmake/checks/check_for_cxx_features.cmake
-    include/deal.II/base/config.h.in
-          </pre>
+<pre>
+cmake/checks/check_01_for_compiler_features.cmake
+cmake/checks/check_01_for_cxx_features.cmake
+cmake/checks/check_03_for_compiler_bugs.cmake
+include/deal.II/base/config.h.in
+</pre>
           to see how compiler specific checks are done.
       </ul>
     </p>
@@ -105,14 +102,13 @@
           and Windows and throw a compile time error on other platforms.
         <li>
           Have a look at
-          <pre>
-
-    cmake/checks/check_for_compiler_bugs.cmake
-    cmake/checks/check_for_compiler_features.cmake
-    cmake/checks/check_for_cxx_features.cmake
-    cmake/checks/check_for_system_features.cmake
-    include/deal.II/base/config.h.in
-          </pre>
+<pre>
+cmake/checks/check_for_compiler_bugs.cmake
+cmake/checks/check_for_compiler_features.cmake
+cmake/checks/check_for_cxx_features.cmake
+cmake/checks/check_for_system_features.cmake
+include/deal.II/base/config.h.in
+</pre>
           to see how platform and compiler specific checks are done.
 	<li>
           Of course, we would be happy to hear about the changes you made
@@ -148,13 +144,12 @@
       (or for for
       <a href="Toolchain-x86_64-w64-mingw32.sample">Windows64 using MinGW</a>).
       After that invoke <code>cmake</code> with something like:
-      <pre>
-
-    cmake -DCMAKE_TOOLCHAIN_FILE=&lt;...&gt;/Toolchain.sample
-          -DDEAL_II_FORCE_BUNDLED_BOOST=ON
-          -DDEAL_II_ALLOW_AUTODETECTION=OFF
-          ../deal.II
-      </pre>
+<pre>
+$ cmake -DCMAKE_TOOLCHAIN_FILE=&lt;...&gt;/Toolchain.sample \
+        -DDEAL_II_FORCE_BUNDLED_BOOST=ON \
+        -DDEAL_II_ALLOW_AUTODETECTION=OFF \
+        ../deal.II
+</pre>
       where <code>CMAKE_TOOLCHAIN_FILE</code> points to the toolchain file.
       The remaining configuration can be adjusted at will, see <a
       href="cmake.html">the documentation</a>.
