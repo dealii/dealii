@@ -60,8 +60,9 @@
         <li><a href="#layout">Testsuite development</a></li>
         <ol>
           <li><a href="#layoutgeneral">General layout</a></li>
-          <li><a href="#restrictbuild">Restricting tests for build configurations</a></li>
-          <li><a href="#restrictfeature">Restricting tests for feature configurations</a></li>
+          <li><a href="#restrictcompiler">Restricting tests to specific compiler and compiler versions</a></li>
+          <li><a href="#restrictbuild">Restricting tests to build configurations</a></li>
+          <li><a href="#restrictfeature">Restricting tests to feature configurations</a></li>
           <li><a href="#mpi">Running tests with MPI</a></li>
           <li><a href="#binary">Tests with binary output</a></li>
           <li><a href="#expect">Changing condition for success</a></li>
@@ -422,13 +423,13 @@ category/test.output
 
 
     <a name="restrictbuild"></a>
-    <h3>Restricting tests for build configurations</h3>
+    <h3>Restricting tests to build configurations</h3>
 
     <p>
       Comparison file can actually be named in a more complex way than
       just <code>category/test.output</code>:
 <pre>
-category/test.[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
+category/test.[compiler=&lt;regex&gt;=&lt;yes|no&gt;.]*[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
 </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
@@ -450,9 +451,24 @@ category/test.release.output
 </pre>
     </p>
 
+    <a name="restrictcompiler"></a>
+    <h3>Restricting tests to specific compiler and compiler versions</h3>
+    <p>
+      In a similar vain as for build configurations, it is possible to restrict
+      tests to specific compiler versions, e.g.:
+<pre>
+category/test.compiler=GNU=yes.output, or
+category/test.compiler=ICC-14=no.output
+</pre>
+      These tests will only be set up if the specified regular expression
+      matches (in case of <code>=yes</code>), or doesn't match
+      (<code>=no</code>) the string
+      <code>${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}</code>.
+      Common compiler names are <code>GNU</code>, <code>Clang</code> or
+      <code>Intel</code>.
 
     <a name="restrictfeature"></a>
-    <h3>Restricting tests for feature configurations</h3>
+    <h3>Restricting tests to feature configurations</h3>
     <p>
       In a similar vain as for build configurations, it is possible to restrict
       tests to specific feature configurations, e.g.:
