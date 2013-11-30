@@ -1,0 +1,5 @@
+
+DEAL:double:GMRES::Starting value 14.14
+DEAL:double:GMRES::Convergence step 109 value 0
+DEAL:float:GMRES::Starting value 14.14
+DEAL:float:GMRES::Convergence step 69 value 0

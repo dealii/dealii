@@ -1,0 +1,26 @@
+
+DEAL:double:0:GMRES::Starting value 8.00
+DEAL:double:0:GMRES::Convergence step 57 value 0
+DEAL:double:1:GMRES::Starting value 8.00
+DEAL:double:1:GMRES::Re-orthogonalization enabled at step 65
+DEAL:double:1:GMRES::Convergence step 65 value 0
+DEAL:double:2:GMRES::Starting value 8.00
+DEAL:double:2:GMRES::Convergence step 57 value 0
+DEAL:double:3:GMRES::Starting value 8.00
+DEAL:double:3:GMRES::Re-orthogonalization enabled at step 65
+DEAL:double:3:GMRES::Convergence step 65 value 0
+DEAL:double:4:GMRES::Starting value 8.00
+DEAL:double:4:GMRES::Convergence step 57 value 0
+DEAL:double:5:GMRES::Starting value 8.00
+DEAL:double:5:GMRES::Re-orthogonalization enabled at step 65
+DEAL:double:5:GMRES::Convergence step 65 value 0
+DEAL:float:0:GMRES::Starting value 8.00
+DEAL:float:0:GMRES::Convergence step 37 value 0
+DEAL:float:1:GMRES::Starting value 8.00
+DEAL:float:1:GMRES::Re-orthogonalization enabled at step 65
+DEAL:float:1:GMRES::Convergence step 66 value 0
+DEAL:float:2:GMRES::Starting value 8.00
+DEAL:float:2:GMRES::Convergence step 37 value 0
+DEAL:float:3:GMRES::Starting value 8.00
+DEAL:float:3:GMRES::Re-orthogonalization enabled at step 65
+DEAL:float:3:GMRES::Convergence step 66 value 0
