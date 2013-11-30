@@ -82,18 +82,6 @@ The feature \"DEAL_II_${_feature}\" does not exist.\n"
       ENDIF()
     ENDFOREACH()
 
-    #
-    # Respect TEST_OVERRIDE_LOCATION:
-    #
-
-    SET(_add_output)
-    IF(EXISTS ${TEST_OVERRIDE_LOCATION}/${_category}/${_test})
-      SET(_add_output
-        "!!NOTE!! Comparison file overriden by ${TEST_OVERRIDE_LOCATION}/${_category}/${_test}"
-        )
-      SET(_comparison "${TEST_OVERRIDE_LOCATION}/${_category}/${_test}")
-    ENDIF()
-
     IF(_define_test)
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
       DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_add_output})

@@ -31,12 +31,9 @@
 #     DEAL_II_ADD_TEST(category test_name comparison_file [ARGN])
 #
 # This macro assumes that a source file "./tests/category/<test_name>.cc"
-# as well as the comparison file "./tests/category/<comparison_file>" is
-# available in the testsuite. The output of compiled source file is
-# compared against the file comparison file.
-#
-# [ARGN] is an optional list of additional output lines passed down to the
-# run_test.cmake script and printed at the beginning of the test output.
+# as well as the comparison file "<comparison_file>" is available in the
+# testsuite. The output of compiled source file is compared against the
+# file comparison file.
 #
 # This macro gets the following options from the comparison file name (have
 # a look at the testsuite documentation for details):
@@ -246,7 +243,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           -DTRGT=${_diff_target}
           -DTEST=${_test_full}
           -DEXPECT=${_expect}
-          -DADDITIONAL_OUTPUT=${ARGN}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
           -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
@@ -263,7 +259,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       # when compiling the not yet existent executable that is shared
       # between the different tests.
       #
-      # Luckily CMake has a mechanism to force a test to be run when
+      # Luckily CMake has a mechanism to force a test to be run after
       # another has finished (and both are scheduled):
       #
       IF(NOT "${_n_cpu}" STREQUAL "0")

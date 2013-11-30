@@ -28,8 +28,6 @@
 #            (return value 0)
 #            Possible values are CONFIGURE, BUILD, RUN, DIFF, PASSED
 #
-#   ADDITIONAL_OUTPUT - A list of additional output lines that should be printed
-#
 #   GUARD_FILE - used to detect a forced interruption of this script: On
 #                startup the backed up file ${GUARD_FILE}_bck is put back
 #                in place as ${GUARD_FILE} and on exit ${GUARD_FILE} is
@@ -89,10 +87,6 @@ ENDIF()
 #
 
 MESSAGE("Test ${TEST}: ${_stage}")
-
-FOREACH(_line ${ADDITIONAL_OUTPUT})
-  MESSAGE("Test ${TEST}: ${_line}")
-ENDFOREACH()
 
 MESSAGE("===============================   OUTPUT BEGIN  ===============================")
 
