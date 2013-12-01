@@ -207,7 +207,7 @@ the following equation (still an inequality, but linearized):
 where the rank-4 tensor $I_\Pi=I_\Pi(\varepsilon^D(\mathbf u^{i-1}))$ given by
 @f{align}
   I_\Pi = \begin{cases}
-    C_{\mu} + C_{\kappa}, & \hspace{-8em}\hfill \text{if } \vert C\varepsilon^D(\mathbf u^{i-1}) \vert \leq \sigma_0,
+    C_{\mu} + C_{\kappa}, & \hspace{-8em} \text{if } \vert C\varepsilon^D(\mathbf u^{i-1}) \vert \leq \sigma_0,
     \\
     \frac{\gamma^{\text{iso}}}{2\mu + \gamma^{\text{iso}}} C_{\mu} + \frac{\left(1-\frac{\gamma^{\text{iso}}}{2\mu + \gamma^{\text{iso}}}\right)\sigma_0}{\vert C\varepsilon^D(\mathbf u^{i-1}) \vert}\left(C_{\mu} -
       2\mu\dfrac{C\varepsilon^D(\mathbf u^{i-1})\otimes C\varepsilon^D(\mathbf
@@ -328,7 +328,7 @@ method for the contact. It works as follows:
  from the undisplaced configuration of the body.
 
  <li> If $\mathcal{A}_{i+1} = \mathcal{A}_k$ and $\left\|
- {\hat R}\left({\mathbf u}^{i}\right)\right) \right\|_{\ell_2} < \delta$ then stop, else set $i=i+1$ and go to
+ {\hat R}\left({\mathbf u}^{i}\right) \right\|_{\ell_2} < \delta$ then stop, else set $i=i+1$ and go to
  step (1). This step ensures that we only stop iterations if both the correct
  active set has been found and the plasticity has been iterated to sufficient
  accuracy.
