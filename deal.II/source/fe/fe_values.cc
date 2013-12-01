@@ -3356,6 +3356,37 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 }
 
 
+namespace
+{
+  // Reset a std::auto_ptr. If we can, do not de-allocate the previously
+  // held memory but re-use it for the next item to avoid the repeated
+  // memory allocation. We do this because FEValues objects are heavily
+  // used in multithreaded contexts where memory allocations are evil.
+  template <typename Type, typename Pointer, typename Iterator>
+  void
+  reset_pointer_in_place_if_possible
+  (std::auto_ptr<Pointer> &present_cell,
+   const Iterator         &new_cell)
+  {
+    // see if the existing pointer is non-null and if the type of
+    // the old object pointed to matches that of the one we'd
+    // like to create
+    if (present_cell.get()
+        &&
+        (typeid(*present_cell.get()) == typeid(Type)))
+      {
+        // call destructor of the old object
+        static_cast<const Type*>(present_cell.get())->~Type();
+
+        // then construct a new object in-place
+        new(const_cast<void *>(static_cast<const void *>(present_cell.get()))) Type(new_cell);
+      }
+    else
+      // if the types don't match, there is nothing we can do here
+      present_cell.reset (new Type(new_cell));
+  }
+}
+
 
 template <int dim, int spacedim>
 void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
@@ -3369,9 +3400,10 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
   // care that old object gets
   // destroyed and also that this
   // object gets destroyed in the
-  // destruction of this class
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
+  // destruction of the current object
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
+  (this->present_cell, cell);
+
   // this was the part of the work
   // that is dependent on the actual
   // data type of the iterator. now
@@ -3403,10 +3435,9 @@ FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > ce
   // care that old object gets
   // destroyed and also that this
   // object gets destroyed in the
-  // destruction of this class
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > (cell));
+  // destruction of the current object
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > >
+  (this->present_cell, cell);
 
   // this was the part of the work
   // that is dependent on the actual
@@ -3581,11 +3612,10 @@ FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> 
   // care that old object gets
   // destroyed and also that this
   // object gets destroyed in the
-  // destruction of this class
+  // destruction of the current object
   this->maybe_invalidate_previous_present_cell (cell);
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > (cell));
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > >
+  (this->present_cell, cell);
 
   // this was the part of the work
   // that is dependent on the actual
@@ -3608,10 +3638,10 @@ void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spaced
   // care that old object gets
   // destroyed and also that this
   // object gets destroyed in the
-  // destruction of this class
+  // destruction of the current object
   this->maybe_invalidate_previous_present_cell (cell);
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
+  (this->present_cell, cell);
 
   // this was the part of the work
   // that is dependent on the actual
@@ -3756,11 +3786,10 @@ void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<D
   // care that old object gets
   // destroyed and also that this
   // object gets destroyed in the
-  // destruction of this class
+  // destruction of the current object
   this->maybe_invalidate_previous_present_cell (cell);
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > (cell));
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > >
+  (this->present_cell, cell);
 
   // this was the part of the work
   // that is dependent on the actual
@@ -3785,10 +3814,10 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spa
   // care that old object gets
   // destroyed and also that this
   // object gets destroyed in the
-  // destruction of this class
+  // destruction of the current object
   this->maybe_invalidate_previous_present_cell (cell);
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
+  reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
+  (this->present_cell, cell);
 
   // this was the part of the work
   // that is dependent on the actual
