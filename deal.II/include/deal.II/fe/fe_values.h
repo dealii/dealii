@@ -2218,7 +2218,15 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcAccessToUninitializedField);
+  DeclException1 (ExcAccessToUninitializedField,
+                  char *,
+		  << ("You are requesting information from an FEValues/FEFaceValues/FESubfaceValues "
+		      "object for which this kind of information has not been computed. What "
+		      "information these objects compute is determined by the update_* flags you "
+		      "pass to the constructor. Here, the operation you are attempting requires "
+		      "the <")
+		  << arg1
+		  << "> flag to be set, but it was apparently not specified upon construction.");
   /**
    * @todo Document this
    *
@@ -2843,7 +2851,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_values,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_values"));
 
     // an adaptation of the FEValuesBase::shape_value_component function
     // except that here we know the component as fixed and we have
@@ -2869,7 +2877,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     // an adaptation of the
     // FEValuesBase::shape_grad_component
@@ -2896,7 +2904,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_hessians,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_hessians"));
 
     // an adaptation of the
     // FEValuesBase::shape_grad_component
@@ -2922,7 +2930,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_values,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_values"));
 
     // same as for the scalar case except
     // that we have one more index
@@ -2960,7 +2968,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     // same as for the scalar case except
     // that we have one more index
@@ -3000,7 +3008,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     // same as for the scalar case except
     // that we have one more index
@@ -3035,7 +3043,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
     // same as for the scalar case except that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
 
@@ -3173,7 +3181,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_hessians,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_hessians"));
 
     // same as for the scalar case except
     // that we have one more index
@@ -3289,7 +3297,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     // same as for the scalar case except
     // that we have one more index
@@ -3323,7 +3331,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_values,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_values"));
 
     // similar to the vector case where we
     // have more then one index and we need
@@ -3370,7 +3378,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     const int snc = shape_function_data[shape_function].single_nonzero_component;
 
@@ -3460,7 +3468,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_values,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_values"));
 
     // similar to the vector case where we
     // have more then one index and we need
@@ -3510,7 +3518,7 @@ namespace FEValuesViews
     Assert (shape_function < fe_values.fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
 
     const int snc = shape_function_data[shape_function].single_nonzero_component;
 
@@ -3636,7 +3644,7 @@ FEValuesBase<dim,spacedim>::shape_value (const unsigned int i,
   Assert (i < fe->dofs_per_cell,
           ExcIndexRange (i, 0, fe->dofs_per_cell));
   Assert (this->update_flags & update_values,
-          ExcAccessToUninitializedField());
+          ExcAccessToUninitializedField("update_values"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
 
@@ -3672,7 +3680,7 @@ FEValuesBase<dim,spacedim>::shape_value_component (const unsigned int i,
   Assert (i < fe->dofs_per_cell,
           ExcIndexRange (i, 0, fe->dofs_per_cell));
   Assert (this->update_flags & update_values,
-          ExcAccessToUninitializedField());
+          ExcAccessToUninitializedField("update_values"));
   Assert (component < fe->n_components(),
           ExcIndexRange(component, 0, fe->n_components()));
 
@@ -3701,7 +3709,7 @@ FEValuesBase<dim,spacedim>::shape_grad (const unsigned int i,
   Assert (i < fe->dofs_per_cell,
           ExcIndexRange (i, 0, fe->dofs_per_cell));
   Assert (this->update_flags & update_gradients,
-          ExcAccessToUninitializedField());
+          ExcAccessToUninitializedField("update_gradients"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
   Assert (i<this->shape_gradients.size(),
@@ -3741,7 +3749,7 @@ FEValuesBase<dim,spacedim>::shape_grad_component (const unsigned int i,
   Assert (i < fe->dofs_per_cell,
           ExcIndexRange (i, 0, fe->dofs_per_cell));
   Assert (this->update_flags & update_gradients,
-          ExcAccessToUninitializedField());
+          ExcAccessToUninitializedField("update_gradients"));
   Assert (component < fe->n_components(),
           ExcIndexRange(component, 0, fe->n_components()));
 
@@ -3770,7 +3778,7 @@ FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
   Assert (i < fe->dofs_per_cell,
           ExcIndexRange (i, 0, fe->dofs_per_cell));
   Assert (this->update_flags & update_hessians,
-          ExcAccessToUninitializedField());
+          ExcAccessToUninitializedField("update_hessians"));
   Assert (fe->is_primitive (i),
           ExcShapeFunctionNotPrimitive(i));
   Assert (i<this->shape_hessians.size(),
@@ -3821,7 +3829,7 @@ FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
   Assert (i < fe->dofs_per_cell,
           ExcIndexRange (i, 0, fe->dofs_per_cell));
   Assert (this->update_flags & update_hessians,
-          ExcAccessToUninitializedField());
+          ExcAccessToUninitializedField("update_hessians"));
   Assert (component < fe->n_components(),
           ExcIndexRange(component, 0, fe->n_components()));
 
@@ -3887,7 +3895,8 @@ inline
 const std::vector<Point<spacedim> > &
 FEValuesBase<dim,spacedim>::get_quadrature_points () const
 {
-  Assert (this->update_flags & update_quadrature_points, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_quadrature_points,
+	  ExcAccessToUninitializedField("update_quadrature_points"));
   return this->quadrature_points;
 }
 
@@ -3898,7 +3907,8 @@ inline
 const std::vector<double> &
 FEValuesBase<dim,spacedim>::get_JxW_values () const
 {
-  Assert (this->update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_JxW_values,
+	  ExcAccessToUninitializedField("update_JxW_values"));
   return this->JxW_values;
 }
 
@@ -3909,7 +3919,8 @@ inline
 const std::vector<DerivativeForm<1,dim,spacedim> > &
 FEValuesBase<dim,spacedim>::get_jacobians () const
 {
-  Assert (this->update_flags & update_jacobians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_jacobians,
+	  ExcAccessToUninitializedField("update_jacobians"));
   return this->jacobians;
 }
 
@@ -3920,7 +3931,8 @@ inline
 const std::vector<DerivativeForm<2,dim,spacedim> > &
 FEValuesBase<dim,spacedim>::get_jacobian_grads () const
 {
-  Assert (this->update_flags & update_jacobian_grads, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_jacobian_grads,
+	  ExcAccessToUninitializedField("update_jacobians_grads"));
   return this->jacobian_grads;
 }
 
@@ -3931,7 +3943,8 @@ inline
 const std::vector<DerivativeForm<1,spacedim,dim> > &
 FEValuesBase<dim,spacedim>::get_inverse_jacobians () const
 {
-  Assert (this->update_flags & update_inverse_jacobians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_inverse_jacobians,
+	  ExcAccessToUninitializedField("update_inverse_jacobians"));
   return this->inverse_jacobians;
 }
 
@@ -3942,7 +3955,8 @@ inline
 const Point<spacedim> &
 FEValuesBase<dim,spacedim>::quadrature_point (const unsigned int i) const
 {
-  Assert (this->update_flags & update_quadrature_points, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_quadrature_points,
+	  ExcAccessToUninitializedField("update_quadrature_points"));
   Assert (i<this->quadrature_points.size(), ExcIndexRange(i, 0, this->quadrature_points.size()));
 
   return this->quadrature_points[i];
@@ -3956,7 +3970,8 @@ inline
 double
 FEValuesBase<dim,spacedim>::JxW (const unsigned int i) const
 {
-  Assert (this->update_flags & update_JxW_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_JxW_values,
+	  ExcAccessToUninitializedField("update_JxW_values"));
   Assert (i<this->JxW_values.size(), ExcIndexRange(i, 0, this->JxW_values.size()));
 
   return this->JxW_values[i];
@@ -3969,7 +3984,8 @@ inline
 const DerivativeForm<1,dim,spacedim> &
 FEValuesBase<dim,spacedim>::jacobian (const unsigned int i) const
 {
-  Assert (this->update_flags & update_jacobians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_jacobians,
+	  ExcAccessToUninitializedField("update_jacobians"));
   Assert (i<this->jacobians.size(), ExcIndexRange(i, 0, this->jacobians.size()));
 
   return this->jacobians[i];
@@ -3982,7 +3998,8 @@ inline
 const DerivativeForm<2,dim,spacedim> &
 FEValuesBase<dim,spacedim>::jacobian_grad (const unsigned int i) const
 {
-  Assert (this->update_flags & update_jacobian_grads, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_jacobian_grads,
+	  ExcAccessToUninitializedField("update_jacobians_grads"));
   Assert (i<this->jacobian_grads.size(), ExcIndexRange(i, 0, this->jacobian_grads.size()));
 
   return this->jacobian_grads[i];
@@ -3995,7 +4012,8 @@ inline
 const DerivativeForm<1,spacedim,dim> &
 FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 {
-  Assert (this->update_flags & update_inverse_jacobians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_inverse_jacobians,
+	  ExcAccessToUninitializedField("update_inverse_jacobians"));
   Assert (i<this->inverse_jacobians.size(), ExcIndexRange(i, 0, this->inverse_jacobians.size()));
 
   return this->inverse_jacobians[i];
@@ -4090,7 +4108,7 @@ FEValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
 {
   typedef FEValuesBase<dim,spacedim> FVB;
   Assert (this->update_flags & update_normal_vectors,
-          typename FVB::ExcAccessToUninitializedField());
+          typename FVB::ExcAccessToUninitializedField("update_normal_vectors"));
   Assert (i<this->normal_vectors.size(),
           ExcIndexRange(i, 0, this->normal_vectors.size()));
 
@@ -4185,7 +4203,7 @@ FEFaceValuesBase<dim,spacedim>::boundary_form (const unsigned int i) const
   Assert (i<this->boundary_forms.size(),
           ExcIndexRange(i, 0, this->boundary_forms.size()));
   Assert (this->update_flags & update_boundary_forms,
-          typename FVB::ExcAccessToUninitializedField());
+          typename FVB::ExcAccessToUninitializedField("update_boundary_forms"));
 
   return this->boundary_forms[i];
 }

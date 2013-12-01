@@ -1265,7 +1265,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_values,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_values"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1289,7 +1289,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1313,7 +1313,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_hessians"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1337,7 +1337,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_hessians"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1361,7 +1361,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_values,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_values"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1386,7 +1386,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1410,7 +1410,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1435,7 +1435,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1459,7 +1459,7 @@ namespace FEValuesViews
     typedef FEValuesBase<dim,spacedim> FVB;
 
     Assert (fe_values.update_flags & update_gradients,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_gradients"));
     Assert (fe_values.present_cell.get () != 0,
             ExcMessage ("FEValues object is not reinited to any cell"));
     AssertDimension (fe_function.size (),
@@ -1482,7 +1482,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_hessians"));
     Assert (fe_values.present_cell.get() != 0,
             ExcMessage ("FEValues object is not reinit'ed to any cell"));
     AssertDimension (fe_function.size(),
@@ -1506,7 +1506,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
-            typename FVB::ExcAccessToUninitializedField());
+            typename FVB::ExcAccessToUninitializedField("update_hessians"));
     Assert (laplacians.size() == fe_values.n_quadrature_points,
             ExcDimensionMismatch(laplacians.size(), fe_values.n_quadrature_points));
     Assert (fe_values.present_cell.get() != 0,
@@ -1533,7 +1533,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_values,
-           typename FVB::ExcAccessToUninitializedField());
+           typename FVB::ExcAccessToUninitializedField("update_values"));
     Assert(fe_values.present_cell.get() != 0,
            ExcMessage("FEValues object is not reinit'ed to any cell"));
     AssertDimension(fe_function.size(),
@@ -1557,7 +1557,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_gradients,
-           typename FVB::ExcAccessToUninitializedField());
+           typename FVB::ExcAccessToUninitializedField("update_gradients"));
     Assert(fe_values.present_cell.get() != 0,
            ExcMessage("FEValues object is not reinit'ed to any cell"));
     AssertDimension(fe_function.size(),
@@ -1580,7 +1580,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_values,
-           typename FVB::ExcAccessToUninitializedField());
+           typename FVB::ExcAccessToUninitializedField("update_values"));
     Assert(fe_values.present_cell.get() != 0,
            ExcMessage("FEValues object is not reinit'ed to any cell"));
     AssertDimension(fe_function.size(),
@@ -1604,7 +1604,7 @@ namespace FEValuesViews
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_gradients,
-           typename FVB::ExcAccessToUninitializedField());
+           typename FVB::ExcAccessToUninitializedField("update_gradients"));
     Assert(fe_values.present_cell.get() != 0,
            ExcMessage("FEValues object is not reinit'ed to any cell"));
     AssertDimension(fe_function.size(),
@@ -2575,7 +2575,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector   &fe_function,
   std::vector<number> &values) const
 {
-  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_values,
+          ExcAccessToUninitializedField("update_values"));
   AssertDimension (fe->n_components(), 1);
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
@@ -2598,7 +2599,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<number> &values) const
 {
-  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_values,
+          ExcAccessToUninitializedField("update_values"));
   AssertDimension (fe->n_components(), 1);
   AssertDimension (indices.size(), dofs_per_cell);
 
@@ -2631,7 +2633,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
-  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_values,
+          ExcAccessToUninitializedField("update_values"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
@@ -2655,7 +2658,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   // number of function values is generated in each point.
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
-  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_values,
+          ExcAccessToUninitializedField("update_values"));
 
   VectorSlice<std::vector<Vector<number> > > val(values);
   if (indices.size() <= 100)
@@ -2688,7 +2692,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   VectorSlice<std::vector<std::vector<double> > > values,
   bool quadrature_points_fastest) const
 {
-  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_values,
+          ExcAccessToUninitializedField("update_values"));
 
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
@@ -2726,7 +2731,8 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector           &fe_function,
   std::vector<Tensor<1,spacedim> > &gradients) const
 {
-  Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_gradients,
+          ExcAccessToUninitializedField("update_gradients"));
   AssertDimension (fe->n_components(), 1);
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
@@ -2748,7 +2754,8 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<1,spacedim> > &gradients) const
 {
-  Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_gradients,
+          ExcAccessToUninitializedField("update_gradients"));
   AssertDimension (fe->n_components(), 1);
   AssertDimension (indices.size(), dofs_per_cell);
   if (dofs_per_cell <= 100)
@@ -2779,7 +2786,8 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector                              &fe_function,
   std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const
 {
-  Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_gradients,
+          ExcAccessToUninitializedField("update_gradients"));
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
@@ -2807,7 +2815,9 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
   // number of function values is generated in each point.
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
-  Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_gradients,
+          ExcAccessToUninitializedField("update_gradients"));
+
   if (indices.size() <= 100)
     {
       double dof_values[100];
@@ -2840,7 +2850,8 @@ get_function_hessians (const InputVector                &fe_function,
                        std::vector<Tensor<2,spacedim> > &hessians) const
 {
   AssertDimension (fe->n_components(), 1);
-  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
@@ -2861,8 +2872,8 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<2,spacedim> > &hessians) const
 {
-  Assert (this->update_flags & update_second_derivatives,
-          ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
   AssertDimension (indices.size(), dofs_per_cell);
   if (dofs_per_cell <= 100)
@@ -2894,7 +2905,8 @@ get_function_hessians (const InputVector                         &fe_function,
                        std::vector<std::vector<Tensor<2,spacedim> > > &hessians,
                        bool quadrature_points_fastest) const
 {
-  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
@@ -2918,8 +2930,8 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
   VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
   bool quadrature_points_fastest) const
 {
-  Assert (this->update_flags & update_second_derivatives,
-          ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
   if (indices.size() <= 100)
@@ -2952,7 +2964,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector   &fe_function,
   std::vector<number> &laplacians) const
 {
-  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe->n_components(), 1);
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
@@ -2974,7 +2987,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<number> &laplacians) const
 {
-  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe->n_components(), 1);
   AssertDimension (indices.size(), dofs_per_cell);
   if (dofs_per_cell <= 100)
@@ -3005,7 +3019,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 {
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
-  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
@@ -3029,7 +3044,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   // number of function values is generated in each point.
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
-  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   if (indices.size() <= 100)
     {
       double dof_values[100];
@@ -3064,7 +3080,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 {
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
-  Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_hessians,
+          ExcAccessToUninitializedField("update_hessians"));
   if (indices.size() <= 100)
     {
       double dof_values[100];
@@ -3104,7 +3121,7 @@ FEValuesBase<dim,spacedim>::get_normal_vectors () const
 {
   typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (this->update_flags & update_normal_vectors,
-          typename FEVB::ExcAccessToUninitializedField());
+          typename FEVB::ExcAccessToUninitializedField("update_normal_vectors"));
   return this->normal_vectors;
 }
 
@@ -3513,7 +3530,7 @@ FEFaceValuesBase<dim,spacedim>::get_boundary_forms () const
 {
   typedef FEValuesBase<dim,spacedim> FEVB;
   Assert (this->update_flags & update_boundary_forms,
-          typename FEVB::ExcAccessToUninitializedField());
+          typename FEVB::ExcAccessToUninitializedField("update_boundary_forms"));
   return this->boundary_forms;
 }
 

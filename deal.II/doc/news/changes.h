@@ -230,6 +230,18 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: When attempting operations such as FEValues::get_function_values()
+  or FEValues::shape_value(), the FEValues object needs to know that what these
+  functions return has been computed previously. What is computed is specified
+  by the update flags that are passed to the constructor of all FEValues, FEFaceValues
+  and FESubfaceValues objects. If a user attempts an operation for which the
+  corresponding flag was not specified, an exception is generated. This exception
+  did say previously what the cause was, but it was not overly explicit.
+  The exception now generates a message that says exactly what is going wrong.
+  <br>
+  (Wolfgang Bangerth, 2013/12/01)
+  </li>
+
   <li> Fixed: GridGenerator::truncated_cone() failed if half_length < 0.5*radius in 3d.
   <br>
   (Timo Heister, 2013/11/25)

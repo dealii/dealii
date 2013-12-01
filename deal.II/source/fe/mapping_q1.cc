@@ -1225,7 +1225,7 @@ void MappingQ1<dim,spacedim>::transform_fields(
     case mapping_contravariant:
     {
       Assert (data.update_flags & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
 
       for (unsigned int i=0; i<output.size(); ++i)
         output[i] = apply_transformation(data.contravariant[i], input[i]);
@@ -1236,9 +1236,9 @@ void MappingQ1<dim,spacedim>::transform_fields(
     case mapping_piola:
     {
       Assert (data.update_flags & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
       Assert (data.update_flags & update_volume_elements,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
       Assert (rank==1, ExcMessage("Only for rank 1"));
       if (rank!=1)
         return;
@@ -1258,7 +1258,7 @@ void MappingQ1<dim,spacedim>::transform_fields(
     case mapping_covariant:
     {
       Assert (data.update_flags & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
 
       for (unsigned int i=0; i<output.size(); ++i)
         output[i] = apply_transformation(data.covariant[i], input[i]);
@@ -1290,9 +1290,9 @@ void MappingQ1<dim,spacedim>::transform_gradients(
     case mapping_contravariant_gradient:
     {
       Assert (data.update_flags & update_covariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
       Assert (data.update_flags & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
       Assert (rank==2, ExcMessage("Only for rank 2"));
 
       for (unsigned int i=0; i<output.size(); ++i)
@@ -1308,9 +1308,9 @@ void MappingQ1<dim,spacedim>::transform_gradients(
     case mapping_covariant_gradient:
     {
       Assert (data.update_flags & update_covariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
       Assert (data.update_flags & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
       Assert (rank==2, ExcMessage("Only for rank 2"));
 
       for (unsigned int i=0; i<output.size(); ++i)
@@ -1330,11 +1330,11 @@ void MappingQ1<dim,spacedim>::transform_gradients(
     case mapping_piola_gradient:
     {
       Assert (data.update_flags & update_covariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
       Assert (data.update_flags & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
       Assert (data.update_flags & update_volume_elements,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
       Assert (rank==2, ExcMessage("Only for rank 2"));
 
       for (unsigned int i=0; i<output.size(); ++i)
@@ -1378,7 +1378,7 @@ void MappingQ1<dim,spacedim>::transform_differential_forms(
     case mapping_covariant:
     {
       Assert (data.update_flags & update_contravariant_transformation,
-              typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
 
       for (unsigned int i=0; i<output.size(); ++i)
         output[i] = apply_transformation(data.covariant[i], input[i]);
