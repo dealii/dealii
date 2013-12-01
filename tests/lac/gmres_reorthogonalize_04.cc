@@ -66,7 +66,7 @@ void test ()
   for (unsigned int i=0; i<n; ++i)
     matrix.diag_element(i) = (i+1);
 
-  SolverControl control(1000, 1e2*std::numeric_limits<number>::epsilon());
+  SolverControl control(1000, 1e3*std::numeric_limits<number>::epsilon());
   typename SolverGMRES<Vector<number> >::AdditionalData data;
   data.max_n_tmp_vectors = 202;
 
