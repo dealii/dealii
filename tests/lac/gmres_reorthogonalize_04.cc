@@ -66,6 +66,9 @@ void test ()
   for (unsigned int i=0; i<n; ++i)
     matrix.diag_element(i) = (i+1);
 
+  // compared to the 02 test, need to use a looser tolerance because linear
+  // summation does not allow for 1e2*eps (at least with the current detection
+  // of re-orthogonalization)
   SolverControl control(1000, 1e3*std::numeric_limits<number>::epsilon());
   typename SolverGMRES<Vector<number> >::AdditionalData data;
   data.max_n_tmp_vectors = 202;
