@@ -141,7 +141,7 @@ we list here:
   <pre>
     Vector &
     operator += (Vector       &lhs,
-                 const Vector &rhs) {
+                 const Vector &rhs)
     {
       for (unsigned int i=0; i<lhs.size(); ++i)
         lhs(i) += rhs(i);
@@ -165,7 +165,7 @@ we list here:
   <pre>
     Vector &
     operator += (Vector       &lhs,
-                 const Vector &rhs) {
+                 const Vector &rhs)
     {
       Assert (lhs.size() == rhs.size(),
               ExcDimensionMismatch (lhs.size(), rhs.size());
@@ -210,7 +210,7 @@ we list here:
   follows:
   <code>
   <pre>
-    double norm (const Vector &v) {
+    double norm (const Vector &v)
     {
       double s = 0;
       for (unsigned int i=0; i<v.size(); ++i)
