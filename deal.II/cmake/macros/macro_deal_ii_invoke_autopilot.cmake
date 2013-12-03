@@ -154,8 +154,8 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
   # switch between them:
   IF(${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
     SET(_switch_targets
-"#      ${_make_command} debug          - to switch the build type to \"Debug\"
-#      ${_make_command} release        - to switch the build type to \"Release\"\n"
+"#      ${_make_command} debug          - to switch the build type to 'Debug'
+#      ${_make_command} release        - to switch the build type to 'Release'\n"
       )
   ENDIF()
 
