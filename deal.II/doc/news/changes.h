@@ -40,6 +40,12 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: With the switch of the testsuite to CMake, the old report_features
+  and build test facilities are removed.
+  <br>
+  (Matthias Maier, 2013/12/03)
+  </li>
+
   <li>
   Changed: The kinds of template arguments for the VectorTools::interpolate
   function taking a Mapping as first argument has changed. This was done to
