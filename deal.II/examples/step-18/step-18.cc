@@ -1718,6 +1718,17 @@ namespace Step18
   // to the vertex we consider at present, as they may or may not be ordered
   // in the same order.
   //
+  // This inconvenience could be avoided if finite elements have support
+  // points on vertices (which the one here has; for the concept of support
+  // points, see @ref GlossSupport "support points"). For such a case, one
+  // could construct a custom quadrature rule using
+  // FiniteElement::get_unit_support_points(). The first
+  // <code>GeometryInfo@<dim@>::vertices_per_cell*fe.dofs_per_vertex</code>
+  // quadrature points will then correspond to the vertices of the cell and
+  // are ordered consistent with <code>cell-@>vertex(i)</code>, taking into
+  // account that support points for vector elements will be duplicated
+  // <code>fe.dofs_per_vertex</code> times.
+  //
   // Another point worth explaining about this short function is the way in
   // which the triangulation class exports information about its vertices:
   // through the <code>Triangulation::n_vertices</code> function, it
