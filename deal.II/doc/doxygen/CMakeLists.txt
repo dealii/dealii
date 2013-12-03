@@ -54,12 +54,12 @@ CONFIGURE_FILE(
   )
 
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_header.pl
+  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_header.pl.in
   ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
   )
 
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_footer.pl
+  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_footer.pl.in
   ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl
   )
 
