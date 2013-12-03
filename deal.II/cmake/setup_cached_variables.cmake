@@ -291,6 +291,19 @@ SET(DEAL_II_LINKER_FLAGS_SAVED "$ENV{LDFLAGS} ${DEAL_II_LINKER_FLAGS_SAVED}")
 UNSET(ENV{CXXFLAGS})
 UNSET(ENV{LDFLAGS})
 
+#
+# Also respect DEAL_II_CXX_FLAGS - it just too easy to accientally write
+# DEAL_II_CXX_FLAGS instead of CMAKE_CXX_FLAGS... (this was a poor design
+# choice, I know...)
+#
+IF(NOT "${DEAL_II_CXX_FLAGS}" STREQUAL "")
+  MESSAGE(STATUS
+    "Appending \${DEAL_II_CXX_FLAGS} to saved \${CMAKE_CXX_FLAGS}"
+    )
+  SET(CMAKE_CXX_FLAGS_SAVED "${CMAKE_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS}")
+ENDIF()
+
+
 
 ########################################################################
 #                                                                      #
