@@ -14,13 +14,12 @@
 ##
 ## ---------------------------------------------------------------------
 
-
-
-
 #
 # Set up all necessary bits for the documentation
 #
 IF(DEAL_II_COMPONENT_DOCUMENTATION)
+
+  MESSAGE(STATUS "Setup documentation")
 
   #
   # Required packages for the document generation:
@@ -46,10 +45,6 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   # Generate the source documentation via doxygen:
   #
   ADD_SUBDIRECTORY(doxygen)
-
-  #
-  # A custom target with the same name as the component:
-  #
   ADD_DEPENDENCIES(documentation doxygen)
 
   #
@@ -72,6 +67,8 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
     DESTINATION ${DEAL_II_DOCHTML_RELDIR}
     COMPONENT documentation
     )
+
+  MESSAGE(STATUS "Setup documentation - Done")
 
 ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
 

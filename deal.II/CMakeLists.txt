@@ -88,7 +88,13 @@ INCLUDE(setup_compiler_flags)
 # Include information about bundled libraries:
 #
 IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  INCLUDE(bundled/CMakeLists.txt)
+  FILE(GLOB _check_files "bundled/*.cmake")
+  LIST(SORT _check_files)
+  FOREACH(_file ${_check_files})
+    MESSAGE(STATUS "")
+    MESSAGE(STATUS "Include ${_file}")
+    INCLUDE(${_file})
+  ENDFOREACH()
 ENDIF()
 
 #

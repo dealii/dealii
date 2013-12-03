@@ -113,6 +113,16 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: The build system now supports usage of the library
+  out of the build directory without prior installation. This is done by
+  exporting an additional project configuration just for the build directory.
+  Furthermore, a bunch of convenience targets get now defined that just build
+  individual components (such as just the documentation or the libraries), and
+  if <tt>CMAKE_INSTALL_PREFIX</tt> is set, also install that specific component.
+  <br>
+  (Matthias Maier, Luca Heltai, 2013/12/03)
+  </li>
+
   <li> Fixed: Missing instantiations of SparseDirectMUMPS have been added.
   <br>
   (Timo Heister, 2013/11/25)

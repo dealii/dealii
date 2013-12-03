@@ -14,6 +14,8 @@
 ##
 ## ---------------------------------------------------------------------
 
+MESSAGE(STATUS "Setup library")
+
 #
 # Compile the deal.II library
 #
@@ -114,3 +116,5 @@ INSTALL(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )
+
+MESSAGE(STATUS "Setup library - Done")

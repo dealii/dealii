@@ -20,6 +20,8 @@ SET_TARGET_PROPERTIES(expand_instantiations_exe
   )
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
+  MESSAGE(STATUS "Setup compat_files")
+
   #
   # Also build and install the old dependency_resolution executable:
   #
@@ -38,4 +40,5 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
     COMPONENT compat_files
     )
+  MESSAGE(STATUS "Setup compat_files - Done")
 ENDIF()

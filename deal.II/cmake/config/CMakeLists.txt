@@ -26,6 +26,8 @@
 # two distinct set ups.
 #
 
+MESSAGE(STATUS "Setup project configuration")
+
 #
 # Read in auxiliary include directories for the build directory
 # configuration:
@@ -377,3 +379,5 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     COMPONENT compat_files
     )
 ENDIF()
+
+MESSAGE(STATUS "Setup project configuration - Done")

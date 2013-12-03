@@ -15,6 +15,8 @@
 ## ---------------------------------------------------------------------
 
 IF(DEAL_II_COMPONENT_EXAMPLES)
+  MESSAGE(STATUS "Setup examples")
+
   INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION ${DEAL_II_EXAMPLES_RELDIR}
     COMPONENT examples
@@ -42,4 +44,6 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "untitled.geo"         # step-49
     PATTERN "untitled.msh"         # step-49
     )
+
+  MESSAGE(STATUS "Setup examples - Done")
 ENDIF()
