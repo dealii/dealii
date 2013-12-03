@@ -63,19 +63,38 @@ ENDFOREACH()
 # Provide an "info" target to print a help message:
 #
 
+IF(CMAKE_GENERATOR MATCHES "Ninja")
+  SET(_make_command "ninja")
+ELSE()
+  SET(_make_command "make")
+ENDIF()
 FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 "MESSAGE(
 \"###
 #
-#  The following targets are available (invoke by $ make <target>):
+#  The following targets are available (invoke by $ ${_make_command} <target>):
 #
 #    all            - compiles the library and all enabled components
 #    clean          - removes all generated files
 #    install        - installs into CMAKE_INSTALL_PREFIX
+")
+
+IF(CMAKE_GENERATOR MATCHES "Ninja")
+  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+"#    info           - prints this help message
 #    help           - prints a list of valid top level targets
-#    info           - prints this help message
 #
-#    edit_cache     - runs ccmake for changing (cached) configuration variables
+")
+ELSE()
+  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+"#    help           - prints this help message in the toplevel directory,
+#                     otherwise prints a list of targets (in subdirectories)
+#
+")
+ENDIF()
+
+FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+"#    edit_cache     - runs ccmake for changing (cached) configuration variables
 #                     and reruns the configure and generate phases of CMake
 #    rebuild_cache  - reruns the configure and generate phases of CMake
 #
@@ -95,6 +114,12 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #
 ###\")"
   )
+
 ADD_CUSTOM_TARGET(info
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   )
+IF(NOT CMAKE_GENERATOR MATCHES "Ninja")
+  ADD_CUSTOM_TARGET(help
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+    )
+ENDIF()

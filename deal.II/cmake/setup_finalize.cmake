@@ -274,8 +274,14 @@ ENDFOREACH()
 
 _summary(
 "#\n#  Detailed information (compiler flags, feature configuration) can be found in detailed.log
-#\n#  Run  $ make info  to print a help message with a list of top level targets\n"
+#\n#  Run  $ "
   )
+IF(CMAKE_GENERATOR MATCHES "Ninja")
+  _summary("ninja info")
+ELSE()
+_summary("make help")
+ENDIF()
+_summary("  to print a help message with a list of top level targets\n")
 
 _both("#\n###")
 
