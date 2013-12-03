@@ -236,6 +236,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: The methods ConstraintMatrix::distribute_local_to_global
+  now use scratch data that is private to each thread instead of allocating
+  it for every cell anew. This gives better performance, in particular in
+  parallel, of these operations, while maintaining thread-safety (when
+  accessing non-overlapping rows, no race condition can exist).
+  <br>
+  (Martin Kronbichler, 2013/12/03)
+  </li>
+
   <li> Improved: When attempting operations such as FEValues::get_function_values()
   or FEValues::shape_value(), the FEValues object needs to know that what these
   functions return has been computed previously. What is computed is specified
