@@ -398,7 +398,7 @@ private:
  * product (#vmult()) and scalar multiplication (#Tvmult()) functions
  * of the Vector class.
  *
- * @author Guidl Kanschat, 2006
+ * @author Guido Kanschat, 2006
  */
 template <typename number>
 class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
