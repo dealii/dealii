@@ -1289,10 +1289,12 @@ namespace internals
 
     void reinit ()
     {
-      Assert (element_size == 0, ExcInternalError());
-      element_size = 6;
-      data = new std::pair<size_type,double> [20*6];
-      individual_size.resize(20);
+      if (element_size == 0)
+        {
+          element_size = 6;
+          data = new std::pair<size_type,double> [20*6];
+          individual_size.resize(20);
+        }
       n_used_elements = 0;
     }
 
@@ -1388,13 +1390,21 @@ namespace internals
   class GlobalRowsFromLocal
   {
   public:
-    GlobalRowsFromLocal (const size_type n_local_rows)
+    GlobalRowsFromLocal ()
       :
-      total_row_indices (n_local_rows),
-      n_active_rows (n_local_rows),
+      n_active_rows (0),
       n_inhomogeneous_rows (0)
     {}
 
+    void reinit (const size_type n_local_rows)
+    {
+      total_row_indices.resize(n_local_rows);
+      for (unsigned int i=0; i<n_local_rows; ++i)
+        total_row_indices[i].constraint_position = numbers::invalid_size_type;
+      n_active_rows = n_local_rows;
+      n_inhomogeneous_rows = 0;
+      data_cache.reinit();
+    }
 
     // implemented below
     void insert_index (const size_type global_row,
@@ -1671,6 +1681,7 @@ namespace internals
         block_starts[i] = first_block - global_rows.total_row_indices.begin();
         block_indices = first_block;
       }
+    block_starts[num_blocks] = n_active_rows;
 
     // transform row indices to block-local index space
     for (size_type i=block_starts[1]; i<n_active_rows; ++i)
@@ -1707,6 +1718,7 @@ namespace internals
         block_starts[i] = first_block - row_indices.begin();
         col_indices = first_block;
       }
+    block_starts[num_blocks] = row_indices.size();
 
     // transform row indices to local index space
     for (size_type i=block_starts[1]; i<row_indices.size(); ++i)
@@ -2142,7 +2154,7 @@ add_this_index:
   template <typename SparsityType>
   inline void
   set_sparsity_diagonals (const internals::GlobalRowsFromLocal &global_rows,
-                          const std::vector<size_type>      &local_dof_indices,
+                          const std::vector<size_type>         &local_dof_indices,
                           const Table<2,bool>                  &dof_mask,
                           const bool                            keep_constrained_entries,
                           SparsityType                         &sparsity_pattern)
@@ -2187,8 +2199,8 @@ add_this_index:
 // are related to it.
 void
 ConstraintMatrix::
-make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
-                      internals::GlobalRowsFromLocal  &global_rows) const
+make_sorted_row_list (const std::vector<size_type>   &local_dof_indices,
+                      internals::GlobalRowsFromLocal &global_rows) const
 {
   const size_type n_local_dofs = local_dof_indices.size();
   AssertDimension (n_local_dofs, global_rows.size());
@@ -2377,21 +2389,41 @@ ConstraintMatrix::distribute_local_to_global (
   Assert (lines.empty() || sorted == true, ExcMatrixNotClosed());
 
   const size_type n_local_dofs = local_dof_indices.size();
-  internals::GlobalRowsFromLocal global_rows (n_local_dofs);
+
+  ScratchData &my_scratch_data = scratch_data.get();
+  Assert(my_scratch_data.in_use == false,
+         ExcMessage("Access to thread-local scratch data tried, but it is already "
+                    "in use"));
+  // TODO: might want to have a scoped variable for in_use here and in the
+  // methods below
+  my_scratch_data.in_use = true;
+
+  if (my_scratch_data.global_rows.get() == 0)
+    my_scratch_data.global_rows.reset(new internals::GlobalRowsFromLocal());
+  internals::GlobalRowsFromLocal &global_rows = *my_scratch_data.global_rows;
+  global_rows.reinit(n_local_dofs);
   make_sorted_row_list (local_dof_indices, global_rows);
 
   const size_type n_actual_dofs = global_rows.size();
 
   // create arrays for the column data (indices and values) that will then be
-  // written into the matrix. Shortcut for deal.II sparse matrix
-  std::vector<size_type>  cols;
-  std::vector<number>     vals;
+  // written into the matrix. Shortcut for deal.II sparse matrix. We can use
+  // the scratch data if we have a double matrix. Otherwise, we need to create
+  // an array in any case since we cannot know about the actual data type in
+  // the ConstraintMatrix class (unless we do cast). This involves a little
+  // bit of logic to determine the type of the matrix value.
+  std::vector<size_type> & cols = my_scratch_data.columns;
+  std::vector<double>    & vals = my_scratch_data.values;
+  std::vector<number>      values_non_double;
   SparseMatrix<number> *sparse_matrix
     = dynamic_cast<SparseMatrix<number> *>(&global_matrix);
   if (use_dealii_matrix == false)
     {
       cols.resize (n_actual_dofs);
-      vals.resize (n_actual_dofs);
+      if (types_are_equal<double,number>::value == false)
+        values_non_double.resize(n_actual_dofs);
+      else
+        vals.resize (n_actual_dofs);
     }
   else
     Assert (sparse_matrix != 0, ExcInternalError());
@@ -2406,13 +2438,14 @@ ConstraintMatrix::distribute_local_to_global (
       if (use_dealii_matrix == false)
         {
           size_type *col_ptr = &cols[0];
-          number *val_ptr = &vals[0];
+          // cast is uncritical here and only used to avoid compiler
+          // warnings. We never access a non-double array
+          number *val_ptr = types_are_equal<double,number>::value ?
+            reinterpret_cast<number*>(&vals[0]) : &values_non_double[0];
           internals::resolve_matrix_row (global_rows, global_rows, i, 0,
                                          n_actual_dofs,
                                          local_matrix, col_ptr, val_ptr);
           const size_type n_values = col_ptr - &cols[0];
-          Assert (n_values == (size_type)(val_ptr - &vals[0]),
-                  ExcInternalError());
           if (n_values > 0)
             global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
         }
@@ -2440,6 +2473,7 @@ ConstraintMatrix::distribute_local_to_global (
   internals::set_matrix_diagonals (global_rows, local_dof_indices,
                                    local_matrix, *this,
                                    global_matrix, global_vector, use_inhomogeneities_for_rhs);
+  my_scratch_data.in_use = false;
 }
 
 
@@ -2460,8 +2494,21 @@ ConstraintMatrix::distribute_local_to_global (
 
   const size_type n_local_row_dofs = row_indices.size();
   const size_type n_local_col_dofs = col_indices.size();
-  internals::GlobalRowsFromLocal global_rows (n_local_row_dofs);
-  internals::GlobalRowsFromLocal global_cols (n_local_col_dofs);
+
+  ScratchData &my_scratch_data = scratch_data.get();
+  Assert(my_scratch_data.in_use == false,
+         ExcMessage("Access to thread-local scratch data tried, but it is already "
+                    "in use"));
+  my_scratch_data.in_use = true;
+
+  if (my_scratch_data.global_rows.get() == 0)
+    my_scratch_data.global_rows.reset(new internals::GlobalRowsFromLocal());
+  if (my_scratch_data.global_columns.get() == 0)
+    my_scratch_data.global_columns.reset(new internals::GlobalRowsFromLocal());
+  internals::GlobalRowsFromLocal &global_rows = *my_scratch_data.global_rows;
+  global_rows.reinit(n_local_row_dofs);
+  internals::GlobalRowsFromLocal &global_cols = *my_scratch_data.global_columns;
+  global_cols.reinit(n_local_col_dofs);
   make_sorted_row_list (row_indices, global_rows);
   make_sorted_row_list (col_indices, global_cols);
 
@@ -2470,8 +2517,14 @@ ConstraintMatrix::distribute_local_to_global (
 
   // create arrays for the column data (indices and values) that will then be
   // written into the matrix. Shortcut for deal.II sparse matrix
-  std::vector<size_type> cols (n_actual_col_dofs);
-  std::vector<number>       vals (n_actual_col_dofs);
+  std::vector<size_type> & cols = my_scratch_data.columns;
+  std::vector<double>    & vals = my_scratch_data.values;
+  std::vector<number>      values_non_double;
+  cols.resize(n_actual_col_dofs);
+  if (types_are_equal<double,number>::value == true)
+    vals.resize(n_actual_col_dofs);
+  else
+    values_non_double.resize(n_actual_col_dofs);
 
   // now do the actual job.
   for (size_type i=0; i<n_actual_row_dofs; ++i)
@@ -2480,16 +2533,17 @@ ConstraintMatrix::distribute_local_to_global (
 
       // calculate all the data that will be written into the matrix row.
       size_type *col_ptr = &cols[0];
-      number *val_ptr = &vals[0];
+      number    *val_ptr = types_are_equal<double,number>::value ?
+        reinterpret_cast<number*>(&vals[0]) : &values_non_double[0];
       internals::resolve_matrix_row (global_rows, global_cols, i, 0,
                                      n_actual_col_dofs,
                                      local_matrix, col_ptr, val_ptr);
       const size_type n_values = col_ptr - &cols[0];
-      Assert (n_values == (size_type)(val_ptr - &vals[0]),
-              ExcInternalError());
       if (n_values > 0)
         global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
     }
+
+  my_scratch_data.in_use = false;
 }
 
 
@@ -2524,12 +2578,22 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
     }
   Assert (sorted == true, ExcMatrixNotClosed());
 
+  ScratchData &my_scratch_data = scratch_data.get();
+  Assert(my_scratch_data.in_use == false,
+         ExcMessage("Access to thread-local scratch data tried, but it is already "
+                    "in use"));
+  my_scratch_data.in_use = true;
+
   const size_type n_local_dofs = local_dof_indices.size();
-  internals::GlobalRowsFromLocal global_rows (n_local_dofs);
+  if (my_scratch_data.global_rows.get() == 0)
+    my_scratch_data.global_rows.reset(new internals::GlobalRowsFromLocal());
+  internals::GlobalRowsFromLocal &global_rows = *my_scratch_data.global_rows;
+  global_rows.reinit(n_local_dofs);
+
   make_sorted_row_list (local_dof_indices, global_rows);
   const size_type n_actual_dofs = global_rows.size();
 
-  std::vector<size_type> global_indices;
+  std::vector<size_type> &global_indices = my_scratch_data.vector_indices;
   if (use_vectors == true)
     {
       global_indices.resize(n_actual_dofs);
@@ -2539,15 +2603,20 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
 
   // additional construct that also takes care of block indices.
   const size_type num_blocks   = global_matrix.n_block_rows();
-  std::vector<size_type> block_starts(num_blocks+1, n_actual_dofs);
+  std::vector<size_type> &block_starts = my_scratch_data.block_starts;
+  block_starts.resize(num_blocks+1);
   internals::make_block_starts (global_matrix, global_rows, block_starts);
 
-  std::vector<size_type> cols;
-  std::vector<number>       vals;
+  std::vector<size_type> & cols = my_scratch_data.columns;
+  std::vector<double>    & vals = my_scratch_data.values;
+  std::vector<number>      values_non_double;
   if (use_dealii_matrix == false)
     {
       cols.resize (n_actual_dofs);
-      vals.resize (n_actual_dofs);
+      if (types_are_equal<double,number>::value == true)
+        vals.resize(n_actual_dofs);
+      else
+        values_non_double.resize(n_actual_dofs);
     }
 
   // the basic difference to the non-block variant from now onwards is that we
@@ -2567,13 +2636,12 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
               if (use_dealii_matrix == false)
                 {
                   size_type *col_ptr = &cols[0];
-                  number *val_ptr = &vals[0];
+                  number *val_ptr = types_are_equal<double,number>::value ?
+                    reinterpret_cast<number*>(&vals[0]) : &values_non_double[0];
                   internals::resolve_matrix_row (global_rows, global_rows, i,
                                                  start_block, end_block,
                                                  local_matrix, col_ptr, val_ptr);
                   const size_type n_values = col_ptr - &cols[0];
-                  Assert (n_values == (size_type )(val_ptr - &vals[0]),
-                          ExcInternalError());
                   if (n_values > 0)
                     global_matrix.block(block, block_col).add(row, n_values,
                                                               &cols[0], &vals[0],
@@ -2607,6 +2675,8 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
   internals::set_matrix_diagonals (global_rows, local_dof_indices,
                                    local_matrix, *this,
                                    global_matrix, global_vector, use_inhomogeneities_for_rhs);
+
+  my_scratch_data.in_use = false;
 }
 
 
@@ -2630,13 +2700,20 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
       AssertDimension (dof_mask.n_cols(), n_local_dofs);
     }
 
+  ScratchData &my_scratch_data = scratch_data.get();
+  Assert(my_scratch_data.in_use == false,
+         ExcMessage("Access to thread-local scratch data tried, but it is already "
+                    "in use"));
+  my_scratch_data.in_use = true;
+
   // if the dof mask is not active, all we have to do is to add some indices
   // in a matrix format. To do this, we first create an array of all the
   // indices that are to be added. these indices are the local dof indices
   // plus some indices that come from constraints.
   if (dof_mask_is_active == false)
     {
-      std::vector<size_type> actual_dof_indices (n_local_dofs);
+      std::vector<size_type> & actual_dof_indices = my_scratch_data.columns;
+      actual_dof_indices.resize(n_local_dofs);
       make_sorted_row_list (local_dof_indices, actual_dof_indices);
       const size_type n_actual_dofs = actual_dof_indices.size();
 
@@ -2664,6 +2741,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
               sparsity_pattern.add (local_dof_indices[i], local_dof_indices[i]);
           }
 
+      my_scratch_data.in_use = false;
       return;
     }
 
@@ -2671,13 +2749,17 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
   // complicated case: we need to filter out some indices. then the function
   // gets similar to the function for distributing matrix entries, see there
   // for additional comments.
-  internals::GlobalRowsFromLocal global_rows (n_local_dofs);
+  if (my_scratch_data.global_rows.get() == 0)
+    my_scratch_data.global_rows.reset(new internals::GlobalRowsFromLocal());
+  internals::GlobalRowsFromLocal &global_rows = *my_scratch_data.global_rows;
+  global_rows.reinit(n_local_dofs);
   make_sorted_row_list (local_dof_indices, global_rows);
   const size_type n_actual_dofs = global_rows.size();
 
   // create arrays for the column indices that will then be written into the
   // sparsity pattern.
-  std::vector<size_type> cols (n_actual_dofs);
+  std::vector<size_type> & cols = my_scratch_data.columns;
+  cols.resize(n_actual_dofs);
 
   for (size_type i=0; i<n_actual_dofs; ++i)
     {
@@ -2695,6 +2777,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
   internals::set_sparsity_diagonals (global_rows, local_dof_indices,
                                      dof_mask, keep_constrained_entries,
                                      sparsity_pattern);
+  my_scratch_data.in_use = false;
 }
 
 
@@ -2705,9 +2788,9 @@ void
 ConstraintMatrix::
 add_entries_local_to_global (const std::vector<size_type> &row_indices,
                              const std::vector<size_type> &col_indices,
-                             SparsityType                    &sparsity_pattern,
-                             const bool                       keep_constrained_entries,
-                             const Table<2,bool>             &dof_mask) const
+                             SparsityType                 &sparsity_pattern,
+                             const bool                    keep_constrained_entries,
+                             const Table<2,bool>          &dof_mask) const
 {
   const size_type n_local_rows = row_indices.size();
   const size_type n_local_cols = col_indices.size();
@@ -2777,6 +2860,12 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
   const size_type n_local_dofs = local_dof_indices.size();
   const size_type num_blocks = sparsity_pattern.n_block_rows();
 
+  ScratchData &my_scratch_data = scratch_data.get();
+  Assert(my_scratch_data.in_use == false,
+         ExcMessage("Access to thread-local scratch data tried, but it is already "
+                    "in use"));
+  my_scratch_data.in_use = true;
+
   bool dof_mask_is_active = false;
   if (dof_mask.n_rows() == n_local_dofs)
     {
@@ -2786,12 +2875,14 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
 
   if (dof_mask_is_active == false)
     {
-      std::vector<size_type> actual_dof_indices (n_local_dofs);
+      std::vector<size_type> & actual_dof_indices = my_scratch_data.columns;
+      actual_dof_indices.resize(n_local_dofs);
       make_sorted_row_list (local_dof_indices, actual_dof_indices);
       const size_type n_actual_dofs = actual_dof_indices.size();
 
       // additional construct that also takes care of block indices.
-      std::vector<size_type> block_starts(num_blocks+1, n_actual_dofs);
+      std::vector<size_type> &block_starts = my_scratch_data.block_starts;
+      block_starts.resize(num_blocks+1);
       internals::make_block_starts (sparsity_pattern, actual_dof_indices,
                                     block_starts);
 
@@ -2831,21 +2922,26 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
               sparsity_pattern.add (local_dof_indices[i], local_dof_indices[i]);
           }
 
+      my_scratch_data.in_use = false;
       return;
     }
 
   // difficult case with dof_mask, similar to the distribute_local_to_global
   // function for block matrices
-  internals::GlobalRowsFromLocal global_rows (n_local_dofs);
+  if (my_scratch_data.global_rows.get() == 0)
+    my_scratch_data.global_rows.reset(new internals::GlobalRowsFromLocal());
+  internals::GlobalRowsFromLocal &global_rows = *my_scratch_data.global_rows;
+  global_rows.reinit(n_local_dofs);
   make_sorted_row_list (local_dof_indices, global_rows);
   const size_type n_actual_dofs = global_rows.size();
 
   // additional construct that also takes care of block indices.
-  std::vector<size_type> block_starts(num_blocks+1, n_actual_dofs);
-  internals::make_block_starts(sparsity_pattern, global_rows,
-                               block_starts);
+  std::vector<size_type> & block_starts = my_scratch_data.block_starts;
+  block_starts.resize(num_blocks+1);
+  internals::make_block_starts(sparsity_pattern, global_rows, block_starts);
 
-  std::vector<size_type> cols (n_actual_dofs);
+  std::vector<size_type> &cols = my_scratch_data.columns;
+  cols.resize(n_actual_dofs);
 
   // the basic difference to the non-block variant from now onwards is that we
   // go through the blocks of the matrix separately.
@@ -2874,10 +2970,10 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
   internals::set_sparsity_diagonals (global_rows, local_dof_indices,
                                      dof_mask, keep_constrained_entries,
                                      sparsity_pattern);
+  my_scratch_data.in_use = false;
 }
 
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

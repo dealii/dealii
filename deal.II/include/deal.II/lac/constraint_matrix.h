@@ -23,6 +23,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -150,58 +151,40 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * An enum that describes what should
-   * happen if the two ConstraintMatrix
-   * objects involved in a call to the
-   * merge() function happen to have
-   * constraints on the same degrees of
-   * freedom.
+   * An enum that describes what should happen if the two ConstraintMatrix
+   * objects involved in a call to the merge() function happen to have
+   * constraints on the same degrees of freedom.
    */
   enum MergeConflictBehavior
   {
     /**
-     * Throw an exception if the two
-     * objects concerned have
-     * conflicting constraints on the
-     * same degree of freedom.
+     * Throw an exception if the two objects concerned have conflicting
+     * constraints on the same degree of freedom.
      */
     no_conflicts_allowed,
 
     /**
-     * In an operation
-     * <code>cm1.merge(cm2)</code>, if
-     * <code>cm1</code> and
-     * <code>cm2</code> have
-     * constraints on the same degree
-     * of freedom, take the one from
-     * <code>cm1</code>.
+     * In an operation <code>cm1.merge(cm2)</code>, if <code>cm1</code> and
+     * <code>cm2</code> have constraints on the same degree of freedom, take
+     * the one from <code>cm1</code>.
      */
     left_object_wins,
 
     /**
-     * In an operation
-     * <code>cm1.merge(cm2)</code>, if
-     * <code>cm1</code> and
-     * <code>cm2</code> have
-     * constraints on the same degree
-     * of freedom, take the one from
-     * <code>cm2</code>.
+     * In an operation <code>cm1.merge(cm2)</code>, if <code>cm1</code> and
+     * <code>cm2</code> have constraints on the same degree of freedom, take
+     * the one from <code>cm2</code>.
      */
     right_object_wins
   };
 
   /**
-   * Constructor. The supplied IndexSet
-   * defines which indices might be
-   * constrained inside this
-   * ConstraintMatrix. In a calculation
-   * with a
-   * parallel::distributed::DoFHandler one
-   * should use locally_relevant_dofs. The
-   * IndexSet allows the ConstraintMatrix
-   * to safe memory. Otherwise internal
-   * data structures for all possible
-   * indices will be created.
+   * Constructor. The supplied IndexSet defines which indices might be
+   * constrained inside this ConstraintMatrix. In a calculation with a
+   * parallel::distributed::DoFHandler one should use
+   * locally_relevant_dofs. The IndexSet allows the ConstraintMatrix to safe
+   * memory. Otherwise internal data structures for all possible indices will
+   * be created.
    */
   ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
 
@@ -211,25 +194,18 @@ public:
   ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
 
   /**
-   * Reinit the ConstraintMatrix object and
-   * supply an IndexSet with lines that may
-   * be constrained. This function is only
-   * relevant in the distributed case to
-   * supply a different IndexSet. Otherwise
-   * this routine is equivalent to calling
-   * clear(). See the constructor for
-   * details.
+   * Reinit the ConstraintMatrix object and supply an IndexSet with lines that
+   * may be constrained. This function is only relevant in the distributed
+   * case to supply a different IndexSet. Otherwise this routine is equivalent
+   * to calling clear(). See the constructor for details.
    */
   void reinit (const IndexSet &local_constraints = IndexSet());
 
   /**
-   * Determines if we can store a
-   * constraint for the given @p
-   * line_index. This routine only matters
-   * in the distributed case and checks if
-   * the IndexSet allows storage of this
-   * line. Always returns true if not in
-   * the distributed case.
+   * Determines if we can store a constraint for the given @p line_index. This
+   * routine only matters in the distributed case and checks if the IndexSet
+   * allows storage of this line. Always returns true if not in the
+   * distributed case.
    */
   bool can_store_line (const size_type line_index) const;
 
@@ -242,39 +218,23 @@ public:
   const IndexSet & get_local_lines() const;
 
   /**
-   * This function copies the content of @p
-   * constraints_in with DoFs that are
-   * element of the IndexSet @p
-   * filter. Elements that are not present
-   * in the IndexSet are ignored. All DoFs
-   * will be transformed to local index
-   * space of the filter, both the
-   * constrained DoFs and the other DoFs
-   * these entries are constrained to. The
-   * local index space of the filter is a
-   * contiguous numbering of all (global)
-   * DoFs that are elements in the
-   * filter.
+   * This function copies the content of @p constraints_in with DoFs that are
+   * element of the IndexSet @p filter. Elements that are not present in the
+   * IndexSet are ignored. All DoFs will be transformed to local index space
+   * of the filter, both the constrained DoFs and the other DoFs these entries
+   * are constrained to. The local index space of the filter is a contiguous
+   * numbering of all (global) DoFs that are elements in the filter.
    *
-   * If, for example, the filter represents
-   * the range <tt>[10,20)</tt>, and the
-   * constraint matrix @p constraints_in
-   * includes the global indices
-   * <tt>{7,13,14}</tt>, the indices
-   * <tt>{3,4}</tt> are added to the
-   * calling constraint matrix (since 13
-   * and 14 are elements in the filter and
-   * element 13 is the fourth element in
-   * the index, and 14 is the fifth).
+   * If, for example, the filter represents the range <tt>[10,20)</tt>, and
+   * the constraint matrix @p constraints_in includes the global indices
+   * <tt>{7,13,14}</tt>, the indices <tt>{3,4}</tt> are added to the calling
+   * constraint matrix (since 13 and 14 are elements in the filter and element
+   * 13 is the fourth element in the index, and 14 is the fifth).
    *
-   * This function provides an easy way to
-   * create a ConstraintMatrix for certain
-   * vector components in a vector-valued
-   * problem from a full ConstraintMatrix,
-   * i.e. extracting a diagonal subblock
-   * from a larger ConstraintMatrix. The
-   * block is specified by the IndexSet
-   * argument.
+   * This function provides an easy way to create a ConstraintMatrix for
+   * certain vector components in a vector-valued problem from a full
+   * ConstraintMatrix, i.e. extracting a diagonal subblock from a larger
+   * ConstraintMatrix. The block is specified by the IndexSet argument.
    */
   void add_selected_constraints (const ConstraintMatrix &constraints_in,
                                  const IndexSet         &filter);
@@ -285,220 +245,147 @@ public:
    */
 
   /**
-   * Add a new line to the matrix. If the
-   * line already exists, then the function
-   * simply returns without doing anything.
+   * Add a new line to the matrix. If the line already exists, then the
+   * function simply returns without doing anything.
    */
   void add_line (const size_type line);
 
   /**
-   * Call the first add_line() function for
-   * every index <code>i</code> for which
-   * <code>lines[i]</code> is true.
+   * Call the first add_line() function for every index <code>i</code> for
+   * which <code>lines[i]</code> is true.
    *
-   * This function essentially exists to
-   * allow adding several constraints of
-   * the form <i>x<sub>i</sub></i>=0 all at once, where
-   * the set of indices <i>i</i> for which these
-   * constraints should be added are given
-   * by the argument of this function. On
-   * the other hand, just as if the
-   * single-argument add_line() function
-   * were called repeatedly, the
-   * constraints can later be modified to
-   * include linear dependencies using the
-   * add_entry() function as well as
-   * inhomogeneities using
+   * This function essentially exists to allow adding several constraints of
+   * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
+   * <i>i</i> for which these constraints should be added are given by the
+   * argument of this function. On the other hand, just as if the
+   * single-argument add_line() function were called repeatedly, the
+   * constraints can later be modified to include linear dependencies using
+   * the add_entry() function as well as inhomogeneities using
    * set_inhomogeneity().
    */
   void add_lines (const std::vector<bool> &lines);
 
   /**
-   * Call the first add_line() function for
-   * every index <code>i</code> that
+   * Call the first add_line() function for every index <code>i</code> that
    * appears in the argument.
    *
-   * This function essentially exists to
-   * allow adding several constraints of
-   * the form <i>x<sub>i</sub></i>=0 all at once, where
-   * the set of indices <i>i</i> for which these
-   * constraints should be added are given
-   * by the argument of this function. On
-   * the other hand, just as if the
-   * single-argument add_line() function
-   * were called repeatedly, the
-   * constraints can later be modified to
-   * include linear dependencies using the
-   * add_entry() function as well as
-   * inhomogeneities using
+   * This function essentially exists to allow adding several constraints of
+   * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
+   * <i>i</i> for which these constraints should be added are given by the
+   * argument of this function. On the other hand, just as if the
+   * single-argument add_line() function were called repeatedly, the
+   * constraints can later be modified to include linear dependencies using
+   * the add_entry() function as well as inhomogeneities using
    * set_inhomogeneity().
    */
   void add_lines (const std::set<size_type> &lines);
 
   /**
-   * Call the first add_line() function for
-   * every index <code>i</code> that
+   * Call the first add_line() function for every index <code>i</code> that
    * appears in the argument.
    *
-   * This function essentially exists to
-   * allow adding several constraints of
-   * the form <i>x<sub>i</sub></i>=0 all at once, where
-   * the set of indices <i>i</i> for which these
-   * constraints should be added are given
-   * by the argument of this function. On
-   * the other hand, just as if the
-   * single-argument add_line() function
-   * were called repeatedly, the
-   * constraints can later be modified to
-   * include linear dependencies using the
-   * add_entry() function as well as
-   * inhomogeneities using
+   * This function essentially exists to allow adding several constraints of
+   * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
+   * <i>i</i> for which these constraints should be added are given by the
+   * argument of this function. On the other hand, just as if the
+   * single-argument add_line() function were called repeatedly, the
+   * constraints can later be modified to include linear dependencies using
+   * the add_entry() function as well as inhomogeneities using
    * set_inhomogeneity().
    */
   void add_lines (const IndexSet &lines);
 
   /**
-   * Add an entry to a given
-   * line. The list of lines is
-   * searched from the back to the
-   * front, so clever programming
-   * would add a new line (which is
-   * pushed to the back) and
-   * immediately afterwards fill
-   * the entries of that line. This
-   * way, no expensive searching is
-   * needed.
+   * Add an entry to a given line. The list of lines is searched from the back
+   * to the front, so clever programming would add a new line (which is pushed
+   * to the back) and immediately afterwards fill the entries of that
+   * line. This way, no expensive searching is needed.
    *
-   * If an entry with the same
-   * indices as the one this
-   * function call denotes already
-   * exists, then this function
-   * simply returns provided that
-   * the value of the entry is the
-   * same. Thus, it does no harm to
-   * enter a constraint twice.
+   * If an entry with the same indices as the one this function call denotes
+   * already exists, then this function simply returns provided that the value
+   * of the entry is the same. Thus, it does no harm to enter a constraint
+   * twice.
    */
   void add_entry (const size_type line,
                   const size_type column,
                   const double value);
 
   /**
-   * Add a whole series of entries,
-   * denoted by pairs of column indices
-   * and values, to a line of
-   * constraints. This function is
-   * equivalent to calling the preceding
-   * function several times, but is
-   * faster.
+   * Add a whole series of entries, denoted by pairs of column indices and
+   * values, to a line of constraints. This function is equivalent to calling
+   * the preceding function several times, but is faster.
    */
   void add_entries (const size_type                                  line,
                     const std::vector<std::pair<size_type,double> > &col_val_pairs);
 
   /**
-   * Set an imhomogeneity to the
-   * constraint line <i>i</i>, according
-   * to the discussion in the general
-   * class description.
+   * Set an imhomogeneity to the constraint line <i>i</i>, according to the
+   * discussion in the general class description.
   *
-   * @note the line needs to be added with
-   * one of the add_line() calls first.
+   * @note the line needs to be added with one of the add_line() calls first.
    */
   void set_inhomogeneity (const size_type line,
                           const double    value);
 
   /**
-   * Close the filling of entries. Since
-   * the lines of a matrix of this type
-   * are usually filled in an arbitrary
-   * order and since we do not want to
-   * use associative constainers to store
-   * the lines, we need to sort the lines
-   * and within the lines the columns
-   * before usage of the matrix.  This is
-   * done through this function.
+   * Close the filling of entries. Since the lines of a matrix of this type
+   * are usually filled in an arbitrary order and since we do not want to use
+   * associative constainers to store the lines, we need to sort the lines and
+   * within the lines the columns before usage of the matrix. This is done
+   * through this function.
    *
-   * Also, zero entries are discarded,
-   * since they are not needed.
+   * Also, zero entries are discarded, since they are not needed.
    *
-   * After closing, no more entries are
-   * accepted. If the object was already
-   * closed, then this function returns
-   * immediately.
+   * After closing, no more entries are accepted. If the object was already
+   * closed, then this function returns immediately.
    *
-   * This function also resolves chains
-   * of constraints. For example, degree
-   * of freedom 13 may be constrained to
-   * <i>u</i><sub>13</sub>=<i>u</i><sub>3</sub>/2+<i>u</i><sub>7</sub>/2 while degree of
-   * freedom 7 is itself constrained as
-   * <i>u</i><sub>7</sub>=<i>u</i><sub>2</sub>/2+<i>u</i><sub>4</sub>/2. Then, the
-   * resolution will be that
-   * <i>u</i><sub>13</sub>=<i>u</i><sub>3</sub>/2+<i>u</i><sub>2</sub>/4+<i>u</i><sub>4</sub>/4. Note,
-   * however, that cycles in this graph
-   * of constraints are not allowed,
-   * i.e. for example <i>u</i><sub>4</sub> may not be
-   * constrained, directly or indirectly,
-   * to <i>u</i><sub>13</sub> again.
+   * This function also resolves chains of constraints. For example, degree of
+   * freedom 13 may be constrained to $u_{13} = \frac{u_3}{2} + \frac{u_7}{2}$
+   * while degree of freedom 7 is itself constrained as $u_{7} = \frac{u_2}{2}
+   * + \frac{u_4}{2}$. Then, the resolution will be that $u_{13} =
+   * \frac{u_3}{2} + \frac{u_2}{4} + \frac{u_4}{4}$. Note, however, that
+   * cycles in this graph of constraints are not allowed, i.e. for example
+   * $u_4$ may not be constrained, directly or indirectly, to $u_{13}$ again.
    */
   void close ();
 
   /**
-   * Merge the constraints represented by
-   * the object given as argument into
-   * the constraints represented by this
-   * object. Both objects may or may not
-   * be closed (by having their function
-   * close() called before). If this
-   * object was closed before, then it
-   * will be closed afterwards as
-   * well. Note, however, that if the
-   * other argument is closed, then
-   * merging may be significantly faster.
+   * Merge the constraints represented by the object given as argument into
+   * the constraints represented by this object. Both objects may or may not
+   * be closed (by having their function close() called before). If this
+   * object was closed before, then it will be closed afterwards as
+   * well. Note, however, that if the other argument is closed, then merging
+   * may be significantly faster.
    *
-   * Using the default value of the second
-   * arguments, the constraints in each of
-   * the two objects (the old one
-   * represented by this object and the
-   * argument) may not refer to the same
-   * degree of freedom, i.e. a degree of
-   * freedom that is constrained in one
-   * object may not be constrained in the
-   * second. If this is nevertheless the
-   * case, an exception is thrown. However,
-   * this behavior can be changed by
-   * providing a different value for the
-   * second argument.
+   * Using the default value of the second arguments, the constraints in each
+   * of the two objects (the old one represented by this object and the
+   * argument) may not refer to the same degree of freedom, i.e. a degree of
+   * freedom that is constrained in one object may not be constrained in the
+   * second. If this is nevertheless the case, an exception is
+   * thrown. However, this behavior can be changed by providing a different
+   * value for the second argument.
    */
   void merge (const ConstraintMatrix &other_constraints,
               const MergeConflictBehavior merge_conflict_behavior = no_conflicts_allowed);
 
   /**
-   * Shift all entries of this matrix
-   * down @p offset rows and over @p
-   * offset columns.
+   * Shift all entries of this matrix down @p offset rows and over @p offset
+   * columns.
    *
-   * This function is useful if you are
-   * building block matrices, where all
-   * blocks are built by the same
-   * DoFHandler object, i.e. the matrix
-   * size is larger than the number of
-   * degrees of freedom. Since several
-   * matrix rows and columns correspond
-   * to the same degrees of freedom,
-   * you'd generate several constraint
-   * objects, then shift them, and
-   * finally merge() them together
-   * again.
+   * This function is useful if you are building block matrices, where all
+   * blocks are built by the same DoFHandler object, i.e. the matrix size is
+   * larger than the number of degrees of freedom. Since several matrix rows
+   * and columns correspond to the same degrees of freedom, you'd generate
+   * several constraint objects, then shift them, and finally merge() them
+   * together again.
    */
   void shift (const size_type offset);
 
   /**
-   * Clear all entries of this
-   * matrix. Reset the flag determining
-   * whether new entries are accepted or
-   * not.
+   * Clear all entries of this matrix. Reset the flag determining whether new
+   * entries are accepted or not.
    *
-   * This function may be called also on
-   * objects which are empty or already
+   * This function may be called also on objects which are empty or already
    * cleared.
    */
   void clear ();
@@ -514,51 +401,37 @@ public:
    */
 
   /**
-   * Return number of constraints stored in
-   * this matrix.
+   * Return number of constraints stored in this matrix.
    */
   size_type n_constraints () const;
 
   /**
-   * Return whether the degree of freedom
-   * with number @p index is a
+   * Return whether the degree of freedom with number @p index is a
    * constrained one.
    *
-   * Note that if close() was called
-   * before, then this function is
-   * significantly faster, since then the
-   * constrained degrees of freedom are
-   * sorted and we can do a binary
-   * search, while before close() was
-   * called, we have to perform a linear
-   * search through all entries.
+   * Note that if close() was called before, then this function is
+   * significantly faster, since then the constrained degrees of freedom are
+   * sorted and we can do a binary search, while before close() was called, we
+   * have to perform a linear search through all entries.
    */
   bool is_constrained (const size_type index) const;
 
   /**
-   * Return whether the dof is
-   * constrained, and whether it is
-   * constrained to only one other degree
-   * of freedom with weight one. The
-   * function therefore returns whether
-   * the degree of freedom would simply
-   * be eliminated in favor of exactly
-   * one other degree of freedom.
+   * Return whether the dof is constrained, and whether it is constrained to
+   * only one other degree of freedom with weight one. The function therefore
+   * returns whether the degree of freedom would simply be eliminated in favor
+   * of exactly one other degree of freedom.
    *
-   * The function returns @p false if
-   * either the degree of freedom is not
-   * constrained at all, or if it is
-   * constrained to more than one other
-   * degree of freedom, or if it is
-   * constrained to only one degree of
-   * freedom but with a weight different
-   * from one.
+   * The function returns @p false if either the degree of freedom is not
+   * constrained at all, or if it is constrained to more than one other degree
+   * of freedom, or if it is constrained to only one degree of freedom but
+   * with a weight different from one.
    */
   bool is_identity_constrained (const size_type index) const;
 
   /**
-   * Return whether the two given degrees of freedom are linked by an
-   * equality constraint that either constrains index1 to be so that
+   * Return whether the two given degrees of freedom are linked by an equality
+   * constraint that either constrains index1 to be so that
    * <code>index1=index2</code> or constrains index2 so that
    * <code>index2=index1</code>.
    */
@@ -566,105 +439,78 @@ public:
                                      const size_type index2) const;
 
   /**
-   * Return the maximum number of other
-   * dofs that one dof is constrained
-   * to. For example, in 2d a hanging
-   * node is constrained only to its two
-   * neighbors, so the returned value
-   * would be 2. However, for higher
-   * order elements and/or higher
-   * dimensions, or other types of
-   * constraints, this number is no more
-   * obvious.
+   * Return the maximum number of other dofs that one dof is constrained
+   * to. For example, in 2d a hanging node is constrained only to its two
+   * neighbors, so the returned value would be 2. However, for higher order
+   * elements and/or higher dimensions, or other types of constraints, this
+   * number is no more obvious.
    *
-   * The name indicates that within the
-   * system matrix, references to a
-   * constrained node are indirected to
-   * the nodes it is constrained to.
+   * The name indicates that within the system matrix, references to a
+   * constrained node are indirected to the nodes it is constrained to.
    */
   size_type max_constraint_indirections () const;
 
   /**
-   * Returns <tt>true</tt> in case the
-   * dof is constrained and there is a
-   * non-trivial inhomogeneous valeus set
-   * to the dof.
+   * Returns <tt>true</tt> in case the dof is constrained and there is a
+   * non-trivial inhomogeneous valeus set to the dof.
    */
   bool is_inhomogeneously_constrained (const size_type index) const;
 
   /**
-   * Returns <tt>false</tt> if all
-   * constraints in the ConstraintMatrix
-   * are homogeneous ones, and
-   * <tt>true</tt> if there is at least
-   * one inhomogeneity.
+   * Returns <tt>false</tt> if all constraints in the ConstraintMatrix are
+   * homogeneous ones, and <tt>true</tt> if there is at least one
+   * inhomogeneity.
    */
   bool has_inhomogeneities () const;
 
   /**
-   * Returns a pointer to the the vector of
-   * entries if a line is constrained, and a
-   * zero pointer in case the dof is not
-   * constrained.
+   * Returns a pointer to the the vector of entries if a line is constrained,
+   * and a zero pointer in case the dof is not constrained.
    */
   const std::vector<std::pair<size_type,double> > *
   get_constraint_entries (const size_type line) const;
 
   /**
-   * Returns the value of the inhomogeneity
-   * stored in the constrained dof @p
-   * line. Unconstrained dofs also return a
-   * zero value.
+   * Returns the value of the inhomogeneity stored in the constrained dof @p
+   * line. Unconstrained dofs also return a zero value.
    */
   double get_inhomogeneity (const size_type line) const;
 
   /**
-   * Print the constraint lines. Mainly
-   * for debugging purposes.
+   * Print the constraint lines. Mainly for debugging purposes.
    *
-   * This function writes out all entries
-   * in the constraint matrix lines with
-   * their value in the form <tt>row col
-   * : value</tt>. Unconstrained lines
-   * containing only one identity entry
-   * are not stored in this object and
-   * are not printed.
+   * This function writes out all entries in the constraint matrix lines with
+   * their value in the form <tt>row col : value</tt>. Unconstrained lines
+   * containing only one identity entry are not stored in this object and are
+   * not printed.
    */
   void print (std::ostream &) const;
 
   /**
-   * Write the graph of constraints in
-   * 'dot' format. 'dot' is a program
-   * that can take a list of nodes and
-   * produce a graphical representation
-   * of the graph of constrained degrees
-   * of freedom and the degrees of
-   * freedom they are constrained to.
+   * Write the graph of constraints in 'dot' format. 'dot' is a program that
+   * can take a list of nodes and produce a graphical representation of the
+   * graph of constrained degrees of freedom and the degrees of freedom they
+   * are constrained to.
    *
-   * The output of this function can be
-   * used as input to the 'dot' program
-   * that can convert the graph into a
-   * graphical representation in
-   * postscript, png, xfig, and a number
-   * of other formats.
+   * The output of this function can be used as input to the 'dot' program
+   * that can convert the graph into a graphical representation in postscript,
+   * png, xfig, and a number of other formats.
    *
-   * This function exists mostly for
-   * debugging purposes.
+   * This function exists mostly for debugging purposes.
    */
   void write_dot (std::ostream &) const;
 
   /**
-   * Determine an estimate for the memory
-   * consumption (in bytes) of this
+   * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
   std::size_t memory_consumption () const;
 
   /**
    * Add the constraint indices associated to the indices in the given vector.
-   * After a call to this function, the indices vector contains the
-   * initial elements and all the associated constrained indices. This 
-   * function sorts the elements and suppresses duplicates.
+   * After a call to this function, the indices vector contains the initial
+   * elements and all the associated constrained indices. This function sorts
+   * the elements and suppresses duplicates.
    */
   void resolve_indices(std::vector<types::global_dof_index> &indices) const;
 
@@ -678,150 +524,100 @@ public:
    */
 
   /**
-   * Condense a given sparsity
-   * pattern. This function assumes the
-   * uncondensed matrix struct to be
-   * compressed and the one to be filled
-   * to be empty. The condensed structure
-   * is compressed afterwards.
+   * Condense a given sparsity pattern. This function assumes the uncondensed
+   * matrix struct to be compressed and the one to be filled to be empty. The
+   * condensed structure is compressed afterwards.
    *
-   * The constraint matrix object must be
-   * closed to call this function.
+   * The constraint matrix object must be closed to call this function.
    *
-   * @note The hanging nodes are
-   * completely eliminated from the
-   * linear system referring to
-   * <tt>condensed</tt>. Therefore, the
-   * dimension of <tt>condensed</tt> is
-   * the dimension of
-   * <tt>uncondensed</tt> minus the
-   * number of constrained degrees of
-   * freedom.
+   * @note The hanging nodes are completely eliminated from the linear system
+   * referring to <tt>condensed</tt>. Therefore, the dimension of
+   * <tt>condensed</tt> is the dimension of <tt>uncondensed</tt> minus the
+   * number of constrained degrees of freedom.
    */
   void condense (const SparsityPattern &uncondensed,
                  SparsityPattern       &condensed) const;
 
 
   /**
-   * This function does much the same as
-   * the above one, except that it
-   * condenses the matrix struct
-   * 'in-place'. It does not remove
-   * nonzero entries from the matrix but
-   * adds those needed for the process of
-   * distribution of the constrained
-   * degrees of freedom.
+   * This function does much the same as the above one, except that it
+   * condenses the matrix struct 'in-place'. It does not remove nonzero
+   * entries from the matrix but adds those needed for the process of
+   * distribution of the constrained degrees of freedom.
    *
-   * Since this function adds new nonzero
-   * entries to the sparsity pattern, the
-   * argument must not be
-   * compressed. However the constraint
-   * matrix must be closed. The matrix
-   * struct is compressed at the end of
-   * the function.
+   * Since this function adds new nonzero entries to the sparsity pattern, the
+   * argument must not be compressed. However the constraint matrix must be
+   * closed. The matrix struct is compressed at the end of the function.
    */
   void condense (SparsityPattern &sparsity) const;
 
   /**
-   * Same function as above, but
-   * condenses square block sparsity
-   * patterns.
+   * Same function as above, but condenses square block sparsity patterns.
    */
   void condense (BlockSparsityPattern &sparsity) const;
 
   /**
-   * Same function as above, but
-   * condenses square compressed sparsity
+   * Same function as above, but condenses square compressed sparsity
    * patterns.
    *
-   * Given the data structure used by
-   * CompressedSparsityPattern, this
-   * function becomes quadratic in the
-   * number of degrees of freedom for
-   * large problems and can dominate
-   * setting up linear systems when
-   * several hundred thousand or millions
-   * of unknowns are involved and for
-   * problems with many nonzero elements
-   * per row (for example for
-   * vector-valued problems or hp finite
-   * elements). In this case, it is
-   * advisable to use the
-   * CompressedSetSparsityPattern class
-   * instead, see for example @ref
-   * step_27 "step-27", or to use the
-   * CompressedSimpleSparsityPattern
-   * class, see for example @ref step_31
-   * "step-31".
+   * Given the data structure used by CompressedSparsityPattern, this function
+   * becomes quadratic in the number of degrees of freedom for large problems
+   * and can dominate setting up linear systems when several hundred thousand
+   * or millions of unknowns are involved and for problems with many nonzero
+   * elements per row (for example for vector-valued problems or hp finite
+   * elements). In this case, it is advisable to use the
+   * CompressedSetSparsityPattern class instead, see for example @ref step_27
+   * "step-27", or to use the CompressedSimpleSparsityPattern class, see for
+   * example @ref step_31 "step-31".
    */
   void condense (CompressedSparsityPattern &sparsity) const;
 
   /**
-   * Same function as above, but
-   * condenses compressed sparsity
-   * patterns, which are based on the
-   * std::set container.
+   * Same function as above, but condenses compressed sparsity patterns, which
+   * are based on the std::set container.
    */
   void condense (CompressedSetSparsityPattern &sparsity) const;
 
   /**
-   * Same function as above, but
-   * condenses compressed sparsity
-   * patterns, which are based on the
-   * ''simple'' aproach.
+   * Same function as above, but condenses compressed sparsity patterns, which
+   * are based on the ''simple'' aproach.
    */
   void condense (CompressedSimpleSparsityPattern &sparsity) const;
 
   /**
-   * Same function as above, but
-   * condenses square compressed sparsity
+   * Same function as above, but condenses square compressed sparsity
    * patterns.
    *
-   * Given the data structure used by
-   * BlockCompressedSparsityPattern, this
-   * function becomes quadratic in the
-   * number of degrees of freedom for
-   * large problems and can dominate
-   * setting up linear systems when
-   * several hundred thousand or millions
-   * of unknowns are involved and for
-   * problems with many nonzero elements
-   * per row (for example for
-   * vector-valued problems or hp finite
-   * elements). In this case, it is
-   * advisable to use the
-   * BlockCompressedSetSparsityPattern
-   * class instead, see for example @ref
-   * step_27 "step-27" and @ref step_31
-   * "step-31".
+   * Given the data structure used by BlockCompressedSparsityPattern, this
+   * function becomes quadratic in the number of degrees of freedom for large
+   * problems and can dominate setting up linear systems when several hundred
+   * thousand or millions of unknowns are involved and for problems with many
+   * nonzero elements per row (for example for vector-valued problems or hp
+   * finite elements). In this case, it is advisable to use the
+   * BlockCompressedSetSparsityPattern class instead, see for example @ref
+   * step_27 "step-27" and @ref step_31 "step-31".
    */
   void condense (BlockCompressedSparsityPattern &sparsity) const;
 
   /**
-   * Same function as above, but
-   * condenses square compressed sparsity
+   * Same function as above, but condenses square compressed sparsity
    * patterns.
    */
   void condense (BlockCompressedSetSparsityPattern &sparsity) const;
 
   /**
-   * Same function as above, but
-   * condenses square compressed sparsity
+   * Same function as above, but condenses square compressed sparsity
    * patterns.
    */
   void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
 
 
   /**
-   * Condense a given matrix. The
-   * associated matrix struct should be
-   * condensed and compressed. It is the
-   * user's responsibility to guarantee
-   * that all entries in the @p condensed
-   * matrix be zero!
+   * Condense a given matrix. The associated matrix struct should be condensed
+   * and compressed. It is the user's responsibility to guarantee that all
+   * entries in the @p condensed matrix be zero!
    *
-   * The constraint matrix object must be
-   * closed to call this function.
+   * The constraint matrix object must be closed to call this function.
    *
    * @deprecated The functions converting an uncondensed matrix into
    * its condensed form are deprecated. Use the functions doing the
@@ -832,42 +628,30 @@ public:
                  SparseMatrix<number>       &condensed) const DEAL_II_DEPRECATED;
 
   /**
-   * This function does much the same as
-   * the above one, except that it
-   * condenses the matrix 'in-place'. See
-   * the general documentation of this
+   * This function does much the same as the above one, except that it
+   * condenses the matrix 'in-place'. See the general documentation of this
    * class for more detailed information.
    */
   template<typename number>
   void condense (SparseMatrix<number> &matrix) const;
 
   /**
-   * Same function as above, but
-   * condenses square block sparse
-   * matrices.
+   * Same function as above, but condenses square block sparse matrices.
    */
   template <typename number>
   void condense (BlockSparseMatrix<number> &matrix) const;
 
   /**
-   * Condense the given vector @p
-   * uncondensed into @p condensed. It is
-   * the user's responsibility to
-   * guarantee that all entries of @p
-   * condensed be zero. Note that this
-   * function does not take any
-   * inhomogeneity into account and
-   * throws an exception in case there
-   * are any inhomogeneities. Use
-   * the function using both a matrix and
-   * vector for that case.
+   * Condense the given vector @p uncondensed into @p condensed. It is the
+   * user's responsibility to guarantee that all entries of @p condensed be
+   * zero. Note that this function does not take any inhomogeneity into
+   * account and throws an exception in case there are any
+   * inhomogeneities. Use the function using both a matrix and vector for that
+   * case.
    *
-   * The @p VectorType may be a
-   * Vector<float>, Vector<double>,
-   * BlockVector<tt><...></tt>, a PETSc
-   * or Trilinos vector wrapper class, or
-   * any other type having the same
-   * interface.
+   * The @p VectorType may be a Vector<float>, Vector<double>,
+   * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
+   * any other type having the same interface.
    *
    * @deprecated The functions converting an uncondensed matrix into
    * its condensed form are deprecated. Use the functions doing the
@@ -878,36 +662,25 @@ public:
                  VectorType       &condensed) const DEAL_II_DEPRECATED;
 
   /**
-   * Condense the given vector
-   * in-place. The @p VectorType may be a
-   * Vector<float>, Vector<double>,
-   * BlockVector<tt><...></tt>, a PETSc
-   * or Trilinos vector wrapper class, or
-   * any other type having the same
-   * interface. Note that this function
-   * does not take any inhomogeneity into
-   * account and throws an exception in
-   * case there are any
-   * inhomogeneities. Use the function
-   * using both a matrix and vector for
-   * that case.
+   * Condense the given vector in-place. The @p VectorType may be a
+   * Vector<float>, Vector<double>, BlockVector<tt><...></tt>, a PETSc or
+   * Trilinos vector wrapper class, or any other type having the same
+   * interface. Note that this function does not take any inhomogeneity into
+   * account and throws an exception in case there are any
+   * inhomogeneities. Use the function using both a matrix and vector for that
+   * case.
    */
   template <class VectorType>
   void condense (VectorType &vec) const;
 
   /**
-   * Condense a given matrix and a given
-   * vector. The associated matrix struct
-   * should be condensed and
-   * compressed. It is the user's
-   * responsibility to guarantee that all
-   * entries in the @p condensed matrix
-   * and vector be zero! This function is
-   * the appropriate choice for applying
-   * inhomogeneous constraints.
+   * Condense a given matrix and a given vector. The associated matrix struct
+   * should be condensed and compressed. It is the user's responsibility to
+   * guarantee that all entries in the @p condensed matrix and vector be zero!
+   * This function is the appropriate choice for applying inhomogeneous
+   * constraints.
    *
-   * The constraint matrix object must be
-   * closed to call this function.
+   * The constraint matrix object must be closed to call this function.
    *
    * @deprecated The functions converting an uncondensed matrix into
    * its condensed form are deprecated. Use the functions doing the
@@ -920,36 +693,27 @@ public:
                  VectorType                 &condensed_vector) const DEAL_II_DEPRECATED;
 
   /**
-   * This function does much the same as
-   * the above one, except that it
-   * condenses matrix and vector
-   * 'in-place'. See the general
-   * documentation of this class for more
-   * detailed information.
+   * This function does much the same as the above one, except that it
+   * condenses matrix and vector 'in-place'. See the general documentation of
+   * this class for more detailed information.
    */
   template<typename number, class VectorType>
   void condense (SparseMatrix<number> &matrix,
                  VectorType           &vector) const;
 
   /**
-   * Same function as above, but
-   * condenses square block sparse
-   * matrices and vectors.
+   * Same function as above, but condenses square block sparse matrices and
+   * vectors.
    */
   template <typename number, class BlockVectorType>
   void condense (BlockSparseMatrix<number> &matrix,
                  BlockVectorType           &vector) const;
 
   /**
-   * Sets the values of all constrained
-   * DoFs in a vector to zero.
-   * The @p VectorType may be a
-   * Vector<float>, Vector<double>,
-   * BlockVector<tt><...></tt>, a
-   * PETSc or Trilinos vector
-   * wrapper class, or any other
-   * type having the same
-   * interface.
+   * Sets the values of all constrained DoFs in a vector to zero.  The @p
+   * VectorType may be a Vector<float>, Vector<double>,
+   * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
+   * any other type having the same interface.
    */
   template <class VectorType>
   void set_zero (VectorType &vec) const;
@@ -964,59 +728,40 @@ public:
    */
 
   /**
-   * This function takes a vector of
-   * local contributions (@p
-   * local_vector) corresponding to the
-   * degrees of freedom indices given in
-   * @p local_dof_indices and distributes
-   * them to the global vector. In most
-   * cases, these local contributions
-   * will be the result of an integration
-   * over a cell or face of a
-   * cell. However, as long as @p
-   * local_vector and @p
-   * local_dof_indices have the same
-   * number of elements, this function is
-   * happy with whatever it is
-   * given.
+   * This function takes a vector of local contributions (@p local_vector)
+   * corresponding to the degrees of freedom indices given in @p
+   * local_dof_indices and distributes them to the global vector. In most
+   * cases, these local contributions will be the result of an integration
+   * over a cell or face of a cell. However, as long as @p local_vector and @p
+   * local_dof_indices have the same number of elements, this function is
+   * happy with whatever it is given.
    *
-   * In contrast to the similar function
-   * in the DoFAccessor class, this
-   * function also takes care of
-   * constraints, i.e. if one of the
-   * elements of @p local_dof_indices
-   * belongs to a constrained node, then
-   * rather than writing the
-   * corresponding element of @p
-   * local_vector into @p global_vector,
-   * the element is distributed to the
-   * entries in the global vector to
-   * which this particular degree of
-   * freedom is constrained.
+   * In contrast to the similar function in the DoFAccessor class, this
+   * function also takes care of constraints, i.e. if one of the elements of
+   * @p local_dof_indices belongs to a constrained node, then rather than
+   * writing the corresponding element of @p local_vector into @p
+   * global_vector, the element is distributed to the entries in the global
+   * vector to which this particular degree of freedom is constrained.
    *
-   * Thus, by using this function to
-   * distribute local contributions to the
-   * global object, one saves the call to
-   * the condense function after the
-   * vectors and matrices are fully
-   * assembled. On the other hand, by
-   * consequence, the function does not
-   * only write into the entries enumerated
-   * by the @p local_dof_indices array, but
-   * also (possibly) others as necessary.
+   * Thus, by using this function to distribute local contributions to the
+   * global object, one saves the call to the condense function after the
+   * vectors and matrices are fully assembled. On the other hand, by
+   * consequence, the function does not only write into the entries enumerated
+   * by the @p local_dof_indices array, but also (possibly) others as
+   * necessary.
    *
-   * Note that this function will apply all
-   * constraints as if they were
-   * homogeneous. For correctly setting
-   * inhomogeneous constraints, use the
-   * similar function with a matrix
-   * argument or the function with both
-   * matrix and vector arguments.
+   * Note that this function will apply all constraints as if they were
+   * homogeneous. For correctly setting inhomogeneous constraints, use the
+   * similar function with a matrix argument or the function with both matrix
+   * and vector arguments.
    *
-   * @note This function is not
-   * thread-safe, so you will need to make
-   * sure that only one process at a time
-   * calls this function.
+   * @note This function in itself is thread-safe, i.e., it works properly
+   * also when several threads call it simultaneously. However, the function
+   * call is only thread-safe if the underlying global vector allows
+   * for simultaneous access and the access is not to rows with the same
+   * global index at the same time. This needs to be made sure from the
+   * caller's site. There is no locking mechanism inside this method to
+   * prevent data races.
    */
   template <class InVector, class OutVector>
   void
@@ -1025,75 +770,47 @@ public:
                               OutVector                    &global_vector) const;
 
   /**
-   * This function takes a vector of
-   * local contributions (@p
-   * local_vector) corresponding to the
-   * degrees of freedom indices given in
-   * @p local_dof_indices and distributes
-   * them to the global vector. In most
-   * cases, these local contributions
-   * will be the result of an integration
-   * over a cell or face of a
-   * cell. However, as long as @p
-   * local_vector and @p
-   * local_dof_indices have the same
-   * number of elements, this function is
-   * happy with whatever it is
-   * given.
+   * This function takes a vector of local contributions (@p local_vector)
+   * corresponding to the degrees of freedom indices given in @p
+   * local_dof_indices and distributes them to the global vector. In most
+   * cases, these local contributions will be the result of an integration
+   * over a cell or face of a cell. However, as long as @p local_vector and @p
+   * local_dof_indices have the same number of elements, this function is
+   * happy with whatever it is given.
    *
-   * In contrast to the similar function in
-   * the DoFAccessor class, this function
-   * also takes care of constraints,
-   * i.e. if one of the elements of @p
-   * local_dof_indices belongs to a
-   * constrained node, then rather than
-   * writing the corresponding element of
-   * @p local_vector into @p global_vector,
-   * the element is distributed to the
-   * entries in the global vector to which
-   * this particular degree of freedom is
-   * constrained.
+   * In contrast to the similar function in the DoFAccessor class, this
+   * function also takes care of constraints, i.e. if one of the elements of
+   * @p local_dof_indices belongs to a constrained node, then rather than
+   * writing the corresponding element of @p local_vector into @p
+   * global_vector, the element is distributed to the entries in the global
+   * vector to which this particular degree of freedom is constrained.
    *
-   * Thus, by using this function to
-   * distribute local contributions to the
-   * global object, one saves the call to
-   * the condense function after the
-   * vectors and matrices are fully
-   * assembled. On the other hand, by
-   * consequence, the function does not
-   * only write into the entries enumerated
-   * by the @p local_dof_indices array, but
-   * also (possibly) others as
-   * necessary. This includes writing into
-   * diagonal elements of the matrix if the
-   * corresponding degree of freedom is
-   * constrained.
+   * Thus, by using this function to distribute local contributions to the
+   * global object, one saves the call to the condense function after the
+   * vectors and matrices are fully assembled. On the other hand, by
+   * consequence, the function does not only write into the entries enumerated
+   * by the @p local_dof_indices array, but also (possibly) others as
+   * necessary. This includes writing into diagonal elements of the matrix if
+   * the corresponding degree of freedom is constrained.
    *
-   * The fourth argument
-   * <tt>local_matrix</tt> is intended to
-   * be used in case one wants to apply
-   * inhomogeneous constraints on the
-   * vector only. Such a situation could be
-   * where one wants to assemble of a right
-   * hand side vector on a problem with
-   * inhomogeneous constraints, but the
-   * global matrix has been assembled
-   * previously. A typical example of this
-   * is a time stepping algorithm where the
-   * stiffness matrix is assembled once,
-   * and the right hand side updated every
-   * time step. Note that, however, the
-   * entries in the columns of the local
-   * matrix have to be exactly the same as
-   * those that have been written into the
-   * global matrix. Otherwise, this
-   * function will not be able to correctly
-   * handle inhomogeneities.
+   * The fourth argument <tt>local_matrix</tt> is intended to be used in case
+   * one wants to apply inhomogeneous constraints on the vector only. Such a
+   * situation could be where one wants to assemble of a right hand side
+   * vector on a problem with inhomogeneous constraints, but the global matrix
+   * has been assembled previously. A typical example of this is a time
+   * stepping algorithm where the stiffness matrix is assembled once, and the
+   * right hand side updated every time step. Note that, however, the entries
+   * in the columns of the local matrix have to be exactly the same as those
+   * that have been written into the global matrix. Otherwise, this function
+   * will not be able to correctly handle inhomogeneities.
    *
-   * @note This function is not
-   * thread-safe, so you will need to make
-   * sure that only one process at a time
-   * calls this function.
+   * @note This function in itself is thread-safe, i.e., it works properly
+   * also when several threads call it simultaneously. However, the function
+   * call is only thread-safe if the underlying global vector allows
+   * for simultaneous access and the access is not to rows with the same
+   * global index at the same time. This needs to be made sure from the
+   * caller's site. There is no locking mechanism inside this method to
+   * prevent data races.
    */
   template <typename VectorType>
   void
@@ -1103,8 +820,7 @@ public:
                               const FullMatrix<double>     &local_matrix) const;
 
   /**
-   * Enter a single value into a
-   * result vector, obeying constraints.
+   * Enter a single value into a result vector, obeying constraints.
    */
   template <class VectorType>
   void
@@ -1113,45 +829,32 @@ public:
                               VectorType     &global_vector) const;
 
   /**
-   * This function takes a pointer to a
-   * vector of local contributions (@p
-   * local_vector) corresponding to the
-   * degrees of freedom indices given in
-   * @p local_dof_indices and distributes
-   * them to the global vector. In most
-   * cases, these local contributions
-   * will be the result of an integration
-   * over a cell or face of a
-   * cell. However, as long as the
-   * entries in @p local_dof_indices
-   * indicate reasonable global vector
-   * entries, this function is happy with
-   * whatever it is given.
+   * This function takes a pointer to a vector of local contributions (@p
+   * local_vector) corresponding to the degrees of freedom indices given in @p
+   * local_dof_indices and distributes them to the global vector. In most
+   * cases, these local contributions will be the result of an integration
+   * over a cell or face of a cell. However, as long as the entries in @p
+   * local_dof_indices indicate reasonable global vector entries, this
+   * function is happy with whatever it is given.
    *
-   * If one of the elements of @p
-   * local_dof_indices belongs to a
-   * constrained node, then rather than
-   * writing the corresponding element of
-   * @p local_vector into @p
-   * global_vector, the element is
-   * distributed to the entries in the
-   * global vector to which this
-   * particular degree of freedom is
-   * constrained.
+   * If one of the elements of @p local_dof_indices belongs to a constrained
+   * node, then rather than writing the corresponding element of @p
+   * local_vector into @p global_vector, the element is distributed to the
+   * entries in the global vector to which this particular degree of freedom
+   * is constrained.
    *
-   * Thus, by using this function to
-   * distribute local contributions to
-   * the global object, one saves the
-   * call to the condense function after
-   * the vectors and matrices are fully
-   * assembled. Note that this function
-   * completely ignores inhomogeneous
-   * constraints.
+   * Thus, by using this function to distribute local contributions to the
+   * global object, one saves the call to the condense function after the
+   * vectors and matrices are fully assembled. Note that this function
+   * completely ignores inhomogeneous constraints.
    *
-   * @note This function is not
-   * thread-safe, so you will need to
-   * make sure that only one process at a
-   * time calls this function.
+   * @note This function in itself is thread-safe, i.e., it works properly
+   * also when several threads call it simultaneously. However, the function
+   * call is only thread-safe if the underlying global vector allows
+   * for simultaneous access and the access is not to rows with the same
+   * global index at the same time. This needs to be made sure from the
+   * caller's site. There is no locking mechanism inside this method to
+   * prevent data races.
    */
   template <typename ForwardIteratorVec, typename ForwardIteratorInd,
            class VectorType>
@@ -1162,71 +865,45 @@ public:
                               VectorType        &global_vector) const;
 
   /**
-   * This function takes a matrix of
-   * local contributions (@p
-   * local_matrix) corresponding to the
-   * degrees of freedom indices given in
-   * @p local_dof_indices and distributes
-   * them to the global matrix. In most
-   * cases, these local contributions
-   * will be the result of an integration
-   * over a cell or face of a
-   * cell. However, as long as @p
-   * local_matrix and @p
-   * local_dof_indices have the same
-   * number of elements, this function is
+   * This function takes a matrix of local contributions (@p local_matrix)
+   * corresponding to the degrees of freedom indices given in @p
+   * local_dof_indices and distributes them to the global matrix. In most
+   * cases, these local contributions will be the result of an integration
+   * over a cell or face of a cell. However, as long as @p local_matrix and @p
+   * local_dof_indices have the same number of elements, this function is
    * happy with whatever it is given.
    *
-   * In contrast to the similar function
-   * in the DoFAccessor class, this
-   * function also takes care of
-   * constraints, i.e. if one of the
-   * elements of @p local_dof_indices
-   * belongs to a constrained node, then
-   * rather than writing the
-   * corresponding element of @p
-   * local_matrix into @p global_matrix,
-   * the element is distributed to the
-   * entries in the global matrix to
-   * which this particular degree of
-   * freedom is constrained.
+   * In contrast to the similar function in the DoFAccessor class, this
+   * function also takes care of constraints, i.e. if one of the elements of
+   * @p local_dof_indices belongs to a constrained node, then rather than
+   * writing the corresponding element of @p local_matrix into @p
+   * global_matrix, the element is distributed to the entries in the global
+   * matrix to which this particular degree of freedom is constrained.
    *
-   * With this scheme, we never write
-   * into rows or columns of constrained
-   * degrees of freedom. In order to make
-   * sure that the resulting matrix can
-   * still be inverted, we need to do
-   * something with the diagonal elements
-   * corresponding to constrained
-   * nodes. Thus, if a degree of freedom
-   * in @p local_dof_indices is
-   * constrained, we distribute the
-   * corresponding entries in the matrix,
-   * but also add the absolute value of
-   * the diagonal entry of the local
-   * matrix to the corresponding entry in
-   * the global matrix. Since the exact
-   * value of the diagonal element is not
-   * important (the value of the
-   * respective degree of freedom will be
-   * overwritten by the distribute() call
-   * later on anyway), this guarantees
-   * that the diagonal entry is always
-   * non-zero, positive, and of the same
-   * order of magnitude as the other
+   * With this scheme, we never write into rows or columns of constrained
+   * degrees of freedom. In order to make sure that the resulting matrix can
+   * still be inverted, we need to do something with the diagonal elements
+   * corresponding to constrained nodes. Thus, if a degree of freedom in @p
+   * local_dof_indices is constrained, we distribute the corresponding entries
+   * in the matrix, but also add the absolute value of the diagonal entry of
+   * the local matrix to the corresponding entry in the global matrix. Since
+   * the exact value of the diagonal element is not important (the value of
+   * the respective degree of freedom will be overwritten by the distribute()
+   * call later on anyway), this guarantees that the diagonal entry is always
+   * non-zero, positive, and of the same order of magnitude as the other
    * entries of the matrix.
    *
-   * Thus, by using this function to
-   * distribute local contributions to
-   * the global object, one saves the
-   * call to the condense function after
-   * the vectors and matrices are fully
-   * assembled.
+   * Thus, by using this function to distribute local contributions to the
+   * global object, one saves the call to the condense function after the
+   * vectors and matrices are fully assembled.
    *
-   * @note This function is not
-   * thread-safe, so you will need to
-   * make sure that only one process at a
-   * time calls this function.
+   * @note This function in itself is thread-safe, i.e., it works properly
+   * also when several threads call it simultaneously. However, the function
+   * call is only thread-safe if the underlying global matrix allows
+   * for simultaneous access and the access is not to rows with the same
+   * global index at the same time. This needs to be made sure from the
+   * caller's site. There is no locking mechanism inside this method to
+   * prevent data races.
    */
   template <typename MatrixType>
   void
@@ -1235,9 +912,7 @@ public:
                               MatrixType                   &global_matrix) const;
 
   /**
-   * Does the same as the function
-   * above but can treat non
-   * quadratic matrices.
+   * Does the same as the function above but can treat non quadratic matrices.
    */
   template <typename MatrixType>
   void
@@ -1247,22 +922,19 @@ public:
                               MatrixType                   &global_matrix) const;
 
   /**
-   * This function simultaneously
-   * writes elements into matrix
-   * and vector, according to the
-   * constraints specified by the
-   * calling ConstraintMatrix. This
-   * function can correctly handle
-   * inhomogeneous constraints as
-   * well. For the parameter
-   * use_inhomogeneities_for_rhs
-   * see the documentation in @ref
-   * constraints module.
+   * This function simultaneously writes elements into matrix and vector,
+   * according to the constraints specified by the calling
+   * ConstraintMatrix. This function can correctly handle inhomogeneous
+   * constraints as well. For the parameter use_inhomogeneities_for_rhs see
+   * the documentation in @ref constraints module.
    *
-   * @note This function is not
-   * thread-safe, so you will need to
-   * make sure that only one process at a
-   * time calls this function.
+   * @note This function in itself is thread-safe, i.e., it works properly
+   * also when several threads call it simultaneously. However, the function
+   * call is only thread-safe if the underlying global matrix and vector allow
+   * for simultaneous access and the access is not to rows with the same
+   * global index at the same time. This needs to be made sure from the
+   * caller's site. There is no locking mechanism inside this method to
+   * prevent data races.
    */
   template <typename MatrixType, typename VectorType>
   void
@@ -1274,97 +946,67 @@ public:
                               bool                          use_inhomogeneities_for_rhs = false) const;
 
   /**
-   * Do a similar operation as the
-   * distribute_local_to_global() function
-   * that distributes writing entries into
-   * a matrix for constrained degrees of
-   * freedom, except that here we don't
-   * write into a matrix but only allocate
+   * Do a similar operation as the distribute_local_to_global() function that
+   * distributes writing entries into a matrix for constrained degrees of
+   * freedom, except that here we don't write into a matrix but only allocate
    * sparsity pattern entries.
    *
-   * As explained in the
-   * @ref hp_paper "hp paper"
-   * and in step-27,
-   * first allocating a sparsity pattern
-   * and later coming back and allocating
-   * additional entries for those matrix
-   * entries that will be written to due to
-   * the elimination of constrained degrees
-   * of freedom (using
-   * ConstraintMatrix::condense() ), can be
-   * a very expensive procedure. It is
-   * cheaper to allocate these entries
-   * right away without having to do a
-   * second pass over the sparsity pattern
-   * object. This function does exactly
+   * As explained in the @ref hp_paper "hp paper" and in step-27, first
+   * allocating a sparsity pattern and later coming back and allocating
+   * additional entries for those matrix entries that will be written to due
+   * to the elimination of constrained degrees of freedom (using
+   * ConstraintMatrix::condense() ), can be a very expensive procedure. It is
+   * cheaper to allocate these entries right away without having to do a
+   * second pass over the sparsity pattern object. This function does exactly
    * that.
    *
-   * Because the function only allocates
-   * entries in a sparsity pattern, all it
-   * needs to know are the degrees of
-   * freedom that couple to each
-   * other. Unlike the previous function,
-   * no actual values are written, so the
-   * second input argument is not necessary
-   * here.
+   * Because the function only allocates entries in a sparsity pattern, all it
+   * needs to know are the degrees of freedom that couple to each
+   * other. Unlike the previous function, no actual values are written, so the
+   * second input argument is not necessary here.
    *
-   * The third argument to this function,
-   * keep_constrained_entries determines
-   * whether the function shall allocate
-   * entries in the sparsity pattern at
-   * all for entries that will later be
-   * set to zero upon condensation of the
-   * matrix. These entries are necessary
-   * if the matrix is built
-   * unconstrained, and only later
-   * condensed. They are not necessary if
-   * the matrix is built using the
-   * distribute_local_to_global()
-   * function of this class which
-   * distributes entries right away when
-   * copying a local matrix into a global
-   * object. The default of this argument
-   * is true, meaning to allocate the few
-   * entries that may later be set to
-   * zero.
+   * The third argument to this function, keep_constrained_entries determines
+   * whether the function shall allocate entries in the sparsity pattern at
+   * all for entries that will later be set to zero upon condensation of the
+   * matrix. These entries are necessary if the matrix is built unconstrained,
+   * and only later condensed. They are not necessary if the matrix is built
+   * using the distribute_local_to_global() function of this class which
+   * distributes entries right away when copying a local matrix into a global
+   * object. The default of this argument is true, meaning to allocate the few
+   * entries that may later be set to zero.
    *
-   * By default, the function adds
-   * entries for all pairs of indices
-   * given in the first argument to the
-   * sparsity pattern (unless
-   * keep_constrained_entries is
-   * false). However, sometimes one would
-   * like to only add a subset of all of
-   * these pairs. In that case, the last
-   * argument can be used which specifies
-   * a boolean mask which of the pairs of
-   * indices should be considered. If the
-   * mask is false for a pair of indices,
-   * then no entry will be added to the
-   * sparsity pattern for this pair,
-   * irrespective of whether one or both
-   * of the indices correspond to
-   * constrained degrees of freedom.
+   * By default, the function adds entries for all pairs of indices given in
+   * the first argument to the sparsity pattern (unless
+   * keep_constrained_entries is false). However, sometimes one would like to
+   * only add a subset of all of these pairs. In that case, the last argument
+   * can be used which specifies a boolean mask which of the pairs of indices
+   * should be considered. If the mask is false for a pair of indices, then no
+   * entry will be added to the sparsity pattern for this pair, irrespective
+   * of whether one or both of the indices correspond to constrained degrees
+   * of freedom.
    *
-   * This function is not typically called
-   * from user code, but is used in the
-   * DoFTools::make_sparsity_pattern()
-   * function when passed a constraint
+   * This function is not typically called from user code, but is used in the
+   * DoFTools::make_sparsity_pattern() function when passed a constraint
    * matrix object.
+   *
+   * @note This function in itself is thread-safe, i.e., it works properly
+   * also when several threads call it simultaneously. However, the function
+   * call is only thread-safe if the underlying global sparsity pattern allows
+   * for simultaneous access and the access is not to rows with the same
+   * global index at the same time. This needs to be made sure from the
+   * caller's site. There is no locking mechanism inside this method to
+   * prevent data races.
    */
   template <typename SparsityType>
   void
   add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
                                SparsityType                 &sparsity_pattern,
                                const bool                    keep_constrained_entries = true,
-                               const Table<2,bool>             &dof_mask = default_empty_table) const;
+                               const Table<2,bool>          &dof_mask = default_empty_table) const;
 
   /**
-   * Similar to the other function,
-   * but for non-quadratic sparsity
-   * patterns.
+   * Similar to the other function, but for non-quadratic sparsity patterns.
    */
-
   template <typename SparsityType>
   void
   add_entries_local_to_global (const std::vector<size_type> &row_indices,
@@ -1374,38 +1016,23 @@ public:
                                const Table<2,bool>          &dof_mask = default_empty_table) const;
 
   /**
-   * This function imports values from a
-   * global vector (@p global_vector) by
-   * applying the constraints to a vector
-   * of local values, expressed in
-   * iterator format.  In most cases, the
-   * local values will be identified by
-   * the local dof values on a
-   * cell. However, as long as the
-   * entries in @p local_dof_indices
-   * indicate reasonable global vector
-   * entries, this function is happy with
-   * whatever it is given.
+   * This function imports values from a global vector (@p global_vector) by
+   * applying the constraints to a vector of local values, expressed in
+   * iterator format.  In most cases, the local values will be identified by
+   * the local dof values on a cell. However, as long as the entries in @p
+   * local_dof_indices indicate reasonable global vector entries, this
+   * function is happy with whatever it is given.
    *
-   * If one of the elements of @p
-   * local_dof_indices belongs to a
-   * constrained node, then rather than
-   * writing the corresponding element of
-   * @p global_vector into @p
-   * local_vector, the constraints are
-   * resolved as the respective
-   * distribute function does, i.e., the
-   * local entry is constructed from the
-   * global entries to which this
-   * particular degree of freedom is
+   * If one of the elements of @p local_dof_indices belongs to a constrained
+   * node, then rather than writing the corresponding element of @p
+   * global_vector into @p local_vector, the constraints are resolved as the
+   * respective distribute function does, i.e., the local entry is constructed
+   * from the global entries to which this particular degree of freedom is
    * constrained.
    *
-   * In contrast to the similar function
-   * get_dof_values in the DoFAccessor
-   * class, this function does not need
-   * the constrained values to be
-   * correctly set (i.e., distribute to
-   * be called).
+   * In contrast to the similar function get_dof_values in the DoFAccessor
+   * class, this function does not need the constrained values to be correctly
+   * set (i.e., distribute to be called).
    */
   template <typename ForwardIteratorVec, typename ForwardIteratorInd,
            class VectorType>
@@ -1425,41 +1052,29 @@ public:
    */
 
   /**
-   * Re-distribute the elements of the
-   * vector @p condensed to @p
-   * uncondensed. It is the user's
-   * responsibility to guarantee that all
+   * Re-distribute the elements of the vector @p condensed to @p
+   * uncondensed. It is the user's responsibility to guarantee that all
    * entries of @p uncondensed be zero!
    *
-   * This function undoes the action of
-   * @p condense somehow, but it should
-   * be noted that it is not the inverse
-   * of @p condense.
+   * This function undoes the action of @p condense somehow, but it should be
+   * noted that it is not the inverse of @p condense.
    *
-   * The @p VectorType may be a
-   * Vector<float>, Vector<double>,
-   * BlockVector<tt><...></tt>, a PETSc
-   * or Trilinos vector wrapper class, or
-   * any other type having the same
-   * interface.
+   * The @p VectorType may be a Vector<float>, Vector<double>,
+   * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
+   * any other type having the same interface.
    */
   template <class VectorType>
   void distribute (const VectorType &condensed,
                    VectorType       &uncondensed) const;
 
   /**
-   * Re-distribute the elements of the
-   * vector in-place. The @p VectorType
-   * may be a Vector<float>,
-   * Vector<double>,
-   * BlockVector<tt><...></tt>, a PETSc
-   * or Trilinos vector wrapper class, or
-   * any other type having the same
+   * Re-distribute the elements of the vector in-place. The @p VectorType may
+   * be a Vector<float>, Vector<double>, BlockVector<tt><...></tt>, a PETSc or
+   * Trilinos vector wrapper class, or any other type having the same
    * interface.
    *
-   * Note that if called with a
-   * TrilinosWrappers::MPI::Vector it may
-   * not contain ghost elements.
+   * Note that if called with a TrilinosWrappers::MPI::Vector it may not
+   * contain ghost elements.
    */
   template <class VectorType>
   void distribute (VectorType &vec) const;
@@ -1563,35 +1178,27 @@ public:
 private:
 
   /**
-   * This class represents one line of a
-   * constraint matrix.
+   * This class represents one line of a constraint matrix.
    */
   struct ConstraintLine
   {
     /**
-     * A data type in which we store the list
-     * of entries that make up the homogenous
-     * part of a constraint.
+     * A data type in which we store the list of entries that make up the
+     * homogenous part of a constraint.
      */
     typedef std::vector<std::pair<size_type,double> > Entries;
 
     /**
-     * Number of this line. Since only
-     * very few lines are stored, we
-     * can not assume a specific order
-     * and have to store the line
-     * number explicitly.
+     * Number of this line. Since only very few lines are stored, we can not
+     * assume a specific order and have to store the line number explicitly.
      */
     size_type line;
 
     /**
-     * Row numbers and values of the
-     * entries in this line.
+     * Row numbers and values of the entries in this line.
      *
-     * For the reason why we use a
-     * vector instead of a map and the
-     * consequences thereof, the same
-     * applies as what is said for
+     * For the reason why we use a vector instead of a map and the
+     * consequences thereof, the same applies as what is said for
      * ConstraintMatrix::lines.
      */
     Entries entries;
@@ -1602,159 +1209,177 @@ private:
     double inhomogeneity;
 
     /**
-     * This operator is a bit weird and
-     * unintuitive: it compares the
-     * line numbers of two lines. We
-     * need this to sort the lines; in
-     * fact we could do this using a
-     * comparison predicate.  However,
-     * this way, it is easier, albeit
-     * unintuitive since two lines
-     * really have no god-given order
+     * This operator is a bit weird and unintuitive: it compares the line
+     * numbers of two lines. We need this to sort the lines; in fact we could
+     * do this using a comparison predicate.  However, this way, it is easier,
+     * albeit unintuitive since two lines really have no god-given order
      * relation.
      */
     bool operator < (const ConstraintLine &) const;
 
     /**
-     * This operator is likewise weird:
-     * it checks whether the line
-     * indices of the two operands are
-     * equal, irrespective of the fact
-     * that the contents of the line
-     * may be different.
+     * This operator is likewise weird: it checks whether the line indices of
+     * the two operands are equal, irrespective of the fact that the contents
+     * of the line may be different.
      */
     bool operator == (const ConstraintLine &) const;
 
     /**
-     * Determine an estimate for the
-     * memory consumption (in bytes) of
-     * this object.
+     * Determine an estimate for the memory consumption (in bytes) of this
+     * object.
      */
     std::size_t memory_consumption () const;
   };
 
   /**
-   * Store the lines of the matrix.
-   * Entries are usually appended in an
-   * arbitrary order and insertion into a
-   * vector is done best at the end, so
-   * the order is unspecified after all
-   * entries are inserted. Sorting of the
-   * entries takes place when calling the
-   * <tt>close()</tt> function.
+   * Store the lines of the matrix.  Entries are usually appended in an
+   * arbitrary order and insertion into a vector is done best at the end, so
+   * the order is unspecified after all entries are inserted. Sorting of the
+   * entries takes place when calling the <tt>close()</tt> function.
    *
-   * We could, instead of using a vector,
-   * use an associative array, like a map
-   * to store the lines. This, however,
-   * would mean a much more fractioned
-   * heap since it allocates many small
-   * objects, and would additionally make
-   * usage of this matrix much slower.
+   * We could, instead of using a vector, use an associative array, like a map
+   * to store the lines. This, however, would mean a much more fractioned heap
+   * since it allocates many small objects, and would additionally make usage
+   * of this matrix much slower.
    */
   std::vector<ConstraintLine> lines;
 
   /**
-   * A list of size_type that
-   * contains the position of the
-   * ConstraintLine of a constrained degree
-   * of freedom, or
-   * numbers::invalid_size_type if the
-   * degree of freedom is not
-   * constrained. The
-   * numbers::invalid_size_type
-   * return value returns thus whether
-   * there is a constraint line for a given
-   * degree of freedom index. Note that
-   * this class has no notion of how many
-   * degrees of freedom there really are,
-   * so if we check whether there is a
-   * constraint line for a given degree of
-   * freedom, then this vector may actually
-   * be shorter than the index of the DoF
-   * we check for.
+   * A list of size_type that contains the position of the ConstraintLine of a
+   * constrained degree of freedom, or numbers::invalid_size_type if the
+   * degree of freedom is not constrained. The numbers::invalid_size_type
+   * return value returns thus whether there is a constraint line for a given
+   * degree of freedom index. Note that this class has no notion of how many
+   * degrees of freedom there really are, so if we check whether there is a
+   * constraint line for a given degree of freedom, then this vector may
+   * actually be shorter than the index of the DoF we check for.
    *
-   * This field exists since when adding a
-   * new constraint line we have to figure
-   * out whether it already
-   * exists. Previously, we would simply
-   * walk the unsorted list of constraint
-   * lines until we either hit the end or
-   * found it. This algorithm is O(N) if N
-   * is the number of constraints, which
-   * makes it O(N^2) when inserting all
-   * constraints. For large problems with
-   * many constraints, this could easily
-   * take 5-10 per cent of the total run
-   * time. With this field, we can save
-   * this time since we find any constraint
-   * in O(1) time or get to know that it a
-   * certain degree of freedom is not
+   * This field exists since when adding a new constraint line we have to
+   * figure out whether it already exists. Previously, we would simply walk
+   * the unsorted list of constraint lines until we either hit the end or
+   * found it. This algorithm is O(N) if N is the number of constraints, which
+   * makes it O(N^2) when inserting all constraints. For large problems with
+   * many constraints, this could easily take 5-10 per cent of the total run
+   * time. With this field, we can save this time since we find any constraint
+   * in O(1) time or get to know that it a certain degree of freedom is not
    * constrained.
    *
-   * To make things worse, traversing the
-   * list of existing constraints requires
-   * reads from many different places in
-   * memory. Thus, in large 3d
-   * applications, the add_line() function
-   * showed up very prominently in the
-   * overall compute time, mainly because
-   * it generated a lot of cache
-   * misses. This should also be fixed by
-   * using the O(1) algorithm to access the
-   * fields of this array.
+   * To make things worse, traversing the list of existing constraints
+   * requires reads from many different places in memory. Thus, in large 3d
+   * applications, the add_line() function showed up very prominently in the
+   * overall compute time, mainly because it generated a lot of cache
+   * misses. This should also be fixed by using the O(1) algorithm to access
+   * the fields of this array.
    *
-   * The field is useful in a number of
-   * other contexts as well, e.g. when one
-   * needs random access to the constraints
-   * as in all the functions that apply
-   * constraints on the fly while add cell
-   * contributions into vectors and
+   * The field is useful in a number of other contexts as well, e.g. when one
+   * needs random access to the constraints as in all the functions that apply
+   * constraints on the fly while add cell contributions into vectors and
    * matrices.
    */
   std::vector<size_type> lines_cache;
 
   /**
-   * This IndexSet is used to limit the
-   * lines to save in the ContraintMatrix
-   * to a subset. This is necessary,
-   * because the lines_cache vector would
-   * become too big in a distributed
-   * calculation.
+   * This IndexSet is used to limit the lines to save in the ConstraintMatrix
+   * to a subset. This is necessary, because the lines_cache vector would
+   * become too big in a distributed calculation.
    */
   IndexSet local_lines;
 
   /**
-   * Store whether the arrays are sorted.
-   * If so, no new entries can be added.
+   * Store whether the arrays are sorted.  If so, no new entries can be added.
    */
   bool sorted;
 
   /**
-   * Internal function to calculate the
-   * index of line @p line in the vector
+   * Scratch data that is used during calls to distribute_local_to_global and
+   * add_entries_local_to_global. In order to avoid frequent memory
+   * allocation, we keep the data alive from one call to the next.
+   */
+  struct ScratchData
+  {
+    /**
+     * Constructor, does nothing.
+     */
+    ScratchData () :
+      in_use (false)
+    {}
+
+    /**
+     * Copy constructor, does nothing
+     */
+    ScratchData (const ScratchData &) :
+      in_use (false)
+    {}
+
+    /**
+     * Stores whether the data is currently in use.
+     */
+    bool in_use;
+
+    /**
+     * Temporary array for column indices
+     */
+    std::vector<size_type> columns;
+
+    /**
+     * Temporary array for column values
+     */
+    std::vector<double>    values;
+
+    /**
+     * Temporary array for block start indices
+     */
+    std::vector<size_type> block_starts;
+
+    /**
+     * Temporary array for vector indices
+     */
+    std::vector<size_type> vector_indices;
+
+    /**
+     * Data array for reorder row/column indices. Use a shared ptr to
+     * global_rows to avoid defining in the .h file
+     */
+    std_cxx1x::shared_ptr<internals::GlobalRowsFromLocal> global_rows;
+
+    /**
+     * Data array for reorder row/column indices. Use a shared ptr to
+     * global_rows to avoid defining in the .h file
+     */
+    std_cxx1x::shared_ptr<internals::GlobalRowsFromLocal> global_columns;
+  };
+
+  /**
+   * Here comes the actual data structure for the scratch data. It is made
+   * mutable since it is modified in a const function. Since only one thread
+   * can access it at a time, no conflicting access can occur. For this to be
+   * valid, we need to make sure that no call within
+   * distribute_local_to_global is made that by itself can spawn
+   * tasks. Otherwise, we might end up in a situation where several threads
+   * fight for the data.
+   */
+  mutable Threads::ThreadLocalStorage<ScratchData> scratch_data;
+
+  /**
+   * Internal function to calculate the index of line @p line in the vector
    * lines_cache using local_lines.
    */
   size_type calculate_line_index (const size_type line) const;
 
   /**
-   * Return @p true if the weight of an
-   * entry (the second element of the
-   * pair) equals zero. This function is
-   * used to delete entries with zero
-   * weight.
+   * Return @p true if the weight of an entry (the second element of the pair)
+   * equals zero. This function is used to delete entries with zero weight.
    */
   static bool check_zero_weight (const std::pair<size_type, double> &p);
 
   /**
-   * Dummy table that serves as default
-   * argument for function
+   * Dummy table that serves as default argument for function
    * <tt>add_entries_local_to_global()</tt>.
    */
   static const Table<2,bool> default_empty_table;
 
   /**
-   * This function actually implements
-   * the local_to_global function for
+   * This function actually implements the local_to_global function for
    * standard (non-block) matrices.
    */
   template <typename MatrixType, typename VectorType>
@@ -1768,9 +1393,8 @@ private:
                               internal::bool2type<false>) const;
 
   /**
-   * This function actually implements
-   * the local_to_global function for
-   * block matrices.
+   * This function actually implements the local_to_global function for block
+   * matrices.
    */
   template <typename MatrixType, typename VectorType>
   void
@@ -1783,8 +1407,7 @@ private:
                               internal::bool2type<true>) const;
 
   /**
-   * This function actually implements
-   * the local_to_global function for
+   * This function actually implements the local_to_global function for
    * standard (non-block) sparsity types.
    */
   template <typename SparsityType>
@@ -1796,9 +1419,8 @@ private:
                                internal::bool2type<false>) const;
 
   /**
-   * This function actually implements
-   * the local_to_global function for
-   * block sparsity types.
+   * This function actually implements the local_to_global function for block
+   * sparsity types.
    */
   template <typename SparsityType>
   void
@@ -1809,27 +1431,21 @@ private:
                                internal::bool2type<true>) const;
 
   /**
-   * Internal helper function for
-   * distribute_local_to_global function.
+   * Internal helper function for distribute_local_to_global function.
    *
-   * Creates a list of affected global rows
-   * for distribution, including the local
-   * rows where the entries come from. The
-   * list is sorted according to the global
-   * row indices.
+   * Creates a list of affected global rows for distribution, including the
+   * local rows where the entries come from. The list is sorted according to
+   * the global row indices.
    */
   void
   make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
                         internals::GlobalRowsFromLocal  &global_rows) const;
 
   /**
-   * Internal helper function for
-   * add_entries_local_to_global function.
+   * Internal helper function for add_entries_local_to_global function.
    *
-   * Creates a list of affected rows for
-   * distribution without any additional
-   * information, otherwise similar to the
-   * other make_sorted_row_list()
+   * Creates a list of affected rows for distribution without any additional
+   * information, otherwise similar to the other make_sorted_row_list()
    * function.
    */
   void
@@ -1837,8 +1453,7 @@ private:
                         std::vector<size_type>       &active_dofs) const;
 
   /**
-   * Internal helper function for
-   * distribute_local_to_global function.
+   * Internal helper function for distribute_local_to_global function.
    */
   double
   resolve_vector_entry (const size_type                       i,
@@ -1857,7 +1472,8 @@ ConstraintMatrix::ConstraintMatrix (const IndexSet &local_constraints)
   :
   lines (),
   local_lines (local_constraints),
-  sorted (false)
+  sorted (false),
+  scratch_data (ScratchData())
 {
   // make sure the IndexSet is compressed. Otherwise this can lead to crashes
   // that are hard to find (only happen in release mode).
@@ -1874,7 +1490,8 @@ ConstraintMatrix::ConstraintMatrix (const ConstraintMatrix &constraint_matrix)
   lines (constraint_matrix.lines),
   lines_cache (constraint_matrix.lines_cache),
   local_lines (constraint_matrix.local_lines),
-  sorted (constraint_matrix.sorted)
+  sorted (constraint_matrix.sorted),
+  scratch_data (ScratchData())
 {}
 
 
@@ -1884,34 +1501,25 @@ ConstraintMatrix::add_line (const size_type line)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
 
-  // the following can happen when we
-  // compute with distributed meshes
-  // and dof handlers and we
-  // constrain a degree of freedom
-  // whose number we don't have
-  // locally. if we don't abort here
-  // the program will try to allocate
-  // several terabytes of memory to
-  // resize the various arrays below
-  // :-)
+  // the following can happen when we compute with distributed meshes and dof
+  // handlers and we constrain a degree of freedom whose number we don't have
+  // locally. if we don't abort here the program will try to allocate several
+  // terabytes of memory to resize the various arrays below :-)
   Assert (line != numbers::invalid_size_type,
           ExcInternalError());
   const size_type line_index = calculate_line_index (line);
 
-  // check whether line already exists; it
-  // may, in which case we can just quit
+  // check whether line already exists; it may, in which case we can just quit
   if (is_constrained(line))
     return;
 
-  // if necessary enlarge vector of
-  // existing entries for cache
+  // if necessary enlarge vector of existing entries for cache
   if (line_index >= lines_cache.size())
     lines_cache.resize (std::max(2*static_cast<size_type>(lines_cache.size()),
                                  line_index+1),
                         numbers::invalid_size_type);
 
-  // push a new line to the end of the
-  // list
+  // push a new line to the end of the list
   lines.push_back (ConstraintLine());
   lines.back().line = line;
   lines.back().inhomogeneity = 0.;
@@ -1930,14 +1538,11 @@ ConstraintMatrix::add_entry (const size_type line,
   Assert (line != column,
           ExcMessage ("Can't constrain a degree of freedom to itself"));
 
-  // if in debug mode, check whether an
-  // entry for this column already
-  // exists and if it's the same as
-  // the one entered at present
+  // if in debug mode, check whether an entry for this column already exists
+  // and if it's the same as the one entered at present
   //
-  // in any case: exit the function if an
-  // entry for this column already exists,
-  // since we don't want to enter it twice
+  // in any case: exit the function if an entry for this column already
+  // exists, since we don't want to enter it twice
   Assert (lines_cache[calculate_line_index(line)] != numbers::invalid_size_type,
           ExcInternalError());
   ConstraintLine *line_ptr = &lines[lines_cache[calculate_line_index(line)]];
@@ -1998,8 +1603,7 @@ inline
 bool
 ConstraintMatrix::is_inhomogeneously_constrained (const size_type index) const
 {
-  // check whether the entry is
-  // constrained. could use is_constrained, but
+  // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(index);
   if (line_index >= lines_cache.size() ||
@@ -2018,8 +1622,7 @@ inline
 const std::vector<std::pair<types::global_dof_index,double> > *
 ConstraintMatrix::get_constraint_entries (const size_type line) const
 {
-  // check whether the entry is
-  // constrained. could use is_constrained, but
+  // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(line);
   if (line_index >= lines_cache.size() ||
@@ -2035,8 +1638,7 @@ inline
 double
 ConstraintMatrix::get_inhomogeneity (const size_type line) const
 {
-  // check whether the entry is
-  // constrained. could use is_constrained, but
+  // check whether the entry is constrained. could use is_constrained, but
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(line);
   if (line_index >= lines_cache.size() ||
@@ -2182,8 +1784,7 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
                             const std::vector<size_type> &local_dof_indices,
                             MatrixType                   &global_matrix) const
 {
-  // create a dummy and hand on to the
-  // function actually implementing this
+  // create a dummy and hand on to the function actually implementing this
   // feature in the cm.templates.h file.
   Vector<double> dummy(0);
   distribute_local_to_global (local_matrix, dummy, local_dof_indices,
@@ -2204,10 +1805,8 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
                             VectorType                   &global_vector,
                             bool                          use_inhomogeneities_for_rhs) const
 {
-  // enter the internal function with the
-  // respective block information set, the
-  // actual implementation follows in the
-  // cm.templates.h file.
+  // enter the internal function with the respective block information set,
+  // the actual implementation follows in the cm.templates.h file.
   distribute_local_to_global (local_matrix, local_vector, local_dof_indices,
                               global_matrix, global_vector, use_inhomogeneities_for_rhs,
                               internal::bool2type<IsBlockMatrix<MatrixType>::value>());
@@ -2224,10 +1823,8 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
                              const bool                    keep_constrained_entries,
                              const Table<2,bool>          &dof_mask) const
 {
-  // enter the internal function with the
-  // respective block information set, the
-  // actual implementation follows in the
-  // cm.templates.h file.
+  // enter the internal function with the respective block information set,
+  // the actual implementation follows in the cm.templates.h file.
   add_entries_local_to_global (local_dof_indices, sparsity_pattern,
                                keep_constrained_entries, dof_mask,
                                internal::bool2type<IsBlockMatrix<SparsityType>::value>());
