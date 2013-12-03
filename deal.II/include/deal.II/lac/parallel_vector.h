@@ -1185,11 +1185,9 @@ namespace parallel
     {
       Assert (c.partitioner.get() != 0, ExcNotInitialized());
 
-      // check whether the two vectors use the same
-      // parallel partitioner. if not, check if all
-      // local ranges are the same (that way, we can
-      // exchange data between different parallel
-      // layouts)
+      // check whether the two vectors use the same parallel partitioner. if
+      // not, check if all local ranges are the same (that way, we can
+      // exchange data between different parallel layouts)
       if (partitioner.get() == 0)
         reinit (c, true);
       else if (partitioner.get() != c.partitioner.get())
