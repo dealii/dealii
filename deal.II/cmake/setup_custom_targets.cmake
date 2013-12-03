@@ -25,23 +25,41 @@
 #   parameter_gui
 #
 
-# The library can always be installed ;-)
-ADD_CUSTOM_TARGET(library
-  COMMAND ${CMAKE_COMMAND}
-    -DCOMPONENT="library" -P cmake_install.cmake
-  COMMENT "Build and install component \"library\"."
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  )
+
+IF("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr/local")
+  #
+  # In case that CMAKE_INSTALL_PREFIX wasn't set, we assume that the user
+  # doesn't actually want to install but just use deal.II in the build
+  # directory. In this case, do not add the "install" phase to the
+  # convenience targets.
+  #
+  MACRO(_add_custom_target _name)
+    ADD_CUSTOM_TARGET(${_name})
+  ENDMACRO()
+
+  # Print precise informations about the convenience targets:
+  SET(_description_string "build")
+ELSE()
+  MACRO(_add_custom_target _name)
+    ADD_CUSTOM_TARGET(${_name}
+      COMMAND ${CMAKE_COMMAND}
+        -DCOMPONENT="${_name}" -P cmake_install.cmake
+      COMMENT "Build and install component \"library\"."
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      )
+  ENDMACRO()
+
+  # Print precise informations about the convenience targets:
+  SET(_description_string "build and install")
+ENDIF()
+
+# The library can always be compiled and/or installed unconditionally ;-)
+_add_custom_target(library)
 
 FOREACH(_component compat_files documentation examples mesh_converter parameter_gui)
   STRING(TOUPPER "${_component}" _component_uppercase)
   IF(DEAL_II_COMPONENT_${_component_uppercase})
-    ADD_CUSTOM_TARGET(${_component}
-      COMMAND ${CMAKE_COMMAND}
-        -DCOMPONENT="${_component}" -P cmake_install.cmake
-      COMMENT "Build and install component \"${_component}\"."
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      )
+    _add_custom_target(${_component})
   ELSE()
     STRING(TOUPPER ${_component} _componentuppercase)
     ADD_CUSTOM_TARGET(${_component}
@@ -49,7 +67,7 @@ FOREACH(_component compat_files documentation examples mesh_converter parameter_
            ${CMAKE_COMMAND} -E echo ''
         && ${CMAKE_COMMAND} -E echo ''
         && ${CMAKE_COMMAND} -E echo '***************************************************************************'
-        && ${CMAKE_COMMAND} -E echo "**  Error: Could not build and install disabled component \"${_component}\"."
+        && ${CMAKE_COMMAND} -E echo "**  Error: Could not ${_description_string} disabled component \"${_component}\"."
         && ${CMAKE_COMMAND} -E echo "**  Please reconfigure with -DDEAL_II_COMPONENT_${_componentuppercase}=ON"
         && ${CMAKE_COMMAND} -E echo '***************************************************************************'
         && ${CMAKE_COMMAND} -E echo ''
@@ -74,43 +92,43 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #
 #  The following targets are available (invoke by $ ${_make_command} <target>):
 #
-#    all            - compiles the library and all enabled components
-#    clean          - removes all generated files
-#    install        - installs into CMAKE_INSTALL_PREFIX
+#    all            - compile the library and all enabled components
+#    clean          - remove all generated files
+#    install        - install into CMAKE_INSTALL_PREFIX
 ")
 
 IF(CMAKE_GENERATOR MATCHES "Ninja")
   FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    info           - prints this help message
-#    help           - prints a list of valid top level targets
+"#    info           - print this help message
+#    help           - print a list of valid top level targets
 #
 ")
 ELSE()
   FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    help           - prints this help message in the toplevel directory,
-#                     otherwise prints a list of targets (in subdirectories)
+"#    help           - print this help message in the toplevel directory,
+#                     otherwise print a list of targets (in subdirectories)
 #
 ")
 ENDIF()
 
 FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    edit_cache     - runs ccmake for changing (cached) configuration variables
+"#    edit_cache     - run ccmake for changing (cached) configuration variables
 #                     and reruns the configure and generate phases of CMake
-#    rebuild_cache  - reruns the configure and generate phases of CMake
+#    rebuild_cache  - rerun the configure and generate phases of CMake
 #
-#    compat_files   - builds and installs the 'compat_files' component
-#    documentation  - builds and installs the 'documentation' component
-#    examples       - builds and installs the 'examples' component
-#    library        - builds and installs the 'library' component
-#    mesh_converter - builds and installs the 'mesh_converter' component
-#    parameter_gui  - builds and installs the 'parameter_gui' component
+#    compat_files   - ${_description_string} component 'compat_files'
+#    documentation  - ${_description_string} component 'documentation'
+#    examples       - ${_description_string} component 'examples'
+#    library        - ${_description_string} component 'library'
+#    mesh_converter - ${_description_string} component 'mesh_converter'
+#    parameter_gui  - ${_description_string} component 'parameter_gui'
 #
-#    test           - runs a minimal set of tests
+#    test           - run a minimal set of tests
 #
-#    setup_tests    - sets up the testsuite subprojects
+#    setup_tests    - set up the testsuite subprojects
 #    regen_tests    - rerun configure stage in every testsuite subprojects
-#    clean_tests    - runs the 'clean' target in every testsuite subproject
-#    prune_tests    - removes all testsuite subprojects
+#    clean_tests    - run the 'clean' target in every testsuite subproject
+#    prune_tests    - remove all testsuite subprojects
 #
 ###\")"
   )

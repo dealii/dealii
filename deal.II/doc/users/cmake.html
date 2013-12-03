@@ -206,34 +206,35 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
     <h3>Primary build targets</h3>
 
     <p> The current list of primary build targets can be queried via
-    <code>make info</code>:
+    <code>make help</code>:
 <pre class="cmake">
 ###
 #
 #  The following targets are available (invoke via $ make &lt;target&gt;):
 #
-#    all            - compiles the library and all enabled components
-#    clean          - removes all generated files
-#    install        - installs into CMAKE_INSTALL_PREFIX
-#    help           - prints a list of valid top level targets
-#    info           - prints this help message
+#    all            - compile the library and all enabled components
+#    clean          - remove all generated files
+#    install        - install into CMAKE_INSTALL_PREFIX
+#    help           - print this help message in the toplevel directory,
+#                     otherwise print a list of targets (in subdirectories)
 #
-#    edit_cache     - runs ccmake for changing (cached) configuration variables
+#    edit_cache     - run ccmake for changing (cached) configuration variables
 #                     and reruns the configure and generate phases of CMake
-#    rebuild_cache  - reruns the configure and generate phases of CMake
+#    rebuild_cache  - rerun the configure and generate phases of CMake
 #
-#    compat_files   - builds and installs the 'compat_files' component
-#    documentation  - builds and installs the 'documentation' component
-#    examples       - builds and installs the 'examples' component
-#    library        - builds and installs the 'library' component
-#    mesh_converter - builds and installs the 'mesh_converter' component
-#    parameter_gui  - builds and installs the 'parameter_gui' component
+#    compat_files   - build and install component 'compat_files'
+#    documentation  - build and install component 'documentation'
+#    examples       - build and install component 'examples'
+#    library        - build and install component 'library'
+#    mesh_converter - build and install component 'mesh_converter'
+#    parameter_gui  - build and install component 'parameter_gui'
 #
-#    test           - runs a minimal set of tests
+#    test           - run a minimal set of tests
 #
-#    setup_test     - sets up the testsuite subprojects
-#    clean_test     - runs the 'clean' target in every testsuite subproject
-#    prune_test     - removes all testsuite subprojects
+#    setup_tests    - set up the testsuite subprojects
+#    regen_tests    - rerun configure stage in every testsuite subprojects
+#    clean_tests    - run the 'clean' target in every testsuite subproject
+#    prune_tests    - remove all testsuite subprojects
 #
 ###
 </pre>
@@ -273,7 +274,7 @@ cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
 #
 #  Detailed information (compiler flags, feature configuration) can be found in detailed.log
 #
-#  Run  $ make info  to print a help message with a list of top level targets
+#  Run  $ make help  to print a help message with a list of top level targets
 #
 ###
 </pre>
