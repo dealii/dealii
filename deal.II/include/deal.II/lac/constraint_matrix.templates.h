@@ -1276,71 +1276,55 @@ namespace internals
   {
     DataCache ()
       :
-      element_size (0),
-      data (0),
-      n_used_elements(0)
+      element_size (0)
     {}
-
-    ~DataCache()
-    {
-      delete [] data;
-      data = 0;
-    }
 
     void reinit ()
     {
       if (element_size == 0)
         {
+          // the initial size allows for 16 global dofs that are reached with
+          // each having up to 6 entries. But we allow this size to change in
+          // both directions
           element_size = 6;
-          data = new std::pair<size_type,double> [20*6];
-          individual_size.resize(20);
+          data.reserve(16*element_size);
+          individual_size.reserve(16);
         }
-      n_used_elements = 0;
+      individual_size.resize(0);
     }
 
     size_type element_size;
 
-    std::pair<size_type,double> *data;
+    std::vector<std::pair<size_type,double> > data;
 
     std::vector<size_type> individual_size;
-
-    size_type n_used_elements;
 
     size_type insert_new_index (const std::pair<size_type,double> &pair)
     {
       if (element_size == 0)
         reinit();
-      if (n_used_elements == individual_size.size())
-        {
-          std::pair<size_type,double> *new_data =
-            new std::pair<size_type,double> [2*individual_size.size()*element_size];
-          memcpy (new_data, data, individual_size.size()*element_size*
-                  sizeof(std::pair<size_type,double>));
-          delete [] data;
-          data = new_data;
-          individual_size.resize (2*individual_size.size(), 0);
-        }
-      size_type index = n_used_elements;
+      const unsigned int index = individual_size.size();
+      individual_size.push_back(1);
+      data.resize(individual_size.size()*element_size);
       data[index*element_size] = pair;
       individual_size[index] = 1;
-      ++n_used_elements;
       return index;
     }
 
     void append_index (const size_type index,
                        const std::pair<size_type,double> &pair)
     {
-      AssertIndexRange (index, n_used_elements);
+      AssertIndexRange (index, individual_size.size());
       const size_type my_size = individual_size[index];
       if (my_size == element_size)
         {
-          std::pair<size_type,double> *new_data =
-            new std::pair<size_type,double> [2*individual_size.size()*element_size];
-          for (size_type i=0; i<n_used_elements; ++i)
-            memcpy (&new_data[i*element_size*2], &data[i*element_size],
-                    element_size*sizeof(std::pair<size_type,double>));
-          delete [] data;
-          data = new_data;
+          std::vector<std::pair<size_type,double> >
+            new_data(2*individual_size.size()*element_size*2);
+          for (size_type i=0; i<individual_size.size(); ++i)
+            std::copy(&data[i*element_size], &data[i*element_size]+
+                      individual_size[i],
+                      &new_data[i*element_size*2]);
+          data.swap(new_data);
           element_size *= 2;
         }
       data[index*element_size+my_size] = pair;
