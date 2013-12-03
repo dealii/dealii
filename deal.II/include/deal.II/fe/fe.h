@@ -114,12 +114,12 @@ namespace hp
  * FEValues<dim>   fe_values (mapping, fe, dummy_quadrature,
  *                            update_quadrature_points);
  * fe_values.reinit (cell);
- * Point<dim>& mapped_point = fe_values.quadrature_point (i);
+ * Point<dim> mapped_point = fe_values.quadrature_point (i);
  * @endcode
  *
  * Alternatively, the points can be transformed one-by-one:
  * @code
- * const vector<Point<dim> >& unit_points =
+ * const vector<Point<dim> > &unit_points =
  *    fe.get_unit_support_points();
  *
  * Point<dim> mapped_point =
@@ -128,6 +128,13 @@ namespace hp
  * This is a shortcut, and as all shortcuts should be used cautiously.
  * If the mapping of all support points is needed, the first variant should
  * be preferred for efficiency.
+ *
+ * @note Finite elements' implementation of the get_unit_support_points()
+ * returns these points in the same order as shape functions. As a consequence,
+ * the quadrature points accessed above are also ordered in this way. The
+ * order of shape functions is typically documented in the class documentation
+ * of the various finite element classes.
+ *
  *
  * <h3>Notes on the implementation of derived classes</h3>
  *
@@ -1315,7 +1322,7 @@ public:
 
   /**
    * Return the support points of the trial functions on the unit cell, if the
-   * derived finite element defines some.  Finite elements that allow some
+   * derived finite element defines them.  Finite elements that allow some
    * kind of interpolation operation usually have support points. On the other
    * hand, elements that define their degrees of freedom by, for example,
    * moments on faces, or as derivatives, don't have support points. In that
@@ -1327,6 +1334,20 @@ public:
    * function.
    *
    * See the class documentation for details on support points.
+   *
+   * @note Finite elements' implementation of this function
+   * returns these points in the same order as shape functions. The
+   * order of shape functions is typically documented in the class documentation
+   * of the various finite element classes. In particular, shape functions (and
+   * consequently the mapped quadrature points discussed in the class documentation
+   * of this class) will then traverse first those shape functions
+   * located on vertices, then on lines, then on quads, etc.
+   *
+   * @note If this element implements support points, then it will return one
+   * such point per shape function. Since multiple shape functions may be defined
+   * at the same location, the support points returned here may be duplicated. An
+   * example would be an element of the kind <code>FESystem(FE_Q(1),3)</code>
+   * for which each support point would appear three times in the returned array.
    */
   const std::vector<Point<dim> > &
   get_unit_support_points () const;
