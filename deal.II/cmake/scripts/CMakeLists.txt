@@ -20,66 +20,21 @@ SET_TARGET_PROPERTIES(expand_instantiations_exe
   )
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
-
   #
-  # Build and install the old dependency_resolution and report_features
-  # executables:
+  # Also build and install the old dependency_resolution executable:
   #
-
-  INCLUDE_DIRECTORIES(
-    BEFORE # Ensure deal.II include directories come first
-    #
-    # Reverse order due to BEFORE:
-    #
-    ${CMAKE_SOURCE_DIR}/include/
-    ${CMAKE_BINARY_DIR}/include/
-    )
 
   ADD_EXECUTABLE(make_dependencies make_dependencies.cc)
-
-  IF(BUILD_SHARED_LIBS)
-    SET(_shared_libs "true")
-  ELSE()
-    SET(_shared_libs "false")
-  ENDIF()
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/report_features.cc.in
-    ${CMAKE_CURRENT_BINARY_DIR}/report_features.cc
-    )
-
-  ADD_EXECUTABLE(report_features
-    ${CMAKE_CURRENT_BINARY_DIR}/report_features.cc
-    )
-
-  #
-  # Link report_features in the same way as the library/final executable:
-  #
-  TARGET_LINK_LIBRARIES(report_features ${DEAL_II_EXTERNAL_LIBRARIES})
-  SET_TARGET_PROPERTIES(report_features
-    PROPERTIES
-    LINK_FLAGS "${DEAL_II_LINKER_FLAGS}"
-    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS}"
-    )
-  IF(DEAL_II_STATIC_EXECUTABLE)
-    SET_PROPERTY(TARGET report_features PROPERTY
-      LINK_SEARCH_END_STATIC TRUE
-      )
-  ENDIF()
-
-  IF(NOT CMAKE_CROSSCOMPILING)
-    ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)
-  ENDIF()
 
   ADD_DEPENDENCIES(compat_files
     expand_instantiations_exe
     make_dependencies
-    report_features
     )
 
-  SET_TARGET_PROPERTIES(expand_instantiations_exe make_dependencies report_features
+  SET_TARGET_PROPERTIES(expand_instantiations_exe make_dependencies
     PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/scripts
     )
-  INSTALL(TARGETS expand_instantiations_exe make_dependencies report_features
+  INSTALL(TARGETS expand_instantiations_exe make_dependencies
     DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
     COMPONENT compat_files
     )
