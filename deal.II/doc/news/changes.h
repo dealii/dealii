@@ -246,6 +246,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Several functions in namespace GridTools were not instantiated
+  for parallel::distributed::Triangulation objects. This is now fixed.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2013/12/01)
+  </li>
+
   <li> Improved: The methods ConstraintMatrix::distribute_local_to_global
   now use scratch data that is private to each thread instead of allocating
   it for every cell anew. This gives better performance, in particular in

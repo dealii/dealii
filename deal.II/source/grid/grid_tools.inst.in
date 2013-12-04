@@ -69,6 +69,51 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 }
 
 
+// now also instantiate these functions for parallel::distributed::Triangulation
+for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+
+#if deal_II_dimension <= deal_II_space_dimension
+  namespace GridTools \{
+
+  template
+    unsigned int
+    find_closest_vertex (const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &,
+			 const Point<deal_II_space_dimension> &);
+
+  template
+    std::vector<parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>
+    find_cells_adjacent_to_vertex(const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &,
+				  const unsigned int);
+  template
+    parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator
+    find_active_cell_around_point (const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &,
+				   const Point<deal_II_space_dimension> &p);
+
+  template
+    std::pair<parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator, Point<deal_II_dimension> >
+    find_active_cell_around_point (const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+				   const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &,
+				   const Point<deal_II_space_dimension> &);
+
+  template
+    std::list<std::pair<parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::cell_iterator, parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::cell_iterator> >
+    get_finest_common_cells (const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &mesh_1,
+  			     const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &mesh_2);
+
+
+  template
+    bool
+    have_same_coarse_mesh (const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &mesh_1,
+			   const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &mesh_2);
+
+  \}
+
+  #endif
+}
+
+
+
 for (deal_II_space_dimension : SPACE_DIMENSIONS)
 {
   

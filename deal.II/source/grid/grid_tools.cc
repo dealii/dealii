@@ -59,6 +59,13 @@ namespace GridTools
       return tria;
     }
 
+    template<int dim, int spacedim>
+    const Triangulation<dim, spacedim> &
+    get_tria(const parallel::distributed::Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
     template<int dim, template<int, int> class Container, int spacedim>
     const Triangulation<dim,spacedim> &
     get_tria(const Container<dim,spacedim> &container)
@@ -70,6 +77,13 @@ namespace GridTools
     template<int dim, int spacedim>
     Triangulation<dim, spacedim> &
     get_tria(Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
+    template<int dim, int spacedim>
+    Triangulation<dim, spacedim> &
+    get_tria(parallel::distributed::Triangulation<dim, spacedim> &tria)
     {
       return tria;
     }
@@ -862,8 +876,10 @@ next_cell:
   find_active_cell_around_point (const Container<dim,spacedim>  &container,
                                  const Point<spacedim> &p)
   {
-    return find_active_cell_around_point(StaticMappingQ1<dim,spacedim>::mapping,
-                                         container, p).first;
+    return
+      find_active_cell_around_point<dim,Container,spacedim>
+      (StaticMappingQ1<dim,spacedim>::mapping,
+       container, p).first;
   }
 
 
@@ -1417,8 +1433,8 @@ next_cell:
   have_same_coarse_mesh (const Container &mesh_1,
                          const Container &mesh_2)
   {
-    return have_same_coarse_mesh (mesh_1.get_tria(),
-                                  mesh_2.get_tria());
+    return have_same_coarse_mesh (get_tria(mesh_1),
+                                  get_tria(mesh_2));
   }
 
 
