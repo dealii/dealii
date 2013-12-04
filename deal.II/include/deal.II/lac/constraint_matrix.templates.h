@@ -1283,8 +1283,6 @@ namespace internals
       row_length (8)
     {}
 
-    ~DataCache() {std::cout << "destruct cache: " << row_length << " " << individual_size.size() << std::endl;}
-
     void reinit ()
     {
       individual_size.resize(0);
