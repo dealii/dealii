@@ -1,1 +1,1 @@
-Parallelization via MPI. The wave equation, in linear and nonlinear variants. Mass lumping. Cell-based finite element operator.
+Parallelization via MPI. The wave equation, in linear and nonlinear variants. Mass lumping. Fast assembly techniques.
