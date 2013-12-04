@@ -508,8 +508,8 @@ public:
 
   /**
    * Return all components of a
-   * vector-valued function at a
-   * given point.
+   * vector-valued function at the
+   * given point @p p.
    *
    * <tt>values</tt> shall have the
    * right size beforehand,
