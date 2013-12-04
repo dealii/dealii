@@ -16,7 +16,8 @@
 
 
 
-// same as assemble_matrix_parallel, but now for a BlockSparseMatrix
+// same as assemble_matrix_parallel_02, but using a constraint that should
+// create conflicts on most cells (similar to mean value constraint)
 
 #include "../tests.h"
 
@@ -28,8 +29,7 @@
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/block_sparse_matrix.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -44,6 +44,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -88,9 +89,20 @@ namespace Assembly
   {
     struct Data
     {
+      Data (bool second_test = false)
+        :
+        second_test (second_test)
+      {}
+
+      Data (const Data &data)
+        :
+        second_test (data.second_test)
+      {}
+
       std::vector<types::global_dof_index> local_dof_indices;
       FullMatrix<double> local_matrix;
       Vector<double> local_rhs;
+      const bool second_test;
     };
   }
 }
@@ -109,6 +121,8 @@ private:
   void test_equality ();
   void assemble_reference ();
   void assemble_test ();
+  void assemble_test_1();
+  void assemble_test_2();
   void solve ();
   void create_coarse_grid ();
   void postprocess ();
@@ -130,13 +144,15 @@ private:
 
   ConstraintMatrix     constraints;
 
-  BlockSparsityPattern      sparsity_pattern;
-  BlockSparseMatrix<double> reference_matrix;
-  BlockSparseMatrix<double> test_matrix;
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> reference_matrix;
+  SparseMatrix<double> test_matrix;
+  SparseMatrix<double> test_matrix_2;
 
   Vector<double>       solution;
   Vector<double>       reference_rhs;
   Vector<double>       test_rhs;
+  Vector<double>       test_rhs_2;
 
   std::vector<std::vector<typename hp::DoFHandler<dim>::active_cell_iterator> > graph;
 
@@ -244,8 +260,15 @@ void LaplaceProblem<dim>::setup_system ()
   solution.reinit (dof_handler.n_dofs());
   reference_rhs.reinit (dof_handler.n_dofs());
   test_rhs.reinit (dof_handler.n_dofs());
+  test_rhs_2.reinit (dof_handler.n_dofs());
 
   constraints.clear ();
+
+  // add a constraint that expands over most of the domain, which should
+  // create many conflicts
+  constraints.add_line(3);
+  for (unsigned int i=5; i<dof_handler.n_dofs(); i+=11)
+    constraints.add_entry(3, i, -0.5);
 
   DoFTools::make_hanging_node_constraints (dof_handler, constraints);
 
@@ -265,18 +288,15 @@ void LaplaceProblem<dim>::setup_system ()
                                              (std_cxx1x::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx1x::_1)));
 
 
-  BlockCompressedSimpleSparsityPattern csp (2, 2);
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<2; ++j)
-      csp.block(i,j).reinit(i==0 ? 30 : dof_handler.n_dofs() - 30,
-                            j==0 ? 30 : dof_handler.n_dofs() - 30);
-  csp.collect_sizes();
+  CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
+                                       dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, csp,
                                    constraints, false);
   sparsity_pattern.copy_from (csp);
 
   reference_matrix.reinit (sparsity_pattern);
   test_matrix.reinit (sparsity_pattern);
+  test_matrix_2.reinit (sparsity_pattern);
 }
 
 
@@ -305,16 +325,18 @@ LaplaceProblem<dim>::local_assemble (const typename hp::DoFHandler<dim>::active_
        q_point<fe_values.n_quadrature_points;
        ++q_point)
     {
+      const double scale_mat = data.second_test ? numbers::PI : 1.;
       const double rhs_value = rhs_function.value(fe_values.quadrature_point(q_point),0);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         {
           for (unsigned int j=0; j<dofs_per_cell; ++j)
-            data.local_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
+            data.local_matrix(i,j) += (scale_mat *
+                                       fe_values.shape_grad(i,q_point) *
                                        fe_values.shape_grad(j,q_point) *
                                        fe_values.JxW(q_point));
 
             data.local_rhs(i) += (fe_values.shape_value(i,q_point) *
-                                  rhs_value *
+                                  rhs_value * scale_mat *
                                   fe_values.JxW(q_point));
         }
     }
@@ -329,9 +351,14 @@ template <int dim>
 void
 LaplaceProblem<dim>::copy_local_to_global (const Assembly::Copy::Data &data)
 {
-  constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
-                                         data.local_dof_indices,
-                                         test_matrix, test_rhs);
+  if (data.second_test)
+    constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
+                                           data.local_dof_indices,
+                                           test_matrix_2, test_rhs_2);
+  else
+    constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
+                                           data.local_dof_indices,
+                                           test_matrix, test_rhs);
 }
 
 
@@ -360,7 +387,7 @@ void LaplaceProblem<dim>::assemble_reference ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_test ()
+void LaplaceProblem<dim>::assemble_test_1 ()
 {
   test_matrix = 0;
   test_rhs = 0;
@@ -378,18 +405,59 @@ void LaplaceProblem<dim>::assemble_test ()
                           this,
                           std_cxx1x::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
-         Assembly::Copy::Data ());
+         Assembly::Copy::Data (),
+         1);
+}
+
+
+template <int dim>
+void LaplaceProblem<dim>::assemble_test_2 ()
+{
+  test_matrix_2 = 0;
+  test_rhs_2 = 0;
+
+  WorkStream::
+    run (graph,
+         std_cxx1x::bind (&LaplaceProblem<dim>::
+                          local_assemble,
+                          this,
+                          std_cxx1x::_1,
+                          std_cxx1x::_2,
+                          std_cxx1x::_3),
+         std_cxx1x::bind (&LaplaceProblem<dim>::
+                          copy_local_to_global,
+                          this,
+                          std_cxx1x::_1),
+         Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
+         Assembly::Copy::Data (true),
+         1);
+}
+
+template <int dim>
+void LaplaceProblem<dim>::assemble_test()
+{
+  // start two tasks that each run an assembly
+  Threads::TaskGroup<void> tasks;
+  tasks += Threads::new_task (&LaplaceProblem<dim>::assemble_test_1,
+                              *this);
+  tasks += Threads::new_task (&LaplaceProblem<dim>::assemble_test_2,
+                              *this);
+  tasks.join_all();
 
   test_matrix.add(-1, reference_matrix);
+  const double frobenius_norm = test_matrix.frobenius_norm();
 
-  double frobenius_norm = 0;
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<2; ++j)
-      frobenius_norm += test_matrix.block(i,j).frobenius_norm();
-
+  // the data should add up exactly (unfortunately, there is some roundoff due
+  // to the cell similarity detection, but there should not be any similarity
+  // for the hypershell geometry)
   deallog << "log error in matrix norm: " << std::log(frobenius_norm) << std::endl;
   test_rhs.add(-1., reference_rhs);
   deallog << "log error in vector norm: " << std::log(test_rhs.l2_norm()) << std::endl;
+
+  test_matrix_2.add(-numbers::PI, reference_matrix);
+  deallog << "absolute error matrix assembly 2: " << test_matrix_2.frobenius_norm() << std::endl;
+  test_rhs_2.add(-numbers::PI, reference_rhs);
+  deallog << "absolute error vector assembly 2: " << test_rhs_2.l2_norm() << std::endl;
 }
 
 
@@ -424,6 +492,7 @@ void LaplaceProblem<dim>::run ()
           GridGenerator::hyper_shell(triangulation,
                                      Point<dim>(),
                                      0.5, 1., (dim==3) ? 96 : 12, false);
+          triangulation.refine_global(2);
         }
 
       setup_system ();
@@ -449,13 +518,6 @@ int main ()
   {
     deallog.push("2d");
     LaplaceProblem<2> laplace_problem;
-    laplace_problem.run ();
-    deallog.pop();
-  }
-
-  {
-    deallog.push("3d");
-    LaplaceProblem<3> laplace_problem;
     laplace_problem.run ();
     deallog.pop();
   }
