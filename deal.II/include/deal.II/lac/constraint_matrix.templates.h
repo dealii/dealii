@@ -1314,9 +1314,9 @@ namespace internals
           for (size_type i=individual_size.size(); i>0; )
             {
               --i;
-              std::move_backward(&data[i*row_length],
-                                 &data[i*row_length]+individual_size[i],
-                                 &data[i*row_length*2]+individual_size[i]);
+              std::memmove(&data[i*row_length*2], &data[i*row_length],
+                           individual_size[i]*
+                           sizeof(std::pair<size_type,double>));
             }
           row_length *= 2;
         }
