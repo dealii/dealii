@@ -1270,43 +1270,34 @@ namespace internals
   // this is a cache for constraints that are encountered on a local level.
   // The functionality is similar to
   // std::vector<std::vector<std::pair<uint,double> > >, but tuned so that
-  // frequent memory allocation for each entry is avoided. This is not
-  // directly used in the user code, but accessed via the GlobalRowsFromLocal.
+  // frequent memory allocation for each entry is avoided. The data is put
+  // into a std::vector<std::pair<uint,double> > and the row length is kept
+  // fixed at row_length. Both the number of rows and the row length can
+  // change is this structure is filled. In that case, the data is
+  // rearranged. This is not directly used in the user code, but accessed via
+  // the GlobalRowsFromLocal.
   struct DataCache
   {
     DataCache ()
       :
-      element_size (0)
+      row_length (8)
     {}
+
+    ~DataCache() {std::cout << "destruct cache: " << row_length << " " << individual_size.size() << std::endl;}
 
     void reinit ()
     {
-      if (element_size == 0)
-        {
-          // the initial size allows for 16 global dofs that are reached with
-          // each having up to 6 entries. But we allow this size to change in
-          // both directions
-          element_size = 6;
-          data.reserve(16*element_size);
-          individual_size.reserve(16);
-        }
       individual_size.resize(0);
+      data.resize(0);
     }
-
-    size_type element_size;
-
-    std::vector<std::pair<size_type,double> > data;
-
-    std::vector<size_type> individual_size;
 
     size_type insert_new_index (const std::pair<size_type,double> &pair)
     {
-      if (element_size == 0)
-        reinit();
+      Assert(row_length > 0, ExcInternalError());
       const unsigned int index = individual_size.size();
       individual_size.push_back(1);
-      data.resize(individual_size.size()*element_size);
-      data[index*element_size] = pair;
+      data.resize(individual_size.size()*row_length);
+      data[index*row_length] = pair;
       individual_size[index] = 1;
       return index;
     }
@@ -1315,20 +1306,21 @@ namespace internals
                        const std::pair<size_type,double> &pair)
     {
       AssertIndexRange (index, individual_size.size());
-      const size_type my_size = individual_size[index];
-      if (my_size == element_size)
+      const size_type my_length = individual_size[index];
+      if (my_length == row_length)
         {
+          // no space left, need to double row_length
           std::vector<std::pair<size_type,double> >
-            new_data(2*individual_size.size()*element_size*2);
+            new_data(2*individual_size.size()*row_length*2);
           for (size_type i=0; i<individual_size.size(); ++i)
-            std::copy(&data[i*element_size], &data[i*element_size]+
+            std::copy(&data[i*row_length], &data[i*row_length]+
                       individual_size[i],
-                      &new_data[i*element_size*2]);
+                      &new_data[i*row_length*2]);
           data.swap(new_data);
-          element_size *= 2;
+          row_length *= 2;
         }
-      data[index*element_size+my_size] = pair;
-      individual_size[index]++;
+      data[index*row_length+my_length] = pair;
+      individual_size[index] = my_length + 1;
     }
 
     size_type
@@ -1340,8 +1332,14 @@ namespace internals
     const std::pair<size_type,double> *
     get_entry (const size_type index) const
     {
-      return &data[index*element_size];
+      return &data[index*row_length];
     }
+
+    size_type row_length;
+
+    std::vector<std::pair<size_type,double> > data;
+
+    std::vector<size_type> individual_size;
   };
 
 
@@ -1425,12 +1423,6 @@ namespace internals
       return n_active_rows;
     }
 
-    // returns the global index of the counter_index-th entry in the list
-    size_type &global_row (const size_type counter_index)
-    {
-      return total_row_indices[counter_index].global_row;
-    }
-
     // returns the number of constraints that are associated to the
     // counter_index-th entry in the list
     size_type size (const size_type counter_index) const
@@ -1442,17 +1434,22 @@ namespace internals
                                   constraint_position));
     }
 
-    // returns the global row associated with the counter_index-th entry in
-    // the list
-    const size_type &global_row (const size_type counter_index) const
+    // returns the global row of the counter_index-th entry in the list
+    size_type global_row (const size_type counter_index) const
+    {
+      return total_row_indices[counter_index].global_row;
+    }
+
+    // returns the global row of the counter_index-th entry in the list
+    size_type &global_row (const size_type counter_index)
     {
       return total_row_indices[counter_index].global_row;
     }
 
     // returns the local row in the cell matrix associated with the
     // counter_index-th entry in the list. Returns invalid_size_type for
-    // invalid size_types
-    const size_type &local_row (const size_type counter_index) const
+    // constrained rows
+    size_type local_row (const size_type counter_index) const
     {
       return total_row_indices[counter_index].local_row;
     }
@@ -1486,7 +1483,7 @@ namespace internals
     // there has been at least one constraint with non-trivial ConstraintLine)
     bool have_indirect_rows () const
     {
-      return data_cache.element_size;
+      return data_cache.individual_size.empty() == false;
     }
 
     // append an entry that is constrained. This means that there is one less
@@ -1495,6 +1492,7 @@ namespace internals
     {
       --n_active_rows;
       total_row_indices[n_active_rows].local_row = constrained_local_dof;
+      total_row_indices[n_active_rows].global_row = numbers::invalid_size_type;
     }
 
     // returns the number of constrained dofs in the structure. Constrained
@@ -2216,9 +2214,9 @@ make_sorted_row_list (const std::vector<size_type>   &local_dof_indices,
         {
           global_rows.global_row(added_rows)  = local_dof_indices[i];
           global_rows.local_row(added_rows++) = i;
-          continue;
         }
-      global_rows.insert_constraint(i);
+      else
+        global_rows.insert_constraint(i);
     }
   global_rows.sort();
 
