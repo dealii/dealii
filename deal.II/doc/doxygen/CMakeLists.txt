@@ -88,8 +88,10 @@ file(GLOB _doxygen_input
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/main.cpp
   ${CMAKE_SOURCE_DIR}/doc/news/*.h
   ${CMAKE_SOURCE_DIR}/include/deal.II/**/*.h
-
+  )
+LIST(APPEND _doxygen_input
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
+  ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
   )
 FOREACH(_step ${DEAL_II_STEPS})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
@@ -138,7 +140,6 @@ ADD_CUSTOM_COMMAND(
 ADD_CUSTOM_TARGET(doxygen ALL
   DEPENDS ${CMAKE_BINARY_DIR}/doxygen.log
   )
-
 
 INSTALL(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/deal.tag

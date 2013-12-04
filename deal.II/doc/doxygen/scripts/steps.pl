@@ -16,6 +16,16 @@
 
 use strict;
 
+my $tutorial_file = shift;
+open TUTORIAL, "<$tutorial_file";
+
+# Print the first part of tutorial.h.in
+while (my $line = <TUTORIAL>)
+{
+  last if($line =~ m/\@\@MAP\@\@/);
+  print $line;
+}
+
 # List of additional node attributes to highlight purpose and state of the example
 my %style = (
  "basic"          => ',height=.8,width=.8,shape="octagon",fillcolor="green"',
@@ -26,9 +36,7 @@ my %style = (
  "unfinished"     => ',height=.25,width=.25,style="dashed"'
     );
 
-
 # Print a preamble setting common attributes
-
 print << 'EOT'
 digraph StepsMap
 {
@@ -65,7 +73,7 @@ foreach $step (@ARGV)
     close TF;
     chop $tooltip;
 
-    printf "Step$number [label=\"$number\", URL=\"../deal.II/step_$number.html\", tooltip=\"$tooltip\"";
+    printf "Step$number [label=\"$number\", URL=\"\\ref step_$number\", tooltip=\"$tooltip\"";
 
 
     # read first line of 'kind' file
@@ -106,3 +114,9 @@ foreach $step (@ARGV)
 
 print "}\n";
 
+# Print the rest of tutorial.h.in
+while (my $line = <TUTORIAL>)
+{
+  print $line;
+}
+close TUTORIAL;

@@ -53,7 +53,7 @@ for linear algebra contents.
 <h1>Introduction</h1>
 
 The basic equation of stationary quantum mechanics is the
-Schr&ouml;dinger equation which models the motion of particles in an
+Schrödinger equation which models the motion of particles in an
 external potential $V(\mathbf x)$. The particle is described by a wave
 function $\Psi(\mathbf x)$ that satisfies a relation of the
 (nondimensionalized) form

@@ -19,10 +19,9 @@
  * @mainpage
  *
  * This is the main starting page for the deal.II class and function
- * documentation.  Documentation on other aspects, such as the build system,
- * can be found elsewhere. In addition, there are <a
- * href="../tutorial/index.html">tutorial programs on the use of this
- * library</a>.
+ * documentation. Documentation on other aspects, such as the build
+ * system, can be found elsewhere. In addition, there are
+ * <a href="Tutorial.html">Tutorial programs on the use of the library</a>.
  *
  * Many of the classes in the deal.II library can be grouped into modules (see
  * the <a href="modules.html">Modules page</a> or the corresponding entry in

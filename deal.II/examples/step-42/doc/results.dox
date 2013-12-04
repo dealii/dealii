@@ -199,7 +199,7 @@ situations are concerned:
 <ul>
 <li> Extend the program from a static to a quasi-static situation, perhaps by
 choosing a backward-Euler-scheme for the time discretization. Some theoretical
-results can be found in the PhD thesis by J&ouml;rg Frohne, <i>FEM-Simulation
+results can be found in the PhD thesis by Jörg Frohne, <i>FEM-Simulation
 der Umformtechnik metallischer Oberfl&auml;chen im Mikrokosmos</i>, University
 of Siegen, Germany, 2011.
 
