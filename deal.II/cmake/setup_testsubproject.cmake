@@ -29,7 +29,6 @@
 # environment or command line:
 #
 #     TEST_DIFF
-#     TEST_OVERRIDE_LOCATION
 #     TEST_PICKUP_REGEX
 #     TEST_TIME_LIMIT
 #
@@ -51,14 +50,13 @@ FOREACH(_var
   TEST_DIFF
   TEST_TIME_LIMIT
   TEST_PICKUP_REGEX
-  TEST_OVERRIDE_LOCATION
   )
   # Environment wins:
   IF(DEFINED ENV{${_var}})
     SET(${_var} $ENV{${_var}})
   ENDIF()
   IF(NOT "${_var}" STREQUAL "")
-    SET(${_var} "${${_var}}" CACHE STRING "")
+    SET(${_var} "${${_var}}" CACHE STRING "" FORCE)
   ENDIF()
 ENDFOREACH()
 

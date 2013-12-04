@@ -95,7 +95,6 @@
 #   TEST_DIFF
 #   TEST_TIME_LIMIT
 #   TEST_PICKUP_REGEX
-#   TEST_OVERRIDE_LOCATION
 #
 # For details, consult the ./README file.
 #

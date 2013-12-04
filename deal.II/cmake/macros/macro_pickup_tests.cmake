@@ -20,10 +20,6 @@
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
 #
-# If TEST_OVERRIDE_LOCATION is set, a comparison file category/test.output
-# will be substituted by ${TEST_OVERRIDE_LOCATION}/category/test.output if
-# the latter exists.
-#
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
 #
