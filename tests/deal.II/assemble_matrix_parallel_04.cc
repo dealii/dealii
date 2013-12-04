@@ -89,20 +89,20 @@ namespace Assembly
   {
     struct Data
     {
-      Data (bool second_test = false)
+      Data (const unsigned int test_variant)
         :
-        second_test (second_test)
+        test_variant (test_variant)
       {}
 
       Data (const Data &data)
         :
-        second_test (data.second_test)
+        test_variant (data.test_variant)
       {}
 
       std::vector<types::global_dof_index> local_dof_indices;
       FullMatrix<double> local_matrix;
       Vector<double> local_rhs;
-      const bool second_test;
+      const unsigned int test_variant;
     };
   }
 }
@@ -291,7 +291,7 @@ void LaplaceProblem<dim>::setup_system ()
   CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
                                        dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, csp,
-                                   constraints, false);
+                                   constraints, true);
   sparsity_pattern.copy_from (csp);
 
   reference_matrix.reinit (sparsity_pattern);
@@ -325,7 +325,7 @@ LaplaceProblem<dim>::local_assemble (const typename hp::DoFHandler<dim>::active_
        q_point<fe_values.n_quadrature_points;
        ++q_point)
     {
-      const double scale_mat = data.second_test ? numbers::PI : 1.;
+      const double scale_mat = data.test_variant == 2 ? numbers::PI : 1.;
       const double rhs_value = rhs_function.value(fe_values.quadrature_point(q_point),0);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         {
@@ -351,14 +351,24 @@ template <int dim>
 void
 LaplaceProblem<dim>::copy_local_to_global (const Assembly::Copy::Data &data)
 {
-  if (data.second_test)
+  if (data.test_variant == 2)
     constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
                                            data.local_dof_indices,
                                            test_matrix_2, test_rhs_2);
-  else
+  else if (data.test_variant == 1)
     constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
                                            data.local_dof_indices,
                                            test_matrix, test_rhs);
+  else
+    {
+      for (unsigned int i=0; i<data.local_dof_indices.size(); ++i)
+        for (unsigned int j=0; j<data.local_dof_indices.size(); ++j)
+          reference_matrix.add (data.local_dof_indices[i],
+                                data.local_dof_indices[j],
+                                data.local_matrix(i,j));
+      for (unsigned int i=0; i<data.local_dof_indices.size(); ++i)
+        reference_rhs(data.local_dof_indices[i]) += data.local_rhs(i);
+    }
 }
 
 
@@ -366,10 +376,10 @@ LaplaceProblem<dim>::copy_local_to_global (const Assembly::Copy::Data &data)
 template <int dim>
 void LaplaceProblem<dim>::assemble_reference ()
 {
-  test_matrix = 0;
-  test_rhs = 0;
+  reference_matrix = 0;
+  reference_rhs = 0;
 
-  Assembly::Copy::Data copy_data;
+  Assembly::Copy::Data copy_data (0);
   Assembly::Scratch::Data<dim> assembly_data(fe_collection, quadrature_collection);
 
   for (unsigned int color=0; color<graph.size(); ++color)
@@ -379,9 +389,15 @@ void LaplaceProblem<dim>::assemble_reference ()
         local_assemble(*p, assembly_data, copy_data);
         copy_local_to_global(copy_data);
       }
+  constraints.condense(reference_matrix, reference_rhs);
 
-  reference_matrix.add(1., test_matrix);
-  reference_rhs = test_rhs;
+  // since constrained diagonal entries might be different, zero them out here
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    if (constraints.is_constrained(i))
+      {
+        reference_matrix.diag_element(i) = 0;
+        reference_rhs(i) = 0;
+      }
 }
 
 
@@ -405,8 +421,14 @@ void LaplaceProblem<dim>::assemble_test_1 ()
                           this,
                           std_cxx1x::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
-         Assembly::Copy::Data (),
+         Assembly::Copy::Data (1),
          1);
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    if (constraints.is_constrained(i))
+      {
+        test_matrix.diag_element(i) = 0;
+        test_rhs(i) = 0;
+      }
 }
 
 
@@ -429,8 +451,14 @@ void LaplaceProblem<dim>::assemble_test_2 ()
                           this,
                           std_cxx1x::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
-         Assembly::Copy::Data (true),
+         Assembly::Copy::Data (2),
          1);
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    if (constraints.is_constrained(i))
+      {
+        test_matrix_2.diag_element(i) = 0;
+        test_rhs_2(i) = 0;
+      }
 }
 
 template <int dim>
@@ -446,13 +474,9 @@ void LaplaceProblem<dim>::assemble_test()
 
   test_matrix.add(-1, reference_matrix);
   const double frobenius_norm = test_matrix.frobenius_norm();
-
-  // the data should add up exactly (unfortunately, there is some roundoff due
-  // to the cell similarity detection, but there should not be any similarity
-  // for the hypershell geometry)
-  deallog << "log error in matrix norm: " << std::log(frobenius_norm) << std::endl;
+  deallog << "absolute error in matrix norm: " << frobenius_norm << std::endl;
   test_rhs.add(-1., reference_rhs);
-  deallog << "log error in vector norm: " << std::log(test_rhs.l2_norm()) << std::endl;
+  deallog << "absolute error in vector norm: " << test_rhs.l2_norm() << std::endl;
 
   test_matrix_2.add(-numbers::PI, reference_matrix);
   deallog << "absolute error matrix assembly 2: " << test_matrix_2.frobenius_norm() << std::endl;
