@@ -1307,14 +1307,17 @@ namespace internals
       const size_type my_length = individual_size[index];
       if (my_length == row_length)
         {
-          // no space left, need to double row_length
-          std::vector<std::pair<size_type,double> >
-            new_data(2*individual_size.size()*row_length*2);
-          for (size_type i=0; i<individual_size.size(); ++i)
-            std::copy(&data[i*row_length], &data[i*row_length]+
-                      individual_size[i],
-                      &new_data[i*row_length*2]);
-          data.swap(new_data);
+          AssertDimension(data.size(), individual_size.size()*row_length);
+          // no space left in this row, need to double row_length and
+          // rearrange the data items
+          data.resize(2*data.size());
+          for (size_type i=individual_size.size(); i>0; )
+            {
+              --i;
+              std::move_backward(&data[i*row_length],
+                                 &data[i*row_length]+individual_size[i],
+                                 &data[i*row_length*2]+individual_size[i]);
+            }
           row_length *= 2;
         }
       data[index*row_length+my_length] = pair;
