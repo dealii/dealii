@@ -2431,7 +2431,8 @@ ConstraintMatrix::distribute_local_to_global (
                                          local_matrix, col_ptr, val_ptr);
           const size_type n_values = col_ptr - &cols[0];
           if (n_values > 0)
-            global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
+            global_matrix.add(row, n_values, &cols[0], val_ptr-n_values, false,
+                              true);
         }
       else
         internals::resolve_matrix_row (global_rows, i, 0, n_actual_dofs,
@@ -2524,7 +2525,8 @@ ConstraintMatrix::distribute_local_to_global (
                                      local_matrix, col_ptr, val_ptr);
       const size_type n_values = col_ptr - &cols[0];
       if (n_values > 0)
-        global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
+        global_matrix.add(row, n_values, &cols[0], val_ptr-n_values,
+                          false, true);
     }
 
   my_scratch_data.in_use = false;
@@ -2628,7 +2630,8 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
                   const size_type n_values = col_ptr - &cols[0];
                   if (n_values > 0)
                     global_matrix.block(block, block_col).add(row, n_values,
-                                                              &cols[0], &vals[0],
+                                                              &cols[0],
+                                                              val_ptr-n_values,
                                                               false, true);
                 }
               else
