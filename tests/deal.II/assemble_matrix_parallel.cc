@@ -384,11 +384,9 @@ void LaplaceProblem<dim>::assemble_test ()
   // the data should add up exactly (unfortunately, there is some roundoff due
   // to the cell similarity detection, but there should not be any similarity
   // for the hypershell geometry)
-  AssertThrow(frobenius_norm == 0., ExcInternalError());
+  deallog << "log error in matrix norm: " << std::log(frobenius_norm) << std::endl;
   test_rhs.add(-1., reference_rhs);
-  AssertThrow(test_rhs.l2_norm() == 0., ExcInternalError());
-
-  deallog << "OK" << std::endl;
+  deallog << "log error in vector norm: " << std::log(test_rhs.l2_norm()) << std::endl;
 }
 
 
