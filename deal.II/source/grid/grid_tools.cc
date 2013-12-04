@@ -2405,42 +2405,42 @@ next_cell:
 
 
 
-  template<typename DH>
-  std::vector<PeriodicFacePair<typename DH::cell_iterator> >
+  template<typename CONTAINER>
+  std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> >
   collect_periodic_faces
-    (const DH                 &dof_handler,
+    (const CONTAINER                 &container,
      const types::boundary_id b_id1,
      const types::boundary_id b_id2,
      const int                direction,
-     const dealii::Tensor<1,DH::space_dimension> &offset)
+     const dealii::Tensor<1,CONTAINER::space_dimension> &offset)
   {
-    static const int dim = DH::dimension;
-    static const int space_dim = DH::space_dimension;
+    static const int dim = CONTAINER::dimension;
+    static const int space_dim = CONTAINER::space_dimension;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
     // Loop over all cells on the highest level and collect all boundary
     // faces belonging to b_id1 and b_id2:
 
-    std::set<std::pair<typename DH::cell_iterator, unsigned int> > pairs1;
-    std::set<std::pair<typename DH::cell_iterator, unsigned int> > pairs2;
+    std::set<std::pair<typename CONTAINER::cell_iterator, unsigned int> > pairs1;
+    std::set<std::pair<typename CONTAINER::cell_iterator, unsigned int> > pairs2;
 
-    for (typename DH::cell_iterator cell = dof_handler.begin(0);
-         cell != dof_handler.end(0); ++cell)
+    for (typename CONTAINER::cell_iterator cell = container.begin(0);
+         cell != container.end(0); ++cell)
       {
         for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
           {
-            const typename DH::face_iterator face = cell->face(i);
+            const typename CONTAINER::face_iterator face = cell->face(i);
             if (face->at_boundary() && face->boundary_indicator() == b_id1)
             {
-              const std::pair<typename DH::cell_iterator, unsigned int> pair1
+              const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair1
                 = std::make_pair(cell, i);
               pairs1.insert(pair1);
             } 
 
             if (face->at_boundary() && face->boundary_indicator() == b_id2)
             {
-              const std::pair<typename DH::cell_iterator, unsigned int> pair2
+              const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair2
                 = std::make_pair(cell, i);
               pairs2.insert(pair2);
             }
@@ -2456,15 +2456,15 @@ next_cell:
 
 
 
-  template<typename DH>
-  std::vector<PeriodicFacePair<typename DH::cell_iterator> >
-  collect_periodic_faces (const DH                 &dof_handler,
+  template<typename CONTAINER>
+  std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> >
+  collect_periodic_faces (const CONTAINER                 &container,
                           const types::boundary_id b_id,
                           const int                direction,
-                          const dealii::Tensor<1,DH::space_dimension> &offset)
+                          const dealii::Tensor<1,CONTAINER::space_dimension> &offset)
   {
-    static const int dim = DH::dimension;
-    static const int space_dim = DH::space_dimension;
+    static const int dim = CONTAINER::dimension;
+    static const int space_dim = CONTAINER::space_dimension;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
@@ -2474,25 +2474,25 @@ next_cell:
     // Loop over all cells on the highest level and collect all boundary
     // faces 2*direction and 2*direction*1:
 
-    std::set<std::pair<typename DH::cell_iterator, unsigned int> > pairs1;
-    std::set<std::pair<typename DH::cell_iterator, unsigned int> > pairs2;
+    std::set<std::pair<typename CONTAINER::cell_iterator, unsigned int> > pairs1;
+    std::set<std::pair<typename CONTAINER::cell_iterator, unsigned int> > pairs2;
 
-    for (typename DH::cell_iterator cell = dof_handler.begin(0);
-         cell != dof_handler.end(0); ++cell)
+    for (typename CONTAINER::cell_iterator cell = container.begin(0);
+         cell != container.end(0); ++cell)
          {
-           const typename DH::face_iterator face_1 = cell->face(2*direction);
-           const typename DH::face_iterator face_2 = cell->face(2*direction+1);
+           const typename CONTAINER::face_iterator face_1 = cell->face(2*direction);
+           const typename CONTAINER::face_iterator face_2 = cell->face(2*direction+1);
 
            if (face_1->at_boundary() && face_1->boundary_indicator() == b_id)
            {
-             const std::pair<typename DH::cell_iterator, unsigned int> pair1
+             const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair1
                = std::make_pair(cell, 2*direction);
              pairs1.insert(pair1);
            }
 
            if (face_2->at_boundary() && face_2->boundary_indicator() == b_id)
            {
-             const std::pair<typename DH::cell_iterator, unsigned int> pair2
+             const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair2
                = std::make_pair(cell, 2*direction+1);
              pairs2.insert(pair2);
            }
@@ -2503,7 +2503,7 @@ next_cell:
 
     // and call match_periodic_face_pairs that does the actual matching:
 
-    typedef std::vector<PeriodicFacePair<typename DH::cell_iterator> >
+    typedef std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> >
       FaceVector;
 
     FaceVector matching = match_periodic_face_pairs(pairs1, pairs2,
