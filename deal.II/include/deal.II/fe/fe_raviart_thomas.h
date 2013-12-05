@@ -43,7 +43,7 @@ template <int dim, int spacedim> class MappingQ;
  *
  * We follow the usual definition of the degree of RT elements, which
  * denotes the polynomial degree of the largest complete polynomial
- * subspace contained in the RT space. Then, approxiamtion order of
+ * subspace contained in the RT space. Then, approximation order of
  * the function itself is <i>degree+1</i>, as with usual polynomial
  * spaces. The numbering so chosen implies the sequence
  * @f[
