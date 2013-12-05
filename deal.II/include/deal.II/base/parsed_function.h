@@ -259,7 +259,7 @@ namespace Functions
      * The object with which we do
      * computations.
      */
-    FunctionParse<dim> function_object;
+    FunctionParser<dim> function_object;
   };
 }
 
