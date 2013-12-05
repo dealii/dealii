@@ -2030,13 +2030,12 @@ namespace DoFTools
             ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
                         "different to denote different boundaries."));
 
-    typedef std::vector<GridTools::PeriodicFacePair
-                          <typename DH::cell_iterator> > FaceVector;
+    std::vector<GridTools::PeriodicFacePair
+                 <typename DH::cell_iterator> > matched_faces;
 
     // Collect matching periodic cells on the coarsest level:
-    FaceVector matched_faces =
-      GridTools::collect_periodic_faces(dof_handler, b_id1, b_id2,
-                                        direction, offset);
+    GridTools::collect_periodic_faces(dof_handler, b_id1, b_id2, direction, 
+                                      matched_faces, offset);
 
     make_periodicity_constraints<DH>
       (matched_faces, constraint_matrix, component_mask);
@@ -2081,13 +2080,12 @@ namespace DoFTools
     Assert(dim == space_dim,
            ExcNotImplemented());
 
-    typedef std::vector<GridTools::PeriodicFacePair
-                          <typename DH::cell_iterator> > FaceVector;
+    std::vector<GridTools::PeriodicFacePair
+                 <typename DH::cell_iterator> > matched_faces;
 
     // Collect matching periodic cells on the coarsest level:
-    const FaceVector matched_faces =
-      GridTools::collect_periodic_faces(dof_handler, b_id,
-                                        direction, offset);
+    GridTools::collect_periodic_faces(dof_handler, b_id, direction,
+                                      matched_faces, offset);
 
     make_periodicity_constraints<DH>
       (matched_faces, constraint_matrix, component_mask);

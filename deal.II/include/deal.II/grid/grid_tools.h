@@ -1096,12 +1096,13 @@ namespace GridTools
    * @author Daniel Arndt, Matthias Maier, 2013
    */
   template<typename CONTAINER>
-  std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> >
+  void
   collect_periodic_faces
   (const CONTAINER &container,
    const types::boundary_id b_id1,
    const types::boundary_id b_id2,
    const int                direction,
+   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const dealii::Tensor<1,CONTAINER::space_dimension> &offset = dealii::Tensor<1,CONTAINER::space_dimension>());
 
 
@@ -1125,11 +1126,12 @@ namespace GridTools
    * @author Daniel Arndt, Matthias Maier, 2013
    */
   template<typename CONTAINER>
-  std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> >
+  void
   collect_periodic_faces
   (const CONTAINER                 &container,
    const types::boundary_id b_id,
    const int                direction,
+   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const dealii::Tensor<1,CONTAINER::space_dimension> &offset = dealii::Tensor<1,CONTAINER::space_dimension>());
 
 

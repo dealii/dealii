@@ -311,21 +311,19 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
     #if deal_II_dimension >= 2
 
       template
-      std::vector<PeriodicFacePair<X::cell_iterator> >
-      collect_periodic_faces<X>
-                                 (const X &,
-                                  const types::boundary_id,
-                                  const types::boundary_id,
-                                  const int,
-                                  const Tensor<1,X::space_dimension> &);
+      void collect_periodic_faces<X> (const X &,
+                                      const types::boundary_id,
+                                      const types::boundary_id,
+                                      const int,
+                                      std::vector<PeriodicFacePair<X::cell_iterator> > &,
+                                      const Tensor<1,X::space_dimension> &);
 
       template
-      std::vector<PeriodicFacePair<X::cell_iterator> >
-      collect_periodic_faces<X>
-                                 (const X &,
-                                  const types::boundary_id,
-                                  const int,
-                                  const Tensor<1,X::space_dimension> &);
+      void collect_periodic_faces<X> (const X &,
+                                      const types::boundary_id,
+                                      const int,
+                                      std::vector<PeriodicFacePair<X::cell_iterator> > &,
+                                      const Tensor<1,X::space_dimension> &);
 
     #endif
 
@@ -341,20 +339,22 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
      namespace GridTools \{
 
       template
-      std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> >
+      void
       collect_periodic_faces<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >
                                  (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
                                   const types::boundary_id,
                                   const types::boundary_id,
                                   const int,
+                                  std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> > &,
                                   const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
 
       template
-      std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> >
+      void
       collect_periodic_faces<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >
                                  (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
                                   const types::boundary_id,
                                   const int,
+                                  std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> > &,
                                   const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
 
      \}
