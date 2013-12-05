@@ -1900,4 +1900,25 @@ ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 
 #include "constraint_matrix.inst"
 
+// allocate scratch data. Cannot use the generic template instantiation
+// because we need to provide an initializer object of type
+// internals::ConstraintMatrixData<Number> that can be passed to the
+// constructor of scratch_data (it won't allow one to be constructed in place).
+namespace internals
+{
+#define SCRATCH_INITIALIZER(Number,Name)                                \
+  ConstraintMatrixData<Number>::ScratchData scratch_data_initializer_##Name; \
+  template<> Threads::ThreadLocalStorage<ConstraintMatrixData<Number>::ScratchData> \
+  ConstraintMatrixData<Number>::scratch_data(scratch_data_initializer_##Name)
+
+  SCRATCH_INITIALIZER(double,double);
+  SCRATCH_INITIALIZER(float,float);
+  SCRATCH_INITIALIZER(long double,ldouble);
+  SCRATCH_INITIALIZER(std::complex<double>,cdouble);
+  SCRATCH_INITIALIZER(std::complex<float>,cfloat);
+  SCRATCH_INITIALIZER(std::complex<long double>,cldouble);
+#undef SCRATCH_INITIALIZER
+}
+
+
 DEAL_II_NAMESPACE_CLOSE

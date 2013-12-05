@@ -1291,76 +1291,6 @@ private:
   bool sorted;
 
   /**
-   * Scratch data that is used during calls to distribute_local_to_global and
-   * add_entries_local_to_global. In order to avoid frequent memory
-   * allocation, we keep the data alive from one call to the next.
-   */
-  struct ScratchData
-  {
-    /**
-     * Constructor, does nothing.
-     */
-    ScratchData () :
-      in_use (false)
-    {}
-
-    /**
-     * Copy constructor, does nothing
-     */
-    ScratchData (const ScratchData &) :
-      in_use (false)
-    {}
-
-    /**
-     * Stores whether the data is currently in use.
-     */
-    bool in_use;
-
-    /**
-     * Temporary array for column indices
-     */
-    std::vector<size_type> columns;
-
-    /**
-     * Temporary array for column values
-     */
-    std::vector<double>    values;
-
-    /**
-     * Temporary array for block start indices
-     */
-    std::vector<size_type> block_starts;
-
-    /**
-     * Temporary array for vector indices
-     */
-    std::vector<size_type> vector_indices;
-
-    /**
-     * Data array for reorder row/column indices. Use a shared ptr to
-     * global_rows to avoid defining in the .h file
-     */
-    std_cxx1x::shared_ptr<internals::GlobalRowsFromLocal> global_rows;
-
-    /**
-     * Data array for reorder row/column indices. Use a shared ptr to
-     * global_rows to avoid defining in the .h file
-     */
-    std_cxx1x::shared_ptr<internals::GlobalRowsFromLocal> global_columns;
-  };
-
-  /**
-   * Here comes the actual data structure for the scratch data. It is made
-   * mutable since it is modified in a const function. Since only one thread
-   * can access it at a time, no conflicting access can occur. For this to be
-   * valid, we need to make sure that no call within
-   * distribute_local_to_global is made that by itself can spawn
-   * tasks. Otherwise, we might end up in a situation where several threads
-   * fight for the data.
-   */
-  mutable Threads::ThreadLocalStorage<ScratchData> scratch_data;
-
-  /**
    * Internal function to calculate the index of line @p line in the vector
    * lines_cache using local_lines.
    */
@@ -1472,8 +1402,7 @@ ConstraintMatrix::ConstraintMatrix (const IndexSet &local_constraints)
   :
   lines (),
   local_lines (local_constraints),
-  sorted (false),
-  scratch_data (ScratchData())
+  sorted (false)
 {
   // make sure the IndexSet is compressed. Otherwise this can lead to crashes
   // that are hard to find (only happen in release mode).
@@ -1490,8 +1419,7 @@ ConstraintMatrix::ConstraintMatrix (const ConstraintMatrix &constraint_matrix)
   lines (constraint_matrix.lines),
   lines_cache (constraint_matrix.lines_cache),
   local_lines (constraint_matrix.local_lines),
-  sorted (constraint_matrix.sorted),
-  scratch_data (ScratchData())
+  sorted (constraint_matrix.sorted)
 {}
 
 
