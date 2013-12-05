@@ -264,13 +264,20 @@ void LaplaceProblem<dim>::setup_system ()
 
   constraints.clear ();
 
-  // add a constraint that expands over most of the domain, which should
-  // create many conflicts
-  constraints.add_line(3);
-  for (unsigned int i=5; i<dof_handler.n_dofs(); i+=11)
-    constraints.add_entry(3, i, -0.5);
-
   DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+
+  // add a constraint that expands over most of the domain, which should
+  // create many conflicts. Avoid cycles and do not constrain to entries
+  // already constrained
+  for (unsigned int c=0; c<dof_handler.n_dofs(); ++c)
+    if (constraints.is_constrained(c) == false)
+      {
+        constraints.add_line(c);
+        for (unsigned int i=5; i<dof_handler.n_dofs(); i+=11)
+          if (constraints.is_constrained(i) == false)
+            constraints.add_entry(c, i, -0.5);
+        break;
+      }
 
   // add boundary conditions as inhomogeneous constraints here, do it after
   // having added the hanging node constraints in order to be consistent and
