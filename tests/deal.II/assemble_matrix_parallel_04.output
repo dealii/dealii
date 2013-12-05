@@ -1,13 +1,13 @@
 
-DEAL:2d::absolute error in matrix norm: 0
-DEAL:2d::absolute error in vector norm: 0
-DEAL:2d::absolute error matrix assembly 2: 0
-DEAL:2d::absolute error vector assembly 2: 0
-DEAL:2d::absolute error in matrix norm: 0
-DEAL:2d::absolute error in vector norm: 0
-DEAL:2d::absolute error matrix assembly 2: 0
-DEAL:2d::absolute error vector assembly 2: 0
-DEAL:2d::absolute error in matrix norm: 0
-DEAL:2d::absolute error in vector norm: 0
-DEAL:2d::absolute error matrix assembly 2: 0
-DEAL:2d::absolute error vector assembly 2: 0
+DEAL:2d::error in matrix 1: 0
+DEAL:2d::error in vector 1: 0
+DEAL:2d::error in matrix 2: 0
+DEAL:2d::error in vector 2: 0
+DEAL:2d::error in matrix 1: 0
+DEAL:2d::error in vector 1: 0
+DEAL:2d::error in matrix 2: 0
+DEAL:2d::error in vector 2: 0
+DEAL:2d::error in matrix 1: 0
+DEAL:2d::error in vector 1: 0
+DEAL:2d::error in matrix 2: 0
+DEAL:2d::error in vector 2: 0
