@@ -225,8 +225,9 @@ int main()
       typedef Triangulation<2>::cell_iterator CellIterator;
       typedef std::vector<GridTools::PeriodicFacePair<CellIterator> >
         FaceVector;
-      FaceVector test = GridTools::collect_periodic_faces
-                          (triangulation, 42, 43, 1, dealii::Tensor<1,2>());
+      FaceVector test;
+      GridTools::collect_periodic_faces
+        (triangulation, 42, 43, 1, test, dealii::Tensor<1,2>());
 
       deallog << "Triangulation: " << i << std::endl;
 
@@ -248,8 +249,9 @@ int main()
       typedef Triangulation<3>::cell_iterator CellIterator;
       typedef std::vector<GridTools::PeriodicFacePair<CellIterator> >
         FaceVector;
-      FaceVector test = GridTools::collect_periodic_faces
-                          (triangulation, 42, 43, 2, dealii::Tensor<1,3>());
+      FaceVector test;
+      GridTools::collect_periodic_faces
+        (triangulation, 42, 43, 2, test, dealii::Tensor<1,3>());
 
       deallog << "Triangulation: " << i << std::endl;
 
