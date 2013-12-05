@@ -473,15 +473,14 @@ void LaplaceProblem<dim>::assemble_test()
   tasks.join_all();
 
   test_matrix.add(-1, reference_matrix);
-  const double frobenius_norm = test_matrix.frobenius_norm();
-  deallog << "absolute error in matrix norm: " << frobenius_norm << std::endl;
+  deallog << "error in matrix 1: " << test_matrix.frobenius_norm() << std::endl;
   test_rhs.add(-1., reference_rhs);
-  deallog << "absolute error in vector norm: " << test_rhs.l2_norm() << std::endl;
+  deallog << "error in vector 1: " << test_rhs.l2_norm() << std::endl;
 
   test_matrix_2.add(-numbers::PI, reference_matrix);
-  deallog << "absolute error matrix assembly 2: " << test_matrix_2.frobenius_norm() << std::endl;
+  deallog << "error in matrix 2: " << test_matrix_2.frobenius_norm() << std::endl;
   test_rhs_2.add(-numbers::PI, reference_rhs);
-  deallog << "absolute error vector assembly 2: " << test_rhs_2.l2_norm() << std::endl;
+  deallog << "error in vector 2: " << test_rhs_2.l2_norm() << std::endl;
 }
 
 
@@ -537,7 +536,7 @@ int main ()
   logfile << std::setprecision (2);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-8);
+  deallog.threshold_double(1.e-10);
 
   {
     deallog.push("2d");

@@ -387,9 +387,11 @@ void LaplaceProblem<dim>::assemble_test ()
     for (unsigned int j=0; j<2; ++j)
       frobenius_norm += test_matrix.block(i,j).frobenius_norm();
 
-  deallog << "log error in matrix norm: " << std::log(frobenius_norm) << std::endl;
+  // there should not even be roundoff difference between matrices
+  deallog.threshold_double(1e-30);
+  deallog << "error in matrix: " << frobenius_norm << std::endl;
   test_rhs.add(-1., reference_rhs);
-  deallog << "log error in vector norm: " << std::log(test_rhs.l2_norm()) << std::endl;
+  deallog << "error in vector: " << test_rhs.l2_norm() << std::endl;
 }
 
 
@@ -444,7 +446,6 @@ int main ()
   logfile << std::setprecision (2);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-8);
 
   {
     deallog.push("2d");
