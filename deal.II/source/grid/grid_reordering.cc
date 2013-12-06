@@ -65,6 +65,24 @@ GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2
 }
 
 
+template<>
+void
+GridReordering<1,3>::reorder_cells (std::vector<CellData<1> > &)
+{
+  // there should not be much to do
+  // in 1d...
+}
+
+
+template<>
+void
+GridReordering<1,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &,
+                                                       std::vector<CellData<1> > &)
+{
+  // nothing to be done in 1d
+}
+
+
 namespace internal
 {
   namespace GridReordering2d
