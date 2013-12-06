@@ -15,6 +15,27 @@
 ## ---------------------------------------------------------------------
 
 #
+# Generate the source documentation via doxygen:
+#
+
+FIND_PACKAGE(Perl)
+FIND_PACKAGE(Doxygen)
+
+#
+# Do we have all necessary dependencies?
+#
+IF(NOT PERL_FOUND)
+  MESSAGE(FATAL_ERROR
+    "Could not find a perl installation which is required for building the documentation"
+    )
+ENDIF()
+IF(NOT DOXYGEN_FOUND)
+  MESSAGE(FATAL_ERROR
+    "Could not find doxygen which is required for building the documentation"
+    )
+ENDIF()
+
+#
 # A glob. I'm sorry
 #
 file(GLOB DEAL_II_STEPS
@@ -25,7 +46,6 @@ file(GLOB DEAL_II_STEPS
 # Prepare the example steps for doxygen:
 #
 ADD_SUBDIRECTORY(tutorial) # uses ${DEAL_II_STEPS}
-ADD_SUBDIRECTORY(images)
 
 #
 # Prepare auxiliary files for doxygen:
@@ -33,12 +53,6 @@ ADD_SUBDIRECTORY(images)
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
-  )
-
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/deal.css
-  ${CMAKE_CURRENT_BINARY_DIR}/deal.II/deal.css
-  COPYONLY
   )
 
 CONFIGURE_FILE(
@@ -129,7 +143,6 @@ ADD_CUSTOM_COMMAND(
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial
-    images
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html
@@ -140,10 +153,10 @@ ADD_CUSTOM_COMMAND(
 ADD_CUSTOM_TARGET(doxygen ALL
   DEPENDS ${CMAKE_BINARY_DIR}/doxygen.log
   )
+ADD_DEPENDENCIES(documentation doxygen)
 
 INSTALL(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/deal.tag
-  ${CMAKE_CURRENT_SOURCE_DIR}/stylesheet.css
   DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen
   COMPONENT documentation
   )

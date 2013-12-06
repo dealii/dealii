@@ -21,31 +21,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
 
   MESSAGE(STATUS "Setup documentation")
 
-  #
-  # Required packages for the document generation:
-  #
-  FIND_PACKAGE(Perl)
-  FIND_PACKAGE(Doxygen)
-
-  #
-  # Do we have all necessary dependencies?
-  #
-  IF(NOT PERL_FOUND)
-    MESSAGE(FATAL_ERROR
-      "Could not find a perl installation which is required for building the documentation"
-      )
-  ENDIF()
-  IF(NOT DOXYGEN_FOUND OR NOT DOXYGEN_DOT_FOUND)
-    MESSAGE(FATAL_ERROR
-      "Could not find doxygen and dot which is required for building the documentation"
-      )
-  ENDIF()
-
-  #
-  # Generate the source documentation via doxygen:
-  #
   ADD_SUBDIRECTORY(doxygen)
-  ADD_DEPENDENCIES(documentation doxygen)
 
   #
   # Install the static elements of the html documentation:
