@@ -40,6 +40,19 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li>Changed: During the implementation of the 64-bit features for deal.II
+  8.0, many linear algebra classes obtained a local typedef
+  <code>size_type</code> indicating the integer type that is used to index
+  into them. In some instances, this was accidentally set to
+  <code>types::global_dof_index</code> (which may be a 64-bit data type)
+  even in cases where this is clearly not going to work, for example for
+  FullMatrix::size_type, since we will not be able to store full matrix
+  objects of sizes for which a 32-bit index type is not sufficient. In
+  these cases, the typedef was reverted to just <code>unsigned int</code>.
+  <br>
+  (Wolfgang Bangerth, 2013/12/04)
+  </li>
+
   <li> Removed: With the switch of the testsuite to CMake, the old report_features
   and build test facilities are removed.
   <br>

@@ -61,17 +61,17 @@ template <typename number> class LAPACKFullMatrix;
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */
-template<typename number>
+template <typename number>
 class FullMatrix : public Table<2,number>
 {
 public:
   /**
-   * Declare type of container size.
+   * A type of used to index into this container. Because we can not
+   * expect to store matrices bigger than what can be indexed by a regular
+   * unsigned integer, <code>unsigned int</code> is completely sufficient
+   * as an index type.
    */
-  // A FullMatrix will never require to use unsigned long long int instead of
-  // unsigned but because a ConstraintMatrix can be a SparseMatrix or a
-  // FullMatrix, we need have the same interface.
-  typedef types::global_dof_index size_type;
+  typedef unsigned int size_type;
 
   /**
    * Type of matrix entries. In analogy to
@@ -324,7 +324,7 @@ public:
   /**
    * Variable assignment operator.
    */
-  template<typename number2>
+  template <typename number2>
   FullMatrix<number> &
   operator = (const FullMatrix<number2> &);
 
@@ -448,8 +448,8 @@ public:
    */
   template <typename MatrixType>
   void extract_submatrix_from (const MatrixType &matrix,
-                               const std::vector<size_type> &row_index_set,
-                               const std::vector<size_type> &column_index_set);
+                               const std::vector<typename MatrixType::size_type> &row_index_set,
+                               const std::vector<typename MatrixType::size_type> &column_index_set);
 
   /**
    * Copy the elements of the current matrix object into a specified
@@ -487,7 +487,7 @@ public:
    * determined either by the size
    * of <tt>this</tt> or <tt>src</tt>.
    */
-  template<typename number2>
+  template <typename number2>
   void fill (const FullMatrix<number2> &src,
              const size_type dst_offset_i = 0,
              const size_type dst_offset_j = 0,
@@ -499,7 +499,7 @@ public:
    * Make function of base class
    * available.
    */
-  template<typename number2>
+  template <typename number2>
   void fill (const number2 *);
 
   /**
@@ -520,7 +520,7 @@ public:
    * possible to duplicate rows or
    * columns by this method.
    */
-  template<typename number2>
+  template <typename number2>
   void fill_permutation (const FullMatrix<number2>       &src,
                          const std::vector<size_type> &p_rows,
                          const std::vector<size_type> &p_cols);
@@ -612,7 +612,7 @@ public:
    * complex-valued, but not mixed, for
    * this function to make sense.
    */
-  template<typename number2>
+  template <typename number2>
   number2 matrix_norm_square (const Vector<number2> &v) const;
 
   /**
@@ -630,7 +630,7 @@ public:
    * complex-valued, but not mixed, for
    * this function to make sense.
    */
-  template<typename number2>
+  template <typename number2>
   number2 matrix_scalar_product (const Vector<number2> &u,
                                  const Vector<number2> &v) const;
 
@@ -825,7 +825,7 @@ public:
    * convertible to the data type
    * of this matrix.
    */
-  template<typename number2>
+  template <typename number2>
   void add (const number               a,
             const FullMatrix<number2> &A);
 
@@ -842,7 +842,7 @@ public:
    * convertible to the data type
    * of this matrix.
    */
-  template<typename number2>
+  template <typename number2>
   void add (const number               a,
             const FullMatrix<number2> &A,
             const number               b,
@@ -861,7 +861,7 @@ public:
    * is convertible to the data
    * type of this matrix.
    */
-  template<typename number2>
+  template <typename number2>
   void add (const number               a,
             const FullMatrix<number2> &A,
             const number               b,
@@ -886,7 +886,7 @@ public:
    * size of <tt>this</tt> or <tt>src</tt>
    * and the given offsets.
    */
-  template<typename number2>
+  template <typename number2>
   void add (const FullMatrix<number2> &src,
             const number factor,
             const size_type dst_offset_i = 0,
@@ -901,7 +901,7 @@ public:
    *
    * <i>A += s B<sup>T</sup></i>
    */
-  template<typename number2>
+  template <typename number2>
   void Tadd (const number               s,
              const FullMatrix<number2> &B);
 
@@ -927,7 +927,7 @@ public:
    * of <tt>this</tt> or
    * <tt>src</tt>.
    */
-  template<typename number2>
+  template <typename number2>
   void Tadd (const FullMatrix<number2> &src,
              const number               factor,
              const size_type dst_offset_i = 0,
@@ -959,10 +959,10 @@ public:
    * and are indeed ignored in the
    * implementation.
    */
-  template <typename number2>
+  template <typename number2, typename index_type>
   void add (const size_type     row,
-            const size_type     n_cols,
-            const size_type    *col_indices,
+            const unsigned int  n_cols,
+            const index_type   *col_indices,
             const number2      *values,
             const bool          elide_zero_values = true,
             const bool          col_indices_are_sorted = false);
@@ -1030,7 +1030,7 @@ public:
    * Assignment <tt>*this =
    * a*A</tt>.
    */
-  template<typename number2>
+  template <typename number2>
   void equ (const number               a,
             const FullMatrix<number2> &A);
 
@@ -1038,7 +1038,7 @@ public:
    * Assignment <tt>*this = a*A +
    * b*B</tt>.
    */
-  template<typename number2>
+  template <typename number2>
   void equ (const number               a,
             const FullMatrix<number2> &A,
             const number               b,
@@ -1048,7 +1048,7 @@ public:
    * Assignment <tt>*this = a*A +
    * b*B + c*C</tt>.
    */
-  template<typename number2>
+  template <typename number2>
   void equ (const number               a,
             const FullMatrix<number2> &A,
             const number               b,
@@ -1176,7 +1176,7 @@ public:
    * usually results in considerable
    * performance gains.
    */
-  template<typename number2>
+  template <typename number2>
   void mmult (FullMatrix<number2>       &C,
               const FullMatrix<number2> &B,
               const bool                 adding=false) const;
@@ -1208,7 +1208,7 @@ public:
    * BLAS usually results in considerable
    * performance gains.
    */
-  template<typename number2>
+  template <typename number2>
   void Tmmult (FullMatrix<number2>       &C,
                const FullMatrix<number2> &B,
                const bool                 adding=false) const;
@@ -1240,7 +1240,7 @@ public:
    * usually results in considerable
    * performance gains.
    */
-  template<typename number2>
+  template <typename number2>
   void mTmult (FullMatrix<number2>       &C,
                const FullMatrix<number2> &B,
                const bool                 adding=false) const;
@@ -1273,7 +1273,7 @@ public:
    * BLAS usually results in considerable
    * performance gains.
    */
-  template<typename number2>
+  template <typename number2>
   void TmTmult (FullMatrix<number2>       &C,
                 const FullMatrix<number2> &B,
                 const bool                 adding=false) const;
@@ -1322,7 +1322,7 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  template<typename number2>
+  template <typename number2>
   void vmult (Vector<number2>       &w,
               const Vector<number2> &v,
               const bool             adding=false) const;
@@ -1334,7 +1334,7 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  template<typename number2>
+  template <typename number2>
   void vmult_add (Vector<number2>       &w,
                   const Vector<number2> &v) const;
 
@@ -1357,7 +1357,7 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  template<typename number2>
+  template <typename number2>
   void Tvmult (Vector<number2>       &w,
                const Vector<number2> &v,
                const bool             adding=false) const;
@@ -1370,7 +1370,7 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  template<typename number2>
+  template <typename number2>
   void Tvmult_add (Vector<number2>       &w,
                    const Vector<number2> &v) const;
 
@@ -1398,7 +1398,7 @@ public:
    * <i>dst</i> must not be the same
    * vector.
    */
-  template<typename number2, typename number3>
+  template <typename number2, typename number3>
   number residual (Vector<number2>       &dst,
                    const Vector<number2> &x,
                    const Vector<number3> &b) const;
@@ -1420,7 +1420,7 @@ public:
    * same object for @p dst and @p
    * src.
    */
-  template<typename number2>
+  template <typename number2>
   void forward (Vector<number2>       &dst,
                 const Vector<number2> &src) const;
 
@@ -1434,7 +1434,7 @@ public:
    * same object for @p dst and @p
    * src.
    */
-  template<typename number2>
+  template <typename number2>
   void backward (Vector<number2>       &dst,
                  const Vector<number2> &src) const;
 
@@ -1576,8 +1576,8 @@ template <typename MatrixType>
 inline
 void
 FullMatrix<number>::extract_submatrix_from (const MatrixType &matrix,
-                                            const std::vector<size_type> &row_index_set,
-                                            const std::vector<size_type> &column_index_set)
+                                            const std::vector<typename MatrixType::size_type> &row_index_set,
+                                            const std::vector<typename MatrixType::size_type> &column_index_set)
 {
   AssertDimension(row_index_set.size(), this->n_rows());
   AssertDimension(column_index_set.size(), this->n_cols());
@@ -1627,7 +1627,7 @@ FullMatrix<number>::set (const size_type i,
 
 
 template <typename number>
-template<typename number2>
+template <typename number2>
 void
 FullMatrix<number>::vmult_add (Vector<number2>       &w,
                                const Vector<number2> &v) const
@@ -1637,7 +1637,7 @@ FullMatrix<number>::vmult_add (Vector<number2>       &w,
 
 
 template <typename number>
-template<typename number2>
+template <typename number2>
 void
 FullMatrix<number>::Tvmult_add (Vector<number2>       &w,
                                 const Vector<number2> &v) const
@@ -1833,13 +1833,13 @@ FullMatrix<number>::add (const size_type r, const size_type c, const number v)
 
 
 template <typename number>
-template <typename number2>
+template <typename number2, typename index_type>
 inline
 void
-FullMatrix<number>::add (const size_type  row,
-                         const size_type  n_cols,
-                         const size_type *col_indices,
-                         const number2   *values,
+FullMatrix<number>::add (const size_type    row,
+                         const unsigned int n_cols,
+                         const index_type  *col_indices,
+                         const number2     *values,
                          const bool,
                          const bool)
 {

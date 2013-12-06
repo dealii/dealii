@@ -51,7 +51,7 @@ for (S1, S2 : REAL_SCALARS)
 
     template
       void FullMatrix<S1>::fill<S2> (
-	const FullMatrix<S2>&, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
+	const FullMatrix<S2>&, size_type, size_type, size_type, size_type);
     template
       void FullMatrix<S1>::add<S2> (const S1, const FullMatrix<S2>&);
     template
@@ -63,12 +63,12 @@ for (S1, S2 : REAL_SCALARS)
 				    const S1, const FullMatrix<S2>&);
     template
       void FullMatrix<S1>::add<S2> (
-	const FullMatrix<S2>&, S1, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
+	const FullMatrix<S2>&, S1, size_type, size_type, size_type, size_type);
     template
       void FullMatrix<S1>::Tadd<S2> (const S1, const FullMatrix<S2>&);
     template
       void FullMatrix<S1>::Tadd<S2> (
-	const FullMatrix<S2>&, S1, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
+	const FullMatrix<S2>&, S1, size_type, size_type, size_type, size_type);
     template
       void FullMatrix<S1>::equ<S2> (const S1, const FullMatrix<S2>&);
     template
@@ -159,7 +159,7 @@ for (S1, S2 : COMPLEX_SCALARS)
   {
     template
       void FullMatrix<S1>::fill<S2> (
-	const FullMatrix<S2>&, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
+	const FullMatrix<S2>&, size_type, size_type, size_type, size_type);
     template
       void FullMatrix<S1>::add<S2> (const S1, const FullMatrix<S2>&);
     template
@@ -171,13 +171,13 @@ for (S1, S2 : COMPLEX_SCALARS)
 				    const S1, const FullMatrix<S2>&);
     template
       void FullMatrix<S1>::add<S2> (
-	const FullMatrix<S2>&, S1, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
+	const FullMatrix<S2>&, S1, size_type, size_type, size_type, size_type);
     template
       void FullMatrix<S1>::Tadd<S2> (const S1, const FullMatrix<S2>&);
     template
       void FullMatrix<S1>::Tadd<S2> (
-	const FullMatrix<S2>&, S1, types::global_dof_index, types::global_dof_index,
-  types::global_dof_index, types::global_dof_index);
+	const FullMatrix<S2>&, S1, size_type, size_type,
+  size_type, size_type);
     template
       void FullMatrix<S1>::equ<S2> (const S1, const FullMatrix<S2>&);
     template
