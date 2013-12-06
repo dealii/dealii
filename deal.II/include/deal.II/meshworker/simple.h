@@ -824,13 +824,24 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-      //Assert(mg_constrained_dofs == 0, ExcInternalError());
-//TODO: Possibly remove this function all together
 
-      for (unsigned int j=0; j<i1.size(); ++j)
-	for (unsigned int k=0; k<i2.size(); ++k)
-	  if (std::fabs(M(j,k)) >= threshold)
-	    G.add(i1[j], i2[k], M(j,k));
+      if (mg_constrained_dofs == 0)
+        {
+          for (unsigned int j=0; j<i1.size(); ++j)
+            for (unsigned int k=0; k<i2.size(); ++k)
+              if (std::fabs(M(j,k)) >= threshold)
+                G.add(i1[j], i2[k], M(j,k));
+        }
+      else
+        {
+          for (unsigned int j=0; j<i1.size(); ++j)
+            for (unsigned int k=0; k<i2.size(); ++k)
+              if (std::fabs(M(j,k)) >= threshold)
+                {
+                  if (!mg_constrained_dofs->continuity_across_refinement_edges())
+                    G.add(i1[j], i2[k], M(j,k));
+                }
+        }
     }
 
 
@@ -905,8 +916,8 @@ namespace MeshWorker
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(k,j)) >= threshold)
 		if (!mg_constrained_dofs->at_refinement_edge(level, i2[k]))
-		    G.add(i1[j], i2[k], M(k,j));
-	}
+                  G.add(i1[j], i2[k], M(k,j));
+        }
     }
 
     template <class MATRIX>
@@ -1076,10 +1087,10 @@ namespace MeshWorker
             {
               if (mg_constrained_dofs == 0)
                 {
-                  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
-                  assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
-                  assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
-                  assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+                  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
+                  assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices);
+                  assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices);
+                  assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
                 }
               else
                 {
@@ -1095,7 +1106,7 @@ namespace MeshWorker
               // Do not add info2.M1,
               // which is done by
               // the coarser cell
-              assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
+              assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
               if (level1>0)
                 {
                   assemble_up((*flux_up)[level1],info1.matrix(0,true).matrix, info2.indices, info1.indices, level1);
@@ -1113,10 +1124,10 @@ namespace MeshWorker
               {
                 if (mg_constrained_dofs == 0)
                   {
-                    assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column], level1);
-                    assemble((*matrix)[level1], info1.matrix(k,true).matrix, info1.indices_by_block[row], info2.indices_by_block[column], level1);
-                    assemble((*matrix)[level1], info2.matrix(k,false).matrix, info2.indices_by_block[row], info2.indices_by_block[column], level1);
-                    assemble((*matrix)[level1], info2.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
+                    assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column]);
+                    assemble((*matrix)[level1], info1.matrix(k,true).matrix, info1.indices_by_block[row], info2.indices_by_block[column]);
+                    assemble((*matrix)[level1], info2.matrix(k,false).matrix, info2.indices_by_block[row], info2.indices_by_block[column]);
+                    assemble((*matrix)[level1], info2.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column]);
                   }
                 else
                   {
@@ -1132,7 +1143,7 @@ namespace MeshWorker
                 // Do not add info2.M1,
                 // which is done by
                 // the coarser cell
-                assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column], level1);
+                assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column]);
                 if (level1>0)
                   {
                     assemble_up((*flux_up)[level1],info1.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
