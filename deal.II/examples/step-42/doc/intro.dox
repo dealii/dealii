@@ -55,7 +55,7 @@ step-32.
 The classical formulation of the problem possesses the following form:
 @f{align*}
  \varepsilon(\mathbf u) &= A\sigma + \varepsilon^p & &\quad\text{in } \Omega,\\
-  -\textrm{\textrm{div}}\ \sigma &= \mathbf f & &\quad\text{in } \Omega,\\
+  -\textrm{div}\ \sigma &= \mathbf f & &\quad\text{in } \Omega,\\
   \varepsilon^p:(\tau - \sigma) &\geq 0\quad\forall\tau\text{ with
   }\mathcal{F}(\tau)\leq 0 & &\quad\text{in } \Omega,\\
   \mathbf u &= 0 & &\quad\text{on }\Gamma_D,\\
