@@ -56,18 +56,6 @@ CONFIGURE_FILE(
   )
 
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/stylesheet.css
-  ${CMAKE_CURRENT_BINARY_DIR}/stylesheet.css
-  COPYONLY
-  )
-
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/images/logo200.png
-  ${CMAKE_CURRENT_BINARY_DIR}/logo200.png
-  COPYONLY
-  )
-
-CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_header.pl.in
   ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
   )
