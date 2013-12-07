@@ -446,10 +446,10 @@ public:
    *      rows and columns in the current object. In other words,
    *      the current object is not resized for this operation.
    */
-  template <typename MatrixType>
+  template <typename MatrixType, typename index_type>
   void extract_submatrix_from (const MatrixType &matrix,
-                               const std::vector<typename MatrixType::size_type> &row_index_set,
-                               const std::vector<typename MatrixType::size_type> &column_index_set);
+                               const std::vector<index_type> &row_index_set,
+                               const std::vector<index_type> &column_index_set);
 
   /**
    * Copy the elements of the current matrix object into a specified
@@ -463,10 +463,10 @@ public:
    *      rows and columns in the current object. In other words,
    *      the current object is not resized for this operation.
    */
-  template <typename MatrixType>
+  template <typename MatrixType, typename index_type>
   void
-  scatter_matrix_to (const std::vector<size_type> &row_index_set,
-                     const std::vector<size_type> &column_index_set,
+  scatter_matrix_to (const std::vector<index_type> &row_index_set,
+                     const std::vector<index_type> &column_index_set,
                      MatrixType &matrix) const;
 
   /**
@@ -1572,12 +1572,12 @@ FullMatrix<number>::copy_transposed (const MATRIX &M)
 
 
 template <typename number>
-template <typename MatrixType>
+template <typename MatrixType, typename index_type>
 inline
 void
 FullMatrix<number>::extract_submatrix_from (const MatrixType &matrix,
-                                            const std::vector<typename MatrixType::size_type> &row_index_set,
-                                            const std::vector<typename MatrixType::size_type> &column_index_set)
+                                            const std::vector<index_type> &row_index_set,
+                                            const std::vector<index_type> &column_index_set)
 {
   AssertDimension(row_index_set.size(), this->n_rows());
   AssertDimension(column_index_set.size(), this->n_cols());
@@ -1593,11 +1593,11 @@ FullMatrix<number>::extract_submatrix_from (const MatrixType &matrix,
 
 
 template <typename number>
-template <typename MatrixType>
+template <typename MatrixType, typename index_type>
 inline
 void
-FullMatrix<number>::scatter_matrix_to (const std::vector<size_type> &row_index_set,
-                                       const std::vector<size_type> &column_index_set,
+FullMatrix<number>::scatter_matrix_to (const std::vector<index_type> &row_index_set,
+                                       const std::vector<index_type> &column_index_set,
                                        MatrixType &matrix) const
 {
   AssertDimension(row_index_set.size(), this->n_rows());

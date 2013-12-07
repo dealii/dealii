@@ -372,9 +372,11 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
   double average = 0;
   size_type n_elements = 0;
   for (size_type row=i*options.block_size;
-       row < std::min(matrix.m(), (i+1)*options.block_size); ++row)
+       row < std::min(size_type(matrix.m()),
+		      size_type((i+1)*options.block_size)); ++row)
     for (size_type col=j*options.block_size;
-         col < std::min(matrix.m(), (j+1)*options.block_size); ++col, ++n_elements)
+         col < std::min(size_type(matrix.m()),
+			size_type((j+1)*options.block_size)); ++col, ++n_elements)
       if (options.show_absolute_values == true)
         average += std::fabs(get_element (matrix, row, col));
       else
