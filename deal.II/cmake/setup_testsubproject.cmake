@@ -34,6 +34,16 @@
 #
 
 #
+# Silence warnings:
+#
+FOREACH(_var
+    MPIEXEC MPIEXEC_NUMPROC_FLAG MPIEXEC_POSTFLAGS MPIEXEC_PREFLAGS
+    )
+  SET(${_var} ${${_var}})
+ENDFOREACH()
+
+
+#
 # Load all macros:
 #
 FILE(GLOB _macro_files ${DEAL_II_SOURCE_DIR}/cmake/macros/*.cmake)
