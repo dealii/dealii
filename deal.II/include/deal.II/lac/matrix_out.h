@@ -134,7 +134,7 @@ public:
      *
      * Default value is one.
      */
-    size_type block_size;
+    unsigned int block_size;
 
     /**
      * If true, plot
@@ -149,9 +149,9 @@ public:
      * structure to their default
      * values.
      */
-    Options (const bool      show_absolute_values = false,
-             const size_type block_size           = 1,
-             const bool      discontinuous        = false);
+    Options (const bool         show_absolute_values = false,
+             const unsigned int block_size           = 1,
+             const bool         discontinuous        = false);
   };
 
   /**
@@ -365,7 +365,7 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
         return std::fabs(get_element (matrix, i, j));
       else
         return get_element (matrix, i, j);
-    };
+    }
 
   // if blocksize greater than one,
   // then compute average of elements
@@ -394,12 +394,12 @@ MatrixOut::build_patches (const Matrix      &matrix,
                           const Options      options)
 {
   size_type
-  gridpoints_x = (matrix.n() / options.block_size
-                  +
-                  (matrix.n() % options.block_size != 0 ? 1 : 0)),
-                 gridpoints_y = (matrix.m() / options.block_size
-                                 +
-                                 (matrix.m() % options.block_size != 0 ? 1 : 0));
+    gridpoints_x = (matrix.n() / options.block_size
+		    +
+		    (matrix.n() % options.block_size != 0 ? 1 : 0)),
+    gridpoints_y = (matrix.m() / options.block_size
+		    +
+		    (matrix.m() % options.block_size != 0 ? 1 : 0));
 
   // If continuous, the number of
   // plotted patches is matrix size-1
