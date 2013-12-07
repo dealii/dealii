@@ -54,9 +54,8 @@
  * <code>cmake .</code>, build it via <code>make</code> and run it using
  * <code>make run</code>. The latter command also compiles the program if
  * that has not already been done. The CMakefiles.txt files in the
- * different directories are based on the small program Makefile template
- * described <a href="../../user/cmakelists.html" target="_top">in this
- * section</a>.
+ * different directories are based on the 
+ * <a href="../../usesr/cmakelists.html" target="_top">small program Makefile template</a>.
  *
  * <a name="graph"></a>
  * <h3>Connections between tutorial programs</h3>
@@ -859,7 +858,7 @@
  *   </tr>
  *
  * </table>
- * <h4><b>Vector problems</b></h4>
+ * <h4><b>%Vector problems</b></h4>
  * <table align="center" width="90%">
  *
  *   <tr valign="top">
