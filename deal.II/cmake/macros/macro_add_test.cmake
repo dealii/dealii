@@ -131,7 +131,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         SET(_diff_target ${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}/mpirun=${_n_cpu}) # directory to run the test in
-        SET(_run_command mpirun -np ${_n_cpu} ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target}) # the command to issue
+        SET(_run_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${_n_cpu} ${MPIEXEC_PREFLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target} ${MPIEXEC_POSTFLAGS}) # the command to issue
 
       ENDIF()
 
