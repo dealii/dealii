@@ -1,5 +1,5 @@
 ## ---------------------------------------------------------------------
-## $Id$
+## $Id: FindTRILINOS.cmake 31527 2013-11-03 09:58:45Z maier $
 ##
 ## Copyright (C) 2012 - 2013 by the deal.II authors
 ##
@@ -36,20 +36,18 @@ INCLUDE(FindPackageHandleStandardArgs)
 SET_IF_EMPTY(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
 
 #
-# Do not include TrilinosConfig.cmake directly, it is just too big o_O
+# Include the trilinos package configuration:
 #
-# Just search for the file:
-#
-FIND_FILE(TRILINOS_CONFIG
-  NAMES TrilinosConfig.cmake trilinos-config.cmake
+FIND_PACKAGE(TRILINOS_CONFIG
+  CONFIG QUIET
+  NAMES Trilinos TRILINOS
   HINTS
+    ${TRILINOS_DIR}/lib/cmake/Trilinos
     ${TRILINOS_DIR}
   PATH_SUFFIXES
     lib64/cmake/Trilinos
     lib/cmake/Trilinos
     lib${LIB_SUFFIX}/cmake/Trilinos
-    include/trilinos
-    include/Trilinos
   NO_SYSTEM_ENVIRONMENT_PATH
   )
 
@@ -57,38 +55,6 @@ IF(NOT "${TRILINOS_CONFIG}" STREQUAL "${TRILINOS_CONFIG_SAVED}")
   SET(_new_trilinos_config TRUE)
 ENDIF()
 SET(TRILINOS_CONFIG_SAVED "${TRILINOS_CONFIG}" CACHE INTERNAL "" FORCE)
-
-
-IF(NOT TRILINOS_CONFIG MATCHES "-NOTFOUND")
-
-  SET(_filtered_trilinos_config
-    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/TrilinosConfig.cmake"
-    )
-
-  IF(_new_trilinos_config)
-    GET_FILENAME_COMPONENT(_trilinos_path "${TRILINOS_CONFIG}" PATH)
-    FILE(WRITE ${_filtered_trilinos_config} "SET(_cmake_current_list_dir ${_trilinos_path})\n")
-
-    #
-    # Only pick up every line that starts with "^SET("...
-    #
-    FILE(STRINGS "${TRILINOS_CONFIG}" _trilinos_config_filtered REGEX "^SET")
-
-    FOREACH(_line ${_trilinos_config_filtered})
-      STRING(REPLACE "CMAKE_CURRENT_LIST_DIR" "_cmake_current_list_dir"
-        _line "${_line}"
-        )
-      FILE(APPEND ${_filtered_trilinos_config} "${_line}\n")
-    ENDFOREACH()
-  ENDIF()
-
-  #
-  # ... and include only that:
-  #
-  INCLUDE(${_filtered_trilinos_config})
-
-  SET(TRILINOS_CONFIG_FOUND TRUE)
-ENDIF()
 
 
 #
@@ -106,18 +72,16 @@ FIND_FILE(EPETRA_CONFIG_H Epetra_config.h
   NO_CMAKE_SYSTEM_PATH
   NO_CMAKE_FIND_ROOT_PATH
   )
-IF(EPETRA_CONFIG_H MATCHES "-NOTFOUND")
-  SET(TRILINOS_CONFIG_FOUND FALSE)
-ELSE()
-  SET(TRILINOS_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS})
-  #
-  # *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
-  #
-  STRING(REGEX REPLACE
-    "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
-    TRILINOS_INCLUDE_DIRS "${TRILINOS_INCLUDE_DIRS}"
-    )
-ENDIF()
+
+
+#
+# *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
+#
+SET(TRILINOS_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS})
+STRING(REGEX REPLACE
+  "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
+  TRILINOS_INCLUDE_DIRS "${TRILINOS_INCLUDE_DIRS}"
+  )
 
 
 #
@@ -143,11 +107,9 @@ FOREACH(_library ${Trilinos_LIBRARIES})
 
   MARK_AS_ADVANCED(TRILINOS_LIBRARY_${_library})
 
-  IF(TRILINOS_LIBRARY_${_library} MATCHES "-NOTFOUND")
-    SET(TRILINOS_CONFIG_FOUND FALSE)
-  ELSE()
-    LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${_library}})
-  ENDIF()
+  LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${_library}})
+  LIST(APPEND TRILINOS_LIBRARY_VARIABLES TRILINOS_LIBRARY_${_library})
+
 ENDFOREACH()
 
 #
@@ -161,10 +123,11 @@ LIST(APPEND TRILINOS_LIBRARIES
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(TRILINOS DEFAULT_MSG
   TRILINOS_LIBRARIES # cosmetic: Gives nice output
   TRILINOS_CONFIG_FOUND
+  EPETRA_CONFIG_H
+  ${TRILINOS_LIBRARY_VARIABLES}
   )
 
 MARK_AS_ADVANCED(TRILINOS_CONFIG EPETRA_CONFIG_H)
-
 
 IF(TRILINOS_FOUND)
   #
@@ -248,6 +211,10 @@ IF(TRILINOS_FOUND)
   MARK_AS_ADVANCED(TRILINOS_DIR)
 
 ELSE()
+
+  SET(TRILINOS_LIBRARIES)
+  SET(TRILINOS_INCLUDE_DIRS)
+  SET(TRILINOS_CONFIG_SAVED "" CACHE INTERNAL "" FORCE)
 
   SET(TRILINOS_DIR "" CACHE PATH
     "An optional hint to a Trilinos installation"
