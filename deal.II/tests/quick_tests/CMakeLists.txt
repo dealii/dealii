@@ -62,9 +62,6 @@ MACRO(make_quicktest test_basename build_name mpi_run)
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     )
 
-  # make sure kill is run before running the task
-  ADD_DEPENDENCIES(${_target} kill-${_target}-OK)
-
   ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
       -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
