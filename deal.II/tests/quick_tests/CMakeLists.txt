@@ -39,6 +39,7 @@ MACRO(make_quicktest test_basename build_name mpi_run)
     SET(_command mpirun -n ${mpi_run} ./${_target})
   ENDIF()
   ADD_CUSTOM_TARGET(${_target}.run
+    DEPENDS kill-${_target}-OK
     DEPENDS ${_target}
     COMMAND
       ${_command} > ${_target}-OK 2>&1
@@ -49,6 +50,16 @@ MACRO(make_quicktest test_basename build_name mpi_run)
     COMMAND echo "${_target}: PASSED."
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
+
+  # this is a hack to make sure the -OK file is deleted
+  # even if compilation fails.
+  ADD_CUSTOM_TARGET(kill-${_target}-OK
+        COMMAND rm -f ${_target}-OK 
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+  # make sure kill is run before running the task
+  ADD_DEPENDENCIES(${_target} kill-${_target}-OK)
 
   ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
