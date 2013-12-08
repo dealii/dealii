@@ -27,6 +27,7 @@ MESSAGE(STATUS "Setup quick_tests in ${_mybuild} mode")
 MACRO(make_quicktest test_basename build_name mpi_run)
   STRING(TOLOWER ${build_name} _build_lowercase)
   SET(_target ${test_basename}.${_build_lowercase})
+  LIST(APPEND AllTests "${_target}")
   ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${test_basename}.cc)
   DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${build_name})
 
@@ -39,7 +40,7 @@ MACRO(make_quicktest test_basename build_name mpi_run)
   ELSE()
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     DEPENDS ${_target}
-    COMMAND ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
+    COMMAND ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (cat ${_target}-OK && rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   ENDIF()
@@ -96,7 +97,7 @@ ENDIF()
 
 # A custom test target:
 ADD_CUSTOM_TARGET(test
-  COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
+  COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${AllTests}" -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   )
 ADD_DEPENDENCIES(test build_library)
