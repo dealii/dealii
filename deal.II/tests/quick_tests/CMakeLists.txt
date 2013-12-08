@@ -34,20 +34,31 @@ MACRO(make_quicktest test_basename build_name mpi_run)
   IF(NOT ${mpi_run} EQUAL "")
   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
     DEPENDS ${_target}
+    DEPENDS kill-${_target}-OK
     COMMAND mpirun -n ${mpi_run} ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   ELSE()
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+  ADD_CUSTOM_TARGET(${_target}-OK
     DEPENDS ${_target}
+    DEPENDS kill-${_target}-OK
     COMMAND ./${_target} > ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK 2>&1 || (cat ${_target}-OK && rm ${_target}-OK  && exit 1)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   ENDIF()
 
+  # this is a hack to make sure the -OK file is deleted
+  ADD_CUSTOM_TARGET(kill-${_target}-OK
+	COMMAND rm -f ${_target}-OK 
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+  # make sure kill is run before the other two:
+  ADD_DEPENDENCIES(${_target} kill-${_target}-OK)
+
   ADD_CUSTOM_TARGET(${_target}.run
     DEPENDS ${_target}
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+    DEPENDS ${_target}-OK
     COMMAND echo "${_target}: PASSED.")
 
   ADD_TEST(NAME ${_target}
