@@ -1066,7 +1066,9 @@ namespace GridTools
 
   /**
    * This function will collect periodic face pairs on the
-   * coarsest mesh level of the given @p container (a Triangulation or DoFHandler).
+   * coarsest mesh level of the given @p container (a Triangulation or
+   * DoFHandler) and add them to the vector @p matched_pairs leaving the
+   * original contents intact.
    *
    * Define a 'first' boundary as all boundary faces having boundary_id
    * @p b_id1 and a 'second' boundary consisting of all faces belonging
@@ -1093,6 +1095,11 @@ namespace GridTools
    * parallel::distributed::Triangulation::add_periodicity to enforce
    * periodicity algebraically.
    *
+   * @note Because elements will be added to @p matched_pairs (and existing
+   * entries will be preserved), it is possible to call this function several
+   * times with different boundary ids to generate a vector with all periodic
+   * pairs.
+   *
    * @author Daniel Arndt, Matthias Maier, 2013
    */
   template<typename CONTAINER>
@@ -1117,7 +1124,8 @@ namespace GridTools
    * face with local face index <code>2*dimension+1</code> and boundary
    * indicator @p b_id.
    *
-   * This function will collect periodic face pairs on the coarsest mesh level.
+   * This function will collect periodic face pairs on the coarsest mesh level
+   * and add them to @p matched_pairs leaving the original contents intact.
    *
    * @note This version of collect_periodic_face_pairs  will not work on
    * meshes with cells not in @ref GlossFaceOrientation
