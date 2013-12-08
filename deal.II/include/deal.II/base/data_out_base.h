@@ -3179,15 +3179,16 @@ public:
    * Read or write the data of this object for serialization
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version) {
+  void serialize(Archive &ar, const unsigned int version)
+  {
     ar &valid
-       &h5_sol_filename
-       &h5_mesh_filename
-       &entry_time
-       &num_nodes
-       &num_cells
-       &dimension
-       &attribute_dims;
+    &h5_sol_filename
+    &h5_mesh_filename
+    &entry_time
+    &num_nodes
+    &num_cells
+    &dimension
+    &attribute_dims;
   }
 
   /// Get the XDMF content associated with this entry.

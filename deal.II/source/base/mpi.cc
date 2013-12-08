@@ -190,7 +190,7 @@ namespace Utilities
       void max_reduce ( const void *in_lhs_,
                         void *inout_rhs_,
                         int *len,
-                        MPI_Datatype * )
+                        MPI_Datatype *)
       {
         const MinMaxAvg *in_lhs = static_cast<const MinMaxAvg *>(in_lhs_);
         MinMaxAvg *inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
@@ -443,7 +443,7 @@ namespace Utilities
       // when running PETSc, because we initialize MPI ourselves before calling
       // PetscInitialize
 #ifdef DEAL_II_WITH_MPI
-     int mpi_err = 0;
+      int mpi_err = 0;
 
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);

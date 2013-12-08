@@ -159,7 +159,10 @@ namespace internal
 }
 
 //forward declaration of the data type for periodic face pairs
-namespace GridTools {template <typename CellIterator> struct PeriodicFacePair;}
+namespace GridTools
+{
+  template <typename CellIterator> struct PeriodicFacePair;
+}
 
 namespace parallel
 {
@@ -679,7 +682,7 @@ namespace parallel
       register_data_attach (const std::size_t size,
                             const std_cxx1x::function<void (const cell_iterator &,
                                                             const CellStatus,
-                                                            void *)> & pack_callback);
+                                                            void *)> &pack_callback);
 
       /**
        * The given function is called for
@@ -691,7 +694,7 @@ namespace parallel
       notify_ready_to_unpack (const unsigned int offset,
                               const std_cxx1x::function<void (const cell_iterator &,
                                                               const CellStatus,
-                                                              const void *)> & unpack_callback);
+                                                              const void *)> &unpack_callback);
 
       /**
        * Returns a permutation vector for the order the coarse
@@ -723,7 +726,7 @@ namespace parallel
        */
       void
       add_periodicity
-      (const std::vector<GridTools::PeriodicFacePair<cell_iterator> >&);
+      (const std::vector<GridTools::PeriodicFacePair<cell_iterator> > &);
 
 
 
@@ -934,8 +937,8 @@ namespace parallel
        */
       void
       fill_vertices_with_ghost_neighbors
-        (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-         &vertices_with_ghost_neighbors);
+      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors);
 
       template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
     };
@@ -1040,8 +1043,8 @@ namespace parallel
        */
       void
       fill_vertices_with_ghost_neighbors
-        (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-         &vertices_with_ghost_neighbors);
+      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+       &vertices_with_ghost_neighbors);
 
     };
   }

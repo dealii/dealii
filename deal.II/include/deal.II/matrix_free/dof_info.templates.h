@@ -742,7 +742,7 @@ no_constraint:
       // locally owned plus the number of ghosts
       const unsigned int index_range = (vector_partitioner->local_range().second-
                                         vector_partitioner->local_range().first)
-                                        + vector_partitioner->ghost_indices().n_elements();
+                                       + vector_partitioner->ghost_indices().n_elements();
       for (std::size_t i=0; i<dof_indices.size(); ++i)
         AssertIndexRange (dof_indices[i], index_range);
 
@@ -1846,7 +1846,7 @@ not_connect:
           else
             {
               const unsigned int *it = begin_indices (block),
-                                 * end_cell = end_indices (block);
+                                  * end_cell = end_indices (block);
               for ( ; it != end_cell; ++it)
                 if (row_lengths[*it] > 0)
                   {
@@ -1970,7 +1970,7 @@ not_connect:
         {
           out << "Entries row " << row << ": ";
           const unsigned int *glob_indices = begin_indices(row),
-            *end_row = end_indices(row);
+                              *end_row = end_indices(row);
           unsigned int index = 0;
           const std::pair<unsigned short,unsigned short>
           *con_it = begin_indicators(row),

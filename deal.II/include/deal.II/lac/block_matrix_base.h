@@ -1083,7 +1083,7 @@ protected:
    * compiler.
    */
   template <class BlockVectorType,
-           class VectorType>
+            class VectorType>
   void vmult_block_nonblock (BlockVectorType          &dst,
                              const VectorType &src) const;
 
@@ -1106,7 +1106,7 @@ protected:
    * compiler.
    */
   template <class BlockVectorType,
-           class VectorType>
+            class VectorType>
   void vmult_nonblock_block (VectorType    &dst,
                              const BlockVectorType &src) const;
 
@@ -1174,7 +1174,7 @@ protected:
    * compiler.
    */
   template <class BlockVectorType,
-           class VectorType>
+            class VectorType>
   void Tvmult_block_nonblock (BlockVectorType  &dst,
                               const VectorType &src) const;
 
@@ -1197,7 +1197,7 @@ protected:
    * compiler.
    */
   template <class BlockVectorType,
-           class VectorType>
+            class VectorType>
   void Tvmult_nonblock_block (VectorType    &dst,
                               const BlockVectorType &src) const;
 
@@ -1301,7 +1301,7 @@ private:
      * beginning of their use, so there is no point actually copying
      * anything.
      */
-    TemporaryData & operator = (const TemporaryData &)
+    TemporaryData &operator = (const TemporaryData &)
     {
       return *this;
     }
@@ -2537,7 +2537,7 @@ vmult_block_block (BlockVectorType       &dst,
 
 template <class MatrixType>
 template <class BlockVectorType,
-         class VectorType>
+          class VectorType>
 void
 BlockMatrixBase<MatrixType>::
 vmult_nonblock_block (VectorType    &dst,
@@ -2557,7 +2557,7 @@ vmult_nonblock_block (VectorType    &dst,
 
 template <class MatrixType>
 template <class BlockVectorType,
-         class VectorType>
+          class VectorType>
 void
 BlockMatrixBase<MatrixType>::
 vmult_block_nonblock (BlockVectorType  &dst,
@@ -2638,7 +2638,7 @@ Tvmult_block_block (BlockVectorType       &dst,
 
 template <class MatrixType>
 template <class BlockVectorType,
-         class VectorType>
+          class VectorType>
 void
 BlockMatrixBase<MatrixType>::
 Tvmult_block_nonblock (BlockVectorType  &dst,
@@ -2659,7 +2659,7 @@ Tvmult_block_nonblock (BlockVectorType  &dst,
 
 template <class MatrixType>
 template <class BlockVectorType,
-         class VectorType>
+          class VectorType>
 void
 BlockMatrixBase<MatrixType>::
 Tvmult_nonblock_block (VectorType    &dst,

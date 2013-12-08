@@ -606,10 +606,10 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
 // be done for the face orientation flag in 3D.
       const Quadrature<dim> subface_quadrature
         = subface == numbers::invalid_unsigned_int
-        ?
-        QProjector<dim>::project_to_face (quad_face_support, 0)
-        :
-        QProjector<dim>::project_to_subface (quad_face_support, 0, subface);
+          ?
+          QProjector<dim>::project_to_face (quad_face_support, 0)
+          :
+          QProjector<dim>::project_to_subface (quad_face_support, 0, subface);
       for (unsigned int i=0; i<source_fe->dofs_per_face; ++i)
         {
           const Point<dim> &p = subface_quadrature.point (i);
@@ -995,35 +995,35 @@ face_to_cell_index (const unsigned int face_index,
       // face orientation, face flips, etc
       unsigned int adjusted_dof_index_on_line;
       switch (dim)
-      {
-      case 1:
-        Assert (false, ExcInternalError());
+        {
+        case 1:
+          Assert (false, ExcInternalError());
 
-      case 2:
-        // in 2d, only face_flip has a meaning. if it is set, consider
-        // dofs in reverse order
-        if (face_flip == false)
+        case 2:
+          // in 2d, only face_flip has a meaning. if it is set, consider
+          // dofs in reverse order
+          if (face_flip == false)
+            adjusted_dof_index_on_line = dof_index_on_line;
+          else
+            adjusted_dof_index_on_line = this->dofs_per_line - dof_index_on_line - 1;
+          break;
+
+        case 3:
+          // in 3d, things are difficult. someone will have to think
+          // about how this code here should look like, by drawing a bunch
+          // of pictures of how all the faces can look like with the various
+          // flips and rotations.
+          //
+          // that said, the Q2 case is easy enough to implement, as is the case
+          // where everything is in standard orientation
+          Assert ((this->dofs_per_line <= 1) ||
+                  ((face_orientation == true) &&
+                   (face_flip == false) &&
+                   (face_rotation == false)),
+                  ExcNotImplemented());
           adjusted_dof_index_on_line = dof_index_on_line;
-        else
-          adjusted_dof_index_on_line = this->dofs_per_line - dof_index_on_line - 1;
-        break;
-
-      case 3:
-        // in 3d, things are difficult. someone will have to think
-        // about how this code here should look like, by drawing a bunch
-        // of pictures of how all the faces can look like with the various
-        // flips and rotations.
-        //
-        // that said, the Q2 case is easy enough to implement, as is the case
-        // where everything is in standard orientation
-        Assert ((this->dofs_per_line <= 1) ||
-                ((face_orientation == true) &&
-                 (face_flip == false) &&
-                 (face_rotation == false)),
-                ExcNotImplemented());
-        adjusted_dof_index_on_line = dof_index_on_line;
-        break;
-      }
+          break;
+        }
 
       return (this->first_line_index
               + GeometryInfo<dim>::face_to_cell_lines(face, face_line,

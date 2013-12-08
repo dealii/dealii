@@ -514,7 +514,7 @@ SparseDirectMUMPS::~SparseDirectMUMPS ()
 template <class Matrix>
 void SparseDirectMUMPS::initialize_matrix (const Matrix &matrix)
 {
-    Assert(matrix.n() == matrix.m(), ExcMessage("Matrix needs to be square."));
+  Assert(matrix.n() == matrix.m(), ExcMessage("Matrix needs to be square."));
 
 
   // Check we haven't been here before:

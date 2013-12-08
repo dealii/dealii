@@ -982,7 +982,7 @@ next_cell:
       }
 
     AssertThrow (best_cell.first.state() == IteratorState::valid,
-            ExcPointNotFound<spacedim>(p));
+                 ExcPointNotFound<spacedim>(p));
 
     return best_cell;
   }
@@ -1105,7 +1105,7 @@ next_cell:
       }
 
     AssertThrow (best_cell.first.state() == IteratorState::valid,
-            ExcPointNotFound<spacedim>(p));
+                 ExcPointNotFound<spacedim>(p));
 
     return best_cell;
   }
@@ -1136,7 +1136,7 @@ next_cell:
     // pointer/index clashes when saving/restoring them. The following approach
     // works, but this map can get quite big. Not sure about more efficient solutions.
     std::map< std::pair<unsigned int,unsigned int>, unsigned int >
-      indexmap;
+    indexmap;
     unsigned int index = 0;
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
          cell = triangulation.begin_active();
@@ -1171,7 +1171,7 @@ next_cell:
               (cell->neighbor(f)->has_children() == false))
             {
               unsigned int other_index = indexmap.find(
-                  std::pair<unsigned int,unsigned int>(cell->neighbor(f)->level(),cell->neighbor(f)->index()))->second;
+                                           std::pair<unsigned int,unsigned int>(cell->neighbor(f)->level(),cell->neighbor(f)->index()))->second;
               cell_connectivity.add (index, other_index);
               cell_connectivity.add (other_index, index);
             }
@@ -2369,12 +2369,12 @@ next_cell:
    */
   template<typename CellIterator>
   void
-  match_periodic_face_pairs 
-    (std::set<std::pair<CellIterator, unsigned int> > &pairs1,
-     std::set<std::pair<typename identity<CellIterator>::type, unsigned int> > &pairs2,
-     const int direction,
-     std::vector<PeriodicFacePair<CellIterator> > & matched_pairs,
-     const dealii::Tensor<1,CellIterator::AccessorType::space_dimension> &offset)
+  match_periodic_face_pairs
+  (std::set<std::pair<CellIterator, unsigned int> > &pairs1,
+   std::set<std::pair<typename identity<CellIterator>::type, unsigned int> > &pairs2,
+   const int direction,
+   std::vector<PeriodicFacePair<CellIterator> > &matched_pairs,
+   const dealii::Tensor<1,CellIterator::AccessorType::space_dimension> &offset)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     Assert (0<=direction && direction<space_dim,
@@ -2388,7 +2388,7 @@ next_cell:
     // Match with a complexity of O(n^2). This could be improved...
     std::bitset<3> orientation;
     typedef typename std::set
-      <std::pair<CellIterator, unsigned int> >::const_iterator PairIterator;
+    <std::pair<CellIterator, unsigned int> >::const_iterator PairIterator;
     for (PairIterator it1 = pairs1.begin(); it1 != pairs1.end(); ++it1)
       {
         for (PairIterator it2 = pairs2.begin(); it2 != pairs2.end(); ++it2)
@@ -2406,7 +2406,7 @@ next_cell:
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
                 const PeriodicFacePair<CellIterator> matched_face
-                  = {{cell1, cell2},{face_idx1, face_idx2}, orientation};
+                = {{cell1, cell2},{face_idx1, face_idx2}, orientation};
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;
@@ -2425,12 +2425,12 @@ next_cell:
   template<typename CONTAINER>
   void
   collect_periodic_faces
-    (const CONTAINER          &container,
-     const types::boundary_id b_id1,
-     const types::boundary_id b_id2,
-     const int                direction,
-     std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > & matched_pairs,
-     const dealii::Tensor<1,CONTAINER::space_dimension> &offset)
+  (const CONTAINER          &container,
+   const types::boundary_id b_id1,
+   const types::boundary_id b_id2,
+   const int                direction,
+   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
+   const dealii::Tensor<1,CONTAINER::space_dimension> &offset)
   {
     static const int dim = CONTAINER::dimension;
     static const int space_dim = CONTAINER::space_dimension;
@@ -2450,18 +2450,18 @@ next_cell:
           {
             const typename CONTAINER::face_iterator face = cell->face(i);
             if (face->at_boundary() && face->boundary_indicator() == b_id1)
-            {
-              const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair1
-                = std::make_pair(cell, i);
-              pairs1.insert(pair1);
-            } 
+              {
+                const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair1
+                  = std::make_pair(cell, i);
+                pairs1.insert(pair1);
+              }
 
             if (face->at_boundary() && face->boundary_indicator() == b_id2)
-            {
-              const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair2
-                = std::make_pair(cell, i);
-              pairs2.insert(pair2);
-            }
+              {
+                const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair2
+                  = std::make_pair(cell, i);
+                pairs2.insert(pair2);
+              }
           }
       }
 
@@ -2477,11 +2477,11 @@ next_cell:
   template<typename CONTAINER>
   void
   collect_periodic_faces
-    (const CONTAINER          &container,
-     const types::boundary_id b_id,
-     const int                direction,
-     std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > & matched_pairs,
-     const dealii::Tensor<1,CONTAINER::space_dimension> &offset)
+  (const CONTAINER          &container,
+   const types::boundary_id b_id,
+   const int                direction,
+   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
+   const dealii::Tensor<1,CONTAINER::space_dimension> &offset)
   {
     static const int dim = CONTAINER::dimension;
     static const int space_dim = CONTAINER::space_dimension;
@@ -2499,24 +2499,24 @@ next_cell:
 
     for (typename CONTAINER::cell_iterator cell = container.begin(0);
          cell != container.end(0); ++cell)
-         {
-           const typename CONTAINER::face_iterator face_1 = cell->face(2*direction);
-           const typename CONTAINER::face_iterator face_2 = cell->face(2*direction+1);
+      {
+        const typename CONTAINER::face_iterator face_1 = cell->face(2*direction);
+        const typename CONTAINER::face_iterator face_2 = cell->face(2*direction+1);
 
-           if (face_1->at_boundary() && face_1->boundary_indicator() == b_id)
-           {
-             const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair1
-               = std::make_pair(cell, 2*direction);
-             pairs1.insert(pair1);
-           }
+        if (face_1->at_boundary() && face_1->boundary_indicator() == b_id)
+          {
+            const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair1
+              = std::make_pair(cell, 2*direction);
+            pairs1.insert(pair1);
+          }
 
-           if (face_2->at_boundary() && face_2->boundary_indicator() == b_id)
-           {
-             const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair2
-               = std::make_pair(cell, 2*direction+1);
-             pairs2.insert(pair2);
-           }
-         }
+        if (face_2->at_boundary() && face_2->boundary_indicator() == b_id)
+          {
+            const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair2
+              = std::make_pair(cell, 2*direction+1);
+            pairs2.insert(pair2);
+          }
+      }
 
     Assert (pairs1.size() == pairs2.size(),
             ExcMessage ("Unmatched faces on periodic boundaries"));
@@ -2525,21 +2525,21 @@ next_cell:
 #ifdef DEBUG
     const unsigned int size_old = matched_pairs.size();
 #endif
-    
-    // and call match_periodic_face_pairs that does the actual matching:    
+
+    // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset);
 
 #ifdef DEBUG
     //check for standard orientation
     const unsigned int size_new = matched_pairs.size();
     for (unsigned int i = size_old; i < size_new; ++i)
-    {
-      Assert(matched_pairs[i].orientation == 1,
-             ExcMessage("Found a face match with non standard orientation. "
-                        "This function is only suitable for meshes with cells "
-                        "in default orientation"));
-    }
-#endif    
+      {
+        Assert(matched_pairs[i].orientation == 1,
+               ExcMessage("Found a face match with non standard orientation. "
+                          "This function is only suitable for meshes with cells "
+                          "in default orientation"));
+      }
+#endif
   }
 
 

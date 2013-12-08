@@ -66,18 +66,17 @@ namespace internal
 namespace internal
 {
   template<int dim, int spacedim>
-  std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> & policy)
+  std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy)
   {
     std::string policy_name;
     if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dim,spacedim>*>(&policy))
-        policy_name = "Policy::Sequential<";
+      policy_name = "Policy::Sequential<";
+    else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
+      policy_name = "Policy::ParallelDistributed<";
     else
-      if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
-          policy_name = "Policy::ParallelDistributed<";
-      else
-        AssertThrow(false, ExcNotImplemented());
+      AssertThrow(false, ExcNotImplemented());
     policy_name += Utilities::int_to_string(dim)+
-            ","+Utilities::int_to_string(spacedim)+">";
+                   ","+Utilities::int_to_string(spacedim)+">";
     return policy_name;
   }
 
@@ -168,10 +167,10 @@ namespace internal
                           16*dof_handler.selected_fe->dofs_per_quad;
             break;
 
-            // the following numbers are not based on actual counting but by
-            // extrapolating the number sequences from the previous ones (for
-            // example, for dofs_per_vertex, the sequence above is 19, 21, 28,
-            // 30, 37, and is continued as follows):
+          // the following numbers are not based on actual counting but by
+          // extrapolating the number sequences from the previous ones (for
+          // example, for dofs_per_vertex, the sequence above is 19, 21, 28,
+          // 30, 37, and is continued as follows):
           case 9:
             max_couplings=39*dof_handler.selected_fe->dofs_per_vertex +
                           59*dof_handler.selected_fe->dofs_per_line +

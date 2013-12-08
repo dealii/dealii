@@ -595,7 +595,7 @@ void MatrixFree<dim,Number>::initialize_indices
         for (types::global_dof_index i=start_index; i<end_index; ++i)
           if (constraint[no]->is_constrained(i)==true)
             dof_info[no].constrained_dofs.
-              push_back(static_cast<unsigned int>(i-start_index));
+            push_back(static_cast<unsigned int>(i-start_index));
       }
     }
 

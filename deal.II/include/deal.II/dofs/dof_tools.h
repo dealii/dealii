@@ -53,7 +53,10 @@ class ConstraintMatrix;
 template <class GridClass> class InterGridMap;
 template <int dim, int spacedim> class Mapping;
 
-namespace GridTools {template <typename CellIterator> struct PeriodicFacePair;}
+namespace GridTools
+{
+  template <typename CellIterator> struct PeriodicFacePair;
+}
 
 //TODO: map_support_points_to_dofs should generate a multimap, rather than just a map, since several dofs may be located at the same support point
 
@@ -1024,8 +1027,8 @@ namespace DoFTools
   template<typename DH>
   void
   make_periodicity_constraints
-  (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> > 
-     &periodic_faces,
+  (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> >
+   &periodic_faces,
    dealii::ConstraintMatrix &constraint_matrix,
    const ComponentMask      &component_mask = ComponentMask());
 

@@ -963,8 +963,8 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 {
   switch (dim)
     {
-      // in 2d, first check whether the two end points of the line are on the
-      // axis of symmetry. if so, then return the mid point
+    // in 2d, first check whether the two end points of the line are on the
+    // axis of symmetry. if so, then return the mid point
     case 2:
     {
       if ((line->vertex(0)(0) == this->center(0))
@@ -1083,8 +1083,8 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
 {
   switch (dim)
     {
-      // in 2d, first check whether the two end points of the line are on the
-      // axis of symmetry. if so, then return the mid point
+    // in 2d, first check whether the two end points of the line are on the
+    // axis of symmetry. if so, then return the mid point
     case 2:
     {
       if ((line->vertex(0)(0) == this->center(0))

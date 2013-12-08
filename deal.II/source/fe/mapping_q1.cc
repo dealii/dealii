@@ -1705,7 +1705,7 @@ transform_real_to_unit_cell_internal
   // early out if we already have our point
   if (f.square() < 1e-24 * cell->diameter() * cell->diameter())
     return p_unit;
-  
+
   // we need to compare the position of the computed p(x) against the given
   // point 'p'. We will terminate the iteration and return 'x' if they are
   // less than eps apart. The question is how to choose eps -- or, put maybe
@@ -1749,7 +1749,7 @@ transform_real_to_unit_cell_internal
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
       std::cout << "Newton iteration " << newton_iteration << std::endl;
 #endif
-      
+
       // f'(x)
       Tensor<2,spacedim> df;
       for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
@@ -1770,7 +1770,7 @@ transform_real_to_unit_cell_internal
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
       std::cout << "   delta=" << delta  << std::endl;
 #endif
-      
+
       // do a line search
       double step_length = 1;
       do
@@ -1792,19 +1792,19 @@ transform_real_to_unit_cell_internal
           const Point<spacedim> f_trial = p_real_trial-p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-	  std::cout << "     step_length=" << step_length << std::endl
-		    << "       ||f ||   =" << f.norm() << std::endl
-		    << "       ||f*||   =" << f_trial.norm() << std::endl
-		    << "       ||f*||_A =" << (df_inverse * f_trial).norm() << std::endl;
+          std::cout << "     step_length=" << step_length << std::endl
+                    << "       ||f ||   =" << f.norm() << std::endl
+                    << "       ||f*||   =" << f_trial.norm() << std::endl
+                    << "       ||f*||_A =" << (df_inverse * f_trial).norm() << std::endl;
 #endif
-	  
+
           // see if we are making progress with the current step length
           // and if not, reduce it by a factor of two and try again
-	  //
-	  // strictly speaking, we should probably use the same norm as we use
-	  // for the outer algorithm. in practice, line search is just a
-	  // crutch to find a "reasonable" step length, and so using the l2
-	  // norm is probably just fine
+          //
+          // strictly speaking, we should probably use the same norm as we use
+          // for the outer algorithm. in practice, line search is just a
+          // crutch to find a "reasonable" step length, and so using the l2
+          // norm is probably just fine
           if (f_trial.norm() < f.norm())
             {
               p_real = p_real_trial;
@@ -1815,19 +1815,19 @@ transform_real_to_unit_cell_internal
           else if (step_length > 0.05)
             step_length /= 2;
           else
-	    AssertThrow (false,
-			 (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+            AssertThrow (false,
+                         (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
         }
       while (true);
 
       ++newton_iteration;
       if (newton_iteration > newton_iteration_limit)
-	AssertThrow (false,
-		     (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+        AssertThrow (false,
+                     (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
       last_f_weighted_norm = (df_inverse * f).norm();
     }
   while (last_f_weighted_norm > eps);
-    
+
   return p_unit;
 }
 

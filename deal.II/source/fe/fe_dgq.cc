@@ -312,8 +312,8 @@ FE_DGQ<dim, spacedim>::rotate_indices (std::vector<unsigned int> &numbers,
     {
       switch (direction)
         {
-          // Rotate xy-plane
-          // counter-clockwise
+        // Rotate xy-plane
+        // counter-clockwise
         case 'z':
           for (unsigned int iz=0; iz<((dim>2) ? n:1); ++iz)
             for (unsigned int j=0; j<n; ++j)
@@ -323,8 +323,8 @@ FE_DGQ<dim, spacedim>::rotate_indices (std::vector<unsigned int> &numbers,
                   numbers[l++] = k;
                 }
           break;
-          // Rotate xy-plane
-          // clockwise
+        // Rotate xy-plane
+        // clockwise
         case 'Z':
           for (unsigned int iz=0; iz<((dim>2) ? n:1); ++iz)
             for (unsigned int iy=0; iy<n; ++iy)
@@ -334,8 +334,8 @@ FE_DGQ<dim, spacedim>::rotate_indices (std::vector<unsigned int> &numbers,
                   numbers[k] = l++;
                 }
           break;
-          // Rotate yz-plane
-          // counter-clockwise
+        // Rotate yz-plane
+        // counter-clockwise
         case 'x':
           Assert (dim>2, ExcDimensionMismatch (dim,3));
           for (unsigned int iz=0; iz<n; ++iz)
@@ -346,8 +346,8 @@ FE_DGQ<dim, spacedim>::rotate_indices (std::vector<unsigned int> &numbers,
                   numbers[l++] = k;
                 }
           break;
-          // Rotate yz-plane
-          // clockwise
+        // Rotate yz-plane
+        // clockwise
         case 'X':
           Assert (dim>2, ExcDimensionMismatch (dim,3));
           for (unsigned int iz=0; iz<n; ++iz)

@@ -94,7 +94,7 @@ template <class number> class SparseMatrix;
  * @author Ralf Hartmann, 1999
  */
 template <class MATRIX = SparseMatrix<double>,
-         class VECTOR = dealii::Vector<double> >
+          class VECTOR = dealii::Vector<double> >
 class PreconditionSelector : public Subscriptor
 {
 public:

@@ -187,7 +187,7 @@ build_one_patch (const cell_iterator *cell,
           // first fill dof_data
           for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
             {
-              const FEValuesBase<DH::dimension> & fe_patch_values
+              const FEValuesBase<DH::dimension> &fe_patch_values
                 = data.get_present_fe_values(dataset);
               const unsigned int n_components
                 = fe_patch_values.get_fe().n_components();

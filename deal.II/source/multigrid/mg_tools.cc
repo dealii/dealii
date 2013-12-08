@@ -1336,17 +1336,17 @@ namespace MGTools
                                      :
                                      (dim == 2 ?
                                       (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                                      :
+                                      (dim == 3 ?
+                                       (i<4*fe.dofs_per_vertex ?
+                                        i
                                         :
-                                        (dim == 3 ?
-                                         (i<4*fe.dofs_per_vertex ?
-                                          i
-                                          :
-                                          (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                           i+4*fe.dofs_per_vertex
-                                           :
-                                           i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                                        (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                                         i+4*fe.dofs_per_vertex
                                          :
-                                         numbers::invalid_unsigned_int)));
+                                         i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                                       :
+                                       numbers::invalid_unsigned_int)));
                                 Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
 
                                 // make sure
@@ -1394,7 +1394,7 @@ namespace MGTools
                      const typename FunctionMap<dim>::type &function_map,
                      std::vector<IndexSet> &boundary_indices,
                      const ComponentMask &component_mask)
-{
+  {
     Assert (boundary_indices.size() == dof.get_tria().n_global_levels(),
             ExcDimensionMismatch (boundary_indices.size(),
                                   dof.get_tria().n_global_levels()));

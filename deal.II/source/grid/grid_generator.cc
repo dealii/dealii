@@ -731,12 +731,12 @@ namespace GridGenerator
 
     switch (dim)
       {
-        // A line (1d parallelepiped)
+      // A line (1d parallelepiped)
       case 1:
         vertices[1] = corners[0];
         break;
 
-        // A parallelogram (2d parallelepiped)
+      // A parallelogram (2d parallelepiped)
       case 2:
         // assign corners to vertices:
         vertices[1] = corners[0];
@@ -746,7 +746,7 @@ namespace GridGenerator
         vertices[3] = vertices[1] + vertices[2];
         break;
 
-        // A parallelepiped (3d parallelepiped)
+      // A parallelepiped (3d parallelepiped)
       case 3:
         // assign corners to vertices:
         vertices[1] = corners[0];
@@ -2500,8 +2500,8 @@ namespace GridGenerator
     // Determine number of cells and vertices
     const unsigned int
     n_cells = static_cast<unsigned int>(std::ceil (half_length /
-                                                    std::max (radius_0,
-                                                              radius_1)));
+                                                   std::max (radius_0,
+                                                             radius_1)));
     const unsigned int n_vertices = 4 * (n_cells + 1);
     std::vector<Point<3> > vertices_tmp(n_vertices);
 

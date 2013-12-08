@@ -300,7 +300,7 @@ namespace SLEPcWrappers
      */
     void
     solve (const unsigned int n_eigenpairs,
-	   unsigned int *n_converged);
+           unsigned int *n_converged);
 
     /**
      * Access the real parts of solutions for a solved eigenvector

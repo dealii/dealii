@@ -312,7 +312,7 @@ IterationNumberControl::IterationNumberControl(const unsigned int n,
                                                const bool m_log_history,
                                                const bool m_log_result)
   :
-  SolverControl (n, tolerance, m_log_history, m_log_result){}
+  SolverControl (n, tolerance, m_log_history, m_log_result) {}
 
 
 IterationNumberControl::~IterationNumberControl()

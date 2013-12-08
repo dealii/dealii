@@ -1679,7 +1679,7 @@ void
 ConstraintMatrix::resolve_indices (std::vector<types::global_dof_index> &indices) const
 {
   const unsigned int indices_size = indices.size();
-  const std::vector<std::pair<types::global_dof_index,double> > * line_ptr;
+  const std::vector<std::pair<types::global_dof_index,double> > *line_ptr;
   for (unsigned int i=0; i<indices_size; ++i)
     {
       line_ptr = get_constraint_entries(indices[i]);

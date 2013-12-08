@@ -110,7 +110,7 @@ namespace parallel
        * three elements.
        */
       template <typename I1, typename I2,
-               typename I3, typename I4>
+                typename I3, typename I4>
       static
       void
       apply (const F &f,
@@ -173,8 +173,8 @@ namespace parallel
    * module.
    */
   template <typename InputIterator,
-           typename OutputIterator,
-           typename Predicate>
+            typename OutputIterator,
+            typename Predicate>
   void transform (const InputIterator &begin_in,
                   const InputIterator &end_in,
                   OutputIterator       out,
@@ -239,9 +239,9 @@ namespace parallel
    * module.
    */
   template <typename InputIterator1,
-           typename InputIterator2,
-           typename OutputIterator,
-           typename Predicate>
+            typename InputIterator2,
+            typename OutputIterator,
+            typename Predicate>
   void transform (const InputIterator1 &begin_in1,
                   const InputIterator1 &end_in1,
                   InputIterator2        in2,
@@ -307,10 +307,10 @@ namespace parallel
    * module.
    */
   template <typename InputIterator1,
-           typename InputIterator2,
-           typename InputIterator3,
-           typename OutputIterator,
-           typename Predicate>
+            typename InputIterator2,
+            typename InputIterator3,
+            typename OutputIterator,
+            typename Predicate>
   void transform (const InputIterator1 &begin_in1,
                   const InputIterator1 &end_in1,
                   InputIterator2        in2,
@@ -563,7 +563,7 @@ namespace parallel
      * for each subrange.
      */
     template <typename ResultType,
-             typename Function>
+              typename Function>
     struct ReductionOnSubranges
     {
       /**

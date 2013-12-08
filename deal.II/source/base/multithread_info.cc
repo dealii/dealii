@@ -105,7 +105,7 @@ unsigned int MultithreadInfo::get_n_cpus()
 void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 {
   Assert(n_max_threads==numbers::invalid_unsigned_int,
-      ExcMessage("Calling set_thread_limit() more than once is not supported!"));
+         ExcMessage("Calling set_thread_limit() more than once is not supported!"));
 
   unsigned int max_threads_env = numbers::invalid_unsigned_int;
   char *penv;

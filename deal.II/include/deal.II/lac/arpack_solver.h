@@ -140,7 +140,7 @@ public:
    * functions of ARPACK.
    */
   template <typename VECTOR, typename MATRIX1,
-           typename MATRIX2, typename INVERSE>
+            typename MATRIX2, typename INVERSE>
   void solve(
     const MATRIX1 &A,
     const MATRIX2 &B,
@@ -228,7 +228,7 @@ ArpackSolver::ArpackSolver (SolverControl &control,
 
 
 template <typename VECTOR, typename MATRIX1,
-         typename MATRIX2, typename INVERSE>
+          typename MATRIX2, typename INVERSE>
 inline
 void ArpackSolver::solve (
   const MATRIX1 &system_matrix,

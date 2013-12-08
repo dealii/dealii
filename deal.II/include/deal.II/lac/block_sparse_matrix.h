@@ -278,7 +278,7 @@ public:
    * only one block column.
    */
   template <typename block_number,
-           typename nonblock_number>
+            typename nonblock_number>
   void vmult (BlockVector<block_number>          &dst,
               const Vector<nonblock_number> &src) const;
 
@@ -290,7 +290,7 @@ public:
    * only one block row.
    */
   template <typename block_number,
-           typename nonblock_number>
+            typename nonblock_number>
   void vmult (Vector<nonblock_number>    &dst,
               const BlockVector<block_number> &src) const;
 
@@ -325,7 +325,7 @@ public:
    * only one block row.
    */
   template <typename block_number,
-           typename nonblock_number>
+            typename nonblock_number>
   void Tvmult (BlockVector<block_number>  &dst,
                const Vector<nonblock_number> &src) const;
 
@@ -337,7 +337,7 @@ public:
    * only one block column.
    */
   template <typename block_number,
-           typename nonblock_number>
+            typename nonblock_number>
   void Tvmult (Vector<nonblock_number>    &dst,
                const BlockVector<block_number> &src) const;
 
@@ -501,7 +501,7 @@ BlockSparseMatrix<number>::vmult (BlockVector<block_number>       &dst,
 
 template <typename number>
 template <typename block_number,
-         typename nonblock_number>
+          typename nonblock_number>
 inline
 void
 BlockSparseMatrix<number>::vmult (BlockVector<block_number>     &dst,
@@ -514,7 +514,7 @@ BlockSparseMatrix<number>::vmult (BlockVector<block_number>     &dst,
 
 template <typename number>
 template <typename block_number,
-         typename nonblock_number>
+          typename nonblock_number>
 inline
 void
 BlockSparseMatrix<number>::vmult (Vector<nonblock_number>         &dst,
@@ -551,7 +551,7 @@ BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>       &dst,
 
 template <typename number>
 template <typename block_number,
-         typename nonblock_number>
+          typename nonblock_number>
 inline
 void
 BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>     &dst,
@@ -564,7 +564,7 @@ BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>     &dst,
 
 template <typename number>
 template <typename block_number,
-         typename nonblock_number>
+          typename nonblock_number>
 inline
 void
 BlockSparseMatrix<number>::Tvmult (Vector<nonblock_number>         &dst,

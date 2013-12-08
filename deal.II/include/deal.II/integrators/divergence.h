@@ -187,18 +187,18 @@ namespace LocalIntegrators
     }
 
 
-/**
- * Cell matrix for gradient. The derivative is on the trial function.
- * \f[
- * \int_Z \nabla u \cdot \mathbf v\,dx
- * \f]
- *
- * This is the strong gradient and the trial space should be at least
- * in <i>H</i><sup>1</sup>. The test functions can be discontinuous.
- *
- * @author Guido Kanschat
- * @date 2011
- */
+    /**
+     * Cell matrix for gradient. The derivative is on the trial function.
+     * \f[
+     * \int_Z \nabla u \cdot \mathbf v\,dx
+     * \f]
+     *
+     * This is the strong gradient and the trial space should be at least
+     * in <i>H</i><sup>1</sup>. The test functions can be discontinuous.
+     *
+     * @author Guido Kanschat
+     * @date 2011
+     */
     template <int dim>
     void gradient_matrix(
       FullMatrix<double> &M,

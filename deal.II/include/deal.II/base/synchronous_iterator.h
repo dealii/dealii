@@ -166,7 +166,7 @@ void advance (std_cxx1x::tuple<I1,I2,I3> &t,
  * Advance a tuple of iterators by $n$.
  */
 template <typename I1, typename I2,
-         typename I3, typename I4>
+          typename I3, typename I4>
 inline
 void advance (std_cxx1x::tuple<I1,I2,I3, I4> &t,
               const unsigned int              n)
@@ -206,7 +206,7 @@ void advance_by_one (std_cxx1x::tuple<I1,I2,I3> &t)
  * Advance a tuple of iterators by 1.
  */
 template <typename I1, typename I2,
-         typename I3, typename I4>
+          typename I3, typename I4>
 inline
 void advance_by_one (std_cxx1x::tuple<I1,I2,I3,I4> &t)
 {

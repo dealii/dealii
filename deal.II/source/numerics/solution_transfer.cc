@@ -563,41 +563,41 @@ interpolate (const std::vector<VECTOR> &all_in,
                           local_values.reinit (cell->has_children() ?
                                                cell->child(0)->get_fe().dofs_per_cell
                                                : cell->get_fe().dofs_per_cell, true);
-			  // do the interpolation. we get into trouble if the
-			  // interpolation_hp(new,old) matrix hasn't been computed.
-			  // this can happen if the respective elements don't support
-			  // the corresponding interpolation; if that's the case, then
-			  // the computation of the matrix simply sets the matrix
-			  // back to size zero. so if we get here and that is
-			  // the wrong size, then this may be because the elements
-			  // haven't implemented the correct function yet
-			  //
-			  // there is one wrinkle. we would like to only error out if
-			  // the size of the matrix is 0 times 0 but at least one
-			  // of the elements has more than one dof per cell. the
-			  // problem is that if you reinit a matrix to 4x0, it automatically
-			  // sets its size to 0x0. so we can only execute the following
-			  // test if *both* elements have dofs_per_cell>0, not if *at
-			  // least one* have.
-			  Assert (! ((interpolation_hp(new_fe_index,old_index).m() == 0)
-				     &&
-				     (interpolation_hp(new_fe_index,old_index).n() == 0)
-				     &&
-				     ((dof_handler->get_fe()[new_fe_index].dofs_per_cell > 0)
-				      &&
-				      (dof_handler->get_fe()[old_index].dofs_per_cell > 0))),
-				  ExcMessage ("The interpolation between two different "
-					      "elements you are trying to use here has "
-					      "not been implemented for this pair of "
-					      "elements!"));
+                          // do the interpolation. we get into trouble if the
+                          // interpolation_hp(new,old) matrix hasn't been computed.
+                          // this can happen if the respective elements don't support
+                          // the corresponding interpolation; if that's the case, then
+                          // the computation of the matrix simply sets the matrix
+                          // back to size zero. so if we get here and that is
+                          // the wrong size, then this may be because the elements
+                          // haven't implemented the correct function yet
+                          //
+                          // there is one wrinkle. we would like to only error out if
+                          // the size of the matrix is 0 times 0 but at least one
+                          // of the elements has more than one dof per cell. the
+                          // problem is that if you reinit a matrix to 4x0, it automatically
+                          // sets its size to 0x0. so we can only execute the following
+                          // test if *both* elements have dofs_per_cell>0, not if *at
+                          // least one* have.
+                          Assert (! ((interpolation_hp(new_fe_index,old_index).m() == 0)
+                                     &&
+                                     (interpolation_hp(new_fe_index,old_index).n() == 0)
+                                     &&
+                                     ((dof_handler->get_fe()[new_fe_index].dofs_per_cell > 0)
+                                      &&
+                                      (dof_handler->get_fe()[old_index].dofs_per_cell > 0))),
+                                  ExcMessage ("The interpolation between two different "
+                                              "elements you are trying to use here has "
+                                              "not been implemented for this pair of "
+                                              "elements!"));
 
                           // simple case where all children have the
                           // same FE index: just interpolate to their FE
                           // first and then use the standard routines
-			  if (tmp.size() > 0)
-			    interpolation_hp(new_fe_index,old_index).vmult (local_values, tmp);
-			  else
-			    local_values = 0;
+                          if (tmp.size() > 0)
+                            interpolation_hp(new_fe_index,old_index).vmult (local_values, tmp);
+                          else
+                            local_values = 0;
                         }
 
                       if (cell->has_children() == false)
@@ -615,21 +615,21 @@ interpolate (const std::vector<VECTOR> &all_in,
                                                      interpolation_hp(c_index,old_index).n());
                                     local_values.reinit(cell->child(child)->get_fe().dofs_per_cell, true);
 
-				    // do the interpolation. same problem as above
-				    Assert (! ((interpolation_hp(c_index,old_index).m() == 0)
-					       &&
-					       (interpolation_hp(c_index,old_index).n() == 0)
-					       &&
-					       ((dof_handler->get_fe()[c_index].dofs_per_cell > 0)
-						&&
-						(dof_handler->get_fe()[old_index].dofs_per_cell > 0))),
-					    ExcMessage ("The interpolation between two different "
-							"elements you are trying to use here has "
-							"not been implemented for this pair of "
-							"elements!"));
+                                    // do the interpolation. same problem as above
+                                    Assert (! ((interpolation_hp(c_index,old_index).m() == 0)
+                                               &&
+                                               (interpolation_hp(c_index,old_index).n() == 0)
+                                               &&
+                                               ((dof_handler->get_fe()[c_index].dofs_per_cell > 0)
+                                                &&
+                                                (dof_handler->get_fe()[old_index].dofs_per_cell > 0))),
+                                            ExcMessage ("The interpolation between two different "
+                                                        "elements you are trying to use here has "
+                                                        "not been implemented for this pair of "
+                                                        "elements!"));
 
-				    if (tmp.size() > 0)
-				      interpolation_hp(c_index,old_index).vmult (local_values, tmp);
+                                    if (tmp.size() > 0)
+                                      interpolation_hp(c_index,old_index).vmult (local_values, tmp);
                                     else
                                       local_values = 0;
                                   }

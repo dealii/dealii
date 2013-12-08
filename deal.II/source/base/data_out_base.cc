@@ -5631,10 +5631,10 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
 
 template <>
 void DataOutBase::write_svg<1,1> (const std::vector<Patch<1,1> > &patches,
-                             const std::vector<std::string> &data_names,
-                             const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-                             const SvgFlags &flags,
-                             std::ostream &out)
+                                  const std::vector<std::string> &data_names,
+                                  const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                                  const SvgFlags &flags,
+                                  std::ostream &out)
 {
   AssertThrow (false, ExcNotImplemented());
 }
@@ -6533,7 +6533,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
   MPI_Info_create(&info);
   MPI_File fh;
   err = MPI_File_open(comm, const_cast<char *>(filename),
-                MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
+                      MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
   AssertThrow(err==0, ExcMessage("Unable to open file with MPI_File_open!"));
 
 

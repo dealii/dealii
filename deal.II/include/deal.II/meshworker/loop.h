@@ -114,7 +114,7 @@ namespace MeshWorker
     const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
     const std_cxx1x::function<void (DOFINFO &, DOFINFO &,
                                     typename INFOBOX::CellInfo &,
-                                    typename INFOBOX::CellInfo &)>& face_worker,
+                                    typename INFOBOX::CellInfo &)> &face_worker,
     const bool cells_first,
     const bool unique_faces_only)
   {
@@ -260,7 +260,7 @@ namespace MeshWorker
             const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
             const std_cxx1x::function<void (DOFINFO &, DOFINFO &,
                                             typename INFOBOX::CellInfo &,
-                                            typename INFOBOX::CellInfo &)>& face_worker,
+                                            typename INFOBOX::CellInfo &)> &face_worker,
             ASSEMBLER &assembler,
             bool cells_first = true,
             bool unique_faces_only = true)

@@ -190,16 +190,16 @@ FiniteElement<dim,spacedim>::FiniteElement (
       system_to_component_table.resize(this->dofs_per_cell);
       face_system_to_component_table.resize(this->dofs_per_face);
       for (unsigned int j=0 ; j<this->dofs_per_cell ; ++j)
-	system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
+        system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
       for (unsigned int j=0 ; j<this->dofs_per_face ; ++j)
-	face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
+        face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
     }
-  
+
   for (unsigned int j=0 ; j<this->dofs_per_cell ; ++j)
     system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);
   for (unsigned int j=0 ; j<this->dofs_per_face ; ++j)
     face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);
-  
+
   // Fill with default value; may be changed by constructor of derived class.
   base_to_block_indices.reinit(1,1);
 

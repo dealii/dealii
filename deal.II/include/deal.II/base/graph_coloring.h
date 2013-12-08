@@ -236,15 +236,15 @@ namespace GraphColoring
       // intersection of the conflict indices.
       for (unsigned int i=0; i<partition_size; ++i)
         for (unsigned int j=i+1; j<partition_size; ++j)
-            // If the two iterators share indices then we increase the degree of the
-            // vertices and create an ''edge'' in the graph.
-            if (have_nonempty_intersection (conflict_indices[i], conflict_indices[j]))
-              {
-                ++degrees[i];
-                ++degrees[j];
-                graph[i].push_back(j);
-                graph[j].push_back(i);
-              }
+          // If the two iterators share indices then we increase the degree of the
+          // vertices and create an ''edge'' in the graph.
+          if (have_nonempty_intersection (conflict_indices[i], conflict_indices[j]))
+            {
+              ++degrees[i];
+              ++degrees[j];
+              graph[i].push_back(j);
+              graph[j].push_back(i);
+            }
 
       // Sort the vertices by decreasing degree.
       std::vector<int>::iterator degrees_it;

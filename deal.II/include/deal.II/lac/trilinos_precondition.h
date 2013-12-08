@@ -128,7 +128,7 @@ namespace TrilinosWrappers
      * Apply the transpose preconditioner.
      */
     virtual void Tvmult (VectorBase       &dst,
-                 const VectorBase &src) const;
+                         const VectorBase &src) const;
 
     /**
      * Apply the preconditioner on
@@ -1532,15 +1532,15 @@ namespace TrilinosWrappers
                  const VectorBase &src) const;
 
     /**
-     * Apply the preconditioner on deal.II data structures 
-     * instead of the ones provided in the Trilinos wrapper class, 
+     * Apply the preconditioner on deal.II data structures
+     * instead of the ones provided in the Trilinos wrapper class,
      * i.e., dst = src.
      */
     void vmult (dealii::Vector<double>       &dst,
                 const dealii::Vector<double> &src) const;
 
     /**
-     * Apply the transpose preconditioner on deal.II data structures 
+     * Apply the transpose preconditioner on deal.II data structures
      * instead of the ones provided in the Trilinos wrapper class,
      * i.e. dst = src.
      */
@@ -1548,7 +1548,7 @@ namespace TrilinosWrappers
                  const dealii::Vector<double> &src) const;
 
     /**
-     * Apply the preconditioner on deal.II parallel data structures 
+     * Apply the preconditioner on deal.II parallel data structures
      * instead of the ones provided in the Trilinos wrapper class,
      * i.e., dst = src.
      */
@@ -1556,7 +1556,7 @@ namespace TrilinosWrappers
                 const dealii::parallel::distributed::Vector<double> &src) const;
 
     /**
-     * Apply the transpose preconditioner on deal.II parallel data structures 
+     * Apply the transpose preconditioner on deal.II parallel data structures
      * instead of the ones provided in the Trilinos wrapper class,
      * i.e., dst = src.
      */

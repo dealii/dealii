@@ -2172,11 +2172,11 @@ struct GeometryInfo
   static void
   alternating_form_at_vertices
 #ifndef DEAL_II_CONSTEXPR_BUG
-    (const Point<spacedim> (&vertices)[vertices_per_cell],
-     Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell]);
+  (const Point<spacedim> (&vertices)[vertices_per_cell],
+   Tensor<spacedim-dim,spacedim> (&forms)[vertices_per_cell]);
 #else
-    (const Point<spacedim> *vertices,
-     Tensor<spacedim-dim,spacedim> *forms);
+  (const Point<spacedim> *vertices,
+   Tensor<spacedim-dim,spacedim> *forms);
 #endif
 
   /**
@@ -2372,7 +2372,8 @@ RefinementCase<2>::cut_axis (const unsigned int i)
   Assert (i < dim, ExcIndexRange(i, 0, dim));
 
   static const RefinementCase options[dim] = { RefinementPossibilities<2>::cut_x,
-					       RefinementPossibilities<2>::cut_y };
+                                               RefinementPossibilities<2>::cut_y
+                                             };
   return options[i];
 }
 
@@ -2387,8 +2388,9 @@ RefinementCase<3>::cut_axis (const unsigned int i)
   Assert (i < dim, ExcIndexRange(i, 0, dim));
 
   static const RefinementCase options[dim] = { RefinementPossibilities<3>::cut_x,
-					       RefinementPossibilities<3>::cut_y,
-					       RefinementPossibilities<3>::cut_z };
+                                               RefinementPossibilities<3>::cut_y,
+                                               RefinementPossibilities<3>::cut_z
+                                             };
   return options[i];
 }
 
@@ -2577,7 +2579,7 @@ GeometryInfo<2>::child_cell_from_point (const Point<2> &p)
 
   return (p[0] <= 0.5 ?
           (p[1] <= 0.5 ? 0 : 2) :
-            (p[1] <= 0.5 ? 1 : 3));
+          (p[1] <= 0.5 ? 1 : 3));
 }
 
 
@@ -2594,10 +2596,10 @@ GeometryInfo<3>::child_cell_from_point (const Point<3> &p)
   return (p[0] <= 0.5 ?
           (p[1] <= 0.5 ?
            (p[2] <= 0.5 ? 0 : 4) :
-             (p[2] <= 0.5 ? 2 : 6)) :
-            (p[1] <= 0.5 ?
-             (p[2] <= 0.5 ? 1 : 5) :
-             (p[2] <= 0.5 ? 3 : 7)));
+           (p[2] <= 0.5 ? 2 : 6)) :
+          (p[1] <= 0.5 ?
+           (p[2] <= 0.5 ? 1 : 5) :
+           (p[2] <= 0.5 ? 3 : 7)));
 }
 
 

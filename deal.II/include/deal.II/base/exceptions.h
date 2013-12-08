@@ -76,7 +76,7 @@ public:
   /**
    * Override the standard function that returns the description of the error.
    */
-  virtual const char* what() const throw();
+  virtual const char *what() const throw();
 
   /**
    * Get exception name.
@@ -266,7 +266,7 @@ namespace deal_II_exceptions
       // Fill the fields of the exception object
       e.set_fields (file, line, function, cond, exc_name);
 
-      switch(handling)
+      switch (handling)
         {
         case abort_on_exception:
           dealii::deal_II_exceptions::internals::abort(e);
@@ -297,15 +297,15 @@ namespace deal_II_exceptions
  */
 #ifdef DEBUG
 #define Assert(cond, exc)                                                   \
-{                                                                           \
-  if (!(cond))                                                              \
-    ::dealii::deal_II_exceptions::internals::                               \
-    issue_error(::dealii::deal_II_exceptions::internals::abort_on_exception,\
-                __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-}
+  {                                                                           \
+    if (!(cond))                                                              \
+      ::dealii::deal_II_exceptions::internals::                               \
+      issue_error(::dealii::deal_II_exceptions::internals::abort_on_exception,\
+                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+  }
 #else
 #define Assert(cond, exc)                                                   \
-{}
+  {}
 #endif
 
 
@@ -325,16 +325,16 @@ namespace deal_II_exceptions
  */
 #ifdef DEBUG
 #define AssertNothrow(cond, exc)                                            \
-{                                                                           \
-  if (!(cond))                                                              \
-    ::dealii::deal_II_exceptions::internals::                               \
-    issue_error(                                                            \
-      ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,  \
-      __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);           \
-}
+  {                                                                           \
+    if (!(cond))                                                              \
+      ::dealii::deal_II_exceptions::internals::                               \
+      issue_error(                                                            \
+          ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,  \
+          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);           \
+  }
 #else
 #define AssertNothrow(cond, exc)                                            \
-{}
+  {}
 #endif
 
 
@@ -352,20 +352,20 @@ namespace deal_II_exceptions
  */
 #ifdef HAVE_BUILTIN_EXPECT
 #define AssertThrow(cond, exc)                                              \
-{                                                                           \
-  if (__builtin_expect(!(cond), false))                                     \
-    ::dealii::deal_II_exceptions::internals::                               \
-    issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
-                __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-}
+  {                                                                           \
+    if (__builtin_expect(!(cond), false))                                     \
+      ::dealii::deal_II_exceptions::internals::                               \
+      issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
+                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+  }
 #else /*ifdef HAVE_BUILTIN_EXPECT*/
 #define AssertThrow(cond, exc)                                              \
-{                                                                           \
-  if (!(cond))                                                              \
-    ::dealii::deal_II_exceptions::internals::                               \
-    issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
-                __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-}
+  {                                                                           \
+    if (!(cond))                                                              \
+      ::dealii::deal_II_exceptions::internals::                               \
+      issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
+                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+  }
 #endif /*ifdef HAVE_BUILTIN_EXPECT*/
 
 

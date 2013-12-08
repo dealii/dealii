@@ -159,12 +159,12 @@ namespace SLEPcWrappers
     // transformation and target the wanted eigenvalues
     if (transformation)
       {
-	// set transformation type if any
-	transformation->set_context (solver_data->eps);
-	
-	// set target eigenvalues to solve for
-	ierr = EPSSetTarget (solver_data->eps, target_eigenvalue);
-	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+        // set transformation type if any
+        transformation->set_context (solver_data->eps);
+
+        // set target eigenvalues to solve for
+        ierr = EPSSetTarget (solver_data->eps, target_eigenvalue);
+        AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
 
     // set which portion of the eigenspectrum to solve for
@@ -195,7 +195,7 @@ namespace SLEPcWrappers
 
     // get number of converged eigenstates
     ierr = EPSGetConverged (solver_data->eps,
-                            reinterpret_cast<PetscInt*>(n_converged));
+                            reinterpret_cast<PetscInt *>(n_converged));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     PetscInt n_iterations   = 0;
@@ -211,10 +211,10 @@ namespace SLEPcWrappers
       // get the residual norm of the most extreme eigenvalue if and
       // only if at least one eigenvector has converged.
       if ((*n_converged)>0)
-	{
-	  ierr = EPSComputeResidualNorm (solver_data->eps, 0, &residual_norm);
-	  AssertThrow (ierr == 0, ExcSLEPcError(ierr));
-	}
+        {
+          ierr = EPSComputeResidualNorm (solver_data->eps, 0, &residual_norm);
+          AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+        }
 
       // check the solver state
       const SolverControl::State state

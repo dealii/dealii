@@ -437,8 +437,8 @@ namespace internal
      * task scheduler.
      */
     template <typename number,
-             typename InVector,
-             typename OutVector>
+              typename InVector,
+              typename OutVector>
     void vmult_on_subrange (const size_type    begin_row,
                             const size_type    end_row,
                             const number      *values,
@@ -823,7 +823,7 @@ namespace internal
      * scheduler.
      */
     template <typename number,
-             typename InVector>
+              typename InVector>
     number matrix_norm_sqr_on_subrange (const size_type    begin_row,
                                         const size_type    end_row,
                                         const number      *values,
@@ -886,7 +886,7 @@ namespace internal
      * scheduler.
      */
     template <typename number,
-             typename InVector>
+              typename InVector>
     number matrix_scalar_product_on_subrange (const size_type    begin_row,
                                               const size_type    end_row,
                                               const number      *values,
@@ -1269,8 +1269,8 @@ namespace internal
      * scheduler.
      */
     template <typename number,
-             typename InVector,
-             typename OutVector>
+              typename InVector,
+              typename OutVector>
     number residual_sqr_on_subrange (const size_type    begin_row,
                                      const size_type    end_row,
                                      const number      *values,

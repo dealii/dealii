@@ -52,9 +52,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace FETools
 {
   template <int dim, int spacedim,
-           template <int, int> class DH1,
-           template <int, int> class DH2,
-           class InVector, class OutVector>
+            template <int, int> class DH1,
+            template <int, int> class DH2,
+            class InVector, class OutVector>
   void
   interpolate(const DH1<dim, spacedim> &dof1,
               const InVector           &u1,
@@ -69,9 +69,9 @@ namespace FETools
 
 
   template <int dim, int spacedim,
-           template <int, int> class DH1,
-           template <int, int> class DH2,
-           class InVector, class OutVector>
+            template <int, int> class DH1,
+            template <int, int> class DH2,
+            class InVector, class OutVector>
   void
   interpolate (const DH1<dim, spacedim> &dof1,
                const InVector           &u1,
@@ -314,8 +314,8 @@ namespace FETools
 
 
   template <int dim,
-           template <int> class DH,
-           class InVector, class OutVector, int spacedim>
+            template <int> class DH,
+            class InVector, class OutVector, int spacedim>
   void
   back_interpolate(const DH<dim>            &dof1,
                    const InVector           &u1,

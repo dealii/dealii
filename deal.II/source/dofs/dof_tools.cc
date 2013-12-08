@@ -615,19 +615,19 @@ namespace DoFTools
                            :
                            (dim == 2 ?
                             (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                            :
+                            (dim == 3 ?
+                             (i<4*fe.dofs_per_vertex ?
+                              i
                               :
-                              (dim == 3 ?
-                               (i<4*fe.dofs_per_vertex ?
-                                i
-                                :
-                                (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                 i+4*fe.dofs_per_vertex
-                                 :
-                                 i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                              (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                               i+4*fe.dofs_per_vertex
                                :
-                               numbers::invalid_unsigned_int)));
+                               i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                             :
+                             numbers::invalid_unsigned_int)));
                       if (fe.is_primitive (cell_index))
-                      {
+                        {
                           if (component_mask[fe.face_system_to_component_index(i).first]
                               == true)
                             selected_dofs.add_index (face_dof_indices[i]);

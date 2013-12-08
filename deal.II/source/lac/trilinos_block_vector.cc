@@ -62,7 +62,7 @@ namespace TrilinosWrappers
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
       Assert (n_blocks() == 0 || n_blocks() == v.n_blocks(),
-                    ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+              ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
         reinit(v.n_blocks());

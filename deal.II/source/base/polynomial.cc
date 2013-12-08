@@ -149,9 +149,9 @@ namespace Polynomials
             }
             break;
 
-            // manually implement size 1 (values only), size 2 (value + first
-            // derivative), and size 3 (up to second derivative) since they
-            // might be called often. then, we can unroll the loop.
+          // manually implement size 1 (values only), size 2 (value + first
+          // derivative), and size 3 (up to second derivative) since they
+          // might be called often. then, we can unroll the loop.
           case 1:
             values[0] = 1;
             for (unsigned int i=0; i<n_supp; ++i)

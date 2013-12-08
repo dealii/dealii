@@ -750,7 +750,7 @@ namespace TrilinosWrappers
 
   /* -------------------------- PreconditionAMG -------------------------- */
 
-  void 
+  void
   PreconditionIdentity::vmult(VectorBase       &dst,
                               const VectorBase &src) const
   {
@@ -764,7 +764,7 @@ namespace TrilinosWrappers
     dst = src;
   }
 
-  void 
+  void
   PreconditionIdentity::vmult(dealii::Vector<double>       &dst,
                               const dealii::Vector<double> &src) const
   {

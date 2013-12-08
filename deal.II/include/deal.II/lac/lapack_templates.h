@@ -720,7 +720,7 @@ syev (const char *, const char *, const int *, number1 *, const int *, number2 *
 inline void
 syev (const char *jobz, const char *uplo, const int *n, double *A, const int *lda, double *w, double *work, const int *lwork, int *info)
 {
-  dsyev_ (char*jobz,char*uplo,int*n,double*A,int*lda,double*w,double*work,int*lwork,int*info);
+  dsyev_ (char *jobz,char *uplo,int *n,double*A,int *lda,double*w,double*work,int *lwork,int *info);
 }
 #else
 inline void
@@ -735,7 +735,7 @@ syev (const char *, const char *, const int *, double *, const int *, double *, 
 inline void
 syev (const char *jobz, const char *uplo, const int *n, float *A, const int *lda, float *w, float *work, const int *lwork, int *info)
 {
-  ssyev_ (char*jobz,char*uplo,int*n,double*A,int*lda,double*w,double*work,int*lwork,int*info);
+  ssyev_ (char *jobz,char *uplo,int *n,double*A,int *lda,double*w,double*work,int *lwork,int *info);
 }
 #else
 inline void

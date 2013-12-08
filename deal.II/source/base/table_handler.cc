@@ -391,7 +391,7 @@ void TableHandler::write_text(std::ostream &out,
       out << std::flush;
       return;
     }
-    
+
     case simple_table_with_separate_column_description:
     {
       // write the captions
@@ -417,7 +417,7 @@ void TableHandler::write_text(std::ostream &out,
       out << std::flush;
       return;
     }
-    
+
     case table_with_separate_column_description:
     {
       // writing the captions for table_with_separate_column_description
@@ -430,7 +430,7 @@ void TableHandler::write_text(std::ostream &out,
         }
       break;
     }
-    
+
     case table_with_headers:
     {
       // This format output supercolumn headers and aligns them centered
@@ -507,12 +507,12 @@ void TableHandler::write_text(std::ostream &out,
       out << '\n';
       break;
     }
-    
+
     default:
       Assert (false, ExcInternalError());
     }
 
-  
+
   // finally output the data itself for
   // table_with_headers or table_with_separate_column_description:
   for (unsigned int i=0; i<nrows; ++i)

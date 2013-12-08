@@ -30,32 +30,32 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace mg
 {
-/**
- * Handler and storage for all five SparseMatrix object involved in
- * using multigrid with local refinement.
- *
- * @author Baerbel Janssen, Guido Kanschat
- * @date 2013
- */
+  /**
+   * Handler and storage for all five SparseMatrix object involved in
+   * using multigrid with local refinement.
+   *
+   * @author Baerbel Janssen, Guido Kanschat
+   * @date 2013
+   */
   template <typename number>
   class SparseMatrixCollection : public Subscriptor
   {
-    public:
-      void resize(const unsigned int minlevel, const unsigned  int maxlevel);
-      
-      template <class DH>
-      void reinit(const DH& dof_handler);
+  public:
+    void resize(const unsigned int minlevel, const unsigned  int maxlevel);
 
-      void set_zero();
-      
-      MGLevelObject<SparsityPattern> sparsity;
-      MGLevelObject<SparsityPattern> sparsity_edge;
-      
-      MGLevelObject<SparseMatrix<number> > matrix;
-      MGLevelObject<SparseMatrix<number> > matrix_down;
-      MGLevelObject<SparseMatrix<number> > matrix_up;
-      MGLevelObject<SparseMatrix<number> > matrix_in;
-      MGLevelObject<SparseMatrix<number> > matrix_out;
+    template <class DH>
+    void reinit(const DH &dof_handler);
+
+    void set_zero();
+
+    MGLevelObject<SparsityPattern> sparsity;
+    MGLevelObject<SparsityPattern> sparsity_edge;
+
+    MGLevelObject<SparseMatrix<number> > matrix;
+    MGLevelObject<SparseMatrix<number> > matrix_down;
+    MGLevelObject<SparseMatrix<number> > matrix_up;
+    MGLevelObject<SparseMatrix<number> > matrix_in;
+    MGLevelObject<SparseMatrix<number> > matrix_out;
   };
 
 
@@ -81,28 +81,28 @@ namespace mg
   template <typename number>
   template <class DH>
   void
-  SparseMatrixCollection<number>::reinit(const DH& dof_handler)
+  SparseMatrixCollection<number>::reinit(const DH &dof_handler)
   {
     AssertIndexRange(sparsity.max_level(), dof_handler.get_tria().n_levels());
-    
+
     for (unsigned int level=sparsity.min_level();
-	 level<=sparsity.max_level();++level)
+         level<=sparsity.max_level(); ++level)
       {
-	CompressedSparsityPattern c_sparsity(dof_handler.n_dofs(level));      
-	MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
-	sparsity[level].copy_from(c_sparsity);
-	matrix[level].reinit(sparsity[level]);
-	matrix_in[level].reinit(sparsity[level]);
-	matrix_out[level].reinit(sparsity[level]);
-	if (level>0)
-	  {
-	    CompressedSparsityPattern ci_sparsity;
-	    ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
-	    MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
-	    sparsity_edge[level].copy_from(ci_sparsity);
-	    matrix_up[level].reinit(sparsity_edge[level]);
-	    matrix_down[level].reinit(sparsity_edge[level]);
-	  }
+        CompressedSparsityPattern c_sparsity(dof_handler.n_dofs(level));
+        MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
+        sparsity[level].copy_from(c_sparsity);
+        matrix[level].reinit(sparsity[level]);
+        matrix_in[level].reinit(sparsity[level]);
+        matrix_out[level].reinit(sparsity[level]);
+        if (level>0)
+          {
+            CompressedSparsityPattern ci_sparsity;
+            ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
+            sparsity_edge[level].copy_from(ci_sparsity);
+            matrix_up[level].reinit(sparsity_edge[level]);
+            matrix_down[level].reinit(sparsity_edge[level]);
+          }
       }
   }
 
@@ -116,7 +116,7 @@ namespace mg
     matrix_up = 0.;
     matrix_down = 0.;
   }
-  
+
 }
 
 DEAL_II_NAMESPACE_CLOSE

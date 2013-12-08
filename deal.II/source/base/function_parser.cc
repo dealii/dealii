@@ -24,14 +24,14 @@
 namespace fparser
 {
   class FunctionParser: public ::FunctionParser
-{};
+  {};
 }
 #else
 
 namespace fparser
 {
   class FunctionParser
-{};
+  {};
 }
 
 #endif

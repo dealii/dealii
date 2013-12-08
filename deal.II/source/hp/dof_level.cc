@@ -45,12 +45,12 @@ namespace internal
             // find the next cell active on this level
             unsigned int next_cell = cell+1;
             while ((next_cell<dof_offsets.size()) &&
-                    (dof_offsets[next_cell] == (offset_type)(-1)))
+                   (dof_offsets[next_cell] == (offset_type)(-1)))
               ++next_cell;
 
             const unsigned int next_offset = (next_cell < dof_offsets.size() ?
-                                                dof_offsets[next_cell] :
-                                                dof_indices.size());
+                                              dof_offsets[next_cell] :
+                                              dof_indices.size());
 
             Assert (next_offset-dof_offsets[cell] == fe_collection[active_fe_indices[cell]].template n_dofs_per_object<dim>(),
                     ExcInternalError());
@@ -88,12 +88,12 @@ namespace internal
             // find the next cell active on this level
             unsigned int next_cell = cell+1;
             while ((next_cell<dof_offsets.size()) &&
-                    (dof_offsets[next_cell] == (offset_type)(-1)))
+                   (dof_offsets[next_cell] == (offset_type)(-1)))
               ++next_cell;
 
             const unsigned int next_offset = (next_cell < dof_offsets.size() ?
-                                                dof_offsets[next_cell] :
-                                                dof_indices.size());
+                                              dof_offsets[next_cell] :
+                                              dof_indices.size());
 
             Assert (next_offset-dof_offsets[cell] == fe_collection[active_fe_indices[cell]].template n_dofs_per_object<dim>(),
                     ExcInternalError());
@@ -172,12 +172,12 @@ namespace internal
             // find the next cell active on this level
             unsigned int next_cell = cell+1;
             while ((next_cell<dof_offsets.size()) &&
-                    (dof_offsets[next_cell] == (offset_type)(-1)))
+                   (dof_offsets[next_cell] == (offset_type)(-1)))
               ++next_cell;
 
             const unsigned int next_offset = (next_cell < dof_offsets.size() ?
-                                                dof_offsets[next_cell] :
-                                                dof_indices.size());
+                                              dof_offsets[next_cell] :
+                                              dof_indices.size());
 
             // set offset for this cell
             new_dof_offsets[cell] = new_dof_indices.size();
@@ -217,7 +217,7 @@ namespace internal
     DoFLevel::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (active_fe_indices) +
-	      MemoryConsumption::memory_consumption (dof_indices) +
+              MemoryConsumption::memory_consumption (dof_indices) +
               MemoryConsumption::memory_consumption (dof_offsets) +
               MemoryConsumption::memory_consumption (cell_cache_offsets) +
               MemoryConsumption::memory_consumption(cell_dof_indices_cache));

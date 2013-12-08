@@ -83,7 +83,7 @@ namespace internal
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 class FEEvaluationBase
 {
 public:
@@ -745,7 +745,7 @@ protected:
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 class FEEvaluationAccess :
   public FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 {
@@ -1070,7 +1070,7 @@ protected:
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1,
-         int n_components_ = 1, typename Number = double >
+          int n_components_ = 1, typename Number = double >
 class FEEvaluationGeneral :
   public FEEvaluationAccess<dim,
   Utilities::fixed_int_power<fe_degree+1,dim>::value,
@@ -1219,7 +1219,7 @@ protected:
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1,
-         int n_components_ = 1, typename Number = double >
+          int n_components_ = 1, typename Number = double >
 class FEEvaluation :
   public FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 {
@@ -1427,7 +1427,7 @@ protected:
 /*----------------------- FEEvaluationBase ----------------------------------*/
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 ::FEEvaluationBase (const MatrixFree<dim,Number> &data_in,
@@ -1478,7 +1478,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -1553,7 +1553,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 unsigned int
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -1566,7 +1566,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 internal::MatrixFreeFunctions::CellType
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -1664,7 +1664,7 @@ namespace internal
                       VectorType         &vec,
                       Number             &res) const
     {
-      res = vector_access (const_cast<const VectorType&>(vec), index);
+      res = vector_access (const_cast<const VectorType &>(vec), index);
     }
 
     void pre_constraints (const Number &,
@@ -1679,7 +1679,7 @@ namespace internal
                              VectorType        &vec,
                              Number            &res) const
     {
-      res += weight * vector_access (const_cast<const VectorType&>(vec), index);
+      res += weight * vector_access (const_cast<const VectorType &>(vec), index);
     }
 
     void post_constraints (const Number &sum,
@@ -1803,7 +1803,7 @@ namespace internal
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType, typename VectorOperation>
 inline
 void
@@ -2124,7 +2124,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2149,7 +2149,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2178,7 +2178,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2207,7 +2207,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2227,7 +2227,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2249,7 +2249,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2271,7 +2271,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2295,7 +2295,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2322,7 +2322,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2349,7 +2349,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2373,7 +2373,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2401,7 +2401,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2429,7 +2429,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 template<typename VectorType>
 inline
 void
@@ -2549,7 +2549,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components, typename Number>
+          int n_components, typename Number>
 inline
 const VectorizedArray<Number> *
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components,Number>::
@@ -2561,7 +2561,7 @@ begin_dof_values () const
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components, typename Number>
+          int n_components, typename Number>
 inline
 VectorizedArray<Number> *
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components,Number>::
@@ -2576,7 +2576,7 @@ begin_dof_values ()
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components, typename Number>
+          int n_components, typename Number>
 inline
 const VectorizedArray<Number> *
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components,Number>::
@@ -2590,7 +2590,7 @@ begin_values () const
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components, typename Number>
+          int n_components, typename Number>
 inline
 VectorizedArray<Number> *
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components,Number>::
@@ -2605,7 +2605,7 @@ begin_values ()
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components, typename Number>
+          int n_components, typename Number>
 inline
 const VectorizedArray<Number> *
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components,Number>::
@@ -2619,7 +2619,7 @@ begin_gradients () const
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components, typename Number>
+          int n_components, typename Number>
 inline
 VectorizedArray<Number> *
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components,Number>::
@@ -2634,7 +2634,7 @@ begin_gradients ()
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components, typename Number>
+          int n_components, typename Number>
 inline
 const VectorizedArray<Number> *
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components,Number>::
@@ -2647,7 +2647,7 @@ begin_hessians () const
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components, typename Number>
+          int n_components, typename Number>
 inline
 VectorizedArray<Number> *
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components,Number>::
@@ -2659,7 +2659,7 @@ begin_hessians ()
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -2675,7 +2675,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -2693,7 +2693,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > >
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -2782,7 +2782,7 @@ namespace internal
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 Tensor<1,n_components_,Tensor<2,dim,VectorizedArray<Number> > >
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -2908,7 +2908,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > >
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -2987,7 +2987,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -3011,7 +3011,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -3029,7 +3029,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -3058,7 +3058,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -3101,7 +3101,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
@@ -3127,7 +3127,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         int n_components_, typename Number>
+          int n_components_, typename Number>
 inline
 FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 ::FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
@@ -3537,7 +3537,7 @@ FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number>
 }
 
 template <int dim, int dofs_per_cell_, int n_q_points_,
-         typename Number>
+          typename Number>
 inline
 void
 FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number>
@@ -3685,7 +3685,7 @@ FEEvaluationAccess<dim,dofs_per_cell_,n_q_points_,dim,Number>
 /*----------------------- FEEvaluationGeneral -------------------------------*/
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 inline
 FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::FEEvaluationGeneral (const MatrixFree<dim,Number> &data_in,
@@ -3735,7 +3735,7 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
             {
               proposed_quad_comp = no;
               break;
-           }
+            }
       if (proposed_dof_comp  != numbers::invalid_unsigned_int &&
           proposed_quad_comp != numbers::invalid_unsigned_int)
         {
@@ -3805,7 +3805,7 @@ namespace internal
   // like the functions below and corresponds to a usual matrix-matrix
   // product
   template <int dim, int fe_degree, int n_q_points_1d, typename Number,
-           int direction, bool dof_to_quad, bool add>
+            int direction, bool dof_to_quad, bool add>
   inline
   void
   apply_tensor_product (const Number *shape_data,
@@ -3880,7 +3880,7 @@ namespace internal
   // fe_degree+1 degrees of freedom per direction and not n_q_points_1d for
   // those directions lower than the one currently applied
   template <int dim, int fe_degree, typename Number, int face_direction,
-           bool dof_to_quad, bool add>
+            bool dof_to_quad, bool add>
   inline
   void
   apply_tensor_product_face (const Number *shape_data,
@@ -3969,7 +3969,7 @@ namespace internal
   // ones and in addition use the symmetry in entries to reduce the number of
   // read operations.
   template <int dim, int fe_degree, int n_q_points_1d, typename Number,
-           int direction, bool dof_to_quad, bool add>
+            int direction, bool dof_to_quad, bool add>
   inline
   void
   apply_tensor_product_values (const Number *shape_values,
@@ -4172,7 +4172,7 @@ namespace internal
   // zeros and ones and in addition use the symmetry in entries to
   // reduce the number of read operations.
   template <int dim, int fe_degree, int n_q_points_1d, typename Number,
-           int direction, bool dof_to_quad, bool add>
+            int direction, bool dof_to_quad, bool add>
   inline
   void
   apply_tensor_product_gradients (const Number *shape_gradients,
@@ -4316,7 +4316,7 @@ namespace internal
   // form assuming the symmetries of unit cell shape hessians for
   // finite elements in FEEvaluation
   template <int dim, int fe_degree, int n_q_points_1d, typename Number,
-           int direction, bool dof_to_quad, bool add>
+            int direction, bool dof_to_quad, bool add>
   inline
   void
   apply_tensor_product_hessians (const Number *shape_hessians,
@@ -4688,7 +4688,7 @@ namespace internal
   //        [ 2.82  -1.528  2.673  0    -13.51  ]
   //        [-1      0.518 -0.75   2.482 10     ]
   template <int dim, int fe_degree, typename Number,
-           int direction, bool dof_to_quad, bool add>
+            int direction, bool dof_to_quad, bool add>
   inline
   void
   apply_tensor_product_gradients_gl (const Number *shape_gradients,
@@ -5185,7 +5185,7 @@ namespace internal
 
 
 template <int dim, int fe_degree, int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 inline
 void
 FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
@@ -5199,7 +5199,7 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 inline
 void
 FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
@@ -5212,7 +5212,7 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 inline
 Point<dim,VectorizedArray<Number> >
 FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
@@ -5254,7 +5254,7 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 template <int direction, bool dof_to_quad, bool add>
 inline
 void
@@ -5270,7 +5270,7 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 template <int direction, bool dof_to_quad, bool add>
 inline
 void
@@ -5286,7 +5286,7 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 template <int direction, bool dof_to_quad, bool add>
 inline
 void
@@ -5304,7 +5304,7 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 inline
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::FEEvaluation (const MatrixFree<dim,Number> &data_in,
@@ -5408,7 +5408,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
@@ -5422,7 +5422,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
@@ -5434,7 +5434,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 template <int direction, bool dof_to_quad, bool add>
 inline
 void
@@ -5447,18 +5447,18 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   // for all other orders, we choose even-odd
   if (fe_degree > 1 || n_q_points_1d > 3)
     internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
-           VectorizedArray<Number>, direction, dof_to_quad, add, 0>
-           (shape_val_evenodd, in, out);
+             VectorizedArray<Number>, direction, dof_to_quad, add, 0>
+             (shape_val_evenodd, in, out);
   else
     internal::apply_tensor_product_values<dim,fe_degree,n_q_points_1d,
-           VectorizedArray<Number>, direction, dof_to_quad, add>
-           (this->data.shape_values.begin(), in, out);
+             VectorizedArray<Number>, direction, dof_to_quad, add>
+             (this->data.shape_values.begin(), in, out);
 }
 
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 template <int direction, bool dof_to_quad, bool add>
 inline
 void
@@ -5468,12 +5468,12 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 {
   if (fe_degree > 1 || n_q_points_1d > 3)
     internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
-           VectorizedArray<Number>, direction, dof_to_quad, add, 1>
-           (shape_gra_evenodd, in, out);
+             VectorizedArray<Number>, direction, dof_to_quad, add, 1>
+             (shape_gra_evenodd, in, out);
   else
     internal::apply_tensor_product_gradients<dim,fe_degree,n_q_points_1d,
-           VectorizedArray<Number>, direction, dof_to_quad, add>
-           (this->data.shape_gradients.begin(), in, out);
+             VectorizedArray<Number>, direction, dof_to_quad, add>
+             (this->data.shape_gradients.begin(), in, out);
 }
 
 
@@ -5482,7 +5482,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 // the same symmetry relations hold. However, it is not possible to omit some
 // values that are zero for the values
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
-         typename Number>
+          typename Number>
 template <int direction, bool dof_to_quad, bool add>
 inline
 void
@@ -5492,12 +5492,12 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 {
   if (fe_degree > 1 || n_q_points_1d > 3)
     internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
-           VectorizedArray<Number>, direction, dof_to_quad, add, 2>
-           (shape_hes_evenodd, in, out);
+             VectorizedArray<Number>, direction, dof_to_quad, add, 2>
+             (shape_hes_evenodd, in, out);
   else
     internal::apply_tensor_product_hessians<dim,fe_degree,n_q_points_1d,
-           VectorizedArray<Number>, direction, dof_to_quad, add>
-           (this->data.shape_hessians.begin(), in, out);
+             VectorizedArray<Number>, direction, dof_to_quad, add>
+             (this->data.shape_hessians.begin(), in, out);
 }
 
 

@@ -48,7 +48,7 @@ namespace
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::InternalData::InternalData(const unsigned int n_base_elements,
                                                    const bool         compute_hessians)
-:
+  :
   compute_hessians (compute_hessians),
   base_fe_datas(n_base_elements),
   base_fe_values_datas(n_base_elements)
@@ -765,11 +765,11 @@ face_to_cell_index (const unsigned int face_dof_index,
 
   const unsigned int
   base_face_to_cell_index
-  = this->base_element(face_base_index.first.first).face_to_cell_index (face_base_index.second,
-                                                                        face,
-                                                                        face_orientation,
-                                                                        face_flip,
-                                                                        face_rotation);
+    = this->base_element(face_base_index.first.first).face_to_cell_index (face_base_index.second,
+        face,
+        face_orientation,
+        face_flip,
+        face_rotation);
 
   // it would be nice if we had a base_to_system_index function, but
   // all that exists is a component_to_system_index function. we can't do

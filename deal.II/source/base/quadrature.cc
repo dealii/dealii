@@ -207,10 +207,10 @@ Quadrature<1>::Quadrature (const Quadrature<0> &)
 
 template <int dim>
 Quadrature<dim>::Quadrature (const Quadrature<dim != 1 ? 1 : 0> &q)
-  :
-  Subscriptor(),
-  quadrature_points (Utilities::fixed_power<dim>(q.size())),
-  weights (Utilities::fixed_power<dim>(q.size()))
+:
+Subscriptor(),
+            quadrature_points (Utilities::fixed_power<dim>(q.size())),
+            weights (Utilities::fixed_power<dim>(q.size()))
 {
   Assert (dim <= 3, ExcNotImplemented());
 

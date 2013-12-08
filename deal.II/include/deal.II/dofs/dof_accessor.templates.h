@@ -514,7 +514,7 @@ namespace internal
       {
         return dof_handler.faces->lines.
                get_dof_index (dof_handler,
-                       obj_index,
+                              obj_index,
                               fe_index,
                               local_index,
                               obj_level);
@@ -814,7 +814,7 @@ namespace internal
                           const dealii::internal::int2type<1> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-               fe_index);
+                                                                 fe_index);
       }
 
 
@@ -826,7 +826,7 @@ namespace internal
                            const unsigned int obj_index,
                            const dealii::internal::int2type<1> &)
       {
-	// on a cell, the number of active elements is one
+        // on a cell, the number of active elements is one
         return 1;
       }
 
@@ -841,7 +841,7 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<1> &)
       {
-	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
         return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
@@ -902,7 +902,7 @@ namespace internal
                           const dealii::internal::int2type<2> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-               fe_index);
+                                                                 fe_index);
       }
 
 
@@ -914,7 +914,7 @@ namespace internal
                            const unsigned int obj_index,
                            const dealii::internal::int2type<2> &)
       {
-	// on a cell, the number of active elements is one
+        // on a cell, the number of active elements is one
         return 1;
       }
 
@@ -929,7 +929,7 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<2> &)
       {
-	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
         return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
@@ -1007,7 +1007,7 @@ namespace internal
                           const dealii::internal::int2type<3> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
-               fe_index);
+                                                                 fe_index);
       }
 
 
@@ -1050,7 +1050,7 @@ namespace internal
                            const unsigned int obj_index,
                            const dealii::internal::int2type<3> &)
       {
-	// on a cell, the number of active elements is one
+        // on a cell, the number of active elements is one
         return 1;
       }
 
@@ -1065,7 +1065,7 @@ namespace internal
                            const unsigned int n,
                            const dealii::internal::int2type<3> &)
       {
-	Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
+        Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
         return dof_handler.levels[obj_level]->active_fe_index (obj_index);
       }
 
@@ -2571,7 +2571,7 @@ namespace internal
         Assert (static_cast<unsigned int>(accessor.present_index)
                 <
                 accessor.dof_handler->levels[accessor.present_level]
-                                             ->cell_cache_offsets.size(),
+                ->cell_cache_offsets.size(),
                 ExcInternalError());
         Assert (accessor.dof_handler->levels[accessor.present_level]
                 ->cell_cache_offsets[accessor.present_index]
@@ -2582,12 +2582,12 @@ namespace internal
 
         std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
         static_cast<const dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim>,lda> &>
-          (accessor).get_dof_indices (dof_indices, accessor.active_fe_index());
+        (accessor).get_dof_indices (dof_indices, accessor.active_fe_index());
 
         types::global_dof_index *next_dof_index
-        = &accessor.dof_handler->levels[accessor.present_level]
-           ->cell_dof_indices_cache[accessor.dof_handler->levels[accessor.present_level]
-                                                                 ->cell_cache_offsets[accessor.present_index]];
+          = &accessor.dof_handler->levels[accessor.present_level]
+            ->cell_dof_indices_cache[accessor.dof_handler->levels[accessor.present_level]
+                                     ->cell_cache_offsets[accessor.present_index]];
         for (unsigned int i=0; i<dofs_per_cell; ++i, ++next_dof_index)
           *next_dof_index = dof_indices[i];
       }
@@ -2781,7 +2781,7 @@ namespace internal
                 ExcMessage ("DoFHandler not initialized"));
 
         return accessor.dof_handler->levels[accessor.level()]
-	  ->active_fe_index(accessor.present_index);
+               ->active_fe_index(accessor.present_index);
       }
 
 
@@ -2821,7 +2821,7 @@ namespace internal
                 ExcMessage ("DoFHandler not initialized"));
 
         accessor.dof_handler->levels[accessor.level()]
-	  ->set_active_fe_index (accessor.present_index, i);
+        ->set_active_fe_index (accessor.present_index, i);
       }
 
 
@@ -3033,7 +3033,7 @@ namespace internal
 
 
       template <int dim, int spacedim, bool lda, typename number,
-               class OutputMatrix, typename OutputVector>
+                class OutputMatrix, typename OutputVector>
       static
       void
       distribute_local_to_global (const DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, lda> &accessor,
@@ -3078,7 +3078,7 @@ namespace internal
 
 
       template <int dim, int spacedim, bool lda, typename number,
-               class OutputMatrix, typename OutputVector>
+                class OutputMatrix, typename OutputVector>
       static
       void
       distribute_local_to_global (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, lda> &accessor,
@@ -3287,8 +3287,8 @@ DoFCellAccessor<DH,lda>::get_dof_indices (std::vector<types::global_dof_index> &
   AssertDimension (dof_indices.size(), this->get_fe().dofs_per_cell);
 
   const types::global_dof_index *cache
-  = this->dof_handler->levels[this->present_level]
-    ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
+    = this->dof_handler->levels[this->present_level]
+      ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
   for (unsigned int i=0; i<this->get_fe().dofs_per_cell; ++i, ++cache)
     dof_indices[i] = *cache;
 }
@@ -3357,8 +3357,8 @@ DoFCellAccessor<DH,lda>::get_dof_values (const InputVector &values,
           typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
   const types::global_dof_index *cache
-  = this->dof_handler->levels[this->present_level]
-    ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
+    = this->dof_handler->levels[this->present_level]
+      ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
 
   values.extract_subvector_to (cache,
                                cache + this->get_fe().dofs_per_cell,
@@ -3385,12 +3385,12 @@ DoFCellAccessor<DH,lda>::get_dof_values (const ConstraintMatrix &constraints,
           == this->get_fe().dofs_per_cell,
           typename DoFCellAccessor::ExcVectorDoesNotMatch());
   Assert (values.size() == this->get_dof_handler().n_dofs(),
-      typename DoFCellAccessor::ExcVectorDoesNotMatch());
+          typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
 
   const types::global_dof_index *cache
-  = this->dof_handler->levels[this->present_level]
-    ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
+    = this->dof_handler->levels[this->present_level]
+      ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
 
   constraints.get_dof_values(values, *cache, local_values_begin,
                              local_values_end);
@@ -3414,12 +3414,12 @@ DoFCellAccessor<DH,lda>::set_dof_values (const Vector<number> &local_values,
           == this->get_fe().dofs_per_cell,
           typename DoFCellAccessor::ExcVectorDoesNotMatch());
   Assert (values.size() == this->get_dof_handler().n_dofs(),
-      typename DoFCellAccessor::ExcVectorDoesNotMatch());
+          typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
 
   const types::global_dof_index *cache
-  = this->dof_handler->levels[this->present_level]
-    ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
+    = this->dof_handler->levels[this->present_level]
+      ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
 
   for (unsigned int i=0; i<this->get_fe().dofs_per_cell; ++i, ++cache)
     values(*cache) = local_values(i);

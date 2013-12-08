@@ -1034,7 +1034,7 @@ namespace Threads
      * for each number of arguments.
      */
     template <typename RT, typename ArgList,
-             int length = std_cxx1x::tuple_size<ArgList>::value>
+              int length = std_cxx1x::tuple_size<ArgList>::value>
     struct fun_ptr_helper;
 
 
@@ -1477,7 +1477,7 @@ namespace Threads
        * returned by the function called on
        * the thread.
        */
-        std_cxx1x::shared_ptr<return_value<RT> > ret_val;
+      std_cxx1x::shared_ptr<return_value<RT> > ret_val;
 
       /**
        * Start the thread and
@@ -1570,8 +1570,8 @@ namespace Threads
      * Copy constructor.
      */
     Thread (const Thread<RT> &t)
-    :
-    thread_descriptor (t.thread_descriptor)
+      :
+      thread_descriptor (t.thread_descriptor)
     {}
 
     /**
@@ -2330,14 +2330,14 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3)) DEAL_II_DEPRECATED;
 
 
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3))
@@ -2355,14 +2355,14 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3)) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3))
@@ -2380,14 +2380,14 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const)
@@ -2409,14 +2409,14 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) DEAL_II_DEPRECATED;
 
 
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4))
@@ -2434,14 +2434,14 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4))
@@ -2459,14 +2459,14 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const)
@@ -2487,16 +2487,16 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) DEAL_II_DEPRECATED;
 
 
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5))
@@ -2514,16 +2514,16 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5))
@@ -2541,16 +2541,16 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const)
@@ -2571,16 +2571,16 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) DEAL_II_DEPRECATED;
 
 
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6))
@@ -2598,16 +2598,16 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6))
@@ -2625,8 +2625,8 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
@@ -2634,8 +2634,8 @@ namespace Threads
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
@@ -2657,9 +2657,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
@@ -2667,9 +2667,9 @@ namespace Threads
 
 
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
@@ -2688,9 +2688,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
@@ -2698,9 +2698,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
@@ -2719,9 +2719,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
@@ -2730,9 +2730,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
@@ -2755,9 +2755,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2767,9 +2767,9 @@ namespace Threads
 
 
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2790,9 +2790,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2802,9 +2802,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2825,9 +2825,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
@@ -2838,9 +2838,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
@@ -2865,9 +2865,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2877,9 +2877,9 @@ namespace Threads
 
 
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2900,9 +2900,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2912,9 +2912,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2935,9 +2935,9 @@ namespace Threads
    * @deprecated Use new_thread() instead.
    */
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
@@ -2948,9 +2948,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
@@ -3189,7 +3189,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   Thread<RT>
   new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3),
@@ -3215,7 +3215,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3),
@@ -3241,7 +3241,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const,
@@ -3270,7 +3270,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   Thread<RT>
   new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4),
@@ -3298,7 +3298,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4),
@@ -3326,7 +3326,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const,
@@ -3356,8 +3356,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   Thread<RT>
   new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5),
@@ -3387,8 +3387,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5),
@@ -3418,8 +3418,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const,
@@ -3451,8 +3451,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   Thread<RT>
   new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6),
@@ -3484,8 +3484,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6),
@@ -3517,8 +3517,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const,
@@ -3552,9 +3552,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   Thread<RT>
   new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7),
@@ -3588,9 +3588,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7),
@@ -3624,9 +3624,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const,
@@ -3662,9 +3662,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   Thread<RT>
   new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -3701,9 +3701,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -3740,9 +3740,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -3781,9 +3781,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   Thread<RT>
   new_thread (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -3822,9 +3822,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -3863,9 +3863,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   Thread<RT>
   new_thread (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -4341,8 +4341,8 @@ namespace Threads
      * Copy constructor.
      */
     Task (const Task<RT> &t)
-    :
-    task_descriptor (t.task_descriptor)
+      :
+      task_descriptor (t.task_descriptor)
     {}
 
 
@@ -4649,7 +4649,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   Task<RT>
   new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3),
@@ -4675,7 +4675,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3),
@@ -4701,7 +4701,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3>
+            typename Arg1, typename Arg2, typename Arg3>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const,
@@ -4730,7 +4730,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   Task<RT>
   new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4),
@@ -4758,7 +4758,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4),
@@ -4786,7 +4786,7 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const,
@@ -4816,8 +4816,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   Task<RT>
   new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5),
@@ -4847,8 +4847,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5),
@@ -4878,8 +4878,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const,
@@ -4911,8 +4911,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   Task<RT>
   new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6),
@@ -4944,8 +4944,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6),
@@ -4977,8 +4977,8 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const,
@@ -5012,9 +5012,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   Task<RT>
   new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7),
@@ -5048,9 +5048,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7),
@@ -5084,9 +5084,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const,
@@ -5122,9 +5122,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   Task<RT>
   new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -5161,9 +5161,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -5200,9 +5200,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -5241,9 +5241,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   Task<RT>
   new_task (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -5282,9 +5282,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
@@ -5323,9 +5323,9 @@ namespace Threads
    * @ingroup threads
    */
   template <typename RT, typename C,
-           typename Arg1, typename Arg2, typename Arg3,
-           typename Arg4, typename Arg5, typename Arg6,
-           typename Arg7, typename Arg8, typename Arg9>
+            typename Arg1, typename Arg2, typename Arg3,
+            typename Arg4, typename Arg5, typename Arg6,
+            typename Arg7, typename Arg8, typename Arg9>
   inline
   Task<RT>
   new_task (RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,

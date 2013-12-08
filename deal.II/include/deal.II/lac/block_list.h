@@ -465,7 +465,7 @@ BlockList::cell_generates_vertex_patch(
       if (same_level_only && cell->neighbor(4)->neighbor(2)->level() != cell->level()) break;
       if (cell->neighbor(4)->neighbor(0)->at_boundary(2)) break;
       if (same_level_only && cell->neighbor(4)->neighbor(0)->neighbor(2)->level() != cell->level()) break;
-      // No break here
+    // No break here
     case 2:
       if (cell->at_boundary(2)) break;
       if (same_level_only && cell->neighbor(2)->level() != cell->level()) break;
@@ -578,7 +578,7 @@ BlockList::initialize_vertex_patches_mg(
                     indices[fe.face_to_cell_index(i,5)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
-              // no break here
+            // no break here
             case 1:
               cell->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)

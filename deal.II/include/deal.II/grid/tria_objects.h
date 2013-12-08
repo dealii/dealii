@@ -175,7 +175,7 @@ namespace internal
         void serialize(Archive &ar,
                        const unsigned int version);
       };
-      
+
       /**
        * Store boundary and material data. For
        * example, in one dimension, this field

@@ -118,7 +118,7 @@ void ExceptionBase::set_fields (const char *f,
 #endif
 }
 
-const char* ExceptionBase::what() const throw()
+const char *ExceptionBase::what() const throw()
 {
   // If no error c_string was generated so far, do it now:
   if (what_str == "")

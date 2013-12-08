@@ -215,7 +215,7 @@ public:
    * IndexSet, whereas otherwise it contains the global problem size and the
    * local range.
    */
-  const IndexSet & get_local_lines() const;
+  const IndexSet &get_local_lines() const;
 
   /**
    * This function copies the content of @p constraints_in with DoFs that are
@@ -436,7 +436,7 @@ public:
    * <code>index2=index1</code>.
    */
   bool are_identity_constrained (const size_type index1,
-                                     const size_type index2) const;
+                                 const size_type index2) const;
 
   /**
    * Return the maximum number of other dofs that one dof is constrained
@@ -857,7 +857,7 @@ public:
    * prevent data races.
    */
   template <typename ForwardIteratorVec, typename ForwardIteratorInd,
-           class VectorType>
+            class VectorType>
   void
   distribute_local_to_global (ForwardIteratorVec local_vector_begin,
                               ForwardIteratorVec local_vector_end,
@@ -1035,7 +1035,7 @@ public:
    * set (i.e., distribute to be called).
    */
   template <typename ForwardIteratorVec, typename ForwardIteratorInd,
-           class VectorType>
+            class VectorType>
   void
   get_dof_values (const VectorType  &global_vector,
                   ForwardIteratorInd local_indices_begin,
@@ -1633,7 +1633,7 @@ void ConstraintMatrix::distribute_local_to_global (
 
 
 template <typename ForwardIteratorVec, typename ForwardIteratorInd,
-         class VectorType>
+          class VectorType>
 inline
 void ConstraintMatrix::distribute_local_to_global (
   ForwardIteratorVec local_vector_begin,
@@ -1676,7 +1676,7 @@ ConstraintMatrix::distribute_local_to_global (
 
 
 template <typename ForwardIteratorVec, typename ForwardIteratorInd,
-         class VectorType>
+          class VectorType>
 inline
 void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
                                        ForwardIteratorInd local_indices_begin,

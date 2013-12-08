@@ -580,7 +580,7 @@ namespace internal
     // The code returns the result as the last argument in order to make
     // spawning tasks simpler and use automatic template deduction.
     template <typename Operation, typename Number, typename Number2,
-	      typename ResultType, typename size_type>
+              typename ResultType, typename size_type>
     void accumulate (const Operation   &op,
                      const Number      *X,
                      const Number2     *Y,
@@ -635,18 +635,18 @@ namespace internal
                   r2 = op(X, Y, power);
                   for (size_type j=1; j<8; ++j)
                     r2 += op(X, Y, power);
-                  // no break
+                // no break
                 case 2:
                   r1 = op(X, Y, power);
                   for (size_type j=1; j<8; ++j)
                     r1 += op(X, Y, power);
                   r1 += r2;
-                  // no break
+                // no break
                 case 1:
                   r2 = op(X, Y, power);
                   for (size_type j=1; j<8; ++j)
                     r2 += op(X, Y, power);
-                  // no break
+                // no break
                 default:
                   for (size_type j=0; j<remainder_inner; ++j)
                     r0 += op(X, Y, power);

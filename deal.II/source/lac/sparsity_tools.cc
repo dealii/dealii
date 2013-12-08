@@ -506,129 +506,129 @@ namespace SparsityTools
 
   }
 
-template <class CSP_t>
-void distribute_sparsity_pattern(CSP_t &csp,
+  template <class CSP_t>
+  void distribute_sparsity_pattern(CSP_t &csp,
                                    const std::vector<IndexSet> &owned_set_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange)
-{
-  size_type myid = Utilities::MPI::this_mpi_process(mpi_comm);
-
-  typedef std::map<size_type, std::vector<size_type> > map_vec_t;
-  map_vec_t send_data;
-
   {
-    unsigned int dest_cpu=0;
+    size_type myid = Utilities::MPI::this_mpi_process(mpi_comm);
 
-    size_type n_local_rel_rows = myrange.n_elements();
-    for (size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
-      {
-        size_type row=myrange.nth_index_in_set(row_idx);
+    typedef std::map<size_type, std::vector<size_type> > map_vec_t;
+    map_vec_t send_data;
 
-        // calculate destination CPU, note that we start the search
-        // at last destination cpu, because even if the owned ranges
-        // are not contiguous, they hopefully consist of large blocks
-        while (!owned_set_per_cpu[dest_cpu].is_element(row))
-          {
-            ++dest_cpu;
-            if (dest_cpu==owned_set_per_cpu.size()) // wrap around
+    {
+      unsigned int dest_cpu=0;
+
+      size_type n_local_rel_rows = myrange.n_elements();
+      for (size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
+        {
+          size_type row=myrange.nth_index_in_set(row_idx);
+
+          // calculate destination CPU, note that we start the search
+          // at last destination cpu, because even if the owned ranges
+          // are not contiguous, they hopefully consist of large blocks
+          while (!owned_set_per_cpu[dest_cpu].is_element(row))
+            {
+              ++dest_cpu;
+              if (dest_cpu==owned_set_per_cpu.size()) // wrap around
                 dest_cpu=0;
-          }
+            }
 
-        //skip myself
-        if (dest_cpu==myid)
-          continue;
+          //skip myself
+          if (dest_cpu==myid)
+            continue;
 
-        size_type rlen = csp.row_length(row);
+          size_type rlen = csp.row_length(row);
 
-        //skip empty lines
-        if (!rlen)
-          continue;
+          //skip empty lines
+          if (!rlen)
+            continue;
 
-        //save entries
-        std::vector<size_type> &dst = send_data[dest_cpu];
+          //save entries
+          std::vector<size_type> &dst = send_data[dest_cpu];
 
-        dst.push_back(rlen); // number of entries
-        dst.push_back(row); // row index
-        for (size_type c=0; c<rlen; ++c)
-          {
-            //columns
-            size_type column = csp.column_number(row, c);
-            dst.push_back(column);
-          }
-      }
+          dst.push_back(rlen); // number of entries
+          dst.push_back(row); // row index
+          for (size_type c=0; c<rlen; ++c)
+            {
+              //columns
+              size_type column = csp.column_number(row, c);
+              dst.push_back(column);
+            }
+        }
 
-  }
+    }
 
-  unsigned int num_receive=0;
-  {
-    std::vector<unsigned int> send_to;
-    send_to.reserve(send_data.size());
-    for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
-      send_to.push_back(it->first);
+    unsigned int num_receive=0;
+    {
+      std::vector<unsigned int> send_to;
+      send_to.reserve(send_data.size());
+      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
+        send_to.push_back(it->first);
 
-    num_receive =
-      Utilities::MPI::
-      compute_point_to_point_communication_pattern(mpi_comm, send_to).size();
-  }
+      num_receive =
+        Utilities::MPI::
+        compute_point_to_point_communication_pattern(mpi_comm, send_to).size();
+    }
 
-  std::vector<MPI_Request> requests(send_data.size());
+    std::vector<MPI_Request> requests(send_data.size());
 
 
-  // send data
-  {
-    unsigned int idx=0;
-    for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
-      MPI_Isend(&(it->second[0]),
-                it->second.size(),
-                DEAL_II_DOF_INDEX_MPI_TYPE,
-                it->first,
-                124,
-                mpi_comm,
-                &requests[idx]);
-  }
+    // send data
+    {
+      unsigned int idx=0;
+      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
+        MPI_Isend(&(it->second[0]),
+                  it->second.size(),
+                  DEAL_II_DOF_INDEX_MPI_TYPE,
+                  it->first,
+                  124,
+                  mpi_comm,
+                  &requests[idx]);
+    }
 
 //TODO: In the following, we read individual bytes and then reinterpret them
 //    as size_type objects. this is error prone. use properly typed reads that
 //    match the write above
-  {
-    //receive
-    std::vector<size_type> recv_buf;
-    for (unsigned int index=0; index<num_receive; ++index)
-      {
-        MPI_Status status;
-        int len;
-        MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
-        Assert (status.MPI_TAG==124, ExcInternalError());
+    {
+      //receive
+      std::vector<size_type> recv_buf;
+      for (unsigned int index=0; index<num_receive; ++index)
+        {
+          MPI_Status status;
+          int len;
+          MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
+          Assert (status.MPI_TAG==124, ExcInternalError());
 
-        MPI_Get_count(&status, MPI_BYTE, &len);
-        Assert( len%sizeof(unsigned int)==0, ExcInternalError());
+          MPI_Get_count(&status, MPI_BYTE, &len);
+          Assert( len%sizeof(unsigned int)==0, ExcInternalError());
 
-        recv_buf.resize(len/sizeof(size_type));
+          recv_buf.resize(len/sizeof(size_type));
 
-        MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
-                 status.MPI_TAG, mpi_comm, &status);
+          MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
+                   status.MPI_TAG, mpi_comm, &status);
 
-        std::vector<size_type>::const_iterator ptr = recv_buf.begin();
-        std::vector<size_type>::const_iterator end = recv_buf.end();
-        while (ptr+1<end)
-          {
-            size_type num=*(ptr++);
-            size_type row=*(ptr++);
-            for (unsigned int c=0; c<num; ++c)
-              {
-                csp.add(row, *ptr);
-                ptr++;
-              }
-          }
-        Assert(ptr==end, ExcInternalError());
-      }
+          std::vector<size_type>::const_iterator ptr = recv_buf.begin();
+          std::vector<size_type>::const_iterator end = recv_buf.end();
+          while (ptr+1<end)
+            {
+              size_type num=*(ptr++);
+              size_type row=*(ptr++);
+              for (unsigned int c=0; c<num; ++c)
+                {
+                  csp.add(row, *ptr);
+                  ptr++;
+                }
+            }
+          Assert(ptr==end, ExcInternalError());
+        }
+    }
+
+    // complete all sends, so that we can
+    // safely destroy the buffers.
+    MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
   }
-
-  // complete all sends, so that we can
-  // safely destroy the buffers.
-  MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
-}
 
 
 #endif
@@ -650,9 +650,9 @@ SPARSITY_FUNCTIONS(CompressedSimpleSparsityPattern);
 template void SparsityTools::distribute_sparsity_pattern
 <BlockCompressedSimpleSparsityPattern>
 (BlockCompressedSimpleSparsityPattern &csp,
-                                   const std::vector<IndexSet> &owned_set_per_cpu,
-                                   const MPI_Comm &mpi_comm,
-                                   const IndexSet &myrange);
+ const std::vector<IndexSet> &owned_set_per_cpu,
+ const MPI_Comm &mpi_comm,
+ const IndexSet &myrange);
 
 #endif
 

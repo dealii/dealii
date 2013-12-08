@@ -539,8 +539,8 @@ namespace VectorTools
    * constraints object.
    */
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class VECTOR>
+            template <int,int> class DH,
+            class VECTOR>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const VECTOR            &u1,
@@ -573,8 +573,8 @@ namespace VectorTools
    * at hanging nodes.
    */
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class VECTOR>
+            template <int,int> class DH,
+            class VECTOR>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const VECTOR            &u1,
@@ -597,8 +597,8 @@ namespace VectorTools
    * destination DoFHandler.
    */
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class VECTOR>
+            template <int,int> class DH,
+            class VECTOR>
   void
   interpolate_to_different_mesh (const InterGridMap<DH<dim, spacedim> > &intergridmap,
                                  const VECTOR                           &u1,
@@ -686,8 +686,8 @@ namespace VectorTools
                 VECTOR                   &vec,
                 const bool                enforce_zero_boundary = false,
                 const hp::QCollection<dim-1>  &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
-                                                        QGauss<dim-1>(2) :
-                                                        Quadrature<dim-1>(0)),
+                                                            QGauss<dim-1>(2) :
+                                                            Quadrature<dim-1>(0)),
                 const bool                project_to_boundary_first = false);
 
   /**
@@ -703,8 +703,8 @@ namespace VectorTools
                 VECTOR                   &vec,
                 const bool                enforce_zero_boundary = false,
                 const hp::QCollection<dim-1>  &q_boundary = hp::QCollection<dim-1>(dim > 1 ?
-                                                        QGauss<dim-1>(2) :
-                                                        Quadrature<dim-1>(0)),
+                                                            QGauss<dim-1>(2) :
+                                                            Quadrature<dim-1>(0)),
                 const bool                project_to_boundary_first = false);
 
   /**

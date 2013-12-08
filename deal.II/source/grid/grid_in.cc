@@ -63,7 +63,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
   text[2] = "ASCII";
   text[3] = "DATASET UNSTRUCTURED_GRID";
 
-  for(unsigned int i = 0;i < 4;i++)//Checking for the match between initial strings/text in the file.
+  for (unsigned int i = 0; i < 4; i++) //Checking for the match between initial strings/text in the file.
     {
       getline(in,line);
 
@@ -95,15 +95,15 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
       in>>no_vertices;// taking the no. of vertices
       in.ignore(256, '\n');//ignoring the number beside the total no. of points.
 
-      for(unsigned int count = 0; count < no_vertices; count++)//loop to read three values till the no . vertices is satisfied
+      for (unsigned int count = 0; count < no_vertices; count++) //loop to read three values till the no . vertices is satisfied
         {
-	  // VTK format always specifies vertex coordinates with 3 components
-	  Point<3> x;
+          // VTK format always specifies vertex coordinates with 3 components
+          Point<3> x;
           in >> x(0) >> x(1) >> x(2);
 
           vertices.push_back(Point<spacedim>());
-	  for (unsigned int d=0; d<spacedim; ++d)
-	    vertices.back()(d) = x(d);
+          for (unsigned int d=0; d<spacedim; ++d)
+            vertices.back()(d) = x(d);
 
           vertex_indices[count] = count;
         }
@@ -143,21 +143,21 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       if (dim == 3)
         {
-          for(unsigned int count = 0; count < total_cells; count++)
+          for (unsigned int count = 0; count < total_cells; count++)
             {
               in>>type;
 
-              if(type == 8)
+              if (type == 8)
                 {
 
                   cells.push_back(CellData<dim>());
 
-                  for(j = 0; j < type; j++)//loop to feed data
+                  for (j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
 
-                  for(j = 0; j < type; j++)//loop to feed the data of the vertices to the cell
+                  for (j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
                     {
                       cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
                     }
@@ -171,12 +171,12 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   subcelldata.boundary_quads.push_back(CellData<2>());
                   int no_quads = 0;
 
-                  for(j = 0; j < type; j++)//loop to feed the data to the boundary
+                  for (j = 0; j < type; j++) //loop to feed the data to the boundary
                     {
                       in >> subcelldata.boundary_quads.back().vertices[j];
                     }
                   subcelldata.boundary_quads.back().material_id = 0;
-                  for(unsigned int j = 0; j < type; j++)
+                  for (unsigned int j = 0; j < type; j++)
                     {
                       subcelldata.boundary_quads.back().vertices[j] = vertex_indices[subcelldata.boundary_quads.back().vertices[j]];
                     }
@@ -192,20 +192,20 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       else if (dim == 2)
         {
-          for(unsigned int count = 0; count < total_cells; count++)
+          for (unsigned int count = 0; count < total_cells; count++)
             {
               in>>type;
 
-              if(type == 4)
+              if (type == 4)
                 {
                   cells.push_back(CellData<dim>());
 
-                  for(j = 0; j < type; j++)//loop to feed data
+                  for (j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
 
-                  for(j = 0; j < type; j++)//loop to feed the data of the vertices to the cell
+                  for (j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
                     {
                       cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
                     }
@@ -213,19 +213,19 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   no_cells++;
                 }
 
-              else if(type == 2)
+              else if (type == 2)
                 {
                   //If this is encountered, the pointer comes out of the loop
                   //and starts processing boundaries.
                   subcelldata.boundary_lines.push_back(CellData<1>());
                   int no_lines = 0;
 
-                  for(j = 0; j < type; j++)//loop to feed the data to the boundary
+                  for (j = 0; j < type; j++) //loop to feed the data to the boundary
                     {
                       in >> subcelldata.boundary_lines.back().vertices[j];
                     }
                   subcelldata.boundary_lines.back().material_id = 0;
-                  for(unsigned int j = 0; j < type; j++)
+                  for (unsigned int j = 0; j < type; j++)
                     {
                       subcelldata.boundary_lines.back().vertices[j] = vertex_indices[subcelldata.boundary_lines.back().vertices[j]];
                     }
@@ -250,10 +250,10 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
         {
           in.ignore(256, '\n');
 
-          while(!in.eof())
+          while (!in.eof())
             {
               in>>keyword_3;
-              if(std::strcmp(keyword_3,"12") && std::strcmp(keyword_3,"9"))
+              if (std::strcmp(keyword_3,"12") && std::strcmp(keyword_3,"9"))
                 {
                   break;
                 }
@@ -274,11 +274,11 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
           in.ignore(256, '\n');
 
-          for(unsigned int i = 0;i < 2;i++)
+          for (unsigned int i = 0; i < 2; i++)
             {
               getline(in,linenew);
 
-              if(linenew.compare(textnew[i]) == 0)
+              if (linenew.compare(textnew[i]) == 0)
                 {}
               else
                 AssertThrow (false,
@@ -286,7 +286,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                          textnew[i] + "> section"));
             }
 
-          for(unsigned int i = 0; i < no_cells; i++)//assigning IDs to cells.
+          for (unsigned int i = 0; i < no_cells; i++) //assigning IDs to cells.
             {
               int id;
               in>>id;
@@ -295,7 +295,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
           if (dim == 3)
             {
-              for(unsigned int i = 0; i < no_quads; i++)//assigning IDs to bounds.
+              for (unsigned int i = 0; i < no_quads; i++) //assigning IDs to bounds.
                 {
                   int id;
                   in>>id;
@@ -304,7 +304,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
             }
           else if (dim == 2)
             {
-              for(unsigned int i = 0; i < no_lines; i++)//assigning IDs to bounds.
+              for (unsigned int i = 0; i < no_lines; i++) //assigning IDs to bounds.
                 {
                   int id;
                   in>>id;
@@ -323,9 +323,9 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                         cells,
                                         subcelldata);
 
-      if(dim == spacedim)
+      if (dim == spacedim)
         GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
-                                                                         cells);
+            cells);
 
       GridReordering<dim, spacedim>::reorder_cells(cells);
       tria->create_triangulation_compatibility(vertices,
@@ -2642,8 +2642,8 @@ void GridIn<dim, spacedim>::read (std::istream &in,
       return;
 
     case vtk:
-         read_vtk (in);
-         return;
+      read_vtk (in);
+      return;
 
     case unv:
       read_unv (in);

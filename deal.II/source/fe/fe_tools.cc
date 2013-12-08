@@ -390,7 +390,7 @@ namespace FETools
           start_indices[i] = k;
           k += block_data[i];
         }
-    
+
     for (unsigned int i=0; i<element.dofs_per_cell; ++i)
       {
         std::pair<unsigned int, types::global_dof_index>

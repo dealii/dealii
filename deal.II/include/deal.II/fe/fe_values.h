@@ -2220,13 +2220,13 @@ public:
    */
   DeclException1 (ExcAccessToUninitializedField,
                   char *,
-		  << ("You are requesting information from an FEValues/FEFaceValues/FESubfaceValues "
-		      "object for which this kind of information has not been computed. What "
-		      "information these objects compute is determined by the update_* flags you "
-		      "pass to the constructor. Here, the operation you are attempting requires "
-		      "the <")
-		  << arg1
-		  << "> flag to be set, but it was apparently not specified upon construction.");
+                  << ("You are requesting information from an FEValues/FEFaceValues/FESubfaceValues "
+                      "object for which this kind of information has not been computed. What "
+                      "information these objects compute is determined by the update_* flags you "
+                      "pass to the constructor. Here, the operation you are attempting requires "
+                      "the <")
+                  << arg1
+                  << "> flag to be set, but it was apparently not specified upon construction.");
   /**
    * @todo Document this
    *
@@ -3896,7 +3896,7 @@ const std::vector<Point<spacedim> > &
 FEValuesBase<dim,spacedim>::get_quadrature_points () const
 {
   Assert (this->update_flags & update_quadrature_points,
-	  ExcAccessToUninitializedField("update_quadrature_points"));
+          ExcAccessToUninitializedField("update_quadrature_points"));
   return this->quadrature_points;
 }
 
@@ -3908,7 +3908,7 @@ const std::vector<double> &
 FEValuesBase<dim,spacedim>::get_JxW_values () const
 {
   Assert (this->update_flags & update_JxW_values,
-	  ExcAccessToUninitializedField("update_JxW_values"));
+          ExcAccessToUninitializedField("update_JxW_values"));
   return this->JxW_values;
 }
 
@@ -3920,7 +3920,7 @@ const std::vector<DerivativeForm<1,dim,spacedim> > &
 FEValuesBase<dim,spacedim>::get_jacobians () const
 {
   Assert (this->update_flags & update_jacobians,
-	  ExcAccessToUninitializedField("update_jacobians"));
+          ExcAccessToUninitializedField("update_jacobians"));
   return this->jacobians;
 }
 
@@ -3932,7 +3932,7 @@ const std::vector<DerivativeForm<2,dim,spacedim> > &
 FEValuesBase<dim,spacedim>::get_jacobian_grads () const
 {
   Assert (this->update_flags & update_jacobian_grads,
-	  ExcAccessToUninitializedField("update_jacobians_grads"));
+          ExcAccessToUninitializedField("update_jacobians_grads"));
   return this->jacobian_grads;
 }
 
@@ -3944,7 +3944,7 @@ const std::vector<DerivativeForm<1,spacedim,dim> > &
 FEValuesBase<dim,spacedim>::get_inverse_jacobians () const
 {
   Assert (this->update_flags & update_inverse_jacobians,
-	  ExcAccessToUninitializedField("update_inverse_jacobians"));
+          ExcAccessToUninitializedField("update_inverse_jacobians"));
   return this->inverse_jacobians;
 }
 
@@ -3956,7 +3956,7 @@ const Point<spacedim> &
 FEValuesBase<dim,spacedim>::quadrature_point (const unsigned int i) const
 {
   Assert (this->update_flags & update_quadrature_points,
-	  ExcAccessToUninitializedField("update_quadrature_points"));
+          ExcAccessToUninitializedField("update_quadrature_points"));
   Assert (i<this->quadrature_points.size(), ExcIndexRange(i, 0, this->quadrature_points.size()));
 
   return this->quadrature_points[i];
@@ -3971,7 +3971,7 @@ double
 FEValuesBase<dim,spacedim>::JxW (const unsigned int i) const
 {
   Assert (this->update_flags & update_JxW_values,
-	  ExcAccessToUninitializedField("update_JxW_values"));
+          ExcAccessToUninitializedField("update_JxW_values"));
   Assert (i<this->JxW_values.size(), ExcIndexRange(i, 0, this->JxW_values.size()));
 
   return this->JxW_values[i];
@@ -3985,7 +3985,7 @@ const DerivativeForm<1,dim,spacedim> &
 FEValuesBase<dim,spacedim>::jacobian (const unsigned int i) const
 {
   Assert (this->update_flags & update_jacobians,
-	  ExcAccessToUninitializedField("update_jacobians"));
+          ExcAccessToUninitializedField("update_jacobians"));
   Assert (i<this->jacobians.size(), ExcIndexRange(i, 0, this->jacobians.size()));
 
   return this->jacobians[i];
@@ -3999,7 +3999,7 @@ const DerivativeForm<2,dim,spacedim> &
 FEValuesBase<dim,spacedim>::jacobian_grad (const unsigned int i) const
 {
   Assert (this->update_flags & update_jacobian_grads,
-	  ExcAccessToUninitializedField("update_jacobians_grads"));
+          ExcAccessToUninitializedField("update_jacobians_grads"));
   Assert (i<this->jacobian_grads.size(), ExcIndexRange(i, 0, this->jacobian_grads.size()));
 
   return this->jacobian_grads[i];
@@ -4013,7 +4013,7 @@ const DerivativeForm<1,spacedim,dim> &
 FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 {
   Assert (this->update_flags & update_inverse_jacobians,
-	  ExcAccessToUninitializedField("update_inverse_jacobians"));
+          ExcAccessToUninitializedField("update_inverse_jacobians"));
   Assert (i<this->inverse_jacobians.size(), ExcIndexRange(i, 0, this->inverse_jacobians.size()));
 
   return this->inverse_jacobians[i];

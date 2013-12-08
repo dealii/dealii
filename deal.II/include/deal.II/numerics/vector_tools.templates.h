@@ -89,7 +89,7 @@ namespace VectorTools
     const bool                  fe_is_system = (n_components != 1);
 
     typename DH<dim,spacedim>::active_cell_iterator cell = dof.begin_active(),
-						    endc = dof.end();
+                                                    endc = dof.end();
 
     // For FESystems many of the
     // unit_support_points will appear
@@ -200,7 +200,7 @@ namespace VectorTools
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
 
     hp::FEValues<dim,spacedim> fe_values (mapping_collection,
-                                                      fe, support_quadrature, update_quadrature_points);
+                                          fe, support_quadrature, update_quadrature_points);
 
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
@@ -392,8 +392,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class Vector>
+            template <int,int> class DH,
+            class Vector>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const Vector            &u1,
@@ -416,8 +416,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class Vector>
+            template <int,int> class DH,
+            class Vector>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const Vector            &u1,
@@ -438,8 +438,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class Vector>
+            template <int,int> class DH,
+            class Vector>
   void
   interpolate_to_different_mesh (const InterGridMap<DH<dim, spacedim> > &intergridmap,
                                  const Vector                           &u1,
@@ -507,12 +507,12 @@ namespace VectorTools
               template <int,int> class M_or_MC,
               template <int> class Q_or_QC>
     void project_compute_b_v (const M_or_MC<dim, spacedim>   &mapping,
-                  const DH<dim,spacedim> &dof,
-                  const Function<spacedim> &function,
-                  const bool                enforce_zero_boundary,
-                  const Q_or_QC<dim-1>  &q_boundary,
-                  const bool                project_to_boundary_first,
-                  std::map<types::global_dof_index,double> &boundary_values)
+                              const DH<dim,spacedim> &dof,
+                              const Function<spacedim> &function,
+                              const bool                enforce_zero_boundary,
+                              const Q_or_QC<dim-1>  &q_boundary,
+                              const bool                project_to_boundary_first,
+                              std::map<types::global_dof_index,double> &boundary_values)
     {
       if (enforce_zero_boundary == true)
         // no need to project boundary
@@ -574,14 +574,14 @@ namespace VectorTools
               template <int,int> class M_or_MC,
               template <int> class Q_or_QC>
     void do_project (const M_or_MC<dim, spacedim>   &mapping,
-                  const DH<dim,spacedim> &dof,
-                  const ConstraintMatrix   &constraints,
-                  const Q_or_QC<dim>       &quadrature,
-                  const Function<spacedim> &function,
-                  Vector                   &vec_result,
-                  const bool                enforce_zero_boundary,
-                  const Q_or_QC<dim-1>  &q_boundary,
-                  const bool                project_to_boundary_first)
+                     const DH<dim,spacedim> &dof,
+                     const ConstraintMatrix   &constraints,
+                     const Q_or_QC<dim>       &quadrature,
+                     const Function<spacedim> &function,
+                     Vector                   &vec_result,
+                     const bool                enforce_zero_boundary,
+                     const Q_or_QC<dim-1>  &q_boundary,
+                     const bool                project_to_boundary_first)
     {
       Assert (dof.get_fe().n_components() == function.n_components,
               ExcDimensionMismatch(dof.get_fe().n_components(),
@@ -673,9 +673,9 @@ namespace VectorTools
                 const bool                project_to_boundary_first)
   {
     do_project (mapping, dof, constraints, quadrature,
-        function, vec_result,
-        enforce_zero_boundary, q_boundary,
-        project_to_boundary_first);
+                function, vec_result,
+                enforce_zero_boundary, q_boundary,
+                project_to_boundary_first);
   }
 
 
@@ -707,9 +707,9 @@ namespace VectorTools
                 const bool                project_to_boundary_first)
   {
     do_project (mapping, dof, constraints, quadrature,
-        function, vec_result,
-        enforce_zero_boundary, q_boundary,
-        project_to_boundary_first);
+                function, vec_result,
+                enforce_zero_boundary, q_boundary,
+                project_to_boundary_first);
   }
 
 
@@ -1484,11 +1484,11 @@ namespace VectorTools
               template <int,int> class M_or_MC>
     static inline
     void do_interpolate_boundary_values (const M_or_MC<DH::dimension, DH::space_dimension> &,
-                                      const DH                 &dof,
-                                      const typename FunctionMap<DH::space_dimension>::type &function_map,
-                                      std::map<types::global_dof_index,double> &boundary_values,
-                                      const ComponentMask       &component_mask,
-                                      const dealii::internal::int2type<1>)
+                                         const DH                 &dof,
+                                         const typename FunctionMap<DH::space_dimension>::type &function_map,
+                                         std::map<types::global_dof_index,double> &boundary_values,
+                                         const ComponentMask       &component_mask,
+                                         const dealii::internal::int2type<1>)
     {
       const unsigned int dim = DH::dimension;
       const unsigned int spacedim=DH::space_dimension;
@@ -1564,11 +1564,11 @@ namespace VectorTools
     static inline
     void
     do_interpolate_boundary_values (const M_or_MC<DH::dimension, DH::space_dimension> &mapping,
-                                 const DH                 &dof,
-                                 const typename FunctionMap<DH::space_dimension>::type &function_map,
-                                 std::map<types::global_dof_index,double> &boundary_values,
-                                 const ComponentMask       &component_mask,
-                                 const dealii::internal::int2type<DH::dimension>)
+                                    const DH                 &dof,
+                                    const typename FunctionMap<DH::space_dimension>::type &function_map,
+                                    std::map<types::global_dof_index,double> &boundary_values,
+                                    const ComponentMask       &component_mask,
+                                    const dealii::internal::int2type<DH::dimension>)
     {
       const unsigned int dim = DH::dimension;
       const unsigned int spacedim=DH::space_dimension;
@@ -1747,17 +1747,17 @@ namespace VectorTools
                                    :
                                    (dim == 2 ?
                                     (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                                    :
+                                    (dim == 3 ?
+                                     (i<4*fe.dofs_per_vertex ?
+                                      i
                                       :
-                                      (dim == 3 ?
-                                       (i<4*fe.dofs_per_vertex ?
-                                        i
-                                        :
-                                        (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                         i+4*fe.dofs_per_vertex
-                                         :
-                                         i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                                      (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                                       i+4*fe.dofs_per_vertex
                                        :
-                                       numbers::invalid_unsigned_int)));
+                                       i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                                     :
+                                     numbers::invalid_unsigned_int)));
                               Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
 
                               // make sure that if this is not a primitive
@@ -1783,7 +1783,7 @@ namespace VectorTools
                     }
                   else
                     // fe has only one component, so save some computations
-                  {
+                    {
                       // get only the one component that this function has
                       dof_values_scalar.resize (fe.dofs_per_face);
                       function_map.find(boundary_component)->second
@@ -1811,8 +1811,8 @@ namespace VectorTools
                                const ComponentMask       &component_mask_)
   {
     do_interpolate_boundary_values (mapping, dof, function_map, boundary_values,
-                                 component_mask_,
-                                 dealii::internal::int2type<DH::dimension>());
+                                    component_mask_,
+                                    dealii::internal::int2type<DH::dimension>());
   }
 
 
@@ -1842,8 +1842,8 @@ namespace VectorTools
                                const ComponentMask       &component_mask_)
   {
     do_interpolate_boundary_values (mapping, dof, function_map, boundary_values,
-                                 component_mask_,
-                                 dealii::internal::int2type<dim>());
+                                    component_mask_,
+                                    dealii::internal::int2type<dim>());
   }
 
 
@@ -1972,11 +1972,11 @@ namespace VectorTools
               template <int> class Q_or_QC>
     void
     do_project_boundary_values (const M_or_MC<dim, spacedim>   &mapping,
-                             const DH<dim, spacedim> &dof,
-                             const typename FunctionMap<spacedim>::type &boundary_functions,
-                             const Q_or_QC<dim-1>        &q,
-                             std::map<types::global_dof_index,double>  &boundary_values,
-                             std::vector<unsigned int>       component_mapping)
+                                const DH<dim, spacedim> &dof,
+                                const typename FunctionMap<spacedim>::type &boundary_functions,
+                                const Q_or_QC<dim-1>        &q,
+                                std::map<types::global_dof_index,double>  &boundary_values,
+                                std::vector<unsigned int>       component_mapping)
     {
       // in 1d, projection onto the 0d end points == interpolation
       if (dim == 1)
@@ -1987,11 +1987,11 @@ namespace VectorTools
           return;
         }
 
-  //TODO:[?] In project_boundary_values, no condensation of sparsity
-  //    structures, matrices and right hand sides or distribution of
-  //    solution vectors is performed. This is ok for dim<3 because then
-  //    there are no constrained nodes on the boundary, but is not
-  //    acceptable for higher dimensions. Fix this.
+      //TODO:[?] In project_boundary_values, no condensation of sparsity
+      //    structures, matrices and right hand sides or distribution of
+      //    solution vectors is performed. This is ok for dim<3 because then
+      //    there are no constrained nodes on the boundary, but is not
+      //    acceptable for higher dimensions. Fix this.
 
       if (component_mapping.size() == 0)
         {
@@ -2047,8 +2047,8 @@ namespace VectorTools
       // but it needs to be implemented
       if (dim>=3)
         {
-  #ifdef DEBUG
-  // Assert that there are no hanging nodes at the boundary
+#ifdef DEBUG
+          // Assert that there are no hanging nodes at the boundary
           int level = -1;
           for (typename DH<dim,spacedim>::active_cell_iterator cell = dof.begin_active();
                cell != dof.end(); ++cell)
@@ -2064,7 +2064,7 @@ namespace VectorTools
                       }
                   }
               }
-  #endif
+#endif
         }
       sparsity.compress();
 
@@ -2185,9 +2185,9 @@ namespace VectorTools
                                 std::vector<unsigned int> component_mapping)
   {
     do_project_boundary_values (mapping, dof,
-        boundary_functions,
-        q, boundary_values,
-        component_mapping);
+                                boundary_functions,
+                                q, boundary_values,
+                                component_mapping);
   }
 
 
@@ -2200,9 +2200,9 @@ namespace VectorTools
                                 std::vector<unsigned int> component_mapping)
   {
     project_boundary_values (hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof,
-        boundary_function,
-        q, boundary_values,
-        component_mapping);
+                             boundary_function,
+                             q, boundary_values,
+                             component_mapping);
   }
 
 
@@ -2299,11 +2299,11 @@ namespace VectorTools
 
 
     template <int dim>
-    std::ostream & operator << (std::ostream &out,
-				const VectorDoFTuple<dim> &vdt)
+    std::ostream &operator << (std::ostream &out,
+                               const VectorDoFTuple<dim> &vdt)
     {
       for (unsigned int d=0; d<dim; ++d)
-	out << vdt.dof_indices[d] << (d < dim-1 ? " " : "");
+        out << vdt.dof_indices[d] << (d < dim-1 ? " " : "");
       return out;
     }
 
@@ -2934,12 +2934,12 @@ namespace VectorTools
               -= tol;
               tangentials[q_point]
                 = (fe_values.get_mapping ()
-                     .transform_unit_to_real_cell (cell,
-                                                   shifted_reference_point_1)
-                     -
-                     fe_values.get_mapping ()
-                     .transform_unit_to_real_cell (cell,
-                                                   shifted_reference_point_2))
+                   .transform_unit_to_real_cell (cell,
+                                                 shifted_reference_point_1)
+                   -
+                   fe_values.get_mapping ()
+                   .transform_unit_to_real_cell (cell,
+                                                 shifted_reference_point_2))
                   / tol;
               tangentials[q_point]
               /= std::sqrt (tangentials[q_point].square ());
@@ -4147,7 +4147,7 @@ namespace VectorTools
                                                      fe_collection,
                                                      face_quadrature_collection,
                                                      update_q_points |
-						     update_normal_vectors);
+                                                     update_normal_vectors);
 
     // have a map that stores normal vectors for each vector-dof tuple we want
     // to constrain. since we can get at the same vector dof tuple more than
@@ -4199,8 +4199,8 @@ namespace VectorTools
                     vector_dofs.dof_indices[0] = face_dofs[i];
 
                     Assert(first_vector_component+dim<=fe.n_components(),
-			   ExcMessage("Error: the finite element does not have enough components "
-				      "to define a normal direction."));
+                           ExcMessage("Error: the finite element does not have enough components "
+                                      "to define a normal direction."));
 
                     for (unsigned int k=0; k<fe.dofs_per_face; ++k)
                       if ((k != i)
@@ -4248,31 +4248,31 @@ namespace VectorTools
                     // to check that they are small *relative to something
                     // else*). we do this and then normalize the length of the
                     // vector back to one, just to be on the safe side
-		    //
-		    // one more point: we would like to use the "real" normal
-		    // vector here, as provided by the boundary description
-		    // and as opposed to what we get from the FEValues object.
-		    // we do this in the immediately next line, but as is
-		    // obvious, the boundary only has a vague idea which side
-		    // of a cell it is on -- indicated by the face number. in
-		    // other words, it may provide the inner or outer normal.
-		    // by and large, there is no harm from this, since the
-		    // tangential vector we compute is still the same. however,
-		    // we do average over normal vectors from adjacent cells
-		    // and if they have recorded normal vectors from the inside
-		    // once and from the outside the other time, then this
-		    // averaging is going to run into trouble. as a consequence
-		    // we ask the mapping after all for its normal vector,
-		    // but we only ask it so that we can possibly correct the
-		    // sign of the normal vector provided by the boundary
-		    // if they should point in different directions. this is the
-		    // case in tests/deal.II/no_flux_11.
+                    //
+                    // one more point: we would like to use the "real" normal
+                    // vector here, as provided by the boundary description
+                    // and as opposed to what we get from the FEValues object.
+                    // we do this in the immediately next line, but as is
+                    // obvious, the boundary only has a vague idea which side
+                    // of a cell it is on -- indicated by the face number. in
+                    // other words, it may provide the inner or outer normal.
+                    // by and large, there is no harm from this, since the
+                    // tangential vector we compute is still the same. however,
+                    // we do average over normal vectors from adjacent cells
+                    // and if they have recorded normal vectors from the inside
+                    // once and from the outside the other time, then this
+                    // averaging is going to run into trouble. as a consequence
+                    // we ask the mapping after all for its normal vector,
+                    // but we only ask it so that we can possibly correct the
+                    // sign of the normal vector provided by the boundary
+                    // if they should point in different directions. this is the
+                    // case in tests/deal.II/no_flux_11.
                     Point<dim> normal_vector
                       = (cell->face(face_no)->get_boundary()
                          .normal_vector (cell->face(face_no),
                                          fe_values.quadrature_point(i)));
-		    if (normal_vector * fe_values.normal_vector(i) < 0)
-		      normal_vector *= -1;
+                    if (normal_vector * fe_values.normal_vector(i) < 0)
+                      normal_vector *= -1;
                     Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
                             ExcInternalError());
                     for (unsigned int d=0; d<dim; ++d)
@@ -4287,10 +4287,10 @@ namespace VectorTools
                                              std::make_pair (normal_vector,
                                                              cell)));
 #ifdef DEBUG_NO_NORMAL_FLUX
-		    std::cout << "Adding normal vector:" << std::endl
-			      << "   dofs=" << vector_dofs << std::endl
-			      << "   cell=" << cell << " at " << cell->center() << std::endl
-			      << "   normal=" << normal_vector << std::endl;
+                    std::cout << "Adding normal vector:" << std::endl
+                              << "   dofs=" << vector_dofs << std::endl
+                              << "   cell=" << cell << " at " << cell->center() << std::endl
+                              << "   normal=" << normal_vector << std::endl;
 #endif
                   }
             }
@@ -4320,14 +4320,14 @@ namespace VectorTools
           same_dof_range[1] = dof_to_normals_map.end();
 
 #ifdef DEBUG_NO_NORMAL_FLUX
-	std::cout << "For dof indices <" << p->first << ">, found the following normals"
-		  << std::endl;
+        std::cout << "For dof indices <" << p->first << ">, found the following normals"
+                  << std::endl;
         for (typename DoFToNormalsMap::const_iterator
              q = same_dof_range[0];
              q != same_dof_range[1]; ++q)
-	  std::cout << "   " << q->second.first
-		    << " from cell " << q->second.second
-		    << std::endl;
+          std::cout << "   " << q->second.first
+                    << " from cell " << q->second.second
+                    << std::endl;
 #endif
 
 
@@ -4367,13 +4367,13 @@ namespace VectorTools
         Assert (cell_to_normals_map.size() >= 1, ExcInternalError());
 
 #ifdef DEBUG_NO_NORMAL_FLUX
-	std::cout << "   cell_to_normals_map:" << std::endl;
+        std::cout << "   cell_to_normals_map:" << std::endl;
         for (typename CellToNormalsMap::const_iterator
              x = cell_to_normals_map.begin();
              x != cell_to_normals_map.end(); ++x)
-	  std::cout << "      " << x->first << " -> ("
-		    << x->second.first << ',' << x->second.second << ')'
-		    << std::endl;
+          std::cout << "      " << x->first << " -> ("
+                    << x->second.first << ',' << x->second.second << ')'
+                    << std::endl;
 #endif
 
         // count the maximum number of contributions from each cell
@@ -4392,17 +4392,17 @@ namespace VectorTools
 
         switch (max_n_contributions_per_cell)
           {
-            // first deal with the case that a number of cells all have
-            // registered that they have a normal vector defined at the
-            // location of a given vector dof, and that each of them have
-            // encountered this vector dof exactly once while looping over all
-            // their faces. as stated in the documentation, this is the case
-            // where we want to simply average over all normal vectors
-	    //
-	    // the typical case is in 2d where multiple cells meet at one
-	    // vertex sitting on the boundary. same in 3d for a vertex that
-	    // is associated with only one of the boundary indicators passed
-	    // to this function
+          // first deal with the case that a number of cells all have
+          // registered that they have a normal vector defined at the
+          // location of a given vector dof, and that each of them have
+          // encountered this vector dof exactly once while looping over all
+          // their faces. as stated in the documentation, this is the case
+          // where we want to simply average over all normal vectors
+          //
+          // the typical case is in 2d where multiple cells meet at one
+          // vertex sitting on the boundary. same in 3d for a vertex that
+          // is associated with only one of the boundary indicators passed
+          // to this function
           case 1:
           {
 
@@ -4513,21 +4513,21 @@ namespace VectorTools
             // if this is dim-1 for all cells (if a single cell has
             // contributed dim, or if all adjacent cells have contributed 1
             // normal vector, this is already handled above).
-	    //
-	    // we only implement the case that all cells contribute
-	    // dim-1 because we assume that we are following an edge
-	    // of the domain (think: we are looking at a vertex
-	    // located on one of the edges of a refined cube where the
-	    // boundary indicators of the two adjacent faces of the
-	    // cube are both listed in the set of boundary indicators
-	    // passed to this function). in that case, all cells along
-	    // that edge of the domain are assumed to have contributed
-	    // dim-1 normal vectors. however, there are cases where
-	    // this assumption is not justified (see the lengthy
-	    // explanation in test no_flux_12.cc) and in those cases
-	    // we simply ignore the cell that contributes only
-	    // once. this is also discussed at length in the
-	    // documentation of this function.
+            //
+            // we only implement the case that all cells contribute
+            // dim-1 because we assume that we are following an edge
+            // of the domain (think: we are looking at a vertex
+            // located on one of the edges of a refined cube where the
+            // boundary indicators of the two adjacent faces of the
+            // cube are both listed in the set of boundary indicators
+            // passed to this function). in that case, all cells along
+            // that edge of the domain are assumed to have contributed
+            // dim-1 normal vectors. however, there are cases where
+            // this assumption is not justified (see the lengthy
+            // explanation in test no_flux_12.cc) and in those cases
+            // we simply ignore the cell that contributes only
+            // once. this is also discussed at length in the
+            // documentation of this function.
             //
             // for each contributing cell compute the tangential vector that
             // remains unconstrained
@@ -4538,21 +4538,21 @@ namespace VectorTools
                  ++contribution)
               {
 #ifdef DEBUG_NO_NORMAL_FLUX
-		std::cout << "   Treating edge case with dim-1 contributions." << std::endl
-			  << "   Looking at cell " << contribution->first
-			  << " which has contributed these normal vectors:"
-			  << std::endl;
-		for (typename std::list<Tensor<1,dim> >::const_iterator
-                       t = contribution->second.begin();
-		     t != contribution->second.end();
-		     ++t)
-		  std::cout << "      " << *t << std::endl;
+                std::cout << "   Treating edge case with dim-1 contributions." << std::endl
+                          << "   Looking at cell " << contribution->first
+                          << " which has contributed these normal vectors:"
+                          << std::endl;
+                for (typename std::list<Tensor<1,dim> >::const_iterator
+                     t = contribution->second.begin();
+                     t != contribution->second.end();
+                     ++t)
+                  std::cout << "      " << *t << std::endl;
 #endif
 
-		// as mentioned above, simply ignore cells that only
-		// contribute once
+                // as mentioned above, simply ignore cells that only
+                // contribute once
                 if (contribution->second.size() < dim-1)
-		  continue;
+                  continue;
 
                 Tensor<1,dim> normals[dim-1];
                 {
@@ -4654,7 +4654,7 @@ namespace VectorTools
 
   template <int dim, template <int, int> class DH, int spacedim>
   void
-  compute_normal_flux_constraints (const DH<dim,spacedim>&dof_handler,
+  compute_normal_flux_constraints (const DH<dim,spacedim> &dof_handler,
                                    const unsigned int     first_vector_component,
                                    const std::set<types::boundary_id> &boundary_ids,
                                    ConstraintMatrix      &constraints,
@@ -4699,7 +4699,7 @@ namespace VectorTools
                       std::max(n_scalar_indices,
                                fe.face_system_to_component_index(i).second+1);
                     cell_vector_dofs[fe.face_system_to_component_index(i).second]
-                      [fe.face_system_to_component_index(i).first-first_vector_component]
+                    [fe.face_system_to_component_index(i).first-first_vector_component]
                       = face_dofs[i];
                   }
 
@@ -4714,8 +4714,8 @@ namespace VectorTools
     // can find constrained ones
     unsigned int n_total_constraints_found = 0;
     for (typename std::set<std_cxx1x::array<types::global_dof_index,dim>,
-           PointComparator<dim> >::const_iterator it=vector_dofs.begin();
-           it!=vector_dofs.end(); ++it)
+         PointComparator<dim> >::const_iterator it=vector_dofs.begin();
+         it!=vector_dofs.end(); ++it)
       {
         unsigned int n_constraints = 0;
         bool is_constrained[dim];
@@ -4754,7 +4754,7 @@ namespace VectorTools
                   normal[d] = 1.;
                 }
             AssertIndexRange(constrained_index, dim);
-            const std::vector<std::pair<types::global_dof_index, double> >* constrained
+            const std::vector<std::pair<types::global_dof_index, double> > *constrained
               = no_normal_flux_constraints.get_constraint_entries((*it)[constrained_index]);
             // find components to which this index is constrained to
             Assert(constrained != 0, ExcInternalError());
@@ -4998,7 +4998,7 @@ namespace VectorTools
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
                 sum += data.psi_values[q](k) * data.psi_values[q](k) *
-                  data.weight_vectors[q](k);
+                       data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
           // Compute the root only, if no derivative values are added later
@@ -5046,7 +5046,7 @@ namespace VectorTools
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
                 sum += (data.psi_grads[q][k] * data.psi_grads[q][k]) *
-                  data.weight_vectors[q](k);
+                       data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
@@ -5054,18 +5054,18 @@ namespace VectorTools
 
         case W1infty_seminorm:
         case W1infty_norm:
-          {
-            double t = 0;
-            for (unsigned int q=0; q<n_q_points; ++q)
-              for (unsigned int k=0; k<n_components; ++k)
-                for (unsigned int d=0; d<dim; ++d)
-                  t = std::max(t, std::abs(data.psi_grads[q][k][d]) *
-                               data.weight_vectors[q](k));
+        {
+          double t = 0;
+          for (unsigned int q=0; q<n_q_points; ++q)
+            for (unsigned int k=0; k<n_components; ++k)
+              for (unsigned int d=0; d<dim; ++d)
+                t = std::max(t, std::abs(data.psi_grads[q][k][d]) *
+                             data.weight_vectors[q](k));
 
-            // then add seminorm to norm if that had previously been computed
-            diff += t;
-          }
-          break;
+          // then add seminorm to norm if that had previously been computed
+          diff += t;
+        }
+        break;
         default:
           break;
         }
@@ -5130,7 +5130,7 @@ namespace VectorTools
         case W1infty_seminorm:
           update_flags |= UpdateFlags (update_gradients);
           if (spacedim == dim+1)
-	    update_flags |= UpdateFlags (update_normal_vectors);
+            update_flags |= UpdateFlags (update_normal_vectors);
 
           break;
 
@@ -5139,8 +5139,8 @@ namespace VectorTools
         case W1infty_norm:
           update_flags |= UpdateFlags (update_gradients);
           if (spacedim == dim+1)
-	    update_flags |= UpdateFlags (update_normal_vectors);
-          // no break!
+            update_flags |= UpdateFlags (update_normal_vectors);
+        // no break!
 
         default:
           update_flags |= UpdateFlags (update_values);

@@ -423,8 +423,8 @@ namespace parallel
     template <typename Number>
     inline
     BlockVector<Number>::BlockVector (const std::vector<IndexSet> &local_ranges,
-        const std::vector<IndexSet> &ghost_indices,
-        const MPI_Comm  communicator)
+                                      const std::vector<IndexSet> &ghost_indices,
+                                      const MPI_Comm  communicator)
     {
       std::vector<size_type> sizes(local_ranges.size());
       for (unsigned int i=0; i<local_ranges.size(); ++i)
@@ -441,7 +441,7 @@ namespace parallel
     template <typename Number>
     inline
     BlockVector<Number>::BlockVector (const std::vector<IndexSet> &local_ranges,
-        const MPI_Comm  communicator)
+                                      const MPI_Comm  communicator)
     {
       std::vector<size_type> sizes(local_ranges.size());
       for (unsigned int i=0; i<local_ranges.size(); ++i)
@@ -556,7 +556,7 @@ namespace parallel
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
       Assert (this->n_blocks() == 0 || this->n_blocks() == v.n_blocks(),
-                    ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
+              ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
         reinit(v.n_blocks(), true);

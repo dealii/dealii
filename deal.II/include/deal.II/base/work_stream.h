@@ -162,8 +162,8 @@ namespace WorkStream
        * A class that creates a sequence of items from a range of iterators.
        */
       template <typename Iterator,
-               typename ScratchData,
-               typename CopyData>
+                typename ScratchData,
+                typename CopyData>
       class IteratorRangeToItemStream : public tbb::filter
       {
       public:
@@ -481,8 +481,8 @@ namespace WorkStream
        * run in parallel.
        */
       template <typename Iterator,
-               typename ScratchData,
-               typename CopyData>
+                typename ScratchData,
+                typename CopyData>
       class Worker : public tbb::filter
       {
       public:
@@ -635,8 +635,8 @@ namespace WorkStream
        * they are created.
        */
       template <typename Iterator,
-               typename ScratchData,
-               typename CopyData>
+                typename ScratchData,
+                typename CopyData>
       class Copier : public tbb::filter
       {
       public:
@@ -722,8 +722,8 @@ namespace WorkStream
        * A class that creates a sequence of items from a range of iterators.
        */
       template <typename Iterator,
-               typename ScratchData,
-               typename CopyData>
+                typename ScratchData,
+                typename CopyData>
       class IteratorRangeToItemStream : public tbb::filter
       {
       public:
@@ -1009,8 +1009,8 @@ namespace WorkStream
        * run in parallel.
        */
       template <typename Iterator,
-               typename ScratchData,
-               typename CopyData>
+                typename ScratchData,
+                typename CopyData>
       class WorkerAndCopier : public tbb::filter
       {
       public:
@@ -1198,10 +1198,10 @@ namespace WorkStream
    * are generated.
    */
   template <typename Worker,
-           typename Copier,
-           typename Iterator,
-           typename ScratchData,
-           typename CopyData>
+            typename Copier,
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
   void
   run (const Iterator                          &begin,
        const typename identity<Iterator>::type &end,
@@ -1331,10 +1331,10 @@ namespace WorkStream
    * are generated.
    */
   template <typename Worker,
-           typename Copier,
-           typename Iterator,
-           typename ScratchData,
-           typename CopyData>
+            typename Copier,
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
   void
   run (const std::vector<std::vector<Iterator> > &colored_iterators,
        Worker                                   worker,
@@ -1443,9 +1443,9 @@ namespace WorkStream
    * are generated.
    */
   template <typename MainClass,
-           typename Iterator,
-           typename ScratchData,
-           typename CopyData>
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
   void
   run (const Iterator                          &begin,
        const typename identity<Iterator>::type &end,

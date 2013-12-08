@@ -168,8 +168,8 @@ namespace Functions
    * @author Luca Heltai, 2006, Markus Buerg, 2012, Wolfgang Bangerth, 2013
    */
   template <int dim,
-           typename DH=DoFHandler<dim>,
-           typename VECTOR=Vector<double> >
+            typename DH=DoFHandler<dim>,
+            typename VECTOR=Vector<double> >
   class FEFieldFunction :  public Function<dim>
   {
   public:

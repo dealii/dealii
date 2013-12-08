@@ -1216,7 +1216,7 @@ namespace internal
               //have us as a neighbor. In this case we and the children are active.
               if (dealii_cell->active())
                 {
-                  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+                  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
                     {
                       if (dealii_cell->at_boundary(f))
                         continue;

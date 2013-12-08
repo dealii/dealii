@@ -1262,8 +1262,8 @@ namespace internal
    *
    * Defined in dof_handler.cc.
    */
-    template<int dim, int spacedim>
-    std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> & policy);
+  template<int dim, int spacedim>
+  std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy);
 
 }
 
@@ -1327,11 +1327,11 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
                            "the one that was associated with the DoFHandler previously stored."));
   AssertThrow (policy_name == internal::policy_to_string(*policy),
                ExcMessage (std::string ("The policy currently associated with this DoFHandler (")
-			   + internal::policy_to_string(*policy)
-			   +std::string(") does not match the one that was associated with the "
-				       "DoFHandler previously stored (")
-			   + policy_name
-			   + ")."));
+                           + internal::policy_to_string(*policy)
+                           +std::string(") does not match the one that was associated with the "
+                                        "DoFHandler previously stored (")
+                           + policy_name
+                           + ")."));
 }
 
 

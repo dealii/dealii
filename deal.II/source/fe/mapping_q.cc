@@ -134,7 +134,7 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
   // Qp mapping of cells at the boundary.
   const QGaussLobatto<1> points(degree+1);
   tensor_pols = new TensorProductPolynomials<dim>
-    (Polynomials::generate_complete_Lagrange_basis(points.get_points()));
+  (Polynomials::generate_complete_Lagrange_basis(points.get_points()));
   Assert (n_shape_functions==tensor_pols->n(),
           ExcInternalError());
   Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
@@ -468,8 +468,8 @@ MappingQ<dim,spacedim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
   double const *loqv_ptr=0;
   switch (degree)
     {
-      // for degree==1, we shouldn't have to compute any support points, since
-      // all of them are on the vertices
+    // for degree==1, we shouldn't have to compute any support points, since
+    // all of them are on the vertices
 
     case 2:
     {
@@ -606,14 +606,14 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
   for (unsigned int point=0; point<n_q_points; ++point)
     for (unsigned int i=0; i<n_inner; ++i)
       for (unsigned int j=0; j<n_inner; ++j)
-	{
-	  long double res = 0.;
-	  for (unsigned int l=0; l<dim; ++l)
-	    res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
-		   (long double)quadrature_data.derivative(point, n_outer+j)[l];
+        {
+          long double res = 0.;
+          for (unsigned int l=0; l<dim; ++l)
+            res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+                   (long double)quadrature_data.derivative(point, n_outer+j)[l];
 
-	  S(i,j) += res * (long double)quadrature.weight(point);
-	}
+          S(i,j) += res * (long double)quadrature.weight(point);
+        }
 
   // Compute the components of T to be the product of gradients of inner and
   // outer shape functions.
@@ -621,14 +621,14 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
   for (unsigned int point=0; point<n_q_points; ++point)
     for (unsigned int i=0; i<n_inner; ++i)
       for (unsigned int k=0; k<n_outer; ++k)
-	{
-	  long double res = 0.;
-	  for (unsigned int l=0; l<dim; ++l)
-	    res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
-		   (long double)quadrature_data.derivative(point, k)[l];
+        {
+          long double res = 0.;
+          for (unsigned int l=0; l<dim; ++l)
+            res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+                   (long double)quadrature_data.derivative(point, k)[l];
 
-	  T(i,k) += res *(long double)quadrature.weight(point);
-	}
+          T(i,k) += res *(long double)quadrature.weight(point);
+        }
 
   FullMatrix<long double> S_1(n_inner);
   S_1.invert(S);

@@ -373,10 +373,10 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
   size_type n_elements = 0;
   for (size_type row=i*options.block_size;
        row < std::min(size_type(matrix.m()),
-		      size_type((i+1)*options.block_size)); ++row)
+                      size_type((i+1)*options.block_size)); ++row)
     for (size_type col=j*options.block_size;
          col < std::min(size_type(matrix.m()),
-			size_type((j+1)*options.block_size)); ++col, ++n_elements)
+                        size_type((j+1)*options.block_size)); ++col, ++n_elements)
       if (options.show_absolute_values == true)
         average += std::fabs(get_element (matrix, row, col));
       else
@@ -394,12 +394,12 @@ MatrixOut::build_patches (const Matrix      &matrix,
                           const Options      options)
 {
   size_type
-    gridpoints_x = (matrix.n() / options.block_size
-		    +
-		    (matrix.n() % options.block_size != 0 ? 1 : 0)),
-    gridpoints_y = (matrix.m() / options.block_size
-		    +
-		    (matrix.m() % options.block_size != 0 ? 1 : 0));
+  gridpoints_x = (matrix.n() / options.block_size
+                  +
+                  (matrix.n() % options.block_size != 0 ? 1 : 0)),
+                 gridpoints_y = (matrix.m() / options.block_size
+                                 +
+                                 (matrix.m() % options.block_size != 0 ? 1 : 0));
 
   // If continuous, the number of
   // plotted patches is matrix size-1

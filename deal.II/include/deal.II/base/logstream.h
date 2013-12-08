@@ -551,7 +551,7 @@ private:
    */
   Threads::ThreadLocalStorage<std_cxx1x::shared_ptr<std::ostringstream> > outstreams;
 
-  template <typename T> friend LogStream &operator << (LogStream & log, const T &t);
+  template <typename T> friend LogStream &operator << (LogStream &log, const T &t);
 };
 
 
@@ -567,7 +567,7 @@ private:
  */
 template <typename T>
 inline
-LogStream & operator<< (LogStream &log, const T &t)
+LogStream &operator<< (LogStream &log, const T &t)
 {
   // print to the internal stringstream
   log.get_stream() << t;

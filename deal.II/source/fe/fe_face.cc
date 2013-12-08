@@ -62,8 +62,8 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
         for (unsigned int iy=0; iy <= ((codim>1) ? this->degree : 0) ; ++iy)
           for (unsigned int ix=0; ix<=this->degree; ++ix)
             {
-	      Point<codim> p;
-	      
+              Point<codim> p;
+
               p(0) = points[ix][0];
               if (codim>1)
                 p(1) = points[iy][0];
@@ -164,7 +164,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
               (typename FiniteElement<dim,spacedim>::
                ExcInterpolationNotImplemented ()));
 
-      // generate a quadrature with the unit face support points. 
+      // generate a quadrature with the unit face support points.
       const Quadrature<dim-1> face_quadrature (source_fe->get_unit_face_support_points ());
 
       // Rule of thumb for FP accuracy, that can be expected for a given
@@ -291,8 +291,8 @@ FE_FaceP<dim,spacedim>::FE_FaceP (const unsigned int degree)
   :
   FE_PolyFace<PolynomialSpace<dim-1>, dim, spacedim>
   (PolynomialSpace<dim-1>(Polynomials::Legendre::generate_complete_basis(degree)),
-  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-  std::vector<bool>(1,true))
+   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+   std::vector<bool>(1,true))
 {}
 
 
@@ -437,7 +437,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
       const double eps = 2e-13*(this->degree+1)*(dim-1);
 
       FullMatrix<double> mass (face_quadrature.size(), source_fe->dofs_per_face);
- 
+
       for (unsigned int k = 0; k < face_quadrature.size(); ++k)
         {
           const Point<dim-1> p =
@@ -462,9 +462,9 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
           for (unsigned int k = 0; k < face_quadrature.size(); ++k)
             {
               const Point<dim-1> p = numbers::invalid_unsigned_int ?
-                face_quadrature.point(k) :
-                GeometryInfo<dim-1>::child_to_cell_coordinates (face_quadrature.point(k),
-                                                                subface);
+                                     face_quadrature.point(k) :
+                                     GeometryInfo<dim-1>::child_to_cell_coordinates (face_quadrature.point(k),
+                                         subface);
               v_in(k) = this->poly_space.compute_value(i, p);
             }
           const double result = H.least_squares(v_out, v_in);

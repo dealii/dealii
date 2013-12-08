@@ -133,8 +133,8 @@ namespace TrilinosWrappers
        * be ignored.
        */
       BlockVector (const std::vector<IndexSet> &parallel_partitioning,
-          const std::vector<IndexSet> &ghost_values,
-          const MPI_Comm              &communicator);
+                   const std::vector<IndexSet> &ghost_values,
+                   const MPI_Comm              &communicator);
 
 
       /**
@@ -448,8 +448,8 @@ namespace TrilinosWrappers
 
     inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
-        const std::vector<IndexSet> &ghost_values,
-        const MPI_Comm              &communicator)
+                              const std::vector<IndexSet> &ghost_values,
+                              const MPI_Comm              &communicator)
     {
       reinit(parallel_partitioning, ghost_values, communicator);
     }

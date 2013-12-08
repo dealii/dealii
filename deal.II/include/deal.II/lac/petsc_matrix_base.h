@@ -84,10 +84,10 @@ namespace PETScWrappers
                   const size_type   row,
                   const size_type   index);
 
-	/**
-	 * Copy constructor.
-	 */
-	Accessor (const Accessor &a);
+        /**
+         * Copy constructor.
+         */
+        Accessor (const Accessor &a);
 
         /**
          * Row number of the element

@@ -606,12 +606,12 @@ namespace GridGenerator
    */
   template<int dim>
   void hyper_cube_with_cylindrical_hole (
-      Triangulation<dim> &triangulation,
-      const double        inner_radius = .25,
-      const double        outer_radius = .5,
-      const double        L = .5,
-      const unsigned int  repetition = 1,
-      const bool          colorize = false);
+    Triangulation<dim> &triangulation,
+    const double        inner_radius = .25,
+    const double        outer_radius = .5,
+    const double        L = .5,
+    const unsigned int  repetition = 1,
+    const bool          colorize = false);
 
   /**
    * Produce a ring of cells in 3D that is cut open, twisted and glued

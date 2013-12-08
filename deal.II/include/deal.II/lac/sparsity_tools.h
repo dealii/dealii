@@ -256,7 +256,7 @@ namespace SparsityTools
   /**
    * similar to the function above, but includes support for
    * BlockCompressedSimpleSparsityPattern.
-   * @p owned_set_per_cpu is typically DoFHandler::locally_owned_dofs_per_processor 
+   * @p owned_set_per_cpu is typically DoFHandler::locally_owned_dofs_per_processor
    * and @p myrange are locally_relevant_dofs.
    */
   template <class CSP_t>

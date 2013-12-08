@@ -250,7 +250,7 @@ namespace internal
        */
       void
       set_active_fe_index (const unsigned int obj_index,
-			   const unsigned int fe_index);
+                           const unsigned int fe_index);
 
       /**
        * Return a pointer to the beginning of the DoF indices cache
@@ -265,7 +265,7 @@ namespace internal
        */
       const types::global_dof_index *
       get_cell_cache_start (const unsigned int obj_index,
-                               const unsigned int dofs_per_cell) const;
+                            const unsigned int dofs_per_cell) const;
 
       /**
        * Determine an estimate for the
@@ -330,7 +330,7 @@ namespace internal
                           "information is available"));
 
       Assert (fe_index == active_fe_indices[obj_index],
-	      ExcMessage ("FE index does not match that of the present cell"));
+              ExcMessage ("FE index does not match that of the present cell"));
 
       // see if the dof_indices array has been compressed for this
       // particular cell
@@ -363,7 +363,7 @@ namespace internal
       Assert ((signed_active_fe_index_type)active_fe_indices[obj_index]>=0,
               ExcMessage ("This function can no longer be called after compressing the dof_indices array"));
       Assert (fe_index == active_fe_indices[obj_index],
-	      ExcMessage ("FE index does not match that of the present cell"));
+              ExcMessage ("FE index does not match that of the present cell"));
       dof_indices[dof_offsets[obj_index]+local_index] = global_index;
     }
 
@@ -399,7 +399,7 @@ namespace internal
     void
     DoFLevel::
     set_active_fe_index (const unsigned int obj_index,
-			 const unsigned int fe_index)
+                         const unsigned int fe_index)
     {
       Assert (obj_index < active_fe_indices.size(),
               ExcIndexRange (obj_index, 0, active_fe_indices.size()));
@@ -412,7 +412,7 @@ namespace internal
     inline
     const types::global_dof_index *
     DoFLevel::get_cell_cache_start (const unsigned int obj_index,
-                                        const unsigned int dofs_per_cell) const
+                                    const unsigned int dofs_per_cell) const
     {
       Assert (obj_index < cell_cache_offsets.size(),
               ExcInternalError());

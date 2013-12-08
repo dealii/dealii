@@ -159,26 +159,32 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
   {
     // Implement a minimalistic stream buffer that only stores the fact
     // whether overflow or sync was called
-    public:
-      QueryStreambuf()
-        : flushed_(false), newline_written_(false)
-      {
-      }
-      bool flushed() { return flushed_; }
-      bool newline_written() { return newline_written_; }
-    private:
-      int_type overflow(int_type ch)
-        {
-          newline_written_ = true;
-          return ch;
-        }
-      int sync()
-        {
-          flushed_ = true;
-          return 0;
-        }
-      bool flushed_;
-      bool newline_written_;
+  public:
+    QueryStreambuf()
+      : flushed_(false), newline_written_(false)
+    {
+    }
+    bool flushed()
+    {
+      return flushed_;
+    }
+    bool newline_written()
+    {
+      return newline_written_;
+    }
+  private:
+    int_type overflow(int_type ch)
+    {
+      newline_written_ = true;
+      return ch;
+    }
+    int sync()
+    {
+      flushed_ = true;
+      return 0;
+    }
+    bool flushed_;
+    bool newline_written_;
   } query_streambuf;
 
   {

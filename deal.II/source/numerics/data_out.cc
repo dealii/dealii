@@ -294,7 +294,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
     }
 
   const unsigned int patch_idx =
-      (*data.cell_to_patch_index_map)[cell_and_index->first->level()][cell_and_index->first->index()];
+    (*data.cell_to_patch_index_map)[cell_and_index->first->level()][cell_and_index->first->index()];
   // did we mess up the indices?
   Assert(patch_idx < patches.size(), ExcInternalError());
 
@@ -373,13 +373,13 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
     unsigned int active_index = 0;
     cell_iterator cell = first_locally_owned_cell();
     for (; cell != this->triangulation->end();
-        cell = next_locally_owned_cell(cell))
+         cell = next_locally_owned_cell(cell))
       {
         // move forward until active_cell points at the cell (cell) we are looking
         // at to compute the current active_index
         while (active_cell!=this->triangulation->end()
-            && cell->active()
-            && active_cell_iterator(cell) != active_cell)
+               && cell->active()
+               && active_cell_iterator(cell) != active_cell)
           {
             ++active_cell;
             ++active_index;
@@ -392,7 +392,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                 cell_to_patch_index_map[cell->level()].size(),
                 ExcInternalError());
         Assert (active_index < this->triangulation->n_active_cells(),
-                        ExcInternalError());
+                ExcInternalError());
         cell_to_patch_index_map[cell->level()][cell->index()] = all_cells.size();
 
         all_cells.push_back (std::make_pair(cell, active_index));
@@ -451,18 +451,18 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                      std_cxx1x::bind(&DataOut<dim,DH>::build_one_patch,
                                      this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3,
                                      curved_cell_region,std_cxx1x::ref(this->patches)),
-		     // no copy-local-to-global function needed here
-		     std_cxx1x::function<void (const ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &)>(),
+                     // no copy-local-to-global function needed here
+                     std_cxx1x::function<void (const ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &)>(),
                      thread_data,
                      sample_patch,
-		     // experimenting shows that we can make things run a bit
-		     // faster if we increase the number of cells we work on
-		     // per item (i.e., WorkStream's chunk_size argument,
-		     // about 10% improvement) and the items in flight at any
-		     // given time (another 5% on the testcase discussed in
-		     // @ref workstream_paper, on 32 cores) and if
-		     8*multithread_info.n_threads(),
-		     64);
+                     // experimenting shows that we can make things run a bit
+                     // faster if we increase the number of cells we work on
+                     // per item (i.e., WorkStream's chunk_size argument,
+                     // about 10% improvement) and the items in flight at any
+                     // given time (another 5% on the testcase discussed in
+                     // @ref workstream_paper, on 32 cores) and if
+                     8*multithread_info.n_threads(),
+                     64);
 }
 
 
@@ -483,7 +483,7 @@ DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell)
   // convert the iterator to an active_iterator and advance this to the next
   // active cell
   typename Triangulation<DH::dimension,DH::space_dimension>::
-    active_cell_iterator active_cell = cell;
+  active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
 }
@@ -495,7 +495,7 @@ typename DataOut<dim,DH>::cell_iterator
 DataOut<dim,DH>::first_locally_owned_cell ()
 {
   typename DataOut<dim,DH>::cell_iterator
-    cell = first_cell();
+  cell = first_cell();
 
   // skip cells if the current one has no children (is active) and is a ghost
   // or artificial cell

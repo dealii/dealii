@@ -687,7 +687,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 
   for (unsigned int i=0; i<vertices.size(); ++i)
     if (vertex_used[i])
-        out << '\t' << vertices[i] << '\n';
+      out << '\t' << vertices[i] << '\n';
 
   // write cells or faces
   const bool write_cells = dx_flags.write_cells;

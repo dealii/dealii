@@ -1366,10 +1366,12 @@ void Vector<Number>::extract_subvector_to (ForwardIterator          indices_begi
                                            const ForwardIterator    indices_end,
                                            OutputIterator           values_begin) const
 {
-  while (indices_begin != indices_end) {
-    *values_begin = operator()(*indices_begin);
-    indices_begin++; values_begin++;
-  }
+  while (indices_begin != indices_end)
+    {
+      *values_begin = operator()(*indices_begin);
+      indices_begin++;
+      values_begin++;
+    }
 }
 
 

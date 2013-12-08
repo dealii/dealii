@@ -1264,97 +1264,99 @@ namespace PETScWrappers
     // if we are dealing
     // with a parallel vector
     if (ghosted )
-    {
+      {
 
-      int ierr;
+        int ierr;
 
-      // there is the possibility
-      // that the vector has
-      // ghost elements. in that
-      // case, we first need to
-      // figure out which
-      // elements we own locally,
-      // then get a pointer to
-      // the elements that are
-      // stored here (both the
-      // ones we own as well as
-      // the ghost elements). in
-      // this array, the locally
-      // owned elements come
-      // first followed by the
-      // ghost elements whose
-      // position we can get from
-      // an index set
-      PetscInt begin, end, i;
-      ierr = VecGetOwnershipRange (vector, &begin, &end);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+        // there is the possibility
+        // that the vector has
+        // ghost elements. in that
+        // case, we first need to
+        // figure out which
+        // elements we own locally,
+        // then get a pointer to
+        // the elements that are
+        // stored here (both the
+        // ones we own as well as
+        // the ghost elements). in
+        // this array, the locally
+        // owned elements come
+        // first followed by the
+        // ghost elements whose
+        // position we can get from
+        // an index set
+        PetscInt begin, end, i;
+        ierr = VecGetOwnershipRange (vector, &begin, &end);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      Vec locally_stored_elements = PETSC_NULL;
-      ierr = VecGhostGetLocalForm(vector, &locally_stored_elements);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+        Vec locally_stored_elements = PETSC_NULL;
+        ierr = VecGhostGetLocalForm(vector, &locally_stored_elements);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      PetscInt lsize;
-      ierr = VecGetSize(locally_stored_elements, &lsize);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+        PetscInt lsize;
+        ierr = VecGetSize(locally_stored_elements, &lsize);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      PetscScalar *ptr;
-      ierr = VecGetArray(locally_stored_elements, &ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+        PetscScalar *ptr;
+        ierr = VecGetArray(locally_stored_elements, &ptr);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      for (i = 0; i < n_idx; i++) {
-        const unsigned int index = *(indices_begin+i);
-        if ( index>=static_cast<unsigned int>(begin)
-            && index<static_cast<unsigned int>(end) )
-        {
-          //local entry
-          *(values_begin+i) = *(ptr+index-begin);
-        }
-        else
-        {
-          //ghost entry
-          const unsigned int ghostidx
-          = ghost_indices.index_within_set(index);
+        for (i = 0; i < n_idx; i++)
+          {
+            const unsigned int index = *(indices_begin+i);
+            if ( index>=static_cast<unsigned int>(begin)
+                 && index<static_cast<unsigned int>(end) )
+              {
+                //local entry
+                *(values_begin+i) = *(ptr+index-begin);
+              }
+            else
+              {
+                //ghost entry
+                const unsigned int ghostidx
+                  = ghost_indices.index_within_set(index);
 
-          Assert(ghostidx+end-begin<(unsigned int)lsize, ExcInternalError());
-          *(values_begin+i) = *(ptr+ghostidx+end-begin);
-        }
+                Assert(ghostidx+end-begin<(unsigned int)lsize, ExcInternalError());
+                *(values_begin+i) = *(ptr+ghostidx+end-begin);
+              }
+          }
+
+        ierr = VecRestoreArray(locally_stored_elements, &ptr);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecGhostRestoreLocalForm(vector, &locally_stored_elements);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
       }
-
-      ierr = VecRestoreArray(locally_stored_elements, &ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-      ierr = VecGhostRestoreLocalForm(vector, &locally_stored_elements);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    }
     // if the vector is local or the
     // caller, then simply access the
     // element we are interested in
     else
-    {
-      int ierr;
+      {
+        int ierr;
 
-      PetscInt begin, end;
-      ierr = VecGetOwnershipRange (vector, &begin, &end);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+        PetscInt begin, end;
+        ierr = VecGetOwnershipRange (vector, &begin, &end);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      PetscScalar *ptr;
-      ierr = VecGetArray(vector, &ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+        PetscScalar *ptr;
+        ierr = VecGetArray(vector, &ptr);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      for (PetscInt i = 0; i < n_idx; i++) {
-        const unsigned int index = *(indices_begin+i);
+        for (PetscInt i = 0; i < n_idx; i++)
+          {
+            const unsigned int index = *(indices_begin+i);
 
-        Assert(index>=static_cast<unsigned int>(begin)
-            && index<static_cast<unsigned int>(end), ExcInternalError());
+            Assert(index>=static_cast<unsigned int>(begin)
+                   && index<static_cast<unsigned int>(end), ExcInternalError());
 
-        *(values_begin+i) = *(ptr+index-begin);
+            *(values_begin+i) = *(ptr+index-begin);
+          }
+
+        ierr = VecRestoreArray(vector, &ptr);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
       }
-
-      ierr = VecRestoreArray(vector, &ptr);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    }
   }
 
 #endif // DOXYGEN

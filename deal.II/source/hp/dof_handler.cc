@@ -543,7 +543,7 @@ namespace internal
             active_fe_backup(dof_handler.levels.size ());
             for (unsigned int level = 0; level<dof_handler.levels.size (); ++level)
               std::swap (dof_handler.levels[level]->active_fe_indices,
-			 active_fe_backup[level]);
+                         active_fe_backup[level]);
 
             // delete all levels and set them up
             // newly, since vectors are
@@ -870,7 +870,7 @@ namespace internal
             // non-invalid value later on
             dof_handler.faces->lines.dof_offsets
               = std::vector<unsigned int> (dof_handler.tria->n_raw_lines(),
-                                             (unsigned int)(-1));
+                                           (unsigned int)(-1));
             dof_handler.faces->lines.dofs
               = std::vector<types::global_dof_index> (n_line_slots,
                                                       DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -1250,8 +1250,8 @@ namespace internal
               {
                 dof_handler.faces->quads.dof_offsets
                   = std::vector<unsigned int>
-                                                         (dof_handler.tria->n_raw_quads(),
-                                                         (unsigned int)(-1));
+                    (dof_handler.tria->n_raw_quads(),
+                     (unsigned int)(-1));
                 dof_handler.faces->quads.dofs
                   = std::vector<types::global_dof_index> (n_quad_slots,
                                                           DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -1992,7 +1992,7 @@ namespace hp
             dofs_on_face.resize (dofs_per_face);
 
             cell->face(f)->get_dof_indices (dofs_on_face,
-	                                    cell->active_fe_index());
+                                            cell->active_fe_index());
             for (unsigned int i=0; i<dofs_per_face; ++i)
               boundary_dofs.insert(dofs_on_face[i]);
           };

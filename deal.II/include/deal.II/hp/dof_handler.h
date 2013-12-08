@@ -790,7 +790,7 @@ namespace hp
      * <tt>levels[]</tt> tree of
      * the Triangulation objects.
      */
-    std::vector<dealii::internal::hp::DoFLevel*> levels;
+    std::vector<dealii::internal::hp::DoFLevel *> levels;
 
     /**
      * Space to store the DoF

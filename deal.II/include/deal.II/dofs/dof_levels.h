@@ -101,7 +101,7 @@ namespace internal
        */
       const types::global_dof_index *
       get_cell_cache_start (const unsigned int obj_index,
-                               const unsigned int dofs_per_cell) const;
+                            const unsigned int dofs_per_cell) const;
 
       /**
        * Determine an estimate for the
@@ -125,7 +125,7 @@ namespace internal
     inline
     const types::global_dof_index *
     DoFLevel<dim>::get_cell_cache_start (const unsigned int obj_index,
-                                             const unsigned int dofs_per_cell) const
+                                         const unsigned int dofs_per_cell) const
     {
       Assert (obj_index*dofs_per_cell+dofs_per_cell
               <=

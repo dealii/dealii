@@ -552,7 +552,7 @@ private:
    * we are to work on.
    */
   template <class DerivativeDescription, int dim,
-           template <int, int> class DH, class InputVector, int spacedim>
+            template <int, int> class DH, class InputVector, int spacedim>
   static void
   approximate_derivative (const Mapping<dim,spacedim>    &mapping,
                           const DH<dim,spacedim>         &dof,
@@ -566,10 +566,10 @@ private:
    * on the cell.
    */
   template <class DerivativeDescription, int dim,
-           template <int, int> class DH, class InputVector, int spacedim>
+            template <int, int> class DH, class InputVector, int spacedim>
   static void
   approximate (SynchronousIterators<std_cxx1x::tuple<FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator>,
-                Vector<float>::iterator> > const &cell,
+               Vector<float>::iterator> > const &cell,
                const Mapping<dim,spacedim>    &mapping,
                const DH<dim,spacedim>         &dof,
                const InputVector     &solution,
@@ -580,7 +580,7 @@ private:
    * derivative tensor.
    */
   template <class DerivativeDescription, int dim,
-           template <int, int> class DH, class InputVector, int spacedim>
+            template <int, int> class DH, class InputVector, int spacedim>
   static void
   approximate_cell (const Mapping<dim,spacedim>                            &mapping,
                     const DH<dim,spacedim>                                 &dof,

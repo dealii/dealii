@@ -61,8 +61,8 @@ namespace internal
      * fragment.
      */
     template <typename MatrixIterator,
-             typename SrcIterator,
-             typename DstIterator>
+              typename SrcIterator,
+              typename DstIterator>
     inline
     void
     chunk_vmult_add (const size_type      chunk_size,
@@ -92,8 +92,8 @@ namespace internal
      * the residual.
      */
     template <typename MatrixIterator,
-             typename SrcIterator,
-             typename DstIterator>
+              typename SrcIterator,
+              typename DstIterator>
     inline
     void
     chunk_vmult_subtract (const size_type chunk_size,
@@ -123,8 +123,8 @@ namespace internal
      * chunk_size to the destination vector fragment.
      */
     template <typename MatrixIterator,
-             typename SrcIterator,
-             typename DstIterator>
+              typename SrcIterator,
+              typename DstIterator>
     inline
     void
     chunk_Tvmult_add (const size_type      chunk_size,
@@ -150,9 +150,9 @@ namespace internal
      * individual chunk.
      */
     template <typename result_type,
-             typename MatrixIterator,
-             typename SrcIterator1,
-             typename SrcIterator2>
+              typename MatrixIterator,
+              typename SrcIterator1,
+              typename SrcIterator2>
     inline
     result_type
     chunk_matrix_scalar_product (const size_type      chunk_size,
@@ -190,8 +190,8 @@ namespace internal
      * task scheduler.
      */
     template <typename number,
-             typename InVector,
-             typename OutVector>
+              typename InVector,
+              typename OutVector>
     void vmult_add_on_subrange (const ChunkSparsityPattern &cols,
                                 const unsigned int  begin_row,
                                 const unsigned int  end_row,

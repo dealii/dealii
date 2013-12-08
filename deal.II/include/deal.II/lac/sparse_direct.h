@@ -93,7 +93,7 @@ public:
    * preconditioners.
    */
   class AdditionalData
-{};
+  {};
 
 
   /**
