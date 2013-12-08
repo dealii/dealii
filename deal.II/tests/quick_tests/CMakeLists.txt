@@ -30,37 +30,33 @@ MACRO(make_quicktest test_basename build_name mpi_run)
   STRING(TOLOWER ${build_name} _build_lowercase)
   SET(_target ${test_basename}.${_build_lowercase})
   LIST(APPEND ALL_TESTS "${_target}")
-
   ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${test_basename}.cc)
   DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${build_name})
-
-  # Remove ${_target}-OK prior to compilation:
-  SET_PROPERTY(TARGET ${_target} PROPERTY RULE_LAUNCH_COMPILE
-    "rm -f ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK &&"
-    )
 
   IF("${mpi_run}" STREQUAL "")
     SET(_command ./${_target})
   ELSE()
     SET(_command mpirun -n ${mpi_run} ./${_target})
   ENDIF()
-
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+  ADD_CUSTOM_TARGET(${_target}.run
+    DEPENDS ${_target}
     COMMAND
       ${_command} > ${_target}-OK 2>&1
       ||(echo "${_target}: RUN failed. Output:"
          && cat ${_target}-OK
          && rm ${_target}-OK
          && exit 1)
-    DEPENDS ${_target}
+    COMMAND echo "${_target}: PASSED."
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
-  ADD_CUSTOM_TARGET(${_target}.run
-    COMMAND echo "${_target}: PASSED."
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_target}-OK
+  # this is a hack to make sure the -OK file is deleted
+  # even if compilation fails.
+  ADD_CUSTOM_TARGET(kill-${_target}-OK
+        COMMAND rm -f ${_target}-OK 
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
+  ADD_DEPENDENCIES(${_target} kill-${_target}-OK)
 
   ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
