@@ -76,7 +76,7 @@ void test2()
 				  std_cxx1x::_1),
 		  scratch_data(), copy_data());
   std::cout << "result: " << result << std::endl;
-  
+
   if (result != (3*3+5*5+1*1))
     exit(2);
 }
@@ -84,7 +84,7 @@ void test2()
 int main ()
 {
   std::cout << "TBB will use " << tbb::task_scheduler_init::default_num_threads() << " threads." << std::endl;
-  
+
   test1();
   test2();
 }
