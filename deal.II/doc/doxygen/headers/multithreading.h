@@ -643,7 +643,12 @@
  * relatively independent jobs: for example, assembling local
  * contributions to the global linear system on each cell of a mesh;
  * evaluating an error estimator on each cell; or postprocessing on
- * each cell computed data for output fall into this class.
+ * each cell computed data for output fall into this class. These
+ * cases can be treated using a software design pattern we call
+ * "%WorkStream". In the following, we will walk through the rationale
+ * for this pattern and its implementation; more details as well as
+ * examples for the speedup that can be achieved with it are given in
+ * the @ref workstream_paper .
  *
  * Code like this could then be written like this:
  * @code
@@ -1011,7 +1016,7 @@
  *
  * As a final point: What if, for some reason, my assembler and copier
  * function do not match the above signature with three and one argument,
- * respectively? That's not a problem either. The WorkStream class offers two
+ * respectively? That's not a problem either. The WorkStream namespace offers two
  * versions of the WorkStream::run() function: one that takes an object and
  * the addresses of two member functions, and one that simply takes two
  * function objects that can be called with three and one argument,
@@ -1027,9 +1032,14 @@
      // ...is the same as:
      WorkStream::run (dof_handler.begin_active(),
                       dof_handler.end(),
-                      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell, *this,
-                                  std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
-                      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global, *this, std_cxx1x::_1),
+                      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell,
+                                      *this,
+                                      std_cxx1x::_1,
+                                      std_cxx1x::_2,
+                                      std_cxx1x::_3),
+                      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global,
+                                      *this,
+                                      std_cxx1x::_1),
                       per_task_data);
  * @endcode
  * Note how <code>std_cxx1x::bind</code> produces a function object that takes three
@@ -1063,21 +1073,23 @@
      WorkStream::run (dof_handler.begin_active(),
                       dof_handler.end(),
                       std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell,
-                                  *this,
-                                  current_solution,
-                                  std_cxx1x::_1,
-                                  std_cxx1x::_2,
-                                  std_cxx1x::_3,
-                                  previous_time+time_step),
+                                      *this,
+                                      current_solution,
+                                      std_cxx1x::_1,
+                                      std_cxx1x::_2,
+                                      std_cxx1x::_3,
+                                      previous_time+time_step),
                       std_cxx1x::bind(&MyClass<dim>::copy_local_to_global,
-                                  *this, std_cxx1x::_1),
+                                      *this,
+                                      std_cxx1x::_1),
                       per_task_data);
  * @endcode
  * Here, we bind the object, the linearization point argument, and the
  * current time argument to the function before we hand it off to
  * WorkStream::run(). WorkStream::run() will then simply call the
  * function with the cell and scratch and per task objects which will be filled
- * in at the positions indicated by <code>std_cxx1x::_1, std_cxx1x::_2</code> and <code>std_cxx1x::_3</code>.
+ * in at the positions indicated by <code>std_cxx1x::_1, std_cxx1x::_2</code>
+ * and <code>std_cxx1x::_3</code>.
  *
  * There are refinements to the WorkStream::run function shown above.
  * For example, one may realize that the basic idea above can only scale
