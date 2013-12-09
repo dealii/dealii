@@ -379,7 +379,9 @@ IF(${_result} EQUAL 0)
 
   STRING(REGEX REPLACE "^${_svn_WC_ROOT}/" "" _branch ${_svn_WC_URL})
   STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
+  STRING(REGEX REPLACE "^releases/" "" _branch ${_branch})
   STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
+  STRING(REGEX REPLACE "/" "" _branch ${_branch})
 
   SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}")
 ENDIF()
