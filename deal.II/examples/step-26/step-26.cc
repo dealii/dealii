@@ -380,8 +380,8 @@ namespace Step26
   template<int dim>
   void HeatEquation<dim>::run()
   {
-    const unsigned int initial_global_refinement = (dim == 2 ? 1 : 2);
-    const unsigned int n_adaptive_pre_refinement_steps = 1;
+    const unsigned int initial_global_refinement = 2;
+    const unsigned int n_adaptive_pre_refinement_steps = 4;
 
     GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (initial_global_refinement);
@@ -458,7 +458,7 @@ start_time_iteration:
                                              system_rhs);
         }
 
-        constraints.condense (system_rhs);
+        constraints.condense (system_matrix, system_rhs);
 
         solve_time_step();
 
