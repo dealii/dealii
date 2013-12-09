@@ -259,6 +259,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Since the introduction of ThreadLocalStorage in version 8.0, the
+  way in which FEValues objects visit cells in a parallel assembly loop is no
+  longer deterministic. Therefore, the detection of CellSimilarity that can
+  speed up computations of certain geometric quantities (shape gradients) on
+  cells that are translations is disabled when the number of threads is
+  greater than one. This produces somewhat slower code (usually not more than
+  a few percent) but ensures exact reproducibility of results.
+  <br>
+  (Martin Kronbichler, Wolfgang Bangerth, 2013/12/09)
+  </li>
+
   <li> Fixed: Several functions in namespace GridTools were not instantiated
   for parallel::distributed::Triangulation objects. This is now fixed.
   <br>

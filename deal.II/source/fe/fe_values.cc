@@ -15,6 +15,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/multithread_info.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -3256,15 +3257,33 @@ void
 FEValuesBase<dim,spacedim>::check_cell_similarity
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
 {
-  // case that there has not been any cell
-  // before
+  // Unfortunately, the detection of simple geometries with CellSimilarity is
+  // sensitive to the first cell detected. When doing this with multiple
+  // threads, each thread will get its own scratch data object with an
+  // FEValues object in the implementation framework from late 2013, which is
+  // initialized to the first cell the thread sees. As this number might
+  // different between different runs (after all, the tasks are scheduled
+  // dynamically onto threads), this slight deviation leads to difference in
+  // roundoff errors that propagate through the program. Therefore, we need to
+  // disable CellSimilarity in case there is more than one thread in the
+  // problem. This will likely not affect many MPI test cases as there
+  // multithreading is disabled on default, but in many other situations
+  // because we rarely explicitly set the number of threads.
+  //
+  // TODO: Is it reasonable to introduce a flag "unsafe" in the constructor of
+  // FEValues to re-enable this feature?
+  if (multithread_info.n_threads() > 1)
+    {
+      cell_similarity = CellSimilarity::none;
+      return;
+    }
+
+  // case that there has not been any cell before
   if (this->present_cell.get() == 0)
     cell_similarity = CellSimilarity::none;
   else
-    // in MappingQ, data can have been
-    // modified during the last call. Then,
-    // we can't use that data on the new
-    // cell.
+    // in MappingQ, data can have been modified during the last call. Then, we
+    // can't use that data on the new cell.
     if (cell_similarity == CellSimilarity::invalid_next_cell)
       cell_similarity = CellSimilarity::none;
     else
@@ -3282,8 +3301,7 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
           != cell->direction_flag() )
         cell_similarity =  CellSimilarity::inverted_translation;
     }
-  // TODO: here, one could implement other
-  // checks for similarity, e.g. for
+  // TODO: here, one could implement other checks for similarity, e.g. for
   // children of a parallelogram.
 }
 
