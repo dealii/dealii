@@ -19,7 +19,7 @@
 
 <p>
 This is the list of changes made after the release of
-deal.II version 8.0.0.
+deal.II version 8.1.0.
 All entries are signed with the names of the authors.
 </p>
 
