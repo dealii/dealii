@@ -174,7 +174,7 @@ void test ()
   ub = b;
   ubb = bb;
 
-  SolverControl control (1000, 1e-12);
+  SolverControl control (1000, 1e-13);
 
   SolverCG<BlockVector<double> > bcg(control, SolverCG<BlockVector<double> >::AdditionalData());
   bcg.solve(Bb, bx, bb, PreconditionIdentity());
