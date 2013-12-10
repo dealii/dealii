@@ -373,8 +373,36 @@ ENDIF()
 #
 # - Matthias Maier, 2013
 #
-
 IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
     OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
   SET(DEAL_II_CONSTEXPR_BUG TRUE)
+ENDIF()
+
+#
+# On Mac OS-X 10.9 with recent gcc compilers in C++11 mode linking to some
+# standard C library functions, notably toupper and tolower, fail due to
+# unresolved references to this functions. Disable C++11 support in this
+# case.
+#
+# Thanks to Denis Davydov for the testcase.
+#
+# Matthias Maier, 2013
+#
+CHECK_CXX_COMPILER_BUG(
+  "
+  #include <ctype.h>
+  int main ()
+  {
+    char c = toupper('a');
+  }
+  "
+  DEAL_II_MAC_OSX_C99_BUG)
+
+IF(DEAL_II_MAC_OSX_C99_BUG)
+  MESSAGE(STATUS
+    "Mac OS-X C99 bug found, disabling C++11 support"
+    )
+  STRIP_FLAG(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
+  SET(DEAL_II_CAN_USE_CXX1X FALSE)
+  SET(DEAL_II_USE_CXX11 FALSE)
 ENDIF()
