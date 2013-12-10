@@ -4,11 +4,8 @@ DEAL::
 DEAL::  Number of active cells:       32
 DEAL::  Number of degrees of freedom: 159
 DEAL::  Number of constraints       : 30
-DEAL::  Reference matrix nonzeros: 2499, actually: 1441
-DEAL::  Test matrix 1 nonzeros: 2499, actually: 1442
 DEAL::  Matrix difference norm: 0
 DEAL::  RHS difference norm: 0
-DEAL::  Test matrix 2 nonzeros: 2499, actually: 1440
 DEAL::  Matrix difference norm: 0
 DEAL::  RHS difference norm: 0
 DEAL::
@@ -16,10 +13,7 @@ DEAL::
 DEAL::  Number of active cells:       42
 DEAL::  Number of degrees of freedom: 529
 DEAL::  Number of constraints       : 234
-DEAL::  Reference matrix nonzeros: 30555, actually: 11223
-DEAL::  Test matrix 1 nonzeros: 30555, actually: 11228
 DEAL::  Matrix difference norm: 0
 DEAL::  RHS difference norm: 0
-DEAL::  Test matrix 2 nonzeros: 30555, actually: 11194
 DEAL::  Matrix difference norm: 0
 DEAL::  RHS difference norm: 0

@@ -416,9 +416,10 @@ void LaplaceProblem<dim>::run ()
     {
       if (cycle == 0)
         {
-          GridGenerator::hyper_shell(triangulation,
+          GridGenerator::hyper_cube(triangulation, 0, 1/* ,
                                      Point<dim>(),
-                                     0.5, 1., (dim==3) ? 96 : 12, false);
+                                     0.5, 1., (dim==3) ? 96 : 12, false*/);
+          triangulation.refine_global(2);
         }
 
       setup_system ();
