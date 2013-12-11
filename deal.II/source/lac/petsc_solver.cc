@@ -629,34 +629,25 @@ namespace PETScWrappers
   SparseDirectMUMPS::set_solver_type (KSP &ksp) const
   {
     /**
-    * KSPPREONLY implements a stub
-    * method that applies only the
-    * preconditioner.  Its use is due
-    * to SparseDirectMUMPS being
-    * a direct (rather than iterative)
-    * solver
+    * KSPPREONLY implements a stub method that applies only the
+    * preconditioner.  Its use is due to SparseDirectMUMPS being a direct
+    * (rather than iterative) solver
     */
     int ierr;
     ierr = KSPSetType (ksp, KSPPREONLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     /**
-     * The KSPPREONLY solver of
-     * PETSc never calls the convergence
-     * monitor, which leads to failure
-     * even when everything was ok.
-     * Therefore, the SolverControl
-     * status is set to some nice
-     * values, which guarantee a nice
-     * result at the end of the solution
-     * process.
+     * The KSPPREONLY solver of PETSc never calls the convergence monitor,
+     * which leads to failure even when everything was ok. Therefore, the
+     * SolverControl status is set to some nice values, which guarantee a
+     * nice result at the end of the solution process.
      */
     solver_control.check (1, 0.0);
 
     /**
-     * Using a PREONLY solver with a
-     * nonzero initial guess leads PETSc
-     * to produce some error messages.
+     * Using a PREONLY solver with a nonzero initial guess leads PETSc to
+     * produce some error messages.
      */
     KSPSetInitialGuessNonzero (ksp, PETSC_FALSE);
   }
@@ -667,37 +658,21 @@ namespace PETScWrappers
                             const VectorBase &b)
   {
 #ifdef PETSC_HAVE_MUMPS
-    /**
-     * had some trouble with the
-     * deallog printing to console
-     * the outcome of the solve function
-     * for every process. Brought
-     * down the depth level to zero
-     * to alleviate this
-     */
-    deallog.depth_console (0);
     int ierr;
 
     /**
-     * factorization matrix to be
-     * obtained from MUMPS
+     * factorization matrix to be obtained from MUMPS
      */
     Mat F;
 
     /**
-     * setting MUMPS integer control
-     * parameters ICNTL to be passed
-     * to MUMPS.  Setting
-     * entry 7 of MUMPS ICNTL array
-     * (of size 40) to a value of 2.
-     * This sets use of Approximate
-     * Minimum Fill (AMF)
+     * setting MUMPS integer control parameters ICNTL to be passed to
+     * MUMPS.  Setting entry 7 of MUMPS ICNTL array (of size 40) to a value
+     * of 2. This sets use of Approximate Minimum Fill (AMF)
      */
     PetscInt ival=2, icntl=7;
     /**
-     * number of iterations to
-     * solution (should be 1)
-     * for a direct solver
+     * number of iterations to solution (should be 1) for a direct solver
      */
     PetscInt its;
     /**
@@ -706,26 +681,22 @@ namespace PETScWrappers
     PetscReal rnorm;
 
     /**
-     * creating a solver object
-     * if this is necessary
+     * creating a solver object if this is necessary
      */
     if (solver_data.get() == 0)
       {
         solver_data.reset (new SolverDataMUMPS ());
 
         /**
-         * creates the default KSP
-         * context and puts it in
-         * the location solver_data->ksp
+         * creates the default KSP context and puts it in the location
+         * solver_data->ksp
          */
         ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
-         * set the matrices involved.
-         * the last argument is irrelevant
-         * here, since we use the solver
-         * only once anyway
+         * set the matrices involved. the last argument is irrelevant here,
+         * since we use the solver only once anyway
          */
         ierr = KSPSetOperators (solver_data->ksp, A, A,
                                 DIFFERENT_NONZERO_PATTERN);
@@ -737,18 +708,15 @@ namespace PETScWrappers
         set_solver_type (solver_data->ksp);
 
         /**
-        * getting the associated
-        * preconditioner context
+        * getting the associated preconditioner context
         */
         ierr = KSPGetPC (solver_data->ksp, & solver_data->pc);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
-         * build PETSc PC for particular
-                 * PCLU or PCCHOLESKY preconditioner
-                 * depending on whether the
-                 * symmetric mode has been set
-                 */
+         * build PETSc PC for particular PCLU or PCCHOLESKY preconditioner
+         * depending on whether the symmetric mode has been set
+         */
         if (symmetric_mode)
           ierr = PCSetType (solver_data->pc, PCCHOLESKY);
         else
@@ -756,8 +724,7 @@ namespace PETScWrappers
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
-         * convergence monitor function
-         * that checks with the solver_control
+         * convergence monitor function that checks with the solver_control
          * object for convergence
          */
         KSPSetConvergenceTest (solver_data->ksp, &convergence_test,
@@ -765,33 +732,29 @@ namespace PETScWrappers
                                PETSC_NULL);
 
         /**
-         * set the software that is to be
-         * used to perform the lu factorization
-         * here we start to see differences
-         * with the base class solve function
+         * set the software that is to be used to perform the lu
+         * factorization here we start to see differences with the base
+         * class solve function
          */
         ierr = PCFactorSetMatSolverPackage (solver_data->pc, MATSOLVERMUMPS);
         AssertThrow (ierr == 0, ExcPETScError (ierr));
 
         /**
-         * set up the package to call
-         * for the factorization
+         * set up the package to call for the factorization
          */
         ierr = PCFactorSetUpMatSolverPackage (solver_data->pc);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
-         * get the factored matrix F from the
-         * preconditioner context.  This routine
-         * is valid only for LU, ILU, Cholesky,
-         * and imcomplete Cholesky
+         * get the factored matrix F from the preconditioner context.  This
+         * routine is valid only for LU, ILU, Cholesky, and imcomplete
+         * Cholesky
          */
         ierr = PCFactorGetMatrix(solver_data->pc, &F);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
-         * Passing the control parameters
-         * to MUMPS
+         * Passing the control parameters to MUMPS
          */
         ierr = MatMumpsSetIcntl (F, icntl, ival);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -803,8 +766,8 @@ namespace PETScWrappers
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
-         * set the command line options provided
-         * by the user to override the defaults
+         * set the command line options provided by the user to override
+         * the defaults
          */
         ierr = KSPSetFromOptions (solver_data->ksp);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -818,8 +781,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     /**
-    * in case of failure
-    * throw exception
+    * in case of failure throw exception
     */
     if (solver_control.last_check() != SolverControl::success)
       {
@@ -829,9 +791,7 @@ namespace PETScWrappers
     else
       {
         /**
-         * obtain convergence
-         * information. obtain
-         * the number of iterations
+         * obtain convergence information. obtain the number of iterations
          * and residual norm
          */
         ierr = KSPGetIterationNumber (solver_data->ksp, &its);
@@ -845,8 +805,7 @@ namespace PETScWrappers
             ExcMessage ("Your PETSc installation does not include a copy of "
                         "MUMPS package necessary for this solver"));
 
-    // Cast to void to silence compiler
-    // warnings
+    // Cast to void to silence compiler warnings
     (void) A;
     (void) x;
     (void) b;
