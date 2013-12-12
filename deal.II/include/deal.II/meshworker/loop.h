@@ -70,6 +70,33 @@ namespace internal
 namespace MeshWorker
 {
   /**
+   * Collection of parameters for execution of MeshWorker loops.
+   */
+  class LoopControl
+  {
+    public:
+      /**
+       * Loop over cells owned by this process. Defaults to <code>true</code>.
+       */
+      bool own_cells;
+      /**
+       * Loop over cells owned by this process. Defaults to <code>false</code>.
+       */
+      bool ghost_cells;
+
+      
+      enum
+      {
+	    never,
+	    one_process,
+	    both_processes
+      } faces_to_ghost;
+      
+      bool own_faces_from_both_sides;
+  };
+  
+  
+  /**
    * The function called by loop() to perform the required actions on a
    * cell and its faces. The three functions <tt>cell_worker</tt>,
    * <tt>boundary_worker</tt> and <tt>face_worker</tt> are the same ones
