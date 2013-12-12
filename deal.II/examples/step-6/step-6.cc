@@ -364,6 +364,7 @@ void Step6<dim>::setup_system ()
   system_matrix.reinit (sparsity_pattern);
 }
 
+
 // @sect4{Step6::assemble_system}
 
 // Next, we have to assemble the matrix again. There are two code changes
@@ -442,10 +443,11 @@ void Step6<dim>::assemble_system ()
       // Finally, transfer the contributions from @p cell_matrix and
       // @p cell_rhs into the global objects.
       cell->get_dof_indices (local_dof_indices);
-      constraints.distribute_local_to_global(cell_matrix,
-                                             cell_rhs,
-                                             local_dof_indices,
-                                             system_matrix, system_rhs);
+      constraints.distribute_local_to_global (cell_matrix,
+					      cell_rhs,
+					      local_dof_indices,
+					      system_matrix,
+					      system_rhs);
     }
   // Now we are done assembling the linear system.  The constrained nodes are
   // still in the linear system (there is a one on the diagonal of the matrix
@@ -453,7 +455,6 @@ void Step6<dim>::assemble_system ()
   // values are invalid. We compute the correct values for these nodes at the
   // end of the <code>solve</code> function.
 }
-
 
 
 // @sect4{Step6::solve}
@@ -475,8 +476,8 @@ void Step6<dim>::assemble_system ()
 template <int dim>
 void Step6<dim>::solve ()
 {
-  SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              solver (solver_control);
+  SolverControl      solver_control (1000, 1e-12);
+  SolverCG<>         solver (solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
@@ -636,7 +637,6 @@ void Step6<dim>::output_results (const unsigned int cycle) const
   GridOut grid_out;
   grid_out.write_eps (triangulation, output);
 }
-
 
 
 // @sect4{Step6::run}
