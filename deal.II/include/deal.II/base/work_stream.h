@@ -348,6 +348,15 @@ namespace WorkStream
           // and have set the ring buffer to have exactly this size. so
           // if this function is called, we know that less than the
           // maximal number of items in currently in flight
+	  //
+	  // note that we need not lock access to this array since
+	  // the current stage is run sequentially and we can therefore
+	  // enter the following block only once at any given time.
+	  // thus, there can be no race condition between checking that
+	  // a flag is false and setting it to true. (there may be
+	  // another thread where we release items and set 'false'
+	  // flags to 'true', but that too does not produce any
+	  // problems)
           ItemType *current_item = 0;
           for (unsigned int i=0; i<item_buffer.size(); ++i)
             if (item_buffer[i].currently_in_use == false)
