@@ -70,21 +70,12 @@ namespace internal
   namespace p4est
   {
     /**
-     * A structure whose explicit
-     * specializations contain
-     * typedefs to the relevant
-     * p4est_* and p8est_*
-     * types. Using this
-     * structure, for example by
-     * saying
-     * <code>types@<dim@>::connectivity</code>
-     * we can write code in a
-     * dimension independent way,
-     * either referring to
-     * p4est_connectivity_t or
-     * p8est_connectivity_t,
-     * depending on template
-     * argument.
+     * A structure whose explicit specializations contain typedefs to
+     * the relevant p4est_* and p8est_* types. Using this structure,
+     * for example by saying <code>types@<dim@>::connectivity</code>
+     * we can write code in a dimension independent way, either
+     * referring to p4est_connectivity_t or p8est_connectivity_t,
+     * depending on template argument.
      */
     template <int> struct types;
 
@@ -116,10 +107,8 @@ namespace internal
 
 
     /**
-     * Initialize the
-     * GeometryInfo<dim>::max_children_per_cell
-     * children of the cell
-     * p4est_cell.
+     * Initialize the GeometryInfo<dim>::max_children_per_cell
+     * children of the cell p4est_cell.
      */
     template <int dim>
     void
@@ -328,26 +317,18 @@ namespace parallel
       typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
 
       /**
-       * Generic settings for distributed
-       * Triangulations. If
-       * mesh_reconstruction_after_repartitioning
-       * is set, the deal.II mesh will be
-       * reconstructed from the coarse mesh
-       * every time a repartioning in p4est
-       * happens. This can be a bit more
-       * expensive, but guarantees the same
-       * memory layout and therefore cell
-       * ordering in the deal.II mesh. As
-       * assembly is done in the deal.II
-       * cell ordering, this flag is
-       * required to get reproducible
-       * behaviour after snapshot/resume.
+       * Generic settings for distributed Triangulations. If
+       * mesh_reconstruction_after_repartitioning is set, the deal.II
+       * mesh will be reconstructed from the coarse mesh every time a
+       * repartioning in p4est happens. This can be a bit more
+       * expensive, but guarantees the same memory layout and
+       * therefore cell ordering in the deal.II mesh. As assembly is
+       * done in the deal.II cell ordering, this flag is required to
+       * get reproducible behaviour after snapshot/resume.
        *
-       * The flag construct_multigrid_hierarchy
-       * needs to be set to use the geometric
-       * multigrid functionality. This option
-       * requires additional computation and
-       * communication. Note: geometric
+       * The flag construct_multigrid_hierarchy needs to be set to use
+       * the geometric multigrid functionality. This option requires
+       * additional computation and communication. Note: geometric
        * multigrid is still a work in progress.
        */
       enum Settings
@@ -362,52 +343,33 @@ namespace parallel
       /**
        * Constructor.
        *
-       * @param mpi_communicator denotes
-       * the MPI communicator to be used for
-       * the triangulation.
+       * @param mpi_communicator denotes the MPI communicator to be
+       * used for the triangulation.
        *
-       * @param smooth_grid Degree
-       * and kind of mesh smoothing
-       * to be applied to the
-       * mesh. See the
-       * dealii::Triangulation
-       * class for a description of
-       * the kinds of smoothing
-       * operations that can be
-       * applied.
+       * @param smooth_grid Degree and kind of mesh smoothing to be
+       * applied to the mesh. See the dealii::Triangulation class for
+       * a description of the kinds of smoothing operations that can
+       * be applied.
        *
-       * @param settings See the
-       * description of the Settings
+       * @param settings See the description of the Settings
        * enumerator.
        *
-       * @note This class does not
-       * currently support the
-       * <code>check_for_distorted_cells</code>
-       * argument provided by the
-       * base class.
+       * @note This class does not currently support the
+       * <code>check_for_distorted_cells</code> argument provided by
+       * the base class.
        *
-       * @note While it is possible to pass
-       * all of the mesh smoothing flags
-       * listed in the base class to
-       * objects of this type, it is not
-       * always possible to honor all of
-       * these smoothing options if they
-       * would require knowledge of
-       * refinement/coarsening flags on
-       * cells not locally owned by this
-       * processor. As a consequence, for
-       * some of these flags, the ultimate
-       * number of cells of the parallel
-       * triangulation may depend on the
-       * number of processors into which it
-       * is partitioned. On the other hand,
-       * if no smoothing flags are passed,
-       * if you always mark the same cells
-       * of the mesh, you will always get
-       * the exact same refined mesh
-       * independent of the number of
-       * processors into which the
-       * triangulation is partitioned.
+       * @note While it is possible to pass all of the mesh smoothing
+       * flags listed in the base class to objects of this type, it is
+       * not always possible to honor all of these smoothing options
+       * if they would require knowledge of refinement/coarsening
+       * flags on cells not locally owned by this processor. As a
+       * consequence, for some of these flags, the ultimate number of
+       * cells of the parallel triangulation may depend on the number
+       * of processors into which it is partitioned. On the other
+       * hand, if no smoothing flags are passed, if you always mark
+       * the same cells of the mesh, you will always get the exact
+       * same refined mesh independent of the number of processors
+       * into which the triangulation is partitioned.
        */
       Triangulation (MPI_Comm mpi_communicator,
                      const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing
@@ -420,134 +382,81 @@ namespace parallel
       virtual ~Triangulation ();
 
       /**
-       * Reset this triangulation into a
-       * virgin state by deleting all data.
+       * Reset this triangulation into a virgin state by deleting all
+       * data.
        *
-       * Note that this operation is only
-       * allowed if no subscriptions to this
-       * object exist any more, such as
-       * DoFHandler objects using it.
+       * Note that this operation is only allowed if no subscriptions
+       * to this object exist any more, such as DoFHandler objects
+       * using it.
        */
       virtual void clear ();
 
       /**
-       * Implementation of the same
-       * function as in the base
-       * class.
+       * Implementation of the same function as in the base class.
        */
       virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria);
 
       /**
-       * Create a triangulation as
-       * documented in the base
-       * class.
+       * Create a triangulation as documented in the base class.
        *
-       * This function also sets up
-       * the various data
-       * structures necessary to
-       * distribute a mesh across a
-       * number of processors. This
-       * will be necessary once the
-       * mesh is being refined,
-       * though we will always keep
-       * the entire coarse mesh
-       * that is generated by this
-       * function on all
-       * processors.
+       * This function also sets up the various data structures
+       * necessary to distribute a mesh across a number of
+       * processors. This will be necessary once the mesh is being
+       * refined, though we will always keep the entire coarse mesh
+       * that is generated by this function on all processors.
        */
       virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
                                          const std::vector<CellData<dim> > &cells,
                                          const SubCellData                 &subcelldata);
 
       /**
-       * Coarsen and refine the
-       * mesh according to
-       * refinement and coarsening
-       * flags set.
+       * Coarsen and refine the mesh according to refinement and
+       * coarsening flags set.
        *
-       * Since the current
-       * processor only has control
-       * over those cells it owns
-       * (i.e. the ones for which
-       * <code>cell-@>subdomain_id()
-       * ==
-       * this-@>locally_owned_subdomain()</code>),
-       * refinement and coarsening
-       * flags are only respected
-       * for those locally owned
-       * cells. Flags may be set on
-       * other cells as well (and
-       * may often, in fact, if you
-       * call
-       * dealii::Triangulation::prepare_coarsening_and_refinement)
-       * but will be largely
-       * ignored: the decision to
-       * refine the global mesh
-       * will only be affected by
-       * flags set on locally owned
+       * Since the current processor only has control over those cells
+       * it owns (i.e. the ones for which <code>cell-@>subdomain_id() ==
+       * this-@>locally_owned_subdomain()</code>), refinement and
+       * coarsening flags are only respected for those locally owned
+       * cells. Flags may be set on other cells as well (and may
+       * often, in fact, if you call
+       * dealii::Triangulation::prepare_coarsening_and_refinement) but
+       * will be largely ignored: the decision to refine the global
+       * mesh will only be affected by flags set on locally owned
        * cells.
        */
       virtual void execute_coarsening_and_refinement ();
 
       /**
-       * Return the subdomain id of
-       * those cells that are owned
-       * by the current
-       * processor. All cells in
-       * the triangulation that do
-       * not have this subdomain id
-       * are either owned by
-       * another processor or have
-       * children that only exist
-       * on other processors.
+       * Return the subdomain id of those cells that are owned by the
+       * current processor. All cells in the triangulation that do not
+       * have this subdomain id are either owned by another processor
+       * or have children that only exist on other processors.
        */
       types::subdomain_id locally_owned_subdomain () const;
 
       /**
-       * Return the number of
-       * active cells in the
-       * triangulation that are
-       * locally owned, i.e. that
-       * have a subdomain_id equal
-       * to
-       * locally_owned_subdomain(). Note
-       * that there may be more
-       * active cells in the
-       * triangulation stored on
-       * the present processor,
-       * such as for example ghost
-       * cells, or cells further
-       * away from the locally
-       * owned block of cells but
-       * that are needed to ensure
-       * that the triangulation
-       * that stores this
-       * processor's set of active
-       * cells still remains
-       * balanced with respect to
-       * the 2:1 size ratio of
-       * adjacent cells.
+       * Return the number of active cells in the triangulation that
+       * are locally owned, i.e. that have a subdomain_id equal to
+       * locally_owned_subdomain(). Note that there may be more active
+       * cells in the triangulation stored on the present processor,
+       * such as for example ghost cells, or cells further away from
+       * the locally owned block of cells but that are needed to
+       * ensure that the triangulation that stores this processor's
+       * set of active cells still remains balanced with respect to
+       * the 2:1 size ratio of adjacent cells.
        *
-       * As a consequence of the remark
-       * above, the result of this function
-       * is always smaller or equal to the
-       * result of the function with the
-       * same name in the ::Triangulation
-       * base class, which includes the
-       * active ghost and artificial cells
-       * (see also @ref GlossArtificialCell
-       * and @ref GlossGhostCell).
+       * As a consequence of the remark above, the result of this
+       * function is always smaller or equal to the result of the
+       * function with the same name in the ::Triangulation base
+       * class, which includes the active ghost and artificial cells
+       * (see also @ref GlossArtificialCell and @ref GlossGhostCell).
        */
       unsigned int n_locally_owned_active_cells () const;
 
       /**
-       * Return the sum over all
-       * processors of the number
-       * of active cells owned by
-       * each processor. This
-       * equals the overall number
-       * of active cells in the
-       * distributed triangulation.
+       * Return the sum over all processors of the number of active
+       * cells owned by each processor. This equals the overall number
+       * of active cells in the distributed triangulation.
        */
       types::global_dof_index n_global_active_cells () const;
 
@@ -557,61 +466,46 @@ namespace parallel
       virtual unsigned int n_global_levels () const;
 
       /**
-       * Return the number of
-       * active cells owned by each
-       * of the MPI processes that
-       * contribute to this
-       * triangulation. The element
-       * of this vector indexed by
-       * locally_owned_subdomain()
-       * equals the result of
-       * n_locally_owned_active_cells().
+       * Return the number of active cells owned by each of the MPI
+       * processes that contribute to this triangulation. The element
+       * of this vector indexed by locally_owned_subdomain() equals
+       * the result of n_locally_owned_active_cells().
        */
       const std::vector<unsigned int> &
       n_locally_owned_active_cells_per_processor () const;
 
       /**
-       * Return the MPI
-       * communicator used by this
-       * triangulation.
+       * Return the MPI communicator used by this triangulation.
        */
       MPI_Comm get_communicator () const;
 
       /**
-       * Return the local memory
-       * consumption in bytes.
+       * Return the local memory consumption in bytes.
        */
       virtual std::size_t memory_consumption () const;
 
       /**
-       * Return the local memory
-       * consumption contained in the p4est
-       * data structures alone. This is
-       * already contained in
-       * memory_consumption() but made
-       * available separately for debugging
-       * purposes.
+       * Return the local memory consumption contained in the p4est
+       * data structures alone. This is already contained in
+       * memory_consumption() but made available separately for
+       * debugging purposes.
        */
       virtual std::size_t memory_consumption_p4est () const;
 
       /**
-       * A collective operation that produces
-       * a sequence of output files with the
-       * given file base name that contain
-       * the mesh in VTK format.
+       * A collective operation that produces a sequence of output
+       * files with the given file base name that contain the mesh in
+       * VTK format.
        *
-       * More than anything else, this
-       * function is useful for debugging the
-       * interface between deal.II and p4est.
+       * More than anything else, this function is useful for
+       * debugging the interface between deal.II and p4est.
        */
       void write_mesh_vtk (const char *file_basename) const;
 
       /**
-       * Produce a check sum of the
-       * triangulation.  This is a
-       * collective operation and
-       * is mostly useful for
-       * debugging purposes.
+       * Produce a check sum of the triangulation.  This is a
+       * collective operation and is mostly useful for debugging
+       * purposes.
        */
       unsigned int get_checksum () const;
 
@@ -634,15 +528,11 @@ namespace parallel
       void load(const char *filename);
 
       /**
-       * Used to inform in the callbacks of
-       * register_data_attach() and
-       * notify_ready_to_unpack() how the
-       * cell with the given cell_iterator
-       * is going to change.  Note that
-       * this may me different than the
-       * refine_flag() and coarsen_flag()
-       * in the cell_iterator because of
-       * refinement constraints that this
+       * Used to inform in the callbacks of register_data_attach() and
+       * notify_ready_to_unpack() how the cell with the given
+       * cell_iterator is going to change.  Note that this may me
+       * different than the refine_flag() and coarsen_flag() in the
+       * cell_iterator because of refinement constraints that this
        * machine does not see.
        */
       enum CellStatus
@@ -651,32 +541,19 @@ namespace parallel
       };
 
       /**
-       * Register a function with
-       * the current Triangulation
-       * object that will be used
-       * to attach data to active
-       * cells before
+       * Register a function with the current Triangulation object
+       * that will be used to attach data to active cells before
        * execute_coarsening_and_refinement(). In
-       * execute_coarsening_and_refinement()
-       * the Triangulation will
-       * call the given function
-       * pointer and provide
-       * @p size bytes to store
-       * data. If necessary, this data will be
-       * transferred to the new
-       * owner of that cell during repartitioning
-       * the tree. See
-       * notify_ready_to_unpack()
-       * on how to retrieve the
+       * execute_coarsening_and_refinement() the Triangulation will
+       * call the given function pointer and provide @p size bytes to
+       * store data. If necessary, this data will be transferred to
+       * the new owner of that cell during repartitioning the
+       * tree. See notify_ready_to_unpack() on how to retrieve the
        * data.
        *
-       * Callers need to store the
-       * return value.  It
-       * specifies an offset of the
-       * position at which data can
-       * later be retrieved during
-       * a call to
-       * notify_ready_to_unpack().
+       * Callers need to store the return value.  It specifies an
+       * offset of the position at which data can later be retrieved
+       * during a call to notify_ready_to_unpack().
        */
       unsigned int
       register_data_attach (const std::size_t size,
@@ -685,9 +562,8 @@ namespace parallel
                                                             void *)> &pack_callback);
 
       /**
-       * The given function is called for
-       * each new active cell and supplies
-       * a pointer to the data saved with
+       * The given function is called for each new active cell and
+       * supplies a pointer to the data saved with
        * register_data_attach().
        */
       void
@@ -697,11 +573,10 @@ namespace parallel
                                                               const void *)> &unpack_callback);
 
       /**
-       * Returns a permutation vector for the order the coarse
-       * cells are handed of to p4est. For example the first
-       * element i in this vector denotes that the first cell
-       * in hierarchical ordering is the ith deal cell starting
-       * from begin(0).
+       * Returns a permutation vector for the order the coarse cells
+       * are handed of to p4est. For example the first element i in
+       * this vector denotes that the first cell in hierarchical
+       * ordering is the ith deal cell starting from begin(0).
        */
       const std::vector<types::global_dof_index> &
       get_p4est_tree_to_coarse_cell_permutation() const;
@@ -709,9 +584,10 @@ namespace parallel
 
 
       /**
-       * Join faces in the p4est forest for periodic boundary conditions. As a
-       * result, each pair of faces will differ by at most one refinement level
-       * and ghost neighbors will be available across these faces.
+       * Join faces in the p4est forest for periodic boundary
+       * conditions. As a result, each pair of faces will differ by at
+       * most one refinement level and ghost neighbors will be
+       * available across these faces.
        *
        * The vector can be filled by the function
        * GridTools::collect_periodic_faces.
@@ -732,13 +608,9 @@ namespace parallel
 
     private:
       /**
-       * MPI communicator to be
-       * used for the
-       * triangulation. We create a
-       * unique communicator for
-       * this class, which is a
-       * duplicate of the one
-       * passed to the constructor.
+       * MPI communicator to be used for the triangulation. We create
+       * a unique communicator for this class, which is a duplicate of
+       * the one passed to the constructor.
        */
       MPI_Comm mpi_communicator;
 
@@ -748,22 +620,19 @@ namespace parallel
       Settings settings;
 
       /**
-       * The subdomain id to be
-       * used for the current
-       * processor.
+       * The subdomain id to be used for the current processor.
        */
       types::subdomain_id my_subdomain;
 
       /**
-       * A flag that indicates whether the
-       * triangulation has actual content.
+       * A flag that indicates whether the triangulation has actual
+       * content.
        */
       bool triangulation_has_content;
 
       /**
-       * A structure that contains
-       * some numbers about the
-       * distributed triangulation.
+       * A structure that contains some numbers about the distributed
+       * triangulation.
        */
       struct NumberCache
       {
@@ -777,67 +646,54 @@ namespace parallel
       NumberCache number_cache;
 
       /**
-       * A data structure that holds the
-       * connectivity between trees. Since
-       * each tree is rooted in a coarse grid
-       * cell, this data structure holds the
-       * connectivity between the cells of
+       * A data structure that holds the connectivity between
+       * trees. Since each tree is rooted in a coarse grid cell, this
+       * data structure holds the connectivity between the cells of
        * the coarse grid.
        */
       typename dealii::internal::p4est::types<dim>::connectivity *connectivity;
 
       /**
-       * A data structure that holds the
-       * local part of the global
+       * A data structure that holds the local part of the global
        * triangulation.
        */
       typename dealii::internal::p4est::types<dim>::forest *parallel_forest;
       /**
-       * A data structure that holds some
-       * information about the ghost cells of the triangulation.
+       * A data structure that holds some information about the ghost
+       * cells of the triangulation.
        */
       typename dealii::internal::p4est::types<dim>::ghost  *parallel_ghost;
 
       /**
-       * A flag that indicates
-       * whether refinement of a
-       * triangulation is currently
-       * in progress. This flag is
-       * used to disambiguate whether
-       * a call to execute_coarsening_and_triangulation
-       * came from the outside or
-       * through a recursive call. While the
-       * first time we want to take
-       * over work to copy things
-       * from a refined p4est, the
-       * other times we don't want to
-       * get in the way as these
-       * latter calls to
-       * Triangulation::execute_coarsening_and_refinement()
-       * are simply there in order to
-       * re-create a triangulation
-       * that matches the p4est.
+       * A flag that indicates whether refinement of a triangulation
+       * is currently in progress. This flag is used to disambiguate
+       * whether a call to execute_coarsening_and_triangulation came
+       * from the outside or through a recursive call. While the first
+       * time we want to take over work to copy things from a refined
+       * p4est, the other times we don't want to get in the way as
+       * these latter calls to
+       * Triangulation::execute_coarsening_and_refinement() are simply
+       * there in order to re-create a triangulation that matches the
+       * p4est.
        */
       bool refinement_in_progress;
 
 
       /**
        * number of bytes that get attached to the Triangulation
-       * through register_data_attach() for example
-       * SolutionTransfer.
+       * through register_data_attach() for example SolutionTransfer.
        */
       unsigned int attached_data_size;
 
       /**
        * number of functions that get attached to the Triangulation
-       * through register_data_attach() for example
-       * SolutionTransfer.
+       * through register_data_attach() for example SolutionTransfer.
        */
       unsigned int n_attached_datas;
 
       /**
-       * number of functions that need to unpack their data
-       * after a call from load()
+       * number of functions that need to unpack their data after a
+       * call from load()
        */
       unsigned int n_attached_deserialize;
 
@@ -851,81 +707,66 @@ namespace parallel
 
       /**
        * List of callback functions registered by
-       * register_data_attach() that are going to be called
-       * for packing data.
+       * register_data_attach() that are going to be called for
+       * packing data.
        */
       callback_list_t attached_data_pack_callbacks;
 
 
       /**
-       * Two arrays that store which p4est
-       * tree corresponds to which coarse
-       * grid cell and vice versa. We need
-       * these arrays because p4est goes with
-       * the original order of coarse cells
-       * when it sets up its forest, and then
-       * applies the Morton ordering within
-       * each tree. But if coarse grid cells
-       * are badly ordered this may mean that
-       * individual parts of the forest
-       * stored on a local machine may be
-       * split across coarse grid cells that
-       * are not geometrically
-       * close. Consequently, we apply a
-       * Cuthill-McKee preordering to ensure
-       * that the part of the forest stored
-       * by p4est is located on geometrically
-       * close coarse grid cells.
+       * Two arrays that store which p4est tree corresponds to which
+       * coarse grid cell and vice versa. We need these arrays because
+       * p4est goes with the original order of coarse cells when it
+       * sets up its forest, and then applies the Morton ordering
+       * within each tree. But if coarse grid cells are badly ordered
+       * this may mean that individual parts of the forest stored on a
+       * local machine may be split across coarse grid cells that are
+       * not geometrically close. Consequently, we apply a
+       * Cuthill-McKee preordering to ensure that the part of the
+       * forest stored by p4est is located on geometrically close
+       * coarse grid cells.
        */
       std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
       std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
 
       /**
-       * Return a pointer to the p4est
-       * tree that belongs to the given
+       * Return a pointer to the p4est tree that belongs to the given
        * dealii_coarse_cell_index()
        */
       typename dealii::internal::p4est::types<dim>::tree *
       init_tree(const int dealii_coarse_cell_index) const;
 
       /**
-       * The function that computes the
-       * permutation between the two data
-       * storage schemes.
+       * The function that computes the permutation between the two
+       * data storage schemes.
        */
       void setup_coarse_cell_to_p4est_tree_permutation ();
 
       /**
-       * Take the contents of a newly created
-       * triangulation we are attached to and
-       * copy it to p4est data structures.
+       * Take the contents of a newly created triangulation we are
+       * attached to and copy it to p4est data structures.
        *
-       * This function exists in 2d
-       * and 3d variants.
+       * This function exists in 2d and 3d variants.
        */
       void copy_new_triangulation_to_p4est (dealii::internal::int2type<2>);
       void copy_new_triangulation_to_p4est (dealii::internal::int2type<3>);
 
       /**
-       * Copy the local part of the refined
-       * forest from p4est into the attached
-       * triangulation.
+       * Copy the local part of the refined forest from p4est into the
+       * attached triangulation.
        */
       void copy_local_forest_to_triangulation ();
 
 
       /**
-       * Update the number_cache
-       * variable after mesh
-       * creation or refinement.
+       * Update the number_cache variable after mesh creation or
+       * refinement.
        */
       void update_number_cache ();
 
       /**
-       * Internal function notifying all
-       * registered classes to attach their
-       * data before repartitioning
-       * occurs. Called from
+       * Internal function notifying all registered classes to attach
+       * their data before repartitioning occurs. Called from
        * execute_coarsening_and_refinement().
        */
       void attach_mesh_data();
@@ -945,20 +786,18 @@ namespace parallel
 
 
     /**
-     * Specialization of the general template
-     * for the 1d case. There is currently no
-     * support for distributing 1d
-     * triangulations. Consequently, all this
-     * class does is throw an exception.
+     * Specialization of the general template for the 1d case. There
+     * is currently no support for distributing 1d
+     * triangulations. Consequently, all this class does is throw an
+     * exception.
      */
     template <int spacedim>
     class Triangulation<1,spacedim> : public dealii::Triangulation<1,spacedim>
     {
     public:
       /**
-       * Constructor. The argument denotes
-       * the MPI communicator to be used for
-       * the triangulation.
+       * Constructor. The argument denotes the MPI communicator to be
+       * used for the triangulation.
        */
       Triangulation (MPI_Comm mpi_communicator);
 
@@ -968,54 +807,38 @@ namespace parallel
       virtual ~Triangulation ();
 
       /**
-       * Return the MPI
-       * communicator used by this
-       * triangulation.
+       * Return the MPI communicator used by this triangulation.
        */
       MPI_Comm get_communicator () const;
 
       /**
-       * Return the sum over all
-       * processors of the number
-       * of active cells owned by
-       * each processor. This
-       * equals the overall number
-       * of active cells in the
-       * distributed triangulation.
+       * Return the sum over all processors of the number of active
+       * cells owned by each processor. This equals the overall number
+       * of active cells in the distributed triangulation.
        */
       types::global_dof_index n_global_active_cells () const;
       virtual unsigned int n_global_levels () const;
 
       /**
-       * Returns a permutation vector for the order the coarse
-       * cells are handed of to p4est. For example the first
-       * element i in this vector denotes that the first cell
-       * in hierarchical ordering is the ith deal cell starting
-       * from begin(0).
+       * Returns a permutation vector for the order the coarse cells
+       * are handed of to p4est. For example the first element i in
+       * this vector denotes that the first cell in hierarchical
+       * ordering is the ith deal cell starting from begin(0).
        */
       const std::vector<types::global_dof_index> &
       get_p4est_tree_to_coarse_cell_permutation() const;
 
       /**
-       * Return the subdomain id of
-       * those cells that are owned
-       * by the current
-       * processor. All cells in
-       * the triangulation that do
-       * not have this subdomain id
-       * are either owned by
-       * another processor or have
-       * children that only exist
-       * on other processors.
+       * Return the subdomain id of those cells that are owned by the
+       * current processor. All cells in the triangulation that do not
+       * have this subdomain id are either owned by another processor
+       * or have children that only exist on other processors.
        */
       types::subdomain_id locally_owned_subdomain () const;
 
       /**
-       * Dummy arrays. This class
-       * isn't usable but the
-       * compiler wants to see
-       * these variables at a
-       * couple places anyway.
+       * Dummy arrays. This class isn't usable but the compiler wants
+       * to see these variables at a couple places anyway.
        */
       std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
       std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
@@ -1058,19 +881,14 @@ namespace parallel
   namespace distributed
   {
     /**
-     * Dummy class the compiler chooses for
-     * parallel distributed triangulations if
-     * we didn't actually configure deal.II
-     * with the p4est library. The existence
-     * of this class allows us to refer to
-     * parallel::distributed::Triangulation
-     * objects throughout the library even if
-     * it is disabled.
+     * Dummy class the compiler chooses for parallel distributed
+     * triangulations if we didn't actually configure deal.II with the
+     * p4est library. The existence of this class allows us to refer
+     * to parallel::distributed::Triangulation objects throughout the
+     * library even if it is disabled.
      *
-     * Since the constructor of this class is
-     * private, no such objects can actually
-     * be created if we don't have p4est
-     * available.
+     * Since the constructor of this class is private, no such objects
+     * can actually be created if we don't have p4est available.
      */
     template <int dim, int spacedim = dim>
     class Triangulation : public dealii::Triangulation<dim,spacedim>
@@ -1089,23 +907,15 @@ namespace parallel
       virtual ~Triangulation ();
 
       /**
-       * Return the subdomain id of
-       * those cells that are owned
-       * by the current
-       * processor. All cells in
-       * the triangulation that do
-       * not have this subdomain id
-       * are either owned by
-       * another processor or have
-       * children that only exist
-       * on other processors.
+       * Return the subdomain id of those cells that are owned by the
+       * current processor. All cells in the triangulation that do not
+       * have this subdomain id are either owned by another processor
+       * or have children that only exist on other processors.
        */
       types::subdomain_id locally_owned_subdomain () const;
 
       /**
-       * Return the MPI
-       * communicator used by this
-       * triangulation.
+       * Return the MPI communicator used by this triangulation.
        */
 #ifdef DEAL_II_WITH_MPI
       MPI_Comm get_communicator () const;
