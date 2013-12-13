@@ -45,11 +45,11 @@ template <typename> class Vector;
  * 'x' and 'y'. Some of the information contained here is copied verbatim
  * from the fparser.txt file that comes with the fparser library. Please refer
  * also to that file both for clarifications on how this wrapper works, as
- * well as for any issue regarding the licence that applies to this class.
+ * well as for any issue regarding the license that applies to this class.
  * This class is used in the step-33 and step-36
  * tutorial programs (the latter being much simpler to understand).
  *
- * By using this class you indicate that you accept the terms of the licence
+ * By using this class you indicate that you accept the terms of the license
  * that comes with the fparser library. If you do not agree with them, you
  * should not use this class or configure the deal.II library without the
  * function parser (see the ReadMe file of deal.II on instructions for this).
@@ -145,7 +145,7 @@ template <typename> class Vector;
  @verbatim
 
  The library is intended to be very fast. It byte-compiles the
- function string at parse time and interpretes this byte-code at
+ function string at parse time and interprets this byte-code at
  evaluation time.  The evaluation is straightforward and no recursions
  are done (uses stack arithmetic).  Empirical tests show that it indeed
  is very fast (specially compared to libraries which evaluate functions
@@ -454,7 +454,7 @@ public:
    * above, but accepts a string rather
    * than a vector of strings. If this is a
    * vector valued function, its
-   * componenents are expected to be
+   * components are expected to be
    * separated by a semicolon. An exception
    * is thrown if this method is called and
    * the number of components successfully
@@ -556,7 +556,7 @@ private:
    * Number of variables. If this
    * is also a function of time,
    * then the number of variables
-   * is dim+1, otherwhise it is
+   * is dim+1, otherwise it is
    * dim. In the case that this is
    * a time dependent function, the
    * time is supposed to be the
