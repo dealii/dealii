@@ -182,7 +182,7 @@ public:
    * Constructor. The supplied IndexSet defines which indices might be
    * constrained inside this ConstraintMatrix. In a calculation with a
    * parallel::distributed::DoFHandler one should use
-   * locally_relevant_dofs. The IndexSet allows the ConstraintMatrix to safe
+   * locally_relevant_dofs. The IndexSet allows the ConstraintMatrix to save
    * memory. Otherwise internal data structures for all possible indices will
    * be created.
    */
@@ -194,7 +194,7 @@ public:
   ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
 
   /**
-   * Reinit the ConstraintMatrix object and supply an IndexSet with lines that
+   * clear() the ConstraintMatrix object and supply an IndexSet with lines that
    * may be constrained. This function is only relevant in the distributed
    * case to supply a different IndexSet. Otherwise this routine is equivalent
    * to calling clear(). See the constructor for details.
