@@ -1296,7 +1296,7 @@ namespace TrilinosWrappers
     else if (vector->Map().NumMyElements() > 0)
       {
         const size_type n_indices = vector->Map().NumMyElements();
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
         unsigned int *vector_indices = (unsigned int *)vector->Map().MyGlobalElements();
 #else
         size_type *vector_indices = (size_type *)vector->Map().MyGlobalElements64();
@@ -1661,7 +1661,7 @@ namespace TrilinosWrappers
   VectorBase::size_type
   VectorBase::size () const
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     return (size_type) (vector->Map().MaxAllGID() + 1 - vector->Map().MinAllGID());
 #else
     return (size_type) (vector->Map().MaxAllGID64() + 1 - vector->Map().MinAllGID64());
@@ -1683,7 +1683,7 @@ namespace TrilinosWrappers
   std::pair<VectorBase::size_type, VectorBase::size_type>
   VectorBase::local_range () const
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     const TrilinosWrappers::types::int_type begin = vector->Map().MinMyGID();
     const TrilinosWrappers::types::int_type end = vector->Map().MaxMyGID()+1;
 #else

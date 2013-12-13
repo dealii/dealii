@@ -29,7 +29,7 @@ namespace TrilinosWrappers
 {
   namespace
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     // define a helper function that queries the global vector length of an
     // Epetra_FEVector object  by calling either the 32- or 64-bit
     // function necessary.

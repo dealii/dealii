@@ -461,7 +461,7 @@ namespace FETools
 #endif
 
       // special version for Trilinos
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
       template <int dim, int spacedim>
       void back_interpolate (const DoFHandler<dim,spacedim> &dof1,
                              const ConstraintMatrix &constraints1,
@@ -644,7 +644,7 @@ namespace FETools
       }
 
       // special version for Trilinos
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
       template <int dim, int spacedim>
       void interpolation_difference (const DoFHandler<dim,spacedim> &dof1,
                                      const ConstraintMatrix &constraints1,

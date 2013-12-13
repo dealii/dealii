@@ -36,7 +36,7 @@ namespace TrilinosWrappers
 {
   namespace
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     // define a helper function that queries the size of an Epetra_Map object
     // by calling either the 32- or 64-bit function necessary, and returns the
     // result in the correct data type so that we can use it in calling other
@@ -1040,7 +1040,7 @@ namespace TrilinosWrappers
                         const VectorBase   &V,
                         const bool          transpose_left)
     {
-#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifdef DEAL_II_WITH_64BIT_INDICES
       Assert(false,ExcNotImplemented())
 #endif
       const bool use_vector = (V.size() == inputright.m() ? true : false);
@@ -1132,7 +1132,7 @@ namespace TrilinosWrappers
               inputleft.trilinos_sparsity_pattern().ExtractMyRowView(i, num_entries,
                                                                      indices);
               Assert (num_entries >= 0, ExcInternalError());
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
               const size_type GID = inputleft.row_partitioner().GID(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
                 sparsity_transposed.add (inputleft.col_partitioner().GID(indices[j]),
@@ -1154,7 +1154,7 @@ namespace TrilinosWrappers
               inputleft.trilinos_matrix().ExtractMyRowView(i, num_entries,
                                                            values, indices);
               Assert (num_entries >= 0, ExcInternalError());
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
               const size_type GID = inputleft.row_partitioner().GID(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
                 transposed_mat.set (inputleft.col_partitioner().GID(indices[j]),
@@ -1257,7 +1257,7 @@ namespace TrilinosWrappers
                        const SparseMatrix &B,
                        const VectorBase   &V) const
   {
-#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifdef DEAL_II_WITH_64BIT_INDICES
     Assert(false,ExcNotImplemented())
 #endif
     internals::perform_mmult (*this, B, C, V, false);
@@ -1270,7 +1270,7 @@ namespace TrilinosWrappers
                         const SparseMatrix &B,
                         const VectorBase   &V) const
   {
-#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifdef DEAL_II_WITH_64BIT_INDICES
     Assert(false,ExcNotImplemented())
 #endif
     internals::perform_mmult (*this, B, C, V, true);

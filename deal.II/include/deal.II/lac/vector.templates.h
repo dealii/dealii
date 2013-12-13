@@ -1393,7 +1393,7 @@ void Vector<Number>::block_write (std::ostream &out) const
   const size_type sz = size();
   char buf[16];
 
-#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifdef DEAL_II_WITH_64BIT_INDICES
   std::sprintf(buf, "%llu", sz);
 #else
   std::sprintf(buf, "%u", sz);

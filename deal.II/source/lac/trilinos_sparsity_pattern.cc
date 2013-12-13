@@ -34,7 +34,7 @@ namespace TrilinosWrappers
     // by calling either the 32- or 64-bit function necessary, and returns the
     // result in the correct data type so that we can use it in calling other
     // Epetra member functions that are overloaded by index type
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     int n_global_elements (const Epetra_BlockMap &map)
     {
       return map.NumGlobalElements();

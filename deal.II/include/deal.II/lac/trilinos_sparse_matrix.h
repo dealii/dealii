@@ -2942,7 +2942,7 @@ namespace TrilinosWrappers
   SparseMatrix::in_local_range (const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     begin = matrix->RowMap().MinMyGID();
     end = matrix->RowMap().MaxMyGID()+1;
 #else
@@ -3465,7 +3465,7 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::m () const
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     return matrix->NumGlobalRows();
 #else
     return matrix->NumGlobalRows64();
@@ -3478,7 +3478,7 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::n () const
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     return matrix->NumGlobalCols();
 #else
     return matrix->NumGlobalCols64();
@@ -3501,7 +3501,7 @@ namespace TrilinosWrappers
   SparseMatrix::local_range () const
   {
     size_type begin, end;
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     begin = matrix->RowMap().MinMyGID();
     end = matrix->RowMap().MaxMyGID()+1;
 #else
@@ -3518,7 +3518,7 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::n_nonzero_elements () const
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     return matrix->NumGlobalNonzeros();
 #else
     return matrix->NumGlobalNonzeros64();

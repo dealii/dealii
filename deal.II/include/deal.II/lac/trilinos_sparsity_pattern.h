@@ -1626,7 +1626,7 @@ namespace TrilinosWrappers
   SparsityPattern::in_local_range (const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     begin = graph->RowMap().MinMyGID();
     end = graph->RowMap().MaxMyGID()+1;
 #else
