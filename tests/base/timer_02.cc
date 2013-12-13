@@ -36,8 +36,10 @@ int main ()
   deallog.threshold_double(1.e-1);
 
   {
-
-    TimerOutput t(logfile, TimerOutput::summary, TimerOutput::cpu_times);
+    
+    // use std::cout so that no output is saved to the logfile, because it
+    // is difficult to test (timing)
+    TimerOutput t(std::cout, TimerOutput::summary, TimerOutput::cpu_times);
 
     t.enter_subsection("hi");
     t.leave_subsection("hi");
