@@ -59,6 +59,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: It is now possible to select between different smoothers and coarse
+  solvers in the Trilinos AMG preconditioners by a string to the smoother's name.
+  <br>
+  (Andrew Baker, 2013/12/14)
+  </li>
+
 </ol>
 
 
