@@ -633,10 +633,17 @@ namespace Step39
     MeshWorker::integration_loop<dim, dim> (
       begin, end,
       dof_info, info_box,
-      integrator, assembler);
+      integrator, assembler); // TODO: do this on all faces touching ghost cells
 
     triangulation.load_user_indices(old_user_indices);
-    return estimates.block(0).l2_norm();
+    // estimates is a BlockVector<double> (so serial) on each processor
+    // with one entry per active cell. Note that only the locally owned
+    // cells are !=0, so summing the contributions of l2_norm() over all
+    // processors is the right way to do this.
+    double local_norm = estimates.block(0).l2_norm();
+    local_norm *= local_norm;
+    estimates.block(0).print(deallog);
+    return std::sqrt(Utilities::MPI::sum(local_norm, MPI_COMM_WORLD));
   }
 
 
@@ -756,8 +763,8 @@ namespace Step39
 int main(int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-  mpi_initlog(true);
-
+  MPILogInitAll log;
+  
   using namespace dealii;
   using namespace Step39;
 
