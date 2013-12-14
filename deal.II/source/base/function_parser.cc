@@ -19,7 +19,12 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 
-#ifdef DEAL_II_WITH_FUNCTIONPARSER
+
+#ifdef DEAL_II_WITH_MUPARSER
+#include <deal.II/base/std_cxx1x/bind.h>
+#include <muParser.h>
+
+#elif defined(DEAL_II_WITH_FUNCTIONPARSER)
 #include <fparser.hh>
 namespace fparser
 {
@@ -47,7 +52,12 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
   Function<dim>(n_components, initial_time),
   fp (0)
 {
+
+#ifdef DEAL_II_WITH_MUPARSER
+  fp = new mu::Parser[n_components];
+#else
   fp = new fparser::FunctionParser[n_components];
+#endif
 }
 
 
@@ -75,6 +85,11 @@ void FunctionParser<dim>::initialize (const std::string                   &varia
               use_degrees);
 }
 
+double constant_eval(double x, double c)
+{
+  return x*c;
+}
+
 
 
 template <int dim>
@@ -94,7 +109,10 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
               ExcInvalidExpressionSize(this->n_components,
                                        expressions.size()) );
 
-
+#ifdef DEAL_II_WITH_MUPARSER
+  var_names = Utilities::split_string_list(variables, ',');
+  AssertThrow(((time_dependent)?dim+1:dim) == var_names.size(), ExcMessage("wrong number of variables"));
+#endif
 
   for (unsigned int i=0; i<this->n_components; ++i)
     {
@@ -104,13 +122,22 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
       std::map< std::string, double >::const_iterator
       unit = units.begin(),
       endu = units.end();
+
       for (; unit != endu; ++unit)
         {
+#ifdef DEAL_II_WITH_MUPARSER
+	  // TODO: 
+	  //	  fp[i].DefinePostfixOprt(unit->first.c_str(),
+//				  std_cxx1x::bind(&constant_eval, std_cxx1x:_1, unit->second));
+	  
+	  AssertThrow(false, ExcNotImplemented());
+	  
+#else	  
           const bool success = fp[i].AddUnit(unit->first, unit->second);
           AssertThrow (success,
                        ExcMessage("Invalid Unit Name [error adding a unit]"));
+#endif	  
         }
-
 
 
       // Add the various constants to
@@ -118,17 +145,29 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
       std::map< std::string, double >::const_iterator
       constant = constants.begin(),
       endc  = constants.end();
+
+
       for (; constant != endc; ++constant)
         {
+#ifdef DEAL_II_WITH_MUPARSER
+	  fp[i].DefineConst(constant->first.c_str(), constant->second);
+#else
           const bool success = fp[i].AddConstant(constant->first, constant->second);
           AssertThrow (success, ExcMessage("Invalid Constant Name"));
+#endif
         }
 
+#ifdef DEAL_II_WITH_MUPARSER
+      AssertThrow(!use_degrees, ExcNotImplemented());
+
+      fp[i].SetExpr(expressions[i]);
+#else
       const int ret_value = fp[i].Parse(expressions[i],
                                         variables,
                                         use_degrees);
       AssertThrow (ret_value == -1,
                    ExcParseError(ret_value, fp[i].ErrorMsg()));
+#endif
 
       // The fact that the parser did
       // not throw an error does not
@@ -232,11 +271,19 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
   if (dim != n_vars)
     vars[dim] = this->get_time();
 
+#ifdef DEAL_II_WITH_MUPARSER  
+  for (unsigned int iv=0;iv<var_names.size();++iv)
+    fp[component].DefineVar(var_names[iv].c_str(), &vars[iv]);
+  
+  return fp[component].Eval();
+#else  
+
   double my_value = fp[component].Eval((double *)vars);
 
   AssertThrow (fp[component].EvalError() == 0,
                ExcMessage(fp[component].ErrorMsg()));
   return my_value;
+#endif  
 }
 
 
@@ -265,6 +312,20 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
   if (dim != n_vars)
     vars[dim] = this->get_time();
 
+#ifdef DEAL_II_WITH_MUPARSER
+  
+  for (unsigned int component = 0; component < this->n_components;
+       ++component)
+    {
+      for (unsigned int iv=0;iv<var_names.size();++iv)
+      {
+	fp[component].DefineVar(var_names[iv].c_str(), &vars[iv]);
+      }
+      values(component) = fp[component].Eval();
+    }
+  
+#else
+
   for (unsigned int component = 0; component < this->n_components;
        ++component)
     {
@@ -272,6 +333,7 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
       AssertThrow(fp[component].EvalError() == 0,
                   ExcMessage(fp[component].ErrorMsg()));
     }
+#endif  
 }
 
 #else

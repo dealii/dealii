@@ -26,10 +26,17 @@
 #include <vector>
 #include <map>
 
+#ifdef DEAL_II_WITH_MUPARSER
+namespace mu
+{
+  class Parser;
+}
+#else
 namespace fparser
 {
   class FunctionParser;
 }
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -541,8 +548,12 @@ private:
    * the array equals the number of
    * vector components.
    */
+#ifdef DEAL_II_WITH_MUPARSER
+    std::vector<std::string> var_names;
+    mu::Parser *fp;
+#else
   fparser::FunctionParser *fp;
-
+#endif
   /**
    * State of usability. This
    * variable is checked every time
