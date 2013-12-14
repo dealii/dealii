@@ -642,7 +642,6 @@ namespace Step39
     // processors is the right way to do this.
     double local_norm = estimates.block(0).l2_norm();
     local_norm *= local_norm;
-    estimates.block(0).print(deallog);
     return std::sqrt(Utilities::MPI::sum(local_norm, MPI_COMM_WORLD));
   }
 
