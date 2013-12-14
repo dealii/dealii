@@ -32,7 +32,7 @@ INCLUDE(FindPackageHandleStandardArgs)
 SET_IF_EMPTY(MUPARSER_DIR "$ENV{MUPARSER_DIR}")
 
 FIND_LIBRARY(MUPARSER_LIBRARY
-  NAMES muparser
+  NAMES muparser muparserd
   HINTS ${MUPARSER_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
