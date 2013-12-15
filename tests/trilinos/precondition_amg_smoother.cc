@@ -214,7 +214,6 @@ void Step4<dim>::solve ()
   TrilinosWrappers::PreconditionAMG::AdditionalData data;
   data.coarse_type = "Amesos-KLU";
   data.smoother_type = "Chebyshev";
-  data.output_details = true;
   data.aggregation_threshold = 1e-3;
   data.smoother_sweeps = 3;
   {
