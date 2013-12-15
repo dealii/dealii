@@ -156,7 +156,7 @@ OPTION(DEAL_II_SETUP_COVERAGE
   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
   OFF
   )
-MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+MARK_AS_ADVANCED(DEAL_II_SETUP_COVERAGE)
 
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"

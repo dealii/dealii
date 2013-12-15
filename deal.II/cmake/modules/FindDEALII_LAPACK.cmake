@@ -53,6 +53,7 @@ SET(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
 MARK_AS_ADVANCED(
   atlas_LIBRARY
   blas_LIBRARY
+  eigen_blas_LIBRARY
   gslcblas_LIBRARY
   lapack_LIBRARY
   m_LIBRARY
