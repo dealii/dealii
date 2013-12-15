@@ -92,7 +92,7 @@
 #   )
 #
 # SET(DEAL_II_CXX_FLAGS "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated CMAKE_CXX_FLAGS variable"
+#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_CXX_FLAGS variable"
 #   )
 #
 # SET(DEAL_II_CXX_FLAGS_DEBUG "" CACHE STRING
