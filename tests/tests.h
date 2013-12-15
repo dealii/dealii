@@ -85,6 +85,8 @@ void srand(int seed) throw()
 }
 }
 
+
+
 // given the name of a file, copy it to deallog
 // and then delete it
 inline void cat_file(const char *filename)
@@ -104,6 +106,7 @@ inline void cat_file(const char *filename)
 }
 
 
+
 #ifdef DEAL_II_WITH_PETSC
 #include <petscsys.h>
 
@@ -119,17 +122,18 @@ inline void check_petsc_allocations()
   bool errors = false;
   for (int i=0;i<stageLog->stageInfo->classLog->numClasses;++i)
     {
-      if (stageLog->stageInfo->classLog->classInfo[i].destructions
-	  != stageLog->stageInfo->classLog->classInfo[i].creations)
-	{
-	  errors = true;
-	  std::cerr << "ERROR: PETSc objects leaking of type '"
-	       <<  stageLog->classLog->classInfo[i].name << "'"
-	       << " with " << stageLog->stageInfo->classLog->classInfo[i].creations
-	       << " creations and only "
-	       << stageLog->stageInfo->classLog->classInfo[i].destructions
-	       << " destructions." << std::endl;
-	  }
+      if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
+          stageLog->stageInfo->classLog->classInfo[i].creations)
+        {
+          errors = true;
+          std::cerr << "ERROR: PETSc objects leaking of type '"
+                    << stageLog->classLog->classInfo[i].name << "'"
+                    << " with "
+                    << stageLog->stageInfo->classLog->classInfo[i].creations
+                    << " creations and only "
+                    << stageLog->stageInfo->classLog->classInfo[i].destructions
+                    << " destructions." << std::endl;
+        }
     }
 
   if (errors)
@@ -278,9 +282,9 @@ struct MPILogInitAll
 void sort_file_contents (const std::string &filename)
 {
   int error = std::system ((std::string ("LC_ALL=C sort ") + filename + " -o " + filename).c_str());
-  Assert (error == 0,
-	  ExcInternalError());
+  Assert (error == 0, ExcInternalError());
 }
+
 
 
 /*
@@ -292,25 +296,19 @@ void sort_file_contents (const std::string &filename)
  */
 void unify_pretty_function (const std::string &filename)
 {
-
   int error = std::system ((std::string ("sed -i -e 's/ \\&/ \\& /g' -e 's/ & ,/\\&,/g' -e 's/ \\& )/\\&)/g' -e 's/ \\& /\\& /g' -e 's/^DEAL::virtual /DEAL::/g' ") + filename).c_str());
 
-  Assert (error == 0,
-	  ExcInternalError());
-
+  Assert (error == 0, ExcInternalError());
 }
 
 
+DEAL_II_NAMESPACE_OPEN
+/*
+ * Now, change some global behaviour of deal.II and supporting libraries:
+ */
 
+/* Disable stack traces: */
 
-
-#ifndef DEAL_II_STACKTRACE_SWITCH
-#define DEAL_II_STACKTRACE_SWITCH
-
-// A structure and a variable that are used to make sure that we do
-// not show a stacktrace in out testcases, since this would lead to
-// trouble with automatic comparison of output against a fixed
-// baseline
 struct SwitchOffStacktrace
 {
   SwitchOffStacktrace ()
@@ -319,46 +317,74 @@ struct SwitchOffStacktrace
   }
 } deal_II_stacktrace_dummy;
 
-#endif
 
-DEAL_II_NAMESPACE_OPEN
+/* Set grainsizes for parallel mode smaller than they would otherwise be.
+ * This is used to test that the parallel algorithms in lac/ work alright:
+ */
+
 namespace internal
 {
-
   namespace Vector
   {
-
     extern unsigned int minimum_parallel_grain_size;
-
   }
-
   namespace SparseMatrix
   {
-
     extern unsigned int minimum_parallel_grain_size;
-
   }
-
 }
 
-// A structure and a variable that are used to set grainsizes for parallel
-// mode smaller than they would otherwise be. this is used to test that the
-// parallel algorithms in lac/ work alright.
 struct SetGrainSizes
 {
-
   SetGrainSizes ()
   {
-
     internal::Vector::minimum_parallel_grain_size = 2;
-
     internal::SparseMatrix::minimum_parallel_grain_size = 2;
-
   }
+} set_grain_sizes;
 
+
+/* Override the tbb assertion handler in order to print a stacktrace:*/
+
+#ifdef TBB_DO_ASSERT
+
+#include <tbb/tbb_stddef.h>
+
+namespace deal_II_exceptions
+{
+  extern bool abort_on_exception;
+  extern bool show_stacktrace;
 }
-set_grain_sizes;
+
+void new_tbb_assertion_handler(const char *file, int line, const char *expr,
+                               const char *comment)
+{
+  // Print out the original assertion message
+  std::cerr << "TBB assertion:" << std::endl;
+  std::cerr << "Assertion " << expr << " failed on line " << line << " of file "
+            << file << std::endl;
+  std::cerr << "Detailed description: " << comment << std::endl;
+
+  // Reenable abort and stacktraces:
+  deal_II_exceptions::abort_on_exception = true;
+  deal_II_exceptions::show_stacktrace = true;
+
+  // And abort with a deal.II exception:
+  Assert(false, ExcMessage("TBB Exception, see above"));
+}
+
+struct SetTBBAssertionHandler
+{
+  SetTBBAssertionHandler ()
+  {
+    ::tbb::set_assertion_handler(new_tbb_assertion_handler);
+  }
+} set_tbb_assertion_handler;
+
+#endif /*TBB_DO_ASSERT*/
+
 
 DEAL_II_NAMESPACE_CLOSE
+
 
 #endif // __tests_tests_h
