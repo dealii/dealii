@@ -91,7 +91,7 @@
 #   "Fortran Compiler."
 #   )
 #
-# SET(CMAKE_CXX_FLAGS "" CACHE STRING
+# SET(DEAL_II_CXX_FLAGS "" CACHE STRING
 #   "The user supplied cache variable will be appended _at the end_ of the auto generated CMAKE_CXX_FLAGS variable"
 #   )
 #
@@ -113,6 +113,18 @@
 #
 # SET(DEAL_II_LINKER_FLAGS_RELEASE "" CACHE STRING
 #   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS_RELEASE variable"
+#   )
+#
+# SET(DEAL_II_DEFINITIONS "" CACHE STRING
+#   "Additional, user supplied compile definitions"
+#   )
+#
+# SET(DEAL_II_DEFINITIONS_DEBUG "" CACHE STRING
+#   "Additional, user supplied compile definitions"
+#   )
+#
+# SET(DEAL_II_DEFINITIONS_RELEASE "" CACHE STRING
+#   "Additional, user supplied compile definitions"
 #   )
 #
 # SET(BUILD_SHARED_LIBS "ON" CACHE BOOL

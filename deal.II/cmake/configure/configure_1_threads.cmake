@@ -185,8 +185,8 @@ MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED)
   #
   # We have to disable a bunch of warnings:
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-parentheses")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-parentheses")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 
   #
   # Add some definitions to use the header files in debug mode:

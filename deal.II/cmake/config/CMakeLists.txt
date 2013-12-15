@@ -74,11 +74,11 @@ INSTALL(FILES # for installation:
 ########################################################################
 
 #
-# Strip -Wno-deprecated from CMAKE_CXX_FLAGS so that deprecation warnings
+# Strip -Wno-deprecated from DEAL_II_CXX_FLAGS so that deprecation warnings
 # are actually shown for user code:
 #
-STRIP_FLAG(CMAKE_CXX_FLAGS "-Wno-deprecated")
-STRIP_FLAG(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 #
 # Populate a bunch of CONFIG_* variables with useful information:
@@ -317,7 +317,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     # Set up our linker flags:
     #
     SET(MAKEFILE_LDFLAGS_${build}
-      "${CMAKE_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}} ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
+      "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}} ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
       )
   ENDFOREACH()
 

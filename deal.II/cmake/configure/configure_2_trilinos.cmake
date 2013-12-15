@@ -208,9 +208,9 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   #
   # Disable a bunch of warnings caused by Trilinos headers:
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-extra")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-extra")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-overloaded-virtual")
 
 ENDMACRO()
 

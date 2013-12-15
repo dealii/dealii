@@ -27,7 +27,7 @@
 # All configuration in setup_compiler_flags.cmake and
 # setup_compiler_flags_<compiler>.cmake shall ONLY modify:
 #
-#   CMAKE_CXX_FLAGS
+#   DEAL_II_CXX_FLAGS
 #   DEAL_II_CXX_FLAGS_DEBUG
 #   DEAL_II_CXX_FLAGS_RELEASE
 #   DEAL_II_LINKER_FLAGS
@@ -37,7 +37,7 @@
 # All modifications shall be guarded with the ENABLE_IF_SUPPORTED
 # or ENABLE_IF_LINKS macro, e.g.
 #
-#   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
+#   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
 #   ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
 # Checks for compiler features (such as C++11 support) and compiler
@@ -66,12 +66,12 @@
 # Check the user provided CXX flags:
 #
 
-MESSAGE(STATUS "")
-IF(NOT "${CMAKE_CXX_FLAGS_SAVED}" STREQUAL "${CACHED_CMAKE_CXX_FLAGS_SAVED}")
+IF(NOT "${DEAL_II_CXX_FLAGS_SAVED}" STREQUAL "${CACHED_DEAL_II_CXX_FLAGS_SAVED}")
+  MESSAGE(STATUS "")
   # Rerun this test if cxx flags changed:
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
 ENDIF()
-SET(CACHED_CMAKE_CXX_FLAGS_SAVED "${CMAKE_CXX_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
+SET(CACHED_DEAL_II_CXX_FLAGS_SAVED "${DEAL_II_CXX_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
 
 # Initialize all CMAKE_REQUIRED_* variables a this point:
 RESET_CMAKE_REQUIRED()
@@ -84,8 +84,8 @@ IF(NOT DEAL_II_HAVE_USABLE_CXX_FLAGS)
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
   MESSAGE(FATAL_ERROR "\n"
     "Configuration error: Cannot compile with the user supplied CXX flags:\n"
-    "${CMAKE_CXX_FLAGS_SAVED}\n"
-    "Please check the CMake variable CMAKE_CXX_FLAGS and the\n"
+    "${DEAL_II_CXX_FLAGS_SAVED}\n"
+    "Please check the CMake variable DEAL_II_CXX_FLAGS and the\n"
     "environment variable CXXFLAGS\n\n"
     )
 ENDIF()

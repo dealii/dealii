@@ -31,7 +31,7 @@
 #     DEAL_II_LINKER_FLAGS
 #
 #   - add ${feature}_CXX_FLAGS and ${feature}_COMPILE_FLAGS to
-#     CMAKE_CXX_FLAGS
+#     DEAL_II_CXX_FLAGS
 #
 #   - add ${feature}_LIBRARIES to the list of deal.II libraries depending
 #     on general, optimized or debug keyword
@@ -59,7 +59,7 @@ MACRO(REGISTER_FEATURE _feature)
   # variables for compiler flags:
   FOREACH(_var ${_feature}_CXX_FLAGS ${_feature}_COMPILE_FLAGS)
     IF(DEFINED ${_var})
-      ADD_FLAGS(CMAKE_CXX_FLAGS "${${_var}}")
+      ADD_FLAGS(DEAL_II_CXX_FLAGS "${${_var}}")
     ENDIF()
   ENDFOREACH()
 

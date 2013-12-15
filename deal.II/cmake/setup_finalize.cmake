@@ -37,6 +37,21 @@ FOREACH(_flags ${DEAL_II_USED_FLAGS})
 ENDFOREACH()
 
 #
+# Sanity check: The variables defined in DEAL_II_REMOVED_FLAGS must not be
+# used during the comfiguration stage:
+#
+FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
+  IF(NOT "${_flag}" STREQUAL "")
+    MESSAGE(FATAL_ERROR
+      "\nInternal configuration error: The variable ${_flag} was set to a "
+      "non empty value during the configuration! (The corresponding "
+      "DEAL_II_* variable should have been used.)\n"
+      "${_flag}=\"${${_flag}}\"\n"
+      )
+  ENDIF()
+ENDFOREACH()
+
+#
 # Deduplicate entries in DEAL_II_USER_INCLUDE_DIRS
 #
 IF(NOT "${DEAL_II_USER_INCLUDE_DIRS}" STREQUAL "")
@@ -149,7 +164,7 @@ _both("#\n")
 
 _detailed(
 "#  Compiler flags used for this build:
-#        CMAKE_CXX_FLAGS:              ${CMAKE_CXX_FLAGS}
+#        DEAL_II_CXX_FLAGS:            ${DEAL_II_CXX_FLAGS}
 "
   )
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
@@ -158,6 +173,7 @@ ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   _detailed("#        DEAL_II_CXX_FLAGS_DEBUG:      ${DEAL_II_CXX_FLAGS_DEBUG}\n")
 ENDIF()
+
 _detailed("#        DEAL_II_LINKER_FLAGS:         ${DEAL_II_LINKER_FLAGS}\n")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
   _detailed("#        DEAL_II_LINKER_FLAGS_RELEASE: ${DEAL_II_LINKER_FLAGS_RELEASE}\n")
@@ -165,6 +181,15 @@ ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   _detailed("#        DEAL_II_LINKER_FLAGS_DEBUG:   ${DEAL_II_LINKER_FLAGS_DEBUG}\n")
 ENDIF()
+
+_detailed("#        DEAL_II_DEFINITIONS:          ${DEAL_II_DEFINITIONS}\n")
+IF(CMAKE_BUILD_TYPE MATCHES "Release")
+  _detailed("#        DEAL_II_DEFINITIONS_RELEASE:  ${DEAL_II_DEFINITIONS_RELEASE}\n")
+ENDIF()
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+  _detailed("#        DEAL_II_DEFINITIONS_DEBUG:    ${DEAL_II_DEFINITIONS_DEBUG}\n")
+ENDIF()
+
 _detailed("#\n")
 
 IF(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)

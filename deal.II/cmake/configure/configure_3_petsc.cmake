@@ -120,7 +120,7 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
   #
   # Disable a bunch of warnings when compiling with petsc:
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 
   SET(DEAL_II_EXPAND_PETSC_VECTOR "PETScWrappers::Vector")
   SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")

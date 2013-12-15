@@ -861,7 +861,7 @@ cmake -DCMAKE_C_COMPILER="mpicc" -DCMAKE_CXX_COMPILER="mpicxx" -DCMAKE_Fortran_C
 	  Override the default configuration by setting the following
 	  cached variables:
 <pre class="cmake">
-CMAKE_CXX_FLAGS           - used during all builds
+DEAL_II_CXX_FLAGS         - used during all builds
 DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
 DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
 </pre>
@@ -872,7 +872,7 @@ DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
 	  <code>-Wsign-compare</code>, set by the build system, can be
 	  overwritten by specifying:
 <pre class="cmake">
-cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
+cmake -DDEAL_II_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
 </pre>
 
         <li>
