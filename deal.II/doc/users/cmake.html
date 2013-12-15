@@ -674,7 +674,7 @@ cmake -D&lt;feature&gt;_FOUND=true \
       call the corresponding <code>Find&lt;lib&gt;.cmake</code> module.
       Therefore, all information that would be otherwise exported by the
       module must be specified by hand. (See the
-      <a href="Config.sample" target="_top">Config.sample file</a> for a
+      <a href="config.sample" target="_top">config.sample file</a> for a
       detailed list of valid variables per feature.)
     </p>
     <p>
@@ -692,7 +692,7 @@ cmake -DLAPACK_FOUND=true \
       or by providing an initial cache file, see
       <a href="#advanced">advanced setup section</a>.
       Possible manual overrides are explained in detail in the
-      in the <a href="Config.sample" target="_top">Config.sample file</a>.
+      in the <a href="config.sample" target="_top">config.sample file</a>.
     </p>
 
 
@@ -961,15 +961,28 @@ DEAL_II_PROJECT_CONFIG_RELDIR
     <a name="advanced"></a>
     <h2>Initial cache file and advanced options</h2>
 
-    A sample configuration file for preloading the CMake cache with
+    <p>
+      A sample configuration file for preloading the CMake cache with
 <pre class="cmake">
-$ cmake -C Config.sample <...>
+$ cmake -C config.sample <...>
 </pre>
-    can be found <a href="Config.sample" target="_top">here</a>.
-    This sample configuration covers all options mentioned in this
-    documentation as well as some advanced aspects in feature
-    configuration.
+      can be found <a href="config.sample" target="_top">here</a>.
+      This sample configuration covers all options mentioned in this
+      documentation as well as some advanced aspects in feature
+      configuration.
+    </p>
 
+    <p>
+      The build system automatically exports a <code>config.camke</code>
+      into the binary directory that can be used to conveniently clone a
+      build directories cache entries, e.g. assuming that there is a
+      configured build directory <code>build</code> next to an empty
+      directory <code>build2</code>:
+<pre class="cmake">
+$ cd build2
+$ cmake -C ../build/config.cmake ../deal.II
+</pre>
+    </p>
 
     <a name="compiling"></a>
     <h2> Compiling only certain parts </h2>
