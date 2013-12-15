@@ -191,22 +191,6 @@ namespace MeshWorker
     return false;
   }
 
-  /*
-
-    if (unique_faces_only && (neighbor < cell)) continue;
-
-
-                      // If iterator
-                   // is active
-                   // and neighbor
-                   // is refined,
-                   // skip
-                   // internal face.
-                   if (internal::is_active_iterator(cell) && neighbor->has_children())
-                     continue;
-
-
-   */
 
 
 
