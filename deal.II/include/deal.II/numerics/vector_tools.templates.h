@@ -2111,23 +2111,27 @@ namespace VectorTools
 
       Vector<double> boundary_projection (rhs.size());
 
-      // Allow for a maximum of 5*n
-      // steps to reduce the residual by
-      // 10^-12. n steps may not be
-      // sufficient, since roundoff
-      // errors may accumulate for badly
-      // conditioned matrices
-      ReductionControl        control(5*rhs.size(), 0., 1.e-12, false, false);
-      GrowingVectorMemory<> memory;
-      SolverCG<>              cg(control,memory);
+      // cannot reduce residual in a useful way if we are close to the square
+      // root of the minimal double value
+      if (rhs.norm_sqr() < 1e28 * std::numeric_limits<double>::min())
+        boundary_projection = 0;
+      else
+        {
+          // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
+          // steps may not be sufficient, since roundoff errors may accumulate for
+          // badly conditioned matrices
+          ReductionControl        control(5*rhs.size(), 0., 1.e-12, false, false);
+          GrowingVectorMemory<> memory;
+          SolverCG<>              cg(control,memory);
 
-      PreconditionSSOR<> prec;
-      prec.initialize(mass_matrix, 1.2);
-      filtered_precondition.initialize(prec, true);
-      // solve
-      cg.solve (filtered_mass_matrix, boundary_projection, rhs, filtered_precondition);
-      filtered_precondition.apply_constraints(boundary_projection, true);
-      filtered_precondition.clear();
+          PreconditionSSOR<> prec;
+          prec.initialize(mass_matrix, 1.2);
+          filtered_precondition.initialize(prec, true);
+          // solve
+          cg.solve (filtered_mass_matrix, boundary_projection, rhs, filtered_precondition);
+          filtered_precondition.apply_constraints(boundary_projection, true);
+          filtered_precondition.clear();
+        }
       // fill in boundary values
       for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)
         if (dof_to_boundary_mapping[i] != DoFHandler<dim,spacedim>::invalid_dof_index

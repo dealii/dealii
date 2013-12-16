@@ -59,6 +59,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: VectorTools::project_boundary_values could not deal with
+  function values close to (but not exactly equal to) zero. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2013/12/16)
+  </li>
+
   <li> New: It is now possible to select between different smoothers and coarse
   solvers in the Trilinos AMG preconditioners by a string to the smoother's name.
   <br>
