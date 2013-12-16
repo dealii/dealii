@@ -202,7 +202,7 @@ compared to the stationary case. Let us go through them in turn:
     =
     (\varphi_i^n, u_h^{n-1})
     =
-    \sum_{j=1}^{N_{n-1}
+    \sum_{j=1}^{N_{n-1}}
     (\varphi_i^n, \varphi_j^{n-1}) U^{n-1}_j,
     \qquad\qquad
     i=1\ldots N_n.
