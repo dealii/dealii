@@ -19,6 +19,8 @@
  */
 
 
+// The program starts with the usual include files, all of which you should
+// have seen before by now:
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -51,12 +53,30 @@
 #include <iostream>
 
 
+// Then the usual placing of all content of this program into a namespace and
+// the importation of the deal.II namespace into the one we will work in:
 namespace Step26
 {
   using namespace dealii;
 
 
-
+  // @sect3{The <code>HeatEquation</code> class}
+  //
+  // The next piece is the declaration of the main class of this program. It
+  // follows the well trodden path of previous examples. If you have looked at
+  // step-6, for example, the only thing worth noting here is that we need to
+  // build two matrices (the mass and Laplace matrix) and keep the current and
+  // previous time step's solution. We then also need to store the current
+  // time, the size of the time step, and the number of the current time
+  // step. The last of the member variables denotes the theta parameter
+  // discussed in the introduction that allows us to treat the explicit and
+  // implicit Euler methods as well as the Crank-Nicolson method and other
+  // generalizations all in one program.
+  //
+  // As far as member functions are concerned, the only possible surprise is
+  // that the <code>refine_mesh</code> function takes arguments for the
+  // minimal and maximal mesh refinement level. The purpose of this is
+  // discussed in the introduction.
   template<int dim>
   class HeatEquation
   {
@@ -95,18 +115,26 @@ namespace Step26
 
 
 
+  // @sect3{Equation data}
+
+  // In the following classes and functions, we implement the various pieces
+  // of data that define this problem (right hand side and boundary values)
+  // that are used in this program and for which we need function objects. The
+  // right hand side is chosen as discussed at the end of the
+  // introduction. For boundary values, we choose zero values, but this is
+  // easily changed below.
   template<int dim>
-  class RightHandSide: public Function<dim>
+  class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
+    RightHandSide ()
       :
       Function<dim>(),
       period (0.2)
     {}
 
-    virtual double value(const Point<dim> &p,
-                         const unsigned int component = 0) const;
+    virtual double value (const Point<dim> &p,
+			  const unsigned int component = 0) const;
 
   private:
     const double period;
@@ -115,8 +143,8 @@ namespace Step26
 
 
   template<int dim>
-  double RightHandSide<dim>::value(const Point<dim> &p,
-                                   const unsigned int component) const
+  double RightHandSide<dim>::value (const Point<dim> &p,
+				    const unsigned int component) const
   {
     Assert (component == 0, ExcInternalError());
     Assert (dim == 2, ExcNotImplemented());
@@ -145,22 +173,18 @@ namespace Step26
 
 
   template<int dim>
-  class BoundaryValues: public Function<dim>
+  class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues()
-      :
-      Function<dim>()
-    {
-    }
-
-    virtual double value(const Point<dim> &p,
-                         const unsigned int component = 0) const;
+    virtual double value (const Point<dim>  &p,
+			  const unsigned int component = 0) const;
   };
 
+
+  
   template<int dim>
-  double BoundaryValues<dim>::value(const Point<dim> &/*p*/,
-                                    const unsigned int component) const
+  double BoundaryValues<dim>::value (const Point<dim> &/*p*/,
+				     const unsigned int component) const
   {
     Assert(component == 0, ExcInternalError());
     return 0;
@@ -168,8 +192,11 @@ namespace Step26
 
 
 
+  // @sect3{The <code>HeatEquation</code> implementation}
+  //
+  // The next step then is the implementation of the main class.
   template<int dim>
-  HeatEquation<dim>::HeatEquation()
+  HeatEquation<dim>::HeatEquation ()
     :
     fe(1),
     dof_handler(triangulation),
