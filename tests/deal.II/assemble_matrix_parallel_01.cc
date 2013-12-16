@@ -319,9 +319,6 @@ LaplaceProblem<dim>::local_assemble (const typename hp::DoFHandler<dim>::active_
 
   data.local_dof_indices.resize (dofs_per_cell);
   cell->get_dof_indices (data.local_dof_indices);
-  constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
-                                         data.local_dof_indices,
-                                         test_matrix, test_rhs);
 }
 
 
@@ -330,6 +327,9 @@ template <int dim>
 void
 LaplaceProblem<dim>::copy_local_to_global (const Assembly::Copy::Data &data)
 {
+  constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
+                                         data.local_dof_indices,
+                                         test_matrix, test_rhs);
 }
 
 
