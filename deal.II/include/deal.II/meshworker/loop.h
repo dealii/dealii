@@ -79,7 +79,11 @@ namespace MeshWorker
       /**
        * Constructor.
        */
-      LoopControl();
+      LoopControl()
+      : own_cells(true), ghost_cells(false),
+        faces_to_ghost(LoopControl::one), own_faces(LoopControl::one)
+      {
+      }
 
       /**
        * Loop over cells owned by this process. Defaults to <code>true</code>.
@@ -134,11 +138,6 @@ namespace MeshWorker
       bool operator() (const ITERATOR& cell, bool is_level) const;
   };
   
-  LoopControl::LoopControl()
-  : own_cells(true), ghost_cells(false),
-    faces_to_ghost(LoopControl::one), own_faces(LoopControl::one)
-  {
-  }
   
   template <class ITERATOR>
   bool LoopControl::operator() (const ITERATOR& cell, unsigned int face, bool is_level) const
