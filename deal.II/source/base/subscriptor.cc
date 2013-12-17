@@ -142,10 +142,10 @@ Subscriptor &Subscriptor::operator = (const Subscriptor &s)
   return *this;
 }
 
-// These are the implementations for debug mode. The optimized
-// versions are inlined in the header file.
 
-void Subscriptor::do_subscribe (const char *id) const
+
+void
+Subscriptor::subscribe(const char *id) const
 {
 #ifdef DEBUG
   if (object_info == 0)
@@ -153,7 +153,7 @@ void Subscriptor::do_subscribe (const char *id) const
   Threads::Mutex::ScopedLock lock (subscription_lock);
   ++counter;
 
-#ifndef DEAL_II_WITH_THREADS
+#  ifndef DEAL_II_WITH_THREADS
   const char *const name = (id != 0) ? id : unknown_subscriber;
 
   map_iterator it = counter_map.find(name);
@@ -162,12 +162,15 @@ void Subscriptor::do_subscribe (const char *id) const
 
   else
     it->second++;
-#endif
+#  endif
+#else
+  (void)id;
 #endif
 }
 
 
-void Subscriptor::do_unsubscribe (const char *id) const
+void
+Subscriptor::unsubscribe(const char *id) const
 {
 #ifdef DEBUG
   const char *name = (id != 0) ? id : unknown_subscriber;
@@ -180,21 +183,25 @@ void Subscriptor::do_unsubscribe (const char *id) const
   Threads::Mutex::ScopedLock lock (subscription_lock);
   --counter;
 
-#ifndef DEAL_II_WITH_THREADS
+#  ifndef DEAL_II_WITH_THREADS
   map_iterator it = counter_map.find(name);
   AssertNothrow (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
   AssertNothrow (it->second > 0, ExcNoSubscriber(object_info->name(), name));
 
   it->second--;
-#endif
+#  endif
+#else
+  (void)id;
 #endif
 }
+
 
 
 unsigned int Subscriptor::n_subscriptions () const
 {
   return counter;
 }
+
 
 
 void Subscriptor::list_subscribers () const
