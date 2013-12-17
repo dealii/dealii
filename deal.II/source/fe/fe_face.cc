@@ -86,10 +86,14 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
         for (unsigned int e=0, c=0; e<dim; ++e)
           if (d!=e)
             {
+              // faces in y-direction are oriented differently
+              unsigned int renumber = i;
+              if (dim == 3 && d == 1)
+                renumber = i/(degree+1)+(degree+1)*(i%(degree+1));
               this->unit_support_points[n_face_dofs*2*d+i][e] =
-                this->unit_face_support_points[i][c];
+                this->unit_face_support_points[renumber][c];
               this->unit_support_points[n_face_dofs*(2*d+1)+i][e] =
-                this->unit_face_support_points[i][c];
+                this->unit_face_support_points[renumber][c];
               this->unit_support_points[n_face_dofs*(2*d+1)+i][d] = 1;
               ++c;
             }
