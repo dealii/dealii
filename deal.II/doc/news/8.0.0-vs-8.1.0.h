@@ -259,6 +259,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Move the implementation of Subscriptor::(un)subscribe() to
+  the .cc file so that it is possible to link against the debug library
+  without specifying <code>-DDEBUG</code>
+  <br>
+  (Wolfgang Bangerth, 2013/12/13)
+  </li>
+
   <li> Fixed: Since the introduction of ThreadLocalStorage in version 8.0, the
   way in which FEValues objects visit cells in a parallel assembly loop is no
   longer deterministic. Therefore, the detection of CellSimilarity that can
