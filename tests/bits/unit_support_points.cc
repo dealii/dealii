@@ -26,6 +26,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_face.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <fstream>
 
@@ -106,6 +107,21 @@ void check2 (const FiniteElement<dim> &fe,
 
 
 template <int dim>
+void face_check()
+{
+  check1 (FE_FaceQ<dim>(2));
+  check2 (FE_FaceQ<dim>(2), 0);
+}
+
+
+
+template <>
+void face_check<1>()
+{}
+
+
+
+template <int dim>
 void check ()
 {
   check1 (FE_Q<dim>(2));
@@ -122,6 +138,7 @@ void check ()
   check2 (FESystem<dim> (FE_Q<dim> (2), 1,
                          FE_DGP<dim> (2), 1),
           0);
+  face_check<dim>();
 }
 
 
