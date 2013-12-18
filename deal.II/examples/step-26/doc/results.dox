@@ -38,7 +38,7 @@ Number of active cells: 1803
 Number of degrees of freedom: 2109
 @endcode
 
-Maybe of more interest is a visualization of the solution and the mesh on wich
+Maybe of more interest is a visualization of the solution and the mesh on which
 it was computed:
 
 <img
@@ -87,7 +87,22 @@ Ralf Hartmann, published by the University of Heidelberg, Germany, in 2002.
 
 If you look at the meshes in the movie above, it is clear that they are not
 particularly well suited to the task at hand. In fact, they look rather
-random. The underlying reason is that we only adapt the mesh once every fifth
+random. 
+
+There are two factors at play. First, there are some islands where cells
+have been refined but that are surrounded by non-refined cells (and there
+are probably also a few occasional coarsened islands). These are not terrible,
+as they most of the time do not affect the approximation quality of the mesh,
+but they also don't help because so many of their additional degrees of
+freedom are in fact constrained by hanging node constraints. That said,
+this is easy to fix: the Triangulation class takes an argument to its
+constructor indicating a level of "mesh smoothing". Passing one of many 
+possible flags, this instructs the triangulation to refine some additional 
+cells, or not to refine some cells, so that the resulting mesh does not have 
+these artifacts.
+
+The second problem is more severe: the mesh appears to lag the solution. 
+The underlying reason is that we only adapt the mesh once every fifth
 time step, and only allow for a single refinement in these cases. Whenever a
 source switches on, the solution had been very smooth in this area before and
 the mesh was consequently rather coarse. This implies that the next time step
