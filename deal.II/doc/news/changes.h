@@ -59,6 +59,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The DerivativeApproximation class did not work for
+  parallel programs. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/12/18)
+  </li>
+
   <li> Fixed: VectorTools::project_boundary_values could not deal with
   function values close to (but not exactly equal to) zero. This is now fixed.
   <br>
