@@ -1,8 +1,259 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+This program implements the heat equation
+@f{align*}
+  \frac{\partial u(\mathbf x, t)}{\partial t}
+  -
+  \Delta u(\mathbf x, t)
+  &=
+  f(\mathbf x, t),
+  \qquad\qquad &&
+  \forall \mathbf x \in \Omega, t\in (0,T), 
+  \\
+  u(\mathbf x, 0) &= u_0(\mathbf x) &&
+  \forall \mathbf x \in \Omega, \\
+  \\
+  u(\mathbf x, t) &= g(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,T).
+@f}
+In some sense, this equation is simpler than the ones we have discussed in the
+preceding programs step-23, step-24, step-25, namely the wave equation. This
+is due to the fact that the heat equation smoothes out the solution over time,
+and is consequently more forgiving in many regards. For example, when using
+implicit time stepping methods, we can actually take large time steps, we have
+less trouble with the small disturbances we introduce through adapting the
+mesh every few time steps, etc.
 
-<h4> Verifying whether the code is correct </h4>
+Our goal here will be to solve the equations above using the theta-scheme that
+discretizes the equation in time using the following approach, where we would
+like $u^n(\mathbf x)$ to approximate $u(\mathbf x, t_n)$ at some time $t_n$:
+@f{align*}
+  \frac{u^n(\mathbf x)-u^{n-1}(\mathbf x)}{k_n}
+  -
+  \left[
+  (1-\theta)\Delta u^{n-1}(\mathbf x)
+  +
+  \theta\Delta u^n(\mathbf x)
+  \right]
+  &=
+  \left[
+  (1-\theta)f(\mathbf x, t_{n-1})
+  +
+  \theta f(\mathbf x, t_n)
+  \right].  
+@f}
+Here, $k_n=t_n-t_{n-1}$ is the time step size. The theta-scheme generalizes
+the explicit Euler ($\theta=0$), implicit Euler ($\theta=1$) and
+Crank-Nicolson ($\theta=\frac 12$) time discretizations. Since the latter has
+the highest convergence order, we will choose $\theta=\frac 12$ in the program
+below, but make it so that playing with this parameter remains simple.
+
+Given this time discretization, space discretization happens as it always
+does, by multiplying with test functions, integrating by parts, and then
+restricting everything to a finite dimensional subspace. This yields the
+following set of fully discrete equations after multiplying through with
+$k_n$:
+@f{align*}
+  M U^n-MU^{n-1}
+  +
+  k_n \left[
+  (1-\theta)A U^{n-1}
+  +
+  \theta A U^n
+  \right]
+  &=
+  k_n
+  \left[
+  (1-\theta)F^{n-1}
+  +
+  \theta F^n
+  \right],
+@f}
+where $M$ is the mass matrix and $A$ is the stiffness matrix that results from
+discretizing the Laplacian. Bringing all known quantities to the right hand
+side yields the linear system we have to solve in every step:
+@f{align*}
+  (M
+  +
+  k_n \theta A) U^n
+  &=
+  MU^{n-1}
+  -
+  k_n
+  (1-\theta)A U^{n-1}
+  +
+  k_n
+  \left[
+  (1-\theta)F^{n-1}
+  +
+  \theta F^n
+  \right].
+@f}
+The linear system on the left hand side is symmetric and positive definite, so
+we should have no trouble solving it with the Conjugate Gradient method.
+
+We can start the iteration above if we have the set of nodal coefficients
+$U^0$ at the initial time. Here, we take the ones we get by interpolating the
+initial values $u_0(\mathbf x)$ onto the mesh used for the first time step. We
+will also need to choose a time step; we will here just choose it as fixed,
+but clearly advanced simulators will want to choose it adaptively. We will
+briefly come back to this in the <a href="#Results">results section
+below</a>.
+
+
+<h3> Adapting meshes for time dependent problems </h3>
+
+When solving the wave equation and its variants in the previous few programs,
+we kept the mesh fixed. Just as for stationary equations, one can make a good
+case that this is not the smartest approach and that significant savings can
+be had by adapting the mesh. There are, however, significant difficulties
+compared to the stationary case. Let us go through them in turn:
+
+<ul>
+  <li><i>Time step size and minimal mesh size</i>: For stationary problems, the
+  general approach is "make the mesh as fine as it is necessary". For problems
+  with singularities, this often leads to situations where we get many levels
+  of refinement into corners or along interfaces. The very first tutorial to
+  use adaptive meshes, step-6, is a point in case already.
+
+  However, for time dependent problems, we typically need to choose the time
+  step related to the mesh size. For explicit time discretizations, this is
+  obvious, since we need to respect a CFL condition that ties the time step
+  size to the smallest mesh size. For implicit time discretizations, no such
+  hard restriction exists, but in practice we still want to make the time step
+  smaller if we make the mesh size smaller since we typically have error
+  estimates of the form $\|e\| \le {\cal O}(k^p + h^q)$ where $p,q$ are the
+  convergence orders of the time and space discretization, respectively. We
+  can only make the error small if we decrease both terms. Ideally, an
+  estimate like this would suggest to choose $k \propto h^{q/p}$. Because, at
+  least for problems with non-smooth solutions, the error is typically
+  localized in the cells with the smallest mesh size, we have to indeed choose
+  $k \propto h_{\text{min}}^{q/p}$, using the <i>smallest</i> mesh size.
+
+  The consequence is that refining the mesh further in one place implies not
+  only the moderate additional effort of increasing the number of degrees of
+  freedom slightly, but also the much larger effort of having the solve the
+  <i>global</i> linear system more often because of the smaller time step.
+
+  In practice, one typically deals with this by acknowledging that we can not
+  make the time step arbitrarily small, and consequently can not make the
+  local mesh size arbitrarily small. Rather, we set a maximal level of
+  refinement and when we flag cells for refinement, we simply do not refine
+  those cells whose children would exceed this maximal level of refinement.
+
+  There is a similar problem in that we will choose a right hand side that
+  will switch on in different parts of the domain at different times. To avoid
+  being caught flat footed with too coarse a mesh in areas where we suddenly
+  need a finer mesh, we will also enforce in our program a <i>minimal</i> mesh
+  refinement level.
+
+  <li><i>Test functions from different meshes</i>: Let us consider again the
+  semi-discrete equations we have written down above:
+  @f{align*}
+    \frac{u^n(\mathbf x)-u^{n-1}(\mathbf x)}{k_n}
+    -
+    \left[
+    (1-\theta)\Delta u^{n-1}(\mathbf x)
+    +
+    \theta\Delta u^n(\mathbf x)
+    \right]
+    &=
+    \left[
+    (1-\theta)f(\mathbf x, t_{n-1})
+    +
+    \theta f(\mathbf x, t_n)
+    \right].  
+  @f}
+  We can here consider $u^{n-1}$ as data since it has presumably been computed
+  before. Now, let us replace 
+  @f{align*}
+    u^n(\mathbf x)\approx u_h^n(\mathbf x) 
+    =
+    \sum_j U^n \varphi_j(\mathbf x),
+  @f}
+  multiply with test functions $\varphi_i(\mathbf x)$ and integrate by parts
+  where necessary. In a process as outlined above, this would yield
+  @f{align*}
+    \sum_j
+    (M
+    +
+    k_n \theta A)_{ij} U^n_j
+    &=
+    (\varphi_i, u_h^{n-1})
+    -
+    k_n
+    (1-\theta)(\nabla \varphi_i, \nabla u_h^{n-1})
+    +
+    k_n
+    \left[
+    (1-\theta)F^{n-1}
+    +
+    \theta F^n
+    \right].
+  @f}
+  Now imagine that we have changed the mesh between time steps $n-1$ and
+  $n$. Then the problem is that the basis functions we use for $u_h^n$ and
+  $u^{n-1}$ are different! This pertains to the terms on the right hand side,
+  the first of which we could more clearly write as (the second follows the
+  same pattern)
+  @f{align*}
+    (\varphi_i, u_h^{n-1})
+    =
+    (\varphi_i^n, u_h^{n-1})
+    =
+    \sum_{j=1}^{N_{n-1}}
+    (\varphi_i^n, \varphi_j^{n-1}) U^{n-1}_j,
+    \qquad\qquad
+    i=1\ldots N_n.
+  @f}
+  If the meshes used in these two time steps are the same, then
+  $(\varphi_i^n, \varphi_j^{n-1})$ forms a square mass matrix
+  $M_{ij}$. However, if the meshes are not the same, then in general the matrix
+  is rectangular. Worse, it is difficult to even compute these integrals
+  because if we loop over the cells of the mesh at time step $n$, then we need
+  to evaluate $\varphi_j^{n-1}$ at the quadrature points of these cells, but
+  they do not necessarily correspond to the cells of the mesh at time step
+  $n-1$ and $\varphi_j^{n-1}$ is not defined via these cells; the same of
+  course applies if we wanted to compute the integrals via integration on the
+  cells of mesh $n-1$.
+
+  In any case, what we have to face is a situation where we need to integrate
+  shape functions defined on two different meshes. This can be done, and is in
+  fact demonstrated in step-28, but the process is at best described by the
+  word "awkward".
+
+  In practice, one does not typically want to do this. Rather, we avoid the
+  whole situation by interpolating the solution from the old to the new mesh
+  every time we adapt the mesh. In other words, rather than solving the
+  equations above, we instead solve the problem
+  @f{align*}
+    \sum_j
+    (M
+    +
+    k_n \theta A)_{ij} U^n_j
+    &=
+    (\varphi_i, I_h^n u_h^{n-1})
+    -
+    k_n
+    (1-\theta)(\nabla \varphi_i, \nabla I_h^n u_h^{n-1})
+    +
+    k_n
+    \left[
+    (1-\theta)F^{n-1}
+    +
+    \theta F^n
+    \right],
+  @f}
+  where $I_h^n$ is the interpolation operator onto the finite element space
+  used in time step $n$. This is not the optimal approach since it introduces
+  an additional error besides time and space discretization, but it is a
+  pragmatic one that makes it feasible to do time adapting meshes.
+</ul>
+
+
+
+<h3> What could possibly go wrong? Verifying whether the code is correct </h3>
 
 There are a number of things one can typically get wrong when implementing a
 finite element code. In particular, for time dependent problems, the following
@@ -113,3 +364,71 @@ $\frac{1}{(n_x^2+n_y^2)\pi^2}$.
 Once we have verified that the time integration and right hand side handling
 are correct using this scheme, we can go on to verifying that we have the
 boundary values correct, using a very similar approach.
+
+
+
+<h3> The testcase </h3>
+
+Solving the heat equation on a simple domain with a simple right hand side
+almost always leads to solutions that are exceedingly boring, since they
+become very smooth very quickly and then do not move very much any
+more. Rather, we here solve the equation on the L-shaped domain with zero
+Dirichlet boundary values and zero initial conditions, but as right hand side
+we choose
+@f{align*}
+  f(\mathbf x, t)
+  =
+  \left\{
+  \begin{array}{ll}
+    \chi_1(\mathbf x)
+    & \text{if \(0\le t \le 0.2\tau\) or \(\tau\le t \le 1.2\tau\) or \(2\tau\le t
+    \le 2.2\tau\), etc}
+    \\
+    \chi_2(\mathbf x)
+    & \text{if \(0.5\le t \le 0.7\tau\) or \(1.5\tau\le t \le 1.7\tau\) or \(2.5\tau\le t
+    \le 2.7\tau\), etc}
+    \\
+    0
+    & \text{otherwise}
+  \end{array}
+  \right.
+@f}
+Here,
+@f{align*}
+  \chi_1(\mathbf x) &= 
+  \left\{
+  \begin{array}{ll}
+    1
+    & \text{if \(x>0.5\) and \(y>-0.5\)}
+    \\
+    0
+    & \text{otherwise}
+  \end{array}
+  \right.
+  \\
+  \chi_2(\mathbf x) &= 
+  \left\{
+  \begin{array}{ll}
+    1
+    & \text{if \(x>-0.5\) and \(y>0.5\)}
+    \\
+    0
+    & \text{otherwise}
+  \end{array}
+  \right.
+@f}
+In other words, in every period of lenght $\tau$, the right hand side first
+flashes on in domain 1, then off completely, then on in domain 2, then off
+completely again. This pattern is probably best observed via the little
+animation of the solution shown in the <a href="#Results">results
+section</a>.
+
+If you interpret the heat equation as finding the spatially and temporally
+variable temperature distribution of a conducting solid, then the test case
+above corresponds to an L-shaped body where we keep the boundary at zero
+temperature, and heat alternatingly in two parts of the domain. While heating
+is in effect, the temperature rises in these places, after which it diffuses
+and diminishes again. The point of these initial conditions is that they
+provide us with a solution that has singularities both in time (when sources
+switch on and off) as well as time (at the reentrant corner as well as at the
+edges and corners of the regions where the source acts).

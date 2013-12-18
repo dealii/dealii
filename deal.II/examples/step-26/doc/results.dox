@@ -1,1 +1,115 @@
 <h1>Results</h1>
+
+As in many of the tutorials, the actual output of the program matters less
+than how we arrived there. Nonetheless, here it is:
+@code
+===========================================
+Number of active cells: 48
+Number of degrees of freedom: 65
+
+Time step 1 at t=0.002
+     7 CG iterations.
+
+===========================================
+Number of active cells: 60
+Number of degrees of freedom: 81
+
+
+Time step 1 at t=0.002
+     7 CG iterations.
+
+===========================================
+Number of active cells: 105
+Number of degrees of freedom: 136
+
+
+Time step 1 at t=0.002
+     7 CG iterations.
+
+[...]
+
+Time step 249 at t=0.498
+     13 CG iterations.
+Time step 250 at t=0.5
+     14 CG iterations.
+
+===========================================
+Number of active cells: 1803
+Number of degrees of freedom: 2109
+@endcode
+
+Maybe of more interest is a visualization of the solution and the mesh on which
+it was computed:
+
+<img
+src="http://www.dealii.org/images/steps/developer/step-26.movie.gif"
+alt="Animation of the solution of step 26.">
+
+The movie shows how the two sources switch on and off and how the mesh reacts
+to this. It is quite obvious that the mesh as is is probably not the best we
+could come up with. We'll get back to this in the next section.
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+There are at least two areas where one can improve this program significantly:
+adaptive time stepping and a better choice of the mesh.
+
+<h4>Adaptive time stepping</h4>
+
+Having chosen an implicit time stepping scheme, we are not bound by any
+CFL-like condition on the time step. Furthermore, because the time scales on
+which change happens on a given cell in the heat equation are not bound to the
+cells diameter (unlike the case with the wave equation, where we had a fixed
+speed of information transport that couples the temporal and spatial scales),
+we can choose the time step as we please. Or, better, choose it as we deem
+necessary for accuracy.
+
+Looking at the solution, it is clear that the action does not happen uniformly
+over time: a lot is changing around the time we switch on a source, things
+become less dramatic once a source is on for a little while, and we enter a
+long phase of decline when both sources are off. During these times, we could
+surely get away with a larger time step than before without sacrificing too
+much accuracy.
+
+The literature has many suggestions on how to choose the time step size
+adaptively. Much can be learned, for example, from the way ODE solvers choose
+their time steps. One can also be inspired by a posteriori error estimators
+that can, ideally, be written in a way that the consist of a temporal and a
+spatial contribution to the overall error. If the temporal one is too large,
+we should choose a smaller time step. Ideas in this direction can be found,
+for example, in the PhD thesis of a former principal developer of deal.II,
+Ralf Hartmann, published by the University of Heidelberg, Germany, in 2002.
+
+
+<h4>Better refinement criteria</h4>
+
+If you look at the meshes in the movie above, it is clear that they are not
+particularly well suited to the task at hand. In fact, they look rather
+random. 
+
+There are two factors at play. First, there are some islands where cells
+have been refined but that are surrounded by non-refined cells (and there
+are probably also a few occasional coarsened islands). These are not terrible,
+as they most of the time do not affect the approximation quality of the mesh,
+but they also don't help because so many of their additional degrees of
+freedom are in fact constrained by hanging node constraints. That said,
+this is easy to fix: the Triangulation class takes an argument to its
+constructor indicating a level of "mesh smoothing". Passing one of many 
+possible flags, this instructs the triangulation to refine some additional 
+cells, or not to refine some cells, so that the resulting mesh does not have 
+these artifacts.
+
+The second problem is more severe: the mesh appears to lag the solution. 
+The underlying reason is that we only adapt the mesh once every fifth
+time step, and only allow for a single refinement in these cases. Whenever a
+source switches on, the solution had been very smooth in this area before and
+the mesh was consequently rather coarse. This implies that the next time step
+when we refine the mesh, we will get one refinement level more in this area,
+and five time steps later another level, etc. But this is not enough: first,
+we should refine immediately when a source switches on (after all, in the
+current context we at least know what the right hand side is), and we should
+allow for more than one refinement level. Of course, all of this can be done
+using deal.II, it just requires a bit of algorithmic thinking in how to make
+this work!
