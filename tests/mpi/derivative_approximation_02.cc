@@ -16,20 +16,10 @@
 
 
 
-// document bug in the DerivateApproximation in parallel
-/*
- --------------------------------------------------------
- An error occurred in line <3349> of file </ssd/deal-trunk/deal.II/include/deal.II/dofs/dof_accessor.templates.h> in function
-     void dealii::DoFCellAccessor<DH, lda>::get_dof_values(const InputVector&, ForwardIterator, ForwardIterator) const [with InputVector = dealii::TrilinosWrappers::MPI::Vector, ForwardIterator = double*, DH = dealii::DoFHandler<2>, bool level_dof_access = false]
- The violated condition was:
-     this->is_artificial() == false
- The name and call sequence of the exception was:
-     ExcMessage ("Can't ask for DoF indices on artificial cells.")
- Additional Information:
- Can't ask for DoF indices on artificial cells.
- --------------------------------------------------------
 
- */
+// DerivativeApproximation didn't work in parallel at all. This test verifies
+// that it now does.
+
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -50,6 +40,17 @@
 #include <sstream>
 
 
+template <int dim>
+class Quadratic :
+  public Function<dim>
+{
+public:
+  double value (const Point<dim> &p, const unsigned int) const
+    {
+      return p*p;
+    }
+};
+
 
 template <int dim>
 void test()
@@ -68,33 +69,42 @@ void test()
 
   IndexSet locally_relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh,
-                                           locally_relevant_set);
+					   locally_relevant_set);
 
+  // create a vector representing a function that is independent of the number
+  // of processors involved
   TrilinosWrappers::MPI::Vector vec (dofh.locally_owned_dofs(), MPI_COMM_WORLD);
-  for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)
-    vec(i) = i;
+  VectorTools::interpolate (dofh, Quadratic<dim>(), vec);
   vec.compress(VectorOperation::insert);
 
+  // create such a vector with ghost elements and use it to compute
+  // derivative information
   TrilinosWrappers::MPI::Vector vec_rel ( locally_relevant_set);
   vec_rel = vec;
 
-  MappingQ1<dim> mapping;
   Vector<float> indicators(tr.n_active_cells());
-  DerivativeApproximation::approximate_gradient  (mapping,
-						  dofh,
+  DerivativeApproximation::approximate_gradient  (dofh,
 						  vec_rel,
 						  indicators);
 
-  // we got here, so no exception.
+  // what we get must be a set of derivative indicators, one for each
+  // cell of the distributed mesh. they need to be the same, no matter
+  // how many processors we use. So, the sum of absolute values must
+  // be the same for any processor number
+  const double sum = Utilities::MPI::sum (indicators.l1_norm(), MPI_COMM_WORLD);
   if (myid == 0)
-    deallog << "OK" << std::endl;
+    deallog << sum << std::endl;
 }
+
 
 
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+
   MPILogInitAll log;
 
-  test<2>();
+  test<2> ();
+  test<3> ();
 }
+
