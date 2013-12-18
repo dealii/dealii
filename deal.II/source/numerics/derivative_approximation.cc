@@ -681,19 +681,19 @@ DerivativeApproximation::approximate (SynchronousIterators<std_cxx1x::tuple<type
                                       const unsigned int                            component)
 {
   // if the cell is not locally owned, then there is nothing to do
-    if (std_cxx1x::get<0>(cell.iterators)->is_locally_owned() == false)
-      *std_cxx1x::get<1>(cell.iterators) = 0;
-    else
-      {
-  typename DerivativeDescription::Derivative derivative;
-  // call the function doing the actual
-  // work on this cell
-  DerivativeApproximation::template approximate_cell<DerivativeDescription,dim,DH,InputVector>
-  (mapping,dof_handler,solution,component,std_cxx1x::get<0>(cell.iterators),derivative);
-  // evaluate the norm and fill the vector
-  //*derivative_norm_on_this_cell
-  *std_cxx1x::get<1>(cell.iterators) = DerivativeDescription::derivative_norm (derivative);
-      }
+  if (std_cxx1x::get<0>(cell.iterators)->is_locally_owned() == false)
+    *std_cxx1x::get<1>(cell.iterators) = 0;
+  else
+    {
+      typename DerivativeDescription::Derivative derivative;
+      // call the function doing the actual
+      // work on this cell
+      DerivativeApproximation::template approximate_cell<DerivativeDescription,dim,DH,InputVector>
+      (mapping,dof_handler,solution,component,std_cxx1x::get<0>(cell.iterators),derivative);
+      // evaluate the norm and fill the vector
+      //*derivative_norm_on_this_cell
+      *std_cxx1x::get<1>(cell.iterators) = DerivativeDescription::derivative_norm (derivative);
+    }
 }
 
 
