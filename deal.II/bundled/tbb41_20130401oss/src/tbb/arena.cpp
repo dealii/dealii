@@ -314,7 +314,8 @@ inline bool arena::may_have_tasks ( generic_scheduler* s, arena_slot& slot, bool
     if ( !s ) {
         // This slot is vacant
         __TBB_ASSERT( slot.task_pool == EmptyTaskPool, NULL );
-        __TBB_ASSERT( slot.tail == slot.head, "Someone is tinkering with a vacant arena slot" );
+        // Disable this assertion - 2013 maier
+        // __TBB_ASSERT( slot.tail == slot.head, "Someone is tinkering with a vacant arena slot" );
         return false;
     }
     dequeuing_possible |= s->worker_outermost_level();
