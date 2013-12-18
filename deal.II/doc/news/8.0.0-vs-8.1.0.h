@@ -259,6 +259,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The DerivativeApproximation class did not work for
+  parallel programs. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/12/18)
+  </li>
+
   <li> Fixed: Move the implementation of Subscriptor::(un)subscribe() to
   the .cc file so that it is possible to link against the debug library
   without specifying <code>-DDEBUG</code>

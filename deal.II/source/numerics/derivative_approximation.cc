@@ -646,19 +646,17 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
   Assert (component < dof_handler.get_fe().n_components(),
           ExcIndexRange (component, 0, dof_handler.get_fe().n_components()));
 
-  // Only act on the locally owned cells
-  typedef FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator> CellFilter;
-
-  typedef std_cxx1x::tuple<CellFilter,Vector<float>::iterator>
+  typedef std_cxx1x::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator>
   Iterators;
-  SynchronousIterators<Iterators> begin(Iterators (CellFilter(IteratorFilters::LocallyOwnedCell(),
-                                                              dof_handler.begin_active()),derivative_norm.begin())),
-                                                                                       end(Iterators (CellFilter(IteratorFilters::LocallyOwnedCell(),dof_handler.end()),
-                                                                                           derivative_norm.end()));
+  SynchronousIterators<Iterators> begin(Iterators(dof_handler.begin_active(),
+                                                  derivative_norm.begin())),
+                                  end(Iterators(dof_handler.end(),
+                                                derivative_norm.end()));
 
   // There is no need for a copier because there is no conflict between threads
   // to write in derivative_norm. Scratch and CopyData are also useless.
-  WorkStream::run(begin,end,
+  WorkStream::run(begin,
+                  end,
                   static_cast<std_cxx1x::function<void (SynchronousIterators<Iterators> const &,
                                                         internal::Assembler::Scratch const &,internal::Assembler::CopyData &)> >
                   (std_cxx1x::bind(&DerivativeApproximation::template approximate<DerivativeDescription,dim,DH,
@@ -676,12 +674,17 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
 template <class DerivativeDescription, int dim,
           template <int, int> class DH, class InputVector, int spacedim>
 void
-DerivativeApproximation::approximate (SynchronousIterators<std_cxx1x::tuple<FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator>,Vector<float>::iterator> > const &cell,
+DerivativeApproximation::approximate (SynchronousIterators<std_cxx1x::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator> > const &cell,
                                       const Mapping<dim,spacedim>                  &mapping,
                                       const DH<dim,spacedim>                       &dof_handler,
                                       const InputVector                            &solution,
                                       const unsigned int                            component)
 {
+  // if the cell is not locally owned, then there is nothing to do
+    if (std_cxx1x::get<0>(cell.iterators)->is_locally_owned() == false)
+      *std_cxx1x::get<1>(cell.iterators) = 0;
+    else
+      {
   typename DerivativeDescription::Derivative derivative;
   // call the function doing the actual
   // work on this cell
@@ -690,6 +693,7 @@ DerivativeApproximation::approximate (SynchronousIterators<std_cxx1x::tuple<Filt
   // evaluate the norm and fill the vector
   //*derivative_norm_on_this_cell
   *std_cxx1x::get<1>(cell.iterators) = DerivativeDescription::derivative_norm (derivative);
+      }
 }
 
 

@@ -568,7 +568,7 @@ private:
   template <class DerivativeDescription, int dim,
             template <int, int> class DH, class InputVector, int spacedim>
   static void
-  approximate (SynchronousIterators<std_cxx1x::tuple<FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator>,
+  approximate (SynchronousIterators<std_cxx1x::tuple<typename DH<dim,spacedim>::active_cell_iterator,
                Vector<float>::iterator> > const &cell,
                const Mapping<dim,spacedim>    &mapping,
                const DH<dim,spacedim>         &dof,
