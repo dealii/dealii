@@ -642,7 +642,7 @@ will be <code>Triangulation@<2,3@></code>, and correspondingly we will use
 Some further details on what one can do with things that live on
 curved manifolds can be found in the report
 <a target="_top"
-href="../../reports/codimension-one/desimone-heltai-manigrasso.pdf"><i>Tools
+href="http://www.dealii.org/reports/codimension-one/desimone-heltai-manigrasso.pdf"><i>Tools
 for the Solution of PDEs Defined on Curved Manifolds with the deal.II
 Library</i> by A. DeSimone, L. Heltai, C. Manigrasso</a>. In addition, the
 step-38 tutorial program extends what we show here to cases where the equation
