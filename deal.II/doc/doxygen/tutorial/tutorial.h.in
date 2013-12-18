@@ -763,6 +763,14 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> The heat equation
+ *     </td>
+ *     <td>
+ *       Step-26
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Minimal surface equation
  *     </td>
  *     <td>
@@ -816,14 +824,6 @@
  *       Step-32,
  *       Step-35,
  *       Step-46
- *     </td>
- *   </tr>
- *
- *   <tr valign="top">
- *     <td> The heat equation
- *     </td>
- *     <td>
- *       Step-26
  *     </td>
  *   </tr>
  *
