@@ -126,6 +126,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: step-26 fills a long-standing gap: There was no tutorial
+          program solving the heat equation. There was also no tutorial
+          showing in relatively easy terms how to do adaptive meshes
+          in time dependent problems. This program fills both of these
+          needs.
+  <br>
+  (Wolfgang Bangerth, 2013/12/18)
+  </li>
+
   <li> Improved: The build system now supports usage of the library
   out of the build directory without prior installation. This is done by
   exporting an additional project configuration just for the build directory.
