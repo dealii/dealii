@@ -59,6 +59,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: ParameterHandler::get_double() and ParameterHandler::get_integer()
+  had bugs in that they didn't detect if they were asked to return a number
+  for a parameter whose value was in fact not a number but some general
+  text. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2013/12/19)
+  </li>
+
   <li> Fixed: VectorTools::project_boundary_values could not deal with
   function values close to (but not exactly equal to) zero. This is now fixed.
   <br>

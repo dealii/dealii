@@ -1643,9 +1643,14 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
 {
   std::string s = get (entry_string);
   char *endptr;
-  long int i = std::strtol (s.c_str(), &endptr, 10);
-  // assert there was no error
-  AssertThrow (*endptr == '\0', ExcConversionError(s));
+  const long int i = std::strtol (s.c_str(), &endptr, 10);
+  
+  // assert that there was no error. an error would be if
+  // either there was no string to begin with, or if
+  // strtol set the endptr to anything but the end of
+  // the string
+  AssertThrow ((s.size()>0) && (*endptr == '\0'),
+	       ExcConversionError(s));
 
   return i;
 }
@@ -1657,9 +1662,13 @@ double ParameterHandler::get_double (const std::string &entry_string) const
   std::string s = get (entry_string);
   char *endptr;
   double d = std::strtod (s.c_str(), &endptr);
-  // assert there was no error
-  AssertThrow ((*s.c_str() != '\0') || (*endptr == '\0'),
-               ExcConversionError(s));
+
+  // assert that there was no error. an error would be if
+  // either there was no string to begin with, or if
+  // strtol set the endptr to anything but the end of
+  // the string
+  AssertThrow ((s.size()>0) && (*endptr == '\0'),
+	       ExcConversionError(s));
 
   return d;
 }
