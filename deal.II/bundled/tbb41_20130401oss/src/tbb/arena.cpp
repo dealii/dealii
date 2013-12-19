@@ -313,8 +313,8 @@ inline bool arena::may_have_tasks ( generic_scheduler* s, arena_slot& slot, bool
     suppress_unused_warning(slot);
     if ( !s ) {
         // This slot is vacant
-        __TBB_ASSERT( slot.task_pool == EmptyTaskPool, NULL );
-        // Disable this assertion - 2013 maier
+        // Disable these assertions - 2013 maier
+        // __TBB_ASSERT( slot.task_pool == EmptyTaskPool, NULL );
         // __TBB_ASSERT( slot.tail == slot.head, "Someone is tinkering with a vacant arena slot" );
         return false;
     }
