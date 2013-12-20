@@ -68,7 +68,7 @@ void check ()
 
   const Table<dim,double> data = fill(coordinates);
 
-  Functions::InterpolatedTensorProductData<dim> f(coordinates, data);
+  Functions::InterpolatedTensorProductGridData<dim> f(coordinates, data);
 
   // now choose a number of randomly chosen points inside the box and
   // verify that the functions returned are correct

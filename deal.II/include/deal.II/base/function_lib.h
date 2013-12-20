@@ -1211,7 +1211,7 @@ namespace Functions
    * @author Wolfgang Bangerth, 2013
    */
   template <int dim>
-  class InterpolatedTensorProductData : public Function<dim>
+  class InterpolatedTensorProductGridData : public Function<dim>
   {
     public:
       /**
@@ -1229,8 +1229,8 @@ namespace Functions
        *   converting other data types into a table where you specify this
        *   argument.
        */
-      InterpolatedTensorProductData (const boost::array<std::vector<double>,dim> &coordinate_values,
-                                     const Table<dim,double>                     &data_values);
+      InterpolatedTensorProductGridData (const boost::array<std::vector<double>,dim> &coordinate_values,
+                                         const Table<dim,double>                     &data_values);
 
       /**
        * Compute the value of the function set by bilinear interpolation of the

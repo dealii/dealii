@@ -2267,9 +2267,9 @@ namespace Functions
 
 
   template <int dim>
-  InterpolatedTensorProductData<dim>::
-  InterpolatedTensorProductData(const boost::array<std::vector<double>,dim> &coordinate_values,
-                                const Table<dim,double>                     &data_values)
+  InterpolatedTensorProductGridData<dim>::
+  InterpolatedTensorProductGridData(const boost::array<std::vector<double>,dim> &coordinate_values,
+                                    const Table<dim,double>                     &data_values)
   :
   coordinate_values (coordinate_values),
   data_values (data_values)
@@ -2341,8 +2341,8 @@ namespace Functions
 
   template <int dim>
   double
-  InterpolatedTensorProductData<dim>::value(const Point<dim> &p,
-                                            const unsigned int component) const
+  InterpolatedTensorProductGridData<dim>::value(const Point<dim> &p,
+                                                const unsigned int component) const
   {
     Assert (component == 0,
         ExcMessage ("This is a scalar function object, the component can only be zero."));
@@ -2430,9 +2430,9 @@ namespace Functions
   template class Monomial<3>;
   template class Bessel1<2>;
   template class Bessel1<3>;
-  template class InterpolatedTensorProductData<1>;
-  template class InterpolatedTensorProductData<2>;
-  template class InterpolatedTensorProductData<3>;
+  template class InterpolatedTensorProductGridData<1>;
+  template class InterpolatedTensorProductGridData<2>;
+  template class InterpolatedTensorProductGridData<3>;
 }
 
 DEAL_II_NAMESPACE_CLOSE

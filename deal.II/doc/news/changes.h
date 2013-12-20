@@ -59,7 +59,7 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: There is now a new class InterpolatedTensorProductData that can
+  <li> New: There is now a new class InterpolatedTensorProductGridData that can
   be used to (bi-/tri-)linearly interpolate data given on a tensor product
   mesh of $x$ (and $y$ and $z$) values, for example to evaluate experimentally
   determined coefficients, or to assess the accuracy of a solution by
