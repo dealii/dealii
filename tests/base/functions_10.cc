@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test InterpolatedTensorProductData
+// Test InterpolatedTensorProductGridData
 
 #include "../tests.h"
 #include <deal.II/base/function_lib.h>
