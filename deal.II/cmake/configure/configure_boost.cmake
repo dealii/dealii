@@ -48,9 +48,9 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
   ENDIF()
 
   IF(DEAL_II_WITH_THREADS)
-    SET(_boost_components serialization system thread)
+    SET(_boost_components iostreams serialization system thread)
   ELSE()
-    SET(_boost_components serialization system)
+    SET(_boost_components iostreams serialization system)
   ENDIF()
 
   #
