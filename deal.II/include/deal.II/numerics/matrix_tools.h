@@ -635,7 +635,7 @@ namespace MatrixCreator
  * solver which can handle nonsymmetric matrices in any case, so there
  * may be no need to do the Gauss elimination anyway. In fact, this is
  * the way the function works: it takes a parameter
- * (@p elininate_columns) that specifies whether the sparsity pattern
+ * (@p eliminate_columns) that specifies whether the sparsity pattern
  * is symmetric; if so, then the column is eliminated and the right
  * hand side is also modified accordingly. If not, then only the row
  * is deleted and the column is not touched at all, and all right hand
