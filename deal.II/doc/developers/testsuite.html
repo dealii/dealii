@@ -777,6 +777,15 @@ CONFIG_FILE
     $ cmake -C ${CONFIG_FILE}). This only has an effect if
     CTEST_BINARY_DIRECTORY is empty.
 
+DESCRIPTION
+  - A string that is appended to CTEST_BUILD_NAME
+
+COVERAGE
+  - If set to TRUE deal.II will be configured with
+    DEAL_II_SETUP_COVERAGE=TRUE, CMAKE_BUILD_TYPE=Debug and the
+    CTEST_COVERAGE() stage will be run. Test results must go into the
+    "Experimental" section.
+
 MAKEOPTS
   - Additional options that will be passed directly to make (or ninja).
 </pre>
