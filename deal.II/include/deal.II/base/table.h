@@ -488,9 +488,9 @@ public:
    * component, and then initialize the elements of the table using the
    * second and third argument by calling fill(entries,C_style_indexing).
    */
-  template <typename ForwardIterator>
+  template <typename InputIterator>
   TableBase (const TableIndices<N> &sizes,
-             ForwardIterator entries,
+             InputIterator entries,
              const bool      C_style_indexing = true);
 
   /**
@@ -634,8 +634,8 @@ public:
    *   subsequent elements of the input range. If false, change
    *   the first index fastest.
    */
-  template <typename ForwardIterator>
-  void fill (ForwardIterator entries,
+  template <typename InputIterator>
+  void fill (InputIterator entries,
              const bool      C_style_indexing = true);
 
   /**
@@ -857,9 +857,9 @@ public:
    *   subsequent elements of the input range. If false, change
    *   the first index fastest.
    */
-  template <typename ForwardIterator>
+  template <typename InputIterator>
   Table (const unsigned int size,
-         ForwardIterator entries,
+         InputIterator entries,
          const bool      C_style_indexing = true);
 
   /**
@@ -994,10 +994,10 @@ public:
    *   subsequent elements of the input range. If false, change
    *   the first index fastest.
    */
-  template <typename ForwardIterator>
+  template <typename InputIterator>
   Table (const unsigned int size1,
          const unsigned int size2,
-         ForwardIterator entries,
+         InputIterator entries,
          const bool      C_style_indexing = true);
 
   /**
@@ -1222,11 +1222,11 @@ public:
    *   subsequent elements of the input range. If false, change
    *   the first index fastest.
    */
-  template <typename ForwardIterator>
+  template <typename InputIterator>
   Table (const unsigned int size1,
          const unsigned int size2,
          const unsigned int size3,
-         ForwardIterator entries,
+         InputIterator entries,
          const bool      C_style_indexing = true);
 
   /**
@@ -1903,10 +1903,10 @@ TableBase<N,T>::TableBase (const TableIndices<N> &sizes)
 
 
 template <int N, typename T>
-template <typename ForwardIterator>
+template <typename InputIterator>
 TableBase<N,T>::
 TableBase (const TableIndices<N> &sizes,
-           ForwardIterator entries,
+           InputIterator entries,
            const bool      C_style_indexing)
 {
   reinit (sizes);
@@ -2266,8 +2266,8 @@ namespace internal
 {
   namespace Table
   {
-    template <typename ForwardIterator, typename T>
-    void fill_Fortran_style (ForwardIterator  entries,
+    template <typename InputIterator, typename T>
+    void fill_Fortran_style (InputIterator  entries,
                              TableBase<1,T>  &table)
     {
       for (unsigned int i=0; i<table.size()[0]; ++i)
@@ -2275,8 +2275,8 @@ namespace internal
     }
 
 
-    template <typename ForwardIterator, typename T>
-    void fill_Fortran_style (ForwardIterator  entries,
+    template <typename InputIterator, typename T>
+    void fill_Fortran_style (InputIterator  entries,
                              TableBase<2,T>  &table)
     {
       for (unsigned int j=0; j<table.size()[1]; ++j)
@@ -2285,8 +2285,8 @@ namespace internal
     }
 
 
-    template <typename ForwardIterator, typename T>
-    void fill_Fortran_style (ForwardIterator  entries,
+    template <typename InputIterator, typename T>
+    void fill_Fortran_style (InputIterator  entries,
                              TableBase<3,T>  &table)
     {
       for (unsigned int k=0; k<table.size()[2]; ++k)
@@ -2296,8 +2296,8 @@ namespace internal
     }
 
 
-    template <typename ForwardIterator, typename T, int N>
-    void fill_Fortran_style (ForwardIterator,
+    template <typename InputIterator, typename T, int N>
+    void fill_Fortran_style (InputIterator,
                              TableBase<N,T>  &)
     {
       Assert (false, ExcNotImplemented());
@@ -2307,10 +2307,10 @@ namespace internal
 
 
 template <int N, typename T>
-template <typename ForwardIterator>
+template <typename InputIterator>
 inline
 void
-TableBase<N,T>::fill (ForwardIterator entries,
+TableBase<N,T>::fill (InputIterator entries,
                       const bool C_style_indexing)
 {
   Assert (n_elements() != 0,
@@ -2455,10 +2455,10 @@ Table<1,T>::Table (const unsigned int size)
 
 
 template <typename T>
-template <typename ForwardIterator>
+template <typename InputIterator>
 inline
 Table<1,T>::Table (const unsigned int size,
-                   ForwardIterator entries,
+                   InputIterator entries,
                    const bool C_style_indexing)
   :
   TableBase<1,T> (TableIndices<1> (size),
@@ -2555,11 +2555,11 @@ Table<2,T>::Table (const unsigned int size1,
 
 
 template <typename T>
-template <typename ForwardIterator>
+template <typename InputIterator>
 inline
 Table<2,T>::Table (const unsigned int size1,
                    const unsigned int size2,
-                   ForwardIterator entries,
+                   InputIterator entries,
                    const bool C_style_indexing)
   :
   TableBase<2,T> (TableIndices<2> (size1, size2),
@@ -2824,12 +2824,12 @@ Table<3,T>::Table (const unsigned int size1,
 
 
 template <typename T>
-template <typename ForwardIterator>
+template <typename InputIterator>
 inline
 Table<3,T>::Table (const unsigned int size1,
                    const unsigned int size2,
                    const unsigned int size3,
-                   ForwardIterator entries,
+                   InputIterator entries,
                    const bool C_style_indexing)
   :
   TableBase<3,T> (TableIndices<3> (size1, size2, size3),
