@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test InterpolatedTensorProductGridData
+// Test InterpolatedUniformGridData
 
 #include "../tests.h"
 #include <deal.II/base/function_lib.h>
@@ -61,14 +61,27 @@ void check ()
 {
   // have coordinate arrays that span an interval starting at d+1
   // d+5 nonuniform intervals
+  std_cxx1x::array<std::pair<double,double>,dim> intervals;
+  std_cxx1x::array<unsigned int,dim> n_subintervals;
+  for (unsigned int d=0; d<dim; ++d)
+    {
+      intervals[d] = std::make_pair(d+2., 2*d+5.);
+      n_subintervals[d] = d+1 + d*d;
+    }
+
   std_cxx1x::array<std::vector<double>,dim> coordinates;
   for (unsigned int d=0; d<dim; ++d)
-    for (unsigned int i=0; i<d+5; ++i)
-      coordinates[d].push_back (d+1 + 1.*i*i);
-
+    {
+      const double x = intervals[d].first;
+      const double dx = (intervals[d].second-intervals[d].first)/n_subintervals[d];
+      
+      for (unsigned int i=0; i<n_subintervals[d]+1; ++i)
+	coordinates[d].push_back (x+dx*i);
+    }
+  
   const Table<dim,double> data = fill(coordinates);
 
-  Functions::InterpolatedTensorProductGridData<dim> f(coordinates, data);
+  Functions::InterpolatedUniformGridData<dim> f(intervals, n_subintervals, data);
 
   // now choose a number of randomly chosen points inside the box and
   // verify that the functions returned are correct

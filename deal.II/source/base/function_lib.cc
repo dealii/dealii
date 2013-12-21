@@ -2266,29 +2266,6 @@ namespace Functions
 
 
 
-  template <int dim>
-  InterpolatedTensorProductGridData<dim>::
-  InterpolatedTensorProductGridData(const boost::array<std::vector<double>,dim> &coordinate_values,
-                                    const Table<dim,double>                     &data_values)
-  :
-  coordinate_values (coordinate_values),
-  data_values (data_values)
-  {
-    for (unsigned int d=0; d<dim; ++d)
-      {
-        Assert (coordinate_values[d].size() >= 2,
-                ExcMessage ("Coordinate arrays must have at least two coordinate values!"));
-        for (unsigned int i=0; i<coordinate_values[d].size()-1; ++i)
-          Assert (coordinate_values[d][i] < coordinate_values[d][i+1],
-              ExcMessage ("Coordinate arrays must be sorted in strictly ascending order."));
-
-        Assert (data_values.size()[d] == coordinate_values[d].size(),
-                ExcMessage ("Data and coordinate tables do not have the same size."));
-      }
-  }
-
-
-
   namespace
   {
     // interpolate a data value from a table where ix denotes
@@ -2308,12 +2285,12 @@ namespace Functions
                         const Point<2>        &p_unit)
     {
       return (((1-p_unit[0])*data_values[ix[0]][ix[1]]
-	       +
-	       p_unit[0]*data_values[ix[0]+1][ix[1]])*(1-p_unit[1])
-	      +
-	      ((1-p_unit[0])*data_values[ix[0]][ix[1]+1]
-	       +
-	       p_unit[0]*data_values[ix[0]+1][ix[1]+1])*p_unit[1]);
+               +
+               p_unit[0]*data_values[ix[0]+1][ix[1]])*(1-p_unit[1])
+              +
+              ((1-p_unit[0])*data_values[ix[0]][ix[1]+1]
+               +
+               p_unit[0]*data_values[ix[0]+1][ix[1]+1])*p_unit[1]);
     }
 
     double interpolate (const Table<3,double> &data_values,
@@ -2323,20 +2300,43 @@ namespace Functions
       return ((((1-p_unit[0])*data_values[ix[0]][ix[1]][ix[2]]
                 +
                 p_unit[0]*data_values[ix[0]+1][ix[1]][ix[2]])*(1-p_unit[1])
-	       +
-	       ((1-p_unit[0])*data_values[ix[0]][ix[1]+1][ix[2]]
-		+
-		p_unit[0]*data_values[ix[0]+1][ix[1]+1][ix[2]])*p_unit[1]) * (1-p_unit[2])
-	      +
-	      (((1-p_unit[0])*data_values[ix[0]][ix[1]][ix[2]+1]
-		+
-		p_unit[0]*data_values[ix[0]+1][ix[1]][ix[2]+1])*(1-p_unit[1])
-	       +
-	       ((1-p_unit[0])*data_values[ix[0]][ix[1]+1][ix[2]+1]
-		+
-		p_unit[0]*data_values[ix[0]+1][ix[1]+1][ix[2]+1])*p_unit[1]) * p_unit[2]);
+               +
+               ((1-p_unit[0])*data_values[ix[0]][ix[1]+1][ix[2]]
+                +
+                p_unit[0]*data_values[ix[0]+1][ix[1]+1][ix[2]])*p_unit[1]) * (1-p_unit[2])
+              +
+              (((1-p_unit[0])*data_values[ix[0]][ix[1]][ix[2]+1]
+                +
+                p_unit[0]*data_values[ix[0]+1][ix[1]][ix[2]+1])*(1-p_unit[1])
+               +
+               ((1-p_unit[0])*data_values[ix[0]][ix[1]+1][ix[2]+1]
+                +
+                p_unit[0]*data_values[ix[0]+1][ix[1]+1][ix[2]+1])*p_unit[1]) * p_unit[2]);
     }
   }
+
+
+  template <int dim>
+  InterpolatedTensorProductGridData<dim>::
+  InterpolatedTensorProductGridData(const std_cxx1x::array<std::vector<double>,dim> &coordinate_values,
+                                    const Table<dim,double>                         &data_values)
+  :
+  coordinate_values (coordinate_values),
+  data_values (data_values)
+  {
+    for (unsigned int d=0; d<dim; ++d)
+      {
+        Assert (coordinate_values[d].size() >= 2,
+                ExcMessage ("Coordinate arrays must have at least two coordinate values!"));
+        for (unsigned int i=0; i<coordinate_values[d].size()-1; ++i)
+          Assert (coordinate_values[d][i] < coordinate_values[d][i+1],
+              ExcMessage ("Coordinate arrays must be sorted in strictly ascending order."));
+
+        Assert (data_values.size()[d] == coordinate_values[d].size(),
+                ExcMessage ("Data and coordinate tables do not have the same size."));
+      }
+  }
+
 
 
   template <int dim>
@@ -2388,6 +2388,70 @@ namespace Functions
 
 
 
+  template <int dim>
+  InterpolatedUniformGridData<dim>::
+  InterpolatedUniformGridData(const std_cxx1x::array<std::pair<double,double>,dim> &interval_endpoints,
+                              const std_cxx1x::array<unsigned int,dim>             &n_subintervals,
+                              const Table<dim,double>                              &data_values)
+  :
+  interval_endpoints (interval_endpoints),
+  n_subintervals (n_subintervals),
+  data_values (data_values)
+  {
+    for (unsigned int d=0; d<dim; ++d)
+      {
+        Assert (n_subintervals[d] >= 1,
+                ExcMessage ("There needs to be at least one subinterval in each "
+                            "coordinate direction."));
+        Assert (interval_endpoints[d].first < interval_endpoints[d].second,
+                ExcMessage ("The interval in each coordinate direction needs "
+                            "to have positive size"));
+        Assert (data_values.size()[d] == n_subintervals[d]+1,
+                ExcMessage ("The data table does not have the correct size."));
+      }
+  }
+
+
+  template <int dim>
+  double
+  InterpolatedUniformGridData<dim>::value(const Point<dim> &p,
+                                          const unsigned int component) const
+  {
+    Assert (component == 0,
+        ExcMessage ("This is a scalar function object, the component can only be zero."));
+
+    // find out where this data point lies, relative to the given
+    // subdivision points
+    TableIndices<dim> ix;
+    for (unsigned int d=0; d<dim; ++d)
+      {
+        const double delta_x = ((interval_endpoints[d].second - interval_endpoints[d].first) /
+                                n_subintervals[d]);
+        if (p[d] <= interval_endpoints[d].first)
+          ix[d] = 0;
+        else if (p[d] >= interval_endpoints[d].second-delta_x)
+          ix[d] = n_subintervals[d]-1;
+        else
+          ix[d] = (unsigned int)((p[d]-interval_endpoints[d].first) / delta_x);
+      }
+
+    // now compute the relative point within the interval/rectangle/box
+    // defined by the point coordinates found above. truncate below and
+    // above to accommodate points that may lie outside the range
+    Point<dim> p_unit;
+    for (unsigned int d=0; d<dim; ++d)
+      {
+        const double delta_x = ((interval_endpoints[d].second - interval_endpoints[d].first) /
+                                n_subintervals[d]);	
+	p_unit[d] = std::max(std::min((p[d]-interval_endpoints[d].first-ix[d]*delta_x)/delta_x,
+				      1.),
+			     0.);
+      }
+    
+    return interpolate (data_values, ix, p_unit);
+  }
+
+
 
 // explicit instantiations
   template class SquareFunction<1>;
@@ -2433,6 +2497,9 @@ namespace Functions
   template class InterpolatedTensorProductGridData<1>;
   template class InterpolatedTensorProductGridData<2>;
   template class InterpolatedTensorProductGridData<3>;
+  template class InterpolatedUniformGridData<1>;
+  template class InterpolatedUniformGridData<2>;
+  template class InterpolatedUniformGridData<3>;
 }
 
 DEAL_II_NAMESPACE_CLOSE
