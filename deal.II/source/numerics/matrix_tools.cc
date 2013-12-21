@@ -2033,7 +2033,11 @@ namespace MatrixTools
                 Assert ((p != matrix.end(row))
                         &&
                         (p->column() == dof_number),
-                        ExcInternalError());
+                        ExcMessage("This function is trying to access an element of the "
+                            "matrix that doesn't seem to exist. Are you using a "
+                            "nonsymmetric sparsity pattern? If so, you are not "
+                            "allowed to set the eliminate_column argument of this "
+                            "function, see the documentation."));
 
                 // correct right hand side
                 right_hand_side(row) -= p->value() /
