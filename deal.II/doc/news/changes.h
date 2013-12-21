@@ -88,6 +88,12 @@ inconvenience this causes.
   order in which table elements are initialized, allowing to switch between
   C- and Fortran-style table layouts.
   <br>
+  Along with the TableBase::fill function, the Table classes of various
+  ranks have also gotten constructors that allow the in-place construction
+  not only of a table of correct size, but already initialized from
+  somewhere. This finally allows to mark Table objects as const by creating
+  them already with the correct content.
+  <br>
   (Wolfgang Bangerth, 2013/12/21)
   </li>
 
