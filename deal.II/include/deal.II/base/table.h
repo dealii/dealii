@@ -2317,7 +2317,9 @@ TableBase<N,T>::fill (InputIterator entries,
           ExcMessage("Trying to fill an empty matrix."));
 
   if (C_style_indexing)
-    std::copy_n (entries, n_elements(), values.begin());
+    for (typename std::vector<T>::iterator p = values.begin();
+        p != values.end(); ++p)
+      *p = *entries++;
   else
     internal::Table::fill_Fortran_style (entries, *this);
 }
