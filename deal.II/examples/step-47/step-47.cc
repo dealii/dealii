@@ -280,9 +280,6 @@ namespace Step47
     FEValues<dim> plain_fe_values (fe_collection[0], quadrature_formula,
                                    update_values    |  update_gradients |
                                    update_quadrature_points  |  update_JxW_values);
-    FEValues<dim> enriched_fe_values (fe_collection[1], quadrature_formula,
-                                      update_values    |  update_gradients |
-                                      update_quadrature_points  |  update_JxW_values);
 
     const unsigned int   n_q_points    = quadrature_formula.size();
 
