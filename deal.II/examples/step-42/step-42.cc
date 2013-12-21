@@ -427,7 +427,11 @@ namespace Step42
     // i.e., the Chinese character. The first of the two, <code>BitmapFile</code>
     // is responsible for reading in data from a picture file
     // stored in pbm ascii format. This data will be bilinearly interpolated and
-    // provides in this way a function which describes an obstacle.
+    // thereby provides a function that describes the obstacle. (The code below
+    // shows how one can construct a function by interpolating between given
+    // data points. One could use the Functions::InterpolatedUniformGridData,
+    // introduced after this tutorial program was written, which does exactly
+    // what we want here, but it is instructive to see how to do it by hand.)
     //
     // The data which we read from the file will be stored in a double std::vector
     // named obstacle_data.  This vector composes the base to calculate a
