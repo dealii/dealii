@@ -173,12 +173,12 @@ namespace internal
    */
   template <typename DH>
   void extract_interpolation_matrices (const DH &,
-                                       Table<2,FullMatrix<double> > &)
+                                       dealii::Table<2,FullMatrix<double> > &)
   {}
 
   template <int dim, int spacedim>
   void extract_interpolation_matrices (const dealii::hp::DoFHandler<dim,spacedim> &dof,
-                                       Table<2,FullMatrix<double> > &matrices)
+                                       dealii::Table<2,FullMatrix<double> > &matrices)
   {
     const dealii::hp::FECollection<dim,spacedim> &fe = dof.get_fe();
     matrices.reinit (fe.size(), fe.size());
