@@ -583,31 +583,48 @@ public:
   bool empty () const;
 
   /**
-   * Fill array with an array of
-   * elements. The input array must
-   * be arranged in usual C style,
-   * i.e. with the last index
-   * running fastest. For
-   * two-dimensional tables, this
-   * means line by line. No range
-   * checking is performed, i.e.,
-   * it is assumed that the input
-   * array <tt>entries</tt> contains
-   * n_rows()*n_cols()
-   * elements, and that the layout
-   * refers to the desired shape of
-   * this table. The only check we
-   * do is that the present array
-   * is non-empty.
+   * Fill this table (which is assumed to already have the correct
+   * size) from a source given by dereferencing the given forward
+   * iterator (which could, for example, be a pointer to the first
+   * element of an array, or an inserting std::istream_iterator). The
+   * second argument denotes whether the elements pointed to are
+   * arranged in a way that corresponds to the last index running
+   * fastest or slowest. The default is to use C-style indexing
+   * where the last index runs fastest (as opposed to Fortran-style
+   * where the first index runs fastest when traversing multidimensional
+   * arrays. For example, if you try to fill an object of type
+   * Table<2,T>, then calling this function with the default
+   * value for the second argument will result in the equivalent of
+   * doing
+   * @code
+   *   Table<2,T> t;
+   *   for (unsigned int i=0; i<t.sizes()[0]; ++i)
+   *     for (unsigned int j=0; j<t.sizes()[1]; ++j)
+   *       t[i][j] = *entries++;
+   * @endcode
+   * On the other hand, if the second argument to this function is false,
+   * then this would result in code of the following form:
+   * @code
+   *   Table<2,T> t;
+   *   for (unsigned int j=0; j<t.sizes()[1]; ++j)
+   *     for (unsigned int i=0; i<t.sizes()[0]; ++i)
+   *       t[i][j] = *entries++;
+   * @endcode
+   * Note the switched order in which we fill the table elements by
+   * traversing the given set of iterators.
    *
-   * Note also that the type of the
-   * objects of the input array,
-   * <tt>T2</tt>, must be convertible to
-   * the type of the objects of
-   * this array.
+   * @param entries An iterator to a set of elements from which to
+   *   initialize this table. It is assumed that iterator can be
+   *   incremented and dereferenced a sufficient number of times
+   *   to fill this table.
+   * @param C_style_indexing If true, run over elements of the
+   *   table with the last index changing fastest as we dereference
+   *   subsequent elements of the input range. If false, change
+   *   the first index fastest.
    */
-  template<typename T2>
-  void fill (const T2 *entries);
+  template <typename ForwardIterator>
+  void fill (ForwardIterator entries,
+             const bool      C_style_indexing = true);
 
   /**
    * Fill all table entries with
@@ -2080,16 +2097,64 @@ TableBase<N,T>::empty () const
 
 
 
+namespace internal
+{
+  namespace Table
+  {
+    template <typename ForwardIterator, typename T>
+    void fill_Fortran_style (ForwardIterator  entries,
+                             TableBase<1,T>  &table)
+    {
+      for (unsigned int i=0; i<table.size()[0]; ++i)
+        table(TableIndices<1>(i)) = *entries++;
+    }
+
+
+    template <typename ForwardIterator, typename T>
+    void fill_Fortran_style (ForwardIterator  entries,
+                             TableBase<2,T>  &table)
+    {
+      for (unsigned int j=0; j<table.size()[1]; ++j)
+        for (unsigned int i=0; i<table.size()[0]; ++i)
+          table(TableIndices<2>(i,j)) = *entries++;
+    }
+
+
+    template <typename ForwardIterator, typename T>
+    void fill_Fortran_style (ForwardIterator  entries,
+                             TableBase<3,T>  &table)
+    {
+      for (unsigned int k=0; k<table.size()[2]; ++k)
+        for (unsigned int j=0; j<table.size()[1]; ++j)
+          for (unsigned int i=0; i<table.size()[0]; ++i)
+            table(TableIndices<3>(i,j,k)) = *entries++;
+    }
+
+
+    template <typename ForwardIterator, typename T, int N>
+    void fill_Fortran_style (ForwardIterator,
+                             TableBase<N,T>  &)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+  }
+}
+
+
 template <int N, typename T>
-template <typename T2>
+template <typename ForwardIterator>
 inline
 void
-TableBase<N,T>::fill (const T2 *entries)
+TableBase<N,T>::fill (ForwardIterator entries,
+                      const bool C_style_indexing)
 {
   Assert (n_elements() != 0,
           ExcMessage("Trying to fill an empty matrix."));
 
-  std::copy (entries, entries+n_elements(), values.begin());
+  if (C_style_indexing)
+    std::copy_n (entries, n_elements(), values.begin());
+  else
+    internal::Table::fill_Fortran_style (entries, *this);
 }
 
 

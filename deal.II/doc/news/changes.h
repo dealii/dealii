@@ -82,6 +82,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The TableBase::fill function has become more powerful in that
+  it now doesn't just take pointers to initializing elements but can deal
+  with arbitrary input iterators. It now also takes a flag that denotes the
+  order in which table elements are initialized, allowing to switch between
+  C- and Fortran-style table layouts.
+  <br>
+  (Wolfgang Bangerth, 2013/12/21)
+  </li>
+
   <li> New: There is now a new class Functions::InterpolatedTensorProductGridData that can
   be used to (bi-/tri-)linearly interpolate data given on a tensor product
   mesh of $x$ (and $y$ and $z$) values, for example to evaluate experimentally
