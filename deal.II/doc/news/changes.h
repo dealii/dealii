@@ -50,6 +50,29 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: deal.II now links with the
+  <a href="http://www.boost.org/doc/libs/1_55_0/libs/iostreams/doc/index.html">BOOST
+  Iostreams</a> library. Among many other things, this allows to easily
+  read files that have been compressed, as in the following code snippet:
+  @code
+    #include <boost/iostreams/filtering_stream.hpp>
+    #include <boost/iostreams/filter/gzip.hpp>
+    #include <boost/iostreams/device/file.hpp>
+
+    ...
+
+    boost::iostreams::filtering_istream in;
+    in.push(boost::iostreams::basic_gzip_decompressor<>());
+    in.push(boost::iostreams::file_source("myfile.gz"));
+
+    int i;
+    in >> i;
+  @endcode
+  More documentation on how to use BOOST Iostream can be found
+  in the documentation link referenced above.
+  <br>
+  (Wolfgang Bangerth, 2013/12/21)
+  </li>
 </ol>
 
 
