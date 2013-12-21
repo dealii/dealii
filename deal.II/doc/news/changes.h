@@ -52,7 +52,9 @@ inconvenience this causes.
 <ol>
   <li> New: deal.II now links with the
   <a href="http://www.boost.org/doc/libs/1_55_0/libs/iostreams/doc/index.html">BOOST
-  Iostreams</a> library. Among many other things, this allows to easily
+  Iostreams</a> library (at least if the libz and libbz2 libraries
+  can be found that are necessary for BOOST Iostreams).
+  Among many other things, this allows to easily
   read files that have been compressed, as in the following code snippet:
   @code
     #include <boost/iostreams/filtering_stream.hpp>

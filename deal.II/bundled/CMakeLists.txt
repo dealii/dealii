@@ -32,7 +32,6 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     "${BOOST_FOLDER}/include\n"
     )
 
-  ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/iostreams/src)
   ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
 
   IF(DEAL_II_WITH_THREADS AND NOT DEAL_II_USE_CXX11)
@@ -44,6 +43,15 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     # it. it also ensures that we use the correct compiler and flags
     #
     ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/thread/src)
+  ENDIF()
+
+  # BOOST.iostreams is useful, but it requires libbz2 and libz
+  # to be around. Don't do it if we can't find these two libs.
+  IF(DEAL_II_WITH_BZ2LIB AND DEAL_II_WITH_ZLIB)
+    MESSAGE(STATUS "Configuring BOOST Iostreams library")
+    ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/iostreams/src)
+  ELSE()
+    MESSAGE(STATUS "BOOST.iostream will not be available because libz or libbz2 were not found")
   ENDIF()
 ENDIF()
 
