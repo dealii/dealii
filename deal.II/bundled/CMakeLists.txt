@@ -32,17 +32,13 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     "${BOOST_FOLDER}/include\n"
     )
 
-  ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/iostreams/src)
   ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
 
+  IF(DEAL_II_WITH_ZLIB AND DEAL_II_WITH_BZIP2)
+    ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/iostreams/src)
+  ENDIF()
+
   IF(DEAL_II_WITH_THREADS AND NOT DEAL_II_USE_CXX11)
-    #
-    # If the C++ compiler doesn't completely support the C++11 standard
-    # (and consequently we can't use std::thread, std::mutex, etc), then
-    # include all the files that form BOOST's thread implementation so that
-    # we don't have to build BOOST itself only to get at this small part of
-    # it. it also ensures that we use the correct compiler and flags
-    #
     ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/thread/src)
   ENDIF()
 ENDIF()

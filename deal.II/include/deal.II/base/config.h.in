@@ -114,6 +114,7 @@
  */
 #cmakedefine DEAL_II_USE_CXX11
 #ifdef DEAL_II_USE_CXX11
+/* Compatibility definition (with naming from deal.II < 8.0): */
 # define DEAL_II_CAN_USE_CXX11
 # define DEAL_II_CAN_USE_CXX1X
 #endif
@@ -237,6 +238,7 @@
 
 #cmakedefine DEAL_II_WITH_ARPACK
 #ifdef DEAL_II_WITH_ARPACK
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_ARPACK
 #endif
 
@@ -246,6 +248,7 @@
 
 #cmakedefine DEAL_II_WITH_FUNCTIONPARSER
 #ifdef DEAL_II_WITH_FUNCTIONPARSER
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define HAVE_FUNCTIONPARSER
 #endif
 
@@ -255,6 +258,7 @@
 
 #cmakedefine DEAL_II_WITH_HDF5
 #ifdef DEAL_II_WITH_HDF5
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_HAVE_HDF5
 #endif
 
@@ -264,6 +268,7 @@
 
 #cmakedefine DEAL_II_WITH_LAPACK
 #ifdef DEAL_II_WITH_LAPACK
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define HAVE_LIBLAPACK
 
 /* Defined if the corresponding BLAS or LAPACK function is available */
@@ -315,6 +320,7 @@
 
 #cmakedefine DEAL_II_WITH_METIS
 #ifdef DEAL_II_WITH_METIS
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_METIS
 #endif
 
@@ -325,6 +331,7 @@
 
 #cmakedefine DEAL_II_WITH_MPI
 #ifdef DEAL_II_WITH_MPI
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_COMPILER_SUPPORTS_MPI
 #endif
 
@@ -335,6 +342,7 @@
 
 #cmakedefine DEAL_II_WITH_MUMPS
 #ifdef DEAL_II_WITH_MUMPS
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_MUMPS
 #endif
 
@@ -345,6 +353,7 @@
 
 #cmakedefine DEAL_II_WITH_NETCDF
 #ifdef DEAL_II_WITH_NETCDF
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define HAVE_LIBNETCDF
 #endif
 
@@ -355,6 +364,7 @@
 
 #cmakedefine DEAL_II_WITH_P4EST
 #ifdef DEAL_II_WITH_P4EST
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_P4EST
 
 #  define DEAL_II_P4EST_VERSION_MAJOR @P4EST_VERSION_MAJOR@
@@ -390,6 +400,7 @@
 
 #cmakedefine DEAL_II_WITH_PETSC
 #ifdef DEAL_II_WITH_PETSC
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_PETSC
 #endif
 
@@ -438,8 +449,16 @@
 
 #cmakedefine DEAL_II_WITH_SLEPC
 #ifdef DEAL_II_WITH_SLEPC
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_SLEPC
 #endif
+
+
+/***************************************
+ * Configured in configure_1_bzip2.cmake: *
+ ***************************************/
+
+#cmakedefine DEAL_II_WITH_BZIP2
 
 
 /********************************************
@@ -448,6 +467,7 @@
 
 #cmakedefine DEAL_II_WITH_THREADS
 #ifdef DEAL_II_WITH_THREADS
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_MT
 #endif
 
@@ -474,12 +494,24 @@
 #endif
 
 
+/*****************************************
+ * Configured in configure_1_zlib.cmake: *
+ *****************************************/
+
+#cmakedefine DEAL_II_WITH_ZLIB
+#ifdef DEAL_II_WITH_ZLIB
+/* Compatibility definition (with naming from deal.II < 8.0): */
+#  define HAVE_LIBZ
+#endif
+
+
 /*******************************************
  * Configured in configure_trilinos.cmake: *
  *******************************************/
 
 #cmakedefine DEAL_II_WITH_TRILINOS
 #ifdef DEAL_II_WITH_TRILINOS
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_TRILINOS
 #endif
 
@@ -490,17 +522,8 @@
 
 #cmakedefine DEAL_II_WITH_UMFPACK
 #ifdef DEAL_II_WITH_UMFPACK
+/* Compatibility definition (with naming from deal.II < 8.0): */
 #  define HAVE_LIBUMFPACK
-#endif
-
-
-/***************************************
- * Configured in configure_zlib.cmake: *
- ***************************************/
-
-#cmakedefine DEAL_II_WITH_ZLIB
-#ifdef DEAL_II_WITH_ZLIB
-#  define HAVE_LIBZ
 #endif
 
 
