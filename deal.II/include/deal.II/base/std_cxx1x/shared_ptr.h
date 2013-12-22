@@ -20,7 +20,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_CXX11
+#ifdef DEAL_II_WITH_CXX11
 
 #  include <memory>
 DEAL_II_NAMESPACE_OPEN

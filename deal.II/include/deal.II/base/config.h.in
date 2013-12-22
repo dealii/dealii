@@ -112,8 +112,10 @@
  * to allow using the standard library classes instead of the corresponding
  * BOOST classes.
  */
-#cmakedefine DEAL_II_USE_CXX11
-#ifdef DEAL_II_USE_CXX11
+#cmakedefine DEAL_II_WITH_CXX11
+#ifdef DEAL_II_WITH_CXX11
+/* Compatibility definition (with naming from deal.II 8.0): */
+# define DEAL_II_USE_CXX11
 /* Compatibility definition (with naming from deal.II < 8.0): */
 # define DEAL_II_CAN_USE_CXX11
 # define DEAL_II_CAN_USE_CXX1X

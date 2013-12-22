@@ -632,12 +632,11 @@
 # C++11 support is autodetected. You can explicitly disable C+11 support by
 # specifying
 #
-#   SET(DEAL_II_HAVE_CXX11_FLAG FALSE CACHE BOOL "")
+#   SET(DEAL_II_WITH_CXX11 FALSE CACHE BOOL "")
 #
 # A custom C++11 flag can be set by setting
 #
-#   SET(DEAL_II_HAVE_CXX11_FLAG TRUE CACHE BOOL "")
-#   SET(DEAL_II_CXX11_FLAG "-std=c++0x" CACHE STRING "")
+#   SET(DEAL_II_CXX11_FLAG "-std=c++11" CACHE STRING "")
 #
 
 
