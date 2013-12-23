@@ -15,12 +15,29 @@
 ## ---------------------------------------------------------------------
 
 SET(src_boost_iostreams
-    bzip2.cpp 
     file_descriptor.cpp
     gzip.cpp 
     mapped_file.cpp
-    zlib.cpp
   )
+
+IF(DEAL_II_WITH_ZLIB)
+  SET(src_boost_iostreams
+      ${src_boost_iostreams}
+      zlib.cpp
+  )
+ELSE()
+  MESSAGE(STATUS "BOOST::Iostreams will not support gzipped streams because libz could not be found")
+ENDIF()
+
+IF(DEALII_WITH_BZIP2)
+  SET(src_boost_iostreams
+      ${src_boost_iostreams}
+      bzip2.cpp 
+  )
+ELSE()
+  MESSAGE(STATUS "BOOST::Iostreams will not support bz2'ed streams because libz could not be found")
+ENDIF()
+
 
 DEAL_II_ADD_LIBRARY(obj_boost_iostreams OBJECT ${src_boost_iostreams})
 
