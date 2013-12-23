@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# Setup cached variables (prior to the PROJECT(deal.II) call)
+# Set up cached variables (prior to the PROJECT(deal.II) call)
 #
 # This file sets up the following cached Options:
 #
@@ -55,7 +55,7 @@
 #
 
 MESSAGE(STATUS "")
-MESSAGE(STATUS "Set up cached variables.")
+MESSAGE(STATUS "Setting up cached variables.")
 
 
 ########################################################################
@@ -99,7 +99,7 @@ OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
   )
 
 OPTION(DEAL_II_ALLOW_AUTODETECTION
-  "Allow to automatically setup features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
+  "Allow to automatically set up features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
   ON
   )
 

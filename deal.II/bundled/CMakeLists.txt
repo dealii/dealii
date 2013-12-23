@@ -18,7 +18,7 @@
 # Compile and install enabled bundled features:
 #
 
-MESSAGE(STATUS "Setup bundled features")
+MESSAGE(STATUS "Setting up bundled features")
 
 
 IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
@@ -71,4 +71,4 @@ IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
 ENDIF()
 
 
-MESSAGE(STATUS "Setup bundled features - Done")
+MESSAGE(STATUS "Setting up bundled features - Done")

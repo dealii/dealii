@@ -14,7 +14,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-MESSAGE(STATUS "Setup library")
+MESSAGE(STATUS "Setting up library")
 
 #
 # Compile the deal.II library
@@ -117,4 +117,4 @@ INSTALL(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
   COMPONENT library
   )
 
-MESSAGE(STATUS "Setup library - Done")
+MESSAGE(STATUS "Setting up library - Done")

@@ -102,7 +102,7 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   # *Hooray* We are allowed to set compiler flags :-]
   #
   MESSAGE(STATUS "")
-  MESSAGE(STATUS "Set up default compiler flags.")
+  MESSAGE(STATUS "Setting up default compiler flags.")
 
   #
   # General setup for GCC and compilers sufficiently close to GCC:

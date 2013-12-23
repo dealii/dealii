@@ -21,7 +21,7 @@ ENABLE_TESTING()
 
 # Use the first available build type (this prefers debug mode if available):
 LIST(GET DEAL_II_BUILD_TYPES 0 _mybuild)
-MESSAGE(STATUS "Setup quick_tests in ${_mybuild} mode")
+MESSAGE(STATUS "Setting up quick_tests in ${_mybuild} mode")
 
 SET(ALL_TESTS) # clean variable
 
@@ -110,4 +110,4 @@ ADD_CUSTOM_TARGET(test
   )
 ADD_DEPENDENCIES(test build_library)
 
-MESSAGE(STATUS "Setup quick_tests in ${_mybuild} mode - Done")
+MESSAGE(STATUS "Setting up quick_tests in ${_mybuild} mode - Done")

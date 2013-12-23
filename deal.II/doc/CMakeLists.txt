@@ -19,7 +19,7 @@
 #
 IF(DEAL_II_COMPONENT_DOCUMENTATION)
 
-  MESSAGE(STATUS "Setup documentation")
+  MESSAGE(STATUS "Setting up documentation")
 
   ADD_SUBDIRECTORY(doxygen)
 
@@ -44,7 +44,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
     COMPONENT documentation
     )
 
-  MESSAGE(STATUS "Setup documentation - Done")
+  MESSAGE(STATUS "Setting up documentation - Done")
 
 ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
 
