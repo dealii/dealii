@@ -26,7 +26,7 @@ IF(DEAL_II_WITH_ZLIB)
       zlib.cpp
   )
 ELSE()
-  MESSAGE(STATUS "BOOST::Iostreams will not support gzipped streams because libz could not be found")
+  MESSAGE(STATUS "BOOST::Iostreams will not support gzipped streams because libz or its header files could not be found")
 ENDIF()
 
 IF(DEALII_WITH_BZIP2)
@@ -35,7 +35,7 @@ IF(DEALII_WITH_BZIP2)
       bzip2.cpp 
   )
 ELSE()
-  MESSAGE(STATUS "BOOST::Iostreams will not support bz2'ed streams because libz could not be found")
+  MESSAGE(STATUS "BOOST::Iostreams will not support bz2'ed streams because libbz2 or its header files could not be found")
 ENDIF()
 
 
