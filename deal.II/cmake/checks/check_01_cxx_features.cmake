@@ -143,6 +143,75 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
     "
     DEAL_II_HAVE_CXX11_TYPE_TRAITS)
 
+  #
+  # On Mac OS-X 10.9 with recent gcc compilers in C++11 mode linking to
+  # some standard C library functions, notably toupper and tolower, fail
+  # due to unresolved references to this functions.
+  #
+  # Thanks to Denis Davydov for the testcase.
+  #
+  # Matthias Maier, 2013
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <ctype.h>
+    int main ()
+    {
+      char c = toupper('a');
+    }
+    "
+    DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK)
+
+
+  #
+  # icc-13 triggers an internal compiler error when compiling
+  # std::numeric_limits<...>::min() with -std=c++0x [1].
+  #
+  # Reported by Ted Kord.
+  #
+  # - Matthias Maier, 2013
+  #
+  # [1] http://software.intel.com/en-us/forums/topic/328902
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <limits>
+    struct Integer
+    {
+      static const int min_int_value;
+      static const int max_int_value;
+    };
+    const int Integer::min_int_value = std::numeric_limits<int>::min();
+    const int Integer::max_int_value = std::numeric_limits<int>::max();
+    int main() { return 0; }
+    "
+    DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK)
+
+  #
+  # icc-14.0.0 has an astonishing bug [1] where it hits an internal compiler
+  # error when run in C++11 mode with libstdc++-4.7 (from gcc).
+  #
+  # We just disable C++11 mode in this case
+  #
+  # [1] http://software.intel.com/en-us/forums/topic/472385
+  #
+  # - Matthias Maier, 2013
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <vector>
+    template<typename T> void foo()
+    {
+      std::vector<double> data(100);
+    }
+    int main()
+    {
+      foo<int>();
+    }
+    "
+    DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK)
+
+
   IF( DEAL_II_HAVE_CXX11_ARRAY AND
       DEAL_II_HAVE_CXX11_CONDITION_VARIABLE AND
       DEAL_II_HAVE_CXX11_FUNCTIONAL AND
@@ -151,8 +220,11 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       DEAL_II_HAVE_CXX11_THREAD AND
       DEAL_II_HAVE_CXX11_MUTEX AND
       DEAL_II_HAVE_CXX11_TUPLE AND
-      DEAL_II_HAVE_CXX11_TYPE_TRAITS )
-    SET(DEAL_II_HAVE_CXX11 TRUE)
+      DEAL_II_HAVE_CXX11_TYPE_TRAITS AND
+      DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK AND
+      DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK AND
+      DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK )
+      SET(DEAL_II_HAVE_CXX11 TRUE)
   ENDIF()
 
   RESET_CMAKE_REQUIRED()
@@ -174,8 +246,8 @@ OPTION(DEAL_II_WITH_CXX11
 
 IF(DEAL_II_WITH_CXX11 AND NOT DEAL_II_HAVE_CXX11)
   MESSAGE(FATAL_ERROR "\n"
-    "C++11 support was requested (DEAL_II_WITH_CXX11=TRUE) but is not
-    supported by the current compiler.\n"
+    "C++11 support was requested (DEAL_II_WITH_CXX11=TRUE) but is not "
+    "supported by the current compiler.\n"
     "Please disable C++11 support, i.e. configure with\n"
     "    -DDEAL_II_WITH_CXX11=FALSE,\n"
     "or use a different compiler, instead. (If the compiler flag for C++11 "

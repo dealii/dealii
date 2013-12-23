@@ -39,7 +39,7 @@ namespace boost
 // should only be used by deal.II and dependent projects...
 //
 // - Maier, 2013
-#ifdef DEAL_II_USE_CXX11
+#ifdef DEAL_II_WITH_CXX11
     template<typename T> struct weak_ptr_traits<std::weak_ptr<T> >
     {
       typedef std::shared_ptr<T> shared_type;
@@ -54,7 +54,7 @@ namespace boost
       typedef boost::weak_ptr<T> weak_type;
     };
 // as above
-#ifdef DEAL_II_USE_CXX11
+#ifdef DEAL_II_WITH_CXX11
     template<typename T> struct shared_ptr_traits<std::shared_ptr<T> >
     {
       typedef std::weak_ptr<T> weak_type;
