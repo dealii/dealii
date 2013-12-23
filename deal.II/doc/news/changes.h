@@ -84,6 +84,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+  <li> New: A new reinit() method has been introduced to
+  TrilinosWrappers::SparsityPattern that takes all rows that are possibly
+  written into as an optional argument. This allows for pre-allocating all
+  possible entries right away, which makes writing into the matrix from
+  several threads possible (otherwise, only one processor at a time can write
+  off-processor data).
+  <br>
+  (Martin Kronbichler, 2013/12/23)
+  </li>
+
   <li> New: The TableBase::fill function has become more powerful in that
   it now doesn't just take pointers to initializing elements but can deal
   with arbitrary input iterators. It now also takes a flag that denotes the

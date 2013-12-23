@@ -785,6 +785,45 @@ namespace TrilinosWrappers
     this->collect_sizes();
   }
 
+
+
+  void
+  BlockSparsityPattern::reinit (const std::vector<IndexSet> &row_parallel_partitioning,
+                                const std::vector<IndexSet> &col_parallel_partitioning,
+                                const MPI_Comm &communicator)
+  {
+    dealii::BlockSparsityPatternBase<SparsityPattern>::
+    reinit(row_parallel_partitioning.size(),
+           col_parallel_partitioning.size());
+    for (size_type i=0; i<row_parallel_partitioning.size(); ++i)
+      for (size_type j=0; j<col_parallel_partitioning.size(); ++j)
+        this->block(i,j).reinit(row_parallel_partitioning[i],
+                                col_parallel_partitioning[j],
+                                communicator);
+    this->collect_sizes();
+  }
+
+
+
+  void
+  BlockSparsityPattern::reinit (const std::vector<IndexSet> &row_parallel_partitioning,
+                                const std::vector<IndexSet> &col_parallel_partitioning,
+                                const std::vector<IndexSet> &writable_rows,
+                                const MPI_Comm &communicator)
+  {
+    AssertDimension(writable_rows.size(), row_parallel_partitioning.size());
+    dealii::BlockSparsityPatternBase<SparsityPattern>::
+    reinit(row_parallel_partitioning.size(),
+           col_parallel_partitioning.size());
+    for (size_type i=0; i<row_parallel_partitioning.size(); ++i)
+      for (size_type j=0; j<col_parallel_partitioning.size(); ++j)
+        this->block(i,j).reinit(row_parallel_partitioning[i],
+                                col_parallel_partitioning[j],
+                                writable_rows[i],
+                                communicator);
+    this->collect_sizes();
+  }
+
 }
 
 #endif

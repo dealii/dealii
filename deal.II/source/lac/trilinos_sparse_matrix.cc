@@ -26,6 +26,7 @@
 #  include <deal.II/lac/compressed_set_sparsity_pattern.h>
 #  include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 
+#  include <Epetra_Export.h>
 #  include <ml_epetra_utils.h>
 #  include <ml_struct.h>
 #  include <Teuchos_RCP.hpp>
@@ -574,13 +575,18 @@ namespace TrilinosWrappers
   {
     matrix.reset ();
 
-    // reinit with a (parallel) Trilinos
-    // sparsity pattern.
+    // reinit with a (parallel) Trilinos sparsity pattern.
     column_space_map.reset (new Epetra_Map
                             (sparsity_pattern.domain_partitioner()));
     matrix.reset (new Epetra_FECrsMatrix
                   (Copy, sparsity_pattern.trilinos_sparsity_pattern(), false));
+
+    if (sparsity_pattern.nonlocal_graph.get() != 0)
+      {
+        nonlocal_matrix.reset (new Epetra_CrsMatrix(Copy, *sparsity_pattern.nonlocal_graph));
+      }
     compress();
+    last_action = Zero;
   }
 
 
@@ -770,6 +776,56 @@ namespace TrilinosWrappers
 
 
 
+  inline
+  void
+  SparseMatrix::compress (::dealii::VectorOperation::values operation)
+  {
+
+    Epetra_CombineMode mode = last_action;
+    if (last_action == Zero)
+      {
+        if ((operation==::dealii::VectorOperation::add) ||
+            (operation==::dealii::VectorOperation::unknown))
+          mode = Add;
+        else if (operation==::dealii::VectorOperation::insert)
+          mode = Insert;
+      }
+    else
+      {
+        Assert(
+          ((last_action == Add) && (operation!=::dealii::VectorOperation::insert))
+          ||
+          ((last_action == Insert) && (operation!=::dealii::VectorOperation::add)),
+          ExcMessage("operation and argument to compress() do not match"));
+      }
+
+    // flush buffers
+    int ierr;
+    if (nonlocal_matrix.get() != 0)
+      {
+        nonlocal_matrix->FillComplete(*column_space_map, matrix->RowMap());
+        Epetra_Export exporter(nonlocal_matrix->RowMap(), matrix->RowMap());
+        ierr = matrix->Export(*nonlocal_matrix, exporter, mode);
+        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        ierr = matrix->FillComplete(*column_space_map, matrix->RowMap());
+        nonlocal_matrix->PutScalar(0);
+      }
+    else
+      ierr = matrix->GlobalAssemble (*column_space_map, matrix->RowMap(),
+                                     true, mode);
+
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = matrix->OptimizeStorage ();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    last_action = Zero;
+
+    compressed = true;
+  }
+
+
+
   void
   SparseMatrix::clear ()
   {
@@ -779,6 +835,7 @@ namespace TrilinosWrappers
     column_space_map.reset (new Epetra_Map (0, 0,
                                             Utilities::Trilinos::comm_self()));
     matrix.reset (new Epetra_FECrsMatrix(View, *column_space_map, 0));
+    nonlocal_matrix.reset();
 
     matrix->FillComplete();
 
