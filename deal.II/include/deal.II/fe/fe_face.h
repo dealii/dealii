@@ -33,15 +33,17 @@ DEAL_II_NAMESPACE_OPEN
  * and two, the polynomials hence correspond to the usual Lagrange polynomials
  * on equidistant points.
  *
- * This finite element is the trace space of FE_RaviartThomas on the faces and
+ * Although the name does not give it away, the element is discontinuous
+ * at locations where faces of cells meet. In particular,
+ * this finite element is the trace space of FE_RaviartThomas on the faces and
  * serves in hybridized methods, e.g. in combination with the FE_DGQ
  * element. Its use is demonstrated in the step-51 tutorial program.
  *
- * @note Since these are only finite elements on faces, only
+ * @note Since this element is defined only on faces, only
  * FEFaceValues and FESubfaceValues will be able to extract reasonable
  * values from any face polynomial. In order to make the use of
- * FESystem simpler, FEValues objects will not fail using this finite
- * element space, but all shape function values extracted will equal
+ * FESystem simpler, using a (cell) FEValues object will not fail using this finite
+ * element space, but all shape function values extracted will be equal
  * to zero.
  *
  * @ingroup fe
@@ -133,18 +135,22 @@ private:
 
 
 /**
- * A finite element, which is a Legendre on each face (i.e., FE_DGP)
+ * A finite element, which is a Legendre element of complete polynomials on
+ * each face (i.e., it is the face equivalent of what FE_DGP is on cells)
  * and undefined in the interior of the cells. The basis functions on
  * the faces are from Polynomials::Legendre.
  *
- * This element is used in a hybridized method together with the FE_DGP
- * element for the interior degrees of freedom.
+ * Although the name does not give it away, the element is discontinuous
+ * at locations where faces of cells meet. The element
+ * serves in hybridized methods, e.g. in combination with the FE_DGP
+ * element. An example of hybridizes methods can be found in the
+ * step-51 tutorial program.
  *
- * @note Since these are only finite elements on faces, only
+ * @note Since this element is defined only on faces, only
  * FEFaceValues and FESubfaceValues will be able to extract reasonable
  * values from any face polynomial. In order to make the use of
- * FESystem simpler, FEValues objects will not fail using this finite
- * element space, but all shape function values extracted will equal
+ * FESystem simpler, using a (cell) FEValues object will not fail using this finite
+ * element space, but all shape function values extracted will be equal
  * to zero.
  *
  * @ingroup fe
