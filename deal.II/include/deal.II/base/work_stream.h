@@ -1171,6 +1171,21 @@ namespace WorkStream
 #endif // DEAL_II_WITH_THREADS
 
 
+  // implementation 3 forward declaration
+  template <typename Worker,
+            typename Copier,
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
+  void
+  run (const std::vector<std::vector<Iterator> > &colored_iterators,
+       Worker                                   worker,
+       Copier                                   copier,
+       const ScratchData                       &sample_scratch_data,
+       const CopyData                          &sample_copy_data,
+       const unsigned int queue_length,
+       const unsigned int                       chunk_size);
+
 
   /**
    * This is one of two main functions of the WorkStream concept, doing work as
@@ -1260,17 +1275,17 @@ namespace WorkStream
 #ifdef DEAL_II_WITH_THREADS
     else // have TBB and use more than one thread
       {
-        // create the three stages of the pipeline
-        internal::Implementation2::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
-        iterator_range_to_item_stream (begin, end,
-                                       queue_length,
-                                       chunk_size,
-                                       sample_scratch_data,
-                                       sample_copy_data);
-
         // Check that the copier exist
         if (static_cast<const std_cxx1x::function<void (const CopyData &)>& >(copier))
           {
+	    // create the three stages of the pipeline
+	    internal::Implementation2::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
+	      iterator_range_to_item_stream (begin, end,
+					     queue_length,
+					     chunk_size,
+					     sample_scratch_data,
+					     sample_copy_data);
+
             internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
             internal::Implementation2::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
 
@@ -1287,17 +1302,30 @@ namespace WorkStream
           }
         else
           {
-            internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker,false);
+	    // there is no copier function. in this case, we have an
+	    // embarrassingly parallel problem where we can
+	    // essentially apply parallel_for. because parallel_for
+	    // requires subdividing the range for which operator- is
+	    // necessary between iterators, it is often inefficient to
+	    // apply it directory to cell ranges and similar iterator
+	    // types for which operator- is expensive or, in fact,
+	    // nonexistent. rather, in that case, we simply copy the
+	    // iterators into a large array and use operator- on
+	    // iterators to this array of iterators.
+	    //
+	    // instead of duplicating code, this is essentially the
+	    // same situation we have in Implementation3 below, so we
+	    // just defer to that place
+	    std::vector<std::vector<Iterator> > all_iterators (1);
+	    for (Iterator p=begin; p!=end; ++p)
+	      all_iterators[0].push_back (p);
 
-            // now create a pipeline from these stages
-            tbb::pipeline assembly_line;
-            assembly_line.add_filter (iterator_range_to_item_stream);
-            assembly_line.add_filter (worker_filter);
-
-            // and run it
-            assembly_line.run (queue_length);
-
-            assembly_line.clear ();
+	    run (all_iterators,
+		 worker, copier,
+		 sample_scratch_data,
+		 sample_copy_data,
+		 queue_length,
+		 chunk_size);
           }
       }
 #endif
