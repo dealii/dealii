@@ -265,7 +265,7 @@ void LaplaceProblem<dim>::setup_system ()
   relevant_set[1] = relevant_total.get_view(dofs_per_block[0],
                                             dof_handler.n_dofs());
 
-  csp.reinit(locally_owned, relevant_set, MPI_COMM_WORLD);
+  csp.reinit(locally_owned, locally_owned, relevant_set, MPI_COMM_WORLD);
   DoFTools::make_sparsity_pattern (dof_handler, csp,
                                    constraints, false);
   csp.compress();
