@@ -507,6 +507,13 @@
 #endif
 
 
+/*****************************************
+ * Configured in configure_1_bzip2.cmake: *
+ *****************************************/
+
+#cmakedefine DEAL_II_WITH_BZIP2
+
+
 /*******************************************
  * Configured in configure_trilinos.cmake: *
  *******************************************/
