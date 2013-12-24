@@ -69,8 +69,8 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     ${deal_ii_objects_${build_lowercase}}
     )
 
-  ADD_DEPENDENCIES(build_library ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
-  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+  ADD_DEPENDENCIES(build_library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
+  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
 
   SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     PROPERTIES
