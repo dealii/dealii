@@ -456,9 +456,9 @@
 #endif
 
 
-/***************************************
+/******************************************
  * Configured in configure_1_bzip2.cmake: *
- ***************************************/
+ ******************************************/
 
 #cmakedefine DEAL_II_WITH_BZIP2
 
@@ -505,13 +505,6 @@
 /* Compatibility definition (with naming from deal.II < 8.0): */
 #  define HAVE_LIBZ
 #endif
-
-
-/*****************************************
- * Configured in configure_1_bzip2.cmake: *
- *****************************************/
-
-#cmakedefine DEAL_II_WITH_BZIP2
 
 
 /*******************************************
