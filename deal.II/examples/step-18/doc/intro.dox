@@ -338,63 +338,23 @@ deferred to a later version.
 This functionality has been implemented in the meantime, and this is the time
 to explain its use. Basically, what we need to do is let every process
 generate graphical output for that subset of cells that it owns, write them
-into separate files and have a way to merge them later on. At this point, it
-should be noted that none of the graphical output formats known to the author
-of this program allows for a simple way to later re-read it and merge it with
-other files corresponding to the same simulation. What deal.II therefore
-offers is the following: When you call the <code>DataOut::build_patches</code>
-function, an intermediate format is generated that contains all the
-information for the data on each cell. Usually, this intermediate format is
-then further processed and converted into one of the graphical formats that we
-can presently write, such as gmv, eps, ucd, gnuplot, or a number of other
-ones. Once written in these formats, there is no way to reconstruct the
-necessary information to merge multiple blocks of output. However, the base
-classes of DataOut also allow to simply dump the intermediate format
-to a file, from which it can later be recovered without loss of information.
+into separate files and have a way to display all files for a certain timestep
+at the same time. This way the code produces one .vtu file per processor per
+time step. The two common VTK file viewers ParaView and VisIt both support
+opening more than one .vtu file at once. To simplifiy the process of picking
+the correct files and allow moving around in time, both support record files
+that reference all files for a given timestep. Sadly, the record files have a
+different format between VisIt and Paraview, so we write out both formats.
 
-This has two advantages: first, simulations may just dump the intermediate
-format data during run-time, and the user may later decide which particular
-graphics format she wants to have. This way, she does not have to re-run the
-entire simulation if graphical output is requested in a different format. One
-typical case is that one would like to take a quick look at the data with
-gnuplot, and then create high-quality pictures using GMV or OpenDX. Since both
-can be generated out of the intermediate format without problem, there is no
-need to re-run the simulation.
-
-In the present context, of more interest is the fact that in contrast to any
-of the other formats, it is simple to merge multiple files of intermediate
-format, if they belong to the same simulation. This is what we will do here:
-we will generate one output file in intermediate format for each processor
-that belongs to this computation (in the sequential case, this will simply be
-a single file). They may then later be read in and merged so that we can
-output a single file in whatever graphical format is requested.
-
-The way to do this is to first instruct the DataOutBase class to
-write intermediate format rather than in gmv or any other graphical
-format. This is simple: just use
-<code>data_out.write_deal_II_intermediate</code>. We will write to a file
-called <code>solution-TTTT.TTTT.d2</code> if there is only one processor, or
-files <code>solution-TTTT.TTTT.NNN.d2</code> if this is really a parallel
-job. Here, <code>TTTT.TTTT</code> denotes the time for which this output has
-been generated, and <code>NNN</code> the number of the MPI process that did this.
-
-The next step is to convert this file or these files into whatever
-format you like. The program that does this is the step-19 tutorial program:
-for example, for the first time step, call it through
-@code
-    ../\step-19/\step-19 solution-0001.0000.*.d2 solution-0001.0000.gmv
-@endcode
-to merge all the intermediate format files into a single file in GMV
-format. More details on the parameters of this program and what it can do for
-you can be found in the documentation of the step-19 tutorial program.
-
-@note In the years since the paragraphs above were written, it has
-also become possible to not only compute solutions in parallel, but
-also to visualize them with some programs (for example with the
-Paraview viewer). To make this efficient, one can not store the entire
-solution in a single file, but instead needs to have a single data
-file for each processor to visualize individually. We discuss this
-concept and how to use it in step-40.
+The code will generate the files solution-TTTT.NNN.vtu, where TTTT is the
+timestep number (starting from 1) and NNN is the processor id (starting from
+0). These files contain the locally owned cells for the timestep and
+processor. The files solution-TTTT.visit is the visit record for timestep
+TTTT, while solution-TTTT.pvtu is the same for ParaView. Finally, the file
+solution.pvd is a special record only supported by ParaView that references
+all time steps. So in ParaView, only solution.pvd needs to be opened, while
+one needs to select the group of all .visit files in VisIt for the same
+effect.
 
 
 <h3>Overall structure of the program</h3>
@@ -553,8 +513,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
 
 <li> <code>output_results ()</code>: This function simply outputs the solution
   based on what we have said above, i.e. every processor computes output only
-  for its own portion of the domain, and this can then be later merged by an
-  external program. In addition to the solution, we also compute the norm of
+  for its own portion of the domain. In addition to the solution, we also compute the norm of
   the stress averaged over all the quadrature points on each cell.
 </ul>
 

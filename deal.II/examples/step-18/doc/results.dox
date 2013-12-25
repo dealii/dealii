@@ -90,40 +90,20 @@ problem to keep a computer busy for a while. At the end of the day,
 this is what we have for output:
 @code
 examples/\step-18> ls -l *.d2
--rw-r--r--  1 bangerth wheeler 8797414 May 25 09:10 solution-0001.0000.d2
--rw-r--r--  1 bangerth wheeler 8788500 May 25 09:32 solution-0002.0000.d2
--rw-r--r--  1 bangerth wheeler 8763718 May 25 09:55 solution-0003.0000.d2
--rw-r--r--  1 bangerth wheeler 8738940 May 25 10:17 solution-0004.0000.d2
--rw-r--r--  1 bangerth wheeler 8710104 May 25 10:39 solution-0005.0000.d2
--rw-r--r--  1 bangerth wheeler 8685388 May 25 11:01 solution-0006.0000.d2
--rw-r--r--  1 bangerth wheeler 8649088 May 25 11:23 solution-0007.0000.d2
--rw-r--r--  1 bangerth wheeler 8585146 May 25 11:45 solution-0008.0000.d2
--rw-r--r--  1 bangerth wheeler 8489764 May 25 12:07 solution-0009.0000.d2
--rw-r--r--  1 bangerth wheeler 8405388 May 25 12:29 solution-0010.0000.d2
+-rw-r--r--  1 bangerth wheeler 8797414 May 25 09:10 solution-0001.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8788500 May 25 09:32 solution-0002.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8763718 May 25 09:55 solution-0003.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8738940 May 25 10:17 solution-0004.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8710104 May 25 10:39 solution-0005.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8685388 May 25 11:01 solution-0006.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8649088 May 25 11:23 solution-0007.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8585146 May 25 11:45 solution-0008.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8489764 May 25 12:07 solution-0009.0000.vtu
+-rw-r--r--  1 bangerth wheeler 8405388 May 25 12:29 solution-0010.0000.vtu
 @endcode
 
 
-Let us convert these files in deal.II intermediate format to gmv
-format (this assumes that you have already compiled the
-step-19 example program):
-@code
-examples/\step-18> ../\step-19/\step-19
-
-Converter from deal.II intermediate format to other graphics formats.
-
-Usage: ./\step-19 [-p parameter_file] list_of_input_files [-x output_format] -o output_file
-
-examples/\step-18> ../\step-19/\step-19 solution-0001.0000.d2 -x gmv -o solution-0001.0000.gmv
-examples/\step-18> ../\step-19/\step-19 solution-0002.0000.d2 -x gmv -o solution-0002.0000.gmv
-[...]
-@endcode
-Of course, since we have run the program only in sequential mode, we
-do have only one intermediate file for each time step that we have to
-take as input.
-
-
-
-If we visualize these files with GMV, we get to see the full picture
+If we visualize these files with VisIt or Paraview, we get to see the full picture
 of the disaster our forced compression wreaks on the cylinder (colors in the
 images encode the norm of the stress in the material):
 
@@ -233,39 +213,26 @@ Timestep 20 at time 10
 That's quite a good number of unknowns, given that we are in 3d. The output of
 this program are 16 files for each time step:
 @code
-examples/\step-18> ls -l solution-0001.000*
--rw-r--r--    1 bangerth mfw       4325219 Aug 11 09:44 solution-0001.0000-000.d2
--rw-r--r--    1 bangerth mfw       4454460 Aug 11 09:44 solution-0001.0000-001.d2
--rw-r--r--    1 bangerth mfw       4485242 Aug 11 09:43 solution-0001.0000-002.d2
--rw-r--r--    1 bangerth mfw       4517364 Aug 11 09:43 solution-0001.0000-003.d2
--rw-r--r--    1 bangerth mfw       4462829 Aug 11 09:43 solution-0001.0000-004.d2
--rw-r--r--    1 bangerth mfw       4482487 Aug 11 09:43 solution-0001.0000-005.d2
--rw-r--r--    1 bangerth mfw       4548619 Aug 11 09:43 solution-0001.0000-006.d2
--rw-r--r--    1 bangerth mfw       4522421 Aug 11 09:43 solution-0001.0000-007.d2
--rw-r--r--    1 bangerth mfw       4337529 Aug 11 09:43 solution-0001.0000-008.d2
--rw-r--r--    1 bangerth mfw       4163047 Aug 11 09:43 solution-0001.0000-009.d2
--rw-r--r--    1 bangerth mfw       4288247 Aug 11 09:43 solution-0001.0000-010.d2
--rw-r--r--    1 bangerth mfw       4350410 Aug 11 09:43 solution-0001.0000-011.d2
--rw-r--r--    1 bangerth mfw       4458427 Aug 11 09:43 solution-0001.0000-012.d2
--rw-r--r--    1 bangerth mfw       4466037 Aug 11 09:43 solution-0001.0000-013.d2
--rw-r--r--    1 bangerth mfw       4505679 Aug 11 09:44 solution-0001.0000-014.d2
--rw-r--r--    1 bangerth mfw       4340488 Aug 11 09:44 solution-0001.0000-015.d2
-@endcode
-We merge and convert these 16 intermediate files into a single gmv file as
-follows:
-@code
-examples/\step-18> time ../\step-19/\step-19 solution-0001.0000-* -x gmv -o solution-0001.0000.gmv
-
-real    0m45.929s
-user    0m41.290s
-sys     0m0.990s
-examples/\step-18> ls -l solution-0001.0000.gmv
--rw-r--r--    1 bangerth mfw      68925360 Aug 11 17:04 solution-0001.0000.gmv
+examples/\step-18> ls -l solution-0001*
+-rw-r--r--    1 bangerth mfw       4325219 Aug 11 09:44 solution-0001.000.d2
+-rw-r--r--    1 bangerth mfw       4454460 Aug 11 09:44 solution-0001.001.d2
+-rw-r--r--    1 bangerth mfw       4485242 Aug 11 09:43 solution-0001.002.d2
+-rw-r--r--    1 bangerth mfw       4517364 Aug 11 09:43 solution-0001.003.d2
+-rw-r--r--    1 bangerth mfw       4462829 Aug 11 09:43 solution-0001.004.d2
+-rw-r--r--    1 bangerth mfw       4482487 Aug 11 09:43 solution-0001.005.d2
+-rw-r--r--    1 bangerth mfw       4548619 Aug 11 09:43 solution-0001.006.d2
+-rw-r--r--    1 bangerth mfw       4522421 Aug 11 09:43 solution-0001.007.d2
+-rw-r--r--    1 bangerth mfw       4337529 Aug 11 09:43 solution-0001.008.d2
+-rw-r--r--    1 bangerth mfw       4163047 Aug 11 09:43 solution-0001.009.d2
+-rw-r--r--    1 bangerth mfw       4288247 Aug 11 09:43 solution-0001.010.d2
+-rw-r--r--    1 bangerth mfw       4350410 Aug 11 09:43 solution-0001.011.d2
+-rw-r--r--    1 bangerth mfw       4458427 Aug 11 09:43 solution-0001.012.d2
+-rw-r--r--    1 bangerth mfw       4466037 Aug 11 09:43 solution-0001.013.d2
+-rw-r--r--    1 bangerth mfw       4505679 Aug 11 09:44 solution-0001.014.d2
+-rw-r--r--    1 bangerth mfw       4340488 Aug 11 09:44 solution-0001.015.d2
 @endcode
 
-Doing so for all time steps, we obtain gmv files that we can visualize (albeit
-with some difficulty, due to their size gmv isn't exactly fast when plotting
-them). Here are first the mesh on which we compute as well as the partitioning
+Here are first the mesh on which we compute as well as the partitioning
 for the 16 processors:
 
 
