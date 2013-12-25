@@ -367,7 +367,9 @@ void LaplaceProblem<dim>::assemble_test ()
                           this,
                           std_cxx1x::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
-         Assembly::Copy::Data ());
+         Assembly::Copy::Data (),
+         2*multithread_info.n_threads(),
+         1);
 
   test_matrix.add(-1, reference_matrix);
 
