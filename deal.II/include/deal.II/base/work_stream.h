@@ -1183,8 +1183,8 @@ namespace WorkStream
        Copier                                   copier,
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       const unsigned int queue_length,
-       const unsigned int                       chunk_size);
+       const unsigned int queue_length = 2*multithread_info.n_threads(),
+       const unsigned int                       chunk_size = 8);
 
 
   /**
@@ -1378,8 +1378,8 @@ namespace WorkStream
        Copier                                   copier,
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       const unsigned int queue_length = 2*multithread_info.n_threads(),
-       const unsigned int                       chunk_size = 8)
+       const unsigned int                       queue_length,
+       const unsigned int                       chunk_size)
   {
     Assert (queue_length > 0,
             ExcMessage ("The queue length must be at least one, and preferably "
