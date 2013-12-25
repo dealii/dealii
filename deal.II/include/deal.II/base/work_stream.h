@@ -1171,7 +1171,41 @@ namespace WorkStream
 #endif // DEAL_II_WITH_THREADS
 
 
-  // implementation 3 forward declaration
+  /**
+   * This is one of two main functions of the WorkStream concept, doing work as
+   * described in the introduction to this namespace. It corresponds to
+   * implementation 3 of the paper by Turcksin, Kronbichler and Bangerth,
+   * see @ref workstream_paper .
+   * As such, it takes not a range of iterators described by a begin
+   * and end iterator, but a "colored" graph of iterators where each
+   * color represents cells for which writing the cell contributions into
+   * the global object does not conflict (in other words, these cells
+   * are not neighbors). Each "color" is represented by std::vectors of cells.
+   * The first argument to this function, a set of sets of cells (which are
+   * represent as a vector of vectors, for efficiency), is typically
+   * constructed by calling GraphColoring::make_graph_coloring(). See there
+   * for more information.
+   *
+   * This function that can be used for worker and copier objects that
+   * are either pointers to non-member functions or objects that allow to be
+   * called with an operator(), for example objects created by std::bind.
+   *
+   * The two data types <tt>ScratchData</tt> and <tt>CopyData</tt> need to
+   * have a working copy constructor. <tt>ScratchData</tt> is only used in the
+   * <tt>worker</tt> function, while <tt>CopyData</tt> is the object passed
+   * from the <tt>worker</tt> to the <tt>copier</tt>.
+   *
+   * The @p queue_length argument indicates the number of items that can be
+   * live at any given time. Each item consists of @p chunk_size elements of
+   * the input stream that will be worked on by the worker and copier
+   * functions one after the other on the same thread.
+   *
+   * @note If your data objects are large, or their constructors are
+   * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
+   * copies of the <tt>ScratchData</tt> object and
+   * <tt>queue_length*chunk_size</tt> copies of the <tt>CopyData</tt> object
+   * are generated.
+   */
   template <typename Worker,
             typename Copier,
             typename Iterator,
@@ -1179,12 +1213,12 @@ namespace WorkStream
             typename CopyData>
   void
   run (const std::vector<std::vector<Iterator> > &colored_iterators,
-       Worker                                   worker,
-       Copier                                   copier,
-       const ScratchData                       &sample_scratch_data,
-       const CopyData                          &sample_copy_data,
+       Worker                                     worker,
+       Copier                                     copier,
+       const ScratchData                         &sample_scratch_data,
+       const CopyData                            &sample_copy_data,
        const unsigned int queue_length = 2*multithread_info.n_threads(),
-       const unsigned int                       chunk_size = 8);
+       const unsigned int                         chunk_size = 8);
 
 
   /**
@@ -1278,13 +1312,13 @@ namespace WorkStream
         // Check that the copier exist
         if (static_cast<const std_cxx1x::function<void (const CopyData &)>& >(copier))
           {
-	    // create the three stages of the pipeline
-	    internal::Implementation2::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
-	      iterator_range_to_item_stream (begin, end,
-					     queue_length,
-					     chunk_size,
-					     sample_scratch_data,
-					     sample_copy_data);
+            // create the three stages of the pipeline
+            internal::Implementation2::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
+              iterator_range_to_item_stream (begin, end,
+                                             queue_length,
+                                             chunk_size,
+                                             sample_scratch_data,
+                                             sample_copy_data);
 
             internal::Implementation2::Worker<Iterator, ScratchData, CopyData> worker_filter (worker);
             internal::Implementation2::Copier<Iterator, ScratchData, CopyData> copier_filter (copier);
@@ -1302,71 +1336,37 @@ namespace WorkStream
           }
         else
           {
-	    // there is no copier function. in this case, we have an
-	    // embarrassingly parallel problem where we can
-	    // essentially apply parallel_for. because parallel_for
-	    // requires subdividing the range for which operator- is
-	    // necessary between iterators, it is often inefficient to
-	    // apply it directory to cell ranges and similar iterator
-	    // types for which operator- is expensive or, in fact,
-	    // nonexistent. rather, in that case, we simply copy the
-	    // iterators into a large array and use operator- on
-	    // iterators to this array of iterators.
-	    //
-	    // instead of duplicating code, this is essentially the
-	    // same situation we have in Implementation3 below, so we
-	    // just defer to that place
-	    std::vector<std::vector<Iterator> > all_iterators (1);
-	    for (Iterator p=begin; p!=end; ++p)
-	      all_iterators[0].push_back (p);
+            // there is no copier function. in this case, we have an
+            // embarrassingly parallel problem where we can
+            // essentially apply parallel_for. because parallel_for
+            // requires subdividing the range for which operator- is
+            // necessary between iterators, it is often inefficient to
+            // apply it directory to cell ranges and similar iterator
+            // types for which operator- is expensive or, in fact,
+            // nonexistent. rather, in that case, we simply copy the
+            // iterators into a large array and use operator- on
+            // iterators to this array of iterators.
+            //
+            // instead of duplicating code, this is essentially the
+            // same situation we have in Implementation3 below, so we
+            // just defer to that place
+            std::vector<std::vector<Iterator> > all_iterators (1);
+            for (Iterator p=begin; p!=end; ++p)
+              all_iterators[0].push_back (p);
 
-	    run (all_iterators,
-		 worker, copier,
-		 sample_scratch_data,
-		 sample_copy_data,
-		 queue_length,
-		 chunk_size);
+            run (all_iterators,
+                 worker, copier,
+                 sample_scratch_data,
+                 sample_copy_data,
+                 queue_length,
+                 chunk_size);
           }
       }
 #endif
   }
 
 
-  /**
-   * This is one of two main functions of the WorkStream concept, doing work as
-   * described in the introduction to this namespace. It corresponds to
-   * implementation 3 of the paper by Turcksin, Kronbichler and Bangerth,
-   * see @ref workstream_paper .
-   * As such, it takes not a range of iterators described by a begin
-   * and end iterator, but a "colored" graph of iterators where each
-   * color represents cells for which writing the cell contributions into
-   * the global object does not conflict (in other words, these cells
-   * are not neighbors). Each "color" is represented by std::vectors of cells.
-   * The first argument to this function, a set of sets of cells (which are
-   * represent as a vector of vectors, for efficiency), is typically
-   * constructed by calling GraphColoring::make_graph_coloring(). See there
-   * for more information.
-   *
-   * This function that can be used for worker and copier objects that
-   * are either pointers to non-member functions or objects that allow to be
-   * called with an operator(), for example objects created by std::bind.
-   *
-   * The two data types <tt>ScratchData</tt> and <tt>CopyData</tt> need to
-   * have a working copy constructor. <tt>ScratchData</tt> is only used in the
-   * <tt>worker</tt> function, while <tt>CopyData</tt> is the object passed
-   * from the <tt>worker</tt> to the <tt>copier</tt>.
-   *
-   * The @p queue_length argument indicates the number of items that can be
-   * live at any given time. Each item consists of @p chunk_size elements of
-   * the input stream that will be worked on by the worker and copier
-   * functions one after the other on the same thread.
-   *
-   * @note If your data objects are large, or their constructors are
-   * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
-   * copies of the <tt>ScratchData</tt> object and
-   * <tt>queue_length*chunk_size</tt> copies of the <tt>CopyData</tt> object
-   * are generated.
-   */
+  // Implementation 3:
   template <typename Worker,
             typename Copier,
             typename Iterator,
@@ -1374,12 +1374,12 @@ namespace WorkStream
             typename CopyData>
   void
   run (const std::vector<std::vector<Iterator> > &colored_iterators,
-       Worker                                   worker,
-       Copier                                   copier,
-       const ScratchData                       &sample_scratch_data,
-       const CopyData                          &sample_copy_data,
-       const unsigned int                       queue_length,
-       const unsigned int                       chunk_size)
+       Worker                                     worker,
+       Copier                                     copier,
+       const ScratchData                         &sample_scratch_data,
+       const CopyData                            &sample_copy_data,
+       const unsigned int                         queue_length,
+       const unsigned int                         chunk_size)
   {
     Assert (queue_length > 0,
             ExcMessage ("The queue length must be at least one, and preferably "
