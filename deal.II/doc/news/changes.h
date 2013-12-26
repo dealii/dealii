@@ -85,11 +85,20 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Improved: When you call WorkStream::run with an empty function object
+  for the copier, operations on individual cells are essentially all independent.
+  In other words, you have a massively parallel collection of jobs. In this
+  case, a parallel for loop over all elements is better suited than the
+  pipeline approach currently used. This has now been implemented.
+  <br>
+  (Wolfgang Bangerth, 2013/12/26)
+  </li>
+
   <li> New: The new function VectorTools::interpolate_based_on_material_id()
   can be used to interpolate several functions onto a mesh, based on the
   material id of each cell individually.
   <br>
-  (Valentin Zingan, 2013/12/24)
+  (Valentin Zingan, 2013/12/26)
   </li>
 
   <li> New: A new reinit() method has been introduced to
