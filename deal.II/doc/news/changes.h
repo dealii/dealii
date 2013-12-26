@@ -85,6 +85,13 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: The new function VectorTools::interpolate_based_on_material_id()
+  can be used to interpolate several functions onto a mesh, based on the
+  material id of each cell individually.
+  <br>
+  (Valentin Zingan, 2013/12/24)
+  </li>
+
   <li> New: A new reinit() method has been introduced to
   TrilinosWrappers::SparsityPattern that takes all rows that are possibly
   written into as an optional argument. This allows for pre-allocating all

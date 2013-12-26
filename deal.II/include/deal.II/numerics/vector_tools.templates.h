@@ -331,6 +331,154 @@ namespace VectorTools
   }
 
 
+  template<typename VECTOR, typename DH>
+  void
+  interpolate_based_on_material_id(const Mapping<DH::dimension, DH::space_dimension>&                          mapping,
+                                   const DH&                                                                   dof,
+                                   const std::map< types::material_id, const Function<DH::space_dimension>* >& function_map,
+                                   VECTOR&                                                                     dst,
+                                   const ComponentMask&                                                        component_mask)
+  {
+    const unsigned int dim = DH::dimension;
+
+    Assert( component_mask.represents_n_components(dof.get_fe().n_components()),
+            ExcMessage("The number of components in the mask has to be either "
+                "zero or equal to the number of components in the finite "
+                "element.") );
+
+    if( function_map.size() == 0 )
+      return;
+
+    Assert( function_map.find(numbers::invalid_material_id) == function_map.end(),
+            ExcInvalidMaterialIndicator() );
+
+    for( typename std::map< types::material_id, const Function<DH::space_dimension>* >::const_iterator
+        iter  = function_map.begin();
+        iter != function_map.end();
+        ++iter )
+      {
+        Assert( dof.get_fe().n_components() == iter->second->n_components,
+            ExcDimensionMismatch(dof.get_fe().n_components(), iter->second->n_components) );
+      }
+
+    const hp::FECollection<DH::dimension, DH::space_dimension> fe(dof.get_fe());
+    const unsigned int n_components =  fe.n_components();
+    const bool         fe_is_system = (n_components != 1);
+
+    typename DH::active_cell_iterator cell = dof.begin_active(),
+        endc = dof.end();
+
+    std::vector< std::vector< Point<dim> > > unit_support_points(fe.size());
+    for(unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
+      {
+        unit_support_points[fe_index] = fe[fe_index].get_unit_support_points();
+        Assert( unit_support_points[fe_index].size() != 0,
+                ExcNonInterpolatingFE() );
+      }
+
+    std::vector< std::vector<unsigned int> > dofs_of_rep_points(fe.size());
+    std::vector< std::vector<unsigned int> > dof_to_rep_index_table(fe.size());
+    std::vector<unsigned int>                n_rep_points(fe.size(), 0);
+
+    for(unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
+      {
+        for(unsigned int i = 0; i < fe[fe_index].dofs_per_cell; ++i)
+          {
+            bool representative = true;
+
+            for(unsigned int j = dofs_of_rep_points[fe_index].size(); j > 0; --j)
+              if( unit_support_points[fe_index][i] == unit_support_points[fe_index][dofs_of_rep_points[fe_index][j-1]] )
+                {
+                  dof_to_rep_index_table[fe_index].push_back(j-1);
+                  representative = false;
+                  break;
+                }
+
+            if(representative)
+              {
+                dof_to_rep_index_table[fe_index].push_back(dofs_of_rep_points[fe_index].size());
+                dofs_of_rep_points[fe_index].push_back(i);
+                ++n_rep_points[fe_index];
+              }
+          }
+
+        Assert( dofs_of_rep_points[fe_index].size() == n_rep_points[fe_index],
+                ExcInternalError() );
+        Assert( dof_to_rep_index_table[fe_index].size() == fe[fe_index].dofs_per_cell,
+                ExcInternalError() );
+      }
+
+    const unsigned int max_rep_points = *std::max_element(n_rep_points.begin(),
+                                                          n_rep_points.end());
+    std::vector<unsigned int>                 dofs_on_cell(fe.max_dofs_per_cell());
+    std::vector< Point<DH::space_dimension> > rep_points(max_rep_points);
+
+    std::vector< std::vector<double> >           function_values_scalar(fe.size());
+    std::vector< std::vector< Vector<double> > > function_values_system(fe.size());
+
+    hp::QCollection<dim> support_quadrature;
+    for(unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
+      support_quadrature.push_back( Quadrature<dim>(unit_support_points[fe_index]) );
+
+    hp::MappingCollection<dim, DH::space_dimension> mapping_collection(mapping);
+    hp::FEValues<dim, DH::space_dimension> fe_values(mapping_collection,
+        fe,
+        support_quadrature,
+        update_quadrature_points);
+
+    for( ; cell != endc; ++cell)
+      if( cell->is_locally_owned() )
+        if( function_map.find(cell->material_id()) != function_map.end() )
+          {
+            const unsigned int fe_index = cell->active_fe_index();
+
+            fe_values.reinit(cell);
+
+            const std::vector< Point<DH::space_dimension> >& support_points = fe_values.get_present_fe_values().get_quadrature_points();
+
+            rep_points.resize( dofs_of_rep_points[fe_index].size() );
+            for(unsigned int i = 0; i < dofs_of_rep_points[fe_index].size(); ++i)
+              rep_points[i] = support_points[dofs_of_rep_points[fe_index][i]];
+
+            dofs_on_cell.resize( fe[fe_index].dofs_per_cell );
+            cell->get_dof_indices(dofs_on_cell);
+
+            if(fe_is_system)
+              {
+                function_values_system[fe_index].resize( n_rep_points[fe_index],
+                    Vector<double>(fe[fe_index].n_components()) );
+
+                function_map.find(cell->material_id())->second->vector_value_list(rep_points,
+                    function_values_system[fe_index]);
+
+                for(unsigned int i = 0; i < fe[fe_index].dofs_per_cell; ++i)
+                  {
+                    const unsigned int component = fe[fe_index].system_to_component_index(i).first;
+
+                    if( component_mask[component] )
+                      {
+                        const unsigned int rep_dof = dof_to_rep_index_table[fe_index][i];
+                        dst(dofs_on_cell[i])       = function_values_system[fe_index][rep_dof](component);
+                      }
+                  }
+              }
+            else
+              {
+                function_values_scalar[fe_index].resize(n_rep_points[fe_index]);
+
+                function_map.find(cell->material_id())->second->value_list(rep_points,
+                    function_values_scalar[fe_index],
+                    0);
+
+                for(unsigned int i = 0; i < fe[fe_index].dofs_per_cell; ++i)
+                  dst(dofs_on_cell[i]) = function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]];
+              }
+          }
+
+    dst.compress (VectorOperation::insert);
+  }
+
+
   namespace internal
   {
     /**
