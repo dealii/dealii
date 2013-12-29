@@ -1177,6 +1177,9 @@ namespace TrilinosWrappers
     if (fast == false ||
         vector_partitioner().SameAs(v.vector_partitioner())==false)
       vector.reset (new Epetra_FEVector(*v.vector));
+
+    if (v.nonlocal_vector.get() != 0)
+      nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
   }
 
 
@@ -1221,6 +1224,9 @@ namespace TrilinosWrappers
     const int ierr = vector->PutScalar(s);
 
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    if (nonlocal_vector.get() != 0)
+      nonlocal_vector->PutScalar(0.);
 
     return *this;
   }
