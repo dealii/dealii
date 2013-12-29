@@ -1061,6 +1061,22 @@ namespace TrilinosWrappers
                           const MPI_Comm &communicator = MPI_COMM_WORLD);
 
     /**
+     * Initialize the pattern with two arrays of index sets that specify rows
+     * and columns of the matrix, where the size() of the IndexSets specifies
+     * the size of the blocks and the values in each IndexSet denotes the rows
+     * that are going to be saved in each block. The additional index set
+     * writable_rows is used to set all rows that we allow to write
+     * locally. This constructor is used to create matrices that allow several
+     * threads to write simultaneously into the matrix (to different rows, of
+     * course), see the method TrilinosWrappers::SparsityPattern::reinit
+     * method with three index set arguments for more details.
+     */
+    BlockSparsityPattern (const std::vector<IndexSet> &row_parallel_partitioning,
+                          const std::vector<IndexSet> &column_parallel_partitioning,
+                          const std::vector<IndexSet> &writeable_rows,
+                          const MPI_Comm              &communicator = MPI_COMM_WORLD);
+
+    /**
      * Resize the matrix to a tensor product of matrices with dimensions
      * defined by the arguments.
      *

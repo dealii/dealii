@@ -452,23 +452,23 @@ namespace TrilinosWrappers
    *
    * When writing into Trilinos matrices from several threads in shared
    * memory, several things must be kept in mind as there is no built-in locks
-   * in this class to prevent data races. Therefore, simultaneous access to
-   * the same matrix row at the same time leads to data races in general and
-   * must be explicitly avoided by the user. However, it is possible to access
-   * <b>different</b> rows of the matrix from several threads simultaneously
-   * under the following two conditions:
+   * in this class to prevent data races. Simultaneous access to the same
+   * matrix row at the same time can lead to data races and must be explicitly
+   * avoided by the user. However, it is possible to access <b>different</b>
+   * rows of the matrix from several threads simultaneously under the
+   * following two conditions:
    * <ul>
    *   <li> The matrix uses only one MPI process.
    *   <li> The matrix has been initialized from a
    *   TrilinosWrappers::SparsityPattern object that in turn has been
    *   initialized with the reinit function specifying three index sets, one
    *   for the rows, one for the columns and for the larger set of @p
-   *   writeable_rows. Note that all other reinit methods and constructors of
-   *   TrilinosWrappers::SparsityPattern will result in a matrix that needs to
-   *   allocate off-processor entries on demand, which breaks
-   *   thread-safety. Of course, using the respective reinit method for the
-   *   block Trilinos sparsity pattern and block matrix also results in
-   *   thread-safety.
+   *   writeable_rows, and the operation is an addition. Note that all other
+   *   reinit methods and constructors of TrilinosWrappers::SparsityPattern
+   *   will result in a matrix that needs to allocate off-processor entries on
+   *   demand, which breaks thread-safety. Of course, using the respective
+   *   reinit method for the block Trilinos sparsity pattern and block matrix
+   *   also results in thread-safety.
    * </ul>
    *
    * @ingroup TrilinosWrappers
@@ -2499,25 +2499,17 @@ namespace TrilinosWrappers
             if (ierr > 0)
               ierr = 0;
           }
-        else if (nonlocal_matrix.get() != 0)
-          {
-            // this is the case when we have explicitly set the off-processor
-            // rows and want to create a separate matrix object for them (to
-            // retain thread-safety)
-            Assert (nonlocal_matrix->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
-                    ExcMessage("Attempted to write into off-processor matrix row "
-                               "that has not be specified as being writable upon "
-                               "initialization"));
-            ierr = nonlocal_matrix->ReplaceGlobalValues(row, n_columns,
-                                                        col_value_ptr,
-                                                        col_index_ptr);
-          }
         else
           ierr = matrix->ReplaceGlobalValues (1,
                                               (TrilinosWrappers::types::int_type *)&row,
                                               n_columns, col_index_ptr,
                                               &col_value_ptr,
                                               Epetra_FECrsMatrix::ROW_MAJOR);
+        // use the FECrsMatrix facilities for set even in the case when we
+        // have explicitly set the off-processor rows because that only works
+        // properly when adding elements, not when setting them (since we want
+        // to only touch elements that have been set explicitly, and there is
+        // no way on the receiving processor to identify them otherwise)
       }
 
     Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
@@ -2762,8 +2754,7 @@ namespace TrilinosWrappers
 
 
 
-  // inline "simple" functions that are
-  // called frequently and do only involve
+  // inline "simple" functions that are called frequently and do only involve
   // a call to some Trilinos function.
   inline
   SparseMatrix::size_type

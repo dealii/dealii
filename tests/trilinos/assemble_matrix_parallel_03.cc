@@ -89,9 +89,14 @@ namespace Assembly
   {
     struct Data
     {
+      Data(const bool assemble_reference)
+        :
+        assemble_reference(assemble_reference)
+      {}
       std::vector<types::global_dof_index> local_dof_indices;
       FullMatrix<double> local_matrix;
       Vector<double> local_rhs;
+      const bool assemble_reference;
     };
   }
 }
@@ -247,18 +252,27 @@ void LaplaceProblem<dim>::setup_system ()
         (FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> const &)> >
         (std_cxx1x::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx1x::_1)));
 
-  TrilinosWrappers::SparsityPattern csp;
-  IndexSet locally_owned = dof_handler.locally_owned_dofs(), relevant_set;
-  DoFTools::extract_locally_relevant_dofs (dof_handler, relevant_set);
-  csp.reinit(locally_owned, locally_owned, relevant_set, MPI_COMM_WORLD);
-  DoFTools::make_sparsity_pattern (dof_handler, csp,
-                                   constraints, false);
-  csp.compress();
-  reference_matrix.reinit (csp);
-  test_matrix.reinit (csp);
-
-  reference_rhs.reinit (locally_owned, MPI_COMM_WORLD);
-  test_rhs.reinit (reference_rhs);
+  IndexSet locally_owned = dof_handler.locally_owned_dofs();
+  {
+    TrilinosWrappers::SparsityPattern csp;
+    csp.reinit(locally_owned, locally_owned, MPI_COMM_WORLD);
+    DoFTools::make_sparsity_pattern (dof_handler, csp,
+                                     constraints, false);
+    csp.compress();
+    reference_matrix.reinit (csp);
+    reference_rhs.reinit (locally_owned, MPI_COMM_WORLD);
+  }
+  {
+    TrilinosWrappers::SparsityPattern csp;
+    IndexSet relevant_set;
+    DoFTools::extract_locally_relevant_dofs (dof_handler, relevant_set);
+    csp.reinit(locally_owned, locally_owned, relevant_set, MPI_COMM_WORLD);
+    DoFTools::make_sparsity_pattern (dof_handler, csp,
+                                     constraints, false);
+    csp.compress();
+    test_matrix.reinit (csp);
+    test_rhs.reinit (locally_owned, relevant_set, MPI_COMM_WORLD, true);
+  }
 }
 
 
@@ -311,9 +325,14 @@ template <int dim>
 void
 LaplaceProblem<dim>::copy_local_to_global (const Assembly::Copy::Data &data)
 {
-  constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
-                                         data.local_dof_indices,
-                                         test_matrix, test_rhs);
+  if (data.assemble_reference)
+    constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
+                                           data.local_dof_indices,
+                                           reference_matrix, reference_rhs);
+  else
+    constraints.distribute_local_to_global(data.local_matrix, data.local_rhs,
+                                           data.local_dof_indices,
+                                           test_matrix, test_rhs);
 }
 
 
@@ -321,10 +340,10 @@ LaplaceProblem<dim>::copy_local_to_global (const Assembly::Copy::Data &data)
 template <int dim>
 void LaplaceProblem<dim>::assemble_reference ()
 {
-  test_matrix = 0;
-  test_rhs = 0;
+  reference_matrix = 0;
+  reference_rhs = 0;
 
-  Assembly::Copy::Data copy_data;
+  Assembly::Copy::Data copy_data(true);
   Assembly::Scratch::Data<dim> assembly_data(fe, quadrature);
 
   for (unsigned int color=0; color<graph.size(); ++color)
@@ -334,11 +353,8 @@ void LaplaceProblem<dim>::assemble_reference ()
         local_assemble(*p, assembly_data, copy_data);
         copy_local_to_global(copy_data);
       }
-  test_matrix.compress(VectorOperation::add);
-  test_rhs.compress(VectorOperation::add);
-
-  reference_matrix.add(1., test_matrix);
-  reference_rhs = test_rhs;
+  reference_matrix.compress(VectorOperation::add);
+  reference_rhs.compress(VectorOperation::add);
 }
 
 
@@ -362,12 +378,13 @@ void LaplaceProblem<dim>::assemble_test ()
                           this,
                           std_cxx1x::_1),
          Assembly::Scratch::Data<dim>(fe, quadrature),
-         Assembly::Copy::Data (),
+         Assembly::Copy::Data (false),
          2*multithread_info.n_threads(),
          1);
   test_matrix.compress(VectorOperation::add);
   test_rhs.compress(VectorOperation::add);
   test_matrix.compress(VectorOperation::add);
+  test_rhs.compress(VectorOperation::add);
 
   test_matrix.add(-1, reference_matrix);
   test_matrix.compress(VectorOperation::add);

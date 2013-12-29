@@ -544,7 +544,7 @@ namespace TrilinosWrappers
     if (Utilities::MPI::n_mpi_processes(communicator) > 1)
       {
         Epetra_Map nonlocal_map =
-          nonlocal_partitioner.make_trilinos_map(communicator, false);
+          nonlocal_partitioner.make_trilinos_map(communicator, true);
         nonlocal_graph.reset(new Epetra_CrsGraph(Copy, nonlocal_map, 0));
       }
     else

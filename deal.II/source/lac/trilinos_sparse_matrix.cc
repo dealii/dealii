@@ -389,6 +389,7 @@ namespace TrilinosWrappers
   void
   SparseMatrix::copy_from (const SparseMatrix &m)
   {
+    nonlocal_matrix.reset();
 
     // check whether we need to update the
     // partitioner or can just copy the data:
@@ -404,6 +405,9 @@ namespace TrilinosWrappers
         matrix.reset ();
         matrix.reset (new Epetra_FECrsMatrix(*m.matrix));
       }
+
+    if (m.nonlocal_matrix.get() != 0)
+      nonlocal_matrix.reset(new Epetra_CrsMatrix(Copy, m.nonlocal_matrix->Graph()));
 
     compress();
   }
@@ -475,6 +479,7 @@ namespace TrilinosWrappers
   {
     // release memory before reallocation
     matrix.reset();
+    nonlocal_matrix.reset();
 
     // if we want to exchange data, build a usual Trilinos sparsity pattern
     // and let that handle the exchange. otherwise, manually create a
@@ -582,9 +587,10 @@ namespace TrilinosWrappers
                   (Copy, sparsity_pattern.trilinos_sparsity_pattern(), false));
 
     if (sparsity_pattern.nonlocal_graph.get() != 0)
-      {
-        nonlocal_matrix.reset (new Epetra_CrsMatrix(Copy, *sparsity_pattern.nonlocal_graph));
-      }
+      nonlocal_matrix.reset (new Epetra_CrsMatrix(Copy, *sparsity_pattern.nonlocal_graph));
+    else
+      nonlocal_matrix.reset ();
+
     compress();
     last_action = Zero;
   }
@@ -598,6 +604,11 @@ namespace TrilinosWrappers
     matrix.reset ();
     matrix.reset (new Epetra_FECrsMatrix
                   (Copy, sparse_matrix.trilinos_sparsity_pattern(), false));
+    if (sparse_matrix.nonlocal_matrix != 0)
+      nonlocal_matrix.reset (new Epetra_CrsMatrix
+                             (Copy, sparse_matrix.nonlocal_matrix->Graph()));
+    else
+      nonlocal_matrix.reset();
 
     compress();
   }
@@ -755,6 +766,7 @@ namespace TrilinosWrappers
 
     const Epetra_CrsGraph *graph = &input_matrix.Graph();
 
+    nonlocal_matrix.reset();
     matrix.reset ();
     matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
 
@@ -801,8 +813,10 @@ namespace TrilinosWrappers
 
     // flush buffers
     int ierr;
-    if (nonlocal_matrix.get() != 0)
+    if (nonlocal_matrix.get() != 0 && mode == Add)
       {
+        // do only export in case of an add() operation, otherwise the owning
+        // processor must have set the correct entry
         nonlocal_matrix->FillComplete(*column_space_map, matrix->RowMap());
         Epetra_Export exporter(nonlocal_matrix->RowMap(), matrix->RowMap());
         ierr = matrix->Export(*nonlocal_matrix, exporter, mode);

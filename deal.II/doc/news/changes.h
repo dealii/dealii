@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------------
+ // ---------------------------------------------------------------------
 // $Id$
 //
 // Copyright (C) 2013 by the deal.II authors
@@ -106,7 +106,9 @@ inconvenience this causes.
   written into as an optional argument. This allows for pre-allocating all
   possible entries right away, which makes writing into the matrix from
   several threads possible (otherwise, only one processor at a time can write
-  off-processor data).
+  off-processor data). Similarly, TrilinosWrappers::MPI::Vector objects can
+  be initialized with hints to ghost elements for a writable vector that can
+  be added into from multiple threads.
   <br>
   (Martin Kronbichler, 2013/12/23)
   </li>
