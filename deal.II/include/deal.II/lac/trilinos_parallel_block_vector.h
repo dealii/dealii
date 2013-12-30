@@ -123,8 +123,7 @@ namespace TrilinosWrappers
       BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                    const std::vector<IndexSet> &ghost_values,
                    const MPI_Comm              &communicator,
-                   const bool                   vector_writable);
-
+                   const bool                   vector_writable = false);
 
       /**
        * Copy-Constructor. Set all the properties of the parallel vector to
