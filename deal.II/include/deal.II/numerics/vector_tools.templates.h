@@ -410,7 +410,7 @@ namespace VectorTools
 
     const unsigned int max_rep_points = *std::max_element(n_rep_points.begin(),
                                                           n_rep_points.end());
-    std::vector<unsigned int>                 dofs_on_cell(fe.max_dofs_per_cell());
+    std::vector< types::global_dof_index>     dofs_on_cell(fe.max_dofs_per_cell());
     std::vector< Point<DH::space_dimension> > rep_points(max_rep_points);
 
     std::vector< std::vector<double> >           function_values_scalar(fe.size());
