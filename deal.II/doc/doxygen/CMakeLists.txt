@@ -50,6 +50,11 @@ ADD_SUBDIRECTORY(tutorial) # uses ${DEAL_II_STEPS}
 #
 # Prepare auxiliary files for doxygen:
 #
+IF(DEAL_II_DOXYGEN_USE_MATHJAX)
+  SET(_use_mathjax YES)
+ELSE()
+  SET(_use_mathjax NO)
+ENDIF()
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox

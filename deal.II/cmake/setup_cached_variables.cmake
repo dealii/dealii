@@ -49,6 +49,10 @@
 #
 #     DEAL_II_WITH_64BIT_INDICES
 #
+# Miscellaneous options:
+#     DEAL_II_DOXYGEN_USE_MATHJAX
+#
+#
 # *)  May also be set via environment variable (CXXFLAGS, LDFLAGS)
 #     (a nonempty cached variable has precedence and will not be
 #     overwritten by environment)
@@ -330,6 +334,12 @@ OPTION(DEAL_II_WITH_64BIT_INDICES
 #                         Miscellaneous setup:                         #
 #                                                                      #
 ########################################################################
+
+OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
+  "If set to ON, doxygen documentation is generated using mathjax"
+  OFF
+  )
+MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
 
 #
 # We do not support installation into the binary directory any more ("too
