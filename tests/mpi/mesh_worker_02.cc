@@ -178,10 +178,6 @@ test()
   lctrl.faces_to_ghost = MeshWorker::LoopControl::never;
   test_loop(dofs, lctrl);
 
-  lctrl.own_faces = MeshWorker::LoopControl::both;
-  lctrl.faces_to_ghost = MeshWorker::LoopControl::never;
-  test_loop(dofs, lctrl);
-
   lctrl.own_faces = MeshWorker::LoopControl::never;
   lctrl.faces_to_ghost = MeshWorker::LoopControl::one;
   test_loop(dofs, lctrl);
