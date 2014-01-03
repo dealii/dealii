@@ -409,7 +409,7 @@ namespace MeshWorker
                                               typename INFOBOX::CellInfo &,
                                               typename INFOBOX::CellInfo &)> &face_worker,
               ASSEMBLER &assembler,
-              const LoopControl &lctrl)
+              const LoopControl &lctrl = LoopControl())
     {
       DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
 
@@ -451,7 +451,7 @@ namespace MeshWorker
                                             typename INFOBOX::CellInfo &,
                                             typename INFOBOX::CellInfo &)> &face_worker,
             ASSEMBLER &assembler,
-            bool cells_first = true,
+            bool cells_first,
             bool unique_faces_only = true) DEAL_II_DEPRECATED;
 
   template<int dim, int spacedim, class DOFINFO, class INFOBOX, class ASSEMBLER, class ITERATOR>
@@ -495,7 +495,7 @@ namespace MeshWorker
                                                         IntegrationInfo<dim, spacedim> &,
                                                         IntegrationInfo<dim, spacedim> &)> &face_worker,
                         ASSEMBLER &assembler,
-                        bool cells_first = true) DEAL_II_DEPRECATED;
+                        bool cells_first) DEAL_II_DEPRECATED;
 
 
   template<int dim, int spacedim, class ITERATOR, class ASSEMBLER>
@@ -540,7 +540,7 @@ namespace MeshWorker
                         IntegrationInfoBox<dim, spacedim> &box,
                         const LocalIntegrator<dim, spacedim> &integrator,
                         ASSEMBLER &assembler,
-                        bool cells_first = true)
+                        bool cells_first)
 DEAL_II_DEPRECATED;
 
   template<int dim, int spacedim, class ITERATOR, class ASSEMBLER>
@@ -550,7 +550,7 @@ DEAL_II_DEPRECATED;
                         IntegrationInfoBox<dim, spacedim> &box,
                         const LocalIntegrator<dim, spacedim> &integrator,
                         ASSEMBLER &assembler,
-                        bool cells_first = true)
+                        bool cells_first)
   {
     std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
     std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
@@ -585,7 +585,7 @@ DEAL_II_DEPRECATED;
                         IntegrationInfoBox<dim, spacedim> &box,
                         const LocalIntegrator<dim, spacedim> &integrator,
                         ASSEMBLER &assembler,
-                        const LoopControl &lctrl)
+                        const LoopControl &lctrl = LoopControl())
   {
     std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
     std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
