@@ -280,6 +280,12 @@ namespace MeshWorker
      * face is available.
      */
     bool exterior_face_available[GeometryInfo<dim>::faces_per_cell];
+
+    /**
+     * A flag to specify if the current object has been set to a valid
+     * cell.
+     */
+    bool cell_valid;
   };
 
 //----------------------------------------------------------------------//
@@ -417,7 +423,7 @@ namespace MeshWorker
   inline
   DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DOFINFO &seed)
     :
-    cell(seed)
+    cell(seed), cell_valid(true)
   {
     for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
       {
@@ -433,7 +439,7 @@ namespace MeshWorker
   inline
   DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DoFInfoBox<dim, DOFINFO> &other)
     :
-    cell(other.cell)
+    cell(other.cell), cell_valid(other.cell_valid)
   {
     for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
       {
@@ -449,6 +455,7 @@ namespace MeshWorker
   inline void
   DoFInfoBox<dim, DOFINFO>::reset ()
   {
+      cell_valid = false;
     for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
       {
         interior_face_available[i] = false;
@@ -462,6 +469,9 @@ namespace MeshWorker
   inline void
   DoFInfoBox<dim, DOFINFO>::assemble (ASSEMBLER &assembler) const
   {
+    if (!cell_valid)
+      return;
+
     assembler.assemble(cell);
     for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
       {

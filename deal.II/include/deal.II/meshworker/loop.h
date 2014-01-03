@@ -251,21 +251,20 @@ namespace MeshWorker
 				? cell->level_subdomain_id()
 				: cell->subdomain_id();
      
-     if ((!ignore_subdomain) && (csid == numbers::artificial_subdomain_id))
-       return;
-     
      const bool own_cell = ignore_subdomain || (csid == cell->get_triangulation().locally_owned_subdomain());
 
      dof_info.reset();
+
+     if ((!ignore_subdomain) && (csid == numbers::artificial_subdomain_id))
+       return;
+
      dof_info.cell.reinit(cell);
+     dof_info.cell_valid = true;
      
     const bool integrate_cell          = (cell_worker != 0);
     const bool integrate_boundary      = (boundary_worker != 0);
     const bool integrate_interior_face = (face_worker != 0);
 
-    dof_info.reset();
-
-    dof_info.cell.reinit(cell);
     if (integrate_cell)
       info.cell.reinit(dof_info.cell);
     // Execute this, if cells
