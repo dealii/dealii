@@ -220,7 +220,8 @@ namespace MeshWorker
           typename ITERATOR::AccessorType::Container::face_iterator face = cell->face(face_no);
           if (cell->at_boundary(face_no))
             {
-              if (integrate_boundary)
+              // only integrate boundary faces of own cells
+              if (integrate_boundary && own_cell)
                 {
                   dof_info.interior_face_available[face_no] = true;
                   dof_info.interior[face_no].reinit(cell, face, face_no);
