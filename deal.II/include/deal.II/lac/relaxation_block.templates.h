@@ -53,24 +53,6 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::memory_consumption() const
 
 template <class MATRIX, typename inverse_type>
 inline
-RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
-  const BlockList &bl,
-  const double relaxation,
-  const bool invert_diagonal,
-  const bool same_diagonal)
-  :
-  relaxation(relaxation),
-  invert_diagonal(invert_diagonal),
-  same_diagonal(same_diagonal),
-  inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
-  threshold(0.)
-{
-  bl.create_sparsity_pattern(block_list, 0);
-}
-
-
-template <class MATRIX, typename inverse_type>
-inline
 void
 RelaxationBlock<MATRIX,inverse_type>::initialize (
   const MATRIX &M,

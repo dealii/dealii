@@ -87,19 +87,6 @@ public:
                     const bool same_diagonal = false);
 
     /**
-     * @deprecated Since the BlockList is now a data member of this
-     * class, it is not recommended anymore to generate it
-     * independently.
-     *
-     * Constructor.
-     */
-    AdditionalData (const BlockList &block_list,
-                    const double relaxation = 1.,
-                    const bool invert_diagonal = true,
-                    const bool same_diagonal = false) DEAL_II_DEPRECATED;
-
-
-    /**
      * The mapping from indices to blocks.
      */
     SparsityPattern block_list;
