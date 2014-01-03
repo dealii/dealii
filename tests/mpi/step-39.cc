@@ -239,6 +239,7 @@ namespace Step39
       }
     dinfo1.value(0) = std::sqrt(dinfo1.value(0));
     dinfo2.value(0) = dinfo1.value(0);
+    // do not fill values if cells are ghost cells because we don't communicate
     if (!dinfo1.cell->is_locally_owned())
       dinfo1.value(0) = 0.0;
     if (!dinfo2.cell->is_locally_owned())
