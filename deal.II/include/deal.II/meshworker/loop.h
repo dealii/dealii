@@ -333,20 +333,23 @@ namespace MeshWorker
                 }
               else
                 {
-                  // Neighbor is
-                  // on same
-                  // level, but
-                  // only do this
-                  // from one side.
-                  if (loop_control.own_faces != LoopControl::both && (neighbor < cell)) continue;
-
-                  // If iterator
-                  // is active
-                  // and neighbor
-                  // is refined,
-                  // skip
+                  // If iterator is active and neighbor is refined, skip
                   // internal face.
                   if (internal::is_active_iterator(cell) && neighbor->has_children())
+                    {
+                      Assert(loop_control.own_faces != LoopControl::both, ExcMessage(
+                          "Assembling from both sides for own_faces is not "
+                          "supported with hanging nodes!"));
+                      continue;
+                    }
+
+                  // Now neighbor is on same level
+                  Assert(cell->level()==neighbor->level(), ExcInternalError());
+
+                  // only do faces on same level from one side (unless
+                  // LoopControl says otherwise)
+                  if (loop_control.own_faces != LoopControl::both
+                      && (neighbor < cell))
                     continue;
 
                   const unsigned int neighbor_face_no = cell->neighbor_face_no(face_no);
