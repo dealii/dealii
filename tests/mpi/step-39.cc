@@ -209,8 +209,6 @@ namespace Step39
       dinfo.value(0) += penalty * (boundary_values[k] - uh[k]) * (boundary_values[k] - uh[k])
                         * fe.JxW(k);
     dinfo.value(0) = std::sqrt(dinfo.value(0));
-    if (!dinfo.cell->is_locally_owned())
-      dinfo.value(0) = 0.0;
   }
 
 
