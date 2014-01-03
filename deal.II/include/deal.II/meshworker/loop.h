@@ -300,6 +300,28 @@ namespace MeshWorker
               // Interior face
               TriaIterator<typename ITERATOR::AccessorType> neighbor = cell->neighbor(face_no);
 
+              types::subdomain_id neighbid = numbers::artificial_subdomain_id;
+              if (neighbor->is_level_cell())
+                neighbid = neighbor->level_subdomain_id();
+              //subdomain id is only valid for active cells
+              else if (neighbor->active())
+                neighbid = neighbor->subdomain_id();
+
+              const bool own_neighbor = ignore_subdomain ||
+                  (neighbid == cell->get_triangulation().locally_owned_subdomain());
+
+              // skip all faces between two ghost cells
+              if (!own_cell && !own_neighbor)
+                continue;
+
+              // skip if the user doesn't want faces between own cells
+              if (own_cell && own_neighbor && loop_control.own_faces==LoopControl::never)
+                continue;
+
+              // skip face to ghost
+              if (own_cell != own_neighbor && loop_control.faces_to_ghost==LoopControl::never)
+                              continue;
+
               // Deal with
               // refinement edges
               // from the refined
@@ -314,6 +336,12 @@ namespace MeshWorker
                 {
                   Assert(!cell->has_children(), ExcInternalError());
                   Assert(!neighbor->has_children(), ExcInternalError());
+
+                  // skip if only one processor needs to assemble the face
+                  // to a ghost cell and the fine cell is not ours.
+                  if (!own_cell
+                      && loop_control.faces_to_ghost == LoopControl::one)
+                    continue;
 
                   const std::pair<unsigned int, unsigned int> neighbor_face_no
                     = cell->neighbor_of_coarser_neighbor(face_no);
@@ -343,12 +371,27 @@ namespace MeshWorker
                       continue;
                     }
 
-                  // Now neighbor is on same level
+                  // Now neighbor is on same level, double-check this:
                   Assert(cell->level()==neighbor->level(), ExcInternalError());
 
                   // only do faces on same level from one side (unless
                   // LoopControl says otherwise)
-                  if (loop_control.own_faces != LoopControl::both
+                  if (own_cell && own_neighbor
+                      && loop_control.own_faces == LoopControl::one
+                      && (neighbor < cell))
+                    continue;
+
+                  // independent of loop_control.faces_to_ghost,
+                  // we only look at faces to ghost on the same level once
+                  // (only where own_cell=true and own_neighbor=false)
+                  if (!own_cell)
+                    continue;
+
+                  // now only one processor assembles faces_to_ghost. This
+                  // logic is based on the subdomain id and is handled inside
+                  // operator<.
+                  if (own_cell && !own_neighbor
+                      && loop_control.faces_to_ghost == LoopControl::one
                       && (neighbor < cell))
                     continue;
 
