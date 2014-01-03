@@ -129,74 +129,8 @@ namespace MeshWorker
        * face integrals. Default is t
        */
       bool cells_first;
-
-      /**
-       * Based on the flags in this class, decide if this face needs to be
-       * assembled.
-       */
-      template <class ITERATOR>
-      bool operator() (const ITERATOR& cell, unsigned int face, bool is_level) const;
-      /**
-       * Based on the flags in this class, decide if this cell needs to be
-       * assembled.
-       */
-      template <class ITERATOR>
-      bool operator() (const ITERATOR& cell, bool is_level) const;
   };
   
-  
-  template <class ITERATOR>
-  bool LoopControl::operator() (const ITERATOR& cell, unsigned int face, bool is_level) const
-  {
-    const ITERATOR neighbor = cell->neighbor(face);
-    const bool c_local = (is_level)
-			 ? (cell->is_locally_owned())
-			 : (cell->is_locally_owned_on_level());
-    const bool n_local = (is_level)
-			 ? (neighbor->is_locally_owned())
-			 : (neighbor->is_locally_owned_on_level());
-    
-    if (!c_local && !n_local)
-      return false;
-
-    if (c_local && n_local)
-      {
-        if (own_faces==LoopControl::never)
-          return false;
-
-        //TODO:
-//        if (cell->neighbor_is_coarser(face_no))
-//          return false;
-
-        if (own_faces==LoopControl::one && neighbor < cell)
-          return false;
-
-        Assert(own_faces==LoopControl::both, ExcInternalError());
-        return true;
-      }
-    else
-      {
-        // interface between owned and ghost cell
-
-        // TODO
-
-
-      }
-  }
-  template <class ITERATOR>
-  bool LoopControl::operator() (const ITERATOR &cell, bool is_level) const
-  {
-    const bool c_local = (is_level)
-			 ? (cell->is_locally_owned())
-			 : (cell->is_locally_owned_on_level());
-    if (own_cells && c_local)
-      return true;
-    if (ghost_cells && cell->is_ghost())
-      return true;
-    return false;
-  }
-
-
 
 
   /**
