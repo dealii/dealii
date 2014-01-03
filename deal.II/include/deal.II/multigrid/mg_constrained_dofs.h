@@ -112,14 +112,6 @@ public:
 
   /**
    * Return the indices of dofs for each level that lie on the
-   * boundary of the domain.
-   */
-  // TODO: remove
-  const std::vector<std::set<types::global_dof_index> > &
-  get_non_refinement_edge_indices () const;
-
-  /**
-   * Return the indices of dofs for each level that lie on the
    * refinement edge (i.e. are on faces between cells of this level
    * and cells on the level below).
    */
@@ -142,23 +134,12 @@ public:
 
   bool set_boundary_values () const;
 
-  /**
-   * Return if the finite element requires continuity across
-   * refinement edges.
-   */
-  bool continuity_across_refinement_edges () const;
 private:
 
   /**
    * The indices of boundary dofs for each level.
    */
   std::vector<std::set<types::global_dof_index> > boundary_indices;
-
-  /**
-   * The degrees of freedom on egdges that are not a refinement edge
-   * between a level and coarser cells.
-   */
-  std::vector<std::set<types::global_dof_index> > non_refinement_edge_indices;
 
   /**
    * The degrees of freedom on the refinement edge between a level and
@@ -184,7 +165,6 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
   const unsigned int nlevels = dof.get_tria().n_global_levels();
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
-  non_refinement_edge_indices.resize(nlevels);
   for (unsigned int l=0; l<nlevels; ++l)
     {
       refinement_edge_indices[l].resize(dof.n_dofs(l));
@@ -192,8 +172,6 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
     }
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
                                          refinement_edge_boundary_indices);
-
-  MGTools::extract_non_interface_dofs (dof, non_refinement_edge_indices);
 }
 
 
@@ -209,7 +187,6 @@ MGConstrainedDoFs::initialize(
   boundary_indices.resize(nlevels);
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
-  non_refinement_edge_indices.resize(nlevels);
 
   for (unsigned int l=0; l<nlevels; ++l)
     {
@@ -221,7 +198,6 @@ MGConstrainedDoFs::initialize(
   MGTools::make_boundary_list (dof, function_map, boundary_indices, component_mask);
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
                                          refinement_edge_boundary_indices);
-  MGTools::extract_non_interface_dofs (dof, non_refinement_edge_indices);
 }
 
 
@@ -237,9 +213,6 @@ MGConstrainedDoFs::clear()
 
   for (unsigned int l=0; l<refinement_edge_boundary_indices.size(); ++l)
     refinement_edge_boundary_indices[l].clear();
-
-  for (unsigned int l=0; l<non_refinement_edge_indices.size(); ++l)
-    non_refinement_edge_indices[l].clear();
 }
 
 
@@ -260,12 +233,7 @@ bool
 MGConstrainedDoFs::non_refinement_edge_index (const unsigned int level,
                                               const types::global_dof_index index) const
 {
-  AssertIndexRange(level, non_refinement_edge_indices.size());
-
-  if (non_refinement_edge_indices[level].find(index) != non_refinement_edge_indices[level].end())
-    return true;
-  else
-    return false;
+  return !at_refinement_edge (level, index);
 }
 
 inline
@@ -299,13 +267,6 @@ MGConstrainedDoFs::get_boundary_indices () const
 }
 
 inline
-const std::vector<std::set<types::global_dof_index> > &
-MGConstrainedDoFs::get_non_refinement_edge_indices () const
-{
-  return non_refinement_edge_indices;
-}
-
-inline
 const std::vector<std::vector<bool> > &
 MGConstrainedDoFs::get_refinement_edge_indices () const
 {
@@ -328,20 +289,6 @@ MGConstrainedDoFs::set_boundary_values () const
   return boundary_values_need_to_be_set;
 }
 
-inline
-bool
-MGConstrainedDoFs::continuity_across_refinement_edges () const
-{
-  bool is_continuous = false;
-  for (unsigned int l=0; l<refinement_edge_indices.size(); ++l)
-    for (unsigned int i=0; i<refinement_edge_indices[l].size(); ++i)
-      if (refinement_edge_indices[l][i])
-        {
-          is_continuous = true;
-          return is_continuous;
-        }
-  return is_continuous;
-}
 
 DEAL_II_NAMESPACE_CLOSE
 
