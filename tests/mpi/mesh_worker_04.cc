@@ -51,7 +51,7 @@ template <int dim>
 void
 myIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &info, CellInfo &) const
 {
-  //deallog << "C " << info.cell->id() << std::endl;
+  deallog << "C " << info.cell->id() << std::endl;
 }
 
 
@@ -68,11 +68,11 @@ void
 myIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &info1, MeshWorker::DoFInfo<dim> &info2,
                  CellInfo &, CellInfo &) const
 {
-//  deallog << "F cell1 = " << info1.cell->id()
-//      << " face = " << info1.face_number
-//      << " cell2 = " << info2.cell->id()
-//      << " face2 = " << info2.face_number
-//      << std::endl;
+  deallog << "F cell1 = " << info1.cell->id()
+      << " face = " << info1.face_number
+      << " cell2 = " << info2.cell->id()
+      << " face2 = " << info2.face_number
+      << std::endl;
 }
 
 
@@ -175,7 +175,7 @@ test()
   lctrl.own_cells = false;
   lctrl.ghost_cells = false;
 
-  lctrl.own_faces = MeshWorker::LoopControl::one;
+  lctrl.own_faces = MeshWorker::LoopControl::never;
   lctrl.faces_to_ghost = MeshWorker::LoopControl::never;
   test_loop(dofs, lctrl);
 }
