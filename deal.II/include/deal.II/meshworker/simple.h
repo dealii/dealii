@@ -1074,21 +1074,11 @@ namespace MeshWorker
         {
           if (level1 == level2)
             {
-              if (mg_constrained_dofs == 0)
-                {
-                  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
-                  assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
-                  assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
-                  assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
-                }
-              else
-                {
-                  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
-                  assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
-                  assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
-                  assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
-                }
-            }
+	      assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
+	      assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
+	      assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
+	      assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+	    }
           else
             {
               Assert(level1 > level2, ExcInternalError());
