@@ -118,7 +118,7 @@ namespace MeshWorker
        * Loop over faces between two locally owned cells:
        * - never: do not assemble face terms
        * - one: assemble once (always coming from the finer side)
-       * - both: assemble each face twice
+       * - both: assemble each face twice (not implemented for hanging nodes!)
        * Default is one.
        */
       FaceOption own_faces;
