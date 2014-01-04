@@ -1213,7 +1213,7 @@ namespace MGTools
         for (; cell!=endc; ++cell)
           {
             if (dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
-                && cell->level_subdomain_id()!=dof.get_tria().locally_owned_subdomain())
+                && cell->level_subdomain_id()==numbers::artificial_subdomain_id)
               continue;
             const FiniteElement<dim> &fe = cell->get_fe();
             const unsigned int level = cell->level();
@@ -1247,7 +1247,7 @@ namespace MGTools
         endc = dof.end();
         for (; cell!=endc; ++cell)
           if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
-              || cell->level_subdomain_id()==dof.get_tria().locally_owned_subdomain())
+              || cell->level_subdomain_id()!=numbers::artificial_subdomain_id)
             for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
                  ++face_no)
               {
