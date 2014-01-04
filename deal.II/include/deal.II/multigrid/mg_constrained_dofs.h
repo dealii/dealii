@@ -110,6 +110,9 @@ public:
   get_boundary_indices () const;
 
   /**
+   * @deprecated Use at_refinement_edge() if possible, else
+   * get_refinement_edge_indices(unsigned int).
+   *
    * Return the indices of dofs for each level that lie on the
    * refinement edge (i.e. are on faces between cells of this level
    * and cells on the level below).
@@ -125,6 +128,9 @@ public:
   get_refinement_edge_indices (unsigned int level) const;
 
   /**
+   * @deprecated Use at_refinement_edge_boundary() if possible, else
+   * use get_refinement_edge_boundary_indices().
+   *
    * Return the indices of dofs for each level that are in the
    * intersection of the sets returned by get_boundary_indices() and
    * get_refinement_edge_indices().
@@ -140,10 +146,12 @@ public:
   get_refinement_edge_boundary_indices (unsigned int level) const;
 
   /**
+   * @deprecated The function is_boundary_index() now returns false if
+   * no boundary values are set.
+   *
    * Return if boundary_indices need to be set or not.
    */
-//TODO: remove?
-  bool set_boundary_values () const;
+  bool set_boundary_values () const DEAL_II_DEPRECATED;
 
 private:
 
