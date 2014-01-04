@@ -1416,7 +1416,7 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs)
+                                std::vector<IndexSet>  &interface_dofs)
   {
     Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (interface_dofs.size(),
@@ -1427,10 +1427,7 @@ namespace MGTools
         Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
                 ExcDimensionMismatch (interface_dofs[l].size(),
                                       mg_dof_handler.n_dofs(l)));
-
-        std::fill (interface_dofs[l].begin(),
-                   interface_dofs[l].end(),
-                   false);
+       interface_dofs[l].clear();
       }
 
     const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
@@ -1475,7 +1472,29 @@ namespace MGTools
 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           if (cell_dofs[i])
-            interface_dofs[level][local_dof_indices[i]] = true;
+            interface_dofs[level].add_index(local_dof_indices[i]);
+      }
+  }
+
+  template <int dim, int spacedim>
+  void
+  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
+                                std::vector<std::vector<bool> >  &interface_dofs)
+  {
+    std::vector<IndexSet> temp;
+    temp.resize(interface_dofs.size());
+    for (unsigned int l=0;l<interface_dofs.size();++l)
+      temp[l] = IndexSet(interface_dofs[l].size());
+
+    extract_inner_interface_dofs(mg_dof_handler, temp);
+
+    for (unsigned int l=0;l<interface_dofs.size();++l)
+      {
+        Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
+                ExcDimensionMismatch (interface_dofs[l].size(),
+                                      mg_dof_handler.n_dofs(l)));
+
+        temp[l].fill_binary_vector(interface_dofs[l]);
       }
   }
 
@@ -1483,7 +1502,7 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                              std::vector<std::set<types::global_dof_index> >  &non_interface_dofs)
+                              std::vector<std::set<unsigned int> >  &non_interface_dofs)
   {
     Assert (non_interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (non_interface_dofs.size(),
@@ -1552,8 +1571,8 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs,
-                                std::vector<std::vector<bool> >  &boundary_interface_dofs)
+                                std::vector<IndexSet>  &interface_dofs,
+                                std::vector<IndexSet>  &boundary_interface_dofs)
   {
     Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (interface_dofs.size(),
@@ -1564,19 +1583,8 @@ namespace MGTools
 
     for (unsigned int l=0; l<mg_dof_handler.get_tria().n_global_levels(); ++l)
       {
-        Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
-                ExcDimensionMismatch (interface_dofs[l].size(),
-                                      mg_dof_handler.n_dofs(l)));
-        Assert (boundary_interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
-                ExcDimensionMismatch (boundary_interface_dofs[l].size(),
-                                      mg_dof_handler.n_dofs(l)));
-
-        std::fill (interface_dofs[l].begin(),
-                   interface_dofs[l].end(),
-                   false);
-        std::fill (boundary_interface_dofs[l].begin(),
-                   boundary_interface_dofs[l].end(),
-                   false);
+        interface_dofs[l].clear();
+        boundary_interface_dofs[l].clear();
       }
 
     const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
@@ -1639,10 +1647,10 @@ namespace MGTools
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             if (cell_dofs[i])
-              interface_dofs[level][local_dof_indices[i]] = true;
+              interface_dofs[level].add_index(local_dof_indices[i]);
 
             if (boundary_cell_dofs[i])
-              boundary_interface_dofs[level][local_dof_indices[i]] = true;
+              boundary_interface_dofs[level].add_index(local_dof_indices[i]);
           }
       }
   }
