@@ -221,6 +221,9 @@ bool
 MGConstrainedDoFs::is_boundary_index (const unsigned int level,
                                       const types::global_dof_index index) const
 {
+  if (boundary_indices.size() == 0)
+    return false;
+  
   AssertIndexRange(level, boundary_indices.size());
   if (boundary_indices[level].find(index) != boundary_indices[level].end())
     return true;
