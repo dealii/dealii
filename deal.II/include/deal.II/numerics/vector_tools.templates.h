@@ -3027,7 +3027,7 @@ namespace VectorTools
               fe_index_old = fe_index;
               fe_index += fe.element_multiplicity (i) * fe.base_element (i).n_components ();
 
-              if (fe_index >= first_vector_component)
+              if (fe_index > first_vector_component)
                 break;
             }
 
