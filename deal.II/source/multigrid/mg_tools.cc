@@ -1502,7 +1502,7 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                              std::vector<std::set<unsigned int> >  &non_interface_dofs)
+                              std::vector<std::set<types::global_dof_index> >  &non_interface_dofs)
   {
     Assert (non_interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (non_interface_dofs.size(),
