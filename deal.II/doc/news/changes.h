@@ -85,9 +85,16 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Fixed: DataOut got confused in some situations where one uses FE_Nothing.
+  This is now fixed.
+  <br>
+  (Minh Do-Quang, Wolfgang Bangerth, 2014/01/08)
+  </li>
+
   <li> Fixed: FESystem::get_interpolation_matrix, a function that is among
   other places used by SolutionTransfer, had a bug that prevented it from
   running correctly in some situations where one uses FE_Nothing.
+  This is now fixed.
   <br>
   (Minh Do-Quang, Wolfgang Bangerth, 2014/01/08)
   </li>
