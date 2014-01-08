@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -528,10 +528,18 @@ FESystem<dim,spacedim>::get_interpolation_matrix (
   const FiniteElement<dim,spacedim> &x_source_fe,
   FullMatrix<double>           &interpolation_matrix) const
 {
-  Assert (interpolation_matrix.m() == this->dofs_per_cell,
+  // check that the size of the matrices is correct. for historical
+  // reasons, if you call matrix.reinit(8,0), it sets the sizes
+  // to m==n==0 internally. this may happen when we use a FE_Nothing,
+  // so write the test in a more lenient way
+  Assert ((interpolation_matrix.m() == this->dofs_per_cell)
+	  ||
+	  (x_source_fe.dofs_per_cell == 0),
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 this->dofs_per_cell));
-  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+  Assert ((interpolation_matrix.n() == x_source_fe.dofs_per_cell)
+	  ||
+	  (this->dofs_per_cell == 0),
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 x_source_fe.dofs_per_cell));
 

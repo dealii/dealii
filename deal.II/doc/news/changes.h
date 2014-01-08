@@ -1,7 +1,7 @@
  // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013, 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,6 +84,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+  <li> Fixed: FESystem::get_interpolation_matrix, a function that is among
+  other places used by SolutionTransfer, had a bug that prevented it from
+  running correctly in some situations where one uses FE_Nothing.
+  <br>
+  (Minh Do-Quang, Wolfgang Bangerth, 2014/01/08)
+  </li>
 
   <li> Improved: When you call WorkStream::run with an empty function object
   for the copier, operations on individual cells are essentially all independent.
