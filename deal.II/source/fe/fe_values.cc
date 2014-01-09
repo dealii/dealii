@@ -2373,7 +2373,18 @@ namespace internal
                            const bool quadrature_points_fastest  = false,
                            const unsigned int component_multiple = 1)
   {
+    // initialize with zero
+    for (unsigned int i=0; i<derivatives.size(); ++i)
+      std::fill_n (derivatives[i].begin(), derivatives[i].size(),
+                   Tensor<order,spacedim>());
+
+    // see if there the current cell has DoFs at all, and if not
+    // then there is nothing else to do.
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    if (dofs_per_cell == 0)
+      return;
+
+
     const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                              shape_derivatives[0].size() : 0;
     const unsigned int n_components = fe.n_components();
@@ -2392,11 +2403,6 @@ namespace internal
         for (unsigned int i=0; i<derivatives.size(); ++i)
           AssertDimension (derivatives[i].size(), result_components);
       }
-
-    // initialize with zero
-    for (unsigned int i=0; i<derivatives.size(); ++i)
-      std::fill_n (derivatives[i].begin(), derivatives[i].size(),
-                   Tensor<order,spacedim>());
 
     // add up contributions of trial functions.  now check whether the shape
     // function is primitive or not. if it is, then set its only non-zero
