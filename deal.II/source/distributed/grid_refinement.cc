@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -400,8 +400,9 @@ namespace
   {
     /**
      * Compute a threshold value so
-     * that exactly n_target_cells have
-     * a value that is larger.
+     * that the error accumulated over all criteria[i] so that
+     *     criteria[i] > threshold
+     * is larger than target_error.
      */
     template <typename number>
     number
