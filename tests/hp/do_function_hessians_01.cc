@@ -101,7 +101,7 @@ int main()
   q.push_back(QMidpoint<2>());
   q.push_back(QMidpoint<2>());
   hp::FEValues<2> x_fe_values (fe_collection, q, update_hessians);
-  for (typename hp::DoFHandler<2>::active_cell_iterator  cell = dof_handler.begin_active();
+  for (hp::DoFHandler<2>::active_cell_iterator  cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     {
       x_fe_values.reinit (cell);
