@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1247,6 +1247,11 @@ FiniteElement<dim,spacedim>::compute_2nd (
   Assert ((fe_internal.update_each | fe_internal.update_once)
           & update_hessians,
           ExcInternalError());
+
+  // there is nothing to do if there are no degrees of freedom (e.g., in an
+  // FE_Nothing)
+  if (this->dofs_per_cell == 0)
+    return;
 
 // make sure we have as many entries as there are nonzero components
 //  Assert (data.shape_hessians.size() ==
