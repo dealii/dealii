@@ -2385,8 +2385,7 @@ namespace internal
       return;
 
 
-    const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
-                                             shape_derivatives[0].size() : 0;
+    const unsigned int n_quadrature_points = shape_derivatives[0].size();
     const unsigned int n_components = fe.n_components();
 
     // Assert that we can write all components into the result vectors
@@ -2495,9 +2494,19 @@ namespace internal
                           const bool quadrature_points_fastest  = false,
                           const unsigned int component_multiple = 1)
   {
+    // initialize with zero
+    for (unsigned int i=0; i<laplacians.size(); ++i)
+      std::fill_n (laplacians[i].begin(), laplacians[i].size(),
+                   typename VectorType::value_type());
+
+    // see if there the current cell has DoFs at all, and if not
+    // then there is nothing else to do.
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
-                                             shape_hessians[0].size() : 0;
+    if (dofs_per_cell == 0)
+      return;
+
+
+    const unsigned int n_quadrature_points = shape_hessians[0].size();
     const unsigned int n_components = fe.n_components();
 
     // Assert that we can write all components into the result vectors
@@ -2514,11 +2523,6 @@ namespace internal
         for (unsigned int i=0; i<laplacians.size(); ++i)
           AssertDimension (laplacians[i].size(), result_components);
       }
-
-    // initialize with zero
-    for (unsigned int i=0; i<laplacians.size(); ++i)
-      std::fill_n (laplacians[i].begin(), laplacians[i].size(),
-                   typename VectorType::value_type());
 
     // add up contributions of trial functions.  now check whether the shape
     // function is primitive or not. if it is, then set its only non-zero
