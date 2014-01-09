@@ -16,8 +16,7 @@
 
 
 
-// testcase by Minh Do-Quang: a case where SolutionTransfer got into trouble
-// in a couple of places when using FE_Nothing and FESystem.
+// FEValues::get_function_* had a problem when using FE_Nothing
 
 #include "../tests.h"
 #include <fstream>
@@ -68,7 +67,7 @@ int main()
 
   // Assign FE to cells
   hp::DoFHandler<2>::active_cell_iterator cell;
-  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();      
+  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
 
 
   cell = dof_handler.begin_active();
@@ -93,7 +92,7 @@ int main()
 
   triangulation.execute_coarsening_and_refinement ();
   dof_handler.distribute_dofs (fe_collection);
-  
+
   Vector<double> new_solution(dof_handler.n_dofs());
   solultion_trans.interpolate(solution, new_solution);
 
@@ -107,11 +106,11 @@ int main()
       x_fe_values.reinit (cell);
       std::vector<std::vector<Tensor<2,2> > >
 	derivatives (q[0].size(), std::vector<Tensor<2,2> >(cell->get_fe().n_components()));
-      
+
       x_fe_values.get_present_fe_values().get_function_hessians (new_solution,
 								 derivatives);
     }
-  
+
   // we are good if we made it to here
   deallog << "OK" << std::endl;
 }
