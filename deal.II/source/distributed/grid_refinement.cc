@@ -315,28 +315,15 @@ namespace
           else
             interesting_range[0] = interesting_range[1] = test_threshold;
 
-          // terminate the iteration
-          // after 10 go-arounds. this
-          // is necessary because
-          // oftentimes error
-          // indicators on cells have
-          // exactly the same value,
-          // and so there may not be a
-          // particular value that cuts
-          // the indicators in such a
-          // way that we can achieve
-          // the desired number of
-          // cells. using a max of 10
-          // iterations means that we
-          // terminate the iteration
-          // after 10 steps if the
-          // indicators were perfectly
-          // badly distributed, and we
-          // make at most a mistake of
-          // 1/2^10 in the number of
-          // cells flagged if
-          // indicators are perfectly
-          // equidistributed
+          // terminate the iteration after 25 go-arounds. this is necessary
+          // because oftentimes error indicators on cells have exactly the
+          // same value, and so there may not be a particular value that cuts
+          // the indicators in such a way that we can achieve the desired
+          // number of cells. using a maximal number of iterations means that
+          // we terminate the iteration after a fixed number N of steps if the
+          // indicators were perfectly badly distributed, and we make at most
+          // a mistake of 1/2^N in the number of cells flagged if indicators
+          // are perfectly equidistributed
           ++iteration;
           if (iteration == 25)
             interesting_range[0] = interesting_range[1] = test_threshold;
