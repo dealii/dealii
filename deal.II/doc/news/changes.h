@@ -85,6 +85,13 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Fixed: There were several bugs in functions like
+  FEValues::get_function_values() where the code did not properly handle the
+  case of FE_Nothing. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2014/01/08)
+  </li>
+
   <li> Fixed: DataOut got confused in some situations where one uses FE_Nothing.
   This is now fixed.
   <br>
