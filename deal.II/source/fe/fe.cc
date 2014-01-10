@@ -546,96 +546,6 @@ block_mask (const ComponentMask &component_mask) const
 
 template <int dim, int spacedim>
 unsigned int
-FiniteElement<dim,spacedim>::
-face_to_cell_index (const unsigned int face_index,
-                    const unsigned int face,
-                    const bool face_orientation,
-                    const bool face_flip,
-                    const bool face_rotation) const
-{
-  Assert (face_index < this->dofs_per_face,
-          ExcIndexRange(face_index, 0, this->dofs_per_face));
-  Assert (face < GeometryInfo<dim>::faces_per_cell,
-          ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
-
-//TODO: we could presumably solve the 3d case below using the
-// adjust_quad_dof_index_for_face_orientation_table field. for the
-// 2d case, we can't use adjust_line_dof_index_for_line_orientation_table
-// since that array is empty (presumably because we thought that
-// there are no flipped edges in 2d, but these can happen in
-// DoFTools::make_periodicity_constraints, for example). so we
-// would need to either fill this field, or rely on derived classes
-// implementing this function, as we currently do
-
-  // see the function's documentation for an explanation of this
-  // assertion -- in essence, derived classes have to implement
-  // an overloaded version of this function if we are to use any
-  // other than standard orientation
-  if ((face_orientation != true) || (face_flip != false) || (face_rotation != false))
-    Assert ((this->dofs_per_line <= 1) && (this->dofs_per_quad <= 1),
-            ExcMessage ("The function in this base class can not handle this case. "
-                        "Rather, the derived class you are using must provide "
-                        "an overloaded version but apparently hasn't done so. See "
-                        "the documentation of this function for more information."));
-
-  // we need to distinguish between DoFs on vertices, lines and in 3d quads.
-  // do so in a sequence of if-else statements
-  if (face_index < this->first_face_line_index)
-    // DoF is on a vertex
-    {
-      // get the number of the vertex on the face that corresponds to this DoF,
-      // along with the number of the DoF on this vertex
-      const unsigned int face_vertex         = face_index / this->dofs_per_vertex;
-      const unsigned int dof_index_on_vertex = face_index % this->dofs_per_vertex;
-
-      // then get the number of this vertex on the cell and translate
-      // this to a DoF number on the cell
-      return (GeometryInfo<dim>::face_to_cell_vertices(face, face_vertex,
-                                                       face_orientation,
-                                                       face_flip,
-                                                       face_rotation)
-              * this->dofs_per_vertex
-              +
-              dof_index_on_vertex);
-    }
-  else if (face_index < this->first_face_quad_index)
-    // DoF is on a face
-    {
-      // do the same kind of translation as before. we need to only consider
-      // DoFs on the lines, i.e., ignoring those on the vertices
-      const unsigned int index = face_index - this->first_face_line_index;
-
-      const unsigned int face_line         = index / this->dofs_per_line;
-      const unsigned int dof_index_on_line = index % this->dofs_per_line;
-
-      return (this->first_line_index
-              + GeometryInfo<dim>::face_to_cell_lines(face, face_line,
-                                                      face_orientation,
-                                                      face_flip,
-                                                      face_rotation)
-              * this->dofs_per_line
-              +
-              dof_index_on_line);
-    }
-  else
-    // DoF is on a quad
-    {
-      Assert (dim >= 3, ExcInternalError());
-
-      // ignore vertex and line dofs
-      const unsigned int index = face_index - this->first_face_quad_index;
-
-      return (this->first_quad_index
-              + face * this->dofs_per_quad
-              + index);
-    }
-}
-
-
-
-
-template <int dim, int spacedim>
-unsigned int
 FiniteElement<dim,spacedim>::adjust_quad_dof_index_for_face_orientation (const unsigned int index,
     const bool face_orientation,
     const bool face_flip,
@@ -1195,7 +1105,8 @@ FiniteElement<1,2>::compute_2nd (
   const unsigned int,
   Mapping<1,2>::InternalDataBase &,
   InternalDataBase &,
-  FEValuesData<1,2> &) const
+  FEValuesData<1,2> &,
+  MappingType) const
 {
 
   Assert(false, ExcNotImplemented());
@@ -1210,7 +1121,8 @@ FiniteElement<1,3>::compute_2nd (
   const unsigned int,
   Mapping<1,3>::InternalDataBase &,
   InternalDataBase &,
-  FEValuesData<1,3> &) const
+  FEValuesData<1,3> &,
+  MappingType) const
 {
 
   Assert(false, ExcNotImplemented());
@@ -1226,7 +1138,8 @@ FiniteElement<2,3>::compute_2nd (
   const unsigned int,
   Mapping<2,3>::InternalDataBase &,
   InternalDataBase &,
-  FEValuesData<2,3> &) const
+  FEValuesData<2,3> &,
+  MappingType) const
 {
 
   Assert(false, ExcNotImplemented());
@@ -1242,7 +1155,8 @@ FiniteElement<dim,spacedim>::compute_2nd (
   const unsigned int offset,
   typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
   InternalDataBase                     &fe_internal,
-  FEValuesData<dim,spacedim>                    &data) const
+  FEValuesData<dim,spacedim>                    &data,
+  MappingType mapping_type) const
 {
   Assert ((fe_internal.update_each | fe_internal.update_once)
           & update_hessians,
@@ -1368,7 +1282,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
         // cell
         for (unsigned int d=0; d<spacedim; ++d)
           {
-            mapping.transform (diff_quot[d], diff_quot2, mapping_internal, mapping_covariant);
+            mapping.transform (diff_quot[d], diff_quot2, mapping_internal, mapping_type);
 
             for (unsigned int q=0; q<n_q_points; ++q)
               for (unsigned int d1=0; d1<spacedim; ++d1)
