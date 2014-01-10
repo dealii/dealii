@@ -30,16 +30,34 @@ struct ScratchData
 {};
 
 
+void foo (const std::vector<unsigned int>::iterator,
+          ScratchData&,
+          unsigned int&)
+{
+}
+
+void bar (const unsigned int&)
+{
+}
+
 void test ()
 {
   std::vector<unsigned int> v;
   for (unsigned int i=0; i<20; ++i)
     v.push_back (i);
 
+  // first run with only a worker
+  WorkStream::run (v.begin(), v.end(),
+                   &foo,
+                   std_cxx1x::function<void(const unsigned int&)>(),
+                   ScratchData(),
+                   0U);
+  
+  // next run with only a copier
   WorkStream::run (v.begin(), v.end(),
                    std_cxx1x::function<void(const std::vector<unsigned int>::iterator,
                                             ScratchData&,unsigned int&)>(),
-                   std_cxx1x::function<void(const unsigned int&)>(),
+                   &bar,
                    ScratchData(),
                    0U);
 }
