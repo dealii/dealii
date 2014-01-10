@@ -15,7 +15,7 @@
  *
  * ---------------------------------------------------------------------
 
-/*
+ *
  * Authors: Jean-Paul Pelteret, University of Cape Town,
  *          Andrew McBride, University of Erlangen-Nuremberg, 2010
  */
