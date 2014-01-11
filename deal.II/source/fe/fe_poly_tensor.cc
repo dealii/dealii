@@ -585,27 +585,29 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
     }
 
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    if (mapping_type == mapping_nedelec)
     {
-      this->compute_2nd (mapping, cell,
-                         typename QProjector<dim>::DataSetDescriptor().cell(),
-                         mapping_data, fe_data, data, mapping_covariant_gradient);
+      if (mapping_type == mapping_nedelec)
+	{
+	  this->compute_2nd (mapping, cell,
+			     typename QProjector<dim>::DataSetDescriptor().cell(),
+			     mapping_data, fe_data, data, mapping_covariant_gradient);
       
-      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-      {
-        const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
-                                                                    this->get_nonzero_components(i).first_selected_component()];
+	  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+	    {
+	      const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+									  this->get_nonzero_components(i).first_selected_component()];
         
-        for (unsigned int k = 0; k < n_q_points; ++k)
-          for (unsigned int d = 0; d < dim; ++d)
-            data.shape_hessians[first + d][k] *= sign_change[i];
-      }
-    }
+	      for (unsigned int k = 0; k < n_q_points; ++k)
+		for (unsigned int d = 0; d < dim; ++d)
+		  data.shape_hessians[first + d][k] *= sign_change[i];
+	    }
+	}
     
-    else
-      this->compute_2nd (mapping, cell,
-                         typename QProjector<dim>::DataSetDescriptor().cell(),
-                         mapping_data, fe_data, data);
+      else
+	this->compute_2nd (mapping, cell,
+			   typename QProjector<dim>::DataSetDescriptor().cell(),
+			   mapping_data, fe_data, data);
+    }
 }
 
 
@@ -809,23 +811,25 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
     }
 
   if (flags & update_hessians)
-    if (mapping_type == mapping_nedelec)
     {
-      this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data, mapping_covariant_gradient);
+      if (mapping_type == mapping_nedelec)
+	{
+	  this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data, mapping_covariant_gradient);
       
-      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-      {
-        const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
-                                                                    this->get_nonzero_components(i).first_selected_component()];
+	  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+	    {
+	      const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+									  this->get_nonzero_components(i).first_selected_component()];
         
-        for (unsigned int k = 0; k < n_q_points; ++k)
-          for (unsigned int d = 0; d < dim; ++d)
-            data.shape_hessians[first + d][k] *= sign_change[i];
-      }
-    }
+	      for (unsigned int k = 0; k < n_q_points; ++k)
+		for (unsigned int d = 0; d < dim; ++d)
+		  data.shape_hessians[first + d][k] *= sign_change[i];
+	    }
+	}
     
-    else
-      this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+      else
+	this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    }
 }
 
 
@@ -1035,23 +1039,25 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
     }
 
   if (flags & update_hessians)
-    if (mapping_type == mapping_nedelec)
     {
-      this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data, mapping_covariant_gradient);
+      if (mapping_type == mapping_nedelec)
+	{
+	  this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data, mapping_covariant_gradient);
       
-      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-      {
-        const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
-                                                                    this->get_nonzero_components(i).first_selected_component()];
+	  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+	    {
+	      const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
+									  this->get_nonzero_components(i).first_selected_component()];
         
-        for (unsigned int k = 0; k < n_q_points; ++k)
-          for (unsigned int d = 0; d < dim; ++d)
-            data.shape_hessians[first + d][k] *= sign_change[i];
-      }
-    }
+	      for (unsigned int k = 0; k < n_q_points; ++k)
+		for (unsigned int d = 0; d < dim; ++d)
+		  data.shape_hessians[first + d][k] *= sign_change[i];
+	    }
+	}
     
-    else
-      this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+      else
+	this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+    }
 }
 
 
