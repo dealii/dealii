@@ -1195,8 +1195,7 @@ FiniteElement<1,2>::compute_2nd (
   const unsigned int,
   Mapping<1,2>::InternalDataBase &,
   InternalDataBase &,
-  FEValuesData<1,2> &,
-  MappingType) const
+  FEValuesData<1,2> &) const
 {
 
   Assert(false, ExcNotImplemented());
@@ -1211,8 +1210,7 @@ FiniteElement<1,3>::compute_2nd (
   const unsigned int,
   Mapping<1,3>::InternalDataBase &,
   InternalDataBase &,
-  FEValuesData<1,3> &,
-  MappingType) const
+  FEValuesData<1,3> &) const
 {
 
   Assert(false, ExcNotImplemented());
@@ -1228,8 +1226,7 @@ FiniteElement<2,3>::compute_2nd (
   const unsigned int,
   Mapping<2,3>::InternalDataBase &,
   InternalDataBase &,
-  FEValuesData<2,3> &,
-  MappingType) const
+  FEValuesData<2,3> &) const
 {
 
   Assert(false, ExcNotImplemented());
@@ -1245,8 +1242,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
   const unsigned int offset,
   typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
   InternalDataBase                     &fe_internal,
-  FEValuesData<dim,spacedim>                    &data,
-  MappingType mapping_type) const
+  FEValuesData<dim,spacedim>                    &data) const
 {
   Assert ((fe_internal.update_each | fe_internal.update_once)
           & update_hessians,
@@ -1372,7 +1368,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
         // cell
         for (unsigned int d=0; d<spacedim; ++d)
           {
-            mapping.transform (diff_quot[d], diff_quot2, mapping_internal, mapping_type);
+            mapping.transform (diff_quot[d], diff_quot2, mapping_internal, mapping_covariant);
 
             for (unsigned int q=0; q<n_q_points; ++q)
               for (unsigned int d1=0; d1<spacedim; ++d1)
