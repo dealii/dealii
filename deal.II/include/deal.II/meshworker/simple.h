@@ -975,18 +975,13 @@ namespace MeshWorker
             if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                 !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
               {
-                if (mg_constrained_dofs->set_boundary_values())
-                  {
-                    if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-                         !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
-                        ||
-                        (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-                         mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
-                         i1[j] == i2[k]))
-                      G.add(i1[j], i2[k], M(j,k));
-                  }
-                else
-                  G.add(i1[j], i2[k], M(j,k));
+		if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+		     !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
+		    ||
+		    (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+		     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
+		     i1[j] == i2[k]))
+		  G.add(i1[j], i2[k], M(j,k));
               }
     }
 
@@ -1010,18 +1005,13 @@ namespace MeshWorker
             if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                 !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
               {
-                if (mg_constrained_dofs->set_boundary_values())
-                  {
-                    if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-                         !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
-                        ||
-                        (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-                         mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
-                         i1[j] == i2[k]))
-                      G.add(i1[j], i2[k], M(k,j));
-                  }
-                else
-                  G.add(i1[j], i2[k], M(k,j));
+		if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+		     !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
+		    ||
+		    (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+		     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
+		     i1[j] == i2[k]))
+		  G.add(i1[j], i2[k], M(k,j));
               }
     }
 
