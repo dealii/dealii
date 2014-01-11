@@ -1749,8 +1749,7 @@ protected:
                     const unsigned int                       offset,
                     typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
                     InternalDataBase                        &fe_internal,
-                    FEValuesData<dim,spacedim>                       &data,
-                    const MappingType                        mapping_type = mapping_covariant) const;
+                    FEValuesData<dim,spacedim>                       &data) const;
 
   /**
    * Given the pattern of nonzero components for each shape function, compute
