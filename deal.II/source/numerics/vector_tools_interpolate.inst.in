@@ -32,6 +32,15 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
          const Function<deal_II_space_dimension>&,
          VEC&);
+
+      template
+        void interpolate
+        (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+         const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+         const FullMatrix<double>&,
+         const VEC&,
+         VEC&);
+
       \}
 #endif
   }
@@ -56,14 +65,6 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
         void interpolate
         (const hp::DoFHandler<deal_II_dimension>&,
          const Function<deal_II_dimension>&,
-         VEC&);
-
-      template
-        void interpolate
-        (const DoFHandler<deal_II_dimension>&,
-         const DoFHandler<deal_II_dimension>&,
-         const FullMatrix<double>&,
-         const VEC&,
          VEC&);
          
      template
