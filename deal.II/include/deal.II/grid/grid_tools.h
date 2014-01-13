@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1236,11 +1236,11 @@ namespace GridTools
 
 
 
-  template <class DH>
-  std::vector<typename DH::active_cell_iterator>
-  get_active_child_cells (const typename DH::cell_iterator &cell)
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  get_active_child_cells (const typename Container::cell_iterator &cell)
   {
-    std::vector<typename DH::active_cell_iterator> child_cells;
+    std::vector<typename Container::active_cell_iterator> child_cells;
 
     if (cell->has_children())
       {
@@ -1248,8 +1248,8 @@ namespace GridTools
              child<cell->n_children(); ++child)
           if (cell->child (child)->has_children())
             {
-              const std::vector<typename DH::active_cell_iterator>
-              children = get_active_child_cells<DH> (cell->child(child));
+              const std::vector<typename Container::active_cell_iterator>
+              children = get_active_child_cells<Container> (cell->child(child));
               child_cells.insert (child_cells.end(),
                                   children.begin(), children.end());
             }
