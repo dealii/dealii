@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,8 @@ template <int structdim, class DH, bool lda>
 template <int dim2, class DH2, bool lda2>
 inline
 DoFAccessor<structdim,DH,lda>::DoFAccessor (const DoFAccessor<dim2, DH2, lda2> &other)
-  : BaseClass(other), dof_handler(const_cast<DH *>(other.dof_handler))
+  : BaseClass(other),
+    dof_handler(0)
 {
   Assert (false, ExcInvalidObject());
 }
@@ -88,7 +89,8 @@ template <int structdim, class DH, bool lda>
 template <bool lda2>
 inline
 DoFAccessor<structdim,DH,lda>::DoFAccessor (const DoFAccessor<structdim, DH, lda2> &other)
-  : BaseClass(other), dof_handler(const_cast<DH *>(other.dof_handler))
+  : BaseClass(other),
+    dof_handler(const_cast<DH *>(other.dof_handler))
 {
 }
 
