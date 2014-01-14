@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -187,6 +187,10 @@
 #  pragma warning( disable : 4700 ) /* uninitialized local variable */
 #  pragma warning( disable : 4789 ) /* destination of memory copy is too small */
 #  pragma warning( disable : 4808 ) /* case 'value' is not a valid value for switch condition of type 'bool */
+
+/* Also make sure we don't let MS Windows headers define min/max as
+   macros, see http://support.microsoft.com/kb/143208 */
+#  define NOMINMAX
 #endif /*_MSC_VER*/
 
 
