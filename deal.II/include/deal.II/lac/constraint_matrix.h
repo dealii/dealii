@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1737,7 +1737,7 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
   // the actual implementation follows in the cm.templates.h file.
   distribute_local_to_global (local_matrix, local_vector, local_dof_indices,
                               global_matrix, global_vector, use_inhomogeneities_for_rhs,
-                              internal::bool2type<IsBlockMatrix<MatrixType>::value>());
+                              dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
 
 
