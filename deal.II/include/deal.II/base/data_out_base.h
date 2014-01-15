@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1087,11 +1087,8 @@ public:
      * of an STL <tt>std::map</tt> type with a certain number of
      * elements?), this is only an estimate. however often quite close
      * to the true value.
-    */
+     */
     std::size_t memory_consumption () const;
-
-  private:
-
   };
 
 
@@ -1111,6 +1108,7 @@ public:
      * understand.
      */
     static const unsigned int format_version = 3;
+    
   private:
     /**
      * Dummy entry to suppress compiler warnings when copying an empty
@@ -2308,6 +2306,8 @@ public:
   using DataOutBase::get_output_format_names;
   using DataOutBase::determine_intermediate_format_dimensions;
 
+  using DataOutBase::Patch;
+  
   /**
    * Constructor.
    */
