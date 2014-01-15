@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -41,7 +41,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
   # Generator specific values:
   IF(CMAKE_GENERATOR MATCHES "Ninja")
     #
-    # Ninja doesn't like a redifinition of the "help" target, so use "info"
+    # Ninja doesn't like a redefinition of the "help" target, so use "info"
     # in this case...
     #
     SET(_make_command "$ ninja")
