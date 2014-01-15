@@ -2946,8 +2946,8 @@ namespace VectorTools
                  && (fe.base_element (base_indices.first).face_to_cell_index (line * fe.degree, face)
                      <= fe.system_to_base_index (fe.face_to_cell_index (i, face)).second)
                  && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).second
-                     < fe.base_element (base_indices.first).face_to_cell_index
-                     ((line + 1) * fe.degree, face)))
+                     <= fe.base_element (base_indices.first).face_to_cell_index
+                     ((line + 1) * fe.degree - 1, face)))
                 || ((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != 0) && (line * fe.degree <= i)
                     && (i < (line + 1) * fe.degree)))
               {
