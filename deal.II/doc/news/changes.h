@@ -85,6 +85,13 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Fixed: The methods IndexSet::do_compress() and
+  IndexSet::add_indices(IndexSet&) had quadratic complexity in the number of
+  ranges. The algorithms have been changed into linear complexity ones.
+  <br>
+  (Martin Kronbichler, 2014/01/15)
+  </li>
+
   <li> Fixed: There were several bugs in functions like
   FEValues::get_function_values() where the code did not properly handle the
   case of FE_Nothing. This is now fixed.
