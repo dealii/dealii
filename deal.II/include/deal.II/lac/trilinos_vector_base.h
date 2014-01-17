@@ -482,9 +482,9 @@ namespace TrilinosWrappers
     real_type linfty_norm () const;
 
     /**
-     * Return whether the vector contains only elements with value zero. This
-     * function is mainly for internal consistency checks and should seldom be
-     * used when not in debug mode since it uses quite some time.
+     * Return whether the vector contains only elements with value
+     * zero. This is a collective operation. This function is expensive, because
+     * potentially all elements have to be checked.
      */
     bool all_zero () const;
 

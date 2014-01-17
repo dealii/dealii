@@ -84,6 +84,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: PETScWrappers::MPI::Vector::all_zero() was broken with more than
+  one processor (illegal memory access) and did not communicate between all
+  processors. Documentation for many vector types of all_zero() has been extended.
+  <br>
+  (Timo Heister, 2014/01/17)
+  </li>
 
   <li> Fixed: DoFCellAccessor::set_dof_values_by_interpolation and
   DoFCellAccessor::get_interpolated_dof_values could previously be

@@ -662,7 +662,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     const PetscScalar *ptr  = start_ptr,
-                       *eptr = start_ptr + size();
+                       *eptr = start_ptr + local_size();
     bool flag = true;
     while (ptr != eptr)
       {
@@ -715,7 +715,7 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     const PetscScalar *ptr  = start_ptr,
-                       *eptr = start_ptr + size();
+                       *eptr = start_ptr + local_size();
     bool flag = true;
     while (ptr != eptr)
       {
