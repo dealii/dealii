@@ -526,7 +526,7 @@ namespace Step16
         // with a gotcha that is easily forgotten: The indices of global
         // degrees of freedom we want here are the ones for current level, not
         // for the global matrix. We therefore need the function
-        // MGDoFAccessorLLget_mg_dof_indices, not
+        // MGDoFAccessor::get_mg_dof_indices, not
         // MGDoFAccessor::get_dof_indices as used in the assembly of the
         // global system:
         cell->get_mg_dof_indices (local_dof_indices);
