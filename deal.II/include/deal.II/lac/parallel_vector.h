@@ -71,8 +71,11 @@ namespace parallel
      * Functions related to parallel functionality:
      * - The function <code>compress()</code> goes through the data associated
      *   with ghost indices and communicates it to the owner process, which can
-     *   then add/set it to the correct position. This can be used e.g. after
+     *   then add it to the correct position. This can be used e.g. after
      *   having run an assembly routine involving ghosts that fill this vector.
+     *   Note that the @p insert mode of @p compress() does not set the
+     *   elements included in ghost entries but simply discards them, assuming
+     *   that the owning processor has set them to the desired value already.
      * - The <code>update_ghost_values()</code> function imports the data from
      *   the owning processor to the ghost indices in order to provide read
      *   access to the data associated with ghosts.
@@ -92,7 +95,7 @@ namespace parallel
      *   writing into ghost elements but only reading from them. This is in
      *   order to avoid undesired ghost data artifacts when calling compress()
      *   after modifying some vector entries.
-     * The current statues of the ghost entries (read mode or write mode) can
+     * The current status of the ghost entries (read mode or write mode) can
      * be queried by the method has_ghost_elements(), which returns
      * <code>true</code> exactly when ghost elements have been updated and
      * <code>false</code> otherwise, irrespective of the actual number of
@@ -301,9 +304,9 @@ namespace parallel
        * both the element on the ghost site as well as the owning site), this
        * operation makes the assumption that all data is set correctly on the
        * owning processor. Upon call of compress(VectorOperation::insert), all
-       * ghost entries are therefore simply zeroed out (using
-       * zero_ghost_values()). In debug mode, a check is performed that makes
-       * sure that the data set is actually consistent between processors,
+       * ghost entries are thus simply zeroed out (using
+       * zero_ghost_values()). In debug mode, a check is performed for whether
+       * the data set is actually consistent between processors,
        * i.e., whenever a non-zero ghost element is found, it is compared to
        * the value on the owning processor and an exception is thrown if these
        * elements do not agree.
