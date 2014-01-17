@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,25 +45,41 @@ DoFCellAccessor<DH,lda>::
 get_interpolated_dof_values (const InputVector &values,
                              Vector<number>    &interpolated_values) const
 {
-  const FiniteElement<dim,spacedim> &fe            = this->get_fe();
-  const unsigned int        dofs_per_cell = fe.dofs_per_cell;
-
-  Assert (this->dof_handler != 0,
-          typename BaseClass::ExcInvalidObject());
-  Assert (&fe != 0,
-          typename BaseClass::ExcInvalidObject());
-  Assert (interpolated_values.size() == dofs_per_cell,
-          typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (values.size() == this->dof_handler->n_dofs(),
-          typename BaseClass::ExcVectorDoesNotMatch());
-
   if (!this->has_children())
     // if this cell has no children: simply return the exact values on this
     // cell
     this->get_dof_values (values, interpolated_values);
   else
-    // otherwise clobber them from the children
+    // otherwise obtain them from the children
     {
+      // we are on a non-active cell. these do not have any finite
+      // element associated with them in the hp context (in the non-hp
+      // context, we can simply assume that the FE space to which we
+      // want to interpolate is the same as for all elements in the
+      // mesh). consequently, we cannot interpolate from children's FE
+      // space to this cell's (unknown) FE space
+      Assert ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
+	       (this->dof_handler)
+	       != 0),
+	      ExcMessage ("You cannot call this function on non-active cells "
+			  "of hp::DoFHandler objects because they do not have "
+			  "associated finite element spaces associated: degrees "
+			  "of freedom are only distributed on active cells for which "
+			  "the active_fe_index has been set."));
+
+      const FiniteElement<dim,spacedim> &fe            = this->get_fe();
+      const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
+
+      Assert (this->dof_handler != 0,
+	      typename BaseClass::ExcInvalidObject());
+      Assert (&fe != 0,
+	      typename BaseClass::ExcInvalidObject());
+      Assert (interpolated_values.size() == dofs_per_cell,
+	      typename BaseClass::ExcVectorDoesNotMatch());
+      Assert (values.size() == this->dof_handler->n_dofs(),
+	      typename BaseClass::ExcVectorDoesNotMatch());
+
+
       Vector<number> tmp1(dofs_per_cell);
       Vector<number> tmp2(dofs_per_cell);
 

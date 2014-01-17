@@ -85,6 +85,15 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Fixed: DoFCellAccessor::set_dof_values_by_interpolation and
+  DoFCellAccessor::get_interpolated_dof_values could previously be
+  called for hp::DoFHandler objects on cells that are non-active. This
+  makes no sense since these cells have no associated finite element
+  space. Doing so now raises an exception.
+  <br>
+  (Wolfgang Bangerth, 2014/01/17)
+  </li>
+
   <li> Fixed: The methods IndexSet::do_compress() and
   IndexSet::add_indices(IndexSet&) had quadratic complexity in the number of
   ranges. The algorithms have been changed into linear complexity ones.

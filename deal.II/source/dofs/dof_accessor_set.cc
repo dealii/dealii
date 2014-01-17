@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,23 +46,38 @@ DoFCellAccessor<DH,lda>::
 set_dof_values_by_interpolation (const Vector<number> &local_values,
                                  OutputVector         &values) const
 {
-  const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
-
-  Assert (this->dof_handler != 0,
-          typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
-          typename BaseClass::ExcInvalidObject());
-  Assert (local_values.size() == dofs_per_cell,
-          typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (values.size() == this->dof_handler->n_dofs(),
-          typename BaseClass::ExcVectorDoesNotMatch());
-
   if (!this->has_children())
     // if this cell has no children: simply set the values on this cell
     this->set_dof_values (local_values, values);
   else
     // otherwise distribute them to the children
     {
+      // we are on a non-active cell. these do not have any finite
+      // element associated with them in the hp context (in the non-hp
+      // context, we can simply assume that the FE space to from which we
+      // want to interpolate is the same as for all elements in the
+      // mesh). consequently, we cannot interpolate to children's FE
+      // space from this cell's (unknown) FE space
+      Assert ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
+	       (this->dof_handler)
+	       != 0),
+	      ExcMessage ("You cannot call this function on non-active cells "
+			  "of hp::DoFHandler objects because they do not have "
+			  "associated finite element spaces associated: degrees "
+			  "of freedom are only distributed on active cells for which "
+			  "the active_fe_index has been set."));
+
+      const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
+
+      Assert (this->dof_handler != 0,
+	      typename BaseClass::ExcInvalidObject());
+      Assert (&this->get_fe() != 0,
+	      typename BaseClass::ExcInvalidObject());
+      Assert (local_values.size() == dofs_per_cell,
+	      typename BaseClass::ExcVectorDoesNotMatch());
+      Assert (values.size() == this->dof_handler->n_dofs(),
+	      typename BaseClass::ExcVectorDoesNotMatch());
+
       Vector<number> tmp(dofs_per_cell);
 
       for (unsigned int child=0; child<this->n_children(); ++child)
