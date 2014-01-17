@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2008 - 2013 by the deal.II authors
+ * Copyright (C) 2008 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -2090,7 +2090,7 @@ namespace Step32
     // All this done, we can then initialize the various matrix and vector
     // objects to their proper sizes. At the end, we also record that all
     // matrices and preconditioners have to be re-computed at the beginning of
-    // the next time step. Note how we initialize the vectors for the stokes
+    // the next time step. Note how we initialize the vectors for the Stokes
     // and temperature right hand sides: These are writable vectors (last
     // boolean argument set to @p true) that have the correct one-to-one
     // partitioning of locally owned elements but are still given the relevant
