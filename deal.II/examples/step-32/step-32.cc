@@ -1839,7 +1839,7 @@ namespace Step32
   // hinting WorkStream at cells that do not share vertices, allowing for
   // parallelism among those cells (see the graph coloring algorithms and
   // WorkStream with colored iterators argument). However, that only works
-  // when only MPI processor is present because Trilinos' internal data
+  // when only one MPI processor is present because Trilinos' internal data
   // structures for accumulating off-processor data on the fly are not thread
   // safe. With the initialization presented here, there is no such problem
   // and one could safely introduce graph coloring for this algorithm.
