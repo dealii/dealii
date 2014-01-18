@@ -1407,27 +1407,42 @@ public:
   /**
    * Return the interpolation of the given finite element function to
    * the present cell. In the simplest case, the cell is a terminal
-   * one, i.e. has no children; then, the returned value is the vector
-   * of nodal values on that cell. You could then as well get the
+   * one, i.e., it has no children; then, the returned value is the vector
+   * of nodal values on that cell. You could as well get the
    * desired values through the @p get_dof_values function. In the
    * other case, when the cell has children, we use the restriction
    * matrices provided by the finite element class to compute the
    * interpolation from the children to the present cell.
    *
-   * It is assumed that both vectors already have the right size
+   * If the cell is part of a hp::DoFHandler object, cells only have an
+   * associated finite element space if they are active. However, this
+   * function is supposed to also provide information on inactive cells
+   * with children. Consequently, it carries a third argument that can be
+   * used in the hp context that denotes the finite element space we are
+   * supposed to interpolate onto. If the cell is active, this function
+   * then obtains the finite element function from the <code>values</code>
+   * vector on this cell and interpolates it onto the space described
+   * by the <code>fe_index</code>th element of the hp::FECollection associated
+   * with the hp::DoFHandler of which this cell is a part of. If the cell
+   * is not active, then we first perform this interpolation on all of its
+   * terminal children and then interpolate this function down to the
+   * cell requested keeping the function space the same.
+   *
+   * It is assumed that both input vectors already have the right size
    * beforehand.
    *
-   * Unlike the get_dof_values() function, this function works on
-   * cells rather than to lines, quads, and hexes, since interpolation
+   * @note Unlike the get_dof_values() function, this function is only available
+   * on cells, rather than on lines, quads, and hexes, since interpolation
    * is presently only provided for cells by the finite element
    * classes.
    */
   template <class InputVector, typename number>
   void get_interpolated_dof_values (const InputVector &values,
-                                    Vector<number>    &interpolated_values) const;
+                                    Vector<number>    &interpolated_values,
+                                    const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
-   * This, again, is the counterpart to get_interpolated_dof_values():
+   * This function is the counterpart to get_interpolated_dof_values():
    * you specify the dof values on a cell and these are interpolated
    * to the children of the present cell and set on the terminal
    * cells.
@@ -1476,7 +1491,8 @@ public:
    */
   template <class OutputVector, typename number>
   void set_dof_values_by_interpolation (const Vector<number> &local_values,
-                                        OutputVector         &values) const;
+                                        OutputVector         &values,
+                                        const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Distribute a local (cell based) vector to a global one by mapping

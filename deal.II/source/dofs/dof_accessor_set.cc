@@ -44,7 +44,8 @@ template <class OutputVector, typename number>
 void
 DoFCellAccessor<DH,lda>::
 set_dof_values_by_interpolation (const Vector<number> &local_values,
-                                 OutputVector         &values) const
+                                 OutputVector         &values,
+                                 const unsigned int fe_index) const
 {
   if (!this->has_children())
     // if this cell has no children: simply set the values on this cell
@@ -57,15 +58,19 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
       // context, we can simply assume that the FE space to from which we
       // want to interpolate is the same as for all elements in the
       // mesh). consequently, we cannot interpolate to children's FE
-      // space from this cell's (unknown) FE space
+      // space from this cell's (unknown) FE space unless an explicit
+      // fe_index is given
       Assert ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
-	       (this->dof_handler)
-	       != 0),
-	      ExcMessage ("You cannot call this function on non-active cells "
-			  "of hp::DoFHandler objects because they do not have "
-			  "associated finite element spaces associated: degrees "
-			  "of freedom are only distributed on active cells for which "
-			  "the active_fe_index has been set."));
+               (this->dof_handler)
+               != 0)
+              ||
+              (fe_index != DH::default_fe_index),
+              ExcMessage ("You cannot call this function on non-active cells "
+                          "of hp::DoFHandler objects unless you provide an explicit "
+                          "finite element index because they do not have naturally "
+                          "associated finite element spaces associated: degrees "
+                          "of freedom are only distributed on active cells for which "
+                          "the active_fe_index has been set."));
 
       const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
 

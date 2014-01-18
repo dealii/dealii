@@ -43,12 +43,37 @@ template <class InputVector, typename number>
 void
 DoFCellAccessor<DH,lda>::
 get_interpolated_dof_values (const InputVector &values,
-                             Vector<number>    &interpolated_values) const
+                             Vector<number>    &interpolated_values,
+                             const unsigned int fe_index) const
 {
   if (!this->has_children())
     // if this cell has no children: simply return the exact values on this
-    // cell
-    this->get_dof_values (values, interpolated_values);
+    // cell unless the finite element we need to interpolate to is different than
+    // the one we have on the current cell
+    {
+      if ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
+           (this->dof_handler)
+           != 0)
+          ||
+          (fe_index == this->active_fe_index())
+          ||
+          (fe_index == DH::default_fe_index))
+        this->get_dof_values (values, interpolated_values);
+      else
+        {
+          // well, here we need to first get the values from the current
+          // cell and then interpolate it to the element requested. this
+          // can clearly only happen for hp::DoFHandler objects
+          Vector<number> tmp (this->get_fe().dofs_per_cell);
+          this->get_dof_values (values, tmp);
+
+          FullMatrix<double> interpolation (this->dof_handler->get_fe()[fe_index].dofs_per_cell,
+                                            this->get_fe().dofs_per_cell);
+          this->dof_handler->get_fe()[fe_index].get_interpolation_matrix (this->get_fe(),
+                                                                          interpolation);
+          interpolation.vmult (interpolated_values, tmp);
+        }
+    }
   else
     // otherwise obtain them from the children
     {
@@ -57,17 +82,21 @@ get_interpolated_dof_values (const InputVector &values,
       // context, we can simply assume that the FE space to which we
       // want to interpolate is the same as for all elements in the
       // mesh). consequently, we cannot interpolate from children's FE
-      // space to this cell's (unknown) FE space
+      // space to this cell's (unknown) FE space unless an explicit
+      // fe_index is given
       Assert ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
 	       (this->dof_handler)
-	       != 0),
+	       != 0)
+              ||
+	      (fe_index != DH::default_fe_index),
 	      ExcMessage ("You cannot call this function on non-active cells "
-			  "of hp::DoFHandler objects because they do not have "
+			  "of hp::DoFHandler objects unless you provide an explicit "
+			  "finite element index because they do not have naturally "
 			  "associated finite element spaces associated: degrees "
 			  "of freedom are only distributed on active cells for which "
 			  "the active_fe_index has been set."));
 
-      const FiniteElement<dim,spacedim> &fe            = this->get_fe();
+      const FiniteElement<dim,spacedim> &fe            = this->get_dof_handler().get_fe()[fe_index];
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
       Assert (this->dof_handler != 0,
@@ -117,9 +146,12 @@ get_interpolated_dof_values (const InputVector &values,
       for (unsigned int child=0; child<this->n_children(); ++child)
         {
           // get the values from the present child, if necessary by
-          // interpolation itself
+          // interpolation itself either from its own children or
+          // by interpolating from the finite element on an active
+          // child to the finite element space requested here
           this->child(child)->get_interpolated_dof_values (values,
-                                                           tmp1);
+                                                           tmp1,
+                                                           fe_index);
           // interpolate these to the mother cell
           fe.get_restriction_matrix(child, this->refinement_case()).vmult (tmp2, tmp1);
 

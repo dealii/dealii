@@ -91,13 +91,20 @@ inconvenience this causes.
   (Timo Heister, 2014/01/17)
   </li>
 
-  <li> Fixed: DoFCellAccessor::set_dof_values_by_interpolation and
+  <li> Fixed/new: DoFCellAccessor::set_dof_values_by_interpolation and
   DoFCellAccessor::get_interpolated_dof_values could previously be
   called for hp::DoFHandler objects on cells that are non-active. This
   makes no sense since these cells have no associated finite element
   space. Doing so now raises an exception.
   <br>
-  (Wolfgang Bangerth, 2014/01/17)
+  However, there are legitimate cases where one may want to interpolate
+  from children to a parent's finite element space. Since in the hp
+  case no finite element space is naturally associated with an inactive
+  cell, it is now possible to pass an explicit finite element index
+  argument to the function specifying which element of an hp::FECollection
+  object describes the space onto which you want to interpolate.
+  <br>
+  (Wolfgang Bangerth, 2014/01/18)
   </li>
 
   <li> Fixed: The methods IndexSet::do_compress() and
