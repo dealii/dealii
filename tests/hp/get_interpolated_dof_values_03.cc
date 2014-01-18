@@ -18,6 +18,10 @@
 // cell->get_interpolated_dof_values can not work properly in the hp
 // context when called on non-active cells because these do not have a
 // finite element associated with them
+//
+// this test verifies that if we call the function on active cells with an
+// explicitly given fe_index that we can interpolate from children to the
+// so-specified FE space
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
@@ -35,14 +39,12 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 2
-
-
-
 
 template <int dim>
 void test ()
 {
+  deallog << dim << "D" << std::endl;
+  
   // create a hp::DoFHandler with different finite elements on the
   // cells. note that we assign active_fe_indices also to inactive
   // elements
@@ -66,20 +68,26 @@ void test ()
   for (unsigned int i=0; i<solution.size(); ++i)
     solution(i) = i;
 
-  // try to interpolate from the active cell onto the coarsest cell,
-  // which is definitely not active. this can't work, so expect an
-  // exception
+  // do the test where we request interpolation onto the coarsest cell with an
+  // explicit Q1 space
   typename hp::DoFHandler<dim>::cell_iterator cell=dof_handler.begin(0);
-  Vector<double> local (cell->get_fe().dofs_per_cell);
+  Vector<double> local (fe[0].dofs_per_cell);
+  cell->get_interpolated_dof_values (solution, local,
+				     0);
+  for (unsigned int i=0; i<local.size(); ++i)
+    deallog << local[i] << ' ';
+  deallog << std::endl;
 
-  try
+  // for comparison purposes, also output the values of DoFs on all cells
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
+       cell!=dof_handler.end(); ++cell)
     {
-      cell->get_interpolated_dof_values (solution, local);
-    }
-  catch (const ExceptionBase &e)
-    {
-      deallog << "Yes, exception!" << std::endl;
-      deallog << e.get_exc_name() << std::endl;
+      Vector<double> x (cell->get_fe().dofs_per_cell);
+      cell->get_dof_values (solution, x);
+      deallog << "cell =" << cell << ":  ";
+      for (unsigned int i=0; i<x.size(); ++i)
+	deallog << x[i] << ' ';
+      deallog << std::endl;
     }
 }
 
@@ -88,13 +96,11 @@ int
 main()
 {
   std::ofstream logfile ("output");
-  logfile.precision (PRECISION);
+  logfile.precision (1);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-
-  deal_II_exceptions::disable_abort_on_exception();
 
   test<1>();
   test<2>();
