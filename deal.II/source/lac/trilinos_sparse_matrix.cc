@@ -633,7 +633,7 @@ namespace TrilinosWrappers
         relevant_rows.add_range(0, n_global_elements(input_row_map));
       }
     relevant_rows.compress();
-    Assert(relevant_rows.n_elements() >= input_row_map.NumMyElements(),
+    Assert(relevant_rows.n_elements() >= static_cast<unsigned int>(input_row_map.NumMyElements()),
            ExcMessage("Locally relevant rows of sparsity pattern must contain "
                       "all locally owned rows"));
 
