@@ -46,6 +46,8 @@
 #    include "Epetra_SerialComm.h"
 #  endif
 
+class Epetra_Export;
+
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
@@ -53,6 +55,7 @@ template <typename MatrixType> class BlockMatrixBase;
 
 template <typename number> class SparseMatrix;
 class SparsityPattern;
+
 
 namespace TrilinosWrappers
 {
@@ -456,20 +459,25 @@ namespace TrilinosWrappers
    * matrix row at the same time can lead to data races and must be explicitly
    * avoided by the user. However, it is possible to access <b>different</b>
    * rows of the matrix from several threads simultaneously under the
-   * following two conditions:
+   * following three conditions:
    * <ul>
    *   <li> The matrix uses only one MPI process.
+   *   <li> The matrix has been initialized with the reinit() method
+   *   with a CompressedSimpleSparsityPattern (that includes the set of locally
+   *   relevant rows, i.e., the rows that an assembly routine will possibly
+   *   write into).
    *   <li> The matrix has been initialized from a
    *   TrilinosWrappers::SparsityPattern object that in turn has been
    *   initialized with the reinit function specifying three index sets, one
    *   for the rows, one for the columns and for the larger set of @p
-   *   writeable_rows, and the operation is an addition. Note that all other
-   *   reinit methods and constructors of TrilinosWrappers::SparsityPattern
-   *   will result in a matrix that needs to allocate off-processor entries on
-   *   demand, which breaks thread-safety. Of course, using the respective
-   *   reinit method for the block Trilinos sparsity pattern and block matrix
-   *   also results in thread-safety.
+   *   writeable_rows, and the operation is an addition.
    * </ul>
+   *
+   * Note that all other reinit methods and constructors of
+   * TrilinosWrappers::SparsityPattern will result in a matrix that needs to
+   * allocate off-processor entries on demand, which breaks thread-safety. Of
+   * course, using the respective reinit method for the block Trilinos
+   * sparsity pattern and block matrix also results in thread-safety.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Matrix1
@@ -719,6 +727,11 @@ namespace TrilinosWrappers
      * patterns of type CompressedSimpleSparsityPattern. If the flag is not
      * set, each processor just sets the elements in the sparsity pattern that
      * belong to its rows.
+     *
+     * If the sparsity pattern given to this function is of type
+     * CompressedSimpleSparsity pattern, then a matrix will be created that
+     * allows several threads to write into different rows of the matrix at
+     * the same also with MPI, as opposed to most other reinit() methods.
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
@@ -1843,6 +1856,11 @@ namespace TrilinosWrappers
      * sparsity pattern with the respective option.
      */
     std_cxx1x::shared_ptr<Epetra_CrsMatrix> nonlocal_matrix;
+
+    /**
+     * An export object used to communicate the nonlocal matrix.
+     */
+    std_cxx1x::shared_ptr<Epetra_Export>    nonlocal_matrix_exporter;
 
     /**
      * Trilinos doesn't allow to mix additions to matrix entries and
