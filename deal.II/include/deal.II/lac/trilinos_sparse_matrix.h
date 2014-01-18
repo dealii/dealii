@@ -2756,10 +2756,18 @@ namespace TrilinosWrappers
           std::cout << col_index_ptr[i] << " ";
         std::cout << std::endl << std::endl;
         std::cout << "Matrix row has the following indices:" << std::endl;
-        int n_indices, *indices;
-        trilinos_sparsity_pattern().ExtractMyRowView(row_partitioner().LID(static_cast<TrilinosWrappers::types::int_type>(row)),
-                                                     n_indices,
-                                                     indices);
+        std::vector<TrilinosWrappers::types::int_type> indices;
+        const Epetra_CrsGraph* graph =
+          (nonlocal_matrix.get() != 0 &&
+           row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == false) ?
+          &nonlocal_matrix->Graph() : &matrix->Graph();
+
+        indices.resize(graph->NumGlobalIndices(static_cast<TrilinosWrappers::types::int_type>(row)));
+        int n_indices = 0;
+        graph->ExtractGlobalRowCopy(static_cast<TrilinosWrappers::types::int_type>(row),
+                                    indices.size(), n_indices, &indices[0]);
+        AssertDimension(static_cast<unsigned int>(n_indices), indices.size());
+
         for (TrilinosWrappers::types::int_type i=0; i<n_indices; ++i)
           std::cout << indices[i] << " ";
         std::cout << std::endl << std::endl;

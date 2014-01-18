@@ -615,9 +615,15 @@ namespace DoFTools
                           ||
                           (cell->neighbor(face)->subdomain_id() !=
                            cell->subdomain_id()))
-                        constraints.add_entries_local_to_global
-                        (dofs_on_other_cell, dofs_on_this_cell,
-                         sparsity, keep_constrained_dofs);
+                        {
+                          constraints.add_entries_local_to_global
+                            (dofs_on_other_cell, dofs_on_this_cell,
+                             sparsity, keep_constrained_dofs);
+                          if (cell->neighbor(face)->active())
+                            constraints.add_entries_local_to_global
+                              (dofs_on_other_cell, dofs_on_other_cell,
+                               sparsity, keep_constrained_dofs);
+                        }
                     }
                 }
             }
