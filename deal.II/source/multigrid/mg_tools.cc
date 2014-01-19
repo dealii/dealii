@@ -611,9 +611,9 @@ namespace MGTools
                 typename DoFHandler<dim,spacedim>::cell_iterator
                 neighbor = cell->neighbor(face);
                 neighbor->get_mg_dof_indices (dofs_on_other_cell);
-                // only add one direction
-                // The other is taken care of
-                // by neighbor.
+                // only add one direction The other is taken care of by
+                // neighbor (except when the neighbor is not owned by the same
+                // processor)
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   {
                     for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -622,6 +622,15 @@ namespace MGTools
                                       dofs_on_other_cell[j]);
                       }
                   }
+                if (neighbor->is_locally_owned_on_level() == false)
+                  for (unsigned int i=0; i<dofs_per_cell; ++i)
+                    for (unsigned int j=0; j<dofs_per_cell; ++j)
+                      {
+                        sparsity.add (dofs_on_other_cell[i],
+                                      dofs_on_other_cell[j]);
+                        sparsity.add (dofs_on_other_cell[i],
+                                      dofs_on_this_cell[j]);
+                      }
               }
           }
       }

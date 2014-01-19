@@ -584,6 +584,12 @@ namespace DoFTools
                           constraints.add_entries_local_to_global
                           (dofs_on_other_cell, dofs_on_this_cell,
                            sparsity, keep_constrained_dofs);
+                          // only need to add this when the neighbor is not
+                          // owned by the current processor, otherwise we add
+                          // the entries for the neighbor there
+                          if (sub_neighbor->subdomain_id() != cell->subdomain_id())
+                            constraints.add_entries_local_to_global
+                            (dofs_on_other_cell, sparsity, keep_constrained_dofs);
                         }
                     }
                   else
@@ -619,10 +625,10 @@ namespace DoFTools
                           constraints.add_entries_local_to_global
                             (dofs_on_other_cell, dofs_on_this_cell,
                              sparsity, keep_constrained_dofs);
-                          if (cell->neighbor(face)->active())
+                          if (cell->neighbor(face)->subdomain_id() !=
+                              cell->subdomain_id())
                             constraints.add_entries_local_to_global
-                              (dofs_on_other_cell, dofs_on_other_cell,
-                               sparsity, keep_constrained_dofs);
+                            (dofs_on_other_cell, sparsity, keep_constrained_dofs);
                         }
                     }
                 }
