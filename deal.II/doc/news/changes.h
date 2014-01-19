@@ -84,6 +84,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The method DoFTools::extract_constant_modes only worked for
+  elements where the constant function 1 is represented by all ones. This
+  is now fixed by querying the element for its constant modes on each cell.
+  <br>
+  (Martin Kronbichler, 2014/01/19)
+  </li>
+
   <li> Fixed: PETScWrappers::MPI::Vector::all_zero() was broken with more than
   one processor (illegal memory access) and did not communicate between all
   processors. Documentation for many vector types of all_zero() has been extended.

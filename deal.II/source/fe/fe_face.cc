@@ -288,6 +288,18 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 
 
 
+template <int dim, int spacedim>
+Table<2,bool>
+FE_FaceQ<dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    constant_modes(0,i) = true;
+  return constant_modes;
+}
+
+
+
 // --------------------------------------- FE_FaceP --------------------------
 
 template <int dim, int spacedim>
@@ -498,6 +510,19 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
     AssertThrow (false,(typename FiniteElement<dim,spacedim>::
                         ExcInterpolationNotImplemented()));
 }
+
+
+
+template <int dim, int spacedim>
+Table<2,bool>
+FE_FaceP<dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    constant_modes(0, face*this->dofs_per_face) = true;
+  return constant_modes;
+}
+
 
 
 // explicit instantiations

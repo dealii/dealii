@@ -124,6 +124,13 @@ public:
   FiniteElementDomination::Domination
   compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 
+
+  /**
+   * Returns a list of constant modes of the element. For this element, it
+   * simply returns one row with all entries set to true.
+   */
+  virtual Table<2,bool> get_constant_modes () const;
+
 private:
   /**
    * Return vector with dofs per vertex, line, quad, hex.
@@ -233,6 +240,14 @@ public:
   virtual
   FiniteElementDomination::Domination
   compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+
+  /**
+   * Returns a list of constant modes of the element. For this element, the
+   * first entry on each face is true, all other are false (as the constant
+   * function is represented by the first base function of Legendre
+   * polynomials.
+   */
+  virtual Table<2,bool> get_constant_modes () const;
 
 private:
   /**

@@ -1313,6 +1313,15 @@ public:
   BlockMask
   block_mask (const ComponentMask &component_mask) const;
 
+  /**
+   * Returns a list of constant modes of the element. The returns table has as
+   * many rows as there are components in the element and dofs_per_cell
+   * columns. To each component of the finite element, the row in the returned
+   * table contains a basis representation of the constant function 1 on the
+   * element.
+   */
+  virtual Table<2,bool> get_constant_modes () const;
+
   //@}
 
   /**

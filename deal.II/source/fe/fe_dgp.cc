@@ -238,6 +238,17 @@ FE_DGP<dim,spacedim>::has_support_on_face (const unsigned int,
 
 
 template <int dim, int spacedim>
+Table<2,bool>
+FE_DGP<dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  constant_modes(0,0) = true;
+  return constant_modes;
+}
+
+
+
+template <int dim, int spacedim>
 std::size_t
 FE_DGP<dim,spacedim>::memory_consumption () const
 {

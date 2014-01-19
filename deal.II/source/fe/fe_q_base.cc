@@ -1494,6 +1494,18 @@ FE_Q_Base<POLY,dim,spacedim>::has_support_on_face (const unsigned int shape_inde
 
 
 
+template <typename POLY, int dim, int spacedim>
+Table<2,bool>
+FE_Q_Base<POLY,dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  // leave out last component
+  for (unsigned int i=0; i<Utilities::fixed_power<dim>(this->degree+1); ++i)
+    constant_modes(0, i) = true;
+  return constant_modes;
+}
+
+
 // explicit instantiations
 #include "fe_q_base.inst"
 

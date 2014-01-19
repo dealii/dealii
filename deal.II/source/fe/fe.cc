@@ -1087,6 +1087,7 @@ FiniteElement<dim,spacedim>::unit_face_support_point (const unsigned int index) 
 }
 
 
+
 template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::has_support_on_face (
@@ -1095,6 +1096,17 @@ FiniteElement<dim,spacedim>::has_support_on_face (
 {
   return true;
 }
+
+
+
+template <int dim, int spacedim>
+Table<2,bool>
+FiniteElement<dim,spacedim>::get_constant_modes () const
+{
+  Assert (false, ExcNotImplemented());
+  return Table<2,bool>(this->n_components(), this->dofs_per_cell);
+}
+
 
 
 template <int dim, int spacedim>
