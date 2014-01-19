@@ -717,7 +717,8 @@ namespace TrilinosWrappers
             nonlocal_graph->RowMap().NumMyElements() > 0)
           {
             // insert dummy element
-            TrilinosWrappers::types::int_type row = nonlocal_graph->RowMap().MyGID(0);
+            TrilinosWrappers::types::int_type row =
+              nonlocal_graph->RowMap().MyGID(TrilinosWrappers::types::int_type(0));
             nonlocal_graph->InsertGlobalIndices(row, 1, &row);
           }
         Assert(nonlocal_graph->IndicesAreGlobal() == true,
