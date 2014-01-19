@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -608,7 +608,7 @@ namespace TrilinosWrappers
                       &owned_per_proc[0], 1,
                       Utilities::MPI::internal::mpi_type_id(&my_elements),
                       communicator->Comm());
-        
+
         SparsityTools::distribute_sparsity_pattern
           (const_cast<CompressedSimpleSparsityPattern&>(sparsity_pattern),
            owned_per_proc, communicator->Comm(), sparsity_pattern.row_index_set());
@@ -637,6 +637,24 @@ namespace TrilinosWrappers
            ExcMessage("Locally relevant rows of sparsity pattern must contain "
                       "all locally owned rows"));
 
+    // check whether the relevant rows correspond to exactly the same map as
+    // the owned rows. In that case, do not create the nonlocal graph and fill
+    // the columns by demand
+    bool have_ghost_rows = false;
+    {
+      std::vector<dealii::types::global_dof_index> indices;
+      relevant_rows.fill_index_vector(indices);
+      Epetra_Map relevant_map (TrilinosWrappers::types::int_type(-1),
+                               TrilinosWrappers::types::int_type(relevant_rows.n_elements()),
+                               (indices.empty() ? 0 :
+                                reinterpret_cast<TrilinosWrappers::types::int_type *>(&indices[0])),
+                               0, input_row_map.Comm());
+      if (relevant_map.SameAs(input_row_map))
+        have_ghost_rows = false;
+      else
+        have_ghost_rows = true;
+    }
+
     const unsigned int n_rows = relevant_rows.n_elements();
     std::vector<TrilinosWrappers::types::int_type> ghost_rows;
     std::vector<int> n_entries_per_row(input_row_map.NumMyElements());
@@ -656,7 +674,7 @@ namespace TrilinosWrappers
 
     // make sure all processors create an off-processor matrix with at least
     // one entry
-    if (input_row_map.Comm().NumProc() > 1 && ghost_rows.empty() == true)
+    if (have_ghost_rows == true && ghost_rows.empty() == true)
       {
         ghost_rows.push_back(0);
         n_entries_per_ghost_row.push_back(1);
@@ -670,9 +688,10 @@ namespace TrilinosWrappers
       {
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
                                           &n_entries_per_row[0], true));
-        nonlocal_graph.reset (new Epetra_CrsGraph (Copy, off_processor_map,
-                                                   &n_entries_per_ghost_row[0],
-                                                   true));
+        if (have_ghost_rows == true)
+          nonlocal_graph.reset (new Epetra_CrsGraph (Copy, off_processor_map,
+                                                     &n_entries_per_ghost_row[0],
+                                                     true));
       }
     else
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
