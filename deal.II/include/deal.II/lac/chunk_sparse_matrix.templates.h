@@ -596,6 +596,38 @@ ChunkSparseMatrix<number>::add (const number factor,
 }
 
 
+
+template <typename number>
+void
+ChunkSparseMatrix<number>::extract_row_copy (const size_type row,
+                                             const size_type array_length,
+                                             size_type &row_length,
+                                             size_type *column_indices,
+                                             number *values) const
+{
+  row_length = cols->row_length(row);
+  const unsigned int chunk_size = cols->get_chunk_size();
+  const size_type reduced_row = row/chunk_size;
+  AssertIndexRange(cols->sparsity_pattern.row_length(reduced_row)*chunk_size,
+                   array_length+1);
+
+  SparsityPattern::iterator it = cols->sparsity_pattern.begin(reduced_row),
+    itend = cols->sparsity_pattern.end(reduced_row);
+  const number *val_ptr = &val[(it-cols->sparsity_pattern.begin(0))*chunk_size*chunk_size
+                               +(row%chunk_size)*chunk_size];
+  for ( ; it < itend; ++it)
+    {
+      for (unsigned int c=0; c<chunk_size; ++c)
+        {
+          *values++ = val_ptr[c];
+          *column_indices++ = it->column()*chunk_size+c;
+        }
+      val_ptr += chunk_size*chunk_size;
+    }
+}
+
+
+
 template <typename number>
 template <class OutVector, class InVector>
 void
