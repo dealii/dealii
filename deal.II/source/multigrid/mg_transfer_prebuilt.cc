@@ -160,9 +160,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                    ExcNotImplemented());
             for (unsigned int child=0; child<cell->n_children(); ++child)
               {
-                // set an alias to the
-                // prolongation matrix for
-                // this child
+                // set an alias to the prolongation matrix for this child
                 const FullMatrix<double> &prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
@@ -209,9 +207,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                    ExcNotImplemented());
             for (unsigned int child=0; child<cell->n_children(); ++child)
               {
-                // set an alias to the
-                // prolongation matrix for
-                // this child
+                // set an alias to the prolongation matrix for this child
                 prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
@@ -224,8 +220,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
-                // now set the entries in the
-                // matrix
+                // now set the entries in the matrix
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   prolongation_matrices[level]->set (dof_indices_child[i],
                                                      dofs_per_cell,
