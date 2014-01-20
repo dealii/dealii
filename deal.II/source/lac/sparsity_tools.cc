@@ -601,7 +601,7 @@ namespace SparsityTools
           Assert (status.MPI_TAG==124, ExcInternalError());
 
           MPI_Get_count(&status, MPI_BYTE, &len);
-          Assert( len%sizeof(unsigned int)==0, ExcInternalError());
+          Assert( len%sizeof(size_type)==0, ExcInternalError());
 
           recv_buf.resize(len/sizeof(size_type));
 

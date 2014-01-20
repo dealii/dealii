@@ -593,38 +593,8 @@ namespace TrilinosWrappers
 
     AssertDimension (sparsity_pattern.n_rows(),
                      static_cast<size_type>(n_global_elements(input_row_map)));
-
-    // exchange data if requested with deal.II's own function
-#ifdef DEAL_II_WITH_MPI
-    const Epetra_MpiComm* communicator =
-      dynamic_cast<const Epetra_MpiComm*>(&input_row_map.Comm());
-    if (exchange_data && communicator != 0)
-      {
-        std::vector<size_type>
-          owned_per_proc(communicator->NumProc(), -1);
-        size_type my_elements = input_row_map.NumMyElements();
-        MPI_Allgather(&my_elements, 1,
-                      Utilities::MPI::internal::mpi_type_id(&my_elements),
-                      &owned_per_proc[0], 1,
-                      Utilities::MPI::internal::mpi_type_id(&my_elements),
-                      communicator->Comm());
-
-        AssertDimension(std::accumulate(owned_per_proc.begin(),
-          owned_per_proc.end(), size_type()), sparsity_pattern.n_rows());
-
-        SparsityTools::distribute_sparsity_pattern
-          (const_cast<CompressedSimpleSparsityPattern&>(sparsity_pattern),
-           owned_per_proc, communicator->Comm(), sparsity_pattern.row_index_set());
-      }
-#endif
-
-    if (input_row_map.Comm().MyPID() == 0)
-      {
-        AssertDimension (sparsity_pattern.n_rows(),
-                         static_cast<size_type>(n_global_elements(input_row_map)));
-        AssertDimension (sparsity_pattern.n_cols(),
-                         static_cast<size_type>(n_global_elements(input_col_map)));
-      }
+    AssertDimension (sparsity_pattern.n_cols(),
+                     static_cast<size_type>(n_global_elements(input_col_map)));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
 
@@ -690,7 +660,8 @@ namespace TrilinosWrappers
     if (input_row_map.Comm().NumProc() > 1)
       {
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
-                                          &n_entries_per_row[0], true));
+                                          &n_entries_per_row[0],
+                                          exchange_data ? false : true));
         if (have_ghost_rows == true)
           nonlocal_graph.reset (new Epetra_CrsGraph (Copy, off_processor_map,
                                                      &n_entries_per_ghost_row[0],
@@ -724,15 +695,7 @@ namespace TrilinosWrappers
           }
       }
 
-    graph->FillComplete(input_col_map, input_row_map);
-    graph->OptimizeStorage();
-
-    AssertDimension (sparsity_pattern.n_cols(),static_cast<size_type>(
-                       n_global_cols(*graph)));
-
-    matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
-
-    // and now the same operations for the nonlocal graph and matrix
+    // finalize nonlocal graph and create nonlocal matrix
     if (nonlocal_graph.get() != 0)
       {
         if (nonlocal_graph->IndicesAreGlobal() == false &&
@@ -748,8 +711,24 @@ namespace TrilinosWrappers
         nonlocal_graph->FillComplete(input_col_map, input_row_map);
         nonlocal_graph->OptimizeStorage();
 
+        // insert data from nonlocal graph into the final sparsity pattern
+        if (exchange_data)
+          {
+            Epetra_Export exporter(nonlocal_graph->RowMap(), input_row_map);
+            int ierr = graph->Export(*nonlocal_graph, exporter, Add);
+            Assert (ierr==0, ExcTrilinosError(ierr));
+          }
+
         nonlocal_matrix.reset (new Epetra_CrsMatrix(Copy, *nonlocal_graph));
       }
+
+    graph->FillComplete(input_col_map, input_row_map);
+    graph->OptimizeStorage();
+
+    AssertDimension (sparsity_pattern.n_cols(),static_cast<size_type>(
+                       n_global_cols(*graph)));
+
+    matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
     last_action = Zero;
 
     // In the end, the matrix needs to be compressed in order to be really
