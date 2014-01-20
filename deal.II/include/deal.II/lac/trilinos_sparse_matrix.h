@@ -2755,7 +2755,9 @@ namespace TrilinosWrappers
         for (TrilinosWrappers::types::int_type i=0; i<n_columns; ++i)
           std::cout << col_index_ptr[i] << " ";
         std::cout << std::endl << std::endl;
-        std::cout << "Matrix row has the following indices:" << std::endl;
+        std::cout << "Matrix row "
+                  << (row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == false ? "(nonlocal part)" : "")
+                  << " has the following indices:" << std::endl;
         std::vector<TrilinosWrappers::types::int_type> indices;
         const Epetra_CrsGraph* graph =
           (nonlocal_matrix.get() != 0 &&

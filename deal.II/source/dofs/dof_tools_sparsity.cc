@@ -596,11 +596,8 @@ namespace DoFTools
                     {
                       // Refinement edges are taken care of by coarser
                       // cells
-
-                      // TODO: in the distributed case, we miss out the
-                      // constraints when the neighbor cell is coarser, but
-                      // only the current cell is owned locally!
-                      if (cell->neighbor_is_coarser(face))
+                      if (cell->neighbor_is_coarser(face) &&
+                          neighbor->subdomain_id() == cell->subdomain_id())
                         continue;
 
                       const unsigned int n_dofs_on_neighbor
@@ -619,14 +616,12 @@ namespace DoFTools
                       // around
                       if (!cell->neighbor(face)->active()
                           ||
-                          (cell->neighbor(face)->subdomain_id() !=
-                           cell->subdomain_id()))
+                          (neighbor->subdomain_id() != cell->subdomain_id()))
                         {
                           constraints.add_entries_local_to_global
                             (dofs_on_other_cell, dofs_on_this_cell,
                              sparsity, keep_constrained_dofs);
-                          if (cell->neighbor(face)->subdomain_id() !=
-                              cell->subdomain_id())
+                          if (neighbor->subdomain_id() != cell->subdomain_id())
                             constraints.add_entries_local_to_global
                             (dofs_on_other_cell, sparsity, keep_constrained_dofs);
                         }

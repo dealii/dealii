@@ -477,7 +477,7 @@ namespace SparsityTools
           Assert (status.MPI_TAG==124, ExcInternalError());
 
           MPI_Get_count(&status, MPI_BYTE, &len);
-          Assert( len%sizeof(unsigned int)==0, ExcInternalError());
+          Assert( len%sizeof(size_type)==0, ExcInternalError());
 
           recv_buf.resize(len/sizeof(size_type));
 
@@ -500,8 +500,7 @@ namespace SparsityTools
         }
     }
 
-    // complete all sends, so that we can
-    // safely destroy the buffers.
+    // complete all sends, so that we can safely destroy the buffers.
     MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 
   }
@@ -625,8 +624,7 @@ namespace SparsityTools
         }
     }
 
-    // complete all sends, so that we can
-    // safely destroy the buffers.
+    // complete all sends, so that we can safely destroy the buffers.
     MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
   }
 

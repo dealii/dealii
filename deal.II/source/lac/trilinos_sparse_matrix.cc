@@ -609,6 +609,9 @@ namespace TrilinosWrappers
                       Utilities::MPI::internal::mpi_type_id(&my_elements),
                       communicator->Comm());
 
+        AssertDimension(std::accumulate(owned_per_proc.begin(),
+          owned_per_proc.end(), size_type()), sparsity_pattern.n_rows());
+
         SparsityTools::distribute_sparsity_pattern
           (const_cast<CompressedSimpleSparsityPattern&>(sparsity_pattern),
            owned_per_proc, communicator->Comm(), sparsity_pattern.row_index_set());
@@ -753,6 +756,7 @@ namespace TrilinosWrappers
     // ready.
     compress();
   }
+
 
 
 
@@ -1804,7 +1808,7 @@ namespace TrilinosWrappers
   template void
   SparseMatrix::reinit (const Epetra_Map &,
                         const Epetra_Map &,
-                        const CompressedSimpleSparsityPattern &,
+                        const CompressedSetSparsityPattern &,
                         const bool);
 
 }
