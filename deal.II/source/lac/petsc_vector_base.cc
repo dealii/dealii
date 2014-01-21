@@ -1036,10 +1036,10 @@ namespace PETScWrappers
       out.setf (std::ios::fixed, std::ios::floatfield);
 
     if (across)
-      for (size_type i=0; i<size(); ++i)
+      for (size_type i=0; i<local_size(); ++i)
         out << val[i] << ' ';
     else
-      for (size_type i=0; i<size(); ++i)
+      for (size_type i=0; i<local_size(); ++i)
         out << val[i] << std::endl;
     out << std::endl;
 
