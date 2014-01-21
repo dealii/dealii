@@ -84,6 +84,19 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: It was previously possible to set the
+  <code>active_fe_index</code> on non-active cells of an hp::DoFHandler.
+  However, this was prone to mistakes because it may lead to the assumption
+  that a finite element space out of the ones described by the hp::FECollection
+  associated with this hp::DoFHandler was actually associated with such
+  a cell. Since we do not actually distribute degrees of freedom for such
+  hp::DoFHandler objects on non-active cells, this is not the case. Consequently,
+  it no longer has any effect to assign active FE indices to non-active cells:
+  these values are simply reset later on.
+  <br>
+  (Wolfgang Bangerth, 2014/01/20)
+  </li>
+
   <li> Fixed: The method DoFTools::extract_constant_modes only worked for
   elements where the constant function 1 is represented by all ones. This
   is now fixed by querying the element for its constant modes on each cell.
