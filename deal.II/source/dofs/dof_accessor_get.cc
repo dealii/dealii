@@ -55,6 +55,9 @@ get_interpolated_dof_values (const InputVector &values,
            (this->dof_handler)
            != 0)
           ||
+          // for hp-DoFHandlers, we need to require that on
+          // active cells, you either don't specify an fe_index,
+          // or that you specify the correct one
           (fe_index == this->active_fe_index())
           ||
           (fe_index == DH::default_fe_index))
@@ -70,7 +73,7 @@ get_interpolated_dof_values (const InputVector &values,
           FullMatrix<double> interpolation (this->dof_handler->get_fe()[fe_index].dofs_per_cell,
                                             this->get_fe().dofs_per_cell);
           this->dof_handler->get_fe()[fe_index].get_interpolation_matrix (this->get_fe(),
-                                                                          interpolation);
+              interpolation);
           interpolation.vmult (interpolated_values, tmp);
         }
     }
@@ -85,28 +88,28 @@ get_interpolated_dof_values (const InputVector &values,
       // space to this cell's (unknown) FE space unless an explicit
       // fe_index is given
       Assert ((dynamic_cast<DoFHandler<DH::dimension,DH::space_dimension>*>
-	       (this->dof_handler)
-	       != 0)
+               (this->dof_handler)
+               != 0)
               ||
-	      (fe_index != DH::default_fe_index),
-	      ExcMessage ("You cannot call this function on non-active cells "
-			  "of hp::DoFHandler objects unless you provide an explicit "
-			  "finite element index because they do not have naturally "
-			  "associated finite element spaces associated: degrees "
-			  "of freedom are only distributed on active cells for which "
-			  "the active_fe_index has been set."));
+              (fe_index != DH::default_fe_index),
+              ExcMessage ("You cannot call this function on non-active cells "
+                          "of hp::DoFHandler objects unless you provide an explicit "
+                          "finite element index because they do not have naturally "
+                          "associated finite element spaces associated: degrees "
+                          "of freedom are only distributed on active cells for which "
+                          "the active_fe_index has been set."));
 
       const FiniteElement<dim,spacedim> &fe            = this->get_dof_handler().get_fe()[fe_index];
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
       Assert (this->dof_handler != 0,
-	      typename BaseClass::ExcInvalidObject());
+              typename BaseClass::ExcInvalidObject());
       Assert (&fe != 0,
-	      typename BaseClass::ExcInvalidObject());
+              typename BaseClass::ExcInvalidObject());
       Assert (interpolated_values.size() == dofs_per_cell,
-	      typename BaseClass::ExcVectorDoesNotMatch());
+              typename BaseClass::ExcVectorDoesNotMatch());
       Assert (values.size() == this->dof_handler->n_dofs(),
-	      typename BaseClass::ExcVectorDoesNotMatch());
+              typename BaseClass::ExcVectorDoesNotMatch());
 
 
       Vector<number> tmp1(dofs_per_cell);
