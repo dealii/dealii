@@ -1448,7 +1448,7 @@ public:
    * cells.
    *
    * In principle, it works as follows: if the cell pointed to by this
-   * object is terminal, then the dof values are set in the global
+   * object is terminal (i.e., has no children), then the dof values are set in the global
    * data vector by calling the set_dof_values() function; otherwise,
    * the values are prolonged to each of the children and this
    * function is called for each of them.
@@ -1467,6 +1467,22 @@ public:
    * requirements are not taken care of and must be enforced by the
    * user afterward.
    *
+   * If the cell is part of a hp::DoFHandler object, cells only have an
+   * associated finite element space if they are active. However, this
+   * function is supposed to also work on inactive cells
+   * with children. Consequently, it carries a third argument that can be
+   * used in the hp context that denotes the finite element space we are
+   * supposed to interpret the input vector of this function in.
+   * If the cell is active, this function
+   * then interpolates the input vector interpreted as an element of the space described
+   * by the <code>fe_index</code>th element of the hp::FECollection associated
+   * with the hp::DoFHandler of which this cell is a part of, and interpolates
+   * it into the space that is associated with this cell. On the other hand, if the cell
+   * is not active, then we first perform this interpolation from this cell
+   * to its children using the given <code>fe_index</code> until we end
+   * up on an active cell, at which point we follow the procedure outlined
+   * at the beginning of the paragraph.
+   *
    * It is assumed that both vectors already have the right size
    * beforehand. This function relies on the existence of a natural
    * interpolation property of finite element spaces of a cell to its
@@ -1477,17 +1493,10 @@ public:
    * element class for a description of what the prolongation matrices
    * represent in this case.
    *
-   * Unlike the set_dof_values() function, this function is associated
-   * to cells rather than to lines, quads, and hexes, since
-   * interpolation is presently only provided for cells by the finite
-   * element objects.
-   *
-   * The output vector may be either a Vector<float>, Vector<double>,
-   * or a BlockVector<double>, or a PETSc vector if deal.II is
-   * compiled to support these libraries. It is in the responsibility
-   * of the caller to assure that the types of the numbers stored in
-   * input and output vectors are compatible and with similar
-   * accuracy.
+   * @note Unlike the get_dof_values() function, this function is only available
+   * on cells, rather than on lines, quads, and hexes, since interpolation
+   * is presently only provided for cells by the finite element
+   * classes.
    */
   template <class OutputVector, typename number>
   void set_dof_values_by_interpolation (const Vector<number> &local_values,

@@ -105,13 +105,14 @@ inconvenience this causes.
   space. Doing so now raises an exception.
   <br>
   However, there are legitimate cases where one may want to interpolate
-  from children to a parent's finite element space. Since in the hp
+  from children to a parent's finite element space or the other way around.
+  Since in the hp
   case no finite element space is naturally associated with an inactive
   cell, it is now possible to pass an explicit finite element index
-  argument to the function specifying which element of an hp::FECollection
+  argument to these functions specifying which element of an hp::FECollection
   object describes the space onto which you want to interpolate.
   <br>
-  (Wolfgang Bangerth, 2014/01/18)
+  (Mihai, Wolfgang Bangerth, 2014/01/18)
   </li>
 
   <li> Fixed: The methods IndexSet::do_compress() and
