@@ -75,9 +75,7 @@ void test ()
   solution_trans.prepare_for_pure_refinement();
   triangulation.execute_coarsening_and_refinement ();
 
-  // now set the active_fe_index flags on the new set of fine level cells, but
-  // also clear the one from the now inactive cell
-  dof_handler.begin(0)->set_active_fe_index(1);
+  // now set the active_fe_index flags on the new set of fine level cells
   for (unsigned int c=0; c<dof_handler.begin(0)->n_children(); ++c)
     dof_handler.begin(0)->child(c)->set_active_fe_index(1);
 
