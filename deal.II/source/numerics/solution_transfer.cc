@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -513,8 +513,6 @@ interpolate (const std::vector<VECTOR> &all_in,
           const std::vector<Vector<typename VECTOR::value_type> > *const valuesptr
             =pointerstruct->second.dof_values_ptr;
 
-          const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
-
           // cell stayed or is
           // refined
           if (indexptr)
@@ -528,7 +526,6 @@ interpolate (const std::vector<VECTOR> &all_in,
               // cell and prolong it
               // to its children
               unsigned int in_size = indexptr->size();
-              local_values.reinit(dofs_per_cell, true);
               for (unsigned int j=0; j<size; ++j)
                 {
                   // check the FE index of the new element. if
@@ -644,11 +641,16 @@ interpolate (const std::vector<VECTOR> &all_in,
                     }
                   else
                     {
+                      const unsigned int dofs_per_cell
+                      = cell->get_fe().dofs_per_cell;
+
                       AssertDimension (dofs_per_cell, indexptr->size());
+		      local_values.reinit (dofs_per_cell);
                       for (unsigned int i=0; i<dofs_per_cell; ++i)
                         local_values(i)=all_in[j]((*indexptr)[i]);
                       cell->set_dof_values_by_interpolation(local_values,
-                                                            all_out[j]);
+                                                            all_out[j],
+                                                            cell->active_fe_index());
                     }
                 }
             }
@@ -659,6 +661,8 @@ interpolate (const std::vector<VECTOR> &all_in,
               Assert (!cell->has_children(), ExcInternalError());
               Assert (indexptr == 0,
                       ExcInternalError());
+
+              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
               dofs.resize(dofs_per_cell);
               // get the local
               // indices
