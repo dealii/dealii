@@ -38,7 +38,7 @@
       webpage). Then call the script as follows:
       <pre>
 
-    ./p4est-setup.sh p4est-x-y-z.tar.gz /path/to/installation
+sh ./p4est-setup.sh p4est-x-y-z.tar.gz /path/to/installation
       </pre>
       where <code>p4est-x-y-z.tar.gz</code> is the name of the p4est
       distribution file, and <code>/path/to/installation</code> is a
@@ -50,14 +50,9 @@
       line like
       <pre>
 
-    cmake -DP4EST_DIR=/path/to/installation -DDEAL_II_WITH_P4EST=ON -DDEAL_II_WITH_MPI=ON <...>
+cmake -DP4EST_DIR=/path/to/installation -DDEAL_II_WITH_P4EST=ON -DDEAL_II_WITH_MPI=ON <...>
       </pre>
-      if the p4est library isn't picked up automatically. Note the presence
-      of <code>/FAST</code>  at the end of the path necessary when using
-      the <code>./p4est-setup.sh</code> script to select the release
-      version of p4est. Obviously, you
-      can also add additional flags to <code>cmake</code> as described in
-      the general <a href="../readme.html">ReadMe file</a>.
+      if the p4est library isn't picked up automatically.
     </p>
 
     <hr />
