@@ -149,7 +149,8 @@ SolutionTransfer<dim, VECTOR, DH>::refine_interpolate(const VECTOR &in,
                  ExcNumberOfDoFsPerCellHasChanged());
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             local_values(i)=in((*pointerstruct->second.indices_ptr)[i]);
-          cell->set_dof_values_by_interpolation(local_values, out);
+          cell->set_dof_values_by_interpolation(local_values, out,
+                                                cell->active_fe_index());
         }
     }
 }
