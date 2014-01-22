@@ -199,11 +199,16 @@ namespace
     Assert (interesting_range[0] <= interesting_range[1],
             ExcInternalError());
 
+    Assert (interesting_range[0] >= 0,
+            ExcInternalError());
+
+    // adjust the lower bound only
+    // if the end point is not equal
+    // to zero, otherwise it could
+    // happen, that the result
+    // becomes negative
     if (interesting_range[0] > 0)
       interesting_range[0] *= 0.99;
-    else
-      interesting_range[0]
-      -= 0.01 * (interesting_range[1] - interesting_range[0]);
 
     if (interesting_range[1] > 0)
       interesting_range[1] *= 1.01;

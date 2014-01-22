@@ -84,6 +84,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: In rare cases when the vector of error indicators
+  has entries equal to zero the adjust_interesting_range method
+  produces a negative lower bound. As a result the
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_*
+  methods flagged the wrong number of cells for coarsening and refinement.
+  This is now changed by adjusting the lower bound in adjust_interesting_range
+  only, if not equal to zero.
+  <br>
+  (Martin Steigemann, 2014/01/22)
+  </li>
+
   <li> Changed: It was previously possible to set the
   <code>active_fe_index</code> on non-active cells of an hp::DoFHandler.
   However, this was prone to mistakes because it may lead to the assumption
