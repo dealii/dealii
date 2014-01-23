@@ -82,16 +82,17 @@ namespace hp
 //---------------------------------------------------------------------------
 
 
-
   template<int dim, int spacedim>
-  MappingQ1<dim,spacedim>
-  StaticMappingQ1<dim,spacedim>::mapping_q1;
-
+  MappingQ1<dim,spacedim>& StaticMappingQ1<dim,spacedim>::return_static_mapping_q1()
+  {
+    static MappingQ1<dim,spacedim> mapping;
+    return mapping;
+  }
 
   template<int dim, int spacedim>
   MappingCollection<dim,spacedim>
   StaticMappingQ1<dim,spacedim>::mapping_collection
-    = MappingCollection<dim,spacedim>(mapping_q1);
+    = MappingCollection<dim,spacedim>(StaticMappingQ1<dim,spacedim>::return_static_mapping_q1());
 
 }
 
