@@ -53,11 +53,11 @@ void test (const unsigned int chunk_size)
       Vector<double> src(m.n()), dst(m.m()), dst_ref(m.m());
       for (unsigned int i=0; i<src.size(); ++i)
         src(i) = (double)Testing::rand()/RAND_MAX;
-      std::vector<unsigned int> indices(sp.max_entries_per_row());
+      std::vector<types::global_dof_index> indices(sp.max_entries_per_row());
       std::vector<double> values(sp.max_entries_per_row());
       for (unsigned int i=0; i<m.m(); ++i)
         {
-          unsigned int n_entries = numbers::invalid_unsigned_int;
+          types::global_dof_index n_entries = numbers::invalid_unsigned_int;
           m.extract_row_copy(i, values.size(), n_entries, &indices[0], &values[0]);
           double sum = 0;
           for (unsigned int j=0; j<n_entries; ++j)
