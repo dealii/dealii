@@ -47,7 +47,7 @@
 // resulting from the distribution of degrees of freedom on the grid. That
 // class can be found here:
 #include <deal.II/lac/sparse_matrix.h>
-// We will also need to use an intermediate sparsity patter structure, which
+// We will also need to use an intermediate sparsity pattern structure, which
 // is found in this file:
 #include <deal.II/lac/compressed_sparsity_pattern.h>
 
