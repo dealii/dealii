@@ -282,7 +282,7 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
   # file).
   #
   SET(${_flag}_SAVED ${${_flag}})
-  SET(${_flag})
+  SET(${_flag} "")
 ENDFOREACH()
 
 FOREACH(_variable
