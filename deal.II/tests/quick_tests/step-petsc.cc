@@ -109,7 +109,7 @@ void LaplaceProblem::assemble_system ()
   
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
   
-  typename DoFHandler<2>::active_cell_iterator
+  DoFHandler<2>::active_cell_iterator
     cell = dof_handler.begin_active (),
     endc = dof_handler.end ();
   
