@@ -2046,13 +2046,19 @@ namespace parallel
       if (attached_data_size>0)
         real_data_size = attached_data_size+sizeof(CellStatus);
 
+      Assert(this->n_cells()>0, ExcMessage("Can not save() an empty Triangulation."));
+
       if (my_subdomain==0)
         {
           std::string fname=std::string(filename)+".info";
           std::ofstream f(fname.c_str());
-          f << Utilities::MPI::n_mpi_processes (mpi_communicator) << " "
+          f << "version nproc attached_bytes n_attached_objs n_coarse_cells" << std::endl
+            << 2 << " "
+            << Utilities::MPI::n_mpi_processes (mpi_communicator) << " "
             << real_data_size << " "
-            << attached_data_pack_callbacks.size() << std::endl;
+            << attached_data_pack_callbacks.size() << " "
+            << this->n_cells(0)
+            << std::endl;
         }
 
       if (attached_data_size>0)
@@ -2082,6 +2088,10 @@ namespace parallel
     Triangulation<dim,spacedim>::
     load(const char *filename)
     {
+      Assert(this->n_cells()>0, ExcMessage("load() only works if Triangulation already contains the same coarse mesh!"));
+      Assert(this->n_levels()==1, ExcMessage("Triangulation may only contain coarse cells when calling load()."));
+
+
       if (parallel_ghost != 0)
         {
           dealii::internal::p4est::functions<dim>::ghost_destroy (parallel_ghost);
@@ -2090,14 +2100,19 @@ namespace parallel
       dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
       parallel_forest = 0;
       dealii::internal::p4est::functions<dim>::connectivity_destroy (connectivity);
-      connectivity=0;
+      connectivity = 0;
 
-      unsigned int numcpus, attached_size, attached_count;
+      unsigned int version, numcpus, attached_size, attached_count, n_coarse_cells;
       {
         std::string fname=std::string(filename)+".info";
         std::ifstream f(fname.c_str());
-        f >> numcpus >> attached_size >> attached_count;
+        std::string firstline;
+        getline(f, firstline); //skip first line
+        f >> version >> numcpus >> attached_size >> attached_count >> n_coarse_cells;
       }
+
+      Assert(version == 2, ExcMessage("Incompatible version found in .info file."));
+      Assert(this->n_cells(0) == n_coarse_cells, ExcMessage("Number of coarse cells differ!"));
 
       attached_data_size = 0;
       n_attached_datas = 0;
