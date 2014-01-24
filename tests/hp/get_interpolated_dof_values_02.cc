@@ -49,7 +49,7 @@ template <int dim>
 void test ()
 {
   // create a hp::DoFHandler with different finite elements on the
-  // cells. note that we assign active_fe_indices also to inactive
+  // cells. note that we skip setting active_fe_indices on inactive
   // elements
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
@@ -62,7 +62,8 @@ void test ()
   hp::DoFHandler<dim> dof_handler(tr);
   for (typename hp::DoFHandler<dim>::cell_iterator cell=dof_handler.begin();
        cell!=dof_handler.end(); ++cell)
-    cell->set_active_fe_index (cell->index() % fe.size());
+    if (cell->has_children() == false)
+      cell->set_active_fe_index (cell->index() % fe.size());
 
   dof_handler.distribute_dofs (fe);
 
