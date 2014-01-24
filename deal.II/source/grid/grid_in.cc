@@ -84,13 +84,13 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   unsigned int no_vertices, no_quads=0,no_lines=0;
 
-  char keyword_1[7],keyword_2[6],keyword_3[10] ;//keywords for the three types of data
+  std::string keyword;
 
-  in.get(keyword_1, 7);
+  in >> keyword;
 
   //////////////////Processing the POINTS section///////////////
 
-  if (std::strcmp(keyword_1,"POINTS") == 0)//comparing the keyword points
+  if (keyword == "POINTS")
     {
       in>>no_vertices;// taking the no. of vertices
       in.ignore(256, '\n');//ignoring the number beside the total no. of points.
@@ -120,24 +120,19 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
   in.ignore(256, '\n');//this move pointer to the next line ignoring unwanted no.
   no = in.tellg();
   getline(in,checkline);
-  if (checkline.compare("") == 0)
-    {
-      in.get(keyword_2, 6);
-    }
-  else
+  if (checkline.compare("") != 0)
     {
       in.seekg(no);
-      in.get(keyword_2, 6);
     }
 
+  in >> keyword;
 
   unsigned int total_cells, no_cells = 0, type, j = 0;// declaring counters, refer to the order of declaring variables for an idea of what is what!
 
   ///////////////////Processing the CELLS section that contains cells(cells) and bound_quads(subcelldata)///////////////////////
 
-  if (std::strcmp(keyword_2,"CELLS") == 0)//comparing the keyword cells.
+  if (keyword == "CELLS")
     {
-
       in>>total_cells;
       in.ignore(256,'\n');
 
@@ -244,16 +239,16 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       /////////////////////Processing the CELL_TYPES section////////////////////////
 
-      in>>keyword_3;
+      in >> keyword;
 
-      if (std::strcmp(keyword_3,"CELL_TYPES") == 0)//Entering the cell_types section and ignoring data.
+      if (keyword == "CELL_TYPES")//Entering the cell_types section and ignoring data.
         {
           in.ignore(256, '\n');
 
           while (!in.eof())
             {
-              in>>keyword_3;
-              if (std::strcmp(keyword_3,"12") && std::strcmp(keyword_3,"9"))
+              in>>keyword;
+              if (keyword != "12" && keyword != "9")
                 {
                   break;
                 }
@@ -262,7 +257,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       ////////////////////////Processing the CELL_DATA section/////////////////////////////
 
-      if (std::strcmp(keyword_3,"CELL_DATA") == 0)
+      if (keyword == "CELL_DATA")
         {
           int no_ids;
           in>>no_ids;
