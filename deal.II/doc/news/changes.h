@@ -84,6 +84,19 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
+  on non-active cells. However, this made no sense: Since degrees of
+  freedoms only exist on active cells
+  for hp::DoFHandler (i.e., there is currently no implementation
+  of multilevel hp::DoFHandler objects), it does not make sense
+  to assign active FE indices to non-active cells since they
+  do not have finite element spaces associated with them without
+  having any degrees of freedom. Consequently, this function will
+  now produce an exception when called on non-active cells.
+  <br>
+  (Wolfgang Bangerth, 2014/01/24)
+  </li>
+
   <li> Fixed: SparsityPattern::max_entries_per_row() forgot to consider
   the last row of the matrix and consequently sometimes returned
   wrong values. This is now fixed.

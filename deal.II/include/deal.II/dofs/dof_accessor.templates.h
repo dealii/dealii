@@ -3459,6 +3459,10 @@ inline
 void
 DoFCellAccessor<DH,lda>::set_active_fe_index (const unsigned int i)
 {
+  Assert (this->has_children() == false,
+          ExcMessage ("You can not set the active_fe_index on a cell that has "
+                      "children because no degrees of freedom will be assigned "
+                      "to this cell."));
   dealii::internal::DoFCellAccessor::Implementation::set_active_fe_index (*this, i);
 }
 

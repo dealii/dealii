@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1665,13 +1665,26 @@ public:
   get_fe () const;
 
   /**
-   *  Returns the index inside the hp::FECollection of the
-   *  FiniteElement used for this cell.
+   * Returns the index inside the hp::FECollection of the
+   * FiniteElement used for this cell. This function is
+   * only useful if the DoF handler object associated with
+   * the current cell is an hp::DoFHandler.
    */
   unsigned int active_fe_index () const;
 
   /**
-   *  Sets the index of the FiniteElement used for this cell.
+   * Sets the index of the FiniteElement used for this cell. This
+   * determines which element in an hp::FECollection to use. This function is
+   * only useful if the DoF handler object associated with
+   * the current cell is an hp::DoFHandler.
+   *
+   * @note Since degrees of freedoms only exist on active cells
+   * for hp::DoFHandler (i.e., there is currently no implementation
+   * of multilevel hp::DoFHandler objects), it does not make sense
+   * to assign active FE indices to non-active cells since they
+   * do not have finite element spaces associated with them without
+   * having any degrees of freedom. Consequently, this function will
+   * produce an exception when called on non-active cells.
    */
   void set_active_fe_index (const unsigned int i);
   /**
