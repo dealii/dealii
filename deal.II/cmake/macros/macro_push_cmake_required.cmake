@@ -15,21 +15,17 @@
 ## ---------------------------------------------------------------------
 
 #
-# A small macro used in the platform checks to remove the right most flag in
+# A small macro used in the platform checks to easily add a flag to
 # CMAKE_REQUIRED_FLAGS
 #
-# We assume that the flags in CMAKE_REQUIRED_FLAGS are space separated
-#
 # Usage:
-#     POP_TEST_FLAG()
+#     PUSH_CMAKE_REQUIRED("flag")
 #
 
-MACRO(POP_TEST_FLAG)
-  SET(CMAKE_REQUIRED_FLAGS " ${CMAKE_REQUIRED_FLAGS}")
-  STRING(REGEX REPLACE " [^ ]+$" ""
-    CMAKE_REQUIRED_FLAGS
-    "${CMAKE_REQUIRED_FLAGS}"
-    )
+MACRO(PUSH_CMAKE_REQUIRED _flag)
+
+  SET(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${_flag}")
   STRING(STRIP "${CMAKE_REQUIRED_FLAGS}" CMAKE_REQUIRED_FLAGS)
+
 ENDMACRO()
 

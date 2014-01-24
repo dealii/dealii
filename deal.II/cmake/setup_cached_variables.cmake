@@ -353,7 +353,7 @@ It is not possible to install into the build directory. Please set
 CMAKE_INSTALL_PREFIX to a designated install directory different than
 CMAKE_BINARY_DIR.
 (Please note that you can use deal.II directly out of a build directory
-if this is what you tried to do.)
+without the need to install it, if this is what you tried to do.)
 "
     )
 ENDIF()

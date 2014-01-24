@@ -51,7 +51,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
 
   # Set CMAKE_REQUIRED_FLAGS for the unit tests
   MESSAGE(STATUS "Using C++11 flag \"${DEAL_II_CXX11_FLAG}\"")
-  PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -103,7 +103,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
   # that as well.
   #
   IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-    PUSH_TEST_FLAG("-pthread")
+    PUSH_CMAKE_REQUIRED("-pthread")
     CHECK_CXX_SOURCE_RUNS(
       "
       #include <thread>
@@ -111,7 +111,8 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       int main(){ std::thread t(f,1); t.join(); return 0; }
       "
       DEAL_II_HAVE_CXX11_THREAD)
-    POP_TEST_FLAG()
+    RESET_CMAKE_REQUIRED()
+    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
   ELSE()
     # Just export it ;-)
     SET(DEAL_II_HAVE_CXX11_THREAD TRUE CACHE BOOL "")
@@ -146,7 +147,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
   #
   # On Mac OS-X 10.9 with recent gcc compilers in C++11 mode linking to
   # some standard C library functions, notably toupper and tolower, fail
-  # due to unresolved references to this functions.
+  # due to unresolved references to these functions.
   #
   # Thanks to Denis Davydov for the testcase.
   #
@@ -252,7 +253,8 @@ IF(DEAL_II_WITH_CXX11 AND NOT DEAL_II_HAVE_CXX11)
     "    -DDEAL_II_WITH_CXX11=FALSE,\n"
     "or use a different compiler, instead. (If the compiler flag for C++11 "
     "support differs from \"-std=c++0x\" or \"-std=c++11\", a suitable "
-    "compiler flag has to be specified manually.\n\n"
+    "compiler flag has to be specified manually via\n"
+    "    -DDEAL_II_CXX11_FLAG="..."\n\n"
     )
 ENDIF()
 
@@ -264,14 +266,14 @@ IF(DEAL_II_WITH_CXX11)
   ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
   MESSAGE(STATUS "DEAL_II_WITH_CXX11 successfully set up")
 
-  PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <type_traits>
     int main(){ std::is_trivially_copyable<int> bob; }
     "
     DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
-  POP_TEST_FLAG()
+  RESET_CMAKE_REQUIRED()
 ELSE()
   MESSAGE(STATUS "DEAL_II_WITH_CXX11 disabled")
 ENDIF()

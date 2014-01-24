@@ -29,8 +29,8 @@
 #
 # - Wolfgang Bangerth, Matthias Maier, rewritten 2012
 #
-PUSH_TEST_FLAG("-Wreturn-type")
-PUSH_TEST_FLAG("-Werror")
+PUSH_CMAKE_REQUIRED("-Wreturn-type")
+PUSH_CMAKE_REQUIRED("-Werror")
 CHECK_CXX_COMPILER_BUG(
   "
   const double foo() { return 1.; }
@@ -38,8 +38,7 @@ CHECK_CXX_COMPILER_BUG(
   "
   DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG
   )
-POP_TEST_FLAG()
-POP_TEST_FLAG()
+RESET_CMAKE_REQUIRED()
 
 IF(DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG)
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-return-type)

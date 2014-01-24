@@ -292,13 +292,13 @@ CHECK_CXX_COMPILER_FLAG(flag variable)
 </pre>
 
   <li> Necessary compiler flags can easily set in the string variable
-    <code>CMAKE_REQUIRED_FLAGS</code>. There are two small macros
-    that do this job nicely:
+    <code>CMAKE_REQUIRED_FLAGS</code>. There is a small macro that does this
+    job nicely:
 
 <pre class="cmake">
-PUSH_TEST_FLAG("-Werror")
+PUSH_CMAKE_REQUIRED("-Werror")
 CHECK_CXX_SOURCE_COMPILES(...)
-POP_TEST_FLAG()
+RESET_CMAKE_REQUIRED()
 </pre>
 
   <li> Necessary include directories and libraries necessary for
