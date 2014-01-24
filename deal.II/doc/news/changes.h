@@ -84,6 +84,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: SparsityPattern::max_entries_per_row() forgot to consider
+  the last row of the matrix and consequently sometimes returned
+  wrong values. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/01/22)
+  </li>
+
   <li> Improved: In rare cases when the vector of error indicators
   has entries equal to zero the adjust_interesting_range method
   produces a negative lower bound. As a result the
