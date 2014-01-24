@@ -80,7 +80,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
           // the interpolation points at @p{t=0.276} and @p{t=0.724}
           // (Gauss-Lobatto points). Since at @p{t=0,1} we want a vertex which
           // is actually at the boundary, we know that @p{d=0} and @p{a=-b-c},
-          // which gives @p{s(0.276)} and @{s(0.726)} in terms of @p{b,c}. As
+          // which gives @p{s(0.276)} and @p{s(0.726)} in terms of @p{b,c}. As
           // side-conditions, we want that the derivatives at @p{t=0} and
           // @p{t=1}, i.e. at the vertices match those returned by the
           // boundary.

@@ -50,6 +50,8 @@ template<typename number>
 class TridiagonalMatrix
 {
 public:
+  ///@name Constructors
+  //@{
   /**
    * Declare type for container size.
    */

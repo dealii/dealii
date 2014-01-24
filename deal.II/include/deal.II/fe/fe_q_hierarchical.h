@@ -310,6 +310,8 @@ public:
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
 
+  /*@}*/
+
   /**
    * Return the matrix interpolating from a face of one
    * element to the face of the neighboring element. The
