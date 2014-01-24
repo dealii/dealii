@@ -497,15 +497,14 @@ namespace TrilinosWrappers
     void Vector::reinit (const Epetra_Map             &parallel_partitioner,
                          const dealii::Vector<number> &v)
     {
-      if (vector.get() != 0 && vector->Map().SameAs(parallel_partitioner))
+      if (vector.get() == 0 || vector->Map().SameAs(parallel_partitioner) == false)
         vector.reset (new Epetra_FEVector(parallel_partitioner));
 
       has_ghosts = vector->Map().UniqueGIDs()==false;
 
       const int size = parallel_partitioner.NumMyElements();
 
-      // Need to copy out values, since the
-      // deal.II might not use doubles, so
+      // Need to copy out values, since the deal.II might not use doubles, so
       // that a direct access is not possible.
       for (int i=0; i<size; ++i)
         (*vector)[0][i] = v(gid(parallel_partitioner,i));
