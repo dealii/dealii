@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2599,14 +2599,6 @@ namespace hp
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
 
     finite_elements = &ff;
-
-    // nothing good can come off having active_fe_indices
-    // on non-active cells, since we do not distribute dofs
-    // there. kill these
-    for (cell_iterator cell = begin(); cell != end(); ++cell)
-      if (cell->has_children())
-        cell->set_active_fe_index (default_fe_index);
-
 
     // This call ensures that the
     // active_fe_indices vectors are
