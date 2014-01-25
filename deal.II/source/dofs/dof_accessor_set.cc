@@ -70,10 +70,14 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
           this->get_fe().get_interpolation_matrix (this->dof_handler->get_fe()[fe_index],
                                                    interpolation);
 
+          // do the interpolation to the target space. for historical
+          // reasons, matrices are set to size 0x0 internally even
+          // we reinit as 4x0, so we have to treat this case specially
           Vector<number> tmp (this->get_fe().dofs_per_cell);
-          interpolation.vmult (tmp, local_values);
+          if ((tmp.size() > 0) && (local_values.size() > 0))
+            interpolation.vmult (tmp, local_values);
 
-          //now set the dof values in the global vector
+          // now set the dof values in the global vector
           this->set_dof_values (tmp, values);
         }
     }

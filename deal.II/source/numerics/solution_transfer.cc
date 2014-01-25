@@ -436,12 +436,14 @@ interpolate (const std::vector<VECTOR> &all_in,
           const std::vector<Vector<typename VECTOR::value_type> > *const valuesptr
             =pointerstruct->second.dof_values_ptr;
 
-          // cell stayed or is
-          // refined
+          // cell stayed as it was or was refined
           if (indexptr)
             {
               Assert (valuesptr == 0,
                       ExcInternalError());
+
+              const unsigned int old_fe_index =
+                pointerstruct->second.active_fe_index;
 
               // get the values of
               // each of the input
@@ -451,135 +453,17 @@ interpolate (const std::vector<VECTOR> &all_in,
               unsigned int in_size = indexptr->size();
               for (unsigned int j=0; j<size; ++j)
                 {
-                  // check the FE index of the new element. if
-                  // we have children and not all of the
-                  // children have the same FE index, need to
-                  // manually implement
-                  // set_dof_values_by_interpolation
-                  unsigned int new_fe_index = cell->active_fe_index();
-                  bool different_elements = false;
-                  if (cell->has_children())
-                    {
-                      new_fe_index = cell->child(0)->active_fe_index();
-                      for (unsigned int child=1; child<cell->n_children(); ++child)
-                        if (cell->child(child)->active_fe_index() != new_fe_index)
-                          {
-                            different_elements = true;
-                            break;
-                          }
-                    }
-                  if (different_elements == true ||
-                      new_fe_index != pointerstruct->second.active_fe_index)
-                    {
-                      const unsigned int old_index =
-                        pointerstruct->second.active_fe_index;
-                      tmp.reinit (in_size, true);
-                      for (unsigned int i=0; i<in_size; ++i)
-                        tmp(i)=all_in[j]((*indexptr)[i]);
-                      if (different_elements == false)
-                        {
-                          AssertDimension (tmp.size(),
-                                           interpolation_hp(new_fe_index,old_index).n());
-                          local_values.reinit (cell->has_children() ?
-                                               cell->child(0)->get_fe().dofs_per_cell
-                                               : cell->get_fe().dofs_per_cell, true);
-                          // do the interpolation. we get into trouble if the
-                          // interpolation_hp(new,old) matrix hasn't been computed.
-                          // this can happen if the respective elements don't support
-                          // the corresponding interpolation; if that's the case, then
-                          // the computation of the matrix simply sets the matrix
-                          // back to size zero. so if we get here and that is
-                          // the wrong size, then this may be because the elements
-                          // haven't implemented the correct function yet
-                          //
-                          // there is one wrinkle. we would like to only error out if
-                          // the size of the matrix is 0 times 0 but at least one
-                          // of the elements has more than one dof per cell. the
-                          // problem is that if you reinit a matrix to 4x0, it automatically
-                          // sets its size to 0x0. so we can only execute the following
-                          // test if *both* elements have dofs_per_cell>0, not if *at
-                          // least one* have.
-                          Assert (! ((interpolation_hp(new_fe_index,old_index).m() == 0)
-                                     &&
-                                     (interpolation_hp(new_fe_index,old_index).n() == 0)
-                                     &&
-                                     ((dof_handler->get_fe()[new_fe_index].dofs_per_cell > 0)
-                                      &&
-                                      (dof_handler->get_fe()[old_index].dofs_per_cell > 0))),
-                                  ExcMessage ("The interpolation between two different "
-                                              "elements you are trying to use here has "
-                                              "not been implemented for this pair of "
-                                              "elements!"));
+                  tmp.reinit (in_size, true);
+                  for (unsigned int i=0; i<in_size; ++i)
+                    tmp(i) = all_in[j]((*indexptr)[i]);
 
-                          // simple case where all children have the
-                          // same FE index: just interpolate to their FE
-                          // first and then use the standard routines
-                          if (tmp.size() > 0)
-                            interpolation_hp(new_fe_index,old_index).vmult (local_values, tmp);
-                          else
-                            local_values = 0;
-                        }
-
-                      if (cell->has_children() == false)
-                        cell->set_dof_values (local_values, all_out[j]);
-                      else
-                        for (unsigned int child=0; child<cell->n_children(); ++child)
-                          {
-                            if (different_elements == true)
-                              {
-                                const unsigned int c_index =
-                                  cell->child(child)->active_fe_index();
-                                if (c_index != old_index)
-                                  {
-                                    AssertDimension (tmp.size(),
-                                                     interpolation_hp(c_index,old_index).n());
-                                    local_values.reinit(cell->child(child)->get_fe().dofs_per_cell, true);
-
-                                    // do the interpolation. same problem as above
-                                    Assert (! ((interpolation_hp(c_index,old_index).m() == 0)
-                                               &&
-                                               (interpolation_hp(c_index,old_index).n() == 0)
-                                               &&
-                                               ((dof_handler->get_fe()[c_index].dofs_per_cell > 0)
-                                                &&
-                                                (dof_handler->get_fe()[old_index].dofs_per_cell > 0))),
-                                            ExcMessage ("The interpolation between two different "
-                                                        "elements you are trying to use here has "
-                                                        "not been implemented for this pair of "
-                                                        "elements!"));
-
-                                    if (tmp.size() > 0)
-                                      interpolation_hp(c_index,old_index).vmult (local_values, tmp);
-                                    else
-                                      local_values = 0;
-                                  }
-                                else
-                                  local_values = tmp;
-                              }
-                            tmp2.reinit (cell->child(child)->get_fe().dofs_per_cell, true);
-                            cell->child(child)->get_fe().get_prolongation_matrix(child, cell->refinement_case())
-                            .vmult (tmp2, local_values);
-                            cell->child(child)->set_dof_values(tmp2,all_out[j]);
-                          }
-                    }
-                  else
-                    {
-                      const unsigned int dofs_per_cell
-                      = cell->get_fe().dofs_per_cell;
-
-                      AssertDimension (dofs_per_cell, indexptr->size());
-		      local_values.reinit (dofs_per_cell);
-                      for (unsigned int i=0; i<dofs_per_cell; ++i)
-                        local_values(i)=all_in[j]((*indexptr)[i]);
-                      cell->set_dof_values_by_interpolation(local_values,
-                                                            all_out[j],
-                                                            cell->active_fe_index());
-                    }
+                  cell->set_dof_values_by_interpolation (tmp, all_out[j],
+                                                         old_fe_index);
                 }
             }
-          // children of cell were
-          // deleted
           else if (valuesptr)
+            // the children of this cell were
+            // deleted
             {
               Assert (!cell->has_children(), ExcInternalError());
               Assert (indexptr == 0,
