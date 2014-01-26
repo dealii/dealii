@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1063,11 +1063,31 @@ namespace internal
   {
     template <int rank, int dim, bool constness, int P, typename Number>
     Accessor<rank,dim,constness,P,Number>::
+    Accessor ()
+      :
+      tensor (*static_cast<tensor_type*>(0)),
+      previous_indices ()
+    {
+      Assert (false, ExcMessage ("You can't call the default constructor of this class."));
+    }
+
+
+    template <int rank, int dim, bool constness, int P, typename Number>
+    Accessor<rank,dim,constness,P,Number>::
     Accessor (tensor_type              &tensor,
               const TableIndices<rank> &previous_indices)
       :
       tensor (tensor),
       previous_indices (previous_indices)
+    {}
+
+
+    template <int rank, int dim, bool constness, int P, typename Number>
+    Accessor<rank,dim,constness,P,Number>::
+    Accessor (const Accessor &a)
+      :
+      tensor (a.tensor),
+      previous_indices (a.previous_indices)
     {}
 
 
@@ -1084,11 +1104,33 @@ namespace internal
 
     template <int rank, int dim, bool constness, typename Number>
     Accessor<rank,dim,constness,1,Number>::
+    Accessor ()
+      :
+      tensor (*static_cast<tensor_type*>(0)),
+      previous_indices ()
+    {
+      Assert (false, ExcMessage ("You can't call the default constructor of this class."));
+    }
+
+
+
+    template <int rank, int dim, bool constness, typename Number>
+    Accessor<rank,dim,constness,1,Number>::
     Accessor (tensor_type              &tensor,
               const TableIndices<rank> &previous_indices)
       :
       tensor (tensor),
       previous_indices (previous_indices)
+    {}
+
+
+
+    template <int rank, int dim, bool constness, typename Number>
+    Accessor<rank,dim,constness,1,Number>::
+    Accessor (const Accessor &a)
+      :
+      tensor (a.tensor),
+      previous_indices (a.previous_indices)
     {}
 
 
