@@ -38,10 +38,19 @@ cluster at Texas A&amp;M University.
 
 <h3>Results for a 2d circular shell testcase</h3>
 
+Next, we will run step-32 with the parameter file in the directory. Here we
+are using 50 processors. The command to launch is (note that step-32.prm is
+the default):
 
-If we run the program as shown above (with the parameter file in the
-directory), the output will look roughly
-like this when run on 50 processors:
+<code>
+<pre>
+$ mpirun -n 50 ./step-32
+</pre>
+</code>
+
+Note that running a job on a cluster typically requires going through a job
+scheduler, which we won't discuss here. The output will look roughly like
+this:
 
 <code>
 <pre>
