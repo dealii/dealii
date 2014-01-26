@@ -66,12 +66,14 @@
 # Check the user provided CXX flags:
 #
 
-IF(NOT "${DEAL_II_CXX_FLAGS_SAVED}" STREQUAL "${CACHED_DEAL_II_CXX_FLAGS_SAVED}")
+IF( NOT "${DEAL_II_CXX_FLAGS_SAVED}" STREQUAL "${CACHED_DEAL_II_CXX_FLAGS_SAVED}"
+    OR NOT "${DEAL_II_LINKER_FLAGS_SAVED}" STREQUAL "${CACHED_DEAL_II_LINKER_FLAGS_SAVED}")
   MESSAGE(STATUS "")
   # Rerun this test if cxx flags changed:
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
 ENDIF()
 SET(CACHED_DEAL_II_CXX_FLAGS_SAVED "${DEAL_II_CXX_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
+SET(CACHED_DEAL_II_LINKER_FLAGS_SAVED "${DEAL_II_LINKER_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
 
 # Initialize all CMAKE_REQUIRED_* variables a this point:
 RESET_CMAKE_REQUIRED()
@@ -82,11 +84,12 @@ CHECK_CXX_SOURCE_COMPILES(
 
 IF(NOT DEAL_II_HAVE_USABLE_CXX_FLAGS)
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
-  MESSAGE(FATAL_ERROR "\n"
-    "Configuration error: Cannot compile with the user supplied CXX flags:\n"
-    "${DEAL_II_CXX_FLAGS_SAVED}\n"
-    "Please check the CMake variable DEAL_II_CXX_FLAGS and the\n"
-    "environment variable CXXFLAGS\n\n"
+  MESSAGE(FATAL_ERROR "
+Configuration error: Cannot compile with the user supplied flags:
+CXX flags: ${DEAL_II_CXX_FLAGS_SAVED}
+LD flags: ${DEAL_II_LINKER_FLAGS_SAVED}
+Please check the CMake variables DEAL_II_CXX_FLAGS, DEAL_II_LINKER_FLAGS
+and the environment variables CXXFLAGS, LDFLAGS.\n\n"
     )
 ENDIF()
 
