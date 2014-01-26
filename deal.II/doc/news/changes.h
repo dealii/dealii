@@ -50,6 +50,24 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
+  on non-active cells. However, this made no sense: Since degrees of
+  freedoms only exist on active cells
+  for hp::DoFHandler (i.e., there is currently no implementation
+  of multilevel hp::DoFHandler objects), it does not make sense
+  to assign active FE indices to non-active cells since they
+  do not have finite element spaces associated with them without
+  having any degrees of freedom.
+  <br>
+  The same of course is true for asking for the finite element active
+  on a non-active cell, i.e. using the functions
+  DoFAccessor::active_fe_index() and
+  DoFAccessor::get_fe(). All of these functions now produce exceptions on
+  non-active cells.
+  <br>
+  (Wolfgang Bangerth, 2014/01/24)
+  </li>
+
   <li> New: deal.II now links with the
   <a href="http://www.boost.org/doc/libs/1_55_0/libs/iostreams/doc/index.html">BOOST
   Iostreams</a> library (at least if the libz and libbz2 libraries
@@ -84,24 +102,18 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: The SolutionTransfer class had all sorts of problems when
+  used with hp::DoFHandler that made its results at least questionable.
+  Several parts of this class have been rewritten to make the results
+  more predictable and, likely, more correct.
+  <br>
+  (Wolfgang Bangerth, 2014/01/26)
+
   <li>Fixed: A regression where a single whitespace accidentally added to
   DEAL_II_LINKER_FLAGS internally prevented cmake-2.8.8 from configuring
-  sucessfully
+  sucessfully.
   <br>
-  (Matthias Maier, Krysztof Bzowski 2014/01/26)
-
-  <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
-  on non-active cells. However, this made no sense: Since degrees of
-  freedoms only exist on active cells
-  for hp::DoFHandler (i.e., there is currently no implementation
-  of multilevel hp::DoFHandler objects), it does not make sense
-  to assign active FE indices to non-active cells since they
-  do not have finite element spaces associated with them without
-  having any degrees of freedom. Consequently, this function will
-  now produce an exception when called on non-active cells.
-  <br>
-  (Wolfgang Bangerth, 2014/01/24)
-  </li>
+  (Matthias Maier, Krysztof Bzowski, 2014/01/26)
 
   <li> Fixed: SparsityPattern::max_entries_per_row() forgot to consider
   the last row of the matrix and consequently sometimes returned

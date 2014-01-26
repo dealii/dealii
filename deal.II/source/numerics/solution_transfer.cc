@@ -135,10 +135,11 @@ SolutionTransfer<dim, VECTOR, DH>::refine_interpolate(const VECTOR &in,
         // which is both done by one
         // function
         {
-          const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
-          local_values.reinit(dofs_per_cell, true); // fast reinit, i.e. the
-          // entries are not set to 0.
-          // make sure that the size of the
+	  const unsigned int this_fe_index = pointerstruct->second.active_fe_index;
+          const unsigned int dofs_per_cell=cell->get_dof_handler().get_fe()[this_fe_index].dofs_per_cell;
+          local_values.reinit(dofs_per_cell, true);
+
+	  // make sure that the size of the
           // stored indices is the same as
           // dofs_per_cell. this is kind of a
           // test if we use the same fe in the
@@ -150,7 +151,7 @@ SolutionTransfer<dim, VECTOR, DH>::refine_interpolate(const VECTOR &in,
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             local_values(i)=in((*pointerstruct->second.indices_ptr)[i]);
           cell->set_dof_values_by_interpolation(local_values, out,
-                                                cell->active_fe_index());
+                                                this_fe_index);
         }
     }
 }

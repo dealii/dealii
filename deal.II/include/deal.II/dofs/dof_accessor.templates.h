@@ -3439,6 +3439,13 @@ inline
 const FiniteElement<DH::dimension,DH::space_dimension> &
 DoFCellAccessor<DH,lda>::get_fe () const
 {
+  Assert ((dynamic_cast<const dealii::DoFHandler<DH::dimension,DH::space_dimension>*>
+	   (this->dof_handler) != 0)
+	  ||
+	  (this->has_children() == false),
+          ExcMessage ("In hp::DoFHandler objects, finite elements are only associated "
+		      "with active cells. Consequently, you can not ask for the "
+		      "active finite element on cells with children."));
   return dealii::internal::DoFAccessor::get_fe (this->dof_handler->get_fe(), active_fe_index());
 }
 
@@ -3449,6 +3456,11 @@ inline
 unsigned int
 DoFCellAccessor<DH,lda>::active_fe_index () const
 {
+  Assert (this->has_children() == false,
+          ExcMessage ("You can not ask for the active_fe_index on a cell that has "
+                      "children because no degrees of freedom are assigned "
+                      "to this cell and, consequently, no finite element "
+		      "is associated with it."));
   return dealii::internal::DoFCellAccessor::Implementation::active_fe_index (*this);
 }
 

@@ -1660,6 +1660,14 @@ public:
    * this iterator. For non-hp DoF handlers, this is of course always
    * the same element, independent of the cell we are presently on,
    * but for hp DoF handlers, this may change from cell to cell.
+   *
+   * @note Since degrees of freedoms only exist on active cells
+   * for hp::DoFHandler (i.e., there is currently no implementation
+   * of multilevel hp::DoFHandler objects), it does not make sense
+   * to query the finite element on non-active cells since they
+   * do not have finite element spaces associated with them without
+   * having any degrees of freedom. Consequently, this function will
+   * produce an exception when called on non-active cells.
    */
   const FiniteElement<DH::dimension,DH::space_dimension> &
   get_fe () const;
@@ -1669,6 +1677,14 @@ public:
    * FiniteElement used for this cell. This function is
    * only useful if the DoF handler object associated with
    * the current cell is an hp::DoFHandler.
+   *
+   * @note Since degrees of freedoms only exist on active cells
+   * for hp::DoFHandler (i.e., there is currently no implementation
+   * of multilevel hp::DoFHandler objects), it does not make sense
+   * to query active FE indices on non-active cells since they
+   * do not have finite element spaces associated with them without
+   * having any degrees of freedom. Consequently, this function will
+   * produce an exception when called on non-active cells.
    */
   unsigned int active_fe_index () const;
 
