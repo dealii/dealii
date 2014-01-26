@@ -69,9 +69,21 @@ void test ()
 
   // try to interpolate from the active cell onto the coarsest cell,
   // which is definitely not active. this can't work, so expect an
-  // exception
+  // exception for both the call to cell->get_fe() and the call to
+  // cell->get_interpolated_dof_values
   typename hp::DoFHandler<dim>::cell_iterator cell=dof_handler.begin(0);
-  Vector<double> local (cell->get_fe().dofs_per_cell);
+
+  unsigned int dofs_per_cell = 4;
+  try
+    {
+      dofs_per_cell = cell->get_fe().dofs_per_cell;
+    }
+  catch (const ExceptionBase &e)
+    {
+      deallog << "Yes, exception 1!" << std::endl;
+      deallog << e.get_exc_name() << std::endl;
+    }
+  Vector<double> local (dofs_per_cell);
 
   try
     {
@@ -79,7 +91,7 @@ void test ()
     }
   catch (const ExceptionBase &e)
     {
-      deallog << "Yes, exception!" << std::endl;
+      deallog << "Yes, exception 2!" << std::endl;
       deallog << e.get_exc_name() << std::endl;
     }
 }
