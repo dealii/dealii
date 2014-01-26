@@ -254,7 +254,7 @@ IF(DEAL_II_WITH_CXX11 AND NOT DEAL_II_HAVE_CXX11)
     "or use a different compiler, instead. (If the compiler flag for C++11 "
     "support differs from \"-std=c++0x\" or \"-std=c++11\", a suitable "
     "compiler flag has to be specified manually via\n"
-    "    -DDEAL_II_CXX11_FLAG="..."\n\n"
+    "    -DDEAL_II_CXX11_FLAG=\"...\"\n\n"
     )
 ENDIF()
 

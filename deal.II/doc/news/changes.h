@@ -84,6 +84,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: A regression where a single whitespace accidentally added to
+  DEAL_II_LINKER_FLAGS internally prevented cmake-2.8.8 from configuring
+  sucessfully
+  <br>
+  (Matthias Maier, Krysztof Bzowski 2014/01/26)
+
   <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
   on non-active cells. However, this made no sense: Since degrees of
   freedoms only exist on active cells
