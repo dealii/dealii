@@ -174,7 +174,7 @@ namespace SLEPcWrappers
     /**
      * Same as above, but here a composite method for solving the
      * system $A x=\lambda B x$ with real matrices $A, B$ and
-     * imaginary eigenpairs $x, \lamda$.
+     * imaginary eigenpairs $x, \lambda$.
      */
     template <typename OutputVector>
     void
