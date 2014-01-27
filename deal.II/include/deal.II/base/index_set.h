@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -743,17 +743,12 @@ IndexSet::nth_index_in_set (const unsigned int n) const
       range_end   = ranges.end();
     }
 
-  std::vector<Range>::const_iterator
+  const std::vector<Range>::const_iterator
   p = Utilities::lower_bound(range_begin, range_end, r,
                              Range::nth_index_compare);
 
-  if (p != ranges.end())
-    return p->begin + (n-p->nth_index_in_set);
-  else
-    {
-      Assert (false, ExcInternalError());
-      return numbers::invalid_dof_index;
-    }
+  Assert (p != ranges.end(), ExcInternalError());
+  return p->begin + (n-p->nth_index_in_set);
 }
 
 
