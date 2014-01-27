@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>The deal.II Testsuite</title>
   <link href="../screen.css" rel="StyleSheet">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II Authors">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 by the deal.II Authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
@@ -55,7 +55,8 @@
         <li><a href="#run">Running the testsuite</a></li>
         <ol>
           <li><a href="#runoutput">How to interpret the output</a></li>
-          <li><a href="#runmakeopts">Parallelize testsuite configuration</a></li>
+          <li><a href="#runmakeopts">Parallelizing testsuite configuration</a></li>
+          <li><a href="#coverage">Generating coverage information</a></li>
         </ol>
         <li><a href="#layout">Testsuite development</a></li>
         <ol>
@@ -334,10 +335,12 @@ xx: ===============================    OUTPUT END   ============================
 
 
     <a name="runmakeopts"></a>
-    <h3>Parallelize testsuite configuration</h3>
+    <h3>Parallelizing testsuite configuration</h3>
 
     <p>
-      If you have set up a good portion of the testsuite you'll notice that a
+      If you have set up the testsuite (or at least a few hundred tests by
+      providing a sufficiently general regular expression
+      as <code>TEST_PICKUP_REGEX</code>) you'll notice that a 
       reconfiguration of the build directory takes a noticeable time (in the
       order of minutes instead of seconds) with
       <code>Reconfiguring testsuite subprojects</code>.
@@ -348,7 +351,59 @@ xx: ===============================    OUTPUT END   ============================
       variable.
     </p>
     <p>
-      Alternatively, you can use <code>Ninja</code>.
+      Alternatively, you can use <code>Ninja</code> as your build tool instead
+      of <code>make</code>.
+    </p>
+
+
+
+    <a name="coverage"></a>
+    <h3>Generating coverage information</h3>
+
+    <p>
+      The testsuite can also be used to provide <i>coverage</i> information,
+      i.e., data that shows which lines of the library are executed how many
+      times by running through all of the tests in the testsuite. This is of
+      interest in finding places in the library that are not covered by
+      the testsuite and, consequently, are prone to the inadvertent
+      introduction of bugs since existing functionality is not subject to
+      existing tests.
+    </p>
+
+    <p>
+      To run the testsuite in this mode, essentially, you have to do three
+      things: 
+      <ol>
+	<li>
+	  build the library with appropriate profiling flags
+	</li>
+	<li>
+	  run all or some tests (built with the same profiling flags)
+	</li>
+	<li>
+	  gather all information and convert them to a viewable format.
+	</li>
+      </ol>
+      In order to achieve the first two, configure the library with
+      <pre>
+  cmake -DCMAKE_BUILD_TYPE=Debug -DDEAL_II_SETUP_COVERAGE=YES <...>
+      </pre>
+      You can then build the library and run the tests as usual.
+    </p>
+
+    <p>
+      For the last point, one can in principal use whatever tool one
+      wants. That said, the deal.II ctest driver already has builtin
+      functionality to gather all profiling files and submit them to cdash
+      where we already gather testsuite results
+      (see <a href="#submit">below</a>). You can do so by invoking
+      <pre>
+  ctest -DCOVERAGE=YES <...> -S ../tests/run_testsuite.cmake
+      </pre>
+      when running the testsuite, or directly by
+      <pre>
+	ctest <...> -S ../tests/run_coverage.cmake
+      </pre>
     </p>
 
 
