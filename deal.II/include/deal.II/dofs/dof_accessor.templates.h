@@ -3456,7 +3456,10 @@ inline
 unsigned int
 DoFCellAccessor<DH,lda>::active_fe_index () const
 {
-  Assert (this->has_children() == false,
+  Assert ((dynamic_cast<const dealii::DoFHandler<DH::dimension,DH::space_dimension>*>
+	   (this->dof_handler) != 0)
+	  ||
+	  (this->has_children() == false),
           ExcMessage ("You can not ask for the active_fe_index on a cell that has "
                       "children because no degrees of freedom are assigned "
                       "to this cell and, consequently, no finite element "
@@ -3471,7 +3474,10 @@ inline
 void
 DoFCellAccessor<DH,lda>::set_active_fe_index (const unsigned int i)
 {
-  Assert (this->has_children() == false,
+  Assert ((dynamic_cast<const dealii::DoFHandler<DH::dimension,DH::space_dimension>*>
+	   (this->dof_handler) != 0)
+	  ||
+	  (this->has_children() == false),
           ExcMessage ("You can not set the active_fe_index on a cell that has "
                       "children because no degrees of freedom will be assigned "
                       "to this cell."));
