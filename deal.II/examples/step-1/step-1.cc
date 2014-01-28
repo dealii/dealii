@@ -75,6 +75,7 @@ void first_grid ()
   std::ofstream out ("grid-1.eps");
   GridOut grid_out;
   grid_out.write_eps (triangulation, out);
+  std::cout << "Grid written to grid-1.eps" << std::endl;
 }
 
 
@@ -190,6 +191,7 @@ void second_grid ()
   GridOut grid_out;
   grid_out.write_eps (triangulation, out);
 
+  std::cout << "Grid written to grid-2.eps" << std::endl;  
 
   // At this point, all objects created in this function will be destroyed in
   // reverse order. Unfortunately, we defined the boundary object after the

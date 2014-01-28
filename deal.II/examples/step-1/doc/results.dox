@@ -1,7 +1,6 @@
 <h1>Results</h1>
 
-The program has, after having been run, produced two grids, which look
-like this:
+Running the program produces graphics of two grids (grid-1.eps and grid-2.eps). They look like this:
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
