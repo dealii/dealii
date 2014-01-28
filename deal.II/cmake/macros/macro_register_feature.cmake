@@ -15,26 +15,24 @@
 ## ---------------------------------------------------------------------
 
 #
-# This macro is used for the feature configuration in deal.II
+# This macro is used for the feature configuration in deal.II. It adds
+# individual FEATURE_* configuration variables to the corresponding
+# DEAL_II_* variables
 #
 # Usage:
 #     REGISTER_FEATURE(feature)
 #
-# This macro will
+# This macro will add
 #
-#   - add ${feature}_INCLUDE_DIRS and ${feature}_INCLUDE_PATH
-#     to the list of (internal) include directories
-#   - and if ${feature}_ADD_TO_USER_INCLUDE_DIRS is defined also to
-#     DEAL_II_USER_INCLUDE_DIRS
+#   <FEATURE>_LIBRARIES
+#   <FEATURE>_INCLUDE_DIRS(|_DEBUG|_RELEASE)
+#   <FEATURE>_USER_INCLUDE_DIRS(|_DEBUG|_RELEASE)
+#   <FEATURE>_DEFINITIONS(|_DEBUG|_RELEASE)
+#   <FEATURE>_USER_DEFINITIONS(|_DEBUG|_RELEASE)
+#   <FEATURE>_CXX_FLAGS(|_DEBUG|_RELEASE)
+#   <FEATURE>_LINKER_FLAGS(|_DEBUG|_RELEASE)
 #
-#   - add ${feature}_LINKER_FLAGS and ${feature}_LINK_FLAGS to
-#     DEAL_II_LINKER_FLAGS
-#
-#   - add ${feature}_CXX_FLAGS and ${feature}_COMPILE_FLAGS to
-#     DEAL_II_CXX_FLAGS
-#
-#   - add ${feature}_LIBRARIES to the list of deal.II libraries depending
-#     on general, optimized or debug keyword
+# to the corresponding DEAL_II_* variables
 #
 
 
