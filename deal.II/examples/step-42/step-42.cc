@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2012 - 2013 by the deal.II authors
+ * Copyright (C) 2012 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1683,14 +1683,18 @@ namespace Step42
   // on the current mesh. There are two nested loops: the outer loop for the Newton
   // iteration and the inner loop for the line search which
   // will be used only if necessary. To obtain a good and reasonable
-  // starting value we solve an elastic problem in very first Newton step on each
+  // starting value we solve an elastic problem in the very first Newton step on each
   // mesh (or only on the first mesh if we transfer solutions between meshes). We
   // do so by setting the yield stress to an unreasonably large value in these
   // iterations and then setting it back to the correct value in subsequent
   // iterations.
   //
-  // Other than this, the top part of this function should be reasonably
-  // obvious:
+  // Other than this, the top part of this function should be
+  // reasonably obvious. We initialize the variable
+  // <code>previous_residual_norm</code> to the most negative value
+  // representable with double precision numbers so that the
+  // comparison whether the current residual is less than that of the
+  // previous step will always fail in the first step.
   template <int dim>
   void
   PlasticityContactProblem<dim>::solve_newton ()
@@ -1701,7 +1705,8 @@ namespace Step42
     TrilinosWrappers::MPI::Vector locally_relevant_tmp_vector(locally_relevant_dofs, mpi_communicator);
     TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
 
-    double residual_norm, previous_residual_norm;
+    double residual_norm;
+    double previous_residual_norm = -std::numeric_limits<double>::max();
 
     const double correct_sigma = sigma_0;
 
