@@ -174,7 +174,7 @@ inconvenience this causes.
   argument to these functions specifying which element of an hp::FECollection
   object describes the space onto which you want to interpolate.
   <br>
-  (Mihai, Wolfgang Bangerth, 2014/01/18)
+  (Mihai Alexe, Wolfgang Bangerth, 2014/01/18)
   </li>
 
   <li> Fixed: The methods IndexSet::do_compress() and
