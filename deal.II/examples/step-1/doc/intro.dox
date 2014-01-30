@@ -111,6 +111,17 @@ end of the results section of this program, where we also provide a few links
 to other useful pieces of information.
 
 
+<h3> Video lectures on tutorial programs </h3>
+
+This and several of the other tutorial programs are also discussed and
+demonstrated in <a
+href="http://www.math.tamu.edu/~bangerth/videos.html">Wolfgang
+Bangerth's video lectures</a> on deal.II and computational science. In
+particular, you can see the steps he executes to run this and other
+programs, and you will get a much better idea of the tools that can be
+used to work with deal.II.
+
+
 <h3> What this program does </h3>
 
 Let's come back to step-1, the current program.
@@ -148,7 +159,7 @@ that we typically train mathematicians, engineers, or scientists in but that
 is important when you start writing software of more than a few hundred
 lines. Remember: Producing software is not the same as just writing code.
 
-To make your life easier on this journey let us point to two resources that
+To make your life easier on this journey let us point to three resources that
 are worthwhile browsing through before you start any large-scale programming:
 
 - The <a
@@ -164,8 +175,15 @@ are worthwhile browsing through before you start any large-scale programming:
   specifically written for scientists and engineers, not for computer
   scientists, and has a focus on short, practical lessons.
 
+- An article on <a href="http://arxiv.org/abs/1210.0530">Best
+  Practices for Scientific Computing</a> that gives an introduction to
+  many of the ways by which you can make sure you are an efficient
+  programmer writing programs that work.
+
 As a general recommendation: If you expect to spend more than a few days
 writing software in the future, do yourself the favor of learning tools that
 can make your life more productive, in particular debuggers and integrated
 development environments. You will find that you will get the time spent
 learning these tools back severalfold soon by being more productive!
+Several of the video lectures referenced above show how to use tools
+such as integrated development environments or debuggers.
