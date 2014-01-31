@@ -202,7 +202,7 @@ namespace Algorithms
 
     const unsigned int n = flags.size();
     const unsigned int m = event.flags.size();
-    const unsigned int n_min = std::min(n, m);
+    const unsigned int n_min = std::fmin(n, m);
 
     // Now, if all_true set in the
     // other, then all must be true

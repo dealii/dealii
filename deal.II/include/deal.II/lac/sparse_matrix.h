@@ -145,7 +145,7 @@ namespace SparseMatrixIterators
      * Return a reference to the matrix into which this accessor points. Note
      * that in the present case, this is a constant reference.
      */
-    MatrixType &get_matrix () const;
+    const MatrixType &get_matrix () const;
 
   private:
     /**
@@ -2086,7 +2086,7 @@ namespace SparseMatrixIterators
 
   template <typename number>
   inline
-  typename Accessor<number, true>::MatrixType &
+  const typename Accessor<number, true>::MatrixType &
   Accessor<number, true>::get_matrix () const
   {
     return *matrix;

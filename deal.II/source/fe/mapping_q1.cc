@@ -1902,7 +1902,7 @@ transform_real_to_unit_cell_internal_codim1
 (const typename Triangulation<dim_,dim_ + 1>::cell_iterator &cell,
  const Point<dim_ + 1>                                      &p,
  const Point<dim_ >                                         &initial_p_unit,
- MappingQ1<dim,spacedim>::InternalData                      &mdata) const
+ typename MappingQ1<dim,spacedim>::InternalData                      &mdata) const
 {
   const unsigned int spacedim1 = dim_+1;
   const unsigned int dim1 = dim_;

@@ -1463,7 +1463,7 @@ void MatrixFree<dim,Number>::
 reinit(const DH               &dof_handler,
        const ConstraintMatrix &constraints_in,
        const Quad             &quad,
-       const MatrixFree<dim,Number>::AdditionalData additional_data)
+       const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   MappingQ1<dim>                       mapping;
   std::vector<const DH *>               dof_handlers;
@@ -1490,7 +1490,7 @@ reinit(const Mapping<dim>     &mapping,
        const DH               &dof_handler,
        const ConstraintMatrix &constraints_in,
        const Quad             &quad,
-       const MatrixFree<dim,Number>::AdditionalData additional_data)
+       const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<const DH *>               dof_handlers;
   std::vector<const ConstraintMatrix *> constraints;
@@ -1515,7 +1515,7 @@ void MatrixFree<dim,Number>::
 reinit(const std::vector<const DH *>               &dof_handler,
        const std::vector<const ConstraintMatrix *> &constraint,
        const std::vector<Quad>                    &quad,
-       const MatrixFree<dim,Number>::AdditionalData additional_data)
+       const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   MappingQ1<dim> mapping;
   std::vector<IndexSet> locally_owned_set =
@@ -1534,7 +1534,7 @@ void MatrixFree<dim,Number>::
 reinit(const std::vector<const DH *>               &dof_handler,
        const std::vector<const ConstraintMatrix *> &constraint,
        const Quad                                 &quad,
-       const MatrixFree<dim,Number>::AdditionalData additional_data)
+       const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   MappingQ1<dim> mapping;
   std::vector<Quad> quads;
@@ -1555,7 +1555,7 @@ reinit(const Mapping<dim>                         &mapping,
        const std::vector<const DH *>               &dof_handler,
        const std::vector<const ConstraintMatrix *> &constraint,
        const Quad                                 &quad,
-       const MatrixFree<dim,Number>::AdditionalData additional_data)
+       const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<Quad> quads;
   quads.push_back(quad);
@@ -1575,7 +1575,7 @@ reinit(const Mapping<dim>                         &mapping,
        const std::vector<const DH *>  &dof_handler,
        const std::vector<const ConstraintMatrix *> &constraint,
        const std::vector<Quad>              &quad,
-       const MatrixFree<dim,Number>::AdditionalData additional_data)
+       const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
     internal::MatrixFree::extract_locally_owned_index_sets
@@ -1626,7 +1626,7 @@ reinit(const Mapping<dim>                         &mapping,
        const std::vector<const ConstraintMatrix *> &constraint,
        const std::vector<IndexSet>                &locally_owned_set,
        const std::vector<Quad>                    &quad,
-       const MatrixFree<dim,Number>::AdditionalData additional_data)
+       const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   // find out whether we use a hp Quadrature or a standard quadrature
   std::vector<hp::QCollection<1> > quad_hp;
