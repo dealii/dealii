@@ -21,6 +21,7 @@
 #include <deal.II/lac/sparsity_tools.h>
 
 #include <algorithm>
+#include <functional>
 
 #ifdef DEAL_II_WITH_MPI
 #include <deal.II/base/utilities.h>
