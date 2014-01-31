@@ -128,7 +128,7 @@ QGauss<1>::QGauss (const unsigned int n)
   const long double tolerance
     = (runtime_one + long_double_eps != runtime_one
        ?
-       std::fmax (double_eps / 100, long_double_eps * 5)
+       fmax (double_eps / 100, long_double_eps * 5)
        :
        double_eps * 5
       );
@@ -215,7 +215,7 @@ compute_quadrature_points(const unsigned int q,
   const long double tolerance
     = (runtime_one + long_double_eps != runtime_one
        ?
-       std::fmax (double_eps / 100, long_double_eps * 5)
+       fmax (double_eps / 100, long_double_eps * 5)
        :
        double_eps * 5
       );
