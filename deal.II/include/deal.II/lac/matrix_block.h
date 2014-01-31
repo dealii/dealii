@@ -388,8 +388,8 @@ private:
    */
   BlockIndices column_indices;
 
-  template <class MATRIX>
-  friend void internal::reinit(MatrixBlock<MATRIX> &, const BlockSparsityPattern &);
+  template <class OTHER_MATRIX>
+  friend void internal::reinit(MatrixBlock<OTHER_MATRIX> &, const BlockSparsityPattern &);
 };
 
 
