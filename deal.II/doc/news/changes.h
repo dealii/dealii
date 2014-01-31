@@ -102,6 +102,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>New: There is now a method to copy the content from a
+  PETScWrappers::MPI::Vector to deal.II's parallel distributed vector.
+  <br>
+  (Ben Thompson, 2014/01/31)
+
   <li>Fixed: The SolutionTransfer class had all sorts of problems when
   used with hp::DoFHandler that made its results at least questionable.
   Several parts of this class have been rewritten to make the results

@@ -33,6 +33,17 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_PETSC
+namespace PETScWrappers
+{
+  namespace MPI
+  {
+    class Vector;
+  }
+}
+#endif
+
+
 namespace parallel
 {
   namespace distributed
@@ -274,6 +285,18 @@ namespace parallel
       template <typename Number2>
       Vector<Number> &
       operator = (const Vector<Number2> &in_vector);
+
+#ifdef DEAL_II_WITH_PETSC
+      /**
+       * Copy the content of a PETSc vector into a vector. This function
+       * assumes that the vectors layouts have already been initialized to
+       * match.
+       *
+       * This operator is only available if deal.II was configured with PETSc.
+       */
+      Vector<Number> &
+      operator = (const PETScWrappers::MPI::Vector &petsc_vec);
+#endif
 
       /**
        * This method copies the local range from another vector with the same

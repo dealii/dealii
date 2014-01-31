@@ -21,6 +21,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/lac/parallel_vector.h>
 
+#include <deal.II/lac/petsc_parallel_vector.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -201,6 +203,43 @@ namespace parallel
 
       vector_is_ghosted = false;
     }
+
+
+
+#ifdef DEAL_II_WITH_PETSC
+
+    template <typename Number>
+    inline
+    Vector<Number> &
+    Vector<Number>::operator = (const PETScWrappers::MPI::Vector &petsc_vec)
+    {
+      Assert(petsc_vec.locally_owned_elements() == locally_owned_elements(),
+             StandardExceptions::ExcInvalidState());
+
+      // get a representation of the vector and copy it
+      PetscScalar *start_ptr;
+      int ierr = VecGetArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      const size_type vec_size = local_size();
+      std::copy (start_ptr, start_ptr + vec_size, begin());
+
+      // restore the representation of the vector
+      ierr = VecRestoreArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      // spread ghost values between processes?
+      bool must_update_ghost_values = vector_is_ghosted || 
+        petsc_vec.has_ghost_elements();
+      if (must_update_ghost_values)
+        update_ghost_values();
+
+      // return a pointer to this object per normal c++ operator overloading
+      // semantics
+      return *this;
+    }
+
+#endif
 
 
 
