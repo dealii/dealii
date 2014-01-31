@@ -248,11 +248,26 @@ namespace parallel
     Vector<Number> &
     Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
     {
-      Assert(trilinos_vec.locally_owned_elements() == locally_owned_elements(),
-             StandardExceptions::ExcInvalidState());
+      if (trilinos_vec.has_ghost_elements() == false)
+        {
+          Assert(trilinos_vec.locally_owned_elements() == locally_owned_elements(),
+                 StandardExceptions::ExcInvalidState());
+        }
+      else
+        // ghosted trilinos vector must contain the local range of this vector
+        // which is contiguous
+        {
+          Assert((trilinos_vec.locally_owned_elements() & locally_owned_elements())
+                 == locally_owned_elements(),
+                 StandardExceptions::ExcInvalidState());
+        }
 
       // create on trilinos data
-      const VectorView<double> in_view (local_size(), trilinos_vec.begin());
+      const std::size_t start_index =
+        trilinos_vec.vector_partitioner().NumMyElements() > 0 ?
+        trilinos_vec.vector_partitioner().
+        LID(static_cast<TrilinosWrappers::types::int_type>(this->local_range().first)) : 0;
+      const VectorView<double> in_view (local_size(), trilinos_vec.begin()+start_index);
       static_cast<dealii::Vector<Number>&>(vector_view) =
         static_cast<const dealii::Vector<double>&>(in_view);
 

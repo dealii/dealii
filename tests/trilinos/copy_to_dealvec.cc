@@ -16,10 +16,10 @@
 
 
 
-// Test parallel::distributed::Vector::operator=(PETScWrappers::MPI::Vector&)
+// Test parallel::distributed::Vector::operator=(TrilinosWrappers::MPI::Vector&)
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/parallel_vector.h>
 #include <deal.II/base/index_set.h>
 #include <fstream>
@@ -44,8 +44,8 @@ void test ()
   IndexSet local_relevant(numproc*2);
   local_relevant.add_range(1,2);
 
-  PETScWrappers::MPI::Vector vb(local_active, MPI_COMM_WORLD);
-  PETScWrappers::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector vb(local_active, MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
 
   parallel::distributed::Vector<double> copied(local_active, local_relevant, MPI_COMM_WORLD);
 

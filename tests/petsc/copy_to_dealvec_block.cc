@@ -16,11 +16,13 @@
 
 
 
-// Test parallel::distributed::Vector::operator=(PETScWrappers::MPI::Vector&)
+// Test parallel::distributed::Vector::operator=(PETScWrappers::MPI::BlockVector&)
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/base/index_set.h>
 #include <fstream>
 #include <iostream>
@@ -44,22 +46,32 @@ void test ()
   IndexSet local_relevant(numproc*2);
   local_relevant.add_range(1,2);
 
-  PETScWrappers::MPI::Vector vb(local_active, MPI_COMM_WORLD);
-  PETScWrappers::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
+  PETScWrappers::MPI::Vector vb_one(local_active, MPI_COMM_WORLD);
+  PETScWrappers::MPI::Vector v_one(local_active, local_relevant, MPI_COMM_WORLD);
 
-  parallel::distributed::Vector<double> copied(local_active, local_relevant, MPI_COMM_WORLD);
+  parallel::distributed::Vector<double> copied_one(local_active, local_relevant, MPI_COMM_WORLD);
 
   // set local values
-  vb(myid*2)=myid*2.0;
-  vb(myid*2+1)=myid*2.0+1.0;
+  vb_one(myid*2)=myid*2.0;
+  vb_one(myid*2+1)=myid*2.0+1.0;
 
-  vb.compress(VectorOperation::insert);
-  vb*=2.0;
-  v=vb;
-  //v.update_ghost_values();
+  vb_one.compress(VectorOperation::insert);
+  vb_one*=2.0;
+  v_one=vb_one;
 
-  Assert(!vb.has_ghost_elements(), ExcInternalError());
-  Assert(v.has_ghost_elements(), ExcInternalError());
+  PETScWrappers::MPI::BlockVector vb, v;
+  vb.reinit(2);
+  v.reinit(2);
+  parallel::distributed::BlockVector<double> copied(2);
+  for (unsigned int bl=0; bl<2; ++bl)
+    {
+      vb.block(bl) = vb_one;
+      v.block(bl) = v_one;
+      copied.block(bl) = copied_one;
+    }
+  vb.collect_sizes();
+  v.collect_sizes();
+  copied.collect_sizes();
 
   copied = vb;
 
@@ -70,8 +82,11 @@ void test ()
       deallog << myid*2+1 << ":" << copied(myid*2+1) << std::endl;
     }
 
-  Assert(copied(myid*2) == myid*4.0, ExcInternalError());
-  Assert(copied(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+  for (unsigned int bl=0; bl<2; ++bl)
+    {
+      Assert(copied.block(bl)(myid*2) == myid*4.0, ExcInternalError());
+      Assert(copied.block(bl)(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+    }
 
   copied = v;
 
@@ -79,6 +94,7 @@ void test ()
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << copied(1) << std::endl;
   Assert(copied(1) == 2.0, ExcInternalError());
+  Assert(copied.block(1)(1) == 2.0, ExcInternalError());
 
   // check local values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -87,9 +103,11 @@ void test ()
       deallog << myid*2+1 << ":" << copied(myid*2+1) << std::endl;
     }
 
-  Assert(copied(myid*2) == myid*4.0, ExcInternalError());
-  Assert(copied(myid*2+1) == myid*4.0+2.0, ExcInternalError());
-
+  for (unsigned int bl=0; bl<2; ++bl)
+    {
+      Assert(copied.block(bl)(myid*2) == myid*4.0, ExcInternalError());
+      Assert(copied.block(bl)(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+    }
 
   // done
   if (myid==0)
