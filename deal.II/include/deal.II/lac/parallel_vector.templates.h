@@ -253,8 +253,8 @@ namespace parallel
 
       // create on trilinos data
       const VectorView<double> in_view (local_size(), trilinos_vec.begin());
-      static_cast<::dealii::Vector<Number>&>(vector_view) =
-        static_cast<const ::dealii::Vector<double>&>(in_view);
+      static_cast<dealii::Vector<Number>&>(vector_view) =
+        static_cast<const dealii::Vector<double>&>(in_view);
 
       // spread ghost values between processes?
       if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
