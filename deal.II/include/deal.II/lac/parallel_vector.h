@@ -43,6 +43,16 @@ namespace PETScWrappers
 }
 #endif
 
+#ifdef DEAL_II_WITH_TRILINOS
+namespace TrilinosWrappers
+{
+  namespace MPI
+  {
+    class Vector;
+  }
+}
+#endif
+
 
 namespace parallel
 {
@@ -288,14 +298,27 @@ namespace parallel
 
 #ifdef DEAL_II_WITH_PETSC
       /**
-       * Copy the content of a PETSc vector into a vector. This function
-       * assumes that the vectors layouts have already been initialized to
-       * match.
+       * Copy the content of a PETSc vector into the calling vector. This
+       * function assumes that the vectors layouts have already been
+       * initialized to match.
        *
        * This operator is only available if deal.II was configured with PETSc.
        */
       Vector<Number> &
       operator = (const PETScWrappers::MPI::Vector &petsc_vec);
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+      /**
+       * Copy the content of a Trilinos vector into the calling vector. This
+       * function assumes that the vectors layouts have already been
+       * initialized to match.
+       *
+       * This operator is only available if deal.II was configured with
+       * Trilinos.
+       */
+      Vector<Number> &
+      operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec);
 #endif
 
       /**

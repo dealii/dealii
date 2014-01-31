@@ -20,8 +20,10 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/vector_view.h>
 
 #include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -209,7 +211,6 @@ namespace parallel
 #ifdef DEAL_II_WITH_PETSC
 
     template <typename Number>
-    inline
     Vector<Number> &
     Vector<Number>::operator = (const PETScWrappers::MPI::Vector &petsc_vec)
     {
@@ -229,9 +230,34 @@ namespace parallel
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       // spread ghost values between processes?
-      bool must_update_ghost_values = vector_is_ghosted || 
-        petsc_vec.has_ghost_elements();
-      if (must_update_ghost_values)
+      if (vector_is_ghosted || petsc_vec.has_ghost_elements())
+        update_ghost_values();
+
+      // return a pointer to this object per normal c++ operator overloading
+      // semantics
+      return *this;
+    }
+
+#endif
+
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
+    {
+      Assert(trilinos_vec.locally_owned_elements() == locally_owned_elements(),
+             StandardExceptions::ExcInvalidState());
+
+      // create on trilinos data
+      const VectorView<double> in_view (local_size(), trilinos_vec.begin());
+      static_cast<::dealii::Vector<Number>&>(vector_view) =
+        static_cast<const ::dealii::Vector<double>&>(in_view);
+
+      // spread ghost values between processes?
+      if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
         update_ghost_values();
 
       // return a pointer to this object per normal c++ operator overloading
