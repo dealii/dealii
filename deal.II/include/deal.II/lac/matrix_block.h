@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -388,7 +388,8 @@ private:
    */
   BlockIndices column_indices;
 
-  friend void internal::reinit<>(MatrixBlock<MATRIX> &, const BlockSparsityPattern &);
+  template <class MATRIX>
+  friend void internal::reinit(MatrixBlock<MATRIX> &, const BlockSparsityPattern &);
 };
 
 
