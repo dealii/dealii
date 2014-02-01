@@ -124,6 +124,7 @@ ENDFOREACH()
 INCLUDE(setup_custom_targets)
 INCLUDE(setup_finalize)
 INCLUDE(setup_write_config)
+INCLUDE(setup_sanity_checks)
 
 
 ########################################################################
