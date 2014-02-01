@@ -625,6 +625,7 @@ namespace parallel
 #ifdef DEAL_II_WITH_PETSC
 
     template <typename Number>
+    inline
     BlockVector<Number> &
     BlockVector<Number>::operator = (const PETScWrappers::MPI::BlockVector &petsc_vec)
     {
@@ -642,6 +643,7 @@ namespace parallel
 #ifdef DEAL_II_WITH_TRILINOS
 
     template <typename Number>
+    inline
     BlockVector<Number> &
     BlockVector<Number>::operator = (const TrilinosWrappers::MPI::BlockVector &trilinos_vec)
     {
