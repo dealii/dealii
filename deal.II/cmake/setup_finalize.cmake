@@ -82,6 +82,7 @@ ENDFOREACH()
 # Register features:
 #
 FOREACH(_feature ${DEAL_II_FEATURES})
+  FILTER_SYSTEM_LIBRARIES(${_feature})
   REGISTER_FEATURE(${_feature})
 ENDFOREACH()
 

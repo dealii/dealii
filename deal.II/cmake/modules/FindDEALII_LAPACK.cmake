@@ -94,28 +94,19 @@ IF(LAPACK_FOUND)
   # If CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES is not available, do it
   # unconditionally for the most common case (gfortran).
   #
-  # Switch the library preference back to prefer dynamic libraries if
-  # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
-  # this case system libraries should be linked dynamically.
-  #
   SET(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
   SET_IF_EMPTY(_fortran_libs gfortran m quadmath c)
 
-  SWITCH_LIBRARY_PREFERENCE()
   FOREACH(_lib ${_fortran_libs})
-    FIND_LIBRARY(${_lib}_LIBRARY
-      NAMES ${_lib}
-      HINTS
-        ${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}
-        ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
+    FIND_SYSTEM_LIBRARY(${_lib}_LIBRARY NAMES ${_lib})
     MARK_AS_ADVANCED(${_lib}_LIBRARY)
 
     IF(NOT ${_lib}_LIBRARY MATCHES "-NOTFOUND")
       LIST(APPEND BLAS_LIBRARIES ${${_lib}_LIBRARY})
       LIST(APPEND LAPACK_LIBRARIES ${${_lib}_LIBRARY})
     ENDIF()
+
   ENDFOREACH()
-  SWITCH_LIBRARY_PREFERENCE()
 
   #
   # Filter out spurious "FALSE" in the library lists:

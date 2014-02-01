@@ -31,21 +31,15 @@ MACRO(SETUP_THREADING)
   #
   IF(CMAKE_C_COMPILER_WORKS)
     #
-    # Switch the library preference back to prefer dynamic libraries if
-    # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
-    # this case system libraries must be linked dynamically.
-    #
-    SWITCH_LIBRARY_PREFERENCE()
-
-    #
     # Clear the test flags because FindThreads.cmake will use a C compiler:
     #
     CLEAR_CMAKE_REQUIRED()
 
+    SWITCH_LIBRARY_PREFERENCE()
     FIND_PACKAGE(Threads)
+    SWITCH_LIBRARY_PREFERENCE()
 
     RESET_CMAKE_REQUIRED()
-    SWITCH_LIBRARY_PREFERENCE()
 
   ELSE()
 
@@ -214,7 +208,7 @@ MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED)
   #
   # TODO: Also necessary for external lib, use preference toggle
   #
-  FIND_LIBRARY(dl_LIBRARY NAMES dl)
+  FIND_SYSTEM_LIBRARY(dl_LIBRARY NAMES dl)
   MARK_AS_ADVANCED(dl_LIBRARY)
   IF(NOT dl_LIBRARY MATCHES "-NOTFOUND")
     LIST(APPEND THREADS_LIBRARIES ${dl_LIBRARY})

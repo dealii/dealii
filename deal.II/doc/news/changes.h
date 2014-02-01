@@ -124,6 +124,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: The build system does no longer record full paths to system
+  libraries but uses the appropriate short names instead.
+  <br>
+  (Matthias Maier, 2014/02/01)
+
   <li>Reworked: External feature setup. Disabling a feature now cleans up
   associated internal, cached variables. A per-feature linkage test now spots
   common linking inconsistencies early in the configuration stage (and not

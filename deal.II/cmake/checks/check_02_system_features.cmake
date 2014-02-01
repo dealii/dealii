@@ -58,13 +58,7 @@ CHECK_CXX_SYMBOL_EXISTS("rand_r" "stdlib.h" HAVE_RAND_R)
 #
 # Do we have the Bessel function jn?
 #
-# Switch the library preference back to prefer dynamic libraries if
-# DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
-# this case system libraries should be linked dynamically.
-#
-SWITCH_LIBRARY_PREFERENCE()
-FIND_LIBRARY(m_LIBRARY NAMES m)
-SWITCH_LIBRARY_PREFERENCE()
+FIND_SYSTEM_LIBRARY(m_LIBRARY NAMES m)
 MARK_AS_ADVANCED(m_LIBRARY)
 
 IF(NOT m_LIBRARY MATCHES "-NOTFOUND")

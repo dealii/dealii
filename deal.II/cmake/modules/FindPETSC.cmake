@@ -137,7 +137,16 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
     ELSEIF(_token MATCHES "^-l")
       # Search for every library that was specified with -l:
       STRING(REGEX REPLACE "^-l" "" _token "${_token}")
-      IF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
+
+      IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
+        FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
+        IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
+          LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
+        ENDIF()
+        # Remove from cache, so that updating PETSC search paths will
+        # find a (possibly) new link interface
+        UNSET(PETSC_LIBRARY_${_token} CACHE)
+      ELSEIF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
         FIND_LIBRARY(PETSC_LIBRARY_${_token}
           NAMES ${_token}
           HINTS ${_hints}
@@ -145,12 +154,11 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
         IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
           LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
         ENDIF()
-        #
         # Remove from cache, so that updating PETSC search paths will
         # find a (possibly) new link interface
-        #
         UNSET(PETSC_LIBRARY_${_token} CACHE)
       ENDIF()
+
     ENDIF()
   ENDFOREACH()
 
