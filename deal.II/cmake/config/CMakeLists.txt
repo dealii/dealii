@@ -104,8 +104,8 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   ENDIF()
 
   LIST(APPEND CONFIG_LIBRARIES_${_build}
-    ${DEAL_II_EXTERNAL_LIBRARIES_${_build}}
-    ${DEAL_II_EXTERNAL_LIBRARIES}
+    ${DEAL_II_LIBRARIES_${_build}}
+    ${DEAL_II_LIBRARIES}
     )
   LIST(APPEND CONFIG_LIBRARIES
     ${_keyword}
@@ -227,8 +227,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
     SET(_libs)
     FOREACH(_lib
-        ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
-        ${DEAL_II_EXTERNAL_LIBRARIES}
+        ${DEAL_II_LIBRARIES_${build}}
+        ${DEAL_II_LIBRARIES}
         )
       IF(_lib MATCHES "^\\s*\\/" AND NOT _lib MATCHES "\\.framework$")
         LIST(APPEND _libs "${_lib}")
@@ -243,8 +243,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     SET(_paths)
     FOREACH(_lib
         $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
-        ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
-        ${DEAL_II_EXTERNAL_LIBRARIES}
+        ${DEAL_II_LIBRARIES_${build}}
+        ${DEAL_II_LIBRARIES}
         )
 
       #
