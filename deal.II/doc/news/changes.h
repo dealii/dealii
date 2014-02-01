@@ -102,6 +102,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>New/fixed: The ParameterHandler::print_parameters_section
+  method not worked for XML output. There is now a flag
+  include_top_level_elements which prints all higher
+  subsection elements, default is false.
+  For XML output setting this flag to true is required
+  to ensure that the output is a valid XML document,
+  starting with one root element ParameterHandler and
+  compatible with read_input_from_xml and the parameterGUI.
+  <br>
+  (Martin Steigemann, 2014/02/01)
+
   <li>New: There is now a method to copy the content from a
   PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector to
   deal.II's parallel distributed vector.
