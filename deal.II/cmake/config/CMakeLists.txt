@@ -29,15 +29,6 @@
 MESSAGE(STATUS "Setting up project configuration")
 
 #
-# Read in auxiliary include directories for the build directory
-# configuration:
-#
-FILE(STRINGS
-  ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
-  deal_ii_source_includes
-  )
-
-#
 # Configure the template-arguments file
 #
 CONFIGURE_FILE( # for binary dir:
@@ -140,7 +131,7 @@ SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/include/deal.II
   ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/deal.II
-  ${deal_ii_source_includes}
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 CONFIGURE_FILE(
@@ -351,7 +342,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     $(D)/install/deal.II
     ${CMAKE_SOURCE_DIR}/include/
     ${CMAKE_SOURCE_DIR}/include/deal.II
-    ${deal_ii_source_includes}
+    ${DEAL_II_BUNDLED_INCLUDE_DIRS}
     ${DEAL_II_USER_INCLUDE_DIRS}
     )
   CONFIGURE_FILE(

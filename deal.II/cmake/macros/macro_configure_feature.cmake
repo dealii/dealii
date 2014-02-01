@@ -233,11 +233,10 @@ MACRO(CONFIGURE_FEATURE _feature)
 
           IF(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
             RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
-          ELSE()
-            REGISTER_FEATURE(${_feature})
           ENDIF()
 
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
+          LIST(APPEND DEAL_II_FEATURES ${_feature})
           SET(FEATURE_${_feature}_EXTERNAL_CONFIGURED TRUE)
           SET_CACHED_OPTION(${_feature} ON)
 
@@ -247,9 +246,12 @@ MACRO(CONFIGURE_FEATURE _feature)
 
           IF(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
             RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+
             MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
+            LIST(APPEND DEAL_II_FEATURES ${_feature})
             SET(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
             SET_CACHED_OPTION(${_feature} ON)
+
           ELSE()
             IF(DEAL_II_WITH_${_feature})
               IF(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)

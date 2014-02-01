@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -26,7 +26,7 @@ ENDMACRO()
 
 
 MACRO(FEATURE_FUNCTIONPARSER_CONFIGURE_BUNDLED)
-  INCLUDE_DIRECTORIES(${FUNCTIONPARSER_FOLDER})
+  SET(FUNCTIONPARSER_BUNDLED_INCLUDE_DIRS ${FUNCTIONPARSER_FOLDER})
 ENDMACRO()
 
 

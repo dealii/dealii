@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,7 +21,7 @@
 SET(FEATURE_UMFPACK_DEPENDS DEAL_II_WITH_LAPACK)
 
 MACRO(FEATURE_UMFPACK_CONFIGURE_BUNDLED)
-  INCLUDE_DIRECTORIES(
+  SET(UMFPACK_BUNDLED_INCLUDE_DIRS
     ${UMFPACK_FOLDER}/UMFPACK/Include
     ${UMFPACK_FOLDER}/AMD/Include
     )

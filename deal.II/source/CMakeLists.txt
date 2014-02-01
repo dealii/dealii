@@ -21,12 +21,10 @@ MESSAGE(STATUS "Setting up library")
 #
 
 INCLUDE_DIRECTORIES(
-  BEFORE # Ensure deal.II include directories come first
-  #
-  # Reverse order due to BEFORE:
-  #
-  ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_BINARY_DIR}/include/
+  ${CMAKE_SOURCE_DIR}/include/
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
   )
 
 #
@@ -86,8 +84,8 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     )
 
   TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
-    ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
-    ${DEAL_II_EXTERNAL_LIBRARIES}
+    ${DEAL_II_LIBRARIES_${build}}
+    ${DEAL_II_LIBRARIES}
     )
 
   FILE(MAKE_DIRECTORY

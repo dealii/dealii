@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -58,12 +58,6 @@ MACRO(FEATURE_SLEPC_FIND_EXTERNAL var)
 ENDMACRO()
 
 
-#
-# The user has to know the location of the SLEPC headers as well:
-#
-SET(SLEPC_ADD_TO_USER_INCLUDE_DIRS TRUE)
-
-
 MACRO(FEATURE_SLEPC_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find the SLEPc library!\n"
@@ -84,3 +78,8 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(SLEPC)
+
+#
+# The user has to know the location of the SLEPC headers as well:
+#
+SET(SLEPC_USER_INCLUDE_DIRS ${SLEPC_INCLUDE_DIRS})

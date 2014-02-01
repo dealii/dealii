@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -75,10 +75,9 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
 ENDMACRO()
 
 
+CONFIGURE_FEATURE(P4EST)
+
 #
 # The user has to know the location of the P4est headers as well:
 #
-SET(P4EST_ADD_TO_USER_INCLUDE_DIRS TRUE)
-
-
-CONFIGURE_FEATURE(P4EST)
+SET(P4EST_USER_INCLUDE_DIRS ${P4EST_INCLUDE_DIRS})

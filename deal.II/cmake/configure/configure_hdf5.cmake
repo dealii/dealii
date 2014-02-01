@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -47,10 +47,10 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
 ENDMACRO()
 
 
+CONFIGURE_FEATURE(HDF5)
+
+
 #
 # The user has to know the location of the hdf5 headers as well:
 #
-SET(HDF5_ADD_TO_USER_INCLUDE_DIRS TRUE)
-
-
-CONFIGURE_FEATURE(HDF5)
+SET(HDF5_USER_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS})

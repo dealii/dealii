@@ -124,6 +124,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Reworked: External feature setup. Disabling a feature now cleans up
+  associated internal, cached variables. A per-feature linkage test now spots
+  common linking inconsistencies early in the configuration stage (and not
+  just after a complete compilation).
+  <br>
+  (Matthias Maier, 2014/02/01)
+
   <li>New/fixed: The ParameterHandler::print_parameters_section
   method not worked for XML output. There is now a flag
   include_top_level_elements which prints all higher

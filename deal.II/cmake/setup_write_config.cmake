@@ -76,31 +76,51 @@ ENDIF()
 _both("#\n")
 
 _detailed(
-"#  Compiler flags used for this build:
-#        DEAL_II_CXX_FLAGS:            ${DEAL_II_CXX_FLAGS}
+"#  Base configuration (prior to feature configuration):
+#        DEAL_II_CXX_FLAGS:            ${BASE_CXX_FLAGS}
 "
   )
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_CXX_FLAGS_RELEASE:    ${DEAL_II_CXX_FLAGS_RELEASE}\n")
+  _detailed("#        DEAL_II_CXX_FLAGS_RELEASE:    ${BASE_CXX_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_CXX_FLAGS_DEBUG:      ${DEAL_II_CXX_FLAGS_DEBUG}\n")
+  _detailed("#        DEAL_II_CXX_FLAGS_DEBUG:      ${BASE_CXX_FLAGS_DEBUG}\n")
 ENDIF()
 
-_detailed("#        DEAL_II_LINKER_FLAGS:         ${DEAL_II_LINKER_FLAGS}\n")
+_detailed("#        DEAL_II_LINKER_FLAGS:         ${BASE_LINKER_FLAGS}\n")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_LINKER_FLAGS_RELEASE: ${DEAL_II_LINKER_FLAGS_RELEASE}\n")
+  _detailed("#        DEAL_II_LINKER_FLAGS_RELEASE: ${BASE_LINKER_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_LINKER_FLAGS_DEBUG:   ${DEAL_II_LINKER_FLAGS_DEBUG}\n")
+  _detailed("#        DEAL_II_LINKER_FLAGS_DEBUG:   ${BASE_LINKER_FLAGS_DEBUG}\n")
 ENDIF()
 
-_detailed("#        DEAL_II_DEFINITIONS:          ${DEAL_II_DEFINITIONS}\n")
+_detailed("#        DEAL_II_DEFINITIONS:          ${BASE_DEFINITIONS}\n")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_DEFINITIONS_RELEASE:  ${DEAL_II_DEFINITIONS_RELEASE}\n")
+  _detailed("#        DEAL_II_DEFINITIONS_RELEASE:  ${BASE_DEFINITIONS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_DEFINITIONS_DEBUG:    ${DEAL_II_DEFINITIONS_DEBUG}\n")
+  _detailed("#        DEAL_II_DEFINITIONS_DEBUG:    ${BASE_DEFINITIONS_DEBUG}\n")
+ENDIF()
+
+_detailed("#        DEAL_II_USER_DEFINITIONS:     ${BASE_DEFINITIONS}\n")
+IF(CMAKE_BUILD_TYPE MATCHES "Release")
+  _detailed("#        DEAL_II_USER_DEFINITIONS_REL: ${BASE_DEFINITIONS_RELEASE}\n")
+ENDIF()
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+  _detailed("#        DEAL_II_USER_DEFINITIONS_DEB: ${BASE_DEFINITIONS_DEBUG}\n")
+ENDIF()
+
+_detailed("#        DEAL_II_INCLUDE_DIRS          ${BASE_INCLUDE_DIRS}\n")
+_detailed("#        DEAL_II_USER_INCLUDE_DIRS:    ${BASE_USER_INCLUDE_DIRS}\n")
+_detailed("#        DEAL_II_BUNDLED_INCLUDE_DIRS: ${BASE_BUNDLED_INCLUDE_DIRS}\n")
+
+_detailed("#        DEAL_II_LIBRARIES:            ${BASE_LIBRARIES}\n")
+IF(CMAKE_BUILD_TYPE MATCHES "Release")
+  _detailed("#        DEAL_II_LIBRARIES_RELEASE:    ${BASE_LIBRARIES_RELEASE}\n")
+ENDIF()
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+  _detailed("#        DEAL_II_LIBRARIES_DEBUG:      ${BASE_LIBRARIES_DEBUG}\n")
 ENDIF()
 
 _detailed("#\n")
@@ -134,50 +154,14 @@ ENDFOREACH()
 
 FOREACH(_var ${_features})
   IF(${${_var}})
-    # FEATURE is enabled
+
+    #
+    # The feature is enabled:
+    #
     STRING(REGEX REPLACE "^DEAL_II_WITH_" "" _feature ${_var})
     IF(FEATURE_${_feature}_EXTERNAL_CONFIGURED)
       _both("#        ${_var} set up with external dependencies\n")
-
-      #
-      # Print out version number:
-      #
-      IF(DEFINED ${_feature}_VERSION)
-        _detailed("#            ${_feature}_VERSION = ${${_feature}_VERSION}\n")
-      ENDIF()
-
-      #
-      # Special version numbers:
-      #
-      IF(_feature MATCHES "THREADS" AND DEFINED TBB_VERSION)
-        _detailed("#            TBB_VERSION = ${TBB_VERSION}\n")
-      ENDIF()
-      IF(_feature MATCHES "MPI" AND DEFINED OMPI_VERSION)
-        _detailed("#            OMPI_VERSION = ${OMPI_VERSION}\n")
-      ENDIF()
-
-      #
-      # Print out ${_feature}_DIR:
-      #
-      IF(NOT "${${_feature}_DIR}" STREQUAL "")
-        _detailed("#            ${_feature}_DIR = ${${_feature}_DIR}\n")
-      ENDIF()
-
-      #
-      # Print the feature configuration:
-      #
-      FOREACH(_var2
-          CXX_COMPILER C_COMPILER Fortran_COMPILER LIBRARIES INCLUDE_DIRS
-          USER_INCLUDE_DIRS DEFINITIONS USER_DEFINITIONS CXX_FLAGS
-          LINKER_FLAGS
-        )
-        IF(DEFINED ${_feature}_${_var2})
-          _detailed("#            ${_feature}_${_var2} = ${${_feature}_${_var2}}\n")
-        ENDIF()
-      ENDFOREACH()
-
     ELSEIF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
-
       IF(DEAL_II_FORCE_BUNDLED_${_feature})
         _both("#        ${_var} set up with bundled packages (forced)\n")
       ELSE()
@@ -186,6 +170,47 @@ FOREACH(_var ${_features})
     ELSE()
      _both("#        ${_var} = ${${_var}}\n")
     ENDIF()
+
+    #
+    # Print out version number:
+    #
+    IF(DEFINED ${_feature}_VERSION)
+      _detailed("#            ${_feature}_VERSION = ${${_feature}_VERSION}\n")
+    ENDIF()
+
+    #
+    # Special version numbers:
+    #
+    IF(_feature MATCHES "THREADS" AND DEFINED TBB_VERSION)
+      _detailed("#            TBB_VERSION = ${TBB_VERSION}\n")
+    ENDIF()
+    IF(_feature MATCHES "MPI" AND DEFINED OMPI_VERSION)
+      _detailed("#            OMPI_VERSION = ${OMPI_VERSION}\n")
+    ENDIF()
+
+    #
+    # Print out ${_feature}_DIR:
+    #
+    IF(NOT "${${_feature}_DIR}" STREQUAL "")
+      _detailed("#            ${_feature}_DIR = ${${_feature}_DIR}\n")
+    ENDIF()
+
+    #
+    # Print the feature configuration:
+    #
+    FOREACH(_var2
+        C_COMPILER CXX_COMPILER Fortran_COMPILER
+        CXX_FLAGS CXX_FLAGS_RELEASE CXX_FLAGS_DEBUG
+        DEFINITIONS DEFINITIONS_RELEASE DEFINITIONS_DEBUG
+        USER_DEFINITIONS USER_DEFINITIONS_RELEASE USER_DEFINITIONS_DEBUG
+        LINKER_FLAGS LINKER_FLAGS_RELEASE LINKER_FLAGS_DEBUG
+        INCLUDE_DIRS USER_INCLUDE_DIRS BUNDLED_INCLUDE_DIRS
+        LIBRARIES LIBRARIES_RELEASE LIBRARIES_DEBUG
+      )
+      IF(DEFINED ${_feature}_${_var2})
+        _detailed("#            ${_feature}_${_var2} = ${${_feature}_${_var2}}\n")
+      ENDIF()
+    ENDFOREACH()
   ELSE()
     # FEATURE is disabled
     _both("#      ( ${_var} = ${${_var}} )\n")

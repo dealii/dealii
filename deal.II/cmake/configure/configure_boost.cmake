@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -105,18 +105,17 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 ENDMACRO()
 
 
-#
-# The user has to know the location of the boost headers as well:
-#
-SET(BOOST_ADD_TO_USER_INCLUDE_DIRS TRUE)
-
-
 MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
-  INCLUDE_DIRECTORIES(${BOOST_FOLDER}/include)
+  SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
 ENDMACRO()
 
 
 CONFIGURE_FEATURE(BOOST)
+
+#
+# The user has to know the location of the boost headers as well:
+#
+SET(BOOST_USER_INCLUDE_DIRS ${BOOST_INCLUDE_DIRS})
 
 #
 # DEAL_II_WITH_BOOST is always required.

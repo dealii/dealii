@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -80,7 +80,6 @@ ENDMACRO()
 
 
 MACRO(FEATURE_LAPACK_CONFIGURE_EXTERNAL)
-  REGISTER_FEATURE(LAPACK)
   CHECK_FOR_LAPACK_FUNCTIONS()
 ENDMACRO()
 
