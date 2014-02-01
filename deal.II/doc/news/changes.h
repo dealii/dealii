@@ -40,6 +40,28 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The various classes generating graphical output, such
+  as DataOut or DataOutStack, are all derived from a common interface
+  class DataOutInterface which, in turn was derived from DataOutBase
+  through <i>private</i> inheritance. Because we frequently also
+  access the (public) members of this private base class this has tripped
+  up most every compiler we know of at one point or another. Furthermore,
+  because DataOutBase was a class that only defined static member functions
+  and had not member variables, there was really no reason for this
+  construct.
+  <br>
+  For these reasons, DataOutBase is now just a regular namespace and the
+  inheritance is gone. For the most part, this should not lead to any
+  incompatibilities except in cases where you accessed members of
+  DataOutBase through their derived classes. For example, it was possible
+  to write <code>DataOut@<2@>::Patch@<2,2@></code> even though the
+  <code>Patch</code> class is actually declared in DataOutBase. Since
+  the inheritance is now gone, this is no longer possible and one
+  actually has to write DataOutBase::Patch instead. Using this form
+  turns out to be compatible also with older versions of deal.II.
+  <br>
+  (Wolfgang Bangerth, 2014/02/01)
+  </li>
 </ol>
 
 

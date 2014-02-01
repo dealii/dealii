@@ -273,6 +273,146 @@ namespace
 #endif
 }
 
+
+// some declarations of functions
+namespace DataOutBase
+{
+    /**
+     * Write the coordinates of nodes in the desired format.
+     */
+    template <int dim, int spacedim, typename STREAM>
+    static void write_nodes (const std::vector<Patch<dim,spacedim> > &patches,
+                             STREAM &out);
+
+    /**
+     * Write the node numbers of a cell in the desired format.
+     */
+    template <int dim, int spacedim, typename STREAM>
+    static void write_cells (const std::vector<Patch<dim,spacedim> > &patches,
+                             STREAM &out);
+
+    /**
+     * Write data in the desired format.
+     */
+    template <int dim, int spacedim, class STREAM>
+    static void write_data (const std::vector<Patch<dim,spacedim> > &patches,
+                            const unsigned int n_data_sets,
+                            const bool double_precision,
+                            STREAM &out);
+
+
+    /**
+     * This function projects a three-dimensional point (Point<3> point)
+     * onto a two-dimensional image plane, specified by the position of
+     * the camera viewing system (Point<3> camera_position), camera
+     * direction (Point<3> camera_position), camera horizontal (Point<3>
+     * camera_horizontal, necessary for the correct alignment of the
+     * later images), and the focus of the camera (float camera_focus).
+     *
+     * For SVG output.
+     */
+    static Point<2> svg_project_point(Point<3> point,
+                                      Point<3> camera_position,
+                                      Point<3> camera_direction,
+                                      Point<3> camera_horizontal,
+                                      float camera_focus);
+    /**
+     * Function to compute the gradient parameters for a triangle with
+     * given values for the vertices.
+     *
+     * Used for svg output.
+     */
+    static Point<6> svg_get_gradient_parameters(Point<3> points[]);
+
+    /**
+     * Class holding the data of one cell of a patch in two space
+     * dimensions for output. It is the projection of a cell in
+     * three-dimensional space (two coordinates, one height value) to
+     * the direction of sight.
+     */
+    class SvgCell
+    {
+    public:
+
+      // Center of the cell (three-dimensional)
+      Point<3> center;
+
+      /**
+       * Vector of vertices of this cell (three-dimensional)
+       */
+      Point<3> vertices[4];
+
+      /**
+       * Depth into the picture, which is defined as the distance from
+       * an observer at an the origin in direction of the line of sight.
+       */
+      float depth;
+
+      /**
+       * Vector of vertices of this cell (projected, two-dimensional).
+       */
+      Point<2> projected_vertices[4];
+
+      // Center of the cell (projected, two-dimensional)
+      Point<2> projected_center;
+
+      /**
+       * Comparison operator for sorting.
+       */
+      bool operator < (const SvgCell &) const;
+    };
+
+
+    /**
+     * Class holding the data of one cell of a patch in two space
+     * dimensions for output. It is the projection of a cell in
+     * three-dimensional space (two coordinates, one height value) to
+     * the direction of sight.
+     */
+    class EpsCell2d
+    {
+    public:
+
+      /**
+       * Vector of vertices of this cell.
+       */
+      Point<2> vertices[4];
+
+      /**
+       * Data value from which the actual colors will be computed by the
+       * colorization function stated in the <tt>EpsFlags</tt> class.
+       */
+      float color_value;
+
+      /**
+       * Depth into the picture, which is defined as the distance from
+       * an observer at an the origin in direction of the line of sight.
+       */
+      float depth;
+
+      /**
+       * Comparison operator for sorting.
+       */
+      bool operator < (const EpsCell2d &) const;
+    };
+
+
+    /**
+     * This is a helper function for the write_gmv() function. There,
+     * the data in the patches needs to be copied around as output is
+     * one variable globally at a time, rather than all data on each
+     * vertex at a time. This copying around can be done detached from
+     * the main thread, and is thus moved into this separate function.
+     *
+     * Note that because of the similarity of the formats, this function
+     * is also used by the Vtk and Tecplot output functions.
+     */
+    template <int dim, int spacedim>
+    static void
+    write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
+                                    Table<2,double>                         &data_vectors);
+}
+
 //----------------------------------------------------------------------//
 // DataOutFilter class member functions
 //----------------------------------------------------------------------//
@@ -5629,16 +5769,6 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
   AssertThrow (out, ExcIO());
 }
 
-template <>
-void DataOutBase::write_svg<1,1> (const std::vector<Patch<1,1> > &patches,
-                                  const std::vector<std::string> &data_names,
-                                  const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-                                  const SvgFlags &flags,
-                                  std::ostream &out)
-{
-  AssertThrow (false, ExcNotImplemented());
-}
-
 
 template <int dim, int spacedim>
 void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
@@ -5971,7 +6101,7 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
     }
 
 
-// write the svg file
+  // write the svg file
   if (width==0)
     width = static_cast<unsigned int>(.5 + height * (x_dimension_perspective / y_dimension_perspective));
   unsigned int additional_width = 0;
@@ -6780,16 +6910,25 @@ create_xdmf_entry (const std::string &h5_filename, const double cur_time, MPI_Co
   return create_xdmf_entry(data_filter, h5_filename, cur_time, comm);
 }
 
+
+
 template <int dim, int spacedim>
 XDMFEntry DataOutInterface<dim,spacedim>::
-create_xdmf_entry (const DataOutFilter &data_filter, const std::string &h5_filename, const double cur_time, MPI_Comm comm) const
+create_xdmf_entry (const DataOutBase::DataOutFilter &data_filter,
+    const std::string &h5_filename, const double cur_time, MPI_Comm comm) const
 {
   return create_xdmf_entry(data_filter, h5_filename, h5_filename, cur_time, comm);
 }
 
+
+
 template <int dim, int spacedim>
 XDMFEntry DataOutInterface<dim,spacedim>::
-create_xdmf_entry (const DataOutFilter &data_filter, const std::string &h5_mesh_filename, const std::string &h5_solution_filename, const double cur_time, MPI_Comm comm) const
+create_xdmf_entry (const DataOutBase::DataOutFilter &data_filter,
+    const std::string &h5_mesh_filename,
+    const std::string &h5_solution_filename,
+    const double cur_time,
+    MPI_Comm comm) const
 {
   unsigned int    local_node_cell_count[2], global_node_cell_count[2];
   int             myrank;
@@ -6936,7 +7075,7 @@ std::string XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
  */
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
-write_filtered_data (DataOutFilter &filtered_data) const
+write_filtered_data (DataOutBase::DataOutFilter &filtered_data) const
 {
   DataOutBase::write_filtered_data(get_patches(), get_dataset_names(),
                                    get_vector_data_ranges(),
@@ -6947,7 +7086,7 @@ template <int dim, int spacedim>
 void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &patches,
                                        const std::vector<std::string>          &data_names,
                                        const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-                                       DataOutFilter &filtered_data)
+                                       DataOutBase::DataOutFilter &filtered_data)
 {
   const unsigned int n_data_sets = data_names.size();
   unsigned int    n_node, n_cell;
@@ -7050,21 +7189,23 @@ write_hdf5_parallel (const std::string &filename, MPI_Comm comm) const
 
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
-write_hdf5_parallel (const DataOutFilter &data_filter, const std::string &filename, MPI_Comm comm) const
+write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
+    const std::string &filename, MPI_Comm comm) const
 {
   DataOutBase::write_hdf5_parallel(get_patches(), data_filter, filename, comm);
 }
 
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
-write_hdf5_parallel (const DataOutFilter &data_filter, const bool write_mesh_file, const std::string &mesh_filename, const std::string &solution_filename, MPI_Comm comm) const
+write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
+    const bool write_mesh_file, const std::string &mesh_filename, const std::string &solution_filename, MPI_Comm comm) const
 {
   DataOutBase::write_hdf5_parallel(get_patches(), data_filter, write_mesh_file, mesh_filename, solution_filename, comm);
 }
 
 template <int dim, int spacedim>
 void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
-                                       const DataOutFilter &data_filter,
+                                       const DataOutBase::DataOutFilter &data_filter,
                                        const std::string &filename,
                                        MPI_Comm comm)
 {
@@ -7073,7 +7214,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
 template <int dim, int spacedim>
 void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
-                                       const DataOutFilter &data_filter,
+                                       const DataOutBase::DataOutFilter &data_filter,
                                        const bool write_mesh_file,
                                        const std::string &mesh_filename,
                                        const std::string &solution_filename,
@@ -7356,62 +7497,62 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 template <int dim, int spacedim>
 void
 DataOutInterface<dim,spacedim>::write (std::ostream &out,
-                                       const OutputFormat output_format_) const
+                                       const DataOutBase::OutputFormat output_format_) const
 {
-  OutputFormat output_format = output_format_;
-  if (output_format == default_format)
+  DataOutBase::OutputFormat output_format = output_format_;
+  if (output_format == DataOutBase::default_format)
     output_format = default_fmt;
 
   switch (output_format)
     {
-    case none:
+    case DataOutBase::none:
       break;
 
-    case dx:
+    case DataOutBase::dx:
       write_dx (out);
       break;
 
-    case ucd:
+    case DataOutBase::ucd:
       write_ucd (out);
       break;
 
-    case gnuplot:
+    case DataOutBase::gnuplot:
       write_gnuplot (out);
       break;
 
-    case povray:
+    case DataOutBase::povray:
       write_povray (out);
       break;
 
-    case eps:
+    case DataOutBase::eps:
       write_eps (out);
       break;
 
-    case gmv:
+    case DataOutBase::gmv:
       write_gmv (out);
       break;
 
-    case tecplot:
+    case DataOutBase::tecplot:
       write_tecplot (out);
       break;
 
-    case tecplot_binary:
+    case DataOutBase::tecplot_binary:
       write_tecplot_binary (out);
       break;
 
-    case vtk:
+    case DataOutBase::vtk:
       write_vtk (out);
       break;
 
-    case vtu:
+    case DataOutBase::vtu:
       write_vtu (out);
       break;
 
-    case svg:
+    case DataOutBase::svg:
       write_svg (out);
       break;
 
-    case deal_II_intermediate:
+    case DataOutBase::deal_II_intermediate:
       write_deal_II_intermediate (out);
       break;
 
@@ -7424,9 +7565,9 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_default_format(const OutputFormat fmt)
+DataOutInterface<dim,spacedim>::set_default_format(const DataOutBase::OutputFormat fmt)
 {
-  Assert (fmt != default_format, ExcNotImplemented());
+  Assert (fmt != DataOutBase::default_format, ExcNotImplemented());
   default_fmt = fmt;
 }
 
@@ -7434,7 +7575,7 @@ DataOutInterface<dim,spacedim>::set_default_format(const OutputFormat fmt)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const DXFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::DXFlags &flags)
 {
   dx_flags = flags;
 }
@@ -7443,7 +7584,7 @@ DataOutInterface<dim,spacedim>::set_flags (const DXFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const UcdFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::UcdFlags &flags)
 {
   ucd_flags = flags;
 }
@@ -7452,7 +7593,7 @@ DataOutInterface<dim,spacedim>::set_flags (const UcdFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const GnuplotFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::GnuplotFlags &flags)
 {
   gnuplot_flags = flags;
 }
@@ -7461,7 +7602,7 @@ DataOutInterface<dim,spacedim>::set_flags (const GnuplotFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const PovrayFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::PovrayFlags &flags)
 {
   povray_flags = flags;
 }
@@ -7470,7 +7611,7 @@ DataOutInterface<dim,spacedim>::set_flags (const PovrayFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const EpsFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::EpsFlags &flags)
 {
   eps_flags = flags;
 }
@@ -7479,7 +7620,7 @@ DataOutInterface<dim,spacedim>::set_flags (const EpsFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const GmvFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::GmvFlags &flags)
 {
   gmv_flags = flags;
 }
@@ -7488,7 +7629,7 @@ DataOutInterface<dim,spacedim>::set_flags (const GmvFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const TecplotFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::TecplotFlags &flags)
 {
   tecplot_flags = flags;
 }
@@ -7497,7 +7638,7 @@ DataOutInterface<dim,spacedim>::set_flags (const TecplotFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const VtkFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::VtkFlags &flags)
 {
   vtk_flags = flags;
 }
@@ -7506,7 +7647,7 @@ DataOutInterface<dim,spacedim>::set_flags (const VtkFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const SvgFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::SvgFlags &flags)
 {
   svg_flags = flags;
 }
@@ -7515,7 +7656,7 @@ DataOutInterface<dim,spacedim>::set_flags (const SvgFlags &flags)
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim,spacedim>::set_flags (const Deal_II_IntermediateFlags &flags)
+DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::Deal_II_IntermediateFlags &flags)
 {
   deal_II_intermediate_flags = flags;
 }
@@ -7525,9 +7666,9 @@ DataOutInterface<dim,spacedim>::set_flags (const Deal_II_IntermediateFlags &flag
 template <int dim, int spacedim>
 std::string
 DataOutInterface<dim,spacedim>::
-default_suffix (const OutputFormat output_format) const
+default_suffix (const DataOutBase::OutputFormat output_format) const
 {
-  if (output_format == default_format)
+  if (output_format == DataOutBase::default_format)
     return DataOutBase::default_suffix (default_fmt);
   else
     return DataOutBase::default_suffix (output_format);
@@ -7540,46 +7681,46 @@ void
 DataOutInterface<dim,spacedim>::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Output format", "gnuplot",
-                     Patterns::Selection (get_output_format_names ()),
+                     Patterns::Selection (DataOutBase::get_output_format_names ()),
                      "A name for the output format to be used");
   prm.declare_entry("Subdivisions", "1", Patterns::Integer(),
                     "Number of subdivisions of each mesh cell");
 
   prm.enter_subsection ("DX output parameters");
-  DXFlags::declare_parameters (prm);
+  DataOutBase::DXFlags::declare_parameters (prm);
   prm.leave_subsection ();
 
   prm.enter_subsection ("UCD output parameters");
-  UcdFlags::declare_parameters (prm);
+  DataOutBase::UcdFlags::declare_parameters (prm);
   prm.leave_subsection ();
 
   prm.enter_subsection ("Gnuplot output parameters");
-  GnuplotFlags::declare_parameters (prm);
+  DataOutBase::GnuplotFlags::declare_parameters (prm);
   prm.leave_subsection ();
 
   prm.enter_subsection ("Povray output parameters");
-  PovrayFlags::declare_parameters (prm);
+  DataOutBase::PovrayFlags::declare_parameters (prm);
   prm.leave_subsection ();
 
   prm.enter_subsection ("Eps output parameters");
-  EpsFlags::declare_parameters (prm);
+  DataOutBase::EpsFlags::declare_parameters (prm);
   prm.leave_subsection ();
 
   prm.enter_subsection ("Gmv output parameters");
-  GmvFlags::declare_parameters (prm);
+  DataOutBase::GmvFlags::declare_parameters (prm);
   prm.leave_subsection ();
 
   prm.enter_subsection ("Tecplot output parameters");
-  TecplotFlags::declare_parameters (prm);
+  DataOutBase::TecplotFlags::declare_parameters (prm);
   prm.leave_subsection ();
 
   prm.enter_subsection ("Vtk output parameters");
-  VtkFlags::declare_parameters (prm);
+  DataOutBase::VtkFlags::declare_parameters (prm);
   prm.leave_subsection ();
 
 
   prm.enter_subsection ("deal.II intermediate output parameters");
-  Deal_II_IntermediateFlags::declare_parameters (prm);
+  DataOutBase::Deal_II_IntermediateFlags::declare_parameters (prm);
   prm.leave_subsection ();
 }
 
@@ -7590,7 +7731,7 @@ void
 DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm)
 {
   const std::string &output_name = prm.get ("Output format");
-  default_fmt = parse_output_format (output_name);
+  default_fmt = DataOutBase::parse_output_format (output_name);
   default_subdivisions = prm.get_integer ("Subdivisions");
 
   prm.enter_subsection ("DX output parameters");
@@ -7695,7 +7836,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
   {
     std::pair<unsigned int, unsigned int>
     dimension_info
-      = this->determine_intermediate_format_dimensions (in);
+      = DataOutBase::determine_intermediate_format_dimensions (in);
     AssertThrow ((dimension_info.first  == dim) &&
                  (dimension_info.second == spacedim),
                  ExcIncompatibleDimensions (dimension_info.first, dim,
