@@ -56,9 +56,35 @@ MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c, const
   mg_constrained_dofs(&mg_c)
 {}
 
+
 template <class VECTOR>
 MGTransferPrebuilt<VECTOR>::~MGTransferPrebuilt ()
 {}
+
+
+template <class VECTOR>
+void MGTransferPrebuilt<VECTOR>::initialize_constraints (
+  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+{
+  constraints = &c;
+  mg_constrained_dofs = &mg_c;
+}
+
+
+template <class VECTOR>
+void MGTransferPrebuilt<VECTOR>::clear ()
+{
+  sizes.resize(0);
+  prolongation_matrices.resize(0);
+  prolongation_sparsities.resize(0);
+  copy_indices.resize(0);
+  copy_indices_to_me.resize(0);
+  copy_indices_from_me.resize(0);
+  component_to_block_map.resize(0);
+  interface_dofs.resize(0);
+  constraints = 0;
+  mg_constrained_dofs = 0;
+}
 
 
 template <class VECTOR>

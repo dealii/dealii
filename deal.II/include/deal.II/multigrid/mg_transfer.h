@@ -121,7 +121,8 @@ public:
    */
   MGTransferPrebuilt ();
   /**
-   * Constructor with constraint matrices as well as mg_constrained_dofs.
+   * Constructor with constraints. Equivalent to the default
+   * constructor followed by initialize_constraints().
    */
   MGTransferPrebuilt (const ConstraintMatrix &constraints,
                       const MGConstrainedDoFs &mg_constrained_dofs);
@@ -129,6 +130,18 @@ public:
    * Destructor.
    */
   virtual ~MGTransferPrebuilt ();
+
+  /**
+   * Initialize the constraints to be used in build_matrices().
+   */
+  void initialize_constraints (const ConstraintMatrix &constraints,
+			       const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Reset the object to the state it had right after the default constructor.
+   */
+  void clear ();
+    
   /**
    * Actually build the prolongation
    * matrices for each level.
