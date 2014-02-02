@@ -14,6 +14,8 @@
 ##
 ## ---------------------------------------------------------------------
 
+INCLUDE_DIRECTORIES(${BOOST_BUNDLED_INCLUDE_DIRS})
+
 SET(src_boost_iostreams
     file_descriptor.cpp
     gzip.cpp

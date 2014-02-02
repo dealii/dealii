@@ -14,6 +14,8 @@
 ##
 ## ---------------------------------------------------------------------
 
+INCLUDE_DIRECTORIES(${BOOST_BUNDLED_INCLUDE_DIRS})
+
 IF(DEAL_II_USE_MT_POSIX)
   SET(src_boost_thread
     pthread/once.cpp

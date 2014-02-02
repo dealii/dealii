@@ -19,8 +19,11 @@
 # (... where everything is explained contrary to this... mess)
 #
 
+INCLUDE_DIRECTORIES(${UMFPACK_BUNDLED_INCLUDE_DIRS})
+
 #
 # *Shush!*
+# (Remove locally in this subdirectory)
 #
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wall")

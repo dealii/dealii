@@ -14,6 +14,8 @@
 ##
 ## ---------------------------------------------------------------------
 
+INCLUDE_DIRECTORIES(${UMFPACK_BUNDLED_INCLUDE_DIRS})
+
 SET(src_amd
   amd_1.cc
   amd_2.cc

@@ -14,6 +14,8 @@
 ##
 ## ---------------------------------------------------------------------
 
+INCLUDE_DIRECTORIES(${BOOST_BUNDLED_INCLUDE_DIRS})
+
 SET(src_boost_serialization
   basic_archive.cpp
   basic_iarchive.cpp
