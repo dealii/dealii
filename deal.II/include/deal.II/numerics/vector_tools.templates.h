@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1707,8 +1707,13 @@ namespace VectorTools
 
 
 
+    // template for the case dim!=1. Since the function has a template argument
+    // dim_, it is clearly less specialized than the 1d function above and
+    // whenever possible (i.e., if dim==1), the function template above
+    // will be used
     template <class DH,
-              template <int,int> class M_or_MC>
+              template <int,int> class M_or_MC,
+	      int dim_>
     static inline
     void
     do_interpolate_boundary_values (const M_or_MC<DH::dimension, DH::space_dimension> &mapping,
@@ -1716,7 +1721,7 @@ namespace VectorTools
                                     const typename FunctionMap<DH::space_dimension>::type &function_map,
                                     std::map<types::global_dof_index,double> &boundary_values,
                                     const ComponentMask       &component_mask,
-                                    const dealii::internal::int2type<DH::dimension>)
+                                    const dealii::internal::int2type<dim_>)
     {
       const unsigned int dim = DH::dimension;
       const unsigned int spacedim=DH::space_dimension;
