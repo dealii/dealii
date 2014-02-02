@@ -1717,7 +1717,7 @@ distribute_local_to_global (const FullMatrix<double>     &local_matrix,
   Vector<double> dummy(0);
   distribute_local_to_global (local_matrix, dummy, local_dof_indices,
                               global_matrix, dummy, false,
-                              internal::bool2type<IsBlockMatrix<MatrixType>::value>());
+                              dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
 
 
