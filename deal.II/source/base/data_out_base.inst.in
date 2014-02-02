@@ -20,21 +20,24 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #if deal_II_dimension <= deal_II_space_dimension
   template class DataOutInterface<deal_II_dimension, deal_II_space_dimension>;
   template class DataOutReader<deal_II_dimension, deal_II_space_dimension>;
-  template struct DataOutBase::Patch<deal_II_dimension, deal_II_space_dimension>;
+  
+  namespace DataOutBase
+  \{
+  template struct Patch<deal_II_dimension, deal_II_space_dimension>;
 
   template
   std::ostream &
   operator << (std::ostream                           &out,
-               const DataOutBase::Patch<deal_II_dimension, deal_II_space_dimension> &patch);
+               const Patch<deal_II_dimension, deal_II_space_dimension> &patch);
 
   template
   std::istream &
   operator >> (std::istream                     &in,
-               DataOutBase::Patch<deal_II_dimension, deal_II_space_dimension> &patch);
+               Patch<deal_II_dimension, deal_II_space_dimension> &patch);
 
   template
   void
-  DataOutBase::write_vtk (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_vtk (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const VtkFlags                          &flags,
@@ -42,7 +45,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_vtu (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_vtu (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const VtkFlags                          &flags,
@@ -50,7 +53,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_ucd (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_ucd (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const UcdFlags                          &flags,
@@ -58,7 +61,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_dx (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_dx (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const DXFlags                          &flags,
@@ -66,7 +69,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_gnuplot (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_gnuplot (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const GnuplotFlags                          &flags,
@@ -74,7 +77,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_povray (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_povray (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const PovrayFlags                          &flags,
@@ -82,7 +85,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_eps (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_eps (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const EpsFlags                          &flags,
@@ -90,7 +93,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_gmv (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_gmv (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const GmvFlags                          &flags,
@@ -98,7 +101,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_tecplot (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_tecplot (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const TecplotFlags                          &flags,
@@ -106,7 +109,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 
   template
   void
-  DataOutBase::write_tecplot_binary (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_tecplot_binary (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const TecplotFlags                          &flags,
@@ -115,7 +118,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #if deal_II_space_dimension >1
   template
   void
-  DataOutBase::write_svg (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_svg (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const SvgFlags                          &flags,
@@ -123,10 +126,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #endif
   template
   void
-  DataOutBase::write_deal_II_intermediate (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+  write_deal_II_intermediate (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
                         const std::vector<std::string>          &data_names,
                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                         const Deal_II_IntermediateFlags                          &flags,
                         std::ostream                            &out);
+  \}
 #endif
 }

@@ -1930,7 +1930,6 @@ namespace DataOutBase
    * to either reset the stream to its previous position, or close and
    * reopen it.
    */
-  static
   std::pair<unsigned int, unsigned int>
   determine_intermediate_format_dimensions (std::istream &input);
 
@@ -3022,45 +3021,47 @@ public:
 
 /* -------------------- inline functions ------------------- */
 
-inline
-bool
-DataOutBase::EpsFlags::RgbValues::is_grey () const
+namespace DataOutBase
 {
-  return (red == green) && (red == blue);
+  inline
+  bool
+  EpsFlags::RgbValues::is_grey () const
+  {
+    return (red == green) && (red == blue);
+  }
+
+
+  /* -------------------- template functions ------------------- */
+
+  /**
+   * Output operator for an object of type
+   * <tt>DataOutBase::Patch</tt>. This operator dumps the intermediate
+   * graphics format represented by the patch data structure. It may
+   * later be converted into regular formats for a number of graphics
+   * programs.
+   *
+   * @author Wolfgang Bangerth, 2005
+   */
+  template <int dim, int spacedim>
+  std::ostream &
+  operator << (std::ostream                           &out,
+               const Patch<dim,spacedim> &patch);
+
+
+
+  /**
+   * Input operator for an object of type
+   * <tt>DataOutBase::Patch</tt>. This operator reads the intermediate
+   * graphics format represented by the patch data structure, using the
+   * format in which it was written using the operator<<.
+   *
+   * @author Wolfgang Bangerth, 2005
+   */
+  template <int dim, int spacedim>
+  std::istream &
+  operator >> (std::istream                     &in,
+               Patch<dim,spacedim> &patch);
 }
-
-
-/* -------------------- template functions ------------------- */
-
-/**
- * Output operator for an object of type
- * <tt>DataOutBase::Patch</tt>. This operator dumps the intermediate
- * graphics format represented by the patch data structure. It may
- * later be converted into regular formats for a number of graphics
- * programs.
- *
- * @author Wolfgang Bangerth, 2005
- */
-template <int dim, int spacedim>
-std::ostream &
-operator << (std::ostream                           &out,
-             const DataOutBase::Patch<dim,spacedim> &patch);
-
-
-
-/**
- * Input operator for an object of type
- * <tt>DataOutBase::Patch</tt>. This operator reads the intermediate
- * graphics format represented by the patch data structure, using the
- * format in which it was written using the operator<<.
- *
- * @author Wolfgang Bangerth, 2005
- */
-template <int dim, int spacedim>
-std::istream &
-operator >> (std::istream                     &in,
-             DataOutBase::Patch<dim,spacedim> &patch);
-
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -7980,96 +7980,96 @@ DataOutReader<dim,spacedim>::get_vector_data_ranges () const
 
 
 
-
-template <int dim, int spacedim>
-std::ostream &
-operator << (std::ostream                           &out,
-             const DataOutBase::Patch<dim,spacedim> &patch)
+namespace DataOutBase
 {
-  // write a header line
-  out << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]"
-      << '\n';
-
-  // then write all the data that is
-  // in this patch
-  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << ' ';
-  out << '\n';
-
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    out << patch.neighbors[i] << ' ';
-  out << '\n';
-
-  out << patch.patch_index << ' ' << patch.n_subdivisions
-      << '\n';
-
-  out << patch.points_are_available<<'\n';
-
-  out << patch.data.n_rows() << ' ' << patch.data.n_cols() << '\n';
-  for (unsigned int i=0; i<patch.data.n_rows(); ++i)
-    for (unsigned int j=0; j<patch.data.n_cols(); ++j)
-      out << patch.data[i][j] << ' ';
-  out << '\n';
-  out << '\n';
-
-  return out;
-}
-
-
-
-template <int dim, int spacedim>
-std::istream &
-operator >> (std::istream                     &in,
-             DataOutBase::Patch<dim,spacedim> &patch)
-{
-  Assert (in, ExcIO());
-
-  // read a header line and compare
-  // it to what we usually
-  // write. skip all lines that
-  // contain only blanks at the start
+  template <int dim, int spacedim>
+  std::ostream &
+  operator << (std::ostream                           &out,
+               const Patch<dim,spacedim> &patch)
   {
-    std::string header;
-    do
-      {
-        getline (in, header);
-        while ((header.size() != 0) &&
-               (header[header.size()-1] == ' '))
-          header.erase(header.size()-1);
-      }
-    while ((header == "") && in);
+    // write a header line
+    out << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]"
+        << '\n';
 
-    std::ostringstream s;
-    s << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]";
+    // then write all the data that is
+    // in this patch
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << ' ';
+    out << '\n';
 
-    Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
+    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+      out << patch.neighbors[i] << ' ';
+    out << '\n';
+
+    out << patch.patch_index << ' ' << patch.n_subdivisions
+        << '\n';
+
+    out << patch.points_are_available<<'\n';
+
+    out << patch.data.n_rows() << ' ' << patch.data.n_cols() << '\n';
+    for (unsigned int i=0; i<patch.data.n_rows(); ++i)
+      for (unsigned int j=0; j<patch.data.n_cols(); ++j)
+        out << patch.data[i][j] << ' ';
+    out << '\n';
+    out << '\n';
+
+    return out;
   }
 
 
-  // then read all the data that is
-  // in this patch
-  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    in >> patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]];
+  template <int dim, int spacedim>
+  std::istream &
+  operator >> (std::istream                     &in,
+               Patch<dim,spacedim> &patch)
+  {
+    Assert (in, ExcIO());
 
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    in >> patch.neighbors[i];
+    // read a header line and compare
+    // it to what we usually
+    // write. skip all lines that
+    // contain only blanks at the start
+    {
+      std::string header;
+      do
+        {
+          getline (in, header);
+          while ((header.size() != 0) &&
+                 (header[header.size()-1] == ' '))
+            header.erase(header.size()-1);
+        }
+      while ((header == "") && in);
 
-  in >> patch.patch_index >> patch.n_subdivisions;
+      std::ostringstream s;
+      s << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]";
 
-  in >> patch.points_are_available;
+      Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
+    }
 
-  unsigned int n_rows, n_cols;
-  in >> n_rows >> n_cols;
-  patch.data.reinit (n_rows, n_cols);
-  for (unsigned int i=0; i<patch.data.n_rows(); ++i)
-    for (unsigned int j=0; j<patch.data.n_cols(); ++j)
-      in >> patch.data[i][j];
 
-  Assert (in, ExcIO());
+    // then read all the data that is
+    // in this patch
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      in >> patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
-  return in;
+    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+      in >> patch.neighbors[i];
+
+    in >> patch.patch_index >> patch.n_subdivisions;
+
+    in >> patch.points_are_available;
+
+    unsigned int n_rows, n_cols;
+    in >> n_rows >> n_cols;
+    patch.data.reinit (n_rows, n_cols);
+    for (unsigned int i=0; i<patch.data.n_rows(); ++i)
+      for (unsigned int j=0; j<patch.data.n_cols(); ++j)
+        in >> patch.data[i][j];
+
+    Assert (in, ExcIO());
+
+    return in;
+  }
 }
-
 
 
 

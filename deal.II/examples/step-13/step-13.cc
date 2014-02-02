@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2001 - 2013 by the deal.II authors
+ * Copyright (C) 2001 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -343,15 +343,14 @@ namespace Step13
     // program we shall generate output (from this we will then also generate
     // the suffix of the filename to which we write).
     //
-    // Regarding the output format, the <code>DataOutInterface</code> class
-    // (which is a base class of <code>DataOut</code> through which we will
-    // access its fields) provides an enumeration field
-    // <code>OutputFormat</code>, which lists names for all supported output
+    // Regarding the output format, the DataOutBase namespace
+    // provides an enumeration field
+    // DataOutBase::OutputFormat which lists names for all supported output
     // formats. At the time of writing of this program, the supported graphics
     // formats are represented by the enum values <code>ucd</code>,
     // <code>gnuplot</code>, <code>povray</code>, <code>eps</code>,
     // <code>gmv</code>, <code>tecplot</code>, <code>tecplot_binary</code>,
-    // <code>dx</code>, and <code>vtk</code>, but this list will certainly
+    // <code>dx</code>, <code>vtk</code>, etc, but this list will certainly
     // grow over time. Now, within various functions of that base class, you
     // can use values of this type to get information about these graphics
     // formats (for example the default suffix used for files of each format),
@@ -372,21 +371,21 @@ namespace Step13
     class SolutionOutput : public EvaluationBase<dim>
     {
     public:
-      SolutionOutput (const std::string                         &output_name_base,
-                      const typename DataOut<dim>::OutputFormat  output_format);
+      SolutionOutput (const std::string               &output_name_base,
+                      const DataOutBase::OutputFormat  output_format);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
                                 const Vector<double>  &solution) const;
     private:
-      const std::string                         output_name_base;
-      const typename DataOut<dim>::OutputFormat output_format;
+      const std::string               output_name_base;
+      const DataOutBase::OutputFormat output_format;
     };
 
 
     template <int dim>
     SolutionOutput<dim>::
-    SolutionOutput (const std::string                         &output_name_base,
-                    const typename DataOut<dim>::OutputFormat  output_format)
+    SolutionOutput (const std::string               &output_name_base,
+                    const DataOutBase::OutputFormat  output_format)
       :
       output_name_base (output_name_base),
       output_format (output_format)
@@ -396,7 +395,7 @@ namespace Step13
     // After the description above, the function generating the actual output
     // is now relatively straightforward. The only particularly interesting
     // feature over previous example programs is the use of the
-    // <code>DataOut::default_suffix</code> function, returning the usual
+    // DataOutBase::default_suffix function, returning the usual
     // suffix for files of a given format (e.g. ".eps" for encapsulated
     // postscript files, ".gnuplot" for Gnuplot files), and of the generic
     // <code>DataOut::write</code> function with a second argument, which
@@ -1489,7 +1488,7 @@ namespace Step13
     // Also generate an evaluator which writes out the solution:
     Evaluation::SolutionOutput<dim>
     postprocessor2 (std::string("solution-")+solver_name,
-                    DataOut<dim>::gnuplot);
+                    DataOutBase::gnuplot);
 
     // Take these two evaluation objects and put them in a list...
     std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;

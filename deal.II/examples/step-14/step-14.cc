@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2002 - 2013 by the deal.II authors
+ * Copyright (C) 2002 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -875,7 +875,7 @@ namespace Step14
                << std::ends;
 
       std::ofstream out (filename.str().c_str());
-      data_out.write (out, DataOut<dim>::gnuplot);
+      data_out.write (out, DataOutBase::gnuplot);
     }
 
 
@@ -2399,7 +2399,7 @@ namespace Step14
                << std::ends;
 
       std::ofstream out (filename.str().c_str());
-      data_out.write (out, DataOut<dim>::gnuplot);
+      data_out.write (out, DataOutBase::gnuplot);
     }
 
 
