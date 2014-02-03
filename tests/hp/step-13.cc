@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -163,20 +163,20 @@ namespace Evaluation
   {
   public:
     SolutionOutput (const std::string                         &output_name_base,
-                    const typename DataOut<dim>::OutputFormat  output_format);
+                    const DataOutBase::OutputFormat  output_format);
 
     virtual void operator () (const hp::DoFHandler<dim> &dof_handler,
                               const Vector<double>  &solution) const;
   private:
     const std::string                         output_name_base;
-    const typename DataOut<dim>::OutputFormat output_format;
+    const DataOutBase::OutputFormat output_format;
   };
 
 
   template <int dim>
   SolutionOutput<dim>::
   SolutionOutput (const std::string                         &output_name_base,
-                  const typename DataOut<dim>::OutputFormat  output_format)
+                  const DataOutBase::OutputFormat  output_format)
     :
     output_name_base (output_name_base),
     output_format (output_format)
@@ -783,7 +783,7 @@ void solve_problem (const std::string &solver_name)
 
   Evaluation::SolutionOutput<dim>
   postprocessor2 (std::string("solution-")+solver_name,
-                  DataOut<dim>::gnuplot);
+                  DataOutBase::gnuplot);
 
   std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;
   postprocessor_list.push_back (&postprocessor1);

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -660,7 +660,7 @@ namespace LaplaceSolver
              << this->refinement_cycle
              << ".gnuplot"
              << std::ends;
-    data_out.write (deallog.get_file_stream(), DataOut<dim>::gnuplot);
+    data_out.write (deallog.get_file_stream(), DataOutBase::gnuplot);
   }
 
 
@@ -1635,7 +1635,7 @@ namespace LaplaceSolver
              << this->refinement_cycle
              << ".gnuplot"
              << std::ends;
-    data_out.write (deallog.get_file_stream(), DataOut<dim>::gnuplot);
+    data_out.write (deallog.get_file_stream(), DataOutBase::gnuplot);
   }
 
 
