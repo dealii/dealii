@@ -124,7 +124,7 @@ void test_hyper_cube()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
 
-  FE_Nedelec<dim> fe(3);
+  FESystem<dim> fe(FE_Q<dim>(2), dim);
   test(tr, fe);
 }
 

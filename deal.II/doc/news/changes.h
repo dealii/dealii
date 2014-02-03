@@ -124,6 +124,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: Calling FEValuesViews::Vector::get_function_curls() computed
+  wrong results in some cases (see https://code.google.com/p/dealii/issues/detail?id=182).
+  This is now fixed.
+  <br>
+  (Christoph Heiniger, Wolfgang Bangerth, 2014/02/03)
+
   <li>Added: The class LAPACKFullMatrix now implements interfaces to
   matrix-matrix multiplication. Also, LAPACKFullMatrix::apply_lu_factorization
   now also operates on multiple right hand sides in form of another
