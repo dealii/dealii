@@ -2643,7 +2643,7 @@ namespace hp
 
       for (; cell != endc; ++cell)
         next_free_dof
-          = dealii::internal::hp::DoFHandler::Implementation::template distribute_dofs_on_cell<spacedim> (cell,
+          = dealii::internal::hp::DoFHandler::Implementation::distribute_dofs_on_cell<spacedim> (cell,
             next_free_dof);
 
       number_cache.n_global_dofs = next_free_dof;
