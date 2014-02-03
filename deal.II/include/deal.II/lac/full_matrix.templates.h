@@ -575,8 +575,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
         const number alpha = 1.;
         const number beta = (adding == true) ? 1. : 0.;
 
-        // Use the BLAS function gemm for
-        // calculating the matrix-matrix
+        // Use the BLAS function gemm for calculating the matrix-matrix
         // product.
         gemm(notrans, notrans, &m, &n, &k, &alpha, &src(0,0), &m,
              &this->values[0], &k, &beta, &dst(0,0), &m);

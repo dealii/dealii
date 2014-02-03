@@ -124,6 +124,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Added: The class LAPACKFullMatrix now implements interfaces to
+  matrix-matrix multiplication. Also, LAPACKFullMatrix::apply_lu_factorization
+  now also operates on multiple right hand sides in form of another
+  LAPACKFullMatrix.
+  <br>
+  (Martin Kronbichler, 2014/02/03)
+
   <li>Added: A sanity check for the full link interface at configure time.
   Hopefully this prevents some people from compiling the whole library just
   to hit a link error.
