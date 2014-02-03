@@ -82,17 +82,6 @@ void test (const Triangulation<dim> &tr,
   ConstraintMatrix cm;
   cm.close ();
   VectorTools::project (dof, cm, QGauss<2>(4), F(), fe_function);
-
-  // verify that we really have something that after projection equals the
-  // original
-  {
-    DataOut<dim> x;
-    x.attach_dof_handler (dof);
-    x.add_data_vector (fe_function, "u");
-    std::ofstream o("x.gnuplot");
-    x.build_patches(6);
-    x.write_gnuplot (o);
-  }
   
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
