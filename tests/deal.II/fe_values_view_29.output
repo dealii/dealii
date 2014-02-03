@@ -1,0 +1,10 @@
+
+DEAL::FE=FE_Nedelec<2>(2)
+DEAL::  curls[q]= 0.423
+DEAL::  grads[q]= 0.00 0.00 0.423 -1.98e-16
+DEAL::  curls[q]= 1.58
+DEAL::  grads[q]= 0.00 0.00 1.58 4.45e-16
+DEAL::  curls[q]= 0.423
+DEAL::  grads[q]= 0.00 0.00 0.423 -2.00e-16
+DEAL::  curls[q]= 1.58
+DEAL::  grads[q]= 0.00 0.00 1.58 -3.38e-16
