@@ -618,14 +618,14 @@ approximate_derivative_tensor (const DH<dim,spacedim>                           
                                Tensor<order,dim>                            &derivative,
                                const unsigned int                            component)
 {
-  // just call the respective function with Q1
-  // mapping
-  approximate_derivative_tensor (StaticMappingQ1<dim>::mapping,
-                                 dof,
-                                 solution,
-                                 cell,
-                                 derivative,
-                                 component);
+  // just call the respective function with Q1 mapping
+  approximate_derivative_tensor<dim,DH,InputVector,order,spacedim>
+  (StaticMappingQ1<dim>::mapping,
+   dof,
+   solution,
+   cell,
+   derivative,
+   component);
 }
 
 
