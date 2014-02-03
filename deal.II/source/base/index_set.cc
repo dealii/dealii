@@ -28,16 +28,48 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+void
+IndexSet::add_range (const types::global_dof_index begin,
+                     const types::global_dof_index end)
+{
+  Assert ((begin < index_space_size)
+          ||
+          ((begin == index_space_size) && (end == index_space_size)),
+          ExcIndexRangeType<types::global_dof_index> (begin, 0, index_space_size));
+  Assert (end <= index_space_size,
+          ExcIndexRangeType<types::global_dof_index> (end, 0, index_space_size+1));
+  Assert (begin <= end,
+          ExcIndexRangeType<types::global_dof_index> (begin, 0, end));
+
+  if (begin != end)
+    {
+      const Range new_range(begin,end);
+
+      // the new index might be larger than the last index present in the
+      // ranges. Then we can skip the binary search
+      if (ranges.size() == 0 || begin > ranges.back().end)
+        ranges.push_back(new_range);
+      else
+        ranges.insert (Utilities::lower_bound (ranges.begin(),
+                                               ranges.end(),
+                                               new_range),
+                       new_range);
+      is_compressed = false;
+    }
+}
+
+
+
 void
 IndexSet::do_compress () const
 {
-  // see if any of the
-  // contiguous ranges can be
-  // merged. since they are sorted by
-  // their first index, determining
+  // see if any of the contiguous ranges can be merged. do not use
+  // std::vector::erase in-place as it is quadratic in the number of
+  // ranges. since the ranges are sorted by their first index, determining
   // overlap isn't all that hard
-  for (std::vector<Range>::iterator
-       i = ranges.begin();
+  std::vector<Range>::iterator store = ranges.begin();
+  for (std::vector<Range>::iterator i = ranges.begin();
        i != ranges.end(); )
     {
       std::vector<Range>::iterator
@@ -47,37 +79,29 @@ IndexSet::do_compress () const
       types::global_dof_index first_index = i->begin;
       types::global_dof_index last_index  = i->end;
 
-      // see if we can merge any of
-      // the following ranges
-      bool can_merge = false;
+      // see if we can merge any of the following ranges
       while (next != ranges.end() &&
              (next->begin <= last_index))
         {
           last_index = std::max (last_index, next->end);
           ++next;
-          can_merge = true;
         }
+      i = next;
 
-      if (can_merge == true)
-        {
-          // delete the old ranges
-          // and insert the new range
-          // in place of the previous
-          // one
-          *i = Range(first_index, last_index);
-          i = ranges.erase (i+1, next);
-        }
-      else
-        ++i;
+      // store the new range in the slot we last occupied
+      *store = Range(first_index, last_index);
+      ++store;
+    }
+  // use a compact array with exactly the right amount of storage
+  if (store != ranges.end())
+    {
+      std::vector<Range> new_ranges(ranges.begin(), store);
+      ranges.swap(new_ranges);
     }
 
-
-  // now compute indices within set and the
-  // range with most elements
+  // now compute indices within set and the range with most elements
   types::global_dof_index next_index = 0, largest_range_size = 0;
-  for (std::vector<Range>::iterator
-       i = ranges.begin();
-       i != ranges.end();
+  for (std::vector<Range>::iterator i = ranges.begin();  i != ranges.end();
        ++i)
     {
       Assert(i->begin < i->end, ExcInternalError());
@@ -92,11 +116,8 @@ IndexSet::do_compress () const
     }
   is_compressed = true;
 
-  // check that next_index is
-  // correct. needs to be after the
-  // previous statement because we
-  // otherwise will get into an
-  // endless loop
+  // check that next_index is correct. needs to be after the previous
+  // statement because we otherwise will get into an endless loop
   Assert (next_index == n_elements(), ExcInternalError());
 }
 
@@ -119,18 +140,15 @@ IndexSet::operator & (const IndexSet &is) const
          &&
          (r2 != is.ranges.end()))
     {
-      // if r1 and r2 do not overlap
-      // at all, then move the
-      // pointer that sits to the
-      // left of the other up by one
+      // if r1 and r2 do not overlap at all, then move the pointer that sits
+      // to the left of the other up by one
       if (r1->end <= r2->begin)
         ++r1;
       else if (r2->end <= r1->begin)
         ++r2;
       else
         {
-          // the ranges must overlap
-          // somehow
+          // the ranges must overlap somehow
           Assert (((r1->begin <= r2->begin) &&
                    (r1->end > r2->begin))
                   ||
@@ -138,21 +156,15 @@ IndexSet::operator & (const IndexSet &is) const
                    (r2->end > r1->begin)),
                   ExcInternalError());
 
-          // add the overlapping
-          // range to the result
+          // add the overlapping range to the result
           result.add_range (std::max (r1->begin,
                                       r2->begin),
                             std::min (r1->end,
                                       r2->end));
 
-          // now move that iterator
-          // that ends earlier one
-          // up. note that it has to
-          // be this one because a
-          // subsequent range may
-          // still have a chance of
-          // overlapping with the
-          // range that ends later
+          // now move that iterator that ends earlier one up. note that it has
+          // to be this one because a subsequent range may still have a chance
+          // of overlapping with the range that ends later
           if (r1->end <= r2->end)
             ++r1;
           else
@@ -162,15 +174,6 @@ IndexSet::operator & (const IndexSet &is) const
 
   result.compress ();
   return result;
-}
-
-
-
-unsigned int
-IndexSet::n_intervals () const
-{
-  compress ();
-  return ranges.size();
 }
 
 
@@ -205,6 +208,131 @@ IndexSet::get_view (const types::global_dof_index begin,
 
   result.compress();
   return result;
+}
+
+
+
+void
+IndexSet::subtract_set (const IndexSet &other)
+{
+  compress();
+  other.compress();
+  is_compressed = false;
+
+
+  // we save new ranges to be added to our IndexSet in an temporary list and
+  // add all of them in one go at the end. This is necessary because a growing
+  // ranges vector invalidates iterators.
+  std::list<Range> temp_list;
+
+  std::vector<Range>::iterator own_it = ranges.begin();
+  std::vector<Range>::iterator other_it = other.ranges.begin();
+
+  while (own_it != ranges.end() && other_it != other.ranges.end())
+    {
+      //advance own iterator until we get an overlap
+      if (own_it->end <= other_it->begin)
+        {
+          ++own_it;
+          continue;
+        }
+      //we are done with other_it, so advance
+      if (own_it->begin >= other_it->end)
+        {
+          ++other_it;
+          continue;
+        }
+
+      //Now own_it and other_it overlap.  First save the part of own_it that
+      //is before other_it (if not empty).
+      if (own_it->begin < other_it->begin)
+        {
+          Range r(own_it->begin, other_it->begin);
+          r.nth_index_in_set = 0; //fix warning of unused variable
+          temp_list.push_back(r);
+        }
+      // change own_it to the sub range behind other_it. Do not delete own_it
+      // in any case. As removal would invalidate iterators, we just shrink
+      // the range to an empty one.
+      own_it->begin = other_it->end;
+      if (own_it->begin > own_it->end)
+        {
+          own_it->begin = own_it->end;
+          ++own_it;
+        }
+
+      // continue without advancing iterators, the right one will be advanced
+      // next.
+    }
+
+  // Now delete all empty ranges we might
+  // have created.
+  for (std::vector<Range>::iterator it = ranges.begin();
+       it != ranges.end(); )
+    {
+      if (it->begin >= it->end)
+        it = ranges.erase(it);
+      else
+        ++it;
+    }
+
+  // done, now add the temporary ranges
+  for (std::list<Range>::iterator it = temp_list.begin();
+       it != temp_list.end();
+       ++it)
+    add_range(it->begin, it->end);
+
+  compress();
+}
+
+
+
+void
+IndexSet::add_indices(const IndexSet &other,
+                      const unsigned int offset)
+{
+  if ((this == &other) && (offset == 0))
+    return;
+
+  compress();
+  other.compress();
+
+  std::vector<Range>::const_iterator r1 = ranges.begin(),
+                                     r2 = other.ranges.begin();
+
+  std::vector<Range> new_ranges;
+  // just get the start and end of the ranges right in this method, everything
+  // else will be done in compress()
+  while (r1 != ranges.end() || r2 != other.ranges.end())
+    {
+      // the two ranges do not overlap or we are at the end of one of the
+      // ranges
+      if (r2 == other.ranges.end() ||
+          (r1 != ranges.end() && r1->end < (r2->begin+offset)))
+        {
+          new_ranges.push_back(*r1);
+          ++r1;
+        }
+      else if (r1 == ranges.end() || (r2->end+offset) < r1->begin)
+        {
+          new_ranges.push_back(Range(r2->begin+offset,r2->end+offset));
+          ++r2;
+        }
+      else
+        {
+          // ok, we do overlap, so just take the combination of the current
+          // range (do not bother to merge with subsequent ranges)
+          Range next(std::min(r1->begin, r2->begin+offset),
+                     std::max(r1->end, r2->end+offset));
+          new_ranges.push_back(next);
+          ++r1;
+          ++r2;
+        }
+    }
+  ranges.swap(new_ranges);
+
+  is_compressed = false;
+  compress();
 }
 
 
@@ -275,87 +403,6 @@ IndexSet::block_read(std::istream &in)
   do_compress(); // needed so that largest_range can be recomputed
 }
 
-
-
-void
-IndexSet::subtract_set (const IndexSet &other)
-{
-  compress();
-  other.compress();
-  is_compressed = false;
-
-
-  // we save new ranges to be added to our
-  // IndexSet in an temporary list and add
-  // all of them in one go at the end. This
-  // is necessary because a growing ranges
-  // vector invalidates iterators.
-  std::list<Range> temp_list;
-
-  std::vector<Range>::iterator own_it = ranges.begin();
-  std::vector<Range>::iterator other_it = other.ranges.begin();
-
-  while (own_it != ranges.end() && other_it != other.ranges.end())
-    {
-      //advance own iterator until we get an
-      //overlap
-      if (own_it->end <= other_it->begin)
-        {
-          ++own_it;
-          continue;
-        }
-      //we are done with other_it, so advance
-      if (own_it->begin >= other_it->end)
-        {
-          ++other_it;
-          continue;
-        }
-
-      //Now own_it and other_it overlap.
-      //First save the part of own_it that is
-      //before other_it (if not empty).
-      if (own_it->begin < other_it->begin)
-        {
-          Range r(own_it->begin, other_it->begin);
-          r.nth_index_in_set = 0; //fix warning of unused variable
-          temp_list.push_back(r);
-        }
-      // change own_it to the sub range
-      // behind other_it. Do not delete
-      // own_it in any case. As removal would
-      // invalidate iterators, we just shrink
-      // the range to an empty one.
-      own_it->begin = other_it->end;
-      if (own_it->begin > own_it->end)
-        {
-          own_it->begin = own_it->end;
-          ++own_it;
-        }
-
-      // continue without advancing
-      // iterators, the right one will be
-      // advanced next.
-    }
-
-  // Now delete all empty ranges we might
-  // have created.
-  for (std::vector<Range>::iterator it = ranges.begin();
-       it != ranges.end(); )
-    {
-      if (it->begin >= it->end)
-        it = ranges.erase(it);
-      else
-        ++it;
-    }
-
-  // done, now add the temporary ranges
-  for (std::list<Range>::iterator it = temp_list.begin();
-       it != temp_list.end();
-       ++it)
-    add_range(it->begin, it->end);
-
-  compress();
-}
 
 
 void IndexSet::fill_index_vector(std::vector<types::global_dof_index> &indices) const

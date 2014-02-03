@@ -109,7 +109,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
                 const std::vector<const ConstraintMatrix *> &constraint,
                 const std::vector<IndexSet>                 &locally_owned_set,
                 const std::vector<hp::QCollection<1> >      &quad,
-                const MatrixFree<dim,Number>::AdditionalData additional_data)
+                const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   if (additional_data.initialize_indices == true)
     {
@@ -231,7 +231,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
                 const std::vector<const ConstraintMatrix *>    &constraint,
                 const std::vector<IndexSet>                   &locally_owned_set,
                 const std::vector<hp::QCollection<1> >        &quad,
-                const MatrixFree<dim,Number>::AdditionalData additional_data)
+                const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   if (additional_data.initialize_indices == true)
     {

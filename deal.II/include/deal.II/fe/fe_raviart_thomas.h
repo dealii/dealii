@@ -146,6 +146,13 @@ public:
   virtual void interpolate(
     std::vector<double> &local_dofs,
     const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+
+  /**
+   * Returns a list of constant modes of the element. For this element, the
+   * list consists of true arguments for all components.
+   */
+  virtual Table<2,bool> get_constant_modes () const;
+
   virtual std::size_t memory_consumption () const;
   virtual FiniteElement<dim> *clone() const;
 

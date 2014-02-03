@@ -932,6 +932,19 @@ public:
   face_system_to_component_index (const unsigned int index) const;
 
   /**
+   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * (quads) have to be permuted in order to be combined with the correct
+   * shape functions. Given a local dof @p index on a quad, return the local
+   * index, if the face has non-standard face_orientation, face_flip or
+   * face_rotation. In 2D and 1D there is no need for permutation and
+   * consequently an exception is thrown.
+   */
+  unsigned int adjust_quad_dof_index_for_face_orientation (const unsigned int index,
+                                                           const bool face_orientation,
+                                                           const bool face_flip,
+                                                           const bool face_rotation) const;
+
+  /**
    * Given an index in the natural ordering of indices on a face, return the
    * index of the same degree of freedom on the cell.
    *
@@ -989,20 +1002,7 @@ public:
                                    const bool face_orientation = true,
                                    const bool face_flip        = false,
                                    const bool face_rotation    = false) const;
-
-  /**
-   * For faces with non-standard face_orientation in 3D, the dofs on faces
-   * (quads) have to be permuted in order to be combined with the correct
-   * shape functions. Given a local dof @p index on a quad, return the local
-   * index, if the face has non-standard face_orientation, face_flip or
-   * face_rotation. In 2D and 1D there is no need for permutation and
-   * consequently an exception is thrown.
-   */
-  unsigned int adjust_quad_dof_index_for_face_orientation (const unsigned int index,
-                                                           const bool face_orientation,
-                                                           const bool face_flip,
-                                                           const bool face_rotation) const;
-
+ 
   /**
    * For lines with non-standard line_orientation in 3D, the dofs on lines
    * have to be permuted in order to be combined with the correct shape
@@ -1312,6 +1312,15 @@ public:
    */
   BlockMask
   block_mask (const ComponentMask &component_mask) const;
+
+  /**
+   * Returns a list of constant modes of the element. The returns table has as
+   * many rows as there are components in the element and dofs_per_cell
+   * columns. To each component of the finite element, the row in the returned
+   * table contains a basis representation of the constant function 1 on the
+   * element.
+   */
+  virtual Table<2,bool> get_constant_modes () const;
 
   //@}
 

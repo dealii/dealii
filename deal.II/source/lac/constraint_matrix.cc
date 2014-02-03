@@ -651,7 +651,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 
   // store for each line of the matrix its new line number after
   // compression. If the shift is -1, this line will be condensed away
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
   std::vector<int> new_line;
 #else
   std::vector<long long int> new_line;

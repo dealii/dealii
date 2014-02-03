@@ -385,10 +385,12 @@ namespace GridGenerator
                   const double        half_length = 1.0);
 
   /**
-   * Initialize the given triangulation with a hyper-L consisting of exactly
+   * Initialize the given triangulation with a hyper-L (in 2d or 3d)
+   *  consisting of exactly
    * <tt>2^dim-1</tt> cells. It produces the hypercube with the interval
    * [<i>left,right</i>] without the hypercube made out of the interval
-   * [<i>(a+b)/2,b</i>].
+   * [<i>(a+b)/2,b</i>]. This will result in the classical L-shape in 2d.
+   * The shape will look like the following in 3d:
    *
    * @image html hyper_l.png
    *
@@ -436,12 +438,12 @@ namespace GridGenerator
    * indicator 1, while the inner boundary has id zero. If the flag is @p
    * false, both have indicator zero.
    *
-   * In 2D, the number <tt>n_cells</tt> of elements for this initial
+   * In 2d, the number <tt>n_cells</tt> of elements for this initial
    * triangulation can be chosen arbitrarily. If the number of initial cells
    * is zero (as is the default), then it is computed adaptively such that the
    * resulting elements have the least aspect ratio.
    *
-   * In 3D, only two different numbers are meaningful, 6 for a surface based
+   * In 3d, only two different numbers are meaningful, 6 for a surface based
    * on a hexahedron (i.e. 6 panels on the inner sphere extruded in radial
    * direction to form 6 cells) and 12 for the rhombic dodecahedron. These
    * give rise to the following meshes upon one refinement:
@@ -614,7 +616,7 @@ namespace GridGenerator
     const bool          colorize = false);
 
   /**
-   * Produce a ring of cells in 3D that is cut open, twisted and glued
+   * Produce a ring of cells in 3d that is cut open, twisted and glued
    * together again. This results in a kind of moebius-loop.
    *
    * @param tria        The triangulation to be worked on.

@@ -26,16 +26,7 @@
 # two distinct set ups.
 #
 
-MESSAGE(STATUS "Setup project configuration")
-
-#
-# Read in auxiliary include directories for the build directory
-# configuration:
-#
-FILE(STRINGS
-  ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
-  deal_ii_source_includes
-  )
+MESSAGE(STATUS "Setting up project configuration")
 
 #
 # Configure the template-arguments file
@@ -74,11 +65,11 @@ INSTALL(FILES # for installation:
 ########################################################################
 
 #
-# Strip -Wno-deprecated from CMAKE_CXX_FLAGS so that deprecation warnings
+# Strip -Wno-deprecated from DEAL_II_CXX_FLAGS so that deprecation warnings
 # are actually shown for user code:
 #
-STRIP_FLAG(CMAKE_CXX_FLAGS "-Wno-deprecated")
-STRIP_FLAG(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 #
 # Populate a bunch of CONFIG_* variables with useful information:
@@ -113,8 +104,8 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   ENDIF()
 
   LIST(APPEND CONFIG_LIBRARIES_${_build}
-    ${DEAL_II_EXTERNAL_LIBRARIES_${_build}}
-    ${DEAL_II_EXTERNAL_LIBRARIES}
+    ${DEAL_II_LIBRARIES_${_build}}
+    ${DEAL_II_LIBRARIES}
     )
   LIST(APPEND CONFIG_LIBRARIES
     ${_keyword}
@@ -140,7 +131,7 @@ SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/include/deal.II
   ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/deal.II
-  ${deal_ii_source_includes}
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 CONFIGURE_FILE(
@@ -236,8 +227,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
     SET(_libs)
     FOREACH(_lib
-        ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
-        ${DEAL_II_EXTERNAL_LIBRARIES}
+        ${DEAL_II_LIBRARIES_${build}}
+        ${DEAL_II_LIBRARIES}
         )
       IF(_lib MATCHES "^\\s*\\/" AND NOT _lib MATCHES "\\.framework$")
         LIST(APPEND _libs "${_lib}")
@@ -252,8 +243,8 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     SET(_paths)
     FOREACH(_lib
         $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
-        ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
-        ${DEAL_II_EXTERNAL_LIBRARIES}
+        ${DEAL_II_LIBRARIES_${build}}
+        ${DEAL_II_LIBRARIES}
         )
 
       #
@@ -317,7 +308,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     # Set up our linker flags:
     #
     SET(MAKEFILE_LDFLAGS_${build}
-      "${CMAKE_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}} ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
+      "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}} ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
       )
   ENDFOREACH()
 
@@ -351,7 +342,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     $(D)/install/deal.II
     ${CMAKE_SOURCE_DIR}/include/
     ${CMAKE_SOURCE_DIR}/include/deal.II
-    ${deal_ii_source_includes}
+    ${DEAL_II_BUNDLED_INCLUDE_DIRS}
     ${DEAL_II_USER_INCLUDE_DIRS}
     )
   CONFIGURE_FILE(
@@ -380,4 +371,4 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     )
 ENDIF()
 
-MESSAGE(STATUS "Setup project configuration - Done")
+MESSAGE(STATUS "Setting up project configuration - Done")

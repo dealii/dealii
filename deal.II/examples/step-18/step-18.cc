@@ -15,7 +15,8 @@
  * ---------------------------------------------------------------------
 
  *
- * Author: Wolfgang Bangerth, University of Texas at Austin, 2000, 2004, 2005
+ * Author: Wolfgang Bangerth, University of Texas at Austin, 2000, 2004, 2005,
+ * Timo Heister, 2013
  */
 
 
@@ -1284,11 +1285,10 @@ namespace Step18
 
   // @sect4{TopLevel::output_results}
 
-  // This function generates the graphical output in intermediate format as
-  // explained in the introduction. Each process will only work on the cells
-  // it owns, and then write the result into a file of its own. These files
-  // may later be merged to get a single file in any of the supported output
-  // files, as mentioned in the introduction.
+  // This function generates the graphical output in .vtu format as explained
+  // in the introduction. Each process will only work on the cells it owns,
+  // and then write the result into a file of its own. Additionally, processor
+  // 0 will write the record files the reference all the .vtu files.
   //
   // The crucial part of this function is to give the <code>DataOut</code>
   // class a way to only work on the cells that the present process owns. This
@@ -1468,50 +1468,70 @@ namespace Step18
     data_out.build_patches ();
 
 
-    // Now that we have generated the intermediate format, let us determine
-    // the name of the file we will want to write it to. We compose it of the
-    // prefix <code>solution-</code>, followed by a representation of the
-    // present time written as a fixed point number so that file names sort
-    // naturally:
-    std::ostringstream filename;
-    filename << "solution-";
-    filename << std::setfill('0');
-    filename.setf(std::ios::fixed, std::ios::floatfield);
-    filename << std::setw(9) << std::setprecision(4) << present_time;
-
-    // Next, in case there are multiple processes working together, we have to
-    // generate different file names for the output of each process. In our
-    // case, we encode the process number as a three-digit integer, padded
-    // with zeros. The assertion in the first line of the block makes sure
-    // that there are less than 1000 processes (a very conservative check, but
-    // worth having anyway) as our scheme of generating process numbers would
-    // overflow if there were 1000 processes or more. Note that we choose to
-    // use <code>AssertThrow</code> rather than <code>Assert</code> since the
-    // number of processes is a variable that depends on input files or the
-    // way the process is started, rather than static assumptions in the
-    // program code. Therefore, it is inappropriate to use <code>Assert</code>
-    // that is optimized away in optimized mode, whereas here we actually can
-    // assume that users will run the largest computations with the most
-    // processors in optimized mode, and we should check our assumptions in
-    // this particular case, and not only when running in debug mode:
-    if (n_mpi_processes != 1)
-      {
-        AssertThrow (n_mpi_processes < 1000, ExcNotImplemented());
-
-        filename << '-';
-        filename << std::setfill('0');
-        filename << std::setw(3) << this_mpi_process;
-      }
-
-    // To the file name, attach the file name suffix usually used for the
-    // deal.II intermediate format. To determine it, we use the same function
-    // that has already been used in step-13:
-    filename << data_out.default_suffix(DataOut<dim>::deal_II_intermediate);
+    // Let us determine the name of the file we will want to write it to. We
+    // compose it of the prefix <code>solution-</code>, followed by the time
+    // step number, and finally the processor id (encoded as a three digit
+    // number):
+    std::string filename = "solution-" + Utilities::int_to_string(timestep_no,4)
+			   + "." + Utilities::int_to_string(this_mpi_process,3)
+			   + ".vtu";
+    
+    // The following assertion makes sure that there are less than 1000
+    // processes (a very conservative check, but worth having anyway) as our
+    // scheme of generating process numbers would overflow if there were 1000
+    // processes or more. Note that we choose to use <code>AssertThrow</code>
+    // rather than <code>Assert</code> since the number of processes is a
+    // variable that depends on input files or the way the process is started,
+    // rather than static assumptions in the program code. Therefore, it is
+    // inappropriate to use <code>Assert</code> that is optimized away in
+    // optimized mode, whereas here we actually can assume that users will run
+    // the largest computations with the most processors in optimized mode,
+    // and we should check our assumptions in this particular case, and not
+    // only when running in debug mode:
+    AssertThrow (n_mpi_processes < 1000, ExcNotImplemented());    
 
     // With the so-completed filename, let us open a file and write the data
-    // we have generated into it, using the intermediate format:
-    std::ofstream output (filename.str().c_str());
-    data_out.write_deal_II_intermediate (output);
+    // we have generated into it:
+    std::ofstream output (filename.c_str());
+    data_out.write_vtu (output);
+
+    // The record files must be written only once and not by each processor,
+    // so we do this on processor 0:
+    if (this_mpi_process==0)
+      {
+	// Here we collect all filenames of the current timestep (same format as above)
+	std::vector<std::string> filenames;
+        for (unsigned int i=0; i<n_mpi_processes; ++i)
+          filenames.push_back ("solution-" + Utilities::int_to_string(timestep_no,4)
+			       + "." + Utilities::int_to_string(i,3)
+			       + ".vtu");
+
+	// Now we write the .visit file. The naming is similar to the .vtu files, only
+	// that the file obviously doesn't contain a processor id.
+        const std::string
+        visit_master_filename = ("solution-" +
+				 Utilities::int_to_string(timestep_no,4) +
+                                 ".visit");
+        std::ofstream visit_master (visit_master_filename.c_str());
+        data_out.write_visit_record (visit_master, filenames);
+
+	// Similarly, we write the paraview .pvtu:
+        const std::string
+        pvtu_master_filename = ("solution-" +
+				Utilities::int_to_string(timestep_no,4) +
+                                ".pvtu");
+        std::ofstream pvtu_master (pvtu_master_filename.c_str());
+        data_out.write_pvtu_record (pvtu_master, filenames);
+
+	// Finally, we write the paraview record, that references all .pvtu files and
+	// their respective time. Note that the variable times_and_names is declared
+	// static, so it will retain the entries from the pervious timesteps.
+	static std::vector<std::pair<double,std::string> > times_and_names;
+	times_and_names.push_back (std::pair<double,std::string> (present_time, pvtu_master_filename));
+	std::ofstream pvd_output ("solution.pvd");
+	data_out.write_pvd_record (pvd_output, times_and_names);
+      }
+    
   }
 
 

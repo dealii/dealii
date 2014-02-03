@@ -36,7 +36,7 @@ namespace TrilinosWrappers
 {
   namespace
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     int global_length (const Epetra_MultiVector &vector)
     {
       return vector.GlobalLength();
@@ -516,7 +516,9 @@ namespace TrilinosWrappers
                   const std::vector<std::vector<bool> > &constant_modes,
                   const unsigned int                     smoother_sweeps,
                   const unsigned int                     smoother_overlap,
-                  const bool                             output_details)
+                  const bool                             output_details,
+                  const char*                            smoother_type,
+                  const char*                            coarse_type)
     :
     elliptic (elliptic),
     higher_order_elements (higher_order_elements),
@@ -526,7 +528,9 @@ namespace TrilinosWrappers
     constant_modes (constant_modes),
     smoother_sweeps (smoother_sweeps),
     smoother_overlap (smoother_overlap),
-    output_details (output_details)
+    output_details (output_details),
+    smoother_type (smoother_type),
+    coarse_type (coarse_type)
   {}
 
 
@@ -543,26 +547,17 @@ namespace TrilinosWrappers
     if (additional_data.elliptic == true)
       {
         ML_Epetra::SetDefaults("SA",parameter_list);
-        parameter_list.set("smoother: type", "Chebyshev");
 
-        // uncoupled mode can give a lot of
-        // warnings or even fail when there
-        // are too many entries per row and
-        // aggreggation gets complicated, but
-        // MIS does not work if too few
-        // elements are located on one
-        // processor. work around these
-        // warnings by choosing the different
-        // strategies in different
-        // situations: for low order, always
-        // use the standard choice
-        // uncoupled. if higher order, right
-        // now we also just use Uncoupled,
-        // but we should be aware that maybe
-        // MIS might be needed
+        // uncoupled mode can give a lot of warnings or even fail when there
+        // are too many entries per row and aggreggation gets complicated, but
+        // MIS does not work if too few elements are located on one
+        // processor. work around these warnings by choosing the different
+        // strategies in different situations: for low order, always use the
+        // standard choice uncoupled. if higher order, right now we also just
+        // use Uncoupled, but we should be aware that maybe MIS might be
+        // needed
         //
-        // TODO: Maybe there are any
-        // other/better options?
+        // TODO: Maybe there are any other/better options?
         if (additional_data.higher_order_elements)
           {
             //if (matrix.m()/matrix.matrix->Comm().NumProc() < 50000)
@@ -577,6 +572,9 @@ namespace TrilinosWrappers
         parameter_list.set("aggregation: type", "Uncoupled");
         parameter_list.set("aggregation: block scaling", true);
       }
+
+    parameter_list.set("smoother: type", additional_data.smoother_type);
+    parameter_list.set("coarse: type", additional_data.coarse_type);
 
     parameter_list.set("smoother: sweeps",
                        static_cast<int>(additional_data.smoother_sweeps));
@@ -622,10 +620,8 @@ namespace TrilinosWrappers
                 ExcDimensionMismatch(n_rows,
                                      global_length(distributed_constant_modes)));
 
-        // Reshape null space as a
-        // contiguous vector of
-        // doubles so that Trilinos
-        // can read from it.
+        // Reshape null space as a contiguous vector of doubles so that
+        // Trilinos can read from it.
         for (size_type d=0; d<constant_modes_dimension; ++d)
           for (size_type row=0; row<my_size; ++row)
             {
@@ -641,10 +637,8 @@ namespace TrilinosWrappers
         if (my_size > 0)
           parameter_list.set("null space: vectors",
                              distributed_constant_modes.Values());
-        // We need to set a valid pointer to data even
-        // if there is no data on the current
-        // processor. Therefore, pass a dummy in that
-        // case
+        // We need to set a valid pointer to data even if there is no data on
+        // the current processor. Therefore, pass a dummy in that case
         else
           parameter_list.set("null space: vectors",
                              &dummy[0]);

@@ -48,7 +48,8 @@ SET(FUNCTIONPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/functionparser/")
 #
 
 IF( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
-    AND NOT CMAKE_SYSTEM_NAME MATCHES "Windows" )
+    AND NOT CMAKE_SYSTEM_NAME MATCHES "Windows"
+    AND NOT CMAKE_SYSTEM_PROCESSOR MATCHES "ia64" )
   #
   # Cygwin is unsupported by tbb, Windows due to the way we compile tbb...
   #

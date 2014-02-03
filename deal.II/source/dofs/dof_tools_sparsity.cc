@@ -584,17 +584,20 @@ namespace DoFTools
                           constraints.add_entries_local_to_global
                           (dofs_on_other_cell, dofs_on_this_cell,
                            sparsity, keep_constrained_dofs);
+                          // only need to add this when the neighbor is not
+                          // owned by the current processor, otherwise we add
+                          // the entries for the neighbor there
+                          if (sub_neighbor->subdomain_id() != cell->subdomain_id())
+                            constraints.add_entries_local_to_global
+                            (dofs_on_other_cell, sparsity, keep_constrained_dofs);
                         }
                     }
                   else
                     {
                       // Refinement edges are taken care of by coarser
                       // cells
-
-                      // TODO: in the distributed case, we miss out the
-                      // constraints when the neighbor cell is coarser, but
-                      // only the current cell is owned locally!
-                      if (cell->neighbor_is_coarser(face))
+                      if (cell->neighbor_is_coarser(face) &&
+                          neighbor->subdomain_id() == cell->subdomain_id())
                         continue;
 
                       const unsigned int n_dofs_on_neighbor
@@ -613,11 +616,15 @@ namespace DoFTools
                       // around
                       if (!cell->neighbor(face)->active()
                           ||
-                          (cell->neighbor(face)->subdomain_id() !=
-                           cell->subdomain_id()))
-                        constraints.add_entries_local_to_global
-                        (dofs_on_other_cell, dofs_on_this_cell,
-                         sparsity, keep_constrained_dofs);
+                          (neighbor->subdomain_id() != cell->subdomain_id()))
+                        {
+                          constraints.add_entries_local_to_global
+                            (dofs_on_other_cell, dofs_on_this_cell,
+                             sparsity, keep_constrained_dofs);
+                          if (neighbor->subdomain_id() != cell->subdomain_id())
+                            constraints.add_entries_local_to_global
+                            (dofs_on_other_cell, sparsity, keep_constrained_dofs);
+                        }
                     }
                 }
             }

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -223,14 +223,13 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
       names[i] = std::string("comp");
     }
 
-  DataOutBase dout;
   DataOutBase::DXFlags dxflags;
   DataOutBase::GnuplotFlags gflags;
   std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
   if (dim==2)
-    dout.write_gnuplot(patches, names, vectors, gflags, out);
+    DataOutBase::write_gnuplot(patches, names, vectors, gflags, out);
   else
-    dout.write_dx(patches, names, vectors, dxflags, out);
+    DataOutBase::write_dx(patches, names, vectors, dxflags, out);
 }
 
 

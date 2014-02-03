@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1233,7 +1233,7 @@ inline
 Vector<Number> &
 Vector<Number>::operator = (const Vector<Number> &v)
 {
-  internal::Vector::copy_vector (v, *this);
+  dealii::internal::Vector::copy_vector (v, *this);
   return *this;
 }
 

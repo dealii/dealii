@@ -1,0 +1,36 @@
+
+DEAL::Chunk size = 1
+DEAL::n_cols = 4
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 5
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 6
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::Chunk size = 2
+DEAL::n_cols = 4
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 5
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 6
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::Chunk size = 4
+DEAL::n_cols = 4
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 5
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 6
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::Chunk size = 5
+DEAL::n_cols = 4
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 5
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 6
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::Chunk size = 7
+DEAL::n_cols = 4
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 5
+DEAL::Error in matrix-vector product done via extract_row_copy: 0
+DEAL::n_cols = 6
+DEAL::Error in matrix-vector product done via extract_row_copy: 0

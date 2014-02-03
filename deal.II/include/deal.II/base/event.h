@@ -151,7 +151,12 @@ namespace Algorithms
      * new.
      */
     extern const Event initial;
-
+    
+    /**
+     * The mesh has changed.
+     */
+    extern const Event remesh;
+    
     /**
      * The current derivative leads
      * to slow convergence of
@@ -197,7 +202,7 @@ namespace Algorithms
 
     const unsigned int n = flags.size();
     const unsigned int m = event.flags.size();
-    const unsigned int n_min = std::min(n, m);
+    const unsigned int n_min = (n<m)?n:m;
 
     // Now, if all_true set in the
     // other, then all must be true

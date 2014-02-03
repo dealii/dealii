@@ -1769,7 +1769,7 @@ public:
 
   /**
    * Print all parameters with the given style to <tt>out</tt>. Presently
-   * only <tt>Text</tt> and <tt>LaTeX</tt> are implemented.
+   * only <tt>Text</tt>, <tt>LaTeX</tt> and <tt>XML</tt> are implemented.
    *
    * In <tt>Text</tt> format, the output is formatted in such a way that it
    * is possible to use it for later input again. This is most useful to
@@ -1782,6 +1782,10 @@ public:
    * well as the documenting string given to the declare_entry() function
    * if available.
    *
+   * In <tt>XML</tt> format, the output starts with one root element
+   * <tt>ParameterHandler</tt> in order to get a valid XML document
+   * and all subsections under it.
+   * 
    * In <tt>Text</tt> format, the output contains the same information but
    * in a format so that the resulting file can be input into a latex
    * document such as a manual for the code for which this object handles
@@ -1817,12 +1821,18 @@ public:
    * by entering and leaving subsections through the enter_subsection() and
    * leave_subsection() functions.
    *
+   * If <tt>include_top_level_elements</tt> is <tt>true</tt>, also
+   * the higher subsection elements are printed. In <tt>XML</tt> format
+   * this is required to get a valid XML document and output starts
+   * with one root element <tt>ParameterHandler</tt>.
+   * 
    * In most cases, you will not want to use this function directly, but
    * have it called recursively by the previous function.
    */
   void print_parameters_section (std::ostream       &out,
                                  const OutputStyle   style,
-                                 const unsigned int  indent_level);
+                                 const unsigned int  indent_level,
+                                 const bool          include_top_level_elements = false);
 
   /**
    * Print parameters to a logstream. This function allows to print all

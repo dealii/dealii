@@ -19,9 +19,8 @@
 #
 # This file sets up
 #
-#   DEAL_II_HAVE_CXX11_FLAG
-#   DEAL_II_CXX11_FLAG
-#   DEAL_II_USE_CXX11
+#   DEAL_II_WITH_CXX11
+#
 #   HAVE_ISNAN
 #   HAVE_UNDERSCORE_ISNAN
 #   DEAL_II_HAVE_ISFINITE
@@ -34,32 +33,25 @@
 #                                                                      #
 ########################################################################
 
-#
-# See if there is a compiler flag to enable C++11 features
-#
-IF(NOT DEFINED DEAL_II_HAVE_CXX11_FLAG)
-  FOREACH(_test_flag
-      "-std=c++11"
-      "-std=c++0x"
-      )
-    CHECK_CXX_COMPILER_FLAG("${_test_flag}" DEAL_II_HAVE_CXX11_FLAG)
 
-    IF(DEAL_II_HAVE_CXX11_FLAG)
-      # We have found a CXX11_FLAG that the compiler understands
-      SET(DEAL_II_CXX11_FLAG "${_test_flag}" CACHE INTERNAL "")
-      BREAK()
-    ELSE()
-      # Remove test result from cache and try the next flag in the list
-      UNSET(DEAL_II_HAVE_CXX11_FLAG CACHE)
+#
+# Only run these tests if C++11 support should actually be set up:
+#
+IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
+
+  IF("${DEAL_II_CXX11_FLAG}" STREQUAL "")
+    CHECK_CXX_COMPILER_FLAG("-std=c++11" DEAL_II_HAVE_FLAG_stdcxx11)
+    IF(DEAL_II_HAVE_FLAG_stdcxx11)
+      SET(DEAL_II_CXX11_FLAG "-std=c++11")
+    ELSEIF(DEAL_II_HAVE_FLAG_stdcxx11)
+      CHECK_CXX_COMPILER_FLAG("-std=c++0x" DEAL_II_HAVE_FLAG_stdcxx0x)
+      SET(DEAL_II_CXX11_FLAG "-std=x++0x")
     ENDIF()
-  ENDFOREACH()
-ENDIF()
-
-
-IF(DEAL_II_HAVE_CXX11_FLAG)
+  ENDIF()
 
   # Set CMAKE_REQUIRED_FLAGS for the unit tests
-  PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
+  MESSAGE(STATUS "Using C++11 flag \"${DEAL_II_CXX11_FLAG}\"")
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -110,13 +102,8 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
   # below but it will throw an exception when run. So test
   # that as well.
   #
-  # TODO: This test will only succeed on platforms where "-pthread" is
-  #       recognized. But this isn't easily fixable:
-  #       configure_threads.cmake which will determine and setup threads
-  #       has to be called later...
-  #
-  IF(NOT CMAKE_CROSSCOMPILING) # Todo: Is it better to use DEAL_II_ALLOW_PLATFORM_INTROSPECTION here?
-    PUSH_TEST_FLAG("-pthread")
+  IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+    PUSH_CMAKE_REQUIRED("-pthread")
     CHECK_CXX_SOURCE_RUNS(
       "
       #include <thread>
@@ -124,10 +111,11 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
       int main(){ std::thread t(f,1); t.join(); return 0; }
       "
       DEAL_II_HAVE_CXX11_THREAD)
-    POP_TEST_FLAG()
+    RESET_CMAKE_REQUIRED()
+    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
   ELSE()
     # Just export it ;-)
-    SET_IF_EMPTY(DEAL_II_HAVE_CXX11_THREAD TRUE)
+    SET(DEAL_II_HAVE_CXX11_THREAD TRUE CACHE BOOL "")
   ENDIF()
 
   CHECK_CXX_SOURCE_COMPILES(
@@ -156,6 +144,75 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     "
     DEAL_II_HAVE_CXX11_TYPE_TRAITS)
 
+  #
+  # On Mac OS-X 10.9 with recent gcc compilers in C++11 mode linking to
+  # some standard C library functions, notably toupper and tolower, fail
+  # due to unresolved references to these functions.
+  #
+  # Thanks to Denis Davydov for the testcase.
+  #
+  # Matthias Maier, 2013
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <ctype.h>
+    int main ()
+    {
+      char c = toupper('a');
+    }
+    "
+    DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK)
+
+
+  #
+  # icc-13 triggers an internal compiler error when compiling
+  # std::numeric_limits<...>::min() with -std=c++0x [1].
+  #
+  # Reported by Ted Kord.
+  #
+  # - Matthias Maier, 2013
+  #
+  # [1] http://software.intel.com/en-us/forums/topic/328902
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <limits>
+    struct Integer
+    {
+      static const int min_int_value;
+      static const int max_int_value;
+    };
+    const int Integer::min_int_value = std::numeric_limits<int>::min();
+    const int Integer::max_int_value = std::numeric_limits<int>::max();
+    int main() { return 0; }
+    "
+    DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK)
+
+  #
+  # icc-14.0.0 has an astonishing bug [1] where it hits an internal compiler
+  # error when run in C++11 mode with libstdc++-4.7 (from gcc).
+  #
+  # We just disable C++11 mode in this case
+  #
+  # [1] http://software.intel.com/en-us/forums/topic/472385
+  #
+  # - Matthias Maier, 2013
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <vector>
+    template<typename T> void foo()
+    {
+      std::vector<double> data(100);
+    }
+    int main()
+    {
+      foo<int>();
+    }
+    "
+    DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK)
+
+
   IF( DEAL_II_HAVE_CXX11_ARRAY AND
       DEAL_II_HAVE_CXX11_CONDITION_VARIABLE AND
       DEAL_II_HAVE_CXX11_FUNCTIONAL AND
@@ -164,58 +221,61 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
       DEAL_II_HAVE_CXX11_THREAD AND
       DEAL_II_HAVE_CXX11_MUTEX AND
       DEAL_II_HAVE_CXX11_TUPLE AND
-      DEAL_II_HAVE_CXX11_TYPE_TRAITS )
-
-    MESSAGE(STATUS "Sufficient C++11 support. Enabling ${DEAL_II_CXX11_FLAG}.")
-
-    SET(DEAL_II_USE_CXX11 TRUE)
-
-    ADD_FLAGS(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
-
-  ELSE()
-    MESSAGE(STATUS "Insufficient C++11 support. Disabling ${DEAL_II_CXX11_FLAG}.")
+      DEAL_II_HAVE_CXX11_TYPE_TRAITS AND
+      DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK AND
+      DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK AND
+      DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK )
+      SET(DEAL_II_HAVE_CXX11 TRUE)
   ENDIF()
 
- IF(DEAL_II_USE_CXX11)
-   CHECK_CXX_SOURCE_COMPILES(
-     "
-     #include <type_traits>
-     int main(){ std::is_trivially_copyable<int> bob; }
-     "
-     DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+  RESET_CMAKE_REQUIRED()
+ENDIF()
 
-# Currently unused:
 #
-#    CHECK_CXX_SOURCE_COMPILES(
-#      "
-#      #include <vector>
-#      std::vector<int> v;
-#      int main(){ auto i = v.begin(); *i; return 0;}
-#      "
-#      DEAL_II_HAVE_CXX11_AUTO_TYPE)
+# Set up a configuration option for C++11 support:
 #
-#    CHECK_CXX_SOURCE_COMPILES(
-#      "
-#      #include <vector>],
-#      std::vector<int> v;
-#      int main(){ for (std::vector<int>::iterator i : v) *i; return 0;}
-#      "
-#      DEAL_II_HAVE_CXX11_RANGE_BASED_FOR)
-#
-#    IF( DEAL_II_HAVE_CXX11_AUTO_TYPE AND
-#        DEAL_II_HAVE_CXX11_RANGE_BASED_FOR )
-#
-#      MESSAGE(STATUS "Additional C++11 support available.")
-#
-#      SET(DEAL_II_CAN_USE_ADDITIONAL_CXX1X_FEATURES)
-#    ENDIF()
-#
-  ENDIF()
 
-  POP_TEST_FLAG()
+OPTION(DEAL_II_WITH_CXX11
+  "Compile deal.II using C++11 language standard."
+  ${DEAL_II_HAVE_CXX11}
+  )
 
+#
+# Bail out if user requested C++11 support (DEAL_II_WITH_CXX11) but support
+# is not available due to above tests (DEAL_II_HAVE_CXX11):
+#
+
+IF(DEAL_II_WITH_CXX11 AND NOT DEAL_II_HAVE_CXX11)
+  MESSAGE(FATAL_ERROR "\n"
+    "C++11 support was requested (DEAL_II_WITH_CXX11=TRUE) but is not "
+    "supported by the current compiler.\n"
+    "Please disable C++11 support, i.e. configure with\n"
+    "    -DDEAL_II_WITH_CXX11=FALSE,\n"
+    "or use a different compiler, instead. (If the compiler flag for C++11 "
+    "support differs from \"-std=c++0x\" or \"-std=c++11\", a suitable "
+    "compiler flag has to be specified manually via\n"
+    "    -DDEAL_II_CXX11_FLAG=\"...\"\n\n"
+    )
+ENDIF()
+
+#
+# Set up C++11 support:
+#
+
+IF(DEAL_II_WITH_CXX11)
+  ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
+  MESSAGE(STATUS "DEAL_II_WITH_CXX11 successfully set up")
+
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <type_traits>
+    int main(){ std::is_trivially_copyable<int> bob; }
+    "
+    DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+  RESET_CMAKE_REQUIRED()
 ELSE()
-    MESSAGE(STATUS "Insufficient C++11 support. Disabling ${DEAL_II_CXX11_FLAG}.")
+  MESSAGE(STATUS "DEAL_II_WITH_CXX11 disabled")
 ENDIF()
 
 

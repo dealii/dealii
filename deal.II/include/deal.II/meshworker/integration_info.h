@@ -386,7 +386,7 @@ namespace MeshWorker
      * these grid entities should be performed.
      *
      * If the parameter <tt>force</tt> is true, then all quadrature
-     * sets are filled with new quadrature ruels. If it is false, then
+     * sets are filled with new quadrature rules. If it is false, then
      * only empty rules are changed.
      */
     void initialize_gauss_quadrature(unsigned int n_cell_points,

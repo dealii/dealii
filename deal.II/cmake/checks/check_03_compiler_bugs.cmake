@@ -29,8 +29,8 @@
 #
 # - Wolfgang Bangerth, Matthias Maier, rewritten 2012
 #
-PUSH_TEST_FLAG("-Wreturn-type")
-PUSH_TEST_FLAG("-Werror")
+PUSH_CMAKE_REQUIRED("-Wreturn-type")
+PUSH_CMAKE_REQUIRED("-Werror")
 CHECK_CXX_COMPILER_BUG(
   "
   const double foo() { return 1.; }
@@ -38,11 +38,10 @@ CHECK_CXX_COMPILER_BUG(
   "
   DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG
   )
-POP_TEST_FLAG()
-POP_TEST_FLAG()
+RESET_CMAKE_REQUIRED()
 
 IF(DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG)
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS -Wno-return-type)
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-return-type)
 ENDIF()
 
 
@@ -59,7 +58,7 @@ ENDIF()
 #
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
    CMAKE_CXX_COMPILER_VERSION MATCHES "4.4.")
-  STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
+  STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
 ENDIF()
 
 
@@ -253,7 +252,7 @@ CHECK_CXX_COMPILER_BUG(
   DEAL_II_TYPE_QUALIFIER_BUG)
 
 IF(DEAL_II_TYPE_QUALIFIER_BUG)
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS -Wno-ignored-qualifiers)
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-ignored-qualifiers)
 ENDIF()
 
 
@@ -290,67 +289,6 @@ ENDIF()
 
 
 #
-# icc-13 triggers an internal compiler error when compiling
-# std::numeric_limits<...>::min() with -std=c++0x [1].
-# Just disable C++11 support completely in this case.
-#
-# Reported by Ted Kord.
-#
-# - Matthias Maier, 2013
-#
-# [1] http://software.intel.com/en-us/forums/topic/328902
-#
-CHECK_CXX_COMPILER_BUG(
-  "
-  #include <limits>
-  struct Integer
-  {
-    static const int min_int_value;
-    static const int max_int_value;
-  };
-  const int Integer::min_int_value = std::numeric_limits<int>::min();
-  const int Integer::max_int_value = std::numeric_limits<int>::max();
-  int main() { return 0; }
-  "
-  DEAL_II_ICC_NUMERICLIMITS_BUG)
-
-#
-# icc-14.0.0 has an astonishing bug [1] where it hits an internal compiler
-# error when run in C++11 mode with libstdc++-4.7 (from gcc).
-#
-# We just disable C++11 mode in this case
-#
-# [1] http://software.intel.com/en-us/forums/topic/472385
-#
-# - Matthias Maier, 2013
-#
-CHECK_CXX_COMPILER_BUG(
-  "
-  #include <vector>
-  template<typename T> void foo()
-  {
-    std::vector<double> data(100);
-  }
-  int main()
-  {
-    foo<int>();
-  }
-  "
-  DEAL_II_ICC_LIBSTDCPP47CXX11_BUG)
-
-
-IF( DEAL_II_ICC_NUMERICLIMITS_BUG OR
-    DEAL_II_ICC_LIBSTDCPP47CXX11_BUG )
-  MESSAGE(STATUS
-    "Intel C++11 bug found, disabling C++11 support"
-    )
-  STRIP_FLAG(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
-  SET(DEAL_II_CAN_USE_CXX1X FALSE)
-  SET(DEAL_II_USE_CXX11 FALSE)
-ENDIF()
-
-
-#
 # in intel (at least 13.1 and 14), vectorization causes
 # wrong code. See https://code.google.com/p/dealii/issues/detail?id=156
 # or tests/hp/solution_transfer.cc
@@ -376,33 +314,4 @@ ENDIF()
 IF( CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
     OR CMAKE_SYSTEM_NAME MATCHES "Windows" )
   SET(DEAL_II_CONSTEXPR_BUG TRUE)
-ENDIF()
-
-#
-# On Mac OS-X 10.9 with recent gcc compilers in C++11 mode linking to some
-# standard C library functions, notably toupper and tolower, fail due to
-# unresolved references to this functions. Disable C++11 support in this
-# case.
-#
-# Thanks to Denis Davydov for the testcase.
-#
-# Matthias Maier, 2013
-#
-CHECK_CXX_COMPILER_BUG(
-  "
-  #include <ctype.h>
-  int main ()
-  {
-    char c = toupper('a');
-  }
-  "
-  DEAL_II_MAC_OSX_C99_BUG)
-
-IF(DEAL_II_MAC_OSX_C99_BUG)
-  MESSAGE(STATUS
-    "Mac OS-X C99 bug found, disabling C++11 support"
-    )
-  STRIP_FLAG(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
-  SET(DEAL_II_CAN_USE_CXX1X FALSE)
-  SET(DEAL_II_USE_CXX11 FALSE)
 ENDIF()

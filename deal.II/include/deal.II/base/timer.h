@@ -275,7 +275,7 @@ private:
  * Use of this class could be as follows:
  * @code
  *   TimerOutput timer (std::cout, TimerOutput::summary,
- *                     TimerOutput::wall_times);
+ *                      TimerOutput::wall_times);
  *
  *   timer.enter_subsection ("Setup dof system");
  *   setup_dofs();
@@ -317,6 +317,54 @@ private:
  * object. In this case, we did a lot of other stuff, so that the time
  * proportions of the functions we measured are far away from 100 precent.
  *
+ *
+ * <h3>Using scoped timers</h3>
+ *
+ * The scheme above where you have to have calls to
+ * TimerOutput::enter_subsection() and TimerOutput::leave_subsection() is
+ * awkward if the sections in between these calls contain <code>return</code>
+ * statements or may throw exceptions. In that case, it is easy to forget that
+ * one nevertheless needs to leave the section somehow, somewhere. An easier
+ * approach is to use "scoped" sections. This is a variable that when you create
+ * it enters a section, and leaves the section when you destroy it. If this is
+ * a variable local to a particular scope (a code block between curly braces)
+ * and you leave this scope due to a <code>return</code> statements or an
+ * exception, then the variable is destroyed and the timed section is left
+ * automatically. Consequently, we could have written the code piece above
+ * as follows, with exactly the same result but now exception-safe:
+ * @code
+ *   TimerOutput timer (std::cout, TimerOutput::summary,
+ *                      TimerOutput::wall_times);
+ *
+ *   {
+ *     TimerOutput::Scope timer_section(timer, "Setup dof system");
+ *     setup_dofs();
+ *   }
+ *
+ *   {
+ *     TimerOutput::Scope timer_section(timer, "Assemble");
+ *     assemble_system_1();
+ *   }
+ *
+ *   {
+ *     TimerOutput::Scope timer_section(timer, "Solve");
+ *     solve_system_1();
+ *   }
+ *
+ *   {
+ *     TimerOutput::Scope timer_section(timer, "Assemble");
+ *     assemble_system_2();
+ *   }
+ *
+ *   {
+ *     TimerOutput::Scope timer_section(timer, "Solve");
+ *     solve_system_2();
+ *   }
+ *
+ *   // do something else...
+ * @endcode
+ *
+ *
  * See the step-32 tutorial program for usage of this class.
  *
  * @ingroup utilities
@@ -327,7 +375,8 @@ class TimerOutput
 public:
   /**
    * Helper class to enter/exit sections in TimerOutput be constructing
-   * a simple scope-based object.
+   * a simple scope-based object. The purpose of this class is explained
+   * in the documentation of TimerOutput.
    */
   class Scope
   {
@@ -439,8 +488,8 @@ public:
   /**
    * Open a section by given a string name
    * of it. In case the name already
-   * exists, that section is done once
-   * again.
+   * exists, that section is entered once
+   * again and times are accumulated.
    */
   void enter_subsection (const std::string &section_name);
 

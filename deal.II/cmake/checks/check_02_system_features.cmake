@@ -58,13 +58,7 @@ CHECK_CXX_SYMBOL_EXISTS("rand_r" "stdlib.h" HAVE_RAND_R)
 #
 # Do we have the Bessel function jn?
 #
-# Switch the library preference back to prefer dynamic libraries if
-# DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
-# this case system libraries should be linked dynamically.
-#
-SWITCH_LIBRARY_PREFERENCE()
-FIND_LIBRARY(m_LIBRARY NAMES m)
-SWITCH_LIBRARY_PREFERENCE()
+FIND_SYSTEM_LIBRARY(m_LIBRARY NAMES m)
 MARK_AS_ADVANCED(m_LIBRARY)
 
 IF(NOT m_LIBRARY MATCHES "-NOTFOUND")
@@ -72,7 +66,7 @@ IF(NOT m_LIBRARY MATCHES "-NOTFOUND")
   CHECK_CXX_SYMBOL_EXISTS("jn" "math.h" HAVE_JN)
   RESET_CMAKE_REQUIRED()
   IF(HAVE_JN)
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${m_LIBRARY})
+    LIST(APPEND DEAL_II_LIBRARIES ${m_LIBRARY})
   ENDIF()
 ENDIF()
 
@@ -89,7 +83,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
   # warnings. However, newer gccs on that platform do not have
   # this flag any more, so check whether we can indeed do this
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-double")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-double")
 
   #
   # On Mac OS X, -rdynamic is accepted by the compiler (i.e.

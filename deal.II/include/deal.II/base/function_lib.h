@@ -21,6 +21,9 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/table.h>
+
+#include <deal.II/base/std_cxx1x/array.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1175,6 +1178,175 @@ namespace Functions
     const Tensor<1,dim> exponents;
   };
 
+
+
+  /**
+   * A scalar function that computes its values by (bi-, tri-)linear interpolation
+   * from a set of point data that are arranged on a possibly non-uniform
+   * tensor product mesh. In other words, considering the three-dimensional case,
+   * let there be points $x_0,\ldotx, x_{K-1}$,
+   * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$, and data $d_{klm}$ defined at
+   * point $(x_k,y_l,z_m)^T$, then evaluating the function at a point
+   * $\mathbf x=(x,y,z)$ will find the box so that
+   * $x_k\le x\le x_{k+1}, y_l\le x\le y_{l+1}, z_m\le z\le z_{m+1}$, and do a
+   * trilinear interpolation of the data on this cell. Similar operations are
+   * done in lower dimensions.
+   *
+   * This class is most often used for either evaluating coefficients or right
+   * hand sides that are provided experimentally at a number of points inside the
+   * domain, or for comparing outputs of a solution on a finite element mesh
+   * against previously obtained data defined on a grid.
+   *
+   * @note If the points $x_i$ are actually equally spaced on an interval $[x_0,x_1]$
+   * and the same is true for the other data points in higher dimensions, you should
+   * use the InterpolatedUniformGridData class instead.
+   *
+   * If a point is requested outside the box defined by the end points of the
+   * coordinate arrays, then the function is assumed to simply extend by
+   * constant values beyond the last data point in each coordinate
+   * direction. (The class does not throw an error if a point lies outside the
+   * box since it frequently happens that a point lies just outside the box
+   * by an amount on the order of numerical roundoff.)
+   *
+   * @author Wolfgang Bangerth, 2013
+   */
+  template <int dim>
+  class InterpolatedTensorProductGridData : public Function<dim>
+  {
+    public:
+      /**
+       * Constructor.
+       * @param coordinate_values An array of dim arrays. Each of the inner
+       *   arrays contains the coordinate values $x_0,\ldotx, x_{K-1}$ and
+       *   similarly for the other coordinate directions. These arrays
+       *   need not have the same size. Obviously, we need dim such arrays
+       *   for a dim-dimensional function object. The coordinate values
+       *   within this array are assumed to be strictly ascending to allow
+       *   for efficient lookup.
+       * @param data_values A dim-dimensional table of data at each of the
+       *   mesh points defined by the coordinate arrays above. Note that the
+       *   Table class has a number of conversion constructors that allow
+       *   converting other data types into a table where you specify this
+       *   argument.
+       */
+      InterpolatedTensorProductGridData (const std_cxx1x::array<std::vector<double>,dim> &coordinate_values,
+                                         const Table<dim,double>                         &data_values);
+
+      /**
+       * Compute the value of the function set by bilinear interpolation of the
+       * given data set.
+       *
+       * @param p The point at which the function is to be evaluated.
+       * @param component The vector component. Since this function is scalar,
+       *   only zero is a valid argument here.
+       * @return The interpolated value at this point. If the point lies outside
+       *   the set of coordinates, the function is extended by a constant.
+       */
+      virtual
+      double
+      value (const Point<dim> &p,
+             const unsigned int component = 0) const;
+
+    private:
+      /**
+       * The set of coordinate values in each of the coordinate directions.
+       */
+      const std_cxx1x::array<std::vector<double>,dim> coordinate_values;
+
+      /**
+       * The data that is to be interpolated.
+       */
+      const Table<dim,double>                     data_values;
+  };
+
+
+  /**
+   * A scalar function that computes its values by (bi-, tri-)linear interpolation
+   * from a set of point data that are arranged on a uniformly spaced
+   * tensor product mesh. In other words, considering the three-dimensional case,
+   * let there be points $x_0,\ldotx, x_{K-1}$ that result from a uniform subdivision
+   * of the interval $[x_0,x_{K-1}]$ into $K-1$ sub-intervals of size $\Delta x
+   * = (x_{K-1}-x_0)/(K-1)$, and similarly
+   * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$. Also consider data $d_{klm}$ defined at
+   * point $(x_k,y_l,z_m)^T$, then evaluating the function at a point
+   * $\mathbf x=(x,y,z)$ will find the box so that
+   * $x_k\le x\le x_{k+1}, y_l\le x\le y_{l+1}, z_m\le z\le z_{m+1}$, and do a
+   * trilinear interpolation of the data on this cell. Similar operations are
+   * done in lower dimensions.
+   *
+   * This class is most often used for either evaluating coefficients or right
+   * hand sides that are provided experimentally at a number of points inside the
+   * domain, or for comparing outputs of a solution on a finite element mesh
+   * against previously obtained data defined on a grid.
+   *
+   * @note If you have a problem where the points $x_i$ are not equally spaced
+   * (e.g., they result from a computation on a graded mesh that is denser
+   * closer to one boundary), then use the InterpolatedTensorProductGridData
+   * class instead.
+   *
+   * If a point is requested outside the box defined by the end points of the
+   * coordinate arrays, then the function is assumed to simply extend by
+   * constant values beyond the last data point in each coordinate
+   * direction. (The class does not throw an error if a point lies outside the
+   * box since it frequently happens that a point lies just outside the box
+   * by an amount on the order of numerical roundoff.)
+   *
+   * @author Wolfgang Bangerth, 2013
+   */
+  template <int dim>
+  class InterpolatedUniformGridData : public Function<dim>
+  {
+    public:
+      /**
+       * Constructor
+       * @param interval_endpoints The left and right end points of the (uniformly
+       *   subdivided) intervals in each of the coordinate directions.
+       * @param n_subdivisions The number of subintervals of the subintervals
+       *   in each coordinate direction. A value of one for a coordinate
+       *   means that the interval is considered as one subinterval consisting
+       *   of the entire range. A value of two means that there are two subintervals
+       *   each with one half of the range, etc.
+       * @param data_values A dim-dimensional table of data at each of the
+       *   mesh points defined by the coordinate arrays above. Note that the
+       *   Table class has a number of conversion constructors that allow
+       *   converting other data types into a table where you specify this
+       *   argument.
+       */
+      InterpolatedUniformGridData (const std_cxx1x::array<std::pair<double,double>,dim> &interval_endpoints,
+                                   const std_cxx1x::array<unsigned int,dim>             &n_subintervals,
+                                   const Table<dim,double>                              &data_values);
+
+      /**
+       * Compute the value of the function set by bilinear interpolation of the
+       * given data set.
+       *
+       * @param p The point at which the function is to be evaluated.
+       * @param component The vector component. Since this function is scalar,
+       *   only zero is a valid argument here.
+       * @return The interpolated value at this point. If the point lies outside
+       *   the set of coordinates, the function is extended by a constant.
+       */
+      virtual
+      double
+      value (const Point<dim> &p,
+             const unsigned int component = 0) const;
+
+    private:
+      /**
+       * The set of interval endpoints in each of the coordinate directions.
+       */
+      const std_cxx1x::array<std::pair<double,double>,dim> interval_endpoints;
+
+      /**
+       * The number of subintervals in each of the coordinate directions.
+       */
+      const std_cxx1x::array<unsigned int,dim>             n_subintervals;
+
+      /**
+       * The data that is to be interpolated.
+       */
+      const Table<dim,double>                     data_values;
+  };
 }
 DEAL_II_NAMESPACE_CLOSE
 

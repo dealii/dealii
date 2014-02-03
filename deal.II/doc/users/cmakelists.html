@@ -138,7 +138,7 @@ DEAL_II_SETUP_TARGET(mycode3)
 
 If the list gets longer, consider using
 a <a href="#cmakeadvanced.foreach">loop</a>, possibly
-with <a href="#cmakeadvanced.glob">GLOB</a>.
+with <a href="#cmakeadvanced.globs">GLOB</a>.
 
     <a name="cmakesimple.libs"></a>
     <h3>Adding libraries and common source files</h3>
@@ -396,6 +396,7 @@ IF(NOT &lt;expression&gt;)
 ENDIF()
 </pre>
 
+<a name="cmakeadvanced.foreach"></a> 
 <p>Loops are implemented with the help of <code>WHILE</code> and
 <code>FOR</code> statements. The former takes the same
 <code>&lt;expression&gt;</code> as the <code>IF</code> statement:</p>
@@ -483,9 +484,9 @@ installation.
 <p>
 Furthermore, this macro sets the C++ compiler and the compile flags to
 default values (the same values that were used to compile deal.II itself).
-These are <code>CMAKE_CXX_COMPILER</code> and <code>CMAKE_CXX_FLAGS</code>,
+These are <code>CMAKE_CXX_COMPILER</code> and <code>DEAL_II_CXX_FLAGS</code>,
 as well as - depending on the configuration -
-<code>DEAL_II_FLAGS_DEBUG</code>, or <code>DEAL_II_FLAGS_RELEASE</code>, or
+<code>DEAL_II_CXX_FLAGS_DEBUG</code>, or <code>DEAL_II_CXX_FLAGS_RELEASE</code>, or
 both.
 </p>
 
@@ -588,7 +589,7 @@ INSTALL(TARGETS mycode DESTINATION bin)
 INSTALL(DIRECTORY run DESTINATION share/mycode/run)
 </pre>
 
-<a name="cmakesauto"></a>
+<a name="cmakeauto"></a>
 <h2>Autopilot style CMakeLists.txt</h2>
 
 <p>

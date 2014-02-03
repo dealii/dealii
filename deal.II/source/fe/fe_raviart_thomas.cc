@@ -403,6 +403,19 @@ FE_RaviartThomas<dim>::get_dpo_vector (const unsigned int deg)
 
 
 
+template <int dim>
+Table<2,bool>
+FE_RaviartThomas<dim>::get_constant_modes() const
+{
+  Table<2,bool> constant_modes(dim, this->dofs_per_cell);
+  for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+      constant_modes(d,i) = true;
+  return constant_modes;
+}
+
+
+
 //---------------------------------------------------------------------------
 // Data field initialization
 //---------------------------------------------------------------------------
@@ -530,6 +543,7 @@ FE_RaviartThomas<dim>::interpolate(
       for (unsigned int d=0; d<dim; ++d)
         local_dofs[start_cell_dofs+i*dim+d] += interior_weights(k,i,d) * values[d][k+start_cell_points];
 }
+
 
 
 template <int dim>

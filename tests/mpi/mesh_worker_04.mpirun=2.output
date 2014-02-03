@@ -1,0 +1,17 @@
+
+DEAL:0::DoFHandler ndofs=7
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=0
+DEAL:0::B cell = 0_2:00 face = 0
+DEAL:0::B cell = 0_2:00 face = 2
+DEAL:0::B cell = 0_2:01 face = 2
+DEAL:0::B cell = 0_2:02 face = 0
+
+DEAL:1::DoFHandler ndofs=7
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=0
+DEAL:1::B cell = 0_1:1 face = 1
+DEAL:1::B cell = 0_1:1 face = 2
+DEAL:1::B cell = 0_1:2 face = 0
+DEAL:1::B cell = 0_1:2 face = 3
+DEAL:1::B cell = 0_1:3 face = 1
+DEAL:1::B cell = 0_1:3 face = 3
+

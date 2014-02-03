@@ -57,7 +57,7 @@ namespace types
    */
   const unsigned int artificial_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-2);
 
-#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifdef DEAL_II_WITH_64BIT_INDICES
   /**
    * The type used for global indices of
    * degrees of freedom. While in sequential
@@ -152,7 +152,7 @@ namespace TrilinosWrappers
 {
   namespace types
   {
-#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifdef DEAL_II_WITH_64BIT_INDICES
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */

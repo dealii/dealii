@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,7 +18,7 @@
 # Configuration for mpi support:
 #
 # We look for the C and Fortran libraries as well because they are needed
-# by some external libraries:
+# by some external libraries for the link interface:
 #
 
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
@@ -52,6 +52,7 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
       "not be autodetected"
       )
   ENDIF()
+
   FIND_PACKAGE(MPI)
 
   IF(NOT MPI_CXX_FOUND AND DEAL_II_WITH_MPI)
@@ -139,16 +140,14 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   # Hide some variables:
   MARK_AS_ADVANCED(MPI_EXTRA_LIBRARY MPI_LIBRARY MPI_MPI_H)
 
-ENDMACRO()
-
-
-MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL)
   #
-  # The user has to know the location of the mpi headers as well:
+  # Populate correct variables:
   #
-  SET(MPI_CXX_ADD_TO_USER_INCLUDE_DIRS TRUE)
+  SET(MPI_LIBRARIES ${MPI_CXX_LIBRARIES})
+  SET(MPI_INCLUDE_DIRS ${MPI_CXX_INCLUDE_PATH})
+  SET(MPI_CXX_FLAGS ${MPI_CXX_COMPILE_FLAGS})
+  SET(MPI_LINKER_FLAGS "${MPI_CXX_LINK_FLAGS}")
 
-  REGISTER_FEATURE(MPI_CXX)
 ENDMACRO()
 
 
@@ -170,3 +169,8 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(MPI)
+
+#
+# The user has to know the location of the mpi headers as well:
+#
+SET(MPI_USER_INCLUDE_DIRS ${MPI_INCLUDE_DIRS})

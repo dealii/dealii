@@ -1,0 +1,36 @@
+
+DEAL:0::DoFHandler ndofs=2
+DEAL:0::*** 1. CELLS ***
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=0
+DEAL:0::* own_cells=1 ghost_cells=0 own_faces=0 faces_to_ghost=0
+DEAL:0::C 0_0:
+DEAL:0::* own_cells=0 ghost_cells=1 own_faces=0 faces_to_ghost=0
+DEAL:0::C 1_0:
+DEAL:0::* own_cells=1 ghost_cells=1 own_faces=0 faces_to_ghost=0
+DEAL:0::C 0_0:
+DEAL:0::C 1_0:
+DEAL:0::*** 2. FACES ***
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=1 faces_to_ghost=0
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=2 faces_to_ghost=0
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=1
+DEAL:0::F cell1 = 0_0: face = 1 cell2 = 1_0: face2 = 0
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=2
+DEAL:0::F cell1 = 0_0: face = 1 cell2 = 1_0: face2 = 0
+
+DEAL:1::DoFHandler ndofs=2
+DEAL:1::*** 1. CELLS ***
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=0
+DEAL:1::* own_cells=1 ghost_cells=0 own_faces=0 faces_to_ghost=0
+DEAL:1::C 1_0:
+DEAL:1::* own_cells=0 ghost_cells=1 own_faces=0 faces_to_ghost=0
+DEAL:1::C 0_0:
+DEAL:1::* own_cells=1 ghost_cells=1 own_faces=0 faces_to_ghost=0
+DEAL:1::C 0_0:
+DEAL:1::C 1_0:
+DEAL:1::*** 2. FACES ***
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=1 faces_to_ghost=0
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=2 faces_to_ghost=0
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=1
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=2
+DEAL:1::F cell1 = 1_0: face = 0 cell2 = 0_0: face2 = 1
+

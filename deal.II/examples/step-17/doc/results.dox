@@ -1,18 +1,26 @@
 <h1>Results</h1>
 
 
-If the program above is compiled and run on a single processor machine, it
-should generate results that are very similar to those that we already got
-with step-8. However, it becomes more interesting if we run it on a cluster of
-computers. Most clusters have some kind of scheduling system, all of which
-have different calling syntaxes - on my system, I have to use the command
-<code>bsub</code> with a whole host of options to run a job in parallel - so
-that the exact command line syntax varies. If you have found out how to run a
-job on your system, you should get output like this for a job on 8 processors,
-and with a few more refinement cycles than in the code above (these
-results were generated in 2004 with older versions of deal.II and a
-version of METIS that generated different partitionings; consequently,
-the numbers you get today are slightly different):
+If the program above is compiled and run on a single processor
+machine, it should generate results that are very similar to those
+that we already got with step-8. However, it becomes more interesting
+if we run it on a multicore machine or a cluster of computers. The
+most basic way to run MPI programs is using a command line like
+@code
+  mpirun -np 32 ./step-17
+@endcode
+to run the step-17 executable with 32 processors.
+
+The command line above is the appropriate way of starting the program
+on a multicore machine when using MPI for parallelization. On the
+other hand, most clusters are shared resources and have some kind of
+scheduling system that distributes jobs onto available processors. All
+of these scheduling systems have their own calling syntax - on my system, I have to use the command
+<code>qsub</code> with a whole host of options to run a job in parallel - so
+that the exact command line syntax varies.
+
+Whether directly or through a scheduler, if you run this program on 8
+processors, you should get output like the following:
 @code
 Cycle 0:
    Number of active cells:       64
@@ -84,8 +92,10 @@ Cycle 16:
 471186+470686+475694)
    Solver converged in 2251 iterations.
 @endcode
-
-
+(This run uses a few more refinement cycles than the code available in
+the examples/ directory. The run also used a version of METIS from
+2004 that generated different partitionings; consequently,
+the numbers you get today are slightly different.)
 
 As can be seen, we can easily get to almost four million unknowns. In fact, the
 code's runtime with 8 processes was less than 7 minutes up to (and including)

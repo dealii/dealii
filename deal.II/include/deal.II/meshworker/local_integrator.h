@@ -22,6 +22,9 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/std_cxx1x/function.h>
 
+#include <vector>
+#include <string>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
@@ -106,6 +109,26 @@ namespace MeshWorker
     */
     bool use_face;
 
+    /**
+     * The names of the input vectors. If this vector is nonempty, it
+     * can be used by application programs to automatically select
+     * and verify the input vectors used for integration.
+     *
+     * @note This variable is currently not used by the library, but
+     * it is provided to help develop application programs.
+     */
+    std::vector<std::string> input_vector_names;
+
+    /**
+     * The names of the results produced. If this vector is nonempty,
+     * it can be used by application programs to automatically assign
+     * names to output values and/or verify the names of vectors.
+     *
+     * @note This variable is currently not used by the library, but
+     * it is provided to help develop application programs.
+     */
+    std::vector<std::string> output_names;
+      
     /**
      * This error is thrown if one of the virtual functions cell(),
      * boundary(), or face() is called without being overloaded in a

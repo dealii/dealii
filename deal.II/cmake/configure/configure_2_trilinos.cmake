@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -160,11 +160,11 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # with the -std=c++0x flag of GCC, see deal.II FAQ.
     # Test whether that is indeed the case
     #
-    IF(DEAL_II_USE_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
+    IF(DEAL_II_WITH_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
 
       IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
-        LIST(APPEND DEAL_II_DEFINITIONS "HAS_C99_TR1_CMATH")
-        LIST(APPEND DEAL_II_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
+        LIST(APPEND TRILINOS_DEFINITIONS "HAS_C99_TR1_CMATH")
+        LIST(APPEND TRILINOS_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
       ELSE()
         MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
           "The installation is not compatible with the C++ standard selected for "
@@ -195,8 +195,7 @@ ENDMACRO()
 
 MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
 
-  SET(TRILINOS_ADD_TO_USER_INCLUDE_DIRS TRUE)
-  REGISTER_FEATURE(TRILINOS)
+  SET(TRILINOS_USER_INCLUDE_DIRS ${TRILINOS_INCLUDE_DIRS})
 
   SET(DEAL_II_EXPAND_TRILINOS_VECTOR "TrilinosWrappers::Vector")
   SET(DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR "TrilinosWrappers::BlockVector")
@@ -208,9 +207,9 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   #
   # Disable a bunch of warnings caused by Trilinos headers:
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-extra")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
+  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused")
+  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-extra")
+  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-overloaded-virtual")
 
 ENDMACRO()
 

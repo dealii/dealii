@@ -32,7 +32,7 @@ namespace TrilinosWrappers
 {
   namespace
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     // define a helper function that queries the size of an Epetra_BlockMap object
     // by calling either the 32- or 64-bit function necessary, and returns the
     // result in the correct data type so that we can use it in calling other
@@ -186,6 +186,8 @@ namespace TrilinosWrappers
     Vector::reinit (const Epetra_Map &input_map,
                     const bool        fast)
     {
+      nonlocal_vector.reset();
+
       if (vector->Map().SameAs(input_map)==false)
         vector.reset (new Epetra_FEVector(input_map));
       else if (fast == false)
@@ -205,6 +207,8 @@ namespace TrilinosWrappers
                     const MPI_Comm &communicator,
                     const bool      fast)
     {
+      nonlocal_vector.reset();
+
       Epetra_Map map = parallel_partitioner.make_trilinos_map (communicator,
                                                                true);
       reinit (map, fast);
@@ -217,13 +221,11 @@ namespace TrilinosWrappers
                     const bool        fast,
                     const bool        allow_different_maps)
     {
-      // In case we do not allow to
-      // have different maps, this
-      // call means that we have to
-      // reset the vector. So clear
-      // the vector, initialize our
-      // map with the map in v, and
-      // generate the vector.
+      nonlocal_vector.reset();
+
+      // In case we do not allow to have different maps, this call means that
+      // we have to reset the vector. So clear the vector, initialize our map
+      // with the map in v, and generate the vector.
       if (allow_different_maps == false)
         {
           if (vector->Map().SameAs(v.vector->Map()) == false)
@@ -250,14 +252,10 @@ namespace TrilinosWrappers
             }
         }
 
-      // Otherwise, we have to check
-      // that the two vectors are
-      // already of the same size,
-      // create an object for the data
-      // exchange and then insert all
-      // the data. The first assertion
-      // is only a check whether the
-      // user knows what she is doing.
+      // Otherwise, we have to check that the two vectors are already of the
+      // same size, create an object for the data exchange and then insert all
+      // the data. The first assertion is only a check whether the user knows
+      // what she is doing.
       else
         {
           Assert (fast == false,
@@ -284,19 +282,16 @@ namespace TrilinosWrappers
     Vector::reinit (const BlockVector &v,
                     const bool         import_data)
     {
-      // In case we do not allow to
-      // have different maps, this
-      // call means that we have to
-      // reset the vector. So clear
-      // the vector, initialize our
-      // map with the map in v, and
-      // generate the vector.
+      nonlocal_vector.reset();
+
+      // In case we do not allow to have different maps, this call means that
+      // we have to reset the vector. So clear the vector, initialize our map
+      // with the map in v, and generate the vector.
       if (v.n_blocks() == 0)
         return;
 
-      // create a vector that holds all the elements
-      // contained in the block vector. need to
-      // manually create an Epetra_Map.
+      // create a vector that holds all the elements contained in the block
+      // vector. need to manually create an Epetra_Map.
       size_type n_elements = 0, added_elements = 0, block_offset = 0;
       for (size_type block=0; block<v.n_blocks(); ++block)
         n_elements += v.block(block).local_size();
@@ -349,26 +344,51 @@ namespace TrilinosWrappers
     }
 
 
-    void Vector::reinit(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &communicator)
+    void Vector::reinit(const IndexSet &locally_owned_entries,
+                        const IndexSet &ghost_entries,
+                        const MPI_Comm &communicator,
+                        const bool      vector_writable)
     {
-      IndexSet parallel_partitioning = local;
-      parallel_partitioning.add_indices(ghost);
-      reinit(parallel_partitioning, communicator);
+      nonlocal_vector.reset();
+      if (vector_writable == false)
+        {
+          IndexSet parallel_partitioning = locally_owned_entries;
+          parallel_partitioning.add_indices(ghost_entries);
+          reinit(parallel_partitioning, communicator);
+        }
+      else
+        {
+          Epetra_Map map = locally_owned_entries.make_trilinos_map (communicator,
+                                                                    true);
+          Assert (map.IsOneToOne(),
+                  ExcMessage("A writable vector must not have ghost entries in "
+                             "its parallel partitioning"));
+          reinit (map);
+
+          IndexSet nonlocal_entries(ghost_entries);
+          nonlocal_entries.subtract_set(locally_owned_entries);
+          if (Utilities::MPI::n_mpi_processes(communicator) > 1)
+            {
+              Epetra_Map nonlocal_map =
+                nonlocal_entries.make_trilinos_map(communicator, true);
+              nonlocal_vector.reset(new Epetra_MultiVector(nonlocal_map, 1));
+            }
+        }
     }
 
 
     Vector &
     Vector::operator = (const Vector &v)
     {
-      // distinguish three cases. First case: both
-      // vectors have the same layout (just need to
-      // copy the local data, not reset the memory
-      // and the underlying Epetra_Map). The third
-      // case means that we have to rebuild the
-      // calling vector.
+      // distinguish three cases. First case: both vectors have the same
+      // layout (just need to copy the local data, not reset the memory and
+      // the underlying Epetra_Map). The third case means that we have to
+      // rebuild the calling vector.
       if (vector->Map().SameAs(v.vector->Map()))
         {
           *vector = *v.vector;
+          if (v.nonlocal_vector.get() != 0)
+            nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
           last_action = Zero;
         }
       // Second case: vectors have the same global
@@ -389,6 +409,9 @@ namespace TrilinosWrappers
           has_ghosts = v.has_ghosts;
         }
 
+      if (v.nonlocal_vector.get() != 0)
+        nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
+      
       return *this;
     }
 
@@ -397,6 +420,8 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator = (const TrilinosWrappers::Vector &v)
     {
+      nonlocal_vector.reset();
+
       Assert (size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
       Epetra_Import data_exchange (vector->Map(), v.vector->Map());

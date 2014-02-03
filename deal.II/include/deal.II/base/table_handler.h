@@ -387,25 +387,25 @@ public:
    * <tt>new_order</tt> includes the
    * keys and superkeys of the
    * columns and supercolumns in
-   * the order the user like to.
+   * the order the user would like them to be output.
    * If a superkey is included the
    * keys of the subcolumns need
-   * not to be additionally
+   * not be explicitly
    * mentioned in this vector.  The
    * order of subcolumns within a
    * supercolumn is not changeable
-   * and keeps the order in which
+   * and remains in the order in which
    * the columns are added to the
    * supercolumn.
    *
    * This function may also be used
    * to break big tables with too
    * many columns into smaller
-   * ones. Call this function with
-   * the first e.g. five columns
-   * and then <tt>write_*</tt>.
-   * Afterwards call this function
-   * with the next e.g. five
+   * ones. For example, you can call this function with
+   * the first five columns
+   * and then call one of the <tt>write_*</tt> functions,
+   * then call this function
+   * with the next five
    * columns and again <tt>write_*</tt>,
    * and so on.
    */

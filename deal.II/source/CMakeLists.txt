@@ -14,19 +14,17 @@
 ##
 ## ---------------------------------------------------------------------
 
-MESSAGE(STATUS "Setup library")
+MESSAGE(STATUS "Setting up library")
 
 #
 # Compile the deal.II library
 #
 
 INCLUDE_DIRECTORIES(
-  BEFORE # Ensure deal.II include directories come first
-  #
-  # Reverse order due to BEFORE:
-  #
-  ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_BINARY_DIR}/include/
+  ${CMAKE_SOURCE_DIR}/include/
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
   )
 
 #
@@ -51,9 +49,6 @@ ADD_SUBDIRECTORY(integrators)
 ADD_SUBDIRECTORY(matrix_free)
 ADD_SUBDIRECTORY(meshworker)
 
-# A custom target to build the library:
-ADD_CUSTOM_TARGET(build_library)
-
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${build} build_lowercase)
 
@@ -68,9 +63,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     dummy.cc # Workaround for a bug in the Xcode generator
     ${deal_ii_objects_${build_lowercase}}
     )
-
-  ADD_DEPENDENCIES(build_library ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
-  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+  ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
 
   SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     PROPERTIES
@@ -91,8 +84,8 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     )
 
   TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
-    ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
-    ${DEAL_II_EXTERNAL_LIBRARIES}
+    ${DEAL_II_LIBRARIES_${build}}
+    ${DEAL_II_LIBRARIES}
     )
 
   FILE(MAKE_DIRECTORY
@@ -104,11 +97,11 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     )
 
   INSTALL(TARGETS ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+    COMPONENT library
     EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
     RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
     LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
-    COMPONENT library
     )
 ENDFOREACH()
 
@@ -117,4 +110,4 @@ INSTALL(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
   COMPONENT library
   )
 
-MESSAGE(STATUS "Setup library - Done")
+MESSAGE(STATUS "Setting up library - Done")

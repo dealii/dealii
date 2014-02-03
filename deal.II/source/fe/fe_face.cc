@@ -86,10 +86,14 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
         for (unsigned int e=0, c=0; e<dim; ++e)
           if (d!=e)
             {
+              // faces in y-direction are oriented differently
+              unsigned int renumber = i;
+              if (dim == 3 && d == 1)
+                renumber = i/(degree+1)+(degree+1)*(i%(degree+1));
               this->unit_support_points[n_face_dofs*2*d+i][e] =
-                this->unit_face_support_points[i][c];
+                this->unit_face_support_points[renumber][c];
               this->unit_support_points[n_face_dofs*(2*d+1)+i][e] =
-                this->unit_face_support_points[i][c];
+                this->unit_face_support_points[renumber][c];
               this->unit_support_points[n_face_dofs*(2*d+1)+i][d] = 1;
               ++c;
             }
@@ -280,6 +284,18 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 
   Assert (false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
+}
+
+
+
+template <int dim, int spacedim>
+Table<2,bool>
+FE_FaceQ<dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    constant_modes(0,i) = true;
+  return constant_modes;
 }
 
 
@@ -494,6 +510,19 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
     AssertThrow (false,(typename FiniteElement<dim,spacedim>::
                         ExcInterpolationNotImplemented()));
 }
+
+
+
+template <int dim, int spacedim>
+Table<2,bool>
+FE_FaceP<dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    constant_modes(0, face*this->dofs_per_face) = true;
+  return constant_modes;
+}
+
 
 
 // explicit instantiations

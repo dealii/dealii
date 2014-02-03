@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# Setup cached variables (prior to the PROJECT(deal.II) call)
+# Set up cached variables (prior to the PROJECT(deal.II) call)
 #
 # This file sets up the following cached Options:
 #
@@ -40,18 +40,26 @@
 #     DEAL_II_PREFER_STATIC_LIBS
 #     DEAL_II_STATIC_EXECUTABLE
 #     CMAKE_INSTALL_RPATH_USE_LINK_PATH
-#     CMAKE_CXX_FLAGS                   *)
-#     DEAL_II_LINKER_FLAGS              *)
+#     DEAL_II_CXX_FLAGS                    *)
 #     DEAL_II_CXX_FLAGS_DEBUG
-#     DEAL_II_LINKER_FLAGS_DEBUG
 #     DEAL_II_CXX_FLAGS_RELEASE
+#     DEAL_II_LINKER_FLAGS                 *)
+#     DEAL_II_LINKER_FLAGS_DEBUG
 #     DEAL_II_LINKER_FLAGS_RELEASE
+#
 #     DEAL_II_WITH_64BIT_INDICES
+#
+# Miscellaneous options:
+#     DEAL_II_DOXYGEN_USE_MATHJAX
+#
 #
 # *)  May also be set via environment variable (CXXFLAGS, LDFLAGS)
 #     (a nonempty cached variable has precedence and will not be
 #     overwritten by environment)
 #
+
+MESSAGE(STATUS "")
+MESSAGE(STATUS "Setting up cached variables.")
 
 
 ########################################################################
@@ -95,7 +103,7 @@ OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
   )
 
 OPTION(DEAL_II_ALLOW_AUTODETECTION
-  "Allow to automatically setup features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
+  "Allow to automatically set up features by setting all undefined DEAL_II_WITH_* variables to ON or OFF"
   ON
   )
 
@@ -103,6 +111,7 @@ OPTION(DEAL_II_FORCE_AUTODETECTION
   "Force feature autodetection by undefining all DEAL_II_WITH_* variables prior to configure"
   OFF
   )
+
 
 
 ########################################################################
@@ -114,16 +123,15 @@ OPTION(DEAL_II_FORCE_AUTODETECTION
 #
 # Setup CMAKE_BUILD_TYPE:
 #
+
 SET(CMAKE_BUILD_TYPE
   "DebugRelease"
   CACHE STRING
   "Choose the type of build, options are: Debug, Release and DebugRelease."
   )
 
-#
 # This is cruel, I know. But it is better to only have a known number of
 # options for CMAKE_BUILD_TYPE...
-#
 IF( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
     NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND
     NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease" )
@@ -132,6 +140,9 @@ IF( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
     )
 ENDIF()
 
+#
+# Configuration behaviour:
+#
 
 OPTION(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   "Allow platform introspection for CPU command sets, SSE and AVX"
@@ -149,7 +160,7 @@ OPTION(DEAL_II_SETUP_COVERAGE
   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
   OFF
   )
-MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+MARK_AS_ADVANCED(DEAL_II_SETUP_COVERAGE)
 
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"
@@ -178,11 +189,6 @@ IF(DEAL_II_STATIC_EXECUTABLE)
     )
 ENDIF()
 
-
-#
-# Set CMAKE_INSTALL_RPATH_USE_LINK_PATH to default to ON and promote to
-# cache so that the user can see the value.
-#
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
   "Set the rpath of the library to the external link pathes on installation"
   )
@@ -190,47 +196,43 @@ MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 
 
 #
-# Define the variable that defines whether we should use 32- or 64-bit
-# global DoF indices.
+# Translate CMake specific variables to deal.II naming:
 #
-OPTION(DEAL_II_WITH_64BIT_INDICES
-  "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
-  OFF
-  )
 
-
-#
-# Tell the user very prominently, that we're doing things differently w.r.t
-# CMAKE_(C|CXX)_FLAGS_(DEBUG|RELEASE)
-#
-FOREACH(_flag
-  CXX_FLAGS_RELEASE
-  CXX_FLAGS_DEBUG
-  SHARED_LINKER_FLAGS_RELEASE
-  SHARED_LINKER_FLAGS_DEBUG
-  )
+FOREACH(_flag CXX_FLAGS CXX_FLAGS_RELEASE CXX_FLAGS_DEBUG)
   IF(NOT "${CMAKE_${_flag}}" STREQUAL "")
-    UNSET(${CMAKE_${_flag}} CACHE)
-    MESSAGE(FATAL_ERROR
-      "\nThe deal.II cmake build system does not use CMAKE_${_flag}.\n"
-      "Use DEAL_II_${_flag}, instead!\n\n"
+    MESSAGE(STATUS
+      "Prepending \${CMAKE_${_flag}} to \${DEAL_II_${_flag}}"
       )
+    SET(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
   ENDIF()
 ENDFOREACH()
 
+FOREACH(_flag LINKER_FLAGS LINKER_FLAGS_DEBUG LINKER_FLAGS_RELEASE)
+  IF(NOT "${CMAKE_SHARED_${_flag}}" STREQUAL "")
+    MESSAGE(STATUS
+      "Prepending \${CMAKE_SHARED_${_flag}} to \${DEAL_II_${_flag}}"
+      )
+    SET(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
+  ENDIF()
+ENDFOREACH()
 
 #
-# Hide all unused compiler flag variables:
+# Hide all unused CMake variables:
 #
-FOREACH(_flag
+
+SET(DEAL_II_REMOVED_FLAGS
+  CMAKE_CXX_FLAGS
   CMAKE_CXX_FLAGS_RELEASE
   CMAKE_CXX_FLAGS_DEBUG
   CMAKE_CXX_FLAGS_MINSIZEREL
   CMAKE_CXX_FLAGS_RELWITHDEBINFO
+  CMAKE_C_FLAGS
   CMAKE_C_FLAGS_RELEASE
   CMAKE_C_FLAGS_DEBUG
   CMAKE_C_FLAGS_MINSIZEREL
   CMAKE_C_FLAGS_RELWITHDEBINFO
+  CMAKE_Fortran_FLAGS
   CMAKE_Fortran_FLAGS_RELEASE
   CMAKE_Fortran_FLAGS_DEBUG
   CMAKE_Fortran_FLAGS_MINSIZEREL
@@ -241,44 +243,60 @@ FOREACH(_flag
   CMAKE_SHARED_LINKER_FLAGS_RELEASE
   CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO
   )
+FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
   # Go away...
-  SET(${_flag} "" CACHE INTERNAL "" FORCE)
+  SET(${_flag} ${${_flag}} CACHE INTERNAL "" FORCE)
+  # Also set it to an empty string for the configuration run so that it
+  # does not confuse the build system (to unset is not an option - it is
+  # cached...)
+  SET(${_flag} "")
 ENDFOREACH()
 
+#
+# Promote our configuration variables to cache:
+#
 
-#
-# Set cached compiler flags to an empty string:
-#
 SET(DEAL_II_USED_FLAGS
-  CMAKE_CXX_FLAGS
+  DEAL_II_CXX_FLAGS
   DEAL_II_CXX_FLAGS_DEBUG
   DEAL_II_CXX_FLAGS_RELEASE
   DEAL_II_LINKER_FLAGS
   DEAL_II_LINKER_FLAGS_DEBUG
   DEAL_II_LINKER_FLAGS_RELEASE
   )
-
 FOREACH(_flag ${DEAL_II_USED_FLAGS})
   #
   # Promote to cache:
   #
   SET(${_flag} "${${_flag}}" CACHE STRING
-   "The user supplied cache variable will be appended _at the end_ of the auto generated ${_flag} variable"
-   )
-
-  #
-  # Save the initial (cached) variable at this point and clear it.
-  # ${flags}_SAVED will be appended to ${flags} in
-  # setup_finalize.cmake (called at the end of the
-  # main CMakeLists.txt file).
-  #
-  SET(${_flag}_SAVED "${${_flag}}")
-  SET(${_flag} "")
-
-  #
-  # Mark these flags as advanced.
-  #
+    "The user supplied cache variable will be appended _at the end_ of the configuration step to the auto generated ${_flag} variable"
+    )
   MARK_AS_ADVANCED(${_flag})
+
+  #
+  # The order of compiler and linker flags is important. In order to
+  # provide an override mechanism we have to save the initial (cached)
+  # variable at this point and clear it.
+  # ${flags}_SAVED will be appended to ${flags} again in
+  # setup_finalize.cmake (called at the end of the main CMakeLists.txt
+  # file).
+  #
+  SET(${_flag}_SAVED ${${_flag}})
+  SET(${_flag} "")
+ENDFOREACH()
+
+FOREACH(_variable
+  DEAL_II_DEFINITIONS
+  DEAL_II_DEFINITIONS_DEBUG
+  DEAL_II_DEFINITIONS_RELEASE
+  )
+  #
+  # Promote to cache:
+  #
+  SET(${_variable} ${${_variable}} CACHE STRING
+    "Additional, user supplied compile definitions"
+    )
+  MARK_AS_ADVANCED(${_variable})
 ENDFOREACH()
 
 
@@ -286,22 +304,32 @@ ENDFOREACH()
 # Finally, read in CXXFLAGS and LDFLAGS from environment and prepend them
 # to the saved variables:
 #
-SET(CMAKE_CXX_FLAGS_SAVED "$ENV{CXXFLAGS} ${CMAKE_CXX_FLAGS_SAVED}")
+# Also strip leading and trailing whitespace from linker flags to make
+# old cmake versions happy
+#
+SET(DEAL_II_CXX_FLAGS_SAVED "$ENV{CXXFLAGS} ${DEAL_II_CXX_FLAGS_SAVED}")
+STRING(STRIP "${DEAL_II_CXX_FLAGS_SAVED}" DEAL_II_CXX_FLAGS_SAVED)
 SET(DEAL_II_LINKER_FLAGS_SAVED "$ENV{LDFLAGS} ${DEAL_II_LINKER_FLAGS_SAVED}")
+STRING(STRIP "${DEAL_II_LINKER_FLAGS_SAVED}" DEAL_II_LINKER_FLAGS_SAVED)
 UNSET(ENV{CXXFLAGS})
 UNSET(ENV{LDFLAGS})
 
+
+
+########################################################################
+#                                                                      #
+#                             Components:                              #
+#                                                                      #
+########################################################################
+
 #
-# Also respect DEAL_II_CXX_FLAGS - it just too easy to accientally write
-# DEAL_II_CXX_FLAGS instead of CMAKE_CXX_FLAGS... (this was a poor design
-# choice, I know...)
+# Configuration option for the 64 bit indices component:
 #
-IF(NOT "${DEAL_II_CXX_FLAGS}" STREQUAL "")
-  MESSAGE(STATUS
-    "Appending \${DEAL_II_CXX_FLAGS} to saved \${CMAKE_CXX_FLAGS}"
-    )
-  SET(CMAKE_CXX_FLAGS_SAVED "${CMAKE_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS}")
-ENDIF()
+
+OPTION(DEAL_II_WITH_64BIT_INDICES
+  "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
+  OFF
+  )
 
 
 
@@ -310,6 +338,12 @@ ENDIF()
 #                         Miscellaneous setup:                         #
 #                                                                      #
 ########################################################################
+
+OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
+  "If set to ON, doxygen documentation is generated using mathjax"
+  OFF
+  )
+MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
 
 #
 # We do not support installation into the binary directory any more ("too
@@ -323,11 +357,22 @@ It is not possible to install into the build directory. Please set
 CMAKE_INSTALL_PREFIX to a designated install directory different than
 CMAKE_BINARY_DIR.
 (Please note that you can use deal.II directly out of a build directory
-if this is what you tried to do.)
+without the need to install it, if this is what you tried to do.)
 "
     )
 ENDIF()
 
+#
+# Compatibility renaming:
+#
+
+IF(DEFINED DEAL_II_HAVE_CXX11_FLAG AND NOT DEAL_II_HAVE_CXX11_FLAG)
+  SET(DEAL_II_WITH_CXX11 FALSE CACHE BOOL "" FORCE)
+ENDIF()
+
+#
+# Miscellaneous renaming:
+#
 
 GET_CMAKE_PROPERTY(_res VARIABLES)
 FOREACH(_var ${_res})

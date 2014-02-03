@@ -5469,6 +5469,19 @@ const
 }
 
 
+
+template <int dim>
+Table<2,bool>
+FE_Nedelec<dim>::get_constant_modes() const
+{
+  Table<2,bool> constant_modes(dim, this->dofs_per_cell);
+  for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+      constant_modes(d,i) = true;
+  return constant_modes;
+}
+
+
 template <int dim>
 std::size_t
 FE_Nedelec<dim>::memory_consumption () const

@@ -306,7 +306,7 @@ namespace Step12
      &AdvectionProblem<dim>::integrate_cell_term,
      &AdvectionProblem<dim>::integrate_boundary_term,
      &AdvectionProblem<dim>::integrate_face_term,
-     assembler, true);
+     assembler);
   }
 
 

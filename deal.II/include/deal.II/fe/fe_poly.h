@@ -162,6 +162,7 @@ public:
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
                                                    const Point<dim> &p,
                                                    const unsigned int component) const;
+
 protected:
 
   virtual

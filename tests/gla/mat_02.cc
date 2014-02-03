@@ -45,6 +45,7 @@ void test ()
   IndexSet local_relevant= local_active;
   if (myid==1)
     local_relevant.add_range(5,10);
+  local_relevant.add_range(0,1);
 
   CompressedSimpleSparsityPattern csp (local_relevant);
 
@@ -52,8 +53,7 @@ void test ()
     if (local_relevant.is_element(i))
       csp.add(i,i);
 
-  if (myid==0)
-    csp.add(0,1);
+  csp.add(0,1);
 
   typename LA::MPI::SparseMatrix mat;
   mat.reinit (local_active, local_active, csp, MPI_COMM_WORLD);

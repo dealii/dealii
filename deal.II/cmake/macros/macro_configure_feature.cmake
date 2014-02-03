@@ -100,14 +100,15 @@ or set the relevant variables by hand in ccmake."
       )
   ELSE()
     SET(_hint_snippet
-      "or set the relevant variables by hand in ccmake."
+      " or set the relevant variables by hand in ccmake."
       )
   ENDIF()
 
   IF(FEATURE_${_feature}_HAVE_BUNDLED)
     SET(_bundled_snippet
-      "\n\nAlternatively you may choose to compile the bundled library of
-${_feature_lowercase} by setting DEAL_II_ALLOW_BUNDLED=on or\nDEAL_II_FORCE_BUNDLED_${_feature}=on.\n"
+      "\nAlternatively you may choose to compile the bundled library of "
+      "${_feature_lowercase} by setting DEAL_II_ALLOW_BUNDLED=on or "
+      "DEAL_II_FORCE_BUNDLED_${_feature}=on.\n"
       )
   ELSE()
     SET(_bundled_snippet "\n")
@@ -117,7 +118,7 @@ ${_feature_lowercase} by setting DEAL_II_ALLOW_BUNDLED=on or\nDEAL_II_FORCE_BUND
     "Could not find the ${_feature_lowercase} library!\n"
     ${${_feature}_ADDITIONAL_ERROR_STRING}
     "Please ensure that a suitable ${_feature_lowercase} library is installed on your computer.\n"
-    "If the library is not at a default location, either provide some hints\n"
+    "If the library is not at a default location, either provide some hints "
     "for autodetection,${_hint_snippet}${_bundled_snippet}"
     )
 ENDMACRO()
@@ -156,8 +157,8 @@ MACRO(CONFIGURE_FEATURE _feature)
     STRING(REGEX REPLACE "^DEAL_II_WITH_" "" _dependency ${_dependency})
     IF(NOT FEATURE_${_dependency}_PROCESSED)
       MESSAGE(FATAL_ERROR "\n"
-        "Internal build system error:\nDEAL_II_WITH_${_feature} depends on "
-        "DEAL_II_WITH_${_dependency},\nbut CONFIGURE_FEATURE(${_feature}) "
+        "Internal build system error: DEAL_II_WITH_${_feature} depends on "
+        "DEAL_II_WITH_${_dependency}, but CONFIGURE_FEATURE(${_feature}) "
         "was called before CONFIGURE_FEATURE(${_dependency}).\n\n"
         )
     ENDIF()
@@ -208,6 +209,7 @@ MACRO(CONFIGURE_FEATURE _feature)
         IF(FEATURE_${_feature}_HAVE_BUNDLED)
           RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
+          LIST(APPEND DEAL_II_FEATURES ${_feature})
           SET(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
           SET_CACHED_OPTION(${_feature} ON)
         ELSE()
@@ -232,11 +234,10 @@ MACRO(CONFIGURE_FEATURE _feature)
 
           IF(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
             RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
-          ELSE()
-            REGISTER_FEATURE(${_feature})
           ENDIF()
 
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
+          LIST(APPEND DEAL_II_FEATURES ${_feature})
           SET(FEATURE_${_feature}_EXTERNAL_CONFIGURED TRUE)
           SET_CACHED_OPTION(${_feature} ON)
 
@@ -246,9 +247,12 @@ MACRO(CONFIGURE_FEATURE _feature)
 
           IF(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
             RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+
             MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
+            LIST(APPEND DEAL_II_FEATURES ${_feature})
             SET(FEATURE_${_feature}_BUNDLED_CONFIGURED TRUE)
             SET_CACHED_OPTION(${_feature} ON)
+
           ELSE()
             IF(DEAL_II_WITH_${_feature})
               IF(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)

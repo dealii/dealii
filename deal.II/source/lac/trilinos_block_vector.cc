@@ -31,7 +31,7 @@ namespace TrilinosWrappers
     // by calling either the 32- or 64-bit function necessary, and returns the
     // result in the correct data type so that we can use it in calling other
     // Epetra member functions that are overloaded by index type
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     int n_global_elements (const Epetra_BlockMap &map)
     {
       return map.NumGlobalElements();
@@ -146,7 +146,8 @@ namespace TrilinosWrappers
     void
     BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
                          const std::vector<IndexSet> &ghost_values,
-                         const MPI_Comm              &communicator)
+                         const MPI_Comm              &communicator,
+                         const bool                   vector_writable)
     {
       const size_type no_blocks = parallel_partitioning.size();
       std::vector<size_type> block_sizes (no_blocks);
@@ -161,7 +162,8 @@ namespace TrilinosWrappers
         components.resize(n_blocks());
 
       for (size_type i=0; i<n_blocks(); ++i)
-        components[i].reinit(parallel_partitioning[i], ghost_values[i], communicator);
+        components[i].reinit(parallel_partitioning[i], ghost_values[i],
+                             communicator, vector_writable);
 
       collect_sizes();
     }

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1530,7 +1530,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   Point<3> camera_direction_temp;
   Point<3> camera_horizontal_temp;
 
-  const float angle_factor = 3.14159265 / 180.;
+  const double angle_factor = 3.14159265 / 180.;
 
   // (I) rotate the camera to the chosen polar angle
   camera_position_temp[1] = cos(angle_factor * svg_flags.polar_angle) * camera_position[1] - sin(angle_factor * svg_flags.polar_angle) * camera_position[2];

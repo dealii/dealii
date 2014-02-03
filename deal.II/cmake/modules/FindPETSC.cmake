@@ -123,13 +123,18 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
   # Link line:
   #
 
-  FILE(STRINGS "${PETSC_PETSCVARIABLES}" _external_link_line
+  FILE(STRINGS "${PETSC_PETSCVARIABLES}" PETSC_EXTERNAL_LINK_LINE
     REGEX "^PETSC_WITH_EXTERNAL_LIB =.*")
-  SEPARATE_ARGUMENTS(_external_link_line)
+  SEPARATE_ARGUMENTS(PETSC_EXTERNAL_LINK_LINE)
+
+  IF(NOT "${PETSC_EXTERNAL_LINK_LINE}" STREQUAL "${PETSC_EXTERNAL_LINK_LINE_SAVED}")
+    SET(_new_petsc_external_link_line TRUE)
+  ENDIF()
+  SET(PETSC_EXTERNAL_LINK_LINE_SAVED "${PETSC_EXTERNAL_LINK_LINE}" CACHE INTERNAL "" FORCE)
 
   SET(_hints)
   SET(_petsc_libraries)
-  FOREACH(_token ${_external_link_line}})
+  FOREACH(_token ${PETSC_EXTERNAL_LINK_LINE}})
     IF(_token MATCHES "^-L")
       # Build up hints with the help of all tokens passed with -L:
       STRING(REGEX REPLACE "^-L" "" _token "${_token}")
@@ -137,7 +142,17 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
     ELSEIF(_token MATCHES "^-l")
       # Search for every library that was specified with -l:
       STRING(REGEX REPLACE "^-l" "" _token "${_token}")
-      IF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
+
+      IF(_new_petsc_external_link_line)
+        UNSET(PETSC_LIBRARY_${_token} CACHE)
+      ENDIF()
+
+      IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
+        FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
+        IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
+          LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
+        ENDIF()
+      ELSEIF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
         FIND_LIBRARY(PETSC_LIBRARY_${_token}
           NAMES ${_token}
           HINTS ${_hints}
@@ -145,18 +160,12 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
         IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
           LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
         ENDIF()
-        #
-        # Remove from cache, so that updating PETSC search paths will
-        # find a (possibly) new link interface
-        #
-        UNSET(PETSC_LIBRARY_${_token} CACHE)
       ENDIF()
+
     ENDIF()
   ENDFOREACH()
 
 ENDIF()
-
-
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(PETSC DEFAULT_MSG
   PETSC_LIBRARY

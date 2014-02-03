@@ -611,9 +611,9 @@ namespace MGTools
                 typename DoFHandler<dim,spacedim>::cell_iterator
                 neighbor = cell->neighbor(face);
                 neighbor->get_mg_dof_indices (dofs_on_other_cell);
-                // only add one direction
-                // The other is taken care of
-                // by neighbor.
+                // only add one direction The other is taken care of by
+                // neighbor (except when the neighbor is not owned by the same
+                // processor)
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   {
                     for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -622,6 +622,15 @@ namespace MGTools
                                       dofs_on_other_cell[j]);
                       }
                   }
+                if (neighbor->is_locally_owned_on_level() == false)
+                  for (unsigned int i=0; i<dofs_per_cell; ++i)
+                    for (unsigned int j=0; j<dofs_per_cell; ++j)
+                      {
+                        sparsity.add (dofs_on_other_cell[i],
+                                      dofs_on_other_cell[j]);
+                        sparsity.add (dofs_on_other_cell[i],
+                                      dofs_on_this_cell[j]);
+                      }
               }
           }
       }
@@ -1213,7 +1222,7 @@ namespace MGTools
         for (; cell!=endc; ++cell)
           {
             if (dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
-                && cell->level_subdomain_id()!=dof.get_tria().locally_owned_subdomain())
+                && cell->level_subdomain_id()==numbers::artificial_subdomain_id)
               continue;
             const FiniteElement<dim> &fe = cell->get_fe();
             const unsigned int level = cell->level();
@@ -1247,7 +1256,7 @@ namespace MGTools
         endc = dof.end();
         for (; cell!=endc; ++cell)
           if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
-              || cell->level_subdomain_id()==dof.get_tria().locally_owned_subdomain())
+              || cell->level_subdomain_id()!=numbers::artificial_subdomain_id)
             for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
                  ++face_no)
               {
@@ -1416,7 +1425,7 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs)
+                                std::vector<IndexSet>  &interface_dofs)
   {
     Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (interface_dofs.size(),
@@ -1427,10 +1436,7 @@ namespace MGTools
         Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
                 ExcDimensionMismatch (interface_dofs[l].size(),
                                       mg_dof_handler.n_dofs(l)));
-
-        std::fill (interface_dofs[l].begin(),
-                   interface_dofs[l].end(),
-                   false);
+       interface_dofs[l].clear();
       }
 
     const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
@@ -1475,7 +1481,29 @@ namespace MGTools
 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           if (cell_dofs[i])
-            interface_dofs[level][local_dof_indices[i]] = true;
+            interface_dofs[level].add_index(local_dof_indices[i]);
+      }
+  }
+
+  template <int dim, int spacedim>
+  void
+  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
+                                std::vector<std::vector<bool> >  &interface_dofs)
+  {
+    std::vector<IndexSet> temp;
+    temp.resize(interface_dofs.size());
+    for (unsigned int l=0;l<interface_dofs.size();++l)
+      temp[l] = IndexSet(interface_dofs[l].size());
+
+    extract_inner_interface_dofs(mg_dof_handler, temp);
+
+    for (unsigned int l=0;l<interface_dofs.size();++l)
+      {
+        Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
+                ExcDimensionMismatch (interface_dofs[l].size(),
+                                      mg_dof_handler.n_dofs(l)));
+
+        temp[l].fill_binary_vector(interface_dofs[l]);
       }
   }
 
@@ -1552,8 +1580,8 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs,
-                                std::vector<std::vector<bool> >  &boundary_interface_dofs)
+                                std::vector<IndexSet>  &interface_dofs,
+                                std::vector<IndexSet>  &boundary_interface_dofs)
   {
     Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (interface_dofs.size(),
@@ -1562,22 +1590,10 @@ namespace MGTools
             ExcDimensionMismatch (boundary_interface_dofs.size(),
                                   mg_dof_handler.get_tria().n_global_levels()));
 
-    for (unsigned int l=0; l<mg_dof_handler.get_tria().n_global_levels(); ++l)
-      {
-        Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
-                ExcDimensionMismatch (interface_dofs[l].size(),
-                                      mg_dof_handler.n_dofs(l)));
-        Assert (boundary_interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
-                ExcDimensionMismatch (boundary_interface_dofs[l].size(),
-                                      mg_dof_handler.n_dofs(l)));
-
-        std::fill (interface_dofs[l].begin(),
-                   interface_dofs[l].end(),
-                   false);
-        std::fill (boundary_interface_dofs[l].begin(),
-                   boundary_interface_dofs[l].end(),
-                   false);
-      }
+    std::vector<std::vector<types::global_dof_index> >
+      tmp_interface_dofs(interface_dofs.size());
+    std::vector<std::vector<types::global_dof_index> >
+      tmp_boundary_interface_dofs(interface_dofs.size());
 
     const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
 
@@ -1625,12 +1641,14 @@ namespace MGTools
               }
           }
 
-        if (has_coarser_neighbor == true)
-          for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
-            if (cell->at_boundary(face_nr))
-              for (unsigned int j=0; j<dofs_per_face; ++j)
+        if (has_coarser_neighbor == false)
+          continue;
+
+        for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
+          if (cell->at_boundary(face_nr))
+            for (unsigned int j=0; j<dofs_per_face; ++j)
 //            if (cell_dofs[fe.face_to_cell_index(j,face_nr)] == true) //is this necessary?
-                boundary_cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+              boundary_cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
 
 
         const unsigned int level = cell->level();
@@ -1639,12 +1657,31 @@ namespace MGTools
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             if (cell_dofs[i])
-              interface_dofs[level][local_dof_indices[i]] = true;
+              tmp_interface_dofs[level].push_back(local_dof_indices[i]);
 
             if (boundary_cell_dofs[i])
-              boundary_interface_dofs[level][local_dof_indices[i]] = true;
+              tmp_boundary_interface_dofs[level].push_back(local_dof_indices[i]);
           }
       }
+
+
+    for (unsigned int l=0; l<mg_dof_handler.get_tria().n_global_levels(); ++l)
+      {
+        interface_dofs[l].clear();
+        std::sort(tmp_interface_dofs[l].begin(), tmp_interface_dofs[l].end());
+        interface_dofs[l].add_indices(tmp_interface_dofs[l].begin(),
+                                      std::unique(tmp_interface_dofs[l].begin(),
+                                                  tmp_interface_dofs[l].end()));
+        interface_dofs[l].compress();
+        boundary_interface_dofs[l].clear();
+        std::sort(tmp_boundary_interface_dofs[l].begin(),
+                  tmp_boundary_interface_dofs[l].end());
+        boundary_interface_dofs[l].add_indices(tmp_boundary_interface_dofs[l].begin(),
+                                               std::unique(tmp_boundary_interface_dofs[l].begin(),
+                                                           tmp_boundary_interface_dofs[l].end()));
+        boundary_interface_dofs[l].compress();
+      }
+
   }
 
 

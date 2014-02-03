@@ -856,7 +856,7 @@ namespace StandardExceptions
  * @author Guido Kanschat 2007
  */
 #define AssertDimension(dim1,dim2) Assert((dim1) == (dim2),       \
-                                          ExcDimensionMismatch((dim1),(dim2)))
+                                          dealii::ExcDimensionMismatch((dim1),(dim2)))
 
 
 /**
@@ -886,7 +886,7 @@ namespace StandardExceptions
  * @author Guido Kanschat 2007
  */
 #define AssertIndexRange(index,range) Assert((index) < (range), \
-                                             ExcIndexRange((index),0,(range)))
+                                             dealii::ExcIndexRange((index),0,(range)))
 
 #define AssertGlobalIndexRange(index,range) Assert((index) < (range), \
                                                    ExcIndexRange<types::global_dof_index>((index),0,(range)))

@@ -1000,19 +1000,44 @@ namespace DoFTools
         n_selected_dofs += std::count (dofs_by_component.begin(),
                                        dofs_by_component.end(), i);
 
+    // Find local numbering within the selected components
+    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+    std::vector<unsigned int> component_numbering(locally_owned_dofs.n_elements(),
+                                                  numbers::invalid_unsigned_int);
+    for (unsigned int i=0, count=0; i<locally_owned_dofs.n_elements(); ++i)
+      if (component_mask[dofs_by_component[i]])
+        component_numbering[i] = count++;
+
     // First count the number of dofs in the current component.
     constant_modes.resize (n_components_selected, std::vector<bool>(n_selected_dofs,
                            false));
-    std::vector<unsigned int> component_list (n_components, 0);
-    for (unsigned int d=0; d<n_components; ++d)
-      component_list[d] = component_mask[d];
 
-    unsigned int counter = 0;
-    for (unsigned int i=0; i<dof_handler.n_locally_owned_dofs(); ++i)
-      if (component_mask[dofs_by_component[i]])
+    // Loop over all owned cells and ask the element for the constant modes
+    const dealii::hp::FECollection<DH::dimension,DH::space_dimension>
+      fe_collection (dof_handler.get_fe());
+    std::vector<Table<2,bool> > element_constant_modes;
+    for (unsigned int f=0; f<fe_collection.size(); ++f)
+      element_constant_modes.push_back(fe_collection[f].get_constant_modes());
+
+    typename DH::active_cell_iterator cell = dof_handler.begin_active(),
+                                      endc = dof_handler.end();
+    std::vector<types::global_dof_index> dof_indices;
+    for (; cell!=endc; ++cell)
+      if (cell->is_locally_owned())
         {
-          constant_modes[localized_component[dofs_by_component[i]]][counter] = true;
-          ++counter;
+          dof_indices.resize(cell->get_fe().dofs_per_cell);
+          cell->get_dof_indices(dof_indices);
+
+          for (unsigned int i=0; i<dof_indices.size(); ++i)
+            if (locally_owned_dofs.is_element(dof_indices[i]))
+              {
+                const unsigned int loc_index =
+                  locally_owned_dofs.index_within_set(dof_indices[i]);
+                const unsigned int comp = dofs_by_component[loc_index];
+                if (component_mask[comp])
+                  constant_modes[localized_component[comp]][component_numbering[loc_index]] =
+                    element_constant_modes[cell->active_fe_index()](comp,i);
+              }
         }
   }
 

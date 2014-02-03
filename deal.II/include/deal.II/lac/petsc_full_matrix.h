@@ -50,26 +50,52 @@ namespace PETScWrappers
   class FullMatrix : public MatrixBase
   {
   public:
+    
     /**
      * Declare type for container size.
      */
     typedef types::global_dof_index size_type;
 
+
     /**
-     * Create a full matrix of dimensions
-     * @p m times @p n.
+     * Default constructor. Create an empty matrix.
+     */
+    FullMatrix ();
+
+
+    /**
+     * Create a full matrix of dimensions @p m times @p n.
      */
     FullMatrix (const size_type m,
                 const size_type n);
 
+
     /**
-     * Return a reference to the MPI
-     * communicator object in use with this
-     * matrix. Since this is a sequential
-     * matrix, it returns the MPI_COMM_SELF
-     * communicator.
+     * Throw away the present matrix and generate one that has the
+     * same properties as if it were created by the constructor of
+     * this class with the same argument list as the present function.
+     */
+    void reinit (const size_type m,
+                 const size_type n);
+
+
+    /**
+     * Return a reference to the MPI communicator object in use with
+     * this matrix. Since this is a sequential matrix, it returns the
+     * MPI_COMM_SELF communicator.
      */
     virtual const MPI_Comm &get_mpi_communicator () const;
+
+  private:
+
+    /**
+     * Do the actual work for the respective reinit() function and the
+     * matching constructor, i.e. create a matrix. Getting rid of the
+     * previous matrix is left to the caller.
+     */
+    void do_reinit (const size_type m,
+                    const size_type n);
+
   };
 
   /*@}*/

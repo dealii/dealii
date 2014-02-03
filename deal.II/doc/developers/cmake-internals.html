@@ -170,7 +170,7 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
 # All configuration in setup_compiler_flags.cmake and
 # setup_compiler_flags_<compiler>.cmake shall ONLY modify:
 #
-#   CMAKE_CXX_FLAGS
+#   DEAL_II_CXX_FLAGS
 #   DEAL_II_CXX_FLAGS_DEBUG
 #   DEAL_II_CXX_FLAGS_RELEASE
 #   DEAL_II_LINKER_FLAGS
@@ -180,7 +180,7 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
 # All modifications shall be guarded with the ENABLE_IF_SUPPORTED
 # or ENABLE_IF_LINKS macro, e.g.
 #
-#   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
+#   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
 #   ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
 # Compiler flags for platform dependent optimization (such as
@@ -188,7 +188,7 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
 # DEAL_II_ALLOW_PLATFORM_INTROSPECTION:
 #
 #   IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-#     ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-march=native")
+#     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-march=native")
 #   ENDIF()
 #
 # Checks for compiler features (such as C++11 support) and compiler
@@ -292,13 +292,13 @@ CHECK_CXX_COMPILER_FLAG(flag variable)
 </pre>
 
   <li> Necessary compiler flags can easily set in the string variable
-    <code>CMAKE_REQUIRED_FLAGS</code>. There are two small macros
-    that do this job nicely:
+    <code>CMAKE_REQUIRED_FLAGS</code>. There is a small macro that does this
+    job nicely:
 
 <pre class="cmake">
-PUSH_TEST_FLAG("-Werror")
+PUSH_CMAKE_REQUIRED("-Werror")
 CHECK_CXX_SOURCE_COMPILES(...)
-POP_TEST_FLAG()
+RESET_CMAKE_REQUIRED()
 </pre>
 
   <li> Necessary include directories and libraries necessary for
@@ -343,18 +343,19 @@ RESET_CMAKE_REQUIRED()
       <code>FATAL_ERROR</code> must be avoided (the only exception is
       the <code>REQUIRED</code> keyword).
     <li>
-      If successful, the following uncached variables might be set:
-
+      If the feature is successfully found, a subset of the following
+      <b>uncached</b> variables might be set:
 <pre>
 FEATURE_FOUND
-FEATURE_LIBRARIES
+FEATURE_LIBRARIES (with optimized, debug, release keywords)
+FEATURE_LIBRARIES(_DEBUG|_RELEASE)
 FEATURE_INCLUDE_DIRS
-FEATURE_LINKER_FLAGS
+FEATURE_LINKER_FLAGS(|_DEBUG|_RELEASE)
+FEATURE_CXX_FLAGS(|_DEBUG|_RELEASE)
+FEATURE_DEFINITIONS(|_DEBUG|_RELEASE)
 
 FEATURE_VERSION
-FEATURE_VERSION_MAJOR
-FEATURE_VERSION_MINOR
-FEATURE_VERSION_SUBMINOR
+FEATURE_VERSION(_MAJOR|_MINOR|_SUBMINOR)
 </pre>
 
 There are obviously valid exceptions from this rule, though.
@@ -363,6 +364,11 @@ There are obviously valid exceptions from this rule, though.
       "global" variables prefixed by <code>FEATURE_</code> may be
       altered. Do not set <code>DEAL_II_*</code> or <code>CMAKE_*</code>
       variables directly!
+
+    <li>
+      The find module must define a macro <code>FEATURE_CLEAR</code> that
+      unsets all cached variables, so that a subsequent call to the find
+      module starts a completely fresh features search.
     <li>
       A hint with <code>FEATURE_DIR</code> can be set up for
       convenience. It is best to start the <code>Find</code> module by
@@ -400,11 +406,15 @@ SET(FEATURE_DIR "" CACHE PATH "An optional hint to a FEATURE directory")
   module is used to determine whether an external dependency can be
   resolved or not. Depending on the current state of
   <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> (see
-  <a href="../users/cmake.html#configurefeature">here</a>) the variables
+  <a href="../users/cmake.html#configurefeature">here</a>) the
+  configuration variables
 <pre>
 FEATURE_LIBRARIES
-FEATURE_INCLUDE_DIRS
-FEATURE_LINKER_FLAGS
+FEATURE_LIBRARIES(|_DEBUG|_RELEASE)
+FEATURE_(|USER_|BUNDLED_)INCLUDE_DIRS
+FEATURE_LINKER_FLAGS(|_DEBUG|_RELEASE)
+FEATURE_CXX_FLAGS(|_DEBUG|_RELEASE)
+FEATURE_DEFINITIONS(|_DEBUG|_RELEASE)
 </pre>
   are appended to the set of <a href="#variables">global variables</a>
   and <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> is set to
@@ -458,7 +468,7 @@ FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()      (macro)
 </pre>
 
     <li>
-      In <code>./bundled/CMakeLists.txt</code>:
+      In <code>./bundled/configure_bundled.cmake</code>:
 <pre>
 FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED         (a boolean)
   - which should either be set to TRUE if all necessary libraries of the
@@ -492,6 +502,15 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
   <code>LIST(APPEND ...)</code>, flags with <code>ADD_FLAGS(...)</code>
   (or if it is necessary to guard them with
   <code>ENABLE_IF_SUPPORTED(...)</code>.)
+</p>
+<p>
+  <b>Feature configuration must not be added directly to this variables but
+    to corresponding <code>&lt;FEATURE&gt;_*</code> variables, instead.
+  Feature configuration variables get appended to the below list of global
+  configuration variables automatically.</b>
+</p>
+
+
   <ul>
     <li>
       The general (internal) logic for variables applies:
@@ -503,27 +522,32 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
       </ul>
 
     <li>
-      For internal use, for setting necessary linker flags for the deal.II library:
+      For internal and external use, used to keep track of external
+      libraries, the <acronym>deal.II</acronym> library and user
+      programs have to be linked against:
       <ul>
-        <li> <code>DEAL_II_LINKER_FLAGS</code>
-        <li> <code>DEAL_II_LINKER_FLAGS_DEBUG</code>
-        <li> <code>DEAL_II_LINKER_FLAGS_RELEASE</code>
-      </ul>
-
-    <li>
-      For internal use, for setting necessary compiler flags, e.g.
-      <code>-std=c++11</code> (if available):
-      <ul>
-        <li> <code>CMAKE_CXX_FLAGS</code>
-        <li> <code>DEAL_II_CXX_FLAGS_DEBUG</code>
-        <li> <code>DEAL_II_CXX_FLAGS_RELEASE</code>
+        <li> <code>DEAL_II_LIBRARIES</code>
+        <li> <code>DEAL_II_LIBRARIES_DEBUG</code>
+        <li> <code>DEAL_II_LIBRARIES_RELEASE</code>
       </ul>
 
     <li>
       For internal use, for setting necessary include dirs for the compilation of the
       <acronym>deal.II</acronym> library:
       <ul>
-        <li> <code>INCLUDE_DIRECTORIES(...)</code>
+        <li> <code>DEAL_II_INCLUDE_DIRS</code>
+      </ul>
+    <li>
+      Used to keep track of external include dirs, necessary for the
+      compilation of user programs:
+      <ul>
+        <li> <code>DEAL_II_USER_INCLUDE_DIRS</code>
+      </ul>
+    <li>
+      Include dirs from bundled packages necessary for the compilation fo
+      the library and user projects out of the build directory:
+      <ul>
+        <li> <code>DEAL_II_BUNDLED_INCLUDE_DIRS</code>
       </ul>
 
     <li>
@@ -535,17 +559,6 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
         <li> <code>DEAL_II_DEFINITIONS_DEBUG</code>
         <li> <code>DEAL_II_DEFINITIONS_RELEASE</code>
       </ul>
-
-    <li>
-      For internal and external use, used to keep track of external
-      libraries, the <acronym>deal.II</acronym> library and user
-      programs have to be linked against:
-      <ul>
-        <li> <code>DEAL_II_EXTERNAL_LIBRARIES</code>
-        <li> <code>DEAL_II_EXTERNAL_LIBRARIES_DEBUG</code>
-        <li> <code>DEAL_II_EXTERNAL_LIBRARIES_RELEASE</code>
-      </ul>
-
     <li>
       For external use, used to keep track of external preprocessor
       definitions, necessary for the compilation of user programs:
@@ -556,11 +569,22 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
       </ul>
 
     <li>
-      Used to keep track of external include dirs, necessary for the
-      compilation of user programs:
+      For internal and external use, for setting necessary compiler flags,
+      e.g. <code>-std=c++11</code> (if available):
       <ul>
-        <li> <code>DEAL_II_USER_INCLUDE_DIRS</code>
+        <li> <code>DEAL_II_CXX_FLAGS</code>
+        <li> <code>DEAL_II_CXX_FLAGS_DEBUG</code>
+        <li> <code>DEAL_II_CXX_FLAGS_RELEASE</code>
       </ul>
+
+    <li>
+      For internal use, for setting necessary linker flags for the deal.II library:
+      <ul>
+        <li> <code>DEAL_II_LINKER_FLAGS</code>
+        <li> <code>DEAL_II_LINKER_FLAGS_DEBUG</code>
+        <li> <code>DEAL_II_LINKER_FLAGS_RELEASE</code>
+      </ul>
+
   </ul>
 </p>
 

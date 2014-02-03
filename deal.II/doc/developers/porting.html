@@ -41,13 +41,13 @@
           <code>-DDEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF</code> and set all
           necessary compiler flags by hand via
 <pre>
-CMAKE_CXX_FLAGS           - used during all builds
+DEAL_II_CXX_FLAGS         - used during all builds
 DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
 DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
 </pre>
           After that try to compile the library with minimal external
           dependencies (<code>-DDEAL_II_ALLOW_AUTODETECTION=OFF</code>, for
-          further information see the <a href="cmake.html">deal.II CMake
+          further information see the <a href="../users/cmake.html">deal.II CMake
             documentation</a>).
         <li>
           For adding permanent support for the unknown compiler to the

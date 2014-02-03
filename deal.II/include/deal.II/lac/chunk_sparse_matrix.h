@@ -118,7 +118,7 @@ namespace ChunkSparseMatrixIterators
      * Return a reference to the matrix into which this accessor points. Note
      * that in the present case, this is a constant reference.
      */
-    MatrixType &get_matrix () const;
+    const MatrixType &get_matrix () const;
 
   private:
     /**
@@ -791,11 +791,8 @@ public:
              const size_type j) const;
 
   /**
-   * Return the main diagonal
-   * element in the <i>i</i>th
-   * row. This function throws an
-   * error if the matrix is not
-   * quadratic.
+   * Return the main diagonal element in the <i>i</i>th row. This function
+   * throws an error if the matrix is not quadratic.
    *
    * This function is considerably faster than the operator()(), since for
    * quadratic matrices, the diagonal entry may be the first to be stored in
@@ -809,6 +806,21 @@ public:
    * what you do?
    */
   number &diag_element (const size_type i);
+
+  /**
+   * Extracts a copy of the values and indices in the given matrix row.
+   *
+   * The user is expected to pass the length of the arrays column_indices and
+   * values, which gives a means for checking that we do not write to
+   * unallocated memory. This method is motivated by a similar method in
+   * Trilinos row matrices and gives faster access to entries in the matrix as
+   * compared to iterators which are quite slow for this matrix type.
+   */
+  void extract_row_copy (const size_type row,
+                         const size_type array_length,
+                         size_type      &row_length,
+                         size_type      *column_indices,
+                         number         *values) const;
 
 //@}
   /**
@@ -1650,7 +1662,7 @@ namespace ChunkSparseMatrixIterators
 
   template <typename number>
   inline
-  typename Accessor<number, true>::MatrixType &
+  const typename Accessor<number, true>::MatrixType &
   Accessor<number, true>::get_matrix () const
   {
     return *matrix;

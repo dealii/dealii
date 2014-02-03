@@ -9467,7 +9467,9 @@ Triangulation (const Triangulation<dim, spacedim> &other)
   check_for_distorted_cells(other.check_for_distorted_cells),
   vertex_to_boundary_id_map_1d (0)
 {
-  Assert (false, ExcInternalError());
+  Assert (false, ExcMessage ("You are not allowed to call this constructor "
+                             "because copying Triangulation objects is not "
+                             "allowed. Use Triangulation::copy_from() instead."));
 }
 
 

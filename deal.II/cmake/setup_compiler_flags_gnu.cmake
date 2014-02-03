@@ -41,13 +41,13 @@ ENDIF()
 #
 IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
         CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4"))
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-pedantic")
 ENDIF()
 
 #
 # Set the pic flag.
 #
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
 
 #
 # Check whether the -as-needed flag is available. If so set it to link
@@ -58,12 +58,12 @@ ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
 # Setup various warnings:
 #
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wall")
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wpointer-arith")
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wwrite-strings")
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsynth")
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsign-compare")
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wall")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wpointer-arith")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wwrite-strings")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsynth")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsign-compare")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wswitch")
 
 #
 # Newer versions of gcc have a flag -Wunused-local-typedefs that, though in
@@ -71,26 +71,26 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
 # Unfortunately, this warning is included in -W/-Wall, so disable it if the
 # compiler supports it.
 #
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-local-typedefs")
 
 #
 # Disable Wlong-long that will trigger a lot of warnings when compiling
 # with disabled C++11 support:
 #
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 
 #
 # Disable deprecation warnings
 #
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-deprecated")
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
   # Silence Clang warnings about unused parameters:
   #
-  SET(CMAKE_CXX_FLAGS "-Qunused-arguments ${CMAKE_CXX_FLAGS}")
+  SET(DEAL_II_CXX_FLAGS "-Qunused-arguments ${DEAL_II_CXX_FLAGS}")
 
   #
   # *Boy*, clang seems to be the very definition of "pedantic" in
@@ -98,13 +98,13 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # (that are mainly triggered in third party headers so that we cannot
   # easily fix them...)
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-dangling-else")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-newline-eof")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-function")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-private-field")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-variable")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-dangling-else")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-newline-eof")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-private-field")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
 ENDIF()
 
 
@@ -171,7 +171,7 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     #
     # Enable test coverage
     #
-    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fno-elide-constructors")
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-fno-elide-constructors")
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
     ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
   ENDIF()

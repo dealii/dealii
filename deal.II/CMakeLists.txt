@@ -76,8 +76,7 @@ INCLUDE(setup_cached_variables)
 #
 # Now, set the project and set up the rest:
 #
-PROJECT(deal.II CXX)
-ENABLE_LANGUAGE_OPTIONAL(C)
+PROJECT(deal.II CXX C)
 ENABLE_LANGUAGE_OPTIONAL(Fortran)
 
 INCLUDE(setup_deal_ii)
@@ -124,6 +123,8 @@ ENDFOREACH()
 #
 INCLUDE(setup_custom_targets)
 INCLUDE(setup_finalize)
+INCLUDE(setup_write_config)
+#INCLUDE(setup_sanity_checks)
 
 
 ########################################################################

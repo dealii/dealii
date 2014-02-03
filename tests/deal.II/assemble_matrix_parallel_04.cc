@@ -429,6 +429,7 @@ void LaplaceProblem<dim>::assemble_test_1 ()
                           std_cxx1x::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
          Assembly::Copy::Data (1),
+         2*multithread_info.n_threads(),
          1);
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     if (constraints.is_constrained(i))
@@ -459,6 +460,7 @@ void LaplaceProblem<dim>::assemble_test_2 ()
                           std_cxx1x::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
          Assembly::Copy::Data (2),
+         2*multithread_info.n_threads(),
          1);
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     if (constraints.is_constrained(i))

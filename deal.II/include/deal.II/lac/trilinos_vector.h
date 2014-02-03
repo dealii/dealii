@@ -49,7 +49,7 @@ namespace TrilinosWrappers
 
   namespace
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     // define a helper function that queries the global ID of local ID of
     // an Epetra_BlockMap object  by calling either the 32- or 64-bit
     // function necessary.
@@ -186,6 +186,18 @@ namespace TrilinosWrappers
      * operations at the same time, for example by placing zero additions if
      * necessary.
      *
+     * <h3>Thread safety of Trilinos vectors</h3>
+     *
+     * When writing into Trilinos vectors from several threads in shared
+     * memory, several things must be kept in mind as there is no built-in
+     * locks in this class to prevent data races. Simultaneous access to the
+     * same vector entry at the same time results in data races and must be
+     * explicitly avoided by the user. However, it is possible to access
+     * <b>different</b> entries of the vector from several threads
+     * simultaneously when only one MPI process is present or the vector has
+     * been constructed with an additional index set for ghost entries in
+     * write mode.
+     *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
@@ -199,15 +211,14 @@ namespace TrilinosWrappers
       typedef dealii::types::global_dof_index size_type;
 
       /**
-       * A variable that indicates whether this vector
-       * supports distributed data storage. If true, then
-       * this vector also needs an appropriate compress()
-       * function that allows communicating recent set or
-       * add operations to individual elements to be communicated
-       * to other processors.
+       * A variable that indicates whether this vector supports distributed
+       * data storage. If true, then this vector also needs an appropriate
+       * compress() function that allows communicating recent set or add
+       * operations to individual elements to be communicated to other
+       * processors.
        *
-       * For the current class, the variable equals
-       * true, since it does support parallel data storage.
+       * For the current class, the variable equals true, since it does
+       * support parallel data storage.
        */
       static const bool supports_distributed_data = true;
 
@@ -216,20 +227,14 @@ namespace TrilinosWrappers
        */
       //@{
       /**
-       * Default constructor that
-       * generates an empty (zero size)
-       * vector. The function
-       * <tt>reinit()</tt> will have to
-       * give the vector the correct
-       * size and distribution among
-       * processes in case of an MPI
-       * run.
+       * Default constructor that generates an empty (zero size) vector. The
+       * function <tt>reinit()</tt> will have to give the vector the correct
+       * size and distribution among processes in case of an MPI run.
        */
       Vector ();
 
       /**
-       * Copy constructor using the
-       * given vector.
+       * Copy constructor using the given vector.
        */
       Vector (const Vector &V);
 
@@ -239,156 +244,88 @@ namespace TrilinosWrappers
       ~Vector ();
 
       /**
-       * Reinit functionality. This
-       * function sets the calling vector
-       * to the dimension and the parallel
-       * distribution of the input vector,
-       * but does not copy the elements in
-       * <tt>v</tt>. If <tt>fast</tt> is
-       * not <tt>true</tt>, the elements in
-       * the vector are initialized with
-       * zero, otherwise the content will
-       * be left unchanged and the user has
-       * to set all elements.
+       * Reinit functionality. This function sets the calling vector to the
+       * dimension and the parallel distribution of the input vector, but does
+       * not copy the elements in <tt>v</tt>. If <tt>fast</tt> is not
+       * <tt>true</tt>, the elements in the vector are initialized with zero,
+       * otherwise the content will be left unchanged and the user has to set
+       * all elements.
        *
-       * This function has a third  argument,
-       * <tt>allow_different_maps</tt>,
-       * that allows for an exchange of
-       * data between two equal-sized
-       * vectors (but being distributed
-       * differently among the
-       * processors). A trivial application
-       * of this function is to generate a
-       * replication of a whole vector on
-       * each machine, when the calling
-       * vector is built according to the
-       * localized vector class
-       * TrilinosWrappers::Vector, and
-       * <tt>v</tt> is a distributed
-       * vector. In this case, the variable
-       * <tt>fast</tt> needs to be set to
-       * <tt>false</tt>, since it does not
-       * make sense to exchange data
-       * between differently parallelized
-       * vectors without touching the
-       * elements.
+       * This function has a third argument, <tt>allow_different_maps</tt>,
+       * that allows for an exchange of data between two equal-sized vectors
+       * (but being distributed differently among the processors). A trivial
+       * application of this function is to generate a replication of a whole
+       * vector on each machine, when the calling vector is built according to
+       * the localized vector class TrilinosWrappers::Vector, and <tt>v</tt>
+       * is a distributed vector. In this case, the variable <tt>fast</tt>
+       * needs to be set to <tt>false</tt>, since it does not make sense to
+       * exchange data between differently parallelized vectors without
+       * touching the elements.
        */
       void reinit (const VectorBase &v,
                    const bool        fast = false,
                    const bool        allow_different_maps = false);
 
+      /**
+       * Create vector by merging components from a block vector.
+       */
       void reinit (const BlockVector &v,
                    const bool         import_data = false);
 
       /**
-       * Reinit function. Creates a vector
-       * using the IndexSet local as our
-       * own unknowns, add optional ghost
-       * values ghost.
-       */
-      void reinit (const IndexSet &local,
-                   const IndexSet &ghost,
-                   const MPI_Comm &communicator = MPI_COMM_WORLD);
-
-      /**
-       * Set all components of the
-       * vector to the given number @p
-       * s. Simply pass this down to
-       * the base class, but we still
-       * need to declare this function
-       * to make the example given in
-       * the discussion about making
-       * the constructor explicit work.
+       * Set all components of the vector to the given number @p s. Simply
+       * pass this down to the base class, but we still need to declare this
+       * function to make the example given in the discussion about making the
+       * constructor explicit work.
        */
       Vector &operator = (const TrilinosScalar s);
 
       /**
-       * Copy the given vector. Resize
-       * the present vector if
-       * necessary. In this case, also
-       * the Epetra_Map that designs
-       * the parallel partitioning is
-       * taken from the input vector.
+       * Copy the given vector. Resize the present vector if necessary. In
+       * this case, also the Epetra_Map that designs the parallel partitioning
+       * is taken from the input vector.
        */
       Vector &
       operator = (const Vector &V);
 
       /**
-       * Copy operator from a given
-       * localized vector (present on
-       * all processes) in
-       * TrilinosWrappers format to the
-       * current distributed
-       * vector. This function assumes
-       * that the calling vector (left
-       * hand object) already is of the
-       * same size as the right hand
-       * side vector. Otherwise, an
-       * exception will be thrown.
+       * Copy operator from a given localized vector (present on all
+       * processes) in TrilinosWrappers format to the current distributed
+       * vector. This function assumes that the calling vector (left hand
+       * object) already is of the same size as the right hand side
+       * vector. Otherwise, an exception will be thrown.
        */
       Vector &
       operator = (const ::dealii::TrilinosWrappers::Vector &V);
 
       /**
-       * Another copy function. This
-       * one takes a deal.II vector and
-       * copies it into a
-       * TrilinosWrapper vector. Note
-       * that since we do not provide
-       * any Epetra_map that tells
-       * about the partitioning of the
-       * vector among the MPI
-       * processes, the size of the
-       * TrilinosWrapper vector has to
-       * be the same as the size of the
-       * input vector. In order to
-       * change the map, use the
-       * reinit(const Epetra_Map
-       * &input_map) function.
+       * Another copy function. This one takes a deal.II vector and copies it
+       * into a TrilinosWrapper vector. Note that since we do not provide any
+       * Epetra_map that tells about the partitioning of the vector among the
+       * MPI processes, the size of the TrilinosWrapper vector has to be the
+       * same as the size of the input vector. In order to change the map, use
+       * the reinit(const Epetra_Map &input_map) function.
        */
       template <typename Number>
       Vector &
       operator = (const ::dealii::Vector<Number> &v);
 
       /**
-       * This reinit function is
-       * meant to be used for
-       * parallel calculations where
-       * some non-local data has to
-       * be used. The typical
-       * situation where one needs
-       * this function is the call of
-       * the
-       * FEValues<dim>::get_function_values
-       * function (or of some
-       * derivatives) in
-       * parallel. Since it is
-       * usually faster to retrieve
-       * the data in advance, this
-       * function can be called
-       * before the assembly forks
-       * out to the different
-       * processors. What this
-       * function does is the
-       * following: It takes the
-       * information in the columns
-       * of the given matrix and
-       * looks which data couples
-       * between the different
-       * processors. That data is
-       * then queried from the input
-       * vector. Note that you should
-       * not write to the resulting
-       * vector any more, since the
-       * some data can be stored
-       * several times on different
-       * processors, leading to
-       * unpredictable results. In
-       * particular, such a vector
-       * cannot be used for
-       * matrix-vector products as
-       * for example done during the
-       * solution of linear systems.
+       * This reinit function is meant to be used for parallel calculations
+       * where some non-local data has to be used. The typical situation where
+       * one needs this function is the call of the
+       * FEValues<dim>::get_function_values function (or of some derivatives)
+       * in parallel. Since it is usually faster to retrieve the data in
+       * advance, this function can be called before the assembly forks out to
+       * the different processors. What this function does is the following:
+       * It takes the information in the columns of the given matrix and looks
+       * which data couples between the different processors. That data is
+       * then queried from the input vector. Note that you should not write to
+       * the resulting vector any more, since the some data can be stored
+       * several times on different processors, leading to unpredictable
+       * results. In particular, such a vector cannot be used for
+       * matrix-vector products as for example done during the solution of
+       * linear systems.
        */
       void import_nonlocal_data_for_fe
       (const dealii::TrilinosWrappers::SparseMatrix &matrix,
@@ -399,35 +336,24 @@ namespace TrilinosWrappers
        */
 //@{
       /**
-       * This constructor takes an
-       * Epetra_Map that already knows
-       * how to distribute the
-       * individual components among
-       * the MPI processors. Since it
-       * also includes information
-       * about the size of the vector,
-       * this is all we need to
-       * generate a parallel vector.
+       * This constructor takes an Epetra_Map that already knows how to
+       * distribute the individual components among the MPI processors. Since
+       * it also includes information about the size of the vector, this is
+       * all we need to generate a parallel vector.
        */
       explicit Vector (const Epetra_Map &parallel_partitioning);
 
       /**
-       * Copy constructor from the
-       * TrilinosWrappers vector
-       * class. Since a vector of this
-       * class does not necessarily
-       * need to be distributed among
-       * processes, the user needs to
-       * supply us with an Epetra_Map
-       * that sets the partitioning
-       * details.
+       * Copy constructor from the TrilinosWrappers vector class. Since a
+       * vector of this class does not necessarily need to be distributed
+       * among processes, the user needs to supply us with an Epetra_Map that
+       * sets the partitioning details.
        */
       Vector (const Epetra_Map &parallel_partitioning,
               const VectorBase &v);
 
       /**
-       * Reinitialize from a deal.II
-       * vector. The Epetra_Map specifies the
+       * Reinitialize from a deal.II vector. The Epetra_Map specifies the
        * %parallel partitioning.
        */
       template <typename number>
@@ -435,20 +361,15 @@ namespace TrilinosWrappers
                    const dealii::Vector<number> &v);
 
       /**
-       * Reinit functionality. This
-       * function destroys the old
-       * vector content and generates a
-       * new one based on the input
-       * map.
+       * Reinit functionality. This function destroys the old vector content
+       * and generates a new one based on the input map.
        */
       void reinit (const Epetra_Map &parallel_partitioning,
                    const bool        fast = false);
 
       /**
-       * Copy-constructor from deal.II
-       * vectors. Sets the dimension to that
-       * of the given vector, and copies all
-       * elements.
+       * Copy-constructor from deal.II vectors. Sets the dimension to that of
+       * the given vector, and copies all elements.
        */
       template <typename Number>
       Vector (const Epetra_Map             &parallel_partitioning,
@@ -459,14 +380,10 @@ namespace TrilinosWrappers
        */
 //@{
       /**
-       * This constructor takes an IndexSet
-       * that defines how to distribute the
-       * individual components among the
-       * MPI processors. Since it also
-       * includes information about the
-       * size of the vector, this is all we
-       * need to generate a %parallel
-       * vector.
+       * This constructor takes an IndexSet that defines how to distribute the
+       * individual components among the MPI processors. Since it also
+       * includes information about the size of the vector, this is all we
+       * need to generate a %parallel vector.
        */
       explicit Vector (const IndexSet &parallel_partitioning,
                        const MPI_Comm &communicator = MPI_COMM_WORLD);
@@ -479,25 +396,18 @@ namespace TrilinosWrappers
               const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
-       * Copy constructor from the
-       * TrilinosWrappers vector
-       * class. Since a vector of this
-       * class does not necessarily need to
-       * be distributed among processes,
-       * the user needs to supply us with
-       * an IndexSet and an MPI
-       * communicator that set the
-       * partitioning details.
+       * Copy constructor from the TrilinosWrappers vector class. Since a
+       * vector of this class does not necessarily need to be distributed
+       * among processes, the user needs to supply us with an IndexSet and an
+       * MPI communicator that set the partitioning details.
        */
       Vector (const IndexSet   &parallel_partitioning,
               const VectorBase &v,
               const MPI_Comm   &communicator = MPI_COMM_WORLD);
 
       /**
-       * Copy-constructor from deal.II
-       * vectors. Sets the dimension to
-       * that of the given vector, and
-       * copies all the elements.
+       * Copy-constructor from deal.II vectors. Sets the dimension to that of
+       * the given vector, and copies all the elements.
        */
       template <typename Number>
       Vector (const IndexSet               &parallel_partitioning,
@@ -505,17 +415,37 @@ namespace TrilinosWrappers
               const MPI_Comm               &communicator = MPI_COMM_WORLD);
 
       /**
-       * Reinit functionality. This function
-       * destroys the old vector content and
-       * generates a new one based on the
-       * input partitioning.  The flag
-       * <tt>fast</tt> determines whether the
-       * vector should be filled with zero
-       * (false) or left untouched (true).
+       * Reinit functionality. This function destroys the old vector content
+       * and generates a new one based on the input partitioning.  The flag
+       * <tt>fast</tt> determines whether the vector should be filled with
+       * zero (false) or left untouched (true).
        */
       void reinit (const IndexSet &parallel_partitioning,
                    const MPI_Comm &communicator = MPI_COMM_WORLD,
                    const bool      fast = false);
+
+      /**
+       * Reinit functionality. This function destroys the old vector content
+       * and generates a new one based on the input partitioning. In addition
+       * to just specifying one index set as in all the other methods above,
+       * this method allows to supply an additional set of ghost
+       * entries. There are two different versions of a vector that can be
+       * created. If the flag @p vector_writable is set to @p false, the
+       * vector only allows read access to the joint set of @p
+       * parallel_partitioning and @p ghost_entries. The effect of the reinit
+       * method is then equivalent to calling the other reinit method with an
+       * index set containing both the locally owned entries and the ghost
+       * entries.
+       *
+       * If the flag @p vector_writable is set to true, this creates an
+       * alternative storage scheme for ghost elements that allows multiple
+       * threads to write into the vector (for the other reinit methods, only
+       * one thread is allowed to write into the ghost entries at a time).
+       */
+      void reinit (const IndexSet &locally_owned_entries,
+                   const IndexSet &ghost_entries,
+                   const MPI_Comm &communicator = MPI_COMM_WORLD,
+                   const bool      vector_writable = false);
 //@}
     };
 
@@ -567,15 +497,14 @@ namespace TrilinosWrappers
     void Vector::reinit (const Epetra_Map             &parallel_partitioner,
                          const dealii::Vector<number> &v)
     {
-      if (vector.get() != 0 && vector->Map().SameAs(parallel_partitioner))
+      if (vector.get() == 0 || vector->Map().SameAs(parallel_partitioner) == false)
         vector.reset (new Epetra_FEVector(parallel_partitioner));
 
       has_ghosts = vector->Map().UniqueGIDs()==false;
 
       const int size = parallel_partitioner.NumMyElements();
 
-      // Need to copy out values, since the
-      // deal.II might not use doubles, so
+      // Need to copy out values, since the deal.II might not use doubles, so
       // that a direct access is not possible.
       for (int i=0; i<size; ++i)
         (*vector)[0][i] = v(gid(parallel_partitioner,i));
@@ -639,124 +568,86 @@ namespace TrilinosWrappers
     typedef dealii::types::global_dof_index size_type;
 
     /**
-     * A variable that indicates whether this vector
-     * supports distributed data storage. If true, then
-     * this vector also needs an appropriate compress()
-     * function that allows communicating recent set or
-     * add operations to individual elements to be communicated
-     * to other processors.
+     * A variable that indicates whether this vector supports distributed data
+     * storage. If true, then this vector also needs an appropriate compress()
+     * function that allows communicating recent set or add operations to
+     * individual elements to be communicated to other processors.
      *
-     * For the current class, the variable equals
-     * false, since it does not support parallel data storage.
-     * If you do need parallel data storage, use
-     * TrilinosWrappers::MPI::Vector.
+     * For the current class, the variable equals false, since it does not
+     * support parallel data storage.  If you do need parallel data storage,
+     * use TrilinosWrappers::MPI::Vector.
      */
     static const bool supports_distributed_data = false;
 
     /**
-     * Default constructor that
-     * generates an empty (zero size)
-     * vector. The function
-     * <tt>reinit()</tt> will have to
-     * give the vector the correct
+     * Default constructor that generates an empty (zero size) vector. The
+     * function <tt>reinit()</tt> will have to give the vector the correct
      * size.
      */
     Vector ();
 
     /**
-     * This constructor takes as
-     * input the number of elements
-     * in the vector.
+     * This constructor takes as input the number of elements in the vector.
      */
     explicit Vector (const size_type n);
 
     /**
-     * This constructor takes as
-     * input the number of elements
-     * in the vector. If the map is
-     * not localized, i.e., if there
-     * are some elements that are not
-     * present on all processes, only
-     * the global size of the map
-     * will be taken and a localized
-     * map will be generated
-     * internally.
+     * This constructor takes as input the number of elements in the
+     * vector. If the map is not localized, i.e., if there are some elements
+     * that are not present on all processes, only the global size of the map
+     * will be taken and a localized map will be generated internally.
      */
     explicit Vector (const Epetra_Map &partitioning);
 
     /**
-     * This constructor takes as input
-     * the number of elements in the
-     * vector. If the index set is not
-     * localized, i.e., if there are some
-     * elements that are not present on
-     * all processes, only the global
-     * size of the index set will be
-     * taken and a localized version will
-     * be generated internally.
+     * This constructor takes as input the number of elements in the
+     * vector. If the index set is not localized, i.e., if there are some
+     * elements that are not present on all processes, only the global size of
+     * the index set will be taken and a localized version will be generated
+     * internally.
      */
     explicit Vector (const IndexSet &partitioning,
                      const MPI_Comm &communicator = MPI_COMM_WORLD);
 
     /**
-     * This constructor takes a
-     * (possibly parallel) Trilinos
-     * Vector and generates a
-     * localized version of the whole
-     * content on each processor.
+     * This constructor takes a (possibly parallel) Trilinos Vector and
+     * generates a localized version of the whole content on each processor.
      */
     explicit Vector (const VectorBase &V);
 
     /**
-     * Copy-constructor from deal.II
-     * vectors. Sets the dimension to that
-     * of the given vector, and copies all
-     * elements.
+     * Copy-constructor from deal.II vectors. Sets the dimension to that of
+     * the given vector, and copies all elements.
      */
     template <typename Number>
     explicit Vector (const dealii::Vector<Number> &v);
 
     /**
-     * Reinit function that resizes
-     * the vector to the size
-     * specified by <tt>n</tt>.
+     * Reinit function that resizes the vector to the size specified by
+     * <tt>n</tt>.
      */
     void reinit (const size_type n,
                  const bool      fast = false);
 
     /**
-     * Initialization with an
-     * Epetra_Map. Similar to the call in
-     * the other class MPI::Vector, with
-     * the difference that now a copy on
-     * all processes is generated. This
-     * initialization function is
-     * appropriate when the data in the
-     * localized vector should be
-     * imported from a distributed vector
-     * that has been initialized with the
-     * same communicator. The variable
-     * <tt>fast</tt> determines whether
-     * the vector should be filled with
-     * zero or left untouched.
+     * Initialization with an Epetra_Map. Similar to the call in the other
+     * class MPI::Vector, with the difference that now a copy on all processes
+     * is generated. This initialization function is appropriate when the data
+     * in the localized vector should be imported from a distributed vector
+     * that has been initialized with the same communicator. The variable
+     * <tt>fast</tt> determines whether the vector should be filled with zero
+     * or left untouched.
      */
     void reinit (const Epetra_Map &input_map,
                  const bool        fast = false);
 
     /**
-     * Initialization with an
-     * IndexSet. Similar to the call in the
-     * other class MPI::Vector, with the
-     * difference that now a copy on all
-     * processes is generated. This
-     * initialization function is
-     * appropriate in case the data in the
-     * localized vector should be imported
-     * from a distributed vector that has
-     * been initialized with the same
-     * communicator. The variable
-     * <tt>fast</tt> determines whether the
-     * vector should be filled with zero
+     * Initialization with an IndexSet. Similar to the call in the other class
+     * MPI::Vector, with the difference that now a copy on all processes is
+     * generated. This initialization function is appropriate in case the data
+     * in the localized vector should be imported from a distributed vector
+     * that has been initialized with the same communicator. The variable
+     * <tt>fast</tt> determines whether the vector should be filled with zero
      * (false) or left untouched (true).
      */
     void reinit (const IndexSet   &input_map,
@@ -764,66 +655,52 @@ namespace TrilinosWrappers
                  const bool        fast = false);
 
     /**
-     * Reinit function. Takes the
-     * information of a Vector and copies
-     * everything to the calling vector,
-     * now also allowing different maps.
+     * Reinit function. Takes the information of a Vector and copies
+     * everything to the calling vector, now also allowing different maps.
      */
     void reinit (const VectorBase &V,
                  const bool        fast = false,
                  const bool        allow_different_maps = false);
 
     /**
-     * Set all components of the
-     * vector to the given number @p
-     * s. Simply pass this down to
-     * the base class, but we still
-     * need to declare this function
-     * to make the example given in
-     * the discussion about making
-     * the constructor explicit work.
+     * Set all components of the vector to the given number @p s. Simply pass
+     * this down to the base class, but we still need to declare this function
+     * to make the example given in the discussion about making the
+     * constructor explicit work.
      */
     Vector &operator = (const TrilinosScalar s);
 
     /**
-     * Sets the left hand argument to
-     * the (parallel) Trilinos
-     * Vector. Equivalent to the @p
-     * reinit function.
+     * Sets the left hand argument to the (parallel) Trilinos
+     * Vector. Equivalent to the @p reinit function.
      */
     Vector &
     operator = (const MPI::Vector &V);
 
     /**
-     * Sets the left hand argument to
-     * the deal.II vector.
+     * Sets the left hand argument to the deal.II vector.
      */
     template <typename Number>
     Vector &
     operator = (const ::dealii::Vector<Number> &V);
 
     /**
-     * Copy operator. Copies both the
-     * dimension and the content in
-     * the right hand argument.
+     * Copy operator. Copies both the dimension and the content in the right
+     * hand argument.
      */
     Vector &
     operator = (const Vector &V);
 
     /**
-     * This function does nothing but is
-     * there for compatibility with the
-     * @p PETScWrappers::Vector class.
+     * This function does nothing but is there for compatibility with the @p
+     * PETScWrappers::Vector class.
      *
-     * For the PETSc vector wrapper class,
-     * this function updates the ghost
-     * values of the PETSc vector. This
-     * is necessary after any modification
+     * For the PETSc vector wrapper class, this function updates the ghost
+     * values of the PETSc vector. This is necessary after any modification
      * before reading ghost values.
      *
-     * However, for the implementation of
-     * this class, it is immaterial and thus
-     * an empty function.
+     * However, for the implementation of this class, it is immaterial and
+     * thus an empty function.
      */
     void update_ghost_values () const;
   };

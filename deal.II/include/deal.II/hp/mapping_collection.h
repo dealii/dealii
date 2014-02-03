@@ -148,16 +148,15 @@ namespace hp
   {
   private:
     /**
-     * A static MappingQ1
-     * object. We can't use the one
-     * in ::StaticMappingQ1 since
-     * we can't make sure that the
-     * constructor for that object
-     * is run before the
-     * constructor for the present
-     * static object.
+     * A static MappingQ1 object. We can't use the one in ::StaticMappingQ1
+     * since we can't make sure that the constructor for that object is run
+     * before we want to use the object (when constructing mapping_collection
+     * below).  Therefore we create a helper function which returns a
+     * reference to a static object that will be constructed the first time
+     * this function is called.
      */
-    static MappingQ1<dim,spacedim> mapping_q1;
+      static
+      MappingQ1<dim,spacedim>& return_static_mapping_q1();
 
   public:
     /**

@@ -71,20 +71,17 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Typedef the base class for simpler
-     * access to its own typedefs.
+     * Typedef the base class for simpler access to its own typedefs.
      */
     typedef BlockVectorBase<Vector> BaseClass;
 
     /**
-     * Typedef the type of the underlying
-     * vector.
+     * Typedef the type of the underlying vector.
      */
     typedef BaseClass::BlockType  BlockType;
 
     /**
-     * Import the typedefs from the base
-     * class.
+     * Import the typedefs from the base class.
      */
     typedef BaseClass::value_type      value_type;
     typedef BaseClass::pointer         pointer;
@@ -96,90 +93,59 @@ namespace TrilinosWrappers
     typedef BaseClass::const_iterator  const_iterator;
 
     /**
-     * Default constructor. Generate an
-     * empty vector without any blocks.
+     * Default constructor. Generate an empty vector without any blocks.
      */
     BlockVector ();
 
     /**
-     * Constructor. Generate a block
-     * vector with as many blocks as
-     * there are entries in Input_Maps.
-     * For this non-distributed vector,
-     * the %parallel partitioning is not
-     * used, just the global size of the
-     * partitioner.
+     * Constructor. Generate a block vector with as many blocks as there are
+     * entries in Input_Maps.  For this non-distributed vector, the %parallel
+     * partitioning is not used, just the global size of the partitioner.
      */
     explicit BlockVector (const std::vector<Epetra_Map> &partitioner);
 
     /**
-     * Constructor. Generate a block
-     * vector with as many blocks as
-     * there are entries in Input_Maps.
-     * For this non-distributed vector,
-     * the %parallel partitioning is not
-     * used, just the global size of the
-     * partitioner.
+     * Constructor. Generate a block vector with as many blocks as there are
+     * entries in Input_Maps.  For this non-distributed vector, the %parallel
+     * partitioning is not used, just the global size of the partitioner.
      */
     explicit BlockVector (const std::vector<IndexSet> &partitioner,
                           const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
     /**
-     * Copy-Constructor. Set all the
-     * properties of the non-%parallel
-     * vector to those of the given
-     * %parallel vector and import the
-     * elements.
+     * Copy-Constructor. Set all the properties of the non-%parallel vector to
+     * those of the given %parallel vector and import the elements.
      */
     BlockVector (const MPI::BlockVector &V);
 
     /**
-     * Copy-Constructor. Set all the
-     * properties of the vector to those
-     * of the given input vector and copy
-     * the elements.
+     * Copy-Constructor. Set all the properties of the vector to those of the
+     * given input vector and copy the elements.
      */
     BlockVector (const BlockVector  &V);
 
     /**
-     * Creates a block vector
-     * consisting of
-     * <tt>num_blocks</tt>
-     * components, but there is no
-     * content in the individual
-     * components and the user has to
-     * fill appropriate data using a
-     * reinit of the blocks.
+     * Creates a block vector consisting of <tt>num_blocks</tt> components,
+     * but there is no content in the individual components and the user has
+     * to fill appropriate data using a reinit of the blocks.
      */
     explicit BlockVector (const size_type num_blocks);
 
     /**
-     * Constructor. Set the number of
-     * blocks to <tt>n.size()</tt> and
-     * initialize each block with
-     * <tt>n[i]</tt> zero elements.
+     * Constructor. Set the number of blocks to <tt>n.size()</tt> and
+     * initialize each block with <tt>n[i]</tt> zero elements.
      *
      * References BlockVector.reinit().
      */
     explicit BlockVector (const std::vector<size_type> &N);
 
     /**
-     * Constructor. Set the number of
-     * blocks to
-     * <tt>n.size()</tt>. Initialize the
-     * vector with the elements
-     * pointed to by the range of
-     * iterators given as second and
-     * third argument. Apart from the
-     * first argument, this
-     * constructor is in complete
-     * analogy to the respective
-     * constructor of the
-     * <tt>std::vector</tt> class, but the
-     * first argument is needed in
-     * order to know how to subdivide
-     * the block vector into
-     * different blocks.
+     * Constructor. Set the number of blocks to <tt>n.size()</tt>. Initialize
+     * the vector with the elements pointed to by the range of iterators given
+     * as second and third argument. Apart from the first argument, this
+     * constructor is in complete analogy to the respective constructor of the
+     * <tt>std::vector</tt> class, but the first argument is needed in order
+     * to know how to subdivide the block vector into different blocks.
      */
     template <typename InputIterator>
     BlockVector (const std::vector<size_type> &n,
@@ -196,8 +162,7 @@ namespace TrilinosWrappers
     *
     * @deprecated
     *
-    * See @ref GlossCompress "Compressing
-    * distributed objects" for more
+    * See @ref GlossCompress "Compressing distributed objects" for more
     * information.
     */
     void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
@@ -208,91 +173,60 @@ namespace TrilinosWrappers
     using BlockVectorBase<Vector>::compress;
 
     /**
-     * Copy operator: fill all
-     * components of the vector that
-     * are locally stored with the
-     * given scalar value.
+     * Copy operator: fill all components of the vector that are locally
+     * stored with the given scalar value.
      */
     BlockVector &
     operator = (const value_type s);
 
     /**
-     * Copy operator for a
-     * distributed Trilinos vector to
-     * a localized one.
+     * Copy operator for a distributed Trilinos vector to a localized one.
      */
     BlockVector &
     operator = (const MPI::BlockVector &V);
 
     /**
-     * Copy operator for arguments of
-     * the same type.
+     * Copy operator for arguments of the same type.
      */
     BlockVector &
     operator = (const BlockVector &V);
 
     /**
-     * Another copy function. This
-     * one takes a deal.II block
-     * vector and copies it into a
-     * TrilinosWrappers block
-     * vector. Note that the number
-     * of blocks has to be the same
-     * in the vector as in the input
-     * vector. Use the reinit()
-     * command for resizing the
-     * BlockVector or for changing
-     * the internal structure of the
-     * block components.
+     * Another copy function. This one takes a deal.II block vector and copies
+     * it into a TrilinosWrappers block vector. Note that the number of blocks
+     * has to be the same in the vector as in the input vector. Use the
+     * reinit() command for resizing the BlockVector or for changing the
+     * internal structure of the block components.
      *
-     * Since Trilinos only works on
-     * doubles, this function is
-     * limited to accept only one
-     * possible number type in the
-     * deal.II vector.
+     * Since Trilinos only works on doubles, this function is limited to
+     * accept only one possible number type in the deal.II vector.
      */
     template <typename Number>
     BlockVector &
     operator = (const ::dealii::BlockVector<Number> &V);
 
     /**
-     * Reinitialize the BlockVector to
-     * contain as many blocks as there
-     * are Epetra_Maps given in the
-     * input argument, according to the
-     * global size of the individual
-     * components described in the
-     * maps. Note that the resulting
-     * vector will be stored completely
-     * on each process. The Epetra_Map
-     * is useful when data exchange
-     * with a distributed vector based
-     * on the same Epetra_map is
-     * intended. In that case, the same
-     * communicator is used for data
-     * exchange.
+     * Reinitialize the BlockVector to contain as many blocks as there are
+     * Epetra_Maps given in the input argument, according to the global size
+     * of the individual components described in the maps. Note that the
+     * resulting vector will be stored completely on each process. The
+     * Epetra_Map is useful when data exchange with a distributed vector based
+     * on the same Epetra_map is intended. In that case, the same communicator
+     * is used for data exchange.
      *
-     * If <tt>fast==false</tt>, the vector
-     * is filled with zeros.
+     * If <tt>fast==false</tt>, the vector is filled with zeros.
      */
     void reinit (const std::vector<Epetra_Map> &partitioning,
                  const bool                     fast = false);
 
     /**
-     * Reinitialize the BlockVector to
-     * contain as many blocks as there
-     * are index sets given in the
-     * input argument, according to the
-     * global size of the individual
-     * components described in the
-     * index set, and using a given MPI
-     * communicator. The MPI
-     * communicator is useful when data
-     * exchange with a distributed
-     * vector based on the same
-     * initialization is intended. In
-     * that case, the same communicator
-     * is used for data exchange.
+     * Reinitialize the BlockVector to contain as many blocks as there are
+     * index sets given in the input argument, according to the global size of
+     * the individual components described in the index set, and using a given
+     * MPI communicator. The MPI communicator is useful when data exchange
+     * with a distributed vector based on the same initialization is
+     * intended. In that case, the same communicator is used for data
+     * exchange.
      *
      * If <tt>fast==false</tt>, the vector
      * is filled with zeros.
@@ -302,13 +236,9 @@ namespace TrilinosWrappers
                  const bool                   fast = false);
 
     /**
-     * Reinitialize the BlockVector to
-     * contain as many blocks as there
-     * are elements in the first
-     * argument, and with the respective
-     * sizes. Since no distribution map
-     * is given, all vectors are local
-     * vectors.
+     * Reinitialize the BlockVector to contain as many blocks as there are
+     * elements in the first argument, and with the respective sizes. Since no
+     * distribution map is given, all vectors are local vectors.
      *
      * If <tt>fast==false</tt>, the vector
      * is filled with zeros.
@@ -324,76 +254,44 @@ namespace TrilinosWrappers
     void reinit (const MPI::BlockVector &V);
 
     /**
-     * Change the dimension to that
-     * of the vector <tt>V</tt>. The same
-     * applies as for the other
-     * reinit() function.
+     * Change the dimension to that of the vector <tt>V</tt>. The same applies
+     * as for the other reinit() function.
      *
-     * The elements of <tt>V</tt> are not
-     * copied, i.e.  this function is
-     * the same as calling <tt>reinit
-     * (V.size(), fast)</tt>.
+     * The elements of <tt>V</tt> are not copied, i.e.  this function is the
+     * same as calling <tt>reinit (V.size(), fast)</tt>.
      *
-     * Note that you must call this
-     * (or the other reinit()
-     * functions) function, rather
-     * than calling the reinit()
-     * functions of an individual
-     * block, to allow the block
-     * vector to update its caches of
-     * vector sizes. If you call
-     * reinit() on one of the
-     * blocks, then subsequent
-     * actions on this object may
-     * yield unpredictable results
-     * since they may be routed to
-     * the wrong block.
+     * Note that you must call this (or the other reinit() functions)
+     * function, rather than calling the reinit() functions of an individual
+     * block, to allow the block vector to update its caches of vector
+     * sizes. If you call reinit() on one of the blocks, then subsequent
+     * actions on this object may yield unpredictable results since they may
+     * be routed to the wrong block.
      */
     void reinit (const BlockVector &V,
                  const bool fast = false);
 
     /**
-     * Change the number of blocks to
-     * <tt>num_blocks</tt>. The individual
-     * blocks will get initialized with
-     * zero size, so it is assumed that
-     * the user resizes the
-     * individual blocks by herself
-     * in an appropriate way, and
-     * calls <tt>collect_sizes</tt>
-     * afterwards.
+     * Change the number of blocks to <tt>num_blocks</tt>. The individual
+     * blocks will get initialized with zero size, so it is assumed that the
+     * user resizes the individual blocks by herself in an appropriate way,
+     * and calls <tt>collect_sizes</tt> afterwards.
      */
     void reinit (const size_type num_blocks);
 
     /**
-     * Swap the contents of this
-     * vector and the other vector
-     * <tt>v</tt>. One could do this
-     * operation with a temporary
-     * variable and copying over the
-     * data elements, but this
-     * function is significantly more
-     * efficient since it only swaps
-     * the pointers to the data of
-     * the two vectors and therefore
-     * does not need to allocate
-     * temporary storage and move
-     * data around.
+     * Swap the contents of this vector and the other vector <tt>v</tt>. One
+     * could do this operation with a temporary variable and copying over the
+     * data elements, but this function is significantly more efficient since
+     * it only swaps the pointers to the data of the two vectors and therefore
+     * does not need to allocate temporary storage and move data around.
      *
-     * Limitation: right now this
-     * function only works if both
-     * vectors have the same number
-     * of blocks. If needed, the
-     * numbers of blocks should be
+     * Limitation: right now this function only works if both vectors have the
+     * same number of blocks. If needed, the numbers of blocks should be
      * exchanged, too.
      *
-     * This function is analog to the
-     * the swap() function of all C++
-     * standard containers. Also,
-     * there is a global function
-     * swap(u,v) that simply calls
-     * <tt>u.swap(v)</tt>, again in analogy
-     * to standard functions.
+     * This function is analog to the the swap() function of all C++ standard
+     * containers. Also, there is a global function swap(u,v) that simply
+     * calls <tt>u.swap(v)</tt>, again in analogy to standard functions.
      */
     void swap (BlockVector &v);
 

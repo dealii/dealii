@@ -442,7 +442,7 @@ void MGTransferBlockBase::build_matrices (
                 constraints_per_block[block].resize(0);
                 constraints_per_block[block].resize(n_dofs, 0);
                 for (types::global_dof_index i=0; i<n_dofs; ++i, ++index)
-                  constraints_per_block[block][i] = constrain_indices[index] == 1;
+                  constraints_per_block[block][i] = (constrain_indices[index] == 1);
 
                 for (types::global_dof_index i=0; i<n_dofs; ++i)
                   {

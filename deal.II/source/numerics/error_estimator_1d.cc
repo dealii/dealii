@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -194,7 +194,7 @@ estimate (const Mapping<1,spacedim>                    &/*mapping*/,
           const std::vector<const InputVector *> &/*solutions*/,
           std::vector<Vector<float>*>            &/*errors*/,
           const ComponentMask                &/*component_mask_*/,
-          const Function<spacedim>                   */*coefficient*/,
+          const Function<spacedim>                   * /*coefficient*/,
           const unsigned int,
           const types::subdomain_id          /*subdomain_id*/,
           const types::material_id                   /*material_id*/)

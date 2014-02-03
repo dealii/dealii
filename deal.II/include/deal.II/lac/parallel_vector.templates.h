@@ -20,6 +20,10 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/vector_view.h>
+
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -201,6 +205,82 @@ namespace parallel
 
       vector_is_ghosted = false;
     }
+
+
+
+#ifdef DEAL_II_WITH_PETSC
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator = (const PETScWrappers::MPI::Vector &petsc_vec)
+    {
+      Assert(petsc_vec.locally_owned_elements() == locally_owned_elements(),
+             StandardExceptions::ExcInvalidState());
+
+      // get a representation of the vector and copy it
+      PetscScalar *start_ptr;
+      int ierr = VecGetArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      const size_type vec_size = local_size();
+      std::copy (start_ptr, start_ptr + vec_size, begin());
+
+      // restore the representation of the vector
+      ierr = VecRestoreArray (static_cast<const Vec &>(petsc_vec), &start_ptr);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      // spread ghost values between processes?
+      if (vector_is_ghosted || petsc_vec.has_ghost_elements())
+        update_ghost_values();
+
+      // return a pointer to this object per normal c++ operator overloading
+      // semantics
+      return *this;
+    }
+
+#endif
+
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+    template <typename Number>
+    Vector<Number> &
+    Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec)
+    {
+      if (trilinos_vec.has_ghost_elements() == false)
+        {
+          Assert(trilinos_vec.locally_owned_elements() == locally_owned_elements(),
+                 StandardExceptions::ExcInvalidState());
+        }
+      else
+        // ghosted trilinos vector must contain the local range of this vector
+        // which is contiguous
+        {
+          Assert((trilinos_vec.locally_owned_elements() & locally_owned_elements())
+                 == locally_owned_elements(),
+                 StandardExceptions::ExcInvalidState());
+        }
+
+      // create on trilinos data
+      const std::size_t start_index =
+        trilinos_vec.vector_partitioner().NumMyElements() > 0 ?
+        trilinos_vec.vector_partitioner().
+        LID(static_cast<TrilinosWrappers::types::int_type>(this->local_range().first)) : 0;
+      const VectorView<double> in_view (local_size(), trilinos_vec.begin()+start_index);
+      static_cast<dealii::Vector<Number>&>(vector_view) =
+        static_cast<const dealii::Vector<double>&>(in_view);
+
+      // spread ghost values between processes?
+      if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
+        update_ghost_values();
+
+      // return a pointer to this object per normal c++ operator overloading
+      // semantics
+      return *this;
+    }
+
+#endif
 
 
 

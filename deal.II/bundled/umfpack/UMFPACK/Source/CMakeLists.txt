@@ -19,13 +19,16 @@
 # (... where everything is explained contrary to this... mess)
 #
 
+INCLUDE_DIRECTORIES(${UMFPACK_BUNDLED_INCLUDE_DIRS})
+
 #
 # *Shush!*
+# (Remove locally in this subdirectory)
 #
-STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
-STRIP_FLAG(CMAKE_CXX_FLAGS "-Wall")
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-sign-compare")
-ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-write-strings")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wall")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-sign-compare")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-write-strings")
 
 SET(src_umfpack_UMF
   umf_2by2.cc

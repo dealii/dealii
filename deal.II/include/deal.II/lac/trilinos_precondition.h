@@ -1293,10 +1293,8 @@ namespace TrilinosWrappers
     struct AdditionalData
     {
       /**
-       * Constructor. By default, we
-       * pretend to work on elliptic
-       * problems with linear finite
-       * elements on a scalar equation.
+       * Constructor. By default, we pretend to work on elliptic problems with
+       * linear finite elements on a scalar equation.
        */
       AdditionalData (const bool                             elliptic = true,
                       const bool                             higher_order_elements = false,
@@ -1306,153 +1304,151 @@ namespace TrilinosWrappers
                       const std::vector<std::vector<bool> > &constant_modes = std::vector<std::vector<bool> > (1),
                       const unsigned int                     smoother_sweeps = 2,
                       const unsigned int                     smoother_overlap = 0,
-                      const bool                             output_details = false);
+                      const bool                             output_details = false,
+                      const char*                            smoother_type = "Chebyshev",
+                      const char*                            coarse_type = "Amesos-KLU");
 
       /**
-       * Determines whether the AMG
-       * preconditioner should be optimized
-       * for elliptic problems (ML option
-       * smoothed aggregation SA, using a
-       * Chebyshev smoother) or for
-       * non-elliptic problems (ML option
-       * non-symmetric smoothed aggregation
-       * NSSA, smoother is SSOR with
+       * Determines whether the AMG preconditioner should be optimized for
+       * elliptic problems (ML option smoothed aggregation SA, using a
+       * Chebyshev smoother) or for non-elliptic problems (ML option
+       * non-symmetric smoothed aggregation NSSA, smoother is SSOR with
        * underrelaxation).
        */
       bool elliptic;
 
       /**
-       * Determines whether the matrix that
-       * the preconditioner is built upon
-       * is generated from linear or
-       * higher-order elements.
+       * Determines whether the matrix that the preconditioner is built upon
+       * is generated from linear or higher-order elements.
        */
       bool higher_order_elements;
 
       /**
-       * Defines how many multigrid cycles
-       * should be performed by the
+       * Defines how many multigrid cycles should be performed by the
        * preconditioner.
        */
       unsigned int n_cycles;
 
       /**
-       * Defines whether a w-cycle should be
-       * used instead of the standard setting
-       * of a v-cycle.
+       * Defines whether a w-cycle should be used instead of the standard
+       * setting of a v-cycle.
        */
       bool w_cycle;
 
       /**
-       * This threshold tells the AMG setup
-       * how the coarsening should be
-       * performed. In the AMG used by ML,
-       * all points that strongly couple
-       * with the tentative coarse-level
-       * point form one aggregate. The term
-       * <em>strong coupling</em> is
-       * controlled by the variable
-       * <tt>aggregation_threshold</tt>,
-       * meaning that all elements that are
-       * not smaller than
-       * <tt>aggregation_threshold</tt>
-       * times the diagonal element do
-       * couple strongly.
+       * This threshold tells the AMG setup how the coarsening should be
+       * performed. In the AMG used by ML, all points that strongly couple
+       * with the tentative coarse-level point form one aggregate. The term
+       * <em>strong coupling</em> is controlled by the variable
+       * <tt>aggregation_threshold</tt>, meaning that all elements that are
+       * not smaller than <tt>aggregation_threshold</tt> times the diagonal
+       * element do couple strongly.
        */
       double aggregation_threshold;
 
       /**
-       * Specifies the constant modes (near
-       * null space) of the matrix. This
-       * parameter tells AMG whether we
-       * work on a scalar equation (where
-       * the near null space only consists
-       * of ones) or on a vector-valued
+       * Specifies the constant modes (near null space) of the matrix. This
+       * parameter tells AMG whether we work on a scalar equation (where the
+       * near null space only consists of ones) or on a vector-valued
        * equation.
        */
       std::vector<std::vector<bool> > constant_modes;
 
       /**
-       * Determines how many sweeps of the
-       * smoother should be performed. When
-       * the flag <tt>elliptic</tt> is set
-       * to <tt>true</tt>, i.e., for
-       * elliptic or almost elliptic
-       * problems, the polynomial degree of
-       * the Chebyshev smoother is set to
-       * <tt>smoother_sweeps</tt>. The term
-       * sweeps refers to the number of
-       * matrix-vector products performed
-       * in the Chebyshev case. In the
-       * non-elliptic case,
-       * <tt>smoother_sweeps</tt> sets the
-       * number of SSOR relaxation sweeps
-       * for post-smoothing to be
-       * performed.
+       * Determines how many sweeps of the smoother should be performed. When
+       * the flag <tt>elliptic</tt> is set to <tt>true</tt>, i.e., for
+       * elliptic or almost elliptic problems, the polynomial degree of the
+       * Chebyshev smoother is set to <tt>smoother_sweeps</tt>. The term
+       * sweeps refers to the number of matrix-vector products performed in
+       * the Chebyshev case. In the non-elliptic case,
+       * <tt>smoother_sweeps</tt> sets the number of SSOR relaxation sweeps
+       * for post-smoothing to be performed.
        */
       unsigned int smoother_sweeps;
 
       /**
-       * Determines the overlap in the
-       * SSOR/Chebyshev error smoother when
-       * run in parallel.
+       * Determines the overlap in the SSOR/Chebyshev error smoother when run
+       * in parallel.
        */
       unsigned int smoother_overlap;
 
       /**
-       * If this flag is set to
-       * <tt>true</tt>, then internal
-       * information from the ML
-       * preconditioner is printed to
-       * screen. This can be useful when
+       * If this flag is set to <tt>true</tt>, then internal information from
+       * the ML preconditioner is printed to screen. This can be useful when
        * debugging the preconditioner.
        */
       bool output_details;
+
+      /**
+       * Determines which smoother to use for the AMG cycle. Possibilities
+       * for smoother_type are the following:
+       *     "Aztec"
+       *     "IFPACK"
+       *     "Jacobi"
+       *     "ML symmetric Gauss-Seidel"
+       *     "symmetric Gauss-Seidel"
+       *     "ML Gauss-Seidel"
+       *     "Gauss-Seidel"
+       *     "block Gauss-Seidel"
+       *     "symmetric block Gauss-Seidel"
+       *     "Chebyshev"
+       *     "MLS"
+       *     "Hiptmair"
+       *     "Amesos-KLU"
+       *     "Amesos-Superlu"
+       *     "Amesos-UMFPACK"
+       *     "Amesos-Superludist"
+       *     "Amesos-MUMPS"
+       *     "user-defined"
+       *     "SuperLU"
+       *     "IFPACK-Chebyshev"
+       *     "self"
+       *     "do-nothing"
+       *     "IC"
+       *     "ICT"
+       *     "ILU"
+       *     "ILUT"
+       *     "Block Chebyshev"
+       *     "IFPACK-Block Chebyshev"
+       */
+      const char* smoother_type;
+
+      /**
+       * Determines which solver to use on the coarsest level. The same
+       * settings as for the smoother type are possible.
+       */
+      const char* coarse_type;
     };
 
+
     /**
-     * Let Trilinos compute a multilevel
-     * hierarchy for the solution of a
-     * linear system with the given
-     * matrix. The function uses the
-     * matrix format specified in
-     * TrilinosWrappers::SparseMatrix.
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. The function uses the matrix
+     * format specified in TrilinosWrappers::SparseMatrix.
      */
     void initialize (const SparseMatrix                    &matrix,
                      const AdditionalData &additional_data = AdditionalData());
 
     /**
-     * Let Trilinos compute a multilevel
-     * hierarchy for the solution of a
-     * linear system with the given
-     * matrix. The function uses the
-     * matrix format specified in
-     * TrilinosWrappers::SparseMatrix.
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. The function uses the matrix
+     * format specified in TrilinosWrappers::SparseMatrix.
      *
-     * This function is similar to the one
-     * above, but allows the user to set
-     * all the options of the Trilinos ML
-     * preconditioner. In order to find out
-     * about all the options for ML, we
-     * refer to the <a
-     * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML
-     * user's guide</a>. In particular,
-     * users need to follow the ML
-     * instructions in case a vector-valued
-     * problem ought to be solved.
+     * This function is similar to the one above, but allows the user to set
+     * all the options of the Trilinos ML preconditioner. In order to find out
+     * about all the options for ML, we refer to the <a
+     * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML user's
+     * guide</a>. In particular, users need to follow the ML instructions in
+     * case a vector-valued problem ought to be solved.
      */
     void initialize (const SparseMatrix           &matrix,
                      const Teuchos::ParameterList &ml_parameters);
 
     /**
-     * Let Trilinos compute a multilevel
-     * hierarchy for the solution of a
-     * linear system with the given
-     * matrix. This function takes a
-     * deal.ii matrix and copies the
-     * content into a Trilinos matrix, so
-     * the function can be considered
-     * rather inefficient.
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. This function takes a deal.ii
+     * matrix and copies the content into a Trilinos matrix, so the function
+     * can be considered rather inefficient.
      */
     template <typename number>
     void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
@@ -1461,47 +1457,33 @@ namespace TrilinosWrappers
                      const ::dealii::SparsityPattern      *use_this_sparsity = 0);
 
     /**
-     * This function can be used for a
-     * faster recalculation of the
-     * preconditioner construction when
-     * the matrix entries underlying the
-     * preconditioner have changed, but
-     * the matrix sparsity pattern has
-     * remained the same. What this
-     * function does is taking the
-     * already generated coarsening
-     * structure, computing the AMG
-     * prolongation and restriction
-     * according to a smoothed
-     * aggregation strategy and then
-     * building the whole multilevel
-     * hiearchy. This function can be
-     * considerably faster than the
-     * initialize function, since the
-     * coarsening pattern is usually the
-     * most difficult thing to do when
-     * setting up the AMG ML
-     * preconditioner.
+     * This function can be used for a faster recalculation of the
+     * preconditioner construction when the matrix entries underlying the
+     * preconditioner have changed, but the matrix sparsity pattern has
+     * remained the same. What this function does is taking the already
+     * generated coarsening structure, computing the AMG prolongation and
+     * restriction according to a smoothed aggregation strategy and then
+     * building the whole multilevel hiearchy. This function can be
+     * considerably faster than the initialize function, since the coarsening
+     * pattern is usually the most difficult thing to do when setting up the
+     * AMG ML preconditioner.
      */
     void reinit ();
 
     /**
-     * Destroys the preconditioner, leaving
-     * an object like just after having
+     * Destroys the preconditioner, leaving an object like just after having
      * called the constructor.
      */
     void clear ();
 
     /**
-     * Prints an estimate of the memory
-     * consumption of this class.
+     * Prints an estimate of the memory consumption of this class.
      */
     size_type memory_consumption () const;
 
   private:
     /**
-     * A copy of the deal.II matrix into
-     * Trilinos format.
+     * A copy of the deal.II matrix into Trilinos format.
      */
     std_cxx1x::shared_ptr<SparseMatrix> trilinos_matrix;
   };

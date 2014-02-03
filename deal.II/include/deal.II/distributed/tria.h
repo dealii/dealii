@@ -514,17 +514,20 @@ namespace parallel
        * Save the refinement information from the coarse mesh into the given
        * file. This file needs to be reachable from all nodes in the computation
        * on a shared network file system. See the SolutionTransfer class
-       * on how to store solution vectors into this file.
+       * on how to store solution vectors into this file. Additional cell-based data can be saved
+       * using register_data_attach().
        */
       void save(const char *filename) const;
 
       /**
        * Load the refinement information saved with save() back in. The mesh
-       * must contain the same coarse mesh that was used in save(). You do not
+       * must contain the same coarse mesh that was used in save() before calling
+       * this function. You do not
        * need to load with the same number of MPI processes that you saved
        * with. Rather, if a mesh is loaded with a different number of MPI
        * processes than used at the time of saving, the mesh is repartitioned
-       * appropriately.
+       * appropriately. Cell-based data that was saved with register_data_attach()
+       * can be read in with notify_ready_to_unpack() after calling load().
        */
       void load(const char *filename);
 

@@ -264,8 +264,6 @@ namespace Step40
                                       locally_relevant_dofs, mpi_communicator);
     system_rhs.reinit (locally_owned_dofs, mpi_communicator);
 
-    system_rhs = 0;
-
     // The next step is to compute hanging node and boundary value
     // constraints, which we combine into a single object storing all
     // constraints.

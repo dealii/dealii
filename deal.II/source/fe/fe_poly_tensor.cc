@@ -585,9 +585,9 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
     }
 
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
-    this->compute_2nd (mapping, cell,
-                       typename QProjector<dim>::DataSetDescriptor().cell(),
-                       mapping_data, fe_data, data);
+  	this->compute_2nd (mapping, cell,
+			   typename QProjector<dim>::DataSetDescriptor().cell(),
+			   mapping_data, fe_data, data);
 }
 
 
@@ -791,7 +791,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
     }
 
   if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+   	this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
 
@@ -989,7 +989,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
-                  data.shape_gradients[first + d][k] = shape_grads1[k][d];
+                  data.shape_gradients[first + d][k] = sign_change[i] * shape_grads1[k][d];
 
               break;
             }
@@ -1001,7 +1001,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
     }
 
   if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
+  	this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
 

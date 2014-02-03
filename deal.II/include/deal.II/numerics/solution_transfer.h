@@ -136,7 +136,7 @@ DEAL_II_NAMESPACE_OPEN
  * <li> Solution transfer with only refinement. Assume that we have got a
  * solution vector on the current (original) grid.
  * Each entry of this vector belongs to one of the
- * DoFs of the discretisation. If we now refine the grid then the calling of
+ * DoFs of the discretization. If we now refine the grid then the calling of
  * DoFHandler::distribute_dofs() will change at least some of the
  * DoF indices. Hence we need to store the DoF indices of all active cells
  * before the refinement. A pointer for each active cell
@@ -198,8 +198,36 @@ DEAL_II_NAMESPACE_OPEN
  * <tt>refine_interpolate(in, out)</tt>) only be called once.
  * </ul>
  *
+ *
+ * <h3>Implementation in the context of hp finite elements</h3>
+ *
+ * In the case of hp::DoFHandlers, it is not defined which of the finite elements
+ * that are part of the hp::FECollection associated with the DoF handler, should
+ * be considered on cells that are not active (i.e., that have children). This
+ * is because degrees of freedom are only allocated for active cells and, in fact,
+ * it is not allowed to set an active_fe_index on non-active cells using
+ * DoFAccessor::set_active_fe_index().
+ *
+ * It is, thus, not entirely natural what should happen if, for example, a few cells
+ * are coarsened away. This class then implements the following algorithm:
+ * - If a cell is refined, then the values of the solution vector(s) are saved before
+ *   refinement on the to-be-refined cell and in the space associated with this
+ *   cell. These values are then interpolated to the finite element spaces of the
+ *   children post-refinement. This may lose information if, for example, the old
+ *   cell used a Q2 space and the children use Q1 spaces, or the information may
+ *   be prolonged if the mother cell used a Q1 space and the children are Q2s.
+ * - If cells are to be coarsened, then the values from the child cells are
+ *   interpolated to the mother cell using the largest of the child cell spaces.
+ *   For example, if the children of a cell use Q1, Q2 and Q3 spaces, then the
+ *   values from the children are interpolated into a Q3 space on the mother cell.
+ *   After refinement, this Q3 function on the mother cell is then interpolated into
+ *   the space the user has selected for this cell (which may be different from
+ *   Q3, in this example, if the user has set the active_fe_index for a different
+ *   space post-refinement and before calling hp::DoFHandler::distribute_dofs()).
+ *
+ *
  * @ingroup numerics
- * @author Ralf Hartmann, 1999
+ * @author Ralf Hartmann, 1999, Oliver Kayser-Herold and Wolfgang Bangerth, 2006, 2014
  */
 template<int dim, typename VECTOR=Vector<double>, class DH=DoFHandler<dim> >
 class SolutionTransfer

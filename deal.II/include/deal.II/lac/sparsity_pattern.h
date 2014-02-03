@@ -435,43 +435,11 @@ public:
    * @arg m number of rows
    * @arg n number of columns
    * @arg max_per_row maximum number of nonzero entries per row
-   * @arg optimize_diagonal This parameter is ignored.
-   *
-   * @deprecated Use the constructor without the last argument since
-   *   it is ignored.
-   */
-  SparsityPattern (const size_type m,
-                   const size_type n,
-                   const unsigned int max_per_row,
-                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
-
-  /**
-   * Initialize a rectangular matrix.
-   *
-   * @arg m number of rows
-   * @arg n number of columns
-   * @arg max_per_row maximum number of nonzero entries per row
    */
   SparsityPattern (const size_type m,
                    const size_type n,
                    const unsigned int max_per_row);
 
-  /**
-   * Initialize a rectangular matrix.
-   *
-   * @arg m number of rows
-   * @arg n number of columns
-   * @arg row_lengths possible number of nonzero entries for each row.  This
-   * vector must have one entry for each row.
-   * @arg optimize_diagonal This argument is ignored.
-   *
-   * @deprecated Use the constructor without the last argument since
-   *   it is ignored.
-   */
-  SparsityPattern (const size_type               m,
-                   const size_type               n,
-                   const std::vector<unsigned int> &row_lengths,
-                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Initialize a rectangular matrix.
@@ -495,21 +463,6 @@ public:
    */
   SparsityPattern (const size_type n,
                    const unsigned int max_per_row);
-
-  /**
-   * Initialize a quadratic matrix.
-   *
-   * @arg m number of rows and columns
-   * @arg row_lengths possible number of nonzero entries for each row.  This
-   * vector must have one entry for each row.
-   * @arg optimize_diagonal This argument is ignored.
-   *
-   * @deprecated Use the constructor without the last argument since
-   *   it is ignored.
-   */
-  SparsityPattern (const size_type               m,
-                   const std::vector<unsigned int> &row_lengths,
-                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Initialize a quadratic matrix.
@@ -566,48 +519,11 @@ public:
    *
    * This function simply maps its operations to the other <tt>reinit</tt>
    * function.
-   *
-   * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
-   */
-  void reinit (const size_type m,
-               const size_type n,
-               const unsigned int max_per_row,
-               const bool optimize_diagonal) DEAL_II_DEPRECATED;
-
-  /**
-   * Reallocate memory and set up data structures for a new matrix with <tt>m
-   * </tt>rows and <tt>n</tt> columns, with at most <tt>max_per_row</tt>
-   * nonzero entries per row.
-   *
-   * This function simply maps its operations to the other <tt>reinit</tt>
-   * function.
    */
   void reinit (const size_type m,
                const size_type n,
                const unsigned int max_per_row);
 
-  /**
-   * Reallocate memory for a matrix of size <tt>m x n</tt>. The number of
-   * entries for each row is taken from the array <tt>row_lengths</tt> which
-   * has to give this number of each row <tt>i=1...m</tt>.
-   *
-   * If <tt>m*n==0</tt> all memory is freed, resulting in a total
-   * reinitialization of the object. If it is nonzero, new memory is only
-   * allocated if the new size extends the old one. This is done to save time
-   * and to avoid fragmentation of the heap.
-   *
-   * If the number of rows equals the number of columns and the last parameter
-   * is true, diagonal elements are stored first in each row to allow
-   * optimized access in relaxation methods of SparseMatrix.
-   *
-   * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
-   */
-  void reinit (const size_type               m,
-               const size_type               n,
-               const std::vector<unsigned int> &row_lengths,
-               const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Reallocate memory for a matrix of size <tt>m x n</tt>. The number of
@@ -627,16 +543,6 @@ public:
                const size_type               n,
                const std::vector<unsigned int> &row_lengths);
 
-  /**
-   * Same as above, but with a VectorSlice argument instead.
-   *
-   * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
-   */
-  void reinit (const size_type                                   m,
-               const size_type                                   n,
-               const VectorSlice<const std::vector<unsigned int> > &row_lengths,
-               const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Same as above, but with a VectorSlice argument instead.
@@ -659,91 +565,6 @@ public:
    */
   void compress ();
 
-  /**
-   * This function can be used as a replacement for reinit(), subsequent calls
-   * to add() and a final call to close() if you know exactly in advance the
-   * entries that will form the matrix sparsity pattern.
-   *
-   * The first two parameters determine the size of the matrix. For the two
-   * last ones, note that a sparse matrix can be described by a sequence of
-   * rows, each of which is represented by a sequence of pairs of column
-   * indices and values. In the present context, the begin() and end()
-   * parameters designate iterators (of forward iterator type) into a
-   * container, one representing one row. The distance between begin() and
-   * end() should therefore be equal to n_rows(). These iterators may be
-   * iterators of <tt>std::vector</tt>, <tt>std::list</tt>, pointers into a
-   * C-style array, or any other iterator satisfying the requirements of a
-   * forward iterator. The objects pointed to by these iterators (i.e. what we
-   * get after applying <tt>operator*</tt> or <tt>operator-></tt> to one of
-   * these iterators) must be a container itself that provides functions
-   * <tt>begin</tt> and <tt>end</tt> designating a range of iterators that
-   * describe the contents of one line. Dereferencing these inner iterators
-   * must either yield a pair of an unsigned integer as column index and a
-   * value of arbitrary type (such a type would be used if we wanted to
-   * describe a sparse matrix with one such object), or simply an unsigned
-   * integer (of we only wanted to describe a sparsity pattern). The function
-   * is able to determine itself whether an unsigned integer or a pair is what
-   * we get after dereferencing the inner iterators, through some template
-   * magic.
-   *
-   * While the order of the outer iterators denotes the different rows of the
-   * matrix, the order of the inner iterator denoting the columns does not
-   * matter, as they are sorted internal to this function anyway.
-   *
-   * Since that all sounds very complicated, consider the following example
-   * code, which may be used to fill a sparsity pattern:
-   * @code
-   * std::vector<std::vector<unsigned int> > column_indices (n_rows);
-   * for (unsigned int row=0; row<n_rows; ++row)
-   *         // generate necessary columns in this row
-   *   fill_row (column_indices[row]);
-   *
-   * sparsity.copy_from (n_rows, n_cols,
-   *                     column_indices.begin(),
-   *                     column_indices.end());
-   * @endcode
-   *
-   * Note that this example works since the iterators dereferenced yield
-   * containers with functions <tt>begin</tt> and <tt>end</tt> (namely
-   * <tt>std::vector</tt>s), and the inner iterators dereferenced yield
-   * unsigned integers as column indices. Note that we could have replaced
-   * each of the two <tt>std::vector</tt> occurrences by <tt>std::list</tt>,
-   * and the inner one by <tt>std::set</tt> as well.
-   *
-   * Another example would be as follows, where we initialize a whole matrix,
-   * not only a sparsity pattern:
-   * @code
-   * std::vector<std::map<unsigned int,double> > entries (n_rows);
-   * for (unsigned int row=0; row<n_rows; ++row)
-   *         // generate necessary pairs of columns
-   *         // and corresponding values in this row
-   *   fill_row (entries[row]);
-   *
-   * sparsity.copy_from (n_rows, n_cols,
-   *                     column_indices.begin(),
-   *                     column_indices.end());
-   * matrix.reinit (sparsity);
-   * matrix.copy_from (column_indices.begin(),
-   *                   column_indices.end());
-   * @endcode
-   *
-   * This example works because dereferencing iterators of the inner type
-   * yields a pair of unsigned integers and a value, the first of which we
-   * take as column index. As previously, the outer <tt>std::vector</tt> could
-   * be replaced by <tt>std::list</tt>, and the inner <tt>std::map<unsigned
-   * int,double></tt> could be replaced by <tt>std::vector<std::pair<unsigned
-   * int,double> ></tt>, or a list or set of such pairs, as they all return
-   * iterators that point to such pairs.
-   *
-   * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
-   */
-  template <typename ForwardIterator>
-  void copy_from (const size_type       n_rows,
-                  const size_type       n_cols,
-                  const ForwardIterator begin,
-                  const ForwardIterator end,
-                  const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * This function can be used as a replacement for reinit(), subsequent calls
@@ -829,19 +650,6 @@ public:
 
   /**
    * Copy data from an object of type CompressedSparsityPattern,
-   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern.
-   * Previous content of this object is lost, and the sparsity pattern is in
-   * compressed mode afterwards.
-   *
-   * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
-   */
-  template <typename CompressedSparsityType>
-  void copy_from (const CompressedSparsityType &csp,
-                  const bool optimize_diagonal) DEAL_II_DEPRECATED;
-
-  /**
-   * Copy data from an object of type CompressedSparsityPattern,
    * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern. Although
    * not a compressed sparsity pattern, this function is also instantiated
    * if the argument is of type SparsityPattern (i.e., the current class).
@@ -851,19 +659,6 @@ public:
   template <typename CompressedSparsityType>
   void copy_from (const CompressedSparsityType &csp);
 
-  /**
-   * Take a full matrix and use its nonzero entries to generate a sparse
-   * matrix entry pattern for this object.
-   *
-   * Previous content of this object is lost, and the sparsity pattern is in
-   * compressed mode afterwards.
-   *
-   * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
-   */
-  template <typename number>
-  void copy_from (const FullMatrix<number> &matrix,
-                  const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Take a full matrix and use its nonzero entries to generate a sparse
@@ -906,6 +701,10 @@ public:
                     const bool      indices_are_sorted = false);
 
 // @}
+
+
+
+
   /**
    * @name Iterators
    */
@@ -949,31 +748,6 @@ public:
    */
   iterator end (const size_type r) const;
 
-  /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
-   *
-   * Note that if the given row is empty, i.e. does not contain any nonzero
-   * entries, then the iterator returned by this function equals
-   * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
-   * that case.
-   *
-   * @deprecated Use the iterators provided by the begin() and end()
-   * functions instead.
-   */
-  row_iterator row_begin (const size_type r) const DEAL_II_DEPRECATED;
-
-  /**
-   * Final iterator of row <tt>r</tt>. It points to the first element past the
-   * end of line @p r, or past the end of the entire sparsity pattern.
-   *
-   * Note that the end iterator is not necessarily dereferencable. This is in
-   * particular the case if it is the end iterator for the last row of a
-   * matrix.
-   *
-   * @deprecated Use the iterators provided by the begin() and end()
-   * functions instead.
-   */
-  row_iterator row_end (const size_type r) const DEAL_II_DEPRECATED;
 
 // @}
   /**
@@ -1037,15 +811,6 @@ public:
    * Number of entries in a specific row.
    */
   unsigned int row_length (const size_type row) const;
-
-  /**
-   * Determine whether the matrix uses the special convention for quadratic
-   * matrices that the diagonal entries are stored first in each row.
-   *
-   * @deprecated The function always returns true if the matrix is
-   * square and false if it is not.
-   */
-  bool optimize_diagonal () const DEAL_II_DEPRECATED;
 
   /**
    * Return whether this object stores only those entries that have been added
@@ -1215,6 +980,255 @@ public:
    * @name Deprecated functions
    */
 // @{
+
+  /**
+   * Initialize a rectangular matrix.
+   *
+   * @arg m number of rows
+   * @arg n number of columns
+   * @arg max_per_row maximum number of nonzero entries per row
+   * @arg optimize_diagonal This parameter is ignored.
+   *
+   * @deprecated Use the constructor without the last argument since
+   *   it is ignored.
+   */
+  SparsityPattern (const size_type m,
+                   const size_type n,
+                   const unsigned int max_per_row,
+                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+  /**
+   * Initialize a rectangular matrix.
+   *
+   * @arg m number of rows
+   * @arg n number of columns
+   * @arg row_lengths possible number of nonzero entries for each row.  This
+   * vector must have one entry for each row.
+   * @arg optimize_diagonal This argument is ignored.
+   *
+   * @deprecated Use the constructor without the last argument since
+   *   it is ignored.
+   */
+  SparsityPattern (const size_type               m,
+                   const size_type               n,
+                   const std::vector<unsigned int> &row_lengths,
+                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+  /**
+   * Initialize a quadratic matrix.
+   *
+   * @arg m number of rows and columns
+   * @arg row_lengths possible number of nonzero entries for each row.  This
+   * vector must have one entry for each row.
+   * @arg optimize_diagonal This argument is ignored.
+   *
+   * @deprecated Use the constructor without the last argument since
+   *   it is ignored.
+   */
+  SparsityPattern (const size_type               m,
+                   const std::vector<unsigned int> &row_lengths,
+                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+
+  /**
+   * Reallocate memory for a matrix of size <tt>m x n</tt>. The number of
+   * entries for each row is taken from the array <tt>row_lengths</tt> which
+   * has to give this number of each row <tt>i=1...m</tt>.
+   *
+   * If <tt>m*n==0</tt> all memory is freed, resulting in a total
+   * reinitialization of the object. If it is nonzero, new memory is only
+   * allocated if the new size extends the old one. This is done to save time
+   * and to avoid fragmentation of the heap.
+   *
+   * If the number of rows equals the number of columns and the last parameter
+   * is true, diagonal elements are stored first in each row to allow
+   * optimized access in relaxation methods of SparseMatrix.
+   *
+   * @deprecated The last argument of this function is ignored. Use the
+   *     version of this function without the last argument.
+   */
+  void reinit (const size_type               m,
+               const size_type               n,
+               const std::vector<unsigned int> &row_lengths,
+               const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+
+  /**
+   * Same as above, but with a VectorSlice argument instead.
+   *
+   * @deprecated The last argument of this function is ignored. Use the
+   *     version of this function without the last argument.
+   */
+  void reinit (const size_type                                   m,
+               const size_type                                   n,
+               const VectorSlice<const std::vector<unsigned int> > &row_lengths,
+               const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+  /**
+   * Reallocate memory and set up data structures for a new matrix with <tt>m
+   * </tt>rows and <tt>n</tt> columns, with at most <tt>max_per_row</tt>
+   * nonzero entries per row.
+   *
+   * This function simply maps its operations to the other <tt>reinit</tt>
+   * function.
+   *
+   * @deprecated The last argument of this function is ignored. Use the
+   *     version of this function without the last argument.
+   */
+  void reinit (const size_type m,
+               const size_type n,
+               const unsigned int max_per_row,
+               const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+  /**
+   * This function can be used as a replacement for reinit(), subsequent calls
+   * to add() and a final call to close() if you know exactly in advance the
+   * entries that will form the matrix sparsity pattern.
+   *
+   * The first two parameters determine the size of the matrix. For the two
+   * last ones, note that a sparse matrix can be described by a sequence of
+   * rows, each of which is represented by a sequence of pairs of column
+   * indices and values. In the present context, the begin() and end()
+   * parameters designate iterators (of forward iterator type) into a
+   * container, one representing one row. The distance between begin() and
+   * end() should therefore be equal to n_rows(). These iterators may be
+   * iterators of <tt>std::vector</tt>, <tt>std::list</tt>, pointers into a
+   * C-style array, or any other iterator satisfying the requirements of a
+   * forward iterator. The objects pointed to by these iterators (i.e. what we
+   * get after applying <tt>operator*</tt> or <tt>operator-></tt> to one of
+   * these iterators) must be a container itself that provides functions
+   * <tt>begin</tt> and <tt>end</tt> designating a range of iterators that
+   * describe the contents of one line. Dereferencing these inner iterators
+   * must either yield a pair of an unsigned integer as column index and a
+   * value of arbitrary type (such a type would be used if we wanted to
+   * describe a sparse matrix with one such object), or simply an unsigned
+   * integer (of we only wanted to describe a sparsity pattern). The function
+   * is able to determine itself whether an unsigned integer or a pair is what
+   * we get after dereferencing the inner iterators, through some template
+   * magic.
+   *
+   * While the order of the outer iterators denotes the different rows of the
+   * matrix, the order of the inner iterator denoting the columns does not
+   * matter, as they are sorted internal to this function anyway.
+   *
+   * Since that all sounds very complicated, consider the following example
+   * code, which may be used to fill a sparsity pattern:
+   * @code
+   * std::vector<std::vector<unsigned int> > column_indices (n_rows);
+   * for (unsigned int row=0; row<n_rows; ++row)
+   *         // generate necessary columns in this row
+   *   fill_row (column_indices[row]);
+   *
+   * sparsity.copy_from (n_rows, n_cols,
+   *                     column_indices.begin(),
+   *                     column_indices.end());
+   * @endcode
+   *
+   * Note that this example works since the iterators dereferenced yield
+   * containers with functions <tt>begin</tt> and <tt>end</tt> (namely
+   * <tt>std::vector</tt>s), and the inner iterators dereferenced yield
+   * unsigned integers as column indices. Note that we could have replaced
+   * each of the two <tt>std::vector</tt> occurrences by <tt>std::list</tt>,
+   * and the inner one by <tt>std::set</tt> as well.
+   *
+   * Another example would be as follows, where we initialize a whole matrix,
+   * not only a sparsity pattern:
+   * @code
+   * std::vector<std::map<unsigned int,double> > entries (n_rows);
+   * for (unsigned int row=0; row<n_rows; ++row)
+   *         // generate necessary pairs of columns
+   *         // and corresponding values in this row
+   *   fill_row (entries[row]);
+   *
+   * sparsity.copy_from (n_rows, n_cols,
+   *                     column_indices.begin(),
+   *                     column_indices.end());
+   * matrix.reinit (sparsity);
+   * matrix.copy_from (column_indices.begin(),
+   *                   column_indices.end());
+   * @endcode
+   *
+   * This example works because dereferencing iterators of the inner type
+   * yields a pair of unsigned integers and a value, the first of which we
+   * take as column index. As previously, the outer <tt>std::vector</tt> could
+   * be replaced by <tt>std::list</tt>, and the inner <tt>std::map<unsigned
+   * int,double></tt> could be replaced by <tt>std::vector<std::pair<unsigned
+   * int,double> ></tt>, or a list or set of such pairs, as they all return
+   * iterators that point to such pairs.
+   *
+   * @deprecated The last argument of this function is ignored. Use the
+   *     version of this function without the last argument.
+   */
+  template <typename ForwardIterator>
+  void copy_from (const size_type       n_rows,
+                  const size_type       n_cols,
+                  const ForwardIterator begin,
+                  const ForwardIterator end,
+                  const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+  /**
+   * Copy data from an object of type CompressedSparsityPattern,
+   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern.
+   * Previous content of this object is lost, and the sparsity pattern is in
+   * compressed mode afterwards.
+   *
+   * @deprecated The last argument of this function is ignored. Use the
+   *     version of this function without the last argument.
+   */
+  template <typename CompressedSparsityType>
+  void copy_from (const CompressedSparsityType &csp,
+                  const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+
+  /**
+   * Take a full matrix and use its nonzero entries to generate a sparse
+   * matrix entry pattern for this object.
+   *
+   * Previous content of this object is lost, and the sparsity pattern is in
+   * compressed mode afterwards.
+   *
+   * @deprecated The last argument of this function is ignored. Use the
+   *     version of this function without the last argument.
+   */
+  template <typename number>
+  void copy_from (const FullMatrix<number> &matrix,
+                  const bool optimize_diagonal) DEAL_II_DEPRECATED;
+
+  /**
+   * STL-like iterator with the first entry of row <tt>r</tt>.
+   *
+   * Note that if the given row is empty, i.e. does not contain any nonzero
+   * entries, then the iterator returned by this function equals
+   * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
+   * that case.
+   *
+   * @deprecated Use the iterators provided by the begin() and end()
+   * functions instead.
+   */
+  row_iterator row_begin (const size_type r) const DEAL_II_DEPRECATED;
+
+  /**
+   * Final iterator of row <tt>r</tt>. It points to the first element past the
+   * end of line @p r, or past the end of the entire sparsity pattern.
+   *
+   * Note that the end iterator is not necessarily dereferencable. This is in
+   * particular the case if it is the end iterator for the last row of a
+   * matrix.
+   *
+   * @deprecated Use the iterators provided by the begin() and end()
+   * functions instead.
+   */
+  row_iterator row_end (const size_type r) const DEAL_II_DEPRECATED;
+
+  /**
+   * Determine whether the matrix uses the special convention for quadratic
+   * matrices that the diagonal entries are stored first in each row.
+   *
+   * @deprecated The function always returns true if the matrix is
+   * square and false if it is not.
+   */
+  bool optimize_diagonal () const DEAL_II_DEPRECATED;
+
   /**
    * @deprecated This function is deprecated. Use SparsityTools::partition
    * instead.
@@ -1292,6 +1306,8 @@ public:
    * on outdated information!
    */
   const size_type *get_column_numbers () const DEAL_II_DEPRECATED;
+
+// @}
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   /** @addtogroup Exceptions

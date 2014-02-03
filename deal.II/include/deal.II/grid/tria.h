@@ -477,7 +477,7 @@ namespace internal
  *    typedef quad_iterator        cell_iterator;
  *    typedef active_quad_iterator active_cell_iterator;
  *
-*    typedef line_iterator        face_iterator;
+ *    typedef line_iterator        face_iterator;
  *    typedef active_line_iterator active_face_iterator;
  *  @endcode
  *

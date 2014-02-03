@@ -239,6 +239,11 @@ namespace Step39
       }
     dinfo1.value(0) = std::sqrt(dinfo1.value(0));
     dinfo2.value(0) = dinfo1.value(0);
+    // do not fill values if cells are ghost cells because we don't communicate
+    if (!dinfo1.cell->is_locally_owned())
+      dinfo1.value(0) = 0.0;
+    if (!dinfo2.cell->is_locally_owned())
+      dinfo2.value(0) = 0.0;
   }
 
 
@@ -624,19 +629,25 @@ namespace Step39
     out_data.add(est, "cells");
     assembler.initialize(out_data, false);
 
-    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-    begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
-    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-    end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-
     Estimator<dim> integrator;
+    MeshWorker::LoopControl lctrl;
+    // assemble all faces adjacent to ghost cells to get the full
+    // information for all own cells without communication
+    lctrl.faces_to_ghost = MeshWorker::LoopControl::both;
+    
     MeshWorker::integration_loop<dim, dim> (
-      begin, end,
+        dof_handler.begin_active(), dof_handler.end(),
       dof_info, info_box,
-      integrator, assembler);
+      integrator, assembler, lctrl);
 
     triangulation.load_user_indices(old_user_indices);
-    return estimates.block(0).l2_norm();
+    // estimates is a BlockVector<double> (so serial) on each processor
+    // with one entry per active cell. Note that only the locally owned
+    // cells are !=0, so summing the contributions of l2_norm() over all
+    // processors is the right way to do this.
+    double local_norm = estimates.block(0).l2_norm();
+    local_norm *= local_norm;
+    return std::sqrt(Utilities::MPI::sum(local_norm, MPI_COMM_WORLD));
   }
 
 
@@ -727,12 +738,12 @@ namespace Step39
           }
 
         deallog << "Triangulation "
-                << triangulation.n_active_cells() << " cells, "
-                << triangulation.n_levels() << " levels" << std::endl;
+                << triangulation.n_global_active_cells() << " cells, "
+                << triangulation.n_global_levels() << " levels" << std::endl;
 
         setup_system();
         deallog << "DoFHandler " << dof_handler.n_dofs() << " dofs, level dofs";
-        for (unsigned int l=0; l<triangulation.n_levels(); ++l)
+        for (unsigned int l=0; l<triangulation.n_global_levels(); ++l)
           deallog << ' ' << dof_handler.n_dofs(l);
         deallog << std::endl;
 
@@ -756,8 +767,8 @@ namespace Step39
 int main(int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-  mpi_initlog(true);
-
+  MPILogInitAll log;
+  
   using namespace dealii;
   using namespace Step39;
 

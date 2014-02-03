@@ -64,6 +64,10 @@ public:
    */
   bool operator!= (const CellId &other) const;
 
+  /**
+   * compare two CellIds
+   */
+  bool operator<(const CellId &other) const;
 
   friend std::istream &operator>> (std::istream &is, CellId &cid);
   friend std::ostream &operator<< (std::ostream &os, const CellId &cid);
@@ -120,13 +124,33 @@ CellId::operator== (const CellId &other) const
   return id == other.id;
 }
 
-/**
- *
- */
 inline bool
 CellId::operator!= (const CellId &other) const
 {
   return !(*this == other);
+}
+
+inline
+bool CellId::operator<(const CellId &other) const
+{
+  if (this->coarse_cell_id != other.coarse_cell_id)
+    return this->coarse_cell_id < other.coarse_cell_id;
+
+  unsigned int idx = 0;
+  while (idx < id.size())
+    {
+      if (idx>=other.id.size())
+        return false;
+
+      if (id[idx] != other.id[idx])
+        return id[idx] < other.id[idx];
+
+      ++idx;
+    }
+
+  if (id.size() == other.id.size())
+    return false;
+  return true; // other.id is longer
 }
 
 DEAL_II_NAMESPACE_CLOSE

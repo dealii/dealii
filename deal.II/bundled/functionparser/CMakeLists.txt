@@ -15,11 +15,11 @@
 ## ---------------------------------------------------------------------
 
 #
-# Remove -Wall and -pedantic from CMAKE_CXX_FLAGS (in directory scope) to
+# Remove -Wall and -pedantic from DEAL_II_CXX_FLAGS (in directory scope) to
 # avoid some annoying warnings...
 #
-STRIP_FLAG(CMAKE_CXX_FLAGS "-Wall")
-STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wall")
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
 
 DEAL_II_ADD_LIBRARY(obj_functionparser OBJECT
   fparser.cc

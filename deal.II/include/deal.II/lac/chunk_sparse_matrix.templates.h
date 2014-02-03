@@ -596,6 +596,60 @@ ChunkSparseMatrix<number>::add (const number factor,
 }
 
 
+
+template <typename number>
+void
+ChunkSparseMatrix<number>::extract_row_copy (const size_type row,
+                                             const size_type array_length,
+                                             size_type &row_length,
+                                             size_type *column_indices,
+                                             number *values) const
+{
+  AssertIndexRange(cols->row_length(row), array_length+1);
+  AssertIndexRange(row, m());
+  const unsigned int chunk_size = cols->get_chunk_size();
+  const size_type reduced_row = row/chunk_size;
+
+  SparsityPattern::iterator it = cols->sparsity_pattern.begin(reduced_row),
+    itend = cols->sparsity_pattern.end(reduced_row);
+  const number *val_ptr = &val[(it-cols->sparsity_pattern.begin(0))*chunk_size*chunk_size
+                               +(row%chunk_size)*chunk_size];
+
+  // find out if we did padding and if this row is affected by it
+  if (cols->n_cols() % chunk_size == 0)
+    {
+      for ( ; it < itend; ++it)
+        {
+          for (unsigned int c=0; c<chunk_size; ++c)
+            {
+              *values++ = val_ptr[c];
+              *column_indices++ = it->column()*chunk_size+c;
+            }
+          val_ptr += chunk_size*chunk_size;
+        }
+      row_length = chunk_size * (cols->sparsity_pattern.row_length(reduced_row));
+    }
+  else
+    {
+      const unsigned int last_chunk_size = cols->n_cols() % chunk_size;
+      row_length = 0;
+      for ( ; it < itend; ++it)
+        {
+          const unsigned int next_chunk_size =
+            (it->column()==cols->sparsity_pattern.n_cols()-1) ?
+            last_chunk_size : chunk_size;
+          for (unsigned int c=0; c<next_chunk_size; ++c, ++row_length)
+            {
+              *values++ = val_ptr[c];
+              *column_indices++ = it->column()*chunk_size+c;
+            }
+          val_ptr += chunk_size*chunk_size;
+        }
+    }
+}
+
+
+
 template <typename number>
 template <class OutVector, class InVector>
 void

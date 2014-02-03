@@ -1643,9 +1643,14 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
 {
   std::string s = get (entry_string);
   char *endptr;
-  long int i = std::strtol (s.c_str(), &endptr, 10);
-  // assert there was no error
-  AssertThrow (*endptr == '\0', ExcConversionError(s));
+  const long int i = std::strtol (s.c_str(), &endptr, 10);
+  
+  // assert that there was no error. an error would be if
+  // either there was no string to begin with, or if
+  // strtol set the endptr to anything but the end of
+  // the string
+  AssertThrow ((s.size()>0) && (*endptr == '\0'),
+	       ExcConversionError(s));
 
   return i;
 }
@@ -1657,9 +1662,13 @@ double ParameterHandler::get_double (const std::string &entry_string) const
   std::string s = get (entry_string);
   char *endptr;
   double d = std::strtod (s.c_str(), &endptr);
-  // assert there was no error
-  AssertThrow ((*s.c_str() != '\0') || (*endptr == '\0'),
-               ExcConversionError(s));
+
+  // assert that there was no error. an error would be if
+  // either there was no string to begin with, or if
+  // strtol set the endptr to anything but the end of
+  // the string
+  AssertThrow ((s.size()>0) && (*endptr == '\0'),
+	       ExcConversionError(s));
 
   return d;
 }
@@ -1849,18 +1858,82 @@ ParameterHandler::print_parameters (std::ostream     &out,
 void
 ParameterHandler::print_parameters_section (std::ostream      &out,
                                             const OutputStyle  style,
-                                            const unsigned int indent_level)
+                                            const unsigned int indent_level,
+                                            const bool         include_top_level_elements)
 {
   AssertThrow (out, ExcIO());
 
   const boost::property_tree::ptree &current_section
     = entries->get_child (get_current_path());
 
+  unsigned int overall_indent_level = indent_level;
+
   switch (style)
     {
+    case XML:
+    {
+      if (include_top_level_elements)
+        {
+          // call the writer
+          // function and exit as
+          // there is nothing
+          // further to do down in
+          // this function
+          //
+          // XML has a requirement that
+          // there can only be one
+          // single top-level entry,
+          // but a section has multiple
+          // entries and sections. we
+          // work around this by
+          // creating a tree just for
+          // this purpose with the
+          // single top-level node
+          // "ParameterHandler" and
+          // assign the full path of
+          // down to the current section
+          // under it
+          boost::property_tree::ptree single_node_tree;
+
+          // if there is no subsection selected,
+          // add the whole tree of entries,
+          // otherwise add a root element
+          // and the selected subsection under it
+          if (subsection_path.size() == 0)
+            {
+              single_node_tree.add_child("ParameterHandler",
+                                         *entries);
+            }
+          else
+            {
+              std::string  path ("ParameterHandler");
+
+              single_node_tree.add_child(path,
+                                         boost::property_tree::ptree());
+
+              path += path_separator + get_current_path ();
+              single_node_tree.add_child (path, current_section);
+            };
+
+          write_xml (out, single_node_tree);
+        }
+      else
+        Assert (false, ExcNotImplemented());
+
+      break;
+    }
     case Text:
     case ShortText:
     {
+      // if there are top level elements to print, do it
+      if (include_top_level_elements && (subsection_path.size() > 0))
+        for (unsigned int i=0; i<subsection_path.size(); ++i)
+          {
+            out << std::setw(overall_indent_level*2) << ""
+                << "subsection " << demangle (subsection_path[i]) << std::endl;
+            overall_indent_level += 1;
+          };
+
       // first find out the longest
       // entry name to be able to
       // align the equal signs
@@ -1926,10 +1999,10 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 const std::vector<std::string> doc_lines
                   = Utilities::
                     break_text_into_lines (p->second.get<std::string>("documentation"),
-                                           78 - indent_level*2 - 2);
+                                           78 - overall_indent_level*2 - 2);
 
                 for (unsigned int i=0; i<doc_lines.size(); ++i)
-                  out << std::setw(indent_level*2) << ""
+                  out << std::setw(overall_indent_level*2) << ""
                       << "# "
                       << doc_lines[i]
                       << std::endl;
@@ -1939,7 +2012,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 
             // print name and value
             // of this entry
-            out << std::setw(indent_level*2) << ""
+            out << std::setw(overall_indent_level*2) << ""
                 << "set "
                 << demangle(p->first)
                 << std::setw(longest_name-demangle(p->first).length()+1) << " "
@@ -2034,6 +2107,15 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 
     case Description:
     {
+      // if there are top level elements to print, do it
+      if (include_top_level_elements && (subsection_path.size() > 0))
+        for (unsigned int i=0; i<subsection_path.size(); ++i)
+          {
+            out << std::setw(overall_indent_level*2) << ""
+                << "subsection " << demangle (subsection_path[i]) << std::endl;
+            overall_indent_level += 1;
+          };
+
       // first find out the longest
       // entry name to be able to
       // align the equal signs
@@ -2057,7 +2139,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             const std::string value = p->second.get<std::string>("value");
 
             // print name and value
-            out << std::setw(indent_level*2) << ""
+            out << std::setw(overall_indent_level*2) << ""
                 << "set "
                 << demangle(p->first)
                 << std::setw(longest_name-demangle(p->first).length()+1) << " "
@@ -2067,12 +2149,12 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             const std::vector<std::string> description_str
               = Utilities::break_text_into_lines (p->second.get<std::string>
                                                   ("pattern_description"),
-                                                  78 - indent_level*2 - 2, '|');
+                                                  78 - overall_indent_level*2 - 2, '|');
             if (description_str.size() > 1)
               {
                 out << std::endl;
                 for (unsigned int i=0; i<description_str.size(); ++i)
-                  out << std::setw(indent_level*2+6) << ""
+                  out << std::setw(overall_indent_level*2+6) << ""
                       << description_str[i] << std::endl;
               }
             else if (description_str.empty() == false)
@@ -2084,7 +2166,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             // documenting string,
             // print it as well
             if (p->second.get<std::string>("documentation").length() != 0)
-              out << std::setw(indent_level*2 + longest_name + 10) << ""
+              out << std::setw(overall_indent_level*2 + longest_name + 10) << ""
                   << "(" << p->second.get<std::string>("documentation") << ")" << std::endl;
           }
 
@@ -2100,6 +2182,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
   // sections to come, put two newlines
   // between the last entry and the first
   // subsection
+  if (style != XML)
   {
     unsigned int n_parameters = 0;
     unsigned int n_sections   = 0;
@@ -2119,7 +2202,6 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
         &&
         (n_sections != 0))
       out << std::endl << std::endl;
-  }
 
   // now traverse subsections tree,
   // in alphabetical order
@@ -2134,7 +2216,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
           case Text:
           case Description:
           case ShortText:
-            out << std::setw(indent_level*2) << ""
+                out << std::setw(overall_indent_level*2) << ""
                 << "subsection " << demangle(p->first) << std::endl;
             break;
           case LaTeX:
@@ -2168,7 +2250,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
         // then the contents of the
         // subsection
         enter_subsection (demangle(p->first));
-        print_parameters_section (out, style, indent_level+1);
+            print_parameters_section (out, style, overall_indent_level+1);
         leave_subsection ();
         switch (style)
           {
@@ -2177,14 +2259,14 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             // subsection. one
             // blank line after
             // each subsection
-            out << std::setw(indent_level*2) << ""
+                out << std::setw(overall_indent_level*2) << ""
                 << "end" << std::endl
                 << std::endl;
 
             // if this is a toplevel
             // subsection, then have two
             // newlines
-            if (indent_level == 0)
+                if (overall_indent_level == 0)
               out << std::endl;
 
             break;
@@ -2193,7 +2275,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
           case ShortText:
             // write end of
             // subsection.
-            out << std::setw(indent_level*2) << ""
+                out << std::setw(overall_indent_level*2) << ""
                 << "end" << std::endl;
             break;
           case LaTeX:
@@ -2202,6 +2284,33 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             Assert (false, ExcNotImplemented());
           }
       }
+}
+
+  // close top level elements, if there are any
+  switch (style)
+    {
+    case XML:
+    case LaTeX:
+    case Description:
+      break;
+    case Text:
+    case ShortText:
+    {
+      if (include_top_level_elements && (subsection_path.size() > 0))
+        for (unsigned int i=0; i<subsection_path.size(); ++i)
+          {
+            overall_indent_level -= 1;
+            out << std::setw(overall_indent_level*2) << ""
+                << "end" << std::endl;
+          };
+
+      break;
+    }
+
+    default:
+      Assert (false, ExcNotImplemented());
+    }
+
 }
 
 

@@ -201,11 +201,11 @@ int main()
   FE_RaviartThomas<2> rt1(1);
   FE_Q<2> q2(2);
 
-  FESystem<2> sys1(p0, 2, p1, 1);
-  FESystem<2> sys2(p0, 2, rt0, 1);
-  FESystem<2> sys3(rt0, 1, p0, 2);
-  FESystem<2> sys4(p1, 2, q2, 2);
-  FESystem<2> sys5(q2, 2, p1, 2);
+  // FESystem<2> sys1(p0, 2, p1, 1);
+  // FESystem<2> sys2(p0, 2, rt0, 1);
+  // FESystem<2> sys3(rt0, 1, p0, 2);
+  // FESystem<2> sys4(p1, 2, q2, 2);
+  // FESystem<2> sys5(q2, 2, p1, 2);
 
   test(rt0);
   test(rt1);

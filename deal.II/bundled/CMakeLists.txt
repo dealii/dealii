@@ -18,7 +18,7 @@
 # Compile and install enabled bundled features:
 #
 
-MESSAGE(STATUS "Setup bundled features")
+MESSAGE(STATUS "Setting up bundled features")
 
 
 IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
@@ -28,20 +28,15 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     PATTERN ".svn" EXCLUDE
     )
 
-  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
-    "${BOOST_FOLDER}/include\n"
-    )
-
   ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
 
-  IF(DEAL_II_WITH_THREADS AND NOT DEAL_II_USE_CXX11)
-    #
-    # If the C++ compiler doesn't completely support the C++11 standard
-    # (and consequently we can't use std::thread, std::mutex, etc), then
-    # include all the files that form BOOST's thread implementation so that
-    # we don't have to build BOOST itself only to get at this small part of
-    # it. it also ensures that we use the correct compiler and flags
-    #
+  IF(DEAL_II_WITH_ZLIB)
+    ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/iostreams/src)
+  ELSE()
+    MESSAGE(STATUS "BOOST::Iostreams will not be available because zlib or its header files could not be found")
+  ENDIF()
+
+  IF(DEAL_II_WITH_THREADS AND NOT DEAL_II_WITH_CXX11)
     ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/thread/src)
   ENDIF()
 ENDIF()
@@ -60,10 +55,6 @@ IF(FEATURE_THREADS_BUNDLED_CONFIGURED)
     PATTERN ".svn" EXCLUDE
     )
 
-  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_source_includes
-    "${TBB_FOLDER}/include\n"
-    )
-
   ADD_SUBDIRECTORY(${TBB_FOLDER}/src)
 ENDIF()
 
@@ -74,4 +65,4 @@ IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
 ENDIF()
 
 
-MESSAGE(STATUS "Setup bundled features - Done")
+MESSAGE(STATUS "Setting up bundled features - Done")

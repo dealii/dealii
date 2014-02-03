@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,6 +37,7 @@ LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type n)
 {}
 
 
+
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(
   const size_type m,
@@ -47,12 +48,14 @@ LAPACKFullMatrix<number>::LAPACKFullMatrix(
 {}
 
 
+
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(const LAPACKFullMatrix &M)
   :
   TransposeTable<number> (M),
   state(matrix)
 {}
+
 
 
 template <typename number>
@@ -65,12 +68,13 @@ LAPACKFullMatrix<number>::operator = (const LAPACKFullMatrix<number> &M)
 }
 
 
+
 template <typename number>
 template <typename number2>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator = (const FullMatrix<number2> &M)
 {
-  Assert (this->n_rows() == M.m(), ExcDimensionMismatch(this->n_rows(), M.m()));
+  Assert (this->n_rows() == M.n_rows(), ExcDimensionMismatch(this->n_rows(), M.n_rows()));
   Assert (this->n_cols() == M.n(), ExcDimensionMismatch(this->n_cols(), M.n()));
   for (size_type i=0; i<this->n_rows(); ++i)
     for (size_type j=0; j<this->n_cols(); ++j)
@@ -79,6 +83,7 @@ LAPACKFullMatrix<number>::operator = (const FullMatrix<number2> &M)
   state = LAPACKSupport::matrix;
   return *this;
 }
+
 
 
 template <typename number>
@@ -93,6 +98,7 @@ LAPACKFullMatrix<number>::operator = (const double d)
   state = LAPACKSupport::matrix;
   return *this;
 }
+
 
 
 template <typename number>
@@ -151,6 +157,7 @@ LAPACKFullMatrix<number>::vmult (
       Assert (false, ExcState(state));
     }
 }
+
 
 
 template <typename number>
@@ -213,6 +220,211 @@ LAPACKFullMatrix<number>::Tvmult (
 }
 
 
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::mmult(LAPACKFullMatrix<number>       &C,
+                                const LAPACKFullMatrix<number> &B,
+                                const bool                      adding) const
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert(C.state == matrix, ExcState(state));
+  Assert (this->n_cols() == B.n_rows(), ExcDimensionMismatch(this->n_cols(), B.n_rows()));
+  Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
+  Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
+  const int mm = this->n_rows();
+  const int nn = B.n_cols();
+  const int kk = this->n_cols();
+  const number alpha = 1.;
+  const number beta = (adding ? 1. : 0.);
+  const number null = 0.;
+
+  gemm("N", "N", &mm, &nn, &kk, &alpha, &this->values[0], &mm, &B.values[0],
+       &kk, &beta, &C.values[0], &mm);
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::mmult(FullMatrix<number>             &C,
+                                const LAPACKFullMatrix<number> &B,
+                                const bool                      adding) const
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert (this->n_cols() == B.n_rows(), ExcDimensionMismatch(this->n_cols(), B.n_rows()));
+  Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
+  Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
+  const int mm = this->n_rows();
+  const int nn = B.n_cols();
+  const int kk = this->n_cols();
+  const number alpha = 1.;
+  const number beta = (adding ? 1. : 0.);
+  const number null = 0.;
+
+  // since FullMatrix stores the matrix in transposed order compared to this
+  // matrix, compute B^T * A^T = (A * B)^T
+  gemm("T", "T", &nn, &mm, &kk, &alpha, &B.values[0], &kk, &this->values[0],
+       &mm, &beta, &C(0,0), &nn);
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number>       &C,
+                                 const LAPACKFullMatrix<number> &B,
+                                 const bool                      adding) const
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert(C.state == matrix, ExcState(state));
+  Assert (this->n_rows() == B.n_rows(), ExcDimensionMismatch(this->n_rows(), B.n_rows()));
+  Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
+  Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
+  const int mm = this->n_cols();
+  const int nn = B.n_cols();
+  const int kk = B.n_rows();
+  const number alpha = 1.;
+  const number beta = (adding ? 1. : 0.);
+  const number null = 0.;
+
+  gemm("T", "N", &mm, &nn, &kk, &alpha, &this->values[0], &kk, &B.values[0],
+       &kk, &beta, &C.values[0], &mm);
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::Tmmult(FullMatrix<number>             &C,
+                                 const LAPACKFullMatrix<number> &B,
+                                 const bool                      adding) const
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert (this->n_rows() == B.n_rows(), ExcDimensionMismatch(this->n_rows(), B.n_rows()));
+  Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
+  Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
+  const int mm = this->n_cols();
+  const int nn = B.n_cols();
+  const int kk = B.n_rows();
+  const number alpha = 1.;
+  const number beta = (adding ? 1. : 0.);
+  const number null = 0.;
+
+  // since FullMatrix stores the matrix in transposed order compared to this
+  // matrix, compute B^T * A = (A^T * B)^T
+  gemm("T", "N", &nn, &mm, &kk, &alpha, &B.values[0], &kk, &this->values[0],
+       &kk, &beta, &C(0,0), &nn);
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::mTmult(LAPACKFullMatrix<number>       &C,
+                                 const LAPACKFullMatrix<number> &B,
+                                 const bool                      adding) const
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert(C.state == matrix, ExcState(state));
+  Assert (this->n_cols() == B.n_cols(), ExcDimensionMismatch(this->n_cols(), B.n_cols()));
+  Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
+  Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
+  const int mm = this->n_rows();
+  const int nn = B.n_rows();
+  const int kk = B.n_cols();
+  const number alpha = 1.;
+  const number beta = (adding ? 1. : 0.);
+  const number null = 0.;
+
+  gemm("N", "T", &mm, &nn, &kk, &alpha, &this->values[0], &mm, &B.values[0],
+       &nn, &beta, &C.values[0], &mm);
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::mTmult(FullMatrix<number>             &C,
+                                 const LAPACKFullMatrix<number> &B,
+                                 const bool                      adding) const
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert (this->n_cols() == B.n_cols(), ExcDimensionMismatch(this->n_cols(), B.n_cols()));
+  Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
+  Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
+  const int mm = this->n_rows();
+  const int nn = B.n_rows();
+  const int kk = B.n_cols();
+  const number alpha = 1.;
+  const number beta = (adding ? 1. : 0.);
+  const number null = 0.;
+
+  // since FullMatrix stores the matrix in transposed order compared to this
+  // matrix, compute B * A^T = (A * B^T)^T
+  gemm("N", "T", &nn, &mm, &kk, &alpha, &B.values[0], &nn, &this->values[0],
+       &mm, &beta, &C(0,0), &nn);
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number>       &C,
+                                  const LAPACKFullMatrix<number> &B,
+                                  const bool                      adding) const
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert(C.state == matrix, ExcState(state));
+  Assert (this->n_rows() == B.n_cols(), ExcDimensionMismatch(this->n_rows(), B.n_cols()));
+  Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
+  Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
+  const int mm = this->n_cols();
+  const int nn = B.n_rows();
+  const int kk = B.n_cols();
+  const number alpha = 1.;
+  const number beta = (adding ? 1. : 0.);
+  const number null = 0.;
+
+  gemm("T", "T", &mm, &nn, &kk, &alpha, &this->values[0], &kk, &B.values[0],
+       &nn, &beta, &C.values[0], &mm);
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::TmTmult(FullMatrix<number>             &C,
+                                  const LAPACKFullMatrix<number> &B,
+                                  const bool                      adding) const
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert (this->n_rows() == B.n_cols(), ExcDimensionMismatch(this->n_rows(), B.n_cols()));
+  Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
+  Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
+  const int mm = this->n_cols();
+  const int nn = B.n_rows();
+  const int kk = B.n_cols();
+  const number alpha = 1.;
+  const number beta = (adding ? 1. : 0.);
+  const number null = 0.;
+
+  // since FullMatrix stores the matrix in transposed order compared to this
+  // matrix, compute B * A = (A^T * B^T)^T
+  gemm("N", "N", &nn, &mm, &kk, &alpha, &B.values[0], &nn, &this->values[0],
+       &kk, &beta, &C(0,0), &nn);
+}
+
+
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_lu_factorization()
@@ -230,6 +442,7 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
 
   state = lu;
 }
+
 
 
 template <typename number>
@@ -252,12 +465,10 @@ LAPACKFullMatrix<number>::compute_svd()
   number *mvt = const_cast<number *> (&svd_vt->values[0]);
   int info = 0;
 
-  // see comment on this #if
-  // below. Another reason to love Petsc
+  // see comment on this #if below. Another reason to love Petsc
 #ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
 
-  // First determine optimal
-  // workspace size
+  // First determine optimal workspace size
   work.resize(1);
   int lwork = -1;
   gesdd(&LAPACKSupport::A, &mm, &nn, values, &mm,
@@ -284,6 +495,7 @@ LAPACKFullMatrix<number>::compute_svd()
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
@@ -303,6 +515,7 @@ LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
     }
   state = LAPACKSupport::inverse_svd;
 }
+
 
 
 template <typename number>
@@ -337,6 +550,7 @@ LAPACKFullMatrix<number>::invert()
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
@@ -356,6 +570,29 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
 
   AssertThrow(info == 0, ExcInternalError());
 }
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
+                                                 const bool transposed) const
+{
+  Assert(state == lu, ExcState(state));
+  Assert(B.state == matrix, ExcState(state));
+  Assert(this->n_rows() == this->n_cols(), LACExceptions::ExcNotQuadratic());
+
+  const char *trans = transposed ? &T : &N;
+  const int nn = this->n_cols();
+  const int kk = B.n_cols();
+  const number *values = &this->values[0];
+  int info = 0;
+
+  getrs(trans, &nn, &kk, values, &nn, &ipiv[0], &B.values[0], &nn, &info);
+
+  AssertThrow(info == 0, ExcInternalError());
+}
+
 
 
 template <typename number>
@@ -380,23 +617,20 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
 
   // Optimal workspace query:
 
-  // The LAPACK routine DGEEV requires
-  // a sufficient large workspace variable,
+  // The LAPACK routine DGEEV requires a sufficient large workspace variable,
   // minimum requirement is
   //    work.size>=4*nn.
-  // However, to improve performance, a
-  // somewhat larger workspace may be needed.
+  // However, to improve performance, a somewhat larger workspace may be
+  // needed.
 
-  // SOME implementations of the LAPACK routine
-  // provide a workspace query call,
+  // SOME implementations of the LAPACK routine provide a workspace query
+  // call,
   //   info:=0, lwork:=-1
-  // which returns an optimal value for the
-  // size of the workspace array
-  // (the PETSc 2.3.0 implementation does NOT
-  // provide this functionality!).
+  // which returns an optimal value for the size of the workspace array (the
+  // PETSc 2.3.0 implementation does NOT provide this functionality!).
 
-  // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to
-  // disable the workspace query.
+  // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to disable the workspace
+  // query.
 #ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
   lwork = -1;
   work.resize(1);
@@ -405,14 +639,10 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
        &wr[0], &wi[0],
        &vl[0], &nn, &vr[0], &nn,
        &work[0], &lwork, &info);
-  // geev returns info=0 on
-  // success. Since we only queried
-  // the optimal size for work,
-  // everything else would not be
-  // acceptable.
+  // geev returns info=0 on success. Since we only queried the optimal size
+  // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
-  // Allocate working array according
-  // to suggestion.
+  // Allocate working array according to suggestion.
   lwork = (int) (work[0]+.1);
 #else
   lwork = 4*nn;                    // no query mode
@@ -425,9 +655,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
        &wr[0], &wi[0],
        &vl[0], &nn, &vr[0], &nn,
        &work[0], &lwork, &info);
-  // Negative return value implies a
-  // wrong argument. This should be
-  // internal.
+  // Negative return value implies a wrong argument. This should be internal.
 
   Assert (info >=0, ExcInternalError());
 //TODO:[GK] What if the QR method fails?
@@ -470,20 +698,17 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
 
   // Optimal workspace query:
 
-  // The LAPACK routine ?SYEVX requires
-  // a sufficient large workspace variable,
+  // The LAPACK routine ?SYEVX requires a sufficient large workspace variable,
   // minimum requirement is
   //    work.size>=3*nn-1.
-  // However, to improve performance, a
-  // somewhat larger workspace may be needed.
+  // However, to improve performance, a somewhat larger workspace may be
+  // needed.
 
-  // SOME implementations of the LAPACK routine
-  // provide a workspace query call,
+  // SOME implementations of the LAPACK routine provide a workspace query
+  // call,
   //   info:=0, lwork:=-1
-  // which returns an optimal value for the
-  // size of the workspace array
-  // (the PETSc 2.3.0 implementation does NOT
-  // provide this functionality!).
+  // which returns an optimal value for the size of the workspace array (the
+  // PETSc 2.3.0 implementation does NOT provide this functionality!).
 
   // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to
   // disable the workspace query.
@@ -498,14 +723,10 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
          &n_eigenpairs, &wr[0], values_eigenvectors,
          &nn, &work[0], &lwork, &iwork[0],
          &ifail[0], &info);
-  // syevx returns info=0 on
-  // success. Since we only queried
-  // the optimal size for work,
-  // everything else would not be
-  // acceptable.
+  // syevx returns info=0 on success. Since we only queried the optimal size
+  // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
-  // Allocate working array according
-  // to suggestion.
+  // Allocate working array according to suggestion.
   lwork = (int) (work[0]+.1);
 #else
   lwork = 8*nn > 1 ? 8*nn : 1; // no query mode
@@ -522,9 +743,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
          &nn, &work[0], &lwork, &iwork[0],
          &ifail[0], &info);
 
-  // Negative return value implies a
-  // wrong argument. This should be
-  // internal.
+  // Negative return value implies a wrong argument. This should be internal.
   Assert (info >=0, ExcInternalError());
   if (info != 0)
     std::cerr << "LAPACK error in syevx" << std::endl;
@@ -583,23 +802,20 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 
   // Optimal workspace query:
 
-  // The LAPACK routine ?SYGVX requires
-  // a sufficient large workspace variable,
+  // The LAPACK routine ?SYGVX requires a sufficient large workspace variable,
   // minimum requirement is
   //    work.size>=3*nn-1.
-  // However, to improve performance, a
-  // somewhat larger workspace may be needed.
+  // However, to improve performance, a somewhat larger workspace may be
+  // needed.
 
-  // SOME implementations of the LAPACK routine
-  // provide a workspace query call,
+  // SOME implementations of the LAPACK routine provide a workspace query
+  // call,
   //   info:=0, lwork:=-1
-  // which returns an optimal value for the
-  // size of the workspace array
-  // (the PETSc 2.3.0 implementation does NOT
-  // provide this functionality!).
+  // which returns an optimal value for the size of the workspace array (the
+  // PETSc 2.3.0 implementation does NOT provide this functionality!).
 
-  // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to
-  // disable the workspace query.
+  // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to disable the workspace
+  // query.
 #ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
   lwork = -1;
   work.resize(1);
@@ -609,14 +825,10 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
          dummy, dummy, &abs_accuracy, &n_eigenpairs,
          &wr[0], values_eigenvectors, &nn, &work[0],
          &lwork, &iwork[0], &ifail[0], &info);
-  // sygvx returns info=0 on
-  // success. Since we only queried
-  // the optimal size for work,
-  // everything else would not be
-  // acceptable.
+  // sygvx returns info=0 on success. Since we only queried the optimal size
+  // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
-  // Allocate working array according
-  // to suggestion.
+  // Allocate working array according to suggestion.
   lwork = (int) (work[0]+.1);
 #else
   lwork = 8*nn > 1 ? 8*nn : 1; // no query mode
@@ -624,17 +836,14 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   // resize workspace arrays
   work.resize(static_cast<size_type> (lwork));
 
-  // Finally compute the generalized
-  // eigenvalues.
+  // Finally compute the generalized eigenvalues.
   sygvx (&itype, jobz, range, uplo, &nn, values_A, &nn,
          values_B, &nn, &lower_bound, &upper_bound,
          dummy, dummy, &abs_accuracy, &n_eigenpairs,
          &wr[0], values_eigenvectors, &nn, &work[0],
          &lwork, &iwork[0], &ifail[0], &info);
 
-  // Negative return value implies a
-  // wrong argument. This should be
-  // internal.
+  // Negative return value implies a wrong argument. This should be internal.
   Assert (info >=0, ExcInternalError());
   if (info != 0)
     std::cerr << "LAPACK error in sygvx" << std::endl;
@@ -686,23 +895,20 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
 
   // Optimal workspace query:
 
-  // The LAPACK routine DSYGV requires
-  // a sufficient large workspace variable,
+  // The LAPACK routine DSYGV requires a sufficient large workspace variable,
   // minimum requirement is
   //    work.size>=3*nn-1.
-  // However, to improve performance, a
-  // somewhat larger workspace may be needed.
+  // However, to improve performance, a somewhat larger workspace may be
+  // needed.
 
-  // SOME implementations of the LAPACK routine
-  // provide a workspace query call,
+  // SOME implementations of the LAPACK routine provide a workspace query
+  // call,
   //   info:=0, lwork:=-1
-  // which returns an optimal value for the
-  // size of the workspace array
-  // (the PETSc 2.3.0 implementation does NOT
-  // provide this functionality!).
+  // which returns an optimal value for the size of the workspace array (the
+  // PETSc 2.3.0 implementation does NOT provide this functionality!).
 
-  // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to
-  // disable the workspace query.
+  // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to disable the workspace
+  // query.
 #ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
   lwork = -1;
   work.resize(1);
@@ -710,14 +916,10 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   sygv (&itype, jobz, uplo, &nn, values_A, &nn,
         values_B, &nn,
         &wr[0], &work[0], &lwork, &info);
-  // sygv returns info=0 on
-  // success. Since we only queried
-  // the optimal size for work,
-  // everything else would not be
-  // acceptable.
+  // sygv returns info=0 on success. Since we only queried the optimal size
+  // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
-  // Allocate working array according
-  // to suggestion.
+  // Allocate working array according to suggestion.
   lwork = (int) (work[0]+.1);
 #else
   lwork = 3*nn-1 > 1 ? 3*nn-1 : 1; // no query mode
@@ -725,14 +927,11 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   // resize workspace array
   work.resize((size_type) lwork);
 
-  // Finally compute the generalized
-  // eigenvalues.
+  // Finally compute the generalized eigenvalues.
   sygv (&itype, jobz, uplo, &nn, values_A, &nn,
         values_B, &nn,
         &wr[0], &work[0], &lwork, &info);
-  // Negative return value implies a
-  // wrong argument. This should be
-  // internal.
+  // Negative return value implies a wrong argument. This should be internal.
 
   Assert (info >=0, ExcInternalError());
   if (info != 0)

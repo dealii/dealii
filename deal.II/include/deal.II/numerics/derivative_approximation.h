@@ -271,7 +271,6 @@ public:
    * In a parallel computation the @p solution vector needs to contain the
    * locally relevant unknowns.
    */
-
   template <int dim, template <int, int> class DH, class InputVector, int order, int spacedim>
   static void
   approximate_derivative_tensor (const Mapping<dim,spacedim>                           &mapping,
@@ -284,7 +283,6 @@ public:
   /**
    * Same as above, with <tt>mapping=MappingQ1@<dim@>()</tt>.
    */
-
   template <int dim, template <int, int> class DH, class InputVector, int order, int spacedim>
   static void
   approximate_derivative_tensor (const DH<dim,spacedim>                                &dof,
@@ -568,7 +566,7 @@ private:
   template <class DerivativeDescription, int dim,
             template <int, int> class DH, class InputVector, int spacedim>
   static void
-  approximate (SynchronousIterators<std_cxx1x::tuple<FilteredIterator<typename DH<dim,spacedim>::active_cell_iterator>,
+  approximate (SynchronousIterators<std_cxx1x::tuple<typename DH<dim,spacedim>::active_cell_iterator,
                Vector<float>::iterator> > const &cell,
                const Mapping<dim,spacedim>    &mapping,
                const DH<dim,spacedim>         &dof,

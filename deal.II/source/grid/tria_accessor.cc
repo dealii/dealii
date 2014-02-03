@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1224,7 +1224,7 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
       return (GeometryInfo<dim>::is_inside_unit_cell
               (StaticMappingQ1<dim,spacedim>::mapping.transform_real_to_unit_cell(cell_iterator, p)));
     }
-  catch (const Mapping<dim,spacedim>::ExcTransformationFailed &e)
+  catch (const Mapping<dim,spacedim>::ExcTransformationFailed &)
     {
       return false;
     }

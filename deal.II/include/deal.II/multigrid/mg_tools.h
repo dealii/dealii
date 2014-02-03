@@ -292,8 +292,8 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs,
-                                std::vector<std::vector<bool> >  &boundary_interface_dofs);
+                                std::vector<IndexSet>  &interface_dofs,
+                                std::vector<IndexSet>  &boundary_interface_dofs);
 
   /**
    * Does the same as the function above,
@@ -302,7 +302,16 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs);
+                                std::vector<IndexSet>  &interface_dofs);
+
+  /**
+   * As above but with a deprecated data structure. This makes one additional copy.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
+                                std::vector<std::vector<bool> >  &interface_dofs) DEAL_II_DEPRECATED;
+
 
   template <int dim, int spacedim>
   void

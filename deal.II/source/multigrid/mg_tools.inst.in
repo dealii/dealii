@@ -118,12 +118,17 @@ for (deal_II_dimension : DIMENSIONS)
     template
 	void
 	extract_inner_interface_dofs (const DoFHandler<deal_II_dimension> &mg_dof_handler,
-				      std::vector<std::vector<bool> >  &interface_dofs,
-				      std::vector<std::vector<bool> >  &boundary_interface_dofs);
+				      std::vector<IndexSet>  &interface_dofs,
+				      std::vector<IndexSet>  &boundary_interface_dofs);
+      template
+	void
+	extract_inner_interface_dofs (const DoFHandler<deal_II_dimension> &mg_dof_handler,
+				      std::vector<IndexSet>  &interface_dofs);
       template
 	void
 	extract_inner_interface_dofs (const DoFHandler<deal_II_dimension> &mg_dof_handler,
 				      std::vector<std::vector<bool> >  &interface_dofs);
+
       template
         void
         extract_non_interface_dofs (const DoFHandler<deal_II_dimension> & mg_dof_handler,

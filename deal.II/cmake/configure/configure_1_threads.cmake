@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -31,21 +31,15 @@ MACRO(SETUP_THREADING)
   #
   IF(CMAKE_C_COMPILER_WORKS)
     #
-    # Switch the library preference back to prefer dynamic libraries if
-    # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
-    # this case system libraries should be linked dynamically.
-    #
-    SWITCH_LIBRARY_PREFERENCE()
-
-    #
     # Clear the test flags because FindThreads.cmake will use a C compiler:
     #
     CLEAR_CMAKE_REQUIRED()
 
+    SWITCH_LIBRARY_PREFERENCE()
     FIND_PACKAGE(Threads)
+    SWITCH_LIBRARY_PREFERENCE()
 
     RESET_CMAKE_REQUIRED()
-    SWITCH_LIBRARY_PREFERENCE()
 
   ELSE()
 
@@ -63,7 +57,7 @@ MACRO(SETUP_THREADING)
 
   IF(NOT Threads_FOUND)
     #
-    # TODO: This is a dead end. Threading might be setup with internal TBB
+    # TODO: This is a dead end. Threading might be set up with internal TBB
     # so we have no way of returning unsuccessfully...
     #
     MESSAGE(FATAL_ERROR
@@ -88,7 +82,7 @@ MACRO(SETUP_THREADING)
     ENDIF()
   ENDIF()
 
-  ADD_FLAGS(DEAL_II_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+  ADD_FLAGS(THREADS_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
   #
   # Set up some posix thread specific configuration toggles:
@@ -152,13 +146,10 @@ ENDMACRO()
 
 MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL)
 
-  REGISTER_FEATURE(TBB)
-
   IF(CMAKE_BUILD_TYPE MATCHES "Debug")
     IF(TBB_WITH_DEBUG_LIB)
-      LIST(APPEND DEAL_II_DEFINITIONS_DEBUG
-        "TBB_USE_DEBUG=1" "TBB_DO_ASSERT=1"
-        )
+      LIST(APPEND THREADS_DEFINITIONS_DEBUG "TBB_USE_DEBUG" "TBB_DO_ASSERT=1")
+      LIST(APPEND THREADS_USER_DEFINITIONS_DEBUG "TBB_USE_DEBUG" "TBB_DO_ASSERT=1")
     ENDIF()
   ENDIF()
 
@@ -166,14 +157,18 @@ MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL)
   # Workaround for an issue with C++11 mode, non gcc-compilers and missing
   # template<typename T> std::ist_trivially_copyable<T>
   #
-  IF( DEAL_II_USE_CXX11 AND
+  IF( DEAL_II_WITH_CXX11 AND
       NOT DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE AND
       NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
-    LIST(APPEND DEAL_II_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
-    LIST(APPEND DEAL_II_USER_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
+    LIST(APPEND THREADS_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
+    LIST(APPEND THREADS_USER_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
   ENDIF()
 
   SETUP_THREADING()
+
+  LIST(APPEND THREADS_LIBRARIES ${TBB_LIBRARIES})
+  LIST(APPEND THREADS_INCLUDE_DIRS ${TBB_INCLUDE_DIRS})
+
 ENDMACRO()
 
 
@@ -186,39 +181,40 @@ MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED)
   #
   # We have to disable a bunch of warnings:
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-parentheses")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+  ENABLE_IF_SUPPORTED(THREADS_CXX_FLAGS "-Wno-parentheses")
+  ENABLE_IF_SUPPORTED(THREADS_CXX_FLAGS "-Wno-long-long")
 
   #
   # Add some definitions to use the header files in debug mode:
   #
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    LIST(APPEND DEAL_II_DEFINITIONS_DEBUG
-      "TBB_DO_DEBUG=1" "TBB_DO_ASSERT=1"
-      )
+    LIST(APPEND THREADS_DEFINITIONS_DEBUG "TBB_USE_DEBUG" "TBB_DO_ASSERT=1")
+    LIST(APPEND THREADS_USER_DEFINITIONS_DEBUG "TBB_USE_DEBUG" "TBB_DO_ASSERT=1")
   ENDIF()
 
   #
   # Workaround for an issue with C++11 mode, non gcc-compilers and missing
   # template<typename T> std::ist_trivially_copyable<T>
   #
-  IF( DEAL_II_USE_CXX11 AND
+  IF( DEAL_II_WITH_CXX11 AND
       NOT DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE AND
       NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
-    LIST(APPEND DEAL_II_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
-    LIST(APPEND DEAL_II_USER_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
+    LIST(APPEND THREADS_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
+    LIST(APPEND THREADS_USER_DEFINITIONS "TBB_IMPLEMENT_CPP0X=1")
   ENDIF()
 
   #
   # tbb uses dlopen/dlclose, so link against libdl.so as well:
   #
-  FIND_LIBRARY(dl_LIBRARY NAMES dl)
+  # TODO: Also necessary for external lib, use preference toggle
+  #
+  FIND_SYSTEM_LIBRARY(dl_LIBRARY NAMES dl)
   MARK_AS_ADVANCED(dl_LIBRARY)
   IF(NOT dl_LIBRARY MATCHES "-NOTFOUND")
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${dl_LIBRARY})
+    LIST(APPEND THREADS_LIBRARIES ${dl_LIBRARY})
   ENDIF()
 
-  INCLUDE_DIRECTORIES(${TBB_FOLDER}/include)
+  LIST(APPEND THREADS_BUNDLED_INCLUDE_DIRS ${TBB_FOLDER}/include)
 ENDMACRO()
 
 

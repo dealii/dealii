@@ -80,7 +80,17 @@ namespace Algorithms
     inverse_derivative->notify(e);
   }
 
-
+  
+  template <class VECTOR>
+  double
+  Newton<VECTOR>::threshold(const double thr)
+  {
+    const double t = assemble_threshold;
+    assemble_threshold = thr;
+    return t;
+  }
+  
+  
   template <class VECTOR>
   void
   Newton<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)

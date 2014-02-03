@@ -24,11 +24,14 @@
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/parallel_vector.h>
 
+#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
+
+
 #include <cstdio>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 
 namespace parallel
@@ -170,6 +173,31 @@ namespace parallel
        */
       BlockVector &
       operator= (const Vector<Number> &V);
+
+#ifdef DEAL_II_WITH_PETSC
+      /**
+       * Copy the content of a PETSc vector into the calling vector. This
+       * function assumes that the vectors layouts have already been
+       * initialized to match.
+       *
+       * This operator is only available if deal.II was configured with PETSc.
+       */
+      BlockVector<Number> &
+      operator = (const PETScWrappers::MPI::BlockVector &petsc_vec);
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+      /**
+       * Copy the content of a Trilinos vector into the calling vector. This
+       * function assumes that the vectors layouts have already been
+       * initialized to match.
+       *
+       * This operator is only available if deal.II was configured with
+       * Trilinos.
+       */
+      BlockVector<Number> &
+      operator = (const TrilinosWrappers::MPI::BlockVector &trilinos_vec);
+#endif
 
       /**
        * Reinitialize the BlockVector to contain <tt>num_blocks</tt> blocks of
@@ -591,6 +619,42 @@ namespace parallel
       BaseClass::operator = (v);
       return *this;
     }
+
+
+
+#ifdef DEAL_II_WITH_PETSC
+
+    template <typename Number>
+    inline
+    BlockVector<Number> &
+    BlockVector<Number>::operator = (const PETScWrappers::MPI::BlockVector &petsc_vec)
+    {
+      AssertDimension(this->n_blocks(), petsc_vec.n_blocks());
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        this->block(i) = petsc_vec.block(i);
+
+      return *this;
+    }
+
+#endif
+
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+    template <typename Number>
+    inline
+    BlockVector<Number> &
+    BlockVector<Number>::operator = (const TrilinosWrappers::MPI::BlockVector &trilinos_vec)
+    {
+      AssertDimension(this->n_blocks(), trilinos_vec.n_blocks());
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        this->block(i) = trilinos_vec.block(i);
+
+      return *this;
+    }
+
+#endif
 
 
 

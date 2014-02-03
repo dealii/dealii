@@ -1648,8 +1648,8 @@ namespace internal
             unsigned int sent=needs_to_get_cells.size();
             unsigned int recv=senders.size();
 
-            MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
-            MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
+            MPI_Allreduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
+            MPI_Allreduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
             Assert(sum_send==sum_recv, ExcInternalError());
           }
 #endif
@@ -1892,8 +1892,8 @@ namespace internal
             unsigned int sent=needs_to_get_cells.size();
             unsigned int recv=senders.size();
 
-            MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 56345, tr->get_communicator());
-            MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 56346, tr->get_communicator());
+            MPI_Allreduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
+            MPI_Allreduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
             Assert(sum_send==sum_recv, ExcInternalError());
           }
 #endif

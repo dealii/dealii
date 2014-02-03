@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1407,33 +1407,48 @@ public:
   /**
    * Return the interpolation of the given finite element function to
    * the present cell. In the simplest case, the cell is a terminal
-   * one, i.e. has no children; then, the returned value is the vector
-   * of nodal values on that cell. You could then as well get the
+   * one, i.e., it has no children; then, the returned value is the vector
+   * of nodal values on that cell. You could as well get the
    * desired values through the @p get_dof_values function. In the
    * other case, when the cell has children, we use the restriction
    * matrices provided by the finite element class to compute the
    * interpolation from the children to the present cell.
    *
-   * It is assumed that both vectors already have the right size
+   * If the cell is part of a hp::DoFHandler object, cells only have an
+   * associated finite element space if they are active. However, this
+   * function is supposed to also provide information on inactive cells
+   * with children. Consequently, it carries a third argument that can be
+   * used in the hp context that denotes the finite element space we are
+   * supposed to interpolate onto. If the cell is active, this function
+   * then obtains the finite element function from the <code>values</code>
+   * vector on this cell and interpolates it onto the space described
+   * by the <code>fe_index</code>th element of the hp::FECollection associated
+   * with the hp::DoFHandler of which this cell is a part of. If the cell
+   * is not active, then we first perform this interpolation on all of its
+   * terminal children and then interpolate this function down to the
+   * cell requested keeping the function space the same.
+   *
+   * It is assumed that both input vectors already have the right size
    * beforehand.
    *
-   * Unlike the get_dof_values() function, this function works on
-   * cells rather than to lines, quads, and hexes, since interpolation
+   * @note Unlike the get_dof_values() function, this function is only available
+   * on cells, rather than on lines, quads, and hexes, since interpolation
    * is presently only provided for cells by the finite element
    * classes.
    */
   template <class InputVector, typename number>
   void get_interpolated_dof_values (const InputVector &values,
-                                    Vector<number>    &interpolated_values) const;
+                                    Vector<number>    &interpolated_values,
+                                    const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
-   * This, again, is the counterpart to get_interpolated_dof_values():
+   * This function is the counterpart to get_interpolated_dof_values():
    * you specify the dof values on a cell and these are interpolated
    * to the children of the present cell and set on the terminal
    * cells.
    *
    * In principle, it works as follows: if the cell pointed to by this
-   * object is terminal, then the dof values are set in the global
+   * object is terminal (i.e., has no children), then the dof values are set in the global
    * data vector by calling the set_dof_values() function; otherwise,
    * the values are prolonged to each of the children and this
    * function is called for each of them.
@@ -1452,6 +1467,22 @@ public:
    * requirements are not taken care of and must be enforced by the
    * user afterward.
    *
+   * If the cell is part of a hp::DoFHandler object, cells only have an
+   * associated finite element space if they are active. However, this
+   * function is supposed to also work on inactive cells
+   * with children. Consequently, it carries a third argument that can be
+   * used in the hp context that denotes the finite element space we are
+   * supposed to interpret the input vector of this function in.
+   * If the cell is active, this function
+   * then interpolates the input vector interpreted as an element of the space described
+   * by the <code>fe_index</code>th element of the hp::FECollection associated
+   * with the hp::DoFHandler of which this cell is a part of, and interpolates
+   * it into the space that is associated with this cell. On the other hand, if the cell
+   * is not active, then we first perform this interpolation from this cell
+   * to its children using the given <code>fe_index</code> until we end
+   * up on an active cell, at which point we follow the procedure outlined
+   * at the beginning of the paragraph.
+   *
    * It is assumed that both vectors already have the right size
    * beforehand. This function relies on the existence of a natural
    * interpolation property of finite element spaces of a cell to its
@@ -1462,21 +1493,15 @@ public:
    * element class for a description of what the prolongation matrices
    * represent in this case.
    *
-   * Unlike the set_dof_values() function, this function is associated
-   * to cells rather than to lines, quads, and hexes, since
-   * interpolation is presently only provided for cells by the finite
-   * element objects.
-   *
-   * The output vector may be either a Vector<float>, Vector<double>,
-   * or a BlockVector<double>, or a PETSc vector if deal.II is
-   * compiled to support these libraries. It is in the responsibility
-   * of the caller to assure that the types of the numbers stored in
-   * input and output vectors are compatible and with similar
-   * accuracy.
+   * @note Unlike the get_dof_values() function, this function is only available
+   * on cells, rather than on lines, quads, and hexes, since interpolation
+   * is presently only provided for cells by the finite element
+   * classes.
    */
   template <class OutputVector, typename number>
   void set_dof_values_by_interpolation (const Vector<number> &local_values,
-                                        OutputVector         &values) const;
+                                        OutputVector         &values,
+                                        const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Distribute a local (cell based) vector to a global one by mapping
@@ -1635,18 +1660,47 @@ public:
    * this iterator. For non-hp DoF handlers, this is of course always
    * the same element, independent of the cell we are presently on,
    * but for hp DoF handlers, this may change from cell to cell.
+   *
+   * @note Since degrees of freedoms only exist on active cells
+   * for hp::DoFHandler (i.e., there is currently no implementation
+   * of multilevel hp::DoFHandler objects), it does not make sense
+   * to query the finite element on non-active cells since they
+   * do not have finite element spaces associated with them without
+   * having any degrees of freedom. Consequently, this function will
+   * produce an exception when called on non-active cells.
    */
   const FiniteElement<DH::dimension,DH::space_dimension> &
   get_fe () const;
 
   /**
-   *  Returns the index inside the hp::FECollection of the
-   *  FiniteElement used for this cell.
+   * Returns the index inside the hp::FECollection of the
+   * FiniteElement used for this cell. This function is
+   * only useful if the DoF handler object associated with
+   * the current cell is an hp::DoFHandler.
+   *
+   * @note Since degrees of freedoms only exist on active cells
+   * for hp::DoFHandler (i.e., there is currently no implementation
+   * of multilevel hp::DoFHandler objects), it does not make sense
+   * to query active FE indices on non-active cells since they
+   * do not have finite element spaces associated with them without
+   * having any degrees of freedom. Consequently, this function will
+   * produce an exception when called on non-active cells.
    */
   unsigned int active_fe_index () const;
 
   /**
-   *  Sets the index of the FiniteElement used for this cell.
+   * Sets the index of the FiniteElement used for this cell. This
+   * determines which element in an hp::FECollection to use. This function is
+   * only useful if the DoF handler object associated with
+   * the current cell is an hp::DoFHandler.
+   *
+   * @note Since degrees of freedoms only exist on active cells
+   * for hp::DoFHandler (i.e., there is currently no implementation
+   * of multilevel hp::DoFHandler objects), it does not make sense
+   * to assign active FE indices to non-active cells since they
+   * do not have finite element spaces associated with them without
+   * having any degrees of freedom. Consequently, this function will
+   * produce an exception when called on non-active cells.
    */
   void set_active_fe_index (const unsigned int i);
   /**

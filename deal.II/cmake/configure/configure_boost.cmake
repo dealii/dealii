@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -38,19 +38,24 @@ SET(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
 
 MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 
+  #
+  # This mumbo jumbo is necessary because CMake won't let us test against
+  # BOOST_DIR directly. WTF?!
+  #
   IF(NOT DEFINED BOOST_DIR)
     SET(BOOST_DIR "$ENV{BOOST_DIR}")
   ELSE()
     SET_IF_EMPTY(BOOST_DIR "$ENV{BOOST_DIR}")
   ENDIF()
+
   IF(NOT "${BOOST_DIR}" STREQUAL "")
     SET(BOOST_ROOT "${BOOST_DIR}")
   ENDIF()
 
   IF(DEAL_II_WITH_THREADS)
-    SET(_boost_components serialization system thread)
+    SET(_boost_components iostreams serialization system thread)
   ELSE()
-    SET(_boost_components serialization system)
+    SET(_boost_components iostreams serialization system)
   ENDIF()
 
   #
@@ -65,20 +70,14 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
   #
   # Fall back to dynamic libraries if no static libraries could be found:
   #
-  IF( Boost_USE_STATIC_LIBS AND
-      (NOT Boost_SERIALIZATION_FOUND OR NOT Boost_SYSTEM_FOUND)
-    )
+  IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
     SET(Boost_USE_STATIC_LIBS FALSE)
     FIND_PACKAGE(Boost 1.44 COMPONENTS ${_boost_components})
   ENDIF()
 
   MARK_AS_ADVANCED(Boost_DIR)
 
-
-  IF( Boost_SERIALIZATION_FOUND AND
-      Boost_SYSTEM_FOUND AND
-      (NOT DEAL_II_WITH_THREADS OR Boost_THREAD_FOUND) )
-
+  IF(Boost_FOUND)
     SET(BOOST_VERSION_MAJOR "${Boost_MAJOR_VERSION}")
     SET(BOOST_VERSION_MINOR "${Boost_MINOR_VERSION}")
     SET(BOOST_VERSION_SUBMINOR "${Boost_SUBMINOR_VERSION}")
@@ -101,36 +100,22 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 
   ELSE()
 
-    SET(BOOST_DIR "" CACHE PATH
-      "An optional hint to a boost directory"
-      )
+    SET(BOOST_DIR "" CACHE PATH "An optional hint to a boost directory")
   ENDIF()
 ENDMACRO()
 
 
-#
-# The user has to know the location of the boost headers as well:
-#
-SET(BOOST_ADD_TO_USER_INCLUDE_DIRS TRUE)
-
-
 MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
-  #
-  # We need to set some definitions to use the headers of the bundled boost
-  # library:
-  #
-  LIST(APPEND DEAL_II_DEFINITIONS
-    "BOOST_NO_HASH" "BOOST_NO_SLIST"
-    )
-  LIST(APPEND DEAL_II_USER_DEFINITIONS
-    "BOOST_NO_HASH" "BOOST_NO_SLIST"
-    )
-
-  INCLUDE_DIRECTORIES(${BOOST_FOLDER}/include)
+  SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
 ENDMACRO()
 
 
 CONFIGURE_FEATURE(BOOST)
+
+#
+# The user has to know the location of the boost headers as well:
+#
+SET(BOOST_USER_INCLUDE_DIRS ${BOOST_INCLUDE_DIRS})
 
 #
 # DEAL_II_WITH_BOOST is always required.

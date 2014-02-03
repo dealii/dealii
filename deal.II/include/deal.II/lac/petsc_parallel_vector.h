@@ -502,6 +502,14 @@ namespace PETScWrappers
                   const bool          scientific = true,
                   const bool          across     = true) const;
 
+      /**
+       * @copydoc PETScWrappers::VectorBase::all_zero()
+       * 
+       * @note This function overloads the one in the base class
+       * to make this a collective operation.
+       */
+      bool all_zero () const;
+
     protected:
       /**
        * Create a vector of length

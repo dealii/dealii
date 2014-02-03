@@ -42,7 +42,7 @@ namespace LinearAlgebraDealII
 DEAL_II_NAMESPACE_CLOSE
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -125,9 +125,9 @@ namespace LinearAlgebraPETSc
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
@@ -208,7 +208,7 @@ namespace LinearAlgebraTrilinos
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 
 
 

@@ -1,0 +1,21 @@
+
+DEAL:0:PETSc::numproc=3
+DEAL:0:PETSc::all_zero? 1 (should be true)
+DEAL:0:PETSc::all_zero? 0 (should be false)
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=3
+DEAL:0:Trilinos::all_zero? 1 (should be true)
+DEAL:0:Trilinos::all_zero? 0 (should be false)
+DEAL:0:Trilinos::OK
+
+DEAL:1:PETSc::all_zero? 1 (should be true)
+DEAL:1:PETSc::all_zero? 0 (should be false)
+DEAL:1:Trilinos::all_zero? 1 (should be true)
+DEAL:1:Trilinos::all_zero? 0 (should be false)
+
+
+DEAL:2:PETSc::all_zero? 1 (should be true)
+DEAL:2:PETSc::all_zero? 0 (should be false)
+DEAL:2:Trilinos::all_zero? 1 (should be true)
+DEAL:2:Trilinos::all_zero? 0 (should be false)
+

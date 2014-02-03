@@ -15,14 +15,14 @@
 ## ---------------------------------------------------------------------
 
 IF(DEAL_II_COMPONENT_MESH_CONVERTER)
-  MESSAGE(STATUS "Setup mesh_converter")
+  MESSAGE(STATUS "Setting up mesh_converter")
   ADD_SUBDIRECTORY(mesh_conversion)
-  MESSAGE(STATUS "Setup mesh_converter - Done")
+  MESSAGE(STATUS "Setting up mesh_converter - Done")
 ENDIF()
 
 IF(DEAL_II_COMPONENT_PARAMETER_GUI)
-  MESSAGE(STATUS "Setup parameter_gui")
+  MESSAGE(STATUS "Setting up parameter_gui")
   ADD_SUBDIRECTORY(parameter_gui)
-  MESSAGE(STATUS "Setup parameter_gui - Done")
+  MESSAGE(STATUS "Setting up parameter_gui - Done")
 ENDIF()
 

@@ -112,7 +112,7 @@ namespace internal
        * <tt>2*dim</tt> faces, and the columns the
        * DoFs on the faces.
        */
-      Table<2,unsigned int>  face_indices;
+      dealii::Table<2,unsigned int>  face_indices;
 
       /**
        * Stores one-dimensional values of shape functions evaluated in zero

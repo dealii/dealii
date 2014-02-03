@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2008 - 2013 by the deal.II authors
+ * Copyright (C) 2008 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -939,9 +939,12 @@ namespace Step32
     // that have been broken out of the ones listed above. Specifically, there
     // are first three functions that we call from <code>setup_dofs</code> and
     // then the ones that do the assembling of linear systems:
-    void setup_stokes_matrix (const std::vector<IndexSet> &stokes_partitioning);
-    void setup_stokes_preconditioner (const std::vector<IndexSet> &stokes_partitioning);
-    void setup_temperature_matrices (const IndexSet &temperature_partitioning);
+    void setup_stokes_matrix (const std::vector<IndexSet> &stokes_partitioning,
+                              const std::vector<IndexSet> &stokes_relevant_partitioning);
+    void setup_stokes_preconditioner (const std::vector<IndexSet> &stokes_partitioning,
+                                      const std::vector<IndexSet> &stokes_relevant_partitioning);
+    void setup_temperature_matrices (const IndexSet &temperature_partitioning,
+                                     const IndexSet &temperature_relevant_partitioning);
 
 
     // Following the @ref MTWorkStream "task-based parallelization" paradigm,
@@ -1817,6 +1820,30 @@ namespace Step32
   // the globally assembled sparsity pattern available with which the global
   // matrix can be initialized.
   //
+  // There is one important aspect when initializing Trilinos sparsity
+  // patterns in parallel: In addition to specifying the locally owned rows
+  // and columns of the matrices via the @p stokes_partitioning index set, we
+  // also supply information about all the rows we are possibly going to write
+  // into when assembling on a certain processor. The set of locally relevant
+  // rows contains all such rows (possibly also a few unnecessary ones, but it
+  // is difficult to find the exact row indices before actually getting
+  // indices on all cells and resolving constraints). This additional
+  // information allows to exactly determine the structure for the
+  // off-processor data found during assembly. While Trilinos matrices are
+  // able to collect this information on the fly as well (when initializing
+  // them from some other reinit method), it is less efficient and leads to
+  // problems when assembling matrices with multiple threads. In this program,
+  // we pessimistically assume that only one processor at a time can write
+  // into the matrix while assembly (whereas the computation is parallel),
+  // which is fine for Trilinos matrices. In practice, one can do better by
+  // hinting WorkStream at cells that do not share vertices, allowing for
+  // parallelism among those cells (see the graph coloring algorithms and
+  // WorkStream with colored iterators argument). However, that only works
+  // when only one MPI processor is present because Trilinos' internal data
+  // structures for accumulating off-processor data on the fly are not thread
+  // safe. With the initialization presented here, there is no such problem
+  // and one could safely introduce graph coloring for this algorithm.
+  //
   // The only other change we need to make is to tell the
   // DoFTools::make_sparsity_pattern() function that it is only supposed to
   // work on a subset of cells, namely the ones whose
@@ -1830,15 +1857,16 @@ namespace Step32
   // once the matrix has been given the sparsity structure.
   template <int dim>
   void BoussinesqFlowProblem<dim>::
-  setup_stokes_matrix (const std::vector<IndexSet> &stokes_partitioning)
+  setup_stokes_matrix (const std::vector<IndexSet> &stokes_partitioning,
+                       const std::vector<IndexSet> &stokes_relevant_partitioning)
   {
     stokes_matrix.clear ();
 
-    TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioning,
-                                               MPI_COMM_WORLD);
+    TrilinosWrappers::BlockSparsityPattern sp(stokes_partitioning, stokes_partitioning,
+                                              stokes_relevant_partitioning,
+                                              MPI_COMM_WORLD);
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
-
     for (unsigned int c=0; c<dim+1; ++c)
       for (unsigned int d=0; d<dim+1; ++d)
         if (! ((c==dim) && (d==dim)))
@@ -1860,15 +1888,17 @@ namespace Step32
 
   template <int dim>
   void BoussinesqFlowProblem<dim>::
-  setup_stokes_preconditioner (const std::vector<IndexSet> &stokes_partitioning)
+  setup_stokes_preconditioner (const std::vector<IndexSet> &stokes_partitioning,
+                               const std::vector<IndexSet> &stokes_relevant_partitioning)
   {
     Amg_preconditioner.reset ();
     Mp_preconditioner.reset ();
 
     stokes_preconditioner_matrix.clear ();
 
-    TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioning,
-                                               MPI_COMM_WORLD);
+    TrilinosWrappers::BlockSparsityPattern sp(stokes_partitioning, stokes_partitioning,
+                                              stokes_relevant_partitioning,
+                                              MPI_COMM_WORLD);
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
     for (unsigned int c=0; c<dim+1; ++c)
@@ -1891,15 +1921,18 @@ namespace Step32
 
   template <int dim>
   void BoussinesqFlowProblem<dim>::
-  setup_temperature_matrices (const IndexSet &temperature_partitioner)
+  setup_temperature_matrices (const IndexSet &temperature_partitioner,
+                              const IndexSet &temperature_relevant_partitioner)
   {
     T_preconditioner.reset ();
     temperature_mass_matrix.clear ();
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
-    TrilinosWrappers::SparsityPattern sp (temperature_partitioner,
-                                          MPI_COMM_WORLD);
+    TrilinosWrappers::SparsityPattern sp(temperature_partitioner,
+                                         temperature_partitioner,
+                                         temperature_relevant_partitioner,
+                                         MPI_COMM_WORLD);
     DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
                                      temperature_constraints, false,
                                      Utilities::MPI::
@@ -2057,16 +2090,31 @@ namespace Step32
     // All this done, we can then initialize the various matrix and vector
     // objects to their proper sizes. At the end, we also record that all
     // matrices and preconditioners have to be re-computed at the beginning of
-    // the next time step.
-    setup_stokes_matrix (stokes_partitioning);
-    setup_stokes_preconditioner (stokes_partitioning);
-    setup_temperature_matrices (temperature_partitioning);
+    // the next time step. Note how we initialize the vectors for the Stokes
+    // and temperature right hand sides: These are writable vectors (last
+    // boolean argument set to @p true) that have the correct one-to-one
+    // partitioning of locally owned elements but are still given the relevant
+    // partitioning for means of figuring out the vector entries that are
+    // going to be set right away. As for matrices, this allows for writing
+    // local contributions into the vector with multiple threads (always
+    // assuming that the same vector entry is not accessed by multiple threads
+    // at the same time). The other vectors only allow for read access of
+    // individual elements, including ghosts, but are not suitable for
+    // solvers.
+    setup_stokes_matrix (stokes_partitioning, stokes_relevant_partitioning);
+    setup_stokes_preconditioner (stokes_partitioning,
+                                 stokes_relevant_partitioning);
+    setup_temperature_matrices (temperature_partitioning,
+                                temperature_relevant_partitioning);
 
-    stokes_rhs.reinit (stokes_partitioning, MPI_COMM_WORLD);
+    stokes_rhs.reinit (stokes_partitioning, stokes_relevant_partitioning,
+                       MPI_COMM_WORLD, true);
     stokes_solution.reinit (stokes_relevant_partitioning, MPI_COMM_WORLD);
     old_stokes_solution.reinit (stokes_solution);
 
-    temperature_rhs.reinit (temperature_partitioning, MPI_COMM_WORLD);
+    temperature_rhs.reinit (temperature_partitioning,
+                            temperature_relevant_partitioning,
+                            MPI_COMM_WORLD, true);
     temperature_solution.reinit (temperature_relevant_partitioning, MPI_COMM_WORLD);
     old_temperature_solution.reinit (temperature_solution);
     old_old_temperature_solution.reinit (temperature_solution);
@@ -2449,7 +2497,8 @@ namespace Step32
          Assembly::CopyData::
          StokesSystem<dim> (stokes_fe));
 
-    stokes_matrix.compress(VectorOperation::add);
+    if (rebuild_stokes_matrix == true)
+      stokes_matrix.compress(VectorOperation::add);
     stokes_rhs.compress(VectorOperation::add);
 
     rebuild_stokes_matrix = false;
@@ -3660,7 +3709,8 @@ int main (int argc, char *argv[])
   using namespace Step32;
   using namespace dealii;
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,
+                                                      numbers::invalid_unsigned_int);
 
   try
     {

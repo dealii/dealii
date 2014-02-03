@@ -76,6 +76,48 @@ namespace LocalIntegrators
     }
 
     /**
+     * The weighted mass matrix for scalar or vector values finite elements.
+     * \f[
+     * \int_Z \omega(x) uv\,dx \quad \text{or} \quad \int_Z \omega(x) \mathbf u\cdot \mathbf v\,dx
+     * \f]
+     *
+     * Likewise, this term can be used on faces, where it computes  the integrals
+     * \f[
+     * \int_F \omega(x) uv\,ds \quad \text{or} \quad \int_F \omega(x) \mathbf u\cdot \mathbf v\,ds
+     * \f]
+     *
+     * The size of the vector <tt>weights</tt> must be equal to the
+     * number of quadrature points in the finite element.
+     *
+     * @author Guido Kanschat
+     * @date 2014
+     */
+    template <int dim>
+    void weighted_mass_matrix (
+      FullMatrix<double> &M,
+      const FEValuesBase<dim> &fe,
+      const std::vector<double> weights)
+    {
+      const unsigned int n_dofs = fe.dofs_per_cell;
+      const unsigned int n_components = fe.get_fe().n_components();
+      AssertDimension(M.m(), n_dofs);
+      AssertDimension(M.n(), n_dofs);
+      AssertDimension(weights.size(), fe.n_quadrature_points);
+      
+      for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
+        {
+          const double dx = fe.JxW(k) * weights[k];
+
+          for (unsigned int i=0; i<n_dofs; ++i)
+            for (unsigned int j=0; j<n_dofs; ++j)
+              for (unsigned int d=0; d<n_components; ++d)
+                M(i,j) += dx
+                          * fe.shape_value_component(j,k,d)
+                          * fe.shape_value_component(i,k,d);
+        }
+    }
+
+    /**
      * <i>L<sup>2</sup></i>-inner product for scalar functions.
      *
      * \f[

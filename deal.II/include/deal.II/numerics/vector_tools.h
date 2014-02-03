@@ -503,6 +503,73 @@ namespace VectorTools
                     OutVector                &data_2);
 
   /**
+   * This function is a kind of generalization or modification
+   * of the very first interpolate()
+   * function in the series.
+   * It interpolations a set of functions onto the finite element space
+   * given by the DoFHandler argument where the determination which function
+   * to use is made based on the material id (see @ref GlossMaterialId) of
+   * each cell.
+   *
+   * @param mapping        - The mapping to use to determine the location
+   *                         of support points at which the functions
+   *                         are to be evaluated.
+   * @param dof            - DoFHandler initialized with Triangulation
+   *                                                     and
+   *                                                     FiniteElement
+   *                                                     objects,
+   * @param function_map   - std::map reflecting the correspondence
+   *                         between material ids and functions,
+   * @param dst            - global FE vector at the support points,
+   * @param component_mask - mask of components that shall be interpolated
+   *
+   * @note If a material id of some group of cells
+   * is missed in @p function_map, then @p dst will
+   * not be updated in the respective degrees of freedom
+   * of the output vector
+   * For example, if @p dst was successfully
+   * initialized to capture the degrees of freedom of the @p dof_handler
+   * of the problem with all zeros in it,
+   * then those zeros which correspond to
+   * the missed material ids will still remain
+   * in @p dst even after calling this function.
+   *
+   * @note Degrees of freedom located on faces between cells of different
+   * material ids will get their value by that cell which was called
+   * last in the respective loop over cells implemented
+   * in this function.
+   * Since this process is kind of arbitrary,
+   * you cannot control it.
+   * However, if you want to have control over the order in which cells are visited,
+   * let us take a look at the following example: Let @p u be a variable of interest
+   * which is approximated by some CG finite element.
+   * Let @p 0, @p 1 and @p 2 be material ids
+   * of cells on the triangulation.
+   * Let 0: 0.0, 1: 1.0, 2: 2.0
+   * be the whole @p function_map that you want to pass to
+   * this function, where @p key is a material id and
+   * @p value is a value of @p u.
+   * By using the whole @p function_map you do not really know
+   * which values will be assigned to the face DoFs.
+   * On the other hand, if you split the whole @p function_map
+   * into three smaller independent objects
+   * 0: 0.0 and 1: 1.0 and 2: 2.0
+   * and make three distinct calls of this function passing each
+   * of these objects separately (the order depends on what you want
+   * to get between cells), then each subsequent call will rewrite
+   * the intercell @p dofs of the previous one.
+   *
+   * @author Valentin Zingan, 2013
+   */
+  template<typename VECTOR, typename DH>
+  void
+  interpolate_based_on_material_id(const Mapping<DH::dimension, DH::space_dimension>&                          mapping,
+                                   const DH&                                                                   dof_handler,
+                                   const std::map< types::material_id, const Function<DH::space_dimension>* >& function_map,
+                                   VECTOR&                                                                     dst,
+                                   const ComponentMask&                                                        component_mask = ComponentMask());
+
+  /**
    * Gives the interpolation of a
    * @p dof1-function @p u1 to a
    * @p dof2-function @p u2, where @p
@@ -2352,6 +2419,12 @@ namespace VectorTools
                              const InVector                 &v,
                              const unsigned int              component);
   //@}
+
+
+  /**
+   * Exception.
+   */
+  DeclException0(ExcInvalidMaterialIndicator);
 
   /**
    * Exception

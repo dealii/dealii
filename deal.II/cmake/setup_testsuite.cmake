@@ -30,7 +30,7 @@
 SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
 
 MESSAGE(STATUS "")
-MESSAGE(STATUS "Setup testsuite with TEST_DIR ${TEST_DIR}")
+MESSAGE(STATUS "Testsuite will be set up with TEST_DIR=${TEST_DIR}")
 
 ADD_SUBDIRECTORY(
   ${CMAKE_SOURCE_DIR}/tests/quick_tests
@@ -73,7 +73,7 @@ ADD_CUSTOM_TARGET(clean_tests
     -- ${MAKEOPTS}
   )
 
-MESSAGE(STATUS "Setup testsuite")
+MESSAGE(STATUS "Setting up testsuite")
 
 #
 # Provide custom targets to setup and prune the testsuite subproject:
@@ -152,7 +152,7 @@ FOREACH(_category ${_categories})
       )
   ENDIF()
 ENDFOREACH()
-MESSAGE(STATUS "Setup testsuite - Done")
+MESSAGE(STATUS "Setting up testsuite - Done")
 
 MESSAGE(STATUS "Regenerating testsuite subprojects")
 EXECUTE_PROCESS(

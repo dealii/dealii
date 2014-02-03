@@ -194,7 +194,8 @@ namespace TrilinosWrappers
      */
     template <typename BlockSparsityType>
     void reinit (const std::vector<Epetra_Map> &input_maps,
-                 const BlockSparsityType       &block_sparsity_pattern);
+                 const BlockSparsityType       &block_sparsity_pattern,
+                 const bool                   exchange_data = false);
 
     /**
      * Resize the matrix, by using an
@@ -207,7 +208,8 @@ namespace TrilinosWrappers
     template <typename BlockSparsityType>
     void reinit (const std::vector<IndexSet> &input_maps,
                  const BlockSparsityType     &block_sparsity_pattern,
-                 const MPI_Comm              &communicator = MPI_COMM_WORLD);
+                 const MPI_Comm              &communicator = MPI_COMM_WORLD,
+                 const bool                   exchange_data = false);
 
     /**
      * Resize the matrix and initialize it

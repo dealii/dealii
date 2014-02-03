@@ -181,20 +181,6 @@ public:
 
 private:
   /**
-   * Register a subscriber for
-   * debugging purposes. Called by
-   * subscribe() in debug mode.
-   */
-  void do_subscribe(const char *id) const;
-
-  /**
-   * Deregister a subscriber for
-   * debugging purposes. Called by
-   * unsubscribe() in debug mode.
-   */
-  void do_unsubscribe(const char *id) const;
-
-  /**
    * The data type used in
    * #counter_map.
    */
@@ -274,38 +260,6 @@ Subscriptor::serialize(Archive &,
   // documentation of this function
 }
 
-// If we are in optimized mode, the subscription checking is turned
-// off. Therefore, we provide inline definitions of subscribe and
-// unsubscribe here. The definitions for debug mode are in
-// subscriptor.cc.
-
-#ifdef DEBUG
-
-inline void
-Subscriptor::subscribe(const char *id) const
-{
-  do_subscribe(id);
-}
-
-
-inline void
-Subscriptor::unsubscribe(const char *id) const
-{
-  do_unsubscribe(id);
-}
-
-#else
-
-inline void
-Subscriptor::subscribe(const char *) const
-{}
-
-
-inline void
-Subscriptor::unsubscribe(const char *) const
-{}
-
-#endif
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

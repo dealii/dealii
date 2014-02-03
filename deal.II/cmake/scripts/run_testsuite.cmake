@@ -235,6 +235,7 @@ MESSAGE("-- CTEST_CMAKE_GENERATOR:  ${CTEST_CMAKE_GENERATOR}")
 FIND_PROGRAM(HOSTNAME_COMMAND NAMES hostname)
 IF(NOT "${HOSTNAME_COMMAND}" MATCHES "-NOTFOUND")
   EXEC_PROGRAM(${HOSTNAME_COMMAND} OUTPUT_VARIABLE _hostname)
+  STRING(REGEX REPLACE "\\..*$" "" _hostname ${_hostname})
   SET(CTEST_SITE "${_hostname}")
 ELSE()
   # Well, no hostname available. What about:

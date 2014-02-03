@@ -158,7 +158,7 @@ namespace internal
        * Initially, all entries have zero pointers, and we will allocate them
        * lazily as needed in select_fe_values().
        */
-      Table<3,std_cxx1x::shared_ptr<FEValues> > fe_values_table;
+      dealii::Table<3,std_cxx1x::shared_ptr<FEValues> > fe_values_table;
 
       /**
        * Set of indices pointing at the fe_values object selected last time

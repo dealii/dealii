@@ -60,7 +60,7 @@ namespace GridRefinement
    *
    * <ol>
    *
-   *  <li> Sort the cells according to descenting values of @p criteria.
+   *  <li> Sort the cells according to descending values of @p criteria.
    *
    *  <li> Set the refinement threshold to be the criterion belonging to
    *  the cell at position @p top_fraction_of_cells times

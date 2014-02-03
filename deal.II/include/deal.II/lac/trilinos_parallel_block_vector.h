@@ -73,20 +73,17 @@ namespace TrilinosWrappers
     {
     public:
       /**
-       * Typedef the base class for simpler
-       * access to its own typedefs.
+       * Typedef the base class for simpler access to its own typedefs.
        */
       typedef BlockVectorBase<Vector> BaseClass;
 
       /**
-       * Typedef the type of the underlying
-       * vector.
+       * Typedef the type of the underlying vector.
        */
       typedef BaseClass::BlockType  BlockType;
 
       /**
-       * Import the typedefs from the base
-       * class.
+       * Import the typedefs from the base class.
        */
       typedef BaseClass::value_type      value_type;
       typedef BaseClass::pointer         pointer;
@@ -98,62 +95,46 @@ namespace TrilinosWrappers
       typedef BaseClass::const_iterator  const_iterator;
 
       /**
-       * Default constructor. Generate an
-       * empty vector without any blocks.
+       * Default constructor. Generate an empty vector without any blocks.
        */
       BlockVector ();
 
       /**
-       * Constructor. Generate a block
-       * vector with as many blocks as
-       * there are entries in @p
-       * partitioning. Each Epetra_Map
-       * contains the layout of the
-       * distribution of data among the MPI
-       * processes.
+       * Constructor. Generate a block vector with as many blocks as there are
+       * entries in @p partitioning. Each Epetra_Map contains the layout of
+       * the distribution of data among the MPI processes.
        */
       explicit BlockVector (const std::vector<Epetra_Map> &parallel_partitioning);
 
       /**
-       * Constructor. Generate a block
-       * vector with as many blocks as
-       * there are entries in
-       * @p partitioning.  Each IndexSet
-       * together with the MPI communicator
-       * contains the layout of the
-       * distribution of data among the MPI
-       * processes.
+       * Constructor. Generate a block vector with as many blocks as there are
+       * entries in @p partitioning.  Each IndexSet together with the MPI
+       * communicator contains the layout of the distribution of data among
+       * the MPI processes.
        */
       explicit BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                             const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
       /**
-       * Creates a BlockVector with ghost elements. @p ghost_values
-       * may contain any elements in @p parallel_partitioning, they will
-       * be ignored.
+       * Creates a BlockVector with ghost elements. See the respective
+       * reinit() method for more details. @p ghost_values may contain any
+       * elements in @p parallel_partitioning, they will be ignored.
        */
       BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                    const std::vector<IndexSet> &ghost_values,
-                   const MPI_Comm              &communicator);
-
+                   const MPI_Comm              &communicator,
+                   const bool                   vector_writable = false);
 
       /**
-       * Copy-Constructor. Set all the
-       * properties of the parallel vector
-       * to those of the given argument and
-       * copy the elements.
+       * Copy-Constructor. Set all the properties of the parallel vector to
+       * those of the given argument and copy the elements.
        */
       BlockVector (const BlockVector  &V);
 
       /**
-       * Creates a block vector
-       * consisting of
-       * <tt>num_blocks</tt>
-       * components, but there is no
-       * content in the individual
-       * components and the user has to
-       * fill appropriate data using a
-       * reinit of the blocks.
+       * Creates a block vector consisting of <tt>num_blocks</tt> components,
+       * but there is no content in the individual components and the user has
+       * to fill appropriate data using a reinit of the blocks.
        */
       explicit BlockVector (const size_type num_blocks);
 
@@ -163,168 +144,124 @@ namespace TrilinosWrappers
       ~BlockVector ();
 
       /**
-       * Copy operator: fill all
-       * components of the vector that
-       * are locally stored with the
-       * given scalar value.
+       * Copy operator: fill all components of the vector that are locally
+       * stored with the given scalar value.
        */
       BlockVector &
       operator = (const value_type s);
 
       /**
-       * Copy operator for arguments of
-       * the same type.
+       * Copy operator for arguments of the same type.
        */
       BlockVector &
       operator = (const BlockVector &V);
 
       /**
-       * Copy operator for arguments of
-       * the localized Trilinos vector
-       * type.
+       * Copy operator for arguments of the localized Trilinos vector type.
        */
       BlockVector &
       operator = (const ::dealii::TrilinosWrappers::BlockVector &V);
 
       /**
-       * Another copy function. This
-       * one takes a deal.II block
-       * vector and copies it into a
-       * TrilinosWrappers block
-       * vector. Note that the number
-       * of blocks has to be the same
-       * in the vector as in the input
-       * vector. Use the reinit()
-       * command for resizing the
-       * BlockVector or for changing
-       * the internal structure of the
-       * block components.
+       * Another copy function. This one takes a deal.II block vector and
+       * copies it into a TrilinosWrappers block vector. Note that the number
+       * of blocks has to be the same in the vector as in the input
+       * vector. Use the reinit() command for resizing the BlockVector or for
+       * changing the internal structure of the block components.
        *
-       * Since Trilinos only works on
-       * doubles, this function is
-       * limited to accept only one
-       * possible number type in the
-       * deal.II vector.
+       * Since Trilinos only works on doubles, this function is limited to
+       * accept only one possible number type in the deal.II vector.
        */
       template <typename Number>
       BlockVector &
       operator = (const ::dealii::BlockVector<Number> &V);
 
       /**
-       * Reinitialize the BlockVector to
-       * contain as many blocks as there
-       * are Epetra_Maps given in the input
-       * argument, according to the
-       * parallel distribution of the
-       * individual components described
-       * in the maps.
+       * Reinitialize the BlockVector to contain as many blocks as there are
+       * Epetra_Maps given in the input argument, according to the parallel
+       * distribution of the individual components described in the maps.
        *
-       * If <tt>fast==false</tt>, the vector
-       * is filled with zeros.
+       * If <tt>fast==false</tt>, the vector is filled with zeros.
        */
       void reinit (const std::vector<Epetra_Map> &parallel_partitioning,
                    const bool                     fast = false);
 
       /**
-       * Reinitialize the BlockVector to
-       * contain as many blocks as there
-       * are index sets given in the input
-       * argument, according to the
-       * parallel distribution of the
-       * individual components described
-       * in the maps.
+       * Reinitialize the BlockVector to contain as many blocks as there are
+       * index sets given in the input argument, according to the parallel
+       * distribution of the individual components described in the maps.
        *
-       * If <tt>fast==false</tt>, the vector
-       * is filled with zeros.
+       * If <tt>fast==false</tt>, the vector is filled with zeros.
        */
       void reinit (const std::vector<IndexSet> &parallel_partitioning,
                    const MPI_Comm              &communicator = MPI_COMM_WORLD,
                    const bool                   fast = false);
+
       /**
-       * like above, but with a second set of indices for
-       * ghost entries.
+       * Reinit functionality. This function destroys the old vector content
+       * and generates a new one based on the input partitioning. In addition
+       * to just specifying one index set as in all the other methods above,
+       * this method allows to supply an additional set of ghost
+       * entries. There are two different versions of a vector that can be
+       * created. If the flag @p vector_writable is set to @p false, the
+       * vector only allows read access to the joint set of @p
+       * parallel_partitioning and @p ghost_entries. The effect of the reinit
+       * method is then equivalent to calling the other reinit method with an
+       * index set containing both the locally owned entries and the ghost
+       * entries.
+       *
+       * If the flag @p vector_writable is set to true, this creates an
+       * alternative storage scheme for ghost elements that allows multiple
+       * threads to write into the vector (for the other reinit methods, only
+       * one thread is allowed to write into the ghost entries at a time).
        */
       void reinit (const std::vector<IndexSet> &partitioning,
                    const std::vector<IndexSet> &ghost_values,
-                   const MPI_Comm              &communicator = MPI_COMM_WORLD);
+                   const MPI_Comm              &communicator = MPI_COMM_WORLD,
+                   const bool      vector_writable = false);
 
 
       /**
-       * Change the dimension to that
-       * of the vector <tt>V</tt>. The same
-       * applies as for the other
-       * reinit() function.
+       * Change the dimension to that of the vector <tt>V</tt>. The same
+       * applies as for the other reinit() function.
        *
-       * The elements of <tt>V</tt> are not
-       * copied, i.e.  this function is
-       * the same as calling <tt>reinit
-       * (V.size(), fast)</tt>.
+       * The elements of <tt>V</tt> are not copied, i.e.  this function is the
+       * same as calling <tt>reinit (V.size(), fast)</tt>.
        *
-       * Note that you must call this
-       * (or the other reinit()
-       * functions) function, rather
-       * than calling the reinit()
-       * functions of an individual
-       * block, to allow the block
-       * vector to update its caches of
-       * vector sizes. If you call
-       * reinit() on one of the
-       * blocks, then subsequent
-       * actions on this object may
-       * yield unpredictable results
-       * since they may be routed to
-       * the wrong block.
+       * Note that you must call this (or the other reinit() functions)
+       * function, rather than calling the reinit() functions of an individual
+       * block, to allow the block vector to update its caches of vector
+       * sizes. If you call reinit() on one of the blocks, then subsequent
+       * actions on this object may yield unpredictable results since they may
+       * be routed to the wrong block.
        */
       void reinit (const BlockVector &V,
                    const bool fast = false);
 
       /**
-       * Change the number of blocks to
-       * <tt>num_blocks</tt>. The individual
-       * blocks will get initialized with
-       * zero size, so it is assumed that
-       * the user resizes the
-       * individual blocks by herself
-       * in an appropriate way, and
-       * calls <tt>collect_sizes</tt>
-       * afterwards.
+       * Change the number of blocks to <tt>num_blocks</tt>. The individual
+       * blocks will get initialized with zero size, so it is assumed that the
+       * user resizes the individual blocks by herself in an appropriate way,
+       * and calls <tt>collect_sizes</tt> afterwards.
        */
       void reinit (const size_type num_blocks);
 
       /**
-       * This reinit function is meant to
-       * be used for parallel
-       * calculations where some
-       * non-local data has to be
-       * used. The typical situation
-       * where one needs this function is
-       * the call of the
-       * FEValues<dim>::get_function_values
-       * function (or of some
-       * derivatives) in parallel. Since
-       * it is usually faster to retrieve
-       * the data in advance, this
-       * function can be called before
-       * the assembly forks out to the
-       * different processors. What this
-       * function does is the following:
-       * It takes the information in the
-       * columns of the given matrix and
-       * looks which data couples between
-       * the different processors. That
-       * data is then queried from the
-       * input vector. Note that you
-       * should not write to the
-       * resulting vector any more, since
-       * the some data can be stored
-       * several times on different
-       * processors, leading to
-       * unpredictable results. In
-       * particular, such a vector cannot
-       * be used for matrix-vector
-       * products as for example done
-       * during the solution of linear
-       * systems.
+       * This reinit function is meant to be used for parallel calculations
+       * where some non-local data has to be used. The typical situation where
+       * one needs this function is the call of the
+       * FEValues<dim>::get_function_values function (or of some derivatives)
+       * in parallel. Since it is usually faster to retrieve the data in
+       * advance, this function can be called before the assembly forks out to
+       * the different processors. What this function does is the following:
+       * It takes the information in the columns of the given matrix and looks
+       * which data couples between the different processors. That data is
+       * then queried from the input vector. Note that you should not write to
+       * the resulting vector any more, since the some data can be stored
+       * several times on different processors, leading to unpredictable
+       * results. In particular, such a vector cannot be used for
+       * matrix-vector products as for example done during the solution of
+       * linear systems.
        */
       void import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
                                         const BlockVector                         &v);
@@ -335,8 +272,7 @@ namespace TrilinosWrappers
        *
        * @deprecated
        *
-       * See @ref GlossCompress "Compressing
-       * distributed objects" for more
+       * See @ref GlossCompress "Compressing distributed objects" for more
        * information.
        */
       void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
@@ -348,17 +284,10 @@ namespace TrilinosWrappers
 
 
       /**
-       * Returns the state of the
-       * vector, i.e., whether
-       * compress() needs to be
-       * called after an operation
-       * requiring data
-       * exchange. Does only return
-       * non-true values when used in
-       * <tt>debug</tt> mode, since
-       * it is quite expensive to
-       * keep track of all operations
-       * that lead to the need for
+       * Returns the state of the vector, i.e., whether compress() needs to be
+       * called after an operation requiring data exchange. Does only return
+       * non-true values when used in <tt>debug</tt> mode, since it is quite
+       * expensive to keep track of all operations that lead to the need for
        * compress().
        */
       bool is_compressed () const;
@@ -369,34 +298,21 @@ namespace TrilinosWrappers
       bool has_ghost_elements() const;
 
       /**
-       * Swap the contents of this
-       * vector and the other vector
-       * <tt>v</tt>. One could do this
-       * operation with a temporary
-       * variable and copying over the
-       * data elements, but this
-       * function is significantly more
-       * efficient since it only swaps
-       * the pointers to the data of
-       * the two vectors and therefore
-       * does not need to allocate
-       * temporary storage and move
-       * data around.
+       * Swap the contents of this vector and the other vector <tt>v</tt>. One
+       * could do this operation with a temporary variable and copying over
+       * the data elements, but this function is significantly more efficient
+       * since it only swaps the pointers to the data of the two vectors and
+       * therefore does not need to allocate temporary storage and move data
+       * around.
        *
-       * Limitation: right now this
-       * function only works if both
-       * vectors have the same number
-       * of blocks. If needed, the
-       * numbers of blocks should be
+       * Limitation: right now this function only works if both vectors have
+       * the same number of blocks. If needed, the numbers of blocks should be
        * exchanged, too.
        *
-       * This function is analog to the
-       * the swap() function of all C++
-       * standard containers. Also,
-       * there is a global function
-       * swap(u,v) that simply calls
-       * <tt>u.swap(v)</tt>, again in analogy
-       * to standard functions.
+       * This function is analog to the the swap() function of all C++
+       * standard containers. Also, there is a global function swap(u,v) that
+       * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
+       * functions.
        */
       void swap (BlockVector &v);
 
@@ -446,13 +362,17 @@ namespace TrilinosWrappers
     }
 
 
+
     inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                               const std::vector<IndexSet> &ghost_values,
-                              const MPI_Comm              &communicator)
+                              const MPI_Comm              &communicator,
+                              const bool                   vector_writable)
     {
-      reinit(parallel_partitioning, ghost_values, communicator);
+      reinit(parallel_partitioning, ghost_values, communicator,
+             vector_writable);
     }
+
 
 
     inline
@@ -533,6 +453,7 @@ namespace TrilinosWrappers
     }
 
 
+
     inline
     bool
     BlockVector::has_ghost_elements() const
@@ -544,6 +465,8 @@ namespace TrilinosWrappers
 #endif
       return ghosted;
     }
+
+
 
     inline
     void

@@ -310,6 +310,8 @@ public:
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
 
+  /*@}*/
+
   /**
    * Return the matrix interpolating from a face of one
    * element to the face of the neighboring element. The
@@ -378,6 +380,13 @@ public:
    * numbering on this element.
    */
   std::vector<unsigned int> get_embedding_dofs (const unsigned int sub_degree) const;
+
+  /**
+   * Returns a list of constant modes of the element. For this element, the
+   * list consists of true arguments for the first vertex shape functions and
+   * false for the remaining ones.
+   */
+  virtual Table<2,bool> get_constant_modes () const;
 
 protected:
   /**

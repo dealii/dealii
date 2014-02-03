@@ -254,6 +254,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>Step-26</td>
+ *       <td> The heat equation, solved on a mesh that is adapted
+ *       every few time steps.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>Step-27</td>
  *       <td> hp finite element methods  </td></tr>
  *
@@ -424,7 +430,7 @@
  *
  *   <tr valign="top">
  *     <td> Adaptivity
- *     <td>Step-6</td>
+ *     <td>Step-6, step-26</td>
  *     </td>
  *   </tr>
  *
@@ -757,6 +763,14 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> The heat equation
+ *     </td>
+ *     <td>
+ *       Step-26
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Minimal surface equation
  *     </td>
  *     <td>
@@ -911,8 +925,17 @@
  *   </tr>
  *
  * </table>
+ *
+ *
  * <h4><b>Time dependent problems</b></h4>
  * <table align="center" width="90%">
+ *
+ *   <tr valign="top">
+ *     <td> The heat equation
+ *     </td>
+ *     <td>Step-26
+ *     </td>
+ *   </tr>
  *
  *   <tr valign="top">
  *     <td width="400px"> Quasi-static elasticity

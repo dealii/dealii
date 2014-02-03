@@ -56,9 +56,35 @@ MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c, const
   mg_constrained_dofs(&mg_c)
 {}
 
+
 template <class VECTOR>
 MGTransferPrebuilt<VECTOR>::~MGTransferPrebuilt ()
 {}
+
+
+template <class VECTOR>
+void MGTransferPrebuilt<VECTOR>::initialize_constraints (
+  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+{
+  constraints = &c;
+  mg_constrained_dofs = &mg_c;
+}
+
+
+template <class VECTOR>
+void MGTransferPrebuilt<VECTOR>::clear ()
+{
+  sizes.resize(0);
+  prolongation_matrices.resize(0);
+  prolongation_sparsities.resize(0);
+  copy_indices.resize(0);
+  copy_indices_to_me.resize(0);
+  copy_indices_from_me.resize(0);
+  component_to_block_map.resize(0);
+  interface_dofs.resize(0);
+  constraints = 0;
+  mg_constrained_dofs = 0;
+}
 
 
 template <class VECTOR>
@@ -160,9 +186,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                    ExcNotImplemented());
             for (unsigned int child=0; child<cell->n_children(); ++child)
               {
-                // set an alias to the
-                // prolongation matrix for
-                // this child
+                // set an alias to the prolongation matrix for this child
                 const FullMatrix<double> &prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
@@ -209,9 +233,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                    ExcNotImplemented());
             for (unsigned int child=0; child<cell->n_children(); ++child)
               {
-                // set an alias to the
-                // prolongation matrix for
-                // this child
+                // set an alias to the prolongation matrix for this child
                 prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
@@ -224,8 +246,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
-                // now set the entries in the
-                // matrix
+                // now set the entries in the matrix
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   prolongation_matrices[level]->set (dof_indices_child[i],
                                                      dofs_per_cell,

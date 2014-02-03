@@ -672,6 +672,19 @@ FE_DGQ<dim, spacedim>::has_support_on_face (const unsigned int shape_index,
 
 
 template <int dim, int spacedim>
+Table<2,bool>
+FE_DGQ<dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    constant_modes(0,i) = true;
+  return constant_modes;
+}
+
+
+
+
+template <int dim, int spacedim>
 std::size_t
 FE_DGQ<dim, spacedim>::memory_consumption () const
 {

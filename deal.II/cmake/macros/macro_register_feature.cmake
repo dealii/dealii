@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 by the deal.II authors
+## Copyright (C) 2013 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,60 +15,34 @@
 ## ---------------------------------------------------------------------
 
 #
-# This macro is used for the feature configuration in deal.II
+# This macro is used for the feature configuration in deal.II. It adds
+# individual FEATURE_* configuration variables to the corresponding
+# DEAL_II_* variables
 #
 # Usage:
 #     REGISTER_FEATURE(feature)
 #
-# This macro will
+# This macro will add
 #
-#   - add ${feature}_INCLUDE_DIRS and ${feature}_INCLUDE_PATH
-#     to the list of (internal) include directories
-#   - and if ${feature}_ADD_TO_USER_INCLUDE_DIRS is defined also to
-#     DEAL_II_USER_INCLUDE_DIRS
+#   <FEATURE>_LIBRARIES (respecting general, optimized, debug keyword)
+#   <FEATURE>_LIBRARIES(_DEBUG|_RELEASE)
+#   <FEATURE>_(|BUNDLED_|USER_)INCLUDE_DIRS
+#   <FEATURE>_DEFINITIONS(|_DEBUG|_RELEASE)
+#   <FEATURE>_USER_DEFINITIONS(|_DEBUG|_RELEASE)
+#   <FEATURE>_CXX_FLAGS(|_DEBUG|_RELEASE)
+#   <FEATURE>_LINKER_FLAGS(|_DEBUG|_RELEASE)
 #
-#   - add ${feature}_LINKER_FLAGS and ${feature}_LINK_FLAGS to
-#     DEAL_II_LINKER_FLAGS
+# to the corresponding DEAL_II_* variables
 #
-#   - add ${feature}_CXX_FLAGS and ${feature}_COMPILE_FLAGS to
-#     CMAKE_CXX_FLAGS
-#
-#   - add ${feature}_LIBRARIES to the list of deal.II libraries depending
-#     on general, optimized or debug keyword
-#
-
 
 MACRO(REGISTER_FEATURE _feature)
-  # variables for include directories:
-  FOREACH(_var ${_feature}_INCLUDE_DIRS ${_feature}_INCLUDE_PATH)
-    IF(DEFINED ${_var})
-      INCLUDE_DIRECTORIES(${${_var}})
-      IF(${_feature}_ADD_TO_USER_INCLUDE_DIRS)
-        LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${${_var}})
-      ENDIF()
-    ENDIF()
-  ENDFOREACH()
-
-  # variables for linker flags:
-  FOREACH(_var ${_feature}_LINKER_FLAGS ${_feature}_LINK_FLAGS)
-    IF(DEFINED ${_var})
-      ADD_FLAGS(DEAL_II_LINKER_FLAGS "${${_var}}")
-    ENDIF()
-  ENDFOREACH()
-
-  # variables for compiler flags:
-  FOREACH(_var ${_feature}_CXX_FLAGS ${_feature}_COMPILE_FLAGS)
-    IF(DEFINED ${_var})
-      ADD_FLAGS(CMAKE_CXX_FLAGS "${${_var}}")
-    ENDIF()
-  ENDFOREACH()
 
   IF(DEFINED ${_feature}_LIBRARIES)
     #
     # Add ${_feature}_LIBRARIES to
-    #   DEAL_II_EXTERNAL_LIBRARIES
-    #   DEAL_II_EXTERNAL_LIBRARIES_DEBUG
-    #   DEAL_II_EXTERNAL_LIBRARIES_RELEASE
+    #   DEAL_II_LIBRARIES
+    #   DEAL_II_LIBRARIES_DEBUG
+    #   DEAL_II_LIBRARIES_RELEASE
     # depending on the "optmized", "debug" or "general" keyword
     #
     SET(_toggle "general")
@@ -79,14 +53,34 @@ MACRO(REGISTER_FEATURE _feature)
         SET(_toggle "${_tmp}")
       ELSE()
         IF("${_toggle}" STREQUAL "general")
-          LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${_tmp})
+          LIST(APPEND DEAL_II_LIBRARIES ${_tmp})
         ELSEIF("${_toggle}" STREQUAL "debug")
-          LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${_tmp})
+          LIST(APPEND DEAL_II_LIBRARIES_DEBUG ${_tmp})
         ELSEIF("${_toggle}" STREQUAL "optimized")
-          LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE ${_tmp})
+          LIST(APPEND DEAL_II_LIBRARIES_RELEASE ${_tmp})
         ENDIF()
       ENDIF()
     ENDFOREACH()
   ENDIF()
+
+  FOREACH(_var
+    LIBRARIES_DEBUG LIBRARIES_RELEASE
+    INCLUDE_DIRS BUNDLED_INCLUDE_DIRS USER_INCLUDE_DIRS
+    DEFINITIONS DEFINITIONS_DEBUG DEFINITIONS_RELEASE
+    USER_DEFINITIONS USER_DEFINITIONS_DEBUG USER_DEFINITIONS_RELEASE
+    )
+    IF(DEFINED ${_feature}_${_var})
+      LIST(APPEND DEAL_II_${_var} ${${_feature}_${_var}})
+    ENDIF()
+  ENDFOREACH()
+
+  FOREACH(_var
+    CXX_FLAGS CXX_FLAGS_DEBUG CXX_FLAGS_RELEASE
+    LINKER_FLAGS LINKER_FLAGS_DEBUG LINKER_FLAGS_RELEASE
+    )
+    IF(DEFINED ${_feature}_${_var})
+      ADD_FLAGS(DEAL_II_${_var} "${${_feature}_${_var}}")
+    ENDIF()
+  ENDFOREACH()
 
 ENDMACRO()

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,9 +77,15 @@ template <int structdim, class DH, bool lda>
 template <int dim2, class DH2, bool lda2>
 inline
 DoFAccessor<structdim,DH,lda>::DoFAccessor (const DoFAccessor<dim2, DH2, lda2> &other)
-  : BaseClass(other), dof_handler(const_cast<DH *>(other.dof_handler))
+  : BaseClass(other),
+    dof_handler(0)
 {
-  Assert (false, ExcInvalidObject());
+  Assert (false, ExcMessage("You are trying to assign iterators that are incompatible. "
+			    "Reasons for incompatibility are that they point to different "
+			    "types of DoFHandlers (e.g., dealii::DoFHandler and "
+			    "dealii::hp::DoFHandler) or that the refer to objects of "
+			    "different dimensionality (e.g., assigning a line iterator "
+			    "to a quad iterator)."));
 }
 
 
@@ -88,7 +94,8 @@ template <int structdim, class DH, bool lda>
 template <bool lda2>
 inline
 DoFAccessor<structdim,DH,lda>::DoFAccessor (const DoFAccessor<structdim, DH, lda2> &other)
-  : BaseClass(other), dof_handler(const_cast<DH *>(other.dof_handler))
+  : BaseClass(other),
+    dof_handler(const_cast<DH *>(other.dof_handler))
 {
 }
 
@@ -3432,6 +3439,13 @@ inline
 const FiniteElement<DH::dimension,DH::space_dimension> &
 DoFCellAccessor<DH,lda>::get_fe () const
 {
+  Assert ((dynamic_cast<const dealii::DoFHandler<DH::dimension,DH::space_dimension>*>
+	   (this->dof_handler) != 0)
+	  ||
+	  (this->has_children() == false),
+          ExcMessage ("In hp::DoFHandler objects, finite elements are only associated "
+		      "with active cells. Consequently, you can not ask for the "
+		      "active finite element on cells with children."));
   return dealii::internal::DoFAccessor::get_fe (this->dof_handler->get_fe(), active_fe_index());
 }
 
@@ -3442,6 +3456,14 @@ inline
 unsigned int
 DoFCellAccessor<DH,lda>::active_fe_index () const
 {
+  Assert ((dynamic_cast<const dealii::DoFHandler<DH::dimension,DH::space_dimension>*>
+	   (this->dof_handler) != 0)
+	  ||
+	  (this->has_children() == false),
+          ExcMessage ("You can not ask for the active_fe_index on a cell that has "
+                      "children because no degrees of freedom are assigned "
+                      "to this cell and, consequently, no finite element "
+		      "is associated with it."));
   return dealii::internal::DoFCellAccessor::Implementation::active_fe_index (*this);
 }
 
@@ -3452,6 +3474,13 @@ inline
 void
 DoFCellAccessor<DH,lda>::set_active_fe_index (const unsigned int i)
 {
+  Assert ((dynamic_cast<const dealii::DoFHandler<DH::dimension,DH::space_dimension>*>
+	   (this->dof_handler) != 0)
+	  ||
+	  (this->has_children() == false),
+          ExcMessage ("You can not set the active_fe_index on a cell that has "
+                      "children because no degrees of freedom will be assigned "
+                      "to this cell."));
   dealii::internal::DoFCellAccessor::Implementation::set_active_fe_index (*this, i);
 }
 

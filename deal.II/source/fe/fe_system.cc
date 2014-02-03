@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -528,10 +528,18 @@ FESystem<dim,spacedim>::get_interpolation_matrix (
   const FiniteElement<dim,spacedim> &x_source_fe,
   FullMatrix<double>           &interpolation_matrix) const
 {
-  Assert (interpolation_matrix.m() == this->dofs_per_cell,
+  // check that the size of the matrices is correct. for historical
+  // reasons, if you call matrix.reinit(8,0), it sets the sizes
+  // to m==n==0 internally. this may happen when we use a FE_Nothing,
+  // so write the test in a more lenient way
+  Assert ((interpolation_matrix.m() == this->dofs_per_cell)
+	  ||
+	  (x_source_fe.dofs_per_cell == 0),
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 this->dofs_per_cell));
-  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+  Assert ((interpolation_matrix.n() == x_source_fe.dofs_per_cell)
+	  ||
+	  (this->dofs_per_cell == 0),
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 x_source_fe.dofs_per_cell));
 
@@ -2970,6 +2978,33 @@ FESystem<dim,spacedim>::unit_face_support_point (const unsigned int index) const
     // information
     return (base_element(this->face_system_to_base_index(index).first.first)
             .unit_face_support_point(this->face_system_to_base_index(index).second));
+}
+
+
+
+template <int dim, int spacedim>
+Table<2,bool>
+FESystem<dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(this->n_components(), this->dofs_per_cell);
+  unsigned int comp=0;
+  for (unsigned int i=0; i<base_elements.size(); ++i)
+    {
+      Table<2,bool> base_table = base_elements[i].first->get_constant_modes();
+      const unsigned int n_base_components = base_elements[i].first->n_components();
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        {
+          std::pair<std::pair<unsigned int,unsigned int>, unsigned int> ind
+            = this->system_to_base_index(k);
+          if (ind.first.first == i)
+            for (unsigned int c=0; c<base_table.n_rows(); ++c)
+              constant_modes(comp+ind.first.second*n_base_components+c,k)
+                = base_table(c,ind.second);
+        }
+      comp += n_base_components * base_elements[i].second;
+    }
+  AssertDimension(comp, this->n_components());
+  return constant_modes;
 }
 
 

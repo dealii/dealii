@@ -482,6 +482,18 @@ public:
   TableBase (const TableIndices<N> &sizes);
 
   /**
+   * Constructor. Initialize the
+   * array with the given
+   * dimensions in each index
+   * component, and then initialize the elements of the table using the
+   * second and third argument by calling fill(entries,C_style_indexing).
+   */
+  template <typename InputIterator>
+  TableBase (const TableIndices<N> &sizes,
+             InputIterator entries,
+             const bool      C_style_indexing = true);
+
+  /**
    * Copy constructor. Performs a
    * deep copy.
    */
@@ -583,31 +595,48 @@ public:
   bool empty () const;
 
   /**
-   * Fill array with an array of
-   * elements. The input array must
-   * be arranged in usual C style,
-   * i.e. with the last index
-   * running fastest. For
-   * two-dimensional tables, this
-   * means line by line. No range
-   * checking is performed, i.e.,
-   * it is assumed that the input
-   * array <tt>entries</tt> contains
-   * n_rows()*n_cols()
-   * elements, and that the layout
-   * refers to the desired shape of
-   * this table. The only check we
-   * do is that the present array
-   * is non-empty.
+   * Fill this table (which is assumed to already have the correct
+   * size) from a source given by dereferencing the given forward
+   * iterator (which could, for example, be a pointer to the first
+   * element of an array, or an inserting std::istream_iterator). The
+   * second argument denotes whether the elements pointed to are
+   * arranged in a way that corresponds to the last index running
+   * fastest or slowest. The default is to use C-style indexing
+   * where the last index runs fastest (as opposed to Fortran-style
+   * where the first index runs fastest when traversing multidimensional
+   * arrays. For example, if you try to fill an object of type
+   * Table<2,T>, then calling this function with the default
+   * value for the second argument will result in the equivalent of
+   * doing
+   * @code
+   *   Table<2,T> t;
+   *   for (unsigned int i=0; i<t.sizes()[0]; ++i)
+   *     for (unsigned int j=0; j<t.sizes()[1]; ++j)
+   *       t[i][j] = *entries++;
+   * @endcode
+   * On the other hand, if the second argument to this function is false,
+   * then this would result in code of the following form:
+   * @code
+   *   Table<2,T> t;
+   *   for (unsigned int j=0; j<t.sizes()[1]; ++j)
+   *     for (unsigned int i=0; i<t.sizes()[0]; ++i)
+   *       t[i][j] = *entries++;
+   * @endcode
+   * Note the switched order in which we fill the table elements by
+   * traversing the given set of iterators.
    *
-   * Note also that the type of the
-   * objects of the input array,
-   * <tt>T2</tt>, must be convertible to
-   * the type of the objects of
-   * this array.
+   * @param entries An iterator to a set of elements from which to
+   *   initialize this table. It is assumed that iterator can be
+   *   incremented and dereferenced a sufficient number of times
+   *   to fill this table.
+   * @param C_style_indexing If true, run over elements of the
+   *   table with the last index changing fastest as we dereference
+   *   subsequent elements of the input range. If false, change
+   *   the first index fastest.
    */
-  template<typename T2>
-  void fill (const T2 *entries);
+  template <typename InputIterator>
+  void fill (InputIterator entries,
+             const bool      C_style_indexing = true);
 
   /**
    * Fill all table entries with
@@ -790,6 +819,50 @@ public:
   Table (const unsigned int size);
 
   /**
+   * Constructor. Create a table with a given size and initialize it from
+   * a set of iterators.
+   *
+   * This function is entirely equivalent to creating a table <code>t</code>
+   * of the given size and then calling
+   * @code
+   *   t.fill (entries, C_style_indexing);
+   * @endcode
+   * on it, using the TableBase::fill() function where the arguments are
+   * explained in more detail. The point, however, is that that is only
+   * possible if the table can be changed after running the constructor,
+   * whereas calling the current constructor allows sizing and initializing
+   * an object right away so that it can be marked const.
+   *
+   * Using this constructor, you can do things like this:
+   * @code
+   *   const double values[] = { 1, 2, 3 };
+   *   const Table<1,double> t(3, entries, true);
+   * @endcode
+   * You can also initialize a table right from a file, using input iterators:
+   * @code
+   *   std::ifstream input ("myfile");
+   *   const Table<1,double> t(3,
+   *                           std::istream_iterator<double>(input),
+   *                           true);
+   * @endcode
+   *
+   *
+   * @param size The size of this one-dimensional table.
+   * @param entries An iterator to a set of elements from which to
+   *   initialize this table. It is assumed that iterator can be
+   *   incremented and dereferenced a sufficient number of times
+   *   to fill this table.
+   * @param C_style_indexing If true, run over elements of the
+   *   table with the last index changing fastest as we dereference
+   *   subsequent elements of the input range. If false, change
+   *   the first index fastest.
+   */
+  template <typename InputIterator>
+  Table (const unsigned int size,
+         InputIterator entries,
+         const bool      C_style_indexing = true);
+
+  /**
    * Access operator. Since this is
    * a one-dimensional object, this
    * simply accesses the requested
@@ -880,6 +953,52 @@ public:
    */
   Table (const unsigned int size1,
          const unsigned int size2);
+
+  /**
+   * Constructor. Create a table with a given size and initialize it from
+   * a set of iterators.
+   *
+   * This function is entirely equivalent to creating a table <code>t</code>
+   * of the given size and then calling
+   * @code
+   *   t.fill (entries, C_style_indexing);
+   * @endcode
+   * on it, using the TableBase::fill() function where the arguments are
+   * explained in more detail. The point, however, is that that is only
+   * possible if the table can be changed after running the constructor,
+   * whereas calling the current constructor allows sizing and initializing
+   * an object right away so that it can be marked const.
+   *
+   * Using this constructor, you can do things like this:
+   * @code
+   *   const double values[] = { 1, 2, 3, 4, 5, 6 };
+   *   const Table<2,double> t(2, 3, entries, true);
+   * @endcode
+   * You can also initialize a table right from a file, using input iterators:
+   * @code
+   *   std::ifstream input ("myfile");
+   *   const Table<2,double> t(2, 3,
+   *                           std::istream_iterator<double>(input),
+   *                           true);
+   * @endcode
+   *
+   *
+   * @param size1 The size of this table in the first dimension.
+   * @param size2 The size of this table in the second dimension.
+   * @param entries An iterator to a set of elements from which to
+   *   initialize this table. It is assumed that iterator can be
+   *   incremented and dereferenced a sufficient number of times
+   *   to fill this table.
+   * @param C_style_indexing If true, run over elements of the
+   *   table with the last index changing fastest as we dereference
+   *   subsequent elements of the input range. If false, change
+   *   the first index fastest.
+   */
+  template <typename InputIterator>
+  Table (const unsigned int size1,
+         const unsigned int size2,
+         InputIterator entries,
+         const bool      C_style_indexing = true);
 
   /**
    * Reinitialize the object. This
@@ -1060,6 +1179,55 @@ public:
   Table (const unsigned int size1,
          const unsigned int size2,
          const unsigned int size3);
+
+  /**
+   * Constructor. Create a table with a given size and initialize it from
+   * a set of iterators.
+   *
+   * This function is entirely equivalent to creating a table <code>t</code>
+   * of the given size and then calling
+   * @code
+   *   t.fill (entries, C_style_indexing);
+   * @endcode
+   * on it, using the TableBase::fill() function where the arguments are
+   * explained in more detail. The point, however, is that that is only
+   * possible if the table can be changed after running the constructor,
+   * whereas calling the current constructor allows sizing and initializing
+   * an object right away so that it can be marked const.
+   *
+   * Using this constructor, you can do things like this (shown here for
+   * a two-dimensional table, but the same works for the current class):
+   * @code
+   *   const double values[] = { 1, 2, 3, 4, 5, 6 };
+   *   const Table<2,double> t(2, 3, entries, true);
+   * @endcode
+   * You can also initialize a table right from a file, using input iterators:
+   * @code
+   *   std::ifstream input ("myfile");
+   *   const Table<2,double> t(2, 3,
+   *                           std::istream_iterator<double>(input),
+   *                           true);
+   * @endcode
+   *
+   *
+   * @param size1 The size of this table in the first dimension.
+   * @param size2 The size of this table in the second dimension.
+   * @param size3 The size of this table in the third dimension.
+   * @param entries An iterator to a set of elements from which to
+   *   initialize this table. It is assumed that iterator can be
+   *   incremented and dereferenced a sufficient number of times
+   *   to fill this table.
+   * @param C_style_indexing If true, run over elements of the
+   *   table with the last index changing fastest as we dereference
+   *   subsequent elements of the input range. If false, change
+   *   the first index fastest.
+   */
+  template <typename InputIterator>
+  Table (const unsigned int size1,
+         const unsigned int size2,
+         const unsigned int size3,
+         InputIterator entries,
+         const bool      C_style_indexing = true);
 
   /**
    * Access operator. Generate an
@@ -1735,6 +1903,20 @@ TableBase<N,T>::TableBase (const TableIndices<N> &sizes)
 
 
 template <int N, typename T>
+template <typename InputIterator>
+TableBase<N,T>::
+TableBase (const TableIndices<N> &sizes,
+           InputIterator entries,
+           const bool      C_style_indexing)
+{
+  reinit (sizes);
+  fill (entries, C_style_indexing);
+}
+
+
+
+
+template <int N, typename T>
 TableBase<N,T>::TableBase (const TableBase<N,T> &src)
   :
   Subscriptor ()
@@ -2080,16 +2262,66 @@ TableBase<N,T>::empty () const
 
 
 
+namespace internal
+{
+  namespace Table
+  {
+    template <typename InputIterator, typename T>
+    void fill_Fortran_style (InputIterator  entries,
+                             TableBase<1,T>  &table)
+    {
+      for (unsigned int i=0; i<table.size()[0]; ++i)
+        table(TableIndices<1>(i)) = *entries++;
+    }
+
+
+    template <typename InputIterator, typename T>
+    void fill_Fortran_style (InputIterator  entries,
+                             TableBase<2,T>  &table)
+    {
+      for (unsigned int j=0; j<table.size()[1]; ++j)
+        for (unsigned int i=0; i<table.size()[0]; ++i)
+          table(TableIndices<2>(i,j)) = *entries++;
+    }
+
+
+    template <typename InputIterator, typename T>
+    void fill_Fortran_style (InputIterator  entries,
+                             TableBase<3,T>  &table)
+    {
+      for (unsigned int k=0; k<table.size()[2]; ++k)
+        for (unsigned int j=0; j<table.size()[1]; ++j)
+          for (unsigned int i=0; i<table.size()[0]; ++i)
+            table(TableIndices<3>(i,j,k)) = *entries++;
+    }
+
+
+    template <typename InputIterator, typename T, int N>
+    void fill_Fortran_style (InputIterator,
+                             TableBase<N,T>  &)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+  }
+}
+
+
 template <int N, typename T>
-template <typename T2>
+template <typename InputIterator>
 inline
 void
-TableBase<N,T>::fill (const T2 *entries)
+TableBase<N,T>::fill (InputIterator entries,
+                      const bool C_style_indexing)
 {
   Assert (n_elements() != 0,
           ExcMessage("Trying to fill an empty matrix."));
 
-  std::copy (entries, entries+n_elements(), values.begin());
+  if (C_style_indexing)
+    for (typename std::vector<T>::iterator p = values.begin();
+        p != values.end(); ++p)
+      *p = *entries++;
+  else
+    internal::Table::fill_Fortran_style (entries, *this);
 }
 
 
@@ -2225,6 +2457,20 @@ Table<1,T>::Table (const unsigned int size)
 
 
 template <typename T>
+template <typename InputIterator>
+inline
+Table<1,T>::Table (const unsigned int size,
+                   InputIterator entries,
+                   const bool C_style_indexing)
+  :
+  TableBase<1,T> (TableIndices<1> (size),
+                  entries,
+                  C_style_indexing)
+{}
+
+
+
+template <typename T>
 inline
 typename std::vector<T>::const_reference
 Table<1,T>::operator [] (const unsigned int i) const
@@ -2306,6 +2552,21 @@ Table<2,T>::Table (const unsigned int size1,
                    const unsigned int size2)
   :
   TableBase<2,T> (TableIndices<2> (size1, size2))
+{}
+
+
+
+template <typename T>
+template <typename InputIterator>
+inline
+Table<2,T>::Table (const unsigned int size1,
+                   const unsigned int size2,
+                   InputIterator entries,
+                   const bool C_style_indexing)
+  :
+  TableBase<2,T> (TableIndices<2> (size1, size2),
+                  entries,
+                  C_style_indexing)
 {}
 
 
@@ -2560,6 +2821,22 @@ Table<3,T>::Table (const unsigned int size1,
                    const unsigned int size3)
   :
   TableBase<3,T> (TableIndices<3> (size1, size2, size3))
+{}
+
+
+
+template <typename T>
+template <typename InputIterator>
+inline
+Table<3,T>::Table (const unsigned int size1,
+                   const unsigned int size2,
+                   const unsigned int size3,
+                   InputIterator entries,
+                   const bool C_style_indexing)
+  :
+  TableBase<3,T> (TableIndices<3> (size1, size2, size3),
+                  entries,
+                  C_style_indexing)
 {}
 
 

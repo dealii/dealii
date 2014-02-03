@@ -21,7 +21,7 @@ DEAL::0
 DEAL::0 
 DEAL::0 
 DEAL::0
-DEAL::0
+DEAL::1
 DEAL::1
 DEAL::0
 DEAL::Checking Q1 in 2d:
@@ -96,7 +96,7 @@ DEAL::0
 DEAL::0 
 DEAL::0 
 DEAL::0
-DEAL::0
+DEAL::1
 DEAL::1
 DEAL::0
 DEAL::Checking Q2 in 2d:
@@ -171,7 +171,7 @@ DEAL::0
 DEAL::0 
 DEAL::0 
 DEAL::0
-DEAL::0
+DEAL::1
 DEAL::1
 DEAL::0
 DEAL::Checking Q3 in 2d:

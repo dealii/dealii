@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -164,19 +164,20 @@ namespace TrilinosWrappers
  * basis functions, the roughness of the coefficient @p a, as well as
  * the degree of the given @p Mapping (if any).
  *
- * Note, that for system elements the mass matrix and the laplace matrix is
- * implemented such that each components couple only with itself, i.e. there
- * is no coupling of shape functions belonging to different components. If the
- * degrees of freedom have been sorted according to their vector component
- * (e.g., using DoFRenumbering::component_wise()), then the resulting matrices
- * will be block diagonal.
+ * Note, that for vector-valued elements the mass matrix and the
+ * laplace matrix is implemented in such a way that each component
+ * couples only with itself, i.e. there is no coupling of shape
+ * functions belonging to different components. If the degrees of
+ * freedom have been sorted according to their vector component (e.g.,
+ * using DoFRenumbering::component_wise()), then the resulting
+ * matrices will be block diagonal.
  *
- * If the finite element for which the mass matrix or the laplace
- * matrix is to be built has more than one component, this function
- * accepts a single coefficient as well as a vector valued coefficient
- * function. For the latter case make sure that the number of
- * components coincides with the number of components of the system
- * finite element.
+ * If the finite element for which the mass matrix or the Laplace
+ * matrix is to be built has more than one component, the functions
+ * accept a single coefficient as well as a vector valued coefficient
+ * function. For the latter case, the number of components must
+ * coincide with the number of components of the system finite
+ * element.
  *
  *
  * <h3>Matrices on the boundary</h3>
@@ -227,15 +228,18 @@ namespace TrilinosWrappers
 namespace MatrixCreator
 {
   /**
-   * Assemble the mass matrix. If no coefficient is given, it is assumed to be
-   * unity.
+   * Assemble the mass matrix. If no coefficient is given (i.e., if
+   * the pointer to a function object is zero as it is by default),
+   * the coefficient is taken as being constant and equal to one.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
    *
-   * The optional argument @p constraints allows to apply constraints on the
-   * resulting matrix directly. Be careful when combining several matrices and
-   * using inhomogeneous constraints.
+   * The optional argument @p constraints allows to apply constraints
+   * on the resulting matrix directly. Note, however, that this
+   * becomes difficult when you have inhomogeneous constraints and
+   * later want to add several such matrices, for example in time
+   * dependent settings such as the main loop of step-26.
    *
    * See the general doc of this class for more information.
    */
@@ -259,15 +263,19 @@ namespace MatrixCreator
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
-   * Assemble the mass matrix and a right hand side vector. If no coefficient
-   * is given, it is assumed to be unity.
+   * Assemble the mass matrix and a right hand side vector. If no
+   * coefficient is given (i.e., if the pointer to a function object
+   * is zero as it is by default), the coefficient is taken as being
+   * constant and equal to one.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
    *
    * The optional argument @p constraints allows to apply constraints on the
-   * resulting matrix directly. Be careful when combining several matrices and
-   * using inhomogeneous constraints.
+   * resulting matrix directly. Note, however, that this
+   * becomes difficult when you have inhomogeneous constraints and
+   * later want to add several such matrices, for example in time
+   * dependent settings such as the main loop of step-26.
    *
    * See the general doc of this class for more information.
    */
@@ -457,15 +465,18 @@ namespace MatrixCreator
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
-   * Assemble the Laplace matrix. If no coefficient is given, it is assumed to
-   * be constant one.
+   * Assemble the Laplace matrix. If no coefficient is given (i.e., if
+   * the pointer to a function object is zero as it is by default),
+   * the coefficient is taken as being constant and equal to one.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
    *
    * The optional argument @p constraints allows to apply constraints on the
-   * resulting matrix directly. Be careful when combining several matrices and
-   * using inhomogeneous constraints.
+   * resulting matrix directly. Note, however, that this
+   * becomes difficult when you have inhomogeneous constraints and
+   * later want to add several such matrices, for example in time
+   * dependent settings such as the main loop of step-26.
    *
    * See the general doc of this class for more information.
    */
@@ -496,8 +507,10 @@ namespace MatrixCreator
    * in parallel.
    *
    * The optional argument @p constraints allows to apply constraints on the
-   * resulting matrix directly. Be careful when combining several matrices and
-   * using inhomogeneous constraints.
+   * resulting matrix directly. Note, however, that this
+   * becomes difficult when you have inhomogeneous constraints and
+   * later want to add several such matrices, for example in time
+   * dependent settings such as the main loop of step-26.
    *
    * See the general doc of this class for more information.
    */
@@ -635,7 +648,7 @@ namespace MatrixCreator
  * solver which can handle nonsymmetric matrices in any case, so there
  * may be no need to do the Gauss elimination anyway. In fact, this is
  * the way the function works: it takes a parameter
- * (@p elininate_columns) that specifies whether the sparsity pattern
+ * (@p eliminate_columns) that specifies whether the sparsity pattern
  * is symmetric; if so, then the column is eliminated and the right
  * hand side is also modified accordingly. If not, then only the row
  * is deleted and the column is not touched at all, and all right hand

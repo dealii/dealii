@@ -1862,6 +1862,20 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs (const unsigned int sub_degree) const
 
 
 template <int dim>
+Table<2,bool>
+FE_Q_Hierarchical<dim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    constant_modes(0,i) = true;
+  for (unsigned int i=GeometryInfo<dim>::vertices_per_cell; i<this->dofs_per_cell; ++i)
+    constant_modes(0,i) = false;
+  return constant_modes;
+}
+
+
+
+template <int dim>
 std::size_t
 FE_Q_Hierarchical<dim>::memory_consumption () const
 {

@@ -106,47 +106,53 @@ public:
    * Return the indices of dofs for each level that lie on the
    * boundary of the domain.
    */
-// TODO: remove
   const std::vector<std::set<types::global_dof_index> > &
   get_boundary_indices () const;
 
   /**
-   * Return the indices of dofs for each level that lie on the
-   * boundary of the domain.
-   */
-  // TODO: remove
-  const std::vector<std::set<types::global_dof_index> > &
-  get_non_refinement_edge_indices () const;
-
-  /**
+   * @deprecated Use at_refinement_edge() if possible, else
+   * get_refinement_edge_indices(unsigned int).
+   *
    * Return the indices of dofs for each level that lie on the
    * refinement edge (i.e. are on faces between cells of this level
    * and cells on the level below).
    */
-  // TODO: remove
   const std::vector<std::vector<bool> > &
-  get_refinement_edge_indices () const;
+  get_refinement_edge_indices () const DEAL_II_DEPRECATED;
 
   /**
+   * Return the indices of dofs on the given level that lie on an
+   * refinement edge (dofs on faces to neighbors that are coarser)
+   */
+  const IndexSet &
+  get_refinement_edge_indices (unsigned int level) const;
+
+  /**
+   * @deprecated Use at_refinement_edge_boundary() if possible, else
+   * use get_refinement_edge_boundary_indices().
+   *
    * Return the indices of dofs for each level that are in the
    * intersection of the sets returned by get_boundary_indices() and
    * get_refinement_edge_indices().
    */
-  // TODO: remove
   const std::vector<std::vector<bool> > &
-  get_refinement_edge_boundary_indices () const;
+  get_refinement_edge_boundary_indices () const DEAL_II_DEPRECATED;
 
   /**
+   * Return indices of all dofs that are on boundary faces on the given level 
+   * if the cell has refinement edge indices (i.e. has a coarser neighbor).
+   */
+  const IndexSet &
+  get_refinement_edge_boundary_indices (unsigned int level) const;
+
+  /**
+   * @deprecated The function is_boundary_index() now returns false if
+   * no boundary values are set.
+   *
    * Return if boundary_indices need to be set or not.
    */
+  bool set_boundary_values () const DEAL_II_DEPRECATED;
 
-  bool set_boundary_values () const;
-
-  /**
-   * Return if the finite element requires continuity across
-   * refinement edges.
-   */
-  bool continuity_across_refinement_edges () const;
 private:
 
   /**
@@ -155,16 +161,10 @@ private:
   std::vector<std::set<types::global_dof_index> > boundary_indices;
 
   /**
-   * The degrees of freedom on egdges that are not a refinement edge
-   * between a level and coarser cells.
-   */
-  std::vector<std::set<types::global_dof_index> > non_refinement_edge_indices;
-
-  /**
    * The degrees of freedom on the refinement edge between a level and
    * coarser cells.
    */
-  std::vector<std::vector<bool> > refinement_edge_indices;
+  std::vector<IndexSet> refinement_edge_indices;
 
   /**
    * The degrees of freedom on the refinement edge between a level and
@@ -172,7 +172,17 @@ private:
    *
    * This is a subset of #refinement_edge_indices.
    */
-  std::vector<std::vector<bool> > refinement_edge_boundary_indices;
+  std::vector<IndexSet> refinement_edge_boundary_indices;
+
+  /**
+   * old data structure only filled on demand
+   */
+  mutable std::vector<std::vector<bool> > refinement_edge_boundary_indices_old;
+
+  /**
+   * old data structure only filled on demand
+   */
+  mutable std::vector<std::vector<bool> > refinement_edge_indices_old;
 };
 
 
@@ -184,16 +194,15 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
   const unsigned int nlevels = dof.get_tria().n_global_levels();
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
-  non_refinement_edge_indices.resize(nlevels);
+  refinement_edge_indices_old.clear();
+  refinement_edge_boundary_indices_old.clear();
   for (unsigned int l=0; l<nlevels; ++l)
     {
-      refinement_edge_indices[l].resize(dof.n_dofs(l));
-      refinement_edge_boundary_indices[l].resize(dof.n_dofs(l));
+      refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
+      refinement_edge_boundary_indices[l] = IndexSet(dof.n_dofs(l));
     }
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
                                          refinement_edge_boundary_indices);
-
-  MGTools::extract_non_interface_dofs (dof, non_refinement_edge_indices);
 }
 
 
@@ -209,19 +218,19 @@ MGConstrainedDoFs::initialize(
   boundary_indices.resize(nlevels);
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
-  non_refinement_edge_indices.resize(nlevels);
+  refinement_edge_indices_old.clear();
+  refinement_edge_boundary_indices_old.clear();
 
   for (unsigned int l=0; l<nlevels; ++l)
     {
       boundary_indices[l].clear();
-      refinement_edge_indices[l].resize(dof.n_dofs(l));
-      refinement_edge_boundary_indices[l].resize(dof.n_dofs(l));
+      refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
+      refinement_edge_boundary_indices[l] = IndexSet(dof.n_dofs(l));
     }
 
   MGTools::make_boundary_list (dof, function_map, boundary_indices, component_mask);
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
                                          refinement_edge_boundary_indices);
-  MGTools::extract_non_interface_dofs (dof, non_refinement_edge_indices);
 }
 
 
@@ -238,8 +247,8 @@ MGConstrainedDoFs::clear()
   for (unsigned int l=0; l<refinement_edge_boundary_indices.size(); ++l)
     refinement_edge_boundary_indices[l].clear();
 
-  for (unsigned int l=0; l<non_refinement_edge_indices.size(); ++l)
-    non_refinement_edge_indices[l].clear();
+  refinement_edge_indices_old.clear();
+  refinement_edge_boundary_indices_old.clear();
 }
 
 
@@ -248,11 +257,11 @@ bool
 MGConstrainedDoFs::is_boundary_index (const unsigned int level,
                                       const types::global_dof_index index) const
 {
-  AssertIndexRange(level, boundary_indices.size());
-  if (boundary_indices[level].find(index) != boundary_indices[level].end())
-    return true;
-  else
+  if (boundary_indices.size() == 0)
     return false;
+  
+  AssertIndexRange(level, boundary_indices.size());
+  return (boundary_indices[level].find(index) != boundary_indices[level].end());
 }
 
 inline
@@ -260,12 +269,7 @@ bool
 MGConstrainedDoFs::non_refinement_edge_index (const unsigned int level,
                                               const types::global_dof_index index) const
 {
-  AssertIndexRange(level, non_refinement_edge_indices.size());
-
-  if (non_refinement_edge_indices[level].find(index) != non_refinement_edge_indices[level].end())
-    return true;
-  else
-    return false;
+  return !at_refinement_edge (level, index);
 }
 
 inline
@@ -274,9 +278,8 @@ MGConstrainedDoFs::at_refinement_edge (const unsigned int level,
                                        const types::global_dof_index index) const
 {
   AssertIndexRange(level, refinement_edge_indices.size());
-  AssertIndexRange(index, refinement_edge_indices[level].size());
 
-  return refinement_edge_indices[level][index];
+  return refinement_edge_indices[level].is_element(index);
 }
 
 
@@ -286,9 +289,8 @@ MGConstrainedDoFs::at_refinement_edge_boundary (const unsigned int level,
                                                 const types::global_dof_index index) const
 {
   AssertIndexRange(level, refinement_edge_boundary_indices.size());
-  AssertIndexRange(index, refinement_edge_boundary_indices[level].size());
 
-  return refinement_edge_boundary_indices[level][index];
+  return refinement_edge_boundary_indices[level].is_element(index);
 }
 
 inline
@@ -299,24 +301,54 @@ MGConstrainedDoFs::get_boundary_indices () const
 }
 
 inline
-const std::vector<std::set<types::global_dof_index> > &
-MGConstrainedDoFs::get_non_refinement_edge_indices () const
-{
-  return non_refinement_edge_indices;
-}
-
-inline
 const std::vector<std::vector<bool> > &
 MGConstrainedDoFs::get_refinement_edge_indices () const
 {
-  return refinement_edge_indices;
+  if (refinement_edge_indices_old.size()!=refinement_edge_indices.size())
+    {
+      unsigned int n_levels = refinement_edge_indices.size();
+      refinement_edge_indices_old.resize(n_levels);
+      for (unsigned int l=0;l<n_levels;++l)
+        {
+          refinement_edge_indices_old[l].resize(refinement_edge_indices[l].size(), false);
+          refinement_edge_indices[l].fill_binary_vector(refinement_edge_indices_old[l]);
+        }
+    }
+
+  return refinement_edge_indices_old;
+}
+
+inline
+const IndexSet &
+MGConstrainedDoFs::get_refinement_edge_indices (unsigned int level) const
+{
+  AssertIndexRange(level, refinement_edge_indices.size());
+  return refinement_edge_indices[level];
 }
 
 inline
 const std::vector<std::vector<bool> > &
 MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
 {
-  return refinement_edge_boundary_indices;
+  if (refinement_edge_boundary_indices_old.size()!=refinement_edge_boundary_indices.size())
+    {
+      unsigned int n_levels = refinement_edge_boundary_indices.size();
+      refinement_edge_boundary_indices_old.resize(n_levels);
+      for (unsigned int l=0;l<n_levels;++l)
+        {
+          refinement_edge_boundary_indices_old[l].resize(refinement_edge_boundary_indices[l].size(), false);
+          refinement_edge_boundary_indices[l].fill_binary_vector(refinement_edge_boundary_indices_old[l]);
+        }
+    }
+
+  return refinement_edge_boundary_indices_old;
+}
+
+inline
+const IndexSet &
+MGConstrainedDoFs::get_refinement_edge_boundary_indices (unsigned int level) const
+{
+  return refinement_edge_boundary_indices[level];
 }
 
 inline
@@ -328,20 +360,6 @@ MGConstrainedDoFs::set_boundary_values () const
   return boundary_values_need_to_be_set;
 }
 
-inline
-bool
-MGConstrainedDoFs::continuity_across_refinement_edges () const
-{
-  bool is_continuous = false;
-  for (unsigned int l=0; l<refinement_edge_indices.size(); ++l)
-    for (unsigned int i=0; i<refinement_edge_indices[l].size(); ++i)
-      if (refinement_edge_indices[l][i])
-        {
-          is_continuous = true;
-          return is_continuous;
-        }
-  return is_continuous;
-}
 
 DEAL_II_NAMESPACE_CLOSE
 

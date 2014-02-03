@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -112,15 +112,13 @@ ENDMACRO()
 
 
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
-  INCLUDE_DIRECTORIES(${PETSC_INCLUDE_DIRS})
 
-  SET(PETSC_ADD_TO_USER_INCLUDE_DIRS TRUE)
-  REGISTER_FEATURE(PETSC)
+  SET(PETSC_USER_INCLUDE_DIRS ${PETSC_INCLUDE_DIRS})
 
   #
   # Disable a bunch of warnings when compiling with petsc:
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
+  ENABLE_IF_SUPPORTED(PETSC_CXX_FLAGS "-Wno-long-long")
 
   SET(DEAL_II_EXPAND_PETSC_VECTOR "PETScWrappers::Vector")
   SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")

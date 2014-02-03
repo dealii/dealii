@@ -21,6 +21,7 @@
 
 #  include <cmath>
 #  include <Epetra_Import.h>
+#  include <Epetra_Export.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -29,7 +30,7 @@ namespace TrilinosWrappers
 {
   namespace
   {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+#ifndef DEAL_II_WITH_64BIT_INDICES
     // define a helper function that queries the global vector length of an
     // Epetra_FEVector object  by calling either the 32- or 64-bit
     // function necessary.
@@ -55,13 +56,9 @@ namespace TrilinosWrappers
       Assert (index < vector.size(),
               ExcIndexRange (index, 0, vector.size()));
 
-      // Trilinos allows for vectors
-      // to be referenced by the [] or
-      // () operators but only ()
-      // checks index bounds. We check
-      // these bounds by ourselves, so
-      // we can use []. Note that we
-      // can only get local values.
+      // Trilinos allows for vectors to be referenced by the [] or ()
+      // operators but only () checks index bounds. We check these bounds by
+      // ourselves, so we can use []. Note that we can only get local values.
 
       const TrilinosWrappers::types::int_type local_index =
         vector.vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
@@ -112,9 +109,8 @@ namespace TrilinosWrappers
   void
   VectorBase::clear ()
   {
-    // When we clear the vector,
-    // reset the pointer and generate
-    // an empty vector.
+    // When we clear the vector, reset the pointer and generate an empty
+    // vector.
 #ifdef DEAL_II_WITH_MPI
     Epetra_Map map (0, 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
@@ -186,18 +182,67 @@ namespace TrilinosWrappers
 
 
 
+  void
+  VectorBase::compress (::dealii::VectorOperation::values given_last_action)
+  {
+    //Select which mode to send to Trilinos. Note that we use last_action if
+    //available and ignore what the user tells us to detect wrongly mixed
+    //operations. Typically given_last_action is only used on machines that do
+    //not execute an operation (because they have no own cells for example).
+    Epetra_CombineMode mode = last_action;
+    if (last_action == Zero)
+      {
+        if (given_last_action==::dealii::VectorOperation::add)
+          mode = Add;
+        else if (given_last_action==::dealii::VectorOperation::insert)
+          mode = Insert;
+      }
+
+#ifdef DEBUG
+#  ifdef DEAL_II_WITH_MPI
+    // check that every process has decided to use the same mode. This will
+    // otherwise result in undefined behaviour in the call to
+    // GlobalAssemble().
+    double double_mode = mode;
+    Utilities::MPI::MinMaxAvg result
+      = Utilities::MPI::min_max_avg (double_mode,
+                                     dynamic_cast<const Epetra_MpiComm *>
+                                     (&vector_partitioner().Comm())->GetMpiComm());
+    Assert(result.max-result.min<1e-5,
+           ExcMessage ("Not all processors agree whether the last operation on "
+                       "this vector was an addition or a set operation. This will "
+                       "prevent the compress() operation from succeeding."));
+
+#  endif
+#endif
+
+    // Now pass over the information about what we did last to the vector.
+    int ierr = 0;
+    if (nonlocal_vector.get() == 0 || mode != Add)
+      ierr = vector->GlobalAssemble(mode);
+    else
+      {
+        Epetra_Export exporter(nonlocal_vector->Map(), vector->Map());
+        ierr = vector->Export(*nonlocal_vector, exporter, mode);
+        nonlocal_vector->PutScalar(0.);
+      }
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    last_action = Zero;
+
+    compressed = true;
+  }
+
+
+
   TrilinosScalar
   VectorBase::el (const size_type index) const
   {
-    // Extract local indices in
-    // the vector.
+    // Extract local indices in the vector.
     TrilinosWrappers::types::int_type trilinos_i =
       vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
     TrilinosScalar value = 0.;
 
-    // If the element is not
-    // present on the current
-    // processor, we can't
+    // If the element is not present on the current processor, we can't
     // continue. Just print out 0.
 
     // TODO: Is this reasonable?
@@ -218,17 +263,13 @@ namespace TrilinosWrappers
   TrilinosScalar
   VectorBase::operator () (const size_type index) const
   {
-    // Extract local indices in
-    // the vector.
+    // Extract local indices in the vector.
     TrilinosWrappers::types::int_type trilinos_i =
       vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
     TrilinosScalar value = 0.;
 
-    // If the element is not present
-    // on the current processor, we
-    // can't continue. This is the
-    // main difference to the el()
-    // function.
+    // If the element is not present on the current processor, we can't
+    // continue. This is the main difference to the el() function.
     if (trilinos_i == -1 )
       {
         Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
