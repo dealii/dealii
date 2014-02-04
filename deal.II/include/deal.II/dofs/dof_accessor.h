@@ -1209,6 +1209,14 @@ public:
   typedef DH Container;
 
   /**
+   * A type for an iterator over the faces of a cell. This is
+   * what the face() function returns.
+   */
+  typedef
+  TriaIterator<DoFAccessor<DH::dimension-1, DH, level_dof_access> >
+  face_iterator;
+
+  /**
    * @name Constructors and initialization
    */
   /**
@@ -1284,10 +1292,10 @@ public:
   /**
    * Return an iterator to the @p ith face of this cell.
    *
-   * This function is not implemented in 1D, and maps to
-   * DoFAccessor::line in 2D.
+   * This function is not implemented in 1D, and returns
+   * DoFAccessor::line in 2D and DoFAccessor::quad in 3d.
    */
-  TriaIterator<DoFAccessor<DH::dimension-1,DH, level_dof_access> >
+  face_iterator
   face (const unsigned int i) const;
 
   /**
@@ -1748,12 +1756,12 @@ private:
 };
 
 
-template <int sd, class DH, bool lda>
+template <int sd, class DH, bool level_dof_access>
 inline
 bool
-DoFAccessor<sd, DH, lda>::is_level_cell()
+DoFAccessor<sd, DH, level_dof_access>::is_level_cell()
 {
-  return lda;
+  return level_dof_access;
 }
 
 
