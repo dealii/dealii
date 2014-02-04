@@ -124,6 +124,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: GridTools::transform() can now deal with meshes with hanging nodes.
+  <br>
+  (Timo Heister, 2014/02/04)
+  </li>
+
   <li>Fixed: Calling FEValuesViews::Vector::get_function_curls() computed
   wrong results in some cases (see https://code.google.com/p/dealii/issues/detail?id=182).
   This is now fixed.

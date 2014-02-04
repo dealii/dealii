@@ -171,15 +171,7 @@ namespace GridTools
   /**
    * Transform the vertices of the given
    * triangulation by applying the
-   * function object provided as first argument to all its vertices. Since
-   * the internal consistency of a
-   * triangulation can only be guaranteed
-   * if the transformation is applied to
-   * the vertices of only one level of
-   * hierarchically refined cells, this
-   * function may only be used if all cells
-   * of the triangulation are on the same
-   * refinement level.
+   * function object provided as first argument to all its vertices.
    *
    * The transformation given as
    * argument is used to transform
@@ -193,6 +185,13 @@ namespace GridTools
    * either case, argument and
    * return value have to be of
    * type <tt>Point<spacedim></tt>.
+   *
+   * Note: if you are using a parallel::distributed::Triangulation you will have
+   * hanging nodes in your local Triangulation even if your "global" mesh has
+   * no hanging nodes. This will cause issues with wrong positioning of hanging
+   * nodes in ghost cells. The active cells will be correct, but keep in mind that
+   * computations like KellyErrorEstimator will give wrong answers. A safe bet is
+   * to use this function prior to any refinement in parallel.
    *
    * This function is used in the
    * "Possibilities for extensions" section
@@ -1204,13 +1203,6 @@ namespace GridTools
   void transform (const Predicate    &predicate,
                   Triangulation<dim, spacedim> &triangulation)
   {
-    // ensure that all the cells of the
-    // triangulation are on the same level
-    Assert (triangulation.n_levels() ==
-            static_cast<unsigned int>(triangulation.begin_active()->level()+1),
-            ExcMessage ("Not all cells of this triangulation are at the same "
-                        "refinement level, as is required for this function."));
-
     std::vector<bool> treated_vertices (triangulation.n_vertices(),
                                         false);
 
@@ -1232,6 +1224,49 @@ namespace GridTools
             // and mark it as treated
             treated_vertices[cell->vertex_index(v)] = true;
           };
+
+
+    // now fix any vertices on hanging nodes so that we don't create any holes
+    if (dim==2)
+      {
+        typename Triangulation<dim,spacedim>::active_cell_iterator
+        cell = triangulation.begin_active(),
+        endc = triangulation.end();
+        for (; cell!=endc; ++cell)
+          for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+            if (cell->face(face)->has_children() &&
+                !cell->face(face)->at_boundary())
+              { // this line has children
+                cell->face(face)->child(0)->vertex(1)
+                                       = (cell->face(face)->vertex(0) +
+                                           cell->face(face)->vertex(1)) / 2;
+              }
+      }
+    else if (dim==3)
+      {
+        typename Triangulation<dim,spacedim>::active_cell_iterator
+        cell = triangulation.begin_active(),
+        endc = triangulation.end();
+        for (; cell!=endc; ++cell)
+          for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+            if (cell->face(face)->has_children() &&
+                !cell->face(face)->at_boundary())
+              { // this face has hanging nodes
+                cell->face(face)->child(0)->vertex(1)
+                    = (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)) / 2.0;
+                cell->face(face)->child(0)->vertex(2)
+                    = (cell->face(face)->vertex(0) + cell->face(face)->vertex(2)) / 2.0;
+                cell->face(face)->child(1)->vertex(3)
+                    = (cell->face(face)->vertex(1) + cell->face(face)->vertex(3)) / 2.0;
+                cell->face(face)->child(2)->vertex(3)
+                    = (cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) / 2.0;
+
+                // center of the face
+                cell->face(face)->child(0)->vertex(3)
+                    = (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)
+                        + cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) / 4.0;
+              }
+      }
   }
 
 
