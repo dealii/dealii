@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -205,7 +205,7 @@ namespace GridGenerator
   template <int dim>
   void
   parallelogram (Triangulation<dim> &tria,
-                 const Point<dim>  corners[dim],
+                 const Point<dim>  (&corners)[dim],
                  const bool          colorize=false);
 
   /**
@@ -576,7 +576,6 @@ namespace GridGenerator
    * @param r The inner radius of the
    * torus.
    */
-
   void torus (Triangulation<2,3> &tria,
               const double        R,
               const double        r);
