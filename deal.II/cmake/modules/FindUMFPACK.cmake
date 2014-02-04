@@ -105,6 +105,21 @@ FIND_UMFPACK_LIBRARY(CCOLAMD ccolamd)
 FIND_UMFPACK_LIBRARY(CAMD camd)
 FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
 
+#
+# Test whether libsuitesparseconfig.xxx can be used for shared library
+# linkage. If not, exclude it from the command line.
+#
+LIST(APPEND CMAKE_REQUIRED_LIBRARIES
+  "-shared"
+  ${SuiteSparse_config_LIBRARY}
+  )
+SET(CMAKE_REQUIRED_FLAGS ${DEAL_II_CXX_FLAGS})
+CHECK_CXX_SOURCE_COMPILES("extern int SuiteSparse_version (int[3]);
+  void foo(int bar[3]) { SuiteSparse_version(bar);}"
+  LAPACK_SUITESPARSECONFIG_WITH_PIC
+  )
+RESET_CMAKE_REQUIRED()
+
 IF(EXISTS ${UMFPACK_INCLUDE_DIR}/umfpack.h)
   FILE(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_VERSION_MAJOR_STRING
     REGEX "#define.*UMFPACK_MAIN_VERSION")
@@ -161,8 +176,10 @@ IF(UMFPACK_FOUND)
     ${COLAMD_LIBRARY}
     ${CAMD_LIBRARY}
     ${AMD_LIBRARY}
-    ${SuiteSparse_config_LIBRARY}
     )
+  IF(LAPACK_SUITESPARSECONFIG_WITH_PIC OR NOT BUILD_SHARED_LIBS)
+    LIST(APPEND UMFPACK_LIBRARIES ${SuiteSparse_config_LIBRARY})
+  ENDIF()
 
   #
   # For good measure:

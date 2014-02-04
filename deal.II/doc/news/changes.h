@@ -124,6 +124,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: A configuration error on Debian Testing where accidentally a
+  non-pic libSuiteSparse_config.a was picked up when building a shared
+  library up resulting in a link error.
+  <br>
+  (Matthias Maier, 2014/02/04)
+
   <li> Changed: GridTools::transform() can now deal with meshes with hanging nodes.
   <br>
   (Timo Heister, 2014/02/04)
