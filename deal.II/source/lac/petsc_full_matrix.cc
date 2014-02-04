@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,12 +27,8 @@ namespace PETScWrappers
 
   FullMatrix::FullMatrix ()
   {
-    const int m=0, n=0;
-    const int ierr
-      = MatCreateSeqDense (PETSC_COMM_SELF, m, n, PETSC_NULL,
-			   &matrix);
-
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    // empty constructor generate an empty matrix
+    do_reinit (0, 0);
   }
 
   FullMatrix::FullMatrix (const size_type m,
@@ -69,7 +65,6 @@ namespace PETScWrappers
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
-
 
 
   const MPI_Comm &
