@@ -19,6 +19,8 @@
 
 #include <cmath>
 #include <limits>
+#include <algorithm>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -128,7 +130,7 @@ QGauss<1>::QGauss (const unsigned int n)
   const long double tolerance
     = (runtime_one + long_double_eps != runtime_one
        ?
-       fmax (double_eps / 100, long_double_eps * 5)
+       std::max (double_eps / 100, long_double_eps * 5)
        :
        double_eps * 5
       );
@@ -215,7 +217,7 @@ compute_quadrature_points(const unsigned int q,
   const long double tolerance
     = (runtime_one + long_double_eps != runtime_one
        ?
-       fmax (double_eps / 100, long_double_eps * 5)
+       std::max (double_eps / 100, long_double_eps * 5)
        :
        double_eps * 5
       );
