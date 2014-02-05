@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,6 +108,13 @@ namespace internal
  * applications certainly exist, for which the author is not
  * imaginative enough.
  *
+ * @precondition This class only makes sense if the first template
+ * argument, <code>dim</code> equals the dimension of the
+ * DoFHandler type given as the second template argument, i.e., if
+ * <code>dim == DH::dimension</code>. This redundancy is a historical
+ * relic from the time where the library had only a single DoFHandler
+ * class and this class consequently only a single template argument.
+ *
  * @todo Reimplement this whole class using actual FEFaceValues and MeshWorker.
  *
  * @ingroup output
@@ -119,12 +126,24 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
 {
 public:
   /**
+   * An abbreviation for the dimension of the DoFHandler object we work
+   * with. Faces are then <code>dimension-1</code> dimensional objects.
+   */
+  static const unsigned int dimension = DH::dimension;
+
+  /**
+   * An abbreviation for the spatial dimension within which the triangulation
+   * and DoFHandler are embedded in.
+   */
+  static const unsigned int space_dimension = DH::space_dimension;
+  
+  /**
    * Typedef to the iterator type
    * of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DH,DH::dimension-1,
-          DH::dimension>::cell_iterator cell_iterator;
+  typedef typename DataOut_DoFData<DH,dimension-1,
+          dimension>::cell_iterator cell_iterator;
 
   /**
    * Constructor determining
@@ -193,7 +212,7 @@ public:
    * replaced by a hp::MappingCollection in
    * case of a hp::DoFHandler.
    */
-  virtual void build_patches (const Mapping<DH::dimension> &mapping,
+  virtual void build_patches (const Mapping<dimension> &mapping,
                               const unsigned int n_subdivisions = 0);
 
   /**
@@ -291,8 +310,8 @@ private:
    * context.
    */
   void build_one_patch (const FaceDescriptor *cell_and_face,
-                        internal::DataOutFaces::ParallelData<DH::dimension, DH::dimension> &data,
-                        DataOutBase::Patch<DH::dimension-1,DH::space_dimension> &patch);
+                        internal::DataOutFaces::ParallelData<dimension, dimension> &data,
+                        DataOutBase::Patch<dimension-1,space_dimension> &patch);
 };
 
 
