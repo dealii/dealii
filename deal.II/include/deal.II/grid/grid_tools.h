@@ -873,6 +873,23 @@ namespace GridTools
   fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
                                 Triangulation<dim,spacedim> &triangulation);
 
+#ifdef _MSC_VER
+  // Microsoft's VC++ has a bug where it doesn't want to recognize that
+  // an implementation (definition) of the extract_boundary_mesh function
+  // matches a declaration. This can apparently only be avoided by
+  // doing some contortion with the return type using the following
+  // intermediate type. This is only used when using MS VC++ and uses
+  // the direct way of doing it otherwise
+  template <template <int,int> class Container, int dim, int spacedim>
+  struct ExtractBoundaryMesh
+  {
+      typedef
+          std::map<typename Container<dim-1,spacedim>::cell_iterator,
+              typename Container<dim,spacedim>::face_iterator>
+          return_type;
+  };
+#endif
+
   /**
    * This function implements a boundary
    * subgrid extraction.  Given a
@@ -960,8 +977,12 @@ namespace GridTools
    * curved boundaries.
    */
   template <template <int,int> class Container, int dim, int spacedim>
+#ifndef _MSC_VER
   std::map<typename Container<dim-1,spacedim>::cell_iterator,
       typename Container<dim,spacedim>::face_iterator>
+#else
+  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
+#endif
       extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
                              Container<dim-1,spacedim>     &surface_mesh,
                              const std::set<types::boundary_id> &boundary_ids
