@@ -18,4 +18,24 @@
 # Configuration for the MUPARSER library:
 #
 
+MACRO(FEATURE_MUPARSER_FIND_EXTERNAL var)
+  MESSAGE(STATUS
+    "No module available for finding functionparser externally."
+    )
+ENDMACRO()
+
+
+MACRO(FEATURE_MUPARSER_CONFIGURE_BUNDLED)
+  SET(MUPARSER_BUNDLED_INCLUDE_DIRS ${MUPARSER_FOLDER}/include)
+ENDMACRO()
+
+
+MACRO(FEATURE_MUPARSER_ERROR_MESSAGE)
+  MESSAGE(FATAL_ERROR "\n"
+    "No module available for finding functionparser externally.\n"
+    "Disable DEAL_II_WITH_MUPARSER, or enable DEAL_II_ALLOW_BUNDLED.\n\n"
+    )
+ENDMACRO()
+
+
 CONFIGURE_FEATURE(MUPARSER)

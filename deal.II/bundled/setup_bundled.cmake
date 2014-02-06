@@ -73,3 +73,15 @@ OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
   OFF)
 
 SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
+
+
+#
+# muparser
+#
+SET(FEATURE_MUPARSER_HAVE_BUNDLED TRUE)
+
+OPTION(DEAL_II_FORCE_BUNDLED_MUPARSER
+  "Always use the bundled functionparser library instead of an external one."
+  OFF)
+
+SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_2_3/")
