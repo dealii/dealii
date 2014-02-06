@@ -23,6 +23,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/thread_local_storage.h>
 #include <vector>
 #include <map>
 
@@ -540,18 +541,28 @@ public:
 
   //@}
 private:
-  /**
-   * A pointer to the actual
-   * function parsers. The pointer is
-   * to an array of parsers, not
-   * just a single one. The length of
-   * the array equals the number of
-   * vector components.
-   */
 #ifdef DEAL_II_WITH_MUPARSER
+  /**
+   * muParser will stores references to these variables.
+   */
+
+    // TODO: document variables
+    mutable Threads::ThreadLocalStorage<std::vector<double> > vars;
+    mutable Threads::ThreadLocalStorage<std::vector<mu::Parser> > fp;
+    mutable Threads::ThreadLocalStorage<unsigned int> init_at_version;
+
+    unsigned int version;
+    
+    std::map< std::string, double > constants;
     std::vector<std::string> var_names;
-    mu::Parser *fp;
+    std::vector<std::string> expressions;
+    void init_muparser() const;
 #else
+  /**
+   * A pointer to the actual function parsers. The pointer is to an array of
+   * parsers, not just a single one. The length of the array equals the number
+   * of vector components.
+   */
   fparser::FunctionParser *fp;
 #endif
   /**
