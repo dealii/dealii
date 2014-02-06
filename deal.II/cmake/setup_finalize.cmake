@@ -38,7 +38,7 @@ ENDFOREACH()
 
 #
 # Sanity check: The variables defined in DEAL_II_REMOVED_FLAGS must not be
-# used during the comfiguration stage:
+# used during the configuration stage:
 #
 FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
   IF(NOT "${_flag}" STREQUAL "")
@@ -112,7 +112,6 @@ ENDFOREACH()
 #
 # Cleanup deal.IITargets.cmake in the build directory:
 #
-FILE(WRITE
+FILE(REMOVE
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
-  ""
   )

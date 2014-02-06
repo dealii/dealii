@@ -19,6 +19,13 @@
 #
 ENABLE_TESTING()
 
+INCLUDE_DIRECTORIES(
+  ${CMAKE_BINARY_DIR}/include/
+  ${CMAKE_SOURCE_DIR}/include/
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_INCLUDE_DIRS}
+  )
+
 # Use the first available build type (this prefers debug mode if available):
 LIST(GET DEAL_II_BUILD_TYPES 0 _mybuild)
 MESSAGE(STATUS "Setting up quick_tests in ${_mybuild} mode")
@@ -36,7 +43,7 @@ MACRO(make_quicktest test_basename build_name mpi_run)
   IF("${mpi_run}" STREQUAL "")
     SET(_command ./${_target})
   ELSE()
-    SET(_command mpirun -n ${mpi_run} ./${_target})
+    SET(_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${mpi_run} ${MPIEXEC_PREFLAGS} ./${_target})
   ENDIF()
   ADD_CUSTOM_TARGET(${_target}.run
     DEPENDS ${_target}
@@ -75,7 +82,9 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 ENDFOREACH()
 
 # Test whether thread affinity is well behaved
+IF (DEAL_II_WITH_THREADS)
 make_quicktest("affinity" ${_mybuild} "")
+ENDIF()
 
 # Test if MPI is configured correctly
 IF (DEAL_II_WITH_MPI)

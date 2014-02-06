@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,8 +95,8 @@ template <int dim, class DH>
 void
 DataOutRotation<dim,DH>::
 build_one_patch (const cell_iterator *cell,
-                 internal::DataOutRotation::ParallelData<DH::dimension, DH::space_dimension> &data,
-                 std::vector<DataOutBase::Patch<DH::dimension+1,DH::space_dimension+1> > &patches)
+                 internal::DataOutRotation::ParallelData<dimension, space_dimension> &data,
+                 std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> > &patches)
 {
   if (dim == 3)
     {
@@ -118,12 +118,12 @@ build_one_patch (const cell_iterator *cell,
   // which we will put points in the whole domain (not the rotationally
   // reduced one in which the computation took place. for simplicity add the
   // initial direction at the end again
-  std::vector<Point<DH::dimension+1> > angle_directions (n_patches_per_circle+1);
+  std::vector<Point<dimension+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
-      angle_directions[i][DH::dimension-1] = std::cos(2*numbers::PI *
+      angle_directions[i][dimension-1] = std::cos(2*numbers::PI *
                                                       i/n_patches_per_circle);
-      angle_directions[i][DH::dimension] = std::sin(2*numbers::PI *
+      angle_directions[i][dimension] = std::sin(2*numbers::PI *
                                                     i/n_patches_per_circle);
     }
 
@@ -132,7 +132,7 @@ build_one_patch (const cell_iterator *cell,
       // first compute the vertices of the patch. note that they will have to
       // be computed from the vertices of the cell, which has one dimension
       // less, however.
-      switch (DH::dimension)
+      switch (dimension)
         {
         case 1:
         {
@@ -152,10 +152,10 @@ build_one_patch (const cell_iterator *cell,
         case 2:
         {
           for (unsigned int vertex=0;
-               vertex<GeometryInfo<DH::dimension>::vertices_per_cell;
+               vertex<GeometryInfo<dimension>::vertices_per_cell;
                ++vertex)
             {
-              const Point<DH::dimension> v = (*cell)->vertex(vertex);
+              const Point<dimension> v = (*cell)->vertex(vertex);
 
               // make sure that the radial variable does attain negative
               // values
@@ -165,9 +165,9 @@ build_one_patch (const cell_iterator *cell,
               patches[angle].vertices[vertex] = v(0) * angle_directions[angle];
               patches[angle].vertices[vertex][0] = v(1);
 
-              patches[angle].vertices[vertex+GeometryInfo<DH::dimension>::vertices_per_cell]
+              patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell]
                 = v(0) * angle_directions[angle+1];
-              patches[angle].vertices[vertex+GeometryInfo<DH::dimension>::vertices_per_cell][0]
+              patches[angle].vertices[vertex+GeometryInfo<dimension>::vertices_per_cell][0]
                 = v(1);
             };
 
@@ -187,7 +187,7 @@ build_one_patch (const cell_iterator *cell,
           // first fill dof_data
           for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
             {
-              const FEValuesBase<DH::dimension> &fe_patch_values
+              const FEValuesBase<dimension> &fe_patch_values
                 = data.get_present_fe_values(dataset);
               const unsigned int n_components
                 = fe_patch_values.get_fe().n_components();
@@ -217,7 +217,7 @@ build_one_patch (const cell_iterator *cell,
                       if (update_flags & update_quadrature_points)
                         data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
 
-                      std::vector<Point<DH::space_dimension> > dummy_normals;
+                      std::vector<Point<space_dimension> > dummy_normals;
                       postprocessor->
                       compute_derived_quantities_scalar(data.patch_values,
                                                         data.patch_gradients,
@@ -245,7 +245,7 @@ build_one_patch (const cell_iterator *cell,
                       if (update_flags & update_quadrature_points)
                         data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
 
-                      std::vector<Point<DH::space_dimension> > dummy_normals;
+                      std::vector<Point<space_dimension> > dummy_normals;
                       postprocessor->
                       compute_derived_quantities_vector(data.patch_values_system,
                                                         data.patch_gradients_system,
@@ -259,7 +259,7 @@ build_one_patch (const cell_iterator *cell,
                        component<this->dof_data[dataset]->n_output_variables;
                        ++component)
                     {
-                      switch (DH::dimension)
+                      switch (dimension)
                         {
                         case 1:
                           for (unsigned int x=0; x<n_points; ++x)
@@ -290,7 +290,7 @@ build_one_patch (const cell_iterator *cell,
                   this->dof_data[dataset]->get_function_values (fe_patch_values,
                                                                 data.patch_values);
 
-                  switch (DH::dimension)
+                  switch (dimension)
                     {
                     case 1:
                       for (unsigned int x=0; x<n_points; ++x)
@@ -325,7 +325,7 @@ build_one_patch (const cell_iterator *cell,
                   for (unsigned int component=0; component<n_components;
                        ++component)
                     {
-                      switch (DH::dimension)
+                      switch (dimension)
                         {
                         case 1:
                           for (unsigned int x=0; x<n_points; ++x)
@@ -364,10 +364,10 @@ build_one_patch (const cell_iterator *cell,
                       ExcMessage("Cell must be active for cell data"));
               const unsigned int cell_number
                 = std::distance (this->triangulation->begin_active(),
-                                 typename Triangulation<DH::dimension,DH::space_dimension>::active_cell_iterator(*cell));
+                                 typename Triangulation<dimension,space_dimension>::active_cell_iterator(*cell));
               const double value
                 = this->cell_data[dataset]->get_cell_data_value (cell_number);
-              switch (DH::dimension)
+              switch (dimension)
                 {
                 case 1:
                   for (unsigned int x=0; x<n_points; ++x)
@@ -405,8 +405,8 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 {
   // Check consistency of redundant
   // template parameter
-  Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
-  typedef DataOut_DoFData<DH,DH::dimension+1> BaseClass;
+  Assert (dim==dimension, ExcDimensionMismatch(dim, dimension));
+  typedef DataOut_DoFData<DH,dimension+1> BaseClass;
   Assert (this->triangulation != 0,
           typename BaseClass::ExcNoTriangulationSelected());
 
@@ -455,19 +455,19 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
     else
       n_postprocessor_outputs[dataset] = 0;
 
-  const MappingQ1<DH::dimension, DH::space_dimension> mapping;
-  internal::DataOutRotation::ParallelData<DH::dimension, DH::space_dimension>
+  const MappingQ1<dimension, space_dimension> mapping;
+  internal::DataOutRotation::ParallelData<dimension, space_dimension>
   thread_data (n_datasets,
                n_subdivisions, n_patches_per_circle,
                n_postprocessor_outputs, mapping, this->get_finite_elements(),
                update_flags);
-  std::vector<DataOutBase::Patch<DH::dimension+1,DH::space_dimension+1> >
+  std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> >
   new_patches (n_patches_per_circle);
   for (unsigned int i=0; i<new_patches.size(); ++i)
     {
       new_patches[i].n_subdivisions = n_subdivisions;
       new_patches[i].data.reinit (n_datasets,
-                                  Utilities::fixed_power<DH::dimension+1>(n_subdivisions+1));
+                                  Utilities::fixed_power<dimension+1>(n_subdivisions+1));
     }
 
   // now build the patches in parallel
@@ -476,7 +476,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
                    std_cxx1x::bind(&DataOutRotation<dim,DH>::build_one_patch,
                                    this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
                    std_cxx1x::bind(&internal::DataOutRotation
-                                   ::append_patch_to_list<dim,DH::space_dimension>,
+                                   ::append_patch_to_list<dim,space_dimension>,
                                    std_cxx1x::_1, std_cxx1x::ref(this->patches)),
                    thread_data,
                    new_patches);
@@ -499,7 +499,7 @@ DataOutRotation<dim,DH>::next_cell (const cell_iterator &cell)
   // convert the iterator to an
   // active_iterator and advance
   // this to the next active cell
-  typename Triangulation<DH::dimension,DH::space_dimension>::active_cell_iterator active_cell = cell;
+  typename Triangulation<dimension,space_dimension>::active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
 }

@@ -606,13 +606,11 @@ end_set:
                                                const std::pair<unsigned int,unsigned int> *cells,
                                                const unsigned int  cell,
                                                const unsigned int  my_q,
-                                               CellType (&cell_t_prev)[VectorizedArray<Number>::n_array_elements],
-                                               CellType (&cell_t)[VectorizedArray<Number>::n_array_elements],
+                                               CellType (&cell_t_prev)[n_vector_elements],
+                                               CellType (&cell_t)[n_vector_elements],
                                                FEValues<dim,dim> &fe_val,
                                                CellData          &data) const
     {
-      const unsigned int vectorization_length =
-        VectorizedArray<Number>::n_array_elements;
       const unsigned int n_q_points = fe_val.n_quadrature_points;
       const UpdateFlags update_flags = fe_val.get_update_flags();
 
@@ -620,7 +618,7 @@ end_set:
       // not have that field here)
       const double zero_tolerance_double = data.jac_size *
                                            std::numeric_limits<double>::epsilon() * 1024.;
-      for (unsigned int j=0; j<vectorization_length; ++j)
+      for (unsigned int j=0; j<n_vector_elements; ++j)
         {
           typename dealii::Triangulation<dim>::cell_iterator
           cell_it (&tria, cells[j].first, cells[j].second);
@@ -653,7 +651,7 @@ end_set:
               if (j==0)
                 {
                   Assert (cell>0, ExcInternalError());
-                  cell_t[j] = cell_t_prev[vectorization_length-1];
+                  cell_t[j] = cell_t_prev[n_vector_elements-1];
                 }
               else
                 cell_t[j] = cell_t[j-1];
@@ -791,11 +789,11 @@ end_set:
                         data.general_jac_grad[q][d][e][f][j] = jacobian_grad[d][e][f];
                 }
             }
-        } // end loop over all entries in vectorization (vectorization_length
+        } // end loop over all entries in vectorization (n_vector_elements
       // cells)
 
       // set information for next cell
-      for (unsigned int j=0; j<vectorization_length; ++j)
+      for (unsigned int j=0; j<n_vector_elements; ++j)
         cell_t_prev[j] = cell_t[j];
     }
 

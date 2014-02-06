@@ -15,14 +15,20 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/grid/tria.h>
+#include <deal.II/base/multithread_info.h>
 #include <stdio.h>
+
+#if defined(__linux__)
 #include <sched.h>
+#include <sys/sysinfo.h>
+#endif
 
-int main ()
+bool getaffinity(unsigned int &bits_set,unsigned int &mask)
 {
-  // we need this, otherwise gcc will not link against deal.II
-  dealii::Triangulation<2> test;
-
+  bits_set = 0;
+  mask = 0x00;
+  
+#if defined(__linux__)
   cpu_set_t my_set;
   CPU_ZERO(&my_set);
 
@@ -32,17 +38,45 @@ int main ()
   if (ret!=0)
     {
       printf("sched_getaffinity() failed, return value: %d\n", ret);
-      return -1;
+      return false;
     }
-
-  unsigned int bits_set = 0;//not supported on old kernels: CPU_COUNT(&my_set);
   for (int i=0;i<CPU_SETSIZE;++i)
     bits_set += CPU_ISSET(i,&my_set);
 
-  if (bits_set==1)
+  mask = *(int*)(&my_set);
+#else
+  // sadly we don't have an implementation
+  // for mac/windows
+#endif
+  return true;
+}
+
+
+int main ()
+{
+  // we need this, otherwise gcc will not link against deal.II
+  dealii::Triangulation<2> test;
+
+  unsigned int bits_set, mask;
+  if (!getaffinity(bits_set, mask))
+    return 1;
+
+  unsigned int nprocs = dealii::multithread_info.n_cpus;
+  unsigned int tbbprocs = dealii::multithread_info.n_threads();
+  printf("aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d\n",
+	 bits_set, mask, nprocs, tbbprocs );
+
+  if (bits_set !=0  && bits_set!=nprocs)
     {
-      printf("Warning: sched_getaffinity() returns that we can only use one CPU.\n");
-      return 1;
+      printf("Warning: sched_getaffinity() returns that we can only use %d out of %d CPUs.\n",bits_set, nprocs);
+      return 2;
     }
-  printf("ncpus=%d, mask=%08X\n", bits_set, *(unsigned int*)(&my_set));
+  if (nprocs != tbbprocs)
+    {
+      printf("Warning: for some reason TBB only wants to use %d out of %d CPUs.\n",
+	     tbbprocs, nprocs);
+      return 3;
+    }
+  
+  return 0;
 }

@@ -102,7 +102,7 @@ template <typename> class Vector;
   // Define the expressions of the individual components of a
   // vector valued function with two components:
   std::vector<std::string> expressions(1);
-  expressions[0] = "x cm + y m + PI cm;
+  expressions[0] = "x cm + y m + PI cm";
 
   // Generate an empty function for these two components.
   FunctionParser<2> vector_function;

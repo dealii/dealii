@@ -58,6 +58,11 @@ namespace internal
       static const unsigned int n_cell_types = 1U<<n_cell_type_bits;
 
       /**
+       * An abbreviation for the length of vector lines of the current data type.
+       */
+      static const unsigned int n_vector_elements = VectorizedArray<Number>::n_array_elements;
+
+      /**
        * Empty constructor.
        */
       MappingInfo();
@@ -279,7 +284,6 @@ namespace internal
 
       /**
        * Contains all the stuff that depends on the quadrature formula
-
        */
       std::vector<MappingInfoDependent> mapping_data_gen;
 
@@ -320,8 +324,8 @@ namespace internal
                              const std::pair<unsigned int,unsigned int> *cells,
                              const unsigned int  cell,
                              const unsigned int  my_q,
-                             CellType (&cell_t_prev)[VectorizedArray<Number>::n_array_elements],
-                             CellType (&cell_t)[VectorizedArray<Number>::n_array_elements],
+                             CellType (&cell_t_prev)[n_vector_elements],
+                             CellType (&cell_t)[n_vector_elements],
                              FEValues<dim,dim> &fe_values,
                              CellData          &cell_data) const;
     };

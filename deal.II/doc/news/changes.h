@@ -124,6 +124,23 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: A configuration error on Debian Testing where accidentally a
+  non-pic libSuiteSparse_config.a was picked up when building a shared
+  library up resulting in a link error.
+  <br>
+  (Matthias Maier, 2014/02/04)
+
+  <li> Changed: GridTools::transform() can now deal with meshes with hanging nodes.
+  <br>
+  (Timo Heister, 2014/02/04)
+  </li>
+
+  <li>Fixed: Calling FEValuesViews::Vector::get_function_curls() computed
+  wrong results in some cases (see https://code.google.com/p/dealii/issues/detail?id=182).
+  This is now fixed.
+  <br>
+  (Christoph Heiniger, Wolfgang Bangerth, 2014/02/03)
+
   <li>Added: The class LAPACKFullMatrix now implements interfaces to
   matrix-matrix multiplication. Also, LAPACKFullMatrix::apply_lu_factorization
   now also operates on multiple right hand sides in form of another

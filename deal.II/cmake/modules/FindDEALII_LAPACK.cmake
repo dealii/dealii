@@ -50,18 +50,9 @@ FIND_PACKAGE(LAPACK)
 SET(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
 
 MARK_AS_ADVANCED(
-  atlas_LIBRARY
-  atlcblas_LIBRARY
-  atllapack_LIBRARY
-  blas_LIBRARY
-  eigen_blas_LIBRARY
-  f77blas_LIBRARY
-  gslcblas_LIBRARY
-  lapack_LIBRARY
-  m_LIBRARY
-  ptf77blas_LIBRARY
-  ptlapack_LIBRARY
-  refblas_LIBRARY
+  atlas_LIBRARY atlcblas_LIBRARY atllapack_LIBRARY blas_LIBRARY
+  eigen_blas_LIBRARY f77blas_LIBRARY gslcblas_LIBRARY lapack_LIBRARY
+  m_LIBRARY ptf77blas_LIBRARY ptlapack_LIBRARY refblas_LIBRARY
   reflapack_LIBRARY
   )
 

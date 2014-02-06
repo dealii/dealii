@@ -800,24 +800,22 @@ namespace FEValuesViews
                   const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
                     &shape_gradients[snc][0];
 
-                  switch (shape_function_data[shape_function].single_nonzero_component_index)
-                    {
-                    case 0:
-                    {
-                      for (unsigned int q_point = 0;
-                           q_point < n_quadrature_points; ++q_point)
-                        curls[q_point][0] -= value * (*shape_gradient_ptr++)[1];
-
-                      break;
-                    }
-
-                    default:
-                      for (unsigned int q_point = 0;
-                           q_point < n_quadrature_points; ++q_point)
-                        curls[q_point][0] += value * (*shape_gradient_ptr)[0];
-                    }
+                  Assert (shape_function_data[shape_function].single_nonzero_component >= 0,
+                          ExcInternalError());
+                  // we're in 2d, so the formula for the curl is simple:
+                  if (shape_function_data[shape_function].single_nonzero_component_index == 0)
+                    for (unsigned int q_point = 0;
+                        q_point < n_quadrature_points; ++q_point)
+                      curls[q_point][0] -= value * (*shape_gradient_ptr++)[1];
+                  else
+                    for (unsigned int q_point = 0;
+                        q_point < n_quadrature_points; ++q_point)
+                      curls[q_point][0] += value * (*shape_gradient_ptr++)[0];
                 }
               else
+                // we have multiple non-zero components in the shape functions. not
+                // all of them must necessarily be within the 2-component window
+                // this FEValuesViews::Vector object considers, however.
                 {
                   if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
                     {
@@ -887,17 +885,26 @@ namespace FEValuesViews
                       break;
                     }
 
-                    default:
+                    case 2:
+                    {
                       for (unsigned int q_point = 0;
                            q_point < n_quadrature_points; ++q_point)
                         {
                           curls[q_point][0] += value * (*shape_gradient_ptr)[1];
                           curls[q_point][1] -= value * (*shape_gradient_ptr++)[0];
                         }
+                      break;
+                    }
+
+                    default:
+                      Assert (false, ExcInternalError());
                     }
                 }
 
               else
+                // we have multiple non-zero components in the shape functions. not
+                // all of them must necessarily be within the 3-component window
+                // this FEValuesViews::Vector object considers, however.
                 {
                   if (shape_function_data[shape_function].is_nonzero_shape_function_component[0])
                     {

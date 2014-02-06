@@ -51,9 +51,7 @@ void assemble(const std::vector<int>::iterator &it,
 	      scratch_data &scratch,
 	      copy_data &data)
 {
-  std::cout << "hello!" << std::endl;
-
-  data.value +=(*it)*(*it);
+  data.value = (*it);
 }
 
 void copy(int & value, const copy_data &data)
@@ -62,11 +60,11 @@ void copy(int & value, const copy_data &data)
 }
 
 void test2()
-{ 
-  std::vector<int> v(3);
-  v[0] = 3;
-  v[1] = 5;
-  v[2] = 1;
+{
+  const int maxi = 10000;
+  std::vector<int> v(maxi);
+  for (unsigned int i=0;i<v.size();++i)
+    v[i] = i+1;
   int result = 0;
   WorkStream::run(v.begin(),
 		  v.end(),
@@ -77,7 +75,7 @@ void test2()
 		  scratch_data(), copy_data());
   std::cout << "result: " << result << std::endl;
 
-  if (result != (3*3+5*5+1*1))
+  if (result != maxi*(maxi+1)/2)
     exit(2);
 }
 

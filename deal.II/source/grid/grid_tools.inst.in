@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -116,12 +116,12 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
 
 for (deal_II_space_dimension : SPACE_DIMENSIONS)
 {
-  
+
     parallel::distributed::Triangulation<deal_II_space_dimension>::active_cell_iterator
     find_active_cell_around_point (const parallel::distributed::Triangulation<deal_II_space_dimension> &,
 				   const Point<deal_II_space_dimension> &p);
 
-  
+
     std::pair<parallel::distributed::Triangulation<deal_II_space_dimension>::active_cell_iterator, Point<deal_II_space_dimension> >
     find_active_cell_around_point (const Mapping<deal_II_space_dimension> &,
 				   const parallel::distributed::Triangulation<deal_II_space_dimension> &,
@@ -265,8 +265,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     namespace GridTools \{
 
       template
-	std::map<  Container<deal_II_dimension-1,deal_II_space_dimension>::cell_iterator,
+#ifndef _MSC_VER
+      std::map<  Container<deal_II_dimension-1,deal_II_space_dimension>::cell_iterator,
 		   Container<deal_II_dimension,deal_II_space_dimension>::face_iterator>
+#else
+      ExtractBoundaryMesh<Container,deal_II_dimension,deal_II_space_dimension>::return_type
+#endif
       extract_boundary_mesh (const Container<deal_II_dimension, deal_II_space_dimension> &mesh,
 			     Container<deal_II_dimension-1,deal_II_space_dimension>  &boundary_mesh,
 			     const std::set<types::boundary_id> &boundary_ids);

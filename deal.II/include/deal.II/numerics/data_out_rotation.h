@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -114,6 +114,13 @@ namespace internal
  * It is in the responsibility of the user to make sure that the
  * radial variable attains only non-negative values.
  *
+ * @precondition This class only makes sense if the first template
+ * argument, <code>dim</code> equals the dimension of the
+ * DoFHandler type given as the second template argument, i.e., if
+ * <code>dim == DH::dimension</code>. This redundancy is a historical
+ * relic from the time where the library had only a single DoFHandler
+ * class and this class consequently only a single template argument.
+ *
  * @ingroup output
  * @author Wolfgang Bangerth, 2000
  */
@@ -122,11 +129,23 @@ class DataOutRotation : public DataOut_DoFData<DH,DH::dimension+1>
 {
 public:
   /**
+   * An abbreviation for the dimension of the DoFHandler object we work
+   * with. Faces are then <code>dimension-1</code> dimensional objects.
+   */
+  static const unsigned int dimension = DH::dimension;
+
+  /**
+   * An abbreviation for the spatial dimension within which the triangulation
+   * and DoFHandler are embedded in.
+   */
+  static const unsigned int space_dimension = DH::space_dimension;
+
+  /**
    * Typedef to the iterator type
    * of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DH,DH::dimension+1>::cell_iterator cell_iterator;
+  typedef typename DataOut_DoFData<DH,dimension+1>::cell_iterator cell_iterator;
 
   /**
    * This is the central function
@@ -212,8 +231,8 @@ private:
    */
   void
   build_one_patch (const cell_iterator *cell,
-                   internal::DataOutRotation::ParallelData<DH::dimension, DH::space_dimension> &data,
-                   std::vector<DataOutBase::Patch<DH::dimension+1,DH::space_dimension+1> > &patches);
+                   internal::DataOutRotation::ParallelData<dimension, space_dimension> &data,
+                   std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> > &patches);
 };
 
 

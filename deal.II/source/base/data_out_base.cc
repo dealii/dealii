@@ -317,7 +317,7 @@ namespace DataOutBase
       bool operator < (const SvgCell &) const;
     };
 
-    bool DataOutBase::SvgCell::operator < (const SvgCell &e) const
+    bool SvgCell::operator < (const SvgCell &e) const
     {
       // note the "wrong" order in
       // which we sort the elements

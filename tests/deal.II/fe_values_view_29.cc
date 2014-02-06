@@ -16,8 +16,7 @@
 
 
 
-// like _27, but even simpler. this is based on a testcase proposed by
-// Christoph Heiniger
+// like _28 but also test a non-primitive element.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -31,6 +30,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/data_out.h>
 
 #include <fstream>
 
@@ -68,7 +68,8 @@ Tensor<1,3> curl (const Tensor<2,3> &grads)
 
 template<int dim>
 void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe)
+           const FiniteElement<dim> &fe,
+	   const unsigned int degree)
 {
   deallog << "FE=" << fe.get_name()
           << std::endl;
@@ -81,8 +82,8 @@ void test (const Triangulation<dim> &tr,
   // equals the vector function (0,x^2)
   ConstraintMatrix cm;
   cm.close ();
-  VectorTools::project (dof, cm, QGauss<2>(4), F(), fe_function);
-
+  VectorTools::project (dof, cm, QGauss<2>(2+degree), F(), fe_function);
+  
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
                            update_values | update_gradients | update_q_points);
@@ -124,8 +125,11 @@ void test_hyper_cube()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
 
-  FESystem<dim> fe(FE_Q<dim>(2), dim);
-  test(tr, fe);
+  for (unsigned int degree=2; degree<5; ++degree)
+    {
+      FE_Nedelec<dim> fe(degree);
+      test(tr, fe, degree);
+    }
 }
 
 

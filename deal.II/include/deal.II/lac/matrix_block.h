@@ -37,11 +37,13 @@ namespace internal
 {
   template <class MATRIX>
   void
-  reinit(MatrixBlock<MATRIX> &v, const BlockSparsityPattern &p);
+  reinit(MatrixBlock<MATRIX> &v,
+	 const BlockSparsityPattern &p);
 
   template <typename number>
   void
-  reinit(MatrixBlock<dealii::SparseMatrix<number> > &, const BlockSparsityPattern &);
+  reinit(MatrixBlock<dealii::SparseMatrix<number> > &v,
+	 const BlockSparsityPattern &p);
 }
 
 /**
@@ -369,6 +371,7 @@ public:
    * The matrix itself
    */
   MATRIX matrix;
+
 private:
   /**
    * The rwo BlockIndices of the
@@ -389,7 +392,14 @@ private:
   BlockIndices column_indices;
 
   template <class OTHER_MATRIX>
-  friend void internal::reinit(MatrixBlock<OTHER_MATRIX> &, const BlockSparsityPattern &);
+  friend
+  void dealii::internal::reinit(MatrixBlock<OTHER_MATRIX> &,
+ 			        const BlockSparsityPattern &);
+
+  template <typename number>
+  friend
+  void internal::reinit(MatrixBlock<dealii::SparseMatrix<number> > &v,
+                         const BlockSparsityPattern &p);
 };
 
 
@@ -691,7 +701,8 @@ namespace internal
 {
   template <class MATRIX>
   void
-  reinit(MatrixBlock<MATRIX> &v, const BlockSparsityPattern &p)
+  reinit(MatrixBlock<MATRIX> &v,
+	 const BlockSparsityPattern &p)
   {
     v.row_indices = p.get_row_indices();
     v.column_indices = p.get_column_indices();
@@ -700,7 +711,8 @@ namespace internal
 
   template <typename number>
   void
-  reinit(MatrixBlock<dealii::SparseMatrix<number> > &v, const BlockSparsityPattern &p)
+  reinit(MatrixBlock<dealii::SparseMatrix<number> > &v,
+	 const BlockSparsityPattern &p)
   {
     v.row_indices = p.get_row_indices();
     v.column_indices = p.get_column_indices();

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -186,8 +186,8 @@ namespace internal
        */
       template <class FE>
       ParallelData (const FE                                           &fe,
-                    const dealii::hp::QCollection<DH::dimension-1>               &face_quadratures,
-                    const dealii::hp::MappingCollection<DH::dimension, DH::space_dimension> &mapping,
+                    const dealii::hp::QCollection<dim-1>               &face_quadratures,
+                    const dealii::hp::MappingCollection<dim,spacedim> &mapping,
                     const bool         need_quadrature_points,
                     const unsigned int n_solution_vectors,
                     const types::subdomain_id subdomain_id,
@@ -209,8 +209,8 @@ namespace internal
     template <class FE>
     ParallelData<DH>::
     ParallelData (const FE                                           &fe,
-                  const dealii::hp::QCollection<DH::dimension-1>     &face_quadratures,
-                  const dealii::hp::MappingCollection<DH::dimension, DH::space_dimension> &mapping,
+                  const dealii::hp::QCollection<dim-1>     &face_quadratures,
+                  const dealii::hp::MappingCollection<dim, spacedim> &mapping,
                   const bool     need_quadrature_points,
                   const unsigned int n_solution_vectors,
                   const types::subdomain_id subdomain_id,
