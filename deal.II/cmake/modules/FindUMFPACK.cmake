@@ -113,7 +113,6 @@ LIST(APPEND CMAKE_REQUIRED_LIBRARIES
   "-shared"
   ${SuiteSparse_config_LIBRARY}
   )
-SET(CMAKE_REQUIRED_FLAGS ${DEAL_II_CXX_FLAGS})
 CHECK_CXX_SOURCE_COMPILES("extern int SuiteSparse_version (int[3]);
   void foo(int bar[3]) { SuiteSparse_version(bar);}"
   LAPACK_SUITESPARSECONFIG_WITH_PIC
