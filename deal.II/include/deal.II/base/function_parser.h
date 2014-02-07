@@ -424,18 +424,26 @@ public:
    * method in this case is dim+1. The
    * value of this parameter defaults to
    * false, i.e. do not consider time.
-   *
-   * <b>use_degrees</b>. Parameter to
-   * decide if the trigonometric functions
-   * work in radians or degrees. The
-   * default for this parameter is false,
-   * i.e. use radians and not degrees.
    */
   void initialize (const std::string              &vars,
                    const std::vector<std::string> &expressions,
                    const ConstMap                 &constants,
-                   const bool time_dependent = false,
-                   const bool use_degrees = false);
+                   const bool time_dependent = false);
+
+    /**
+     * Same as above, but with an additional parameter:
+     * <b>use_degrees</b>. Parameter to decide if the trigonometric functions
+     * work in radians or degrees. The default for this parameter is false,
+     * i.e. use radians and not degrees.
+     *
+     * @note: this function is deprecated. Use the function without this
+     * argument instead (which has the default use_degrees=false).
+     */
+    void initialize (const std::string              &vars,
+                   const std::vector<std::string> &expressions,
+                   const ConstMap                 &constants,
+                   const bool time_dependent,
+                   const bool use_degrees) DEAL_II_DEPRECATED;
 
 
   /**
@@ -455,7 +463,7 @@ public:
                    const ConstMap                 &constants,
                    const ConstMap                 &units,
                    const bool time_dependent = false,
-                   const bool use_degrees = false);
+                   const bool use_degrees = false) DEAL_II_DEPRECATED;
 
   /**
    * Initialize the function. Same as
@@ -472,9 +480,22 @@ public:
   void initialize (const std::string &vars,
                    const std::string &expression,
                    const ConstMap    &constants,
-                   const bool time_dependent = false,
-                   const bool use_degrees = false);
+                   const bool time_dependent = false);
 
+    /**
+     * Same as above, but with an additional parameter:
+     * <b>use_degrees</b>. Parameter to decide if the trigonometric functions
+     * work in radians or degrees. The default for this parameter is false,
+     * i.e. use radians and not degrees.
+     *
+     * @note: this function is deprecated. Use the function without this
+     * argument instead (which has the default use_degrees=false).
+     */
+  void initialize (const std::string &vars,
+                   const std::string &expression,
+                   const ConstMap    &constants,
+                   const bool time_dependent,
+                   const bool use_degrees) DEAL_II_DEPRECATED;
   /**
    * Initialize the function. Same as
    * above, but with <b>units</b>.
@@ -485,7 +506,7 @@ public:
                    const ConstMap    &constants,
                    const ConstMap    &units,
                    const bool time_dependent = false,
-                   const bool use_degrees = false);
+                   const bool use_degrees = false) DEAL_II_DEPRECATED;
 
   /**
    * A function that returns

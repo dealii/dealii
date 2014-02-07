@@ -90,6 +90,17 @@ void FunctionParser<dim>::initialize (const std::string                   &varia
               use_degrees);
 }
 
+template <int dim>
+void FunctionParser<dim>::initialize (const std::string              &vars,
+				      const std::vector<std::string> &expressions,
+				      const std::map<std::string, double> &constants,
+				      const bool time_dependent)
+  {
+    initialize(vars, expressions, constants, time_dependent, false);
+  }
+
+
+
 #ifdef DEAL_II_WITH_MUPARSER
 template <int dim>
 void FunctionParser<dim>:: init_muparser() const
@@ -251,6 +262,14 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
   initialized = true;
 }
 
+template <int dim>
+void FunctionParser<dim>::initialize (const std::string &vars,
+                   const std::string &expression,
+                   const std::map<std::string, double> &constants,
+                   const bool time_dependent)
+{
+  initialize(vars, expression, constants, time_dependent, false);
+}
 
 
 template <int dim>
