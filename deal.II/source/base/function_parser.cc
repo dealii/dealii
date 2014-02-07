@@ -51,7 +51,6 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
   :
   Function<dim>(n_components, initial_time)
 #ifdef DEAL_II_WITH_MUPARSER
-  ,version(0)
 #else
   ,fp (0)
 #endif
@@ -105,7 +104,7 @@ void FunctionParser<dim>::initialize (const std::string              &vars,
 template <int dim>
 void FunctionParser<dim>:: init_muparser() const
 {
-  if (version == init_at_version.get())
+  if (fp.get().size()>0)
     return;
   
   fp.get().resize(this->n_components);
@@ -151,8 +150,8 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
 {
 
 #ifdef DEAL_II_WITH_MUPARSER
-  version++;
-
+  this->fp.clear(); // this will reset all thread-local objects
+  
   this->constants = constants;
   this->var_names = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;

@@ -564,19 +564,29 @@ public:
 private:
 #ifdef DEAL_II_WITH_MUPARSER
   /**
-   * muParser will stores references to these variables.
+   * place for the variables for each thread
    */
-
-    // TODO: document variables
     mutable Threads::ThreadLocalStorage<std::vector<double> > vars;
+    /**
+     * the muParser objects for each thread (and one for each component)
+     */
     mutable Threads::ThreadLocalStorage<std::vector<mu::Parser> > fp;
-    mutable Threads::ThreadLocalStorage<unsigned int> init_at_version;
 
-    unsigned int version;
-    
+    /**
+     * keep track of all the constants, required to initialize fp in each thread
+     */
     std::map< std::string, double > constants;
+    /**
+     * variable names, required to initialize fp in each thread
+     */
     std::vector<std::string> var_names;
+    /**
+     * the expressions, required to initialize fp in each thread
+     */
     std::vector<std::string> expressions;
+    /**
+     * this function will initialize fp on the current thread
+     */
     void init_muparser() const;
 #else
   /**
