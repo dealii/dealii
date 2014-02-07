@@ -5100,8 +5100,9 @@ namespace internal
                   fe_eval.template apply_gradients<0,false,false>
                   (fe_eval.gradients_quad[c][0], temp1);
               }
-            fe_eval.template apply_values<1,false,false>
-            (temp1, temp2);
+            if (integrate_val || integrate_grad)
+              fe_eval.template apply_values<1,false,false>
+                (temp1, temp2);
             if (integrate_grad == true)
               {
                 // grad y: can sum to temporary x value in temp2
@@ -5110,8 +5111,9 @@ namespace internal
                 fe_eval.template apply_gradients<1,false,true>
                 (temp1, temp2);
               }
-            fe_eval.template apply_values<2,false,false>
-            (temp2, fe_eval.values_dofs[c]);
+            if (integrate_val || integrate_grad)
+              fe_eval.template apply_values<2,false,false>
+                (temp2, fe_eval.values_dofs[c]);
             if (integrate_grad == true)
               {
                 // grad z: can sum to temporary x and y value in output
@@ -5141,8 +5143,9 @@ namespace internal
                   fe_eval.template apply_gradients<0,false,false>
                   (fe_eval.gradients_quad[c][0], temp1);
               }
-            fe_eval.template apply_values<1,false,false>
-            (temp1, fe_eval.values_dofs[c]);
+            if (integrate_val || integrate_grad)
+              fe_eval.template apply_values<1,false,false>
+                (temp1, fe_eval.values_dofs[c]);
             if (integrate_grad == true)
               {
                 // grad y

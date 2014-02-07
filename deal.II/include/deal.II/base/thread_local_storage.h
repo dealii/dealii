@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,7 +84,7 @@ namespace Threads
     /**
      * Copy constructor. Initialize each thread local object
      * with the corresponding object of the given object.
-     **/
+     */
     ThreadLocalStorage (const ThreadLocalStorage<T> &t);
 
     /**
@@ -132,17 +132,37 @@ namespace Threads
     ThreadLocalStorage<T> &operator = (const T &t);
 
     /**
-     * Returns a reference to the internal implementation.
+     * Remove the thread-local objects stored for all threads that have
+     * created one with this object (i.e., that have called get()
+     * at least once on this thread. This includes the current thread. If you
+     * call get() subsequently on this or any other thread, new objects will
+     * again be created.
+     *
+     * If deal.II has been configured to not use multithreading, then this function
+     * does not do anything at all. Note that this of course has different semantics
+     * as in the multithreading context the objects are deleted and created again
+     * (possible by copying from a sample object, if the appropriate constructor
+     * of this class was called), whereas in the multithreaded context the object
+     * is simply not touched at all. At the same time, the purpose of this function
+     * is to release memory other threads may have allocated for their own thread
+     * local objects after which every use of this object will require some kind
+     * of initialization. This is necessary both in the multithreaded or
+     * non-multithreaded case.
+     */
+    void clear ();
+
+    /**
+     * Returns a reference to the internal Threading Building Blocks
+     * implementation. This function is really only useful if deal.II
+     * has been configured with multithreading and has no useful
+     * purpose otherwise.
      */
 #ifdef DEAL_II_WITH_THREADS
     tbb::enumerable_thread_specific<T> &
 #else
     T &
 #endif
-    get_implementation()
-    {
-      return data;
-    }
+    get_implementation();
 
   private:
 #ifdef DEAL_II_WITH_THREADS
@@ -224,6 +244,31 @@ namespace Threads
   {
     get() = t;
     return *this;
+  }
+
+
+  template <typename T>
+  inline
+#ifdef DEAL_II_WITH_THREADS
+  tbb::enumerable_thread_specific<T> &
+#else
+  T &
+#endif
+  ThreadLocalStorage<T>::get_implementation()
+  {
+    return data;
+  }
+
+
+
+  template <typename T>
+  inline
+  void
+  ThreadLocalStorage<T>::clear ()
+  {
+#ifdef DEAL_II_WITH_THREADS
+    data.clear ();
+#endif
   }
 }   // end of implementation of namespace Threads
 
