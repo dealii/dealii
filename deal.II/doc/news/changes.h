@@ -124,6 +124,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Changed: DerivativeApproximation used to be a class that only had
+  static members. It is now a namespace.
+  <br>
+  (Wolfgang Bangerth, 2014/02/08)
+
   <li>New: ThreadLocalStorage::clear() clears out all objects allocated on the
   current and all other threads.
   <br>
@@ -172,7 +177,7 @@ inconvenience this causes.
   (Matthias Maier, 2014/02/01)
 
   <li>New/fixed: The ParameterHandler::print_parameters_section
-  method not worked for XML output. There is now a flag
+  method did not work for XML output. There is now a flag
   include_top_level_elements which prints all higher
   subsection elements, default is false.
   For XML output setting this flag to true is required

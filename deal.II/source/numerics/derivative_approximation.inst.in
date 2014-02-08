@@ -17,9 +17,10 @@
 
 for (deal_II_dimension : DIMENSIONS ; VEC : SERIAL_VECTORS ; DH : DOFHANDLER_TEMPLATES)
 {
+  namespace DerivativeApproximation
+  \{
 template
 void
-DerivativeApproximation::
 approximate_gradient<deal_II_dimension>
 (const Mapping<deal_II_dimension> &mapping,
  const DH<deal_II_dimension> &dof_handler,
@@ -29,7 +30,6 @@ approximate_gradient<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_gradient<deal_II_dimension>
 (const DH<deal_II_dimension> &dof_handler,
  const VEC             &solution,
@@ -38,7 +38,6 @@ approximate_gradient<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_second_derivative<deal_II_dimension>
 (const Mapping<deal_II_dimension> &mapping,
  const DH<deal_II_dimension> &dof_handler,
@@ -48,7 +47,6 @@ approximate_second_derivative<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_second_derivative<deal_II_dimension>
 (const DH<deal_II_dimension> &dof_handler,
  const VEC             &solution,
@@ -57,7 +55,6 @@ approximate_second_derivative<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_derivative_tensor<deal_II_dimension>
 (const Mapping<deal_II_dimension> & 	mapping,
  const DH<deal_II_dimension> &dof_handler,
@@ -68,7 +65,6 @@ approximate_derivative_tensor<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_derivative_tensor<deal_II_dimension>
 (const Mapping<deal_II_dimension> & 	mapping,
  const DH<deal_II_dimension> &dof_handler,
@@ -79,7 +75,6 @@ approximate_derivative_tensor<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_derivative_tensor<deal_II_dimension>
 (const Mapping<deal_II_dimension> & 	mapping,
  const DH<deal_II_dimension> &dof_handler,
@@ -90,7 +85,6 @@ approximate_derivative_tensor<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_derivative_tensor<deal_II_dimension>
 (const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
@@ -100,7 +94,6 @@ approximate_derivative_tensor<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_derivative_tensor<deal_II_dimension>
 (const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
@@ -110,7 +103,6 @@ approximate_derivative_tensor<deal_II_dimension>
 
 template
 void
-DerivativeApproximation::
 approximate_derivative_tensor<deal_II_dimension>
 (const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
@@ -118,40 +110,24 @@ approximate_derivative_tensor<deal_II_dimension>
  Tensor<3,deal_II_dimension> &derivative,
  const unsigned int     component);
 
+  \}
 }
 
 
 for (deal_II_dimension : DIMENSIONS)
 {
+  namespace DerivativeApproximation
+  \{
 template
 double
-DerivativeApproximation::
 derivative_norm(const Tensor<1,deal_II_dimension> &derivative);
 
 template
 double
-DerivativeApproximation::
 derivative_norm(const Tensor<2,deal_II_dimension> &derivative);
 
 template
 double
-DerivativeApproximation::
 derivative_norm(const Tensor<3,deal_II_dimension> &derivative);
-
-
-// static variables
-//
-// on AIX, the linker is unhappy about some missing symbols. they
-// should really be there, but explicitly instantiating them will also
-// not hurt
-template
-const UpdateFlags
-DerivativeApproximation::Gradient<deal_II_dimension>::update_flags;
-
-template
-const UpdateFlags
-DerivativeApproximation::SecondDerivative<deal_II_dimension>::update_flags;
-template
-const UpdateFlags
-DerivativeApproximation::ThirdDerivative<deal_II_dimension>::update_flags;
+  \}
 }
