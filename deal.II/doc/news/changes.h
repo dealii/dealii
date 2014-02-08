@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 /**
-// * @page changes_after_8_1 Changes after Version 8.1
+@page changes_after_8_1 Changes after Version 8.1
 
 <p>
 This is the list of changes made after the release of
