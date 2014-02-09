@@ -238,7 +238,6 @@ LAPACKFullMatrix<number>::mmult(LAPACKFullMatrix<number>       &C,
   const int kk = this->n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-  const number null = 0.;
 
   gemm("N", "N", &mm, &nn, &kk, &alpha, &this->values[0], &mm, &B.values[0],
        &kk, &beta, &C.values[0], &mm);
@@ -262,7 +261,6 @@ LAPACKFullMatrix<number>::mmult(FullMatrix<number>             &C,
   const int kk = this->n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-  const number null = 0.;
 
   // since FullMatrix stores the matrix in transposed order compared to this
   // matrix, compute B^T * A^T = (A * B)^T
@@ -289,7 +287,6 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number>       &C,
   const int kk = B.n_rows();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-  const number null = 0.;
 
   gemm("T", "N", &mm, &nn, &kk, &alpha, &this->values[0], &kk, &B.values[0],
        &kk, &beta, &C.values[0], &mm);
@@ -313,7 +310,6 @@ LAPACKFullMatrix<number>::Tmmult(FullMatrix<number>             &C,
   const int kk = B.n_rows();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-  const number null = 0.;
 
   // since FullMatrix stores the matrix in transposed order compared to this
   // matrix, compute B^T * A = (A^T * B)^T
@@ -340,7 +336,6 @@ LAPACKFullMatrix<number>::mTmult(LAPACKFullMatrix<number>       &C,
   const int kk = B.n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-  const number null = 0.;
 
   gemm("N", "T", &mm, &nn, &kk, &alpha, &this->values[0], &mm, &B.values[0],
        &nn, &beta, &C.values[0], &mm);
@@ -364,7 +359,6 @@ LAPACKFullMatrix<number>::mTmult(FullMatrix<number>             &C,
   const int kk = B.n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-  const number null = 0.;
 
   // since FullMatrix stores the matrix in transposed order compared to this
   // matrix, compute B * A^T = (A * B^T)^T
@@ -391,7 +385,6 @@ LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number>       &C,
   const int kk = B.n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-  const number null = 0.;
 
   gemm("T", "T", &mm, &nn, &kk, &alpha, &this->values[0], &kk, &B.values[0],
        &nn, &beta, &C.values[0], &mm);
@@ -415,7 +408,6 @@ LAPACKFullMatrix<number>::TmTmult(FullMatrix<number>             &C,
   const int kk = B.n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-  const number null = 0.;
 
   // since FullMatrix stores the matrix in transposed order compared to this
   // matrix, compute B * A = (A^T * B^T)^T
