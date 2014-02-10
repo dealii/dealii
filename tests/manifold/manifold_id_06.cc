@@ -22,8 +22,8 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
 // Helper function
 template <int dim, int spacedim>
@@ -37,7 +37,7 @@ void test(unsigned int ref=1){
 
 	double radius=center.norm();
 	
-	PolarManifold<spacedim> boundary(center);	
+	HyperBallBoundary<dim,spacedim> boundary(center, .25*std::sqrt((double)spacedim));	
 	Triangulation<dim,spacedim> tria;
 	GridGenerator::hyper_cube (tria);
 	typename Triangulation<dim,spacedim>::active_cell_iterator cell;
@@ -52,7 +52,7 @@ void test(unsigned int ref=1){
 	      if(cell->face(f)->center().distance(center)< radius)
 		cell->face(f)->set_all_manifold_ids(1);
 
-	tria.set_manifold(1,boundary);
+	tria.set_boundary(1,boundary);
 	tria.refine_global(2);
 
 	GridOut gridout;

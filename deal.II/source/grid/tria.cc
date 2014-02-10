@@ -4054,8 +4054,13 @@ namespace internal
                 // to the information
                 // stored in the
                 // boundary class
+		const Boundary<dim,spacedim> &manifold = 
+		  (cell->manifold_id() != numbers::invalid_manifold_id ?
+		   cell->get_manifold() :
+		   triangulation.get_boundary(static_cast<types::boundary_id>(cell->material_id())));
+		
                 triangulation.vertices[next_unused_vertex] =
-                  cell->get_boundary().get_new_point_on_quad(cell);
+                  manifold.get_new_point_on_quad (cell);
               }
           }
 
@@ -4441,14 +4446,20 @@ namespace internal
                   // midpoint; otherwise we
                   // have to ask the manifold
                   // object
-                  if (dim == spacedim)
-                    triangulation.vertices[next_unused_vertex] =
-                      (cell->vertex(0) + cell->vertex(1)) / 2;
-                  else
-                    triangulation.vertices[next_unused_vertex] =
-		      cell->get_boundary().get_new_point_on_line(cell);
-                  triangulation.vertices_used[next_unused_vertex] = true;
-
+		  
+		  // Now we always ask the manifold where to put the
+		  // new point. The get_boundary function will return
+		  // a flat boundary if invalid_manifold_id is set,
+		  // behaving as before in the flat case.  Backward
+		  // compatibility requires us to use the material id
+		  // of the cell in the codimension one case, however
+		  // we only do this if the manifold_id is the invalid
+		  // one, otherwise use the material id. This is done
+		  // internally in the get_boundary() function.
+		  triangulation.vertices[next_unused_vertex] =
+		    cell->get_boundary().get_new_point_on_line(cell);
+		  triangulation.vertices_used[next_unused_vertex] = true;
+		     
                   // search for next two
                   // unused cell (++ takes
                   // care of the end of the
@@ -4865,21 +4876,23 @@ namespace internal
                       // lines we can compute the
                       // midpoint as the mean of
                       // the two vertices:
-                      if (line->at_boundary())
+                      // if (line->at_boundary())
                         triangulation.vertices[next_unused_vertex]
                           = line->get_boundary().get_new_point_on_line (line);
-                      else
-                        triangulation.vertices[next_unused_vertex]
-                          = (line->vertex(0) + line->vertex(1)) / 2;
                     }
                   else
-                    // however, if spacedim>dim, we
-                    // always have to ask the
-                    // boundary object for its
-                    // answer
-                    triangulation.vertices[next_unused_vertex]
-                      = triangulation.get_boundary(line->user_index()).get_new_point_on_line (line);
-
+                    // however, if spacedim>dim, we always have to ask
+                    // the boundary object for its answer. We use the
+                    // same object of the cell (which was stored in
+                    // line->user_index() before) unless a manifold_id
+                    // has been set on this very line.
+		    if(line->manifold_id() == numbers::invalid_manifold_id)
+		      triangulation.vertices[next_unused_vertex]
+			= triangulation.get_boundary(line->user_index()).get_new_point_on_line (line);
+		    else
+		      triangulation.vertices[next_unused_vertex]
+			= line->get_boundary().get_new_point_on_line (line);
+		      
                   // now that we created
                   // the right point, make
                   // up the two child
@@ -6014,7 +6027,7 @@ namespace internal
                             // care about boundary quads
                             // here
                             triangulation.vertices[next_unused_vertex]
-                              = (middle_line->vertex(0) + middle_line->vertex(1)) / 2;
+                              = middle_line->get_boundary().get_new_point_on_line(middle_line);
                             triangulation.vertices_used[next_unused_vertex] = true;
 
                             // now search a slot for the two
@@ -6080,7 +6093,8 @@ namespace internal
 
                     // set the middle vertex
                     // appropriately
-                    if (quad->at_boundary())
+                    if (quad->at_boundary() || 
+			(quad->manifold_id() != numbers::invalid_manifold_id) )
                       triangulation.vertices[next_unused_vertex]
 			= quad->get_boundary().get_new_point_on_quad (quad);
                     else
