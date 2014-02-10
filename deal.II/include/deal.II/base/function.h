@@ -193,7 +193,7 @@ public:
    * <tt>values</tt> already has the right size, i.e.  the same size as the
    * <tt>points</tt> array.
    *
-   * Be default, this function repeatedly calls value() for each point
+   * By default, this function repeatedly calls value() for each point
    * separately, to fill the output array.
    */
   virtual void value_list (const std::vector<Point<dim> > &points,
@@ -207,7 +207,7 @@ public:
    * all elements be vectors with the same number of components as this
    * function has.
    *
-   * Be default, this function repeatedly calls vector_value() for each
+   * By default, this function repeatedly calls vector_value() for each
    * point separately, to fill the output array.
    */
   virtual void vector_value_list (const std::vector<Point<dim> > &points,

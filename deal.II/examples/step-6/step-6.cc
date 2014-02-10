@@ -273,7 +273,7 @@ Step6<dim>::~Step6 ()
 // The next function is setting up all the variables that describe the linear
 // finite element problem, such as the DoF handler, the matrices, and
 // vectors. The difference to what we did in step-5 is only that we now also
-// have to take care of handing node constraints. These constraints are
+// have to take care of hanging node constraints. These constraints are
 // handled almost transparently by the library, i.e. you only need to know
 // that they exist and how to get them, but you do not have to know how they
 // are formed or what exactly is done with them.
