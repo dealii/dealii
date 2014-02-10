@@ -622,7 +622,7 @@ FE_DGQ<dim, spacedim>::has_support_on_face (const unsigned int shape_index,
       // (==face 0 in some sense), the
       // second on face 1:
       return (((shape_index == 0) && (face_index == 0)) ||
-              ((shape_index == 1) && (face_index == 1)));
+              ((shape_index == this->degree) && (face_index == 1)));
     };
 
     case 2:
