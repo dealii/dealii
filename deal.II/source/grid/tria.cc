@@ -9585,23 +9585,13 @@ Triangulation<dim, spacedim>::set_mesh_smoothing(const MeshSmoothing mesh_smooth
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::set_boundary (const types::boundary_id number,
+Triangulation<dim, spacedim>::set_boundary (const types::boundary_id m_number,
                                             const Boundary<dim, spacedim> &boundary_object)
-{
-  set_manifold(m_number, boundary_object);
-}
-
-
-
-template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number,
-                                            const Boundary<dim,spacedim> &manifold_object)
 {
   Assert(m_number < numbers::invalid_manifold_id,
 	 ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
 
-  manifold[m_number] = &manifold_object;
+  manifold[m_number] = &boundary_object;
 }
 
 

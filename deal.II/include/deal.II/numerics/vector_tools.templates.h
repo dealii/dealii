@@ -4424,12 +4424,10 @@ namespace VectorTools
                     // sign of the normal vector provided by the boundary
                     // if they should point in different directions. this is the
                     // case in tests/deal.II/no_flux_11.
-		    std::vector<Point<dim> > vertices(GeometryInfo<dim>::vertices_per_face);
-		    for(unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-		      vertices[v] = cell->face(face_no)->vertex(v);
                     Point<dim> normal_vector
                       = (cell->face(face_no)->get_boundary()
-                         .normal_vector (vertices, fe_values.quadrature_point(i)));
+                         .normal_vector (cell->face(face_no),
+                                         fe_values.quadrature_point(i)));
                     if (normal_vector * fe_values.normal_vector(i) < 0)
                       normal_vector *= -1;
                     Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,

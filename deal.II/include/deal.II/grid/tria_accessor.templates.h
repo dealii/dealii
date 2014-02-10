@@ -1936,7 +1936,7 @@ TriaAccessor<structdim, dim, spacedim>::at_boundary () const
 
 
 template <int structdim, int dim, int spacedim>
-const Manifold<spacedim> &
+const Boundary<dim,spacedim> &
 TriaAccessor<structdim, dim, spacedim>::get_boundary () const
 {
   return get_manifold();
@@ -1944,7 +1944,7 @@ TriaAccessor<structdim, dim, spacedim>::get_boundary () const
 
 
 template <int structdim, int dim, int spacedim>
-const Manifold<spacedim> &
+const Boundary<dim,spacedim> &
 TriaAccessor<structdim, dim, spacedim>::get_manifold () const
 {				  
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());

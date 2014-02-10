@@ -22,7 +22,6 @@
 #include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/fe/mapping_q1.h>
 
 #include <cmath>
