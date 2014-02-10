@@ -1744,14 +1744,16 @@ next_cell:
       fix_up_object (const Iterator &object,
                      const bool respect_manifold)
       {
-        const Boundary<Iterator::AccessorType::dimension,
-              Iterator::AccessorType::space_dimension>
+        const Manifold<Iterator::AccessorType::space_dimension>
               *manifold = (respect_manifold ?
                            &object->get_boundary() :
                            0);
 
         const unsigned int structdim = Iterator::AccessorType::structure_dimension;
         const unsigned int spacedim  = Iterator::AccessorType::space_dimension;
+	std::vector<Point<spacedim> > vertices(GeometryInfo<structdim>::vertices_per_cell);
+	for(unsigned int i=0; i<vertices.size(); ++i)
+	  vertices[i] = object->vertex(i);
 
         // right now we can only deal
         // with cells that have been
@@ -1815,16 +1817,16 @@ next_cell:
                        /
                        eps);
                 else
-                  gradient[d]
-                    = ((objective_function (object,
-                                            manifold->project_to_surface(object,
-                                                                         object_mid_point + h))
-                        -
-                        objective_function (object,
-                                            manifold->project_to_surface(object,
-                                                                         object_mid_point - h)))
-                       /
-                       eps);
+                   gradient[d]
+                     = ((objective_function (object,
+                                             manifold->project_to_manifold(vertices, 
+									   object_mid_point + h))
+                         -
+                         objective_function (object,
+                                             manifold->project_to_manifold(vertices, 
+									   object_mid_point - h)))
+                        /
+                        eps);
               }
 
             // sometimes, the
@@ -1856,8 +1858,8 @@ next_cell:
                                 gradient;
 
             if (respect_manifold == true)
-              object_mid_point = manifold->project_to_surface(object,
-                                                              object_mid_point);
+              object_mid_point = manifold->project_to_manifold(vertices, 
+							       object_mid_point);
 
             // compute current value of the
             // objective function

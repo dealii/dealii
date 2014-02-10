@@ -1161,11 +1161,87 @@ public:
    * for the boundary object.
    */
   const Boundary<dim,spacedim> &get_boundary () const;
+    
+  /**
+   * Return a constant reference to a
+   * manifold object used for this
+   * object. This function is a shortcut to
+   * retrieving the manifold indicator
+   * using manifold_indicator() and then
+   * asking the
+   * Triangulation::get_manifold() function
+   * for the manifold object.
+   */
+  const Boundary<dim,spacedim> &get_manifold () const;
 
   /**
    * @}
    */
 
+  /**
+   *  @name Dealing with manifold indicators
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Manifold indicator of this
+   * object.
+   *
+   * If the return value is the special value
+   * numbers::flat_manifold_id, then this object is associated with a
+   * standard cartesian Manifold Description.
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  types::manifold_id manifold_id () const;
+
+  /**
+   * Set the manifold indicator.  The same applies as for the
+   * <tt>manifold_id()</tt> function.
+   *
+   * Note that it only sets the manifold object of the current object
+   * itself, not the indicators of the ones that bound it, nor of its
+   * children. For example, in 3d, if this function is called on a
+   * face, then the manifold indicator of the 4 edges that bound the
+   * face remain unchanged. If you want to set the manifold indicators
+   * of face, edges and all children at the same time, use the
+   * set_all_manifold_ids() function.
+   *
+   *
+   * @ingroup manifold
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  void set_manifold_id (const types::manifold_id) const;
+
+  /**
+   * Do as set_manifold_id()
+   * but also set the manifold
+   * indicators of the objects that
+   * bound the current object. For
+   * example, in 3d, if
+   * set_manifold_id() is
+   * called on a face, then the
+   * manifold indicator of the 4
+   * edges that bound the face
+   * remain unchanged. On the other
+   * hand, the manifold indicators
+   * of face and edges are all set
+   * at the same time using the
+   * current function.
+   *
+   * @ingroup manifold
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  void set_all_manifold_ids (const types::manifold_id) const;
+
+  /**
+   * @}
+   */    
+    
 
   /**
    * @name User data
@@ -2014,6 +2090,15 @@ public:
   types::boundary_id boundary_indicator () const;
 
   /**
+   * Manifold indicator of this
+   * object. 
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  types::manifold_id manifold_id () const;
+
+
+  /**
    *  @name Orientation of sub-objects
    */
   /**
@@ -2153,6 +2238,16 @@ public:
   void
   set_boundary_indicator (const types::boundary_id);
 
+				     /**
+				      * Set the manifold indicator of
+				      * this vertex. Does nothing so
+				      * far. This function is here
+				      * only to allow dimension
+				      * independent programming.
+				      */
+  void
+  set_manifold_id (const types::manifold_id);
+
   /**
    * Since this object only represents a
    * single vertex, call
@@ -2166,6 +2261,22 @@ public:
   void
   set_all_boundary_indicators (const types::boundary_id);
   /**
+   * @}
+   */
+/**
+   * Since this object only represents a
+   * single vertex, call
+   * set_manifold_id with the same
+   * argument.
+   *
+   * @ingroup manifold
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+    
+    void
+    set_all_manifold_ids (const types::manifold_id);
+    /**
    * @}
    */
 
@@ -3249,6 +3360,8 @@ template <> bool CellAccessor<1,2>::point_inside (const Point<2> &) const;
 template <> bool CellAccessor<1,3>::point_inside (const Point<3> &) const;
 template <> bool CellAccessor<2,3>::point_inside (const Point<3> &) const;
 // -------------------------------------------------------------------
+
+template <> void TriaAccessor<3,3,3>::set_all_manifold_ids (const types::manifold_id) const;
 
 #endif // DOXYGEN
 
