@@ -4055,8 +4055,7 @@ namespace internal
                 // stored in the
                 // boundary class
                 triangulation.vertices[next_unused_vertex] =
-                  triangulation.get_boundary(static_cast<types::boundary_id>(cell->material_id()))
-                  .get_new_point_on_quad (cell);
+                  cell->get_boundary().get_new_point_on_quad(cell);
               }
           }
 
@@ -4447,8 +4446,7 @@ namespace internal
                       (cell->vertex(0) + cell->vertex(1)) / 2;
                   else
                     triangulation.vertices[next_unused_vertex] =
-                      triangulation.get_boundary(static_cast<types::boundary_id>(cell->material_id()))
-                      .get_new_point_on_line(cell);
+		      cell->get_boundary().get_new_point_on_line(cell);
                   triangulation.vertices_used[next_unused_vertex] = true;
 
                   // search for next two
@@ -4869,8 +4867,7 @@ namespace internal
                       // the two vertices:
                       if (line->at_boundary())
                         triangulation.vertices[next_unused_vertex]
-                          = triangulation.get_boundary(line->boundary_indicator())
-                            .get_new_point_on_line (line);
+                          = line->get_boundary().get_new_point_on_line (line);
                       else
                         triangulation.vertices[next_unused_vertex]
                           = (line->vertex(0) + line->vertex(1)) / 2;
@@ -5413,12 +5410,8 @@ namespace internal
                           ExcTooFewVerticesAllocated());
                   triangulation.vertices_used[next_unused_vertex] = true;
 
-                  if (line->at_boundary())
-                    triangulation.vertices[next_unused_vertex]
-                      = triangulation.get_boundary(line->boundary_indicator()).get_new_point_on_line (line);
-                  else
-                    triangulation.vertices[next_unused_vertex]
-                      = (line->vertex(0) + line->vertex(1)) / 2;
+		  triangulation.vertices[next_unused_vertex]
+		    = line->get_boundary().get_new_point_on_line (line);
 
                   // now that we created
                   // the right point, make
@@ -6089,7 +6082,7 @@ namespace internal
                     // appropriately
                     if (quad->at_boundary())
                       triangulation.vertices[next_unused_vertex]
-                        = triangulation.get_boundary(quad->boundary_indicator()).get_new_point_on_quad (quad);
+			= quad->get_boundary().get_new_point_on_quad (quad);
                     else
                       // it might be that the
                       // quad itself is not
@@ -9110,8 +9103,7 @@ namespace internal
                         // boundary would be
                         // this one.
                         const Point<spacedim> new_bound
-                          = triangulation.get_boundary(face->boundary_indicator())
-                            .get_new_point_on_face (face);
+                          = face->get_boundary().get_new_point_on_face (face);
                         // to check it,
                         // transform to the
                         // unit cell with
