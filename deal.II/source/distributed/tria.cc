@@ -2113,6 +2113,9 @@ namespace parallel
 
       Assert(version == 2, ExcMessage("Incompatible version found in .info file."));
       Assert(this->n_cells(0) == n_coarse_cells, ExcMessage("Number of coarse cells differ!"));
+      AssertThrow(numcpus <= Utilities::MPI::n_mpi_processes (mpi_communicator),
+          ExcMessage("parallel::distributed::Triangulation::load() only supports loading "
+              "saved data with a greater or equal number of processes than were used to save()."));
 
       attached_data_size = 0;
       n_attached_datas = 0;
