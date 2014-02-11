@@ -333,10 +333,6 @@ namespace Step51
     dof_handler.distribute_dofs(fe);
     dof_handler_u_post.distribute_dofs(fe_u_post);
 
-    deallog << "   Number of degrees of freedom: "
-            << dof_handler.n_dofs()
-            << std::endl;
-
     solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
 
@@ -763,10 +759,15 @@ namespace Step51
   void HDG<dim>::solve ()
   {
     SolverControl solver_control (system_matrix.m()*10,
-                                  1e-11*system_rhs.l2_norm());
+                                  1e-12*system_rhs.l2_norm());
+    // do not output iteration numbers to log file because these are too
+    // sensitive
+    std::ostringstream stream;
+    deallog.attach(stream);
     SolverBicgstab<> solver (solver_control, false);
     solver.solve (system_matrix, solution, system_rhs,
                   PreconditionIdentity());
+    deallog.attach(logfile);
 
     system_matrix.clear();
 
@@ -941,8 +942,6 @@ namespace Step51
   {
     for (unsigned int cycle=0; cycle<14-4*dim; ++cycle)
       {
-        deallog << "Cycle " << cycle << ':' << std::endl;
-
         refine_grid (cycle);
         setup_system ();
         assemble_system (false);

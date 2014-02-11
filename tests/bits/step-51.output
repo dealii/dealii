@@ -1,44 +1,14 @@
 
-DEAL::Cycle 0:
-DEAL::   Number of degrees of freedom: 9
-DEAL:Bicgstab::Starting value 8.19443
-DEAL:Bicgstab::Convergence step 8 value 0
-DEAL::Cycle 1:
-DEAL::   Number of degrees of freedom: 13
-DEAL:Bicgstab::Starting value 13.9539
-DEAL:Bicgstab::Convergence step 12 value 0
-DEAL::Cycle 2:
-DEAL::   Number of degrees of freedom: 17
-DEAL:Bicgstab::Starting value 13.0731
-DEAL:Bicgstab::Convergence step 16 value 0
-DEAL::Cycle 3:
-DEAL::   Number of degrees of freedom: 25
-DEAL:Bicgstab::Starting value 12.1492
-DEAL:Bicgstab::Convergence step 24 value 0
-DEAL::Cycle 4:
-DEAL::   Number of degrees of freedom: 33
-DEAL:Bicgstab::Starting value 11.0492
-DEAL:Bicgstab::Convergence step 34 value 0
-DEAL::Cycle 5:
-DEAL::   Number of degrees of freedom: 49
-DEAL:Bicgstab::Starting value 9.35310
-DEAL:Bicgstab::Convergence step 51 value 0
-DEAL::Cycle 6:
-DEAL::   Number of degrees of freedom: 65
-DEAL:Bicgstab::Starting value 8.20475
-DEAL:Bicgstab::Convergence step 74 value 0
-DEAL::Cycle 7:
-DEAL::   Number of degrees of freedom: 97
-DEAL:Bicgstab::Starting value 6.76136
-DEAL:Bicgstab::Convergence step 104 value 0
-DEAL::Cycle 8:
-DEAL::   Number of degrees of freedom: 129
-DEAL:Bicgstab::Starting value 5.87456
-DEAL:Bicgstab::Convergence step 137 value 0
-DEAL::Cycle 9:
-DEAL::   Number of degrees of freedom: 193
-DEAL:Bicgstab::Starting value 4.80772
-DEAL:Bicgstab::Convergence step 213 value 0
+
+
+
+
+
+
+
+
+
+
 cells dofs     val L2        grad L2      val L2-post   
 8     9    4.080e-01 -    1.722e+00 -    3.362e-01 -    
 12    13   1.659e-01 2.22 8.766e-01 1.67 2.151e-02 6.78 
@@ -50,46 +20,16 @@ cells dofs     val L2        grad L2      val L2-post
 96    97   2.440e-03 1.98 1.253e-02 2.01 5.281e-05 3.01 
 128   129  1.377e-03 1.99 7.035e-03 2.01 2.224e-05 3.01 
 192   193  6.141e-04 1.99 3.119e-03 2.01 6.573e-06 3.01 
-DEAL::Cycle 0:
-DEAL::   Number of degrees of freedom: 9
-DEAL:Bicgstab::Starting value 7.96477
-DEAL:Bicgstab::Convergence step 8 value 0
-DEAL::Cycle 1:
-DEAL::   Number of degrees of freedom: 13
-DEAL:Bicgstab::Starting value 13.4076
-DEAL:Bicgstab::Convergence step 12 value 0
-DEAL::Cycle 2:
-DEAL::   Number of degrees of freedom: 17
-DEAL:Bicgstab::Starting value 12.9549
-DEAL:Bicgstab::Convergence step 16 value 0
-DEAL::Cycle 3:
-DEAL::   Number of degrees of freedom: 25
-DEAL:Bicgstab::Starting value 12.1266
-DEAL:Bicgstab::Convergence step 24 value 0
-DEAL::Cycle 4:
-DEAL::   Number of degrees of freedom: 33
-DEAL:Bicgstab::Starting value 11.0426
-DEAL:Bicgstab::Convergence step 34 value 0
-DEAL::Cycle 5:
-DEAL::   Number of degrees of freedom: 49
-DEAL:Bicgstab::Starting value 9.35200
-DEAL:Bicgstab::Convergence step 50 value 0
-DEAL::Cycle 6:
-DEAL::   Number of degrees of freedom: 65
-DEAL:Bicgstab::Starting value 8.20444
-DEAL:Bicgstab::Convergence step 73 value 0
-DEAL::Cycle 7:
-DEAL::   Number of degrees of freedom: 97
-DEAL:Bicgstab::Starting value 6.76131
-DEAL:Bicgstab::Convergence step 105 value 0
-DEAL::Cycle 8:
-DEAL::   Number of degrees of freedom: 129
-DEAL:Bicgstab::Starting value 5.87455
-DEAL:Bicgstab::Convergence step 143 value 0
-DEAL::Cycle 9:
-DEAL::   Number of degrees of freedom: 193
-DEAL:Bicgstab::Starting value 4.80772
-DEAL:Bicgstab::Convergence step 225 value 0
+
+
+
+
+
+
+
+
+
+
 cells dofs     val L2        grad L2      val L2-post   
 8     9    2.141e-02 -    1.398e-01 -    3.487e-03 -    
 12    13   6.701e-03 2.87 3.811e-02 3.21 4.976e-04 4.80 
@@ -98,33 +38,15 @@ cells dofs     val L2        grad L2      val L2-post
 32    33   1.126e-04 3.94 6.373e-04 3.99 3.412e-06 5.01 
 48    49   2.256e-05 3.97 1.259e-04 4.00 4.472e-07 5.01 
 64    65   7.179e-06 3.98 3.980e-05 4.00 1.057e-07 5.01 
-96    97   1.425e-06 3.99 7.848e-06 4.00 1.388e-08 5.01 
-128   129  4.519e-07 3.99 2.481e-06 4.00 3.302e-09 4.99 
-192   193  8.946e-08 3.99 4.894e-07 4.00 7.398e-10 3.69 
-DEAL::Cycle 0:
-DEAL::   Number of degrees of freedom: 80
-DEAL:Bicgstab::Starting value 12.2150
-DEAL:Bicgstab::Convergence step 37 value 0
-DEAL::Cycle 1:
-DEAL::   Number of degrees of freedom: 168
-DEAL:Bicgstab::Starting value 8.50278
-DEAL:Bicgstab::Convergence step 48 value 0
-DEAL::Cycle 2:
-DEAL::   Number of degrees of freedom: 288
-DEAL:Bicgstab::Starting value 10.5333
-DEAL:Bicgstab::Convergence step 62 value 1.01190e-10
-DEAL::Cycle 3:
-DEAL::   Number of degrees of freedom: 624
-DEAL:Bicgstab::Starting value 8.10478
-DEAL:Bicgstab::Convergence step 98 value 0
-DEAL::Cycle 4:
-DEAL::   Number of degrees of freedom: 1088
-DEAL:Bicgstab::Starting value 6.61947
-DEAL:Bicgstab::Convergence step 120 value 0
-DEAL::Cycle 5:
-DEAL::   Number of degrees of freedom: 2400
-DEAL:Bicgstab::Starting value 4.75284
-DEAL:Bicgstab::Convergence step 181 value 0
+96    97   1.425e-06 3.99 7.848e-06 4.00 1.386e-08 5.01 
+128   129  4.519e-07 3.99 2.481e-06 4.00 3.284e-09 5.01 
+192   193  8.946e-08 3.99 4.894e-07 4.00 4.323e-10 5.00 
+
+
+
+
+
+
 cells dofs     val L2        grad L2      val L2-post   
 16    80   1.066e+01 -    1.571e+01 -    1.055e+01 -    
 36    168  3.727e+00 2.59 7.998e+00 1.67 3.660e+00 2.61 
@@ -132,30 +54,12 @@ cells dofs     val L2        grad L2      val L2-post
 144   624  2.730e-01 2.68 1.867e+00 2.02 6.110e-02 4.92 
 256   1088 1.493e-01 2.10 1.046e+00 2.01 2.878e-02 2.62 
 576   2400 6.965e-02 1.88 4.847e-01 1.90 9.202e-03 2.81 
-DEAL::Cycle 0:
-DEAL::   Number of degrees of freedom: 120
-DEAL:Bicgstab::Starting value 10.6959
-DEAL:Bicgstab::Convergence step 43 value 0
-DEAL::Cycle 1:
-DEAL::   Number of degrees of freedom: 252
-DEAL:Bicgstab::Starting value 13.2620
-DEAL:Bicgstab::Convergence step 58 value 0
-DEAL::Cycle 2:
-DEAL::   Number of degrees of freedom: 432
-DEAL:Bicgstab::Starting value 11.2567
-DEAL:Bicgstab::Convergence step 74 value 0
-DEAL::Cycle 3:
-DEAL::   Number of degrees of freedom: 936
-DEAL:Bicgstab::Starting value 9.46542
-DEAL:Bicgstab::Convergence step 105 value 0
-DEAL::Cycle 4:
-DEAL::   Number of degrees of freedom: 1632
-DEAL:Bicgstab::Starting value 7.48176
-DEAL:Bicgstab::Convergence step 138 value 0
-DEAL::Cycle 5:
-DEAL::   Number of degrees of freedom: 3600
-DEAL:Bicgstab::Starting value 5.13012
-DEAL:Bicgstab::Convergence step 189 value 0
+
+
+
+
+
+
 cells dofs     val L2        grad L2       val L2-post   
 16    120  7.645e-01 -    5.413e+00 -    2.667e-01 -     
 36    252  4.745e-01 1.18 2.375e+00 2.03 3.501e-01 -0.67 
