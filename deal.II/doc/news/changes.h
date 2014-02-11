@@ -124,6 +124,16 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>New: FE_FaceQ and FE_FaceP now also work in 1D (with a single dof
+  on each vertex).
+  <br>
+  (Martin Kronbichler, 2014/02/11)
+
+  <li>Fixed: FE_DGQ::has_support_on_face returned a wrong number for element
+  degree larger than 1 in 1D. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/02/10)
+
   <li>Changed: DerivativeApproximation used to be a class that only had
   static members. It is now a namespace.
   <br>

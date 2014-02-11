@@ -300,6 +300,270 @@ FE_FaceQ<dim,spacedim>::get_constant_modes () const
 
 
 
+// ----------------------------- FE_FaceQ<1,spacedim> ------------------------
+
+template <int spacedim>
+FE_FaceQ<1,spacedim>::FE_FaceQ (const unsigned int degree)
+  :
+  FiniteElement<1,spacedim> (FiniteElementData<1>(get_dpo_vector(degree), 1, degree, FiniteElementData<1>::L2),
+                             std::vector<bool>(1,true),
+                             std::vector<ComponentMask> (1, ComponentMask(1,true)))
+{
+  this->unit_face_support_points.resize(1);
+
+  // initialize unit support points (this makes it possible to assign initial
+  // values to FE_FaceQ)
+  this->unit_support_points.resize(GeometryInfo<1>::faces_per_cell);
+  this->unit_support_points[1] = Point<1>(1.);
+}
+
+
+
+template <int spacedim>
+FiniteElement<1,spacedim> *
+FE_FaceQ<1,spacedim>::clone() const
+{
+  return new FE_FaceQ<1,spacedim>(this->degree);
+}
+
+
+
+template <int spacedim>
+std::string
+FE_FaceQ<1,spacedim>::get_name () const
+{
+  // note that the FETools::get_fe_from_name function depends on the
+  // particular format of the string this function returns, so they have to be
+  // kept in synch
+  std::ostringstream namebuf;
+  namebuf << "FE_FaceQ<1>(" << this->degree << ")";
+
+  return namebuf.str();
+}
+
+
+
+template <int spacedim>
+void
+FE_FaceQ<1,spacedim>::
+get_face_interpolation_matrix (const FiniteElement<1,spacedim> &source_fe,
+                               FullMatrix<double>       &interpolation_matrix) const
+{
+  get_subface_interpolation_matrix (source_fe, numbers::invalid_unsigned_int,
+                                    interpolation_matrix);
+}
+
+
+
+template <int spacedim>
+void
+FE_FaceQ<1,spacedim>::
+get_subface_interpolation_matrix (const FiniteElement<1,spacedim> &x_source_fe,
+                                  const unsigned int        subface,
+                                  FullMatrix<double>       &interpolation_matrix) const
+{
+  Assert (interpolation_matrix.n() == this->dofs_per_face,
+          ExcDimensionMismatch (interpolation_matrix.n(),
+                                this->dofs_per_face));
+  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                x_source_fe.dofs_per_face));
+  interpolation_matrix(0,0) = 1.;
+}
+
+
+
+template <int spacedim>
+bool
+FE_FaceQ<1,spacedim>::has_support_on_face (
+  const unsigned int shape_index,
+  const unsigned int face_index) const
+{
+  AssertIndexRange(shape_index, 2);
+  return (face_index == shape_index);
+}
+
+
+
+template <int spacedim>
+std::vector<unsigned int>
+FE_FaceQ<1,spacedim>::get_dpo_vector (const unsigned int)
+{
+  std::vector<unsigned int> dpo(2, 0U);
+  dpo[0] = 1;
+  return dpo;
+}
+
+
+
+template <int spacedim>
+bool
+FE_FaceQ<1,spacedim>::hp_constraints_are_implemented () const
+{
+  return true;
+}
+
+
+
+template <int spacedim>
+FiniteElementDomination::Domination
+FE_FaceQ<1,spacedim>::
+compare_for_face_domination (const FiniteElement<1,spacedim> &fe_other) const
+{
+  return FiniteElementDomination::no_requirements;
+}
+
+
+
+template <int spacedim>
+Table<2,bool>
+FE_FaceQ<1,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(1, this->dofs_per_cell);
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    constant_modes(0,i) = true;
+  return constant_modes;
+}
+
+
+
+template <int spacedim>
+UpdateFlags
+FE_FaceQ<1,spacedim>::update_once (const UpdateFlags) const
+{
+  return update_default;
+}
+
+
+
+template <int spacedim>
+UpdateFlags
+FE_FaceQ<1,spacedim>::update_each (const UpdateFlags flags) const
+{
+  UpdateFlags out = flags & update_values;
+  if (flags & update_gradients)
+    out |= update_gradients | update_covariant_transformation;
+  if (flags & update_hessians)
+    out |= update_hessians | update_covariant_transformation;
+  if (flags & update_cell_normal_vectors)
+    out |= update_cell_normal_vectors | update_JxW_values;
+
+  return out;
+}
+
+
+
+template <int spacedim>
+typename Mapping<1,spacedim>::InternalDataBase *
+FE_FaceQ<1,spacedim>::get_data (
+  const UpdateFlags,
+  const Mapping<1,spacedim> &,
+  const Quadrature<1> &) const
+{
+  return new typename Mapping<1,spacedim>::InternalDataBase;
+}
+
+
+template <int spacedim>
+typename Mapping<1,spacedim>::InternalDataBase *
+FE_FaceQ<1,spacedim>::get_face_data (
+  const UpdateFlags update_flags,
+  const Mapping<1,spacedim> &,
+  const Quadrature<0>& quadrature) const
+{
+  // generate a new data object and initialize some fields
+  typename Mapping<1,spacedim>::InternalDataBase *data =
+    new typename Mapping<1,spacedim>::InternalDataBase;
+
+  // check what needs to be initialized only once and what on every
+  // cell/face/subface we visit
+  data->update_once = update_once(update_flags);
+  data->update_each = update_each(update_flags);
+  data->update_flags = data->update_once | data->update_each;
+
+  const UpdateFlags flags(data->update_flags);
+  const unsigned int n_q_points = quadrature.size();
+  AssertDimension(n_q_points, 1);
+
+  // No derivatives of this element are implemented.
+  if (flags & update_gradients || flags & update_hessians)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+  return data;
+}
+
+
+
+template <int spacedim>
+typename Mapping<1,spacedim>::InternalDataBase *
+FE_FaceQ<1,spacedim>::get_subface_data (
+  const UpdateFlags flags,
+  const Mapping<1,spacedim> &mapping,
+  const Quadrature<0>& quadrature) const
+{
+  return get_face_data (flags, mapping, quadrature);
+}
+
+
+
+template <int spacedim>
+void
+FE_FaceQ<1,spacedim>::fill_fe_values
+(const Mapping<1,spacedim> &,
+ const typename Triangulation<1,spacedim>::cell_iterator &,
+ const Quadrature<1> &,
+ typename Mapping<1,spacedim>::InternalDataBase &,
+ typename Mapping<1,spacedim>::InternalDataBase &,
+ FEValuesData<1,spacedim> &,
+ CellSimilarity::Similarity &) const
+{
+  // Do nothing, since we do not have values in the interior
+}
+
+
+
+template <int spacedim>
+void
+FE_FaceQ<1,spacedim>::fill_fe_face_values (
+  const Mapping<1,spacedim> &,
+  const typename Triangulation<1,spacedim>::cell_iterator &,
+  const unsigned int face,
+  const Quadrature<0>& quadrature,
+  typename Mapping<1,spacedim>::InternalDataBase &,
+  typename Mapping<1,spacedim>::InternalDataBase &fedata,
+  FEValuesData<1,spacedim> &data) const
+{
+  const UpdateFlags flags(fedata.update_once | fedata.update_each);
+
+  const unsigned int foffset = face;
+  if (flags & update_values)
+    {
+      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        data.shape_values(k,0) = 0.;
+      data.shape_values(foffset,0) = 1;
+    }
+}
+
+
+template <int spacedim>
+void
+FE_FaceQ<1,spacedim>::fill_fe_subface_values (
+  const Mapping<1,spacedim> &,
+  const typename Triangulation<1,spacedim>::cell_iterator &,
+  const unsigned int ,
+  const unsigned int ,
+  const Quadrature<0>& ,
+  typename Mapping<1,spacedim>::InternalDataBase &,
+  typename Mapping<1,spacedim>::InternalDataBase &,
+  FEValuesData<1,spacedim> &) const
+{
+  Assert(false, ExcMessage("Should not fille subface values in 1D"));
+}
+
+
+
 // --------------------------------------- FE_FaceP --------------------------
 
 template <int dim, int spacedim>
@@ -312,12 +576,14 @@ FE_FaceP<dim,spacedim>::FE_FaceP (const unsigned int degree)
 {}
 
 
+
 template <int dim, int spacedim>
 FiniteElement<dim,spacedim> *
 FE_FaceP<dim,spacedim>::clone() const
 {
   return new FE_FaceP<dim,spacedim>(this->degree);
 }
+
 
 
 template <int dim, int spacedim>
@@ -521,6 +787,29 @@ FE_FaceP<dim,spacedim>::get_constant_modes () const
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     constant_modes(0, face*this->dofs_per_face) = true;
   return constant_modes;
+}
+
+
+
+template <int spacedim>
+FE_FaceP<1,spacedim>::FE_FaceP (const unsigned int degree)
+  :
+  FE_FaceQ<1,spacedim> (degree)
+{}
+
+
+
+template <int spacedim>
+std::string
+FE_FaceP<1,spacedim>::get_name () const
+{
+  // note that the FETools::get_fe_from_name function depends on the
+  // particular format of the string this function returns, so they have to be
+  // kept in synch
+  std::ostringstream namebuf;
+  namebuf << "FE_FaceP<1>(" << this->degree << ")";
+
+  return namebuf.str();
 }
 
 

@@ -44,20 +44,6 @@
 template <int dim>
 void test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
 {
-				   // Face Q elements
-  fe_datas.push_back(new FE_FaceQ<dim> (0));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_FaceQ<dim> (1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_FaceQ<dim> (3));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-				   // Face P elements
-  fe_datas.push_back(new FE_FaceP<dim> (0));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_FaceP<dim> (1));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_FaceP<dim> (3));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 				   // Vector DG elements
   fe_datas.push_back(
     new FE_DGRaviartThomas<dim>(0));
@@ -134,6 +120,21 @@ void test_fe_datas()
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
                                        FE_Q<dim> (2), 1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+
+				   // Face Q elements
+  fe_datas.push_back(new FE_FaceQ<dim> (0));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_FaceQ<dim> (1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_FaceQ<dim> (3));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+				   // Face P elements
+  fe_datas.push_back(new FE_FaceP<dim> (0));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_FaceP<dim> (1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_FaceP<dim> (3));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 
 

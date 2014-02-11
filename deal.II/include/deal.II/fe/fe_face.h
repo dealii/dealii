@@ -124,7 +124,6 @@ public:
   FiniteElementDomination::Domination
   compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 
-
   /**
    * Returns a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
@@ -138,6 +137,197 @@ private:
   static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
 };
 
+
+
+/**
+ * Specialization of FE_FaceQ for 1D. In that case, the finite element only
+ * consists of one degree of freedom in each of the two faces (= vertices) of
+ * a cell, irrespective of the degree. However, this element still accepts a
+ * degree in its constructor and also returns that degree. This way,
+ * dimension-independent programming with trace elements is also possible in
+ * 1D (even though there is no computational benefit at all from it in 1D).
+ *
+ * @ingroup fe
+ * @author Guido Kanschat, Martin Kronbichler
+ * @date 2014
+ */
+template <int spacedim>
+class FE_FaceQ<1,spacedim> : public FiniteElement<1,spacedim>
+{
+public:
+  /**
+   * Constructor.
+   */
+  FE_FaceQ (const unsigned int p);
+
+  /**
+   * Clone method.
+   */
+  virtual FiniteElement<1,spacedim> *clone() const;
+
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_FaceQ<dim>(degree)</tt>, with <tt>dim</tt> and
+   * <tt>degree</tt> replaced by appropriate values.
+   */
+  virtual std::string get_name () const;
+
+  /**
+   * Return the matrix interpolating from a face of of one element to the face
+   * of the neighboring element.  The size of the matrix is then
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
+   * element only provides interpolation matrices for elements of the same
+   * type and FE_Nothing. For all other elements, an exception of type
+   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
+   */
+  virtual void
+  get_face_interpolation_matrix (const FiniteElement<1,spacedim> &source,
+                                 FullMatrix<double>       &matrix) const;
+
+  /**
+   * Return the matrix interpolating from a face of of one element to the face
+   * of the neighboring element.  The size of the matrix is then
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
+   * element only provides interpolation matrices for elements of the same
+   * type and FE_Nothing. For all other elements, an exception of type
+   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
+   */
+  virtual void
+  get_subface_interpolation_matrix (const FiniteElement<1,spacedim> &source,
+                                    const unsigned int        subface,
+                                    FullMatrix<double>       &matrix) const;
+
+  /**
+   * Check for non-zero values on a face.
+   *
+   * This function returns @p true, if the shape function @p shape_index has
+   * non-zero values on the face @p face_index.
+   *
+   * Implementation of the interface in FiniteElement
+   */
+  virtual bool has_support_on_face (const unsigned int shape_index,
+                                    const unsigned int face_index) const;
+
+  /**
+   * Return whether this element implements its hanging node constraints in
+   * the new way, which has to be used to make elements "hp compatible".
+   */
+  virtual bool hp_constraints_are_implemented () const;
+
+  /**
+   * Return whether this element dominates the one given as argument when they
+   * meet at a common face, whether it is the other way around, whether
+   * neither dominates, or if either could dominate.
+   *
+   * For a definition of domination, see FiniteElementBase::Domination and in
+   * particular the @ref hp_paper "hp paper".
+   */
+  virtual
+  FiniteElementDomination::Domination
+  compare_for_face_domination (const FiniteElement<1,spacedim> &fe_other) const;
+
+  /**
+   * Returns a list of constant modes of the element. For this element, it
+   * simply returns one row with all entries set to true.
+   */
+  virtual Table<2,bool> get_constant_modes () const;
+
+protected:
+  virtual
+  typename Mapping<1,spacedim>::InternalDataBase *
+  get_data (const UpdateFlags,
+            const Mapping<1,spacedim> &mapping,
+            const Quadrature<1> &quadrature) const ;
+
+  typename Mapping<1,spacedim>::InternalDataBase *
+  get_face_data (const UpdateFlags,
+                 const Mapping<1,spacedim> &mapping,
+                 const Quadrature<0>& quadrature) const ;
+
+  typename Mapping<1,spacedim>::InternalDataBase *
+  get_subface_data (const UpdateFlags,
+                    const Mapping<1,spacedim> &mapping,
+                    const Quadrature<0>& quadrature) const ;
+
+  virtual void
+  fill_fe_values (const Mapping<1,spacedim>                           &mapping,
+                  const typename Triangulation<1,spacedim>::cell_iterator &cell,
+                  const Quadrature<1>                                 &quadrature,
+                  typename Mapping<1,spacedim>::InternalDataBase      &mapping_internal,
+                  typename Mapping<1,spacedim>::InternalDataBase      &fe_internal,
+                  FEValuesData<1,spacedim>                            &data,
+                  CellSimilarity::Similarity                       &cell_similarity) const;
+
+  virtual void
+  fill_fe_face_values (const Mapping<1,spacedim> &mapping,
+                       const typename Triangulation<1,spacedim>::cell_iterator &cell,
+                       const unsigned int                    face_no,
+                       const Quadrature<0>                &quadrature,
+                       typename Mapping<1,spacedim>::InternalDataBase      &mapping_internal,
+                       typename Mapping<1,spacedim>::InternalDataBase      &fe_internal,
+                       FEValuesData<1,spacedim> &data) const ;
+
+  virtual void
+  fill_fe_subface_values (const Mapping<1,spacedim> &mapping,
+                          const typename Triangulation<1,spacedim>::cell_iterator &cell,
+                          const unsigned int                    face_no,
+                          const unsigned int                    sub_no,
+                          const Quadrature<0>                &quadrature,
+                          typename Mapping<1,spacedim>::InternalDataBase      &mapping_internal,
+                          typename Mapping<1,spacedim>::InternalDataBase      &fe_internal,
+                          FEValuesData<1,spacedim> &data) const ;
+
+
+  /**
+   * Determine the values that need to be computed on the unit cell to be able
+   * to compute all values required by <tt>flags</tt>.
+   *
+   * For the purpuse of this function, refer to the documentation in
+   * FiniteElement.
+   *
+   * This class assumes that shape functions of this FiniteElement do
+   * <em>not</em> depend on the actual shape of the cells in real
+   * space. Therefore, the effect in this element is as follows: if
+   * <tt>update_values</tt> is set in <tt>flags</tt>, copy it to the
+   * result. All other flags of the result are cleared, since everything else
+   * must be computed for each cell.
+   */
+  virtual UpdateFlags update_once (const UpdateFlags flags) const;
+
+  /**
+   * Determine the values that need to be computed on every cell to be able to
+   * compute all values required by <tt>flags</tt>.
+   *
+   * For the purpuse of this function, refer to the documentation in
+   * FiniteElement.
+   *
+   * This class assumes that shape functions of this FiniteElement do
+   * <em>not</em> depend on the actual shape of the cells in real space.
+   *
+   * The effect in this element is as follows:
+   * <ul>
+   * <li> if <tt>update_gradients</tt> is set, the result will contain
+   * <tt>update_gradients</tt> and <tt>update_covariant_transformation</tt>.
+   * The latter is required to transform the gradient on the unit cell to the
+   * real cell. Remark, that the action required by
+   * <tt>update_covariant_transformation</tt> is actually performed by the
+   * Mapping object used in conjunction with this finite element.  <li> if
+   * <tt>update_hessians</tt> is set, the result will contain
+   * <tt>update_hessians</tt> and <tt>update_covariant_transformation</tt>.
+   * The rationale is the same as above and no higher derivatives of the
+   * transformation are required, since we use difference quotients for the
+   * actual computation.
+   *
+   * </ul>
+   */
+  virtual UpdateFlags update_each (const UpdateFlags flags) const;
+
+private:
+  /**
+   * Return vector with dofs per vertex, line, quad, hex.
+   */
+  static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
+};
 
 
 
@@ -254,6 +444,26 @@ private:
    * Return vector with dofs per vertex, line, quad, hex.
    */
   static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
+};
+
+
+
+/**
+ * FE_FaceP in 1D, i.e., with degrees of freedom on the element vertices.
+ */
+template <int spacedim>
+class FE_FaceP<1,spacedim> : public FE_FaceQ<1,spacedim>
+{
+public:
+  /**
+   * Constructor.
+   */
+  FE_FaceP (const unsigned int p);
+
+  /**
+   * Returns the name of the element
+   */
+  std::string get_name() const;
 };
 
 

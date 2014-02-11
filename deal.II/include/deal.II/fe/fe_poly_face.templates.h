@@ -56,11 +56,8 @@ template <class POLY, int dim, int spacedim>
 UpdateFlags
 FE_PolyFace<POLY,dim,spacedim>::update_once (const UpdateFlags) const
 {
-  // for this kind of elements, only
-  // the values can be precomputed
-  // once and for all. set this flag
-  // if the values are requested at
-  // all
+  // for this kind of elements, only the values can be precomputed once and
+  // for all. set this flag if the values are requested at all
   return update_default;
 }
 
