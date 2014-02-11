@@ -775,7 +775,8 @@ namespace Step7
   // since we have Neumann boundary conditions on part of the boundaries, but
   // since we don't have a function here that describes the Neumann values (we
   // only construct these values from the exact solution when assembling the
-  // matrix), we omit this detail even though they would not be hard to add.
+  // matrix), we omit this detail even though doing this in a strictly correct
+  // way would not be hard to add.
   //
   // At the end of the switch, we have a default case that looks slightly
   // strange: an <code>Assert</code> statement with a <code>false</code>
@@ -809,10 +810,9 @@ namespace Step7
       {
         Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-        typename FunctionMap<dim>::type neumann_boundary;
         KellyErrorEstimator<dim>::estimate (dof_handler,
                                             QGauss<dim-1>(3),
-                                            neumann_boundary,
+                                            typename FunctionMap<dim>::type(),
                                             solution,
                                             estimated_error_per_cell);
 

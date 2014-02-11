@@ -530,20 +530,23 @@ void Step6<dim>::solve ()
 // quartic function, for which a 3 point Gauss formula is sufficient since it
 // integrates polynomials up to order 5 exactly.)
 //
-// Secondly, the function wants a list of boundaries where we have imposed
-// Neumann value, and the corresponding Neumann values. This information is
+// Secondly, the function wants a list of boundary indicators for those
+// boundaries where we have imposed Neumann values of the kind
+// $\partial_n u(\mathbf x) = h(\mathbf x)$, along with a function $h(\mathbf x)$
+// for each such boundary. This information is
 // represented by an object of type <code>FunctionMap::type</code> that is
-// essentially a map from boundary indicators to function objects describing
-// Neumann boundary values (in the present example program, we do not use
+// a typedef to a map from boundary indicators to function objects describing
+// the Neumann boundary values. In the present example program, we do not use
 // Neumann boundary values, so this map is empty, and in fact constructed
 // using the default constructor of the map in the place where the function
-// call expects the respective function argument).
+// call expects the respective function argument.
 //
 // The output, as mentioned is a vector of values for all cells. While it may
-// make sense to compute the *value* of a degree of freedom very accurately,
-// it is usually not helpful to compute the *error indicator* corresponding to
-// a cell particularly accurately. We therefore typically use a vector of
-// floats instead of a vector of doubles to represent error indicators.
+// make sense to compute the <b>value</b> of a solution degree of freedom
+// very accurately, it is usually not necessary to compute the <b>error indicator</b>
+// corresponding to the solution on a cell particularly accurately. We therefore
+// typically use a vector of floats instead of a vector of doubles to represent
+// error indicators.
 template <int dim>
 void Step6<dim>::refine_grid ()
 {

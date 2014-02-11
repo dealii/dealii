@@ -273,7 +273,7 @@ namespace Step16
     // the global matrix from local contributions. This works, but the same
     // can be done in a slightly simpler way if we already take care of these
     // constraints at the time of copying local contributions into the global
-    // matrix. To this end, we here do not just compute the constraints do to
+    // matrix. To this end, we here do not just compute the constraints due to
     // hanging nodes, but also due to zero boundary conditions. We will use
     // this set of constraints later on to help us copy local contributions
     // correctly into the global linear system right away, without the need
@@ -283,11 +283,11 @@ namespace Step16
     DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
-    typename FunctionMap<dim>::type      dirichlet_boundary;
+    typename FunctionMap<dim>::type      dirichlet_boundary_functions;
     ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
-    dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
+    dirichlet_boundary_functions[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(mg_dof_handler),
-                                              dirichlet_boundary,
+                                              dirichlet_boundary_functions,
                                               constraints);
     constraints.close ();
     hanging_node_constraints.close ();
@@ -299,7 +299,7 @@ namespace Step16
     // about the boundary values as well, so we pass the
     // <code>dirichlet_boundary</code> here as well.
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary_functions);
 
 
     // Now for the things that concern the multigrid data structures. First,

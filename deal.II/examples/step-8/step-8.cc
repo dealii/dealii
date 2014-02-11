@@ -610,10 +610,9 @@ namespace Step8
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-    typename FunctionMap<dim>::type neumann_boundary;
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(2),
-                                        neumann_boundary,
+                                        typename FunctionMap<dim>::type(),
                                         solution,
                                         estimated_error_per_cell);
 

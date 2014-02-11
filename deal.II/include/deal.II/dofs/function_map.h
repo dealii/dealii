@@ -27,16 +27,40 @@ template <int spacedim> class Function;
 
 
 /**
- * Declare a data type which denotes a mapping between a boundary indicator
- * and the function denoting the boundary values on this part of the
- * boundary. This type is required in many functions where depending on the
- * boundary indicator, different functions are used. An example is boundary
- * value interpolation.
+ * This class declares a local typedef that denotes a mapping between a boundary indicator
+ * (see @ref GlossBoundaryIndicator) that is used to describe what kind of boundary
+ * condition holds on a particular piece of the boundary,
+ * and the function describing the actual function that provides the boundary
+ * values on this part of the boundary. This type is required in many functions
+ * in the library where, for example, we need to know about the functions $h_i(\mathbf x)$
+ * used in boundary conditions
+ * @f{align*}
+ *   \mathbf n \cdot \nabla u = h_i \qquad \qquad \text{on}\ \Gamma_i\subset\partial\Omega.
+ * @f}
+ * An example is the function KellyErrorEstimator::estimate() that allows us
+ * to provide a set of functions $h_i$ for all those boundary indicators $i$ for
+ * which the boundary condition is supposed to be of Neumann type. Of course,
+ * the same kind of principle can be applied to cases where we care about
+ * Dirichlet values, where one needs to provide a map from boundary indicator $i$
+ * to Dirichlet function $h_i$ if the boundary conditions are given as
+ * @f{align*}
+ *   u = h_i \qquad \qquad \text{on}\ \Gamma_i\subset\partial\Omega.
+ * @f}
+ * This is, for example, the case for the VectorTools::interpolate() functions.
+ *
+ * Tutorial programs step-6, step-7 and step-8 show examples of how to use
+ * function arguments of this type in situations where we actually have an empty
+ * map (i.e., we want to describe that <i>no</i> part of the boundary is a
+ * Neumann boundary). step-16 actually uses it in a case where one of the
+ * parts of the boundary uses a boundary indicator for which we want to use
+ * a function object.
  *
  * It seems odd at first to declare this typedef inside a class, rather than
  * declaring a typedef at global scope. The reason is that C++ does not allow
  * to define templated typedefs, where here in fact we want a typdef that
- * depends on the space dimension.
+ * depends on the space dimension. (Defining templated typedefs is something that
+ * is possible starting with the C++11 standard, but that wasn't possible within
+ * the C++98 standard in place when this programming pattern was conceived.)
  *
  * @ingroup functions
  * @author Wolfgang Bangerth, Ralf Hartmann, 2001
