@@ -172,6 +172,17 @@ namespace internal
                     types<2>::forest *p4est,
                     int save_data);
 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+      static
+      types<2>::forest *(&load_ext) (const char *filename,
+                                 MPI_Comm mpicomm,
+                                 size_t data_size,
+                                 int load_data,
+                                 int autopartition, 
+                                 int broadcasthead,
+                                 void *user_pointer,
+                                 types<2>::connectivity **p4est);
+#else
       static
       types<2>::forest *(&load) (const char *filename,
                                  MPI_Comm mpicomm,
@@ -179,6 +190,7 @@ namespace internal
                                  int load_data,
                                  void *user_pointer,
                                  types<2>::connectivity **p4est);
+#endif
 
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
       static
@@ -337,6 +349,18 @@ namespace internal
                                 int save_data)
       = p4est_save;
 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+    types<2>::forest *
+    (&functions<2>::load_ext) (const char *filename,
+                           MPI_Comm mpicomm,
+                           std::size_t data_size,
+                           int load_data,
+                           int autopartition, 
+                           int broadcasthead,
+                           void *user_pointer,
+                           types<2>::connectivity **p4est)
+      = p4est_load_ext;
+#else
     types<2>::forest *
     (&functions<2>::load) (const char *filename,
                            MPI_Comm mpicomm,
@@ -345,6 +369,7 @@ namespace internal
                            void *user_pointer,
                            types<2>::connectivity **p4est)
       = p4est_load;
+#endif
 
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
    int (&functions<2>::connectivity_save) (const char *filename,
@@ -507,6 +532,17 @@ namespace internal
                     types<3>::forest *p4est,
                     int save_data);
 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+      static
+      types<3>::forest *(&load_ext) (const char *filename,
+                                 MPI_Comm mpicomm,
+                                 std::size_t data_size,
+                                 int load_data,
+                                 int autopartition, 
+                                 int broadcasthead,
+                                 void *user_pointer,
+                                 types<3>::connectivity **p4est);
+#else
       static
       types<3>::forest *(&load) (const char *filename,
                                  MPI_Comm mpicomm,
@@ -514,6 +550,7 @@ namespace internal
                                  int load_data,
                                  void *user_pointer,
                                  types<3>::connectivity **p4est);
+#endif
 
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
       static
@@ -675,6 +712,18 @@ namespace internal
                                 int save_data)
       = p8est_save;
 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+    types<3>::forest *
+    (&functions<3>::load_ext) (const char *filename,
+                           MPI_Comm mpicomm,
+                           std::size_t data_size,
+                           int load_data,
+                           int autopartition, 
+                           int broadcasthead,
+                           void *user_pointer,
+                           types<3>::connectivity **p4est)
+      = p8est_load_ext;
+#else
     types<3>::forest *
     (&functions<3>::load) (const char *filename,
                            MPI_Comm mpicomm,
@@ -683,6 +732,7 @@ namespace internal
                            void *user_pointer,
                            types<3>::connectivity **p4est)
       = p8est_load;
+#endif
 
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
     int (&functions<3>::connectivity_save) (const char *filename,
@@ -2203,12 +2253,20 @@ namespace parallel
       n_attached_datas = 0;
       n_attached_deserialize = attached_count;
 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+      parallel_forest = dealii::internal::p4est::functions<dim>::load_ext (
+                          filename, mpi_communicator,
+                          attached_size, attached_size>0,
+                          1, 0,
+                          this,
+                          &connectivity);
+#else
       parallel_forest = dealii::internal::p4est::functions<dim>::load (
                           filename, mpi_communicator,
                           attached_size, attached_size>0,
                           this,
                           &connectivity);
-
+#endif
       if (numcpus != Utilities::MPI::n_mpi_processes (mpi_communicator))
         {
           // We are changing the number of CPUs so we need to repartition.
