@@ -2599,10 +2599,11 @@ public:
 
   /**
    * Return the @p RefinementCase<dim> this cell was flagged to be refined
-   * with.
-   * The return value of this function can be compared to a bool to check if this cell is flagged
-   * for any kind of refinement. For example, after calling cell->set_refine_flag()
-   * this code will go into the if statement:
+   * with.  The return value of this function can be compared to a bool to
+   * check if this cell is flagged for any kind of refinement. For example, if
+   * you have previously called cell->set_refine_flag() for a cell, then you
+   * will enter the 'if' block in the following snippet:
+   *
    * @code
    * if (cell->refine_flag_set())
    * {
