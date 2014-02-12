@@ -2598,10 +2598,17 @@ public:
    */
 
   /**
-   *  Return the @p
-   *  RefinementCase<dim> this cell
-   *  was flagged to be refined
-   *  with.
+   * Return the @p RefinementCase<dim> this cell was flagged to be refined
+   * with.
+   * The return value of this function can be compared to a bool to check if this cell is flagged
+   * for any kind of refinement. For example, after calling cell->set_refine_flag()
+   * this code will go into the if statement:
+   * @code
+   * if (cell->refine_flag_set())
+   * {
+   *   // yes, this cell is marked for refinement.
+   * }
+   * @endcode
    */
   RefinementCase<dim> refine_flag_set () const;
 
@@ -2609,7 +2616,8 @@ public:
    *  Flag the cell pointed to for
    *  refinement. This function is
    *  only allowed for active
-   *  cells.
+   *  cells. Keeping the default value for @p ref_case will mark this cell for
+   *  isotropic refinement.
    */
   void set_refine_flag (const RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement) const;
 
