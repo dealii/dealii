@@ -308,12 +308,17 @@ namespace FETools
   /**
    * Compute the embedding matrices on faces needed for constraint matrices.
    *
-   * @param fe The finite element for which to compute these matrices.  @param
-   * matrices An array of <i>GeometryInfo<dim>::subfaces_per_face =
+   * @param fe The finite element for which to compute these matrices.
+   *
+   * @param matrices An array of <i>GeometryInfo<dim>::subfaces_per_face =
    * 2<sup>dim-1</sup></i> FullMatrix objects,holding the embedding matrix for
-   * each subface.  @param face_coarse The number of the face on the coarse
-   * side of the face for which this is computed.  @param face_fine The number
-   * of the face on the refined side of the face for which this is computed.
+   * each subface.
+   *
+   * @param face_coarse The number of the face on the coarse side of the face
+   * for which this is computed.
+   *
+   * @param face_fine The number of the face on the refined side of the face
+   * for which this is computed.
    *
    * @warning This function will be used in computing constraint matrices. It
    * is not sufficiently tested yet.
