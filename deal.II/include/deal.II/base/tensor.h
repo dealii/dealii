@@ -2093,6 +2093,48 @@ operator / (const Tensor<rank,dim> &t,
   return tt;
 }
 
+
+
+/**
+ * Multiplication of a tensor of general rank by a scalar
+ * complex<double> from the left.
+ *
+ * @relates Tensor
+ */
+template <int rank, int dim>
+  inline
+  Tensor<rank,dim,std::complex<double> >
+  operator * (const std::complex<double>  factor,
+	      const Tensor<rank,dim>     &t)
+{
+  Tensor<rank,dim,std::complex<double> > tt;
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = factor * t[d];
+  return tt;
+}
+
+
+
+/**
+ * Multiplication of a tensor of general rank by a scalar
+ * complex<double> from the right.
+ *
+ * @relates Tensor
+ */
+template <int rank, int dim>
+  inline
+  Tensor<rank,dim,std::complex<double> >
+  operator * (const Tensor<rank,dim>     &t,
+	      const std::complex<double>  factor)
+{
+  Tensor<rank,dim,std::complex<double> > tt;
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = t[d] * factor;
+  return tt;
+}
+
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

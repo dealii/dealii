@@ -1463,6 +1463,47 @@ operator / (const Tensor<1,dim> &t,
 }
 
 
+
+/**
+ * Multiplication of a tensor of rank 1 by a scalar complex<double>
+ * from the right.
+ *
+ * @relates Tensor<1,dim,Number>
+ */
+template <int dim>
+inline
+Tensor<1,dim,std::complex<double> >
+  operator * (const Tensor<1,dim>        &t,
+	      const std::complex<double>  factor)
+{                                  
+  Tensor<1,dim,std::complex<double> > tt (false);
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = t[d] * factor;
+  return tt;
+}
+
+
+
+/**
+ * Multiplication of a tensor of rank 1 by a scalar complex<double>
+ * from the left.
+ *
+ * @relates Tensor<1,dim,Number>
+ */
+template <int dim>
+inline
+Tensor<1,dim,std::complex<double> >
+  operator * (const std::complex<double>  factor,
+	      const Tensor<1,dim>        &t)
+{                                  
+  Tensor<1,dim,std::complex<double> > tt (false);
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = t[d] * factor;
+  return tt;
+}
+
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
