@@ -49,8 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * #include <deal.II/base/path_search.h>
  *
- DEAL_II_NAMESPACE_OPEN
- * PathSearch search("MESH");
+ * dealii::PathSearch search("MESH");
  * std::string full_name = search.find("grid");
  * std::ifstream in(full_name.c_str());
  * ...
