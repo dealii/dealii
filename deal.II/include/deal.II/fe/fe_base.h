@@ -311,11 +311,16 @@ public:
    *
    * @param dofs_per_object Number of dofs on geometrical objects for each
    * dimension. In this vector, entry 0 refers to dofs on vertices, entry 1 on
-   * lines and so on. Its length must be <i>dim+1</i>.  @param n_components
-   * Number of vector components of the element.  @param degree Maximal
-   * polynomial degree in a single direction.  @param conformity The finite
-   * element space has continuity of this Sobolev space.  @param n_blocks
-   * obsolete and ignored.
+   * lines and so on. Its length must be <i>dim+1</i>.
+   *
+   * @param n_components Number of vector components of the element.
+   *
+   * @param degree Maximal polynomial degree in a single direction.
+   *
+   * @param conformity The finite element space has continuity of this Sobolev
+   * space.
+   *
+   * @param n_blocks obsolete and ignored.
    */
   FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
                      const unsigned int n_components,
