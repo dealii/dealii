@@ -794,13 +794,15 @@ namespace FETools
    * The name must be in the form which is returned by the
    * FiniteElement::get_name function, where a few modifications are allowed:
    *
-   * <ul><li> Dimension template parameters &lt;2&gt; etc. can be
+   * <ul>
+   * <li> Dimension template parameters &lt;2&gt; etc. can be
    * omitted. Alternatively, the explicit number can be replaced by
    * <tt>dim</tt> or <tt>d</tt>. If a number is given, it <b>must</b> match
    * the template parameter of this function.
    *
    * <li> The powers used for FESystem may either be numbers or can be
-   * replaced by <tt>dim</tt> or <tt>d</tt>.  </ul>
+   * replaced by <tt>dim</tt> or <tt>d</tt>.
+   * </ul>
    *
    * If no finite element can be reconstructed from this string, an exception
    * of type @p FETools::ExcInvalidFEName is thrown.
