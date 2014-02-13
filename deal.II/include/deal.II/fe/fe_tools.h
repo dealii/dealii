@@ -761,6 +761,12 @@ namespace FETools
    * correct size, which is equal to the number of degrees of freedom in the
    * finite element.
    */
+
+  template <int dim>
+  void
+  hierarchic_to_lexicographic_numbering (unsigned int degree,
+					 std::vector<unsigned int> &h2l);
+
   template <int dim>
   void
   hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe_data,
