@@ -124,6 +124,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+  <li>New: FE_TraceQ implements finite elements on faces, which
+  correspond to the traces of H<sup>1</sup>-conforming elements.
+  <br>
+  (Angela Klewinghaus, 2014/02/14)
+
   <li>New: FE_FaceQ and FE_FaceP now also work in 1D (with a single dof
   on each vertex).
   <br>
