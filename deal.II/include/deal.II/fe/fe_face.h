@@ -306,13 +306,15 @@ protected:
    *
    * The effect in this element is as follows:
    * <ul>
+   *
    * <li> if <tt>update_gradients</tt> is set, the result will contain
    * <tt>update_gradients</tt> and <tt>update_covariant_transformation</tt>.
    * The latter is required to transform the gradient on the unit cell to the
    * real cell. Remark, that the action required by
    * <tt>update_covariant_transformation</tt> is actually performed by the
-   * Mapping object used in conjunction with this finite element.  <li> if
-   * <tt>update_hessians</tt> is set, the result will contain
+   * Mapping object used in conjunction with this finite element.
+   *
+   * <li> if <tt>update_hessians</tt> is set, the result will contain
    * <tt>update_hessians</tt> and <tt>update_covariant_transformation</tt>.
    * The rationale is the same as above and no higher derivatives of the
    * transformation are required, since we use difference quotients for the
