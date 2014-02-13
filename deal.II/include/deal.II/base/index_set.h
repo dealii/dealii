@@ -260,7 +260,7 @@ public:
 
   /**
    * Constructs the IndexSet from a text based representation given by the
-   * stream @param in written by the write() function.
+   * stream @p in written by the write() function.
    */
   void read(std::istream &in);
 
@@ -272,7 +272,7 @@ public:
 
   /**
    * Constructs the IndexSet from a binary representation given by the stream
-   * @param in written by the write_block() function.
+   * @p in written by the write_block() function.
    */
   void block_read(std::istream &in);
 
