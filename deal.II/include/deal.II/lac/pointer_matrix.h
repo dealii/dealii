@@ -127,7 +127,7 @@ public:
                       const VECTOR &src) const = 0;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   virtual void Tvmult (VECTOR &dst,
                        const VECTOR &src) const = 0;
@@ -140,7 +140,7 @@ public:
                           const VECTOR &src) const = 0;
 
   /**
-   * Tranposed matrix-vector product,
+   * Transposed matrix-vector product,
    * adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
@@ -222,7 +222,7 @@ public:
                       const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   virtual void Tvmult (VECTOR &dst,
                        const VECTOR &src) const;
@@ -235,7 +235,7 @@ public:
                           const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product,
+   * Transposed matrix-vector product,
    * adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
@@ -344,7 +344,7 @@ public:
                       const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   virtual void Tvmult (VECTOR &dst,
                        const VECTOR &src) const;
@@ -357,7 +357,7 @@ public:
                           const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product,
+   * Transposed matrix-vector product,
    * adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
@@ -468,7 +468,7 @@ public:
                       const Vector<number> &src) const;
 
   /**
-   * Tranposed matrix-vector
+   * Transposed matrix-vector
    * product, actually the
    * multiplication of the vector
    * representing this matrix with
@@ -497,7 +497,7 @@ public:
                           const Vector<number> &src) const;
 
   /**
-   * Tranposed matrix-vector product,
+   * Transposed matrix-vector product,
    * adding to <tt>dst</tt>.
    *
    * The dimension of <tt>src</tt>
