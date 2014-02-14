@@ -110,7 +110,7 @@ where the centers $x_i$ of the exponentials are
   $x_1=(-\frac 12,\frac 12)$,
   $x_2=(-\frac 12,-\frac 12)$, and
   $x_3=(\frac 12,-\frac 12)$.
-The half width is set to $\sigma=\frac 13$.
+The half width is set to $\sigma=\frac {1}{8}$.
 
 We further choose $\Gamma_1=\Gamma \cap\{\{x=1\} \cup \{y=1\}\}$, and there
 set $g_1$ such that it resembles the exact values of $u$. Likewise, we choose

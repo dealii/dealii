@@ -152,7 +152,7 @@ namespace Step7
   // concrete instantiation by substituting <code>dim</code> with a concrete
   // value:
   template <int dim>
-  const double SolutionBase<dim>::width = 1./3.;
+  const double SolutionBase<dim>::width = 1./8.;
 
 
 
@@ -976,12 +976,13 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<7; ++cycle)
+	const unsigned int n_cycles = (refinement_mode==global_refinement)?5:9;
+    for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
       {
         if (cycle == 0)
           {
             GridGenerator::hyper_cube (triangulation, -1, 1);
-            triangulation.refine_global (1);
+            triangulation.refine_global (3);
 
             typename Triangulation<dim>::cell_iterator
             cell = triangulation.begin (),
@@ -1019,21 +1020,21 @@ namespace Step7
     // After the last iteration we output the solution on the finest
     // grid. This is done using the following sequence of statements which we
     // have already discussed in previous examples. The first step is to
-    // generate a suitable filename (called <code>gmv_filename</code> here,
-    // since we want to output data in GMV format; we add the prefix to
+    // generate a suitable filename (called <code>vtk_filename</code> here,
+    // since we want to output data in VTK format; we add the prefix to
     // distinguish the filename from that used for other output files further
     // down below). Here, we augment the name by the mesh refinement
     // algorithm, and as above we make sure that we abort the program if
     // another refinement method is added and not handled by the following
     // switch statement:
-    std::string gmv_filename;
+    std::string vtk_filename;
     switch (refinement_mode)
       {
       case global_refinement:
-        gmv_filename = "solution-global";
+        vtk_filename = "solution-global";
         break;
       case adaptive_refinement:
-        gmv_filename = "solution-adaptive";
+        vtk_filename = "solution-adaptive";
         break;
       default:
         Assert (false, ExcNotImplemented());
@@ -1053,10 +1054,10 @@ namespace Step7
     switch (fe->degree)
       {
       case 1:
-        gmv_filename += "-q1";
+        vtk_filename += "-q1";
         break;
       case 2:
-        gmv_filename += "-q2";
+        vtk_filename += "-q2";
         break;
 
       default:
@@ -1064,10 +1065,10 @@ namespace Step7
       }
 
     // Once we have the base name for the output file, we add an extension
-    // appropriate for GMV output, open a file, and add the solution vector to
+    // appropriate for VTK output, open a file, and add the solution vector to
     // the object that will do the actual output:
-    gmv_filename += ".gmv";
-    std::ofstream output (gmv_filename.c_str());
+    vtk_filename += ".vtk";
+    std::ofstream output (vtk_filename.c_str());
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
@@ -1100,9 +1101,9 @@ namespace Step7
     // way as above.
     //
     // With the intermediate format so generated, we can then actually write
-    // the graphical output in GMV format:
+    // the graphical output:
     data_out.build_patches (fe->degree);
-    data_out.write_gmv (output);
+    data_out.write_vtk (output);
 
     // @sect5{Output of convergence tables}
 
@@ -1231,6 +1232,8 @@ namespace Step7
         convergence_table
         .evaluate_convergence_rates("L2", ConvergenceTable::reduction_rate_log2);
         convergence_table
+        .evaluate_convergence_rates("H1", ConvergenceTable::reduction_rate);
+        convergence_table
         .evaluate_convergence_rates("H1", ConvergenceTable::reduction_rate_log2);
         // Each of these function calls produces an additional column that is
         // merged with the original column (in our example the `L2' and the
@@ -1347,7 +1350,19 @@ int main ()
 
         std::cout << std::endl;
       }
+      {
+        std::cout << "Solving with Q2 elements, adaptive refinement" << std::endl
+                  << "===========================================" << std::endl
+                  << std::endl;
 
+        FE_Q<dim> fe(2);
+        HelmholtzProblem<dim>
+        helmholtz_problem_2d (fe, HelmholtzProblem<dim>::adaptive_refinement);
+
+        helmholtz_problem_2d.run ();
+
+        std::cout << std::endl;
+      }
     }
   catch (std::exception &exc)
     {
