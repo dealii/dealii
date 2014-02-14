@@ -1,0 +1,136 @@
+// vector update of the form y += alpha*x with a scalar, x,y vectors
+void daxpy_ (const int* n, const double* alpha, const double* x,
+	     const int* incx, double* y, const int* incy);
+
+// General Matrix
+// Matrix vector product
+void dgemv_ (const char* trans, const int* m, const int* n,
+	     const double* alpha, const double* A, const int* lda,
+	     const double* x, const int* incx,
+	     const double* b, double* y, const int* incy);
+
+// Matrix matrix product
+void dgemm_ (const char* transa, const char* transb,
+	     const int* m, const int* n, const int* k,
+	     const double* alpha, const double* A, const int* lda,
+	     const double* B, const int* ldb,
+	     const double* beta, double* C, const int* ldc);
+
+// Compute LU factorization
+void dgetrf_ (const int* m, const int* n, double* A,
+	      const int* lda, int* ipiv, int* info);
+// Apply forward/backward substitution to LU factorization
+void dgetrs_ (const char* trans, const int* n, const int* nrhs,
+	      const double* A, const int* lda, const int* ipiv,
+	      double* b, const int* ldb, int* info);
+// Invert matrix from LU factorization
+void dgetri_ (const int* n, double* A, const int* lda, 
+	      int* ipiv, double* inv_work, const int* lwork, int* info);
+
+// Compute QR factorization (Householder)
+void dgeqrf_ (const int* m, const int* n, double* A,
+	      const int* lda, double* tau, double* work,
+	      const int* lwork, int* info);
+// Compute vector Q^T B, where Q is the result from dgeqrf_
+void dormqr_ (const char* side, const char* trans, const int* m, 
+	      const int* n, const int* k, const double* A, const int* lda, 
+	      const double* tau, double* B, const int* ldb,
+	      double* work, const int* lwork, int* info);
+// Compute matrix Q from the result of dgeqrf_
+void dorgqr_ (const int* m, const int* n, const int* k, const double* A, 
+	      const int* lda, const double* tau, double* work, const int* lwork, 
+	      int* info);
+// Compute Rx = b
+void dtrtrs_ (const char* uplo, const char* trans,
+	      const char* diag, const int* n, const int* n_rhs,
+	      const double* A, const int* lda, double* B, const int* ldb,
+	      int* info);
+
+// Compute eigenvalues and vectors
+void dgeev_ (const char* jobvl, const char* jobvr,
+	     const int* n, double* A, const int* lda,
+	     double* lambda_re, double* lambda_im,
+	     double* vl, const int* ldvl,
+	     double* vr, const int* ldva,
+	     double* work, const int* lwork,
+	     int* info);
+// Compute eigenvalues and vectors (expert)
+void dgeevx_ (const char* balanc, const char* jobvl, const char* jobvr,
+	      const char* sense,
+	      const int* n, double* A, const int* lda,
+	      double* lambda_re, double* lambda_im,
+	      double* vl, const int* ldvl,
+	      double* vr, const int* ldvr,
+	      int* ilo, int* ihi,
+	      double* scale, double* abnrm,
+	      double* rconde, double* rcondv,
+	      double* work, const int* lwork,
+	      int* iwork, int* info);
+// Eigenvalues for a symmetric matrix
+void dsyev_ (const char *jobz, const char *uplo, const int *n,
+	     double *A, const int *lda, double *w,
+	     double *work, const int *lwork, int *info);
+// Same functionality as dsyev_ but with more options: E.g.
+// Compute only eigenvalues in a specific interval,
+// Compute only eigenvalues with a specific index,
+// Set tolerance for eigenvalue computation
+void dsyevx_ (const char* jobz, const char* range,
+              const char* uplo, const int* n, double* A, const int* lda,
+              const double* vl, const double* vu,
+              const int* il, const int* iu, const double* abstol,
+              int* m, double* w, double* z,
+              const int* ldz, double* work, const int* lwork, int* iwork,
+              int* ifail, int* info);
+// Generalized eigenvalues and eigenvectors of
+// 1: A*x = lambda*B*x; 2: A*B*x = lambda*x; 3: B*A*x = lambda*x
+// A and B are symmetric and B is definite
+void dsygv_ (const int* itype, const char* jobz, const char* uplo,
+             const int* n, double* A, const int* lda, double* B,
+             const int* ldb, double* w, double* work,
+             const int* lwork, int* info);
+// Same functionality as dsygv_ but with more options: E.g.
+// Compute only eigenvalues in a specific interval,
+// Compute only eigenvalues with a specific index,
+// Set tolerance for eigenvalue computation
+void dsygvx_ (const int* itype, const char* jobz, const char* range,
+              const char* uplo, const int* n, double* A, const int* lda,
+              double* B, const int* ldb, const double* vl, const double* vu,
+              const int* il, const int* iu, const double* abstol,
+              int* m, double* w, double* z,
+              const int* ldz, double* work, const int* lwork, int* iwork,
+              int* ifail, int* info);
+
+// Compute singular value decomposition using divide and conquer
+void dgesdd_ (const char* jobz,
+	      const int* m, const int* n, double* A, const int* lda,
+	      double* s,
+	      double* u, const int* ldu,
+	      double* vt, const int* ldvt,
+	      double* work, const int* lwork,
+	      int* iwork,
+	      int* info);
+
+// Compute singular value decomposition
+void dgesvd_ (int* jobu, int* jobvt,
+	      const int* n, const int* m, double* A, const int* lda,
+	      double* s,
+	      double* u, const int* ldu,
+	      double* vt, const int* ldvt,
+	      double* work, const int* lwork,
+	      int* info);
+
+// Solve a least squares problem using SVD
+void dgelsd_ (const int* m, const int* n, const int* nrhs,
+	      const double* A, const int* lda,
+	      double* B, const int* ldb,
+	      double* s, const double* rcond,
+	      int* rank,
+	      double* work, const int* lwork, int* iwork,
+	      int* info);
+
+// Symmetric tridiagonal matrix
+void dstev_ (const char* jobz, const int* n,
+	     double* d, double* e, double* z,
+	     const int* ldz, double* work,
+	     int* info);
+
