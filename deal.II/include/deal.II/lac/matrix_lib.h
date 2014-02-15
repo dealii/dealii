@@ -145,12 +145,6 @@ private:
    * Memory for auxiliary vector.
    */
   SmartPointer<VectorMemory<VECTOR>,ProductMatrix<VECTOR> > mem;
-
-  /**
-   * Return some kind of
-   * identifier.
-   */
-  virtual const void *get() const;
 };
 
 
@@ -190,7 +184,7 @@ public:
   void initialize (const MATRIX &M, const double factor);
 
   /**
-   * Delete internal matrix pointer.
+   * Reset the object to its original state.
    */
   void clear ();
 
@@ -317,11 +311,6 @@ private:
    * Memory for auxiliary vector.
    */
   SmartPointer<VectorMemory<VectorType>,ProductSparseMatrix<number,vector_number>  > mem;
-  /**
-   * Return some kind of
-   * identifier.
-   */
-  virtual const void *get() const;
 };
 
 
@@ -737,13 +726,6 @@ ProductMatrix<VECTOR>::Tvmult_add (VECTOR &dst, const VECTOR &src) const
   mem->free(v);
 }
 
-
-template<class VECTOR>
-const void *
-ProductMatrix<VECTOR>::get () const
-{
-  return (void *) m1;
-}
 
 
 //---------------------------------------------------------------------------

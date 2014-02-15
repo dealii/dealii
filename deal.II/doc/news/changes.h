@@ -40,6 +40,17 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: Class PointerMatrixBase (and, consequently, the various
+  classes derived from it) had comparison operators that were intended to
+  work generically for any kind of derived class. However, the implementation
+  used a scheme that was not robust enough to handle the various situations
+  that derived classes implemented and, consequently, was not always correct.
+  These operators were not previously used inside the library and, likely,
+  were not widely used in applications either. They have now been removed.
+  <br>
+  (Wolfgang Bangerth, 2014/02/15)
+  </li>
+
   <li> Changed: The various classes generating graphical output, such
   as DataOut or DataOutStack, are all derived from a common interface
   class DataOutInterface which, in turn was derived from DataOutBase
