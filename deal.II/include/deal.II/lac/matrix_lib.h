@@ -415,15 +415,29 @@ private:
 
 
 /**
- * Inverse matrix computed approximately by using the SolverRichardson
- * iterative solver. In particular, the function
- * SolverRichardson::Tsolve() allows for the implementation of
- * transpose matrix vector products.
+ * Objects of this type represent the inverse of a matrix as
+ * computed approximately by using the SolverRichardson
+ * iterative solver. In other words, if you set up an object
+ * of the current type for a matrix $A$, then calling the
+ * vmult() function with arguments $v,w$ amounts to setting
+ * $w=A^{-1}v$ by solving the linear system $Aw=v$ using the
+ * Richardson solver with a preconditioner that can be chosen. Similarly,
+ * this class allows to also multiple with the transpose of the
+ * inverse (i.e., the inverse of the transpose) using the function
+ * SolverRichardson::Tsolve().
  *
  * The functions vmult() and Tvmult() approximate the inverse
  * iteratively starting with the vector <tt>dst</tt>. Functions
  * vmult_add() and Tvmult_add() start the iteration with a zero
- * vector.
+ * vector. All of the matrix-vector multiplication functions
+ * expect that the Richardson solver with the given preconditioner
+ * actually converge. If the Richardson solver does not converge
+ * within the specified number of iterations, the exception that will
+ * result in the solver will simply be propagated to the caller of
+ * the member function of the current class.
+ *
+ * @note A more powerful version of this class is provided by the
+ * IterativeInverse class.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the

@@ -135,6 +135,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Changed: The InverseMatrixRichardson used to eat all exceptions
+  that may have been produced by the underlying Richardson solver, leaving
+  no trace that the underlying solver may have failed when you call functions
+  such as InverseMatrixRichardson::vmult(). These exceptions are now propagated
+  out to the caller.
+  <br>
+  (Wolfgang Bangerth, 2014/02/16)
+
 
   <li>New: FE_TraceQ implements finite elements on faces, which
   correspond to the traces of H<sup>1</sup>-conforming elements.
