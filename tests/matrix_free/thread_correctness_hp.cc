@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013-2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -98,7 +98,10 @@ void do_test (const unsigned int parallel_option)
 {
   Triangulation<dim> tria;
   create_mesh (tria);
+  // larger mesh in release mode
+#ifndef DEBUG
   tria.refine_global(2);
+#endif
 
   // refine a few cells
   for (unsigned int i=0; i<11-3*dim; ++i)
@@ -171,10 +174,16 @@ void do_test (const unsigned int parallel_option)
             MatrixFree<dim,number>::AdditionalData::partition_partition;
           deallog << "Parallel option partition/partition" << std::endl;
         }
-      else
+      else if (parallel_option == 1)
         {
           data.tasks_parallel_scheme =
             MatrixFree<dim,number>::AdditionalData::partition_color;
+          deallog << "Parallel option partition/color" << std::endl;
+        }
+      else
+        {
+          data.tasks_parallel_scheme =
+            MatrixFree<dim,number>::AdditionalData::color;
           deallog << "Parallel option partition/color" << std::endl;
         }
       data.tasks_block_size = 1;

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,9 +86,10 @@ namespace internal
        * Helper function to determine which update flags must be set in the
        * internal functions to initialize all data as requested by the user.
        */
-      UpdateFlags
+      static UpdateFlags
       compute_update_flags (const UpdateFlags                        update_flags,
-                            const std::vector<dealii::hp::QCollection<1> >  &quad) const;
+                            const std::vector<dealii::hp::QCollection<1> >  &quad =
+                            std::vector<dealii::hp::QCollection<1> >());
 
       /**
        * Returns the type of a given cell as detected during initialization.

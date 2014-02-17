@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -526,38 +526,22 @@ void MatrixFree<dim,Number>::initialize_indices
           // there the vertex DoFs come first, which is incompatible with the
           // lexicographic ordering necessary to apply tensor products
           // efficiently)
-          const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
-            dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>
-            (&fe.base_element(0));
-          const FE_Poly<TensorProductPolynomials<dim,Polynomials::
-          PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
-            dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
-            Polynomials::PiecewisePolynomial<double> >,dim,dim>*>
-            (&fe.base_element(0));
 
-          // This class currently only works for elements derived from
-          // FE_Poly<TensorProductPolynomials<dim>,dim,dim> or piecewise
-          // polynomials. For any other element, the dynamic casts above will
-          // fail and give fe_poly == 0.
-          Assert (fe_poly != 0 || fe_poly_piece != 0, ExcNotImplemented());
           if (n_fe_components == 1)
             {
-              if (fe_poly != 0)
-                lexicographic_inv[no][fe_index] =
-                  fe_poly->get_poly_space_numbering_inverse();
-              else
-                lexicographic_inv[no][fe_index] =
-                  fe_poly_piece->get_poly_space_numbering_inverse();
+              lexicographic_inv[no][fe_index] =
+                internal::MatrixFreeFunctions::get_lexicographic_numbering_inverse(fe);
               AssertDimension (lexicographic_inv[no][fe_index].size(),
                                dof_info[no].dofs_per_cell[fe_index]);
             }
           else
             {
-              // ok, we have more than one component
+              // ok, we have more than one component, get the inverse
+              // permutation, invert it, sort the components one after one,
+              // and invert back
               Assert (n_fe_components > 1, ExcInternalError());
               std::vector<unsigned int> scalar_lex =
-                fe_poly != 0 ? fe_poly->get_poly_space_numbering() :
-                fe_poly_piece->get_poly_space_numbering();
+                Utilities::invert_permutation(internal::MatrixFreeFunctions::get_lexicographic_numbering_inverse(fe.base_element(0)));
               AssertDimension (scalar_lex.size() * n_fe_components,
                                dof_info[no].dofs_per_cell[fe_index]);
               std::vector<unsigned int> lexicographic (dof_info[no].dofs_per_cell[fe_index]);
