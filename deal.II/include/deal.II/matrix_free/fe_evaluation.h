@@ -89,6 +89,11 @@ public:
    */
   //@{
   /**
+   * Destructor.
+   */
+  ~FEEvaluationBase();
+
+  /**
    * Initializes the operation pointer to the current cell. Unlike the
    * FEValues::reinit function, where the information related to a particular
    * cell is generated in the reinit call, this function is very cheap since
@@ -636,9 +641,10 @@ protected:
    * Stores a reference to the unit cell data, i.e., values, gradients and
    * Hessians in 1D at the quadrature points that constitute the tensor
    * product. Also contained in matrix_info, but it simplifies code if we
-   * store a reference to it.
+   * store a reference to it. If initialized without MatrixFree object, this
+   * call actually initializes the evaluation.
    */
-  std_cxx1x::shared_ptr<const internal::MatrixFreeFunctions::ShapeInfo<Number> > data;
+  const internal::MatrixFreeFunctions::ShapeInfo<Number> *data;
 
   /**
    * A pointer to the Cartesian Jacobian information of the present cell. Only
@@ -1666,34 +1672,6 @@ public:
 #ifndef DOXYGEN
 
 
-namespace internal
-{
-  namespace MatrixFreeFunctions
-  {
-    // a small class that gives control over the delete behavior of
-    // std::shared_ptr: we need to disable it when we initialize a pointer
-    // from another structure.
-    template <typename CLASS>
-    struct DummyDeleter
-    {
-      DummyDeleter (const bool do_delete = false)
-        :
-        do_delete(do_delete)
-      {}
-
-      void operator () (CLASS *pointer)
-      {
-        if (do_delete)
-          delete pointer;
-      }
-
-      const bool do_delete;
-    };
-  }
-}
-
-
-
 /*----------------------- FEEvaluationBase ----------------------------------*/
 
 template <int dim, int n_components_, typename Number>
@@ -1717,9 +1695,7 @@ FEEvaluationBase<dim,n_components_,Number>
   mapping_info       (&data_in.get_mapping_info()),
   data               (&data_in.get_shape_info
                       (fe_no_in, quad_no_in, active_fe_index,
-                       active_quad_index),
-                      internal::MatrixFreeFunctions::DummyDeleter
-                      <const internal::MatrixFreeFunctions::ShapeInfo<Number> >(false)),
+                       active_quad_index)),
   cartesian_data     (0),
   jacobian           (0),
   J_value            (0),
@@ -1804,6 +1780,18 @@ FEEvaluationBase<dim,n_components_,Number>
          dof_handler->get_fe().element_multiplicity(base_element) >= n_components_,
          ExcMessage("The underlying element must at least contain as many "
                     "components as requested by this class"));
+}
+
+
+
+template <int dim, int n_components_, typename Number>
+inline
+FEEvaluationBase<dim,n_components_,Number>::~FEEvaluationBase()
+{
+  // delete memory held by data in case this structure was initialized without
+  // a MatrixFree object which could hold the data structure.
+  if (matrix_info == 0)
+    delete data;
 }
 
 
