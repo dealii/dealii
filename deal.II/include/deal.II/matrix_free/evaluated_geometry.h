@@ -24,6 +24,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/vectorization.h>
 #include <deal.II/matrix_free/shape_info.h>
+#include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/fe/fe_values.h>
 
 
