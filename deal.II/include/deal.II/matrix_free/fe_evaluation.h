@@ -98,14 +98,6 @@ public:
   void reinit (const unsigned int cell);
 
   /**
-   * Initializes the operation pointer to the current cell. This is a reinit
-   * call similar to FEValues where the necessary information is computed on
-   * the fly.
-   */
-  template <typename ITERATOR>
-  void reinit (const ITERATOR &cell_iterator);
-
-  /**
    * For the transformation information stored in MappingInfo, this function
    * returns the index which belongs to the current cell as specified in @p
    * reinit. Note that MappingInfo has different fields for Cartesian cells,

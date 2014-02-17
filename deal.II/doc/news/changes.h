@@ -135,6 +135,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>New: There is now a class FEEvaluationDGP that implements matrix-free
+  evaluation routines by truncated tensor products for FE_DGP elements.
+  <br>
+  (Martin Kronbichler, 2014/02/17)
+
   <li>Changed: The InverseMatrixRichardson used to eat all exceptions
   that may have been produced by the underlying Richardson solver, leaving
   no trace that the underlying solver may have failed when you call functions
