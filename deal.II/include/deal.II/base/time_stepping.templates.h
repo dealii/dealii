@@ -341,7 +341,7 @@ namespace TimeStepping
         const double new_t = t+this->c[i]*delta_t;
         const double new_delta_t = this->a[i][i]*delta_t;
         newton_solve(std_cxx1x::bind(&ImplicitRungeKutta<VECTOR>::compute_residual,this,f,new_t,new_delta_t,
-                                     std_cxx1x::cref(old_y),std_cxx1x::_1,std::ref(f_stages[i]),std_cxx1x::_2),
+                                     std_cxx1x::cref(old_y),std_cxx1x::_1,std_cxx1x::ref(f_stages[i]),std_cxx1x::_2),
                      std_cxx1x::bind(id_minus_tau_J_inverse,new_t,new_delta_t,std_cxx1x::_1),y);
       }
   }
