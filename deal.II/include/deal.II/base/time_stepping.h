@@ -80,7 +80,7 @@ namespace TimeStepping
   public:
     /**
      * Purely virtual function. This function is used to advance from time @p
-     * t to p+ @p delta_t. @p F is a vector of functions \f$ f(t,y) \f$ that should be
+     * t to t+ @p delta_t. @p F is a vector of functions \f$ f(t,y) \f$ that should be
      * integrated, the input parameters are the time t and the vector y and the
      * output is value of f at this point. @p J_inverse is a vector
      * functions that compute the inverse of the Jacobians associated to the
@@ -125,7 +125,7 @@ namespace TimeStepping
     virtual void initialize(runge_kutta_method method) = 0;
     /**
      * This function is used to advance from time @p
-     * t to p+ @p delta_t. @p F is a vector of functions \f$ f(t,y) \f$ that should be
+     * t to t+ @p delta_t. @p F is a vector of functions \f$ f(t,y) \f$ that should be
      * integrated, the input parameters are the time t and the vector y and the
      * output is value of f at this point. @p J_inverse is a vector
      * functions that compute the inverse of the Jacobians associated to the
@@ -144,7 +144,7 @@ namespace TimeStepping
 
     /**
      * Purely virtual function. This function is used to advance from time @p t
-     * to p+ @p delta_t. @p f  is the function \f$ f(t,y) \f$ that should be
+     * to t+ @p delta_t. @p f  is the function \f$ f(t,y) \f$ that should be
      * integrated, the input parameters are the time t and the vector y and the
      * output is value of f at this point. @p id_minus_tau_J_inverse is a function
      * that computes \f$ inv(I-\tau J)\f$ where \f$ I \f$ is the identity matrix,
@@ -208,7 +208,7 @@ namespace TimeStepping
     void initialize(runge_kutta_method method);
 
     /**
-     * This function is used to advance from time @p t to p+ @p delta_t. @p f
+     * This function is used to advance from time @p t to t+ @p delta_t. @p f
      * is the function \f$ f(t,y) \f$ that should be integrated, the input
      * parameters are the time t and the vector y and the output is value of
      * f at this point. @p id_minus_tau_J_inverse is a function that computes
@@ -226,7 +226,7 @@ namespace TimeStepping
       VECTOR &y);
 
     /**
-     * This function is used to advance from time @p t to p+ @p delta_t.
+     * This function is used to advance from time @p t to t+ @p delta_t.
      * This function is similar to the one derived from RungeKutta, but
      * does not required id_minus_tau_J_inverse because it is not used for
      * explicit methods. evolve_one_time_step returns the time at the end of the
@@ -297,7 +297,7 @@ namespace TimeStepping
     void initialize(runge_kutta_method method);
 
     /**
-     * This function is used to advance from time @p t to p+ @p delta_t. @p f
+     * This function is used to advance from time @p t to t+ @p delta_t. @p f
      * is the function \f$ f(t,y) \f$ that should be integrated, the input
      * parameters are the time t and the vector y and the output is value of
      * f at this point. @p id_minus_tau_J_inverse is a function that computes
@@ -438,7 +438,7 @@ namespace TimeStepping
     void initialize(runge_kutta_method method);
 
     /**
-     * This function is used to advance from time @p t to p+ @p delta_t. @p f
+     * This function is used to advance from time @p t to t+ @p delta_t. @p f
      * is the function \f$ f(t,y) \f$ that should be integrated, the input
      * parameters are the time t and the vector y and the output is value of
      * f at this point. @p id_minus_tau_J_inverse is a function that computes
@@ -456,7 +456,7 @@ namespace TimeStepping
       VECTOR &y);
 
     /**
-     * This function is used to advance from time @p t to p+ @p delta_t.
+     * This function is used to advance from time @p t to t+ @p delta_t.
      * This function is similar to the one derived from TimeStepping, but
      * does not required id_minus_tau_J_inverse because it is not used for
      * explicit methods. evolve_one_time_step returns the time at the end of the
