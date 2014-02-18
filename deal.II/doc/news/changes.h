@@ -135,6 +135,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>New: There is a new namespace TimeStepping for the algorithms that do time 
+  integrations. In this new namespace, several Runge-Kutta methods have been 
+  implemented: explicit methods, implicit methods, and embedded explicit methods.
+  <br>
+  (Damien Lebrun-Grandie, Bruno Turcksin, 2014/02/17)
+
   <li>New: There is now a class FEEvaluationDGP that implements matrix-free
   evaluation routines by truncated tensor products for FE_DGP elements.
   <br>

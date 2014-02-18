@@ -1,0 +1,25 @@
+
+DEAL::Forward Euler
+DEAL::0
+DEAL::Runge-Kutta third order
+DEAL::0
+DEAL::Runge-Kutta fourth order
+DEAL::0
+DEAL::Backward Euler
+DEAL::0
+DEAL::Implicit midpoint
+DEAL::0
+DEAL::Crank-Nicolson
+DEAL::0
+DEAL::SDIRK
+DEAL::0
+DEAL::Heun-Euler
+DEAL::0
+DEAL::Bogacki-Shampine
+DEAL::0
+DEAL::DOPRI
+DEAL::0
+DEAL::Fehlberg
+DEAL::0
+DEAL::Cash-Karp
+DEAL::0
