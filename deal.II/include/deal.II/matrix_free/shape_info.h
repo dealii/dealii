@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/vectorization.h>
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/fe/fe.h>
 
 #include <deal.II/matrix_free/helper_functions.h>

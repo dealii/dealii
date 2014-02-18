@@ -21,6 +21,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/vectorization.h>
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
