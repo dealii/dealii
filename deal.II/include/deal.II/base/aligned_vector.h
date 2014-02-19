@@ -288,9 +288,13 @@ namespace internal
     virtual void apply_to_subrange (const std::size_t begin,
                                     const std::size_t end) const
     {
-      // for classes trivial assignment can use memcpy
+      // for classes trivial assignment can use memcpy. cast element to
+      // (void*) to silence compiler warning for virtual classes (they will
+      // never arrive here because they are non-trivial).
+
       if (std_cxx1x::is_trivial<T>::value == true)
-        std::memcpy (destination_+begin, source_+begin, (end-begin)*sizeof(T));
+        std::memcpy ((void*)(destination_+begin), source_+begin,
+                     (end-begin)*sizeof(T));
       else if (copy_only_ == false)
         for (std::size_t i=begin; i<end; ++i)
           {
@@ -339,7 +343,10 @@ namespace internal
       if (std_cxx1x::is_trivial<T>::value == true)
         {
           const unsigned char zero [sizeof(T)] = {};
-          if (std::memcmp(zero, &element, sizeof(T)) == 0)
+          // cast element to (void*) to silence compiler warning for virtual
+          // classes (they will never arrive here because they are
+          // non-trivial).
+          if (std::memcmp(zero, (void*)&element, sizeof(T)) == 0)
             trivial_element = true;
         }
       if (size < minimum_parallel_grain_size)
@@ -356,9 +363,12 @@ namespace internal
     virtual void apply_to_subrange (const std::size_t begin,
                                     const std::size_t end) const
     {
-      // for classes with trivial assignment of zero can use memset
+      // for classes with trivial assignment of zero can use memset. cast
+      // element to (void*) to silence compiler warning for virtual
+      // classes (they will never arrive here because they are
+      // non-trivial).
       if (std_cxx1x::is_trivial<T>::value == true && trivial_element)
-        std::memset (destination_+begin, 0, (end-begin)*sizeof(T));
+        std::memset ((void*)(destination_+begin), 0, (end-begin)*sizeof(T));
       else
         // initialize memory and set
         for (std::size_t i=begin; i<end; ++i)
