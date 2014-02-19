@@ -135,8 +135,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li>New: There is a new namespace TimeStepping for the algorithms that do time 
-  integrations. In this new namespace, several Runge-Kutta methods have been 
+  <li>Fixed: There was an indexing error in GridIn::read_vtk() that triggered
+  for some input files. This is now fixed.
+  <br>
+  (Mayank Sabharwal, 2014/02/19)
+
+  <li>New: There is a new namespace TimeStepping for the algorithms that do time
+  integrations. In this new namespace, several Runge-Kutta methods have been
   implemented: explicit methods, implicit methods, and embedded explicit methods.
   <br>
   (Damien Lebrun-Grandie, Bruno Turcksin, 2014/02/17)
