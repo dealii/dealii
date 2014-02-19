@@ -2,15 +2,29 @@
                  "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II news page</title>
+
+  <link href="../screen.css" rel="StyleSheet">
+
   <meta name="copyright" content="Copyright (C) 2000 - 2013 by the deal.II Authors">
   <meta name="date" content="$Date$">
   <meta name="keywords" content="deal.II">
   <meta name="svn_id" content="$Id$">
-</head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!- Include stylesheets ->
+  <link href="/mockup/htdocs/css/bootstrap.min.css" type="text/css" rel="stylesheet"/>
+  <link href="/mockup/htdocs/css/global.less" type="text/less" rel="stylesheet"/>
+  <link href="/mockup/htdocs/css/index.less" type="text/less" rel="stylesheet"/>
+
+  <!- LESS needs to come after the stylesheets ->
+  <script src="/mockup/htdocs/js/less-1.4.1.min.js"></script>
+</head>
+  
 <body>
+
+<!--#include virtual="/mockup/htdocs/header.include" -->
+
     <h2>News on <acronym>deal.II</acronym></h2>
 
     <p>
@@ -983,4 +997,8 @@
 
 
 </body>
+  <!- Some JQuery needs to come after the body ->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/accordion.js"></script>
 </html>

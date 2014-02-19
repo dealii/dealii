@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013-2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,6 +42,7 @@ void sub_test()
     if (cell->center().norm()<0.5)
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
+#ifndef DEBUG
   if (dim < 3 || fe_degree < 2)
     tria.refine_global(1);
   tria.begin(tria.n_levels()-1)->set_refine_flag();
@@ -51,6 +52,7 @@ void sub_test()
     tria.refine_global(2);
   else
     tria.refine_global(1);
+#endif
 
   FE_Q<dim> fe (fe_degree);
   DoFHandler<dim> dof (tria);

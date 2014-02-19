@@ -38,9 +38,12 @@ template<typename number> class SparseMatrix;
  * quadratic matrices #m1 and #m2 of arbitrary types and implements
  * matrix-vector multiplications for the product
  * <i>M<sub>1</sub>M<sub>2</sub></i> by performing multiplication with
- * both factors consecutively.
+ * both factors consecutively. Because the types of the matrices are
+ * opaque (i.e., they can be arbitrary), you can stack products of three
+ * or more matrices by making one of the two matrices an object of the
+ * current type handles be a ProductMatrix itself.
  *
- * Here an example multiplying two different FullMatrix objects:
+ * Here is an example multiplying two different FullMatrix objects:
  * @include product_matrix.cc
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
@@ -76,6 +79,11 @@ public:
                 VectorMemory<VECTOR> &mem);
 
   /**
+   * Destructor.
+   */
+  ~ProductMatrix();
+
+  /**
    * Change the matrices.
    */
   template <class MATRIX1, class MATRIX2>
@@ -88,11 +96,6 @@ public:
   void initialize(const MATRIX1 &m1, const MATRIX2 &m2,
                   VectorMemory<VECTOR> &mem);
 
-  /**
-   * Destructor.
-   */
-  ~ProductMatrix();
-
   // Doc in PointerMatrixBase
   void clear();
 
@@ -104,7 +107,7 @@ public:
                       const VECTOR &v) const;
 
   /**
-   * Tranposed matrix-vector
+   * Transposed matrix-vector
    * product <i>w = m2<sup>T</sup> *
    * m1<sup>T</sup> * v</i>.
    */
@@ -119,7 +122,7 @@ public:
                           const VECTOR &v) const;
 
   /**
-   * Adding, tranposed
+   * Adding, transposed
    * matrix-vector product <i>w +=
    * m2<sup>T</sup> *
    * m1<sup>T</sup> * v</i>.
@@ -142,19 +145,15 @@ private:
    * Memory for auxiliary vector.
    */
   SmartPointer<VectorMemory<VECTOR>,ProductMatrix<VECTOR> > mem;
-  /**
-   * Return some kind of
-   * identifier.
-   */
-  virtual const void *get() const;
 };
 
 
 /**
- * A matrix that is the scaled version of another matrix.
+ * A matrix that is the multiple of another matrix.
  *
  * Matrix-vector products of this matrix are composed of those of the
- * original matrix and scaling by a constant factor.
+ * original matrix with the vector and then scaling of the result by
+ * a constant factor.
  *
  * @author Guido Kanschat, 2007
  */
@@ -185,7 +184,7 @@ public:
   void initialize (const MATRIX &M, const double factor);
 
   /**
-   * Delete internal matrix pointer.
+   * Reset the object to its original state.
    */
   void clear ();
 
@@ -252,7 +251,7 @@ public:
 
   /**
    * Constructor leaving an
-   * unitialized
+   * uninitialized
    * matrix. initialize() must be
    * called, before the matrix can
    * be used.
@@ -274,7 +273,7 @@ public:
                       const VectorType &v) const;
 
   /**
-   * Tranposed matrix-vector
+   * Transposed matrix-vector
    * product <i>w = m2<sup>T</sup> *
    * m1<sup>T</sup> * v</i>.
    */
@@ -289,7 +288,7 @@ public:
                           const VectorType &v) const;
 
   /**
-   * Adding, tranposed
+   * Adding, transposed
    * matrix-vector product <i>w +=
    * m2<sup>T</sup> *
    * m1<sup>T</sup> * v</i>.
@@ -312,11 +311,6 @@ private:
    * Memory for auxiliary vector.
    */
   SmartPointer<VectorMemory<VectorType>,ProductSparseMatrix<number,vector_number>  > mem;
-  /**
-   * Return some kind of
-   * identifier.
-   */
-  virtual const void *get() const;
 };
 
 
@@ -325,6 +319,16 @@ private:
  * out mean values of the vector.  If the vector is of type
  * BlockVector, then an additional parameter selects a single
  * component for this operation.
+ *
+ * In mathematical terms, this class acts as if it was the matrix
+ * $I-\frac 1n{\mathbf 1}_n{\mathbf 1}_n^T$ where ${\mathbf 1}_n$ is
+ * a vector of size $n$ that has only ones as its entries. Thus,
+ * taking the dot product between a vector $\mathbf v$ and
+ * $\frac 1n {\mathbf 1}_n$ yields the <i>mean value</i> of the entries
+ * of ${\mathbf v}$. Consequently,
+ * $ \left[I-\frac 1n{\mathbf 1}_n{\mathbf 1}_n^T\right] \mathbf v
+ * = \mathbf v - \left[\frac 1n \mathbf v} \cdot {\mathbf 1}_n\right]{\mathbf 1}_n$
+ * subtracts from every vector element the mean value of all elements.
  *
  * @author Guido Kanschat, 2002, 2003
  */
@@ -340,7 +344,7 @@ public:
    * Constructor, optionally
    * selecting a component.
    */
-  MeanValueFilter(size_type component = numbers::invalid_size_type);
+  MeanValueFilter(const size_type component = numbers::invalid_size_type);
 
   /**
    * Subtract mean value from @p v.
@@ -405,21 +409,35 @@ private:
   /**
    * Component for filtering block vectors.
    */
-  size_type component;
+  const size_type component;
 };
 
 
 
 /**
- * Inverse matrix computed approximately by using the SolverRichardson
- * iterative solver. In particular, the function
- * SolverRichardson::Tsolve() allows for the implementation of
- * transpose matrix vector products.
+ * Objects of this type represent the inverse of a matrix as
+ * computed approximately by using the SolverRichardson
+ * iterative solver. In other words, if you set up an object
+ * of the current type for a matrix $A$, then calling the
+ * vmult() function with arguments $v,w$ amounts to setting
+ * $w=A^{-1}v$ by solving the linear system $Aw=v$ using the
+ * Richardson solver with a preconditioner that can be chosen. Similarly,
+ * this class allows to also multiple with the transpose of the
+ * inverse (i.e., the inverse of the transpose) using the function
+ * SolverRichardson::Tsolve().
  *
- * The functions vmult() and Tvmult() appoximate the inverse
+ * The functions vmult() and Tvmult() approximate the inverse
  * iteratively starting with the vector <tt>dst</tt>. Functions
  * vmult_add() and Tvmult_add() start the iteration with a zero
- * vector.
+ * vector. All of the matrix-vector multiplication functions
+ * expect that the Richardson solver with the given preconditioner
+ * actually converge. If the Richardson solver does not converge
+ * within the specified number of iterations, the exception that will
+ * result in the solver will simply be propagated to the caller of
+ * the member function of the current class.
+ *
+ * @note A more powerful version of this class is provided by the
+ * IterativeInverse class.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
@@ -722,13 +740,6 @@ ProductMatrix<VECTOR>::Tvmult_add (VECTOR &dst, const VECTOR &src) const
   mem->free(v);
 }
 
-
-template<class VECTOR>
-const void *
-ProductMatrix<VECTOR>::get () const
-{
-  return (void *) m1;
-}
 
 
 //---------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,7 @@ namespace internal
     UpdateFlags
     MappingInfo<dim,Number>::
     compute_update_flags (const UpdateFlags update_flags,
-                          const std::vector<dealii::hp::QCollection<1> > &quad) const
+                          const std::vector<dealii::hp::QCollection<1> > &quad)
     {
       // this class is build around the evaluation this class is build around
       // the evaluation of inverse gradients, so compute them in any case
@@ -89,22 +89,23 @@ namespace internal
       // one quadrature point on the first component, but more points on later
       // components, we need to have Jacobian gradients anyway in order to
       // determine whether the Jacobian is constant throughout a cell
-      bool formula_with_one_point = false;
-      for (unsigned int i=0; i<quad[0].size(); ++i)
-        if (quad[0][i].size() == 1)
-          {
-            formula_with_one_point = true;
-            break;
-          }
-      if (formula_with_one_point == true)
-        for (unsigned int comp=1; comp<quad.size(); ++comp)
-          for (unsigned int i=0; i<quad[comp].size(); ++i)
-            if (quad[comp][i].size() > 1)
+      if (quad.empty() == false)
+        {
+          bool formula_with_one_point = false;
+          for (unsigned int i=0; i<quad[0].size(); ++i)
+            if (quad[0][i].size() == 1)
               {
-                new_flags |= update_jacobian_grads;
-                goto end_set;
+                formula_with_one_point = true;
+                break;
               }
-end_set:
+          if (formula_with_one_point == true)
+            for (unsigned int comp=1; comp<quad.size(); ++comp)
+              for (unsigned int i=0; i<quad[comp].size(); ++i)
+                if (quad[comp][i].size() > 1)
+                  {
+                    new_flags |= update_jacobian_grads;
+                  }
+        }
       return new_flags;
     }
 

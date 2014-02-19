@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/vectorization.h>
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/fe/fe.h>
 
 #include <deal.II/matrix_free/helper_functions.h>
@@ -50,6 +51,14 @@ namespace internal
       ShapeInfo ();
 
       /**
+       * Constructor that initializes the data fields using the reinit method.
+       */
+      template <int dim>
+      ShapeInfo (const Quadrature<1> &quad,
+                 const FiniteElement<dim> &fe,
+                 const unsigned int base_element = 0);
+
+      /**
        * Initializes the data fields. Takes a one-dimensional quadrature
        * formula and a finite element as arguments and evaluates the shape
        * functions, gradients and Hessians on the one-dimensional unit
@@ -59,7 +68,8 @@ namespace internal
        */
       template <int dim>
       void reinit (const Quadrature<1> &quad,
-                   const FiniteElement<dim> &fe_dim);
+                   const FiniteElement<dim> &fe_dim,
+                   const unsigned int base_element = 0);
 
       /**
        * Returns the memory consumption of this
@@ -169,6 +179,35 @@ namespace internal
        */
       unsigned int dofs_per_face;
     };
+
+
+    /**
+     * Extracts the mapping between the actual numbering inside a scalar
+     * element and lexicographic numbering as required by the evaluation
+     * routines.
+     */
+    template <int dim>
+    std::vector<unsigned int>
+    get_lexicographic_numbering_inverse (const FiniteElement<dim> &fe);
+
+
+
+    // ------------------------------------------ inline functions
+
+    template <typename Number>
+    template <int dim>
+    inline
+    ShapeInfo<Number>::ShapeInfo (const Quadrature<1> &quad,
+                                  const FiniteElement<dim> &fe_in,
+                                  const unsigned int base_element_number)
+      :
+      n_q_points (0),
+      dofs_per_cell (0)
+    {
+      reinit (quad, fe_in, base_element_number);
+    }
+
+
 
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal

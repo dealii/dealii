@@ -1,0 +1,44 @@
+// ---------------------------------------------------------------------
+// $Id: time_stepping.inst.in 30049 2013-07-18 19:42:40Z maier $
+//
+// Copyright (C) 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
+{
+  template class ExplicitRungeKutta<V<S> >;
+  template class ImplicitRungeKutta<V<S> >;
+  template class EmbeddedExplicitRungeKutta<V<S> >;
+}
+
+for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
+{
+  template class ExplicitRungeKutta<parallel::distributed::V<S> >;
+  template class ImplicitRungeKutta<parallel::distributed::V<S> >;
+  template class EmbeddedExplicitRungeKutta<parallel::distributed::V<S> >;
+}
+
+for (V : EXTERNAL_SEQUENTIAL_VECTORS)
+{
+  template class ExplicitRungeKutta<V>;
+  template class ImplicitRungeKutta<V>;
+  template class EmbeddedExplicitRungeKutta<V>;
+}
+
+for (V : EXTERNAL_PARALLEL_VECTORS)
+{
+  template class ExplicitRungeKutta<V>;
+  template class ImplicitRungeKutta<V>;
+  template class EmbeddedExplicitRungeKutta<V>;
+}

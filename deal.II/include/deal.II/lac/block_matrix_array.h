@@ -301,18 +301,49 @@ public:
    * Print the block structure as a
    * LaTeX-array. This output will
    * not be very intuitive, since
-   * the matrix object lacks
-   * important information. What
-   * you see is an entry for each
+   * the current object lacks
+   * knowledge about what the individual blocks represent or
+   * how they should be named. Instead, what
+   * you will see is an entry for each
    * block showing all the matrices
-   * with their multiplicaton
+   * with their multiplication
    * factors and possibly transpose
-   * mark. The matrices itself are
-   * numbered successively upon
-   * being entred. If the same
+   * marks. The matrices itself are
+   * named successively as they are encountered. If the same
    * matrix is entered several
    * times, it will be listed with
-   * the same number everytime.
+   * different names.
+   *
+   * As an example, consider the following code:
+   * @code
+   *   FullMatrix<double> A1(4,4);
+   *  FullMatrix<double> A2(4,4);
+   *  FullMatrix<double> B(4,3);
+   *  FullMatrix<double> C(3,3);
+   *
+   *  BlockMatrixArray<double> block(2,2);
+   *
+   *  block.enter(A1,0,0);
+   *  block.enter(A2,0,0,2,true);
+   *  block.enter(B,0,1,-3.);
+   *  block.enter(B,0,1,-3.,true);
+   *  block.enter(C,1,1,1.,true);
+   *
+   *  block.print_latex(std::cout);
+   * @endcode
+   * The current function will then produce output of the following
+   * kind:
+   * @code
+   * \begin{array}{cc}
+   *    M0+2xM1^T &     -3xM2-3xM3^T\\
+   *    &      M4^T
+   * \end{array}
+   * @endcode
+   * Note how the individual blocks here are just numbered successively
+   * as <code>M0</code> to <code>M4</code> and that the output misses
+   * the fact that <code>M2</code> and <code>M3</code> are, in fact,
+   * the same matrix. Nevertheless, the output at least gives some
+   * kind of idea of the block structure of this matrix.
    */
   template <class STREAM>
   void print_latex (STREAM &out) const;
@@ -713,17 +744,6 @@ BlockMatrixArray<number>::enter_aux (
 }
 
 
-template<typename number>
-struct BlockMatrixArrayPointerMatrixLess
-{
-  bool operator () (const PointerMatrixBase<Vector<number> > *a,
-                    const PointerMatrixBase<Vector<number> > *b) const
-  {
-    return *a < *b;
-  }
-};
-
-
 template <typename number>
 template <class STREAM>
 inline
@@ -736,8 +756,7 @@ BlockMatrixArray<number>::print_latex (STREAM &out) const
 
   Table<2,std::string> array(n_block_rows(), n_block_cols());
 
-  typedef std::map<const PointerMatrixBase<Vector<number> > *,
-          std::string, BlockMatrixArrayPointerMatrixLess<number> > NameMap;
+  typedef std::map<const PointerMatrixBase<Vector<number> > *, std::string> NameMap;
   NameMap matrix_names;
 
   typename std::vector<Entry>::const_iterator m = entries.begin();
@@ -776,7 +795,12 @@ BlockMatrixArray<number>::print_latex (STREAM &out) const
       {
         out << '\t' << array(i,j);
         if (j==n_block_cols()-1)
-          out << "\\\\" << std::endl;
+          {
+            if (i != n_block_rows() - 1)
+              out << "\\\\" << std::endl;
+            else
+              out << std::endl;
+          }
         else
           out << " &";
       }

@@ -111,9 +111,9 @@ check ()
   // we pick only subdomain==0 which will
   // skip the first of the four cells
   FilteredDataOut<dim> data_out(0);
-  data_out.attach_dof_handler (dof_handler);
+  data_out.attach_dof_handler(dof_handler);
 
-  data_out.add_data_vector (cell_data, "cell_data");
+  data_out.add_data_vector (cell_data, "cell_data", DataOut<dim>::type_cell_data);
   data_out.build_patches ();
 
   data_out.write_deal_II_intermediate (deallog.get_file_stream());

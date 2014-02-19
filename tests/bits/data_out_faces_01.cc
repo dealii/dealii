@@ -42,8 +42,8 @@ my_check_this (const DoFHandler<dim> &dof_handler,
 {
   DataOutFaces<dim> data_out_faces;
   data_out_faces.attach_dof_handler (dof_handler);
-  data_out_faces.add_data_vector (v_node, "node_data");
-  data_out_faces.add_data_vector (v_cell, "cell_data");
+  data_out_faces.add_data_vector (v_node, "node_data", DataOutFaces<dim>::type_dof_data);
+  data_out_faces.add_data_vector (v_cell, "cell_data", DataOutFaces<dim>::type_cell_data);
   data_out_faces.build_patches ();
 
   data_out_faces.write_dx (deallog.get_file_stream());

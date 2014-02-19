@@ -1046,14 +1046,14 @@ public:
    * yourself, you should also rename this function to avoid programs relying
    * on outdated information!
    *
-   * @internal @deprecated Use iterator or const_iterator instead!
+   * @deprecated Use iterator or const_iterator instead!
    */
   number global_entry (const size_type i) const DEAL_II_DEPRECATED;
 
   /**
    * Same as above, but with write access.  You certainly know what you do?
    *
-   * @internal @deprecated Use iterator or const_iterator instead!
+   * @deprecated Use iterator or const_iterator instead!
    */
   number &global_entry (const size_type i) DEAL_II_DEPRECATED;
 

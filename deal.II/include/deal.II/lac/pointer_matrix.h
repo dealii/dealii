@@ -78,47 +78,9 @@ public:
   virtual ~PointerMatrixBase ();
 
   /**
-   * Reset pointer and release the
-   * matrix pointed to.
+   * Reset the object to its original state.
    */
   virtual void clear () = 0;
-
-  /**
-   * Find out if two matrices point
-   * to the same object.
-   */
-  bool operator == (const PointerMatrixBase<VECTOR> &) const;
-
-  /**
-   * Find out if two matrices do
-   * not point to the same object.
-   */
-  bool operator != (const PointerMatrixBase<VECTOR> &) const;
-
-  /**
-   * Find out if this pointer is
-   * less.
-   */
-  bool operator < (const PointerMatrixBase<VECTOR> &) const;
-
-  /**
-   * Find out if this pointer is
-   * less or equal.
-   */
-  bool operator <= (const PointerMatrixBase<VECTOR> &) const;
-
-  /**
-   * Find out if this pointer is
-   * greater.
-   */
-  bool operator > (const PointerMatrixBase<VECTOR> &) const;
-
-  /**
-   * Find out if this pointer is
-   * greater or equal.
-   */
-  bool operator >= (const PointerMatrixBase<VECTOR> &) const;
-
 
   /**
    * Matrix-vector product.
@@ -127,7 +89,7 @@ public:
                       const VECTOR &src) const = 0;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   virtual void Tvmult (VECTOR &dst,
                        const VECTOR &src) const = 0;
@@ -140,17 +102,11 @@ public:
                           const VECTOR &src) const = 0;
 
   /**
-   * Tranposed matrix-vector product,
+   * Transposed matrix-vector product,
    * adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
                            const VECTOR &src) const = 0;
-
-private:
-  /**
-   * Get the pointer for comparison.
-   */
-  virtual const void *get() const = 0;
 };
 
 /**
@@ -222,7 +178,7 @@ public:
                       const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   virtual void Tvmult (VECTOR &dst,
                        const VECTOR &src) const;
@@ -235,19 +191,13 @@ public:
                           const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product,
+   * Transposed matrix-vector product,
    * adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
                            const VECTOR &src) const;
 
 private:
-  /**
-   * Return the address of the
-   * matrix for comparison.
-   */
-  virtual const void *get() const;
-
   /**
    * The pointer to the actual matrix.
    */
@@ -344,7 +294,7 @@ public:
                       const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product.
+   * Transposed matrix-vector product.
    */
   virtual void Tvmult (VECTOR &dst,
                        const VECTOR &src) const;
@@ -357,19 +307,13 @@ public:
                           const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product,
+   * Transposed matrix-vector product,
    * adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
                            const VECTOR &src) const;
 
 private:
-  /**
-   * Return the address of the
-   * matrix for comparison.
-   */
-  virtual const void *get() const;
-
   /**
    * The backup memory if none was provided.
    */
@@ -468,7 +412,7 @@ public:
                       const Vector<number> &src) const;
 
   /**
-   * Tranposed matrix-vector
+   * Transposed matrix-vector
    * product, actually the
    * multiplication of the vector
    * representing this matrix with
@@ -497,7 +441,7 @@ public:
                           const Vector<number> &src) const;
 
   /**
-   * Tranposed matrix-vector product,
+   * Transposed matrix-vector product,
    * adding to <tt>dst</tt>.
    *
    * The dimension of <tt>src</tt>
@@ -510,12 +454,6 @@ public:
                            const Vector<number> &src) const;
 
 private:
-  /**
-   * Return the address of the
-   * matrix for comparison.
-   */
-  virtual const void *get() const;
-
   /**
    * The pointer to the actual matrix.
    */
@@ -688,65 +626,6 @@ PointerMatrixBase<VECTOR>::~PointerMatrixBase ()
 
 
 
-template<class VECTOR>
-inline
-bool
-PointerMatrixBase<VECTOR>::operator == (const PointerMatrixBase<VECTOR> &other) const
-{
-  return (get() == other.get());
-}
-
-
-
-template<class VECTOR>
-inline
-bool
-PointerMatrixBase<VECTOR>::operator != (const PointerMatrixBase<VECTOR> &other) const
-{
-  return (get() != other.get());
-}
-
-
-
-template<class VECTOR>
-inline
-bool
-PointerMatrixBase<VECTOR>::operator < (const PointerMatrixBase<VECTOR> &other) const
-{
-  return (get() < other.get());
-}
-
-
-
-template<class VECTOR>
-inline
-bool
-PointerMatrixBase<VECTOR>::operator <= (const PointerMatrixBase<VECTOR> &other) const
-{
-  return (get() <= other.get());
-}
-
-
-
-template<class VECTOR>
-inline
-bool
-PointerMatrixBase<VECTOR>::operator > (const PointerMatrixBase<VECTOR> &other) const
-{
-  return (get() > other.get());
-}
-
-
-
-template<class VECTOR>
-inline
-bool
-PointerMatrixBase<VECTOR>::operator >= (const PointerMatrixBase<VECTOR> &other) const
-{
-  return (get() >= other.get());
-}
-
-
 //----------------------------------------------------------------------//
 
 
@@ -835,13 +714,6 @@ PointerMatrix<MATRIX, VECTOR>::Tvmult_add (VECTOR &dst,
   m->Tvmult_add (dst, src);
 }
 
-
-template<class MATRIX, class VECTOR>
-inline const void *
-PointerMatrix<MATRIX, VECTOR>::get () const
-{
-  return m;
-}
 
 
 //----------------------------------------------------------------------//
@@ -977,14 +849,6 @@ PointerMatrixAux<MATRIX, VECTOR>::Tvmult_add (VECTOR &dst,
 }
 
 
-template<class MATRIX, class VECTOR>
-inline const void *
-PointerMatrixAux<MATRIX, VECTOR>::get () const
-{
-  return m;
-}
-
-
 //----------------------------------------------------------------------//
 
 
@@ -1084,15 +948,6 @@ PointerMatrixVector<number>::Tvmult_add (
 
   dst.add (src(0), *m);
 }
-
-
-template<typename number>
-inline const void *
-PointerMatrixVector<number>::get () const
-{
-  return m;
-}
-
 
 
 DEAL_II_NAMESPACE_CLOSE

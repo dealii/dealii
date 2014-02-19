@@ -472,7 +472,15 @@ SmartPointer<T,P>::memory_consumption () const
 
 
 
-
+// The following function is not strictly necessary but is an optimization
+// for places where you call swap(p1,p2) with SmartPointer objects p1, p2.
+// Unfortunately, MS Visual Studio (at least up to the 2013 edition) trips
+// over it when calling std::swap(v1,v2) where v1,v2 are std::vectors of
+// SmartPointer objects: it can't determine whether it should call std::swap
+// or dealii::swap on the individual elements (see bug #184 on our Google Code
+// site. Consequently, just take this function out of the competition for this
+// compiler.
+#ifndef _MSC_VER
 /**
  * Global function to swap the contents of two smart pointers. As both
  * objects to which the pointers point retain to be subscribed to, we
@@ -484,7 +492,7 @@ void swap (SmartPointer<T,P> &t1, SmartPointer<T,Q> &t2)
 {
   t1.swap (t2);
 }
-
+#endif
 
 
 /**

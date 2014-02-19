@@ -23,7 +23,7 @@
 #include <fstream>
 #include <cmath>
 
-#include <deal.II/base/vectorization.h>
+#include <deal.II/base/aligned_vector.h>
 
 
 void test ()

@@ -2417,45 +2417,26 @@ namespace hp
 
 
 
-  template <>
-  void
-  DoFHandler<1>::
-  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
-  {}
-
-  template <>
-  void
-  DoFHandler<1,2>::
-  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
-  {}
-
-  template <>
-  void
-  DoFHandler<1,3>::
-  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
-  {}
-
-  template <>
-  void
-  DoFHandler<2>::
-  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
-  {}
-
-
-
-  template <>
-  void
-  DoFHandler<2,3>::
-  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
-  {}
-
-
-
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
+  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
+  {
+    // this function should only be called for dim<3 where there are
+    // no quad dof identies. for dim>=3, the specialization below should
+    // take care of it
+    Assert (dim < 3, ExcInternalError());
+  }
+
+
+  template <>
+  void
+  DoFHandler<3,3>::
   compute_quad_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const
   {
+    const int dim = 3;
+    const int spacedim = 3;
+
     // we will mark quads that we
     // have already treated, so first
     // save and clear the user flags

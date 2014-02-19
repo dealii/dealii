@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 /**
-// * @page changes_after_8_1 Changes after Version 8.1
+@page changes_after_8_1 Changes after Version 8.1
 
 <p>
 This is the list of changes made after the release of
@@ -40,6 +40,17 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: Class PointerMatrixBase (and, consequently, the various
+  classes derived from it) had comparison operators that were intended to
+  work generically for any kind of derived class. However, the implementation
+  used a scheme that was not robust enough to handle the various situations
+  that derived classes implemented and, consequently, was not always correct.
+  These operators were not previously used inside the library and, likely,
+  were not widely used in applications either. They have now been removed.
+  <br>
+  (Wolfgang Bangerth, 2014/02/15)
+  </li>
+
   <li> Changed: The various classes generating graphical output, such
   as DataOut or DataOutStack, are all derived from a common interface
   class DataOutInterface which, in turn was derived from DataOutBase
@@ -124,6 +135,46 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>New: There is a new namespace TimeStepping for the algorithms that do time 
+  integrations. In this new namespace, several Runge-Kutta methods have been 
+  implemented: explicit methods, implicit methods, and embedded explicit methods.
+  <br>
+  (Damien Lebrun-Grandie, Bruno Turcksin, 2014/02/17)
+
+  <li>New: There is now a class FEEvaluationDGP that implements matrix-free
+  evaluation routines by truncated tensor products for FE_DGP elements.
+  <br>
+  (Martin Kronbichler, 2014/02/17)
+
+  <li>Changed: The InverseMatrixRichardson used to eat all exceptions
+  that may have been produced by the underlying Richardson solver, leaving
+  no trace that the underlying solver may have failed when you call functions
+  such as InverseMatrixRichardson::vmult(). These exceptions are now propagated
+  out to the caller.
+  <br>
+  (Wolfgang Bangerth, 2014/02/16)
+
+
+  <li>New: FE_TraceQ implements finite elements on faces, which
+  correspond to the traces of H<sup>1</sup>-conforming elements.
+  <br>
+  (Angela Klewinghaus, 2014/02/14)
+
+  <li>New: FE_FaceQ and FE_FaceP now also work in 1D (with a single dof
+  on each vertex).
+  <br>
+  (Martin Kronbichler, 2014/02/11)
+
+  <li>Fixed: FE_DGQ::has_support_on_face returned a wrong number for element
+  degree larger than 1 in 1D. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/02/10)
+
+  <li>Changed: DerivativeApproximation used to be a class that only had
+  static members. It is now a namespace.
+  <br>
+  (Wolfgang Bangerth, 2014/02/08)
+
   <li>New: ThreadLocalStorage::clear() clears out all objects allocated on the
   current and all other threads.
   <br>
@@ -172,7 +223,7 @@ inconvenience this causes.
   (Matthias Maier, 2014/02/01)
 
   <li>New/fixed: The ParameterHandler::print_parameters_section
-  method not worked for XML output. There is now a flag
+  method did not work for XML output. There is now a flag
   include_top_level_elements which prints all higher
   subsection elements, default is false.
   For XML output setting this flag to true is required

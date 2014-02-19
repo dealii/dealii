@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013-2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,12 +52,14 @@ void test ()
     if (cell->center().norm()<0.2)
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
+#ifndef DEBUG
   if (dim < 3 || fe_degree < 2)
     tria.refine_global(1);
   tria.begin(tria.n_levels()-1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   tria.refine_global(4-dim);
+#endif
   cell = tria.begin_active ();
   for (unsigned int i=0; i<10-3*dim; ++i)
     {

@@ -387,7 +387,7 @@ namespace Utilities
 
 
     /**
-     * Fills the @param stats structure with
+     * Fills the @p stats structure with
      * information about the memory
      * consumption of this process. This is
      * only implemented on Linux.

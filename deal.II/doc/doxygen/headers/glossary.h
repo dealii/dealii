@@ -588,7 +588,7 @@
  * is a vector of expension coefficients. Because we don't know their values
  * yet (we will compute them as the solution of a linear or nonlinear system),
  * they are called "unknowns" or "degrees of freedom". The second meaning of
- * the term con be explained as follows: A mathematical description of finite
+ * the term can be explained as follows: A mathematical description of finite
  * element problem is often to say that we are looking for a finite
  * dimensional function $u_h \in V_h$ that satisfies some set of equations
  * (e.g. $a(u_h,\varphi_h)=(f,\varphi_h)$ for all test functions $\varphi_h\in

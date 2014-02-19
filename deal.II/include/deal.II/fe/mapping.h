@@ -208,12 +208,15 @@ enum MappingType
  * <h3>References</h3>
  *
  * A general publication on differential geometry and finite elements
- * is the survey <ul><li>Douglas N. Arnold, Richard S. Falk, and
+ * is the survey
+ * <ul>
+ * <li>Douglas N. Arnold, Richard S. Falk, and
  * Ragnar Winther. <i>Finite element exterior calculus: from
  * Hodge theory to numerical stability.</i>
  * Bull. Amer. Math. Soc. (N.S.), 47:281-354, 2010. <a
  * href="http://dx.doi.org/10.1090/S0273-0979-10-01278-4">DOI:
- * 10.1090/S0273-0979-10-01278-4</a>.</ul>
+ * 10.1090/S0273-0979-10-01278-4</a>.
+ * </ul>
  *
  * The description of the Piola transform has been taken from the <a
  * href="http://www.math.uh.edu/~rohop/spring_05/downloads/">lecture

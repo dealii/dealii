@@ -977,7 +977,8 @@ next_cell:
         // is for.
         if (!found && cells_searched < n_cells)
           {
-            find_active_cell_around_point_internal(container, searched_cells, adjacent_cells);
+            find_active_cell_around_point_internal<dim,Container,spacedim>
+            (container, searched_cells, adjacent_cells);
           }
       }
 
@@ -1098,7 +1099,8 @@ next_cell:
             // the cells in adjacent_cells.
             if (!found && cells_searched < n_cells)
               {
-                find_active_cell_around_point_internal(container, searched_cells, adjacent_cells);
+                find_active_cell_around_point_internal<dim,hp::DoFHandler,spacedim>
+                (container, searched_cells, adjacent_cells);
               }
 
           }
