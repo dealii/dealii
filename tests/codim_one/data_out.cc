@@ -67,8 +67,7 @@ void test(std::string filename)
     numbering(i) = i;
 
   DataOut<dim, DoFHandler<dim,spacedim> > dataout;
-  dataout.attach_dof_handler(dof_handler);
-  dataout.add_data_vector(numbering, "numbering");
+  dataout.add_data_vector(dof_handler, numbering, "numbering");
   dataout.build_patches();
   dataout.write_vtk(logfile);
 }

@@ -39,8 +39,8 @@ check_this (const DoFHandler<dim> &dof_handler,
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (v_node, "node_data");
-  data_out.add_data_vector (v_cell, "cell_data");
+  data_out.add_data_vector (v_node, "node_data", DataOut<dim>::type_dof_data);
+  data_out.add_data_vector (v_cell, "cell_data", DataOut<dim>::type_cell_data);
   data_out.build_patches ();
 
   data_out.write_dx (deallog.get_file_stream());

@@ -85,8 +85,8 @@ my_check_this (const DoFHandler<dim> &dof_handler,
 {
   XDataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (v_node, "node_data");
-  data_out.add_data_vector (v_cell, "cell_data");
+  data_out.add_data_vector (v_node, "node_data", XDataOut<dim>::type_dof_data);
+  data_out.add_data_vector (v_cell, "cell_data", XDataOut<dim>::type_cell_data);
   data_out.build_patches (4);
 
   {
