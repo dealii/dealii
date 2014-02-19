@@ -23,7 +23,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/vectorization.h>
 
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
@@ -76,7 +75,8 @@ public:
    * Sets the vector size to the given size and initializes all elements with
    * T().
    */
-  AlignedVector (const size_type size);
+  AlignedVector (const size_type size,
+                 const T        &init = T());
 
   /**
    * Destructor.
@@ -259,13 +259,10 @@ namespace internal
     static const std::size_t minimum_parallel_grain_size = 160000/sizeof(T)+1;
   public:
     /**
-     * Constructor. Issues a parallel call if
-     * there are sufficiently many elements,
-     * otherwise work in serial. Copies the data
-     * from source to destination and then calls
-     * destructor on the source. If the optional
-     * argument is set to true, the source is left
-     * untouched instead.
+     * Constructor. Issues a parallel call if there are sufficiently many
+     * elements, otherwise work in serial. Copies the data from source to
+     * destination and then calls destructor on the source. If the optional
+     * argument is set to true, the source is left untouched instead.
      */
     AlignedVectorMove (T *source_begin,
                        T *source_end,
@@ -285,30 +282,26 @@ namespace internal
     }
 
     /**
-     * This method moves elements from the source
-     * to the destination given in the constructor
-     * on a subrange given by two integers.
+     * This method moves elements from the source to the destination given in
+     * the constructor on a subrange given by two integers.
      */
     virtual void apply_to_subrange (const std::size_t begin,
                                     const std::size_t end) const
     {
-      // for classes trivial assignment can use
-      // memcpy
+      // for classes trivial assignment can use memcpy
       if (std_cxx1x::is_trivial<T>::value == true)
         std::memcpy (destination_+begin, source_+begin, (end-begin)*sizeof(T));
       else if (copy_only_ == false)
         for (std::size_t i=begin; i<end; ++i)
           {
-            // initialize memory, copy, and destruct
-            new (&destination_[i]) T;
-            destination_[i] = source_[i];
+            // initialize memory (copy construct), and destruct
+            new (&destination_[i]) T(source_[i]);
             source_[i].~T();
           }
       else
         for (std::size_t i=begin; i<end; ++i)
           {
-            new (&destination_[i]) T;
-            destination_[i] = source_[i];
+            new (&destination_[i]) T(source_[i]);
           }
     }
 
@@ -329,9 +322,8 @@ namespace internal
     static const std::size_t minimum_parallel_grain_size = 160000/sizeof(T)+1;
   public:
     /**
-     * Constructor. Issues a parallel call if
-     * there are sufficiently many elements,
-     * otherwise work in serial.
+     * Constructor. Issues a parallel call if there are sufficiently many
+     * elements, otherwise work in serial.
      */
     AlignedVectorSet (const std::size_t size,
                       const T &element,
@@ -359,23 +351,18 @@ namespace internal
   private:
 
     /**
-     * This sets elements on a subrange given by
-     * two integers.
+     * This sets elements on a subrange given by two integers.
      */
     virtual void apply_to_subrange (const std::size_t begin,
                                     const std::size_t end) const
     {
-      // for classes with trivial assignment of zero
-      // can use memset
+      // for classes with trivial assignment of zero can use memset
       if (std_cxx1x::is_trivial<T>::value == true && trivial_element)
         std::memset (destination_+begin, 0, (end-begin)*sizeof(T));
       else
+        // initialize memory and set
         for (std::size_t i=begin; i<end; ++i)
-          {
-            // initialize memory and set
-            new (&destination_[i]) T;
-            destination_[i] = element_;
-          }
+          new (&destination_[i]) T(element_);
     }
 
     const T &element_;
@@ -401,14 +388,15 @@ AlignedVector<T>::AlignedVector ()
 
 template < class T >
 inline
-AlignedVector<T>::AlignedVector (const size_type size)
+AlignedVector<T>::AlignedVector (const size_type size,
+                                 const T &init)
   :
   _data (0),
   _end_data (0),
   _end_allocated (0)
 {
   if (size > 0)
-    resize (size);
+    resize (size, init);
 }
 
 
@@ -504,11 +492,9 @@ AlignedVector<T>::reserve (const size_type size_alloc)
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
 
-      // allocate and align along boundaries of the size of
-      // VectorizedArray<double>, which is 16 bytes for SSE and 32 bytes for
-      // AVX
-      T *new_data = static_cast<T *>(_mm_malloc (size_actual_allocate,
-                                                 sizeof(VectorizedArray<double>)));
+      // allocate and align along 64-byte boundaries (this is enough for all
+      // levels of vectorization currently supported by deal.II)
+      T *new_data = static_cast<T *>(_mm_malloc (size_actual_allocate, 64));
 #else
       T *new_data = static_cast<T *>(malloc (size_actual_allocate));
 #endif

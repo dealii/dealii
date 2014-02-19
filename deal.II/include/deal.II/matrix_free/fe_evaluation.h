@@ -89,11 +89,6 @@ public:
    */
   //@{
   /**
-   * Destructor.
-   */
-  ~FEEvaluationBase();
-
-  /**
    * Initializes the operation pointer to the current cell. Unlike the
    * FEValues::reinit function, where the information related to a particular
    * cell is generated in the reinit call, this function is very cheap since
@@ -536,6 +531,11 @@ protected:
                     const unsigned int                   base_element = 0);
 
   /**
+   * Copy constructor
+   */
+  FEEvaluationBase (const FEEvaluationBase &other);
+
+  /**
    * A unified function to read from and write into vectors based on the given
    * template operation. It can perform the operation for @p read_dof_values,
    * @p distribute_local_to_global, and @p set_dof_values. It performs the
@@ -641,10 +641,10 @@ protected:
    * Stores a reference to the unit cell data, i.e., values, gradients and
    * Hessians in 1D at the quadrature points that constitute the tensor
    * product. Also contained in matrix_info, but it simplifies code if we
-   * store a reference to it. If initialized without MatrixFree object, this
-   * call actually initializes the evaluation.
+   * store a reference to it. If the object is initialized without MatrixFree
+   * object, the constructor creates this data structure.
    */
-  const internal::MatrixFreeFunctions::ShapeInfo<Number> *data;
+  std_cxx1x::shared_ptr<const internal::MatrixFreeFunctions::ShapeInfo<Number> > data;
 
   /**
    * A pointer to the Cartesian Jacobian information of the present cell. Only
@@ -797,7 +797,6 @@ protected:
                       const unsigned int            dofs_per_cell,
                       const unsigned int            n_q_points);
 
-
   /**
    * Constructor that comes with reduced functionality and works similar as
    * FEValues. The user has to provide a structure of type EvaluatedGeometry
@@ -817,6 +816,11 @@ protected:
   FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
                       const DoFHandler<dim>               &dof_handler,
                       const unsigned int                   base_element = 0);
+
+  /**
+   * Copy constructor
+   */
+  FEEvaluationAccess (const FEEvaluationAccess &other);
 };
 
 
@@ -959,6 +963,11 @@ protected:
   FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
                       const DoFHandler<dim>               &dof_handler,
                       const unsigned int                   base_element = 0);
+
+  /**
+   * Copy constructor
+   */
+  FEEvaluationAccess (const FEEvaluationAccess &other);
 };
 
 
@@ -1110,6 +1119,11 @@ protected:
   FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
                       const DoFHandler<dim>               &dof_handler,
                       const unsigned int                   base_element = 0);
+
+  /**
+   * Copy constructor
+   */
+  FEEvaluationAccess (const FEEvaluationAccess &other);
 };
 
 
@@ -1198,6 +1212,11 @@ public:
                        const unsigned int                   base_element = 0);
 
   /**
+   * Copy constructor
+   */
+  FEEvaluationGeneral (const FEEvaluationGeneral &other);
+
+  /**
    * Evaluates the function values, the gradients, and the Laplacians of the
    * FE function given at the DoF values in the input vector at the quadrature
    * points.  The function arguments specify which parts shall actually be
@@ -1267,6 +1286,12 @@ protected:
    * Internally stored variables for the different data fields.
    */
   VectorizedArray<Number> my_data_array[n_components*(dofs_per_cell+(dim*dim+2*dim+1)*n_q_points)];
+
+private:
+  /**
+   * Sets the pointers from the data array to values_dof, etc.
+   */
+  void set_data_pointers();
 };
 
 
@@ -1346,6 +1371,11 @@ public:
   FEEvaluation (const MatrixFree<dim,Number> &matrix_free,
                 const unsigned int            fe_no   = 0,
                 const unsigned int            quad_no = 0);
+
+  /**
+   * Copy constructor
+   */
+  FEEvaluation (const FEEvaluation &other);
 
   /**
    * Constructor that comes with reduced functionality and works similar as
@@ -1522,6 +1552,11 @@ public:
                   const unsigned int                   base_element = 0);
 
   /**
+   * Copy constructor
+   */
+  FEEvaluationGL (const FEEvaluationGL &other);
+
+  /**
    * Evaluates the function values, the gradients, and the Hessians of the FE
    * function given at the DoF values in the input vector at the quadrature
    * points of the unit cell. The function arguments specify which parts shall
@@ -1644,6 +1679,11 @@ public:
                    const unsigned int                   base_element = 0);
 
   /**
+   * Copy constructor
+   */
+  FEEvaluationDGP (const FEEvaluationDGP &other);
+
+  /**
    * Evaluates the function values, the gradients, and the Hessians of the FE
    * function given at the DoF values in the input vector at the quadrature
    * points of the unit cell. The function arguments specify which parts shall
@@ -1672,6 +1712,34 @@ public:
 #ifndef DOXYGEN
 
 
+namespace internal
+{
+  namespace MatrixFreeFunctions
+  {
+    // a small class that gives control over the delete behavior of
+    // std::shared_ptr: we need to disable it when we initialize a pointer
+    // from another structure.
+    template <typename CLASS>
+    struct DummyDeleter
+    {
+      DummyDeleter (const bool do_delete = false)
+        :
+        do_delete(do_delete)
+      {}
+
+      void operator () (CLASS *pointer)
+      {
+        if (do_delete)
+          delete pointer;
+      }
+
+      const bool do_delete;
+    };
+  }
+}
+
+
+
 /*----------------------- FEEvaluationBase ----------------------------------*/
 
 template <int dim, int n_components_, typename Number>
@@ -1695,7 +1763,9 @@ FEEvaluationBase<dim,n_components_,Number>
   mapping_info       (&data_in.get_mapping_info()),
   data               (&data_in.get_shape_info
                       (fe_no_in, quad_no_in, active_fe_index,
-                       active_quad_index)),
+                       active_quad_index),
+                      internal::MatrixFreeFunctions::DummyDeleter
+                      <const internal::MatrixFreeFunctions::ShapeInfo<Number> >(false)),
   cartesian_data     (0),
   jacobian           (0),
   J_value            (0),
@@ -1786,13 +1856,41 @@ FEEvaluationBase<dim,n_components_,Number>
 
 template <int dim, int n_components_, typename Number>
 inline
-FEEvaluationBase<dim,n_components_,Number>::~FEEvaluationBase()
+FEEvaluationBase<dim,n_components_,Number>
+::FEEvaluationBase (const FEEvaluationBase<dim,n_components_,Number> &other)
+  :
+  quad_no            (other.quad_no),
+  n_fe_components    (other.n_fe_components),
+  active_fe_index    (other.active_fe_index),
+  active_quad_index  (other.active_quad_index),
+  matrix_info        (other.matrix_info),
+  dof_info           (other.dof_info),
+  mapping_info       (other.mapping_info),
+  data               (other.data),
+  cartesian_data     (other.cartesian_data),
+  jacobian           (other.jacobian),
+  J_value            (other.J_value),
+  quadrature_weights (other.quadrature_weights),
+  quadrature_points  (other.quadrature_points),
+  jacobian_grad      (other.jacobian_grad),
+  jacobian_grad_upper(other.jacobian_grad_upper),
+  cell               (other.cell),
+  cell_type          (other.cell_type),
+  cell_data_number   (other.cell_data_number),
+  evaluated_geometry (other.evaluated_geometry),
+  dof_handler        (other.dof_handler)
 {
-  // delete memory held by data in case this structure was initialized without
-  // a MatrixFree object which could hold the data structure.
-  if (matrix_info == 0)
-    delete data;
+  for (unsigned int c=0; c<n_components_; ++c)
+    {
+      values_dofs[c] = 0;
+      values_quad[c] = 0;
+      for (unsigned int d=0; d<dim; ++d)
+        gradients_quad[c][d] = 0;
+      for (unsigned int d=0; d<(dim*dim+dim)/2; ++d)
+        hessians_quad[c][d] = 0;
+    }
 }
+
 
 
 
@@ -3460,6 +3558,16 @@ FEEvaluationAccess<dim,n_components_,Number>
 
 
 
+template <int dim, int n_components_, typename Number>
+inline
+FEEvaluationAccess<dim,n_components_,Number>
+::FEEvaluationAccess (const FEEvaluationAccess<dim,n_components_,Number> &other)
+  :
+  FEEvaluationBase <dim,n_components_,Number>(other)
+{}
+
+
+
 
 /*-------------------- FEEvaluationAccess scalar ----------------------------*/
 
@@ -3487,6 +3595,16 @@ FEEvaluationAccess<dim,1,Number>
                       const unsigned int                   base_element)
   :
   FEEvaluationBase <dim,1,Number> (geometry, dof_handler, base_element)
+{}
+
+
+
+template <int dim, typename Number>
+inline
+FEEvaluationAccess<dim,1,Number>
+::FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number>&other)
+  :
+  FEEvaluationBase <dim,1,Number>(other)
 {}
 
 
@@ -3711,6 +3829,16 @@ FEEvaluationAccess<dim,dim,Number>
                       const unsigned int                   base_element)
   :
   FEEvaluationBase <dim,dim,Number> (geometry, dof_handler, base_element)
+{}
+
+
+
+template <int dim, typename Number>
+inline
+FEEvaluationAccess<dim,dim,Number>
+::FEEvaluationAccess (const FEEvaluationAccess<dim,dim,Number>&other)
+  :
+  FEEvaluationBase <dim,dim,Number>(other)
 {}
 
 
@@ -4043,20 +4171,8 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
   :
   BaseClass (data_in, fe_no, quad_no, dofs_per_cell, n_q_points)
 {
-  // set the pointers to the correct position in the data array
-  for (unsigned int c=0; c<n_components_; ++c)
-    {
-      this->values_dofs[c] = &my_data_array[c*dofs_per_cell];
-      this->values_quad[c] = &my_data_array[n_components*dofs_per_cell+c*n_q_points];
-      for (unsigned int d=0; d<dim; ++d)
-        this->gradients_quad[c][d] = &my_data_array[n_components*(dofs_per_cell+n_q_points)
-                                                    +
-                                                    (c*dim+d)*n_q_points];
-      for (unsigned int d=0; d<(dim*dim+dim)/2; ++d)
-        this->hessians_quad[c][d] = &my_data_array[n_components*((dim+1)*n_q_points+dofs_per_cell)
-                                                   +
-                                                   (c*(dim*dim+dim)+d)*n_q_points];
-    }
+  set_data_pointers();
+
 #ifdef DEBUG
   // print error message when the dimensions do not match. Propose a possible
   // fix
@@ -4173,6 +4289,30 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
                        const unsigned int                   base_element)
   :
   BaseClass (geometry, dof_handler, base_element)
+{
+  set_data_pointers();
+}
+
+
+template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
+          typename Number>
+inline
+FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::FEEvaluationGeneral (const FEEvaluationGeneral &other)
+  :
+  BaseClass (other)
+{
+  set_data_pointers();
+}
+
+
+
+template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
+          typename Number>
+inline
+void
+FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::set_data_pointers()
 {
   // set the pointers to the correct position in the data array
   for (unsigned int c=0; c<n_components_; ++c)
@@ -5791,6 +5931,19 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
 inline
+FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::FEEvaluation (const FEEvaluation &other)
+  :
+  BaseClass (other)
+{
+  compute_even_odd_factors();
+}
+
+
+
+template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
+          typename Number>
+inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::compute_even_odd_factors()
@@ -5957,7 +6110,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   if (fe_degree > 1 || n_q_points_1d > 3)
     internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
              VectorizedArray<Number>, direction, dof_to_quad, add, 0>
-             (shape_val_evenodd, in, out);
+             (&shape_val_evenodd[0], in, out);
   else
     internal::apply_tensor_product_values<dim,fe_degree,n_q_points_1d,
              VectorizedArray<Number>, direction, dof_to_quad, add>
@@ -5978,7 +6131,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   if (fe_degree > 1 || n_q_points_1d > 3)
     internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
              VectorizedArray<Number>, direction, dof_to_quad, add, 1>
-             (shape_gra_evenodd, in, out);
+             (&shape_gra_evenodd[0], in, out);
   else
     internal::apply_tensor_product_gradients<dim,fe_degree,n_q_points_1d,
              VectorizedArray<Number>, direction, dof_to_quad, add>
@@ -6002,7 +6155,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   if (fe_degree > 1 || n_q_points_1d > 3)
     internal::apply_tensor_product_evenodd<dim,fe_degree,n_q_points_1d,
              VectorizedArray<Number>, direction, dof_to_quad, add, 2>
-             (shape_hes_evenodd, in, out);
+             (&shape_hes_evenodd[0], in, out);
   else
     internal::apply_tensor_product_hessians<dim,fe_degree,n_q_points_1d,
              VectorizedArray<Number>, direction, dof_to_quad, add>
@@ -6065,6 +6218,16 @@ FEEvaluationGL<dim,fe_degree,n_components_,Number>
                   const unsigned int                   base_element)
   :
   BaseClass (geometry, dof_handler, base_element)
+{}
+
+
+
+template <int dim, int fe_degree, int n_components_, typename Number>
+inline
+FEEvaluationGL<dim,fe_degree,n_components_,Number>
+::FEEvaluationGL (const FEEvaluationGL &other)
+  :
+  BaseClass (other)
 {}
 
 
@@ -6291,6 +6454,18 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
   :
   BaseClass (geometry, dof_handler, base_element)
 {}
+
+
+
+template <int dim, int fe_degree, int n_q_points_1d, int n_components_,
+          typename Number>
+inline
+FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::FEEvaluationDGP (const FEEvaluationDGP &other)
+  :
+  BaseClass (other)
+{}
+
 
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
