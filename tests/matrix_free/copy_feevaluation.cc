@@ -84,7 +84,7 @@ public:
         pressure[0].read_dof_values (src.block(1));
         pressure[0].evaluate (true,false,false);
 
-        for (unsigned int q=0; q<velocity[0].n_q_points; ++q)
+        for (unsigned int q=0; q<FEEvaluation<dim,degree_p,degree_p+2,1,Number>::n_q_points; ++q)
           {
             SymmetricTensor<2,dim,vector_t> sym_grad_u =
               velocity[0].get_symmetric_gradient (q);
