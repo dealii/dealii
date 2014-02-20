@@ -73,7 +73,7 @@ void test ()
   }
 
   DataOut<dim> data_out;
-  data_out.attach_dof_handler (dof_handler);
+  data_out.attach_triangulation (triangulation);
   data_out.add_data_vector (partitions, "partitions");
   data_out.build_patches ();
 
