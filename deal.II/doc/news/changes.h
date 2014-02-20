@@ -135,6 +135,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Improved: DoFRenumbering::Cuthill_McKee can now run with distributed
+  triangulations with the renumbering only done within each processor's
+  subdomain.
+  <br>
+  (Martin Kronbichler, 2014/02/20)
+
   <li>Fixed: There was an indexing error in GridIn::read_vtk() that triggered
   for some input files. This is now fixed.
   <br>
