@@ -5041,7 +5041,7 @@ namespace internal
       {
         for (int i1=0; i1<n_blocks1; ++i1)
           {
-            Number xp[mid], xm[mid];
+            Number xp[mid>0?mid:1], xm[mid>0?mid:1];
             for (int i=0; i<mid; ++i)
               {
                 if (dof_to_quad == true && type == 1)
