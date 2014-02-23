@@ -24,6 +24,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parallel.h>
 
+#include <cstring>
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
 #include <mm_malloc.h>
