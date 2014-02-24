@@ -73,7 +73,64 @@ void FunctionParser<dim>::initialize (const std::string              &vars,
     initialize(vars, expressions, constants, time_dependent, false);
   }
 
+namespace internal
+{
+  // convert double into int
+  int mu_round(double val)
+  {
+    return static_cast<int>(val + ((val>=0.0) ? 0.5 : -0.5) );
+  }
+  
+  double mu_if(double condition, double thenvalue, double elsevalue)
+  {
+    if (mu_round(condition))
+      return thenvalue;
+    else
+      return elsevalue;
+  }
+  
+  double mu_or(double left, double right)
+  {
+    return (mu_round(left)) || (mu_round(right));
+  }
+  
+  double mu_and(double left, double right)
+  {
+    return (mu_round(left)) && (mu_round(right));
+  }
+  
+  double mu_int(double value)
+  {
+    return static_cast<double>(mu_round(value));
+  }
+  double mu_ceil(double value)
+  {
+    return ceil(value);
+  }
+  double mu_floor(double value)
+  {
+    return floor(value);
+  }
+  double mu_cot(double value)
+  {
+    return 1.0/tan(value);
+  }
+  double mu_csc(double value)
+  {
+    return 1.0/sin(value);
+  }
+ double mu_sec(double value)
+  {
+    return 1.0/cos(value);
+  }
+ double mu_log(double value)
+  {
+    return log(value);
+  }
+    
 
+    
+}
 
 template <int dim>
 void FunctionParser<dim>:: init_muparser() const
@@ -97,6 +154,18 @@ void FunctionParser<dim>:: init_muparser() const
       for (unsigned int iv=0;iv<var_names.size();++iv)
 	fp.get()[i].DefineVar(var_names[iv].c_str(), &vars.get()[iv]);
 
+      // define some compatibility functions:
+      fp.get()[i].DefineFun("if",internal::mu_if, true);
+      fp.get()[i].DefineOprt("|", internal::mu_or, 1);
+      fp.get()[i].DefineOprt("&", internal::mu_and, 2);
+      fp.get()[i].DefineFun("int", internal::mu_int, true);
+      fp.get()[i].DefineFun("ceil", internal::mu_ceil, true);
+      fp.get()[i].DefineFun("cot", internal::mu_cot, true);
+      fp.get()[i].DefineFun("csc", internal::mu_csc, true);
+      fp.get()[i].DefineFun("floor", internal::mu_floor, true);
+      fp.get()[i].DefineFun("sec", internal::mu_sec, true);
+      fp.get()[i].DefineFun("log", internal::mu_log, true);
+      
       try
 	{
 	  fp.get()[i].SetExpr(expressions[i]);
