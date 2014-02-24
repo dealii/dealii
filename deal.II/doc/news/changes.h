@@ -51,6 +51,13 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2014/02/15)
   </li>
 
+  <li> The change from functionparser to muparser introduced a small number of
+  incompatibilies: units, use_degress, and recursion with 'eval' are not
+  longer supported. Comparing for equality is done using '==' instead of '='.
+  <br>
+  (Timo Heister, 2014/02/10)
+  </li>  
+
   <li> Changed: The various classes generating graphical output, such
   as DataOut or DataOutStack, are all derived from a common interface
   class DataOutInterface which, in turn was derived from DataOutBase
@@ -83,6 +90,13 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> Changed: the functionparser library bundled with deal.II got replaced
+  by the muparser library.  
+  <br>
+  (Timo Heister, 2014/02/10)
+  </li>  
+
   <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
   on non-active cells. However, this made no sense: Since degrees of
   freedoms only exist on active cells
