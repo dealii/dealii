@@ -408,22 +408,30 @@ namespace DoFRenumbering
                                              dof_handler.locally_owned_dofs());
         DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
 
-        // Create sparsity pattern from csp by transferring its indices to
-        // processor-local index space and doing Cuthill-McKee there
-        std::vector<unsigned int> row_lengths(locally_owned.n_elements());
-        for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
-          row_lengths[i] = csp.row_length(locally_owned.nth_index_in_set(i));
-        sparsity.reinit(locally_owned.n_elements(), locally_owned.n_elements(),
-                        row_lengths);
-        for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
+        // If the index set is not complete, need to get indices in local
+        // index space.
+        if (dof_handler.locally_owned_dofs().n_elements() !=
+            dof_handler.locally_owned_dofs().size())
           {
-            const types::global_dof_index row = locally_owned.nth_index_in_set(i);
-            for (CompressedSimpleSparsityPattern::row_iterator it =
-                   csp.row_begin(row); it != csp.row_end(row); ++it)
-              if (*it != row && locally_owned.is_element(*it))
-                sparsity.add(i, locally_owned.index_within_set(*it));
+            // Create sparsity pattern from csp by transferring its indices to
+            // processor-local index space and doing Cuthill-McKee there
+            std::vector<unsigned int> row_lengths(locally_owned.n_elements());
+            for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
+              row_lengths[i] = csp.row_length(locally_owned.nth_index_in_set(i));
+            sparsity.reinit(locally_owned.n_elements(), locally_owned.n_elements(),
+                            row_lengths);
+            for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
+              {
+                const types::global_dof_index row = locally_owned.nth_index_in_set(i);
+                for (CompressedSimpleSparsityPattern::row_iterator it =
+                       csp.row_begin(row); it != csp.row_end(row); ++it)
+                  if (*it != row && locally_owned.is_element(*it))
+                    sparsity.add(i, locally_owned.index_within_set(*it));
+              }
+            sparsity.compress();
           }
-        sparsity.compress();
+        else
+          sparsity.copy_from(csp);
       }
 
     // constraints are not needed anymore
