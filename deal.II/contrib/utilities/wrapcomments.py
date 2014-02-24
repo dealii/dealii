@@ -121,18 +121,23 @@ def format_block(lines, infostr=""):
                 out.extend(wrap_block(remove_junk(curlines), start))
                 curlines=[]
             while True:
-                if lines[idx][0:len(start)].strip()!="*":
-                    print ("%s Error: wrong formatting inside @code block"%infostr, file=sys.stderr)
-                    thisline = lines[idx].strip()
-                    if thisline.startswith("* "):
-                        thisline = thisline[2:]
-                    elif thisline.startswith("*"):
-                        thisline = thisline[1:]
-                    thisline = start + thisline
+                thisline = lines[idx].rstrip()
+                if thisline.strip()=="*":
+                    thisline = start
+                elif thisline.strip()=="@code" or thisline.strip()=="@endcode":
+                    thisline = start + thisline.strip()
+                elif thisline.strip()[0:2]!="* ":
+                    if thisline[0:len(start)].strip()=="":
+                        # just a missing *, so keep old indentation
+                        thisline = start + thisline[len(start):]
+                    else:
+                        # no way to recover indentation:
+                        print ("%s Error: wrong formatting inside @code block"%infostr, file=sys.stderr)
+                        thisline = start + thisline.strip()
                 else:
-                    thisline = start + lines[idx][len(start):]
+                    thisline = start + thisline.strip()[2:]
                 out.append(thisline.rstrip())
-                if one_in(["@endcode", "@verbatim", "@f]"], lines[idx]):
+                if one_in(["@endcode", "@endverbatim", "@f]"], lines[idx]):
                     break
                 idx += 1
         elif lines[idx].strip()=="*":
@@ -230,6 +235,48 @@ lineO = ["  /**", \
          "   */"]
 assert(format_block(lineI)==lineO)
  
+lineI = ["  /**", \
+         "   * blub", \
+         "       @code ", \
+         "       two three", \
+         "      @endcode ", \
+         "   * four", \
+         "   */"]
+lineO = ["  /**", \
+         "   * blub", \
+         "   * @code", \
+         "   *   two three", \
+         "   * @endcode", \
+         "   * four", \
+         "   */"]
+assert(format_block(lineI)==lineO)
+
+
+lineI = ["  /**", \
+         "   * blub", \
+         "   * @code ", \
+         "    *   two three", \
+         "   *   two three  ", \
+         " * ", \
+         "       two three", \
+         "    ", \
+         "   * @endcode ", \
+         "   * four", \
+         "   */"]
+lineO = ["  /**", \
+         "   * blub", \
+         "   * @code", \
+         "   *   two three", \
+         "   *   two three", \
+         "   *", \
+         "   *   two three", \
+         "   *", \
+         "   * @endcode", \
+         "   * four", \
+         "   */"]
+assert(format_block(lineI)==lineO)
+
+
 
 lineI = ["  /**", \
          "   * blub", \
