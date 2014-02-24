@@ -193,8 +193,10 @@ template <typename> class Vector;
  *  "x-1"
  *  "-sin(sqrt(x^2+y^2))"
  *  "sqrt(XCoord*XCoord + YCoord*YCoord)"
- *
  * @endverbatim
+ *
+ * For a wrapper of the FunctionParser class that supports ParameterHandler,
+ * see ParsedFunction.
  *
  * Vector-valued functions can either be declared using strings where the
  * function components are separated by semicolons, or using a vector of
@@ -202,7 +204,6 @@ template <typename> class Vector;
  *
  * An example of time dependent scalar function is the following:
  * @code
- *
  *    // Empty constants object
  *    std::map<std::string> constants;
  *
@@ -223,13 +224,11 @@ template <typename> class Vector;
  *                                      // it is a time-dependent function
  *                                      // and there is another variable
  *                                      // to be taken into account (t).
- *
  * @endcode
  *
  * The following is another example of how to instantiate a vector valued
  * function by using a single string:
  * @code
- *
  *    // Empty constants object
  *    std::map<std::string> constants;
  *
@@ -246,7 +245,6 @@ template <typename> class Vector;
  *    function.initialize(variables,
  *                        expression,
  *                        constants);
- *
  * @endcode
  *
  *
