@@ -21,7 +21,6 @@
 
 
 #ifdef DEAL_II_WITH_MUPARSER
-#include <deal.II/base/std_cxx1x/bind.h>
 #include <muParser.h>
 #else
 
