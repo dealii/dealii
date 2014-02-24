@@ -40,23 +40,38 @@ template <typename> class Vector;
 
 /**
  * This class implements a function object that gets its value by parsing a
- * string describing this function. It is a wrapper class for the fparser
- * library (see http://warp.povusers.org/FunctionParser/). This class
- * lets you evaluate strings such as "sqrt(1-x^2+y^2)" for given values of
- * 'x' and 'y'. Some of the information contained here is copied verbatim
- * from the fparser.txt file that comes with the fparser library. Please refer
- * also to that file both for clarifications on how this wrapper works, as
- * well as for any issue regarding the license that applies to this class.
- * This class is used in the step-33 and step-36
- * tutorial programs (the latter being much simpler to understand).
+ * string describing this function. It is a wrapper class for the muparser
+ * library (see http://muparser.beltoforion.de/). This class lets you evaluate
+ * strings such as "sqrt(1-x^2+y^2)" for given values of 'x' and 'y'.  Please
+ * refer to the muparser documentation for more information.  This class is
+ * used in the step-33 and step-36 tutorial programs (the latter being much
+ * simpler to understand).
  *
- * By using this class you indicate that you accept the terms of the license
- * that comes with the fparser library. If you do not agree with them, you
- * should not use this class or configure the deal.II library without the
- * function parser (see the ReadMe file of deal.II on instructions for this).
- *
- * The following example shows how to use this class:
+ * The following examples shows how to use this class:
  * @code
+  // set up problem:
+  std::string variables = "x,y";
+  std::string expression = "cos(x)+sqrt(y)";
+  std::map<std::string,double> constants;
+  
+  // FunctionParser with 2 variables and 1 component:
+  FunctionParser<2> fp(1);
+  fp.initialize(variables,
+		expression,
+		constants);
+
+  // Point at which we want to evaluate the function
+  Point<2> point(0.0, 4.0);
+
+  // evaluate the expression at 'point':
+  double result = fp.value(point);
+  
+  deallog << "Function '" << expression << "'"
+	  << " @ " << point
+	  << " is " << result << std::endl;
+@endcode
+* The second example is a bit more complex:
+* @code
   // Define some constants that will be used by the function parser
   std::map<std::string,double> constants;
   constants["pi"] = numbers::PI;
@@ -70,98 +85,38 @@ template <typename> class Vector;
   expressions[0] = "sin(2*pi*x)+sinh(pi*z)";
   expressions[1] = "sin(2*pi*y)*exp(x^2)";
 
-  // Generate an empty function for these two components.
-  ParsedFunction<3> vector_function(2);
+  // function parser with 3 variables and 2 components
+  FunctionParser<3> vector_function(2);
 
   // And populate it with the newly created objects.
   vector_function.initialize(variables,
-                             expressions,
-                             constants);
-  @endcode
-
- * FunctionParser also provides an option to use <b>units</b> in expressions.
- * We illustrate the use of this functionality with the following example:
- * @code
- // Define some constants that will be used by the function parser
-  std::map<std::string> constants;
-  std::map<std::string> units;
-  constants["PI"] = numbers::PI;
-  units["cm"] = 10;
-  units["m"] = 1000;
-
-  // Define the variables that will be used inside the expressions
-  std::string variables = "x,y";
-
-  // Define the expressions of the individual components of a
-  // vector valued function with two components:
-  std::vector<std::string> expressions(1);
-  expressions[0] = "x cm + y m + PI cm";
-
-  // Generate an empty function for these two components.
-  FunctionParser<2> vector_function;
-
-  // And populate it with the newly created objects.
-  vector_function.initialize(variables,
-                expressions,
-                constants,
-                units); //An extra argument here
+			     expressions,
+			     constants);
 
   // Point at which we want to evaluate the function
-  Point<2> point(2.0, 3.0);
+  Point<3> point(0.0, 1.0, 1.0);
+
+  // This Vector will store the result
+  Vector<double> result(2);
+
+  // Fill 'result' by evaluating the function
+  vector_function.vector_value(point, result);
+
+  // We can also only evaluate the 2nd component:
+  double c = vector_function.value(point, 1);
 
   // Output the evaluated function
-  std::cout << "Function " << "[" << expressions[0] << "]" <<
-    " @point " << "[" << point << "]" << " is " <<
-    "[" <<  vector_function.value(point) << "]" << std::endl;
-
- * @endcode
- *
- * Units are similar to <b>constants</b> in the way they are passed to the
- * parser, i.e. via std::map<std::string,double>.  But units are slightly different
- * in that they have a higher precedence than any other operator
- * (except parentheses). Thus for example "5/2in" is parsed as "5/(2*300)".
- * (If you actually do want 5/2 inches, it has to be written as "(5/2)in".)
- *
- * Overall, the main point of units is to make input expressions more readable
- * since expressing, say, length as 10cm looks more natural than 10*cm.
- *
- * Beware that the user has full control over units as well as full
- * responsibility for "sanity" of the parsed expressions, because the parser
- * does NOT know anything about the physical nature of units and one would not
- * be warned when adding kilometers to kilograms.
- *
- * The <b>units</b> argument to the initialize function is <b>optional</b>, i.e. the
- * user does NOT have to use this functionality.
- *
- * For more information on this feature, please see
- * contrib/functionparser/fparser.txt
-
-
- *
- * See http://warp.povusers.org/FunctionParser/ for an
- * explanation on how the underlying library works.
- *
-
- From the fparser.txt file:
- @verbatim
-
- The library is intended to be very fast. It byte-compiles the
- function string at parse time and interprets this byte-code at
- evaluation time.  The evaluation is straightforward and no recursions
- are done (uses stack arithmetic).  Empirical tests show that it indeed
- is very fast (specially compared to libraries which evaluate functions
- by just interpreting the raw function string).
-
- @endverbatim
+  deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
+	  << " @ " << point
+	  << " is " << result << std::endl;
+  * @endcode
  *
  * This class overloads the virtual methods value() and
  * vector_value() of the Function base class with the byte compiled versions
  * of the expressions given to the initialize() methods. Note that the class
  * will not work unless you first call the initialize() method that accepts
  * the text description of the function as an argument (among other
- * things). The reason for this is that this text description may be read from
- * an input file, and may therefore not be available at object construction
- * time yet.
+ * things). 
  *
  * The syntax to describe a function follows usual programming practice,
  * and is explained in this snippet from the fparser.txt file:
@@ -170,19 +125,20 @@ template <typename> class Vector;
       Arithmetic float expressions can be created from float literals, variables
       or functions using the following operators in this order of precedence:
 
-      ()             expressions in parentheses first
       -A             unary minus
       A^B            exponentiation (A raised to the power B)
       A*B  A/B  A%B  multiplication, division and modulo
       A+B  A-B       addition and subtraction
-      A=B  A<B  A>B  comparison between A and B (result is either 0 or 1)
-      A&B            result is 1 if int(A) and int(B) differ from 0, else 0.
-      A|B            result is 1 if int(A) or int(B) differ from 0, else 0.
+      A==B A<B A>B   comparison between A and B (result is either 0 or 1)
+      A&&B A||B      logical 'and' and 'or' 
+      A&B   A|B      same, implemented for compatibility
 
       Since the unary minus has higher precedence than any other operator, for
       example the following expression is valid: x*-y
-      Note that the '=' comparison can be inaccurate due to floating point
-      precision problems (eg. "sqrt(100)=10" probably returns 0, not 1).
+
+      Note that the '==' comparison can be inaccurate due to floating point
+      precision problems, so it should be avoided (eg. "sqrt(100)=10" probably
+      returns 0, not 1).
 
       The class supports these functions:
 
@@ -208,10 +164,6 @@ template <typename> class Vector;
       cosh(A)   : Same as cos() but for hyperbolic cosine.
       cot(A)    : Cotangent of A (equivalent to 1/tan(A)).
       csc(A)    : Cosecant of A (equivalent to 1/sin(A)).
-      eval(...) : This a recursive call to the function to be evaluated. The
-                  number of parameters must be the same as the number of parameters
-                  taken by the function. Usually called inside if() to avoid
-                  infinite recursion.
       exp(A)    : Exponential of A. Returns the value of e raised to the power
                   A where e is the base of the natural logarithm, i.e. the
                   non-repeating value approximately equal to 2.71828182846.
@@ -243,19 +195,6 @@ template <typename> class Vector;
     "-sin(sqrt(x^2+y^2))"
     "sqrt(XCoord*XCoord + YCoord*YCoord)"
 
-    An example of a recursive function is the factorial function:
-
-    "if(n>1, n*eval(n-1), 1)"
-
-  Note that a recursive call has some overhead, which makes it a bit slower
-  than any other operation. It may be a good idea to avoid recursive functions
-  in very time-critical applications. Recursion also takes some memory, so
-  extremely deep recursions should be avoided (eg. millions of nested recursive
-  calls).
-
-  Also note that the if() function is the only place where making a recursive
-  call is safe. In any other place it will cause an infinite recursion (which
-  will make the program eventually run out of memory).
   @endverbatim
  *
  * Vector-valued functions can either be declared using strings where the
@@ -313,7 +252,7 @@ template <typename> class Vector;
  *
  *
  * @ingroup functions
- * @author Luca Heltai, 2005
+ * @author Luca Heltai, Timo Heister 2005, 2014
  */
 template <int dim>
 class FunctionParser : public Function<dim>
