@@ -1,0 +1,4 @@
+
+DEAL::Function 'cos(x)+sqrt(y)' @ 0.00000 4.00000 is 3.00000
+DEAL::Function 'sin(2*pi*x)+sinh(pi*z),sin(2*pi*y)*exp(x^2)' @ 0.00000 1.00000 1.00000 is 11.5487 -2.44929e-16 
+DEAL::
