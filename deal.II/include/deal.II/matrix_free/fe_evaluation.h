@@ -27,7 +27,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/shape_info.h>
-#include <deal.II/matrix_free/evaluated_geometry.h>
+#include <deal.II/matrix_free/mapping_fe_evaluation.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -115,6 +115,18 @@ public:
    */
   internal::MatrixFreeFunctions::CellType get_cell_type() const;
 
+  /**
+   * Returns a reference to the ShapeInfo object currently in use.
+   */
+  const internal::MatrixFreeFunctions::ShapeInfo<Number> &
+  get_shape_info() const;
+
+  /**
+   * Fills the JxW values currently used.
+   */
+  void
+  fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const;
+
   //@}
 
   /**
@@ -136,6 +148,14 @@ public:
    * ConstraintMatrix::distribute. When accessing vector entries during the
    * solution of linear systems, the temporary solution should always have
    * homogeneous constraints and this method is the correct one.
+   *
+   * If the class was constructed through a MappingFEEvaluation object, only
+   * one single cell is used by this class and this function extracts the
+   * values of the underlying components on this cell. This call is slower
+   * than the ones done through a MatrixFree object and lead to a structure
+   * that does not effectively use vectorization in the evaluate routines
+   * based on these values (instead, VectorizedArray<Number>::n_array_elements
+   * same copies are worked on).
    */
   template <typename VectorType>
   void read_dof_values (const VectorType &src);
@@ -171,6 +191,15 @@ public:
    * function is also necessary when inhomogeneous constraints are to be used,
    * as MatrixFree can only handle homogeneous constraints. Note that if
    * vectorization is enabled, the DoF values for several cells are set.
+   *
+   * If the class was constructed through a MappingFEEvaluation object, only
+   * one single cell is used by this class and this function extracts the
+   * values of the underlying components on this cell. This call is slower
+   * than the ones done through a MatrixFree object and lead to a structure
+   * that does not effectively use vectorization in the evaluate routines
+   * based on these values (instead, VectorizedArray<Number>::n_array_elements
+   * same copies are worked on). In that case, no constraints can be
+   * processed as these are not available here.
    */
   template <typename VectorType>
   void read_dof_values_plain (const VectorType &src);
@@ -199,8 +228,17 @@ public:
    * Takes the values stored internally on dof values of the current cell and
    * sums them into the vector @p dst. The function also applies constraints
    * during the write operation. The functionality is hence similar to the
-   * function ConstraintMatrix::distribute_local_to_global.  Note that if
-   * vectorization is enabled, the DoF values for several cells are used.
+   * function ConstraintMatrix::distribute_local_to_global. If vectorization
+   * is enabled, the DoF values for several cells are used.
+   *
+   * If the class was constructed through a MappingFEEvaluation object, only
+   * one single cell is used by this class and this function extracts the
+   * values of the underlying components on this cell. This call is slower
+   * than the ones done through a MatrixFree object and lead to a structure
+   * that does not effectively use vectorization in the evaluate routines
+   * based on these values (instead, VectorizedArray<Number>::n_array_elements
+   * same copies are worked on). In that case, no constraints can be
+   * processed as these are not available here.
    */
   template<typename VectorType>
   void distribute_local_to_global (VectorType &dst) const;
@@ -211,8 +249,8 @@ public:
    * and sums them into the collection of vectors vector @p dst, starting at
    * index @p first_index. The function also applies constraints during the
    * write operation. The functionality is hence similar to the function
-   * ConstraintMatrix::distribute_local_to_global.  Note that if vectorization
-   * is enabled, the DoF values for several cells are used.
+   * ConstraintMatrix::distribute_local_to_global. If vectorization is
+   * enabled, the DoF values for several cells are used.
    */
   template<typename VectorType>
   void distribute_local_to_global (std::vector<VectorType> &dst,
@@ -232,6 +270,15 @@ public:
    * during the write operation. The functionality is hence similar to the
    * function ConstraintMatrix::distribute_local_to_global.  Note that if
    * vectorization is enabled, the DoF values for several cells are used.
+   *
+   * If the class was constructed through a MappingFEEvaluation object, only
+   * one single cell is used by this class and this function extracts the
+   * values of the underlying components on this cell. This call is slower
+   * than the ones done through a MatrixFree object and lead to a structure
+   * that does not effectively use vectorization in the evaluate routines
+   * based on these values (instead, VectorizedArray<Number>::n_array_elements
+   * same copies are worked on). In that case, no constraints can be
+   * processed as these are not available here.
    */
   template<typename VectorType>
   void set_dof_values (VectorType &dst) const;
@@ -512,7 +559,7 @@ protected:
 
   /**
    * Constructor that comes with reduced functionality and works similar as
-   * FEValues. The user has to provide a structure of type EvaluatedGeometry
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
    * and a DoFHandler in order to allow for reading out the finite element
    * data. It uses the data provided by dof_handler.get_fe(). If the element
    * is vector-valued, the optional argument allows to specify the index of
@@ -526,9 +573,9 @@ protected:
    * operations), but only possibly within the element if the
    * evaluate/integrate routines are combined (e.g. for matrix assembly).
    */
-  FEEvaluationBase (const EvaluatedGeometry<dim,Number> &geometry,
-                    const DoFHandler<dim>               &dof_handler,
-                    const unsigned int                   base_element = 0);
+  FEEvaluationBase (const MappingFEEvaluation<dim,Number> &geometry,
+                    const DoFHandler<dim>                 &dof_handler,
+                    const unsigned int                     first_selected_component = 0);
 
   /**
    * Copy constructor
@@ -638,13 +685,18 @@ protected:
   const internal::MatrixFreeFunctions::MappingInfo<dim,Number> *mapping_info;
 
   /**
-   * Stores a reference to the unit cell data, i.e., values, gradients and
+   * In case the class is initialized from MappingFEEvaluation instead of
+   * MatrixFree, this data structure holds the evaluated shape data.
+   */
+  std_cxx1x::shared_ptr<internal::MatrixFreeFunctions::ShapeInfo<Number> > stored_shape_info;
+
+  /**
+   * Stores a pointer to the unit cell shape data, i.e., values, gradients and
    * Hessians in 1D at the quadrature points that constitute the tensor
    * product. Also contained in matrix_info, but it simplifies code if we
-   * store a reference to it. If the object is initialized without MatrixFree
-   * object, the constructor creates this data structure.
+   * store a reference to it.
    */
-  std_cxx1x::shared_ptr<const internal::MatrixFreeFunctions::ShapeInfo<Number> > data;
+  const internal::MatrixFreeFunctions::ShapeInfo<Number> *data;
 
   /**
    * A pointer to the Cartesian Jacobian information of the present cell. Only
@@ -754,12 +806,24 @@ protected:
   /**
    * Geometry data generated by FEValues on the fly.
    */
-  SmartPointer<const EvaluatedGeometry<dim,Number> > evaluated_geometry;
+  SmartPointer<const MappingFEEvaluation<dim,Number> > mapped_geometry;
 
   /**
    * A pointer to the underlying DoFHandler.
    */
   const DoFHandler<dim> *dof_handler;
+
+  /**
+   * For a DoFHandler with more than one finite element, select at which
+   * component this data structure should start.
+   */
+  const unsigned int first_selected_component;
+
+  /**
+   * A temporary data structure necessary to read degrees of freedom when no
+   * MatrixFree object was given at initialization.
+   */
+   mutable std::vector<types::global_dof_index> local_dof_indices;
 };
 
 
@@ -799,7 +863,7 @@ protected:
 
   /**
    * Constructor that comes with reduced functionality and works similar as
-   * FEValues. The user has to provide a structure of type EvaluatedGeometry
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
    * and a DoFHandler in order to allow for reading out the finite element
    * data. It uses the data provided by dof_handler.get_fe(). If the element
    * is vector-valued, the optional argument allows to specify the index of
@@ -813,9 +877,9 @@ protected:
    * operations), but only possibly within the element if the
    * evaluate/integrate routines are combined (e.g. for matrix assembly).
    */
-  FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
-                      const DoFHandler<dim>               &dof_handler,
-                      const unsigned int                   base_element = 0);
+  FEEvaluationAccess (const MappingFEEvaluation<dim,Number> &geometry,
+                      const DoFHandler<dim>                 &dof_handler,
+                      const unsigned int                     first_selected_component = 0);
 
   /**
    * Copy constructor
@@ -946,7 +1010,7 @@ protected:
 
   /**
    * Constructor that comes with reduced functionality and works similar as
-   * FEValues. The user has to provide a structure of type EvaluatedGeometry
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
    * and a DoFHandler in order to allow for reading out the finite element
    * data. It uses the data provided by dof_handler.get_fe(). If the element
    * is vector-valued, the optional argument allows to specify the index of
@@ -960,9 +1024,9 @@ protected:
    * operations), but only possibly within the element if the
    * evaluate/integrate routines are combined (e.g. for matrix assembly).
    */
-  FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
-                      const DoFHandler<dim>               &dof_handler,
-                      const unsigned int                   base_element = 0);
+  FEEvaluationAccess (const MappingFEEvaluation<dim,Number> &geometry,
+                      const DoFHandler<dim>                 &dof_handler,
+                      const unsigned int                     first_selected_component = 0);
 
   /**
    * Copy constructor
@@ -1102,7 +1166,7 @@ protected:
 
   /**
    * Constructor that comes with reduced functionality and works similar as
-   * FEValues. The user has to provide a structure of type EvaluatedGeometry
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
    * and a DoFHandler in order to allow for reading out the finite element
    * data. It uses the data provided by dof_handler.get_fe(). If the element
    * is vector-valued, the optional argument allows to specify the index of
@@ -1116,9 +1180,9 @@ protected:
    * operations), but only possibly within the element if the
    * evaluate/integrate routines are combined (e.g. for matrix assembly).
    */
-  FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
-                      const DoFHandler<dim>               &dof_handler,
-                      const unsigned int                   base_element = 0);
+  FEEvaluationAccess (const MappingFEEvaluation<dim,Number> &geometry,
+                      const DoFHandler<dim>                 &dof_handler,
+                      const unsigned int                     first_selected_component = 0);
 
   /**
    * Copy constructor
@@ -1193,7 +1257,7 @@ public:
 
   /**
    * Constructor that comes with reduced functionality and works similar as
-   * FEValues. The user has to provide a structure of type EvaluatedGeometry
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
    * and a DoFHandler in order to allow for reading out the finite element
    * data. It uses the data provided by dof_handler.get_fe(). If the element
    * is vector-valued, the optional argument allows to specify the index of
@@ -1207,9 +1271,9 @@ public:
    * operations), but only possibly within the element if the
    * evaluate/integrate routines are combined (e.g. for matrix assembly).
    */
-  FEEvaluationGeneral (const EvaluatedGeometry<dim,Number> &geometry,
-                       const DoFHandler<dim>               &dof_handler,
-                       const unsigned int                   base_element = 0);
+  FEEvaluationGeneral (const MappingFEEvaluation<dim,Number> &geometry,
+                       const DoFHandler<dim>                 &dof_handler,
+                       const unsigned int                     first_selected_component = 0);
 
   /**
    * Copy constructor
@@ -1309,7 +1373,7 @@ private:
  * possible to use vectorization for applying a vector operation for several
  * cells at once. The second form of usage is to initialize it from geometry
  * information generated by FEValues, which is stored in the class
- * EvaluatedGeometry. Here, the operations can only work on a single cell, but
+ * MappingFEEvaluation. Here, the operations can only work on a single cell, but
  * possibly be vectorized by combining several operations (e.g. when
  * performing matrix assembly).
  *
@@ -1379,7 +1443,7 @@ public:
 
   /**
    * Constructor that comes with reduced functionality and works similar as
-   * FEValues. The user has to provide a structure of type EvaluatedGeometry
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
    * and a DoFHandler in order to allow for reading out the finite element
    * data. It uses the data provided by dof_handler.get_fe(). If the element
    * is vector-valued, the optional argument allows to specify the index of
@@ -1393,9 +1457,9 @@ public:
    * operations), but only possibly within the element if the
    * evaluate/integrate routines are combined (e.g. for matrix assembly).
    */
-  FEEvaluation (const EvaluatedGeometry<dim,Number> &geometry,
-                const DoFHandler<dim>               &dof_handler,
-                const unsigned int                   base_element = 0);
+  FEEvaluation (const MappingFEEvaluation<dim,Number> &geometry,
+                const DoFHandler<dim>                 &dof_handler,
+                const unsigned int                     first_selected_component = 0);
 
   /**
    * Evaluates the function values, the gradients, and the Laplacians of the
@@ -1533,7 +1597,7 @@ public:
 
   /**
    * Constructor that comes with reduced functionality and works similar as
-   * FEValues. The user has to provide a structure of type EvaluatedGeometry
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
    * and a DoFHandler in order to allow for reading out the finite element
    * data. It uses the data provided by dof_handler.get_fe(). If the element
    * is vector-valued, the optional argument allows to specify the index of
@@ -1547,9 +1611,9 @@ public:
    * operations), but only possibly within the element if the
    * evaluate/integrate routines are combined (e.g. for matrix assembly).
    */
-  FEEvaluationGL (const EvaluatedGeometry<dim,Number> &geometry,
-                  const DoFHandler<dim>               &dof_handler,
-                  const unsigned int                   base_element = 0);
+  FEEvaluationGL (const MappingFEEvaluation<dim,Number> &geometry,
+                  const DoFHandler<dim>                 &dof_handler,
+                  const unsigned int                     first_selected_component = 0);
 
   /**
    * Copy constructor
@@ -1660,7 +1724,7 @@ public:
 
   /**
    * Constructor that comes with reduced functionality and works similar as
-   * FEValues. The user has to provide a structure of type EvaluatedGeometry
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
    * and a DoFHandler in order to allow for reading out the finite element
    * data. It uses the data provided by dof_handler.get_fe(). If the element
    * is vector-valued, the optional argument allows to specify the index of
@@ -1674,9 +1738,9 @@ public:
    * operations), but only possibly within the element if the
    * evaluate/integrate routines are combined (e.g. for matrix assembly).
    */
-  FEEvaluationDGP (const EvaluatedGeometry<dim,Number> &geometry,
-                   const DoFHandler<dim>               &dof_handler,
-                   const unsigned int                   base_element = 0);
+  FEEvaluationDGP (const MappingFEEvaluation<dim,Number> &geometry,
+                   const DoFHandler<dim>                 &dof_handler,
+                   const unsigned int                     first_selected_component = 0);
 
   /**
    * Copy constructor
@@ -1712,33 +1776,6 @@ public:
 #ifndef DOXYGEN
 
 
-namespace internal
-{
-  namespace MatrixFreeFunctions
-  {
-    // a small class that gives control over the delete behavior of
-    // std::shared_ptr: we need to disable it when we initialize a pointer
-    // from another structure.
-    template <typename CLASS>
-    struct DummyDeleter
-    {
-      DummyDeleter (const bool do_delete = false)
-        :
-        do_delete(do_delete)
-      {}
-
-      void operator () (CLASS *pointer)
-      {
-        if (do_delete)
-          delete pointer;
-      }
-
-      const bool do_delete;
-    };
-  }
-}
-
-
 
 /*----------------------- FEEvaluationBase ----------------------------------*/
 
@@ -1763,9 +1800,7 @@ FEEvaluationBase<dim,n_components_,Number>
   mapping_info       (&data_in.get_mapping_info()),
   data               (&data_in.get_shape_info
                       (fe_no_in, quad_no_in, active_fe_index,
-                       active_quad_index),
-                      internal::MatrixFreeFunctions::DummyDeleter
-                      <const internal::MatrixFreeFunctions::ShapeInfo<Number> >(false)),
+                       active_quad_index)),
   cartesian_data     (0),
   jacobian           (0),
   J_value            (0),
@@ -1776,7 +1811,9 @@ FEEvaluationBase<dim,n_components_,Number>
   jacobian_grad_upper(0),
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::undefined),
-  cell_data_number   (0)
+  cell_data_number   (0),
+  dof_handler        (0),
+  first_selected_component (0)
 {
   for (unsigned int c=0; c<n_components_; ++c)
     {
@@ -1812,9 +1849,9 @@ FEEvaluationBase<dim,n_components_,Number>
 template <int dim, int n_components_, typename Number>
 inline
 FEEvaluationBase<dim,n_components_,Number>
-::FEEvaluationBase (const EvaluatedGeometry<dim,Number> &geometry,
-                    const DoFHandler<dim>               &dof_handler_in,
-                    const unsigned int                   base_element)
+::FEEvaluationBase (const MappingFEEvaluation<dim,Number> &geometry,
+                    const DoFHandler<dim>                 &dof_handler_in,
+                    const unsigned int                     first_selected_component)
   :
   quad_no            (-1),
   n_fe_components    (n_components_),
@@ -1823,7 +1860,8 @@ FEEvaluationBase<dim,n_components_,Number>
   matrix_info        (0),
   dof_info           (0),
   mapping_info       (0),
-  data               (new internal::MatrixFreeFunctions::ShapeInfo<Number>(geometry.get_quadrature(), dof_handler_in.get_fe(), base_element)),
+  stored_shape_info  (new internal::MatrixFreeFunctions::ShapeInfo<Number>(geometry.get_quadrature(), dof_handler_in.get_fe(), 0)),
+  data               (stored_shape_info.get()),
   cartesian_data     (0),
   jacobian           (geometry.get_inverse_jacobians().begin()),
   J_value            (geometry.get_JxW_values().begin()),
@@ -1834,8 +1872,9 @@ FEEvaluationBase<dim,n_components_,Number>
   cell               (0),
   cell_type          (internal::MatrixFreeFunctions::general),
   cell_data_number   (0),
-  evaluated_geometry (&geometry),
-  dof_handler        (&dof_handler_in)
+  mapped_geometry    (&geometry),
+  dof_handler        (&dof_handler_in),
+  first_selected_component (first_selected_component)
 {
   for (unsigned int c=0; c<n_components_; ++c)
     {
@@ -1846,8 +1885,8 @@ FEEvaluationBase<dim,n_components_,Number>
       for (unsigned int d=0; d<(dim*dim+dim)/2; ++d)
         hessians_quad[c][d] = 0;
     }
-  Assert(dof_handler->get_fe().element_multiplicity(base_element) == 1 ||
-         dof_handler->get_fe().element_multiplicity(base_element) >= n_components_,
+  Assert(dof_handler->get_fe().element_multiplicity(0) == 1 ||
+         dof_handler->get_fe().element_multiplicity(0)-first_selected_component >= n_components_,
          ExcMessage("The underlying element must at least contain as many "
                     "components as requested by this class"));
 }
@@ -1877,8 +1916,9 @@ FEEvaluationBase<dim,n_components_,Number>
   cell               (other.cell),
   cell_type          (other.cell_type),
   cell_data_number   (other.cell_data_number),
-  evaluated_geometry (other.evaluated_geometry),
-  dof_handler        (other.dof_handler)
+  mapped_geometry    (other.mapped_geometry),
+  dof_handler        (other.dof_handler),
+  first_selected_component (other.first_selected_component)
 {
   for (unsigned int c=0; c<n_components_; ++c)
     {
@@ -1893,15 +1933,13 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-
 template <int dim, int n_components_, typename Number>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
-::reinit (const unsigned int cell_in)
+FEEvaluationBase<dim,n_components_,Number>::reinit (const unsigned int cell_in)
 {
-  Assert (evaluated_geometry == 0, ExcMessage("FEEvaluation was initialized without a matrix-free object. Integer indexing is not possible"));
-  if (evaluated_geometry != 0)
+  Assert (mapped_geometry == 0, ExcMessage("FEEvaluation was initialized without a matrix-free object. Integer indexing is not possible"));
+  if (mapped_geometry != 0)
     return;
   Assert (dof_info != 0, ExcNotInitialized());
   Assert (mapping_info != 0, ExcNotInitialized());
@@ -1988,11 +2026,44 @@ FEEvaluationBase<dim,n_components_,Number>
 template <int dim, int n_components_, typename Number>
 inline
 internal::MatrixFreeFunctions::CellType
-FEEvaluationBase<dim,n_components_,Number>
-::get_cell_type () const
+FEEvaluationBase<dim,n_components_,Number>::get_cell_type () const
 {
   Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   return cell_type;
+}
+
+
+
+template <int dim, int n_components_, typename Number>
+inline
+const internal::MatrixFreeFunctions::ShapeInfo<Number> &
+FEEvaluationBase<dim,n_components_,Number>::get_shape_info() const
+{
+  Assert(data != 0, ExcInternalError());
+  return *data;
+}
+
+
+
+template <int dim, int n_components_, typename Number>
+inline
+void
+FEEvaluationBase<dim,n_components_,Number>
+::fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const
+{
+  AssertDimension(JxW_values.size(), data->n_q_points);
+  Assert (this->J_value != 0, ExcNotImplemented());
+  if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
+      this->cell_type == internal::MatrixFreeFunctions::affine)
+    {
+      Assert (this->mapping_info != 0, ExcNotImplemented());
+      VectorizedArray<Number> J = this->J_value[0];
+      for (unsigned int q=0; q<this->data->n_q_points; ++q)
+        JxW_values[q] = J * this->quadrature_weights[q];
+    }
+  else
+    for (unsigned int q=0; q<data->n_q_points; ++q)
+      JxW_values[q] = this->J_value[q];
 }
 
 
@@ -2086,6 +2157,14 @@ namespace internal
       res = vector_access (const_cast<const VectorType &>(vec), index);
     }
 
+    template <typename VectorType>
+    void process_dof_global (const types::global_dof_index index,
+                             VectorType         &vec,
+                             Number             &res) const
+    {
+      res = const_cast<const VectorType &>(vec)(index);
+    }
+
     void pre_constraints (const Number &,
                           Number       &res) const
     {
@@ -2125,6 +2204,14 @@ namespace internal
       vector_access (vec, index) += res;
     }
 
+    template <typename VectorType>
+    void process_dof_global (const types::global_dof_index index,
+                             VectorType         &vec,
+                             Number             &res) const
+    {
+      vec(index) += res;
+    }
+
     void pre_constraints (const Number &input,
                           Number       &res) const
     {
@@ -2161,6 +2248,14 @@ namespace internal
                       Number             &res) const
     {
       vector_access (vec, index) = res;
+    }
+
+    template <typename VectorType>
+    void process_dof_global (const types::global_dof_index index,
+                             VectorType         &vec,
+                             Number             &res) const
+    {
+      vec(index) = res;
     }
 
     void pre_constraints (const Number &,
@@ -2235,7 +2330,32 @@ FEEvaluationBase<dim,n_components_,Number>
   // into the local data field or write local data into the vector. Certain
   // operations are no-ops for the given use case.
 
-  Assert (matrix_info != 0, ExcNotInitialized());
+  // Case 1: No MatrixFree object given, simple case because we do not need to
+  // process constraints and need not care about vectorization
+  if (matrix_info == 0)
+    {
+      Assert (dof_handler != 0, ExcNotInitialized());
+      typename DoFHandler<dim>::cell_iterator cell (&dof_handler->get_tria(),
+                                                    mapped_geometry->get_cell()->level(),
+                                                    mapped_geometry->get_cell()->index(),
+                                                    dof_handler);
+      local_dof_indices.resize(dof_handler->get_fe().dofs_per_cell);
+      cell->get_dof_indices(local_dof_indices);
+
+      unsigned int index = first_selected_component * this->data->dofs_per_cell;
+      for (unsigned int comp = 0; comp<n_components; ++comp)
+        {
+          for (unsigned int i=0; i<this->data->dofs_per_cell; ++i, ++index)
+            {
+              operation.process_dof_global(local_dof_indices[this->data->lexicographic_numbering[index]],
+                                           *src[0], values_dofs[comp][i][0]);
+              for (unsigned int v=1; v<VectorizedArray<Number>::n_array_elements; ++v)
+                operation.process_empty(values_dofs[comp][i][v]);
+            }
+        }
+      return;
+    }
+
   Assert (dof_info != 0, ExcNotInitialized());
   Assert (matrix_info->indices_initialized() == true,
           ExcNotInitialized());
@@ -2843,9 +2963,16 @@ void
 FEEvaluationBase<dim,n_components_,Number>
 ::read_dof_values_plain (const VectorType *src[])
 {
+  // Case without MatrixFree initialization object
+  if (matrix_info == 0)
+    {
+      internal::VectorReader<Number> reader;
+      read_write_operation (reader, src);
+      return;
+    }
+
   // this is different from the other three operations because we do not use
   // constraints here, so this is a separate function.
-  Assert (matrix_info != 0, ExcNotInitialized());
   Assert (dof_info != 0, ExcNotInitialized());
   Assert (matrix_info->indices_initialized() == true,
           ExcNotInitialized());
@@ -3549,11 +3676,11 @@ FEEvaluationAccess<dim,n_components_,Number>
 template <int dim, int n_components_, typename Number>
 inline
 FEEvaluationAccess<dim,n_components_,Number>
-::FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
+::FEEvaluationAccess (const MappingFEEvaluation<dim,Number> &geometry,
                       const DoFHandler<dim>               &dof_handler,
-                      const unsigned int                   base_element)
+                      const unsigned int                   first_selected_component)
   :
-  FEEvaluationBase <dim,n_components_,Number> (geometry, dof_handler, base_element)
+  FEEvaluationBase <dim,n_components_,Number> (geometry, dof_handler, first_selected_component)
 {}
 
 
@@ -3590,11 +3717,11 @@ FEEvaluationAccess<dim,1,Number>
 template <int dim, typename Number>
 inline
 FEEvaluationAccess<dim,1,Number>
-::FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
+::FEEvaluationAccess (const MappingFEEvaluation<dim,Number> &geometry,
                       const DoFHandler<dim>               &dof_handler,
-                      const unsigned int                   base_element)
+                      const unsigned int                   first_selected_component)
   :
-  FEEvaluationBase <dim,1,Number> (geometry, dof_handler, base_element)
+  FEEvaluationBase <dim,1,Number> (geometry, dof_handler, first_selected_component)
 {}
 
 
@@ -3824,11 +3951,11 @@ FEEvaluationAccess<dim,dim,Number>
 template <int dim, typename Number>
 inline
 FEEvaluationAccess<dim,dim,Number>
-::FEEvaluationAccess (const EvaluatedGeometry<dim,Number> &geometry,
+::FEEvaluationAccess (const MappingFEEvaluation<dim,Number> &geometry,
                       const DoFHandler<dim>               &dof_handler,
-                      const unsigned int                   base_element)
+                      const unsigned int                   first_selected_component)
   :
-  FEEvaluationBase <dim,dim,Number> (geometry, dof_handler, base_element)
+  FEEvaluationBase <dim,dim,Number> (geometry, dof_handler, first_selected_component)
 {}
 
 
@@ -4284,11 +4411,11 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEEvaluationGeneral (const EvaluatedGeometry<dim,Number> &geometry,
+::FEEvaluationGeneral (const MappingFEEvaluation<dim,Number> &geometry,
                        const DoFHandler<dim>               &dof_handler,
-                       const unsigned int                   base_element)
+                       const unsigned int                   first_selected_component)
   :
-  BaseClass (geometry, dof_handler, base_element)
+  BaseClass (geometry, dof_handler, first_selected_component)
 {
   set_data_pointers();
 }
@@ -5917,11 +6044,11 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEEvaluation (const EvaluatedGeometry<dim,Number> &geometry,
+::FEEvaluation (const MappingFEEvaluation<dim,Number> &geometry,
                 const DoFHandler<dim>               &dof_handler,
-                const unsigned int                   base_element)
+                const unsigned int                   first_selected_component)
   :
-  BaseClass (geometry, dof_handler, base_element)
+  BaseClass (geometry, dof_handler, first_selected_component)
 {
   compute_even_odd_factors();
 }
@@ -6213,11 +6340,11 @@ FEEvaluationGL<dim,fe_degree,n_components_,Number>
 template <int dim, int fe_degree, int n_components_, typename Number>
 inline
 FEEvaluationGL<dim,fe_degree,n_components_,Number>
-::FEEvaluationGL (const EvaluatedGeometry<dim,Number> &geometry,
+::FEEvaluationGL (const MappingFEEvaluation<dim,Number> &geometry,
                   const DoFHandler<dim>               &dof_handler,
-                  const unsigned int                   base_element)
+                  const unsigned int                   first_selected_component)
   :
-  BaseClass (geometry, dof_handler, base_element)
+  BaseClass (geometry, dof_handler, first_selected_component)
 {}
 
 
@@ -6448,11 +6575,11 @@ template <int dim, int fe_degree, int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEEvaluationDGP (const EvaluatedGeometry<dim,Number> &geometry,
+::FEEvaluationDGP (const MappingFEEvaluation<dim,Number> &geometry,
                 const DoFHandler<dim>                  &dof_handler,
-                const unsigned int                      base_element)
+                const unsigned int                      first_selected_component)
   :
-  BaseClass (geometry, dof_handler, base_element)
+  BaseClass (geometry, dof_handler, first_selected_component)
 {}
 
 

@@ -16,15 +16,12 @@
 
 
 
-// this test is similar to matrix_vector_07, but implements the operations for
-// FE_DGP instead of FE_DGQ (where there is no complete tensor product and
-// different routines need to be used). The data is still not very useful
-// because the matrix does not include face terms actually present in an
-// approximation of the Laplacian. It only contains cell terms.
+// this test is similar to matrix_vector_06, but implements the operations on
+// the fly from an FEValues implementation instead of data cached in
+// MatrixFree.
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
-#include <deal.II/fe/fe_dgp.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/grid/tria.h>
@@ -46,81 +43,66 @@ std::ofstream logfile("output");
 
 
 
-template <int dim, int fe_degree, typename VECTOR>
-void
-helmholtz_operator_dgp (const MatrixFree<dim,typename VECTOR::value_type>  &data,
-                        VECTOR       &dst,
-                        const VECTOR &src,
-                        const std::pair<unsigned int,unsigned int> &cell_range)
-{
-  typedef typename VECTOR::value_type Number;
-  FEEvaluationDGP<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
-  const unsigned int n_q_points = fe_eval.n_q_points;
-
-  for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
-    {
-      fe_eval.reinit (cell);
-      fe_eval.read_dof_values (src);
-      fe_eval.evaluate (true, true, false);
-      for (unsigned int q=0; q<n_q_points; ++q)
-        {
-          fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
-          fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
-        }
-      fe_eval.integrate (true,true);
-      fe_eval.distribute_local_to_global (dst);
-    }
-}
-
-
-
 template <int dim, int fe_degree, typename Number, typename VECTOR=Vector<Number> >
 class MatrixFreeTest
 {
 public:
-  typedef VectorizedArray<Number> vector_t;
-
-  MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
-    data (data_in)
-  {};
+  MatrixFreeTest(const DoFHandler<dim> &dof_handler,
+                 const ConstraintMatrix &constraints)
+    :
+    dof_handler (dof_handler),
+    constraints (constraints)
+  {}
 
   void vmult (VECTOR       &dst,
               const VECTOR &src) const
   {
+    MappingFEEvaluation<dim,Number> mapping(QGauss<1>(fe_degree+1),
+                                            update_gradients | update_values |
+                                            update_JxW_values);
+    VECTOR src_cpy = src;
+    constraints.distribute(src_cpy);
+    FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval(mapping, dof_handler);
     dst = 0;
-    const std_cxx1x::function<void(const MatrixFree<dim,typename VECTOR::value_type> &,
-                                   VECTOR &,
-                                   const VECTOR &,
-                                   const std::pair<unsigned int,unsigned int> &)>
-      wrap = helmholtz_operator_dgp<dim,fe_degree,VECTOR>;
-    data.cell_loop (wrap, dst, src);
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for ( ; cell != endc; ++cell)
+      {
+        mapping.reinit(cell);
+        fe_eval.read_dof_values (src_cpy);
+        fe_eval.evaluate (true, true, false);
+        for (unsigned int q=0; q<fe_eval.n_q_points; ++q)
+          {
+            fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
+            fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
+          }
+        fe_eval.integrate (true,true);
+        fe_eval.distribute_local_to_global (dst);
+      }
+    constraints.condense(dst);
   };
 
 private:
-  const MatrixFree<dim,Number> &data;
+  const DoFHandler<dim> &dof_handler;
+  const ConstraintMatrix &constraints;
 };
 
 
 
 template <int dim, int fe_degree, typename number>
 void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix &constraints)
+              const ConstraintMatrix &constraints,
+              const unsigned int     parallel_option = 0)
 {
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
+  if (parallel_option > 0)
+    deallog << "Parallel option: " << parallel_option << std::endl;
+  //std::cout << "Number of cells: " << dof.get_tria().n_active_cells() << std::endl;
+  //std::cout << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
+  //std::cout << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-  MatrixFree<dim,number> mf_data;
-  {
-    const QGauss<1> quad (fe_degree+1);
-    typename MatrixFree<dim,number>::AdditionalData data;
-    data.tasks_parallel_scheme =
-      MatrixFree<dim,number>::AdditionalData::partition_color;
-    data.tasks_block_size = 3;
-
-    mf_data.reinit (dof, constraints, quad, data);
-  }
-
-  MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,number> mf (dof, constraints);
   Vector<number> in (dof.n_dofs()), out (dof.n_dofs());
   Vector<number> in_dist (dof.n_dofs());
   Vector<number> out_dist (in_dist);
@@ -215,12 +197,25 @@ void test ()
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  FE_DGP<dim> fe (fe_degree);
+  FE_Q<dim> fe (fe_degree);
   DoFHandler<dim> dof (tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
+  DoFTools::make_hanging_node_constraints(dof, constraints);
+  VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
+                                            constraints);
+  constraints.close();
 
   do_test<dim, fe_degree, double> (dof, constraints);
+
+  if (dim == 2)
+    {
+      deallog.push("float");
+      deallog.threshold_double(1.e-6);
+      do_test<dim, fe_degree, float> (dof, constraints);
+      deallog.threshold_double(5.e-11);
+      deallog.pop();
+    }
 }
 
 
@@ -237,6 +232,7 @@ int main ()
     deallog.push("2d");
     test<2,1>();
     test<2,2>();
+    test<2,4>();
     deallog.pop();
     deallog.push("3d");
     test<3,1>();
@@ -244,5 +240,3 @@ int main ()
     deallog.pop();
   }
 }
-
-
