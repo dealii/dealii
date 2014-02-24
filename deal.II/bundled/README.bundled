@@ -18,17 +18,13 @@ boost-1.49.0/LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt
 A full version of the library can be downloaded at http://www.boost.org/.
 
 
-./functionparser (FunctionParser 4.5)
+./muparser_v2_2_3
 ==============
 
-Contains the FunctionParser project which is copyrighted by Juha Nieminen
-and licensed under the GNU Lesser General Public License (LGPL) Version 3.
-See functionparser/README, functionparser/lgpl-3.0.txt or
-http://warp.povusers.org/FunctionParser/
+Contains the MuParser project licensed under the MIT license.
 
 A full version of the FunctionParser project can be downloaded at
-http://warp.povusers.org/FunctionParser/.
-
+http://muparser.beltoforion.de/.
 
 ./tbb30_104oss
 ==============

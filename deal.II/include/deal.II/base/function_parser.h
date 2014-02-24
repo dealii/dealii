@@ -27,17 +27,10 @@
 #include <vector>
 #include <map>
 
-#ifdef DEAL_II_WITH_MUPARSER
 namespace mu
 {
   class Parser;
 }
-#else
-namespace fparser
-{
-  class FunctionParser;
-}
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -563,9 +556,9 @@ public:
   //@}
 private:
 #ifdef DEAL_II_WITH_MUPARSER
-  /**
-   * place for the variables for each thread
-   */
+    /**
+     * place for the variables for each thread
+     */
     mutable Threads::ThreadLocalStorage<std::vector<double> > vars;
     /**
      * the muParser objects for each thread (and one for each component)
@@ -588,15 +581,9 @@ private:
      * this function will initialize fp on the current thread
      */
     void init_muparser() const;
-#else
-  /**
-   * A pointer to the actual function parsers. The pointer is to an array of
-   * parsers, not just a single one. The length of the array equals the number
-   * of vector components.
-   */
-  fparser::FunctionParser *fp;
 #endif
-  /**
+
+    /**
    * State of usability. This
    * variable is checked every time
    * the function is called for
