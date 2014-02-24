@@ -565,7 +565,7 @@ namespace DoFRenumbering
 
   /**
    * Renumber the degrees of freedom according to the Cuthill-McKee method,
-   * eventually using the reverse numbering scheme.
+   * possibly using the reverse numbering scheme.
    *
    * See the general documentation of this class for details on the different
    * methods.
@@ -573,6 +573,11 @@ namespace DoFRenumbering
    * As an example of the results of this algorithm, take a look at the
    * comparison of various algorithms in the documentation of the
    * DoFRenumbering namespace.
+   *
+   * If the given DoFHandler uses a distributed triangulation (i.e., if
+   * dof_handler.locally_owned() is not the complete index set), the
+   * renumbering is performed on each processor's degrees of freedom
+   * individually.
    */
   template <class DH>
   void

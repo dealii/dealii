@@ -142,39 +142,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
     std::vector<ComponentMask>(FiniteElementData<dim>(
                                  get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
-  // Reinit the vectors of
-  // restriction and prolongation
-  // matrices to the right sizes
-  this->reinit_restriction_and_prolongation_matrices();
-
-  // Fill prolongation matrices with
-  // embedding operators and
-  // restriction with L2 projection
-  //
-  // we can call the respective
-  // functions in the case
-  // dim==spacedim, but they are not
-  // currently implemented for the
-  // codim-1 case. there's no harm
-  // here, though, since these
-  // matrices are independent of the
-  // space dimension and so we can
-  // copy them from the respective
-  // elements (not cheap, but works)
-  if (dim == spacedim)
-    {
-      FETools::compute_embedding_matrices (*this, this->prolongation);
-      FETools::compute_projection_matrices (*this, this->restriction);
-    }
-  else
-    {
-      FE_DGQ<dim> tmp (degree);
-      this->prolongation = tmp.prolongation;
-      this->restriction  = tmp.restriction;
-    }
-
-
-  // finally fill in support points
+  // fill in support points
   if (degree == 0)
     {
       // constant elements, take
@@ -210,8 +178,11 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
             };
     };
 
-  // note: no face support points for
-  // DG elements
+  // do not initialize embedding and restriction here. these matrices are
+  // initialized on demand in get_restriction_matrix and
+  // get_prolongation_matrix
+
+  // note: no face support points for DG elements
 }
 
 
@@ -226,21 +197,17 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1> &points)
     std::vector<ComponentMask>(FiniteElementData<dim>(
                                  get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, std::vector<bool>(1,true)))
 {
-  // Reinit the vectors of
-  // restriction and prolongation
-  // matrices to the right sizes
-  this->reinit_restriction_and_prolongation_matrices();
-  // Fill prolongation matrices with embedding operators
-  FETools::compute_embedding_matrices<dim, double, spacedim> (*this, this->prolongation);
-  // Fill restriction matrices with L2-projection
-  FETools::compute_projection_matrices<dim, double, spacedim> (*this, this->restriction);
-
   // Compute support points, which
   // are the tensor product of the
   // Lagrange interpolation points in
   // the constructor.
   Quadrature<dim> support_quadrature(points);
   this->unit_support_points = support_quadrature.get_points();
+
+
+  // do not initialize embedding and restriction here. these matrices are
+  // initialized on demand in get_restriction_matrix and
+  // get_prolongation_matrix
 }
 
 
@@ -505,6 +472,138 @@ get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_f
   Assert (interpolation_matrix.n() == 0,
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 0));
+}
+
+
+
+template <int dim, int spacedim>
+const FullMatrix<double> &
+FE_DGQ<dim,spacedim>
+::get_prolongation_matrix (const unsigned int child,
+                           const RefinementCase<dim> &refinement_case) const
+{
+  Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
+          ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
+  Assert (refinement_case!=RefinementCase<dim>::no_refinement,
+          ExcMessage("Prolongation matrices are only available for refined cells!"));
+  Assert (child<GeometryInfo<dim>::n_children(refinement_case),
+          ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
+
+  // initialization upon first request
+  if (this->prolongation[refinement_case-1][child].n() == 0)
+    {
+      Threads::Mutex::ScopedLock lock(this->mutex);
+
+      // if matrix got updated while waiting for the lock
+      if (this->prolongation[refinement_case-1][child].n() ==
+          this->dofs_per_cell)
+        return this->prolongation[refinement_case-1][child];
+
+      // now do the work. need to get a non-const version of data in order to
+      // be able to modify them inside a const function
+      FE_DGQ<dim,spacedim> &this_nonconst = const_cast<FE_DGQ<dim,spacedim>& >(*this);
+      if (refinement_case == RefinementCase<dim>::isotropic_refinement)
+        {
+          std::vector<std::vector<FullMatrix<double> > >
+            isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
+          isotropic_matrices.back().
+            resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+                   FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
+          if (dim == spacedim)
+            FETools::compute_embedding_matrices (*this, isotropic_matrices, true);
+          else
+            FETools::compute_embedding_matrices (FE_DGQ<dim>(this->degree),
+                                                 isotropic_matrices, true);
+          this_nonconst.prolongation[refinement_case-1].swap(isotropic_matrices.back());
+        }
+      else
+        {
+          // must compute both restriction and prolongation matrices because
+          // we only check for their size and the reinit call initializes them
+          // all
+          this_nonconst.reinit_restriction_and_prolongation_matrices();
+          if (dim == spacedim)
+            {
+              FETools::compute_embedding_matrices (*this, this_nonconst.prolongation);
+              FETools::compute_projection_matrices (*this, this_nonconst.restriction);
+            }
+          else
+            {
+              FE_DGQ<dim> tmp(this->degree);
+              FETools::compute_embedding_matrices (tmp, this_nonconst.prolongation);
+              FETools::compute_projection_matrices (tmp, this_nonconst.restriction);
+            }
+        }
+    }
+
+  // finally return the matrix
+  return this->prolongation[refinement_case-1][child];
+}
+
+
+
+template <int dim, int spacedim>
+const FullMatrix<double> &
+FE_DGQ<dim,spacedim>
+::get_restriction_matrix (const unsigned int child,
+                          const RefinementCase<dim> &refinement_case) const
+{
+  Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
+          ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
+  Assert (refinement_case!=RefinementCase<dim>::no_refinement,
+          ExcMessage("Restriction matrices are only available for refined cells!"));
+  Assert (child<GeometryInfo<dim>::n_children(refinement_case),
+          ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
+
+  // initialization upon first request
+  if (this->restriction[refinement_case-1][child].n() == 0)
+    {
+      Threads::Mutex::ScopedLock lock(this->mutex);
+
+      // if matrix got updated while waiting for the lock...
+      if (this->restriction[refinement_case-1][child].n() ==
+          this->dofs_per_cell)
+        return this->restriction[refinement_case-1][child];
+
+      // now do the work. need to get a non-const version of data in order to
+      // be able to modify them inside a const function
+      FE_DGQ<dim,spacedim> &this_nonconst = const_cast<FE_DGQ<dim,spacedim>& >(*this);
+      if (refinement_case == RefinementCase<dim>::isotropic_refinement)
+        {
+          std::vector<std::vector<FullMatrix<double> > >
+            isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
+          isotropic_matrices.back().
+            resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+                   FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
+          if (dim == spacedim)
+            FETools::compute_projection_matrices (*this, isotropic_matrices, true);
+          else
+            FETools::compute_projection_matrices (FE_DGQ<dim>(this->degree),
+                                                 isotropic_matrices, true);
+          this_nonconst.restriction[refinement_case-1].swap(isotropic_matrices.back());
+        }
+      else
+        {
+          // must compute both restriction and prolongation matrices because
+          // we only check for their size and the reinit call initializes them
+          // all
+          this_nonconst.reinit_restriction_and_prolongation_matrices();
+          if (dim == spacedim)
+            {
+              FETools::compute_embedding_matrices (*this, this_nonconst.prolongation);
+              FETools::compute_projection_matrices (*this, this_nonconst.restriction);
+            }
+          else
+            {
+              FE_DGQ<dim> tmp(this->degree);
+              FETools::compute_embedding_matrices (tmp, this_nonconst.prolongation);
+              FETools::compute_projection_matrices (tmp, this_nonconst.restriction);
+            }
+        }
+    }
+
+  // finally return the matrix
+  return this->restriction[refinement_case-1][child];
 }
 
 

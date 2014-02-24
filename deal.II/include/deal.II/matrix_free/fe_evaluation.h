@@ -5041,7 +5041,7 @@ namespace internal
       {
         for (int i1=0; i1<n_blocks1; ++i1)
           {
-            Number xp[mid], xm[mid];
+            Number xp[mid>0?mid:1], xm[mid>0?mid:1];
             for (int i=0; i<mid; ++i)
               {
                 if (dof_to_quad == true && type == 1)
@@ -6004,7 +6004,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
   // Compute symmetric and skew-symmetric part of shape values for even-odd
   // decomposition
-  for (unsigned int i=0; i<(fe_degree+1)/2; ++i)
+  for (int i=0; i<(fe_degree+1)/2; ++i)
     for (unsigned int q=0; q<(n_q_points_1d+1)/2; ++q)
       {
         shape_val_evenodd[i][q] =

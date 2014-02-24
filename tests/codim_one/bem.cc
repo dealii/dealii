@@ -558,9 +558,9 @@ BEM<spacedim>::solve()
   // is the tangential component of the
   // perturbation induced in the
   // velocity.
-  tangential_derivative.reinit(dof_handler_q.n_dofs());
-  tangential_velocity.reinit(dof_handler_q.n_dofs());
-  error.reinit(dof_handler_q.n_dofs());
+  tangential_velocity.reinit(tria.n_active_cells());
+  tangential_derivative.reinit(tria.n_active_cells());
+  error.reinit(tria.n_active_cells());
   QMidpoint<spacedim-1>             q_midpoint;
   QTrapez<spacedim-1>               q_trapez;
   const QIterated<spacedim-1>       q_iterated(q_midpoint, 1);
@@ -704,9 +704,9 @@ BEM<spacedim>::output_results()
 
   DataOut<spacedim-1, DoFHandler<spacedim-1,spacedim> > dataout;
   dataout.attach_dof_handler(dof_handler_q);
-  dataout.add_data_vector(smooth_solution, "linear_potential");
-  dataout.add_data_vector(tangential_derivative, "tangential_velocity");
-  dataout.add_data_vector(error, "error");
+  dataout.add_data_vector(dof_handler_q, smooth_solution, "linear_potential");
+  dataout.add_data_vector(tangential_derivative, "tangential_velocity", DataOut<spacedim-1, DoFHandler<spacedim-1,spacedim> >::type_cell_data);
+  dataout.add_data_vector(error, "error", DataOut<spacedim-1, DoFHandler<spacedim-1,spacedim> >::type_cell_data);
   dataout.build_patches();
 //    dataout.build_patches(fe_q.degree);
   dataout.write_vtk(logfile);

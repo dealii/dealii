@@ -388,7 +388,7 @@ namespace Advection
 
     data_out.add_data_vector (solution,
                               solution_names,
-                              DataOut<dim,DoFHandler<dim> >::type_automatic,
+                              DataOut<dim,DoFHandler<dim> >::type_dof_data,
                               interpretation);
 
     data_out.build_patches (fe.degree);

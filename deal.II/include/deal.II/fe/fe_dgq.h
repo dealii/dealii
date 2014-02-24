@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/fe/fe_poly.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -178,6 +179,52 @@ public:
   get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
                                     const unsigned int        subface,
                                     FullMatrix<double>       &matrix) const;
+
+  /**
+   * Projection from a fine grid space onto a coarse grid space. Overrides the
+   * respective method in FiniteElement, implementing lazy evaluation
+   * (initialize when requested).
+   *
+   * If this projection operator is associated with a matrix @p P, then the
+   * restriction of this matrix @p P_i to a single child cell is returned
+   * here.
+   *
+   * The matrix @p P is the concatenation or the sum of the cell matrices @p
+   * P_i, depending on the #restriction_is_additive_flags. This distinguishes
+   * interpolation (concatenation) and projection with respect to scalar
+   * products (summation).
+   *
+   * Row and column indices are related to coarse grid and fine grid spaces,
+   * respectively, consistent with the definition of the associated operator.
+   */
+  virtual const FullMatrix<double> &
+  get_restriction_matrix (const unsigned int child,
+                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+
+  /**
+   * Embedding matrix between grids. Overrides the respective method in
+   * FiniteElement, implementing lazy evaluation (initialize when queried).
+   *
+   * The identity operator from a coarse grid space into a fine grid space is
+   * associated with a matrix @p P. The restriction of this matrix @p P_i to a
+   * single child cell is returned here.
+   *
+   * The matrix @p P is the concatenation, not the sum of the cell matrices @p
+   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in in two
+   * different child matrices @p P_i, the value should be the same in both
+   * matrices and it is copied into the matrix @p P only once.
+   *
+   * Row and column indices are related to fine grid and coarse grid spaces,
+   * respectively, consistent with the definition of the associated operator.
+   *
+   * These matrices are used by routines assembling the prolongation matrix
+   * for multi-level methods.  Upon assembling the transfer matrix between
+   * cells using this matrix array, zero elements in the prolongation matrix
+   * are discarded and will not fill up the transfer matrix.
+   */
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix (const unsigned int child,
+                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
 
   /**
    * @name Functions to support hp
@@ -367,6 +414,11 @@ private:
    */
   void rotate_indices (std::vector<unsigned int> &indices,
                        const char                 direction) const;
+
+  /*
+   * Mutex for protecting initialization of restriction and embedding matrix.
+   */
+  mutable Threads::Mutex mutex;
 
   /**
    * Allow access from other dimensions.
