@@ -42,7 +42,13 @@ DEAL_II_NAMESPACE_OPEN
  * the same element. This interface is thus primarily useful for evaluating
  * several operators on the same cell, e.g., when assembling cell matrices.
  *
- * @author Martin Kronbichler
+ * As opposed to the standard Mapping classes in deal.II, this class does not
+ * actually provide a boundary description that can be used to evaluate the
+ * geometry, but it rather provides the evaluated geometry from a given
+ * deal.II mapping (as passed to the constructor of this class) in a form
+ * accessible to FEEvaluation.
+ *
+ * @author Martin Kronbichler, 2014
  */
 template <int dim, typename Number=double>
 class MappingFEEvaluation : public Subscriptor
@@ -54,14 +60,14 @@ public:
    * FE_Nothing, is used internally for the underlying FEValues object.
    */
   MappingFEEvaluation (const Mapping<dim> &mapping,
-                     const Quadrature<1> &quadrature,
-                     const UpdateFlags update_flags);
+                       const Quadrature<1> &quadrature,
+                       const UpdateFlags update_flags);
 
   /**
    * Constructor. Instead of providing a mapping, use MappingQ1.
    */
   MappingFEEvaluation (const Quadrature<1> &quadrature,
-                     const UpdateFlags update_flags);
+                       const UpdateFlags update_flags);
 
   /**
    * Initialize with the given cell iterator. This works for all type of
