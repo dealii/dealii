@@ -34,43 +34,6 @@ namespace internal
   namespace MatrixFreeFunctions
   {
 
-    // helper function
-    template <int dim>
-    std::vector<unsigned int>
-    get_lexicographic_numbering_inverse(const FiniteElement<dim> &fe)
-    {
-      Assert(fe.n_components() == 1,
-             ExcMessage("Expected a scalar element"));
-
-      const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
-        dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>(&fe);
-
-      const FE_Poly<TensorProductPolynomials<dim,Polynomials::
-        PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
-        dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
-        Polynomials::PiecewisePolynomial<double> >,dim,dim>*> (&fe);
-
-      const FE_DGP<dim> *fe_dgp = dynamic_cast<const FE_DGP<dim>*>(&fe);
-
-      std::vector<unsigned int> lexicographic;
-      if (fe_poly != 0)
-        lexicographic = fe_poly->get_poly_space_numbering_inverse();
-      else if (fe_poly_piece != 0)
-        lexicographic = fe_poly_piece->get_poly_space_numbering_inverse();
-      else if (fe_dgp != 0)
-        {
-          lexicographic.resize(fe_dgp->dofs_per_cell);
-          for (unsigned int i=0; i<fe_dgp->dofs_per_cell; ++i)
-            lexicographic[i] = i;
-        }
-      else
-        Assert(false, ExcNotImplemented());
-
-      return lexicographic;
-    }
-
-
-
     // ----------------- actual ShapeInfo functions --------------------
 
     template <typename Number>
@@ -99,19 +62,67 @@ namespace internal
 
       const unsigned int n_dofs_1d = fe->degree+1,
                          n_q_points_1d = quad.size();
-      std::vector<unsigned int> lexicographic (fe->dofs_per_cell);
 
       // renumber (this is necessary for FE_Q, for example, since there the
       // vertex DoFs come first, which is incompatible with the lexicographic
       // ordering necessary to apply tensor products efficiently)
+      std::vector<unsigned int> scalar_lexicographic;
       {
-        lexicographic = get_lexicographic_numbering_inverse(*fe);
+        // find numbering to lexicographic
+        Assert(fe->n_components() == 1,
+               ExcMessage("Expected a scalar element"));
+
+        const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
+          dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>(fe);
+
+        const FE_Poly<TensorProductPolynomials<dim,Polynomials::
+          PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
+          dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
+          Polynomials::PiecewisePolynomial<double> >,dim,dim>*> (fe);
+
+        const FE_DGP<dim> *fe_dgp = dynamic_cast<const FE_DGP<dim>*>(fe);
+
+        if (fe_poly != 0)
+          scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
+        else if (fe_poly_piece != 0)
+          scalar_lexicographic = fe_poly_piece->get_poly_space_numbering_inverse();
+        else if (fe_dgp != 0)
+          {
+            scalar_lexicographic.resize(fe_dgp->dofs_per_cell);
+          for (unsigned int i=0; i<fe_dgp->dofs_per_cell; ++i)
+            scalar_lexicographic[i] = i;
+          }
+        else
+          Assert(false, ExcNotImplemented());
+
+        // Finally store the renumbering into the member variable of this
+        // class
+        if (fe_in.n_components() == 1)
+          lexicographic_numbering = scalar_lexicographic;
+        else
+          {
+            // have more than one component, get the inverse
+            // permutation, invert it, sort the components one after one,
+            // and invert back
+            std::vector<unsigned int> scalar_inv =
+              Utilities::invert_permutation(scalar_lexicographic);
+            std::vector<unsigned int> lexicographic (fe_in.dofs_per_cell);
+            for (unsigned int comp=0; comp<fe_in.n_components(); ++comp)
+              for (unsigned int i=0; i<scalar_inv.size(); ++i)
+                lexicographic[fe_in.component_to_system_index(comp,i)]
+                  = scalar_inv.size () * comp + scalar_inv[i];
+
+            // invert numbering again
+            lexicographic_numbering =
+              Utilities::invert_permutation(lexicographic);
+          }
 
         // to evaluate 1D polynomials, evaluate along the line where y=z=0,
         // assuming that shape_value(0,Point<dim>()) == 1. otherwise, need
         // other entry point (e.g. generating a 1D element by reading the
         // name, as done before r29356)
-        Assert(std::fabs(fe->shape_value(lexicographic[0], Point<dim>())-1) < 1e-13,
+        Assert(std::fabs(fe->shape_value(scalar_lexicographic[0],
+                                         Point<dim>())-1) < 1e-13,
                ExcInternalError());
       }
 
@@ -138,7 +149,7 @@ namespace internal
         {
           // need to reorder from hierarchical to lexicographic to get the
           // DoFs correct
-          const unsigned int my_i = lexicographic[i];
+          const unsigned int my_i = scalar_lexicographic[i];
           for (unsigned int q=0; q<n_q_points_1d; ++q)
             {
               // fill both vectors with

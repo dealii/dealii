@@ -91,7 +91,7 @@ public:
    */
   unsigned int n_default_threads DEAL_II_DEPRECATED;
 
-  /*
+  /**
    * Returns the number of threads to use. This is governed by the number
    * of cores the system has (n_cpus) and can be further restricted by
    * set_thread_limit().

@@ -1195,7 +1195,7 @@ FullMatrix<number>::operator = (const number d)
   (void)d; // removes -Wunused-parameter warning in optimized mode
 
   if (this->n_elements() != 0)
-    std::memset (&this->values[0], 0, this->n_elements()*sizeof(number));
+    this->reset_values();
 
   return *this;
 }

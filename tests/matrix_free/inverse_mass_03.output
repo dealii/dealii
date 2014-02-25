@@ -1,0 +1,26 @@
+
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(1)^3]
+DEAL:2d:cg::Starting value 10.6
+DEAL:2d:cg::Convergence step 108 value 0
+DEAL:2d::Norm of difference: 0
+DEAL:2d::
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(2)^3]
+DEAL:2d:cg::Starting value 15.1
+DEAL:2d:cg::Convergence step 252 value 0
+DEAL:2d::Norm of difference: 0
+DEAL:2d::
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(4)^3]
+DEAL:2d:cg::Starting value 25.4
+DEAL:2d:cg::Convergence step 699 value 0
+DEAL:2d::Norm of difference: 0
+DEAL:2d::
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d:cg::Starting value 23.7
+DEAL:3d:cg::Convergence step 412 value 0
+DEAL:3d::Norm of difference: 0
+DEAL:3d::
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d:cg::Starting value 23.7
+DEAL:3d:cg::Convergence step 1019 value 0
+DEAL:3d::Norm of difference: 0
+DEAL:3d::

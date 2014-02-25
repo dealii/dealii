@@ -156,6 +156,15 @@ namespace internal
       std::vector<Number>    shape_gradient_number;
 
       /**
+       * Renumbering from deal.II's numbering of cell degrees of freedom to
+       * lexicographic numbering used inside the FEEvaluation schemes of the
+       * underlying element in the DoFHandler. For vector-valued elements, the
+       * renumbering starts with a lexicographic numbering of the first
+       * component, then everything of the second component, and so on.
+       */
+      std::vector<unsigned int> lexicographic_numbering;
+
+      /**
        * Stores the number of quadrature points in
        * @p dim dimensions for a cell.
        */
@@ -179,16 +188,6 @@ namespace internal
        */
       unsigned int dofs_per_face;
     };
-
-
-    /**
-     * Extracts the mapping between the actual numbering inside a scalar
-     * element and lexicographic numbering as required by the evaluation
-     * routines.
-     */
-    template <int dim>
-    std::vector<unsigned int>
-    get_lexicographic_numbering_inverse (const FiniteElement<dim> &fe);
 
 
 
