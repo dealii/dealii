@@ -54,11 +54,12 @@ namespace internal
  * This is the base class for the FEEvaluation classes. This class is a base
  * class and needs usually not be called in user code. It does not have any
  * public constructor. Use one of the derived classes FEEvaluationGeneral,
- * FEEvaluation or FEEvaluationGL instead. It implements a reinit method that
- * is used to set pointers so that operations on quadrature points can be
- * performed quickly, access functions to vectors for the @p read_dof_values,
- * @p set_dof_values, and @p distributed_local_to_global functions, as well as
- * methods to access values and gradients of finite element functions.
+ * FEEvaluation, FEEvaluationGL, or FEEvaluationDGP instead. It implements a
+ * reinit method that is used to set pointers so that operations on quadrature
+ * points can be performed quickly, access functions to vectors for the @p
+ * read_dof_values, @p set_dof_values, and @p distributed_local_to_global
+ * functions, as well as methods to access values and gradients of finite
+ * element functions.
  *
  * This class has three template arguments:
  *
@@ -566,12 +567,16 @@ protected:
    * the base element (as long as the element is primitive, non-primitive are
    * not supported currently).
    *
-   * With this initialization, no call to a reinit method of this
-   * class. Instead, it is enough if the geometry is initialized to a given
-   * cell iterator. Moreover, beware that a kernel using this method does not
-   * vectorize over several elements (which is most efficient for vector
-   * operations), but only possibly within the element if the
-   * evaluate/integrate routines are combined (e.g. for matrix assembly).
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
    */
   FEEvaluationBase (const MappingFEEvaluation<dim,Number> &geometry,
                     const DoFHandler<dim>                 &dof_handler,
@@ -870,6 +875,16 @@ protected:
    * the base element (as long as the element is primitive, non-primitive are
    * not supported currently).
    *
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
    * With this initialization, no call to a reinit method of this
    * class. Instead, it is enough if the geometry is initialized to a given
    * cell iterator. Moreover, beware that a kernel using this method does not
@@ -1017,6 +1032,16 @@ protected:
    * the base element (as long as the element is primitive, non-primitive are
    * not supported currently).
    *
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
    * With this initialization, no call to a reinit method of this
    * class. Instead, it is enough if the geometry is initialized to a given
    * cell iterator. Moreover, beware that a kernel using this method does not
@@ -1173,6 +1198,16 @@ protected:
    * the base element (as long as the element is primitive, non-primitive are
    * not supported currently).
    *
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
    * With this initialization, no call to a reinit method of this
    * class. Instead, it is enough if the geometry is initialized to a given
    * cell iterator. Moreover, beware that a kernel using this method does not
@@ -1264,6 +1299,16 @@ public:
    * the base element (as long as the element is primitive, non-primitive are
    * not supported currently).
    *
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
    * With this initialization, no call to a reinit method of this
    * class. Instead, it is enough if the geometry is initialized to a given
    * cell iterator. Moreover, beware that a kernel using this method does not
@@ -1450,12 +1495,16 @@ public:
    * the base element (as long as the element is primitive, non-primitive are
    * not supported currently).
    *
-   * With this initialization, no call to a reinit method of this
-   * class. Instead, it is enough if the geometry is initialized to a given
-   * cell iterator. Moreover, beware that a kernel using this method does not
-   * vectorize over several elements (which is most efficient for vector
-   * operations), but only possibly within the element if the
-   * evaluate/integrate routines are combined (e.g. for matrix assembly).
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
    */
   FEEvaluation (const MappingFEEvaluation<dim,Number> &geometry,
                 const DoFHandler<dim>                 &dof_handler,
@@ -1604,12 +1653,16 @@ public:
    * the base element (as long as the element is primitive, non-primitive are
    * not supported currently).
    *
-   * With this initialization, no call to a reinit method of this
-   * class. Instead, it is enough if the geometry is initialized to a given
-   * cell iterator. Moreover, beware that a kernel using this method does not
-   * vectorize over several elements (which is most efficient for vector
-   * operations), but only possibly within the element if the
-   * evaluate/integrate routines are combined (e.g. for matrix assembly).
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
    */
   FEEvaluationGL (const MappingFEEvaluation<dim,Number> &geometry,
                   const DoFHandler<dim>                 &dof_handler,
@@ -1731,12 +1784,16 @@ public:
    * the base element (as long as the element is primitive, non-primitive are
    * not supported currently).
    *
-   * With this initialization, no call to a reinit method of this
-   * class. Instead, it is enough if the geometry is initialized to a given
-   * cell iterator. Moreover, beware that a kernel using this method does not
-   * vectorize over several elements (which is most efficient for vector
-   * operations), but only possibly within the element if the
-   * evaluate/integrate routines are combined (e.g. for matrix assembly).
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
    */
   FEEvaluationDGP (const MappingFEEvaluation<dim,Number> &geometry,
                    const DoFHandler<dim>                 &dof_handler,
