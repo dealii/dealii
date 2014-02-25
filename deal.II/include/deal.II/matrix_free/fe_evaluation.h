@@ -6674,14 +6674,14 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
   unsigned int count_p = 0, count_q = 0;
   for (unsigned int i=0; i<(dim>2?fe_degree+1:1); ++i)
     {
-      for (int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
+      for (unsigned int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
         {
-          for (int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
+          for (unsigned int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
             {
               for (unsigned int c=0; c<n_components; ++c)
                 expanded_dof_values[c][count_q] = this->values_dofs[c][count_p];
             }
-          for (int k=fe_degree+1-j-i; k<fe_degree+1; ++k, ++count_q)
+          for (unsigned int k=fe_degree+1-j-i; k<fe_degree+1; ++k, ++count_q)
             for (unsigned int c=0; c<n_components; ++c)
               expanded_dof_values[c][count_q] = VectorizedArray<Number>();
         }
@@ -6736,9 +6736,9 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
   unsigned int count_p = 0, count_q = 0;
   for (unsigned int i=0; i<(dim>2?fe_degree+1:1); ++i)
     {
-      for (int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
+      for (unsigned int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
         {
-          for (int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
+          for (unsigned int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
             {
               for (unsigned int c=0; c<n_components; ++c)
                 this->values_dofs[c][count_p] = expanded_dof_values[c][count_q];
