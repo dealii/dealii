@@ -420,13 +420,17 @@ namespace DoFRenumbering
               row_lengths[i] = csp.row_length(locally_owned.nth_index_in_set(i));
             sparsity.reinit(locally_owned.n_elements(), locally_owned.n_elements(),
                             row_lengths);
+            std::vector<types::global_dof_index> row_entries;
             for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
               {
                 const types::global_dof_index row = locally_owned.nth_index_in_set(i);
+                row_entries.resize(0);
                 for (CompressedSimpleSparsityPattern::row_iterator it =
                        csp.row_begin(row); it != csp.row_end(row); ++it)
                   if (*it != row && locally_owned.is_element(*it))
-                    sparsity.add(i, locally_owned.index_within_set(*it));
+                    row_entries.push_back(locally_owned.index_within_set(*it));
+                sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
+                                     true);
               }
             sparsity.compress();
           }

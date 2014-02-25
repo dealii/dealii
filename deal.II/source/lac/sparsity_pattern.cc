@@ -789,7 +789,8 @@ SparsityPattern::add_entries (const size_type row,
         {
           ForwardIterator it = begin;
           bool has_larger_entries = false;
-          std::size_t k=rowstart[row];
+          // skip diagonal
+          std::size_t k=rowstart[row]+store_diagonal_first_in_row;
           for ( ; k<rowstart[row+1]; k++)
             if (colnums[k] == invalid_entry)
               break;

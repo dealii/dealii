@@ -93,7 +93,7 @@ LAPACKFullMatrix<number>::operator = (const double d)
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
   if (this->n_elements() != 0)
-    std::fill (this->values.begin(), this->values.end(), number());
+    this->reset_values();
 
   state = LAPACKSupport::matrix;
   return *this;
@@ -551,6 +551,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
   Assert(state == lu, ExcState(state));
   Assert(this->n_rows() == this->n_cols(),
          LACExceptions::ExcNotQuadratic());
+  AssertDimension(this->n_rows(), v.size());
 
   const char *trans = transposed ? &T : &N;
   const int nn = this->n_cols();
@@ -573,6 +574,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
   Assert(state == lu, ExcState(state));
   Assert(B.state == matrix, ExcState(state));
   Assert(this->n_rows() == this->n_cols(), LACExceptions::ExcNotQuadratic());
+  AssertDimension(this->n_rows(), B.n_rows());
 
   const char *trans = transposed ? &T : &N;
   const int nn = this->n_cols();
