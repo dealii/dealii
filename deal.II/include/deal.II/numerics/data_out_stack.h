@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ template <int dim, int spacedim> class DoFHandler;
  *
  *                                  // first declare the vectors
  *                                  // to be used later
- *   vector<string> solution_names;
+ *   std::vector<std::string> solution_names;
  *   solution_names.push_back ("u");
  *   solution_names.push_back ("v");
  *   data_out_stack.declare_data_vector (solution_names,
@@ -178,7 +178,7 @@ public:
    * component and therefore more than one
    * name needs to be given. However, you
    * can also call this function with a
-   * <tt>vector<string></tt> containing only one
+   * <tt>std::vector@<std::string@></tt> containing only one
    * element if the finite element has
    * only one component.
    */
@@ -233,7 +233,7 @@ public:
    * component and therefore more than one
    * name needs to be given. However, you
    * can also call this function with a
-   * <tt>vector<string></tt> containing only one
+   * <tt>std::vector@<std::string@></tt> containing only one
    * element if the finite element has
    * only one component.
    *
