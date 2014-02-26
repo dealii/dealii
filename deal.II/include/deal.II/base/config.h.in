@@ -353,6 +353,13 @@
 #endif
 
 
+/*************************************************
+ * Configured in configure_functionparser.cmake: *
+ *************************************************/
+
+#cmakedefine DEAL_II_WITH_MUPARSER
+
+
 /*****************************************
  * Configured in configure_netcdf.cmake: *
  *****************************************/

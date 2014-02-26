@@ -1,4 +1,4 @@
-## ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 ## $Id$
 ##
 ## Copyright (C) 2013 by the deal.II authors
@@ -31,17 +31,6 @@ OPTION(DEAL_II_FORCE_BUNDLED_BOOST
 
 SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.49.0")
 
-#
-# FunctionParser project:
-#
-
-SET(FEATURE_FUNCTIONPARSER_HAVE_BUNDLED TRUE)
-
-OPTION(DEAL_II_FORCE_BUNDLED_FUNCTIONPARSER
-  "Always use the bundled functionparser library instead of an external one."
-  OFF)
-
-SET(FUNCTIONPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/functionparser/")
 
 #
 # Threading Building Blocks library
@@ -73,3 +62,15 @@ OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
   OFF)
 
 SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
+
+
+#
+# muparser
+#
+SET(FEATURE_MUPARSER_HAVE_BUNDLED TRUE)
+
+OPTION(DEAL_II_FORCE_BUNDLED_MUPARSER
+  "Always use the bundled functionparser library instead of an external one."
+  OFF)
+
+SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_2_3/")
