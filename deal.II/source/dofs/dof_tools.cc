@@ -1009,6 +1009,7 @@ namespace DoFTools
         component_numbering[i] = count++;
 
     // First count the number of dofs in the current component.
+    constant_modes.clear ();
     constant_modes.resize (n_components_selected, std::vector<bool>(n_selected_dofs,
                            false));
 
