@@ -342,6 +342,7 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
 
 #else
 
+
 template <int dim>
 void
 FunctionParser<dim>::initialize(const std::string &,
@@ -390,6 +391,27 @@ FunctionParser<dim>::initialize(const std::string &,
 {
   Assert(false, ExcNeedsFunctionparser());
 }
+
+template <int dim>
+void
+FunctionParser<dim>::initialize(const std::string &,
+                                const std::vector<std::string> &,
+                                const std::map<std::string, double> &,
+                                const bool)
+{
+  Assert(false, ExcNeedsFunctionparser());
+}
+
+template <int dim>
+void
+FunctionParser<dim>::initialize(const std::string &,
+                                const std::string &,
+                                const std::map<std::string, double> &,
+                                const bool)
+{
+  Assert(false, ExcNeedsFunctionparser());
+}
+
 
 
 template <int dim>
