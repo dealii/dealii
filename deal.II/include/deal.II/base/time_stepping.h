@@ -135,7 +135,7 @@ namespace TimeStepping
      * time step. When using Runge-Kutta methods, @p F and @ J_inverse can
      * only contain one element.
      */
-    virtual double evolve_one_time_step(
+    double evolve_one_time_step(
       std::vector<std_cxx1x::function<VECTOR (const double, const VECTOR &)> > &F,
       std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > & J_inverse,
       double t,
