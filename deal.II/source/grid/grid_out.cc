@@ -3277,11 +3277,9 @@ namespace internal
 
         case 2:
         {
-          typename dealii::Triangulation<dim>::active_cell_iterator
-          cell=tria.begin_active(),
-          endc=tria.end();
-
-          for (; cell!=endc; ++cell)
+          for (typename dealii::Triangulation<dim>::active_cell_iterator
+              cell=tria.begin_active();
+              cell!=tria.end(); ++cell)
             for (unsigned int line_no=0;
                  line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
               {
@@ -3352,11 +3350,9 @@ namespace internal
               // boundary faces and
               // generate the info from
               // them
-              typename dealii::Triangulation<dim>::active_cell_iterator
-              cell=tria.begin_active ();
-              const typename dealii::Triangulation<dim>::active_cell_iterator
-              end=tria.end ();
-              for (; cell!=end; ++cell)
+              for (typename dealii::Triangulation<dim>::active_cell_iterator
+                  cell=tria.begin_active();
+                  cell!=tria.end(); ++cell)
                 for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                   {
                     const typename dealii::Triangulation<dim>::face_iterator

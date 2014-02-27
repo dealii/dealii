@@ -908,51 +908,53 @@ namespace FETools
     // shape value on the cell.
     std::vector<unsigned int> face_c_dofs(n);
     std::vector<unsigned int> face_f_dofs(n);
-    unsigned int k=0;
-    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
-      {
-        const unsigned int offset_c = GeometryInfo<dim>::face_to_cell_vertices(face_coarse, i)
-                                      *fe.dofs_per_vertex;
-        const unsigned int offset_f = GeometryInfo<dim>::face_to_cell_vertices(face_fine, i)
-                                      *fe.dofs_per_vertex;
-        for (unsigned int j=0; j<fe.dofs_per_vertex; ++j)
-          {
-            face_c_dofs[k] = offset_c + j;
-            face_f_dofs[k] = offset_f + j;
-            ++k;
-          }
-      }
-    for (unsigned int i=1; i<=GeometryInfo<dim>::lines_per_face; ++i)
-      {
-        const unsigned int offset_c = fe.first_line_index
-                                      + GeometryInfo<dim>::face_to_cell_lines(face_coarse, i-1)
-                                      *fe.dofs_per_line;
-        const unsigned int offset_f = fe.first_line_index
-                                      + GeometryInfo<dim>::face_to_cell_lines(face_fine, i-1)
-                                      *fe.dofs_per_line;
-        for (unsigned int j=0; j<fe.dofs_per_line; ++j)
-          {
-            face_c_dofs[k] = offset_c + j;
-            face_f_dofs[k] = offset_f + j;
-            ++k;
-          }
-      }
-    for (unsigned int i=1; i<=GeometryInfo<dim>::quads_per_face; ++i)
-      {
-        const unsigned int offset_c = fe.first_quad_index
-                                      + face_coarse
-                                      *fe.dofs_per_quad;
-        const unsigned int offset_f = fe.first_quad_index
-                                      + face_fine
-                                      *fe.dofs_per_quad;
-        for (unsigned int j=0; j<fe.dofs_per_quad; ++j)
-          {
-            face_c_dofs[k] = offset_c + j;
-            face_f_dofs[k] = offset_f + j;
-            ++k;
-          }
-      }
-    Assert (k == fe.dofs_per_face, ExcInternalError());
+    {
+      unsigned int face_dof=0;
+      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
+        {
+          const unsigned int offset_c = GeometryInfo<dim>::face_to_cell_vertices(face_coarse, i)
+                                          *fe.dofs_per_vertex;
+          const unsigned int offset_f = GeometryInfo<dim>::face_to_cell_vertices(face_fine, i)
+                                          *fe.dofs_per_vertex;
+          for (unsigned int j=0; j<fe.dofs_per_vertex; ++j)
+            {
+              face_c_dofs[face_dof] = offset_c + j;
+              face_f_dofs[face_dof] = offset_f + j;
+              ++face_dof;
+            }
+        }
+      for (unsigned int i=1; i<=GeometryInfo<dim>::lines_per_face; ++i)
+        {
+          const unsigned int offset_c = fe.first_line_index
+              + GeometryInfo<dim>::face_to_cell_lines(face_coarse, i-1)
+              *fe.dofs_per_line;
+          const unsigned int offset_f = fe.first_line_index
+              + GeometryInfo<dim>::face_to_cell_lines(face_fine, i-1)
+              *fe.dofs_per_line;
+          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+            {
+              face_c_dofs[face_dof] = offset_c + j;
+              face_f_dofs[face_dof] = offset_f + j;
+              ++face_dof;
+            }
+        }
+      for (unsigned int i=1; i<=GeometryInfo<dim>::quads_per_face; ++i)
+        {
+          const unsigned int offset_c = fe.first_quad_index
+              + face_coarse
+              *fe.dofs_per_quad;
+          const unsigned int offset_f = fe.first_quad_index
+              + face_fine
+              *fe.dofs_per_quad;
+          for (unsigned int j=0; j<fe.dofs_per_quad; ++j)
+            {
+              face_c_dofs[face_dof] = offset_c + j;
+              face_f_dofs[face_dof] = offset_f + j;
+              ++face_dof;
+            }
+        }
+      Assert (face_dof == fe.dofs_per_face, ExcInternalError());
+    }
 
     // Set up meshes, one with a single
     // reference cell and refine it once

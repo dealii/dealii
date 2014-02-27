@@ -2908,14 +2908,14 @@ namespace GridGenerator
                 cell->face(i)->set_boundary_indicator(1);
                 for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
                   {
-                    const Point<3> vertices[2]
+                    const Point<3> line_vertices[2]
                       = { cell->face(i)->line(j)->vertex(0),
                           cell->face(i)->line(j)->vertex(1)
                         };
-                    if ((std::fabs(vertices[0].distance(center)-radius) >
+                    if ((std::fabs(line_vertices[0].distance(center)-radius) >
                          1e-5*radius)
                         ||
-                        (std::fabs(vertices[1].distance(center)-radius) >
+                        (std::fabs(line_vertices[1].distance(center)-radius) >
                          1e-5*radius))
                       cell->face(i)->line(j)->set_boundary_indicator(1);
                   }

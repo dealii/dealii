@@ -2170,11 +2170,9 @@ next_cell:
     do
       {
         bool changed = false;
-        typename Container<dim-1,spacedim>::active_cell_iterator
-        cell = surface_mesh.begin_active(),
-        endc = surface_mesh.end();
 
-        for (; cell!=endc; ++cell)
+        for (typename Container<dim-1,spacedim>::active_cell_iterator
+            cell = surface_mesh.begin_active(); cell!=surface_mesh.end(); ++cell)
           if (surface_to_volume_mapping[cell]->has_children() == true )
             {
               cell->set_refine_flag ();
@@ -2186,14 +2184,12 @@ next_cell:
             const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
             .execute_coarsening_and_refinement();
 
-            typename Container<dim-1,spacedim>::cell_iterator
-            cell = surface_mesh.begin(),
-            endc = surface_mesh.end();
-            for (; cell!=endc; ++cell)
-              for (unsigned int c=0; c<cell->n_children(); c++)
-                if (surface_to_volume_mapping.find(cell->child(c)) == surface_to_volume_mapping.end())
-                  surface_to_volume_mapping[cell->child(c)]
-                    = surface_to_volume_mapping[cell]->child(c);
+            for (typename Container<dim-1,spacedim>::cell_iterator
+                surface_cell = surface_mesh.begin(); surface_cell!=surface_mesh.end(); ++surface_cell)
+              for (unsigned int c=0; c<surface_cell->n_children(); c++)
+                if (surface_to_volume_mapping.find(surface_cell->child(c)) == surface_to_volume_mapping.end())
+                  surface_to_volume_mapping[surface_cell->child(c)]
+                    = surface_to_volume_mapping[surface_cell]->child(c);
           }
         else
           break;

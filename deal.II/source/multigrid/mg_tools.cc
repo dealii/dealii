@@ -242,9 +242,9 @@ namespace MGTools
             // here.
             if (flux_coupling != DoFTools::none)
               {
-                unsigned int increment = nfe.dofs_per_cell - nfe.dofs_per_face;
+                const unsigned int dof_increment = nfe.dofs_per_cell - nfe.dofs_per_face;
                 for (unsigned int local_dof=0; local_dof<fe.dofs_per_cell; ++local_dof)
-                  row_lengths[cell_indices[local_dof]] += increment;
+                  row_lengths[cell_indices[local_dof]] += dof_increment;
               }
 
             // Do this only once per

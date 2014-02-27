@@ -2036,8 +2036,8 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
 
           AssertThrow(n_vars>=dim,
                       ExcMessage("Tecplot file must contain at least one variable for each dimension"));
-          for (unsigned int i=1; i<dim; ++i)
-            AssertThrow(tecplot2deal[i]>0,
+          for (unsigned int d=1; d<dim; ++d)
+            AssertThrow(tecplot2deal[d]>0,
                         ExcMessage("Tecplot file must contain at least one variable for each dimension."));
         }
       else if (Utilities::match_at_string_start(entries[i],"ZONETYPE=ORDERED"))
