@@ -49,35 +49,21 @@ public:
   {
     // Ask MatrixFree for cell_range for different
     // orders
-    std::pair<unsigned int,unsigned int> subrange_deg =
-      data.create_cell_subrange_hp (cell_range, 1);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,1,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 2);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,2,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 3);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,3,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 4);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,4,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 5);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,5,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 6);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,6,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 7);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,7,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+    std::pair<unsigned int,unsigned int> subrange_deg;
+#define CALL_METHOD(degree)                                             \
+    subrange_deg = data.create_cell_subrange_hp(cell_range, degree);    \ 
+    if (subrange_deg.second > subrange_deg.first)                       \
+      helmholtz_operator<dim,degree,Vector<Number> > (data, dst, src, subrange_deg)
+
+    CALL_METHOD(1);
+    CALL_METHOD(2);
+    CALL_METHOD(3);
+    CALL_METHOD(4);
+    CALL_METHOD(5);
+    CALL_METHOD(6);
+    CALL_METHOD(7);
+
+#undef CALL_METHOD
   }
 
   void vmult (Vector<Number>       &dst,
