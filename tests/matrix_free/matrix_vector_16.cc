@@ -201,7 +201,8 @@ void test ()
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  FESystem<dim> fe(FE_Q<dim>(fe_degree), dim);
+  const unsigned int degree = fe_degree;
+  FESystem<dim> fe(FE_Q<dim>(degree), dim);
   DoFHandler<dim> dof (tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
