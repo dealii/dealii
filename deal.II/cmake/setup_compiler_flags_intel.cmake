@@ -71,6 +71,15 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 #             friend struct Implementation;
 #           };)
 #   -w177  declared but not referenced
+#   -w193  zero used for undefined preprocessing identifier "..."
+#          This happens when using undefined preprocessor names in
+#          conditions such as
+#            #if (abc && def)
+#          instead of
+#            #if (defined(abc) && defined(def))
+#          The standard says that in such cases, the undefined symbol
+#          is assumed to be zero. The warning is in principle
+#          useful, but the pattern appears exceedingly often in the TBB
 #   -w279  controlling expression is constant
 #   -w327  NULL reference is not allowed
 #          (the compiler is correct here in that statements like
@@ -91,6 +100,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd135")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd175")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd177")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd193")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd279")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd327")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd383")
