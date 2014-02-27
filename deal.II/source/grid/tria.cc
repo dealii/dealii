@@ -2960,6 +2960,7 @@ namespace internal
                 // not implemented at
                 // present for dim=3 or
                 // higher
+                // TODO: you can steal the code to do this from GridTools::transform()
                 Assert (dim<=2, ExcNotImplemented());
 
                 // compute where the common
