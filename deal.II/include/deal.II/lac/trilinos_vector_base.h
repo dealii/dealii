@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -621,7 +621,7 @@ namespace TrilinosWrappers
               const TrilinosScalar *values);
 
     /**
-     * A collective add operation: This funnction adds a whole set of values
+     * A collective add operation: This function adds a whole set of values
      * stored in @p values to the vector components specified by @p indices.
      */
     void add (const std::vector<size_type>      &indices,
@@ -679,13 +679,13 @@ namespace TrilinosWrappers
               const bool        allow_different_maps = false);
 
     /**
-     * Simple addition of a multiple of a vector, i.e. <tt>*this = a*V</tt>.
+     * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
     void add (const TrilinosScalar  a,
               const VectorBase     &V);
 
     /**
-     * Multiple addition of scaled vectors, i.e. <tt>*this = a*V + b*W</tt>.
+     * Multiple addition of scaled vectors, i.e. <tt>*this += a*V + b*W</tt>.
      */
     void add (const TrilinosScalar  a,
               const VectorBase     &V,
@@ -1375,7 +1375,7 @@ namespace TrilinosWrappers
             // use pre-allocated vector for non-local entries if it exists for
             // addition operation
             const TrilinosWrappers::types::int_type my_row = nonlocal_vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
-            Assert(my_row != -1, 
+            Assert(my_row != -1,
                    ExcMessage("Attempted to write into off-processor vector entry "
                               "that has not be specified as being writable upon "
                                "initialization"));
