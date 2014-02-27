@@ -2731,11 +2731,9 @@ namespace DataOutBase
       Point<3> v_min, v_max, v_inter;
 
       // Use the Bubblesort algorithm to sort the points with respect to the third coordinate
-      int i, j;
-
-      for (i = 0; i < 2; ++i)
+      for (int i = 0; i < 2; ++i)
         {
-          for (j = 0; j < 2-i; ++j)
+          for (int j = 0; j < 2-i; ++j)
             {
               if (points[j][2] > points[j + 1][2])
                 {

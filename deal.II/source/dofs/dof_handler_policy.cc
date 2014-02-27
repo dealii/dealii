@@ -730,9 +730,8 @@ namespace internal
               // level, as those lines logically belong to the same
               // level as the cell, at least for for isotropic
               // refinement
-              typename DoFHandler<2,spacedim>::level_cell_iterator cell = dof_handler.begin(level),
-                                                                   endcell  = dof_handler.end(level);
-              for ( ; cell != endcell; ++cell)
+              for (typename DoFHandler<2,spacedim>::level_cell_iterator cell = dof_handler.begin(level);
+                    cell != dof_handler.end(level); ++cell)
                 for (unsigned int line=0; line < GeometryInfo<2>::faces_per_cell; ++line)
                   cell->face(line)->set_user_flag();
 
@@ -2083,9 +2082,8 @@ namespace internal
         tr->clear_user_flags ();
 
         //mark all own cells for transfer
-        typename DoFHandler<dim,spacedim>::active_cell_iterator
-        cell, endc = dof_handler.end();
-        for (cell = dof_handler.begin_active(); cell != endc; ++cell)
+        for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof_handler.begin_active();
+            cell != dof_handler.end(); ++cell)
           if (!cell->is_artificial())
             cell->set_user_flag();
 
@@ -2120,10 +2118,9 @@ namespace internal
         //check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
-          typename DoFHandler<dim,spacedim>::active_cell_iterator
-          cell, endc = dof_handler.end();
 
-          for (cell = dof_handler.begin_active(); cell != endc; ++cell)
+          for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof_handler.begin_active();
+              cell != dof_handler.end(); ++cell)
             if (!cell->is_artificial())
               {
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);

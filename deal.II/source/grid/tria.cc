@@ -5723,10 +5723,10 @@ namespace internal
                             for (unsigned int q=0; q<triangulation.faces->quads.cells.size(); ++q)
                               for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
                                 {
-                                  const int index=triangulation.faces->quads.cells[q].face(l);
-                                  if (index==old_index_0)
+                                  const int this_index=triangulation.faces->quads.cells[q].face(l);
+                                  if (this_index==old_index_0)
                                     triangulation.faces->quads.cells[q].set_face(l,new_index_0);
-                                  else if (index==old_index_1)
+                                  else if (this_index==old_index_1)
                                     triangulation.faces->quads.cells[q].set_face(l,new_index_1);
                                 }
                             // now we have to copy

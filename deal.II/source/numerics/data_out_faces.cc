@@ -139,10 +139,10 @@ build_one_patch (const FaceDescriptor *cell_and_face,
       // first fill dof_data
       for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
         {
-          const FEValuesBase<dimension> &fe_patch_values
+          const FEValuesBase<dimension> &this_fe_patch_values
             = data.get_present_fe_values (dataset);
           const unsigned int n_components
-            = fe_patch_values.get_fe().n_components();
+            = this_fe_patch_values.get_fe().n_components();
           const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
           if (postprocessor != 0)
             {
@@ -154,24 +154,24 @@ build_one_patch (const FaceDescriptor *cell_and_face,
               // thus does not depend on the number of components of the data
               // vector
               if (update_flags & update_normal_vectors)
-                data.patch_normals=fe_patch_values.get_normal_vectors();
+                data.patch_normals=this_fe_patch_values.get_normal_vectors();
 
               if (n_components == 1)
                 {
                   // at each point there is only one component of value,
                   // gradient etc.
                   if (update_flags & update_values)
-                    this->dof_data[dataset]->get_function_values (fe_patch_values,
+                    this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                                   data.patch_values);
                   if (update_flags & update_gradients)
-                    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+                    this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
                                                                      data.patch_gradients);
                   if (update_flags & update_hessians)
-                    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+                    this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
                                                                     data.patch_hessians);
 
                   if (update_flags & update_quadrature_points)
-                    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+                    data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
 
                   postprocessor->
                   compute_derived_quantities_scalar(data.patch_values,
@@ -187,17 +187,17 @@ build_one_patch (const FaceDescriptor *cell_and_face,
                   // derivative...
                   data.resize_system_vectors(n_components);
                   if (update_flags & update_values)
-                    this->dof_data[dataset]->get_function_values (fe_patch_values,
+                    this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                                   data.patch_values_system);
                   if (update_flags & update_gradients)
-                    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+                    this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
                                                                      data.patch_gradients_system);
                   if (update_flags & update_hessians)
-                    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+                    this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
                                                                     data.patch_hessians_system);
 
                   if (update_flags & update_quadrature_points)
-                    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+                    data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
 
                   postprocessor->
                   compute_derived_quantities_vector(data.patch_values_system,
@@ -220,7 +220,7 @@ build_one_patch (const FaceDescriptor *cell_and_face,
             // reasons.
             if (n_components == 1)
               {
-                this->dof_data[dataset]->get_function_values (fe_patch_values,
+                this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                               data.patch_values);
                 for (unsigned int q=0; q<n_q_points; ++q)
                   patch.data(offset,q) = data.patch_values[q];
@@ -228,7 +228,7 @@ build_one_patch (const FaceDescriptor *cell_and_face,
             else
               {
                 data.resize_system_vectors(n_components);
-                this->dof_data[dataset]->get_function_values (fe_patch_values,
+                this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                               data.patch_values_system);
                 for (unsigned int component=0; component<n_components;
                      ++component)

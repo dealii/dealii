@@ -369,16 +369,16 @@ namespace FETools
                                 element.n_blocks()));
 
     types::global_dof_index k=0;
-    unsigned int i=0;
+    unsigned int count=0;
     for (unsigned int b=0; b<element.n_base_elements(); ++b)
       for (unsigned int m=0; m<element.element_multiplicity(b); ++m)
         {
-          block_data[i++] = (return_start_indices)
+          block_data[count++] = (return_start_indices)
                             ? k
                             : (element.base_element(b).n_dofs_per_cell());
           k += element.base_element(b).n_dofs_per_cell();
         }
-    Assert (i == element.n_blocks(), ExcInternalError());
+    Assert (count == element.n_blocks(), ExcInternalError());
 
     std::vector<types::global_dof_index> start_indices(block_data.size());
     k = 0;

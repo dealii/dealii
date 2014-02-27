@@ -811,8 +811,8 @@ SparsityPattern::add_entries (const size_type row,
           else
             // cannot just append the new range at the end, forward to the
             // other function
-            for (ForwardIterator it = begin; it != end; ++it)
-              add (row, *it);
+            for (ForwardIterator p = begin; p != end; ++p)
+              add (row, *p);
         }
     }
   else

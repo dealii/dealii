@@ -976,8 +976,6 @@ void PointValueHistory<dim>
 
 
           // write column headings
-          std::map <std::string, std::vector <std::vector <double> > >::iterator
-          data_store_begin = data_store.begin ();
           to_gnuplot << "# <Key> ";
 
           if (indep_names.size() > 0)
@@ -995,7 +993,8 @@ void PointValueHistory<dim>
                 }
             }
 
-          for (; data_store_begin != data_store.end (); data_store_begin++)
+          for (std::map <std::string, std::vector <std::vector <double> > >::iterator
+              data_store_begin = data_store.begin (); data_store_begin != data_store.end (); ++data_store_begin)
             {
               typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);
               unsigned int n_stored = mask->second.n_selected_components();
@@ -1022,8 +1021,6 @@ void PointValueHistory<dim>
           // write data stored for the point
           for (unsigned int key = 0; key < dataset_key.size (); key++)
             {
-              std::map <std::string, std::vector <std::vector <double> > >::iterator
-              data_store_begin = data_store.begin ();
               to_gnuplot << dataset_key[key];
 
               for (unsigned int component = 0; component < n_indep; component++)
@@ -1031,7 +1028,9 @@ void PointValueHistory<dim>
                   to_gnuplot << " " << independent_values[component][key];
                 }
 
-              for (; data_store_begin != data_store.end (); data_store_begin++)
+              for (std::map <std::string, std::vector <std::vector <double> > >::iterator
+                    data_store_begin = data_store.begin ();
+                   data_store_begin != data_store.end (); ++data_store_begin)
                 {
                   typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);
                   unsigned int n_stored = mask->second.n_selected_components();

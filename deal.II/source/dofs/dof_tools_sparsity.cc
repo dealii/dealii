@@ -294,8 +294,8 @@ namespace DoFTools
                 local_dof_indices_col(dofs_per_cell_col);
                 cell_row_child->get_dof_indices (local_dof_indices_row);
                 cell_col->get_dof_indices (local_dof_indices_col);
-                for (unsigned int i=0; i<dofs_per_cell_row; ++i)
-                  sparsity.add_entries (local_dof_indices_row[i],
+                for (unsigned int r=0; r<dofs_per_cell_row; ++r)
+                  sparsity.add_entries (local_dof_indices_row[r],
                                         local_dof_indices_col.begin(),
                                         local_dof_indices_col.end());
               }
@@ -318,8 +318,8 @@ namespace DoFTools
                 local_dof_indices_col(dofs_per_cell_col);
                 cell_row->get_dof_indices (local_dof_indices_row);
                 cell_col_child->get_dof_indices (local_dof_indices_col);
-                for (unsigned int i=0; i<dofs_per_cell_row; ++i)
-                  sparsity.add_entries (local_dof_indices_row[i],
+                for (unsigned int r=0; r<dofs_per_cell_row; ++r)
+                  sparsity.add_entries (local_dof_indices_row[r],
                                         local_dof_indices_col.begin(),
                                         local_dof_indices_col.end());
               }
@@ -784,7 +784,6 @@ namespace DoFTools
                       if (cell->neighbor_is_coarser(face))
                         continue;
 
-                      typename DH::face_iterator cell_face = cell->face(face);
                       const unsigned int
                       neighbor_face = cell->neighbor_of_neighbor(face);
 
@@ -1013,8 +1012,6 @@ namespace DoFTools
                     if (cell->neighbor_is_coarser(face))
                       continue;
 
-                    typename dealii::hp::DoFHandler<dim,spacedim>::face_iterator
-                    cell_face = cell->face(face);
                     const unsigned int
                     neighbor_face = cell->neighbor_of_neighbor(face);
 

@@ -2035,10 +2035,10 @@ namespace DoFTools
         vertex_dof_count[vg] = 0;
 
     // Create a mapping from all vertices to the ones used here
-    unsigned int i=0;
+    unsigned int n_vertex_count=0;
     for (unsigned int vg=0; vg<vertex_mapping.size(); ++vg)
       if (vertex_dof_count[vg] != 0)
-        vertex_mapping[vg] = i++;
+        vertex_mapping[vg] = n_vertex_count++;
 
     // Compactify dof count
     for (unsigned int vg=0; vg<vertex_mapping.size(); ++vg)
@@ -2047,7 +2047,7 @@ namespace DoFTools
 
     // Now that we have all the data, we reduce it to the part we actually
     // want
-    vertex_dof_count.resize(i);
+    vertex_dof_count.resize(n_vertex_count);
 
     // At this point, the list of patches is ready. Now we enter the dofs
     // into the sparsity pattern.

@@ -1233,11 +1233,11 @@ namespace DoFRenumbering
               tria->get_p4est_tree_to_coarse_cell_permutation() [c];
 
             const typename DoFHandler<dim>::level_cell_iterator
-            cell (tria, 0, coarse_cell_index, &dof_handler);
+            this_cell (tria, 0, coarse_cell_index, &dof_handler);
 
             next_free = compute_hierarchical_recursive<dim> (next_free,
                                                              renumbering,
-                                                             cell,
+                                                             this_cell,
                                                              locally_owned);
           }
 #else
