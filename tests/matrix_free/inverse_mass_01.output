@@ -1,41 +1,41 @@
 
 DEAL:2d::Testing FE_DGQ<2>(1)
 DEAL:2d:cg::Starting value 6.32
-DEAL:2d:cg::Convergence step 51 value 0
+DEAL:2d:cg::Convergence step 48 value 0
 DEAL:2d::Norm of difference: 0
 DEAL:2d::
 DEAL:2d:float::Testing FE_DGQ<2>(1)
 DEAL:2d:float:cg::Starting value 6.15
-DEAL:2d:float:cg::Convergence step 66 value 0
+DEAL:2d:float:cg::Convergence step 57 value 0
 DEAL:2d:float::Norm of difference: 0
 DEAL:2d:float::
 DEAL:2d::Testing FE_DGQ<2>(2)
 DEAL:2d:cg::Starting value 8.62
-DEAL:2d:cg::Convergence step 116 value 0
+DEAL:2d:cg::Convergence step 105 value 0
 DEAL:2d::Norm of difference: 0
 DEAL:2d::
 DEAL:2d:float::Testing FE_DGQ<2>(2)
 DEAL:2d:float:cg::Starting value 9.05
-DEAL:2d:float:cg::Convergence step 158 value 0
+DEAL:2d:float:cg::Convergence step 133 value 0
 DEAL:2d:float::Norm of difference: 0
 DEAL:2d:float::
 DEAL:2d::Testing FE_DGQ<2>(4)
 DEAL:2d:cg::Starting value 14.6
-DEAL:2d:cg::Convergence step 354 value 0
+DEAL:2d:cg::Convergence step 311 value 0
 DEAL:2d::Norm of difference: 0
 DEAL:2d::
 DEAL:2d:float::Testing FE_DGQ<2>(4)
 DEAL:2d:float:cg::Starting value 14.7
-DEAL:2d:float:cg::Convergence step 437 value 0
+DEAL:2d:float:cg::Convergence step 376 value 0
 DEAL:2d:float::Norm of difference: 0
 DEAL:2d:float::
 DEAL:3d::Testing FE_DGQ<3>(1)
 DEAL:3d:cg::Starting value 13.7
-DEAL:3d:cg::Convergence step 131 value 0
+DEAL:3d:cg::Convergence step 124 value 0
 DEAL:3d::Norm of difference: 0
 DEAL:3d::
 DEAL:3d::Testing FE_DGQ<3>(2)
 DEAL:3d:cg::Starting value 13.5
-DEAL:3d:cg::Convergence step 255 value 0
+DEAL:3d:cg::Convergence step 241 value 0
 DEAL:3d::Norm of difference: 0
 DEAL:3d::

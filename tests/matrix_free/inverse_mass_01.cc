@@ -144,7 +144,7 @@ void do_test (const DoFHandler<dim> &dof)
 
   mf.apply_inverse (inverse, in);
 
-  SolverControl control(1000, 1e-12);
+  SolverControl control(1000, 1e-10);
   SolverCG<Vector<number> > solver(control);
   solver.solve (mf, reference, in, PreconditionIdentity());
 
@@ -187,7 +187,7 @@ void test ()
       deallog.push("float");
       deallog.threshold_double(1.e-6);
       do_test<dim, fe_degree, float> (dof);
-      deallog.threshold_double(5.e-11);
+      deallog.threshold_double(1.e-10);
       deallog.pop();
     }
 }
@@ -202,7 +202,7 @@ int main ()
   deallog << std::setprecision (3);
 
   {
-    deallog.threshold_double(5.e-11);
+    deallog.threshold_double(1.e-10);
     deallog.push("2d");
     test<2,1>();
     test<2,2>();
