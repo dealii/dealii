@@ -94,6 +94,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 #   -w1572 floating-point equality and inequality comparisons are unreliable
 #   -w2259 non-pointer conversion from "double" to "float" may
 #          lose significant bits
+#   -w21   type qualifiers are meaningless in this declaration
 #   -w2536 type qualifiers are meaningless here
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
@@ -109,7 +110,26 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1418")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1478")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1572")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2259")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
+
+
+# Also disable the following warnings that we frequently
+# trigger writing dimension independent code:
+#   -w111 statement is unreachable
+#         Happens in code that is guarded by a check on 'dim'
+#   -w128 loop is not reachable from preceding
+#         Same as above
+#   -w185 dynamic initialization in unreachable code
+#         When initializing a local variable in code
+#         that is executed only for one specific dimension
+#   -w280 selector expression is constant
+#         When writing 'switch(dim)'
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd111")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd128")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd185")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd280")
+
 
 
 IF(DEAL_II_STATIC_EXECUTABLE)
