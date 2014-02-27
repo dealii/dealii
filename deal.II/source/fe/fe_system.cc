@@ -2510,7 +2510,7 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
     = typename FiniteElementData<dim>::Conformity();
   {
     unsigned int index = 0;
-    for (unsigned int index=0; index<fes.size(); ++index)
+    for (index=0; index<fes.size(); ++index)
       if (multiplicities[index]>0)
         {
           total_conformity = fes[index]->conforming_space;
