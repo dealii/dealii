@@ -887,8 +887,10 @@ namespace TrilinosWrappers
     bool has_ghosts;
 
     /**
-     * An Epetra distibuted vector type. Requires an existing Epetra_Map for
-     * storing data.
+     * Pointer to the actual Epetra vector object. This may represent a
+     * vector that is in fact distributed among multiple processors. The
+     * object requires an existing Epetra_Map for
+     * storing data when setting it up.
      */
     std_cxx1x::shared_ptr<Epetra_FEVector> vector;
 
