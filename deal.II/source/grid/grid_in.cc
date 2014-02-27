@@ -82,7 +82,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
   std::map<int, int> quad_indices; // # quad in unv (key) ---> # quad in deal.II (value)
   std::map<int, int> line_indices; // # line in unv(key) ---> # line in deal.II (value)
 
-  unsigned int no_vertices, no_quads=0,no_lines=0;
+  unsigned int no_vertices, no_quads=0, no_lines=0;
 
   std::string keyword;
 
@@ -164,7 +164,6 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
 
                   subcelldata.boundary_quads.push_back(CellData<2>());
-                  int no_quads = 0;
 
                   for (j = 0; j < type; j++) //loop to feed the data to the boundary
                     {
@@ -213,7 +212,6 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   //If this is encountered, the pointer comes out of the loop
                   //and starts processing boundaries.
                   subcelldata.boundary_lines.push_back(CellData<1>());
-                  int no_lines = 0;
 
                   for (j = 0; j < type; j++) //loop to feed the data to the boundary
                     {
