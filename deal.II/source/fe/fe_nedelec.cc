@@ -246,11 +246,10 @@ FE_Nedelec<2>::initialize_support_points (const unsigned int degree)
   // Initialize quadratures to obtain
   // quadrature points later on.
   const QGauss<dim - 1> reference_edge_quadrature (degree + 1);
-  const unsigned int &
-  n_edge_points = reference_edge_quadrature.size ();
+  const unsigned int n_edge_points = reference_edge_quadrature.size ();
   const unsigned int n_boundary_points
     = GeometryInfo<dim>::lines_per_cell * n_edge_points;
-  const Quadrature<dim> &edge_quadrature
+  const Quadrature<dim> edge_quadrature
     = QProjector<dim>::project_to_all_faces (reference_edge_quadrature);
 
   this->generalized_face_support_points.resize (n_edge_points);
@@ -300,10 +299,6 @@ FE_Nedelec<2>::initialize_support_points (const unsigned int degree)
     {
       // In this case we only need support points
       // on the faces of a cell.
-      const Quadrature<dim> &edge_quadrature
-        = QProjector<dim>::project_to_all_faces
-          (reference_edge_quadrature);
-
       this->generalized_support_points.resize (n_boundary_points);
 
       for (unsigned int line = 0;
