@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -83,6 +83,8 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 #          (happens in boost)
 #   -w1478 deprecation warning
 #   -w1572 floating-point equality and inequality comparisons are unreliable
+#   -w2259 non-pointer conversion from "double" to "float" may
+#          lose significant bits
 #   -w2536 type qualifiers are meaningless here
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
@@ -96,6 +98,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd981")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1418")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1478")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1572")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2259")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
 
 
