@@ -172,11 +172,11 @@ void FunctionParser<dim>:: init_muparser() const
 	}
       catch (mu::ParserError &e)
 	{
-	  cerr << "Message:  " << e.GetMsg() << "\n";
-	  cerr << "Formula:  " << e.GetExpr() << "\n";
-	  cerr << "Token:    " << e.GetToken() << "\n";
-	  cerr << "Position: " << e.GetPos() << "\n";
-	  cerr << "Errc:     " << e.GetCode() << std::endl;	  
+          std::cerr << "Message:  " << e.GetMsg() << "\n";
+	  std::cerr << "Formula:  " << e.GetExpr() << "\n";
+	  std::cerr << "Token:    " << e.GetToken() << "\n";
+	  std::cerr << "Position: " << e.GetPos() << "\n";
+	  std::cerr << "Errc:     " << e.GetCode() << std::endl;	  
 	  AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
 	}      
     }
@@ -306,11 +306,11 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
     }
   catch (mu::ParserError &e)
     {
-      cerr << "Message:  " << e.GetMsg() << "\n";
-      cerr << "Formula:  " << e.GetExpr() << "\n";
-      cerr << "Token:    " << e.GetToken() << "\n";
-      cerr << "Position: " << e.GetPos() << "\n";
-      cerr << "Errc:     " << e.GetCode() << std::endl;	  
+      std::cerr << "Message:  " << e.GetMsg() << "\n";
+      std::cerr << "Formula:  " << e.GetExpr() << "\n";
+      std::cerr << "Token:    " << e.GetToken() << "\n";
+      std::cerr << "Position: " << e.GetPos() << "\n";
+      std::cerr << "Errc:     " << e.GetCode() << std::endl;	  
       AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
       return 0.0;
     }

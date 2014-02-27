@@ -800,11 +800,13 @@ SparsityPattern::add_entries (const size_type row,
                 break;
               }
           if (has_larger_entries == false)
-            for ( ; it != end; ++it, ++k)
+            for ( ; it != end; ++it)
               {
+                if (*it == row)
+                  continue;
                 Assert (k <= rowstart[row+1],
                         ExcNotEnoughSpace(row, rowstart[row+1]-rowstart[row]));
-                colnums[k] = *it;
+                colnums[k++] = *it;
               }
           else
             // cannot just append the new range at the end, forward to the
