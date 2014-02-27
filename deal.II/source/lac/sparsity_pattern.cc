@@ -802,7 +802,7 @@ SparsityPattern::add_entries (const size_type row,
           if (has_larger_entries == false)
             for ( ; it != end; ++it)
               {
-                if (*it == row)
+                if (store_diagonal_first_in_row && *it == row)
                   continue;
                 Assert (k <= rowstart[row+1],
                         ExcNotEnoughSpace(row, rowstart[row+1]-rowstart[row]));
