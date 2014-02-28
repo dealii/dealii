@@ -2,5 +2,5 @@
 # ---------------------
 
 subsection bar
-
+ set val = 123.456
 end
