@@ -988,7 +988,7 @@ namespace
     // orientation
     //
     // while we're at it, also copy the neighborship information between cells
-    typename Triangulation<dim>::active_cell_iterator
+    typename Triangulation<dim, spacedim>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
     for (; cell != endc; ++cell)
