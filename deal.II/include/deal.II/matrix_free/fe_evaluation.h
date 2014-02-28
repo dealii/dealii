@@ -1753,10 +1753,10 @@ namespace internal
 template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1,
           int n_components_ = 1, typename Number = double >
 class FEEvaluationDGP :
-  public FEEvaluationGeneral<dim,fe_degree,fe_degree+1,n_components_,Number>
+  public FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 {
 public:
-  typedef FEEvaluationGeneral<dim,fe_degree,fe_degree+1,n_components_,Number> BaseClass;
+  typedef FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number> BaseClass;
   typedef Number                            number_type;
   typedef typename BaseClass::value_type    value_type;
   typedef typename BaseClass::gradient_type gradient_type;
@@ -2397,6 +2397,8 @@ FEEvaluationBase<dim,n_components_,Number>
                                                     mapped_geometry->get_cell()->level(),
                                                     mapped_geometry->get_cell()->index(),
                                                     dof_handler);
+      Assert (sizeof(src) == sizeof(VectorType *),
+              ExcMessage("Only one single vector allowed"));
       local_dof_indices.resize(dof_handler->get_fe().dofs_per_cell);
       cell->get_dof_indices(local_dof_indices);
 
@@ -4382,7 +4384,7 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
       // points
       unsigned int proposed_dof_comp = numbers::invalid_unsigned_int,
                    proposed_quad_comp = numbers::invalid_unsigned_int;
-      if (dofs_per_cell == this->matrix_info->get_dof_info(fe_no).dofs_per_cell[this->active_fe_index])
+      if (dofs_per_cell == this->data->dofs_per_cell)
         proposed_dof_comp = fe_no;
       else
         for (unsigned int no=0; no<this->matrix_info->n_components(); ++no)
@@ -4476,6 +4478,14 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
   BaseClass (geometry, dof_handler, first_selected_component)
 {
   set_data_pointers();
+
+  Assert ((dofs_per_cell == this->data->dofs_per_cell ||
+           internal::MatrixFreeFunctions::DGP_dofs_per_cell<dim,fe_degree>::value ==
+           this->data->dofs_per_cell
+           )
+          &&
+          n_q_points == this->data->n_q_points,
+          ExcMessage("Underlying element and template arguments do not match"));
 }
 
 
@@ -6625,7 +6635,11 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
                    const unsigned int quad_no)
   :
   BaseClass (data_in, fe_no, quad_no)
-{}
+{
+  // reset values_dofs pointer as it has wider gaps in the base class
+  for (unsigned int c=0; c<n_components_; ++c)
+    this->values_dofs[c] = &this->my_data_array[c*dofs_per_cell];
+}
 
 
 
@@ -6638,7 +6652,10 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
                 const unsigned int                      first_selected_component)
   :
   BaseClass (geometry, dof_handler, first_selected_component)
-{}
+{
+  for (unsigned int c=0; c<n_components_; ++c)
+    this->values_dofs[c] = &this->my_data_array[c*dofs_per_cell];
+}
 
 
 
@@ -6649,7 +6666,10 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::FEEvaluationDGP (const FEEvaluationDGP &other)
   :
   BaseClass (other)
-{}
+{
+  for (unsigned int c=0; c<n_components_; ++c)
+    this->values_dofs[c] = &this->my_data_array[c*dofs_per_cell];
+}
 
 
 
@@ -6666,10 +6686,10 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
           internal::ExcAccessToUninitializedField());
 
   // expand dof_values to tensor product
-  VectorizedArray<Number> data_array[n_components*Utilities::fixed_int_power<fe_degree+1,dim>::value];
+  VectorizedArray<Number> data_array[n_components*BaseClass::dofs_per_cell];
   VectorizedArray<Number> *expanded_dof_values[n_components];
   for (unsigned int c=0; c<n_components; ++c)
-    expanded_dof_values[c] = &data_array[c*Utilities::fixed_int_power<fe_degree+1,dim>::value];
+    expanded_dof_values[c] = &data_array[c*BaseClass::dofs_per_cell];
 
   unsigned int count_p = 0, count_q = 0;
   for (unsigned int i=0; i<(dim>2?fe_degree+1:1); ++i)
@@ -6677,15 +6697,13 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
       for (unsigned int j=0; j<(dim>1?fe_degree+1-i:1); ++j)
         {
           for (unsigned int k=0; k<fe_degree+1-j-i; ++k, ++count_p, ++count_q)
-            {
-              for (unsigned int c=0; c<n_components; ++c)
-                expanded_dof_values[c][count_q] = this->values_dofs[c][count_p];
-            }
+            for (unsigned int c=0; c<n_components; ++c)
+              expanded_dof_values[c][count_q] = this->values_dofs[c][count_p];
           for (unsigned int k=fe_degree+1-j-i; k<fe_degree+1; ++k, ++count_q)
             for (unsigned int c=0; c<n_components; ++c)
               expanded_dof_values[c][count_q] = VectorizedArray<Number>();
         }
-      for (unsigned int j=(dim>1?fe_degree+1-i:1); j<(dim>1?fe_degree+1:1); ++j)
+      for (unsigned int j=fe_degree+1-i; j<fe_degree+1; ++j)
         for (unsigned int k=0; k<fe_degree+1; ++k, ++count_q)
           for (unsigned int c=0; c<n_components; ++c)
             expanded_dof_values[c][count_q] = VectorizedArray<Number>();
@@ -6724,10 +6742,10 @@ FEEvaluationDGP<dim,fe_degree,n_q_points_1d,n_components_,Number>
     Assert (this->gradients_quad_submitted == true,
             internal::ExcAccessToUninitializedField());
 
-  VectorizedArray<Number> data_array[n_components*Utilities::fixed_int_power<fe_degree+1,dim>::value];
+  VectorizedArray<Number> data_array[n_components*BaseClass::dofs_per_cell];
   VectorizedArray<Number> *expanded_dof_values[n_components];
   for (unsigned int c=0; c<n_components; ++c)
-    expanded_dof_values[c] = &data_array[c*Utilities::fixed_int_power<fe_degree+1,dim>::value];
+    expanded_dof_values[c] = &data_array[c*BaseClass::dofs_per_cell];
   internal::do_integrate (*this, expanded_dof_values, this->values_quad,
                           this->gradients_quad, integrate_val, integrate_grad,
                           internal::int2type<dim>());
