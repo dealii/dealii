@@ -149,6 +149,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+  <li> Fixed: ParameterHandler will no longer output an error if the file
+  to be read ends with "end" without a newline.
+  <br>
+  (Timo Heister, 2014/02/28)
+  </li>
+
   <li>Improved: DoFRenumbering::Cuthill_McKee can now run with distributed
   triangulations with the renumbering only done within each processor's
   subdomain.
