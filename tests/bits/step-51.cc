@@ -940,7 +940,7 @@ namespace Step51
   template <int dim>
   void HDG<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<14-4*dim; ++cycle)
+    for (unsigned int cycle=0; cycle<12-3*dim; ++cycle)
       {
         refine_grid (cycle);
         setup_system ();
