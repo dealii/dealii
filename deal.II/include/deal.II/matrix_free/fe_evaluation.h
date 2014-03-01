@@ -2397,8 +2397,6 @@ FEEvaluationBase<dim,n_components_,Number>
                                                     mapped_geometry->get_cell()->level(),
                                                     mapped_geometry->get_cell()->index(),
                                                     dof_handler);
-      Assert (sizeof(src) == sizeof(VectorType *),
-              ExcMessage("Only one single vector allowed"));
       local_dof_indices.resize(dof_handler->get_fe().dofs_per_cell);
       cell->get_dof_indices(local_dof_indices);
 
