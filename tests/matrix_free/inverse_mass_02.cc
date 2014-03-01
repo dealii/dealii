@@ -144,8 +144,11 @@ void do_test (const DoFHandler<dim> &dof)
   mf.apply_inverse (inverse, in);
 
   SolverControl control(1000, 1e-12);
+  std::ostringstream stream;
+  deallog.attach(stream);
   SolverCG<Vector<number> > solver(control);
   solver.solve (mf, reference, in, PreconditionIdentity());
+  deallog.attach(logfile);
 
   inverse -= reference;
   const double diff_norm = inverse.linfty_norm() / reference.linfty_norm();
