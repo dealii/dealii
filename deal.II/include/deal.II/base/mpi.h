@@ -350,6 +350,10 @@ namespace Utilities
        * parameter. If set to numbers::invalid_unsigned_int, the number
        * of threads is determined by TBB. When in doubt, set this value
        * to 1.
+       *
+       * This will call MultithreadInfo::set_thread_limit() with @p
+       * max_num_threads, so the environment variable DEAL_II_NUM_THREADS will
+       * be respected.
        */
       MPI_InitFinalize (int    &argc,
                         char ** &argv,
