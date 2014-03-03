@@ -426,7 +426,7 @@ void Step6<dim>::assemble_system ()
       coefficient.value_list (fe_values.get_quadrature_points(),
                               coefficient_values);
 
-      for (unsigned int q_index=0; q_index<n_q_indexs; ++q_index)
+      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             for (unsigned int j=0; j<dofs_per_cell; ++j)
