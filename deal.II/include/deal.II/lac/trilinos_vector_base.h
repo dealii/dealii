@@ -165,8 +165,8 @@ namespace TrilinosWrappers
       DeclException3 (ExcAccessToNonLocalElement,
                       size_type, size_type, size_type,
                       << "You tried to access element " << arg1
-                      << " of a distributed vector, but it is not stored on "
-                      << "the current processor. Note: the elements stored "
+                      << " of a distributed vector, but this element is not stored "
+                      << "on the current processor. Note: The elements stored "
                       << "on the current processor are within the range "
                       << arg2 << " through " << arg3
                       << " but Trilinos vectors need not store contiguous "
