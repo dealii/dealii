@@ -588,6 +588,14 @@ namespace TrilinosWrappers
      */
     const_iterator end () const;
 
+    //@}
+
+
+    /**
+     * @name 3: Modification of vectors
+     */
+    //@{
+
     /**
      * A collective set operation: instead of setting individual elements of a
      * vector, this function allows to set a whole set of elements at
@@ -603,13 +611,6 @@ namespace TrilinosWrappers
      */
     void set (const std::vector<size_type>        &indices,
               const ::dealii::Vector<TrilinosScalar> &values);
-    //@}
-
-
-    /**
-     * @name 3: Modification of vectors
-     */
-    //@{
 
     /**
      * This collective set operation is of lower level and can handle anything
