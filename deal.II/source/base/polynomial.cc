@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 #include <deal.II/base/thread_management.h>
 
 #include <cmath>
+#include <algorithm>
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
