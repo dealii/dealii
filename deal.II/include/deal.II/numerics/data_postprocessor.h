@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,10 +32,14 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
+ * This class provides an interface to compute derived quantities from
+ * a solution that can then be output in graphical formats for visualization,
+ * using facilities such as the DataOut class.
+ *
  * For the (graphical) output of a FE solution one frequently wants to include
  * derived quantities, which are calculated from the values of the solution
  * and possibly the first and second derivates of the solution. Examples are
- * the calculation Mach numbers from velocity and density in supersonic flow
+ * the calculation of Mach numbers from velocity and density in supersonic flow
  * computations, or the computation of the magnitude of a complex-valued
  * solution as demonstrated in step-29. Other uses are shown in step-32 and
  * step-33. This class offers the interface to perform such
