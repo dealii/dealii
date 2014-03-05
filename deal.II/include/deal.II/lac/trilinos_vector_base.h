@@ -674,7 +674,12 @@ namespace TrilinosWrappers
      * Simple vector addition, equal to the <tt>operator +=</tt>.
      *
      * Though, if the second argument <tt>allow_different_maps</tt> is set,
-     * then it is possible to add data from a different map.
+     * then it is possible to add data from a vector that uses a different
+     * map, i.e., a vector whose elements are split across processors
+     * differently. This may include vectors with ghost elements, for example.
+     * In general, however, adding vectors with a different element-to-processor
+     * map requires communicating data among processors and, consequently,
+     * is a slower operation than when using vectors using the same map.
      */
     void add (const VectorBase &V,
               const bool        allow_different_maps = false);
