@@ -38,7 +38,6 @@
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 // The include files for using the MeshWorker framework
 #include <deal.II/meshworker/dof_info.h>
@@ -438,8 +437,7 @@ namespace Step39
     Triangulation<dim>        triangulation;
     const MappingQ1<dim>      mapping;
     const FiniteElement<dim> &fe;
-    MGDoFHandler<dim>         mg_dof_handler;
-    DoFHandler<dim>          &dof_handler;
+    DoFHandler<dim>           dof_handler;
 
     // Then, we have the matrices and vectors related to the global discrete
     // system.
@@ -478,8 +476,7 @@ namespace Step39
     :
     mapping(),
     fe(fe),
-    mg_dof_handler(triangulation),
-    dof_handler(mg_dof_handler),
+    dof_handler(triangulation),
     estimates(1)
   {
     GridGenerator::hyper_cube_slit(triangulation, -1, 1);
@@ -495,6 +492,7 @@ namespace Step39
     // First, we use the finite element to distribute degrees of freedom over
     // the mesh and number them.
     dof_handler.distribute_dofs(fe);
+    dof_handler.distribute_mg_dofs(fe);
     unsigned int n_dofs = dof_handler.n_dofs();
     // Then, we already know the size of the vectors representing finite
     // element functions.
@@ -532,8 +530,8 @@ namespace Step39
       {
         // These are roughly the same lines as above for the global matrix,
         // now for each level.
-        CompressedSparsityPattern c_sparsity(mg_dof_handler.n_dofs(level));
-        MGTools::make_flux_sparsity_pattern(mg_dof_handler, c_sparsity, level);
+        CompressedSparsityPattern c_sparsity(dof_handler.n_dofs(level));
+        MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
         mg_sparsity[level].copy_from(c_sparsity);
         mg_matrix[level].reinit(mg_sparsity[level]);
 
@@ -544,8 +542,8 @@ namespace Step39
         if (level>0)
           {
             CompressedSparsityPattern ci_sparsity;
-            ci_sparsity.reinit(mg_dof_handler.n_dofs(level-1), mg_dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(mg_dof_handler, ci_sparsity, level);
+            ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
             mg_sparsity_dg_interface[level].copy_from(ci_sparsity);
             mg_matrix_dg_up[level].reinit(mg_sparsity_dg_interface[level]);
             mg_matrix_dg_down[level].reinit(mg_sparsity_dg_interface[level]);
@@ -617,7 +615,7 @@ namespace Step39
     info_box.add_update_flags_all(update_flags);
     info_box.initialize(fe, mapping);
 
-    MeshWorker::DoFInfo<dim> dof_info(mg_dof_handler);
+    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
     // Obviously, the assembler needs to be replaced by one filling level
     // matrices. Note that it automatically fills the edge matrices as well.
@@ -626,12 +624,12 @@ namespace Step39
     assembler.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
 
     MatrixIntegrator<dim> integrator;
-    // Here is the other difference to the previous function: we run over all
-    // cells, not only the active ones. And we use <tt>mg_dof_handler</tt>,
-    // since we need the degrees of freedom on each level, not the global
-    // numbering.
+    // Here is the other difference to the previous function: we run
+    // over all cells, not only the active ones. And we use functions
+    // ending on <code>_mg</code> since we need the degrees of freedom
+    // on each level, not the global numbering.
     MeshWorker::integration_loop<dim, dim> (
-      mg_dof_handler.begin(), mg_dof_handler.end(),
+      dof_handler.begin_mg(), dof_handler.end_mg(),
       dof_info, info_box,
       integrator, assembler);
   }
@@ -685,7 +683,7 @@ namespace Step39
     // preconditioner. First, we need transfer between grid levels. The object
     // we are using here generates sparse matrices for these transfers.
     MGTransferPrebuilt<Vector<double> > mg_transfer;
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build_matrices(dof_handler);
 
     // Then, we need an exact solver for the matrix on the coarsest level.
     FullMatrix<double> coarse_matrix;
@@ -721,7 +719,7 @@ namespace Step39
 
     // Now, we are ready to set up the V-cycle operator and the multilevel
     // preconditioner.
-    Multigrid<Vector<double> > mg(mg_dof_handler, mgmatrix,
+    Multigrid<Vector<double> > mg(dof_handler, mgmatrix,
                                   mg_coarse, mg_transfer,
                                   mg_smoother, mg_smoother);
     // Let us not forget the edge matrices needed because of the adaptive
@@ -732,7 +730,7 @@ namespace Step39
     // which can be used as a regular preconditioner,
     PreconditionMG<dim, Vector<double>,
                    MGTransferPrebuilt<Vector<double> > >
-                   preconditioner(mg_dof_handler, mg, mg_transfer);
+                   preconditioner(dof_handler, mg, mg_transfer);
     // and use it to solve the system.
     solver.solve(matrix, solution, right_hand_side, preconditioner);
   }
@@ -914,7 +912,7 @@ namespace Step39
         setup_system();
         deallog << "DoFHandler " << dof_handler.n_dofs() << " dofs, level dofs";
         for (unsigned int l=0; l<triangulation.n_levels(); ++l)
-          deallog << ' ' << mg_dof_handler.n_dofs(l);
+          deallog << ' ' << dof_handler.n_dofs(l);
         deallog << std::endl;
 
         deallog << "Assemble matrix" << std::endl;
