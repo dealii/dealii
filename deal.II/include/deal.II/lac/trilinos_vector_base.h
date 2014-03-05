@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2013 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1383,7 +1383,7 @@ namespace TrilinosWrappers
             // use pre-allocated vector for non-local entries if it exists for
             // addition operation
             const TrilinosWrappers::types::int_type my_row = nonlocal_vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
-            Assert(my_row != -1,
+            Assert(my_row != -1, 
                    ExcMessage("Attempted to write into off-processor vector entry "
                               "that has not be specified as being writable upon "
                                "initialization"));
@@ -1704,14 +1704,22 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (local_size() == v.local_size(),
-            ExcDimensionMismatch(local_size(), v.local_size()));
+    Assert (size() == v.size(),
+            ExcDimensionMismatch (size(), v.size()));
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-    const int ierr = vector->Update(1., *(v.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    if(local_size() == v.local_size())
+    {
+      const int ierr = vector->Update(1., *(v.vector), s);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    }
+    else
+    {
+      VectorBase tmp = v;
+      tmp *= s;
+      this->add(tmp, true);
+    }
   }
 
 
@@ -1725,15 +1733,23 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (local_size() == v.local_size(),
-            ExcDimensionMismatch(local_size(), v.local_size()));
-
+    Assert (size() == v.size(),
+            ExcDimensionMismatch (size(), v.size()));
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
-    const int ierr = vector->Update(a, *(v.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    if(local_size() == v.local_size())
+    {
+      const int ierr = vector->Update(a, *(v.vector), s);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    }
+    else
+    {
+      (*this)*=s;
+      VectorBase tmp = v;
+      tmp *= a;
+      this->add(tmp, true);
+    }
   }
 
 
@@ -1749,18 +1765,29 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (local_size() == v.local_size(),
-            ExcDimensionMismatch(local_size(), v.local_size()));
-    Assert (local_size() == w.local_size(),
-            ExcDimensionMismatch(local_size(), w.local_size()));
-
+    Assert (size() == v.size(),
+            ExcDimensionMismatch (size(), v.size()));
+    Assert (size() == w.size(),
+            ExcDimensionMismatch (size(), w.size()));
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
-
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    
+    if(local_size() == v.local_size() && local_size() == w.local_size())
+    {
+      const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    }
+    else
+    {
+      (*this)*=s;
+      VectorBase tmp = v;
+      tmp *= a;
+      this->add(tmp, true);
+      tmp = w;
+      tmp *= b;
+      this->add(tmp, true);
+    }
   }
 
 
@@ -1778,27 +1805,44 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (local_size() == v.local_size(),
-            ExcDimensionMismatch(local_size(), v.local_size()));
-    Assert (local_size() == w.local_size(),
-            ExcDimensionMismatch(local_size(), w.local_size()));
-    Assert (local_size() == x.local_size(),
-            ExcDimensionMismatch(local_size(), x.local_size()));
-
+    Assert (size() == v.size(),
+            ExcDimensionMismatch (size(), v.size()));
+    Assert (size() == w.size(),
+            ExcDimensionMismatch (size(), w.size()));
+    Assert (size() == x.size(),
+            ExcDimensionMismatch (size(), x.size()));
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
     Assert (numbers::is_finite(c), ExcNumberNotFinite());
 
-    // Update member can only
-    // input two other vectors so
-    // do it in two steps
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    const int jerr = vector->Update(c, *(x.vector), 1.);
-    Assert (jerr == 0, ExcTrilinosError(jerr));
-    (void)jerr; // removes -Wunused-parameter warning in optimized mode
+    if(local_size() == v.local_size()
+       && local_size() == w.local_size()
+       && local_size() == x.local_size())
+    {
+      // Update member can only
+      // input two other vectors so
+      // do it in two steps
+      const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      
+      const int jerr = vector->Update(c, *(x.vector), 1.);
+      Assert (jerr == 0, ExcTrilinosError(jerr));
+      (void)jerr; // removes -Wunused-parameter warning in optimized mode
+    }
+    else
+    {
+      (*this)*=s;
+      VectorBase tmp = v;
+      tmp *= a;
+      this->add(tmp, true);
+      tmp = w;
+      tmp *= b;
+      this->add(tmp, true);
+      tmp = x;
+      tmp *= c;
+      this->add(tmp, true);
+    }
   }
 
 

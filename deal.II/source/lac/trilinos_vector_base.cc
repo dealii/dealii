@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -291,15 +291,24 @@ namespace TrilinosWrappers
       *this += v;
     else
       {
+        Assert (!has_ghost_elements(), ExcGhostsPresent());
         AssertThrow (size() == v.size(),
                      ExcDimensionMismatch (size(), v.size()));
 
-        Epetra_Import data_exchange (vector->Map(), v.vector->Map());
+        //HACK: For some reason the following doesn't work properly, so do it manually
+        //  Epetra_Import data_exchange (vector->Map(), v.vector->Map());
+        //  int ierr = vector->Import(*v.vector, data_exchange, Add);
+        //  AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+        //  last_action = Add;
 
-        int ierr = vector->Import(*v.vector, data_exchange, Add);
+        Epetra_MultiVector dummy(vector->Map(), 1, false);
+        Epetra_Import data_exchange (dummy.Map(), v.vector->Map());
+
+        int ierr = dummy.Import(*v.vector, data_exchange, Insert);
         AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-        last_action = Insert;
+        ierr = vector->Update (1.0, dummy, 1.0);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
   }
 
