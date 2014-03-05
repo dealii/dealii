@@ -71,6 +71,10 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 #             friend struct Implementation;
 #           };)
 #   -w177  declared but not referenced
+#   -w191  type qualifier is meaningless on cast type
+#          Warnings from this warn about code like this:
+#             static_cast<T const * const>(p)
+#          There are many places in boost that do this kind of stuff
 #   -w193  zero used for undefined preprocessing identifier "..."
 #          This happens when using undefined preprocessor names in
 #          conditions such as
@@ -101,6 +105,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd135")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd175")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd177")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd191")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd193")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd279")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd327")
