@@ -191,6 +191,8 @@ namespace TimeStepping
   class ExplicitRungeKutta : public RungeKutta<VECTOR>
   {
   public:
+    using RungeKutta<VECTOR>::evolve_one_time_step;
+
     /**
      * Default constructor. initialize(runge_kutta_method) needs to be called
      * before the object can be used.
@@ -277,6 +279,8 @@ namespace TimeStepping
   class ImplicitRungeKutta : public RungeKutta<VECTOR>
   {
   public:
+    using RungeKutta<VECTOR>::evolve_one_time_step;
+
     /**
      * Default constructor. initialize(runge_kutta_method) and
      * set_newton_solver_parameters(unsigned int,double)
@@ -400,6 +404,8 @@ namespace TimeStepping
   class EmbeddedExplicitRungeKutta : public RungeKutta<VECTOR>
   {
   public:
+    using RungeKutta<VECTOR>::evolve_one_time_step;
+
     /**
      * Default constructor. initialize(runge_kutta_method) and
      * set_time_adaptation_parameters(double, double, double, double, double, double)
