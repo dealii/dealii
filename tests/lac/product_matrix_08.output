@@ -1,0 +1,13 @@
+
+DEAL::clear
+DEAL::Init with vector memory, matrix 1 and matrix 2
+DEAL::Multiplying with all ones vector
+DEAL::Dimensions of result vector verified
+DEAL::Result vector data verified
+DEAL::17.0000	29.0000	
+DEAL::Clearing product matrix
+DEAL::Reinitializing product matrix with matrix 3 and matrix 4
+DEAL::Multiplying with all ones vector
+DEAL::Dimensions of result vector verified
+DEAL::Result vector data verified
+DEAL::270.0000	648.0000	1026.0000	
