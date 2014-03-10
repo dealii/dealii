@@ -121,6 +121,42 @@ namespace Algorithms
 
   template <class VECTOR>
   OutputOperator<VECTOR> &
+  OutputOperator<VECTOR>::operator<< (const AnyData& vectors)
+  {
+    if (os == 0)
+      {
+        //TODO: make this possible
+        //deallog << ' ' << step;
+        //for (unsigned int i=0;i<vectors.size();++i)
+        //  vectors(i)->print(deallog);
+        //deallog << std::endl;
+      }
+    else
+      {
+        (*os) << ' ' << step;
+        for (unsigned int i=0; i<vectors.size(); ++i)
+	  {
+	    if (vectors.is_type<VECTOR*>(i))
+	      {
+		const VECTOR& v = *vectors.entry<VECTOR*>(i);
+		for (unsigned int j=0; j<v.size(); ++j)
+		  (*os) << ' ' << v(j);
+	      }
+	    else if (vectors.is_type<const VECTOR*>(i))
+	      {
+		const VECTOR& v = *vectors.entry<const VECTOR*>(i);
+		for (unsigned int j=0; j<v.size(); ++j)
+		  (*os) << ' ' << v(j);
+	      }
+	  }
+        (*os) << std::endl;
+      }
+    return *this;
+  }
+  
+
+  template <class VECTOR>
+  OutputOperator<VECTOR> &
   OutputOperator<VECTOR>::operator<< (const NamedData<VECTOR *> &vectors)
   {
     if (os == 0)

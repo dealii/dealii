@@ -65,12 +65,22 @@ namespace Algorithms
   void
   ThetaTimestepping<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
   {
+    Operator<VECTOR>::operator() (out, in);
+  }
+  
+  
+  template <class VECTOR>
+  void
+  ThetaTimestepping<VECTOR>::operator() (AnyData &out, const AnyData &in)
+  {
     Assert(!adaptive, ExcNotImplemented());
 
     deallog.push ("Theta");
+
+    VECTOR& solution = *out.entry<VECTOR*>(0);
     GrowingVectorMemory<VECTOR> mem;
     typename VectorMemory<VECTOR>::Pointer aux(mem);
-    aux->reinit(*out(0));
+    aux->reinit(solution);
 
     control.restart();
 
@@ -79,20 +89,17 @@ namespace Algorithms
     // The data used to compute the
     // vector associated with the old
     // timestep
-    VECTOR *p = out(0);
-    NamedData<VECTOR *> src1;
-    src1.add(p, "Previous iterate");
+    AnyData src1;
+    src1.add<const VECTOR*>(&solution, "Previous iterate");
     src1.merge(in);
 
-    NamedData<VECTOR *> src2;
-    src2.add(p, "Previous iterate");
+    AnyData src2;
+    src2.add<const VECTOR*>(&solution, "Previous iterate");
 
-    p = aux;
-    NamedData<VECTOR *> out1;
-    out1.add(p, "Result");
-    // The data provided to the inner
-    // solver
-    src2.add(p, "Previous time");
+    AnyData out1;
+    out1.add<VECTOR*>(aux, "Solution");
+    // The data provided to the inner solver
+    src2.add<const VECTOR*>(aux, "Previous time");
     src2.merge(in);
 
     if (output != 0)

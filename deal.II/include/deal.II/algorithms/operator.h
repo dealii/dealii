@@ -196,7 +196,12 @@ namespace Algorithms
     OutputOperator<VECTOR> &operator<< (unsigned int step);
 
     /**
-     * Output all the vectors in NamedData.
+     * Output all the vectors in AnyData.
+     */
+    virtual OutputOperator<VECTOR> &operator<< (const AnyData& vectors);
+    
+    /**
+     * @deprecated Output all the vectors in NamedData.
      */
     virtual OutputOperator<VECTOR> &operator<< (const NamedData<VECTOR *> &vectors);
   protected:
