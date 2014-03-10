@@ -118,9 +118,10 @@ type
 AnyData::entry (const unsigned int i)
 {
   AssertIndexRange(i, size());
-  Assert(data[i].type() == typeid(type),
+  type* p = boost::any_cast<type>(&data[i]);
+  Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
-  return boost::any_cast<type>(data[i]);
+  return *p;
 }
 
 
@@ -143,9 +144,10 @@ const type
 AnyData::read(const unsigned int i) const
 {
   AssertIndexRange(i, size());
-  Assert(data[i].type() == typeid(type),
+  const type* p = boost::any_cast<type>(&data[i]);
+  Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
-  return boost::any_cast<const type>(data[i]);
+  return *p;
 }
 
 
@@ -186,9 +188,10 @@ type
 AnyData::entry (const std::string& n)
 {
   const unsigned int i = find(n);
-  /* Assert(dynamic_cast<type*>(&data[i]) != 0, */
-  /* 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name())); */
-  return boost::any_cast<type>(data[i]);
+  type* p = boost::any_cast<type>(&data[i]);
+  Assert(p != 0,
+	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
+  return *p;
 }
 
 
@@ -198,9 +201,10 @@ const type
 AnyData::entry (const std::string& n) const
 {
   const unsigned int i = find(n);
-  Assert(data[i].type() == typeid(type),
+  const type* p = boost::any_cast<type>(&data[i]);
+  Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
-  return boost::any_cast<const type>(data[i]);
+  return *p;
 }
 
 
@@ -210,9 +214,10 @@ const type
 AnyData::read(const std::string& n) const
 {
   const unsigned int i = find(n);
-  Assert(data[i].type() == typeid(type),
+  const type* p = boost::any_cast<type>(&data[i]);
+  Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
-  return boost::any_cast<const type>(data[i]);
+  return *p;
 }
 
 

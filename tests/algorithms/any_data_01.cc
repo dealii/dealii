@@ -17,7 +17,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/any_data.h>
+#include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/logstream.h>
 
 #include <fstream>
@@ -62,19 +62,19 @@ void extract(const AnyData& data)
 	  << d  << std::endl
 	  << *p2 << std::endl
 	  << *p3 << std::endl;
-  try
-    {
-      double* p3a = data.entry<double*>("cd* 17.");
-      deallog << p3a;
-    }
-  // catch(ExceptionBase e)
+  // try
   //   {
-  //     deallog << e.what() << std::endl;
+  //     double* p3a = data.entry<double*>("cd* 17.");
+  //     deallog << p3a;
   //   }
-  catch(...)
-    {
-      deallog << "Exception duly thrown" << std::endl;
-    }
+  // // catch(ExceptionBase e)
+  // //   {
+  // //     deallog << e.what() << std::endl;
+  // //   }
+  // catch(...)
+  //   {
+  //     deallog << "Exception duly thrown" << std::endl;
+  //   }
 
 }
 
