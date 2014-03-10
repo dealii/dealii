@@ -95,10 +95,17 @@ namespace Algorithms
   void
   Newton<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
   {
+    Operator<VECTOR>::operator() (out, in);
+  }
+
+  template <class VECTOR>
+  void
+  Newton<VECTOR>::operator() (AnyData &out, const AnyData &in)
+  {
     Assert (out.size() == 1, ExcNotImplemented());
     deallog.push ("Newton");
 
-    VECTOR &u = *out(0);
+    VECTOR &u = *out.entry<VECTOR*>(0);
 
     if (debug>2)
       deallog << "u: " << u.l2_norm() << std::endl;
@@ -108,19 +115,16 @@ namespace Algorithms
     typename VectorMemory<VECTOR>::Pointer res(mem);
 
     res->reinit(u);
-    NamedData<VECTOR *> src1;
-    NamedData<VECTOR *> src2;
-    VECTOR *p = &u;
-    src1.add(p, "Newton iterate");
+    AnyData src1;
+    AnyData src2;
+    src1.add<const VECTOR*>(&u, "Newton iterate");
     src1.merge(in);
-    p = res;
-    src2.add(p, "Newton residual");
+    src2.add<const VECTOR*>(res, "Newton residual");
     src2.merge(src1);
-    NamedData<VECTOR *> out1;
-    out1.add(p, "Residual");
-    p = Du;
-    NamedData<VECTOR *> out2;
-    out2.add(p, "Update");
+    AnyData out1;
+    out1.add<VECTOR*>(res, "Residual");
+    AnyData out2;
+    out2.add<VECTOR*>(Du, "Update");
 
     unsigned int step = 0;
     // fill res with (f(u), v)

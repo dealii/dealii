@@ -28,6 +28,11 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
+ * @deprecated The use of this class is deprecated and AnyData should
+ * be used instead. It is not only more flexible, the way constness
+ * was assured in this class never worked the way it was
+ * intended. Therefore, the according checks have been disabled.
+ *
  * This class is a collection of DATA objects. Each of the pointers
  * has a name associated, enabling identification by this name rather
  * than the index in the vector only.
@@ -252,7 +257,9 @@ inline
 void
 NamedData<DATA>::add(DATA &v, const std::string &n)
 {
-  Assert(!is_constant, ExcConstantObject());
+  // see operator() below
+  
+  //  Assert(!is_constant, ExcConstantObject());
   names.push_back(n);
   data.push_back(v);
 }
@@ -263,7 +270,9 @@ inline
 void
 NamedData<DATA>::add(const DATA &v, const std::string &n)
 {
-  Assert(!is_constant, ExcConstantObject());
+  // see operator() below
+  
+  //  Assert(!is_constant, ExcConstantObject());
   DATA &aux = const_cast<DATA &>(v);
   data.push_back(aux);
   names.push_back(n);
@@ -277,7 +286,9 @@ inline
 void
 NamedData<DATA>::merge(NamedData<DATA2> &other)
 {
-  Assert(!is_constant, ExcConstantObject());
+  // see operator() below
+  
+  // Assert(!is_constant, ExcConstantObject());
 
   for (unsigned int i=0; i<other.size(); ++i)
     {
@@ -294,7 +305,9 @@ inline
 void
 NamedData<DATA>::merge(const NamedData<DATA2> &other)
 {
-  Assert(!is_constant, ExcConstantObject());
+  // see operator() below
+  
+  //  Assert(!is_constant, ExcConstantObject());
   for (unsigned int i=0; i<other.size(); ++i)
     {
       names.push_back(other.name(i));
@@ -342,7 +355,11 @@ inline
 DATA &
 NamedData<DATA>::operator() (unsigned int i)
 {
-  Assert(!is_constant, ExcConstantObject());
+  // Remove this assertion, since is_const() does not really assert
+  // what we would like to. This can only be fixed by using constness
+  // in AnyData.
+
+  //  Assert(!is_constant, ExcConstantObject());
   AssertIndexRange(i, size());
   return data[i];
 }
