@@ -16,6 +16,7 @@
 
 
 #include <deal.II/algorithms/operator.h>
+#include <deal.II/base/logstream.h>
 
 DEAL_II_NAMESPACE_OPEN
 
