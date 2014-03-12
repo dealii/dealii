@@ -1781,12 +1781,16 @@ namespace TrilinosWrappers
     else
     {
       (*this)*=s;
-      VectorBase tmp = v;
-      tmp *= a;
-      this->add(tmp, true);
-      tmp = w;
-      tmp *= b;
-      this->add(tmp, true);
+      {
+        VectorBase tmp = v;
+        tmp *= a;
+        this->add(tmp, true);
+      }
+      {
+        VectorBase tmp = w;
+        tmp *= b;
+        this->add(tmp, true);
+      }
     }
   }
 
@@ -1833,15 +1837,21 @@ namespace TrilinosWrappers
     else
     {
       (*this)*=s;
-      VectorBase tmp = v;
-      tmp *= a;
-      this->add(tmp, true);
-      tmp = w;
-      tmp *= b;
-      this->add(tmp, true);
-      tmp = x;
-      tmp *= c;
-      this->add(tmp, true);
+      {
+        VectorBase tmp = v;
+        tmp *= a;
+        this->add(tmp, true);
+      }
+      {
+        VectorBase tmp = w;
+        tmp *= b;
+        this->add(tmp, true);
+      }
+      {
+        VectorBase tmp = x;
+        tmp *= c;
+        this->add(tmp, true);
+      }
     }
   }
 
@@ -1876,8 +1886,7 @@ namespace TrilinosWrappers
     // If we don't have the same map, copy.
     if (vector->Map().SameAs(v.vector->Map())==false)
       {
-        *vector = *v.vector;
-        *this *= a;
+        this->sadd(0., a, v);
       }
     else
       {
@@ -1911,8 +1920,7 @@ namespace TrilinosWrappers
     // If we don't have the same map, copy.
     if (vector->Map().SameAs(v.vector->Map())==false)
       {
-        *vector = *v.vector;
-        sadd(a, b, w);
+        sadd(0., a, v, b, w);
       }
     else
       {
