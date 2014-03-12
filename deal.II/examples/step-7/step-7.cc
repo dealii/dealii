@@ -668,10 +668,10 @@ namespace Step7
         // <code>run()</code> function further below. (The default value of
         // boundary indicators is <code>0</code>, so faces can only have an
         // indicator equal to <code>1</code> if we have explicitly set it.)
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-          if (cell->face(face)->at_boundary()
+        for (unsigned int face_number=0; face_number<GeometryInfo<dim>::faces_per_cell; ++face_number)
+          if (cell->face(face_number)->at_boundary()
               &&
-              (cell->face(face)->boundary_indicator() == 1))
+              (cell->face(face_number)->boundary_indicator() == 1))
             {
               // If we came into here, then we have found an external face
               // belonging to Gamma2. Next, we have to compute the values of
@@ -679,7 +679,7 @@ namespace Step7
               // need for the computation of the contour integral. This is
               // done using the <code>reinit</code> function which we already
               // know from the FEValue class:
-              fe_face_values.reinit (cell, face);
+              fe_face_values.reinit (cell, face_number);
 
               // And we can then perform the integration by using a loop over
               // all quadrature points.
@@ -988,13 +988,13 @@ namespace Step7
             cell = triangulation.begin (),
             endc = triangulation.end();
             for (; cell!=endc; ++cell)
-              for (unsigned int face=0;
-                   face<GeometryInfo<dim>::faces_per_cell;
-                   ++face)
-                if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12)
+              for (unsigned int face_number=0;
+                   face_number<GeometryInfo<dim>::faces_per_cell;
+                   ++face_number)
+                if ((std::fabs(cell->face(face_number)->center()(0) - (-1)) < 1e-12)
                     ||
-                    (std::fabs(cell->face(face)->center()(1) - (-1)) < 1e-12))
-                  cell->face(face)->set_boundary_indicator (1);
+                    (std::fabs(cell->face(face_number)->center()(1) - (-1)) < 1e-12))
+                  cell->face(face_number)->set_boundary_indicator (1);
           }
         else
           refine_grid ();
