@@ -28,7 +28,7 @@
  * represent quantities that will most definitely not be larger than 4 billion.
  *
  * The data type we define for these indices to keep the bulk
- * of the code base free of <code>#ifdef</code>s is types::global_dof_index.
+ * of the code base free of <code>\#ifdef</code>s is types::global_dof_index.
  * If deal.II is configured as normal, this type is <code>unsigned int</code>,
  * but can be switched to <code>unsigned long long int</code> if the right
  * flag is provided (see the ReadMe file). This page is intended to clarify
