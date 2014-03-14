@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -284,6 +284,67 @@ IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
     }
     "
     DEAL_II_BOOST_BIND_COMPILER_BUG
+    )
+ENDIF()
+
+
+#
+# Microsoft Visual C++ has a bug where the resulting object
+# from calling std::bind does not have a const operator(),
+# so we cannot pass such objects as const references as we
+# usually do with input arguments of other functions.
+#
+# - Wolfgang Bangerth, 2014
+#
+IF(DEAL_II_WITH_CXX11)
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
+  CHECK_CXX_COMPILER_BUG(
+    "
+    #include <functional>
+
+    void f(int, int) {}
+
+    template <typename F>
+    void g(const F &func)
+    {
+      func(1);
+    }
+
+    int main ()
+    {
+      g (std::bind(&f, std::placeholders::_1, 1));
+    }
+    "
+    DEAL_II_BIND_NO_CONST_OP_PARENTHESES
+    )
+  RESET_CMAKE_REQUIRED()
+ELSE()
+  CHECK_CXX_COMPILER_BUG(
+    "
+    #include <functional>
+    #include \"${BOOST_FOLDER}/include/boost/bind.hpp\"
+
+    void f(int, int) {}
+
+    template <typename F>
+    void g(const F &func)
+    {
+      func(1);
+    }
+
+    int main ()
+    {
+      using boost::bind;
+      using boost::reference_wrapper;
+  
+      // now also import the _1, _2 placeholders from the global namespace
+      // into the current one as suggested above
+      using ::_1;
+
+      g (boost::bind(&f, boost::_1, 1));
+    }
+    "
+    DEAL_II_BIND_NO_CONST_OP_PARENTHESES
     )
 ENDIF()
 
