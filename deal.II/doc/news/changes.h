@@ -157,6 +157,12 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2014/03/14)
   </li>
 
+  <li> Fixed: VectorTools::project_boundary_values_curl_conforming contained
+  a bug for some cases. This is now fixed.
+  <br>
+  (Markus B&uuml;rg, 2014/03/10)
+  </li>
+  
   <li> Fixed: ParameterHandler will no longer output an error if the file
   to be read ends with "end" without a newline.
   <br>
