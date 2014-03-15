@@ -2984,6 +2984,7 @@ namespace internal
                 // not implemented at
                 // present for dim=3 or
                 // higher
+                // TODO: you can steal the code to do this from GridTools::transform()
                 Assert (dim<=2, ExcNotImplemented());
 
                 // compute where the common
@@ -5773,10 +5774,10 @@ namespace internal
                             for (unsigned int q=0; q<triangulation.faces->quads.cells.size(); ++q)
                               for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
                                 {
-                                  const int index=triangulation.faces->quads.cells[q].face(l);
-                                  if (index==old_index_0)
+                                  const int this_index=triangulation.faces->quads.cells[q].face(l);
+                                  if (this_index==old_index_0)
                                     triangulation.faces->quads.cells[q].set_face(l,new_index_0);
-                                  else if (index==old_index_1)
+                                  else if (this_index==old_index_1)
                                     triangulation.faces->quads.cells[q].set_face(l,new_index_1);
                                 }
                             // now we have to copy
@@ -5865,10 +5866,10 @@ namespace internal
                               for (unsigned int h=0; h<triangulation.levels[l]->cells.cells.size(); ++h)
                                 for (unsigned int q=0; q<GeometryInfo<dim>::faces_per_cell; ++q)
                                   {
-                                    const int index=triangulation.levels[l]->cells.cells[h].face(q);
-                                    if (index==switch_1_index)
+                                    const int face_index=triangulation.levels[l]->cells.cells[h].face(q);
+                                    if (face_index==switch_1_index)
                                       triangulation.levels[l]->cells.cells[h].set_face(q,switch_2_index);
-                                    else if (index==switch_2_index)
+                                    else if (face_index==switch_2_index)
                                       triangulation.levels[l]->cells.cells[h].set_face(q,switch_1_index);
                                   }
                             // now we have to copy
@@ -9327,13 +9328,13 @@ namespace internal
                               // at the outset of the
                               // next iteration) for
                               // refinement
-                              for (unsigned int line=0;
-                                   line<GeometryInfo<dim>::lines_per_cell; ++line)
-                                if (!cell->line(line)->has_children() &&
+                              for (unsigned int l=0;
+                                   l<GeometryInfo<dim>::lines_per_cell; ++l)
+                                if (!cell->line(l)->has_children() &&
                                     (GeometryInfo<dim>::line_refinement_case(cell->refine_flag_set(),
-                                                                             line)
+                                                                             l)
                                      !=RefinementCase<1>::no_refinement))
-                                  cell->line(line)->set_user_flag();
+                                  cell->line(l)->set_user_flag();
 
                               break;
                             }

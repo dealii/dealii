@@ -132,10 +132,10 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
       // first fill dof_data
       for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
         {
-          const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values
+          const FEValuesBase<DH::dimension,DH::space_dimension> &this_fe_patch_values
             = data.get_present_fe_values (dataset);
           const unsigned int n_components =
-            fe_patch_values.get_fe().n_components();
+            this_fe_patch_values.get_fe().n_components();
 
           const DataPostprocessor<DH::space_dimension> *postprocessor=this->dof_data[dataset]->postprocessor;
 
@@ -149,17 +149,17 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
                   // at each point there is only one component of value,
                   // gradient etc.
                   if (update_flags & update_values)
-                    this->dof_data[dataset]->get_function_values (fe_patch_values,
+                    this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                                   data.patch_values);
                   if (update_flags & update_gradients)
-                    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+                    this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
                                                                      data.patch_gradients);
                   if (update_flags & update_hessians)
-                    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+                    this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
                                                                     data.patch_hessians);
 
                   if (update_flags & update_quadrature_points)
-                    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+                    data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
 
 
                   std::vector<Point<DH::space_dimension> > dummy_normals;
@@ -178,17 +178,17 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
                   // at each point there is a vector valued function and its
                   // derivative...
                   if (update_flags & update_values)
-                    this->dof_data[dataset]->get_function_values (fe_patch_values,
+                    this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                                   data.patch_values_system);
                   if (update_flags & update_gradients)
-                    this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+                    this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
                                                                      data.patch_gradients_system);
                   if (update_flags & update_hessians)
-                    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+                    this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
                                                                     data.patch_hessians_system);
 
                   if (update_flags & update_quadrature_points)
-                    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+                    data.patch_evaluation_points = this_fe_patch_values.get_quadrature_points();
 
                   std::vector<Point<DH::space_dimension> > dummy_normals;
 
@@ -214,7 +214,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
             // reasons.
             if (n_components == 1)
               {
-                this->dof_data[dataset]->get_function_values (fe_patch_values,
+                this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                               data.patch_values);
                 for (unsigned int q=0; q<n_q_points; ++q)
                   patch.data(offset,q) = data.patch_values[q];
@@ -222,7 +222,7 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
             else
               {
                 data.resize_system_vectors(n_components);
-                this->dof_data[dataset]->get_function_values (fe_patch_values,
+                this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                               data.patch_values_system);
                 for (unsigned int component=0; component<n_components;
                      ++component)

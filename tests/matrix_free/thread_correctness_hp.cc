@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013-2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,35 +49,21 @@ public:
   {
     // Ask MatrixFree for cell_range for different
     // orders
-    std::pair<unsigned int,unsigned int> subrange_deg =
-      data.create_cell_subrange_hp (cell_range, 1);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,1,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 2);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,2,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 3);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,3,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 4);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,4,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 5);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,5,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 6);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,6,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp (cell_range, 7);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim,7,Vector<Number> > (data, dst, src,
-                                        subrange_deg);
+    std::pair<unsigned int,unsigned int> subrange_deg;
+#define CALL_METHOD(degree)                                             \
+    subrange_deg = data.create_cell_subrange_hp(cell_range, degree);    \ 
+    if (subrange_deg.second > subrange_deg.first)                       \
+      helmholtz_operator<dim,degree,Vector<Number> > (data, dst, src, subrange_deg)
+
+    CALL_METHOD(1);
+    CALL_METHOD(2);
+    CALL_METHOD(3);
+    CALL_METHOD(4);
+    CALL_METHOD(5);
+    CALL_METHOD(6);
+    CALL_METHOD(7);
+
+#undef CALL_METHOD
   }
 
   void vmult (Vector<Number>       &dst,
@@ -98,7 +84,10 @@ void do_test (const unsigned int parallel_option)
 {
   Triangulation<dim> tria;
   create_mesh (tria);
+  // larger mesh in release mode
+#ifndef DEBUG
   tria.refine_global(2);
+#endif
 
   // refine a few cells
   for (unsigned int i=0; i<11-3*dim; ++i)
@@ -171,10 +160,16 @@ void do_test (const unsigned int parallel_option)
             MatrixFree<dim,number>::AdditionalData::partition_partition;
           deallog << "Parallel option partition/partition" << std::endl;
         }
-      else
+      else if (parallel_option == 1)
         {
           data.tasks_parallel_scheme =
             MatrixFree<dim,number>::AdditionalData::partition_color;
+          deallog << "Parallel option partition/color" << std::endl;
+        }
+      else
+        {
+          data.tasks_parallel_scheme =
+            MatrixFree<dim,number>::AdditionalData::color;
           deallog << "Parallel option partition/color" << std::endl;
         }
       data.tasks_block_size = 1;

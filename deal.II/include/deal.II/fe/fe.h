@@ -1372,8 +1372,11 @@ public:
    * requirement that they be one at a certain point and zero at all the
    * points associated with the other shape functions.
    *
-   * In composed elements (i.e. for the FESystem class, the result will be
-   * true if all all the base elements have defined support points.
+   * In composed elements (i.e. for the FESystem class), the result will be
+   * true if all all the base elements have defined support points. FE_Nothing
+   * is a special case in FESystems, because it has 0 support points and
+   * has_support_points() is false, but an FESystem containing an FE_Nothing
+   * among other elements will return true.
    */
   bool has_support_points () const;
 

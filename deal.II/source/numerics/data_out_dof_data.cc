@@ -740,6 +740,11 @@ add_data_vector (const VECTOR                             &vec,
   DataVectorType actual_type = type;
   if (type == type_automatic)
     {
+      // in the rare case that someone has a DGP(0) attached, we can not decide what she wants here:
+      Assert((dofs == 0) || (triangulation->n_active_cells() != dofs->n_dofs()),
+          ExcMessage("Unable to determine the type of vector automatically because the number of DoFs "
+              "is equal to the number of cells. Please specify DataVectorType."));
+
       if (vec.size() == triangulation->n_active_cells())
         actual_type = type_cell_data;
       else

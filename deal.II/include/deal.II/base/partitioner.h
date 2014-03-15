@@ -294,10 +294,10 @@ namespace Utilities
                       << "Global index " << arg1
                       << " neither owned nor ghost on proc " << arg2);
 
-    private:                      /**
-                                 * The global size of the vector over all
-                                 * processors
-                                 */
+    private:
+      /**
+       * The global size of the vector over all processors
+       */
       const types::global_dof_index global_size;
 
       /**

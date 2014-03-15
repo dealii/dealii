@@ -119,12 +119,6 @@ public:
 
 private:
   /**
-   * Return the address of the
-   * matrix for comparison.
-   */
-  virtual const void *get() const;
-
-  /**
    * The pointer to the actual matrix.
    */
   SmartPointer<const MATRIX,TransposeMatrix<MATRIX,VECTOR> > m;
@@ -218,15 +212,6 @@ TransposeMatrix<MATRIX, VECTOR>::Tvmult_add (VECTOR &dst,
   Assert (m != 0, ExcNotInitialized());
   m->vmult_add (dst, src);
 }
-
-
-template<class MATRIX, class VECTOR>
-inline const void *
-TransposeMatrix<MATRIX, VECTOR>::get () const
-{
-  return m;
-}
-
 
 
 DEAL_II_NAMESPACE_CLOSE

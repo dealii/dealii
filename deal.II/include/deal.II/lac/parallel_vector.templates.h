@@ -454,7 +454,8 @@ namespace parallel
                        std::abs(local_element(j) - *read_position) <
                        std::abs(local_element(j)) * 1000. *
                        std::numeric_limits<Number>::epsilon(),
-                       ExcMessage("Inserted elements do not match."));
+                       ExcNonMatchingElements(*read_position, local_element(j),
+                                              part.this_mpi_process()));
           AssertDimension(read_position-import_data,part.n_import_indices());
         }
 

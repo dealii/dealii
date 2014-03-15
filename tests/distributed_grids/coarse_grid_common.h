@@ -26,8 +26,8 @@
 #include <unistd.h>
 
 
-template <int dim>
-void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
+template <int dim, int spacedim=dim>
+void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
                 const char                                *filename)
 {
   deallog << "Checksum: "

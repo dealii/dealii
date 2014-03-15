@@ -1,0 +1,14 @@
+
+DEAL::0	 i  7
+DEAL::1	 d  17.
+DEAL::2	 d* 17.
+DEAL::3	cd* 17.
+DEAL:: i  7	7
+DEAL:: d  17.	17.0000
+DEAL:: d* 17.	18.0000
+DEAL::cd* 17.	18.0000
+DEAL::7
+DEAL::7
+DEAL::17.0000
+DEAL::18.0000
+DEAL::18.0000

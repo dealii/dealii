@@ -369,16 +369,16 @@ namespace FETools
                                 element.n_blocks()));
 
     types::global_dof_index k=0;
-    unsigned int i=0;
+    unsigned int count=0;
     for (unsigned int b=0; b<element.n_base_elements(); ++b)
       for (unsigned int m=0; m<element.element_multiplicity(b); ++m)
         {
-          block_data[i++] = (return_start_indices)
+          block_data[count++] = (return_start_indices)
                             ? k
                             : (element.base_element(b).n_dofs_per_cell());
           k += element.base_element(b).n_dofs_per_cell();
         }
-    Assert (i == element.n_blocks(), ExcInternalError());
+    Assert (count == element.n_blocks(), ExcInternalError());
 
     std::vector<types::global_dof_index> start_indices(block_data.size());
     k = 0;
@@ -908,51 +908,53 @@ namespace FETools
     // shape value on the cell.
     std::vector<unsigned int> face_c_dofs(n);
     std::vector<unsigned int> face_f_dofs(n);
-    unsigned int k=0;
-    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
-      {
-        const unsigned int offset_c = GeometryInfo<dim>::face_to_cell_vertices(face_coarse, i)
-                                      *fe.dofs_per_vertex;
-        const unsigned int offset_f = GeometryInfo<dim>::face_to_cell_vertices(face_fine, i)
-                                      *fe.dofs_per_vertex;
-        for (unsigned int j=0; j<fe.dofs_per_vertex; ++j)
-          {
-            face_c_dofs[k] = offset_c + j;
-            face_f_dofs[k] = offset_f + j;
-            ++k;
-          }
-      }
-    for (unsigned int i=1; i<=GeometryInfo<dim>::lines_per_face; ++i)
-      {
-        const unsigned int offset_c = fe.first_line_index
-                                      + GeometryInfo<dim>::face_to_cell_lines(face_coarse, i-1)
-                                      *fe.dofs_per_line;
-        const unsigned int offset_f = fe.first_line_index
-                                      + GeometryInfo<dim>::face_to_cell_lines(face_fine, i-1)
-                                      *fe.dofs_per_line;
-        for (unsigned int j=0; j<fe.dofs_per_line; ++j)
-          {
-            face_c_dofs[k] = offset_c + j;
-            face_f_dofs[k] = offset_f + j;
-            ++k;
-          }
-      }
-    for (unsigned int i=1; i<=GeometryInfo<dim>::quads_per_face; ++i)
-      {
-        const unsigned int offset_c = fe.first_quad_index
-                                      + face_coarse
-                                      *fe.dofs_per_quad;
-        const unsigned int offset_f = fe.first_quad_index
-                                      + face_fine
-                                      *fe.dofs_per_quad;
-        for (unsigned int j=0; j<fe.dofs_per_quad; ++j)
-          {
-            face_c_dofs[k] = offset_c + j;
-            face_f_dofs[k] = offset_f + j;
-            ++k;
-          }
-      }
-    Assert (k == fe.dofs_per_face, ExcInternalError());
+    {
+      unsigned int face_dof=0;
+      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
+        {
+          const unsigned int offset_c = GeometryInfo<dim>::face_to_cell_vertices(face_coarse, i)
+                                          *fe.dofs_per_vertex;
+          const unsigned int offset_f = GeometryInfo<dim>::face_to_cell_vertices(face_fine, i)
+                                          *fe.dofs_per_vertex;
+          for (unsigned int j=0; j<fe.dofs_per_vertex; ++j)
+            {
+              face_c_dofs[face_dof] = offset_c + j;
+              face_f_dofs[face_dof] = offset_f + j;
+              ++face_dof;
+            }
+        }
+      for (unsigned int i=1; i<=GeometryInfo<dim>::lines_per_face; ++i)
+        {
+          const unsigned int offset_c = fe.first_line_index
+              + GeometryInfo<dim>::face_to_cell_lines(face_coarse, i-1)
+              *fe.dofs_per_line;
+          const unsigned int offset_f = fe.first_line_index
+              + GeometryInfo<dim>::face_to_cell_lines(face_fine, i-1)
+              *fe.dofs_per_line;
+          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+            {
+              face_c_dofs[face_dof] = offset_c + j;
+              face_f_dofs[face_dof] = offset_f + j;
+              ++face_dof;
+            }
+        }
+      for (unsigned int i=1; i<=GeometryInfo<dim>::quads_per_face; ++i)
+        {
+          const unsigned int offset_c = fe.first_quad_index
+              + face_coarse
+              *fe.dofs_per_quad;
+          const unsigned int offset_f = fe.first_quad_index
+              + face_fine
+              *fe.dofs_per_quad;
+          for (unsigned int j=0; j<fe.dofs_per_quad; ++j)
+            {
+              face_c_dofs[face_dof] = offset_c + j;
+              face_f_dofs[face_dof] = offset_f + j;
+              ++face_dof;
+            }
+        }
+      Assert (face_dof == fe.dofs_per_face, ExcInternalError());
+    }
 
     // Set up meshes, one with a single
     // reference cell and refine it once
@@ -1944,29 +1946,21 @@ namespace FETools
 
   template <int dim>
   void
-  hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe,
-                                         std::vector<unsigned int> &h2l)
+  hierarchic_to_lexicographic_numbering (unsigned int degree, std::vector<unsigned int>& h2l)
   {
-    Assert (h2l.size() == fe.dofs_per_cell,
-            ExcDimensionMismatch (h2l.size(), fe.dofs_per_cell));
-    h2l = hierarchic_to_lexicographic_numbering (fe);
-  }
-
-
-
-  template <int dim>
-  std::vector<unsigned int>
-  hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe)
-  {
-    Assert (fe.n_components() == 1, ExcInvalidFE());
-
-    std::vector<unsigned int> h2l (fe.dofs_per_cell);
-
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    // polynomial degree
-    const unsigned int degree = fe.dofs_per_line+1;
-    // number of grid points in each direction
+    // number of support points in each
+    // direction
     const unsigned int n = degree+1;
+
+    unsigned int dofs_per_cell = n;
+    for (unsigned int i=1;i<dim;++i)
+      dofs_per_cell *= n;
+
+    // Assert size maches degree
+    AssertDimension (h2l.size(), dofs_per_cell);
+
+    // polynomial degree
+    const unsigned int dofs_per_line = degree - 1;
 
     // the following lines of code are somewhat odd, due to the way the
     // hierarchic numbering is organized. if someone would really want to
@@ -1996,29 +1990,27 @@ namespace FETools
         h2l[next_index++] = n*n-1;
 
         // left   line
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = (1+i)*n;
 
         // right  line
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = (2+i)*n-1;
 
         // bottom line
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = 1+i;
 
         // top    line
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = n*(n-1)+i+1;
 
         // inside quad
-        Assert (fe.dofs_per_quad == fe.dofs_per_line*fe.dofs_per_line,
-                ExcInternalError());
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
             h2l[next_index++] = n*(i+1)+j+1;
 
-        Assert (next_index == fe.dofs_per_cell, ExcInternalError());
+        Assert (next_index == dofs_per_cell, ExcInternalError());
 
         break;
       }
@@ -2037,82 +2029,78 @@ namespace FETools
         h2l[next_index++] = (n*n+n+1)*degree;  // 7
 
         // line 0
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = (i+1)*n;
         // line 1
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = n-1+(i+1)*n;
         // line 2
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = 1+i;
         // line 3
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = 1+i+n*(n-1);
 
         // line 4
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = (n-1)*n*n+(i+1)*n;
         // line 5
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = (n-1)*(n*n+1)+(i+1)*n;
         // line 6
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = n*n*(n-1)+i+1;
         // line 7
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = n*n*(n-1)+i+1+n*(n-1);
 
         // line 8
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = (i+1)*n*n;
         // line 9
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = n-1+(i+1)*n*n;
         // line 10
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = (i+1)*n*n+n*(n-1);
         // line 11
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
           h2l[next_index++] = n-1+(i+1)*n*n+n*(n-1);
 
 
         // inside quads
-        Assert (fe.dofs_per_quad == fe.dofs_per_line*fe.dofs_per_line,
-                ExcInternalError());
         // face 0
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
             h2l[next_index++] = (i+1)*n*n+n*(j+1);
         // face 1
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
             h2l[next_index++] = (i+1)*n*n+n-1+n*(j+1);
         // face 2, note the orientation!
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
             h2l[next_index++] = (j+1)*n*n+i+1;
         // face 3, note the orientation!
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
             h2l[next_index++] = (j+1)*n*n+n*(n-1)+i+1;
         // face 4
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
             h2l[next_index++] = n*(i+1)+j+1;
         // face 5
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
             h2l[next_index++] = (n-1)*n*n+n*(i+1)+j+1;
 
         // inside hex
-        Assert (fe.dofs_per_hex == fe.dofs_per_quad*fe.dofs_per_line,
-                ExcInternalError());
-        for (unsigned int i=0; i<fe.dofs_per_line; ++i)
-          for (unsigned int j=0; j<fe.dofs_per_line; ++j)
-            for (unsigned int k=0; k<fe.dofs_per_line; ++k)
+        for (unsigned int i=0; i<dofs_per_line; ++i)
+          for (unsigned int j=0; j<dofs_per_line; ++j)
+            for (unsigned int k=0; k<dofs_per_line; ++k)
               h2l[next_index++]       = n*n*(i+1)+n*(j+1)+k+1;
 
-        Assert (next_index == fe.dofs_per_cell, ExcInternalError());
+        Assert (next_index == dofs_per_cell, ExcInternalError());
 
         break;
       }
@@ -2120,11 +2108,31 @@ namespace FETools
       default:
         Assert (false, ExcNotImplemented());
       }
-
-    return h2l;
   }
 
 
+
+  template <int dim>
+  void
+  hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe,
+                                         std::vector<unsigned int> &h2l)
+  {
+    Assert (h2l.size() == fe.dofs_per_cell,
+            ExcDimensionMismatch (h2l.size(), fe.dofs_per_cell));
+    hierarchic_to_lexicographic_numbering<dim> (fe.dofs_per_line+1, h2l);
+  }
+
+
+
+  template <int dim>
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe)
+  {
+    Assert (fe.n_components() == 1, ExcInvalidFE());
+    std::vector<unsigned int> h2l(fe.dofs_per_cell);
+    hierarchic_to_lexicographic_numbering<dim> (fe.dofs_per_line+1, h2l);
+    return (h2l);
+  }
 
   template <int dim>
   void

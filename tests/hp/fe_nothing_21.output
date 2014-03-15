@@ -1,0 +1,10 @@
+
+DEAL::n support points: 4
+DEAL::   Number of active cells:       256
+DEAL::   Number of degrees of freedom: 289
+DEAL::l2_norm = 0.00000
+DEAL::n support points: 8
+DEAL::   Number of active cells:       4096
+DEAL::   Number of degrees of freedom: 4913
+DEAL::l2_norm = 0.00000
+DEAL::OK

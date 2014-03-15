@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1886,7 +1886,7 @@ namespace DoFTools
    * This function generates a matrix such that when a vector of data
    * with as many elements as there are degrees of freedom of this
    * component on the coarse grid is multiplied to this matrix, we
-   * obtain a vector with as many elements are there are global
+   * obtain a vector with as many elements as there are global
    * degrees of freedom on the fine grid. All the elements of the
    * other components of the finite element fields on the fine grid
    * are not touched.

@@ -93,7 +93,8 @@ template <typename> class TriaActiveIterator;
  * but rather one of the derived classes TriaIterator or
  * TriaActiveIterator.
  *
- * <ul> <li> TriaRawIterator objects point to lines, cells, etc in the
+ * <ul>
+ * <li> TriaRawIterator objects point to lines, cells, etc in the
  * lists whether they are used or not (in the vectors, also
  * <i>dead</i> objects are stored, since deletion in vectors is
  * expensive and we also do not want to destroy the ordering induced
@@ -138,7 +139,8 @@ template <typename> class TriaActiveIterator;
  * parameter), which really does the access to data. An Accessor
  * has to fulfil some requirements:
  *
- * <ul> <li> It must have two members named <tt>present_level</tt> and
+ * <ul>
+ * <li> It must have two members named <tt>present_level</tt> and
  * <tt>present_index</tt> storing the address of the element in the
  * triangulation presently pointed to. These data have to be
  * accessible by all triangulation iterators listed above.

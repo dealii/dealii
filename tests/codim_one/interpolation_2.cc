@@ -70,8 +70,7 @@ void test(std::string filename)
   VectorTools::interpolate(dof_handler, cosine, interpolated_one);
 
   DataOut<dim, DoFHandler<dim,spacedim> > dataout;
-  dataout.attach_dof_handler(dof_handler);
-  dataout.add_data_vector(interpolated_one, "numbering");
+  dataout.add_data_vector(dof_handler, interpolated_one, "numbering");
   dataout.build_patches();
   dataout.write_vtk(logfile);
 }

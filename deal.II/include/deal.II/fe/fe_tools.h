@@ -308,12 +308,17 @@ namespace FETools
   /**
    * Compute the embedding matrices on faces needed for constraint matrices.
    *
-   * @param fe The finite element for which to compute these matrices.  @param
-   * matrices An array of <i>GeometryInfo<dim>::subfaces_per_face =
+   * @param fe The finite element for which to compute these matrices.
+   *
+   * @param matrices An array of <i>GeometryInfo<dim>::subfaces_per_face =
    * 2<sup>dim-1</sup></i> FullMatrix objects,holding the embedding matrix for
-   * each subface.  @param face_coarse The number of the face on the coarse
-   * side of the face for which this is computed.  @param face_fine The number
-   * of the face on the refined side of the face for which this is computed.
+   * each subface.
+   *
+   * @param face_coarse The number of the face on the coarse side of the face
+   * for which this is computed.
+   *
+   * @param face_fine The number of the face on the refined side of the face
+   * for which this is computed.
    *
    * @warning This function will be used in computing constraint matrices. It
    * is not sufficiently tested yet.
@@ -756,6 +761,12 @@ namespace FETools
    * correct size, which is equal to the number of degrees of freedom in the
    * finite element.
    */
+
+  template <int dim>
+  void
+  hierarchic_to_lexicographic_numbering (unsigned int degree,
+					 std::vector<unsigned int> &h2l);
+
   template <int dim>
   void
   hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe_data,
@@ -794,13 +805,15 @@ namespace FETools
    * The name must be in the form which is returned by the
    * FiniteElement::get_name function, where a few modifications are allowed:
    *
-   * <ul><li> Dimension template parameters &lt;2&gt; etc. can be
+   * <ul>
+   * <li> Dimension template parameters &lt;2&gt; etc. can be
    * omitted. Alternatively, the explicit number can be replaced by
    * <tt>dim</tt> or <tt>d</tt>. If a number is given, it <b>must</b> match
    * the template parameter of this function.
    *
    * <li> The powers used for FESystem may either be numbers or can be
-   * replaced by <tt>dim</tt> or <tt>d</tt>.  </ul>
+   * replaced by <tt>dim</tt> or <tt>d</tt>.
+   * </ul>
    *
    * If no finite element can be reconstructed from this string, an exception
    * of type @p FETools::ExcInvalidFEName is thrown.

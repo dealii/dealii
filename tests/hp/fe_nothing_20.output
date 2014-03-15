@@ -1,0 +1,8 @@
+
+DEAL::   Number of active cells:       256
+DEAL::   Number of degrees of freedom: 2467
+DEAL::l2_norm = 0.00000
+DEAL::   Number of active cells:       4096
+DEAL::   Number of degrees of freedom: 112724
+DEAL::l2_norm = 0.00000
+DEAL::OK

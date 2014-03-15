@@ -311,10 +311,14 @@ FiniteElement<dim,spacedim>::reinit_restriction_and_prolongation_matrices (
 
       for (unsigned int i=0; i<nc; ++i)
         {
-          if (!isotropic_restriction_only || ref_case==RefinementCase<dim>::isotropic_refinement)
+          if (this->restriction[ref_case-1][i].m() != this->dofs_per_cell
+              &&
+              (!isotropic_restriction_only || ref_case==RefinementCase<dim>::isotropic_refinement))
             this->restriction[ref_case-1][i].reinit (this->dofs_per_cell,
                                                      this->dofs_per_cell);
-          if (!isotropic_prolongation_only || ref_case==RefinementCase<dim>::isotropic_refinement)
+          if (this->prolongation[ref_case-1][i].m() != this->dofs_per_cell
+              &&
+              (!isotropic_prolongation_only || ref_case==RefinementCase<dim>::isotropic_refinement))
             this->prolongation[ref_case-1][i].reinit (this->dofs_per_cell,
                                                       this->dofs_per_cell);
         }

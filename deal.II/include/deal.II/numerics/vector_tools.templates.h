@@ -3114,11 +3114,7 @@ namespace VectorTools
                           + values[q_point] (first_vector_component + 1)
                           * tangentials[q_point] (1))
                        * (fe_values[vec].value (fe.face_to_cell_index (i, face), q_point)
-                          * tangentials[q_point])
-                       / std::sqrt (jacobians[q_point][0][face_coordinate_direction[face]]
-                                    * jacobians[q_point][0][face_coordinate_direction[face]]
-                                    + jacobians[q_point][1][face_coordinate_direction[face]]
-                                    * jacobians[q_point][1][face_coordinate_direction[face]]);
+                          * tangentials[q_point]);
 
                     if (q_point == 0)
                       dofs_processed[i] = true;

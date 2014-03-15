@@ -183,6 +183,8 @@ public:
    *
    * <tt>values</tt> shall have the right size beforehand, i.e.
    * #n_components.
+   *
+   * The default implementation will call value() for each component.
    */
   virtual void vector_value (const Point<dim>   &p,
                              Vector<double>     &values) const;

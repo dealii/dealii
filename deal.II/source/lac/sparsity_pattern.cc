@@ -789,7 +789,8 @@ SparsityPattern::add_entries (const size_type row,
         {
           ForwardIterator it = begin;
           bool has_larger_entries = false;
-          std::size_t k=rowstart[row];
+          // skip diagonal
+          std::size_t k=rowstart[row]+store_diagonal_first_in_row;
           for ( ; k<rowstart[row+1]; k++)
             if (colnums[k] == invalid_entry)
               break;
@@ -799,17 +800,19 @@ SparsityPattern::add_entries (const size_type row,
                 break;
               }
           if (has_larger_entries == false)
-            for ( ; it != end; ++it, ++k)
+            for ( ; it != end; ++it)
               {
+                if (store_diagonal_first_in_row && *it == row)
+                  continue;
                 Assert (k <= rowstart[row+1],
                         ExcNotEnoughSpace(row, rowstart[row+1]-rowstart[row]));
-                colnums[k] = *it;
+                colnums[k++] = *it;
               }
           else
             // cannot just append the new range at the end, forward to the
             // other function
-            for (ForwardIterator it = begin; it != end; ++it)
-              add (row, *it);
+            for (ForwardIterator p = begin; p != end; ++p)
+              add (row, *p);
         }
     }
   else

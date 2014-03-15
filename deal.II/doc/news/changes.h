@@ -40,6 +40,24 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: Class PointerMatrixBase (and, consequently, the various
+  classes derived from it) had comparison operators that were intended to
+  work generically for any kind of derived class. However, the implementation
+  used a scheme that was not robust enough to handle the various situations
+  that derived classes implemented and, consequently, was not always correct.
+  These operators were not previously used inside the library and, likely,
+  were not widely used in applications either. They have now been removed.
+  <br>
+  (Wolfgang Bangerth, 2014/02/15)
+  </li>
+
+  <li> The change from functionparser to muparser introduced a small number of
+  incompatibilies: units, use_degress, and recursion with 'eval' are not
+  longer supported. Comparing for equality is done using '==' instead of '='.
+  <br>
+  (Timo Heister, 2014/02/10)
+  </li>  
+
   <li> Changed: The various classes generating graphical output, such
   as DataOut or DataOutStack, are all derived from a common interface
   class DataOutInterface which, in turn was derived from DataOutBase
@@ -72,6 +90,13 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> Changed: the functionparser library bundled with deal.II got replaced
+  by the muparser library.  
+  <br>
+  (Timo Heister, 2014/02/10)
+  </li>  
+
   <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
   on non-active cells. However, this made no sense: Since degrees of
   freedoms only exist on active cells
@@ -124,6 +149,72 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+  <li> Fixed: step-32 had a piece of code where we accessed an internal
+  representation of how Trilinos vectors are actually stored. This is poor
+  style and has been rewritten.
+  <br>
+  (Wolfgang Bangerth, 2014/03/14)
+  </li>
+
+  <li> Fixed: VectorTools::project_boundary_values_curl_conforming contained
+  a bug for some cases. This is now fixed.
+  <br>
+  (Markus B&uuml;rg, 2014/03/10)
+  </li>
+  
+  <li> Fixed: ParameterHandler will no longer output an error if the file
+  to be read ends with "end" without a newline.
+  <br>
+  (Timo Heister, 2014/02/28)
+  </li>
+
+  <li>Improved: DoFRenumbering::Cuthill_McKee can now run with distributed
+  triangulations with the renumbering only done within each processor's
+  subdomain.
+  <br>
+  (Martin Kronbichler, 2014/02/20)
+
+  <li>Fixed: There was an indexing error in GridIn::read_vtk() that triggered
+  for some input files. This is now fixed.
+  <br>
+  (Mayank Sabharwal, 2014/02/19)
+
+  <li>New: There is a new namespace TimeStepping for the algorithms that do time
+  integrations. In this new namespace, several Runge-Kutta methods have been
+  implemented: explicit methods, implicit methods, and embedded explicit methods.
+  <br>
+  (Damien Lebrun-Grandie, Bruno Turcksin, 2014/02/17)
+
+  <li>New: There is now a class FEEvaluationDGP that implements matrix-free
+  evaluation routines by truncated tensor products for FE_DGP elements.
+  <br>
+  (Martin Kronbichler, 2014/02/17)
+
+  <li>Changed: The InverseMatrixRichardson used to eat all exceptions
+  that may have been produced by the underlying Richardson solver, leaving
+  no trace that the underlying solver may have failed when you call functions
+  such as InverseMatrixRichardson::vmult(). These exceptions are now propagated
+  out to the caller.
+  <br>
+  (Wolfgang Bangerth, 2014/02/16)
+
+
+  <li>New: FE_TraceQ implements finite elements on faces, which
+  correspond to the traces of H<sup>1</sup>-conforming elements.
+  <br>
+  (Angela Klewinghaus, 2014/02/14)
+
+  <li>New: FE_FaceQ and FE_FaceP now also work in 1D (with a single dof
+  on each vertex).
+  <br>
+  (Martin Kronbichler, 2014/02/11)
+
+  <li>Fixed: FE_DGQ::has_support_on_face returned a wrong number for element
+  degree larger than 1 in 1D. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/02/10)
+
   <li>Changed: DerivativeApproximation used to be a class that only had
   static members. It is now a namespace.
   <br>

@@ -1538,10 +1538,10 @@ namespace internal
           // rotation to get the new
           // cube
           unsigned int temp[8];
-          for (unsigned int i=0; i<8; ++i)
-            temp[i] = the_cell.nodes[CubePermutations[perm_num][i]];
-          for (unsigned int i=0; i<8; ++i)
-            the_cell.nodes[i] = temp[i];
+          for (unsigned int v=0; v<8; ++v)
+            temp[v] = the_cell.nodes[CubePermutations[perm_num][v]];
+          for (unsigned int v=0; v<8; ++v)
+            the_cell.nodes[v] = temp[v];
         }
     }
   } // namespace GridReordering3d

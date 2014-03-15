@@ -63,11 +63,13 @@ SET(_src
   tensor_product_polynomials_const.cc
   thread_management.cc
   timer.cc
+  time_stepping.cc
   utilities.cc
   )
 
 SET(_inst
   data_out_base.inst.in
+  time_stepping.inst.in
   )
 
 FILE(GLOB _header

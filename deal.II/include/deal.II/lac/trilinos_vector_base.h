@@ -165,8 +165,8 @@ namespace TrilinosWrappers
       DeclException3 (ExcAccessToNonLocalElement,
                       size_type, size_type, size_type,
                       << "You tried to access element " << arg1
-                      << " of a distributed vector, but it is not stored on "
-                      << "the current processor. Note: the elements stored "
+                      << " of a distributed vector, but this element is not stored "
+                      << "on the current processor. Note: The elements stored "
                       << "on the current processor are within the range "
                       << arg2 << " through " << arg3
                       << " but Trilinos vectors need not store contiguous "
@@ -588,6 +588,14 @@ namespace TrilinosWrappers
      */
     const_iterator end () const;
 
+    //@}
+
+
+    /**
+     * @name 3: Modification of vectors
+     */
+    //@{
+
     /**
      * A collective set operation: instead of setting individual elements of a
      * vector, this function allows to set a whole set of elements at
@@ -603,13 +611,6 @@ namespace TrilinosWrappers
      */
     void set (const std::vector<size_type>        &indices,
               const ::dealii::Vector<TrilinosScalar> &values);
-    //@}
-
-
-    /**
-     * @name 3: Modification of vectors
-     */
-    //@{
 
     /**
      * This collective set operation is of lower level and can handle anything
@@ -621,7 +622,7 @@ namespace TrilinosWrappers
               const TrilinosScalar *values);
 
     /**
-     * A collective add operation: This funnction adds a whole set of values
+     * A collective add operation: This function adds a whole set of values
      * stored in @p values to the vector components specified by @p indices.
      */
     void add (const std::vector<size_type>      &indices,
@@ -673,19 +674,24 @@ namespace TrilinosWrappers
      * Simple vector addition, equal to the <tt>operator +=</tt>.
      *
      * Though, if the second argument <tt>allow_different_maps</tt> is set,
-     * then it is possible to add data from a different map.
+     * then it is possible to add data from a vector that uses a different
+     * map, i.e., a vector whose elements are split across processors
+     * differently. This may include vectors with ghost elements, for example.
+     * In general, however, adding vectors with a different element-to-processor
+     * map requires communicating data among processors and, consequently,
+     * is a slower operation than when using vectors using the same map.
      */
     void add (const VectorBase &V,
               const bool        allow_different_maps = false);
 
     /**
-     * Simple addition of a multiple of a vector, i.e. <tt>*this = a*V</tt>.
+     * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
     void add (const TrilinosScalar  a,
               const VectorBase     &V);
 
     /**
-     * Multiple addition of scaled vectors, i.e. <tt>*this = a*V + b*W</tt>.
+     * Multiple addition of scaled vectors, i.e. <tt>*this += a*V + b*W</tt>.
      */
     void add (const TrilinosScalar  a,
               const VectorBase     &V,
@@ -887,8 +893,10 @@ namespace TrilinosWrappers
     bool has_ghosts;
 
     /**
-     * An Epetra distibuted vector type. Requires an existing Epetra_Map for
-     * storing data.
+     * Pointer to the actual Epetra vector object. This may represent a
+     * vector that is in fact distributed among multiple processors. The
+     * object requires an existing Epetra_Map for
+     * storing data when setting it up.
      */
     std_cxx1x::shared_ptr<Epetra_FEVector> vector;
 
@@ -1696,14 +1704,22 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (local_size() == v.local_size(),
-            ExcDimensionMismatch(local_size(), v.local_size()));
+    Assert (size() == v.size(),
+            ExcDimensionMismatch (size(), v.size()));
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-    const int ierr = vector->Update(1., *(v.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    if(local_size() == v.local_size())
+    {
+      const int ierr = vector->Update(1., *(v.vector), s);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    }
+    else
+    {
+      VectorBase tmp = v;
+      tmp *= s;
+      this->add(tmp, true);
+    }
   }
 
 
@@ -1717,15 +1733,23 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (local_size() == v.local_size(),
-            ExcDimensionMismatch(local_size(), v.local_size()));
-
+    Assert (size() == v.size(),
+            ExcDimensionMismatch (size(), v.size()));
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
-    const int ierr = vector->Update(a, *(v.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    if(local_size() == v.local_size())
+    {
+      const int ierr = vector->Update(a, *(v.vector), s);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    }
+    else
+    {
+      (*this)*=s;
+      VectorBase tmp = v;
+      tmp *= a;
+      this->add(tmp, true);
+    }
   }
 
 
@@ -1741,18 +1765,33 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (local_size() == v.local_size(),
-            ExcDimensionMismatch(local_size(), v.local_size()));
-    Assert (local_size() == w.local_size(),
-            ExcDimensionMismatch(local_size(), w.local_size()));
-
+    Assert (size() == v.size(),
+            ExcDimensionMismatch (size(), v.size()));
+    Assert (size() == w.size(),
+            ExcDimensionMismatch (size(), w.size()));
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
-
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    
+    if(local_size() == v.local_size() && local_size() == w.local_size())
+    {
+      const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    }
+    else
+    {
+      (*this)*=s;
+      {
+        VectorBase tmp = v;
+        tmp *= a;
+        this->add(tmp, true);
+      }
+      {
+        VectorBase tmp = w;
+        tmp *= b;
+        this->add(tmp, true);
+      }
+    }
   }
 
 
@@ -1770,27 +1809,50 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (local_size() == v.local_size(),
-            ExcDimensionMismatch(local_size(), v.local_size()));
-    Assert (local_size() == w.local_size(),
-            ExcDimensionMismatch(local_size(), w.local_size()));
-    Assert (local_size() == x.local_size(),
-            ExcDimensionMismatch(local_size(), x.local_size()));
-
+    Assert (size() == v.size(),
+            ExcDimensionMismatch (size(), v.size()));
+    Assert (size() == w.size(),
+            ExcDimensionMismatch (size(), w.size()));
+    Assert (size() == x.size(),
+            ExcDimensionMismatch (size(), x.size()));
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
     Assert (numbers::is_finite(c), ExcNumberNotFinite());
 
-    // Update member can only
-    // input two other vectors so
-    // do it in two steps
-    const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    const int jerr = vector->Update(c, *(x.vector), 1.);
-    Assert (jerr == 0, ExcTrilinosError(jerr));
-    (void)jerr; // removes -Wunused-parameter warning in optimized mode
+    if(local_size() == v.local_size()
+       && local_size() == w.local_size()
+       && local_size() == x.local_size())
+    {
+      // Update member can only
+      // input two other vectors so
+      // do it in two steps
+      const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
+      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      
+      const int jerr = vector->Update(c, *(x.vector), 1.);
+      Assert (jerr == 0, ExcTrilinosError(jerr));
+      (void)jerr; // removes -Wunused-parameter warning in optimized mode
+    }
+    else
+    {
+      (*this)*=s;
+      {
+        VectorBase tmp = v;
+        tmp *= a;
+        this->add(tmp, true);
+      }
+      {
+        VectorBase tmp = w;
+        tmp *= b;
+        this->add(tmp, true);
+      }
+      {
+        VectorBase tmp = x;
+        tmp *= c;
+        this->add(tmp, true);
+      }
+    }
   }
 
 
@@ -1824,8 +1886,7 @@ namespace TrilinosWrappers
     // If we don't have the same map, copy.
     if (vector->Map().SameAs(v.vector->Map())==false)
       {
-        *vector = *v.vector;
-        *this *= a;
+        this->sadd(0., a, v);
       }
     else
       {
@@ -1859,8 +1920,7 @@ namespace TrilinosWrappers
     // If we don't have the same map, copy.
     if (vector->Map().SameAs(v.vector->Map())==false)
       {
-        *vector = *v.vector;
-        sadd(a, b, w);
+        sadd(0., a, v, b, w);
       }
     else
       {

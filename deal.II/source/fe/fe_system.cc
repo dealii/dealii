@@ -1887,9 +1887,9 @@ initialize_unit_support_points ()
 {
   // if one of the base elements has no support points, then it makes no sense
   // to define support points for the composed element, so return an empty
-  // array to demonstrate that fact
+  // array to demonstrate that fact. Note that we ignore FE_Nothing in this logic.
   for (unsigned int base_el=0; base_el<this->n_base_elements(); ++base_el)
-    if (!base_element(base_el).has_support_points())
+    if (!base_element(base_el).has_support_points() && base_element(base_el).dofs_per_cell!=0)
       {
         this->unit_support_points.resize(0);
         return;
@@ -2510,7 +2510,7 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
     = typename FiniteElementData<dim>::Conformity();
   {
     unsigned int index = 0;
-    for (unsigned int index=0; index<fes.size(); ++index)
+    for (index=0; index<fes.size(); ++index)
       if (multiplicities[index]>0)
         {
           total_conformity = fes[index]->conforming_space;

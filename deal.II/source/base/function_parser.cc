@@ -19,13 +19,9 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 
-#ifdef DEAL_II_WITH_FUNCTIONPARSER
-#include <fparser.hh>
-namespace fparser
-{
-  class FunctionParser: public ::FunctionParser
-  {};
-}
+
+#ifdef DEAL_II_WITH_MUPARSER
+#include <muParser.h>
 #else
 
 namespace fparser
@@ -33,7 +29,6 @@ namespace fparser
   class FunctionParser
   {};
 }
-
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -44,22 +39,16 @@ template <int dim>
 FunctionParser<dim>::FunctionParser(const unsigned int n_components,
                                     const double       initial_time)
   :
-  Function<dim>(n_components, initial_time),
-  fp (0)
-{
-  fp = new fparser::FunctionParser[n_components];
-}
+  Function<dim>(n_components, initial_time)
+{}
 
 
 
 template <int dim>
 FunctionParser<dim>::~FunctionParser()
-{
-  delete[] fp;
-}
+{}
 
-
-#ifdef DEAL_II_WITH_FUNCTIONPARSER
+#ifdef DEAL_II_WITH_MUPARSER
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string                   &variables,
                                       const std::vector<std::string>      &expressions,
@@ -75,7 +64,123 @@ void FunctionParser<dim>::initialize (const std::string                   &varia
               use_degrees);
 }
 
+template <int dim>
+void FunctionParser<dim>::initialize (const std::string              &vars,
+				      const std::vector<std::string> &expressions,
+				      const std::map<std::string, double> &constants,
+				      const bool time_dependent)
+  {
+    initialize(vars, expressions, constants, time_dependent, false);
+  }
 
+namespace internal
+{
+  // convert double into int
+  int mu_round(double val)
+  {
+    return static_cast<int>(val + ((val>=0.0) ? 0.5 : -0.5) );
+  }
+  
+  double mu_if(double condition, double thenvalue, double elsevalue)
+  {
+    if (mu_round(condition))
+      return thenvalue;
+    else
+      return elsevalue;
+  }
+  
+  double mu_or(double left, double right)
+  {
+    return (mu_round(left)) || (mu_round(right));
+  }
+  
+  double mu_and(double left, double right)
+  {
+    return (mu_round(left)) && (mu_round(right));
+  }
+  
+  double mu_int(double value)
+  {
+    return static_cast<double>(mu_round(value));
+  }
+  double mu_ceil(double value)
+  {
+    return ceil(value);
+  }
+  double mu_floor(double value)
+  {
+    return floor(value);
+  }
+  double mu_cot(double value)
+  {
+    return 1.0/tan(value);
+  }
+  double mu_csc(double value)
+  {
+    return 1.0/sin(value);
+  }
+ double mu_sec(double value)
+  {
+    return 1.0/cos(value);
+  }
+ double mu_log(double value)
+  {
+    return log(value);
+  }
+    
+
+    
+}
+
+template <int dim>
+void FunctionParser<dim>:: init_muparser() const
+{
+  if (fp.get().size()>0)
+    return;
+  
+  fp.get().resize(this->n_components);
+  vars.get().resize(var_names.size());
+  for (unsigned int i=0; i<this->n_components; ++i)
+    {
+      std::map< std::string, double >::const_iterator
+	constant = constants.begin(),
+	endc  = constants.end();
+
+      for (; constant != endc; ++constant)
+        {
+ 	  fp.get()[i].DefineConst(constant->first.c_str(), constant->second);
+	}
+
+      for (unsigned int iv=0;iv<var_names.size();++iv)
+	fp.get()[i].DefineVar(var_names[iv].c_str(), &vars.get()[iv]);
+
+      // define some compatibility functions:
+      fp.get()[i].DefineFun("if",internal::mu_if, true);
+      fp.get()[i].DefineOprt("|", internal::mu_or, 1);
+      fp.get()[i].DefineOprt("&", internal::mu_and, 2);
+      fp.get()[i].DefineFun("int", internal::mu_int, true);
+      fp.get()[i].DefineFun("ceil", internal::mu_ceil, true);
+      fp.get()[i].DefineFun("cot", internal::mu_cot, true);
+      fp.get()[i].DefineFun("csc", internal::mu_csc, true);
+      fp.get()[i].DefineFun("floor", internal::mu_floor, true);
+      fp.get()[i].DefineFun("sec", internal::mu_sec, true);
+      fp.get()[i].DefineFun("log", internal::mu_log, true);
+      
+      try
+	{
+	  fp.get()[i].SetExpr(expressions[i]);
+	}
+      catch (mu::ParserError &e)
+	{
+          std::cerr << "Message:  " << e.GetMsg() << "\n";
+	  std::cerr << "Formula:  " << e.GetExpr() << "\n";
+	  std::cerr << "Token:    " << e.GetToken() << "\n";
+	  std::cerr << "Position: " << e.GetPos() << "\n";
+	  std::cerr << "Errc:     " << e.GetCode() << std::endl;	  
+	  AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
+	}      
+    }
+}
 
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string   &variables,
@@ -85,6 +190,16 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
                                       const bool time_dependent,
                                       const bool use_degrees)
 {
+
+  this->fp.clear(); // this will reset all thread-local objects
+  
+  this->constants = constants;
+  this->var_names = Utilities::split_string_list(variables, ',');
+  this->expressions = expressions;
+  AssertThrow(((time_dependent)?dim+1:dim) == var_names.size(),
+	      ExcMessage("wrong number of variables"));
+  AssertThrow(!use_degrees, ExcNotImplemented());
+
   // We check that the number of
   // components of this function
   // matches the number of components
@@ -94,49 +209,9 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
               ExcInvalidExpressionSize(this->n_components,
                                        expressions.size()) );
 
+  // we no longer support units:
+  AssertThrow(units.size()==0, ExcNotImplemented());
 
-
-  for (unsigned int i=0; i<this->n_components; ++i)
-    {
-
-      // Add the various units to
-      // the parser.
-      std::map< std::string, double >::const_iterator
-      unit = units.begin(),
-      endu = units.end();
-      for (; unit != endu; ++unit)
-        {
-          const bool success = fp[i].AddUnit(unit->first, unit->second);
-          AssertThrow (success,
-                       ExcMessage("Invalid Unit Name [error adding a unit]"));
-        }
-
-
-
-      // Add the various constants to
-      // the parser.
-      std::map< std::string, double >::const_iterator
-      constant = constants.begin(),
-      endc  = constants.end();
-      for (; constant != endc; ++constant)
-        {
-          const bool success = fp[i].AddConstant(constant->first, constant->second);
-          AssertThrow (success, ExcMessage("Invalid Constant Name"));
-        }
-
-      const int ret_value = fp[i].Parse(expressions[i],
-                                        variables,
-                                        use_degrees);
-      AssertThrow (ret_value == -1,
-                   ExcParseError(ret_value, fp[i].ErrorMsg()));
-
-      // The fact that the parser did
-      // not throw an error does not
-      // mean that everything went
-      // ok... we can still have
-      // problems with the number of
-      // variables...
-    }
   // Now we define how many variables
   // we expect to read in.  We
   // distinguish between two cases:
@@ -155,19 +230,20 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
   else
     n_vars = dim;
 
-  /*
-                                     // Let's check if the number of
-                                     // variables is correct...
-    AssertThrow (n_vars == fp[0].NVars(),
-  !                              ~~~~~~~
-  !                              not available anymore in fparser-4.5, maier 2012
-                 ExcDimensionMismatch(n_vars,fp[0].NVars()));
-  */
-
+  init_muparser();
+  
   // Now set the initialization bit.
   initialized = true;
 }
 
+template <int dim>
+void FunctionParser<dim>::initialize (const std::string &vars,
+                   const std::string &expression,
+                   const std::map<std::string, double> &constants,
+                   const bool time_dependent)
+{
+  initialize(vars, expression, constants, time_dependent, false);
+}
 
 
 template <int dim>
@@ -216,27 +292,28 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
   Assert (component < this->n_components,
           ExcIndexRange(component, 0, this->n_components));
 
-  // Statically allocate dim+1
-  // double variables.
-  double vars[dim+1];
+  // initialize if not done so on this thread yet:
+  init_muparser();
 
   for (unsigned int i=0; i<dim; ++i)
-    vars[i] = p(i);
-
-  // We need the time variable only
-  // if the number of variables is
-  // different from the dimension. In
-  // this case it can only be dim+1,
-  // otherwise an exception would
-  // have already been thrown
+    vars.get()[i] = p(i);
   if (dim != n_vars)
-    vars[dim] = this->get_time();
+    vars.get()[dim] = this->get_time();
 
-  double my_value = fp[component].Eval((double *)vars);
-
-  AssertThrow (fp[component].EvalError() == 0,
-               ExcMessage(fp[component].ErrorMsg()));
-  return my_value;
+  try
+    {
+      return fp.get()[component].Eval();
+    }
+  catch (mu::ParserError &e)
+    {
+      std::cerr << "Message:  " << e.GetMsg() << "\n";
+      std::cerr << "Formula:  " << e.GetExpr() << "\n";
+      std::cerr << "Token:    " << e.GetToken() << "\n";
+      std::cerr << "Position: " << e.GetPos() << "\n";
+      std::cerr << "Errc:     " << e.GetCode() << std::endl;	  
+      AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
+      return 0.0;
+    }
 }
 
 
@@ -249,33 +326,23 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
   Assert (values.size() == this->n_components,
           ExcDimensionMismatch (values.size(), this->n_components));
 
-  // Statically allocates dim+1
-  // double variables.
-  double vars[dim+1];
+
+  // initialize if not done so on this thread yet:
+  init_muparser();
 
   for (unsigned int i=0; i<dim; ++i)
-    vars[i] = p(i);
-
-  // We need the time variable only
-  // if the number of variables is
-  // different from the dimension. In
-  // this case it can only be dim+1,
-  // otherwise an exception would
-  // have already been thrown
+    vars.get()[i] = p(i);
   if (dim != n_vars)
-    vars[dim] = this->get_time();
-
+    vars.get()[dim] = this->get_time();
+  
   for (unsigned int component = 0; component < this->n_components;
        ++component)
-    {
-      values(component) = fp[component].Eval((double *)vars);
-      AssertThrow(fp[component].EvalError() == 0,
-                  ExcMessage(fp[component].ErrorMsg()));
-    }
+    values(component) = fp.get()[component].Eval();
 }
 
 #else
 
+
 template <int dim>
 void
 FunctionParser<dim>::initialize(const std::string &,
@@ -324,6 +391,27 @@ FunctionParser<dim>::initialize(const std::string &,
 {
   Assert(false, ExcNeedsFunctionparser());
 }
+
+template <int dim>
+void
+FunctionParser<dim>::initialize(const std::string &,
+                                const std::vector<std::string> &,
+                                const std::map<std::string, double> &,
+                                const bool)
+{
+  Assert(false, ExcNeedsFunctionparser());
+}
+
+template <int dim>
+void
+FunctionParser<dim>::initialize(const std::string &,
+                                const std::string &,
+                                const std::map<std::string, double> &,
+                                const bool)
+{
+  Assert(false, ExcNeedsFunctionparser());
+}
+
 
 
 template <int dim>

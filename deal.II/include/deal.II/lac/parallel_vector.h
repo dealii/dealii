@@ -29,6 +29,7 @@
 #include <deal.II/lac/vector_view.h>
 
 #include <cstring>
+#include <iomanip>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -931,6 +932,18 @@ namespace parallel
        */
       std::size_t memory_consumption () const;
       //@}
+
+      /**
+       * Exception
+       */
+      DeclException3 (ExcNonMatchingElements,
+                      double, double, unsigned int,
+                      << "Called compress(VectorOperation::insert), but"
+                      << " the element received from a remote processor, value "
+                      << std::setprecision(16) << arg1
+                      << ", does not match with the value "
+                      << std::setprecision(16) << arg2
+                      << " on the owner processor " << arg3);
 
     private:
       /**

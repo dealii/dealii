@@ -18,6 +18,8 @@
 
 // This program tests the functionality of the function parser
 // wrapper with respect to the ability to deal with units.
+// because units are deprecated and muparser can not deal with this,
+// recycle the test to use constants instead of units
 
 #include "../tests.h"
 #include <fstream>
@@ -36,20 +38,21 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
+  
 
   std::vector<std::string> function(1);
   std::map<std::string, double> constants;
   std::map<std::string, double> units;
 
   constants["PI"] = 3.141592654;
-  units["cm"] = 10;
-  units["m"] = 1000;
+  constants["cm"] = 10;
+  constants["m"] = 1000;
 
   Point<2> point(2.0, 3.0);
 
   //initialized with units
   FunctionParser<2> fp;
-  function[0] = "x cm + y m + PI";
+  function[0] = "x * cm + y * m + PI";
   fp.initialize(FunctionParser<2>::default_variable_names(),
                 function, constants, units);
 

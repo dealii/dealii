@@ -16,29 +16,91 @@
 
 
 #include <deal.II/algorithms/operator.h>
+#include <deal.II/base/logstream.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace Algorithms
 {
   template <class VECTOR>
-  Operator<VECTOR>::~Operator()
+  Operator<VECTOR>::Operator()
+    : compatibility_flag(false)
   {}
 
 
-
   template <class VECTOR>
-  void Operator<VECTOR>::notify(const Event &e)
+  void
+  Operator<VECTOR>::operator() (AnyData& out, const AnyData& in)
   {
-    notifications += e;
+    // Had this function been overloaded in a derived clas, it would
+    // not have been called. Therefore, we have to start the
+    // compatibility engine. But before, we have to avoid an endless loop.
+    Assert(!compatibility_flag, ExcMessage("Compatibility resolution of Operator generates and endless loop\n"
+					   "Please provide an operator() in a derived class"));
+    compatibility_flag = true;
+    
+    NamedData<VECTOR*> new_out;
+    for (unsigned int i=0;i<out.size();++i)
+      {
+	if (out.is_type<VECTOR*>(i))
+	  new_out.add(out.entry<VECTOR*>(i), out.name(i));
+	else
+	  deallog << "Cannot convert AnyData argument " << out.name(i) << " to NamedData"
+		  << std::endl;
+      }
+    
+    NamedData<VECTOR*> new_in;
+    for (unsigned int i=0;i<in.size();++i)
+      {
+	//	deallog << "Convert " << in.name(i) << std::endl;
+	if (in.is_type<VECTOR*>(i))
+	  {
+	    // This const cast is due to the wrong constness handling
+	    // in NamedData. As soon as NamedData is gone, this code
+	    // will not be necessary anymore. And deprecating begins
+	    // now.
+	    VECTOR* p = const_cast<VECTOR*> (in.entry<VECTOR*>(i));
+	    new_in.add(p, in.name(i));
+	  }
+	else if (in.is_type<const VECTOR*>(i))
+	  {
+	    // This const cast is due to the wrong constness handling
+	    // in NamedData. As soon as NamedData is gone, this code
+	    // will not be necessary anymore. And deprecating begins
+	    // now.
+	    VECTOR* p = const_cast<VECTOR*> (in.entry<const VECTOR*>(i));
+	    new_in.add(p, in.name(i));
+	  }
+	else
+	  deallog << "Cannot convert AnyData argument " << in.name(i)
+		  << " to NamedData" << std::endl;
+      }
+    this->operator() (new_out, new_in);
+    compatibility_flag = false;
   }
 
 
   template <class VECTOR>
   void
-  Operator<VECTOR>::clear_events ()
+  Operator<VECTOR>::operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in)
   {
-    notifications.clear();
+    // Had this function been overloaded in a derived clas, it would
+    // not have been called. Therefore, we have to start the
+    // compatibility engine. But before, we have to avoid an endless loop.
+    Assert(!compatibility_flag, ExcMessage("Compatibility resolution of Operator generates and endless loop\n"
+					   "Please provide an operator() in a derived class"));
+    compatibility_flag = true;
+    
+    AnyData new_out;
+    for (unsigned int i=0;i<out.size();++i)
+      new_out.add(out(i), out.name(i));
+
+    AnyData new_in;
+    for (unsigned int i=0;i<in.size();++i)
+      new_in.add(in(i), in.name(i));
+
+    this->operator() (new_out, new_in);
+    compatibility_flag = false;
   }
 
 
@@ -57,6 +119,42 @@ namespace Algorithms
   {
     os =&stream;
   }
+
+  template <class VECTOR>
+  OutputOperator<VECTOR> &
+  OutputOperator<VECTOR>::operator<< (const AnyData& vectors)
+  {
+    if (os == 0)
+      {
+        //TODO: make this possible
+        //deallog << ' ' << step;
+        //for (unsigned int i=0;i<vectors.size();++i)
+        //  vectors(i)->print(deallog);
+        //deallog << std::endl;
+      }
+    else
+      {
+        (*os) << ' ' << step;
+        for (unsigned int i=0; i<vectors.size(); ++i)
+	  {
+	    if (vectors.is_type<VECTOR*>(i))
+	      {
+		const VECTOR& v = *vectors.entry<VECTOR*>(i);
+		for (unsigned int j=0; j<v.size(); ++j)
+		  (*os) << ' ' << v(j);
+	      }
+	    else if (vectors.is_type<const VECTOR*>(i))
+	      {
+		const VECTOR& v = *vectors.entry<const VECTOR*>(i);
+		for (unsigned int j=0; j<v.size(); ++j)
+		  (*os) << ' ' << v(j);
+	      }
+	  }
+        (*os) << std::endl;
+      }
+    return *this;
+  }
+  
 
   template <class VECTOR>
   OutputOperator<VECTOR> &

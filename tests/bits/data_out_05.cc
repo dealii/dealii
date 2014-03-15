@@ -74,7 +74,7 @@ check_this (const DoFHandler<dim> &dof_handler,
                                                      "node_data_2"),
                             DataOut<dim>::type_dof_data,
                             data_component_interpretation);
-  data_out.add_data_vector (v_cell, "cell_data");
+  data_out.add_data_vector (v_cell, "cell_data", DataOut<dim>::type_cell_data);
   data_out.build_patches ();
 
   data_out.write_vtk (deallog.get_file_stream());

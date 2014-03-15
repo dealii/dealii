@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
   std::map<int, int> quad_indices; // # quad in unv (key) ---> # quad in deal.II (value)
   std::map<int, int> line_indices; // # line in unv(key) ---> # line in deal.II (value)
 
-  unsigned int no_vertices, no_quads=0,no_lines=0;
+  unsigned int no_vertices, no_quads=0, no_lines=0;
 
   std::string keyword;
 
@@ -127,7 +127,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
   in >> keyword;
 
-  unsigned int total_cells, no_cells = 0, type, j = 0;// declaring counters, refer to the order of declaring variables for an idea of what is what!
+  unsigned int total_cells, no_cells = 0, type;// declaring counters, refer to the order of declaring variables for an idea of what is what!
 
   ///////////////////Processing the CELLS section that contains cells(cells) and bound_quads(subcelldata)///////////////////////
 
@@ -147,12 +147,12 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
                   cells.push_back(CellData<dim>());
 
-                  for (j = 0; j < type; j++) //loop to feed data
+                  for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
 
-                  for (j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
+                  for (unsigned int j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
                     {
                       cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
                     }
@@ -164,9 +164,8 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
 
                   subcelldata.boundary_quads.push_back(CellData<2>());
-                  int no_quads = 0;
 
-                  for (j = 0; j < type; j++) //loop to feed the data to the boundary
+                  for (unsigned int j = 0; j < type; j++) //loop to feed the data to the boundary
                     {
                       in >> subcelldata.boundary_quads.back().vertices[j];
                     }
@@ -175,7 +174,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     {
                       subcelldata.boundary_quads.back().vertices[j] = vertex_indices[subcelldata.boundary_quads.back().vertices[j]];
                     }
-                  quad_indices[count] = count + 1;
+                  quad_indices[no_quads] = no_quads + 1;
                   no_quads++;
                 }
 
@@ -195,12 +194,12 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   cells.push_back(CellData<dim>());
 
-                  for (j = 0; j < type; j++) //loop to feed data
+                  for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
 
                   cells.back().material_id = 0;
 
-                  for (j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
+                  for (unsigned int j = 0; j < type; j++) //loop to feed the data of the vertices to the cell
                     {
                       cells.back().vertices[j] = vertex_indices[cells.back().vertices[j]];
                     }
@@ -213,9 +212,8 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   //If this is encountered, the pointer comes out of the loop
                   //and starts processing boundaries.
                   subcelldata.boundary_lines.push_back(CellData<1>());
-                  int no_lines = 0;
 
-                  for (j = 0; j < type; j++) //loop to feed the data to the boundary
+                  for (unsigned int j = 0; j < type; j++) //loop to feed the data to the boundary
                     {
                       in >> subcelldata.boundary_lines.back().vertices[j];
                     }
@@ -224,7 +222,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     {
                       subcelldata.boundary_lines.back().vertices[j] = vertex_indices[subcelldata.boundary_lines.back().vertices[j]];
                     }
-                  line_indices[count] = count + 1;
+                  line_indices[no_lines] = no_lines + 1;
                   no_lines++;
                 }
 
@@ -513,11 +511,11 @@ void GridIn<dim, spacedim>::read_unv(std::istream &in)
 
           const unsigned int n_lines = (n_entities%2 == 0)?(n_entities/2):((n_entities+1)/2);
 
-          for (unsigned int no_line = 0; no_line < n_lines; no_line++)
+          for (unsigned int line = 0; line < n_lines; line++)
             {
               unsigned int n_fragments;
 
-              if (no_line == n_lines-1)
+              if (line == n_lines-1)
                 n_fragments = (n_entities%2 == 0)?(2):(1);
               else
                 n_fragments = 2;
@@ -2038,8 +2036,8 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
 
           AssertThrow(n_vars>=dim,
                       ExcMessage("Tecplot file must contain at least one variable for each dimension"));
-          for (unsigned int i=1; i<dim; ++i)
-            AssertThrow(tecplot2deal[i]>0,
+          for (unsigned int d=1; d<dim; ++d)
+            AssertThrow(tecplot2deal[d]>0,
                         ExcMessage("Tecplot file must contain at least one variable for each dimension."));
         }
       else if (Utilities::match_at_string_start(entries[i],"ZONETYPE=ORDERED"))

@@ -1348,9 +1348,7 @@ void DoFHandler<2>::renumber_dofs (const unsigned int  level,
       // level, as those lines logically belong to the same
       // level as the cell, at least for for isotropic
       // refinement
-      level_cell_iterator cell = begin(level),
-                          endcell  = end(level);
-      for ( ; cell != endcell; ++cell)
+      for (level_cell_iterator cell = begin(level); cell != end(level); ++cell)
         for (unsigned int line=0; line < GeometryInfo<2>::faces_per_cell; ++line)
           cell->face(line)->set_user_flag();
 
@@ -1408,10 +1406,7 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
       // level, as those lines logically belong to the same
       // level as the cell, at least for for isotropic
       // refinement
-
-      level_cell_iterator cell = begin(level),
-                          endcell  = end(level);
-      for ( ; cell != endcell ; ++cell)
+      for (level_cell_iterator cell = begin(level) ; cell != end(level) ; ++cell)
         for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
           cell->line(line)->set_user_flag();
 
@@ -1441,9 +1436,7 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
       // level, as those lines logically belong to the same
       // level as the cell, at least for for isotropic
       // refinement
-      level_cell_iterator cell = begin(level),
-                          endcell  = end(level);
-      for ( ; cell != endcell ; ++cell)
+      for (level_cell_iterator cell = begin(level) ; cell != end(level); ++cell)
         for (unsigned int quad=0; quad < GeometryInfo<3>::faces_per_cell; ++quad)
           cell->face(quad)->set_user_flag();
 

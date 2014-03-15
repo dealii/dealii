@@ -617,6 +617,10 @@ namespace GridOutFlags
    */
   struct Svg
   {
+    /// Height of the plot in SVG units, computed from width if zero. Defaults to 1000
+    unsigned int height;
+    /// The width of the plot. Computed automatically from height if zero (default)
+    unsigned int width;
     /// Thickness of the lines between cells
     unsigned int line_thickness;
     /// Thickness of lines at the boundary
@@ -672,6 +676,9 @@ namespace GridOutFlags
     /// Interpret the level number of the cells as altitude over the x-y-plane (useful in the perpspective view).
     bool convert_level_number_to_height;
 
+    /// The factor determining the vertical distance between levels (default = 0.3)
+    float level_height_factor;
+      
     /**
      * Cell labeling (fixed order).
      *

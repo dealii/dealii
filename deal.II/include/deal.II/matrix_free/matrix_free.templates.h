@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -111,6 +111,21 @@ internal_reinit(const Mapping<dim>                          &mapping,
                 const std::vector<hp::QCollection<1> >      &quad,
                 const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
+
+  // Reads out the FE information and stores the shape function values,
+  // gradients and Hessians for quadrature points.
+  {
+    const unsigned int n_fe   = dof_handler.size();
+    const unsigned int n_quad = quad.size();
+    shape_info.reinit (TableIndices<4>(n_fe, n_quad, 1, 1));
+    for (unsigned int no=0; no<n_fe; no++)
+      for (unsigned int nq =0; nq<n_quad; nq++)
+        {
+          AssertDimension (quad[nq].size(), 1);
+          shape_info(no,nq,0,0).reinit(quad[nq][0], dof_handler[no]->get_fe());
+        }
+  }
+
   if (additional_data.initialize_indices == true)
     {
       clear();
@@ -191,21 +206,6 @@ internal_reinit(const Mapping<dim>                          &mapping,
         }
     }
 
-  // Reads out the FE information and stores the shape function values,
-  // gradients and Hessians for quadrature points.
-  const unsigned int n_fe   = dof_handler.size();
-  const unsigned int n_quad = quad.size();
-  shape_info.reinit (TableIndices<4>(n_fe, n_quad, 1, 1));
-  for (unsigned int no=0; no<n_fe; no++)
-    {
-      const FiniteElement<dim> &fe = dof_handler[no]->get_fe();
-      for (unsigned int nq =0; nq<n_quad; nq++)
-        {
-          AssertDimension (quad[nq].size(), 1);
-          shape_info(no,nq,0,0).reinit(quad[nq][0], fe.base_element(0));
-        }
-    }
-
   // Evaluates transformations from unit to real cell, Jacobian determinants,
   // quadrature points in real space, based on the ordering of the cells
   // determined in @p extract_local_to_global_indices. The algorithm assumes
@@ -233,6 +233,29 @@ internal_reinit(const Mapping<dim>                            &mapping,
                 const std::vector<hp::QCollection<1> >        &quad,
                 const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
+  // Reads out the FE information and stores the shape function values,
+  // gradients and Hessians for quadrature points.
+  {
+    const unsigned int n_components = dof_handler.size();
+    const unsigned int n_quad       = quad.size();
+    unsigned int n_fe_in_collection = 0;
+    for (unsigned int i=0; i<n_components; ++i)
+      n_fe_in_collection = std::max (n_fe_in_collection,
+                                     dof_handler[i]->get_fe().size());
+    unsigned int n_quad_in_collection = 0;
+    for (unsigned int q=0; q<n_quad; ++q)
+      n_quad_in_collection = std::max (n_quad_in_collection, quad[q].size());
+    shape_info.reinit (TableIndices<4>(n_components, n_quad,
+                                       n_fe_in_collection,
+                                       n_quad_in_collection));
+    for (unsigned int no=0; no<n_components; no++)
+      for (unsigned int fe_no=0; fe_no<dof_handler[no]->get_fe().size(); ++fe_no)
+        for (unsigned int nq =0; nq<n_quad; nq++)
+          for (unsigned int q_no=0; q_no<quad[nq].size(); ++q_no)
+            shape_info(no,nq,fe_no,q_no).reinit (quad[nq][q_no],
+                                                 dof_handler[no]->get_fe()[fe_no]);
+  }
+
   if (additional_data.initialize_indices == true)
     {
       clear();
@@ -313,30 +336,6 @@ internal_reinit(const Mapping<dim>                            &mapping,
             cell_level_index.push_back(cell_level_index.back());
         }
     }
-
-  // Reads out the FE information and stores the shape function values,
-  // gradients and Hessians for quadrature points.
-  const unsigned int n_components = dof_handler.size();
-  const unsigned int n_quad       = quad.size();
-  unsigned int n_fe_in_collection = 0;
-  for (unsigned int i=0; i<n_components; ++i)
-    n_fe_in_collection = std::max (n_fe_in_collection,
-                                   dof_handler[i]->get_fe().size());
-  unsigned int n_quad_in_collection = 0;
-  for (unsigned int q=0; q<n_quad; ++q)
-    n_quad_in_collection = std::max (n_quad_in_collection, quad[q].size());
-  shape_info.reinit (TableIndices<4>(n_components, n_quad,
-                                     n_fe_in_collection,
-                                     n_quad_in_collection));
-  for (unsigned int no=0; no<n_components; no++)
-    for (unsigned int fe_no=0; fe_no<dof_handler[no]->get_fe().size(); ++fe_no)
-      {
-        const FiniteElement<dim> &fe = dof_handler[no]->get_fe()[fe_no];
-        for (unsigned int nq =0; nq<n_quad; nq++)
-          for (unsigned int q_no=0; q_no<quad[nq].size(); ++q_no)
-            shape_info(no,nq,fe_no,q_no).reinit (quad[nq][q_no],
-                                                 fe.base_element(0));
-      }
 
   // Evaluates transformations from unit to real cell, Jacobian determinants,
   // quadrature points in real space, based on the ordering of the cells
@@ -461,7 +460,7 @@ initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_hand
 template <int dim, typename Number>
 void MatrixFree<dim,Number>::initialize_indices
 (const std::vector<const ConstraintMatrix *> &constraint,
- const std::vector<IndexSet>                &locally_owned_set)
+ const std::vector<IndexSet>                 &locally_owned_set)
 {
   const unsigned int n_fe = dof_handlers.n_dof_handlers;
   const unsigned int n_active_cells = cell_level_index.size();
@@ -507,12 +506,11 @@ void MatrixFree<dim,Number>::initialize_indices
                                                  fes.back()->dofs_per_cell);
         }
 
-      lexicographic_inv[no].resize (fes.size());
       for (unsigned int fe_index = 0; fe_index<fes.size(); ++fe_index)
         {
           const FiniteElement<dim> &fe = *fes[fe_index];
           Assert (fe.n_base_elements() == 1,
-                  ExcMessage ("MatrixFree only works for DoFHandler with one base element"));
+                  ExcMessage ("MatrixFree currently only works for DoFHandler with one base element"));
           const unsigned int n_fe_components = fe.element_multiplicity (0);
 
           // cache number of finite elements and dofs_per_cell
@@ -521,56 +519,7 @@ void MatrixFree<dim,Number>::initialize_indices
           dof_info[no].dimension    = dim;
           dof_info[no].n_components = n_fe_components;
 
-          // get permutation that gives lexicographic renumbering of the cell
-          // dofs renumber (this is necessary for FE_Q, for example, since
-          // there the vertex DoFs come first, which is incompatible with the
-          // lexicographic ordering necessary to apply tensor products
-          // efficiently)
-          const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
-            dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>
-            (&fe.base_element(0));
-          const FE_Poly<TensorProductPolynomials<dim,Polynomials::
-          PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
-            dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
-            Polynomials::PiecewisePolynomial<double> >,dim,dim>*>
-            (&fe.base_element(0));
-
-          // This class currently only works for elements derived from
-          // FE_Poly<TensorProductPolynomials<dim>,dim,dim> or piecewise
-          // polynomials. For any other element, the dynamic casts above will
-          // fail and give fe_poly == 0.
-          Assert (fe_poly != 0 || fe_poly_piece != 0, ExcNotImplemented());
-          if (n_fe_components == 1)
-            {
-              if (fe_poly != 0)
-                lexicographic_inv[no][fe_index] =
-                  fe_poly->get_poly_space_numbering_inverse();
-              else
-                lexicographic_inv[no][fe_index] =
-                  fe_poly_piece->get_poly_space_numbering_inverse();
-              AssertDimension (lexicographic_inv[no][fe_index].size(),
-                               dof_info[no].dofs_per_cell[fe_index]);
-            }
-          else
-            {
-              // ok, we have more than one component
-              Assert (n_fe_components > 1, ExcInternalError());
-              std::vector<unsigned int> scalar_lex =
-                fe_poly != 0 ? fe_poly->get_poly_space_numbering() :
-                fe_poly_piece->get_poly_space_numbering();
-              AssertDimension (scalar_lex.size() * n_fe_components,
-                               dof_info[no].dofs_per_cell[fe_index]);
-              std::vector<unsigned int> lexicographic (dof_info[no].dofs_per_cell[fe_index]);
-              for (unsigned int comp=0; comp<n_fe_components; ++comp)
-                for (unsigned int i=0; i<scalar_lex.size(); ++i)
-                  lexicographic[fe.component_to_system_index(comp,i)]
-                    = scalar_lex.size () * comp + scalar_lex[i];
-
-              // invert numbering
-              lexicographic_inv[no][fe_index] =
-                Utilities::invert_permutation(lexicographic);
-            }
-          AssertDimension (lexicographic_inv[no][fe_index].size(),
+          AssertDimension (shape_info(no,0,fe_index,0).lexicographic_numbering.size(),
                            dof_info[no].dofs_per_cell[fe_index]);
         }
 
@@ -620,7 +569,7 @@ void MatrixFree<dim,Number>::initialize_indices
               local_dof_indices.resize (dof_info[no].dofs_per_cell[0]);
               cell_it->get_dof_indices(local_dof_indices);
               dof_info[no].read_dof_indices (local_dof_indices,
-                                             lexicographic_inv[no][0],
+                                             shape_info(no,0,0,0).lexicographic_numbering,
                                              *constraint[no], counter,
                                              constraint_values,
                                              cell_at_boundary);
@@ -639,7 +588,7 @@ void MatrixFree<dim,Number>::initialize_indices
               local_dof_indices.resize (dof_info[no].dofs_per_cell[0]);
               cell_it->get_mg_dof_indices(local_dof_indices);
               dof_info[no].read_dof_indices (local_dof_indices,
-                                             lexicographic_inv[no][0],
+                                             shape_info(no,0,0,0).lexicographic_numbering,
                                              *constraint[no], counter,
                                              constraint_values,
                                              cell_at_boundary);
@@ -659,7 +608,7 @@ void MatrixFree<dim,Number>::initialize_indices
               local_dof_indices.resize (cell_it->get_fe().dofs_per_cell);
               cell_it->get_dof_indices(local_dof_indices);
               dof_info[no].read_dof_indices (local_dof_indices,
-                                             lexicographic_inv[no][cell_it->active_fe_index()],
+                                             shape_info(no,0,cell_it->active_fe_index(),0).lexicographic_numbering,
                                              *constraint[no], counter,
                                              constraint_values,
                                              cell_at_boundary);

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,9 +38,8 @@ int main ()
   FullMatrix<double> A2(4,4);
   FullMatrix<double> B(4,3);
   FullMatrix<double> C(3,3);
-  PrimitiveVectorMemory<Vector<double> > mem;
 
-  BlockMatrixArray<double> block(2,2,mem);
+  BlockMatrixArray<double> block(2,2);
 
   block.enter(A1,0,0);
   block.enter(A2,0,0,2,true);

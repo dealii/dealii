@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -471,7 +471,13 @@ namespace parallel
     // warnings about unused arguments
     (void) grainsize;
 
+#  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
     f (begin, end);
+#  else
+    // work around a problem with MS VC++ where there is no const
+    // operator() in Function
+    Function(f) (begin, end);
+#  endif
 #else
     tbb::parallel_for (tbb::blocked_range<RangeType>
                        (begin, end, grainsize),
@@ -751,7 +757,13 @@ namespace parallel
     // warnings about unused arguments
     (void) grainsize;
 
-    return f(begin,end);
+#  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
+    f (begin, end);
+#  else
+    // work around a problem with MS VC++ where there is no const
+    // operator() in Function
+    Function(f) (begin, end);
+#  endif
 #else
     internal::ReductionOnSubranges<ResultType,Function>
     reductor (f, std::plus<ResultType>(), 0);

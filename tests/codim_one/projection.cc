@@ -77,8 +77,7 @@ void test(std::string filename, unsigned int n)
   VectorTools::project(dof_handler, constraints, quad, cosine, projected_one);
 
   DataOut<dim, DoFHandler<dim,spacedim> > dataout;
-  dataout.attach_dof_handler(dof_handler);
-  dataout.add_data_vector(projected_one, "projection");
+  dataout.add_data_vector(dof_handler, projected_one, "projection");
   dataout.build_patches();
   dataout.write_vtk(logfile);
 }

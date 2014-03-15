@@ -1,0 +1,5 @@
+
+DEAL::Function [x * cm + y * m + PI] @point [2.00000 3.00000] is [3023.14]
+DEAL::Function [x * cm + y * m + PI] @point [2.00000 3.00000] is [3023.14]
+DEAL::Function [x + y + PI] @point [2.00000 3.00000] is [8.14159]
+DEAL::Function [x + y + PI] @point [2.00000 3.00000] is [8.14159]

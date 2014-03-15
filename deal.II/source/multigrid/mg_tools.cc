@@ -224,8 +224,8 @@ namespace MGTools
 
             if (level_boundary)
               {
-                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-                  row_lengths[cell_indices[i]] += fe.dofs_per_face;
+                for (unsigned int local_dof=0; local_dof<fe.dofs_per_cell; ++local_dof)
+                  row_lengths[cell_indices[local_dof]] += fe.dofs_per_face;
                 continue;
               }
 
@@ -242,9 +242,9 @@ namespace MGTools
             // here.
             if (flux_coupling != DoFTools::none)
               {
-                unsigned int increment = nfe.dofs_per_cell - nfe.dofs_per_face;
-                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-                  row_lengths[cell_indices[i]] += increment;
+                const unsigned int dof_increment = nfe.dofs_per_cell - nfe.dofs_per_face;
+                for (unsigned int local_dof=0; local_dof<fe.dofs_per_cell; ++local_dof)
+                  row_lengths[cell_indices[local_dof]] += dof_increment;
               }
 
             // Do this only once per
@@ -266,10 +266,10 @@ namespace MGTools
             // the coarse one.
             neighbor_indices.resize(nfe.dofs_per_cell);
             neighbor->get_mg_dof_indices(neighbor_indices);
-            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-              row_lengths[cell_indices[i]] += nfe.dofs_per_face;
-            for (unsigned int i=0; i<nfe.dofs_per_cell; ++i)
-              row_lengths[neighbor_indices[i]] += fe.dofs_per_face;
+            for (unsigned int local_dof=0; local_dof<fe.dofs_per_cell; ++local_dof)
+              row_lengths[cell_indices[local_dof]] += nfe.dofs_per_face;
+            for (unsigned int local_dof=0; local_dof<nfe.dofs_per_cell; ++local_dof)
+              row_lengths[neighbor_indices[local_dof]] += fe.dofs_per_face;
           }
       }
     user_flags_triangulation.load_user_flags(old_flags);
@@ -462,8 +462,8 @@ namespace MGTools
 
             if (level_boundary)
               {
-                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-                  row_lengths[cell_indices[i]] += fe.dofs_per_face;
+                for (unsigned int local_dof=0; local_dof<fe.dofs_per_cell; ++local_dof)
+                  row_lengths[cell_indices[local_dof]] += fe.dofs_per_face;
                 continue;
               }
 
@@ -480,13 +480,13 @@ namespace MGTools
             // here.
             for (unsigned int base=0; base<nfe.n_base_elements(); ++base)
               for (unsigned int mult=0; mult<nfe.element_multiplicity(base); ++mult)
-                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-                  if (couple_face[fe_index](fe.system_to_block_index(i).first,
+                for (unsigned int local_dof=0; local_dof<fe.dofs_per_cell; ++local_dof)
+                  if (couple_face[fe_index](fe.system_to_block_index(local_dof).first,
                                             nfe.first_block_of_base(base) + mult) != DoFTools::none)
                     {
-                      unsigned int increment = nfe.base_element(base).dofs_per_cell
-                                               - nfe.base_element(base).dofs_per_face;
-                      row_lengths[cell_indices[i]] += increment;
+                      const unsigned int dof_increment = nfe.base_element(base).dofs_per_cell
+                                                           - nfe.base_element(base).dofs_per_face;
+                      row_lengths[cell_indices[local_dof]] += dof_increment;
                     }
 
             // Do this only once per
@@ -519,17 +519,17 @@ namespace MGTools
             neighbor->get_mg_dof_indices(neighbor_indices);
             for (unsigned int base=0; base<nfe.n_base_elements(); ++base)
               for (unsigned int mult=0; mult<nfe.element_multiplicity(base); ++mult)
-                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-                  if (couple_cell[fe_index](fe.system_to_component_index(i).first,
+                for (unsigned int local_dof=0; local_dof<fe.dofs_per_cell; ++local_dof)
+                  if (couple_cell[fe_index](fe.system_to_component_index(local_dof).first,
                                             nfe.first_block_of_base(base) + mult) != DoFTools::none)
-                    row_lengths[cell_indices[i]]
+                    row_lengths[cell_indices[local_dof]]
                     += nfe.base_element(base).dofs_per_face;
             for (unsigned int base=0; base<fe.n_base_elements(); ++base)
               for (unsigned int mult=0; mult<fe.element_multiplicity(base); ++mult)
-                for (unsigned int i=0; i<nfe.dofs_per_cell; ++i)
-                  if (couple_cell[fe_index](nfe.system_to_component_index(i).first,
+                for (unsigned int local_dof=0; local_dof<nfe.dofs_per_cell; ++local_dof)
+                  if (couple_cell[fe_index](nfe.system_to_component_index(local_dof).first,
                                             fe.first_block_of_base(base) + mult) != DoFTools::none)
-                    row_lengths[neighbor_indices[i]]
+                    row_lengths[neighbor_indices[local_dof]]
                     += fe.base_element(base).dofs_per_face;
           }
       }

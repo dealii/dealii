@@ -21,6 +21,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/algorithms/operator.h>
+#include <deal.II/algorithms/any_data.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -46,7 +47,7 @@ namespace Algorithms
    * #inverse_derivative. It is up to this object to implement
    * reassembling accordingly.
    *
-   * <h3>Contents of the NamedData objects</h3>
+   * <h3>Contents of the AnyData objects</h3>
    *
    * The only value used by the Newton method is the first vector in the
    * parameter <tt>out</tt> of operator()(). It serves as the start
@@ -105,7 +106,12 @@ namespace Algorithms
      * down to the objects
      * #residual and #inverse_derivative.
      */
-    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
+    virtual void operator() (AnyData &out, const AnyData &in);
+
+    /**
+     * @deprecated Use the function using AnyData
+     */
+    virtual void operator() (NamedData<VECTOR*> &out, const NamedData<VECTOR*> &in);
 
     virtual void notify(const Event &);
 

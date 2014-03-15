@@ -596,6 +596,15 @@ namespace PETScWrappers
     Vector &
     Vector::operator = (const Vector &v)
     {
+      // make sure left- and right-hand side of the assignment are compress()'ed:
+      Assert(v.last_action == VectorOperation::unknown,
+            internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
+                                                   v.last_action));
+      Assert(last_action == VectorOperation::unknown,
+            internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
+                                                   last_action));
+
+
       if (v.size()==0)
         {
           // this happens if v has not been initialized to something useful:

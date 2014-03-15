@@ -1,0 +1,773 @@
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2011 - 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+#ifndef __deal2__aligned_vector_h
+#define __deal2__aligned_vector_h
+
+#include <deal.II/base/config.h>
+#include <deal.II/base/std_cxx1x/type_traits.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/parallel.h>
+
+#include <cstring>
+
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+#include <mm_malloc.h>
+#endif
+
+
+
+DEAL_II_NAMESPACE_OPEN
+
+
+/**
+ * This is a replacement class for std::vector to be used in combination with
+ * VectorizedArray and derived data types. It allocates memory aligned to
+ * addresses of a vectorized data type (in order to avoid segmentation faults
+ * when a variable of type VectorizedArray which the compiler assumes to be
+ * aligned to certain memory addresses does not actually follow these
+ * rules). This could also be achieved by proving std::vector with a
+ * user-defined allocator. On the other hand, writing an own small vector
+ * class lets us implement parallel copy and move operations with TBB, insert
+ * deal.II-style assertions, and cut some unnecessary functionality. Note that
+ * this vector is a bit more memory-consuming than std::vector because of
+ * alignment, so it is recommended to only use this vector on long vectors.
+ *
+ * @p author Katharina Kormann, Martin Kronbichler, 2011
+ */
+template < class T >
+class AlignedVector
+{
+public:
+  /**
+   * Declare standard types used in all containers. These types parallel those
+   * in the <tt>C++</tt> standard libraries <tt>vector<...></tt> class.
+   */
+  typedef T                   value_type;
+  typedef value_type         *pointer;
+  typedef const value_type   *const_pointer;
+  typedef value_type         *iterator;
+  typedef const value_type   *const_iterator;
+  typedef value_type         &reference;
+  typedef const value_type   &const_reference;
+  typedef std::size_t         size_type;
+
+  /**
+   * Empty constructor. Sets the vector size to zero.
+   */
+  AlignedVector ();
+
+  /**
+   * Sets the vector size to the given size and initializes all elements with
+   * T().
+   */
+  AlignedVector (const size_type size,
+                 const T        &init = T());
+
+  /**
+   * Destructor.
+   */
+  ~AlignedVector ();
+
+  /**
+   * Copy constructor.
+   */
+  AlignedVector (const AlignedVector<T> &vec);
+
+  /**
+   * Assignment to the input vector @p vec.
+   */
+  AlignedVector &
+  operator = (const AlignedVector<T> &vec);
+
+  /**
+   * Change the size of the vector. It keeps old elements previously available
+   * but does not initialize the newly allocated memory, leaving it in an
+   * undefined state.
+   */
+  void resize_fast (const size_type size);
+
+  /**
+   * Change the size of the vector. It keeps old elements previously
+   * available, and initializes each element with the specified data. If the
+   * new vector size is shorter than the old one, the memory is not released
+   * unless the new size is zero.
+   */
+  void resize (const size_type size_in,
+               const T        &init = T());
+
+  /**
+   * Reserve memory space for @p size elements. If the argument @p size is set
+   * to zero, all previously allocated memory is released.
+   *
+   * In order to avoid too frequent reallocation (which involves copy of the
+   * data), this function doubles the amount of memory occupied when the given
+   * size is larger than the previously allocated size.
+   */
+  void reserve (const size_type size_alloc);
+
+  /**
+   * Releases all previously allocated memory and leaves the vector in a state
+   * equivalent to the state after the default constructor has been called.
+   */
+  void clear ();
+
+  /**
+   * Inserts an element at the end of the vector, increasing the vector size
+   * by one. Note that the allocated size will double whenever the previous
+   * space is not enough to hold the new element.
+   */
+  void push_back (const T in_data);
+
+  /**
+   * Returns the last element of the vector (read and write access).
+   */
+  reference back ();
+
+  /**
+   * Returns the last element of the vector (read-only access).
+   */
+  const_reference back () const;
+
+  /**
+   * Inserts several elements at the end of the vector given by a range of
+   * elements.
+   */
+  template <typename ForwardIterator>
+  void insert_back (ForwardIterator begin,
+                    ForwardIterator end);
+
+  /**
+   * Swaps the given vector with the calling vector.
+   */
+  void swap (AlignedVector<T> &vec);
+
+  /**
+   * Returns whether the vector is empty, i.e., its size is zero.
+   */
+  bool empty () const;
+
+  /**
+   * Returns the size of the vector.
+   */
+  size_type size () const;
+
+  /**
+   * Returns the capacity of the vector, i.e., the size this vector can hold
+   * without reallocation. Note that capacity() >= size().
+   */
+  size_type capacity () const;
+
+  /**
+   * Read-write access to entry @p index in the vector.
+   */
+  reference
+  operator [] (const size_type index);
+
+  /**
+   * Read-only access to entry @p index in the vector.
+   */
+  const_reference operator [] (const size_type index) const;
+
+  /**
+   * Returns a read and write pointer to the beginning of the data array.
+   */
+  iterator begin ();
+
+  /**
+   * Returns a read and write pointer to the end of the data array.
+   */
+  iterator end ();
+
+  /**
+   * Returns a read-only pointer to the beginning of the data array.
+   */
+  const_iterator begin () const;
+
+  /**
+   * Returns a read-only pointer to the end of the data array.
+   */
+  const_iterator end () const;
+
+  /**
+   * Returns the memory consumption of the allocated memory in this class. If
+   * the underlying type @p T allocates memory by itself, this memory is not
+   * counted.
+   */
+  size_type memory_consumption () const;
+
+private:
+
+  /**
+   * Pointer to actual class data.
+   */
+  T *_data;
+
+  /**
+   * Pointer to the end of valid data fields.
+   */
+  T *_end_data;
+
+  /**
+   * Pointer to the end of the allocated memory.
+   */
+  T *_end_allocated;
+};
+
+
+// ------------------------------- inline functions --------------------------
+
+/**
+ * This namespace defines the copy and set functions used in
+ * AlignedVector. These functions operate in parallel when there are enough
+ * elements in the vector.
+ */
+namespace internal
+{
+  /**
+   * Move and class that actually issues the copy commands in
+   * AlignedVector. This class is based on the specialized for loop base class
+   * ParallelForLoop in parallel.h whose purpose is the following: When
+   * calling a parallel for loop on AlignedVector with apply_to_subranges, it
+   * generates different code for every different argument we might choose (as
+   * it is templated). This gives a lot of code (e.g. it triples the memory
+   * required for compiling the file matrix_free.cc and the final object size
+   * is several times larger) which is completely useless. Therefore, this
+   * class channels all copy commands through one call to apply_to_subrange
+   * for all possible types, which makes the copy operation much cleaner
+   * (thanks to a virtual function, whose cost is negligible in this context).
+   *
+   * @relates AlignedVector
+   */
+  template <typename T>
+  class AlignedVectorMove : private parallel::ParallelForInteger
+  {
+    static const std::size_t minimum_parallel_grain_size = 160000/sizeof(T)+1;
+  public:
+    /**
+     * Constructor. Issues a parallel call if there are sufficiently many
+     * elements, otherwise work in serial. Copies the data from source to
+     * destination and then calls destructor on the source. If the optional
+     * argument is set to true, the source is left untouched instead.
+     */
+    AlignedVectorMove (T *source_begin,
+                       T *source_end,
+                       T *destination,
+                       bool copy_only = false)
+      :
+      source_ (source_begin),
+      destination_ (destination),
+      copy_only_ (copy_only)
+    {
+      Assert (source_end >= source_begin, ExcInternalError());
+      const std::size_t size = source_end - source_begin;
+      if (size < minimum_parallel_grain_size)
+        apply_to_subrange (0, size);
+      else
+        apply_parallel (0, size, minimum_parallel_grain_size);
+    }
+
+    /**
+     * This method moves elements from the source to the destination given in
+     * the constructor on a subrange given by two integers.
+     */
+    virtual void apply_to_subrange (const std::size_t begin,
+                                    const std::size_t end) const
+    {
+      // for classes trivial assignment can use memcpy. cast element to
+      // (void*) to silence compiler warning for virtual classes (they will
+      // never arrive here because they are non-trivial).
+
+      if (std_cxx1x::is_trivial<T>::value == true)
+        std::memcpy ((void*)(destination_+begin), source_+begin,
+                     (end-begin)*sizeof(T));
+      else if (copy_only_ == false)
+        for (std::size_t i=begin; i<end; ++i)
+          {
+            // initialize memory (copy construct), and destruct
+            new (&destination_[i]) T(source_[i]);
+            source_[i].~T();
+          }
+      else
+        for (std::size_t i=begin; i<end; ++i)
+          {
+            new (&destination_[i]) T(source_[i]);
+          }
+    }
+
+  private:
+    T *source_;
+    T *destination_;
+    const bool copy_only_;
+  };
+
+  /**
+   * Class that issues the set commands for AlignedVector.
+   *
+   * @relates AlignedVector
+   */
+  template <typename T>
+  class AlignedVectorSet : private parallel::ParallelForInteger
+  {
+    static const std::size_t minimum_parallel_grain_size = 160000/sizeof(T)+1;
+  public:
+    /**
+     * Constructor. Issues a parallel call if there are sufficiently many
+     * elements, otherwise work in serial.
+     */
+    AlignedVectorSet (const std::size_t size,
+                      const T &element,
+                      T *destination)
+      :
+      element_ (element),
+      destination_ (destination),
+      trivial_element (false)
+    {
+      if (size == 0)
+        return;
+
+      if (std_cxx1x::is_trivial<T>::value == true)
+        {
+          const unsigned char zero [sizeof(T)] = {};
+          // cast element to (void*) to silence compiler warning for virtual
+          // classes (they will never arrive here because they are
+          // non-trivial).
+          if (std::memcmp(zero, (void*)&element, sizeof(T)) == 0)
+            trivial_element = true;
+        }
+      if (size < minimum_parallel_grain_size)
+        apply_to_subrange (0, size);
+      else
+        apply_parallel (0, size, minimum_parallel_grain_size);
+    }
+
+  private:
+
+    /**
+     * This sets elements on a subrange given by two integers.
+     */
+    virtual void apply_to_subrange (const std::size_t begin,
+                                    const std::size_t end) const
+    {
+      // for classes with trivial assignment of zero can use memset. cast
+      // element to (void*) to silence compiler warning for virtual
+      // classes (they will never arrive here because they are
+      // non-trivial).
+      if (std_cxx1x::is_trivial<T>::value == true && trivial_element)
+        std::memset ((void*)(destination_+begin), 0, (end-begin)*sizeof(T));
+      else
+        // initialize memory and set
+        for (std::size_t i=begin; i<end; ++i)
+          new (&destination_[i]) T(element_);
+    }
+
+    const T &element_;
+    mutable T *destination_;
+    bool trivial_element;
+  };
+} // end of namespace internal
+
+
+#ifndef DOXYGEN
+
+
+template < class T >
+inline
+AlignedVector<T>::AlignedVector ()
+  :
+  _data (0),
+  _end_data (0),
+  _end_allocated (0)
+{}
+
+
+
+template < class T >
+inline
+AlignedVector<T>::AlignedVector (const size_type size,
+                                 const T &init)
+  :
+  _data (0),
+  _end_data (0),
+  _end_allocated (0)
+{
+  if (size > 0)
+    resize (size, init);
+}
+
+
+
+template < class T >
+inline
+AlignedVector<T>::~AlignedVector ()
+{
+  clear();
+}
+
+
+
+template < class T >
+inline
+AlignedVector<T>::AlignedVector (const AlignedVector<T> &vec)
+  :
+  _data (0),
+  _end_data (0),
+  _end_allocated (0)
+{
+  // do not invalidate old data
+  resize_fast (vec._end_data - vec._data);
+  internal::AlignedVectorMove<T> (vec._data, vec._end_data, _data, true);
+}
+
+
+
+template < class T >
+inline
+AlignedVector<T>&
+AlignedVector<T>::operator = (const AlignedVector<T> &vec)
+{
+  clear();
+  resize_fast (vec._end_data - vec._data);
+  internal::AlignedVectorMove<T> (vec._data, vec._end_data, _data, true);
+  return *this;
+}
+
+
+
+template < class T >
+inline
+void
+AlignedVector<T>::resize_fast (const size_type size)
+{
+  reserve (size);
+  _end_data = _data + size;
+}
+
+
+template < class T >
+inline
+void
+AlignedVector<T>::resize (const size_type size_in,
+                          const T        &init)
+{
+  const size_type old_size = size();
+  if (std_cxx1x::is_trivial<T>::value == false && size_in < old_size)
+    {
+      // call destructor on fields that are released
+      while (_end_data != _data+size_in)
+        (--_end_data)->~T();
+    }
+
+  resize_fast (size_in);
+  // now _size is set correctly, need to set the
+  // values
+  if (size_in > old_size)
+    internal::AlignedVectorSet<T> (size_in-old_size, init,
+                                   _data+old_size);
+}
+
+
+
+template < class T >
+inline
+void
+AlignedVector<T>::reserve (const size_type size_alloc)
+{
+  const size_type old_size = _end_data - _data;
+  const size_type allocated_size = _end_allocated - _data;
+  if (size_alloc > allocated_size)
+    {
+      // if we continuously increase the size of the vector, we might be
+      // reallocating a lot of times. therefore, try to increase the size more
+      // aggressively
+      size_type new_size = size_alloc;
+      if (size_alloc < (2 * allocated_size))
+        new_size = 2 * allocated_size;
+
+      const size_type size_actual_allocate = new_size * sizeof(T);
+
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+
+      // allocate and align along 64-byte boundaries (this is enough for all
+      // levels of vectorization currently supported by deal.II)
+      T *new_data = static_cast<T *>(_mm_malloc (size_actual_allocate, 64));
+#else
+      T *new_data = static_cast<T *>(malloc (size_actual_allocate));
+#endif
+      if (new_data == 0)
+        throw std::bad_alloc();
+
+      // copy data in case there was some content before and release the old
+      // memory with the function corresponding to the one used for allocating
+      std::swap (_data, new_data);
+      _end_data = _data + old_size;
+      _end_allocated = _data + new_size;
+      if (_end_data != _data)
+        {
+          internal::AlignedVectorMove<T>(new_data, new_data + old_size,
+                                         _data);
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+          _mm_free(new_data);
+#else
+          free(new_data);
+#endif
+        }
+    }
+  else if (size_alloc == 0)
+    clear();
+}
+
+
+
+template < class T >
+inline
+void
+AlignedVector<T>::clear ()
+{
+  if (_data != 0)
+    {
+      if (std_cxx1x::is_trivial<T>::value == false)
+        while (_end_data != _data)
+          (--_end_data)->~T();
+
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+      _mm_free(_data);
+#else
+      free(_data);
+#endif
+    }
+  _data = 0;
+  _end_data = 0;
+  _end_allocated = 0;
+}
+
+
+
+template < class T >
+inline
+void
+AlignedVector<T>::push_back (const T in_data)
+{
+  Assert (_end_data <= _end_allocated, ExcInternalError());
+  if (_end_data == _end_allocated)
+    reserve (std::max(2*capacity(),static_cast<size_type>(16)));
+  if (std_cxx1x::is_trivial<T>::value == false)
+    new (_end_data) T;
+  *_end_data++ = in_data;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::reference
+AlignedVector<T>::back ()
+{
+  AssertIndexRange (0, size());
+  T *field = _end_data - 1;
+  return *field;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::const_reference
+AlignedVector<T>::back () const
+{
+  AssertIndexRange (0, size());
+  const T *field = _end_data - 1;
+  return *field;
+}
+
+
+
+template < class T >
+template <typename ForwardIterator>
+inline
+void
+AlignedVector<T>::insert_back (ForwardIterator begin,
+                               ForwardIterator end)
+{
+  const unsigned int old_size = size();
+  reserve (old_size + (end-begin));
+  for ( ; begin != end; ++begin, ++_end_data)
+    {
+      if (std_cxx1x::is_trivial<T>::value == false)
+        new (_end_data) T;
+      *_end_data = *begin;
+    }
+}
+
+
+
+template < class T >
+inline
+void
+AlignedVector<T>::swap (AlignedVector<T> &vec)
+{
+  std::swap (_data, vec._data);
+  std::swap (_end_data, vec._end_data);
+  std::swap (_end_allocated, vec._end_allocated);
+}
+
+
+
+template < class T >
+inline
+bool
+AlignedVector<T>::empty () const
+{
+  return _end_data == _data;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::size_type
+AlignedVector<T>::size () const
+{
+  return _end_data - _data;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::size_type
+AlignedVector<T>::capacity () const
+{
+  return _end_allocated - _data;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::reference
+AlignedVector<T>::operator [] (const size_type index)
+{
+  AssertIndexRange (index, size());
+  return _data[index];
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::const_reference
+AlignedVector<T>::operator [] (const size_type index) const
+{
+  AssertIndexRange (index, size());
+  return _data[index];
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::iterator
+AlignedVector<T>::begin ()
+{
+  return _data;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::iterator
+AlignedVector<T>::end ()
+{
+  return _end_data;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::const_iterator
+AlignedVector<T>::begin () const
+{
+  return _data;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::const_iterator
+AlignedVector<T>::end () const
+{
+  return _end_data;
+}
+
+
+
+template < class T >
+inline
+typename AlignedVector<T>::size_type
+AlignedVector<T>::memory_consumption () const
+{
+  size_type memory = sizeof(this);
+  memory += sizeof(T) * capacity();
+  return memory;
+}
+
+
+#endif // ifndef DOXYGEN
+
+
+/**
+ * Relational operator == for AlignedVector
+ *
+ * @relates AlignedVector
+ */
+template < class T >
+bool operator == (const AlignedVector<T> &lhs,
+                  const AlignedVector<T> &rhs)
+{
+  if (lhs.size() != rhs.size())
+    return false;
+  for (typename AlignedVector<T>::const_iterator lit = lhs.begin(),
+         rit = rhs.begin(); lit != lhs.end(); ++lit, ++rit)
+    if (*lit != *rit)
+      return false;
+  return true;
+}
+
+
+
+
+/**
+ * Relational operator != for AlignedVector
+ *
+ * @relates AlignedVector
+ */
+template < class T >
+bool operator != (const AlignedVector<T> &lhs,
+                  const AlignedVector<T> &rhs)
+{
+  return !(operator==(lhs, rhs));
+}
+
+
+DEAL_II_NAMESPACE_CLOSE
+
+#endif

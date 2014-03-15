@@ -19,6 +19,7 @@
 #define __deal2__operator_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/named_data.h>
 #include <deal.II/base/event.h>
 
@@ -40,6 +41,74 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   /**
+   * @todo Update this documentation and the one of Operator
+   *
+   * The abstract base class of all algorithms in this library. An
+   * operator is an object with an operator(), which transforms a set
+   * of named vectors into another set of named vectors.
+   *
+   * Furthermore, an operator can be notified of parameter changes by
+   * the calling routine. The outer iteration can notify() the Operator
+   * of an Event, which could be for instance a change of mesh, a
+   * different time step size or too slow convergence of Newton's
+   * method, which would then trigger reassembling of a matrix or
+   * similar things.
+   *
+   * <h3>Usage for nested iterations</h3>
+   *
+   * This is probably the most prominent use for Operator, where an
+   * outer iterative method calls an inner solver and so on. Typically,
+   * the innermost method in such a nested system will have to compute a
+   * residual using values from all outer iterations. Since the depth
+   * and order of such a nesting is hardly predictable when designing a
+   * general tool, we use AnyData to access these vectors. Typically,
+   * the first vector in <tt>out</tt> contains the start vector when
+   * operator()() is called, and the solution when the function
+   * returns. The object <tt>in</tt> is providing additional information
+   * and forwarded to the inner Operator objects of the nested
+   * iteration.
+   *
+   * @author Guido Kanschat
+   * @date 2014
+   */
+  class OperatorBase : public Subscriptor
+  {
+  public:
+    /**
+     * The virtual destructor.
+     */
+    ~OperatorBase();
+
+    /**
+     * The actual operation, which
+     * is implemented in a derived class.
+     */
+    virtual void operator() (AnyData &out, const AnyData &in) = 0;
+
+    /**
+     * Register an event triggered
+     * by an outer iteration.
+     */
+    virtual void notify(const Event &);
+    /**
+     * Clear all #notifications.
+     */
+    void clear_events();
+  protected:
+    /**
+     * Accumulate events here. If any of
+     * those is set, the function
+     * solve() of a terminal
+     * application must take care
+     * of reassembling the matrix.
+     */
+    Event notifications;
+    
+  };
+
+  /**
+   * @deprecated This class has been replaced by OperatorBase.
+   *
    * The abstract base class of all algorithms in this library. An
    * operator is an object with an operator(), which transforms a set
    * of named vectors into another set of named vectors.
@@ -68,39 +137,32 @@ namespace Algorithms
    * @author Guido Kanschat, 2010
    */
   template <class VECTOR>
-  class Operator : public Subscriptor
+  class Operator : public OperatorBase
   {
   public:
+    Operator();
+    
     /**
-     * The virtual destructor.
+     * Implementation of the function in the base class in order to do
+     * compatibility conversions between the old and the new
+     * interface.
      */
-    ~Operator();
+    virtual void operator() (AnyData &out, const AnyData &in);
 
     /**
+     * @deprecated It is in particular this function which should not be used anymore.
+     *
      * The actual operation, which
      * is implemented in a derived class.
      */
-    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in) = 0;
+    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
 
+  private:
     /**
-     * Register an event triggered
-     * by an outer iteration.
+     * While we are providing compatibility functions to the old
+     * interface, this variable will ensure there is no endless loop.
      */
-    virtual void notify(const Event &);
-    /**
-     * Clear all #notifications.
-     */
-    void clear_events();
-  protected:
-    /**
-     * Accumulate reasons for
-     * reassembling here. If any of
-     * those is set, the function
-     * solve() of a terminal
-     * application must take care
-     * of reassembling the matrix.
-     */
-    Event notifications;
+    bool compatibility_flag;
   };
 
   /**
@@ -134,7 +196,12 @@ namespace Algorithms
     OutputOperator<VECTOR> &operator<< (unsigned int step);
 
     /**
-     * Output all the vectors in NamedData.
+     * Output all the vectors in AnyData.
+     */
+    virtual OutputOperator<VECTOR> &operator<< (const AnyData& vectors);
+    
+    /**
+     * @deprecated Output all the vectors in NamedData.
      */
     virtual OutputOperator<VECTOR> &operator<< (const NamedData<VECTOR *> &vectors);
   protected:

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/fe/fe_poly.h>
+#include <deal.II/fe/fe_dgp.h>
 
 #include <deal.II/matrix_free/shape_info.h>
 
@@ -48,43 +49,87 @@ namespace internal
     template <int dim>
     void
     ShapeInfo<Number>::reinit (const Quadrature<1> &quad,
-                               const FiniteElement<dim> &fe)
+                               const FiniteElement<dim> &fe_in,
+                               const unsigned int base_element_number)
     {
-      Assert (fe.n_components() == 1,
+      const FiniteElement<dim> *fe = &fe_in;
+      if (fe_in.n_components() > 1)
+        fe = &fe_in.base_element(base_element_number);
+
+      Assert (fe->n_components() == 1,
               ExcMessage("FEEvaluation only works for scalar finite elements."));
 
-      const unsigned int n_dofs_1d = fe.degree+1,
+
+      const unsigned int n_dofs_1d = fe->degree+1,
                          n_q_points_1d = quad.size();
-      AssertDimension(fe.dofs_per_cell, Utilities::fixed_power<dim>(n_dofs_1d));
-      std::vector<unsigned int> lexicographic (fe.dofs_per_cell);
 
       // renumber (this is necessary for FE_Q, for example, since there the
       // vertex DoFs come first, which is incompatible with the lexicographic
       // ordering necessary to apply tensor products efficiently)
+      std::vector<unsigned int> scalar_lexicographic;
       {
+        // find numbering to lexicographic
+        Assert(fe->n_components() == 1,
+               ExcMessage("Expected a scalar element"));
+
         const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
-          dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>(&fe);
+          dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>(fe);
+
         const FE_Poly<TensorProductPolynomials<dim,Polynomials::
-        PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
+          PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
           dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
-          Polynomials::PiecewisePolynomial<double> >,dim,dim>*> (&fe);
-        Assert (fe_poly != 0 || fe_poly_piece, ExcNotImplemented());
-        lexicographic = fe_poly != 0 ?
-                        fe_poly->get_poly_space_numbering_inverse() :
-                        fe_poly_piece->get_poly_space_numbering_inverse();
+          Polynomials::PiecewisePolynomial<double> >,dim,dim>*> (fe);
+
+        const FE_DGP<dim> *fe_dgp = dynamic_cast<const FE_DGP<dim>*>(fe);
+
+        if (fe_poly != 0)
+          scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
+        else if (fe_poly_piece != 0)
+          scalar_lexicographic = fe_poly_piece->get_poly_space_numbering_inverse();
+        else if (fe_dgp != 0)
+          {
+            scalar_lexicographic.resize(fe_dgp->dofs_per_cell);
+          for (unsigned int i=0; i<fe_dgp->dofs_per_cell; ++i)
+            scalar_lexicographic[i] = i;
+          }
+        else
+          Assert(false, ExcNotImplemented());
+
+        // Finally store the renumbering into the member variable of this
+        // class
+        if (fe_in.n_components() == 1)
+          lexicographic_numbering = scalar_lexicographic;
+        else
+          {
+            // have more than one component, get the inverse
+            // permutation, invert it, sort the components one after one,
+            // and invert back
+            std::vector<unsigned int> scalar_inv =
+              Utilities::invert_permutation(scalar_lexicographic);
+            std::vector<unsigned int> lexicographic (fe_in.dofs_per_cell);
+            for (unsigned int comp=0; comp<fe_in.n_components(); ++comp)
+              for (unsigned int i=0; i<scalar_inv.size(); ++i)
+                lexicographic[fe_in.component_to_system_index(comp,i)]
+                  = scalar_inv.size () * comp + scalar_inv[i];
+
+            // invert numbering again
+            lexicographic_numbering =
+              Utilities::invert_permutation(lexicographic);
+          }
 
         // to evaluate 1D polynomials, evaluate along the line where y=z=0,
         // assuming that shape_value(0,Point<dim>()) == 1. otherwise, need
         // other entry point (e.g. generating a 1D element by reading the
         // name, as done before r29356)
-        Assert(std::fabs(fe.shape_value(lexicographic[0], Point<dim>())-1) < 1e-13,
+        Assert(std::fabs(fe->shape_value(scalar_lexicographic[0],
+                                         Point<dim>())-1) < 1e-13,
                ExcInternalError());
       }
 
       n_q_points      = Utilities::fixed_power<dim>(n_q_points_1d);
-      dofs_per_cell   = Utilities::fixed_power<dim>(n_dofs_1d);
+      dofs_per_cell   = fe->dofs_per_cell;
       n_q_points_face = dim>1?Utilities::fixed_power<dim-1>(n_q_points_1d):1;
-      dofs_per_face   = dim>1?Utilities::fixed_power<dim-1>(n_dofs_1d):1;
+      dofs_per_face   = fe->dofs_per_face;
 
       const unsigned int array_size = n_dofs_1d*n_q_points_1d;
       this->shape_gradients.resize_fast (array_size);
@@ -104,7 +149,7 @@ namespace internal
         {
           // need to reorder from hierarchical to lexicographic to get the
           // DoFs correct
-          const unsigned int my_i = lexicographic[i];
+          const unsigned int my_i = scalar_lexicographic[i];
           for (unsigned int q=0; q<n_q_points_1d; ++q)
             {
               // fill both vectors with
@@ -113,25 +158,25 @@ namespace internal
               // non-vectorized fields
               Point<dim> q_point;
               q_point[0] = quad.get_points()[q][0];
-              shape_values_number[i*n_q_points_1d+q]   = fe.shape_value(my_i,q_point);
-              shape_gradient_number[i*n_q_points_1d+q] = fe.shape_grad (my_i,q_point)[0];
+              shape_values_number[i*n_q_points_1d+q]   = fe->shape_value(my_i,q_point);
+              shape_gradient_number[i*n_q_points_1d+q] = fe->shape_grad (my_i,q_point)[0];
               shape_values   [i*n_q_points_1d+q] =
                 shape_values_number  [i*n_q_points_1d+q];
               shape_gradients[i*n_q_points_1d+q] =
                 shape_gradient_number[i*n_q_points_1d+q];
               shape_hessians[i*n_q_points_1d+q] =
-                fe.shape_grad_grad(my_i,q_point)[0][0];
+                fe->shape_grad_grad(my_i,q_point)[0][0];
               q_point[0] *= 0.5;
-              subface_value[0][i*n_q_points_1d+q] = fe.shape_value(my_i,q_point);
+              subface_value[0][i*n_q_points_1d+q] = fe->shape_value(my_i,q_point);
               q_point[0] += 0.5;
-              subface_value[1][i*n_q_points_1d+q] = fe.shape_value(my_i,q_point);
+              subface_value[1][i*n_q_points_1d+q] = fe->shape_value(my_i,q_point);
             }
           Point<dim> q_point;
-          this->face_value[0][i] = fe.shape_value(my_i,q_point);
-          this->face_gradient[0][i] = fe.shape_grad(my_i,q_point)[0];
+          this->face_value[0][i] = fe->shape_value(my_i,q_point);
+          this->face_gradient[0][i] = fe->shape_grad(my_i,q_point)[0];
           q_point[0] = 1;
-          this->face_value[1][i] = fe.shape_value(my_i,q_point);
-          this->face_gradient[1][i] = fe.shape_grad(my_i,q_point)[0];
+          this->face_value[1][i] = fe->shape_value(my_i,q_point);
+          this->face_gradient[1][i] = fe->shape_grad(my_i,q_point)[0];
         }
 
       // face information
@@ -157,7 +202,7 @@ namespace internal
         }
         case 2:
         {
-          for (unsigned int i=0; i<n_dofs_1d; i++)
+          for (unsigned int i=0; i<this->dofs_per_face; i++)
             {
               this->face_indices(0,i) = n_dofs_1d*i;
               this->face_indices(1,i) = n_dofs_1d*i + n_dofs_1d-1;

@@ -1,0 +1,6 @@
+
+DEAL::Tvmult_add
+DEAL::Result vector set to all ones and to be added with product result vector
+DEAL::Dimensions of result vector verified
+DEAL::Result vector data verified
+DEAL::27.0000	50.0000	

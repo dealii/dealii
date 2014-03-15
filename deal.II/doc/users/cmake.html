@@ -5,7 +5,7 @@
     <title>deal.II CMake documentation</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-    <meta name="copyright" content="Copyright (C) 2012, 2013 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2012, 2013, 2014 by the deal.II authors">
     <meta name="date" content="$Date$">
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
@@ -450,6 +450,7 @@ DEAL_II_WITH_FUNCTIONPARSER
 DEAL_II_WITH_LAPACK
 DEAL_II_WITH_METIS
 DEAL_II_WITH_MUMPS
+DEAL_II_WITH_MUPARSER
 DEAL_II_WITH_MPI
 DEAL_II_WITH_NETCDF
 DEAL_II_WITH_P4EST
@@ -596,6 +597,7 @@ HDF5_DIR,
 LAPACK_DIR (and BLAS_DIR),
 METIS_DIR,
 MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
+MUPARSER_DIR,
 P4EST_DIR (and SC_DIR),
 PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
 SLEPC_DIR (forming ${SLEPC_DIR}/${PETSC_ARCH}),
@@ -818,7 +820,7 @@ cmake -DLAPACK_FOUND=true \
           a way to provide a link interface that is suitable for static
           linkage of executables. Enabling this option forces
           <code>BUILD_SHARED_LIBS=OFF</code> and
-          <code>DEAL_II_PERFER_STATIC_LIBS</code>.
+          <code>DEAL_II_PREFER_STATIC_LIBS=ON</code>.
 
 	<li>
 	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set

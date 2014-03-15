@@ -188,6 +188,11 @@ namespace Algorithms
      * should contain the initial
      * value in first position. <tt>out</tt>
      */
+    virtual void operator() (AnyData &out, const AnyData &in);
+
+    /**
+     * @deprecated Use  the function with AnyData arguments
+     */
     virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
 
     /**
@@ -197,11 +202,8 @@ namespace Algorithms
     virtual void notify(const Event &);
 
     /**
-     * Define an operator which
-     * will output the result in
-     * each step. Note that no
-     * output will be generated
-     * without this.
+     * Define an operator which will output the result in each
+     * step. Note that no output will be generated without this.
      */
     void set_output(OutputOperator<VECTOR> &output);
 
@@ -217,34 +219,23 @@ namespace Algorithms
      */
     const double &step_size() const;
     /**
-     * The weight between implicit
-     * and explicit part.
+     * The weight between implicit and explicit part.
      */
     const double &theta() const;
 
     /**
-     * The data handed to the
-     * #op_explicit time stepping
-     * operator.
+     * The data handed to the #op_explicit time stepping operator.
      *
-     * The time in here is the time
-     * at the beginning of the
-     * current step, the time step
-     * is (1-#theta) times the
-     * actual time step.
+     * The time in here is the time at the beginning of the current
+     * step, the time step is (1-#theta) times the actual time step.
      */
     const TimestepData &explicit_data() const;
 
     /**
-     * The data handed to the
-     * #op_implicit time stepping
-     * operator.
+     * The data handed to the #op_implicit time stepping operator.
      *
-     * The time in here is the time
-     * at the beginning of the
-     * current step, the time step
-     * is #theta times the
-     * actual time step.
+     * The time in here is the time at the beginning of the current
+     * step, the time step is #theta times the actual time step.
      */
     const TimestepData &implicit_data() const;
 
@@ -255,84 +246,61 @@ namespace Algorithms
 
   private:
     /**
-     * The object controlling the
-     * time step size and computing
-     * the new time in each step.
+     * The object controlling the time step size and computing the new
+     * time in each step.
      */
     TimestepControl control;
 
     /**
-     * The control parameter theta in the
-     * range <tt>[0,1]</tt>.
+     * The control parameter theta in the range <tt>[0,1]</tt>. It
+     * defaults to 0.5.
      */
     double vtheta;
     /**
-     * Use adaptive #theta if
-     * <tt>true</tt>.
+     * Use adaptive #theta if <tt>true</tt>. Not yet implemented.
      */
     bool adaptive;
 
     /**
-     * The data for the explicit
-     * part of the scheme.
+     * The data for the explicit part of the scheme.
      */
     TimestepData d_explicit;
 
     /**
-     * The data for the implicit
-     * part of the scheme.
+     * The data for the implicit part of the scheme.
      */
     TimestepData d_implicit;
 
 
     /**
-     * The operator computing the
-     * explicit part of the
-     * scheme. This will receive in
-     * its input data the value at
-     * the current time with name
-     * "Current time solution". It
-     * should obtain the current
-     * time and time step size from
-     * explicit_data().
+     * The operator computing the explicit part of the scheme. This
+     * will receive in its input data the value at the current time
+     * with name "Current time solution". It should obtain the current
+     * time and time step size from explicit_data().
      *
-     * Its return value is
-     * <i>Mu+cAu</i>, where
-     * <i>u</i> is the current
-     * state vector, <i>M</i> the
-     * mass matrix, <i>A</i> the
-     * operator in space and
-     * <i>c</i> is the time step
-     * size in explicit_data().
+     * Its return value is <i>Mu+cAu</i>, where <i>u</i> is the
+     * current state vector, <i>M</i> the mass matrix, <i>A</i> the
+     * operator in space and <i>c</i> is the time step size in
+     * explicit_data().
      */
     SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_explicit;
 
     /**
-     * The operator solving the
-     * implicit part of the
-     * scheme. It will receive in
-     * its input data the vector
-     * "Previous time". Information on the
-     * timestep should be obtained
-     * from implicit_data().
+     * The operator solving the implicit part of the scheme. It will
+     * receive in its input data the vector "Previous
+     * time". Information on the timestep should be obtained from
+     * implicit_data().
      *
-     * Its return value is the
-     * solution <i>u</i> of
-     * <i>Mu-cAu=f</i>, where
-     * <i>f</i> is the dual space
-     * vector found in the
-     * "Previous time" entry of the
-     * input data, <i>M</i> the
-     * mass matrix, <i>A</i> the
-     * operator in space and
-     * <i>c</i> is the time step
+     * Its return value is the solution <i>u</i> of <i>Mu-cAu=f</i>,
+     * where <i>f</i> is the dual space vector found in the "Previous
+     * time" entry of the input data, <i>M</i> the mass matrix,
+     * <i>A</i> the operator in space and <i>c</i> is the time step
      * size in explicit_data().
      */
     SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_implicit;
 
     /**
-     * The operator writing the
-     * output in each time step
+     * The operator writing the output in each time step
      */
     SmartPointer<OutputOperator<VECTOR>, ThetaTimestepping<VECTOR> > output;
   };
@@ -353,6 +321,15 @@ namespace Algorithms
   ThetaTimestepping<VECTOR>::implicit_data () const
   {
     return d_implicit;
+  }
+
+
+  template <class VECTOR>
+  inline
+  TimestepControl &
+  ThetaTimestepping<VECTOR>::timestep_control ()
+  {
+    return control;
   }
 
   template <class VECTOR>

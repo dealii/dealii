@@ -955,7 +955,6 @@ namespace TrilinosWrappers
 
 
 
-  inline
   void
   SparseMatrix::compress (::dealii::VectorOperation::values operation)
   {

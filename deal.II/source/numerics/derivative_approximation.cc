@@ -845,19 +845,19 @@ namespace DerivativeApproximation
 
                 // reinit fe values object...
                 x_fe_midpoint_value.reinit (neighbor);
-                const FEValues<dim> &fe_midpoint_value
+                const FEValues<dim> &neighbor_fe_midpoint_value
                 = x_fe_midpoint_value.get_present_fe_values();
 
                 // ...and get the value of the
                 // solution...
                 const typename DerivativeDescription::ProjectedDerivative
                 neighbor_midpoint_value
-                = DerivativeDescription::get_projected_derivative (fe_midpoint_value,
+                = DerivativeDescription::get_projected_derivative (neighbor_fe_midpoint_value,
                                                                    solution, component);
 
                 // ...and the place where it lives
                 const Point<dim>
-                neighbor_center = fe_midpoint_value.quadrature_point(0);
+                neighbor_center = neighbor_fe_midpoint_value.quadrature_point(0);
 
 
                 // vector for the

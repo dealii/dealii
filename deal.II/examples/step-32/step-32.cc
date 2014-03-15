@@ -3110,12 +3110,13 @@ namespace Step32
                               };
       double global_temperature[2];
 
-      for (unsigned int i=0; i<distributed_temperature_solution.local_size(); ++i)
+      for (unsigned int i=distributed_temperature_solution.local_range().first;
+	   i < distributed_temperature_solution.local_range().second; ++i)
         {
           temperature[0] = std::min<double> (temperature[0],
-                                             distributed_temperature_solution.trilinos_vector()[0][i]);
+                                             distributed_temperature_solution(i));
           temperature[1] = std::max<double> (temperature[1],
-                                             distributed_temperature_solution.trilinos_vector()[0][i]);
+                                             distributed_temperature_solution(i));
         }
 
       temperature[0] *= -1.0;

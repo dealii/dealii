@@ -1,0 +1,12 @@
+
+DEAL:Newton::Check 0	98.0000
+DEAL:Newton::Starting value 98.0000
+DEAL:Newton::Check 1	24.0100
+DEAL:Newton::Check 2	5.54095
+DEAL:Newton::Check 3	1.01785
+DEAL:Newton::Check 4	0.0858237
+DEAL:Newton::Check 5	0.000882829
+DEAL:Newton::Check 6	9.73804e-08
+DEAL:Newton::Check 7	0
+DEAL:Newton::Convergence step 7 value 0
+DEAL:: square root 1.41421

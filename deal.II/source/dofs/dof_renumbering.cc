@@ -358,7 +358,7 @@ namespace DoFRenumbering
                  const bool       use_constraints,
                  const std::vector<types::global_dof_index> &starting_indices)
   {
-    std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(),
+    std::vector<types::global_dof_index> renumbering(dof_handler.locally_owned_dofs().n_elements(),
                                                      DH::invalid_dof_index);
     compute_Cuthill_McKee(renumbering, dof_handler, reversed_numbering,
                           use_constraints, starting_indices);
@@ -379,25 +379,19 @@ namespace DoFRenumbering
                          const bool                 use_constraints,
                          const std::vector<types::global_dof_index> &starting_indices)
   {
-    // make the connection graph. in
-    // more than 2d use an intermediate
-    // compressed sparsity pattern
-    // since the we don't have very
-    // good estimates for
-    // max_couplings_between_dofs() in
-    // 3d and this then leads to
-    // excessive memory consumption
+    // make the connection graph. in 2d/3d use an intermediate compressed
+    // sparsity pattern since the we don't have very good estimates for
+    // max_couplings_between_dofs() in 3d and this then leads to excessive
+    // memory consumption
     //
-    // note that if constraints are not
-    // requested, then the
-    // 'constraints' object will be
-    // empty, and calling condense with
-    // it is a no-op
+    // note that if constraints are not requested, then the 'constraints'
+    // object will be empty and nothing happens
     ConstraintMatrix constraints;
     if (use_constraints)
       DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close ();
 
+    IndexSet locally_owned = dof_handler.locally_owned_dofs();
     SparsityPattern sparsity;
     if (DH::dimension < 2)
       {
@@ -410,9 +404,38 @@ namespace DoFRenumbering
     else
       {
         CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                             dof_handler.n_dofs());
+                                             dof_handler.n_dofs(),
+                                             dof_handler.locally_owned_dofs());
         DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
-        sparsity.copy_from (csp);
+
+        // If the index set is not complete, need to get indices in local
+        // index space.
+        if (dof_handler.locally_owned_dofs().n_elements() !=
+            dof_handler.locally_owned_dofs().size())
+          {
+            // Create sparsity pattern from csp by transferring its indices to
+            // processor-local index space and doing Cuthill-McKee there
+            std::vector<unsigned int> row_lengths(locally_owned.n_elements());
+            for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
+              row_lengths[i] = csp.row_length(locally_owned.nth_index_in_set(i));
+            sparsity.reinit(locally_owned.n_elements(), locally_owned.n_elements(),
+                            row_lengths);
+            std::vector<types::global_dof_index> row_entries;
+            for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
+              {
+                const types::global_dof_index row = locally_owned.nth_index_in_set(i);
+                row_entries.resize(0);
+                for (CompressedSimpleSparsityPattern::row_iterator it =
+                       csp.row_begin(row); it != csp.row_end(row); ++it)
+                  if (*it != row && locally_owned.is_element(*it))
+                    row_entries.push_back(locally_owned.index_within_set(*it));
+                sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
+                                     true);
+              }
+            sparsity.compress();
+          }
+        else
+          sparsity.copy_from(csp);
       }
 
     // constraints are not needed anymore
@@ -427,6 +450,10 @@ namespace DoFRenumbering
 
     if (reversed_numbering)
       new_indices = Utilities::reverse_permutation (new_indices);
+
+    // convert indices back to global index space
+    for (std::size_t i=0; i<new_indices.size(); ++i)
+      new_indices[i] = locally_owned.nth_index_in_set(new_indices[i]);
   }
 
 
@@ -1206,11 +1233,11 @@ namespace DoFRenumbering
               tria->get_p4est_tree_to_coarse_cell_permutation() [c];
 
             const typename DoFHandler<dim>::level_cell_iterator
-            cell (tria, 0, coarse_cell_index, &dof_handler);
+            this_cell (tria, 0, coarse_cell_index, &dof_handler);
 
             next_free = compute_hierarchical_recursive<dim> (next_free,
                                                              renumbering,
-                                                             cell,
+                                                             this_cell,
                                                              locally_owned);
           }
 #else

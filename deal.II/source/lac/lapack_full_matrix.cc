@@ -93,7 +93,7 @@ LAPACKFullMatrix<number>::operator = (const double d)
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
   if (this->n_elements() != 0)
-    std::fill (this->values.begin(), this->values.end(), number());
+    this->reset_values();
 
   state = LAPACKSupport::matrix;
   return *this;
@@ -227,9 +227,9 @@ LAPACKFullMatrix<number>::mmult(LAPACKFullMatrix<number>       &C,
                                 const LAPACKFullMatrix<number> &B,
                                 const bool                      adding) const
 {
-  Assert(state == matrix, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
-  Assert(C.state == matrix, ExcState(state));
+  Assert(state == matrix || state == inverse_matrix, ExcState(state));
+  Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
+  Assert(C.state == matrix || C.state == inverse_matrix, ExcState(state));
   Assert (this->n_cols() == B.n_rows(), ExcDimensionMismatch(this->n_cols(), B.n_rows()));
   Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
   Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
@@ -251,8 +251,8 @@ LAPACKFullMatrix<number>::mmult(FullMatrix<number>             &C,
                                 const LAPACKFullMatrix<number> &B,
                                 const bool                      adding) const
 {
-  Assert(state == matrix, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
+  Assert(state == matrix || state == inverse_matrix, ExcState(state));
+  Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
   Assert (this->n_cols() == B.n_rows(), ExcDimensionMismatch(this->n_cols(), B.n_rows()));
   Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
   Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
@@ -276,9 +276,9 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number>       &C,
                                  const LAPACKFullMatrix<number> &B,
                                  const bool                      adding) const
 {
-  Assert(state == matrix, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
-  Assert(C.state == matrix, ExcState(state));
+  Assert(state == matrix || state == inverse_matrix, ExcState(state));
+  Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
+  Assert(C.state == matrix || C.state == inverse_matrix, ExcState(state));
   Assert (this->n_rows() == B.n_rows(), ExcDimensionMismatch(this->n_rows(), B.n_rows()));
   Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
   Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
@@ -300,8 +300,8 @@ LAPACKFullMatrix<number>::Tmmult(FullMatrix<number>             &C,
                                  const LAPACKFullMatrix<number> &B,
                                  const bool                      adding) const
 {
-  Assert(state == matrix, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
+  Assert(state == matrix || state == inverse_matrix, ExcState(state));
+  Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
   Assert (this->n_rows() == B.n_rows(), ExcDimensionMismatch(this->n_rows(), B.n_rows()));
   Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
   Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
@@ -325,9 +325,9 @@ LAPACKFullMatrix<number>::mTmult(LAPACKFullMatrix<number>       &C,
                                  const LAPACKFullMatrix<number> &B,
                                  const bool                      adding) const
 {
-  Assert(state == matrix, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
-  Assert(C.state == matrix, ExcState(state));
+  Assert(state == matrix || state == inverse_matrix, ExcState(state));
+  Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
+  Assert(C.state == matrix || C.state == inverse_matrix, ExcState(state));
   Assert (this->n_cols() == B.n_cols(), ExcDimensionMismatch(this->n_cols(), B.n_cols()));
   Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
   Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
@@ -349,8 +349,8 @@ LAPACKFullMatrix<number>::mTmult(FullMatrix<number>             &C,
                                  const LAPACKFullMatrix<number> &B,
                                  const bool                      adding) const
 {
-  Assert(state == matrix, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
+  Assert(state == matrix || state == inverse_matrix, ExcState(state));
+  Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
   Assert (this->n_cols() == B.n_cols(), ExcDimensionMismatch(this->n_cols(), B.n_cols()));
   Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
   Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
@@ -374,9 +374,9 @@ LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number>       &C,
                                   const LAPACKFullMatrix<number> &B,
                                   const bool                      adding) const
 {
-  Assert(state == matrix, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
-  Assert(C.state == matrix, ExcState(state));
+  Assert(state == matrix || state == inverse_matrix, ExcState(state));
+  Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
+  Assert(C.state == matrix || C.state == inverse_matrix, ExcState(state));
   Assert (this->n_rows() == B.n_cols(), ExcDimensionMismatch(this->n_rows(), B.n_cols()));
   Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
   Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
@@ -398,8 +398,8 @@ LAPACKFullMatrix<number>::TmTmult(FullMatrix<number>             &C,
                                   const LAPACKFullMatrix<number> &B,
                                   const bool                      adding) const
 {
-  Assert(state == matrix, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
+  Assert(state == matrix || state == inverse_matrix, ExcState(state));
+  Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
   Assert (this->n_rows() == B.n_cols(), ExcDimensionMismatch(this->n_rows(), B.n_cols()));
   Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
   Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
@@ -551,6 +551,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
   Assert(state == lu, ExcState(state));
   Assert(this->n_rows() == this->n_cols(),
          LACExceptions::ExcNotQuadratic());
+  AssertDimension(this->n_rows(), v.size());
 
   const char *trans = transposed ? &T : &N;
   const int nn = this->n_cols();
@@ -573,6 +574,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
   Assert(state == lu, ExcState(state));
   Assert(B.state == matrix, ExcState(state));
   Assert(this->n_rows() == this->n_cols(), LACExceptions::ExcNotQuadratic());
+  AssertDimension(this->n_rows(), B.n_rows());
 
   const char *trans = transposed ? &T : &N;
   const int nn = this->n_cols();

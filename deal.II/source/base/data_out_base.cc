@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2731,11 +2731,9 @@ namespace DataOutBase
       Point<3> v_min, v_max, v_inter;
 
       // Use the Bubblesort algorithm to sort the points with respect to the third coordinate
-      int i, j;
-
-      for (i = 0; i < 2; ++i)
+      for (int i = 0; i < 2; ++i)
         {
-          for (j = 0; j < 2-i; ++j)
+          for (int j = 0; j < 2-i; ++j)
             {
               if (points[j][2] > points[j + 1][2])
                 {
@@ -3666,12 +3664,12 @@ namespace DataOutBase
       }
 
     // max. and min. heigth of solution
-    typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-    Assert(patch!=patches.end(), ExcInternalError());
-    double hmin=patch->data(0,0);
-    double hmax=patch->data(0,0);
+    Assert(patches.size()>0, ExcInternalError());
+    double hmin=patches[0].data(0,0);
+    double hmax=patches[0].data(0,0);
 
-    for (; patch != patches.end(); ++patch)
+    for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+	 patch != patches.end(); ++patch)
       {
         const unsigned int n_subdivisions = patch->n_subdivisions;
 

@@ -977,7 +977,8 @@ next_cell:
         // is for.
         if (!found && cells_searched < n_cells)
           {
-            find_active_cell_around_point_internal(container, searched_cells, adjacent_cells);
+            find_active_cell_around_point_internal<dim,Container,spacedim>
+            (container, searched_cells, adjacent_cells);
           }
       }
 
@@ -1098,7 +1099,8 @@ next_cell:
             // the cells in adjacent_cells.
             if (!found && cells_searched < n_cells)
               {
-                find_active_cell_around_point_internal(container, searched_cells, adjacent_cells);
+                find_active_cell_around_point_internal<dim,hp::DoFHandler,spacedim>
+                (container, searched_cells, adjacent_cells);
               }
 
           }
@@ -2168,11 +2170,9 @@ next_cell:
     do
       {
         bool changed = false;
-        typename Container<dim-1,spacedim>::active_cell_iterator
-        cell = surface_mesh.begin_active(),
-        endc = surface_mesh.end();
 
-        for (; cell!=endc; ++cell)
+        for (typename Container<dim-1,spacedim>::active_cell_iterator
+            cell = surface_mesh.begin_active(); cell!=surface_mesh.end(); ++cell)
           if (surface_to_volume_mapping[cell]->has_children() == true )
             {
               cell->set_refine_flag ();
@@ -2184,14 +2184,12 @@ next_cell:
             const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
             .execute_coarsening_and_refinement();
 
-            typename Container<dim-1,spacedim>::cell_iterator
-            cell = surface_mesh.begin(),
-            endc = surface_mesh.end();
-            for (; cell!=endc; ++cell)
-              for (unsigned int c=0; c<cell->n_children(); c++)
-                if (surface_to_volume_mapping.find(cell->child(c)) == surface_to_volume_mapping.end())
-                  surface_to_volume_mapping[cell->child(c)]
-                    = surface_to_volume_mapping[cell]->child(c);
+            for (typename Container<dim-1,spacedim>::cell_iterator
+                surface_cell = surface_mesh.begin(); surface_cell!=surface_mesh.end(); ++surface_cell)
+              for (unsigned int c=0; c<surface_cell->n_children(); c++)
+                if (surface_to_volume_mapping.find(surface_cell->child(c)) == surface_to_volume_mapping.end())
+                  surface_to_volume_mapping[surface_cell->child(c)]
+                    = surface_to_volume_mapping[surface_cell]->child(c);
           }
         else
           break;

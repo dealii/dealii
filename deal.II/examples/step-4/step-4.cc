@@ -359,27 +359,28 @@ void Step4<dim>::assemble_system ()
       // difference to how we did things in step-3: Instead of using a
       // constant right hand side with value 1, we use the object representing
       // the right hand side and evaluate it at the quadrature points:
-      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              cell_matrix(i,j) += (fe_values.shape_grad (i, q_point) *
-                                   fe_values.shape_grad (j, q_point) *
-                                   fe_values.JxW (q_point));
+              cell_matrix(i,j) += (fe_values.shape_grad (i, q_index) *
+                                   fe_values.shape_grad (j, q_index) *
+                                   fe_values.JxW (q_index));
 
-            cell_rhs(i) += (fe_values.shape_value (i, q_point) *
-                            right_hand_side.value (fe_values.quadrature_point (q_point)) *
-                            fe_values.JxW (q_point));
+            cell_rhs(i) += (fe_values.shape_value (i, q_index) *
+                            right_hand_side.value (fe_values.quadrature_point (q_index)) *
+                            fe_values.JxW (q_index));
           }
       // As a final remark to these loops: when we assemble the local
       // contributions into <code>cell_matrix(i,j)</code>, we have to multiply
-      // the gradients of shape functions $i$ and $j$ at point q_point and
+      // the gradients of shape functions $i$ and $j$ at point number
+      // q_index and
       // multiply it with the scalar weights JxW. This is what actually
-      // happens: <code>fe_values.shape_grad(i,q_point)</code> returns a
+      // happens: <code>fe_values.shape_grad(i,q_index)</code> returns a
       // <code>dim</code> dimensional vector, represented by a
       // <code>Tensor@<1,dim@></code> object, and the operator* that
       // multiplies it with the result of
-      // <code>fe_values.shape_grad(j,q_point)</code> makes sure that the
+      // <code>fe_values.shape_grad(j,q_index)</code> makes sure that the
       // <code>dim</code> components of the two vectors are properly
       // contracted, and the result is a scalar floating point number that
       // then is multiplied with the weights. Internally, this operator* makes
