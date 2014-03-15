@@ -150,6 +150,13 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Fixed: step-32 had a piece of code where we accessed an internal
+  representation of how Trilinos vectors are actually stored. This is poor
+  style and has been rewritten.
+  <br>
+  (Wolfgang Bangerth, 2014/03/14)
+  </li>
+
   <li> Fixed: ParameterHandler will no longer output an error if the file
   to be read ends with "end" without a newline.
   <br>
