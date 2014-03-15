@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1675,8 +1675,11 @@ namespace VectorTools
 
   /**
    * Compute the constraints that correspond to boundary conditions of the
-   * form $\vec n \times \vec u=0$, i.e. flow normal to the boundary if $\vec
-   * u$ is a vector-valued quantity. This function constrains exactly those
+   * form $\vec n \times \vec u=0$. This corresponds to flow with no tangential
+   * component, i.e. flow is parallel to the normal vector to the boundary if $\vec
+   * u$ is a vector-valued quantity.
+   *
+   * This function constrains exactly those
    * vector-valued components that are left unconstrained by
    * compute_no_normal_flux_constraints, and leaves the one component
    * unconstrained that is constrained by compute_no_normal_flux_constraints.
