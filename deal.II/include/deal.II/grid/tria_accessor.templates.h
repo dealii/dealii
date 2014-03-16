@@ -1369,20 +1369,6 @@ TriaAccessor<structdim, dim, spacedim>::clear_used_flag () const
 template <int structdim, int dim, int spacedim>
 int
 TriaAccessor<structdim, dim, spacedim>::
-parent_index () const
-{
-  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
-
-  // the parent of two consecutive cells
-  // is stored only once, since it is
-  // the same
-  return this->tria->levels[this->present_level]->parents[this->present_index / 2];
-}
-
-
-template <int structdim, int dim, int spacedim>
-int
-TriaAccessor<structdim, dim, spacedim>::
 child_index (const unsigned int i) const
 {
   Assert (has_children(), TriaAccessorExceptions::ExcCellHasNoChildren());
@@ -1634,18 +1620,6 @@ TriaAccessor<structdim, dim, spacedim>::set_children (const unsigned int i,
           TriaAccessorExceptions::ExcCantSetChildren(index));
 
   this->objects().children[n_sets_of_two*this->present_index+i/2] = index;
-}
-
-
-
-template <int structdim, int dim, int spacedim>
-void
-TriaAccessor<structdim, dim, spacedim>::set_parent (const unsigned int parent_index)
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
-  this->tria->levels[this->present_level]->parents[this->present_index / 2]
-    = parent_index;
 }
 
 
@@ -2200,16 +2174,6 @@ TriaAccessor<0, 1, spacedim>::operator != (const TriaAccessor &t) const
   return !(*this==t);
 }
 
-
-
-
-template <int spacedim>
-inline
-int
-TriaAccessor<0, 1, spacedim>::parent_index ()
-{
-  return -1;
-}
 
 
 template <int spacedim>

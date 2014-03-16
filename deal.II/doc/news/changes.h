@@ -90,8 +90,7 @@ inconvenience this causes.
 
 
 <ol>
-
-  <li> Changed: the functionparser library bundled with deal.II got replaced
+  <li> Changed: The functionparser library bundled with deal.II got replaced
   by the muparser library.  
   <br>
   (Timo Heister, 2014/02/10)
@@ -149,6 +148,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: Class TriaAccessor had a function parent_index(), but this function
+  could only work for cell accessors. The function has consequently been moved
+  to class CellAccessor.
+  <br>
+  (Wolfgang Bangerth, 2014/03/15)
+  </li>
 
   <li> Fixed: step-32 had a piece of code where we accessed an internal
   representation of how Trilinos vectors are actually stored. This is poor

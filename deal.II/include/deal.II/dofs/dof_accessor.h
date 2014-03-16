@@ -291,12 +291,6 @@ public:
   static bool is_level_cell();
 
   /**
-   * Return an iterator pointing to the the parent.
-   */
-  TriaIterator<DoFAccessor<structdim,DH, level_dof_access> >
-  parent () const;
-
-  /**
    *  @name Accessing sub-objects
    */
   /**
@@ -827,12 +821,6 @@ public:
   void copy_from (const TriaAccessorBase<0, 1, spacedim> &da);
 
   /**
-   * Return an iterator pointing to the the parent.
-   */
-  TriaIterator<DoFAccessor<0,DH<1,spacedim>, level_dof_access> >
-  parent () const;
-
-  /**
    *  @name Accessing sub-objects
    */
   /**
@@ -1259,9 +1247,13 @@ public:
    */
 
   /**
-   * Return the parent as a DoF cell iterator. This function is needed
-   * since the parent function of the base class returns a cell
-   * accessor without access to the DoF data.
+   * Return the parent of this cell as a DoF cell iterator.
+   * If the parent does not exist (i.e., if the object is at the coarsest level of
+   * the mesh hierarchy), an exception is generated.
+   *
+   * This function is needed
+   * since the parent function of the base class CellAccessor returns a triangulation
+   * cell accessor without access to the DoF data.
    */
   TriaIterator<DoFCellAccessor<DH, level_dof_access> >
   parent () const;

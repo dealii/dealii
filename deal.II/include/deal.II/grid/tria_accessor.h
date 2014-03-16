@@ -733,18 +733,6 @@ public:
   bool used () const;
 
   /**
-   *  Index of the parent.
-   *  The level of the parent is one
-   *  lower than that of the
-   *  present cell, if the parent
-   *  of a cell is accessed. If the
-   *  parent does not exist, -1 is
-   *  returned.
-   */
-  int parent_index () const;
-
-
-  /**
    *  @name Accessing sub-objects
    */
   /**
@@ -1611,11 +1599,6 @@ private:
   void clear_refinement_case () const;
 
   /**
-   * Set the parent of a cell.
-   */
-  void set_parent (const unsigned int parent_index);
-
-  /**
    *  Set the index of the ith
    *  child. Since the children
    *  come at least in pairs, we
@@ -1886,12 +1869,6 @@ public:
   /**
    * @}
    */
-
-  /**
-   *  Index of the parent. You
-   *  can't do this for points.
-   */
-  static int parent_index ();
 
   /**
    *  @name Accessing sub-objects
@@ -2836,12 +2813,22 @@ public:
    */
   bool direction_flag () const;
 
-
+  /**
+   *  Index of the parent of this cell.
+   *  The level of the parent is one
+   *  lower than that of the
+   *  present cell, if the parent
+   *  of a cell is accessed. If the
+   *  parent does not exist (i.e., if the object is at the coarsest level of
+   *  the mesh hierarchy), an exception is generated.
+   */
+  int parent_index () const;
 
   /**
    *  Return an iterator to the
-   *  parent. Throws an exception if this cell has no parent, i.e. has
-   *  level 0.
+   *  parent. If the
+   *  parent does not exist (i.e., if the object is at the coarsest level of
+   *  the mesh hierarchy), an exception is generated.
    */
   TriaIterator<CellAccessor<dim,spacedim> >
   parent () const;
@@ -3101,6 +3088,11 @@ protected:
 
 
 private:
+  /**
+   * Set the parent of a cell.
+   */
+  void set_parent (const unsigned int parent_index);
+
   /**
    * Set the orientation of this
    * cell.
