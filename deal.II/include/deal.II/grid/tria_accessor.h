@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -449,9 +449,20 @@ public:
    */
 
   /**
-   *  Return the level the element
-   *  pointed to belongs to.
-   *  This is only valid for cells.
+   * For cells, this function returns the level within the mesh hierarchy at
+   * which this cell is located. For all other objects, the function returns
+   * zero.
+   *
+   * @note Within a Triangulation object, cells are uniquely identified by a
+   * pair <code>(level, index)</code> where the former is the cell's
+   * refinement level and the latter is the index of the cell within
+   * this refinement level (the former being what this function
+   * returns). Consequently, there may be multiple cells on different
+   * refinement levels but with the same index within their level.
+   * Contrary to this, if the current object corresponds to a face or
+   * edge, then the object is uniquely identified solely by its index
+   * as faces and edges do not have a refinement level. For these objects,
+   * the current function always returns zero as the level.
    */
   int level () const;
 
@@ -460,7 +471,7 @@ public:
    * element presently pointed to
    * on the present level.
    *
-   * Within a Triangulation object cells are uniquely identified by a
+   * Within a Triangulation object, cells are uniquely identified by a
    * pair <code>(level, index)</code> where the former is the cell's
    * refinement level and the latter is the index of the cell within
    * this refinement level (the latter being what this function
