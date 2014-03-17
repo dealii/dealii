@@ -1471,17 +1471,18 @@ namespace VectorTools
 
 
   /**
-   * This function computes the constraints that correspond to boundary conditions of the
-   * form $\vec n \cdot \vec u=0$, i.e. no normal flux if $\vec u$ is a
-   * vector-valued quantity. These conditions have exactly the form handled by
-   * the ConstraintMatrix class, so instead of creating a map between boundary
-   * degrees of freedom and corresponding value, we here create a list of
-   * constraints that are written into a ConstraintMatrix. This object may
-   * already have some content, for example from hanging node constraints,
-   * that remains untouched. These constraints have to be applied to the
-   * linear system like any other such constraints, i.e. you have to condense
-   * the linear system with the constraints before solving, and you have to
-   * distribute the solution vector afterwards.
+   * This function computes the constraints that correspond to boundary
+   * conditions of the form $\vec u \cdot \vec n=\vec u_\Gamma \cdot \vec n$,
+   * i.e. normal flux constraints if $\vec u$ is a vector-valued quantity.
+   * These conditions have exactly the form handled by the ConstraintMatrix
+   * class, so instead of creating a map between boundary degrees of freedom
+   * and corresponding value, we here create a list of constraints that are
+   * written into a ConstraintMatrix. This object may already have some
+   * content, for example from hanging node constraints, that remains
+   * untouched. These constraints have to be applied to the linear system
+   * like any other such constraints, i.e. you have to condense the linear
+   * system with the constraints before solving, and you have to distribute
+   * the solution vector afterwards.
    *
    * The use of this function is explained in more detail in step-31. It
    * doesn't make much sense in 1d, so the function throws an exception in
@@ -1494,11 +1495,11 @@ namespace VectorTools
    * first_vector_component would be zero. On the other hand, if we solved the
    * Maxwell equations in 3d and the finite element has components
    * $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want the boundary condition $\vec
-   * n\cdot \vec B=0$, then @p first_vector_component would be 3. Vectors are
-   * implicitly assumed to have exactly <code>dim</code> components that are
-   * ordered in the same way as we usually order the coordinate directions,
-   * i.e. $x$-, $y$-, and finally $z$-component. The function assumes, but
-   * can't check, that the vector components in the range
+   * B\cdot \vec n=\vec B_\Gamma\cdot \vec n$, then @p first_vector_component
+   * would be 3. Vectors are implicitly assumed to have exactly <code>dim</code>
+   * components that are ordered in the same way as we usually order the
+   * coordinate directions, i.e. $x$-, $y$-, and finally $z$-component. The
+   * function assumes, but can't check, that the vector components in the range
    * <code>[first_vector_component,first_vector_component+dim)</code> come
    * from the same base finite element. For example, in the Stokes example
    * above, it would not make sense to use a
@@ -1514,6 +1515,9 @@ namespace VectorTools
    * function multiple times with only one boundary indicator, or whether we
    * call the function onces with the whole set of boundary indicators at
    * once.
+   *
+   * The forth parameter describes the boundary function that is used for
+   * computing these constraints. 
    *
    * The mapping argument is used to compute the boundary points where the
    * function needs to request the normal vector $\vec n$ from the boundary
@@ -1542,20 +1546,22 @@ namespace VectorTools
    * right are meant to approximate a curved boundary (as indicated by the
    * dashed line), then neither of the two computed normal vectors are equal
    * to the exact normal vector (though they approximate it as the mesh is
-   * refined further). What is worse, if we constrain $\vec n \cdot \vec u=0$
-   * at the common vertex with the normal vector from both cells, then we
-   * constrain the vector $\vec u$ with respect to two linearly independent
-   * vectors; consequently, the constraint would be $\vec u=0$ at this point
-   * (i.e. <i>all</i> components of the vector), which is not what we wanted.
+   * refined further). What is worse, if we constrain $\vec u \cdot \vec n=
+   * \vec u_\Gamma \cdot \vec n$ at the common vertex with the normal vector
+   * from both cells, then we constrain the vector $\vec u$ with respect to
+   * two linearly independent vectors; consequently, the constraint would be
+   * $\vec u=\vec u_\Gamma$ at this point (i.e. <i>all</i> components of the
+   * vector), which is not what we wanted.
    *
    * To deal with this situation, the algorithm works in the following way: at
    * each point where we want to constrain $\vec u$, we first collect all
    * normal vectors that adjacent cells might compute at this point. We then
-   * do not constrain $\vec n \cdot \vec u=0$ for <i>each</i> of these normal
-   * vectors but only for the <i>average</i> of the normal vectors. In the
-   * example above, we therefore record only a single constraint $\vec n \cdot
-   * \vec {\bar u}=0$, where $\vec {\bar u}$ is the average of the two
-   * indicated normal vectors.
+   * do not constrain $\vec u \cdot \vec n=\vec u_\Gamma \cdot \vec n$ for
+   * <i>each</i> of these normal vectors but only for the <i>average</i> of
+   * the normal vectors. In the example above, we therefore record only a
+   * single constraint $\vec u \cdot \vec {\bar n}=\vec u_\Gamma \cdot \vec
+   * {\bar n}$, where $\vec {\bar n}$ is the average of the two indicated
+   * normal vectors.
    *
    * Unfortunately, this is not quite enough. Consider the situation here:
    *
@@ -1598,7 +1604,7 @@ namespace VectorTools
    * point per invocation (because we consider only one boundary part at a
    * time), with the result that the normal vectors will not be averaged. This
    * situation also needs to be taken into account when using this function
-   * around reentrant corners on Cartesian meshes. If no-normal-flux boundary
+   * around reentrant corners on Cartesian meshes. If normal-flux boundary
    * conditions are to be enforced on non-Cartesian meshes around reentrant
    * corners, one may even get cycles in the constraints as one will in
    * general constrain different components from the two sides. In that case,
@@ -1632,7 +1638,7 @@ namespace VectorTools
    * front faces of the left cell belong to the boundary selected whereas only
    * the top face of the right cell belongs to it, maybe indicating the the entire
    * front part of the domain is a smooth manifold whereas the top really forms
-   * two separate manifolds that meet in a ridge, and that no-flux boundary
+   * two separate manifolds that meet in a ridge, and that normal-flux boundary
    * conditions are only desired on the front manifold and the right one on top.
    * In cases like these, it's difficult to define what should happen. The
    * current implementation simply ignores the one contribution from the
@@ -1667,6 +1673,22 @@ namespace VectorTools
    */
   template <int dim, template <int, int> class DH, int spacedim>
   void
+  compute_nonzero_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
+                                           const unsigned int     first_vector_component,
+                                           const std::set<types::boundary_id> &boundary_ids,
+                                           typename FunctionMap<spacedim>::type &function_map,
+                                           ConstraintMatrix      &constraints,
+                                           const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
+
+  /**
+   * Same as above for homogeneous normal-flux constraints.
+   *
+   * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   */
+  template <int dim, template <int, int> class DH, int spacedim>
+  void
   compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
                                       const unsigned int     first_vector_component,
                                       const std::set<types::boundary_id> &boundary_ids,
@@ -1675,14 +1697,32 @@ namespace VectorTools
 
   /**
    * Compute the constraints that correspond to boundary conditions of the
-   * form $\vec n \times \vec u=0$. This corresponds to flow with no tangential
-   * component, i.e. flow is parallel to the normal vector to the boundary if $\vec
-   * u$ is a vector-valued quantity.
+   * form $\vec u \times \vec n=\vec u_\Gamma \times \vec n$, i.e. tangential
+   * flow constraints if $\vec u$ is a vector-valued quantity. This function
+   * constrains exactly those vector-valued components that are left
+   * unconstrained by compute_no_normal_flux_constraints, and leaves the one
+   * component unconstrained that is constrained by
+   * compute_no_normal_flux_constraints.
    *
-   * This function constrains exactly those
-   * vector-valued components that are left unconstrained by
-   * compute_no_normal_flux_constraints, and leaves the one component
-   * unconstrained that is constrained by compute_no_normal_flux_constraints.
+   * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   */
+  template <int dim, template <int, int> class DH, int spacedim>
+  void
+  compute_nonzero_tangential_flux_constraints (const DH<dim,spacedim>         &dof_handler,
+                                               const unsigned int     first_vector_component,
+                                               const std::set<types::boundary_id> &boundary_ids,
+                                               typename FunctionMap<spacedim>::type &function_map,
+                                               ConstraintMatrix      &constraints,
+                                               const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
+  
+  /**
+   * Same as above for homogeneous tangential-flux constraints.
+   *
+   * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, template <int, int> class DH, int spacedim>
   void

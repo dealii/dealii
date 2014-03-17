@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: Inhomogeneous tangential and normal flow constraints can
+       now be treated via VectorTools::compute_nonzero_normal_flux_constraints
+       and VectorTools::compute_nonzero_tangential_flux_constraints.
+  <br>
+  (Daniel Arndt, 2014/03/16)
+  </li>
+
   <li> Changed: Class TriaAccessor had a function parent_index(), but this function
   could only work for cell accessors. The function has consequently been moved
   to class CellAccessor.
