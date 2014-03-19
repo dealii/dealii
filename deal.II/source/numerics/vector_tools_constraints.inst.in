@@ -28,7 +28,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
   compute_nonzero_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
                                            const unsigned int     first_vector_component,
                                            const std::set<types::boundary_id> &boundary_ids,
-                                           typename FunctionMap<deal_II_dimension>::type &function_map,
+                                           FunctionMap<deal_II_dimension>::type &function_map,
                                            ConstraintMatrix      &constraints,
                                            const Mapping<deal_II_dimension>    &mapping);
 
@@ -37,7 +37,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
   compute_nonzero_normal_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
                                            const unsigned int     first_vector_component,
                                            const std::set<types::boundary_id> &boundary_ids,
-                                           typename FunctionMap<deal_II_dimension>::type &function_map,
+                                           FunctionMap<deal_II_dimension>::type &function_map,
                                            ConstraintMatrix      &constraints,
                                            const Mapping<deal_II_dimension>    &mapping);
 
@@ -46,7 +46,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
   compute_nonzero_tangential_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
                                                const unsigned int     first_vector_component,
                                                const std::set<types::boundary_id> &boundary_ids,
-                                               typename FunctionMap<deal_II_dimension>::type &function_map,
+                                               FunctionMap<deal_II_dimension>::type &function_map,
                                                ConstraintMatrix      &constraints,
                                                const Mapping<deal_II_dimension>    &mapping);
   template
@@ -54,7 +54,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
   compute_nonzero_tangential_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
                                                const unsigned int     first_vector_component,
                                                const std::set<types::boundary_id> &boundary_ids,
-                                               typename FunctionMap<deal_II_dimension>::type &function_map,
+                                               FunctionMap<deal_II_dimension>::type &function_map,
                                                ConstraintMatrix      &constraints,
                                                const Mapping<deal_II_dimension>    &mapping);
     
