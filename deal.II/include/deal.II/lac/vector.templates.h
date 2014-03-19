@@ -22,6 +22,7 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/multithread_info.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
@@ -586,7 +587,8 @@ namespace internal
                      const Number2     *Y,
                      const ResultType   power,
                      const size_type    vec_size,
-                     ResultType        &result)
+                     ResultType        &result,
+                     const int          depth = -1)
     {
       if (vec_size <= 4096)
         {
@@ -672,29 +674,39 @@ namespace internal
           result = outer_results[0];
         }
 #ifdef DEAL_II_WITH_THREADS
-      else if (vec_size > 4 * internal::Vector::minimum_parallel_grain_size)
+      else if (multithread_info.n_threads() > 1 &&
+               vec_size > 4 * internal::Vector::minimum_parallel_grain_size &&
+               depth != 0)
         {
-          // split the vector into smaller pieces to be
-          // worked on recursively and create tasks for
-          // them. Make pieces divisible by 1024.
+          // split the vector into smaller pieces to be worked on recursively
+          // and create tasks for them. Make pieces divisible by 1024.
           const size_type new_size = (vec_size / 4096) * 1024;
           ResultType r0, r1, r2, r3;
+
+          // find out how many recursions we should make (avoid too deep
+          // hierarchies of tasks on large vectors), max use 8 *
+          // multithread_info.n_threads()
+          int next_depth = depth;
+          if (depth == -1)
+            next_depth = 8 * multithread_info.n_threads();
+          next_depth /= 4;
+
           Threads::TaskGroup<> task_group;
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
                                           ResultType,size_type>,
-                                          op, X, Y, power, new_size, r0);
+                                          op, X, Y, power, new_size, r0, next_depth);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
                                           ResultType,size_type>,
                                           op, X+new_size, Y+new_size, power,
-                                          new_size, r1);
+                                          new_size, r1, next_depth);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
                                           ResultType,size_type>,
                                           op, X+2*new_size, Y+2*new_size, power,
-                                          new_size, r2);
+                                          new_size, r2, next_depth);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
                                           ResultType,size_type>,
                                           op, X+3*new_size, Y+3*new_size, power,
-                                          vec_size-3*new_size, r3);
+                                          vec_size-3*new_size, r3, next_depth);
           task_group.join_all();
           r0 += r1;
           r2 += r3;
