@@ -3153,11 +3153,7 @@ namespace VectorTools
                           + values[q_point] (first_vector_component + 1)
                           * tangentials[q_point] (1))
                        * (fe_values[vec].value (fe.face_to_cell_index (i, face), q_point)
-                          * tangentials[q_point])
-                       / std::sqrt (jacobians[q_point][0][face_coordinate_direction[face]]
-                                    * jacobians[q_point][0][face_coordinate_direction[face]]
-                                    + jacobians[q_point][1][face_coordinate_direction[face]]
-                                    * jacobians[q_point][1][face_coordinate_direction[face]]);
+                          * tangentials[q_point]);
 
                     if (q_point == 0)
                       dofs_processed[i] = true;
@@ -4666,8 +4662,8 @@ namespace VectorTools
         // contributions. Here we do not want to average the normal
         // vectors. Since we have DIM contributions, let's assume (and
         // verify) that they are in fact all linearly independent; in that
-        // case, all vector components are constrained and we need to solve
-        // a linear equation
+        // case, all vector components are constrained and we need to set all 
+        // of them to the corresponding boundary values
         case dim:
         {
           // assert that indeed only a single cell has contributed
