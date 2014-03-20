@@ -803,7 +803,9 @@ namespace PETScWrappers
 #else  // PETSC_HAVE_MUMPS
     Assert (false,
             ExcMessage ("Your PETSc installation does not include a copy of "
-                        "MUMPS package necessary for this solver"));
+                        "the MUMPS package necessary for this solver. You will need to configure "
+                        "PETSc so that it includes MUMPS, recompile it, and then re-configure "
+                        "and recompile deal.II as well."));
 
     // Cast to void to silence compiler warnings
     (void) A;
