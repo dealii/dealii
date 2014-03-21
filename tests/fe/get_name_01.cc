@@ -16,19 +16,8 @@
 
 
 
-// test get_name() (it is currently broken for FE_DGQArbitraryNodes)
-/*
-6264: An error occurred in line <833> of file </ssd/deal-trunk/deal.II/source/fe/fe_dgq.cc> in function
-6264:     std::string dealii::FE_DGQArbitraryNodes<dim, spacedim>::get_name() const [with int dim = 2, int spacedim = 2, std::string = std::basic_string<char>]
-6264: The violated condition was: 
-6264:     index == n_points
-6264: The name and call sequence of the exception was:
-6264:     ExcMessage ("Could not decode support points in one coordinate direction.")
-6264: Additional Information: 
-6264: Could not decode support points in one coordinate direction.
-6264: --------------------------------------------------------
-*/
-  
+// test get_name()
+ 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_q.h>
@@ -57,6 +46,10 @@ main()
 
   {
     FE_Q<2> fe(1);
+    test(fe);
+  }
+  {
+    FE_Q<2> fe(QGaussLobatto<1>(4));
     test(fe);
   }
   {

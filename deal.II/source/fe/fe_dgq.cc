@@ -343,9 +343,7 @@ get_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
   // source FE is also a
   // DGQ element
   typedef FiniteElement<dim, spacedim> FE;
-  AssertThrow ((x_source_fe.get_name().find ("FE_DGQ<") == 0)
-               ||
-               (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
+  AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented() );
 
   // ok, source is a Q element, so
@@ -432,9 +430,7 @@ get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   typedef FiniteElement<dim,spacedim> FE;
-  AssertThrow ((x_source_fe.get_name().find ("FE_DGQ<") == 0)
-               ||
-               (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
+  AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
 
   Assert (interpolation_matrix.m() == 0,
@@ -461,9 +457,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_f
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   typedef FiniteElement<dim, spacedim> FE;
-  AssertThrow ((x_source_fe.get_name().find ("FE_DGQ<") == 0)
-               ||
-               (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
+  AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
 
   Assert (interpolation_matrix.m() == 0,
@@ -804,59 +798,39 @@ template <int dim, int spacedim>
 std::string
 FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
 {
-  // note that the
-  // FETools::get_fe_from_name
-  // function does not work for
-  // FE_DGQArbitraryNodes since
-  // there is no initialization by
-  // a degree value.
+  // note that the FETools::get_fe_from_name function does not work for
+  // FE_DGQArbitraryNodes since there is no initialization by a degree value.
   std::ostringstream namebuf;
+  bool equidistant = true;
+  std::vector<double> points(this->degree+1);
 
-  bool type = true;
-  const unsigned int n_points = this->degree +1;
-  std::vector<double> points(n_points);
-  const unsigned int dofs_per_cell = this->dofs_per_cell;
-  const std::vector<Point<dim> > &unit_support_points = this->unit_support_points;
-  unsigned int index = 0;
+  std::vector<unsigned int> lexicographic = this->poly_space.get_numbering_inverse();
+  for (unsigned int j=0; j<=this->degree; j++)
+    points[j] = this->unit_support_points[lexicographic[j]][0];
 
-  // Decode the support points
-  // in one coordinate direction.
-  for (unsigned int j=0; j<dofs_per_cell; j++)
-    {
-      if ((dim>1) ? (unit_support_points[j](1)==0 &&
-                     ((dim>2) ? unit_support_points[j](2)==0: true)) : true)
-        {
-          points[index++] = unit_support_points[j](0);
-        }
-    }
-  Assert (index == n_points,
-          ExcMessage ("Could not decode support points in one coordinate direction."));
-
-  // Check whether the support
-  // points are equidistant.
-  for (unsigned int j=0; j<n_points; j++)
+  // Check whether the support points are equidistant.
+  for (unsigned int j=0; j<=this->degree; j++)
     if (std::fabs(points[j] - (double)j/this->degree) > 1e-15)
       {
-        type = false;
+        equidistant = false;
         break;
       }
 
-  if (type == true)
+  if (equidistant == true)
     namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
   else
     {
 
-      // Check whether the support
-      // points come from QGaussLobatto.
-      const QGaussLobatto<1> points_gl(n_points);
-      type = true;
-      for (unsigned int j=0; j<n_points; j++)
+      // Check whether the support points come from QGaussLobatto.
+      const QGaussLobatto<1> points_gl(this->degree+1);
+      bool gauss_lobatto = true;
+      for (unsigned int j=0; j<=this->degree; j++)
         if (points[j] != points_gl.point(j)(0))
           {
-            type = false;
+            gauss_lobatto = false;
             break;
           }
-      if (type == true)
+      if (gauss_lobatto == true)
         namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
       else
         namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QUnknownNodes(" << this->degree << "))";
@@ -871,15 +845,11 @@ template <int dim, int spacedim>
 FiniteElement<dim,spacedim> *
 FE_DGQArbitraryNodes<dim,spacedim>::clone() const
 {
-  // TODO[Prill] : There must be a better way
-  // to extract 1D quadrature points from the
-  // tensor product FE.
-
-  // Construct a dummy quadrature formula
-  // containing the FE's nodes:
+  // Construct a dummy quadrature formula containing the FE's nodes:
   std::vector<Point<1> > qpoints(this->degree+1);
+  std::vector<unsigned int> lexicographic = this->poly_space.get_numbering_inverse();
   for (unsigned int i=0; i<=this->degree; ++i)
-    qpoints[i] = Point<1>(this->unit_support_points[i][0]);
+    qpoints[i] = Point<1>(this->unit_support_points[lexicographic[i]][0]);
   Quadrature<1> pquadrature(qpoints);
 
   return new FE_DGQArbitraryNodes<dim,spacedim>(pquadrature);
