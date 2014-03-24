@@ -758,11 +758,11 @@ namespace parallel
     (void) grainsize;
 
 #  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-    f (begin, end);
+    return f (begin, end);
 #  else
     // work around a problem with MS VC++ where there is no const
     // operator() in Function
-    Function(f) (begin, end);
+    return Function(f) (begin, end);
 #  endif
 #else
     internal::ReductionOnSubranges<ResultType,Function>
