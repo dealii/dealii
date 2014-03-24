@@ -72,8 +72,8 @@ public:
   /**
    * Virtual destructor.  Does
    * nothing except making sure that
-   * the destructor of the derived
-   * class is called.
+   * the destructor of any derived
+   * class is called whenever a pointer-to-base-class object is destroyed.
    */
   virtual ~PointerMatrixBase ();
 
@@ -109,6 +109,7 @@ public:
                            const VECTOR &src) const = 0;
 };
 
+
 /**
  * A pointer to be used as a matrix.  This class stores a pointer to a
  * matrix and can be used as a matrix itself in iterative methods.
@@ -136,9 +137,15 @@ public:
   PointerMatrix (const MATRIX *M=0);
 
   /**
-   * Constructor. The name argument
-   * is used to identify the
-   * SmartPointer for this object.
+   * Constructor.
+   *
+   * This class internally stores a pointer to a matrix via a SmartPointer
+   * object. The SmartPointer class allows to associate a name with the
+   * object pointed to that identifies the object that has the pointer,
+   * in order to identify objects that still refer to the object pointed to.
+   * The @p name argument to this function
+   * is used to this end, i.e., you can in essence assign a name to
+   * the current PointerMatrix object.
    */
   PointerMatrix(const char *name);
 
@@ -146,10 +153,15 @@ public:
    * Constructor. <tt>M</tt> points
    * to a matrix which must live
    * longer than the
-   * PointerMatrix. The name
-   * argument is used to identify
-   * the SmartPointer for this
-   * object.
+   * PointerMatrix.
+   *
+   * This class internally stores a pointer to a matrix via a SmartPointer
+   * object. The SmartPointer class allows to associate a name with the
+   * object pointed to that identifies the object that has the pointer,
+   * in order to identify objects that still refer to the object pointed to.
+   * The @p name argument to this function
+   * is used to this end, i.e., you can in essence assign a name to
+   * the current PointerMatrix object.
    */
   PointerMatrix(const MATRIX *M,
                 const char *name);
@@ -243,9 +255,15 @@ public:
 
   /**
    * Constructor not using a
-   * matrix. The name argument is
-   * used to identify the
-   * SmartPointer for this object.
+   * matrix.
+   *
+   * This class internally stores a pointer to a matrix via a SmartPointer
+   * object. The SmartPointer class allows to associate a name with the
+   * object pointed to that identifies the object that has the pointer,
+   * in order to identify objects that still refer to the object pointed to.
+   * The @p name argument to this function
+   * is used to this end, i.e., you can in essence assign a name to
+   * the current PointerMatrix object.
    */
   PointerMatrixAux(VectorMemory<VECTOR> *mem,
                    const char *name);
@@ -254,10 +272,15 @@ public:
    * Constructor. <tt>M</tt> points
    * to a matrix which must live
    * longer than the
-   * PointerMatrixAux. The name
-   * argument is used to identify
-   * the SmartPointer for this
-   * object.
+   * PointerMatrixAux.
+   *
+   * This class internally stores a pointer to a matrix via a SmartPointer
+   * object. The SmartPointer class allows to associate a name with the
+   * object pointed to that identifies the object that has the pointer,
+   * in order to identify objects that still refer to the object pointed to.
+   * The @p name argument to this function
+   * is used to this end, i.e., you can in essence assign a name to
+   * the current PointerMatrix object.
    */
   PointerMatrixAux(VectorMemory<VECTOR> *mem,
                    const MATRIX *M,
@@ -361,9 +384,15 @@ public:
   PointerMatrixVector (const Vector<number> *M=0);
 
   /**
-   * Constructor. The name argument
-   * is used to identify the
-   * SmartPointer for this object.
+   * Constructor.
+   *
+   * This class internally stores a pointer to a matrix via a SmartPointer
+   * object. The SmartPointer class allows to associate a name with the
+   * object pointed to that identifies the object that has the pointer,
+   * in order to identify objects that still refer to the object pointed to.
+   * The @p name argument to this function
+   * is used to this end, i.e., you can in essence assign a name to
+   * the current PointerMatrix object.
    */
   PointerMatrixVector (const char *name);
 
@@ -371,10 +400,15 @@ public:
    * Constructor. <tt>M</tt> points
    * to a matrix which must live
    * longer than the
-   * PointerMatrix. The name
-   * argument is used to identify
-   * the SmartPointer for this
-   * object.
+   * PointerMatrix.
+   *
+   * This class internally stores a pointer to a matrix via a SmartPointer
+   * object. The SmartPointer class allows to associate a name with the
+   * object pointed to that identifies the object that has the pointer,
+   * in order to identify objects that still refer to the object pointed to.
+   * The @p name argument to this function
+   * is used to this end, i.e., you can in essence assign a name to
+   * the current PointerMatrix object.
    */
   PointerMatrixVector (const Vector<number> *M,
                        const char *name);
