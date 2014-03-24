@@ -681,7 +681,7 @@ namespace GridGenerator
                          Triangulation<3,3>        &result);
 
   /**
-   * This function transformes the @p Triangulation @p tria smoothly to a
+   * This function transforms the @p Triangulation @p tria smoothly to a
    * domain that is described by the boundary points in the map @p
    * new_points. This map maps the point indices to the boundary points in the
    * transformed domain.
