@@ -56,7 +56,7 @@ inconvenience this causes.
   longer supported. Comparing for equality is done using '==' instead of '='.
   <br>
   (Timo Heister, 2014/02/10)
-  </li>  
+  </li>
 
   <li> Changed: The various classes generating graphical output, such
   as DataOut or DataOutStack, are all derived from a common interface
@@ -91,10 +91,10 @@ inconvenience this causes.
 
 <ol>
   <li> Changed: The functionparser library bundled with deal.II got replaced
-  by the muparser library.  
+  by the muparser library.
   <br>
   (Timo Heister, 2014/02/10)
-  </li>  
+  </li>
 
   <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
   on non-active cells. However, this made no sense: Since degrees of
@@ -148,6 +148,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: GridTools::laplace_transform had previously announced in
+  the documentation that one can also set the location of interior points,
+  but this was not in fact what was implemented. This has now been fixed:
+  the code can now do that.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2014/03/23)
+  </li>
+
   <li> Improved: Inhomogeneous tangential and normal flow constraints can
        now be treated via VectorTools::compute_nonzero_normal_flux_constraints
        and VectorTools::compute_nonzero_tangential_flux_constraints.
@@ -174,7 +182,7 @@ inconvenience this causes.
   <br>
   (Markus B&uuml;rg, 2014/03/10)
   </li>
-  
+
   <li> Fixed: ParameterHandler will no longer output an error if the file
   to be read ends with "end" without a newline.
   <br>

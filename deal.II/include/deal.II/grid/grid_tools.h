@@ -236,8 +236,8 @@ namespace GridTools
                Triangulation<2> &triangulation);
 
   /**
-   * Transform the given triangulation smoothly to a different domain where
-   * each of the vertices at the boundary of the triangulation is mapped to
+   * Transform the given triangulation smoothly to a different domain where,
+   * typically, each of the vertices at the boundary of the triangulation is mapped to
    * the corresponding points in the @p new_points map.
    *
    * The way this function works is that it solves a Laplace equation for each
