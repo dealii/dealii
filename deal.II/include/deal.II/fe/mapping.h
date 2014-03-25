@@ -22,7 +22,6 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_update_flags.h>
 
 #include <cmath>

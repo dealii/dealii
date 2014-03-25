@@ -23,7 +23,7 @@
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/block_mask.h>
-
+#include <deal.II/fe/mapping.h>
 
 DEAL_II_NAMESPACE_OPEN
 
