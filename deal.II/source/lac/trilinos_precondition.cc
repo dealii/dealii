@@ -534,6 +534,12 @@ namespace TrilinosWrappers
   {}
 
 
+  PreconditionAMG::~PreconditionAMG()
+  {
+    preconditioner.reset();
+    trilinos_matrix.reset();
+  }
+
 
   void
   PreconditionAMG:: initialize (const SparseMatrix   &matrix,
