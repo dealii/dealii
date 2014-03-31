@@ -34,6 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 template<typename number> class Vector;
 template<typename number> class BlockVector;
 template<typename number> class FullMatrix;
+template<typename number> class SparseMatrix;
 
 
 /**
@@ -70,6 +71,7 @@ public:
    */
   explicit LAPACKFullMatrix (const size_type n = 0);
 
+
   /**
    * Constructor. Initialize the matrix as a rectangular matrix.
    */
@@ -95,13 +97,22 @@ public:
   operator = (const LAPACKFullMatrix<number> &);
 
   /**
-   * Assignment operator for a regular FullMatrix. Note that since LAPACK
-   * expects matrices in transposed order, this transposition is included
-   * here.
+   * Assignment operator from a regular FullMatrix. @note Since LAPACK
+   * expects matrices in transposed order, this transposition is
+   * included here.
    */
   template <typename number2>
   LAPACKFullMatrix<number> &
   operator = (const FullMatrix<number2> &);
+
+  /**
+   * Assignment operator from a regular SparseMatrix. @note Since
+   * LAPACK expects matrices in transposed order, this transposition
+   * is included here.
+   */
+  template <typename number2>
+  LAPACKFullMatrix<number> &
+  operator = (const SparseMatrix<number2> &);
 
   /**
    * This operator assigns a scalar to a matrix. To avoid confusion with
@@ -544,6 +555,10 @@ public:
                         const double        threshold   = 0.) const;
 
 private:
+  /**
+   * n_rows
+   */
+
   /**
    * Since LAPACK operations notoriously change the meaning of the matrix
    * entries, we record the current state after the last operation here.

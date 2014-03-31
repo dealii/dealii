@@ -19,6 +19,7 @@
 #include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
@@ -30,32 +31,28 @@ DEAL_II_NAMESPACE_OPEN
 using namespace LAPACKSupport;
 
 template <typename number>
-LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type n)
+LAPACKFullMatrix<number>::LAPACKFullMatrix (const size_type n)
   :
   TransposeTable<number> (n,n),
-  state(matrix)
+  state (matrix)
 {}
 
 
-
 template <typename number>
-LAPACKFullMatrix<number>::LAPACKFullMatrix(
-  const size_type m,
-  const size_type n)
+LAPACKFullMatrix<number>::LAPACKFullMatrix (const size_type m,
+					    const size_type n)
   :
   TransposeTable<number> (m,n),
-  state(matrix)
+  state (matrix)
 {}
-
 
 
 template <typename number>
-LAPACKFullMatrix<number>::LAPACKFullMatrix(const LAPACKFullMatrix &M)
+LAPACKFullMatrix<number>::LAPACKFullMatrix (const LAPACKFullMatrix &M)
   :
   TransposeTable<number> (M),
-  state(matrix)
+  state (matrix)
 {}
-
 
 
 template <typename number>
@@ -66,7 +63,6 @@ LAPACKFullMatrix<number>::operator = (const LAPACKFullMatrix<number> &M)
   state = LAPACKSupport::matrix;
   return *this;
 }
-
 
 
 template <typename number>
@@ -85,6 +81,21 @@ LAPACKFullMatrix<number>::operator = (const FullMatrix<number2> &M)
 }
 
 
+template <typename number>
+template <typename number2>
+LAPACKFullMatrix<number> &
+LAPACKFullMatrix<number>::operator = (const SparseMatrix<number2> &M)
+{
+  Assert (this->n_rows() == M.n(), ExcDimensionMismatch(this->n_rows(), M.n()));
+  Assert (this->n_cols() == M.m(), ExcDimensionMismatch(this->n_cols(), M.m()));
+  for (size_type i=0; i<this->n_rows(); ++i)
+    for (size_type j=0; j<this->n_cols(); ++j)
+      (*this)(i,j) = M.el(i,j);
+
+  state = LAPACKSupport::matrix;
+  return *this;
+}
+
 
 template <typename number>
 LAPACKFullMatrix<number> &
@@ -98,7 +109,6 @@ LAPACKFullMatrix<number>::operator = (const double d)
   state = LAPACKSupport::matrix;
   return *this;
 }
-
 
 
 template <typename number>
@@ -157,7 +167,6 @@ LAPACKFullMatrix<number>::vmult (
       Assert (false, ExcState(state));
     }
 }
-
 
 
 template <typename number>
@@ -220,7 +229,6 @@ LAPACKFullMatrix<number>::Tvmult (
 }
 
 
-
 template <typename number>
 void
 LAPACKFullMatrix<number>::mmult(LAPACKFullMatrix<number>       &C,
@@ -242,7 +250,6 @@ LAPACKFullMatrix<number>::mmult(LAPACKFullMatrix<number>       &C,
   gemm("N", "N", &mm, &nn, &kk, &alpha, &this->values[0], &mm, &B.values[0],
        &kk, &beta, &C.values[0], &mm);
 }
-
 
 
 template <typename number>
@@ -293,7 +300,6 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number>       &C,
 }
 
 
-
 template <typename number>
 void
 LAPACKFullMatrix<number>::Tmmult(FullMatrix<number>             &C,
@@ -316,7 +322,6 @@ LAPACKFullMatrix<number>::Tmmult(FullMatrix<number>             &C,
   gemm("T", "N", &nn, &mm, &kk, &alpha, &B.values[0], &kk, &this->values[0],
        &kk, &beta, &C(0,0), &nn);
 }
-
 
 
 template <typename number>
@@ -367,7 +372,6 @@ LAPACKFullMatrix<number>::mTmult(FullMatrix<number>             &C,
 }
 
 
-
 template <typename number>
 void
 LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number>       &C,
@@ -389,7 +393,6 @@ LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number>       &C,
   gemm("T", "T", &mm, &nn, &kk, &alpha, &this->values[0], &kk, &B.values[0],
        &nn, &beta, &C.values[0], &mm);
 }
-
 
 
 template <typename number>
@@ -416,7 +419,6 @@ LAPACKFullMatrix<number>::TmTmult(FullMatrix<number>             &C,
 }
 
 
-
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_lu_factorization()
@@ -434,7 +436,6 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
 
   state = lu;
 }
-
 
 
 template <typename number>
@@ -487,7 +488,6 @@ LAPACKFullMatrix<number>::compute_svd()
 }
 
 
-
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
@@ -507,7 +507,6 @@ LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
     }
   state = LAPACKSupport::inverse_svd;
 }
-
 
 
 template <typename number>
@@ -542,7 +541,6 @@ LAPACKFullMatrix<number>::invert()
 }
 
 
-
 template <typename number>
 void
 LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
@@ -563,7 +561,6 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
 
   AssertThrow(info == 0, ExcInternalError());
 }
-
 
 
 template <typename number>
@@ -588,12 +585,10 @@ LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
 }
 
 
-
 template <typename number>
 void
-LAPACKFullMatrix<number>::compute_eigenvalues(
-  const bool right,
-  const bool left)
+LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
+					      const bool left)
 {
   Assert(state == matrix, ExcState(state));
   const int nn = this->n_cols();
@@ -662,12 +657,11 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
-  const number lower_bound,
-  const number upper_bound,
-  const number abs_accuracy,
-  Vector<number> &eigenvalues,
-  FullMatrix<number> &eigenvectors)
+LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lower_bound,
+							const number        upper_bound,
+							const number        abs_accuracy,
+							Vector<number>     &eigenvalues,
+							FullMatrix<number> &eigenvectors)
 {
   Assert(state == matrix, ExcState(state));
   const int nn = (this->n_cols() > 0 ? this->n_cols() : 1);
@@ -967,6 +961,7 @@ LAPACKFullMatrix<number>::Tvmult_add (
 {
   Tvmult(w, v, true);
 }
+
 
 template <typename number>
 void
