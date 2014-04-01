@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,6 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/exceptions.h>
-// Included for VectorOperation
 #include <deal.II/lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
