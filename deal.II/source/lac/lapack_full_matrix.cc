@@ -744,7 +744,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
       size_type col_begin(i*nn);
       for (size_type j=0; j < static_cast<size_type> (nn); ++j)
         {
-          eigenvectors(j,i) = values_eigenvectors[col_begin+j];
+          eigenvectors(i,j) = values_eigenvectors[col_begin+j];
         }
     }
 
