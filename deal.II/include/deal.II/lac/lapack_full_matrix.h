@@ -133,13 +133,13 @@ public:
 
   /**
    * Return the dimension of the range space. @note The matrix is of
-   * dimension \f$m \times n\f$.
+   * dimension $m \times n$.
    */
   unsigned int m () const;
 
   /**
    * Return the number of the range space. @note The matrix is of
-   * dimension \f$m \times n\f$.
+   * dimension $m \times n$.
    */
   unsigned int n () const;
 
@@ -469,7 +469,7 @@ public:
 						  Vector<number>               &eigenvalues,
 						  std::vector<Vector<number> > &eigenvectors,
 						  const int                     itype = 1);
-  
+
   /**
    * Same as the other compute_generalized_eigenvalues_symmetric function
    * except that all eigenvalues are computed and the tolerance is set
@@ -661,16 +661,16 @@ private:
 /*---------------------- Inline functions -----------------------------------*/
 
 template <typename number>
-inline 
-unsigned int 
+inline
+unsigned int
 LAPACKFullMatrix<number>::m () const
 {
   return this->n_rows ();
 }
 
 template <typename number>
-inline 
-unsigned int 
+inline
+unsigned int
 LAPACKFullMatrix<number>::n () const
 {
   return this->n_cols ();
