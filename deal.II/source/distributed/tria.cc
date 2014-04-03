@@ -3916,6 +3916,15 @@ namespace parallel
       return a;
     }
 
+    template <>
+    void
+    Triangulation<1,1>::
+    fill_vertices_with_ghost_neighbors
+    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+     &vertices_with_ghost_neighbors)
+    {
+      Assert (false, ExcNotImplemented());
+    }
 
     template <>
     Triangulation<1,2>::Triangulation (MPI_Comm)
@@ -3964,6 +3973,16 @@ namespace parallel
     Triangulation<1,2>::get_communicator () const
     {
       return MPI_COMM_WORLD;
+    }
+ 
+    template <>
+    void
+    Triangulation<1,2>::
+    fill_vertices_with_ghost_neighbors
+    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+     &vertices_with_ghost_neighbors)
+    {
+      Assert (false, ExcNotImplemented());
     }
 
 
@@ -4014,6 +4033,16 @@ namespace parallel
     Triangulation<1,3>::get_communicator () const
     {
       return MPI_COMM_WORLD;
+    }
+ 
+    template <>
+    void
+    Triangulation<1,3>::
+    fill_vertices_with_ghost_neighbors
+    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+     &vertices_with_ghost_neighbors)
+    {
+      Assert (false, ExcNotImplemented());
     }
   }
 }
