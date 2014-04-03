@@ -3556,15 +3556,15 @@ namespace parallel
       switch (dim)
       {
       case 2:
-        p4est_iterate (reinterpret_cast<internal::p4est::types<2>::forest*>(this->parallel_forest),
-                       reinterpret_cast<internal::p4est::types<2>::ghost*>(this->parallel_ghost),
+        p4est_iterate (reinterpret_cast<dealii::internal::p4est::types<2>::forest*>(this->parallel_forest),
+                       reinterpret_cast<dealii::internal::p4est::types<2>::ghost*>(this->parallel_ghost),
                        static_cast<void *>(&fg),
                        NULL, find_ghosts_face<2,spacedim>, find_ghosts_corner<2,spacedim>);
         break;
 
       case 3:
-        p8est_iterate (reinterpret_cast<internal::p4est::types<3>::forest*>(this->parallel_forest),
-                       reinterpret_cast<internal::p4est::types<3>::ghost*>(this->parallel_ghost),
+        p8est_iterate (reinterpret_cast<dealii::internal::p4est::types<3>::forest*>(this->parallel_forest),
+                       reinterpret_cast<dealii::internal::p4est::types<3>::ghost*>(this->parallel_ghost),
                        static_cast<void *>(&fg),
                        NULL, find_ghosts_face<3,spacedim>, find_ghosts_edge<3,spacedim>, find_ghosts_corner<3,spacedim>);
         break;
