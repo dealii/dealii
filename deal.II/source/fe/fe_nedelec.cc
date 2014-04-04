@@ -5466,14 +5466,18 @@ const
 
 
 template <int dim>
-Table<2,bool>
+std::pair<Table<2,bool>, std::vector<unsigned int> >
 FE_Nedelec<dim>::get_constant_modes() const
 {
   Table<2,bool> constant_modes(dim, this->dofs_per_cell);
   for (unsigned int d=0; d<dim; ++d)
     for (unsigned int i=0; i<this->dofs_per_cell; ++i)
       constant_modes(d,i) = true;
-  return constant_modes;
+  std::vector<unsigned int> components;
+  for (unsigned int d=0; d<dim; ++d)
+    components.push_back(d);
+  return std::pair<Table<2,bool>, std::vector<unsigned int> >
+    (constant_modes, components);
 }
 
 

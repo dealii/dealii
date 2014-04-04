@@ -289,13 +289,14 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 
 
 template <int dim, int spacedim>
-Table<2,bool>
+std::pair<Table<2,bool>, std::vector<unsigned int> >
 FE_FaceQ<dim,spacedim>::get_constant_modes () const
 {
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     constant_modes(0,i) = true;
-  return constant_modes;
+  return std::pair<Table<2,bool>, std::vector<unsigned int> >
+    (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 
@@ -416,13 +417,14 @@ compare_for_face_domination (const FiniteElement<1,spacedim> &fe_other) const
 
 
 template <int spacedim>
-Table<2,bool>
+std::pair<Table<2,bool>, std::vector<unsigned int> >
 FE_FaceQ<1,spacedim>::get_constant_modes () const
 {
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     constant_modes(0,i) = true;
-  return constant_modes;
+  return std::pair<Table<2,bool>, std::vector<unsigned int> >
+    (constant_modes, std::vector<unsigned int>(1,0));
 }
 
 
@@ -780,13 +782,14 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
 
 
 template <int dim, int spacedim>
-Table<2,bool>
+std::pair<Table<2,bool>, std::vector<unsigned int> >
 FE_FaceP<dim,spacedim>::get_constant_modes () const
 {
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     constant_modes(0, face*this->dofs_per_face) = true;
-  return constant_modes;
+  return std::pair<Table<2,bool>, std::vector<unsigned int> >
+    (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 

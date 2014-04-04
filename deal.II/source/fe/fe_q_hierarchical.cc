@@ -1862,7 +1862,7 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs (const unsigned int sub_degree) const
 
 
 template <int dim>
-Table<2,bool>
+std::pair<Table<2,bool>, std::vector<unsigned int> >
 FE_Q_Hierarchical<dim>::get_constant_modes () const
 {
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
@@ -1870,7 +1870,8 @@ FE_Q_Hierarchical<dim>::get_constant_modes () const
     constant_modes(0,i) = true;
   for (unsigned int i=GeometryInfo<dim>::vertices_per_cell; i<this->dofs_per_cell; ++i)
     constant_modes(0,i) = false;
-  return constant_modes;
+  return std::pair<Table<2,bool>, std::vector<unsigned int> >
+    (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 
