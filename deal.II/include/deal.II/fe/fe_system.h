@@ -476,7 +476,8 @@ public:
    * table contains a basis representation of the constant function 1 on the
    * element. Concatenates the constant modes of each base element.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
   /**
    * @name Functions to support hp

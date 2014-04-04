@@ -199,7 +199,8 @@ public:
    * Returns a list of constant modes of the element. For this element, the
    * list consists of true arguments for all components.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
   /**
    * @name Functions to support hp

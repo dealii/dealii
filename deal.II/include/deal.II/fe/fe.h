@@ -1314,13 +1314,22 @@ public:
   block_mask (const ComponentMask &component_mask) const;
 
   /**
-   * Returns a list of constant modes of the element. The returns table has as
-   * many rows as there are components in the element and dofs_per_cell
-   * columns. To each component of the finite element, the row in the returned
-   * table contains a basis representation of the constant function 1 on the
-   * element.
+   * Returns a list of constant modes of the element. The number of rows in
+   * the resulting table depends on the elements in use. For standard
+   * elements, the table has as many rows as there are components in the
+   * element and dofs_per_cell columns. To each component of the finite
+   * element, the row in the returned table contains a basis representation of
+   * the constant function 1 on the element. However, there are some scalar
+   * elements where there is more than one constant mode, e.g. the element
+   * FE_Q_DG0.
+   *
+   * In order to match the constant modes to the actual components in the
+   * element, the returned data structure also returns a vector with as many
+   * components as there are constant modes on the element that contains the
+   * component number.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>,std::vector<unsigned int> >
+  get_constant_modes () const;
 
   //@}
 

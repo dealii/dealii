@@ -21,6 +21,7 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_face.h>
+#include <deal.II/fe/fe_q_dg0.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_system.h>
 #include <fstream>
@@ -30,9 +31,9 @@
 template<int dim>
 void print_constant_modes(const FiniteElement<dim> &fe)
 {
-  Table<2,bool> constant_modes = fe.get_constant_modes();
   deallog << "Testing " << fe.get_name() << std::endl;
 
+  Table<2,bool> constant_modes = fe.get_constant_modes().first;
   for (unsigned int r=0; r<constant_modes.n_rows(); ++r)
     {
       for (unsigned int c=0; c<constant_modes.n_cols(); ++c)
@@ -56,6 +57,9 @@ void test()
   print_constant_modes(FE_FaceP<dim>(1));
   print_constant_modes(FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(2), 1));
   print_constant_modes(FESystem<dim>(FE_DGP<dim>(1), 1, FE_Q_iso_Q1<dim>(2), 1));
+  print_constant_modes(FE_Q_DG0<dim>(1));
+  print_constant_modes(FESystem<dim>(FE_Q_DG0<dim>(2), 1, FE_Q<dim>(1), 2));
+  print_constant_modes(FESystem<dim>(FE_Q<dim>(1), 2, FE_Q_DG0<dim>(1), 2));
 }
 
 template <>

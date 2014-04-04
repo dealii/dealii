@@ -128,7 +128,8 @@ public:
    * Returns a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
 private:
   /**
@@ -230,7 +231,8 @@ public:
    * Returns a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
 protected:
   virtual
@@ -437,9 +439,10 @@ public:
    * Returns a list of constant modes of the element. For this element, the
    * first entry on each face is true, all other are false (as the constant
    * function is represented by the first base function of Legendre
-   * polynomials.
+   * polynomials).
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
 private:
   /**
