@@ -1,0 +1,10 @@
+
+DEAL::shift(sigma)
+DEAL::Init ShiftedMatrix with sigma=0
+DEAL::Multiplying with all ones vector
+DEAL::Dimensions of result vector verified
+DEAL::5.0000	9.0000	
+DEAL::Setting new sigma value
+DEAL::Multiplying with all ones vector
+DEAL::Dimensions of result vector verified
+DEAL::7.0000	11.0000	
