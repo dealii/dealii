@@ -3007,8 +3007,9 @@ FESystem<dim,spacedim>::get_constant_modes () const
           Table<2,bool> new_constant_modes(comp+base_table.first.n_rows()*
                                            element_multiplicity,
                                            constant_modes.n_cols());
-          std::copy(&constant_modes(0,0), &constant_modes(0,0)+this->dofs_per_cell*comp,
-                    &new_constant_modes(0,0));
+          for (unsigned int r=0; r<comp; ++r)
+            for (unsigned int c=0; c<this->dofs_per_cell; ++c)
+              new_constant_modes(r,c) = constant_modes(r,c);
           constant_modes.swap(new_constant_modes);
         }
 
