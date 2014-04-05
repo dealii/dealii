@@ -2954,6 +2954,18 @@ CellAccessor<dim,spacedim>::is_artificial () const
 
 template <int dim, int spacedim>
 inline
+types::subdomain_id
+CellAccessor<dim, spacedim>::subdomain_id () const
+{
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
+  return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
+}
+
+
+
+template <int dim, int spacedim>
+inline
 unsigned int
 CellAccessor<dim,spacedim>::neighbor_face_no (const unsigned int neighbor) const
 {

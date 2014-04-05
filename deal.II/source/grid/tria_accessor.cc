@@ -1331,16 +1331,6 @@ void CellAccessor<dim, spacedim>::recursively_set_material_id (const types::mate
 
 
 template <int dim, int spacedim>
-types::subdomain_id CellAccessor<dim, spacedim>::subdomain_id () const
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
-  return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
-}
-
-
-
-template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 {
