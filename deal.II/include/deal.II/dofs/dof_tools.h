@@ -1656,18 +1656,23 @@ namespace DoFTools
    * works on algebraic properties of the respective matrix, it has no
    * chance to detect whether the matrix comes from a scalar or a
    * vector valued problem. However, a near null space supplies
-   * exactly the needed information about these components.  The null
-   * space will consist of as many vectors as there are true arguments
-   * in <tt>component_mask</tt> (see @ref GlossComponentMask), each of
-   * which will be one in one vector component and zero in all
-   * others. We store this object in a vector of vectors, where the
-   * outer vector is of the size of the number of selected components,
-   * and each inner vector has as many components as there are
-   * (locally owned) degrees of freedom in the selected
-   * components. Note that any matrix associated with this null space
+   * exactly the needed information about the components placement of vector
+   * components within the matrix. The null space (or rather, the constant
+   * modes) is provided by the finite element underlying the given DoFHandler
+   * and for most elements, the null space will consist of as many vectors as
+   * there are true arguments in <tt>component_mask</tt> (see @ref
+   * GlossComponentMask), each of which will be one in one vector component
+   * and zero in all others. However, the representation of the constant
+   * function for e.g. FE_DGP is different (the first component on each
+   * element one, all other components zero), and some scalar elements may
+   * even have two constant modes (FE_Q_DG0). Therefore, we store this object
+   * in a vector of vectors, where the outer vector contains the collection of
+   * the actual constant modes on the DoFHandler. Each inner vector has as
+   * many components as there are (locally owned) degrees of freedom in the
+   * selected components. Note that any matrix associated with this null space
    * must have been constructed using the same <tt>component_mask</tt>
-   * argument, since the numbering of DoFs is done relative to the
-   * selected dofs, not to all dofs.
+   * argument, since the numbering of DoFs is done relative to the selected
+   * dofs, not to all dofs.
    *
    * The main reason for this program is the use of the null space
    * with the AMG preconditioner.
