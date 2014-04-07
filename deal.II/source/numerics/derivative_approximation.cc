@@ -1072,16 +1072,16 @@ namespace DerivativeApproximation
   }
 
 
-  template <int dim, template <int, int> class DH, class InputVector, int order, int spacedim>
+  template <class DH, class InputVector, int order>
   void
-  approximate_derivative_tensor (const Mapping<dim,spacedim>                           &mapping,
-                                 const DH<dim,spacedim>                                &dof,
+  approximate_derivative_tensor (const Mapping<DH::dimension,DH::space_dimension> &mapping,
+                                 const DH                                     &dof,
                                  const InputVector                            &solution,
-                                 const typename DH<dim,spacedim>::active_cell_iterator &cell,
-                                 Tensor<order,dim>                            &derivative,
-                                 const unsigned int                            component)
+                                 const typename DH::active_cell_iterator      &cell,
+                                 Tensor<order,DH::dimension>                  &derivative,
+                                 const unsigned int                            component = 0)
   {
-      internal::approximate_cell<typename internal::DerivativeSelector<order,dim>::DerivDescr,dim,DH,InputVector>
+      internal::approximate_cell<typename internal::DerivativeSelector<order,DH::dimension>::DerivDescr>
       (mapping,
           dof,
           solution,
@@ -1092,17 +1092,17 @@ namespace DerivativeApproximation
 
 
 
-  template <int dim, template <int, int> class DH, class InputVector, int order, int spacedim>
+  template <class DH, class InputVector, int order>
   void
-  approximate_derivative_tensor (const DH<dim,spacedim>                                &dof,
+  approximate_derivative_tensor (const DH                                     &dof,
                                  const InputVector                            &solution,
-                                 const typename DH<dim,spacedim>::active_cell_iterator &cell,
-                                 Tensor<order,dim>                            &derivative,
-                                 const unsigned int                            component)
+                                 const typename DH::active_cell_iterator      &cell,
+                                 Tensor<order,DH::dimension>                  &derivative,
+                                 const unsigned int                            component = 0)
   {
       // just call the respective function with Q1 mapping
-      approximate_derivative_tensor<dim,DH,InputVector,order,spacedim>
-      (StaticMappingQ1<dim>::mapping,
+      approximate_derivative_tensor<DH,InputVector,order>
+      (StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
           dof,
           solution,
           cell,
