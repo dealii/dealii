@@ -3425,7 +3425,10 @@ namespace GridGenerator
     // and create the triangulation
     SubCellData subcell_data;
     std::vector<unsigned int> considered_vertices;
-    GridTools::delete_duplicated_vertices (vertices, cells, subcell_data, considered_vertices);
+    GridTools::delete_duplicated_vertices (vertices, cells,
+					   subcell_data,
+					   considered_vertices);
+
     result.clear ();
     result.create_triangulation (vertices, cells, subcell_data);
   }
@@ -3554,7 +3557,8 @@ namespace GridGenerator
 // Implementation for 1D only
   template <>
   void laplace_transformation (Triangulation<1> &,
-                               const std::map<unsigned int,Point<1> > &)
+                               const std::map<unsigned int,Point<1> > &,
+                               const Function<1> *)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -3563,7 +3567,8 @@ namespace GridGenerator
 // Implementation for dimensions except 1
   template <int dim>
   void laplace_transformation (Triangulation<dim> &tria,
-                               const std::map<unsigned int,Point<dim> > &new_points)
+                               const std::map<unsigned int,Point<dim> > &new_points,
+                               const Function<dim> *coefficient)
   {
     // first provide everything that is
     // needed for solving a Laplace
@@ -3587,7 +3592,7 @@ namespace GridGenerator
 
     QGauss<dim> quadrature(4);
 
-    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S);
+    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S,coefficient);
 
     // set up the boundary values for
     // the laplace problem

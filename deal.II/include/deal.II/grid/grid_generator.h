@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/function.h>
 #include <deal.II/grid/tria.h>
 #include <map>
 
@@ -692,11 +693,21 @@ namespace GridGenerator
    *
    * In 1d, this function is not currently implemented.
    *
+   * An optional @p coefficient for the Laplace problem an be used to control the amount of
+   * mesh deformation in different parts of the domain.
+   * Larger values make cells less prone to deformation (effectively increasing their stiffness).
+   * The coefficient is evaluated in the coordinate system of the old,
+   * undeformed configuration of the triangulation as input, i.e., before
+   * the transformation is applied.
+   * Should this function be provided, sensible results can only be expected if
+   * all coefficients are positive.
+   *
    * @deprecated This function has been moved to GridTools::laplace_transform
    */
   template <int dim>
   void laplace_transformation (Triangulation<dim> &tria,
-                               const std::map<unsigned int,Point<dim> > &new_points) DEAL_II_DEPRECATED;
+                               const std::map<unsigned int,Point<dim> > &new_points,
+                               const Function<dim> *coefficient = 0) DEAL_II_DEPRECATED;
 
   /**
    * Exception

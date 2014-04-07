@@ -261,11 +261,20 @@ namespace GridTools
    * @param[in,out] tria The Triangulation object. This object is changed in-place,
    * i.e., the previous locations of vertices are overwritten.
    *
+   * @param[in] coefficient An optional coefficient for the Laplace problem.
+   * Larger values make cells less prone to deformation (effectively increasing their stiffness).
+   * The coefficient is evaluated in the coordinate system of the old,
+   * undeformed configuration of the triangulation as input, i.e., before
+   * the transformation is applied.
+   * Should this function be provided, sensible results can only be expected if
+   * all coefficients are positive.
+   *
    * @note This function is not currently implemented for the 1d case.
    */
   template <int dim>
   void laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
-                          Triangulation<dim> &tria);
+                          Triangulation<dim> &tria,
+                          const Function<dim> *coefficient = 0);
 
   /**
    * Scale the entire triangulation

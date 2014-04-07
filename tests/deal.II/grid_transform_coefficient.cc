@@ -14,9 +14,7 @@
 //
 // ---------------------------------------------------------------------
 
-
-// test the deformation of a circular annulus to a domain where the central
-// circle is displaced
+// like grid_transform, but use a spatially variable coefficient
 
 
 #include "../tests.h"
@@ -30,6 +28,18 @@
 
 #include <fstream>
 #include <iomanip>
+
+
+template <int dim>
+class Coefficient : public Function<dim>
+{
+public:
+  virtual double value (const Point<dim> &p,
+			const unsigned int) const
+    {
+      return (p[0]>0 ? 10 : 1);
+    }
+};
 
 
 int main ()
@@ -98,7 +108,8 @@ int main ()
           }
     }
 
-  GridGenerator::laplace_transformation (tria, new_points);
+  const Coefficient<dim> c;
+  GridGenerator::laplace_transformation (tria, new_points, &c);
   HyperBallBoundary<dim> inner_ball(n_center, n_radius);
   tria.set_boundary(1, inner_ball);
 

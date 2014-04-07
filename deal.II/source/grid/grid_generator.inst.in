@@ -92,7 +92,8 @@ namespace GridGenerator \{
 #if deal_II_dimension > 1
   template void
     laplace_transformation<deal_II_dimension> (Triangulation<deal_II_dimension> &,
-					       const std::map<unsigned int,Point<deal_II_dimension> > &);
+					       const std::map<unsigned int,Point<deal_II_dimension> > &,
+					       const Function<deal_II_dimension> *);
 #endif
   
 \}  
