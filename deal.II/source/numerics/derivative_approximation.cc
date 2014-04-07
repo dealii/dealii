@@ -1079,7 +1079,7 @@ namespace DerivativeApproximation
                                  const InputVector                            &solution,
                                  const typename DH::active_cell_iterator      &cell,
                                  Tensor<order,DH::dimension>                  &derivative,
-                                 const unsigned int                            component = 0)
+                                 const unsigned int                            component)
   {
       internal::approximate_cell<typename internal::DerivativeSelector<order,DH::dimension>::DerivDescr>
       (mapping,
@@ -1098,7 +1098,7 @@ namespace DerivativeApproximation
                                  const InputVector                            &solution,
                                  const typename DH::active_cell_iterator      &cell,
                                  Tensor<order,DH::dimension>                  &derivative,
-                                 const unsigned int                            component = 0)
+                                 const unsigned int                            component)
   {
       // just call the respective function with Q1 mapping
       approximate_derivative_tensor<DH,InputVector,order>
