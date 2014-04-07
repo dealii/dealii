@@ -3421,13 +3421,14 @@ namespace GridGenerator
         cells.push_back (this_cell);
       }
 
-    // throw out duplicated vertices from the two meshes
-    // and create the triangulation
+    // throw out duplicated vertices from the two meshes, reorder vertices as
+    // necessary and create the triangulation
     SubCellData subcell_data;
     std::vector<unsigned int> considered_vertices;
     GridTools::delete_duplicated_vertices (vertices, cells,
 					   subcell_data,
 					   considered_vertices);
+    GridReordering<dim,spacedim>::reorder_cells (cells);
 
     result.clear ();
     result.create_triangulation (vertices, cells, subcell_data);
