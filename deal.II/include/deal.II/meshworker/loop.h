@@ -308,8 +308,9 @@ namespace MeshWorker
                   // Now neighbor is on same level, double-check this:
                   Assert(cell->level()==neighbor->level(), ExcInternalError());
 
-                  // only do faces on same level from one side (unless
-                  // LoopControl says otherwise)
+                  // If we own both cells only do faces from one side (unless
+                  // LoopControl says otherwise). Here, we rely on cell comparison
+                  // that will look at cell->index().
                   if (own_cell && own_neighbor
                       && loop_control.own_faces == LoopControl::one
                       && (neighbor < cell))
@@ -321,13 +322,13 @@ namespace MeshWorker
                   if (!own_cell)
                     continue;
 
-                  // now only one processor assembles faces_to_ghost. This
-                  // logic is based on the subdomain id and is handled inside
-                  // operator<.
+                  // now only one processor assembles faces_to_ghost. We let the
+                  // processor with the smaller (level-)subdomain id assemble the
+                  // face.
                   if (own_cell && !own_neighbor
                       && loop_control.faces_to_ghost == LoopControl::one
-                      && (neighbor < cell))
-                    continue;
+                      && (neighbid < csid))
+                        continue;
 
                   const unsigned int neighbor_face_no = cell->neighbor_face_no(face_no);
                   Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
