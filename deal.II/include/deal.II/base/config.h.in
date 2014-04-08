@@ -235,7 +235,7 @@
  * Defined if there is no const operator() in the class type returned
  * by std::bind.
  */
-#cmakedefine DEAL_II_BOOST_BIND_NO_CONST_OP_PARENTHESES
+#cmakedefine DEAL_II_BIND_NO_CONST_OP_PARENTHESES
 
 /** Defined if the compiler incorrectly deduces a constexpr as not being a
  * constant integral expression under certain optimization (notably
