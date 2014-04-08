@@ -2980,22 +2980,6 @@ CellAccessor<dim,spacedim>::neighbor_face_no (const unsigned int neighbor) const
 }
 
 
-template <int dim, int spacedim>
-inline
-bool
-CellAccessor<dim,spacedim>::operator < (const CellAccessor<dim,spacedim> &other) const
-{
-  Assert (this->tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
-
-  if (level_subdomain_id() != other.level_subdomain_id())
-    return (level_subdomain_id() < other.level_subdomain_id());
-
-  if (active() && other.active() &&
-      (subdomain_id() != other.subdomain_id()))
-    return (subdomain_id() < other.subdomain_id());
-
-  return TriaAccessorBase<dim,dim,spacedim>::operator < (other);
-}
 
 
 

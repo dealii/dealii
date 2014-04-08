@@ -445,21 +445,13 @@ public:
   /**
    * Ordering relation for iterators.
    *
-   * This relation attempts a total ordering of cells. For lower
-   * dimensional objects on distributed meshes, we only attempt a
-   * partial ordering.
+   * This relation attempts a total ordering of cells.
    *
    * The relation is defined as follows:
    *
    * For objects of <tt>Accessor::structure_dimension <
    * Accessor::dimension</tt>, we simply compare the index of such an
-   * object. This consitutes an ordering of the elements of same
-   * dimension on a mesh on a single process. For a distributed mesh,
-   * the result of the ordering relation between faces across
-   * processes is not defined, but most likely irrelevant.
-   *
-   * For cells, there is a total ordering even in a
-   * distributed::parallel::Triangulation. The ordering is lexicographic
+   * object. The ordering is lexicographic
    * according to the following hierarchy (in the sense, that the next
    * test is only applied if the previous was inconclusive):
    *
@@ -468,11 +460,13 @@ public:
    * past-the-end iterators rank the same, thus false is returned in
    * that case.</li>
    *
-   * <li> The level subdomain id</li>
-   * <li> If both cells are active, the subdomain id.</li>
    * <li> The level of the cell.</li>
    * <li> The index of a cell inside the level.</li>
    * </ol>
+   *
+   * @Note: the ordering is not consistent between different processor in
+   * a parallel::distributed::Triangulation because we rely on index(),
+   * which is likely not the same.
    */
   bool operator < (const TriaRawIterator &) const;
 

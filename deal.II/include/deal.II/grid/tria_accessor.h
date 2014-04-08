@@ -2866,16 +2866,6 @@ public:
   bool active () const;
 
   /**
-   * Ordering of accessors. This function implements a total ordering
-   * of cells even on a parallel::distributed::Triangulation. This
-   * function first compares level_subdomain_id(). If these are equal,
-   * and both cells are active, it compares subdomain_id(). If this is
-   * inconclusive, TriaAccessorBase::operator < () is called.
-   */
-  bool operator < (const CellAccessor<dim, spacedim> &other) const;
-
-
-  /**
    * Return whether this cell is owned by the current processor
    * or is owned by another processor. The function always returns
    * true if applied to an object of type dealii::Triangulation,

@@ -148,6 +148,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+  <li> Changed: operator< for cell iterators no longer looks at
+  (level-)subdomain ids but only compares level() and index(). This makes the
+  ordering inconsistent between processes on a
+  parallel::distributed::Triangulation, but fixes the problem that the
+  ordering of cells changes under mesh refinement or other causes for changing
+  the subdomain id.
+  <br>
+  (Timo Heister, 2014/04/08)
+  </li>
+  
   <li> New: GridTools::laplace_transform() now takes an addition, optional
   parameter that indicates the "stiffness" of the mapping.
   <br>
