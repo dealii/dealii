@@ -341,7 +341,10 @@ namespace internal
       if (size == 0)
         return;
 
-      if (std_cxx1x::is_trivial<T>::value == true)
+      // do not use memset for long double because on some systems it does not
+      // completely fill its memory
+      if (std_cxx1x::is_trivial<T>::value == true &&
+          types_are_equal<T,long double>::value == false)
         {
           const unsigned char zero [sizeof(T)] = {};
           // cast element to (void*) to silence compiler warning for virtual
