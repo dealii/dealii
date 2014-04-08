@@ -2160,7 +2160,7 @@ TableBase<N,T>::reset_values ()
 {
   // use parallel set operation
   if (n_elements() != 0)
-    internal::AlignedVectorSet<T> (values.size(), T(),
+    dealii::internal::AlignedVectorSet<T> (values.size(), T(),
                                    values.begin());
 }
 
@@ -2172,7 +2172,7 @@ void
 TableBase<N,T>::fill (const T &value)
 {
   if (n_elements() != 0)
-    internal::AlignedVectorSet<T> (values.size(), value,
+    dealii::internal::AlignedVectorSet<T> (values.size(), value,
                                    values.begin());
 }
 
@@ -2206,7 +2206,7 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
   // not fast resize, zero out all values)
   values.resize_fast (new_size);
   if (!fast)
-    internal::AlignedVectorSet<T> (values.size(), T(),
+    dealii::internal::AlignedVectorSet<T> (values.size(), T(),
                                    values.begin());
 }
 
