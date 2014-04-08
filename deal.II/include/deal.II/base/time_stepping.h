@@ -43,7 +43,7 @@ namespace TimeStepping
    *   - Implicit methods:
    *     - BACKWARD_EULER: first order
    *     - IMPLICIT_MIDPOINT: second order
-   *     - CRANK_NICHOLSON: second order
+   *     - CRANK_NICOLSON: second order
    *     - SDIRK_TWO_STAGES: second order
    *   - Embedded explicit methods:
    *     - HEUN_EULER: second order
