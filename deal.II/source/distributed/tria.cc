@@ -3858,186 +3858,66 @@ namespace parallel
 
 
 
-    // TODO: again problems with specialization in only one template argument
-    template <>
-    Triangulation<1,1>::Triangulation (MPI_Comm)
+    template <int spacedim>
+    Triangulation<1,spacedim>::Triangulation (MPI_Comm)
     {
       Assert (false, ExcNotImplemented());
     }
 
 
-    template <>
-    Triangulation<1,1>::~Triangulation ()
+    template <int spacedim>
+    Triangulation<1,spacedim>::~Triangulation ()
     {
       Assert (false, ExcNotImplemented());
     }
 
 
 
-    template <>
+    template <int spacedim>
     types::subdomain_id
-    Triangulation<1,1>::locally_owned_subdomain () const
+    Triangulation<1,spacedim>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
       return 0;
     }
 
 
-    template <>
+    template <int spacedim>
     types::global_dof_index
-    Triangulation<1,1>::n_global_active_cells () const
+    Triangulation<1,spacedim>::n_global_active_cells () const
     {
       Assert (false, ExcNotImplemented());
       return 0;
     }
 
 
-    template <>
+    template <int spacedim>
     unsigned int
-    Triangulation<1,1>::n_global_levels () const
+    Triangulation<1,spacedim>::n_global_levels () const
     {
       Assert (false, ExcNotImplemented());
       return 0;
     }
 
 
-    template <>
+    template <int spacedim>
     MPI_Comm
-    Triangulation<1,1>::get_communicator () const
+    Triangulation<1,spacedim>::get_communicator () const
     {
       return MPI_COMM_WORLD;
     }
 
-    template <>
+    template <int spacedim>
     const std::vector<types::global_dof_index> &
-    Triangulation<1,1>::get_p4est_tree_to_coarse_cell_permutation() const
+    Triangulation<1,spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
     {
       static std::vector<types::global_dof_index> a;
       return a;
     }
 
-    template <>
+    template <int spacedim>
     void
-    Triangulation<1,1>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-    template <>
-    Triangulation<1,2>::Triangulation (MPI_Comm)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-    template <>
-    Triangulation<1,2>::~Triangulation ()
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-
-    template <>
-    types::subdomain_id
-    Triangulation<1,2>::locally_owned_subdomain () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    types::global_dof_index
-    Triangulation<1,2>::n_global_active_cells () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    unsigned int
-    Triangulation<1,2>::n_global_levels () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    MPI_Comm
-    Triangulation<1,2>::get_communicator () const
-    {
-      return MPI_COMM_WORLD;
-    }
- 
-    template <>
-    void
-    Triangulation<1,2>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-    template <>
-    Triangulation<1,3>::Triangulation (MPI_Comm)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-    template <>
-    Triangulation<1,3>::~Triangulation ()
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-
-    template <>
-    types::subdomain_id
-    Triangulation<1,3>::locally_owned_subdomain () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    types::global_dof_index
-    Triangulation<1,3>::n_global_active_cells () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    unsigned int
-    Triangulation<1,3>::n_global_levels () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    MPI_Comm
-    Triangulation<1,3>::get_communicator () const
-    {
-      return MPI_COMM_WORLD;
-    }
- 
-    template <>
-    void
-    Triangulation<1,3>::
+    Triangulation<1,spacedim>::
     fill_vertices_with_ghost_neighbors
     (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
      &vertices_with_ghost_neighbors)
