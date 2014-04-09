@@ -364,8 +364,9 @@ namespace internal
       if (size == 0)
         return;
 
-      // do not use memset for long double because on some systems it does not
-      // completely fill its memory
+      // do not use memcmp for long double because on some systems it does not
+      // completely fill its memory and may lead to false positives in
+      // e.g. valgrind
       if (std_cxx1x::is_trivial<T>::value == true &&
           types_are_equal<T,long double>::value == false)
         {
@@ -406,6 +407,7 @@ namespace internal
     mutable T *destination_;
     bool trivial_element;
   };
+
 } // end of namespace internal
 
 
@@ -793,8 +795,9 @@ inline
 typename AlignedVector<T>::size_type
 AlignedVector<T>::memory_consumption () const
 {
-  size_type memory = sizeof(this);
-  memory += sizeof(T) * capacity();
+  size_type memory = sizeof(*this);
+  for (const T* t = _data ; t != _end_data; ++t)
+    memory += dealii::MemoryConsumption::memory_consumption(*t);
   return memory;
 }
 

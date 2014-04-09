@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: TableBase<N,T> now uses AlignedVector for storing data
+  instead of std::vector, which allows its use for VectorizedArray<Number>
+  data fields which require more alignment.
+  <br>
+  (Martin Kronbichler, 2014/04/09)
+  </li>
+
   <li> Improved: Piola transformation for FE_BDM is now active.
   <br>
   (Guido Kanschat, 2014/04/09)
