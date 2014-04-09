@@ -505,7 +505,7 @@ AlignedVector<T>::resize (const size_type size_in,
   // now _size is set correctly, need to set the
   // values
   if (size_in > old_size)
-    internal::AlignedVectorSet<T> (size_in-old_size, init, _data+old_size);
+    dealii::internal::AlignedVectorSet<T> (size_in-old_size, init, _data+old_size);
 }
 
 
@@ -648,7 +648,7 @@ inline
 void
 AlignedVector<T>::fill (const T &value)
 {
-  internal::AlignedVectorSet<T> (size(), value, _data);
+  dealii::internal::AlignedVectorSet<T> (size(), value, _data);
 }
 
 
