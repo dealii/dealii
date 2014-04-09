@@ -148,6 +148,10 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: Piola transformation for FE_BDM is now active.
+  <br>
+  (Guido Kanschat, 2014/04/09)
+  </li>
 
   <li> Changed: operator< for cell iterators no longer looks at
   (level-)subdomain ids but only compares level() and index(). This makes the
