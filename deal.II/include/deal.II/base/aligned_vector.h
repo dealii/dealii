@@ -798,6 +798,7 @@ AlignedVector<T>::memory_consumption () const
   size_type memory = sizeof(*this);
   for (const T* t = _data ; t != _end_data; ++t)
     memory += dealii::MemoryConsumption::memory_consumption(*t);
+  memory += sizeof(T) * (_end_allocated-_end_data);
   return memory;
 }
 
