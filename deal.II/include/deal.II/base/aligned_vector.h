@@ -23,6 +23,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parallel.h>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <cstring>
 
@@ -153,6 +155,11 @@ public:
                     ForwardIterator end);
 
   /**
+   * Fills the vector with size() copies of the given input
+   */
+  void fill (const T &element);
+
+  /**
    * Swaps the given vector with the calling vector.
    */
   void swap (AlignedVector<T> &vec);
@@ -210,6 +217,22 @@ public:
    * counted.
    */
   size_type memory_consumption () const;
+
+  /**
+   * Write the data of this object to
+   * a stream for the purpose of serialization.
+   */
+  template <class Archive>
+  void save (Archive &ar, const unsigned int version) const;
+
+  /**
+   * Read the data of this object
+   * from a stream for the purpose of serialization.
+   */
+  template <class Archive>
+  void load (Archive &ar, const unsigned int version);
+
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 private:
 
@@ -444,7 +467,7 @@ inline
 AlignedVector<T>&
 AlignedVector<T>::operator = (const AlignedVector<T> &vec)
 {
-  clear();
+  resize(0);
   resize_fast (vec._end_data - vec._data);
   internal::AlignedVectorMove<T> (vec._data, vec._end_data, _data, true);
   return *this;
@@ -480,8 +503,7 @@ AlignedVector<T>::resize (const size_type size_in,
   // now _size is set correctly, need to set the
   // values
   if (size_in > old_size)
-    internal::AlignedVectorSet<T> (size_in-old_size, init,
-                                   _data+old_size);
+    internal::AlignedVectorSet<T> (size_in-old_size, init, _data+old_size);
 }
 
 
@@ -622,6 +644,16 @@ AlignedVector<T>::insert_back (ForwardIterator begin,
 template < class T >
 inline
 void
+AlignedVector<T>::fill (const T &value)
+{
+  internal::AlignedVectorSet<T> (size(), value, _data);
+}
+
+
+
+template < class T >
+inline
+void
 AlignedVector<T>::swap (AlignedVector<T> &vec)
 {
   std::swap (_data, vec._data);
@@ -719,6 +751,39 @@ typename AlignedVector<T>::const_iterator
 AlignedVector<T>::end () const
 {
   return _end_data;
+}
+
+
+
+template < class T >
+template < class Archive >
+inline
+void
+AlignedVector<T>::save (Archive &ar, const unsigned int) const
+{
+  size_type vec_size (size());
+  ar &vec_size;
+  if (vec_size > 0)
+    ar &boost::serialization::make_array(_data, vec_size);
+}
+
+
+
+template < class T >
+template < class Archive >
+inline
+void
+AlignedVector<T>::load (Archive &ar, const unsigned int)
+{
+  size_type vec_size = 0;
+  ar &vec_size ;
+
+  if (vec_size > 0)
+    {
+      reserve(vec_size);
+      ar &boost::serialization::make_array(_data, vec_size);
+      _end_data = _data + vec_size;
+    }
 }
 
 

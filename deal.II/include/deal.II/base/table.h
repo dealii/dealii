@@ -1922,12 +1922,8 @@ TableBase<N,T>::TableBase (const TableBase<N,T> &src)
   :
   Subscriptor ()
 {
-  reinit (src.table_size);
-  if (src.n_elements() != 0)
-    internal::AlignedVectorMove<T> (const_cast<T*>(src.values.begin()),
-                                    const_cast<T*>(src.values.end()),
-                                    values.begin(),
-                                    true);
+  values = src.values;
+  reinit (src.table_size, true);
 }
 
 
@@ -2116,12 +2112,9 @@ inline
 TableBase<N,T> &
 TableBase<N,T>::operator = (const TableBase<N,T> &m)
 {
-  reinit (m.size());
-  if (!empty())
-    internal::AlignedVectorMove<T> (const_cast<T*>(m.values.begin()),
-                                    const_cast<T*>(m.values.end()),
-                                    values.begin(),
-                                    true);
+  if (!m.empty())
+    values = m.values;
+  reinit (m.size(), true);
 
   return *this;
 }
@@ -2160,8 +2153,7 @@ TableBase<N,T>::reset_values ()
 {
   // use parallel set operation
   if (n_elements() != 0)
-    dealii::internal::AlignedVectorSet<T> (values.size(), T(),
-                                   values.begin());
+    values.fill(T());
 }
 
 
@@ -2172,8 +2164,7 @@ void
 TableBase<N,T>::fill (const T &value)
 {
   if (n_elements() != 0)
-    dealii::internal::AlignedVectorSet<T> (values.size(), value,
-                                   values.begin());
+    values.fill(value);
 }
 
 
@@ -2206,8 +2197,7 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
   // not fast resize, zero out all values)
   values.resize_fast (new_size);
   if (!fast)
-    dealii::internal::AlignedVectorSet<T> (values.size(), T(),
-                                   values.begin());
+    values.fill(T());
 }
 
 
