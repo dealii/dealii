@@ -1,0 +1,8 @@
+
+DEAL::Constructor: 0 0 0 0 
+DEAL::Insertion: 0 0 1 0 5 42 0 0 1 0 5 42 27 
+DEAL::Shrinking: 0 0 1 0 
+DEAL::Reserve: 0 0 1 0 
+DEAL::Assignment: 0 0 1 0 5 42 27 
+DEAL::Check large initialization: OK
+DEAL::Check large resize: OK
