@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2008 - 2013 by the deal.II authors
+ * Copyright (C) 2008 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -685,7 +685,7 @@ namespace Step22
 		// 1=y velocity, 2=pressure in 2d), which we use to pick out
 		// the correct component of the right-hand side vector to
 		// multiply with.
-		
+
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;
                 local_rhs(i) += fe_values.shape_value(i,q) *
@@ -710,7 +710,7 @@ namespace Step22
         // simultaneously use the ConstraintMatrix object to apply Dirichlet
         // boundary conditions and eliminate hanging node constraints, as we
         // discussed in the introduction), we have to be careful about one
-        // thing, though. We have only build up half of the local matrix
+        // thing, though. We have only built half of the local matrix
         // because of symmetry, but we're going to save the full system matrix
         // in order to use the standard functions for solution. This is done
         // by flipping the indices in case we are pointing into the empty part
