@@ -214,7 +214,7 @@ public:
   /**
    * Same as above but for any number of base elements. Pointers to the base
    * elements and their multiplicities are passed as vectors to this
-   * constructor. The length of these vectors is assumed to be equal.
+   * constructor. The lengths of these vectors are assumed to be equal.
    */
 
   FESystem (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
