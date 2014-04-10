@@ -42,7 +42,7 @@ template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix (const size_type m,
 					    const size_type n)
   :
-  TransposeTable<number> (m,n),
+  TransposeTable<number> (m, n),
   state (matrix)
 {}
 
@@ -62,6 +62,25 @@ LAPACKFullMatrix<number>::operator = (const LAPACKFullMatrix<number> &M)
   TransposeTable<number>::operator=(M);
   state = LAPACKSupport::matrix;
   return *this;
+}
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::reinit (const size_type n)
+{
+  this->TransposeTable<number>::reinit (n, n);
+  state = LAPACKSupport::matrix;
+}
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::reinit (const size_type m,
+				  const size_type n)
+{
+  this->TransposeTable<number>::reinit (m, n);
+  state = LAPACKSupport::matrix;
 }
 
 
@@ -738,6 +757,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.reinit(nn, n_eigenpairs, true);
+
   for (size_type i=0; i < static_cast<size_type> (n_eigenpairs); ++i)
     {
       eigenvalues(i) = wr[i];
@@ -838,6 +858,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.resize(n_eigenpairs);
+
   for (size_type i=0; i < static_cast<size_type> (n_eigenpairs); ++i)
     {
       eigenvalues(i) = wr[i];

@@ -70,7 +70,7 @@ public:
    *
    * By default, no memory is allocated.
    */
-  explicit LAPACKFullMatrix (const size_type n = 0);
+  explicit LAPACKFullMatrix (const size_type size = 0);
 
 
   /**
@@ -78,6 +78,7 @@ public:
    */
   LAPACKFullMatrix (const size_type rows,
                     const size_type cols);
+
 
   /**
    * Copy constructor. This constructor does a deep copy of the
@@ -130,6 +131,21 @@ public:
    */
   template <class MATRIX>
   void copy_from (const MATRIX &);
+
+  /**
+   * Regenerate the current matrix by one that has the same properties
+   * as if it were created by the constructor of this class with the
+   * same argument list as this present function.
+   */
+  void reinit (const size_type size);
+
+  /**
+   * Regenerate the current matrix by one that has the same properties
+   * as if it were created by the constructor of this class with the
+   * same argument list as this present function.
+   */
+  void reinit (const size_type rows,
+	       const size_type cols);
 
   /**
    * Return the dimension of the range space. @note The matrix is of
@@ -565,10 +581,11 @@ public:
                         const double        threshold   = 0.) const;
 
 private:
-
+  
   /**
-   * Since LAPACK operations notoriously change the meaning of the matrix
-   * entries, we record the current state after the last operation here.
+   * Since LAPACK operations notoriously change the meaning of the
+   * matrix entries, we record the current state after the last
+   * operation here.
    */
   LAPACKSupport::State state;
 
