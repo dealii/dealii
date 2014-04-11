@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: named_data.h 30036 2013-07-18 16:55:32Z maier $
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -164,7 +164,7 @@ inline
 unsigned int
 AnyData::find(const std::string& n) const
 {
-  typename std::vector<std::string>::const_iterator it =
+  std::vector<std::string>::const_iterator it =
     std::find(names.begin(), names.end(), n);
   
   Assert(it != names.end(), ExcMessage("An entry with this name does not exist"));

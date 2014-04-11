@@ -4,7 +4,7 @@
   <head>
     <title>The deal.II Readme on interfacing to PETSc</title>
     <link href="../screen.css" rel="StyleSheet">
-    <meta name="copyright" content="Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 by the deal.II authors">
     <meta name="date" content="$Date$">
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
@@ -37,21 +37,27 @@
 
     <h4>Installing <acronym>deal.II</acronym> with PETSc</h4>
 
-    <p style="color: red"><b>Note:</b> The latest version of PETSc tested is
-       3.4.2. Major releases after this version may cause problems, so we
-       recommend sticking to this version if at all possible.
+    <p style="color: red"><b>Note:</b> The most recent version of
+       PETSc that has been reported to be compatible
+       with <acronym>deal.II</acronym> is version 3.4. If you use a
+       later version than this and encounter problems, let us know.
     </p>
 
     <p>
-      PETSc usually requires you to set the
+      When you compile and install PETSc, you need to set
       environment variables <code>PETSC_DIR</code> and <code>PETSC_ARCH</code>
       to a path to PETSc and denoting the architecture for which PETSc is
-      compiled (a string you can choose however you like, it is simply
-      intended to identify one of possibly several different PETSc
-      installations). If these environment variables are set, then
-      <acronym>deal.II</acronym> will pick them up during
-      configuration, and store them. It will then also recognize that
-      PETSc shall be used, and enable the wrapper classes.
+      compiled. <code>PETSC_ARCH</code> is in reality just a name you give to
+      your installation, it is a string you can choose however you like. The
+      point of it is that it allows you to have multiple possibly different
+      PETSc installations. A consequence of this is that you need to
+      let <acronym>deal.II</acronym>'s <code>cmake</code> scripts know which
+      one of these installations you want it to use, i.e., you need to set the
+      <code>PETSC_ARCH</code> variable to the same value you used when you
+      installed PETSc. The same is true for <code>PETSC_DIR</code>. You can
+      this via environment variables. <code>cmake</code> will then also
+      recognize that PETSc shall be used, and enable the wrapper classes,
+      without you having to explicitly say that you want to use PETSc.
     </p>
 
     <p>

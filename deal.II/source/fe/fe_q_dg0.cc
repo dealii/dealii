@@ -307,6 +307,26 @@ FE_Q_DG0<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
 }
 
 
+
+template <int dim, int spacedim>
+std::pair<Table<2,bool>, std::vector<unsigned int> >
+FE_Q_DG0<dim,spacedim>::get_constant_modes () const
+{
+  Table<2,bool> constant_modes(2, this->dofs_per_cell);
+
+  // 1 represented by FE_Q part
+  for (unsigned int i=0; i<this->dofs_per_cell-1; ++i)
+    constant_modes(0, i) = true;
+
+  // 1 represented by DG0 part
+  constant_modes(1, this->dofs_per_cell-1) = true;
+
+  return std::pair<Table<2,bool>, std::vector<unsigned int> >
+    (constant_modes, std::vector<unsigned int> (2, 0));
+}
+
+
+
 // explicit instantiations
 #include "fe_q_dg0.inst"
 

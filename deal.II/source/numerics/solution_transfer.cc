@@ -287,8 +287,6 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
    std::vector<Vector<typename VECTOR::value_type> > (in_size))
   .swap(dof_values_on_cell);
 
-  typename VECTOR::value_type zero_val = typename VECTOR::value_type();
-
   Table<2,FullMatrix<double> > interpolation_hp;
   std::vector<std::vector<bool> > restriction_is_additive;
 

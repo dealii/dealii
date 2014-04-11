@@ -214,7 +214,7 @@ public:
   /**
    * Same as above but for any number of base elements. Pointers to the base
    * elements and their multiplicities are passed as vectors to this
-   * constructor. The length of these vectors is assumed to be equal.
+   * constructor. The lengths of these vectors are assumed to be equal.
    */
 
   FESystem (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
@@ -476,7 +476,8 @@ public:
    * table contains a basis representation of the constant function 1 on the
    * element. Concatenates the constant modes of each base element.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
   /**
    * @name Functions to support hp

@@ -23,6 +23,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/parallel.h>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <cstring>
 
@@ -153,6 +155,11 @@ public:
                     ForwardIterator end);
 
   /**
+   * Fills the vector with size() copies of the given input
+   */
+  void fill (const T &element);
+
+  /**
    * Swaps the given vector with the calling vector.
    */
   void swap (AlignedVector<T> &vec);
@@ -210,6 +217,22 @@ public:
    * counted.
    */
   size_type memory_consumption () const;
+
+  /**
+   * Write the data of this object to
+   * a stream for the purpose of serialization.
+   */
+  template <class Archive>
+  void save (Archive &ar, const unsigned int version) const;
+
+  /**
+   * Read the data of this object
+   * from a stream for the purpose of serialization.
+   */
+  template <class Archive>
+  void load (Archive &ar, const unsigned int version);
+
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 private:
 
@@ -341,7 +364,11 @@ namespace internal
       if (size == 0)
         return;
 
-      if (std_cxx1x::is_trivial<T>::value == true)
+      // do not use memcmp for long double because on some systems it does not
+      // completely fill its memory and may lead to false positives in
+      // e.g. valgrind
+      if (std_cxx1x::is_trivial<T>::value == true &&
+          types_are_equal<T,long double>::value == false)
         {
           const unsigned char zero [sizeof(T)] = {};
           // cast element to (void*) to silence compiler warning for virtual
@@ -380,6 +407,7 @@ namespace internal
     mutable T *destination_;
     bool trivial_element;
   };
+
 } // end of namespace internal
 
 
@@ -441,7 +469,7 @@ inline
 AlignedVector<T>&
 AlignedVector<T>::operator = (const AlignedVector<T> &vec)
 {
-  clear();
+  resize(0);
   resize_fast (vec._end_data - vec._data);
   internal::AlignedVectorMove<T> (vec._data, vec._end_data, _data, true);
   return *this;
@@ -477,8 +505,7 @@ AlignedVector<T>::resize (const size_type size_in,
   // now _size is set correctly, need to set the
   // values
   if (size_in > old_size)
-    internal::AlignedVectorSet<T> (size_in-old_size, init,
-                                   _data+old_size);
+    dealii::internal::AlignedVectorSet<T> (size_in-old_size, init, _data+old_size);
 }
 
 
@@ -619,6 +646,16 @@ AlignedVector<T>::insert_back (ForwardIterator begin,
 template < class T >
 inline
 void
+AlignedVector<T>::fill (const T &value)
+{
+  dealii::internal::AlignedVectorSet<T> (size(), value, _data);
+}
+
+
+
+template < class T >
+inline
+void
 AlignedVector<T>::swap (AlignedVector<T> &vec)
 {
   std::swap (_data, vec._data);
@@ -721,12 +758,47 @@ AlignedVector<T>::end () const
 
 
 template < class T >
+template < class Archive >
+inline
+void
+AlignedVector<T>::save (Archive &ar, const unsigned int) const
+{
+  size_type vec_size (size());
+  ar &vec_size;
+  if (vec_size > 0)
+    ar &boost::serialization::make_array(_data, vec_size);
+}
+
+
+
+template < class T >
+template < class Archive >
+inline
+void
+AlignedVector<T>::load (Archive &ar, const unsigned int)
+{
+  size_type vec_size = 0;
+  ar &vec_size ;
+
+  if (vec_size > 0)
+    {
+      reserve(vec_size);
+      ar &boost::serialization::make_array(_data, vec_size);
+      _end_data = _data + vec_size;
+    }
+}
+
+
+
+template < class T >
 inline
 typename AlignedVector<T>::size_type
 AlignedVector<T>::memory_consumption () const
 {
-  size_type memory = sizeof(this);
-  memory += sizeof(T) * capacity();
+  size_type memory = sizeof(*this);
+  for (const T* t = _data ; t != _end_data; ++t)
+    memory += dealii::MemoryConsumption::memory_consumption(*t);
+  memory += sizeof(T) * (_end_allocated-_end_data);
   return memory;
 }
 

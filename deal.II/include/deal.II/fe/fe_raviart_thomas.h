@@ -148,10 +148,11 @@ public:
     const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 
   /**
-   * Returns a list of constant modes of the element. For this element, the
-   * list consists of true arguments for all components.
+   * Returns a list of constant modes of the element. This method is currently
+   * not correctly implemented because it returns ones for all components.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
   virtual std::size_t memory_consumption () const;
   virtual FiniteElement<dim> *clone() const;

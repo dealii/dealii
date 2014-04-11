@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -449,9 +449,20 @@ public:
    */
 
   /**
-   *  Return the level the element
-   *  pointed to belongs to.
-   *  This is only valid for cells.
+   * For cells, this function returns the level within the mesh hierarchy at
+   * which this cell is located. For all other objects, the function returns
+   * zero.
+   *
+   * @note Within a Triangulation object, cells are uniquely identified by a
+   * pair <code>(level, index)</code> where the former is the cell's
+   * refinement level and the latter is the index of the cell within
+   * this refinement level (the former being what this function
+   * returns). Consequently, there may be multiple cells on different
+   * refinement levels but with the same index within their level.
+   * Contrary to this, if the current object corresponds to a face or
+   * edge, then the object is uniquely identified solely by its index
+   * as faces and edges do not have a refinement level. For these objects,
+   * the current function always returns zero as the level.
    */
   int level () const;
 
@@ -460,7 +471,7 @@ public:
    * element presently pointed to
    * on the present level.
    *
-   * Within a Triangulation object cells are uniquely identified by a
+   * Within a Triangulation object, cells are uniquely identified by a
    * pair <code>(level, index)</code> where the former is the cell's
    * refinement level and the latter is the index of the cell within
    * this refinement level (the latter being what this function
@@ -731,18 +742,6 @@ public:
    *  need this function.
    */
   bool used () const;
-
-  /**
-   *  Index of the parent.
-   *  The level of the parent is one
-   *  lower than that of the
-   *  present cell, if the parent
-   *  of a cell is accessed. If the
-   *  parent does not exist, -1 is
-   *  returned.
-   */
-  int parent_index () const;
-
 
   /**
    *  @name Accessing sub-objects
@@ -1687,11 +1686,6 @@ private:
   void clear_refinement_case () const;
 
   /**
-   * Set the parent of a cell.
-   */
-  void set_parent (const unsigned int parent_index);
-
-  /**
    *  Set the index of the ith
    *  child. Since the children
    *  come at least in pairs, we
@@ -1962,12 +1956,6 @@ public:
   /**
    * @}
    */
-
-  /**
-   *  Index of the parent. You
-   *  can't do this for points.
-   */
-  static int parent_index ();
 
   /**
    *  @name Accessing sub-objects
@@ -2947,12 +2935,22 @@ public:
    */
   bool direction_flag () const;
 
-
+  /**
+   *  Index of the parent of this cell.
+   *  The level of the parent is one
+   *  lower than that of the
+   *  present cell, if the parent
+   *  of a cell is accessed. If the
+   *  parent does not exist (i.e., if the object is at the coarsest level of
+   *  the mesh hierarchy), an exception is generated.
+   */
+  int parent_index () const;
 
   /**
    *  Return an iterator to the
-   *  parent. Throws an exception if this cell has no parent, i.e. has
-   *  level 0.
+   *  parent. If the
+   *  parent does not exist (i.e., if the object is at the coarsest level of
+   *  the mesh hierarchy), an exception is generated.
    */
   TriaIterator<CellAccessor<dim,spacedim> >
   parent () const;
@@ -2977,16 +2975,6 @@ public:
    * for more information.
    */
   bool active () const;
-
-  /**
-   * Ordering of accessors. This function implements a total ordering
-   * of cells even on a parallel::distributed::Triangulation. This
-   * function first compares level_subdomain_id(). If these are equal,
-   * and both cells are active, it compares subdomain_id(). If this is
-   * inconclusive, TriaAccessorBase::operator < () is called.
-   */
-  bool operator < (const CellAccessor<dim, spacedim> &other) const;
-
 
   /**
    * Return whether this cell is owned by the current processor
@@ -3212,6 +3200,11 @@ protected:
 
 
 private:
+  /**
+   * Set the parent of a cell.
+   */
+  void set_parent (const unsigned int parent_index);
+
   /**
    * Set the orientation of this
    * cell.

@@ -67,6 +67,7 @@
 #include <cmath>
 #include <limits>
 #include <set>
+#include <list>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1713,7 +1714,7 @@ namespace VectorTools
     // will be used
     template <class DH,
               template <int,int> class M_or_MC,
-	      int dim_>
+	          int dim_>
     static inline
     void
     do_interpolate_boundary_values (const M_or_MC<DH::dimension, DH::space_dimension> &mapping,
@@ -2468,7 +2469,7 @@ namespace VectorTools
 
     /**
      * Add the constraint
-     * $\vec n \cdot \vec u = 0$
+     * $\vec n \cdot \vec u = inhom$
      * to the list of constraints.
      *
      * Here, $\vec u$ is represented
@@ -2485,7 +2486,8 @@ namespace VectorTools
     void
     add_constraint (const VectorDoFTuple<dim> &dof_indices,
                     const Tensor<1,dim>       &constraining_vector,
-                    ConstraintMatrix          &constraints)
+                    ConstraintMatrix          &constraints,
+                    const double              inhomogeneity=0)
     {
 
       // choose the DoF that has the
@@ -2566,6 +2568,11 @@ namespace VectorTools
                     constraints.add_entry (dof_indices.dof_indices[0],
                                            dof_indices.dof_indices[1],
                                            -constraining_vector[1]/constraining_vector[0]);
+                    
+                  if (std::fabs (inhomogeneity/constraining_vector[0])
+                      > std::numeric_limits<double>::epsilon())
+                    constraints.set_inhomogeneity(dof_indices.dof_indices[0],
+                                                  inhomogeneity/constraining_vector[0]);                  
                 }
             }
           else
@@ -2581,6 +2588,11 @@ namespace VectorTools
                     constraints.add_entry (dof_indices.dof_indices[1],
                                            dof_indices.dof_indices[0],
                                            -constraining_vector[0]/constraining_vector[1]);
+                    
+                  if (std::fabs (inhomogeneity/constraining_vector[1])
+                      > std::numeric_limits<double>::epsilon())
+                    constraints.set_inhomogeneity(dof_indices.dof_indices[1],
+                                                  inhomogeneity/constraining_vector[1]);                 
                 }
             }
           break;
@@ -2609,6 +2621,11 @@ namespace VectorTools
                     constraints.add_entry (dof_indices.dof_indices[0],
                                            dof_indices.dof_indices[2],
                                            -constraining_vector[2]/constraining_vector[0]);
+
+                  if (std::fabs (inhomogeneity/constraining_vector[0])
+                      > std::numeric_limits<double>::epsilon())
+                    constraints.set_inhomogeneity(dof_indices.dof_indices[0],
+                                                  inhomogeneity/constraining_vector[0]);
                 }
             }
           else if ((std::fabs(constraining_vector[1])+1e-10 >= std::fabs(constraining_vector[0]))
@@ -2632,6 +2649,11 @@ namespace VectorTools
                     constraints.add_entry (dof_indices.dof_indices[1],
                                            dof_indices.dof_indices[2],
                                            -constraining_vector[2]/constraining_vector[1]);
+
+                  if (std::fabs (inhomogeneity/constraining_vector[1])
+                      > std::numeric_limits<double>::epsilon())
+                    constraints.set_inhomogeneity(dof_indices.dof_indices[1],
+                                                  inhomogeneity/constraining_vector[1]);
                 }
             }
           else
@@ -2653,6 +2675,11 @@ namespace VectorTools
                     constraints.add_entry (dof_indices.dof_indices[2],
                                            dof_indices.dof_indices[1],
                                            -constraining_vector[1]/constraining_vector[2]);
+
+                  if (std::fabs (inhomogeneity/constraining_vector[2])
+                      > std::numeric_limits<double>::epsilon())
+                    constraints.set_inhomogeneity(dof_indices.dof_indices[2],
+                                                    inhomogeneity/constraining_vector[2]);
                 }
             }
 
@@ -2666,7 +2693,7 @@ namespace VectorTools
 
 
     /**
-     * Add the constraint $\vec u \|
+     * Add the constraint $(\vec u-\vec u_\Gamma) \|
      * \vec t$ to the list of
      * constraints. In 2d, this is a
      * single constraint, in 3d these
@@ -2684,9 +2711,11 @@ namespace VectorTools
      */
     template <int dim>
     void
-    add_tangentiality_constraints (const VectorDoFTuple<dim> &dof_indices,
-                                   const Tensor<1,dim>       &tangent_vector,
-                                   ConstraintMatrix          &constraints)
+    add_tangentiality_constraints
+      (const VectorDoFTuple<dim> &dof_indices,
+       const Tensor<1,dim>       &tangent_vector,
+       ConstraintMatrix          &constraints,
+       const Vector<double>      &b_values = Vector<double>(dim))
     {
 
       // choose the DoF that has the
@@ -2698,7 +2727,7 @@ namespace VectorTools
       // component 0 of the tangent
       // vector t is largest by
       // magnitude, then
-      // x1=t[1]/t[0]*x_0, etc.
+      // x1=(b[1]*t[0]-b[0]*t[1])/t[0]+t[1]/t[0]*x_0, etc.
       unsigned int largest_component = 0;
       for (unsigned int d=1; d<dim; ++d)
         if (std::fabs(tangent_vector[d]) > std::fabs(tangent_vector[largest_component]) + 1e-10)
@@ -2720,6 +2749,16 @@ namespace VectorTools
                 constraints.add_entry (dof_indices.dof_indices[d],
                                        dof_indices.dof_indices[largest_component],
                                        tangent_vector[d]/tangent_vector[largest_component]);
+
+              const double inhomogeneity
+                = (b_values(d)*tangent_vector[largest_component]
+                   -b_values(largest_component)*tangent_vector[d])
+                  /tangent_vector[largest_component];
+
+              if (std::fabs(inhomogeneity)
+                  > std::numeric_limits<double>::epsilon())
+                constraints.set_inhomogeneity(dof_indices.dof_indices[d],
+                                              inhomogeneity);
             }
     }
 
@@ -4265,6 +4304,29 @@ namespace VectorTools
                                       ConstraintMatrix      &constraints,
                                       const Mapping<dim, spacedim>    &mapping)
   {
+    ZeroFunction<dim>zero_function(dim);
+    typename FunctionMap<spacedim>::type function_map;
+    std::set<types::boundary_id>::const_iterator it
+      = boundary_ids.begin();
+    for (;it != boundary_ids.end(); ++it)
+      function_map[*it] = &zero_function;
+    compute_nonzero_normal_flux_constraints(dof_handler, 
+                                            first_vector_component, 
+                                            boundary_ids,
+                                            function_map,
+                                            constraints, 
+                                            mapping);
+  }
+ 
+  template <int dim, template <int, int> class DH, int spacedim>
+  void
+  compute_nonzero_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
+                                           const unsigned int     first_vector_component,
+                                           const std::set<types::boundary_id> &boundary_ids,
+                                           typename FunctionMap<spacedim>::type &function_map,
+                                           ConstraintMatrix      &constraints,
+                                           const Mapping<dim, spacedim>    &mapping)
+  {
     Assert (dim > 1,
             ExcMessage ("This function is not useful in 1d because it amounts "
                         "to imposing Dirichlet values on the vector-valued "
@@ -4284,16 +4346,15 @@ namespace VectorTools
     // FE
     hp::QCollection<dim-1> face_quadrature_collection;
     for (unsigned int i=0; i<fe_collection.size(); ++i)
-      {
-        const std::vector<Point<dim-1> > &
-        unit_support_points = fe_collection[i].get_unit_face_support_points();
+    {
+      const std::vector<Point<dim-1> > &
+      unit_support_points = fe_collection[i].get_unit_face_support_points();
 
-        Assert (unit_support_points.size() == fe_collection[i].dofs_per_face,
-                ExcInternalError());
+      Assert (unit_support_points.size() == fe_collection[i].dofs_per_face,
+              ExcInternalError());
 
-        face_quadrature_collection
-        .push_back (Quadrature<dim-1> (unit_support_points));
-      }
+      face_quadrature_collection.push_back (Quadrature<dim-1> (unit_support_points));
+    }
 
     // now create the object with which we will generate the normal vectors
     hp::FEFaceValues<dim,spacedim> x_fe_face_values (mapping_collection,
@@ -4317,6 +4378,8 @@ namespace VectorTools
     std::multimap<internal::VectorDoFTuple<dim>,
         std::pair<Tensor<1,dim>, typename DH<dim,spacedim>::active_cell_iterator> >
         DoFToNormalsMap;
+    std::map<internal::VectorDoFTuple<dim>, Vector<double> >
+      dof_vector_to_b_values;
 
     DoFToNormalsMap dof_to_normals_map;
 
@@ -4324,129 +4387,136 @@ namespace VectorTools
     typename DH<dim,spacedim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
+    std::set<types::boundary_id>::iterator b_id;
     for (; cell!=endc; ++cell)
       if (!cell->is_artificial())
         for (unsigned int face_no=0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
-          if (boundary_ids.find(cell->face(face_no)->boundary_indicator())
+          if ((b_id=boundary_ids.find(cell->face(face_no)->boundary_indicator()))
               != boundary_ids.end())
-            {
-              const FiniteElement<dim> &fe = cell->get_fe ();
-              typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
+          {
+            const FiniteElement<dim> &fe = cell->get_fe ();
+            typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 
-              // get the indices of the dofs on this cell...
-              face_dofs.resize (fe.dofs_per_face);
-              face->get_dof_indices (face_dofs, cell->active_fe_index());
+            // get the indices of the dofs on this cell...
+            face_dofs.resize (fe.dofs_per_face);
+            face->get_dof_indices (face_dofs, cell->active_fe_index());
 
-              x_fe_face_values.reinit (cell, face_no);
-              const FEFaceValues<dim> &fe_values = x_fe_face_values.get_present_fe_values();
+            x_fe_face_values.reinit (cell, face_no);
+            const FEFaceValues<dim> &fe_values = x_fe_face_values.get_present_fe_values();
 
-              // then identify which of them correspond to the selected set of
-              // vector components
-              for (unsigned int i=0; i<face_dofs.size(); ++i)
-                if (fe.face_system_to_component_index(i).first ==
-                    first_vector_component)
-                  {
-                    // find corresponding other components of vector
-                    internal::VectorDoFTuple<dim> vector_dofs;
-                    vector_dofs.dof_indices[0] = face_dofs[i];
+            // then identify which of them correspond to the selected set of
+            // vector components
+            for (unsigned int i=0; i<face_dofs.size(); ++i)
+              if (fe.face_system_to_component_index(i).first ==
+                  first_vector_component)
+              {
+                // find corresponding other components of vector
+                internal::VectorDoFTuple<dim> vector_dofs;
+                vector_dofs.dof_indices[0] = face_dofs[i];
+                    
+                Assert(first_vector_component+dim<=fe.n_components(),
+                       ExcMessage("Error: the finite element does not have enough components "
+                                  "to define a normal direction."));
+                    
+                for (unsigned int k=0; k<fe.dofs_per_face; ++k)
+                  if ((k != i)
+                      &&
+                      (face_quadrature_collection[cell->active_fe_index()].point(k) ==
+                       face_quadrature_collection[cell->active_fe_index()].point(i))
+                      &&
+                      (fe.face_system_to_component_index(k).first >=
+                       first_vector_component)
+                      &&
+                      (fe.face_system_to_component_index(k).first <
+                       first_vector_component + dim))
+                    vector_dofs.dof_indices[fe.face_system_to_component_index(k).first -
+                                            first_vector_component]
+                      = face_dofs[k];
 
-                    Assert(first_vector_component+dim<=fe.n_components(),
-                           ExcMessage("Error: the finite element does not have enough components "
-                                      "to define a normal direction."));
+                for (unsigned int d=0; d<dim; ++d)
+                  Assert (vector_dofs.dof_indices[d] < dof_handler.n_dofs(),
+                          ExcInternalError());
 
-                    for (unsigned int k=0; k<fe.dofs_per_face; ++k)
-                      if ((k != i)
-                          &&
-                          (face_quadrature_collection[cell->active_fe_index()].point(k) ==
-                           face_quadrature_collection[cell->active_fe_index()].point(i))
-                          &&
-                          (fe.face_system_to_component_index(k).first >=
-                           first_vector_component)
-                          &&
-                          (fe.face_system_to_component_index(k).first <
-                           first_vector_component + dim))
-                        vector_dofs.dof_indices[fe.face_system_to_component_index(k).first -
-                                                first_vector_component]
-                          = face_dofs[k];
+                // we need the normal vector on this face. we know that it
+                // is a vector of length 1 but at least with higher order
+                // mappings it isn't always possible to guarantee that
+                // each component is exact up to zero tolerance. in
+                // particular, as shown in the deal.II/no_flux_06 test, if
+                // we just take the normal vector as given by the
+                // fe_values object, we can get entries in the normal
+                // vectors of the unit cube that have entries up to
+                // several times 1e-14.
+                //
+                // the problem with this is that this later yields
+                // constraints that are circular (e.g., in the testcase,
+                // we get constraints of the form
+                //
+                // x22 =  2.93099e-14*x21 + 2.93099e-14*x23
+                // x21 = -2.93099e-14*x22 + 2.93099e-14*x21
+                //
+                // in both of these constraints, the small numbers should
+                // be zero and the constraints should simply be
+                // x22 = x21 = 0
+                //
+                // to achieve this, we utilize that we know that the
+                // normal vector has (or should have) length 1 and that we
+                // can simply set small elements to zero (without having
+                // to check that they are small *relative to something
+                // else*). we do this and then normalize the length of the
+                // vector back to one, just to be on the safe side
+                //
+                // one more point: we would like to use the "real" normal
+                // vector here, as provided by the boundary description
+                // and as opposed to what we get from the FEValues object.
+                // we do this in the immediately next line, but as is
+                // obvious, the boundary only has a vague idea which side
+                // of a cell it is on -- indicated by the face number. in
+                // other words, it may provide the inner or outer normal.
+                // by and large, there is no harm from this, since the
+                // tangential vector we compute is still the same. however,
+                // we do average over normal vectors from adjacent cells
+                // and if they have recorded normal vectors from the inside
+                // once and from the outside the other time, then this
+                // averaging is going to run into trouble. as a consequence
+                // we ask the mapping after all for its normal vector,
+                // but we only ask it so that we can possibly correct the
+                // sign of the normal vector provided by the boundary
+                // if they should point in different directions. this is the
+                // case in tests/deal.II/no_flux_11.
+                Point<dim> normal_vector
+                  = (cell->face(face_no)->get_boundary().normal_vector
+                      (cell->face(face_no), fe_values.quadrature_point(i)));
+                if (normal_vector * fe_values.normal_vector(i) < 0)
+                  normal_vector *= -1;
+                Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
+                        ExcInternalError());
+                for (unsigned int d=0; d<dim; ++d)
+                  if (std::fabs(normal_vector[d]) < 1e-13)
+                    normal_vector[d] = 0;
+                normal_vector /= normal_vector.norm();
 
-                    for (unsigned int d=0; d<dim; ++d)
-                      Assert (vector_dofs.dof_indices[d] < dof_handler.n_dofs(),
-                              ExcInternalError());
+                const Point<dim> point
+                  = fe_values.quadrature_point(i);                    
+                Vector<double> b_values(dim);
+                function_map[*b_id]->vector_value(point, b_values);
 
-                    // we need the normal vector on this face. we know that it
-                    // is a vector of length 1 but at least with higher order
-                    // mappings it isn't always possible to guarantee that
-                    // each component is exact up to zero tolerance. in
-                    // particular, as shown in the deal.II/no_flux_06 test, if
-                    // we just take the normal vector as given by the
-                    // fe_values object, we can get entries in the normal
-                    // vectors of the unit cube that have entries up to
-                    // several times 1e-14.
-                    //
-                    // the problem with this is that this later yields
-                    // constraints that are circular (e.g., in the testcase,
-                    // we get constraints of the form
-                    //
-                    // x22 =  2.93099e-14*x21 + 2.93099e-14*x23
-                    // x21 = -2.93099e-14*x22 + 2.93099e-14*x21
-                    //
-                    // in both of these constraints, the small numbers should
-                    // be zero and the constraints should simply be
-                    // x22 = x21 = 0
-                    //
-                    // to achieve this, we utilize that we know that the
-                    // normal vector has (or should have) length 1 and that we
-                    // can simply set small elements to zero (without having
-                    // to check that they are small *relative to something
-                    // else*). we do this and then normalize the length of the
-                    // vector back to one, just to be on the safe side
-                    //
-                    // one more point: we would like to use the "real" normal
-                    // vector here, as provided by the boundary description
-                    // and as opposed to what we get from the FEValues object.
-                    // we do this in the immediately next line, but as is
-                    // obvious, the boundary only has a vague idea which side
-                    // of a cell it is on -- indicated by the face number. in
-                    // other words, it may provide the inner or outer normal.
-                    // by and large, there is no harm from this, since the
-                    // tangential vector we compute is still the same. however,
-                    // we do average over normal vectors from adjacent cells
-                    // and if they have recorded normal vectors from the inside
-                    // once and from the outside the other time, then this
-                    // averaging is going to run into trouble. as a consequence
-                    // we ask the mapping after all for its normal vector,
-                    // but we only ask it so that we can possibly correct the
-                    // sign of the normal vector provided by the boundary
-                    // if they should point in different directions. this is the
-                    // case in tests/deal.II/no_flux_11.
-                    Point<dim> normal_vector
-                      = (cell->face(face_no)->get_boundary()
-                         .normal_vector (cell->face(face_no),
-                                         fe_values.quadrature_point(i)));
-                    if (normal_vector * fe_values.normal_vector(i) < 0)
-                      normal_vector *= -1;
-                    Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
-                            ExcInternalError());
-                    for (unsigned int d=0; d<dim; ++d)
-                      if (std::fabs(normal_vector[d]) < 1e-13)
-                        normal_vector[d] = 0;
-                    normal_vector /= normal_vector.norm();
+                // now enter the (dofs,(normal_vector,cell)) entry into
+                // the map
+                dof_to_normals_map.insert
+                  (std::make_pair (vector_dofs,
+                                   std::make_pair (normal_vector,cell)));                                     
+                dof_vector_to_b_values.insert
+                  (std::make_pair(vector_dofs, b_values));
 
-                    // now enter the (dofs,(normal_vector,cell)) entry into
-                    // the map
-                    dof_to_normals_map
-                    .insert (std::make_pair (vector_dofs,
-                                             std::make_pair (normal_vector,
-                                                             cell)));
 #ifdef DEBUG_NO_NORMAL_FLUX
-                    std::cout << "Adding normal vector:" << std::endl
-                              << "   dofs=" << vector_dofs << std::endl
-                              << "   cell=" << cell << " at " << cell->center() << std::endl
-                              << "   normal=" << normal_vector << std::endl;
+                std::cout << "Adding normal vector:" << std::endl
+                          << "   dofs=" << vector_dofs << std::endl
+                          << "   cell=" << cell << " at " << cell->center() << std::endl
+                          << "   normal=" << normal_vector << std::endl;
 #endif
-                  }
-            }
+              }
+          }
 
     // Now do something with the collected information. To this end, loop
     // through all sets of pairs (dofs,normal_vector) and identify which
@@ -4457,332 +4527,338 @@ namespace VectorTools
     p = dof_to_normals_map.begin();
 
     while (p != dof_to_normals_map.end())
-      {
-        // first find the range of entries in the multimap that corresponds to
-        // the same vector-dof tuple. as usual, we define the range
-        // half-open. the first entry of course is 'p'
-        typename DoFToNormalsMap::const_iterator same_dof_range[2]
-          = { p };
-        for (++p; p != dof_to_normals_map.end(); ++p)
-          if (p->first != same_dof_range[0]->first)
-            {
-              same_dof_range[1] = p;
-              break;
-            }
-        if (p == dof_to_normals_map.end())
-          same_dof_range[1] = dof_to_normals_map.end();
+    {
+      // first find the range of entries in the multimap that corresponds to
+      // the same vector-dof tuple. as usual, we define the range
+      // half-open. the first entry of course is 'p'
+      typename DoFToNormalsMap::const_iterator same_dof_range[2] = { p };
+      for (++p; p != dof_to_normals_map.end(); ++p)
+        if (p->first != same_dof_range[0]->first)
+        {
+          same_dof_range[1] = p;
+          break;
+        }
+      if (p == dof_to_normals_map.end())
+        same_dof_range[1] = dof_to_normals_map.end();
 
 #ifdef DEBUG_NO_NORMAL_FLUX
-        std::cout << "For dof indices <" << p->first << ">, found the following normals"
+      std::cout << "For dof indices <" << p->first << ">, found the following normals"
+                << std::endl;
+      for (typename DoFToNormalsMap::const_iterator
+           q = same_dof_range[0];
+           q != same_dof_range[1]; ++q)
+        std::cout << "   " << q->second.first
+                  << " from cell " << q->second.second
                   << std::endl;
-        for (typename DoFToNormalsMap::const_iterator
-             q = same_dof_range[0];
-             q != same_dof_range[1]; ++q)
-          std::cout << "   " << q->second.first
-                    << " from cell " << q->second.second
-                    << std::endl;
 #endif
 
 
-        // now compute the reverse mapping: for each of the cells that
-        // contributed to the current set of vector dofs, add up the normal
-        // vectors. the values of the map are pairs of normal vectors and
-        // number of cells that have contributed
-        typedef
-        std::map
-        <typename DH<dim,spacedim>::active_cell_iterator,
-        std::pair<Tensor<1,dim>, unsigned int> >
+      // now compute the reverse mapping: for each of the cells that
+      // contributed to the current set of vector dofs, add up the normal
+      // vectors. the values of the map are pairs of normal vectors and
+      // number of cells that have contributed
+      typedef std::map<typename DH<dim,spacedim>::active_cell_iterator,
+                       std::pair<Tensor<1,dim>, unsigned int> >
         CellToNormalsMap;
 
-        CellToNormalsMap cell_to_normals_map;
-        for (typename DoFToNormalsMap::const_iterator
-             q = same_dof_range[0];
-             q != same_dof_range[1]; ++q)
-          if (cell_to_normals_map.find (q->second.second)
+      CellToNormalsMap cell_to_normals_map;
+      for (typename DoFToNormalsMap::const_iterator
+           q = same_dof_range[0];
+           q != same_dof_range[1]; ++q)
+        if (cell_to_normals_map.find (q->second.second)
               == cell_to_normals_map.end())
             cell_to_normals_map[q->second.second]
               = std::make_pair (q->second.first, 1U);
-          else
-            {
-              const Tensor<1,dim> old_normal
+        else
+        {
+          const Tensor<1,dim> old_normal
                 = cell_to_normals_map[q->second.second].first;
-              const unsigned int old_count
+          const unsigned int old_count
                 = cell_to_normals_map[q->second.second].second;
 
-              Assert (old_count > 0, ExcInternalError());
+          Assert (old_count > 0, ExcInternalError());
 
-              // in the same entry, store again the now averaged normal vector
-              // and the new count
-              cell_to_normals_map[q->second.second]
-                = std::make_pair ((old_normal * old_count + q->second.first) / (old_count + 1),
-                                  old_count + 1);
-            }
-        Assert (cell_to_normals_map.size() >= 1, ExcInternalError());
+          // in the same entry, store again the now averaged normal vector
+          // and the new count
+          cell_to_normals_map[q->second.second]
+            = std::make_pair ((old_normal * old_count + q->second.first) / (old_count + 1),
+                               old_count + 1);
+        }
+      Assert (cell_to_normals_map.size() >= 1, ExcInternalError());
 
 #ifdef DEBUG_NO_NORMAL_FLUX
-        std::cout << "   cell_to_normals_map:" << std::endl;
-        for (typename CellToNormalsMap::const_iterator
-             x = cell_to_normals_map.begin();
-             x != cell_to_normals_map.end(); ++x)
-          std::cout << "      " << x->first << " -> ("
-                    << x->second.first << ',' << x->second.second << ')'
-                    << std::endl;
+      std::cout << "   cell_to_normals_map:" << std::endl;
+      for (typename CellToNormalsMap::const_iterator
+           x = cell_to_normals_map.begin();
+           x != cell_to_normals_map.end(); ++x)
+        std::cout << "      " << x->first << " -> ("
+                  << x->second.first << ',' << x->second.second << ')'
+                  << std::endl;
 #endif
 
-        // count the maximum number of contributions from each cell
-        unsigned int max_n_contributions_per_cell = 1;
-        for (typename CellToNormalsMap::const_iterator
-             x = cell_to_normals_map.begin();
-             x != cell_to_normals_map.end(); ++x)
+      // count the maximum number of contributions from each cell
+      unsigned int max_n_contributions_per_cell = 1;
+      for (typename CellToNormalsMap::const_iterator
+           x = cell_to_normals_map.begin();
+           x != cell_to_normals_map.end(); ++x)
           max_n_contributions_per_cell
             = std::max (max_n_contributions_per_cell,
                         x->second.second);
 
-        // verify that each cell can have only contributed at most dim times,
-        // since that is the maximum number of faces that come together at a
-        // single place
-        Assert (max_n_contributions_per_cell <= dim, ExcInternalError());
+      // verify that each cell can have only contributed at most dim times,
+      // since that is the maximum number of faces that come together at a
+      // single place
+      Assert (max_n_contributions_per_cell <= dim, ExcInternalError());
 
-        switch (max_n_contributions_per_cell)
+      switch (max_n_contributions_per_cell)
+      {
+        // first deal with the case that a number of cells all have
+        // registered that they have a normal vector defined at the
+        // location of a given vector dof, and that each of them have
+        // encountered this vector dof exactly once while looping over all
+        // their faces. as stated in the documentation, this is the case
+        // where we want to simply average over all normal vectors
+        //
+        // the typical case is in 2d where multiple cells meet at one
+        // vertex sitting on the boundary. same in 3d for a vertex that
+        // is associated with only one of the boundary indicators passed
+        // to this function
+        case 1:
+        {
+          // compute the average normal vector from all the ones that have
+          // the same set of dofs. we could add them up and divide them by
+          // the number of additions, or simply normalize them right away
+          // since we want them to have unit length anyway
+          Tensor<1,dim> normal;
+          for (typename CellToNormalsMap::const_iterator
+               x = cell_to_normals_map.begin();
+               x != cell_to_normals_map.end(); ++x)
+            normal += x->second.first;
+          normal /= normal.norm();
+
+          // normalize again
+          for (unsigned int d=0; d<dim; ++d)
+            if (std::fabs(normal[d]) < 1e-13)
+              normal[d] = 0;
+          normal /= normal.norm();
+
+          // then construct constraints from this:
+          const internal::VectorDoFTuple<dim> &
+          dof_indices = same_dof_range[0]->first;
+          double normal_value = 0.;
+          const Vector<double> b_values = dof_vector_to_b_values[dof_indices];
+          for (unsigned int i=0; i<dim; ++i)
+            normal_value += b_values[i]*normal[i];
+          internal::add_constraint (dof_indices, normal,
+                                    constraints, normal_value);
+            
+          break;
+        }
+
+        // this is the slightly more complicated case that a single cell has
+        // contributed with exactly DIM normal vectors to the same set of
+        // vector dofs. this is what happens in a corner in 2d and 3d (but
+        // not on an edge in 3d, where we have only 2, i.e. <DIM,
+        // contributions. Here we do not want to average the normal
+        // vectors. Since we have DIM contributions, let's assume (and
+        // verify) that they are in fact all linearly independent; in that
+        // case, all vector components are constrained and we need to set all 
+        // of them to the corresponding boundary values
+        case dim:
+        {
+          // assert that indeed only a single cell has contributed
+          Assert (cell_to_normals_map.size() == 1,
+                  ExcInternalError());
+
+          // check linear independence by computing the determinant of the
+          // matrix created from all the normal vectors. if they are
+          // linearly independent, then the determinant is nonzero. if they
+          // are orthogonal, then the matrix is in fact equal to 1 (since
+          // they are all unit vectors); make sure the determinant is larger
+          // than 1e-3 to avoid cases where cells are degenerate
           {
-          // first deal with the case that a number of cells all have
-          // registered that they have a normal vector defined at the
-          // location of a given vector dof, and that each of them have
-          // encountered this vector dof exactly once while looping over all
-          // their faces. as stated in the documentation, this is the case
-          // where we want to simply average over all normal vectors
-          //
-          // the typical case is in 2d where multiple cells meet at one
-          // vertex sitting on the boundary. same in 3d for a vertex that
-          // is associated with only one of the boundary indicators passed
-          // to this function
-          case 1:
-          {
+            Tensor<2,dim> t;
+              
+            typename DoFToNormalsMap::const_iterator x = same_dof_range[0];
+            for (unsigned int i=0; i<dim; ++i, ++x)
+              for (unsigned int j=0; j<dim; ++j)
+                t[i][j] = x->second.first[j];
 
-            // compute the average normal vector from all the ones that have
-            // the same set of dofs. we could add them up and divide them by
-            // the number of additions, or simply normalize them right away
-            // since we want them to have unit length anyway
-            Tensor<1,dim> normal;
-            for (typename CellToNormalsMap::const_iterator
-                 x = cell_to_normals_map.begin();
-                 x != cell_to_normals_map.end(); ++x)
-              normal += x->second.first;
-            normal /= normal.norm();
-
-            // normalize again
-            for (unsigned int d=0; d<dim; ++d)
-              if (std::fabs(normal[d]) < 1e-13)
-                normal[d] = 0;
-            normal /= normal.norm();
-
-            // then construct constraints from this:
-            const internal::VectorDoFTuple<dim> &
-            dof_indices = same_dof_range[0]->first;
-            internal::add_constraint (dof_indices, normal,
-                                      constraints);
-
-            break;
+            Assert (std::fabs(determinant (t)) > 1e-3,
+                    ExcMessage("Found a set of normal vectors that are nearly collinear."));
           }
 
-
-          // this is the slightly more complicated case that a single cell has
-          // contributed with exactly DIM normal vectors to the same set of
-          // vector dofs. this is what happens in a corner in 2d and 3d (but
-          // not on an edge in 3d, where we have only 2, i.e. <DIM,
-          // contributions. Here we do not want to average the normal
-          // vectors. Since we have DIM contributions, let's assume (and
-          // verify) that they are in fact all linearly independent; in that
-          // case, all vector components are constrained and we need to set
-          // them to zero
-          case dim:
-          {
-            // assert that indeed only a single cell has contributed
-            Assert (cell_to_normals_map.size() == 1,
-                    ExcInternalError());
-
-            // check linear independence by computing the determinant of the
-            // matrix created from all the normal vectors. if they are
-            // linearly independent, then the determinant is nonzero. if they
-            // are orthogonal, then the matrix is in fact equal to 1 (since
-            // they are all unit vectors); make sure the determinant is larger
-            // than 1e-3 to avoid cases where cells are degenerate
+          // so all components of this vector dof are constrained. enter
+          // this into the constraint matrix
+          //
+          // ignore dofs already constrained
+          const internal::VectorDoFTuple<dim> &
+          dof_indices = same_dof_range[0]->first;
+          const Vector<double> b_values = dof_vector_to_b_values[dof_indices];
+          for (unsigned int i=0; i<dim; ++i)
+            if (!constraints.is_constrained(same_dof_range[0]->first.dof_indices[i])
+                &&
+                constraints.can_store_line(same_dof_range[0]->first.dof_indices[i]))
             {
-              Tensor<2,dim> t;
-
-              typename DoFToNormalsMap::const_iterator x = same_dof_range[0];
-              for (unsigned int i=0; i<dim; ++i, ++x)
-                for (unsigned int j=0; j<dim; ++j)
-                  t[i][j] = x->second.first[j];
-
-              Assert (std::fabs(determinant (t)) > 1e-3,
-                      ExcMessage("Found a set of normal vectors that are nearly collinear."));
+              const types::global_dof_index line
+                = dof_indices.dof_indices[i];
+              constraints.add_line (line);
+              if (std::fabs(b_values[i])
+                  > std::numeric_limits<double>::epsilon())
+                constraints.set_inhomogeneity(line, b_values[i]);
+              // no add_entries here
             }
 
-            // so all components of this vector dof are constrained. enter
-            // this into the constraint matrix
-            //
-            // ignore dofs already constrained
-            for (unsigned int i=0; i<dim; ++i)
-              if (!constraints.is_constrained (same_dof_range[0]
-                                               ->first.dof_indices[i])
-                  &&
-                  constraints.can_store_line(
-                    same_dof_range[0]->first.dof_indices[i]))
-                {
-                  constraints.add_line (same_dof_range[0]->first.dof_indices[i]);
-                  // no add_entries here
-                }
-
             break;
           }
 
+        // this is the case of an edge contribution in 3d, i.e. the vector
+        // is constrained in two directions but not the third.
+        default:
+        {
+          Assert (dim >= 3, ExcNotImplemented());
+          Assert (max_n_contributions_per_cell == 2, ExcInternalError());
 
-          // this is the case of an edge contribution in 3d, i.e. the vector
-          // is constrained in two directions but not the third.
-          default:
-          {
-            Assert (dim >= 3, ExcNotImplemented());
-            Assert (max_n_contributions_per_cell == 2, ExcInternalError());
-
-            // as described in the documentation, let us first collect what
-            // each of the cells contributed at the current point. we use a
-            // std::list instead of a std::set (which would be more natural)
-            // because std::set requires that the stored elements are
-            // comparable with operator<
-            typedef
-            std::map<typename DH<dim,spacedim>::active_cell_iterator, std::list<Tensor<1,dim> > >
+          // as described in the documentation, let us first collect what
+          // each of the cells contributed at the current point. we use a
+          // std::list instead of a std::set (which would be more natural)
+          // because std::set requires that the stored elements are
+          // comparable with operator<
+          typedef std::map<typename DH<dim,spacedim>::active_cell_iterator,
+                           std::list<Tensor<1,dim> > >
             CellContributions;
-            CellContributions cell_contributions;
+          CellContributions cell_contributions;
 
-            for (typename DoFToNormalsMap::const_iterator
-                 q = same_dof_range[0];
-                 q != same_dof_range[1]; ++q)
-              cell_contributions[q->second.second].push_back (q->second.first);
-            Assert (cell_contributions.size() >= 1, ExcInternalError());
+          for (typename DoFToNormalsMap::const_iterator
+               q = same_dof_range[0];
+               q != same_dof_range[1]; ++q)
+            cell_contributions[q->second.second].push_back (q->second.first);
+          Assert (cell_contributions.size() >= 1, ExcInternalError());
 
-            // now for each cell that has contributed determine the number of
-            // normal vectors it has contributed. we currently only implement
-            // if this is dim-1 for all cells (if a single cell has
-            // contributed dim, or if all adjacent cells have contributed 1
-            // normal vector, this is already handled above).
-            //
-            // we only implement the case that all cells contribute
-            // dim-1 because we assume that we are following an edge
-            // of the domain (think: we are looking at a vertex
-            // located on one of the edges of a refined cube where the
-            // boundary indicators of the two adjacent faces of the
-            // cube are both listed in the set of boundary indicators
-            // passed to this function). in that case, all cells along
-            // that edge of the domain are assumed to have contributed
-            // dim-1 normal vectors. however, there are cases where
-            // this assumption is not justified (see the lengthy
-            // explanation in test no_flux_12.cc) and in those cases
-            // we simply ignore the cell that contributes only
-            // once. this is also discussed at length in the
-            // documentation of this function.
-            //
-            // for each contributing cell compute the tangential vector that
-            // remains unconstrained
-            std::list<Tensor<1,dim> > tangential_vectors;
-            for (typename CellContributions::const_iterator
-                 contribution = cell_contributions.begin();
-                 contribution != cell_contributions.end();
-                 ++contribution)
-              {
+          // now for each cell that has contributed determine the number of
+          // normal vectors it has contributed. we currently only implement
+          // if this is dim-1 for all cells (if a single cell has
+          // contributed dim, or if all adjacent cells have contributed 1
+          // normal vector, this is already handled above).
+          //
+          // we only implement the case that all cells contribute
+          // dim-1 because we assume that we are following an edge
+          // of the domain (think: we are looking at a vertex
+          // located on one of the edges of a refined cube where the
+          // boundary indicators of the two adjacent faces of the
+          // cube are both listed in the set of boundary indicators
+          // passed to this function). in that case, all cells along
+          // that edge of the domain are assumed to have contributed
+          // dim-1 normal vectors. however, there are cases where
+          // this assumption is not justified (see the lengthy
+          // explanation in test no_flux_12.cc) and in those cases
+          // we simply ignore the cell that contributes only
+          // once. this is also discussed at length in the
+          // documentation of this function.
+          //
+          // for each contributing cell compute the tangential vector that
+          // remains unconstrained
+          std::list<Tensor<1,dim> > tangential_vectors;
+          for (typename CellContributions::const_iterator
+               contribution = cell_contributions.begin();
+               contribution != cell_contributions.end();
+               ++contribution)
+          {
 #ifdef DEBUG_NO_NORMAL_FLUX
-                std::cout << "   Treating edge case with dim-1 contributions." << std::endl
-                          << "   Looking at cell " << contribution->first
-                          << " which has contributed these normal vectors:"
-                          << std::endl;
-                for (typename std::list<Tensor<1,dim> >::const_iterator
-                     t = contribution->second.begin();
-                     t != contribution->second.end();
-                     ++t)
-                  std::cout << "      " << *t << std::endl;
+            std::cout << "   Treating edge case with dim-1 contributions." << std::endl
+                      << "   Looking at cell " << contribution->first
+                      << " which has contributed these normal vectors:"
+                      << std::endl;
+            for (typename std::list<Tensor<1,dim> >::const_iterator
+                 t = contribution->second.begin();
+                 t != contribution->second.end();
+                 ++t)
+              std::cout << "      " << *t << std::endl;
 #endif
 
-                // as mentioned above, simply ignore cells that only
-                // contribute once
-                if (contribution->second.size() < dim-1)
-                  continue;
-
-                Tensor<1,dim> normals[dim-1];
-                {
-                  unsigned int index=0;
-                  for (typename std::list<Tensor<1,dim> >::const_iterator
-                       t = contribution->second.begin();
-                       t != contribution->second.end();
-                       ++t, ++index)
-                    normals[index] = *t;
-                  Assert (index == dim-1, ExcInternalError());
-                }
-
-                // calculate the tangent as the outer product of the normal
-                // vectors. since these vectors do not need to be orthogonal
-                // (think, for example, the case of the deal.II/no_flux_07
-                // test: a sheared cube in 3d, with Q2 elements, where we have
-                // constraints from the two normal vectors of two faces of the
-                // sheared cube that are not perpendicular to each other), we
-                // have to normalize the outer product
-                Tensor<1,dim> tangent;
-                switch (dim)
-                  {
-                  case 3:
-                    // take cross product between normals[0] and
-                    // normals[1]. write it in the current form (with [dim-2])
-                    // to make sure that compilers don't warn about
-                    // out-of-bounds accesses -- the warnings are bogus since
-                    // we get here only for dim==3, but at least one isn't
-                    // quite smart enough to notice this and warns when
-                    // compiling the function in 2d
-                    cross_product (tangent, normals[0], normals[dim-2]);
-                    break;
-                  default:
-                    Assert (false, ExcNotImplemented());
-                  }
-
-                Assert (std::fabs (tangent.norm()) > 1e-12,
-                        ExcMessage("Two normal vectors from adjacent faces are almost "
-                                   "parallel."));
-                tangent /= tangent.norm();
-
-                tangential_vectors.push_back (tangent);
-              }
-
-            // go through the list of tangents and make sure that they all
-            // roughly point in the same direction as the first one (i.e. have
-            // an angle less than 90 degrees); if they don't then flip their
-            // sign
+            // as mentioned above, simply ignore cells that only
+            // contribute once
+            if (contribution->second.size() < dim-1)
+              continue;
+              
+            Tensor<1,dim> normals[dim-1];
             {
-              const Tensor<1,dim> first_tangent = tangential_vectors.front();
-              typename std::list<Tensor<1,dim> >::iterator
-              t = tangential_vectors.begin();
-              ++t;
-              for (; t != tangential_vectors.end(); ++t)
-                if (*t * first_tangent < 0)
-                  *t *= -1;
+              unsigned int index=0;
+              for (typename std::list<Tensor<1,dim> >::const_iterator
+                   t = contribution->second.begin();
+                   t != contribution->second.end();
+                   ++t, ++index)
+                normals[index] = *t;
+              Assert (index == dim-1, ExcInternalError());
             }
 
-            // now compute the average tangent and normalize it
-            Tensor<1,dim> average_tangent;
-            for (typename std::list<Tensor<1,dim> >::const_iterator
-                 t = tangential_vectors.begin();
-                 t != tangential_vectors.end();
-                 ++t)
-              average_tangent += *t;
-            average_tangent /= average_tangent.norm();
+            // calculate the tangent as the outer product of the normal
+            // vectors. since these vectors do not need to be orthogonal
+            // (think, for example, the case of the deal.II/no_flux_07
+            // test: a sheared cube in 3d, with Q2 elements, where we have
+            // constraints from the two normal vectors of two faces of the
+            // sheared cube that are not perpendicular to each other), we
+            // have to normalize the outer product
+            Tensor<1,dim> tangent;
+            switch (dim)
+            {
+              case 3:
+                // take cross product between normals[0] and
+                // normals[1]. write it in the current form (with [dim-2])
+                // to make sure that compilers don't warn about
+                // out-of-bounds accesses -- the warnings are bogus since
+                // we get here only for dim==3, but at least one isn't
+                // quite smart enough to notice this and warns when
+                // compiling the function in 2d
+                cross_product (tangent, normals[0], normals[dim-2]);
+                break;
+              default:
+                Assert (false, ExcNotImplemented());
+            }
 
-            // now all that is left is that we add the constraints that the
-            // vector is parallel to the tangent
-            const internal::VectorDoFTuple<dim> &
+            Assert (std::fabs (tangent.norm()) > 1e-12,
+                    ExcMessage("Two normal vectors from adjacent faces are almost "
+                               "parallel."));
+            tangent /= tangent.norm();
+
+            tangential_vectors.push_back (tangent);
+          }
+
+          // go through the list of tangents and make sure that they all
+          // roughly point in the same direction as the first one (i.e. have
+          // an angle less than 90 degrees); if they don't then flip their
+          // sign
+          {
+            const Tensor<1,dim> first_tangent = tangential_vectors.front();
+            typename std::list<Tensor<1,dim> >::iterator
+              t = tangential_vectors.begin();
+            ++t;
+            for (; t != tangential_vectors.end(); ++t)
+              if (*t * first_tangent < 0)
+                *t *= -1;
+          }
+
+          // now compute the average tangent and normalize it
+          Tensor<1,dim> average_tangent;
+          for (typename std::list<Tensor<1,dim> >::const_iterator
+               t = tangential_vectors.begin();
+               t != tangential_vectors.end();
+               ++t)
+            average_tangent += *t;
+          average_tangent /= average_tangent.norm();
+
+          // now all that is left is that we add the constraints that the
+          // vector is parallel to the tangent
+          const internal::VectorDoFTuple<dim> &
             dof_indices = same_dof_range[0]->first;
-            internal::add_tangentiality_constraints (dof_indices,
-                                                     average_tangent,
-                                                     constraints);
-          }
-          }
+          const Vector<double> b_values = dof_vector_to_b_values[dof_indices];
+          internal::add_tangentiality_constraints (dof_indices,
+                                                   average_tangent,
+                                                   constraints,
+                                                   b_values);
+        }
       }
+    }
   }
 
 
@@ -4813,12 +4889,63 @@ namespace VectorTools
                                    ConstraintMatrix      &constraints,
                                    const Mapping<dim, spacedim> &mapping)
   {
+    ZeroFunction<dim>zero_function(dim);
+    typename FunctionMap<spacedim>::type function_map;
+    std::set<types::boundary_id>::const_iterator it
+      = boundary_ids.begin();
+    for (;it != boundary_ids.end(); ++it)
+      function_map[*it] = &zero_function;
+    compute_nonzero_tangential_flux_constraints(dof_handler,
+                                                first_vector_component,
+                                                boundary_ids,
+                                                function_map,
+                                                constraints,
+                                                mapping);
+  }
+
+  template <int dim, template <int, int> class DH, int spacedim>
+  void
+  compute_nonzero_tangential_flux_constraints (const DH<dim,spacedim> &dof_handler,
+                                               const unsigned int     first_vector_component,
+                                               const std::set<types::boundary_id> &boundary_ids,
+                                               typename FunctionMap<spacedim>::type &function_map,
+                                               ConstraintMatrix      &constraints,
+                                               const Mapping<dim, spacedim> &mapping)
+  {
     ConstraintMatrix no_normal_flux_constraints(constraints.get_local_lines());
-    compute_no_normal_flux_constraints (dof_handler,
-                                        first_vector_component,
-                                        boundary_ids,
-                                        no_normal_flux_constraints,
-                                        mapping);
+    compute_nonzero_normal_flux_constraints (dof_handler,
+                                             first_vector_component,
+                                             boundary_ids,
+                                             function_map,
+                                             no_normal_flux_constraints,
+                                             mapping);
+
+    hp::FECollection<dim,spacedim>      fe_collection (dof_handler.get_fe());
+    hp::MappingCollection<dim,spacedim> mapping_collection;
+    for (unsigned int i=0; i<fe_collection.size(); ++i)
+      mapping_collection.push_back (mapping);
+    
+    // now also create a quadrature collection for the faces of a cell. fill
+    // it with a quadrature formula with the support points on faces for each
+    // FE
+    hp::QCollection<dim-1> face_quadrature_collection;
+    for (unsigned int i=0; i<fe_collection.size(); ++i)
+    {
+      const std::vector<Point<dim-1> > &
+      unit_support_points = fe_collection[i].get_unit_face_support_points();
+        
+      Assert (unit_support_points.size() == fe_collection[i].dofs_per_face,
+              ExcInternalError());
+       
+      face_quadrature_collection.push_back (Quadrature<dim-1> (unit_support_points));
+    }
+      
+    // now create the object with which we will generate the normal vectors
+    hp::FEFaceValues<dim,spacedim> x_fe_face_values (mapping_collection,
+                                                     fe_collection,
+                                                     face_quadrature_collection,
+                                                     update_q_points |
+                                                     update_normal_vectors);
 
     // Extract a list that collects all vector components that belong to the
     // same node (scalar basis function). When creating that list, we use an
@@ -4826,13 +4953,17 @@ namespace VectorTools
     std::set<std_cxx1x::array<types::global_dof_index,dim>, PointComparator<dim> > vector_dofs;
     std::vector<types::global_dof_index> face_dofs;
 
+    std::map<std_cxx1x::array<types::global_dof_index,dim>, Vector<double> >
+      dof_vector_to_b_values;
+
+    std::set<types::boundary_id>::iterator b_id;
     std::vector<std_cxx1x::array<types::global_dof_index,dim> > cell_vector_dofs;
     for (typename DH<dim,spacedim>::active_cell_iterator cell =
            dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
       if (!cell->is_artificial())
         for (unsigned int face_no=0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
-          if (boundary_ids.find(cell->face(face_no)->boundary_indicator())
+          if ((b_id=boundary_ids.find(cell->face(face_no)->boundary_indicator()))
               != boundary_ids.end())
             {
               const FiniteElement<dim> &fe = cell->get_fe();
@@ -4842,25 +4973,50 @@ namespace VectorTools
               face_dofs.resize (fe.dofs_per_face);
               face->get_dof_indices (face_dofs, cell->active_fe_index());
 
+              x_fe_face_values.reinit (cell, face_no);
+              const FEFaceValues<dim> &fe_values = x_fe_face_values.get_present_fe_values();
+
+              std::map<types::global_dof_index, double> dof_to_b_value;
+              
               unsigned int n_scalar_indices = 0;
               cell_vector_dofs.resize(fe.dofs_per_face);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+              {
                 if (fe.face_system_to_component_index(i).first >= first_vector_component &&
                     fe.face_system_to_component_index(i).first < first_vector_component + dim)
-                  {
-                    n_scalar_indices =
-                      std::max(n_scalar_indices,
-                               fe.face_system_to_component_index(i).second+1);
-                    cell_vector_dofs[fe.face_system_to_component_index(i).second]
-                    [fe.face_system_to_component_index(i).first-first_vector_component]
-                      = face_dofs[i];
-                  }
+                {
+                  const unsigned int component
+                    = fe.face_system_to_component_index(i).first
+                      -first_vector_component;
+                  n_scalar_indices =
+                    std::max(n_scalar_indices,
+                             fe.face_system_to_component_index(i).second+1);
+                  cell_vector_dofs[fe.face_system_to_component_index(i).second]
+                    [component]
+                    = face_dofs[i];
+                
+                  const Point<dim> point
+                    = fe_values.quadrature_point(i);
+                  const double b_value
+                    = function_map[*b_id]->value(point, component);
+                  dof_to_b_value.insert
+                    (std::make_pair(face_dofs[i], b_value));
+                }
+              }
 
               // now we identified the vector indices on the cell, so next
               // insert them into the set (it would be expensive to directly
               // insert incomplete points into the set)
               for (unsigned int i=0; i<n_scalar_indices; ++i)
+              {
                 vector_dofs.insert(cell_vector_dofs[i]);
+                Vector<double> b_values(dim);
+                for (unsigned int j=0; j<dim; ++j)
+                  b_values[j]=dof_to_b_value[cell_vector_dofs[i][j]];
+                dof_vector_to_b_values.insert
+                  (std::make_pair(cell_vector_dofs[i], b_values));
+              }
+
             }
 
     // iterate over the list of all vector components we found and see if we
@@ -4886,11 +5042,15 @@ namespace VectorTools
             // if more than one no-flux constraint is present, we need to
             // constrain all vector degrees of freedom (we are in a corner
             // where several faces meet and to get a continuous FE solution we
-            // need to set all conditions to zero).
+            // need to set all conditions corresponding to the boundary function.).
             if (n_constraints > 1)
               {
+                const Vector<double> b_value = dof_vector_to_b_values[*it];
                 for (unsigned int d=0; d<dim; ++d)
+                {
                   constraints.add_line((*it)[d]);
+                  constraints.set_inhomogeneity((*it)[d], b_value(d));
+                }
                 continue;
               }
 
@@ -4921,6 +5081,7 @@ namespace VectorTools
                 Assert (index != -1, ExcInternalError());
                 normal[index] = (*constrained)[c].second;
               }
+            Vector<double> boundary_value = dof_vector_to_b_values[*it];
             for (unsigned int d=0; d<dim; ++d)
               {
                 if (is_constrained[d])
@@ -4932,6 +5093,7 @@ namespace VectorTools
                     if (std::abs(normal[d]) > 1e-13)
                       constraints.add_entry(new_index, (*it)[constrained_index],
                                             -normal[d]);
+                    constraints.set_inhomogeneity(new_index, boundary_value[d]);
                   }
               }
           }

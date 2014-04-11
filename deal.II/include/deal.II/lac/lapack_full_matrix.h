@@ -34,6 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 template<typename number> class Vector;
 template<typename number> class BlockVector;
 template<typename number> class FullMatrix;
+template<typename number> class SparseMatrix;
 
 
 /**
@@ -54,6 +55,7 @@ template <typename number>
 class LAPACKFullMatrix : public TransposeTable<number>
 {
 public:
+
   /**
    * Declare type for container size.
    */
@@ -68,13 +70,15 @@ public:
    *
    * By default, no memory is allocated.
    */
-  explicit LAPACKFullMatrix (const size_type n = 0);
+  explicit LAPACKFullMatrix (const size_type size = 0);
+
 
   /**
    * Constructor. Initialize the matrix as a rectangular matrix.
    */
   LAPACKFullMatrix (const size_type rows,
                     const size_type cols);
+
 
   /**
    * Copy constructor. This constructor does a deep copy of the
@@ -95,13 +99,22 @@ public:
   operator = (const LAPACKFullMatrix<number> &);
 
   /**
-   * Assignment operator for a regular FullMatrix. Note that since LAPACK
-   * expects matrices in transposed order, this transposition is included
-   * here.
+   * Assignment operator from a regular FullMatrix. @note Since LAPACK
+   * expects matrices in transposed order, this transposition is
+   * included here.
    */
   template <typename number2>
   LAPACKFullMatrix<number> &
   operator = (const FullMatrix<number2> &);
+
+  /**
+   * Assignment operator from a regular SparseMatrix. @note Since
+   * LAPACK expects matrices in transposed order, this transposition
+   * is included here.
+   */
+  template <typename number2>
+  LAPACKFullMatrix<number> &
+  operator = (const SparseMatrix<number2> &);
 
   /**
    * This operator assigns a scalar to a matrix. To avoid confusion with
@@ -118,6 +131,33 @@ public:
    */
   template <class MATRIX>
   void copy_from (const MATRIX &);
+
+  /**
+   * Regenerate the current matrix by one that has the same properties
+   * as if it were created by the constructor of this class with the
+   * same argument list as this present function.
+   */
+  void reinit (const size_type size);
+
+  /**
+   * Regenerate the current matrix by one that has the same properties
+   * as if it were created by the constructor of this class with the
+   * same argument list as this present function.
+   */
+  void reinit (const size_type rows,
+	       const size_type cols);
+
+  /**
+   * Return the dimension of the range space. @note The matrix is of
+   * dimension $m \times n$.
+   */
+  unsigned int m () const;
+
+  /**
+   * Return the number of the range space. @note The matrix is of
+   * dimension $m \times n$.
+   */
+  unsigned int n () const;
 
   /**
    * Fill rectangular block.
@@ -358,7 +398,7 @@ public:
    * system is to be performed.
    */
   void apply_lu_factorization (Vector<number> &v,
-                               const bool transposed) const;
+                               const bool      transposed) const;
 
   /**
    * Solve the linear system with multiple right hand sides (as many as there
@@ -370,7 +410,7 @@ public:
    * system is to be performed.
    */
   void apply_lu_factorization (LAPACKFullMatrix<number> &B,
-                               const bool transposed) const;
+                               const bool                transposed) const;
 
   /**
    * Compute eigenvalues of the matrix. After this routine has been called,
@@ -391,7 +431,7 @@ public:
    * @note Calls the LAPACK function Xgeev.
    */
   void compute_eigenvalues (const bool right_eigenvectors = false,
-                            const bool left_eigenvectors = false);
+                            const bool left_eigenvectors  = false);
 
   /**
    * Compute eigenvalues and eigenvectors of a real symmetric matrix. Only
@@ -411,12 +451,11 @@ public:
    * @note Calls the LAPACK function Xsyevx. For this to work, ./configure has
    * to be told to use LAPACK.
    */
-  void compute_eigenvalues_symmetric(
-    const number lower_bound,
-    const number upper_bound,
-    const number abs_accuracy,
-    Vector<number> &eigenvalues,
-    FullMatrix<number> &eigenvectors);
+  void compute_eigenvalues_symmetric (const number        lower_bound,
+				      const number        upper_bound,
+				      const number        abs_accuracy,
+				      Vector<number>     &eigenvalues,
+				      FullMatrix<number> &eigenvectors);
 
   /**
    * Compute generalized eigenvalues and eigenvectors of a real generalized
@@ -439,14 +478,13 @@ public:
    * @note Calls the LAPACK function Xsygvx. For this to work, ./configure has
    * to be told to use LAPACK.
    */
-  void compute_generalized_eigenvalues_symmetric(
-    LAPACKFullMatrix<number> &B,
-    const number lower_bound,
-    const number upper_bound,
-    const number abs_accuracy,
-    Vector<number> &eigenvalues,
-    std::vector<Vector<number> > &eigenvectors,
-    const int itype = 1);
+  void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
+						  const number                  lower_bound,
+						  const number                  upper_bound,
+						  const number                  abs_accuracy,
+						  Vector<number>               &eigenvalues,
+						  std::vector<Vector<number> > &eigenvectors,
+						  const int                     itype = 1);
 
   /**
    * Same as the other compute_generalized_eigenvalues_symmetric function
@@ -464,10 +502,9 @@ public:
    * @note Calls the LAPACK function Xsygv. For this to work, ./configure has
    * to be told to use LAPACK.
    */
-  void compute_generalized_eigenvalues_symmetric (
-    LAPACKFullMatrix<number> &B,
-    std::vector<Vector<number> > &eigenvectors,
-    const int itype = 1);
+  void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
+						  std::vector<Vector<number> > &eigenvectors,
+						  const int                     itype = 1);
 
   /**
    * Compute the singular value decomposition of the matrix using LAPACK
@@ -477,7 +514,7 @@ public:
    * #wr, #svd_u, and #svd_vt, and leaves the object in the #state
    * LAPACKSupport::svd.
    */
-  void compute_svd();
+  void compute_svd ();
 
   /**
    * Compute the inverse of the matrix by singular value decomposition.
@@ -544,9 +581,11 @@ public:
                         const double        threshold   = 0.) const;
 
 private:
+  
   /**
-   * Since LAPACK operations notoriously change the meaning of the matrix
-   * entries, we record the current state after the last operation here.
+   * Since LAPACK operations notoriously change the meaning of the
+   * matrix entries, we record the current state after the last
+   * operation here.
    */
   LAPACKSupport::State state;
 
@@ -636,7 +675,23 @@ private:
   SmartPointer<VectorMemory<Vector<number> >,PreconditionLU<number> > mem;
 };
 
+/*---------------------- Inline functions -----------------------------------*/
 
+template <typename number>
+inline
+unsigned int
+LAPACKFullMatrix<number>::m () const
+{
+  return this->n_rows ();
+}
+
+template <typename number>
+inline
+unsigned int
+LAPACKFullMatrix<number>::n () const
+{
+  return this->n_cols ();
+}
 
 template <typename number>
 template <class MATRIX>

@@ -238,12 +238,13 @@ FE_DGP<dim,spacedim>::has_support_on_face (const unsigned int,
 
 
 template <int dim, int spacedim>
-Table<2,bool>
+std::pair<Table<2,bool>, std::vector<unsigned int> >
 FE_DGP<dim,spacedim>::get_constant_modes () const
 {
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
   constant_modes(0,0) = true;
-  return constant_modes;
+  return std::pair<Table<2,bool>, std::vector<unsigned int> >
+    (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 

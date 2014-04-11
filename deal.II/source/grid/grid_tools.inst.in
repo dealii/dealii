@@ -238,7 +238,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     template
     void
     laplace_transform (const std::map<unsigned int,Point<deal_II_dimension> > &new_points,
-                       Triangulation<deal_II_dimension> &triangulation);
+                       Triangulation<deal_II_dimension> &triangulation,
+                       const Function<deal_II_dimension> *coefficient);
 
     template
       Triangulation<deal_II_dimension,deal_II_space_dimension>::DistortedCellList

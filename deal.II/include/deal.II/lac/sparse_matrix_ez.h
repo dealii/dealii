@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1077,14 +1077,6 @@ private:
    * Increment when a row grows.
    */
   unsigned int increment;
-
-  /**
-   * Make member classes
-   * friends. Not strictly
-   * necessary according to the
-   * standard, but some compilers
-   * require this...
-   */
 };
 
 /**

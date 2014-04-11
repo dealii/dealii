@@ -188,34 +188,6 @@ DoFAccessor<structdim,DH,level_dof_access>::child (const unsigned int i) const
 }
 
 
-template <int structdim, class DH, bool level_dof_access>
-inline
-TriaIterator<DoFAccessor<structdim,DH,level_dof_access> >
-DoFAccessor<structdim,DH,level_dof_access>::parent () const
-{
-  Assert (static_cast<unsigned int>(this->level()) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (this->level () > 0,
-          ExcMessage ("Cell is at coarsest level."));
-
-  int previous_level;
-
-  if (DH::dimension==structdim)
-    previous_level = this->level () - 1;
-
-  else
-    previous_level = 0;
-
-  TriaIterator<DoFAccessor<structdim,DH,level_dof_access> > q (this->tria,
-                                                  previous_level,
-                                                  this->parent_index (),
-                                                  this->dof_handler);
-
-  return q;
-}
-
-
-
 namespace internal
 {
   namespace DoFAccessor

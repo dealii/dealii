@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 // ---------------------------------------------------------------------
 
 
+// test the deformation of a circular annulus to a domain where the central
+// circle is displaced
 
 
 #include "../tests.h"

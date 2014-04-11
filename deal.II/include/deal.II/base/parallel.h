@@ -475,8 +475,9 @@ namespace parallel
     f (begin, end);
 #  else
     // work around a problem with MS VC++ where there is no const
-    // operator() in Function
-    Function(f) (begin, end);
+    // operator() in 'Function' if 'Function' is the result of std::bind
+    Function ff = f;
+    ff (begin, end);
 #  endif
 #else
     tbb::parallel_for (tbb::blocked_range<RangeType>
@@ -758,11 +759,12 @@ namespace parallel
     (void) grainsize;
 
 #  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-    f (begin, end);
+    return f (begin, end);
 #  else
     // work around a problem with MS VC++ where there is no const
-    // operator() in Function
-    Function(f) (begin, end);
+    // operator() in 'Function' if 'Function' is the result of std::bind
+    Function ff = f;
+    return ff (begin, end);
 #  endif
 #else
     internal::ReductionOnSubranges<ResultType,Function>

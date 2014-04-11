@@ -51,7 +51,7 @@ FE_BDM<dim>::FE_BDM (const unsigned int deg)
 
   const unsigned int n_dofs = this->dofs_per_cell;
 
-  this->mapping_type = mapping_piola;
+  this->mapping_type = mapping_bdm;
   // These must be done first, since
   // they change the evaluation of
   // basis functions

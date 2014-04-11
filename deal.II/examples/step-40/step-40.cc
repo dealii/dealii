@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2009 - 2013 by the deal.II authors
+ * Copyright (C) 2009 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -468,7 +468,7 @@ namespace Step40
 #ifdef USE_PETSC_LA
     data.symmetric_operator = true;
 #else
-    //trilinos defaults are good
+    /* Trilinos defaults are good */
 #endif
     preconditioner.initialize(system_matrix, data);
 

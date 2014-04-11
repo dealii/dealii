@@ -1420,6 +1420,11 @@ namespace TrilinosWrappers
       const char* coarse_type;
     };
 
+    /**
+     * Destructor.
+     */
+    ~PreconditionAMG();
+
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a

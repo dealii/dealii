@@ -26,8 +26,8 @@
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/block_indices.h>
 #include <deal.II/fe/fe_update_flags.h>
-#include <deal.II/fe/mapping.h>
 
 #include <string>
 #include <vector>

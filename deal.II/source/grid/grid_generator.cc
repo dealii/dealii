@@ -3421,11 +3421,15 @@ namespace GridGenerator
         cells.push_back (this_cell);
       }
 
-    // throw out duplicated vertices from the two meshes
-    // and create the triangulation
+    // throw out duplicated vertices from the two meshes, reorder vertices as
+    // necessary and create the triangulation
     SubCellData subcell_data;
     std::vector<unsigned int> considered_vertices;
-    GridTools::delete_duplicated_vertices (vertices, cells, subcell_data, considered_vertices);
+    GridTools::delete_duplicated_vertices (vertices, cells,
+					   subcell_data,
+					   considered_vertices);
+    GridReordering<dim,spacedim>::reorder_cells (cells);
+
     result.clear ();
     result.create_triangulation (vertices, cells, subcell_data);
   }
@@ -3554,7 +3558,8 @@ namespace GridGenerator
 // Implementation for 1D only
   template <>
   void laplace_transformation (Triangulation<1> &,
-                               const std::map<unsigned int,Point<1> > &)
+                               const std::map<unsigned int,Point<1> > &,
+                               const Function<1> *)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -3563,7 +3568,8 @@ namespace GridGenerator
 // Implementation for dimensions except 1
   template <int dim>
   void laplace_transformation (Triangulation<dim> &tria,
-                               const std::map<unsigned int,Point<dim> > &new_points)
+                               const std::map<unsigned int,Point<dim> > &new_points,
+                               const Function<dim> *coefficient)
   {
     // first provide everything that is
     // needed for solving a Laplace
@@ -3587,38 +3593,39 @@ namespace GridGenerator
 
     QGauss<dim> quadrature(4);
 
-    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S);
+    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S,coefficient);
 
     // set up the boundary values for
     // the laplace problem
     std::vector<std::map<unsigned int,double> > m(dim);
-    typename std::map<unsigned int,Point<dim> >::const_iterator map_iter;
     typename std::map<unsigned int,Point<dim> >::const_iterator map_end=new_points.end();
 
     // fill these maps using the data
     // given by new_points
     typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin_active(),
-                                            endc=dof_handler.end();
-    typename DoFHandler<dim>::face_iterator face;
+        endc=dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-        if (cell->at_boundary())
-          for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-            {
-              face=cell->face(face_no);
-              if (face->at_boundary())
-                for (unsigned int vertex_no=0;
-                     vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
-                  {
-                    const unsigned int vertex_index=face->vertex_index(vertex_no);
-                    map_iter=new_points.find(vertex_index);
+        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+          {
+            const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
 
-                    if (map_iter!=map_end)
-                      for (unsigned int i=0; i<dim; ++i)
-                        m[i].insert(std::pair<unsigned int,double> (
-                                      face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
-                  }
-            }
+            // loop over all vertices of the cell and see if it is listed in the map
+            // given as first argument of the function
+            for (unsigned int vertex_no=0;
+                vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
+              {
+                const unsigned int vertex_index=face->vertex_index(vertex_no);
+
+                const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
+                = new_points.find(vertex_index);
+
+                if (map_iter!=map_end)
+                  for (unsigned int i=0; i<dim; ++i)
+                    m[i].insert(std::pair<unsigned int,double> (
+                        face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
+              }
+          }
       }
 
     // solve the dim problems with

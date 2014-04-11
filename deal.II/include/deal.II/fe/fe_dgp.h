@@ -331,7 +331,8 @@ public:
    * Returns a list of constant modes of the element. For this element, the
    * first entry is true, all other are false.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
 protected:
 

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,10 @@
 #include <cstddef>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+// forward declaration
+template <typename T> class VectorizedArray;
 
 
 /**
@@ -197,6 +201,14 @@ namespace MemoryConsumption
   template <typename T>
   inline
   std::size_t memory_consumption (const std::complex<T> &);
+
+  /**
+   * Determine the amount of memory in bytes consumed by a
+   * <tt>VectorizedArray</tt> variable.
+   */
+  template <typename T>
+  inline
+  std::size_t memory_consumption (const VectorizedArray<T> &);
 
   /**
    * Determine an estimate of the
@@ -522,11 +534,21 @@ namespace MemoryConsumption
   }
 
 
+
   template <typename T>
   inline
   std::size_t memory_consumption (const std::complex<T> &)
   {
     return sizeof(std::complex<T>);
+  }
+
+
+
+  template <typename T>
+  inline
+  std::size_t memory_consumption (const VectorizedArray<T> &)
+  {
+    return sizeof(VectorizedArray<T>);
   }
 
 

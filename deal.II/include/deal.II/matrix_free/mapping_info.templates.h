@@ -850,7 +850,7 @@ namespace internal
       memory += MemoryConsumption::memory_consumption (affine_data);
       memory += MemoryConsumption::memory_consumption (cartesian_data);
       memory += MemoryConsumption::memory_consumption (cell_type);
-      memory += sizeof (this);
+      memory += sizeof (*this);
       return memory;
     }
 

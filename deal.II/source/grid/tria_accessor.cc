@@ -1354,16 +1354,6 @@ void CellAccessor<dim, spacedim>::recursively_set_material_id (const types::mate
 
 
 template <int dim, int spacedim>
-types::subdomain_id CellAccessor<dim, spacedim>::subdomain_id () const
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
-  return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
-}
-
-
-
-template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 {
@@ -1422,13 +1412,39 @@ CellAccessor<dim, spacedim>::set_direction_flag (const bool new_direction_flag) 
 
 
 template <int dim, int spacedim>
+void
+CellAccessor<dim, spacedim>::set_parent (const unsigned int parent_index)
+{
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
+  this->tria->levels[this->present_level]->parents[this->present_index / 2]
+    = parent_index;
+}
+
+
+
+template <int dim, int spacedim>
+int
+CellAccessor<dim, spacedim>::
+parent_index () const
+{
+  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
+
+  // the parent of two consecutive cells
+  // is stored only once, since it is
+  // the same
+  return this->tria->levels[this->present_level]->parents[this->present_index / 2];
+}
+
+
+template <int dim, int spacedim>
 TriaIterator<CellAccessor<dim,spacedim> >
 CellAccessor<dim, spacedim>::parent () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
   TriaIterator<CellAccessor<dim,spacedim> >
-  q (this->tria, this->present_level-1, this->parent_index ());
+  q (this->tria, this->present_level-1, parent_index ());
 
   return q;
 }

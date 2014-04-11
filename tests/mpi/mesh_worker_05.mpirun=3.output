@@ -1,0 +1,98 @@
+
+DEAL:0::DoFHandler ndofs=16
+DEAL:0::*** 1. CELLS ***
+DEAL:0::*** 2. FACES ***
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=1 faces_to_ghost=0
+DEAL:0::F cell1 = 0_2:00 face = 1 cell2 = 0_2:01 face2 = 0
+DEAL:0::F cell1 = 0_2:00 face = 3 cell2 = 0_2:02 face2 = 2
+DEAL:0::F cell1 = 0_2:01 face = 3 cell2 = 0_2:03 face2 = 2
+DEAL:0::F cell1 = 0_2:02 face = 1 cell2 = 0_2:03 face2 = 0
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=2 faces_to_ghost=0
+DEAL:0::F cell1 = 0_2:00 face = 1 cell2 = 0_2:01 face2 = 0
+DEAL:0::F cell1 = 0_2:00 face = 3 cell2 = 0_2:02 face2 = 2
+DEAL:0::F cell1 = 0_2:01 face = 0 cell2 = 0_2:00 face2 = 1
+DEAL:0::F cell1 = 0_2:01 face = 3 cell2 = 0_2:03 face2 = 2
+DEAL:0::F cell1 = 0_2:02 face = 1 cell2 = 0_2:03 face2 = 0
+DEAL:0::F cell1 = 0_2:02 face = 2 cell2 = 0_2:00 face2 = 3
+DEAL:0::F cell1 = 0_2:03 face = 0 cell2 = 0_2:02 face2 = 1
+DEAL:0::F cell1 = 0_2:03 face = 2 cell2 = 0_2:01 face2 = 3
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=1
+DEAL:0::F cell1 = 0_2:01 face = 1 cell2 = 0_2:10 face2 = 0
+DEAL:0::F cell1 = 0_2:02 face = 3 cell2 = 0_2:20 face2 = 2
+DEAL:0::F cell1 = 0_2:03 face = 1 cell2 = 0_2:12 face2 = 0
+DEAL:0::F cell1 = 0_2:03 face = 3 cell2 = 0_2:21 face2 = 2
+DEAL:0::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=2
+DEAL:0::F cell1 = 0_2:01 face = 1 cell2 = 0_2:10 face2 = 0
+DEAL:0::F cell1 = 0_2:02 face = 3 cell2 = 0_2:20 face2 = 2
+DEAL:0::F cell1 = 0_2:03 face = 1 cell2 = 0_2:12 face2 = 0
+DEAL:0::F cell1 = 0_2:03 face = 3 cell2 = 0_2:21 face2 = 2
+
+DEAL:1::DoFHandler ndofs=16
+DEAL:1::*** 1. CELLS ***
+DEAL:1::*** 2. FACES ***
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=1 faces_to_ghost=0
+DEAL:1::F cell1 = 0_2:10 face = 1 cell2 = 0_2:11 face2 = 0
+DEAL:1::F cell1 = 0_2:10 face = 3 cell2 = 0_2:12 face2 = 2
+DEAL:1::F cell1 = 0_2:11 face = 3 cell2 = 0_2:13 face2 = 2
+DEAL:1::F cell1 = 0_2:12 face = 1 cell2 = 0_2:13 face2 = 0
+DEAL:1::F cell1 = 0_2:20 face = 1 cell2 = 0_2:21 face2 = 0
+DEAL:1::F cell1 = 0_2:20 face = 3 cell2 = 0_2:22 face2 = 2
+DEAL:1::F cell1 = 0_2:21 face = 3 cell2 = 0_2:23 face2 = 2
+DEAL:1::F cell1 = 0_2:22 face = 1 cell2 = 0_2:23 face2 = 0
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=2 faces_to_ghost=0
+DEAL:1::F cell1 = 0_2:10 face = 1 cell2 = 0_2:11 face2 = 0
+DEAL:1::F cell1 = 0_2:10 face = 3 cell2 = 0_2:12 face2 = 2
+DEAL:1::F cell1 = 0_2:11 face = 0 cell2 = 0_2:10 face2 = 1
+DEAL:1::F cell1 = 0_2:11 face = 3 cell2 = 0_2:13 face2 = 2
+DEAL:1::F cell1 = 0_2:12 face = 1 cell2 = 0_2:13 face2 = 0
+DEAL:1::F cell1 = 0_2:12 face = 2 cell2 = 0_2:10 face2 = 3
+DEAL:1::F cell1 = 0_2:13 face = 0 cell2 = 0_2:12 face2 = 1
+DEAL:1::F cell1 = 0_2:13 face = 2 cell2 = 0_2:11 face2 = 3
+DEAL:1::F cell1 = 0_2:20 face = 1 cell2 = 0_2:21 face2 = 0
+DEAL:1::F cell1 = 0_2:20 face = 3 cell2 = 0_2:22 face2 = 2
+DEAL:1::F cell1 = 0_2:21 face = 0 cell2 = 0_2:20 face2 = 1
+DEAL:1::F cell1 = 0_2:21 face = 3 cell2 = 0_2:23 face2 = 2
+DEAL:1::F cell1 = 0_2:22 face = 1 cell2 = 0_2:23 face2 = 0
+DEAL:1::F cell1 = 0_2:22 face = 2 cell2 = 0_2:20 face2 = 3
+DEAL:1::F cell1 = 0_2:23 face = 0 cell2 = 0_2:22 face2 = 1
+DEAL:1::F cell1 = 0_2:23 face = 2 cell2 = 0_2:21 face2 = 3
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=1
+DEAL:1::F cell1 = 0_2:12 face = 3 cell2 = 0_2:30 face2 = 2
+DEAL:1::F cell1 = 0_2:13 face = 3 cell2 = 0_2:31 face2 = 2
+DEAL:1::F cell1 = 0_2:21 face = 1 cell2 = 0_2:30 face2 = 0
+DEAL:1::F cell1 = 0_2:23 face = 1 cell2 = 0_2:32 face2 = 0
+DEAL:1::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=2
+DEAL:1::F cell1 = 0_2:10 face = 0 cell2 = 0_2:01 face2 = 1
+DEAL:1::F cell1 = 0_2:12 face = 0 cell2 = 0_2:03 face2 = 1
+DEAL:1::F cell1 = 0_2:12 face = 3 cell2 = 0_2:30 face2 = 2
+DEAL:1::F cell1 = 0_2:13 face = 3 cell2 = 0_2:31 face2 = 2
+DEAL:1::F cell1 = 0_2:20 face = 2 cell2 = 0_2:02 face2 = 3
+DEAL:1::F cell1 = 0_2:21 face = 1 cell2 = 0_2:30 face2 = 0
+DEAL:1::F cell1 = 0_2:21 face = 2 cell2 = 0_2:03 face2 = 3
+DEAL:1::F cell1 = 0_2:23 face = 1 cell2 = 0_2:32 face2 = 0
+
+
+DEAL:2::DoFHandler ndofs=16
+DEAL:2::*** 1. CELLS ***
+DEAL:2::*** 2. FACES ***
+DEAL:2::* own_cells=0 ghost_cells=0 own_faces=1 faces_to_ghost=0
+DEAL:2::F cell1 = 0_2:30 face = 1 cell2 = 0_2:31 face2 = 0
+DEAL:2::F cell1 = 0_2:30 face = 3 cell2 = 0_2:32 face2 = 2
+DEAL:2::F cell1 = 0_2:31 face = 3 cell2 = 0_2:33 face2 = 2
+DEAL:2::F cell1 = 0_2:32 face = 1 cell2 = 0_2:33 face2 = 0
+DEAL:2::* own_cells=0 ghost_cells=0 own_faces=2 faces_to_ghost=0
+DEAL:2::F cell1 = 0_2:30 face = 1 cell2 = 0_2:31 face2 = 0
+DEAL:2::F cell1 = 0_2:30 face = 3 cell2 = 0_2:32 face2 = 2
+DEAL:2::F cell1 = 0_2:31 face = 0 cell2 = 0_2:30 face2 = 1
+DEAL:2::F cell1 = 0_2:31 face = 3 cell2 = 0_2:33 face2 = 2
+DEAL:2::F cell1 = 0_2:32 face = 1 cell2 = 0_2:33 face2 = 0
+DEAL:2::F cell1 = 0_2:32 face = 2 cell2 = 0_2:30 face2 = 3
+DEAL:2::F cell1 = 0_2:33 face = 0 cell2 = 0_2:32 face2 = 1
+DEAL:2::F cell1 = 0_2:33 face = 2 cell2 = 0_2:31 face2 = 3
+DEAL:2::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=1
+DEAL:2::* own_cells=0 ghost_cells=0 own_faces=0 faces_to_ghost=2
+DEAL:2::F cell1 = 0_2:30 face = 0 cell2 = 0_2:21 face2 = 1
+DEAL:2::F cell1 = 0_2:30 face = 2 cell2 = 0_2:12 face2 = 3
+DEAL:2::F cell1 = 0_2:31 face = 2 cell2 = 0_2:13 face2 = 3
+DEAL:2::F cell1 = 0_2:32 face = 0 cell2 = 0_2:23 face2 = 1
+

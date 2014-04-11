@@ -3530,104 +3530,52 @@ namespace parallel
       }
     }
 
-    template <>
-    void
-    Triangulation<1,1>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-    template <>
-    void
-    Triangulation<1,2>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-    template <>
-    void
-    Triangulation<1,3>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
-    {
-      Assert (false, ExcNotImplemented());
-    }
 
     /**
      * Determine the neighboring subdomains that are adjacent to each vertex.
-     * This is achieved via the p4est_iterate tool
+     * This is achieved via the p4est_iterate/p8est_iterate tool
      */
-    template <>
+    template <int dim, int spacedim>
     void
-    Triangulation<2,2>::
+    Triangulation<dim,spacedim>::
     fill_vertices_with_ghost_neighbors
     (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
      &vertices_with_ghost_neighbors)
     {
-      struct find_ghosts<2,2> fg;
+      Assert (dim>1, ExcNotImplemented());
+
+      struct find_ghosts<dim,spacedim> fg;
 
       fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
       fg.triangulation = this;
-      fg.vertices_with_ghost_neighbors = &(vertices_with_ghost_neighbors);
+      fg.vertices_with_ghost_neighbors = &vertices_with_ghost_neighbors;
 
-      p4est_iterate (this->parallel_forest, this->parallel_ghost, static_cast<void *>(&fg),
-                     NULL, find_ghosts_face<2,2>, find_ghosts_corner<2,2>);
+      // switch between functions. to make the compiler happy, we need to cast
+      // the first two arguments to the type p[48]est_iterate wants to see. this
+      // cast is the identity cast in each of the two branches, so it is safe.
+      switch (dim)
+      {
+      case 2:
+        p4est_iterate (reinterpret_cast<dealii::internal::p4est::types<2>::forest*>(this->parallel_forest),
+                       reinterpret_cast<dealii::internal::p4est::types<2>::ghost*>(this->parallel_ghost),
+                       static_cast<void *>(&fg),
+                       NULL, find_ghosts_face<2,spacedim>, find_ghosts_corner<2,spacedim>);
+        break;
+
+      case 3:
+        p8est_iterate (reinterpret_cast<dealii::internal::p4est::types<3>::forest*>(this->parallel_forest),
+                       reinterpret_cast<dealii::internal::p4est::types<3>::ghost*>(this->parallel_ghost),
+                       static_cast<void *>(&fg),
+                       NULL, find_ghosts_face<3,spacedim>, find_ghosts_edge<3,spacedim>, find_ghosts_corner<3,spacedim>);
+        break;
+
+      default:
+        Assert (false, ExcNotImplemented());
+      }
 
       sc_array_destroy (fg.subids);
     }
 
-    /**
-     * Determine the neighboring subdomains that are adjacent to each vertex.
-     * This is achieved via the p4est_iterate tool
-     */
-    template <>
-    void
-    Triangulation<2,3>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
-    {
-      struct find_ghosts<2,3> fg;
-
-      fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
-      fg.triangulation = this;
-      fg.vertices_with_ghost_neighbors = &(vertices_with_ghost_neighbors);
-
-      p4est_iterate (this->parallel_forest, this->parallel_ghost, static_cast<void *>(&fg),
-                     NULL, find_ghosts_face<2,3>, find_ghosts_corner<2,3>);
-
-      sc_array_destroy (fg.subids);
-    }
-
-    /**
-     * Determine the neighboring subdomains that are adjacent to each vertex.
-     * This is achieved via the p8est_iterate tool
-     */
-    template <>
-    void
-    Triangulation<3,3>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
-    {
-      struct find_ghosts<3,3> fg;
-
-      fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
-      fg.triangulation = this;
-      fg.vertices_with_ghost_neighbors = &(vertices_with_ghost_neighbors);
-
-      p8est_iterate (this->parallel_forest, this->parallel_ghost, static_cast<void *>(&fg),
-                     NULL, find_ghosts_face<3,3>, find_ghosts_edge<3,3>, find_ghosts_corner<3,3>);
-
-      sc_array_destroy (fg.subids);
-    }
 
     template <int dim, int spacedim>
     MPI_Comm
@@ -3635,6 +3583,7 @@ namespace parallel
     {
       return mpi_communicator;
     }
+
 
     template<int dim, int spacedim>
     void
@@ -3909,162 +3858,71 @@ namespace parallel
 
 
 
-    // TODO: again problems with specialization in only one template argument
-    template <>
-    Triangulation<1,1>::Triangulation (MPI_Comm)
+    template <int spacedim>
+    Triangulation<1,spacedim>::Triangulation (MPI_Comm)
     {
       Assert (false, ExcNotImplemented());
     }
 
 
-    template <>
-    Triangulation<1,1>::~Triangulation ()
+    template <int spacedim>
+    Triangulation<1,spacedim>::~Triangulation ()
     {
       Assert (false, ExcNotImplemented());
     }
 
 
 
-    template <>
+    template <int spacedim>
     types::subdomain_id
-    Triangulation<1,1>::locally_owned_subdomain () const
+    Triangulation<1,spacedim>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
       return 0;
     }
 
 
-    template <>
+    template <int spacedim>
     types::global_dof_index
-    Triangulation<1,1>::n_global_active_cells () const
+    Triangulation<1,spacedim>::n_global_active_cells () const
     {
       Assert (false, ExcNotImplemented());
       return 0;
     }
 
 
-    template <>
+    template <int spacedim>
     unsigned int
-    Triangulation<1,1>::n_global_levels () const
+    Triangulation<1,spacedim>::n_global_levels () const
     {
       Assert (false, ExcNotImplemented());
       return 0;
     }
 
 
-    template <>
+    template <int spacedim>
     MPI_Comm
-    Triangulation<1,1>::get_communicator () const
+    Triangulation<1,spacedim>::get_communicator () const
     {
       return MPI_COMM_WORLD;
     }
 
-    template <>
+    template <int spacedim>
     const std::vector<types::global_dof_index> &
-    Triangulation<1,1>::get_p4est_tree_to_coarse_cell_permutation() const
+    Triangulation<1,spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
     {
       static std::vector<types::global_dof_index> a;
       return a;
     }
 
-
-    template <>
-    Triangulation<1,2>::Triangulation (MPI_Comm)
+    template <int spacedim>
+    void
+    Triangulation<1,spacedim>::
+    fill_vertices_with_ghost_neighbors
+    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+     &vertices_with_ghost_neighbors)
     {
       Assert (false, ExcNotImplemented());
-    }
-
-
-    template <>
-    Triangulation<1,2>::~Triangulation ()
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-
-    template <>
-    types::subdomain_id
-    Triangulation<1,2>::locally_owned_subdomain () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    types::global_dof_index
-    Triangulation<1,2>::n_global_active_cells () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    unsigned int
-    Triangulation<1,2>::n_global_levels () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    MPI_Comm
-    Triangulation<1,2>::get_communicator () const
-    {
-      return MPI_COMM_WORLD;
-    }
-
-
-    template <>
-    Triangulation<1,3>::Triangulation (MPI_Comm)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-    template <>
-    Triangulation<1,3>::~Triangulation ()
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-
-    template <>
-    types::subdomain_id
-    Triangulation<1,3>::locally_owned_subdomain () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    types::global_dof_index
-    Triangulation<1,3>::n_global_active_cells () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    unsigned int
-    Triangulation<1,3>::n_global_levels () const
-    {
-      Assert (false, ExcNotImplemented());
-      return 0;
-    }
-
-
-    template <>
-    MPI_Comm
-    Triangulation<1,3>::get_communicator () const
-    {
-      return MPI_COMM_WORLD;
     }
   }
 }

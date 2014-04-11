@@ -312,6 +312,15 @@ public:
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
 
+  /**
+   * Returns a list of constant modes of the element. For this element, there
+   * are two constant modes despite the element is scalar: The first constant
+   * mode is all ones for the usual FE_Q basis and the second one only using
+   * the discontinuous part.
+   */
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
+
 protected:
   /**
    * @p clone function instead of a copy constructor.

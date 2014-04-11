@@ -762,7 +762,7 @@ std::size_t MatrixFree<dim,Number>::memory_consumption () const
   memory += MemoryConsumption::memory_consumption (constraint_pool_data);
   memory += MemoryConsumption::memory_consumption (constraint_pool_row_index);
   memory += MemoryConsumption::memory_consumption (task_info);
-  memory += sizeof(this);
+  memory += sizeof(*this);
   memory += mapping_info.memory_consumption();
   return memory;
 }
@@ -853,7 +853,8 @@ namespace internal
     std::size_t
     TaskInfo::memory_consumption () const
     {
-      return (MemoryConsumption::memory_consumption (partition_color_blocks_row_index) +
+      return (sizeof(*this)+
+              MemoryConsumption::memory_consumption (partition_color_blocks_row_index) +
               MemoryConsumption::memory_consumption (partition_color_blocks_data)+
               MemoryConsumption::memory_consumption (partition_evens) +
               MemoryConsumption::memory_consumption (partition_odds) +

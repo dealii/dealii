@@ -76,55 +76,36 @@ FE_Q<dim,spacedim>::get_name () const
   // kept in synch
 
   std::ostringstream namebuf;
-  bool type = true;
-  const unsigned int n_points = this->degree +1;
-  std::vector<double> points(n_points);
-  const unsigned int dofs_per_cell = this->dofs_per_cell;
-  const std::vector<Point<dim> > &unit_support_points = this->unit_support_points;
-  unsigned int index = 0;
+  bool equidistant = true;
+  std::vector<double> points(this->degree+1);
 
   // Decode the support points in one coordinate direction.
-  for (unsigned int j=0; j<dofs_per_cell; j++)
-    {
-      if ((dim>1) ? (unit_support_points[j](1)==0 &&
-                     ((dim>2) ? unit_support_points[j](2)==0: true)) : true)
-        {
-          if (index == 0)
-            points[index] = unit_support_points[j](0);
-          else if (index == 1)
-            points[n_points-1] = unit_support_points[j](0);
-          else
-            points[index-1] = unit_support_points[j](0);
-
-          index++;
-        }
-    }
-  Assert (index == n_points,
-          ExcMessage ("Could not decode support points in one coordinate direction."));
+  std::vector<unsigned int> lexicographic = this->poly_space.get_numbering_inverse();
+  for (unsigned int j=0; j<=this->degree; j++)
+    points[j] = this->unit_support_points[lexicographic[j]][0];
 
   // Check whether the support points are equidistant.
-  for (unsigned int j=0; j<n_points; j++)
+  for (unsigned int j=0; j<=this->degree; j++)
     if (std::fabs(points[j] - (double)j/this->degree) > 1e-15)
       {
-        type = false;
+        equidistant = false;
         break;
       }
 
-  if (type == true)
+  if (equidistant == true)
     namebuf << "FE_Q<" << dim << ">(" << this->degree << ")";
   else
     {
-
       // Check whether the support points come from QGaussLobatto.
-      const QGaussLobatto<1> points_gl(n_points);
-      type = true;
-      for (unsigned int j=0; j<n_points; j++)
+      const QGaussLobatto<1> points_gl(this->degree+1);
+      bool gauss_lobatto = true;
+      for (unsigned int j=0; j<=this->degree; j++)
         if (points[j] != points_gl.point(j)(0))
           {
-            type = false;
+            gauss_lobatto = false;
             break;
           }
-      if (type == true)
+      if (gauss_lobatto == true)
         namebuf << "FE_Q<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
       else
         namebuf << "FE_Q<" << dim << ">(QUnknownNodes(" << this->degree << "))";

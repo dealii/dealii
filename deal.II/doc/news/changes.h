@@ -1,4 +1,4 @@
- // ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
 // $Id$
 //
 // Copyright (C) 2013, 2014 by the deal.II authors
@@ -56,7 +56,7 @@ inconvenience this causes.
   longer supported. Comparing for equality is done using '==' instead of '='.
   <br>
   (Timo Heister, 2014/02/10)
-  </li>  
+  </li>
 
   <li> Changed: The various classes generating graphical output, such
   as DataOut or DataOutStack, are all derived from a common interface
@@ -90,12 +90,11 @@ inconvenience this causes.
 
 
 <ol>
-
-  <li> Changed: the functionparser library bundled with deal.II got replaced
-  by the muparser library.  
+  <li> Changed: The functionparser library bundled with deal.II got replaced
+  by the muparser library.
   <br>
   (Timo Heister, 2014/02/10)
-  </li>  
+  </li>
 
   <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
   on non-active cells. However, this made no sense: Since degrees of
@@ -149,6 +148,63 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: TableBase<N,T> now uses AlignedVector for storing data
+  instead of std::vector, which allows its use for VectorizedArray<Number>
+  data fields which require more alignment.
+  <br>
+  (Martin Kronbichler, 2014/04/09)
+  </li>
+
+  <li> Improved: Piola transformation for FE_BDM is now active.
+  <br>
+  (Guido Kanschat, 2014/04/09)
+  </li>
+
+  <li> Changed: operator< for cell iterators no longer looks at
+  (level-)subdomain ids but only compares level() and index(). This makes the
+  ordering inconsistent between processes on a
+  parallel::distributed::Triangulation, but fixes the problem that the
+  ordering of cells changes under mesh refinement or other causes for changing
+  the subdomain id.
+  <br>
+  (Timo Heister, 2014/04/08)
+  </li>
+  
+  <li> New: GridTools::laplace_transform() now takes an addition, optional
+  parameter that indicates the "stiffness" of the mapping.
+  <br>
+  (Denis Davydov, Jean-Paul Pelteret, 2014/04/07)
+  </li>
+
+  <li> Fixed: DoFTools::extract_constant_modes now correctly identifies both
+  constant modes in the scalar element FE_Q_DG0, which has been realized by a
+  few modifications in how the constant modes propagate from the element to
+  the extract_constant_modes() function.
+  <br>
+  (Martin Kronbichler, 2014/04/04)
+  </li>
+
+  <li> Fixed: GridTools::laplace_transform had previously announced in
+  the documentation that one can also set the location of interior points,
+  but this was not in fact what was implemented. This has now been fixed:
+  the code can now do that.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2014/03/23)
+  </li>
+
+  <li> Improved: Inhomogeneous tangential and normal flow constraints can
+       now be treated via VectorTools::compute_nonzero_normal_flux_constraints
+       and VectorTools::compute_nonzero_tangential_flux_constraints.
+  <br>
+  (Daniel Arndt, 2014/03/16)
+  </li>
+
+  <li> Changed: Class TriaAccessor had a function parent_index(), but this function
+  could only work for cell accessors. The function has consequently been moved
+  to class CellAccessor.
+  <br>
+  (Wolfgang Bangerth, 2014/03/15)
+  </li>
 
   <li> Fixed: step-32 had a piece of code where we accessed an internal
   representation of how Trilinos vectors are actually stored. This is poor
@@ -162,7 +218,7 @@ inconvenience this causes.
   <br>
   (Markus B&uuml;rg, 2014/03/10)
   </li>
-  
+
   <li> Fixed: ParameterHandler will no longer output an error if the file
   to be read ends with "end" without a newline.
   <br>

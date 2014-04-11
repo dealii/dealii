@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/aligned_vector.h>
 
 #include <cstddef>
 #include <algorithm>
@@ -86,11 +87,11 @@ namespace internal
       typedef const T value_type;
       typedef const TableBase<N,T> TableType;
 
-      typedef typename std::vector<T>::const_iterator iterator;
-      typedef typename std::vector<T>::const_iterator const_iterator;
+      typedef typename AlignedVector<T>::const_iterator iterator;
+      typedef typename AlignedVector<T>::const_iterator const_iterator;
 
-      typedef typename std::vector<T>::const_reference reference;
-      typedef typename std::vector<T>::const_reference const_reference;
+      typedef typename AlignedVector<T>::const_reference reference;
+      typedef typename AlignedVector<T>::const_reference const_reference;
     };
 
     /**
@@ -104,11 +105,11 @@ namespace internal
       typedef T value_type;
       typedef TableBase<N,T> TableType;
 
-      typedef typename std::vector<T>::iterator iterator;
-      typedef typename std::vector<T>::const_iterator const_iterator;
+      typedef typename AlignedVector<T>::iterator iterator;
+      typedef typename AlignedVector<T>::const_iterator const_iterator;
 
-      typedef typename std::vector<T>::reference reference;
-      typedef typename std::vector<T>::const_reference const_reference;
+      typedef typename AlignedVector<T>::reference reference;
+      typedef typename AlignedVector<T>::const_reference const_reference;
     };
 
 
@@ -648,7 +649,7 @@ public:
    * Return a read-write reference
    * to the indicated element.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const TableIndices<N> &indices);
 
   /**
@@ -664,7 +665,7 @@ public:
    * don't know here whether
    * copying is expensive or not.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const TableIndices<N> &indices) const;
 
   /**
@@ -712,7 +713,7 @@ protected:
    * used internally and in
    * functions already checked.
    */
-  typename std::vector<T>::reference el (const TableIndices<N> &indices);
+  typename AlignedVector<T>::reference el (const TableIndices<N> &indices);
 
   /**
    * Return the value of the
@@ -732,7 +733,7 @@ protected:
    * don't know here whether
    * copying is expensive or not.
    */
-  typename std::vector<T>::const_reference el (const TableIndices<N> &indices) const;
+  typename AlignedVector<T>::const_reference el (const TableIndices<N> &indices) const;
 
   /**
    * @deprecated This function
@@ -746,13 +747,13 @@ protected:
    * cast from const), otherwise,
    * keep away!
    */
-  typename std::vector<T>::const_pointer data () const DEAL_II_DEPRECATED;
+  typename AlignedVector<T>::const_pointer data () const DEAL_II_DEPRECATED;
 
 protected:
   /**
    * Component-array.
    */
-  std::vector<T> values;
+  AlignedVector<T> values;
 
   /**
    * Size in each direction of the
@@ -869,7 +870,7 @@ public:
    * data element. Returns a
    * read-only reference.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator [] (const unsigned int i) const;
 
   /**
@@ -879,7 +880,7 @@ public:
    * data element. Returns a
    * read-write reference.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator [] (const unsigned int i);
 
   /**
@@ -889,7 +890,7 @@ public:
    * data element. Returns a
    * read-only reference.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const unsigned int i) const;
 
   /**
@@ -899,7 +900,7 @@ public:
    * data element. Returns a
    * read-write reference.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const unsigned int i);
 
   /**
@@ -908,7 +909,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const TableIndices<1> &indices);
 
   /**
@@ -917,7 +918,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const TableIndices<1> &indices) const;
 };
 
@@ -1049,7 +1050,7 @@ public:
    * This version of the function
    * only allows read access.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const unsigned int i,
                const unsigned int j) const;
 
@@ -1063,7 +1064,7 @@ public:
    * This version of the function
    * allows read-write access.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const unsigned int i,
                const unsigned int j);
 
@@ -1073,7 +1074,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const TableIndices<2> &indices);
 
   /**
@@ -1082,7 +1083,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const TableIndices<2> &indices) const;
 
 
@@ -1118,8 +1119,8 @@ protected:
    * table classes for 2d arrays,
    * then called <tt>vector2d</tt>.
    */
-  typename std::vector<T>::reference el (const unsigned int i,
-                                         const unsigned int j);
+  typename AlignedVector<T>::reference el (const unsigned int i,
+                                           const unsigned int j);
 
   /**
    * Return the value of the
@@ -1145,8 +1146,8 @@ protected:
    * table classes for 2d arrays,
    * then called <tt>vector2d</tt>.
    */
-  typename std::vector<T>::const_reference el (const unsigned int i,
-                                               const unsigned int j) const;
+  typename AlignedVector<T>::const_reference el (const unsigned int i,
+                                                 const unsigned int j) const;
 };
 
 
@@ -1266,9 +1267,9 @@ public:
    * This version of the function
    * only allows read access.
    */
-  typename std::vector<T>::const_reference operator () (const unsigned int i,
-                                                        const unsigned int j,
-                                                        const unsigned int k) const;
+  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
+                                                          const unsigned int j,
+                                                          const unsigned int k) const;
 
 
   /**
@@ -1280,9 +1281,9 @@ public:
    * This version of the function
    * allows read-write access.
    */
-  typename std::vector<T>::reference operator () (const unsigned int i,
-                                                  const unsigned int j,
-                                                  const unsigned int k);
+  typename AlignedVector<T>::reference operator () (const unsigned int i,
+                                                    const unsigned int j,
+                                                    const unsigned int k);
 
   /**
    * Make the corresponding
@@ -1290,7 +1291,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::reference operator () (const TableIndices<3> &indices);
+  typename AlignedVector<T>::reference operator () (const TableIndices<3> &indices);
 
   /**
    * Make the corresponding
@@ -1298,7 +1299,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::const_reference operator () (const TableIndices<3> &indices) const;
+  typename AlignedVector<T>::const_reference operator () (const TableIndices<3> &indices) const;
 };
 
 
@@ -1370,10 +1371,10 @@ public:
    * This version of the function
    * only allows read access.
    */
-  typename std::vector<T>::const_reference operator () (const unsigned int i,
-                                                        const unsigned int j,
-                                                        const unsigned int k,
-                                                        const unsigned int l) const;
+  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
+                                                          const unsigned int j,
+                                                          const unsigned int k,
+                                                          const unsigned int l) const;
 
 
   /**
@@ -1385,10 +1386,10 @@ public:
    * This version of the function
    * allows read-write access.
    */
-  typename std::vector<T>::reference operator () (const unsigned int i,
-                                                  const unsigned int j,
-                                                  const unsigned int k,
-                                                  const unsigned int l);
+  typename AlignedVector<T>::reference operator () (const unsigned int i,
+                                                    const unsigned int j,
+                                                    const unsigned int k,
+                                                    const unsigned int l);
 
   /**
    * Make the corresponding
@@ -1396,7 +1397,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const TableIndices<4> &indices);
 
   /**
@@ -1405,7 +1406,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const TableIndices<4> &indices) const;
 };
 
@@ -1479,11 +1480,11 @@ public:
    * This version of the function
    * only allows read access.
    */
-  typename std::vector<T>::const_reference operator () (const unsigned int i,
-                                                        const unsigned int j,
-                                                        const unsigned int k,
-                                                        const unsigned int l,
-                                                        const unsigned int m) const;
+  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
+                                                          const unsigned int j,
+                                                          const unsigned int k,
+                                                          const unsigned int l,
+                                                          const unsigned int m) const;
 
   /**
    * Direct access to one element
@@ -1494,11 +1495,11 @@ public:
    * This version of the function
    * allows read-write access.
    */
-  typename std::vector<T>::reference operator () (const unsigned int i,
-                                                  const unsigned int j,
-                                                  const unsigned int k,
-                                                  const unsigned int l,
-                                                  const unsigned int m);
+  typename AlignedVector<T>::reference operator () (const unsigned int i,
+                                                    const unsigned int j,
+                                                    const unsigned int k,
+                                                    const unsigned int l,
+                                                    const unsigned int m);
 
   /**
    * Make the corresponding
@@ -1506,7 +1507,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const TableIndices<5> &indices);
 
   /**
@@ -1515,7 +1516,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const TableIndices<5> &indices) const;
 };
 
@@ -1590,12 +1591,12 @@ public:
    * This version of the function
    * only allows read access.
    */
-  typename std::vector<T>::const_reference operator () (const unsigned int i,
-                                                        const unsigned int j,
-                                                        const unsigned int k,
-                                                        const unsigned int l,
-                                                        const unsigned int m,
-                                                        const unsigned int n) const;
+  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
+                                                          const unsigned int j,
+                                                          const unsigned int k,
+                                                          const unsigned int l,
+                                                          const unsigned int m,
+                                                          const unsigned int n) const;
 
   /**
    * Direct access to one element
@@ -1606,12 +1607,12 @@ public:
    * This version of the function
    * allows read-write access.
    */
-  typename std::vector<T>::reference operator () (const unsigned int i,
-                                                  const unsigned int j,
-                                                  const unsigned int k,
-                                                  const unsigned int l,
-                                                  const unsigned int m,
-                                                  const unsigned int n);
+  typename AlignedVector<T>::reference operator () (const unsigned int i,
+                                                    const unsigned int j,
+                                                    const unsigned int k,
+                                                    const unsigned int l,
+                                                    const unsigned int m,
+                                                    const unsigned int n);
 
   /**
    * Make the corresponding
@@ -1619,7 +1620,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const TableIndices<6> &indices);
 
   /**
@@ -1628,7 +1629,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const TableIndices<6> &indices) const;
 };
 
@@ -1703,13 +1704,13 @@ public:
    * This version of the function
    * only allows read access.
    */
-  typename std::vector<T>::const_reference operator () (const unsigned int i,
-                                                        const unsigned int j,
-                                                        const unsigned int k,
-                                                        const unsigned int l,
-                                                        const unsigned int m,
-                                                        const unsigned int n,
-                                                        const unsigned int o) const;
+  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
+                                                          const unsigned int j,
+                                                          const unsigned int k,
+                                                          const unsigned int l,
+                                                          const unsigned int m,
+                                                          const unsigned int n,
+                                                          const unsigned int o) const;
 
   /**
    * Direct access to one element
@@ -1720,13 +1721,13 @@ public:
    * This version of the function
    * allows read-write access.
    */
-  typename std::vector<T>::reference operator () (const unsigned int i,
-                                                  const unsigned int j,
-                                                  const unsigned int k,
-                                                  const unsigned int l,
-                                                  const unsigned int m,
-                                                  const unsigned int n,
-                                                  const unsigned int o);
+  typename AlignedVector<T>::reference operator () (const unsigned int i,
+                                                    const unsigned int j,
+                                                    const unsigned int k,
+                                                    const unsigned int l,
+                                                    const unsigned int m,
+                                                    const unsigned int n,
+                                                    const unsigned int o);
 
   /**
    * Make the corresponding
@@ -1734,7 +1735,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::reference
+  typename AlignedVector<T>::reference
   operator () (const TableIndices<7> &indices);
 
   /**
@@ -1743,7 +1744,7 @@ public:
    * base class available also in
    * this class.
    */
-  typename std::vector<T>::const_reference
+  typename AlignedVector<T>::const_reference
   operator () (const TableIndices<7> &indices) const;
 };
 
@@ -1803,8 +1804,8 @@ public:
    * This version of the function
    * only allows read access.
    */
-  typename std::vector<T>::const_reference operator () (const unsigned int i,
-                                                        const unsigned int j) const;
+  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
+                                                          const unsigned int j) const;
 
   /**
    * Direct access to one element
@@ -1815,8 +1816,8 @@ public:
    * This version of the function
    * allows read-write access.
    */
-  typename std::vector<T>::reference operator () (const unsigned int i,
-                                                  const unsigned int j);
+  typename AlignedVector<T>::reference operator () (const unsigned int i,
+                                                    const unsigned int j);
 
   /**
    * Number of rows. This function
@@ -1850,7 +1851,7 @@ protected:
    * table classes for 2d arrays,
    * then called <tt>vector2d</tt>.
    */
-  typename std::vector<T>::reference el (const unsigned int i,
+  typename AlignedVector<T>::reference el (const unsigned int i,
                                          const unsigned int j);
 
   /**
@@ -1877,7 +1878,7 @@ protected:
    * table classes for 2d arrays,
    * then called <tt>vector2d</tt>.
    */
-  typename std::vector<T>::const_reference el (const unsigned int i,
+  typename AlignedVector<T>::const_reference el (const unsigned int i,
                                                const unsigned int j) const;
 };
 
@@ -1921,9 +1922,8 @@ TableBase<N,T>::TableBase (const TableBase<N,T> &src)
   :
   Subscriptor ()
 {
-  reinit (src.table_size);
-  if (src.n_elements() != 0)
-    std::copy (src.values.begin(), src.values.end(), values.begin());
+  values = src.values;
+  reinit (src.table_size, true);
 }
 
 
@@ -2112,9 +2112,9 @@ inline
 TableBase<N,T> &
 TableBase<N,T>::operator = (const TableBase<N,T> &m)
 {
-  reinit (m.size());
-  if (!empty())
-    std::copy (m.values.begin(), m.values.end(), values.begin());
+  if (!m.empty())
+    values = m.values;
+  reinit (m.size(), true);
 
   return *this;
 }
@@ -2127,7 +2127,7 @@ inline
 TableBase<N,T> &
 TableBase<N,T>::operator = (const TableBase<N,T2> &m)
 {
-  reinit (m.size());
+  reinit (m.size(), true);
   if (!empty())
     std::copy (m.values.begin(), m.values.begin() + n_elements(),
                values.begin());
@@ -2151,8 +2151,9 @@ inline
 void
 TableBase<N,T>::reset_values ()
 {
+  // use parallel set operation
   if (n_elements() != 0)
-    std::fill (values.begin(), values.end(), T());
+    values.fill(T());
 }
 
 
@@ -2163,7 +2164,7 @@ void
 TableBase<N,T>::fill (const T &value)
 {
   if (n_elements() != 0)
-    std::fill (values.begin(), values.end(), value);
+    values.fill(value);
 }
 
 
@@ -2179,8 +2180,7 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
 
   const unsigned int new_size = n_elements();
 
-  // if zero size was given: free all
-  // memory
+  // if zero size was given: free all memory
   if (new_size == 0)
     {
       values.resize (0);
@@ -2193,27 +2193,11 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
       return;
     }
 
-  // if new size is nonzero:
-  // if necessary allocate
-  // additional memory
-  values.resize (new_size);
-
-  // reinitialize contents of old or
-  // new memory. note that we
-  // actually need to do this here,
-  // even in the case that we
-  // reallocated memory, since per
-  // C++ standard, clause 5.3.4/15
-  // the newly allocated objects are
-  // only default initialized by
-  // operator new[] if they are
-  // non-POD type. In other words, if
-  // we have a table of doubles, then
-  // their values after calling 'new
-  // double[val_size]' is
-  // indetermined.
-  if (fast == false)
-    reset_values ();
+  // if new size is nonzero: if necessary allocate additional memory, and if
+  // not fast resize, zero out all values)
+  values.resize_fast (new_size);
+  if (!fast)
+    values.fill(T());
 }
 
 
@@ -2317,7 +2301,7 @@ TableBase<N,T>::fill (InputIterator entries,
           ExcMessage("Trying to fill an empty matrix."));
 
   if (C_style_indexing)
-    for (typename std::vector<T>::iterator p = values.begin();
+    for (typename AlignedVector<T>::iterator p = values.begin();
         p != values.end(); ++p)
       *p = *entries++;
   else
@@ -2380,7 +2364,7 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
 
 template <int N, typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 TableBase<N,T>::operator () (const TableIndices<N> &indices) const
 {
   for (unsigned int n=0; n<N; ++n)
@@ -2393,7 +2377,7 @@ TableBase<N,T>::operator () (const TableIndices<N> &indices) const
 
 template <int N, typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 TableBase<N,T>::operator () (const TableIndices<N> &indices)
 {
   for (unsigned int n=0; n<N; ++n)
@@ -2406,7 +2390,7 @@ TableBase<N,T>::operator () (const TableIndices<N> &indices)
 
 template <int N, typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 TableBase<N,T>::el (const TableIndices<N> &indices) const
 {
   return values[position(indices)];
@@ -2416,7 +2400,7 @@ TableBase<N,T>::el (const TableIndices<N> &indices) const
 
 template <int N, typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 TableBase<N,T>::el (const TableIndices<N> &indices)
 {
   Assert (position(indices) < values.size(),
@@ -2428,11 +2412,11 @@ TableBase<N,T>::el (const TableIndices<N> &indices)
 
 template <int N, typename T>
 inline
-typename std::vector<T>::const_pointer
+typename AlignedVector<T>::const_pointer
 TableBase<N,T>::data () const
 {
   if (values.size() == 0)
-    return typename std::vector<T>::const_pointer();
+    return typename AlignedVector<T>::const_pointer();
   else
     return &values[0];
 }
@@ -2472,7 +2456,7 @@ Table<1,T>::Table (const unsigned int size,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<1,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
@@ -2484,7 +2468,7 @@ Table<1,T>::operator [] (const unsigned int i) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<1,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
@@ -2496,7 +2480,7 @@ Table<1,T>::operator [] (const unsigned int i)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<1,T>::operator () (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
@@ -2508,7 +2492,7 @@ Table<1,T>::operator () (const unsigned int i) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<1,T>::operator () (const unsigned int i)
 {
   Assert (i < this->table_size[0],
@@ -2520,7 +2504,7 @@ Table<1,T>::operator () (const unsigned int i)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<1,T>::operator () (const TableIndices<1> &indices) const
 {
   return TableBase<1,T>::operator () (indices);
@@ -2530,7 +2514,7 @@ Table<1,T>::operator () (const TableIndices<1> &indices) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<1,T>::operator () (const TableIndices<1> &indices)
 {
   return TableBase<1,T>::operator () (indices);
@@ -2611,7 +2595,7 @@ Table<2,T>::operator [] (const unsigned int i)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<2,T>::operator () (const unsigned int i,
                          const unsigned int j) const
 {
@@ -2626,7 +2610,7 @@ Table<2,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<2,T>::operator () (const unsigned int i,
                          const unsigned int j)
 {
@@ -2641,7 +2625,7 @@ Table<2,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<2,T>::operator () (const TableIndices<2> &indices) const
 {
   return TableBase<2,T>::operator () (indices);
@@ -2651,7 +2635,7 @@ Table<2,T>::operator () (const TableIndices<2> &indices) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<2,T>::operator () (const TableIndices<2> &indices)
 {
   return TableBase<2,T>::operator () (indices);
@@ -2661,7 +2645,7 @@ Table<2,T>::operator () (const TableIndices<2> &indices)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j) const
 {
@@ -2672,7 +2656,7 @@ Table<2,T>::el (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j)
 {
@@ -2734,7 +2718,7 @@ TransposeTable<T>::reinit (const unsigned int size1,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 TransposeTable<T>::operator () (const unsigned int i,
                                 const unsigned int j) const
 {
@@ -2749,7 +2733,7 @@ TransposeTable<T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 TransposeTable<T>::operator () (const unsigned int i,
                                 const unsigned int j)
 {
@@ -2764,7 +2748,7 @@ TransposeTable<T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 TransposeTable<T>::el (const unsigned int i,
                        const unsigned int j) const
 {
@@ -2775,7 +2759,7 @@ TransposeTable<T>::el (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 TransposeTable<T>::el (const unsigned int i,
                        const unsigned int j)
 {
@@ -2875,7 +2859,7 @@ Table<3,T>::operator [] (const unsigned int i)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<3,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k) const
@@ -2894,7 +2878,7 @@ Table<3,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<3,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k)
@@ -2913,7 +2897,7 @@ Table<3,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<3,T>::operator () (const TableIndices<3> &indices) const
 {
   return TableBase<3,T>::operator () (indices);
@@ -2923,7 +2907,7 @@ Table<3,T>::operator () (const TableIndices<3> &indices) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<3,T>::operator () (const TableIndices<3> &indices)
 {
   return TableBase<3,T>::operator () (indices);
@@ -2986,7 +2970,7 @@ Table<4,T>::operator [] (const unsigned int i)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<4,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3009,7 +2993,7 @@ Table<4,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<4,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3032,7 +3016,7 @@ Table<4,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<4,T>::operator () (const TableIndices<4> &indices) const
 {
   return TableBase<4,T>::operator () (indices);
@@ -3042,7 +3026,7 @@ Table<4,T>::operator () (const TableIndices<4> &indices) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<4,T>::operator () (const TableIndices<4> &indices)
 {
   return TableBase<4,T>::operator () (indices);
@@ -3108,7 +3092,7 @@ Table<5,T>::operator [] (const unsigned int i)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<5,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3135,7 +3119,7 @@ Table<5,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<5,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3162,7 +3146,7 @@ Table<5,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<5,T>::operator () (const TableIndices<5> &indices) const
 {
   return TableBase<5,T>::operator () (indices);
@@ -3172,7 +3156,7 @@ Table<5,T>::operator () (const TableIndices<5> &indices) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<5,T>::operator () (const TableIndices<5> &indices)
 {
   return TableBase<5,T>::operator () (indices);
@@ -3241,7 +3225,7 @@ Table<6,T>::operator [] (const unsigned int i)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<6,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3272,7 +3256,7 @@ Table<6,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<6,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3303,7 +3287,7 @@ Table<6,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<6,T>::operator () (const TableIndices<6> &indices) const
 {
   return TableBase<6,T>::operator () (indices);
@@ -3313,7 +3297,7 @@ Table<6,T>::operator () (const TableIndices<6> &indices) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<6,T>::operator () (const TableIndices<6> &indices)
 {
   return TableBase<6,T>::operator () (indices);
@@ -3385,7 +3369,7 @@ Table<7,T>::operator [] (const unsigned int i)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<7,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3420,7 +3404,7 @@ Table<7,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<7,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3455,7 +3439,7 @@ Table<7,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+typename AlignedVector<T>::const_reference
 Table<7,T>::operator () (const TableIndices<7> &indices) const
 {
   return TableBase<7,T>::operator () (indices);
@@ -3465,7 +3449,7 @@ Table<7,T>::operator () (const TableIndices<7> &indices) const
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+typename AlignedVector<T>::reference
 Table<7,T>::operator () (const TableIndices<7> &indices)
 {
   return TableBase<7,T>::operator () (indices);

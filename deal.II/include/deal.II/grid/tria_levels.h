@@ -39,7 +39,7 @@ namespace internal
      * In TriaLevel, all cell data is stored which is not dependent on the
      * dimension, e.g. a field to store the refinement flag for the cells
      * (what a cell actually is is declared elsewhere), etc. See also
-     * TriaObjects for non leveloriented data.
+     * TriaObjects for non level-oriented data.
      *
      * There is another field, which may fit in here, namely the
      * material data (for cells) or the boundary indicators (for faces),
@@ -154,6 +154,11 @@ namespace internal
        * One integer for every consecutive
        * pair of cells to store which
        * index their parent has.
+       *
+       * (We store this information once for each pair of cells since every
+       * refinement, isotropic or anisotropic, and in any space dimension,
+       * always creates children in multiples of two, so there is no need to
+       * store the parent index for every cell.)
        */
       std::vector<int> parents;
 

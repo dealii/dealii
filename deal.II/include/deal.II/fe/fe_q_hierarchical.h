@@ -386,7 +386,8 @@ public:
    * list consists of true arguments for the first vertex shape functions and
    * false for the remaining ones.
    */
-  virtual Table<2,bool> get_constant_modes () const;
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
 protected:
   /**

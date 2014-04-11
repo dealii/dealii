@@ -1762,7 +1762,8 @@ namespace DataOutBase
    * need a <code>.pvtu</code> file that describes which VTU files form
    * a group. The DataOutInterface::write_pvtu_record() function can
    * generate such a master record. Likewise,
-   * DataOutInterface::write_visit_record() does the same for VisIt.
+   * DataOutInterface::write_visit_record() does the same for VisIt
+   * (although VisIt can also read <code>pvtu</code> records since version 2.5.1).
    * Finally, for time dependent problems, you may also want to look
    * at DataOutInterface::write_pvd_record()
    *
@@ -2239,11 +2240,12 @@ public:
    * function can generate such a
    * master record. Likewise,
    * DataOutInterface::write_visit_record()
-   * does the same for VisIt. Finally,
-   * DataOutInterface::write_pvd_record()
-  * can be used to group together
-  * the files that jointly make up
-  * a time dependent simulation.
+   * does the same for older versions of VisIt
+   * (although VisIt can also read <code>pvtu</code> records since version 2.5.1).
+   * Finally, DataOutInterface::write_pvd_record()
+   * can be used to group together
+   * the files that jointly make up
+   * a time dependent simulation.
    */
   void write_vtu (std::ostream &out) const;
 
@@ -2297,17 +2299,15 @@ public:
    * @note The use of this function is
    * explained in step-40.
    *
-  * @note In order to tell Paraview to
-  * group together multiple <code>pvtu</code>
-  * files that each describe one time
-  * step of a time dependent simulation,
-  * see the
+   * @note In order to tell Paraview to
+   * group together multiple <code>pvtu</code>
+   * files that each describe one time
+   * step of a time dependent simulation,
+   * see the
    * DataOutInterface::write_pvd_record()
-  * function.
-  *
-   * @note At the time of writing,
-   * the other big VTK-based
-   * visualization program, VisIt,
+   * function.
+   *
+   * @note Older versions of VisIt (before 2.5.1),
    * can not read <code>pvtu</code>
    * records. However, it can read
    * visit records as written by
@@ -2374,7 +2374,7 @@ public:
 
   /**
    * This function is the exact equivalent of the write_pvtu_record()
-   * function but for the VisIt visualization program and for one visualization graph
+   * function but for older versions of the VisIt visualization program and for one visualization graph
    * (or one time step only). See there for the purpose of this function.
    *
    * This function is documented in the "Creating a master file for

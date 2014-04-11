@@ -22,7 +22,6 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_update_flags.h>
 
 #include <cmath>
@@ -80,10 +79,8 @@ enum MappingType
    */
   mapping_piola = 0x0100,
   /**
-     transformation for the gradient of
-     for a vector field
-     correspoing to a mapping_piola
-     transformation (see Mapping::transform() for details).
+     transformation for the gradient of a vector field corresponding to a
+     mapping_piola transformation (see Mapping::transform() for details).
   */
 
   mapping_piola_gradient = 0x0101,

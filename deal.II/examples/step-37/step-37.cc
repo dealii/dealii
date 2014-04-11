@@ -221,17 +221,18 @@ namespace Step37
   // twice. Rather, we would keep this object in the main class and simply
   // store a reference.
   //
-  // @note Observe how we store the values for the coefficient: We use a
-  // vector type <code>AlignedVector<VectorizedArray<number> ></code>
-  // structure. One would think that one can use
-  // <code>std::vector<VectorizedArray<number> ></code> as well, but there are
-  // some technicalities with vectorization: A certain alignment of the data
-  // with the memory address boundaries is required (essentially, a
-  // VectorizedArray of 16 bytes length as in SSE needs to start at a memory
-  // address that is divisible by 16). The chosen class makes sure that this
-  // alignment is respected, whereas std::vector can in general not, which may
-  // lead to segmentation faults at strange places for some systems or
-  // suboptimal performance for other systems.
+  // @note Note that storing values of type
+  // <code>VectorizedArray<number></code> requires care: Here, we use the
+  // deal.II table class which is prepared to hold the data with correct
+  // alignment. However, storing it in e.g.
+  // <code>std::vector<VectorizedArray<number> ></code> is not possible with
+  // vectorization: A certain alignment of the data with the memory address
+  // boundaries is required (essentially, a VectorizedArray of 16 bytes length
+  // as in SSE needs to start at a memory address that is divisible by
+  // 16). The table class (as well as the AlignedVector class it is based on)
+  // makes sure that this alignment is respected, whereas std::vector can in
+  // general not, which may lead to segmentation faults at strange places for
+  // some systems or suboptimal performance for other systems.
   template <int dim, int fe_degree, typename number>
   class LaplaceOperator : public Subscriptor
   {
@@ -271,7 +272,7 @@ namespace Step37
     void evaluate_coefficient(const Coefficient<dim> &function);
 
     MatrixFree<dim,number>      data;
-    AlignedVector<VectorizedArray<number> > coefficient;
+    Table<2, VectorizedArray<number> > coefficient;
 
     Vector<number>  diagonal_values;
     bool            diagonal_is_available;
@@ -389,12 +390,12 @@ namespace Step37
   {
     const unsigned int n_cells = data.n_macro_cells();
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
-    coefficient.resize (n_cells * phi.n_q_points);
+    coefficient.reinit (n_cells, phi.n_q_points);
     for (unsigned int cell=0; cell<n_cells; ++cell)
       {
         phi.reinit (cell);
         for (unsigned int q=0; q<phi.n_q_points; ++q)
-          coefficient[cell*phi.n_q_points+q] =
+          coefficient(cell,q) =
             coefficient_function.value(phi.quadrature_point(q));
       }
   }
@@ -499,7 +500,6 @@ namespace Step37
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
-    AssertDimension (coefficient.size(), data.n_macro_cells() * phi.n_q_points);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
@@ -507,7 +507,7 @@ namespace Step37
         phi.read_dof_values(src);
         phi.evaluate (false,true,false);
         for (unsigned int q=0; q<phi.n_q_points; ++q)
-          phi.submit_gradient (coefficient[cell*phi.n_q_points+q] *
+          phi.submit_gradient (coefficient(cell,q) *
                                phi.get_gradient(q), q);
         phi.integrate (false,true);
         phi.distribute_local_to_global (dst);

@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo This is for 2D only.
  *
- * @todo Transformation works only for uniform, Cartesian meshes.
+ * @todo Restriction matrices are missing.
  *
  * The matching pressure space for FE_BDM of order <i>k</i> is the
  * element FE_DGP of order <i>k</i>.

@@ -1369,20 +1369,6 @@ TriaAccessor<structdim, dim, spacedim>::clear_used_flag () const
 template <int structdim, int dim, int spacedim>
 int
 TriaAccessor<structdim, dim, spacedim>::
-parent_index () const
-{
-  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
-
-  // the parent of two consecutive cells
-  // is stored only once, since it is
-  // the same
-  return this->tria->levels[this->present_level]->parents[this->present_index / 2];
-}
-
-
-template <int structdim, int dim, int spacedim>
-int
-TriaAccessor<structdim, dim, spacedim>::
 child_index (const unsigned int i) const
 {
   Assert (has_children(), TriaAccessorExceptions::ExcCellHasNoChildren());
@@ -1634,18 +1620,6 @@ TriaAccessor<structdim, dim, spacedim>::set_children (const unsigned int i,
           TriaAccessorExceptions::ExcCantSetChildren(index));
 
   this->objects().children[n_sets_of_two*this->present_index+i/2] = index;
-}
-
-
-
-template <int structdim, int dim, int spacedim>
-void
-TriaAccessor<structdim, dim, spacedim>::set_parent (const unsigned int parent_index)
-{
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
-  this->tria->levels[this->present_level]->parents[this->present_index / 2]
-    = parent_index;
 }
 
 
@@ -2275,16 +2249,6 @@ TriaAccessor<0, 1, spacedim>::operator != (const TriaAccessor &t) const
   return !(*this==t);
 }
 
-
-
-
-template <int spacedim>
-inline
-int
-TriaAccessor<0, 1, spacedim>::parent_index ()
-{
-  return -1;
-}
 
 
 template <int spacedim>
@@ -3095,6 +3059,18 @@ CellAccessor<dim,spacedim>::is_artificial () const
 
 template <int dim, int spacedim>
 inline
+types::subdomain_id
+CellAccessor<dim, spacedim>::subdomain_id () const
+{
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
+  return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
+}
+
+
+
+template <int dim, int spacedim>
+inline
 unsigned int
 CellAccessor<dim,spacedim>::neighbor_face_no (const unsigned int neighbor) const
 {
@@ -3109,22 +3085,6 @@ CellAccessor<dim,spacedim>::neighbor_face_no (const unsigned int neighbor) const
 }
 
 
-template <int dim, int spacedim>
-inline
-bool
-CellAccessor<dim,spacedim>::operator < (const CellAccessor<dim,spacedim> &other) const
-{
-  Assert (this->tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
-
-  if (level_subdomain_id() != other.level_subdomain_id())
-    return (level_subdomain_id() < other.level_subdomain_id());
-
-  if (active() && other.active() &&
-      (subdomain_id() != other.subdomain_id()))
-    return (subdomain_id() < other.subdomain_id());
-
-  return TriaAccessorBase<dim,dim,spacedim>::operator < (other);
-}
 
 
 

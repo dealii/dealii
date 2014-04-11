@@ -421,7 +421,7 @@ equivalent form:
   \nabla \cdot \kappa \nabla (T^\alpha)
   +
   \kappa(\alpha-1)
-  T^{\alpha-2} |\nabla T|^\alpha
+  T^{\alpha-2} |\nabla T|^2
   -
   \gamma
   T^{\alpha-1}

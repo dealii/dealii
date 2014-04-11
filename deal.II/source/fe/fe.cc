@@ -1104,11 +1104,13 @@ FiniteElement<dim,spacedim>::has_support_on_face (
 
 
 template <int dim, int spacedim>
-Table<2,bool>
+std::pair<Table<2,bool>, std::vector<unsigned int> >
 FiniteElement<dim,spacedim>::get_constant_modes () const
 {
   Assert (false, ExcNotImplemented());
-  return Table<2,bool>(this->n_components(), this->dofs_per_cell);
+  return std::pair<Table<2,bool>, std::vector<unsigned int> >
+    (Table<2,bool>(this->n_components(), this->dofs_per_cell),
+     std::vector<unsigned int>(this->n_components()));
 }
 
 

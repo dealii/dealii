@@ -830,9 +830,8 @@ no_constraint:
       // set up partitions. if we just use coloring without partitions, do
       // nothing here, assume all cells to belong to the zero partition (that
       // we otherwise use for MPI boundary cells)
-      unsigned int partition = 0, start_up = 0, counter = 0;
-      unsigned int start_nonboundary = numbers::invalid_unsigned_int;
-      bool work = true;
+      unsigned int start_up = 0,
+        start_nonboundary = numbers::invalid_unsigned_int;
       if (task_info.use_coloring_only == false)
         {
           start_nonboundary =
@@ -920,6 +919,8 @@ no_constraint:
                                true, connectivity);
 
       // Create cell-block  partitioning.
+      unsigned int partition = 0, counter = 0;
+      bool work = true;
 
       // For each block of cells, this variable saves to which partitions the
       // block belongs. Initialize all to n_macro_cells to mark them as not
@@ -1131,8 +1132,8 @@ no_constraint:
       }
 #endif
       AssertDimension(counter,size_info.n_active_cells);
-      task_info.evens = (partition+1)>>1;
-      task_info.odds  = (partition)>>1;
+      task_info.evens = (partition+1)/2;
+      task_info.odds  = (partition)/2;
       task_info.n_blocked_workers = task_info.odds-
                                     (task_info.odds+task_info.evens+1)%2;
       task_info.n_workers = task_info.partition_color_blocks_data.size()-1-
