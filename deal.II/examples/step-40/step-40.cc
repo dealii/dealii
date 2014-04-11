@@ -656,11 +656,11 @@ namespace Step40
             output_results (cycle);
           }
 
-        pcout << std::endl;
         computing_timer.print_summary ();
         computing_timer.reset ();
-      }
 
+        pcout << std::endl;
+      }
   }
 }
 
