@@ -94,7 +94,7 @@ def format_block(lines, infostr=""):
 
     ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated"]
 
-    ops_separate_line = ["<ul>", "</ul>", "@{", "@}"]
+    ops_separate_line = ["<ol>", "</ol>", "<ul>", "</ul>", "@{", "@}", "<br>"]
 
     while idx<endidx:
         if one_in(ops_separate_line, lines[idx]):
