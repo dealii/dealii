@@ -8,40 +8,44 @@ Cycle 0:
    Number of degrees of freedom: 4225
    Solved in 10 iterations.
 
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.176s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assembly                        |         1 |    0.0209s |        12% |
+| output                          |         1 |    0.0189s |        11% |
+| setup                           |         1 |    0.0299s |        17% |
+| solve                           |         1 |    0.0419s |        24% |
++---------------------------------+-----------+------------+------------+
+
+
 Cycle 1:
    Number of active cells:       1954
    Number of degrees of freedom: 8399
-   Solved in 11 iterations.
+   Solved in 10 iterations.
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.327s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assembly                        |         1 |    0.0368s |        11% |
+| output                          |         1 |    0.0208s |       6.4% |
+| refine                          |         1 |     0.157s |        48% |
+| setup                           |         1 |    0.0452s |        14% |
+| solve                           |         1 |    0.0668s |        20% |
++---------------------------------+-----------+------------+------------+
+
 
 Cycle 2:
-   Number of active cells:       3640
-   Number of degrees of freedom: 16091
+   Number of active cells:       3664
+   Number of degrees of freedom: 16183
    Solved in 11 iterations.
 
-Cycle 3:
-   Number of active cells:       7018
-   Number of degrees of freedom: 31387
-   Solved in 11 iterations.
-
-Cycle 4:
-   Number of active cells:       13594
-   Number of degrees of freedom: 61531
-   Solved in 13 iterations.
-
-Cycle 5:
-   Number of active cells:       26950
-   Number of degrees of freedom: 122693
-   Solved in 13 iterations.
-
-Cycle 6:
-   Number of active cells:       54373
-   Number of degrees of freedom: 248265
-   Solved in 14 iterations.
-
-Cycle 7:
-   Number of active cells:       111754
-   Number of degrees of freedom: 513153
-   Solved in 14 iterations.
+...
 @endcode
 
 The exact numbers differ, depending on how many processors we use;

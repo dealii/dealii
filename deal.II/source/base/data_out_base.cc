@@ -7220,20 +7220,17 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   herr_t          status;
   unsigned int    local_node_cell_count[2], global_node_cell_count[2], global_node_cell_offsets[2];
   hsize_t         count[2], offset[2], node_ds_dim[2], cell_ds_dim[2];
-  bool            empty_proc = false;
   std::vector<double>          node_data_vec;
   std::vector<unsigned int>    cell_data_vec;
 
-  if (data_filter.n_nodes() == 0) empty_proc = true;
-
   // If HDF5 is not parallel and we're using multiple processes, abort
 #ifndef H5_HAVE_PARALLEL
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
   int world_size;
   MPI_Comm_size(comm, &world_size);
   AssertThrow (world_size <= 1,
                ExcMessage ("Serial HDF5 output on multiple processes is not yet supported."));
-#endif
+#  endif
 #endif
 
   local_node_cell_count[0] = data_filter.n_nodes();
@@ -7390,7 +7387,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // all vector data, then handle the
   // scalar data sets that have been
   // left over
-  unsigned int    i, n, q, r, pt_data_vector_dim;
+  unsigned int    i, pt_data_vector_dim;
   std::string     vector_name;
   for (i=0; i<data_filter.n_data_sets(); ++i)
     {
