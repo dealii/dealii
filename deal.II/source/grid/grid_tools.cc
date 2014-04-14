@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1979,7 +1979,7 @@ next_cell:
 
 
 
-      void fix_up_faces (const dealii::Triangulation<1,1>::active_cell_iterator &,
+      void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &,
                          dealii::internal::int2type<1>,
                          dealii::internal::int2type<1>)
       {
@@ -1993,7 +1993,7 @@ next_cell:
       // a cell by moving around its
       // mid-points
       template <int structdim, int spacedim>
-      void fix_up_faces (const typename dealii::Triangulation<structdim,spacedim>::active_cell_iterator &cell,
+      void fix_up_faces (const typename dealii::Triangulation<structdim,spacedim>::cell_iterator &cell,
                          dealii::internal::int2type<structdim>,
                          dealii::internal::int2type<spacedim>)
       {
