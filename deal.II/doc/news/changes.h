@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: GridTools::find_active_cell_around_point() could get into an infinite
+  loop if the point we are looking for is in fact not within the domain. This is now
+  fixed.
+  <br>
+  (Giorgos Kourakos, Timo Heister, Wolfgang Bangerth, 2014/04/14)
+  </li>
+
   <li> Changed: TableBase<N,T> now uses AlignedVector for storing data
   instead of std::vector, which allows its use for VectorizedArray<Number>
   data fields which require more alignment.
