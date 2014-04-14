@@ -33,7 +33,7 @@
 #include <fstream>
 #include <deal.II/fe/fe_q.h>
 
-template <int dim>
+template <int dim, int spacedim>
 void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
                 const char                                *filename)
 {
