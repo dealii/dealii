@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// test for correctness of step-48 (without output and only small sizes)
+// simplified version of step-48, no sine term (i.e., usual wave equation)
 
 
 #include "../tests.h"
@@ -253,24 +253,6 @@ namespace Step48
   {
     GridGenerator::hyper_cube (triangulation, -15, 15);
     triangulation.refine_global (n_global_refinements);
-    {
-      typename Triangulation<dim>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      end_cell = triangulation.end();
-      for ( ; cell != end_cell; ++cell)
-        if (cell->is_locally_owned())
-          if (cell->center().norm() < 11)
-            cell->set_refine_flag();
-      triangulation.execute_coarsening_and_refinement();
-
-      cell = triangulation.begin_active();
-      end_cell = triangulation.end();
-      for ( ; cell != end_cell; ++cell)
-        if (cell->is_locally_owned())
-          if (cell->center().norm() < 6)
-            cell->set_refine_flag();
-      triangulation.execute_coarsening_and_refinement();
-    }
 
     deallog << "   Number of global active cells: "
 #ifdef DEAL_II_WITH_P4EST
@@ -289,9 +271,6 @@ namespace Step48
 
     DoFTools::extract_locally_relevant_dofs (dof_handler,
                                              locally_relevant_dofs);
-    constraints.clear();
-    constraints.reinit (locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close();
 
     QGaussLobatto<1> quadrature (fe_degree+1);
