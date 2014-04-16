@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -890,7 +890,7 @@ next_cell:
                                  const Container<dim,spacedim> &container,
                                  const Point<spacedim>     &p)
   {
-    typedef typename Container<dim,spacedim>::active_cell_iterator cell_iterator;
+    typedef typename Container<dim,spacedim>::active_cell_iterator active_cell_iterator;
 
     // The best distance is set to the
     // maximum allowable distance from
@@ -898,22 +898,22 @@ next_cell:
     // max. deviation of 1e-10
     double best_distance = 1e-10;
     int    best_level = -1;
-    std::pair<cell_iterator, Point<dim> > best_cell;
+    std::pair<active_cell_iterator, Point<dim> > best_cell;
 
     // Find closest vertex and determine
     // all adjacent cells
-    unsigned int vertex = find_closest_vertex(container, p);
-
-    std::vector<cell_iterator> adjacent_cells_tmp =
-      find_cells_adjacent_to_vertex(container, vertex);
+    std::vector<active_cell_iterator> adjacent_cells_tmp
+    = find_cells_adjacent_to_vertex(container,
+                                    find_closest_vertex(container, p));
 
     // Make sure that we have found
     // at least one cell adjacent to vertex.
     Assert(adjacent_cells_tmp.size()>0, ExcInternalError());
 
     // Copy all the cells into a std::set
-    std::set<cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(), adjacent_cells_tmp.end());
-    std::set<cell_iterator> searched_cells;
+    std::set<active_cell_iterator> adjacent_cells (adjacent_cells_tmp.begin(),
+                                                   adjacent_cells_tmp.end());
+    std::set<active_cell_iterator> searched_cells;
 
     // Determine the maximal number of cells
     // in the grid.
@@ -921,12 +921,12 @@ next_cell:
     // the cell and have not searched
     // every cell in the triangulation,
     // we keep on looking.
-    const unsigned int n_cells =get_tria(container).n_cells();
+    const unsigned int n_active_cells = get_tria(container).n_active_cells();
     bool found = false;
     unsigned int cells_searched = 0;
-    while (!found && cells_searched < n_cells)
+    while (!found && cells_searched < n_active_cells)
       {
-        typename std::set<cell_iterator>::const_iterator
+        typename std::set<active_cell_iterator>::const_iterator
         cell = adjacent_cells.begin(),
         endc = adjacent_cells.end();
         for (; cell != endc; ++cell)
@@ -943,10 +943,13 @@ next_cell:
                 // unit cell (or at least not too far
                 // outside). If it is, it is also checked
                 // that the cell has a more refined state
-                if (dist < best_distance ||
-                    (dist == best_distance && (*cell)->level() > best_level))
+                if ((dist < best_distance)
+                    ||
+                    ((dist == best_distance)
+                     &&
+                     ((*cell)->level() > best_level)))
                   {
-                    found       = true;
+                    found         = true;
                     best_distance = dist;
                     best_level    = (*cell)->level();
                     best_cell     = std::make_pair(*cell, p_cell);
@@ -967,16 +970,18 @@ next_cell:
                 // to the next
               }
           }
-        //udpate the number of cells searched
+
+        // update the number of cells searched
         cells_searched += adjacent_cells.size();
+
         // if we have not found the cell in
         // question and have not yet searched every
         // cell, we expand our search to
         // all the not already searched neighbors of
         // the cells in adjacent_cells. This is
-        // what find_active_cell_around_poin_internal
+        // what find_active_cell_around_point_internal
         // is for.
-        if (!found && cells_searched < n_cells)
+        if (!found && cells_searched < n_active_cells)
           {
             find_active_cell_around_point_internal<dim,Container,spacedim>
             (container, searched_cells, adjacent_cells);

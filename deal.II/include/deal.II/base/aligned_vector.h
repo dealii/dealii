@@ -546,8 +546,8 @@ AlignedVector<T>::reserve (const size_type size_alloc)
       _end_allocated = _data + new_size;
       if (_end_data != _data)
         {
-          internal::AlignedVectorMove<T>(new_data, new_data + old_size,
-                                         _data);
+          dealii::internal::AlignedVectorMove<T>(new_data, new_data + old_size,
+						 _data);
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
           _mm_free(new_data);
 #else

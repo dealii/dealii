@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,7 +96,7 @@ void test_rect(unsigned int m, unsigned int n, const double *values)
   LA.Tvmult(u, v2);
   u *= -1;
   A.Tvmult_add(u, v2);
-  if (u.l2_norm() < 1.e-12)
+  if (u.l2_norm() < 1.e-11)
     deallog << "Tvmult ok" << std::endl;
   else
     deallog << "Tvmult error " << u.l2_norm() << std::endl;
@@ -104,7 +104,7 @@ void test_rect(unsigned int m, unsigned int n, const double *values)
   A.Tvmult(u, v2);
   u *= -1;
   LA.Tvmult_add(u, v2);
-  if (u.l2_norm() < 1.e-12)
+  if (u.l2_norm() < 1.e-11)
     deallog << "Tvmult_add ok" << std::endl;
   else
     deallog << "Tvmult_add error " << u.l2_norm() << std::endl;

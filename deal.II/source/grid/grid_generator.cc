@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3428,8 +3428,6 @@ namespace GridGenerator
     GridTools::delete_duplicated_vertices (vertices, cells,
 					   subcell_data,
 					   considered_vertices);
-    GridReordering<dim,spacedim>::reorder_cells (cells);
-
     result.clear ();
     result.create_triangulation (vertices, cells, subcell_data);
   }
