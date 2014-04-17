@@ -35,7 +35,7 @@ void test ()
   deallog << "Constructor: ";
   for (unsigned int i=0; i<a.size(); ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == 0, ExcInternalError());
+      AssertThrow (a[i][d] == 0, ExcInternalError());
   deallog << "OK" << std::endl;
 
   a[2] = 1;
@@ -57,21 +57,21 @@ void test ()
   deallog << "Insertion: ";
   for (unsigned int i=0; i<a.size(); ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == a_ref[i], ExcInternalError());
+      AssertThrow (a[i][d] == a_ref[i], ExcInternalError());
   deallog << "OK" << std::endl;
 
   a.resize(4);
   deallog << "Shrinking: ";
   for (unsigned int i=0; i<a.size(); ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == a_ref[i], ExcInternalError());
+      AssertThrow (a[i][d] == a_ref[i], ExcInternalError());
   deallog << "OK" << std::endl;
 
   a.reserve(100);
   deallog << "Reserve: ";
   for (unsigned int i=0; i<a.size(); ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == a_ref[i], ExcInternalError());
+      AssertThrow (a[i][d] == a_ref[i], ExcInternalError());
   deallog << "OK" << std::endl;
 
   a = b;
@@ -79,7 +79,7 @@ void test ()
   deallog << "Assignment: ";
   for (unsigned int i=0; i<a.size(); ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == a_ref[i], ExcInternalError());
+      AssertThrow (a[i][d] == a_ref[i], ExcInternalError());
   deallog << "OK" << std::endl;
 
   // check setting elements for large vectors
@@ -88,7 +88,7 @@ void test ()
   deallog << "Check large initialization: ";
   for (unsigned int i=0; i<100000; ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == 1., ExcInternalError());
+      AssertThrow (a[i][d] == 1., ExcInternalError());
   deallog << "OK" << std::endl;
 
   // check resize for large vectors
@@ -97,13 +97,13 @@ void test ()
   a.resize (400000);
   for (unsigned int i=0; i<100000; ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == 1., ExcInternalError());
+      AssertThrow (a[i][d] == 1., ExcInternalError());
   for (unsigned int i=100000; i<200000; ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == 2., ExcInternalError());
+      AssertThrow (a[i][d] == 2., ExcInternalError());
   for (unsigned int i=200000; i<400000; ++i)
     for (unsigned int d=0; d<n_vectors; ++d)
-      Assert (a[i][d] == 0., ExcInternalError());
+      AssertThrow (a[i][d] == 0., ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
