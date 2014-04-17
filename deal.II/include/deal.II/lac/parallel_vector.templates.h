@@ -451,7 +451,7 @@ namespace parallel
               for (size_type j=my_imports->first; j<my_imports->second;
                    j++, read_position++)
                 Assert(*read_position == 0. ||
-                       std::abs(local_element(j) - *read_position) <
+                       std::abs(local_element(j) - *read_position) <=
                        std::abs(local_element(j)) * 1000. *
                        std::numeric_limits<Number>::epsilon(),
                        ExcNonMatchingElements(*read_position, local_element(j),
