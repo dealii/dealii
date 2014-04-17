@@ -1656,6 +1656,8 @@ private:
    */
   template <typename,bool> friend class SparseMatrixIterators::Iterator;
   template <typename,bool> friend class SparseMatrixIterators::Accessor;
+
+  template <typename number2> friend class SparseMatrixIterators::Accessor<number2, false>::Reference;
 };
 
 #ifndef DOXYGEN
