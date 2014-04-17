@@ -90,7 +90,7 @@ public:
   VectorizedArray &
   operator = (const double x)
   {
-    data = _mm256_set_pd(x, x, x, x, x, x, x, x);
+    data = _mm512_set_pd(x, x, x, x, x, x, x, x);
     return *this;
   }
 
@@ -201,9 +201,9 @@ private:
     // to compute the absolute value, perform bitwise andnot with -0. This
     // will leave all value and exponent bits unchanged but force the sign
     // value to +.
-    __m256d mask = _mm256_set_pd (-0., -0., -0., -0., -0., -0., -0., -0.);
+    __m256d mask = _mm512_set_pd (-0., -0., -0., -0., -0., -0., -0., -0.);
     VectorizedArray res;
-    res.data = _mm256_andnot_pd(mask, data);
+    res.data = _mm512_andnot_pd(mask, data);
     return res;
   }
 
@@ -264,7 +264,7 @@ public:
   VectorizedArray &
   operator = (const float x)
   {
-    data = _mm256_set_ps(x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x);
+    data = _mm512_set_ps(x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x);
     return *this;
   }
 
@@ -417,6 +417,7 @@ private:
   template <typename Number2> friend VectorizedArray<Number2>
   std::min  (const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
 };
+
 
 
 #elif DEAL_II_COMPILER_VECTORIZATION_LEVEL == 2  && defined(__AVX__)
