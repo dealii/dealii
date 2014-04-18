@@ -1,0 +1,11 @@
+
+DEAL::   Number of global active cells: 16
+DEAL::   Number of degrees of freedom: 289
+DEAL::   Time step size: 0.2500, finest cell: 7.500
+DEAL::
+DEAL::   Time: -10.0 , solution norm: 7.11111164   
+DEAL::   Time: -9.75 , solution norm: 3.78861141   
+DEAL::   Time: -9.50 , solution norm: 0.869590104  
+DEAL::
+DEAL::   Performed 3 time steps.
+DEAL::
