@@ -4,11 +4,9 @@ DEAL::   Number of degrees of freedom: 289
 DEAL::   Time step size: 0.2500, finest cell: 7.500
 DEAL::
 DEAL::   Time: -10.0 , solution norm: 7.11111164   
-DEAL::submitted values: 0 0 0 0 0 0 0 0 0 0 0 0 0.569151584 0 0 0 
-DEAL::no sine term: 0 0 0 0 0 0 0 0 0 0 0 0 0.562500000 0 0 0 
+DEAL::submit / sine values: 0 0   0 0   0 0   0 0   0 0   0 0   0 0   0 0   0 0   0 0   0 0   0 0   4.04730016 -0.0473001560   0 0   0 0   0 0   
 DEAL::   Time: -9.75 , solution norm: 3.78861141   
-DEAL::submitted values: 0 0 0 0 0 0 -0.00121093741 0 0 -0.00121093741 0 0 0.222882619 -0.00121093741 -0.00121093741 0 
-DEAL::no sine term: 0 0 0 0 0 0 -0.00124999978 0 0 -0.00124999978 0 0 0.225803189 -0.00124999978 -0.00124999978 0 
+DEAL::submit / sine values: 0 0   0 0   0 0   0 0   0 0   0 0   -0.00861111050 -0.000277776814   0 0   0 0   -0.00861111050 -0.000277776814   0 0   0 0   1.58494307 0.0207685003   -0.00861111050 -0.000277776814   -0.00861111050 -0.000277776814   0 0   
 DEAL::   Time: -9.50 , solution norm: 0.869590104  
 DEAL::
 DEAL::   Performed 3 time steps.

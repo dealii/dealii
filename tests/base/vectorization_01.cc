@@ -110,9 +110,9 @@ void test ()
 
   deallog << "OK" << std::endl
           << "Sine: ";
-  e = std::sin(b);
+  e = std::sin(d);
   for (unsigned int i=0; i<n_vectors; ++i)
-    AssertThrow (std::fabs(e[i]-std::sin(b[i])) <
+    AssertThrow (std::fabs(e[i]-std::sin(d[i])) <
                  10.*std::numeric_limits<Number>::epsilon(),
                  ExcInternalError());
   deallog << "OK" << std::endl

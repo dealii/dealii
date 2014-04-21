@@ -120,7 +120,7 @@ namespace Step48
   {
     AssertDimension (src.size(), 2);
     FEEvaluationGL<dim,fe_degree> current (data), old (data);
-    deallog << "submitted values: ";
+    deallog << "submit / sine values: ";
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         current.reinit (cell);
@@ -137,48 +137,22 @@ namespace Step48
             const VectorizedArray<double> current_value = current.get_value(q);
             const VectorizedArray<double> old_value     = old.get_value(q);
 
-            current.submit_value (2.*current_value - old_value -
-                                  delta_t_sqr * std::sin(current_value),q);
+            const VectorizedArray<double> submit_value =
+              2.*current_value - old_value - delta_t_sqr * std::sin(current_value);
+            current.submit_value (submit_value,q);
             current.submit_gradient (- delta_t_sqr *
                                      current.get_gradient(q), q);
+
+            // output first value on quadrature point for all vector
+            // components (should be stable irrespective of vectorization
+            // width)
+            if (q==0)
+              for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
+                deallog << submit_value[v] << " " << (delta_t_sqr*std::sin(current_value))[v] << "   ";
           }
-        // output first value on quadrature point for all vector components
-        // (should be stable irrespective of vectorization width)
-        for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
-          deallog << current.begin_values()[0][v] << " ";
 
         current.integrate (true,true);
         current.distribute_local_to_global (dst);
-      }
-    deallog << std::endl;
-
-    deallog << "no sine term: ";
-    // now output similar terms again but without the sine term (and do not
-    // write anything back to the solution vector)
-    for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
-      {
-        current.reinit (cell);
-        old.reinit (cell);
-
-        current.read_dof_values (*src[0]);
-        old.read_dof_values     (*src[1]);
-
-        current.evaluate (true, true, false);
-        old.evaluate (true, false, false);
-
-        for (unsigned int q=0; q<current.n_q_points; ++q)
-          {
-            const VectorizedArray<double> current_value = current.get_value(q);
-            const VectorizedArray<double> old_value     = old.get_value(q);
-
-            current.submit_value (2.*current_value - old_value, q);
-            current.submit_gradient (- delta_t_sqr *
-                                     current.get_gradient(q), q);
-          }
-        // output first value on quadrature point for all vector components
-        // (should be stable irrespective of vectorization width)
-        for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
-          deallog << current.begin_values()[0][v] << " ";
       }
     deallog << std::endl;
   }
