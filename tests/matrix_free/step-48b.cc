@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// simplified version of step-48, no sine term (i.e., usual wave equation)
+// simplified version of step-48
 
 
 #include "../tests.h"
@@ -139,6 +139,9 @@ namespace Step48
 
             const VectorizedArray<double> submit_value =
               2.*current_value - old_value - delta_t_sqr * std::sin(current_value);
+            const VectorizedArray<double> simple_value =
+              2.*current_value - old_value;
+            const VectorizedArray<double> sin_value = delta_t_sqr * std::sin(current_value);
             current.submit_value (submit_value,q);
             current.submit_gradient (- delta_t_sqr *
                                      current.get_gradient(q), q);
@@ -148,13 +151,13 @@ namespace Step48
             // width)
             if (q==0)
               for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
-                deallog << submit_value[v] << " " << (delta_t_sqr*std::sin(current_value))[v] << "   ";
+                deallog << submit_value[v] << " = " << simple_value[v] << " - "
+                        << sin_value[v] << std::endl;
           }
 
         current.integrate (true,true);
         current.distribute_local_to_global (dst);
       }
-    deallog << std::endl;
   }
 
 
@@ -187,7 +190,7 @@ namespace Step48
   double ExactSolution<dim>::value (const Point<dim> &p,
                                     const unsigned int /* component */) const
   {
-    return 4.*std::exp(-p.square()*10);
+    return std::exp(-p.distance(Point<2>(0.03, -0.2))*p.distance(Point<2>(0.03,-0.2))*0.1);
   }
 
 
@@ -230,7 +233,7 @@ namespace Step48
     dof_handler (triangulation),
     n_global_refinements (2),
     time (-10),
-    final_time (-9.5),
+    final_time (-9.75),
     cfl_number (.1/fe_degree),
     output_timestep_skip (1)
   {}
