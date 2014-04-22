@@ -58,3 +58,6 @@ s/^DEAL.*::_.*\n//g;
 # Normalize version string by replacing (for example) 'written by
 # deal.II 8.1.pre' by written by 'written by deal.II x.y.z'
 s/written by deal\.II \d+\.\d+\.(pre|\d+)/written by deal.II x.y.z/;
+
+# Normalize boost serialization output
+s/DEAL::22 serialization::archive 10/DEAL::22 serialization::archive 9/;
