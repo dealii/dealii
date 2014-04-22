@@ -206,8 +206,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         COMMAND touch ${_test_directory}/diff
         COMMAND
           ${${_test_diff_variable}} # see comment in line 72
-            ${_test_directory}/output
             ${_comparison_file}
+            ${_test_directory}/output
             > ${_test_directory}/diff
           || (mv ${_test_directory}/diff
                  ${_test_directory}/failing_diff
