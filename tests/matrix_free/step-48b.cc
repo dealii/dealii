@@ -142,7 +142,7 @@ namespace Step48
             const VectorizedArray<double> simple_value =
               2.*current_value - old_value;
             const VectorizedArray<double> sin_value = delta_t_sqr * std::sin(current_value);
-            current.submit_value (submit_value,q);
+            current.submit_value (simple_value-sin_value,q);
             current.submit_gradient (- delta_t_sqr *
                                      current.get_gradient(q), q);
 
