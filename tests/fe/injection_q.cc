@@ -25,7 +25,7 @@ char logname[] = "output";
 template <int dim>
 void test ()
 {
-  deallog << std::setprecision (4);
+  deallog << std::setprecision (10);
   for (unsigned int i=1; i<4; ++i)
     for (unsigned int j=i; j<4; ++j)
       do_check (FE_Q<dim>(i), FE_Q<dim>(j));

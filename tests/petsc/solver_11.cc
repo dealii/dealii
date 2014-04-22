@@ -43,12 +43,15 @@ check_solve( SOLVER &solver, const MATRIX &A,
   f = 1.;
   try
     {
+      deallog.depth_file(0);
       solver.solve(A,u,f,P);
+      deallog.depth_file(3);
     }
   catch (dealii::SolverControl::NoConvergence &e)
     {
       // just like for Richardson: expect to
       // get here, don't abort the program
+      deallog.depth_file(3);
       deallog << "Catched exception dealii::SolverControl::NoConvergence" << std::endl;
     }
 

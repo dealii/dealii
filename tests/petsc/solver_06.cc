@@ -43,10 +43,13 @@ check_solve( SOLVER &solver, const MATRIX &A,
   f = 1.;
   try
     {
+      deallog.depth_file(0);
       solver.solve(A,u,f,P);
+      deallog.depth_file(3);
     }
   catch (std::exception &e)
     {
+      deallog.depth_file(3);
       deallog << e.what() << std::endl;
       abort ();
     }

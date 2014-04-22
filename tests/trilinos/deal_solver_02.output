@@ -1,6 +1,4 @@
 
 DEAL::Size 32 Unknowns 961
 DEAL::Solver type: N6dealii14SolverBicgstabINS_16TrilinosWrappers6VectorEEE
-DEAL:Bicgstab::Starting value 31.00
-DEAL:Bicgstab::Convergence step 51 value 0
-DEAL::Solver stopped after 51 iterations
+DEAL::Solver stopped within 49 - 51 iterations
