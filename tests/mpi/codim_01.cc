@@ -45,25 +45,19 @@ void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
 
   // copy the .pvtu and .vtu files
   // into the logstream
-  {
-    std::ifstream in((std::string(filename) + ".pvtu").c_str());
-    while (in)
-      {
-        std::string s;
-        std::getline(in, s);
-        deallog.get_file_stream() << s << "\n";
-      }
-  }
-
-  {
-    std::ifstream in((std::string(filename) + "_0000.vtu").c_str());
-    while (in)
-      {
-        std::string s;
-        std::getline(in, s);
-        deallog.get_file_stream() << s << "\n";
-      }
-  }
+  int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  if (myid==0)
+    {
+      cat_file((std::string(filename) + ".pvtu").c_str());
+      cat_file((std::string(filename) + "_0000.vtu").c_str());
+    }
+  else if (myid==1)
+      cat_file((std::string(filename) + "_0001.vtu").c_str());
+  else if (myid==2)
+      cat_file((std::string(filename) + "_0002.vtu").c_str());
+  else
+    AssertThrow(false, ExcNotImplemented());
+  
 }
 
 template<int dim, int spacedim>

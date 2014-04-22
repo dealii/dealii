@@ -301,9 +301,10 @@ namespace SparseMatrixIterators
     friend class Iterator;
 
     /**
-     * Make the inner reference class a friend if the compiler has a bug and
-     * requires this.
+     * Make the SparseMatrix class a friend so that it, in turn, can
+     * declare the Reference class a friend.
      */
+    template <typename> friend class dealii::SparseMatrix;
   };
 
 
@@ -1656,6 +1657,8 @@ private:
    */
   template <typename,bool> friend class SparseMatrixIterators::Iterator;
   template <typename,bool> friend class SparseMatrixIterators::Accessor;
+
+  template <typename number2> friend class SparseMatrixIterators::Accessor<number2, false>::Reference;
 };
 
 #ifndef DOXYGEN

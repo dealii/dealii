@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// test for correctness of step-48 (without output and only small sizes)
+// simplified version of step-48
 
 
 #include "../tests.h"
@@ -30,13 +30,9 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/distributed/tria.h>
 
 #include <deal.II/lac/parallel_vector.h>
 #include <deal.II/matrix_free/matrix_free.h>
@@ -51,7 +47,6 @@ namespace Step48
 {
   using namespace dealii;
 
-  const unsigned int dimension = 2;
   const unsigned int fe_degree = 4;
 
 
@@ -125,6 +120,7 @@ namespace Step48
   {
     AssertDimension (src.size(), 2);
     FEEvaluationGL<dim,fe_degree> current (data), old (data);
+    deallog << "submit / sine values: ";
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         current.reinit (cell);
@@ -141,10 +137,22 @@ namespace Step48
             const VectorizedArray<double> current_value = current.get_value(q);
             const VectorizedArray<double> old_value     = old.get_value(q);
 
-            current.submit_value (2.*current_value - old_value -
-                                  delta_t_sqr * std::sin(current_value),q);
+            const VectorizedArray<double> submit_value =
+              2.*current_value - old_value - delta_t_sqr * std::sin(current_value);
+            const VectorizedArray<double> simple_value =
+              2.*current_value - old_value;
+            const VectorizedArray<double> sin_value = delta_t_sqr * std::sin(current_value);
+            current.submit_value (simple_value-sin_value,q);
             current.submit_gradient (- delta_t_sqr *
                                      current.get_gradient(q), q);
+
+            // output first value on quadrature point for all vector
+            // components (should be stable irrespective of vectorization
+            // width)
+            if (q==0)
+              for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
+                deallog << submit_value[v] << " = " << simple_value[v] << " - "
+                        << sin_value[v] << std::endl;
           }
 
         current.integrate (true,true);
@@ -182,17 +190,7 @@ namespace Step48
   double ExactSolution<dim>::value (const Point<dim> &p,
                                     const unsigned int /* component */) const
   {
-    double t = this->get_time ();
-
-    const double m = 0.5;
-    const double c1 = 0.;
-    const double c2 = 0.;
-    const double factor = (m / std::sqrt(1.-m*m) *
-                           std::sin(std::sqrt(1.-m*m)*t+c2));
-    double result = 1.;
-    for (unsigned int d=0; d<dim; ++d)
-      result *= -4. * std::atan (factor / std::cosh(m*p[d]+c1));
-    return result;
+    return std::exp(-p.distance(Point<2>(0.03, -0.2))*p.distance(Point<2>(0.03,-0.2))*0.1);
   }
 
 
@@ -207,13 +205,9 @@ namespace Step48
 
   private:
     void make_grid_and_dofs ();
-    void output_results (const unsigned int timestep_number);
+    void output_norm ();
 
-#ifdef DEAL_II_WITH_P4EST
-    parallel::distributed::Triangulation<dim>   triangulation;
-#else
     Triangulation<dim>   triangulation;
-#endif
     FE_Q<dim>            fe;
     DoFHandler<dim>      dof_handler;
     ConstraintMatrix     constraints;
@@ -235,16 +229,13 @@ namespace Step48
   template <int dim>
   SineGordonProblem<dim>::SineGordonProblem ()
     :
-#ifdef DEAL_II_WITH_P4EST
-    triangulation (MPI_COMM_WORLD),
-#endif
     fe (QGaussLobatto<1>(fe_degree+1)),
     dof_handler (triangulation),
-    n_global_refinements (8-2*dim),
+    n_global_refinements (2),
     time (-10),
-    final_time (-9),
+    final_time (-9.75),
     cfl_number (.1/fe_degree),
-    output_timestep_skip (200)
+    output_timestep_skip (1)
   {}
 
 
@@ -253,31 +244,9 @@ namespace Step48
   {
     GridGenerator::hyper_cube (triangulation, -15, 15);
     triangulation.refine_global (n_global_refinements);
-    {
-      typename Triangulation<dim>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      end_cell = triangulation.end();
-      for ( ; cell != end_cell; ++cell)
-        if (cell->is_locally_owned())
-          if (cell->center().norm() < 11)
-            cell->set_refine_flag();
-      triangulation.execute_coarsening_and_refinement();
-
-      cell = triangulation.begin_active();
-      end_cell = triangulation.end();
-      for ( ; cell != end_cell; ++cell)
-        if (cell->is_locally_owned())
-          if (cell->center().norm() < 6)
-            cell->set_refine_flag();
-      triangulation.execute_coarsening_and_refinement();
-    }
 
     deallog << "   Number of global active cells: "
-#ifdef DEAL_II_WITH_P4EST
-            << triangulation.n_global_active_cells()
-#else
             << triangulation.n_active_cells()
-#endif
             << std::endl;
 
     dof_handler.distribute_dofs (fe);
@@ -289,16 +258,12 @@ namespace Step48
 
     DoFTools::extract_locally_relevant_dofs (dof_handler,
                                              locally_relevant_dofs);
-    constraints.clear();
-    constraints.reinit (locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close();
 
     QGaussLobatto<1> quadrature (fe_degree+1);
     typename MatrixFree<dim>::AdditionalData additional_data;
-    additional_data.mpi_communicator = MPI_COMM_WORLD;
     additional_data.tasks_parallel_scheme =
-      MatrixFree<dim>::AdditionalData::partition_partition;
+      MatrixFree<dim>::AdditionalData::none;
 
     matrix_free_data.reinit (dof_handler, constraints,
                              quadrature, additional_data);
@@ -313,7 +278,7 @@ namespace Step48
 
   template <int dim>
   void
-  SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
+  SineGordonProblem<dim>::output_norm ()
   {
     constraints.distribute (solution);
     solution.update_ghost_values();
@@ -325,13 +290,12 @@ namespace Step48
                                        norm_per_cell,
                                        QGauss<dim>(fe_degree+1),
                                        VectorTools::L2_norm);
-    const double solution_norm =
-      std::sqrt(Utilities::MPI::sum (norm_per_cell.norm_sqr(), MPI_COMM_WORLD));
+    const double solution_norm = norm_per_cell.norm_sqr();
 
-    deallog << "   Time:"
-            << std::setw(8) << std::setprecision(3) << time
+    deallog << "   Time: "
+            << std::setw(6) << std::setprecision(3) << time
             << ", solution norm: "
-            << std::setprecision(5) << std::setw(7) << solution_norm
+            << std::setprecision(9) << std::setw(13) << solution_norm
             << std::endl;
   }
 
@@ -343,14 +307,12 @@ namespace Step48
   {
     make_grid_and_dofs();
 
-    const double local_min_cell_diameter =
+    const double min_cell_diameter =
       triangulation.last()->diameter()/std::sqrt(dim);
-    const double global_min_cell_diameter
-      = -Utilities::MPI::max(-local_min_cell_diameter, MPI_COMM_WORLD);
-    time_step = cfl_number * global_min_cell_diameter;
+    time_step = cfl_number * min_cell_diameter;
     time_step = (final_time-time)/(int((final_time-time)/time_step));
     deallog << "   Time step size: " << time_step << ", finest cell: "
-            << global_min_cell_diameter << std::endl << std::endl;
+            << min_cell_diameter << std::endl << std::endl;
 
 
     VectorTools::interpolate (dof_handler,
@@ -359,7 +321,7 @@ namespace Step48
     VectorTools::interpolate (dof_handler,
                               ExactSolution<dim> (1, time-time_step),
                               old_solution);
-    output_results (0);
+    output_norm ();
 
     std::vector<parallel::distributed::Vector<double>*> previous_solutions;
     previous_solutions.push_back(&old_solution);
@@ -376,10 +338,8 @@ namespace Step48
         old_solution.swap (solution);
         sine_gordon_op.apply (solution, previous_solutions);
 
-        if (timestep_number % output_timestep_skip == 0)
-          output_results(timestep_number / output_timestep_skip);
+        output_norm();
       }
-    output_results(timestep_number / output_timestep_skip + 1);
 
     deallog << std::endl
             << "   Performed " << timestep_number << " time steps."
@@ -391,43 +351,13 @@ namespace Step48
 
 int main (int argc, char **argv)
 {
-  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
+  std::ofstream logfile("output");
+  deallog.attach(logfile);
+  deallog << std::setprecision(4);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  deallog.push(Utilities::int_to_string(myid));
-
-  if (myid == 0)
-    {
-      std::ofstream logfile("output");
-      deallog.attach(logfile);
-      deallog << std::setprecision(4);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
-
-      {
-        deallog.push("2d");
-        Step48::SineGordonProblem<2> sg_problem;
-        sg_problem.run ();
-        deallog.pop();
-      }
-      {
-        deallog.push("3d");
-        Step48::SineGordonProblem<3> sg_problem;
-        sg_problem.run ();
-        deallog.pop();
-      }
-    }
-  else
-    {
-      deallog.depth_console(0);
-      {
-        Step48::SineGordonProblem<2> sg_problem;
-        sg_problem.run ();
-      }
-      {
-        Step48::SineGordonProblem<3> sg_problem;
-        sg_problem.run ();
-      }
-    }
+  Step48::SineGordonProblem<2> sg_problem;
+  sg_problem.run ();
 }
 

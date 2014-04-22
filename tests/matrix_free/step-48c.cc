@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// test for correctness of step-48 (without output and only small sizes)
+// simplified form for step-48 test 
 
 
 #include "../tests.h"
@@ -141,8 +141,7 @@ namespace Step48
             const VectorizedArray<double> current_value = current.get_value(q);
             const VectorizedArray<double> old_value     = old.get_value(q);
 
-            current.submit_value (2.*current_value - old_value -
-                                  delta_t_sqr * std::sin(current_value),q);
+            current.submit_value (2.*current_value - old_value,q);
             current.submit_gradient (- delta_t_sqr *
                                      current.get_gradient(q), q);
           }
@@ -169,30 +168,20 @@ namespace Step48
 
 
   template <int dim>
-  class ExactSolution : public Function<dim>
+  class InitialSolution : public Function<dim>
   {
   public:
-    ExactSolution (const unsigned int n_components = 1,
+    InitialSolution (const unsigned int n_components = 1,
                    const double time = 0.) : Function<dim>(n_components, time) {}
     virtual double value (const Point<dim> &p,
                           const unsigned int component = 0) const;
   };
 
   template <int dim>
-  double ExactSolution<dim>::value (const Point<dim> &p,
-                                    const unsigned int /* component */) const
+  double InitialSolution<dim>::value (const Point<dim> &p,
+                                      const unsigned int /* component */) const
   {
-    double t = this->get_time ();
-
-    const double m = 0.5;
-    const double c1 = 0.;
-    const double c2 = 0.;
-    const double factor = (m / std::sqrt(1.-m*m) *
-                           std::sin(std::sqrt(1.-m*m)*t+c2));
-    double result = 1.;
-    for (unsigned int d=0; d<dim; ++d)
-      result *= -4. * std::atan (factor / std::cosh(m*p[d]+c1));
-    return result;
+    return 4.*std::exp(-p.square()*10);
   }
 
 
@@ -240,7 +229,7 @@ namespace Step48
 #endif
     fe (QGaussLobatto<1>(fe_degree+1)),
     dof_handler (triangulation),
-    n_global_refinements (8-2*dim),
+    n_global_refinements (9-2*dim),
     time (-10),
     final_time (-9),
     cfl_number (.1/fe_degree),
@@ -253,24 +242,6 @@ namespace Step48
   {
     GridGenerator::hyper_cube (triangulation, -15, 15);
     triangulation.refine_global (n_global_refinements);
-    {
-      typename Triangulation<dim>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      end_cell = triangulation.end();
-      for ( ; cell != end_cell; ++cell)
-        if (cell->is_locally_owned())
-          if (cell->center().norm() < 11)
-            cell->set_refine_flag();
-      triangulation.execute_coarsening_and_refinement();
-
-      cell = triangulation.begin_active();
-      end_cell = triangulation.end();
-      for ( ; cell != end_cell; ++cell)
-        if (cell->is_locally_owned())
-          if (cell->center().norm() < 6)
-            cell->set_refine_flag();
-      triangulation.execute_coarsening_and_refinement();
-    }
 
     deallog << "   Number of global active cells: "
 #ifdef DEAL_II_WITH_P4EST
@@ -354,10 +325,10 @@ namespace Step48
 
 
     VectorTools::interpolate (dof_handler,
-                              ExactSolution<dim> (1, time),
+                              InitialSolution<dim> (1, time),
                               solution);
     VectorTools::interpolate (dof_handler,
-                              ExactSolution<dim> (1, time-time_step),
+                              InitialSolution<dim> (1, time-time_step),
                               old_solution);
     output_results (0);
 

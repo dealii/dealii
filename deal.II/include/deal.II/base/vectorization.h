@@ -90,7 +90,7 @@ public:
   VectorizedArray &
   operator = (const double x)
   {
-    data = _mm256_set_pd(x, x, x, x, x, x, x, x);
+    data = _mm512_set_pd(x, x, x, x, x, x, x, x);
     return *this;
   }
 
@@ -201,9 +201,9 @@ private:
     // to compute the absolute value, perform bitwise andnot with -0. This
     // will leave all value and exponent bits unchanged but force the sign
     // value to +.
-    __m256d mask = _mm256_set_pd (-0., -0., -0., -0., -0., -0., -0., -0.);
+    __m256d mask = _mm512_set_pd (-0., -0., -0., -0., -0., -0., -0., -0.);
     VectorizedArray res;
-    res.data = _mm256_andnot_pd(mask, data);
+    res.data = _mm512_andnot_pd(mask, data);
     return res;
   }
 
@@ -264,7 +264,7 @@ public:
   VectorizedArray &
   operator = (const float x)
   {
-    data = _mm256_set_ps(x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x);
+    data = _mm512_set_ps(x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x);
     return *this;
   }
 
@@ -417,6 +417,7 @@ private:
   template <typename Number2> friend VectorizedArray<Number2>
   std::min  (const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
 };
+
 
 
 #elif DEAL_II_COMPILER_VECTORIZATION_LEVEL == 2  && defined(__AVX__)
@@ -1749,7 +1750,7 @@ DEAL_II_NAMESPACE_CLOSE
 namespace std
 {
   /**
-   * Computes the sine of a vectorized data field. The result is return as
+   * Computes the sine of a vectorized data field. The result is returned as
    * vectorized array in the form <tt>{sin(x[0]), sin(x[1]), ...,
    * sin(x[n_array_elements-1])}</tt>.
    *
@@ -1769,7 +1770,7 @@ namespace std
 
 
   /**
-   * Computes the tangent of a vectorized data field. The result is return as
+   * Computes the tangent of a vectorized data field. The result is returned as
    * vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
    * tan(x[n_array_elements-1])}</tt>.
    *
@@ -1788,7 +1789,7 @@ namespace std
 
 
   /**
-   * Computes the cosine of a vectorized data field. The result is return as
+   * Computes the cosine of a vectorized data field. The result is returned as
    * vectorized array in the form <tt>{cos(x[0]), cos(x[1]), ...,
    * cos(x[n_array_elements-1])}</tt>.
    *
@@ -1807,7 +1808,7 @@ namespace std
 
 
   /**
-   * Computes the exponential of a vectorized data field. The result is return
+   * Computes the exponential of a vectorized data field. The result is returned
    * as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
    * exp(x[n_array_elements-1])}</tt>.
    *
@@ -1827,7 +1828,7 @@ namespace std
 
   /**
    * Computes the natural logarithm of a vectorized data field. The result is
-   * return as vectorized array in the form <tt>{log(x[0]), log(x[1]), ...,
+   * returned as vectorized array in the form <tt>{log(x[0]), log(x[1]), ...,
    * log(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -1846,7 +1847,7 @@ namespace std
 
 
   /**
-   * Computes the square root of a vectorized data field. The result is return
+   * Computes the square root of a vectorized data field. The result is returned
    * as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]), ...,
    * sqrt(x[n_array_elements-1])}</tt>.
    *
@@ -1864,7 +1865,7 @@ namespace std
 
   /**
    * Computes the absolute value (modulus) of a vectorized data field. The
-   * result is return as vectorized array in the form <tt>{abs(x[0]),
+   * result is returned as vectorized array in the form <tt>{abs(x[0]),
    * abs(x[1]), ..., abs(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -1881,7 +1882,7 @@ namespace std
 
   /**
    * Computes the componentwise maximum of two vectorized data fields. The
-   * result is return as vectorized array in the form <tt>{max(x[0],y[0]),
+   * result is returned as vectorized array in the form <tt>{max(x[0],y[0]),
    * max(x[1],y[1]), ...}</tt>.
    *
    * @relates VectorizedArray
@@ -1899,7 +1900,7 @@ namespace std
 
   /**
    * Computes the componentwise minimum of two vectorized data fields. The
-   * result is return as vectorized array in the form <tt>{min(x[0],y[0]),
+   * result is returned as vectorized array in the form <tt>{min(x[0],y[0]),
    * min(x[1],y[1]), ...}</tt>.
    *
    * @relates VectorizedArray

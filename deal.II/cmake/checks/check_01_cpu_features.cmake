@@ -27,6 +27,7 @@
 #   DEAL_II_WORDS_BIGENDIAN
 #   DEAL_II_HAVE_SSE2                    *)
 #   DEAL_II_HAVE_AVX                     *)
+#   DEAL_II_HAVE_AVX512                  *)
 #   DEAL_II_COMPILER_VECTORIZATION_LEVEL
 #
 # *)
@@ -80,7 +81,6 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   CHECK_CXX_SOURCE_RUNS(
     "
     #include <emmintrin.h>
-    #include <mm_malloc.h>
     int main()
     {
     __m128d a, b;
@@ -112,7 +112,6 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   CHECK_CXX_SOURCE_RUNS(
     "
     #include <immintrin.h>
-    #include <mm_malloc.h>
     int main()
     {
       __m256d a, b;
@@ -139,15 +138,45 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     }
     "
     DEAL_II_HAVE_AVX)
+
+  CHECK_CXX_SOURCE_RUNS(
+    "
+    #include <immintrin.h>
+    int main()
+    {
+      __m512d a, b;
+      const unsigned int vector_bytes = sizeof(__m512d);
+      const int n_vectors = vector_bytes/sizeof(double);
+      __m512d * data =
+        reinterpret_cast<__m512d*>(_mm_malloc (2*vector_bytes, vector_bytes));
+      double * ptr = reinterpret_cast<double*>(&a);
+      ptr[0] = (volatile double)(1.0);
+      for (int i=1; i<n_vectors; ++i)
+        ptr[i] = 0.0;
+      const volatile double x = 2.25;
+      b = _mm512_set_pd(x, x, x, x, x, x, x, x);
+      data[0] = _mm512_add_pd (a, b);
+      data[1] = _mm512_mul_pd (b, data[0]);
+      ptr = reinterpret_cast<double*>(&data[1]);
+      unsigned int return_value = 0;
+      if (ptr[0] != 7.3125)
+        return_value = 1;
+      for (int i=1; i<n_vectors; ++i)
+        if (ptr[i] != 5.0625)
+          return_value = 1;
+      _mm_free (data);
+      return return_value;
+    }
+    "
+    DEAL_II_HAVE_AVX512)
 ENDIF()
 
-
-IF(DEAL_II_HAVE_SSE2)
-  IF(DEAL_II_HAVE_AVX)
-    SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 2)
-  ELSE()
-    SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
-  ENDIF()
+IF(DEAL_II_HAVE_AVX512)
+  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 3)
+ELSEIF(DEAL_II_HAVE_AVX)
+  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 2)
+ELSEIF(DEAL_II_HAVE_SSE2)
+  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
 ELSE()
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
 ENDIF()

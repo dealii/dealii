@@ -286,8 +286,6 @@ namespace Step48
     ConditionalOStream pcout;
 
     void make_grid_and_dofs ();
-    void oldstyle_operation ();
-    void assemble_system ();
     void output_results (const unsigned int timestep_number);
 
 #ifdef DEAL_II_WITH_P4EST

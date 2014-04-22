@@ -67,7 +67,7 @@ FOREACH(_full_file ${_meshes})
       COMMAND rm -f ${_test_directory}/failing_diff
       COMMAND touch ${_test_directory}/diff
       COMMAND
-        ${TEST_DIFF} ${_test_directory}/output ${_comparison_file} > ${_test_directory}/diff
+        ${TEST_DIFF} ${_comparison_file} ${_test_directory}/output > ${_test_directory}/diff
         || (mv ${_test_directory}/diff
                ${_test_directory}/failing_diff
             && echo "${_test_full}: RUN successful."

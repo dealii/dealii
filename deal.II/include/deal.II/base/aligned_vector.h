@@ -29,7 +29,7 @@
 #include <cstring>
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
-#include <mm_malloc.h>
+#include <emmintrin.h>
 #endif
 
 

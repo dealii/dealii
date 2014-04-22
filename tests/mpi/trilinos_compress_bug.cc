@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,12 +72,12 @@ void test ()
     test(locally_owned.nth_index_in_set(5))=7;
 
   if (myid==0)
-    deallog << "before compress: " << test(locally_owned.nth_index_in_set(5)) << endl;
+    deallog << "before compress: " << test(locally_owned.nth_index_in_set(5)) << std::endl;
 
   test.compress(VectorOperation::insert);
 
   if (myid==0)
-    deallog << "after compress: " << test(locally_owned.nth_index_in_set(5)) << endl;
+    deallog << "after compress: " << test(locally_owned.nth_index_in_set(5)) << std::endl;
 
   // Trilinos produces a 0 instead of a 7 here. Why?
   if (myid==0)
