@@ -49,7 +49,7 @@ void verify (const T &t1,
   // save data to archive
   std::ostringstream oss;
   {
-    boost::archive::text_oarchive oa(oss);
+    boost::archive::text_oarchive oa(oss, boost::archive::no_header);
     oa << t1;
     // archive and stream closed when
     // destructors are called
@@ -60,7 +60,7 @@ void verify (const T &t1,
   // serialization
   {
     std::istringstream  iss(oss.str());
-    boost::archive::text_iarchive ia(iss);
+    boost::archive::text_iarchive ia(iss, boost::archive::no_header);
 
 
     ia >> t2;
