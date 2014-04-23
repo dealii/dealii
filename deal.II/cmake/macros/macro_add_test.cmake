@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 by the deal.II authors
+## Copyright (C) 2013, 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -205,7 +205,12 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         COMMAND rm -f ${_test_directory}/failing_diff
         COMMAND touch ${_test_directory}/diff
         COMMAND
-          ${${_test_diff_variable}} # see comment in line 72
+	  # run diff or numdiff (if available) to determine
+	  # whether files are the same. if they are not, output
+          # the first few lines of the output of numdiff, followed
+          # by the results of regular diff since the latter is just
+          # more readable
+          ${${_test_diff_variable}} # see comment above about redirection
             ${_comparison_file}
             ${_test_directory}/output
             > ${_test_directory}/diff
@@ -216,8 +221,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
               && echo "${_test_full}: DIFF failed. ------ Source: ${_comparison_file}"
               && echo "${_test_full}: DIFF failed. ------ Result: ${_test_directory}/output"
               && echo "${_test_full}: DIFF failed. ------ Diff:   ${_test_directory}/failing_diff"
-              && echo "${_test_full}: DIFF failed. ------ Diffs as follows:"
-              && cat ${_test_directory}/failing_diff
+              && echo "${_test_full}: DIFF failed. ------ First 8 lines of numdiff/diff output:"
+              && cat ${_test_directory}/failing_diff | head -n 8
+              && echo "${_test_full}: DIFF failed. ------ First 50 lines diff output:"
+              && ${DIFF_EXECUTABLE} -c ${_comparison_file} ${_test_directory}/output | head -n 50
               && exit 1)
         WORKING_DIRECTORY
           ${_test_directory}
