@@ -141,6 +141,9 @@ namespace Step48
             const VectorizedArray<double> current_value = current.get_value(q);
             const VectorizedArray<double> old_value     = old.get_value(q);
 
+            // the first 'dummy' is needed to work around a compiler bug in
+            // the tester
+            const VectorizedArray<double> dummy = -std::sin(current_value);
             current.submit_value (2.*current_value - old_value -
                                   delta_t_sqr * std::sin(current_value),q);
             current.submit_gradient (- delta_t_sqr *
