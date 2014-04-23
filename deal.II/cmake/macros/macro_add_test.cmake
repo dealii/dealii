@@ -77,9 +77,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
   SET(_test_diff_variable TEST_DIFF)
   IF(_file MATCHES "\\.binary\\.")
-    IF(NOT DIFF_EXECUTABLE MATCHES "-NOTFOUND")
-      SET(_test_diff_variable DIFF_EXECUTABLE)
-    ENDIF()
+    SET(_test_diff_variable DIFF_EXECUTABLE)
   ENDIF()
 
   #
