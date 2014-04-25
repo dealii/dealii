@@ -944,6 +944,11 @@ Article{BK07,
  * distributed meshes, see the @ref distributed module. In such meshes, each
  * cell is owned by exactly one processor. The locally owned ones are those
  * owned by the current processor.
+ *
+ * Each processor in a parallel computation has a triangulation covering
+ * the entire domain that consists of cells that are locally owned, of
+ * @ref GlossGhostCell "ghost cells" and of
+ * @ref GlossArtificialCell "artificial cells".
  * </dd>
  *
  *

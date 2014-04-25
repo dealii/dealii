@@ -782,7 +782,7 @@ public:
    *  thereby moving the vertex of a cell within the triangulation. Of
    *  course, doing so requires that you ensure that the new location
    *  of the vertex remains useful -- for example, avoiding inverted
-   *  or otherwise distorted (see also @ref GlossDistorted).
+   *  or otherwise distorted (see also @ref GlossDistorted "this glossary entry").
    *
    *  @note When a cell is refined, its children inherit the position
    *  of the vertex positions of those vertices they share with the mother
@@ -798,10 +798,11 @@ public:
    *  placed again at the same position as the first time around -- i.e.,
    *  not at the location you had previously moved it to.
    *
-   *  @note The behavior described in the previous note is relevant if
+   *  @note The behavior described above is relevant if
    *  you have a parallel::distributed::Triangulation object. There,
    *  refining a mesh always involves a re-partitioning. In other words,
-   *  vertices of locally owned cells (see @ref GlossLocallyOwnedCell)
+   *  vertices of locally owned cells (see
+   *  @ref GlossLocallyOwnedCell "this glossary entry")
    *  that you may have moved to a different location on one processor
    *  may be moved to a different processor upon mesh refinement (even
    *  if these particular cells were not refined) which will re-create
