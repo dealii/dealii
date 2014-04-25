@@ -1442,7 +1442,41 @@ public:
     maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
   };
 
+  /**
+   * A typedef that is used to to identify cell iterators. The
+   * concept of iterators is discussed at length in the
+   * @ref Iterators "iterators documentation module".
+   *
+   * The current typedef identifies cells in a triangulation. The
+   * TriaIterator class works like a pointer that when you
+   * dereference it yields an object of type CellAccessor.
+   * CellAccessor is a class that identifies properties that
+   * are specific to cells in a triangulation, but it is derived
+   * (and consequently inherits) from TriaAccessor that describes
+   * what you can ask of more general objects (lines, faces, as
+   * well as cells) in a triangulation.
+   *
+   * @ingroup Iterators
+   */
   typedef TriaIterator      <CellAccessor<dim,spacedim>         > cell_iterator;
+
+  /**
+   * A typedef that is used to to identify
+   * see @ref GlossActive "active cell iterators". The
+   * concept of iterators is discussed at length in the
+   * @ref Iterators "iterators documentation module".
+   *
+   * The current typedef identifies active cells in a triangulation. The
+   * TriaActiveIterator class works like a pointer to active objects that when you
+   * dereference it yields an object of type CellAccessor.
+   * CellAccessor is a class that identifies properties that
+   * are specific to cells in a triangulation, but it is derived
+   * (and consequently inherits) from TriaAccessor that describes
+   * what you can ask of more general objects (lines, faces, as
+   * well as cells) in a triangulation.
+   *
+   * @ingroup Iterators
+   */
   typedef TriaActiveIterator<CellAccessor<dim,spacedim>         > active_cell_iterator;
 
   typedef TriaIterator      <TriaAccessor<dim-1, dim, spacedim> > face_iterator;
@@ -1454,8 +1488,8 @@ public:
   typedef typename IteratorSelector::quad_iterator        quad_iterator;
   typedef typename IteratorSelector::active_quad_iterator active_quad_iterator;
 
-  typedef typename IteratorSelector::hex_iterator        hex_iterator;
-  typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
+  typedef typename IteratorSelector::hex_iterator         hex_iterator;
+  typedef typename IteratorSelector::active_hex_iterator  active_hex_iterator;
 
   /**
    *  Base class for refinement listeners.

@@ -309,13 +309,46 @@ namespace parallel
     class Triangulation : public dealii::Triangulation<dim,spacedim>
     {
     public:
+     /**
+      * A typedef that is used to to identify cell iterators. The
+      * concept of iterators is discussed at length in the
+      * @ref Iterators "iterators documentation module".
+      *
+      * The current typedef identifies cells in a triangulation. You
+      * can find the exact type it refers to in the base class's own
+      * typedef, but it should be TriaIterator<CellAccessor<dim,spacedim> >. The
+      * TriaIterator class works like a pointer that when you
+      * dereference it yields an object of type CellAccessor.
+      * CellAccessor is a class that identifies properties that
+      * are specific to cells in a triangulation, but it is derived
+      * (and consequently inherits) from TriaAccessor that describes
+      * what you can ask of more general objects (lines, faces, as
+      * well as cells) in a triangulation.
+      *
+      * @ingroup Iterators
+      */
+      typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
+
       /**
-       * Import the various
-       * iterator typedefs from the
-       * base class.
+       * A typedef that is used to to identify
+       * see @ref GlossActive "active cell iterators". The
+       * concept of iterators is discussed at length in the
+       * @ref Iterators "iterators documentation module".
+       *
+       * The current typedef identifies active cells in a triangulation. You
+       * can find the exact type it refers to in the base class's own
+       * typedef, but it should be TriaActiveIterator<CellAccessor<dim,spacedim> >. The
+       * TriaActiveIterator class works like a pointer to active objects that when you
+       * dereference it yields an object of type CellAccessor.
+       * CellAccessor is a class that identifies properties that
+       * are specific to cells in a triangulation, but it is derived
+       * (and consequently inherits) from TriaAccessor that describes
+       * what you can ask of more general objects (lines, faces, as
+       * well as cells) in a triangulation.
+       *
+       * @ingroup Iterators
        */
       typedef typename dealii::Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
-      typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
 
       /**
        * Generic settings for distributed Triangulations. If
