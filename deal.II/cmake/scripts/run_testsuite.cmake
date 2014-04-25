@@ -546,7 +546,7 @@ IF("${_res}" STREQUAL "0")
   IF("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
 
-    MESSAGE("-- Running make setup_tests")
+    MESSAGE("-- Running setup_tests")
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
       --build ${CTEST_BINARY_DIRECTORY} --target setup_tests
       -- ${MAKEOPTS}
