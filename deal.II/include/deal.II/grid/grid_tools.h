@@ -184,14 +184,15 @@ namespace GridTools
    * pointer to the function. In
    * either case, argument and
    * return value have to be of
-   * type <tt>Point<spacedim></tt>.
+   * type <tt>Point@<spacedim@></tt>.
    *
-   * Note: if you are using a parallel::distributed::Triangulation you will have
+   * @note If you are using a parallel::distributed::Triangulation you will have
    * hanging nodes in your local Triangulation even if your "global" mesh has
    * no hanging nodes. This will cause issues with wrong positioning of hanging
-   * nodes in ghost cells. The active cells will be correct, but keep in mind that
-   * computations like KellyErrorEstimator will give wrong answers. A safe bet is
-   * to use this function prior to any refinement in parallel.
+   * nodes in ghost cells. The vertices of all locally owned cells will be correct,
+   * but the vertices of some ghost cells may not. This means that
+   * computations like KellyErrorEstimator may give wrong answers. A safe bet is
+   * to use this function prior to any refinement in parallel, if that is possible.
    *
    * This function is used in the
    * "Possibilities for extensions" section
