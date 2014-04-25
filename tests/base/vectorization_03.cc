@@ -27,7 +27,7 @@
 void test()
 {
   VectorizedArray<double> array[3];
-  for (unsigned int i=0; i<4; ++i)
+  for (unsigned int i=0; i<3; ++i)
     for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
       array[i][v] = static_cast<double>(rand())/RAND_MAX;
 
