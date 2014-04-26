@@ -567,7 +567,7 @@ namespace parallel
        * If you use p4est version > 0.3.4.2 the @p autopartition flag tells
        * p4est to ignore the partitioning that the triangulation had when
        * it was saved and make it uniform upon loading. If @p autopartition
-       * set to false, the triangulation is only repartitioned if needed
+       * is set to false, the triangulation is only repartitioned if needed
        * (i.e. if a different number of MPI processes is encountered).
        */
       void load(const char *filename, bool autopartition = true);
