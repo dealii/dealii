@@ -34,6 +34,8 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(PETSC_DIR "" CACHE PATH "An optional hint to a PETSc directory")
+SET(PETSC_ARCH "" CACHE STRING "An optional hint to a PETSc arch")
 SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
 SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
@@ -182,10 +184,7 @@ MARK_AS_ADVANCED(
   )
 
 IF(PETSC_FOUND)
-  SET(PETSC_LIBRARIES
-    ${PETSC_LIBRARY}
-    ${_petsc_libraries}
-    )
+  SET(PETSC_LIBRARIES ${PETSC_LIBRARY} ${_petsc_libraries})
   SET(PETSC_INCLUDE_DIRS
     ${PETSC_INCLUDE_DIR_COMMON}
     ${PETSC_INCLUDE_DIR_ARCH}
@@ -257,12 +256,5 @@ IF(PETSC_FOUND)
     )
 
   MARK_AS_ADVANCED(PETSC_ARCH PETSC_DIR)
-ELSE()
-  SET(PETSC_DIR "" CACHE PATH
-    "An optional hint to a PETSc directory"
-    )
-  SET(PETSC_ARCH "" CACHE STRING
-    "An optional hint to a PETSc arch"
-    )
 ENDIF()
 

@@ -31,6 +31,7 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(SLEPC_DIR "" CACHE PATH "An optional hint to a SLEPC directory")
 SET_IF_EMPTY(SLEPC_DIR "$ENV{SLEPC_DIR}")
 SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
 SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
@@ -126,9 +127,5 @@ IF(SLEPC_FOUND)
     )
 
   MARK_AS_ADVANCED(SLEPC_DIR)
-ELSE()
-  SET(SLEPC_DIR "" CACHE PATH
-    "An optional hint to a SLEPC directory"
-    )
 ENDIF()
 

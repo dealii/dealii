@@ -29,6 +29,7 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
 SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
 
 FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
@@ -87,7 +88,6 @@ MARK_AS_ADVANCED(
   )
 
 IF(TBB_FOUND)
-
   IF(NOT TBB_DEBUG_LIBRARY MATCHES "-NOTFOUND")
     SET(TBB_WITH_DEBUGLIB TRUE)
     SET(TBB_LIBRARIES debug ${TBB_DEBUG_LIBRARY} optimized ${TBB_LIBRARY})
@@ -98,9 +98,5 @@ IF(TBB_FOUND)
   SET(TBB_INCLUDE_DIRS ${TBB_INCLUDE_DIR})
 
   MARK_AS_ADVANCED(TBB_DIR)
-ELSE()
-  SET(TBB_DIR "" CACHE PATH
-    "An optional hint to a TBB installation"
-    )
 ENDIF()
 

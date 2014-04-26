@@ -30,6 +30,10 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(UMFPACK_DIR "" CACHE PATH "An optional hint to an UMFPACK directory")
+SET(SUITESPARSE_DIR "" CACHE PATH
+  "An optional hint to a SUITESPARSE directory"
+  )
 FOREACH(_comp SUITESPARSE SUITESPARSE_CONFIG UMFPACK AMD CHOLMOD COLAMD)
   SET_IF_EMPTY(${_comp}_DIR "$ENV{${_comp}_DIR}")
 ENDFOREACH()
@@ -206,16 +210,7 @@ IF(UMFPACK_FOUND)
     ${AMD_INCLUDE_DIR}
     ${SuiteSparse_config_INCLUDE_DIR}
     )
-  SET(UMFPACK_LINKER_FLAGS
-    ${LAPACK_LINKER_FLAGS}
-    )
+  SET(UMFPACK_LINKER_FLAGS ${LAPACK_LINKER_FLAGS})
 
   MARK_AS_ADVANCED(UMFPACK_DIR SUITESPARSE_DIR)
-ELSE()
-  SET(UMFPACK_DIR "" CACHE PATH
-    "An optional hint to an UMFPACK directory"
-    )
-  SET(SUITESPARSE_DIR "" CACHE PATH
-    "An optional hint to a SUITESPARSE directory"
-    )
 ENDIF()

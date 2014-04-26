@@ -26,6 +26,7 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(HDF5_DIR "" CACHE PATH "An optional hint to an hdf5 directory")
 SET_IF_EMPTY(HDF5_DIR "$ENV{HDF5_DIR}")
 
 FIND_PATH(HDF5_INCLUDE_DIR hdf5.h
@@ -74,20 +75,15 @@ MARK_AS_ADVANCED(
   )
 
 IF(HDF5_FOUND)
-  SET(HDF5_INCLUDE_DIRS
-    ${HDF5_INCLUDE_DIR}
-    )
-  SET(HDF5_LIBRARIES
-    ${HDF5_HL_LIBRARY}
-    ${HDF5_LIBRARY}
-    ${MPI_C_LIBRARIES} # for good measure
-    )
+  SET(HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIR})
+  SET(HDF5_LIBRARIES ${HDF5_HL_LIBRARY} ${HDF5_LIBRARY} ${MPI_C_LIBRARIES})
 
   #
   # Is hdf5 compiled with support for mpi?
   #
   FILE(STRINGS ${HDF5_PUBCONF} HDF5_MPI_STRING
-    REGEX "#define.*H5_HAVE_PARALLEL 1")
+    REGEX "#define.*H5_HAVE_PARALLEL 1"
+    )
   IF("${HDF5_MPI_STRING}" STREQUAL "")
     SET(HDF5_WITH_MPI FALSE)
   ELSE()
@@ -95,9 +91,5 @@ IF(HDF5_FOUND)
   ENDIF()
 
   MARK_AS_ADVANCED(HDF5_DIR)
-ELSE()
-  SET(HDF5_DIR "" CACHE PATH
-    "An optional hint to an hdf5 directory"
-    )
 ENDIF()
 

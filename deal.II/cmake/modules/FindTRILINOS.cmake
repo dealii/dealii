@@ -33,6 +33,7 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(TRILINOS_DIR "" CACHE PATH "An optional hint to a Trilinos installation")
 SET_IF_EMPTY(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
 
 #
@@ -213,9 +214,5 @@ ELSE()
   SET(TRILINOS_LIBRARIES)
   SET(TRILINOS_INCLUDE_DIRS)
   UNSET(TRILINOS_CONFIG_DIR_SAVED CACHE)
-
-  SET(TRILINOS_DIR "" CACHE PATH
-    "An optional hint to a Trilinos installation"
-    )
 ENDIF()
 

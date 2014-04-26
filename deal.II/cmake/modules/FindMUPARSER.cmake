@@ -29,6 +29,7 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(MUPARSER_DIR "" CACHE PATH "An optional hint to a MUPARSER installation")
 SET_IF_EMPTY(MUPARSER_DIR "$ENV{MUPARSER_DIR}")
 
 FIND_LIBRARY(MUPARSER_LIBRARY
@@ -68,8 +69,4 @@ IF(MUPARSER_FOUND)
     )
 
   MARK_AS_ADVANCED(MUPARSER_DIR)
-ELSE()
-  SET(MUPARSER_DIR "" CACHE PATH
-    "An optional hint to a MUPARSER installation"
-    )
 ENDIF()

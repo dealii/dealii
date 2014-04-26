@@ -30,6 +30,9 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(P4EST_DIR "" CACHE PATH
+  "An optional hint to a p4est installation/directory"
+  )
 SET_IF_EMPTY(P4EST_DIR "$ENV{P4EST_DIR}")
 SET_IF_EMPTY(SC_DIR "$ENV{SC_DIR}")
 
@@ -158,7 +161,6 @@ IF(P4EST_FOUND)
   IF("${P4EST_MPI_STRING}" STREQUAL "")
     SET(P4EST_WITH_MPI FALSE)
   ELSE()
-
     SET(P4EST_WITH_MPI TRUE)
   ENDIF()
 
@@ -191,11 +193,5 @@ IF(P4EST_FOUND)
     SET(P4EST_VERSION_PATCH "0")
   ENDIF()
 
-
   MARK_AS_ADVANCED(P4EST_DIR)
-ELSE()
-  SET(P4EST_DIR "" CACHE PATH
-    "An optional hint to a p4est installation/directory"
-    )
 ENDIF()
-

@@ -29,6 +29,7 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(METIS_DIR "" CACHE PATH "An optional hint to a metis directory")
 SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
 
 #
@@ -77,7 +78,6 @@ MARK_AS_ADVANCED(
   )
 
 IF(METIS_FOUND)
-
   #
   # Sanity check: Only include parmetis library if it is in the same
   # directory as the metis library...
@@ -121,9 +121,4 @@ IF(METIS_FOUND)
     )
 
   MARK_AS_ADVANCED(METIS_DIR)
-ELSE()
-  SET(METIS_DIR "" CACHE PATH
-    "An optional hint to a metis directory"
-    )
 ENDIF()
-
