@@ -570,7 +570,8 @@ namespace parallel
        * is set to false, the triangulation is only repartitioned if needed
        * (i.e. if a different number of MPI processes is encountered).
        */
-      void load(const char *filename, bool autopartition = true);
+      void load(const char *filename,
+                const bool autopartition = true);
 
       /**
        * Used to inform in the callbacks of register_data_attach() and
