@@ -122,18 +122,17 @@ ENDIF()
 #
 # *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
 #
-SET(TRILINOS_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS})
 STRING(REGEX REPLACE
   "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
-  TRILINOS_INCLUDE_DIRS "${TRILINOS_INCLUDE_DIRS}"
+  Trilinos_INCLUDE_DIRS "${Trilinos_INCLUDE_DIRS}"
   )
-
 
 #
 # We'd like to have the full library names but the Trilinos package only
 # exports a list with short names...
 # So we check again for every lib and store the full path:
 #
+SET(_libraries "")
 FOREACH(_library ${Trilinos_LIBRARIES})
   IF(_new_trilinos_config)
     UNSET(TRILINOS_LIBRARY_${_library} CACHE)
@@ -150,32 +149,18 @@ FOREACH(_library ${Trilinos_LIBRARIES})
     NO_CMAKE_FIND_ROOT_PATH
     )
 
-  MARK_AS_ADVANCED(TRILINOS_LIBRARY_${_library})
-
-  LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${_library}})
-  LIST(APPEND TRILINOS_LIBRARY_VARIABLES TRILINOS_LIBRARY_${_library})
-
+  LIST(APPEND _libraries TRILINOS_LIBRARY_${_library})
 ENDFOREACH()
 
-#
-# Add the link interface:
-#
-LIST(APPEND TRILINOS_LIBRARIES
-  ${Trilinos_TPL_LIBRARIES}
-  ${MPI_CXX_LIBRARIES} # for good measure
+DEAL_II_PACKAGE_HANDLE(TRILINOS
+  LIBRARIES
+    REQUIRED ${_libraries} Trilinos_TPL_LIBRARIES
+    OPTIONAL MPI_CXX_LIBRARIES
+  INCLUDE_DIRS
+    REQUIRED Trilinos_INCLUDE_DIRS
   )
-
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(TRILINOS DEFAULT_MSG
-  TRILINOS_LIBRARIES # cosmetic: Gives nice output
-  TRILINOS_CONFIG_FOUND
-  EPETRA_CONFIG_H
-  ${TRILINOS_LIBRARY_VARIABLES}
-  )
-
-MARK_AS_ADVANCED(TRILINOS_CONFIG_DIR EPETRA_CONFIG_H)
 
 IF(TRILINOS_FOUND)
-
   #
   # Some versions of Sacado_cmath.hpp do things that aren't compatible
   # with the -std=c++0x flag of GCC, see deal.II FAQ.
@@ -210,12 +195,7 @@ IF(TRILINOS_FOUND)
     )
   RESET_CMAKE_REQUIRED()
 
-  MARK_AS_ADVANCED(TRILINOS_DIR)
-
 ELSE()
 
-  SET(TRILINOS_LIBRARIES)
-  SET(TRILINOS_INCLUDE_DIRS)
   UNSET(TRILINOS_CONFIG_DIR_SAVED CACHE)
 ENDIF()
-
