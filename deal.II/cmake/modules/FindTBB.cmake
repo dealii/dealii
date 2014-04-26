@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,14 +32,7 @@ INCLUDE(FindPackageHandleStandardArgs)
 SET(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
 SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
 
-FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
-  HINTS
-    ${TBB_DIR}
-  PATH_SUFFIXES include include/tbb tbb
-  )
-
 FILE(GLOB _path ${TBB_DIR}/build/*_release)
-
 FIND_LIBRARY(TBB_LIBRARY
   NAMES tbb
   HINTS
@@ -49,7 +42,6 @@ FIND_LIBRARY(TBB_LIBRARY
   )
 
 FILE(GLOB _path ${TBB_DIR}/build/*_debug)
-
 FIND_LIBRARY(TBB_DEBUG_LIBRARY
   NAMES tbb_debug
   HINTS
@@ -58,28 +50,32 @@ FIND_LIBRARY(TBB_DEBUG_LIBRARY
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(TBB DEFAULT_MSG
-  TBB_LIBRARY
-  TBB_INCLUDE_DIR
+FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
+  HINTS
+    ${TBB_DIR}
+  PATH_SUFFIXES include include/tbb tbb
   )
 
-IF(NOT TBB_INCLUDE_DIR MATCHES "-NOTFOUND")
+IF(EXISTS ${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h)
   FILE(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MAJOR_STRING
     REGEX "#define.*TBB_VERSION_MAJOR")
   STRING(REGEX REPLACE "^.*TBB_VERSION_MAJOR.*([0-9]+).*" "\\1"
     TBB_VERSION_MAJOR "${TBB_VERSION_MAJOR_STRING}"
     )
-
   FILE(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MINOR_STRING
     REGEX "#define.*TBB_VERSION_MINOR")
   STRING(REGEX REPLACE "^.*TBB_VERSION_MINOR.*([0-9]+).*" "\\1"
     TBB_VERSION_MINOR "${TBB_VERSION_MINOR_STRING}"
     )
-
   SET(TBB_VERSION
     "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}"
     )
 ENDIF()
+
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(TBB DEFAULT_MSG
+  TBB_LIBRARY
+  TBB_INCLUDE_DIR
+  )
 
 MARK_AS_ADVANCED(
   TBB_LIBRARY

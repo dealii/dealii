@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -57,6 +57,24 @@ IF(NOT "${TRILINOS_CONFIG_DIR}" STREQUAL "${TRILINOS_CONFIG_DIR_SAVED}")
 ENDIF()
 SET(TRILINOS_CONFIG_DIR_SAVED "${TRILINOS_CONFIG_DIR}" CACHE INTERNAL "" FORCE)
 
+IF(DEFINED Trilinos_VERSION)
+  #
+  # Extract version numbers:
+  #
+  SET(TRILINOS_VERSION "${Trilinos_VERSION}")
+
+  STRING(REGEX REPLACE
+    "^([0-9]+).*$" "\\1"
+    TRILINOS_VERSION_MAJOR "${Trilinos_VERSION}")
+
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.([0-9]+).*$" "\\1"
+    TRILINOS_VERSION_MINOR "${Trilinos_VERSION}")
+
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
+    TRILINOS_VERSION_SUBMINOR "${Trilinos_VERSION}")
+ENDIF()
 
 #
 # Look for the one include file that we'll query for further information:
@@ -74,6 +92,32 @@ FIND_FILE(EPETRA_CONFIG_H Epetra_config.h
   NO_CMAKE_FIND_ROOT_PATH
   )
 
+IF(EXISTS ${EPETRA_CONFIG_H})
+  #
+  # Determine whether Trilinos was configured with MPI and 64bit indices:
+  #
+  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_MPI_STRING
+    REGEX "#define HAVE_MPI")
+  IF("${EPETRA_MPI_STRING}" STREQUAL "")
+    SET(TRILINOS_WITH_MPI FALSE)
+  ELSE()
+    SET(TRILINOS_WITH_MPI TRUE)
+  ENDIF()
+  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_32BIT_STRING
+    REGEX "#define EPETRA_NO_32BIT_GLOBAL_INDICES")
+  IF("${EPETRA_64BIT_STRING}" STREQUAL "")
+    SET(TRILINOS_WITH_NO_32BITS_INDICES TRUE)
+  ELSE()
+    SET(TRILINOS_WITH_NO_32BITS_INDICES FALSE)
+  ENDIF()
+  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_64BIT_STRING
+    REGEX "#define EPETRA_NO_64BIT_GLOBAL_INDICES")
+  IF("${EPETRA_64BIT_STRING}" STREQUAL "")
+    SET(TRILINOS_WITH_NO_64BITS_INDICES TRUE)
+  ELSE()
+    SET(TRILINOS_WITH_NO_64BITS_INDICES FALSE)
+  ENDIF()
+ENDIF()
 
 #
 # *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
@@ -131,47 +175,6 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(TRILINOS DEFAULT_MSG
 MARK_AS_ADVANCED(TRILINOS_CONFIG_DIR EPETRA_CONFIG_H)
 
 IF(TRILINOS_FOUND)
-  #
-  # Extract version numbers:
-  #
-  SET(TRILINOS_VERSION "${Trilinos_VERSION}")
-
-  STRING(REGEX REPLACE
-    "^([0-9]+).*$" "\\1"
-    TRILINOS_VERSION_MAJOR "${Trilinos_VERSION}")
-
-  STRING(REGEX REPLACE
-    "^[0-9]+\\.([0-9]+).*$" "\\1"
-    TRILINOS_VERSION_MINOR "${Trilinos_VERSION}")
-
-  STRING(REGEX REPLACE
-    "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
-    TRILINOS_VERSION_SUBMINOR "${Trilinos_VERSION}")
-
-  #
-  # Determine whether Trilinos was configured with MPI and 64bit indices:
-  #
-  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_MPI_STRING
-    REGEX "#define HAVE_MPI")
-  IF("${EPETRA_MPI_STRING}" STREQUAL "")
-    SET(TRILINOS_WITH_MPI FALSE)
-  ELSE()
-    SET(TRILINOS_WITH_MPI TRUE)
-  ENDIF()
-  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_32BIT_STRING
-    REGEX "#define EPETRA_NO_32BIT_GLOBAL_INDICES")
-  IF("${EPETRA_64BIT_STRING}" STREQUAL "")
-    SET(TRILINOS_WITH_NO_32BITS_INDICES TRUE)
-  ELSE()
-    SET(TRILINOS_WITH_NO_32BITS_INDICES FALSE)
-  ENDIF()
-  FILE(STRINGS "${EPETRA_CONFIG_H}" EPETRA_64BIT_STRING
-    REGEX "#define EPETRA_NO_64BIT_GLOBAL_INDICES")
-  IF("${EPETRA_64BIT_STRING}" STREQUAL "")
-    SET(TRILINOS_WITH_NO_64BITS_INDICES TRUE)
-  ELSE()
-    SET(TRILINOS_WITH_NO_64BITS_INDICES FALSE)
-  ENDIF()
 
   #
   # Some versions of Sacado_cmath.hpp do things that aren't compatible
