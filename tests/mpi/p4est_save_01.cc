@@ -87,7 +87,7 @@ void test()
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
     GridGenerator::hyper_cube(tr);
-    tr.load(filename.c_str());
+    tr.load(filename.c_str(), false);
 
     if (myid == 0)
       {

@@ -553,16 +553,24 @@ namespace parallel
       void save(const char *filename) const;
 
       /**
-       * Load the refinement information saved with save() back in. The mesh
-       * must contain the same coarse mesh that was used in save() before calling
-       * this function. You do not
-       * need to load with the same number of MPI processes that you saved
-       * with. Rather, if a mesh is loaded with a different number of MPI
-       * processes than used at the time of saving, the mesh is repartitioned
-       * appropriately. Cell-based data that was saved with register_data_attach()
-       * can be read in with notify_ready_to_unpack() after calling load().
+       * Load the refinement information saved with save() back in. The
+       * mesh must contain the same coarse mesh that was used in save()
+       * before calling this function.
+       *
+       * You do not need to load with the same number of MPI processes that
+       * you saved with. Rather, if a mesh is loaded with a different
+       * number of MPI processes than used at the time of saving, the mesh
+       * is repartitioned appropriately. Cell-based data that was saved
+       * with register_data_attach() can be read in with
+       * notify_ready_to_unpack() after calling load().
+       *
+       * If you use p4est version > 0.3.4.2 the @p autopartition flag tells
+       * p4est to ignore the partitioning that the triangulation had when
+       * it was saved and make it uniform upon loading. If @p autopartition
+       * set to false, the triangulation is only repartitioned if needed
+       * (i.e. if a different number of MPI processes is encountered).
        */
-      void load(const char *filename);
+      void load(const char *filename, bool autopartition = true);
 
       /**
        * Used to inform in the callbacks of register_data_attach() and
