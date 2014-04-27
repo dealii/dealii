@@ -414,27 +414,42 @@ public:
    * time we exit a section, just in the
    * end, both, or never.
    */
-  enum OutputFrequency {every_call, summary, every_call_and_summary, never}
+  enum OutputFrequency
+  {
+    every_call,
+    summary,
+    every_call_and_summary,
+    never
+  }
   output_frequency;
 
   /**
    * Sets whether to show CPU times, wall
    * times, or both CPU and wall times.
    */
-  enum OutputType      {cpu_times, wall_times, cpu_and_wall_times}
+  enum OutputType
+  {
+    cpu_times,
+    wall_times,
+    cpu_and_wall_times
+  }
   output_type;
 
   /**
-   * Constructor that takes std::cout as
-   * output stream.
+   * Constructor. Output is written to the stream (of type std::ostream)
+   * given as first argument. The second and third arguments denote how
+   * often output is to be generated and what kind of timing the output
+   * should represent (CPU or wall time).
    */
   TimerOutput (std::ostream              &stream,
                const enum OutputFrequency output_frequency,
                const enum OutputType      output_type);
 
   /**
-   * Constructor that takes a
-   * ConditionalOStream to write output to.
+   * Constructor. Output is written to the stream (of type ConditionalOstream)
+   * given as first argument. The second and third arguments denote how
+   * often output is to be generated and what kind of timing the output
+   * should represent (CPU or wall time).
    */
   TimerOutput (ConditionalOStream        &stream,
                const enum OutputFrequency output_frequency,
