@@ -258,16 +258,21 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         TIMEOUT ${TEST_TIME_LIMIT}
         )
 
-      #
-      # We have to be careful not to run different mpirun settings for the
-      # same executable in parallel because this triggers a race condition
-      # when compiling the not yet existent executable that is shared
-      # between the different tests.
-      #
-      # Luckily CMake has a mechanism to force a test to be run after
-      # another has finished (and both are scheduled):
-      #
       IF(NOT "${_n_cpu}" STREQUAL "0")
+        #
+        # Limit concurrency of mpi tests:
+        #
+        SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_n_cpu})
+
+        #
+        # We have to be careful not to run different mpirun settings for the
+        # same executable in parallel because this triggers a race condition
+        # when compiling the not yet existent executable that is shared
+        # between the different tests.
+        #
+        # Luckily CMake has a mechanism to force a test to be run after
+        # another has finished (and both are scheduled):
+        #
         IF(DEFINED TEST_DEPENDENCIES_${_target})
           SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
             DEPENDS ${TEST_DEPENDENCIES_${_target}}
