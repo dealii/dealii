@@ -258,12 +258,15 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         TIMEOUT ${TEST_TIME_LIMIT}
         )
 
-      IF(NOT "${_n_cpu}" STREQUAL "0")
+      IF(_n_cpu GREATER 4)
+        MATH(EXPR _slots "${_n_cpu} / 2")
         #
         # Limit concurrency of mpi tests:
         #
-        SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_n_cpu})
+        SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_slots})
+      ENDIF()
 
+      IF(NOT "${_n_cpu}" STREQUAL "0")
         #
         # We have to be careful not to run different mpirun settings for the
         # same executable in parallel because this triggers a race condition
