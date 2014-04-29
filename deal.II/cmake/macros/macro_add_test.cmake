@@ -258,11 +258,16 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         TIMEOUT ${TEST_TIME_LIMIT}
         )
 
-      IF(_n_cpu GREATER 4)
+      #
+      # Limit concurrency of mpi tests. We can only set concurrency
+      # for the entire test, which includes the compiling and linking
+      # stages that are purely sequential. There is no good way to model
+      # this without unnecessarily restricting concurrency. Consequently,
+      # we just choose to model an "average" concurrency as one half of
+      # the number of MPI jobs.
+      #
+      IF(_n_cpu GREATER 2)
         MATH(EXPR _slots "${_n_cpu} / 2")
-        #
-        # Limit concurrency of mpi tests:
-        #
         SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_slots})
       ENDIF()
 
