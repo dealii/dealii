@@ -1113,6 +1113,7 @@ namespace parallel
     {
       reinit (v, true);
       vector_view = v.vector_view;
+      zero_out_ghosts();
     }
 
 
