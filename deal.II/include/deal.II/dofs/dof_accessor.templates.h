@@ -2859,7 +2859,7 @@ namespace internal
 
         const unsigned int n_dofs = local_source_end - local_source_begin;
 
-//TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array. This should be fixed eventually
+//TODO[WB/MK]: This function could me made more efficient because it allocates memory, which could be avoided by passing in another argument as a scratch array. This should be fixed eventually. another option would be to let the surrounding class have a (static, mutable) scratch array that is thread-local
 
         // get indices of dofs
         std::vector<types::global_dof_index> dofs (n_dofs);

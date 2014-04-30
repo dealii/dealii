@@ -388,7 +388,7 @@ namespace TimeStepping
     tendency = f(t,y);
     residual = tendency;
     residual.sadd(delta_t,1.0,old_y);
-    residual.sadd(1.0,-1.,y);
+    residual.sadd(-1.0,1.,y);
   }
 
 

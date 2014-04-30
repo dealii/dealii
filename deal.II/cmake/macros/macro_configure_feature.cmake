@@ -230,8 +230,6 @@ MACRO(CONFIGURE_FEATURE _feature)
         ENDIF()
 
         IF(FEATURE_${_feature}_EXTERNAL_FOUND)
-          MESSAGE(STATUS "All external dependencies for DEAL_II_WITH_${_feature} are fullfilled.")
-
           IF(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
             RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
           ENDIF()

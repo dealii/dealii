@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,8 +27,7 @@
 #   METIS_VERSION_SUBMINOR
 #
 
-INCLUDE(FindPackageHandleStandardArgs)
-
+SET(METIS_DIR "" CACHE PATH "An optional hint to a metis directory")
 SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
 
 #
@@ -38,63 +37,37 @@ SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
 # Link in MPI unconditionally (if found).
 #
 
-FIND_PATH(METIS_INCLUDE_DIR metis.h
-  HINTS
-    ${METIS_DIR}
-  PATH_SUFFIXES
-    metis include/metis include
-  )
-
 FIND_LIBRARY(METIS_LIBRARY
   NAMES metis
-  HINTS
-    ${METIS_DIR}
+  HINTS ${METIS_DIR}
   PATH_SUFFIXES
     lib${LIB_SUFFIX} lib64 lib
     # This is a hint, isn't it?
     build/${CMAKE_CXX_PLATFORM_ID}-${CMAKE_SYSTEM_PROCESSOR}/libmetis
   )
 
+#
+# Sanity check: Only search the parmetis library in the same directory as
+# the metis library...
+#
+GET_FILENAME_COMPONENT(_path "${METIS_LIBRARY}" PATH)
 FIND_LIBRARY(PARMETIS_LIBRARY
   NAMES parmetis
-  HINTS
-    ${METIS_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
-    # This is a hint, isn't it?
-    build/${CMAKE_CXX_PLATFORM_ID}-${CMAKE_SYSTEM_PROCESSOR}/libmetis
+  HINTS ${_path}
+  NO_DEFAULT_PATH
+  NO_CMAKE_ENVIRONMENT_PATH
+  NO_CMAKE_PATH
+  NO_SYSTEM_ENVIRONMENT_PATH
+  NO_CMAKE_SYSTEM_PATH
+  NO_CMAKE_FIND_ROOT_PATH
   )
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(METIS DEFAULT_MSG
-  METIS_LIBRARY
-  METIS_INCLUDE_DIR
+FIND_PATH(METIS_INCLUDE_DIR metis.h
+  HINTS ${METIS_DIR}
+  PATH_SUFFIXES metis include/metis include
   )
 
-MARK_AS_ADVANCED(
-  METIS_LIBRARY
-  PARMETIS_LIBRARY
-  METIS_INCLUDE_DIR
-  )
-
-IF(METIS_FOUND)
-
-  #
-  # Sanity check: Only include parmetis library if it is in the same
-  # directory as the metis library...
-  #
-  GET_FILENAME_COMPONENT(_path1 "${PARMETIS_LIBRARY}" PATH)
-  GET_FILENAME_COMPONENT(_path2 "${ETIS_LIBRARY}" PATH)
-  IF( NOT PARMETIS_LIBRARY MATCHES "-NOTFOUND"
-      AND "${_path1}" STREQUAL "${_path2}" )
-    SET(METIS_LIBRARIES ${PARMETIS_LIBRARY})
-  ENDIF()
-
-  LIST(APPEND METIS_LIBRARIES
-    ${METIS_LIBRARY}
-    ${MPI_C_LIBRARIES} # for good measure
-    )
-  SET(METIS_INCLUDE_DIRS ${METIS_INCLUDE_DIR})
-
+IF(EXISTS ${METIS_INCLUDE_DIR}/metis.h)
   #
   # Extract the version number out of metis.h
   #
@@ -119,11 +92,13 @@ IF(METIS_FOUND)
   SET(METIS_VERSION
     "${METIS_VERSION_MAJOR}.${METIS_VERSION_MINOR}.${METIS_VERSION_SUBMINOR}"
     )
-
-  MARK_AS_ADVANCED(METIS_DIR)
-ELSE()
-  SET(METIS_DIR "" CACHE PATH
-    "An optional hint to a metis directory"
-    )
 ENDIF()
 
+DEAL_II_PACKAGE_HANDLE(METIS
+  LIBRARIES
+    OPTIONAL PARMETIS_LIBRARY
+    REQUIRED METIS_LIBRARY
+    OPTIONAL MPI_C_LIBRARIES
+  INCLUDE_DIRS
+    REQUIRED METIS_INCLUDE_DIR
+  )

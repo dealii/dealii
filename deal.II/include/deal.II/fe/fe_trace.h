@@ -24,7 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A finite element, which is the trace of Fe_Q elements, that is
+ * A finite element, which is the trace of FE_Q elements, that is
  * a tensor product of polynomials on the faces,
  * undefined in the interior of the cells and continuous. The basis functions on
  * the faces are from Polynomials::LagrangeEquidistant
@@ -89,6 +89,13 @@ public:
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
+
+  /**
+   * Returns a list of constant modes of the element. For this element, it
+   * simply returns one row with all entries set to true.
+   */
+  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
+  get_constant_modes () const;
 
 private:
   /**

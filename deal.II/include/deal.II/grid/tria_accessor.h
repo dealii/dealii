@@ -777,7 +777,42 @@ public:
 
   /**
    *  Return a reference to the
-   *  @p ith vertex.
+   *  @p ith vertex. The reference is not const, i.e., it is possible
+   *  to call this function on the left hand side of an assignment,
+   *  thereby moving the vertex of a cell within the triangulation. Of
+   *  course, doing so requires that you ensure that the new location
+   *  of the vertex remains useful -- for example, avoiding inverted
+   *  or otherwise distorted (see also @ref GlossDistorted "this glossary entry").
+   *
+   *  @note When a cell is refined, its children inherit the position
+   *  of the vertex positions of those vertices they share with the mother
+   *  cell (plus the locations of the new vertices on edges, faces, and
+   *  cell interiors that are created for the new child cells). If the
+   *  vertex of a cell is moved, this implies that its children will also
+   *  use these new locations. On the other hand, imagine a 2d situation
+   *  where you have one cell that is refined (with four children) and then
+   *  you move the central vertex connecting all four children. If you
+   *  coarsen these four children again to the mother cell, then the
+   *  location of the moved vertex is lost and if, in a later step, you
+   *  refine the mother cell again, the then again new vertex will be
+   *  placed again at the same position as the first time around -- i.e.,
+   *  not at the location you had previously moved it to.
+   *
+   *  @note The behavior described above is relevant if
+   *  you have a parallel::distributed::Triangulation object. There,
+   *  refining a mesh always involves a re-partitioning. In other words,
+   *  vertices of locally owned cells (see
+   *  @ref GlossLocallyOwnedCell "this glossary entry")
+   *  that you may have moved to a different location on one processor
+   *  may be moved to a different processor upon mesh refinement (even
+   *  if these particular cells were not refined) which will re-create
+   *  their position based on the position of the coarse cells they
+   *  previously had, not based on the position these vertices had on
+   *  the processor that previously owned them. In other words, in
+   *  parallel computations, you will probably have to move nodes
+   *  explicitly after every mesh refinement because vertex positions
+   *  may or may not be preserved across the re-partitioning that
+   *  accompanies mesh refinement.
    */
   Point<spacedim> &vertex (const unsigned int i) const;
 

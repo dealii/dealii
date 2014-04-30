@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,42 +27,16 @@
 # TODO: ARPACK and mpi...
 #
 
-INCLUDE(FindPackageHandleStandardArgs)
-
+SET(ARPACK_DIR "" CACHE PATH "An optional hint to an ARPACK installation")
 SET_IF_EMPTY(ARPACK_DIR "$ENV{ARPACK_DIR}")
 
 FIND_LIBRARY(ARPACK_LIBRARY
   NAMES arpack
-  HINTS
-    ${ARPACK_DIR}
+  HINTS ${ARPACK_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(ARPACK DEFAULT_MSG
-  ARPACK_LIBRARY
-  LAPACK_FOUND
+DEAL_II_PACKAGE_HANDLE(ARPACK
+  LIBRARIES REQUIRED ARPACK_LIBRARY LAPACK_LIBRARIES
+  LINKER_FLAGS OPTIONAL LAPACK_LINKER_FLAGS
   )
-
-MARK_AS_ADVANCED(
-  lapack_LIBRARY
-  atlas_LIBRARY
-  blas_LIBRARY
-  ARPACK_LIBRARY
-  )
-
-IF(ARPACK_FOUND)
-  SET(ARPACK_LIBRARIES
-    ${ARPACK_LIBRARY}
-    ${LAPACK_LIBRARIES}
-    )
-  SET(ARPACK_LINKER_FLAGS
-    ${LAPACK_LINKER_FLAGS}
-    )
-
-  MARK_AS_ADVANCED(ARPACK_DIR)
-ELSE()
-  SET(ARPACK_DIR "" CACHE PATH
-    "An optional hint to an ARPACK installation"
-    )
-ENDIF()
-

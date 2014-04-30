@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -30,6 +30,9 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(P4EST_DIR "" CACHE PATH
+  "An optional hint to a p4est installation/directory"
+  )
 SET_IF_EMPTY(P4EST_DIR "$ENV{P4EST_DIR}")
 SET_IF_EMPTY(SC_DIR "$ENV{SC_DIR}")
 
@@ -37,15 +40,6 @@ SET_IF_EMPTY(SC_DIR "$ENV{SC_DIR}")
 # Search for the sc library, usually bundled with p4est. If no SC_DIR was
 # given, take what we chose for p4est.
 #
-
-FIND_PATH(P4EST_INCLUDE_DIR p4est_config.h
-  HINTS
-    ${P4EST_DIR}/FAST
-    ${P4EST_DIR}/DEBUG
-    ${P4EST_DIR}
-  PATH_SUFFIXES
-    p4est include/p4est include src
-  )
 
 FIND_PATH(SC_INCLUDE_DIR sc.h
   HINTS
@@ -61,20 +55,8 @@ FIND_PATH(SC_INCLUDE_DIR sc.h
 
 FIND_LIBRARY(P4EST_LIBRARY_OPTIMIZED
   NAMES p4est
-  HINTS
-    ${P4EST_DIR}/FAST
-    ${P4EST_DIR}/DEBUG
-    ${P4EST_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib src
-  )
-
-FIND_LIBRARY(P4EST_LIBRARY_DEBUG
-  NAMES p4est
-  HINTS
-    ${P4EST_DIR}/DEBUG
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib src
+  HINTS ${P4EST_DIR}/FAST ${P4EST_DIR}/DEBUG ${P4EST_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib src
   )
 
 FIND_LIBRARY(SC_LIBRARY_OPTIMIZED
@@ -90,66 +72,43 @@ FIND_LIBRARY(SC_LIBRARY_OPTIMIZED
     lib${LIB_SUFFIX} lib64 lib src sc/src
   )
 
+#
+# Support debug variants as well:
+#
+
+FIND_LIBRARY(P4EST_LIBRARY_DEBUG
+  NAMES p4est
+  HINTS ${P4EST_DIR}/DEBUG
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib src
+  )
+
 FIND_LIBRARY(SC_LIBRARY_DEBUG
   NAMES sc
-  HINTS
-    ${SC_DIR}/DEBUG
-    ${P4EST_DIR}/DEBUG
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib src sc/src
+  HINTS ${SC_DIR}/DEBUG ${P4EST_DIR}/DEBUG
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib src sc/src
   )
+MARK_AS_ADVANCED(P4EST_LIBRARY_DEBUG SC_LIBRARY_DEBUG)
 
-SET(_output ${P4EST_LIBRARY_OPTMIZED} ${SC_LIBRARY_OPTIMIZED})
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(P4EST DEFAULT_MSG
-  _output # Cosmetic: Gives nice output
-  P4EST_LIBRARY_OPTIMIZED
-  SC_LIBRARY_OPTIMIZED
-  P4EST_INCLUDE_DIR
-  SC_INCLUDE_DIR
-  )
-
-MARK_AS_ADVANCED(
-  P4EST_LIBRARY_OPTIMIZED
-  P4EST_LIBRARY_DEBUG
-  P4EST_INCLUDE_DIR
-  SC_LIBRARY_OPTIMIZED
-  SC_LIBRARY_DEBUG
-  SC_INCLUDE_DIR
-  )
-
-
-IF(P4EST_FOUND)
-
-  IF( ( "${P4EST_LIBRARY_OPTIMIZED}" STREQUAL "${P4EST_LIBRARY_DEBUG}"
-        AND
-        "${SC_LIBRARY_OPTIMIZED}" STREQUAL "${SC_LIBRARY_DEBUG}" )
-      OR P4EST_LIBRARY_DEBUG MATCHES "-NOTFOUND"
-      OR SC_LIBRARY_DEBUG MATCHES "-NOTFOUND" )
-    SET(P4EST_LIBRARIES
-      ${P4EST_LIBRARY_OPTIMIZED}
-      ${SC_LIBRARY_OPTIMIZED}
-      )
-  ELSE()
-    SET(P4EST_LIBRARIES
-      optimized
-      ${P4EST_LIBRARY_OPTIMIZED}
-      ${SC_LIBRARY_OPTIMIZED}
-      debug
-      ${P4EST_LIBRARY_DEBUG}
-      ${SC_LIBRARY_DEBUG}
-      general
-      )
-  ENDIF()
-
-  LIST(APPEND P4EST_LIBRARIES
-    ${LAPACK_LIBRARIES} # for good measure
-    ${MPI_C_LIBRARIES} # for good measure
+IF( ( "${P4EST_LIBRARY_OPTIMIZED}" STREQUAL "${P4EST_LIBRARY_DEBUG}"
+      AND "${SC_LIBRARY_OPTIMIZED}" STREQUAL "${SC_LIBRARY_DEBUG}" )
+    OR P4EST_LIBRARY_DEBUG MATCHES "-NOTFOUND"
+    OR SC_LIBRARY_DEBUG MATCHES "-NOTFOUND" )
+  SET(_libraries P4EST_LIBRARY_OPTIMIZED SC_LIBRARY_OPTIMIZED)
+ELSE()
+  SET(_libraries
+    optimized P4EST_LIBRARY_OPTIMIZED SC_LIBRARY_OPTIMIZED
+    debug P4EST_LIBRARY_DEBUG SC_LIBRARY_DEBUG
+    general
     )
-  SET(P4EST_INCLUDE_DIRS
-    ${P4EST_INCLUDE_DIR}
-    ${SC_INCLUDE_DIR}
-    )
+ENDIF()
 
+
+FIND_PATH(P4EST_INCLUDE_DIR p4est_config.h
+  HINTS ${P4EST_DIR}/FAST ${P4EST_DIR}/DEBUG ${P4EST_DIR}
+  PATH_SUFFIXES p4est include/p4est include src
+  )
+
+IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   #
   # Determine mpi support of p4est:
   #
@@ -158,7 +117,6 @@ IF(P4EST_FOUND)
   IF("${P4EST_MPI_STRING}" STREQUAL "")
     SET(P4EST_WITH_MPI FALSE)
   ELSE()
-
     SET(P4EST_WITH_MPI TRUE)
   ENDIF()
 
@@ -190,12 +148,12 @@ IF(P4EST_FOUND)
   IF(${P4EST_VERSION_PATCH} STREQUAL "${P4EST_VERSION}")
     SET(P4EST_VERSION_PATCH "0")
   ENDIF()
-
-
-  MARK_AS_ADVANCED(P4EST_DIR)
-ELSE()
-  SET(P4EST_DIR "" CACHE PATH
-    "An optional hint to a p4est installation/directory"
-    )
 ENDIF()
 
+DEAL_II_PACKAGE_HANDLE(P4EST
+  LIBRARIES
+    REQUIRED ${_libraries}
+    OPTIONAL LAPACK_LIBRARIES MPI_C_LIBRARIES
+  INCLUDE_DIRS
+    REQUIRED P4EST_INCLUDE_DIR SC_INCLUDE_DIR
+  )

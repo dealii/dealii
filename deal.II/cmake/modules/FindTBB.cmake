@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -29,16 +29,10 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
 SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
 
-FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
-  HINTS
-    ${TBB_DIR}
-  PATH_SUFFIXES include include/tbb tbb
-  )
-
 FILE(GLOB _path ${TBB_DIR}/build/*_release)
-
 FIND_LIBRARY(TBB_LIBRARY
   NAMES tbb
   HINTS
@@ -47,8 +41,10 @@ FIND_LIBRARY(TBB_LIBRARY
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
+#
+# Also search for the debug library:
+#
 FILE(GLOB _path ${TBB_DIR}/build/*_debug)
-
 FIND_LIBRARY(TBB_DEBUG_LIBRARY
   NAMES tbb_debug
   HINTS
@@ -56,51 +52,36 @@ FIND_LIBRARY(TBB_DEBUG_LIBRARY
     ${TBB_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
+IF(NOT TBB_DEBUG_LIBRARY MATCHES "-NOTFOUND")
+  SET(TBB_WITH_DEBUGLIB TRUE)
+  SET(_libraries debug TBB_DEBUG_LIBRARY optimized TBB_LIBRARY)
+ELSE()
+  SET(_libraries TBB_LIBRARY)
+ENDIF()
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(TBB DEFAULT_MSG
-  TBB_LIBRARY
-  TBB_INCLUDE_DIR
+FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
+  HINTS
+    ${TBB_DIR}
+  PATH_SUFFIXES include include/tbb tbb
   )
 
-IF(NOT TBB_INCLUDE_DIR MATCHES "-NOTFOUND")
+IF(EXISTS ${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h)
   FILE(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MAJOR_STRING
     REGEX "#define.*TBB_VERSION_MAJOR")
   STRING(REGEX REPLACE "^.*TBB_VERSION_MAJOR.*([0-9]+).*" "\\1"
     TBB_VERSION_MAJOR "${TBB_VERSION_MAJOR_STRING}"
     )
-
   FILE(STRINGS "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h" TBB_VERSION_MINOR_STRING
     REGEX "#define.*TBB_VERSION_MINOR")
   STRING(REGEX REPLACE "^.*TBB_VERSION_MINOR.*([0-9]+).*" "\\1"
     TBB_VERSION_MINOR "${TBB_VERSION_MINOR_STRING}"
     )
-
   SET(TBB_VERSION
     "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}"
     )
 ENDIF()
 
-MARK_AS_ADVANCED(
-  TBB_LIBRARY
-  TBB_DEBUG_LIBRARY
-  TBB_INCLUDE_DIR
+DEAL_II_PACKAGE_HANDLE(TBB
+  LIBRARIES REQUIRED ${_libraries}
+  INCLUDE_DIRS REQUIRED TBB_INCLUDE_DIR
   )
-
-IF(TBB_FOUND)
-
-  IF(NOT TBB_DEBUG_LIBRARY MATCHES "-NOTFOUND")
-    SET(TBB_WITH_DEBUGLIB TRUE)
-    SET(TBB_LIBRARIES debug ${TBB_DEBUG_LIBRARY} optimized ${TBB_LIBRARY})
-  ELSE()
-    SET(TBB_LIBRARIES ${TBB_LIBRARY})
-  ENDIF()
-
-  SET(TBB_INCLUDE_DIRS ${TBB_INCLUDE_DIR})
-
-  MARK_AS_ADVANCED(TBB_DIR)
-ELSE()
-  SET(TBB_DIR "" CACHE PATH
-    "An optional hint to a TBB installation"
-    )
-ENDIF()
-

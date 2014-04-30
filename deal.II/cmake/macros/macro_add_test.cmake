@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 by the deal.II authors
+## Copyright (C) 2013, 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -77,9 +77,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
   SET(_test_diff_variable TEST_DIFF)
   IF(_file MATCHES "\\.binary\\.")
-    IF(NOT DIFF_EXECUTABLE MATCHES "-NOTFOUND")
-      SET(_test_diff_variable DIFF_EXECUTABLE)
-    ENDIF()
+    SET(_test_diff_variable DIFF_EXECUTABLE)
   ENDIF()
 
   #
@@ -205,7 +203,12 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         COMMAND rm -f ${_test_directory}/failing_diff
         COMMAND touch ${_test_directory}/diff
         COMMAND
-          ${${_test_diff_variable}} # see comment in line 72
+	  # run diff or numdiff (if available) to determine
+	  # whether files are the same. if they are not, output
+          # the first few lines of the output of numdiff, followed
+          # by the results of regular diff since the latter is just
+          # more readable
+          ${${_test_diff_variable}} # see comment above about redirection
             ${_comparison_file}
             ${_test_directory}/output
             > ${_test_directory}/diff
@@ -216,8 +219,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
               && echo "${_test_full}: DIFF failed. ------ Source: ${_comparison_file}"
               && echo "${_test_full}: DIFF failed. ------ Result: ${_test_directory}/output"
               && echo "${_test_full}: DIFF failed. ------ Diff:   ${_test_directory}/failing_diff"
-              && echo "${_test_full}: DIFF failed. ------ Diffs as follows:"
-              && cat ${_test_directory}/failing_diff
+              && echo "${_test_full}: DIFF failed. ------ First 8 lines of numdiff/diff output:"
+              && cat ${_test_directory}/failing_diff | head -n 8
+              && echo "${_test_full}: DIFF failed. ------ First 50 lines diff output:"
+              && ${DIFF_EXECUTABLE} -c ${_comparison_file} ${_test_directory}/output | head -n 50
               && exit 1)
         WORKING_DIRECTORY
           ${_test_directory}
@@ -254,15 +259,28 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         )
 
       #
-      # We have to be careful not to run different mpirun settings for the
-      # same executable in parallel because this triggers a race condition
-      # when compiling the not yet existent executable that is shared
-      # between the different tests.
+      # Limit concurrency of mpi tests. We can only set concurrency
+      # for the entire test, which includes the compiling and linking
+      # stages that are purely sequential. There is no good way to model
+      # this without unnecessarily restricting concurrency. Consequently,
+      # we just choose to model an "average" concurrency as one half of
+      # the number of MPI jobs.
       #
-      # Luckily CMake has a mechanism to force a test to be run after
-      # another has finished (and both are scheduled):
-      #
+      IF(_n_cpu GREATER 2)
+        MATH(EXPR _slots "${_n_cpu} / 2")
+        SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_slots})
+      ENDIF()
+
       IF(NOT "${_n_cpu}" STREQUAL "0")
+        #
+        # We have to be careful not to run different mpirun settings for the
+        # same executable in parallel because this triggers a race condition
+        # when compiling the not yet existent executable that is shared
+        # between the different tests.
+        #
+        # Luckily CMake has a mechanism to force a test to be run after
+        # another has finished (and both are scheduled):
+        #
         IF(DEFINED TEST_DEPENDENCIES_${_target})
           SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
             DEPENDS ${TEST_DEPENDENCIES_${_target}}

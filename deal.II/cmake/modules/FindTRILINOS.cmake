@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -33,6 +33,7 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(TRILINOS_DIR "" CACHE PATH "An optional hint to a Trilinos installation")
 SET_IF_EMPTY(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
 
 #
@@ -56,6 +57,24 @@ IF(NOT "${TRILINOS_CONFIG_DIR}" STREQUAL "${TRILINOS_CONFIG_DIR_SAVED}")
 ENDIF()
 SET(TRILINOS_CONFIG_DIR_SAVED "${TRILINOS_CONFIG_DIR}" CACHE INTERNAL "" FORCE)
 
+IF(DEFINED Trilinos_VERSION)
+  #
+  # Extract version numbers:
+  #
+  SET(TRILINOS_VERSION "${Trilinos_VERSION}")
+
+  STRING(REGEX REPLACE
+    "^([0-9]+).*$" "\\1"
+    TRILINOS_VERSION_MAJOR "${Trilinos_VERSION}")
+
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.([0-9]+).*$" "\\1"
+    TRILINOS_VERSION_MINOR "${Trilinos_VERSION}")
+
+  STRING(REGEX REPLACE
+    "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
+    TRILINOS_VERSION_SUBMINOR "${Trilinos_VERSION}")
+ENDIF()
 
 #
 # Look for the one include file that we'll query for further information:
@@ -73,80 +92,7 @@ FIND_FILE(EPETRA_CONFIG_H Epetra_config.h
   NO_CMAKE_FIND_ROOT_PATH
   )
 
-
-#
-# *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
-#
-SET(TRILINOS_INCLUDE_DIRS ${Trilinos_INCLUDE_DIRS})
-STRING(REGEX REPLACE
-  "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
-  TRILINOS_INCLUDE_DIRS "${TRILINOS_INCLUDE_DIRS}"
-  )
-
-
-#
-# We'd like to have the full library names but the Trilinos package only
-# exports a list with short names...
-# So we check again for every lib and store the full path:
-#
-FOREACH(_library ${Trilinos_LIBRARIES})
-  IF(_new_trilinos_config)
-    UNSET(TRILINOS_LIBRARY_${_library} CACHE)
-  ENDIF()
-
-  FIND_LIBRARY(TRILINOS_LIBRARY_${_library}
-    NAMES ${_library}
-    HINTS ${Trilinos_LIBRARY_DIRS}
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
-    )
-
-  MARK_AS_ADVANCED(TRILINOS_LIBRARY_${_library})
-
-  LIST(APPEND TRILINOS_LIBRARIES ${TRILINOS_LIBRARY_${_library}})
-  LIST(APPEND TRILINOS_LIBRARY_VARIABLES TRILINOS_LIBRARY_${_library})
-
-ENDFOREACH()
-
-#
-# Add the link interface:
-#
-LIST(APPEND TRILINOS_LIBRARIES
-  ${Trilinos_TPL_LIBRARIES}
-  ${MPI_CXX_LIBRARIES} # for good measure
-  )
-
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(TRILINOS DEFAULT_MSG
-  TRILINOS_LIBRARIES # cosmetic: Gives nice output
-  TRILINOS_CONFIG_FOUND
-  EPETRA_CONFIG_H
-  ${TRILINOS_LIBRARY_VARIABLES}
-  )
-
-MARK_AS_ADVANCED(TRILINOS_CONFIG_DIR EPETRA_CONFIG_H)
-
-IF(TRILINOS_FOUND)
-  #
-  # Extract version numbers:
-  #
-  SET(TRILINOS_VERSION "${Trilinos_VERSION}")
-
-  STRING(REGEX REPLACE
-    "^([0-9]+).*$" "\\1"
-    TRILINOS_VERSION_MAJOR "${Trilinos_VERSION}")
-
-  STRING(REGEX REPLACE
-    "^[0-9]+\\.([0-9]+).*$" "\\1"
-    TRILINOS_VERSION_MINOR "${Trilinos_VERSION}")
-
-  STRING(REGEX REPLACE
-    "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
-    TRILINOS_VERSION_SUBMINOR "${Trilinos_VERSION}")
-
+IF(EXISTS ${EPETRA_CONFIG_H})
   #
   # Determine whether Trilinos was configured with MPI and 64bit indices:
   #
@@ -171,7 +117,50 @@ IF(TRILINOS_FOUND)
   ELSE()
     SET(TRILINOS_WITH_NO_64BITS_INDICES FALSE)
   ENDIF()
+ENDIF()
 
+#
+# *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
+#
+STRING(REGEX REPLACE
+  "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
+  Trilinos_INCLUDE_DIRS "${Trilinos_INCLUDE_DIRS}"
+  )
+
+#
+# We'd like to have the full library names but the Trilinos package only
+# exports a list with short names...
+# So we check again for every lib and store the full path:
+#
+SET(_libraries "")
+FOREACH(_library ${Trilinos_LIBRARIES})
+  IF(_new_trilinos_config)
+    UNSET(TRILINOS_LIBRARY_${_library} CACHE)
+  ENDIF()
+
+  FIND_LIBRARY(TRILINOS_LIBRARY_${_library}
+    NAMES ${_library}
+    HINTS ${Trilinos_LIBRARY_DIRS}
+    NO_DEFAULT_PATH
+    NO_CMAKE_ENVIRONMENT_PATH
+    NO_CMAKE_PATH
+    NO_SYSTEM_ENVIRONMENT_PATH
+    NO_CMAKE_SYSTEM_PATH
+    NO_CMAKE_FIND_ROOT_PATH
+    )
+
+  LIST(APPEND _libraries TRILINOS_LIBRARY_${_library})
+ENDFOREACH()
+
+DEAL_II_PACKAGE_HANDLE(TRILINOS
+  LIBRARIES
+    REQUIRED ${_libraries} Trilinos_TPL_LIBRARIES
+    OPTIONAL MPI_CXX_LIBRARIES
+  INCLUDE_DIRS
+    REQUIRED Trilinos_INCLUDE_DIRS
+  )
+
+IF(TRILINOS_FOUND)
   #
   # Some versions of Sacado_cmath.hpp do things that aren't compatible
   # with the -std=c++0x flag of GCC, see deal.II FAQ.
@@ -206,16 +195,7 @@ IF(TRILINOS_FOUND)
     )
   RESET_CMAKE_REQUIRED()
 
-  MARK_AS_ADVANCED(TRILINOS_DIR)
-
 ELSE()
 
-  SET(TRILINOS_LIBRARIES)
-  SET(TRILINOS_INCLUDE_DIRS)
   UNSET(TRILINOS_CONFIG_DIR_SAVED CACHE)
-
-  SET(TRILINOS_DIR "" CACHE PATH
-    "An optional hint to a Trilinos installation"
-    )
 ENDIF()
-

@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -30,6 +30,10 @@
 
 INCLUDE(FindPackageHandleStandardArgs)
 
+SET(UMFPACK_DIR "" CACHE PATH "An optional hint to an UMFPACK directory")
+SET(SUITESPARSE_DIR "" CACHE PATH
+  "An optional hint to a SUITESPARSE directory"
+  )
 FOREACH(_comp SUITESPARSE SUITESPARSE_CONFIG UMFPACK AMD CHOLMOD COLAMD)
   SET_IF_EMPTY(${_comp}_DIR "$ENV{${_comp}_DIR}")
 ENDFOREACH()
@@ -66,12 +70,6 @@ MACRO(FIND_UMFPACK_LIBRARY _comp _name)
     PATH_SUFFIXES
     lib${LIB_SUFFIX} lib64 lib Lib ${_comp}/Lib
     )
-  IF(NOT "${ARGN}" STREQUAL "REQUIRED")
-    IF(${_comp}_LIBRARY MATCHES "-NOTFOUND")
-      SET(${_comp}_LIBRARY "")
-      UNSET(${_comp}_LIBRARY CACHE)
-    ENDIF()
-  ENDIF()
 ENDMACRO()
 
 
@@ -81,45 +79,17 @@ ENDMACRO()
 FIND_UMFPACK_PATH(UMFPACK umfpack.h)
 FIND_UMFPACK_PATH(AMD amd.h)
 
-#
-# Well, recent versions of UMFPACK include SuiteSparse_config.h, if so,
-# ensure that we'll find these headers as well.
-#
-IF(NOT UMFPACK_INCLUDE_DIR MATCHES "-NOTFOUND")
+IF(EXISTS ${UMFPACK_INCLUDE_DIR}/umfpack.h)
+  #
+  # Well, recent versions of UMFPACK include SuiteSparse_config.h, if so,
+  # ensure that we'll find these headers as well.
+  #
   FILE(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_SUITESPARSE_STRING
     REGEX "#include \"SuiteSparse_config.h\"")
   IF(NOT "${UMFPACK_SUITESPARSE_STRING}" STREQUAL "")
     FIND_UMFPACK_PATH(SuiteSparse_config SuiteSparse_config.h)
-    LIST(APPEND _required SuiteSparse_config_INCLUDE_DIR)
   ENDIF()
-ENDIF()
 
-#
-# Link against everything we can find to avoid underlinkage:
-#
-FIND_UMFPACK_LIBRARY(UMFPACK umfpack REQUIRED)
-FIND_UMFPACK_LIBRARY(AMD amd REQUIRED)
-FIND_UMFPACK_LIBRARY(CHOLMOD cholmod)
-FIND_UMFPACK_LIBRARY(COLAMD colamd)
-FIND_UMFPACK_LIBRARY(CCOLAMD ccolamd)
-FIND_UMFPACK_LIBRARY(CAMD camd)
-FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
-
-#
-# Test whether libsuitesparseconfig.xxx can be used for shared library
-# linkage. If not, exclude it from the command line.
-#
-LIST(APPEND CMAKE_REQUIRED_LIBRARIES
-  "-shared"
-  ${SuiteSparse_config_LIBRARY}
-  )
-CHECK_CXX_SOURCE_COMPILES("extern int SuiteSparse_version (int[3]);
-  void foo(int bar[3]) { SuiteSparse_version(bar);}"
-  LAPACK_SUITESPARSECONFIG_WITH_PIC
-  )
-RESET_CMAKE_REQUIRED()
-
-IF(EXISTS ${UMFPACK_INCLUDE_DIR}/umfpack.h)
   FILE(STRINGS "${UMFPACK_INCLUDE_DIR}/umfpack.h" UMFPACK_VERSION_MAJOR_STRING
     REGEX "#define.*UMFPACK_MAIN_VERSION")
   STRING(REGEX REPLACE "^.*UMFPACK_MAIN_VERSION.*([0-9]+).*" "\\1"
@@ -140,82 +110,57 @@ IF(EXISTS ${UMFPACK_INCLUDE_DIR}/umfpack.h)
     )
 ENDIF()
 
-SET(_output ${UMFPACK_LIBRARY} ${CHOLMOD_LIBRARY} ${CCOLAMD_LIBRARY} ${COLAMD_LIBRARY} ${CAMD_LIBRARY} ${AMD_LIBRARY} ${SuiteSparse_config_LIBRARY})
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(UMFPACK DEFAULT_MSG
-  _output # Cosmetic: Gives nice output
-  UMFPACK_LIBRARY
-  AMD_LIBRARY
-  UMFPACK_INCLUDE_DIR
-  AMD_INCLUDE_DIR
-  ${_required}
-  LAPACK_FOUND
-  )
+#
+# Link against everything we can find to avoid underlinkage:
+#
+FIND_UMFPACK_LIBRARY(UMFPACK umfpack)
+FIND_UMFPACK_LIBRARY(AMD amd)
+FIND_UMFPACK_LIBRARY(CHOLMOD cholmod)
+FIND_UMFPACK_LIBRARY(COLAMD colamd)
+FIND_UMFPACK_LIBRARY(CCOLAMD ccolamd)
+FIND_UMFPACK_LIBRARY(CAMD camd)
+FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
 
-MARK_AS_ADVANCED(
-  AMD_INCLUDE_DIR
-  AMD_LIBRARY
-  atlas_LIBRARY
-  blas_LIBRARY
-  CAMD_LIBRARY
-  CHOLMOD_LIBRARY
-  CCOLAMD_LIBRARY
-  COLAMD_LIBRARY
-  SuiteSparse_config_INCLUDE_DIR
-  SuiteSparse_config_LIBRARY
-  UMFPACK_INCLUDE_DIR
-  UMFPACK_LIBRARY
+#
+# Test whether libsuitesparseconfig.xxx can be used for shared library
+# linkage. If not, exclude it from the command line.
+#
+LIST(APPEND CMAKE_REQUIRED_LIBRARIES
+  "-shared"
+  ${SuiteSparse_config_LIBRARY}
   )
+CHECK_CXX_SOURCE_COMPILES("extern int SuiteSparse_version (int[3]);
+  void foo(int bar[3]) { SuiteSparse_version(bar);}"
+  LAPACK_SUITESPARSECONFIG_WITH_PIC
+  )
+RESET_CMAKE_REQUIRED()
 
+IF(LAPACK_SUITESPARSECONFIG_WITH_PIC OR NOT BUILD_SHARED_LIBS)
+  SET(_suitesparse_config SuiteSparse_config_LIBRARY)
+ENDIF()
+
+#
+# Add rt to the link interface as well (for whatever reason,
+# libsuitesparse.so depends on clock_gettime but the shared
+# lib does not record its dependence on librt.so as evidenced
+# by ldd :-( ):
+#
+FIND_SYSTEM_LIBRARY(rt_LIBRARY NAMES rt)
+
+DEAL_II_PACKAGE_HANDLE(UMFPACK
+  LIBRARIES
+    REQUIRED UMFPACK_LIBRARY
+    OPTIONAL CHOLMOD_LIBRARY CCOLAMD_LIBRARY COLAMD_LIBRARY CAMD_LIBRARY ${_suitesparse_config}
+    REQUIRED AMD_LIBRARY
+    OPTIONAL METIS_LIBRARIES LAPACK_LIBRARIES rt_LIBRARY
+  INCLUDE_DIRS
+    REQUIRED UMFPACK_INCLUDE_DIR AMD_INCLUDE_DIR
+    OPTIONAL SuiteSparse_config_INCLUDE_DIR
+  LINKER_FLAGS
+    OPTIONAL LAPACK_LINKER_FLAGS
+  )
 
 IF(UMFPACK_FOUND)
-  SET(UMFPACK_LIBRARIES
-    ${UMFPACK_LIBRARY}
-    ${CHOLMOD_LIBRARY}
-    ${CCOLAMD_LIBRARY}
-    ${COLAMD_LIBRARY}
-    ${CAMD_LIBRARY}
-    ${AMD_LIBRARY}
-    )
-  IF(LAPACK_SUITESPARSECONFIG_WITH_PIC OR NOT BUILD_SHARED_LIBS)
-    LIST(APPEND UMFPACK_LIBRARIES ${SuiteSparse_config_LIBRARY})
-  ENDIF()
-
-  #
-  # For good measure:
-  #
-  IF(METIS_FOUND)
-    LIST(APPEND UMFPACK_LIBRARIES ${METIS_LIBRARIES})
-  ENDIF()
-
-  LIST(APPEND UMFPACK_LIBRARIES ${LAPACK_LIBRARIES})
-
-  #
-  # Add rt to the link interface as well (for whatever reason,
-  # libsuitesparse.so depends on clock_gettime but the shared
-  # lib does not record its dependence on librt.so as evidenced
-  # by ldd :-( ):
-  #
-  FIND_SYSTEM_LIBRARY(rt_LIBRARY NAMES rt)
-  MARK_AS_ADVANCED(rt_LIBRARY)
-  IF(NOT rt_LIBRARY MATCHES "-NOTFOUND")
-    LIST(APPEND UMFPACK_LIBRARIES ${rt_LIBRARY})
-  ENDIF()
-
-  SET(UMFPACK_INCLUDE_DIRS
-    ${UMFPACK_INCLUDE_DIR}
-    ${AMD_INCLUDE_DIR}
-    ${SuiteSparse_config_INCLUDE_DIR}
-    )
-  SET(UMFPACK_LINKER_FLAGS
-    ${LAPACK_LINKER_FLAGS}
-    )
-
-  MARK_AS_ADVANCED(UMFPACK_DIR SUITESPARSE_DIR)
-ELSE()
-  SET(UMFPACK_DIR "" CACHE PATH
-    "An optional hint to an UMFPACK directory"
-    )
-  SET(SUITESPARSE_DIR "" CACHE PATH
-    "An optional hint to a SUITESPARSE directory"
-    )
+  MARK_AS_ADVANCED(SUITESPARSE_DIR)
 ENDIF()
+MARK_AS_ADVANCED(SuiteSparse_config_LIBRARY rt_LIBRARY)

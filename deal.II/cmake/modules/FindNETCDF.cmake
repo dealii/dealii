@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,15 +23,12 @@
 #   NETCDF_INCLUDE_DIRS
 #
 
-INCLUDE(FindPackageHandleStandardArgs)
-
+SET(NETCDF_DIR "" CACHE PATH "An optional hint to a NETCDF installation")
 SET_IF_EMPTY(NETCDF_DIR "$ENV{NETCDF_DIR}")
 
 FIND_PATH(NETCDF_INCLUDE_DIR netcdfcpp.h
-  HINTS
-    ${NETCDF_DIR}
-  PATH_SUFFIXES
-    netcdf include
+  HINTS ${NETCDF_DIR}
+  PATH_SUFFIXES netcdf include
   )
 
 #
@@ -42,45 +39,16 @@ FIND_PATH(NETCDF_INCLUDE_DIR netcdfcpp.h
 #
 
 FIND_LIBRARY(NETCDF_CPLUSPLUS_LIBRARY NAMES netcdf_c++ netcdf_cpp
-  HINTS
-    ${NETCDF_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
+  HINTS ${NETCDF_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
 FIND_LIBRARY(NETCDF_C_LIBRARY NAMES netcdf
-  HINTS
-    ${NETCDF_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
+  HINTS ${NETCDF_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-SET(_output ${NETCDF_CPLUSPLUS_LIBRARY} ${NETCDF_C_LIBRARY})
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(NETCDF DEFAULT_MSG
-  _output # Cosmetic: Gives nice output
-  NETCDF_CPLUSPLUS_LIBRARY
-  NETCDF_C_LIBRARY
-  NETCDF_INCLUDE_DIR
+DEAL_II_PACKAGE_HANDLE(NETCDF
+  LIBRARIES REQUIRED NETCDF_CPLUSPLUS_LIBRARY NETCDF_C_LIBRARY
+  INCLUDE_DIRS REQUIRED NETCDF_INCLUDE_DIR
   )
-
-MARK_AS_ADVANCED(
-  NETCDF_CPLUSPLUS_LIBRARY
-  NETCDF_C_LIBRARY
-  NETCDF_INCLUDE_DIR
-  )
-
-IF(NETCDF_FOUND)
-  SET(NETCDF_INCLUDE_DIRS
-    ${NETCDF_INCLUDE_DIR}
-    )
-  SET(NETCDF_LIBRARIES
-    ${NETCDF_CPLUSPLUS_LIBRARY}
-    ${NETCDF_C_LIBRARY}
-    )
-
-  MARK_AS_ADVANCED(NETCDF_DIR)
-ELSE()
-  SET(NETCDF_DIR "" CACHE PATH
-    "An optional hint to a NETCDF installation"
-    )
-ENDIF()

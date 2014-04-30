@@ -148,6 +148,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: parallel::distributed::Triangulation::load now has an
+  additional parameter <code>autopartition</code> to control p4est's behavior of
+  rebalancing triangulations between MPI nodes upon reading. It is
+  particularly useful to disable this behavior when data is stored
+  separately (examples for this are in the regression tests mpi/p4est_save_0?).
+  <br>
+  (Alexander Grayver, Matthias Maier, 2014/04/26)
+  </li>
+
   <li> Fixed: GridTools::find_active_cell_around_point() could get into an infinite
   loop if the point we are looking for is in fact not within the domain. This is now
   fixed.

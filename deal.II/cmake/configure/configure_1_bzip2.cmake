@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# Configuration for the zlib library:
+# Configuration for the bzip2 library:
 #
 
 MACRO(FEATURE_BZIP2_FIND_EXTERNAL var)

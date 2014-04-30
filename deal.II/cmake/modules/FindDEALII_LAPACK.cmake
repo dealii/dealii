@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 by the deal.II authors
+## Copyright (C) 2013 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -34,19 +34,16 @@
 # We have to use a trick with CMAKE_PREFIX_PATH to make LAPACK_DIR and
 # BLAS_DIR work...
 #
+SET(LAPACK_DIR "" CACHE PATH "An optional hint to a LAPACK installation")
+SET(BLAS_DIR "" CACHE PATH "An optional hint to a BLAS installation")
 SET_IF_EMPTY(BLAS_DIR "$ENV{BLAS_DIR}")
 SET_IF_EMPTY(LAPACK_DIR "$ENV{LAPACK_DIR}")
 
 SET(_cmake_prefix_path_backup "${CMAKE_PREFIX_PATH}")
-
 SET(CMAKE_PREFIX_PATH ${BLAS_DIR} ${LAPACK_DIR} ${_cmake_prefix_path_backup})
-
 FIND_PACKAGE(BLAS)
-
 SET(CMAKE_PREFIX_PATH ${LAPACK_DIR} ${_cmake_prefix_path_backup})
-
 FIND_PACKAGE(LAPACK)
-
 SET(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
 
 MARK_AS_ADVANCED(
@@ -107,20 +104,10 @@ IF(LAPACK_FOUND)
   ENDIF()
   LIST(REMOVE_ITEM LAPACK_LIBRARIES "FALSE")
 
-  MARK_AS_ADVANCED(
-    BLAS_DIR
-    LAPACK_DIR
-    )
+  MARK_AS_ADVANCED(BLAS_DIR LAPACK_DIR)
 
 ELSE()
   SET(DEALII_LAPACK_FOUND FALSE)
-
-  SET(LAPACK_DIR "" CACHE PATH
-    "An optional hint to a LAPACK installation"
-    )
-  SET(BLAS_DIR "" CACHE PATH
-    "An optional hint to a BLAS installation"
-    )
 
   #
   # Clean up the library variables in case we couldn't find the libraries
@@ -128,5 +115,4 @@ ELSE()
   #
   SET(BLAS_LIBRARIES)
   SET(LAPACK_LIBRARIES)
-
 ENDIF()

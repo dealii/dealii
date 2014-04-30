@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -28,9 +28,8 @@
 #   MUMPS_VERSION_SUBMINOR
 #
 
+SET(MUMPS_DIR "" CACHE PATH "An optional hint to a mumps directory")
 SET_IF_EMPTY(MUMPS_DIR "$ENV{MUMPS_DIR}")
-
-INCLUDE(FindPackageHandleStandardArgs)
 
 #
 # Search for all known dependencies of MUMPS:
@@ -40,23 +39,19 @@ FIND_PACKAGE(SCALAPACK) # which will also include lapack and blas
 
 
 FIND_PATH(MUMPS_INCLUDE_DIR dmumps_c.h
-  HINTS
-    ${MUMPS_DIR}
-  PATH_SUFFIXES
-    mumps include/mumps include
+  HINTS ${MUMPS_DIR}
+  PATH_SUFFIXES mumps include/mumps include
   )
 
 FIND_LIBRARY(DMUMPS_LIBRARY
   NAMES dmumps
-  HINTS
-    ${MUMPS_DIR}
+  HINTS ${MUMPS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
 FIND_LIBRARY(MUMPS_COMMON_LIBRARY
   NAMES mumps_common
-  HINTS
-    ${MUMPS_DIR}
+  HINTS ${MUMPS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
@@ -65,8 +60,7 @@ FIND_LIBRARY(MUMPS_COMMON_LIBRARY
 #
 FIND_LIBRARY(PORD_LIBRARY
   NAMES pord
-  HINTS
-    ${MUMPS_DIR}
+  HINTS ${MUMPS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 MARK_AS_ADVANCED(PORD_LIBRARY)
@@ -92,42 +86,14 @@ IF(EXISTS ${MUMPS_INCLUDE_DIR}/dmumps_c.h)
     )
 ENDIF()
 
-SET(_output ${DMUMPS_LIBRARY} ${MUMPS_COMMON_LIBRARY} ${PORD_LIBRARY})
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(MUMPS DEFAULT_MSG
-  _output # Cosmetic: Gives nice output
-  DMUMPS_LIBRARY
-  MUMPS_COMMON_LIBRARY
-  MUMPS_INCLUDE_DIR
-  SCALAPACK_FOUND
+DEAL_II_PACKAGE_HANDLE(MUMPS
+  LIBRARIES
+    REQUIRED DMUMPS_LIBRARY MUMPS_COMMON_LIBRARY
+    OPTIONAL PORD_LIBRARY
+    REQUIRED SCALAPACK_LIBRARIES
+    OPTIONAL METIS_LIBRARIES MPI_Fortran_LIBRARIES
+  INCLUDE_DIRS
+    REQUIRED MUMPS_INCLUDE_DIR
+  LINKER_FLAGS
+    OPTIONAL SCALAPACK_LINKER_FLAGS
   )
-
-MARK_AS_ADVANCED(
-  DMUMPS_LIBRARY
-  MUMPS_COMMON_LIBRARY
-  MUMPS_INCLUDE_DIR
-  PORT_LIBRARY
-  )
-
-IF(MUMPS_FOUND)
-  SET(MUMPS_INCLUDE_DIRS
-    ${MUMPS_INCLUDE_DIR}
-    )
-  SET(MUMPS_LIBRARIES
-    ${DMUMPS_LIBRARY}
-    ${MUMPS_COMMON_LIBRARY}
-    ${PORD_LIBRARY}
-    ${SCALAPACK_LIBRARIES}
-    ${METIS_LIBRARIES}       # for good measure
-    ${MPI_Fortran_LIBRARIES} # for good measure
-    )
-  SET(MUMPS_LINKER_FLAGS
-    ${SCALAPACK_LINKER_FLAGS}
-    )
-
-  MARK_AS_ADVANCED(MUMPS_DIR)
-ELSE()
-  SET(MUMPS_DIR "" CACHE PATH
-    "An optional hint to a mumps directory"
-    )
-ENDIF()
-

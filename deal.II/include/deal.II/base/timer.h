@@ -410,31 +410,49 @@ public:
   };
 
   /**
-   * Sets whether to generate output every
-   * time we exit a section, just in the
-   * end, both, or never.
+   * An enumeration data type that describes whether to generate output every
+   * time we exit a section, just in the end, both, or never.
    */
-  enum OutputFrequency {every_call, summary, every_call_and_summary, never}
-  output_frequency;
+  enum OutputFrequency
+  {
+    every_call,
+    summary,
+    every_call_and_summary,
+    never
+  };
 
   /**
-   * Sets whether to show CPU times, wall
-   * times, or both CPU and wall times.
+   * An enumeration data type that describes whether to show CPU times, wall
+   * times, or both CPU and wall times whenever we generate output.
    */
-  enum OutputType      {cpu_times, wall_times, cpu_and_wall_times}
-  output_type;
+  enum OutputType
+  {
+    cpu_times,
+    wall_times,
+    cpu_and_wall_times
+  };
 
   /**
-   * Constructor that takes std::cout as
-   * output stream.
+   * Constructor.
+   *
+   * @param stream The stream (of type std::ostream) to which output is written.
+   * @param output_frequency A variable indicating when output is to be written
+   *   to the given stream.
+   * @param output_type A variable indicating what kind of timing the output
+   *   should represent (CPU or wall time).
    */
   TimerOutput (std::ostream              &stream,
                const enum OutputFrequency output_frequency,
                const enum OutputType      output_type);
 
   /**
-   * Constructor that takes a
-   * ConditionalOStream to write output to.
+   * Constructor.
+   *
+   * @param stream The stream (of type ConditionalOstream) to which output is written.
+   * @param output_frequency A variable indicating when output is to be written
+   *   to the given stream.
+   * @param output_type A variable indicating what kind of timing the output
+   *   should represent (CPU or wall time).
    */
   TimerOutput (ConditionalOStream        &stream,
                const enum OutputFrequency output_frequency,
@@ -449,8 +467,13 @@ public:
    * MPI network for calculating the CPU
    * time.
    *
-   * Meant for using std::cout as output
-   * stream.
+   * @param mpi_comm An MPI communicator across which we should accumulate or
+   *   otherwise synchronize the timing information we produce on every MPI process.
+   * @param stream The stream (of type std::ostream) to which output is written.
+   * @param output_frequency A variable indicating when output is to be written
+   *   to the given stream.
+   * @param output_type A variable indicating what kind of timing the output
+   *   should represent (CPU or wall time).
    */
   TimerOutput (MPI_Comm                   mpi_comm,
                std::ostream              &stream,
@@ -465,8 +488,13 @@ public:
    * MPI network for calculating the CPU
    * time.
    *
-   * Constructor that takes a
-   * ConditionalOStream to write output to.
+   * @param mpi_comm An MPI communicator across which we should accumulate or
+   *   otherwise synchronize the timing information we produce on every MPI process.
+   * @param stream The stream (of type ConditionalOstream) to which output is written.
+   * @param output_frequency A variable indicating when output is to be written
+   *   to the given stream.
+   * @param output_type A variable indicating what kind of timing the output
+   *   should represent (CPU or wall time).
    */
   TimerOutput (MPI_Comm                   mpi_comm,
                ConditionalOStream        &stream,
@@ -549,6 +577,18 @@ public:
   void reset ();
 
 private:
+  /**
+   * When to output information to the output stream.
+   */
+  OutputFrequency output_frequency;
+
+  /**
+   * Whether to show CPU times, wall
+   * times, or both CPU and wall times.
+   */
+  OutputType output_type;
+
+
   /**
    * A timer object for the overall
    * run time. If we are using MPI,

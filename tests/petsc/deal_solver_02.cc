@@ -50,16 +50,28 @@ check_solve( SOLVER &solver, const MATRIX &A,
   f = 1.;
   try
     {
+      deallog.depth_file(0);
       solver.solve(A,u,f,P);
+      deallog.depth_file(3);
     }
   catch (std::exception &e)
     {
+      deallog.depth_file(3);
       deallog << e.what() << std::endl;
       abort ();
     }
 
-  deallog << "Solver stopped after " << solver.control().last_step()
-          << " iterations" << std::endl;
+  const unsigned int steps = solver.control().last_step();
+  if (steps >= 49 && steps <= 51)
+    {
+      deallog << "Solver stopped within 49 - 51 iterations"
+              << std::endl;
+    }
+  else
+    {
+      deallog << "Solver stopped after " << solver.control().last_step()
+              << " iterations" << std::endl;
+    }
 }
 
 

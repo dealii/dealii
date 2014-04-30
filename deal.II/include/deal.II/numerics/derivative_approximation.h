@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__gradient_estimator_h
-#define __deal2__gradient_estimator_h
+#ifndef __deal2__derivative_approximation_h
+#define __deal2__derivative_approximation_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

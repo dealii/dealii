@@ -309,13 +309,46 @@ namespace parallel
     class Triangulation : public dealii::Triangulation<dim,spacedim>
     {
     public:
+     /**
+      * A typedef that is used to to identify cell iterators. The
+      * concept of iterators is discussed at length in the
+      * @ref Iterators "iterators documentation module".
+      *
+      * The current typedef identifies cells in a triangulation. You
+      * can find the exact type it refers to in the base class's own
+      * typedef, but it should be TriaIterator<CellAccessor<dim,spacedim> >. The
+      * TriaIterator class works like a pointer that when you
+      * dereference it yields an object of type CellAccessor.
+      * CellAccessor is a class that identifies properties that
+      * are specific to cells in a triangulation, but it is derived
+      * (and consequently inherits) from TriaAccessor that describes
+      * what you can ask of more general objects (lines, faces, as
+      * well as cells) in a triangulation.
+      *
+      * @ingroup Iterators
+      */
+      typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
+
       /**
-       * Import the various
-       * iterator typedefs from the
-       * base class.
+       * A typedef that is used to to identify
+       * see @ref GlossActive "active cell iterators". The
+       * concept of iterators is discussed at length in the
+       * @ref Iterators "iterators documentation module".
+       *
+       * The current typedef identifies active cells in a triangulation. You
+       * can find the exact type it refers to in the base class's own
+       * typedef, but it should be TriaActiveIterator<CellAccessor<dim,spacedim> >. The
+       * TriaActiveIterator class works like a pointer to active objects that when you
+       * dereference it yields an object of type CellAccessor.
+       * CellAccessor is a class that identifies properties that
+       * are specific to cells in a triangulation, but it is derived
+       * (and consequently inherits) from TriaAccessor that describes
+       * what you can ask of more general objects (lines, faces, as
+       * well as cells) in a triangulation.
+       *
+       * @ingroup Iterators
        */
       typedef typename dealii::Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
-      typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
 
       /**
        * Generic settings for distributed Triangulations. If
@@ -520,16 +553,25 @@ namespace parallel
       void save(const char *filename) const;
 
       /**
-       * Load the refinement information saved with save() back in. The mesh
-       * must contain the same coarse mesh that was used in save() before calling
-       * this function. You do not
-       * need to load with the same number of MPI processes that you saved
-       * with. Rather, if a mesh is loaded with a different number of MPI
-       * processes than used at the time of saving, the mesh is repartitioned
-       * appropriately. Cell-based data that was saved with register_data_attach()
-       * can be read in with notify_ready_to_unpack() after calling load().
+       * Load the refinement information saved with save() back in. The
+       * mesh must contain the same coarse mesh that was used in save()
+       * before calling this function.
+       *
+       * You do not need to load with the same number of MPI processes that
+       * you saved with. Rather, if a mesh is loaded with a different
+       * number of MPI processes than used at the time of saving, the mesh
+       * is repartitioned appropriately. Cell-based data that was saved
+       * with register_data_attach() can be read in with
+       * notify_ready_to_unpack() after calling load().
+       *
+       * If you use p4est version > 0.3.4.2 the @p autopartition flag tells
+       * p4est to ignore the partitioning that the triangulation had when
+       * it was saved and make it uniform upon loading. If @p autopartition
+       * is set to false, the triangulation is only repartitioned if needed
+       * (i.e. if a different number of MPI processes is encountered).
        */
-      void load(const char *filename);
+      void load(const char *filename,
+                const bool autopartition = true);
 
       /**
        * Used to inform in the callbacks of register_data_attach() and

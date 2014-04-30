@@ -2214,9 +2214,10 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::
-    load(const char *filename)
+    load (const char *filename,
+          const bool autopartition)
     {
-      Assert(this->n_cells()>0, ExcMessage("load() only works if Triangulation already contains the same coarse mesh!"));
+      Assert(this->n_cells()>0, ExcMessage("load() only works if the Triangulation already contains a coarse mesh!"));
       Assert(this->n_levels()==1, ExcMessage("Triangulation may only contain coarse cells when calling load()."));
 
 
@@ -2257,7 +2258,7 @@ namespace parallel
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext (
                           filename, mpi_communicator,
                           attached_size, attached_size>0,
-                          1, 0,
+                          autopartition, 0,
                           this,
                           &connectivity);
 #else

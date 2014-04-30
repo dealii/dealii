@@ -226,8 +226,22 @@ void LaplaceProblem::solve ()
   SolverControl           solver_control (1000, 1e-6);
   SolverCG<>              cg (solver_control);
 
+  deallog.depth_file(0);
   cg.solve (system_matrix, solution, system_rhs,
             PreconditionIdentity());
+  deallog.depth_file(3);
+
+  const unsigned int steps = solver_control.last_step();
+  if (steps >= 629 && steps <= 630)
+    {
+      deallog << "Solver stopped within 629 - 630 iterations"
+              << std::endl;
+    }
+  else
+    {
+      deallog << "Solver stopped after " << steps << " iterations"
+              << std::endl;
+    }
 
   solution.print (deallog.get_file_stream());
 

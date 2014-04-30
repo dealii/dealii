@@ -108,7 +108,7 @@ int main ()
           }
     }
 
-  const Coefficient<dim> c;
+  Coefficient<dim> c;
   GridGenerator::laplace_transformation (tria, new_points, &c);
   HyperBallBoundary<dim> inner_ball(n_center, n_radius);
   tria.set_boundary(1, inner_ball);

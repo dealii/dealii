@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -25,16 +25,14 @@
 #   SCALAPACK_LINKER_FLAGS
 #
 
+SET(SCALAPACK_DIR "" CACHE PATH "An optional hint to a SCALAPACK directory")
+SET(BLACS_DIR "" CACHE PATH "An optional hint to a BLACS directory")
 SET_IF_EMPTY(SCALAPACK_DIR "$ENV{SCALAPACK_DIR}")
 SET_IF_EMPTY(BLACS_DIR "$ENV{BLACS_DIR}")
 
-INCLUDE(FindPackageHandleStandardArgs)
-
 FIND_LIBRARY(SCALAPACK_LIBRARY NAMES scalapack
-  HINTS
-    ${SCALAPACK_DIR}
-  PATH_SUFFIXES
-    lib${LIB_SUFFIX} lib64 lib
+  HINTS ${SCALAPACK_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
 #
@@ -46,55 +44,20 @@ FOREACH(_lib blacs blacsCinit blacsF77init)
   STRING(TOUPPER "${_lib}" _lib_upper)
   FIND_LIBRARY(${_lib_upper}_LIBRARY
     NAMES ${_lib} ${_lib}_MPI-LINUX-0 ${_lib}_MPI-DARWIN-0
-    HINTS
-      ${BLACS_DIR}
-      ${SCALAPACK_DIR}
-      ${SCALAPACK_DIR}/../blacs/
+    HINTS ${BLACS_DIR} ${SCALAPACK_DIR} ${SCALAPACK_DIR}/../blacs/
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib LIB
   )
-  IF(NOT ${_lib_upper}_LIBRARY MATCHES "-NOTFOUND")
-    LIST(APPEND BLACS_LIBRARIES
-      ${${_lib_upper}_LIBRARY}
-      )
-  ENDIF()
+  MARK_AS_ADVANCED(${_lib_upper}_LIBRARY)
 ENDFOREACH()
 
-
-SET(_output ${SCALAPACK_LIBRARY} ${BLACS_LIBRARIES})
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SCALAPACK DEFAULT_MSG
-  _output # Cosmetic: Gives nice output
-  SCALAPACK_LIBRARY
-  LAPACK_FOUND
-  )
-
-MARK_AS_ADVANCED(
-  lapack_LIBRARY
-  atlas_LIBRARY
-  blas_LIBRARY
-  SCALAPACK_LIBRARY
-  BLACS_LIBRARY
-  BLACSCINIT_LIBRARY
-  BLACSF77INIT_LIBRARY
+DEAL_II_PACKAGE_HANDLE(SCALAPACK
+  LIBRARIES
+    REQUIRED SCALAPACK_LIBRARY LAPACK_LIBRARIES
+    OPTIONAL BLACS_LIBRARY BLACSCINIT_LIBRARY BLACSF77INIT_LIBRARY MPI_Fortran_LIBRARIES
+  LINKER_FLAGS
+    OPTIONAL LAPACK_LINKER_FLAGS
   )
 
 IF(SCALAPACK_FOUND)
-  SET(SCALAPACK_LIBRARIES
-    ${SCALAPACK_LIBRARY}
-    ${LAPACK_LIBRARIES}
-    ${BLACS_LIBRARIES}
-    ${MPI_Fortran_LIBRARIES} # for good measure
-    )
-  SET(SCALAPACK_LINKER_FLAGS
-    ${LAPACK_LINKER_FLAGS}
-    )
-
-  MARK_AS_ADVANCED(SCALAPACK_DIR BLACS_DIR)
-ELSE()
-  SET(SCALAPACK_DIR "" CACHE PATH
-    "An optional hint to a SCALAPACK directory"
-    )
-  SET(BLACS_DIR "" CACHE PATH
-    "An optional hint to a BLACS directory"
-    )
+  MARK_AS_ADVANCED(BLACS_DIR)
 ENDIF()
-
