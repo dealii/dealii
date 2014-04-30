@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: FE_DGQArbitraryNodes::has_support_on_face was broken when
+  polynomials with support points not on the element boundary were used.
+  This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/04/30)
+  </li>
+
   <li> Fixed: parallel::distributed::Triangulation::load now has an
   additional parameter <code>autopartition</code> to control p4est's behavior of
   rebalancing triangulations between MPI nodes upon reading. It is
