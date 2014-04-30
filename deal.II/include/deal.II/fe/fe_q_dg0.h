@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -302,12 +302,8 @@ public:
 
 
   /**
-   * Check for non-zero values on a face.
-   *
    * This function returns @p true, if the shape function @p shape_index has
-   * non-zero values on the face @p face_index.
-   *
-   * Implementation of the interface in FiniteElement
+   * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
