@@ -1462,7 +1462,7 @@ public:
 
   /**
    * A typedef that is used to to identify
-   * see @ref GlossActive "active cell iterators". The
+   * @ref GlossActive "active cell iterators". The
    * concept of iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
