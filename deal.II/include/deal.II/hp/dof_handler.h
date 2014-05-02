@@ -146,7 +146,7 @@ namespace hp
      *
      * @ingroup Iterators
      */
-    typedef level_cell_iterator                           cell_iterator;
+    typedef typename ActiveSelector::cell_iterator        cell_iterator;
 
     typedef typename ActiveSelector::face_iterator        face_iterator;
     typedef typename ActiveSelector::active_face_iterator active_face_iterator;
