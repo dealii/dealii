@@ -148,6 +148,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Updated: The step-16 tutorial program was updated to the new layout
+  multigrid objects and thus avoids using deprecated interfaces.
+  <br>
+  (Martin Kronbichler, 2014/05/03)
+  </li>
+
   <li> Fixed: FE_DGQArbitraryNodes::has_support_on_face was broken when
   polynomials with support points not on the element boundary were used.
   This is now fixed.
