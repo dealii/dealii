@@ -681,101 +681,17 @@ freedom in non-$hp$ mode, but the difference is that each constrained
 hanging node is constrained not only against the two adjacent degrees
 of freedom, but is constrained against many more degrees of freedom.
 
-In previous programs, for example in step-6, we have dealt with eliminating
-these constrained degrees of freedom by first building an object of type
-ConstraintMatrix that stores the constraints, and then "condensing" away these
-degrees of freedom first from the sparsity pattern. The same scheme is used
-for the matrix and right hand side, which are also both first built then
-condensed.
-
-Dealing with sparsity patterns and matrices in this way turns out to be
-inefficient because the effort necessary is at least ${\cal O}(N \log N)$ in
-the number of unknowns, whereas an ideal finite element program would of
-course only have algorithms that are linear in the number of unknowns. The
-solution to this problem is to use the ConstraintMatrix object already at the
-time of creating the sparsity pattern, or while copying local contributions
-into the global matrix object (or global vector).
-
-So, instead of the code snippet (taken from step-6)
-@code
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
-  hanging_node_constraints.close ();
-
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  hanging_node_constraints.condense (sparsity_pattern);
-@endcode
-we now use the following:
-@code
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
-  hanging_node_constraints.close ();
-
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern,
-                                   hanging_node_constraints, false);
-@endcode
-
-Note the last <tt>false</tt> argument we pass when creating the sparsity
-pattern. It tells the sparsity pattern that constrained entries should not
-be inserted into the sparsity pattern. This makes sense for the way we're
-going to do assembly, which does the elimination of constraints already
-locally. Hence, we will never write the constrained entries. This is the
-second key to increase this program's performance, since the system matrix
-will have less entries &mdash; this saves both memory and computing time
-when doing matrix-vector multiplications or applying a preconditioner.
-
-In a similar vein, we have to slightly modify the way we copy local
-contributions into global matrices and vectors. In previous tutorial programs,
-we have always used a process like this:
-@code
-  typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
-    {
-      ...  // assemble local contributions them into global object
-
-      cell->get_dof_indices (local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    system_matrix.add (local_dof_indices[i],
-			       local_dof_indices[j],
-			       cell_matrix(i,j));
-	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	}
-    }
-
-  hanging_node_constraints.condense (system_matrix);
-  hanging_node_constraints.condense (system_rhs);
-@endcode
-We now replace copying and later condensing into one step, as already shown in
-step-17, step-18, and step-22:
-@code
-  typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
-    {
-      ...  // assemble local contributions them into global object
-
-      cell->get_dof_indices (local_dof_indices);
-
-      hanging_node_constraints
-	.distribute_local_to_global (cell_matrix, cell_rhs,
-				     local_dof_indices,
-				     system_matrix, system_rhs);
-    }
-@endcode
-Essentially, what the
-<code>hanging_node_constraints.distribute_local_to_global</code> call does is
-to implement the same loops as before, but whenever we hit a constrained degree
-of freedom, the function does the right thing and already condenses it away.
-
-Using this technique of eliminating constrained nodes already when
-transferring local contributions into the global objects, we avoid the problem
-of having to go back later and change these objects. Timing these operations
-shows that this makes the overall algorithms faster.
+It turns out that the strategy presented first in step-6 to eliminate the
+constraints while computing the element matrices and vectors with
+ConstraintMatrix::distribute_local_to_global is the most efficient approach
+also for this case. The alternative strategy to first build the matrix without
+constraints and then "condensing" away constrained degrees of freedom is
+considerably more expensive. It turns out that building the sparsity pattern
+by this inefficient algorithm requires at least ${\cal O}(N \log N)$ in the
+number of unknowns, whereas an ideal finite element program would of course
+only have algorithms that are linear in the number of unknowns. Timing the
+sparsity pattern creation as well as the matrix assembly shows that the
+algorithm presented in step-6 (and used in the code below) is indeed faster.
 
 In our program, we will also treat the boundary conditions as (possibly
 inhomogeneous) constraints and eliminate the matrix rows and columns to
@@ -783,7 +699,7 @@ those as well. All we have to do for this is to call the function that
 interpolates the Dirichlet boundary conditions already in the setup phase in
 order to tell the ConstraintMatrix object about them, and then do the
 transfer from local to global data on matrix and vector simultaneously. This
-is exactly what we've shown in the step-22 tutorial program.
+is exactly what we've shown in step-6.
 
 
 <h3>The test case</h3>

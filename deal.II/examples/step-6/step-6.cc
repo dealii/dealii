@@ -449,11 +449,13 @@ void Step6<dim>::assemble_system ()
 					      system_matrix,
 					      system_rhs);
     }
-  // Now we are done assembling the linear system.  The constrained nodes are
-  // still in the linear system (there is a one on the diagonal of the matrix
-  // and all other entries for this line are set to zero) but the computed
-  // values are invalid. We compute the correct values for these nodes at the
-  // end of the <code>solve</code> function.
+  // Now we are done assembling the linear system. The constraint matrix took
+  // care of applying the boundary conditions and also eliminated hanging node
+  // constraints. The constrained nodes are still in the linear system (there
+  // is a one on the diagonal of the matrix and all other entries for this
+  // line are set to zero) but the computed values are invalid. We compute the
+  // correct values for these nodes at the end of the <code>solve</code>
+  // function.
 }
 
 
