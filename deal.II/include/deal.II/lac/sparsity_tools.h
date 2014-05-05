@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 #include <vector>
 
@@ -29,9 +30,6 @@
 #endif
 
 DEAL_II_NAMESPACE_OPEN
-
-class SparsityPattern;
-
 
 
 /*! @addtogroup Sparsity
@@ -46,11 +44,6 @@ class SparsityPattern;
 */
 namespace SparsityTools
 {
-  /**
-   * Declare type for container size.
-   */
-  typedef types::global_dof_index size_type;
-
   /**
    * Use the METIS partitioner to generate a partitioning of the degrees of
    * freedom represented by this sparsity pattern. In effect, we view this
@@ -138,8 +131,8 @@ namespace SparsityTools
    */
   void
   reorder_Cuthill_McKee (const SparsityPattern     &sparsity,
-                         std::vector<size_type> &new_indices,
-                         const std::vector<size_type> &starting_indices = std::vector<size_type>());
+                         std::vector<SparsityPattern::size_type> &new_indices,
+                         const std::vector<SparsityPattern::size_type> &starting_indices = std::vector<SparsityPattern::size_type>());
 
 
 #ifdef DEAL_II_WITH_MPI
@@ -167,7 +160,7 @@ namespace SparsityTools
    */
   template <class CSP_t>
   void distribute_sparsity_pattern(CSP_t &csp,
-                                   const std::vector<size_type> &rows_per_cpu,
+                                   const std::vector<typename CSP_t::size_type> &rows_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange);
 

@@ -148,6 +148,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: Namespace SparsityTools had a local typedef <code>size_type</code>
+  that was set equal to types::global_dof_index. This typedef has been removed
+  and we now use SparsityPattern::size_type wherever applicable as this is the
+  type we really want to use. (The code worked previously because
+  types::global_dof_index and SparsityPattern::size_type happen to be the same
+  as far as the underlying type is concerned; however, they are different
+  semantically.)
+  <br>
+  (Wolfgang Bangerth, 2014/05/04)
+  </li>
+
   <li> Updated: The step-16 tutorial program was updated to the new layout
   multigrid objects and thus avoids using deprecated interfaces.
   <br>
