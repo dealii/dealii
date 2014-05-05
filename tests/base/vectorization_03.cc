@@ -84,9 +84,10 @@ void test()
 
   vector *= 2.*current.get_value(0)[0];
 
+  double error = 0;
   for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
-    deallog << current.get_value(0)[v]/(current.cartesian_weight[v]*current.jac_weight[0][0])-(2.*vec[v]-ol[v]-weight[v]*std::sin(vec[v]) + std::cos(ol[v])) << " ";
-  deallog << std::endl;
+    error += std::abs(current.get_value(0)[v]/(current.cartesian_weight[v]*current.jac_weight[0][0])-(2.*vec[v]-ol[v]-weight[v]*std::sin(vec[v])));
+  deallog << "error: " << error << std::endl;
 }
 
 
