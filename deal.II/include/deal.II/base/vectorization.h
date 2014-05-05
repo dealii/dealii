@@ -173,6 +173,27 @@ public:
   }
 
   /**
+   * Loads @p n_array_elements from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by 64 bytes, as opposed
+   * to casting a double address to VectorizedArray<double>*.
+   */
+  void load (const double* ptr)
+  {
+    data = _mm512_loadu_pd (ptr);
+  }
+
+  /**
+   * Writes the content of the calling class into memory in form of @p
+   * n_array_elements to the given address. The memory need not be aligned by
+   * 64 bytes, as opposed to casting a double address to
+   * VectorizedArray<double>*.
+   */
+  void store (double* ptr) const
+  {
+    _mm512_storeu_pd (ptr, data);
+  }
+
+  /**
    * Actual data field. Since this class represents a POD data type, it
    * remains public.
    */
@@ -341,6 +362,27 @@ public:
     data = _mm512_div_ps(data,vec.data);
 #endif
     return *this;
+  }
+
+  /**
+   * Loads @p n_array_elements from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by 64 bytes, as opposed
+   * to casting a float address to VectorizedArray<float>*.
+   */
+  void load (const float* ptr)
+  {
+    data = _mm512_loadu_ps (ptr);
+  }
+
+  /**
+   * Writes the content of the calling class into memory in form of @p
+   * n_array_elements to the given address. The memory need not be aligned by
+   * 64 bytes, as opposed to casting a float address to
+   * VectorizedArray<float>*.
+   */
+  void store (float* ptr) const
+  {
+    _mm512_storeu_ps (ptr, data);
   }
 
   /**
@@ -527,6 +569,27 @@ public:
   }
 
   /**
+   * Loads @p n_array_elements from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by 32 bytes, as opposed
+   * to casting a double address to VectorizedArray<double>*.
+   */
+  void load (const double* ptr)
+  {
+    data = _mm256_loadu_pd (ptr);
+  }
+
+  /**
+   * Writes the content of the calling class into memory in form of @p
+   * n_array_elements to the given address. The memory need not be aligned by
+   * 32 bytes, as opposed to casting a double address to
+   * VectorizedArray<double>*.
+   */
+  void store (double* ptr) const
+  {
+    _mm256_storeu_pd (ptr, data);
+  }
+
+  /**
    * Actual data field. Since this class
    * represents a POD data type, it remains
    * public.
@@ -702,6 +765,27 @@ public:
     data = _mm256_div_ps(data,vec.data);
 #endif
     return *this;
+  }
+
+  /**
+   * Loads @p n_array_elements from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by 32 bytes, as opposed
+   * to casting a float address to VectorizedArray<float>*.
+   */
+  void load (const float* ptr)
+  {
+    data = _mm256_loadu_ps (ptr);
+  }
+
+  /**
+   * Writes the content of the calling class into memory in form of @p
+   * n_array_elements to the given address. The memory need not be aligned by
+   * 32 bytes, as opposed to casting a float address to
+   * VectorizedArray<float>*.
+   */
+  void store (float* ptr) const
+  {
+    _mm256_storeu_ps (ptr, data);
   }
 
   /**
@@ -891,6 +975,27 @@ public:
   }
 
   /**
+   * Loads @p n_array_elements from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by 16 bytes, as opposed
+   * to casting a double address to VectorizedArray<double>*.
+   */
+  void load (const double* ptr)
+  {
+    data = _mm_loadu_pd (ptr);
+  }
+
+  /**
+   * Writes the content of the calling class into memory in form of @p
+   * n_array_elements to the given address. The memory need not be aligned by
+   * 16 bytes, as opposed to casting a double address to
+   * VectorizedArray<double>*.
+   */
+  void store (double* ptr) const
+  {
+    _mm_storeu_pd (ptr, data);
+  }
+
+  /**
    * Actual data field. Since this class
    * represents a POD data type, it remains
    * public.
@@ -1067,6 +1172,27 @@ public:
     data = _mm_div_ps(data,vec.data);
 #endif
     return *this;
+  }
+
+  /**
+   * Loads @p n_array_elements from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by 16 bytes, as opposed
+   * to casting a float address to VectorizedArray<float>*.
+   */
+  void load (const float* ptr)
+  {
+    data = _mm_loadu_ps (ptr);
+  }
+
+  /**
+   * Writes the content of the calling class into memory in form of @p
+   * n_array_elements to the given address. The memory need not be aligned by
+   * 16 bytes, as opposed to casting a float address to
+   * VectorizedArray<float>*.
+   */
+  void store (float* ptr) const
+  {
+    _mm_storeu_ps (ptr, data);
   }
 
   /**
@@ -1286,6 +1412,28 @@ public:
   {
     data/=vec.data;
     return *this;
+  }
+
+  /**
+   * Loads @p n_array_elements from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by the amount of bytes
+   * in the vectorized array, as opposed to casting a double address to
+   * VectorizedArray<double>*.
+   */
+  void load (const Number* ptr)
+  {
+    data = *ptr;
+  }
+
+  /**
+   * Writes the content of the calling class into memory in form of @p
+   * n_array_elements to the given address. The memory need not be aligned by
+   * the amount of bytes in the vectorized array, as opposed to casting a
+   * double address to VectorizedArray<double>*.
+   */
+  void store (Number* ptr) const
+  {
+    *ptr = data;
   }
 
   /**
@@ -1761,10 +1909,39 @@ namespace std
   ::dealii::VectorizedArray<Number>
   sin (const ::dealii::VectorizedArray<Number> &x)
   {
-    ::dealii::VectorizedArray<Number> sin_val;
+    // put values in an array and later read in that array with an unaligned
+    // read. This should safe some instructions as compared to directly
+    // setting the individual elements and also circumvents a compiler
+    // optimization bug in gcc-4.6 (see also deal.II developers list from
+    // April 2014, topic "matrix_free/step-48 Test").
+    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
     for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
-      sin_val[i] = std::sin(x[i]);
-    return sin_val;
+      values[i] = std::sin(x[i]);
+    ::dealii::VectorizedArray<Number> out;
+    out.load(&values[0]);
+    return out;
+  }
+
+
+
+  /**
+   * Computes the cosine of a vectorized data field. The result is returned as
+   * vectorized array in the form <tt>{cos(x[0]), cos(x[1]), ...,
+   * cos(x[n_array_elements-1])}</tt>.
+   *
+   * @relates VectorizedArray
+   */
+  template <typename Number>
+  inline
+  ::dealii::VectorizedArray<Number>
+  cos (const ::dealii::VectorizedArray<Number> &x)
+  {
+    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
+      values[i] = std::cos(x[i]);
+    ::dealii::VectorizedArray<Number> out;
+    out.load(&values[0]);
+    return out;
   }
 
 
@@ -1781,30 +1958,14 @@ namespace std
   ::dealii::VectorizedArray<Number>
   tan (const ::dealii::VectorizedArray<Number> &x)
   {
-    ::dealii::VectorizedArray<Number> tan_val;
+    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
     for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
-      tan_val[i] = std::tan(x[i]);
-    return tan_val;
+      values[i] = std::tan(x[i]);
+    ::dealii::VectorizedArray<Number> out;
+    out.load(&values[0]);
+    return out;
   }
 
-
-  /**
-   * Computes the cosine of a vectorized data field. The result is returned as
-   * vectorized array in the form <tt>{cos(x[0]), cos(x[1]), ...,
-   * cos(x[n_array_elements-1])}</tt>.
-   *
-   * @relates VectorizedArray
-   */
-  template <typename Number>
-  inline
-  ::dealii::VectorizedArray<Number>
-  cos (const ::dealii::VectorizedArray<Number> &x)
-  {
-    ::dealii::VectorizedArray<Number> cos_val;
-    for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
-      cos_val[i] = std::cos(x[i]);
-    return cos_val;
-  }
 
 
   /**
@@ -1819,11 +1980,14 @@ namespace std
   ::dealii::VectorizedArray<Number>
   exp (const ::dealii::VectorizedArray<Number> &x)
   {
-    ::dealii::VectorizedArray<Number> exp_val;
+    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
     for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
-      exp_val[i] = std::exp(x[i]);
-    return exp_val;
+      values[i] = std::exp(x[i]);
+    ::dealii::VectorizedArray<Number> out;
+    out.load(&values[0]);
+    return out;
   }
+
 
 
   /**
@@ -1838,10 +2002,12 @@ namespace std
   ::dealii::VectorizedArray<Number>
   log (const ::dealii::VectorizedArray<Number> &x)
   {
-    ::dealii::VectorizedArray<Number> log_val;
+    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
     for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
-      log_val[i] = std::log(x[i]);
-    return log_val;
+      values[i] = std::log(x[i]);
+    ::dealii::VectorizedArray<Number> out;
+    out.load(&values[0]);
+    return out;
   }
 
 

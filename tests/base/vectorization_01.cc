@@ -34,7 +34,7 @@ void test ()
   a = Number(2.);
   b = Number(-1.);
   for (unsigned int i=0; i<n_vectors; ++i)
-    c[i] = i;
+    c[i] = Number(i);
 
   deallog << "Addition: ";
   VectorizedArray<Number> d = a + b;
@@ -57,17 +57,17 @@ void test ()
     AssertThrow (e[i] == c[i], ExcInternalError());
   deallog << "OK" << std::endl
           << "Multiplication scalar: ";
-  a = 2. * a;
+  a = Number(2.) * a;
   for (unsigned int i=0; i<n_vectors; ++i)
     AssertThrow (a[i] == 4., ExcInternalError());
   deallog << "OK" << std::endl
           << "Division scalar left: ";
-  d = 1. / a;
+  d = Number(1.) / a;
   for (unsigned int i=0; i<n_vectors; ++i)
     AssertThrow (d[i] == 0.25, ExcInternalError());
   deallog << "OK" << std::endl
           << "Division scalar right: ";
-  e = d / 0.25;
+  e = d / Number(0.25);
   for (unsigned int i=0; i<n_vectors; ++i)
     AssertThrow (e[i] == 1, ExcInternalError());
   deallog << "OK" << std::endl
@@ -103,7 +103,7 @@ void test ()
     AssertThrow (d[i] == std::max(a[i], c[i]), ExcInternalError());
   deallog << "OK" << std::endl
           << "Minimum value: ";
-  d = std::min(0.5 * a + b, c);
+  d = std::min(Number(0.5) * a + b, c);
   for (unsigned int i=0; i<n_vectors; ++i)
     AssertThrow (d[i] == std::min(Number(0.5 * a[i] + b[i]), c[i]),
                  ExcInternalError());
@@ -167,6 +167,6 @@ int main()
   // path of VectorizedArray is taken no matter
   // what was done for double or float
   deallog.push("long double");
-  test<float> ();
+  test<long double> ();
   deallog.pop();
 }
