@@ -148,6 +148,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The class VectorizedArray<Number> now provides methods
+  VectorizedArray::load(ptr) to read from arbitrary pointer addresses and
+  VectorizedArray::store(ptr) to write to arbitrary pointer addresses,
+  as opposed to the data layout of VectorizedArray that requires pointers
+  to be aligned by the size of the array in bytes. This also circumvents
+  a (rare) compiler optimization bug with gcc-4.6 on SSE code in combination
+  with function calls, e.g. to std::sin.
+  <br>
+  (Martin Kronbichler, 2014/05/05)
+  </li>
+
   <li> Changed: Namespace SparsityTools had a local typedef <code>size_type</code>
   that was set equal to types::global_dof_index. This typedef has been removed
   and we now use SparsityPattern::size_type wherever applicable as this is the
