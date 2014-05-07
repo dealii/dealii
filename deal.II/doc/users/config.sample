@@ -1,37 +1,9 @@
-## ---------------------------------------------------------------------
-## $Id$
-##
-## Copyright (C) 2013 by the deal.II Authors
-##
-## This file is part of the deal.II library.
-##
-## The deal.II library is free software; you can use it, redistribute
-## it, and/or modify it under the terms of the GNU Lesser General
-## Public License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
-##
-## ---------------------------------------------------------------------
-
-#
-# Example configuration file
-#
-# This file can be used as a script to preseed the initial cache of a build
-# directory. To do so, invoke cmake with
-#
-#   $ cmake -C configuration.cmake [...]
-#
-#
-# Please note that this file is actually intrepeted as a full featured
-# CMake script file, so in order to set variables in the cache a statement
-# of the form
-#
-#   SET(<variable> <value> CACHE <type> "<string>")
-#
-# has to be used. See doc/readme.html and doc/users/cmake.html for further
-# details on how to use the cmake build system of deal.II.
-#
+##                                                                       ##
+#                      Example configuration file                         #
+#                                                                         #
+#        See doc/readme.html and doc/users/cmake.html for further         #
+#        details on how to use the cmake build system of deal.II.         #
+##                                                                       ##
 
 
 ###########################################################################
@@ -119,8 +91,8 @@
 #   "Fortran Compiler."
 #   )
 #
-# SET(DEAL_II_CXX_FLAGS "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_CXX_FLAGS variable"
+# SET(CMAKE_CXX_FLAGS "" CACHE STRING
+#   "The user supplied cache variable will be appended _at the end_ of the auto generated CMAKE_CXX_FLAGS variable"
 #   )
 #
 # SET(DEAL_II_CXX_FLAGS_DEBUG "" CACHE STRING
@@ -143,18 +115,6 @@
 #   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS_RELEASE variable"
 #   )
 #
-# SET(DEAL_II_DEFINITIONS "" CACHE STRING
-#   "Additional, user supplied compile definitions"
-#   )
-#
-# SET(DEAL_II_DEFINITIONS_DEBUG "" CACHE STRING
-#   "Additional, user supplied compile definitions"
-#   )
-#
-# SET(DEAL_II_DEFINITIONS_RELEASE "" CACHE STRING
-#   "Additional, user supplied compile definitions"
-#   )
-#
 # SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
 #   "Build a shared library"
 #   )
@@ -174,6 +134,7 @@
 # SET(DEAL_II_WITH_64BIT_INDICES "OFF" CACHE BOOL
 #   "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
 #   )
+#
 #
 
 
@@ -416,6 +377,25 @@
 
 
 #
+# muPaser:
+#
+# SET(DEAL_II_WITH_MUPARSER ON CACHE BOOL
+#   "Build deal.II with support for muparser"
+#
+# Automatic detection:
+#
+# Specify a hint with CMAKE_PREFIX_PATH or by setting
+# SET(MUPARSER_DIR "/.../..." CACHE PATH "")
+#
+# Manual setup:
+#
+# SET(MUPARSER_FOUND TRUE CACHE BOOL "")
+# SET(MUPARSER_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(MUPARSER_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
+#
+
+
+#
 # Netcdf:
 #
 # SET(DEAL_II_WITH_NETCDF ON CACHE BOOL
@@ -632,11 +612,12 @@
 # C++11 support is autodetected. You can explicitly disable C+11 support by
 # specifying
 #
-#   SET(DEAL_II_WITH_CXX11 FALSE CACHE BOOL "")
+#   SET(DEAL_II_HAVE_CXX11_FLAG FALSE CACHE BOOL "")
 #
 # A custom C++11 flag can be set by setting
 #
-#   SET(DEAL_II_CXX11_FLAG "-std=c++11" CACHE STRING "")
+#   SET(DEAL_II_HAVE_CXX11_FLAG TRUE CACHE BOOL "")
+#   SET(DEAL_II_CXX11_FLAG "-std=c++0x" CACHE STRING "")
 #
 
 
@@ -674,7 +655,7 @@
 #   "Library suffix for the debug library"
 #   )
 #
-# SET(DEAL_II_RELEASE_SUFFIX "" CACHE STRING
+# SET_IF_EMPTY(DEAL_II_RELEASE_SUFFIX "" CACHE STRING
 #   "Library suffix for the release library"
 #   )
 #

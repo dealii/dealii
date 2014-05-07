@@ -148,6 +148,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There is now a QSorted<dim> quadrature which takes an 
+  arbitrary quadrature at construction time and reorders the quadrature
+  points according to the weigths, from smaller to bigger. This should
+  improve stability of higher order polynomial integration.
+  <br>
+  (Luca Heltai, 2014/05/07)
+  </li>  
+
   <li> New: The class VectorizedArray<Number> now provides methods
   VectorizedArray::load(ptr) to read from arbitrary pointer addresses and
   VectorizedArray::store(ptr) to write to arbitrary pointer addresses,
