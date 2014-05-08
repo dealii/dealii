@@ -57,20 +57,27 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 {
   Assert((dim == 2)||(dim == 3), ExcNotImplemented());
   std::string line;
-  std::string text[4];
-  text[0] = "# vtk DataFile Version 3.0";
-  text[1] = "vtk output";
-  text[2] = "ASCII";
-  text[3] = "DATASET UNSTRUCTURED_GRID";
 
-  for (unsigned int i = 0; i < 4; i++) //Checking for the match between initial strings/text in the file.
+  // verify that the first, third and fourth lines match
+  // expectations. the second line of the file may essentially be
+  // anything the author of the file chose to identify what's in
+  // there, so we just ensure that we can read it
+  {    
+    std::string text[4];
+    text[0] = "# vtk DataFile Version 3.0";
+    text[1] = "****";
+    text[2] = "ASCII";
+    text[3] = "DATASET UNSTRUCTURED_GRID";
+
+    for (unsigned int i = 0; i < 4; ++i)
     {
       getline(in,line);
-
-      AssertThrow (line.compare(text[i]) == 0,
-                   ExcMessage(std::string("While reading VTK file, failed to find <") +
-                              text[i] + ">"));
+      if (i != 1)
+	AssertThrow (line.compare(text[i]) == 0,
+		     ExcMessage(std::string("While reading VTK file, failed to find a header line with text <") +
+				text[i] + ">"));
     }
+  }
 
   ///////////////////Declaring storage and mappings//////////////////
 
@@ -149,6 +156,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
                   for (unsigned int j = 0; j < type; j++) //loop to feed data
                     in >> cells.back().vertices[j];
+
 
                   cells.back().material_id = 0;
 
@@ -269,14 +277,14 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
           for (unsigned int i = 0; i < 2; i++)
             {
-              getline(in,linenew);
+              getline(in, linenew);
+              if (i == 0)
+		if (linenew.size() > textnew[0].size())
+		  linenew.resize(textnew[0].size());
 
-              if (linenew.compare(textnew[i]) == 0)
-                {}
-              else
-                AssertThrow (false,
-                             ExcMessage (std::string("While reading VTK file, failed to find <") +
-                                         textnew[i] + "> section"));
+	      AssertThrow (linenew.compare(textnew[i]) == 0,
+			   ExcMessage (std::string("While reading VTK file, failed to find <") +
+				       textnew[i] + "> section"));
             }
 
           for (unsigned int i = 0; i < no_cells; i++) //assigning IDs to cells.
@@ -305,10 +313,6 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 }
             }
         }
-      else
-        AssertThrow (false,
-                     ExcMessage ("While reading VTK file, failed to find CELL_DATA section"));
-
 
       Assert(subcelldata.check_consistency(dim), ExcInternalError());
 

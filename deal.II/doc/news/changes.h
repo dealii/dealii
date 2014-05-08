@@ -148,7 +148,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: There is now a QSorted<dim> quadrature which takes an 
+  <li> New: The GridIn::read_vtk() function places fewer restrictions
+  on the VTK files it wants to read and should, consequently, be able
+  to read more correctly formatted VTK files than before.
+  <br>
+  (Giorgos Kourakos, 2014/05/08)
+  </li>  
+
+  <li> New: There is now a QSorted quadrature which takes an 
   arbitrary quadrature at construction time and reorders the quadrature
   points according to the weigths, from smaller to bigger. This should
   improve stability of higher order polynomial integration.
