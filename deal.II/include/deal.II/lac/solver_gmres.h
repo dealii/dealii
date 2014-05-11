@@ -441,6 +441,13 @@ namespace internal
         }
       return *data[i-offset];
     }
+
+    // A comparator for better printing eigenvalues
+    bool complex_less_pred(const std::complex<double> &x,
+                           const std::complex<double> &y)
+    {
+      return x.real() < y.real() || (x.real() == y.real() && x.imag() < y.imag());
+    }
   }
 }
 
@@ -831,9 +838,16 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
             for (unsigned int j=0; j<dim; ++j)
               mat(i,j) = H_orig(i,j);
           mat.compute_eigenvalues();
+          std::vector<std::complex<double> > eigenvalues(dim);
+          for (unsigned int i=0; i<mat.n(); ++i)
+            eigenvalues[i] = mat.eigenvalue(i);
+
+          std::sort(eigenvalues.begin(), eigenvalues.end(),
+                    internal::SolverGMRES::complex_less_pred);
+
           deallog << "Eigenvalue estimate: ";
           for (unsigned int i=0; i<mat.n(); ++i)
-            deallog << ' ' << mat.eigenvalue(i);
+            deallog << ' ' << eigenvalues[i];
           deallog << std::endl;
         }
 
