@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The GMRES solver of deal.II can now write an estimate of
+  eigenvalues to the log file, in analogy to the CG solver. This is enabled
+  by the flag SolverGMRES<>::AdditionalData::compute_eigenvalues.
+  <br>
+  (Martin Kronbichler, 2014/05/11)
+  </li>  
+
   <li> New: The GridIn::read_vtk() function places fewer restrictions
   on the VTK files it wants to read and should, consequently, be able
   to read more correctly formatted VTK files than before.
