@@ -19,7 +19,7 @@
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 
@@ -28,11 +28,11 @@
 template <typename number>
 void test (unsigned int variant)
 {
-  const unsigned int n = 64;
+  const unsigned int n = variant < 3 ? 64 : 16;
   Vector<number> rhs(n), sol(n);
   rhs = 1.;
 
-  FullMatrix<number> matrix(n, n);
+  LAPACKFullMatrix<number> matrix(n, n);
 
   // put diagonal entries of different strengths. these are very challenging
   // for GMRES and will usually take a lot of iterations until the Krylov
@@ -53,7 +53,9 @@ void test (unsigned int variant)
         if (i<n-1)
           matrix(i,i+1) = 1.5+i;
         if (i<n-2)
-          matrix(i,i+2) = -0.25;
+          matrix(i,i+2) = -1.65;
+	matrix(i,n-1) = 2.;
+	matrix(n-1,i) = -2.;
       }
   else
     Assert(false, ExcMessage("Invalid variant"));
@@ -79,6 +81,21 @@ void test (unsigned int variant)
       solver_cg.solve(matrix, sol, rhs, PreconditionIdentity());
     }
 
+  if (variant == 3)
+    {
+      matrix.compute_eigenvalues();
+      std::vector<std::complex<double> > eigenvalues(n);
+      for (unsigned int i=0; i<n; ++i)
+        eigenvalues[i] = matrix.eigenvalue(i);
+
+      std::sort(eigenvalues.begin(), eigenvalues.end(),
+                internal::SolverGMRES::complex_less_pred);
+
+      deallog << "Actual eigenvalues:        ";
+      for (unsigned int i=0; i<n; ++i)
+        deallog << ' ' << eigenvalues[i];
+      deallog << std::endl;
+    }
   deallog.pop();
 }
 
