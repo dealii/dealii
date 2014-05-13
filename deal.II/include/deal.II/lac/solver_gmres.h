@@ -443,6 +443,7 @@ namespace internal
     }
 
     // A comparator for better printing eigenvalues
+    inline
     bool complex_less_pred(const std::complex<double> &x,
                            const std::complex<double> &y)
     {
