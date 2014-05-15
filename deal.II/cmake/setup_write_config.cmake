@@ -138,11 +138,6 @@ ENDIF()
 _both("DEAL_II_ALLOW_AUTODETECTION = ${DEAL_II_ALLOW_AUTODETECTION}):\n")
 
 
-#
-# Cache for quicker access to avoid the O(n^2) complexity of a loop over
-# _all_ defined variables.
-#
-
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
   IF(_var MATCHES "DEAL_II_WITH")
@@ -239,50 +234,3 @@ ENDIF()
 _summary("  to print a help message with a list of top level targets\n")
 
 _both("#\n###")
-
-
-########################################################################
-#                                                                      #
-#                    Dump the cache into config.cmake:                 #
-#                                                                      #
-########################################################################
-
-SET(_config_cmake "${CMAKE_BINARY_DIR}/config.cmake")
-FILE(WRITE ${_config_cmake}
-"#
-# This is a raw CMake cache dump of this build directory suitable as an
-# initial cache file: Use this file to preseed a CMake cache in an empty
-# build directory by (note that it is still necessary to declare a source
-# directory):
-#   $ cmake -C [...]/config.cmake ../deal.II
-#
-# If you want to have a clean configuration file have a look at
-# doc/users/config.sample
-#\n"
-  )
-
-FUNCTION(_config _var)
-  # It is absolutely beyond my comprehension why on earth there is
-  # hardcoded logic built into CMake to throw an error if one uses
-  # uppercase variants of FindPACKAGE call variables...
-  IF(NOT _var MATCHES "BOOST_DIR")
-    UNSET(${_var})
-  ENDIF()
-  #
-  # We have to get down to the raw entry in the cache, therefore clear the
-  # current value (and do it in a function to get private scope):
-  #
-  FILE(APPEND ${_config_cmake}
-    "SET(${_var} \"${${_var}}\" CACHE STRING \"\")\n"
-    )
-ENDFUNCTION()
-
-GET_CMAKE_PROPERTY(_variables CACHE_VARIABLES)
-FOREACH(_var
-    CMAKE_C_COMPILER
-    CMAKE_CXX_COMPILER
-    CMAKE_Fortran_COMPILER
-    ${_variables}
-    )
-  _config(${_var})
-ENDFOREACH()
