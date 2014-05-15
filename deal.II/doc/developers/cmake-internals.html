@@ -331,60 +331,72 @@ RESET_CMAKE_REQUIRED()
       library (no deal.II specific dependency checking, no
       compatibility checking).
     <li>
-      It should do so by appropriate <code>FIND_LIBRARY</code> and
-      <code>FIND_PATH</code> calls. The results of this calls should be the
-      only cached variables.
-    <li>
-      <code>FIND_PACKAGE_HANDLE_STANDARD_ARGS</code> should be used for
-      setting <code>FEATURE_FOUND</code> as this already respects the
-      <code>QUIET</code> and <code>REQUIRED</code> keywords.
+      It should do so by appropriate <code>DEAL_II_FIND_LIBRARY</code>,
+      <code>DEAL_II_FIND_PATH</code> and <code>DEAL_II_FIND_FILE</code>
+      calls (same syntax as the native CMake functions; just a small
+      wrapper to provide some useful output). The results of this calls
+      should be the only cached variables.
     <li>
       A <code>WARNING</code>, <code>SEND_ERROR</code> or
       <code>FATAL_ERROR</code> must be avoided (the only exception is
       the <code>REQUIRED</code> keyword).
     <li>
-      If the feature is successfully found, a subset of the following
-      <b>uncached</b> variables might be set:
-<pre>
+      The following uncached variables are recognized by the feature
+      configuration mechanism:
+<pre class="cmake">
 FEATURE_FOUND
 FEATURE_LIBRARIES (with optimized, debug, release keywords)
 FEATURE_LIBRARIES(_DEBUG|_RELEASE)
-FEATURE_INCLUDE_DIRS
+FEATURE_INCLUDE_DIRS FEATURE_USER_INCLUDE_DIRS
 FEATURE_LINKER_FLAGS(|_DEBUG|_RELEASE)
 FEATURE_CXX_FLAGS(|_DEBUG|_RELEASE)
 FEATURE_DEFINITIONS(|_DEBUG|_RELEASE)
-
 FEATURE_VERSION
 FEATURE_VERSION(_MAJOR|_MINOR|_SUBMINOR)
 </pre>
-
-There are obviously valid exceptions from this rule, though.
+      The <code>DEAL_II_PACKAGE_HANDLE</code> macro should be exclusively
+      used for setting up these variables (except the version variants). An
+      example invocation is
+<pre class="cmake">
+DEAL_II_PACKAGE_HANDLE(UMFPACK
+  LIBRARIES
+    REQUIRED UMFPACK_LIBRARY
+    OPTIONAL CHOLMOD_LIBRARY CCOLAMD_LIBRARY COLAMD_LIBRARY CAMD_LIBRARY ${_suitesparse_config}
+    REQUIRED AMD_LIBRARY
+    OPTIONAL METIS_LIBRARIES LAPACK_LIBRARIES rt_LIBRARY
+  INCLUDE_DIRS
+    REQUIRED UMFPACK_INCLUDE_DIR AMD_INCLUDE_DIR
+    OPTIONAL SuiteSparse_config_INCLUDE_DIR
+  LINKER_FLAGS
+    OPTIONAL LAPACK_LINKER_FLAGS
+  CLEAR
+    UMFPACK_LIBRARY CHOLMOD_LIBRARY CCOLAMD_LIBRARY COLAMD_LIBRARY
+    CAMD_LIBRARY SuiteSparse_config_LIBRARY AMD_LIBRARY UMFPACK_INCLUDE_DIR
+    AMD_INCLUDE_DIR SuiteSparse_config_INCLUDE_DIR
+  )
+</pre>
+      The macro concatenates all specified variables into the final
+      <code>FEATURE_SUFFIX</code> variable. Hereby, a feature is
+      successfully found if all <code>REQUIRED</code> variables are
+      non-empty an not set to <code>"-NOTFOUND"</code>.
+      <code>OPTIONAL</code> variables are just filtered out in this case.
+      As a last set of parameters the full list of cached search result
+      variables must be specified after the <code>CLEAR</code> keyword -
+      this is used to provide a possibility to undo a feature search.
     <li>
       Only "local" variables "<code>_&lt;all lowercase&gt;</code>" or
       "global" variables prefixed by <code>FEATURE_</code> may be
       altered. Do not set <code>DEAL_II_*</code> or <code>CMAKE_*</code>
       variables directly!
-
-    <li>
-      The find module must define a macro <code>FEATURE_CLEAR</code> that
-      unsets all cached variables, so that a subsequent call to the find
-      module starts a completely fresh features search.
     <li>
       A hint with <code>FEATURE_DIR</code> can be set up for
       convenience. It is best to start the <code>Find</code> module by
-
 <pre class="cmake">
+SET(FEATURE_DIR "" CACHE PATH "short description")
 SET_IF_EMPTY(FEATURE_DIR "$ENV{FEATURE_DIR}")
 </pre>
-
-and use <code>FEATURE_DIR</code> as a hint. If the external
-library could be found, hide it via
-<code>MARK_AS_ADVANCED</code>, if the external library could not
-be found, set a cache value:
-<pre class="cmake">
-SET(FEATURE_DIR "" CACHE PATH "An optional hint to a FEATURE directory")
-</pre>
-  </ul>
+      and use <code>FEATURE_DIR</code> as a hint.
+</ul>
 
 
 <a name="configure"></a>
@@ -435,9 +447,14 @@ FEATURE_DEFINITIONS(|_DEBUG|_RELEASE)
 <pre>
 FEATURE_&lt;FEATURE&gt;_DEPENDS              (a variable)
   - a variable which contains an optional list of other features
-    this feature depends on (and which have to be enabled for this feature
-    to work.) The features must be given with the full option toggle:
-    DEAL_II_WITH_[...]
+    this feature depends on (and which have to be enbled for this feature
+    to work.)
+    Features must be given with short name, i.e. without DEAL_II_WITH_
+
+FEATURE_&lt;FEATURE&gt;_AFTER                (a variable)
+  - a variable which contains an optional list of other features
+    that have to be configured prior to this feature
+    Features must be given with short name, i.e. without DEAL_II_WITH_
 
 FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)   (a macro)
   - which should set var to TRUE if all dependencies for the feature are

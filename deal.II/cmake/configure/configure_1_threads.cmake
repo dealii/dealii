@@ -14,12 +14,10 @@
 ##
 ## ---------------------------------------------------------------------
 
-
 #
 # Configuration for thread support in deal.II with the help of the tbb
 # library:
 #
-
 
 #
 # Set up general threading:

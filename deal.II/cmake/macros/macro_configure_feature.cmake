@@ -26,8 +26,13 @@
 # FEATURE_${feature}_DEPENDS    (a variable)
 #    a variable which contains an optional list of other features
 #    this feature depends on (and which have to be enbled for this feature
-#    to work.) The features must be given with the full option toggle:
-#    DEAL_II_WITH_[...]
+#    to work.)
+#    Features must be given with short name, i.e. without DEAL_II_WITH_
+#
+# FEATURE_${feature}_after      (a variable)
+#    a variable which contains an optional list of other features
+#    that have to be configured prior to this feature
+#    Features must be given with short name, i.e. without DEAL_II_WITH_
 #
 # FEATURE_${feature}_HAVE_BUNDLED   (a variable)
 #    which should either be set to TRUE if all necessary libraries of the
@@ -150,14 +155,18 @@ MACRO(CONFIGURE_FEATURE _feature)
 
   #
   # Check for correct include order of the configure_*.cmake files:
-  # If feature B depends on feature A, configure_A.cmake has to be
-  # included before configure_B.cmake:
+  # If feature B explicitly states to come after feature A, or if feature B
+  # depends on feature A, configure_A.cmake has to be included before
+  # configure_B.cmake:
   #
-  FOREACH(_dependency ${FEATURE_${_feature}_DEPENDS})
-    STRING(REGEX REPLACE "^DEAL_II_WITH_" "" _dependency ${_dependency})
+  FOREACH(_dependency
+      ${FEATURE_${_feature}_AFTER}
+      ${FEATURE_${_feature}_DEPENDS}
+      )
     IF(NOT FEATURE_${_dependency}_PROCESSED)
       MESSAGE(FATAL_ERROR "\n"
-        "Internal build system error: DEAL_II_WITH_${_feature} depends on "
+        "Internal build system error: The configuration of "
+        "DEAL_II_WITH_${_feature} depends on "
         "DEAL_II_WITH_${_dependency}, but CONFIGURE_FEATURE(${_feature}) "
         "was called before CONFIGURE_FEATURE(${_dependency}).\n\n"
         )
@@ -185,7 +194,7 @@ MACRO(CONFIGURE_FEATURE _feature)
     #
     SET(_dependencies_ok TRUE)
     FOREACH(_dependency ${FEATURE_${_feature}_DEPENDS})
-      IF(NOT ${_dependency})
+      IF(NOT DEAL_II_WITH_${_dependency})
         IF(DEAL_II_WITH_${_feature})
           MESSAGE(FATAL_ERROR "\n"
             "DEAL_II_WITH_${_feature} has unmet configuration requirements: "

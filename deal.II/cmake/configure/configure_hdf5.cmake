@@ -14,16 +14,12 @@
 ##
 ## ---------------------------------------------------------------------
 
-IF(NOT FEATURE_MPI_PROCESSED)
-  MESSAGE(FATAL_ERROR "\n"
-    "Internal build system error:\n"
-    "configure_hdf5.cmake included before configure_1_mpi.cmake\n\n"
-    )
-ENDIF()
-
 #
 # Configuration for the hdf5 library:
 #
+
+SET(FEATURE_HDF5_AFTER MPI)
+
 
 MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
   FIND_PACKAGE(HDF5)
@@ -48,5 +44,6 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
     CHECK_MPI_INTERFACE(HDF5 ${var})
   ENDIF()
 ENDMACRO()
+
 
 CONFIGURE_FEATURE(HDF5)

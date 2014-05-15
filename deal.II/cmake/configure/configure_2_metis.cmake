@@ -14,12 +14,7 @@
 ##
 ## ---------------------------------------------------------------------
 
-IF(NOT FEATURE_MPI_PROCESSED)
-  MESSAGE(FATAL_ERROR "\n"
-    "Internal build system error:\n"
-    "configure_2_metis.cmake included before configure_1_mpi.cmake\n\n"
-    )
-ENDIF()
+SET(FEATURE_METIS_AFTER MPI)
 
 #
 # Configuration for the metis library:

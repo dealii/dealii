@@ -18,9 +18,10 @@
 # Configuration for the petsc library:
 #
 
+SET(FEATURE_PETSC_AFTER MPI)
+
 
 MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
-
   FIND_PACKAGE(PETSC)
 
   IF(PETSC_FOUND)
@@ -66,7 +67,6 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
-
 
     #
     # Petsc has to be configured with the same number of bits for indices as
