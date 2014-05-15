@@ -31,6 +31,9 @@ MACRO(PURGE_FEATURE _feature)
     ENDIF()
   ENDFOREACH()
 
+  UNSET(${_feature}_FOUND)
+  UNSET(${_feature}_VERSION)
+
   #
   # cached:
   #
