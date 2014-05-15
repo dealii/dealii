@@ -65,11 +65,11 @@ namespace Algorithms
    * error term. In order to avoid a loss of convergence order, the
    * adaptive theta scheme can be used, where <i>#theta=½+c dt</i>.
    *
-   * Assume that we want to solve the equation <i>u' + Au = 0</i> with a
+   * Assume that we want to solve the equation <i>u' + F(u) = 0</i> with a
    * step size <i>k</i>.  A step of the theta scheme can be written as
    *
    * @f[
-   *   (M + \theta k A) u_{n+1} = (M - (1-\theta)k A) u_n.
+   *   M u_{n+1} + \theta k F(u_{n+1})  = M u_n - (1-\theta)k F(u_n).
    * @f]
    *
    * Here, <i>M</i> is the mass matrix. We see, that the right hand side
