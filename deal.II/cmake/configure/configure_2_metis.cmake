@@ -14,6 +14,13 @@
 ##
 ## ---------------------------------------------------------------------
 
+IF(NOT FEATURE_MPI_PROCESSED)
+  MESSAGE(FATAL_ERROR "\n"
+    "Internal build system error:\n"
+    "configure_2_metis.cmake included before configure_1_mpi.cmake\n\n"
+    )
+ENDIF()
+
 #
 # Configuration for the metis library:
 #
@@ -21,16 +28,21 @@
 MACRO(FEATURE_METIS_FIND_EXTERNAL var)
   FIND_PACKAGE(METIS)
 
-  IF(METIS_FOUND AND METIS_VERSION_MAJOR GREATER 4)
+  IF(METIS_FOUND)
     SET(${var} TRUE)
-  ELSE()
-    MESSAGE(STATUS "Insufficient metis installation found: "
-      "Version 5.x required!"
-      )
-    SET(METIS_ADDITIONAL_ERROR_STRING
-      "Could not find a sufficient modern metis installation: "
-      "Version 5.x required!\n"
-      )
+
+    IF(NOT METIS_VERSION_MAJOR GREATER 4)
+      MESSAGE(STATUS "Insufficient metis installation found: "
+        "Version 5.x required!"
+        )
+      SET(METIS_ADDITIONAL_ERROR_STRING
+        "Could not find a sufficient modern metis installation: "
+        "Version 5.x required!\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
+    CHECK_MPI_INTERFACE(METIS ${var})
   ENDIF()
 ENDMACRO()
 

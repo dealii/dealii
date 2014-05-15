@@ -14,6 +14,13 @@
 ##
 ## ---------------------------------------------------------------------
 
+IF(NOT FEATURE_MPI_PROCESSED)
+  MESSAGE(FATAL_ERROR "\n"
+    "Internal build system error:\n"
+    "configure_hdf5.cmake included before configure_1_mpi.cmake\n\n"
+    )
+ENDIF()
+
 #
 # Configuration for the hdf5 library:
 #
@@ -22,12 +29,10 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
   FIND_PACKAGE(HDF5)
 
   IF(HDF5_FOUND)
-    IF( (HDF5_WITH_MPI AND DEAL_II_WITH_MPI) OR
-        (NOT HDF5_WITH_MPI AND NOT DEAL_II_WITH_MPI) )
-      SET(${var} TRUE)
+    SET(${var} TRUE)
 
-    ELSE()
-
+    IF( (HDF5_WITH_MPI AND NOT DEAL_II_WITH_MPI) OR
+        (NOT HDF5_WITH_MPI AND DEAL_II_WITH_MPI) )
       MESSAGE(STATUS "Insufficient hdf5 installation found: "
         "hdf5 has to be configured with the same MPI configuration as deal.II."
         )
@@ -37,7 +42,10 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  HDF5_WITH_MPI    = ${HDF5_WITH_MPI}\n"
         )
+      SET(${var} FALSE)
     ENDIF()
+
+    CHECK_MPI_INTERFACE(HDF5 ${var})
   ENDIF()
 ENDMACRO()
 

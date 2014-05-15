@@ -176,11 +176,6 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
     REGEX "^PETSC_WITH_EXTERNAL_LIB =.*")
   SEPARATE_ARGUMENTS(PETSC_EXTERNAL_LINK_LINE)
 
-  IF(NOT "${PETSC_EXTERNAL_LINK_LINE}" STREQUAL "${PETSC_EXTERNAL_LINK_LINE_SAVED}")
-    SET(_new_petsc_external_link_line TRUE)
-  ENDIF()
-  SET(PETSC_EXTERNAL_LINK_LINE_SAVED "${PETSC_EXTERNAL_LINK_LINE}" CACHE INTERNAL "" FORCE)
-
   SET(_hints)
   SET(_petsc_libraries)
   SET(_cleanup_variables)
@@ -193,11 +188,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
       # Search for every library that was specified with -l:
       STRING(REGEX REPLACE "^-l" "" _token "${_token}")
 
-      # TODO:
       LIST(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
-      IF(_new_petsc_external_link_line)
-        UNSET(PETSC_LIBRARY_${_token} CACHE)
-      ENDIF()
 
       IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
         FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
