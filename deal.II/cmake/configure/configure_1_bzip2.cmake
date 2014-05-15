@@ -18,18 +18,4 @@
 # Configuration for the bzip2 library:
 #
 
-MACRO(FEATURE_BZIP2_FIND_EXTERNAL var)
-  FIND_PACKAGE(BZip2)
-
-  IF(BZIP2_FOUND)
-    #
-    # Rename variables:
-    #
-    SET(BZIP2_VERSION ${BZIP2_VERSION_STRING})
-    SET(BZIP2_INCLUDE_DIRS ${BZIP2_INCLUDE_DIR})
-
-    SET(${var} TRUE)
-  ENDIF()
-ENDMACRO()
-
 CONFIGURE_FEATURE(BZIP2)

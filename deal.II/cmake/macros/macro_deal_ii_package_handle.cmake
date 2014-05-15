@@ -104,11 +104,11 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
           LIST(APPEND _clear ${_arg})
         ENDIF()
       ELSE()
-        IF(NOT DEFINED ${_arg} OR ${_arg} MATCHES "-NOTFOUND")
+        IF("${_arg}" STREQUAL "" OR ${_arg} MATCHES "-NOTFOUND")
           IF(_required AND _fine)
-            IF(NOT DEFINED ${_arg})
+            IF("${_arg}" STREQUAL "")
               MESSAGE(STATUS
-                "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" undefined ***"
+                "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" empty ***"
                 )
             ELSE()
               MESSAGE(STATUS

@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -19,8 +19,3 @@
 #
 
 CONFIGURE_FEATURE(ZLIB)
-
-# Export ZLIB_VERSION:
-IF(DEFINED ZLIB_VERSION_STRING)
-  SET(ZLIB_VERSION ${ZLIB_VERSION_STRING})
-ENDIF()
