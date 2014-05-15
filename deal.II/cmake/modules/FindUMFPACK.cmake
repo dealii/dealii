@@ -43,7 +43,7 @@ ENDFOREACH()
 MACRO(FIND_UMFPACK_PATH _comp _file)
   STRING(TOLOWER ${_comp} _comp_lowercase)
   STRING(TOUPPER ${_comp} _comp_uppercase)
-  FIND_PATH(${_comp}_INCLUDE_DIR ${_file}
+  DEAL_II_FIND_PATH(${_comp}_INCLUDE_DIR ${_file}
     HINTS
       ${${_comp_uppercase}_DIR}
       ${SUITESPARSE_DIR}/${_comp}
@@ -57,7 +57,7 @@ ENDMACRO()
 
 MACRO(FIND_UMFPACK_LIBRARY _comp _name)
   STRING(TOUPPER ${_comp} _comp_uppercase)
-  FIND_LIBRARY(${_comp}_LIBRARY
+  DEAL_II_FIND_LIBRARY(${_comp}_LIBRARY
     NAMES ${_name}
     HINTS
       ${${_comp_uppercase}_DIR}

@@ -37,8 +37,8 @@ SET(PETSC_ARCH "" CACHE STRING "An optional hint to a PETSc arch")
 SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
 SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
-FIND_LIBRARY(PETSC_LIBRARY
-  NAMES petsc
+DEAL_II_FIND_LIBRARY(PETSC_LIBRARY
+  NAMES petscbob
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
@@ -47,7 +47,7 @@ FIND_LIBRARY(PETSC_LIBRARY
 # Search for the first part of the includes:
 #
 
-FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
+DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_INCLUDE_DIRS}
   PATH_SUFFIXES petsc include include/petsc
 )
@@ -102,7 +102,7 @@ ENDIF()
 # Either way, we must be able to find petscversion.h:
 #
 
-FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
+DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_INCLUDE_DIRS}
   PATH_SUFFIXES petsc include include/petsc
 )
@@ -140,7 +140,7 @@ ENDIF()
 # that file:
 #
 
-FIND_FILE(PETSC_PETSCVARIABLES
+DEAL_II_FIND_FILE(PETSC_PETSCVARIABLES
   NAMES petscvariables
   HINTS ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_DIR}
   PATH_SUFFIXES conf
@@ -205,7 +205,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
           LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
         ENDIF()
       ELSEIF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
-        FIND_LIBRARY(PETSC_LIBRARY_${_token}
+        DEAL_II_FIND_LIBRARY(PETSC_LIBRARY_${_token}
           NAMES ${_token}
           HINTS ${_hints}
           )

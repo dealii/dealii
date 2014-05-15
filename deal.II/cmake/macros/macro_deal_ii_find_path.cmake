@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,29 +15,17 @@
 ## ---------------------------------------------------------------------
 
 #
-# Try to find the ARPACK library
-#
-# This module exports
-#
-#   ARPACK_LIBRARIES
-#   ARPACK_LINKER_FLAGS
+# A small wrapper around FIND_FILE to be a bit more verbose
 #
 
-#
-# TODO: ARPACK and mpi...
-#
+MACRO(DEAL_II_FIND_PATH _path_name)
+  FIND_PATH(${_path_name} ${ARGN})
 
-SET(ARPACK_DIR "" CACHE PATH "An optional hint to an ARPACK installation")
-SET_IF_EMPTY(ARPACK_DIR "$ENV{ARPACK_DIR}")
-
-DEAL_II_FIND_LIBRARY(ARPACK_LIBRARY
-  NAMES arpack
-  HINTS ${ARPACK_DIR}
-  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
-  )
-
-DEAL_II_PACKAGE_HANDLE(ARPACK
-  LIBRARIES REQUIRED ARPACK_LIBRARY LAPACK_LIBRARIES
-  LINKER_FLAGS OPTIONAL LAPACK_LINKER_FLAGS
-  CLEAR ARPACK_LIBRARY
-  )
+  IF(${_path_name} MATCHES "-NOTFOUND")
+    MESSAGE(STATUS "${_path_name} NOTFOUND! Call:")
+    TO_STRING(_str ${ARGN})
+    MESSAGE(STATUS "    FIND_PATH(${_path_name} ${_str})")
+  ELSE()
+    MESSAGE(STATUS "Found ${_path_name}")
+  ENDIF()
+ENDMACRO()

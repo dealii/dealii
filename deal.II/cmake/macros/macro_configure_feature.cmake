@@ -169,6 +169,7 @@ MACRO(CONFIGURE_FEATURE _feature)
   #
   IF( (NOT DEAL_II_ALLOW_AUTODETECTION) AND
       (NOT DEFINED DEAL_II_WITH_${_feature}) )
+    PURGE_FEATURE(${_feature})
     SET_CACHED_OPTION(${_feature} OFF)
   ENDIF()
 
@@ -278,6 +279,7 @@ MACRO(CONFIGURE_FEATURE _feature)
     # DEAL_II_WITH_${_feature} is defined and set to OFF, promote it to
     # cache nevertheless:
     #
+    MESSAGE(STATUS "DEAL_II_WITH_${_feature} is set to off.")
     PURGE_FEATURE(${_feature})
     SET_CACHED_OPTION(${_feature} OFF)
   ENDIF()
