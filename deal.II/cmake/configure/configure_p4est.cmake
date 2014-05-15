@@ -54,30 +54,8 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
-
-    #
-    # Reset configuration:
-    #
-    IF(NOT ${var})
-      UNSET(P4EST_LIBRARY_OPTIMIZED CACHE)
-      UNSET(P4EST_LIBRARY_DEBUG CACHE)
-      UNSET(P4EST_INCLUDE_DIR CACHE)
-      UNSET(SC_LIBRARY_OPTIMIZED CACHE)
-      UNSET(SC_LIBRARY_DEBUG CACHE)
-      UNSET(SC_INCLUDE_DIR CACHE)
-      SET(P4EST_DIR "" CACHE PATH
-        "An optional hint to a p4est installation/directory"
-        )
-      MARK_AS_ADVANCED(CLEAR P4EST_DIR)
-    ENDIF()
-
   ENDIF()
 ENDMACRO()
 
 
 CONFIGURE_FEATURE(P4EST)
-
-#
-# The user has to know the location of the P4est headers as well:
-#
-SET(P4EST_USER_INCLUDE_DIRS ${P4EST_INCLUDE_DIRS})

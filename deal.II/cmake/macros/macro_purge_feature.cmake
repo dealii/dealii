@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,23 +15,31 @@
 ## ---------------------------------------------------------------------
 
 #
-# Configuration for the metis library:
+# Remove all cached and non cached variables associated with a feature.
+#
+# Usage:
+#     PURGE_FEATURE(feature)
 #
 
-MACRO(FEATURE_METIS_FIND_EXTERNAL var)
-  FIND_PACKAGE(METIS)
+MACRO(PURGE_FEATURE _feature)
+  #
+  # uncached:
+  #
+  FOREACH(_var ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
+    IF(NOT _var MATCHES BUNDLED)
+      SET(${_feature}_${_var})
+    ENDIF()
+  ENDFOREACH()
 
-  IF(METIS_FOUND AND METIS_VERSION_MAJOR GREATER 4)
-    SET(${var} TRUE)
-  ELSE()
-    MESSAGE(STATUS "Insufficient metis installation found: "
-      "Version 5.x required!"
-      )
-    SET(METIS_ADDITIONAL_ERROR_STRING
-      "Could not find a sufficient modern metis installation: "
-      "Version 5.x required!\n"
-      )
-  ENDIF()
+  #
+  # cached:
+  #
+  FOREACH(_var ${${_feature}_CLEAR_VARIABLES})
+    SET(${_var})
+    UNSET(${_var} CACHE)
+  ENDFOREACH()
+
+  UNSET(${_feature}_CLEAR_VARIABLES CACHE)
+
+  MARK_AS_ADVANCED(CLEAR ${_feature}_DIR ${_feature}_ARCH)
 ENDMACRO()
-
-CONFIGURE_FEATURE(METIS)

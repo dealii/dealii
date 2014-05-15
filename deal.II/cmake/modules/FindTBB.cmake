@@ -27,8 +27,6 @@
 #   TBB_VERSION_MINOR
 #
 
-INCLUDE(FindPackageHandleStandardArgs)
-
 SET(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
 SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
 

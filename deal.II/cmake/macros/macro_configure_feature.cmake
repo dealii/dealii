@@ -195,6 +195,7 @@ MACRO(CONFIGURE_FEATURE _feature)
             "DEAL_II_WITH_${_feature} has unmet configuration requirements: "
             "${_dependency} has to be set to \"ON\"."
             )
+          PURGE_FEATURE(${_feature})
           SET_CACHED_OPTION(${_feature} OFF)
         ENDIF()
         SET(_dependencies_ok FALSE)
@@ -206,6 +207,9 @@ MACRO(CONFIGURE_FEATURE _feature)
         #
         # First case: DEAL_II_FORCE_BUNDLED_${_feature} is defined:
         #
+
+        PURGE_FEATURE(${_feature})
+
         IF(FEATURE_${_feature}_HAVE_BUNDLED)
           RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
@@ -241,6 +245,8 @@ MACRO(CONFIGURE_FEATURE _feature)
 
         ELSE(FEATURE_${_feature}_EXTERNAL_FOUND)
 
+          PURGE_FEATURE(${_feature})
+
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} has unmet external dependencies.")
 
           IF(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
@@ -272,6 +278,7 @@ MACRO(CONFIGURE_FEATURE _feature)
     # DEAL_II_WITH_${_feature} is defined and set to OFF, promote it to
     # cache nevertheless:
     #
+    PURGE_FEATURE(${_feature})
     SET_CACHED_OPTION(${_feature} OFF)
   ENDIF()
 

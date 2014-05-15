@@ -78,8 +78,3 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(SLEPC)
-
-#
-# The user has to know the location of the SLEPC headers as well:
-#
-SET(SLEPC_USER_INCLUDE_DIRS ${SLEPC_INCLUDE_DIRS})

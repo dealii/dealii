@@ -56,7 +56,6 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
   SET(${_feature}_FOUND TRUE)
 
   SET(_variable ${_var})
-  SET(_cleanup ${_var})
   SET(${_feature}_${_variable} "")
   SET(_required TRUE)
   SET(_fine TRUE)
@@ -82,7 +81,6 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
       # *Yay* a new keyword.
       #
       SET(_variable ${_arg})
-      LIST(APPEND _cleanup ${_var})
       SET(${_feature}_${_variable} "")
       SET(_required TRUE)
       SET(_fine TRUE)
@@ -139,27 +137,22 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
 
   IF(${_feature}_FOUND)
     #
-    # Deduplicate entries in *_INCLUDE_DIRS and *_LIBRARIES
+    # Deduplicate entries:
     #
-    FOREACH(_suffix INCLUDE_DIRS USER_INCLUDE_DIRS BUNDLED_INCLUDE_DIRS)
-      REMOVE_DUPLICATES(${_feature}_${_suffix})
-    ENDFOREACH()
-    FOREACH(_suffix
-        LIBRARIES LIBRARIES_RELEASE LIBRARIES_DEBUG
-        USER_DEFINITIONS USER_DEFINITIONS_DEBUG USER_DEFINITIONS_RELEASE
-        DEFINITIONS DEFINITIONS_DEBUG DEFINITIONS_RELEASE
-        )
-      REMOVE_DUPLICATES(${_feature}_${_suffix} REVERSE)
+    FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES})
+      IF(_suffix MATCHES "INCLUDE_DIRS$")
+        REMOVE_DUPLICATES(${_feature}_${_suffix})
+      ELSE()
+        REMOVE_DUPLICATES(${_feature}_${_suffix} REVERSE)
+      ENDIF()
     ENDFOREACH()
 
     MESSAGE(STATUS "Found ${_feature}")
-    MARK_AS_ADVANCED(${_feature}_DIR)
+
+    MARK_AS_ADVANCED(${_feature}_DIR ${_feature}_ARCH)
 
   ELSE()
 
-    FOREACH(_v _cleanup)
-      SET(${_feature}_${_v})
-    ENDFOREACH()
     MESSAGE(STATUS "Could NOT find ${_feature}")
   ENDIF()
 ENDMACRO()
