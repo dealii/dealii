@@ -22,7 +22,7 @@ MACRO(DEAL_II_FIND_PATH _path_name)
   FIND_PATH(${_path_name} ${ARGN})
 
   IF(${_path_name} MATCHES "-NOTFOUND")
-    MESSAGE(STATUS "${_path_name} NOTFOUND! Call:")
+    MESSAGE(STATUS "${_path_name} not found! Call:")
     TO_STRING(_str ${ARGN})
     MESSAGE(STATUS "    FIND_PATH(${_path_name} ${_str})")
   ELSE()

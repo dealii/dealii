@@ -22,7 +22,7 @@ MACRO(DEAL_II_FIND_LIBRARY _library_name)
   FIND_LIBRARY(${_library_name} ${ARGN})
 
   IF(${_library_name} MATCHES "-NOTFOUND")
-    MESSAGE(STATUS "${_library_name} NOTFOUND! Call:")
+    MESSAGE(STATUS "${_library_name} not found! Call:")
     TO_STRING(_str ${ARGN})
     MESSAGE(STATUS "    FIND_LIBRARY(${_library_name} ${_str})")
   ELSE()

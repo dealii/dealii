@@ -22,7 +22,7 @@ MACRO(DEAL_II_FIND_FILE _file_name)
   FIND_FILE(${_file_name} ${ARGN})
 
   IF(${_file_name} MATCHES "-NOTFOUND")
-    MESSAGE(STATUS "${_file_name} NOTFOUND! Call:")
+    MESSAGE(STATUS "${_file_name} not found! Call:")
     TO_STRING(_str ${ARGN})
     MESSAGE(STATUS "    FIND_FILE(${_file_name} ${_str})")
   ELSE()

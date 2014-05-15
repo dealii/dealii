@@ -24,8 +24,7 @@
 # FIND_PACKAGE_HANDLE_STANDARD_ARGS macro shipped with CMake - aka do
 # everything that was expected from CMake in the first place *sigh*
 #
-# It's usage is
-# best explained with an example:
+# Its usage is best explained with an example:
 #
 #   DEAL_II_PACKAGE_HANDLE(PETSC
 #     LIBRARIES
