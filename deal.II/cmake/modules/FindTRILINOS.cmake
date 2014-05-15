@@ -79,6 +79,7 @@ ENDIF()
 #
 # Look for the one include file that we'll query for further information:
 #
+# TODO:
 IF(_new_trilinos_config)
   UNSET(EPETRA_CONFIG_H CACHE)
 ENDIF()
@@ -158,6 +159,7 @@ DEAL_II_PACKAGE_HANDLE(TRILINOS
     OPTIONAL MPI_CXX_LIBRARIES
   INCLUDE_DIRS
     REQUIRED Trilinos_INCLUDE_DIRS
+  CLEAR TRILINOS_CONFIG EPETRA_CONFIG_H ${_libraries}
   )
 
 IF(TRILINOS_FOUND)

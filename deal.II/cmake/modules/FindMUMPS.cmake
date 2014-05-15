@@ -29,14 +29,39 @@
 #
 
 SET(MUMPS_DIR "" CACHE PATH "An optional hint to a mumps directory")
+SET(SCALAPACK_DIR "" CACHE PATH "An optional hint to a SCALAPACK directory")
+SET(BLACS_DIR "" CACHE PATH "An optional hint to a BLACS directory")
 SET_IF_EMPTY(MUMPS_DIR "$ENV{MUMPS_DIR}")
+SET_IF_EMPTY(SCALAPACK_DIR "$ENV{SCALAPACK_DIR}")
+SET_IF_EMPTY(BLACS_DIR "$ENV{BLACS_DIR}")
 
 #
-# Search for all known dependencies of MUMPS:
-# (We'll rely on the user of FindMUMPS, setting up mpi *cough*)
+# Search for scalapack:
 #
-FIND_PACKAGE(SCALAPACK) # which will also include lapack and blas
 
+FIND_LIBRARY(SCALAPACK_LIBRARY NAMES scalapack
+  HINTS ${SCALAPACK_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  )
+
+#
+# Well, depending on the version of scalapack and the distribution it might
+# be necessary to search for blacs, too. So we do this in a very
+# probabilistic way...
+#
+FOREACH(_lib blacs blacsCinit blacsF77init)
+  STRING(TOUPPER "${_lib}" _lib_upper)
+  FIND_LIBRARY(${_lib_upper}_LIBRARY
+    NAMES ${_lib} ${_lib}_MPI-LINUX-0 ${_lib}_MPI-DARWIN-0
+    HINTS ${BLACS_DIR} ${SCALAPACK_DIR} ${SCALAPACK_DIR}/../blacs/
+    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib LIB
+  )
+  MARK_AS_ADVANCED(${_lib_upper}_LIBRARY)
+ENDFOREACH()
+
+#
+# Search for mumps:
+#
 
 FIND_PATH(MUMPS_INCLUDE_DIR dmumps_c.h
   HINTS ${MUMPS_DIR}
@@ -90,10 +115,14 @@ DEAL_II_PACKAGE_HANDLE(MUMPS
   LIBRARIES
     REQUIRED DMUMPS_LIBRARY MUMPS_COMMON_LIBRARY
     OPTIONAL PORD_LIBRARY
-    REQUIRED SCALAPACK_LIBRARIES
+    REQUIRED SCALAPACK_LIBRARY LAPACK_LIBRARIES
+    OPTIONAL BLACS_LIBRARY BLACSCINIT_LIBRARY BLACSF77INIT_LIBRARY MPI_Fortran_LIBRARIES
     OPTIONAL METIS_LIBRARIES MPI_Fortran_LIBRARIES
   INCLUDE_DIRS
     REQUIRED MUMPS_INCLUDE_DIR
   LINKER_FLAGS
-    OPTIONAL SCALAPACK_LINKER_FLAGS
+    OPTIONAL LAPACK_LINKER_FLAGS
+  CLEAR
+    DMUMPS_LIBRARY MUMPS_COMMON_LIBRARY PORD_LIBRARY SCALAPACK_LIBRARY
+    BLACS_LIBRARY BLACSCINIT_LIBRARY BLACSF77INIT_LIBRARY MUMPS_INCLUDE_DIR
   )

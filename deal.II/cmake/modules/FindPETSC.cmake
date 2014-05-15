@@ -183,6 +183,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
 
   SET(_hints)
   SET(_petsc_libraries)
+  SET(_cleanup_variables)
   FOREACH(_token ${PETSC_EXTERNAL_LINK_LINE}})
     IF(_token MATCHES "^-L")
       # Build up hints with the help of all tokens passed with -L:
@@ -192,6 +193,8 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
       # Search for every library that was specified with -l:
       STRING(REGEX REPLACE "^-l" "" _token "${_token}")
 
+      # TODO:
+      LIST(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
       IF(_new_petsc_external_link_line)
         UNSET(PETSC_LIBRARY_${_token} CACHE)
       ENDIF()
@@ -222,6 +225,9 @@ DEAL_II_PACKAGE_HANDLE(PETSC
   INCLUDE_DIRS
     REQUIRED PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
     OPTIONAL _petsc_includes
+  CLEAR
+    PETSC_LIBRARY PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
+    ${_cleanup_variables}
   )
 
 IF(PETSC_FOUND)
