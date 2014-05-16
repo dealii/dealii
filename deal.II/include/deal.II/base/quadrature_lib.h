@@ -435,6 +435,29 @@ private:
 
 
 
+/**
+ * Sorted Quadrature. Given an arbitrary quadrature formula, this
+ * class generates a quadrature formula where the quadrature points
+ * are ordered according the weights, from those with smaller
+ * corresponding weight, to those with higher corresponding weights.
+ * This might be necessary, for example, when integrating high order
+ * polynomials, since in these cases you might sum very big numbers
+ * with very small numbers, and summation is not stable if the numbers
+ * to sum are not close to each other.
+ */
+template <int dim>
+class QSorted : public Quadrature<dim>
+{
+public:
+  /** The constructor takes an arbitrary quadrature formula. */
+  QSorted (const Quadrature<dim>);
+  
+  /** A rule to reorder pairs of points and weights.*/
+  bool operator()(const std::pair<double, Point<dim> > &a,
+		  const std::pair<double, Point<dim> > &b);
+};
+
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */

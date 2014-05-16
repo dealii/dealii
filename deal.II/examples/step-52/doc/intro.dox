@@ -1,0 +1,102 @@
+<br>
+
+<i>This program was contributed by Bruno Turcksin and Damien Lebrun-Grandie.</i>
+
+<a name="Intro"></a>
+<h1>Introducion</h1>
+
+This program shows how to use Runge-Kutta methods to solve a time-dependent
+problem.
+
+<h3>Problem statement<h3>
+
+In this example, we solve the energy-integrated time-dependent diffusion
+approximation of the neutron transport equation (see step-28 for the
+time-independent multigroup diffusion). We assume that the medium is not
+fissible and therefore, the neutron flux satisfies the following equation:
+@f{eqnarray*}
+\frac{1}{v}\frac{\partial \phi(x,t)}{\partial t} = \nabla D(x) \nabla \phi(x,t)
+- \Sigma_a(x) \phi(x,t) + S(x,t)
+@f}
+augmented by appropriate boundary conditions. Here, $v$ is the velocity of
+neutrons, $D$ is the diffusion coefficient, $\Sigma_a$ is the <i>absorption
+cross section</i>, and $S$ is a source. Because we are only interested in the
+time dependence, we assume that $D$ and $\Sigma_a$ are constant. In this
+example, we are only interested in the error in time and thus, we are looking
+for a solution of the form:
+@f{eqnarray*}
+\phi(x,t) = A\sin(\omega t)(bx-x^2).
+@f}
+By using quadratic finite elements, we will not have any spatial error. We
+impose the following boundary conditions: homogeneous Dirichlet fo $x=0$ and
+$x=b$ and homogeneous Neumann conditions for $y=0$ and $y=b$. The source is
+given by:
+@f{eqnarray*}
+S=A\left(\frac{1}{v}\omega \cos(\omega t)(bx -x^2) + \sin(\omega t)
+\left(\Sigma_a (bx-x^2)+2D\right) \right).
+@f}
+Because the solution is a sine, we know that
+\f$\phi\left(x,\frac{\pi}{\omega}\right) = 0$. Therefore, we can easily
+compute the error at this time since it is simply the norm of the solution
+found.
+
+<h3>Runge-Kutta</h3>
+
+The Runke-Kutta methods implemented in deal.II assume that the equation to be
+solved can be written as:
+@f{eqnarray*}
+\frac{dy}{dt} = f(t,y).
+@f}
+When using finite elements, the previous equation becomes:
+@f{eqnarray*}
+M\frac{dy}{dt} = f(t,y),
+@f}
+where $M$ is the mass matrix. Therefore, we have:
+@f{eqnarray*}
+\frac{dy}{dt} = M^{-1}f(t,y).
+@f}
+Runke-Kutta methods can be written as:
+@f{eqnarray*}
+y_{n+1} = y_n + \sum_{i=1}^s b_i k_i
+@f}
+where
+@f{eqnarray*}
+k_i = h M^{-1} f(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j)
+@f}
+with $a_{ij}$, $b_i$, and $c_i$ are known coefficient and $h$ is the time step
+used. The methods currently implemented in deal.II can be divided in three
+categories:
+<ol>
+<li> explicit Runge-Kutta
+<li> embedded (or adaptive) Runge-Kutta
+<li> implicit Runge-Kutta
+</ol> 
+
+<h4>Explicit Runge-Kutta</h4>
+These methods that include for forward Euler, third order Runge-Kutta, and
+fourth order Runge-Kutta, require a function to evaluate $M^{-1}f(t,y). These
+methods become unstable when the time step chosen is too large.
+
+<h4>Embedded Runge-Kutta</h4>
+These methods include Heun-Euler, Bogacki-Shampine, Dormand-Prince (ode45 in
+Matlab), Fehlberg, and Cash-Karp. These methods use a low order method to
+estimate the error and decide if the time step needs to be refined or it can be
+coarsen. Only embedded explicit methods have been implemented so far.
+
+<h4>Implicit Runge-Kutta</h4>
+These methods include backward Euler, implicit midpoint, Crank-Nicolson, and the
+two stages SDIRK. These methods require to evaluate $M^{-1}f(t,y)$ and
+$\left(I-\Delta t M^{-1} \frac{\partial f}{\partial Y}\right) = \left(M - \Delta
+t \frac{\partial f}{\partial y}\right)^{-1} M$. These methods are always stable.
+
+<h3>Remarks</h3>
+To simplify the problem, we solve the domain in two dimensional and the mesh is
+uniform (there is no need to adapt the mesh since we use quadratic finite
+elements and the exact solution is quadratic). Going from a two dimensional
+domain to a three dimensional domain is not very challenging. However if the
+mesh must be adapted, we cannot forget to:
+<ol>
+<li> project the solution to the new mesh when the mesh is changed. The mesh
+used should be the same at the beginning and at the end of the time step.
+<li> update the mass matrix and its inverse.
+</ol>

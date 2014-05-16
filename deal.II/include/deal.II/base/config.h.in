@@ -282,46 +282,44 @@
 #ifdef DEAL_II_WITH_LAPACK
 /** Compatibility definition (with naming from deal.II < 8.0): */
 #  define HAVE_LIBLAPACK
-
-/* Defined if the corresponding BLAS or LAPACK function is available */
-#cmakedefine HAVE_DAXPY_
-#cmakedefine HAVE_DGEEVX_
-#cmakedefine HAVE_DGEEV_
-#cmakedefine HAVE_DGELSD_
-#cmakedefine HAVE_DGEMM_
-#cmakedefine HAVE_DGEMV_
-#cmakedefine HAVE_DGEQRF_
-#cmakedefine HAVE_DGESDD_
-#cmakedefine HAVE_DGESVD_
-#cmakedefine HAVE_DGETRF_
-#cmakedefine HAVE_DGETRI_
-#cmakedefine HAVE_DGETRS_
-#cmakedefine HAVE_DORGQR_
-#cmakedefine HAVE_DORMQR_
-#cmakedefine HAVE_DSTEV_
-#cmakedefine HAVE_DSYEVX_
-#cmakedefine HAVE_DSYGV_
-#cmakedefine HAVE_DSYGVX_
-#cmakedefine HAVE_DTRTRS_
-#cmakedefine HAVE_SAXPY_
-#cmakedefine HAVE_SGEEVX_
-#cmakedefine HAVE_SGEEV_
-#cmakedefine HAVE_SGELSD_
-#cmakedefine HAVE_SGEMM_
-#cmakedefine HAVE_SGEMV_
-#cmakedefine HAVE_SGEQRF_
-#cmakedefine HAVE_SGESDD_
-#cmakedefine HAVE_SGESVD_
-#cmakedefine HAVE_SGETRF_
-#cmakedefine HAVE_SGETRI_
-#cmakedefine HAVE_SGETRS_
-#cmakedefine HAVE_SORGQR_
-#cmakedefine HAVE_SORMQR_
-#cmakedefine HAVE_SSTEV_
-#cmakedefine HAVE_SSYEVX_
-#cmakedefine HAVE_SSYGV_
-#cmakedefine HAVE_SSYGVX_
-#cmakedefine HAVE_STRTRS_
+#  define HAVE_DAXPY_
+#  define HAVE_DGEEVX_
+#  define HAVE_DGEEV_
+#  define HAVE_DGELSD_
+#  define HAVE_DGEMM_
+#  define HAVE_DGEMV_
+#  define HAVE_DGEQRF_
+#  define HAVE_DGESDD_
+#  define HAVE_DGESVD_
+#  define HAVE_DGETRF_
+#  define HAVE_DGETRI_
+#  define HAVE_DGETRS_
+#  define HAVE_DORGQR_
+#  define HAVE_DORMQR_
+#  define HAVE_DSTEV_
+#  define HAVE_DSYEVX_
+#  define HAVE_DSYGV_
+#  define HAVE_DSYGVX_
+#  define HAVE_DTRTRS_
+#  define HAVE_SAXPY_
+#  define HAVE_SGEEVX_
+#  define HAVE_SGEEV_
+#  define HAVE_SGELSD_
+#  define HAVE_SGEMM_
+#  define HAVE_SGEMV_
+#  define HAVE_SGEQRF_
+#  define HAVE_SGESDD_
+#  define HAVE_SGESVD_
+#  define HAVE_SGETRF_
+#  define HAVE_SGETRI_
+#  define HAVE_SGETRS_
+#  define HAVE_SORGQR_
+#  define HAVE_SORMQR_
+#  define HAVE_SSTEV_
+#  define HAVE_SSYEVX_
+#  define HAVE_SSYGV_
+#  define HAVE_SSYGVX_
+#  define HAVE_STRTRS_
 #endif
 
 

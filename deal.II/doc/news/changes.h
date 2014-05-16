@@ -148,6 +148,70 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: AnyData::try_read() is a function that allows users to check
+whether an entry exists and get a pointer to it without throwing an
+exception in case of failure.
+<br>
+(Guido Kanschat, 2014/05/16)
+</li>
+
+<li> New: The GMRES solver of deal.II can now write an estimate of
+  eigenvalues to the log file, in analogy to the CG solver. This is enabled
+  by the flag SolverGMRES<>::AdditionalData::compute_eigenvalues.
+  <br>
+  (Martin Kronbichler, 2014/05/11)
+  </li>  
+
+  <li> New: The GridIn::read_vtk() function places fewer restrictions
+  on the VTK files it wants to read and should, consequently, be able
+  to read more correctly formatted VTK files than before.
+  <br>
+  (Giorgos Kourakos, 2014/05/08)
+  </li>  
+
+  <li> New: There is now a QSorted quadrature which takes an 
+  arbitrary quadrature at construction time and reorders the quadrature
+  points according to the weigths, from smaller to bigger. This should
+  improve stability of higher order polynomial integration.
+  <br>
+  (Luca Heltai, 2014/05/07)
+  </li>  
+
+  <li> New: The class VectorizedArray<Number> now provides methods
+  VectorizedArray::load(ptr) to read from arbitrary pointer addresses and
+  VectorizedArray::store(ptr) to write to arbitrary pointer addresses,
+  as opposed to the data layout of VectorizedArray that requires pointers
+  to be aligned by the size of the array in bytes. This also circumvents
+  a (rare) compiler optimization bug with gcc-4.6 on SSE code in combination
+  with function calls, e.g. to std::sin.
+  <br>
+  (Martin Kronbichler, 2014/05/05)
+  </li>
+
+  <li> Changed: Namespace SparsityTools had a local typedef <code>size_type</code>
+  that was set equal to types::global_dof_index. This typedef has been removed
+  and we now use SparsityPattern::size_type wherever applicable as this is the
+  type we really want to use. (The code worked previously because
+  types::global_dof_index and SparsityPattern::size_type happen to be the same
+  as far as the underlying type is concerned; however, they are different
+  semantically.)
+  <br>
+  (Wolfgang Bangerth, 2014/05/04)
+  </li>
+
+  <li> Updated: The step-16 tutorial program was updated to the new layout
+  multigrid objects and thus avoids using deprecated interfaces.
+  <br>
+  (Martin Kronbichler, 2014/05/03)
+  </li>
+
+  <li> Fixed: FE_DGQArbitraryNodes::has_support_on_face was broken when
+  polynomials with support points not on the element boundary were used.
+  This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/04/30)
+  </li>
+
   <li> Fixed: parallel::distributed::Triangulation::load now has an
   additional parameter <code>autopartition</code> to control p4est's behavior of
   rebalancing triangulations between MPI nodes upon reading. It is

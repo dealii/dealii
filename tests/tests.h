@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/multithread_info.h>
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
@@ -32,6 +33,13 @@
 #include <sstream>
 #include <iomanip>
 
+
+// implicitly use the deal.II namespace everywhere, without us having to say
+// so in each and every testcase
+using namespace dealii;
+
+
+// ------------------------------ Utility functions used in tests -----------------------
 
 // Cygwin has a different implementation for rand() which causes many tests to fail.
 // This here is a reimplementation that gives the same sequence of numbers as a program
@@ -89,7 +97,7 @@ void srand(int seed) throw()
 
 // given the name of a file, copy it to deallog
 // and then delete it
-inline void cat_file(const char *filename)
+void cat_file(const char *filename)
 {
   std::ifstream in(filename);
   Assert (in, dealii::ExcIO());
@@ -106,47 +114,104 @@ inline void cat_file(const char *filename)
 }
 
 
+/*
+ * Some tests (notably base/thread*, base/task*) create output that
+ * comes out in random order. To make the output of these tests comparable,
+ * we need to sort them.
+ *
+ * This function does just that with the file given. All streams writing
+ * to this should be closed when calling this function.
+ */
+void sort_file_contents (const std::string &filename)
+{
+  int error = std::system ((std::string ("LC_ALL=C sort ") + filename + " -o " + filename).c_str());
+  Assert (error == 0, ExcInternalError());
+}
+
+
+
+/*
+ * Replace all occurences of ' &' by '& ' from the given file to hopefully be
+ * more compiler independent with respect to __PRETTY_FUNCTION__
+ *
+ * Also, while GCC prepends the name by "virtual " if the function is virtual,
+ * Intel's ICC does not do that, so filter that out as well.
+ */
+void unify_pretty_function (const std::string &filename)
+{
+  int error = std::system ((std::string ("sed -i -e 's/ \\&/ \\& /g' -e 's/ & ,/\\&,/g' -e 's/ \\& )/\\&)/g' -e 's/ \\& /\\& /g' -e 's/^DEAL::virtual /DEAL::/g' ") + filename).c_str());
+
+  Assert (error == 0, ExcInternalError());
+}
+
+
+// ------------------------------ Functions used in initializing subsystems -------------------
+
+
+/*
+ * If we run 64 tests at the same time on a 64-core system, and
+ * each of them runs 64 threads, then we get astronomical loads.
+ * Limit concurrency to a fixed (small) number of threads, independent
+ * of the core count.
+ *
+ * Note that we can't do this if we run in MPI mode because then
+ * MPI_InitFinalize already calls this function. Since every test
+ * calls MPI_InitFinalize itself, we can't adjust the thread count
+ * for this here.
+ */
+#ifndef DEAL_II_WITH_MPI
+struct LimitConcurrency
+{
+  LimitConcurrency ()
+  {
+    multithread_info.set_thread_limit (5);
+  }
+} limit_concurrency;
+#endif
+
+
 
 #ifdef DEAL_II_WITH_PETSC
 #include <petscsys.h>
 
-inline void check_petsc_allocations()
+namespace
 {
-  PetscStageLog stageLog;
-  PetscLogGetStageLog(&stageLog);
+  void check_petsc_allocations()
+  {
+    PetscStageLog stageLog;
+    PetscLogGetStageLog(&stageLog);
 
-  // I don't quite understand petsc and it looks like stageLog->stageInfo->classLog->classInfo[i].id
-  // is always -1, so we look it up in stageLog->classLog, make sure it has the same number of entries:
-  Assert(stageLog->stageInfo->classLog->numClasses == stageLog->classLog->numClasses, dealii::ExcInternalError());
+    // I don't quite understand petsc and it looks like
+    // stageLog->stageInfo->classLog->classInfo[i].id is always -1, so we look
+    // it up in stageLog->classLog, make sure it has the same number of entries:
+    Assert(stageLog->stageInfo->classLog->numClasses == stageLog->classLog->numClasses,
+	   dealii::ExcInternalError());
 
-  bool errors = false;
-  for (int i=0;i<stageLog->stageInfo->classLog->numClasses;++i)
-    {
-      if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
-          stageLog->stageInfo->classLog->classInfo[i].creations)
-        {
-          errors = true;
-          std::cerr << "ERROR: PETSc objects leaking of type '"
-                    << stageLog->classLog->classInfo[i].name << "'"
-                    << " with "
-                    << stageLog->stageInfo->classLog->classInfo[i].creations
-                    << " creations and only "
-                    << stageLog->stageInfo->classLog->classInfo[i].destructions
-                    << " destructions." << std::endl;
-        }
-    }
+    bool errors = false;
+    for (int i=0;i<stageLog->stageInfo->classLog->numClasses;++i)
+      {
+	if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
+	    stageLog->stageInfo->classLog->classInfo[i].creations)
+	  {
+	    errors = true;
+	    std::cerr << "ERROR: PETSc objects leaking of type '"
+		      << stageLog->classLog->classInfo[i].name << "'"
+		      << " with "
+		      << stageLog->stageInfo->classLog->classInfo[i].creations
+		      << " creations and only "
+		      << stageLog->stageInfo->classLog->classInfo[i].destructions
+		      << " destructions." << std::endl;
+	  }
+      }
 
-  if (errors)
-    throw dealii::ExcMessage("PETSc memory leak");
+    if (errors)
+      throw dealii::ExcMessage("PETSc memory leak");
+  }
 }
 #endif
 
 
-// implicitly use the deal.II namespace everywhere, without us having to say
-// so in each and every testcase
-using namespace dealii;
-
-// Function for initialize deallog. Normally, it should be called at
+// Function to initialize deallog. Normally, it should be called at
 // the beginning of main() like
 //
 // initlog();
@@ -157,7 +222,6 @@ using namespace dealii;
 std::string deallogname;
 std::ofstream deallogfile;
 
-inline
 void
 initlog(bool console=false)
 {
@@ -271,40 +335,55 @@ struct MPILogInitAll
 
 
 
-/*
- * Some tests (notably base/thread*, base/task*) create output that
- * comes out in random order. To make the output of these tests comparable,
- * we need to sort them.
- *
- * This function does just that with the file given. All streams writing
- * to this should be closed when calling this function.
- */
-void sort_file_contents (const std::string &filename)
+/* Override the tbb assertion handler in order to print a stacktrace:*/
+
+#ifdef TBB_DO_ASSERT
+
+#include <tbb/tbb_stddef.h>
+
+DEAL_II_NAMESPACE_OPEN
+namespace deal_II_exceptions
 {
-  int error = std::system ((std::string ("LC_ALL=C sort ") + filename + " -o " + filename).c_str());
-  Assert (error == 0, ExcInternalError());
+  extern bool abort_on_exception;
+  extern bool show_stacktrace;
+}
+DEAL_II_NAMESPACE_CLOSE
+
+
+void new_tbb_assertion_handler(const char *file, int line, const char *expr,
+                               const char *comment)
+{
+  // Print out the original assertion message
+  std::cerr << "TBB assertion:" << std::endl;
+  std::cerr << "Assertion " << expr << " failed on line " << line << " of file "
+            << file << std::endl;
+  std::cerr << "Detailed description: " << comment << std::endl;
+
+  // Reenable abort and stacktraces:
+  deal_II_exceptions::abort_on_exception = true;
+  deal_II_exceptions::show_stacktrace = true;
+
+  // And abort with a deal.II exception:
+  Assert(false, ExcMessage("TBB Exception, see above"));
 }
 
-
-
-/*
- * Replace all occurences of ' &' by '& ' from the given file to hopefully be
- * more compiler independent with respect to __PRETTY_FUNCTION__
- *
- * Also, while GCC prepends the name by "virtual " if the function is virtual,
- * Intel's ICC does not do that, so filter that out as well.
- */
-void unify_pretty_function (const std::string &filename)
+struct SetTBBAssertionHandler
 {
-  int error = std::system ((std::string ("sed -i -e 's/ \\&/ \\& /g' -e 's/ & ,/\\&,/g' -e 's/ \\& )/\\&)/g' -e 's/ \\& /\\& /g' -e 's/^DEAL::virtual /DEAL::/g' ") + filename).c_str());
+  SetTBBAssertionHandler ()
+  {
+    ::tbb::set_assertion_handler(new_tbb_assertion_handler);
+  }
+} set_tbb_assertion_handler;
 
-  Assert (error == 0, ExcInternalError());
-}
+#endif /*TBB_DO_ASSERT*/
+
+
+// ------------------------------ Adjust global variables in deal.II -----------------------
 
 
 DEAL_II_NAMESPACE_OPEN
 /*
- * Now, change some global behaviour of deal.II and supporting libraries:
+ * Now, change some global behavior of deal.II and supporting libraries:
  */
 
 /* Disable stack traces: */
@@ -342,47 +421,6 @@ struct SetGrainSizes
     internal::SparseMatrix::minimum_parallel_grain_size = 2;
   }
 } set_grain_sizes;
-
-
-/* Override the tbb assertion handler in order to print a stacktrace:*/
-
-#ifdef TBB_DO_ASSERT
-
-#include <tbb/tbb_stddef.h>
-
-namespace deal_II_exceptions
-{
-  extern bool abort_on_exception;
-  extern bool show_stacktrace;
-}
-
-void new_tbb_assertion_handler(const char *file, int line, const char *expr,
-                               const char *comment)
-{
-  // Print out the original assertion message
-  std::cerr << "TBB assertion:" << std::endl;
-  std::cerr << "Assertion " << expr << " failed on line " << line << " of file "
-            << file << std::endl;
-  std::cerr << "Detailed description: " << comment << std::endl;
-
-  // Reenable abort and stacktraces:
-  deal_II_exceptions::abort_on_exception = true;
-  deal_II_exceptions::show_stacktrace = true;
-
-  // And abort with a deal.II exception:
-  Assert(false, ExcMessage("TBB Exception, see above"));
-}
-
-struct SetTBBAssertionHandler
-{
-  SetTBBAssertionHandler ()
-  {
-    ::tbb::set_assertion_handler(new_tbb_assertion_handler);
-  }
-} set_tbb_assertion_handler;
-
-#endif /*TBB_DO_ASSERT*/
-
 
 DEAL_II_NAMESPACE_CLOSE
 

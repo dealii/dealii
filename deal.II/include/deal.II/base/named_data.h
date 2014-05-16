@@ -26,6 +26,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+class AnyData;
 
 /**
  * @deprecated The use of this class is deprecated and AnyData should
@@ -206,6 +207,13 @@ public:
    */
   template <typename DATA>
   void initialize(const NamedData<DATA> &data);
+
+  /**
+   * Create the index vector
+   * pointing into the AnyData
+   * object.
+   */
+  void initialize(const AnyData &data);
 
   /**
    * The number of names in this

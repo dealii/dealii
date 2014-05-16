@@ -37,7 +37,7 @@ SET(PETSC_ARCH "" CACHE STRING "An optional hint to a PETSc arch")
 SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
 SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
-FIND_LIBRARY(PETSC_LIBRARY
+DEAL_II_FIND_LIBRARY(PETSC_LIBRARY
   NAMES petsc
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
@@ -47,7 +47,7 @@ FIND_LIBRARY(PETSC_LIBRARY
 # Search for the first part of the includes:
 #
 
-FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
+DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_INCLUDE_DIRS}
   PATH_SUFFIXES petsc include include/petsc
 )
@@ -102,7 +102,7 @@ ENDIF()
 # Either way, we must be able to find petscversion.h:
 #
 
-FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
+DEAL_II_FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
   HINTS ${PETSC_DIR} ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_INCLUDE_DIRS}
   PATH_SUFFIXES petsc include include/petsc
 )
@@ -140,7 +140,7 @@ ENDIF()
 # that file:
 #
 
-FIND_FILE(PETSC_PETSCVARIABLES
+DEAL_II_FIND_FILE(PETSC_PETSCVARIABLES
   NAMES petscvariables
   HINTS ${PETSC_DIR}/${PETSC_ARCH} ${PETSC_DIR}
   PATH_SUFFIXES conf
@@ -176,13 +176,9 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
     REGEX "^PETSC_WITH_EXTERNAL_LIB =.*")
   SEPARATE_ARGUMENTS(PETSC_EXTERNAL_LINK_LINE)
 
-  IF(NOT "${PETSC_EXTERNAL_LINK_LINE}" STREQUAL "${PETSC_EXTERNAL_LINK_LINE_SAVED}")
-    SET(_new_petsc_external_link_line TRUE)
-  ENDIF()
-  SET(PETSC_EXTERNAL_LINK_LINE_SAVED "${PETSC_EXTERNAL_LINK_LINE}" CACHE INTERNAL "" FORCE)
-
   SET(_hints)
   SET(_petsc_libraries)
+  SET(_cleanup_variables)
   FOREACH(_token ${PETSC_EXTERNAL_LINK_LINE}})
     IF(_token MATCHES "^-L")
       # Build up hints with the help of all tokens passed with -L:
@@ -192,9 +188,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
       # Search for every library that was specified with -l:
       STRING(REGEX REPLACE "^-l" "" _token "${_token}")
 
-      IF(_new_petsc_external_link_line)
-        UNSET(PETSC_LIBRARY_${_token} CACHE)
-      ENDIF()
+      LIST(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
 
       IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
         FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
@@ -202,7 +196,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
           LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
         ENDIF()
       ELSEIF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
-        FIND_LIBRARY(PETSC_LIBRARY_${_token}
+        DEAL_II_FIND_LIBRARY(PETSC_LIBRARY_${_token}
           NAMES ${_token}
           HINTS ${_hints}
           )
@@ -222,8 +216,16 @@ DEAL_II_PACKAGE_HANDLE(PETSC
   INCLUDE_DIRS
     REQUIRED PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
     OPTIONAL _petsc_includes
+  USER_INCLUDE_DIRS
+    REQUIRED PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
+    OPTIONAL _petsc_includes
+  CLEAR
+    PETSC_LIBRARY PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
+    PETSC_PETSCVARIABLES ${_cleanup_variables}
   )
 
 IF(PETSC_FOUND)
   MARK_AS_ADVANCED(PETSC_ARCH)
+ELSE()
+  MARK_AS_ADVANCED(CLEAR PETSC_ARCH)
 ENDIF()

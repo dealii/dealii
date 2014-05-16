@@ -192,26 +192,10 @@ namespace Step27
 
   // @sect4{LaplaceProblem::setup_system}
   //
-  // This function is again an almost verbatim copy of what we already did in
-  // step-6. The first change is that we append the Dirichlet boundary
-  // conditions to the ConstraintMatrix object, which we consequently call
-  // just <code>constraints</code> instead of
-  // <code>hanging_node_constraints</code>. The second difference is that we
-  // don't directly build the sparsity pattern, but first create an
-  // intermediate object that we later copy into the usual SparsityPattern
-  // data structure, since this is more efficient for the problem with many
-  // entries per row (and different number of entries in different rows). In
-  // another slight deviation, we do not first build the sparsity pattern and
-  // then condense away constrained degrees of freedom, but pass the
-  // constraint matrix object directly to the function that builds the
-  // sparsity pattern. We disable the insertion of constrained entries with
-  // <tt>false</tt> as fourth argument in the DoFTools::make_sparsity_pattern
-  // function. All of these changes are explained in the introduction of this
-  // program.
-  //
-  // The last change, maybe hidden in plain sight, is that the dof_handler
-  // variable here is an hp object -- nevertheless all the function calls we
-  // had before still work in exactly the same way as they always did.
+  // This function is again a verbatim copy of what we already did in
+  // step-6. Despite function calls with exactly the same names and arguments,
+  // the algorithms used internally are different in some aspect since the
+  // dof_handler variable here is an hp object.
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
@@ -324,12 +308,6 @@ namespace Step27
                                                 local_dof_indices,
                                                 system_matrix, system_rhs);
       }
-
-    // Now with the loop over all cells finished, we are done for this
-    // function. The steps we still had to do at this point in earlier
-    // tutorial programs, namely condensing hanging node constraints and
-    // applying Dirichlet boundary conditions, have been taken care of by the
-    // ConstraintMatrix object <code>constraints</code> on the fly.
   }
 
 

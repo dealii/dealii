@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,7 +94,7 @@ namespace SparsityTools
     int_rowstart.reserve(sparsity_pattern.n_rows()+1);
     std::vector<idx_t> int_colnums;
     int_colnums.reserve(sparsity_pattern.n_nonzero_elements());
-    for (size_type row=0; row<sparsity_pattern.n_rows(); ++row)
+    for (SparsityPattern::size_type row=0; row<sparsity_pattern.n_rows(); ++row)
       {
         for (SparsityPattern::iterator col=sparsity_pattern.begin(row);
              col < sparsity_pattern.end(row); ++col)
@@ -147,14 +147,14 @@ namespace SparsityTools
      * invalid_size_type indicates that a node has not been numbered yet),
      * pick a valid starting index among the as-yet unnumbered one.
      */
-    size_type
+    SparsityPattern::size_type
     find_unnumbered_starting_index (const SparsityPattern     &sparsity,
-                                    const std::vector<size_type> &new_indices)
+                                    const std::vector<SparsityPattern::size_type> &new_indices)
     {
       {
-        size_type starting_point   = numbers::invalid_size_type;
-        size_type min_coordination = sparsity.n_rows();
-        for (size_type row=0; row<sparsity.n_rows(); ++row)
+        SparsityPattern::size_type starting_point   = numbers::invalid_size_type;
+        SparsityPattern::size_type min_coordination = sparsity.n_rows();
+        for (SparsityPattern::size_type row=0; row<sparsity.n_rows(); ++row)
           // look over all as-yet unnumbered indices
           if (new_indices[row] == numbers::invalid_size_type)
             {
@@ -166,7 +166,7 @@ namespace SparsityTools
                   break;
               // post-condition after loop: coordination, i.e. the number of
               // entries in this row is now j-rowstart[row]
-              if (static_cast<size_type>(j-sparsity.begin(row)) <
+              if (static_cast<SparsityPattern::size_type>(j-sparsity.begin(row)) <
                   min_coordination)
                 {
                   min_coordination = j-sparsity.begin(row);
@@ -183,7 +183,7 @@ namespace SparsityTools
         // starting point, e.g. the first unnumbered one
         if (starting_point == numbers::invalid_size_type)
           {
-            for (size_type i=0; i<new_indices.size(); ++i)
+            for (SparsityPattern::size_type i=0; i<new_indices.size(); ++i)
               if (new_indices[i] == numbers::invalid_size_type)
                 {
                   starting_point = i;
@@ -201,9 +201,9 @@ namespace SparsityTools
 
 
   void
-  reorder_Cuthill_McKee (const SparsityPattern     &sparsity,
-                         std::vector<size_type> &new_indices,
-                         const std::vector<size_type> &starting_indices)
+  reorder_Cuthill_McKee (const SparsityPattern                         &sparsity,
+                         std::vector<SparsityPattern::size_type>       &new_indices,
+                         const std::vector<SparsityPattern::size_type> &starting_indices)
   {
     Assert (sparsity.n_rows() == sparsity.n_cols(),
             ExcDimensionMismatch (sparsity.n_rows(), sparsity.n_cols()));
@@ -211,26 +211,26 @@ namespace SparsityTools
             ExcDimensionMismatch (sparsity.n_rows(), new_indices.size()));
     Assert (starting_indices.size() <= sparsity.n_rows(),
             ExcMessage ("You can't specify more starting indices than there are rows"));
-    for (size_type i=0; i<starting_indices.size(); ++i)
+    for (SparsityPattern::size_type i=0; i<starting_indices.size(); ++i)
       Assert (starting_indices[i] < sparsity.n_rows(),
               ExcMessage ("Invalid starting index"));
 
     // store the indices of the dofs renumbered in the last round. Default to
     // starting points
-    std::vector<size_type> last_round_dofs (starting_indices);
+    std::vector<SparsityPattern::size_type> last_round_dofs (starting_indices);
 
     // initialize the new_indices array with invalid values
     std::fill (new_indices.begin(), new_indices.end(),
                numbers::invalid_size_type);
 
     // delete disallowed elements
-    for (size_type i=0; i<last_round_dofs.size(); ++i)
+    for (SparsityPattern::size_type i=0; i<last_round_dofs.size(); ++i)
       if ((last_round_dofs[i]==numbers::invalid_size_type) ||
           (last_round_dofs[i]>=sparsity.n_rows()))
         last_round_dofs[i] = numbers::invalid_size_type;
 
     std::remove_if (last_round_dofs.begin(), last_round_dofs.end(),
-                    std::bind2nd(std::equal_to<size_type>(),
+                    std::bind2nd(std::equal_to<SparsityPattern::size_type>(),
                                  numbers::invalid_size_type));
 
     // now if no valid points remain: find dof with lowest coordination number
@@ -240,10 +240,10 @@ namespace SparsityTools
                                                             new_indices));
 
     // store next free dof index
-    size_type next_free_number = 0;
+    SparsityPattern::size_type next_free_number = 0;
 
     // enumerate the first round dofs
-    for (size_type i=0; i!=last_round_dofs.size(); ++i)
+    for (SparsityPattern::size_type i=0; i!=last_round_dofs.size(); ++i)
       new_indices[last_round_dofs[i]] = next_free_number++;
 
     // now do as many steps as needed to
@@ -252,12 +252,12 @@ namespace SparsityTools
       {
         // store the indices of the dofs to be
         // renumbered in the next round
-        std::vector<size_type> next_round_dofs;
+        std::vector<SparsityPattern::size_type> next_round_dofs;
 
         // find all neighbors of the
         // dofs numbered in the last
         // round
-        for (size_type i=0; i<last_round_dofs.size(); ++i)
+        for (SparsityPattern::size_type i=0; i<last_round_dofs.size(); ++i)
           for (SparsityPattern::iterator j=sparsity.begin(last_round_dofs[i]);
                j<sparsity.end(last_round_dofs[i]); ++j)
             if (j->is_valid_entry() == false)
@@ -269,7 +269,7 @@ namespace SparsityTools
         std::sort (next_round_dofs.begin(), next_round_dofs.end());
 
         // delete multiple entries
-        std::vector<size_type>::iterator end_sorted;
+        std::vector<SparsityPattern::size_type>::iterator end_sorted;
         end_sorted = std::unique (next_round_dofs.begin(), next_round_dofs.end());
         next_round_dofs.erase (end_sorted, next_round_dofs.end());
 
@@ -332,14 +332,14 @@ namespace SparsityTools
         // store for each coordination
         // number the dofs with these
         // coordination number
-        std::multimap<size_type, int> dofs_by_coordination;
+        std::multimap<SparsityPattern::size_type, int> dofs_by_coordination;
 
         // find coordination number for
         // each of these dofs
-        for (std::vector<size_type>::iterator s=next_round_dofs.begin();
+        for (std::vector<SparsityPattern::size_type>::iterator s=next_round_dofs.begin();
              s!=next_round_dofs.end(); ++s)
           {
-            size_type coordination = 0;
+            SparsityPattern::size_type coordination = 0;
             for (SparsityPattern::iterator j=sparsity.begin(*s);
                  j<sparsity.end(*s); ++j)
               if (j->is_valid_entry() == false)
@@ -349,14 +349,14 @@ namespace SparsityTools
 
             // insert this dof at its
             // coordination number
-            const std::pair<const size_type, int> new_entry (coordination, *s);
+            const std::pair<const SparsityPattern::size_type, int> new_entry (coordination, *s);
             dofs_by_coordination.insert (new_entry);
           }
 
         // assign new DoF numbers to
         // the elements of the present
         // front:
-        std::multimap<size_type, int>::iterator i;
+        std::multimap<SparsityPattern::size_type, int>::iterator i;
         for (i = dofs_by_coordination.begin(); i!=dofs_by_coordination.end(); ++i)
           new_indices[i->second] = next_free_number++;
 
@@ -382,27 +382,27 @@ namespace SparsityTools
 #ifdef DEAL_II_WITH_MPI
   template <class CSP_t>
   void distribute_sparsity_pattern(CSP_t &csp,
-                                   const std::vector<size_type> &rows_per_cpu,
+                                   const std::vector<typename CSP_t::size_type> &rows_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange)
   {
-    size_type myid = Utilities::MPI::this_mpi_process(mpi_comm);
-    std::vector<size_type> start_index(rows_per_cpu.size()+1);
+    const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
+    std::vector<typename CSP_t::size_type> start_index(rows_per_cpu.size()+1);
     start_index[0]=0;
-    for (size_type i=0; i<rows_per_cpu.size(); ++i)
+    for (typename CSP_t::size_type i=0; i<rows_per_cpu.size(); ++i)
       start_index[i+1]=start_index[i]+rows_per_cpu[i];
 
-    typedef std::map<size_type, std::vector<size_type> > map_vec_t;
+    typedef std::map<typename CSP_t::size_type, std::vector<typename CSP_t::size_type> > map_vec_t;
 
     map_vec_t send_data;
 
     {
       unsigned int dest_cpu=0;
 
-      size_type n_local_rel_rows = myrange.n_elements();
-      for (size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
+      typename CSP_t::size_type n_local_rel_rows = myrange.n_elements();
+      for (typename CSP_t::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
         {
-          size_type row=myrange.nth_index_in_set(row_idx);
+          typename CSP_t::size_type row=myrange.nth_index_in_set(row_idx);
 
           //calculate destination CPU
           while (row>=start_index[dest_cpu+1])
@@ -415,21 +415,21 @@ namespace SparsityTools
               continue;
             }
 
-          size_type rlen = csp.row_length(row);
+          typename CSP_t::size_type rlen = csp.row_length(row);
 
           //skip empty lines
           if (!rlen)
             continue;
 
           //save entries
-          std::vector<size_type> &dst = send_data[dest_cpu];
+          std::vector<typename CSP_t::size_type> &dst = send_data[dest_cpu];
 
           dst.push_back(rlen); // number of entries
           dst.push_back(row); // row index
-          for (size_type c=0; c<rlen; ++c)
+          for (typename CSP_t::size_type c=0; c<rlen; ++c)
             {
               //columns
-              size_type column = csp.column_number(row, c);
+              typename CSP_t::size_type column = csp.column_number(row, c);
               dst.push_back(column);
             }
         }
@@ -440,7 +440,7 @@ namespace SparsityTools
     {
       std::vector<unsigned int> send_to;
       send_to.reserve(send_data.size());
-      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
+      for (typename map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
         send_to.push_back(it->first);
 
       num_receive =
@@ -454,7 +454,7 @@ namespace SparsityTools
     // send data
     {
       unsigned int idx=0;
-      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
+      for (typename map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
         MPI_Isend(&(it->second[0]),
                   it->second.size(),
                   DEAL_II_DOF_INDEX_MPI_TYPE,
@@ -465,11 +465,11 @@ namespace SparsityTools
     }
 
 //TODO: In the following, we read individual bytes and then reinterpret them
-//    as size_type objects. this is error prone. use properly typed reads that
+//    as typename CSP_t::size_type objects. this is error prone. use properly typed reads that
 //    match the write above
     {
       //receive
-      std::vector<size_type> recv_buf;
+      std::vector<typename CSP_t::size_type> recv_buf;
       for (unsigned int index=0; index<num_receive; ++index)
         {
           MPI_Status status;
@@ -478,19 +478,19 @@ namespace SparsityTools
           Assert (status.MPI_TAG==124, ExcInternalError());
 
           MPI_Get_count(&status, MPI_BYTE, &len);
-          Assert( len%sizeof(size_type)==0, ExcInternalError());
+          Assert( len%sizeof(typename CSP_t::size_type)==0, ExcInternalError());
 
-          recv_buf.resize(len/sizeof(size_type));
+          recv_buf.resize(len/sizeof(typename CSP_t::size_type));
 
           MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
-          std::vector<size_type>::const_iterator ptr = recv_buf.begin();
-          std::vector<size_type>::const_iterator end = recv_buf.end();
+          typename std::vector<typename CSP_t::size_type>::const_iterator ptr = recv_buf.begin();
+          typename std::vector<typename CSP_t::size_type>::const_iterator end = recv_buf.end();
           while (ptr+1<end)
             {
-              size_type num=*(ptr++);
-              size_type row=*(ptr++);
+              typename CSP_t::size_type num=*(ptr++);
+              typename CSP_t::size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
                   csp.add(row, *ptr);
@@ -512,18 +512,18 @@ namespace SparsityTools
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange)
   {
-    size_type myid = Utilities::MPI::this_mpi_process(mpi_comm);
+    const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
 
-    typedef std::map<size_type, std::vector<size_type> > map_vec_t;
+    typedef std::map<typename CSP_t::size_type, std::vector<typename CSP_t::size_type> > map_vec_t;
     map_vec_t send_data;
 
     {
       unsigned int dest_cpu=0;
 
-      size_type n_local_rel_rows = myrange.n_elements();
-      for (size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
+      typename CSP_t::size_type n_local_rel_rows = myrange.n_elements();
+      for (typename CSP_t::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
         {
-          size_type row=myrange.nth_index_in_set(row_idx);
+          typename CSP_t::size_type row=myrange.nth_index_in_set(row_idx);
 
           // calculate destination CPU, note that we start the search
           // at last destination cpu, because even if the owned ranges
@@ -539,21 +539,21 @@ namespace SparsityTools
           if (dest_cpu==myid)
             continue;
 
-          size_type rlen = csp.row_length(row);
+          typename CSP_t::size_type rlen = csp.row_length(row);
 
           //skip empty lines
           if (!rlen)
             continue;
 
           //save entries
-          std::vector<size_type> &dst = send_data[dest_cpu];
+          std::vector<typename CSP_t::size_type> &dst = send_data[dest_cpu];
 
           dst.push_back(rlen); // number of entries
           dst.push_back(row); // row index
-          for (size_type c=0; c<rlen; ++c)
+          for (typename CSP_t::size_type c=0; c<rlen; ++c)
             {
               //columns
-              size_type column = csp.column_number(row, c);
+              typename CSP_t::size_type column = csp.column_number(row, c);
               dst.push_back(column);
             }
         }
@@ -564,7 +564,7 @@ namespace SparsityTools
     {
       std::vector<unsigned int> send_to;
       send_to.reserve(send_data.size());
-      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
+      for (typename map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it)
         send_to.push_back(it->first);
 
       num_receive =
@@ -578,7 +578,7 @@ namespace SparsityTools
     // send data
     {
       unsigned int idx=0;
-      for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
+      for (typename map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
         MPI_Isend(&(it->second[0]),
                   it->second.size(),
                   DEAL_II_DOF_INDEX_MPI_TYPE,
@@ -589,11 +589,11 @@ namespace SparsityTools
     }
 
 //TODO: In the following, we read individual bytes and then reinterpret them
-//    as size_type objects. this is error prone. use properly typed reads that
+//    as typename CSP_t::size_type objects. this is error prone. use properly typed reads that
 //    match the write above
     {
       //receive
-      std::vector<size_type> recv_buf;
+      std::vector<typename CSP_t::size_type> recv_buf;
       for (unsigned int index=0; index<num_receive; ++index)
         {
           MPI_Status status;
@@ -602,19 +602,19 @@ namespace SparsityTools
           Assert (status.MPI_TAG==124, ExcInternalError());
 
           MPI_Get_count(&status, MPI_BYTE, &len);
-          Assert( len%sizeof(size_type)==0, ExcInternalError());
+          Assert( len%sizeof(typename CSP_t::size_type)==0, ExcInternalError());
 
-          recv_buf.resize(len/sizeof(size_type));
+          recv_buf.resize(len/sizeof(typename CSP_t::size_type));
 
           MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
-          std::vector<size_type>::const_iterator ptr = recv_buf.begin();
-          std::vector<size_type>::const_iterator end = recv_buf.end();
+          typename std::vector<typename CSP_t::size_type>::const_iterator ptr = recv_buf.begin();
+          typename std::vector<typename CSP_t::size_type>::const_iterator end = recv_buf.end();
           while (ptr+1<end)
             {
-              size_type num=*(ptr++);
-              size_type row=*(ptr++);
+              typename CSP_t::size_type num=*(ptr++);
+              typename CSP_t::size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
                   csp.add(row, *ptr);
@@ -638,7 +638,7 @@ namespace SparsityTools
 
 #define SPARSITY_FUNCTIONS(SparsityType) \
   template void SparsityTools::distribute_sparsity_pattern<SparsityType> (SparsityType & csp, \
-      const std::vector<size_type> & rows_per_cpu,\
+      const std::vector<SparsityType::size_type> & rows_per_cpu,\
       const MPI_Comm & mpi_comm,\
       const IndexSet & myrange)
 

@@ -27,13 +27,11 @@
 #   TBB_VERSION_MINOR
 #
 
-INCLUDE(FindPackageHandleStandardArgs)
-
 SET(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
 SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
 
 FILE(GLOB _path ${TBB_DIR}/build/*_release)
-FIND_LIBRARY(TBB_LIBRARY
+DEAL_II_FIND_LIBRARY(TBB_LIBRARY
   NAMES tbb
   HINTS
     ${_path}
@@ -45,7 +43,7 @@ FIND_LIBRARY(TBB_LIBRARY
 # Also search for the debug library:
 #
 FILE(GLOB _path ${TBB_DIR}/build/*_debug)
-FIND_LIBRARY(TBB_DEBUG_LIBRARY
+DEAL_II_FIND_LIBRARY(TBB_DEBUG_LIBRARY
   NAMES tbb_debug
   HINTS
     ${_path}
@@ -59,7 +57,7 @@ ELSE()
   SET(_libraries TBB_LIBRARY)
 ENDIF()
 
-FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
+DEAL_II_FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
   HINTS
     ${TBB_DIR}
   PATH_SUFFIXES include include/tbb tbb
@@ -84,4 +82,5 @@ ENDIF()
 DEAL_II_PACKAGE_HANDLE(TBB
   LIBRARIES REQUIRED ${_libraries}
   INCLUDE_DIRS REQUIRED TBB_INCLUDE_DIR
+  CLEAR TBB_DEBUG_LIBRARY TBB_LIBRARY TBB_INCLUDE_DIR
   )

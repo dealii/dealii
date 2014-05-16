@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,9 +80,8 @@ FE_DGVector<POLY,dim,spacedim>::get_dpo_vector (const unsigned int deg)
 
 template <class POLY, int dim, int spacedim>
 bool
-FE_DGVector<POLY,dim,spacedim>::has_support_on_face (
-  const unsigned int,
-  const unsigned int) const
+FE_DGVector<POLY,dim,spacedim>::has_support_on_face (const unsigned int,
+						     const unsigned int) const
 {
   return true;
 }

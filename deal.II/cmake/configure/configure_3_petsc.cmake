@@ -18,9 +18,10 @@
 # Configuration for the petsc library:
 #
 
+SET(FEATURE_PETSC_AFTER MPI)
+
 
 MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
-
   FIND_PACKAGE(PETSC)
 
   IF(PETSC_FOUND)
@@ -67,7 +68,6 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
-
     #
     # Petsc has to be configured with the same number of bits for indices as
     # deal.II.
@@ -94,36 +94,21 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
-    IF(NOT ${var})
-      UNSET(PETSC_INCLUDE_DIR_ARCH CACHE)
-      UNSET(PETSC_INCLUDE_DIR_COMMON CACHE)
-      UNSET(PETSC_LIBRARY CACHE)
-      UNSET(PETSC_PETSCVARIABLES CACHE)
-      SET(PETSC_DIR "" CACHE PATH
-        "An optional hint to a PETSc directory"
-        )
-      SET(PETSC_ARCH "" CACHE STRING
-        "An optional hint to a PETSc arch"
-        )
-      MARK_AS_ADVANCED(CLEAR PETSC_DIR PETSC_ARCH)
-    ENDIF()
+    CHECK_MPI_INTERFACE(PETSC ${var})
   ENDIF()
 ENDMACRO()
 
 
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
-
-  SET(PETSC_USER_INCLUDE_DIRS ${PETSC_INCLUDE_DIRS})
+  SET(DEAL_II_EXPAND_PETSC_VECTOR "PETScWrappers::Vector")
+  SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")
+  SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
+  SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
 
   #
   # Disable a bunch of warnings when compiling with petsc:
   #
   ENABLE_IF_SUPPORTED(PETSC_CXX_FLAGS "-Wno-long-long")
-
-  SET(DEAL_II_EXPAND_PETSC_VECTOR "PETScWrappers::Vector")
-  SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")
-  SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
-  SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
 ENDMACRO()
 
 

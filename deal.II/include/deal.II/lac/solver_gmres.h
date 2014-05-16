@@ -26,6 +26,7 @@
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <vector>
@@ -170,7 +171,8 @@ public:
     AdditionalData (const unsigned int max_n_tmp_vectors = 30,
                     const bool right_preconditioning = false,
                     const bool use_default_residual = true,
-                    const bool force_re_orthogonalization = false);
+                    const bool force_re_orthogonalization = false,
+                    const bool compute_eigenvalues = false);
 
     /**
      * Maximum number of temporary vectors. This parameter controls the size
@@ -200,6 +202,17 @@ public:
      * if necessary.
      */
     bool force_re_orthogonalization;
+
+    /**
+     * Compute all eigenvalues of the Hessenberg matrix generated while
+     * solving, i.e., the projected system matrix. This gives an approximation
+     * of the eigenvalues of the (preconditioned) system matrix. Since the
+     * Hessenberg matrix is thrown away at restart, the eigenvalues are
+     * printed for every 30 iterations.
+     *
+     * @note Requires LAPACK support.
+     */
+    bool compute_eigenvalues;
   };
 
   /**
@@ -428,6 +441,14 @@ namespace internal
         }
       return *data[i-offset];
     }
+
+    // A comparator for better printing eigenvalues
+    inline
+    bool complex_less_pred(const std::complex<double> &x,
+                           const std::complex<double> &y)
+    {
+      return x.real() < y.real() || (x.real() == y.real() && x.imag() < y.imag());
+    }
   }
 }
 
@@ -439,12 +460,14 @@ SolverGMRES<VECTOR>::AdditionalData::
 AdditionalData (const unsigned int max_n_tmp_vectors,
                 const bool         right_preconditioning,
                 const bool         use_default_residual,
-                const bool         force_re_orthogonalization)
+                const bool         force_re_orthogonalization,
+                const bool         compute_eigenvalues)
   :
   max_n_tmp_vectors(max_n_tmp_vectors),
   right_preconditioning(right_preconditioning),
   use_default_residual(use_default_residual),
-  force_re_orthogonalization(force_re_orthogonalization)
+  force_re_orthogonalization(force_re_orthogonalization),
+  compute_eigenvalues (compute_eigenvalues)
 {}
 
 
@@ -580,6 +603,12 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   // number is not reset to zero upon a
   // restart
   unsigned int accumulated_iterations = 0;
+
+  // for eigenvalue computation, need to collect the Hessenberg matrix (before
+  // applying Givens rotations)
+  FullMatrix<double> H_orig;
+  if (additional_data.compute_eigenvalues)
+    H_orig.reinit(n_tmp_vectors, n_tmp_vectors-1);
 
   // matrix used for the orthogonalization process later
   H.reinit(n_tmp_vectors, n_tmp_vectors-1);
@@ -727,6 +756,12 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
           if (numbers::is_finite(1./s))
             vv *= 1./s;
 
+          // for eigenvalues, get the resulting coefficients from the
+          // orthogonalization process
+          if (additional_data.compute_eigenvalues)
+            for (unsigned int i=0; i<dim+1; ++i)
+              H_orig(i,inner_iteration) = h(i);
+
           //  Transformation into triagonal structure
           givens_rotation(h,gamma,ci,si,inner_iteration);
 
@@ -794,6 +829,28 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
       for (unsigned int i=0; i<dim+1; ++i)
         for (unsigned int j=0; j<dim; ++j)
           H1(i,j) = H(i,j);
+
+      // compute eigenvalues from the Hessenberg matrix generated during the
+      // inner iterations
+      if (additional_data.compute_eigenvalues)
+        {
+          LAPACKFullMatrix<double> mat(dim,dim);
+          for (unsigned int i=0; i<dim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              mat(i,j) = H_orig(i,j);
+          mat.compute_eigenvalues();
+          std::vector<std::complex<double> > eigenvalues(dim);
+          for (unsigned int i=0; i<mat.n(); ++i)
+            eigenvalues[i] = mat.eigenvalue(i);
+
+          std::sort(eigenvalues.begin(), eigenvalues.end(),
+                    internal::SolverGMRES::complex_less_pred);
+
+          deallog << "Eigenvalue estimate: ";
+          for (unsigned int i=0; i<mat.n(); ++i)
+            deallog << ' ' << eigenvalues[i];
+          deallog << std::endl;
+        }
 
       H1.backward(h,gamma);
 

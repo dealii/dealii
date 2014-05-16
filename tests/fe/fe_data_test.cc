@@ -21,6 +21,7 @@
 #include <fstream>
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
 
 #include <deal.II/grid/tria_iterator.h>
@@ -111,6 +112,10 @@ void test_fe_datas()
   fe_datas.push_back(new FE_DGQ<dim> (2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim> (4));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_DGQArbitraryNodes<dim> (QGaussLobatto<1>(5)));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_DGQArbitraryNodes<dim> (QGauss<1>(3)));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGP<dim> (1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;

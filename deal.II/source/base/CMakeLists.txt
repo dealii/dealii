@@ -38,6 +38,7 @@ SET(_src
   memory_consumption.cc
   mpi.cc
   multithread_info.cc
+  named_selection.cc
   parallel.cc
   parameter_handler.cc
   parsed_function.cc

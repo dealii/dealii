@@ -15,9 +15,35 @@
 ## ---------------------------------------------------------------------
 
 #
-# DEAL_II_PACKAGE_HANDLE
+# DEAL_II_PACKAGE_HANDLE(<feature>
+#  {<conf. variable> {(REQUIRED|OPTIONAL) <variables>}}
+#  [CLEAR <variables>]
+#  )
 #
-# TODO: Documentation
+# This macro is an alternative implementation of the
+# FIND_PACKAGE_HANDLE_STANDARD_ARGS macro shipped with CMake - aka do
+# everything that was expected from CMake in the first place *sigh*
+#
+# Its usage is best explained with an example:
+#
+#   DEAL_II_PACKAGE_HANDLE(PETSC
+#     LIBRARIES
+#       REQUIRED PETSC_LIBRARY
+#       OPTIONAL _petsc_libraries
+#     INCLUDE_DIRS
+#       REQUIRED PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
+#       OPTIONAL _petsc_includes
+#     CLEAR PETSC_LIBRARY PETSC_INCLUDE_DIR_COMMON PETSC_INCLUDE_DIR_ARCH
+#     )
+#
+# This will check whether all REQUIRED variables are non-empty and
+# different from "-NOTFOUND". If so, PETSC_LIBRARIES and PETSC_INCLUDE_DIRS
+# is defined and populated with the contents of all specified variables.
+# Optional variables with no content or whose content is "-NOTFOUND" are
+# filtered out.
+# After the 'CLEAR' statement all internally cached variables should be
+# listed - this is used to provide a possibility to undo a feature
+# search.
 #
 
 MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
@@ -29,10 +55,11 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
   SET(${_feature}_FOUND TRUE)
 
   SET(_variable ${_var})
-  SET(_cleanup ${_var})
   SET(${_feature}_${_variable} "")
   SET(_required TRUE)
   SET(_fine TRUE)
+  SET(_fill_clear FALSE)
+  SET(_clear "")
 
   FOREACH(_arg ${ARGN})
     IF(_arg MATCHES "^LIBRARIES(|_DEBUG|_RELEASE)$"
@@ -53,7 +80,6 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
       # *Yay* a new keyword.
       #
       SET(_variable ${_arg})
-      LIST(APPEND _cleanup ${_var})
       SET(${_feature}_${_variable} "")
       SET(_required TRUE)
       SET(_fine TRUE)
@@ -62,33 +88,43 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
       SET(_required TRUE)
     ELSEIF("${_arg}" STREQUAL "OPTIONAL")
       SET(_required FALSE)
-    ELSEIF( _arg MATCHES "^(optimized|debug|general)$"
+    ELSEIF(_arg MATCHES "^(optimized|debug|general)$"
             AND "${_variable}" STREQUAL "LIBRARIES")
       #
       # Keywords are special...
       #
       LIST(APPEND ${_feature}_${_variable} ${_arg})
+    ELSEIF("${_arg}" STREQUAL "CLEAR")
+      SET(_fill_clear TRUE)
     ELSE()
       MARK_AS_ADVANCED(${_arg})
-      IF(NOT DEFINED ${_arg} OR ${_arg} MATCHES "-NOTFOUND")
-        IF(_required AND _fine)
-          IF(NOT DEFINED ${_arg})
-            MESSAGE(STATUS
-              "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" undefined ***"
-              )
-          ELSE()
-            MESSAGE(STATUS
-              "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
-              )
-          ENDIF()
-          SET(${_feature}_FOUND FALSE)
-          SET(_fine FALSE)
+      IF(_fill_clear)
+        IF(NOT _arg MATCHES "^(optimized|debug|general)$")
+          LIST(APPEND _clear ${_arg})
         ENDIF()
       ELSE()
-        LIST(APPEND ${_feature}_${_variable} ${${_arg}})
+        IF("${${_arg}}" MATCHES "^\\s*$" OR "${${_arg}}" MATCHES "-NOTFOUND")
+          IF(_required AND _fine)
+            IF("${${_arg}}" MATCHES "^\\s*$")
+              MESSAGE(STATUS
+                "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" empty ***"
+                )
+            ELSE()
+              MESSAGE(STATUS
+                "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
+                )
+            ENDIF()
+            SET(${_feature}_FOUND FALSE)
+            SET(_fine FALSE)
+          ENDIF()
+        ELSE()
+          LIST(APPEND ${_feature}_${_variable} ${${_arg}})
+        ENDIF()
       ENDIF()
     ENDIF()
   ENDFOREACH()
+
+  SET(${_feature}_CLEAR_VARIABLES ${_clear} CACHE INTERNAL "")
 
   IF(_fine)
     IF(_variable MATCHES "^CXX_FLAGS(|_DEBUG|_RELEASE)"
@@ -100,27 +136,22 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
 
   IF(${_feature}_FOUND)
     #
-    # Deduplicate entries in *_INCLUDE_DIRS and *_LIBRARIES
+    # Deduplicate entries:
     #
-    FOREACH(_suffix INCLUDE_DIRS USER_INCLUDE_DIRS BUNDLED_INCLUDE_DIRS)
-      REMOVE_DUPLICATES(${_feature}_${_suffix})
-    ENDFOREACH()
-    FOREACH(_suffix
-        LIBRARIES LIBRARIES_RELEASE LIBRARIES_DEBUG
-        USER_DEFINITIONS USER_DEFINITIONS_DEBUG USER_DEFINITIONS_RELEASE
-        DEFINITIONS DEFINITIONS_DEBUG DEFINITIONS_RELEASE
-        )
-      REMOVE_DUPLICATES(${_feature}_${_suffix} REVERSE)
+    FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES})
+      IF(_suffix MATCHES "INCLUDE_DIRS$")
+        REMOVE_DUPLICATES(${_feature}_${_suffix})
+      ELSE()
+        REMOVE_DUPLICATES(${_feature}_${_suffix} REVERSE)
+      ENDIF()
     ENDFOREACH()
 
     MESSAGE(STATUS "Found ${_feature}")
-    MARK_AS_ADVANCED(${_feature}_DIR)
+
+    MARK_AS_ADVANCED(${_feature}_DIR ${_feature}_ARCH)
 
   ELSE()
 
-    FOREACH(_v _cleanup)
-      SET(${_feature}_${_v})
-    ENDFOREACH()
     MESSAGE(STATUS "Could NOT find ${_feature}")
   ENDIF()
 ENDMACRO()

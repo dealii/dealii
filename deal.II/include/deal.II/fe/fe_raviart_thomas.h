@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -127,13 +127,11 @@ public:
 
 
   /**
-   * Check whether a shape function
-   * may be non-zero on a face.
+   * This function returns @p true, if the shape function @p shape_index has
+   * non-zero function values somewhere on the face @p face_index.
    *
-   * Right now, this is only
-   * implemented for RT0 in
-   * 1D. Otherwise, returns always
-   * @p true.
+   * Right now, this is only implemented for RT0 in 1D. Otherwise, returns
+   * always @p true.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
@@ -412,9 +410,10 @@ private:
    */
   static std::vector<bool>
   get_ria_vector (const unsigned int degree);
+
   /**
-   * Check whether a shape function
-   * may be non-zero on a face.
+   * This function returns @p true, if the shape function @p shape_index has
+   * non-zero function values somewhere on the face @p face_index.
    *
    * Right now, this is only
    * implemented for RT0 in

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -315,7 +315,7 @@ namespace Utilities
 
     MPI_InitFinalize::MPI_InitFinalize (int    &argc,
                                         char ** &argv,
-                                        unsigned int max_num_threads)
+                                        const unsigned int max_num_threads)
       :
       owns_mpi (true)
     {
@@ -337,7 +337,7 @@ namespace Utilities
     void
     MPI_InitFinalize::do_init(int    &argc,
                               char ** &argv,
-                              unsigned int max_num_threads)
+                              const unsigned int max_num_threads)
     {
       static bool constructor_has_already_run = false;
       Assert (constructor_has_already_run == false,
@@ -389,7 +389,8 @@ namespace Utilities
 
       constructor_has_already_run = true;
 
-      //set maximum number of threads:
+      // set maximum number of threads (also respecting the environment
+      // variable that the called function evaluates)
       multithread_info.set_thread_limit(max_num_threads);
     }
 

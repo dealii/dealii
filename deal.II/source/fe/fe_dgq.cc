@@ -696,10 +696,17 @@ FE_DGQ<dim, spacedim>::has_support_on_face (const unsigned int shape_index,
 
   unsigned int n = this->degree+1;
 
-  // for DGQ(0) elements, the single
-  // shape functions is constant and
+  // for DGQ(0) elements or arbitrary node DGQ with support points not located
+  // at the element boundary, the single shape functions is constant and
   // therefore lives on the boundary
-  if (this->degree == 0)
+  bool support_points_on_boundary = true;
+  for (unsigned int d=0; d<dim; ++d)
+    if (std::abs(this->unit_support_points[0][d]) > 1e-13)
+      support_points_on_boundary = false;
+  for (unsigned int d=0; d<dim; ++d)
+    if (std::abs(this->unit_support_points.back()[d]-1.) > 1e-13)
+      support_points_on_boundary = false;
+  if (support_points_on_boundary == false)
     return true;
 
   unsigned int n2 = n*n;

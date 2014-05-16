@@ -22,20 +22,72 @@
 #include "../tests.h"
 
 #include <deal.II/base/vectorization.h>
+#include <deal.II/lac/vector.h>
+
+
+struct Evaluation
+{
+  VectorizedArray<double> get_value(const unsigned int index) const
+  {
+    return values[index];
+  }
+
+  void submit_value(const VectorizedArray<double> val,
+                    const unsigned int index)
+  {
+    if (is_cartesian)
+      values[index] = val * cartesian_weight * jac_weight[index];
+    else
+      values[index] = val * general_weight[index];
+  }
+
+  bool is_cartesian;
+  VectorizedArray<double> cartesian_weight;
+  VectorizedArray<double> jac_weight[1];
+  VectorizedArray<double> general_weight[1];
+  VectorizedArray<double> values[1];
+};
+
+
+void initialize(Evaluation &eval)
+{
+  eval.is_cartesian = true;
+  eval.cartesian_weight = static_cast<double>(rand())/RAND_MAX;
+  for (unsigned int i=0; i<4; ++i)
+    eval.cartesian_weight = std::max(eval.cartesian_weight, eval.cartesian_weight * eval.cartesian_weight);
+  eval.general_weight[0] = 0.2313342 * eval.cartesian_weight;
+  eval.jac_weight[0] = static_cast<double>(rand())/RAND_MAX;
+}
 
 
 void test()
 {
-  VectorizedArray<double> array[3];
-  for (unsigned int i=0; i<3; ++i)
-    for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
-      array[i][v] = static_cast<double>(rand())/RAND_MAX;
+  Evaluation current, old;
+  initialize(current);
+  initialize(old);
+  VectorizedArray<double> weight;
+  weight = static_cast<double>(rand())/RAND_MAX;
 
-  const VectorizedArray<double> tmp = 2. * array[0] - array[1] - array[2] * std::sin(array[0]);
-
+  VectorizedArray<double> vec;
   for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
-    deallog << tmp[v]-(2.*array[0][v]-array[1][v]-array[2][v]*std::sin(array[0][v])) << " ";
-  deallog << std::endl;
+    vec[v] = static_cast<double>(rand())/RAND_MAX;
+
+  current.values[0] = vec;
+  old.values[0] = vec * 1.112 - std::max(2.*vec - 1., VectorizedArray<double>());
+
+  Vector<double> vector(200);
+  vector = 1.2;
+
+  VectorizedArray<double> cur = current.get_value(0);
+  VectorizedArray<double> ol =  old.get_value(0);
+  current.submit_value(2. * cur - ol - weight * std::sin(cur), 0);
+
+  vector *= 2.*current.get_value(0)[0];
+
+  double error = 0;
+  for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
+    error += std::abs(current.get_value(0)[v]/(current.cartesian_weight[v]*current.jac_weight[0][0])-(2.*vec[v]-ol[v]-weight[v]*std::sin(vec[v])));
+  deallog << "error: " << error << std::endl;
 }
 
 

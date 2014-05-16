@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -533,13 +533,13 @@ public:
                                                    const Point<dim>   &p,
                                                    const unsigned int component) const;
   /**
-   * Check for non-zero values on a face in order to optimize out matrix
-   * elements.
-   *
    * This function returns @p true, if the shape function @p shape_index has
-   * non-zero values on the face @p face_index.
+   * non-zero function values somewhere on the face @p face_index. The
+   * function is typically used to determine whether some matrix elements
+   * resulting from face integrals can be assumed to be zero and may therefore
+   * be omitted from integration.
    *
-   * A default implementation is provided in this basis class which always
+   * A default implementation is provided in this basa class which always
    * returns @p true. This is the safe way to go.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,

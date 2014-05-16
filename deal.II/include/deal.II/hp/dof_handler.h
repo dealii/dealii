@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,7 +95,58 @@ namespace hp
     typedef typename ActiveSelector::hex_iterator         hex_iterator;
     typedef typename ActiveSelector::active_hex_iterator  active_hex_iterator;
 
+    /**
+     * A typedef that is used to to identify
+     * @ref GlossActive "active cell iterators". The
+     * concept of iterators is discussed at length in the
+     * @ref Iterators "iterators documentation module".
+     *
+     * The current typedef identifies active cells in a hp::DoFHandler object.
+     * While the actual data type of the typedef is hidden behind a few layers
+     * of (unfortunately necessary) indirections, it is in essence
+     * TriaActiveIterator<DoFCellAccessor>. The TriaActiveIterator
+     * class works like a pointer to active objects that when you
+     * dereference it yields an object of type DoFCellAccessor.
+     * DoFCellAccessor is a class that identifies properties that
+     * are specific to cells in a DoFHandler, but it is derived
+     * (and consequently inherits) from both DoFAccessor, TriaCellAccessor
+     * and TriaAccessor that describe
+     * what you can ask of more general objects (lines, faces, as
+     * well as cells) in a triangulation and hp::DoFHandler objects.
+     *
+     * @ingroup Iterators
+     */
     typedef typename ActiveSelector::active_cell_iterator active_cell_iterator;
+
+    typedef typename LevelSelector::cell_iterator         level_cell_iterator;
+
+    /**
+     * A typedef that is used to to identify cell iterators. The
+     * concept of iterators is discussed at length in the
+     * @ref Iterators "iterators documentation module".
+     *
+     * The current typedef identifies cells in a DoFHandler object. Some
+     * of these cells may in fact be active (see @ref GlossActive "active cell iterators")
+     * in which case they can in fact be asked for the degrees of freedom
+     * that live on them. On the other hand, if the cell is not active,
+     * any such query will result in an error. Note that this is what distinguishes
+     * this typedef from the level_cell_iterator typedef.
+     *
+     * While the actual data type of the typedef is hidden behind a few layers
+     * of (unfortunately necessary) indirections, it is in essence
+     * TriaIterator<DoFCellAccessor>. The TriaIterator
+     * class works like a pointer to objects that when you
+     * dereference it yields an object of type DoFCellAccessor.
+     * DoFCellAccessor is a class that identifies properties that
+     * are specific to cells in a DoFHandler, but it is derived
+     * (and consequently inherits) from both DoFAccessor, TriaCellAccessor
+     * and TriaAccessor that describe
+     * what you can ask of more general objects (lines, faces, as
+     * well as cells) in a triangulation and DoFHandler objects.
+     *
+     * @ingroup Iterators
+     */
+    typedef typename ActiveSelector::cell_iterator        cell_iterator;
 
     typedef typename ActiveSelector::face_iterator        face_iterator;
     typedef typename ActiveSelector::active_face_iterator active_face_iterator;
@@ -103,10 +154,7 @@ namespace hp
     typedef typename LevelSelector::CellAccessor          level_cell_accessor;
     typedef typename LevelSelector::FaceAccessor          level_face_accessor;
 
-    typedef typename LevelSelector::cell_iterator         level_cell_iterator;
     typedef typename LevelSelector::face_iterator         level_face_iterator;
-
-    typedef level_cell_iterator                           cell_iterator;
 
     /**
      * Alias the @p FunctionMap type
@@ -862,7 +910,7 @@ namespace hp
      */
     std::vector<types::global_dof_index>      vertex_dofs_offsets;
 
-    std::vector<MGVertexDoFs> mg_vertex_dofs;
+    std::vector<MGVertexDoFs> mg_vertex_dofs;  // we should really remove this field!
 
     /**
      * Array to store the

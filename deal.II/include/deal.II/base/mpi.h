@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -274,15 +274,20 @@ namespace Utilities
        * Initialize MPI (and optionally PETSc) and set the number of threads
        * used by deal.II (and TBB) to the given parameter. If set to
        * numbers::invalid_unsigned_int, the number of threads is determined by
-       * TBB. When in doubt, set this value to 1.
+       * TBB. When in doubt, set this value to 1 since MPI jobs are typically
+       * run in a way where one has one MPI process per available processor
+       * core and there will be little CPU resources left to support multithreaded
+       * processes.
        *
-       * This will call MultithreadInfo::set_thread_limit() with @p
-       * max_num_threads, so the environment variable DEAL_II_NUM_THREADS will
-       * be respected.
+       * This function calls MultithreadInfo::set_thread_limit()
+       * unconditionally with @p max_num_threads . That function in turn also
+       * evaluates the environment variable DEAL_II_NUM_THREADS and the number
+       * of threads to be used will be the minimum of the argument passed here
+       * and the environment (if both are set).
        */
       MPI_InitFinalize (int    &argc,
                         char ** &argv,
-                        unsigned int max_num_threads);
+                        const unsigned int max_num_threads);
       /**
        * Destructor. Calls <tt>MPI_Finalize()</tt> in case this class owns the
        * MPI process.
@@ -304,7 +309,7 @@ namespace Utilities
        */
       void do_init(int    &argc,
                    char ** &argv,
-                   unsigned int max_num_threads);
+                   const unsigned int max_num_threads);
     };
 
     namespace internal

@@ -854,9 +854,9 @@ cmake -DCMAKE_C_COMPILER="mpicc" -DCMAKE_CXX_COMPILER="mpicxx" -DCMAKE_Fortran_C
     </p>
 
     <p>
-      deal.II will configure sensible default <code>CXXFLAGS</code>
-      depending on platform, compiler and build target. There are two
-      options to override this behaviour:
+      deal.II will configure sensible default <code>CXXFLAGS</code> and
+      <code>LDFLAGS</code> depending on platform, compiler and build
+      target. There are two options to override this behaviour:
 
       <ol>
 	<li>
@@ -866,6 +866,10 @@ cmake -DCMAKE_C_COMPILER="mpicc" -DCMAKE_CXX_COMPILER="mpicxx" -DCMAKE_Fortran_C
 DEAL_II_CXX_FLAGS         - used during all builds
 DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
 DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
+
+DEAL_II_LINKER_FLAGS         - used during all builds
+DEAL_II_LINKER_FLAGS_DEBUG   - additional flags for the debug library
+DEAL_II_LINKER_FLAGS_RELEASE - additional flags for the release library
 </pre>
 
 	  The content of the cached variables will be preserved
@@ -972,18 +976,6 @@ $ cmake -C config.sample <...>
       This sample configuration covers all options mentioned in this
       documentation as well as some advanced aspects in feature
       configuration.
-    </p>
-
-    <p>
-      The build system automatically exports a <code>config.camke</code>
-      into the binary directory that can be used to conveniently clone a
-      build directories cache entries, e.g. assuming that there is a
-      configured build directory <code>build</code> next to an empty
-      directory <code>build2</code>:
-<pre class="cmake">
-$ cd build2
-$ cmake -C ../build/config.cmake ../deal.II
-</pre>
     </p>
 
     <a name="compiling"></a>

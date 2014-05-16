@@ -1,0 +1,9 @@
+
+DEAL:double::load OK
+DEAL:double::store OK
+DEAL:float::load OK
+DEAL:float::store OK
+DEAL:long double::load OK
+DEAL:long double::store OK
+DEAL:unsigned int::load OK
+DEAL:unsigned int::store OK

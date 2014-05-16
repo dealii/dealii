@@ -62,15 +62,15 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-// These, now, are the include necessary for the multilevel methods. The
-// first two declare classes that allow us to enumerate degrees of freedom not
-// only on the finest mesh level, but also on intermediate levels (that's what
-// the MGDoFHandler class does) as well as allow to access this information
-// (iterators and accessors over these cells).
+// These, now, are the include necessary for the multilevel methods. The first
+// one declares how to handle Dirichlet boundary conditions on each of the
+// levels of the multigrid method. For the actual description of the degrees
+// of freedom, we do not need any new include file because DoFHandler already
+// has all necessary methods implemented. We will only need to distribute the
+// DoFs for the levels further down.
 //
 // The rest of the include files deals with the mechanics of multigrid as a
 // linear operator (solver or preconditioner).
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_transfer.h>
@@ -112,7 +112,7 @@ namespace Step16
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
-    MGDoFHandler<dim>    mg_dof_handler;
+    DoFHandler<dim>      dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -234,7 +234,7 @@ namespace Step16
     triangulation (Triangulation<dim>::
                    limit_level_difference_at_vertices),
     fe (degree),
-    mg_dof_handler (triangulation),
+    dof_handler (triangulation),
     degree(degree)
   {}
 
@@ -243,29 +243,31 @@ namespace Step16
   // @sect4{LaplaceProblem::setup_system}
 
   // The following function extends what the corresponding one in step-6
-  // did. The top part, apart from the additional output, does the same:
+  // did, with the exception of also distributing the degrees of freedom on
+  // each level of the mesh which is needed for the multigrid hierarchy.
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
-    mg_dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_mg_dofs (fe);
 
     // Here we output not only the degrees of freedom on the finest level, but
     // also in the multilevel structure
     deallog << "Number of degrees of freedom: "
-            << mg_dof_handler.n_dofs();
+            << dof_handler.n_dofs();
 
     for (unsigned int l=0; l<triangulation.n_levels(); ++l)
       deallog << "   " << 'L' << l << ": "
-              << mg_dof_handler.n_dofs(l);
+              << dof_handler.n_dofs(l);
     deallog  << std::endl;
 
-    sparsity_pattern.reinit (mg_dof_handler.n_dofs(),
-                             mg_dof_handler.n_dofs(),
-                             mg_dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (mg_dof_handler, sparsity_pattern);
+    sparsity_pattern.reinit (dof_handler.n_dofs(),
+                             dof_handler.n_dofs(),
+                             dof_handler.max_couplings_between_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
-    solution.reinit (mg_dof_handler.n_dofs());
-    system_rhs.reinit (mg_dof_handler.n_dofs());
+    solution.reinit (dof_handler.n_dofs());
+    system_rhs.reinit (dof_handler.n_dofs());
 
     // But it starts to be a wee bit different here, although this still
     // doesn't have anything to do with multigrid methods. step-6 took care of
@@ -280,13 +282,13 @@ namespace Step16
     // for a later clean-up stage:
     constraints.clear ();
     hanging_node_constraints.clear ();
-    DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
-    DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
+    DoFTools::make_hanging_node_constraints (dof_handler, hanging_node_constraints);
+    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
 
     typename FunctionMap<dim>::type      dirichlet_boundary_functions;
     ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
     dirichlet_boundary_functions[0] = &homogeneous_dirichlet_bc;
-    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(mg_dof_handler),
+    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(dof_handler),
                                               dirichlet_boundary_functions,
                                               constraints);
     constraints.close ();
@@ -299,7 +301,7 @@ namespace Step16
     // about the boundary values as well, so we pass the
     // <code>dirichlet_boundary</code> here as well.
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary_functions);
+    mg_constrained_dofs.initialize(dof_handler, dirichlet_boundary_functions);
 
 
     // Now for the things that concern the multigrid data structures. First,
@@ -337,9 +339,9 @@ namespace Step16
     for (unsigned int level=0; level<n_levels; ++level)
       {
         CompressedSparsityPattern csp;
-        csp.reinit(mg_dof_handler.n_dofs(level),
-                   mg_dof_handler.n_dofs(level));
-        MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
+        csp.reinit(dof_handler.n_dofs(level),
+                   dof_handler.n_dofs(level));
+        MGTools::make_sparsity_pattern(dof_handler, csp, level);
 
         mg_sparsity_patterns[level].copy_from (csp);
 
@@ -352,11 +354,7 @@ namespace Step16
   // @sect4{LaplaceProblem::assemble_system}
 
   // The following function assembles the linear system on the finest level of
-  // the mesh. It is almost exactly the same as in step-6, with the exception
-  // that we don't eliminate hanging nodes and boundary values after
-  // assembling, but while copying local contributions into the global
-  // matrix. This is not only simpler but also more efficient for large
-  // problems.
+  // the mesh. It is almost exactly the same as in step-6.
   //
   // This latter trick is something that only found its way into deal.II over
   // time and wasn't used in the initial version of this tutorial
@@ -382,9 +380,9 @@ namespace Step16
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values (n_q_points);
 
-    typename MGDoFHandler<dim>::active_cell_iterator
-    cell = mg_dof_handler.begin_active(),
-    endc = mg_dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         cell_matrix = 0;
@@ -455,44 +453,39 @@ namespace Step16
     // obscure if you're not familiar with the algorithm actually implemented
     // in deal.II to support multilevel algorithms on adaptive meshes; if some
     // of the things below seem strange, take a look at the @ref mg_paper.
-    //
-    // Our first job is to identify those degrees of freedom on each level
-    // that are located on interfaces between adaptively refined levels, and
-    // those that lie on the interface but also on the exterior boundary of
-    // the domain. As in many other parts of the library, we do this by using
-    // Boolean masks, i.e. vectors of Booleans each element of which indicates
-    // whether the corresponding degree of freedom index is an interface DoF
-    // or not. The <code>MGConstraints</code> already computed the information
-    // for us when we called initialize in <code>setup_system()</code>.
-    std::vector<std::vector<bool> > interface_dofs
-      = mg_constrained_dofs.get_refinement_edge_indices ();
-    std::vector<std::vector<bool> > boundary_interface_dofs
-      = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
-    // The indices just identified will later be used to decide where the
-    // assembled value has to be added into on each level.  On the other hand,
-    // we also have to impose zero boundary conditions on the external
-    // boundary of each level. But this the <code>MGConstraints</code> knows.
-    // So we simply ask for them by calling <code>get_boundary_indices()</code>.
-    // The third step is to construct constraints on all those
-    // degrees of freedom: their value should be zero after each application
-    // of the level operators. To this end, we construct ConstraintMatrix
-    // objects for each level, and add to each of these constraints for each
-    // degree of freedom. Due to the way the ConstraintMatrix stores its data,
-    // the function to add a constraint on a single degree of freedom and
-    // force it to be zero is called Constraintmatrix::add_line(); doing so
-    // for several degrees of freedom at once can be done using
+    // Our first job is to identify the boundary conditions for the levels. On
+    // each level, we impose Dirichlet boundary conditions on the exterior
+    // boundary of the domain as well as on interfaces between adaptively
+    // refined levels. As in many other parts of the library, we do this by
+    // using a mask described by an IndexSet. The <code>MGConstraints</code>
+    // already computed the information for us when we called initialize in
+    // <code>setup_system()</code>. So we simply ask for them by calling
+    // <code>get_boundary_indices()</code> and
+    // <code>get_refinement_edge_indices(level)</code>. Moreover, we have to
+    // identify the subset of the refinement edge indices which are also
+    // located on the boundary as they require special treatment in the
+    // algorithm further down.
+
+    // These three masks are used to fill a ConstraintMatrix objects for each
+    // level that we use during the assembly of the matrix: the value of the
+    // associated degrees of freedom should be zero after each application of
+    // the level operators. Due to the way the ConstraintMatrix stores its
+    // data, the function to add a constraint on a single degree of freedom
+    // and force it to be zero is called Constraintmatrix::add_line(); doing
+    // so for several degrees of freedom at once can be done using
     // Constraintmatrix::add_lines():
     std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
     std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
     for (unsigned int level=0; level<triangulation.n_levels(); ++level)
       {
-        boundary_constraints[level].add_lines (interface_dofs[level]);
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
+        boundary_constraints[level].
+        add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].close ();
 
         boundary_interface_constraints[level]
-        .add_lines (boundary_interface_dofs[level]);
+        .add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices(level));
         boundary_interface_constraints[level].close ();
       }
 
@@ -501,10 +494,10 @@ namespace Step16
     // <code>assemble_system</code>, with two exceptions: (i) we don't need a
     // right hand side, and more significantly (ii) we don't just loop over
     // all active cells, but in fact all cells, active or not. Consequently,
-    // the correct iterator to use is MGDoFHandler::cell_iterator rather than
-    // MGDoFHandler::active_cell_iterator. Let's go about it:
-    typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-                                              endc = mg_dof_handler.end();
+    // the correct iterator to use is DoFHandler::cell_iterator rather than
+    // DoFHandler::active_cell_iterator. Let's go about it:
+    typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(),
+                                            endc = dof_handler.end();
 
     for (; cell!=endc; ++cell)
       {
@@ -526,8 +519,8 @@ namespace Step16
         // with a gotcha that is easily forgotten: The indices of global
         // degrees of freedom we want here are the ones for current level, not
         // for the global matrix. We therefore need the function
-        // MGDoFAccessor::get_mg_dof_indices, not
-        // MGDoFAccessor::get_dof_indices as used in the assembly of the
+        // DoFAccessor::get_mg_dof_indices, not
+        // DoFAccessor::get_dof_indices as used in the assembly of the
         // global system:
         cell->get_mg_dof_indices (local_dof_indices);
 
@@ -554,7 +547,7 @@ namespace Step16
         // we have a symmetric operator, one of these matrices is the
         // transpose of the other.
         //
-        // The way we assemble these matrices is as follows: since the are
+        // The way we assemble these matrices is as follows: since they are
         // formed from parts of the local contributions, we first delete all
         // those parts of the local contributions that we are not interested
         // in, namely all those elements of the local matrix for which not $i$
@@ -572,8 +565,10 @@ namespace Step16
         // necessary.
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
-            if ( !(interface_dofs[cell->level()][local_dof_indices[i]]==true &&
-                   interface_dofs[cell->level()][local_dof_indices[j]]==false))
+            if ( !(mg_constrained_dofs.get_refinement_edge_indices(cell->level()).
+                   is_element(local_dof_indices[i])==true &&
+                   mg_constrained_dofs.get_refinement_edge_indices(cell->level()).
+                   is_element(local_dof_indices[j])==false))
               cell_matrix(i,j) = 0;
 
         boundary_interface_constraints[cell->level()]
@@ -597,8 +592,11 @@ namespace Step16
   // the finite element function spaces involved and can often be computed in
   // a generic way independent of the problem under consideration. In that
   // case, we can use the MGTransferPrebuilt class that, given the constraints
-  // on the global level and an MGDoFHandler object computes the matrices
-  // corresponding to these transfer operators.
+  // of the final linear system and the MGConstrainedDoFs object that knows
+  // about the boundary conditions on the each level and the degrees of
+  // freedom on interfaces between different refinement level can build the
+  // matrices for those transfer operations from a DoFHandler object with
+  // level degrees of freedom.
   //
   // The second part of the following lines deals with the coarse grid
   // solver. Since our coarse grid is very coarse indeed, we decide for a
@@ -609,15 +607,8 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
-
-    // Create the object that deals with the transfer between different
-    // refinement levels. We need to pass it the hanging node constraints.
     MGTransferPrebuilt<Vector<double> > mg_transfer(hanging_node_constraints, mg_constrained_dofs);
-    // Now the prolongation matrix has to be built.  This matrix needs to take
-    // the boundary values on each level into account and needs to know about
-    // the indices at the refinement edges. The <code>MGConstraints</code>
-    // knows about that so pass it as an argument.
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build_matrices(dof_handler);
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from (mg_matrices[0]);
@@ -668,13 +659,13 @@ namespace Step16
     // the transpose operator for the latter operation, allowing us to
     // initialize both up and down versions of the operator with the matrices
     // we already built:
-    MGMatrix<> mg_matrix(&mg_matrices);
-    MGMatrix<> mg_interface_up(&mg_interface_matrices);
-    MGMatrix<> mg_interface_down(&mg_interface_matrices);
+    mg::Matrix<Vector<double> > mg_matrix(mg_matrices);
+    mg::Matrix<Vector<double> > mg_interface_up(mg_interface_matrices);
+    mg::Matrix<Vector<double> > mg_interface_down(mg_interface_matrices);
 
     // Now, we are ready to set up the V-cycle operator and the multilevel
     // preconditioner.
-    Multigrid<Vector<double> > mg(mg_dof_handler,
+    Multigrid<Vector<double> > mg(dof_handler,
                                   mg_matrix,
                                   coarse_grid_solver,
                                   mg_transfer,
@@ -683,7 +674,7 @@ namespace Step16
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >
-    preconditioner(mg_dof_handler, mg, mg_transfer);
+    preconditioner(dof_handler, mg, mg_transfer);
 
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
@@ -709,9 +700,7 @@ namespace Step16
   // computed. In particular, the first one refines the mesh at the beginning
   // of each cycle while the second one outputs results at the end of each
   // such cycle. The functions are almost unchanged from those in step-6, with
-  // the exception of two minor differences: The KellyErrorEstimator::estimate
-  // function wants an argument of type DoFHandler, not MGDoFHandler, and so
-  // we have to cast from derived to base class; and we generate output in VTK
+  // the exception of one minor difference: we generate output in VTK
   // format, to use the more modern visualization programs available today
   // compared to those that were available when step-6 was written.
   template <int dim>
@@ -719,7 +708,7 @@ namespace Step16
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
+    KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(3),
                                         typename FunctionMap<dim>::type(),
                                         solution,
@@ -737,7 +726,7 @@ namespace Step16
   {
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler (mg_dof_handler);
+    data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
 
@@ -784,10 +773,10 @@ namespace Step16
         setup_system ();
 
         std::cout << "   Number of degrees of freedom: "
-                  << mg_dof_handler.n_dofs()
+                  << dof_handler.n_dofs()
                   << " (by level: ";
         for (unsigned int level=0; level<triangulation.n_levels(); ++level)
-          std::cout << mg_dof_handler.n_dofs(level)
+          std::cout << dof_handler.n_dofs(level)
                     << (level == triangulation.n_levels()-1
                         ? ")" : ", ");
         std::cout << std::endl;

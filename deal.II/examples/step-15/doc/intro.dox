@@ -47,7 +47,7 @@ $\Omega$ is the domain we get by projecting the wire's positions into $x-y$
 space. In this example, we choose $\Omega$ as the unit disk.
 
 As described above, we solve this equation using Newton's method in which we
-compute the $n$th approximate solution from the $n-1$st one, and use
+compute the $n$th approximate solution from the $n$th$-1$ one, and use
 a damping parameter $\alpha^n$ to get better global convergence behavior:
   @f{align*}
     F'(u^{n},\delta u^{n})&=- F(u^{n})

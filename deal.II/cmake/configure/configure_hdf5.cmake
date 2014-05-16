@@ -18,17 +18,17 @@
 # Configuration for the hdf5 library:
 #
 
+SET(FEATURE_HDF5_AFTER MPI)
+
+
 MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
   FIND_PACKAGE(HDF5)
 
   IF(HDF5_FOUND)
+    SET(${var} TRUE)
 
-    IF( (HDF5_WITH_MPI AND DEAL_II_WITH_MPI) OR
-        (NOT HDF5_WITH_MPI AND NOT DEAL_II_WITH_MPI) )
-      SET(${var} TRUE)
-
-    ELSE()
-
+    IF( (HDF5_WITH_MPI AND NOT DEAL_II_WITH_MPI) OR
+        (NOT HDF5_WITH_MPI AND DEAL_II_WITH_MPI) )
       MESSAGE(STATUS "Insufficient hdf5 installation found: "
         "hdf5 has to be configured with the same MPI configuration as deal.II."
         )
@@ -38,19 +38,12 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  HDF5_WITH_MPI    = ${HDF5_WITH_MPI}\n"
         )
-      UNSET(HDF5_HL_LIBRARY CACHE)
-      UNSET(HDF5_INCLUDE_DIR CACHE)
-      UNSET(HDF5_LIBRARY CACHE)
-      UNSET(HDF5_PUBCONF CACHE)
+      SET(${var} FALSE)
     ENDIF()
+
+    CHECK_MPI_INTERFACE(HDF5 ${var})
   ENDIF()
 ENDMACRO()
 
 
 CONFIGURE_FEATURE(HDF5)
-
-
-#
-# The user has to know the location of the hdf5 headers as well:
-#
-SET(HDF5_USER_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS})

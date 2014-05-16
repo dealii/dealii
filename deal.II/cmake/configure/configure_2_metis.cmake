@@ -14,6 +14,8 @@
 ##
 ## ---------------------------------------------------------------------
 
+SET(FEATURE_METIS_AFTER MPI)
+
 #
 # Configuration for the metis library:
 #
@@ -22,9 +24,9 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
   FIND_PACKAGE(METIS)
 
   IF(METIS_FOUND)
-    IF(METIS_VERSION_MAJOR GREATER 4)
-      SET(${var} TRUE)
-    ELSE()
+    SET(${var} TRUE)
+
+    IF(NOT METIS_VERSION_MAJOR GREATER 4)
       MESSAGE(STATUS "Insufficient metis installation found: "
         "Version 5.x required!"
         )
@@ -32,14 +34,10 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
         "Could not find a sufficient modern metis installation: "
         "Version 5.x required!\n"
         )
-
-      UNSET(METIS_LIBRARY CACHE)
-      UNSET(METIS_INCLUDE_DIR CACHE)
-      SET(METIS_DIR "" CACHE PATH
-        "An optional hint to a metis directory"
-        )
-      MARK_AS_ADVANCED(CLEAR METIS_DIR)
+      SET(${var} FALSE)
     ENDIF()
+
+    CHECK_MPI_INTERFACE(METIS ${var})
   ENDIF()
 ENDMACRO()
 
