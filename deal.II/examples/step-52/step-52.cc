@@ -83,11 +83,11 @@ namespace Step52
       // Compute the intensity of the source at the given point.
       double get_source(double time,const Point<2> &point) const;
       
-      // Evaluate the diffusion equation \f$M^{-1}(f(t,y))\f$
+      // Evaluate the diffusion equation $M^{-1}(f(t,y))$
       Vector<double> evaluate_diffusion(const double time, const Vector<double> &y) const;
 
-      // Evaluate \f$\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1} = 
-      // \left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M \f$
+      // Evaluate $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1} = 
+      // \left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M $
       Vector<double> id_minus_tau_J_inverse(const double time, const double tau, 
           const Vector<double> &y);
       
@@ -196,7 +196,7 @@ namespace Step52
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
            
-    // Compute \f$-\int D \nabla b \cdot \nabla b - \int \Sigma_a b b\f$ and \f$\int b b\f$
+    // Compute $-\int D \nabla b \cdot \nabla b - \int \Sigma_a b b $ and $\int b b $
     for (; cell!=endc; ++cell)
     {
       cell_matrix = 0.;

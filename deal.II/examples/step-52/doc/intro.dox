@@ -8,7 +8,7 @@
 This program shows how to use Runge-Kutta methods to solve a time-dependent
 problem.
 
-<h3>Problem statement<h3>
+<h3>Problem statement</h3>
 
 In this example, we solve the energy-integrated time-dependent diffusion
 approximation of the neutron transport equation (see step-28 for the
@@ -36,7 +36,7 @@ S=A\left(\frac{1}{v}\omega \cos(\omega t)(bx -x^2) + \sin(\omega t)
 \left(\Sigma_a (bx-x^2)+2D\right) \right).
 @f}
 Because the solution is a sine, we know that
-\f$\phi\left(x,\frac{\pi}{\omega}\right) = 0$. Therefore, we can easily
+$\phi\left(x,\frac{\pi}{\omega}\right) = 0$. Therefore, we can easily
 compute the error at this time since it is simply the norm of the solution
 found.
 
@@ -74,7 +74,7 @@ categories:
 
 <h4>Explicit Runge-Kutta</h4>
 These methods that include for forward Euler, third order Runge-Kutta, and
-fourth order Runge-Kutta, require a function to evaluate $M^{-1}f(t,y). These
+fourth order Runge-Kutta, require a function to evaluate $M^{-1}f(t,y)$. These
 methods become unstable when the time step chosen is too large.
 
 <h4>Embedded Runge-Kutta</h4>
