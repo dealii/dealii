@@ -80,14 +80,19 @@ namespace Algorithms
    * Operator objects, one for the explicit, one for the implicit
    * part. Each of these will use its own TimestepData to account for
    * the modified step sizes (and different times if the problem is not
-   * autonomous).
+   * autonomous). Note that once the explicit part has been computed,
+   * the left hand side actually constitutes a linear or nonlinear
+   * system which has to be solved.
    *
-   * <h3>Usage of vectors in NamedData</h3>
+   * <h3>Usage AnyData</h3>
    *
-   * ThetaTimestepping uses NamedData for communicating vectors. With
+   * ThetaTimestepping uses AnyData for communicating vectors and time
+   * step information. With
    * outer or inner Operator objects. It does not use itself the input
    * vectors provided, but forwards them to the explicit and implicit
    * operators.
+   *
+   * <h4>Vector data</h4>
    *
    * The explicit Operator #op_explicit receives in its input in first
    * place the vector <tt>"Previous iterate"</tt>, which is the solution
@@ -102,6 +107,17 @@ namespace Algorithms
    * ThetaTimestepping::operator() as input argument. The output of
    * #op_implicit is directly written into the output argument given to
    * ThetaTimestepping.
+   *
+   * <h4>Scalar data</h4>
+   *
+   * Since the introduction of AnyData, ThetaTimestepping is able to
+   * communicate the current time step information through AnyData as
+   * well. Therefore, the AnyData objects handed as input to
+   * #op_explicit and #op_implicit contain two entries of type
+   * <tt>const double</tt> reference named "Time" and "Timestep". Note
+   * that "Time" refers to the time at the beginning of the current
+   * step for #op_explicit and at the end for #op_implicit,
+   * respectively.
    *
    * <h3>Usage of ThetaTimestepping</h3>
    *
