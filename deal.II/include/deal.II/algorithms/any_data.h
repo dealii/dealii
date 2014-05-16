@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/named_data.h>
 
 #include <boost/any.hpp>
 #include <vector>
@@ -38,6 +39,9 @@ class AnyData :
    public Subscriptor
 {
   public:
+    /// Default constructor for empty object
+    AnyData();
+    
     /// Number of stored data objects.
     unsigned int size() const;
     
@@ -125,6 +129,10 @@ class AnyData :
     /// Find out if object is of a certain type
     template <typename type>
     bool is_type(const unsigned int i) const;
+
+    /// Conversion from old NamedData
+    template <typename type>
+    AnyData(const NamedData<type>&);
     
     /// The requested type and the stored type are different
   DeclException2(ExcTypeMismatch,
@@ -139,6 +147,18 @@ class AnyData :
     /// The names of the stored data
     std::vector<std::string> names;
 };
+
+
+AnyData::AnyData()
+{}
+
+
+template <typename type>
+AnyData::AnyData(const NamedData<type>& other)
+{
+  for (unsigned int i=0;i<other.size();++i)
+    add(other(i), other.name(i));
+}
 
 
 unsigned int
