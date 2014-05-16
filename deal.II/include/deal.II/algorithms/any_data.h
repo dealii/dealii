@@ -274,7 +274,7 @@ AnyData::try_read(const std::string& n) const
   // Compute index and return casted pointer
   unsigned int i=it-names.begin();
   const type* p = boost::any_cast<type>(&data[i]);
-  return *p;
+  return p;
 }
 
 

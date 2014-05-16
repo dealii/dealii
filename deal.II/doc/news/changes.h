@@ -148,7 +148,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: The GMRES solver of deal.II can now write an estimate of
+<li> New: AnyData::try_read() is a function that allows users to check
+whether an entry exists and get a pointer to it without throwing an
+exception in case of failure.
+<br>
+(Guido Kanschat, 2014/05/16)
+</li>
+
+<li> New: The GMRES solver of deal.II can now write an estimate of
   eigenvalues to the log file, in analogy to the CG solver. This is enabled
   by the flag SolverGMRES<>::AdditionalData::compute_eigenvalues.
   <br>

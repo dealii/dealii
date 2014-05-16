@@ -62,7 +62,11 @@ void extract(const AnyData& data)
 	  << d  << std::endl
 	  << *p2 << std::endl
 	  << *p3 << std::endl;
-  // try
+
+  deallog << *data.try_read<double>(" d  17.") << std::endl
+	  << data.try_read<char *>(" d  17.") << std::endl
+	  << data.try_read<double>("does not exist") << std::endl;
+// try
   //   {
   //     double* p3a = data.entry<double*>("cd* 17.");
   //     deallog << p3a;
