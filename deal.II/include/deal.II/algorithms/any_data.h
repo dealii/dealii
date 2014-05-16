@@ -52,20 +52,53 @@ class AnyData :
 
     /**
      * @brief Access to stored data object by name.
+     *
+     * Find the object with given name, try to convert it to
+     * <tt>type</tt> and return it. This function throws an exception
+     * if either the name does not exist or if the conversion
+     * fails. If such an exception is not desired, use try_read()
+     * instead.
      */
     template <typename type>
     type entry (const std::string& name);
 
-    /// Read-only access to stored data object by name.
+    /**
+     * @brief Read-only access to stored data object by name.
+     *
+     * Find the object with given name, try to convert it to
+     * <tt>type</tt> and return it. This function throws an exception
+     * if either the name does not exist or if the conversion
+     * fails. If such an exception is not desired, use try_read()
+     * instead.
+     */
     template <typename type>
     const type entry (const std::string& name) const;
 
-    /// Dedicated read only access by name.
+    /**
+     * @brief Dedicated read only access by name.
+     *
+     * For a constant object, this function equals entry(). For a
+     * non-const object, it forces read only access to the data. In
+     * particular, it throws an exception if the object is not found
+     * or cannot be converted to type.  If such an exception is not
+     * desired, use try_read() instead.
+     */
     template <typename type>
     const type read (const std::string& name) const;
     
+    /**
+     * @brief Dedicated read only access by name without exceptions.
+     *
+     * This function tries to find the name in the list and return a
+     * pointer to the associated object. If either the name is not
+     * found or the object cannot be converted to the return type, a
+     * null pointer is returned.
+     */
+    template <typename type>
+    const type * try_read (const std::string& name) const;
+    
   /**
-   * @brief Access to stored data object by index.
+   * Access to stored data object by index.
    */
     template <typename type>
     type entry (const unsigned int i);
@@ -81,7 +114,12 @@ class AnyData :
     /// Name of object at index.
     const std::string &name(const unsigned int i) const;
 
-    /// Find index of a named object
+    /**
+     * @brief Find index of a named object
+     *
+     * Try to find the objecty and return its index in the list. Throw
+     * an exception if the object has not been found.
+     */
     unsigned int find(const std::string &name) const;
 
     /// Find out if object is of a certain type
@@ -217,6 +255,25 @@ AnyData::read(const std::string& n) const
   const type* p = boost::any_cast<type>(&data[i]);
   Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
+  return *p;
+}
+
+
+template <typename type>
+inline
+const type*
+AnyData::try_read(const std::string& n) const
+{
+  // Try to find name
+  std::vector<std::string>::const_iterator it =
+    std::find(names.begin(), names.end(), n);
+  // Return null pointer if not found
+  if (it == names.end())
+    return 0;
+
+  // Compute index and return casted pointer
+  unsigned int i=it-names.begin();
+  const type* p = boost::any_cast<type>(&data[i]);
   return *p;
 }
 
