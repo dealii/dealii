@@ -149,11 +149,13 @@ class AnyData :
 };
 
 
+inline
 AnyData::AnyData()
 {}
 
 
 template <typename type>
+inline
 AnyData::AnyData(const NamedData<type>& other)
 {
   for (unsigned int i=0;i<other.size();++i)
