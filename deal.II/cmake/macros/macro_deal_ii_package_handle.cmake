@@ -103,9 +103,9 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
           LIST(APPEND _clear ${_arg})
         ENDIF()
       ELSE()
-        IF("${_arg}" STREQUAL "" OR ${_arg} MATCHES "-NOTFOUND")
+        IF("${${_arg}}" MATCHES "^\\s*$" OR "${${_arg}}" MATCHES "-NOTFOUND")
           IF(_required AND _fine)
-            IF("${_arg}" STREQUAL "")
+            IF("${${_arg}}" MATCHES "^\\s*$")
               MESSAGE(STATUS
                 "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" empty ***"
                 )
