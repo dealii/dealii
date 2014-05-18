@@ -86,9 +86,30 @@ class AnyData :
      * particular, it throws an exception if the object is not found
      * or cannot be converted to type.  If such an exception is not
      * desired, use try_read() instead.
+     *
+     * @warning Do not use this function for stored objects which are
+     * pointers. Use read_ptr() instead!
      */
     template <typename type>
     const type read (const std::string& name) const;
+    
+    /**
+     * @brief Dedicated read only access by name for pointer data.
+     *
+     * If the stored data object is a pointer to a constant object, the logic
+     * of access becomes fairly complicated. Namely, the standard read
+     * function may fail, depending on whether it was a const pointer
+     * or a regular pointer. This function fixes the logic and
+     * ascertains that the object does not become mutable by accident.
+     *
+     * For a constant object, this function equals entry(). For a
+     * non-const object, it forces read only access to the data. In
+     * particular, it throws an exception if the object is not found
+     * or cannot be converted to type.  If such an exception is not
+     * desired, use try_read() instead.
+     */
+    template <typename type>
+    const type* read_ptr (const std::string& name) const;
     
     /**
      * @brief Dedicated read only access by name without exceptions.
@@ -114,6 +135,14 @@ class AnyData :
     /// Dedicated read only access.
     template <typename type>
     const type read (const unsigned int i) const;
+
+    /// Dedicated read only access to pointer object.
+    template <typename type>
+    const type* read_ptr (const unsigned int i) const;
+
+    /// Dedicated read only access without exception.
+    template <typename type>
+    const type* try_read (const unsigned int i) const;
     
     /// Name of object at index.
     const std::string &name(const unsigned int i) const;
@@ -141,6 +170,15 @@ class AnyData :
 		 << " and the stored type " << arg2
 		 << " must coincide");
   
+  /**
+   * Exception indicating that a
+   * function expected a vector
+   * to have a certain name, but
+   * NamedData had a different
+   * name in that position.
+   */
+  DeclException2(ExcNameMismatch, int, std::string,
+                 << "Name at position " << arg1 << " is not equal to " << arg2);
   private:
     /// The stored data
     std::vector<boost::any> data;
@@ -192,6 +230,8 @@ AnyData::entry (const unsigned int i) const
 {
   AssertIndexRange(i, size());
   const type* p = boost::any_cast<type>(&data[i]);
+  if (p==0 )
+    p = boost::any_cast<const type>(&data[i]);
   Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
   return *p;
@@ -205,9 +245,39 @@ AnyData::read(const unsigned int i) const
 {
   AssertIndexRange(i, size());
   const type* p = boost::any_cast<type>(&data[i]);
+  if (p==0)
+    p = boost::any_cast<const type>(&data[i]);
   Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
   return *p;
+}
+
+
+template <typename type>
+inline
+const type*
+AnyData::read_ptr(const unsigned int i) const
+{
+  AssertIndexRange(i, size());
+  const type* const * p = boost::any_cast<type*>(&data[i]);
+  if (p==0)
+    p = boost::any_cast<const type*>(&data[i]);
+  Assert(p != 0,
+	 ExcTypeMismatch(typeid(type*).name(),data[i].type().name()));
+  return *p;
+}
+
+
+template <typename type>
+inline
+const type*
+AnyData::try_read(const unsigned int i) const
+{
+  AssertIndexRange(i, size());
+  const type* p = boost::any_cast<type>(&data[i]);
+  if (p==0)
+    p = boost::any_cast<const type>(&data[i]);
+  return p;
 }
 
 
@@ -275,6 +345,21 @@ AnyData::read(const std::string& n) const
 {
   const unsigned int i = find(n);
   const type* p = boost::any_cast<type>(&data[i]);
+  Assert(p != 0,
+	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
+  return *p;
+}
+
+
+template <typename type>
+inline
+const type*
+AnyData::read_ptr(const std::string& n) const
+{
+  const unsigned int i = find(n);
+  const type* const * p = boost::any_cast<type*>(&data[i]);
+  if (p==0)
+    p = boost::any_cast<const type*>(&data[i]);
   Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
   return *p;
