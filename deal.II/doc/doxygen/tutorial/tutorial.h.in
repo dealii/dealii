@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,12 +69,12 @@
 @@MAP@@
  * @enddot
  *
- * Legend:<br />
- * <b>Green octagons:</b> programs that show basic techniques;<br />
- * <b>Orange boxes:</b> advanced techniques;<br />
- * <b>Yellow:</b> applications in fluid dynamics;<br />
- * <b>Light blue:</b> applications in solid mechanics;<br />
- * <b>Dark blue boxes:</b> time dependent problems.
+ * <b>Legend:</b><br />
+ * <b>Green:</b> programs that show basic techniques; &nbsp;
+ * <b>Orange:</b> advanced techniques; &nbsp;
+ * <b>Yellow:</b> applications in fluid dynamics; &nbsp;
+ * <b>Light blue:</b> applications in solid mechanics; &nbsp;
+ * <b>Dark blue:</b> time dependent problems.
  *
  * <a name="list"></a>
  * <h3>Tutorial programs listed by number</h3>
