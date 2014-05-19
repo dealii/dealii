@@ -70,11 +70,13 @@
  * @enddot
  *
  * <b>Legend:</b><br />
- * <b>Green:</b> programs that show basic techniques; &nbsp;
- * <b>Orange:</b> advanced techniques; &nbsp;
- * <b>Yellow:</b> applications in fluid dynamics; &nbsp;
- * <b>Light blue:</b> applications in solid mechanics; &nbsp;
- * <b>Dark blue:</b> time dependent problems.
+ * <blockquote>
+ * <i>Green:</i> programs that show basic techniques; <br />
+ * <i>Orange:</i> advanced techniques; <br />
+ * <i>Yellow:</i> applications in fluid dynamics; <br />
+ * <i>Light blue:</i> applications in solid mechanics; <br />
+ * <i>Dark blue:</i> time dependent problems.
+ * </blockquote>
  *
  * <a name="list"></a>
  * <h3>Tutorial programs listed by number</h3>
