@@ -148,16 +148,23 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> New: AnyData::try_read() is a function that allows users to check
-whether an entry exists and get a pointer to it without throwing an
-exception in case of failure.
-<br>
-(Guido Kanschat, 2014/05/16)
-</li>
+  <li> Fixed: The MatrixTools::apply_boundary_values() variant that works
+  on PETSc matrices could produce a deadlock in parallel if one processor
+  had no boundary values to apply. This is now fixed.
+  <br>
+  (Michal Wichrowski, 2014/05/19)
+  </li>
 
-<li> New: The GMRES solver of deal.II can now write an estimate of
+  <li> New: AnyData::try_read() is a function that allows users to check
+  whether an entry exists and get a pointer to it without throwing an
+  exception in case of failure.
+  <br>
+  (Guido Kanschat, 2014/05/16)
+  </li>
+
+  <li> New: The GMRES solver of deal.II can now write an estimate of
   eigenvalues to the log file, in analogy to the CG solver. This is enabled
-  by the flag SolverGMRES<>::AdditionalData::compute_eigenvalues.
+  by the flag SolverGMRES::AdditionalData::compute_eigenvalues.
   <br>
   (Martin Kronbichler, 2014/05/11)
   </li>  

@@ -2334,74 +2334,75 @@ namespace MatrixTools
         Assert (matrix.n() == solution.size(),
                 ExcDimensionMismatch(matrix.n(), solution.size()));
 
-        // if no boundary values are to be applied
-        // simply return
-        if (boundary_values.size() == 0)
-          return;
+        // if no boundary values are to be applied, then
+        // jump straight to the compress() calls that we still have
+        // to perform because they are collective operations
+        if (boundary_values.size() > 0)
+          {
+            const std::pair<types::global_dof_index, types::global_dof_index> local_range
+            = matrix.local_range();
+            Assert (local_range == right_hand_side.local_range(),
+                    ExcInternalError());
+            Assert (local_range == solution.local_range(),
+                    ExcInternalError());
 
-        const std::pair<types::global_dof_index, types::global_dof_index> local_range
-          = matrix.local_range();
-        Assert (local_range == right_hand_side.local_range(),
-                ExcInternalError());
-        Assert (local_range == solution.local_range(),
-                ExcInternalError());
+            // determine the first nonzero diagonal
+            // entry from within the part of the
+            // matrix that we can see. if we can't
+            // find such an entry, take one
+            PetscScalar average_nonzero_diagonal_entry = 1;
+            for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
+              if (matrix.diag_element(i) != 0)
+                {
+                  average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
+                  break;
+                }
 
-        // determine the first nonzero diagonal
-        // entry from within the part of the
-        // matrix that we can see. if we can't
-        // find such an entry, take one
-        PetscScalar average_nonzero_diagonal_entry = 1;
-        for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
-          if (matrix.diag_element(i) != 0)
-            {
-              average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
-              break;
-            }
+            // figure out which rows of the matrix we
+            // have to eliminate on this processor
+            std::vector<types::global_dof_index> constrained_rows;
+            for (std::map<types::global_dof_index,double>::const_iterator
+                dof  = boundary_values.begin();
+                dof != boundary_values.end();
+                ++dof)
+              if ((dof->first >= local_range.first) &&
+                  (dof->first < local_range.second))
+                constrained_rows.push_back (dof->first);
 
-        // figure out which rows of the matrix we
-        // have to eliminate on this processor
-        std::vector<types::global_dof_index> constrained_rows;
-        for (std::map<types::global_dof_index,double>::const_iterator
-             dof  = boundary_values.begin();
-             dof != boundary_values.end();
-             ++dof)
-          if ((dof->first >= local_range.first) &&
-              (dof->first < local_range.second))
-            constrained_rows.push_back (dof->first);
+            // then eliminate these rows and set
+            // their diagonal entry to what we have
+            // determined above. note that for petsc
+            // matrices interleaving read with write
+            // operations is very expensive. thus, we
+            // here always replace the diagonal
+            // element, rather than first checking
+            // whether it is nonzero and in that case
+            // preserving it. this is different from
+            // the case of deal.II sparse matrices
+            // treated in the other functions.
+            matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-        // then eliminate these rows and set
-        // their diagonal entry to what we have
-        // determined above. note that for petsc
-        // matrices interleaving read with write
-        // operations is very expensive. thus, we
-        // here always replace the diagonal
-        // element, rather than first checking
-        // whether it is nonzero and in that case
-        // preserving it. this is different from
-        // the case of deal.II sparse matrices
-        // treated in the other functions.
-        matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
+            std::vector<types::global_dof_index> indices;
+            std::vector<PetscScalar>  solution_values;
+            for (std::map<types::global_dof_index,double>::const_iterator
+                dof  = boundary_values.begin();
+                dof != boundary_values.end();
+                ++dof)
+              if ((dof->first >= local_range.first) &&
+                  (dof->first < local_range.second))
+                {
+                  indices.push_back (dof->first);
+                  solution_values.push_back (dof->second);
+                }
+            solution.set (indices, solution_values);
 
-        std::vector<types::global_dof_index> indices;
-        std::vector<PetscScalar>  solution_values;
-        for (std::map<types::global_dof_index,double>::const_iterator
-             dof  = boundary_values.begin();
-             dof != boundary_values.end();
-             ++dof)
-          if ((dof->first >= local_range.first) &&
-              (dof->first < local_range.second))
-            {
-              indices.push_back (dof->first);
-              solution_values.push_back (dof->second);
-            }
-        solution.set (indices, solution_values);
+            // now also set appropriate values for
+            // the rhs
+            for (unsigned int i=0; i<solution_values.size(); ++i)
+              solution_values[i] *= average_nonzero_diagonal_entry;
 
-        // now also set appropriate values for
-        // the rhs
-        for (unsigned int i=0; i<solution_values.size(); ++i)
-          solution_values[i] *= average_nonzero_diagonal_entry;
-
-        right_hand_side.set (indices, solution_values);
+            right_hand_side.set (indices, solution_values);
+          }
 
         // clean up
         matrix.compress ();
