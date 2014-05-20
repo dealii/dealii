@@ -101,15 +101,17 @@ class AnyData :
      * function may fail, depending on whether it was a const pointer
      * or a regular pointer. This function fixes the logic and
      * ascertains that the object does not become mutable by accident.
-     *
-     * For a constant object, this function equals entry(). For a
-     * non-const object, it forces read only access to the data. In
-     * particular, it throws an exception if the object is not found
-     * or cannot be converted to type.  If such an exception is not
-     * desired, use try_read() instead.
      */
     template <typename type>
     const type* read_ptr (const std::string& name) const;
+
+    /**
+     * Perform the same action as read_ptr(), but do not throw an
+     * exception if the pointer does not exist. Return a null pointer
+     * instead.
+     */
+    template <typename type>
+    const type* try_read_ptr (const std::string& name) const;
     
     /**
      * @brief Dedicated read only access by name without exceptions.
@@ -140,6 +142,10 @@ class AnyData :
     template <typename type>
     const type* read_ptr (const unsigned int i) const;
 
+    /// Dedicated read only access to pointer object without exception.
+    template <typename type>
+    const type* try_read_ptr (const unsigned int i) const;
+
     /// Dedicated read only access without exception.
     template <typename type>
     const type* try_read (const unsigned int i) const;
@@ -155,6 +161,15 @@ class AnyData :
      */
     unsigned int find(const std::string &name) const;
 
+    /**
+     * @brief Try to find index of a named object
+     *
+     * Try to find the objecty and return its index in the
+     * list. returns numbers::invalid_unsigned_int if the name was not
+     * found.
+     */
+    unsigned int try_find(const std::string &name) const;
+
     /// Find out if object is of a certain type
     template <typename type>
     bool is_type(const unsigned int i) const;
@@ -162,20 +177,22 @@ class AnyData :
     /// Conversion from old NamedData
     template <typename type>
     AnyData(const NamedData<type>&);
+
+    /// An entry with this name does not exist in the AnyData object.
+    DeclException1(ExcNameNotFound, std::string&,
+		   << "No entry with the name " << arg1 << " exists");
     
     /// The requested type and the stored type are different
-  DeclException2(ExcTypeMismatch,
-		 char*, char*,
-		 << "The requested type " << arg1
-		 << " and the stored type " << arg2
-		 << " must coincide");
+    DeclException2(ExcTypeMismatch,
+		   char*, char*,
+		   << "The requested type " << arg1
+		   << " and the stored type " << arg2
+		   << " must coincide");
   
   /**
-   * Exception indicating that a
-   * function expected a vector
-   * to have a certain name, but
-   * NamedData had a different
-   * name in that position.
+   * Exception indicating that a function expected a vector to have a
+   * certain name, but NamedData had a different name in that
+   * position.
    */
   DeclException2(ExcNameMismatch, int, std::string,
                  << "Name at position " << arg1 << " is not equal to " << arg2);
@@ -271,6 +288,19 @@ AnyData::read_ptr(const unsigned int i) const
 template <typename type>
 inline
 const type*
+AnyData::try_read_ptr(const unsigned int i) const
+{
+  AssertIndexRange(i, size());
+  const type* const * p = boost::any_cast<type*>(&data[i]);
+  if (p==0)
+    p = boost::any_cast<const type*>(&data[i]);
+  return *p;
+}
+
+
+template <typename type>
+inline
+const type*
 AnyData::try_read(const unsigned int i) const
 {
   AssertIndexRange(i, size());
@@ -292,14 +322,26 @@ AnyData::name(const unsigned int i) const
 
 inline
 unsigned int
-AnyData::find(const std::string& n) const
+AnyData::try_find(const std::string& n) const
 {
   std::vector<std::string>::const_iterator it =
     std::find(names.begin(), names.end(), n);
   
-  Assert(it != names.end(), ExcMessage("An entry with this name does not exist"));
+  if (it == names.end())
+    return numbers::invalid_unsigned_int;
   
   return it - names.begin();
+}
+
+
+inline
+unsigned int
+AnyData::find(const std::string& n) const
+{
+  const unsigned int i = try_find(n);
+  Assert(i != numbers::invalid_unsigned_int, ExcNameNotFound(n));
+  
+  return i;
 }
 
 
@@ -362,6 +404,22 @@ AnyData::read_ptr(const std::string& n) const
     p = boost::any_cast<const type*>(&data[i]);
   Assert(p != 0,
 	 ExcTypeMismatch(typeid(type).name(),data[i].type().name()));
+  return *p;
+}
+
+
+template <typename type>
+inline
+const type*
+AnyData::try_read_ptr(const std::string& n) const
+{
+  const unsigned int i = try_find(n);
+  if (i == numbers::invalid_unsigned_int)
+    return 0;
+  
+  const type* const * p = boost::any_cast<type*>(&data[i]);
+  if (p==0)
+    p = boost::any_cast<const type*>(&data[i]);
   return *p;
 }
 
