@@ -114,7 +114,7 @@ namespace Algorithms
    * communicate the current time step information through AnyData as
    * well. Therefore, the AnyData objects handed as input to
    * #op_explicit and #op_implicit contain two entries of type
-   * <tt>const double</tt> reference named "Time" and "Timestep". Note
+   * <tt>const double*</tt> named "Time" and "Timestep". Note
    * that "Time" refers to the time at the beginning of the current
    * step for #op_explicit and at the end for #op_implicit,
    * respectively.

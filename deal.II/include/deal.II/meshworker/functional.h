@@ -19,6 +19,7 @@
 #define __deal2__mesh_worker_functional_h
 
 #include <deal.II/base/named_data.h>
+#include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/block_vector.h>
@@ -107,49 +108,28 @@ namespace MeshWorker
     {
     public:
       /**
-       * The data type for
-       * communicating the cell and
-       * face vectors.
+       * The initialization function, specifying the @p results
+       * vectors and whether face data should be collected separately.
+       *
+       * @p results should contain two block vectors named "cells" and
+       * "faces" (the latter only if @p separate_faces is true). In
+       * each of the two, each block should have equal size and be
+       * large enough to accommodate all user indices set in the cells
+       * and faces covered by the loop it is used in. Typically, for
+       * estimators, this is Triangulation::n_active_cells() and
+       * Triangulation::n_faces(), respectively.
+       *
+       * The use of BlockVector may seem cumbersome, but it allows us
+       * to assemble several functionals at the same time, one in each
+       * block. The typical situation for error estimate is just
+       * having a single block in each vector.
        */
-      typedef NamedData<BlockVector<number>*> DataVectors;
+      void initialize(AnyData &results, bool separate_faces = true);
 
-      /**
-       * The initialization
-       * function, specifying the
-       * @p results vectors and
-       * whether face data should
-       * be collected separately.
-       *
-       * @p results should contain
-       * two block vectors named
-       * "cells" and "faces" (the
-       * latter only if
-       * @p separate_faces is
-       * true). In each of the two,
-       * each block should have
-       * equal size and be large
-       * enough to accommodate all
-       * user indices set in the
-       * cells and faces covered by
-       * the loop it is used
-       * in. Typically, for
-       * estimators, this is
-       * Triangulation::n_active_cells()
-       * and
-       * Triangulation::n_faces(),
-       * respectively.
-       *
-       * The use of BlockVector may
-       * seem cumbersome, but it
-       * allows us to assemble
-       * several functionals at the
-       * same time, one in each
-       * block. The typical
-       * situation for error
-       * estimate is just having a
-       * single block in each vector.
-       */
-      void initialize(DataVectors &results,
+	/**
+	 * @deprecated
+	 */
+	void initialize(NamedData<BlockVector<number>*> &results,
                       bool separate_faces = true);
       /**
        * Initialize the local data
@@ -188,7 +168,7 @@ namespace MeshWorker
        */
       number operator() (const unsigned int i) const;
     private:
-      DataVectors results;
+      AnyData results;
       bool separate_faces;
     };
 //----------------------------------------------------------------------//
@@ -247,13 +227,29 @@ namespace MeshWorker
 
     template <typename number>
     inline void
-    CellsAndFaces<number>::initialize(DataVectors &r, bool sep)
+    CellsAndFaces<number>::initialize(AnyData &r, bool sep)
     {
-      Assert(r.name(0) == "cells", typename DataVectors::ExcNameMismatch(0, "cells"));
+      Assert(r.name(0) == "cells", AnyData::ExcNameMismatch(0, "cells"));
       if (sep)
         {
-          Assert(r.name(1) == "faces", typename DataVectors::ExcNameMismatch(1, "faces"));
-          AssertDimension(r(0)->n_blocks(), r(1)->n_blocks());
+          Assert(r.name(1) == "faces", AnyData::ExcNameMismatch(1, "faces"));
+          AssertDimension(r.entry<BlockVector<double>*>(0)->n_blocks(),
+			  r.entry<BlockVector<double>*>(1)->n_blocks());
+        }
+
+      results = r;
+      separate_faces = sep;
+    }
+
+    template <typename number>
+    inline void
+    CellsAndFaces<number>::initialize(NamedData<BlockVector<number>*> &r, bool sep)
+    {
+      Assert(r.name(0) == "cells", AnyData::ExcNameMismatch(0, "cells"));
+      if (sep)
+        {
+          Assert(r.name(1) == "faces", AnyData::ExcNameMismatch(1, "faces"));
+          AssertDimension(r(0)->n_blocks(),r(1)->n_blocks());
         }
 
       results = r;
@@ -266,7 +262,7 @@ namespace MeshWorker
     inline void
     CellsAndFaces<number>::initialize_info(DOFINFO &info, bool) const
     {
-      info.initialize_numbers(results(0)->n_blocks());
+      info.initialize_numbers(results.entry<BlockVector<double>*>(0)->n_blocks());
     }
 
 
@@ -275,14 +271,15 @@ namespace MeshWorker
     inline void
     CellsAndFaces<number>::assemble(const DOFINFO &info)
     {
+      BlockVector<double>* v;
+      if (separate_faces &&
+	  info.face_number != deal_II_numbers::invalid_unsigned_int)
+	v = results.entry<BlockVector<double>*>(1);
+      else
+	v = results.entry<BlockVector<double>*>(0);
+      
       for (unsigned int i=0; i<info.n_values(); ++i)
-        {
-          if (separate_faces &&
-              info.face_number != deal_II_numbers::invalid_unsigned_int)
-            results(1)->block(i)(info.face->user_index()) += info.value(i);
-          else
-            results(0)->block(i)(info.cell->user_index()) += info.value(i);
-        }
+	v->block(i)(info.cell->user_index()) += info.value(i);
     }
 
 
@@ -296,15 +293,17 @@ namespace MeshWorker
         {
           if (separate_faces)
             {
+	      BlockVector<double>* v1 = results.entry<BlockVector<double>*>(1);
               const double J = info1.value(i) + info2.value(i);
-              results(1)->block(i)(info1.face->user_index()) += J;
+              v1->block(i)(info1.face->user_index()) += J;
               if (info2.face != info1.face)
-                results(1)->block(i)(info2.face->user_index()) += J;
+                v1->block(i)(info2.face->user_index()) += J;
             }
           else
             {
-              results(0)->block(i)(info1.cell->user_index()) += .5*info1.value(i);
-              results(0)->block(i)(info2.cell->user_index()) += .5*info2.value(i);
+	      BlockVector<double>* v0 = results.entry<BlockVector<double>*>(0);
+              v0->block(i)(info1.cell->user_index()) += .5*info1.value(i);
+              v0->block(i)(info2.cell->user_index()) += .5*info2.value(i);
             }
         }
     }

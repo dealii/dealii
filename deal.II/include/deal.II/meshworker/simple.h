@@ -19,6 +19,7 @@
 #define __deal2__mesh_worker_simple_h
 
 #include <deal.II/base/named_data.h>
+#include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/block_vector.h>
@@ -60,8 +61,18 @@ namespace MeshWorker
     class ResidualSimple
     {
     public:
-      void initialize(NamedData<VECTOR *> &results);
+     /**
+      * Initialize with an AnyData object holding the result of
+      * assembling.
+      *
+      * Assembling currently writes into the first vector of <tt>results</tt>.
+      */
+      void initialize(AnyData& results);
 
+      /**
+       * @deprecated Use initialize(AnyData&) instead.
+       */
+      void initialize(NamedData<VECTOR *> &results);
       /**
        * Initialize the constraints.
        */
@@ -114,7 +125,7 @@ namespace MeshWorker
       /**
        * The global residal vectors filled by assemble().
        */
-      NamedData<SmartPointer<VECTOR,ResidualSimple<VECTOR> > > residuals;
+      AnyData residuals;
       /**
        * A pointer to the object containing constraints.
        */
@@ -502,6 +513,13 @@ namespace MeshWorker
 
     template <class VECTOR>
     inline void
+    ResidualSimple<VECTOR>::initialize(AnyData &results)
+    {
+      residuals = results;
+    }
+
+    template <class VECTOR>
+    inline void
     ResidualSimple<VECTOR>::initialize(NamedData<VECTOR *> &results)
     {
       residuals = results;
@@ -537,18 +555,19 @@ namespace MeshWorker
     {
       for (unsigned int k=0; k<residuals.size(); ++k)
         {
+	  VECTOR* v = residuals.entry<VECTOR*>(k);
           if (constraints == 0)
             {
               for (unsigned int i=0; i<info.vector(k).block(0).size(); ++i)
-                (*residuals(k))(info.indices[i]) += info.vector(k).block(0)(i);
+                (*v)(info.indices[i]) += info.vector(k).block(0)(i);
             }
           else
             {
               if (info.indices_by_block.size() == 0)
-                constraints->distribute_local_to_global(info.vector(k).block(0), info.indices, (*residuals(k)));
+                constraints->distribute_local_to_global(info.vector(k).block(0), info.indices, *v);
               else
                 for (unsigned int i=0; i != info.vector(k).n_blocks(); ++i)
-                  constraints->distribute_local_to_global(info.vector(k).block(i), info.indices_by_block[i], (*residuals(k)));
+                  constraints->distribute_local_to_global(info.vector(k).block(i), info.indices_by_block[i], *v);
             }
         }
     }
@@ -561,30 +580,31 @@ namespace MeshWorker
     {
       for (unsigned int k=0; k<residuals.size(); ++k)
         {
+	  VECTOR* v = residuals.entry<VECTOR*>(k);
           if (constraints == 0)
             {
               for (unsigned int i=0; i<info1.vector(k).block(0).size(); ++i)
-                (*residuals(k))(info1.indices[i]) += info1.vector(k).block(0)(i);
+                (*v)(info1.indices[i]) += info1.vector(k).block(0)(i);
               for (unsigned int i=0; i<info2.vector(k).block(0).size(); ++i)
-                (*residuals(k))(info2.indices[i]) += info2.vector(k).block(0)(i);
+                (*v)(info2.indices[i]) += info2.vector(k).block(0)(i);
             }
           else
             {
               if (info1.indices_by_block.size() == 0 && info2.indices_by_block.size() == 0)
                 {
                   constraints->distribute_local_to_global
-                  (info1.vector(k).block(0), info1.indices, (*residuals(k)));
+                  (info1.vector(k).block(0), info1.indices, *v);
                   constraints->distribute_local_to_global
-                  (info2.vector(k).block(0), info2.indices, (*residuals(k)));
+                  (info2.vector(k).block(0), info2.indices, *v);
                 }
               else if (info1.indices_by_block.size() != 0 && info2.indices_by_block.size() != 0)
                 {
                   for (unsigned int i=0; i<info1.vector(k).n_blocks(); ++i)
                     {
                       constraints->distribute_local_to_global
-                      (info1.vector(k).block(i), info1.indices_by_block[i], (*residuals(k)));
+                      (info1.vector(k).block(i), info1.indices_by_block[i], *v);
                       constraints->distribute_local_to_global
-                      (info2.vector(k).block(i), info2.indices_by_block[i], (*residuals(k)));
+                      (info2.vector(k).block(i), info2.indices_by_block[i], *v);
                     }
                 }
               else
@@ -1132,7 +1152,7 @@ namespace MeshWorker
     inline void
     SystemSimple<MATRIX,VECTOR>::initialize(MATRIX &m, VECTOR &rhs)
     {
-      NamedData<VECTOR *> data;
+      AnyData data;
       VECTOR *p = &rhs;
       data.add(p, "right hand side");
 
