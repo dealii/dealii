@@ -157,6 +157,11 @@ namespace Algorithms
      */
     virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
 
+    /**
+     * Set this true to avoid compatibility warnings.
+     */
+    bool silent_compatibility;
+      
   private:
     /**
      * While we are providing compatibility functions to the old

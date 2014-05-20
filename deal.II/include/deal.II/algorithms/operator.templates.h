@@ -24,7 +24,7 @@ namespace Algorithms
 {
   template <class VECTOR>
   Operator<VECTOR>::Operator()
-    : compatibility_flag(false)
+		  : silent_compatibility(false), compatibility_flag(false)
   {}
 
 
@@ -45,8 +45,9 @@ namespace Algorithms
 	if (out.is_type<VECTOR*>(i))
 	  new_out.add(out.entry<VECTOR*>(i), out.name(i));
 	else
-	  deallog << "Cannot convert AnyData argument " << out.name(i) << " to NamedData"
-		  << std::endl;
+	  if (!silent_compatibility)
+	    deallog << "Cannot convert AnyData argument " << out.name(i) << " to NamedData"
+		    << std::endl;
       }
     
     NamedData<VECTOR*> new_in;
@@ -72,8 +73,9 @@ namespace Algorithms
 	    new_in.add(p, in.name(i));
 	  }
 	else
-	  deallog << "Cannot convert AnyData argument " << in.name(i)
-		  << " to NamedData" << std::endl;
+	  if (!silent_compatibility)
+	    deallog << "Cannot convert AnyData argument " << in.name(i)
+		    << " to NamedData" << std::endl;
       }
     this->operator() (new_out, new_in);
     compatibility_flag = false;
