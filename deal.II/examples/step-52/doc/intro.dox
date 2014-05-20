@@ -23,7 +23,7 @@ neutrons, $D$ is the diffusion coefficient, $\Sigma_a$ is the <i>absorption
 cross section</i>, and $S$ is a source. Because we are only interested in the
 time dependence, we assume that $D$ and $\Sigma_a$ are constant. In this
 example, we are only interested in the error in time. The domain is square
-$[0,b]\times[0,b] and we are looking for a solution of the form:
+$[0,b]\times[0,b]$ and we are looking for a solution of the form:
 @f{eqnarray*}
 \phi(x,t) = A\sin(\omega t)(bx-x^2).
 @f}
