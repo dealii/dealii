@@ -245,7 +245,7 @@ ENDIF()
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
 
 IF( "${TRACK}" STREQUAL "Regression Tests"
-    AND NOT CTEST_SITE MATCHES "tester" )
+    AND NOT CTEST_SITE MATCHES "^(simserv04|tester)$" )
   MESSAGE(FATAL_ERROR "
 I'm sorry ${CTEST_SITE}, I'm afraid I can't do that.
 The TRACK \"Regression Tests\" is not for you.
