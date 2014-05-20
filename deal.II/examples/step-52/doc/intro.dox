@@ -22,12 +22,13 @@ augmented by appropriate boundary conditions. Here, $v$ is the velocity of
 neutrons, $D$ is the diffusion coefficient, $\Sigma_a$ is the <i>absorption
 cross section</i>, and $S$ is a source. Because we are only interested in the
 time dependence, we assume that $D$ and $\Sigma_a$ are constant. In this
-example, we are only interested in the error in time and thus, we are looking
-for a solution of the form:
+example, we are only interested in the error in time. The domain is square
+$[0,b]\times[0,b] and we are looking for a solution of the form:
 @f{eqnarray*}
 \phi(x,t) = A\sin(\omega t)(bx-x^2).
 @f}
-By using quadratic finite elements, we will not have any spatial error. We
+By using quadratic finite elements, we will not have any spatial error and all
+the error will come from the time discretization. We
 impose the following boundary conditions: homogeneous Dirichlet fo $x=0$ and
 $x=b$ and homogeneous Neumann conditions for $y=0$ and $y=b$. The source is
 given by:
@@ -42,7 +43,7 @@ found.
 
 <h3>Runge-Kutta</h3>
 
-The Runke-Kutta methods implemented in deal.II assume that the equation to be
+The Runge-Kutta methods implemented in deal.II assume that the equation to be
 solved can be written as:
 @f{eqnarray*}
 \frac{dy}{dt} = f(t,y).
@@ -61,11 +62,11 @@ y_{n+1} = y_n + \sum_{i=1}^s b_i k_i
 @f}
 where
 @f{eqnarray*}
-k_i = h M^{-1} f(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j)
+k_i = h M^{-1} f\left(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j\right)
 @f}
 with $a_{ij}$, $b_i$, and $c_i$ are known coefficient and $h$ is the time step
-used. The methods currently implemented in deal.II can be divided in three
-categories:
+used. At the time of the writing of this tutorial, the methods implemented in
+deal.II can be divided in three categories:
 <ol>
 <li> explicit Runge-Kutta
 <li> embedded (or adaptive) Runge-Kutta
@@ -80,17 +81,18 @@ methods become unstable when the time step chosen is too large.
 <h4>Embedded Runge-Kutta</h4>
 These methods include Heun-Euler, Bogacki-Shampine, Dormand-Prince (ode45 in
 Matlab), Fehlberg, and Cash-Karp. These methods use a low order method to
-estimate the error and decide if the time step needs to be refined or it can be
-coarsen. Only embedded explicit methods have been implemented so far.
+estimate the error and decide if the time step needs to be refined or coarsen. 
+Only embedded explicit methods have been implemented at the time of the writing.
 
 <h4>Implicit Runge-Kutta</h4>
 These methods include backward Euler, implicit midpoint, Crank-Nicolson, and the
 two stages SDIRK. These methods require to evaluate $M^{-1}f(t,y)$ and
-$\left(I-\Delta t M^{-1} \frac{\partial f}{\partial Y}\right) = \left(M - \Delta
-t \frac{\partial f}{\partial y}\right)^{-1} M$. These methods are always stable.
+$\left(I-\Delta t M^{-1} \frac{\partial f}{\partial Y}\right)$ or equivalently 
+$\left(M - \Deltat \frac{\partial f}{\partial y}\right)^{-1} M$. These methods are 
+always stable.
 
 <h3>Remarks</h3>
-To simplify the problem, we solve the domain in two dimensional and the mesh is
+To simplify the problem, the domain is two dimensional and the mesh is
 uniform (there is no need to adapt the mesh since we use quadratic finite
 elements and the exact solution is quadratic). Going from a two dimensional
 domain to a three dimensional domain is not very challenging. However if the

@@ -20,7 +20,7 @@
 
 // @sect3{Include files}
 
-// The first task as usal is to include the functionality of these well-known
+// The first task as usual is to include the functionality of these well-known
 // deal.II library files and some C++ header files.
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -70,6 +70,7 @@ namespace Step52
     public:
       Diffusion();
 
+      // This function is the driver that will call the other ones.
       void run();
 
     private:
@@ -83,24 +84,26 @@ namespace Step52
       // Compute the intensity of the source at the given point.
       double get_source(double time,const Point<2> &point) const;
       
-      // Evaluate the diffusion equation $M^{-1}(f(t,y))$
+      // Evaluate the diffusion equation $M^{-1}(f(t,y))$ at a given time and
+      // for a given y.
       Vector<double> evaluate_diffusion(const double time, const Vector<double> &y) const;
 
-      // Evaluate $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1} = 
-      // \left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M $
+      // Evaluate $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1}$ or 
+      // equivalently $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M$ at a given 
+      // time, for a given $\tau$ and y.
       Vector<double> id_minus_tau_J_inverse(const double time, const double tau, 
           const Vector<double> &y);
       
-      // Output the results as vtu
+      // Output the results as vtu files.
       void output_results(unsigned int time_step,TimeStepping::runge_kutta_method method) const;
 
-      // Driver for the explicit methods
+      // Driver for the explicit methods.
       void explicit_method(TimeStepping::runge_kutta_method method,
                            const unsigned int n_time_steps,
                            const double       initial_time,
                            const double       final_time);
 
-      // Driver for the implicit methods
+      // Driver for the implicit methods.
       void implicit_method(TimeStepping::runge_kutta_method method,
                            const unsigned int n_time_steps,
                            const double       initial_time,
@@ -114,6 +117,7 @@ namespace Step52
                                             const double final_time);
 
 
+      // The next parameters are self-explanatory.
       unsigned int                 fe_degree;
 
       double                       diffusion_coefficient;
@@ -140,7 +144,8 @@ namespace Step52
 
 
 
-  // We choose quadratic finite elements so that there are no spatial error.
+  // We choose quadratic finite elements so there are no spatial error and we
+  // initialize the parameters.
   Diffusion::Diffusion()
     :
       fe_degree(2),
@@ -152,6 +157,7 @@ namespace Step52
 
 
 
+  // @sect5{<code>Diffusion::setup_system</code>}
   void Diffusion::setup_system()
   {
     dof_handler.distribute_dofs(fe);
@@ -165,6 +171,7 @@ namespace Step52
     DoFTools::make_sparsity_pattern(dof_handler,c_sparsity,constraint_matrix);
     sparsity_pattern.copy_from(c_sparsity);
 
+    // Initialize the matrices and the solution vector.
     system_matrix.reinit(sparsity_pattern);
     mass_matrix.reinit(sparsity_pattern);
     mass_minus_tau_Jacobian.reinit(sparsity_pattern);
@@ -173,6 +180,7 @@ namespace Step52
 
 
 
+  // @sect5{<code>Diffusion::assemble_system</code>}
   void Diffusion::assemble_system()
   {
     system_matrix = 0.;
@@ -196,7 +204,8 @@ namespace Step52
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
            
-    // Compute $-\int D \nabla b \cdot \nabla b - \int \Sigma_a b b $ and $\int b b $
+    // Compute $-\int D \nabla b \cdot \nabla b - \int \Sigma_a b b $ and the mass matrix
+    // $\int b b$.
     for (; cell!=endc; ++cell)
     {
       cell_matrix = 0.;
@@ -229,6 +238,9 @@ namespace Step52
 
 
 
+  // @sect5{<code>Diffusion::get_source</code>}
+  //
+  // Compute the source for a given time and a given point.
   double Diffusion::get_source(double time,const Point<2> &point) const
   {
     const double pi = 3.14159265358979323846;
@@ -246,6 +258,9 @@ namespace Step52
 
 
 
+  // @sect5{<code>Diffusion:evaluate_diffusion</code>}
+  //
+  // Evaluate the diffusion weak form give a time t and a vector y.
   Vector<double> Diffusion::evaluate_diffusion(const double time, const Vector<double> &y) const
   {
     Vector<double> tmp(dof_handler.n_dofs());
@@ -253,8 +268,6 @@ namespace Step52
     // Compute system_matrix*y
     system_matrix.vmult(tmp,y);
 
-
-    // Compute the source term
     const QGauss<2> quadrature_formula(fe_degree+1);
 
     FEValues<2> fe_values(fe, quadrature_formula,
@@ -300,7 +313,9 @@ namespace Step52
   }
 
 
-
+  // @sect5{<code>Diffusion::id_minus_tau_J_inverse</code>}
+  //
+  // We compute $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M$.
   Vector<double> Diffusion::id_minus_tau_J_inverse(const double time, const double tau, 
       const Vector<double> &y)
   {
@@ -308,10 +323,17 @@ namespace Step52
     Vector<double> result(y);
     SparseDirectUMFPACK inverse_mass_minus_tau_Jacobian;
 
+    // Compute $M-\tau \frac{\partial f}{\partial y}$.
     mass_minus_tau_Jacobian.copy_from(mass_matrix);
     mass_minus_tau_Jacobian.add(-tau,system_matrix);
+    
+    // Inverse the matrix to get  $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1}$
     inverse_mass_minus_tau_Jacobian.initialize(mass_minus_tau_Jacobian);
+
+    // Compute $tmp=My$.
     mass_matrix.vmult(tmp,y);
+
+    // Compute $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp$
     inverse_mass_minus_tau_Jacobian.vmult(result,tmp);
 
     return result;
@@ -319,6 +341,7 @@ namespace Step52
 
 
 
+  // @sect5{<code>Diffusion::output_results}
   void Diffusion::output_results(unsigned int time_step,TimeStepping::runge_kutta_method method) const
   {
     std::string method_name;
@@ -401,7 +424,7 @@ namespace Step52
   }
 
 
-
+  // sect5{<code>Diffusion::explicit_method</code>}
   void Diffusion::explicit_method(TimeStepping::runge_kutta_method method,
                                   const unsigned int                n_time_steps,
                                   const double                      initial_time,
@@ -415,7 +438,7 @@ namespace Step52
     output_results(0,method);
     for (unsigned int i=0; i<n_time_steps; ++i)
     {
-      // Because we use a member function, we need to bind this to the
+      // Because we use a member function, we need to bind $this$ to the
       // function.
       time = explicit_runge_kutta.evolve_one_time_step(
           std_cxx1x::bind(&Diffusion::evaluate_diffusion,this,std_cxx1x::_1,std_cxx1x::_2),
@@ -429,6 +452,7 @@ namespace Step52
 
 
 
+  // sect5{<code>Diffusion::implicit_method</code>}
   void Diffusion::implicit_method(TimeStepping::runge_kutta_method method,
                                   const unsigned int               n_time_steps,
                                   const double                     initial_time,
@@ -442,7 +466,7 @@ namespace Step52
     output_results(0,method);
     for (unsigned int i=0; i<n_time_steps; ++i)
     {
-      // Because we use a member function, we need to bind this to the
+      // Because we use a member function, we need to bind $this$ to the
       // function.
       time = implicit_runge_kutta.evolve_one_time_step(
           std_cxx1x::bind(&Diffusion::evaluate_diffusion,this,std_cxx1x::_1,std_cxx1x::_2),
@@ -458,6 +482,7 @@ namespace Step52
 
 
 
+  // sect5{<code>Diffusion::embedded_explicit_method</code>}
   unsigned int Diffusion::embedded_explicit_method(TimeStepping::runge_kutta_method method,
                                                    const unsigned int n_time_steps,
                                                    const double initial_time,
@@ -491,7 +516,7 @@ namespace Step52
       if (time+time_step>final_time)
         time_step = final_time-time;
 
-      // Because we use a member function, we need to bind this to the
+      // Because we use a member function, we need to bind $this$ to the
       // function.
       time = embedded_explicit_runge_kutta.evolve_one_time_step(
           std_cxx1x::bind(&Diffusion::evaluate_diffusion,this,std_cxx1x::_1,std_cxx1x::_2),
@@ -511,14 +536,15 @@ namespace Step52
 
 
 
+  // sect5{<code>Diffusion::run</code>}
   void Diffusion::run()
   {
     // Create the grid (a square [0,5]x[0,5]) and refine the mesh four times.
-    // The final gird has 16 times 16 cells, for a total of 256.
+    // The final gird has 16 by 16 cells, for a total of 256.
     GridGenerator::hyper_cube(triangulation, 0., 5.);
     triangulation.refine_global(4);
 
-    // Set the boundary indicator for x=0 and x=5 to 1
+    // Set the boundary indicator for x=0 and x=5 to 1.
     typename Triangulation<2>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
@@ -542,56 +568,58 @@ namespace Step52
     const double initial_time = 0.;
     const double final_time = 10.;
 
-    // Use forward Euler
+    // Use forward Euler.
     explicit_method(TimeStepping::FORWARD_EULER,n_time_steps,initial_time,final_time);
     std::cout<<"Forward Euler error: "<<solution.l2_norm()<<std::endl;
-    // Use third order Runge-Kutta
+    // Use third order Runge-Kutta.
     explicit_method(TimeStepping::RK_THIRD_ORDER,n_time_steps,initial_time,final_time);
     std::cout<<"Third order Runge-Kutta error: "<<solution.l2_norm()<<std::endl;
-    // Use fourth order Runge-Kutta
+    // Use fourth order Runge-Kutta.
     explicit_method(TimeStepping::RK_CLASSIC_FOURTH_ORDER,n_time_steps,initial_time,final_time);
     std::cout<<"Fourth order Runge-Kutta error: "<<solution.l2_norm()<<std::endl;
 
 
-    // Use backward Euler
+    // Use backward Euler.
     implicit_method(TimeStepping::BACKWARD_EULER,n_time_steps,initial_time,final_time);
     std::cout<<"Backward Euler error: "<<solution.l2_norm()<<std::endl;
-    // Use implicit midpoint
+    // Use implicit midpoint.
     implicit_method(TimeStepping::IMPLICIT_MIDPOINT,n_time_steps,initial_time,final_time);
     std::cout<<"Implicit Midpoint error: "<<solution.l2_norm()<<std::endl;
-    // Use Crank-NICOLSON
+    // Use Crank-NICOLSON.
     implicit_method(TimeStepping::CRANK_NICOLSON,n_time_steps,initial_time,final_time);
     std::cout<<"Crank-Nicolson error: "<<solution.l2_norm()<<std::endl;
-    // Use two stages SDIRK
+    // Use two stages SDIRK.
     implicit_method(TimeStepping::SDIRK_TWO_STAGES,n_time_steps,initial_time,final_time);
     std::cout<<"SDIRK error: "<<solution.l2_norm()<<std::endl;
 
     
-    // Use Heun-Euler
+    // Use Heun-Euler.
     n_steps = embedded_explicit_method(TimeStepping::HEUN_EULER,n_time_steps,initial_time,final_time);
     std::cout<<"Heun-Euler error: "<<solution.l2_norm()<<std::endl;
     std::cout<<"Number of steps done: "<<n_steps<<std::endl;
-    // Use Bogacki-Shampine
+    // Use Bogacki-Shampine.
     n_steps = embedded_explicit_method(TimeStepping::BOGACKI_SHAMPINE,n_time_steps,initial_time,final_time);
     std::cout<<"Bogacki-Shampine error: "<<solution.l2_norm()<<std::endl;
     std::cout<<"Number of steps done: "<<n_steps<<std::endl;
-    // Use Dopri
+    // Use Dopri.
     n_steps = embedded_explicit_method(TimeStepping::DOPRI,n_time_steps,initial_time,final_time);
     std::cout<<"Dopri error: "<<solution.l2_norm()<<std::endl;
     std::cout<<"Number of steps done: "<<n_steps<<std::endl;
-    // Use Fehlberg
+    // Use Fehlberg.
     n_steps = embedded_explicit_method(TimeStepping::FEHLBERG,n_time_steps,initial_time,final_time);
     std::cout<<"Fehlberg error: "<<solution.l2_norm()<<std::endl;
     std::cout<<"Number of steps done: "<<n_steps<<std::endl;
-    // Use Cash-Karp
+    // Use Cash-Karp.
     n_steps = embedded_explicit_method(TimeStepping::CASH_KARP,n_time_steps,initial_time,final_time);
     std::cout<<"Cash-Karp error: "<<solution.l2_norm()<<std::endl;
     std::cout<<"Number of steps done: "<<n_steps<<std::endl;
   }
 }
+                     
 
 
-
+// @sect3{The <code>main()</code> function}
+//
 // The following <code>main</code> function is similar to previous examples as
 // well, and need not be commented on.
 int main ()
