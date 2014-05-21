@@ -28,7 +28,7 @@
 template <typename number>
 void test (unsigned int variant)
 {
-  const unsigned int n = variant < 3 ? 64 : 16;
+  const unsigned int n = variant % 2 == 0 ? 64 : 16;
   Vector<number> rhs(n), sol(n);
   rhs = 1.;
 
