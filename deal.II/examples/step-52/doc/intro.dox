@@ -21,13 +21,12 @@ fissible and therefore, the neutron flux satisfies the following equation:
 augmented by appropriate boundary conditions. Here, $v$ is the velocity of
 neutrons, $D$ is the diffusion coefficient, $\Sigma_a$ is the <i>absorption
 cross section</i>, and $S$ is a source. Because we are only interested in the
-time dependence, we assume that $D$ and $\Sigma_a$ are constant. In this
-example, we are only interested in the error in time. The domain is square
+time dependence, we assume that $D$ and $\Sigma_a$ are constant. The domain is square
 $[0,b]\times[0,b]$ and we are looking for a solution of the form:
 @f{eqnarray*}
 \phi(x,t) = A\sin(\omega t)(bx-x^2).
 @f}
-By using quadratic finite elements, we will not have any spatial error and all
+By using quadratic finite elements, there will not have any spatial error and all
 the error will come from the time discretization. We
 impose the following boundary conditions: homogeneous Dirichlet fo $x=0$ and
 $x=b$ and homogeneous Neumann conditions for $y=0$ and $y=b$. The source is
@@ -36,10 +35,8 @@ given by:
 S=A\left(\frac{1}{v}\omega \cos(\omega t)(bx -x^2) + \sin(\omega t)
 \left(\Sigma_a (bx-x^2)+2D\right) \right).
 @f}
-Because the solution is a sine, we know that
-$\phi\left(x,\frac{\pi}{\omega}\right) = 0$. Therefore, we can easily
-compute the error at this time since it is simply the norm of the solution
-found.
+Because the solution is a sine, we know that $\phi\left(x,\pi\right) = 0$.
+Therefore, the error at this time is simply the norm of the numerical solution.
 
 <h3>Runge-Kutta</h3>
 
@@ -96,7 +93,7 @@ To simplify the problem, the domain is two dimensional and the mesh is
 uniform (there is no need to adapt the mesh since we use quadratic finite
 elements and the exact solution is quadratic). Going from a two dimensional
 domain to a three dimensional domain is not very challenging. However if the
-mesh must be adapted, we cannot forget to:
+mesh must be adapted, it is important to note to remember to:
 <ol>
 <li> project the solution to the new mesh when the mesh is changed. The mesh
 used should be the same at the beginning and at the end of the time step.

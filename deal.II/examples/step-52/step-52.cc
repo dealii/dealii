@@ -91,8 +91,9 @@ namespace Step52
       // Evaluate $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1}$ or 
       // equivalently $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M$ at a given 
       // time, for a given $\tau$ and y.
-      Vector<double> id_minus_tau_J_inverse(const double time, const double tau, 
-          const Vector<double> &y);
+      Vector<double> id_minus_tau_J_inverse(const double time, 
+                                            const double tau, 
+                                            const Vector<double> &y);
       
       // Output the results as vtu files.
       void output_results(unsigned int time_step,TimeStepping::runge_kutta_method method) const;
@@ -260,7 +261,7 @@ namespace Step52
 
   // @sect5{<code>Diffusion:evaluate_diffusion</code>}
   //
-  // Evaluate the diffusion weak form give a time t and a vector y.
+  // Evaluate the weak form of the diffusion equation at a given time t and for a given vector y.
   Vector<double> Diffusion::evaluate_diffusion(const double time, const Vector<double> &y) const
   {
     Vector<double> tmp(dof_handler.n_dofs());
@@ -327,13 +328,13 @@ namespace Step52
     mass_minus_tau_Jacobian.copy_from(mass_matrix);
     mass_minus_tau_Jacobian.add(-tau,system_matrix);
     
-    // Inverse the matrix to get  $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1}$
+    // Inverse the matrix to get  $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1}$.
     inverse_mass_minus_tau_Jacobian.initialize(mass_minus_tau_Jacobian);
 
     // Compute $tmp=My$.
     mass_matrix.vmult(tmp,y);
 
-    // Compute $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp$
+    // Compute $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp$.
     inverse_mass_minus_tau_Jacobian.vmult(result,tmp);
 
     return result;
@@ -424,7 +425,7 @@ namespace Step52
   }
 
 
-  // sect5{<code>Diffusion::explicit_method</code>}
+  // @sect5{<code>Diffusion::explicit_method</code>}
   void Diffusion::explicit_method(TimeStepping::runge_kutta_method method,
                                   const unsigned int                n_time_steps,
                                   const double                      initial_time,
@@ -452,7 +453,7 @@ namespace Step52
 
 
 
-  // sect5{<code>Diffusion::implicit_method</code>}
+  // @sect5{<code>Diffusion::implicit_method</code>}
   void Diffusion::implicit_method(TimeStepping::runge_kutta_method method,
                                   const unsigned int               n_time_steps,
                                   const double                     initial_time,
@@ -482,7 +483,7 @@ namespace Step52
 
 
 
-  // sect5{<code>Diffusion::embedded_explicit_method</code>}
+  // @sect5{<code>Diffusion::embedded_explicit_method</code>}
   unsigned int Diffusion::embedded_explicit_method(TimeStepping::runge_kutta_method method,
                                                    const unsigned int n_time_steps,
                                                    const double initial_time,
@@ -512,7 +513,7 @@ namespace Step52
     unsigned int n_steps=0;
     while (time<final_time)
     {
-      // Choose the last time step to reach final_time.
+      // Choose the last time step to exactly reach the final time.
       if (time+time_step>final_time)
         time_step = final_time-time;
 
@@ -526,7 +527,7 @@ namespace Step52
       if ((n_steps+1)%10==0)
         output_results(n_steps+1,method);
 
-      // Update the time step
+      // Update the time step.
       time_step = embedded_explicit_runge_kutta.get_status().delta_t_guess;
       ++n_steps;
     }
@@ -536,7 +537,7 @@ namespace Step52
 
 
 
-  // sect5{<code>Diffusion::run</code>}
+  // @sect5{<code>Diffusion::run</code>}
   void Diffusion::run()
   {
     // Create the grid (a square [0,5]x[0,5]) and refine the mesh four times.
@@ -585,7 +586,7 @@ namespace Step52
     // Use implicit midpoint.
     implicit_method(TimeStepping::IMPLICIT_MIDPOINT,n_time_steps,initial_time,final_time);
     std::cout<<"Implicit Midpoint error: "<<solution.l2_norm()<<std::endl;
-    // Use Crank-NICOLSON.
+    // Use Crank-Nicolson.
     implicit_method(TimeStepping::CRANK_NICOLSON,n_time_steps,initial_time,final_time);
     std::cout<<"Crank-Nicolson error: "<<solution.l2_norm()<<std::endl;
     // Use two stages SDIRK.
