@@ -176,8 +176,8 @@ namespace MeshWorker
 
   template <class VECTOR, int dim, int spacedim>
   MGVectorData<VECTOR, dim, spacedim>::MGVectorData(const VectorSelector &s)
-    :
-    VectorDataBase<dim, spacedim>(s)
+		  :
+		  VectorData<VECTOR, dim, spacedim>(s)
   {}
 
 
@@ -240,16 +240,6 @@ namespace MeshWorker
         VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians((*src)[level], make_slice(index, start, size), dst, true);
       }
-  }
-
-
-  template <class VECTOR, int dim, int spacedim>
-  std::size_t
-  MGVectorData<VECTOR, dim, spacedim>::memory_consumption () const
-  {
-    std::size_t mem = VectorSelector::memory_consumption();
-    mem += sizeof (this->data);
-    return mem;
   }
 }
 

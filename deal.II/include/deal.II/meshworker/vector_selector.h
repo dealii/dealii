@@ -373,7 +373,7 @@ namespace MeshWorker
    */
   template <class VECTOR, int dim, int spacedim = dim>
   class MGVectorData :
-    public VectorDataBase<dim, spacedim>
+      public VectorData<VECTOR, dim, spacedim>
   {
   public:
     /**
