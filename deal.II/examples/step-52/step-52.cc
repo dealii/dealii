@@ -70,7 +70,7 @@ namespace Step52
     public:
       Diffusion();
 
-      // This function is the driver that will call the other ones.
+      // This function is the driver that will call the other functions.
       void run();
 
     private:
@@ -81,7 +81,7 @@ namespace Step52
       // the time.
       void assemble_system();
 
-      // Compute the intensity of the source at the given point.
+      // Compute the intensity of the source at a given time for a given point.
       double get_source(double time,const Point<2> &point) const;
       
       // Evaluate the diffusion equation $M^{-1}(f(t,y))$ at a given time and
@@ -266,7 +266,7 @@ namespace Step52
   {
     Vector<double> tmp(dof_handler.n_dofs());
     tmp = 0.;
-    // Compute system_matrix*y
+    // Compute $tmp=system_matrix y$.
     system_matrix.vmult(tmp,y);
 
     const QGauss<2> quadrature_formula(fe_degree+1);
@@ -343,6 +343,8 @@ namespace Step52
 
 
   // @sect5{<code>Diffusion::output_results}
+  //
+  // We output the solution in vtu files.
   void Diffusion::output_results(unsigned int time_step,TimeStepping::runge_kutta_method method) const
   {
     std::string method_name;
@@ -540,8 +542,8 @@ namespace Step52
   // @sect5{<code>Diffusion::run</code>}
   void Diffusion::run()
   {
-    // Create the grid (a square [0,5]x[0,5]) and refine the mesh four times.
-    // The final gird has 16 by 16 cells, for a total of 256.
+    // Create the grid (a [0,5]x[0,5] square) and refine the mesh four times.
+    // The final grid has 16 by 16 cells, for a total of 256.
     GridGenerator::hyper_cube(triangulation, 0., 5.);
     triangulation.refine_global(4);
 
