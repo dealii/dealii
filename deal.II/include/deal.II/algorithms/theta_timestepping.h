@@ -140,7 +140,7 @@ namespace Algorithms
    * @until End of declarations
    *
    * These operators will be implemented after the main program. But let
-   * us look at how they get used. First, let us define a matrix to be
+   * us look first at how they get used. First, let us define a matrix to be
    * used for our system and also an OutputOperator in order to write
    * the data of each timestep to a file.
    *
@@ -148,10 +148,9 @@ namespace Algorithms
    * @until out.initialize
    *
    * Now we create objects for the implicit and explicit parts of the
-   * steps as well as the ThetaTimestepping itself. Notice how the
-   * TimestepData of ThetaTimestepping gets forwarded to the inner
-   * operators. There are two different data objects, because the
-   * timestep size is modified by #theta.
+   * steps as well as the ThetaTimestepping itself. We initialize the
+   * timestepping with the output operator in order to be able to see
+   * the output in every step.
    *
    * @until set_output
    *
@@ -159,29 +158,47 @@ namespace Algorithms
    * is filled with the initial value and is also the vector where the
    * solution at each timestep will be. Because the interface of
    * Operator has to be able to handle several vectors, we need to store
-   * it in a NamedData object. Notice, that we need to create the
-   * intermediate pointer <tt>p</tt>. If we would use
-   * <code>&value</code> directly in the <code>add</code> function, the
-   * resulting object would be constant.
+   * it in an AnyData object. Since our problem has no additional
+   * parameters, the input AnyData object remains empty.
    *
    * @until add
    *
-   * Finally, we are ready to tell the solver, that we are looknig at
+   * Finally, we are ready to tell the solver, that we are starting at
    * the initial timestep and run it.
    *
-   * @until outdata
-   * @skip Explicit::initialize
+   * @until }
+   *
+   * First the constructor, which simply copies the system matrix into
+   * the member pointer for later use.
+   *
+   * @skip Explicit::
+   * @until }
    *
    * Now we need to study the application of the implicit and explicit
    * operator. We assume that the pointer <code>matrix</code> points to
-   * the matrix created in the main program, and that
-   * <code>timestep_data</code> points to the correct data object of
-   * ThetaTimestepping.
+   * the matrix created in the main program (the constructor did this
+   * for us). Here, we first get the time step size from the AnyData
+   * object that was provided as input. Then, if we are in the first
+   * step or if the timestep has changed, we fill the local matrix
+   * <tt>m</tt>, such that with the given matrix \f$M\f$, it becomes
+   * \f[
+   * m = I - \Delta t M.
+   * \f]
+   * After we have worked off the notifications, we clear them, such
+   * that the matrix is only generated when necessary.
    *
    * @skipline void
+   * @until clear
+   *
+   * Now we multiply the input vector with the new matrix and store on output.
+   *
+   * @until }
+   * The code for the implicit operator is almost the same, except
+   * that we change the sign in front of the timestep and use the
+   * inverse of t he matrix.
+   *
    * @until vmult
    * @until }
-   *
    * @author Guido Kanschat
    * @date 2010
    */
