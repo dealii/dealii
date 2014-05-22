@@ -23,18 +23,36 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <class VECTOR, int dim, int spacedim>
+  DoFOutputOperator<VECTOR, dim, spacedim>::DoFOutputOperator (
+    const std::string filename_base,
+    const unsigned int digits)
+		  :
+		  filename_base(filename_base),
+		  digits(digits)
+  {}
+  
+
+  template <class VECTOR, int dim, int spacedim>
   OutputOperator<VECTOR> &
   DoFOutputOperator<VECTOR, dim, spacedim>::operator<<(
-    const NamedData<VECTOR *> &vectors)
+    const AnyData &data)
   {
     Assert ((dof!=0), ExcNotInitialized());
     DataOut<dim> out;
+    out.set_default_format(DataOutBase::gnuplot);
     out.attach_dof_handler (*dof);
-    out.add_data_vector (*vectors(vectors.find("solution")), "solution");
-    out.add_data_vector (*vectors(vectors.find("update")), "update");
-    out.add_data_vector (*vectors(vectors.find("residual")), "residual");
+    for (unsigned int i=0;i<data.size();++i)
+      {
+	const VECTOR* p = data.try_read_ptr<VECTOR>(i);
+	if (p!=0)
+	  {
+	    out.add_data_vector (*p, data.name(i));
+	  }
+      }
     std::ostringstream streamOut;
-    streamOut << "Newton_" << std::setw(3) << std::setfill('0') << this->step;
+    streamOut << filename_base
+	      << std::setw(digits) << std::setfill('0') << this->step
+	      << out.default_suffix();
     std::ofstream out_filename (streamOut.str().c_str());
     out.build_patches (2);
     out.write_gnuplot (out_filename);
