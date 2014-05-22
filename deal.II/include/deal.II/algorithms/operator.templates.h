@@ -131,8 +131,9 @@ namespace Algorithms
           {
             const VECTOR *v = vectors.try_read_ptr<VECTOR>(i);
             if (v == 0) continue;
+	    deallog << vectors.name(i);
             for (unsigned int j=0; j<v->size(); ++j)
-              (*os) << ' ' << (*v)(j);
+              deallog << ' ' << (*v)(j);
             deallog << std::endl;
           }
         deallog << std::endl;
