@@ -103,7 +103,7 @@ namespace Algorithms
      * of reassembling the matrix.
      */
     Event notifications;
-    
+
   };
 
   /**
@@ -141,7 +141,7 @@ namespace Algorithms
   {
   public:
     Operator();
-    
+
     /**
      * Implementation of the function in the base class in order to do
      * compatibility conversions between the old and the new
@@ -161,7 +161,7 @@ namespace Algorithms
      * Set this true to avoid compatibility warnings.
      */
     bool silent_compatibility;
-      
+
   private:
     /**
      * While we are providing compatibility functions to the old
@@ -203,8 +203,8 @@ namespace Algorithms
     /**
      * Output all the vectors in AnyData.
      */
-    virtual OutputOperator<VECTOR> &operator<< (const AnyData& vectors);
-    
+    virtual OutputOperator<VECTOR> &operator<< (const AnyData &vectors);
+
     /**
      * @deprecated Output all the vectors in NamedData.
      */

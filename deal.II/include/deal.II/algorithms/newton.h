@@ -111,7 +111,7 @@ namespace Algorithms
     /**
      * @deprecated Use the function using AnyData
      */
-    virtual void operator() (NamedData<VECTOR*> &out, const NamedData<VECTOR*> &in);
+    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
 
     virtual void notify(const Event &);
 

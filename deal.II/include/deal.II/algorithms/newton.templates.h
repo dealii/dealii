@@ -80,7 +80,7 @@ namespace Algorithms
     inverse_derivative->notify(e);
   }
 
-  
+
   template <class VECTOR>
   double
   Newton<VECTOR>::threshold(const double thr)
@@ -89,8 +89,8 @@ namespace Algorithms
     assemble_threshold = thr;
     return t;
   }
-  
-  
+
+
   template <class VECTOR>
   void
   Newton<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
@@ -105,7 +105,7 @@ namespace Algorithms
     Assert (out.size() == 1, ExcNotImplemented());
     deallog.push ("Newton");
 
-    VECTOR &u = *out.entry<VECTOR*>(0);
+    VECTOR &u = *out.entry<VECTOR *>(0);
 
     if (debug>2)
       deallog << "u: " << u.l2_norm() << std::endl;
@@ -117,14 +117,14 @@ namespace Algorithms
     res->reinit(u);
     AnyData src1;
     AnyData src2;
-    src1.add<const VECTOR*>(&u, "Newton iterate");
+    src1.add<const VECTOR *>(&u, "Newton iterate");
     src1.merge(in);
-    src2.add<const VECTOR*>(res, "Newton residual");
+    src2.add<const VECTOR *>(res, "Newton residual");
     src2.merge(src1);
     AnyData out1;
-    out1.add<VECTOR*>(res, "Residual");
+    out1.add<VECTOR *>(res, "Residual");
     AnyData out2;
-    out2.add<VECTOR*>(Du, "Update");
+    out2.add<VECTOR *>(Du, "Update");
 
     unsigned int step = 0;
     // fill res with (f(u), v)
