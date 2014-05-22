@@ -128,29 +128,27 @@ namespace Algorithms
   {
     if (os == 0)
       {
-        //TODO: make this possible
-        //deallog << ' ' << step;
-        //for (unsigned int i=0;i<vectors.size();++i)
-        //  vectors(i)->print(deallog);
-        //deallog << std::endl;
+        deallog << "Step " << step << std::endl;
+        for (unsigned int i=0; i<vectors.size(); ++i)
+	  {
+	    const VECTOR* v = vectors.try_read_ptr<VECTOR>(i);
+	    if (v == 0) continue;
+	    for (unsigned int j=0; j<v->size(); ++j)
+	      (*os) << ' ' << (*v)(j);
+	    deallog << std::endl;
+	  }
+        deallog << std::endl;
       }
     else
       {
         (*os) << ' ' << step;
         for (unsigned int i=0; i<vectors.size(); ++i)
 	  {
-	    if (vectors.is_type<VECTOR*>(i))
-	      {
-		const VECTOR& v = *vectors.entry<VECTOR*>(i);
-		for (unsigned int j=0; j<v.size(); ++j)
-		  (*os) << ' ' << v(j);
-	      }
-	    else if (vectors.is_type<const VECTOR*>(i))
-	      {
-		const VECTOR& v = *vectors.entry<const VECTOR*>(i);
-		for (unsigned int j=0; j<v.size(); ++j)
-		  (*os) << ' ' << v(j);
-	      }
+	    const VECTOR* v = vectors.try_read_ptr<VECTOR>(i);
+	    if (v == 0) continue;
+	    for (unsigned int j=0; j<v->size(); ++j)
+	      (*os) << ' ' << (*v)(j);
+	    (*os) << std::endl;
 	  }
         (*os) << std::endl;
       }
@@ -162,22 +160,8 @@ namespace Algorithms
   OutputOperator<VECTOR> &
   OutputOperator<VECTOR>::operator<< (const NamedData<VECTOR *> &vectors)
   {
-    if (os == 0)
-      {
-        //TODO: make this possible
-        //deallog << ' ' << step;
-        //for (unsigned int i=0;i<vectors.size();++i)
-        //  vectors(i)->print(deallog);
-        //deallog << std::endl;
-      }
-    else
-      {
-        (*os) << ' ' << step;
-        for (unsigned int i=0; i<vectors.size(); ++i)
-          for (unsigned int j=0; j<vectors(i)->size(); ++j)
-            (*os) << ' ' << (*vectors(i))(j);
-        (*os) << std::endl;
-      }
+    const AnyData newdata = vectors;
+    (*this) << newdata;
     return *this;
   }
 }
