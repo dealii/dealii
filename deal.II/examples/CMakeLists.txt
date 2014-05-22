@@ -26,7 +26,6 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     #
     PATTERN "CMakeFiles*" EXCLUDE
     PATTERN "doc*" EXCLUDE
-    PATTERN "doxygen*" EXCLUDE
     PATTERN ".svn*" EXCLUDE
     #
     # Glob Includes:
@@ -35,6 +34,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "*.prm"
     PATTERN "*.inp"
     PATTERN "step*/CMakeLists.txt"
+    PATTERN "doxygen/CMakeLists.txt"
     #
     # Special files:
     #
