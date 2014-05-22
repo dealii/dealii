@@ -42,7 +42,7 @@ void test (unsigned int variant)
       matrix(i,i) = (i+1);
   else if (variant == 1)
     for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = (i+1) * (i+1) * (i+1) * (i+1);
+      matrix(i,i) = (i+1) * (i+1) * (i+1) * (i+1) * 1.001;
   else if (variant == 2)
     for (unsigned int i=0; i<n; ++i)
       matrix(i,i) = (i%2?1.:-1.)*(i+1);
