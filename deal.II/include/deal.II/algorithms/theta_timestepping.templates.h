@@ -93,17 +93,19 @@ namespace Algorithms
     src1.add<const VECTOR *>(&solution, "Previous iterate");
     src1.add<const double *>(&d_explicit.time, "Time");
     src1.add<const double *>(&d_explicit.step, "Timestep");
+    src1.add<const double *>(&vtheta, "Theta");
     src1.merge(in);
 
     AnyData src2;
-    src2.add<const VECTOR *>(&solution, "Previous iterate");
 
     AnyData out1;
     out1.add<VECTOR *>(aux, "Solution");
     // The data provided to the inner solver
     src2.add<const VECTOR *>(aux, "Previous time");
+    src2.add<const VECTOR *>(&solution, "Previous iterate");
     src2.add<const double *>(&d_implicit.time, "Time");
     src2.add<const double *>(&d_implicit.step, "Timestep");
+    src2.add<const double *>(&vtheta, "Theta");
     src2.merge(in);
 
     if (output != 0)
