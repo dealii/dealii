@@ -401,17 +401,7 @@ namespace Algorithms
   const double ThetaTimestepping<VECTOR>::current_time () const
   {
     return control.now();
-  }
-
-
-  template <class VECTOR>
-  inline
-  const double ThetaTimestepping<VECTOR>::theta () const
-  {
-    return control.step();
-  }
-
-  
+  }  
 }
 
 DEAL_II_NAMESPACE_CLOSE
