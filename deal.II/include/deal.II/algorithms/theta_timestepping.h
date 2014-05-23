@@ -254,7 +254,12 @@ namespace Algorithms
     /**
      * The weight between implicit and explicit part.
      */
-    const double &theta() const;
+    const double theta() const;
+
+      /**
+       * Set a new weight and return the old
+       */
+    const double theta(double new_theta);
 
     /**
      * The data handed to the #op_explicit time stepping operator.
@@ -370,6 +375,24 @@ namespace Algorithms
   void ThetaTimestepping<VECTOR>::set_output (OutputOperator<VECTOR> &out)
   {
     output = &out;
+  }
+
+
+  template <class VECTOR>
+  inline
+  const double ThetaTimestepping<VECTOR>::theta () const
+  {
+    return vtheta;
+  }
+
+
+  template <class VECTOR>
+  inline
+  const double ThetaTimestepping<VECTOR>::theta (double new_theta)
+  {
+    const double tmp = vtheta;
+    vtheta = new_theta;
+    return tmp;
   }
 }
 

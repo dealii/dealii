@@ -103,7 +103,7 @@ namespace Algorithms
     // The data provided to the inner solver
     src2.add<const VECTOR *>(aux, "Previous time");
     src2.add<const double *>(&d_implicit.time, "Time");
-    src2.add<const double *>(&d_explicit.step, "Timestep");
+    src2.add<const double *>(&d_implicit.step, "Timestep");
     src2.merge(in);
 
     if (output != 0)
