@@ -1325,7 +1325,10 @@ namespace TrilinosWrappers
                      const TrilinosScalar          new_diag_value = 0);
 
     /**
-     * Make an in-place transpose of a matrix.
+     * Sets an internal flag so that all operations performed by the matrix,
+     * i.e., multiplications, are done in transposed order. However, this does
+     * not reshape the matrix to transposed form directly, so care should be
+     * taken when using this flag.
      */
     void transpose ();
 
