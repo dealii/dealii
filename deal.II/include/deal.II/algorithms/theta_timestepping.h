@@ -246,11 +246,11 @@ namespace Algorithms
      * The current time in the
      * timestepping scheme.
      */
-    const double &current_time() const;
+    const double current_time() const;
     /**
      * The current step size.
      */
-    const double &step_size() const;
+    const double step_size() const;
     /**
      * The weight between implicit and explicit part.
      */
@@ -394,6 +394,24 @@ namespace Algorithms
     vtheta = new_theta;
     return tmp;
   }
+
+
+  template <class VECTOR>
+  inline
+  const double ThetaTimestepping<VECTOR>::current_time () const
+  {
+    return control.now();
+  }
+
+
+  template <class VECTOR>
+  inline
+  const double ThetaTimestepping<VECTOR>::theta () const
+  {
+    return control.step();
+  }
+
+  
 }
 
 DEAL_II_NAMESPACE_CLOSE
