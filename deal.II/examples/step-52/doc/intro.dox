@@ -20,9 +20,10 @@ fissible and therefore, the neutron flux satisfies the following equation:
 @f}
 augmented by appropriate boundary conditions. Here, $v$ is the velocity of
 neutrons (for simplicity we assume it is equal to 1), $D$ is the diffusion coefficient, 
-$\Sigma_a$ is the absorption cross section, and $S$ is a source. Because we are only i
-nterested in the time dependence, we assume that $D$ and $\Sigma_a$ are constant. We are looking 
-for a solution on a square domain $[0,b]\times[0,b]$ of the form:
+$\Sigma_a$ is the absorption cross section, and $S$ is a source. Because we are
+only interested in the time dependence, we assume that $D$ and $\Sigma_a$ are
+constant. We are looking for a solution on a square domain $[0,b]\times[0,b]$ of
+the form:
 @f{eqnarray*}
 \phi(x,t) = A\sin(\omega t)(bx-x^2).
 @f}
@@ -70,7 +71,7 @@ deal.II can be divided in three categories:
 </ol> 
 
 <h4>Explicit Runge-Kutta</h4>
-These methods that include for forward Euler, third order Runge-Kutta, and
+These methods that include forward Euler, third order Runge-Kutta, and
 fourth order Runge-Kutta, require a function to evaluate $M^{-1}f(t,y)$. These
 methods become unstable when the time step chosen is too large.
 
@@ -81,9 +82,9 @@ estimate the error and decide if the time step needs to be refined or coarsen.
 Only embedded explicit methods have been implemented at the time of the writing.
 
 <h4>Implicit Runge-Kutta</h4>
-These methods include backward Euler, implicit midpoint, Crank-Nicolson, and the
+These methods include backward Euler, implicit midpoint, Crank-Nicolson, and a
 two stages SDIRK. These methods require to evaluate $M^{-1}f(t,y)$ and
-$\left(I-\Delta t M^{-1} \frac{\partial f}{\partial y}\right)$ or equivalently 
+$\left(I-\Delta t M^{-1} \frac{\partial f}{\partial y}\right)^{-1}$ or equivalently 
 $\left(M - \Delta t \frac{\partial f}{\partial y}\right)^{-1} M$. These methods are 
 always stable.
 
@@ -91,7 +92,7 @@ always stable.
 To use the Runge-Kutta methods, we need to be able to evaluate:
 @f{eqnarray*}
 f = \oint D b_i \frac{\partial b_j}{\partial n} d\boldsymbol{r} - \int D \nabla
-b_i \nabla b_j \phi_j d\boldsymbol{r} -\int \Sigma_a b_i b_j \phi_j \phi_j
+b_i \nabla b_j \phi_j d\boldsymbol{r} -\int \Sigma_a b_i b_j \phi_j 
 d\boldsymbol{r} + \int b_j S d\boldsymbol{r}
 @f}
 and $\frac{\partial f}{\partial y}$. Because $f$ is linear in $y$ (or $\phi$ in
@@ -102,7 +103,7 @@ To simplify the problem, the domain is two dimensional and the mesh is
 uniform (there is no need to adapt the mesh since we use quadratic finite
 elements and the exact solution is quadratic). Going from a two dimensional
 domain to a three dimensional domain is not very challenging. However if the
-mesh must be adapted, it is important to note to remember to:
+mesh must be adapted, it is important to remember to:
 <ol>
 <li> project the solution to the new mesh when the mesh is changed. The mesh
 used should be the same at the beginning and at the end of the time step.

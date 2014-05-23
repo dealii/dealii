@@ -110,7 +110,7 @@ namespace Step52
                            const double       initial_time,
                            const double       final_time);
 
-      // Driver for the embedded explicit methods. Returns the number of steps
+      // Driver for the embedded explicit methods. This function returns the number of steps
       // executed.
       unsigned int embedded_explicit_method(TimeStepping::runge_kutta_method method,
                                             const unsigned int n_time_steps,
@@ -145,8 +145,7 @@ namespace Step52
 
 
 
-  // We choose quadratic finite elements so there are no spatial error and we
-  // initialize the parameters.
+  // We choose quadratic finite elements and we initialize the parameters.
   Diffusion::Diffusion()
     :
       fe_degree(2),
@@ -205,8 +204,8 @@ namespace Step52
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
            
-    // Compute $-\int D \nabla b \cdot \nabla b - \int \Sigma_a b b $ and the mass matrix
-    // $\int b b$.
+    // Compute $-\int D \nabla b_i \cdot \nabla b_j d\boldsymbol{r} - \int \Sigma_a b_i b_j d\boldsymbol{r}$ 
+    // and the mass matrix $\int b_i b_j d\boldsymbol{r}$.
     for (; cell!=endc; ++cell)
     {
       cell_matrix = 0.;
@@ -266,7 +265,7 @@ namespace Step52
   {
     Vector<double> tmp(dof_handler.n_dofs());
     tmp = 0.;
-    // Compute $tmp=system_matrix y$.
+    // Compute $tmp=system\_matrix\cdot y$.
     system_matrix.vmult(tmp,y);
 
     const QGauss<2> quadrature_formula(fe_degree+1);
@@ -334,7 +333,7 @@ namespace Step52
     // Compute $tmp=My$.
     mass_matrix.vmult(tmp,y);
 
-    // Compute $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp$.
+    // Compute $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp = \left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} My$.
     inverse_mass_minus_tau_Jacobian.vmult(result,tmp);
 
     return result;
