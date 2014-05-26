@@ -93,8 +93,6 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
-
-    CHECK_MPI_INTERFACE(PETSC ${var})
   ENDIF()
 ENDMACRO()
 
