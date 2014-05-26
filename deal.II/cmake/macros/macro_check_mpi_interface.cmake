@@ -27,7 +27,8 @@ MACRO(CHECK_MPI_INTERFACE _feature _var)
     SET(_nope FALSE)
 
     FOREACH(_library ${${_feature}_LIBRARIES})
-      IF(_library MATCHES "/libmpi[^/]*\\.so")
+      IF( _library MATCHES "/libmpi[^/]*\\.so"
+          AND NOT _library MATCHES "f(77|90|ort)" )
         LIST(FIND MPI_LIBRARIES "${_library}" _position)
         IF("${_position}" STREQUAL "-1")
           SET(_nope TRUE)
