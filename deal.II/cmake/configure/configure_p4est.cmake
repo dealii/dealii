@@ -55,6 +55,8 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
+
+    CHECK_MPI_INTERFACE(P4EST ${var})
   ENDIF()
 ENDMACRO()
 

@@ -36,6 +36,8 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
+
+    CHECK_MPI_INTERFACE(METIS ${var})
   ENDIF()
 ENDMACRO()
 

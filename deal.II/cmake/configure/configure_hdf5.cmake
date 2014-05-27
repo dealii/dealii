@@ -40,6 +40,8 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
+
+    CHECK_MPI_INTERFACE(HDF5 ${var})
   ENDIF()
 ENDMACRO()
 
