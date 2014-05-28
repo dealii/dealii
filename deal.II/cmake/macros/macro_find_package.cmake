@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -20,12 +20,12 @@
 # ${package}_FOUND and ${package}_LIBRARIES to allow easy custom overrides
 #
 
-MACRO(DEAL_II_FIND_PACKAGE _package_name)
+MACRO(FIND_PACKAGE _package_name)
   STRING(TOUPPER ${_package_name} _package_name_uppercase)
 
   IF( NOT DEFINED ${_package_name_uppercase}_FOUND AND
       NOT DEFINED ${_package_name_uppercase}_LIBRARIES )
-    FIND_PACKAGE (${_package_name} ${ARGN})
+    _FIND_PACKAGE (${_package_name} ${ARGN})
   ELSE()
     IF(NOT DEFINED ${_package_name_uppercase}_FOUND)
       SET(${_package_name_uppercase}_FOUND TRUE)

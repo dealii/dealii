@@ -42,14 +42,14 @@ IF(NOT BUILD_SHARED_LIBS)
   SET(Boost_USE_STATIC_LIBS TRUE)
 ENDIF()
 
-DEAL_II_FIND_PACKAGE(Boost 1.44 COMPONENTS iostreams serialization system thread)
+FIND_PACKAGE(Boost 1.44 COMPONENTS iostreams serialization system thread)
 
 #
 # Fall back to dynamic libraries if no static libraries could be found:
 #
 IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
   SET(Boost_USE_STATIC_LIBS FALSE)
-  DEAL_II_FIND_PACKAGE(Boost 1.44 COMPONENTS iostreams serialization system thread)
+  FIND_PACKAGE(Boost 1.44 COMPONENTS iostreams serialization system thread)
 ENDIF()
 
 IF(Boost_FOUND)

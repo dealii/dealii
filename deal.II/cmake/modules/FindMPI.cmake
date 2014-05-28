@@ -64,7 +64,7 @@ ENDIF()
 # Call the system FindMPI.cmake module:
 #
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-DEAL_II_FIND_PACKAGE(MPI)
+FIND_PACKAGE(MPI)
 
 IF(NOT MPI_CXX_FOUND AND DEAL_II_WITH_MPI)
   #
@@ -76,12 +76,12 @@ IF(NOT MPI_CXX_FOUND AND DEAL_II_WITH_MPI)
     "MPI not found but DEAL_II_WITH_MPI is set to TRUE."
     " Try again with more aggressive search paths:"
     )
-  # Clear variables so that DEAL_II_FIND_PACKAGE runs again:
+  # Clear variables so that FIND_PACKAGE runs again:
   SET(MPI_FOUND)
   UNSET(MPI_CXX_COMPILER CACHE)
   UNSET(MPI_C_COMPILER CACHE)
   UNSET(MPI_Fortran_COMPILER CACHE)
-  DEAL_II_FIND_PACKAGE(MPI)
+  FIND_PACKAGE(MPI)
 ENDIF()
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
