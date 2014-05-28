@@ -148,6 +148,19 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Bugfix: CMake: Do not override external functions like FIND_PACKAGE
+  but use a different name DEAL_II_FIND_PACKAGE instead. This avoids a
+  deadlock (with final segfault) on some newer CMake versions.
+  <br>
+  (Matthias Maier, 2014/05/28)
+  </li>
+
+  <li> Improved: CMake: Search results and error conditions for external
+  libraries are now much more verbose. Added an MPI sanity check.
+  <br>
+  (Matthias Maier, 2014/05/28)
+  </li>
+
   <li> Fixed: The MatrixTools::apply_boundary_values() variant that works
   on PETSc matrices could produce a deadlock in parallel if one processor
   had no boundary values to apply. This is now fixed.
