@@ -19,7 +19,7 @@
 #
 
 MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
-  FIND_PACKAGE(LAPACK)
+  DEAL_II_FIND_PACKAGE(LAPACK)
 
   #
   # We do a check for availability of every single LAPACK function we use.
