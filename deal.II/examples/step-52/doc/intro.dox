@@ -61,7 +61,7 @@ where
 @f{eqnarray*}
 k_i = h M^{-1} f\left(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j\right)
 @f}
-with $a_{ij}$, $b_i$, and $c_i$ are known coefficient and $h$ is the time step
+where $a_{ij}$, $b_i$, and $c_i$ are known coefficients and $h$ is the time step
 used. At the time of the writing of this tutorial, the methods implemented in
 deal.II can be divided in three categories:
 <ol>
