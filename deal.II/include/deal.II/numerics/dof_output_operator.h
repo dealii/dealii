@@ -20,9 +20,11 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/named_data.h>
+#include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/event.h>
 #include <deal.II/algorithms/operator.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/numerics/data_out.h>
 
 #include <fstream>
 
@@ -58,9 +60,11 @@ namespace Algorithms
   private:
     SmartPointer<DoFHandler<dim, spacedim>,
                  DoFOutputOperator<VECTOR, dim, spacedim> > dof;
-
+      
       const std::string filename_base;
       const unsigned int digits;
+      
+      DataOut<dim> out;
   };
 
   template <class VECTOR, int dim, int spacedim>

@@ -16,7 +16,6 @@
 
 
 #include <deal.II/numerics/dof_output_operator.h>
-#include <deal.II/numerics/data_out.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -29,7 +28,9 @@ namespace Algorithms
 		  :
 		  filename_base(filename_base),
 		  digits(digits)
-  {}
+  {
+    out.set_default_format(DataOutBase::gnuplot);
+  }
   
 
   template <class VECTOR, int dim, int spacedim>
@@ -38,8 +39,6 @@ namespace Algorithms
     const AnyData &data)
   {
     Assert ((dof!=0), ExcNotInitialized());
-    DataOut<dim> out;
-    out.set_default_format(DataOutBase::gnuplot);
     out.attach_dof_handler (*dof);
     for (unsigned int i=0;i<data.size();++i)
       {
@@ -56,6 +55,7 @@ namespace Algorithms
     std::ofstream out_filename (streamOut.str().c_str());
     out.build_patches (2);
     out.write_gnuplot (out_filename);
+    out.clear ();
     return *this;
   }
 }
