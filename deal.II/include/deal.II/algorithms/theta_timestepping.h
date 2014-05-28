@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -246,20 +246,20 @@ namespace Algorithms
      * The current time in the
      * timestepping scheme.
      */
-    const double current_time() const;
+    double current_time() const;
     /**
      * The current step size.
      */
-    const double step_size() const;
+    double step_size() const;
     /**
      * The weight between implicit and explicit part.
      */
-    const double theta() const;
+    double theta() const;
 
       /**
        * Set a new weight and return the old
        */
-    const double theta(double new_theta);
+    double theta(double new_theta);
 
     /**
      * The data handed to the #op_explicit time stepping operator.
@@ -380,7 +380,7 @@ namespace Algorithms
 
   template <class VECTOR>
   inline
-  const double ThetaTimestepping<VECTOR>::theta () const
+  double ThetaTimestepping<VECTOR>::theta () const
   {
     return vtheta;
   }
@@ -388,7 +388,7 @@ namespace Algorithms
 
   template <class VECTOR>
   inline
-  const double ThetaTimestepping<VECTOR>::theta (double new_theta)
+  double ThetaTimestepping<VECTOR>::theta (double new_theta)
   {
     const double tmp = vtheta;
     vtheta = new_theta;
@@ -398,7 +398,7 @@ namespace Algorithms
 
   template <class VECTOR>
   inline
-  const double ThetaTimestepping<VECTOR>::current_time () const
+  double ThetaTimestepping<VECTOR>::current_time () const
   {
     return control.now();
   }  
