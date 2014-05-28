@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Bugfix: CMake: Also clean CMAKE_MODULE_PATH prior to call to
+  FIND_PACKAGE(Boost) inside FindBOOST.cmake because apparently
+  "Boost" == "BOOST" for the Mac file system...
+  <br>
+  (Matthias Maier, 2014/05/28)
+  </li>
+
   <li> Improved: CMake: Search results and error conditions for external
   libraries are now much more verbose. Added an MPI sanity check.
   <br>
