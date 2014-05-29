@@ -9,6 +9,7 @@
 
 \begin{itemize}
 \item {\it Parameter name:} {\tt double}
+\phantomsection\label{parameters:Testing/double}
 
 
 \index[prmindex]{double}
@@ -24,6 +25,7 @@
 
 {\it Possible values:} [Double -1.79769e+308...1.79769e+308 (inclusive)]
 \item {\it Parameter name:} {\tt int}
+\phantomsection\label{parameters:Testing/int}
 
 
 \index[prmindex]{int}
@@ -36,6 +38,7 @@
 
 {\it Possible values:} [Integer range -2147483648...2147483647 (inclusive)]
 \item {\it Parameter name:} {\tt string list}
+\phantomsection\label{parameters:Testing/string list}
 
 
 \index[prmindex]{string list}
@@ -59,6 +62,7 @@
 
 \begin{itemize}
 \item {\it Parameter name:} {\tt double 2}
+\phantomsection\label{parameters:Testing/Testing 2/double 2}
 
 
 \index[prmindex]{double 2}
@@ -74,6 +78,7 @@
 
 {\it Possible values:} [Double -1.79769e+308...1.79769e+308 (inclusive)]
 \item {\it Parameter name:} {\tt int 2}
+\phantomsection\label{parameters:Testing/Testing 2/int 2}
 
 
 \index[prmindex]{int 2}
@@ -86,6 +91,7 @@
 
 {\it Possible values:} [Integer range -2147483648...2147483647 (inclusive)]
 \item {\it Parameter name:} {\tt string list 2}
+\phantomsection\label{parameters:Testing/Testing 2/string list 2}
 
 
 \index[prmindex]{string list 2}
