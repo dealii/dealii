@@ -352,25 +352,28 @@ ELSE()
   # Umm, no valid subversion info was found, try again with git-svn:
   FIND_PACKAGE(Git QUIET)
   IF(GIT_FOUND)
-    EXECUTE_PROCESS(
-      COMMAND ${GIT_EXECUTABLE} svn info
-      WORKING_DIRECTORY ${CTEST_SOURCE_DIRECTORY}
-      OUTPUT_VARIABLE _svn_WC_INFO
-      RESULT_VARIABLE _result
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-      )
+    GET_FILENAME_COMPONENT(_path "${CTEST_SOURCE_DIRECTORY}" PATH)
+    IF(EXISTS ${_path}/.git/svn)
+      EXECUTE_PROCESS(
+        COMMAND ${GIT_EXECUTABLE} svn info
+        WORKING_DIRECTORY ${CTEST_SOURCE_DIRECTORY}
+        OUTPUT_VARIABLE _svn_WC_INFO
+        RESULT_VARIABLE _result
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
 
-    IF(${_result} EQUAL 0)
-      STRING(REGEX REPLACE "^(.*\n)?URL: ([^\n]+).*"
-        "\\2" _svn_WC_URL "${_svn_WC_INFO}")
-      STRING(REGEX REPLACE "^(.*\n)?Repository Root: ([^\n]+).*"
-        "\\2" _svn_WC_ROOT "${_svn_WC_INFO}")
-      STRING(REGEX REPLACE "^(.*\n)?Revision: ([^\n]+).*"
-        "\\2" _svn_WC_REVISION "${_svn_WC_INFO}")
-      STRING(REGEX REPLACE "^(.*\n)?Last Changed Date: ([^\n]+).*"
-        "\\2" _svn_WC_LAST_CHANGED_DATE "${_svn_WC_INFO}")
-    ELSE()
-      SET(_svn_WC_INFO)
+      IF(${_result} EQUAL 0)
+        STRING(REGEX REPLACE "^(.*\n)?URL: ([^\n]+).*"
+          "\\2" _svn_WC_URL "${_svn_WC_INFO}")
+        STRING(REGEX REPLACE "^(.*\n)?Repository Root: ([^\n]+).*"
+          "\\2" _svn_WC_ROOT "${_svn_WC_INFO}")
+        STRING(REGEX REPLACE "^(.*\n)?Revision: ([^\n]+).*"
+          "\\2" _svn_WC_REVISION "${_svn_WC_INFO}")
+        STRING(REGEX REPLACE "^(.*\n)?Last Changed Date: ([^\n]+).*"
+          "\\2" _svn_WC_LAST_CHANGED_DATE "${_svn_WC_INFO}")
+      ELSE()
+        SET(_svn_WC_INFO)
+      ENDIF()
     ENDIF()
   ENDIF()
 ENDIF()
