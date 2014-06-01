@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2403,7 +2403,14 @@ namespace MatrixTools
 
             right_hand_side.set (indices, solution_values);
           }
-
+	else
+	  {
+            // clear_rows() is a collective operation so we still have to call
+            // it:
+            std::vector<types::global_dof_index> constrained_rows;
+            matrix.clear_rows (constrained_rows, 1.);
+	  }
+	
         // clean up
         matrix.compress ();
         solution.compress (VectorOperation::insert);
