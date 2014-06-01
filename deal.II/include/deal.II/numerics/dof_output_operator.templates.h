@@ -25,13 +25,20 @@ namespace Algorithms
   DoFOutputOperator<VECTOR, dim, spacedim>::DoFOutputOperator (
     const std::string filename_base,
     const unsigned int digits)
-		  :
-		  filename_base(filename_base),
-		  digits(digits)
+    :
+    filename_base(filename_base),
+    digits(digits)
   {
     out.set_default_format(DataOutBase::gnuplot);
   }
-  
+
+
+  template <class VECTOR, int dim, int spacedim>
+  void
+  DoFOutputOperator<VECTOR, dim, spacedim>::parse_parameters(ParameterHandler &param)
+  {
+    out.parse_parameters(param);
+  }
 
   template <class VECTOR, int dim, int spacedim>
   OutputOperator<VECTOR> &
@@ -40,21 +47,21 @@ namespace Algorithms
   {
     Assert ((dof!=0), ExcNotInitialized());
     out.attach_dof_handler (*dof);
-    for (unsigned int i=0;i<data.size();++i)
+    for (unsigned int i=0; i<data.size(); ++i)
       {
-	const VECTOR* p = data.try_read_ptr<VECTOR>(i);
-	if (p!=0)
-	  {
-	    out.add_data_vector (*p, data.name(i));
-	  }
+        const VECTOR *p = data.try_read_ptr<VECTOR>(i);
+        if (p!=0)
+          {
+            out.add_data_vector (*p, data.name(i));
+          }
       }
     std::ostringstream streamOut;
     streamOut << filename_base
-	      << std::setw(digits) << std::setfill('0') << this->step
-	      << out.default_suffix();
+              << std::setw(digits) << std::setfill('0') << this->step
+              << out.default_suffix();
     std::ofstream out_filename (streamOut.str().c_str());
-    out.build_patches (2);
-    out.write_gnuplot (out_filename);
+    out.build_patches ();
+    out.write (out_filename);
     out.clear ();
     return *this;
   }
