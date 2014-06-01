@@ -3025,12 +3025,11 @@ public:
    * may be different as to whether
    * a point is in- or outside the
    * cell in real space.
-
-   In case of codim>0, the point is first projected
-   to the manifold where the cell is embedded and
-   then check if this projection is inside the cell.
-
-  */
+   *
+   * In case of codim>0, the point is first projected
+   * to the manifold where the cell is embedded and
+   * then check if this projection is inside the cell.
+   */
   bool point_inside (const Point<spacedim> &p) const;
 
   /**
