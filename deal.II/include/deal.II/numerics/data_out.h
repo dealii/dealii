@@ -121,9 +121,20 @@ namespace internal
  * the sequence of cells to be converted into patches itself, but relies
  * on the two functions first_cell() and next_cell(). By default, they
  * return the first active cell, and the next active cell, respectively.
- * Since they are @p virtual functions, you may overload them to select other
- * cells for output. If cells are not active, interpolated values are taken
- * for output instead of the exact values on active cells.
+ * Since they are @p virtual functions, you can write your own class
+ * derived from DataOut in which you overload these two functions to select other
+ * cells for output. This may, for example, include only cells that are
+ * in parts of a domain (e.g., if you don't care about the solution elsewhere,
+ * think for example a buffer region in which you attenuate outgoing waves
+ * in the Perfectly Matched Layer method) or if you don't want output to
+ * be generated at all levels of an adaptively refined mesh because this
+ * creates too much data (in this case, the set of cells returned by
+ * your implementations of first_cell() and next_cell() will include
+ * non-active cells, and DataOut::build_patches() will simply take
+ * interpolated values of the solution instead of the exact values on these
+ * cells children for output). Once you derive your own class, you would
+ * just create an object of this type instead of an object of type DataOut,
+ * and everything else will remain the same.
  *
  * The two functions are not constant, so you may store information within
  * your derived class about the last accessed cell. This is useful if the
