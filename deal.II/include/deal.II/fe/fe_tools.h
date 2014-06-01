@@ -697,10 +697,10 @@ namespace FETools
 
   /**
    * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
-   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler based on
+   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler objects based on
    * the same triangulation.
    *
-   * This function is interesting for e.g. extrapolating patchwise a piecewise
+   * This function is used, for example, for extrapolating patchwise a piecewise
    * linear solution to a piecewise quadratic solution.
    *
    * Note that the resulting field does not satisfy continuity requirements of
@@ -722,9 +722,9 @@ namespace FETools
 
   /**
    * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
-   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler based on
+   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler objects based on
    * the same triangulation.  @p constraints is a hanging node constraints
-   * object corresponding to @p dof2. This object is particular important when
+   * object corresponding to @p dof2. This object is necessary when
    * interpolating onto continuous elements on grids with hanging nodes
    * (locally refined grids).
    *
