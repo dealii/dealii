@@ -51,13 +51,21 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  ThetaTimestepping<VECTOR>::initialize (ParameterHandler &param)
+  ThetaTimestepping<VECTOR>::parse_parameters (ParameterHandler &param)
   {
     param.enter_subsection("ThetaTimestepping");
     control.parse_parameters (param);
     vtheta = param.get_double("Theta");
     adaptive = param.get_bool("Adaptive");
     param.leave_subsection ();
+  }
+
+
+  template <class VECTOR>
+  void
+  ThetaTimestepping<VECTOR>::initialize (ParameterHandler &param)
+  {
+    parse_parameters(param);
   }
 
 

@@ -55,7 +55,7 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  Newton<VECTOR>::initialize (ParameterHandler &param)
+  Newton<VECTOR>::parse_parameters (ParameterHandler &param)
   {
     param.enter_subsection("Newton");
     control.parse_parameters (param);
@@ -63,6 +63,13 @@ namespace Algorithms
     n_stepsize_iterations = param.get_integer("Stepsize iterations");
     debug_vectors = param.get_bool("Debug vectors");
     param.leave_subsection ();
+  }
+
+  template <class VECTOR>
+  void
+  Newton<VECTOR>::initialize (ParameterHandler &param)
+  {
+    parse_parameters(param);
   }
 
   template <class VECTOR>

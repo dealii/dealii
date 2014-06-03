@@ -240,8 +240,20 @@ namespace Algorithms
      */
     void set_output(OutputOperator<VECTOR> &output);
 
-    void declare_parameters (ParameterHandler &param);
-    void initialize (ParameterHandler &param);
+    /**
+     * Declare parameters in a parameter handler.
+     */
+    static void declare_parameters (ParameterHandler &param);
+
+    /**
+     * Read the parameters in the ParameterHandler.
+     */
+    void parse_parameters (ParameterHandler &param);
+
+    /**
+     * @deprecated Use parse_parameters().
+     */
+    void initialize (ParameterHandler &param) DEAL_II_DEPRECATED;
     /**
      * The current time in the
      * timestepping scheme.
@@ -256,9 +268,9 @@ namespace Algorithms
      */
     double theta() const;
 
-      /**
-       * Set a new weight and return the old
-       */
+    /**
+     * Set a new weight and return the old
+     */
     double theta(double new_theta);
 
     /**
@@ -401,7 +413,7 @@ namespace Algorithms
   double ThetaTimestepping<VECTOR>::current_time () const
   {
     return control.now();
-  }  
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE
