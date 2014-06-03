@@ -148,6 +148,20 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: ParameterHandler parsing added to DoFOutputOperator
+  <br>
+  (Guido Kanschat, 2014/06/03)
+  </li>
+
+  <li> Improved: ThetaTimestepping and other operators now use AnyData
+  to communicate with operators they rely on. This way, time step data
+  can be forwarded using the same mechanism, and no complicated back
+  access to member data is required
+  anymore. MeshWorker::IntegrationInfo uses AnyData as well.
+  <br>
+  (Guido Kanschat, 2014/06/03)
+  </li>
+
   <li> Bugfix: CMake: Also clean CMAKE_MODULE_PATH prior to call to
   FIND_PACKAGE(Boost) inside FindBOOST.cmake because apparently
   "Boost" == "BOOST" for the Mac file system...
