@@ -190,7 +190,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
 
       LIST(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
 
-      IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
+      IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread|clang_rt|clang_rt.osx)$")
         FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
         IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
           LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})

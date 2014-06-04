@@ -148,6 +148,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Bugfix: Also treat libclang_rt and libclang_rt.osx as system libraries.
+  <br>
+  (Matthias Maier, 2014/06/04)
+  </li>
+
   <li> Improved: ParameterHandler parsing added to DoFOutputOperator
   <br>
   (Guido Kanschat, 2014/06/03)
