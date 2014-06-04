@@ -148,7 +148,7 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> Bugfix: Also treat libclang_rt and libclang_rt.osx as system libraries.
+  <li> Bugfix: Filter libclang_rt* from the PETSc link line.
   <br>
   (Matthias Maier, 2014/06/04)
   </li>

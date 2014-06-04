@@ -189,10 +189,10 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
       # Search for every library that was specified with -l:
       STRING(REGEX REPLACE "^-l" "" _token "${_token}")
 
-      IF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
+      IF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s|clang_rt)")
         LIST(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
 
-        IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread|clang_rt.*)$")
+        IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
           FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
         ELSE()
           DEAL_II_FIND_LIBRARY(PETSC_LIBRARY_${_token}
