@@ -28,8 +28,7 @@ MACRO(CHECK_MPI_INTERFACE _feature _var)
     SET(_nope FALSE)
 
     FOREACH(_library ${${_feature}_LIBRARIES})
-      IF( _library MATCHES "/libmpi[^/]*\\.so"
-          AND NOT _library MATCHES "f(77|90|ort)" )
+      IF( _library MATCHES "/libmpi(|_cxx)\\.(a|so)[^/]*$")
 
         GET_FILENAME_COMPONENT(_file1 ${_library} REALPATH)
 
@@ -44,6 +43,7 @@ MACRO(CHECK_MPI_INTERFACE _feature _var)
 
         IF(_not_found)
           SET(_nope TRUE)
+          SET(_spurious_library ${_library})
           BREAK()
         ENDIF()
       ENDIF()
@@ -60,7 +60,7 @@ MACRO(CHECK_MPI_INTERFACE _feature _var)
         "Could not find a sufficient ${_feature} installation:\n"
         "${_feature} has to be compiled against the same MPI library as deal.II "
         "but the link line of ${_feature} contains:\n"
-        "  ${_mpi_library}\n"
+        "  ${_spurious_library}\n"
         "which is not listed in MPI_LIBRARIES:\n"
         "  MPI_LIBRARIES = \"${_str}\"\n"
         )
