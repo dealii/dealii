@@ -148,16 +148,55 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> New: AnyData::try_read() is a function that allows users to check
-whether an entry exists and get a pointer to it without throwing an
-exception in case of failure.
-<br>
-(Guido Kanschat, 2014/05/16)
-</li>
+  <li> Bugfix: Filter libclang_rt* from the PETSc link line.
+  <br>
+  (Matthias Maier, 2014/06/04)
+  </li>
 
-<li> New: The GMRES solver of deal.II can now write an estimate of
+  <li> Improved: ParameterHandler parsing added to DoFOutputOperator
+  <br>
+  (Guido Kanschat, 2014/06/03)
+  </li>
+
+  <li> Improved: ThetaTimestepping and other operators now use AnyData
+  to communicate with operators they rely on. This way, time step data
+  can be forwarded using the same mechanism, and no complicated back
+  access to member data is required
+  anymore. MeshWorker::IntegrationInfo uses AnyData as well.
+  <br>
+  (Guido Kanschat, 2014/06/03)
+  </li>
+
+  <li> Bugfix: CMake: Also clean CMAKE_MODULE_PATH prior to call to
+  FIND_PACKAGE(Boost) inside FindBOOST.cmake because apparently
+  "Boost" == "BOOST" for the Mac file system...
+  <br>
+  (Matthias Maier, 2014/05/28)
+  </li>
+
+  <li> Improved: CMake: Search results and error conditions for external
+  libraries are now much more verbose. Added an MPI sanity check.
+  <br>
+  (Matthias Maier, 2014/05/28)
+  </li>
+
+  <li> Fixed: The MatrixTools::apply_boundary_values() variant that works
+  on PETSc matrices could produce a deadlock in parallel if one processor
+  had no boundary values to apply. This is now fixed.
+  <br>
+  (Michal Wichrowski, 2014/05/19)
+  </li>
+
+  <li> New: AnyData::try_read() is a function that allows users to check
+  whether an entry exists and get a pointer to it without throwing an
+  exception in case of failure.
+  <br>
+  (Guido Kanschat, 2014/05/16)
+  </li>
+
+  <li> New: The GMRES solver of deal.II can now write an estimate of
   eigenvalues to the log file, in analogy to the CG solver. This is enabled
-  by the flag SolverGMRES<>::AdditionalData::compute_eigenvalues.
+  by the flag SolverGMRES::AdditionalData::compute_eigenvalues.
   <br>
   (Martin Kronbichler, 2014/05/11)
   </li>  

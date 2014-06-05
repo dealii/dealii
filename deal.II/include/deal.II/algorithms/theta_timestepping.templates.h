@@ -51,7 +51,7 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  ThetaTimestepping<VECTOR>::initialize (ParameterHandler &param)
+  ThetaTimestepping<VECTOR>::parse_parameters (ParameterHandler &param)
   {
     param.enter_subsection("ThetaTimestepping");
     control.parse_parameters (param);
@@ -63,12 +63,20 @@ namespace Algorithms
 
   template <class VECTOR>
   void
+  ThetaTimestepping<VECTOR>::initialize (ParameterHandler &param)
+  {
+    parse_parameters(param);
+  }
+
+
+  template <class VECTOR>
+  void
   ThetaTimestepping<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
   {
     Operator<VECTOR>::operator() (out, in);
   }
-  
-  
+
+
   template <class VECTOR>
   void
   ThetaTimestepping<VECTOR>::operator() (AnyData &out, const AnyData &in)
@@ -77,7 +85,7 @@ namespace Algorithms
 
     deallog.push ("Theta");
 
-    VECTOR& solution = *out.entry<VECTOR*>(0);
+    VECTOR &solution = *out.entry<VECTOR *>(0);
     GrowingVectorMemory<VECTOR> mem;
     typename VectorMemory<VECTOR>::Pointer aux(mem);
     aux->reinit(solution);
@@ -90,24 +98,32 @@ namespace Algorithms
     // vector associated with the old
     // timestep
     AnyData src1;
-    src1.add<const VECTOR*>(&solution, "Previous iterate");
-    src1.add<const double&>(d_explicit.time, "Time");
-    src1.add<const double&>(d_explicit.step, "Timestep");
+    src1.add<const VECTOR *>(&solution, "Previous iterate");
+    src1.add<const double *>(&d_explicit.time, "Time");
+    src1.add<const double *>(&d_explicit.step, "Timestep");
+    src1.add<const double *>(&vtheta, "Theta");
     src1.merge(in);
 
     AnyData src2;
-    src2.add<const VECTOR*>(&solution, "Previous iterate");
 
     AnyData out1;
-    out1.add<VECTOR*>(aux, "Solution");
+    out1.add<VECTOR *>(aux, "Solution");
     // The data provided to the inner solver
-    src2.add<const VECTOR*>(aux, "Previous time");
-    src2.add<const double&>(d_implicit.time, "Time");
-    src2.add<const double&>(d_explicit.step, "Timestep");
+    src2.add<const VECTOR *>(aux, "Previous time");
+    src2.add<const VECTOR *>(&solution, "Previous iterate");
+    src2.add<const double *>(&d_implicit.time, "Time");
+    src2.add<const double *>(&d_implicit.step, "Timestep");
+    src2.add<const double *>(&vtheta, "Theta");
     src2.merge(in);
 
     if (output != 0)
       (*output) << 0U << out;
+
+    // Avoid warnings because time and timestep cannot be converted to VECTOR*
+    const bool explicit_silent = op_explicit->silent_compatibility;
+    const bool implicit_silent = op_implicit->silent_compatibility;
+    op_explicit->silent_compatibility = true;
+    op_implicit->silent_compatibility = true;
 
     for (unsigned int count = 1; d_explicit.time < control.final(); ++count)
       {
@@ -135,6 +151,8 @@ namespace Algorithms
 
         d_explicit.time = control.now();
       }
+    op_explicit->silent_compatibility = explicit_silent;
+    op_implicit->silent_compatibility = implicit_silent;
     deallog.pop();
   }
 }

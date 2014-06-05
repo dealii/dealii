@@ -42,7 +42,9 @@ IF(NOT BUILD_SHARED_LIBS)
   SET(Boost_USE_STATIC_LIBS TRUE)
 ENDIF()
 
+LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 FIND_PACKAGE(Boost 1.44 COMPONENTS iostreams serialization system thread)
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
 # Fall back to dynamic libraries if no static libraries could be found:

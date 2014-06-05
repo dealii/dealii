@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -697,21 +697,64 @@ namespace FETools
 
   /**
    * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
-   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler based on
-   * the same triangulation.
+   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler objects
+   * based on the same triangulation. This function is used, for example, for
+   * extrapolating patchwise a piecewise linear solution to a piecewise
+   * quadratic solution.
    *
-   * This function is interesting for e.g. extrapolating patchwise a piecewise
-   * linear solution to a piecewise quadratic solution.
+   * The function's name is historical and probably not particularly well
+   * chosen. The function performs the following operations, one after the
+   * other:
    *
-   * Note that the resulting field does not satisfy continuity requirements of
-   * the given finite elements.
+   * - It interpolates directly from every cell of @p dof1 to the
+   *   corresponding cell of @dof2 using the interpolation matrix of the
+   *   finite element spaces used on these cells and provided by
+   *   the finite element objects involved. This step is done using the
+   *   FETools::interpolate() function.
+   * - It then performs a loop over all non-active cells of @dof2. If
+   *   such a non-active cell has at least one active child, then we
+   *   call the children of this cell a "patch". We then interpolate
+   *   from the children of this patch to the patch, using the finite
+   *   element space associated with @p dof2 and immediately interpolate
+   *   back to the children. In essence, this information throws away
+   *   all information in the solution vector that lives on a scale
+   *   smaller than the patch cell.
+   * - Since we traverse non-active cells from the coarsest to the
+   *   finest levels, we may find patches that correspond to child
+   *   cells of previously treated patches if the mesh had been
+   *   refined adaptively (this cannot happen if the mesh has been
+   *   refined globally because there the children of a patch are
+   *   all active). We also perform the operation described above
+   *   on these patches, but it is easy to see that on patches that
+   *   are children of previously treated patches, the operation is
+   *   now the identity operation (since it interpolates from the
+   *   children of the current patch a function that had previously
+   *   been interpolated to these children from an even coarser patch).
+   *   Consequently, this does not alter the solution vector any more.
    *
+   * The name of the function originates from the fact that it can be
+   * used to construct a representation of a function of higher polynomial
+   * degree on a once coarser mesh. For example, if you imagine that you
+   * start with a $Q_1$ function on globally refined mesh, and that @p dof2
+   * is associated with a $Q_2$ element, then this function computes the
+   * equivalent of the operator $I_{2h}^{(2)}$ interpolating the original
+   * piecewise linear function onto a quadratic function on a once coarser
+   * mesh with mesh size $2h$ (but representing this function on the original
+   * mesh with size $h$). If the exact solution is sufficiently smooth,
+   * then $u^\ast=I_{2h}^{(2)}u_h$ is typically a better approximation to
+   * the exact solution $u$ of the PDE than $u_h$ is. In other words, this
+   * function provides a postprocessing step that improves the solution in
+   * a similar way one often obtains by extrapolating a sequence of solutions,
+   * explaining the origin of the function's name.
+   *
+   * @note The resulting field does not satisfy continuity requirements of
+   * the given finite elements if the algorithm outlined above is used.
    * When you use continuous elements on grids with hanging nodes, please use
    * the @p extrapolate function with an additional ConstraintMatrix argument,
    * see below.
    *
-   * Since this function operates on patches of cells, it is required that the
-   * underlying grid is refined at least once for every coarse grid cell. If
+   * @note Since this function operates on patches of cells, it requires that
+   * the underlying grid is refined at least once for every coarse grid cell. If
    * this is not the case, an exception will be raised.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
@@ -722,13 +765,15 @@ namespace FETools
 
   /**
    * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
-   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler based on
+   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler objects based on
    * the same triangulation.  @p constraints is a hanging node constraints
-   * object corresponding to @p dof2. This object is particular important when
+   * object corresponding to @p dof2. This object is necessary when
    * interpolating onto continuous elements on grids with hanging nodes
    * (locally refined grids).
    *
-   * Otherwise, the same holds as for the other @p extrapolate function.
+   * Otherwise, the function does the same as the other @p extrapolate
+   * function above (for which the documentation provides an extensive
+   * description of its operation).
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void extrapolate (const DoFHandler<dim,spacedim>  &dof1,
@@ -803,17 +848,15 @@ namespace FETools
    * accordingly.
    *
    * The name must be in the form which is returned by the
-   * FiniteElement::get_name function, where a few modifications are allowed:
-   *
-   * <ul>
-   * <li> Dimension template parameters &lt;2&gt; etc. can be
+   * FiniteElement::get_name function, where dimension template parameters &lt;2&gt; etc. can be
    * omitted. Alternatively, the explicit number can be replaced by
    * <tt>dim</tt> or <tt>d</tt>. If a number is given, it <b>must</b> match
    * the template parameter of this function.
    *
-   * <li> The powers used for FESystem may either be numbers or can be
+   * The names of FESystem elements follow the pattern <code>FESystem[FE_Base1^p1-FE_Base2^p2]</code>
+   * The powers <code>p1</code> etc. may either be numbers or can be
    * replaced by <tt>dim</tt> or <tt>d</tt>.
-   * </ul>
+   *
    *
    * If no finite element can be reconstructed from this string, an exception
    * of type @p FETools::ExcInvalidFEName is thrown.

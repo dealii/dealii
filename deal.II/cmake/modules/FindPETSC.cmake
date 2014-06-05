@@ -174,12 +174,13 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
 
   FILE(STRINGS "${PETSC_PETSCVARIABLES}" PETSC_EXTERNAL_LINK_LINE
     REGEX "^PETSC_WITH_EXTERNAL_LIB =.*")
+
   SEPARATE_ARGUMENTS(PETSC_EXTERNAL_LINK_LINE)
 
   SET(_hints)
   SET(_petsc_libraries)
   SET(_cleanup_variables)
-  FOREACH(_token ${PETSC_EXTERNAL_LINK_LINE}})
+  FOREACH(_token ${PETSC_EXTERNAL_LINK_LINE})
     IF(_token MATCHES "^-L")
       # Build up hints with the help of all tokens passed with -L:
       STRING(REGEX REPLACE "^-L" "" _token "${_token}")
@@ -188,21 +189,21 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
       # Search for every library that was specified with -l:
       STRING(REGEX REPLACE "^-l" "" _token "${_token}")
 
-      LIST(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
+      IF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s|clang_rt)")
+        LIST(APPEND _cleanup_variables PETSC_LIBRARY_${_token})
 
-      IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
-        FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
+        IF(_token MATCHES "^(c|quadmath|gfortran|m|rt|nsl|dl|pthread)$")
+          FIND_SYSTEM_LIBRARY(PETSC_LIBRARY_${_token} NAMES ${_token})
+        ELSE()
+          DEAL_II_FIND_LIBRARY(PETSC_LIBRARY_${_token}
+            NAMES ${_token}
+            HINTS ${_hints}
+            )
+        ENDIF()
         IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
           LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
         ENDIF()
-      ELSEIF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
-        DEAL_II_FIND_LIBRARY(PETSC_LIBRARY_${_token}
-          NAMES ${_token}
-          HINTS ${_hints}
-          )
-        IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
-          LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
-        ENDIF()
+
       ENDIF()
 
     ENDIF()

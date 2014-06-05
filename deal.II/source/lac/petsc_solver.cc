@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -736,7 +736,11 @@ namespace PETScWrappers
          * factorization here we start to see differences with the base
          * class solve function
          */
+#if DEAL_II_PETSC_VERSION_GTE(3,2,0)
         ierr = PCFactorSetMatSolverPackage (solver_data->pc, MATSOLVERMUMPS);
+#else
+        ierr = PCFactorSetMatSolverPackage (solver_data->pc, MAT_SOLVER_MUMPS);
+#endif
         AssertThrow (ierr == 0, ExcPETScError (ierr));
 
         /**

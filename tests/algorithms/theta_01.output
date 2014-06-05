@@ -1,0 +1,13 @@
+
+DEAL::Initial: 1.00000 0
+DEAL:Theta::Time step:0.100000
+DEAL:Theta::Time step:0.200000
+DEAL:Theta::Time step:0.300000
+DEAL:Theta::Time step:0.400000
+DEAL:Theta::Time step:0.500000
+DEAL:Theta::Time step:0.600000
+DEAL:Theta::Time step:0.700000
+DEAL:Theta::Time step:0.800000
+DEAL:Theta::Time step:0.900000
+DEAL:Theta::Time step:1.00000
+DEAL::Result: -0.999676 0.0254599 Norm 1.00000

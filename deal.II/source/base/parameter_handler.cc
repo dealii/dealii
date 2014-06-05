@@ -2066,7 +2066,12 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 const std::string value = p->second.get<std::string>("value");
 
                 // print name
-                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n\n"
+                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
+                    << "\\phantomsection\\label{parameters:";
+                for (unsigned int i=0; i<subsection_path.size(); ++i)
+                  out << subsection_path[i] << "/";
+                out << demangle(p->first);
+                out << "}\n\n"
                     << std::endl;
 
                 out << "\\index[prmindex]{"

@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-The output of this program consist of the console output and solutions given in
+The output of this program consists of the console output and the solutions given in
 vtu format.
 
 The console output is:
@@ -24,7 +24,7 @@ Cash-Karp error: 2.5579e-10
 Number of steps done: 200
 @endcode
 
-Like expected the high-order methods give a more accurate solutions. We see that
+Like expected the high-order methods give a more accurate solution. We see that
 the Heun-Euler method adapted the number of time steps in order to satisfy the
 tolerance. The others embedded methods did not need to change the number of time
 steps.

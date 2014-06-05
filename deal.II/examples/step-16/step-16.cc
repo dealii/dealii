@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2003 - 2013 by the deal.II authors
+ * Copyright (C) 2003 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -245,21 +245,32 @@ namespace Step16
   // The following function extends what the corresponding one in step-6
   // did, with the exception of also distributing the degrees of freedom on
   // each level of the mesh which is needed for the multigrid hierarchy.
+  // We then output the number of degrees (globally and on each level) and
+  // reset the solution and right hand side vectors to the correct size.
+  // As in other programs where we use a sequence of meshes that become
+  // finer and finer (starting with step-5), the code as is here sets
+  // the solution vector to zero, rather than trying to interpolate the
+  // solution obtained on the previous mesh to the current one. This
+  // follows from the empirical observation that interpolating the solution
+  // and using it as a starting guess does not significant decrease the number
+  // of linear CG iterations one has to perform to solve a linear system.
+  // (The situation is very different for nonlinear problems, where using
+  // a previous time step's solution, or a solution from a coarser grid,
+  // typically drastically makes the solution of a nonlinear system cheaper.)
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
     dof_handler.distribute_mg_dofs (fe);
 
-    // Here we output not only the degrees of freedom on the finest level, but
-    // also in the multilevel structure
-    deallog << "Number of degrees of freedom: "
-            << dof_handler.n_dofs();
-
-    for (unsigned int l=0; l<triangulation.n_levels(); ++l)
-      deallog << "   " << 'L' << l << ": "
-              << dof_handler.n_dofs(l);
-    deallog  << std::endl;
+    std::cout << "   Number of degrees of freedom: "
+	      << dof_handler.n_dofs()
+	      << " (by level: ";
+    for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+      std::cout << dof_handler.n_dofs(level)
+		<< (level == triangulation.n_levels()-1
+		    ? ")" : ", ");
+    std::cout << std::endl;
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
                              dof_handler.n_dofs(),
@@ -771,15 +782,6 @@ namespace Step16
                   << std::endl;
 
         setup_system ();
-
-        std::cout << "   Number of degrees of freedom: "
-                  << dof_handler.n_dofs()
-                  << " (by level: ";
-        for (unsigned int level=0; level<triangulation.n_levels(); ++level)
-          std::cout << dof_handler.n_dofs(level)
-                    << (level == triangulation.n_levels()-1
-                        ? ")" : ", ");
-        std::cout << std::endl;
 
         assemble_system ();
         assemble_multigrid ();

@@ -24,56 +24,56 @@ namespace Algorithms
 {
   template <class VECTOR>
   Operator<VECTOR>::Operator()
-    : compatibility_flag(false)
+    : silent_compatibility(false), compatibility_flag(false)
   {}
 
 
   template <class VECTOR>
   void
-  Operator<VECTOR>::operator() (AnyData& out, const AnyData& in)
+  Operator<VECTOR>::operator() (AnyData &out, const AnyData &in)
   {
     // Had this function been overloaded in a derived clas, it would
     // not have been called. Therefore, we have to start the
     // compatibility engine. But before, we have to avoid an endless loop.
     Assert(!compatibility_flag, ExcMessage("Compatibility resolution of Operator generates and endless loop\n"
-					   "Please provide an operator() in a derived class"));
+                                           "Please provide an operator() in a derived class"));
     compatibility_flag = true;
-    
-    NamedData<VECTOR*> new_out;
-    for (unsigned int i=0;i<out.size();++i)
+
+    NamedData<VECTOR *> new_out;
+    for (unsigned int i=0; i<out.size(); ++i)
       {
-	if (out.is_type<VECTOR*>(i))
-	  new_out.add(out.entry<VECTOR*>(i), out.name(i));
-	else
-	  deallog << "Cannot convert AnyData argument " << out.name(i) << " to NamedData"
-		  << std::endl;
+        if (out.is_type<VECTOR *>(i))
+          new_out.add(out.entry<VECTOR *>(i), out.name(i));
+        else if (!silent_compatibility)
+          deallog << "Cannot convert AnyData argument " << out.name(i) << " to NamedData"
+                  << std::endl;
       }
-    
-    NamedData<VECTOR*> new_in;
-    for (unsigned int i=0;i<in.size();++i)
+
+    NamedData<VECTOR *> new_in;
+    for (unsigned int i=0; i<in.size(); ++i)
       {
-	//	deallog << "Convert " << in.name(i) << std::endl;
-	if (in.is_type<VECTOR*>(i))
-	  {
-	    // This const cast is due to the wrong constness handling
-	    // in NamedData. As soon as NamedData is gone, this code
-	    // will not be necessary anymore. And deprecating begins
-	    // now.
-	    VECTOR* p = const_cast<VECTOR*> (in.entry<VECTOR*>(i));
-	    new_in.add(p, in.name(i));
-	  }
-	else if (in.is_type<const VECTOR*>(i))
-	  {
-	    // This const cast is due to the wrong constness handling
-	    // in NamedData. As soon as NamedData is gone, this code
-	    // will not be necessary anymore. And deprecating begins
-	    // now.
-	    VECTOR* p = const_cast<VECTOR*> (in.entry<const VECTOR*>(i));
-	    new_in.add(p, in.name(i));
-	  }
-	else
-	  deallog << "Cannot convert AnyData argument " << in.name(i)
-		  << " to NamedData" << std::endl;
+        //  deallog << "Convert " << in.name(i) << std::endl;
+        if (in.is_type<VECTOR *>(i))
+          {
+            // This const cast is due to the wrong constness handling
+            // in NamedData. As soon as NamedData is gone, this code
+            // will not be necessary anymore. And deprecating begins
+            // now.
+            VECTOR *p = const_cast<VECTOR *> (in.entry<VECTOR *>(i));
+            new_in.add(p, in.name(i));
+          }
+        else if (in.is_type<const VECTOR *>(i))
+          {
+            // This const cast is due to the wrong constness handling
+            // in NamedData. As soon as NamedData is gone, this code
+            // will not be necessary anymore. And deprecating begins
+            // now.
+            VECTOR *p = const_cast<VECTOR *> (in.entry<const VECTOR *>(i));
+            new_in.add(p, in.name(i));
+          }
+        else if (!silent_compatibility)
+          deallog << "Cannot convert AnyData argument " << in.name(i)
+                  << " to NamedData" << std::endl;
       }
     this->operator() (new_out, new_in);
     compatibility_flag = false;
@@ -82,21 +82,21 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  Operator<VECTOR>::operator() (NamedData<VECTOR*>& out, const NamedData<VECTOR*>& in)
+  Operator<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
   {
     // Had this function been overloaded in a derived clas, it would
     // not have been called. Therefore, we have to start the
     // compatibility engine. But before, we have to avoid an endless loop.
     Assert(!compatibility_flag, ExcMessage("Compatibility resolution of Operator generates and endless loop\n"
-					   "Please provide an operator() in a derived class"));
+                                           "Please provide an operator() in a derived class"));
     compatibility_flag = true;
-    
+
     AnyData new_out;
-    for (unsigned int i=0;i<out.size();++i)
+    for (unsigned int i=0; i<out.size(); ++i)
       new_out.add(out(i), out.name(i));
 
     AnyData new_in;
-    for (unsigned int i=0;i<in.size();++i)
+    for (unsigned int i=0; i<in.size(); ++i)
       new_in.add(in(i), in.name(i));
 
     this->operator() (new_out, new_in);
@@ -122,60 +122,45 @@ namespace Algorithms
 
   template <class VECTOR>
   OutputOperator<VECTOR> &
-  OutputOperator<VECTOR>::operator<< (const AnyData& vectors)
+  OutputOperator<VECTOR>::operator<< (const AnyData &vectors)
   {
     if (os == 0)
       {
-        //TODO: make this possible
-        //deallog << ' ' << step;
-        //for (unsigned int i=0;i<vectors.size();++i)
-        //  vectors(i)->print(deallog);
-        //deallog << std::endl;
+        deallog << "Step " << step << std::endl;
+        for (unsigned int i=0; i<vectors.size(); ++i)
+          {
+            const VECTOR *v = vectors.try_read_ptr<VECTOR>(i);
+            if (v == 0) continue;
+            deallog << vectors.name(i);
+            for (unsigned int j=0; j<v->size(); ++j)
+              deallog << ' ' << (*v)(j);
+            deallog << std::endl;
+          }
+        deallog << std::endl;
       }
     else
       {
         (*os) << ' ' << step;
         for (unsigned int i=0; i<vectors.size(); ++i)
-	  {
-	    if (vectors.is_type<VECTOR*>(i))
-	      {
-		const VECTOR& v = *vectors.entry<VECTOR*>(i);
-		for (unsigned int j=0; j<v.size(); ++j)
-		  (*os) << ' ' << v(j);
-	      }
-	    else if (vectors.is_type<const VECTOR*>(i))
-	      {
-		const VECTOR& v = *vectors.entry<const VECTOR*>(i);
-		for (unsigned int j=0; j<v.size(); ++j)
-		  (*os) << ' ' << v(j);
-	      }
-	  }
+          {
+            const VECTOR *v = vectors.try_read_ptr<VECTOR>(i);
+            if (v == 0) continue;
+            for (unsigned int j=0; j<v->size(); ++j)
+              (*os) << ' ' << (*v)(j);
+            (*os) << std::endl;
+          }
         (*os) << std::endl;
       }
     return *this;
   }
-  
+
 
   template <class VECTOR>
   OutputOperator<VECTOR> &
   OutputOperator<VECTOR>::operator<< (const NamedData<VECTOR *> &vectors)
   {
-    if (os == 0)
-      {
-        //TODO: make this possible
-        //deallog << ' ' << step;
-        //for (unsigned int i=0;i<vectors.size();++i)
-        //  vectors(i)->print(deallog);
-        //deallog << std::endl;
-      }
-    else
-      {
-        (*os) << ' ' << step;
-        for (unsigned int i=0; i<vectors.size(); ++i)
-          for (unsigned int j=0; j<vectors(i)->size(); ++j)
-            (*os) << ' ' << (*vectors(i))(j);
-        (*os) << std::endl;
-      }
+    const AnyData newdata = vectors;
+    (*this) << newdata;
     return *this;
   }
 }

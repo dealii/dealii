@@ -534,9 +534,4 @@ the results section will show what displacement pattern comes out of this
 simulation.
 
 
-@note PETSc appears not to co-operate well when using
-threads and the program crashes when deal.II is compiled in its usual mode
-supporting multithreading. The program can therefore only be compiled and run
-if multithreading is disabled upon configuration of deal.II using the
-<code>--disable-threads</code> switch to <code>./configure</code>.
 

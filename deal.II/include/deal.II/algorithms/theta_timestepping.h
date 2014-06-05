@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -114,7 +114,7 @@ namespace Algorithms
    * communicate the current time step information through AnyData as
    * well. Therefore, the AnyData objects handed as input to
    * #op_explicit and #op_implicit contain two entries of type
-   * <tt>const double</tt> reference named "Time" and "Timestep". Note
+   * <tt>const double*</tt> named "Time" and "Timestep". Note
    * that "Time" refers to the time at the beginning of the current
    * step for #op_explicit and at the end for #op_implicit,
    * respectively.
@@ -140,7 +140,7 @@ namespace Algorithms
    * @until End of declarations
    *
    * These operators will be implemented after the main program. But let
-   * us look at how they get used. First, let us define a matrix to be
+   * us look first at how they get used. First, let us define a matrix to be
    * used for our system and also an OutputOperator in order to write
    * the data of each timestep to a file.
    *
@@ -148,10 +148,9 @@ namespace Algorithms
    * @until out.initialize
    *
    * Now we create objects for the implicit and explicit parts of the
-   * steps as well as the ThetaTimestepping itself. Notice how the
-   * TimestepData of ThetaTimestepping gets forwarded to the inner
-   * operators. There are two different data objects, because the
-   * timestep size is modified by #theta.
+   * steps as well as the ThetaTimestepping itself. We initialize the
+   * timestepping with the output operator in order to be able to see
+   * the output in every step.
    *
    * @until set_output
    *
@@ -159,29 +158,47 @@ namespace Algorithms
    * is filled with the initial value and is also the vector where the
    * solution at each timestep will be. Because the interface of
    * Operator has to be able to handle several vectors, we need to store
-   * it in a NamedData object. Notice, that we need to create the
-   * intermediate pointer <tt>p</tt>. If we would use
-   * <code>&value</code> directly in the <code>add</code> function, the
-   * resulting object would be constant.
+   * it in an AnyData object. Since our problem has no additional
+   * parameters, the input AnyData object remains empty.
    *
    * @until add
    *
-   * Finally, we are ready to tell the solver, that we are looknig at
+   * Finally, we are ready to tell the solver, that we are starting at
    * the initial timestep and run it.
    *
-   * @until outdata
-   * @skip Explicit::initialize
+   * @until }
+   *
+   * First the constructor, which simply copies the system matrix into
+   * the member pointer for later use.
+   *
+   * @skip Explicit::
+   * @until }
    *
    * Now we need to study the application of the implicit and explicit
    * operator. We assume that the pointer <code>matrix</code> points to
-   * the matrix created in the main program, and that
-   * <code>timestep_data</code> points to the correct data object of
-   * ThetaTimestepping.
+   * the matrix created in the main program (the constructor did this
+   * for us). Here, we first get the time step size from the AnyData
+   * object that was provided as input. Then, if we are in the first
+   * step or if the timestep has changed, we fill the local matrix
+   * <tt>m</tt>, such that with the given matrix \f$M\f$, it becomes
+   * \f[
+   * m = I - \Delta t M.
+   * \f]
+   * After we have worked off the notifications, we clear them, such
+   * that the matrix is only generated when necessary.
    *
    * @skipline void
+   * @until clear
+   *
+   * Now we multiply the input vector with the new matrix and store on output.
+   *
+   * @until }
+   * The code for the implicit operator is almost the same, except
+   * that we change the sign in front of the timestep and use the
+   * inverse of t he matrix.
+   *
    * @until vmult
    * @until }
-   *
    * @author Guido Kanschat
    * @date 2010
    */
@@ -223,21 +240,38 @@ namespace Algorithms
      */
     void set_output(OutputOperator<VECTOR> &output);
 
-    void declare_parameters (ParameterHandler &param);
-    void initialize (ParameterHandler &param);
+    /**
+     * Declare parameters in a parameter handler.
+     */
+    static void declare_parameters (ParameterHandler &param);
+
+    /**
+     * Read the parameters in the ParameterHandler.
+     */
+    void parse_parameters (ParameterHandler &param);
+
+    /**
+     * @deprecated Use parse_parameters().
+     */
+    void initialize (ParameterHandler &param) DEAL_II_DEPRECATED;
     /**
      * The current time in the
      * timestepping scheme.
      */
-    const double &current_time() const;
+    double current_time() const;
     /**
      * The current step size.
      */
-    const double &step_size() const;
+    double step_size() const;
     /**
      * The weight between implicit and explicit part.
      */
-    const double &theta() const;
+    double theta() const;
+
+    /**
+     * Set a new weight and return the old
+     */
+    double theta(double new_theta);
 
     /**
      * The data handed to the #op_explicit time stepping operator.
@@ -353,6 +387,32 @@ namespace Algorithms
   void ThetaTimestepping<VECTOR>::set_output (OutputOperator<VECTOR> &out)
   {
     output = &out;
+  }
+
+
+  template <class VECTOR>
+  inline
+  double ThetaTimestepping<VECTOR>::theta () const
+  {
+    return vtheta;
+  }
+
+
+  template <class VECTOR>
+  inline
+  double ThetaTimestepping<VECTOR>::theta (double new_theta)
+  {
+    const double tmp = vtheta;
+    vtheta = new_theta;
+    return tmp;
+  }
+
+
+  template <class VECTOR>
+  inline
+  double ThetaTimestepping<VECTOR>::current_time () const
+  {
+    return control.now();
   }
 }
 

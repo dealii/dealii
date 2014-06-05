@@ -103,7 +103,7 @@ namespace Algorithms
      * of reassembling the matrix.
      */
     Event notifications;
-    
+
   };
 
   /**
@@ -141,7 +141,7 @@ namespace Algorithms
   {
   public:
     Operator();
-    
+
     /**
      * Implementation of the function in the base class in order to do
      * compatibility conversions between the old and the new
@@ -156,6 +156,11 @@ namespace Algorithms
      * is implemented in a derived class.
      */
     virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
+
+    /**
+     * Set this true to avoid compatibility warnings.
+     */
+    bool silent_compatibility;
 
   private:
     /**
@@ -198,12 +203,12 @@ namespace Algorithms
     /**
      * Output all the vectors in AnyData.
      */
-    virtual OutputOperator<VECTOR> &operator<< (const AnyData& vectors);
-    
+    virtual OutputOperator<VECTOR> &operator<< (const AnyData &vectors);
+
     /**
      * @deprecated Output all the vectors in NamedData.
      */
-    virtual OutputOperator<VECTOR> &operator<< (const NamedData<VECTOR *> &vectors);
+    OutputOperator<VECTOR> &operator<< (const NamedData<VECTOR *> &vectors);
   protected:
     unsigned int step;
   private:

@@ -1190,7 +1190,7 @@ namespace PETScWrappers
     /**
     * The method allows to take advantage
     * if the system matrix is symmetric by
-    * using LDL^T decomposition unstead of
+    * using LDL^T decomposition instead of
     * more expensive LU. The argument
     * indicates whether the matrix is
     * symmetric or not.

@@ -79,15 +79,19 @@ namespace Algorithms
     Newton (Operator<VECTOR> &residual, Operator<VECTOR> &inverse_derivative);
 
     /**
-     * Declare the parameters
-     * applicable to Newton's method.
+     * Declare the parameters applicable to Newton's method.
      */
-    void declare_parameters (ParameterHandler &param);
+    static void declare_parameters (ParameterHandler &param);
 
     /**
-     * Read the parameters.
+     * Read the parameters in the ParameterHandler.
      */
-    void initialize (ParameterHandler &param);
+    void parse_parameters (ParameterHandler &param);
+
+    /**
+     * @deprecated Use parse_parameters().
+     */
+    void initialize (ParameterHandler &param) DEAL_II_DEPRECATED;
 
     /**
      * Initialize the pointer
@@ -111,7 +115,7 @@ namespace Algorithms
     /**
      * @deprecated Use the function using AnyData
      */
-    virtual void operator() (NamedData<VECTOR*> &out, const NamedData<VECTOR*> &in);
+    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
 
     virtual void notify(const Event &);
 

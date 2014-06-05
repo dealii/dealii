@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// $Id$
+// $Id: theta_timestepping.cc 30050 2013-07-18 20:03:31Z maier $
 //
 // Copyright (C) 2005 - 2013 by the deal.II authors
 //
@@ -30,25 +30,25 @@ using namespace dealii;
 using namespace Algorithms;
 
 
-class Explicit : public Operator<Vector<double> >
+class Explicit
+  : public Operator<Vector<double> >
 {
 public:
   Explicit(const FullMatrix<double> &matrix);
   void operator() (AnyData &out, const AnyData &in);
-
 private:
   SmartPointer<const FullMatrix<double>, Explicit> matrix;
   FullMatrix<double> m;
 };
 
 
-class Implicit : public Operator<Vector<double> >
+class Implicit
+  : public Operator<Vector<double> >
 {
 public:
   Implicit(const FullMatrix<double> &matrix);
   void operator() (AnyData &out, const AnyData &in);
-    
-  private:
+private:
   SmartPointer<const FullMatrix<double>, Implicit> matrix;
   FullMatrix<double> m;
 };
@@ -57,28 +57,38 @@ public:
 
 int main()
 {
+  std::string logname = "output";
+  std::ofstream logfile(logname.c_str());
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
+
   FullMatrix<double> matrix(2);
   matrix(0,0) = 0.;
   matrix(1,1) = 0.;
-  matrix(0,1) = 3.14;
-  matrix(1,0) = -3.14;
+  matrix(0,1) = numbers::PI;
+  matrix(1,0) = -numbers::PI;
 
   OutputOperator<Vector<double> > out;
-  out.initialize_stream(std::cout);
+  out.initialize_stream(logfile);
 
   Explicit op_explicit(matrix);
   Implicit op_implicit(matrix);
   ThetaTimestepping<Vector<double> > solver(op_explicit, op_implicit);
-  solver.set_output(out);
+  solver.timestep_control().start_step(0.1);
+  //solver.set_output(out);
 
   Vector<double> value(2);
   value(0) = 1.;
   AnyData indata;
   AnyData outdata;
-  outdata.add(&value, "value");
-
+  Vector<double> *p = &value;
+  outdata.add(p, "value");
+  deallog << "Initial: " << value(0) << ' ' << value(1) << std::endl;
   solver.notify(Events::initial);
   solver(outdata, indata);
+  deallog << "Result: " << value(0) << ' ' << value(1)
+	  << " Norm " << value.l2_norm() << std::endl;
 }
 
 
@@ -93,16 +103,17 @@ Explicit::Explicit(const FullMatrix<double> &M)
 void
 Explicit::operator() (AnyData &out, const AnyData &in)
 {
-  const double timestep = *in.read_ptr<double>("Timestep");  
+  const double* step = in.read_ptr<double>("Timestep");
+  
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
-      m.equ(-timestep, *matrix);
+      m.equ(-*step, *matrix);
       for (unsigned int i=0; i<m.m(); ++i)
         m(i,i) += 1.;
     }
   this->notifications.clear();
-  m.vmult(*out.entry<Vector<double>*>(0),
-	  *in.read_ptr<Vector<double> >("Previous iterate"));
+  unsigned int i = in.find("Previous iterate");
+  m.vmult(*out.entry<Vector<double>*>(0), *in.read_ptr<Vector<double> >(i));
 }
 
 
@@ -117,17 +128,19 @@ Implicit::Implicit(const FullMatrix<double> &M)
 void
 Implicit::operator() (AnyData &out, const AnyData &in)
 {
-  const double timestep = *in.read_ptr<double>("Timestep");  
+  const double * step = in.read_ptr<double>("Timestep");
+  
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
-      m.equ(timestep, *matrix);
+      m.equ(*step, *matrix);
       for (unsigned int i=0; i<m.m(); ++i)
         m(i,i) += 1.;
       m.gauss_jordan();
     }
   this->notifications.clear();
-  m.vmult(*out.entry<Vector<double>*>(0),
-	  *in.read_ptr<Vector<double> >("Previous time"));
+
+  unsigned int i = in.find("Previous time");
+  m.vmult(*out.entry<Vector<double>*>(0), *in.read_ptr<Vector<double> >(i));
 }
 
 

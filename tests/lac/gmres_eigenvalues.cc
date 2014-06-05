@@ -28,7 +28,7 @@
 template <typename number>
 void test (unsigned int variant)
 {
-  const unsigned int n = variant < 3 ? 64 : 16;
+  const unsigned int n = variant % 2 == 0 ? 64 : 16;
   Vector<number> rhs(n), sol(n);
   rhs = 1.;
 
@@ -42,7 +42,7 @@ void test (unsigned int variant)
       matrix(i,i) = (i+1);
   else if (variant == 1)
     for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = (i+1) * (i+1) * (i+1) * (i+1);
+      matrix(i,i) = (i+1) * (i+1) * (i+1) * (i+1) * 1.001;
   else if (variant == 2)
     for (unsigned int i=0; i<n; ++i)
       matrix(i,i) = (i%2?1.:-1.)*(i+1);
@@ -102,10 +102,10 @@ void test (unsigned int variant)
 int main()
 {
   std::ofstream logfile("output");
-  deallog << std::setprecision(3);
+  deallog << std::setprecision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-8);
 
   deallog.push("double");
   test<double>(0);
