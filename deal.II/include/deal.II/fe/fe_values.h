@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1849,7 +1849,7 @@ public:
    *
    * @post <code>hessians[q]</code> will contain the Hessian of the field
    * described by fe_function at the $q$th quadrature
-   * point. <code>gradients[q][i][j]</code> represents the $(i,j)$th component
+   * point. <code>hessians[q][i][j]</code> represents the $(i,j)$th component
    * of the matrix of second derivatives at quadrature point $q$.
    *
    * @note The actual data type of the input vector may be either a
@@ -1875,7 +1875,7 @@ public:
    * vector accessed by <code>hessians[q]</code> equals the number of
    * components of the finite element, i.e. <code>hessians[q][c]</code>
    * returns the Hessian of the $c$th vector component at the $q$th quadrature
-   * point. Consequently, <code>values[q][c][i][j]</code> is the $(i,j)$th
+   * point. Consequently, <code>hessians[q][c][i][j]</code> is the $(i,j)$th
    * component of the matrix of second derivatives of the $c$th vector
    * component of the vector field at quadrature point $q$ of the current
    * cell.
