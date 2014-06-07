@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -883,6 +883,12 @@
  * process and are not further refined there. See the
  * @ref distributed_paper "Distributed Computing paper" for more
  * information.
+ *
+ * The layer of ghost cells consists of all cells that are face, edge, or
+ * vertex neighbors of any locally owned cell and that are not locally
+ * owned themselves. In other word, the ghost cells completely enclose the
+ * subdomain of locally owned cells (with the exception of the boundary of
+ * the domain, of course).
  *
  * The concept of ghost cells has no meaning for triangulations that
  * store the entire mesh on each processor, i.e. the
