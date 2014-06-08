@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// $Id$
+// $Id: dof_tools.h 32722 2014-04-06 17:25:25Z kronbichler $
 //
 // Copyright (C) 1999 - 2014 by the deal.II authors
 //
@@ -1524,6 +1524,16 @@ namespace DoFTools
   void
   extract_locally_relevant_dofs (const DH &dof_handler,
                                  IndexSet &dof_set);
+
+  /**
+   * Same as extract_locally_relevant_dofs() but for multigrid DoFs
+   * for the given @p level.
+   */
+  template <class DH>
+  void
+  extract_locally_relevant_mg_dofs (const DH &dof_handler,
+                                 IndexSet &dof_set,
+                                 unsigned int level);
 
   /**
    * For each DoF, return in the output array to which subdomain (as

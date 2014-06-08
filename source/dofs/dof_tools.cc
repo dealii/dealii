@@ -972,6 +972,46 @@ namespace DoFTools
   }
 
 
+  template <class DH>
+  void
+  extract_locally_relevant_mg_dofs (const DH &dof_handler,
+                                 IndexSet &dof_set,
+                                 unsigned int level)
+  {
+    // collect all the locally owned dofs
+    dof_set = dof_handler.locally_owned_mg_dofs(level);
+
+    // add the DoF on the adjacent ghost cells to the IndexSet, cache them
+    // in a set. need to check each dof manually because we can't be sure
+    // that the dof range of locally_owned_dofs is really contiguous.
+    std::vector<types::global_dof_index> dof_indices;
+    std::set<types::global_dof_index> global_dof_indices;
+
+    typename DH::cell_iterator cell = dof_handler.begin(level),
+                                      endc = dof_handler.end(level);
+    for (; cell!=endc; ++cell)
+      {
+        types::subdomain_id id = cell->level_subdomain_id();
+
+        // skip artificial and own cells (only look at ghost cells)
+        if (id == dof_handler.get_tria().locally_owned_subdomain()
+            || id == numbers::artificial_subdomain_id)
+          continue;
+
+        dof_indices.resize(cell->get_fe().dofs_per_cell);
+        cell->get_mg_dof_indices(dof_indices);
+
+        for (std::vector<types::global_dof_index>::iterator it=dof_indices.begin();
+            it!=dof_indices.end();
+            ++it)
+          if (!dof_set.is_element(*it))
+            global_dof_indices.insert(*it);
+        }
+
+    dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
+
+    dof_set.compress();
+  }
 
   template <class DH>
   void
