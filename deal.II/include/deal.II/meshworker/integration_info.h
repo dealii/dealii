@@ -132,22 +132,26 @@ namespace MeshWorker
      */
     void clear();
 
+    /**
+     * Return a reference to the FiniteElement that was used to
+     * initialize this object.
+     */
+    const FiniteElement<dim, spacedim>& finite_element() const;
+      
     /// This is true if we are assembling for multigrid
     bool multigrid;
     /// Access to finite element
     /**
-     * This is the access function being used, if the constructor for
-     * a single element was used. It throws an exception, if applied
-     * to a vector of elements.
+     * This is the access function being used, if initialize() for a
+     * single element was used (without the BlockInfo argument). It
+     * throws an exception, if applied to a vector of elements.
      */
     const FEValuesBase<dim, spacedim> &fe_values () const;
 
     /// Access to finite elements
     /**
-     * This access function must be used if the constructor for a
-     * group of elements was used.
-     *
-     * @see DGBlockSplitApplication
+     * This access function must be used if the initalize() for a
+     * group of elements was used (with a valid BlockInfo object).
      */
     const FEValuesBase<dim, spacedim> &fe_values (const unsigned int i) const;
 
@@ -206,6 +210,11 @@ namespace MeshWorker
     std::size_t memory_consumption () const;
 
   private:
+      /**
+       * The pointer to the (system) element used for initialization.
+       */
+      SmartPointer<const FiniteElement<dim, spacedim>, IntegrationInfo<dim, spacedim> > fe_pointer;
+      
     /**
      * Use the finite element functions in #global_data and fill the
      * vectors #values, #gradients and #hessians with values according
@@ -579,6 +588,7 @@ namespace MeshWorker
     gradients(other.gradients),
     hessians(other.hessians),
     global_data(other.global_data),
+    fe_pointer(other.fe_pointer),
     n_components(other.n_components)
   {
     fevalv.resize(other.fevalv.size());
@@ -616,6 +626,7 @@ namespace MeshWorker
     const UpdateFlags flags,
     const BlockInfo *block_info)
   {
+    fe_pointer = &el;
     if (block_info == 0 || block_info->local().size() == 0)
       {
         fevalv.resize(1);
@@ -635,6 +646,14 @@ namespace MeshWorker
   }
 
 
+  template <int dim, int spacedim>
+  inline const FiniteElement<dim, spacedim> &
+  IntegrationInfo<dim,spacedim>::finite_element() const
+  {
+    Assert (fe_pointer !=0, ExcNotInitialized());
+    return *fe_pointer;
+  }
+  
   template <int dim, int spacedim>
   inline const FEValuesBase<dim, spacedim> &
   IntegrationInfo<dim,spacedim>::fe_values() const
