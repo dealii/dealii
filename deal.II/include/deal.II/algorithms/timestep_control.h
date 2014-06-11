@@ -98,14 +98,11 @@ namespace Algorithms
                      double max_step = 1.);
 
     /**
-     * Declare the control
-     * parameters for parameter
-     * handler.
+     * Declare the control parameters for parameter handler.
      */
     static void declare_parameters (ParameterHandler &param);
     /**
-     * Read the control parameters
-     * from a parameter handler.
+     * Read the control parameters from a parameter handler.
      */
     void parse_parameters (ParameterHandler &param);
 
@@ -114,21 +111,16 @@ namespace Algorithms
      */
     double start () const;
     /**
-     * The right end of the time
-     * interval. The control
-     * mechanism ensures that the
-     * final time step ends at this
-     * point.
+     * The right end of the time interval. The control mechanism
+     * ensures that the final time step ends at this point.
      */
     double final () const;
     /**
-     * The tolerance value
-     * controlling the time steps.
+     * The tolerance value controlling the time steps.
      */
     double tolerance () const;
     /**
-     * The size of the current time
-     * step.
+     * The size of the current time step.
      */
     double step () const;
 
@@ -138,12 +130,9 @@ namespace Algorithms
     double now () const;
 
     /**
-     * Compute the size of the next
-     * step size and return true if
-     * it differs from the current
-     * step size. Advance the
-     * current time by the new step
-     * size.
+     * Compute the size of the next step and return true if it differs
+     * from the current step size. Advance the current time by the new
+     * step size.
      */
     bool advance ();
 
@@ -165,28 +154,23 @@ namespace Algorithms
     void strategy (Strategy);
 
     /**
-     * Set size of the first
-     * step. This may be overwritten
-     * by the time stepping strategy.
+     * Set size of the first step. This may be overwritten by the time
+     * stepping strategy.
      */
     void start_step (double);
 
     /**
-     * Set size of the maximum
-     * step size.
+     * Set size of the maximum step size.
      */
     void max_step (double);
 
     /**
-     * Set now() equal to
-     * start(). Initialize step() and
-     * print() to their initial
-     * values.
+     * Set now() equal to start(). Initialize step() and print() to
+     * their initial values.
      */
     void restart ();
     /**
-     * Return true if this timestep
-     * should be written to disk.
+     * Return true if this timestep should be written to disk.
      */
     bool print ();
     /**
