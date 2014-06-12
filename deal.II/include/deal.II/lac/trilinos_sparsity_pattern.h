@@ -1095,12 +1095,6 @@ namespace TrilinosWrappers
     std_cxx1x::shared_ptr<Epetra_Map> column_space_map;
 
     /**
-     * A boolean variable to hold information on whether the vector is
-     * compressed or not.
-     */
-    bool compressed;
-
-    /**
      * A sparsity pattern object in Trilinos to be used for finite element
      * based problems which allows for adding non-local elements to the
      * pattern.
@@ -1363,7 +1357,7 @@ namespace TrilinosWrappers
   bool
   SparsityPattern::is_compressed () const
   {
-    return compressed;
+    return graph->Filled();
   }
 
 
@@ -1413,7 +1407,6 @@ namespace TrilinosWrappers
     TrilinosWrappers::types::int_type *col_index_ptr =
       (TrilinosWrappers::types::int_type *)(&*begin);
     const int n_cols = static_cast<int>(end - begin);
-    compressed = false;
 
     int ierr;
     if ( graph->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row)) != -1)
