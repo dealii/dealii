@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,13 +27,28 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * A class to represent a unique ID for a cell in a Triangulation.
- * This class stores the index of the coarse cell together with the
- * information on how to reach the cell from that coarse cell (which
- * child index to take on each level). The internal representation
- * is not exposed on purpose.
+ * A class to represent a unique ID for a cell in a Triangulation.  This class
+ * stores the index of the coarse cell from which a cell is descendant,
+ * together with information on how to reach the cell from that coarse cell
+ * (i.e., which child index to take on each level when moving from one cell to
+ * its children). The important point about this class is that an object of
+ * the current class uniquely identifies a cell in triangulation, and it even
+ * does so in the context of objects of type
+ * parallel::distributed::Triangulation where the local portion of a mesh may
+ * not store all cells. For example, the CellId computed for a ghost cell on
+ * one processor will be exactly the same as the CellId computed for the very
+ * same cell on the processor that actually owns the cell, although the level
+ * and index of the iterators pointing to that cell <i>within the
+ * triangulation stored on each of the processors</i> may (and in general
+ * will) be different. In other words, CellId provides the tool with which it
+ * is possible to uniquely identify cells in a parallel triangulation, and
+ * consequently makes it possible to exchange data between processors tied to
+ * individual cells.
  *
- * TODO: does it make sense to implement a more efficient representation
+ * @note How this data is internally represented is not of importance (and not
+ * exposed on purpose).
+ *
+ * @todo Does it make sense to implement a more efficient representation
  * (internally and/or as a string)? If yes, something like a 64bit int
  * as in p4est would be a good option.
  */
