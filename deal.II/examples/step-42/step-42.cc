@@ -1901,7 +1901,6 @@ namespace Step42
     if (transfer_solution)
       {
         TrilinosWrappers::MPI::Vector distributed_solution(locally_owned_dofs, mpi_communicator);
-        distributed_solution = solution;
         solution_transfer.interpolate(distributed_solution);
         solution = distributed_solution;
         compute_nonlinear_residual(solution);
