@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -136,7 +136,11 @@ namespace parallel
       void prepare_for_coarsening_and_refinement (const VECTOR &in);
 
       /**
-       *
+       * Interpolate the data previously stored in this object before
+       * the mesh was refined or coarsened onto the current set of
+       * cells. Do so for each of the vectors provided to
+       * prepare_for_coarsening_and_refinement() and write the result into
+       * the given set of vectors.
        */
       void interpolate (std::vector<VECTOR *> &all_out);
 
