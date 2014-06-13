@@ -72,55 +72,40 @@ namespace internal
                    const unsigned int base_element = 0);
 
       /**
-       * Returns the memory consumption of this
-       * class in bytes.
+       * Returns the memory consumption of this class in bytes.
        */
       std::size_t memory_consumption () const;
 
       /**
-       * Stores the shape values of the 1D finite
-       * element evaluated on all 1D quadrature
-       * points in vectorized format, i.e., as an
-       * array of
-       * VectorizedArray<dim>::n_array_elements
-       * equal elements. The length of this array is
-       * <tt>n_dofs_1d * n_q_points_1d</tt> and
-       * quadrature points are the index running
-       * fastest.
+       * Stores the shape values of the 1D finite element evaluated on all 1D
+       * quadrature points in vectorized format, i.e., as an array of
+       * VectorizedArray<dim>::n_array_elements equal elements. The length of
+       * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
+       * points are the index running fastest.
        */
       AlignedVector<VectorizedArray<Number> > shape_values;
 
       /**
-       * Stores the shape gradients of the 1D finite
-       * element evaluated on all 1D quadrature
-       * points in vectorized format, i.e., as an
-       * array of
-       * VectorizedArray<dim>::n_array_elements
-       * equal elements. The length of this array is
-       * <tt>n_dofs_1d * n_q_points_1d</tt> and
-       * quadrature points are the index running
-       * fastest.
+       * Stores the shape gradients of the 1D finite element evaluated on all
+       * 1D quadrature points in vectorized format, i.e., as an array of
+       * VectorizedArray<dim>::n_array_elements equal elements. The length of
+       * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
+       * points are the index running fastest.
        */
       AlignedVector<VectorizedArray<Number> > shape_gradients;
 
       /**
-       * Stores the shape Hessians of the 1D finite
-       * element evaluated on all 1D quadrature
-       * points in vectorized format, i.e., as an
-       * array of
-       * VectorizedArray<dim>::n_array_elements
-       * equal elements. The length of this array is
-       * <tt>n_dofs_1d * n_q_points_1d</tt> and
-       * quadrature points are the index running
-       * fastest.
+       * Stores the shape Hessians of the 1D finite element evaluated on all
+       * 1D quadrature points in vectorized format, i.e., as an array of
+       * VectorizedArray<dim>::n_array_elements equal elements. The length of
+       * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
+       * points are the index running fastest.
        */
       AlignedVector<VectorizedArray<Number> > shape_hessians;
 
       /**
-       * Stores the indices from cell DoFs to face
-       * DoFs. The rows go through the
-       * <tt>2*dim</tt> faces, and the columns the
-       * DoFs on the faces.
+       * Stores the indices from cell DoFs to face DoFs. The rows go through
+       * the <tt>2*dim</tt> faces, and the columns the DoFs on the faces.
        */
       dealii::Table<2,unsigned int>  face_indices;
 
@@ -143,15 +128,14 @@ namespace internal
       std::vector<Number>    subface_value[2];
 
       /**
-       * Non-vectorized version of shape
-       * values. Needed when evaluating face info.
+       * Non-vectorized version of shape values. Needed when evaluating face
+       * info.
        */
       std::vector<Number>    shape_values_number;
 
       /**
-       * Non-vectorized version of shape
-       * gradients. Needed when evaluating face
-       * info.
+       * Non-vectorized version of shape gradients. Needed when evaluating
+       * face info.
        */
       std::vector<Number>    shape_gradient_number;
 
@@ -165,26 +149,28 @@ namespace internal
       std::vector<unsigned int> lexicographic_numbering;
 
       /**
-       * Stores the number of quadrature points in
-       * @p dim dimensions for a cell.
+       * Stores the degree of the element.
+       */
+      unsigned int fe_degree;
+
+      /**
+       * Stores the number of quadrature points in @p dim dimensions for a
+       * cell.
        */
       unsigned int n_q_points;
 
       /**
-       * Stores the number of DoFs per cell in @p
-       * dim dimensions.
+       * Stores the number of DoFs per cell in @p dim dimensions.
        */
       unsigned int dofs_per_cell;
 
       /**
-       * Stores the number of quadrature points per
-       * face in @p dim dimensions.
+       * Stores the number of quadrature points per face in @p dim dimensions.
        */
       unsigned int n_q_points_face;
 
       /**
-       * Stores the number of DoFs per face in @p
-       * dim dimensions.
+       * Stores the number of DoFs per face in @p dim dimensions.
        */
       unsigned int dofs_per_face;
     };
@@ -200,6 +186,7 @@ namespace internal
                                   const FiniteElement<dim> &fe_in,
                                   const unsigned int base_element_number)
       :
+      fe_degree (0),
       n_q_points (0),
       dofs_per_cell (0)
     {

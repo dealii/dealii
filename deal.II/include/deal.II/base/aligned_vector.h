@@ -487,6 +487,7 @@ AlignedVector<T>::resize_fast (const size_type size)
 }
 
 
+
 template < class T >
 inline
 void

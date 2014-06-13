@@ -148,6 +148,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There is now a class FEEvaluationQ_DG0 that does
+  optimized matrix-free evaluation for FE_Q_DG0 elements.
+  <br>
+  (Martin Kronbichler, 2014/06/13)
+  </li>
+
   <li> Bugfix: Filter libclang_rt* from the PETSc link line.
   <br>
   (Matthias Maier, 2014/06/04)
