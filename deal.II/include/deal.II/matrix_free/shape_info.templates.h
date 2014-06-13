@@ -54,8 +54,7 @@ namespace internal
                                const unsigned int base_element_number)
     {
       const FiniteElement<dim> *fe = &fe_in;
-      if (fe_in.n_components() > 1)
-        fe = &fe_in.base_element(base_element_number);
+      fe = &fe_in.base_element(base_element_number);
 
       Assert (fe->n_components() == 1,
               ExcMessage("FEEvaluation only works for scalar finite elements."));
