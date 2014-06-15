@@ -2879,14 +2879,22 @@ public:
   unsigned int n_active_faces () const;
 
   /**
-   * Return number of levels in use. This
-   * may be less than the number of levels
-   * existing in the triangulation if by
-   * coarsening the highest level was
-   * completely depopulated. That level is
-   * not removed, since it will most likely
-   * be repopulated soon by the next
-   * refinement process.
+   * Return the number of levels in this triangulation.
+   *
+   * @note Internally, triangulations store data in levels, and there
+   * may be more levels in this data structure than one may think --
+   * for example, imagine a triangulation that we just got by
+   * coarsening the highest level so that it was completely
+   * depopulated. That level is not removed, since it will most likely
+   * be repopulated soon by the next refinement process. As a consequence,
+   * if you happened to run through raw cell iterators (which you can't
+   * do as a user of this class, but can internally), then the number
+   * of objects in the levels hierarchy is larger than the level of the most
+   * refined cell plus one. On the other hand, since this is rarely what a
+   * user of this class cares about, the function really just returns the
+   * level of the most refined active cell plus one. (The plus one is
+   * because in a coarse, unrefined mesh, all cells have level zero --
+   * making the number of levels equal to one.)
    */
   unsigned int n_levels () const;
 
