@@ -148,6 +148,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Functions DoFTools::extract_locally_relevant_dofs(),
+  parallel::distributed::refine_and_coarsen_fixed_number() and
+  parallel::distributed::refine_and_coarsen_fixed_fraction() are
+  now also instantiation for objects of codimension 1.
+  <br>
+  (Michal Wichrowski, 2014/06/15)
+  </li>
+
   <li> New: There are now functions Triangulation::has_hanging_nodes()
   and parallel::distributed::Triangulation::has_hanging_nodes().
   <br>

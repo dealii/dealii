@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,6 +13,10 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
+
+
+
+
 
 
 for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
@@ -30,6 +34,15 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
 
 for (deal_II_dimension : DIMENSIONS)
 {
+
+#if deal_II_dimension > 1
+  template
+  void 
+  DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension-1,deal_II_dimension > >
+  (const DoFHandler<deal_II_dimension-1,deal_II_dimension > & dof_handler,
+   IndexSet & dof_set);
+#endif
+
   template
   void DoFTools::make_vertex_patches (SparsityPattern&, const DoFHandler<deal_II_dimension>&,
   unsigned int, bool, bool, bool, bool);
