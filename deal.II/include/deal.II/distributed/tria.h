@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -498,6 +498,25 @@ namespace parallel
        * Returns the global maximum level. This may be bigger than n_levels.
        */
       virtual unsigned int n_global_levels () const;
+
+      /**
+       * Returns true if the triangulation has hanging nodes.
+       *
+       * In the context of parallel distributed triangulations, every
+       * processor stores only that part of the triangulation it
+       * locally owns. However, it also stores the entire coarse
+       * mesh, and to guarantee the 2:1 relationship between cells,
+       * this may mean that there are hanging nodes between cells that
+       * are not locally owned or ghost cells (i.e., between ghost cells
+       * and artificial cells, or between artificial and artificial cells;
+       * see @ref GlossArtificialCell "the glossary").
+       * One is not typically interested in this case, so the function
+       * returns whether there are hanging nodes between any two cells
+       * of the "global" mesh, i.e., the union of locally owned cells
+       * on all processors.
+       */
+      virtual
+      bool has_hanging_nodes() const;
 
       /**
        * Return the number of active cells owned by each of the MPI

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2896,7 +2896,20 @@ public:
    * n_levels() over all processors for a parallel::distributed::Triangulation
    * and therefore can be larger than n_levels().
    */
-  virtual unsigned int n_global_levels () const;
+  virtual
+  unsigned int n_global_levels () const;
+
+  /**
+   * Return true if the triangulation has hanging nodes.
+   *
+   * The function is made virtual since the result can be interpreted in different
+   * ways, depending on whether the triangulation lives only on a single processor,
+   * or may be distributed as done in the parallel::distributed::Triangulation
+   * class (see there for a description of what the function is supposed to do in the
+   * parallel context).
+   */
+  virtual
+  bool has_hanging_nodes() const;
 
   /**
    * Return the total number of

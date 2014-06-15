@@ -11571,6 +11571,16 @@ unsigned int Triangulation<dim, spacedim>::n_active_cells (const unsigned int le
 }
 
 
+template <int dim, int spacedim>
+bool Triangulation<dim, spacedim>::has_hanging_nodes () const
+{
+  for (unsigned int lvl = 0; lvl<n_global_levels()-1;lvl++)
+    if (n_active_cells(lvl) != 0)
+      return true;
+
+  return false;
+}
+
 
 template <int dim, int spacedim>
 unsigned int Triangulation<dim, spacedim>::n_lines () const
