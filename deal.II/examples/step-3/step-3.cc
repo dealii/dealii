@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 1999 - 2013 by the deal.II authors
+ * Copyright (C) 1999 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -570,7 +570,7 @@ void Step3::output_results () const
 void Step3::run ()
 {
   make_grid ();
-  setup_system();
+  setup_system ();
   assemble_system ();
   solve ();
   output_results ();
