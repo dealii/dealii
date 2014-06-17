@@ -156,10 +156,10 @@ Step3::Step3 ()
 // degree of freedom. We have seen these two steps in step-1 and step-2
 // before, respectively.
 //
-// This function does the first part, creating the mesh.
-// We create the grid and refine all cells five times. Since the initial
-// grid (which is the square [-1,1]x[-1,1]) consists of only one cell, the
-// final grid has 32 times 32 cells, for a total of 1024.
+// This function does the first part, creating the mesh.  We create the grid
+// and refine all cells five times. Since the initial grid (which is the
+// square $[-1,1] \times [-1,1]$) consists of only one cell, the final grid
+// has 32 times 32 cells, for a total of 1024.
 //
 // Unsure that 1024 is the correct number? We can check that by outputting the
 // number of cells using the <code>n_active_cells()</code> function on the
