@@ -80,12 +80,12 @@ ENDFOREACH()
 #
 # Provide an "info" target to print a help message:
 #
-
 IF(CMAKE_GENERATOR MATCHES "Ninja")
   SET(_make_command "ninja")
 ELSE()
   SET(_make_command "make")
 ENDIF()
+
 FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 "MESSAGE(
 \"###
@@ -105,7 +105,7 @@ IF(CMAKE_GENERATOR MATCHES "Ninja")
 ")
 ELSE()
   FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    help           - print this help message in the toplevel directory,
+"#    info           - print this help message in the toplevel directory,
 #                     otherwise print a list of targets (in subdirectories)
 #
 ")
@@ -125,8 +125,8 @@ FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #
 #    test           - run a minimal set of tests
 #
-#    setup_tests    - set up the testsuite subprojects
-#    regen_tests    - rerun configure stage in every testsuite subprojects
+#    setup_tests    - set up testsuite subprojects
+#    regen_tests    - rerun configure stage in every testsuite subproject
 #    clean_tests    - run the 'clean' target in every testsuite subproject
 #    prune_tests    - remove all testsuite subprojects
 #
@@ -136,7 +136,12 @@ FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 ADD_CUSTOM_TARGET(info
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   )
-IF(NOT CMAKE_GENERATOR MATCHES "Ninja")
+
+#
+# In case of the Unix Makefiles generator it is safe to override the
+# default 'help' target, which is - frankly - quite unhelpful.
+#
+IF(CMAKE_GENERATOR MATCHES "Unix Makefiles")
   ADD_CUSTOM_TARGET(help
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
     )
