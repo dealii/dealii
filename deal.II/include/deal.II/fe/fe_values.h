@@ -2024,9 +2024,10 @@ public:
   //@{
 
   /**
-   * Position of the <tt>i</tt>th quadrature point in real space.
+   * Position of the <tt>q</tt>th quadrature point in real space.
    */
-  const Point<spacedim> &quadrature_point (const unsigned int i) const;
+  const Point<spacedim> &
+  quadrature_point (const unsigned int q) const;
 
   /**
    * Return a pointer to the vector of quadrature points in real space.
