@@ -147,7 +147,7 @@ href="http://en.wikipedia.org/wiki/Name_mangling">"mangled" names</a> for
 <code>DoFHandler</code> and <code>FE_Q</code>. The mangling works as
 follows: the first number indicates the number of characters of the
 template class, i.e. 10 for <code>DoFHandler</code> and 4
-for<code>FE_Q</code>; the rest of the text is then template
+for <code>FE_Q</code>; the rest of the text is then template
 arguments. From this we can already glean a little bit who's the
 culprit here, and who the victim:
 The one object that still uses the finite element is the
