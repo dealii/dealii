@@ -505,7 +505,7 @@ namespace GridTools
         for (unsigned int j=i+1; j<considered_vertices.size(); ++j)
           {
             bool equal=true;
-            for (unsigned int d=0; d<dim; ++d)
+            for (unsigned int d=0; d<spacedim; ++d)
               equal &= (fabs(vertices[considered_vertices[j]](d)-vertices[considered_vertices[i]](d))<tol);
             if (equal)
               {
