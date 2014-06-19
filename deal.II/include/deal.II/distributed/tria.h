@@ -495,7 +495,12 @@ namespace parallel
       types::global_dof_index n_global_active_cells () const;
 
       /**
-       * Returns the global maximum level. This may be bigger than n_levels.
+       * Returns the global maximum level. This may be bigger than
+       * the number dealii::Triangulation::n_levels() (a function in this
+       * class's base class) returns if the current processor only stores
+       * cells in parts of the domain that are not very refined, but
+       * if other processors store cells in more deeply refined parts of
+       * the domain.
        */
       virtual unsigned int n_global_levels () const;
 
