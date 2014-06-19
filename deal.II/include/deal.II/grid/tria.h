@@ -2755,80 +2755,80 @@ public:
    */
 
   /**
-   *  Return total number of used lines,
+   *  Return the total number of used lines,
    *  active or not.
    */
   unsigned int n_lines () const;
 
   /**
-   *  Return total number of used lines,
+   *  Return the total number of used lines,
    *  active or not on level @p level.
    */
   unsigned int n_lines (const unsigned int level) const;
 
   /**
-   * Return total number of active lines.
+   * Return the total number of active lines.
    */
   unsigned int n_active_lines () const;
 
   /**
-   *  Return total number of active lines,
+   *  Return the total number of active lines,
    *  on level @p level.
    */
   unsigned int n_active_lines (const unsigned int level) const;
 
   /**
-   *  Return total number of used quads,
+   *  Return the total number of used quads,
    *  active or not.
    */
   unsigned int n_quads () const;
 
   /**
-   *  Return total number of used quads,
+   *  Return the total number of used quads,
    *  active or not on level @p level.
    */
   unsigned int n_quads (const unsigned int level) const;
 
   /**
-   *  Return total number of active quads,
+   *  Return the total number of active quads,
    *  active or not.
    */
   unsigned int n_active_quads () const;
 
   /**
-   *  Return total number of active quads,
+   *  Return the total number of active quads,
    *  active or not on level @p level.
    */
   unsigned int n_active_quads (const unsigned int level) const;
 
   /**
-   *  Return total number of used
+   *  Return the total number of used
    *  hexahedra, active or not.
    */
   unsigned int n_hexs() const;
 
   /**
-   *  Return total number of used
+   *  Return the total number of used
    *  hexahedra, active or not on level @p
    *  level.
    */
   unsigned int n_hexs(const unsigned int level) const;
 
   /**
-   *  Return total number of active
+   *  Return the total number of active
    *  hexahedra, active or not.
    */
   unsigned int n_active_hexs() const;
 
   /**
-   *  Return total number of active
+   *  Return the total number of active
    *  hexahedra, active or not on level @p
    *  level.
    */
   unsigned int n_active_hexs(const unsigned int level) const;
 
   /**
-   *  Return total number of used cells,
+   *  Return the total number of used cells,
    *  active or not.  Maps to
    *  <tt>n_lines()</tt> in one space
    *  dimension and so on.
@@ -2836,7 +2836,7 @@ public:
   unsigned int n_cells () const;
 
   /**
-   *  Return total number of used cells,
+   *  Return the total number of used cells,
    *  active or not, on level @p level.
    *  Maps to <tt>n_lines(level)</tt> in
    *  one space dimension and so on.
@@ -2844,7 +2844,7 @@ public:
   unsigned int n_cells (const unsigned int level) const;
 
   /**
-   *  Return total number of active cells.
+   *  Return the total number of active cells.
    *  Maps to <tt>n_active_lines()</tt> in
    *  one space dimension and so on.
    */
@@ -2861,7 +2861,7 @@ public:
 
 
   /**
-   * Return total number of active cells on
+   * Return the total number of active cells on
    * level @p level.  Maps to
    * <tt>n_active_lines(level)</tt> in one
    * space dimension and so on.
@@ -2869,7 +2869,7 @@ public:
   unsigned int n_active_cells (const unsigned int level) const;
 
   /**
-   *  Return total number of used faces,
+   *  Return the total number of used faces,
    *  active or not.  In 2D, the result
    *  equals n_lines(), while in 3D it
    *  equals n_quads(). Since there are no
@@ -2879,7 +2879,7 @@ public:
   unsigned int n_faces () const;
 
   /**
-   *  Return total number of active faces,
+   *  Return the total number of active faces,
    *  active or not.  In 2D, the result
    *  equals n_active_lines(), while in 3D
    *  it equals n_active_quads(). Since
@@ -3036,7 +3036,7 @@ public:
   /**
    * Total number of lines, used or
    * unused.
-  *
+   *
   * @note This function really
   * exports internal information
   * about the triangulation. It
@@ -3167,7 +3167,7 @@ public:
   unsigned int n_raw_cells (const unsigned int level) const;
 
   /**
-   * Return total number of faces,
+   * Return the total number of faces,
    * used or not. In 2d, the result
    * equals n_raw_lines(), while in 3d it
    * equals n_raw_quads().
