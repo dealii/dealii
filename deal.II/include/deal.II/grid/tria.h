@@ -3037,132 +3037,132 @@ public:
    * Total number of lines, used or
    * unused.
    *
-  * @note This function really
-  * exports internal information
-  * about the triangulation. It
-  * shouldn't be used in
-  * applications. The function is
-  * only part of the public
-  * interface of this class
-  * because it is used in some of
-  * the other classes that build
-  * very closely on it (in
-  * particular, the DoFHandler
-  * class).
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_lines () const;
 
   /**
    * Number of lines, used or
    * unused, on the given level.
-  *
-  * @note This function really
-  * exports internal information
-  * about the triangulation. It
-  * shouldn't be used in
-  * applications. The function is
-  * only part of the public
-  * interface of this class
-  * because it is used in some of
-  * the other classes that build
-  * very closely on it (in
-  * particular, the DoFHandler
-  * class).
+   *
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_lines (const unsigned int level) const;
 
   /**
    * Total number of quads, used or
    * unused.
-  *
-  * @note This function really
-  * exports internal information
-  * about the triangulation. It
-  * shouldn't be used in
-  * applications. The function is
-  * only part of the public
-  * interface of this class
-  * because it is used in some of
-  * the other classes that build
-  * very closely on it (in
-  * particular, the DoFHandler
-  * class).
+   *
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_quads () const;
 
   /**
    * Number of quads, used or
    * unused, on the given level.
-  *
-  * @note This function really
-  * exports internal information
-  * about the triangulation. It
-  * shouldn't be used in
-  * applications. The function is
-  * only part of the public
-  * interface of this class
-  * because it is used in some of
-  * the other classes that build
-  * very closely on it (in
-  * particular, the DoFHandler
-  * class).
+   *
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_quads (const unsigned int level) const;
 
   /**
    * Total number of hexs, used or
    * unused.
-  *
-  * @note This function really
-  * exports internal information
-  * about the triangulation. It
-  * shouldn't be used in
-  * applications. The function is
-  * only part of the public
-  * interface of this class
-  * because it is used in some of
-  * the other classes that build
-  * very closely on it (in
-  * particular, the DoFHandler
-  * class).
+   *
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_hexs () const;
 
   /**
    * Number of hexs, used or
    * unused, on the given level.
-  *
-  * @note This function really
-  * exports internal information
-  * about the triangulation. It
-  * shouldn't be used in
-  * applications. The function is
-  * only part of the public
-  * interface of this class
-  * because it is used in some of
-  * the other classes that build
-  * very closely on it (in
-  * particular, the DoFHandler
-  * class).
+   *
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_hexs (const unsigned int level) const;
 
   /**
    * Number of cells, used or
    * unused, on the given level.
-  *
-  * @note This function really
-  * exports internal information
-  * about the triangulation. It
-  * shouldn't be used in
-  * applications. The function is
-  * only part of the public
-  * interface of this class
-  * because it is used in some of
-  * the other classes that build
-  * very closely on it (in
-  * particular, the DoFHandler
-  * class).
+   *
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_cells (const unsigned int level) const;
 
@@ -3171,19 +3171,19 @@ public:
    * used or not. In 2d, the result
    * equals n_raw_lines(), while in 3d it
    * equals n_raw_quads().
-  *
-  * @note This function really
-  * exports internal information
-  * about the triangulation. It
-  * shouldn't be used in
-  * applications. The function is
-  * only part of the public
-  * interface of this class
-  * because it is used in some of
-  * the other classes that build
-  * very closely on it (in
-  * particular, the DoFHandler
-  * class).
+   *
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_faces () const;
 
