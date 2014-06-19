@@ -492,7 +492,7 @@ namespace parallel
        * cells owned by each processor. This equals the overall number
        * of active cells in the distributed triangulation.
        */
-      types::global_dof_index n_global_active_cells () const;
+      virtual types::global_dof_index n_global_active_cells () const;
 
       /**
        * Returns the global maximum level. This may be bigger than

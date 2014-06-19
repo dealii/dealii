@@ -11462,6 +11462,13 @@ unsigned int Triangulation<dim, spacedim>::n_active_cells () const
   return internal::Triangulation::n_active_cells (number_cache);
 }
 
+template <int dim, int spacedim>
+types::global_dof_index Triangulation<dim, spacedim>::n_global_active_cells () const
+{
+  return n_active_cells();
+}
+
+
 
 template <int dim, int spacedim>
 unsigned int Triangulation<dim, spacedim>::n_faces () const

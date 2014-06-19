@@ -2851,6 +2851,16 @@ public:
   unsigned int n_active_cells () const;
 
   /**
+   * Return the total number of active cells. For the current class, this is
+   * the same as n_active_cells(). However, the function may be overloaded in
+   * derived classes (e.g., in parallel::distributed::Triangulation) where it
+   * may return a value greater than the number of active cells reported by
+   * the triangulation object on the current processor.
+   */
+  virtual types::global_dof_index n_global_active_cells () const;
+
+
+  /**
    * Return total number of active cells on
    * level @p level.  Maps to
    * <tt>n_active_lines(level)</tt> in one

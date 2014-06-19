@@ -162,6 +162,11 @@ inconvenience this causes.
   (Denis Davydov, 2014/06/15)
   </li>
 
+  <li> New: There is now function Triangulation::n_global_active_cells().
+  <br>
+  (Denis Davydov, 2014/06/19)
+  </li>
+
   <li> New: There is now a class FEEvaluationQ_DG0 that does
   optimized matrix-free evaluation for FE_Q_DG0 elements.
   <br>
