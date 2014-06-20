@@ -334,10 +334,10 @@ namespace Algorithms
      * with name "Current time solution". It should obtain the current
      * time and time step size from explicit_data().
      *
-     * Its return value is <i>Mu+cAu</i>, where <i>u</i> is the
-     * current state vector, <i>M</i> the mass matrix, <i>A</i> the
-     * operator in space and <i>c</i> is the time step size in
-     * explicit_data().
+     * Its return value is <i>Mu+cF(u)</i>, where <i>u</i> is the
+     * current state vector, <i>M</i> the mass matrix, <i>F</i> the
+     * operator in space and <i>c</i> is the adjusted
+     * time step size \f$ (1-\theta) \Delta t\f$.
      */
     SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_explicit;
 
@@ -347,11 +347,11 @@ namespace Algorithms
      * time". Information on the timestep should be obtained from
      * implicit_data().
      *
-     * Its return value is the solution <i>u</i> of <i>Mu-cAu=f</i>,
+     * Its return value is the solution <i>u</i> of <i>Mu-cF(u)=f</i>,
      * where <i>f</i> is the dual space vector found in the "Previous
      * time" entry of the input data, <i>M</i> the mass matrix,
-     * <i>A</i> the operator in space and <i>c</i> is the time step
-     * size in explicit_data().
+     * <i>F</i> the operator in space and <i>c</i> is the adjusted
+     * time step size \f$ \theta \Delta t\f$
      */
     SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_implicit;
 
