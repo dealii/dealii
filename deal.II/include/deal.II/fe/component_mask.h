@@ -99,6 +99,11 @@ public:
                  const bool         initializer);
 
   /**
+   * Set a particular entry in the mask to a value.
+   */
+  void set (const unsigned int index, const bool value);
+    
+  /**
    * If this component mask has been initialized with a mask of
    * size greater than zero, then return the size of the mask
    * represented by this object. On the other hand, if this
@@ -275,6 +280,15 @@ ComponentMask::size () const
 
 
 inline
+void
+ComponentMask::set(const unsigned int index, const bool value)
+{
+  AssertIndexRange(index, component_mask.size());
+  component_mask[index] = value;
+}
+
+
+inline
 bool
 ComponentMask::operator [](const unsigned int component_index) const
 {
@@ -286,8 +300,7 @@ ComponentMask::operator [](const unsigned int component_index) const
     {
       // otherwise check the validity of the index and
       // return whatever is appropriate
-      Assert (component_index < component_mask.size(),
-              ExcIndexRange (component_index, 0, component_mask.size()));
+      AssertIndexRange (component_index, component_mask.size());
       return component_mask[component_index];
     }
 }
