@@ -6,7 +6,11 @@
 <h1>Introducion</h1>
 
 This program shows how to use Runge-Kutta methods to solve a time-dependent
-problem.
+problem. It solves a small variation of the heat equation discussed first in
+step-26 but, since the purpose of this program is only to demonstrate using
+more advanced ways to interface with deal.II's time stepping algorithms, only
+solves a simple problem on a uniformly refined mesh.
+
 
 <h3>Problem statement</h3>
 
