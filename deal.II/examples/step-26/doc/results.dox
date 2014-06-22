@@ -83,6 +83,15 @@ for example, in the PhD thesis of a former principal developer of deal.II,
 Ralf Hartmann, published by the University of Heidelberg, Germany, in 2002.
 
 
+<h4>Better time stepping methods</h4>
+
+We here use one of the simpler time stepping methods, namely the second order
+in time Crank-Nicolson method. However, more accurate methods such as
+Runge-Kutta methods are available and should be used as they do not represent
+much additional effort. It is not difficult to implement this for the current
+program, but a more systematic treatment is also given in step-52.
+
+
 <h4>Better refinement criteria</h4>
 
 If you look at the meshes in the movie above, it is clear that they are not
