@@ -98,6 +98,15 @@ namespace parallel
     sol_trans.deserialize (distributed_vector);
     @endcode
      *
+     *
+     * <h3>Interaction with hanging nodes</h3>
+     *
+     * In essence, this class implements the same steps as does
+     * dealii::SolutionTransfer (though the implementation is entirely
+     * separate). Consequently, the same issue with hanging nodes and
+     * coarsening can happen with this class as happens with
+     * dealii::SolutionTransfer. See there for an extended discussion.
+     *
      * @ingroup distributed
      * @author Timo Heister, 2009-2011
      */
