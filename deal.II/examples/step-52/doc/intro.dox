@@ -139,7 +139,7 @@ where
 @f{eqnarray*}
   M_{ij}  &= (\psi_i,\psi_j), \\
   {\cal D}_{ij}  &= (D\nabla\psi_i,\nabla\psi_j)_\Omega, \\
-  {\cal A}_{ij}  &= (\Sigma_a\psi_i,\Sigma_a\psi_j)_\Omega, \\
+  {\cal A}_{ij}  &= (\Sigma_a\psi_i,\psi_j)_\Omega, \\
   {\cal S}_{i}(t)  &= (\psi_i,S(x,t))_\Omega.
 @f}
 Boundary terms are not necessary due to the chosen boundary conditions.
