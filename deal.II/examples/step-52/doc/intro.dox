@@ -142,14 +142,14 @@ where
   {\cal A}_{ij}  &= (\Sigma_a\psi_i,\psi_j)_\Omega, \\
   {\cal S}_{i}(t)  &= (\psi_i,S(x,t))_\Omega.
 @f}
-Boundary terms are not necessary due to the chosen boundary conditions.
+%Boundary terms are not necessary due to the chosen boundary conditions.
 To use the Runge-Kutta methods, we can then recast this as follows:
 @f{eqnarray*}
-f(y) = -{\cal D)y - {\cal A}y + {\cal S}
+f(y) = -{\cal D}y - {\cal A}y + {\cal S}
 @f}
 In the code, we will need to be able to evaluate this function $f(U)$ along
 with its derivative. However, in view of the linearity of $f$, we will be able
-to use $\frac{\partial f}{\partial y} y = f(y)$.
+to use that $\frac{\partial f}{\partial y} y = f(y)$.
 
 
 <h3>Remarks</h3>
@@ -159,8 +159,12 @@ elements and the exact solution is quadratic). Going from a two dimensional
 domain to a three dimensional domain is not very challenging. However if the
 mesh must be adapted, it is important to remember to do the following:
 <ol>
-<li> Project the solution to the new mesh when the mesh is changed. The mesh
-     used should be the same at the beginning and at the end of the time step.
-<li> update the mass matrix and its inverse.
+<li> Project the solution to the new mesh when the mesh is changed. Of course,
+     the mesh 
+     used should be the same at the beginning and at the end of the time step,
+     a question that arises because Runge-Kutta methods use multiple
+     evaluations of the equations within each time step.
+<li> You will need to update the mass matrix and its inverse every time the
+     mesh is changed.
 </ol>
-The techniques to do all of this are available in step-26.
+The techniques for these steps are readily available by looking at step-26.
