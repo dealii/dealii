@@ -13,7 +13,7 @@ FIND_PACKAGE(deal.II 8.0 QUIET
   )
 IF(NOT ${deal.II_FOUND})
   MESSAGE(FATAL_ERROR "\n"
-    "*** Could not locate deal.II. ***\n\n"
+    "*** Could not locate a (sufficiently recent) version of deal.II. ***\n\n"
     "You may want to either pass a flag -DDEAL_II_DIR=/path/to/deal.II to cmake\n"
     "or set an environment variable \"DEAL_II_DIR\" that contains this path."
     )
