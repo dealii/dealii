@@ -530,6 +530,17 @@
 #ifdef DEAL_II_WITH_TRILINOS
 /** Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_USE_TRILINOS
+
+#  define DEAL_II_TRILINOS_VERSION_MAJOR @TRILINOS_VERSION_MAJOR@
+#  define DEAL_II_TRILINOS_VERSION_MINOR @TRILINOS_VERSION_MINOR@
+#  define DEAL_II_TRILINOS_VERSION_SUBMINOR @TRILINOS_VERSION_SUBMINOR@
+
+#  define DEAL_II_TRILINOS_VERSION_GTE(major,minor,subminor) \
+ ((DEAL_II_TRILINOS_VERSION_MAJOR * 10000 + \
+    DEAL_II_TRILINOS_VERSION_MINOR * 100 + \
+      DEAL_II_TRILINOS_VERSION_SUBMINOR) \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
 #endif
 
 

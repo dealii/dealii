@@ -65,9 +65,15 @@ IF(DEFINED Trilinos_VERSION)
     "^[0-9]+\\.([0-9]+).*$" "\\1"
     TRILINOS_VERSION_MINOR "${Trilinos_VERSION}")
 
+  # If there is no subminor number, then the REGEX REPLACE will fail,
+  # setting TRILINOS_VERSION_PATCH to TRILINOS_VERSION. If that
+  # is the case, then set the subminor number to zero
   STRING(REGEX REPLACE
-    "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
+    "^[0-9]+\\.[0-9]+\\.([0-9]+)?.*$" "\\1"
     TRILINOS_VERSION_SUBMINOR "${Trilinos_VERSION}")
+  IF(${TRILINOS_VERSION_SUBMINOR} STREQUAL "${Trilinos_VERSION}")
+    SET(TRILINOS_VERSION_SUBMINOR "0")
+  ENDIF()
 ENDIF()
 
 #
