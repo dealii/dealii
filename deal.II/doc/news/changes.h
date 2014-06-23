@@ -148,6 +148,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: GridGenerator::hyper_cube() accepts a
+  <code>colorize</code> argument.
+  <br>
+  (Guido Kanschat, 2014/06/23)
+  </li>
+  
   <li> New: Functions DoFTools::extract_locally_relevant_dofs(),
   parallel::distributed::refine_and_coarsen_fixed_number() and
   parallel::distributed::refine_and_coarsen_fixed_fraction() are

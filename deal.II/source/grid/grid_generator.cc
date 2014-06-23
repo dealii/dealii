@@ -421,7 +421,8 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void hyper_cube (Triangulation<dim,spacedim> &tria,
                    const double                 left,
-                   const double                 right)
+                   const double                 right,
+		   const bool                   colorize)
   {
     Assert (left < right,
             ExcMessage ("Invalid left-to-right bounds of hypercube"));
@@ -437,7 +438,7 @@ namespace GridGenerator
         p1(i) = left;
         p2(i) = right;
       }
-    hyper_rectangle (tria, p1, p2);
+    hyper_rectangle (tria, p1, p2, colorize);
   }
 
 

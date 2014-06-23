@@ -54,13 +54,16 @@ template <typename number> class SparseMatrix;
 namespace GridGenerator
 {
   /**
-   * Initialize the given triangulation with a hypercube (line in 1D, square
-   * in 2D, etc) consisting of exactly one cell. The hypercube volume is the
-   * tensor product interval <i>[left,right]<sup>dim</sup></i> in the present
-   * number of dimensions, where the limits are given as arguments. They
-   * default to zero and unity, then producing the unit hypercube. All
-   * boundary indicators are set to zero ("not colorized") for 2d and 3d. In
-   * 1d the indicators are colorized, see hyper_rectangle().
+   * Initialize the given triangulation with a hypercube (line in 1D,
+   * square in 2D, etc) consisting of exactly one cell. The hypercube
+   * volume is the tensor product interval
+   * \f$ [left,right]^{\text{dim}}\f$ in the present number of
+   * dimensions, where the limits are given as arguments. They default
+   * to zero and unity, then producing the unit hypercube. If the
+   * argument `colorize` is false, all boundary indicators are set to
+   * zero ("not colorized") for 2d and 3d. If it is true, the boundary
+   * is colorized as in hyper_rectangle(). In 1d the indicators are
+   * always colorized, see hyper_rectangle().
    *
    * @image html hyper_cubes.png
    *
@@ -73,7 +76,8 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void hyper_cube (Triangulation<dim,spacedim>  &tria,
                    const double                  left = 0.,
-                   const double                  right= 1.);
+                   const double                  right= 1.,
+		   const bool                    colorize= false);
 
   /**
    * Same as hyper_cube(), but with the difference that not only one cell is
