@@ -10,8 +10,8 @@ SET(TARGET "step-41")
 # to add other source files as well. If your project becomes much larger,
 # you may want to either replace the following statement by something like
 #  FILE(GLOB_RECURSE TARGET_SRC  "source/*.cc")
-FI#    LE(GLOB_RECURSE TARGET_INC  "include/*.h")
-SE#    T(TARGET_SRC ${TARGET_SRC}  ${TARGET_INC})   
+#  FILE(GLOB_RECURSE TARGET_INC  "include/*.h")
+#  SET(TARGET_SRC ${TARGET_SRC}  ${TARGET_INC})
 # or switch altogether to the large project CMakeLists.txt file discussed
 # in the "CMake in user projects" page accessible from the "User info"
 # page of the documentation.
