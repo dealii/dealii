@@ -354,19 +354,20 @@ namespace TrilinosWrappers
     graph.reset ();
     column_space_map.reset (new Epetra_Map (input_col_map));
 
-    // for more than one processor, need to
-    // specify only row map first and let the
-    // matrix entries decide about the column
-    // map (which says which columns are
-    // present in the matrix, not to be
-    // confused with the col_map that tells
-    // how the domain dofs of the matrix will
-    // be distributed). for only one
-    // processor, we can directly assign the
-    // columns as well.
+    // for more than one processor, need to specify only row map first and let
+    // the matrix entries decide about the column map (which says which
+    // columns are present in the matrix, not to be confused with the col_map
+    // that tells how the domain dofs of the matrix will be distributed). for
+    // only one processor, we can directly assign the columns as well. If we
+    // use a recent Trilinos version, we can also require building a non-local
+    // graph which gives us thread-safe initialization.
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset (new Epetra_FECrsGraph(Copy, input_row_map,
-                                         n_entries_per_row, false));
+                                         n_entries_per_row, false
+#if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
+                                         , true
+#endif
+                                         ));
     else
       graph.reset (new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
                                          n_entries_per_row, false));
@@ -413,7 +414,11 @@ namespace TrilinosWrappers
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map,
                                         n_entries_per_row[min_my_gid(input_row_map)],
-                                        false));
+                                        false
+#if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
+                                        , true
+#endif
+                                        ));
     else
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
                                         n_entries_per_row[max_my_gid(input_row_map)],
