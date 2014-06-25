@@ -22,6 +22,7 @@
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_q_dg0.h>
 
 #include <deal.II/matrix_free/shape_info.h>
 
@@ -53,14 +54,14 @@ namespace internal
                                const unsigned int base_element_number)
     {
       const FiniteElement<dim> *fe = &fe_in;
-      if (fe_in.n_components() > 1)
-        fe = &fe_in.base_element(base_element_number);
+      fe = &fe_in.base_element(base_element_number);
 
       Assert (fe->n_components() == 1,
               ExcMessage("FEEvaluation only works for scalar finite elements."));
 
+      fe_degree = fe->degree;
 
-      const unsigned int n_dofs_1d = fe->degree+1,
+      const unsigned int n_dofs_1d = fe_degree+1,
                          n_q_points_1d = quad.size();
 
       // renumber (this is necessary for FE_Q, for example, since there the
@@ -82,6 +83,8 @@ namespace internal
 
         const FE_DGP<dim> *fe_dgp = dynamic_cast<const FE_DGP<dim>*>(fe);
 
+        const FE_Q_DG0<dim> *fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim>*>(fe);
+
         if (fe_poly != 0)
           scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
         else if (fe_poly_piece != 0)
@@ -89,9 +92,11 @@ namespace internal
         else if (fe_dgp != 0)
           {
             scalar_lexicographic.resize(fe_dgp->dofs_per_cell);
-          for (unsigned int i=0; i<fe_dgp->dofs_per_cell; ++i)
-            scalar_lexicographic[i] = i;
+            for (unsigned int i=0; i<fe_dgp->dofs_per_cell; ++i)
+              scalar_lexicographic[i] = i;
           }
+        else if (fe_q_dg0 != 0)
+          scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
         else
           Assert(false, ExcNotImplemented());
 

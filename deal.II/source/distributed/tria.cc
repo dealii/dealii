@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2131,6 +2131,32 @@ namespace parallel
       dealii::Triangulation<dim,spacedim>::clear ();
 
       update_number_cache ();
+    }
+
+    template <int dim, int spacedim>
+    bool
+    Triangulation<dim,spacedim>::has_hanging_nodes () const
+    {
+      // if there are any active cells with level less than n_global_levels()-1, then
+      // there is obviously also one with level n_global_levels()-1, and
+      // consequently there must be a hanging node somewhere.
+      //
+      // the problem is that we cannot just ask for the first active cell, but
+      // instead need to filter over locally owned cells
+      bool res_local = false;
+      for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = this->begin_active();
+	   (cell != this->end()) && (cell->level() < (int)(n_global_levels()-1));
+	   cell++)
+	if (cell->is_locally_owned())
+	  {
+	    res_local = true;
+	    break;
+	  }
+
+      // reduce over MPI
+      bool res;
+      MPI_Allreduce(&res_local, &res, 1, MPI::BOOL, MPI_LOR, mpi_communicator);
+      return res;
     }
 
 

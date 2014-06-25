@@ -167,8 +167,6 @@ namespace TrilinosWrappers
   // MPI will still get a parallel
   // interface.
   SparsityPattern::SparsityPattern ()
-    :
-    compressed (true)
   {
     column_space_map.reset(new Epetra_Map (TrilinosWrappers::types::int_type(0),
                                            TrilinosWrappers::types::int_type(0),
@@ -240,7 +238,6 @@ namespace TrilinosWrappers
     column_space_map (new Epetra_Map(TrilinosWrappers::types::int_type(0),
                                      TrilinosWrappers::types::int_type(0),
                                      Utilities::Trilinos::comm_self())),
-    compressed (false),
     graph (new Epetra_FECrsGraph(View,
                                  *column_space_map,
                                  *column_space_map,
@@ -255,8 +252,6 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern  (const IndexSet  &parallel_partitioning,
                                      const MPI_Comm  &communicator,
                                      const size_type  n_entries_per_row)
-    :
-    compressed (false)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
                                                               false);
@@ -268,8 +263,6 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern  (const IndexSet     &parallel_partitioning,
                                      const MPI_Comm     &communicator,
                                      const std::vector<size_type> &n_entries_per_row)
-    :
-    compressed (false)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
                                                               false);
@@ -282,8 +275,6 @@ namespace TrilinosWrappers
                                      const IndexSet  &col_parallel_partitioning,
                                      const MPI_Comm  &communicator,
                                      const size_type  n_entries_per_row)
-    :
-    compressed (false)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -299,8 +290,6 @@ namespace TrilinosWrappers
                     const IndexSet     &col_parallel_partitioning,
                     const MPI_Comm     &communicator,
                     const std::vector<size_type> &n_entries_per_row)
-    :
-    compressed (false)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -317,8 +306,6 @@ namespace TrilinosWrappers
                     const IndexSet     &writable_rows,
                     const MPI_Comm     &communicator,
                     const size_type     n_max_entries_per_row)
-    :
-    compressed (false)
   {
     reinit (row_parallel_partitioning, col_parallel_partitioning,
             writable_rows, communicator, n_max_entries_per_row);
@@ -366,21 +353,21 @@ namespace TrilinosWrappers
                       "the maps of different processors."));
     graph.reset ();
     column_space_map.reset (new Epetra_Map (input_col_map));
-    compressed = false;
 
-    // for more than one processor, need to
-    // specify only row map first and let the
-    // matrix entries decide about the column
-    // map (which says which columns are
-    // present in the matrix, not to be
-    // confused with the col_map that tells
-    // how the domain dofs of the matrix will
-    // be distributed). for only one
-    // processor, we can directly assign the
-    // columns as well.
+    // for more than one processor, need to specify only row map first and let
+    // the matrix entries decide about the column map (which says which
+    // columns are present in the matrix, not to be confused with the col_map
+    // that tells how the domain dofs of the matrix will be distributed). for
+    // only one processor, we can directly assign the columns as well. If we
+    // use a recent Trilinos version, we can also require building a non-local
+    // graph which gives us thread-safe initialization.
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset (new Epetra_FECrsGraph(Copy, input_row_map,
-                                         n_entries_per_row, false));
+                                         n_entries_per_row, false
+#if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
+                                         , true
+#endif
+                                         ));
     else
       graph.reset (new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
                                          n_entries_per_row, false));
@@ -423,12 +410,15 @@ namespace TrilinosWrappers
                      static_cast<size_type>(n_global_elements(input_row_map)));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
-    compressed = false;
 
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map,
                                         n_entries_per_row[min_my_gid(input_row_map)],
-                                        false));
+                                        false
+#if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
+                                        , true
+#endif
+                                        ));
     else
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
                                         n_entries_per_row[max_my_gid(input_row_map)],
@@ -609,7 +599,6 @@ namespace TrilinosWrappers
                      static_cast<size_type>(n_global_elements(input_col_map)));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
-    compressed = false;
 
     Assert (input_row_map.LinearMap() == true,
             ExcMessage ("This function is not efficient if the map is not contiguous."));
@@ -708,8 +697,6 @@ namespace TrilinosWrappers
     graph->FillComplete();
 
     nonlocal_graph.reset();
-
-    compressed = true;
   }
 
 
@@ -749,8 +736,6 @@ namespace TrilinosWrappers
 
     ierr = graph->OptimizeStorage ();
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-    compressed = true;
   }
 
 

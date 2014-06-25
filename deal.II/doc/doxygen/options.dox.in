@@ -72,6 +72,9 @@ IMAGE_PATH             =
 INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter
 FILTER_SOURCE_FILES    = YES
 
+ALIASES += dealiiRequiresUpdateFlags{1}="@note For this function to work properly, the underlying FEValues, FEFaceValues, or FESubfaceValues object on which you call it must have computed the information you are requesting. To do so, the <code>\1</code> flag must be an element of the list of UpdateFlags that you passed to the constructor of this object. See @ref UpdateFlagsEssay for more information."
+
+
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 1999 - 2013 by the deal.II authors
+ * Copyright (C) 1999 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -64,7 +64,7 @@ void first_grid ()
   // to write programs in an essentially dimension independent way.
 
   // Next, we want to fill the triangulation with a single cell for a square
-  // domain. The triangulation is the refined four times, to yield 4^4=256
+  // domain. The triangulation is the refined four times, to yield $4^4=256$
   // cells in total:
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (4);

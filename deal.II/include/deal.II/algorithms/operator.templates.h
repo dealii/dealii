@@ -147,7 +147,6 @@ namespace Algorithms
             if (v == 0) continue;
             for (unsigned int j=0; j<v->size(); ++j)
               (*os) << ' ' << (*v)(j);
-            (*os) << std::endl;
           }
         (*os) << std::endl;
       }

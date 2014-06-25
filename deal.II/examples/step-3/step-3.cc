@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 1999 - 2013 by the deal.II authors
+ * Copyright (C) 1999 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -153,31 +153,39 @@ Step3::Step3 ()
 
 // Now, the first thing we've got to do is to generate the triangulation on
 // which we would like to do our computation and number each vertex with a
-// degree of freedom. We have seen this in the previous examples before.
+// degree of freedom. We have seen these two steps in step-1 and step-2
+// before, respectively.
+//
+// This function does the first part, creating the mesh.  We create the grid
+// and refine all cells five times. Since the initial grid (which is the
+// square $[-1,1] \times [-1,1]$) consists of only one cell, the final grid
+// has 32 times 32 cells, for a total of 1024.
+//
+// Unsure that 1024 is the correct number? We can check that by outputting the
+// number of cells using the <code>n_active_cells()</code> function on the
+// triangulation.
 void Step3::make_grid ()
 {
-  // First create the grid and refine all cells five times. Since the initial
-  // grid (which is the square [-1,1]x[-1,1]) consists of only one cell, the
-  // final grid has 32 times 32 cells, for a total of 1024.
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (5);
-  // Unsure that 1024 is the correct number?  Let's see: n_active_cells
-  // returns the number of active cells:
+
   std::cout << "Number of active cells: "
             << triangulation.n_active_cells()
             << std::endl;
-  // Here, by active we mean the cells that aren't refined any further.  We
-  // stress the adjective `active', since there are more cells, namely the
-  // parent cells of the finest cells, their parents, etc, up to the one cell
-  // which made up the initial grid. Of course, on the next coarser level, the
-  // number of cells is one quarter that of the cells on the finest level,
-  // i.e. 256, then 64, 16, 4, and 1. We can get the total number of cells
-  // like this:
-  std::cout << "Total number of cells: "
-            << triangulation.n_cells()
-            << std::endl;
-  // Note the distinction between n_active_cells() and n_cells().
 }
+
+// @note We call the Triangulation::n_active_cells() function, rather than
+// Triangulation::n_cells(). Here, <i>active</i> means the cells that aren't
+// refined any further. We stress the adjective "active" since there are more
+// cells, namely the parent cells of the finest cells, their parents, etc, up
+// to the one cell which made up the initial grid. Of course, on the next
+// coarser level, the number of cells is one quarter that of the cells on the
+// finest level, i.e. 256, then 64, 16, 4, and 1. If you called
+// <code>triangulation.n_cells()</code> instead in the code above, you would
+// consequently get a value of 1365 instead. On the other hand, the number of
+// cells (as opposed to the number of active cells) is not typically of much
+// interest, so there is no good reason to print it.
+
 
 // @sect4{Step3::setup_system}
 
@@ -570,7 +578,7 @@ void Step3::output_results () const
 void Step3::run ()
 {
   make_grid ();
-  setup_system();
+  setup_system ();
   assemble_system ();
   solve ();
   output_results ();

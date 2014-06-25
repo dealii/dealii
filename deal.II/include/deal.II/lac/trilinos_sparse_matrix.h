@@ -470,7 +470,11 @@ namespace TrilinosWrappers
    *   TrilinosWrappers::SparsityPattern object that in turn has been
    *   initialized with the reinit function specifying three index sets, one
    *   for the rows, one for the columns and for the larger set of @p
-   *   writeable_rows, and the operation is an addition.
+   *   writeable_rows, and the operation is an addition. If Trilinos version
+   *   11.10 and greater is used, initializing from a
+   *   TrilinosWrappers::SparsityPattern that has been filled by a function
+   *   similar to DoFTools::make_sparsity_pattern always results in a matrix
+   *   that allows several processes to write into the same matrix row.
    * </ul>
    *
    * Note that all other reinit methods and constructors of

@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
  * $Id$
  *
- * Copyright (C) 2012 - 2013 by the deal.II authors
+ * Copyright (C) 2012 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -442,8 +442,8 @@ namespace Step15
     // compute again. To ensure there are no hanging nodes of the old mesh in
     // the object, it's first cleared.  To be on the safe side, we then also
     // make sure that the current solution's vector entries satisfy the
-    // hanging node constraints:
-
+    // hanging node constraints (see the discussion in the documentation of
+    // the SolutionTransfer class for why this is necessary):
     hanging_node_constraints.clear();
 
     DoFTools::make_hanging_node_constraints(dof_handler,

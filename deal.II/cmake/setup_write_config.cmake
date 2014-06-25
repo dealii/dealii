@@ -227,10 +227,10 @@ _summary(
 #\n#  Run  $ "
   )
 IF(CMAKE_GENERATOR MATCHES "Ninja")
-  _summary("ninja info")
+  _summary("ninja ")
 ELSE()
-_summary("make help")
+_summary("make ")
 ENDIF()
-_summary("  to print a help message with a list of top level targets\n")
+_summary("info  to print a help message with a list of top level targets\n")
 
 _both("#\n###")

@@ -1879,6 +1879,8 @@ BLOCK_SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
       const std::vector<ConstraintMatrix::size_type> &, \
       MatrixType                      &) const
 
+ONLY_MATRIX_FUNCTIONS(FullMatrix<float>);
+ONLY_MATRIX_FUNCTIONS(FullMatrix<double>);
 ONLY_MATRIX_FUNCTIONS(SparseMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(SparseMatrix<double>);
 ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<float> >);

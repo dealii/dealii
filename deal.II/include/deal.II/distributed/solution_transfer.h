@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -98,6 +98,15 @@ namespace parallel
     sol_trans.deserialize (distributed_vector);
     @endcode
      *
+     *
+     * <h3>Interaction with hanging nodes</h3>
+     *
+     * In essence, this class implements the same steps as does
+     * dealii::SolutionTransfer (though the implementation is entirely
+     * separate). Consequently, the same issue with hanging nodes and
+     * coarsening can happen with this class as happens with
+     * dealii::SolutionTransfer. See there for an extended discussion.
+     *
      * @ingroup distributed
      * @author Timo Heister, 2009-2011
      */
@@ -136,7 +145,11 @@ namespace parallel
       void prepare_for_coarsening_and_refinement (const VECTOR &in);
 
       /**
-       *
+       * Interpolate the data previously stored in this object before
+       * the mesh was refined or coarsened onto the current set of
+       * cells. Do so for each of the vectors provided to
+       * prepare_for_coarsening_and_refinement() and write the result into
+       * the given set of vectors.
        */
       void interpolate (std::vector<VECTOR *> &all_out);
 

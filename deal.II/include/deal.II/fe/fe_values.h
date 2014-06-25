@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -218,7 +218,9 @@ namespace FEValuesViews
      * in the case of an FEFaceValues or FESubfaceValues object.
      *
      * @param q_point Number of the quadrature point at which function is to
-     * be evaluated
+     * be evaluated.
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
      */
     value_type
     value (const unsigned int shape_function,
@@ -231,6 +233,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     gradient_type
     gradient (const unsigned int shape_function,
@@ -243,6 +247,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
      */
     hessian_type
     hessian (const unsigned int shape_function,
@@ -257,6 +263,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_values function but it only works on the
      * selected scalar component.
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
@@ -271,6 +279,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_gradients function but it only works on the
      * selected scalar component.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
@@ -285,6 +295,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_hessians function but it only works on the
      * selected scalar component.
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
@@ -300,6 +312,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_laplacians function but it only works on the
      * selected scalar component.
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
@@ -480,7 +494,9 @@ namespace FEValuesViews
      * in the case of an FEFaceValues or FESubfaceValues object.
      *
      * @param q_point Number of the quadrature point at which function is to
-     * be evaluated
+     * be evaluated.
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
      */
     value_type
     value (const unsigned int shape_function,
@@ -496,6 +512,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     gradient_type
     gradient (const unsigned int shape_function,
@@ -513,6 +531,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     symmetric_gradient_type
     symmetric_gradient (const unsigned int shape_function,
@@ -525,6 +545,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     divergence_type
     divergence (const unsigned int shape_function,
@@ -543,6 +565,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     curl_type
     curl (const unsigned int shape_function,
@@ -555,6 +579,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
      */
     hessian_type
     hessian (const unsigned int shape_function,
@@ -569,6 +595,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
@@ -583,6 +611,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_gradients function but it only works on the
      * selected vector components.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
@@ -602,6 +632,8 @@ namespace FEValuesViews
      * FEValuesBase::get_function_symmetric_gradients in the FEValues classes
      * but the information can be obtained from
      * FEValuesBase::get_function_gradients, of course.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void
@@ -618,6 +650,8 @@ namespace FEValuesViews
      * FEValuesBase::get_function_divergences in the FEValues classes but the
      * information can be obtained from FEValuesBase::get_function_gradients,
      * of course.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
@@ -633,6 +667,8 @@ namespace FEValuesViews
      * FEValuesBase::get_function_curls in the FEValues classes but the
      * information can be obtained from FEValuesBase::get_function_gradients,
      * of course.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_curls (const InputVector &fe_function,
@@ -647,6 +683,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_hessians function but it only works on the
      * selected vector components.
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
@@ -662,6 +700,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_laplacians function but it only works on the
      * selected vector components.
+     *
+     * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
@@ -809,7 +849,9 @@ namespace FEValuesViews
      * in the case of an FEFaceValues or FESubfaceValues object.
      *
      * @param q_point Number of the quadrature point at which function is to
-     * be evaluated
+     * be evaluated.
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
      */
     value_type
     value (const unsigned int shape_function,
@@ -826,6 +868,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     divergence_type
     divergence (const unsigned int shape_function,
@@ -840,6 +884,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
@@ -858,6 +904,8 @@ namespace FEValuesViews
      *
      * See the general discussion of this class for a definition of the
      * divergence.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
@@ -995,7 +1043,9 @@ namespace FEValuesViews
      * in the case of an FEFaceValues or FESubfaceValues object.
      *
      * @param q_point Number of the quadrature point at which function is to
-     * be evaluated
+     * be evaluated.
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
      */
     value_type
     value (const unsigned int shape_function,
@@ -1011,6 +1061,8 @@ namespace FEValuesViews
      *
      * @note The meaning of the arguments is as documented for the value()
      * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     divergence_type
     divergence (const unsigned int shape_function,
@@ -1025,6 +1077,8 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
+     *
+     * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
@@ -1044,6 +1098,8 @@ namespace FEValuesViews
      *
      * See the general discussion of this class for a definition of the
      * divergence.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
@@ -1456,6 +1512,8 @@ public:
    *
    * @param point_no Number of the quadrature point at which function is to be
    * evaluated
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
    */
   const double &shape_value (const unsigned int function_no,
                              const unsigned int point_no) const;
@@ -1471,12 +1529,14 @@ public:
    * shape function is not primitive, but then it is necessary since the other
    * function cannot be used.
    *
-   * @param function_no Number of the shape function to be evaluated
+   * @param function_no Number of the shape function to be evaluated.
    *
    * @param point_no Number of the quadrature point at which function is to be
-   * evaluated
+   * evaluated.
    *
-   * @param component vector component to be evaluated
+   * @param component vector component to be evaluated.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
    */
   double shape_value_component (const unsigned int function_no,
                                 const unsigned int point_no,
@@ -1499,6 +1559,8 @@ public:
    *
    * The same holds for the arguments of this function as for the
    * shape_value() function.
+   *
+   * @dealiiRequiresUpdateFlags{update_gradients}
    */
   const Tensor<1,spacedim> &
   shape_grad (const unsigned int function_no,
@@ -1517,6 +1579,8 @@ public:
    *
    * The same holds for the arguments of this function as for the
    * shape_value_component() function.
+   *
+   * @dealiiRequiresUpdateFlags{update_gradients}
    */
   Tensor<1,spacedim>
   shape_grad_component (const unsigned int function_no,
@@ -1539,6 +1603,8 @@ public:
    *
    * The same holds for the arguments of this function as for the
    * shape_value() function.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   const Tensor<2,spacedim> &
   shape_hessian (const unsigned int function_no,
@@ -1565,6 +1631,8 @@ public:
    *
    * The same holds for the arguments of this function as for the
    * shape_value_component() function.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   Tensor<2,spacedim>
   shape_hessian_component (const unsigned int function_no,
@@ -1615,6 +1683,8 @@ public:
    * object was last initialized. Alternatively, if the vector argument is of
    * type IndexSet, then the function is represented as one that is either
    * zero or one, depending on whether a DoF index is in the set or not.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
    */
   template <class InputVector, typename number>
   void get_function_values (const InputVector &fe_function,
@@ -1630,6 +1700,8 @@ public:
    * accessed by <code>values[q]</code> equals the number of components of the
    * finite element, i.e. <code>values[q](c)</code> returns the value of the
    * $c$th vector component at the $q$th quadrature point.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
    */
   template <class InputVector, typename number>
   void get_function_values (const InputVector       &fe_function,
@@ -1650,6 +1722,8 @@ public:
    * You may want to use this function, if you want to access just a single
    * block from a BlockVector, if you have a multi-level vector or if you
    * already have a local representation of your finite element data.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
    */
   template <class InputVector, typename number>
   void get_function_values (const InputVector &fe_function,
@@ -1674,6 +1748,8 @@ public:
    *
    * Since this function allows for fairly general combinations of argument
    * sizes, be aware that the checks on the arguments may not detect errors.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
    */
   template <class InputVector, typename number>
   void get_function_values (const InputVector &fe_function,
@@ -1708,6 +1784,8 @@ public:
    *
    * Since this function allows for fairly general combinations of argument
    * sizes, be aware that the checks on the arguments may not detect errors.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
    */
   template <class InputVector>
   void get_function_values (const InputVector &fe_function,
@@ -1750,6 +1828,8 @@ public:
    * object was last initialized. Alternatively, if the vector argument is of
    * type IndexSet, then the function is represented as one that is either
    * zero or one, depending on whether a DoF index is in the set or not.
+   *
+   * @dealiiRequiresUpdateFlags{update_gradients}
    */
   template <class InputVector>
   void get_function_gradients (const InputVector      &fe_function,
@@ -1768,14 +1848,18 @@ public:
    * quadrature point. Consequently, <code>gradients[q][c][d]</code> is the
    * derivative in coordinate direction $d$ of the $c$th vector component of
    * the vector field at quadrature point $q$ of the current cell.
+   *
+   * @dealiiRequiresUpdateFlags{update_gradients}
    */
   template <class InputVector>
   void get_function_gradients (const InputVector               &fe_function,
                                std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
 
   /**
-   * Function gradient access with more flexibility. see get_function_values()
+   * Function gradient access with more flexibility. See get_function_values()
    * with corresponding arguments.
+   *
+   * @dealiiRequiresUpdateFlags{update_gradients}
    */
   template <class InputVector>
   void get_function_gradients (const InputVector &fe_function,
@@ -1783,8 +1867,10 @@ public:
                                std::vector<Tensor<1,spacedim> > &gradients) const;
 
   /**
-   * Function gradient access with more flexibility. see get_function_values()
+   * Function gradient access with more flexibility. See get_function_values()
    * with corresponding arguments.
+   *
+   * @dealiiRequiresUpdateFlags{update_gradients}
    */
   template <class InputVector>
   void get_function_gradients (const InputVector &fe_function,
@@ -1849,7 +1935,7 @@ public:
    *
    * @post <code>hessians[q]</code> will contain the Hessian of the field
    * described by fe_function at the $q$th quadrature
-   * point. <code>gradients[q][i][j]</code> represents the $(i,j)$th component
+   * point. <code>hessians[q][i][j]</code> represents the $(i,j)$th component
    * of the matrix of second derivatives at quadrature point $q$.
    *
    * @note The actual data type of the input vector may be either a
@@ -1859,6 +1945,8 @@ public:
    * object was last initialized. Alternatively, if the vector argument is of
    * type IndexSet, then the function is represented as one that is either
    * zero or one, depending on whether a DoF index is in the set or not.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector>
   void
@@ -1875,10 +1963,12 @@ public:
    * vector accessed by <code>hessians[q]</code> equals the number of
    * components of the finite element, i.e. <code>hessians[q][c]</code>
    * returns the Hessian of the $c$th vector component at the $q$th quadrature
-   * point. Consequently, <code>values[q][c][i][j]</code> is the $(i,j)$th
+   * point. Consequently, <code>hessians[q][c][i][j]</code> is the $(i,j)$th
    * component of the matrix of second derivatives of the $c$th vector
    * component of the vector field at quadrature point $q$ of the current
    * cell.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector>
   void
@@ -1887,7 +1977,7 @@ public:
                          bool quadrature_points_fastest = false) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. see
+   * Access to the second derivatives of a function with more flexibility. See
    * get_function_values() with corresponding arguments.
    */
   template <class InputVector>
@@ -1897,8 +1987,10 @@ public:
     std::vector<Tensor<2,spacedim> > &hessians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. see
+   * Access to the second derivatives of a function with more flexibility. See
    * get_function_values() with corresponding arguments.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector>
   void get_function_hessians (
@@ -1960,6 +2052,8 @@ public:
    * object was last initialized. Alternatively, if the vector argument is of
    * type IndexSet, then the function is represented as one that is either
    * zero or one, depending on whether a DoF index is in the set or not.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector, typename number>
   void
@@ -1982,6 +2076,8 @@ public:
    * <code>laplacians[q][c]=trace(hessians[q][c])</code>, where
    * <tt>hessians</tt> would be the output of the get_function_hessians()
    * function.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector, typename number>
   void
@@ -1989,8 +2085,10 @@ public:
                            std::vector<Vector<number> > &laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. see
+   * Access to the second derivatives of a function with more flexibility. See
    * get_function_values() with corresponding arguments.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector, typename number>
   void get_function_laplacians (
@@ -1999,8 +2097,10 @@ public:
     std::vector<number> &laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. see
+   * Access to the second derivatives of a function with more flexibility. See
    * get_function_values() with corresponding arguments.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector, typename number>
   void get_function_laplacians (
@@ -2009,8 +2109,10 @@ public:
     std::vector<Vector<number> > &laplacians) const;
 
   /**
-   * Access to the second derivatives of a function with more flexibility. see
+   * Access to the second derivatives of a function with more flexibility. See
    * get_function_values() with corresponding arguments.
+   *
+   * @dealiiRequiresUpdateFlags{update_hessians}
    */
   template <class InputVector, typename number>
   void get_function_laplacians (
@@ -2024,12 +2126,17 @@ public:
   //@{
 
   /**
-   * Position of the <tt>i</tt>th quadrature point in real space.
+   * Position of the <tt>q</tt>th quadrature point in real space.
+   *
+   * @dealiiRequiresUpdateFlags{update_quadrature_points}
    */
-  const Point<spacedim> &quadrature_point (const unsigned int i) const;
+  const Point<spacedim> &
+  quadrature_point (const unsigned int q) const;
 
   /**
-   * Return a pointer to the vector of quadrature points in real space.
+   * Return a reference to the vector of quadrature points in real space.
+   *
+   * @dealiiRequiresUpdateFlags{update_quadrature_points}
    */
   const std::vector<Point<spacedim> > &get_quadrature_points () const;
 
@@ -2045,22 +2152,28 @@ public:
    * You can think of the quantity returned by this function as the volume or
    * surface element $dx, ds$ in the integral that we implement here by
    * quadrature.
+   *
+   * @dealiiRequiresUpdateFlags{update_JxW_values}
    */
   double JxW (const unsigned int quadrature_point) const;
 
   /**
-   * Pointer to the array holding the values returned by JxW().
+   * Return a reference to the array holding the values returned by JxW().
    */
   const std::vector<double> &get_JxW_values () const;
 
   /**
    * Return the Jacobian of the transformation at the specified quadrature
    * point, i.e.  $J_{ij}=dx_i/d\hat x_j$
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobians}
    */
   const DerivativeForm<1,dim,spacedim> &jacobian (const unsigned int quadrature_point) const;
 
   /**
-   * Pointer to the array holding the values returned by jacobian().
+   * Return a reference to the array holding the values returned by jacobian().
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobians}
    */
   const std::vector<DerivativeForm<1,dim,spacedim> > &get_jacobians () const;
 
@@ -2068,24 +2181,33 @@ public:
    * Return the second derivative of the transformation from unit to real
    * cell, i.e. the first derivative of the Jacobian, at the specified
    * quadrature point, i.e. $G_{ijk}=dJ_{jk}/d\hat x_i$.
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_grads}
    */
   const DerivativeForm<2,dim,spacedim> &jacobian_grad (const unsigned int quadrature_point) const;
 
   /**
-   * Pointer to the array holding the values returned by jacobian_grads().
+   * Return a reference to the array holding the values returned by jacobian_grads().
+   *
+   * @dealiiRequiresUpdateFlags{update_jacobian_grads}
    */
   const std::vector<DerivativeForm<2,dim,spacedim> > &get_jacobian_grads () const;
 
   /**
    * Return the inverse Jacobian of the transformation at the specified
    * quadrature point, i.e.  $J_{ij}=d\hat x_i/dx_j$
+   *
+   * @dealiiRequiresUpdateFlags{update_inverse_jacobians}
    */
   const DerivativeForm<1,spacedim,dim> &inverse_jacobian (const unsigned int quadrature_point) const;
 
   /**
-   * Pointer to the array holding the values returned by inverse_jacobian().
+   * Return a reference to the array holding the values returned by inverse_jacobian().
+   *
+   * @dealiiRequiresUpdateFlags{update_inverse_jacobians}
    */
   const std::vector<DerivativeForm<1,spacedim,dim> > &get_inverse_jacobians () const;
+  
   /**
    * For a face, return the outward normal vector to the cell at the
    * <tt>i</tt>th quadrature point.
@@ -2094,6 +2216,8 @@ public:
    * specified by the numbering of the vertices.
    *
    * The length of the vector is normalized to one.
+   *
+   * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
   const Point<spacedim> &normal_vector (const unsigned int i) const;
 
@@ -2101,6 +2225,8 @@ public:
    * Return the normal vectors at the quadrature points. For a face, these are
    * the outward normal vectors to the cell. For a cell of codimension one,
    * the orientation is given by the numbering of vertices.
+   *
+   * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
   const std::vector<Point<spacedim> > &get_normal_vectors () const;
 
@@ -2562,12 +2688,16 @@ public:
   /**
    * Boundary form of the transformation of the cell at the <tt>i</tt>th
    * quadrature point.  See @ref GlossBoundaryForm .
+   *
+   * @dealiiRequiresUpdateFlags{update_boundary_forms}
    */
   const Tensor<1,spacedim> &boundary_form (const unsigned int i) const;
 
   /**
    * Return the list of outward normal vectors times the Jacobian of the
    * surface mapping.
+   *
+   * @dealiiRequiresUpdateFlags{update_boundary_forms}
    */
   const std::vector<Tensor<1,spacedim> > &get_boundary_forms () const;
 
@@ -2855,7 +2985,7 @@ namespace FEValuesViews
 
     // an adaptation of the FEValuesBase::shape_value_component function
     // except that here we know the component as fixed and we have
-    // pre-computed and cached a bunch of information. see the comments there
+    // pre-computed and cached a bunch of information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
       return fe_values.shape_values(shape_function_data[shape_function]
                                     .row_index,
@@ -2884,7 +3014,7 @@ namespace FEValuesViews
     // function except that here we know the
     // component as fixed and we have
     // pre-computed and cached a bunch of
-    // information. see the comments there
+    // information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
       return fe_values.shape_gradients[shape_function_data[shape_function]
                                        .row_index][q_point];
@@ -2911,7 +3041,7 @@ namespace FEValuesViews
     // function except that here we know the
     // component as fixed and we have
     // pre-computed and cached a bunch of
-    // information. see the comments there
+    // information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
       return fe_values.shape_hessians[shape_function_data[shape_function].row_index][q_point];
     else

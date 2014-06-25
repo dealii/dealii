@@ -2971,13 +2971,11 @@ public:
   bool direction_flag () const;
 
   /**
-   *  Index of the parent of this cell.
-   *  The level of the parent is one
-   *  lower than that of the
-   *  present cell, if the parent
-   *  of a cell is accessed. If the
-   *  parent does not exist (i.e., if the object is at the coarsest level of
-   *  the mesh hierarchy), an exception is generated.
+   *  Index of the parent of this cell within the level of the triangulation
+   *  to which the parent cell belongs. The level of the parent is of course
+   *  one lower than that of the present cell. If the parent does not exist
+   *  (i.e., if the object is at the coarsest level of the mesh hierarchy), an
+   *  exception is generated.
    */
   int parent_index () const;
 
@@ -3161,10 +3159,16 @@ public:
 
   /**
    * Return a unique ID for the current cell. This ID is constructed from the
-   * path in the hierarchy from the coarse father cell and works correctly
-   * in parallel computations.
+   * path in the hierarchy from the coarse father cell and works correctly in
+   * parallel computations using objects of type
+   * parallel::distributed::Triangulation. This function is therefore useful
+   * in providing a unique identifier for cells (active or not) that also
+   * works for parallel triangulations. See the documentation of the CellId
+   * class for more information.
    *
-   * Note: This operation takes O(log(level)) time.
+   * @note This operation takes O(level) time to compute. In most practicaly
+   * cases, the number of levels of a triangulation will depend
+   * logarithmically on the number of cells in the triangulation.
    */
   CellId id() const;
 

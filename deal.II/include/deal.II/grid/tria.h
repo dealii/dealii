@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2572,117 +2572,156 @@ public:
    */
 
   /**
-   *  Return total number of used lines, active or not.
+   *  Return the total number of used lines,
+   *  active or not.
    */
   unsigned int n_lines () const;
 
   /**
-   *  Return total number of used lines, active or not on level @p
-   *  level.
+   *  Return the total number of used lines,
+   *  active or not on level @p level.
    */
   unsigned int n_lines (const unsigned int level) const;
 
   /**
-   * Return total number of active lines.
+   * Return the total number of active lines.
    */
   unsigned int n_active_lines () const;
 
   /**
-   *  Return total number of active lines, on level @p level.
+   *  Return the total number of active lines,
+   *  on level @p level.
    */
   unsigned int n_active_lines (const unsigned int level) const;
 
   /**
-   *  Return total number of used quads, active or not.
+   *  Return the total number of used quads,
+   *  active or not.
    */
   unsigned int n_quads () const;
 
   /**
-   *  Return total number of used quads, active or not on level @p
-   *  level.
+   *  Return the total number of used quads,
+   *  active or not on level @p level.
    */
   unsigned int n_quads (const unsigned int level) const;
 
   /**
-   *  Return total number of active quads, active or not.
+   *  Return the total number of active quads,
+   *  active or not.
    */
   unsigned int n_active_quads () const;
 
   /**
-   *  Return total number of active quads, active or not on level @p
-   *  level.
+   *  Return the total number of active quads,
+   *  active or not on level @p level.
    */
   unsigned int n_active_quads (const unsigned int level) const;
 
   /**
-   *  Return total number of used hexahedra, active or not.
+   *  Return the total number of used
+   *  hexahedra, active or not.
    */
   unsigned int n_hexs() const;
 
   /**
-   *  Return total number of used hexahedra, active or not on level @p
+   *  Return the total number of used
+   *  hexahedra, active or not on level @p
    *  level.
    */
   unsigned int n_hexs(const unsigned int level) const;
 
   /**
-   *  Return total number of active hexahedra, active or not.
+   *  Return the total number of active
+   *  hexahedra, active or not.
    */
   unsigned int n_active_hexs() const;
 
   /**
-   *  Return total number of active hexahedra, active or not on level
-   *  @p level.
+   *  Return the total number of active
+   *  hexahedra, active or not on level @p
+   *  level.
    */
   unsigned int n_active_hexs(const unsigned int level) const;
 
   /**
-   *  Return total number of used cells, active or not.  Maps to
-   *  <tt>n_lines()</tt> in one space dimension and so on.
+   *  Return the total number of used cells,
+   *  active or not.  Maps to
+   *  <tt>n_lines()</tt> in one space
+   *  dimension and so on.
    */
   unsigned int n_cells () const;
 
   /**
-   *  Return total number of used cells, active or not, on level @p
-   *  level.  Maps to <tt>n_lines(level)</tt> in one space dimension
-   *  and so on.
+   *  Return the total number of used cells,
+   *  active or not, on level @p level.
+   *  Maps to <tt>n_lines(level)</tt> in
+   *  one space dimension and so on.
    */
   unsigned int n_cells (const unsigned int level) const;
 
   /**
-   *  Return total number of active cells.  Maps to
-   *  <tt>n_active_lines()</tt> in one space dimension and so on.
+   *  Return the total number of active cells.
+   *  Maps to <tt>n_active_lines()</tt> in
+   *  one space dimension and so on.
    */
   unsigned int n_active_cells () const;
 
   /**
-   * Return total number of active cells on level @p level.  Maps to
-   * <tt>n_active_lines(level)</tt> in one space dimension and so on.
+   * Return the total number of active cells. For the current class, this is
+   * the same as n_active_cells(). However, the function may be overloaded in
+   * derived classes (e.g., in parallel::distributed::Triangulation) where it
+   * may return a value greater than the number of active cells reported by
+   * the triangulation object on the current processor.
+   */
+  virtual types::global_dof_index n_global_active_cells () const;
+
+
+  /**
+   * Return the total number of active cells on
+   * level @p level.  Maps to
+   * <tt>n_active_lines(level)</tt> in one
+   * space dimension and so on.
    */
   unsigned int n_active_cells (const unsigned int level) const;
 
   /**
-   *  Return total number of used faces, active or not.  In 2D, the
-   *  result equals n_lines(), while in 3D it equals n_quads(). Since
-   *  there are no face objects in 1d, the function returns zero in
-   *  1d.
+   *  Return the total number of used faces,
+   *  active or not.  In 2D, the result
+   *  equals n_lines(), while in 3D it
+   *  equals n_quads(). Since there are no
+   *  face objects in 1d, the function
+   *  returns zero in 1d.
    */
   unsigned int n_faces () const;
 
   /**
-   *  Return total number of active faces, active or not.  In 2D, the
-   *  result equals n_active_lines(), while in 3D it equals
-   *  n_active_quads(). Since there are no face objects in 1d, the
+   *  Return the total number of active faces,
+   *  active or not.  In 2D, the result
+   *  equals n_active_lines(), while in 3D
+   *  it equals n_active_quads(). Since
+   *  there are no face objects in 1d, the
    *  function returns zero in 1d.
    */
   unsigned int n_active_faces () const;
 
   /**
-   * Return number of levels in use. This may be less than the number
-   * of levels existing in the triangulation if by coarsening the
-   * highest level was completely depopulated. That level is not
-   * removed, since it will most likely be repopulated soon by the
-   * next refinement process.
+   * Return the number of levels in this triangulation.
+   *
+   * @note Internally, triangulations store data in levels, and there
+   * may be more levels in this data structure than one may think --
+   * for example, imagine a triangulation that we just got by
+   * coarsening the highest level so that it was completely
+   * depopulated. That level is not removed, since it will most likely
+   * be repopulated soon by the next refinement process. As a consequence,
+   * if you happened to run through raw cell iterators (which you can't
+   * do as a user of this class, but can internally), then the number
+   * of objects in the levels hierarchy is larger than the level of the most
+   * refined cell plus one. On the other hand, since this is rarely what a
+   * user of this class cares about, the function really just returns the
+   * level of the most refined active cell plus one. (The plus one is
+   * because in a coarse, unrefined mesh, all cells have level zero --
+   * making the number of levels equal to one.)
    */
   unsigned int n_levels () const;
 
@@ -2693,15 +2732,34 @@ public:
    * parallel::distributed::Triangulation and therefore can be larger
    * than n_levels().
    */
-  virtual unsigned int n_global_levels () const;
+  virtual
+  unsigned int n_global_levels () const;
 
   /**
-   * Return the total number of vertices.  Some of them may not be
-   * used, which usually happens upon coarsening of a triangulation
-   * when some vertices are discarded, but we do not want to renumber
-   * the remaining ones, leading to holes in the numbers of used
-   * vertices.  You can get the number of used vertices using @p
-   * n_used_vertices function.
+   * Return true if the triangulation has hanging nodes.
+   *
+   * The function is made virtual since the result can be interpreted in different
+   * ways, depending on whether the triangulation lives only on a single processor,
+   * or may be distributed as done in the parallel::distributed::Triangulation
+   * class (see there for a description of what the function is supposed to do in the
+   * parallel context).
+   */
+  virtual
+  bool has_hanging_nodes() const;
+
+  /**
+   * Return the total number of
+   * vertices.  Some of them may
+   * not be used, which usually
+   * happens upon coarsening of a
+   * triangulation when some
+   * vertices are discarded, but we
+   * do not want to renumber the
+   * remaining ones, leading to
+   * holes in the numbers of used
+   * vertices.  You can get the
+   * number of used vertices using
+   * @p n_used_vertices function.
    */
   unsigned int n_vertices () const;
 
@@ -2766,90 +2824,154 @@ public:
 
   /**
    * Total number of lines, used or unused.
-  *
-  * @note This function really exports internal information about the
-  * triangulation. It shouldn't be used in applications. The function
-  * is only part of the public interface of this class because it is
-  * used in some of the other classes that build very closely on it
-  * (in particular, the DoFHandler class).
+   *
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_lines () const;
 
   /**
-   * Number of lines, used or unused, on the given level.
+   * Number of lines, used or
+   * unused, on the given level.
    *
-   * @note This function really exports internal information about the
-   * triangulation. It shouldn't be used in applications. The function
-   * is only part of the public interface of this class because it is
-   * used in some of the other classes that build very closely on it
-   * (in particular, the DoFHandler class).
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_lines (const unsigned int level) const;
 
   /**
-   * Total number of quads, used or unused.
+   * Total number of quads, used or
+   * unused.
    *
-   * @note This function really exports internal information about the
-   * triangulation. It shouldn't be used in applications. The function
-   * is only part of the public interface of this class because it is
-   * used in some of the other classes that build very closely on it
-   * (in particular, the DoFHandler class).
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_quads () const;
 
   /**
-   * Number of quads, used or unused, on the given level.
+   * Number of quads, used or
+   * unused, on the given level.
    *
-   * @note This function really exports internal information about the
-   * triangulation. It shouldn't be used in applications. The function
-   * is only part of the public interface of this class because it is
-   * used in some of the other classes that build very closely on it
-   * (in particular, the DoFHandler class).
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_quads (const unsigned int level) const;
 
   /**
-   * Total number of hexs, used or unused.
+   * Total number of hexs, used or
+   * unused.
    *
-   * @note This function really exports internal information about the
-   * triangulation. It shouldn't be used in applications. The function
-   * is only part of the public interface of this class because it is
-   * used in some of the other classes that build very closely on it
-   * (in particular, the DoFHandler class).
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_hexs () const;
 
   /**
-   * Number of hexs, used or unused, on the given level.
+   * Number of hexs, used or
+   * unused, on the given level.
    *
-   * @note This function really exports internal information about the
-   * triangulation. It shouldn't be used in applications. The function
-   * is only part of the public interface of this class because it is
-   * used in some of the other classes that build very closely on it
-   * (in particular, the DoFHandler class).
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_hexs (const unsigned int level) const;
 
   /**
-   * Number of cells, used or unused, on the given level.
+   * Number of cells, used or
+   * unused, on the given level.
    *
-   * @note This function really exports internal information about the
-   * triangulation. It shouldn't be used in applications. The function
-   * is only part of the public interface of this class because it is
-   * used in some of the other classes that build very closely on it
-   * (in particular, the DoFHandler class).
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_cells (const unsigned int level) const;
 
   /**
-   * Return total number of faces, used or not. In 2d, the result
-   * equals n_raw_lines(), while in 3d it equals n_raw_quads().
+   * Return the total number of faces,
+   * used or not. In 2d, the result
+   * equals n_raw_lines(), while in 3d it
+   * equals n_raw_quads().
    *
-   * @note This function really exports internal information about the
-   * triangulation. It shouldn't be used in applications. The function
-   * is only part of the public interface of this class because it is
-   * used in some of the other classes that build very closely on it
-   * (in particular, the DoFHandler class).
+   * @note This function really
+   * exports internal information
+   * about the triangulation. It
+   * shouldn't be used in
+   * applications. The function is
+   * only part of the public
+   * interface of this class
+   * because it is used in some of
+   * the other classes that build
+   * very closely on it (in
+   * particular, the DoFHandler
+   * class).
    */
   unsigned int n_raw_faces () const;
 

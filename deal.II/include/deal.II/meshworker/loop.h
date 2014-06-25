@@ -448,7 +448,9 @@ namespace MeshWorker
   {
       LoopControl lctrl;
       lctrl.cells_first = cells_first;
-      lctrl.own_faces = (unique_faces_only)?LoopControl::one:LoopControl::both;
+      lctrl.own_faces = (unique_faces_only)
+			? LoopControl::one
+			: LoopControl::both;
 
       loop<dim,spacedim>(begin, end, dinfo, info, cell_worker, boundary_worker, face_worker, assembler, lctrl);
   }

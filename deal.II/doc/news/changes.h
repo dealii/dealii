@@ -148,6 +148,37 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: GridGenerator::hyper_cube() accepts a
+  <code>colorize</code> argument.
+  <br>
+  (Guido Kanschat, 2014/06/23)
+  </li>
+  
+  <li> New: Functions DoFTools::extract_locally_relevant_dofs(),
+  parallel::distributed::refine_and_coarsen_fixed_number() and
+  parallel::distributed::refine_and_coarsen_fixed_fraction() are
+  now also instantiation for objects of codimension 1.
+  <br>
+  (Michal Wichrowski, 2014/06/15)
+  </li>
+
+  <li> New: There are now functions Triangulation::has_hanging_nodes()
+  and parallel::distributed::Triangulation::has_hanging_nodes().
+  <br>
+  (Denis Davydov, 2014/06/15)
+  </li>
+
+  <li> New: There is now function Triangulation::n_global_active_cells().
+  <br>
+  (Denis Davydov, 2014/06/19)
+  </li>
+
+  <li> New: There is now a class FEEvaluationQ_DG0 that does
+  optimized matrix-free evaluation for FE_Q_DG0 elements.
+  <br>
+  (Martin Kronbichler, 2014/06/13)
+  </li>
+
   <li> Bugfix: Filter libclang_rt* from the PETSc link line.
   <br>
   (Matthias Maier, 2014/06/04)

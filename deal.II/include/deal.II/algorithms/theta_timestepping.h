@@ -95,15 +95,15 @@ namespace Algorithms
    * <h4>Vector data</h4>
    *
    * The explicit Operator #op_explicit receives in its input in first
-   * place the vector <tt>"Previous iterate"</tt>, which is the solution
+   * place the vector "Previous iterate", which is the solution
    * value after the previous timestep. It is followed by all vectors
    * provided to ThetaTimestepping::operator() as input
    * argument. #op_explicit is supposed to write its result into the
-   * first position of its output argument, labeled <tt>"Result"</tt>.
+   * first position of its output argument, labeled "Result".
    *
    * The implicit Operator #op_implicit receives the result of
-   * #op_explicit in its first input vector labeled <tt>"Previous
-   * time"</tt>. It is followed by all vectors provided to
+   * #op_explicit in its first input vector labeled "Previous
+   * time". It is followed by all vectors provided to
    * ThetaTimestepping::operator() as input argument. The output of
    * #op_implicit is directly written into the output argument given to
    * ThetaTimestepping.
@@ -114,7 +114,7 @@ namespace Algorithms
    * communicate the current time step information through AnyData as
    * well. Therefore, the AnyData objects handed as input to
    * #op_explicit and #op_implicit contain two entries of type
-   * <tt>const double*</tt> named "Time" and "Timestep". Note
+   * `const double*` named "Time" and "Timestep". Note
    * that "Time" refers to the time at the beginning of the current
    * step for #op_explicit and at the end for #op_implicit,
    * respectively.
@@ -217,9 +217,15 @@ namespace Algorithms
                        Operator<VECTOR> &op_implicit);
 
     /**
-     * The timestepping scheme. <tt>in</tt>
-     * should contain the initial
-     * value in first position. <tt>out</tt>
+     * The timestepping scheme.
+     *
+     * @param `in` is ignored by
+     * ThetaTimestepping, but is merged into the AnyData objects used
+     * as input for the operators #op_explicit and #op_implicit.
+     *
+     * @param `out` in its first argument must contain a pointer to a
+     * `VECTOR`, which contains the initial value when the operator is
+     * called. It contains the final value when the operator returns.
      */
     virtual void operator() (AnyData &out, const AnyData &in);
 
@@ -328,10 +334,10 @@ namespace Algorithms
      * with name "Current time solution". It should obtain the current
      * time and time step size from explicit_data().
      *
-     * Its return value is <i>Mu+cAu</i>, where <i>u</i> is the
-     * current state vector, <i>M</i> the mass matrix, <i>A</i> the
-     * operator in space and <i>c</i> is the time step size in
-     * explicit_data().
+     * Its return value is <i>Mu+cF(u)</i>, where <i>u</i> is the
+     * current state vector, <i>M</i> the mass matrix, <i>F</i> the
+     * operator in space and <i>c</i> is the adjusted
+     * time step size \f$ (1-\theta) \Delta t\f$.
      */
     SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_explicit;
 
@@ -341,11 +347,11 @@ namespace Algorithms
      * time". Information on the timestep should be obtained from
      * implicit_data().
      *
-     * Its return value is the solution <i>u</i> of <i>Mu-cAu=f</i>,
+     * Its return value is the solution <i>u</i> of <i>Mu-cF(u)=f</i>,
      * where <i>f</i> is the dual space vector found in the "Previous
      * time" entry of the input data, <i>M</i> the mass matrix,
-     * <i>A</i> the operator in space and <i>c</i> is the time step
-     * size in explicit_data().
+     * <i>F</i> the operator in space and <i>c</i> is the adjusted
+     * time step size \f$ \theta \Delta t\f$
      */
     SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_implicit;
 

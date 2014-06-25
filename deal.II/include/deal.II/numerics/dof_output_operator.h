@@ -54,13 +54,13 @@ namespace Algorithms
                        const unsigned int digits = 3);
 
     void parse_parameters(ParameterHandler &param);
-    void initialize (DoFHandler<dim, spacedim> &dof_handler);
+    void initialize (const DoFHandler<dim, spacedim> &dof_handler);
 
     virtual OutputOperator<VECTOR> &
     operator << (const AnyData &vectors);
 
   private:
-    SmartPointer<DoFHandler<dim, spacedim>,
+    SmartPointer<const DoFHandler<dim, spacedim>,
                  DoFOutputOperator<VECTOR, dim, spacedim> > dof;
 
     const std::string filename_base;
@@ -70,8 +70,8 @@ namespace Algorithms
   };
 
   template <class VECTOR, int dim, int spacedim>
-  void DoFOutputOperator<VECTOR, dim, spacedim>::initialize(
-    DoFHandler<dim, spacedim> &dof_handler)
+  inline void
+  DoFOutputOperator<VECTOR, dim, spacedim>::initialize(const DoFHandler<dim, spacedim> &dof_handler)
   {
     dof = &dof_handler;
   }

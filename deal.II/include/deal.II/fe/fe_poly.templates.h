@@ -18,6 +18,7 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/tensor_product_polynomials_const.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_poly.h>
 
@@ -477,6 +478,22 @@ namespace internal
   inline
   std::vector<unsigned int>
   get_poly_space_numbering_inverse (const TensorProductPolynomials<dim,POLY> &poly)
+  {
+    return poly.get_numbering_inverse();
+  }
+
+  template <int dim>
+  inline
+  std::vector<unsigned int>
+  get_poly_space_numbering (const TensorProductPolynomialsConst<dim> &poly)
+  {
+    return poly.get_numbering();
+  }
+
+  template <int dim>
+  inline
+  std::vector<unsigned int>
+  get_poly_space_numbering_inverse (const TensorProductPolynomialsConst<dim> &poly)
   {
     return poly.get_numbering_inverse();
   }

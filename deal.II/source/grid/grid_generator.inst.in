@@ -28,7 +28,7 @@ namespace GridGenerator
     
     template void
       hyper_cube<deal_II_dimension, deal_II_space_dimension> (
-	Triangulation<deal_II_dimension, deal_II_space_dimension> &, const double, const double);
+	Triangulation<deal_II_dimension, deal_II_space_dimension> &, const double, const double, const bool);
     
     template
       void
