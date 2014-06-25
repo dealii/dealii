@@ -136,13 +136,13 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
     P4EST_VERSION_SUBMINOR "${P4EST_VERSION}")
 
   # Now for the patch number such as in 0.3.4.1. If there
-  # is no patch number, then the REGEX REPLACE will fail,
-  # setting P4EST_VERSION_PATCH to P4EST_VERSION. If that
+  # is no patch number, then REGEX REPLACE will set  
+  # P4EST_VERSION_PATCH to an empty string. If that
   # is the case, then set the patch number to zero
   STRING(REGEX REPLACE
-    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.([0-9]+)?.*$" "\\1"
+    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.?(([0-9]+)?).*$" "\\1"
     P4EST_VERSION_PATCH "${P4EST_VERSION}")
-  IF(${P4EST_VERSION_PATCH} STREQUAL "${P4EST_VERSION}")
+  IF("${P4EST_VERSION_PATCH}" STREQUAL "")
     SET(P4EST_VERSION_PATCH "0")
   ENDIF()
 ENDIF()
