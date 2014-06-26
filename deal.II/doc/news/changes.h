@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Bugfix: TBB specific include directories have to be added to the
+  list of user include directories because of direct inclusion of header
+  files in base/thread_local_storage.h.
+  <br>
+  (Matthias Maier, Kainan Wang, 2014/06/25)
+  </li>
+
   <li> Improved: GridGenerator::hyper_cube() accepts a
   <code>colorize</code> argument.
   <br>

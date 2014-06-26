@@ -2869,6 +2869,20 @@ add_entries_local_to_global (const std::vector<size_type> &row_indices,
   if (dof_mask.n_rows() == n_local_rows && dof_mask.n_cols() == n_local_cols)
     dof_mask_is_active = true;
 
+  // if constrained entries should be kept, need to add rows and columns of
+  // those to the sparsity pattern
+  if (keep_constrained_entries == true)
+    {
+      for (size_type i=0; i<row_indices.size(); i++)
+        if (is_constrained(row_indices[i]))
+          for (size_type j=0; j<col_indices.size(); j++)
+            sparsity_pattern.add (row_indices[i], col_indices[j]);
+      for (size_type i=0; i<col_indices.size(); i++)
+        if (is_constrained(col_indices[i]))
+          for (size_type j=0; j<row_indices.size(); j++)
+            sparsity_pattern.add (row_indices[j], col_indices[i]);
+    }
+
   // if the dof mask is not active, all we have to do is to add some indices
   // in a matrix format. To do this, we first create an array of all the
   // indices that are to be added. these indices are the local dof indices
@@ -2889,20 +2903,6 @@ add_entries_local_to_global (const std::vector<size_type> &row_indices,
                                      actual_col_indices.end(),
                                      true);
       return;
-    }
-
-  // if constrained entries should be kept, need to add rows and columns of
-  // those to the sparsity pattern
-  if (keep_constrained_entries == true)
-    {
-      for (size_type i=0; i<row_indices.size(); i++)
-        if (is_constrained(row_indices[i]))
-          for (size_type j=0; j<col_indices.size(); j++)
-            sparsity_pattern.add (row_indices[i], col_indices[j]);
-      for (size_type i=0; i<col_indices.size(); i++)
-        if (is_constrained(col_indices[i]))
-          for (size_type j=0; j<row_indices.size(); j++)
-            sparsity_pattern.add (row_indices[j], col_indices[i]);
     }
 
 
