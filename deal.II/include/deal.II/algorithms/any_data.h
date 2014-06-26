@@ -174,6 +174,10 @@ public:
   template <typename type>
   bool is_type(const unsigned int i) const;
 
+  /// List the contents to a stream
+  template <class STREAM>
+  void list (STREAM& os) const;
+    
   /// Conversion from old NamedData
   template <typename type>
   AnyData(const NamedData<type> &);
@@ -466,6 +470,20 @@ AnyData::merge(const AnyData &other)
 }
 
 
+template <class STREAM>
+inline
+void AnyData::list(STREAM& os) const
+{
+  for (unsigned int i=0;i<names.size();++i)
+    {
+      os << i
+	 << '\t' << names[i]
+	 << '\t' << data[i].type().name()
+	 << std::endl;
+    }
+}
+
+
 //----------------------------------------------------------------------//
 
 
@@ -473,3 +491,13 @@ AnyData::merge(const AnyData &other)
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
+
+
+
+
+
+
+
+
+
+
