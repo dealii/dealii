@@ -520,6 +520,45 @@ namespace LocalIntegrators
     }
 
     /**
+     * The weak form of the grad-div residual
+     * @f[
+     *  \int_Z \nabla\!\cdot\!u \nabla\!\cdot\!v \,dx
+     * @f]
+     *
+     * @author Guido Kanschat
+     * @date 2014
+     */
+    template <int dim, typename number>
+    void grad_div_residual (
+      Vector<number> &result,
+      const FEValuesBase<dim> &fetest,
+      const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
+      const double factor = 1.)
+    {
+      const unsigned int n_dofs = fetest.dofs_per_cell;
+
+      AssertDimension(fetest.get_fe().n_components(), dim);
+      AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
+      
+      for (unsigned int k=0; k<fetest.n_quadrature_points; ++k)
+        {
+          const double dx = factor * fetest.JxW(k);
+          for (unsigned int i=0; i<n_dofs; ++i)
+	    {
+	      double dv = 0.;
+	      double du = 0.;
+	      for (unsigned int d=0; d<dim; ++d)
+		{
+		  dv += fetest.shape_grad_component(i,k,d)[d];
+		  du += input[d][k][d];
+		}
+	      
+	      result(i) += dx * du * dv;
+	    }
+        }
+    }
+
+    /**
      * The jump of the normal component
      * @f[
      * \int_F
