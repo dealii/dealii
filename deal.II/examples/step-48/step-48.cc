@@ -125,7 +125,7 @@ namespace Step48
 
     data.initialize_dof_vector (inv_mass_matrix);
 
-    FEEvaluationGL<dim,fe_degree> fe_eval(data);
+    FEEvaluation<dim,fe_degree>   fe_eval(data);
     const unsigned int            n_q_points = fe_eval.n_q_points;
 
     for (unsigned int cell=0; cell<data.n_macro_cells(); ++cell)
@@ -151,9 +151,14 @@ namespace Step48
 
   // This operator implements the core operation of the program, the
   // integration over a range of cells for the nonlinear operator of the
-  // Sine-Gordon problem. The implementation is based on the FEEvaluationGL
-  // class since we are using the cell-based implementation for Gauss-Lobatto
-  // elements.
+  // Sine-Gordon problem. The implementation is based on the FEEvaluation
+  // class as in step-37. Due to the special structure in Gauss-Lobatto
+  // elements, certain operations become simpler, in particular the evaluation
+  // of shape function values on quadrature points which is simply the
+  // injection of the values of cell degrees of freedom. The MatrixFree class
+  // detects possible structure of the finite element at quadrature points
+  // when initializing, which is then used by FEEvaluation for selecting the
+  // most appropriate numerical kernel.
 
   // The nonlinear function that we have to evaluate for the time stepping
   // routine includes the value of the function at the present time @p current
@@ -183,7 +188,7 @@ namespace Step48
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     AssertDimension (src.size(), 2);
-    FEEvaluationGL<dim,fe_degree> current (data), old (data);
+    FEEvaluation<dim,fe_degree> current (data), old (data);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         current.reinit (cell);

@@ -127,7 +127,7 @@ variable <code>constraint_indicator</code> at hand that holds, for
 each cell, the local indices of DoFs that are constrained as well as
 the identifier of the type of constraint. Actually, you will not see
 these data structures in the example program since the class
-<code>FEEvaluationGL</code> takes care of the constraints without user
+<code>FEEvaluation</code> takes care of the constraints without user
 interaction.
 
 

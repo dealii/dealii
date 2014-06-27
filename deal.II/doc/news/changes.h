@@ -148,6 +148,20 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Simplified interfaces for FEEvaluation: Previously, the user had to
+  select the appropriate kernel (FEEvaluation, FEEvaluationGeneral,
+  FEEvaluationDGP, FEEvaluationGL) for the matrix-free evaluation
+  routines. This made it difficult to write compact code that needs to select
+  between different elements. Therefore, all the functionality has been merged
+  into FEEvaluation and one should only use FEEvaluation, while the other
+  interfaces have been marked deprecated and will be removed in a future
+  version. The internal data structures for the various special cases have
+  been kept in order to provide for the most efficient routines, which is
+  selected at construction of FEEvaluation.
+  <br>
+  (Martin Kronbichler, 2014/06/27)
+  </li>
+  
   <li> Bugfix: TBB specific include directories have to be added to the
   list of user include directories because of direct inclusion of header
   files in base/thread_local_storage.h.
@@ -180,8 +194,8 @@ inconvenience this causes.
   (Denis Davydov, 2014/06/19)
   </li>
 
-  <li> New: There is now a class FEEvaluationQ_DG0 that does
-  optimized matrix-free evaluation for FE_Q_DG0 elements.
+  <li> New: The class FEEvaluation now provides optimized matrix-free
+  evaluation routines for FE_Q_DG0 elements.
   <br>
   (Martin Kronbichler, 2014/06/13)
   </li>
