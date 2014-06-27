@@ -52,11 +52,19 @@ namespace dealii
             if (c1->vertex_index(v) != c2->vertex_index(v))
               return false;
           }
+	
+	// if (c1->manifold_id() !=
+	//     c2->manifold_id())
+	//   return false;
 
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
+
+	    // if (c1->face(f)->manifold_id() !=
+	    // 	c2->face(f)->manifold_id())
+	    //   return false;
 
             if (c1->face(f)->at_boundary())
               {
@@ -115,8 +123,10 @@ void do_boundary (Triangulation<dim,spacedim> &t1)
   c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (c1->at_boundary(f))
+      if (c1->at_boundary(f)) {
         c1->face(f)->set_boundary_indicator (42);
+	//        c1->face(f)->set_manifold_id (43);
+      }
 }
 
 

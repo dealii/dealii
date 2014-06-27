@@ -64,7 +64,7 @@ void check (TRIA &tr)
 
 int main (int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  // Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   initlog();
   deal_II_exceptions::disable_abort_on_exception();
