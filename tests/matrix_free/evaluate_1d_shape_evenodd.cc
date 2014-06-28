@@ -54,16 +54,16 @@ void test()
 
   // create symmetrized shape array exactly as expected by the evenodd
   // function
-  double shape_sym[M][(N+1)/2];
+  AlignedVector<double> shape_sym(M*((N+1)/2));
   for (unsigned int i=0; i<M/2; ++i)
     for (unsigned int q=0; q<(N+1)/2; ++q)
       {
-        shape_sym[i][q] = 0.5 * (shape[i][q] + shape[i][N-1-q]);
-        shape_sym[M-1-i][q] = 0.5 * (shape[i][q] - shape[i][N-1-q]);
+        shape_sym[i*((N+1)/2)+q] = 0.5 * (shape[i][q] + shape[i][N-1-q]);
+        shape_sym[(M-1-i)*((N+1)/2)+q] = 0.5 * (shape[i][q] - shape[i][N-1-q]);
       }
   if (M % 2 == 1)
     for (unsigned int q=0; q<(N+1)/2; ++q)
-      shape_sym[(M-1)/2][q] = shape[(M-1)/2][q];
+      shape_sym[(M-1)/2*((N+1)/2)+q] = shape[(M-1)/2][q];
 
   double x[N], x_ref[N], y[M], y_ref[M];
   for (unsigned int i=0; i<N; ++i)
@@ -77,9 +77,16 @@ void test()
       for (unsigned int j=0; j<N; ++j)
         y_ref[i] += shape[i][j] * x[j];
     }
-
+                
   // apply function for tensor product
-  internal::apply_tensor_product_evenodd<1,M-1,N,double,0,false,add,type>(shape_sym,x,y);
+  internal::EvaluatorTensorProduct<internal::evaluate_evenodd,1,M-1,N,double> evaluator(shape_sym, shape_sym, shape_sym);
+  if (type == 0)
+    evaluator.template values<0,false,add> (x,y);
+  if (type == 1)
+    evaluator.template gradients<0,false,add> (x,y);
+  if (type == 2)
+    evaluator.template hessians<0,false,add> (x,y);
+
 
   deallog << "Errors no transpose: ";
   for (unsigned int i=0; i<M; ++i)
@@ -100,7 +107,12 @@ void test()
     }
 
   // apply function for tensor product
-  internal::apply_tensor_product_evenodd<1,M-1,N,double,0,true,add,type>(shape_sym,y,x);
+  if (type == 0)
+    evaluator.template values<0,true,add> (y,x);
+  if (type == 1)
+    evaluator.template gradients<0,true,add> (y,x);
+  if (type == 2)
+    evaluator.template hessians<0,true,add> (y,x);
 
   deallog << "Errors transpose:    ";
   for (unsigned int i=0; i<N; ++i)

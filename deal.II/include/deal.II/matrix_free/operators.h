@@ -86,14 +86,9 @@ namespace MatrixFreeOperators
     const FEEvaluationBase<dim,n_components,Number> &fe_eval;
 
     /**
-     * A structure to hold inverse shape functions, put into an aligned vector
-     * in order to make sure it can be allocated.
+     * A structure to hold inverse shape functions
      */
-    struct Inverse1DShape
-    {
-      VectorizedArray<Number> evenodd[fe_degree+1][fe_degree/2+1];
-    };
-    AlignedVector<Inverse1DShape> inverse_shape;
+    AlignedVector<VectorizedArray<Number> > inverse_shape;
   };
 
 
@@ -112,18 +107,19 @@ namespace MatrixFreeOperators
       for (unsigned int j=0; j<shapes_1d.n(); ++j, ++c)
         shapes_1d(i,j) = fe_eval.get_shape_info().shape_values_number[c];
     shapes_1d.gauss_jordan();
-    inverse_shape.resize(1);
-    for (int i=0; i<(fe_degree+1)/2; ++i)
+    const unsigned int stride = (fe_degree+2)/2;
+    inverse_shape.resize(stride*(fe_degree+1));
+    for (unsigned int i=0; i<stride; ++i)
       for (unsigned int q=0; q<(fe_degree+2)/2; ++q)
         {
-          inverse_shape[0].evenodd[i][q] =
+          inverse_shape[i*stride+q] =
             0.5 * (shapes_1d(i,q) + shapes_1d(i,fe_degree-q));
-          inverse_shape[0].evenodd[fe_degree-i][q] =
+          inverse_shape[(fe_degree-i)*stride+q] =
             0.5 * (shapes_1d(i,q) - shapes_1d(i,fe_degree-q));
         }
     if (fe_degree % 2 == 0)
       for (unsigned int q=0; q<(fe_degree+2)/2; ++q)
-        inverse_shape[0].evenodd[fe_degree/2][q] = shapes_1d(fe_degree/2,q);
+        inverse_shape[fe_degree/2*stride+q] = shapes_1d(fe_degree/2,q);
   }
 
 
@@ -175,6 +171,10 @@ namespace MatrixFreeOperators
 
     Assert(dim == 2 || dim == 3, ExcNotImplemented());
 
+    internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,fe_degree,
+                                     fe_degree+1, VectorizedArray<Number> >
+      evaluator(inverse_shape, inverse_shape, inverse_shape);
+
     const unsigned int shift_coefficient =
       inverse_coefficients.size() > dofs_per_cell ? dofs_per_cell : 0;
     const VectorizedArray<Number> *inv_coefficient = &inverse_coefficients[0];
@@ -183,34 +183,24 @@ namespace MatrixFreeOperators
       {
         const VectorizedArray<Number>* in = in_array+d*dofs_per_cell;
         VectorizedArray<Number>* out = out_array+d*dofs_per_cell;
-        internal::apply_tensor_product_evenodd<dim,fe_degree,fe_degree+1,
-                                               VectorizedArray<Number>,0,false,false,2>
-          (inverse_shape[0].evenodd, in, temp_data_field);
-        internal::apply_tensor_product_evenodd<dim,fe_degree,fe_degree+1,
-                                               VectorizedArray<Number>,1,false,false,2>
-          (inverse_shape[0].evenodd, temp_data_field, out);
+        // Need to select 'apply' method with hessian slot because values
+        // assume symmetries that do not exist in the inverse shapes
+        evaluator.template hessians<0,false,false> (in, temp_data_field);
+        evaluator.template hessians<1,false,false> (temp_data_field, out);
 
         if (dim == 3)
           {
-            internal::apply_tensor_product_evenodd<dim,fe_degree,fe_degree+1,
-                                                   VectorizedArray<Number>,2,false,false,2>
-              (inverse_shape[0].evenodd, out, temp_data_field);
+            evaluator.template hessians<2,false,false> (out, temp_data_field);
             for (unsigned int q=0; q<dofs_per_cell; ++q)
               temp_data_field[q] *= inv_coefficient[q];
-            internal::apply_tensor_product_evenodd<dim,fe_degree,fe_degree+1,
-                                                   VectorizedArray<Number>,2,true,false,2>
-              (inverse_shape[0].evenodd, temp_data_field, out);
+            evaluator.template hessians<2,true,false> (temp_data_field, out);
           }
         else if (dim == 2)
           for (unsigned int q=0; q<dofs_per_cell; ++q)
             out[q] *= inv_coefficient[q];
 
-        internal::apply_tensor_product_evenodd<dim,fe_degree,fe_degree+1,
-                                               VectorizedArray<Number>,1,true,false,2>
-          (inverse_shape[0].evenodd, out, temp_data_field);
-        internal::apply_tensor_product_evenodd<dim,fe_degree,fe_degree+1,
-                                               VectorizedArray<Number>,0,true,false,2>
-          (inverse_shape[0].evenodd, temp_data_field, out);
+        evaluator.template hessians<1,true,false>(out, temp_data_field);
+        evaluator.template hessians<0,true,false>(temp_data_field, out);
 
         inv_coefficient += shift_coefficient;
       }

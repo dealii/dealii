@@ -92,8 +92,8 @@ namespace Step48
 
     data.initialize_dof_vector (inv_mass_matrix);
 
-    FEEvaluationGL<dim,fe_degree> fe_eval(data);
-    const unsigned int            n_q_points = fe_eval.n_q_points;
+    FEEvaluation<dim,fe_degree> fe_eval(data);
+    const unsigned int          n_q_points = fe_eval.n_q_points;
 
     for (unsigned int cell=0; cell<data.get_size_info().n_macro_cells; ++cell)
       {
@@ -124,7 +124,7 @@ namespace Step48
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     AssertDimension (src.size(), 2);
-    FEEvaluationGL<dim,fe_degree> current (data), old (data);
+    FEEvaluation<dim,fe_degree> current (data), old (data);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         current.reinit (cell);

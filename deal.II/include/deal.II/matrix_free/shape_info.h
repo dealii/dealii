@@ -35,6 +35,20 @@ namespace internal
   namespace MatrixFreeFunctions
   {
     /**
+     * An enum that encodes the type of element detected during
+     * initialization. FEEvaluation will select the most efficient algorithm
+     * based on the given element type.
+     */
+    enum ElementType
+      {
+        tensor_general,
+        tensor_symmetric,
+        truncated_tensor,
+        tensor_symmetric_plus_dg0,
+        tensor_gausslobatto
+      };
+
+    /**
      * The class that stores the shape functions, gradients and Hessians
      * evaluated for a tensor product finite element and tensor product
      * quadrature formula on the unit cell. Because of this structure, only
@@ -77,6 +91,13 @@ namespace internal
       std::size_t memory_consumption () const;
 
       /**
+       * Encodes the type of element detected at construction. FEEvaluation
+       * will select the most efficient algorithm based on the given element
+       * type.
+       */
+      ElementType element_type;
+          
+      /**
        * Stores the shape values of the 1D finite element evaluated on all 1D
        * quadrature points in vectorized format, i.e., as an array of
        * VectorizedArray<dim>::n_array_elements equal elements. The length of
@@ -102,6 +123,27 @@ namespace internal
        * points are the index running fastest.
        */
       AlignedVector<VectorizedArray<Number> > shape_hessians;
+
+      /**
+       * Stores the shape values in a different format, namely the so-called
+       * even-odd scheme where the symmetries in shape_values are used for
+       * faster evaluation.
+       */
+      AlignedVector<VectorizedArray<Number> > shape_val_evenodd;
+
+      /**
+       * Stores the shape gradients in a different format, namely the
+       * so-called even-odd scheme where the symmetries in shape_gradients are
+       * used for faster evaluation.
+       */
+      AlignedVector<VectorizedArray<Number> > shape_gra_evenodd;
+
+      /**
+       * Stores the shape second derivatives in a different format, namely the
+       * so-called even-odd scheme where the symmetries in shape_hessians are
+       * used for faster evaluation.
+       */
+      AlignedVector<VectorizedArray<Number> > shape_hes_evenodd;
 
       /**
        * Stores the indices from cell DoFs to face DoFs. The rows go through
@@ -173,6 +215,19 @@ namespace internal
        * Stores the number of DoFs per face in @p dim dimensions.
        */
       unsigned int dofs_per_face;
+
+      /**
+       * Checks whether we have symmetries in the shape values. In that case,
+       * also fill the shape_???_evenodd fields.
+       */
+      bool check_1d_shapes_symmetric(const unsigned int n_q_points_1d);
+
+      /**
+       * Checks whether symmetric 1D basis functions are such that the shape
+       * values form a diagonal matrix, which allows to use specialized
+       * algorithms that save some operations.
+       */
+      bool check_1d_shapes_gausslobatto();
     };
 
 

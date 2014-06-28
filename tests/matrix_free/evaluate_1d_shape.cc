@@ -32,24 +32,24 @@ template <int M, int N, int type, bool add>
 void test()
 {
   deallog << "Test " << M << " x " << N << std::endl;
-  double shape[M][N];
+  AlignedVector<double> shape(M*N);
   for (unsigned int i=0; i<(M+1)/2; ++i)
     for (unsigned int j=0; j<N; ++j)
       {
-        shape[i][j] = -1. + 2. * (double)Testing::rand()/RAND_MAX;
+        shape[i*N+j] = -1. + 2. * (double)Testing::rand()/RAND_MAX;
         if (type == 1)
-          shape[M-1-i][N-1-j] = -shape[i][j];
+          shape[(M-1-i)*N+N-1-j] = -shape[i*N+j];
         else
-          shape[M-1-i][N-1-j] = shape[i][j];
+          shape[(M-1-i)*N+N-1-j] = shape[i*N+j];
       }
   if (type == 0 && M%2 == 1 && N%2 == 1)
     {
       for (unsigned int i=0; i<M; ++i)
-        shape[i][N/2] = 0.;
-      shape[M/2][N/2] = 1;
+        shape[i*N+N/2] = 0.;
+      shape[M/2*N+N/2] = 1;
     }
   if (type == 1 && M%2 == 1 && N%2 == 1)
-    shape[M/2][N/2] = 0.;
+    shape[M/2*N+N/2] = 0.;
 
   double x[N], x_ref[N], y[M], y_ref[M];
   for (unsigned int i=0; i<N; ++i)
@@ -61,19 +61,17 @@ void test()
       y[i] = 1.;
       y_ref[i] = add ? y[i] : 0.;
       for (unsigned int j=0; j<N; ++j)
-        y_ref[i] += shape[i][j] * x[j];
+        y_ref[i] += shape[i*N+j] * x[j];
     }
 
   // apply function for tensor product
+  internal::EvaluatorTensorProduct<internal::evaluate_symmetric,1,M-1,N,double> evaluator(shape, shape, shape);
   if (type == 0)
-    internal::apply_tensor_product_values<1,M-1,N,double,0,false,add>
-      (&shape[0][0],x,y);
+    evaluator.template values<0,false,add> (x,y);
   if (type == 1)
-    internal::apply_tensor_product_gradients<1,M-1,N,double,0,false,add>
-      (&shape[0][0],x,y);
+    evaluator.template gradients<0,false,add> (x,y);
   if (type == 2)
-    internal::apply_tensor_product_hessians<1,M-1,N,double,0,false,add>
-      (&shape[0][0],x,y);
+    evaluator.template hessians<0,false,add> (x,y);
 
   deallog << "Errors no transpose: ";
   for (unsigned int i=0; i<M; ++i)
@@ -90,19 +88,16 @@ void test()
       x[i] = 2.;
       x_ref[i] = add ? x[i] : 0.;
       for (unsigned int j=0; j<M; ++j)
-        x_ref[i] += shape[j][i] * y[j];
+        x_ref[i] += shape[j*N+i] * y[j];
     }
 
   // apply function for tensor product
   if (type == 0)
-    internal::apply_tensor_product_values<1,M-1,N,double,0,true,add>
-      (&shape[0][0],y,x);
+    evaluator.template values<0,true,add> (y,x);
   if (type == 1)
-    internal::apply_tensor_product_gradients<1,M-1,N,double,0,true,add>
-      (&shape[0][0],y,x);
+    evaluator.template gradients<0,true,add> (y,x);
   if (type == 2)
-    internal::apply_tensor_product_hessians<1,M-1,N,double,0,true,add>
-      (&shape[0][0],y,x);
+    evaluator.template hessians<0,true,add> (y,x);
 
   deallog << "Errors transpose:    ";
   for (unsigned int i=0; i<N; ++i)

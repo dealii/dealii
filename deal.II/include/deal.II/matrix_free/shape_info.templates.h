@@ -40,6 +40,7 @@ namespace internal
     template <typename Number>
     ShapeInfo<Number>::ShapeInfo ()
       :
+      element_type (tensor_general),
       n_q_points (0),
       dofs_per_cell (0)
     {}
@@ -85,6 +86,7 @@ namespace internal
 
         const FE_Q_DG0<dim> *fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim>*>(fe);
 
+        element_type = tensor_general;
         if (fe_poly != 0)
           scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
         else if (fe_poly_piece != 0)
@@ -94,9 +96,13 @@ namespace internal
             scalar_lexicographic.resize(fe_dgp->dofs_per_cell);
             for (unsigned int i=0; i<fe_dgp->dofs_per_cell; ++i)
               scalar_lexicographic[i] = i;
+            element_type = truncated_tensor;
           }
         else if (fe_q_dg0 != 0)
-          scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
+          {
+            scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
+            element_type = tensor_symmetric_plus_dg0;
+          }
         else
           Assert(false, ExcNotImplemented());
 
@@ -184,6 +190,17 @@ namespace internal
           this->face_gradient[1][i] = fe->shape_grad(my_i,q_point)[0];
         }
 
+      if (element_type == tensor_general &&
+          check_1d_shapes_symmetric(n_q_points_1d))
+        {
+          if (check_1d_shapes_gausslobatto())
+            element_type = tensor_gausslobatto;
+          else
+            element_type = tensor_symmetric;
+        }
+      else if (element_type == tensor_symmetric_plus_dg0)
+        check_1d_shapes_symmetric(n_q_points_1d);
+
       // face information
       unsigned int n_faces = GeometryInfo<dim>::faces_per_cell;
       this->face_indices.reinit(n_faces, this->dofs_per_face);
@@ -230,13 +247,147 @@ namespace internal
 
 
     template <typename Number>
+    bool
+    ShapeInfo<Number>::check_1d_shapes_symmetric(const unsigned int n_q_points_1d)
+    {
+      const double zero_tol =
+        types_are_equal<Number,double>::value==true?1e-10:1e-7;
+      // symmetry for values
+      const unsigned int n_dofs_1d = fe_degree + 1;
+      for (unsigned int i=0; i<(n_dofs_1d+1)/2; ++i)
+        for (unsigned int j=0; j<n_q_points_1d; ++j)
+          if (std::fabs(shape_values[i*n_q_points_1d+j][0] -
+                        shape_values[(n_dofs_1d-i)*n_q_points_1d
+                                                 -j-1][0]) > zero_tol)
+            return false;
+
+      // shape values should be zero at x=0.5 for all basis functions except
+      // for one which is one
+      if (n_q_points_1d%2 == 1 && n_dofs_1d%2 == 1)
+        {
+          for (unsigned int i=0; i<n_dofs_1d/2; ++i)
+            if (std::fabs(shape_values[i*n_q_points_1d+
+                                                   n_q_points_1d/2][0]) > zero_tol)
+              return false;
+          if (std::fabs(shape_values[(n_dofs_1d/2)*n_q_points_1d+
+                                                 n_q_points_1d/2][0]-1.)> zero_tol)
+            return false;
+        }
+
+      // skew-symmetry for gradient, zero of middle basis function in middle
+      // quadrature point
+      for (unsigned int i=0; i<(n_dofs_1d+1)/2; ++i)
+        for (unsigned int j=0; j<n_q_points_1d; ++j)
+          if (std::fabs(shape_gradients[i*n_q_points_1d+j][0] +
+                        shape_gradients[(n_dofs_1d-i)*n_q_points_1d-
+                                                    j-1][0]) > zero_tol)
+            return false;
+      if (n_dofs_1d%2 == 1 && n_q_points_1d%2 == 1)
+        if (std::fabs(shape_gradients[(n_dofs_1d/2)*n_q_points_1d+
+                                                  (n_q_points_1d/2)][0]) > zero_tol)
+          return false;
+
+      // symmetry for Laplacian
+      for (unsigned int i=0; i<(n_dofs_1d+1)/2; ++i)
+        for (unsigned int j=0; j<n_q_points_1d; ++j)
+          if (std::fabs(shape_hessians[i*n_q_points_1d+j][0] -
+                        shape_hessians[(n_dofs_1d-i)*n_q_points_1d-
+                                                   j-1][0]) > zero_tol)
+            return false;
+
+      const unsigned int stride = (n_q_points_1d+1)/2;
+      shape_val_evenodd.resize((fe_degree+1)*stride);
+      shape_gra_evenodd.resize((fe_degree+1)*stride);
+      shape_hes_evenodd.resize((fe_degree+1)*stride);
+      for (unsigned int i=0; i<(fe_degree+1)/2; ++i)
+        for (unsigned int q=0; q<stride; ++q)
+          {
+            shape_val_evenodd[i*stride+q] =
+              0.5 * (shape_values[i*n_q_points_1d+q] +
+                     shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
+            shape_val_evenodd[(fe_degree-i)*stride+q] =
+              0.5 * (shape_values[i*n_q_points_1d+q] -
+                     shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
+
+            shape_gra_evenodd[i*stride+q] =
+              0.5 * (shape_gradients[i*n_q_points_1d+q] +
+                     shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
+            shape_gra_evenodd[(fe_degree-i)*stride+q] =
+              0.5 * (shape_gradients[i*n_q_points_1d+q] -
+                     shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
+
+            shape_hes_evenodd[i*stride+q] =
+              0.5 * (shape_hessians[i*n_q_points_1d+q] +
+                     shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
+            shape_hes_evenodd[(fe_degree-i)*stride+q] =
+              0.5 * (shape_hessians[i*n_q_points_1d+q] -
+                     shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
+          }
+      if (fe_degree % 2 == 0)
+        for (unsigned int q=0; q<stride; ++q)
+          {
+            shape_val_evenodd[fe_degree/2*stride+q] =
+              shape_values[(fe_degree/2)*n_q_points_1d+q];
+            shape_gra_evenodd[fe_degree/2*stride+q] =
+              shape_gradients[(fe_degree/2)*n_q_points_1d+q];
+            shape_hes_evenodd[fe_degree/2*stride+q] =
+              shape_hessians[(fe_degree/2)*n_q_points_1d+q];
+          }
+
+      return true;
+    }
+
+
+
+    template <typename Number>
+    bool
+    ShapeInfo<Number>::check_1d_shapes_gausslobatto()
+    {
+      if (dofs_per_cell != n_q_points)
+        return false;
+
+      const double zero_tol =
+        types_are_equal<Number,double>::value==true?1e-10:1e-7;
+      // check: - identity operation for shape values
+      //        - zero diagonal at interior points for gradients
+      //        - gradient equal to unity at element boundary
+      const unsigned int n_points_1d = fe_degree+1;
+      for (unsigned int i=0; i<n_points_1d; ++i)
+        for (unsigned int j=0; j<n_points_1d; ++j)
+          if (i!=j)
+            {
+              if (std::fabs(shape_values[i*n_points_1d+j][0])>zero_tol)
+                return false;
+            }
+          else
+            {
+              if (std::fabs(shape_values[i*n_points_1d+
+                                                     j][0]-1.)>zero_tol)
+                return false;
+            }
+      for (unsigned int i=1; i<n_points_1d-1; ++i)
+        if (std::fabs(shape_gradients[i*n_points_1d+i][0])>zero_tol)
+          return false;
+      if (std::fabs(shape_gradients[n_points_1d-1][0]-
+                    (n_points_1d%2==0 ? -1. : 1.)) > zero_tol)
+        return false;
+
+      return true;
+    }
+
+
+
+    template <typename Number>
     std::size_t
     ShapeInfo<Number>::memory_consumption () const
     {
       std::size_t memory = sizeof(*this);
       memory += MemoryConsumption::memory_consumption(shape_values);
       memory += MemoryConsumption::memory_consumption(shape_gradients);
-      memory += MemoryConsumption::memory_consumption(shape_hessians);
+      memory += MemoryConsumption::memory_consumption(shape_hessians); 
+      memory += MemoryConsumption::memory_consumption(shape_val_evenodd);
+      memory += MemoryConsumption::memory_consumption(shape_gra_evenodd);
+      memory += MemoryConsumption::memory_consumption(shape_hes_evenodd);
       memory += face_indices.memory_consumption();
       for (unsigned int i=0; i<2; ++i)
         {
