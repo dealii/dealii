@@ -3524,7 +3524,7 @@ Triangulation<dim,spacedim>::save (Archive &ar,
                                    const unsigned int) const
 {
   // as discussed in the documentation, do not store the signals as
-  // well as boundary and manifold descrption but everything else
+  // well as boundary and manifold description but everything else
   ar &smooth_grid;
   ar &levels;
   ar &faces;
@@ -3536,8 +3536,10 @@ Triangulation<dim,spacedim>::save (Archive &ar,
 
   ar &check_for_distorted_cells;
 
-  if (dim == 1)
+  if (dim == 1) {
     ar &vertex_to_boundary_id_map_1d;
+    ar &vertex_to_manifold_id_map_1d;
+  }
 }
 
 
@@ -3570,8 +3572,10 @@ Triangulation<dim,spacedim>::load (Archive &ar,
                       "same setting with regard to reporting distorted "
                       "cell as the one previously stored."));
 
-  if (dim == 1)
+  if (dim == 1) {
     ar &vertex_to_boundary_id_map_1d;
+    ar &vertex_to_manifold_id_map_1d;
+  }
 
   // trigger the create signal to indicate
   // that new content has been imported into

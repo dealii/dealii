@@ -53,18 +53,13 @@ namespace dealii
               return false;
           }
 	
-	// if (c1->manifold_id() !=
-	//     c2->manifold_id())
-	//   return false;
-
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
 
-	    // if (c1->face(f)->manifold_id() !=
-	    // 	c2->face(f)->manifold_id())
-	    //   return false;
+	    if (c1->face(f)->manifold_id() != c2->face(f)->manifold_id())
+	      return false;
 
             if (c1->face(f)->at_boundary())
               {
@@ -96,6 +91,9 @@ namespace dealii
 
         if (c1->user_flag_set() != c2->user_flag_set())
           return false;
+
+	if (c1->manifold_id() != c2->manifold_id())
+	  return false;
       }
 
     // also check the order of raw iterators as they contain
