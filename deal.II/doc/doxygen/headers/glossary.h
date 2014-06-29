@@ -307,14 +307,12 @@
  *
  * <dt class="glossary">@anchor GlossBoundaryIndicator <b>%Boundary indicator</b></dt>
  *
- * <dd>
- * In a Triangulation object, every part of the boundary is associated with
- * a unique number (of type types::boundary_id) that is used to identify which
- * boundary geometry object is responsible to generate new points when the mesh
- * is refined. By convention, this boundary indicator is also often used to
- * determine what kinds of boundary conditions are to be applied to a particular
- * part of a boundary. The boundary is composed of the faces of the cells and, in 3d,
- * the edges of these faces.
+ * <dd> In a Triangulation object, every part of the boundary may be
+ * associated with a unique number (of type types::boundary_id) that
+ * is used to determine what kinds of boundary conditions are to be
+ * applied to a particular part of a boundary. The boundary is
+ * composed of the faces of the cells and, in 3d, the edges of these
+ * faces.
  *
  * By default, all boundary indicators of a mesh are zero, unless you are
  * reading from a mesh file that specifically sets them to something different,
@@ -338,22 +336,29 @@
  * on each of the selected faces. To query the boundary indicator of a particular
  * face or edge, use TriaAccessor::boundary_indicator.
  *
- * The code above only sets the boundary indicators of a particular part
- * of the boundary, but it does not by itself change the way the Triangulation
- * class treats this boundary for the purposes of mesh refinement. For this,
- * you need to call Triangulation::set_boundary to associate a boundary
- * object with a particular boundary indicator. This allows the Triangulation
- * object to use a different method of finding new points on faces and edges
- * to be refined; the default is to use a StraightBoundary object for all
- * faces and edges. The results section of step-49 has a worked example that
- * shows all of this in action.
+ * In older versions of the library (prior to 8.2), if you wanted also
+ * to change the way the Triangulation class treated the boundary for
+ * the purposes of mesh refinement, you could call
+ * Triangulation::set_boundary to associate a boundary object with a
+ * particular boundary indicator. This method is still supported, and
+ * it allows the Triangulation object to use a different method of
+ * finding new points on faces and edges to be refined; the default is
+ * to use a StraightBoundary object for all faces and edges. The
+ * results section of step-49 has a worked example that shows all of
+ * this in action.
  *
- * The second use of boundary indicators is to describe not only which geometry
- * object to use on a particular boundary but to select a part of the boundary
- * for particular boundary conditions. To this end, many of the functions in
- * namespaces DoFTools and VectorTools take arguments that specify which part of
- * the boundary to work on. Examples are DoFTools::make_periodicity_constraints,
- * DoFTools::extract_boundary_dofs, DoFTools::make_zero_boundary_constraints and
+ * The suggested method from version 8.2 onwards, is to split the
+ * geometrical description of the boundary from its physical meaning,
+ * by using separately manifold_ids and boundary_ids. The former are
+ * used to describe how the geometry changes, and the latter are used
+ * to identify the boundary conditions.
+ *
+ * Many of the functions in namespaces DoFTools and VectorTools take
+ * arguments that specify which part of the boundary to work on, and
+ * they specifically refer to boundary_ids. Examples are
+ * DoFTools::make_periodicity_constraints,
+ * DoFTools::extract_boundary_dofs,
+ * DoFTools::make_zero_boundary_constraints and
  * VectorTools::interpolate_boundary_values,
  * VectorTools::compute_no_normal_flux_constraints.
  *
@@ -361,14 +366,6 @@
  * their children upon mesh refinement. Some more information about boundary
  * indicators is also presented in a section of the documentation of the
  * Triangulation class.
- *
- * @note For meshes embedded in a higher dimension (i.e., for which the
- * 'dim' template argument to the Triangulation class is less than the
- * 'spacedim' argument -- sometimes called the 'codimension one' or 'codimension
- * two' case), the Triangulation also stores boundary indicators for cells, not just
- * faces and edges. In this case, the boundary object associated with a particular
- * boundary indicator is also used to move the new center points of cells back
- * onto the manifold that the triangulation describes whenever a cell is refined.
  *
  * @note For parallel triangulations of type parallel::distributed::Triangulation,
  * it is not enough to set boundary indicators only once at the beginning. See
