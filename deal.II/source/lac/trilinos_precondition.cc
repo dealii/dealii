@@ -608,7 +608,8 @@ namespace TrilinosWrappers
     const size_type constant_modes_dimension =
       additional_data.constant_modes.size();
     Epetra_MultiVector distributed_constant_modes (domain_map,
-                                                   constant_modes_dimension);
+                                                   constant_modes_dimension > 0 ?
+                                                   constant_modes_dimension : 1);
     std::vector<double> dummy (constant_modes_dimension);
 
     if (constant_modes_dimension > 0)
