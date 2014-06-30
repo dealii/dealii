@@ -148,6 +148,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: GridGenerator::merge_triangulations produced sometimes invalid
+  orientations of faces. This is now fixed.
+  <br>
+  (Daniel Arndt, 2014/06/30)
+  </li>
+
   <li> Fixed: TrilinosWrappers::PreconditionAMG did not read user-provided
   constant modes (aka null space) when the null space dimension is one but not
   just the trivial one vector. This is now fixed.
