@@ -109,7 +109,7 @@ private:
   void solve ();
 
   Triangulation<dim>   triangulation;
-  FE_Q<dim>            fe;
+  FE_DGP<dim>          fe;
   DoFHandler<dim>      dof_handler;
 
   TrilinosWrappers::SparseMatrix system_matrix;
@@ -133,7 +133,7 @@ template <int dim>
 void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (7);
+  triangulation.refine_global (6);
 }
 
 
@@ -177,7 +177,6 @@ template <int dim>
 void Step4<dim>::solve ()
 {
 
-  // variant 1: solve with AMG
   deallog.push(Utilities::int_to_string(dof_handler.n_dofs(),5));
   TrilinosWrappers::PreconditionAMG preconditioner;
   TrilinosWrappers::PreconditionAMG::AdditionalData data;
