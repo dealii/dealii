@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: TrilinosWrappers::PreconditionAMG did not read user-provided
+  constant modes (aka null space) when the null space dimension is one but not
+  just the trivial one vector. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/06/30)
+  </li>
+
   <li> Simplified interfaces for FEEvaluation: Previously, the user had to
   select the appropriate kernel (FEEvaluation, FEEvaluationGeneral,
   FEEvaluationDGP, FEEvaluationGL) for the matrix-free evaluation

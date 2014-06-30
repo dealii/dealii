@@ -611,7 +611,7 @@ namespace TrilinosWrappers
                                                    constant_modes_dimension);
     std::vector<double> dummy (constant_modes_dimension);
 
-    if (constant_modes_dimension > 1)
+    if (constant_modes_dimension > 0)
       {
         const bool constant_modes_are_global =
           additional_data.constant_modes[0].size() == n_rows;
