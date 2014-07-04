@@ -148,6 +148,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Some versions of DoFTools::extract_boundary_dofs() were
+  not instantiated for some combinations of arguments. This could lead
+  to missing symbol errors during linking of applications on some
+  platforms and with some compiler versions. This is now
+  fixed.
+  <br>
+  (Wolfgang Bangerth, 2014/07/04)
+  </li>
+
   <li> Fixed: GridGenerator::merge_triangulations produced sometimes invalid
   orientations of faces. This is now fixed.
   <br>
