@@ -148,6 +148,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There are now three new preconditioner classes
+  TrilinosWrappers::PreconditionBlockJacobi,
+  TrilinosWrappers::PreconditionBlockSSOR, and
+  TrilinosWrappers::PreconditionBlockSOR that work on small dense blocks of
+  the global matrix instead of the point-wise relaxation methods in
+  TrilinosWrappers::Precondition{Jacobi,SSOR,SOR} that work on each row
+  separately.
+  <br>
+  (Martin Kronbichler, 2014/07/04)
+  </li>
+
   <li> Fixed: Some versions of DoFTools::extract_boundary_dofs() were
   not instantiated for some combinations of arguments. This could lead
   to missing symbol errors during linking of applications on some
