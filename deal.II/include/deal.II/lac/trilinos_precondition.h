@@ -560,10 +560,10 @@ namespace TrilinosWrappers
 
 
   /**
-   * A wrapper class for a (pointwise) SSOR preconditioner for Trilinos
-   * matrices. As opposed to PreconditionSSOR where each row is treated
-   * separately, this scheme collects block of a given size and inverts a full
-   * matrix for all these rows simultaneously. Trilinos allows to select
+   * A wrapper class for a block SSOR preconditioner for Trilinos matrices. As
+   * opposed to PreconditionSSOR where each row is treated separately
+   * (point-wise), this scheme collects block of a given size and inverts a
+   * full matrix for all these rows simultaneously. Trilinos allows to select
    * several strategies for selecting which rows form a block, including
    * "linear" (i.e., divide the local range of the matrix in slices of the
    * block size), "greedy" or "metis".
