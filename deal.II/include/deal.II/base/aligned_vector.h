@@ -77,6 +77,9 @@ public:
   /**
    * Sets the vector size to the given size and initializes all elements with
    * T().
+   *
+   * @note If deal.II is configured with threads, the initialization will run
+   * multi-threaded over subranges of the vector.
    */
   AlignedVector (const size_type size,
                  const T        &init = T());
@@ -88,11 +91,17 @@ public:
 
   /**
    * Copy constructor.
+   *
+   * @note If deal.II is configured with threads, the initialization will run
+   * multi-threaded over subranges of the vector.
    */
   AlignedVector (const AlignedVector<T> &vec);
 
   /**
    * Assignment to the input vector @p vec.
+   *
+   * @note If deal.II is configured with threads, the initialization will run
+   * multi-threaded over subranges of the vector.
    */
   AlignedVector &
   operator = (const AlignedVector<T> &vec);
@@ -109,6 +118,9 @@ public:
    * available, and initializes each element with the specified data. If the
    * new vector size is shorter than the old one, the memory is not released
    * unless the new size is zero.
+   *
+   * @note If deal.II is configured with threads, the initialization will run
+   * multi-threaded over subranges of the vector.
    */
   void resize (const size_type size_in,
                const T        &init = T());
@@ -155,7 +167,10 @@ public:
                     ForwardIterator end);
 
   /**
-   * Fills the vector with size() copies of the given input
+   * Fills the vector with size() copies of the given input.
+   *
+   * @note If deal.II is configured with threads, this operation will run
+   * multi-threaded over subranges of the vector.
    */
   void fill (const T &element);
 

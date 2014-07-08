@@ -268,6 +268,9 @@ public:
 
   /**
    * Assignment operator.
+   *
+   * @note If deal.II is configured with threads, this operation will run
+   * multi-threaded (if the number of matrix entries is larger than 20,000).
    */
   FullMatrix<number> &
   operator = (const FullMatrix<number> &);
@@ -283,6 +286,9 @@ public:
    * This operator assigns a scalar to a matrix. To avoid confusion with the
    * semantics of this function, zero is the only value allowed for
    * <tt>d</tt>, allowing you to clear a matrix in an intuitive way.
+   *
+   * @note If deal.II is configured with threads, this operation will run
+   * multi-threaded (if the number of matrix entries is larger than 20,000).
    */
   FullMatrix<number> &
   operator = (const number d);
