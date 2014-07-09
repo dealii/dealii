@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -503,6 +503,10 @@ namespace TrilinosWrappers
    * specify the type of solver. It allows the use of built-in solvers
    * Amesos_Klu as well as third-party solvers Amesos_Superludist or
    * Amesos_Mumps.
+   *
+   * For instructions on how to install Trilinos for use with
+   * direct solvers other than KLU, see the link to the Trilinos
+   * installation instructions linked to from the deal.II ReadMe file.
    *
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2009, Uwe K&ouml;cher, 2014
