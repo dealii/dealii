@@ -529,7 +529,7 @@ namespace TrilinosWrappers
       /**
        * Set the solver type (for third party solver support of Trilinos
        * Amesos package). Possibilities are:
-       * <ol>
+       * <ul>
        *   <li>  "Amesos_Lapack" </li>
        *   <li>  "Amesos_Scalapack" </li>
        *   <li>  "Amesos_Klu" </li>
@@ -540,7 +540,7 @@ namespace TrilinosWrappers
        *   <li>  "Amesos_Superludist" </li>
        *   <li>  "Amesos_Dscpack" </li>
        *   <li>  "Amesos_Mumps" </li>
-       * </ol>
+       * </ul>
        * Note that the availability of these solvers in deal.II depends on
        * which solvers were set when configuring Trilinos.
        */

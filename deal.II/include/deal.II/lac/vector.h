@@ -327,24 +327,21 @@ public:
    * <tt>v=0</tt>. Assigning other values is deprecated and may be disallowed
    * in the future.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator = (const Number s);
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator= (const Vector<Number> &v);
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   template <typename Number2>
   Vector<Number> &operator= (const Vector<Number2> &v);
@@ -427,8 +424,7 @@ public:
    * For complex vectors, the scalar product is implemented as
    * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector. The algorithm uses pairwise
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
    * summation with the same order of summation in every run, which gives
    * fully repeatable results from one run to another.
    */
@@ -438,8 +434,7 @@ public:
   /**
    * Return square of the $l_2$-norm.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector. The algorithm uses pairwise
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
    * summation with the same order of summation in every run, which gives
    * fully repeatable results from one run to another.
    */
@@ -448,8 +443,7 @@ public:
   /**
    * Mean value of the elements of this vector.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector. The algorithm uses pairwise
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
    * summation with the same order of summation in every run, which gives
    * fully repeatable results from one run to another.
    */
@@ -458,8 +452,7 @@ public:
   /**
    * $l_1$-norm of the vector. The sum of the absolute values.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector. The algorithm uses pairwise
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
    * summation with the same order of summation in every run, which gives
    * fully repeatable results from one run to another.
    */
@@ -469,8 +462,7 @@ public:
    * $l_2$-norm of the vector. The square root of the sum of the squares of
    * the elements.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector. The algorithm uses pairwise
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
    * summation with the same order of summation in every run, which gives
    * fully repeatable results from one run to another.
    */
@@ -480,8 +472,7 @@ public:
    * $l_p$-norm of the vector. The pth root of the sum of the pth powers of
    * the absolute values of the elements.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector. The algorithm uses pairwise
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
    * summation with the same order of summation in every run, which gives
    * fully repeatable results from one run to another.
    */
@@ -624,16 +615,14 @@ public:
   /**
    * Add the given vector to the present one.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator += (const Vector<Number> &V);
 
   /**
    * Subtract the given vector from the present one.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator -= (const Vector<Number> &V);
 
@@ -667,32 +656,28 @@ public:
    * Addition of @p s to all components. Note that @p s is a scalar and not a
    * vector.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void add (const Number s);
 
   /**
    * Simple vector addition, equal to the <tt>operator +=</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void add (const Vector<Number> &V);
 
   /**
    * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void add (const Number a, const Vector<Number> &V);
 
   /**
    * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void add (const Number a, const Vector<Number> &V,
             const Number b, const Vector<Number> &W);
@@ -700,8 +685,7 @@ public:
   /**
    * Scaling and simple vector addition, i.e.  <tt>*this = s*(*this)+V</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Vector<Number> &V);
@@ -709,8 +693,7 @@ public:
   /**
    * Scaling and simple addition, i.e.  <tt>*this = s*(*this)+a*V</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Number          a,
@@ -719,8 +702,7 @@ public:
   /**
    * Scaling and multiple addition.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Number          a,
@@ -732,8 +714,7 @@ public:
    * Scaling and multiple addition.  <tt>*this = s*(*this)+a*V + b*W +
    * c*X</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Number          a,
@@ -758,16 +739,14 @@ public:
   /**
    * Scale each element of the vector by a constant value.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator *= (const Number factor);
 
   /**
    * Scale each element of the vector by the inverse of the given value.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator /= (const Number factor);
 
@@ -776,8 +755,7 @@ public:
    * argument. This function is mostly meant to simulate multiplication (and
    * immediate re-assignment) by a diagonal scaling matrix.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void scale (const Vector<Number> &scaling_factors);
 
@@ -792,8 +770,7 @@ public:
   /**
    * Assignment <tt>*this = a*u</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u);
 
@@ -806,8 +783,7 @@ public:
   /**
    * Assignment <tt>*this = a*u + b*v</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u,
             const Number b, const Vector<Number> &v);
@@ -815,8 +791,7 @@ public:
   /**
    * Assignment <tt>*this = a*u + b*v + b*w</tt>.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u,
             const Number b, const Vector<Number> &v,
@@ -832,8 +807,7 @@ public:
    * If any of the <tt>b[i]</tt> is zero, the result is undefined. No attempt
    * is made to catch such situations.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded over subranges of the vector.
+   * @dealiiOperationIsMultithreaded
    */
   void ratio (const Vector<Number> &a,
               const Vector<Number> &b);

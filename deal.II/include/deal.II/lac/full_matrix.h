@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -269,8 +269,7 @@ public:
   /**
    * Assignment operator.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded (if the number of matrix entries is larger than 20,000).
+   * @dealiiOperationIsMultithreaded
    */
   FullMatrix<number> &
   operator = (const FullMatrix<number> &);
@@ -287,8 +286,7 @@ public:
    * semantics of this function, zero is the only value allowed for
    * <tt>d</tt>, allowing you to clear a matrix in an intuitive way.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded (if the number of matrix entries is larger than 20,000).
+   * @dealiiOperationIsMultithreaded
    */
   FullMatrix<number> &
   operator = (const number d);

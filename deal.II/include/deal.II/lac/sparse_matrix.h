@@ -633,8 +633,7 @@ public:
    * all elements of the matrix to zero, but keep the sparsity pattern
    * previously used.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded by splitting the work over matrix rows.
+   * @dealiiOperationIsMultithreaded
    */
   SparseMatrix &operator = (const double d);
 
@@ -1078,8 +1077,7 @@ public:
    *
    * Source and destination must not be the same vector.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded by splitting the work over matrix rows.
+   * @dealiiOperationIsMultithreaded
    */
   template <class OutVector, class InVector>
   void vmult (OutVector &dst,
@@ -1116,8 +1114,7 @@ public:
    *
    * Source and destination must not be the same vector.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded by splitting the work over matrix rows.
+   * @dealiiOperationIsMultithreaded
    */
   template <class OutVector, class InVector>
   void vmult_add (OutVector &dst,
@@ -1156,8 +1153,7 @@ public:
    * should either both be real or complex-valued, but not mixed, for this
    * function to make sense.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded by splitting the work over matrix rows.
+   * @dealiiOperationIsMultithreaded
    */
   template <typename somenumber>
   somenumber matrix_norm_square (const Vector<somenumber> &v) const;
@@ -1165,8 +1161,7 @@ public:
   /**
    * Compute the matrix scalar product $\left(u,Mv\right)$.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded by splitting the work over matrix rows.
+   * @dealiiOperationIsMultithreaded
    */
   template <typename somenumber>
   somenumber matrix_scalar_product (const Vector<somenumber> &u,
@@ -1179,8 +1174,7 @@ public:
    *
    * Source <i>x</i> and destination <i>dst</i> must not be the same vector.
    *
-   * @note If deal.II is configured with threads, this operation will run
-   * multi-threaded by splitting the work over matrix rows.
+   * @dealiiOperationIsMultithreaded
    */
   template <typename somenumber>
   somenumber residual (Vector<somenumber>       &dst,

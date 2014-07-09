@@ -74,6 +74,8 @@ FILTER_SOURCE_FILES    = YES
 
 ALIASES += dealiiRequiresUpdateFlags{1}="@note For this function to work properly, the underlying FEValues, FEFaceValues, or FESubfaceValues object on which you call it must have computed the information you are requesting. To do so, the <code>\1</code> flag must be an element of the list of UpdateFlags that you passed to the constructor of this object. See @ref UpdateFlagsEssay for more information."
 
+ALIASES += dealiiOperationIsMultithreaded="@note If deal.II is configured with threads, this operation will run multi-threaded by splitting the work into smaller chunks (assuming there is enough work to make this worthwhile)."
+
 
 #---------------------------------------------------------------------------
 # configuration options related to source browsing

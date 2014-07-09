@@ -1416,7 +1416,7 @@ namespace TrilinosWrappers
       /**
        * Determines which smoother to use for the AMG cycle. Possibilities
        * for smoother_type are the following:
-       * <ol>
+       * <ul>
        *   <li>  "Aztec" </li>
        *   <li>  "IFPACK" </li>
        *   <li>  "Jacobi" </li>
@@ -1445,7 +1445,7 @@ namespace TrilinosWrappers
        *   <li>  "ILUT" </li>
        *   <li>  "Block Chebyshev" </li>
        *   <li>  "IFPACK-Block Chebyshev" </li>
-       * </ol>
+       * </ul>
        */
       const char* smoother_type;
 
