@@ -128,7 +128,8 @@
       scripts that you want to use them, for example via the 
       <code>TrilinosWrappers::SolverDirect</code> class.  This can be tricky,
       but adding defines similar to the following to the cmake command line
-      will achieve the goal:
+      will achieve the goal to enable the UMFPACK and SuperLU/SuperLUDist
+      solvers:
       <pre>
 
           -D TPL_ENABLE_UMFPACK:BOOL=ON \
@@ -140,6 +141,20 @@
           -D SuperLU_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_4.3/SRC" \
           -D TPL_SuperLU_LIBRARIES:FILEPATH="/path/to/SuperLU_4.3/lib/libsuperlu_4.3.a"
       </pre>
+      Similarly, to enable MUMPS, commands should include
+      <pre>
+
+          -D TPL_ENABLE_MUMPS:BOOL=ON \
+          -D TPL_ENABLE_SCALAPACK:BOOL=ON
+      </pre>
+      and possibly followed by
+      <pre>
+
+          -D TPL_MUMPS_INCLUDE_DIRS:PATH=/usr/include/openmpi-x86_64 \
+          -D SCALAPACK_LIBRARY_DIRS:PATH=/lib64/openmpi/lib \
+      </pre>
+      where you need to adjust the exact paths, of course.
+    </p>
     <hr />
     <address>
       <a href="http://www.dealii.org/authors.html" target="_top">The deal.II Authors</a>
