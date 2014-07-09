@@ -237,7 +237,7 @@ void Step4<dim>::solve ()
     deallog.push("SOR");
     TrilinosWrappers::PreconditionSOR preconditioner;
     solution = 0;
-    SolverControl           solver_control (1000, 1e-10);
+    SolverControl           solver_control (1000, 1e-5);
     SolverBicgstab<>        solver (solver_control);
     preconditioner.initialize(system_matrix);
     solver.solve (system_matrix, solution, system_rhs,
@@ -281,7 +281,7 @@ void Step4<dim>::solve ()
     data.block_size = 4;
     data.omega = 0.8;
     solution = 0;
-    SolverControl           solver_control (1000, 1e-10);
+    SolverControl           solver_control (1000, 1e-5);
     SolverBicgstab<>        solver (solver_control);
     preconditioner.initialize(system_matrix, data);
     solver.solve (system_matrix, solution, system_rhs,
@@ -320,7 +320,7 @@ void Step4<dim>::solve ()
     data.ilut_drop = 1e-6;
     data.ilut_fill = 3;
     solution = 0;
-    SolverControl           solver_control (1000, 1e-10);
+    SolverControl           solver_control (1000, 1e-5);
     SolverBicgstab<>        solver (solver_control);
     preconditioner.initialize(system_matrix, data);
     solver.solve (system_matrix, solution, system_rhs,
@@ -383,7 +383,7 @@ int main (int argc, char **argv)
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-5);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
