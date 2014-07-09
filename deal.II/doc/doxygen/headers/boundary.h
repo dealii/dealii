@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,7 +84,7 @@
  * manifold_id values.
  *
  * Befor version 8.2, the library allowed only boundary faces to
- * follow a curved geometrical description. Since version 8.2 this has
+ * follow a curved geometric description. Since version 8.2 this has
  * been introduced also for interior faces and cells, and the
  * boundary_id has been separated from the manifold_id.
  *
@@ -101,7 +101,7 @@
  * future releases.
  *
  * Whenever a new vertex is needed in a object that supports
- * geometrical dependent refinement (i.e., a face on the boundary, an
+ * geometric dependent refinement (i.e., a face on the boundary, an
  * interior face, or a cell in codimension one), the Triangulation
  * queries to manifold_id of the object which needs refinement. If the
  * manifold_id is set to numbers::invalid_manifold_id, then the
