@@ -1920,8 +1920,8 @@ public:
    *
    *  Keep in mind that this function also copies the pointer to the
    *  boundary descriptor previously set by the @p set_boundary
-   *  function and to the Manifold object previously set by the @p
-   *  set_manifold function. You must therefore also guarantee that
+   *  function and to the Manifold object previously set by the
+   *  set_manifold() function. You must therefore also guarantee that
    *  the boundary and manifold objects have a lifetime at least as
    *  long as the copied triangulation.
    *
