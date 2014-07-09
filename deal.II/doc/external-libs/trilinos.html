@@ -25,7 +25,7 @@
       engines, etc. Of particular interest to deal.II is their ability to
       provide this functionality both on sequential and parallel (using MPI)
       computers. Compared to <a href="http://www.mcs.anl.gov/petsc/"
-      target="_top">PETSc</a>, which is written in C, Trilinos is written in
+				target="_top">PETSc</a>, which is written in C, Trilinos is written in
       C++ and can be
       considered to be a more modern version of PETSc though both packages are
       under continuing development at their respective national laboratories.
@@ -61,28 +61,28 @@
       Trilinos uses <a href="http://cmake.org/">cmake</a> to configure and
       build. The following slightly longish set of commands will set up a
       reasonable configuration:
-	<pre>
+      <pre>
 
-    cd trilinos-11.4.1
-    mkdir build
-    cd build
+	cd trilinos-11.4.1
+	mkdir build
+	cd build
 
-    cmake -D Trilinos_ENABLE_Sacado=ON \
-      -D Trilinos_ENABLE_Stratimikos=ON \
-      -D CMAKE_BUILD_TYPE=RELEASE \
-      -D CMAKE_CXX_FLAGS="-g -O3" \
-      -D CMAKE_C_FLAGS="-g -O3" \
-      -D CMAKE_FORTRAN_FLAGS="-g -O5" \
-      -D Trilinos_EXTRA_LINK_FLAGS="-lgfortran" \
-      -D CMAKE_VERBOSE_MAKEFILE=FALSE \
-      -D Trilinos_VERBOSE_CONFIGURE=FALSE \
-      -D TPL_ENABLE_MPI=ON \
-      -D BUILD_SHARED_LIBS=ON \
-      -D CMAKE_INSTALL_PREFIX:PATH=$HOME/share/trilinos \
-      ..
+	cmake -D Trilinos_ENABLE_Sacado=ON \
+	-D Trilinos_ENABLE_Stratimikos=ON \
+	-D CMAKE_BUILD_TYPE=RELEASE \
+	-D CMAKE_CXX_FLAGS="-g -O3" \
+	-D CMAKE_C_FLAGS="-g -O3" \
+	-D CMAKE_FORTRAN_FLAGS="-g -O5" \
+	-D Trilinos_EXTRA_LINK_FLAGS="-lgfortran" \
+	-D CMAKE_VERBOSE_MAKEFILE=FALSE \
+	-D Trilinos_VERBOSE_CONFIGURE=FALSE \
+	-D TPL_ENABLE_MPI=ON \
+	-D BUILD_SHARED_LIBS=ON \
+	-D CMAKE_INSTALL_PREFIX:PATH=$HOME/share/trilinos \
+	..
 
-    make install
-	</pre>
+	make install
+      </pre>
       You will need to adjust the path into which you want to install Trilinos
       in the CMAKE_INSTALL_PREFIX line.
     </p>
@@ -107,13 +107,13 @@
       library names under which they can be found
       to <code>cmake</code>. For example, this may mean to add the
       following flags to the call above:
-	<pre>
+      <pre>
 
-    -D BLAS_LIBRARY_NAMES:STRING=goto \
-    -D BLAS_LIBRARY_DIRS:STRING=/apps/GotoBLAS/lib64 \
-    -D LAPACK_LIBRARY_NAMES:STRING=lapack \
-    -D LAPACK_LIBRARY_DIRS:STRING=/apps/lapack-3.2.1/lib64
-	</pre>
+	-D BLAS_LIBRARY_NAMES:STRING=goto \
+	-D BLAS_LIBRARY_DIRS:STRING=/apps/GotoBLAS/lib64 \
+	-D LAPACK_LIBRARY_NAMES:STRING=lapack \
+	-D LAPACK_LIBRARY_DIRS:STRING=/apps/lapack-3.2.1/lib64
+      </pre>
     </p>
 
 
@@ -132,26 +132,26 @@
       solvers:
       <pre>
 
-          -D TPL_ENABLE_UMFPACK:BOOL=ON \
-          -D TPL_ENABLE_SuperLU:BOOL=ON \
-          -D TPL_ENABLE_SuperLUDist:BOOL=ON \
-          -D TPL_UMFPACK_INCLUDE_DIRS="/usr/include" \
-          -D SuperLUDist_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_DIST_3.2/SRC" \
--D TPL_SuperLUDist_LIBRARIES:FILEPATH="/path/to/SuperLU_DIST_3.2/lib/libsuperlu_dist.a" \
-          -D SuperLU_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_4.3/SRC" \
-          -D TPL_SuperLU_LIBRARIES:FILEPATH="/path/to/SuperLU_4.3/lib/libsuperlu_4.3.a"
+        -D TPL_ENABLE_UMFPACK:BOOL=ON \
+        -D TPL_ENABLE_SuperLU:BOOL=ON \
+        -D TPL_ENABLE_SuperLUDist:BOOL=ON \
+        -D TPL_UMFPACK_INCLUDE_DIRS="/usr/include" \
+        -D SuperLUDist_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_DIST_3.2/SRC" \
+	-D TPL_SuperLUDist_LIBRARIES:FILEPATH="/path/to/SuperLU_DIST_3.2/lib/libsuperlu_dist.a" \
+        -D SuperLU_INCLUDE_DIRS:FILEPATH="/path/to/SuperLU_4.3/SRC" \
+        -D TPL_SuperLU_LIBRARIES:FILEPATH="/path/to/SuperLU_4.3/lib/libsuperlu_4.3.a"
       </pre>
       Similarly, to enable MUMPS, commands should include
       <pre>
 
-          -D TPL_ENABLE_MUMPS:BOOL=ON \
-          -D TPL_ENABLE_SCALAPACK:BOOL=ON
+        -D TPL_ENABLE_MUMPS:BOOL=ON \
+        -D TPL_ENABLE_SCALAPACK:BOOL=ON
       </pre>
       and possibly followed by
       <pre>
 
-          -D TPL_MUMPS_INCLUDE_DIRS:PATH=/usr/include/openmpi-x86_64 \
-          -D SCALAPACK_LIBRARY_DIRS:PATH=/lib64/openmpi/lib \
+        -D TPL_MUMPS_INCLUDE_DIRS:PATH=/usr/include/openmpi-x86_64 \
+        -D SCALAPACK_LIBRARY_DIRS:PATH=/lib64/openmpi/lib \
       </pre>
       where you need to adjust the exact paths, of course.
     </p>
