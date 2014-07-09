@@ -1416,34 +1416,36 @@ namespace TrilinosWrappers
       /**
        * Determines which smoother to use for the AMG cycle. Possibilities
        * for smoother_type are the following:
-       *     "Aztec"
-       *     "IFPACK"
-       *     "Jacobi"
-       *     "ML symmetric Gauss-Seidel"
-       *     "symmetric Gauss-Seidel"
-       *     "ML Gauss-Seidel"
-       *     "Gauss-Seidel"
-       *     "block Gauss-Seidel"
-       *     "symmetric block Gauss-Seidel"
-       *     "Chebyshev"
-       *     "MLS"
-       *     "Hiptmair"
-       *     "Amesos-KLU"
-       *     "Amesos-Superlu"
-       *     "Amesos-UMFPACK"
-       *     "Amesos-Superludist"
-       *     "Amesos-MUMPS"
-       *     "user-defined"
-       *     "SuperLU"
-       *     "IFPACK-Chebyshev"
-       *     "self"
-       *     "do-nothing"
-       *     "IC"
-       *     "ICT"
-       *     "ILU"
-       *     "ILUT"
-       *     "Block Chebyshev"
-       *     "IFPACK-Block Chebyshev"
+       * <ol>
+       *   <li>  "Aztec" </li>
+       *   <li>  "IFPACK" </li>
+       *   <li>  "Jacobi" </li>
+       *   <li>  "ML symmetric Gauss-Seidel" </li>
+       *   <li>  "symmetric Gauss-Seidel" </li>
+       *   <li>  "ML Gauss-Seidel" </li>
+       *   <li>  "Gauss-Seidel" </li>
+       *   <li>  "block Gauss-Seidel" </li>
+       *   <li>  "symmetric block Gauss-Seidel" </li>
+       *   <li>  "Chebyshev" </li>
+       *   <li>  "MLS" </li>
+       *   <li>  "Hiptmair" </li>
+       *   <li>  "Amesos-KLU" </li>
+       *   <li>  "Amesos-Superlu" </li>
+       *   <li>  "Amesos-UMFPACK" </li>
+       *   <li>  "Amesos-Superludist" </li>
+       *   <li>  "Amesos-MUMPS" </li>
+       *   <li>  "user-defined" </li>
+       *   <li>  "SuperLU" </li>
+       *   <li>  "IFPACK-Chebyshev" </li>
+       *   <li>  "self" </li>
+       *   <li>  "do-nothing" </li>
+       *   <li>  "IC" </li>
+       *   <li>  "ICT" </li>
+       *   <li>  "ILU" </li>
+       *   <li>  "ILUT" </li>
+       *   <li>  "Block Chebyshev" </li>
+       *   <li>  "IFPACK-Block Chebyshev" </li>
+       * </ol>
        */
       const char* smoother_type;
 

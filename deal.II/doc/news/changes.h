@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: The Trilinos direct solver, TrilinosWrappers::SolverDirect,
+  now takes a string to select among the available Amesos solvers. Moreover,
+  the solver now also supports deal.II's distributed vectors.
+  <br>
+  (Uwe K&ouml;cher, Martin Kronbichler, 2014/07/09)
+  </li>
+
   <li> New: There are now three new preconditioner classes
   TrilinosWrappers::PreconditionBlockJacobi,
   TrilinosWrappers::PreconditionBlockSSOR, and
