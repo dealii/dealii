@@ -498,11 +498,14 @@ namespace TrilinosWrappers
 
 
   /**
-   * An implementation of the Trilinos KLU direct solver (using the Amesos
-   * package).
+   * An implementation of Trilinos direct solvers (using the Amesos
+   * package). The data field AdditionalData::solver_type can be used to
+   * specify the type of solver. It allows the use of built-in solvers
+   * Amesos_Klu as well as third-party solvers Amesos_Superludist or
+   * Amesos_Mumps.
    *
    * @ingroup TrilinosWrappers
-   * @author Martin Kronbichler, 2009
+   * @author Martin Kronbichler, 2009, Uwe K&ouml;cher, 2014
    */
   class SolverDirect
   {
