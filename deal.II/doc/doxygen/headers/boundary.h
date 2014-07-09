@@ -100,10 +100,10 @@
  * maintained for backward compatibility, but will be deprecated in
  * future releases.
  *
- * Whenever a new vertex is needed in a object that supports
- * geometric dependent refinement (i.e., a face on the boundary, an
+ * Whenever a new vertex is needed in an object that supports
+ * geometry dependent refinement (i.e., a face on the boundary, an
  * interior face, or a cell in codimension one), the Triangulation
- * queries to manifold_id of the object which needs refinement. If the
+ * queries the manifold_id of the object which needs refinement. If the
  * manifold_id is set to numbers::invalid_manifold_id, then the
  * Triangulation queries the boundary_id (if the face is on the
  * boundary) or the material_id (if the Triangulation is of
@@ -115,13 +115,14 @@
  * new vertices, otherwise it uses a FlatManifold or StraightBoundary
  * object.
  *
- * The given behavior is backward compatible. If one ignores the
- * manifold_id of an object, by default this is set to
- * numbers::invalid_manifold_id, and the first query will trigger a
- * query to the old style boundary_id. This behavior will be
- * maintained for a while, but might eventually be changed. The
- * suggested strategy is to use manifold_ids to describe the geometry,
- * and boundary_ids to describe boundary conditions. 
+ * @note This behavior is backward compatible to that of deal.II versions
+ * prior to 8.2. If one ignores the manifold_id of an object (i.e., if it has
+ * never been set), by default it is and remains set to
+ * numbers::invalid_manifold_id. In that case, the first query above will
+ * trigger a query to the old style boundary_id. This behavior will be
+ * maintained for a while, but might eventually be changed. The suggested
+ * strategy is to use manifold_ids to describe the geometry, and boundary_ids
+ * to describe boundary conditions.
  * 
  *
  * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
