@@ -6,14 +6,9 @@
 <h4>2D calculations</h4>
 
 Running the program with the space dimension set to 2 in <code>main()</code>
-yields the following output (when the flag is set to optimized in the
-Makefile):
+yields the following output (in "release mode", @dealiiVideoLectureSeeAlso{18}):
 @code
 examples/\step-22> make run
-============================ Remaking Makefile.dep
-==============optimized===== \step-22.cc
-============================ Linking \step-22
-============================ Running \step-22
 Refinement cycle 0
    Number of active cells: 64
    Number of degrees of freedom: 679 (594+85)

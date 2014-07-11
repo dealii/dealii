@@ -1,6 +1,8 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+@dealiiVideoLecture{28}
+
 This is the first of a number of tutorial programs that will finally
 cover "real" time-dependent problems, not the slightly odd form of time
 dependence found in step-18 or the DAE model of step-21. In particular, this program introduces

@@ -30,7 +30,7 @@ them are:
        complex, so debugging is an important aspect. We support safe
        programming by using assertions that check the validity of
        parameters and %internal states in a debug mode, but are removed
-       in optimized mode.
+       in optimized mode. (@dealiiVideoLectureSeeAlso{18})
   <li> Regarding the mathematical side, we show how to support a
        variable coefficient in the elliptic operator and how to use
        preconditioned iterative solvers for the linear systems of

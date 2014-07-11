@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,6 +44,8 @@
  * easily in deal.II. In particular, it explains the usage of the class
  * FESystem, which allows us to write code for systems of partial
  * differential very much like we write code for single equations.
+ *
+ * @dealiiVideoLecture{19,20,21}
  *
  * <table class="tutorial" width="50%">
  * <tr><th><b>%Table of contents</b></th></tr>
