@@ -1,6 +1,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+@dealiiVideoLecture{14}
 
 This example does not show revolutionary new things, but it shows many
 small improvements over the previous examples, and also many small

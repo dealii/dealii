@@ -1,6 +1,9 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+@dealiiVideoLecture{29,30}
+
+
 This program implements the heat equation
 @f{align*}
   \frac{\partial u(\mathbf x, t)}{\partial t}

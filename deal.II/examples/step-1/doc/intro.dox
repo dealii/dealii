@@ -140,7 +140,9 @@ library; in the context of deal.II, the @ref Iterators module talks
 about them).
 
 The program is otherwise small enough that it doesn't need a whole lot
-of introduction. Let us just continue with its commented source.
+of introduction.
+
+@dealiiVideoLecture{5,6}
 
 
 <h3> About scientific computing in general </h3>

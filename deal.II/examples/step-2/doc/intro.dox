@@ -1,6 +1,8 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+@dealiiVideoLecture{9}
+
 After we have created a grid in the previous example, we now show how
 to define degrees of freedom on this mesh. For this example, we
 will use the lowest order ($Q_1$) finite elements, for which the degrees

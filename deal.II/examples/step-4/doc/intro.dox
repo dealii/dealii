@@ -1,6 +1,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+@dealiiVideoLecture{12,13}
 
 deal.II has a unique feature which we call
 ``dimension independent programming''. You may have noticed in the
