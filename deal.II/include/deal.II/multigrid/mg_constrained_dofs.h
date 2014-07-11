@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,25 +43,24 @@ public:
 
   typedef std::vector<std::set<types::global_dof_index> >::size_type size_dof;
   /**
-   * Fill the internal data
-   * structures with values
-   * extracted from the dof
-   * handler.
+   * Fill the internal data structures with values extracted from the dof
+   * handler object.
    *
-   * This function leaves
-   * #boundary_indices empty, since
-   * no boundary values are
-   * provided.
+   * This function ensures that on every level, degrees of freedom at interior
+   * edges of a refinement level are treated corrected but leaves degrees of
+   * freedom at the boundary of the domain untouched assuming that no
+   * Dirichlet boundary conditions for them exist.
    */
   template <int dim, int spacedim>
-  void initialize(const DoFHandler<dim,spacedim> &dof);
+  void initialize (const DoFHandler<dim,spacedim> &dof);
 
   /**
-   * Fill the internal data
-   * structures with values
-   * extracted from the dof
-   * handler, applying the boundary
-   * values provided.
+   * Fill the internal data structures with values extracted from the dof
+   * handler object and apply the boundary values provided.
+   *
+   * This function internally calls the initialize() function above and the
+   * constrains degrees on the external boundary of the domain by calling
+   * MGTools::make_boundary_list() with the given second and third argument.
    */
   template <int dim, int spacedim>
   void initialize(const DoFHandler<dim,spacedim> &dof,
@@ -75,7 +74,7 @@ public:
 
   /**
    * Determine whether a dof index is subject to a boundary
-   * constraint. (is on boundary of domain)
+   * constraint. (In other words, whether it is on boundary of domain.)
    */
   bool is_boundary_index (const unsigned int level,
                           const types::global_dof_index index) const;
@@ -192,15 +191,21 @@ void
 MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
 {
   const unsigned int nlevels = dof.get_tria().n_global_levels();
+
+  boundary_indices.resize(nlevels);
+
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
   refinement_edge_indices_old.clear();
   refinement_edge_boundary_indices_old.clear();
   for (unsigned int l=0; l<nlevels; ++l)
     {
+      boundary_indices[l].clear();
+
       refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
       refinement_edge_boundary_indices[l] = IndexSet(dof.n_dofs(l));
     }
+  
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
                                          refinement_edge_boundary_indices);
 }
@@ -209,28 +214,16 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
 template <int dim, int spacedim>
 inline
 void
-MGConstrainedDoFs::initialize(
-  const DoFHandler<dim,spacedim> &dof,
-  const typename FunctionMap<dim>::type &function_map,
-  const ComponentMask &component_mask)
+MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof,
+			      const typename FunctionMap<dim>::type &function_map,
+			      const ComponentMask &component_mask)
 {
-  const unsigned int nlevels = dof.get_tria().n_global_levels();
-  boundary_indices.resize(nlevels);
-  refinement_edge_indices.resize(nlevels);
-  refinement_edge_boundary_indices.resize(nlevels);
-  refinement_edge_indices_old.clear();
-  refinement_edge_boundary_indices_old.clear();
-
-  for (unsigned int l=0; l<nlevels; ++l)
-    {
-      boundary_indices[l].clear();
-      refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
-      refinement_edge_boundary_indices[l] = IndexSet(dof.n_dofs(l));
-    }
-
-  MGTools::make_boundary_list (dof, function_map, boundary_indices, component_mask);
-  MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
-                                         refinement_edge_boundary_indices);
+  initialize (dof);
+  
+  MGTools::make_boundary_list (dof,
+			       function_map,
+			       boundary_indices,
+			       component_mask);
 }
 
 
