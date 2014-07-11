@@ -414,7 +414,7 @@ namespace Step52
     DataOut<2> data_out;
 
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, "flux");
+    data_out.add_data_vector(solution, "solution");
 
     data_out.build_patches();
 
@@ -571,50 +571,99 @@ namespace Step52
     const double final_time = 10.;
 
     // Use forward Euler.
-    explicit_method(TimeStepping::FORWARD_EULER,n_time_steps,initial_time,final_time);
-    std::cout<<"Forward Euler error: "<<solution.l2_norm()<<std::endl;
+    std::cout << "Explicit methods:" << std::endl;
+    explicit_method (TimeStepping::FORWARD_EULER,
+		     n_time_steps,
+		     initial_time,
+		     final_time);
+    std::cout << "Forward Euler:            error=" << solution.l2_norm() << std::endl;
+    
     // Use third order Runge-Kutta.
-    explicit_method(TimeStepping::RK_THIRD_ORDER,n_time_steps,initial_time,final_time);
-    std::cout<<"Third order Runge-Kutta error: "<<solution.l2_norm()<<std::endl;
+    explicit_method (TimeStepping::RK_THIRD_ORDER,
+		     n_time_steps,
+		     initial_time,
+		     final_time);
+    std::cout << "Third order Runge-Kutta:  error=" << solution.l2_norm() << std::endl;
+
     // Use fourth order Runge-Kutta.
-    explicit_method(TimeStepping::RK_CLASSIC_FOURTH_ORDER,n_time_steps,initial_time,final_time);
-    std::cout<<"Fourth order Runge-Kutta error: "<<solution.l2_norm()<<std::endl;
+    explicit_method (TimeStepping::RK_CLASSIC_FOURTH_ORDER,
+		     n_time_steps,
+		     initial_time,
+		     final_time);
+    std::cout << "Fourth order Runge-Kutta: error=" << solution.l2_norm() << std::endl;
+    std::cout << std::endl;
 
 
     // Use backward Euler.
-    implicit_method(TimeStepping::BACKWARD_EULER,n_time_steps,initial_time,final_time);
-    std::cout<<"Backward Euler error: "<<solution.l2_norm()<<std::endl;
-    // Use implicit midpoint.
-    implicit_method(TimeStepping::IMPLICIT_MIDPOINT,n_time_steps,initial_time,final_time);
-    std::cout<<"Implicit Midpoint error: "<<solution.l2_norm()<<std::endl;
-    // Use Crank-Nicolson.
-    implicit_method(TimeStepping::CRANK_NICOLSON,n_time_steps,initial_time,final_time);
-    std::cout<<"Crank-Nicolson error: "<<solution.l2_norm()<<std::endl;
-    // Use two stages SDIRK.
-    implicit_method(TimeStepping::SDIRK_TWO_STAGES,n_time_steps,initial_time,final_time);
-    std::cout<<"SDIRK error: "<<solution.l2_norm()<<std::endl;
+    std::cout << "Implicit methods:" << std::endl;
+    implicit_method (TimeStepping::BACKWARD_EULER,
+		     n_time_steps,
+		     initial_time,
+		     final_time);
+    std::cout << "Backward Euler:           error=" << solution.l2_norm() << std::endl;
 
+    // Use implicit midpoint.
+    implicit_method (TimeStepping::IMPLICIT_MIDPOINT,
+		     n_time_steps,
+		     initial_time,
+		     final_time);
+    std::cout << "Implicit Midpoint:        error=" << solution.l2_norm() << std::endl;
+
+    // Use Crank-Nicolson.
+    implicit_method (TimeStepping::CRANK_NICOLSON,
+		     n_time_steps,
+		     initial_time,
+		     final_time);
+    std::cout << "Crank-Nicolson:           error=" << solution.l2_norm() << std::endl;
+
+    // Use two stages SDIRK.
+    implicit_method (TimeStepping::SDIRK_TWO_STAGES,
+		     n_time_steps,
+		     initial_time,
+		     final_time);
+    std::cout << "SDIRK:                    error=" << solution.l2_norm() << std::endl;
+    std::cout << std::endl;
     
     // Use Heun-Euler.
-    n_steps = embedded_explicit_method(TimeStepping::HEUN_EULER,n_time_steps,initial_time,final_time);
-    std::cout<<"Heun-Euler error: "<<solution.l2_norm()<<std::endl;
-    std::cout<<"Number of steps done: "<<n_steps<<std::endl;
+    std::cout << "Embedded explicit methods:" << std::endl;
+    n_steps = embedded_explicit_method (TimeStepping::HEUN_EULER,
+					n_time_steps,
+					initial_time,
+					final_time);
+    std::cout << "Heun-Euler:               error=" << solution.l2_norm() << std::endl;
+    std::cout << "                steps performed=" << n_steps << std::endl;
+    
     // Use Bogacki-Shampine.
-    n_steps = embedded_explicit_method(TimeStepping::BOGACKI_SHAMPINE,n_time_steps,initial_time,final_time);
-    std::cout<<"Bogacki-Shampine error: "<<solution.l2_norm()<<std::endl;
-    std::cout<<"Number of steps done: "<<n_steps<<std::endl;
+    n_steps = embedded_explicit_method (TimeStepping::BOGACKI_SHAMPINE,
+					n_time_steps,
+					initial_time,
+					final_time);
+    std::cout << "Bogacki-Shampine:         error=" << solution.l2_norm() << std::endl;
+    std::cout << "                steps performed=" << n_steps << std::endl;
+
     // Use Dopri.
-    n_steps = embedded_explicit_method(TimeStepping::DOPRI,n_time_steps,initial_time,final_time);
-    std::cout<<"Dopri error: "<<solution.l2_norm()<<std::endl;
-    std::cout<<"Number of steps done: "<<n_steps<<std::endl;
+    n_steps = embedded_explicit_method (TimeStepping::DOPRI,
+					n_time_steps,
+					initial_time,
+					final_time);
+    std::cout << "Dopri:                    error=" << solution.l2_norm() << std::endl;
+    std::cout << "                steps performed=" << n_steps << std::endl;
+
     // Use Fehlberg.
-    n_steps = embedded_explicit_method(TimeStepping::FEHLBERG,n_time_steps,initial_time,final_time);
-    std::cout<<"Fehlberg error: "<<solution.l2_norm()<<std::endl;
-    std::cout<<"Number of steps done: "<<n_steps<<std::endl;
+    n_steps = embedded_explicit_method (TimeStepping::FEHLBERG,
+					n_time_steps,
+					initial_time,
+					final_time);
+    std::cout << "Fehlberg:                 error=" << solution.l2_norm() << std::endl;
+    std::cout << "                steps performed=" << n_steps << std::endl;
+    
     // Use Cash-Karp.
-    n_steps = embedded_explicit_method(TimeStepping::CASH_KARP,n_time_steps,initial_time,final_time);
-    std::cout<<"Cash-Karp error: "<<solution.l2_norm()<<std::endl;
-    std::cout<<"Number of steps done: "<<n_steps<<std::endl;
+    n_steps = embedded_explicit_method (TimeStepping::CASH_KARP,
+					n_time_steps,
+					initial_time,
+					final_time);
+    std::cout << "Cash-Karp:                error=" << solution.l2_norm() << std::endl;
+    std::cout << "                steps performed=" << n_steps << std::endl;
   }
 }
                      
