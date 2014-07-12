@@ -148,6 +148,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: PETSc up to at least version 3.5 has a bug where it does
+  not zero-initialize the ghost elements of a newly created ghosted
+  parallel vector. This is now worked around inside deal.II.
+  <br>
+  (Wolfgang Bangerth, Michal Wichrowski, 2014/07/12)
+  </li>
+
   <li> Improved: The Trilinos direct solver, TrilinosWrappers::SolverDirect,
   now takes a string to select among the available Amesos solvers. Moreover,
   the solver now also supports deal.II's distributed vectors.
