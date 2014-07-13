@@ -2362,7 +2362,7 @@ types::manifold_id
 TriaAccessor<0, 1, spacedim>::manifold_id () const
 {
   if( tria->vertex_to_manifold_id_map_1d->find (this->vertex_index())
-      != tria->vertex_to_boundary_id_map_1d->end())
+      != tria->vertex_to_manifold_id_map_1d->end())
     return (*tria->vertex_to_manifold_id_map_1d)[this->vertex_index()];
   else
     return numbers::invalid_manifold_id;

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -9592,7 +9592,7 @@ Triangulation<dim, spacedim>::set_mesh_smoothing(const MeshSmoothing mesh_smooth
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::set_boundary (const types::boundary_id m_number,
+Triangulation<dim, spacedim>::set_boundary (const types::manifold_id m_number,
                                             const Boundary<dim, spacedim> &boundary_object)
 {
   Assert(m_number < numbers::invalid_manifold_id,
@@ -9713,7 +9713,7 @@ Triangulation<dim, spacedim>::get_manifold_ids () const
       mi_exists[cell->manifold_id()] = true;
       if(dim>1)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  mi_exists[cell->face(face)->manifold_id()]=true;
+	  mi_exists[cell->face(face)->manifold_id()] = true;
     }
   
   const unsigned int n_mi=
@@ -9754,7 +9754,7 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
 
   faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
 
-  typename std::map<types::boundary_id,
+  typename std::map<types::manifold_id,
     SmartPointer<const Boundary<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
   bdry_iterator = old_tria.manifold.begin();
   for (; bdry_iterator != old_tria.manifold.end() ; bdry_iterator++)
