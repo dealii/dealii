@@ -4055,10 +4055,7 @@ namespace internal
                 // to the information
                 // stored in the
                 // boundary class
-		const Boundary<dim,spacedim> &manifold = 
-		  (cell->manifold_id() != numbers::invalid_manifold_id ?
-		   cell->get_manifold() :
-		   triangulation.get_boundary(static_cast<types::boundary_id>(cell->material_id())));
+		const Boundary<dim,spacedim> &manifold = cell->get_manifold();
 		
                 triangulation.vertices[next_unused_vertex] =
                   manifold.get_new_point_on_quad (cell);
@@ -4449,16 +4446,16 @@ namespace internal
                   // object
 		  
 		  // Now we always ask the manifold where to put the
-		  // new point. The get_boundary function will return
+		  // new point. The get_manifold function will return
 		  // a flat boundary if invalid_manifold_id is set,
 		  // behaving as before in the flat case.  Backward
 		  // compatibility requires us to use the material id
 		  // of the cell in the codimension one case, however
 		  // we only do this if the manifold_id is the invalid
 		  // one, otherwise use the material id. This is done
-		  // internally in the get_boundary() function.
+		  // internally in the get_manifold() function.
 		  triangulation.vertices[next_unused_vertex] =
-		    cell->get_boundary().get_new_point_on_line(cell);
+		    cell->get_manifold().get_new_point_on_line(cell);
 		  triangulation.vertices_used[next_unused_vertex] = true;
 		     
                   // search for next two
@@ -4879,7 +4876,7 @@ namespace internal
                       // the two vertices:
                       // if (line->at_boundary())
                         triangulation.vertices[next_unused_vertex]
-                          = line->get_boundary().get_new_point_on_line (line);
+                          = line->get_manifold().get_new_point_on_line (line);
                     }
                   else
                     // however, if spacedim>dim, we always have to ask
@@ -4889,10 +4886,10 @@ namespace internal
                     // has been set on this very line.
 		    if(line->manifold_id() == numbers::invalid_manifold_id)
 		      triangulation.vertices[next_unused_vertex]
-			= triangulation.get_boundary(line->user_index()).get_new_point_on_line (line);
+			= triangulation.get_manifold(line->user_index()).get_new_point_on_line (line);
 		    else
 		      triangulation.vertices[next_unused_vertex]
-			= line->get_boundary().get_new_point_on_line (line);
+			= line->get_manifold().get_new_point_on_line (line);
 		      
                   // now that we created
                   // the right point, make
@@ -5425,7 +5422,7 @@ namespace internal
                   triangulation.vertices_used[next_unused_vertex] = true;
 
 		  triangulation.vertices[next_unused_vertex]
-		    = line->get_boundary().get_new_point_on_line (line);
+		    = line->get_manifold().get_new_point_on_line (line);
 
                   // now that we created
                   // the right point, make
@@ -6028,7 +6025,7 @@ namespace internal
                             // care about boundary quads
                             // here
                             triangulation.vertices[next_unused_vertex]
-                              = middle_line->get_boundary().get_new_point_on_line(middle_line);
+                              = middle_line->get_manifold().get_new_point_on_line(middle_line);
                             triangulation.vertices_used[next_unused_vertex] = true;
 
                             // now search a slot for the two
@@ -6097,7 +6094,7 @@ namespace internal
                     if (quad->at_boundary() || 
 			(quad->manifold_id() != numbers::invalid_manifold_id) )
                       triangulation.vertices[next_unused_vertex]
-			= quad->get_boundary().get_new_point_on_quad (quad);
+			= quad->get_manifold().get_new_point_on_quad (quad);
                     else
                       // it might be that the
                       // quad itself is not
@@ -9118,7 +9115,7 @@ namespace internal
                         // boundary would be
                         // this one.
                         const Point<spacedim> new_bound
-                          = face->get_boundary().get_new_point_on_face (face);
+                          = face->get_manifold().get_new_point_on_face (face);
                         // to check it,
                         // transform to the
                         // unit cell with
@@ -9677,24 +9674,13 @@ Triangulation<dim, spacedim>::get_boundary_indicators () const
     }
   else
     {
-//TODO: if boundary_id_t is a real integer type, this might become
-//a humongously large array...
-      std::vector<bool> bi_exists(numbers::internal_face_boundary_id, false);
+      std::set<types::boundary_id> b_ids;
       active_cell_iterator cell=begin_active();
       for (; cell!=end(); ++cell)
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->at_boundary(face))
-            bi_exists[cell->face(face)->boundary_indicator()]=true;
-
-      const unsigned int n_bi=
-        std::count(bi_exists.begin(), bi_exists.end(), true);
-
-      std::vector<types::boundary_id> boundary_indicators(n_bi);
-      unsigned int bi_counter=0;
-      for (unsigned int i=0; i<bi_exists.size(); ++i)
-        if (bi_exists[i]==true)
-          boundary_indicators[bi_counter++]=i;
-
+            b_ids.insert(cell->face(face)->boundary_indicator());
+      std::vector<types::boundary_id> boundary_indicators(b_ids.begin(), b_ids.end());
       return boundary_indicators;
     }
 }
@@ -9703,31 +9689,18 @@ template <int dim, int spacedim>
 std::vector<types::manifold_id>
 Triangulation<dim, spacedim>::get_manifold_ids () const
 {
-//TODO: if manifold_id_t is a real integer type, this might become
-//a humongously large array...
-				   // Just store all possible values
-  std::vector<bool> mi_exists(numbers::invalid_manifold_id+1, false);
+  std::set<types::manifold_id> m_ids;
   active_cell_iterator cell=begin_active();
-  for (; cell!=end(); ++cell)
-    {
-      mi_exists[cell->manifold_id()] = true;
-      if(dim>1)
-	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  mi_exists[cell->face(face)->manifold_id()] = true;
-    }
-  
-  const unsigned int n_mi=
-    std::count(mi_exists.begin(), mi_exists.end(), true)-1;
-
-  std::vector<types::manifold_id> manifold_indicators(n_mi);
-  unsigned int mi_counter=0;
-  for (unsigned int i=0; i<mi_exists.size()-1; ++i)
-    if (mi_exists[i]==true)
-      manifold_indicators[mi_counter++]=i;
-  
+  for (; cell!=end(); ++cell) {
+    m_ids.insert(cell->manifold_id());
+    if(dim>1)
+      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	if (cell->at_boundary(face))
+	  m_ids.insert(cell->face(face)->manifold_id());
+  }
+  std::vector<types::manifold_id> manifold_indicators(m_ids.begin(), m_ids.end());
   return manifold_indicators;
 }
-
 
 /*-----------------------------------------------------------------*/
 
