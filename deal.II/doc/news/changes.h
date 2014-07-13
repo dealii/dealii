@@ -148,6 +148,53 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: PETSc up to at least version 3.5 has a bug where it does
+  not zero-initialize the ghost elements of a newly created ghosted
+  parallel vector. This is now worked around inside deal.II.
+  <br>
+  (Wolfgang Bangerth, Michal Wichrowski, 2014/07/12)
+  </li>
+
+  <li> Improved: The Trilinos direct solver, TrilinosWrappers::SolverDirect,
+  now takes a string to select among the available Amesos solvers. Moreover,
+  the solver now also supports deal.II's distributed vectors.
+  <br>
+  (Uwe K&ouml;cher, Martin Kronbichler, 2014/07/09)
+  </li>
+
+  <li> New: There are now three new preconditioner classes
+  TrilinosWrappers::PreconditionBlockJacobi,
+  TrilinosWrappers::PreconditionBlockSSOR, and
+  TrilinosWrappers::PreconditionBlockSOR that work on small dense blocks of
+  the global matrix instead of the point-wise relaxation methods in
+  TrilinosWrappers::Precondition{Jacobi,SSOR,SOR} that work on each row
+  separately.
+  <br>
+  (Martin Kronbichler, 2014/07/04)
+  </li>
+
+  <li> Fixed: Some versions of DoFTools::extract_boundary_dofs() were
+  not instantiated for some combinations of arguments. This could lead
+  to missing symbol errors during linking of applications on some
+  platforms and with some compiler versions. This is now
+  fixed.
+  <br>
+  (Wolfgang Bangerth, 2014/07/04)
+  </li>
+
+  <li> Fixed: GridGenerator::merge_triangulations produced sometimes invalid
+  orientations of faces. This is now fixed.
+  <br>
+  (Daniel Arndt, 2014/06/30)
+  </li>
+
+  <li> Fixed: TrilinosWrappers::PreconditionAMG did not read user-provided
+  constant modes (aka null space) when the null space dimension is one but not
+  just the trivial one vector. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/06/30)
+  </li>
+
   <li> Simplified interfaces for FEEvaluation: Previously, the user had to
   select the appropriate kernel (FEEvaluation, FEEvaluationGeneral,
   FEEvaluationDGP, FEEvaluationGL) for the matrix-free evaluation

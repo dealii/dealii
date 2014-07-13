@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,20 +83,15 @@ namespace TrilinosWrappers
     typedef dealii::types::global_dof_index size_type;
 
     /**
-     * Standardized data struct to
-     * pipe additional flags to the
+     * Standardized data struct to pipe additional flags to the
      * preconditioner.
      */
     struct AdditionalData
     {};
 
     /**
-     * Constructor. Does not do
-     * anything. The
-     * <tt>initialize</tt> function
-     * of the derived classes will
-     * have to create the
-     * preconditioner from a given
+     * Constructor. Does not do anything. The <tt>initialize</tt> function of
+     * the derived classes will have to create the preconditioner from a given
      * sparse matrix.
      */
     PreconditionBase ();
@@ -112,8 +107,7 @@ namespace TrilinosWrappers
     ~PreconditionBase ();
 
     /**
-     * Destroys the preconditioner, leaving
-     * an object like just after having
+     * Destroys the preconditioner, leaving an object like just after having
      * called the constructor.
      */
     void clear ();
@@ -131,39 +125,29 @@ namespace TrilinosWrappers
                          const VectorBase &src) const;
 
     /**
-     * Apply the preconditioner on
-     * deal.II data structures
-     * instead of the ones provided
-     * in the Trilinos wrapper
-     * class.
+     * Apply the preconditioner on deal.II data structures instead of the ones
+     * provided in the Trilinos wrapper class.
      */
     virtual void vmult (dealii::Vector<double>       &dst,
                         const dealii::Vector<double> &src) const;
 
     /**
-     * Apply the transpose preconditioner on
-     * deal.II data structures
-     * instead of the ones provided
-     * in the Trilinos wrapper
-     * class.
+     * Apply the transpose preconditioner on deal.II data structures instead
+     * of the ones provided in the Trilinos wrapper class.
      */
     virtual void Tvmult (dealii::Vector<double>       &dst,
                          const dealii::Vector<double> &src) const;
 
     /**
-     * Apply the preconditioner on deal.II
-     * parallel data structures instead of
-     * the ones provided in the Trilinos
-     * wrapper class.
+     * Apply the preconditioner on deal.II parallel data structures instead of
+     * the ones provided in the Trilinos wrapper class.
      */
     virtual void vmult (dealii::parallel::distributed::Vector<double>       &dst,
                         const dealii::parallel::distributed::Vector<double> &src) const;
 
     /**
-     * Apply the transpose preconditioner on deal.II
-     * parallel data structures instead of
-     * the ones provided in the Trilinos
-     * wrapper class.
+     * Apply the transpose preconditioner on deal.II parallel data structures
+     * instead of the ones provided in the Trilinos wrapper class.
      */
     virtual void Tvmult (dealii::parallel::distributed::Vector<double>       &dst,
                          const dealii::parallel::distributed::Vector<double> &src) const;
@@ -183,18 +167,14 @@ namespace TrilinosWrappers
 
   protected:
     /**
-     * This is a pointer to the
-     * preconditioner object that
-     * is used when applying the
-     * preconditioner.
+     * This is a pointer to the preconditioner object that is used when
+     * applying the preconditioner.
      */
     std_cxx1x::shared_ptr<Epetra_Operator> preconditioner;
 
     /**
-     * Internal communication
-     * pattern in case the matrix
-     * needs to be copied from
-     * deal.II format.
+     * Internal communication pattern in case the matrix needs to be copied
+     * from deal.II format.
      */
 #ifdef DEAL_II_WITH_MPI
     Epetra_MpiComm     communicator;
@@ -203,9 +183,8 @@ namespace TrilinosWrappers
 #endif
 
     /**
-     * Internal Trilinos map in
-     * case the matrix needs to be
-     * copied from deal.II format.
+     * Internal Trilinos map in case the matrix needs to be copied from
+     * deal.II format.
      */
     std_cxx1x::shared_ptr<Epetra_Map>   vector_distributor;
   };
@@ -233,69 +212,50 @@ namespace TrilinosWrappers
   public:
 
     /**
-     * Standardized data struct to
-     * pipe additional flags to the
-     * preconditioner. The
-     * parameter <tt>omega</tt>
-     * specifies the relaxation
-     * parameter in the Jacobi
-     * preconditioner. The
-     * parameter
-     * <tt>min_diagonal</tt> can be
-     * used to make the application
-     * of the preconditioner also
-     * possible when some diagonal
-     * elements are zero. In a
-     * default application this
-     * would mean that we divide by
-     * zero, so by setting the
-     * parameter
-     * <tt>min_diagonal</tt> to a
-     * small nonzero value the SOR
-     * will work on a matrix that
-     * is not too far away from the
-     * one we want to
-     * treat.
+     * Standardized data struct to pipe additional flags to the
+     * preconditioner. The parameter <tt>omega</tt> specifies the relaxation
+     * parameter in the Jacobi preconditioner. The parameter
+     * <tt>min_diagonal</tt> can be used to make the application of the
+     * preconditioner also possible when some diagonal elements are zero. In a
+     * default application this would mean that we divide by zero, so by
+     * setting the parameter <tt>min_diagonal</tt> to a small nonzero value
+     * the SOR will work on a matrix that is not too far away from the one we
+     * want to treat.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, set
-       * the damping parameter to
-       * one, and do not modify the
-       * diagonal.
+       * Constructor. By default, set the damping parameter to one, and do not
+       * modify the diagonal.
        */
       AdditionalData (const double       omega = 1,
-                      const double       min_diagonal = 0);
+                      const double       min_diagonal = 0,
+                      const unsigned int n_sweeps = 1);
 
       /**
-       * This specifies the
-       * relaxation parameter in the
-       * Jacobi preconditioner.
+       * This specifies the relaxation parameter in the Jacobi preconditioner.
        */
       double omega;
 
       /**
-       * This specifies the minimum
-       * value the diagonal elements
-       * should have. This might be
-       * necessary when the Jacobi
-       * preconditioner is used on
-       * matrices with zero diagonal
-       * elements. In that case, a
-       * straight-forward application
-       * would not be possible since
-       * we would divide by zero.
+       * This specifies the minimum value the diagonal elements should
+       * have. This might be necessary when the Jacobi preconditioner is used
+       * on matrices with zero diagonal elements. In that case, a
+       * straight-forward application would not be possible since we would
+       * divide by zero.
        */
       double min_diagonal;
+
+      /**
+       * Sets how many times the given operation should be applied during the
+       * vmult() operation.
+       */
+      unsigned int n_sweeps;
     };
 
     /**
-     * Take the sparse matrix the
-     * preconditioner object should
-     * be built of, and additional
-     * flags (damping parameter,
-     * etc.) if there are any.
+     * Take the sparse matrix the preconditioner object should be built of,
+     * and additional flags (damping parameter, etc.) if there are any.
      */
     void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
@@ -337,93 +297,63 @@ namespace TrilinosWrappers
   public:
 
     /**
-     * Standardized data struct to
-     * pipe additional flags to the
-     * preconditioner. The
-     * parameter <tt>omega</tt>
-     * specifies the relaxation
-     * parameter in the SSOR
-     * preconditioner. The
-     * parameter
-     * <tt>min_diagonal</tt> can be
-     * used to make the application
-     * of the preconditioner also
-     * possible when some diagonal
-     * elements are zero. In a
-     * default application this
-     * would mean that we divide by
-     * zero, so by setting the
-     * parameter
-     * <tt>min_diagonal</tt> to a
-     * small nonzero value the SOR
-     * will work on a matrix that
-     * is not too far away from the
-     * one we want to
-     * treat. Finally,
-     * <tt>overlap</tt> governs the
-     * overlap of the partitions
-     * when the preconditioner runs
-     * in parallel, forming a
-     * so-called additive Schwarz
-     * preconditioner.
+     * Standardized data struct to pipe additional flags to the
+     * preconditioner. The parameter <tt>omega</tt> specifies the relaxation
+     * parameter in the SSOR preconditioner. The parameter
+     * <tt>min_diagonal</tt> can be used to make the application of the
+     * preconditioner also possible when some diagonal elements are zero. In a
+     * default application this would mean that we divide by zero, so by
+     * setting the parameter <tt>min_diagonal</tt> to a small nonzero value
+     * the SOR will work on a matrix that is not too far away from the one we
+     * want to treat. Finally, <tt>overlap</tt> governs the overlap of the
+     * partitions when the preconditioner runs in parallel, forming a
+     * so-called additive Schwarz preconditioner.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, set
-       * the damping parameter to
-       * one, we do not modify the
-       * diagonal, and there is no
-       * overlap (i.e. in parallel,
-       * we run a BlockJacobi
-       * preconditioner, where each
-       * block is inverted
-       * approximately by an SSOR.
+       * Constructor. By default, set the damping parameter to one, we do not
+       * modify the diagonal, and there is no overlap (i.e. in parallel, we
+       * run a BlockJacobi preconditioner, where each block is inverted
+       * approximately by an SSOR).
        */
       AdditionalData (const double       omega = 1,
                       const double       min_diagonal = 0,
-                      const unsigned int overlap = 0);
+                      const unsigned int overlap = 0,
+                      const unsigned int n_sweeps = 1);
 
       /**
-       * This specifies the (over-)
-       * relaxation parameter in the
-       * SSOR preconditioner.
+       * This specifies the (over-) relaxation parameter in the SSOR
+       * preconditioner.
        */
       double omega;
 
       /**
-       * This specifies the minimum
-       * value the diagonal elements
-       * should have. This might be
-       * necessary when the SSOR
-       * preconditioner is used on
-       * matrices with zero diagonal
-       * elements. In that case, a
-       * straight-forward application
-       * would not be possible since
-       * we divide by the diagonal
-       * element.
+       * This specifies the minimum value the diagonal elements should
+       * have. This might be necessary when the SSOR preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a
+       * straight-forward application would not be possible since we divide by
+       * the diagonal element.
        */
       double min_diagonal;
 
       /**
-       * This determines how large
-       * the overlap of the local
-       * matrix portions on each
-       * processor in a parallel
-       * application should be.
+       * This determines how large the overlap of the local matrix portions on
+       * each processor in a parallel application should be.
        */
       unsigned int overlap;
+
+      /**
+       * Sets how many times the given operation should be applied during the
+       * vmult() operation.
+       */
+      unsigned int n_sweeps;
     };
 
     /**
-     * Take the sparse matrix the
-     * preconditioner object should
-     * be built of, and additional
-     * flags (damping parameter,
-     * overlap in parallel
-     * computations, etc.) if there
-     * are any.
+     * Take the sparse matrix the preconditioner object should be built of,
+     * and additional flags (damping parameter, overlap in parallel
+     * computations, etc.) if there are any.
      */
     void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
@@ -465,93 +395,390 @@ namespace TrilinosWrappers
   public:
 
     /**
-     * Standardized data struct to
-     * pipe additional flags to the
-     * preconditioner. The
-     * parameter <tt>omega</tt>
-     * specifies the relaxation
-     * parameter in the SOR
-     * preconditioner. The
-     * parameter
-     * <tt>min_diagonal</tt> can be
-     * used to make the application
-     * of the preconditioner also
-     * possible when some diagonal
-     * elements are zero. In a
-     * default application this
-     * would mean that we divide by
-     * zero, so by setting the
-     * parameter
-     * <tt>min_diagonal</tt> to a
-     * small nonzero value the SOR
-     * will work on a matrix that
-     * is not too far away from the
-     * one we want to
-     * treat. Finally,
-     * <tt>overlap</tt> governs the
-     * overlap of the partitions
-     * when the preconditioner runs
-     * in parallel, forming a
-     * so-called additive Schwarz
-     * preconditioner.
+     * Standardized data struct to pipe additional flags to the
+     * preconditioner. The parameter <tt>omega</tt> specifies the relaxation
+     * parameter in the SOR preconditioner. The parameter
+     * <tt>min_diagonal</tt> can be used to make the application of the
+     * preconditioner also possible when some diagonal elements are zero. In a
+     * default application this would mean that we divide by zero, so by
+     * setting the parameter <tt>min_diagonal</tt> to a small nonzero value
+     * the SOR will work on a matrix that is not too far away from the one we
+     * want to treat. Finally, <tt>overlap</tt> governs the overlap of the
+     * partitions when the preconditioner runs in parallel, forming a
+     * so-called additive Schwarz preconditioner.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, set
-       * the damping parameter to
-       * one, we do not modify the
-       * diagonal, and there is no
-       * overlap (i.e. in parallel,
-       * we run a BlockJacobi
-       * preconditioner, where each
-       * block is inverted
+       * Constructor. By default, set the damping parameter to one, we do not
+       * modify the diagonal, and there is no overlap (i.e. in parallel, we
+       * run a BlockJacobi preconditioner, where each block is inverted
        * approximately by an SOR.
        */
       AdditionalData (const double       omega = 1,
                       const double       min_diagonal = 0,
-                      const unsigned int overlap = 0);
+                      const unsigned int overlap = 0,
+                      const unsigned int n_sweeps = 1);
 
       /**
-       * This specifies the (over-)
-       * relaxation parameter in the
-       * SOR preconditioner.
+       * This specifies the (over-) relaxation parameter in the SOR
+       * preconditioner.
        */
       double omega;
 
       /**
-       * This specifies the minimum
-       * value the diagonal elements
-       * should have. This might be
-       * necessary when the SOR
-       * preconditioner is used on
-       * matrices with zero diagonal
-       * elements. In that case, a
-       * straight-forward application
-       * would not be possible since
-       * we divide by the diagonal
-       * element.
+       * This specifies the minimum value the diagonal elements should
+       * have. This might be necessary when the SOR preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a
+       * straight-forward application would not be possible since we divide by
+       * the diagonal element.
        */
       double min_diagonal;
 
       /**
-       * This determines how large
-       * the overlap of the local
-       * matrix portions on each
-       * processor in a parallel
-       * application should be.
+       * This determines how large the overlap of the local matrix portions on
+       * each processor in a parallel application should be.
        */
       unsigned int overlap;
+
+      /**
+       * Sets how many times the given operation should be applied during the
+       * vmult() operation.
+       */
+      unsigned int n_sweeps;
     };
 
     /**
-     * Take the sparse matrix the
-     * preconditioner object should
-     * be built of, and additional
-     * flags (damping parameter,
-     * overlap in parallel
-     * computations etc.) if there
-     * are any.
+     * Take the sparse matrix the preconditioner object should be built of,
+     * and additional flags (damping parameter, overlap in parallel
+     * computations etc.) if there are any.
+     */
+    void initialize (const SparseMatrix   &matrix,
+                     const AdditionalData &additional_data = AdditionalData());
+  };
+
+
+
+  /**
+   * A wrapper class for a block Jacobi preconditioner for Trilinos
+   * matrices. As opposed to PreconditionSOR where each row is treated
+   * separately, this scheme collects block of a given size and inverts a full
+   * matrix for all these rows simultaneously. Trilinos allows to select
+   * several strategies for selecting which rows form a block, including
+   * "linear" (i.e., divide the local range of the matrix in slices of the
+   * block size), "greedy" or "metis". Note that the term <em>block
+   * Jacobi</em> does not relate to possible blocks in the MPI setting, but
+   * small blocks of dense matrices extracted from the sparse matrix local to
+   * each processor.
+   *
+   * The AdditionalData data structure allows to set preconditioner
+   * options.
+   *
+   * @ingroup TrilinosWrappers
+   * @ingroup Preconditioners
+   * @author Martin Kronbichler, 2014
+   */
+  class PreconditionBlockJacobi : public PreconditionBase
+  {
+  public:
+
+    /**
+     * Standardized data struct to pipe additional flags to the
+     * preconditioner. The parameter <tt>block_size</tt> sets the size of
+     * small blocks. It is recommended to choose this parameter not too large
+     * (a few hundreds at most) since this implementation uses a dense matrix
+     * for the block. The parameter <tt>block_creation_type</tt> allows to
+     * pass the strategy for finding the blocks to Ifpack. The parameter
+     * <tt>omega</tt> specifies the relaxation parameter in the SOR
+     * preconditioner. The parameter <tt>min_diagonal</tt> can be used to make
+     * the application of the preconditioner also possible when some diagonal
+     * elements are zero. In a default application this would mean that we
+     * divide by zero, so by setting the parameter <tt>min_diagonal</tt> to a
+     * small nonzero value the SOR will work on a matrix that is not too far
+     * away from the one we want to treat. Finally, <tt>overlap</tt> governs
+     * the overlap of the partitions when the preconditioner runs in parallel,
+     * forming a so-called additive Schwarz preconditioner.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor. By default, use a block size of 1, use linear
+       * subdivision of the rows, set the damping parameter to one, and do not
+       * modify the diagonal.
+       */
+      AdditionalData (const unsigned int block_size = 1,
+                      const std::string  block_creation_type = "linear",
+                      const double       omega = 1,
+                      const double       min_diagonal = 0,
+                      const unsigned int n_sweeps = 1);
+
+      /**
+       * This specifies the size of blocks.
+       */
+      unsigned int block_size;
+
+      /**
+       * Strategy for creation of blocks passed on to Ifpack block relaxation
+       * (variable 'partitioner: type') with this string as the given
+       * value. Available types in Ifpack include "linear" (i.e., divide the
+       * local range of the matrix in slices of the block size), "greedy"
+       * "metis". For a full list, see the documentation of Ifpack.
+       */
+      std::string block_creation_type;
+
+      /**
+       * This specifies the (over-) relaxation parameter in the Jacobi
+       * preconditioner.
+       */
+      double omega;
+
+      /**
+       * This specifies the minimum value the diagonal elements should
+       * have. This might be necessary when the block Jacobi preconditioner is
+       * used on matrices with zero diagonal elements. In that case, a
+       * straight-forward application would not be possible since we divide by
+       * the diagonal element.
+       */
+      double min_diagonal;
+
+      /**
+       * Sets how many times the given operation should be applied during the
+       * vmult() operation.
+       */
+      unsigned int n_sweeps;
+    };
+
+    /**
+     * Take the sparse matrix the preconditioner object should be built of,
+     * and additional flags (damping parameter, etc.) if there are any.
+     */
+    void initialize (const SparseMatrix   &matrix,
+                     const AdditionalData &additional_data = AdditionalData());
+  };
+
+
+
+
+  /**
+   * A wrapper class for a block SSOR preconditioner for Trilinos matrices. As
+   * opposed to PreconditionSSOR where each row is treated separately
+   * (point-wise), this scheme collects block of a given size and inverts a
+   * full matrix for all these rows simultaneously. Trilinos allows to select
+   * several strategies for selecting which rows form a block, including
+   * "linear" (i.e., divide the local range of the matrix in slices of the
+   * block size), "greedy" or "metis".
+   *
+   * The AdditionalData data structure allows to set preconditioner
+   * options.
+   *
+   * Note that a parallel application of this preconditioner is actually a
+   * block-Jacobi preconditioner with (outer) block size equal to the local
+   * matrix size. Spoken more technically, this parallel operation is an <a
+   * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+   * Schwarz method</a> with a block SSOR <em>approximate solve</em> as inner
+   * solver, based on the outer parallel partitioning.
+   *
+   * @ingroup TrilinosWrappers
+   * @ingroup Preconditioners
+   * @author Martin Kronbichler, 2014
+   */
+  class PreconditionBlockSSOR : public PreconditionBase
+  {
+  public:
+
+    /**
+     * Standardized data struct to pipe additional flags to the
+     * preconditioner. The parameter <tt>block_size</tt> sets the size of
+     * small blocks. It is recommended to choose this parameter not too large
+     * (a few hundreds at most) since this implementation uses a dense matrix
+     * for the block. The parameter <tt>block_creation_type</tt> allows to
+     * pass the strategy for finding the blocks to Ifpack. The parameter
+     * <tt>omega</tt> specifies the relaxation parameter in the SSOR
+     * preconditioner. The parameter <tt>min_diagonal</tt> can be used to make
+     * the application of the preconditioner also possible when some diagonal
+     * elements are zero. In a default application this would mean that we
+     * divide by zero, so by setting the parameter <tt>min_diagonal</tt> to a
+     * small nonzero value the SOR will work on a matrix that is not too far
+     * away from the one we want to treat. Finally, <tt>overlap</tt> governs
+     * the overlap of the partitions when the preconditioner runs in parallel,
+     * forming a so-called additive Schwarz preconditioner.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor. By default, use a block size of 1, use linear
+       * subdivision of the rows, set the damping parameter to one, we do not
+       * modify the diagonal, and there is no overlap (i.e. in parallel, we
+       * run a BlockJacobi preconditioner, where each block is inverted
+       * approximately by a block SOR).
+       */
+      AdditionalData (const unsigned int block_size = 1,
+                      const std::string  block_creation_type = "linear",
+                      const double       omega = 1,
+                      const double       min_diagonal = 0,
+                      const unsigned int overlap = 0,
+                      const unsigned int n_sweeps = 1);
+
+      /**
+       * This specifies the size of blocks.
+       */
+      unsigned int block_size;
+
+      /**
+       * Strategy for creation of blocks passed on to Ifpack block relaxation
+       * (variable 'partitioner: type') with this string as the given
+       * value. Available types in Ifpack include "linear" (i.e., divide the
+       * local range of the matrix in slices of the block size), "greedy"
+       * "metis". For a full list, see the documentation of Ifpack.
+       */
+      std::string block_creation_type;
+
+      /**
+       * This specifies the (over-) relaxation parameter in the SOR
+       * preconditioner.
+       */
+      double omega;
+
+      /**
+       * This specifies the minimum value the diagonal elements should
+       * have. This might be necessary when the SSOR preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a
+       * straight-forward application would not be possible since we divide by
+       * the diagonal element.
+       */
+      double min_diagonal;
+
+      /**
+       * This determines how large the overlap of the local matrix portions on
+       * each processor in a parallel application should be.
+       */
+      unsigned int overlap;
+
+      /**
+       * Sets how many times the given operation should be applied during the
+       * vmult() operation.
+       */
+      unsigned int n_sweeps;
+    };
+
+    /**
+     * Take the sparse matrix the preconditioner object should be built of,
+     * and additional flags (damping parameter, overlap in parallel
+     * computations, etc.) if there are any.
+     */
+    void initialize (const SparseMatrix   &matrix,
+                     const AdditionalData &additional_data = AdditionalData());
+  };
+
+
+
+
+  /**
+   * A wrapper class for a block SOR preconditioner for Trilinos matrices. As
+   * opposed to PreconditionSOR where each row is treated separately, this
+   * scheme collects block of a given size and inverts a full matrix for all
+   * these rows simultaneously. Trilinos allows to select several strategies
+   * for selecting which rows form a block, including "linear" (i.e., divide
+   * the local range of the matrix in slices of the block size), "greedy" or
+   * "metis".
+   *
+   * The AdditionalData data structure allows to set preconditioner
+   * options.
+   *
+   * Note that a parallel application of this preconditioner is actually a
+   * block-Jacobi preconditioner with (outer) block size equal to the local
+   * matrix size. Spoken more technically, this parallel operation is an <a
+   * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+   * Schwarz method</a> with a block SOR <em>approximate solve</em> as inner
+   * solver, based on the outer parallel partitioning.
+   *
+   * @ingroup TrilinosWrappers
+   * @ingroup Preconditioners
+   * @author Martin Kronbichler, 2014
+   */
+  class PreconditionBlockSOR : public PreconditionBase
+  {
+  public:
+
+    /**
+     * Standardized data struct to pipe additional flags to the
+     * preconditioner. The parameter <tt>block_size</tt> sets the size of
+     * small blocks. It is recommended to choose this parameter not too large
+     * (a few hundreds at most) since this implementation uses a dense matrix
+     * for the block. The parameter <tt>block_creation_type</tt> allows to
+     * pass the strategy for finding the blocks to Ifpack. The parameter
+     * <tt>omega</tt> specifies the relaxation parameter in the SOR
+     * preconditioner. The parameter <tt>min_diagonal</tt> can be used to make
+     * the application of the preconditioner also possible when some diagonal
+     * elements are zero. In a default application this would mean that we
+     * divide by zero, so by setting the parameter <tt>min_diagonal</tt> to a
+     * small nonzero value the SOR will work on a matrix that is not too far
+     * away from the one we want to treat. Finally, <tt>overlap</tt> governs
+     * the overlap of the partitions when the preconditioner runs in parallel,
+     * forming a so-called additive Schwarz preconditioner.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor. By default, use a block size of 1, use linear
+       * subdivision of the rows, set the damping parameter to one, we do not
+       * modify the diagonal, and there is no overlap (i.e. in parallel, we
+       * run a BlockJacobi preconditioner, where each block is inverted
+       * approximately by a block SOR).
+       */
+      AdditionalData (const unsigned int block_size = 1,
+                      const std::string  block_creation_type = "linear",
+                      const double       omega = 1,
+                      const double       min_diagonal = 0,
+                      const unsigned int overlap = 0,
+                      const unsigned int n_sweeps = 1);
+
+      /**
+       * This specifies the size of blocks.
+       */
+      unsigned int block_size;
+
+      /**
+       * Strategy for creation of blocks passed on to Ifpack block relaxation
+       * (variable 'partitioner: type') with this string as the given
+       * value. Available types in Ifpack include "linear" (i.e., divide the
+       * local range of the matrix in slices of the block size), "greedy"
+       * "metis". For a full list, see the documentation of Ifpack.
+       */
+      std::string block_creation_type;
+
+      /**
+       * This specifies the (over-) relaxation parameter in the SOR
+       * preconditioner.
+       */
+      double omega;
+
+      /**
+       * This specifies the minimum value the diagonal elements should
+       * have. This might be necessary when the SOR preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a
+       * straight-forward application would not be possible since we divide by
+       * the diagonal element.
+       */
+      double min_diagonal;
+
+      /**
+       * This determines how large the overlap of the local matrix portions on
+       * each processor in a parallel application should be.
+       */
+      unsigned int overlap;
+
+      /**
+       * Sets how many times the given operation should be applied during the
+       * vmult() operation.
+       */
+      unsigned int n_sweeps;
+    };
+
+    /**
+     * Take the sparse matrix the preconditioner object should be built of,
+     * and additional flags (damping parameter, overlap in parallel
+     * computations etc.) if there are any.
      */
     void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
@@ -601,63 +828,30 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to
-     * pipe additional parameters
-     * to the preconditioner. The
-     * Trilinos IC decomposition
-     * allows for some fill-in, so
-     * it actually is a threshold
-     * incomplete Cholesky
-     * factorization. The amount of
-     * fill-in, and hence, the
-     * amount of memory used by
-     * this preconditioner, is
-     * controlled by the parameter
-     * <tt>ic_fill</tt>, which
-     * specifies this as a
-     * double. When forming the
-     * preconditioner, for certain
-     * problems bad conditioning
-     * (or just bad luck) can cause
-     * the preconditioner to be
-     * very poorly
-     * conditioned. Hence it can
-     * help to add diagonal
-     * perturbations to the
-     * original matrix and form the
-     * preconditioner for this
-     * slightly better
-     * matrix. <tt>ic_atol</tt> is
-     * an absolute perturbation
-     * that is added to the
-     * diagonal before forming the
-     * prec, and <tt>ic_rtol</tt>
-     * is a scaling factor $rtol
-     * \geq 1$. The last parameter
-     * specifies the overlap of the
-     * partitions when the
-     * preconditioner runs in
-     * parallel.
+     * Standardized data struct to pipe additional parameters to the
+     * preconditioner. The Trilinos IC decomposition allows for some fill-in,
+     * so it actually is a threshold incomplete Cholesky factorization. The
+     * amount of fill-in, and hence, the amount of memory used by this
+     * preconditioner, is controlled by the parameter <tt>ic_fill</tt>, which
+     * specifies this as a double. When forming the preconditioner, for
+     * certain problems bad conditioning (or just bad luck) can cause the
+     * preconditioner to be very poorly conditioned. Hence it can help to add
+     * diagonal perturbations to the original matrix and form the
+     * preconditioner for this slightly better matrix. <tt>ic_atol</tt> is an
+     * absolute perturbation that is added to the diagonal before forming the
+     * prec, and <tt>ic_rtol</tt> is a scaling factor $rtol \geq 1$. The last
+     * parameter specifies the overlap of the partitions when the
+     * preconditioner runs in parallel.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, set
-       * the drop tolerance to 0, the
-       * level of extra fill-ins is
-       * set to be zero (just use the
-       * matrix structure, do not
-       * generate any additional
-       * fill-in), the tolerance
-       * level are 0 and 1,
-       * respectively, and the
-       * overlap in case of a
-       * parallel execution is
-       * zero. This overlap in a
-       * block-application of the IC
-       * in the parallel case makes
-       * the preconditioner a
-       * so-called additive Schwarz
+       * Constructor. By default, set the drop tolerance to 0, the level of
+       * extra fill-ins is set to be zero (just use the matrix structure, do
+       * not generate any additional fill-in), the tolerance level are 0 and
+       * 1, respectively, and the overlap in case of a parallel execution is
+       * zero. This overlap in a block-application of the IC in the parallel
+       * case makes the preconditioner a so-called additive Schwarz
        * preconditioner.
        */
       AdditionalData (const unsigned int ic_fill = 0,
@@ -666,61 +860,38 @@ namespace TrilinosWrappers
                       const unsigned int overlap = 0);
 
       /**
-       * This specifies the amount of
-       * additional fill-in elements
-       * besides the sparse matrix
-       * structure. When
-       * <tt>ic_fill</tt> is large,
-       * this means that many
-       * fill-ins will be added, so
-       * that the IC preconditioner
-       * comes closer to a direct
-       * sparse Cholesky
-       * decomposition. Note,
-       * however, that this will
-       * drastically increase the
-       * memory requirement,
-       * especially when the
-       * preconditioner is used in
-       * 3D.
+       * This specifies the amount of additional fill-in elements besides the
+       * sparse matrix structure. When <tt>ic_fill</tt> is large, this means
+       * that many fill-ins will be added, so that the IC preconditioner comes
+       * closer to a direct sparse Cholesky decomposition. Note, however, that
+       * this will drastically increase the memory requirement, especially
+       * when the preconditioner is used in 3D.
        */
       unsigned int ic_fill;
 
       /**
-       * This specifies the amount of
-       * an absolute perturbation
-       * that will be added to the
-       * diagonal of the matrix,
-       * which sometimes can help to
-       * get better preconditioners.
+       * This specifies the amount of an absolute perturbation that will be
+       * added to the diagonal of the matrix, which sometimes can help to get
+       * better preconditioners.
        */
       double ic_atol;
 
       /**
-       * This specifies the factor by
-       * which the diagonal of the
-       * matrix will be scaled, which
-       * sometimes can help to get
-       * better preconditioners.
+       * This specifies the factor by which the diagonal of the matrix will be
+       * scaled, which sometimes can help to get better preconditioners.
        */
       double ic_rtol;
 
       /**
-       * This determines how large
-       * the overlap of the local
-       * matrix portions on each
-       * processor in a parallel
-       * application should be.
+       * This determines how large the overlap of the local matrix portions on
+       * each processor in a parallel application should be.
        */
       unsigned int overlap;
     };
 
     /**
-     * Initialize function. Takes
-     * the matrix the
-     * preconditioner should be
-     * computed of, and additional
-     * flags if there are any.
+     * Initialize function. Takes the matrix the preconditioner should be
+     * computed of, and additional flags if there are any.
      */
     void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
@@ -770,63 +941,30 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to
-     * pipe additional parameters
-     * to the preconditioner. The
-     * Trilinos ILU decomposition
-     * allows for some fill-in, so
-     * it actually is a threshold
-     * incomplete LU
-     * factorization. The amount of
-     * fill-in, and hence, the
-     * amount of memory used by
-     * this preconditioner, is
-     * controlled by the parameter
-     * <tt>ilu_fill</tt>, which
-     * specifies this as a
-     * double. When forming the
-     * preconditioner, for certain
-     * problems bad conditioning
-     * (or just bad luck) can cause
-     * the preconditioner to be
-     * very poorly
-     * conditioned. Hence it can
-     * help to add diagonal
-     * perturbations to the
-     * original matrix and form the
-     * preconditioner for this
-     * slightly better
-     * matrix. <tt>ilu_atol</tt> is
-     * an absolute perturbation
-     * that is added to the
-     * diagonal before forming the
-     * prec, and <tt>ilu_rtol</tt>
-     * is a scaling factor $rtol
-     * \geq 1$. The last parameter
-     * specifies the overlap of the
-     * partitions when the
-     * preconditioner runs in
-     * parallel.
+     * Standardized data struct to pipe additional parameters to the
+     * preconditioner. The Trilinos ILU decomposition allows for some fill-in,
+     * so it actually is a threshold incomplete LU factorization. The amount
+     * of fill-in, and hence, the amount of memory used by this
+     * preconditioner, is controlled by the parameter <tt>ilu_fill</tt>, which
+     * specifies this as a double. When forming the preconditioner, for
+     * certain problems bad conditioning (or just bad luck) can cause the
+     * preconditioner to be very poorly conditioned. Hence it can help to add
+     * diagonal perturbations to the original matrix and form the
+     * preconditioner for this slightly better matrix. <tt>ilu_atol</tt> is an
+     * absolute perturbation that is added to the diagonal before forming the
+     * prec, and <tt>ilu_rtol</tt> is a scaling factor $rtol \geq 1$. The last
+     * parameter specifies the overlap of the partitions when the
+     * preconditioner runs in parallel.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, the
-       * level of extra fill-ins is
-       * set to be zero (just use the
-       * matrix structure, do not
-       * generate any additional
-       * fill-in), the tolerance
-       * level are 0 and 1,
-       * respectively, and the
-       * overlap in case of a
-       * parallel execution is
-       * zero. This overlap in a
-       * block-application of the ILU
-       * in the parallel case makes
-       * the preconditioner a
-       * so-called additive Schwarz
-       * preconditioner.
+       * Constructor. By default, the level of extra fill-ins is set to be
+       * zero (just use the matrix structure, do not generate any additional
+       * fill-in), the tolerance level are 0 and 1, respectively, and the
+       * overlap in case of a parallel execution is zero. This overlap in a
+       * block-application of the ILU in the parallel case makes the
+       * preconditioner a so-called additive Schwarz preconditioner.
        */
       AdditionalData (const unsigned int ilu_fill = 0,
                       const double       ilu_atol = 0.,
@@ -834,61 +972,38 @@ namespace TrilinosWrappers
                       const unsigned int overlap  = 0);
 
       /**
-       * This specifies the amount of
-       * additional fill-in elements
-       * besides the sparse matrix
-       * structure. When
-       * <tt>ilu_fill</tt> is large,
-       * this means that many
-       * fill-ins will be added, so
-       * that the ILU preconditioner
-       * comes closer to a (direct)
-       * sparse LU
-       * decomposition. Note,
-       * however, that this will
-       * drastically increase the
-       * memory requirement,
-       * especially when the
-       * preconditioner is used in
-       * 3D.
+       * This specifies the amount of additional fill-in elements besides the
+       * sparse matrix structure. When <tt>ilu_fill</tt> is large, this means
+       * that many fill-ins will be added, so that the ILU preconditioner
+       * comes closer to a (direct) sparse LU decomposition. Note, however,
+       * that this will drastically increase the memory requirement,
+       * especially when the preconditioner is used in 3D.
        */
       unsigned int ilu_fill;
 
       /**
-       * This specifies the amount of
-       * an absolute perturbation
-       * that will be added to the
-       * diagonal of the matrix,
-       * which sometimes can help to
-       * get better preconditioners.
+       * This specifies the amount of an absolute perturbation that will be
+       * added to the diagonal of the matrix, which sometimes can help to get
+       * better preconditioners.
        */
       double ilu_atol;
 
       /**
-       * This specifies the factor by
-       * which the diagonal of the
-       * matrix will be scaled, which
-       * sometimes can help to get
-       * better preconditioners.
+       * This specifies the factor by which the diagonal of the matrix will be
+       * scaled, which sometimes can help to get better preconditioners.
        */
       double ilu_rtol;
 
       /**
-       * This determines how large
-       * the overlap of the local
-       * matrix portions on each
-       * processor in a parallel
-       * application should be.
+       * This determines how large the overlap of the local matrix portions on
+       * each processor in a parallel application should be.
        */
       unsigned int overlap;
     };
 
     /**
-     * Initialize function. Takes
-     * the matrix which is used to
-     * form the preconditioner, and
-     * additional flags if there
-     * are any.
+     * Initialize function. Takes the matrix which is used to form the
+     * preconditioner, and additional flags if there are any.
      */
     void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
@@ -940,58 +1055,33 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to pipe
-     * additional parameters to the
-     * preconditioner. The Trilinos ILU-T
-     * decomposition allows for some
-     * fill-in, so it actually is a
-     * threshold incomplete LU
-     * factorization. The amount of
-     * fill-in, and hence, the amount of
-     * memory used by this
-     * preconditioner, is controlled by
-     * the parameters <tt>ilut_drop</tt>
-     * and <tt>ilut_fill</tt>, which
-     * specifies a threshold about which
-     * values should form the incomplete
-     * factorization and the level of
-     * additional fill-in. When forming
-     * the preconditioner, for certain
-     * problems bad conditioning (or just
-     * bad luck) can cause the
-     * preconditioner to be very poorly
-     * conditioned. Hence it can help to
-     * add diagonal perturbations to the
-     * original matrix and form the
-     * preconditioner for this slightly
-     * better matrix. <tt>ilut_atol</tt>
-     * is an absolute perturbation that
-     * is added to the diagonal before
-     * forming the prec, and
-     * <tt>ilu_rtol</tt> is a scaling
-     * factor $rtol \geq 1$. The last
-     * parameter specifies the overlap of
-     * the partitions when the
-     * preconditioner runs in parallel.
+     * Standardized data struct to pipe additional parameters to the
+     * preconditioner. The Trilinos ILU-T decomposition allows for some
+     * fill-in, so it actually is a threshold incomplete LU factorization. The
+     * amount of fill-in, and hence, the amount of memory used by this
+     * preconditioner, is controlled by the parameters <tt>ilut_drop</tt> and
+     * <tt>ilut_fill</tt>, which specifies a threshold about which values
+     * should form the incomplete factorization and the level of additional
+     * fill-in. When forming the preconditioner, for certain problems bad
+     * conditioning (or just bad luck) can cause the preconditioner to be very
+     * poorly conditioned. Hence it can help to add diagonal perturbations to
+     * the original matrix and form the preconditioner for this slightly
+     * better matrix. <tt>ilut_atol</tt> is an absolute perturbation that is
+     * added to the diagonal before forming the prec, and <tt>ilu_rtol</tt> is
+     * a scaling factor $rtol \geq 1$. The last parameter specifies the
+     * overlap of the partitions when the preconditioner runs in parallel.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, no
-       * element will be dropped, the level
-       * of extra fill-ins is set to be
-       * zero (just use the matrix
-       * structure, do not generate any
-       * additional fill-in except the one
-       * that results from non-dropping
-       * large elements), the tolerance
-       * level are 0 and 1, respectively,
-       * and the overlap in case of a
-       * parallel execution is zero. This
-       * overlap in a block-application of
-       * the ILU in the parallel case makes
-       * the preconditioner a so-called
-       * additive Schwarz preconditioner.
+       * Constructor. By default, no element will be dropped, the level of
+       * extra fill-ins is set to be zero (just use the matrix structure, do
+       * not generate any additional fill-in except the one that results from
+       * non-dropping large elements), the tolerance level are 0 and 1,
+       * respectively, and the overlap in case of a parallel execution is
+       * zero. This overlap in a block-application of the ILU in the parallel
+       * case makes the preconditioner a so-called additive Schwarz
+       * preconditioner.
        */
       AdditionalData (const double       ilut_drop = 0.,
                       const unsigned int ilut_fill = 0,
@@ -1000,69 +1090,44 @@ namespace TrilinosWrappers
                       const unsigned int overlap  = 0);
 
       /**
-       * This specifies the relative size
-       * of elements which should be
-       * dropped when forming an incomplete
-       * LU decomposition with threshold.
+       * This specifies the relative size of elements which should be dropped
+       * when forming an incomplete LU decomposition with threshold.
        */
       double ilut_drop;
 
       /**
-       * This specifies the amount of
-       * additional fill-in elements
-       * besides the sparse matrix
-       * structure. When
-       * <tt>ilu_fill</tt> is large,
-       * this means that many
-       * fill-ins will be added, so
-       * that the ILU preconditioner
-       * comes closer to a (direct)
-       * sparse LU
-       * decomposition. Note,
-       * however, that this will
-       * drastically increase the
-       * memory requirement,
-       * especially when the
-       * preconditioner is used in
-       * 3D.
+       * This specifies the amount of additional fill-in elements besides the
+       * sparse matrix structure. When <tt>ilu_fill</tt> is large, this means
+       * that many fill-ins will be added, so that the ILU preconditioner
+       * comes closer to a (direct) sparse LU decomposition. Note, however,
+       * that this will drastically increase the memory requirement,
+       * especially when the preconditioner is used in 3D.
        */
       unsigned int ilut_fill;
 
       /**
-       * This specifies the amount of
-       * an absolute perturbation
-       * that will be added to the
-       * diagonal of the matrix,
-       * which sometimes can help to
-       * get better preconditioners.
+       * This specifies the amount of an absolute perturbation that will be
+       * added to the diagonal of the matrix, which sometimes can help to get
+       * better preconditioners.
        */
       double ilut_atol;
 
       /**
-       * This specifies the factor by
-       * which the diagonal of the
-       * matrix will be scaled, which
-       * sometimes can help to get
-       * better preconditioners.
+       * This specifies the factor by which the diagonal of the matrix will be
+       * scaled, which sometimes can help to get better preconditioners.
        */
       double ilut_rtol;
 
       /**
-       * This determines how large
-       * the overlap of the local
-       * matrix portions on each
-       * processor in a parallel
-       * application should be.
+       * This determines how large the overlap of the local matrix portions on
+       * each processor in a parallel application should be.
        */
       unsigned int overlap;
     };
 
     /**
-     * Initialize function. Takes
-     * the matrix which is used to
-     * form the preconditioner, and
-     * additional flags if there
-     * are any.
+     * Initialize function. Takes the matrix which is used to form the
+     * preconditioner, and additional flags if there are any.
      */
     void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
@@ -1094,9 +1159,8 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to
-     * pipe additional parameters
-     * to the preconditioner.
+     * Standardized data struct to pipe additional parameters to the
+     * preconditioner.
      */
     struct AdditionalData
     {
@@ -1107,21 +1171,15 @@ namespace TrilinosWrappers
 
 
       /**
-       * This determines how large
-       * the overlap of the local
-       * matrix portions on each
-       * processor in a parallel
-       * application should be.
+       * This determines how large the overlap of the local matrix portions on
+       * each processor in a parallel application should be.
        */
       unsigned int overlap;
     };
 
     /**
-     * Initialize function. Takes
-     * the matrix which is used to
-     * form the preconditioner, and
-     * additional flags if there
-     * are any.
+     * Initialize function. Takes the matrix which is used to form the
+     * preconditioner, and additional flags if there are any.
      */
     void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
@@ -1146,9 +1204,8 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to
-     * pipe additional parameters
-     * to the preconditioner.
+     * Standardized data struct to pipe additional parameters to the
+     * preconditioner.
      */
     struct AdditionalData
     {
@@ -1163,74 +1220,51 @@ namespace TrilinosWrappers
                       const bool         nonzero_starting = false);
 
       /**
-       * This determines the degree of the
-       * Chebyshev polynomial. The degree
-       * of the polynomial gives the number
-       * of matrix-vector products to be
-       * performed for one application of
-       * the vmult() operation.
+       * This determines the degree of the Chebyshev polynomial. The degree of
+       * the polynomial gives the number of matrix-vector products to be
+       * performed for one application of the vmult() operation.
        */
       unsigned int degree;
 
       /**
-       * This sets the maximum eigenvalue
-       * of the matrix, which needs to be
-       * set properly for appropriate
-       * performance of the Chebyshev
-       * preconditioner.
+       * This sets the maximum eigenvalue of the matrix, which needs to be set
+       * properly for appropriate performance of the Chebyshev preconditioner.
        */
       double max_eigenvalue;
 
       /**
-       * This sets the ratio between the
-       * maximum and the minimum
-       * eigenvalue.
+       * This sets the ratio between the maximum and the minimum eigenvalue.
        */
       double eigenvalue_ratio;
 
       /**
-       * This sets the minimum eigenvalue,
-       * which is an optional parameter
-       * only used internally for checking
-       * whether we use an identity matrix.
+       * This sets the minimum eigenvalue, which is an optional parameter only
+       * used internally for checking whether we use an identity matrix.
        */
       double min_eigenvalue;
 
       /**
-       * This sets a threshold below which
-       * the diagonal element will not be
-       * inverted in the Chebyshev
-       * algorithm.
+       * This sets a threshold below which the diagonal element will not be
+       * inverted in the Chebyshev algorithm.
        */
       double min_diagonal;
 
       /**
-       * When this flag is set to
-       * <tt>true</tt>, it enables the
-       * method <tt>vmult(dst, src)</tt> to
-       * use non-zero data in the vector
-       * <tt>dst</tt>, appending to it the
-       * Chebyshev corrections. This can be
-       * useful in some situations
-       * (e.g. when used for high-frequency
-       * error smoothing), but not the way
-       * the solver classes expect a
-       * preconditioner to work (where one
-       * ignores the content in
-       * <tt>dst</tt> for the
-       * preconditioner application). The
-       * user should really know what she
-       * is doing when touching this flag.
+       * When this flag is set to <tt>true</tt>, it enables the method
+       * <tt>vmult(dst, src)</tt> to use non-zero data in the vector
+       * <tt>dst</tt>, appending to it the Chebyshev corrections. This can be
+       * useful in some situations (e.g. when used for high-frequency error
+       * smoothing), but not the way the solver classes expect a
+       * preconditioner to work (where one ignores the content in <tt>dst</tt>
+       * for the preconditioner application). The user should really know what
+       * she is doing when touching this flag.
        */
       bool nonzero_starting;
     };
 
     /**
-     * Initialize function. Takes
-     * the matrix which is used to
-     * form the preconditioner, and
-     * additional flags if there
-     * are any.
+     * Initialize function. Takes the matrix which is used to form the
+     * preconditioner, and additional flags if there are any.
      */
     void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
@@ -1301,7 +1335,7 @@ namespace TrilinosWrappers
                       const unsigned int                     n_cycles = 1,
                       const bool                             w_cyle = false,
                       const double                           aggregation_threshold = 1e-4,
-                      const std::vector<std::vector<bool> > &constant_modes = std::vector<std::vector<bool> > (1),
+                      const std::vector<std::vector<bool> > &constant_modes = std::vector<std::vector<bool> > (0),
                       const unsigned int                     smoother_sweeps = 2,
                       const unsigned int                     smoother_overlap = 0,
                       const bool                             output_details = false,
@@ -1382,34 +1416,36 @@ namespace TrilinosWrappers
       /**
        * Determines which smoother to use for the AMG cycle. Possibilities
        * for smoother_type are the following:
-       *     "Aztec"
-       *     "IFPACK"
-       *     "Jacobi"
-       *     "ML symmetric Gauss-Seidel"
-       *     "symmetric Gauss-Seidel"
-       *     "ML Gauss-Seidel"
-       *     "Gauss-Seidel"
-       *     "block Gauss-Seidel"
-       *     "symmetric block Gauss-Seidel"
-       *     "Chebyshev"
-       *     "MLS"
-       *     "Hiptmair"
-       *     "Amesos-KLU"
-       *     "Amesos-Superlu"
-       *     "Amesos-UMFPACK"
-       *     "Amesos-Superludist"
-       *     "Amesos-MUMPS"
-       *     "user-defined"
-       *     "SuperLU"
-       *     "IFPACK-Chebyshev"
-       *     "self"
-       *     "do-nothing"
-       *     "IC"
-       *     "ICT"
-       *     "ILU"
-       *     "ILUT"
-       *     "Block Chebyshev"
-       *     "IFPACK-Block Chebyshev"
+       * <ul>
+       *   <li>  "Aztec" </li>
+       *   <li>  "IFPACK" </li>
+       *   <li>  "Jacobi" </li>
+       *   <li>  "ML symmetric Gauss-Seidel" </li>
+       *   <li>  "symmetric Gauss-Seidel" </li>
+       *   <li>  "ML Gauss-Seidel" </li>
+       *   <li>  "Gauss-Seidel" </li>
+       *   <li>  "block Gauss-Seidel" </li>
+       *   <li>  "symmetric block Gauss-Seidel" </li>
+       *   <li>  "Chebyshev" </li>
+       *   <li>  "MLS" </li>
+       *   <li>  "Hiptmair" </li>
+       *   <li>  "Amesos-KLU" </li>
+       *   <li>  "Amesos-Superlu" </li>
+       *   <li>  "Amesos-UMFPACK" </li>
+       *   <li>  "Amesos-Superludist" </li>
+       *   <li>  "Amesos-MUMPS" </li>
+       *   <li>  "user-defined" </li>
+       *   <li>  "SuperLU" </li>
+       *   <li>  "IFPACK-Chebyshev" </li>
+       *   <li>  "self" </li>
+       *   <li>  "do-nothing" </li>
+       *   <li>  "IC" </li>
+       *   <li>  "ICT" </li>
+       *   <li>  "ILU" </li>
+       *   <li>  "ILUT" </li>
+       *   <li>  "Block Chebyshev" </li>
+       *   <li>  "IFPACK-Block Chebyshev" </li>
+       * </ul>
        */
       const char* smoother_type;
 
@@ -1591,30 +1627,15 @@ namespace TrilinosWrappers
   }
 
 
-  // For the implementation of
-  // the <code>vmult</code>
-  // function with deal.II data
-  // structures we note that
-  // invoking a call of the
-  // Trilinos preconditioner
-  // requires us to use Epetra
-  // vectors as well. We do this
-  // by providing a view, i.e.,
-  // feed Trilinos with a
-  // pointer to the data, so we
-  // avoid copying the content
-  // of the vectors during the
-  // iteration (this function is
-  // only useful when used in
-  // serial anyway). In the
-  // declaration of the right
-  // hand side, we need to cast
-  // the source vector (that is
-  // <code>const</code> in all
-  // deal.II calls) to
-  // non-constant value, as this
-  // is the way Trilinos wants
-  // to have them.
+  // For the implementation of the <code>vmult</code> function with deal.II
+  // data structures we note that invoking a call of the Trilinos
+  // preconditioner requires us to use Epetra vectors as well. We do this by
+  // providing a view, i.e., feed Trilinos with a pointer to the data, so we
+  // avoid copying the content of the vectors during the iteration (this
+  // function is only useful when used in serial anyway). In the declaration
+  // of the right hand side, we need to cast the source vector (that is
+  // <code>const</code> in all deal.II calls) to non-constant value, as this
+  // is the way Trilinos wants to have them.
   inline
   void PreconditionBase::vmult (dealii::Vector<double>       &dst,
                                 const dealii::Vector<double> &src) const

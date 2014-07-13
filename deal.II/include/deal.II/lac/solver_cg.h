@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,10 +37,14 @@ class PreconditionIdentity;
 /*@{*/
 
 /**
- * Preconditioned cg method for symmetric positive definite matrices.
- *
- * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the Solver base class.
+ * Preconditioned cg method for symmetric positive definite matrices. This
+ * class is used first in step-3 and step-4, but is used in many other
+ * tutorial programs as well. Like all other solver classes, it can work on
+ * any kind of vector and matrix as long as they satisfy certain requirements
+ * (for the requirements on matrices and vectors in order to work with this
+ * class, see the documentation of the Solver base class). The type of the
+ * solution vector must be passed as template argument, and defaults to
+ * dealii::Vector<double>.
  *
  * Like all other solver classes, this class has a local structure
  * called @p AdditionalData which is used to pass additional
@@ -48,10 +52,11 @@ class PreconditionIdentity;
  * a switch allowing for additional output for the computation of
  * eigenvalues of the matrix.
  *
- * <h3>Eigenvalue computation</h3>
+ * @note This version of CG is taken from D. Braess's book "Finite
+ * Elements". It requires a symmetric preconditioner (i.e., for example, SOR
+ * is not a possible choice).
  *
- * See Y. Saad: "Iterative methods for Sparse Linear Systems", section
- * 6.7.3 for details.
+ * <h3>Eigenvalue computation</h3>
  *
  * The cg-method performs an orthogonal projection of the original
  * preconditioned linear system to another system of smaller
@@ -71,8 +76,8 @@ class PreconditionIdentity;
  * <tt>sqrt(beta_0)/alpha_0</tt>, ..., <tt>sqrt(beta_{m-2</tt>)/alpha_{m-2}}.
  * The eigenvalues of this matrix can be computed by postprocessing.
  *
- * This version of CG is taken from Braess: "Finite Elements". It
- * requires a symmetric preconditioner, i.e. SOR is not feasible.
+ * See Y. Saad: "Iterative methods for Sparse Linear Systems", section
+ * 6.7.3 for details.
  *
  * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */

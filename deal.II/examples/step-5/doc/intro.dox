@@ -1,6 +1,7 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+@dealiiVideoLecture{14}
 
 This example does not show revolutionary new things, but it shows many
 small improvements over the previous examples, and also many small
@@ -29,7 +30,7 @@ them are:
        complex, so debugging is an important aspect. We support safe
        programming by using assertions that check the validity of
        parameters and %internal states in a debug mode, but are removed
-       in optimized mode.
+       in optimized mode. (@dealiiVideoLectureSeeAlso{18})
   <li> Regarding the mathematical side, we show how to support a
        variable coefficient in the elliptic operator and how to use
        preconditioned iterative solvers for the linear systems of

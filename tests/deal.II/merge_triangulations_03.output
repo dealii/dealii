@@ -1,0 +1,17 @@
+
+DEAL::Mesh info for shell.eps:
+DEAL:: dimension: 2
+DEAL:: no. of cells: 8
+DEAL:: boundary indicators: 0(8 times) 1(8 times) 
+DEAL::Mesh info for ball.eps:
+DEAL:: dimension: 2
+DEAL:: no. of cells: 20
+DEAL:: boundary indicators: 0(8 times) 
+DEAL::Mesh info for flat_ball.eps:
+DEAL:: dimension: 2
+DEAL:: no. of cells: 20
+DEAL:: boundary indicators: 0(8 times) 
+DEAL::Mesh info for tria_out.eps:
+DEAL:: dimension: 2
+DEAL:: no. of cells: 28
+DEAL:: boundary indicators: 0(8 times) 

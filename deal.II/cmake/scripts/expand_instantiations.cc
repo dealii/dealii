@@ -67,40 +67,37 @@ std::map<std::string, std::list<std::string> >  expansion_lists;
 // return the result
 std::string
 replace_all (const std::string &in,
-	     const std::string &pattern,
-	     const std::string &substitute)
+             const std::string &pattern,
+             const std::string &substitute)
 {
   std::string x = in;
   while (x.find(pattern) != std::string::npos)
     x.replace (x.find(pattern),
-	       pattern.size(),
-	       substitute);
+               pattern.size(),
+               substitute);
   return x;
 }
 
 
-// extract from the start of #in the part of the string that ends with one of
-// the characters in #delim_list. The extracted part is deleted from #in
-// and returned. We skip characters in delim_list if they are preceded
-// by a backslash
+// extract from the start of #in the part of the string that ends with one
+// of the characters in #delim_list. The extracted part is deleted from #in
+// and returned. We skip characters in delim_list if they are preceded by a
+// backslash
 std::string
 get_substring_with_delim (std::string       &in,
-			  const std::string &delim_list)
+                          const std::string &delim_list)
 {
   std::string x;
   while (in.size() != 0)
     {
-				       // stop copying to the result
-				       // if the current character is
-				       // a delimiter, but only if the
-				       // previous character was not a
-				       // backslash
+      // stop copying to the result if the current character is a
+      // delimiter, but only if the previous character was not a backslash
       if ((delim_list.find (in[0]) != std::string::npos)
-	  &&
-	  !((x.size() > 0)
-	    &&
-	    (x[x.size()-1] == '\\')))
-	break;
+          &&
+          !((x.size() > 0)
+            &&
+            (x[x.size()-1] == '\\')))
+        break;
 
       x += in[0];
       in.erase (0, 1);
@@ -115,8 +112,8 @@ void
 skip_space (std::string &in)
 {
   while ((in.size() != 0)
-	 &&
-	 ((in[0] == ' ') || (in[0] == '\t') || (in[0] == '\n')))
+         &&
+         ((in[0] == ' ') || (in[0] == '\t') || (in[0] == '\n')))
     in.erase (0, 1);
 }
 
@@ -132,14 +129,14 @@ std::string remove_comments (std::string line)
     {
       const std::string::size_type slash_star_comment_end = line.find ("*/");
       if (slash_star_comment_end == std::string::npos)
-	{
-	  std::cerr << "The program can currently only handle /* block */"
-		    << "comments that start and end within the same line."
-		    << std::endl;
-	  std::exit (1);
-	}
+        {
+          std::cerr << "The program can currently only handle /* block */"
+                    << "comments that start and end within the same line."
+                    << std::endl;
+          std::exit (1);
+        }
       line.erase (slash_star_comment_begin,
-		  slash_star_comment_end - slash_star_comment_begin + 2);
+                  slash_star_comment_end - slash_star_comment_begin + 2);
     }
 
   return line;
@@ -159,8 +156,7 @@ std::string read_whole_file (std::istream &in)
       whole_file += remove_comments (line);
       whole_file += '\n';
     }
-				   // substitute tabs by spaces, multiple
-				   // spaces by single ones
+  // substitute tabs by spaces, multiple spaces by single ones
   for (unsigned int i=0; i<whole_file.size(); ++i)
     if (whole_file[i] == '\t')
       whole_file[i] = ' ';
@@ -172,33 +168,33 @@ std::string read_whole_file (std::istream &in)
 
 
 
-// split a given string assumed to consist of a list of substrings delimited
-// by a particular character into its components
+// split a given string assumed to consist of a list of substrings
+// delimited by a particular character into its components
 std::list<std::string>
 split_string_list (const std::string &s,
-		   const char         delimiter)
+                   const char         delimiter)
 {
   std::string tmp = s;
   std::list<std::string> split_list;
 
-				   // split the input list
+  // split the input list
   while (tmp.length() != 0)
     {
       std::string name;
       name = tmp;
 
       if (name.find(delimiter) != std::string::npos)
-	{
-	  name.erase (name.find(delimiter), std::string::npos);
-	  tmp.erase (0, tmp.find(delimiter)+1);
-	}
+        {
+          name.erase (name.find(delimiter), std::string::npos);
+          tmp.erase (0, tmp.find(delimiter)+1);
+        }
       else
-	tmp = "";
+        tmp = "";
 
       skip_space (name);
 
       while ((name.size() != 0) && (name[name.length()-1] == ' '))
-	name.erase (name.length()-1, 1);
+        name.erase (name.length()-1, 1);
 
       split_list.push_back (name);
     }
@@ -223,16 +219,16 @@ delete_empty_entries (const std::list<std::string> &list)
 
 
 
-// determine whether a given substring at position #pos and length #length in
-// the string #text is a real token, i.e. not just part of another word
+// determine whether a given substring at position #pos and length #length
+// in the string #text is a real token, i.e. not just part of another word
 bool is_real_token (const std::string &text,
-		    const std::string::size_type pos,
-		    const std::string::size_type length)
+                    const std::string::size_type pos,
+                    const std::string::size_type length)
 {
   static const std::string token_chars ("abcdefghijklmnopqrstuvwxyz"
-					"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-					"0123456789"
-					"_");
+                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                        "0123456789"
+                                        "_");
   if ((pos != 0) && (token_chars.find (text[pos-1]) != std::string::npos))
     return false;
 
@@ -245,25 +241,26 @@ bool is_real_token (const std::string &text,
 
 
 // substitute all occurrences of #token in #text by #substitute. because a
-// replacement token could be a templated class like std::complex<double> and
-// because the token to the substituted may be a template argument itself, we
-// surround the substitution by a space which shouldn't matter in C++
+// replacement token could be a templated class like std::complex<double>
+// and because the token to the substituted may be a template argument
+// itself, we surround the substitution by a space which shouldn't matter
+// in C++
 std::string substitute_tokens (const std::string &text,
-			       const std::string &token,
-			       const std::string &substitute)
+                               const std::string &token,
+                               const std::string &substitute)
 {
   std::string x_text = text;
   std::string::size_type pos = 0;
   while ((pos = x_text.find(token, pos)) != std::string::npos)
     {
       if (is_real_token (x_text, pos, token.size()))
-	{
-	  x_text.replace (pos, token.size(),
-			  std::string(" ")+substitute+std::string(" "));
-	  pos += substitute.size()+2;
-	}
+        {
+          x_text.replace (pos, token.size(),
+                          std::string(" ")+substitute+std::string(" "));
+          pos += substitute.size()+2;
+        }
       else
-	++pos;
+        ++pos;
     }
 
   return x_text;
@@ -275,9 +272,9 @@ std::string substitute_tokens (const std::string &text,
 
 
 // read and parse the expansion lists like
-//     REAL_SCALARS    := { double; float; long double }
-// as specified at the top of the file and store them in
-// the global expansion_lists variable
+//   REAL_SCALARS    := { double; float; long double }
+// as specified at the top of the file and store them in the global
+// expansion_lists variable
 void read_expansion_lists (const std::string &filename)
 {
   std::ifstream in (filename.c_str());
@@ -285,61 +282,56 @@ void read_expansion_lists (const std::string &filename)
   if (! in)
     {
       std::cerr << "Instantiation list file can not be read!"
-		<< std::endl;
+                << std::endl;
       std::exit (1);
     }
 
-				   // read the entire file into a string for
-				   // simpler processing. replace end-of-line
-				   // characters by spaces
+  // read the entire file into a string for simpler processing. replace
+  // end-of-line characters by spaces
   std::string whole_file = read_whole_file (in);
 
-				   // now process entries of the form
-				   // NAME := { class1; class2; ...}.
+  // now process entries of the form
+  //   NAME := { class1; class2; ...}.
   while (whole_file.size() != 0)
     {
       const std::string
-	name = get_substring_with_delim (whole_file, " :");
+      name = get_substring_with_delim (whole_file, " :");
 
       skip_space (whole_file);
       if (whole_file.find (":=") != 0)
-	{
-	  std::cerr << "Invalid entry <" << name << '>' << std::endl;
-	  std::exit (1);
-	}
+        {
+          std::cerr << "Invalid entry <" << name << '>' << std::endl;
+          std::exit (1);
+        }
       whole_file.erase (0, 2);
       skip_space (whole_file);
       if (whole_file.find ("{") != 0)
-	{
-	  std::cerr << "Invalid entry <" << name << '>' << std::endl;
-	  std::exit (1);
-	}
+        {
+          std::cerr << "Invalid entry <" << name << '>' << std::endl;
+          std::exit (1);
+        }
       whole_file.erase (0, 1);
       skip_space (whole_file);
 
       std::string
-	expansion = get_substring_with_delim (whole_file, "}");
+      expansion = get_substring_with_delim (whole_file, "}");
 
       if (whole_file.find ("}") != 0)
-	{
-	  std::cerr << "Invalid entry <" << name << '>' << std::endl;
-	  std::exit (1);
-	}
+        {
+          std::cerr << "Invalid entry <" << name << '>' << std::endl;
+          std::exit (1);
+        }
       whole_file.erase (0, 1);
       skip_space (whole_file);
 
-				       // assign but remove empty entries;
-				       // this may happen if an expansion list
-				       // ends in a semicolon (then we get an
-				       // empty entry at the end), or if there
-				       // are multiple semicolons after each
-				       // other (this may happen if, for
-				       // example, we have "Vector<double>;
-				       // TRILINOS_VECTOR;" and if
-				       // TRILINOS_VECTOR is an empty
-				       // expansion after running ./configure)
+      // assign but remove empty entries; this may happen if an expansion
+      // list ends in a semicolon (then we get an empty entry at the end),
+      // or if there are multiple semicolons after each other (this may
+      // happen if, for example, we have "Vector<double>; TRILINOS_VECTOR;"
+      // and if TRILINOS_VECTOR is an empty expansion after running
+      // ./configure)
       expansion_lists[name]
-	= delete_empty_entries (split_string_list (expansion, ';'));
+        = delete_empty_entries (split_string_list (expansion, ';'));
     }
 }
 
@@ -348,145 +340,138 @@ void read_expansion_lists (const std::string &filename)
 // produce all combinations of substitutions of the tokens given in the
 // #substitutions list in #text and output it to std::cout
 void substitute (const std::string &text,
-		 const std::list<std::pair<std::string, std::string> > &substitutions)
+                 const std::list<std::pair<std::string, std::string> > &substitutions)
 {
-				   // do things recursively: if the list of
-				   // substitutions has a single entry, then
-				   // process all of them. otherwise, process
-				   // the first in the list and call the
-				   // function recursively with the rest of
-				   // the substitutions
+  // do things recursively: if the list of substitutions has a single
+  // entry, then process all of them. otherwise, process the first in the
+  // list and call the function recursively with the rest of the
+  // substitutions
   if (substitutions.size() > 1)
     {
-				       // do the first substitution, then call
-				       // function recursively
+      // do the first substitution, then call function recursively
       const std::string name    = substitutions.front().first,
-			pattern = substitutions.front().second;
+                        pattern = substitutions.front().second;
 
       const std::list<std::pair<std::string, std::string> >
-	rest_of_substitutions (++substitutions.begin(),
-			       substitutions.end());
+      rest_of_substitutions (++substitutions.begin(),
+                             substitutions.end());
 
       for (std::list<std::string>::const_iterator
-	     expansion = expansion_lists[pattern].begin();
-	   expansion != expansion_lists[pattern].end();
-	   ++expansion)
-	{
-	  std::string new_text
-	    = substitute_tokens (text, name, *expansion);
+           expansion = expansion_lists[pattern].begin();
+           expansion != expansion_lists[pattern].end();
+           ++expansion)
+        {
+          std::string new_text
+            = substitute_tokens (text, name, *expansion);
 
-	  substitute (new_text, rest_of_substitutions);
-	}
+          substitute (new_text, rest_of_substitutions);
+        }
     }
   else if (substitutions.size() == 1)
     {
-				       // do the substitutions
+      // do the substitutions
       const std::string name    = substitutions.front().first,
-			pattern = substitutions.front().second;
+                        pattern = substitutions.front().second;
 
       for (std::list<std::string>::const_iterator
-	     expansion = expansion_lists[pattern].begin();
-	   expansion != expansion_lists[pattern].end();
-	   ++expansion)
-	std::cout << substitute_tokens (text, name, *expansion)
-		  << std::endl;
+           expansion = expansion_lists[pattern].begin();
+           expansion != expansion_lists[pattern].end();
+           ++expansion)
+        std::cout << substitute_tokens (text, name, *expansion)
+                  << std::endl;
     }
   else
     {
       std::cout << text
-		<< std::endl;
+                << std::endl;
     }
 }
 
 
 
 // process the list of instantiations given in the form
-// --------------------
-// for (u,v:VECTORS; z:SCALARS) { f(u, z, const v &); }
-// --------------------
+//   for (u,v:VECTORS; z:SCALARS) { f(u, z, const v &); }
 void process_instantiations ()
 {
   std::string whole_file = read_whole_file (std::cin);
 
-				   // process entries of the form
-				   //  for (X:Y; A:B) { INST }
+  // process entries of the form
+  //   for (X:Y; A:B) { INST }
   while (whole_file.size() != 0)
     {
       skip_space (whole_file);
       if (whole_file.find ("for") != 0)
-	{
-	  std::cerr << "Invalid instantiation list: missing 'for'" << std::endl;
-	  std::exit (1);
-	}
+        {
+          std::cerr << "Invalid instantiation list: missing 'for'" << std::endl;
+          std::exit (1);
+        }
       whole_file.erase (0, 3);
       skip_space (whole_file);
       if (whole_file.find ("(") != 0)
-	{
-	  std::cerr << "Invalid instantiation list: missing '('" << std::endl;
-	  std::exit (1);
-	}
+        {
+          std::cerr << "Invalid instantiation list: missing '('" << std::endl;
+          std::exit (1);
+        }
       whole_file.erase (0, 1);
       skip_space (whole_file);
 
       const std::list<std::string>
-	substitutions_list
-	= split_string_list (get_substring_with_delim (whole_file,
-						       ")"),
-			     ';');
+      substitutions_list
+        = split_string_list (get_substring_with_delim (whole_file,
+                                                       ")"),
+                             ';');
       if (whole_file.find (")") != 0)
-	{
-	  std::cerr << "Invalid instantiation list: missing ')'" << std::endl;
-	  std::exit (1);
-	}
+        {
+          std::cerr << "Invalid instantiation list: missing ')'" << std::endl;
+          std::exit (1);
+        }
       whole_file.erase (0, 1);
       skip_space (whole_file);
 
-				       // process the header
+      // process the header
       std::list<std::pair<std::string, std::string> >
-	substitutions;
+      substitutions;
 
       for (std::list<std::string>::const_iterator
-	     s = substitutions_list.begin();
-	   s != substitutions_list.end(); ++s)
-	{
-	  const std::list<std::string>
-	    names_and_type = split_string_list (*s, ':');
-	  if (names_and_type.size() != 2)
-	    {
-	      std::cerr << "Invalid instantiation header" << std::endl;
-	      std::exit (1);
-	    }
+           s = substitutions_list.begin();
+           s != substitutions_list.end(); ++s)
+        {
+          const std::list<std::string>
+          names_and_type = split_string_list (*s, ':');
+          if (names_and_type.size() != 2)
+            {
+              std::cerr << "Invalid instantiation header" << std::endl;
+              std::exit (1);
+            }
 
-	  const std::list<std::string>
-	    names = split_string_list (names_and_type.front(), ',');
+          const std::list<std::string>
+          names = split_string_list (names_and_type.front(), ',');
 
-	  for (std::list<std::string>::const_iterator
-		 x = names.begin(); x != names.end(); ++x)
-	    substitutions.push_back (std::make_pair (*x,
-						     names_and_type.back()));
-	}
+          for (std::list<std::string>::const_iterator
+               x = names.begin(); x != names.end(); ++x)
+            substitutions.push_back (std::make_pair (*x,
+                                                     names_and_type.back()));
+        }
 
-				       // now read the part in {...}
+      // now read the part in {...}
       skip_space (whole_file);
       if (whole_file.find ("{") != 0)
-	{
-	  std::cerr << "Invalid substitution text" << std::endl;
-	  std::exit (1);
-	}
+        {
+          std::cerr << "Invalid substitution text" << std::endl;
+          std::exit (1);
+        }
       whole_file.erase (0, 1);
       skip_space (whole_file);
       const std::string text_to_substitute
-	= get_substring_with_delim (whole_file, "}");
+        = get_substring_with_delim (whole_file, "}");
       whole_file.erase (0,1);
       skip_space (whole_file);
 
-				       // now produce the
-				       // substitutions. first replace
-				       // all occurrences of "\{" by
-				       // "{"
+      // now produce the substitutions. first replace all occurrences of
+      // "\{" by "{"
       substitute (replace_all(replace_all(text_to_substitute, "\\{", "{"),
-			      "\\}", "}"),
-		  substitutions);
+                              "\\}", "}"),
+                  substitutions);
     }
 }
 
@@ -497,8 +482,8 @@ int main (int argc, char **argv)
   if (argc < 2)
     {
       std::cerr << "Usage: " << std::endl
-		<< "  expand_instantiations class_list_files < in_file > out_file"
-		<< std::endl;
+                << "  expand_instantiations class_list_files < in_file > out_file"
+                << std::endl;
       std::exit (1);
     }
 

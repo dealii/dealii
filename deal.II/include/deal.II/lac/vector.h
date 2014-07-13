@@ -111,10 +111,8 @@ class Vector : public Subscriptor
 {
 public:
   /**
-   * Declare standard types used in all
-   * containers. These types parallel
-   * those in the <tt>C++</tt> standard libraries
-   * <tt>vector<...></tt> class.
+   * Declare standard types used in all containers. These types parallel those
+   * in the <tt>C++</tt> standard libraries <tt>vector<...></tt> class.
    */
   typedef Number                                            value_type;
   typedef value_type                                       *pointer;
@@ -126,23 +124,13 @@ public:
   typedef types::global_dof_index                           size_type;
 
   /**
-   * Declare a type that has holds
-   * real-valued numbers with the
-   * same precision as the template
-   * argument to this class. If the
-   * template argument of this
-   * class is a real data type,
-   * then real_type equals the
-   * template argument. If the
-   * template argument is a
-   * std::complex type then
-   * real_type equals the type
-   * underlying the complex
-   * numbers.
+   * Declare a type that has holds real-valued numbers with the same precision
+   * as the template argument to this class. If the template argument of this
+   * class is a real data type, then real_type equals the template
+   * argument. If the template argument is a std::complex type then real_type
+   * equals the type underlying the complex numbers.
    *
-   * This typedef is used to
-   * represent the return type of
-   * norms.
+   * This typedef is used to represent the return type of norms.
    */
   typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
@@ -166,43 +154,32 @@ public:
    */
   //@{
   /**
-   *  Constructor. Create a vector of
-   *  dimension zero.
+   *  Constructor. Create a vector of dimension zero.
    */
   Vector ();
 
   /**
-   * Copy-constructor. Sets the dimension
-   * to that of the given vector, and
+   * Copy-constructor. Sets the dimension to that of the given vector, and
    * copies all elements.
    *
-   * We would like to make this
-   * constructor explicit, but STL
-   * insists on using it implicitly.
+   * We would like to make this constructor explicit, but STL insists on using
+   * it implicitly.
    */
   Vector (const Vector<Number> &v);
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
   /**
-   * Copy constructor taking a vector of
-   * another data type. This will fail if
-   * there is no conversion path from
-   * @p OtherNumber to @p Number. Note that
-   * you may lose accuracy when copying
-   * to a vector with data elements with
+   * Copy constructor taking a vector of another data type. This will fail if
+   * there is no conversion path from @p OtherNumber to @p Number. Note that
+   * you may lose accuracy when copying to a vector with data elements with
    * less accuracy.
    *
-   * Older versions of gcc did not honor
-   * the @p explicit keyword on template
-   * constructors. In such cases, it is
-   * easy to accidentally write code that
-   * can be very inefficient, since the
-   * compiler starts performing hidden
-   * conversions. To avoid this, this
-   * function is disabled if we have
-   * detected a broken compiler during
-   * configuration.
+   * Older versions of gcc did not honor the @p explicit keyword on template
+   * constructors. In such cases, it is easy to accidentally write code that
+   * can be very inefficient, since the compiler starts performing hidden
+   * conversions. To avoid this, this function is disabled if we have detected
+   * a broken compiler during configuration.
    */
   template <typename OtherNumber>
   explicit
@@ -211,164 +188,111 @@ public:
 
 #ifdef DEAL_II_WITH_PETSC
   /**
-   * Another copy constructor: copy the
-   * values from a sequential PETSc wrapper
-   * vector class. This copy constructor is
-   * only available if PETSc was detected
-   * during configuration time.
+   * Another copy constructor: copy the values from a sequential PETSc wrapper
+   * vector class. This copy constructor is only available if PETSc was
+   * detected during configuration time.
    */
   Vector (const PETScWrappers::Vector &v);
 
   /**
-   * Another copy constructor: copy the
-   * values from a parallel PETSc wrapper
-   * vector class. This copy constructor is
-   * only available if PETSc was detected
-   * during configuration time.
+   * Another copy constructor: copy the values from a parallel PETSc wrapper
+   * vector class. This copy constructor is only available if PETSc was
+   * detected during configuration time.
    *
-   * Note that due to the communication
-   * model used in MPI, this operation can
-   * only succeed if all processes do it at
-   * the same time. I.e., it is not
-   * possible for only one process to
-   * obtain a copy of a parallel vector
-   * while the other jobs do something
-   * else.
+   * Note that due to the communication model used in MPI, this operation can
+   * only succeed if all processes do it at the same time. I.e., it is not
+   * possible for only one process to obtain a copy of a parallel vector while
+   * the other jobs do something else.
    */
   Vector (const PETScWrappers::MPI::Vector &v);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
-   * Another copy constructor: copy
-   * the values from a Trilinos
-   * wrapper vector. This copy
-   * constructor is only available if
-   * Trilinos was detected during
-   * configuration time.
+   * Another copy constructor: copy the values from a Trilinos wrapper
+   * vector. This copy constructor is only available if Trilinos was detected
+   * during configuration time.
    *
-   * Note that due to the
-   * communication model used in MPI,
-   * this operation can only succeed
-   * if all processes do it at the
-   * same time. This means that it is
-   * not possible for only one
-   * process to obtain a copy of a
-   * parallel vector while the other
-   * jobs do something else. This
-   * call will rather result in a
-   * copy of the vector on all
-   * processors.
+   * Note that due to the communication model used in MPI, this operation can
+   * only succeed if all processes do it at the same time. This means that it
+   * is not possible for only one process to obtain a copy of a parallel
+   * vector while the other jobs do something else. This call will rather
+   * result in a copy of the vector on all processors.
    */
   Vector (const TrilinosWrappers::MPI::Vector &v);
 
   /**
-   * Another copy constructor: copy
-   * the values from a localized
-   * Trilinos wrapper vector. This
-   * copy constructor is only
-   * available if Trilinos was
-   * detected during configuration
-   * time.
+   * Another copy constructor: copy the values from a localized Trilinos
+   * wrapper vector. This copy constructor is only available if Trilinos was
+   * detected during configuration time.
    */
   Vector (const TrilinosWrappers::Vector &v);
 #endif
 
   /**
-   * Constructor. Set dimension to
-   * @p n and initialize all
-   * elements with zero.
+   * Constructor. Set dimension to @p n and initialize all elements with zero.
    *
-   * The constructor is made
-   * explicit to avoid accidents
-   * like this:
-   * <tt>v=0;</tt>. Presumably, the user
-   * wants to set every element of
-   * the vector to zero, but
-   * instead, what happens is this
-   * call:
-   * <tt>v=Vector@<number@>(0);</tt>,
-   * i.e. the vector is replaced by
-   * one of length zero.
+   * The constructor is made explicit to avoid accidents like this:
+   * <tt>v=0;</tt>. Presumably, the user wants to set every element of the
+   * vector to zero, but instead, what happens is this call:
+   * <tt>v=Vector@<number@>(0);</tt>, i.e. the vector is replaced by one of
+   * length zero.
    */
   explicit Vector (const size_type n);
 
   /**
-   * Initialize the vector with a
-   * given range of values pointed
-   * to by the iterators. This
-   * function is there in analogy
-   * to the @p std::vector class.
+   * Initialize the vector with a given range of values pointed to by the
+   * iterators. This function is there in analogy to the @p std::vector class.
    */
   template <typename InputIterator>
   Vector (const InputIterator first,
           const InputIterator last);
 
   /**
-   * Destructor, deallocates
-   * memory. Made virtual to allow
-   * for derived classes to behave
-   * properly.
+   * Destructor, deallocates memory. Made virtual to allow for derived classes
+   * to behave properly.
    */
   virtual ~Vector ();
 
   /**
-   * This function does nothing but is
-   * there for compatibility with the
-   * @p PETScWrappers::Vector class.
+   * This function does nothing but is there for compatibility with the @p
+   * PETScWrappers::Vector class.
    *
-   * For the PETSc vector wrapper class,
-   * this function compresses the
-   * underlying representation of the PETSc
-   * object, i.e. flushes the buffers of
-   * the vector object if it has any. This
-   * function is necessary after writing
-   * into a vector element-by-element and
-   * before anything else can be done on
-   * it.
+   * For the PETSc vector wrapper class, this function compresses the
+   * underlying representation of the PETSc object, i.e. flushes the buffers
+   * of the vector object if it has any. This function is necessary after
+   * writing into a vector element-by-element and before anything else can be
+   * done on it.
    *
-   * However, for the implementation of
-   * this class, it is immaterial and thus
+   * However, for the implementation of this class, it is immaterial and thus
    * an empty function.
    */
   void compress (::dealii::VectorOperation::values operation
                  =::dealii::VectorOperation::unknown) const;
 
   /**
-   * Change the dimension of the vector to
-   * @p N. The reserved memory for this
-   * vector remains unchanged if possible,
-   * to make things faster; this may waste
-   * some memory, so keep this in mind.
-   * However, if <tt>N==0</tt> all memory is
-   * freed, i.e. if you want to resize the
-   * vector and release the memory not
-   * needed, you have to first call
-   * <tt>reinit(0)</tt> and then
-   * <tt>reinit(N)</tt>. This cited behaviour is
-   * analogous to that of the STL
+   * Change the dimension of the vector to @p N. The reserved memory for this
+   * vector remains unchanged if possible, to make things faster; this may
+   * waste some memory, so keep this in mind.  However, if <tt>N==0</tt> all
+   * memory is freed, i.e. if you want to resize the vector and release the
+   * memory not needed, you have to first call <tt>reinit(0)</tt> and then
+   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the STL
    * containers.
    *
-   * If @p fast is false, the vector is
-   * filled by zeros. Otherwise, the
-   * elements are left an unspecified
-   * state.
+   * If @p fast is false, the vector is filled by zeros. Otherwise, the
+   * elements are left an unspecified state.
    *
-   * This function is virtual in
-   * order to allow for derived
-   * classes to handle memory
-   * separately.
+   * This function is virtual in order to allow for derived classes to handle
+   * memory separately.
    */
   virtual void reinit (const size_type N,
                        const bool      fast=false);
 
   /**
-   * Change the dimension to that of the
-   * vector @p V. The same applies as for
+   * Change the dimension to that of the vector @p V. The same applies as for
    * the other @p reinit function.
    *
-   * The elements of @p V are not copied,
-   * i.e.  this function is the same as
+   * The elements of @p V are not copied, i.e.  this function is the same as
    * calling <tt>reinit (V.size(), fast)</tt>.
    */
   template <typename Number2>
@@ -376,105 +300,75 @@ public:
                const bool            fast=false);
 
   /**
-   * Swap the contents of this
-   * vector and the other vector
-   * @p v. One could do this
-   * operation with a temporary
-   * variable and copying over the
-   * data elements, but this
-   * function is significantly more
-   * efficient since it only swaps
-   * the pointers to the data of
-   * the two vectors and therefore
-   * does not need to allocate
-   * temporary storage and move
-   * data around.
+   * Swap the contents of this vector and the other vector @p v. One could do
+   * this operation with a temporary variable and copying over the data
+   * elements, but this function is significantly more efficient since it only
+   * swaps the pointers to the data of the two vectors and therefore does not
+   * need to allocate temporary storage and move data around.
    *
-   * This function is analog to the
-   * the @p swap function of all C++
-   * standard containers. Also,
-   * there is a global function
-   * <tt>swap(u,v)</tt> that simply calls
-   * <tt>u.swap(v)</tt>, again in analogy
-   * to standard functions.
+   * This function is analog to the the @p swap function of all C++ standard
+   * containers. Also, there is a global function <tt>swap(u,v)</tt> that
+   * simply calls <tt>u.swap(v)</tt>, again in analogy to standard functions.
    *
-   * This function is virtual in
-   * order to allow for derived
-   * classes to handle memory
-   * separately.
+   * This function is virtual in order to allow for derived classes to handle
+   * memory separately.
    */
   virtual void swap (Vector<Number> &v);
 
   /**
-   * Set all components of the vector to
-   * the given number @p s. Simply pass
-   * this down to the individual block
-   * objects, but we still need to declare
-   * this function to make the example
-   * given in the discussion about making
+   * Set all components of the vector to the given number @p s. Simply pass
+   * this down to the individual block objects, but we still need to declare
+   * this function to make the example given in the discussion about making
    * the constructor explicit work.
    *
-   * Since the semantics of assigning a
-   * scalar to a vector are not
-   * immediately clear, this operator
-   * should really only be used if you
-   * want to set the entire vector to
-   * zero. This allows the intuitive
-   * notation <tt>v=0</tt>. Assigning
-   * other values is deprecated and may
-   * be disallowed in the future.
+   * Since the semantics of assigning a scalar to a vector are not immediately
+   * clear, this operator should really only be used if you want to set the
+   * entire vector to zero. This allows the intuitive notation
+   * <tt>v=0</tt>. Assigning other values is deprecated and may be disallowed
+   * in the future.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator = (const Number s);
 
   /**
-   * Copy the given vector. Resize the
-   * present vector if necessary.
+   * Copy the given vector. Resize the present vector if necessary.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator= (const Vector<Number> &v);
 
   /**
-   * Copy the given vector. Resize the
-   * present vector if necessary.
+   * Copy the given vector. Resize the present vector if necessary.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   template <typename Number2>
   Vector<Number> &operator= (const Vector<Number2> &v);
 
   /**
-   * Copy operator for assigning a
-   * block vector to a regular
-   * vector.
+   * Copy operator for assigning a block vector to a regular vector.
    */
   Vector<Number> &operator= (const BlockVector<Number> &v);
 
 #ifdef DEAL_II_WITH_PETSC
   /**
-   * Another copy operator: copy the
-   * values from a sequential PETSc
-   * wrapper vector class. This
-   * operator is only available if
-   * PETSc was detected during
-   * configuration time.
+   * Another copy operator: copy the values from a sequential PETSc wrapper
+   * vector class. This operator is only available if PETSc was detected
+   * during configuration time.
    */
   Vector<Number> &
   operator = (const PETScWrappers::Vector &v);
 
   /**
-   * Another copy operator: copy the
-   * values from a parallel PETSc
-   * wrapper vector class. This
-   * operator is only available if
-   * PETSc was detected during
-   * configuration time.
+   * Another copy operator: copy the values from a parallel PETSc wrapper
+   * vector class. This operator is only available if PETSc was detected
+   * during configuration time.
    *
-   * Note that due to the
-   * communication model used in MPI,
-   * this operation can only succeed
-   * if all processes do it at the
-   * same time. I.e., it is not
-   * possible for only one process to
-   * obtain a copy of a parallel
-   * vector while the other jobs do
-   * something else.
+   * Note that due to the communication model used in MPI, this operation can
+   * only succeed if all processes do it at the same time. I.e., it is not
+   * possible for only one process to obtain a copy of a parallel vector while
+   * the other jobs do something else.
    */
   Vector<Number> &
   operator = (const PETScWrappers::MPI::Vector &v);
@@ -483,126 +377,116 @@ public:
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
-   * Another copy operator: copy
-   * the values from a (sequential
-   * or parallel, depending on the
-   * underlying compiler) Trilinos
-   * wrapper vector class. This
-   * operator is only available if
-   * Trilinos was detected during
-   * configuration time.
+   * Another copy operator: copy the values from a (sequential or parallel,
+   * depending on the underlying compiler) Trilinos wrapper vector class. This
+   * operator is only available if Trilinos was detected during configuration
+   * time.
    *
-   * Note that due to the
-   * communication model used in MPI,
-   * this operation can only succeed
-   * if all processes do it at the
-   * same time. I.e., it is not
-   * possible for only one process to
-   * obtain a copy of a parallel
-   * vector while the other jobs do
-   * something else.
+   * Note that due to the communication model used in MPI, this operation can
+   * only succeed if all processes do it at the same time. I.e., it is not
+   * possible for only one process to obtain a copy of a parallel vector while
+   * the other jobs do something else.
    */
   Vector<Number> &
   operator = (const TrilinosWrappers::MPI::Vector &v);
 
   /**
-   * Another copy operator: copy the
-   * values from a sequential
-   * Trilinos wrapper vector
-   * class. This operator is only
-   * available if Trilinos was
-   * detected during configuration
-   * time.
+   * Another copy operator: copy the values from a sequential Trilinos wrapper
+   * vector class. This operator is only available if Trilinos was detected
+   * during configuration time.
    */
   Vector<Number> &
   operator = (const TrilinosWrappers::Vector &v);
 #endif
 
   /**
-   * Test for equality. This function
-   * assumes that the present vector
-   * and the one to compare with have
-   * the same size already, since
-   * comparing vectors of different
-   * sizes makes not much sense
-   * anyway.
+   * Test for equality. This function assumes that the present vector and the
+   * one to compare with have the same size already, since comparing vectors
+   * of different sizes makes not much sense anyway.
    */
   template <typename Number2>
   bool operator == (const Vector<Number2> &v) const;
 
   /**
-   * Test for inequality. This function
-   * assumes that the present vector and
-   * the one to compare with have the same
-   * size already, since comparing vectors
-   * of different sizes makes not much
-   * sense anyway.
+   * Test for inequality. This function assumes that the present vector and
+   * the one to compare with have the same size already, since comparing
+   * vectors of different sizes makes not much sense anyway.
    */
   template <typename Number2>
   bool operator != (const Vector<Number2> &v) const;
 
   /**
-   * Return the scalar product of
-   * two vectors.  The return type
-   * is the underlying type of
-   * @p this vector, so the return
-   * type and the accuracy with
-   * which it the result is
-   * computed depend on the order
-   * of the arguments of this
-   * vector.
+   * Return the scalar product of two vectors.  The return type is the
+   * underlying type of @p this vector, so the return type and the accuracy
+   * with which it the result is computed depend on the order of the arguments
+   * of this vector.
    *
-   * For complex vectors, the
-   * scalar product is implemented
-   * as $\left<v,w\right>=\sum_i
-   * v_i \bar{w_i}$.
+   * For complex vectors, the scalar product is implemented as
+   * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
+   *
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
+   * summation with the same order of summation in every run, which gives
+   * fully repeatable results from one run to another.
    */
   template <typename Number2>
   Number operator * (const Vector<Number2> &V) const;
 
   /**
    * Return square of the $l_2$-norm.
+   *
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
+   * summation with the same order of summation in every run, which gives
+   * fully repeatable results from one run to another.
    */
   real_type norm_sqr () const;
 
   /**
-   * Mean value of the elements of
-   * this vector.
+   * Mean value of the elements of this vector.
+   *
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
+   * summation with the same order of summation in every run, which gives
+   * fully repeatable results from one run to another.
    */
   Number mean_value () const;
 
   /**
-   * $l_1$-norm of the vector.
-   * The sum of the absolute values.
+   * $l_1$-norm of the vector. The sum of the absolute values.
+   *
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
+   * summation with the same order of summation in every run, which gives
+   * fully repeatable results from one run to another.
    */
   real_type l1_norm () const;
 
   /**
-   * $l_2$-norm of the vector.  The
-   * square root of the sum of the
-   * squares of the elements.
+   * $l_2$-norm of the vector. The square root of the sum of the squares of
+   * the elements.
+   *
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
+   * summation with the same order of summation in every run, which gives
+   * fully repeatable results from one run to another.
    */
   real_type l2_norm () const;
 
   /**
-   * $l_p$-norm of the vector. The
-   * pth root of the sum of the pth
-   * powers of the absolute values
-   * of the elements.
+   * $l_p$-norm of the vector. The pth root of the sum of the pth powers of
+   * the absolute values of the elements.
+   *
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
+   * summation with the same order of summation in every run, which gives
+   * fully repeatable results from one run to another.
    */
   real_type lp_norm (const real_type p) const;
 
   /**
-   * Maximum absolute value of the
-   * elements.
+   * Maximum absolute value of the elements.
    */
   real_type linfty_norm () const;
 
   /**
-   * Returns true if the given global index is
-   * in the local range of this processor.
-   * Since this is not a distributed
-   * vector the method always returns true.
+   * Returns true if the given global index is in the local range of this
+   * processor.  Since this is not a distributed vector the method always
+   * returns true.
    */
   bool in_local_range (const size_type global_index) const;
 
@@ -632,55 +516,43 @@ public:
   std::size_t size () const;
 
   /**
-   * Return whether the vector contains only
-   * elements with value zero. This function
-   * is mainly for internal consistency
-   * checks and should seldom be used when
-   * not in debug mode since it uses quite
-   * some time.
+   * Return whether the vector contains only elements with value zero. This
+   * function is mainly for internal consistency checks and should seldom be
+   * used when not in debug mode since it uses quite some time.
    */
   bool all_zero () const;
 
   /**
-   * Return @p true if the vector has no
-   * negative entries, i.e. all entries are
-   * zero or positive. This function is
-   * used, for example, to check whether
-   * refinement indicators are really all
-   * positive (or zero).
+   * Return @p true if the vector has no negative entries, i.e. all entries
+   * are zero or positive. This function is used, for example, to check
+   * whether refinement indicators are really all positive (or zero).
    *
-   * The function obviously only makes
-   * sense if the template argument of this
-   * class is a real type. If it is a
-   * complex type, then an exception is
+   * The function obviously only makes sense if the template argument of this
+   * class is a real type. If it is a complex type, then an exception is
    * thrown.
    */
   bool is_non_negative () const;
 
   /**
-   * Make the @p Vector class a bit like
-   * the <tt>vector<></tt> class of the C++
-   * standard library by returning
-   * iterators to the start and end of the
+   * Make the @p Vector class a bit like the <tt>vector<></tt> class of the
+   * C++ standard library by returning iterators to the start and end of the
    * elements of this vector.
    */
   iterator begin ();
 
   /**
-   * Return constant iterator to the start of
-   * the vectors.
+   * Return constant iterator to the start of the vectors.
    */
   const_iterator begin () const;
 
   /**
-   * Return an iterator pointing to the
-   * element past the end of the array.
+   * Return an iterator pointing to the element past the end of the array.
    */
   iterator end ();
 
   /**
-   * Return a constant iterator pointing to
-   * the element past the end of the array.
+   * Return a constant iterator pointing to the element past the end of the
+   * array.
    */
   const_iterator end () const;
   //@}
@@ -691,50 +563,42 @@ public:
    */
   //@{
   /**
-   * Access the value of the @p ith
-   * component.
+   * Access the value of the @p ith component.
    */
   Number operator() (const size_type i) const;
 
   /**
-   * Access the @p ith component
-   * as a writeable reference.
+   * Access the @p ith component as a writeable reference.
    */
   Number &operator() (const size_type i);
 
   /**
-   * Access the value of the @p ith
-   * component.
+   * Access the value of the @p ith component.
    *
    * Exactly the same as operator().
    */
   Number operator[] (const size_type i) const;
 
   /**
-   * Access the @p ith component
-   * as a writeable reference.
+   * Access the @p ith component as a writeable reference.
    *
    * Exactly the same as operator().
    */
   Number &operator[] (const size_type i);
 
   /**
-   * A collective get operation: instead
-   * of getting individual elements of a
-   * vector, this function allows to get
-   * a whole set of elements at once. The
-   * indices of the elements to be read
-   * are stated in the first argument,
-   * the corresponding values are returned in the
-   * second.
+   * A collective get operation: instead of getting individual elements of a
+   * vector, this function allows to get a whole set of elements at once. The
+   * indices of the elements to be read are stated in the first argument, the
+   * corresponding values are returned in the second.
    */
   template <typename OtherNumber>
   void extract_subvector_to (const std::vector<size_type> &indices,
                              std::vector<OtherNumber> &values) const;
 
   /**
-   * Just as the above, but with pointers.
-   * Useful in minimizing copying of data around.
+   * Just as the above, but with pointers. Useful in minimizing copying of
+   * data around.
    */
   template <typename ForwardIterator, typename OutputIterator>
   void extract_subvector_to (ForwardIterator       indices_begin,
@@ -749,48 +613,39 @@ public:
   //@{
 
   /**
-   * Add the given vector to the present
-   * one.
+   * Add the given vector to the present one.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator += (const Vector<Number> &V);
 
   /**
-   * Subtract the given vector from the
-   * present one.
+   * Subtract the given vector from the present one.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator -= (const Vector<Number> &V);
 
   /**
-   * A collective add operation:
-   * This funnction adds a whole
-   * set of values stored in @p
-   * values to the vector
-   * components specified by @p
-   * indices.
+   * A collective add operation: This funnction adds a whole set of values
+   * stored in @p values to the vector components specified by @p indices.
    */
   template <typename OtherNumber>
   void add (const std::vector<size_type>   &indices,
             const std::vector<OtherNumber>  &values);
 
   /**
-   * This is a second collective
-   * add operation. As a
-   * difference, this function
-   * takes a deal.II vector of
-   * values.
+   * This is a second collective add operation. As a difference, this function
+   * takes a deal.II vector of values.
    */
   template <typename OtherNumber>
   void add (const std::vector<size_type> &indices,
             const Vector<OtherNumber>    &values);
 
   /**
-   * Take an address where
-   * <tt>n_elements</tt> are stored
-   * contiguously and add them into
-   * the vector. Handles all cases
-   * which are not covered by the
-   * other two <tt>add()</tt>
-   * functions above.
+   * Take an address where <tt>n_elements</tt> are stored contiguously and add
+   * them into the vector. Handles all cases which are not covered by the
+   * other two <tt>add()</tt> functions above.
    */
   template <typename OtherNumber>
   void add (const size_type    n_elements,
@@ -798,42 +653,47 @@ public:
             const OtherNumber  *values);
 
   /**
-   * Addition of @p s to all
-   * components. Note that @p s is a
-   * scalar and not a vector.
+   * Addition of @p s to all components. Note that @p s is a scalar and not a
+   * vector.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void add (const Number s);
 
   /**
-   * Simple vector addition, equal to the
-   * <tt>operator +=</tt>.
+   * Simple vector addition, equal to the <tt>operator +=</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void add (const Vector<Number> &V);
 
   /**
-   * Simple addition of a multiple of a
-   * vector, i.e. <tt>*this += a*V</tt>.
+   * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void add (const Number a, const Vector<Number> &V);
 
   /**
-   * Multiple addition of scaled vectors,
-   * i.e. <tt>*this += a*V+b*W</tt>.
+   * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void add (const Number a, const Vector<Number> &V,
             const Number b, const Vector<Number> &W);
 
   /**
-   * Scaling and simple vector addition,
-   * i.e.
-   * <tt>*this = s*(*this)+V</tt>.
+   * Scaling and simple vector addition, i.e.  <tt>*this = s*(*this)+V</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Vector<Number> &V);
 
   /**
-   * Scaling and simple addition, i.e.
-   * <tt>*this = s*(*this)+a*V</tt>.
+   * Scaling and simple addition, i.e.  <tt>*this = s*(*this)+a*V</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Number          a,
@@ -841,6 +701,8 @@ public:
 
   /**
    * Scaling and multiple addition.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Number          a,
@@ -849,8 +711,10 @@ public:
              const Vector<Number> &W);
 
   /**
-   * Scaling and multiple addition.
-   * <tt>*this = s*(*this)+a*V + b*W + c*X</tt>.
+   * Scaling and multiple addition.  <tt>*this = s*(*this)+a*V + b*W +
+   * c*X</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
              const Number          a,
@@ -861,14 +725,10 @@ public:
              const Vector<Number> &X);
 
   /**
-   * Scale each element of the
-   * vector by the given factor.
+   * Scale each element of the vector by the given factor.
    *
-   * @deprecated This function is deprecated
-   * and will be removed in a
-   * future version. Use
-   * <tt>operator *=</tt> and
-   * <tt>operator /=</tt> instead.
+   * @deprecated This function is deprecated and will be removed in a future
+   * version. Use <tt>operator *=</tt> and <tt>operator /=</tt> instead.
    */
   void scale (const Number factor) DEAL_II_DEPRECATED
   {
@@ -877,44 +737,40 @@ public:
 
 
   /**
-   * Scale each element of the
-   * vector by a constant
-   * value.
+   * Scale each element of the vector by a constant value.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator *= (const Number factor);
 
   /**
-   * Scale each element of the
-   * vector by the inverse of the
-   * given value.
+   * Scale each element of the vector by the inverse of the given value.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator /= (const Number factor);
 
   /**
-   * Scale each element of this
-   * vector by the corresponding
-   * element in the argument. This
-   * function is mostly meant to
-   * simulate multiplication (and
-   * immediate re-assignment) by a
-   * diagonal scaling matrix.
+   * Scale each element of this vector by the corresponding element in the
+   * argument. This function is mostly meant to simulate multiplication (and
+   * immediate re-assignment) by a diagonal scaling matrix.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void scale (const Vector<Number> &scaling_factors);
 
   /**
-   * Scale each element of this
-   * vector by the corresponding
-   * element in the argument. This
-   * function is mostly meant to
-   * simulate multiplication (and
-   * immediate re-assignment) by a
-   * diagonal scaling matrix.
+   * Scale each element of this vector by the corresponding element in the
+   * argument. This function is mostly meant to simulate multiplication (and
+   * immediate re-assignment) by a diagonal scaling matrix.
    */
   template <typename Number2>
   void scale (const Vector<Number2> &scaling_factors);
 
   /**
    * Assignment <tt>*this = a*u</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u);
 
@@ -926,49 +782,45 @@ public:
 
   /**
    * Assignment <tt>*this = a*u + b*v</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u,
             const Number b, const Vector<Number> &v);
 
   /**
    * Assignment <tt>*this = a*u + b*v + b*w</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u,
             const Number b, const Vector<Number> &v,
             const Number c, const Vector<Number> &w);
 
   /**
-   * Compute the elementwise ratio of the
-   * two given vectors, that is let
-   * <tt>this[i] = a[i]/b[i]</tt>. This is
-   * useful for example if you want to
-   * compute the cellwise ratio of true to
-   * estimated error.
+   * Compute the elementwise ratio of the two given vectors, that is let
+   * <tt>this[i] = a[i]/b[i]</tt>. This is useful for example if you want to
+   * compute the cellwise ratio of true to estimated error.
    *
-   * This vector is appropriately
-   * scaled to hold the result.
+   * This vector is appropriately scaled to hold the result.
    *
-   * If any of the <tt>b[i]</tt> is
-   * zero, the result is
-   * undefined. No attempt is made
-   * to catch such situations.
+   * If any of the <tt>b[i]</tt> is zero, the result is undefined. No attempt
+   * is made to catch such situations.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void ratio (const Vector<Number> &a,
               const Vector<Number> &b);
 
   /**
-   * This function does nothing but is
-   * there for compatibility with the
-   * @p PETScWrappers::Vector class.
+   * This function does nothing but is there for compatibility with the @p
+   * PETScWrappers::Vector class.
    *
-   * For the PETSc vector wrapper class,
-   * this function updates the ghost
-   * values of the PETSc vector. This
-   * is necessary after any modification
+   * For the PETSc vector wrapper class, this function updates the ghost
+   * values of the PETSc vector. This is necessary after any modification
    * before reading ghost values.
    *
-   * However, for the implementation of
-   * this class, it is immaterial and thus
+   * However, for the implementation of this class, it is immaterial and thus
    * an empty function.
    */
   void update_ghost_values () const;
@@ -980,27 +832,16 @@ public:
    */
   //@{
   /**
-   *  Output of vector in user-defined
-   *  format. For complex-valued vectors,
-   *  the format should include specifiers
-   *  for both the real and imaginary
-   *  parts.
+   *  Output of vector in user-defined format. For complex-valued vectors, the
+   *  format should include specifiers for both the real and imaginary parts.
    */
   void print (const char *format = 0) const;
 
   /**
-   * Print to a
-   * stream. @p precision denotes
-   * the desired precision with
-   * which values shall be printed,
-   * @p scientific whether
-   * scientific notation shall be
-   * used. If @p across is
-   * @p true then the vector is
-   * printed in a line, while if
-   * @p false then the elements
-   * are printed on a separate line
-   * each.
+   * Print to a stream. @p precision denotes the desired precision with which
+   * values shall be printed, @p scientific whether scientific notation shall
+   * be used. If @p across is @p true then the vector is printed in a line,
+   * while if @p false then the elements are printed on a separate line each.
    */
   void print (std::ostream &out,
               const unsigned int precision  = 3,
@@ -1008,71 +849,52 @@ public:
               const bool across     = true) const;
 
   /**
-   * Print to a
-   * LogStream. <tt>width</tt> is
-   * used as argument to the
-   * std::setw manipulator, if
-   * printing across.  If @p
-   * across is @p true then the
-   * vector is printed in a line,
-   * while if @p false then the
-   * elements are printed on a
-   * separate line each.
+   * Print to a LogStream. <tt>width</tt> is used as argument to the std::setw
+   * manipulator, if printing across.  If @p across is @p true then the vector
+   * is printed in a line, while if @p false then the elements are printed on
+   * a separate line each.
    */
   void print (LogStream &out,
               const unsigned int width = 6,
               const bool across = true) const;
 
   /**
-   * Write the vector en bloc to a
-   * file. This is done in a binary
-   * mode, so the output is neither
-   * readable by humans nor
-   * (probably) by other computers
-   * using a different operating
-   * system or number format.
+   * Write the vector en bloc to a file. This is done in a binary mode, so the
+   * output is neither readable by humans nor (probably) by other computers
+   * using a different operating system or number format.
    */
   void block_write (std::ostream &out) const;
 
   /**
-   * Read a vector en block from a
-   * file. This is done using the
-   * inverse operations to the
-   * above function, so it is
-   * reasonably fast because the
+   * Read a vector en block from a file. This is done using the inverse
+   * operations to the above function, so it is reasonably fast because the
    * bitstream is not interpreted.
    *
-   * The vector is resized if
-   * necessary.
+   * The vector is resized if necessary.
    *
-   * A primitive form of error
-   * checking is performed which
-   * will recognize the bluntest
-   * attempts to interpret some
-   * data as a vector stored
-   * bitwise to a file, but not
-   * more.
+   * A primitive form of error checking is performed which will recognize the
+   * bluntest attempts to interpret some data as a vector stored bitwise to a
+   * file, but not more.
    */
   void block_read (std::istream &in);
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
    */
   std::size_t memory_consumption () const;
   //@}
 
   /**
-   * Write the data of this object to
-   * a stream for the purpose of serialization.
+   * Write the data of this object to a stream for the purpose of
+   * serialization.
    */
   template <class Archive>
   void save (Archive &ar, const unsigned int version) const;
 
   /**
-   * Read the data of this object
-   * from a stream for the purpose of serialization.
+   * Read the data of this object from a stream for the purpose of
+   * serialization.
    */
   template <class Archive>
   void load (Archive &ar, const unsigned int version);
@@ -1082,48 +904,36 @@ public:
 protected:
 
   /**
-   * Dimension. Actual number of
-   * components contained in the
-   * vector.  Get this number by
-   * calling <tt>size()</tt>.
+   * Dimension. Actual number of components contained in the vector.  Get this
+   * number by calling <tt>size()</tt>.
    */
   size_type vec_size;
 
   /**
-   * Amount of memory actually
-   * reserved for this vector. This
-   * number may be greater than
-   * @p vec_size if a @p reinit was
-   * called with less memory
-   * requirements than the vector
-   * needed last time. At present
-   * @p reinit does not free
-   * memory when the number of
-   * needed elements is reduced.
+   * Amount of memory actually reserved for this vector. This number may be
+   * greater than @p vec_size if a @p reinit was called with less memory
+   * requirements than the vector needed last time. At present @p reinit does
+   * not free memory when the number of needed elements is reduced.
    */
   size_type max_vec_size;
 
   /**
-   * Pointer to the array of
-   * elements of this vector.
+   * Pointer to the array of elements of this vector.
    */
   Number *val;
 
   /**
-   * Make all other vector types
-   * friends.
+   * Make all other vector types friends.
    */
   template <typename Number2> friend class Vector;
 
   /**
-   * LAPACK matrices need access to
-   * the data.
+   * LAPACK matrices need access to the data.
    */
   friend class LAPACKFullMatrix<Number>;
 
   /**
-   * VectorView will access the
-   * pointer.
+   * VectorView will access the pointer.
    */
   friend class VectorView<Number>;
 };
@@ -1154,9 +964,8 @@ Vector<Number>::Vector (const InputIterator first, const InputIterator last)
   max_vec_size (0),
   val (0)
 {
-  // allocate memory. do not
-  // initialize it, as we will copy
-  // over to it in a second
+  // allocate memory. do not initialize it, as we will copy over to it in a
+  // second
   reinit (std::distance (first, last), true);
   std::copy (first, last, begin());
 }
@@ -1486,8 +1295,7 @@ inline
 void
 Vector<Number>::save (Archive &ar, const unsigned int) const
 {
-  // forward to serialization
-  // function in the base class.
+  // forward to serialization function in the base class.
   ar   &static_cast<const Subscriptor &>(*this);
 
   ar &vec_size &max_vec_size ;
@@ -1502,8 +1310,7 @@ inline
 void
 Vector<Number>::load (Archive &ar, const unsigned int)
 {
-  // forward to serialization
-  // function in the base class.
+  // forward to serialization function in the base class.
   ar   &static_cast<Subscriptor &>(*this);
 
   ar &vec_size &max_vec_size ;

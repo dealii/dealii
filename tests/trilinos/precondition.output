@@ -1,0 +1,45 @@
+
+DEAL:04225:Jacobi:cg::Starting value 21.8299
+DEAL:04225:Jacobi:cg::Convergence step 101 value 0
+DEAL:04225:SSOR:cg::Starting value 21.8299
+DEAL:04225:SSOR:cg::Convergence step 78 value 0
+DEAL:04225:SOR:Bicgstab::Starting value 21.8299
+DEAL:04225:SOR:Bicgstab::Convergence step 63 value 0
+DEAL:04225:BlockJacobi:cg::Starting value 21.8299
+DEAL:04225:BlockJacobi:cg::Convergence step 163 value 0
+DEAL:04225:BlockSSOR:cg::Starting value 21.8299
+DEAL:04225:BlockSSOR:cg::Convergence step 60 value 0
+DEAL:04225:BlockSOR:Bicgstab::Starting value 21.8299
+DEAL:04225:BlockSOR:Bicgstab::Convergence step 54 value 0
+DEAL:04225:IC:cg::Starting value 21.8299
+DEAL:04225:IC:cg::Convergence step 70 value 0
+DEAL:04225:ILU:cg::Starting value 21.8299
+DEAL:04225:ILU:cg::Convergence step 57 value 0
+DEAL:04225:ILUT:Bicgstab::Starting value 21.8299
+DEAL:04225:ILUT:Bicgstab::Convergence step 20 value 0
+DEAL:04225:Chebyshev:cg::Starting value 21.8299
+DEAL:04225:Chebyshev:cg::Convergence step 47 value 0
+DEAL:04225:Direct:cg::Starting value 21.8299
+DEAL:04225:Direct:cg::Convergence step 1 value 0
+DEAL:16641:Jacobi:cg::Starting value 30.8770
+DEAL:16641:Jacobi:cg::Convergence step 201 value 0
+DEAL:16641:SSOR:cg::Starting value 30.8770
+DEAL:16641:SSOR:cg::Convergence step 141 value 0
+DEAL:16641:SOR:Bicgstab::Starting value 30.8770
+DEAL:16641:SOR:Bicgstab::Convergence step 140 value 0
+DEAL:16641:BlockJacobi:cg::Starting value 30.8770
+DEAL:16641:BlockJacobi:cg::Convergence step 321 value 0
+DEAL:16641:BlockSSOR:cg::Starting value 30.8770
+DEAL:16641:BlockSSOR:cg::Convergence step 117 value 0
+DEAL:16641:BlockSOR:Bicgstab::Starting value 30.8770
+DEAL:16641:BlockSOR:Bicgstab::Convergence step 104 value 0
+DEAL:16641:IC:cg::Starting value 30.8770
+DEAL:16641:IC:cg::Convergence step 134 value 0
+DEAL:16641:ILU:cg::Starting value 30.8770
+DEAL:16641:ILU:cg::Convergence step 110 value 0
+DEAL:16641:ILUT:Bicgstab::Starting value 30.8770
+DEAL:16641:ILUT:Bicgstab::Convergence step 36 value 0
+DEAL:16641:Chebyshev:cg::Starting value 30.8770
+DEAL:16641:Chebyshev:cg::Convergence step 94 value 0
+DEAL:16641:Direct:cg::Starting value 30.8770
+DEAL:16641:Direct:cg::Convergence step 1 value 0

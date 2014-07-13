@@ -100,10 +100,12 @@ namespace TrilinosWrappers
 
   PreconditionJacobi::AdditionalData::
   AdditionalData (const double omega,
-                  const double min_diagonal)
+                  const double min_diagonal,
+                  const unsigned int n_sweeps)
     :
     omega (omega),
-    min_diagonal (min_diagonal)
+    min_diagonal (min_diagonal),
+    n_sweeps     (n_sweeps)
   {}
 
 
@@ -127,7 +129,7 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("relaxation: sweeps", 1);
+    parameter_list.set ("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set ("relaxation: type", "Jacobi");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
     parameter_list.set ("relaxation: min diagonal value",
@@ -150,11 +152,13 @@ namespace TrilinosWrappers
   PreconditionSSOR::AdditionalData::
   AdditionalData (const double       omega,
                   const double       min_diagonal,
-                  const unsigned int overlap)
+                  const unsigned int overlap,
+                  const unsigned int n_sweeps)
     :
     omega        (omega),
     min_diagonal (min_diagonal),
-    overlap      (overlap)
+    overlap      (overlap),
+    n_sweeps     (n_sweeps)
   {}
 
 
@@ -177,7 +181,7 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("relaxation: sweeps", 1);
+    parameter_list.set ("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set ("relaxation: type", "symmetric Gauss-Seidel");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
     parameter_list.set ("relaxation: min diagonal value",
@@ -201,11 +205,13 @@ namespace TrilinosWrappers
   PreconditionSOR::AdditionalData::
   AdditionalData (const double       omega,
                   const double       min_diagonal,
-                  const unsigned int overlap)
+                  const unsigned int overlap,
+                  const unsigned int n_sweeps)
     :
     omega        (omega),
     min_diagonal (min_diagonal),
-    overlap      (overlap)
+    overlap      (overlap),
+    n_sweeps     (n_sweeps)
   {}
 
 
@@ -228,12 +234,193 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("relaxation: sweeps", 1);
+    parameter_list.set ("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
     parameter_list.set ("relaxation: type", "Gauss-Seidel");
     parameter_list.set ("relaxation: damping factor", additional_data.omega);
     parameter_list.set ("relaxation: min diagonal value",
                         additional_data.min_diagonal);
     parameter_list.set ("schwarz: combine mode", "Add");
+
+    ierr = ifpack->SetParameters(parameter_list);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Initialize();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Compute();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  /* ----------------------- PreconditionBlockJacobi ---------------------- */
+
+  PreconditionBlockJacobi::AdditionalData::
+  AdditionalData (const unsigned int block_size,
+                  const std::string  block_creation_type,
+                  const double omega,
+                  const double min_diagonal,
+                  const unsigned int n_sweeps)
+    :
+    block_size(block_size),
+    block_creation_type(block_creation_type),
+    omega (omega),
+    min_diagonal (min_diagonal),
+    n_sweeps     (n_sweeps)
+  {}
+
+
+
+  void
+  PreconditionBlockJacobi::initialize (const SparseMatrix   &matrix,
+                                       const AdditionalData &additional_data)
+  {
+    // release memory before reallocation
+    preconditioner.reset ();
+    preconditioner.reset (Ifpack().Create
+                          ("block relaxation",
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                           0));
+
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
+    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
+                                     "preconditioner"));
+
+    int ierr;
+
+    Teuchos::ParameterList parameter_list;
+    parameter_list.set ("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set ("relaxation: type", "Jacobi");
+    parameter_list.set ("relaxation: damping factor", additional_data.omega);
+    parameter_list.set ("relaxation: min diagonal value",
+                        additional_data.min_diagonal);
+    parameter_list.set ("partitioner: type", additional_data.block_creation_type);
+    int n_local_parts = (matrix.trilinos_matrix().NumMyRows()+additional_data.
+                         block_size-1)/additional_data.block_size;
+    parameter_list.set ("partitioner: local parts", n_local_parts);
+
+    ierr = ifpack->SetParameters(parameter_list);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Initialize();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Compute();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  /* ----------------------- PreconditionBlockSSOR ------------------------ */
+
+  PreconditionBlockSSOR::AdditionalData::
+  AdditionalData (const unsigned int block_size,
+                  const std::string  block_creation_type,
+                  const double       omega,
+                  const double       min_diagonal,
+                  const unsigned int overlap,
+                  const unsigned int n_sweeps)
+    :
+    block_size(block_size),
+    block_creation_type(block_creation_type),
+    omega        (omega),
+    min_diagonal (min_diagonal),
+    overlap      (overlap),
+    n_sweeps     (n_sweeps)
+  {}
+
+
+
+  void
+  PreconditionBlockSSOR::initialize (const SparseMatrix   &matrix,
+                                     const AdditionalData &additional_data)
+  {
+    preconditioner.reset ();
+    preconditioner.reset (Ifpack().Create
+                          ("block relaxation",
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                           additional_data.overlap));
+
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
+    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
+                                     "preconditioner"));
+
+    int ierr;
+
+    Teuchos::ParameterList parameter_list;
+    parameter_list.set ("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set ("relaxation: type", "symmetric Gauss-Seidel");
+    parameter_list.set ("relaxation: damping factor", additional_data.omega);
+    parameter_list.set ("relaxation: min diagonal value",
+                        additional_data.min_diagonal);
+    parameter_list.set ("schwarz: combine mode", "Add");
+    parameter_list.set ("partitioner: type", additional_data.block_creation_type);
+    int n_local_parts = (matrix.trilinos_matrix().NumMyRows()+additional_data.
+                         block_size-1)/additional_data.block_size;
+    parameter_list.set ("partitioner: local parts", n_local_parts);
+
+    ierr = ifpack->SetParameters(parameter_list);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Initialize();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    ierr = ifpack->Compute();
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  /* ------------------------ PreconditionBlockSOR ------------------------ */
+
+  PreconditionBlockSOR::AdditionalData::
+  AdditionalData (const unsigned int block_size,
+                  const std::string  block_creation_type,
+                  const double       omega,
+                  const double       min_diagonal,
+                  const unsigned int overlap,
+                  const unsigned int n_sweeps)
+    :
+    block_size(block_size),
+    block_creation_type(block_creation_type),
+    omega        (omega),
+    min_diagonal (min_diagonal),
+    overlap      (overlap),
+    n_sweeps     (n_sweeps)
+  {}
+
+
+
+  void
+  PreconditionBlockSOR::initialize (const SparseMatrix   &matrix,
+                                    const AdditionalData &additional_data)
+  {
+    preconditioner.reset ();
+    preconditioner.reset (Ifpack().Create
+                          ("block relaxation",
+                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                           additional_data.overlap));
+
+    Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
+                                    (preconditioner.get());
+    Assert (ifpack != 0, ExcMessage ("Trilinos could not create this "
+                                     "preconditioner"));
+
+    int ierr;
+
+    Teuchos::ParameterList parameter_list;
+    parameter_list.set ("relaxation: sweeps", static_cast<int>(additional_data.n_sweeps));
+    parameter_list.set ("relaxation: type", "Gauss-Seidel");
+    parameter_list.set ("relaxation: damping factor", additional_data.omega);
+    parameter_list.set ("relaxation: min diagonal value",
+                        additional_data.min_diagonal);
+    parameter_list.set ("schwarz: combine mode", "Add");
+    parameter_list.set ("partitioner: type", additional_data.block_creation_type);
+    int n_local_parts = (matrix.trilinos_matrix().NumMyRows()+additional_data.
+                         block_size-1)/additional_data.block_size;
+    parameter_list.set ("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -608,10 +795,11 @@ namespace TrilinosWrappers
     const size_type constant_modes_dimension =
       additional_data.constant_modes.size();
     Epetra_MultiVector distributed_constant_modes (domain_map,
-                                                   constant_modes_dimension);
+                                                   constant_modes_dimension > 0 ?
+                                                   constant_modes_dimension : 1);
     std::vector<double> dummy (constant_modes_dimension);
 
-    if (constant_modes_dimension > 1)
+    if (constant_modes_dimension > 0)
       {
         const bool constant_modes_are_global =
           additional_data.constant_modes[0].size() == n_rows;

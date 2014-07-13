@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -332,28 +332,41 @@ namespace PETScWrappers
               ExcDimensionMismatch (size(), n));
 
 #if DEBUG
-      // test ghost allocation in debug mode
-      PetscInt begin, end;
+      {
+	// test ghost allocation in debug mode
+	PetscInt begin, end;
 
-      ierr = VecGetOwnershipRange (vector, &begin, &end);
+	ierr = VecGetOwnershipRange (vector, &begin, &end);
 
-      Assert(local_size==(size_type)(end-begin), ExcInternalError());
+	Assert(local_size==(size_type)(end-begin), ExcInternalError());
 
-      Vec l;
-      ierr = VecGhostGetLocalForm(vector, &l);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+	Vec l;
+	ierr = VecGhostGetLocalForm(vector, &l);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      PetscInt lsize;
-      ierr = VecGetSize(l, &lsize);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+	PetscInt lsize;
+	ierr = VecGetSize(l, &lsize);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      ierr = VecGhostRestoreLocalForm(vector, &l);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+	ierr = VecGhostRestoreLocalForm(vector, &l);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      Assert( lsize==end-begin+(PetscInt)ghost_indices.n_elements() ,ExcInternalError());
-
+	Assert (lsize==end-begin+(PetscInt)ghost_indices.n_elements(),
+		ExcInternalError());
+      }
 #endif
 
+
+      // in PETSc versions up to 3.5, VecCreateGhost zeroed out the locally
+      // owned vector elements but forgot about the ghost elements. we need to
+      // do this ourselves
+      //
+      // see https://code.google.com/p/dealii/issues/detail?id=233
+#if DEAL_II_PETSC_VERSION_LT(3,6,0)
+      PETScWrappers::MPI::Vector zero;
+      zero.reinit (communicator, this->size(), local_size);
+      *this = zero;
+#endif
 
     }
 

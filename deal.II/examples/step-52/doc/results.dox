@@ -1,30 +1,40 @@
 <h1>Results</h1>
 
-The output of this program consists of the console output and the solutions given in
-vtu format.
+The point of this program is less to show partcular results, but instead to
+show how it is done and that we have already demonstrated using the code
+above. Consequently, the output the program yields is relatively sparse and
+consists only of the console output and the solutions given in
+VTU format for visualization.
 
-The console output is:
+The console output contains both errors and, for some of the methods, the
+number of steps they performed:
 @code
-Forward Euler error: 1.00883
-Third order Runge-Kutta error: 0.000227982
-Fourth order Runge-Kutta error: 1.90541e-06
-Backward Euler error: 1.03428
-Implicit Midpoint error: 0.00862702
-Crank-Nicolson error: 0.00862675
-SDIRK error: 0.0042349
-Heun-Euler error: 0.0073012
-Number of steps done: 284
-Bogacki-Shampine error: 0.000207511
-Number of steps done: 200
-Dopri error: 4.01775e-09
-Number of steps done: 200
-Fehlberg error: 9.89504e-09
-Number of steps done: 200
-Cash-Karp error: 2.5579e-10
-Number of steps done: 200
+Explicit methods:
+Forward Euler:            error=1.00883
+Third order Runge-Kutta:  error=0.000227982
+Fourth order Runge-Kutta: error=1.90541e-06
+
+Implicit methods:
+Backward Euler:           error=1.03428
+Implicit Midpoint:        error=0.00862702
+Crank-Nicolson:           error=0.00862675
+SDIRK:                    error=0.0042349
+
+Embedded explicit methods:
+Heun-Euler:               error=0.0073012
+                steps performed=284
+Bogacki-Shampine:         error=0.000207511
+                steps performed=200
+Dopri:                    error=4.01774e-09
+                steps performed=200
+Fehlberg:                 error=9.89504e-09
+                steps performed=200
+Cash-Karp:                error=2.55791e-10
+                steps performed=200
 @endcode
 
-Like expected the high-order methods give a more accurate solution. We see that
-the Heun-Euler method adapted the number of time steps in order to satisfy the
-tolerance. The others embedded methods did not need to change the number of time
-steps.
+As expected the higher order methods give (much) more accurate solutions. We
+also see that the (rather inaccurate) Heun-Euler method adapted the number of
+time steps in order to satisfy the tolerance. On the other hand, the other
+embedded methods did not need to change the number of time steps as they are
+easily able to reach the desired tolerance with the given time step size.

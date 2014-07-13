@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -213,26 +213,20 @@ namespace MGTools
                             std::vector<unsigned int> target_component) DEAL_II_DEPRECATED;
 
   /**
-   * Generate a list of those
-   * degrees of freedom at the
-   * boundary which should be
-   * eliminated from the matrix.
+   * Generate a list of those degrees of freedom at the boundary of the domain
+   * that should be eliminated from the matrix because they will be
+   * constrained by Dirichlet boundary conditions.
    *
-   * This is the multilevel
-   * equivalent of
-   * VectorTools::interpolate_boundary_values,
-   * but since the multilevel
-   * method does not have its own
-   * right hand side, the function
-   * values are ignored.
+   * This is the multilevel equivalent of
+   * VectorTools::interpolate_boundary_values, but since the multilevel method
+   * does not have its own right hand side, the function values returned by
+   * the function object that is part of the function_map argument are
+   * ignored.
    *
-   * @arg <tt>boundary_indices</tt>
-   * is a vector which on return
-   * contains all indices of
-   * boundary constraint degrees of
-   * freedom for each level. Its
-   * length has to match the number
-   * of levels.
+   * @arg <tt>boundary_indices</tt> is a vector which on return contains all
+   * indices of degrees of freedom for each level that are at the part of the
+   * boundary identified by the function_map argument. Its length has to match
+   * the number of levels in the dof handler object.
    */
   template <int dim, int spacedim>
   void

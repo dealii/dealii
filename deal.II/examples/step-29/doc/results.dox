@@ -57,7 +57,7 @@ DEAL::Generating output... done (4.52428s)
 (Of course, execution times will differ if you run the program
 locally.) The fact that most of the time is spent on assembling
 the system matrix and generating output is due to the many assertion
-that need to be checked in debug mode. In optimized mode these parts
+that need to be checked in debug mode. In release mode these parts
 of the program run much faster whereas solving the linear system is
 hardly sped up at all:
 

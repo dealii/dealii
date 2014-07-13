@@ -77,6 +77,8 @@ public:
   /**
    * Sets the vector size to the given size and initializes all elements with
    * T().
+   *
+   * @dealiiOperationIsMultithreaded
    */
   AlignedVector (const size_type size,
                  const T        &init = T());
@@ -88,11 +90,15 @@ public:
 
   /**
    * Copy constructor.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   AlignedVector (const AlignedVector<T> &vec);
 
   /**
    * Assignment to the input vector @p vec.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   AlignedVector &
   operator = (const AlignedVector<T> &vec);
@@ -109,6 +115,8 @@ public:
    * available, and initializes each element with the specified data. If the
    * new vector size is shorter than the old one, the memory is not released
    * unless the new size is zero.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void resize (const size_type size_in,
                const T        &init = T());
@@ -155,7 +163,9 @@ public:
                     ForwardIterator end);
 
   /**
-   * Fills the vector with size() copies of the given input
+   * Fills the vector with size() copies of the given input.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   void fill (const T &element);
 

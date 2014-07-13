@@ -88,8 +88,12 @@ namespace PETScWrappers
         // last argument is irrelevant here,
         // since we use the solver only once
         // anyway
+#if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
         ierr = KSPSetOperators (solver_data->ksp, A, preconditioner,
                                 SAME_PRECONDITIONER);
+#else
+        ierr = KSPSetOperators (solver_data->ksp, A, preconditioner);
+#endif
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         // let derived classes set the solver

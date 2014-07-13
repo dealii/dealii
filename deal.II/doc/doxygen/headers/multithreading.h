@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,8 @@
  * machines. See the detailed documentation and
  * @ref MTToC "Table of Contents" below the lenghty list of members
  * of this module.
+ *
+ * @dealiiVideoLecture{39,40}
  *
  * On machines with more than one processor (or multicore processors),
  * it is often profitable to run several parts of the computations in

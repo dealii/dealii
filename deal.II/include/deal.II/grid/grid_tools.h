@@ -53,6 +53,11 @@ class SparsityPattern;
 namespace GridTools
 {
   /**
+   *  @name Information about meshes and cells
+   */
+  /*@{*/
+
+  /**
    * Return the diameter of a
    * triangulation. The diameter is
    * computed using only the
@@ -82,6 +87,24 @@ namespace GridTools
                  const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
+   * Return the diamater of the smallest
+   * active cell of a triangulation. See
+   * step-24 for an example
+   * of use of this function.
+   */
+  template <int dim, int spacedim>
+  double
+  minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
+
+  /**
+   * Return the diamater of the largest
+   * active cell of a triangulation.
+   */
+  template <int dim, int spacedim>
+  double
+  maximal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
+
+  /**
    * Given a list of vertices (typically
    * obtained using
    * Triangulation::get_vertices) as the
@@ -100,6 +123,12 @@ namespace GridTools
   template <int dim>
   double cell_measure (const std::vector<Point<dim> > &all_vertices,
                        const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
+
+  /*@}*/
+  /**
+   *  @name Functions supporting the creation of meshes
+   */
+  /*@{*/
 
   /**
    * Remove vertices that are not
@@ -168,6 +197,12 @@ namespace GridTools
                                    std::vector<unsigned int>   &considered_vertices,
                                    const double                 tol=1e-12);
 
+  /*@}*/
+  /**
+   *  @name Rotating, stretching and otherwise transforming meshes
+   */
+  /*@{*/
+
   /**
    * Transform the vertices of the given
    * triangulation by applying the
@@ -189,10 +224,12 @@ namespace GridTools
    * @note If you are using a parallel::distributed::Triangulation you will have
    * hanging nodes in your local Triangulation even if your "global" mesh has
    * no hanging nodes. This will cause issues with wrong positioning of hanging
-   * nodes in ghost cells. The vertices of all locally owned cells will be correct,
+   * nodes in ghost cells if you call the current functions: The vertices of
+   * all locally owned cells will be correct,
    * but the vertices of some ghost cells may not. This means that
-   * computations like KellyErrorEstimator may give wrong answers. A safe bet is
-   * to use this function prior to any refinement in parallel, if that is possible.
+   * computations like KellyErrorEstimator may give wrong answers. A safe approach is
+   * to use this function prior to any refinement in parallel, if that is possible, but
+   * not after you refine the mesh.
    *
    * This function is used in the
    * "Possibilities for extensions" section
@@ -318,6 +355,12 @@ namespace GridTools
                        Triangulation<dim, spacedim> &triangulation,
                        const bool   keep_boundary=true);
 
+  /*@}*/
+  /**
+   *  @name Finding cells and vertices of a triangulation
+   */
+  /*@{*/
+  
   /**
    * Find and return the number of
    * the used vertex in a given
@@ -494,8 +537,9 @@ namespace GridTools
    * not be deduced from a function call,
    * you will have to specify it after the
    * function name, as for example in
-   * <code>GridTools::get_active_child_cells@<DoFHandler@<dim@>
-   * @> (cell)</code>.
+   * @code
+   *   GridTools::get_active_child_cells<DoFHandler<dim> > (cell)
+   * @endcode
    */
   template <class Container>
   std::vector<typename Container::active_cell_iterator>
@@ -511,6 +555,12 @@ namespace GridTools
   get_active_neighbors (const typename Container::active_cell_iterator        &cell,
                         std::vector<typename Container::active_cell_iterator> &active_neighbors);
 
+  /*@}*/
+  /**
+   *  @name Partitions and subdomains of triangulations
+   */
+  /*@{*/
+  
   /**
    * Produce a sparsity pattern in which
    * nonzero entries indicate that two
@@ -681,6 +731,12 @@ namespace GridTools
   count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
                                           const types::subdomain_id         subdomain);
 
+  /*@}*/
+  /**
+   *  @name Comparing different meshes
+   */
+  /*@{*/
+
   /**
    * Given two mesh containers
    * (i.e. objects of type
@@ -781,24 +837,6 @@ namespace GridTools
                          const Container &mesh_2);
 
   /**
-   * Return the diamater of the smallest
-   * active cell of a triangulation. See
-   * step-24 for an example
-   * of use of this function.
-   */
-  template <int dim, int spacedim>
-  double
-  minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
-
-  /**
-   * Return the diamater of the largest
-   * active cell of a triangulation.
-   */
-  template <int dim, int spacedim>
-  double
-  maximal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
-
-  /**
    * Given the two triangulations
    * specified as the first two
    * arguments, create the
@@ -814,7 +852,7 @@ namespace GridTools
    * triangulation that contains the
    * <i>most refined cells</i> from
    * two input triangulations that
-   * were derived from the <i>same </i>
+   * were derived from the <i>same</i>
    * coarse grid by adaptive refinement.
    * This is an operation sometimes
    * needed when one solves for two
@@ -844,14 +882,20 @@ namespace GridTools
    * example in order to compose a mesh
    * for a complicated geometry from
    * meshes for simpler geometries,
-   * take a look at
-   * GridGenerator::merge_triangulations .
+   * then this is not the function for you. Instead, consider
+   * GridGenerator::merge_triangulations().
    */
   template <int dim, int spacedim>
   void
   create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
                               const Triangulation<dim, spacedim> &triangulation_2,
                               Triangulation<dim, spacedim>       &result);
+
+  /*@}*/
+  /**
+   *  @name Dealing with distorted cells
+   */
+  /*@{*/
 
   /**
    * Given a triangulation and a
@@ -882,6 +926,13 @@ namespace GridTools
   typename Triangulation<dim,spacedim>::DistortedCellList
   fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
                                 Triangulation<dim,spacedim> &triangulation);
+
+  /*@}*/
+  /**
+   *  @name Lower-dimensional meshes for parts of higher-dimensional meshes 
+   */
+  /*@{*/
+
 
 #ifdef _MSC_VER
   // Microsoft's VC++ has a bug where it doesn't want to recognize that
@@ -997,6 +1048,12 @@ namespace GridTools
                              Container<dim-1,spacedim>     &surface_mesh,
                              const std::set<types::boundary_id> &boundary_ids
                              = std::set<types::boundary_id>());
+
+  /*@}*/
+  /**
+   *  @name Dealing with periodic domains
+   */
+  /*@{*/
 
   /**
    * Data type that provides all the information that is needed
@@ -1172,6 +1229,12 @@ namespace GridTools
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const dealii::Tensor<1,CONTAINER::space_dimension> &offset = dealii::Tensor<1,CONTAINER::space_dimension>());
 
+  /*@}*/
+  /**
+   *  @name Exceptions
+   */
+  /*@{*/
+
 
   /**
    * Exception
@@ -1216,17 +1279,24 @@ namespace GridTools
                   << "> could not be found inside any of the "
                   << "subcells of a coarse grid cell.");
 
+  /**
+   * Exception
+   */
   DeclException1 (ExcVertexNotUsed,
                   unsigned int,
                   << "The given vertex " << arg1
                   << " is not used in the given triangulation");
 
 
+  /*@}*/
+
 } /*namespace GridTools*/
 
 
 
 /* ----------------- Template function --------------- */
+
+#ifndef DOXYGEN
 
 namespace GridTools
 {
@@ -1391,7 +1461,7 @@ namespace GridTools
                   const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell]);
 }
 
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

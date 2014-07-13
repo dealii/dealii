@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -268,6 +268,8 @@ public:
 
   /**
    * Assignment operator.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   FullMatrix<number> &
   operator = (const FullMatrix<number> &);
@@ -283,6 +285,8 @@ public:
    * This operator assigns a scalar to a matrix. To avoid confusion with the
    * semantics of this function, zero is the only value allowed for
    * <tt>d</tt>, allowing you to clear a matrix in an intuitive way.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   FullMatrix<number> &
   operator = (const number d);

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,8 @@
  *
  * @brief A module discussing the use of parallelism on distributed memory
  * clusters.
+ *
+ * @dealiiVideoLecture{39,41,41.25,41.5}
  *
  * <h3>Overview</h3>
  *

@@ -55,38 +55,56 @@ Therefore, the error at time $t=\pi$ is simply the norm of the numerical
 solution and is particularly easily evaluated.
 
 
-<h3>Runge-Kutta</h3>
+<h3>Runge-Kutta methods</h3>
 
 The Runge-Kutta methods implemented in deal.II assume that the equation to be
 solved can be written as:
 @f{eqnarray*}
 \frac{dy}{dt} = g(t,y).
 @f}
-When using finite elements, discretized time derivatives always result in the
-presence of a mass matrix. If the solution vector $y(t)$ is given by the vector
-of nodal coefficients $U(t)$ the previous equation, then spatially discretized
-equations always have the form
+On the other hand, when using finite elements, discretized time derivatives always result in the
+presence of a mass matrix on the left hand side. This can easily be seen by
+considering that if the solution vector $y(t)$ in the equation above is in fact the vector
+of nodal coefficients $U(t)$ for a variable of the form
+@f{eqnarray*}
+  u_h(x,t) = \sum_j U_j(t) \varphi_j(x)
+@f}
+with spatial shape functions $\varphi_j(x)$, then multiplying an equation of
+the form 
+@f{eqnarray*}
+  \frac{\partial u(x,t)}{\partial t} = q(t,u(x,t))
+@f}
+by test functions, integrating over $\Omega$, substituting $u\rightarrow u_h$
+and restricting the test functions to the $\varphi_i(x)$ from above, then this
+spatially discretized equation has the form
 @f{eqnarray*}
 M\frac{dU}{dt} = f(t,U),
 @f}
-where $M$ is the mass matrix. In other words, this fits the scheme above if we
-write 
+where $M$ is the mass matrix and $f(t,U)$ is the spatially discretized version
+of the $q(t,u(x,t))$ (where $q$ is typically the place where spatial
+derivatives appear, but this is not of much concern for the moment given that
+we only consider time derivatives). In other words, this form fits the general
+scheme above if we write 
 @f{eqnarray*}
 \frac{dy}{dt} = g(t,y) = M^{-1}f(t,y).
 @f}
-Runke-Kutta methods can be written as:
+
+Runke-Kutta methods are time stepping schemes that approximate $y(t_n)\approx
+y_{n}$ through a particular one-step approach. They are typically written in the form
 @f{eqnarray*}
 y_{n+1} = y_n + \sum_{i=1}^s b_i k_i
 @f}
-where
+where for the form of the right hand side above
 @f{eqnarray*}
-k_i = h M^{-1} f\left(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j\right)
+k_i = h M^{-1} f\left(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j\right).
 @f}
-where $a_{ij}$, $b_i$, and $c_i$ are known coefficients and $h$ is the time step
+Here $a_{ij}$, $b_i$, and $c_i$ are known coefficients that identify which
+particular Runge-Kutta scheme you want to use, and $h=t_{n+1}-t_n$ is the time step
 used. Different time stepping methods of the Runge-Kutta class differ in the
 number of stages $s$ and the values they use for the coefficients $a_{ij}$,
 $b_i$, and $c_i$ but are otherwise easy to implement since one can look up
-tabulated values for these coefficients.
+tabulated values for these coefficients. (These tables are often called
+Butcher tableaus.)
 
 At the time of the writing of this tutorial, the methods implemented in
 deal.II can be divided in three categories:
@@ -95,33 +113,64 @@ deal.II can be divided in three categories:
 <li> embedded (or adaptive) Runge-Kutta
 <li> implicit Runge-Kutta
 </ol> 
+Many well known time stepping schemes that one does not typically associated
+with the names Runge or Kutta can in fact be written in a way so that they,
+too, can be expressed in these categories. They oftentimes represent the
+lowest-order members of these families.
 
-<h4>Explicit Runge-Kutta</h4> 
-These methods that include forward Euler, third order Runge-Kutta, and fourth
-order Runge-Kutta, only require a function to evaluate $M^{-1}f(t,y)$ but not
-(as implicit methods) to solve an equation for $y$ that involves
-$f(t,y)$. These methods become unstable when the time step chosen is too
-large.
 
-<h4>Embedded Runge-Kutta</h4>
-These methods include Heun-Euler, Bogacki-Shampine, Dormand-Prince (ode45 in
-Matlab), Fehlberg, and Cash-Karp. These methods use a low order method to
-estimate the error and decide if the time step needs to be refined or coarsened. 
-Only embedded explicit methods have been implemented at the time of the writing.
+<h4>Explicit Runge-Kutta methods</h4> 
 
-<h4>Implicit Runge-Kutta</h4>
-These methods include backward Euler, implicit midpoint, Crank-Nicolson, and a
-two stages SDIRK. These methods require to evaluate $M^{-1}f(t,y)$ and
+These methods, only require a function to evaluate $M^{-1}f(t,y)$ but not
+(as implicit methods) to solve an equation that involves
+$f(t,y)$ for $y$. As all explicit time stepping methods, they become unstable
+when the time step chosen is too large.
+
+Well known methods in this class include forward Euler, third order
+Runge-Kutta, and fourth order Runge-Kutta (often abbreviated as RK4).
+
+
+<h4>Embedded Runge-Kutta methods</h4>
+
+These methods use both a lower and a higher order method to
+estimate the error and decide if the time step needs to be shortened or can be
+increased. The term "embedded" refers to the fact that the lower-order method
+does not require additional evaluates of the function $M^{-1}f(\cdot,\cdot)$
+but reuses data that has to be computed for the high order method anyway. It
+is, in other words, essentially free, and we get the error estimate as a side
+product of using the higher order method.
+
+This class of methods include Heun-Euler, Bogacki-Shampine, Dormand-Prince (ode45 in
+Matlab and often abbreviated as RK45 to indicate that the lower and higher order methods
+used here are 4th and 5th order Runge-Kutta methods, respectively), Fehlberg,
+and Cash-Karp.
+ 
+At the time of the writing, only embedded explicit methods have been implemented.
+
+
+<h4>Implicit Runge-Kutta methods</h4>
+
+Implicit methods require the solution of (possibly nonlinear) systems of the
+form $\alpha y = f(t,y)$
+for $y$ in each (sub-)timestep. Internally, this is
+done using a Newton-type method and, consequently, they require that the user
+provide functions that can evaluate $M^{-1}f(t,y)$ and
 $\left(I-\Delta t M^{-1} \frac{\partial f}{\partial y}\right)^{-1}$ or equivalently 
-$\left(M - \Delta t \frac{\partial f}{\partial y}\right)^{-1} M$. This is necessary in order to solve for the solution of (possibly nonlinear)
-systems in every time step, where each Newton step requires the solution of an
-equation of the form
+$\left(M - \Delta t \frac{\partial f}{\partial y}\right)^{-1} M$. 
+
+The particular form of this operator results from the fact that each Newton
+step requires the solution of an equation of the form
 @f{align*}
   \left(M - \Delta t \frac{\partial f}{\partial y}\right) \Delta y
   = -M h(t,y)
 @f}
-for some (given) $h(t,y)$. These methods are 
-always stable
+for some (given) $h(t,y)$. Implicit methods are 
+always stable, regardless of the time step size, but too large time steps of
+course affect the <i>accuracy</i> of the solution, even if the numerical
+solution remains stable and bounded.
+
+Methods in this class include backward Euler, implicit midpoint,
+Crank-Nicolson, and a two stage SDIRK. 
 
 
 <h3>Spatially discrete formulation</h3>
@@ -130,36 +179,41 @@ By expanding the solution as always using shape functions $\psi_j$ and writing
 @f{eqnarray*}
 \phi_h(x,t) = \sum_j U_j(t) \psi_j(x),
 @f}
-we can then get the spatially discretized version of the diffusion equation as
+we immediately get the spatially discretized version of the diffusion equation as
 @f{eqnarray*}
   M \frac{dU(t)}{dt}
   = -{\cal D} U(t) - {\cal A} U(t) + {\cal S}(t)
 @f}
 where
 @f{eqnarray*}
-  M_{ij}  &= (\psi_i,\psi_j), \\
-  {\cal D}_{ij}  &= (D\nabla\psi_i,\nabla\psi_j)_\Omega, \\
-  {\cal A}_{ij}  &= (\Sigma_a\psi_i,\psi_j)_\Omega, \\
-  {\cal S}_{i}(t)  &= (\psi_i,S(x,t))_\Omega.
+  M_{ij}  &=& (\psi_i,\psi_j), \\
+  {\cal D}_{ij}  &=& (D\nabla\psi_i,\nabla\psi_j)_\Omega, \\
+  {\cal A}_{ij}  &=& (\Sigma_a\psi_i,\psi_j)_\Omega, \\
+  {\cal S}_{i}(t)  &=& (\psi_i,S(x,t))_\Omega.
 @f}
-%Boundary terms are not necessary due to the chosen boundary conditions.
-To use the Runge-Kutta methods, we can then recast this as follows:
+See also step-24 and step-26 to understand how we arrive here.
+%Boundary terms are not necessary due to the chosen boundary conditions for
+the current problem. To use the Runge-Kutta methods, we can then recast this
+as follows:
 @f{eqnarray*}
 f(y) = -{\cal D}y - {\cal A}y + {\cal S}
 @f}
 In the code, we will need to be able to evaluate this function $f(U)$ along
-with its derivative. However, in view of the linearity of $f$, we will be able
-to use that $\frac{\partial f}{\partial y} y = f(y)$.
+with its derivative.
 
 
-<h3>Remarks</h3>
+<h3>Notes on the testcase</h3>
+
 To simplify the problem, the domain is two dimensional and the mesh is
-uniform (there is no need to adapt the mesh since we use quadratic finite
-elements and the exact solution is quadratic). Going from a two dimensional
-domain to a three dimensional domain is not very challenging. However if the
-mesh must be adapted, it is important to remember to do the following:
+uniformly refined (there is no need to adapt the mesh since we use quadratic
+finite elements and the exact solution is quadratic). Going from a two
+dimensional domain to a three dimensional domain is not very
+challenging. However if you intend to solve more complex problems where the
+mesh must be adapted (as is done, for example, in step-26), then it is
+important to remember the following issues:
+
 <ol>
-<li> Project the solution to the new mesh when the mesh is changed. Of course,
+<li> You will need to project the solution to the new mesh when the mesh is changed. Of course,
      the mesh 
      used should be the same at the beginning and at the end of the time step,
      a question that arises because Runge-Kutta methods use multiple

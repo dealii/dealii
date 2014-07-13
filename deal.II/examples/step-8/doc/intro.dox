@@ -10,7 +10,9 @@ that that is mostly rather simple. The only more complicated problems
 are in assembling matrix and right hand side, but these are easily
 understood as well.
 
-In the example, we will want to solve the elastic equations. They are
+@dealiiVideoLecture{19}
+
+In this tutorial program we will want to solve the elastic equations. They are
 an extension to Laplace's equation with a vector-valued solution that
 describes the displacement in each space direction of a rigid body
 which is subject to a force. Of course, the force is also

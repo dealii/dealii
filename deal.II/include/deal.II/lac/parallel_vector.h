@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -123,6 +123,13 @@ namespace parallel
      * <code>false</code> otherwise, irrespective of the actual number of
      * ghost entries in the vector layout (for that information, use
      * n_ghost_entries() instead).
+     *
+     * This vector uses the facilities of the class dealii::Vector<Number> for
+     * implementing the operations on the local range of the vector. In
+     * particular, it also inherits thread parallelism that splits most
+     * vector-vector operations into smaller chunks if the program uses
+     * multiple threads. This may or may not be desired when working also with
+     * MPI.
      *
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      */

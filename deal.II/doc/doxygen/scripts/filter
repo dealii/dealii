@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2007 - 2013 by the deal.II authors
+## Copyright (C) 2007 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -66,3 +66,60 @@ s#(static dealii::ExceptionBase\&)#\n//\! \@ingroup Exceptions\n \1#g;
 # by replacing a "file:" at the end of a line with the text
 # "file :", which doxygen doesn't recognize:
 s#file:[ \t]*$#file :#g;
+
+
+
+# Handle commands such as @dealiiVideoLecture{20.5,33} by expanding it
+# into a note with some text
+if (m/(\@dealiiVideoLecture\{([0-9\.]+)(, *[0-9\.]+ *)*\})/)
+{
+    $substext = $1;
+
+    $text = "\@note The material presented here is also discussed in ";
+
+    # add links to the individual lectures
+    $text = $text . "<a href=\"http://www.math.tamu.edu/~bangerth/videos.676.$2.html\">video lecture $2</a>";
+    
+    if (length($3) > 0)
+    {
+	$x = $3;
+	$x =~ s/^, *//g;
+	@otherlectures = split (',', "$x");
+
+	foreach $lecture (@otherlectures)
+	{
+	    $text = $text . ", <a href=\"http://www.math.tamu.edu/~bangerth/videos.676.$lecture.html\">video lecture $lecture</a>";
+	}
+    }
+
+    $text = $text . ". (All video lectures are also available <a href=\"http://www.math.tamu.edu/~bangerth/videos.html\">here</a>.)";
+    s/(\@dealiiVideoLecture\{([0-9\.]+)(, *[0-9\.]+ *)*\})/$text/;
+}
+
+
+# @dealiiVideoLectureSeeAlso works as above, but just expands into
+# regular text, no @note
+if (m/(\@dealiiVideoLectureSeeAlso\{([0-9\.]+)(, *[0-9\.]+ *)*\})/)
+{
+    $substext = $1;
+
+    $text = "See also ";
+
+    # add links to the individual lectures
+    $text = $text . "<a href=\"http://www.math.tamu.edu/~bangerth/videos.676.$2.html\">video lecture $2</a>";
+    
+    if (length($3) > 0)
+    {
+	$x = $3;
+	$x =~ s/^, *//g;
+	@otherlectures = split (',', "$x");
+
+	foreach $lecture (@otherlectures)
+	{
+	    $text = $text . ", <a href=\"http://www.math.tamu.edu/~bangerth/videos.676.$lecture.html\">video lecture $lecture</a>";
+	}
+    }
+
+    $text = $text . ".";
+    s/(\@dealiiVideoLectureSeeAlso\{([0-9\.]+)(, *[0-9\.]+ *)*\})/$text/;
+}

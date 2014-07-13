@@ -119,7 +119,8 @@ href="http://www.math.tamu.edu/~bangerth/videos.html">Wolfgang
 Bangerth's video lectures</a> on deal.II and computational science. In
 particular, you can see the steps he executes to run this and other
 programs, and you will get a much better idea of the tools that can be
-used to work with deal.II.
+used to work with deal.II. In particular, lectures 2 and 4 give an overview of
+deal.II and of the building blocks of any finite element code.
 
 
 <h3> What this program does </h3>
@@ -140,7 +141,9 @@ library; in the context of deal.II, the @ref Iterators module talks
 about them).
 
 The program is otherwise small enough that it doesn't need a whole lot
-of introduction. Let us just continue with its commented source.
+of introduction.
+
+@dealiiVideoLecture{5,6}
 
 
 <h3> About scientific computing in general </h3>
@@ -183,7 +186,8 @@ are worthwhile browsing through before you start any large-scale programming:
 As a general recommendation: If you expect to spend more than a few days
 writing software in the future, do yourself the favor of learning tools that
 can make your life more productive, in particular debuggers and integrated
-development environments. You will find that you will get the time spent
+development environments. (@dealiiVideoLectureSeeAlso{7,8,25})
+You will find that you will get the time spent
 learning these tools back severalfold soon by being more productive!
 Several of the video lectures referenced above show how to use tools
 such as integrated development environments or debuggers.

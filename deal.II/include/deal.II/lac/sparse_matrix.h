@@ -632,6 +632,8 @@ public:
    * exists to allow for the obvious notation <tt>matrix=0</tt>, which sets
    * all elements of the matrix to zero, but keep the sparsity pattern
    * previously used.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   SparseMatrix &operator = (const double d);
 
@@ -1074,6 +1076,8 @@ public:
    * consider using a BlockSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   template <class OutVector, class InVector>
   void vmult (OutVector &dst,
@@ -1109,6 +1113,8 @@ public:
    * consider using a BlockSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   template <class OutVector, class InVector>
   void vmult_add (OutVector &dst,
@@ -1146,12 +1152,16 @@ public:
    * The underlying template types of both this matrix and the given vector
    * should either both be real or complex-valued, but not mixed, for this
    * function to make sense.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   template <typename somenumber>
   somenumber matrix_norm_square (const Vector<somenumber> &v) const;
 
   /**
    * Compute the matrix scalar product $\left(u,Mv\right)$.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   template <typename somenumber>
   somenumber matrix_scalar_product (const Vector<somenumber> &u,
@@ -1163,6 +1173,8 @@ public:
    * <i>l<sub>2</sub></i> norm of the residual vector is returned.
    *
    * Source <i>x</i> and destination <i>dst</i> must not be the same vector.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   template <typename somenumber>
   somenumber residual (Vector<somenumber>       &dst,

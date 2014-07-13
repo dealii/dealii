@@ -139,6 +139,19 @@ namespace Algorithms
     double resnorm = res->l2_norm();
     double old_residual = resnorm / assemble_threshold + 1;
 
+    if (debug_vectors)
+      {
+	NamedData<VECTOR *> out;
+	VECTOR *p = &u;
+	out.add(p, "solution");
+	p = Du;
+	out.add(p, "update");
+	p = res;
+	out.add(p, "residual");
+	*data_out << step;
+	*data_out << out;
+      }
+
     while (control.check(step++, resnorm) == SolverControl::iterate)
       {
         // assemble (Df(u), v)
