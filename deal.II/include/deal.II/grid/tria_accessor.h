@@ -1220,12 +1220,12 @@ public:
    */
 
   /**
-   * Manifold indicator of this
+   * Return the manifold indicator of this
    * object.
    *
    * If the return value is the special value
    * numbers::flat_manifold_id, then this object is associated with a
-   * standard cartesian Manifold Description.
+   * standard Cartesian Manifold Description.
    *
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
@@ -2095,25 +2095,22 @@ public:
   bool at_boundary () const;
 
   /**
-   * Boundary indicator of this
-   * object. The convention for one
-   * dimensional triangulations is
-   * that left end vertices have
-   * boundary indicator zero, and
-   * right end vertices have
-   * boundary indicator one.
+   * Return the boundary indicator of this object. The convention for one
+   * dimensional triangulations is that left end vertices (of each line
+   * segment from which the triangulation may be constructed) have boundary
+   * indicator zero, and right end vertices have boundary indicator one,
+   * unless explicitly set differently.
    *
-   * If the return value is the special
-   * value numbers::internal_face_boundary_id,
-   * then this object is in the
-   * interior of the domain.
+   * If the return value is the special value
+   * numbers::internal_face_boundary_id, then this object is in the interior
+   * of the domain.
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   types::boundary_id boundary_indicator () const;
 
   /**
-   * Manifold indicator of this
+   * Return the manifold indicator of this
    * object. 
    *
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
@@ -2261,21 +2258,20 @@ public:
   void
   set_boundary_indicator (const types::boundary_id);
 
-				     /**
-				      * Set the manifold indicator of
-				      * this vertex. Does nothing so
-				      * far. This function is here
-				      * only to allow dimension
-				      * independent programming.
-				      */
+  /**
+   * Set the manifold indicator of this vertex. This does nothing so far since
+   * manifolds are only used to refine and map objects, but vertices are not
+   * refined and the mapping is trivial. This function is here only to allow
+   * dimension independent programming.
+   */
   void
   set_manifold_id (const types::manifold_id);
 
   /**
-   * Since this object only represents a
-   * single vertex, call
-   * set_boundary_indicator with the same
-   * argument.
+   * Set the boundary indicator of this object and all of its
+   * lower-dimensional sub-objects.  Since this object only represents a
+   * single vertex, there are no lower-dimensional obejct and this function is
+   * equivalent to calling set_boundary_indicator with the same argument.
    *
    * @ingroup boundary
    *
@@ -2283,23 +2279,21 @@ public:
    */
   void
   set_all_boundary_indicators (const types::boundary_id);
+
   /**
-   * @}
-   */
-/**
-   * Since this object only represents a
-   * single vertex, call
-   * set_manifold_id with the same
-   * argument.
+   * Set the manifold indicator of this object and all of its
+   * lower-dimensional sub-objects.  Since this object only represents a
+   * single vertex, there are no lower-dimensional obejct and this function is
+   * equivalent to calling set_manifold_indicator with the same argument.
    *
    * @ingroup manifold
    *
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
     
-    void
-    set_all_manifold_ids (const types::manifold_id);
-    /**
+  void
+  set_all_manifold_ids (const types::manifold_id);
+  /**
    * @}
    */
 
