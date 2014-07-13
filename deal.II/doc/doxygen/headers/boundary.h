@@ -16,7 +16,7 @@
 
 
 /**
- * @defgroup boundary Boundary and Manifold description for triangulations
+ * @defgroup boundary Boundary and manifold description for triangulations
  *
  * The classes in this module are concerned with the description of the
  * geometry of a domain in which a Triangulation lives. This geometry

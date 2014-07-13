@@ -1185,26 +1185,20 @@ public:
   bool at_boundary () const;
 
   /**
-   * Return a constant reference to a
-   * boundary object used for this
-   * object. This function is a shortcut to
-   * retrieving the boundary indicator
-   * using boundary_indicator() and then
-   * asking the
-   * Triangulation::get_boundary() function
-   * for the boundary object.
+   * Return a constant reference to the manifold object used for this
+   * object. This function exists for backward compatibility and calls
+   * get_manifold() internally.
    */
   const Boundary<dim,spacedim> &get_boundary () const;
     
   /**
-   * Return a constant reference to a
-   * manifold object used for this
-   * object. This function is a shortcut to
-   * retrieving the manifold indicator
-   * using manifold_indicator() and then
-   * asking the
-   * Triangulation::get_manifold() function
-   * for the manifold object.
+   * Return a constant reference to the manifold object used for this object.
+   *
+   * As explained in
+   * @ref boundary "Boundary and manifold description for triangulations",
+   * the process involved in finding the appropriate manifold description
+   * involves querying both the manifold or boundary indicators. See there
+   * for more information.
    */
   const Boundary<dim,spacedim> &get_manifold () const;
 

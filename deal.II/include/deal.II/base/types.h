@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -136,7 +136,7 @@ namespace types
    *
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  typedef unsigned char manifold_id;
+  typedef unsigned int manifold_id;
 
   
   /**

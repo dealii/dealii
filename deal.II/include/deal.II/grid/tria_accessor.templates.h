@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1922,19 +1922,20 @@ const Boundary<dim,spacedim> &
 TriaAccessor<structdim, dim, spacedim>::get_manifold () const
 {				  
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  
 				   // Get the default (manifold_id)
-  types::manifold_id mi = this->objects().manifold_id[this->present_index];
+  const types::manifold_id mi = this->objects().manifold_id[this->present_index];
   
 				   // In case this is not valid, check
 				   // the boundary id, after having
 				   // casted it to a manifold id
   if(mi == numbers::invalid_manifold_id) 
-    mi =  static_cast<types::manifold_id>
-	  (structdim < dim ?
-	   this->objects().boundary_or_material_id[this->present_index].boundary_id:
-	   dim < spacedim ? 
-	   this->objects().boundary_or_material_id[this->present_index].material_id:
-	   numbers::invalid_manifold_id);
+    mi = static_cast<types::manifold_id>
+	 (structdim < dim ?
+	  this->objects().boundary_or_material_id[this->present_index].boundary_id:
+	  dim < spacedim ? 
+	  this->objects().boundary_or_material_id[this->present_index].material_id:
+	  numbers::invalid_manifold_id);
   
   return this->tria->get_manifold(mi);
 }
