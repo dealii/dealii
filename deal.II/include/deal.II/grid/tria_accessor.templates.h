@@ -1936,7 +1936,7 @@ TriaAccessor<structdim, dim, spacedim>::get_manifold () const
 				    this->objects().boundary_or_material_id[this->present_index].material_id:
 				    numbers::invalid_manifold_id);
   else
-    this->tria->get_manifold(mi);
+    return this->tria->get_manifold(mi);
 }
 
 
