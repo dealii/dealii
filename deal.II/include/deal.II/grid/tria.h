@@ -3371,6 +3371,11 @@ private:
    * in 2d and higher where we have space in the structures that store
    * data for faces, but in 1d there is no such space for faces.
    *
+   * @note Manifold objects are pretty useless for points since they are
+   * neither refined nor are their interiors mapped. We nevertheless allow
+   * storing manifold ids for points to be consistent in dimension-independent
+   * programs.
+   *
    * The field is declared as a pointer for a rather mundane reason:
    * all other fields of this class that can be modified by the
    * TriaAccessor hierarchy are pointers, and so these accessor
