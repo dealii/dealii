@@ -1930,14 +1930,13 @@ TriaAccessor<structdim, dim, spacedim>::get_manifold () const
 				   // the boundary id, after having
 				   // casted it to a manifold id
   if(mi == numbers::invalid_manifold_id) 
-    mi = static_cast<types::manifold_id>
-	 (structdim < dim ?
-	  this->objects().boundary_or_material_id[this->present_index].boundary_id:
-	  dim < spacedim ? 
-	  this->objects().boundary_or_material_id[this->present_index].material_id:
-	  numbers::invalid_manifold_id);
-  
-  return this->tria->get_manifold(mi);
+    return this->tria->get_manifold(structdim < dim ?
+				    this->objects().boundary_or_material_id[this->present_index].boundary_id:
+				    dim < spacedim ? 
+				    this->objects().boundary_or_material_id[this->present_index].material_id:
+				    numbers::invalid_manifold_id);
+  else
+    this->tria->get_manifold(mi);
 }
 
 
