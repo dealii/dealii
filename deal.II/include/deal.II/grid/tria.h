@@ -121,11 +121,13 @@ struct CellData
     types::boundary_id boundary_id;
     types::material_id material_id;
   };
+
   /**
    * Manifold identificator of this object. This identificator should
    * be used to identify the manifold to which this object belongs,
    * and from which this object will collect information on how to add
-   * points upon refinement.*/
+   * points upon refinement.
+   */
   types::manifold_id manifold_id;
 
   /**
