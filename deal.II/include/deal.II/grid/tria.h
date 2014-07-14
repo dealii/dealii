@@ -1781,59 +1781,39 @@ public:
   virtual void set_mesh_smoothing (const MeshSmoothing mesh_smoothing);
 
   /**
-   * If @p dim==spacedim, assign a boundary
-   * object to a certain part of the
-   * boundary of a the triangulation. If a
-   * face with boundary number @p number is
-   * refined, this object is used to find
-   * the location of new vertices on the
-   * boundary (see the results section of step-49
-   * for a more in-depth discussion of this, with examples).
-   * It is also used for
-   * non-linear (i.e.: non-Q1)
-   * transformations of cells to the unit
-   * cell in shape function calculations.
+   * If @p dim==spacedim, assign a boundary object to a certain part
+   * of the boundary of a the triangulation. If a face with boundary
+   * number @p number is refined, this object is used to find the
+   * location of new vertices on the boundary (see the results section
+   * of step-49 for a more in-depth discussion of this, with
+   * examples).  It is also used for non-linear (i.e.: non-Q1)
+   * transformations of cells to the unit cell in shape function
+   * calculations.
    *
-   * If @p dim!=spacedim the boundary object
-   * is in fact the exact manifold that the
-   * triangulation is approximating (for
-   * example a circle approximated by a
-   * polygon triangulation). As above, the
-   * refinement is made in such a way that
-   * the new points are located on the exact
-   * manifold.
+   * If @p dim!=spacedim the boundary object is in fact the exact
+   * manifold that the triangulation is approximating (for example a
+   * circle approximated by a polygon triangulation). As above, the
+   * refinement is made in such a way that the new points are located
+   * on the exact manifold.
    *
-   * Numbers of boundary objects correspond
-   * to material numbers of faces at the
-   * boundary, for instance the material id
-   * in a UCD input file. They are not
-   * necessarily consecutive but must be in
-   * the range 0-(types::boundary_id-1).
-   * Material IDs on boundaries are also
-   * called boundary indicators and are
-   * accessed with accessor functions
-   * of that name.
+   * Numbers of boundary objects correspond to material numbers of
+   * faces at the boundary, for instance the material id in a UCD
+   * input file. They are not necessarily consecutive but must be in
+   * the range 0-(types::boundary_id-1).  Material IDs on boundaries
+   * are also called boundary indicators and are accessed with
+   * accessor functions of that name.
    *
-   * The @p boundary_object is not copied
-   * and MUST persist until the
-   * triangulation is destroyed. This is
-   * also true for triangulations generated
-   * from this one by @p
-   * copy_triangulation.
+   * The @p boundary_object is not copied and MUST persist until the
+   * triangulation is destroyed. This is also true for triangulations
+   * generated from this one by @p copy_triangulation.
    *
-   * It is possible to remove or replace
-   * the boundary object during the
-   * lifetime of a non-empty
-   * triangulation. Usually, this is done
-   * before the first refinement and is
-   * dangerous afterwards. Removal of a
-   * boundary object is done by
-   * <tt>set_boundary(number)</tt>,
-   * i.e. the function of same name but
-   * only one argument. This operation then
-   * replaces the boundary object given
-   * before by a straight boundary
-   * approximation.
+   * It is possible to remove or replace the boundary object during
+   * the lifetime of a non-empty triangulation. Usually, this is done
+   * before the first refinement and is dangerous afterwards. Removal
+   * of a boundary object is done by <tt>set_boundary(number)</tt>,
+   * i.e. the function of same name but only one argument. This
+   * operation then replaces the boundary object given before by a
+   * straight boundary approximation.
    *
    * @ingroup boundary
    *
@@ -1854,6 +1834,35 @@ public:
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_boundary (const types::manifold_id number);
+
+  /**
+   * Assign a manifold object to a certain part of the the
+   * triangulation. If an object with manfifold number @p number is
+   * refined, this object is used to find the location of new vertices
+   * (see the results section of step-49 for a more in-depth
+   * discussion of this, with examples).  It is also used for
+   * non-linear (i.e.: non-Q1) transformations of cells to the unit
+   * cell in shape function calculations.
+   *
+   * The @p manifold_object is not copied and MUST persist until the
+   * triangulation is destroyed. This is also true for triangulations
+   * generated from this one by @p copy_triangulation.
+   *
+   * It is possible to remove or replace the boundary object during
+   * the lifetime of a non-empty triangulation. Usually, this is done
+   * before the first refinement and is dangerous afterwards. Removal
+   * of a manifold object is done by <tt>set_manifold(number)</tt>,
+   * i.e. the function of same name but only one argument. This
+   * operation then replaces the manifold object given before by a
+   * straight manifold approximation.
+   *
+   * @ingroup manifold
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  void set_manifold (const types::manifold_id   number,
+                     const Boundary<dim,spacedim> &manifold_object);
+
     
   /**
    * Reset those parts of the triangulation with the given manifold_id

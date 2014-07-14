@@ -9592,10 +9592,18 @@ void
 Triangulation<dim, spacedim>::set_boundary (const types::manifold_id m_number,
                                             const Boundary<dim, spacedim> &boundary_object)
 {
+  set_manifold(m_number, boundary_object);
+}
+
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number,
+                                            const Boundary<dim, spacedim> &manifold_object)
+{
   Assert(m_number < numbers::invalid_manifold_id,
 	 ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
 
-  manifold[m_number] = &boundary_object;
+  manifold[m_number] = &manifold_object;
 }
 
 

@@ -52,7 +52,7 @@ void test(unsigned int ref=1){
 	      if(cell->face(f)->center().distance(center)< radius)
 		cell->face(f)->set_all_manifold_ids(1);
 
-	tria.set_boundary(1,boundary);
+	tria.set_manifold(1,boundary);
 	tria.refine_global(2);
 
 	GridOut gridout;
