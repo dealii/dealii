@@ -49,6 +49,10 @@ for (deal_II_dimension : DIMENSIONS)
       (const Triangulation<deal_II_dimension> &,
        std::ostream &,
        const Mapping<deal_II_dimension,deal_II_dimension> *) const;
+    template void GridOut::write_vtk
+      (const Triangulation<deal_II_dimension>&,
+       std::ostream&) const;       
+       
     template void GridOut::write<deal_II_dimension>
       (const Triangulation<deal_II_dimension> &,
        std::ostream &, const OutputFormat,
@@ -69,6 +73,9 @@ for (deal_II_dimension : DIMENSIONS)
       (const Triangulation<deal_II_dimension,deal_II_dimension+1>&,
        std::ostream&,
        const Mapping<deal_II_dimension,deal_II_dimension+1>*) const;
+   template void GridOut::write_vtk
+      (const Triangulation<deal_II_dimension,deal_II_dimension+1>&,
+       std::ostream&) const;
 #endif
 #if deal_II_dimension == 3
    template void GridOut::write_ucd

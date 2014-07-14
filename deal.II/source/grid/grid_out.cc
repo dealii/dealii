@@ -392,7 +392,6 @@ namespace GridOutFlags
   {
     draw_bounding_box = param.get_bool ("Draw bounding box");
   }
-
 }  // end namespace GridOutFlags
 
 
@@ -468,6 +467,11 @@ void GridOut::set_flags (const GridOutFlags::MathGL &flags)
   mathgl_flags = flags;
 }
 
+void GridOut::set_flags (const GridOutFlags::Vtk &flags)
+{
+  vtk_flags = flags;
+}
+
 std::string
 GridOut::default_suffix (const OutputFormat output_format)
 {
@@ -491,6 +495,8 @@ GridOut::default_suffix (const OutputFormat output_format)
       return ".svg";
     case mathgl:
       return ".mathgl";
+    case vtk:
+      return ".vtk";
     default:
       Assert (false, ExcNotImplemented());
       return "";
@@ -537,6 +543,9 @@ GridOut::parse_output_format (const std::string &format_name)
   if (format_name == "mathgl")
     return mathgl;
 
+  if (format_name == "vtk")
+    return vtk;
+
   AssertThrow (false, ExcInvalidState ());
   // return something weird
   return OutputFormat(-1);
@@ -546,7 +555,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names ()
 {
-  return "none|dx|gnuplot|eps|ucd|xfig|msh|svg|mathgl";
+  return "none|dx|gnuplot|eps|ucd|xfig|msh|svg|mathgl|vtk";
 }
 
 
@@ -586,6 +595,10 @@ GridOut::declare_parameters(ParameterHandler &param)
   param.enter_subsection("MathGL");
   GridOutFlags::MathGL::declare_parameters(param);
   param.leave_subsection();
+
+  param.enter_subsection("Vtk");
+  GridOutFlags::Vtk::declare_parameters(param);
+  param.leave_subsection();
 }
 
 
@@ -624,6 +637,10 @@ GridOut::parse_parameters(ParameterHandler &param)
   param.enter_subsection("MathGL");
   mathgl_flags.parse_parameters(param);
   param.leave_subsection();
+
+  param.enter_subsection("Vtk");
+  vtk_flags.parse_parameters(param);
+  param.leave_subsection();
 }
 
 
@@ -640,7 +657,8 @@ GridOut::memory_consumption () const
           sizeof(eps_flags_3)   +
           sizeof(xfig_flags)    +
           sizeof(svg_flags)     +
-          sizeof(mathgl_flags));
+          sizeof(mathgl_flags)  +
+          sizeof(vtk_flags));
 }
 
 
@@ -2367,6 +2385,65 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
 }
 
 
+
+namespace
+{
+  /**
+   * A function that is able to convert each cell of a triangulation into
+   * a patch that can then be output by the functions in DataOutBase.
+   * This is made particularly simple because the patch only needs to
+   * contain geometry info -- we attach no data at all
+   */
+  template <int dim, int spacedim>
+  std::vector<DataOutBase::Patch<dim,spacedim> >
+  triangulation_to_patches (const Triangulation<dim,spacedim> &triangulation)
+  {
+    std::vector<DataOutBase::Patch<dim,spacedim> > patches;
+    patches.reserve (triangulation.n_active_cells());
+
+    // convert each of the active cells into a patch
+    for (typename Triangulation<dim,spacedim>::active_cell_iterator cell = triangulation.begin_active();
+        cell != triangulation.end(); ++cell)
+      {
+        DataOutBase::Patch<dim,spacedim> patch;
+        patch.n_subdivisions = 1;
+
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          patch.vertices[v] = cell->vertex(v);
+
+        // no data
+        patch.data.reinit (0,0);
+
+        patches.push_back (patch);
+      }
+
+    return patches;
+  }
+}
+
+
+
+template <int dim, int spacedim>
+void GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
+                            std::ostream             &out) const
+{
+  AssertThrow (out, ExcIO ());
+
+  // convert the cells of the triangulation into a set of patches
+  // and then have them output. since there is no data attached to
+  // the geometry, we also do not have to provide any names, identifying
+  // information, etc.
+  DataOutBase::write_vtk (triangulation_to_patches(tria),
+                          std::vector<std::string>(),
+                          std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >(),
+                          vtk_flags,
+                          out);
+
+  AssertThrow (out, ExcIO ());
+}
+
+
+
 unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
 {
   return 0;
@@ -3736,6 +3813,10 @@ void GridOut::write (const Triangulation<dim, spacedim> &tria,
     case mathgl:
       write_mathgl (tria, out);
       return;
+
+    case vtk:
+      write_vtk (tria, out);
+      return;
     }
 
   Assert (false, ExcInternalError());
@@ -3743,10 +3824,9 @@ void GridOut::write (const Triangulation<dim, spacedim> &tria,
 
 
 template <int dim, int spacedim>
-void GridOut::write (
-  const Triangulation<dim, spacedim> &tria,
-  std::ostream             &out,
-  const Mapping<dim,spacedim>       *mapping) const
+void GridOut::write (const Triangulation<dim, spacedim> &tria,
+                     std::ostream             &out,
+                     const Mapping<dim,spacedim>  *mapping) const
 {
   write(tria, out, default_format, mapping);
 }

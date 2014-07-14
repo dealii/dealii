@@ -407,7 +407,9 @@ namespace DataOutBase
                                         :
                                         n_data_sets,
                                         patch->data.n_rows()));
-          Assert (patch->data.n_cols() == Utilities::fixed_power<dim>(n_subdivisions+1),
+          Assert ((n_data_sets == 0)
+                  ||
+                  (patch->data.n_cols() == Utilities::fixed_power<dim>(n_subdivisions+1)),
                   ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
           for (unsigned int i=0; i<patch->data.n_cols(); ++i, ++next_value)

@@ -172,6 +172,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There is now a function GridOut::write_vtk() that can
+  write a mesh in VTK format.
+  <br>
+  (Wolfgang Bangerth, 2014/07/14)
+  </li>
+
   <li> Fixed: PETSc up to at least version 3.5 has a bug where it does
   not zero-initialize the ghost elements of a newly created ghosted
   parallel vector. This is now worked around inside deal.II.
