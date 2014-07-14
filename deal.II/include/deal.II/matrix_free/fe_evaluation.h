@@ -1647,7 +1647,7 @@ FEEvaluationBase<dim,n_components_,Number>
   matrix_info        (0),
   dof_info           (0),
   mapping_info       (0),
-  stored_shape_info  (new internal::MatrixFreeFunctions::ShapeInfo<Number>(geometry.get_quadrature(), dof_handler_in.get_fe(), 0)),
+  stored_shape_info  (new internal::MatrixFreeFunctions::ShapeInfo<Number>(geometry.get_quadrature(), dof_handler_in.get_fe(), dof_handler_in.get_fe().component_to_base_index(first_selected_component).first)),
   data               (stored_shape_info.get()),
   cartesian_data     (0),
   jacobian           (geometry.get_inverse_jacobians().begin()),
@@ -1663,6 +1663,8 @@ FEEvaluationBase<dim,n_components_,Number>
   dof_handler        (&dof_handler_in),
   first_selected_component (first_selected_component)
 {
+  const unsigned int base_element_number =
+    dof_handler_in.get_fe().component_to_base_index(first_selected_component).first;
   for (unsigned int c=0; c<n_components_; ++c)
     {
       values_dofs[c] = 0;
@@ -1672,8 +1674,8 @@ FEEvaluationBase<dim,n_components_,Number>
       for (unsigned int d=0; d<(dim*dim+dim)/2; ++d)
         hessians_quad[c][d] = 0;
     }
-  Assert(dof_handler->get_fe().element_multiplicity(0) == 1 ||
-         dof_handler->get_fe().element_multiplicity(0)-first_selected_component >= n_components_,
+  Assert(dof_handler->get_fe().element_multiplicity(base_element_number) == 1 ||
+         dof_handler->get_fe().element_multiplicity(base_element_number)-first_selected_component >= n_components_,
          ExcMessage("The underlying element must at least contain as many "
                     "components as requested by this class"));
 }
@@ -5249,6 +5251,9 @@ namespace internal
               const bool               evaluate_grad,
               const bool               evaluate_lapl)
   {
+    if (evaluate_val == false && evaluate_grad == false && evaluate_lapl == false)
+      return;
+
     const EvaluatorVariant variant =
       EvaluatorSelector<type,(fe_degree+n_q_points_1d>4)>::variant;
     typedef EvaluatorTensorProduct<variant, dim, fe_degree, n_q_points_1d,
