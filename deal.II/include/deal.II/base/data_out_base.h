@@ -303,21 +303,22 @@ namespace DataOutBase
     Table<2,float> data;
 
     /**
-     * Bool flag indicating, whether the coordinates of the inner
-     * patch points are appended to the @p data table (@p true) or not
-     * (@p false), where the second is the standard and can be found
-     * for all cells in the interior of a domain.
+     * A flag indicating whether the coordinates of the interior patch points
+     * (assuming that the patch is supposed to be subdivided further) are
+     * appended to the @p data table (@p true) or not (@p false). The latter
+     * is the default and in this case the locations of the points interior to
+     * this patch are computed by (bi-, tri-)linear interpolation from the
+     * vertices of the patch.
      *
-     * On the boundary of a domain, patch points are evaluated using a
-     * Mapping and therefore have to be stored inside the patch, as
-     * the Mapping and the corresponding boundary information are no
-     * longer available later on when we actually write the patch out
-     * to an output stream.
+     * This option exists since patch points may be evaluated using a Mapping
+     * (rather than by a linear interpolation) and therefore have to be stored
+     * in the Patch structure.
      */
     bool points_are_available;
 
     /**
-     * Default constructor. Sets #n_subdivisions to one.
+     * Default constructor. Sets #n_subdivisions to one, #points_are_available
+     * to false, and #patch_index to #no_neighbor.
      */
     Patch ();
 
