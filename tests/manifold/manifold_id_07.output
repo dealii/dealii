@@ -2,16 +2,16 @@
 DEAL::Testing dim=1, spacedim=1
 DEAL::C: 2.0
 DEAL::F: 0, mid: 1
-DEAL::F: 3, mid: 255
+DEAL::F: 3, mid: -1
 DEAL::C: 2.1
-DEAL::F: 3, mid: 255
-DEAL::F: 2, mid: 255
+DEAL::F: 3, mid: -1
+DEAL::F: 2, mid: -1
 DEAL::C: 2.2
-DEAL::F: 2, mid: 255
-DEAL::F: 4, mid: 255
+DEAL::F: 2, mid: -1
+DEAL::F: 4, mid: -1
 DEAL::C: 2.3
-DEAL::F: 4, mid: 255
-DEAL::F: 1, mid: 255
+DEAL::F: 4, mid: -1
+DEAL::F: 1, mid: -1
 $NOD
 5
 1  0.00000 0 0
@@ -30,16 +30,16 @@ $ENDELM
 DEAL::Testing dim=1, spacedim=2
 DEAL::C: 2.0
 DEAL::F: 0, mid: 1
-DEAL::F: 3, mid: 255
+DEAL::F: 3, mid: -1
 DEAL::C: 2.1
-DEAL::F: 3, mid: 255
-DEAL::F: 2, mid: 255
+DEAL::F: 3, mid: -1
+DEAL::F: 2, mid: -1
 DEAL::C: 2.2
-DEAL::F: 2, mid: 255
-DEAL::F: 4, mid: 255
+DEAL::F: 2, mid: -1
+DEAL::F: 4, mid: -1
 DEAL::C: 2.3
-DEAL::F: 4, mid: 255
-DEAL::F: 1, mid: 255
+DEAL::F: 4, mid: -1
+DEAL::F: 1, mid: -1
 $NOD
 5
 1  0.00000 0.00000 0
@@ -58,84 +58,84 @@ $ENDELM
 DEAL::Testing dim=2, spacedim=2
 DEAL::C: 2.0
 DEAL::F: 20, mid: 1
-DEAL::F: 40, mid: 255
-DEAL::F: 16, mid: 255
-DEAL::F: 42, mid: 255
+DEAL::F: 40, mid: -1
+DEAL::F: 16, mid: -1
+DEAL::F: 42, mid: -1
 DEAL::C: 2.1
-DEAL::F: 40, mid: 255
-DEAL::F: 32, mid: 255
-DEAL::F: 17, mid: 255
-DEAL::F: 43, mid: 255
+DEAL::F: 40, mid: -1
+DEAL::F: 32, mid: -1
+DEAL::F: 17, mid: -1
+DEAL::F: 43, mid: -1
 DEAL::C: 2.2
 DEAL::F: 21, mid: 1
-DEAL::F: 41, mid: 255
-DEAL::F: 42, mid: 255
-DEAL::F: 36, mid: 255
+DEAL::F: 41, mid: -1
+DEAL::F: 42, mid: -1
+DEAL::F: 36, mid: -1
 DEAL::C: 2.3
-DEAL::F: 41, mid: 255
-DEAL::F: 33, mid: 255
-DEAL::F: 43, mid: 255
-DEAL::F: 37, mid: 255
+DEAL::F: 41, mid: -1
+DEAL::F: 33, mid: -1
+DEAL::F: 43, mid: -1
+DEAL::F: 37, mid: -1
 DEAL::C: 2.4
-DEAL::F: 32, mid: 255
-DEAL::F: 44, mid: 255
-DEAL::F: 18, mid: 255
-DEAL::F: 46, mid: 255
+DEAL::F: 32, mid: -1
+DEAL::F: 44, mid: -1
+DEAL::F: 18, mid: -1
+DEAL::F: 46, mid: -1
 DEAL::C: 2.5
-DEAL::F: 44, mid: 255
-DEAL::F: 24, mid: 255
-DEAL::F: 19, mid: 255
-DEAL::F: 47, mid: 255
+DEAL::F: 44, mid: -1
+DEAL::F: 24, mid: -1
+DEAL::F: 19, mid: -1
+DEAL::F: 47, mid: -1
 DEAL::C: 2.6
-DEAL::F: 33, mid: 255
-DEAL::F: 45, mid: 255
-DEAL::F: 46, mid: 255
-DEAL::F: 38, mid: 255
+DEAL::F: 33, mid: -1
+DEAL::F: 45, mid: -1
+DEAL::F: 46, mid: -1
+DEAL::F: 38, mid: -1
 DEAL::C: 2.7
-DEAL::F: 45, mid: 255
-DEAL::F: 25, mid: 255
-DEAL::F: 47, mid: 255
-DEAL::F: 39, mid: 255
+DEAL::F: 45, mid: -1
+DEAL::F: 25, mid: -1
+DEAL::F: 47, mid: -1
+DEAL::F: 39, mid: -1
 DEAL::C: 2.8
 DEAL::F: 22, mid: 1
-DEAL::F: 48, mid: 255
-DEAL::F: 36, mid: 255
-DEAL::F: 50, mid: 255
+DEAL::F: 48, mid: -1
+DEAL::F: 36, mid: -1
+DEAL::F: 50, mid: -1
 DEAL::C: 2.9
-DEAL::F: 48, mid: 255
-DEAL::F: 34, mid: 255
-DEAL::F: 37, mid: 255
-DEAL::F: 51, mid: 255
+DEAL::F: 48, mid: -1
+DEAL::F: 34, mid: -1
+DEAL::F: 37, mid: -1
+DEAL::F: 51, mid: -1
 DEAL::C: 2.10
 DEAL::F: 23, mid: 1
-DEAL::F: 49, mid: 255
-DEAL::F: 50, mid: 255
-DEAL::F: 28, mid: 255
+DEAL::F: 49, mid: -1
+DEAL::F: 50, mid: -1
+DEAL::F: 28, mid: -1
 DEAL::C: 2.11
-DEAL::F: 49, mid: 255
-DEAL::F: 35, mid: 255
-DEAL::F: 51, mid: 255
-DEAL::F: 29, mid: 255
+DEAL::F: 49, mid: -1
+DEAL::F: 35, mid: -1
+DEAL::F: 51, mid: -1
+DEAL::F: 29, mid: -1
 DEAL::C: 2.12
-DEAL::F: 34, mid: 255
-DEAL::F: 52, mid: 255
-DEAL::F: 38, mid: 255
-DEAL::F: 54, mid: 255
+DEAL::F: 34, mid: -1
+DEAL::F: 52, mid: -1
+DEAL::F: 38, mid: -1
+DEAL::F: 54, mid: -1
 DEAL::C: 2.13
-DEAL::F: 52, mid: 255
-DEAL::F: 26, mid: 255
-DEAL::F: 39, mid: 255
-DEAL::F: 55, mid: 255
+DEAL::F: 52, mid: -1
+DEAL::F: 26, mid: -1
+DEAL::F: 39, mid: -1
+DEAL::F: 55, mid: -1
 DEAL::C: 2.14
-DEAL::F: 35, mid: 255
-DEAL::F: 53, mid: 255
-DEAL::F: 54, mid: 255
-DEAL::F: 30, mid: 255
+DEAL::F: 35, mid: -1
+DEAL::F: 53, mid: -1
+DEAL::F: 54, mid: -1
+DEAL::F: 30, mid: -1
 DEAL::C: 2.15
-DEAL::F: 53, mid: 255
-DEAL::F: 27, mid: 255
-DEAL::F: 55, mid: 255
-DEAL::F: 31, mid: 255
+DEAL::F: 53, mid: -1
+DEAL::F: 27, mid: -1
+DEAL::F: 55, mid: -1
+DEAL::F: 31, mid: -1
 $NOD
 25
 1  0.00000 0.00000 0
@@ -186,84 +186,84 @@ $ENDELM
 DEAL::Testing dim=2, spacedim=3
 DEAL::C: 2.0
 DEAL::F: 20, mid: 1
-DEAL::F: 40, mid: 255
-DEAL::F: 16, mid: 255
-DEAL::F: 42, mid: 255
+DEAL::F: 40, mid: -1
+DEAL::F: 16, mid: -1
+DEAL::F: 42, mid: -1
 DEAL::C: 2.1
-DEAL::F: 40, mid: 255
-DEAL::F: 32, mid: 255
-DEAL::F: 17, mid: 255
-DEAL::F: 43, mid: 255
+DEAL::F: 40, mid: -1
+DEAL::F: 32, mid: -1
+DEAL::F: 17, mid: -1
+DEAL::F: 43, mid: -1
 DEAL::C: 2.2
 DEAL::F: 21, mid: 1
-DEAL::F: 41, mid: 255
-DEAL::F: 42, mid: 255
-DEAL::F: 36, mid: 255
+DEAL::F: 41, mid: -1
+DEAL::F: 42, mid: -1
+DEAL::F: 36, mid: -1
 DEAL::C: 2.3
-DEAL::F: 41, mid: 255
-DEAL::F: 33, mid: 255
-DEAL::F: 43, mid: 255
-DEAL::F: 37, mid: 255
+DEAL::F: 41, mid: -1
+DEAL::F: 33, mid: -1
+DEAL::F: 43, mid: -1
+DEAL::F: 37, mid: -1
 DEAL::C: 2.4
-DEAL::F: 32, mid: 255
-DEAL::F: 44, mid: 255
-DEAL::F: 18, mid: 255
-DEAL::F: 46, mid: 255
+DEAL::F: 32, mid: -1
+DEAL::F: 44, mid: -1
+DEAL::F: 18, mid: -1
+DEAL::F: 46, mid: -1
 DEAL::C: 2.5
-DEAL::F: 44, mid: 255
-DEAL::F: 24, mid: 255
-DEAL::F: 19, mid: 255
-DEAL::F: 47, mid: 255
+DEAL::F: 44, mid: -1
+DEAL::F: 24, mid: -1
+DEAL::F: 19, mid: -1
+DEAL::F: 47, mid: -1
 DEAL::C: 2.6
-DEAL::F: 33, mid: 255
-DEAL::F: 45, mid: 255
-DEAL::F: 46, mid: 255
-DEAL::F: 38, mid: 255
+DEAL::F: 33, mid: -1
+DEAL::F: 45, mid: -1
+DEAL::F: 46, mid: -1
+DEAL::F: 38, mid: -1
 DEAL::C: 2.7
-DEAL::F: 45, mid: 255
-DEAL::F: 25, mid: 255
-DEAL::F: 47, mid: 255
-DEAL::F: 39, mid: 255
+DEAL::F: 45, mid: -1
+DEAL::F: 25, mid: -1
+DEAL::F: 47, mid: -1
+DEAL::F: 39, mid: -1
 DEAL::C: 2.8
 DEAL::F: 22, mid: 1
-DEAL::F: 48, mid: 255
-DEAL::F: 36, mid: 255
-DEAL::F: 50, mid: 255
+DEAL::F: 48, mid: -1
+DEAL::F: 36, mid: -1
+DEAL::F: 50, mid: -1
 DEAL::C: 2.9
-DEAL::F: 48, mid: 255
-DEAL::F: 34, mid: 255
-DEAL::F: 37, mid: 255
-DEAL::F: 51, mid: 255
+DEAL::F: 48, mid: -1
+DEAL::F: 34, mid: -1
+DEAL::F: 37, mid: -1
+DEAL::F: 51, mid: -1
 DEAL::C: 2.10
 DEAL::F: 23, mid: 1
-DEAL::F: 49, mid: 255
-DEAL::F: 50, mid: 255
-DEAL::F: 28, mid: 255
+DEAL::F: 49, mid: -1
+DEAL::F: 50, mid: -1
+DEAL::F: 28, mid: -1
 DEAL::C: 2.11
-DEAL::F: 49, mid: 255
-DEAL::F: 35, mid: 255
-DEAL::F: 51, mid: 255
-DEAL::F: 29, mid: 255
+DEAL::F: 49, mid: -1
+DEAL::F: 35, mid: -1
+DEAL::F: 51, mid: -1
+DEAL::F: 29, mid: -1
 DEAL::C: 2.12
-DEAL::F: 34, mid: 255
-DEAL::F: 52, mid: 255
-DEAL::F: 38, mid: 255
-DEAL::F: 54, mid: 255
+DEAL::F: 34, mid: -1
+DEAL::F: 52, mid: -1
+DEAL::F: 38, mid: -1
+DEAL::F: 54, mid: -1
 DEAL::C: 2.13
-DEAL::F: 52, mid: 255
-DEAL::F: 26, mid: 255
-DEAL::F: 39, mid: 255
-DEAL::F: 55, mid: 255
+DEAL::F: 52, mid: -1
+DEAL::F: 26, mid: -1
+DEAL::F: 39, mid: -1
+DEAL::F: 55, mid: -1
 DEAL::C: 2.14
-DEAL::F: 35, mid: 255
-DEAL::F: 53, mid: 255
-DEAL::F: 54, mid: 255
-DEAL::F: 30, mid: 255
+DEAL::F: 35, mid: -1
+DEAL::F: 53, mid: -1
+DEAL::F: 54, mid: -1
+DEAL::F: 30, mid: -1
 DEAL::C: 2.15
-DEAL::F: 53, mid: 255
-DEAL::F: 27, mid: 255
-DEAL::F: 55, mid: 255
-DEAL::F: 31, mid: 255
+DEAL::F: 53, mid: -1
+DEAL::F: 27, mid: -1
+DEAL::F: 55, mid: -1
+DEAL::F: 31, mid: -1
 $NOD
 25
 1  0.00000 0.00000 0.00000
@@ -314,452 +314,452 @@ $ENDELM
 DEAL::Testing dim=3, spacedim=3
 DEAL::C: 2.0
 DEAL::F: 74, mid: 1
-DEAL::F: 281, mid: 255
-DEAL::F: 42, mid: 255
-DEAL::F: 277, mid: 255
-DEAL::F: 58, mid: 255
-DEAL::F: 273, mid: 255
+DEAL::F: 281, mid: -1
+DEAL::F: 42, mid: -1
+DEAL::F: 277, mid: -1
+DEAL::F: 58, mid: -1
+DEAL::F: 273, mid: -1
 DEAL::C: 2.1
-DEAL::F: 281, mid: 255
-DEAL::F: 182, mid: 255
-DEAL::F: 44, mid: 255
-DEAL::F: 275, mid: 255
-DEAL::F: 59, mid: 255
-DEAL::F: 272, mid: 255
+DEAL::F: 281, mid: -1
+DEAL::F: 182, mid: -1
+DEAL::F: 44, mid: -1
+DEAL::F: 275, mid: -1
+DEAL::F: 59, mid: -1
+DEAL::F: 272, mid: -1
 DEAL::C: 2.2
 DEAL::F: 75, mid: 1
-DEAL::F: 280, mid: 255
-DEAL::F: 277, mid: 255
-DEAL::F: 166, mid: 255
-DEAL::F: 60, mid: 255
-DEAL::F: 271, mid: 255
+DEAL::F: 280, mid: -1
+DEAL::F: 277, mid: -1
+DEAL::F: 166, mid: -1
+DEAL::F: 60, mid: -1
+DEAL::F: 271, mid: -1
 DEAL::C: 2.3
-DEAL::F: 280, mid: 255
-DEAL::F: 183, mid: 255
-DEAL::F: 275, mid: 255
-DEAL::F: 168, mid: 255
-DEAL::F: 61, mid: 255
-DEAL::F: 270, mid: 255
+DEAL::F: 280, mid: -1
+DEAL::F: 183, mid: -1
+DEAL::F: 275, mid: -1
+DEAL::F: 168, mid: -1
+DEAL::F: 61, mid: -1
+DEAL::F: 270, mid: -1
 DEAL::C: 2.4
 DEAL::F: 76, mid: 1
-DEAL::F: 279, mid: 255
-DEAL::F: 43, mid: 255
-DEAL::F: 276, mid: 255
-DEAL::F: 273, mid: 255
-DEAL::F: 150, mid: 255
+DEAL::F: 279, mid: -1
+DEAL::F: 43, mid: -1
+DEAL::F: 276, mid: -1
+DEAL::F: 273, mid: -1
+DEAL::F: 150, mid: -1
 DEAL::C: 2.5
-DEAL::F: 279, mid: 255
-DEAL::F: 184, mid: 255
-DEAL::F: 45, mid: 255
-DEAL::F: 274, mid: 255
-DEAL::F: 272, mid: 255
-DEAL::F: 151, mid: 255
+DEAL::F: 279, mid: -1
+DEAL::F: 184, mid: -1
+DEAL::F: 45, mid: -1
+DEAL::F: 274, mid: -1
+DEAL::F: 272, mid: -1
+DEAL::F: 151, mid: -1
 DEAL::C: 2.6
 DEAL::F: 77, mid: 1
-DEAL::F: 278, mid: 255
-DEAL::F: 276, mid: 255
-DEAL::F: 167, mid: 255
-DEAL::F: 271, mid: 255
-DEAL::F: 152, mid: 255
+DEAL::F: 278, mid: -1
+DEAL::F: 276, mid: -1
+DEAL::F: 167, mid: -1
+DEAL::F: 271, mid: -1
+DEAL::F: 152, mid: -1
 DEAL::C: 2.7
-DEAL::F: 278, mid: 255
-DEAL::F: 185, mid: 255
-DEAL::F: 274, mid: 255
-DEAL::F: 169, mid: 255
-DEAL::F: 270, mid: 255
-DEAL::F: 153, mid: 255
+DEAL::F: 278, mid: -1
+DEAL::F: 185, mid: -1
+DEAL::F: 274, mid: -1
+DEAL::F: 169, mid: -1
+DEAL::F: 270, mid: -1
+DEAL::F: 153, mid: -1
 DEAL::C: 2.8
-DEAL::F: 182, mid: 255
-DEAL::F: 269, mid: 255
-DEAL::F: 50, mid: 255
-DEAL::F: 265, mid: 255
-DEAL::F: 62, mid: 255
-DEAL::F: 261, mid: 255
+DEAL::F: 182, mid: -1
+DEAL::F: 269, mid: -1
+DEAL::F: 50, mid: -1
+DEAL::F: 265, mid: -1
+DEAL::F: 62, mid: -1
+DEAL::F: 261, mid: -1
 DEAL::C: 2.9
-DEAL::F: 269, mid: 255
-DEAL::F: 90, mid: 255
-DEAL::F: 52, mid: 255
-DEAL::F: 263, mid: 255
-DEAL::F: 63, mid: 255
-DEAL::F: 260, mid: 255
+DEAL::F: 269, mid: -1
+DEAL::F: 90, mid: -1
+DEAL::F: 52, mid: -1
+DEAL::F: 263, mid: -1
+DEAL::F: 63, mid: -1
+DEAL::F: 260, mid: -1
 DEAL::C: 2.10
-DEAL::F: 183, mid: 255
-DEAL::F: 268, mid: 255
-DEAL::F: 265, mid: 255
-DEAL::F: 158, mid: 255
-DEAL::F: 64, mid: 255
-DEAL::F: 259, mid: 255
+DEAL::F: 183, mid: -1
+DEAL::F: 268, mid: -1
+DEAL::F: 265, mid: -1
+DEAL::F: 158, mid: -1
+DEAL::F: 64, mid: -1
+DEAL::F: 259, mid: -1
 DEAL::C: 2.11
-DEAL::F: 268, mid: 255
-DEAL::F: 91, mid: 255
-DEAL::F: 263, mid: 255
-DEAL::F: 160, mid: 255
-DEAL::F: 65, mid: 255
-DEAL::F: 258, mid: 255
+DEAL::F: 268, mid: -1
+DEAL::F: 91, mid: -1
+DEAL::F: 263, mid: -1
+DEAL::F: 160, mid: -1
+DEAL::F: 65, mid: -1
+DEAL::F: 258, mid: -1
 DEAL::C: 2.12
-DEAL::F: 184, mid: 255
-DEAL::F: 267, mid: 255
-DEAL::F: 51, mid: 255
-DEAL::F: 264, mid: 255
-DEAL::F: 261, mid: 255
-DEAL::F: 146, mid: 255
+DEAL::F: 184, mid: -1
+DEAL::F: 267, mid: -1
+DEAL::F: 51, mid: -1
+DEAL::F: 264, mid: -1
+DEAL::F: 261, mid: -1
+DEAL::F: 146, mid: -1
 DEAL::C: 2.13
-DEAL::F: 267, mid: 255
-DEAL::F: 92, mid: 255
-DEAL::F: 53, mid: 255
-DEAL::F: 262, mid: 255
-DEAL::F: 260, mid: 255
-DEAL::F: 147, mid: 255
+DEAL::F: 267, mid: -1
+DEAL::F: 92, mid: -1
+DEAL::F: 53, mid: -1
+DEAL::F: 262, mid: -1
+DEAL::F: 260, mid: -1
+DEAL::F: 147, mid: -1
 DEAL::C: 2.14
-DEAL::F: 185, mid: 255
-DEAL::F: 266, mid: 255
-DEAL::F: 264, mid: 255
-DEAL::F: 159, mid: 255
-DEAL::F: 259, mid: 255
-DEAL::F: 148, mid: 255
+DEAL::F: 185, mid: -1
+DEAL::F: 266, mid: -1
+DEAL::F: 264, mid: -1
+DEAL::F: 159, mid: -1
+DEAL::F: 259, mid: -1
+DEAL::F: 148, mid: -1
 DEAL::C: 2.15
-DEAL::F: 266, mid: 255
-DEAL::F: 93, mid: 255
-DEAL::F: 262, mid: 255
-DEAL::F: 161, mid: 255
-DEAL::F: 258, mid: 255
-DEAL::F: 149, mid: 255
+DEAL::F: 266, mid: -1
+DEAL::F: 93, mid: -1
+DEAL::F: 262, mid: -1
+DEAL::F: 161, mid: -1
+DEAL::F: 258, mid: -1
+DEAL::F: 149, mid: -1
 DEAL::C: 2.16
 DEAL::F: 78, mid: 1
-DEAL::F: 257, mid: 255
-DEAL::F: 166, mid: 255
-DEAL::F: 253, mid: 255
-DEAL::F: 66, mid: 255
-DEAL::F: 249, mid: 255
+DEAL::F: 257, mid: -1
+DEAL::F: 166, mid: -1
+DEAL::F: 253, mid: -1
+DEAL::F: 66, mid: -1
+DEAL::F: 249, mid: -1
 DEAL::C: 2.17
-DEAL::F: 257, mid: 255
-DEAL::F: 178, mid: 255
-DEAL::F: 168, mid: 255
-DEAL::F: 251, mid: 255
-DEAL::F: 67, mid: 255
-DEAL::F: 248, mid: 255
+DEAL::F: 257, mid: -1
+DEAL::F: 178, mid: -1
+DEAL::F: 168, mid: -1
+DEAL::F: 251, mid: -1
+DEAL::F: 67, mid: -1
+DEAL::F: 248, mid: -1
 DEAL::C: 2.18
 DEAL::F: 79, mid: 1
-DEAL::F: 256, mid: 255
-DEAL::F: 253, mid: 255
-DEAL::F: 106, mid: 255
-DEAL::F: 68, mid: 255
-DEAL::F: 247, mid: 255
+DEAL::F: 256, mid: -1
+DEAL::F: 253, mid: -1
+DEAL::F: 106, mid: -1
+DEAL::F: 68, mid: -1
+DEAL::F: 247, mid: -1
 DEAL::C: 2.19
-DEAL::F: 256, mid: 255
-DEAL::F: 179, mid: 255
-DEAL::F: 251, mid: 255
-DEAL::F: 108, mid: 255
-DEAL::F: 69, mid: 255
-DEAL::F: 246, mid: 255
+DEAL::F: 256, mid: -1
+DEAL::F: 179, mid: -1
+DEAL::F: 251, mid: -1
+DEAL::F: 108, mid: -1
+DEAL::F: 69, mid: -1
+DEAL::F: 246, mid: -1
 DEAL::C: 2.20
 DEAL::F: 80, mid: 1
-DEAL::F: 255, mid: 255
-DEAL::F: 167, mid: 255
-DEAL::F: 252, mid: 255
-DEAL::F: 249, mid: 255
-DEAL::F: 142, mid: 255
+DEAL::F: 255, mid: -1
+DEAL::F: 167, mid: -1
+DEAL::F: 252, mid: -1
+DEAL::F: 249, mid: -1
+DEAL::F: 142, mid: -1
 DEAL::C: 2.21
-DEAL::F: 255, mid: 255
-DEAL::F: 180, mid: 255
-DEAL::F: 169, mid: 255
-DEAL::F: 250, mid: 255
-DEAL::F: 248, mid: 255
-DEAL::F: 143, mid: 255
+DEAL::F: 255, mid: -1
+DEAL::F: 180, mid: -1
+DEAL::F: 169, mid: -1
+DEAL::F: 250, mid: -1
+DEAL::F: 248, mid: -1
+DEAL::F: 143, mid: -1
 DEAL::C: 2.22
 DEAL::F: 81, mid: 1
-DEAL::F: 254, mid: 255
-DEAL::F: 252, mid: 255
-DEAL::F: 107, mid: 255
-DEAL::F: 247, mid: 255
-DEAL::F: 144, mid: 255
+DEAL::F: 254, mid: -1
+DEAL::F: 252, mid: -1
+DEAL::F: 107, mid: -1
+DEAL::F: 247, mid: -1
+DEAL::F: 144, mid: -1
 DEAL::C: 2.23
-DEAL::F: 254, mid: 255
-DEAL::F: 181, mid: 255
-DEAL::F: 250, mid: 255
-DEAL::F: 109, mid: 255
-DEAL::F: 246, mid: 255
-DEAL::F: 145, mid: 255
+DEAL::F: 254, mid: -1
+DEAL::F: 181, mid: -1
+DEAL::F: 250, mid: -1
+DEAL::F: 109, mid: -1
+DEAL::F: 246, mid: -1
+DEAL::F: 145, mid: -1
 DEAL::C: 2.24
-DEAL::F: 178, mid: 255
-DEAL::F: 245, mid: 255
-DEAL::F: 158, mid: 255
-DEAL::F: 241, mid: 255
-DEAL::F: 70, mid: 255
-DEAL::F: 237, mid: 255
+DEAL::F: 178, mid: -1
+DEAL::F: 245, mid: -1
+DEAL::F: 158, mid: -1
+DEAL::F: 241, mid: -1
+DEAL::F: 70, mid: -1
+DEAL::F: 237, mid: -1
 DEAL::C: 2.25
-DEAL::F: 245, mid: 255
-DEAL::F: 94, mid: 255
-DEAL::F: 160, mid: 255
-DEAL::F: 239, mid: 255
-DEAL::F: 71, mid: 255
-DEAL::F: 236, mid: 255
+DEAL::F: 245, mid: -1
+DEAL::F: 94, mid: -1
+DEAL::F: 160, mid: -1
+DEAL::F: 239, mid: -1
+DEAL::F: 71, mid: -1
+DEAL::F: 236, mid: -1
 DEAL::C: 2.26
-DEAL::F: 179, mid: 255
-DEAL::F: 244, mid: 255
-DEAL::F: 241, mid: 255
-DEAL::F: 114, mid: 255
-DEAL::F: 72, mid: 255
-DEAL::F: 235, mid: 255
+DEAL::F: 179, mid: -1
+DEAL::F: 244, mid: -1
+DEAL::F: 241, mid: -1
+DEAL::F: 114, mid: -1
+DEAL::F: 72, mid: -1
+DEAL::F: 235, mid: -1
 DEAL::C: 2.27
-DEAL::F: 244, mid: 255
-DEAL::F: 95, mid: 255
-DEAL::F: 239, mid: 255
-DEAL::F: 116, mid: 255
-DEAL::F: 73, mid: 255
-DEAL::F: 234, mid: 255
+DEAL::F: 244, mid: -1
+DEAL::F: 95, mid: -1
+DEAL::F: 239, mid: -1
+DEAL::F: 116, mid: -1
+DEAL::F: 73, mid: -1
+DEAL::F: 234, mid: -1
 DEAL::C: 2.28
-DEAL::F: 180, mid: 255
-DEAL::F: 243, mid: 255
-DEAL::F: 159, mid: 255
-DEAL::F: 240, mid: 255
-DEAL::F: 237, mid: 255
-DEAL::F: 138, mid: 255
+DEAL::F: 180, mid: -1
+DEAL::F: 243, mid: -1
+DEAL::F: 159, mid: -1
+DEAL::F: 240, mid: -1
+DEAL::F: 237, mid: -1
+DEAL::F: 138, mid: -1
 DEAL::C: 2.29
-DEAL::F: 243, mid: 255
-DEAL::F: 96, mid: 255
-DEAL::F: 161, mid: 255
-DEAL::F: 238, mid: 255
-DEAL::F: 236, mid: 255
-DEAL::F: 139, mid: 255
+DEAL::F: 243, mid: -1
+DEAL::F: 96, mid: -1
+DEAL::F: 161, mid: -1
+DEAL::F: 238, mid: -1
+DEAL::F: 236, mid: -1
+DEAL::F: 139, mid: -1
 DEAL::C: 2.30
-DEAL::F: 181, mid: 255
-DEAL::F: 242, mid: 255
-DEAL::F: 240, mid: 255
-DEAL::F: 115, mid: 255
-DEAL::F: 235, mid: 255
-DEAL::F: 140, mid: 255
+DEAL::F: 181, mid: -1
+DEAL::F: 242, mid: -1
+DEAL::F: 240, mid: -1
+DEAL::F: 115, mid: -1
+DEAL::F: 235, mid: -1
+DEAL::F: 140, mid: -1
 DEAL::C: 2.31
-DEAL::F: 242, mid: 255
-DEAL::F: 97, mid: 255
-DEAL::F: 238, mid: 255
-DEAL::F: 117, mid: 255
-DEAL::F: 234, mid: 255
-DEAL::F: 141, mid: 255
+DEAL::F: 242, mid: -1
+DEAL::F: 97, mid: -1
+DEAL::F: 238, mid: -1
+DEAL::F: 117, mid: -1
+DEAL::F: 234, mid: -1
+DEAL::F: 141, mid: -1
 DEAL::C: 2.32
 DEAL::F: 82, mid: 1
-DEAL::F: 233, mid: 255
-DEAL::F: 46, mid: 255
-DEAL::F: 229, mid: 255
-DEAL::F: 150, mid: 255
-DEAL::F: 225, mid: 255
+DEAL::F: 233, mid: -1
+DEAL::F: 46, mid: -1
+DEAL::F: 229, mid: -1
+DEAL::F: 150, mid: -1
+DEAL::F: 225, mid: -1
 DEAL::C: 2.33
-DEAL::F: 233, mid: 255
-DEAL::F: 174, mid: 255
-DEAL::F: 48, mid: 255
-DEAL::F: 227, mid: 255
-DEAL::F: 151, mid: 255
-DEAL::F: 224, mid: 255
+DEAL::F: 233, mid: -1
+DEAL::F: 174, mid: -1
+DEAL::F: 48, mid: -1
+DEAL::F: 227, mid: -1
+DEAL::F: 151, mid: -1
+DEAL::F: 224, mid: -1
 DEAL::C: 2.34
 DEAL::F: 83, mid: 1
-DEAL::F: 232, mid: 255
-DEAL::F: 229, mid: 255
-DEAL::F: 162, mid: 255
-DEAL::F: 152, mid: 255
-DEAL::F: 223, mid: 255
+DEAL::F: 232, mid: -1
+DEAL::F: 229, mid: -1
+DEAL::F: 162, mid: -1
+DEAL::F: 152, mid: -1
+DEAL::F: 223, mid: -1
 DEAL::C: 2.35
-DEAL::F: 232, mid: 255
-DEAL::F: 175, mid: 255
-DEAL::F: 227, mid: 255
-DEAL::F: 164, mid: 255
-DEAL::F: 153, mid: 255
-DEAL::F: 222, mid: 255
+DEAL::F: 232, mid: -1
+DEAL::F: 175, mid: -1
+DEAL::F: 227, mid: -1
+DEAL::F: 164, mid: -1
+DEAL::F: 153, mid: -1
+DEAL::F: 222, mid: -1
 DEAL::C: 2.36
 DEAL::F: 84, mid: 1
-DEAL::F: 231, mid: 255
-DEAL::F: 47, mid: 255
-DEAL::F: 228, mid: 255
-DEAL::F: 225, mid: 255
-DEAL::F: 122, mid: 255
+DEAL::F: 231, mid: -1
+DEAL::F: 47, mid: -1
+DEAL::F: 228, mid: -1
+DEAL::F: 225, mid: -1
+DEAL::F: 122, mid: -1
 DEAL::C: 2.37
-DEAL::F: 231, mid: 255
-DEAL::F: 176, mid: 255
-DEAL::F: 49, mid: 255
-DEAL::F: 226, mid: 255
-DEAL::F: 224, mid: 255
-DEAL::F: 123, mid: 255
+DEAL::F: 231, mid: -1
+DEAL::F: 176, mid: -1
+DEAL::F: 49, mid: -1
+DEAL::F: 226, mid: -1
+DEAL::F: 224, mid: -1
+DEAL::F: 123, mid: -1
 DEAL::C: 2.38
 DEAL::F: 85, mid: 1
-DEAL::F: 230, mid: 255
-DEAL::F: 228, mid: 255
-DEAL::F: 163, mid: 255
-DEAL::F: 223, mid: 255
-DEAL::F: 124, mid: 255
+DEAL::F: 230, mid: -1
+DEAL::F: 228, mid: -1
+DEAL::F: 163, mid: -1
+DEAL::F: 223, mid: -1
+DEAL::F: 124, mid: -1
 DEAL::C: 2.39
-DEAL::F: 230, mid: 255
-DEAL::F: 177, mid: 255
-DEAL::F: 226, mid: 255
-DEAL::F: 165, mid: 255
-DEAL::F: 222, mid: 255
-DEAL::F: 125, mid: 255
+DEAL::F: 230, mid: -1
+DEAL::F: 177, mid: -1
+DEAL::F: 226, mid: -1
+DEAL::F: 165, mid: -1
+DEAL::F: 222, mid: -1
+DEAL::F: 125, mid: -1
 DEAL::C: 2.40
-DEAL::F: 174, mid: 255
-DEAL::F: 221, mid: 255
-DEAL::F: 54, mid: 255
-DEAL::F: 217, mid: 255
-DEAL::F: 146, mid: 255
-DEAL::F: 213, mid: 255
+DEAL::F: 174, mid: -1
+DEAL::F: 221, mid: -1
+DEAL::F: 54, mid: -1
+DEAL::F: 217, mid: -1
+DEAL::F: 146, mid: -1
+DEAL::F: 213, mid: -1
 DEAL::C: 2.41
-DEAL::F: 221, mid: 255
-DEAL::F: 98, mid: 255
-DEAL::F: 56, mid: 255
-DEAL::F: 215, mid: 255
-DEAL::F: 147, mid: 255
-DEAL::F: 212, mid: 255
+DEAL::F: 221, mid: -1
+DEAL::F: 98, mid: -1
+DEAL::F: 56, mid: -1
+DEAL::F: 215, mid: -1
+DEAL::F: 147, mid: -1
+DEAL::F: 212, mid: -1
 DEAL::C: 2.42
-DEAL::F: 175, mid: 255
-DEAL::F: 220, mid: 255
-DEAL::F: 217, mid: 255
-DEAL::F: 154, mid: 255
-DEAL::F: 148, mid: 255
-DEAL::F: 211, mid: 255
+DEAL::F: 175, mid: -1
+DEAL::F: 220, mid: -1
+DEAL::F: 217, mid: -1
+DEAL::F: 154, mid: -1
+DEAL::F: 148, mid: -1
+DEAL::F: 211, mid: -1
 DEAL::C: 2.43
-DEAL::F: 220, mid: 255
-DEAL::F: 99, mid: 255
-DEAL::F: 215, mid: 255
-DEAL::F: 156, mid: 255
-DEAL::F: 149, mid: 255
-DEAL::F: 210, mid: 255
+DEAL::F: 220, mid: -1
+DEAL::F: 99, mid: -1
+DEAL::F: 215, mid: -1
+DEAL::F: 156, mid: -1
+DEAL::F: 149, mid: -1
+DEAL::F: 210, mid: -1
 DEAL::C: 2.44
-DEAL::F: 176, mid: 255
-DEAL::F: 219, mid: 255
-DEAL::F: 55, mid: 255
-DEAL::F: 216, mid: 255
-DEAL::F: 213, mid: 255
-DEAL::F: 126, mid: 255
+DEAL::F: 176, mid: -1
+DEAL::F: 219, mid: -1
+DEAL::F: 55, mid: -1
+DEAL::F: 216, mid: -1
+DEAL::F: 213, mid: -1
+DEAL::F: 126, mid: -1
 DEAL::C: 2.45
-DEAL::F: 219, mid: 255
-DEAL::F: 100, mid: 255
-DEAL::F: 57, mid: 255
-DEAL::F: 214, mid: 255
-DEAL::F: 212, mid: 255
-DEAL::F: 127, mid: 255
+DEAL::F: 219, mid: -1
+DEAL::F: 100, mid: -1
+DEAL::F: 57, mid: -1
+DEAL::F: 214, mid: -1
+DEAL::F: 212, mid: -1
+DEAL::F: 127, mid: -1
 DEAL::C: 2.46
-DEAL::F: 177, mid: 255
-DEAL::F: 218, mid: 255
-DEAL::F: 216, mid: 255
-DEAL::F: 155, mid: 255
-DEAL::F: 211, mid: 255
-DEAL::F: 128, mid: 255
+DEAL::F: 177, mid: -1
+DEAL::F: 218, mid: -1
+DEAL::F: 216, mid: -1
+DEAL::F: 155, mid: -1
+DEAL::F: 211, mid: -1
+DEAL::F: 128, mid: -1
 DEAL::C: 2.47
-DEAL::F: 218, mid: 255
-DEAL::F: 101, mid: 255
-DEAL::F: 214, mid: 255
-DEAL::F: 157, mid: 255
-DEAL::F: 210, mid: 255
-DEAL::F: 129, mid: 255
+DEAL::F: 218, mid: -1
+DEAL::F: 101, mid: -1
+DEAL::F: 214, mid: -1
+DEAL::F: 157, mid: -1
+DEAL::F: 210, mid: -1
+DEAL::F: 129, mid: -1
 DEAL::C: 2.48
 DEAL::F: 86, mid: 1
-DEAL::F: 209, mid: 255
-DEAL::F: 162, mid: 255
-DEAL::F: 205, mid: 255
-DEAL::F: 142, mid: 255
-DEAL::F: 201, mid: 255
+DEAL::F: 209, mid: -1
+DEAL::F: 162, mid: -1
+DEAL::F: 205, mid: -1
+DEAL::F: 142, mid: -1
+DEAL::F: 201, mid: -1
 DEAL::C: 2.49
-DEAL::F: 209, mid: 255
-DEAL::F: 170, mid: 255
-DEAL::F: 164, mid: 255
-DEAL::F: 203, mid: 255
-DEAL::F: 143, mid: 255
-DEAL::F: 200, mid: 255
+DEAL::F: 209, mid: -1
+DEAL::F: 170, mid: -1
+DEAL::F: 164, mid: -1
+DEAL::F: 203, mid: -1
+DEAL::F: 143, mid: -1
+DEAL::F: 200, mid: -1
 DEAL::C: 2.50
 DEAL::F: 87, mid: 1
-DEAL::F: 208, mid: 255
-DEAL::F: 205, mid: 255
-DEAL::F: 110, mid: 255
-DEAL::F: 144, mid: 255
-DEAL::F: 199, mid: 255
+DEAL::F: 208, mid: -1
+DEAL::F: 205, mid: -1
+DEAL::F: 110, mid: -1
+DEAL::F: 144, mid: -1
+DEAL::F: 199, mid: -1
 DEAL::C: 2.51
-DEAL::F: 208, mid: 255
-DEAL::F: 171, mid: 255
-DEAL::F: 203, mid: 255
-DEAL::F: 112, mid: 255
-DEAL::F: 145, mid: 255
-DEAL::F: 198, mid: 255
+DEAL::F: 208, mid: -1
+DEAL::F: 171, mid: -1
+DEAL::F: 203, mid: -1
+DEAL::F: 112, mid: -1
+DEAL::F: 145, mid: -1
+DEAL::F: 198, mid: -1
 DEAL::C: 2.52
 DEAL::F: 88, mid: 1
-DEAL::F: 207, mid: 255
-DEAL::F: 163, mid: 255
-DEAL::F: 204, mid: 255
-DEAL::F: 201, mid: 255
-DEAL::F: 130, mid: 255
+DEAL::F: 207, mid: -1
+DEAL::F: 163, mid: -1
+DEAL::F: 204, mid: -1
+DEAL::F: 201, mid: -1
+DEAL::F: 130, mid: -1
 DEAL::C: 2.53
-DEAL::F: 207, mid: 255
-DEAL::F: 172, mid: 255
-DEAL::F: 165, mid: 255
-DEAL::F: 202, mid: 255
-DEAL::F: 200, mid: 255
-DEAL::F: 131, mid: 255
+DEAL::F: 207, mid: -1
+DEAL::F: 172, mid: -1
+DEAL::F: 165, mid: -1
+DEAL::F: 202, mid: -1
+DEAL::F: 200, mid: -1
+DEAL::F: 131, mid: -1
 DEAL::C: 2.54
 DEAL::F: 89, mid: 1
-DEAL::F: 206, mid: 255
-DEAL::F: 204, mid: 255
-DEAL::F: 111, mid: 255
-DEAL::F: 199, mid: 255
-DEAL::F: 132, mid: 255
+DEAL::F: 206, mid: -1
+DEAL::F: 204, mid: -1
+DEAL::F: 111, mid: -1
+DEAL::F: 199, mid: -1
+DEAL::F: 132, mid: -1
 DEAL::C: 2.55
-DEAL::F: 206, mid: 255
-DEAL::F: 173, mid: 255
-DEAL::F: 202, mid: 255
-DEAL::F: 113, mid: 255
-DEAL::F: 198, mid: 255
-DEAL::F: 133, mid: 255
+DEAL::F: 206, mid: -1
+DEAL::F: 173, mid: -1
+DEAL::F: 202, mid: -1
+DEAL::F: 113, mid: -1
+DEAL::F: 198, mid: -1
+DEAL::F: 133, mid: -1
 DEAL::C: 2.56
-DEAL::F: 170, mid: 255
-DEAL::F: 197, mid: 255
-DEAL::F: 154, mid: 255
-DEAL::F: 193, mid: 255
-DEAL::F: 138, mid: 255
-DEAL::F: 189, mid: 255
+DEAL::F: 170, mid: -1
+DEAL::F: 197, mid: -1
+DEAL::F: 154, mid: -1
+DEAL::F: 193, mid: -1
+DEAL::F: 138, mid: -1
+DEAL::F: 189, mid: -1
 DEAL::C: 2.57
-DEAL::F: 197, mid: 255
-DEAL::F: 102, mid: 255
-DEAL::F: 156, mid: 255
-DEAL::F: 191, mid: 255
-DEAL::F: 139, mid: 255
-DEAL::F: 188, mid: 255
+DEAL::F: 197, mid: -1
+DEAL::F: 102, mid: -1
+DEAL::F: 156, mid: -1
+DEAL::F: 191, mid: -1
+DEAL::F: 139, mid: -1
+DEAL::F: 188, mid: -1
 DEAL::C: 2.58
-DEAL::F: 171, mid: 255
-DEAL::F: 196, mid: 255
-DEAL::F: 193, mid: 255
-DEAL::F: 118, mid: 255
-DEAL::F: 140, mid: 255
-DEAL::F: 187, mid: 255
+DEAL::F: 171, mid: -1
+DEAL::F: 196, mid: -1
+DEAL::F: 193, mid: -1
+DEAL::F: 118, mid: -1
+DEAL::F: 140, mid: -1
+DEAL::F: 187, mid: -1
 DEAL::C: 2.59
-DEAL::F: 196, mid: 255
-DEAL::F: 103, mid: 255
-DEAL::F: 191, mid: 255
-DEAL::F: 120, mid: 255
-DEAL::F: 141, mid: 255
-DEAL::F: 186, mid: 255
+DEAL::F: 196, mid: -1
+DEAL::F: 103, mid: -1
+DEAL::F: 191, mid: -1
+DEAL::F: 120, mid: -1
+DEAL::F: 141, mid: -1
+DEAL::F: 186, mid: -1
 DEAL::C: 2.60
-DEAL::F: 172, mid: 255
-DEAL::F: 195, mid: 255
-DEAL::F: 155, mid: 255
-DEAL::F: 192, mid: 255
-DEAL::F: 189, mid: 255
-DEAL::F: 134, mid: 255
+DEAL::F: 172, mid: -1
+DEAL::F: 195, mid: -1
+DEAL::F: 155, mid: -1
+DEAL::F: 192, mid: -1
+DEAL::F: 189, mid: -1
+DEAL::F: 134, mid: -1
 DEAL::C: 2.61
-DEAL::F: 195, mid: 255
-DEAL::F: 104, mid: 255
-DEAL::F: 157, mid: 255
-DEAL::F: 190, mid: 255
-DEAL::F: 188, mid: 255
-DEAL::F: 135, mid: 255
+DEAL::F: 195, mid: -1
+DEAL::F: 104, mid: -1
+DEAL::F: 157, mid: -1
+DEAL::F: 190, mid: -1
+DEAL::F: 188, mid: -1
+DEAL::F: 135, mid: -1
 DEAL::C: 2.62
-DEAL::F: 173, mid: 255
-DEAL::F: 194, mid: 255
-DEAL::F: 192, mid: 255
-DEAL::F: 119, mid: 255
-DEAL::F: 187, mid: 255
-DEAL::F: 136, mid: 255
+DEAL::F: 173, mid: -1
+DEAL::F: 194, mid: -1
+DEAL::F: 192, mid: -1
+DEAL::F: 119, mid: -1
+DEAL::F: 187, mid: -1
+DEAL::F: 136, mid: -1
 DEAL::C: 2.63
-DEAL::F: 194, mid: 255
-DEAL::F: 105, mid: 255
-DEAL::F: 190, mid: 255
-DEAL::F: 121, mid: 255
-DEAL::F: 186, mid: 255
-DEAL::F: 137, mid: 255
+DEAL::F: 194, mid: -1
+DEAL::F: 105, mid: -1
+DEAL::F: 190, mid: -1
+DEAL::F: 121, mid: -1
+DEAL::F: 186, mid: -1
+DEAL::F: 137, mid: -1
 $NOD
 125
 1  0.00000 0.00000 0.00000
