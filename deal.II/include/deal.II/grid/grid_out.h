@@ -753,6 +753,16 @@ namespace GridOutFlags
    */
   struct Vtk : public DataOutBase::VtkFlags
   {};
+
+
+  /**
+   * Flags for grid output in Vtu format. These flags are the same as
+   * those declared in DataOutBase::VtuFlags.
+   *
+   * @ingroup output
+   */
+  struct Vtu : public DataOutBase::VtkFlags
+  {};
 }
 
 
@@ -863,7 +873,9 @@ public:
     /// write() calls write_mathgl()
     mathgl,
     /// write() calls write_vtk()
-    vtk
+    vtk,
+    /// write() calls write_vtu()
+    vtu
   };
 
   /**
@@ -1122,6 +1134,13 @@ public:
                   std::ostream                      &out) const;
 
   /**
+   * Write triangulation in VTU format.
+   */
+  template <int dim, int spacedim>
+  void write_vtu (const Triangulation<dim,spacedim> &tria,
+                  std::ostream                      &out) const;
+
+  /**
    * Write grid to @p out according to the given data format. This
    * function simply calls the appropriate <tt>write_*</tt> function.
    */
@@ -1195,6 +1214,11 @@ public:
    * Set flags for VTK output
    */
   void set_flags (const GridOutFlags::Vtk &flags);
+
+  /**
+   * Set flags for VTU output
+   */
+  void set_flags (const GridOutFlags::Vtu &flags);
 
   /**
    * Provide a function that can tell us which
@@ -1337,6 +1361,11 @@ private:
    * Flags for VTK output.
    */
   GridOutFlags::Vtk vtk_flags;
+
+  /**
+   * Flags for VTU output.
+   */
+  GridOutFlags::Vtu vtu_flags;
 
   /**
    * Write the grid information about faces to @p out. Only those

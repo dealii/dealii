@@ -472,6 +472,11 @@ void GridOut::set_flags (const GridOutFlags::Vtk &flags)
   vtk_flags = flags;
 }
 
+void GridOut::set_flags (const GridOutFlags::Vtu &flags)
+{
+  vtu_flags = flags;
+}
+
 std::string
 GridOut::default_suffix (const OutputFormat output_format)
 {
@@ -497,6 +502,8 @@ GridOut::default_suffix (const OutputFormat output_format)
       return ".mathgl";
     case vtk:
       return ".vtk";
+    case vtu:
+      return ".vtu";
     default:
       Assert (false, ExcNotImplemented());
       return "";
@@ -546,6 +553,9 @@ GridOut::parse_output_format (const std::string &format_name)
   if (format_name == "vtk")
     return vtk;
 
+  if (format_name == "vtu")
+    return vtu;
+
   AssertThrow (false, ExcInvalidState ());
   // return something weird
   return OutputFormat(-1);
@@ -555,7 +565,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names ()
 {
-  return "none|dx|gnuplot|eps|ucd|xfig|msh|svg|mathgl|vtk";
+  return "none|dx|gnuplot|eps|ucd|xfig|msh|svg|mathgl|vtk|vtu";
 }
 
 
@@ -599,6 +609,10 @@ GridOut::declare_parameters(ParameterHandler &param)
   param.enter_subsection("Vtk");
   GridOutFlags::Vtk::declare_parameters(param);
   param.leave_subsection();
+
+  param.enter_subsection("Vtu");
+  GridOutFlags::Vtu::declare_parameters(param);
+  param.leave_subsection();
 }
 
 
@@ -641,6 +655,10 @@ GridOut::parse_parameters(ParameterHandler &param)
   param.enter_subsection("Vtk");
   vtk_flags.parse_parameters(param);
   param.leave_subsection();
+
+  param.enter_subsection("Vtu");
+  vtu_flags.parse_parameters(param);
+  param.leave_subsection();
 }
 
 
@@ -658,7 +676,8 @@ GridOut::memory_consumption () const
           sizeof(xfig_flags)    +
           sizeof(svg_flags)     +
           sizeof(mathgl_flags)  +
-          sizeof(vtk_flags));
+          sizeof(vtk_flags)     +
+          sizeof(vtu_flags));
 }
 
 
@@ -2444,6 +2463,27 @@ void GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
 
 
 
+template <int dim, int spacedim>
+void GridOut::write_vtu (const Triangulation<dim,spacedim> &tria,
+                         std::ostream             &out) const
+{
+  AssertThrow (out, ExcIO ());
+
+  // convert the cells of the triangulation into a set of patches
+  // and then have them output. since there is no data attached to
+  // the geometry, we also do not have to provide any names, identifying
+  // information, etc.
+  DataOutBase::write_vtu (triangulation_to_patches(tria),
+                          std::vector<std::string>(),
+                          std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >(),
+                          vtu_flags,
+                          out);
+
+  AssertThrow (out, ExcIO ());
+}
+
+
+
 unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
 {
   return 0;
@@ -3816,6 +3856,10 @@ void GridOut::write (const Triangulation<dim, spacedim> &tria,
 
     case vtk:
       write_vtk (tria, out);
+      return;
+
+    case vtu:
+      write_vtu (tria, out);
       return;
     }
 

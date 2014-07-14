@@ -52,6 +52,9 @@ for (deal_II_dimension : DIMENSIONS)
     template void GridOut::write_vtk
       (const Triangulation<deal_II_dimension>&,
        std::ostream&) const;       
+    template void GridOut::write_vtu
+      (const Triangulation<deal_II_dimension>&,
+       std::ostream&) const;       
        
     template void GridOut::write<deal_II_dimension>
       (const Triangulation<deal_II_dimension> &,
@@ -74,6 +77,9 @@ for (deal_II_dimension : DIMENSIONS)
        std::ostream&,
        const Mapping<deal_II_dimension,deal_II_dimension+1>*) const;
    template void GridOut::write_vtk
+      (const Triangulation<deal_II_dimension,deal_II_dimension+1>&,
+       std::ostream&) const;
+   template void GridOut::write_vtu
       (const Triangulation<deal_II_dimension,deal_II_dimension+1>&,
        std::ostream&) const;
 #endif
