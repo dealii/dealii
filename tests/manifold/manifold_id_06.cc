@@ -27,56 +27,57 @@
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref=1){
-	deallog << "Testing dim=" << dim
-	<< ", spacedim="<< spacedim << std::endl;
+void test(unsigned int ref=1)
+{
+  deallog << "Testing dim=" << dim
+          << ", spacedim="<< spacedim << std::endl;
 
-	Point<spacedim> center;
-	for(unsigned int i=0; i<spacedim; ++i)
-	  center[i] = .25;
+  Point<spacedim> center;
+  for (unsigned int i=0; i<spacedim; ++i)
+    center[i] = .25;
 
-	double radius=center.norm();
-	
-	HyperBallBoundary<dim,spacedim> boundary(center, .25*std::sqrt((double)spacedim));	
-	Triangulation<dim,spacedim> tria;
-	GridGenerator::hyper_cube (tria);
-	typename Triangulation<dim,spacedim>::active_cell_iterator cell;
+  double radius=center.norm();
 
-	tria.refine_global(1);
-	
-	for(cell=tria.begin_active(); cell!=tria.end(); ++cell)
-	  if(dim<spacedim && cell->center().distance(center)<radius)
-	    cell->set_all_manifold_ids(1);
-	  else
-	    for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell;++f)
-	      if(cell->face(f)->center().distance(center)< radius)
-		cell->face(f)->set_all_manifold_ids(1);
+  HyperBallBoundary<dim,spacedim> boundary(center, .25*std::sqrt((double)spacedim));
+  Triangulation<dim,spacedim> tria;
+  GridGenerator::hyper_cube (tria);
+  typename Triangulation<dim,spacedim>::active_cell_iterator cell;
 
-	tria.set_manifold(1,boundary);
-	tria.refine_global(2);
+  tria.refine_global(1);
 
-	GridOut gridout;
-	gridout.write_msh(tria, deallog.get_file_stream());
-	char fname[30];
-	sprintf(fname, "/tmp/id_6_mesh_%d_%d.msh",
-		dim, spacedim);
-	std::ofstream ofile(fname);
-	gridout.write_msh(tria,ofile);
+  for (cell=tria.begin_active(); cell!=tria.end(); ++cell)
+    if (dim<spacedim && cell->center().distance(center)<radius)
+      cell->set_all_manifold_ids(1);
+    else
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        if (cell->face(f)->center().distance(center)< radius)
+          cell->face(f)->set_all_manifold_ids(1);
+
+  tria.set_manifold(1,boundary);
+  tria.refine_global(2);
+
+  GridOut gridout;
+  gridout.write_msh(tria, deallog.get_file_stream());
+  char fname[30];
+  sprintf(fname, "/tmp/id_6_mesh_%d_%d.msh",
+          dim, spacedim);
+  std::ofstream ofile(fname);
+  gridout.write_msh(tria,ofile);
 }
 
-int main () 
+int main ()
 {
-	std::ofstream logfile("output");
-	deallog.attach(logfile);
-	deallog.depth_console(0);
-	deallog.threshold_double(1.e-10);
-	
-	test<1,1>();
-	test<1,2>();
-	test<2,2>();
-	test<2,3>();
-	test<3,3>();
-	
-	return 0;
+  std::ofstream logfile("output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
+
+  test<1,1>();
+  test<1,2>();
+  test<2,2>();
+  test<2,3>();
+  test<3,3>();
+
+  return 0;
 }
 
