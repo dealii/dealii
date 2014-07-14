@@ -713,18 +713,6 @@ namespace GridOutFlags
         const bool label_subdomain_id = false,
         const bool draw_colorbar = true,
         const bool draw_legend = true);
-
-    /**
-     * Declare parameters in
-     * ParameterHandler.
-     */
-//    static void declare_parameters (ParameterHandler &param);
-
-    /**
-     * Parse parameters of
-     * ParameterHandler.
-     */
-//    void parse_parameters (ParameterHandler &param);
   };
 
   /**
