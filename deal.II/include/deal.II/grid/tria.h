@@ -46,6 +46,7 @@ template <int dim, int spacedim> class StraightBoundary;
 template <int, int, int> class TriaAccessor;
 template <int spacedim> class TriaAccessor<0,1,spacedim>;
 
+
 namespace internal
 {
   namespace Triangulation
@@ -120,6 +121,14 @@ struct CellData
     types::boundary_id boundary_id;
     types::material_id material_id;
   };
+
+  /**
+   * Manifold identificator of this object. This identificator should
+   * be used to identify the manifold to which this object belongs,
+   * and from which this object will collect information on how to add
+   * points upon refinement.
+   */
+  types::manifold_id manifold_id;
 
   /**
    * Default constructor. Sets the vertex indices to invalid values and the boundary or material
@@ -1226,12 +1235,12 @@ private:
 
 public:
   /**
-   * Default boundary object. This is used
-   * for those boundaries for which no
-   * boundary object has been explicitly
-   * set using set_boundary().
+   * Default manifold object. This is used
+   * for those objects for which no
+   * boundary description has been explicitly
+   * set using set_manifold().
    */
-  static const StraightBoundary<dim,spacedim> straight_boundary;
+    static const StraightBoundary<dim,spacedim> straight_boundary;
 
   /**
    * Declare some symbolic names
@@ -1606,7 +1615,7 @@ public:
     virtual
     void
     create_notification (const Triangulation<dim, spacedim> &tria);
-  };
+  }; 
 
   /**
    * A structure that is used as an
@@ -1830,211 +1839,171 @@ public:
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  void set_boundary (const types::boundary_id   number,
+  void set_boundary (const types::manifold_id   number,
                      const Boundary<dim,spacedim> &boundary_object);
 
+
   /**
-   * Reset those parts of the boundary with
-   * the given number to use a straight
-   * boundary approximation. This is the
-   * default state of a triangulation, and
-   * undoes assignment of a different
-   * boundary object by the function of
-   * same name and two arguments.
+   * Reset those parts of the boundary with the given number to use a
+   * straight boundary approximation. This is the default state of a
+   * triangulation, and undoes assignment of a different boundary
+   * object by the function of same name and two arguments.
    *
    * @ingroup boundary
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  void set_boundary (const types::boundary_id number);
+  void set_boundary (const types::manifold_id number);
+    
+  /**
+   * Reset those parts of the triangulation with the given manifold_id
+   * to use a FlatManifold object. This is the default state of a
+   * triangulation, and undoes assignment of a different Manifold
+   * object by the function of same name and two arguments.
+   *
+   * @ingroup manifold
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  void set_manifold (const types::manifold_id number);
 
   /**
-   * Return a constant reference to
-   * a boundary object used for
-   * this triangulation.  Number is
-   * the same as in
-   * @p set_boundary
+   * Return a constant reference to a boundary object used for this
+   * triangulation.  Number is the same as in @p set_boundary
    *
    * @ingroup boundary
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const Boundary<dim,spacedim> &get_boundary (const types::boundary_id number) const;
+  const Boundary<dim,spacedim> &get_boundary (const types::manifold_id number) const;
 
   /**
-   * Returns a vector containing
-   * all boundary indicators
-   * assigned to boundary faces of
-   * this Triangulation
-   * object. Note, that each
-   * boundary indicator is reported
-   * only once. The size of the
-   * return vector will represent
-   * the number of different
-   * indicators (which is greater
-   * or equal one).
+   * Return a constant reference to a Manifold object used for this
+   * triangulation.  Number is the same as in @p set_manifold
+   *
+   * @ingroup manifold
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */    
+  const Boundary<dim,spacedim> &get_manifold (const types::manifold_id number) const;
+
+  /**
+   * Returns a vector containing all boundary indicators assigned to
+   * boundary faces of this Triangulation object. Note, that each
+   * boundary indicator is reported only once. The size of the return
+   * vector will represent the number of different indicators (which
+   * is greater or equal one).
    *
    * @ingroup boundary
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   std::vector<types::boundary_id> get_boundary_indicators() const;
-
+    
   /**
-   *  Copy a triangulation. This
-   *  operation is not cheap, so
-   *  you should be careful with
-   *  using this. We do not
-   *  implement this function as a
-   *  copy constructor, since it
-   *  makes it easier to maintain
-   *  collections of triangulations
-   *  if you can assign them values
+   * Returns a vector containing all manifold indicators assigned to
+   * the objects of this Triangulation. Note, that each manifold
+   * indicator is reported only once. The size of the return vector
+   * will represent the number of different indicators (which is
+   * greater or equal one).
+   *
+   * @ingroup manifold
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  std::vector<types::manifold_id> get_manifold_ids() const;
+    
+  /**
+   *  Copy a triangulation. This operation is not cheap, so you should
+   *  be careful with using this. We do not implement this function as
+   *  a copy constructor, since it makes it easier to maintain
+   *  collections of triangulations if you can assign them values
    *  later on.
    *
-   *  Keep in mind that this
-   *  function also copies the
-   *  pointer to the boundary
-   *  descriptor previously set by
-   *  the @p set_boundary
-   *  function. You must therefore
-   *  also guarantee that the
-   *  boundary objects has a
-   *  lifetime at least as long as
-   *  the copied triangulation.
+   *  Keep in mind that this function also copies the pointer to the
+   *  boundary descriptor previously set by the @p set_boundary
+   *  function and to the Manifold object previously set by the
+   *  set_manifold() function. You must therefore also guarantee that
+   *  the boundary and manifold objects have a lifetime at least as
+   *  long as the copied triangulation.
    *
-   *  This triangulation must be
-   *  empty beforehand.
+   *  This triangulation must be empty beforehand.
    *
-   *  The function is made
-   *  @p virtual since some
-   *  derived classes might want to
-   *  disable or extend the
-   *  functionality of this
-   *  function.
+   *  The function is made @p virtual since some derived classes might
+   *  want to disable or extend the functionality of this function.
    *
-   *  @note Calling this function triggers
-   *  the 'copy' signal on old_tria, i.e.
-   *  the triangulation being copied <i>from</i>.
-   *  It also triggers the 'create' signal of
-   *  the current triangulation.
-   *  See the section on signals in the
-   *  general documentation for more information.
+   *  @note Calling this function triggers the 'copy' signal on
+   *  old_tria, i.e.  the triangulation being copied <i>from</i>.  It
+   *  also triggers the 'create' signal of the current triangulation.
+   *  See the section on signals in the general documentation for more
+   *  information.
    *
-   *  @note The list of connections to
-   *  signals is not copied from the old
-   *  to the new triangulation since
-   *  these connections were established
-   *  to monitor how the old triangulation
-   *  changes, not how any triangulation
-   *  it may be copied to changes.
+   *  @note The list of connections to signals is not copied from the
+   *  old to the new triangulation since these connections were
+   *  established to monitor how the old triangulation changes, not
+   *  how any triangulation it may be copied to changes.
    */
   virtual void copy_triangulation (const Triangulation<dim, spacedim> &old_tria);
 
   /**
-   * Create a triangulation from a
-   * list of vertices and a list of
-   * cells, each of the latter
-   * being a list of <tt>1<<dim</tt>
-   * vertex indices. The
-   * triangulation must be empty
-   * upon calling this function and
-   * the cell list should be useful
-   * (connected domain, etc.).
+   * Create a triangulation from a list of vertices and a list of
+   * cells, each of the latter being a list of <tt>1<<dim</tt> vertex
+   * indices. The triangulation must be empty upon calling this
+   * function and the cell list should be useful (connected domain,
+   * etc.).
    *
-   * Material data for the cells is
-   * given within the @p cells
-   * array, while boundary
-   * information is given in the
-   * @p subcelldata field.
+   * Material data for the cells is given within the @p cells array,
+   * while boundary information is given in the @p subcelldata field.
    *
-   * The numbering of vertices
-   * within the @p cells array is
-   * subject to some constraints;
-   * see the general class
-   * documentation for this.
+   * The numbering of vertices within the @p cells array is subject to
+   * some constraints; see the general class documentation for this.
    *
-   * For conditions when this
-   * function can generate a valid
-   * triangulation, see the
-   * documentation of this class,
-   * and the GridIn and
-   * GridReordering class.
+   * For conditions when this function can generate a valid
+   * triangulation, see the documentation of this class, and the
+   * GridIn and GridReordering class.
    *
-   * If the
-   * <code>check_for_distorted_cells</code>
-   * flag was specified upon
-   * creation of this object, at
-   * the very end of its operation,
-   * the current function walks
-   * over all cells and verifies
-   * that none of the cells is
-   * deformed (see the entry on
-   * @ref GlossDistorted "distorted cells"
-   in the glossary), where
-   * we call a cell deformed if the
-   * determinant of the Jacobian of
-   * the mapping from reference
-   * cell to real cell is negative
-   * at least at one of the
-   * vertices (this computation is
-   * done using the
-   * GeometryInfo::jacobian_determinants_at_vertices
-   * function). If there are
-   * deformed cells, this function
-   * throws an exception of kind
-   * DistortedCellList. Since this
-   * happens after all data
-   * structures have been set up,
-   * you can catch and ignore this
-   * exception if you know what you
-   * do -- for example, it may be
-   * that the determinant is zero
-   * (indicating that you have
-   * collapsed edges in a cell) but
-   * that this is ok because you
-   * didn't intend to integrate on
-   * this cell anyway. On the other
-   * hand, deformed cells are often
-   * a sign of a mesh that is too
-   * coarse to resolve the geometry
-   * of the domain, and in this
-   * case ignoring the exception is
-   * probably unwise.
+   * If the <code>check_for_distorted_cells</code> flag was specified
+   * upon creation of this object, at the very end of its operation,
+   * the current function walks over all cells and verifies that none
+   * of the cells is deformed (see the entry on @ref GlossDistorted
+   * "distorted cells" in the glossary), where we call a cell deformed
+   * if the determinant of the Jacobian of the mapping from reference
+   * cell to real cell is negative at least at one of the vertices
+   * (this computation is done using the
+   * GeometryInfo::jacobian_determinants_at_vertices function). If
+   * there are deformed cells, this function throws an exception of
+   * kind DistortedCellList. Since this happens after all data
+   * structures have been set up, you can catch and ignore this
+   * exception if you know what you do -- for example, it may be that
+   * the determinant is zero (indicating that you have collapsed edges
+   * in a cell) but that this is ok because you didn't intend to
+   * integrate on this cell anyway. On the other hand, deformed cells
+   * are often a sign of a mesh that is too coarse to resolve the
+   * geometry of the domain, and in this case ignoring the exception
+   * is probably unwise.
    *
    * @note This function is used in step-14 .
    *
-   * @note This function triggers the create
-   * signal after doing its work. See the
-   * section on signals in the general
-   * documentation of this class.
+   * @note This function triggers the create signal after doing its
+   * work. See the section on signals in the general documentation of
+   * this class.
    *
-   * @note The check for distorted
-   * cells is only done if
-   * dim==spacedim, as otherwise
-   * cells can legitimately be
-   * twisted if the manifold they
-   * describe is twisted.
+   * @note The check for distorted cells is only done if
+   * dim==spacedim, as otherwise cells can legitimately be twisted if
+   * the manifold they describe is twisted.
    */
   virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
                                      const std::vector<CellData<dim> > &cells,
                                      const SubCellData                 &subcelldata);
 
   /**
-   * For backward compatibility,
-   * only. This function takes the
-   * cell data in the ordering as
-   * requested by deal.II versions
-   * up to 5.2, converts it to the
-   * new (lexicographic) ordering
-   * and calls
+   * For backward compatibility, only. This function takes the cell
+   * data in the ordering as requested by deal.II versions up to 5.2,
+   * converts it to the new (lexicographic) ordering and calls
    * create_triangulation().
    *
-   * @note This function internally
-   * calls create_triangulation and
-   * therefore can throw the same
-   * exception as the other
-   * function.
+   * @note This function internally calls create_triangulation and
+   * therefore can throw the same exception as the other function.
    */
   virtual void create_triangulation_compatibility (
     const std::vector<Point<spacedim> >    &vertices,
@@ -2042,34 +2011,22 @@ public:
     const SubCellData                 &subcelldata);
 
   /**
-   * Revert or flip the
-   * direction_flags of a
-   * dim<spacedim triangulation,
-   * see @ref GlossDirectionFlag .
+   * Revert or flip the direction_flags of a dim<spacedim
+   * triangulation, see @ref GlossDirectionFlag .
    *
-   * This function throws an
-   * exception if dim equals
-   * spacedim.
+   * This function throws an exception if dim equals spacedim.
   */
   void flip_all_direction_flags();
 
   /**
-   * Distort the grid by randomly
-   * moving around all the vertices
-   * of the grid.  The direction of
-   * moving is random, while the
-   * length of the shift vector has
-   * a value of @p factor times
-   * the minimal length of the
-   * active lines adjacent to this
-   * vertex. Note that @p factor
-   * should obviously be well below
-   * <tt>0.5</tt>.
+   * Distort the grid by randomly moving around all the vertices of
+   * the grid.  The direction of moving is random, while the length of
+   * the shift vector has a value of @p factor times the minimal
+   * length of the active lines adjacent to this vertex. Note that @p
+   * factor should obviously be well below <tt>0.5</tt>.
    *
-   * If @p keep_boundary is set to
-   * @p true (which is the
-   * default), then boundary
-   * vertices are not moved.
+   * If @p keep_boundary is set to @p true (which is the default),
+   * then boundary vertices are not moved.
    *
    * @deprecated Use GridTools::distort_random instead.
    */
@@ -2082,154 +2039,95 @@ public:
    */
   /*@{*/
   /**
-   *  Flag all active cells for
-   *  refinement.  This will refine
-   *  all cells of all levels which
-   *  are not already refined
-   *  (i.e. only cells are refined
-   *  which do not yet have
-   *  children). The cells are only
-   *  flagged, not refined, thus
-   *  you have the chance to save
-   *  the refinement flags.
+   *  Flag all active cells for refinement.  This will refine all
+   *  cells of all levels which are not already refined (i.e. only
+   *  cells are refined which do not yet have children). The cells are
+   *  only flagged, not refined, thus you have the chance to save the
+   *  refinement flags.
    */
   void set_all_refine_flags ();
 
   /**
-   * Refine all cells @p times times, by
-   * alternatingly calling
-   * set_all_refine_flags and
-   * execute_coarsening_and_refinement.
+   * Refine all cells @p times times, by alternatingly calling
+   * set_all_refine_flags and execute_coarsening_and_refinement.
    *
-   * The latter function may throw an
-   * exception if it creates cells that are
-   * distorted (see its documentation for
-   * an explanation). This exception will
-   * be propagated through this function if
-   * that happens, and you may not get the
-   * actual number of refinement steps in
-   * that case.
+   * The latter function may throw an exception if it creates cells
+   * that are distorted (see its documentation for an
+   * explanation). This exception will be propagated through this
+   * function if that happens, and you may not get the actual number
+   * of refinement steps in that case.
    *
-   * @note This function triggers the pre-
-   * and post-refinement signals before
-   * and after doing each individual refinement
-   * cycle (i.e. more than once if
-   * times > 1) . See the
-   * section on signals in the general
-   * documentation of this class.
+   * @note This function triggers the pre- and post-refinement signals
+   * before and after doing each individual refinement cycle
+   * (i.e. more than once if times > 1) . See the section on signals
+   * in the general documentation of this class.
    */
   void refine_global (const unsigned int times = 1);
 
   /**
-   * Execute both refinement and
-   * coarsening of the
-   * triangulation.
+   * Execute both refinement and coarsening of the triangulation.
    *
-   * The function resets all refinement and
-   * coarsening flags to false. It uses the
-   * user flags for internal purposes. They
-   * will therefore be overwritten by
-   * undefined content.
+   * The function resets all refinement and coarsening flags to
+   * false. It uses the user flags for internal purposes. They will
+   * therefore be overwritten by undefined content.
    *
-   * To allow user programs to fix
-   * up these cells if that is
-   * desired, this function after
-   * completing all other work may
-   * throw an exception of type
-   * DistortedCellList that
-   * contains a list of those cells
-   * that have been refined and
-   * have at least one child that
-   * is distorted. The function
-   * does not create such an
-   * exception if no cells have
-   * created distorted children.
-   * Note that for the check for
-   * distorted cells to happen, the
-   * <code>check_for_distorted_cells</code>
-   * flag has to be specified upon
-   * creation of a triangulation
-   * object.
+   * To allow user programs to fix up these cells if that is desired,
+   * this function after completing all other work may throw an
+   * exception of type DistortedCellList that contains a list of those
+   * cells that have been refined and have at least one child that is
+   * distorted. The function does not create such an exception if no
+   * cells have created distorted children.  Note that for the check
+   * for distorted cells to happen, the
+   * <code>check_for_distorted_cells</code> flag has to be specified
+   * upon creation of a triangulation object.
    *
-   * See the general docs for more
-   * information.
+   * See the general docs for more information.
    *
-   * @note This function triggers the pre-
-   * and post-refinement signals before
-   * and after doing its work. See the
-   * section on signals in the general
-   * documentation of this class.
+   * @note This function triggers the pre- and post-refinement signals
+   * before and after doing its work. See the section on signals in
+   * the general documentation of this class.
    *
-   * @note If the boundary description is
-   * sufficiently irregular, it can
-   * happen that some of the
-   * children produced by mesh
-   * refinement are distorted (see
-   * the extensive discussion on
-   * @ref GlossDistorted "distorted cells").
+   * @note If the boundary description is sufficiently irregular, it
+   * can happen that some of the children produced by mesh refinement
+   * are distorted (see the extensive discussion on @ref
+   * GlossDistorted "distorted cells").
    *
-   * @note This function is
-   * <tt>virtual</tt> to allow
-   * derived classes to insert
-   * hooks, such as saving
-   * refinement flags and the like
-   * (see e.g. the
-   * PersistentTriangulation
-   * class).
+   * @note This function is <tt>virtual</tt> to allow derived classes
+   * to insert hooks, such as saving refinement flags and the like
+   * (see e.g. the PersistentTriangulation class).
    */
   virtual void execute_coarsening_and_refinement ();
 
   /**
-   * Do both preparation for
-   * refinement and coarsening as
-   * well as mesh smoothing.
+   * Do both preparation for refinement and coarsening as well as mesh
+   * smoothing.
    *
-   * Regarding the refinement
-   * process it fixes the closure
-   * of the refinement in
-   * <tt>dim>=2</tt> (make sure that no
-   * two cells are adjacent with a
-   * refinement level differing
-   * with more than one), etc.  It
-   * performs some mesh smoothing
-   * if the according flag was
-   * given to the constructor of
-   * this class.  The function
-   * returns whether additional
-   * cells have been flagged for
-   * refinement.
+   * Regarding the refinement process it fixes the closure of the
+   * refinement in <tt>dim>=2</tt> (make sure that no two cells are
+   * adjacent with a refinement level differing with more than one),
+   * etc.  It performs some mesh smoothing if the according flag was
+   * given to the constructor of this class.  The function returns
+   * whether additional cells have been flagged for refinement.
    *
-   * See the general doc of this
-   * class for more information on
+   * See the general doc of this class for more information on
    * smoothing upon refinement.
    *
-   * Regarding the coarsening part,
-   * flagging and deflagging cells
-   * in preparation of the actual
-   * coarsening step are done. This
-   * includes deleting coarsen
-   * flags from cells which may not
-   * be deleted (e.g. because one
-   * neighbor is more refined
-   * than the cell), doing some
-   * smoothing, etc.
+   * Regarding the coarsening part, flagging and deflagging cells in
+   * preparation of the actual coarsening step are done. This includes
+   * deleting coarsen flags from cells which may not be deleted
+   * (e.g. because one neighbor is more refined than the cell), doing
+   * some smoothing, etc.
    *
-   * The effect is that only those
-   * cells are flagged for
-   * coarsening which will actually
-   * be coarsened. This includes
-   * the fact that all flagged
-   * cells belong to parent cells
-   * of which all children are
+   * The effect is that only those cells are flagged for coarsening
+   * which will actually be coarsened. This includes the fact that all
+   * flagged cells belong to parent cells of which all children are
    * flagged.
    *
-   * The function returns whether
-   * some cells' flagging has been
+   * The function returns whether some cells' flagging has been
    * changed in the process.
    *
-   * This function uses the user
-   * flags, so store them if you
-   * still need them afterwards.
+   * This function uses the user flags, so store them if you still
+   * need them afterwards.
    */
   bool prepare_coarsening_and_refinement ();
   /** @} */
@@ -2240,35 +2138,26 @@ public:
   /** @{ */
 
   /**
-   *  Add a
-   *  RefinementListener. Adding
-   *  listeners to the
-   *  Triangulation allows other
-   *  classes to be informed when
-   *  the Triangulation is refined.
+   *  Add a RefinementListener. Adding listeners to the Triangulation
+   *  allows other classes to be informed when the Triangulation is
+   *  refined.
    *
-   * @note The use of this function has been
-   * superseded by the signals mechanism.
-   * See the general documentation of the
-   * Triangulation class for more information.
+   * @note The use of this function has been superseded by the signals
+   * mechanism.  See the general documentation of the Triangulation
+   * class for more information.
    *
    * @deprecated
    */
   void add_refinement_listener (RefinementListener &listener) const DEAL_II_DEPRECATED;
 
   /**
-   *  Remove a
-   *  RefinementListener. When some
-   *  class needs no longer to be
-   *  informed about refinements,
-   *  the listener should be
-   *  removed from the
-   *  Triangulation.
+   *  Remove a RefinementListener. When some class needs no longer to
+   *  be informed about refinements, the listener should be removed
+   *  from the Triangulation.
    *
-   * @note The use of this function has been
-   * superseded by the signals mechanism.
-   * See the general documentation of the
-   * Triangulation class for more information.
+   * @note The use of this function has been superseded by the signals
+   * mechanism.  See the general documentation of the Triangulation
+   * class for more information.
    *
    * @deprecated
    */
@@ -2304,29 +2193,25 @@ public:
    */
   /*@{*/
   /**
-   *  Save the addresses of the
-   *  cells which are flagged for
-   *  refinement to @p out.  For
-   *  usage, read the general
-   *  documentation for this class.
+   *  Save the addresses of the cells which are flagged for refinement
+   *  to @p out.  For usage, read the general documentation for this
+   *  class.
    */
   void save_refine_flags (std::ostream &out) const;
 
   /**
-   * Same as above, but store the flags to
-   * a bitvector rather than to a file.
+   * Same as above, but store the flags to a bitvector rather than to
+   * a file.
    */
   void save_refine_flags (std::vector<bool> &v) const;
 
   /**
-   *  Read the information stored by
-   *  @p save_refine_flags.
+   *  Read the information stored by @p save_refine_flags.
    */
   void load_refine_flags (std::istream &in);
 
   /**
-   *  Read the information stored by
-   *  @p save_refine_flags.
+   *  Read the information stored by @p save_refine_flags.
    */
   void load_refine_flags (const std::vector<bool> &v);
 
@@ -2336,8 +2221,8 @@ public:
   void save_coarsen_flags (std::ostream &out) const;
 
   /**
-   * Same as above, but store the flags to
-   * a bitvector rather than to a file.
+   * Same as above, but store the flags to a bitvector rather than to
+   * a file.
    */
   void save_coarsen_flags (std::vector<bool> &v) const;
 
@@ -2352,9 +2237,8 @@ public:
   void load_coarsen_flags (const std::vector<bool> &v);
 
   /**
-   * Return whether this triangulation has
-   * ever undergone anisotropic (as opposed
-   * to only isotropic) refinement.
+   * Return whether this triangulation has ever undergone anisotropic
+   * (as opposed to only isotropic) refinement.
    */
   bool get_anisotropic_refinement_flag() const;
   /*@}*/
@@ -2365,277 +2249,229 @@ public:
    */
   /*@{*/
   /**
-   *  Clear all user flags.
-  *  See also @ref GlossUserFlags .
+   *  Clear all user flags.  See also @ref GlossUserFlags .
    */
   void clear_user_flags ();
 
   /**
-   *  Save all user flags. See the general
-   *  documentation for this class
-   *  and the documentation for the
-   *  @p save_refine_flags for more
-   *  details.
-  *  See also @ref GlossUserFlags .
+   *  Save all user flags. See the general documentation for this
+   *  class and the documentation for the @p save_refine_flags for
+   *  more details.  See also @ref GlossUserFlags .
    */
   void save_user_flags (std::ostream &out) const;
 
   /**
-   *  Same as above, but store the flags to
-   *  a bitvector rather than to a file.
-   *  The output vector is resized if
-   *  necessary.
-  *  See also @ref GlossUserFlags .
+   *  Same as above, but store the flags to a bitvector rather than to
+   *  a file.  The output vector is resized if necessary.  See also
+   *  @ref GlossUserFlags .
    */
   void save_user_flags (std::vector<bool> &v) const;
 
   /**
-   *  Read the information stored by
-   *  @p save_user_flags.
-  *  See also @ref GlossUserFlags .
+   *  Read the information stored by @p save_user_flags.  See also
+   *  @ref GlossUserFlags .
    */
   void load_user_flags (std::istream &in);
 
   /**
-   *  Read the information stored by
-   *  @p save_user_flags.
-  *  See also @ref GlossUserFlags .
+   *  Read the information stored by @p save_user_flags.  See also
+   *  @ref GlossUserFlags .
    */
   void load_user_flags (const std::vector<bool> &v);
 
   /**
-   *  Clear all user flags on lines.
-  *  See also @ref GlossUserFlags .
+   *  Clear all user flags on lines.  See also @ref GlossUserFlags .
    */
   void clear_user_flags_line ();
 
   /**
-   * Save the user flags on lines.
-  * See also @ref GlossUserFlags .
+   * Save the user flags on lines.  See also @ref GlossUserFlags .
    */
   void save_user_flags_line (std::ostream &out) const;
 
   /**
-   * Same as above, but store the flags to
-   * a bitvector rather than to a file.
-   * The output vector is resized if
-   * necessary.
-  * See also @ref GlossUserFlags .
+   * Same as above, but store the flags to a bitvector rather than to
+   * a file.  The output vector is resized if necessary.  See also
+   * @ref GlossUserFlags .
    */
   void save_user_flags_line (std::vector<bool> &v) const;
 
   /**
-   * Load the user flags located on lines.
-  * See also @ref GlossUserFlags .
+   * Load the user flags located on lines.  See also @ref
+   * GlossUserFlags .
    */
   void load_user_flags_line (std::istream &in);
 
   /**
-   * Load the user flags located on lines.
-  * See also @ref GlossUserFlags .
+   * Load the user flags located on lines.  See also @ref
+   * GlossUserFlags .
    */
   void load_user_flags_line (const std::vector<bool> &v);
 
   /**
-   *  Clear all user flags on quads.
-  * See also @ref GlossUserFlags .
+   *  Clear all user flags on quads.  See also @ref GlossUserFlags .
    */
   void clear_user_flags_quad ();
 
   /**
-   * Save the user flags on quads.
-  * See also @ref GlossUserFlags .
+   * Save the user flags on quads.  See also @ref GlossUserFlags .
    */
   void save_user_flags_quad (std::ostream &out) const;
 
   /**
-   * Same as above, but store the flags to
-   * a bitvector rather than to a file.
-   * The output vector is resized if
-   * necessary.
-  * See also @ref GlossUserFlags .
+   * Same as above, but store the flags to a bitvector rather than to
+   * a file.  The output vector is resized if necessary.  See also
+   * @ref GlossUserFlags .
    */
   void save_user_flags_quad (std::vector<bool> &v) const;
 
   /**
-   * Load the user flags located on quads.
-  * See also @ref GlossUserFlags .
+   * Load the user flags located on quads.  See also @ref
+   * GlossUserFlags .
    */
   void load_user_flags_quad (std::istream &in);
 
   /**
-   * Load the user flags located on quads.
-  * See also @ref GlossUserFlags .
+   * Load the user flags located on quads.  See also @ref
+   * GlossUserFlags .
    */
   void load_user_flags_quad (const std::vector<bool> &v);
 
 
   /**
-   * Clear all user flags on quads.
-  * See also @ref GlossUserFlags .
+   * Clear all user flags on quads.  See also @ref GlossUserFlags .
    */
   void clear_user_flags_hex ();
 
   /**
-   * Save the user flags on hexs.
-  * See also @ref GlossUserFlags .
+   * Save the user flags on hexs.  See also @ref GlossUserFlags .
    */
   void save_user_flags_hex (std::ostream &out) const;
 
   /**
-   * Same as above, but store the flags to
-   * a bitvector rather than to a file.
-   * The output vector is resized if
-   * necessary.
-  * See also @ref GlossUserFlags .
+   * Same as above, but store the flags to a bitvector rather than to
+   * a file.  The output vector is resized if necessary.  See also
+   * @ref GlossUserFlags .
    */
   void save_user_flags_hex (std::vector<bool> &v) const;
 
   /**
-   * Load the user flags located on hexs.
-  * See also @ref GlossUserFlags .
+   * Load the user flags located on hexs.  See also @ref
+   * GlossUserFlags .
    */
   void load_user_flags_hex (std::istream &in);
 
   /**
-   * Load the user flags located on hexs.
-  * See also @ref GlossUserFlags .
+   * Load the user flags located on hexs.  See also @ref
+   * GlossUserFlags .
    */
   void load_user_flags_hex (const std::vector<bool> &v);
 
   /**
-   * Clear all user pointers and
-   * indices and allow the use of
-   * both for next access.
-  * See also @ref GlossUserData .
+   * Clear all user pointers and indices and allow the use of both for
+   * next access.  See also @ref GlossUserData .
    */
   void clear_user_data ();
 
   /**
-   * @deprecated User
-   * clear_user_data() instead.
+   * @deprecated User clear_user_data() instead.
    *
-   *  Clear all user pointers.
-  *  See also @ref GlossUserData .
+   *  Clear all user pointers.  See also @ref GlossUserData .
    */
   void clear_user_pointers () DEAL_II_DEPRECATED;
 
   /**
-   * Save all user indices. The
-   * output vector is resized if
-   * necessary.
-  * See also @ref GlossUserData .
+   * Save all user indices. The output vector is resized if necessary.
+   * See also @ref GlossUserData .
    */
   void save_user_indices (std::vector<unsigned int> &v) const;
 
   /**
-   * Read the information stored by
-   * save_user_indices().
-  * See also @ref GlossUserData .
+   * Read the information stored by save_user_indices().  See also
+   * @ref GlossUserData .
    */
   void load_user_indices (const std::vector<unsigned int> &v);
 
   /**
-   * Save all user pointers. The
-   * output vector is resized if
-   * necessary.
-  * See also @ref GlossUserData .
+   * Save all user pointers. The output vector is resized if
+   * necessary.  See also @ref GlossUserData .
    */
   void save_user_pointers (std::vector<void *> &v) const;
 
   /**
-   * Read the information stored by
-   * save_user_pointers().
-  * See also @ref GlossUserData .
+   * Read the information stored by save_user_pointers().  See also
+   * @ref GlossUserData .
    */
   void load_user_pointers (const std::vector<void *> &v);
 
   /**
-   * Save the user indices on
-   * lines. The output vector is
-   * resized if necessary.
-  * See also @ref GlossUserData .
+   * Save the user indices on lines. The output vector is resized if
+   * necessary.  See also @ref GlossUserData .
    */
   void save_user_indices_line (std::vector<unsigned int> &v) const;
 
   /**
-   * Load the user indices located
-   * on lines.
-  * See also @ref GlossUserData .
+   * Load the user indices located on lines.  See also @ref
+   * GlossUserData .
    */
   void load_user_indices_line (const std::vector<unsigned int> &v);
 
   /**
-   * Save the user indices on
-   * quads. The output vector is
-   * resized if necessary.
-  * See also @ref GlossUserData .
+   * Save the user indices on quads. The output vector is resized if
+   * necessary.  See also @ref GlossUserData .
    */
   void save_user_indices_quad (std::vector<unsigned int> &v) const;
 
   /**
-   * Load the user indices located
-   * on quads.
-  * See also @ref GlossUserData .
+   * Load the user indices located on quads.  See also @ref
+   * GlossUserData .
    */
   void load_user_indices_quad (const std::vector<unsigned int> &v);
 
   /**
-   * Save the user indices on
-   * hexes. The output vector is
-   * resized if necessary.
-  * See also @ref GlossUserData .
+   * Save the user indices on hexes. The output vector is resized if
+   * necessary.  See also @ref GlossUserData .
    */
   void save_user_indices_hex (std::vector<unsigned int> &v) const;
 
   /**
-   * Load the user indices located
-   * on hexs.
-  * See also @ref GlossUserData .
+   * Load the user indices located on hexs.  See also @ref
+   * GlossUserData .
    */
   void load_user_indices_hex (const std::vector<unsigned int> &v);
   /**
-   * Save the user indices on
-   * lines. The output vector is
-   * resized if necessary.
-  * See also @ref GlossUserData .
+   * Save the user indices on lines. The output vector is resized if
+   * necessary.  See also @ref GlossUserData .
    */
   void save_user_pointers_line (std::vector<void *> &v) const;
 
   /**
-   * Load the user pointers located
-   * on lines.
-  * See also @ref GlossUserData .
+   * Load the user pointers located on lines.  See also @ref
+   * GlossUserData .
    */
   void load_user_pointers_line (const std::vector<void *> &v);
 
   /**
-   * Save the user pointers on
-   * quads. The output vector is
-   * resized if necessary.
-  * See also @ref GlossUserData .
+   * Save the user pointers on quads. The output vector is resized if
+   * necessary.  See also @ref GlossUserData .
    */
   void save_user_pointers_quad (std::vector<void *> &v) const;
 
   /**
-   * Load the user pointers located
-   * on quads.
-  * See also @ref GlossUserData .
+   * Load the user pointers located on quads.  See also @ref
+   * GlossUserData .
    */
   void load_user_pointers_quad (const std::vector<void *> &v);
 
   /**
-   * Save the user pointers on
-   * hexes. The output vector is
-   * resized if necessary.
-  * See also @ref GlossUserData .
+   * Save the user pointers on hexes. The output vector is resized if
+   * necessary.  See also @ref GlossUserData .
    */
   void save_user_pointers_hex (std::vector<void *> &v) const;
 
   /**
-   * Load the user pointers located
-   * on hexs.
-  * See also @ref GlossUserData .
+   * Load the user pointers located on hexs.  See also @ref
+   * GlossUserData .
    */
   void load_user_pointers_hex (const std::vector<void *> &v);
   /*@}*/
@@ -2646,8 +2482,7 @@ public:
    */
   /*@{*/
   /**
-   *  Iterator to the first used cell
-   *  on level @p level.
+   *  Iterator to the first used cell on level @p level.
    */
   cell_iterator        begin       (const unsigned int level = 0) const;
 
@@ -2666,18 +2501,14 @@ public:
   active_cell_iterator begin_active(const unsigned int level = 0) const;
 
   /**
-   *  Iterator past the end; this
-   *  iterator serves for comparisons of
-   *  iterators with past-the-end or
-   *  before-the-beginning states.
+   *  Iterator past the end; this iterator serves for comparisons of
+   *  iterators with past-the-end or before-the-beginning states.
    */
   cell_iterator        end () const;
 
   /**
-   * Return an iterator which is the first
-   * iterator not on level. If @p level is
-   * the last level, then this returns
-   * <tt>end()</tt>.
+   * Return an iterator which is the first iterator not on level. If
+   * @p level is the last level, then this returns <tt>end()</tt>.
    */
   cell_iterator        end (const unsigned int level) const;
 
@@ -2690,14 +2521,12 @@ public:
 
 
   /**
-   *  Return an iterator pointing to the
-   *  last used cell.
+   *  Return an iterator pointing to the last used cell.
    */
   cell_iterator        last () const;
 
   /**
-   *  Return an iterator pointing to the
-   *  last active cell.
+   *  Return an iterator pointing to the last active cell.
    */
   active_cell_iterator last_active () const;
   /*@}*/
@@ -2715,16 +2544,13 @@ public:
   face_iterator        begin_face       () const;
 
   /**
-   *  Iterator to the first active
-   *  face.
+   *  Iterator to the first active face.
    */
   active_face_iterator begin_active_face() const;
 
   /**
-   *  Iterator past the end; this
-   *  iterator serves for comparisons of
-   *  iterators with past-the-end or
-   *  before-the-beginning states.
+   *  Iterator past the end; this iterator serves for comparisons of
+   *  iterators with past-the-end or before-the-beginning states.
    */
   face_iterator        end_face () const;
   /*@}*/
@@ -2738,20 +2564,13 @@ public:
   /*@{*/
 
   /**
-   * In the following, most
-   * functions are provided in two
-   * versions, with and without an
-   * argument describing the
-   * level. The versions with this
-   * argument are only applicable
-   * for objects describing the
-   * cells of the present
-   * triangulation. For example: in
-   * 2D <tt>n_lines(level)</tt>
-   * cannot be called, only
-   * <tt>n_lines()</tt>, as lines
-   * are faces in 2D and therefore
-   * have no level.
+   * In the following, most functions are provided in two versions,
+   * with and without an argument describing the level. The versions
+   * with this argument are only applicable for objects describing the
+   * cells of the present triangulation. For example: in 2D
+   * <tt>n_lines(level)</tt> cannot be called, only
+   * <tt>n_lines()</tt>, as lines are faces in 2D and therefore have
+   * no level.
    */
 
   /**
@@ -2909,10 +2728,11 @@ public:
   unsigned int n_levels () const;
 
   /**
-   * Return the number of levels in use. This function is equivalent to
-   * n_levels() for a serial Triangulation, but gives the maximum of
-   * n_levels() over all processors for a parallel::distributed::Triangulation
-   * and therefore can be larger than n_levels().
+   * Return the number of levels in use. This function is equivalent
+   * to n_levels() for a serial Triangulation, but gives the maximum
+   * of n_levels() over all processors for a
+   * parallel::distributed::Triangulation and therefore can be larger
+   * than n_levels().
    */
   virtual
   unsigned int n_global_levels () const;
@@ -2946,84 +2766,55 @@ public:
   unsigned int n_vertices () const;
 
   /**
-   * Return a constant reference to
-   * all the vertices present in
-   * this triangulation. Note that
-   * not necessarily all vertices
-   * in this array are actually
-   * used; for example, if you
-   * coarsen a mesh, then some
-   * vertices are deleted, but
-   * their positions in this array
-   * are unchanged as the indices
-   * of vertices are only allocated
-   * once. You can find out about
-   * which vertices are actually
-   * used by the function
-   * get_used_vertices().
+   * Return a constant reference to all the vertices present in this
+   * triangulation. Note that not necessarily all vertices in this
+   * array are actually used; for example, if you coarsen a mesh, then
+   * some vertices are deleted, but their positions in this array are
+   * unchanged as the indices of vertices are only allocated once. You
+   * can find out about which vertices are actually used by the
+   * function get_used_vertices().
    */
   const std::vector<Point<spacedim> > &
   get_vertices () const;
 
   /**
-   * Return the number of vertices
-   * that are presently in use,
-   * i.e. belong to at least one
-   * used element.
+   * Return the number of vertices that are presently in use,
+   * i.e. belong to at least one used element.
    */
   unsigned int n_used_vertices () const;
 
   /**
-   * Return @p true if the vertex
-   * with this @p index is used.
+   * Return @p true if the vertex with this @p index is used.
    */
   bool vertex_used (const unsigned int index) const;
 
   /**
-   * Return a constant reference to
-   * the array of @p bools
-   * indicating whether an entry in
-   * the vertex array is used or
-   * not.
+   * Return a constant reference to the array of @p bools indicating
+   * whether an entry in the vertex array is used or not.
    */
   const std::vector<bool> &
   get_used_vertices () const;
 
   /**
-   * Return the maximum number of
-   * cells meeting at a common
-   * vertex. Since this number is
-   * an invariant under refinement,
-   * only the cells on the coarsest
-   * level are considered. The
-   * operation is thus reasonably
-   * fast. The invariance is only
-   * true for sufficiently many
-   * cells in the coarsest
-   * triangulation (e.g. for a
-   * single cell one would be
-   * returned), so a minimum of
-   * four is returned in two
-   * dimensions, 8 in three
-   * dimensions, etc, which is how
-   * many cells meet if the
-   * triangulation is refined.
+   * Return the maximum number of cells meeting at a common
+   * vertex. Since this number is an invariant under refinement, only
+   * the cells on the coarsest level are considered. The operation is
+   * thus reasonably fast. The invariance is only true for
+   * sufficiently many cells in the coarsest triangulation (e.g. for a
+   * single cell one would be returned), so a minimum of four is
+   * returned in two dimensions, 8 in three dimensions, etc, which is
+   * how many cells meet if the triangulation is refined.
    *
-   * In one space dimension, two is
-   * returned.
+   * In one space dimension, two is returned.
    */
   unsigned int max_adjacent_cells () const;
 
   /**
-   * This function always returns
-   * @p invalid_subdomain_id
-   * but is there for compatibility
-   * with the derived
-   * @p parallel::distributed::Triangulation
-   * class. For distributed parallel triangulations
-   * this function returns the subdomain id
-   * of those cells that are owned
-   * by the current processor.
+   * This function always returns @p invalid_subdomain_id but is there
+   * for compatibility with the derived @p
+   * parallel::distributed::Triangulation class. For distributed
+   * parallel triangulations this function returns the subdomain id of
+   * those cells that are owned by the current processor.
    */
   virtual types::subdomain_id locally_owned_subdomain () const;
   /*@}*/
@@ -3034,8 +2825,7 @@ public:
   /*@{*/
 
   /**
-   * Total number of lines, used or
-   * unused.
+   * Total number of lines, used or unused.
    *
    * @note This function really
    * exports internal information
@@ -3190,58 +2980,43 @@ public:
   /*@}*/
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Determine an estimate for the memory consumption (in bytes) of
+   * this object.
    *
-   * This function is made virtual,
-   * since a triangulation object
-   * might be accessed through a
-   * pointer to this base class,
-   * even if the actual object is a
-   * derived class.
+   * This function is made virtual, since a triangulation object might
+   * be accessed through a pointer to this base class, even if the
+   * actual object is a derived class.
    */
   virtual std::size_t memory_consumption () const;
 
   /**
-   * Write the data of this object to a
-   * stream for the purpose of
+   * Write the data of this object to a stream for the purpose of
    * serialization.
    *
-   * @note This function does not save
-   * <i>all</i> member variables of the
-   * current triangulation. Rather, only
-   * certain kinds of information are
-   * stored. For more information see the
-   * general documentation of this class.
+   * @note This function does not save <i>all</i> member variables of
+   * the current triangulation. Rather, only certain kinds of
+   * information are stored. For more information see the general
+   * documentation of this class.
    */
   template <class Archive>
   void save (Archive &ar,
              const unsigned int version) const;
 
   /**
-   * Read the data of this object from a
-   * stream for the purpose of
-   * serialization. Throw away the previous
-   * content.
+   * Read the data of this object from a stream for the purpose of
+   * serialization. Throw away the previous content.
    *
-   * @note This function does not reset
-   * <i>all</i> member variables of the
-   * current triangulation to the ones of
-   * the triangulation that was previously
-   * stored to an archive. Rather, only
-   * certain kinds of information are
-   * loaded. For more information see the
-   * general documentation of this class.
-   *
-   * @note This function calls the
-   * Triangulation::clear() function and
-   * consequently triggers the "clear"
-   * signal. After loading all data from
-   * the archive, it then triggers the
-   * "create" signal. For more information
-   * on signals, see the general
+   * @note This function does not reset <i>all</i> member variables of
+   * the current triangulation to the ones of the triangulation that
+   * was previously stored to an archive. Rather, only certain kinds
+   * of information are loaded. For more information see the general
    * documentation of this class.
+   *
+   * @note This function calls the Triangulation::clear() function and
+   * consequently triggers the "clear" signal. After loading all data
+   * from the archive, it then triggers the "create" signal. For more
+   * information on signals, see the general documentation of this
+   * class.
    */
   template <class Archive>
   void load (Archive &ar,
@@ -3254,19 +3029,15 @@ public:
    */
   /*@{*/
   /**
-   *  Exception
-   * @ingroup Exceptions
+   *  Exception @ingroup Exceptions
    */
   DeclException1 (ExcInvalidLevel,
                   int,
                   << "The given level " << arg1
                   << " is not in the valid range!");
   /**
-   * The function raising this
-   * exception can only operate on
-   * an empty Triangulation, i.e.,
-   * a Triangulation without grid
-   * cells.
+   * The function raising this exception can only operate on an empty
+   * Triangulation, i.e., a Triangulation without grid cells.
    *
    * @ingroup Exceptions
    */
@@ -3283,8 +3054,7 @@ public:
    */
   DeclException0 (ExcFacesHaveNoLevel);
   /**
-   * The triangulation level you
-   * accessed is empty.
+   * The triangulation level you accessed is empty.
    *
    * @ingroup Exceptions
    */
@@ -3293,45 +3063,32 @@ public:
                   << "You tried to do something on level " << arg1
                   << ", but this level is empty.");
   /**
-   * Exception
-   * @ingroup Exceptions
+   * Exception @ingroup Exceptions
    */
   DeclException0 (ExcNonOrientableTriangulation);
   /*@}*/
 protected:
   /**
-   *  Do some smoothing in the process
-   *  of refining the triangulation. See
-   *  the general doc of this class for
-   *  more information about this.
+   *  Do some smoothing in the process of refining the
+   *  triangulation. See the general doc of this class for more
+   *  information about this.
    */
   MeshSmoothing                    smooth_grid;
 
   /**
-   *  Write a bool vector to the given stream,
-   *  writing a pre- and a postfix magic
-   *  number. The vector is written in an
-   *  almost binary format, i.e. the bool
-   *  flags are packed but the data is written
+   *  Write a bool vector to the given stream, writing a pre- and a
+   *  postfix magic number. The vector is written in an almost binary
+   *  format, i.e. the bool flags are packed but the data is written
    *  as ASCII text.
    *
-   *  The flags are stored in a
-   *  binary format: for each @p
-   *  true, a @p 1 bit is stored, a
-   *  @p 0 bit otherwise.  The bits
-   *  are stored as <tt>unsigned
-   *  char</tt>, thus avoiding
-   *  endianess. They are written
-   *  to @p out in plain text, thus
-   *  amounting to 3.6 bits in the
-   *  output per bits in the input
-   *  on the average. Other
-   *  information (magic numbers
-   *  and number of elements of the
-   *  input vector) is stored as
-   *  plain text as well. The
-   *  format should therefore be
-   *  interplatform compatible.
+   *  The flags are stored in a binary format: for each @p true, a @p
+   *  1 bit is stored, a @p 0 bit otherwise.  The bits are stored as
+   *  <tt>unsigned char</tt>, thus avoiding endianess. They are
+   *  written to @p out in plain text, thus amounting to 3.6 bits in
+   *  the output per bits in the input on the average. Other
+   *  information (magic numbers and number of elements of the input
+   *  vector) is stored as plain text as well. The format should
+   *  therefore be interplatform compatible.
    */
   static void write_bool_vector (const unsigned int       magic_number1,
                                  const std::vector<bool> &v,
@@ -3339,9 +3096,8 @@ protected:
                                  std::ostream            &out);
 
   /**
-   * Re-read a vector of bools previously
-   * written by @p write_bool_vector and
-   * compare with the magic numbers.
+   * Re-read a vector of bools previously written by @p
+   * write_bool_vector and compare with the magic numbers.
    */
   static void read_bool_vector (const unsigned int       magic_number1,
                                 std::vector<bool>       &v,
@@ -3354,17 +3110,13 @@ private:
    */
   /*@{*/
   /**
-   * Declare a number of iterator types for
-   * raw iterators, i.e., iterators that also
-   * iterate over holes in the list of cells
-   * left by cells that have been coarsened
-   * away in previous mesh refinement cycles.
+   * Declare a number of iterator types for raw iterators, i.e.,
+   * iterators that also iterate over holes in the list of cells left
+   * by cells that have been coarsened away in previous mesh
+   * refinement cycles.
    *
-   * Since users should never have
-   * to access these internal
-   * properties of how we store
-   * data, these iterator types are
-   * made private.
+   * Since users should never have to access these internal properties
+   * of how we store data, these iterator types are made private.
    */
   typedef TriaRawIterator   <CellAccessor<dim,spacedim>         > raw_cell_iterator;
   typedef TriaRawIterator   <TriaAccessor<dim-1, dim, spacedim> > raw_face_iterator;
@@ -3373,17 +3125,14 @@ private:
   typedef typename IteratorSelector::raw_hex_iterator             raw_hex_iterator;
 
   /**
-   *  Iterator to the first cell, used
-   *  or not, on level @p level. If a level
-   *  has no cells, a past-the-end iterator
-   *  is returned.
+   *  Iterator to the first cell, used or not, on level @p level. If a
+   *  level has no cells, a past-the-end iterator is returned.
    */
   raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
 
   /**
-   * Return a raw iterator which is the first
-   * iterator not on level. If @p level is
-   * the last level, then this returns
+   * Return a raw iterator which is the first iterator not on
+   * level. If @p level is the last level, then this returns
    * <tt>end()</tt>.
    */
   raw_cell_iterator    end_raw (const unsigned int level) const;
@@ -3397,37 +3146,30 @@ private:
   /*@{*/
 
   /**
-   *  Iterator to the first line, used or
-   *  not, on level @p level. If a level
-   *  has no lines, a past-the-end iterator
-   *  is returned.
-   *  If lines are no cells, i.e. for @p dim>1
-   *  no @p level argument must be given.
-   *  The same applies for all the other functions
-   *  above, of course.
+   *  Iterator to the first line, used or not, on level @p level. If a
+   *  level has no lines, a past-the-end iterator is returned.  If
+   *  lines are no cells, i.e. for @p dim>1 no @p level argument must
+   *  be given.  The same applies for all the other functions above,
+   *  of course.
    */
   raw_line_iterator
   begin_raw_line   (const unsigned int level = 0) const;
 
   /**
-   *  Iterator to the first used line
-   *  on level @p level.
+   *  Iterator to the first used line on level @p level.
    */
   line_iterator
   begin_line       (const unsigned int level = 0) const;
 
   /**
-   *  Iterator to the first active
-   *  line on level @p level.
+   *  Iterator to the first active line on level @p level.
    */
   active_line_iterator
   begin_active_line(const unsigned int level = 0) const;
 
   /**
-   *  Iterator past the end; this
-   *  iterator serves for comparisons of
-   *  iterators with past-the-end or
-   *  before-the-beginning states.
+   *  Iterator past the end; this iterator serves for comparisons of
+   *  iterators with past-the-end or before-the-beginning states.
    */
   line_iterator        end_line () const;
   /*@}*/
@@ -3440,36 +3182,30 @@ private:
   /*@{
    */
   /**
-   *  Iterator to the first quad, used or
-   *  not, on the given level. If a level
-   *  has no quads, a past-the-end iterator
-   *  is returned.  If quads are no cells,
-   *  i.e. for $dim>2$ no level argument
-   *  must be given.
+   *  Iterator to the first quad, used or not, on the given level. If
+   *  a level has no quads, a past-the-end iterator is returned.  If
+   *  quads are no cells, i.e. for $dim>2$ no level argument must be
+   *  given.
 
    */
   raw_quad_iterator
   begin_raw_quad   (const unsigned int level = 0) const;
 
   /**
-   *  Iterator to the first used quad
-   *  on level @p level.
+   *  Iterator to the first used quad on level @p level.
    */
   quad_iterator
   begin_quad       (const unsigned int level = 0) const;
 
   /**
-   *  Iterator to the first active
-   *  quad on level @p level.
+   *  Iterator to the first active quad on level @p level.
    */
   active_quad_iterator
   begin_active_quad (const unsigned int level = 0) const;
 
   /**
-   *  Iterator past the end; this
-   *  iterator serves for comparisons of
-   *  iterators with past-the-end or
-   *  before-the-beginning states.
+   *  Iterator past the end; this iterator serves for comparisons of
+   *  iterators with past-the-end or before-the-beginning states.
    */
   quad_iterator
   end_quad () const;
@@ -3483,33 +3219,27 @@ private:
   /*@{
    */
   /**
-   *  Iterator to the first hex, used
-   *  or not, on level @p level. If a level
-   *  has no hexs, a past-the-end iterator
-   *  is returned.
+   *  Iterator to the first hex, used or not, on level @p level. If a
+   *  level has no hexs, a past-the-end iterator is returned.
    */
   raw_hex_iterator
   begin_raw_hex   (const unsigned int level = 0) const;
 
   /**
-   *  Iterator to the first used hex
-   *  on level @p level.
+   *  Iterator to the first used hex on level @p level.
    */
   hex_iterator
   begin_hex       (const unsigned int level = 0) const;
 
   /**
-   *  Iterator to the first active
-   *  hex on level @p level.
+   *  Iterator to the first active hex on level @p level.
    */
   active_hex_iterator
   begin_active_hex (const unsigned int level = 0) const;
 
   /**
-   *  Iterator past the end; this
-   *  iterator serves for comparisons of
-   *  iterators with past-the-end or
-   *  before-the-beginning states.
+   *  Iterator past the end; this iterator serves for comparisons of
+   *  iterators with past-the-end or before-the-beginning states.
    */
   hex_iterator
   end_hex () const;
@@ -3517,168 +3247,149 @@ private:
 
 
   /**
-   * The (public) function clear() will
-   * only work when the triangulation is
-   * not subscribed to by other users. The
-   * clear_despite_subscriptions() function
-   * now allows the triangulation being
-   * cleared even when there are
-   * subscriptions.
+   * The (public) function clear() will only work when the
+   * triangulation is not subscribed to by other users. The
+   * clear_despite_subscriptions() function now allows the
+   * triangulation being cleared even when there are subscriptions.
    *
-   * Make sure, you know what you
-   * do, when calling this
-   * function, as its use is
-   * reasonable in very rare cases,
-   * only. For example, when the
-   * subscriptions were for the
-   * initially empty Triangulation
-   * and the Triangulation object
-   * wants to release its memory
-   * before throwing an assertion
-   * due to input errors (e.g. in
-   * the create_triangulation()
-   * function).
+   * Make sure, you know what you do, when calling this function, as
+   * its use is reasonable in very rare cases, only. For example, when
+   * the subscriptions were for the initially empty Triangulation and
+   * the Triangulation object wants to release its memory before
+   * throwing an assertion due to input errors (e.g. in the
+   * create_triangulation() function).
    */
   void clear_despite_subscriptions ();
 
   /**
-   *  Refine all cells on all levels which
-   *  were previously flagged for refinement.
+   *  Refine all cells on all levels which were previously flagged for
+   *  refinement.
    *
-   *  Note, that this function uses
-   *  the <tt>line->user_flags</tt>
-   *  for <tt>dim=2,3</tt> and the
-   *  <tt>quad->user_flags</tt> for
+   *  Note, that this function uses the <tt>line->user_flags</tt> for
+   *  <tt>dim=2,3</tt> and the <tt>quad->user_flags</tt> for
    *  <tt>dim=3</tt>.
    *
-   *  The function returns a list
-   *  of cells that have produced
-   *  children that satisfy the
-   *  criteria of
-   *  @ref GlossDistorted "distorted cells"
-   * if the
-   * <code>check_for_distorted_cells</code>
-   * flag was specified upon
-   * creation of this object, at
+   *  The function returns a list of cells that have produced children
+   *  that satisfy the criteria of @ref GlossDistorted "distorted
+   *  cells" if the <code>check_for_distorted_cells</code> flag was
+   *  specified upon creation of this object, at
    */
   DistortedCellList execute_refinement ();
 
   /**
-   * Coarsen all cells which were flagged for
-   * coarsening, or rather: delete all
-   * children of those cells of which all
-   * child cells are flagged for coarsening
-   * and several other constraints hold (see
+   * Coarsen all cells which were flagged for coarsening, or rather:
+   * delete all children of those cells of which all child cells are
+   * flagged for coarsening and several other constraints hold (see
    * the general doc of this class).
    */
   void execute_coarsening ();
 
   /**
-   * Make sure that either all or none of
-   * the children of a cell are tagged for
-   * coarsening.
+   * Make sure that either all or none of the children of a cell are
+   * tagged for coarsening.
    */
   void fix_coarsen_flags ();
 
   /**
-   *  Array of pointers pointing to the
-   *  objects storing the cell data on the
-   *  different levels.
+   *  Array of pointers pointing to the objects storing the cell data
+   *  on the different levels.
    */
   std::vector<dealii::internal::Triangulation::TriaLevel<dim>*> levels;
 
   /**
-   *  Pointer to the faces of the triangulation. In 1d
-   *  this contains nothing, in 2D it contains data
-   *  concerning lines and in 3D quads and lines.  All of
-   *  these have no level and are therefore treated
+   *  Pointer to the faces of the triangulation. In 1d this contains
+   *  nothing, in 2D it contains data concerning lines and in 3D quads
+   *  and lines.  All of these have no level and are therefore treated
    *  separately.
    */
   dealii::internal::Triangulation::TriaFaces<dim> *faces;
 
 
   /**
-   *  Array of the vertices of this
-   *  triangulation.
+   *  Array of the vertices of this triangulation.
    */
   std::vector<Point<spacedim> >              vertices;
 
   /**
-   *  Array storing a bit-pattern which
-   *  vertices are used.
+   *  Array storing a bit-pattern which vertices are used.
    */
   std::vector<bool>                     vertices_used;
 
   /**
-   *  Collection of boundary
-   *  objects. We store only
-   *  objects, which are not
-   *  of type StraightBoundary.
+   *  Collection of manifold objects. We store only objects, which are
+   *  not of type FlatManifold.
    */
-  std::map<types::boundary_id, SmartPointer<const Boundary<dim, spacedim> , Triangulation<dim, spacedim> > >  boundary;
+  std::map<types::manifold_id, SmartPointer<const Boundary<dim,spacedim> , Triangulation<dim, spacedim> > >  manifold;
+
 
   /**
-   * Flag indicating whether
-   * anisotropic refinement took
-   * place.
+   * Flag indicating whether anisotropic refinement took place.
    */
   bool                             anisotropic_refinement;
 
 
   /**
-   * A flag that determines whether
-   * we are to check for distorted
-   * cells upon creation and
-   * refinement of a mesh.
+   * A flag that determines whether we are to check for distorted
+   * cells upon creation and refinement of a mesh.
    */
   const bool check_for_distorted_cells;
 
   /**
-   * Cache to hold the numbers of lines,
-   * quads, hexes, etc. These numbers
-   * are set at the end of the refinement
-   * and coarsening functions and enable
-   * faster access later on. In the old
-   * days, whenever one wanted to access
-   * one of these numbers, one had to
-   * perform a loop over all lines, e.g.,
-   * and count the elements until we hit
-   * the end iterator. This is time
-   * consuming and since access to the
-   * number of lines etc is a rather
-   * frequent operation, this was not
-   * an optimal solution.
+   * Cache to hold the numbers of lines, quads, hexes, etc. These
+   * numbers are set at the end of the refinement and coarsening
+   * functions and enable faster access later on. In the old days,
+   * whenever one wanted to access one of these numbers, one had to
+   * perform a loop over all lines, e.g., and count the elements until
+   * we hit the end iterator. This is time consuming and since access
+   * to the number of lines etc is a rather frequent operation, this
+   * was not an optimal solution.
    */
   dealii::internal::Triangulation::NumberCache<dim> number_cache;
 
   /**
-   * A map that relates the number of a
-   * boundary vertex to the boundary
-   * indicator. This field is only used in
-   * 1d. We have this field because we
-   * store boundary indicator information
-   * with faces in 2d and higher where we
-   * have space in the structures that
-   * store data for faces, but in 1d there
-   * is no such space for faces.
+   * A map that relates the number of a boundary vertex to the
+   * boundary indicator. This field is only used in 1d. We have this
+   * field because we store boundary indicator information with faces
+   * in 2d and higher where we have space in the structures that store
+   * data for faces, but in 1d there is no such space for faces.
    *
-   * The field is declared as a pointer for
-   * a rather mundane reason: all other
-   * fields of this class that can be
-   * modified by the TriaAccessor hierarchy
-   * are pointers, and so these accessor
-   * classes store a const pointer to the
-   * triangulation. We could no longer do
-   * so for TriaAccessor<0,1,spacedim> if
-   * this field (that can be modified by
-   * TriaAccessor::set_boundary_indicator)
-   * were not a pointer.
+   * The field is declared as a pointer for a rather mundane reason:
+   * all other fields of this class that can be modified by the
+   * TriaAccessor hierarchy are pointers, and so these accessor
+   * classes store a const pointer to the triangulation. We could no
+   * longer do so for TriaAccessor<0,1,spacedim> if this field (that
+   * can be modified by TriaAccessor::set_boundary_indicator) were not
+   * a pointer.
    */
   std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
+	
 
   /**
-   * A map that correlates each refinement listener that has been added
-   * through the outdated RefinementListener interface via
+   * A map that relates the number of a boundary vertex to the
+   * manifold indicator. This field is only used in 1d. We have this
+   * field because we store manifold indicator information with faces
+   * in 2d and higher where we have space in the structures that store
+   * data for faces, but in 1d there is no such space for faces.
+   *
+   * @note Manifold objects are pretty useless for points since they are
+   * neither refined nor are their interiors mapped. We nevertheless allow
+   * storing manifold ids for points to be consistent in dimension-independent
+   * programs.
+   *
+   * The field is declared as a pointer for a rather mundane reason:
+   * all other fields of this class that can be modified by the
+   * TriaAccessor hierarchy are pointers, and so these accessor
+   * classes store a const pointer to the triangulation. We could no
+   * longer do so for TriaAccessor<0,1,spacedim> if this field (that
+   * can be modified by TriaAccessor::set_boundary_indicator) were not
+   * a pointer.
+   */
+  std::map<unsigned int, types::manifold_id> *vertex_to_manifold_id_map_1d;
+
+
+  /**
+   * A map that correlates each refinement listener that has been
+   * added through the outdated RefinementListener interface via
    * add_refinement_listener(), with the new-style boost::signal
    * connections for each of the member function. We need to keep this
    * list around so that we can later terminate the connection again
@@ -3721,6 +3432,9 @@ CellData<structdim>::CellData ()
     vertices[i] = numbers::invalid_unsigned_int;
 
   material_id = 0;
+
+  // And the manifold to be invalid
+  manifold_id = numbers::invalid_manifold_id;
 }
 
 
@@ -3816,10 +3530,8 @@ void
 Triangulation<dim,spacedim>::save (Archive &ar,
                                    const unsigned int) const
 {
-  // as discussed in the documentation, do
-  // not store the signals as well as
-  // boundary and manifold descrption
-  // but everything else
+  // as discussed in the documentation, do not store the signals as
+  // well as boundary and manifold description but everything else
   ar &smooth_grid;
   ar &levels;
   ar &faces;
@@ -3831,8 +3543,10 @@ Triangulation<dim,spacedim>::save (Archive &ar,
 
   ar &check_for_distorted_cells;
 
-  if (dim == 1)
+  if (dim == 1) {
     ar &vertex_to_boundary_id_map_1d;
+    ar &vertex_to_manifold_id_map_1d;
+  }
 }
 
 
@@ -3843,14 +3557,11 @@ void
 Triangulation<dim,spacedim>::load (Archive &ar,
                                    const unsigned int)
 {
-  // clear previous content. this also calls
-  // the respective signal
+  // clear previous content. this also calls the respective signal
   clear ();
 
-  // as discussed in the documentation, do
-  // not store the signals as well as
-  // boundary and manifold description
-  // but everything else
+  // as discussed in the documentation, do not store the signals as
+  // well as boundary and manifold description but everything else
   ar &smooth_grid;
   ar &levels;
   ar &faces;
@@ -3868,8 +3579,10 @@ Triangulation<dim,spacedim>::load (Archive &ar,
                       "same setting with regard to reporting distorted "
                       "cell as the one previously stored."));
 
-  if (dim == 1)
+  if (dim == 1) {
     ar &vertex_to_boundary_id_map_1d;
+    ar &vertex_to_manifold_id_map_1d;
+  }
 
   // trigger the create signal to indicate
   // that new content has been imported into
@@ -3929,10 +3642,10 @@ template <> unsigned int Triangulation<1,3>::max_adjacent_cells () const;
 
 DEAL_II_NAMESPACE_CLOSE
 
-// Include tria_accessor.h here, so that it is possible for an end user to
-// use the iterators of Triangulation<dim> directly without the need to
-// include tria_accessor.h separately. (Otherwise the iterators are an
-// 'opaque' or 'incomplete' type.)
+// Include tria_accessor.h here, so that it is possible for an end
+// user to use the iterators of Triangulation<dim> directly without
+// the need to include tria_accessor.h separately. (Otherwise the
+// iterators are an 'opaque' or 'incomplete' type.)
 #include <deal.II/grid/tria_accessor.h>
 
 #endif

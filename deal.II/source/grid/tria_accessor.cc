@@ -1098,6 +1098,29 @@ double TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
 }
 
 
+// Recursively set manifold ids on hex iterators.
+template <>
+void
+TriaAccessor<3,3,3>::
+set_all_manifold_ids (const types::manifold_id manifold_ind) const
+{
+  set_manifold_id (manifold_ind);
+
+  if (this->has_children())
+    for (unsigned int c=0; c<this->n_children(); ++c)
+      this->child(c)->set_all_manifold_ids (manifold_ind);
+
+				   // for hexes also set manifold_id
+				   // of bounding quads and lines
+  
+				   // Six bonding quads
+  for(unsigned int i=0; i<6; ++i)
+    this->quad(i)->set_manifold_id(manifold_ind);
+				   // Twelve bounding lines
+  for (unsigned int i=0; i<12; ++i)
+    this->line(i)->set_manifold_id (manifold_ind);
+}
+
 
 /*------------------------ Functions: CellAccessor<1> -----------------------*/
 

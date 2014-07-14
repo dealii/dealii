@@ -124,7 +124,6 @@ check ()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   std::ofstream logfile(output_file_name.c_str());
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

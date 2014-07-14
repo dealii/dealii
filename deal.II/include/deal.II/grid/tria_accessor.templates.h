@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1913,11 +1913,86 @@ template <int structdim, int dim, int spacedim>
 const Boundary<dim,spacedim> &
 TriaAccessor<structdim, dim, spacedim>::get_boundary () const
 {
-  Assert (structdim<dim, ExcImpossibleInDim(dim));
+  return get_manifold();
+}
+
+
+template <int structdim, int dim, int spacedim>
+const Boundary<dim,spacedim> &
+TriaAccessor<structdim, dim, spacedim>::get_manifold () const
+{				  
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  
+				   // Get the default (manifold_id)
+  const types::manifold_id mi = this->objects().manifold_id[this->present_index];
+  
+				   // In case this is not valid, check
+				   // the boundary id, after having
+				   // casted it to a manifold id
+  if(mi == numbers::invalid_manifold_id) 
+    return this->tria->get_manifold(structdim < dim ?
+				    this->objects().boundary_or_material_id[this->present_index].boundary_id:
+				    dim < spacedim ? 
+				    this->objects().boundary_or_material_id[this->present_index].material_id:
+				    numbers::invalid_manifold_id);
+  else
+    return this->tria->get_manifold(mi);
+}
+
+
+template <int structdim, int dim, int spacedim>
+types::manifold_id
+TriaAccessor<structdim, dim, spacedim>::manifold_id () const
+{
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return this->tria->get_boundary(this->objects()
-                                  .boundary_or_material_id[this->present_index].boundary_id);
+  return this->objects().manifold_id[this->present_index];
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+void
+TriaAccessor<structdim, dim, spacedim>::
+set_manifold_id (const types::manifold_id manifold_ind) const
+{
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+
+  this->objects().manifold_id[this->present_index] = manifold_ind;
+}
+
+
+template <int structdim, int dim, int spacedim>
+void
+TriaAccessor<structdim, dim, spacedim>::
+set_all_manifold_ids (const types::manifold_id manifold_ind) const
+{
+  set_manifold_id (manifold_ind);
+
+  if (this->has_children())
+    for (unsigned int c=0; c<this->n_children(); ++c)
+      this->child(c)->set_all_manifold_ids (manifold_ind);
+
+  switch (structdim)
+    {
+    case 1:
+	  if(dim == 1)
+	    {
+	      (*this->tria->vertex_to_manifold_id_map_1d)
+		[vertex_index(0)] = manifold_ind;
+	      (*this->tria->vertex_to_manifold_id_map_1d)
+		[vertex_index(1)] = manifold_ind;
+	    }
+      break;
+
+    case 2:
+      // for quads also set manifold_id of bounding lines
+      for (unsigned int i=0; i<4; ++i)
+        this->line(i)->set_manifold_id (manifold_ind);
+      break;
+    default:
+      Assert (false, ExcNotImplemented());
+    }
 }
 
 
@@ -2281,6 +2356,18 @@ TriaAccessor<0, 1, spacedim>::boundary_indicator () const
 
 }
 
+template <int spacedim>
+inline
+types::manifold_id
+TriaAccessor<0, 1, spacedim>::manifold_id () const
+{
+  if( tria->vertex_to_manifold_id_map_1d->find (this->vertex_index())
+      != tria->vertex_to_manifold_id_map_1d->end())
+    return (*tria->vertex_to_manifold_id_map_1d)[this->vertex_index()];
+  else
+    return numbers::invalid_manifold_id;
+}
+
 
 template <int spacedim>
 inline
@@ -2407,12 +2494,30 @@ TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const types::boundary_id b
 }
 
 
+template <int spacedim>
+inline
+void
+TriaAccessor<0, 1, spacedim>::set_manifold_id (const types::manifold_id b)
+{
+  (*tria->vertex_to_manifold_id_map_1d)[this->vertex_index()] = b;
+}
+
+
 
 template <int spacedim>
 inline
 void TriaAccessor<0, 1, spacedim>::set_all_boundary_indicators (const types::boundary_id b)
 {
   set_boundary_indicator (b);
+}
+
+
+
+template <int spacedim>
+inline
+void TriaAccessor<0, 1, spacedim>::set_all_manifold_ids (const types::manifold_id b)
+{
+  set_manifold_id (b);
 }
 
 

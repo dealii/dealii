@@ -139,6 +139,29 @@ inconvenience this causes.
   <br>
   (Wolfgang Bangerth, 2013/12/21)
   </li>
+
+  <li> New: Added support for curved interior boundaries, and general
+  manifold id description.
+  <br>
+  A new flag was added to each triangulation obejct
+  (types::manifold_id) which allows one to specify a manifold
+  description, much in the same way we do for boundaries, also for
+  interior edges and faces. At the moment this information is used
+  only for objects of topological dimension less than spacedim, but a
+  generalization of the class Boundary<dim,spacedim> is on its way to 
+  allow also curved cells.
+  <br>
+  For the moment, full backward compatibility is granted, and one can 
+  keep using the old Boundary<dim,spacedim>, together with 
+  Triangulation::set_boundary(), and Triangulation::get_boundary() 
+  methods. However, this change suggests to use the types::boundary_id associated
+  with each boundary face to indicate only boundary condition types, and 
+  it allows to separate the geometrical meaning from the physical meaning. The 
+  suggested usage is types::boundary_id -> physical meaning, types::manifold_id
+  -> geometrical meaning. 
+  <br>
+  (Luca Heltai, 2014/07/14)
+  </li>
 </ol>
 
 

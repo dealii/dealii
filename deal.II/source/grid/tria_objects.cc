@@ -196,8 +196,15 @@ namespace internal
           // more entries.
           boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.resize (new_size);
+
           user_data.reserve (new_size);
           user_data.resize (new_size);
+
+          manifold_id.reserve (new_size);
+          manifold_id.insert (manifold_id.end(),
+			      new_size-manifold_id.size(),
+			      numbers::flat_manifold_id);
+
         }
 
       if (n_unused_singles==0)
@@ -275,6 +282,11 @@ namespace internal
           // actually reserves)
           boundary_or_material_id.reserve (new_size);
           boundary_or_material_id.resize (new_size);
+
+          manifold_id.reserve (new_size);
+          manifold_id.insert (manifold_id.end(),
+			      new_size-manifold_id.size(),
+			      numbers::flat_manifold_id);
 
           user_data.reserve (new_size);
           user_data.resize (new_size);
@@ -388,6 +400,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), children.size()));
       Assert (cells.size() == boundary_or_material_id.size(),
               ExcMemoryInexact (cells.size(), boundary_or_material_id.size()));
+      Assert (cells.size() == manifold_id.size(),
+              ExcMemoryInexact (cells.size(), manifold_id.size()));
       Assert (cells.size() == user_data.size(),
               ExcMemoryInexact (cells.size(), user_data.size()));
     }
@@ -407,6 +421,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), refinement_cases.size()));
       Assert (cells.size() == boundary_or_material_id.size(),
               ExcMemoryInexact (cells.size(), boundary_or_material_id.size()));
+      Assert (cells.size() == manifold_id.size(),
+              ExcMemoryInexact (cells.size(), manifold_id.size()));
       Assert (cells.size() == user_data.size(),
               ExcMemoryInexact (cells.size(), user_data.size()));
     }
@@ -423,6 +439,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), children.size()));
       Assert (cells.size() == boundary_or_material_id.size(),
               ExcMemoryInexact (cells.size(), boundary_or_material_id.size()));
+      Assert (cells.size() == manifold_id.size(),
+              ExcMemoryInexact (cells.size(), manifold_id.size()));
       Assert (cells.size() == user_data.size(),
               ExcMemoryInexact (cells.size(), user_data.size()));
       Assert (cells.size() * GeometryInfo<3>::faces_per_cell
@@ -465,6 +483,7 @@ namespace internal
       used.clear();
       user_flags.clear();
       boundary_or_material_id.clear();
+      manifold_id.clear();
       user_data.clear();
       user_data_type = data_unknown;
     }
@@ -497,6 +516,7 @@ namespace internal
               MemoryConsumption::memory_consumption (used) +
               MemoryConsumption::memory_consumption (user_flags) +
               MemoryConsumption::memory_consumption (boundary_or_material_id) +
+	      MemoryConsumption::memory_consumption (manifold_id) +
               MemoryConsumption::memory_consumption (refinement_cases) +
               user_data.capacity() * sizeof(UserData) + sizeof(user_data));
     }

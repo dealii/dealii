@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -126,7 +126,19 @@ namespace types
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   typedef unsigned char boundary_id;
+  
+  /**
+   * The type used to denote manifold indicators associated with every
+   * object of the mesh.
+   *
+   * There is a special value, numbers::flat_manifold_id
+   * that is used to indicate the standard cartesian manifold.
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  typedef unsigned int manifold_id;
 
+  
   /**
    * @deprecated Old name for the typedef above.
    */
@@ -251,6 +263,24 @@ namespace numbers
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const types::boundary_id internal_face_boundary_id = static_cast<types::boundary_id>(-1);
+
+  /**
+   * Invalid manifold_id which we
+   * need in several places as a
+   * default value.  We assume that
+   * all valid manifold_ids lie in the
+   * range [0, invalid_maifold_id).
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  const types::manifold_id invalid_manifold_id = static_cast<types::manifold_id>(-1);
+  
+  /**
+   * A manifold_id we reserve for the default flat Cartesian manifold.
+   *
+   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  const types::manifold_id flat_manifold_id = static_cast<types::manifold_id>(-1);
 
   /**
    * A special id for an invalid

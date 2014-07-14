@@ -1834,7 +1834,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
       // reset deal.II stream
       deallog.detach();
       if (old_stream)
-        deallog.attach(*old_stream, false);
+        deallog.attach(*old_stream);
 
       // include a safety factor since the CG method will in general not be
       // converged
