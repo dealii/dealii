@@ -1,5 +1,5 @@
 //----------------------------  manifold_id_05.cc  ---------------------------
-//    Copyright (C) 2011, 2013 by the mathLab team.
+//    Copyright (C) 2011, 2013, 2014 by the mathLab team.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,11 +57,6 @@ void test(unsigned int ref=1)
 
   GridOut gridout;
   gridout.write_msh(tria, deallog.get_file_stream());
-  char fname[30];
-  sprintf(fname, "/tmp/id_5_mesh_%d_%d.msh",
-          dim, spacedim);
-  std::ofstream ofile(fname);
-  gridout.write_msh(tria,ofile);
 }
 
 int main ()
