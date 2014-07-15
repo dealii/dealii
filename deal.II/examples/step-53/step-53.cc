@@ -20,6 +20,7 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 
@@ -29,62 +30,35 @@
 using namespace dealii;
 
 
-class SineBoundary : public Boundary<3>
-{
-public:
-  virtual
-  Point<3>
-  get_new_point_on_line (const typename Triangulation<3>::line_iterator &line) const;
 
-  virtual
-  Point<3>
-  get_new_point_on_quad (const typename Triangulation<3>::quad_iterator &quad) const;
-};
-  
-
-Point<3>
-SineBoundary::
-get_new_point_on_line (const typename Triangulation<3>::line_iterator &line) const
-{
-  const double new_x = (line->vertex(0)[0] + line->vertex(1)[0]) / 2;
-  const double new_y = (line->vertex(0)[1] + line->vertex(1)[1]) / 2;
-  const double new_z = 1 +
-		       0.05 * std::sin (2 * numbers::PI * new_x) +
-		       0.05 * std::sin (2 * numbers::PI * new_y);
-  return Point<3> (new_x, new_y, new_z);
-}
-
-
-Point<3>
-SineBoundary::
-get_new_point_on_quad (const typename Triangulation<3>::quad_iterator &quad) const
-{
-  const double new_x = (quad->vertex(0)[0] + quad->vertex(1)[0] +
-			quad->vertex(2)[0] + quad->vertex(3)[0]) / 4;
-  const double new_y = (quad->vertex(0)[1] + quad->vertex(1)[1] +
-			quad->vertex(2)[1] + quad->vertex(3)[1]) / 4;
-  const double new_z = 1 +
-		       0.05 * std::sin (2 * numbers::PI * new_x) +
-		       0.05 * std::sin (2 * numbers::PI * new_y);
-  return Point<3> (new_x, new_y, new_z);
-}
-
-
+template <int dim>
 void make_grid ()
 {
-  SineBoundary sine_boundary;
-  
-  Triangulation<3> triangulation;
+  Point<dim> center;
+  for (unsigned int i=0; i<dim; ++i)
+    center[i] = .25;
+
+  double radius=center.norm();
+
+  HyperBallBoundary<dim,dim> boundary(center, .25*std::sqrt((double)dim));
+  Triangulation<dim,dim> triangulation;
   GridGenerator::hyper_cube (triangulation);
 
-  triangulation.begin_active()->face(5)->set_manifold_id(1);
-  triangulation.set_boundary (1, sine_boundary);
+  triangulation.refine_global(1);
 
-  triangulation.refine_global (2);
+  for (typename Triangulation<dim>::active_cell_iterator cell=triangulation.begin_active();
+      cell!=triangulation.end(); ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->center().distance(center)< radius)
+        cell->face(f)->set_all_manifold_ids(1);
 
-  std::ofstream out ("mesh.mgl");
+  triangulation.set_manifold(1,boundary);
+  triangulation.refine_global(3);
+
+  const std::string filename = "mesh-" + Utilities::int_to_string(dim) + "d.vtk";
+  std::ofstream out (filename.c_str());
   GridOut grid_out;
-  grid_out.write_mathgl (triangulation, out);
+  grid_out.write_vtk (triangulation, out);
 }
 
 
@@ -96,5 +70,6 @@ void make_grid ()
 // subfunctions.
 int main ()
 {
-  make_grid ();
+  make_grid<2> ();
+  make_grid<3> ();
 }
