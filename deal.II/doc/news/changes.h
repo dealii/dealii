@@ -172,6 +172,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The GridReordering::reorder_cells() function used a
+  numbering format for the vertices in a cell that was last used in
+  deal.II version 5.2. This format is still used internally, but
+  the function now also understands the numbering that has been
+  used in deal.II ever since. The choice is made by an additional
+  argument to the function that defaults to the old-style
+  format for backward compatibility.
+  <br>
+  (Wolfgang Bangerth, 2014/07/14)
+  </li>
+
   <li> New: There are now functions GridOut::write_vtk() and
    GridOut::write_vtu() that can
   write a mesh in VTK/VTU format.

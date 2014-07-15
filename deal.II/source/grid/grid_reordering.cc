@@ -32,7 +32,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template<>
 void
-GridReordering<1>::reorder_cells (std::vector<CellData<1> > &)
+GridReordering<1>::reorder_cells (std::vector<CellData<1> > &,
+                                  const bool)
 {
   // there should not be much to do
   // in 1d...
@@ -49,7 +50,8 @@ GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> 
 
 template<>
 void
-GridReordering<1,2>::reorder_cells (std::vector<CellData<1> > &)
+GridReordering<1,2>::reorder_cells (std::vector<CellData<1> > &,
+                                    const bool)
 {
   // there should not be much to do
   // in 1d...
@@ -67,7 +69,8 @@ GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2
 
 template<>
 void
-GridReordering<1,3>::reorder_cells (std::vector<CellData<1> > &)
+GridReordering<1,3>::reorder_cells (std::vector<CellData<1> > &,
+                                    const bool)
 {
   // there should not be much to do
   // in 1d...
@@ -614,28 +617,121 @@ namespace internal
 } // namespace internal
 
 
-
-
-template<>
-void
-GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
+// anonymous namespace for internal helper functions
+namespace
 {
-  // check if grids are already
-  // consistent. if so, do
-  // nothing. if not, then do the
-  // reordering
-  if (internal::GridReordering2d::is_consistent (original_cells))
-    return;
+  /**
+   * A set of three functions that
+   * reorder the data from the
+   * "current" to the "classic"
+   * format of vertex numbering of
+   * cells and faces. These functions
+   * do the reordering of their
+   * arguments in-place.
+   */
+  void
+  reorder_new_to_old_style (const std::vector<CellData<1> > &)
+  {
+    // nothing to do here: the format
+    // hasn't changed for 1d
+  }
 
-  internal::GridReordering2d::GridReordering().reorient(original_cells);
+
+  void
+  reorder_new_to_old_style (std::vector<CellData<2> > &cells)
+  {
+    for (unsigned int cell=0; cell<cells.size(); ++cell)
+      std::swap(cells[cell].vertices[2], cells[cell].vertices[3]);
+  }
+
+
+  void
+  reorder_new_to_old_style (std::vector<CellData<3> > &cells)
+  {
+    unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
+    for (unsigned int cell=0; cell<cells.size(); ++cell)
+      {
+        for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+          tmp[i] = cells[cell].vertices[i];
+        for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+          cells[cell].vertices[i] = tmp[GeometryInfo<3>::ucd_to_deal[i]];
+      }
+  }
+
+
+  /**
+   * And now also in the opposite direction.
+   */
+  void
+  reorder_old_to_new_style (const std::vector<CellData<1> > &)
+  {
+    // nothing to do here: the format
+    // hasn't changed for 1d
+  }
+
+
+  void
+  reorder_old_to_new_style (std::vector<CellData<2> > &cells)
+  {
+    // just invert the permutation:
+    reorder_new_to_old_style(cells);
+  }
+
+
+  void
+  reorder_old_to_new_style (std::vector<CellData<3> > &cells)
+  {
+    // undo the ordering above
+    unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
+    for (unsigned int cell=0; cell<cells.size(); ++cell)
+      {
+        for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+          tmp[i] = cells[cell].vertices[i];
+        for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+          cells[cell].vertices[GeometryInfo<3>::ucd_to_deal[i]] = tmp[i];
+      }
+  }
 }
 
 
 template<>
 void
-GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells)
+GridReordering<2>::reorder_cells (std::vector<CellData<2> > &cells,
+                                  const bool use_new_style_ordering)
 {
-  GridReordering<2>::reorder_cells(original_cells);
+  // if necessary, convert to old-style format
+  if (use_new_style_ordering)
+    reorder_new_to_old_style(cells);
+
+  // check if grids are already
+  // consistent. if so, do
+  // nothing. if not, then do the
+  // reordering
+  if (!internal::GridReordering2d::is_consistent (cells))
+    internal::GridReordering2d::GridReordering().reorient(cells);
+
+
+  // and convert back if necessary
+  if (use_new_style_ordering)
+    reorder_old_to_new_style(cells);
+}
+
+
+template<>
+void
+GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &cells,
+                                    const bool use_new_style_ordering)
+{
+  // if necessary, convert to old-style format
+  if (use_new_style_ordering)
+    reorder_new_to_old_style(cells);
+
+  GridReordering<2>::reorder_cells(cells);
+
+
+  // and convert back if necessary
+  if (use_new_style_ordering)
+    reorder_old_to_new_style(cells);
 }
 
 
@@ -1551,26 +1647,34 @@ namespace internal
 
 template<>
 void
-GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
+GridReordering<3>::reorder_cells (std::vector<CellData<3> > &cells,
+                                  const bool use_new_style_ordering)
 {
+  Assert (cells.size() != 0,
+          ExcMessage("List of elements to orient must have at least one cell"));
 
-  Assert (incubes.size() != 0,
-          ExcMessage("List of elements to orient was of zero length"));
+  // if necessary, convert to old-style format
+  if (use_new_style_ordering)
+    reorder_new_to_old_style(cells);
 
   // create a backup to use if GridReordering
   // was not successful
-  std::vector<CellData<3> > backup=incubes;
+  std::vector<CellData<3> > backup=cells;
 
   // This does the real work
-  bool success=
-    internal::GridReordering3d::Orienter::orient_mesh (incubes);
+  const bool success=
+    internal::GridReordering3d::Orienter::orient_mesh (cells);
 
   // if reordering was not successful use
-  // original connectivity, otherwiese do
+  // original connectivity, otherwise do
   // nothing (i.e. use the reordered
   // connectivity)
   if (!success)
-    incubes=backup;
+    cells=backup;
+
+  // and convert back if necessary
+  if (use_new_style_ordering)
+    reorder_old_to_new_style(cells);
 }
 
 

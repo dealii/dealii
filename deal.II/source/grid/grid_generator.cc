@@ -44,58 +44,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// anonymous namespace for internal helper functions
-namespace
-{
-  /**
-   * A set of three functions that
-   * reorder the data from the
-   * "current" to the "classic"
-   * format of vertex numbering of 
-   * cells and faces. These functions 
-   * do the reordering of their 
-   * arguments in-place.
-   */
-  void
-  reorder_compatibility (const std::vector<CellData<1> > &,
-                         const SubCellData &)
-  {
-    // nothing to do here: the format
-    // hasn't changed for 1d
-  }
-
-
-  void
-  reorder_compatibility (std::vector<CellData<2> > &cells,
-                         const SubCellData &)
-  {
-    for (unsigned int cell=0; cell<cells.size(); ++cell)
-      std::swap(cells[cell].vertices[2],cells[cell].vertices[3]);
-  }
-
-
-  void
-  reorder_compatibility (std::vector<CellData<3> > &cells,
-                         SubCellData               &subcelldata)
-  {
-    unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
-    for (unsigned int cell=0; cell<cells.size(); ++cell)
-      {
-        for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
-          tmp[i] = cells[cell].vertices[i];
-        for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
-          cells[cell].vertices[i] = tmp[GeometryInfo<3>::ucd_to_deal[i]];
-      }
-
-    // now points in boundary quads
-    std::vector<CellData<2> >::iterator boundary_quad
-      = subcelldata.boundary_quads.begin();
-    std::vector<CellData<2> >::iterator end_quad
-      = subcelldata.boundary_quads.end();
-    for (unsigned int quad_no=0; boundary_quad!=end_quad; ++boundary_quad, ++quad_no)
-      std::swap(boundary_quad->vertices[2], boundary_quad->vertices[3]);
-  }
-}
 
 namespace GridGenerator
 {
@@ -3480,12 +3428,12 @@ namespace GridGenerator
     GridTools::delete_duplicated_vertices (vertices, cells,
 					   subcell_data,
 					   considered_vertices);
-    // reorder_cells expects data in the "classic" format, transform
-    // the cell data before and after the call to that function 
-    reorder_compatibility(cells, subcell_data);
-    GridReordering<dim, spacedim>::reorder_cells(cells);
+
+    // reorder the cells to ensure that they satisfy the convention for
+    // edge and face directions
+    GridReordering<dim, spacedim>::reorder_cells(cells, true);
     result.clear ();
-    result.create_triangulation_compatibility (vertices, cells, subcell_data);
+    result.create_triangulation (vertices, cells, subcell_data);
   }
 
 
