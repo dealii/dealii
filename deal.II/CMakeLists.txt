@@ -157,7 +157,7 @@ ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
-INCLUDE(setup_testsuite)
+ADD_SUBDIRECTORY(tests)
 
 #
 # And finally, print the configuration:

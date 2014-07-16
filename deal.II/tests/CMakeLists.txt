@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 by the deal.II authors
+## Copyright (C) 2013 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,46 +15,121 @@
 ## ---------------------------------------------------------------------
 
 #
-# This is a small project that provides some custom targets that need a
-# working, independent subproject because they are called back during
-# configure phase.
+# Setup the testsuite.
+#
+# We define toplevel targets:
+#    setup_tests    - set up testsuite subprojects
+#    regen_tests    - rerun configure stage in every testsuite subproject
+#    clean_tests    - run the 'clean' target in every testsuite subproject
+#    prune_tests    - remove all testsuite subprojects
 #
 
-IF(NOT DEFINED TEST_DIR)
-  MESSAGE(FATAL_ERROR "\n
-  The testsuite cannot be set up as an independent project.
-  Please configure \"deal.II\" directly instead.\n\n"
-    )
-ENDIF()
+SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-PROJECT(testsuite NONE)
+#
+# First of all, our quicktests:
+#
 
-# Regenerate tests (run "make rebuild_cache" in subprojects):
-ADD_CUSTOM_TARGET(regen_tests)
+ADD_SUBDIRECTORY(quick_tests)
 
-# Clean all tests
-ADD_CUSTOM_TARGET(clean_tests)
+#
+# Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR and
+# CMAKE_BINARY_DIR/tests:
+#
+
+MESSAGE(STATUS "Testsuite will be set up with TEST_DIR=${TEST_DIR}")
+MESSAGE(STATUS "Setting up testsuite")
+
+FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)")
+FILE(WRITE ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake "")
+
+#
+# A config line for tests:
+#
+
+SET(_options "")
+LIST(APPEND _options -DDEAL_II_SOURCE_DIR=${CMAKE_SOURCE_DIR})
+LIST(APPEND _options -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR})
+FOREACH(_var
+  DIFF_DIR NUMDIFF_DIR TEST_DIFF TEST_PICKUP_REGEX TEST_TIME_LIMIT
+  MPIEXEC MPIEXEC_NUMPROC_FLAG MPIEXEC_PREFLAGS MPIEXEC_POSTFLAGS
+  )
+  ADD_FLAGS(_options "-U${_var}")
+  IF(DEFINED ${_var})
+    ADD_FLAGS(_options "-D${_var}=${${_var}}")
+  ENDIF()
+ENDFOREACH()
+
+#
+# Glob together a list of all subfolders to set up:
+#
 
 FILE(GLOB _categories RELATIVE ${TEST_DIR} ${TEST_DIR}/*)
 SET(_categories all-headers build_tests mesh_converter ${_categories})
 LIST(REMOVE_DUPLICATES _categories)
 
+#
+# Custom targets for the testsuite:
+#
+
+# Setup tests:
+ADD_CUSTOM_TARGET(setup_tests)
+
+# Remove all tests:
+ADD_CUSTOM_TARGET(prune_tests)
+
+# Regenerate tests (run "make rebuild_cache" in subprojects):
+ADD_CUSTOM_TARGET(regen_tests)
+
+# Regenerate tests (run "make clean" in subprojects):
+ADD_CUSTOM_TARGET(clean_tests)
+
 FOREACH(_category ${_categories})
-  IF( EXISTS ${CMAKE_SOURCE_DIR}/${_category}/CMakeLists.txt OR
-      EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt )
+  IF(EXISTS ${CMAKE_SOURCE_DIR}/tests/${_category}/CMakeLists.txt)
+    SET(_category_dir ${CMAKE_SOURCE_DIR}/tests/${_category})
+  ELSEIF(EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt)
+    SET(_category_dir ${TEST_DIR}/${_category})
+  ELSE()
+    SET(_category_dir)
+  ENDIF()
+
+  IF(NOT "${_category_dir}" STREQUAL "")
+    ADD_CUSTOM_TARGET(setup_tests_${_category}
+      COMMAND ${CMAKE_COMMAND} -E make_directory
+        ${CMAKE_BINARY_DIR}/tests/${_category}
+      COMMAND cd ${CMAKE_BINARY_DIR}/tests/${_category} &&
+        ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
+        > /dev/null
+      COMMENT "Processing tests/${_category}"
+      )
+    ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
+
+    ADD_CUSTOM_TARGET(prune_tests_${_category}
+      COMMAND ${CMAKE_COMMAND} -E remove_directory
+        ${CMAKE_BINARY_DIR}/tests/${_category}
+      COMMENT "Processing tests/${_category}"
+      )
+    ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
     ADD_CUSTOM_TARGET(regen_tests_${_category}
-      COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
+      COMMAND ${CMAKE_COMMAND}
         --build ${CMAKE_BINARY_DIR}/${_category} --target regenerate
+      COMMENT "Processing tests/${_category}"
       )
     ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
     ADD_CUSTOM_TARGET(clean_tests_${_category}
-      COMMAND [ ! -d ${_category} ] || ${CMAKE_COMMAND}
+      COMMAND ${CMAKE_COMMAND}
         --build ${CMAKE_BINARY_DIR}/${_category} --target clean
+      COMMENT "Processing tests/${_category}"
       )
     ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
 
+    FILE(APPEND ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake
+      "SUBDIRS(${_category})\n"
+      )
   ENDIF()
 ENDFOREACH()
+
+MESSAGE(STATUS "Setting up testsuite - Done")
+
