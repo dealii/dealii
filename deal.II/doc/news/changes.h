@@ -114,6 +114,12 @@ inconvenience this causes.
   (Luca Heltai, 2014/07/14)
   </li>
 
+  <li> New: Tutorial programs (and a few other places) are now cross-linked
+  to their corresponding video lectures.
+  <br>
+  (Wolfgang Bangerth, 2014/07/10)
+  </li>
+
   <li> Changed: The functionparser library bundled with deal.II got replaced
   by the muparser library.
   <br>
