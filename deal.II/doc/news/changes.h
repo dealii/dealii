@@ -97,6 +97,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Ported: The build system now supports cmake-3.0.0
+  <br>
+  (Matthias Maier, 2014/07/15)
+  </li>
+
   <li> New: Added support for curved interior boundaries, and general
   manifold id description.
   <br>

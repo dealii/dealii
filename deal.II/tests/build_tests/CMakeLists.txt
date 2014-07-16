@@ -113,7 +113,7 @@ FOREACH(_step_full ${_steps})
 
       # And a rule on how to build the example step:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/build_output
-        COMMAND [ ! -f ${_step_dir}/configure_output ]
+        COMMAND test ! -f ${_step_dir}/configure_output
           || (rm -f ${_step_dir}/failing_build_output
               &&${CMAKE_COMMAND} --build ${_step_dir} --target all
               > ${_step_dir}/build_output 2>&1)
@@ -123,7 +123,7 @@ FOREACH(_step_full ${_steps})
               && echo "${_test}: BUILD failed. Output:"
               && cat ${_step_dir}/failing_build_output
               && exit 1)
-        COMMAND [ -f ${_step_dir}/configure_output ]
+        COMMAND test -f ${_step_dir}/configure_output
           || (rm -f ${_step_dir}/build_output
               && rm -f ${_step_dir}/failing_build_output
               && echo "${_test}: BUILD stage not invoked due to failing CONFIGURE") # succeed anyway!
@@ -133,7 +133,7 @@ FOREACH(_step_full ${_steps})
 
       # And a rule on how to run the example step:
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/run_output
-        COMMAND [ ! -f ${_step_dir}/build_output ]
+        COMMAND test ! -f ${_step_dir}/build_output
           || (rm -f ${_step_dir}/failing_run_output
              && ${CMAKE_COMMAND} --build ${_step_dir} --target run
              > ${_step_dir}/run_output 2>&1)
@@ -144,7 +144,7 @@ FOREACH(_step_full ${_steps})
               && echo "${_test}: RUN failed. Output:"
               && cat ${_step_dir}/failing_run_output
               && exit 1)
-        COMMAND [ -f ${_step_dir}/build_output ]
+        COMMAND test -f ${_step_dir}/build_output
           || (   rm -f ${_step_dir}/run_output
               && rm -f ${_step_dir}/failing_run_output
               && echo "${_test}: RUN stage not invoked due to failing BUILD"

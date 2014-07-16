@@ -112,14 +112,16 @@ FOREACH(_category ${_categories})
     ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
     ADD_CUSTOM_TARGET(regen_tests_${_category}
-      COMMAND ${CMAKE_COMMAND}
+      COMMAND
+        test ! -f ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
         --build ${CMAKE_BINARY_DIR}/${_category} --target regenerate
       COMMENT "Processing tests/${_category}"
       )
     ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
     ADD_CUSTOM_TARGET(clean_tests_${_category}
-      COMMAND ${CMAKE_COMMAND}
+      COMMAND
+        test ! -f ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
         --build ${CMAKE_BINARY_DIR}/${_category} --target clean
       COMMENT "Processing tests/${_category}"
       )
