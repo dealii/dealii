@@ -1,0 +1,39 @@
+
+DEAL:3d::Checksum: 2760466831
+<?xml version="1.0"?>
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPoints>
+      <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
+    </PPoints>
+    <PCellData Scalars="mpirank,treeid">
+      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
+      <PDataArray type="Int32" Name="treeid" format="ascii"/>
+    </PCellData>
+    <PPointData>
+    </PPointData>
+    <Piece Source="1_0000.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="266608" NumberOfCells="33326">
+      <Points>
+        <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+            3.64536738e+00   3.64710069e+00  -3.99903727e+00
+            3.61407876e+00   3.68167734e+00  -3.99898410e+00
+            3.63464022e+00   3.63641191e+00  -3.99901295e+00
+            3.60356712e+00   3.67266297e+00  -3.99896145e+00
+            3.64638615e+00   3.64810348e+00  -3.96245122e+00
+            3.61549616e+00   3.68247652e+00  -3.96037817e+00
+            3.63625789e+00   3.63800883e+00  -3.96150446e+00
+            3.60595322e+00   3.67423248e+00  -3.95949459e+00
+            3.61252499e+00   3.68357348e+00  -3.99898148e+00
+            3.58476353e+00   3.72105145e+00  -3.99893379e+00
+            3.60201979e+00   3.67464304e+00  -3.99895883e+00
+            3.57428741e+00   3.71363878e+00  -3.99891257e+00
+            3.61395955e+00   3.68436384e+00  -3.96027470e+00
+DEAL:3d::
+DEAL:3d::0 Number of cells: 33326 33326

@@ -39,8 +39,9 @@ void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
   // copy the .pvtu and .vtu files
   // into the logstream
   {
+    unsigned int c=0;
     std::ifstream in((std::string(filename) + ".pvtu").c_str());
-    while (in)
+    while (in && ++c<20)
       {
         std::string s;
         std::getline(in, s);
@@ -49,8 +50,9 @@ void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
   }
 
   {
+    unsigned int c=0;
     std::ifstream in((std::string(filename) + "_0000.vtu").c_str());
-    while (in)
+    while (in && ++c<20)
       {
         std::string s;
         std::getline(in, s);

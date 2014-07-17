@@ -63,7 +63,7 @@ void test(std::ostream & /*out*/)
       for (unsigned int i=0; i<tr.n_active_cells() / 5 + 1; ++i)
         {
           const unsigned int x = Testing::rand() % flags.size();
-          deallog << "Refining cell " << x << std::endl;
+          //deallog << "Refining cell " << x << std::endl;
           flags[x] = true;
         }
 
@@ -88,6 +88,9 @@ void test(std::ostream & /*out*/)
               << tr.n_active_cells() << ' '
               << tr2.n_active_cells()
               << std::endl;
+      deallog << "Checksum: "
+	      << tr.get_checksum ()
+	      << std::endl;
 
       assert_tria_equal(tr, tr2);
 
