@@ -218,6 +218,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
               && echo "${_test_full}: RUN successful."
               && echo "${_test_full}: DIFF failed. ------ Source: ${_comparison_file}"
               && echo "${_test_full}: DIFF failed. ------ Result: ${_test_directory}/output"
+              && echo "Check ${_comparison_file} ${_test_directory}/output"
               && echo "${_test_full}: DIFF failed. ------ Diff:   ${_test_directory}/failing_diff"
               && echo "${_test_full}: DIFF failed. ------ First 8 lines of numdiff/diff output:"
               && cat ${_test_directory}/failing_diff | head -n 8
