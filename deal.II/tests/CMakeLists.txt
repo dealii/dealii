@@ -54,9 +54,9 @@ FOREACH(_var
   DIFF_DIR NUMDIFF_DIR TEST_DIFF TEST_PICKUP_REGEX TEST_TIME_LIMIT
   MPIEXEC MPIEXEC_NUMPROC_FLAG MPIEXEC_PREFLAGS MPIEXEC_POSTFLAGS
   )
-  ADD_FLAGS(_options "-U${_var}")
+  LIST(APPEND _options "-U${_var}")
   IF(DEFINED ${_var})
-    ADD_FLAGS(_options "-D${_var}=${${_var}}")
+    LIST(APPEND _options "-D${_var}=${${_var}}")
   ENDIF()
 ENDFOREACH()
 
