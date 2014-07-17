@@ -156,6 +156,8 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 {
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;
+  //deallog << "copy_to_mg src " << src.l2_norm() << std::endl;
+  //MPI_Barrier(MPI_COMM_WORLD);
   for (unsigned int level=mg_dof_handler.get_tria().n_global_levels(); level != 0;)
     {
       --level;
@@ -164,16 +166,31 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
       typedef std::vector<std::pair<types::global_dof_index, unsigned int> >::const_iterator IT;
       for (IT i= copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
-        dst_level(i->second) = src(i->first);
+        {
+          dst_level(i->second) = src(i->first);
+        //if (i->first == 446)
+        //std::cout << "L" << level << " " << i->first << " -> " << i->second << ": " << src(i->first) << std::endl;
 
-      // for (IT i= copy_indices_to_me[level].begin();
-      //      i != copy_indices_to_me[level].end(); ++i)
-      //   dst_level(i->second) = src(i->first);
+        }
+
+       for (IT i= copy_indices_to_me[level].begin();
+            i != copy_indices_to_me[level].end(); ++i)
+         {
+           dst_level(i->second) = src(i->first);
+           //if (i->first == 446)
+             //std::cout << "L" << level << " " << i->first << " --> " << i->second << ": " << src(i->first) << std::endl;
+         }
 
       dst_level.compress(VectorOperation::insert);
+      //MPI_Barrier(MPI_COMM_WORLD);
+      //deallog << "copy_to_mg dst " << level << " " << dst_level.l2_norm() << std::endl;
 
       if (!first)
-        restrict_and_add (level+1, dst[level], dst[level+1]);
+        {
+          restrict_and_add (level+1, dst[level], dst[level+1]);
+          //deallog << "copy_to_mg restr&add " << level << " " << dst_level.l2_norm() << std::endl;
+
+        }
 
       first = false;
     }
@@ -201,6 +218,9 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
     {
       typedef std::vector<std::pair<types::global_dof_index, unsigned int> >::const_iterator IT;
 
+      //deallog << "copy_from_mg src " << level << " " << src[level].l2_norm() << std::endl;
+
+
       // First copy all indices local to this process
       if (constraints==0)
         for (IT i= copy_indices[level].begin();
@@ -222,6 +242,11 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
              i != copy_indices_from_me[level].end(); ++i)
           constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
     }
+  if (constraints == 0)
+    dst.compress(VectorOperation::insert);
+  else
+    dst.compress(VectorOperation::add);
+  //deallog << "copy_from_mg " << dst.l2_norm() << std::endl;
 }
 
 
@@ -264,6 +289,7 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
              i != copy_indices_from_me[level].end(); ++i)
           constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
     }
+  dst.compress(VectorOperation::add);
 }
 
 

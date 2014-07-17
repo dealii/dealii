@@ -324,8 +324,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               else if (global_mine)
                 copy_indices_to_me[level].push_back(
                   std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
-              else
-                continue;
+//              else
+//                continue;
 
               dof_touched[global_idx] = true;
             }
