@@ -28,22 +28,16 @@ set CTEST_BINARY_DIRECTORY accordingly.
     )
 ENDIF()
 
-#
-# Try to find the source directory and invoke
-# ./cmake/scripts/run_testsuite.cmake from this location:
-#
-
 IF("${CTEST_SOURCE_DIRECTORY}" STREQUAL "")
   # If CTEST_SOURCE_DIRECTORY is not set we just assume that this script
-  # was called residing under ../tests relative to the source directory.
-  GET_FILENAME_COMPONENT(_path "${CMAKE_CURRENT_LIST_DIR}" PATH)
-  SET(CTEST_SOURCE_DIRECTORY ${_path}/deal.II)
+  # was called residing under ./tests relative to the source directory.
+  GET_FILENAME_COMPONENT(CTEST_SOURCE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}" PATH)
 ENDIF()
 
 IF(NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/cmake/scripts/run_testsuite.cmake)
   MESSAGE(FATAL_ERROR "
 Could not find a suitable source directory.
-There is no source directory \"../deal.II\" relative to the location of
+There is no source directory under \"../\" relative to the location of
 this script. Please, set CTEST_SOURCE_DIRECTORY manually to the appropriate
 source directory.
 "

@@ -37,7 +37,6 @@ ADD_SUBDIRECTORY(quick_tests)
 # CMAKE_BINARY_DIR/tests:
 #
 
-MESSAGE(STATUS "Testsuite will be set up with TEST_DIR=${TEST_DIR}")
 MESSAGE(STATUS "Setting up testsuite")
 
 FILE(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "SUBDIRS(tests)")
@@ -60,13 +59,12 @@ FOREACH(_var
   ENDIF()
 ENDFOREACH()
 
-#
-# Glob together a list of all subfolders to set up:
-#
-
-FILE(GLOB _categories RELATIVE ${TEST_DIR} ${TEST_DIR}/*)
-SET(_categories all-headers build_tests mesh_converter ${_categories})
-LIST(REMOVE_DUPLICATES _categories)
+SET(_categories
+  a-framework algorithms all-headers aniso base bits build_tests codim_one
+  deal.II distributed_grids fe gla grid hp integrators lac lapack manifold
+  matrix_free mesh_converter metis mpi multigrid mumps petsc serialization
+  slepc trilinos umfpack
+  )
 
 #
 # Custom targets for the testsuite:
@@ -85,52 +83,44 @@ ADD_CUSTOM_TARGET(regen_tests)
 ADD_CUSTOM_TARGET(clean_tests)
 
 FOREACH(_category ${_categories})
-  IF(EXISTS ${CMAKE_SOURCE_DIR}/tests/${_category}/CMakeLists.txt)
-    SET(_category_dir ${CMAKE_SOURCE_DIR}/tests/${_category})
-  ELSEIF(EXISTS ${TEST_DIR}/${_category}/CMakeLists.txt)
-    SET(_category_dir ${TEST_DIR}/${_category})
-  ELSE()
-    SET(_category_dir)
-  ENDIF()
+  SET(_category_dir ${CMAKE_SOURCE_DIR}/tests/${_category})
 
-  IF(NOT "${_category_dir}" STREQUAL "")
-    ADD_CUSTOM_TARGET(setup_tests_${_category}
-      COMMAND ${CMAKE_COMMAND} -E make_directory
-        ${CMAKE_BINARY_DIR}/tests/${_category}
-      COMMAND cd ${CMAKE_BINARY_DIR}/tests/${_category} &&
-        ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
-        > /dev/null
-      COMMENT "Processing tests/${_category}"
-      )
-    ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
+  ADD_CUSTOM_TARGET(setup_tests_${_category}
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+      ${CMAKE_BINARY_DIR}/tests/${_category}
+    COMMAND cd ${CMAKE_BINARY_DIR}/tests/${_category} &&
+      ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir}
+      > /dev/null
+    COMMENT "Processing tests/${_category}"
+    )
+  ADD_DEPENDENCIES(setup_tests setup_tests_${_category})
 
-    ADD_CUSTOM_TARGET(prune_tests_${_category}
-      COMMAND ${CMAKE_COMMAND} -E remove_directory
-        ${CMAKE_BINARY_DIR}/tests/${_category}
-      COMMENT "Processing tests/${_category}"
-      )
-    ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
+  ADD_CUSTOM_TARGET(prune_tests_${_category}
+    COMMAND ${CMAKE_COMMAND} -E remove_directory
+      ${CMAKE_BINARY_DIR}/tests/${_category}
+    COMMENT "Processing tests/${_category}"
+    )
+  ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
-    ADD_CUSTOM_TARGET(regen_tests_${_category}
-      COMMAND
-        test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
-        --build ${CMAKE_BINARY_DIR}/tests/${_category} --target regenerate
-      COMMENT "Processing tests/${_category}"
-      )
-    ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
+  ADD_CUSTOM_TARGET(regen_tests_${_category}
+    COMMAND
+      test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
+      --build ${CMAKE_BINARY_DIR}/tests/${_category} --target regenerate
+    COMMENT "Processing tests/${_category}"
+    )
+  ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
-    ADD_CUSTOM_TARGET(clean_tests_${_category}
-      COMMAND
-        test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
-        --build ${CMAKE_BINARY_DIR}/tests/${_category} --target clean
-      COMMENT "Processing tests/${_category}"
-      )
-    ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
+  ADD_CUSTOM_TARGET(clean_tests_${_category}
+    COMMAND
+      test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
+      --build ${CMAKE_BINARY_DIR}/tests/${_category} --target clean
+    COMMENT "Processing tests/${_category}"
+    )
+  ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
 
-    FILE(APPEND ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake
-      "SUBDIRS(${_category})\n"
-      )
-  ENDIF()
+  FILE(APPEND ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake
+    "SUBDIRS(${_category})\n"
+    )
 ENDFOREACH()
 
 MESSAGE(STATUS "Setting up testsuite - Done")

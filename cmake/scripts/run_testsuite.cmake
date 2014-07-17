@@ -137,9 +137,8 @@ IF("${CTEST_SOURCE_DIRECTORY}" STREQUAL "")
   IF(NOT EXISTS ${CTEST_SOURCE_DIRECTORY}/CMakeLists.txt)
     MESSAGE(FATAL_ERROR "
 Could not find a suitable source directory. There is no source directory
-\"../deal.II\" or \"../../\" relative to the location of this script.
-Please, set CTEST_SOURCE_DIRECTORY manually to the appropriate source
-directory.
+\"../../\" relative to the location of this script. Please, set
+CTEST_SOURCE_DIRECTORY manually to the appropriate source directory.
 "
       )
   ENDIF()
