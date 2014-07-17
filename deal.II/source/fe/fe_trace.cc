@@ -16,7 +16,9 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_poly_face.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_trace.h>
 
@@ -42,6 +44,10 @@ FE_TraceQ<dim,spacedim>::FE_TraceQ (const unsigned int degree)
   std::vector<unsigned int> renumber (this->dofs_per_face);
   FETools::hierarchic_to_lexicographic_numbering<dim-1> (degree, renumber);
   this->poly_space.set_numbering(renumber);
+
+  // Initialize face support points
+  FE_Q<dim,spacedim> fe_q(degree);
+  this->unit_face_support_points = fe_q.get_unit_face_support_points();
 }
 
 
@@ -73,7 +79,7 @@ FE_TraceQ<dim,spacedim>::get_name () const
 template <int dim, int spacedim>
 bool
 FE_TraceQ<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
-                                const unsigned int face_index) const
+                                              const unsigned int face_index) const
 {
   Assert (shape_index < this->dofs_per_cell,
           ExcIndexRange (shape_index, 0, this->dofs_per_cell));
