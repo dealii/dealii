@@ -702,8 +702,12 @@ namespace PETScWrappers
          * set the matrices involved. the last argument is irrelevant here,
          * since we use the solver only once anyway
          */
+#if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
         ierr = KSPSetOperators (solver_data->ksp, A, A,
                                 DIFFERENT_NONZERO_PATTERN);
+#else
+        ierr = KSPSetOperators (solver_data->ksp, A, A);
+#endif
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
