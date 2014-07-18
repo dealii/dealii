@@ -23,15 +23,15 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim>
-const unsigned int Function<dim>::dimension;
+template <int dim, typename Number>
+const unsigned int Function<dim, Number>::dimension;
 
 
-template <int dim>
-Function<dim>::Function (const unsigned int n_components,
-                         const double       initial_time)
+template <int dim, typename Number>
+Function<dim, Number>::Function (const unsigned int n_components,
+				 const Number       initial_time)
   :
-  FunctionTime(initial_time),
+  FunctionTime<Number>(initial_time),
   n_components(n_components)
 {
   // avoid the construction of function
@@ -45,22 +45,22 @@ Function<dim>::Function (const unsigned int n_components,
 }
 
 
-template <int dim>
-Function<dim>::~Function ()
+template <int dim, typename Number>
+Function<dim, Number>::~Function ()
 {}
 
 
 
-template <int dim>
-Function<dim> &Function<dim>::operator= (const Function &f)
+template <int dim, typename Number>
+Function<dim, Number> &Function<dim, Number>::operator= (const Function &f)
 {
   AssertDimension (n_components, f.n_components);
   return *this;
 }
 
 
-template <int dim>
-double Function<dim>::value (const Point<dim> &,
+template <int dim, typename Number>
+Number Function<dim, Number>::value (const Point<dim, Number> &,
                              const unsigned int) const
 {
   Assert (false, ExcPureFunctionCalled());
@@ -68,9 +68,9 @@ double Function<dim>::value (const Point<dim> &,
 }
 
 
-template <int dim>
-void Function<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double> &v) const
+template <int dim, typename Number>
+void Function<dim, Number>::vector_value (const Point<dim, Number> &p,
+                                  Vector<Number> &v) const
 {
   AssertDimension(v.size(), this->n_components);
   for (unsigned int i=0; i<this->n_components; ++i)
@@ -78,9 +78,9 @@ void Function<dim>::vector_value (const Point<dim> &p,
 }
 
 
-template <int dim>
-void Function<dim>::value_list (const std::vector<Point<dim> > &points,
-                                std::vector<double>                     &values,
+template <int dim, typename Number>
+void Function<dim, Number>::value_list (const std::vector<Point<dim, Number> > &points,
+                                std::vector<Number>                     &values,
                                 const unsigned int                       component) const
 {
   // check whether component is in
@@ -94,9 +94,9 @@ void Function<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
-template <int dim>
-void Function<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                       std::vector<Vector<double> >   &values) const
+template <int dim, typename Number>
+void Function<dim, Number>::vector_value_list (const std::vector<Point<dim, Number> > &points,
+                                       std::vector<Vector<Number> >   &values) const
 {
   // check whether component is in
   // the valid range is up to the
@@ -109,10 +109,10 @@ void Function<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 }
 
 
-template <int dim>
-void Function<dim>::vector_values (
-  const std::vector<Point<dim> > &points,
-  std::vector<std::vector<double> > &values) const
+template <int dim, typename Number>
+void Function<dim, Number>::vector_values (
+  const std::vector<Point<dim, Number> > &points,
+  std::vector<std::vector<Number> > &values) const
 {
   const unsigned int n = this->n_components;
   AssertDimension (values.size(), n);
@@ -121,19 +121,19 @@ void Function<dim>::vector_values (
 }
 
 
-template <int dim>
-Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
-                                       const unsigned int) const
+template <int dim, typename Number>
+Tensor<1,dim,Number> Function<dim, Number>::gradient (const Point<dim, Number> &,
+					       const unsigned int) const
 {
   Assert (false, ExcPureFunctionCalled());
-  return Point<dim>();
+  return Point<dim, Number>();
 }
 
 
-template <int dim>
-void Function<dim>::vector_gradient (
-  const Point<dim> &p,
-  std::vector<Tensor<1,dim> > &v) const
+template <int dim, typename Number>
+void Function<dim, Number>::vector_gradient (
+  const Point<dim, Number> &p,
+  std::vector<Tensor<1,dim,Number> > &v) const
 {
   AssertDimension(v.size(), this->n_components);
   for (unsigned int i=0; i<this->n_components; ++i)
@@ -141,10 +141,10 @@ void Function<dim>::vector_gradient (
 }
 
 
-template <int dim>
-void Function<dim>::gradient_list (const std::vector<Point<dim> > &points,
-                                   std::vector<Tensor<1,dim> >    &gradients,
-                                   const unsigned int              component) const
+template <int dim, typename Number>
+void Function<dim, Number>::gradient_list (const std::vector<Point<dim, Number> > &points,
+					   std::vector<Tensor<1,dim,Number> >    &gradients,
+					   const unsigned int              component) const
 {
   Assert (gradients.size() == points.size(),
           ExcDimensionMismatch(gradients.size(), points.size()));
@@ -154,9 +154,9 @@ void Function<dim>::gradient_list (const std::vector<Point<dim> > &points,
 }
 
 
-template <int dim>
-void Function<dim>::vector_gradient_list (const std::vector<Point<dim> >            &points,
-                                          std::vector<std::vector<Tensor<1,dim> > > &gradients) const
+template <int dim, typename Number>
+void Function<dim, Number>::vector_gradient_list (const std::vector<Point<dim, Number> >            &points,
+						  std::vector<std::vector<Tensor<1,dim,Number> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
           ExcDimensionMismatch(gradients.size(), points.size()));
@@ -170,10 +170,10 @@ void Function<dim>::vector_gradient_list (const std::vector<Point<dim> >        
 }
 
 
-template <int dim>
-void Function<dim>::vector_gradients (
-  const std::vector<Point<dim> > &points,
-  std::vector<std::vector<Tensor<1,dim> > > &values) const
+template <int dim, typename Number>
+void Function<dim, Number>::vector_gradients (
+  const std::vector<Point<dim, Number> > &points,
+  std::vector<std::vector<Tensor<1,dim,Number> > > &values) const
 {
   const unsigned int n = this->n_components;
   AssertDimension (values.size(), n);
@@ -183,8 +183,8 @@ void Function<dim>::vector_gradients (
 
 
 
-template <int dim>
-double Function<dim>::laplacian (const Point<dim> &,
+template <int dim, typename Number>
+Number Function<dim, Number>::laplacian (const Point<dim, Number> &,
                                  const unsigned int) const
 {
   Assert (false, ExcPureFunctionCalled());
@@ -192,18 +192,18 @@ double Function<dim>::laplacian (const Point<dim> &,
 }
 
 
-template <int dim>
-void Function<dim>::vector_laplacian (const Point<dim> &,
-                                      Vector<double> &) const
+template <int dim, typename Number>
+void Function<dim, Number>::vector_laplacian (const Point<dim, Number> &,
+                                      Vector<Number> &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
 
 
 
-template <int dim>
-void Function<dim>::laplacian_list (const std::vector<Point<dim> > &points,
-                                    std::vector<double>            &laplacians,
+template <int dim, typename Number>
+void Function<dim, Number>::laplacian_list (const std::vector<Point<dim, Number> > &points,
+                                    std::vector<Number>            &laplacians,
                                     const unsigned int              component) const
 {
   // check whether component is in
@@ -217,9 +217,9 @@ void Function<dim>::laplacian_list (const std::vector<Point<dim> > &points,
 }
 
 
-template <int dim>
-void Function<dim>::vector_laplacian_list (const std::vector<Point<dim> > &points,
-                                           std::vector<Vector<double> >   &laplacians) const
+template <int dim, typename Number>
+void Function<dim, Number>::vector_laplacian_list (const std::vector<Point<dim, Number> > &points,
+                                           std::vector<Vector<Number> >   &laplacians) const
 {
   // check whether component is in
   // the valid range is up to the
@@ -233,9 +233,9 @@ void Function<dim>::vector_laplacian_list (const std::vector<Point<dim> > &point
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::size_t
-Function<dim>::memory_consumption () const
+Function<dim, Number>::memory_consumption () const
 {
   // only simple data elements, so
   // use sizeof operator
@@ -245,29 +245,29 @@ Function<dim>::memory_consumption () const
 
 //---------------------------------------------------------------------------
 
-template <int dim>
-ZeroFunction<dim>::ZeroFunction (const unsigned int n_components)
+template <int dim, typename Number>
+ZeroFunction<dim, Number>::ZeroFunction (const unsigned int n_components)
   :
-  Function<dim> (n_components)
+  Function<dim, Number> (n_components)
 {}
 
 
-template <int dim>
-ZeroFunction<dim>::~ZeroFunction ()
+template <int dim, typename Number>
+ZeroFunction<dim, Number>::~ZeroFunction ()
 {}
 
 
-template <int dim>
-double ZeroFunction<dim>::value (const Point<dim> &,
+template <int dim, typename Number>
+Number ZeroFunction<dim, Number>::value (const Point<dim, Number> &,
                                  const unsigned int) const
 {
   return 0.;
 }
 
 
-template <int dim>
-void ZeroFunction<dim>::vector_value (const Point<dim> &,
-                                      Vector<double>   &return_value) const
+template <int dim, typename Number>
+void ZeroFunction<dim, Number>::vector_value (const Point<dim, Number> &,
+                                      Vector<Number>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -276,9 +276,9 @@ void ZeroFunction<dim>::vector_value (const Point<dim> &,
 }
 
 
-template <int dim>
-void ZeroFunction<dim>::value_list (const std::vector<Point<dim> > &points,
-                                    std::vector<double>            &values,
+template <int dim, typename Number>
+void ZeroFunction<dim, Number>::value_list (const std::vector<Point<dim, Number> > &points,
+                                    std::vector<Number>            &values,
                                     const unsigned int         /*component*/) const
 {
   Assert (values.size() == points.size(),
@@ -288,9 +288,9 @@ void ZeroFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
-template <int dim>
-void ZeroFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                           std::vector<Vector<double> >   &values) const
+template <int dim, typename Number>
+void ZeroFunction<dim, Number>::vector_value_list (const std::vector<Point<dim, Number> > &points,
+                                           std::vector<Vector<Number> >   &values) const
 {
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
@@ -304,17 +304,17 @@ void ZeroFunction<dim>::vector_value_list (const std::vector<Point<dim> > &point
 }
 
 
-template <int dim>
-Tensor<1,dim> ZeroFunction<dim>::gradient (const Point<dim> &,
+template <int dim, typename Number>
+Tensor<1,dim,Number> ZeroFunction<dim, Number>::gradient (const Point<dim, Number> &,
                                            const unsigned int) const
 {
-  return Tensor<1,dim>();
+  return Tensor<1,dim,Number>();
 }
 
 
-template <int dim>
-void ZeroFunction<dim>::vector_gradient (const Point<dim> &,
-                                         std::vector<Tensor<1,dim> > &gradients) const
+template <int dim, typename Number>
+void ZeroFunction<dim, Number>::vector_gradient (const Point<dim, Number> &,
+                                         std::vector<Tensor<1,dim,Number> > &gradients) const
 {
   Assert (gradients.size() == this->n_components,
           ExcDimensionMismatch(gradients.size(), this->n_components));
@@ -324,9 +324,9 @@ void ZeroFunction<dim>::vector_gradient (const Point<dim> &,
 }
 
 
-template <int dim>
-void ZeroFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
-                                       std::vector<Tensor<1,dim> >    &gradients,
+template <int dim, typename Number>
+void ZeroFunction<dim, Number>::gradient_list (const std::vector<Point<dim, Number> > &points,
+                                       std::vector<Tensor<1,dim,Number> >    &gradients,
                                        const unsigned int              /*component*/) const
 {
   Assert (gradients.size() == points.size(),
@@ -337,9 +337,9 @@ void ZeroFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
 }
 
 
-template <int dim>
-void ZeroFunction<dim>::vector_gradient_list (const std::vector<Point<dim> >            &points,
-                                              std::vector<std::vector<Tensor<1,dim> > > &gradients) const
+template <int dim, typename Number>
+void ZeroFunction<dim, Number>::vector_gradient_list (const std::vector<Point<dim, Number> >            &points,
+                                              std::vector<std::vector<Tensor<1,dim,Number> > > &gradients) const
 {
   Assert (gradients.size() == points.size(),
           ExcDimensionMismatch(gradients.size(), points.size()));
@@ -355,23 +355,23 @@ void ZeroFunction<dim>::vector_gradient_list (const std::vector<Point<dim> >    
 //---------------------------------------------------------------------------
 
 
-template <int dim>
-ConstantFunction<dim>::ConstantFunction (const double value,
+template <int dim, typename Number>
+ConstantFunction<dim, Number>::ConstantFunction (const Number value,
                                          const unsigned int n_components)
   :
-  ZeroFunction<dim> (n_components),
+  ZeroFunction<dim, Number> (n_components),
   function_value    (value)
 {}
 
 
 
-template <int dim>
-ConstantFunction<dim>::~ConstantFunction () {}
+template <int dim, typename Number>
+ConstantFunction<dim, Number>::~ConstantFunction () {}
 
 
 
-template <int dim>
-double ConstantFunction<dim>::value (const Point<dim> &,
+template <int dim, typename Number>
+Number ConstantFunction<dim, Number>::value (const Point<dim, Number> &,
                                      const unsigned int component) const
 {
   Assert (component < this->n_components,
@@ -381,9 +381,9 @@ double ConstantFunction<dim>::value (const Point<dim> &,
 
 
 
-template <int dim>
-void ConstantFunction<dim>::vector_value (const Point<dim> &,
-                                          Vector<double>   &return_value) const
+template <int dim, typename Number>
+void ConstantFunction<dim, Number>::vector_value (const Point<dim, Number> &,
+                                          Vector<Number>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -393,9 +393,9 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
 
 
 
-template <int dim>
-void ConstantFunction<dim>::value_list (const std::vector<Point<dim> > &points,
-                                        std::vector<double>            &values,
+template <int dim, typename Number>
+void ConstantFunction<dim, Number>::value_list (const std::vector<Point<dim, Number> > &points,
+                                        std::vector<Number>            &values,
                                         const unsigned int              component) const
 {
   Assert (component < this->n_components,
@@ -408,9 +408,9 @@ void ConstantFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 
 
 
-template <int dim>
-void ConstantFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                               std::vector<Vector<double> >   &values) const
+template <int dim, typename Number>
+void ConstantFunction<dim, Number>::vector_value_list (const std::vector<Point<dim, Number> > &points,
+                                               std::vector<Vector<Number> >   &values) const
 {
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
@@ -425,9 +425,9 @@ void ConstantFunction<dim>::vector_value_list (const std::vector<Point<dim> > &p
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::size_t
-ConstantFunction<dim>::memory_consumption () const
+ConstantFunction<dim, Number>::memory_consumption () const
 {
   // only simple data elements, so
   // use sizeof operator
@@ -436,24 +436,24 @@ ConstantFunction<dim>::memory_consumption () const
 
 //---------------------------------------------------------------------------
 
-template <int dim>
-ComponentSelectFunction<dim>::
+template <int dim, typename Number>
+ComponentSelectFunction<dim, Number>::
 ComponentSelectFunction (const unsigned int selected,
-                         const double value,
+                         const Number value,
                          const unsigned int n_components)
   :
-  ConstantFunction<dim> (value, n_components),
+  ConstantFunction<dim, Number> (value, n_components),
   selected_components(std::make_pair(selected,selected+1))
 {}
 
 
 
-template <int dim>
-ComponentSelectFunction<dim>::
+template <int dim, typename Number>
+ComponentSelectFunction<dim, Number>::
 ComponentSelectFunction (const unsigned int selected,
                          const unsigned int n_components)
   :
-  ConstantFunction<dim> (1., n_components),
+  ConstantFunction<dim, Number> (1., n_components),
   selected_components(std::make_pair(selected,selected+1))
 {
   Assert (selected < n_components,
@@ -462,12 +462,12 @@ ComponentSelectFunction (const unsigned int selected,
 
 
 
-template <int dim>
-ComponentSelectFunction<dim>::
+template <int dim, typename Number>
+ComponentSelectFunction<dim, Number>::
 ComponentSelectFunction (const std::pair<unsigned int,unsigned int> &selected,
                          const unsigned int n_components)
   :
-  ConstantFunction<dim> (1., n_components),
+  ConstantFunction<dim, Number> (1., n_components),
   selected_components(selected)
 {
   Assert (selected_components.first < selected_components.second,
@@ -480,9 +480,9 @@ ComponentSelectFunction (const std::pair<unsigned int,unsigned int> &selected,
 
 
 
-template <int dim>
-void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
-                                                 Vector<double>   &return_value) const
+template <int dim, typename Number>
+void ComponentSelectFunction<dim, Number>::vector_value (const Point<dim, Number> &,
+                                                 Vector<Number>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -495,23 +495,23 @@ void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
 
 
 
-template <int dim>
-void ComponentSelectFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                                      std::vector<Vector<double> >   &values) const
+template <int dim, typename Number>
+void ComponentSelectFunction<dim, Number>::vector_value_list (const std::vector<Point<dim, Number> > &points,
+                                                      std::vector<Vector<Number> >   &values) const
 {
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
-    ComponentSelectFunction<dim>::vector_value (points[i],
+    ComponentSelectFunction<dim, Number>::vector_value (points[i],
                                                 values[i]);
 }
 
 
 
-template <int dim>
+template <int dim, typename Number>
 std::size_t
-ComponentSelectFunction<dim>::memory_consumption () const
+ComponentSelectFunction<dim, Number>::memory_consumption () const
 {
   // only simple data elements, so
   // use sizeof operator
@@ -519,19 +519,19 @@ ComponentSelectFunction<dim>::memory_consumption () const
 }
 
 
-template <int dim>
-ScalarFunctionFromFunctionObject<dim>::
-ScalarFunctionFromFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object)
+template <int dim, typename Number>
+ScalarFunctionFromFunctionObject<dim, Number>::
+ScalarFunctionFromFunctionObject (const std_cxx1x::function<Number (const Point<dim, Number> &)> &function_object)
   :
-  Function<dim>(1),
+  Function<dim, Number>(1),
   function_object (function_object)
 {}
 
 
 
-template <int dim>
-double
-ScalarFunctionFromFunctionObject<dim>::value (const Point<dim> &p,
+template <int dim, typename Number>
+Number
+ScalarFunctionFromFunctionObject<dim, Number>::value (const Point<dim, Number> &p,
                                               const unsigned int component) const
 {
   Assert (component == 0,
@@ -541,13 +541,13 @@ ScalarFunctionFromFunctionObject<dim>::value (const Point<dim> &p,
 
 
 
-template <int dim>
-VectorFunctionFromScalarFunctionObject<dim>::
-VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object,
+template <int dim, typename Number>
+VectorFunctionFromScalarFunctionObject<dim, Number>::
+VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<Number (const Point<dim, Number> &)> &function_object,
                                         const unsigned int selected_component,
                                         const unsigned int n_components)
   :
-  Function<dim>(n_components),
+  Function<dim, Number>(n_components),
   function_object (function_object),
   selected_component (selected_component)
 {
@@ -557,9 +557,9 @@ VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<double (const 
 
 
 
-template <int dim>
-double
-VectorFunctionFromScalarFunctionObject<dim>::value (const Point<dim> &p,
+template <int dim, typename Number>
+Number
+VectorFunctionFromScalarFunctionObject<dim, Number>::value (const Point<dim, Number> &p,
                                                     const unsigned int component) const
 {
   Assert (component < this->n_components,
@@ -573,11 +573,11 @@ VectorFunctionFromScalarFunctionObject<dim>::value (const Point<dim> &p,
 
 
 
-template <int dim>
+template <int dim, typename Number>
 void
-VectorFunctionFromScalarFunctionObject<dim>::
-vector_value (const Point<dim>   &p,
-              Vector<double>     &values) const
+VectorFunctionFromScalarFunctionObject<dim, Number>::
+vector_value (const Point<dim, Number>   &p,
+              Vector<Number>     &values) const
 {
   AssertDimension(values.size(), this->n_components);
 
@@ -592,31 +592,31 @@ vector_value (const Point<dim>   &p,
  * The constructor for <tt>VectorFunctionFromTensorFunction</tt> which initiates the return vector
  * to be size <tt>n_components</tt>.
  */
-template <int dim>
-VectorFunctionFromTensorFunction<dim>::VectorFunctionFromTensorFunction (const TensorFunction<1,dim> &tensor_function,
+template <int dim, typename Number>
+VectorFunctionFromTensorFunction<dim, Number>::VectorFunctionFromTensorFunction (const TensorFunction<1,dim,Number> &tensor_function,
     const unsigned int selected_component,
     const unsigned int n_components)
   :
-  Function<dim> (n_components),
+  Function<dim, Number> (n_components),
   tensor_function (tensor_function),
   selected_component (selected_component)
 {
 
-  // Verify that the Tensor<1,dim> will fit in the given length selected_components
+  // Verify that the Tensor<1,dim,Number> will fit in the given length selected_components
   // and not hang over the end of the vector.
   Assert (selected_component + dim - 1 < this->n_components,
           ExcIndexRange (selected_component, 0, this->n_components));
 }
 
 
-template <int dim>
-VectorFunctionFromTensorFunction<dim>::~VectorFunctionFromTensorFunction ()
+template <int dim, typename Number>
+VectorFunctionFromTensorFunction<dim, Number>::~VectorFunctionFromTensorFunction ()
 {}
 
 
-template <int dim>
+template <int dim, typename Number>
 inline
-double VectorFunctionFromTensorFunction<dim>::value (const Point<dim> &p,
+Number VectorFunctionFromTensorFunction<dim, Number>::value (const Point<dim, Number> &p,
                                                      const unsigned int component) const
 {
   Assert (component<this->n_components,
@@ -632,16 +632,16 @@ double VectorFunctionFromTensorFunction<dim>::value (const Point<dim> &p,
   // otherwise retrieve the values from the <tt>tensor_function</tt> to be
   // placed at the <tt>selected_component</tt> to <tt>selected_component + dim - 1</tt>
   // elements of the <tt>Vector</tt> values and pick the correct one
-  const Tensor<1,dim> tensor_value = tensor_function.value (p);
+  const Tensor<1,dim,Number> tensor_value = tensor_function.value (p);
 
   return tensor_value[component-selected_component];
 }
 
 
-template <int dim>
+template <int dim, typename Number>
 inline
-void VectorFunctionFromTensorFunction<dim>::vector_value (const Point<dim> &p,
-                                                          Vector<double>   &values) const
+void VectorFunctionFromTensorFunction<dim, Number>::vector_value (const Point<dim, Number> &p,
+                                                          Vector<Number>   &values) const
 {
   Assert(values.size() == this->n_components,
          ExcDimensionMismatch(values.size(),this->n_components));
@@ -649,7 +649,7 @@ void VectorFunctionFromTensorFunction<dim>::vector_value (const Point<dim> &p,
   // Retrieve the values from the <tt>tensor_function</tt> to be
   // placed at the <tt>selected_component</tt> to <tt>selected_component + dim - 1</tt>
   // elements of the <tt>Vector</tt> values.
-  const Tensor<1,dim> tensor_value = tensor_function.value (p);
+  const Tensor<1,dim,Number> tensor_value = tensor_function.value (p);
 
   // First we make all elements of values = 0
   values = 0;
@@ -661,13 +661,13 @@ void VectorFunctionFromTensorFunction<dim>::vector_value (const Point<dim> &p,
 
 
 /** Member function <tt>vector_value_list </tt> is the interface for giving a list of
- * points (<code>vector<Point<dim> ></code>) of which to evaluate using the <tt>vector_value</tt>
+ * points (<code>vector<Point<dim, Number> ></code>) of which to evaluate using the <tt>vector_value</tt>
  * member function.  Again, this function is written so as to not replicate the function definition
  * but passes each point on to <tt>vector_value</tt> to be evaluated.
  */
-template <int dim>
-void VectorFunctionFromTensorFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-    std::vector<Vector<double> > &value_list) const
+template <int dim, typename Number>
+void VectorFunctionFromTensorFunction<dim, Number>::vector_value_list (const std::vector<Point<dim, Number> > &points,
+    std::vector<Vector<Number> > &value_list) const
 {
   Assert (value_list.size() == points.size(),
           ExcDimensionMismatch (value_list.size(), points.size()));
@@ -675,7 +675,7 @@ void VectorFunctionFromTensorFunction<dim>::vector_value_list (const std::vector
   const unsigned int n_points = points.size();
 
   for (unsigned int p=0; p<n_points; ++p)
-    VectorFunctionFromTensorFunction<dim>::vector_value (points[p], value_list[p]);
+    VectorFunctionFromTensorFunction<dim, Number>::vector_value (points[p], value_list[p]);
 }
 
 

@@ -28,31 +28,31 @@ DEAL_II_NAMESPACE_OPEN
 // TensorFunction
 //////////////////////////////////////////////////////////////////////
 
-template <int rank, int dim>
-TensorFunction<rank, dim>::TensorFunction (const double initial_time)
+template <int rank, int dim, typename Number>
+TensorFunction<rank, dim, Number>::TensorFunction (const Number initial_time)
   :
-  FunctionTime (initial_time)
+  FunctionTime<Number> (initial_time)
 {}
 
 
 
-template <int rank, int dim>
-TensorFunction<rank, dim>::~TensorFunction ()
+template <int rank, int dim, typename Number>
+TensorFunction<rank, dim, Number>::~TensorFunction ()
 {}
 
 
-template <int rank, int dim>
-typename TensorFunction<rank, dim>::value_type
-TensorFunction<rank, dim>::value (const Point<dim> &) const
+template <int rank, int dim, typename Number>
+typename TensorFunction<rank, dim, Number>::value_type
+TensorFunction<rank, dim, Number>::value (const Point<dim,Number> &) const
 {
   Assert (false, ExcPureFunctionCalled());
   return Tensor<rank,dim>();
 }
 
 
-template <int rank, int dim>
+template <int rank, int dim, typename Number>
 void
-TensorFunction<rank, dim>::value_list (const std::vector<Point<dim> > &points,
+TensorFunction<rank, dim, Number>::value_list (const std::vector<Point<dim,Number> > &points,
                                        std::vector<value_type>        &values) const
 {
   Assert (values.size() == points.size(),
@@ -63,18 +63,18 @@ TensorFunction<rank, dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
-template <int rank, int dim>
-typename TensorFunction<rank, dim>::gradient_type
-TensorFunction<rank, dim>::gradient (const Point<dim> &) const
+template <int rank, int dim, typename Number>
+typename TensorFunction<rank, dim, Number>::gradient_type
+TensorFunction<rank, dim, Number>::gradient (const Point<dim,Number> &) const
 {
   Assert (false, ExcPureFunctionCalled());
   return Tensor<rank+1,dim>();
 }
 
 
-template <int rank, int dim>
+template <int rank, int dim, typename Number>
 void
-TensorFunction<rank, dim>::gradient_list (const std::vector<Point<dim> >   &points,
+TensorFunction<rank, dim, Number>::gradient_list (const std::vector<Point<dim,Number> >   &points,
                                           std::vector<gradient_type> &gradients) const
 {
   Assert (gradients.size() == points.size(),
@@ -91,32 +91,32 @@ TensorFunction<rank, dim>::gradient_list (const std::vector<Point<dim> >   &poin
 //////////////////////////////////////////////////////////////////////
 
 
-template <int rank, int dim>
-ConstantTensorFunction<rank, dim>::ConstantTensorFunction (const Tensor<rank, dim> &value,
-                                                           const double initial_time)
+template <int rank, int dim, typename Number>
+ConstantTensorFunction<rank, dim, Number>::ConstantTensorFunction (const Tensor<rank, dim, Number> &value,
+								   const Number initial_time)
   :
-  TensorFunction<rank, dim> (initial_time),
+  TensorFunction<rank, dim, Number> (initial_time),
   _value(value)
 {}
 
 
-template <int rank, int dim>
-ConstantTensorFunction<rank, dim>::~ConstantTensorFunction ()
+template <int rank, int dim, typename Number>
+ConstantTensorFunction<rank, dim, Number>::~ConstantTensorFunction ()
 {}
 
 
-template <int rank, int dim>
-typename TensorFunction<rank, dim>::value_type
-ConstantTensorFunction<rank, dim>::value (const Point<dim> &/*point*/) const
+template <int rank, int dim, typename Number>
+typename TensorFunction<rank, dim, Number>::value_type
+ConstantTensorFunction<rank, dim, Number>::value (const Point<dim,Number> &/*point*/) const
 {
   return _value;
 }
 
 
-template <int rank, int dim>
+template <int rank, int dim, typename Number>
 void
-ConstantTensorFunction<rank, dim>::value_list (const std::vector<Point<dim> > &points,
-                                               std::vector<typename TensorFunction<rank, dim>::value_type> &values) const
+ConstantTensorFunction<rank, dim, Number>::value_list (const std::vector<Point<dim,Number> > &points,
+                                               std::vector<typename TensorFunction<rank, dim, Number>::value_type> &values) const
 {
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
@@ -126,9 +126,9 @@ ConstantTensorFunction<rank, dim>::value_list (const std::vector<Point<dim> > &p
 }
 
 
-template <int rank, int dim>
-typename TensorFunction<rank, dim>::gradient_type
-ConstantTensorFunction<rank, dim>::gradient (const Point<dim> &) const
+template <int rank, int dim, typename Number>
+typename TensorFunction<rank, dim, Number>::gradient_type
+ConstantTensorFunction<rank, dim, Number>::gradient (const Point<dim,Number> &) const
 {
   static const Tensor<rank+1,dim> zero;
 
@@ -136,10 +136,10 @@ ConstantTensorFunction<rank, dim>::gradient (const Point<dim> &) const
 }
 
 
-template <int rank, int dim>
+template <int rank, int dim, typename Number>
 void
-ConstantTensorFunction<rank, dim>::gradient_list (const std::vector<Point<dim> >   &points,
-                                                  std::vector<typename TensorFunction<rank, dim>::gradient_type> &gradients) const
+ConstantTensorFunction<rank, dim, Number>::gradient_list (const std::vector<Point<dim,Number> >   &points,
+                                                  std::vector<typename TensorFunction<rank, dim, Number>::gradient_type> &gradients) const
 {
   Assert (gradients.size() == points.size(),
           ExcDimensionMismatch(gradients.size(), points.size()));
@@ -157,10 +157,10 @@ ConstantTensorFunction<rank, dim>::gradient_list (const std::vector<Point<dim> >
 //////////////////////////////////////////////////////////////////////
 
 
-template <int rank, int dim>
-ZeroTensorFunction<rank, dim>::ZeroTensorFunction (const double initial_time)
+template <int rank, int dim, typename Number>
+ZeroTensorFunction<rank, dim, Number>::ZeroTensorFunction (const Number initial_time)
   :
-  ConstantTensorFunction<rank, dim> (dealii::Tensor<rank, dim>(), initial_time)
+  ConstantTensorFunction<rank, dim, Number> (dealii::Tensor<rank, dim, Number>(), initial_time)
 {}
 
 

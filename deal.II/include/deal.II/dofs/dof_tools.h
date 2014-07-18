@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
 template<int dim, class T> class Table;
 class SparsityPattern;
 template <typename number> class Vector;
-template <int dim> class Function;
+template <int dim, typename Number> class Function;
 template <int dim, int spacedim> class FiniteElement;
 template <int dim, int spacedim> class DoFHandler;
 namespace hp

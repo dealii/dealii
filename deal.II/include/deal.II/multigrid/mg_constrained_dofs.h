@@ -28,7 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim> class DoFHandler;
-template <int dim> struct FunctionMap;
+template <int dim, typename Number> struct FunctionMap;
 
 
 /**

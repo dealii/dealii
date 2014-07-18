@@ -689,17 +689,31 @@ void GridOut::write_dx (const Triangulation<1> &,
   Assert (false, ExcNotImplemented());
 }
 
+template <>
+void GridOut::write_dx (const Triangulation<1,2> &,
+                        std::ostream &) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+void GridOut::write_dx (const Triangulation<1,3> &,
+                        std::ostream &) const
+{
+  Assert (false, ExcNotImplemented());
+}
 
 
-template <int dim>
-void GridOut::write_dx (const Triangulation<dim> &tria,
+
+template <int dim, int spacedim>
+void GridOut::write_dx (const Triangulation<dim, spacedim> &tria,
                         std::ostream             &out) const
 {
 //TODO:[GK] allow for boundary faces only
   Assert(dx_flags.write_all_faces, ExcNotImplemented());
   AssertThrow (out, ExcIO());
   // Copied and adapted from write_ucd
-  const std::vector<Point<dim> > &vertices    = tria.get_vertices();
+  const std::vector<Point<spacedim> > &vertices    = tria.get_vertices();
   const std::vector<bool>        &vertex_used = tria.get_used_vertices();
 
   const unsigned int n_vertices = tria.n_used_vertices();
@@ -718,8 +732,8 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
       renumber[i]=new_number++;
   Assert(new_number==n_vertices, ExcInternalError());
 
-  typename Triangulation<dim>::active_cell_iterator       cell;
-  const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
+  typename Triangulation<dim, spacedim>::active_cell_iterator       cell;
+  const typename Triangulation<dim, spacedim>::active_cell_iterator endc=tria.end();
 
 
   // write the vertices
@@ -809,7 +823,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
         {
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
             {
-              typename Triangulation<dim>::face_iterator face = cell->face(f);
+              typename Triangulation<dim, spacedim>::face_iterator face = cell->face(f);
 
               for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
                 out << '\t' << renumber[face->vertex_index(GeometryInfo<dim-1>::dx_to_deal[v])];
@@ -1192,11 +1206,11 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void GridOut::write_xfig (
-  const Triangulation<dim> &,
+  const Triangulation<dim, spacedim> &,
   std::ostream &,
-  const Mapping<dim> *) const
+  const Mapping<dim, spacedim> *) const
 {
   Assert (false, ExcNotImplemented());
 }
@@ -1210,6 +1224,7 @@ void GridOut::write_xfig (
   const Mapping<2> *       /*mapping*/) const
 {
   const int dim = 2;
+  const int spacedim = 2;
 
   const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
   const unsigned int nf = GeometryInfo<dim>::faces_per_cell;
@@ -1272,8 +1287,8 @@ void GridOut::write_xfig (
   // on finer levels. Level 0
   // corresponds to a depth of 900,
   // each level subtracting 1
-  Triangulation<dim>::cell_iterator cell = tria.begin();
-  const Triangulation<dim>::cell_iterator end = tria.end();
+  Triangulation<dim, spacedim>::cell_iterator cell = tria.begin();
+  const Triangulation<dim, spacedim>::cell_iterator end = tria.end();
 
   for (; cell != end; ++cell)
     {
@@ -1339,7 +1354,7 @@ void GridOut::write_xfig (
       if (xfig_flags.draw_boundary)
         for (unsigned int f=0; f<nf; ++f)
           {
-            Triangulation<dim>::face_iterator
+            Triangulation<dim, spacedim>::face_iterator
             face = cell->face(face_reorder[f]);
             const types::boundary_id bi = face->boundary_indicator();
             if (bi != numbers::internal_face_boundary_id)
@@ -2264,8 +2279,8 @@ void GridOut::write_mathgl (const Triangulation<1> &,
 }
 
 
-template <int dim>
-void GridOut::write_mathgl (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_mathgl (const Triangulation<dim, spacedim> &tria,
                             std::ostream             &out) const
 {
   AssertThrow (out, ExcIO ());
@@ -2356,7 +2371,7 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
 
   // run over all active cells and write out a list of
   // xyz-coordinates that correspond to vertices
-  typename dealii::Triangulation<dim>::active_cell_iterator
+  typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
   cell=tria.begin_active (),
   endc=tria.end ();
 
@@ -3345,12 +3360,30 @@ namespace internal
       Assert(false, ExcNotImplemented());
     }
 
+    void write_eps (const dealii::Triangulation<1,2> &,
+                    std::ostream &,
+                    const Mapping<1,2> *,
+                    const GridOutFlags::Eps<2> &,
+                    const GridOutFlags::Eps<3> &)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+    void write_eps (const dealii::Triangulation<2,3> &,
+                    std::ostream &,
+                    const Mapping<2,3> *,
+                    const GridOutFlags::Eps<2> &,
+                    const GridOutFlags::Eps<3> &)
+    {
+      Assert(false, ExcNotImplemented());
+    }
 
 
-    template <int dim>
-    void write_eps (const dealii::Triangulation<dim> &tria,
+
+    template <int dim, int spacedim>
+    void write_eps (const dealii::Triangulation<dim, spacedim> &tria,
                     std::ostream             &out,
-                    const Mapping<dim>       *mapping,
+                    const Mapping<dim,spacedim>       *mapping,
                     const GridOutFlags::Eps<2> &eps_flags_2,
                     const GridOutFlags::Eps<3> &eps_flags_3)
     {
@@ -3394,13 +3427,13 @@ namespace internal
 
         case 2:
         {
-          for (typename dealii::Triangulation<dim>::active_cell_iterator
+          for (typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
               cell=tria.begin_active();
               cell!=tria.end(); ++cell)
             for (unsigned int line_no=0;
                  line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
               {
-                typename dealii::Triangulation<dim>::line_iterator
+                typename dealii::Triangulation<dim, spacedim>::line_iterator
                 line=cell->line(line_no);
 
                 // first treat all
@@ -3467,12 +3500,12 @@ namespace internal
               // boundary faces and
               // generate the info from
               // them
-              for (typename dealii::Triangulation<dim>::active_cell_iterator
+              for (typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
                   cell=tria.begin_active();
                   cell!=tria.end(); ++cell)
                 for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                   {
-                    const typename dealii::Triangulation<dim>::face_iterator
+                    const typename dealii::Triangulation<dim, spacedim>::face_iterator
                     face = cell->face(face_no);
 
                     if (face->at_boundary())
@@ -3517,7 +3550,7 @@ namespace internal
           // presently not supported
           Assert (mapping == 0, ExcNotImplemented());
 
-          typename dealii::Triangulation<dim>::active_cell_iterator
+          typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
           cell=tria.begin_active(),
           endc=tria.end();
 
@@ -3568,7 +3601,7 @@ namespace internal
             for (unsigned int line_no=0;
                  line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
               {
-                typename dealii::Triangulation<dim>::line_iterator
+                typename dealii::Triangulation<dim, spacedim>::line_iterator
                 line=cell->line(line_no);
                 line_list.push_back (LineEntry(Point<2>(line->vertex(0) * unit_vector2,
                                                         line->vertex(0) * unit_vector1),
@@ -3734,7 +3767,7 @@ namespace internal
           out << "(Helvetica) findfont 140 scalefont setfont"
               << '\n';
 
-          typename dealii::Triangulation<dim>::active_cell_iterator
+          typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
           cell = tria.begin_active (),
           endc = tria.end ();
           for (; cell!=endc; ++cell)
@@ -3765,7 +3798,7 @@ namespace internal
           // already tracked, to avoid
           // doing this multiply
           std::set<unsigned int> treated_vertices;
-          typename dealii::Triangulation<dim>::active_cell_iterator
+          typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
           cell = tria.begin_active (),
           endc = tria.end ();
           for (; cell!=endc; ++cell)
@@ -3801,10 +3834,10 @@ namespace internal
 }
 
 
-template <int dim>
-void GridOut::write_eps (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_eps (const Triangulation<dim, spacedim> &tria,
                          std::ostream             &out,
-                         const Mapping<dim>       *mapping) const
+                         const Mapping<dim,spacedim>       *mapping) const
 {
   internal::write_eps (tria, out, mapping,
                        eps_flags_2, eps_flags_3);

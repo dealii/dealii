@@ -64,6 +64,7 @@ DEAL_II_NAMESPACE_OPEN
  *  @ingroup functions
  *  @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999
  */
+template <typename Number=double>
 class FunctionTime
 {
 public:
@@ -72,7 +73,7 @@ public:
    * for the time variable, which defaults
    * to zero.
    */
-  FunctionTime (const double initial_time = 0.0);
+  FunctionTime (const Number initial_time = Number(0.0));
 
   /**
    * Virtual destructor.
@@ -82,25 +83,25 @@ public:
   /**
    * Return the value of the time variable/
    */
-  double get_time () const;
+  Number get_time () const;
 
   /**
    * Set the time to <tt>new_time</tt>, overwriting
    * the old value.
    */
-  virtual void set_time (const double new_time);
+  virtual void set_time (const Number new_time);
 
   /**
    * Advance the time by the given
    * time step <tt>delta_t</tt>.
    */
-  virtual void advance_time (const double delta_t);
+  virtual void advance_time (const Number delta_t);
 
 private:
   /**
    * Store the present time.
    */
-  double time;
+  Number time;
 };
 
 
@@ -109,8 +110,9 @@ private:
 
 #ifndef DOXYGEN
 
-inline double
-FunctionTime::get_time () const
+template<typename Number>
+inline Number
+FunctionTime<Number>::get_time () const
 {
   return time;
 }

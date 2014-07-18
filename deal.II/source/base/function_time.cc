@@ -19,30 +19,37 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-FunctionTime::FunctionTime(const double initial_time)
+template<typename Number>
+FunctionTime<Number>::FunctionTime(const Number initial_time)
   :
   time(initial_time)
 {}
 
 
 
-FunctionTime::~FunctionTime()
+template<typename Number>
+FunctionTime<Number>::~FunctionTime()
 {}
 
 
 
+template<typename Number>
 void
-FunctionTime::set_time (const double new_time)
+FunctionTime<Number>::set_time (const Number new_time)
 {
   time = new_time;
 }
 
 
-
+template<typename Number>
 void
-FunctionTime::advance_time (const double delta_t)
+FunctionTime<Number>::advance_time (const Number delta_t)
 {
   set_time (time+delta_t);
 }
 
+// Explicit instantiation
+template class FunctionTime<double>;
+
 DEAL_II_NAMESPACE_CLOSE
+

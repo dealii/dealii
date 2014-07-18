@@ -190,6 +190,20 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The function GridOut::write, can now be used also in 
+  the codimension one case. 
+  <br>
+  (Luca Heltai, 2014/07/18)
+  </li>
+
+  <li> New: The Function classes, now take an additional optional
+  template argument, specifying the type of number to use, which defaults
+  to double. 
+  <br>
+  (Luca Heltai, 2014/07/18)
+  </li>
+
+
   <li> New: The GridReordering::reorder_cells() function used a
   numbering format for the vertices in a cell that was last used in
   deal.II version 5.2. This format is still used internally, but

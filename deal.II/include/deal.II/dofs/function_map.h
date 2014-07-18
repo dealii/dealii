@@ -22,7 +22,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int spacedim> class Function;
+template <int spacedim, typename Number> class Function;
 
 
 
@@ -65,7 +65,7 @@ template <int spacedim> class Function;
  * @ingroup functions
  * @author Wolfgang Bangerth, Ralf Hartmann, 2001
  */
-template<int dim>
+template<int dim,typename Number=double>
 struct FunctionMap
 {
   /**
@@ -77,7 +77,7 @@ struct FunctionMap
    * name it in the fashion of the
    * STL local typedefs.
    */
-  typedef std::map<types::boundary_id, const Function<dim>*> type;
+  typedef std::map<types::boundary_id, const Function<dim,Number>*> type;
 };
 
 DEAL_II_NAMESPACE_CLOSE

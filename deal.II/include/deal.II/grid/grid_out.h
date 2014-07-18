@@ -895,8 +895,8 @@ public:
    * Not implemented for the
    * codimension one case.
    */
-  template <int dim>
-  void write_dx (const Triangulation<dim> &tria,
+  template <int dim, int spacedim>
+  void write_dx (const Triangulation<dim,spacedim> &tria,
                  std::ostream             &out) const;
 
   /**
@@ -1044,10 +1044,10 @@ public:
    *
    * Not implemented for the codimension one case.
    */
-  template <int dim>
-  void write_eps (const Triangulation<dim> &tria,
+  template <int dim, int spacedim>
+  void write_eps (const Triangulation<dim, spacedim> &tria,
                   std::ostream             &out,
-                  const Mapping<dim>       *mapping=0) const;
+                  const Mapping<dim, spacedim>       *mapping=0) const;
 
   /**
    * Write two-dimensional XFig-file.
@@ -1067,10 +1067,10 @@ public:
    *
    * Not implemented for the codimension one case.
    */
-  template <int dim>
-  void write_xfig (const Triangulation<dim> &tria,
+  template <int dim, int spacedim>
+  void write_xfig (const Triangulation<dim, spacedim> &tria,
                    std::ostream              &out,
-                   const Mapping<dim>        *mapping=0) const;
+                   const Mapping<dim, spacedim>        *mapping=0) const;
 
   /**
    * Write the triangulation in the SVG format.
@@ -1122,8 +1122,8 @@ public:
    *
    * @note Not implemented for the codimension one case.
    */
-  template <int dim>
-  void write_mathgl (const Triangulation<dim> &tria,
+  template <int dim, int spacedim>
+  void write_mathgl (const Triangulation<dim, spacedim> &tria,
                      std::ostream             &out) const;
 
   /**
