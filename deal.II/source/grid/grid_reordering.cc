@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -621,7 +621,7 @@ namespace internal
 namespace
 {
   /**
-   * A set of three functions that
+   * A set of functions that
    * reorder the data from the
    * "current" to the "classic"
    * format of vertex numbering of
@@ -629,14 +629,6 @@ namespace
    * do the reordering of their
    * arguments in-place.
    */
-  void
-  reorder_new_to_old_style (const std::vector<CellData<1> > &)
-  {
-    // nothing to do here: the format
-    // hasn't changed for 1d
-  }
-
-
   void
   reorder_new_to_old_style (std::vector<CellData<2> > &cells)
   {
@@ -662,14 +654,6 @@ namespace
   /**
    * And now also in the opposite direction.
    */
-  void
-  reorder_old_to_new_style (const std::vector<CellData<1> > &)
-  {
-    // nothing to do here: the format
-    // hasn't changed for 1d
-  }
-
-
   void
   reorder_old_to_new_style (std::vector<CellData<2> > &cells)
   {
