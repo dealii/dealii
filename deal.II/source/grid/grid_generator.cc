@@ -171,19 +171,6 @@ namespace GridGenerator
      * Assign boundary number zero to the inner shell boundary and 1 to the
      * outer.
      */
-    void colorize_hyper_shell (Triangulation<1> &,
-                               const Point<1> &,
-                               const double,
-                               const double)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-    /**
-     * Assign boundary number zero to the inner shell boundary and 1 to the
-     * outer.
-     */
     void
     colorize_hyper_shell (Triangulation<2> &tria,
                           const Point<2> &,
