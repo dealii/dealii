@@ -149,18 +149,10 @@ namespace Utilities
   int
   string_to_int (const std::string &s)
   {
-    std::istringstream ss(s);
-
-    int i = std::numeric_limits<int>::max();
-    ss >> i;
-    // check for errors
-    AssertThrow (i != std::numeric_limits<int>::max(),
-                 ExcCantConvertString (s));
-
-//TODO: The test for errors above doesn't work, as can easily be
-//verified. furthermore, it doesn't catch cases like when calling
-//string_to_int("1.23.4") since it just reads in however much it can, without
-//realizing that there is more
+    char *p;
+    const int i = std::strtol(s.c_str(), &p, 10);
+    AssertThrow ( !((errno != 0) || (s.size() == 0) || ((s.size()>0) && (*p != '\0'))),
+                  ExcMessage ("Can't convert <" + s + "> to an integer."));
 
     return i;
   }

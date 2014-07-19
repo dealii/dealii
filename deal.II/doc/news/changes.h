@@ -190,6 +190,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Utilities::string_to_int() did not catch if the
+  string given started with an integer but contained additional
+  text. It now throws an exception if this happens.
+  <br>
+  (Wolfgang Bangerth, 2014/07/14)
+  </li>
+
   <li> New: The function GridOut::write, can now be used also in 
   the codimension one case. 
   <br>
@@ -202,7 +209,6 @@ inconvenience this causes.
   <br>
   (Luca Heltai, 2014/07/18)
   </li>
-
 
   <li> New: The GridReordering::reorder_cells() function used a
   numbering format for the vertices in a cell that was last used in
