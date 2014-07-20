@@ -191,13 +191,13 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
               && cat ${_test_directory}/failing_output
               && exit 1)
         COMMAND
-          ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
+          ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
                                  ${_test_directory}/output
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
           ${_target}
-          ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
+          ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
         )
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND rm -f ${_test_directory}/failing_diff
@@ -251,7 +251,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           -DEXPECT=${_expect}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
-          -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
+          -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
       SET_TESTS_PROPERTIES(${_test_full} PROPERTIES

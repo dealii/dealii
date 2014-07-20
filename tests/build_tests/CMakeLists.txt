@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsubproject.cmake)
+INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 INCLUDE(${DEAL_II_TARGET_CONFIG})
 
@@ -182,7 +182,7 @@ FOREACH(_step_full ${_steps})
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${_step_dir}/interrupt_guard
-          -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
+          -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
       SET_TESTS_PROPERTIES(${_test} PROPERTIES

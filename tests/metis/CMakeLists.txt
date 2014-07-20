@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
-INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsubproject.cmake)
+INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 INCLUDE(${DEAL_II_TARGET_CONFIG})
 IF(DEAL_II_WITH_METIS)
