@@ -147,9 +147,17 @@ namespace Utilities
 
 
   int
-  string_to_int (const std::string &s)
+  string_to_int (const std::string &s_)
   {
+    // trim whitespace on either side of the text if necessary
+    std::string s = s_;
+    while ((s.size() > 0) && (s[0] == ' '))
+      s.erase (s.begin());
+    while ((s.size() > 0) && (s[s.size()-1] == ' '))
+      s.erase (s.end()-1);
+
     char *p;
+    errno = 0;
     const int i = std::strtol(s.c_str(), &p, 10);
     AssertThrow ( !((errno != 0) || (s.size() == 0) || ((s.size()>0) && (*p != '\0'))),
                   ExcMessage ("Can't convert <" + s + "> to an integer."));
