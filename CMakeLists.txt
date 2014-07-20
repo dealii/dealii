@@ -64,11 +64,7 @@ IF(EXISTS ${CMAKE_SOURCE_DIR}/doc/CMakeLists.txt)
   SET(DEAL_II_HAVE_DOC_DIRECTORY TRUE)
 ENDIF()
 
-IF(NOT DEFINED TEST_DIR)
-  GET_FILENAME_COMPONENT(TEST_DIR "${CMAKE_SOURCE_DIR}" PATH)
-  SET(TEST_DIR "${TEST_DIR}/tests")
-ENDIF()
-IF(EXISTS ${TEST_DIR}/CMakeLists.txt)
+IF(EXISTS ${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt)
   SET(DEAL_II_HAVE_TESTS_DIRECTORY TRUE)
 ENDIF()
 
@@ -157,7 +153,9 @@ ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
-ADD_SUBDIRECTORY(tests)
+IF(DEAL_II_HAVE_TESTS_DIRECTORY)
+  ADD_SUBDIRECTORY(tests)
+ENDIF()
 
 #
 # And finally, print the configuration:

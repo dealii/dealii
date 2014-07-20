@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-INCLUDE(${DEAL_II_SOURCE_DIR}/cmake/setup_testsubproject.cmake)
+INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 INCLUDE(${DEAL_II_TARGET_CONFIG})
 
@@ -58,7 +58,7 @@ FOREACH(_full_file ${_meshes})
             && cat ${_test_directory}/failing_output
             && exit 1)
       COMMAND
-        ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
+        ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
                                ${_test_directory}/output
       WORKING_DIRECTORY ${_test_directory}
       DEPENDS mesh_converter_exe ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
@@ -95,7 +95,7 @@ FOREACH(_full_file ${_meshes})
         -DTRGT=${_mesh}.diff
         -DTEST=${_test_full}
         -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
-        -P ${DEAL_II_SOURCE_DIR}/cmake/scripts/run_test.cmake
+        -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
       WORKING_DIRECTORY ${_test_directory}
       )
     SET_TESTS_PROPERTIES(${_test_full} PROPERTIES

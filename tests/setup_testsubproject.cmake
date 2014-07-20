@@ -51,6 +51,8 @@ FOREACH(_file ${_macro_files})
   INCLUDE(${_file})
 ENDFOREACH()
 
+INCLUDE(${DEAL_II_SOURCE_DIR}/tests/macro_add_test.cmake)
+
 #
 # Pick up values from environment:
 #
