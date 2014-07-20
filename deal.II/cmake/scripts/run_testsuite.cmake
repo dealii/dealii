@@ -330,102 +330,65 @@ IF(EXISTS ${CTEST_BINARY_DIRECTORY}/detailed.log)
 ENDIF()
 
 #
-# Query subversion information:
+# Query git information:
 #
 
-# First try native subversion:
-FIND_PACKAGE(Subversion QUIET)
-SET(_result 1)
-IF(SUBVERSION_FOUND)
-  EXECUTE_PROCESS(
-    COMMAND ${Subversion_SVN_EXECUTABLE} info ${CTEST_SOURCE_DIRECTORY}
-    OUTPUT_QUIET ERROR_QUIET
-    RESULT_VARIABLE _result
-    )
+FIND_PACKAGE(Git)
+
+IF(NOT GIT_FOUND)
+  MESSAGE(FATAL_ERROR "\nCould not find git. Bailing out.\n"
+   )
 ENDIF()
 
-IF(${_result} EQUAL 0)
-  Subversion_WC_INFO(${CTEST_SOURCE_DIRECTORY} _svn)
+EXECUTE_PROCESS(
+   COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%H %h %ae"
+   WORKING_DIRECTORY ${CTEST_SOURCE_DIRECTORY}
+   OUTPUT_VARIABLE _git_WC_INFO
+   RESULT_VARIABLE _result
+   OUTPUT_STRIP_TRAILING_WHITESPACE
+   )
 
-ELSE()
-
-  # Umm, no valid subversion info was found, try again with git-svn:
-  FIND_PACKAGE(Git QUIET)
-  IF(GIT_FOUND)
-    GET_FILENAME_COMPONENT(_path "${CTEST_SOURCE_DIRECTORY}" PATH)
-    IF(EXISTS ${_path}/.git/svn)
-      EXECUTE_PROCESS(
-        COMMAND ${GIT_EXECUTABLE} svn info
-        WORKING_DIRECTORY ${CTEST_SOURCE_DIRECTORY}
-        OUTPUT_VARIABLE _svn_WC_INFO
-        RESULT_VARIABLE _result
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-
-      IF(${_result} EQUAL 0)
-        STRING(REGEX REPLACE "^(.*\n)?URL: ([^\n]+).*"
-          "\\2" _svn_WC_URL "${_svn_WC_INFO}")
-        STRING(REGEX REPLACE "^(.*\n)?Repository Root: ([^\n]+).*"
-          "\\2" _svn_WC_ROOT "${_svn_WC_INFO}")
-        STRING(REGEX REPLACE "^(.*\n)?Revision: ([^\n]+).*"
-          "\\2" _svn_WC_REVISION "${_svn_WC_INFO}")
-        STRING(REGEX REPLACE "^(.*\n)?Last Changed Date: ([^\n]+).*"
-          "\\2" _svn_WC_LAST_CHANGED_DATE "${_svn_WC_INFO}")
-      ELSE()
-        SET(_svn_WC_INFO)
-      ENDIF()
-    ENDIF()
-  ENDIF()
+IF(NOT ${_result} EQUAL 0)
+  MESSAGE(FATAL_ERROR "\nCould not retrieve git information. Bailing out.\n")
 ENDIF()
 
-# If we have a valid (git) svn info use it:
-IF(${_result} EQUAL 0)
+STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+) ([^\"]+)\""
+         "\\1" _git_WC_REV "${_git_WC_INFO}")
 
-  STRING(REGEX REPLACE "^${_svn_WC_ROOT}/" "" _branch ${_svn_WC_URL})
-  STRING(REGEX REPLACE "^branches/" "" _branch ${_branch})
-  STRING(REGEX REPLACE "^releases/" "" _branch ${_branch})
-  STRING(REGEX REPLACE "/deal.II$" "" _branch ${_branch})
-  STRING(REGEX REPLACE "/" "" _branch ${_branch})
+STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+) ([^\"]+)\""
+         "\\2" _git_WC_SHORTREV "${_git_WC_INFO}")
 
-  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_branch}")
-ENDIF()
+STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+) ([^\"]+)\""
+         "\\3" _git_WC_AUTHOR "${_git_WC_INFO}")
 
-#
-# We require valid svn information for build tests:
-#
+EXECUTE_PROCESS(
+   COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD
+   WORKING_DIRECTORY ${CTEST_SOURCE_DIRECTORY}
+   OUTPUT_VARIABLE _git_WC_BRANCH
+   RESULT_VARIABLE _result
+   OUTPUT_STRIP_TRAILING_WHITESPACE
+   )
 
-IF( "${TRACK}" STREQUAL "Build Tests"
-    AND NOT DEFINED _svn_WC_REVISION )
-  MESSAGE(FATAL_ERROR "
-TRACK was set to \"Build Tests\" which requires the source directory to be
-under Subversion version control.
-"
-  )
-ENDIF()
+STRING(REGEX REPLACE "refs/heads/" ""
+  _git_WC_BRANCH "${_git_WC_BRANCH}")
 
 #
 # Write revision log:
 #
 
-IF(DEFINED _svn_WC_REVISION)
-  FILE(WRITE ${CTEST_BINARY_DIRECTORY}/revision.log
+FILE(WRITE ${CTEST_BINARY_DIRECTORY}/revision.log
 "###
 #
-#  SVN information:
-#        SVN_WC_URL:               ${_svn_WC_URL}
-#        SVN_WC_REVISION:          ${_svn_WC_REVISION}
-#        SVN_WC_LAST_CHANGED_DATE: ${_svn_WC_LAST_CHANGED_DATE}
+#  Git information:
+#    Branch: ${_git_WC_BRANCH}
+#    Commit: ${_git_WC_REV}
+#    Author: ${_git_WC_AUTHOR}
 #
 ###"
-    )
-ELSE()
-  FILE(WRITE ${CTEST_BINARY_DIRECTORY}/revision.log
-"###
-#
-#  No SVN information available.
-#
-###"
-    )
+  )
+
+IF(NOT "${_git_WC_BRANCH}" STREQUAL "")
+  SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_git_WC_BRANCH}")
 ENDIF()
 
 #
@@ -526,15 +489,6 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
-IF("${_branch}" STREQUAL "")
-  #
-  # If we have no branch information, just assume we are on trunk:
-  #
-  SET_PROPERTY(GLOBAL PROPERTY SubProject "trunk")
-ELSE()
-  SET_PROPERTY(GLOBAL PROPERTY SubProject ${_branch})
-ENDIF()
-
 CTEST_START(Experimental TRACK ${TRACK})
 
 MESSAGE("-- Running CTEST_CONFIGURE()")
@@ -609,19 +563,17 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
   ENDIF()
 ENDIF()
 
-IF(NOT "${_svn_WC_REVISION}" STREQUAL "")
-  FILE(WRITE ${_path}/Update.xml
+FILE(WRITE ${_path}/Update.xml
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Update mode=\"Client\" Generator=\"ctest-${CTEST_VERSION}\">
-    <Site>${CTEST_SITE}</Site>
-      <BuildName>${CTEST_BUILD_NAME}</BuildName>
-        <BuildStamp>${_tag}-${TRACK}</BuildStamp>
-	<UpdateType>SVN</UpdateType>
-	<Revision>${_svn_WC_REVISION}</Revision>
-        <Path>${_branch}</Path>
+<Site>${CTEST_SITE}</Site>
+<BuildName>${CTEST_BUILD_NAME}</BuildName>
+<BuildStamp>${_tag}-${TRACK}</BuildStamp>
+<UpdateType>GIT</UpdateType>
+<Revision>${_git_WC_SHORTREV}</Revision>
+<Path>${_git_WC_BRANCH}</Path>
 </Update>"
-    )
-ENDIF()
+  )
 
 #
 # And finally submit:
