@@ -961,6 +961,8 @@ namespace GridTools
    * the mesh. This also requires manipulating the degrees of freedom associated
    * with the cells of a patch. To this end, there are further functions working
    * on patches in namespace DoFTools.
+   *
+   * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
    */
   template <class Container>
   std::vector<typename Container::active_cell_iterator>
