@@ -30,6 +30,25 @@ before output arguments of a function call. They also simplify reading code
 because some things become clear already by looking at the style a piece of
 code is written, without having to look up the exact definition of something.
 
+<h3>Notes on deal.II indentation</h3>
+
+<p>deal.II uses <code>astyle</code> to normalize indentation. A
+style file is provided at
+<code>
+<pre>
+  ./contrib/utilities/astyle.rc
+</pre>
+</code>
+
+<p>Before a commit, you should run
+<code>
+<pre>
+  astyle --options=&lt;SOURCE DIRECTORY&gt;/contrib/utilities/astyle.rc &lt;file&gt;
+</pre>
+</code>
+on each of your files. This will make sure indentation is conforming to the
+style guidelines outlined in this page.</p>
+
 <h3>Style issues</h3>
 
 <ol>
