@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------
-// $Id: shifted_matrix.cc 32491 2014-03-13 dilangov $
+// $Id$
 //
 // Copyright (C) 2014 by the deal.II authors
 //
