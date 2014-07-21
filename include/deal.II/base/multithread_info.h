@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,22 +26,23 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class provides information about the system which may be of
- * use in multithreaded programs.  At the moment this is just the
- * number of cpus. If deal.II is compiled with multithreading support,
- * some functions will use multiple threads for their action. Currently
- * the library supports both thread-based and task-based parallelism. @ref threads
- * describes the different uses of each. Thread-based parallel methods will
- * use the member variable n_default_threads of this class as a guide to the
- * number of threads to start.  This variable
- * n_default_threads is set to the number of CPUs by default, but
- * can be adjusted by the user to fit the requirements. The default number of
- * threads used for task-based parallel methods is selected automatically
- * by the Threading Building
- * Blocks library. See @ref threads for more information on this.
- * To set n_default_threads add the following at the start of your main():
+ * This class provides information about the system which may be of use in
+ * multithreaded programs.  At the moment this is just the number of CPUs. If
+ * deal.II is compiled with multithreading support, some functions will use
+ * multiple threads for their action. Currently the library supports both
+ * thread-based and task-based parallelism. @ref threads describes the
+ * different uses of each. The default number of threads used for task-based
+ * parallel methods is selected automatically by the Threading Building Blocks
+ * library. See @ref threads for more information on this.  Thread-based
+ * parallel methods need to explicitly created threads and may want to use a
+ * number of threads that is related to the number of CPUs in your
+ * system. This can be queried using the variable
  * <code>
- * multithread_info.n_default_threads=1;
+ * multithread_info.n_cpus;
+ * </code>
+ * of a global variable <code>multithread_info</code> of this class that, or using
+ * <code>
+ * multithread_info.n_threads();
  * </code>
  *
  * @ingroup threads
@@ -80,20 +81,30 @@ public:
   const unsigned int n_cpus;
 
   /**
-   * The number of threads to use as
-   * a default value for all functions
-   * that support multithreading.
-   * At start time this is <tt>n_cpus</tt> or
-   * one, if detection of the number
-   * of CPUs is not possible.
+   * The number of threads to use as a default value for all functions that
+   * support multithreading.  At start time this is <tt>n_cpus</tt> or one, if
+   * detection of the number of CPUs is not possible.
    *
-   * @deprecated: use set_thread_limit() instead.
+   * This variable used to be the mechanism by which many parts of the library
+   * determined how many threads to use, for example when assembling matrices
+   * in MatrixCreator or generating output in DataOut. To this end,
+   * n_default_threads is set to n_cpus at the start of the program, but used
+   * programs could set it to a different value in their main()
+   * function. However, since almost all of deal.II has now been converted to
+   * a task-based parallelism model, this variable is no longer used in the
+   * library. Instead, the task scheduling methods use the n_threads()
+   * function as a guide to how many threads to use, and the current variable
+   * is now deprecated.
+   *
+   * @deprecated: Use n_threads() to query the number of threads to use (if
+   * you wanted to read this variable), and set_thread_limit() to limit it (if
+   * you wanted to write to it).
    */
   unsigned int n_default_threads DEAL_II_DEPRECATED;
 
   /**
-   * Returns the number of threads to use. This is governed by the number
-   * of cores the system has (n_cpus) and can be further restricted by
+   * Returns the number of threads to use. This is initially set to the number
+   * of cores the system has (n_cpus) but can be further restricted by
    * set_thread_limit().
    */
   unsigned int n_threads() const;
