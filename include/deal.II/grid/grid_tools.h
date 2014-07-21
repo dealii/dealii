@@ -1254,6 +1254,7 @@ namespace GridTools
    * Exception
    */
   DeclException0 (ExcTriangulationHasBeenRefined);
+
   /**
    * Exception
    */
