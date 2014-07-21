@@ -23,7 +23,6 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
