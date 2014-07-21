@@ -61,7 +61,7 @@ FOREACH(_full_file ${_meshes})
         ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
                                ${_test_directory}/output
       WORKING_DIRECTORY ${_test_directory}
-      DEPENDS mesh_converter_exe ${DEAL_II_SOURCE_DIR}/cmake/scripts/normalize.pl
+      DEPENDS mesh_converter_exe ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
       )
     ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
       COMMAND rm -f ${_test_directory}/failing_diff
