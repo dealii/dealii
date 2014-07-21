@@ -156,6 +156,12 @@ namespace Utilities
     while ((s.size() > 0) && (s[s.size()-1] == ' '))
       s.erase (s.end()-1);
 
+    // now convert and see whether we succeed. note that strtol only
+    // touches errno if an error occurred, so if we want to check
+    // whether an error happened, we need to make sure that errno==0
+    // before calling strtol since otherwise it may be that the
+    // conversion succeeds and that errno remains at the value it
+    // was before, whatever that was
     char *p;
     errno = 0;
     const int i = std::strtol(s.c_str(), &p, 10);
@@ -179,23 +185,28 @@ namespace Utilities
 
 
   double
-  string_to_double (const std::string &s)
+  string_to_double (const std::string &s_)
   {
-    std::istringstream ss(s);
+    // trim whitespace on either side of the text if necessary
+    std::string s = s_;
+    while ((s.size() > 0) && (s[0] == ' '))
+      s.erase (s.begin());
+    while ((s.size() > 0) && (s[s.size()-1] == ' '))
+      s.erase (s.end()-1);
 
-    double i = std::numeric_limits<double>::max();
-    ss >> i;
+    // now convert and see whether we succeed. note that strtol only
+    // touches errno if an error occurred, so if we want to check
+    // whether an error happened, we need to make sure that errno==0
+    // before calling strtol since otherwise it may be that the
+    // conversion succeeds and that errno remains at the value it
+    // was before, whatever that was
+    char *p;
+    errno = 0;
+    const double d = std::strtod(s.c_str(), &p);
+    AssertThrow ( !((errno != 0) || (s.size() == 0) || ((s.size()>0) && (*p != '\0'))),
+                  ExcMessage ("Can't convert <" + s + "> to an integer."));
 
-    // check for errors
-    AssertThrow (i != std::numeric_limits<double>::max(),
-                 ExcCantConvertString (s));
-
-//TODO: The test for errors above doesn't work, as can easily be
-//verified. furthermore, it doesn't catch cases like when calling
-//string_to_int("1.23.4") since it just reads in however much it can, without
-//realizing that there is more
-
-    return i;
+    return d;
   }
 
 
