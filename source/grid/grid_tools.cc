@@ -2094,6 +2094,11 @@ next_cell:
   std::vector<typename Container::active_cell_iterator>
   get_patch_around_cell(const typename Container::active_cell_iterator &cell)
   {
+    Assert (cell->is_locally_owned(),
+	    ExcMessage ("This function only makes sense if the cell for "
+			"which you are asking for a patch, is locally "
+			"owned."));
+    
     std::vector<typename Container::active_cell_iterator> patch;
     patch.push_back (cell);
     for (unsigned int face_number=0; face_number<GeometryInfo<Container::dimension>::faces_per_cell; ++face_number)

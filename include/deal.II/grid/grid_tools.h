@@ -935,10 +935,10 @@ namespace GridTools
 
 
   /**
-   * This function returns a list of all the neighbor cells of the given cell.
-   * Here, a neighbor is defined as one having at least part of a face in common
-   * with the given cell, but not edge (in 3d) or vertex neighbors (in 2d and
-   * 3d).
+   * This function returns a list of all the active neighbor cells of the
+   * given, active cell.  Here, a neighbor is defined as one having at least
+   * part of a face in common with the given cell, but not edge (in 3d) or
+   * vertex neighbors (in 2d and 3d).
    *
    * The first element of the returned list is the cell provided as
    * argument. The remaining ones are neighbors: The function loops over all
@@ -961,6 +961,13 @@ namespace GridTools
    * the mesh. This also requires manipulating the degrees of freedom associated
    * with the cells of a patch. To this end, there are further functions working
    * on patches in namespace DoFTools.
+   *
+   * @note In the context of a parallel distributed computation, it only makes
+   * sense to call this function on locally owned cells. This is because the
+   * neighbors of locally owned cells are either locally owned themselves, or
+   * ghost cells. For both, we know that these are in fact the real cells of
+   * the complete, parallel triangulation. We can also query the degrees of
+   * freedom on these.
    *
    * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
    */
