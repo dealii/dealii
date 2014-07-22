@@ -97,7 +97,7 @@ inconvenience this causes.
 
 
 <ol>
-  <li> Ported: The build system now supports cmake-3.0.0
+  <li> Ported: The build system now supports CMake 3.0.
   <br>
   (Matthias Maier, 2014/07/15)
   </li>
@@ -190,6 +190,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The function GridTools::get_patch_around_cell() extracts
+  the set of cells that surround a single cell.
+  <br>
+  (Arezou Ghesmati, Wolfgang Bangerth, 2014/07/21)
+  </li>
+
   <li> Fixed: Utilities::string_to_int() and
   Utilities::string_to_double() did not catch if the
   string given started with an integer or double but contained additional

@@ -929,6 +929,54 @@ namespace GridTools
 
   /*@}*/
   /**
+   *  @name Extracting and creating patches of cells surrounding a single cell
+   */
+  /*@{*/
+
+
+  /**
+   * This function returns a list of all the active neighbor cells of the
+   * given, active cell.  Here, a neighbor is defined as one having at least
+   * part of a face in common with the given cell, but not edge (in 3d) or
+   * vertex neighbors (in 2d and 3d).
+   *
+   * The first element of the returned list is the cell provided as
+   * argument. The remaining ones are neighbors: The function loops over all
+   * faces of that given cell and checks if that face is not on the boundary of
+   * the domain. Then, if the neighbor cell does not have any children (i.e., it
+   * is either at the same refinement level as the current cell, or coarser)
+   * then this neighbor cell is added to the list of cells. Otherwise, if the
+   * neighbor cell is refined and therefore has children, then this function
+   * loops over all subfaces of current face adds the neighbors behind these
+   * sub-faces to the list to be returned.
+   *
+   * The <code>Container</code> template argument can be either a triangulation
+   * or any of the DoF handler classes. Because the C++ language specifies that
+   * the container type can not be inferred from an iterator alone, you will
+   * need to explicitly specify the template argument when calling this
+   * function.
+   *
+   * @note Patches are often used in defining error estimators that require the
+   * solution of a local problem on the patch surrounding each of the cells of
+   * the mesh. This also requires manipulating the degrees of freedom associated
+   * with the cells of a patch. To this end, there are further functions working
+   * on patches in namespace DoFTools.
+   *
+   * @note In the context of a parallel distributed computation, it only makes
+   * sense to call this function on locally owned cells. This is because the
+   * neighbors of locally owned cells are either locally owned themselves, or
+   * ghost cells. For both, we know that these are in fact the real cells of
+   * the complete, parallel triangulation. We can also query the degrees of
+   * freedom on these.
+   *
+   * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
+   */
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  get_patch_around_cell(const typename Container::active_cell_iterator &cell);
+
+  /*@}*/
+  /**
    *  @name Lower-dimensional meshes for parts of higher-dimensional meshes 
    */
   /*@{*/
@@ -1254,6 +1302,7 @@ namespace GridTools
    * Exception
    */
   DeclException0 (ExcTriangulationHasBeenRefined);
+
   /**
    * Exception
    */

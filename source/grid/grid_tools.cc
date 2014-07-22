@@ -2090,6 +2090,50 @@ next_cell:
 
 
 
+  template <class Container>
+  std::vector<typename Container::active_cell_iterator>
+  get_patch_around_cell(const typename Container::active_cell_iterator &cell)
+  {
+    Assert (cell->is_locally_owned(),
+	    ExcMessage ("This function only makes sense if the cell for "
+			"which you are asking for a patch, is locally "
+			"owned."));
+    
+    std::vector<typename Container::active_cell_iterator> patch;
+    patch.push_back (cell);
+    for (unsigned int face_number=0; face_number<GeometryInfo<Container::dimension>::faces_per_cell; ++face_number)
+      if (cell->face(face_number)->at_boundary()==false)
+        {
+          if (cell->neighbor(face_number)->has_children() == false)
+            patch.push_back (cell->neighbor(face_number));
+          else
+            // the neighbor is refined. in 2d/3d, we can simply ask for the children
+            // of the neighbor because they can not be further refined and,
+            // consequently, the children is active
+            if (Container::dimension > 1)
+              {
+                for (unsigned int subface=0; subface<cell->face(face_number)->n_children(); ++subface)
+                  patch.push_back (cell->neighbor_child_on_subface (face_number, subface));
+              }
+            else
+              {
+                // in 1d, we need to work a bit harder: iterate until we find
+                // the child by going from cell to child to child etc
+                typename Container::cell_iterator neighbor
+                = cell->neighbor (face_number);
+                while (neighbor->has_children())
+                  neighbor = neighbor->child(1-face_number);
+
+                Assert (neighbor->neighbor(1-face_number) == cell, ExcInternalError());
+                patch.push_back (neighbor);
+              }
+        }
+    return patch;
+  }
+
+
+
+
   template <template <int,int> class Container, int dim, int spacedim>
 #ifndef _MSC_VER
   std::map<typename Container<dim-1,spacedim>::cell_iterator,
