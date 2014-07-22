@@ -88,7 +88,11 @@ namespace internal
       typedef p4est_quadrant_t     quadrant;
       typedef p4est_topidx_t       topidx;
       typedef p4est_locidx_t       locidx;
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+      typedef p4est_connect_type_t balance_type;
+#else
       typedef p4est_balance_type_t balance_type;
+#endif
       typedef p4est_ghost_t        ghost;
     };
 
@@ -101,7 +105,11 @@ namespace internal
       typedef p8est_quadrant_t     quadrant;
       typedef p4est_topidx_t       topidx;
       typedef p4est_locidx_t       locidx;
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+      typedef p8est_connect_type_t balance_type;
+#else
       typedef p8est_balance_type_t balance_type;
+#endif
       typedef p8est_ghost_t        ghost;
     };
 
