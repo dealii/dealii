@@ -30,6 +30,7 @@ BUILD_DEBUG="$BUILD_DIR/DEBUG"
 
 function busage() {
         echo "Usage: `basename $0` <p4est_tar.gz_file> [<install location>]"
+        echo "   or: `basename $0` /path/to/p4est-src/ [<install location>]"
 }
 function bdie () {
         echo "Error: $@"
@@ -50,13 +51,18 @@ fi
 echo "CFLAGS_DEBUG: $CFLAGS_DEBUG"
 
 TGZ="$1"; shift
-if test ! -f "$TGZ" ; then
+if test -d "$TGZ" ; then
+  SRCDIR="$TGZ"  
+  echo "using existing source dir '$SRCDIR'"
+else
+    if test ! -f "$TGZ" ; then
         busage
         bdie "File not found"
-fi
-if ! (echo "$TGZ" | grep -q 'p4est.*.tar.gz') ; then
+    fi
+    if ! (echo "$TGZ" | grep -q 'p4est.*.tar.gz') ; then
         busage
         bdie "File name mismatch"
+    fi
 fi
 
 # choose names for fast and debug installation directories
@@ -80,25 +86,28 @@ if test -d "$BUILD_DIR" ; then
         rm -rf "$BUILD_DIR"
 fi
 
-DIR=`echo "$TGZ" | sed 's/\(p4est.*\).tar.gz/\1/'`
-DIR=`basename $DIR`
-echo "Unpack directory: $UNPACK/$DIR"
-if test -d "$UNPACK/$DIR" ; then
+if test -f "$TGZ" ; then
+    DIR=`echo "$TGZ" | sed 's/\(p4est.*\).tar.gz/\1/'`
+    DIR=`basename $DIR`
+    echo "Unpack directory: $UNPACK/$DIR"
+    if test -d "$UNPACK/$DIR" ; then
         echo "Source directory found (remove it to unpack anew)"
-else
+    else
         echo -n "Unpacking... "
         tar -xvz -f "$TGZ" -C "$UNPACK" >/dev/null
         echo "done"
+    fi
+    SRCDIR=$UNPACK/$DIR
 fi
-test -f "$UNPACK/$DIR/src/p4est.h" || bdie "Main header file missing"
-test -f "$UNPACK/$DIR/configure" || bdie "Configure script missing"
+test -f "$SRCDIR/src/p4est.h" || bdie "Main header file missing"
+test -f "$SRCDIR/configure" || bdie "Configure script missing"
 
 echo "See output in files .../config.output and .../make.output"
 echo
 echo "Build FAST version in $BUILD_FAST"
 mkdir -p "$BUILD_FAST"
 cd "$BUILD_FAST"
-"$UNPACK/$DIR/configure" --enable-mpi --enable-shared \
+"$SRCDIR/configure" --enable-mpi --enable-shared \
         --disable-vtk-binary --without-blas \
         --prefix="$INSTALL_FAST" CFLAGS="$CFLAGS_FAST" \
         CPPFLAGS="-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL" \
@@ -112,7 +121,7 @@ echo
 echo "Build DEBUG version in $BUILD_DEBUG"
 mkdir -p "$BUILD_DEBUG"
 cd "$BUILD_DEBUG"
-"$UNPACK/$DIR/configure" --enable-debug --enable-mpi --enable-shared \
+"$SRCDIR/configure" --enable-debug --enable-mpi --enable-shared \
         --disable-vtk-binary --without-blas \
         --prefix="$INSTALL_DEBUG" CFLAGS="$CFLAGS_DEBUG" \
         CPPFLAGS="-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL" \
