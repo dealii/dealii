@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------
- * $Id$
+ * $Id: step-50.cc 30939 2013-09-26 01:22:38Z bangerth $
  *
  * Copyright (C) 2003 - 2013 by the deal.II authors
  *
@@ -152,7 +152,7 @@ namespace Step50
     // We need an additional object for the
     // hanging nodes constraints. They are
     // handed to the transfer object in the
-    // multigrid. Since we call a compress
+    // multigrid. Since we call a condense
     // inside the multigrid these constraints
     // are not allowed to be inhomogeneous so
     // we store them in different ConstraintMatrix
@@ -302,6 +302,12 @@ namespace Step50
       deallog.depth_console(0);
   }
 
+  std::string id_to_string(const CellId &id)
+  {
+    std::ostringstream ss;
+    ss << id;
+    return ss.str();
+  }
 
 
   // @sect4{LaplaceProblem::setup_system}
@@ -315,6 +321,139 @@ namespace Step50
   {
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs (fe);
+
+
+    static unsigned int n=0;
+    ++n;
+    unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+    if (numprocs==1) // renumber DoFs
+      {
+        std::map<std::string,std::vector<types::global_dof_index> > dofmap;
+        std::map<std::string,std::vector<types::global_dof_index> > mgdofmap;
+
+        {
+          std::ifstream f(("ordering." + Utilities::int_to_string(n)).c_str());
+
+          while (!f.eof())
+            {
+              CellId id;
+              f >> id;
+              if (f.eof())
+                break;
+              std::vector<types::global_dof_index> &d = dofmap[id_to_string(id)];
+              d.reserve(fe.dofs_per_cell);
+              for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+                {
+                  unsigned int temp;
+                  f >> temp;
+                  d.push_back(temp);
+                }
+            }
+        }
+        {
+
+          std::ifstream f(("mgordering." + Utilities::int_to_string(n)).c_str());
+
+          while (!f.eof())
+            {
+              CellId id;
+              f >> id;
+              if (f.eof())
+                break;
+              std::vector<types::global_dof_index> &d = mgdofmap[id_to_string(id)];
+              d.reserve(fe.dofs_per_cell);
+              for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+                {
+                  unsigned int temp;
+                  f >> temp;
+                  d.push_back(temp);
+                }
+            }
+        }
+        std::ofstream f(("temp." + Utilities::int_to_string(n)).c_str(), std::ofstream::out);
+
+        for (typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler.begin_active();
+             cell != mg_dof_handler.end(); ++cell)
+          {
+            if (!cell->is_locally_owned())
+              continue;
+
+            std::vector<types::global_dof_index>   &renumbered = dofmap[id_to_string(cell->id())];
+            if (renumbered.size()!=fe.dofs_per_cell)
+              {
+                std::cout << " ERROR " << cell->id() << " not found!" << std::endl;
+
+              }
+            cell->set_dof_indices(renumbered);
+            cell->update_cell_dof_indices_cache();
+
+            std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
+            f << cell->id() << ' ';
+            cell->get_dof_indices(local_dof_indices);
+            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+              f << local_dof_indices[i] << ' ';
+            f << std::endl;
+          }
+        for (typename DoFHandler<dim>::level_cell_iterator cell = mg_dof_handler.begin();
+             cell != mg_dof_handler.end(); ++cell)
+          {
+            if (!cell->is_locally_owned_on_level())
+              continue;
+
+            std::vector<types::global_dof_index>   &renumbered = mgdofmap[id_to_string(cell->id())];
+            cell->set_mg_dof_indices(renumbered);
+            cell->update_cell_dof_indices_cache();
+          }
+
+      }
+       if (numprocs>1)
+         {
+           unsigned int myid=Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+           unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+
+           for (unsigned int i=0; i<numprocs; ++i)
+             {
+               MPI_Barrier(MPI_COMM_WORLD);
+               if (myid!=i)
+                 continue;
+                 {
+                   std::ofstream f(("ordering." + Utilities::int_to_string(n)).c_str(), (myid>0)?std::ofstream::app:std::ofstream::out);
+                   std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
+                   for (typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler.begin_active();
+                        cell != mg_dof_handler.end(); ++cell)
+                     {
+                       if (!cell->is_locally_owned())
+                         continue;
+
+                       f << cell->id() << ' ';
+                       cell->get_dof_indices(local_dof_indices);
+                       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+                         f << local_dof_indices[i] << ' ';
+                       f << std::endl;
+                     }
+                   f.close();
+                 }
+                 {
+                   std::ofstream f(("mgordering." + Utilities::int_to_string(n)).c_str(), (myid>0)?std::ofstream::app:std::ofstream::out);
+                   std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
+                   for (typename DoFHandler<dim>::level_cell_iterator cell = mg_dof_handler.begin();
+                       cell != mg_dof_handler.end(); ++cell)
+                     {
+                       if (!cell->is_locally_owned_on_level())
+                         continue;
+
+                       f << cell->id() << ' ';
+                       cell->get_mg_dof_indices(local_dof_indices);
+                       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+                         f << local_dof_indices[i] << ' ';
+                       f << std::endl;
+                     }
+                   f.close();
+                 }
+             }
+         }
+
+
 
 
     // Here we output not only the
@@ -585,10 +724,162 @@ namespace Step50
     // not. The <code>MGConstraints</code> already computed the
     // information for us when we called initialize in
     // <code>setup_system()</code>.
-    std::vector<std::vector<bool> > interface_dofs
-      = mg_constrained_dofs.get_refinement_edge_indices ();
-    std::vector<std::vector<bool> > boundary_interface_dofs
-      = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
+//    std::vector<std::vector<bool> > interface_dofs
+//      = mg_constrained_dofs.get_refinement_edge_indices ();
+//    std::vector<std::vector<bool> > boundary_interface_dofs
+//      = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
+
+
+    // now communicate mg_constraint_dofs
+    {
+      for (unsigned int l=0;l<triangulation.n_global_levels(); ++l)
+        {
+          std::cout << "level " << l << std::endl;
+
+          std::map<unsigned int, IndexSet> to_send;
+
+
+          // determine dofs we need to get information for
+          {
+            IndexSet dofset;
+            DoFTools::extract_locally_relevant_mg_dofs (mg_dof_handler,
+                dofset, l);
+            dofset.subtract_set(mg_dof_handler.locally_owned_mg_dofs(l));
+
+            unsigned int dest_cpu = 0;
+            while (dofset.n_elements()>0)
+              {
+                types::global_dof_index first_idx = dofset.nth_index_in_set(0);
+
+                while (!mg_dof_handler.locally_owned_mg_dofs_per_processor(l)[dest_cpu]
+                                                                              .is_element(first_idx))
+                  ++dest_cpu;
+                Assert(mg_dof_handler.locally_owned_mg_dofs_per_processor(l)[dest_cpu]
+                                                                             .is_element(first_idx),
+                                                                             ExcInternalError());
+                to_send[dest_cpu] = dofset & mg_dof_handler.locally_owned_mg_dofs_per_processor(l)[dest_cpu];
+                dofset.subtract_set(mg_dof_handler.locally_owned_mg_dofs_per_processor(l)[dest_cpu]);
+              }
+          }
+
+
+          // create list of processor to send to and get a list of things to
+          // receive
+          std::vector<unsigned int> destinations;
+          for (std::map<unsigned int, IndexSet>::iterator it = to_send.begin();
+              it != to_send.end(); ++it)
+            destinations.push_back(it->first);
+
+          std::vector<unsigned int> to_receive =
+              Utilities::MPI::compute_point_to_point_communication_pattern(MPI_COMM_WORLD,
+                                                            destinations);
+
+          std::cout << "I want to send " << destinations.size()
+              << " and receive " << to_receive.size() << std::endl;
+
+          // send messages
+          std::vector<MPI_Request> requests (to_send.size() + to_receive.size());
+          unsigned int req_index = 0;
+          std::vector<std::string> buffers(to_send.size());
+          {
+            unsigned int index = 0;
+            for (std::map<unsigned int, IndexSet>::iterator it = to_send.begin();
+                it!=to_send.end();++it, ++index)
+              {
+                std::ostringstream oss;
+                it->second.block_write(oss);
+                buffers[index] = oss.str();
+
+                char *ptr = const_cast<char*>(buffers[index].c_str());
+                MPI_Isend(ptr, buffers[index].length(),
+                                        MPI_BYTE, it->first,
+                                        1000+l, MPI_COMM_WORLD, &requests[req_index]);
+                ++req_index;
+
+                std::cout << "send to " << it->first << std::endl;
+              }
+          }
+
+          // receive
+          unsigned int n_to_recieve = to_receive.size();
+          std::vector<char> receive;
+          std::vector<std::string> buffers2(n_to_recieve);
+          unsigned int index = 0;
+          while (n_to_recieve>0)
+            {
+              MPI_Status status;
+              int len;
+              MPI_Probe(MPI_ANY_SOURCE, 1000+l, MPI_COMM_WORLD, &status);
+              MPI_Get_count(&status, MPI_BYTE, &len);
+              receive.resize(len);
+
+              char *ptr = &receive[0];
+              MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                  MPI_COMM_WORLD, &status);
+
+              IndexSet idxset;
+              std::istringstream iss(std::string(ptr, len));
+              idxset.block_read(iss);
+
+              std::cout << "got idxset from " << status.MPI_SOURCE << std::endl;
+
+              // compute and send reply
+              std::ostringstream oss;
+              IndexSet reply_ref_edge = mg_constrained_dofs.refinement_edge_indices[l] & idxset;
+              IndexSet reply_ref_edge_bdry = mg_constrained_dofs.refinement_edge_boundary_indices[l] & idxset;
+              reply_ref_edge.block_write(oss);
+              reply_ref_edge_bdry.block_write(oss);
+              buffers2[index] = oss.str();
+              char *ptr2 = const_cast<char*>(buffers2[index].c_str());
+              MPI_Isend(ptr2, buffers2[index].length(),
+                  MPI_BYTE, status.MPI_SOURCE,
+                  2000+l, MPI_COMM_WORLD, &requests[req_index]);
+              ++req_index;
+
+              ++index;
+              --n_to_recieve;
+            }
+
+          // receive answers
+          {
+            std::vector<char> receive;
+            for (unsigned int n=0;n<destinations.size();++n)
+              {
+                MPI_Status status;
+                int len;
+                MPI_Probe(MPI_ANY_SOURCE, 2000+l, MPI_COMM_WORLD, &status);
+                MPI_Get_count(&status, MPI_BYTE, &len);
+                receive.resize(len);
+
+                char *ptr = &receive[0];
+                MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                    MPI_COMM_WORLD, &status);
+
+                std::istringstream iss(std::string(ptr,len));
+                IndexSet reply_ref_edge;
+                IndexSet reply_ref_edge_bdry;
+                reply_ref_edge.block_read(iss);
+                reply_ref_edge_bdry.block_read(iss);
+                unsigned int c1 = mg_constrained_dofs.refinement_edge_indices[l].n_elements();
+                unsigned int c2 = mg_constrained_dofs.refinement_edge_boundary_indices[l].n_elements();
+
+                mg_constrained_dofs.refinement_edge_indices[l].add_indices(reply_ref_edge);
+                mg_constrained_dofs.refinement_edge_boundary_indices[l].add_indices(reply_ref_edge_bdry);
+
+                std::cout << "new " << mg_constrained_dofs.refinement_edge_indices[l].n_elements()-c1
+                    << " and " << mg_constrained_dofs.refinement_edge_boundary_indices[l].n_elements()-c2
+                    << std::endl;
+              }
+
+          }
+
+          // finish all requests:
+          if (requests.size() > 0)
+            MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+
+          MPI_Barrier(MPI_COMM_WORLD);
+        }
+    }
 
     // The indices just identified will later be used to decide where
     // the assembled value has to be added into on each level.  On the
@@ -610,12 +901,15 @@ namespace Step50
     std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_global_levels());
     for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
       {
-        boundary_constraints[level].add_lines (interface_dofs[level]);
+        // TODO: here we get missing entries!
+        boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
+
         boundary_constraints[level].close ();
 
-        boundary_interface_constraints[level]
-        .add_lines (boundary_interface_dofs[level]);
+
+       // boundary_interface_constraints[level]
+        //.add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices (level));
         boundary_interface_constraints[level].close ();
       }
 
@@ -703,8 +997,8 @@ namespace Step50
           // the transpose matrix where necessary.
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              if ( !(interface_dofs[cell->level()][local_dof_indices[i]]==true &&
-                     interface_dofs[cell->level()][local_dof_indices[j]]==false))
+              if (!mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[i])
+                || mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[j]))
                 cell_matrix(i,j) = 0;
 
           boundary_interface_constraints[cell->level()]
@@ -759,6 +1053,7 @@ namespace Step50
     // <code>MGConstraints</code> knows about that so pass it as an
     // argument.
     mg_transfer.build_matrices(mg_dof_handler);
+
 
     matrix_t &coarse_matrix = mg_matrices[0];
     //coarse_matrix.copy_from (mg_matrices[0]);
@@ -835,8 +1130,11 @@ namespace Step50
                             mg_transfer,
                             mg_smoother,
                             mg_smoother);
-    //mg.set_debug(6);
+    mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
+
+
+
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
     preconditioner(mg_dof_handler, mg, mg_transfer);
@@ -845,7 +1143,7 @@ namespace Step50
     // get about solving the linear system in
     // the usual way:
     SolverControl solver_control (500, 1e-8*system_rhs.l2_norm(), false);
-    SolverCG<vector_t>    cg (solver_control);
+    SolverGMRES<vector_t>    cg (solver_control);
 
     solution = 0;
 
@@ -899,6 +1197,35 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::refine_grid ()
   {
+    static int n = 0;
+    n++;
+
+    if (true)//Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1)
+      {
+        std::ifstream f(("refine." + Utilities::int_to_string(n)).c_str());
+        std::set<CellId> to_refine;
+        while(!f.eof())
+          {
+            CellId temp;
+            f >> temp;
+            to_refine.insert(temp);
+          }
+
+        typename DoFHandler<dim>::active_cell_iterator
+        cell = mg_dof_handler.begin_active(),
+        endc = mg_dof_handler.end();
+        for (; cell!=endc; ++cell)
+          if (cell->is_locally_owned()
+              && to_refine.find(cell->id()) != to_refine.end())
+            {
+              cell->set_refine_flag();
+                //std::cout << cell->id() << std::endl;
+              }
+
+      }
+    else
+      {
+
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
     TrilinosWrappers::MPI::Vector temp_solution;
@@ -910,10 +1237,39 @@ namespace Step50
                                         typename FunctionMap<dim>::type(),
                                         temp_solution,
                                         estimated_error_per_cell);
+    if (false && n==2)
+      {
+
+        typename DoFHandler<dim>::active_cell_iterator
+                cell = mg_dof_handler.begin_active(),
+                endc = mg_dof_handler.end();
+                for (; cell!=endc; ++cell)
+                  if (cell->is_locally_owned() && id_to_string(cell->id())=="0_3:300")
+                    cell->set_refine_flag();
+
+      }
+    else
     parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_fraction (triangulation,
                                        estimated_error_per_cell,
-                                       0.3, 0.03);
+                                       0.3, 0.0);
+
+    triangulation.prepare_coarsening_and_refinement ();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    typename DoFHandler<dim>::active_cell_iterator
+        cell = mg_dof_handler.begin_active(),
+        endc = mg_dof_handler.end();
+        for (; cell!=endc; ++cell)
+          if (cell->is_locally_owned() && cell->refine_flag_set())
+            {
+            std::cout << cell->id() << std::endl;
+
+          }
+    MPI_Barrier(MPI_COMM_WORLD);
+    }
+
+
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -942,7 +1298,7 @@ namespace Step50
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector (subdomain, "subdomain");
 
-    data_out.build_patches (3);
+    data_out.build_patches (0);
 
     const std::string filename = ("solution-" +
                                   Utilities::int_to_string (cycle, 5) +
@@ -992,7 +1348,7 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<13; ++cycle)
+    for (unsigned int cycle=0; cycle<5; ++cycle)
       {
         deallog << "Cycle " << cycle << ':' << std::endl;
 
@@ -1020,11 +1376,50 @@ namespace Step50
                       ? ")" : ", ");
         deallog << std::endl;
 
+
         assemble_system ();
         assemble_multigrid ();
 
-        solve ();
+        unsigned int myid=Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+        unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+
+
+        static unsigned int n=0;
+        ++n;
+
+        std::cout << "matrix:" << std::endl;
+        MPI_Barrier(MPI_COMM_WORLD);
+        for (unsigned int lvl = 0;lvl<triangulation.n_global_levels();++lvl)
+        for (unsigned int i=0; i<numprocs; ++i)
+          {
+            MPI_Barrier(MPI_COMM_WORLD);
+            if (myid!=i)
+              continue;
+
+            std::ofstream f(("matrix."+Utilities::int_to_string(n)+"."+Utilities::int_to_string(lvl)).c_str(),
+                (myid>0)?std::ofstream::app:std::ofstream::out);
+            mg_matrices[lvl].print(f);
+            mg_interface_matrices[lvl].print(f);
+          }
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        std::cout << "rhs:" << system_rhs.l2_norm() << std::endl;
+        MPI_Barrier(MPI_COMM_WORLD);
+        //system_rhs.print(std::cout);
+        MPI_Barrier(MPI_COMM_WORLD);
+
+
+
+
+
+
+
+
+
         output_results (cycle);
+
+        solve ();
+
       }
   }
 }
