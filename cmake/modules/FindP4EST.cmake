@@ -134,15 +134,20 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   STRING(REGEX REPLACE
     "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
     P4EST_VERSION_SUBMINOR "${P4EST_VERSION}")
-
-  # Now for the patch number such as in 0.3.4.1. If there
-  # is no patch number, then REGEX REPLACE will set  
-  # P4EST_VERSION_PATCH to an empty string. If that
-  # is the case, then set the patch number to zero
   STRING(REGEX REPLACE
-    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.?(([0-9]+)?).*$" "\\1"
+    "^[0-9]+\\.[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1"
     P4EST_VERSION_PATCH "${P4EST_VERSION}")
-  IF("${P4EST_VERSION_PATCH}" STREQUAL "")
+
+  #
+  # We cannot rely on the fact that SUBMINOR or PATCH are defined.
+  # Nevertheless, we need a full version number for our preprocessor macros
+  # to work. Therefore, set those numbers to 0 if necessary.
+  #
+  IF("${P4EST_VERSION_SUBMINOR}" MATCHES "^(|${P4EST_VERSION})$")
+    SET(P4EST_VERSION_SUBMINOR "0")
+  ENDIF()
+
+  IF("${P4EST_VERSION_PATCH}" MATCHES "^(|${P4EST_VERSION})$")
     SET(P4EST_VERSION_PATCH "0")
   ENDIF()
 ENDIF()
