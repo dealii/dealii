@@ -364,12 +364,13 @@ namespace GridTools
   /**
    * Find and return the number of
    * the used vertex in a given
-   * Container that is located closest
-   * to a given point @p p. The
-   * type of the first parameter
-   * may be either Triangulation,
-   * DoFHandler, hp::DoFHandler, or
-   * MGDoFHandler.
+   * mesh that is located closest
+   * to a given point.
+   *
+   * @param container A variable of a type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * @param p The point for which we want to find the closest vertex.
+   * @return The index of the closest vertex found.
    *
    * @author Ralf B. Schulz, 2006
    */
@@ -382,10 +383,6 @@ namespace GridTools
    * Find and return a vector of
    * iterators to active cells that
    * surround a given vertex with index @p vertex_index.
-   * The type of the first parameter
-   * may be either Triangulation,
-   * DoFHandler, hp::DoFHandler, or
-   * MGDoFHandler.
    *
    * For locally refined grids, the
    * vertex itself might not be a vertex
@@ -394,6 +391,12 @@ namespace GridTools
    * always be either a vertex of a cell or be
    * a hanging node located on a face or an
    * edge of it.
+   *
+   * @param container A variable of a type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * @param vertex_index The index of the vertex for which we try to
+   *   find adjacent cells.
+   * @return A vector of cells that lie adjacent to the given vertex.
    *
    * @note If the point requested does not lie in any of the cells of
    * the mesh given, then this function throws an exception of type
@@ -412,9 +415,7 @@ namespace GridTools
 
   /**
    * Find and return an iterator to the active cell that surrounds a
-   * given point @p ref. The type of the first parameter may be either
-   * Triangulation, or one of the DoF handler classes, i.e. we can find the
-   * cell around a point for iterators into each of these classes.
+   * given point.
    *
    * This is solely a wrapper function for the function of same name
    * below.  A Q1 mapping is used for the boundary, and the iterator
@@ -423,6 +424,12 @@ namespace GridTools
    * It is recommended to use the other version of this function, as
    * it simultaneously delivers the local coordinate of the given
    * point without additional computational cost.
+   *
+   * @param container A variable of a type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * @param p The point for which we want to find the surrounding cell.
+   * @return An iterator into the mesh container that points to the
+   *   surrounding cell.
    *
    * @note If the point requested does not lie in any of the cells of
    * the mesh given, then this function throws an exception of type
@@ -444,10 +451,7 @@ namespace GridTools
 
   /**
    * Find and return an iterator to the active cell that surrounds a
-   * given point @p p. The type of the first parameter may be either
-   * Triangulation, DoFHandler, hp::DoFHandler, or MGDoFHandler, i.e.,
-   * we can find the cell around a point for iterators into each of
-   * these classes.
+   * given point @p p.
    *
    * The algorithm used in this function proceeds by first looking for
    * vertex located closest to the given point, see
@@ -464,13 +468,19 @@ namespace GridTools
    * algorithm tries to identify the cell that is of highest
    * refinement level.
    *
-   * The function returns an iterator to the cell, as well as the
-   * local position of the point inside the unit cell. This local
-   * position might be located slightly outside an actual unit cell,
-   * due to numerical roundoff.  Therefore, the point returned by this
-   * function should be projected onto the unit cell, using
-   * GeometryInfo::project_to_unit_cell.  This is not automatically
-   * performed by the algorithm.
+   * @param mapping The mapping used to determine whether the given
+   *   point is inside a given cell.
+   * @param container A variable of a type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * @param p The point for which we want to find the surrounding cell.
+   * @return An pair of an iterator into the mesh container that points to the
+   *   surrounding cell, and of the coordinates of that point inside the cell
+   *   in the reference coordinates of that cell. This local
+   *   position might be located slightly outside an actual unit cell,
+   *   due to numerical roundoff.  Therefore, the point returned by this
+   *   function should be projected onto the unit cell, using
+   *   GeometryInfo::project_to_unit_cell().  This is not automatically
+   *   performed by the algorithm.
    *
    * @note If the point requested does not lie in any of the cells of
    * the mesh given, then this function throws an exception of type
@@ -518,7 +528,7 @@ namespace GridTools
                                  const Point<spacedim>     &p);
 
   /**
-   * Return a list of all descendents of
+   * Return a list of all descendants of
    * the given cell that are active. For
    * example, if the current cell is once
    * refined but none of its children are
@@ -530,10 +540,13 @@ namespace GridTools
    * (because the cell has no children that
    * may be active).
    *
-   * Since in C++ the type of the Container
-   * template argument (which can be
-   * Triangulation, DoFHandler,
-   * MGDoFHandler, or hp::DoFHandler) can
+   * @tparam Container A type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * @param cell An iterator pointing to a cell of the mesh container.
+   * @return A list of active descendants of the given cell
+   *
+   * @note Since in C++ the type of the Container
+   * template argument can
    * not be deduced from a function call,
    * you will have to specify it after the
    * function name, as for example in
@@ -549,6 +562,11 @@ namespace GridTools
    * Extract the active cells around a given
    * cell @p cell and return them in the
    * vector @p active_neighbors.
+   *
+   * @tparam Container A type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * @param cell[in] An iterator pointing to a cell of the mesh container.
+   * @param active_neighbors[out] A list of active descendants of the given cell
    */
   template <class Container>
   void
@@ -787,11 +805,14 @@ namespace GridTools
    *
    * Note that the list of these
    * iterators is not necessarily
-   * order, and does also not
+   * ordered, and does also not
    * necessarily coincide with the
    * order in which cells are
    * traversed in one, or both, of
    * the meshes given as arguments.
+   *
+   * @tparam Container A type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
    */
   template <typename Container>
   std::list<std::pair<typename Container::cell_iterator,
@@ -830,6 +851,9 @@ namespace GridTools
    * representing triangulations or
    * the classes built on
    * triangulations.
+   *
+   * @tparam Container A type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
    */
   template <typename Container>
   bool
@@ -950,11 +974,10 @@ namespace GridTools
    * loops over all subfaces of current face adds the neighbors behind these
    * sub-faces to the list to be returned.
    *
-   * The <code>Container</code> template argument can be either a triangulation
-   * or any of the DoF handler classes. Because the C++ language specifies that
-   * the container type can not be inferred from an iterator alone, you will
-   * need to explicitly specify the template argument when calling this
-   * function.
+   * @tparam Container A type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * @param cell[in] An iterator pointing to a cell of the mesh container.
+   * @return A list of active cells that form the patch around the given cell
    *
    * @note Patches are often used in defining error estimators that require the
    * solution of a local problem on the patch surrounding each of the cells of
@@ -1012,7 +1035,7 @@ namespace GridTools
    * extracted. The function is used in
    * step-38.
    *
-   * It also builds a mapping linking the
+   * The function also builds a mapping linking the
    * cells on the surface mesh to the
    * corresponding faces on the volume
    * one. This mapping is the return value
@@ -1041,26 +1064,21 @@ namespace GridTools
    * you may want to use to determine the
    * location of new vertices.
    *
-   * @note Oftentimes, the
-   * <code>Container</code>
-   * template type will be of kind
-   * Triangulation; in that case,
-   * the map that is returned will
-   * be between Triangulation cell
-   * iterators of the surface mesh
-   * and Triangulation face
+   *
+   * @tparam Container A type that satisfies the
+   * requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * The map that is returned will
+   * be between cell
+   * iterators pointing into the container describing the surface mesh
+   * and face
    * iterators of the volume
-   * mesh. However, one often needs
-   * to have this mapping between
-   * DoFHandler (or hp::DoFHandler)
-   * iterators. In that case, you
-   * can pass DoFHandler arguments
-   * as first and second parameter;
-   * the function will in that case
+   * mesh container. If the Container argument is
+   * DoFHandler of hp::DoFHandler, then
+   * the function will
    * re-build the triangulation
    * underlying the second argument
    * and return a map between
-   * DoFHandler iterators. However,
+   * appropriate iterators into the Container arguments. However,
    * the function will not actually
    * distribute degrees of freedom
    * on this newly created surface
@@ -1225,6 +1243,9 @@ namespace GridTools
    * them to the corresponding vertices of the 'second' boundary. This can
    * be used to implement conditions such as $u(0,y)=u(1,y+1)$.
    *
+   * @tparam Container A type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   *
    * @note The created std::vector can be used in
    * DoFTools::make_periodicity_constraints and in
    * parallel::distributed::Triangulation::add_periodicity to enforce
@@ -1237,15 +1258,15 @@ namespace GridTools
    *
    * @author Daniel Arndt, Matthias Maier, 2013
    */
-  template<typename CONTAINER>
+  template <typename Container>
   void
   collect_periodic_faces
-  (const CONTAINER &container,
+  (const Container &container,
    const types::boundary_id b_id1,
    const types::boundary_id b_id2,
    const int                direction,
-   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
-   const dealii::Tensor<1,CONTAINER::space_dimension> &offset = dealii::Tensor<1,CONTAINER::space_dimension>());
+   std::vector<PeriodicFacePair<typename Container::cell_iterator> > &matched_pairs,
+   const dealii::Tensor<1,Container::space_dimension> &offset = dealii::Tensor<1,Container::space_dimension>());
 
 
   /**
@@ -1262,20 +1283,23 @@ namespace GridTools
    * This function will collect periodic face pairs on the coarsest mesh level
    * and add them to @p matched_pairs leaving the original contents intact.
    *
+   * @tparam Container A type that satisfies the
+   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   *
    * @note This version of collect_periodic_face_pairs  will not work on
    * meshes with cells not in @ref GlossFaceOrientation
    * "standard orientation".
    *
    * @author Daniel Arndt, Matthias Maier, 2013
    */
-  template<typename CONTAINER>
+  template <typename Container>
   void
   collect_periodic_faces
-  (const CONTAINER                 &container,
+  (const Container         &container,
    const types::boundary_id b_id,
    const int                direction,
-   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
-   const dealii::Tensor<1,CONTAINER::space_dimension> &offset = dealii::Tensor<1,CONTAINER::space_dimension>());
+   std::vector<PeriodicFacePair<typename Container::cell_iterator> > &matched_pairs,
+   const dealii::Tensor<1,Container::space_dimension> &offset = dealii::Tensor<1,Container::space_dimension>());
 
   /*@}*/
   /**

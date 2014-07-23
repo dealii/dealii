@@ -454,6 +454,9 @@ namespace internal
  *  dimension and there only exist specialized versions for distinct
  *  dimensions.
  *
+ *  This class satisfies the requirements outlined in
+ *  @ref GlossMeshAsAContainer "Meshes as containers".
+ *
  *
  *  <h3>Structure and iterators</h3>
  *

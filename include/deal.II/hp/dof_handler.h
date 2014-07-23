@@ -69,7 +69,8 @@ namespace hp
 
   /**
    * Manage the distribution and numbering of the degrees of freedom for
-   * hp-FEM algorithms.
+   * hp-FEM algorithms. This class satisfies the requirements outlined in
+   * @ref GlossMeshAsAContainer "Meshes as containers".
    *
    * This class has not yet been implemented for the use in the codimension
    * one case (<tt>spacedim != dim </tt>).

@@ -67,10 +67,11 @@ namespace internal
 
 /**
  * Manage the distribution and numbering of the degrees of freedom for
- * non-multigrid algorithms. The purpose of this class is first discussed
- * in the step-2 tutorial program.
+ * non-multigrid algorithms. This class satisfies the requirements outlined in
+ * @ref GlossMeshAsAContainer "Meshes as containers". It is first used in the
+ * step-2 tutorial program.
  *
- * For each vertex, line, quad, etc, we store a list of the indices of degrees
+ * For each vertex, line, quad, etc, this class stores a list of the indices of degrees
  * of freedom living on this object. These indices refer to the unconstrained
  * degrees of freedom, i.e. constrained degrees of freedom are numbered in the
  * same way as unconstrained ones, and are only later eliminated.  This leads
