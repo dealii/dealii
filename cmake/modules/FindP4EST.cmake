@@ -141,7 +141,12 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   #
   # We cannot rely on the fact that SUBMINOR or PATCH are defined.
   # Nevertheless, we need a full version number for our preprocessor macros
-  # to work. Therefore, set those numbers to 0 if necessary.
+  # to work. If the p4est version number is only of the form x.y instead of
+  # a.b.c.d, then the last two REGEX_REPLACE calls above will have failed
+  # because the regular expression didn't match the version string,
+  # and P4EST_VERSION_SUBMINOR and P4EST_VERSION_PATCH will either be
+  # empty or be the full version string. In those cases, set those numbers
+  # to 0 if necessary.
   #
   IF("${P4EST_VERSION_SUBMINOR}" MATCHES "^(|${P4EST_VERSION})$")
     SET(P4EST_VERSION_SUBMINOR "0")
