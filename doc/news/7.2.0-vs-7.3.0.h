@@ -18,8 +18,7 @@
  * @page changes_between_7_2_and_7_3 Changes between Version 7.2 and 7.3
 
 <p>
-This is the list of changes made between the release of
-deal.II version 7.2.0 and that of 7.3.0.
+This is the list of changes made between the deal.II releases listed above.
 All entries are signed with the names of the author.
 </p>
 

@@ -1,16 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-<body>
+/**
+ * @page changes_between_3_0_0_and_3_0_1 Changes between Version 3.0.0 and 3.0.1
 
-
-<h2>Changes between versions 3.0 and 3.0.1</h2>
+<p>
+This is the list of changes made between the deal.II releases listed above.
+All entries are signed with the names of the author.
+</p>
 
 <ol>
   <li> <p>
@@ -23,22 +33,22 @@
 
   <li> <p>
        Fix: getting the support points from system finite elements
-       (class <code class="class">FESystem</code>) resulted in an
+       (class <code>FESystem</code>) resulted in an
        exception. 
        <br>
        (WB 2000/05/10)
        </p>
 
   <li> <p>
-       Fix: <code class="member">FullMatrix::Tmmult</code> and
-       <code class="member">FullMatrix::Tvmult</code> were broken.
+       Fix: <code>FullMatrix::Tmmult</code> and
+       <code>FullMatrix::Tvmult</code> were broken.
        <br>
        (WB 2000/05/08 and 2000/05/26)
        </p>
 
   <li> <p>
        Fix: slight bug in 
-       <code class="member">DataOut::build_patches</code>
+       <code>DataOut::build_patches</code>
        in multithreaded mode fixed.
        <br>
        (Ralf Hartmann, 2000/05/29)
@@ -46,7 +56,7 @@
 
   <li> <p>
        Fix: 
-       <code class="member">SparsityPattern::print_gnuplot</code>
+       <code>SparsityPattern::print_gnuplot</code>
        wrote rows and columns exchanged. Since most matrices have
        symmetric sparsity patterns, this has gone unnoticed by now.
        <br>
@@ -64,10 +74,4 @@
        </p>
 </ol>
 
-
-<hr>
-Last update $Date$
-
-</body>
-</html>
-
+*/

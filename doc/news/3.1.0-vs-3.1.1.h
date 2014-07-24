@@ -1,16 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-<body>
+/**
+ * @page changes_between_3_1_0_and_3_1_1 Changes between Version 3.1.0 and 3.1.1
 
-
-<h2>Changes between versions 3.1 and 3.1.1</h2>
+<p>
+This is the list of changes made between the deal.II releases listed above.
+All entries are signed with the names of the author.
+</p>
 
 <ol>
   <li> <p>
@@ -27,7 +37,7 @@
        class="class">GridOut</code>::<code
        class="member">write_ucd_faces</code> function are now also
        1-based. This, to be consistent with the vertex numbers given
-       by the <code class="class">GridOut</code>::<code
+       by the <code>GridOut</code>::<code
        class="member">write_ucd</code> function.
        <br>
        (RH 2001/04/20)
@@ -45,7 +55,7 @@
        
   <li> <p>
        Fixed: When using Neuman boundary functions in the 
-       <code class="class">KellyErrorEstimator</code> class, it was
+       <code>KellyErrorEstimator</code> class, it was
        assumed that the function object had <code
        class="member">Function::vector_value</code> overloaded, even
        in the scalar case. We now use <code
@@ -58,12 +68,12 @@
        New/Fixed: Now there exists a new <code
        class="class">Triangulation</code>::<code
        class="member">ExcMultiplySetLineInfoOfLine</code> exception,
-       that is thrown if the <code class="class">SubCellData</code>
+       that is thrown if the <code>SubCellData</code>
        that is given to <code
        class="class">Triangulation</code>::<code
        class="member">create_triangulation</code>, multiply includes
        the line info of a specific line. Before the fix the wrong
-       <code class="member">ExcInteriorLineCantBeBoundary</code>
+       <code>ExcInteriorLineCantBeBoundary</code>
        exception was thrown.
        <br>
        (RH 2001/04/03)
@@ -121,7 +131,7 @@
        </p>
 
   <li> <p>
-       New: The class <code class="class">GridReordering::Cell</code> has
+       New: The class <code>GridReordering::Cell</code> has
        now a copy constructor to work around a bug in a gcc3.0
        snapshot.
        <br>
@@ -169,9 +179,4 @@
 </ol>
 
 
-<hr>
-Last update $Date$
-
-</body>
-</html>
-
+*/

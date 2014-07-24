@@ -18,8 +18,7 @@
  * @page changes_between_7_3_and_8_0 Changes between Version 7.3 and 8.0
 
 <p>
-This is the list of changes made between the release of
-deal.II version 7.3.0 and that of 8.0.0.
+This is the list of changes made between the deal.II releases listed above.
 All entries are signed with the names of the authors.
 </p>
 

@@ -1,32 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<body>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-
-<h2>Changes between versions 3.3.0 and 3.4.0</h2>
-
-<p>
-This is a quite extensive list of changes made between versions 3.3.0
-and 3.4.0 of <acronym>deal.II</acronym>. It is subdivided into changes
-made to the three sub-libraries <a href="#base">base</a>, <a
-href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
-changes to the <a href="#general">general infrastructure,
-documentation, etc</a>.
-</p>
+/**
+ * @page changes_between_3_3_and_3_4 Changes between Version 3.3 and 3.4
 
 <p>
-All entries are signed with the names of the author. Regular
-contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
-(Guido Kanschat), RH (Ralf Hartmann), BK (Benjamin S. Kirk).
+This is the list of changes made between the deal.II releases listed above.
+All entries are signed with the names of the author.
 </p>
-
 
 <a name="general"></a>
 <h3>General</h3>
@@ -70,7 +64,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       New: In all previous versions, <acronym>deal.II</acronym> used
+       New: In all previous versions, deal.II used
        the <a href="http://www.cs.wustl.edu/~schmidt/ACE.html"
        target="_top">ACE (Adaptive Communications Environment)</a>
        library to support cross-platform threading
@@ -129,7 +123,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        Fixed: For gcc versions that used <code
        class="class">ostrstream</code> instead of <code
        class="class">ostringstream</code>, it was necessary to append
-       a final <code class="member">std::ends</code> when piping text
+       a final <code>std::ends</code> when piping text
        into the string stream. This was not previously
        conditionalized, but done for old and new classes.
        <br>
@@ -171,9 +165,9 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
-       New: The <code class="class">vector2d</code> row accessor
+       New: The <code>vector2d</code> row accessor
        classes now have member functions <code
-       class="member">begin</code> and <code class="member">end</code>
+       class="member">begin</code> and <code>end</code>
        which allow iterating over the elements of a row of such an
        object. 
        <br>
@@ -181,8 +175,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       New: The <code class="class">Legendre</code> and
-       <code class="class">LagrangeEquidistant</code> classes now have
+       New: The <code>Legendre</code> and
+       <code>LagrangeEquidistant</code> classes now have
        static member functions <code
        class="member">generate_complete_basis</code> which returns an
        array of polynomial objects spanning the complete space up to a
@@ -193,8 +187,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Changed: The <code class="class">Polynomial</code> and
-       <code class="class">LagrangeEquidistant</code> classes have lost
+       Changed: The <code>Polynomial</code> and
+       <code>LagrangeEquidistant</code> classes have lost
        their default constructor, as that did not make much sense
        anyway.
        <br>
@@ -211,9 +205,9 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Fixed: The class <code class="class">TensorFunction</code>
-       now uses local types <code class="class">value_type</code> and
-       <code class="class">gradient_type</code> as return values of
+       Fixed: The class <code>TensorFunction</code>
+       now uses local types <code>value_type</code> and
+       <code>gradient_type</code> as return values of
        its member functions. This works around a bug in Sun's Forte
        C++ compilers.
        <br>
@@ -221,8 +215,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Improved: The <code class="member">AssertThrow</code> macro now
-       uses <code class="member">__builtin_expect</code> if the
+       Improved: The <code>AssertThrow</code> macro now
+       uses <code>__builtin_expect</code> if the
        compiler supports this. This indicates to the compiler that we
        expect the condition to be true and that throwing an exception
        is a rare case. By this information, the compiler can help the
@@ -233,19 +227,19 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p>
-       New: The <code class="class">vector2d</code> class now not only
+       New: The <code>vector2d</code> class now not only
        allows access to elements through the <code
        class="member">operator()(unsingned int,unsigned int)</code>
        (i.e. matrix or Fortran style access), but also through nested
-       brackets via an <code class="member">operator[]</code>
+       brackets via an <code>operator[]</code>
        (i.e. like to a two-dimensional C-style array).
        <br>
        (WB 2002/03/08)
        </p> 
 
   <li> <p>
-       Changed: The function <code class="class">MultithreadInfo</code>::
-       <code class="member">get_n_cpus</code> now reports the proper number
+       Changed: The function <code>MultithreadInfo</code>::
+       <code>get_n_cpus</code> now reports the proper number
        of CPUs when running on Silicon Graphics.
        <br>
        (BK 2002/02/19)
@@ -255,14 +249,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        Changed: The quite logorrhoeic function name <code
        class="class">TensorProductPolynomials</code>::<code
        class="member">n_tensor_product_polynomials</code> was changed to
-       <code class="member">n</code> to be compliant wth the new class <code
+       <code>n</code> to be compliant wth the new class <code
        class="class">PolynomialSpace</code>.
        <br>
        (GK 2002/02/11)
        </p>
 
   <li> <p> 
-       New: The class <code class="class">PolynomialSpace</code>
+       New: The class <code>PolynomialSpace</code>
        implements the space of polynomials at most a certain degree in
        arbitrary space dimensions.
        <br>
@@ -270,8 +264,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       New: The function <code class="class">DataOutBase</code>::
-       <code class="member">write_tecplot_binary</code> has been
+       New: The function <code>DataOutBase</code>::
+       <code>write_tecplot_binary</code> has been
        added.  This function will write Tecplot binary files if the
        Tecplot API is detected by ./configure.  To use this feature be
        sure that the environment variable TECHOME points to a valid
@@ -294,7 +288,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>lac</h3>
 
 <ol>
-  <li> <p> Improved: <code class="class">SolverGMRES</code> allocates
+  <li> <p> Improved: <code>SolverGMRES</code> allocates
        basis vectors only, when they are needed. Therefore, it is safe
        now to ask for a basis larger than the expected number of
        iteration steps. On the other hand, memory allocation failures
@@ -329,9 +323,9 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p> 
-       New: The <code class="class">GeometryInfo</code> class now
+       New: The <code>GeometryInfo</code> class now
        provides two methods,
-       <code class="member">unit_cell_vertex</code> and <code
+       <code>unit_cell_vertex</code> and <code
        class="member">vertices_adjacent_to_line</code>, that reveal
        something about the placement and numbering of vertices on the
        uni cell.
@@ -340,8 +334,8 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       New: The <code class="class">GridOut::</code>
-       <code class="member">write_dx</code> function is now implemented.
+       New: The <code>GridOut::</code>
+       <code>write_dx</code> function is now implemented.
        It allows to write the mesh (cells and faces) with some additional
        information that may be useful once in a while.
        <br>
@@ -349,7 +343,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Fixed: The <code class="class">IteratorState::IteratorState</code>
+       Fixed: The <code>IteratorState::IteratorState</code>
        enum is now called <code
        class="class">IteratorState::IteratorStates</code>. This works
        around a bug in Sun's Forte C++ compilers which can't handle
@@ -370,7 +364,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Fixed: <code class="member">TriaAccessor<3,3>::measure</code>
+       Fixed: <code>TriaAccessor<3,3>::measure</code>
        sometimes computed a negative value. This is now fixed.
        <br> 
        (WB 2002/02/21)
@@ -378,14 +372,10 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
   <li> <p> 
        New: Finite element family with complete polynomial spaces
-       for discontinuous Galerkin: <code class="class">FE_DGP</code>
+       for discontinuous Galerkin: <code>FE_DGP</code>
        <br> 
        (GK 2002/02/11)
        </p>
 </ol>
 
-<hr>
-Last update $Date$
-
-</body>
-</html>
+*/

@@ -1,20 +1,33 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-<body>
+/**
+ * @page changes_between_3_2_0_and_3_2_1 Changes between Version 3.2.0 and 3.2.1
+
+<p>
+This is the list of changes made between the deal.II releases listed above.
+All entries are signed with the names of the author.
+</p>
 
 
 <h2>Changes between versions 3.2.0 and 3.2.1</h2>
 
 <ol>
   <li> <p>
-       Fixed: In the <code class="class">ParameterHandler</code>
+       Fixed: In the <code>ParameterHandler</code>
        class, we leaked 8 or 12 bytes of memory per declared
        parameter. This is now fixed.
        <br>
@@ -22,7 +35,7 @@
        </p>
 
   <li> <p>
-       Fixed: he <code class="class">DoFHandler</code> class had a
+       Fixed: he <code>DoFHandler</code> class had a
        memory leak. This is now fixed.
        <br>
        (WB 2001/11/28)
@@ -52,7 +65,7 @@
 
   <li> <p>
        Fixed: when checking for convergence in linear solvers in
-       <code class="member">SolverControl::check</code>, we first
+       <code>SolverControl::check</code>, we first
        checked whether the maximal iteration count was reached, and
        only then whether the target residual was achieved. In cases,
        where the target residual was only reached in the very last
@@ -95,7 +108,7 @@
        </p>
 
   <li> <p>
-       Fixed: class <code class="class">SparsityPattern</code> can
+       Fixed: class <code>SparsityPattern</code> can
        handle rows of length zero now. For quadratic matrices, these
        rows are changed to length one, since a diagonal element must
        be stored.
@@ -104,10 +117,10 @@
        </p>
 
   <li> <p>
-       Fixed: The <code class="class">DataOutBase::EpsFlags</code>
+       Fixed: The <code>DataOutBase::EpsFlags</code>
        class forgot to declare the reverse grey scale function as one
        possible input for the color function for the
-       <code class="class">ParameterHandler</code> class. This is now
+       <code>ParameterHandler</code> class. This is now
        possible.
        <br>
        (WB 2001/10/10)
@@ -122,8 +135,4 @@
 </ol>
 
 
-<hr>
-
-</body>
-</html>
-
+*/

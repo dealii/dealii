@@ -1,23 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<body>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
+/**
+ * @page changes_between_3_2_and_3_3 Changes between Version 3.2 and 3.3
 
-<h2>Changes between versions 3.2.0 and 3.3.0</h2>
-
-This is a quite extensive list of changes made between versions 3.2.0
-and 3.3.0 of <acronym>deal.II</acronym>. It is subdivided into changes
-made to the three sub-libraries <a href="#base">base</a>, <a
-href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
-changes to the <a href="#general">general infrastructure,
-documentation, etc</a>.
+<p>
+This is the list of changes made between the deal.II releases listed above.
+All entries are signed with the names of the author.
+</p>
 
 
 <a name="general"></a>
@@ -89,7 +92,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <acronym>deal.II</acronym> now uses a file
+       New: deal.II now uses a file
        <code>config.h</code> for most global preprocessor defines,
        instead of an overly long list of compiler flags given on the
        command line.
@@ -99,9 +102,9 @@ documentation, etc</a>.
 
   <li> <p>
        Changed: If available, the library now uses the C++ standard
-       classes <code class="class">istringstream</code> and <code
+       classes <code>istringstream</code> and <code
        class="class">ostringstream</code> over the old classes
-       <code class="class">i/ostrstream</code>. The ./configure script
+       <code>i/ostrstream</code>. The ./configure script
        finds out whether the new classes exist, or whether the
        backward compatibility classes are to be used.
        <br>
@@ -171,15 +174,15 @@ documentation, etc</a>.
        aborted the program. In that case only report the error and
        write out an indication why we do not abort the program any
        more. On the other hand, also suppress output of further failed
-       <code class="member">Assert()</code> calls, since they often
+       <code>Assert()</code> calls, since they often
        are follow-ups of the first one.
        <br>
        (WB 2002/01/09)
        </p>
 
   <li> <p>
-       New: <code class="class">ExcFileNotOpen</code> can be used
-       after initializing an <code class="class">fstream</code>
+       New: <code>ExcFileNotOpen</code> can be used
+       after initializing an <code>fstream</code>
        object. This allows to avoid some cryptic <code
        class="class">ExcIO</code>s.
        <br>
@@ -187,15 +190,15 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Changed: The <code class="class">OutputStyle</code> enum used
+       Changed: The <code>OutputStyle</code> enum used
        to indicate the output format has been moved into the
-       <code class="class">ParameterHandler</code> class.
+       <code>ParameterHandler</code> class.
        <br>
        (WB 2001/11/30)
        </p>
 
   <li> <p>
-       Fixed: In the <code class="class">ParameterHandler</code>
+       Fixed: In the <code>ParameterHandler</code>
        class, we leaked 8 or 12 bytes of memory per declared
        parameter. This is now fixed.
        <br>
@@ -203,9 +206,9 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="class">Functions::CutOffFunctionCinfty</code>,
-       <code class="class">Functions::CutOffFunctionW1</code>, and
-       <code class="class">Functions::CutOffFunctionLinfty</code>
+       New: <code>Functions::CutOffFunctionCinfty</code>,
+       <code>Functions::CutOffFunctionW1</code>, and
+       <code>Functions::CutOffFunctionLinfty</code>
        implement functions with support in an arbitrary ball and
        differentiability as indicated by their name
        <br>
@@ -213,10 +216,10 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Fixed: The <code class="class">DataOutBase::EpsFlags</code>
+       Fixed: The <code>DataOutBase::EpsFlags</code>
        class forgot to declare the reverse grey scale function as one
        possible input for the color function for the
-       <code class="class">ParameterHandler</code> class. This is now
+       <code>ParameterHandler</code> class. This is now
        possible.
        <br>
        (WB 2001/10/10)
@@ -256,8 +259,8 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Improved: reinit function of <code class="class">Vector</code>
-       and <code class="class">BlockVector</code> allows use of a
+       Improved: reinit function of <code>Vector</code>
+       and <code>BlockVector</code> allows use of a
        vector with different number type.
        <br>
        (GK 2001/11/21)
@@ -265,7 +268,7 @@ documentation, etc</a>.
 
   <li> <p>
        Fixed: when checking for convergence in linear solvers in
-       <code class="member">SolverControl::check</code>, we first
+       <code>SolverControl::check</code>, we first
        checked whether the maximal iteration count was reached, and
        only then whether the target residual was achieved. In cases,
        where the target residual was only reached in the very last
@@ -276,7 +279,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: the <code class="class">SparseDirectMA27/47</code> classes
+       New: the <code>SparseDirectMA27/47</code> classes
        now provide access to Mutex locks for external
        synchronisation. 
        <br>
@@ -300,15 +303,15 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Improved: class <code class="class">SolverGMRES</code> accepts
-       a parameter in <code class="class">AdditionalData</code>,
+       Improved: class <code>SolverGMRES</code> accepts
+       a parameter in <code>AdditionalData</code>,
        allowing for right preconditioning.
        <br>
        (GK 2001/11/09)
        </p>
 
   <li> <p>
-       Fixed: class <code class="class">SparsityPattern</code> can
+       Fixed: class <code>SparsityPattern</code> can
        handle rows of length zero now. For quadratic matrices, these
        rows are changed to length one, since a diagonal element must
        be stored.
@@ -317,14 +320,14 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: The <code class="class">BlockVector</code> now has a
+       New: The <code>BlockVector</code> now has a
        full-fledged random access iterator type, working in exactly
        the same way as the iterators of the C++ standard containers.
        <br>
        (WB 2001/09/28)
        </p>
 
-  <li> <p> New: <code class="class">Vector</code>::<code
+  <li> <p> New: <code>Vector</code>::<code
        class="member">operator *</code> is now templatized, allowing
        for scalar products of vectors with different underlying types.
        <br>
@@ -339,22 +342,22 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       Changed: The classes <code class="class">FEQ1</code>-<code
+       Changed: The classes <code>FEQ1</code>-<code
        class="class">FEQ4</code>, <code
-       class="class">FEDG_Q1</code><code class="class">FEDG_Q4</code>
+       class="class">FEDG_Q1</code><code>FEDG_Q4</code>
        as well as the files with their definitions,
        <tt>fe/fe_lib.lagrange.h</tt> and <tt>fe/fe_lib.dg.h</tt>
        ceased to exist. They had been left in for backward
        compatibility in an earlier version, but their existence is
        more confusing than helpful. Please change your code to use the
-       classes <code class="class">FE_Q</code> and <code
+       classes <code>FE_Q</code> and <code
        class="class">FE_DGQ</code>, respectively.
        <br>
        (GK 2002/02/01)
        </p>
 
   <li> <p>
-       New: The <code class="class">FilteredIterator</code> class
+       New: The <code>FilteredIterator</code> class
        provides a view on ranges of iterators by iterating over only
        those objects that satisfy a certain predicate.
        <br>
@@ -363,7 +366,7 @@ documentation, etc</a>.
 
   <li> <p>
        Improved: It is now possible to read in unconnected domains
-       through the <code class="class">GridIn</code> class, since
+       through the <code>GridIn</code> class, since
        renumbering the cells now also works for these domains.
        <br>
        (<a href="mailto:ms@biomech.tu-graz.ac.at">Michael Stadler</a> 2001/12/14)
@@ -374,14 +377,14 @@ documentation, etc</a>.
        class="class">VectorTools</code>::<code
        class="member">compute_mean_value</code> take ingoing and
        outgoing vector types as template arguments. This allows
-       applying them to <code class="class">BlockVector</code>.
+       applying them to <code>BlockVector</code>.
        <br>
        (GK 2001/12/07)
        </p>
 
   <li> <p>
-       New: <code class="class">GridGenerator</code> has a function
-       <code class="member">cylinder</code> for cylinders in three
+       New: <code>GridGenerator</code> has a function
+       <code>cylinder</code> for cylinders in three
        space dimensions. Accoridngly, a class <code
        class="class">CylinderBoundary</code> has been created.
        <br>
@@ -389,7 +392,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="class">FiniteElement</code>::<code
+       New: <code>FiniteElement</code>::<code
        class="member">has_support_on_face</code> allows to check
        whether a shape function has non-zero values on a certain face
        of a cell.
@@ -398,7 +401,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Changed: The <code class="class">IteratorState</code> enum used
+       Changed: The <code>IteratorState</code> enum used
        to indicate the state in which an iterator can be is now
        enclosed in a namespace of the same name, to take its members
        out of the global namespace. When using one of these members,
@@ -409,11 +412,11 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Changed: The <code class="class">NormType</code> enum used to
+       Changed: The <code>NormType</code> enum used to
        indicate the norm the <code
        class="member">VectorTools::integrate_difference</code>
        function shall integrate is moved from the global namespace
-       into the <code class="class">VectorTools</code> class. You
+       into the <code>VectorTools</code> class. You
        therefore have to prefix the members of this enum by the
        respective class name.
        <br>
@@ -429,7 +432,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Fixed: The <code class="class">DoFHandler</code> class had a
+       Fixed: The <code>DoFHandler</code> class had a
        memory leak. This is now fixed. Likewise for the <code
        class="class">MGDoFHandler</code> class.
        <br>
@@ -485,7 +488,7 @@ documentation, etc</a>.
        <em>subdomain_id</em> which can be used in parallel
        computations to identify which cells are handled on which
        processor. These flags are read and set using the functions
-       <code class="member">cell->subdomain_id()</code> and <code
+       <code>cell->subdomain_id()</code> and <code
        class="member">cell->set_subdomain_id(new_id)</code>. The
        subdomain ids are unsigned integers, so should be sufficiently
        large also for larger numbers of subdomains.
@@ -515,7 +518,7 @@ documentation, etc</a>.
        class="class">VectorTools</code>::<code
        class="member">integrate_difference</code> take ingoing and
        outgoing vector types as template arguments. This allows
-       applying them to <code class="class">BlockVector</code> and of
+       applying them to <code>BlockVector</code> and of
        outputting a vector of doubles suitable for <code
        class="class">DataOut</code>.
        <br>
@@ -524,7 +527,7 @@ documentation, etc</a>.
 
   <li> <p>
        Fixed: Functions creating sparsity patterns for DG elements in
-       <code class="class">DoFTools</code> get the pattern type as
+       <code>DoFTools</code> get the pattern type as
        template argument, too..
        <br>
        (GK 2001/10/01)
@@ -538,8 +541,4 @@ documentation, etc</a>.
        </p>
 </ol>
 
-<hr>
-Last update $Date$
-
-</body>
-</html>
+*/

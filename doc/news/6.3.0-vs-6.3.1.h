@@ -18,8 +18,7 @@
  * @page changes_between_6_3_0_and_6_3_1 Changes between Version 6.3.0 and 6.3.1
 
 <p>
-This is the list of changes made between the release of
-deal.II version 6.3.0 and version 6.3.1:
+This is the list of changes made between the deal.II releases listed above.
 </p>
 
 <p>
