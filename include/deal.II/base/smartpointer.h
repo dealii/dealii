@@ -72,7 +72,7 @@ public:
    */
   SmartPointer ();
 
-  /*
+  /**
    * Copy constructor for
    * SmartPointer. We do now
    * copy the object subscribed to
@@ -82,7 +82,7 @@ public:
   template <class Q>
   SmartPointer (const SmartPointer<T,Q> &tt);
 
-  /*
+  /**
    * Copy constructor for
    * SmartPointer. We do now
    * copy the object subscribed to
@@ -246,6 +246,7 @@ private:
    * short name.
    */
   T *t;
+
   /**
    * The identification for the
    * subscriptor.
