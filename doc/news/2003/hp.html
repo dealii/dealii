@@ -1,13 +1,27 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<body>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+/**
+ * @page changes_on_the_hp_branchbetween_1_0_and_2_0 Changes between Version 1.0 and 2.0
+
+<p>
+This is the list of changes made between the deal.II releases listed above.
+All entries are signed with the names of the author.
+</p>
+
 
 
 <h2>Changes on the hp branch</h2>
@@ -32,11 +46,11 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <ol>
   <li> <p>
        Changed:
-       Changed <code class="class">FE</code> to
-       <code class="class">FECollection</code> at several places and
+       Changed <code>FE</code> to
+       <code>FECollection</code> at several places and
        also changed depending functions accordingly. Modified the
-       <code class="member">reserve_space</code> method of
-       <code class="class">hpDoFHandler</code> to work for 2D
+       <code>reserve_space</code> method of
+       <code>hpDoFHandler</code> to work for 2D
        DG-problems. In this context the 2D code for
        <code class"member">pre_refinement_notification</code> was
        added as well.
@@ -47,85 +61,85 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
   <li> <p> 
        Changed: 
        Implemented a couple of small modifications to get a first 1D
-       hp-example running. The <code class="class">Triangulation</code>
+       hp-example running. The <code>Triangulation</code>
        class was extended by a method to add
-       <code class="class">RefinementListener</code>s, which allow
+       <code>RefinementListener</code>s, which allow
        other classes to be informed about Refinements. This is
-       needed for the <code class="class">hpDoFHandler</code>, which
-       administrates the <code class="member">active_fe_indices</code>
-       in the <code class="class">hpDoFLevel</code>s. Once this
+       needed for the <code>hpDoFHandler</code>, which
+       administrates the <code>active_fe_indices</code>
+       in the <code>hpDoFLevel</code>s. Once this
        was implemented, the other changes were straightforward. For
        1D, the only thing which had to be changed for hp was the
-       <code class="member">reserve_space</code> method.
+       <code>reserve_space</code> method.
        Last but not least, for the hp-example the
-       <code class="member">add</code> method was added to the
-       <code class="class">FECollection</code>. It allows the user to
-       add new <code class="class">FiniteElements</code>s to the
-       the <code class="class">FECollection</code>.
+       <code>add</code> method was added to the
+       <code>FECollection</code>. It allows the user to
+       add new <code>FiniteElements</code>s to the
+       the <code>FECollection</code>.
        <br>
        (Oliver Kayser-Herold 2003/06/01)
        </p>
 
   <li> <p> 
-       Changed: Introduced the <code class="class">DoFHandler</code>
-       as template parameter in classes <code class="class">DataOutStack</code>,
-       <code class="class">DataOutFaces</code>, <code class="class">DataOut</code> and 
-       <code class="class">DataOut_DoFData</code>.
-       <code class="class">DoFHandler</code> is used as default
+       Changed: Introduced the <code>DoFHandler</code>
+       as template parameter in classes <code>DataOutStack</code>,
+       <code>DataOutFaces</code>, <code>DataOut</code> and 
+       <code>DataOut_DoFData</code>.
+       <code>DoFHandler</code> is used as default
        template argument to ensure backward compatibility. Added
-       an overloaded method <code class="member">reinit</code> for the
-       new <code class="class">hpDoFHandler</code> in class
-       <code class="class">FEValues</code>. Modified method
-       <code class="member">interpolate_boundary_values</code> in
-       class <code class="class">VectorTools</code> to take the
-       <code class="class">DoFHandler</code> as template
+       an overloaded method <code>reinit</code> for the
+       new <code>hpDoFHandler</code> in class
+       <code>FEValues</code>. Modified method
+       <code>interpolate_boundary_values</code> in
+       class <code>VectorTools</code> to take the
+       <code>DoFHandler</code> as template
        argument. Probably this method must be changed later, when the real
-       <code class="class">hpDoFHandler</code> is implemented. Added
+       <code>hpDoFHandler</code> is implemented. Added
        the first implementation of the
-       <code class="class">hpDoFHandler</code> which is simply a copy
+       <code>hpDoFHandler</code> which is simply a copy
        of the old one. But it should provide a good basis for the new
-       one. Finally the <code class="class">DoFAccessor</code> is now
+       one. Finally the <code>DoFAccessor</code> is now
        instantiated for the new
-       <code class="class">hpDoFAccessor</code>. Overall these changes
+       <code>hpDoFAccessor</code>. Overall these changes
        now allow the compilation of some of the sample programs with
-       the new <code class="class">hpDoFAccessor</code> but obviously
+       the new <code>hpDoFAccessor</code> but obviously
        not yet with new functionality.
        <br>
        (Oliver Kayser-Herold 2003/02/18)
        </p>
 
   <li> <p> 
-       Changed: The <code class="member">DoFHandler::n_boundary_dofs</code>
+       Changed: The <code>DoFHandler::n_boundary_dofs</code>
        functions have been moved and renamed. They are now
-       <code class="member">DoFTools::count_boundary_dofs</code>.
+       <code>DoFTools::count_boundary_dofs</code>.
        <br>
        (WB 2003/02/18)
        </p>
 
   <li> <p> 
-       Changed: The <code class="class">DoFLevel</code> classes has been moved to
-       a namespace <code class="class">internal</code>, since they are not
+       Changed: The <code>DoFLevel</code> classes has been moved to
+       a namespace <code>internal</code>, since they are not
        meant for public use.
        <br>
        (WB 2003/02/18)
        </p>
 
   <li> <p> 
-       Changed: Many of the functions in <code class="class">DoFTools</code>
-       are now templatized to accept both <code class="class">DoFHandler</code>
-       and <code class="class">hpDoFHandler</code> objects.
+       Changed: Many of the functions in <code>DoFTools</code>
+       are now templatized to accept both <code>DoFHandler</code>
+       and <code>hpDoFHandler</code> objects.
        <br>
        (WB 2003/02/14)
        </p>
 
   <li> <p> 
-       Changed: The <code class="class">TriaDimensionInfo</code> and
-       <code class="class">DoFDimensionInfo</code> classes that were used to
+       Changed: The <code>TriaDimensionInfo</code> and
+       <code>DoFDimensionInfo</code> classes that were used to
        declare typedefs for the iterators have been moved to a namespace
        internal (so as to get them out of the class index in the documentation
        -- these classes were not meant for use in applications after all), and
-       have been renamed to <code class="class">TriaIteratorSelector</code>
-       and <code class="class">DoFIteratorSelector</code>, since that is what
+       have been renamed to <code>TriaIteratorSelector</code>
+       and <code>DoFIteratorSelector</code>, since that is what
        they are.
        <br>
        (WB 2003/02/13)
@@ -135,12 +149,12 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        Changed: Due to the demand for different <code
        class="class">DoFHandler</code> classes (mainly for the planned
        hp-DoFHandler) the DoFHandler has been introduced as a
-       template parameter into the <code class="class">DoFAccessor</code>,
-       the <code class="class">DoFObjectAccessor</code>,
-       and the <code class="class">DoFCellAccessor</code> classes.
-       Furthermore the <code class="class">DoFHandler</code> was
+       template parameter into the <code>DoFAccessor</code>,
+       the <code>DoFObjectAccessor</code>,
+       and the <code>DoFCellAccessor</code> classes.
+       Furthermore the <code>DoFHandler</code> was
        also introduced as template parameter into the
-       <code class="class">DoFDimensionInfo</code>
+       <code>DoFDimensionInfo</code>
        class. These changes induced several little changes in a couple
        of methods to get the code through the compiler. But no
        functionality was affected.
@@ -151,14 +165,14 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
   <li> <p> 
        Changed: There are now overloaded versions of the <code
        class="member">FEValues::reinit</code> function (and likewise in the
-       <code class="class">FEFaceValues</code> and <code
+       <code>FEFaceValues</code> and <code
        class="class">FESubFaceValues</code> classes) that either take a
-       <code class="member">Triangulation::cell_iterator</code> or a
-       <code class="member">DoFHandler::cell_iterator</code>. That means that
+       <code>Triangulation::cell_iterator</code> or a
+       <code>DoFHandler::cell_iterator</code>. That means that
        you can compute certain data with only the geometrical information the
        former provides, independent of whether degrees of freedom are
        associated with this cell or not. However, certain functions of the
-       <code class="class">FEValues</code> class will throw an error if you
+       <code>FEValues</code> class will throw an error if you
        attempt to use them without DoF data being delivered in the
        reinitialization call; these functions need to extract values from
        finite element fields, and are mostly the
@@ -172,9 +186,9 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
   <li> <p> 
        Changed: The <code
        class="member">Mapping::transform_real_to_unit_cell</code> and
-       <code class="member">Mapping::transform_unit_to_real_cell</code>
-       now only take a <code class="member">Triangulation::cell_iterator</code>
-       instead of a <code class="member">DoFHandler::cell_iterator</code> as
+       <code>Mapping::transform_unit_to_real_cell</code>
+       now only take a <code>Triangulation::cell_iterator</code>
+       instead of a <code>DoFHandler::cell_iterator</code> as
        previously. This is also reasonable, since they only need the geometric
        information.
        <br>
@@ -182,13 +196,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        </p>
 
   <li> <p> 
-       Changed: The <code class="member">FiniteElement::fill_fe_*_values</code>
-       now only take a <code class="member">Triangulation::cell_iterator</code>
-       instead of a <code class="member">DoFHandler::cell_iterator</code> as
+       Changed: The <code>FiniteElement::fill_fe_*_values</code>
+       now only take a <code>Triangulation::cell_iterator</code>
+       instead of a <code>DoFHandler::cell_iterator</code> as
        previously. Likewise for <code
        class="member">FiniteElementBase::compute_2nd</code> and <code
        class="member">FESystem::compute_fill</code>, and the 
-       <code class="member">Mapping::fill_fe_*_values</code> functions.
+       <code>Mapping::fill_fe_*_values</code> functions.
        <br>
        (WB 2003/01/20)
        </p>

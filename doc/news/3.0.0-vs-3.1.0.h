@@ -1,23 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-<body>
+/**
+ * @page changes_between_3_0_0_and_3_1_0 Changes between Version 3.0.0 and 3.1.0
 
-
-<h2>Changes between Versions 3.0 and 3.1</h2>
-
-This is a quite extensive list of changes made after the release of 
-<acronym>deal.II</acronym> version 3.0. It is subdivided into changes
-made to the three sub-libraries <a href="#base">base</a>, 
-<a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
-changes to the <a href="#general">general infrastructure,
-documentation, etc</a>.
+<p>
+This is the list of changes made between the deal.II releases listed above.
+All entries are signed with the names of the author.
+</p>
 
 
 
@@ -50,7 +53,7 @@ documentation, etc</a>.
 
   <li> <p>
        New: Major and minor version numbers of the
-       <acronym>deal.II</acronym> library are now passed to the
+       deal.II library are now passed to the
        compiler as preprocessor variables
        <code class="program">DEAL_2_MAJOR</code> and
        <code class="program">DEAL_2_MINOR</code>. Their present values
@@ -63,18 +66,18 @@ documentation, etc</a>.
   <li> <p>
        New: the <code class="program">step-9</code> example program is
        now ready, showing several advanced programming techniques in
-       <acronym>deal.II</acronym>. 
+       deal.II. 
        <br>
        (WB 2000/07/18)
        </p>
 
   <li> <p>
-       Changed: <acronym>deal.II</acronym> now uses the 
+       Changed: deal.II now uses the 
        <code class="program">kdoc2</code> program to generate the API
        documentation. This makes up for much nices documentation and
        also works better than the previous <code class="program">kdoc1</code>.
        A copy of <code class="program">kdoc2</code> is provided within
-       the <acronym>deal.II</acronym> source tree.
+       the deal.II source tree.
        <br>
        (WB 2000/06/28)
        </p>
@@ -150,7 +153,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Changed: License is now <acronym>deal.II</acronym> Public
+       Changed: License is now deal.II Public
        License, restricting commercial use more explicitely.
        <br>
        (WB/RH/GK)
@@ -165,15 +168,15 @@ documentation, etc</a>.
 <ol>
 
   <li> <p>
-       Improved: exceptions <code class="class">ExcIO</code> and <code
+       Improved: exceptions <code>ExcIO</code> and <code
        class="class">ExcOutOfMemory</code> are defined globally now.
        <br>
        (GK 2000/12/07)
        </p>
 
   <li> <p>
-       Improved: <code class="class">ParameterHandler</code> now has a
-       function <code class="member">log_parameters</code> which
+       Improved: <code>ParameterHandler</code> now has a
+       function <code>log_parameters</code> which
        allows output of all parameters to a log file.
        <br>
        (GK 2000/12/07)
@@ -181,26 +184,26 @@ documentation, etc</a>.
 
   <li> <p>
        New: almost all classes that store data now have a function
-       <code class="member">memory_consumption</code> that returns an
+       <code>memory_consumption</code> that returns an
        estimate of the amount of memory (in bytes) used up by this
        class. Supporting functions to compute the size of STL vectors
        and other objects can be found the 
-       <code class="class">MemoryConsumption</code> namespace.
+       <code>MemoryConsumption</code> namespace.
        <br>
        (WB 2000/11/27)
        </p>
 
   <li> <p>
-       New: Class <code class="class">FunctionDerivative</code>
+       New: Class <code>FunctionDerivative</code>
        computes finite difference approximations of a directional
-       derivative of a <code class="class">Function</code>.
+       derivative of a <code>Function</code>.
        <br>
        (GK 2000/11/13)
        </p>
 
   <li> <p>
-       New: The <code class="class">DataOutBase</code> and
-       <code class="class">DataOutBase::Patch</code> classes have been
+       New: The <code>DataOutBase</code> and
+       <code>DataOutBase::Patch</code> classes have been
        changed so as to allow output of objects that have an other
        dimension than the surrounding space, for example writing faces
        instead of cells (this might be useful to write only external
@@ -210,16 +213,16 @@ documentation, etc</a>.
        </p>       
 
   <li> <p>
-       New: There is a new <code class="member">distance</code> function
-       in the <code class="class">Point</code> class that calculates the
+       New: There is a new <code>distance</code> function
+       in the <code>Point</code> class that calculates the
        distance between two points.
        <br>
        (Ralf Hartmann 2000/09/06)
        </p>   
 
   <li> <p> 
-       New: <code class="class">Timer</code> now uses the system
-       function <code class="member">getrusage (RUSAGE_CHILDREN,
+       New: <code>Timer</code> now uses the system
+       function <code>getrusage (RUSAGE_CHILDREN,
        .)</code> that is need in multithreading. But still the <code
        class="class">Timer</code> class does not yet work in
        multithreading, as getrusage with flag RUSAGE_CHILDREN gives always
@@ -230,7 +233,7 @@ documentation, etc</a>.
 
   <li> <p>
        New: There are now a set of functions
-       <code class="member">outer_product</code> that for the outer
+       <code>outer_product</code> that for the outer
        product of tensors.
        <br>
        (WB 2000/07/23)
@@ -238,11 +241,11 @@ documentation, etc</a>.
 
   <li> <p>
        New: The classes 
-       <code class="class">Patterns::Integer</code>
-       and <code class="class">Patterns::Double</code> now allow that
+       <code>Patterns::Integer</code>
+       and <code>Patterns::Double</code> now allow that
        a range may be specified in which the parameter shall
        be. Furthermore, instead of a class,
-       <code class="class">Patterns</code> is now a namespace, so it
+       <code>Patterns</code> is now a namespace, so it
        can be reopened in case you want to write another pattern class
        and want to put it into the same namespace.
        <br>
@@ -250,7 +253,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: classes <code class="class">QMilne</code> and <code
+       New: classes <code>QMilne</code> and <code
        class="class">QWeddle</code> for closed Newton-Cotes-formul&aelig; of
        orders 7 and 9, respectively.
        <br>
@@ -258,7 +261,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: There is now a function <code class="member">invert
+       New: There is now a function <code>invert
        (Tensor<2,dim>)</code> that returns the inverse of a tensor of
        rank 2.
        <br>
@@ -272,7 +275,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Improved: <code class="class">Subscriptor</code> prints the
+       Improved: <code>Subscriptor</code> prints the
        real class name if a subscribed object is deleted.
        <br>
        (GK 2000/04/12)
@@ -286,7 +289,7 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       Fixed: <code class="class">SparseILU</code> had two bugs which
+       Fixed: <code>SparseILU</code> had two bugs which
        are now fixed.
        <br>
        (<a href="mailto:or@winfos.com">Oliver Rheinbach</a>, 2001/02/02)
@@ -300,7 +303,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="class">BlockDiagonalMatrix</code> is a
+       New: <code>BlockDiagonalMatrix</code> is a
        template that generates a matrix with multiple copies of the
        same block on the diagonal.
        <br>
@@ -311,7 +314,7 @@ documentation, etc</a>.
 
        Improved: Krylov-space solvers do not use the function residual
        anymore. This allows easier implementation of new matrix
-       classes. <code class="class">SolverGMRES</code> now also counts
+       classes. <code>SolverGMRES</code> now also counts
        the first iteration step. Finally, all solvers inherit a <code
        class="class">Subscriptor</code>.
        <br>
@@ -320,8 +323,8 @@ documentation, etc</a>.
 
   <li> <p>
        New: There are now functions 
-       <code class="member">SparsityPattern::symmetrize</code> and
-       <code class="member">SparseMatrix::symmetrize</code> that
+       <code>SparsityPattern::symmetrize</code> and
+       <code>SparseMatrix::symmetrize</code> that
        generate a symmetric matrix from a non-symmetric one.
        <br>
        (WB 2000/12/02)
@@ -329,7 +332,7 @@ documentation, etc</a>.
 
   <li> <p>
        New: almost all classes that store data now have a function
-       <code class="member">memory_consumption</code> that returns an
+       <code>memory_consumption</code> that returns an
        estimate of the amount of memory (in bytes) used up by this
        class.
        <br>
@@ -337,7 +340,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p> 
-       New: <code class="member">
+       New: <code>
        SparseMatrix<number>::n_actually_nonzero_elements</code>
        returns the number of entries that are actually nonzero.
        <br>
@@ -346,7 +349,7 @@ documentation, etc</a>.
 
   <li> <p>
        Fixed: unlike announced in the docs, the
-       <code class="member">FullMatrix::norm2</code> function did not
+       <code>FullMatrix::norm2</code> function did not
        return the Frobenius norm of a matrix, but its square. This is
        fixed now.
        <br>
@@ -354,7 +357,7 @@ documentation, etc</a>.
        </p>       
 
   <li> <p>
-       Improved: <code class="class">PreconditionBlockSOR</code><code
+       Improved: <code>PreconditionBlockSOR</code><code
        class="member">::Tvmult(...)</code> is implemented.
        <br>
        (GK 2000/07/07)
@@ -363,22 +366,22 @@ documentation, etc</a>.
   <li> <p>
        Improved: The breakdown criterion of <code
        class="class">SolverBicgstab</code> can be changed by the use
-       of <code class="class">SolverBicgstab::AdditionalData</code>.
+       of <code>SolverBicgstab::AdditionalData</code>.
        <br>
        (GK 2000/07/07)
        </p>       
 
   <li> <p>
-       New: <code class="class">SolverRichardson</code> has a
-       transposed solver <code class="member">Tsolve(...)</code>. It
-       uses the functions <code class="member">Tvmult(...)</code> of
+       New: <code>SolverRichardson</code> has a
+       transposed solver <code>Tsolve(...)</code>. It
+       uses the functions <code>Tvmult(...)</code> of
        the provided matrix and preconditioner.
        <br>
        (GK 2000/07/07)
        </p>
 
   <li> <p>
-       Improved: <code class="class">FullMatrix</code><code
+       Improved: <code>FullMatrix</code><code
        class="member">::invert(...)</code> now inverts matrices of all
        sizes. If there is no hardcoded inversion, <code
        class="member">gauss_jordan()</code> is used implicitly.
@@ -389,14 +392,14 @@ documentation, etc</a>.
   <li> <p> 
        New: For recognizing a diverging solver before the maximum
        number of steps is reached, 
-       <code class="class">SolverControl</code> returns 
-       <code class="member">failure</code> also if the residual
+       <code>SolverControl</code> returns 
+       <code>failure</code> also if the residual
        increases over the start residual by a specific factor. This
-       factor is given to the <code class="class">SolverControl</code> 
-       object by the <code class="member">set_failure_criterion</code>
+       factor is given to the <code>SolverControl</code> 
+       object by the <code>set_failure_criterion</code>
        function. After calling the latter function, checking of this
        additional failure criterion may again be disabled by calling
-       <code class="member">clear_failure_criterion</code>.
+       <code>clear_failure_criterion</code>.
        <br>
        (Ralf Hartmann 2000/06/26)
        </p>
@@ -404,8 +407,8 @@ documentation, etc</a>.
   <li> <p>
        Improved: The interface of preconditioner classes has changed.
        Preconditioners are now considered linear operators like
-       matrices: they have members <code class="member">vmult</code>
-       and <code class="member">Tvmult</code> instead of the old <code
+       matrices: they have members <code>vmult</code>
+       and <code>Tvmult</code> instead of the old <code
        class="member">operator()</code>. This will allow the
        implementation of further non-symmetric solvers.
        <br>
@@ -414,13 +417,13 @@ documentation, etc</a>.
 
   <li> <p>
        New: there is now a function
-       <code class="member">SparseMatrix::el</code> that does mostly
-       the same as <code class="member">SparseMatrix::operator()</code>,
+       <code>SparseMatrix::el</code> that does mostly
+       the same as <code>SparseMatrix::operator()</code>,
        but returns a zero if elements of the matrix are accessed that
        are not in the sparsity pattern. Thus, the new function allows
        to actually traverse rows or columns of the matrix without
        taking care of the sparsity pattern, while
-       <code class="member">SparseMatrix::operator()</code> should be
+       <code>SparseMatrix::operator()</code> should be
        used to write algorithms more efficiently.
        <br>
        (WB 2000/06/02)
@@ -428,7 +431,7 @@ documentation, etc</a>.
 
   <li> <p>
        Fix: 
-       <code class="member">SparsityPattern::print_gnuplot</code>
+       <code>SparsityPattern::print_gnuplot</code>
        wrote rows and columns exchanged. Since most matrices have
        symmetric sparsity patterns, this has gone unnoticed by now.
        <br>
@@ -437,30 +440,30 @@ documentation, etc</a>.
 
   <li> <p>
        Fix: the 
-       <code class="member">FullMatrix::Tvmult</code> function
+       <code>FullMatrix::Tvmult</code> function
        suffered from the same problems as the
-       <code class="member">FullMatrix::Tmmult</code> function. This
+       <code>FullMatrix::Tmmult</code> function. This
        is now fixed as well.
        <br>
        (WB 2000/05/26)
        </p>
 
   <li> <p>
-       New: Class <code class="class">PreconditionBlockJacobi</code>.
+       New: Class <code>PreconditionBlockJacobi</code>.
        <br>
        (GK 2000/05/24)
        </p>
 
   <li> <p>
-       New: <code class="class">SolverControl</code> has an interface
-       to <code class="class">ParameterHandler</code>, defining and
+       New: <code>SolverControl</code> has an interface
+       to <code>ParameterHandler</code>, defining and
        reading parameters from a file automatically.
        <br>
        (GK 2000/05/24)
        </p>
 
   <li> <p>
-       New: <code class="class">BlockIndices</code>: Class that
+       New: <code>BlockIndices</code>: Class that
        manages the conversion of global indices into a block
        vector/matrix/... to the indices local to each of the blocks. 
        <br>
@@ -468,8 +471,8 @@ documentation, etc</a>.
        </p>  
 
   <li> <p>
-       New: <code class="class">BlockSparsityPattern</code> and
-       <code class="class">BlockSparseMatrix</code>: Classes that
+       New: <code>BlockSparsityPattern</code> and
+       <code>BlockSparseMatrix</code>: Classes that
        represent matrices that are composed of sparse matrices.
        <br>
        (WB 2000/05/08)
@@ -477,20 +480,20 @@ documentation, etc</a>.
 
   <li> <p>
        Fix: the 
-       <code class="member">FullMatrix::mmult</code> and
-       <code class="member">FullMatrix::Tmmult</code> code don't
+       <code>FullMatrix::mmult</code> and
+       <code>FullMatrix::Tmmult</code> code don't
        resize their output argument any more, as this is not common
        style in the library. Furthermore, 
-       <code class="member">FullMatrix::Tmmult</code> was utterly
+       <code>FullMatrix::Tmmult</code> was utterly
        broken. 
        <br>
        (WB 2000/05/08)
        </p>
 
   <li> <p>
-       Change: the <code class="member">matrix_norm</code> functions
+       Change: the <code>matrix_norm</code> functions
        of sparse and full matrices are renamed to 
-       <code class="member">matrix_norm_square</code>, since they in
+       <code>matrix_norm_square</code>, since they in
        fact return the square of the norm. This should avoid confusion
        in some cases.
        <br>
@@ -499,7 +502,7 @@ documentation, etc</a>.
 
   <li> <p>
        Fix: the ``copy-like'' constructor of 
-       <code class="class">SparsityPattern</code> that copies another
+       <code>SparsityPattern</code> that copies another
        object and adds some off-diagonals had a bug that caused an
        exception in some cases. This is now fixed.
        <br>
@@ -507,7 +510,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="class">SwappableVector</code>: Class that
+       New: <code>SwappableVector</code>: Class that
        allows to swap out the data of a vector to disk and reload it
        later on. It also has a function to preload the data before its
        use in a separate thread if the library is configured for
@@ -517,9 +520,9 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: there are now functions <code class="member">Vector::swap</code> 
-       and <code class="member">BlockVector::swap</code>, as well as
-       global functions <code class="member">swap(u,v)</code> that
+       New: there are now functions <code>Vector::swap</code> 
+       and <code>BlockVector::swap</code>, as well as
+       global functions <code>swap(u,v)</code> that
        exchange the data of two vectors without needing a temporary
        vector and without copying around data. Their run-time is
        therefore independent of the length of the vectors.
@@ -528,7 +531,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Fix: <code class="class">SolverCG</code> counts steps properly.
+       Fix: <code>SolverCG</code> counts steps properly.
        <br>
        (GK 2000/04/25)
        </p>
@@ -536,38 +539,38 @@ documentation, etc</a>.
   <li> <p>
        Change: the solver classes in LAC lost their first template
        argument. Their names are now 
-       <code class="class">SolverXX&lt;VECTOR&gt;</code>, where
-       <code class="class">XX</code> denotes the name of the solver
+       <code>SolverXX&lt;VECTOR&gt;</code>, where
+       <code>XX</code> denotes the name of the solver
        (e.g. CG, GMRES, etc). Furthermore, the
-       inheritance from <code class="class">Solver</code> was made private
+       inheritance from <code>Solver</code> was made private
        to reflect the logical structure.
        <br>
        (GK 2000/04/25)
        </p>
 
   <li> <p>
-       New: <code class="class">EigenInverse</code> implements inverse
+       New: <code>EigenInverse</code> implements inverse
        iteration by Wieland.
        <br>
        (GK 2000/04/20)
        </p>
 
   <li> <p>
-       New: <code class="class">EigenPower</code> implements power
+       New: <code>EigenPower</code> implements power
        method by von Mises
        <br>
        (GK 2000/04/19)
        </p>
 
   <li> <p>
-       New: <code class="member">PreconditionBlockSOR::set_omega</code>
+       New: <code>PreconditionBlockSOR::set_omega</code>
        allows to change the relaxation parameter.
        <br>
        (GK 2000/04/12)
        </p>
 
   <li> <p>
-       New: <code class="class">SolverXX</code>: There is a virtual function
+       New: <code>SolverXX</code>: There is a virtual function
        <code>print_vectors</code> called in every step. It is void in the
        solver itself but can be used to print intermediate iteration
        vectors.
@@ -583,7 +586,7 @@ documentation, etc</a>.
 
 <ol>
   <li> <p>
-       Extend: <code class="member">DoFTools::extract_boundary_dofs</code>
+       Extend: <code>DoFTools::extract_boundary_dofs</code>
        now allows to also specify which boundary conditions shall be
        considered. 
        <br>
@@ -592,12 +595,12 @@ documentation, etc</a>.
 
   <li> <p>
        New: some arguments of the functions 
-       <code class="member">DoFHandler::n_boundary_dofs</code>,
-       <code class="member">DoFTools::extract_boundary_dofs</code>,
+       <code>DoFHandler::n_boundary_dofs</code>,
+       <code>DoFTools::extract_boundary_dofs</code>,
        and
-       <code class="member">DoFTools::map_dof_to_boundary_indices</code> 
-       are changed from <code class="class">list</code> to
-       <code class="class">set</code>, since that resembles more
+       <code>DoFTools::map_dof_to_boundary_indices</code> 
+       are changed from <code>list</code> to
+       <code>set</code>, since that resembles more
        closely the purpose of the parameter, and makes computations
        slightly faster.
        <br>
@@ -606,7 +609,7 @@ documentation, etc</a>.
 
   <li> <p>
        New: almost all classes that store data now have a function
-       <code class="member">memory_consumption</code> that returns an
+       <code>memory_consumption</code> that returns an
        estimate of the amount of memory (in bytes) used up by this
        class.
        <br>
@@ -614,31 +617,31 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: The <code class="member">ConstraintMatrix::add_entries</code>
+       New: The <code>ConstraintMatrix::add_entries</code>
        function add several constraints at once.
        <br>
        (WB 2000/10/26)
        </p>
 
   <li> <p>
-       New: The <code class="member">DoFRenumbering::random</code>
+       New: The <code>DoFRenumbering::random</code>
        function renumbers degrees of freedom in a random way.
        <br>
        (WB 2000/10/22)
        </p>
 
   <li> <p>
-       New: The <code class="class">TriaAccessor</code> now has a
-       function <code class="member">point_inside</code> that checks
+       New: The <code>TriaAccessor</code> now has a
+       function <code>point_inside</code> that checks
        whether a certain point is inside a given cell.
        <br>
        (Thomas Richter 2000/10/12)
        </p>
 
   <li> <p>
-       New: The <code class="class">FiniteElement</code> has got two
-       new functions <code class="member">transform_unit_to_real_cell
-       </code> and <code class="member">transform_real_to_unit_cell
+       New: The <code>FiniteElement</code> has got two
+       new functions <code>transform_unit_to_real_cell
+       </code> and <code>transform_real_to_unit_cell
        </code>. They allow to transform points from reference (unit)
        cell to real cell and visa versa. <code
        class="member">transform_real_to_unit_cell</code> involves a
@@ -649,7 +652,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Extended: The <code class="class">Triangulation</code>
+       Extended: The <code>Triangulation</code>
        class can handle boundary information in 3d as well
        (i.e. lines and quads in 3d with special material IDs).
        <br>
@@ -658,7 +661,7 @@ documentation, etc</a>.
        </p>       
 
   <li> <p>
-       Extended: The <code class="class">GridIn</code>
+       Extended: The <code>GridIn</code>
        class can now read 3D UCD data, including boundary information
        (i.e. lines and quads in 3d with special material IDs).
        <br>
@@ -667,7 +670,7 @@ documentation, etc</a>.
        </p>       
 
   <li> <p>
-       New: The <code class="member">GridRefinement::refine_and_coarsen_optimize</code>
+       New: The <code>GridRefinement::refine_and_coarsen_optimize</code>
        function implements an alternative way to flag cells for
        refinement and coarsening.
        <br>
@@ -675,13 +678,13 @@ documentation, etc</a>.
        </p>       
 
   <li> <p>
-       Extended: The <code class="member">GridIn::delete_unused_vertices</code>
+       Extended: The <code>GridIn::delete_unused_vertices</code>
        function now eliminates vertices from the input that are not
        referenced by any of the cells in the input file. This makes is
        simpler to delete some cells from the input file by hand,
        without the need to update the vertex lists, which can be
        tiring as several cells usually use each vertex. All functions
-       in the <code class="class">GridIn</code> reading grids in
+       in the <code>GridIn</code> reading grids in
        several input files call this function before passing the data
        to the triangulation object.
        <br>
@@ -689,23 +692,23 @@ documentation, etc</a>.
        </p>       
 
   <li> <p>
-       New: The <code class="class">GridIn</code>
+       New: The <code>GridIn</code>
        class can now read the basics of grids in DB Mesh format.
        <br>
        (WB 2000/09/26)
        </p>       
 
   <li> <p>
-       Extended: The <code class="class">KellyErrorEstimator</code>
+       Extended: The <code>KellyErrorEstimator</code>
        class is now able to estimate errors for several solution
        vectors at the same time, provided they live on the same
-       <code class="class">DoFHandler</code> object.
+       <code>DoFHandler</code> object.
        <br>
        (WB 2000/09/11)
        </p>       
 
   <li> <p>
-       New: The <code class="class">DataOut_Faces</code> class allows to
+       New: The <code>DataOut_Faces</code> class allows to
        output faces instead of cells. This might be handy for 3d
        computations if one is only interested in surface plots, or
        cuts through the domain.
@@ -715,21 +718,21 @@ documentation, etc</a>.
 
   <li> <p>
        Removed: The 
-       <code class="class">DataOut_Old</code> class has finally gone for
+       <code>DataOut_Old</code> class has finally gone for
        good. It was already deprecated in version 3.0, and has been
        superceded for a long time by the framwork of classes around
-       <code class="class">DataOutBase</code> and
-       <code class="class">DataOut</code>.
+       <code>DataOutBase</code> and
+       <code>DataOut</code>.
        <br>
        (WB 2000/09/07)
        </p>
 
   <li> <p>
        New: There is now a function
-       <code class="member">DoFHandler::n_boundary_dofs</code>
+       <code>DoFHandler::n_boundary_dofs</code>
        that takes the list of selected boundary indicators as a
-       <code class="class">list</code> of values, rather than the
-       usual <code class="class">map</code> of pairs of boundary
+       <code>list</code> of values, rather than the
+       usual <code>map</code> of pairs of boundary
        indicators and function object pointers.
        <br>
        (WB 2000/08/25)
@@ -737,9 +740,9 @@ documentation, etc</a>.
 
   <li> <p>
        Changed: The 
-       <code class="member">map_dof_to_boundary_index</code>
-       functions have been moved from the <code class="class">DoFHandler</code>
-       to the <code class="class">DoFTools</code> class, in order to
+       <code>map_dof_to_boundary_index</code>
+       functions have been moved from the <code>DoFHandler</code>
+       to the <code>DoFTools</code> class, in order to
        further remove code from the big classes which is necessarily
        needed there.
        <br>
@@ -747,7 +750,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: there is now a class <code class="class">DataOutRotation</code>
+       New: there is now a class <code>DataOutRotation</code>
        that can be used to output data which has been computed
        exploiting rotational symmetry, on the original domain. Thus,
        the output is of one dimension higher than the computation was,
@@ -758,8 +761,8 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: class <code class="class">HalfHyperShellBoundary</code>
-       and <code class="member">GridGenerator::half_hyper_shell</code>
+       New: class <code>HalfHyperShellBoundary</code>
+       and <code>GridGenerator::half_hyper_shell</code>
        generate a half shell, useful for computations with a shell
        domain and rotational symmetry.
        <br>
@@ -768,15 +771,15 @@ documentation, etc</a>.
 
   <li> <p>
        Changed: The functions
-       <code class="member">Triangulation::refine</code>,
-       <code class="member">Triangulation::coarsen</code>,
+       <code>Triangulation::refine</code>,
+       <code>Triangulation::coarsen</code>,
        <code
        class="member">Triangulation::refine_and_coarsen_fixed_fraction</code>,
        and
        <code
        class="member">Triangulation::refine_and_coarsen_fixed_number</code>
        have been moved from the triangulation class to a separate
-       class <code class="class">GridRefinement</code> as they are not
+       class <code>GridRefinement</code> as they are not
        intricately bound to the triangulation but rather form a
        distinct class of functions that flag cells for refinement or
        coarsening based on error indicators.
@@ -785,7 +788,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="member">DataOut::clear_input_data_references</code>
+       New: <code>DataOut::clear_input_data_references</code>
        clears all reference to input data vectors and to the <code
        class="class">DoFHandler</code>. This function may be useful
        after the patches have been built, to release memory as early
@@ -795,7 +798,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="class">class DerivativeApproximation</code>
+       New: <code>class DerivativeApproximation</code>
        approximates the norm of the gradient or second derivative of a
        finite element field on each cell from finite difference
        approximations.
@@ -807,9 +810,9 @@ documentation, etc</a>.
        Fix: Add a missing assertions in <code
        class="member">FEValuesBase::get_function_*</code>. If an <code
        class="class">ExcAccessToUninitializedField</code> is now thrown
-       then probably an <code class="member">update_values</code> or
-       <code class="member">update_gradients</code> is missing in the
-       <code class="class">UpdateFlags</code> of a used <code
+       then probably an <code>update_values</code> or
+       <code>update_gradients</code> is missing in the
+       <code>UpdateFlags</code> of a used <code
        class="class">FEValues</code>. Adding this assertion uncovered
        several other errors which are now also fixed; these errors
        were dormant, since the values of finite elements are always
@@ -821,7 +824,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: Class <code class="class">DoFRenumbering</code> now has
+       New: Class <code>DoFRenumbering</code> now has
        functions for cell-wise downstream renumbering for
        discontinuous elements. The parameters of the function <code
        class="member">sort_selected_dofs_back</code> have been
@@ -832,7 +835,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: Function <code class="class">VectorTools</code><code
+       New: Function <code>VectorTools</code><code
        class="member">::compute_mean_value</code> integrates the mean
        value of one component of a finite element function.
        <br>
@@ -840,8 +843,8 @@ documentation, etc</a>.
        </p>
        
   <li> <p>
-       New: The new function <code class="member">get_face</code>
-       of <code class="class">FEFaceValues</code> and <code
+       New: The new function <code>get_face</code>
+       of <code>FEFaceValues</code> and <code
        class="class">FESubfaceValues</code> returns an iterator of the
        present face. This is the face, for that the <code
        class="class">FE(Sub)FaceValues</code> object was reinited
@@ -851,10 +854,10 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: classes <code class="class">FEDG_Px</code> implement
+       New: classes <code>FEDG_Px</code> implement
        complete polynomial spaces of degree <em>x</em> on
        quadrilaterals. Since they have less degrees of freedom than
-       <code class="class">FEDG_Qx</code>, there is no continuous
+       <code>FEDG_Qx</code>, there is no continuous
        version for these elements. Implementation for P4 and 3D is
        still incomplete.
        <br>
@@ -863,16 +866,16 @@ documentation, etc</a>.
 
   <li> <p>
        Fix: slight bug in 
-       <code class="member">DataOut::build_patches</code>
+       <code>DataOut::build_patches</code>
        in multithreaded mode fixed.
        <br>
        (Ralf Hartmann, 2000/05/29)
        </p>
 
   <li> <p>
-       New: class <code class="class">FETools</code> performs
+       New: class <code>FETools</code> performs
        interpolations and extrapolations of discrete functions from one
-       <code class="class">FiniteElement</code> to another <code
+       <code>FiniteElement</code> to another <code
        class="class">FiniteElement</code>. It also provides the local
        interpolation matrices that interpolate on each
        cell. Furthermore it provides the interpolation difference
@@ -882,7 +885,7 @@ documentation, etc</a>.
 
        <p>
        Removed: The obsolete 
-       <code class="member">MatrixCreator::create_interpolation_matrix</code>
+       <code>MatrixCreator::create_interpolation_matrix</code>
        function is now removed.
        </p>
 
@@ -891,14 +894,14 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="member">DoFTools::make_flux_sparsity_pattern</code>
+       New: <code>DoFTools::make_flux_sparsity_pattern</code>
        can be optimized by providing two coefficient matrices.
        <br>
        (GK 2000/05/25)
        </p>
 
   <li> <p>
-       Improved: <code class="member">VectorTools::integrate_difference</code>
+       Improved: <code>VectorTools::integrate_difference</code>
        allows for vector-valued weight functions. L<sup>1</sup> and
        L<sup>infinity</sup> norms are calculated correctly.
        <br>
@@ -906,7 +909,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       Changed: <code class="member">FE_DGx::restriction</code> is
+       Changed: <code>FE_DGx::restriction</code> is
        not an interpolation any more but a local projection which is
        more reasonable for DG elements.
        <br>
@@ -915,14 +918,14 @@ documentation, etc</a>.
 
   <li> <p>
        Changed: enum 
-       <code class="class">MeshSmoothing</code> is moved into the 
-       <code class="class">Triangulation</code> class.
+       <code>MeshSmoothing</code> is moved into the 
+       <code>Triangulation</code> class.
        <br>
        (Ralf Hartmann 2000/05/18)
        </p>
 
   <li> <p> 
-       New: <code class="member">Triangulation<dim>::patch_level_1</code>
+       New: <code>Triangulation<dim>::patch_level_1</code>
        is a new mesh smoothing. A mesh of patch level 1 consists of
        patches, i.e. they consists of cells that are all refined at
        least once.
@@ -930,7 +933,7 @@ documentation, etc</a>.
 
        <p>
        Changed: As follows from the existence of this new smoothing,
-       <code class="member">maximum_smoothing</code> will include this
+       <code>maximum_smoothing</code> will include this
        smoothing.
        </p>
 
@@ -940,7 +943,7 @@ documentation, etc</a>.
 
   <li> <p>
        Changed: the 
-       <code class="member">MatrixTools::apply_boundary_values</code>
+       <code>MatrixTools::apply_boundary_values</code>
        now uses a much faster algorithm when working on matrices with
        symmetric sparsity patterns. On the other hand, it does no more
        eliminate whole rows when a matrix has a non-symmetric sparsity
@@ -966,29 +969,29 @@ documentation, etc</a>.
   <li> <p>
        New: many functions are now templatized on the data type of the
        vector they take or return. They thus now support
-       <code class="class">Vector&lt;float&gt;</code>, but also
-       <code class="class">BlockVector&lt;...&gt;</code>. An
+       <code>Vector&lt;float&gt;</code>, but also
+       <code>BlockVector&lt;...&gt;</code>. An
        incomplete and growing list of functions that were treated in
        this way is:
        <ul>
        <li>
-       <code class="member">DoFAccessor::get_dof_values</code>,
+       <code>DoFAccessor::get_dof_values</code>,
        <li>
-       <code class="member">DoFAccessor::set_dof_values</code>,
+       <code>DoFAccessor::set_dof_values</code>,
        <li>
-       <code class="member">DoFAccessor::get_interpolated_dof_values</code>,
+       <code>DoFAccessor::get_interpolated_dof_values</code>,
        <li>
-       <code class="member">DoFAccessor::set_dof_values_by_interpolation</code>,
+       <code>DoFAccessor::set_dof_values_by_interpolation</code>,
        <li>
-       <code class="member">FEValues::get_function_values</code>,
+       <code>FEValues::get_function_values</code>,
        <li>
-       <code class="member">FEValues::get_function_grads</code>,
+       <code>FEValues::get_function_grads</code>,
        <li>
-       <code class="member">FEValues::get_function_2nd_derivatives</code>,
+       <code>FEValues::get_function_2nd_derivatives</code>,
        <li>
-       <code class="member">MatrixTools::apply_boundary_values</code>,
+       <code>MatrixTools::apply_boundary_values</code>,
        <li>
-       Several functions in <code class="class">ConstraintMatrix</code>.
+       Several functions in <code>ConstraintMatrix</code>.
        </ul>
        <br>
        (WB 2000/05/16 and later)
@@ -996,7 +999,7 @@ documentation, etc</a>.
 
   <li> <p>
        Changed: The computation of the Jacobian matrices in the 
-       <code class="class">FEValues</code> class is now done more
+       <code>FEValues</code> class is now done more
        efficiently. The speedup is in the range of a factor of 40 for
        3D. 
        <br>
@@ -1004,7 +1007,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p> 
-       Change: <code class="member">DoFTools::make_hanging_node_constraints ()</code>
+       Change: <code>DoFTools::make_hanging_node_constraints ()</code>
        does not use the user flags any more, and can thus run in
        parallel more than once. 
        <br>
@@ -1012,24 +1015,24 @@ documentation, etc</a>.
        </p>
 
   <li> <p> 
-       Extended: <code class="member">DoFTools::make_sparsity_pattern ()</code>
+       Extended: <code>DoFTools::make_sparsity_pattern ()</code>
        now accepts a template parameter as sparsity pattern. This
        allows to use this function for the usual 
-       <code class="class">SparsityPattern</code>, or for 
-       <code class="class">BlockSparsityPattern</code> arguments.
+       <code>SparsityPattern</code>, or for 
+       <code>BlockSparsityPattern</code> arguments.
        <br>
        (WB 2000/05/15)
        </p>
 
   <li> <p> 
-       New: <code class="member">DoFTools::extract_hanging_node_dofs ()</code>
+       New: <code>DoFTools::extract_hanging_node_dofs ()</code>
        identifies nodes that will be constrained by hanging node constraints.
        <br>
        (WB 2000/05/12)
        </p>
 
   <li> <p> 
-       New: <code class="member">DoFRenumbering::sort_selected_dofs_back ()</code>
+       New: <code>DoFRenumbering::sort_selected_dofs_back ()</code>
        sorts selected degrees of freedom to the end of the index
        range.
        <br>
@@ -1038,29 +1041,29 @@ documentation, etc</a>.
 
   <li> <p> 
        Change: the return value of
-       <code class="member">DoFHandler::max_couplings_between_dofs ()</code>
-       is bounded by <code class="member">DoFHandler::n_dofs()</code>.
+       <code>DoFHandler::max_couplings_between_dofs ()</code>
+       is bounded by <code>DoFHandler::n_dofs()</code>.
        <br>
        (Ralf Hartmann 2000/05/11)
        </p>
 
   <li> <p> 
-       New: <code class="member">FEValuesBase::get_cell ()</code>
+       New: <code>FEValuesBase::get_cell ()</code>
        returns present cell.
        <br>
        (Ralf Hartmann 2000/05/11)
        </p>
 
   <li> <p> 
-       Fix: <code class="member">FESystem::reinit()</code> generated
-       an exception if <code class="member">update_support_points</code> 
+       Fix: <code>FESystem::reinit()</code> generated
+       an exception if <code>update_support_points</code> 
        was set.
        <br>
        (WB 2000/05/10)
        </p>
 
   <li> <p> 
-       New: <code class="member">IntergridMap::get_{source,destination}_grid</code> 
+       New: <code>IntergridMap::get_{source,destination}_grid</code> 
        functions return the grids for which the map was created.
        <br>
        (WB 2000/04/19)
@@ -1075,7 +1078,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="member">DoFTools::extract_boundary_dofs</code> 
+       New: <code>DoFTools::extract_boundary_dofs</code> 
        finds all degrees of freedom which are at the boundary and belong to
        specified components.
        <br>
@@ -1083,7 +1086,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="member">DoFTools::compute_intergrid_constraints</code> 
+       New: <code>DoFTools::compute_intergrid_constraints</code> 
        allows to use different discretization grids for different
        variables.
        <br>
@@ -1091,7 +1094,7 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="member">DataOut::clear_data_vectors</code>
+       New: <code>DataOut::clear_data_vectors</code>
        allows to re-use an object without deleting the <code
        class="class">DoFHandler</code>. 
        <br>
@@ -1099,17 +1102,13 @@ documentation, etc</a>.
        </p>
 
   <li> <p>
-       New: <code class="class">class DoFPrintSolverStep</code> prints
+       New: <code>class DoFPrintSolverStep</code> prints
        intermediate vectors of a solver as finite element functions using
-       <code class="class">DataOut</code>.
+       <code>DataOut</code>.
        <br>
        (GK 2000/04/05)
        </p>
 
 </ol>
 
-<hr>
-Last update $Date$
-
-</body>
-</html>
+*/

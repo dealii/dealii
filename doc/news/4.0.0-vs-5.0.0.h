@@ -1,27 +1,24 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.1 Transitional//EN"
-   "http://www.w3.org/TR/REC-html40/loose.dtd">
-<html>
-  <head>
-    <link href="../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<body>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-
-<h2>Changes between Version 4.0.0 and 5.0.0</h2>
-
+/**
+ * @page changes_between_4_0_and_5_0 Changes between Version 4.0 and 5.0
+ 
 <p>
-This is the list of changes made after the release of 
-<acronym>deal.II</acronym> version 4.0. It is subdivided into changes
-made to the three sub-libraries <a href="#base">base</a>, 
-<a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
-changes to the <a href="#general">general infrastructure,
-documentation, etc</a>.
-</p>
-
-<p>
+This is the list of changes made between the deal.II releases listed above.
 All entries are signed with the names of the author. Regular
 contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 (Guido Kanschat), RH (Ralf Hartmann).
@@ -42,101 +39,82 @@ inconvenience this causes.
 
 
 <ol>
-  <li> <p> Removed: All the matrix classes have functions <code
-       class="member">reinit</code> that are used to resize the
+  <li> <p> Removed: All the matrix classes have functions <code>reinit</code> that are used to resize the
        matrix. However, the sparse matrix classes had an equally named
        function without arguments that basically left the size of the matrix
        unchanged but set all elements of the matrix to zero. It could also be
        abused to notify the matrix that the sparsity pattern on which it is
        built has changed, an inherently risky procedure. The no-argument code
-       <class="member">reinit</code> function has therefore been removed to
-       avoid confusion with the <code class="member">reinit</code> functions
-       that take arguments. Instead, you should now use <code
-       class="member">matrix=0</code> to simply set all elements of the
+       <code>reinit</code> function has therefore been removed to
+       avoid confusion with the <code>reinit</code> functions
+       that take arguments. Instead, you should now use <code>matrix=0</code> to simply set all elements of the
        matrix to zero. If you want to notify a sparse matrix that its sparsity
-       pattern has changed, use the <code
-       class="member">reinit(SparsityPattern)</code> function.
+       pattern has changed, use the <code>reinit(SparsityPattern)</code> function.
        <br> 
        (WB 2004/05/10)
        </p>
 
   <li> <p> Removed: All the vector and block vector classes as well as
-       the <code class="class">FullMatrix</code> class (the latter
-       through its <code class="class">Table</code> base class) had a
-       member function <code class="member">clear</code> which simply
+       the <code>FullMatrix</code> class (the latter
+       through its <code>Table</code> base class) had a
+       member function <code>clear</code> which simply
        resets all values of the vector or matrix to zero. It did not
        change the size of the object, though. This was confusing,
        since the standard C++ container classes implement the
-       semantics that the <code class="member">clear</code> functions
+       semantics that the <code>clear</code> functions
        delete all entries of the containers, i.e. resize it to zero,
-       and we implemented similar semantics also for the <code
-       class="class">SparseMatrix</code>, <code
-       class="class">DoFHandler</code>, <code
-       class="class">ConstraintMatrix</code> and various other
+       and we implemented similar semantics also for the <code>SparseMatrix</code>, <code>DoFHandler</code>, <code>ConstraintMatrix</code> and various other
        classes.
        <br>
-       To avoid this confusion in the future, the <code
-       class="member">clear</code> functions have been dropped from
+       To avoid this confusion in the future, the <code>clear</code> functions have been dropped from
        the interface of the vector and full matrix classes, and the
        remaining instances where deal.II classes have a function of
        that name really mean that the object is reset to its virginal
        state. To set all
        elements of a matrix or vector to zero without changing its size, the
-       recommended way is to use the more obvious notation <code
-       class="member">vector=0</code> and <code
-       class="member">matrix=0</code>. To
+       recommended way is to use the more obvious notation <code>vector=0</code> and <code>matrix=0</code>. To
        reset the elements of a table over arbitrary objects, use
-       <code class="member">Table&lt;T&gt;::reset_values()</code>.
+       <code>Table&lt;T&gt;::reset_values()</code>.
        <br> 
        (WB 2004/05/10)
        </p>
 
-  <li> <p> Removed: The <code
-       class="member">SparseLUDecomposition::reinit</code> and <code
-       class="member">SparseMIC::reinit</code> functions without
+  <li> <p> Removed: The <code>SparseLUDecomposition::reinit</code> and <code>SparseMIC::reinit</code> functions without
        argument had been deprecated before, and have now been removed.
        <br> 
        (WB 2004/05/10)
        </p>
 
-  <li> <p> Changed: the template parameter of <code
-       class="class">MGTransferPrebuilt</code> is now the complete vector
+  <li> <p> Changed: the template parameter of <code>MGTransferPrebuilt</code> is now the complete vector
        type, not just the value type of the vector. This allows to operate
-       on <code class="class">Vector</code> as well as on <code
+       on <code>Vector</code> as well as on <code
        class="class">BlockVector</code>. Unfortunately, the untested class
-       <code class="class">MGTransferBlock</code> underwent some more
+       <code>MGTransferBlock</code> underwent some more
        changes without testing, such that it should be used with high
        caution.
        <br>
        (GK 2004/04/01)
        </p>
 
-  <li> <p> Changed: The <code class="class">FiniteElement</code> classes had a
-       function <code class="member">restrict</code> that returns the
+  <li> <p> Changed: The <code>FiniteElement</code> classes had a
+       function <code>restrict</code> that returns the
        restriction matrix from children to the mother cell. Unfortunately,
        <code>restrict</code> has become a keyword in recent standards of the C
        language, and some C++ compilers have picked this up. The function has
        therefore been renamed <code
        class="member">get_restriction_matrix</code>, which also better
        reflects what it is actually doing. To keep consistent, we have also
-       rename the corresponding function <code
-       class="member">prolongate</code> to <code
-       class="member">get_prolongation_matrix</code>. 
+       rename the corresponding function <code>prolongate</code> to <code>get_prolongation_matrix</code>. 
        <br>
        (WB 2004/02/29)
        </p>
 
   <li> <p>
-       Fixed and changed: The <code
-       class="class">SolutionTransfer</code><code
-       class="member">::(refine_)interpolate(const Vector &in, Vector
-       &out)</code> functions now require the <code
-       class="member">in</code> and <code class="member">out</code>
+       Fixed and changed: The <code>SolutionTransfer</code><code>::(refine_)interpolate(const Vector &in, Vector
+       &out)</code> functions now require the <code>in</code> and <code>out</code>
        vectors being already of right sizes,
        i.e. <code>in.size()=n_dofs_old</code> and
-       <code>out.size()=n_dofs_refined</code>. Furthermore, the <code
-       class="class">SolutionTransfer</code><code
-       class="member">::(refine_)interpolate(const
+       <code>out.size()=n_dofs_refined</code>. Furthermore, the <code>SolutionTransfer</code><code>::(refine_)interpolate(const
        vector&lt;Vector&gt; &all_in, vector&lt;Vector&gt;
        &all_out)</code> now check that the number of in and output
        vectors are the same, i.e.
@@ -146,7 +124,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Changed: The <code class="class">QProjector</code> has functions that
+       Changed: The <code>QProjector</code> has functions that
        project a lower-dimensional quadrature formula onto all faces or
        subfaces of a cell. In 3d, it now does this but also adds projections of
        these quadrature formula onto the faces from the other side. We need
@@ -159,9 +137,7 @@ inconvenience this causes.
   <li> <p> Moved and changed: The header file
        <tt>include/numerics/dof_renumbering.h</tt> has been moved to the 
        directory <tt>include/dofs</tt>, where it logically
-       belongs. Furthermore, the sorting parameter of the function <code
-       class="class">DoFRenumbering</code><code
-       class="member">::component_wise</code> has changed its meaning. See
+       belongs. Furthermore, the sorting parameter of the function <code>DoFRenumbering</code><code>::component_wise</code> has changed its meaning. See
        the reference documentation for details.
        <br>
        (GK 2003/07/03)
@@ -174,7 +150,7 @@ inconvenience this causes.
 
 <ol>
 
-  <li> <p> New: After the documentation tool for <acronym>deal.II</acronym> has been
+  <li> <p> New: After the documentation tool for deal.II has been
   changed to <a href="http://www.doxygen.org">Doxygen</a>, it is delivered in two
   tar-files. Additional to the traditional source tarball, the preprocessed
   documentation is available ready for reading with a web browser.
@@ -202,7 +178,7 @@ inconvenience this causes.
        (WB 2004/04/12)
        </p>
 
-  <li> <p> New: <acronym>deal.II</acronym> is now able to interface to the 
+  <li> <p> New: deal.II is now able to interface to the 
        <a href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
        target="_top">METIS</a> library to generate domain partitionings. This
        is enabled if a METIS installation is detected, which either happens
@@ -226,7 +202,7 @@ inconvenience this causes.
        (RH 2004/03/08)
        </p>
 
-  <li> <p> New: <acronym>deal.II</acronym> now comes with a complete set of
+  <li> <p> New: deal.II now comes with a complete set of
        wrappers classes for <a href="http://www.mcs.anl.gov/petsc/"
        target="_top">PETSc</a> vectors, matrices, linear solvers and 
        preconditioners. Many of the algorithms in deal.II have also been
@@ -336,11 +312,11 @@ inconvenience this causes.
        simply forwards to the new program. In order to use the new
        one, simply replace the line
        <code><pre>
-         $(PERL) $D/common/scripts/make_dependencies.pl ...
+         \$(PERL) \$D/common/scripts/make_dependencies.pl ...
        </pre></code>
        by
        <code><pre>
-         $D/common/scripts/make_dependencies ...
+         \$D/common/scripts/make_dependencies ...
        </pre></code>
        i.e. call the program directly without the perl interpreter and
        without the file extension for a perl program.
@@ -366,14 +342,10 @@ inconvenience this causes.
 
 <ol>
   <li> <p> 
-       New: There is now a new <code class="class">PolynomialsP</code>
-       class which is based on <code
-       class="class">Polynomials::Monomial</code> and <code
-       class="class">PolynomialSpace</code>. In contrast to the
-       default ordering of the polynomials in <code
-       class="class">PolynomialSpace</code>, (e.g. for degree=2) <i>1,
-       x, x<sup>2</sup>, y, xy, y<sup>2</sup></i>, the <code
-       class="class">PolynomialsP</code> class now gives the
+       New: There is now a new <code>PolynomialsP</code>
+       class which is based on <code>Polynomials::Monomial</code> and <code>PolynomialSpace</code>. In contrast to the
+       default ordering of the polynomials in <code>PolynomialSpace</code>, (e.g. for degree=2) <i>1,
+       x, x<sup>2</sup>, y, xy, y<sup>2</sup></i>, the <code>PolynomialsP</code> class now gives the
        (natural?!)  ordering <i>1, x, y, xy, x<sup>2</sup>,
        y<sup>2</sup></i>.
        <br>
@@ -381,43 +353,40 @@ inconvenience this causes.
        </p>
 
   <li> <p> 
-       New: The classes <code class="class">PolynomialSpace</code> and
-       <code class="class">TensorProductPolynomials</code> now have
-       new <code class="member">set_numbering</code> functions which
+       New: The classes <code>PolynomialSpace</code> and
+       <code>TensorProductPolynomials</code> now have
+       new <code>set_numbering</code> functions which
        allow to change the ordering of the polynomials. The ordering
        and the indices of the polynomials kann be checked by using the
-       new <code class="member">output_indices</code> functions.
+       new <code>output_indices</code> functions.
        <br>
        (RH 2004/03/11)
        </p>
 
-  <li> <p> New: The class <code
-       class="class">PolynomialsBDM</code> implements BDM polynomials in
+  <li> <p> New: The class <code>PolynomialsBDM</code> implements BDM polynomials in
        two dimensions on the unit square. It was implemented as is
        according to some urgent need, but should be suitable to be fit
-       into a <code class="class">FiniteElement</code> similar to
+       into a <code>FiniteElement</code> similar to
        Raviart/Thomas.
        <br>
        (GK 2004/01/05)
        </p>
 
-  <li> <p> New: Objects of type <code class="class">Polynomial</code>
+  <li> <p> New: Objects of type <code>Polynomial</code>
        can now be added to and subtracted from each other through
-       operators <code class="member">+=</code> and <code
-       class="member">-=</code>.
+       operators <code>+=</code> and <code>-=</code>.
        <br>
        (GK 2003/12/16)
        </p>
 
-  <li> <p> New: There is now a class <code
-       class="class">QuadratureSelector</code> that allows to select a
+  <li> <p> New: There is now a class <code>QuadratureSelector</code> that allows to select a
        quadrature formula based on a string argument and possibly a
        number indicating the order of the formula.
        <br>
        (Ralf B. Schulz 2003/10/29)
        </p>
 
-  <li> <p> Fixed: The constructor of the <code class="class">QGauss</code> class
+  <li> <p> Fixed: The constructor of the <code>QGauss</code> class
        computed positions and weights of quadrature points in long double accuracy.
        However, on machines where long double is the same as double, it 
        never reached the requested accuracy, in effect leading to an infinite loop.
@@ -426,15 +395,14 @@ inconvenience this causes.
        (WB 2003/09/19)
        </p>
 
-  <li> <p> New: The <code class="class">Function</code> class now
+  <li> <p> New: The <code>Function</code> class now
        exports the value of its template argument through the static
-       member variable <code class="member">dimension</code>.
+       member variable <code>dimension</code>.
        <br>
        (WB 2003/09/15)
        </p>
 
-  <li> <p> Changed: The <code
-       class="member">ParameterHandler::declare_entry</code> function
+  <li> <p> Changed: The <code>ParameterHandler::declare_entry</code> function
        now allows to redeclare an entry that has already been
        declared. This can be used to override a default value
        previously set.
@@ -442,20 +410,17 @@ inconvenience this causes.
        (WB 2003/09/03)
        </p>
 
-  <li> <p> Improved: The <code
-       class="member">ParameterHandler::declare_entry</code> function now takes an
+  <li> <p> Improved: The <code>ParameterHandler::declare_entry</code> function now takes an
        additional parameter (defaulting to the empty string) that can be used
        to document the intent of a parameter. This string, together with the
-       default value of an entry, is written to the output by the <code
-       class="member">ParameterHandler::print_parameters</code> function that
+       default value of an entry, is written to the output by the <code>ParameterHandler::print_parameters</code> function that
        can be used to generate a virginial parameter file, or one that contains
        the settings of all parameters used in a computation.
        <br>
        (WB 2003/08/13)
        </p>
 
-  <li> <p> Changed: The <code
-       class="member">ParameterHandler::declare_entry</code> previously
+  <li> <p> Changed: The <code>ParameterHandler::declare_entry</code> previously
        returned a value indicating whether the just-declared entry didn't
        already existed and that the default value matches the given
        pattern. However, this value could only always be true since these two
@@ -466,13 +431,7 @@ inconvenience this causes.
        (WB 2003/08/13)
        </p>
 
-  <li> <p> Improved: <code class="class">Logstream</code>::<code
-       class="member">depth_console</code>, <code
-       class="class">Logstream</code>::<code class="member">depth_file</code>, <code
-       class="class">Logstream</code>::<code
-       class="member">log_execution_time</code> and <code
-       class="class">Logstream</code>::<code
-       class="member">log_time_differences</code> return the previous value.
+  <li> <p> Improved: <code>Logstream</code>::<code>depth_console</code>, <code>Logstream</code>::<code>depth_file</code>, <code>Logstream</code>::<code>log_execution_time</code> and <code>Logstream</code>::<code>log_time_differences</code> return the previous value.
        <br>
        (GK 2003/06/22)
        </p>
@@ -484,77 +443,67 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
-  <li> <p> Improved: The matrix-vector operations of <code
-  class="class">SparseMatrix</code> accept arguments of type <code
-  class="class">BlockVector</code>.
+  <li> <p> Improved: The matrix-vector operations of <code>SparseMatrix</code> accept arguments of type <code>BlockVector</code>.
   <br>
   (GK/2004/03/31)
   </p>
 
-  <li> <p> Fixed: The <code class="class">SparseMatrix</code> iterator classes
+  <li> <p> Fixed: The <code>SparseMatrix</code> iterator classes
        had various interesting bugs when rows of the matrix were completely
        empty. These should now be fixed.
        <br>
        (WB 2004/03/30)
        </p>
 
-  <li> <p> New: The <code class="class">SparsityPattern</code> class now also
+  <li> <p> New: The <code>SparsityPattern</code> class now also
        has an iterator class that allows to walk over all nonzero entries of a
        sparsity pattern.
        <br>
        (WB 2004/03/29)
        </p>
 
-  <li> <p> New: The iterator classes into <code
-       class="class">SparseMatrix</code> have been rearranged and extended, so
+  <li> <p> New: The iterator classes into <code>SparseMatrix</code> have been rearranged and extended, so
        that it is now also possible to write to individual matrix entries
        through these iterators.
        <br>
        (WB 2004/03/29)
        </p>
 
-  <li> <p> New: The <code class="class">Vector</code> and <code
-       class="class">BlockVector</code> classes now have member functions
-       <code class="member">is_non_negative</code> that check whether a vector
+  <li> <p> New: The <code>Vector</code> and <code>BlockVector</code> classes now have member functions
+       <code>is_non_negative</code> that check whether a vector
        has no negative entries.
        <br>
        (WB 2004/02/29)
        </p>
 
-  <li> <p> Fixed: The <code
-       class="class">SolverMinRes</code> class had a nasty bug where we were
+  <li> <p> Fixed: The <code>SolverMinRes</code> class had a nasty bug where we were
        inadvertently copying vectors; this could also have led to a memory
        corruption bug. This is now fixed.
        <br>
        (WB 2004/02/26)
        </p>
 
-  <li> <p> New: There is now a function <code
-       class="class">FullMatrix::add_scaled</code>. It replaces the old
-       function <code class="class">FullMatrix::add</code> which did the same,
+  <li> <p> New: There is now a function <code>FullMatrix::add_scaled</code>. It replaces the old
+       function <code>FullMatrix::add</code> which did the same,
        but had a name that was incompatible with respective functions in the
        other matrix classes.
        <br>
        (WB 2004/02/23)
        </p>
 
-  <li> <p> New: <code class="class">FullMatrix</code> has new functions <code
-       class="member">add</code> and ,<code
-       class="member">Tadd</code>
+  <li> <p> New: <code>FullMatrix</code> has new functions <code>add</code> and ,<code>Tadd</code>
        allowing to add to a selected block of the matrix.
        <br>
        (GK 2004/02/12)
        </p>
 
-  <li> <p> New: The <code
-       class="class">Vector</code> class now has operators to compare for
+  <li> <p> New: The <code>Vector</code> class now has operators to compare for
        equality and inequality.
        <br>
        (WB 2004/02/09)
        </p>
 
-  <li> <p> New: The <code
-       class="member">SparseMatrix::operator()</code> generated an assertion
+  <li> <p> New: The <code>SparseMatrix::operator()</code> generated an assertion
        failure if the requested entry in the matrix isn't there. This has been
        changed so that it actually throws an exception instead, also in
        optimized mode.
@@ -562,37 +511,33 @@ inconvenience this causes.
        (WB 2004/02/06)
        </p>
 
-  <li> <p> New: There is now a function <code
-       class="member">SparseMatrix::frobenius_norm</code> that computes the
+  <li> <p> New: There is now a function <code>SparseMatrix::frobenius_norm</code> that computes the
        Frobenius norm of a sparse matrix.
        <br>
        (WB 2004/02/06)
        </p>
 
-  <li> <p> Changed: In matrix-vector operations of the <code
-       class="class">Full/SparseMatrix</code> classes, source and destination
+  <li> <p> Changed: In matrix-vector operations of the <code>Full/SparseMatrix</code> classes, source and destination
        cannot be the same. We now also check that this is indeed the case.
        <br>
        (WB 2004/01/26)
        </p>
   
-  <li> <p> Improved: Initialization routines of class <code
-       class="class">SparseMatrix</code> have an additional parameter
+  <li> <p> Improved: Initialization routines of class <code>SparseMatrix</code> have an additional parameter
        controlling the storage of diagonal entries.
        <br>
        (GK 2003/11/18)
        </p>
 
   <li> <p> New: 
-       <code class="class">SolverFGMRES</code> implements the flexible
+       <code>SolverFGMRES</code> implements the flexible
        GMRES method with varying preconditioner from the right. It is
-       also accessible in <code
-       class="class">SolverSelector</code> by choosing <tt>fgmres</tt>.
+       also accessible in <code>SolverSelector</code> by choosing <tt>fgmres</tt>.
        <br>
        (GK 2003/10/07)
        </p>
 
-  <li> <p> Changed: The <code class="class">SparseDirectMA27</code>
+  <li> <p> Changed: The <code>SparseDirectMA27</code>
        class used to store a pointer to the sparsity pattern of the
        matrix. It now releases this as soon as it doesn't need it any
        more.
@@ -601,25 +546,22 @@ inconvenience this causes.
        </p>
 
   <li> <p> New: Some of the member matrix-vector functions of the
-       <code class="class">BlockSparseMatrix</code> class that
-       previously could only be used with arguments of type <code
-       class="class">BlockVector</code> can now also be used with the
-       usual <code class="class">Vector</code> class provided the
+       <code>BlockSparseMatrix</code> class that
+       previously could only be used with arguments of type <code>BlockVector</code> can now also be used with the
+       usual <code>Vector</code> class provided the
        block matrix has only one block row or column.
        <br>
        (WB 2003/09/09)
        </p>
 
-  <li> <p> Fixed: <code class="class">FullMatrix</code>::<code
-       class="member">copy_from</code> didn't compile when copying
+  <li> <p> Fixed: <code>FullMatrix</code>::<code>copy_from</code> didn't compile when copying
        from a sparse matrix. This is now fixed.
        <br>
        (Ralf B. Schulz 2003/09/04)
        </p>
 
-  <li> <p> New: The classes <code class="class">FullMatrix</code> and
-       <code class="class">PreconditionBlockJacobi</code> have a <code
-       class="class">const_iterator</code>.
+  <li> <p> New: The classes <code>FullMatrix</code> and
+       <code>PreconditionBlockJacobi</code> have a <code>const_iterator</code>.
        <br>
        (GK 2003/07/18)
        </p>
@@ -631,11 +573,9 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
-  <li> <p> Improved: The <code
-       class="member">DoFTools::compute_Cuthill_McKee</code> function
+  <li> <p> Improved: The <code>DoFTools::compute_Cuthill_McKee</code> function
        needs to build a sparsity pattern for its operations, and uses
-       the <code
-       class="member">DoFHandler::max_couplings_per_dof</code>
+       the <code>DoFHandler::max_couplings_per_dof</code>
        function for this. However, the estimates returned by the
        latter function are rather bad in 3d, leading to excessive
        memory allocation in the Cuthill McKee algorithm in 3d. This is
@@ -645,33 +585,29 @@ inconvenience this causes.
        (WB 2004/05/18)
   </p>
 
-  <li> <p> Improved: <code class="class">Triangulation</code> has
-       functions <code class="member">n_faces</code> and <code
-       class="member">n_active_faces</code>, globally as well as by level,
-       similar to <code class="member">n_cells</code>.
+  <li> <p> Improved: <code>Triangulation</code> has
+       functions <code>n_faces</code> and <code>n_active_faces</code>, globally as well as by level,
+       similar to <code>n_cells</code>.
        <br>
        (GK 2004/05/18)
   </p>
 
   <li> <p>
        New: Added support for <a href="http://www.geuz.org/gmsh/"
-       target="_top">gmsh</a> mesh format in <code
-       class="member">GridIn::read_msh</code>.
+       target="_top">gmsh</a> mesh format in <code>GridIn::read_msh</code>.
        <br>
        (Luca Heltai 2004/04/21)
        </p>
               
   <li> <p>
-       New: The function <code
-       class="member">GridGenerator::cylinder_shell</code> generates a domain
+       New: The function <code>GridGenerator::cylinder_shell</code> generates a domain
        of the type which the name suggests.
        <br>
        (WB 2004/04/19)
        </p>
               
   <li> <p>
-       Changed: The <code
-       class="member">KellyErrorEstimator::estimate</code> function takes an
+       Changed: The <code>KellyErrorEstimator::estimate</code> function takes an
        additional parameter that lets it only compute error indicators for a
        certain subdomain. This is meant to allow for a better parallelization
        of efforts in parallel programs.
@@ -680,66 +616,52 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Changed: <code
-       class="class">MGTransferSelect</code> uses target components
-       correctly. Unfortunately, the untested class <code
-       class="class">MGTransferBlock</code> does not work anymore. Since its
+       Changed: <code>MGTransferSelect</code> uses target components
+       correctly. Unfortunately, the untested class <code>MGTransferBlock</code> does not work anymore. Since its
        usefulness was not clear anyway, this state may continue for a while.
        <br>
        (GK 2004/04/01)
        </p>
 
   <li> <p>
-       New: There is now a new <code class="class">FE_Poly</code>
-       class which is templatized for polynomial spaces like <code
-       class="class">TensorProductPolynomials</code>, <code
-       class="class">PolynomialSpace</code> or <code
-       class="class">PolynomialsP</code>. Many finite element classes
+       New: There is now a new <code>FE_Poly</code>
+       class which is templatized for polynomial spaces like <code>TensorProductPolynomials</code>, <code>PolynomialSpace</code> or <code>PolynomialsP</code>. Many finite element classes
        are now derived from this class and the implementation of all
        common functionality is now moved from these finite element
-       classes to <code class="class">FE_Poly</code>.
+       classes to <code>FE_Poly</code>.
        <br>
        (RH 2004/03/18)
        </p>
 
-  <li> <p> New: The new function <code
-       class="member">MatrixTools::local_apply_boundary_values</code> folds
+  <li> <p> New: The new function <code>MatrixTools::local_apply_boundary_values</code> folds
        boundary value information into local matrices and vectors before they
        are written into the global matrix and vector. This way, the final call
-       to  <code class="member">MatrixTools::apply_boundary_values</code> can
+       to  <code>MatrixTools::apply_boundary_values</code> can
        be avoided.
        <br>
        (WB 2004/03/16)
        </p>
 
-  <li> <p> New: There are now functions <code
-       class="member">ConstraintMatrix::distribute_local_to_global</code> that
+  <li> <p> New: There are now functions <code>ConstraintMatrix::distribute_local_to_global</code> that
        take a local matrix or vector and distribute it to a global one, but
        taking care of constrained degrees of freedom; in that case, the
        respective entries are already distributed to the final place in the
-       global matrix or vector. That way, the final call to the <code
-       class="member">ConstraintMatrix::condense</code> function can be
+       global matrix or vector. That way, the final call to the <code>ConstraintMatrix::condense</code> function can be
        avoided.
        <br>
        (WB 2004/03/15)
        </p>
 
-  <li> <p> New: The new functions <code
-       class="member">SparsityPattern::partition</code>, <code
-       class="member">GridTools::partition_triangulation</code>, <code
-       class="member">DoFTools::get_subdomain_association</code>, <code
-       class="member">DoFTools::count_dofs_with_subdomain_association</code>,
-       <code class="member">GridTools::get_subdomain_association</code>, <code
-       class="member">GridTools::count_cells_with_subdomain_association</code>, 
-       and <code class="member">DoFRenumbering::subdomain_wise</code> can now
+  <li> <p> New: The new functions <code>SparsityPattern::partition</code>, <code>GridTools::partition_triangulation</code>, <code>DoFTools::get_subdomain_association</code>, <code>DoFTools::count_dofs_with_subdomain_association</code>,
+       <code>GridTools::get_subdomain_association</code>, <code>GridTools::count_cells_with_subdomain_association</code>, 
+       and <code>DoFRenumbering::subdomain_wise</code> can now
        be used to generate partitions of a triangulation and its associated
        degrees of freedom suitable for parallel computations with PETSc.
        <br>
        (WB 2004/03/08)
        </p>
 
-  <li> <p> Improved: When eliminating nodes from a matrix using the <code
-       class="member">ConstraintMatrix::condense</code> functions, the
+  <li> <p> Improved: When eliminating nodes from a matrix using the <code>ConstraintMatrix::condense</code> functions, the
        diagonal entry was set to one. It is now set to an entry that more
        resembles the size of the other diagonal entries, so that we don't run
        into scaling problems for applications that have very large or small
@@ -748,8 +670,7 @@ inconvenience this causes.
        (WB 2004/03/02)
        </p>
 
-  <li> <p> Changed: The classes <code class="class">DataOut*</code> and <code
-       class="class">KellyErrorEstimator</code> have been generalized to take
+  <li> <p> Changed: The classes <code>DataOut*</code> and <code>KellyErrorEstimator</code> have been generalized to take
        more and different vector types as input parameters. In particular,
        they now take normal and block vectors over doubles and floats, as well
        as PETSc vectors if PETSc support is detected during configuration of
@@ -758,10 +679,8 @@ inconvenience this causes.
        (WB 2004/03/01)
        </p>
 
-  <li> <p> Changed: The template parameter of the functions in the <code
-       class="class">GridRefinement</code> class have been changed. Where they
-       previously denoted the type over which the <code
-       class="class">Vector</code> class is to be templated, they now mean the
+  <li> <p> Changed: The template parameter of the functions in the <code>GridRefinement</code> class have been changed. Where they
+       previously denoted the type over which the <code>Vector</code> class is to be templated, they now mean the
        actual vector class. Thus, they can be any other template class as long
        as there are suitable operations defined over them. In addition,
        the documentation stated that they must be vectors of floats; this
@@ -773,26 +692,13 @@ inconvenience this causes.
 
   <li> <p>
        New: The function
-       <class="class">FETools</code>::<class="member">project_dg</code>
+       <code>FETools::project_dg</code>
        performs <i>L<sup>2</sup></i>-projections between finite element spaces
        of different degrees on the same mesh.
        <br>
        (GK 2003/11/28)
        </p>
-
-  <li> <p>
-       Improved: <code class="class">FiniteElementData</code> has a function
-       <class="member">tensor_degree()</code>, returning the degree of the
-       polynomial space suitable for choosing a tensor product quadrature
-       formula. 
-       <br>
-       (GK 2003/11/28)
-       </p>
-
-  <li> <p>
-       New: Long requested but never implemented before in the
-       library: there is now a function <code
-       <class="class">GridTool</code>::<class="member">find_active_cell_around_point</code>
+<code>FiniteElementData</code> has a function>tensor_degree()</code>, returning the degree of thesuitable for choosing a tensor product quadratureimplemented before in theis now a function <code>GridTool</code>::<code>find_active_cell_around_point</code>
        that, given a point, finds the active cell in which this point
        lies.
        <br>
@@ -800,37 +706,31 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: <code class="class">MGCoarseGridHouseholder</code>
+       New: <code>MGCoarseGridHouseholder</code>
        implements a coarse grid solver using QR-factorization.
        <br>
        (GK 2003/10/17)
        </p>
 
   <li> <p>
-       Fixed: The <code
-       class="member">FEFaceValuesBase::boundary_form</code>
+       Fixed: The <code>FEFaceValuesBase::boundary_form</code>
        function was declared but not implemented. This is now fixed.
        <br>
        (J&ouml;rg R. Weimar 2003/10/22)
        </p>
 
   <li> <p>
-       Improved: The <code
-       class="member">MatrixCreator::create_mass_matrix</code>
+       Improved: The <code>MatrixCreator::create_mass_matrix</code>
        functions are now templatized also on the template argument of
-       the <code class="class">SparseMatrix</code> class. This allows
-       invoking this function for <code
-       class="class">SparseMatrix&lt;double&gt;</code> and <code
-       class="class">SparseMatrix&lt;float&gt;</code> objects.
+       the <code>SparseMatrix</code> class. This allows
+       invoking this function for <code>SparseMatrix&lt;double&gt;</code> and <code>SparseMatrix&lt;float&gt;</code> objects.
        <br>
        (RH 2003/10/22)
        </p>
 
   <li> <p>
-       New: There is now also a function <code
-       class="member">MGDoFCellAccessor::neighbor_child_on_subface</code>
-       that returns the result of the <code
-       class="member">CellAccessor::neighbor_child_on_subface</code>
+       New: There is now also a function <code>MGDoFCellAccessor::neighbor_child_on_subface</code>
+       that returns the result of the <code>CellAccessor::neighbor_child_on_subface</code>
        function but converts it so that one can also access MGDoF
        data.
        <br>
@@ -838,18 +738,15 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There are now functions <code
-       class="member">CellAccessor::neighbor_child_on_subface</code> and <code
-       class="member">DoFCellAccessor::neighbor_child_on_subface</code>
-       that should be called instead of using <code
-       class="member">GeometryInfo::child_cell_on_face</code> in most cases.
+       New: There are now functions <code>CellAccessor::neighbor_child_on_subface</code> and <code>DoFCellAccessor::neighbor_child_on_subface</code>
+       that should be called instead of using <code>GeometryInfo::child_cell_on_face</code> in most cases.
        <br> 
        (WB 2003/10/17)
        </p>
 
   <li> <p>
-       New: <code class="class">GridGenerator</code> has a new
-       function <code class="member">subdivided_hyper_rectangle</code> 
+       New: <code>GridGenerator</code> has a new
+       function <code>subdivided_hyper_rectangle</code> 
        which generates a rectangle with given corner points and possibly 
        different numbers of subdivisions in different directions.
        Use it, e.g., to generate a domain of 1*4 length units
@@ -859,8 +756,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Improved: The 3d grid reordering code in the <code
-       class="class">GridReordering</code> class now uses an algorithm
+       Improved: The 3d grid reordering code in the <code>GridReordering</code> class now uses an algorithm
        that is linear in the number of elements. The old code was
        exponential, so this is a vast improvement.
        <br> 
@@ -868,54 +764,48 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Improved: <code class="class">GridOut</code> has a an improved
-       functionality for <code class="member">write_eps</code> 
+       Improved: <code>GridOut</code> has a an improved
+       functionality for <code>write_eps</code> 
        to color the grid according to the refinement level.
        A corresponding option is included in 
-       <code class="class">GridOutFlags::Eps<2></code>.
+       <code>GridOutFlags::Eps<2></code>.
        <br> 
        (Joerg Weimar 2003/09/09)
        </p>
 
-  <li> <p> New: The <code class="class">TriaAccessor</code>::<code
-       class="member">point_inside</code> function is now also
+  <li> <p> New: The <code>TriaAccessor</code>::<code>point_inside</code> function is now also
        implemented in 3d.
        <br>
        (Joerg Weimar, WB 2003/09/04)
        </p>
 
-  <li> <p> New: The <code class="class">TriaAccessor</code>::<code
-       class="member">recursively_set_material_id</code> function sets
+  <li> <p> New: The <code>TriaAccessor</code>::<code>recursively_set_material_id</code> function sets
        the material id of the present cell and of all its children,
        grandchildren, etc to the given value.
        <br>
        (WB 2003/09/04)
        </p>
 
-  <li> <p> New: The new <code class="class">FETools</code>::<code
-       class="member">get_fe_from_name</code> function can do the
-       reverse of the <code class="class">FiniteElement</code>::<code
-       class="member">get_name</code> function: it takes a string and
+  <li> <p> New: The new <code>FETools</code>::<code>get_fe_from_name</code> function can do the
+       reverse of the <code>FiniteElement</code>::<code>get_name</code> function: it takes a string and
        parses it to regenerate a finite element from it. Useful for
        parsing finite element names from input files.
        <br>
        (WB 2003/07/08)
        </p>
 
-  <li> <p> New: The <code class="class">DataOut_DoFData</code>::<code
-       class="member">merge_patches</code> now takes a second
+  <li> <p> New: The <code>DataOut_DoFData</code>::<code>merge_patches</code> now takes a second
        parameter that indicates a shift for each vertex of the given
        patches to be merged. This is sometimes nice if one wants to
        generate "exploded" views of a collection of subdomains. It is
        also templatized on the first argument, so can merge in some
-       other <code class="class">DataOut_DoFData</code> that create
+       other <code>DataOut_DoFData</code> that create
        the same type of patches but are otherwise different.
        <br>
        (WB 2003/06/30)
        </p>
 
-  <li> <p> Fixed: The <code class="class">FETools</code>::<code
-       class="member">extrapolate</code> function operates on patches
+  <li> <p> Fixed: The <code>FETools</code>::<code>extrapolate</code> function operates on patches
        of cells, but didn't check whether the grid is at least refined
        once everywhere. If this was not the case, it would generate
        wrong results. It now checks for this, and if the grid has
@@ -925,8 +815,8 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Improved: <code class="class">FEFaceValuesBase</code> has a new
-       function <code class="member">orientation</code> accessing a unique
+       Improved: <code>FEFaceValuesBase</code> has a new
+       function <code>orientation</code> accessing a unique
        and consistent orientation for each face.
        <br> 
        (GK 2003/06/23)
@@ -943,12 +833,10 @@ inconvenience this causes.
        </p>
 
   <li> <p> 
-       New: Finite elements got a function <code
-       class="member">get_interpolation_matrix</code>, with which they can
+       New: Finite elements got a function <code>get_interpolation_matrix</code>, with which they can
        compute interpolations between different finite elements. Most will use
        this to compute interpolations between finite elements of the same kind
-       but different polynomial degrees. The <code
-       class="member">FETools::get_interpolation_matrix</code> makes use of
+       but different polynomial degrees. The <code>FETools::get_interpolation_matrix</code> makes use of
        this function if it implements the desired interpolation, and falls back
        to the old algorithm if this is not the case.
        <br>
@@ -956,23 +844,18 @@ inconvenience this causes.
        </p>
 
   <li> <p> 
-       New: Finite elements got a function <code
-       class="member">get_name</code>, which can be used to identify a finite
+       New: Finite elements got a function <code>get_name</code>, which can be used to identify a finite
        element by its name.
        <br>
        (WB 2003/06/09)
        </p>
 
   <li> <p> 
-       New: Raviart-Thomas elements are now implemented in the <code
-       class="class">FE_RaviartThomas</code> class.
+       New: Raviart-Thomas elements are now implemented in the <code>FE_RaviartThomas</code> class.
        <br>
        (WB 2003/06/09)
        </p>
 </ol>
 
-<hr>
-Last update $Date$
 
-</body>
-</html>
+*/

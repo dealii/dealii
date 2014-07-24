@@ -1,17 +1,21 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
-   "http://www.w3.org/TR/REC-html40/frameset.dtd">
-<html>
-  <head>
-    <link href="../../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II news page</title>
-    <meta name="author" content="the deal.II authors">
-    <meta name="keywords" content="deal.II"></head>
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2013, 2014 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-<body>
-
-
-
-<h2>Announcement of <acronym>deal.II</acronym> 3.0</h2>
+/**
+ * @page changes_between_2_0_and_3_0 Changes between Version 2.0 and 3.0
 
 <p>
 Version 3.0  of the deal.II object-oriented finite  element library is
@@ -76,6 +80,4 @@ The library is written for research purposes and offers many features:
 Wolfgang Bangerth, Guido Kanschat, the deal.II team
 </p>
 
-</body>
-</html>
-
+*/
