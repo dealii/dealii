@@ -150,7 +150,7 @@ public:
 public:
 
   /**
-   * @name 1: Basic Object-handling
+   * @name Basic object handling
    */
   //@{
   /**
@@ -415,6 +415,14 @@ public:
   template <typename Number2>
   bool operator != (const Vector<Number2> &v) const;
 
+  //@}
+
+
+  /**
+   * @name Scalar products, norms and related operations
+   */
+  //@{
+
   /**
    * Return the scalar product of two vectors.  The return type is the
    * underlying type of @p this vector, so the return type and the accuracy
@@ -482,56 +490,13 @@ public:
    * Maximum absolute value of the elements.
    */
   real_type linfty_norm () const;
+  //@}
+
 
   /**
-   * Returns true if the given global index is in the local range of this
-   * processor.  Since this is not a distributed vector the method always
-   * returns true.
+   * @name Data access
    */
-  bool in_local_range (const size_type global_index) const;
-
-  /**
-   * Return an index set that describes which elements of this vector
-   * are owned by the current processor. Note that this index set does
-   * not include elements this vector may store locally as ghost
-   * elements but that are in fact owned by another processor.
-   * As a consequence, the index sets returned on different
-   * processors if this is a distributed vector will form disjoint
-   * sets that add up to the complete index set.
-   * Obviously, if a vector is created on only one processor, then
-   * the result would satisfy
-   * @code
-   *   vec.locally_owned_elements() == complete_index_set (vec.size())
-   * @endcode
-   *
-   * Since the current data type does not support parallel data storage
-   * across different processors, the returned index set is the
-   * complete index set.
-   */
-  IndexSet locally_owned_elements () const;
-
-  /**
-   * Return dimension of the vector.
-   */
-  std::size_t size () const;
-
-  /**
-   * Return whether the vector contains only elements with value zero. This
-   * function is mainly for internal consistency checks and should seldom be
-   * used when not in debug mode since it uses quite some time.
-   */
-  bool all_zero () const;
-
-  /**
-   * Return @p true if the vector has no negative entries, i.e. all entries
-   * are zero or positive. This function is used, for example, to check
-   * whether refinement indicators are really all positive (or zero).
-   *
-   * The function obviously only makes sense if the template argument of this
-   * class is a real type. If it is a complex type, then an exception is
-   * thrown.
-   */
-  bool is_non_negative () const;
+  //@{
 
   /**
    * Make the @p Vector class a bit like the <tt>vector<></tt> class of the
@@ -555,13 +520,7 @@ public:
    * array.
    */
   const_iterator end () const;
-  //@}
 
-
-  /**
-   * @name 2: Data-Access
-   */
-  //@{
   /**
    * Access the value of the @p ith component.
    */
@@ -608,7 +567,7 @@ public:
 
 
   /**
-   * @name 3: Modification of vectors
+   * @name Modification of vectors
    */
   //@{
 
@@ -735,7 +694,6 @@ public:
     this->operator *= (factor);
   }
 
-
   /**
    * Scale each element of the vector by a constant value.
    *
@@ -828,7 +786,7 @@ public:
 
 
   /**
-   * @name 4: Mixed stuff
+   * @name Input and output
    */
   //@{
   /**
@@ -879,13 +837,6 @@ public:
   void block_read (std::istream &in);
 
   /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object.
-   */
-  std::size_t memory_consumption () const;
-  //@}
-
-  /**
    * Write the data of this object to a stream for the purpose of
    * serialization.
    */
@@ -900,6 +851,72 @@ public:
   void load (Archive &ar, const unsigned int version);
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Information about the object
+   */
+  //@{
+
+  /**
+   * Returns true if the given global index is in the local range of this
+   * processor.  Since this is not a distributed vector the method always
+   * returns true.
+   */
+  bool in_local_range (const size_type global_index) const;
+
+  /**
+   * Return an index set that describes which elements of this vector
+   * are owned by the current processor. Note that this index set does
+   * not include elements this vector may store locally as ghost
+   * elements but that are in fact owned by another processor.
+   * As a consequence, the index sets returned on different
+   * processors if this is a distributed vector will form disjoint
+   * sets that add up to the complete index set.
+   * Obviously, if a vector is created on only one processor, then
+   * the result would satisfy
+   * @code
+   *   vec.locally_owned_elements() == complete_index_set (vec.size())
+   * @endcode
+   *
+   * Since the current data type does not support parallel data storage
+   * across different processors, the returned index set is the
+   * complete index set.
+   */
+  IndexSet locally_owned_elements () const;
+
+  /**
+   * Return dimension of the vector.
+   */
+  std::size_t size () const;
+
+  /**
+   * Return whether the vector contains only elements with value zero. This
+   * function is mainly for internal consistency checks and should seldom be
+   * used when not in debug mode since it uses quite some time.
+   */
+  bool all_zero () const;
+
+  /**
+   * Return @p true if the vector has no negative entries, i.e. all entries
+   * are zero or positive. This function is used, for example, to check
+   * whether refinement indicators are really all positive (or zero).
+   *
+   * The function obviously only makes sense if the template argument of this
+   * class is a real type. If it is a complex type, then an exception is
+   * thrown.
+   */
+  bool is_non_negative () const;
+
+  /**
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
+   */
+  std::size_t memory_consumption () const;
+  //@}
 
 protected:
 
