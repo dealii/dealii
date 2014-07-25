@@ -58,6 +58,7 @@ void test(unsigned int ref=1)
 
   GridOut gridout;
   gridout.write_msh(tria, deallog.get_file_stream());
+
 }
 
 int main ()

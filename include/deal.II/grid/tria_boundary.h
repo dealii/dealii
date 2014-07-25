@@ -26,6 +26,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/point.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/manifold.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -79,10 +80,10 @@ template <int dim, int space_dim> class Triangulation;
  *   around a given center point.
  *
  * @ingroup boundary
- * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008
+ * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008, Luca Heltai, 2014
  */
 template <int dim, int spacedim=dim>
-class Boundary : public Subscriptor
+class Boundary : public FlatManifold<dim, spacedim>
 {
 public:
 
@@ -105,42 +106,6 @@ public:
    */
   virtual ~Boundary ();
 
-  /**
-   * Return the point which shall become the new middle vertex of the two
-   * children of a regular line. In 2D, this line is a line at the boundary,
-   * while in 3d, it is bounding a face at the boundary (the lines therefore
-   * is also on the boundary).
-   */
-  virtual
-  Point<spacedim>
-  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const = 0;
-
-  /**
-   * Return the point which shall become the common point of the four children
-   * of a quad at the boundary in three or more spatial dimensions. This
-   * function therefore is only useful in at least three dimensions and should
-   * not be called for lower dimensions.
-   *
-   * This function is called after the four lines bounding the given @p quad
-   * are refined, so you may want to use the information provided by
-   * <tt>quad->line(i)->child(j)</tt>, <tt>i=0...3</tt>, <tt>j=0,1</tt>.
-   *
-   * Because in 2D, this function is not needed, it is not made pure virtual,
-   * to avoid the need to overload it.  The default implementation throws an
-   * error in any case, however.
-   */
-  virtual
-  Point<spacedim>
-  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
-
-  /**
-   * Depending on <tt>dim=2</tt> or <tt>dim=3</tt> this function calls the
-   * get_new_point_on_line or the get_new_point_on_quad function. It throws an
-   * exception for <tt>dim=1</tt>. This wrapper allows dimension independent
-   * programming.
-   */
-  Point<spacedim>
-  get_new_point_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face) const;
 
   /**
    * Return intermediate points on a line spaced according to the interior
@@ -465,33 +430,16 @@ public:
 #ifndef DOXYGEN
 
 template <>
-Point<1>
-Boundary<1,1>::
-get_new_point_on_face (const Triangulation<1,1>::face_iterator &) const;
-
-template <>
 void
 Boundary<1,1>::
 get_intermediate_points_on_face (const Triangulation<1,1>::face_iterator &,
                                  std::vector<Point<1> > &) const;
 
 template <>
-Point<2>
-Boundary<1,2>::
-get_new_point_on_face (const Triangulation<1,2>::face_iterator &) const;
-
-template <>
 void
 Boundary<1,2>::
 get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
                                  std::vector<Point<2> > &) const;
-
-
-
-template <>
-Point<3>
-Boundary<1,3>::
-get_new_point_on_face (const Triangulation<1,3>::face_iterator &) const;
 
 template <>
 void

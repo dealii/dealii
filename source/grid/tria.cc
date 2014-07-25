@@ -3961,12 +3961,13 @@ namespace internal
                 // average of the
                 // 8 surrounding
                 // vertices
-                Point<spacedim> new_point;
-                for (unsigned int i=0; i<8; ++i)
-                  new_point += triangulation.vertices[new_vertices[i]];
-                new_point /= 8.0;
-
-                triangulation.vertices[next_unused_vertex] = new_point;
+                // Point<spacedim> new_point;
+		Quadrature<spacedim> quadrature;
+		Manifolds::get_default_quadrature(cell,quadrature);
+		
+                // triangulation.vertices[next_unused_vertex] = new_point;
+		triangulation.vertices[next_unused_vertex] = 
+		  cell->get_manifold().get_new_point(quadrature);
 
                 // if the user_flag is set, i.e. if the
                 // cell is at the boundary, use a
@@ -4011,13 +4012,19 @@ namespace internal
                       // connection between the new
                       // points on this face and on the
                       // opposite face
-                      triangulation.vertices[next_unused_vertex]
-                        = 0.5*(cell->face(boundary_face)
-                               ->child(0)->vertex(1)+
-                               cell->face(GeometryInfo<dim>
-                                          ::opposite_face[boundary_face])
-                               ->child(0)->vertex(1));
-                  }
+		      {
+			std::vector<Point<spacedim> > ps(2);
+			std::vector<double> ws(2, 0.5);
+			ps[0] = cell->face(boundary_face)
+			  ->child(0)->vertex(1);
+			ps[1] = cell->face(GeometryInfo<dim>
+					   ::opposite_face[boundary_face])
+			  ->child(0)->vertex(1);
+			Quadrature<spacedim> qs(ps,ws);
+			triangulation.vertices[next_unused_vertex]
+			  = cell->get_manifold().get_new_point(qs);
+		      }
+		  }
               }
             else
               {
@@ -6096,61 +6103,41 @@ namespace internal
                       triangulation.vertices[next_unused_vertex]
 			= quad->get_manifold().get_new_point_on_quad (quad);
                     else
-                      // it might be that the
-                      // quad itself is not
-                      // at the boundary, but
-                      // that one of its lines
-                      // actually is. in this
-                      // case, the newly
-                      // created vertices at
-                      // the centers of the
-                      // lines are not
-                      // necessarily the mean
-                      // values of the
-                      // adjacent vertices,
-                      // so do not compute
-                      // the new vertex as
-                      // the mean value of
-                      // the 4 vertices of
-                      // the face, but rather
-                      // as a weighted mean
-                      // value of the 8
-                      // vertices which we
-                      // already have (the
-                      // four old ones, and
-                      // the four ones
-                      // inserted as middle
-                      // points for the four
-                      // lines). summing up
-                      // some more points is
-                      // generally cheaper
-                      // than first asking
-                      // whether one of the
-                      // lines is at the
-                      // boundary
-                      //
-                      // note that the exact
-                      // weights are chosen
-                      // such as to minimize
-                      // the distortion of
-                      // the four new quads
-                      // from the optimal
-                      // shape; their
-                      // derivation and
-                      // values is copied
-                      // over from the
-                      // @p{MappingQ::set_laplace_on_vector}
-                      // function
-                      triangulation.vertices[next_unused_vertex]
-                        = (quad->vertex(0) + quad->vertex(1) +
-                           quad->vertex(2) + quad->vertex(3) +
-                           3*(quad->line(0)->child(0)->vertex(1) +
-                              quad->line(1)->child(0)->vertex(1) +
-                              quad->line(2)->child(0)->vertex(1) +
-                              quad->line(3)->child(0)->vertex(1))   ) / 16;
-
-                    triangulation.vertices_used[next_unused_vertex] = true;
-
+		      {
+			// it might be that the quad itself is not at
+			// the boundary, but that one of its lines
+			// actually is. in this case, the newly
+			// created vertices at the centers of the
+			// lines are not necessarily the mean values
+			// of the adjacent vertices, so do not compute
+			// the new vertex as the mean value of the 4
+			// vertices of the face, but rather as a
+			// weighted mean value of the 8 vertices which
+			// we already have (the four old ones, and the
+			// four ones inserted as middle points for the
+			// four lines). summing up some more points is
+			// generally cheaper than first asking whether
+			// one of the lines is at the boundary
+			//
+			// note that the exact weights are chosen such
+			// as to minimize the distortion of the four
+			// new quads from the optimal shape; their
+			// derivation and values is copied over from
+			// the @p{MappingQ::set_laplace_on_vector}
+			// function
+			// triangulation.vertices[next_unused_vertex]
+			//   = (quad->vertex(0) + quad->vertex(1) +
+			//      quad->vertex(2) + quad->vertex(3) +
+			//      3*(quad->line(0)->child(0)->vertex(1) +
+			// 	quad->line(1)->child(0)->vertex(1) +
+			// 	quad->line(2)->child(0)->vertex(1) +
+			// 	quad->line(3)->child(0)->vertex(1))   ) / 16;
+			Quadrature<spacedim> qs;
+			Manifolds::get_default_quadrature(quad, qs, true);
+			triangulation.vertices[next_unused_vertex] =
+			  quad->get_manifold().get_new_point (qs);
+		      }
+		    triangulation.vertices_used[next_unused_vertex] = true;
                     // now that we created
                     // the right point, make
                     // up the four lines
@@ -8413,26 +8400,28 @@ namespace internal
                       // vertex at the center of
                       // the quad is weighted (see
                       // above)
-                      triangulation.vertices[next_unused_vertex] = Point<dim>();
-                      // first add corners of hex
-                      for (unsigned int vertex=0;
-                           vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-                        triangulation.vertices[next_unused_vertex] += hex->vertex(vertex) / 128;
-                      // now add center of lines
-                      for (unsigned int line=0;
-                           line<GeometryInfo<dim>::lines_per_cell; ++line)
-                        triangulation.vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1) *
-                                                                      7./192.;
-                      // finally add centers of
-                      // faces. note that vertex 3
-                      // of child 0 is an invariant
-                      // with respect to the face
-                      // orientation, flip and
-                      // rotation
-                      for (unsigned int face=0;
-                           face<GeometryInfo<dim>::faces_per_cell; ++face)
-                        triangulation.vertices[next_unused_vertex] += hex->face(face)->isotropic_child(0)->vertex(3) *
-                                                                      1./12.;
+
+		      // triangulation.vertices[next_unused_vertex] = Point<dim>();
+		      // // first add corners of hex
+		      // for (unsigned int vertex=0;
+		      // 	   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
+		      // 	triangulation.vertices[next_unused_vertex] += hex->vertex(vertex) / 128;
+		      // // now add center of lines
+		      // for (unsigned int line=0;
+		      // 	   line<GeometryInfo<dim>::lines_per_cell; ++line)
+		      // 	triangulation.vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1) *
+		      // 	  7./192.;
+		      // // finally add centers of faces. note that
+		      // // vertex 3 of child 0 is an invariant with
+		      // // respect to the face orientation, flip and
+		      // // rotation
+		      // for (unsigned int face=0;
+		      // 	   face<GeometryInfo<dim>::faces_per_cell; ++face)
+		      // 	triangulation.vertices[next_unused_vertex] += hex->face(face)->isotropic_child(0)->vertex(3) *
+		      // 	  1./12.;
+
+		      triangulation.vertices[next_unused_vertex] =
+			hex->get_manifold().get_new_point_on_hex(hex);
 
                       // set the data of the
                       // six lines.  first
