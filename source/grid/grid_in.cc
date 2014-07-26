@@ -659,9 +659,11 @@ void GridIn<dim, spacedim>::read_ucd (std::istream &in)
             else
               {
                 // no such vertex index
-                AssertThrow (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
+                AssertThrow (false,
+                             ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
+
                 cells.back().vertices[i] = numbers::invalid_unsigned_int;
-              };
+              }
         }
       else if ((cell_type == "line") && ((dim == 2) || (dim == 3)))
         // boundary info
