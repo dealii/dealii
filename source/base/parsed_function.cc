@@ -128,7 +128,7 @@ namespace Functions
     constants["pi"] = numbers::PI;
     constants["Pi"] = numbers::PI;
 
-    unsigned int nn = (Utilities::split_string_list(vnames)).size();
+    const unsigned int nn = (Utilities::split_string_list(vnames)).size();
     switch (nn)
       {
       case dim:
@@ -140,7 +140,13 @@ namespace Functions
         function_object.initialize(vnames, expression, constants, true);
         break;
       default:
-        AssertThrow(false, ExcMessage("Not the correct size. Check your code."));
+        AssertThrow(false,
+                    ExcMessage("The list of variables specified is <" + vnames
+                               + "> which is a list of length "
+                               + Utilities::int_to_string(nn)
+                               + " but it has to be a list of length equal to"
+                               + " either dim (for a time-independent function)"
+                               + " or dim+1 (for a time-dependent function)."));
       }
   }
 
