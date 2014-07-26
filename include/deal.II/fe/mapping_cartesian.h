@@ -29,17 +29,34 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Mapping of an axis-parallel cell.
+ * A class providing a mapping from the reference cell to cells that are axiparallel.
  *
  * This class maps the unit cell to a grid cell with surfaces parallel
- * to the coordinate lines/planes. The mapping is therefore a scaling
- * along the coordinate directions. It is specifically developed for
- * cartesian meshes. Apply this mapping to a general mesh to get
- * strange results.
+ * to the coordinate lines/planes. It is specifically developed for
+ * Cartesian meshes. In other words, the mapping is meant for cells for which the
+ * mapping from the reference to the real cell is a scaling
+ * along the coordinate directions: The transformation from reference coordinates
+ * $\hat {\mathbf x}$ to real coordinates $\mathbf x$ on each cell is of the
+ * form
+ * @f{align*}
+ *   {\mathbf x}(\hat {\mathbf x})
+ *   =
+ *   \begin{pmatrix} h_x & 0 \\ 0 & h_y \end{pmatrix}
+ *   \hat{\mathbf x} + {\mathbf v}_0
+ * @f}
+ * in 2d, and
+ * @f{align*}
+ *   {\mathbf x}(\hat {\mathbf x})
+ *   =
+ *   \begin{pmatrix} h_x & 0 & 0 \\ 0 & h_y & 0 \\ 0 & 0 & h_z \end{pmatrix}
+ *   \hat{\mathbf x} + {\mathbf v}_0
+ * @f}
+ * in 3d, where ${\mathbf v}_0$ is the bottom left vertex and $h_x,h_y,h_z$ are
+ * the extents of the cell along the axes.
  *
- * For more information about the <tt>spacedim</tt> template parameter
- * check the documentation of FiniteElement or the one of
- * Triangulation.
+ * The class is intended for efficiency, and it does not do a whole lot of
+ * error checking. If you apply this mapping to a cell that does not conform to
+ * the requirements above, you will get strange results.
  *
  * @author Guido Kanschat, 2001; Ralf Hartmann, 2005
  */
