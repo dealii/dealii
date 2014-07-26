@@ -510,8 +510,9 @@ public:
    */
   DeclException2 (ExcInvalidVertexIndex,
                   int, int,
-                  << "Trying to access invalid vertex index " << arg2
-                  << " while creating cell " << arg1);
+                  << "While creating cell " << arg1
+                  << ", you are referencing a vertex with index " << arg2
+                  << " but no vertex with this index has been described in the input file.");
   /**
    * Exception
    */
