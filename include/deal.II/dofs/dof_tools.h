@@ -1660,9 +1660,9 @@ namespace DoFTools
   /**
    * Create an incidence matrix that for every cell on a given level
    * of a multilevel DoFHandler flags which degrees of freedom are
-   * associated with the corresponding cell. This data structure is
+   * associated with the corresponding cell. This data structure is a
    * matrix with as many rows as there are cells on a given level, as
-   * many rows as there are degrees of freedom on this level, and
+   * many columns as there are degrees of freedom on this level, and
    * entries that are either true or false. This data structure is
    * conveniently represented by a SparsityPattern object.
    *
@@ -1679,9 +1679,9 @@ namespace DoFTools
   /**
    * Create an incidence matrix that for every vertex on a given level
    * of a multilevel DoFHandler flags which degrees of freedom are
-   * associated with the adjacent cells. This data structure is matrix
+   * associated with the adjacent cells. This data structure is a matrix
    * with as many rows as there are vertices on a given level, as many
-   * rows as there are degrees of freedom on this level, and entries
+   * columns as there are degrees of freedom on this level, and entries
    * that are either true or false. This data structure is
    * conveniently represented by a SparsityPattern object.  The
    * sparsity pattern may be empty when entering this function and
@@ -1731,10 +1731,13 @@ namespace DoFTools
    * of a multilevel DoFHandler flags which degrees of freedom are
    * associated with children of this cell. This data structure is
    * conveniently represented by a SparsityPattern object.
-
-   * Create a sparsity pattern which in each row lists the degrees of
-   * freedom associated to the cells which are the children of the
-   * same cell. The sparsity pattern may be empty when entering this
+   *
+   * The function thus creates a sparsity pattern which in each row
+   * (with rows corresponding to the cells on this level) lists the degrees of
+   * freedom associated to the cells that are the children of this
+   * cell. The DoF indices used here are level dof indices of a multilevel
+   * hierarchy, i.e., they may be associated with children that are
+   * not themselves active. The sparsity pattern may be empty when entering this
    * function and will be reinitialized to the correct size.
    *
    * The function has some boolean arguments (listed below)

@@ -1943,7 +1943,6 @@ namespace DoFTools
     Assert(level > 0 && level < dof_handler.get_tria().n_levels(),
            ExcIndexRange(level, 1, dof_handler.get_tria().n_levels()));
 
-    typename DH::level_cell_iterator cell;
     typename DH::level_cell_iterator pcell = dof_handler.begin(level-1);
     typename DH::level_cell_iterator endc = dof_handler.end(level-1);
 
@@ -1952,10 +1951,12 @@ namespace DoFTools
 
     for (unsigned int block = 0; pcell != endc; ++pcell)
       {
-        if (!pcell->has_children()) continue;
+        if (!pcell->has_children())
+          continue;
+
         for (unsigned int child=0; child<pcell->n_children(); ++child)
           {
-            cell = pcell->child(child);
+            const typename DH::level_cell_iterator cell = pcell->child(child);
 
             // For hp, only this line here would have to be replaced.
             const FiniteElement<DH::dimension> &fe = dof_handler.get_fe();
