@@ -1246,11 +1246,11 @@ namespace VectorTools
 
     rhs_vector = 0;
 
-    std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+    const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
     cell_point =
       GridTools::find_active_cell_around_point (mapping, dof_handler, p);
 
-    Quadrature<dim> q(GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+    const Quadrature<dim> q(GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
 
     const FEValuesExtractors::Vector vec (0);
     FEValues<dim,spacedim> fe_values(mapping, dof_handler.get_fe(),

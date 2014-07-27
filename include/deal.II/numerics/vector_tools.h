@@ -1842,10 +1842,19 @@ namespace VectorTools
 
   /**
    * Create a right hand side
-   * vector for a point source at point @p p
-   * for vector-valued finite elements.
-   * Prior content of the
-   * given @p rhs_vector vector is
+   * vector for a point source at point @p p. This variation of the function
+   * is meant for vector-valued problems with exactly dim components (it will
+   * also work for problems with more than dim components, and in this case
+   * simply consider only the first dim components of the shape functions).
+   * It computes a right hand side that corresponds to a forcing function that
+   * is equal to a delta function times a given direction.
+   * In other words, it creates a vector $F$ so that
+   * $F_i = \int_\Omega [\mathbf d \delta(x-p)] \cdot \phi_i(x) dx$.
+   * Note here that $\phi_i$ is a vector-valued function. $\mathbf d$ is
+   * the given direction of the source term $\mathbf d \delta(x-p)$ and
+   * corresponds to the @p direction argument to be passed to this function.
+   *
+   * Prior content of the given @p rhs_vector vector is
    * deleted.
    *
    * See the general documentation of this
@@ -1855,7 +1864,7 @@ namespace VectorTools
   void create_point_source_vector(const Mapping<dim,spacedim>    &mapping,
                                   const DoFHandler<dim,spacedim> &dof,
                                   const Point<spacedim>          &p,
-                                  const Point<dim>               &orientation,
+                                  const Point<dim>               &direction,
                                   Vector<double>                 &rhs_vector);
 
   /**
@@ -1867,7 +1876,7 @@ namespace VectorTools
   template <int dim, int spacedim>
   void create_point_source_vector(const DoFHandler<dim,spacedim> &dof,
                                   const Point<spacedim>          &p,
-                                  const Point<dim>               &orientation,
+                                  const Point<dim>               &direction,
                                   Vector<double>                 &rhs_vector);
 
   /**
@@ -1878,7 +1887,7 @@ namespace VectorTools
   void create_point_source_vector(const hp::MappingCollection<dim,spacedim> &mapping,
                                   const hp::DoFHandler<dim,spacedim>        &dof,
                                   const Point<spacedim>                     &p,
-                                  const Point<dim>                          &orientation,
+                                  const Point<dim>                          &direction,
                                   Vector<double>                            &rhs_vector);
 
   /**
@@ -1894,7 +1903,7 @@ namespace VectorTools
   template <int dim, int spacedim>
   void create_point_source_vector(const hp::DoFHandler<dim,spacedim> &dof,
                                   const Point<spacedim>              &p,
-                                  const Point<dim>                   &orientation,
+                                  const Point<dim>                   &direction,
                                   Vector<double>                     &rhs_vector);
 
   /**
