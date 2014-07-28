@@ -976,6 +976,9 @@ namespace GridTools
    *
    * @tparam Container A type that satisfies the
    *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   *   In C++, the compiler can not determine the type of <code>Container</code>
+   *   from the function call. You need to specify it as an explicit template
+   *   argument following the function name.
    * @param cell[in] An iterator pointing to a cell of the mesh container.
    * @return A list of active cells that form the patch around the given cell
    *

@@ -1902,6 +1902,90 @@ namespace DoFTools
                          std::vector<unsigned int> &active_fe_indices);
 
   /**
+   * Count how many degrees of freedom live on a set of cells (i.e., a patch)
+   * described by the argument.
+   *
+   * Patches are often used in defining error estimators that require the
+   * solution of a local problem on the patch surrounding each of the cells of
+   * the mesh. You can get a list of cells that form the patch around a given
+   * cell using GridTools::get_patch_around_cell(). This function is then
+   * useful in setting up the size of the linear system used to solve the local
+   * problem on the patch around a cell. The function
+   * DoFTools::map_global_dofs_to_patch_indices() will then help to make the
+   * connection between global degrees of freedom and the local ones.
+   *
+   * @tparam Container A type that is either DoFHandler or hp::DoFHandler.
+   *   In C++, the compiler can not determine the type of <code>DH</code>
+   *   from the function call. You need to specify it as an explicit template
+   *   argument following the function name.
+   * @param patch[in] A collection of cells within an object of type DH
+   * @return The number of degrees of freedom associated with the cells of this patch.
+   *
+   * @note In the context of a parallel distributed computation, it only makes
+   * sense to call this function on patches around locally owned cells. This is because the
+   * neighbors of locally owned cells are either locally owned themselves, or
+   * ghost cells. For both, we know that these are in fact the real cells of
+   * the complete, parallel triangulation. We can also query the degrees of
+   * freedom on these. In other words, this function can only work if all
+   * cells in the patch are either locally owned or ghost cells.
+   *
+   * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
+   */
+  template <class DH>
+  unsigned int
+  count_dofs_on_patch (const std::vector<typename DH::active_cell_iterator> &patch);
+
+  /**
+   * Provide a mapping from the degrees of freedom that live on a set of
+   * cells (i.e., a patch) described by the argument, to a local numbering.
+   *
+   * Patches are often used in defining error estimators that require the
+   * solution of a local problem on the patch surrounding each of the cells of
+   * the mesh. You can get a list of cells that form the patch around a given
+   * cell using GridTools::get_patch_around_cell(). While DoFTools::count_dofs_on_patch()
+   * can be used to determine the size of these local problems, so that one can assemble
+   * the local system and then solve it, it is still necessary to provide a mapping
+   * between the global indices of the degrees of freedom that live on the patch
+   * and a local enumeration. This function provides such a local enumeration
+   * by computing a map that consists of pairs
+   * @code
+   *   global_dof_index -> local_dof_index
+   * @endcode
+   * where <code>global_dof_index</code> is the index of a degree of freedom
+   * located on the patch, <code>local_dof_index</code> is between zero and
+   * DoFTools::count_dofs_on_patch(), and there are a total of
+   * DoFTools::count_dofs_on_patch() entries in this map.
+   *
+   * @note The local DoF indices are assigned in no particular order; in particular,
+   * even if the global DoFHandler object has been renumbered (using the functions
+   * in DoFRenumbering) to respect a particular block structure, the local
+   * numbering produced by this function will not have this block structure.
+   * This is not usually a problem because local systems are typically small enough
+   * to allow for direct solution for which the block structure is not important.
+   *
+   * @tparam Container A type that is either DoFHandler or hp::DoFHandler.
+   *   In C++, the compiler can not determine the type of <code>DH</code>
+   *   from the function call. You need to specify it as an explicit template
+   *   argument following the function name.
+   * @param patch[in] A collection of cells within an object of type DH
+   * @return A mapping from those global degrees of freedom located on the
+   *   patch to a local numbering, as defined above.
+   *
+   * @note In the context of a parallel distributed computation, it only makes
+   * sense to call this function on patches around locally owned cells. This is because the
+   * neighbors of locally owned cells are either locally owned themselves, or
+   * ghost cells. For both, we know that these are in fact the real cells of
+   * the complete, parallel triangulation. We can also query the degrees of
+   * freedom on these. In other words, this function can only work if all
+   * cells in the patch are either locally owned or ghost cells.
+   *
+   * @author Arezou Ghesmati, Wolfgang Bangerth, 2014
+   */
+  template <class DH>
+  std::map<types::global_dof_index,unsigned int>
+  map_global_dofs_to_patch_indices (const std::vector<typename DH::active_cell_iterator> &patch);
+
+  /**
    * @}
    */
   
