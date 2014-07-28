@@ -142,12 +142,24 @@ project_to_manifold (const std::vector<Point<spacedim> > &,
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
-get_new_point (const Quadrature<spacedim> &) const
+get_new_point (const Quadrature<spacedim> &quad) const
 {
-  Assert (false, ExcPureFunctionCalled());
-  return Point<spacedim>();
-}
+  const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
+  const std::vector<double> &weights = quad.get_weights();
+  Point<spacedim> p;
 
+#ifdef DEBUG
+  double sum=0;
+  for(unsigned int i=0; i<weights.size(); ++i)
+    sum+= weights[i];
+  Assert(std::abs(sum-1.0) < 1e-10, ExcMessage("Weights should sum to 1!"));
+#endif
+  
+  for(unsigned int i=0; i<surrounding_points.size(); ++i) 
+    p += surrounding_points[i]*weights[i];
+
+  return project_to_manifold(surrounding_points, p);
+}
 
 
 template <int dim, int spacedim>
@@ -323,7 +335,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
       for(unsigned int d=0; d<spacedim; ++d) {
 	minP[d] = std::min(minP[d], surrounding_points[i][d]);
 	if(periodicity[d] > 0)
-	  Assert(surrounding_points[i][d] < periodicity[d],
+	  Assert(surrounding_points[i][d] < periodicity[d]+1e-10,
 		 ExcMessage("One of the points does not lye into the periodic box! Bailing out."));
       }
   
@@ -377,8 +389,9 @@ get_new_point (const Quadrature<spacedim> &quad) const
   
   for(unsigned int i=0; i<surrounding_points.size(); ++i) 
     chart_points[i] = pull_back(surrounding_points[i]);
-      
-  Point<chartdim> p_chart = sub_manifold.get_new_point(chart_points, weights);
+
+  Quadrature<chartdim> chart_quad(chart_points, weights);
+  Point<chartdim> p_chart = sub_manifold.get_new_point(chart_quad);
   
   return push_forward(p_chart);
 }

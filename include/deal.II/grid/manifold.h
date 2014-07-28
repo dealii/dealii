@@ -70,8 +70,10 @@ namespace Manifolds {
  *   collection of points in @p spacedim dimension, and a collection of
  *   weights.
  *
- *   Internally, the get_new_point() function calls the project_to_manifold()
- *   function. This allows end users to only overload project_to_manifold().
+ *   Internally, the get_new_point() function calls the
+ *   project_to_manifold() function after computing the weighted
+ *   average of the quadrature poitns. This allows end users to only
+ *   overload project_to_manifold() for simple situations.
  *
  *   Should a finer control be necessary, then get_new_point() can be
  *   overloaded.  For backward compatibility, this function also
@@ -79,6 +81,13 @@ namespace Manifolds {
  *   Boundary<dim,spacedim>, which are all derived from
  *   FlatManifold<dim,spacedim>, allowing old user codes to keep using
  *   their boundary descriptors as Manifold<dim,spacedim> objects.
+ *
+ *   The default behavior of these backward compatible interfaces is
+ *   to construct a Quadrature<spacedim> object containting the
+ *   vertices, midpoints of lines, and midpoints of quads with the
+ *   correct weight, and call get_new_point() with this quadrature. If
+ *   you need finer tuning for lines, quads or hexes, you can overload
+ *   any of the get_new_point_on_* functions. 
  *
  *   FlatManifold is the specialization from which StraigthBoundary is
  *   derived, where the project_to_manifold() function is the identity.
@@ -134,7 +143,9 @@ public:
    * become the new middle vertex of the two children of a regular
    * line. In 2D, this line is a line at the boundary, while in 3d, it
    * is bounding a face at the boundary (the lines therefore is also
-   * on the boundary). The default implementation of this function
+   * on the boundary).
+   *
+   * The default implementation of this function
    * passes its argument to the Manifolds::get_default_quadrature()
    * function, and then calls the
    * Manifold<dim,spacedim>::get_new_point() function. User derived
@@ -415,7 +426,7 @@ public:
    * The sub_manifold object is used to compute the average of the
    * points in the chart coordinates system. 
    */
-  FlatManifold<dim,spacedim> sub_manifold;
+  FlatManifold<dim,chartdim> sub_manifold;
 };
 
 
