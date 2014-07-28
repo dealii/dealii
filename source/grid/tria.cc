@@ -23,6 +23,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_levels.h>
 #include <deal.II/grid/tria_faces.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -4039,7 +4040,7 @@ namespace internal
 
                 // new vertex is placed on the surface according to
                 // the information stored in the boundary class
-		const Boundary<dim,spacedim> &manifold = cell->get_manifold();
+		const Manifold<dim,spacedim> &manifold = cell->get_manifold();
 		
                 triangulation.vertices[next_unused_vertex] =
                   manifold.get_new_point_on_quad (cell);
@@ -8992,7 +8993,7 @@ Triangulation<dim, spacedim>::set_boundary (const types::manifold_id m_number,
 template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number,
-                                            const Boundary<dim, spacedim> &manifold_object)
+                                            const Manifold<dim, spacedim> &manifold_object)
 {
   Assert(m_number < numbers::invalid_manifold_id,
 	 ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
@@ -9026,17 +9027,22 @@ template <int dim, int spacedim>
 const Boundary<dim,spacedim> &
 Triangulation<dim, spacedim>::get_boundary (const types::manifold_id m_number) const
 {
-  return get_manifold(m_number);
+  const Boundary<dim, spacedim> * man = 
+    dynamic_cast<const Boundary<dim, spacedim> *>(&get_manifold(m_number));
+  Assert(man != NULL,
+	 ExcMessage("You tried to get a Boundary, but I only have a Manifold."));
+    
+  return *man;
 }
 
 
 template <int dim, int spacedim>
-const Boundary<dim,spacedim> &
+const Manifold<dim,spacedim> &
 Triangulation<dim, spacedim>::get_manifold (const types::manifold_id m_number) const
 {
 				   //look, if there is a manifold stored at
 				   //manifold_id number.
-  typename std::map<types::manifold_id, SmartPointer<const Boundary<dim,spacedim>, Triangulation<dim, spacedim> > >::const_iterator it
+  typename std::map<types::manifold_id, SmartPointer<const Manifold<dim,spacedim>, Triangulation<dim, spacedim> > >::const_iterator it
     = manifold.find(m_number);
 
   if (it != manifold.end())
@@ -9128,7 +9134,7 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
   faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
 
   typename std::map<types::manifold_id,
-    SmartPointer<const Boundary<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
+    SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
   bdry_iterator = old_tria.manifold.begin();
   for (; bdry_iterator != old_tria.manifold.end() ; bdry_iterator++)
     manifold[bdry_iterator->first] = bdry_iterator->second;
