@@ -335,7 +335,7 @@ namespace Step52
 
 
 
-  // @sect5{<code>Diffusion::output_results}
+  // @sect5{<code>Diffusion::output_results</code>}
   //
   // We output the solution in vtu files.
   void Diffusion::output_results(unsigned int time_step,TimeStepping::runge_kutta_method method) const

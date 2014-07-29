@@ -748,7 +748,7 @@ namespace DoFTools
    * grid. The finite element used for the respective components on the two
    * grids needs to be the same. An example may clarify this: consider an
    * optimization problem with controls $q$ discretized on a coarse mesh and a
-   * state variable $u$ (and corresponding Lagrange multiplier $\lambda)
+   * state variable $u$ (and corresponding Lagrange multiplier $\lambda$)
    * discretized on the fine mesh. These are discretized using piecewise
    * constant discontinuous, continuous linear, and continuous linear
    * elements, respectively. Only the parameter $q$ is represented on the

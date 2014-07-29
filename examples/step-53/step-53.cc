@@ -219,8 +219,8 @@ SphereGeometry<3>::average (const std_cxx1x::array<double,3> (&array)[N])
   }
 
   // finally for the polar angle. the difficulty here is that we have, for
-  // example, two points at (r,phi,theta) and (r,phi+pi,\pm pi/2), then we want
-  // to average these to (r,*,pi) where the equatorial angle does not matter
+  // example, two points at $(r,\phi,\theta)$ and $(r,\phi+\pi,\pm \pi/2)$, then we want
+  // to average these to $(r,\ast,\pi)$ where the equatorial angle does not matter
   {
     //??? not sure how exactly to do this
   }
