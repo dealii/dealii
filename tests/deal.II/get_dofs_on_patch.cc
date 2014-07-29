@@ -16,7 +16,7 @@
 
 
 
-// Test DoFTools::map_global_dofs_to_patch_indices()
+// Test DoFTools::get_dofs_on_patch()
 
 
 #include "../tests.h"
@@ -86,13 +86,12 @@ void test()
 	 cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     {
-      const std::map<types::global_dof_index,unsigned int>
-	m = DoFTools::map_global_dofs_to_patch_indices<DoFHandler<dim> >
+      const std::vector<types::global_dof_index>
+	m = DoFTools::get_dofs_on_patch<DoFHandler<dim> >
 	(GridTools::get_patch_around_cell<DoFHandler<dim> > (cell));
       deallog << cell << ": ";
-      for (typename std::map<types::global_dof_index,unsigned int>::const_iterator
-	     x = m.begin(); x != m.end(); ++x)
-	deallog << x->first << "->" << x->second
+      for (unsigned int i=0; i<m.size(); ++i)
+	deallog << i << "->" << m[i]
 		<< ' ';
       deallog << std::endl;
     }
