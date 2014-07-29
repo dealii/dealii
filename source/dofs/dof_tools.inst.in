@@ -838,8 +838,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         (const std::vector<DoFHandler<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> &patch);
 
         template
-        std::map<types::global_dof_index,unsigned int>
-        map_global_dofs_to_patch_indices<DoFHandler<deal_II_dimension,deal_II_space_dimension> >
+        std::vector<types::global_dof_index>
+        get_dofs_on_patch<DoFHandler<deal_II_dimension,deal_II_space_dimension> >
         (const std::vector<DoFHandler<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> &patch);
 
         template
@@ -848,8 +848,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         (const std::vector<hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> &patch);
 
         template
-        std::map<types::global_dof_index,unsigned int>
-        map_global_dofs_to_patch_indices<hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> >
+        std::vector<types::global_dof_index>
+        get_dofs_on_patch<hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> >
         (const std::vector<hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> &patch);
       \}
     #endif

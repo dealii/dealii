@@ -191,9 +191,11 @@ inconvenience this causes.
 
 <ol>
   <li> New: The function GridTools::get_patch_around_cell() extracts
-  the set of cells that surround a single cell.
+  the set of cells that surround a single cell. The new functions
+  DoFTools::count_dofs_on_patch() and DoFTools::get_dofs_on_patch()
+  then help set up local problem on patches.
   <br>
-  (Arezou Ghesmati, Wolfgang Bangerth, 2014/07/21)
+  (Arezou Ghesmati, Wolfgang Bangerth, 2014/07/29)
   </li>
 
   <li> Fixed: Utilities::string_to_int() and

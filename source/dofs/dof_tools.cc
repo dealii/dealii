@@ -2145,38 +2145,36 @@ namespace DoFTools
 
 
   template <class DH>
-  std::map<types::global_dof_index,unsigned int>
-  map_global_dofs_to_patch_indices (const std::vector<typename DH::active_cell_iterator> &patch)
+  std::vector<types::global_dof_index>
+  get_dofs_on_patch (const std::vector<typename DH::active_cell_iterator> &patch)
   {
-    std::map<types::global_dof_index,unsigned int> dofs_mapping;
-    std::vector<types::global_dof_index> local_dof_indices;
+      std::set<types::global_dof_index> dofs_on_patch;
+      std::vector<types::global_dof_index> local_dof_indices;
 
-    // loop over the cells in the patch and get the DoFs on each.
-    // number all of them unless we have already encountered them
-    unsigned int next_unused_patch_dof_index = 0;
-    for(unsigned int i=0; i<patch.size(); ++i)
-      {
-        const typename DH::active_cell_iterator cell = patch[i];
-        Assert (cell->is_artificial() == false,
-                ExcMessage("This function can not be called with cells that are "
-                           "not either locally owned or ghost cells."));
+      // loop over the cells in the patch and get the DoFs on each.
+      // add all of them to a std::set which automatically makes sure
+      // all duplicates are ignored
+      for(unsigned int i=0; i<patch.size(); ++i)
+        {
+          const typename DH::active_cell_iterator cell = patch[i];
+          Assert (cell->is_artificial() == false,
+                  ExcMessage("This function can not be called with cells that are "
+                             "not either locally owned or ghost cells."));
+          local_dof_indices.resize (cell->get_fe().dofs_per_cell);
+          cell->get_dof_indices (local_dof_indices);
+          dofs_on_patch.insert (local_dof_indices.begin(),
+                                local_dof_indices.end());
+        }
 
-        local_dof_indices.resize (cell->get_fe().dofs_per_cell);
-        cell->get_dof_indices(local_dof_indices);
-
-        for (unsigned int i=0; i < cell->get_fe().dofs_per_cell ; ++i)
-          if (dofs_mapping.find(local_dof_indices[i]) == dofs_mapping.end())
-            {
-              dofs_mapping.insert(std::make_pair(local_dof_indices[i],
-                                                 next_unused_patch_dof_index));
-              ++next_unused_patch_dof_index;
-            }
-      }
-
-    Assert (next_unused_patch_dof_index == count_dofs_on_patch<DH>(patch),
+    Assert (dofs_on_patch.size() == count_dofs_on_patch<DH>(patch),
             ExcInternalError());
 
-    return dofs_mapping;
+    // return a vector with the content of the set above. copying
+    // also ensures that we retain sortedness as promised in the
+    // documentation and as necessary to retain the block structure
+    // also on the local system
+    return std::vector<types::global_dof_index> (dofs_on_patch.begin(),
+                                                 dofs_on_patch.end());
   }
 
 
