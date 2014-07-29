@@ -44,7 +44,7 @@ the default):
 
 <code>
 <pre>
-$ mpirun -n 50 ./step-32
+\$ mpirun -np 50 ./step-32
 </pre>
 </code>
 

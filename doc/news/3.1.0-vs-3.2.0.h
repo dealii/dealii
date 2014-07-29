@@ -57,7 +57,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        Changed: If in multithreaded mode, the ACE library is now
-       automatically added to the <code>$(LIBS)</code> Makefile
+       automatically added to the <code>\$(LIBS)</code> Makefile
        variable. There is no need anymore for a special clause in your
        Makefile.
        <br>
