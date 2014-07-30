@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -45,7 +45,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       SET(DEAL_II_CXX11_FLAG "-std=c++11")
     ELSEIF(DEAL_II_HAVE_FLAG_stdcxx11)
       CHECK_CXX_COMPILER_FLAG("-std=c++0x" DEAL_II_HAVE_FLAG_stdcxx0x)
-      SET(DEAL_II_CXX11_FLAG "-std=x++0x")
+      SET(DEAL_II_CXX11_FLAG "-std=c++0x")
     ENDIF()
   ENDIF()
 
