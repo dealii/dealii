@@ -14,11 +14,7 @@
 //
 // ---------------------------------------------------------------------
 
-/*
- * Authors: Guido Kanschat, University of Heidelberg, 2003
- *          Baerbel Janssen, University of Heidelberg, 2010
- *          Wolfgang Bangerth, Texas A&M University, 2010
- */
+// Multigrid for continuous finite elements using MeshWorker
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
