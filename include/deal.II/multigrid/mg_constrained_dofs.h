@@ -306,18 +306,17 @@ inline
 const std::vector<std::vector<bool> > &
 MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
 {
-  Assert(false, ExcMessage("Timo fixes this"));
-  
-  // if (refinement_edge_boundary_indices_old.size()!=refinement_edge_boundary_indices.size())
-  //   {
-  //     unsigned int n_levels = refinement_edge_boundary_indices.size();
-  //     refinement_edge_boundary_indices_old.resize(n_levels);
-  //     for (unsigned int l=0;l<n_levels;++l)
-  //       {
-  //         refinement_edge_boundary_indices_old[l].resize(refinement_edge_boundary_indices[l].size(), false);
-  //         refinement_edge_boundary_indices[l].fill_binary_vector(refinement_edge_boundary_indices_old[l]);
-  //       }
-  //   }
+  if (refinement_edge_boundary_indices_old.size()==0)
+  {
+    unsigned int n_levels = refinement_edge_indices.size();
+    refinement_edge_boundary_indices_old.resize(n_levels);
+    for (unsigned int l=0;l<n_levels;++l)
+    {
+      refinement_edge_boundary_indices_old[l].resize(refinement_edge_indices[l].size());
+      for (types::global_dof_index idx=0;idx<refinement_edge_indices[l].size();++idx)
+        refinement_edge_boundary_indices_old[l][idx] = this->is_boundary_index(l, idx);
+    }
+  }
 
   return refinement_edge_boundary_indices_old;
 }
