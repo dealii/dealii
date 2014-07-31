@@ -550,10 +550,10 @@ namespace Step39
     mg_smoother.set_symmetric(true);
     mg_smoother.set_variable(false);
 
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgmatrix(&mg_matrix);
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgdown(&mg_matrix_dg_down);
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgup(&mg_matrix_dg_up);
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgedge(&mg_matrix_in_out);
+    mg::Matrix<Vector<double> > mgmatrix(mg_matrix);
+    mg::Matrix<Vector<double> > mgdown(mg_matrix_dg_down);
+    mg::Matrix<Vector<double> > mgup(mg_matrix_dg_up);
+    mg::Matrix<Vector<double> > mgedge(mg_matrix_in_out);
 
     Multigrid<Vector<double> > mg(mg_dof_handler, mgmatrix,
                                   mg_coarse, mg_transfer,

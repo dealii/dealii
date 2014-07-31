@@ -43,6 +43,20 @@ public:
 
   typedef std::vector<std::set<types::global_dof_index> >::size_type size_dof;
   /**
+   * Fill the internal data structures with hanging node constraints
+   * extracted from the dof handler object. Works with natural
+   * boundary conditions only. There exists a sister function setting
+   * up boundary constraints as well.
+   *
+   * This function ensures that on every level, degrees of freedom at interior
+   * edges of a refinement level are treated corrected but leaves degrees of
+   * freedom at the boundary of the domain untouched assuming that no
+   * Dirichlet boundary conditions for them exist.
+   */
+  template <int dim, int spacedim>
+  void initialize (const DoFHandler<dim,spacedim> &dof);
+
+  /**
    * Fill the internal data structures with values extracted from the dof
    * handler object and apply the boundary values provided.
    *
@@ -136,21 +150,6 @@ public:
   bool set_boundary_values () const DEAL_II_DEPRECATED;
 
 private:
-
-  /**
-   * @warning This function generates an inconsistent object if not
-   * called from the other initialize() in this class.
-   *
-   * Fill the internal data structures with values extracted from the dof
-   * handler object.
-   *
-   * This function ensures that on every level, degrees of freedom at interior
-   * edges of a refinement level are treated corrected but leaves degrees of
-   * freedom at the boundary of the domain untouched assuming that no
-   * Dirichlet boundary conditions for them exist.
-   */
-  template <int dim, int spacedim>
-  void initialize (const DoFHandler<dim,spacedim> &dof);
 
   /**
    * The indices of boundary dofs for each level.
