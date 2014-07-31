@@ -192,7 +192,7 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
 
       refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
     }
-  
+
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices);
 }
 
@@ -201,15 +201,15 @@ template <int dim, int spacedim>
 inline
 void
 MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof,
-			      const typename FunctionMap<dim>::type &function_map,
-			      const ComponentMask &component_mask)
+                              const typename FunctionMap<dim>::type &function_map,
+                              const ComponentMask &component_mask)
 {
   initialize (dof);
-  
+
   MGTools::make_boundary_list (dof,
-			       function_map,
-			       boundary_indices,
-			       component_mask);
+                               function_map,
+                               boundary_indices,
+                               component_mask);
 }
 
 
@@ -235,7 +235,7 @@ MGConstrainedDoFs::is_boundary_index (const unsigned int level,
 {
   if (boundary_indices.size() == 0)
     return false;
-  
+
   AssertIndexRange(level, boundary_indices.size());
   return (boundary_indices[level].find(index) != boundary_indices[level].end());
 }
@@ -282,7 +282,7 @@ MGConstrainedDoFs::get_refinement_edge_indices () const
     {
       unsigned int n_levels = refinement_edge_indices.size();
       refinement_edge_indices_old.resize(n_levels);
-      for (unsigned int l=0;l<n_levels;++l)
+      for (unsigned int l=0; l<n_levels; ++l)
         {
           refinement_edge_indices_old[l].resize(refinement_edge_indices[l].size(), false);
           refinement_edge_indices[l].fill_binary_vector(refinement_edge_indices_old[l]);
@@ -306,16 +306,16 @@ const std::vector<std::vector<bool> > &
 MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
 {
   if (refinement_edge_boundary_indices_old.size()==0)
-  {
-    unsigned int n_levels = refinement_edge_indices.size();
-    refinement_edge_boundary_indices_old.resize(n_levels);
-    for (unsigned int l=0;l<n_levels;++l)
     {
-      refinement_edge_boundary_indices_old[l].resize(refinement_edge_indices[l].size());
-      for (types::global_dof_index idx=0;idx<refinement_edge_indices[l].size();++idx)
-        refinement_edge_boundary_indices_old[l][idx] = this->is_boundary_index(l, idx);
+      unsigned int n_levels = refinement_edge_indices.size();
+      refinement_edge_boundary_indices_old.resize(n_levels);
+      for (unsigned int l=0; l<n_levels; ++l)
+        {
+          refinement_edge_boundary_indices_old[l].resize(refinement_edge_indices[l].size());
+          for (types::global_dof_index idx=0; idx<refinement_edge_indices[l].size(); ++idx)
+            refinement_edge_boundary_indices_old[l][idx] = this->is_boundary_index(l, idx);
+        }
     }
-  }
 
   return refinement_edge_boundary_indices_old;
 }

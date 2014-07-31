@@ -13,21 +13,12 @@
  * the top level of the deal.II distribution.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Guido Kanschat, University of Heidelberg, 2003
  *          Baerbel Janssen, University of Heidelberg, 2010
  *          Wolfgang Bangerth, Texas A&M University, 2010
  */
 
-
-// As discussed in the introduction, most of this program is copied almost
-// verbatim from step-6, which itself is only a slight modification of
-// step-5. Consequently, a significant part of this program is not new if
-// you've read all the material up to step-6, and we won't comment on that
-// part of the functionality that is unchanged. Rather, we will focus on those
-// aspects of the program that have to do with the multigrid functionality
-// which forms the new aspect of this tutorial program.
 
 // @sect3{Include files}
 
@@ -79,10 +70,12 @@
 #include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/multigrid/mg_matrix.h>
 
-// Finally we include the MeshWorker framework. Since we have to build
+// Finally we include the MeshWorker framework. This framework through
+// its function loop() and integration_loop(), automates loops over
+// cells and assembling of data into vectors, matrices, etc. It obeys
+// constraints automatically. Since we have to build
 // several matrices and have to be aware of several sets of
-// constraints, we do not program loops over cells ourselves, but
-// rather leave the actual logic to MeshWorker::loop().
+// constraints, this will save us a lot of headache.
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
 #include <deal.II/meshworker/simple.h>
@@ -97,53 +90,81 @@
 #include <fstream>
 #include <sstream>
 
-// Lazy as we are, we avoid typing namespace names
-
 using namespace dealii;
-using namespace LocalIntegrators;
 
 namespace Step16
 {
-  // @{sect3}{The integrator on each cell}
+  // @sect3{The integrator on each cell}
 
-  // MeshWorker::integration_loop() expects a class that provides
+  // The MeshWorker::integration_loop() expects a class that provides
   // functions for integration on cells and boundary and interior
   // faces. This is done by the following class. In the constructor,
   // we tell the loop that cell integrals should be computed (the
   // 'true'), but integrals should not be computed on boundary and
-  // interior faces (the two 'false').
+  // interior faces (the two 'false'). Accordingly, we only need a
+  // cell function, but none for the faces.
 
   template <int dim>
-  class LaplaceMatrix : public MeshWorker::LocalIntegrator<dim>
+  class LaplaceIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
-public:
-LaplaceMatrix();
-virtual void cell(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const;
-};
+  public:
+    LaplaceIntegrator();
+      virtual void cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
+  };
 
 
-template <int dim>
-LaplaceMatrix<dim>::LaplaceMatrix()
-		:
-		MeshWorker::LocalIntegrator<dim>(true, false, false)
-{}
+  template <int dim>
+  LaplaceIntegrator<dim>::LaplaceIntegrator()
+    :
+    MeshWorker::LocalIntegrator<dim>(true, false, false)
+  {}
 
 
-template <int dim>
-void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, MeshWorker::IntegrationInfo<dim>& info) const
-{
-  AssertDimension (dinfo.n_matrices(), 1);
-const double coefficient = (dinfo.cell->center()(0) > 0.)
-			   ? .1 : 1.;
- 
- Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0), coefficient);
+  // Next the actual integrator on each cell. We solve a Poisson problem with a
+  // coefficient one in the right half plane and one tenth in the left
+  // half plane.
 
-  if (dinfo.n_vectors() > 0)
-    {
-std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
- L2::L2(dinfo.vector(0).block(0), info.fe_values(0), rhs);
-}
-}
+  // The MeshWorker::LocalResults base class of MeshWorker::DoFInfo
+  // contains objects that can be filled in this local integrator. How
+  // many objects is determined inside the MeshWorker framework by the
+  // assembler class. Here, we test for instance that one matrix is
+  // required (MeshWorker::LocalResults::n_matrices()). The matrices are accessed
+  // through MeshWorker::LocalResults::matrix(), which takes the number of the
+  // matrix as its first argument. The second argument is only used
+  // for integrals over faces, where there are two matrices for each
+  // test function set. In such a case, a second matrix with indicator
+  // 'true' would exist with the same index.
+
+  // MeshWorker::IntegrationInfo provides one or several FEValues
+  // objects, which below are used by
+  // LocalIntegrators::Laplace::cell_matrix() or
+  // LocalIntegrators::L2::L2(). Since we are assembling only a single
+  // PDE, there is also only one of these objects with index zero.
+  
+  // In addition, we note that this integrator serves to compute the
+  // matrices for the multilevel preconditioner as well as the matrix
+  // and the right hand side for the global system. Since the
+  // assembler for a system requires an additional vector, this is
+  // indicated by MeshWorker::LocalResults::n_vectors() returning a nonzero
+  // value. Accordingly we fill a right hand side vector at the end of
+  // this function. Since LocalResults can deal with several
+  // BlockVector objects, but we are again in the simplest case here,
+  // we enter the information into block zero of vector zero.
+  template <int dim>
+  void LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const
+  {
+    AssertDimension (dinfo.n_matrices(), 1);
+    const double coefficient = (dinfo.cell->center()(0) > 0.)
+                               ? .1 : 1.;
+
+    LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0), coefficient);
+
+    if (dinfo.n_vectors() > 0)
+      {
+        std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
+        LocalIntegrators::L2::L2(dinfo.vector(0).block(0), info.fe_values(0), rhs);
+      }
+  }
 
 
   // @sect3{The <code>LaplaceProblem</code> class template}
@@ -186,26 +207,21 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
 
     const unsigned int degree;
 
-    // The following four objects are the only additional member variables,
-    // compared to step-6. The first three represent the operators that act
-    // on individual levels of the multilevel hierarchy, rather than on the
-    // finest mesh as do the objects above while the last object stores
-    // information about the boundary indices on each level and information
-    // about indices lying on a refinement edge between two different
-    // refinement levels.
-    //
-    // To facilitate having objects on each level of a multilevel hierarchy,
-    // deal.II has the MGLevelObject class template that provides storage for
-    // objects on each level. What we need here are matrices on each level,
-    // which implies that we also need sparsity patterns on each level. As
-    // outlined in the @ref mg_paper, the operators (matrices) that we need
-    // are actually twofold: one on the interior of each level, and one at the
-    // interface between each level and that part of the domain where the mesh
-    // is coarser. In fact, we will need the latter in two versions: for the
-    // direction from coarse to fine mesh and from fine to
-    // coarse. Fortunately, however, we here have a self-adjoint problem for
-    // which one of these is the transpose of the other, and so we only have
-    // to build one; we choose the one from coarse to fine.
+    // The following members are the essential data structures for the
+    // multigrid method. The first two represent the sparsity patterns
+    // and the matrices on individual levels of the multilevel
+    // hierarchy, very much like the objects for the global mesh above.
+
+    // Then we have two new matrices only needed for multigrid
+    // methods with local smoothing on adaptive meshes. They convey
+    // data between the interior part of the refined region and the
+    // refinement edge, as outline in detail in @ref mg_paper.
+
+    // The last object stores information about the boundary indices
+    // on each level and information about indices lying on a
+    // refinement edge between two different refinement levels. It
+    // thus serves a similar purpose as ConstraintMatrix, but on each
+    // level.
     MGLevelObject<SparsityPattern>       mg_sparsity_patterns;
     MGLevelObject<SparseMatrix<double> > mg_matrices;
     MGLevelObject<SparseMatrix<double> > mg_interface_in;
@@ -216,13 +232,8 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
 
   // @sect3{The <code>LaplaceProblem</code> class implementation}
 
-  // @sect4{LaplaceProblem::LaplaceProblem}
-
-  // The constructor is left mostly unchanged. We take the polynomial degree
-  // of the finite elements to be used as a constructor argument and store it
-  // in a member variable.
-  //
-  // By convention, all adaptively refined triangulations in deal.II never
+  // Just one short remark about the constructor of the Triangulation:
+  // by convention, all adaptively refined triangulations in deal.II never
   // change by more than one level across a face between cells. For our
   // multigrid algorithms, however, we need a slightly stricter guarantee,
   // namely that the mesh also does not change by more than refinement level
@@ -248,35 +259,23 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
 
   // @sect4{LaplaceProblem::setup_system}
 
-  // The following function extends what the corresponding one in step-6
-  // did, with the exception of also distributing the degrees of freedom on
-  // each level of the mesh which is needed for the multigrid hierarchy.
-  // We then output the number of degrees (globally and on each level) and
-  // reset the solution and right hand side vectors to the correct size.
-  // As in other programs where we use a sequence of meshes that become
-  // finer and finer (starting with step-5), the code as is here sets
-  // the solution vector to zero, rather than trying to interpolate the
-  // solution obtained on the previous mesh to the current one. This
-  // follows from the empirical observation that interpolating the solution
-  // and using it as a starting guess does not significant decrease the number
-  // of linear CG iterations one has to perform to solve a linear system.
-  // (The situation is very different for nonlinear problems, where using
-  // a previous time step's solution, or a solution from a coarser grid,
-  // typically drastically makes the solution of a nonlinear system cheaper.)
+  // In addition to just distributing the degrees of freedom in
+  // the DoFHandler, we do the same on each level. Then, we follow the
+  // same procedure as before to set up the system on the leaf mesh.
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
     dof_handler.distribute_mg_dofs (fe);
 
-    std::cout << "   Number of degrees of freedom: "
-	      << dof_handler.n_dofs()
-	      << " (by level: ";
+    deallog << "   Number of degrees of freedom: "
+              << dof_handler.n_dofs()
+              << " (by level: ";
     for (unsigned int level=0; level<triangulation.n_levels(); ++level)
-      std::cout << dof_handler.n_dofs(level)
-		<< (level == triangulation.n_levels()-1
-		    ? ")" : ", ");
-    std::cout << std::endl;
+      deallog << dof_handler.n_dofs(level)
+                << (level == triangulation.n_levels()-1
+                    ? ")" : ", ");
+    deallog << std::endl;
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
                              dof_handler.n_dofs(),
@@ -286,17 +285,6 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
     solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
 
-    // But it starts to be a wee bit different here, although this still
-    // doesn't have anything to do with multigrid methods. step-6 took care of
-    // boundary values and hanging nodes in a separate step after assembling
-    // the global matrix from local contributions. This works, but the same
-    // can be done in a slightly simpler way if we already take care of these
-    // constraints at the time of copying local contributions into the global
-    // matrix. To this end, we here do not just compute the constraints due to
-    // hanging nodes, but also due to zero boundary conditions. We will use
-    // this set of constraints later on to help us copy local contributions
-    // correctly into the global linear system right away, without the need
-    // for a later clean-up stage:
     constraints.clear ();
     hanging_node_constraints.clear ();
     DoFTools::make_hanging_node_constraints (dof_handler, hanging_node_constraints);
@@ -374,12 +362,34 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
   // @sect4{LaplaceProblem::assemble_system}
 
   // The following function assembles the linear system on the finest level of
-  // the mesh. It is almost exactly the same as in step-6.
+  // the mesh. Since we want to reuse the code here for the level
+  // assembling below, we use the local integrator class
+  // LaplaceIntegrator and leave the loops to the MeshWorker
+  // framework. Thus, this function first sets up the objects
+  // necessary for this framework, namely
+  // <ol>
+  // <li>an MeshWorker::IntegrationInfoBox, which will provide all the required
+  // data in quadrature points on the cell. This object can be seen as
+  // an extension of FEValues, providing a lot more useful
+  // information,</li>
+  // <li>a MeshWorker::DoFInfo object, which on the one hand side extends the
+  // functionality of cell iterators, but also provides space for
+  // return values in its base class LocalResults,</li>
+  // <li>an assembler, in this case for the whole system. The term
+  // 'simple' here refers to the fact that the global system does not
+  // have a block structure,</li>
+  // <li>an the local integrator, which implements the actual forms.
+  // </ol>
   //
-  // This latter trick is something that only found its way into deal.II over
-  // time and wasn't used in the initial version of this tutorial
-  // program. There is, however, a discussion of this function in the
-  // introduction of step-27.
+  // After the loop has combined all of these into a matrix and a
+  // right hand side, there is one thing left to do: the assemblers
+  // leave matrix rows and columns of constrained degrees of freedom
+  // untouched. Therefore, we put a one on the diagonal to make the
+  // whole system well posed. The value one, or any fixed value has
+  // the advantage, that its effect on the spectrum of the matrix is
+  // easily understood. Since the corresponding eigenvectors form an
+  // invariant subspace, the value chosen does not affect the
+  // convergence of Krylov space solvers.
   template <int dim>
   void LaplaceProblem<dim>::assemble_system ()
   {
@@ -394,15 +404,15 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
     MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> > assembler;
     assembler.initialize(constraints);
     assembler.initialize(system_matrix, system_rhs);
- 
-    LaplaceMatrix<dim> matrix_integrator;
-    MeshWorker::integration_loop<dim, dim> (
-        dof_handler.begin_active(), dof_handler.end(),
-        dof_info, info_box, matrix_integrator, assembler);
 
-    for(unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-      if(constraints.is_constrained(i))
-	system_matrix.set(i,i,1.);
+    LaplaceIntegrator<dim> matrix_integrator;
+    MeshWorker::integration_loop<dim, dim> (
+      dof_handler.begin_active(), dof_handler.end(),
+      dof_info, info_box, matrix_integrator, assembler);
+
+    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+      if (constraints.is_constrained(i))
+        system_matrix.set(i, i, 1.);
   }
 
 
@@ -412,12 +422,11 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
   // that define the multigrid method on each level of the mesh. The
   // integration core is the same as above, but the loop below will go over
   // all existing cells instead of just the active ones, and the results must
-  // be entered into the correct matrix. Note also that since we only do
-  // multilevel preconditioning, no right-hand side needs to be assembled
-  // here.
-  //
-  // Before we go there, however, we have to take care of a significant amount
-  // of book keeping:
+  // be entered into the correct level matrices. Fortunately,
+  // MeshWorker hides most of that from us, and thus the difference
+  // between this function and the previous lies only in the setup of
+  // the assembler and the different iterators in the loop.
+  // Also, fixing up the matrices in the end is a little more comlicated.
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid ()
   {
@@ -434,18 +443,19 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
     assembler.initialize(mg_matrices);
     assembler.initialize_interfaces(mg_interface_in, mg_interface_out);
 
-    LaplaceMatrix<dim> matrix_integrator;
+    LaplaceIntegrator<dim> matrix_integrator;
     MeshWorker::integration_loop<dim, dim> (
-        dof_handler.begin_mg(), dof_handler.end_mg(),
-        dof_info, info_box, matrix_integrator, assembler);
+      dof_handler.begin_mg(), dof_handler.end_mg(),
+      dof_info, info_box, matrix_integrator, assembler);
 
     const unsigned int nlevels = triangulation.n_levels();
-    for (unsigned int level=0;level<nlevels;++level)
-    {
-      for(unsigned int i=0; i<dof_handler.n_dofs(level); ++i)
-        if(mg_matrices[level].diag_element(i)==0)
-          mg_matrices[level].set(i,i,1.);
-    }
+    for (unsigned int level=0; level<nlevels; ++level)
+      {
+        for (unsigned int i=0; i<dof_handler.n_dofs(level); ++i)
+          if (mg_constrained_dofs.is_boundary_index(level,i) ||
+              mg_constrained_dofs.at_refinement_edge(level,i))
+            mg_matrices[level].set(i, i, 1.);
+      }
   }
 
 
@@ -549,17 +559,13 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
     SolverControl solver_control (1000, 1e-12);
-    SolverCG<>    cg (solver_control);
+    SolverCG<>    solver (solver_control);
 
     solution = 0;
 
-    cg.solve (system_matrix, solution, system_rhs,
-              preconditioner);
+    solver.solve (system_matrix, solution, system_rhs,
+                  preconditioner);
     constraints.distribute (solution);
-
-    std::cout << "   " << solver_control.last_step()
-              << " CG iterations needed to obtain convergence."
-              << std::endl;
   }
 
 
@@ -621,7 +627,7 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
   {
     for (unsigned int cycle=0; cycle<8; ++cycle)
       {
-        std::cout << "Cycle " << cycle << ':' << std::endl;
+        deallog << "Cycle " << cycle << std::endl;
 
         if (cycle == 0)
           {
@@ -634,12 +640,10 @@ std::vector<double> rhs(info.fe_values(0).n_quadrature_points, 1.);
           }
         else
           refine_grid ();
-//            triangulation.refine_global (1);
 
-
-        std::cout << "   Number of active cells:       "
-                  << triangulation.n_active_cells()
-                  << std::endl;
+        deallog << "   Number of active cells:       "
+		<< triangulation.n_active_cells()
+		<< std::endl;
 
         setup_system ();
 
@@ -661,8 +665,6 @@ int main ()
   try
     {
       using namespace Step16;
-
-      deallog.depth_console (0);
 
       LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();
