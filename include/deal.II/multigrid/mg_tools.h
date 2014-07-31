@@ -267,31 +267,10 @@ namespace MGTools
                          const bool preserve_symmetry) DEAL_II_DEPRECATED;
 
   /**
-   * For each level in a multigrid
-   * hierarchy, produce a boolean
-   * mask that indicates which of
-   * the degrees of freedom are
-   * along interfaces of this level
-   * to cells that only exist on
-   * coarser levels. The function
-   * returns the subset of these
-   * indices in the last argument
-   * that are not only on interior
-   * interfaces (i.e. between cells
-   * of a given level and adjacent
-   * coarser levels) but also on
-   * the external boundary of the
-   * domain.
-   */
-  template <int dim, int spacedim>
-  void
-  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<IndexSet>  &interface_dofs,
-                                std::vector<IndexSet>  &boundary_interface_dofs);
-
-  /**
-   * Does the same as the function above,
-   * but fills only the interface_dofs.
+   * For each level in a multigrid hierarchy, produce an IndexSet
+   * that indicates which of the degrees of freedom are along
+   * interfaces of this level to cells that only exist on coarser
+   * levels.
    */
   template <int dim, int spacedim>
   void

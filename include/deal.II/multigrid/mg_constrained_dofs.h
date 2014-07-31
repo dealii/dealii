@@ -44,18 +44,6 @@ public:
   typedef std::vector<std::set<types::global_dof_index> >::size_type size_dof;
   /**
    * Fill the internal data structures with values extracted from the dof
-   * handler object.
-   *
-   * This function ensures that on every level, degrees of freedom at interior
-   * edges of a refinement level are treated corrected but leaves degrees of
-   * freedom at the boundary of the domain untouched assuming that no
-   * Dirichlet boundary conditions for them exist.
-   */
-  template <int dim, int spacedim>
-  void initialize (const DoFHandler<dim,spacedim> &dof);
-
-  /**
-   * Fill the internal data structures with values extracted from the dof
    * handler object and apply the boundary values provided.
    *
    * This function internally calls the initialize() function above and the
@@ -74,18 +62,17 @@ public:
 
   /**
    * Determine whether a dof index is subject to a boundary
-   * constraint. (In other words, whether it is on boundary of domain.)
+   * constraint.
    */
   bool is_boundary_index (const unsigned int level,
                           const types::global_dof_index index) const;
 
   /**
-   * Determine whether a dof index is at an edge that is not a
+   * @deprecated Determine whether a dof index is at an edge that is not a
    * refinement edge.
    */
-// TODO: remove
   bool non_refinement_edge_index (const unsigned int level,
-                                  const types::global_dof_index index) const;
+                                  const types::global_dof_index index) const DEAL_II_DEPRECATED;
 
   /**
    * Determine whether a dof index is at the refinement edge.
@@ -94,16 +81,19 @@ public:
                            const types::global_dof_index index) const;
 
   /**
-   * Determine whether a dof index is at the refinement edge and
-   * subject to a boundary constraint .
-   * = is_boundary_index() && at_refinement_edge()
+   * @deprecated Use is_boundary_index() instead. The logic behind
+   * this function here is unclear and for practical purposes, the
+   * other is needed.
+   *
+   * Determine whether a dof index is subject to a boundary
+   * constraint.
    */
   bool at_refinement_edge_boundary (const unsigned int level,
-                                    const types::global_dof_index index) const;
+                                    const types::global_dof_index index) const DEAL_II_DEPRECATED;
 
   /**
-   * Return the indices of dofs for each level that lie on the
-   * boundary of the domain.
+   * Return the indices of dofs for each level that are subject to
+   * boundary constraints.
    */
   const std::vector<std::set<types::global_dof_index> > &
   get_boundary_indices () const;
@@ -138,13 +128,6 @@ public:
   get_refinement_edge_boundary_indices () const DEAL_II_DEPRECATED;
 
   /**
-   * Return indices of all dofs that are on boundary faces on the given level 
-   * if the cell has refinement edge indices (i.e. has a coarser neighbor).
-   */
-  const IndexSet &
-  get_refinement_edge_boundary_indices (unsigned int level) const;
-
-  /**
    * @deprecated The function is_boundary_index() now returns false if
    * no boundary values are set.
    *
@@ -153,6 +136,21 @@ public:
   bool set_boundary_values () const DEAL_II_DEPRECATED;
 
 //private:
+
+  /**
+   * @warning This function generates an inconsistent object if not
+   * called from the other initialize() in this class.
+   *
+   * Fill the internal data structures with values extracted from the dof
+   * handler object.
+   *
+   * This function ensures that on every level, degrees of freedom at interior
+   * edges of a refinement level are treated corrected but leaves degrees of
+   * freedom at the boundary of the domain untouched assuming that no
+   * Dirichlet boundary conditions for them exist.
+   */
+  template <int dim, int spacedim>
+  void initialize (const DoFHandler<dim,spacedim> &dof);
 
   /**
    * The indices of boundary dofs for each level.
@@ -164,14 +162,6 @@ public:
    * coarser cells.
    */
   std::vector<IndexSet> refinement_edge_indices;
-
-  /**
-   * The degrees of freedom on the refinement edge between a level and
-   * coarser cells, which are also on the boundary.
-   *
-   * This is a subset of #refinement_edge_indices.
-   */
-  std::vector<IndexSet> refinement_edge_boundary_indices;
 
   /**
    * old data structure only filled on demand
@@ -195,7 +185,6 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
   boundary_indices.resize(nlevels);
 
   refinement_edge_indices.resize(nlevels);
-  refinement_edge_boundary_indices.resize(nlevels);
   refinement_edge_indices_old.clear();
   refinement_edge_boundary_indices_old.clear();
   for (unsigned int l=0; l<nlevels; ++l)
@@ -203,11 +192,9 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
       boundary_indices[l].clear();
 
       refinement_edge_indices[l] = IndexSet(dof.n_dofs(l));
-      refinement_edge_boundary_indices[l] = IndexSet(dof.n_dofs(l));
     }
   
-  MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
-                                         refinement_edge_boundary_indices);
+  MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices);
 }
 
 
@@ -236,9 +223,6 @@ MGConstrainedDoFs::clear()
 
   for (unsigned int l=0; l<refinement_edge_indices.size(); ++l)
     refinement_edge_indices[l].clear();
-
-  for (unsigned int l=0; l<refinement_edge_boundary_indices.size(); ++l)
-    refinement_edge_boundary_indices[l].clear();
 
   refinement_edge_indices_old.clear();
   refinement_edge_boundary_indices_old.clear();
@@ -281,9 +265,7 @@ bool
 MGConstrainedDoFs::at_refinement_edge_boundary (const unsigned int level,
                                                 const types::global_dof_index index) const
 {
-  AssertIndexRange(level, refinement_edge_boundary_indices.size());
-
-  return refinement_edge_boundary_indices[level].is_element(index);
+  return is_boundary_index(level, index);
 }
 
 inline
@@ -319,30 +301,26 @@ MGConstrainedDoFs::get_refinement_edge_indices (unsigned int level) const
   return refinement_edge_indices[level];
 }
 
+
 inline
 const std::vector<std::vector<bool> > &
 MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
 {
-  if (refinement_edge_boundary_indices_old.size()!=refinement_edge_boundary_indices.size())
+  if (refinement_edge_boundary_indices_old.size()==0)
+  {
+    unsigned int n_levels = refinement_edge_indices.size();
+    refinement_edge_boundary_indices_old.resize(n_levels);
+    for (unsigned int l=0;l<n_levels;++l)
     {
-      unsigned int n_levels = refinement_edge_boundary_indices.size();
-      refinement_edge_boundary_indices_old.resize(n_levels);
-      for (unsigned int l=0;l<n_levels;++l)
-        {
-          refinement_edge_boundary_indices_old[l].resize(refinement_edge_boundary_indices[l].size(), false);
-          refinement_edge_boundary_indices[l].fill_binary_vector(refinement_edge_boundary_indices_old[l]);
-        }
+      refinement_edge_boundary_indices_old[l].resize(refinement_edge_indices[l].size());
+      for (types::global_dof_index idx=0;idx<refinement_edge_indices[l].size();++idx)
+        refinement_edge_boundary_indices_old[l][idx] = this->is_boundary_index(l, idx);
     }
+  }
 
   return refinement_edge_boundary_indices_old;
 }
 
-inline
-const IndexSet &
-MGConstrainedDoFs::get_refinement_edge_boundary_indices (unsigned int level) const
-{
-  return refinement_edge_boundary_indices[level];
-}
 
 inline
 bool

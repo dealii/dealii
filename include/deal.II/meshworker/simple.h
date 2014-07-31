@@ -995,11 +995,11 @@ namespace MeshWorker
             if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                 !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
               {
-		if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-		     !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
+		if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+		     !mg_constrained_dofs->is_boundary_index(level, i2[k]))
 		    ||
-		    (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-		     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
+		    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+		     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
 		     i1[j] == i2[k]))
 		  G.add(i1[j], i2[k], M(j,k));
               }
@@ -1025,11 +1025,11 @@ namespace MeshWorker
             if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                 !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
               {
-		if ((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-		     !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
+		if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+		     !mg_constrained_dofs->is_boundary_index(level, i2[k]))
 		    ||
-		    (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-		     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
+		    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+		     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
 		     i1[j] == i2[k]))
 		  G.add(i1[j], i2[k], M(k,j));
               }
