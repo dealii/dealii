@@ -79,6 +79,11 @@ namespace TimeStepping
   {
   public:
     /**
+     * Virtual destructor.
+     */
+    virtual ~TimeStepping() {};
+
+    /**
      * Purely virtual function. This function is used to advance from time @p
      * t to t+ @p delta_t. @p F is a vector of functions \f$ f(t,y) \f$ that should be
      * integrated, the input parameters are the time t and the vector y and the
@@ -119,6 +124,11 @@ namespace TimeStepping
   class RungeKutta : public TimeStepping<VECTOR>
   {
   public:
+    /**
+     * Virtual destructor.
+     */
+    virtual ~RungeKutta() {};
+
     /**
      * Purely virtual method used to initialize the Runge-Kutta method.
      */
