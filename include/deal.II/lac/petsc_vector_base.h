@@ -1298,7 +1298,7 @@ namespace PETScWrappers
         ierr = VecGetArray(locally_stored_elements, &ptr);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-        for (PetscInti=0; i<n_idx; ++i)
+        for (PetscInt i=0; i<n_idx; ++i)
           {
             const unsigned int index = *(indices_begin+i);
             if ( index>=static_cast<unsigned int>(begin)
