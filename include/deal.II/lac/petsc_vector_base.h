@@ -1282,7 +1282,7 @@ namespace PETScWrappers
         // ghost elements whose
         // position we can get from
         // an index set
-        PetscInt begin, end, i;
+        PetscInt begin, end;
         ierr = VecGetOwnershipRange (vector, &begin, &end);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -1298,7 +1298,7 @@ namespace PETScWrappers
         ierr = VecGetArray(locally_stored_elements, &ptr);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-        for (i = 0; i < n_idx; i++)
+        for (PetscInt i=0; i<n_idx; ++i)
           {
             const unsigned int index = *(indices_begin+i);
             if ( index>=static_cast<unsigned int>(begin)
@@ -1340,7 +1340,7 @@ namespace PETScWrappers
         ierr = VecGetArray(vector, &ptr);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-        for (PetscInt i = 0; i < n_idx; i++)
+        for (PetscInt i=0; i<n_idx; ++i)
           {
             const unsigned int index = *(indices_begin+i);
 
