@@ -464,7 +464,7 @@ public:
    * <li> The index of a cell inside the level.</li>
    * </ol>
    *
-   * @Note: the ordering is not consistent between different processor in
+   * @note The ordering is not consistent between different processor in
    * a parallel::distributed::Triangulation because we rely on index(),
    * which is likely not the same.
    */

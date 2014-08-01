@@ -794,7 +794,7 @@ namespace TrilinosWrappers
 
     /**
      *  Output of vector in user-defined format in analogy to the
-     *  dealii::Vector<number> class.
+     *  dealii::Vector class.
      */
     void print (const char *format = 0) const;
 
