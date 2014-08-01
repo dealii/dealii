@@ -592,7 +592,7 @@ void LaplaceProblem<dim>::run ()
       assemble_multigrid (true);
 
       solve ();
-      output_results (cycle);
+      // output_results (cycle);
     }
 }
 

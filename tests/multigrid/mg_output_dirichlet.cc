@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// like _01 but on adaptively refined grid
+// Check the results of MGTransferPrebuilt with Dirichlet boundary conditions
 
 //TODO:[GK] Add checks for RT again!
 
