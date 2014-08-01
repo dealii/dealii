@@ -64,7 +64,7 @@ namespace Manifolds {
   
   template <typename OBJECT, int spacedim>
   void get_default_quadrature(const OBJECT& obj, 
-			      Quadrature<spacedim> &quad, bool with_laplace = false) 
+			      Quadrature<spacedim> &quad, bool with_laplace) 
   {
     std::vector<Point<spacedim> > sp;
     std::vector<double> wp;
