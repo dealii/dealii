@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------
 
 
-// like _01 but on adaptively refined grid
+// Check the results of MGTransferPrebuilt with Neumann boundary conditions
 
 //TODO:[GK] Add checks for RT again!
 
@@ -38,7 +38,6 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -52,7 +51,7 @@ using namespace std;
 
 template <int dim, typename number, int spacedim>
 void
-reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
                MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.min_level();
@@ -98,13 +97,13 @@ void refine_mesh (Triangulation<dim> &triangulation)
 }
 
 template <int dim>
-void initialize (const MGDoFHandler<dim> &dof,
+void initialize (const DoFHandler<dim> &dof,
                  Vector<double> &u)
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-  for (typename MGDoFHandler<dim>::active_cell_iterator
+  for (typename DoFHandler<dim>::active_cell_iterator
        cell = dof.begin_active();
        cell != dof.end(); ++cell)
     {
@@ -115,7 +114,7 @@ void initialize (const MGDoFHandler<dim> &dof,
 }
 
 template <int dim>
-void initialize (const MGDoFHandler<dim> &dof,
+void initialize (const DoFHandler<dim> &dof,
                  MGLevelObject<Vector<double> > &u)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -125,9 +124,9 @@ void initialize (const MGDoFHandler<dim> &dof,
 
   for (unsigned int l=0; l<dof.get_tria().n_levels(); ++l)
     {
-      for (typename MGDoFHandler<dim>::cell_iterator
-           cell = dof.begin(l);
-           cell != dof.end(l); ++cell)
+      for (typename DoFHandler<dim>::cell_iterator
+           cell = dof.begin_mg(l);
+           cell != dof.end_mg(l); ++cell)
         {
           cell->get_mg_dof_indices(dof_indices);
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
@@ -150,7 +149,7 @@ void initialize (const MGDoFHandler<dim> &dof,
 }
 
 template <int dim>
-void print (const MGDoFHandler<dim> &dof,
+void print (const DoFHandler<dim> &dof,
             MGLevelObject<Vector<double> > &u)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -159,9 +158,9 @@ void print (const MGDoFHandler<dim> &dof,
     {
       deallog << std::endl;
       deallog << "Level " << l << std::endl;
-      for (typename MGDoFHandler<dim>::cell_iterator
-           cell = dof.begin(l);
-           cell != dof.end(l); ++cell)
+      for (typename DoFHandler<dim>::cell_iterator
+           cell = dof.begin_mg(l);
+           cell != dof.end_mg(l); ++cell)
         {
           cell->get_mg_dof_indices(dof_indices);
           for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -171,7 +170,7 @@ void print (const MGDoFHandler<dim> &dof,
 }
 
 template <int dim>
-void print_diff (const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
+void print_diff (const DoFHandler<dim> &dof_1, const DoFHandler<dim> &dof_2,
                  const Vector<double> &u, const Vector<double> &v)
 {
   Vector<double> diff;
@@ -179,7 +178,7 @@ void print_diff (const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
   const unsigned int dofs_per_cell = dof_1.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices_1(dofs_per_cell);
   std::vector<types::global_dof_index> dof_indices_2(dofs_per_cell);
-  for (typename MGDoFHandler<dim>::active_cell_iterator
+  for (typename DoFHandler<dim>::active_cell_iterator
        cell_1 = dof_1.begin_active(), cell_2 = dof_2.begin_active();
        cell_1 != dof_1.end(); ++cell_1, ++cell_2)
     {
@@ -199,6 +198,8 @@ void check_simple(const FiniteElement<dim> &fe)
 
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr,-1,1);
+  typename FunctionMap<dim>::type      dirichlet_boundary_functions;
+
   tr.refine_global (1);
   refine_mesh(tr);
   refine_mesh(tr);
@@ -207,11 +208,13 @@ void check_simple(const FiniteElement<dim> &fe)
   refine_mesh(tr);
   refine_mesh(tr);
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
+  mgdof.distribute_mg_dofs(fe);
 
-  MGDoFHandler<dim> mgdof_renumbered(tr);
+  DoFHandler<dim> mgdof_renumbered(tr);
   mgdof_renumbered.distribute_dofs(fe);
+  mgdof_renumbered.distribute_mg_dofs(fe);
 
   ConstraintMatrix     hnc, hnc_renumbered;
   hnc.clear ();
@@ -237,10 +240,10 @@ void check_simple(const FiniteElement<dim> &fe)
 
 
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(mgdof);
+  mg_constrained_dofs.initialize(mgdof, dirichlet_boundary_functions);
 
   MGConstrainedDoFs mg_constrained_dofs_renumbered;
-  mg_constrained_dofs_renumbered.initialize(mgdof_renumbered);
+  mg_constrained_dofs_renumbered.initialize(mgdof_renumbered, dirichlet_boundary_functions);
 
   MGTransferPrebuilt<Vector<double> > transfer(hnc, mg_constrained_dofs);
   transfer.build_matrices(mgdof);

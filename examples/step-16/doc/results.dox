@@ -1,89 +1,71 @@
 <h1>Results</h1>
 
-The output that this program generates is, of course, the same as that
-of step-6, so you may see there for more results. On the
-other hand, since no tutorial program is a good one unless it has at
-least one colorful picture, here is, again, the solution:
+On the finest mesh, the solution looks like this:
 
 <p align="center">
   <img src="http://www.dealii.org/images/steps/developer/step-16.solution.png" alt="">
 </p>
 
-When run, the output of this program is
-<pre>
-Cycle 0:
-   Number of active cells:       20
-   Number of degrees of freedom: 25 (by level: 8, 25)
-   7 CG iterations needed to obtain convergence.
-Cycle 1:
-   Number of active cells:       44
-   Number of degrees of freedom: 57 (by level: 8, 25, 48)
-   8 CG iterations needed to obtain convergence.
-Cycle 2:
-   Number of active cells:       92
-   Number of degrees of freedom: 117 (by level: 8, 25, 80, 60)
-   9 CG iterations needed to obtain convergence.
-Cycle 3:
-   Number of active cells:       188
-   Number of degrees of freedom: 221 (by level: 8, 25, 80, 200)
-   12 CG iterations needed to obtain convergence.
-Cycle 4:
-   Number of active cells:       416
-   Number of degrees of freedom: 485 (by level: 8, 25, 89, 288, 280)
-   13 CG iterations needed to obtain convergence.
-Cycle 5:
-   Number of active cells:       800
-   Number of degrees of freedom: 925 (by level: 8, 25, 89, 288, 784, 132)
-   14 CG iterations needed to obtain convergence.
-Cycle 6:
-   Number of active cells:       1628
-   Number of degrees of freedom: 1865 (by level: 8, 25, 89, 304, 1000, 1164, 72)
-   14 CG iterations needed to obtain convergence.
-Cycle 7:
-   Number of active cells:       3194
-   Number of degrees of freedom: 3603 (by level: 8, 25, 89, 328, 1032, 2200, 1392)
-   16 CG iterations needed to obtain convergence.
-</pre>
-That's not perfect &mdash; we would have hoped for a constant number
-of iterations rather than one that increases as we get more and more
-degrees of freedom &mdash; but it is also not far away. The reason for
-this is easy enough to understand, however: since we have a strongly
-varying coefficient, the operators that we assembly by quadrature on
-the lower levels become worse and worse approximations of the operator
-on the finest level. Consequently, even if we had perfect solvers on
-the coarser levels, they would not be good preconditioners on the
-finest level. This theory is easily tested by comparing results when
-we use a constant coefficient: in that case, the number of iterations
-remains constant at 9 after the first three or four refinement steps.
+More impoartantly, we would like to see if the multigrid method really
+improved the solver performance. Therefore, here is the textual
+output:
 
-We can also compare what this program produces with how @ref step_5
-"step-5" performed. To solve the same problem as in step-5, the only
-two changes that are necessary are (i) to replace the body of the
-function <code>LaplaceProblem::refine_grid</code> by a call to
-<code>triangulation.refine_global(1)</code>, and (ii) to use the same
-SolverControl object and tolerance as in step-5 &mdash; the rest of the
-program remains unchanged. In that case, here is how the solvers used
-in step-5 and the multigrid solver used in the current program
-compare:
-<table align="center">
-<tr><th>cells</th><th>step-5</th><th>step-16</th></tr>
-<tr><td>20</td>   <td>13</td> <td>6</td> </tr>
-<tr><td>80</td>   <td>17</td> <td>7</td> </tr>
-<tr><td>320</td>  <td>29</td> <td>9</td> </tr>
-<tr><td>1280</td> <td>51</td> <td>10</td> </tr>
-<tr><td>5120</td> <td>94</td> <td>11</td> </tr>
-<tr><td>20480</td><td>180</td><td>13</td></tr>
-</table>
-This isn't only fewer iterations than in step-5 (each of which
-is, however, much more expensive) but more importantly, the number of
-iterations also grows much more slowly under mesh refinement (again,
-it would be almost constant if the coefficient was constant rather
-than strongly varying as chosen here). This justifies the common
-observation that, whenever possible, multigrid methods should be used
-for second order problems.
+<pre>
+DEAL::Cycle 0
+DEAL::   Number of active cells:       20
+DEAL::   Number of degrees of freedom: 25 (by level: 8, 25)
+DEAL:cg::Starting value 0.510691
+DEAL:cg::Convergence step 6 value 4.59193e-14
+DEAL::Cycle 1
+DEAL::   Number of active cells:       41
+DEAL::   Number of degrees of freedom: 52 (by level: 8, 25, 41)
+DEAL:cg::Starting value 0.455356
+DEAL:cg::Convergence step 8 value 3.09682e-13
+DEAL::Cycle 2
+DEAL::   Number of active cells:       80
+DEAL::   Number of degrees of freedom: 100 (by level: 8, 25, 61, 52)
+DEAL:cg::Starting value 0.394469
+DEAL:cg::Convergence step 9 value 1.96993e-13
+DEAL::Cycle 3
+DEAL::   Number of active cells:       161
+DEAL::   Number of degrees of freedom: 190 (by level: 8, 25, 77, 160)
+DEAL:cg::Starting value 0.322156
+DEAL:cg::Convergence step 9 value 2.94418e-13
+DEAL::Cycle 4
+DEAL::   Number of active cells:       311
+DEAL::   Number of degrees of freedom: 364 (by level: 8, 25, 86, 227, 174)
+DEAL:cg::Starting value 0.279667
+DEAL:cg::Convergence step 10 value 3.45746e-13
+DEAL::Cycle 5
+DEAL::   Number of active cells:       593
+DEAL::   Number of degrees of freedom: 667 (by level: 8, 25, 89, 231, 490, 96)
+DEAL:cg::Starting value 0.215917
+DEAL:cg::Convergence step 10 value 1.03758e-13
+DEAL::Cycle 6
+DEAL::   Number of active cells:       1127
+DEAL::   Number of degrees of freedom: 1251 (by level: 8, 25, 89, 274, 760, 417, 178)
+DEAL:cg::Starting value 0.185906
+DEAL:cg::Convergence step 10 value 3.40351e-13
+DEAL::Cycle 7
+DEAL::   Number of active cells:       2144
+DEAL::   Number of degrees of freedom: 2359 (by level: 8, 25, 89, 308, 779, 1262, 817)
+DEAL:cg::Starting value 0.141519
+DEAL:cg::Convergence step 10 value 5.74965e-13
+</pre>
+
+That's almost perfect multigrid performance: 12 orders of magnitude in
+10 iteration steps, and almost independent of the mesh size. That's
+obviously in part due to the simple nature of the problem solved, but
+it shows the power of multigrid methods.
 
 
 <h3> Possible extensions </h3>
+
+We encourage you to switch on timing output by calling the function
+LogStream::log_execution_time() of the deallog object and compare to
+step 6. You will see that the multigrid method has quite an overhead
+on coarse meshes, but that that it always beats other methods on fine
+meshes because of its optimal complexity.
 
 A close inspection of this program's performance shows that it is mostly
 dominated by matrix-vector operations. step-37 shows one way

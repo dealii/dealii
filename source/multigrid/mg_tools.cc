@@ -1418,72 +1418,7 @@ namespace MGTools
       }
   }
 
-
-
-
-  template <int dim, int spacedim>
-  void
-  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<IndexSet>  &interface_dofs)
-  {
-    Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
-            ExcDimensionMismatch (interface_dofs.size(),
-                                  mg_dof_handler.get_tria().n_global_levels()));
-
-    for (unsigned int l=0; l<mg_dof_handler.get_tria().n_global_levels(); ++l)
-      {
-        Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
-                ExcDimensionMismatch (interface_dofs[l].size(),
-                                      mg_dof_handler.n_dofs(l)));
-       interface_dofs[l].clear();
-      }
-
-    const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
-
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-    const unsigned int   dofs_per_face   = fe.dofs_per_face;
-
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-    std::vector<bool> cell_dofs(dofs_per_cell, false);
-
-    typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-                                            endc = mg_dof_handler.end();
-
-    for (; cell!=endc; ++cell)
-      {
-        if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
-            && cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
-          continue;
-
-        std::fill (cell_dofs.begin(), cell_dofs.end(), false);
-
-        for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
-          {
-            const typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_nr);
-            if (!face->at_boundary())
-              {
-                //interior face
-                const typename DoFHandler<dim>::cell_iterator
-                neighbor = cell->neighbor(face_nr);
-
-                if (neighbor->level() < cell->level())
-                  {
-                    for (unsigned int j=0; j<dofs_per_face; ++j)
-                      cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
-
-                  }
-              }
-          }
-
-        const unsigned int level = cell->level();
-        cell->get_mg_dof_indices (local_dof_indices);
-
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          if (cell_dofs[i])
-            interface_dofs[level].add_index(local_dof_indices[i]);
-      }
-  }
-
+  
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
@@ -1579,20 +1514,14 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<IndexSet>  &interface_dofs,
-                                std::vector<IndexSet>  &boundary_interface_dofs)
+                                std::vector<IndexSet>  &interface_dofs)
   {
     Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (interface_dofs.size(),
                                   mg_dof_handler.get_tria().n_global_levels()));
-    Assert (boundary_interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
-            ExcDimensionMismatch (boundary_interface_dofs.size(),
-                                  mg_dof_handler.get_tria().n_global_levels()));
 
     std::vector<std::vector<types::global_dof_index> >
       tmp_interface_dofs(interface_dofs.size());
-    std::vector<std::vector<types::global_dof_index> >
-      tmp_boundary_interface_dofs(interface_dofs.size());
 
     const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
 
@@ -1600,10 +1529,8 @@ namespace MGTools
     const unsigned int   dofs_per_face   = fe.dofs_per_face;
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-    std::vector<types::global_dof_index> face_dof_indices (dofs_per_face);
 
     std::vector<bool> cell_dofs(dofs_per_cell, false);
-    std::vector<bool> boundary_cell_dofs(dofs_per_cell, false);
 
     typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
                                             endc = mg_dof_handler.end();
@@ -1617,7 +1544,6 @@ namespace MGTools
         bool has_coarser_neighbor = false;
 
         std::fill (cell_dofs.begin(), cell_dofs.end(), false);
-        std::fill (boundary_cell_dofs.begin(), boundary_cell_dofs.end(), false);
 
         for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
           {
@@ -1642,14 +1568,7 @@ namespace MGTools
 
         if (has_coarser_neighbor == false)
           continue;
-
-        for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
-          if (cell->at_boundary(face_nr))
-            for (unsigned int j=0; j<dofs_per_face; ++j)
-//            if (cell_dofs[fe.face_to_cell_index(j,face_nr)] == true) //is this necessary?
-              boundary_cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
-
-
+	
         const unsigned int level = cell->level();
         cell->get_mg_dof_indices (local_dof_indices);
 
@@ -1657,12 +1576,8 @@ namespace MGTools
           {
             if (cell_dofs[i])
               tmp_interface_dofs[level].push_back(local_dof_indices[i]);
-
-            if (boundary_cell_dofs[i])
-              tmp_boundary_interface_dofs[level].push_back(local_dof_indices[i]);
           }
       }
-
 
     for (unsigned int l=0; l<mg_dof_handler.get_tria().n_global_levels(); ++l)
       {
@@ -1672,13 +1587,6 @@ namespace MGTools
                                       std::unique(tmp_interface_dofs[l].begin(),
                                                   tmp_interface_dofs[l].end()));
         interface_dofs[l].compress();
-        boundary_interface_dofs[l].clear();
-        std::sort(tmp_boundary_interface_dofs[l].begin(),
-                  tmp_boundary_interface_dofs[l].end());
-        boundary_interface_dofs[l].add_indices(tmp_boundary_interface_dofs[l].begin(),
-                                               std::unique(tmp_boundary_interface_dofs[l].begin(),
-                                                           tmp_boundary_interface_dofs[l].end()));
-        boundary_interface_dofs[l].compress();
       }
 
   }
