@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@ namespace Functions
                       "`if(x>0, 1, -1)' where the expression evaluates to the second "
                       "argument if the first argument is true, and to the third argument "
                       "otherwise. For a full overview of possible expressions accepted "
-                      "see the documentation of the fparser library."
+                      "see the documentation of the muparser library at http://muparser.beltoforion.de/."
                       "\n\n"
                       "If the function you are describing represents a vector-valued "
                       "function with multiple components, then separate the expressions "
