@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,82 +118,8 @@ template <typename> class Vector;
  * the function as an argument (among other things).
  *
  * The syntax to describe a function follows usual programming practice, and
- * is explained in this snippet from the fparser.txt file:
- * @verbatim
- *    The function string understood by the class is very similar to the C-syntax.
- *    Arithmetic float expressions can be created from float literals, variables
- *    or functions using the following operators in this order of precedence:
- *
- *    -A             unary minus
- *    A^B            exponentiation (A raised to the power B)
- *    A*B  A/B  A%B  multiplication, division and modulo
- *    A+B  A-B       addition and subtraction
- *    A==B A<B A>B   comparison between A and B (result is either 0 or 1)
- *    A&&B A||B      logical 'and' and 'or'
- *    A&B   A|B      same, implemented for compatibility
- *
- *    Since the unary minus has higher precedence than any other operator, for
- *    example the following expression is valid: x*-y
- *
- *    Note that the '==' comparison can be inaccurate due to floating point
- *    precision problems, so it should be avoided (eg. "sqrt(100)=10" probably
- *    returns 0, not 1).
- *
- *    The class supports these functions:
- *
- *    abs(A)    : Absolute value of A. If A is negative, returns -A otherwise
- *                returns A.
- *    acos(A)   : Arc-cosine of A. Returns the angle, measured in radians,
- *                whose cosine is A.
- *    acosh(A)  : Same as acos() but for hyperbolic cosine.
- *    asin(A)   : Arc-sine of A. Returns the angle, measured in radians, whose
- *                sine is A.
- *    asinh(A)  : Same as asin() but for hyperbolic sine.
- *    atan(A)   : Arc-tangent of (A). Returns the angle, measured in radians,
- *                whose tangent is (A).
- *    atan2(A,B): Arc-tangent of A/B. The two main differences to atan() is
- *                that it will return the right angle depending on the signs of
- *                A and B (atan() can only return values between -pi/2 and pi/2),
- *                and that the return value of pi/2 and -pi/2 are possible.
- *    atanh(A)  : Same as atan() but for hyperbolic tangent.
- *    ceil(A)   : Ceiling of A. Returns the smallest integer greater than A.
- *                Rounds up to the next higher integer.
- *    cos(A)    : Cosine of A. Returns the cosine of the angle A, where A is
- *                measured in radians.
- *    cosh(A)   : Same as cos() but for hyperbolic cosine.
- *    cot(A)    : Cotangent of A (equivalent to 1/tan(A)).
- *    csc(A)    : Cosecant of A (equivalent to 1/sin(A)).
- *    exp(A)    : Exponential of A. Returns the value of e raised to the power
- *                A where e is the base of the natural logarithm, i.e. the
- *                non-repeating value approximately equal to 2.71828182846.
- *    floor(A)  : Floor of A. Returns the largest integer less than A. Rounds
- *                down to the next lower integer.
- *    if(A,B,C) : If int(A) differs from 0, the return value of this function is B,
- *                else C. Only the parameter which needs to be evaluated is
- *                evaluated, the other parameter is skipped; this makes it safe to
- *                use eval() in them.
- *    int(A)    : Rounds A to the closest integer. 0.5 is rounded to 1.
- *    log(A)    : Natural (base e) logarithm of A.
- *    log10(A)  : Base 10 logarithm of A.
- *    max(A,B)  : If A>B, the result is A, else B.
- *    min(A,B)  : If A<B, the result is A, else B.
- *    sec(A)    : Secant of A (equivalent to 1/cos(A)).
- *    sin(A)    : Sine of A. Returns the sine of the angle A, where A is
- *                measured in radians.
- *    sinh(A)   : Same as sin() but for hyperbolic sine.
- *    sqrt(A)   : Square root of A. Returns the value whose square is A.
- *    tan(A)    : Tangent of A. Returns the tangent of the angle A, where A
- *                is measured in radians.
- *    tanh(A)   : Same as tan() but for hyperbolic tangent.
- *
- *
- *  Examples of function string understood by the class:
- *
- *  "1+2"
- *  "x-1"
- *  "-sin(sqrt(x^2+y^2))"
- *  "sqrt(XCoord*XCoord + YCoord*YCoord)"
- * @endverbatim
+ * is explained in detail at the homepage of the underlying muparser library
+ * at http://muparser.beltoforion.de/ .
  *
  * For a wrapper of the FunctionParser class that supports ParameterHandler,
  * see ParsedFunction.
@@ -344,8 +270,7 @@ class FunctionParser : public Function<dim>
      * <b> units </b> - a map of units passed to FunctionParser via AddUnint.
      *
      * Can be used as "3cm". Have higher precedence in parsing, i.e. if cm=10
-     * then 3/2cm is 3 /(2*10). See contrib/functionparser/fparser.txt for
-     * more details.
+     * then 3/2cm is 3 /(2*10).
      */
     void initialize (const std::string              &vars,
         const std::vector<std::string> &expressions,
