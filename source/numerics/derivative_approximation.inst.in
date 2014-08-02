@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,31 +56,41 @@ approximate_second_derivative<deal_II_dimension>
 template
 void
 approximate_derivative_tensor
-(const Mapping<deal_II_dimension> & 	mapping,
+(const Mapping<DH<deal_II_dimension>::dimension,DH<deal_II_dimension>::space_dimension> &mapping,
  const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
  const DH<deal_II_dimension>::active_cell_iterator &cell,
- Tensor<1,deal_II_dimension> &derivative,
+ Tensor<1,DH<deal_II_dimension>::dimension> &derivative,
  const unsigned int     component);
 
 template
 void
 approximate_derivative_tensor
-(const Mapping<deal_II_dimension> & 	mapping,
+(const Mapping<DH<deal_II_dimension>::dimension,DH<deal_II_dimension>::space_dimension> &mapping,
  const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
  const DH<deal_II_dimension>::active_cell_iterator &cell,
- Tensor<2,deal_II_dimension> &derivative,
+ Tensor<2,DH<deal_II_dimension>::dimension> &derivative,
  const unsigned int     component);
 
 template
 void
 approximate_derivative_tensor
-(const Mapping<deal_II_dimension> & 	mapping,
+(const Mapping<DH<deal_II_dimension>::dimension,DH<deal_II_dimension>::space_dimension> &mapping,
  const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
  const DH<deal_II_dimension>::active_cell_iterator &cell,
- Tensor<3,deal_II_dimension> &derivative,
+ Tensor<3,DH<deal_II_dimension>::dimension> &derivative,
+ const unsigned int     component);
+
+
+template
+void
+approximate_derivative_tensor
+(const DH<deal_II_dimension> &dof_handler,
+ const VEC &solution,
+ const DH<deal_II_dimension>::active_cell_iterator &cell,
+ Tensor<1,DH<deal_II_dimension>::dimension> &derivative,
  const unsigned int     component);
 
 template
@@ -89,7 +99,7 @@ approximate_derivative_tensor
 (const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
  const DH<deal_II_dimension>::active_cell_iterator &cell,
- Tensor<1,deal_II_dimension> &derivative,
+ Tensor<2,DH<deal_II_dimension>::dimension> &derivative,
  const unsigned int     component);
 
 template
@@ -98,16 +108,7 @@ approximate_derivative_tensor
 (const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
  const DH<deal_II_dimension>::active_cell_iterator &cell,
- Tensor<2,deal_II_dimension> &derivative,
- const unsigned int     component);
-
-template
-void
-approximate_derivative_tensor
-(const DH<deal_II_dimension> &dof_handler,
- const VEC &solution,
- const DH<deal_II_dimension>::active_cell_iterator &cell,
- Tensor<3,deal_II_dimension> &derivative,
+ Tensor<3,DH<deal_II_dimension>::dimension> &derivative,
  const unsigned int     component);
 
   \}
