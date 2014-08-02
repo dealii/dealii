@@ -52,6 +52,7 @@ FOREACH(_file ${_macro_files})
 ENDFOREACH()
 
 INCLUDE(${DEAL_II_SOURCE_DIR}/tests/macro_add_test.cmake)
+INCLUDE(${DEAL_II_SOURCE_DIR}/tests/macro_pickup_tests.cmake)
 
 #
 # Pick up values from environment:
@@ -107,7 +108,7 @@ IF("${TEST_DIFF}" STREQUAL "")
   #
 
   IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-    SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \\t\\n:')
+    SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \\t\\n:<>=,;')
     IF(DIFF_EXECUTABLE MATCHES "-NOTFOUND")
       SET(DIFF_EXECUTABLE ${NUMDIFF_EXECUTABLE})
     ENDIF()
