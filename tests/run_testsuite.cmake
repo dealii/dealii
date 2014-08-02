@@ -582,4 +582,4 @@ IF("${_res}" STREQUAL "0")
   MESSAGE("-- Submission successful. Goodbye!")
 ENDIF()
 
-# .oO( This script is freaky 632 lines long... )
+# .oO( This script is freaky 585 lines long... )
