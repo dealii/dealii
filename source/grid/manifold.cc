@@ -24,23 +24,29 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
 namespace Manifolds {
 
-  void get_default_quadrature(const TriaIterator<CellAccessor<3, 3> >& obj,
-			      Quadrature<3> &quad) 
+  Quadrature<3> 
+  get_default_quadrature(const TriaIterator<CellAccessor<3, 3> >& obj) 
   {
    std::vector<Point<3> > sp;
    std::vector<double> wp;
    
    const int dim = 3;
    
-   int np =  GeometryInfo<dim>::vertices_per_cell+
-	     GeometryInfo<dim>::lines_per_cell+
-	     GeometryInfo<dim>::faces_per_cell;
+   const unsigned int np =  
+     GeometryInfo<dim>::vertices_per_cell+
+     GeometryInfo<dim>::lines_per_cell+
+     GeometryInfo<dim>::faces_per_cell;
+   
    sp.resize(np);
    wp.resize(np);
    unsigned int j=0;
+   
+   // note that the exact weights are chosen such as to minimize the
+   // distortion of the eight new hexes from the optimal shape; their
+   // derivation and values is copied over from the
+   // @p{MappingQ::set_laplace_on_vector} function
    for(unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i, ++j) 
      {
        sp[j] = obj->vertex(i);
@@ -49,71 +55,18 @@ namespace Manifolds {
    for(unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i, ++j) 
      {
        sp[j] = (obj->line(i)->has_children() ? obj->line(i)->child(0)->vertex(1) :
-		obj->line(i)->center());
+		obj->line(i)->get_manifold().get_new_point_on_line(obj->line(i)));
        wp[j] = 7.0/192.0;
      }
    for(unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i, ++j) 
      {
        sp[j] = (obj->face(i)->has_children() ? obj->face(i)->isotropic_child(0)->vertex(3) :
-		obj->face(i)->center());
+		obj->face(i)->get_manifold().get_new_point_on_face(obj->face(i)));
        wp[j] = 1.0/12.0;
      }
-   quad = Quadrature<3>(sp,wp);
+   return Quadrature<3>(sp,wp);
   }
-  
-  
-  template <typename OBJECT, int spacedim>
-  void get_default_quadrature(const OBJECT& obj, 
-			      Quadrature<spacedim> &quad, bool with_laplace) 
-  {
-    std::vector<Point<spacedim> > sp;
-    std::vector<double> wp;
 
-    const int dim = OBJECT::AccessorType::structure_dimension;
-    
-    AssertDimension(spacedim, OBJECT::AccessorType::space_dimension);
-    switch(dim) 
-      {
-	case 1:
-	      sp.resize(2);
-	      wp.resize(2);
-	      sp[0] = obj->vertex(0); wp[0] = .5;
-	      sp[1] = obj->vertex(1); wp[1] = .5;
-	      break;
-	case 2:
-	      sp.resize(8);
-	      wp.resize(8);
-	      sp[0] = obj->vertex(0);
-	      sp[1] = obj->vertex(1);
-	      sp[2] = obj->vertex(2);
-	      sp[3] = obj->vertex(3);
-
-	      sp[4] = obj->line(0)->has_children() ?
-		      obj->line(0)->child(0)->vertex(1) :
-		      obj->line(0)->center();
-	      sp[5] = obj->line(1)->has_children() ?
-		      obj->line(1)->child(0)->vertex(1) :
-		      obj->line(1)->center();
-	      sp[6] = obj->line(2)->has_children() ?
-		      obj->line(2)->child(0)->vertex(1) :
-		      obj->line(2)->center();
-	      sp[7] = obj->line(3)->has_children() ?
-		      obj->line(3)->child(0)->vertex(1) :
-		      obj->line(3)->center();
-	      if(with_laplace) 
-		{
-		  std::fill(wp.begin(), wp.begin()+4, 1.0/16.0);
-		  std::fill(wp.begin()+4, wp.end(), 3.0/16.0);
-		}
-	      else
-		std::fill(wp.begin(), wp.end(), 1.0/8.0);
-	      break;
-	default:
-	      Assert(false, ExcInternalError());
-	      break;
-      }
-    quad = Quadrature<spacedim>(sp,wp);
-  }
 }
 
 using namespace Manifolds;
@@ -167,9 +120,9 @@ Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point_on_line (const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
-  Quadrature<spacedim> quadrature;
-  get_default_quadrature(line, quadrature);
-  return get_new_point(quadrature);
+  return get_new_point
+    (get_default_quadrature<const typename Triangulation<dim, spacedim>::line_iterator, 
+     spacedim>(line, false));
 }
 
 
@@ -179,9 +132,9 @@ Point<spacedim>
 Manifold<dim, spacedim>::
 get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
-  Quadrature<spacedim> quadrature;
-  get_default_quadrature(quad, quadrature);
-  return get_new_point(quadrature);
+  return get_new_point
+    (get_default_quadrature<const typename Triangulation<dim, spacedim>::quad_iterator, 
+     spacedim>(quad, false));
 }
 
 
@@ -296,9 +249,7 @@ template <>
 Point<3>
 Manifold<3,3>::
 get_new_point_on_hex (const typename Triangulation<3, 3>::hex_iterator &hex) const{
-  Quadrature<3> quadrature;
-  get_default_quadrature(hex, quadrature);
-  return get_new_point(quadrature);
+  return get_new_point(get_default_quadrature(hex));
 }
 
 
@@ -331,7 +282,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
   Point<spacedim> p;
   Point<spacedim> dp;
   Point<spacedim> minP = periodicity;
-  bool check_period = (periodicity.norm() > tolerance);
+  const bool check_period = (periodicity.norm() > tolerance);
   if(check_period) 
     for(unsigned int i=0; i<surrounding_points.size(); ++i) 
       for(unsigned int d=0; d<spacedim; ++d) {
@@ -393,8 +344,8 @@ get_new_point (const Quadrature<spacedim> &quad) const
   for(unsigned int i=0; i<surrounding_points.size(); ++i) 
     chart_points[i] = pull_back(surrounding_points[i]);
 
-  Quadrature<chartdim> chart_quad(chart_points, weights);
-  Point<chartdim> p_chart = sub_manifold.get_new_point(chart_quad);
+  const Quadrature<chartdim> chart_quad(chart_points, weights);
+  const Point<chartdim> p_chart = sub_manifold.get_new_point(chart_quad);
   
   return push_forward(p_chart);
 }

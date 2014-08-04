@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  * The two dimensional implementation of this class works by
  * transforming points to spherical coordinates, taking the average in
  * that coordinate system, and then transforming back the point to
- * cartesian coordinates. For the three dimensional case, we use a
+ * Cartesian coordinates. For the three dimensional case, we use a
  * simpler approach: we take the average of the norm of the points,
  * and use this value to shift the average point along the radial
  * direction. In order for this manifold to work correctly, it cannot
@@ -59,7 +59,7 @@ public:
   /**
    * The Constructor takes the center of the spherical coordinates
    * system. This class uses the pull_back and push_forward mechanism
-   * to transform from cartesian to spherical coordinate systems,
+   * to transform from Cartesian to spherical coordinate systems,
    * taking into account the periodicity of base Manifold in two
    * dimensions, while in three dimensions it takes the middle point,
    * and project it along the radius using the average radius of the

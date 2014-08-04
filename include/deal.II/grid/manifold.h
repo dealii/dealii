@@ -32,26 +32,31 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int space_dim> class Triangulation;
 
 
-/** We collect here some helper functions used in the
-    Manifold<dim,spacedim> classes.
+/**
+ * We collect here some helper functions used in the
+ * Manifold<dim,spacedim> classes.
  */
-namespace Manifolds {
-  /** Given a hex iterator, construct a quadrature with the Laplace
-      weigths, and all relevant points of the hex: vertices, line
-      centers and face centers, which can be called when creating
-      middle vertices in the manifold routines.*/
-  void get_default_quadrature(const TriaIterator<CellAccessor<3, 3> >& hex,
-                              Quadrature<3> &quad);
+namespace Manifolds 
+{
+  /**
+   * Given a hex iterator, construct a quadrature with the Laplace
+   * weigths, and all relevant points of the hex: vertices, line
+   * centers and face centers, which can be called when creating
+   * middle vertices in the manifold routines.
+   */
+  Quadrature<3> 
+  get_default_quadrature(const TriaIterator<CellAccessor<3, 3> >& hex);
   
-  /** Given a general mesh iterator, construct a quadrature with the
-      Laplace weigths or with uniform weights according the parameter
-      @p with_laplace, and with all relevant points of the iterator:
-      vertices, line centers and/or face centers, which can be called
-      when creating new vertices in the manifold routines.*/
+  /**
+    * Given a general mesh iterator, construct a quadrature with the
+    * Laplace weights or with uniform weights according the parameter
+    * @p with_laplace, and with all relevant points of the iterator:
+    * vertices, line centers and/or face centers, which can be called
+    * when creating new vertices in the manifold routines.
+    */
   template <typename OBJECT, int spacedim>
-  void get_default_quadrature(const OBJECT& obj, 
-			      Quadrature<spacedim> &quad, 
-			      bool with_laplace = false);
+  Quadrature<spacedim> 
+  get_default_quadrature(const OBJECT& obj, bool with_laplace = false);
 }
 
 
@@ -68,26 +73,17 @@ namespace Manifolds {
  *   @endcode
  *   @p quadrature is a Quadrature<spacedim> object, which contains a
  *   collection of points in @p spacedim dimension, and a collection of
- *   weights.
+ *   weights (Note that unlike almost all other cases in the library,
+ *   we here interpret the points in the quadrature object to be in
+ *   real space, not on the reference cell.)
  *
- *   Internally, the get_new_point() function calls the
+ *   Internaly, the get_new_point() function calls the
  *   project_to_manifold() function after computing the weighted
- *   average of the quadrature poitns. This allows end users to only
+ *   average of the quadrature points. This allows end users to only
  *   overload project_to_manifold() for simple situations.
  *
  *   Should a finer control be necessary, then get_new_point() can be
- *   overloaded.  For backward compatibility, this function also
- *   offers an interface which is compatible with
- *   Boundary<dim,spacedim>, which are all derived from
- *   FlatManifold<dim,spacedim>, allowing old user codes to keep using
- *   their boundary descriptors as Manifold<dim,spacedim> objects.
- *
- *   The default behavior of these backward compatible interfaces is
- *   to construct a Quadrature<spacedim> object containting the
- *   vertices, midpoints of lines, and midpoints of quads with the
- *   correct weight, and call get_new_point() with this quadrature. If
- *   you need finer tuning for lines, quads or hexes, you can overload
- *   any of the get_new_point_on_* functions. 
+ *   overloaded. 
  *
  *   FlatManifold is the specialization from which StraigthBoundary is
  *   derived, where the project_to_manifold() function is the identity.
@@ -114,7 +110,7 @@ public:
    * points together with appropriate weights.
    *
    * In its default implementation it calls internally the function
-   * project to manifold. User classes can get away by simply
+   * project_to_manifold. User classes can get away by simply
    * implementing that method.
    */
   virtual
@@ -248,10 +244,10 @@ class FlatManifold: public Manifold<dim, spacedim>
 {
 public:
   /**
-   * Default constructor.The optional argument can be used to specify
+   * Default constructor. The optional argument can be used to specify
    * the periodicity of the spacedim-dimensional manifold (one period
-   * per direction). A peridicity value of zero means that along that
-   * direction there is no peridicity. By default no periodicity is
+   * per direction). A periodicity value of zero means that along that
+   * direction there is no periodicity. By default no periodicity is
    * assumed.
    *
    * Periodicity affects the way a middle point is computed. It is
@@ -288,10 +284,19 @@ public:
    * project_to_manifold. The reason why we do it this way, is to
    * allow lazy programmers to implement only the project_to_manifold
    * function for their own Manifold classes which are small (or
-   * trivial) perturbations of a flat manifold. For most simple
-   * geometries, it is possible to get reasonable results by deriving
-   * your own Manifold class from FlatManifold, and write a new
-   * interface only for the project_to_manifold function.
+   * trivial) perturbations of a flat manifold. This is the case
+   * whenever the coarse mesh is a decent approximation of the
+   * manifold geometry. In this case, the middle point of a cell is
+   * close to true middle point of the manifold, and a projection may
+   * suffice.
+   *
+   * For most simple geometries, it is possible to get reasonable
+   * results by deriving your own Manifold class from FlatManifold,
+   * and write a new interface only for the project_to_manifold
+   * function. You will have good approximations also with large
+   * deformations, as long as in the coarsest mesh size you are trying
+   * to refine, the middle point is not too far from the manifold mid
+   * point, i.e., as long as the coarse mesh size is small enough.
    */
     virtual Point<spacedim>
     get_new_point(const Quadrature<spacedim> &quad) const;
@@ -343,12 +348,10 @@ private:
  *   Manifold<dim,spacedim>.  This object specializes a Manifold of
  *   dimension chartdim embedded in a manifold of dimension spacedim,
  *   for which you have explicit pull_back and push_forward
- *   transformations. This object only makes sense when chartdim <=
- *   dim, and the constructor throws an exception if this is not the
- *   case. 
+ *   transformations.
  *
  *   This is an helper class which is useful when you have an explicit
- *   map from an Euclidean space of dimension dim to an Euclidean
+ *   map from an Euclidean space of dimension chartdim to an Euclidean
  *   space of dimension spacedim which represents your manifold, i.e.,
  *   when your manifold \f$\mathcal{M}\f$ can be represented by a map
  *   \f[
@@ -374,6 +377,10 @@ private:
  *   Derived classes are required to implement the push_forward() and
  *   the pull_back() methods.
  *
+ *   Notice that the dimenisions #chartdim and #spacedim can be
+ *   arbitrary, as long as the transformation from $\mathcal{B}$ to
+ *   $\mathcal{M}$ is invertible. 
+ *
  *   @ingroup manifold
  *
  *   @author Luca Heltai, 2013
@@ -385,8 +392,8 @@ public:
   /**
    * Constructor. The optional argument can be used to specify the
    * periodicity of the chartdim-dimensional manifold (one period per
-   * direction). A peridicity value of zero means that along that
-   * direction there is no peridicity. By default no periodicity is
+   * direction). A periodicity value of zero means that along that
+   * direction there is no periodicity. By default no periodicity is
    * assumed.
    *
    * Periodicity affects the way a middle point is computed. It is
@@ -415,7 +422,7 @@ public:
     get_new_point(const Quadrature<spacedim> &quad) const;
 
     /**
-     * Pull back the given point in spacedim to the Euclidean dim
+     * Pull back the given point in spacedim to the Euclidean chartdim
      * dimensional space.
      *
      * Refer to the general documentation of this class for more
@@ -425,7 +432,7 @@ public:
     pull_back(const Point<spacedim> &space_point) const = 0;
 
     /**
-     * Given a point in the dim dimensianal Euclidean space, this
+     * Given a point in the chartdim dimensional Euclidean space, this
      * method returns a point on the manifold embedded in the spacedim
      * Euclidean space.
      *
@@ -440,7 +447,7 @@ public:
    * The sub_manifold object is used to compute the average of the
    * points in the chart coordinates system. 
    */
-  FlatManifold<dim,chartdim> sub_manifold;
+  const FlatManifold<dim,chartdim> sub_manifold;
 };
 
 
@@ -488,6 +495,68 @@ template <>
 Point<3>
 Manifold<3,3>::
 get_new_point_on_hex (const Triangulation<3,3>::hex_iterator &) const;
+
+/*---Templated functions---*/
+
+namespace Manifolds {
+  
+  template <typename OBJECT, int spacedim>
+  Quadrature<spacedim> 
+  get_default_quadrature(const OBJECT& obj, bool with_laplace) 
+  {
+    std::vector<Point<spacedim> > sp;
+    std::vector<double> wp;
+
+    const int dim = OBJECT::AccessorType::structure_dimension;
+    
+    // note that the exact weights are chosen such as to minimize the
+    // distortion of the four new quads from the optimal shape; their
+    // derivation and values is copied over from the
+    // @p{MappingQ::set_laplace_on_vector} function
+    AssertDimension(spacedim, OBJECT::AccessorType::space_dimension);
+    switch(dim) 
+      {
+	case 1:
+	      sp.resize(2);
+	      wp.resize(2);
+	      sp[0] = obj->vertex(0); wp[0] = .5;
+	      sp[1] = obj->vertex(1); wp[1] = .5;
+	      break;
+	case 2:
+	      sp.resize(8);
+	      wp.resize(8);
+	      sp[0] = obj->vertex(0);
+	      sp[1] = obj->vertex(1);
+	      sp[2] = obj->vertex(2);
+	      sp[3] = obj->vertex(3);
+
+	      sp[4] = obj->line(0)->has_children() ?
+		      obj->line(0)->child(0)->vertex(1) :
+		      obj->line(0)->get_manifold().get_new_point_on_line(obj->line(0));
+	      sp[5] = obj->line(1)->has_children() ?
+		      obj->line(1)->child(0)->vertex(1) :
+		      obj->line(1)->get_manifold().get_new_point_on_line(obj->line(1));
+	      sp[6] = obj->line(2)->has_children() ?
+		      obj->line(2)->child(0)->vertex(1) :
+		      obj->line(2)->get_manifold().get_new_point_on_line(obj->line(2));
+	      sp[7] = obj->line(3)->has_children() ?
+		      obj->line(3)->child(0)->vertex(1) :
+		      obj->line(3)->get_manifold().get_new_point_on_line(obj->line(3));
+	      if(with_laplace) 
+		{
+		  std::fill(wp.begin(), wp.begin()+4, 1.0/16.0);
+		  std::fill(wp.begin()+4, wp.end(), 3.0/16.0);
+		}
+	      else
+		std::fill(wp.begin(), wp.end(), 1.0/8.0);
+	      break;
+	default:
+	      Assert(false, ExcInternalError());
+	      break;
+      }
+    return Quadrature<spacedim>(sp,wp);
+  }
+}
 
 #endif // DOXYGEN
 

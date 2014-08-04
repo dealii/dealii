@@ -97,6 +97,40 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> New: Added support for curved interior cells for all Triangulation
+  dimensions.
+  <br>
+  A new Manifold<dim,spacedim> class was introduced which only contains the
+  interface needed by Triangulation to refine objects, leaving all boundary
+  related functions in the class Boundary<dim,spacedim>, which was made
+  derived from Manifold<dim,spacedim>. <br>
+  This new construction allows for curved interior cells, and custom refinement
+  strategies. At the moment the following Manifolds are supported:
+  <ul>
+  <li> FlatManifold<dim,spacedim>: This class replaces the old
+  StraightBoundary<dim,spacedim>, and it adds support for periodic
+  manifolds. This is the simplest class one can use to create new Manifold classes;
+  </li>
+  <li> ManifoldChart<dim,spacedim,chartdim>: This is one of the most general Manifold
+  one can think of. The user can overload the functions ManifoldChart::pull_back() and
+  ManifoldChart::push_forward(), to obtain a very general curved geometry, following
+  concepts typical of elasticity;
+  </li>
+  <li> SphericalManifold<dim,spacedim>: A simple implementation of spherical coordinates
+  transformations. This manifold allows hyper shells with curved interior cells which
+  follow the natural shape of the shell;
+  </li>
+  </ul>
+  <br>
+  The functions
+  Triangulation::set_boundary() and Triangulation::get_boundary() can still be used to
+  set and get Boundary objects instead of Manifold ones. For the get function, an exception
+  is thrown if a conversion to a valid Boundary class cannot be made on the fly.
+  <br>
+  (Luca Heltai, 2014/08/06)
+  </li>
+
   <li> Ported: The build system now supports CMake 3.0.
   <br>
   (Matthias Maier, 2014/07/15)

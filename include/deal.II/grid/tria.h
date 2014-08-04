@@ -3647,8 +3647,13 @@ template <> unsigned int Triangulation<1,3>::max_adjacent_cells () const;
 
 
 // -------------------------------------------------------------------
-
-
+// Explicit invalid things...
+template <> 
+const Manifold<2,1> & Triangulation<2, 1>::get_manifold(const types::manifold_id) const;
+template <> 
+const Manifold<3,1> & Triangulation<3, 1>::get_manifold(const types::manifold_id) const;
+template <> 
+const Manifold<3,2> & Triangulation<3, 2>::get_manifold(const types::manifold_id) const;
 
 
 #endif // DOXYGEN

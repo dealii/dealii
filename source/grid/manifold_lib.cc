@@ -70,8 +70,8 @@ Point<spacedim>
 SphericalManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_point) const {
   Assert(spherical_point[0] >=0.0, 
 	 ExcMessage("Negative radius for given point."));
-  const double &rho = spherical_point[0];
-  const double &theta = spherical_point[1];
+  const double rho = spherical_point[0];
+  const double theta = spherical_point[1];
   
   Point<spacedim> p;
   if(rho > 1e-10) 
@@ -99,8 +99,8 @@ Point<spacedim>
 SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const {
   const Point<spacedim> R = space_point-center;
   const double rho = R.norm();
-  const double &x = R[0];
-  const double &y = R[1];
+  const double x = R[0];
+  const double y = R[1];
   
   Point<spacedim> p;
   p[0] = rho;
@@ -113,13 +113,11 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
     break;
   case 3:
     {
-      const double &z = R[2];
+      const double z = R[2];
       p[2] = atan2(y,x); // phi
       if(p[2] < 0)
 	p[2] += 2*numbers::PI; // phi is periodic
       p[1] = atan2(sqrt(x*x+y*y),z);  // theta
-      // if(p[1] < 0) 
-      // 	p[1] += 2*numbers::PI;
     }
     break;
   default:

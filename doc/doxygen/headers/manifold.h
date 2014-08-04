@@ -60,21 +60,32 @@
  *
  * </ul>
  *
- * In deal.II, a Manifold is seen as a collection of points, together with a
- * notion of distance between points (on the manifold). New points are
- * typically obtained by providing a local coordinate system on the manifold,
- * identifying existing points in the local coordinate system (pulling them
- * back using the local map to obtain their local coordinates), find the new
- * point in the local coordinate system by weighted sums of the existing
- * points, and transforming back the point in the real space (pushing it
- * forward using the local map).  (However, this pull back and push forward
- * only happens in classes that implement manifolds, and your own class can
- * also choose other ways of figuring out where a new point should be
- * located.)
+ * In deal.II, a Manifold is seen as a collection of points, together
+ * with a notion of distance between points (on the manifold). New
+ * points are typically obtained by providing a local coordinate
+ * system on the manifold, identifying existing points in the local
+ * coordinate system (pulling them back using the local map to obtain
+ * their local coordinates), find the new point in the local
+ * coordinate system by weighted sums of the existing points, and
+ * transforming back the point in the real space (pushing it forward
+ * using the local map). The main class that implements this mechanism
+ * is the ManifoldChart class, and this is the class that users will
+ * likely overload for complex geometries.
  *
  * While this process is non trivial in most cases of interest, for
  * most of the trivial geometries, like cylinders, spheres or shells,
- * we provide reasonable implementations. 
+ * we provide reasonable implementations.
+ *
+ * The Boundary of a Triangulation is a special case of Manifold, for
+ * which additional informations can be useful in user codes, such as
+ * normal to surfaces or to curves. If your coarse mesh is reasonably
+ * shaped, you might be interested in only attaching a manifold
+ * description to boundary portion of your domain. This can be done
+ * using the set_boundary class, which take as arguments a Boundary
+ * object (derived from Manifold). Notice that Triangulation uses only
+ * the Manifold interface, not the Boundary interface. Other tools,
+ * however, might need to compute exact normals at quadrature points,
+ * and therefore a wrapper to query Boundary objects is provided. 
  *
  * @see @ref GlossManifoldIndicator "Glossary entry on manifold
  * indicators"

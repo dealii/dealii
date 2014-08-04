@@ -3954,15 +3954,12 @@ namespace internal
             // boundary object
             if (dim == spacedim)
               {
-                // in a first step, compute the location of central
-                // vertex as the average of the 8 surrounding
-                // vertices, using Manifolds helper functions
-		Quadrature<spacedim> quadrature;
-		Manifolds::get_default_quadrature(cell,quadrature);
-		
                 // triangulation.vertices[next_unused_vertex] = new_point;
 		triangulation.vertices[next_unused_vertex] = 
-		  cell->get_manifold().get_new_point(quadrature);
+		  cell->get_manifold().get_new_point
+		  (Manifolds::get_default_quadrature
+		   <typename Triangulation<dim,spacedim>::active_cell_iterator, 
+		   spacedim>(cell));
 
                 // if the user_flag is set, i.e. if the
                 // cell is at the boundary, use a
@@ -5828,10 +5825,11 @@ namespace internal
 			// derivation and values is copied over from
 			// the @p{MappingQ::set_laplace_on_vector}
 			// function
-			Quadrature<spacedim> qs;
-			Manifolds::get_default_quadrature(quad, qs, true);
 			triangulation.vertices[next_unused_vertex] =
-			  quad->get_manifold().get_new_point (qs);
+			  quad->get_manifold().get_new_point 
+			  (Manifolds::get_default_quadrature
+			   <typename Triangulation<dim,spacedim>::quad_iterator, 
+			   spacedim>(quad, true));
 		      }
 		    triangulation.vertices_used[next_unused_vertex] = true;
                     // now that we created the right point, make up
@@ -13291,7 +13289,26 @@ Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &li
   refinement_listener_map.erase (refinement_listener_map.find (&listener));
 }
 
+template <>
+const Manifold<2,1> & Triangulation<2, 1>::get_manifold(const types::manifold_id) const {
+  Assert(false, ExcImpossibleInDim(1));
+  static FlatManifold<2,1> flat;
+  return flat;
+}
 
+template <>
+const Manifold<3,1> & Triangulation<3, 1>::get_manifold(const types::manifold_id) const {
+  Assert(false, ExcImpossibleInDim(1));
+  static FlatManifold<3,1> flat;
+  return flat;
+}
+
+template <>
+const Manifold<3,2> & Triangulation<3, 2>::get_manifold(const types::manifold_id) const {
+  Assert(false, ExcImpossibleInDim(2));
+  static FlatManifold<3,2> flat;
+  return flat;
+}
 
 // explicit instantiations
 #include "tria.inst"
