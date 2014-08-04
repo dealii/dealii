@@ -276,8 +276,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
   std::vector<types::global_dof_index> global_dof_indices (dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices  (dofs_per_cell);
-  //  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
-  for (unsigned int level=0; level<mg_dof.get_tria().n_levels(); ++level)
+
+  for (unsigned int level=0; level<n_levels; ++level)
     {
       std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
       copy_indices[level].clear();
