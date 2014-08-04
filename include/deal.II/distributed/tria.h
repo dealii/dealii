@@ -616,7 +616,23 @@ namespace parallel
        */
       enum CellStatus
       {
-        CELL_PERSIST, CELL_REFINE, CELL_COARSEN, CELL_INVALID
+	/**
+	 * The cell will not be refined or coarsened and might or might
+	 * not move to a different processor.
+	 */
+        CELL_PERSIST,
+	/**
+	 * The cell will be or was refined.
+	 */
+	CELL_REFINE,
+	/**
+	 * The children of this cell will be or were coarsened into this cell.
+	 */
+	CELL_COARSEN,
+	/**
+	 * Invalid status. Will not occur for the user.
+	 */
+	CELL_INVALID
       };
 
       /**
@@ -633,6 +649,27 @@ namespace parallel
        * Callers need to store the return value.  It specifies an
        * offset of the position at which data can later be retrieved
        * during a call to notify_ready_to_unpack().
+       * 
+       * The CellStatus argument in the callback function will tell you if the
+       * given cell will be coarsened, refined, or will persist as is (this
+       * can be different than the coarsen and refine flags set by you). If it
+       * is
+       * 
+       * - CELL_PERIST: the cell won't be refined/coarsened, but might be
+       *   moved to a different processor
+       * - CELL_REFINE: this cell will be refined into 4/8 cells, you can not
+       *   access the children (because they don't exist yet)
+       * - CELL_COARSEN: the children of this cell will be coarsened into the
+       *   given cell (you can access the active children!)
+       * 
+       * When unpacking the data with notify_ready_to_unpack() you can access
+       * the children of the cell if the status is CELL_REFINE but not for
+       * CELL_COARSEN. As a consequence you need to handle coarsening while
+       * packing and refinement during unpacking.
+       *
+       * @note The two functions can also be used for serialization of data
+       * using save() and load() in the same way. Then the status will always
+       * be CELL_PERSIST.
        */
       unsigned int
       register_data_attach (const std::size_t size,
@@ -644,6 +681,14 @@ namespace parallel
        * The given function is called for each new active cell and
        * supplies a pointer to the data saved with
        * register_data_attach().
+       * 
+       * This needs to be called after execute_coarsening_and_refinement()
+       * with the offset returned by register_data_attach().
+       * 
+       * The CellStatus will indicate if the cell was refined, coarsened, or
+       * persisted unchanged. Note that contrary to during
+       * register_data_attach() you can now access the children if the status
+       * is CELL_REFINE but not for CELL_COARSEN.
        */
       void
       notify_ready_to_unpack (const unsigned int offset,

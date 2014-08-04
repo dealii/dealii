@@ -3260,7 +3260,10 @@ namespace parallel
                                                             const CellStatus,
                                                             const void *)> &unpack_callback)
     {
-      Assert (offset < attached_data_size, ExcMessage ("invalid offset in notify_ready_to_unpack()"));
+      Assert (offset >= sizeof(CellStatus), 
+              ExcMessage ("invalid offset in notify_ready_to_unpack()"));
+      Assert (offset < sizeof(CellStatus)+attached_data_size, 
+              ExcMessage ("invalid offset in notify_ready_to_unpack()"));
       Assert (n_attached_datas > 0, ExcMessage ("notify_ready_to_unpack() called too often"));
 
       // Recurse over p4est and hand the caller the data back
