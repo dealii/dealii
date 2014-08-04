@@ -42,6 +42,28 @@ SphericalManifold<dim,spacedim>::get_periodicity()  {
 }
 
 
+template <int dim, int spacedim>
+Point<spacedim>
+SphericalManifold<dim,spacedim>::get_new_point(const Quadrature<spacedim> &quad) const {
+  if(spacedim == 2)
+    return ManifoldChart<dim,spacedim,spacedim>::get_new_point(quad);
+  else {
+    double rho_average = 0;
+    Point<spacedim> mid_point;
+    for(unsigned int i=0; i<quad.size(); ++i) {
+      rho_average += quad.weight(i)*(quad.point(i)-center).norm();
+      mid_point += quad.weight(i)*quad.point(i);
+    }
+    // Project the mid_pont back to the right location 
+    Point<spacedim> R = mid_point-center;
+    // Scale it to have radius rho_average
+    R *= rho_average/R.norm();
+    // And return it.
+    return center+R;
+  }
+}
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -95,7 +117,9 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
       p[2] = atan2(y,x); // phi
       if(p[2] < 0)
 	p[2] += 2*numbers::PI; // phi is periodic
-      p[1] = atan(sqrt(x*x+y*y)/z)+numbers::PI;  // theta
+      p[1] = atan2(sqrt(x*x+y*y),z);  // theta
+      // if(p[1] < 0) 
+      // 	p[1] += 2*numbers::PI;
     }
     break;
   default:

@@ -32,25 +32,25 @@ void test(unsigned int ref=1)
   deallog << "Testing dim " << dim 
 	  << ", spacedim " << spacedim << std::endl;
 
-  SphericalManifold<dim,spacedim> manifold;
+  MINE::SphericalManifold<dim,spacedim> manifold;
   
   Triangulation<dim,spacedim> tria;
-  GridGenerator::hyper_shell (tria, Point<spacedim>(), .3, .6);
+  GridGenerator::hyper_shell (tria, Point<spacedim>(), .3, .6, 12);
 
   for(auto cell = tria.begin_active(); cell != tria.end(); ++cell) {
     cell->set_all_manifold_ids(1);
   }
   
   tria.set_manifold(1, manifold);
-  tria.refine_global(2);
+  tria.refine_global(1);
   
   GridOut gridout;
   gridout.write_msh(tria, deallog.get_file_stream());
 
-  char fname[50];
-  fprints(fname, "mehs_%d_%d.msh", dim, spacedim);
-  std::ofstream of(fname);
-  gridout.write_msh(tria, of);
+  // char fname[50];
+  // sprintf(fname, "mesh_%d_%d.msh", dim, spacedim);
+  // std::ofstream of(fname);
+  // gridout.write_msh(tria, of);
 }
 
 int main ()

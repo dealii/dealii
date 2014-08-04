@@ -263,7 +263,8 @@ public:
    * pi, but 2*pi (or zero), since, on a periodic manifold, these two
    * points are at distance 2*eps and not (2*pi-eps). Special cases
    * are taken into account, to ensure that the behavior is always as
-   * expected.
+   * expected. The third argument is used as a tolerance when
+   * computing distances.
    *
    * Periodicity will be intended in the following way: the domain is
    * considered to be the box contained in [Point<spacedim>(),
@@ -273,9 +274,11 @@ public:
    * compute averages is called, an exception will be thrown if one of
    * the points which you are using for the average lies outside the
    * periodicity box. The return points are garanteed to lie in the
-   * perodicity box.
+   * perodicity box plus or minus the tolerance you set as the third
+   * argument.
    */
-  FlatManifold (const Point<spacedim> periodicity=Point<spacedim>());
+  FlatManifold (const Point<spacedim> periodicity=Point<spacedim>(),
+		const double tolerance=1e-10);
 
   /**
    * Let the new point be the average sum of surrounding vertices.
@@ -321,6 +324,17 @@ private:
    * the default value for all directions.
    */
   const Point<spacedim> periodicity;
+
+  /**
+   * Tolerance. This tolerance is used to compute distances in double
+   * precision. Anything below this tolerance is considered zero.
+   */
+  const double tolerance;
+
+  DeclException4(ExcPeriodicBox, int, Point<spacedim>, Point<spacedim>, double,
+		 << "The component number " << arg1 << " of the point [ " << arg2 
+		 << " ]  is not in the interval [ " << -arg4 
+		 << ", " << arg3[arg4] << "), bailing out.");
 };
 
 

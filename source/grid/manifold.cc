@@ -306,8 +306,10 @@ get_new_point_on_hex (const typename Triangulation<3, 3>::hex_iterator &hex) con
 
 
 template <int dim, int spacedim>
-FlatManifold<dim,spacedim>::FlatManifold (const Point<spacedim> periodicity) :
-  periodicity(periodicity)
+FlatManifold<dim,spacedim>::FlatManifold (const Point<spacedim> periodicity, 
+					  const double tolerance) :
+  periodicity(periodicity),
+  tolerance(tolerance)
 {}
 
 template <int dim, int spacedim>
@@ -322,21 +324,22 @@ get_new_point (const Quadrature<spacedim> &quad) const
   double sum=0;
   for(unsigned int i=0; i<weights.size(); ++i)
     sum+= weights[i];
-  Assert(std::abs(sum-1.0) < 1e-10, ExcMessage("Weights should sum to 1!"));
+  Assert(std::abs(sum-1.0) < tolerance, ExcMessage("Weights should sum to 1!"));
 #endif
   
   
   Point<spacedim> p;
   Point<spacedim> dp;
   Point<spacedim> minP = periodicity;
-  bool check_period = (periodicity.norm() != 0);
+  bool check_period = (periodicity.norm() > tolerance);
   if(check_period) 
     for(unsigned int i=0; i<surrounding_points.size(); ++i) 
       for(unsigned int d=0; d<spacedim; ++d) {
 	minP[d] = std::min(minP[d], surrounding_points[i][d]);
 	if(periodicity[d] > 0)
-	  Assert(surrounding_points[i][d] < periodicity[d]+1e-10,
-		 ExcMessage("One of the points does not lye into the periodic box! Bailing out."));
+	  Assert( (surrounding_points[i][d] < periodicity[d]+tolerance) ||
+		  (surrounding_points[i][d] >= -tolerance), 
+		  ExcPeriodicBox(d, surrounding_points[i], periodicity, tolerance));
       }
   
   for(unsigned int i=0; i<surrounding_points.size(); ++i) {

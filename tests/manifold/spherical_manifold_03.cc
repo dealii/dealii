@@ -25,6 +25,7 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 
+
 // Helper function
 template <int dim, int spacedim>
 void test(unsigned int ref=1)
@@ -37,15 +38,15 @@ void test(unsigned int ref=1)
   Triangulation<dim,spacedim> tria;
   Point<spacedim> p0;
   Point<spacedim> p1;
-  p0[0] = .5;
+  p0[0] = .2;
   p1[0] = 1;
-  
+  p0[1] = .1;
+
   if(spacedim == 2) {
-    p1[1] = 2*numbers::PI-1e-10; // theta
+    p1[1] = 2*numbers::PI-.1; // theta
   } else if(spacedim == 3) {
-    p1[1] = numbers::PI-1e-10;
-    
-    p1[2] = 2*numbers::PI-1e-10;
+    p1[1] = numbers::PI-.1;
+    p1[2] = 2*numbers::PI-.1;
   }
 
   GridGenerator::hyper_rectangle (tria, p0, p1);
@@ -56,7 +57,7 @@ void test(unsigned int ref=1)
   for(unsigned int i=0; i<vertices.size(); ++i) {
     Point<spacedim> p0 = manifold.push_forward(vertices[i]);
     Point<spacedim> p1 = manifold.pull_back(p0);
-    
+
     if(p1.distance(vertices[i]) > 1e-10)
       deallog << "ERROR! d: " << p1.distance(vertices[i]) 
 	      << " - " << p1 << " != " << vertices[i] << std::endl;

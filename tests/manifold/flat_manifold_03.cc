@@ -37,7 +37,7 @@ void test(unsigned int ref=1)
   FlatManifold<dim,spacedim> manifold(periodicity);
   
   Quadrature<spacedim> quad;
-  std::vector<std::vector<Point<spacedim> > >ps(8,std::vector<Point<spacedim> >(2));
+  std::vector<std::vector<Point<spacedim> > >ps(10,std::vector<Point<spacedim> >(2));
   Point<spacedim> middle;
   std::vector<double > ws(2, 0.5);
   
@@ -47,24 +47,34 @@ void test(unsigned int ref=1)
   // Case 2: same, with different order
   ps[1][0][0] = 2;
   ps[1][1][0] = 1;
+
   // Case 3: one is close to left, one to right
   ps[2][0][0] = 1;
   ps[2][1][0] = 4;
-  // Case 3: same, opposite order
+  // Case 4: same, opposite order
   ps[3][0][0] = 4;
   ps[3][1][0] = 1;
-  // Case 3: both close to right
+
+  // Case 5: both close to right
   ps[4][0][0] = 3;
   ps[4][1][0] = 4;
-  // Case 3: same, opposite order
+  // Case 6: same, opposite order
   ps[5][0][0] = 4;
   ps[5][1][0] = 3;
-  // Case 3: both close to middle
+
+  // Case 7: both close to middle
   ps[6][0][0] = 2;
   ps[6][1][0] = 3;
-  // Case 3: same, opposite order
+  // Case 8: same, opposite order
   ps[7][0][0] = 3;
   ps[7][1][0] = 2;
+
+  // Case 9: Corner cases
+  ps[8][0][0] = -1e-10;
+  ps[8][1][0] = 5+1e-10;
+  // Case 10: same, opposite order
+  ps[9][0][0] = 5+1e-10;
+  ps[9][1][0] = -1e-10;
   
   for(unsigned int i=0; i<ps.size(); ++i) {
     quad = Quadrature<spacedim>(ps[i],ws);
@@ -79,7 +89,7 @@ int main ()
   std::ofstream logfile("output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  deallog.threshold_double(1.e-8);
   
   test<1,1>();
   test<1,2>();

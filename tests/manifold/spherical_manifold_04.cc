@@ -6,10 +6,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  spherical_manifold_02.cc  ---------------------------
+//----------------------------  spherical_manifold_04.cc  ---------------------------
 
 
-// Test that the flat manifold does what it should on a sphere. 
+// Test that the flat manifold does what it should on a sphere surface. 
 
 #include "../tests.h"
 
@@ -25,6 +25,7 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 
 // Helper function
 template <int dim, int spacedim>
@@ -32,9 +33,11 @@ void test(unsigned int ref=1)
 {
   SphericalManifold<dim,spacedim> manifold;
   
-  Triangulation<dim,spacedim> tria;
-  GridGenerator::hyper_ball (tria);
-  
+  Triangulation<spacedim, spacedim> volume_tria;
+  Triangulation<dim, spacedim> tria;
+  GridGenerator::hyper_ball (volume_tria);
+  GridTools::extract_boundary_mesh(volume_tria, tria);
+
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
   
   for(cell = tria.begin_active(); cell != tria.end(); ++cell) 
@@ -59,8 +62,8 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
-  test<2,2>();
-  test<3,3>();
+  test<1,2>();
+  test<2,3>();
   
   return 0;
 }
