@@ -1474,8 +1474,19 @@ namespace TrilinosWrappers
      * Let Trilinos compute a multilevel hierarchy for the solution of a
      * linear system with the given matrix. As opposed to the other initialize
      * function above, this function uses an abstract interface to an object
-     * of type Epetra_RowMatrix which allows a user to pass by rather
-     * arbitrary objects to the ML preconditioner.
+     * of type Epetra_RowMatrix which allows a user to pass quite general
+     * objects to the ML preconditioner.
+     *
+     * This initialization routine is useful in cases where the operator to be
+     * preconditioned is not a TrilinosWrappers::SparseMatrix object but still
+     * allows to get a copy of the entries in each of the locally owned matrix
+     * (method ExtractMyRowCopy) rows and implements a matrix-vector product
+     * (methods Multiply or Apply). An example are operators which provide
+     * faster matrix-vector multiplications than with the matrix entries
+     * (matrix-free methods) which can be beneficially combined with Chebyshev
+     * smoothers that only do matrix-vector products. The interface class
+     * Epetra_RowMatrix is very flexible to enable this kind of
+     * implementation.
      */
     void initialize (const Epetra_RowMatrix &matrix,
                      const AdditionalData   &additional_data = AdditionalData());
@@ -1499,8 +1510,8 @@ namespace TrilinosWrappers
      * Let Trilinos compute a multilevel hierarchy for the solution of a
      * linear system with the given matrix. As opposed to the other initialize
      * function above, this function uses an abstract interface to an object
-     * of type Epetra_RowMatrix which allows a user to pass by rather
-     * arbitrary objects to the ML preconditioner.
+     * of type Epetra_RowMatrix which allows a user to pass quite general
+     * objects to the ML preconditioner.
      */
     void initialize (const Epetra_RowMatrix       &matrix,
                      const Teuchos::ParameterList &ml_parameters);
