@@ -36,7 +36,7 @@
 #  include <Epetra_Map.h>
 
 #  include <Teuchos_ParameterList.hpp>
-#  include <Epetra_Operator.h>
+#  include <Epetra_RowMatrix.h>
 #  include <Epetra_Vector.h>
 
 // forward declarations
@@ -1467,8 +1467,18 @@ namespace TrilinosWrappers
      * linear system with the given matrix. The function uses the matrix
      * format specified in TrilinosWrappers::SparseMatrix.
      */
-    void initialize (const SparseMatrix                    &matrix,
+    void initialize (const SparseMatrix   &matrix,
                      const AdditionalData &additional_data = AdditionalData());
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. As opposed to the other initialize
+     * function above, this function uses an abstract interface to an object
+     * of type Epetra_RowMatrix which allows a user to pass by rather
+     * arbitrary objects to the ML preconditioner.
+     */
+    void initialize (const Epetra_RowMatrix &matrix,
+                     const AdditionalData   &additional_data = AdditionalData());
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1483,6 +1493,16 @@ namespace TrilinosWrappers
      * case a vector-valued problem ought to be solved.
      */
     void initialize (const SparseMatrix           &matrix,
+                     const Teuchos::ParameterList &ml_parameters);
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. As opposed to the other initialize
+     * function above, this function uses an abstract interface to an object
+     * of type Epetra_RowMatrix which allows a user to pass by rather
+     * arbitrary objects to the ML preconditioner.
+     */
+    void initialize (const Epetra_RowMatrix       &matrix,
                      const Teuchos::ParameterList &ml_parameters);
 
     /**
