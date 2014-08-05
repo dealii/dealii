@@ -1,0 +1,21 @@
+language: C++
+
+before_install: ./contrib/utilities/setup_travis.sh
+
+compiler: 
+- clang
+- gcc
+
+script: ./contrib/utilities/run_travis.sh $CI_TEST_SUITE $CI_BUILD_TYPE
+
+branches:
+  only:
+    - master
+
+env:
+  - CI_TEST_SUITE=mini CI_BUILD_TYPE=Debug
+  - CI_TEST_SUITE=mini CI_BUILD_TYPE=Release
+  - CI_TEST_SUITE=build CI_BUILD_TYPE=Debug
+  - CI_TEST_SUITE=build CI_BUILD_TYPE=Release
+# This is way too long. We should find a way to do this in little pieces...
+#  - CI_TEST_SUITE=tests 
