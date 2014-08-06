@@ -125,6 +125,9 @@ FOREACH(_step ${DEAL_II_STEPS})
   LIST(APPEND _doxygen_depend
     ${CMAKE_CURRENT_BINARY_DIR}/tutorial/${_step}.h
     )
+  LIST(APPEND _doxygen_input
+    ${CMAKE_CURRENT_BINARY_DIR}/tutorial/${_step}.h
+    )
 ENDFOREACH()
 
 FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
