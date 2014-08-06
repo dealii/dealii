@@ -190,6 +190,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: TrilinosWrappers::PreconditionAMG can now be initialized from an
+  object of type Epetra_RowMatrix, which allows using it with more arbitrary
+  matrix objects, including matrix-free methods.
+  <br>
+  (Martin Kronbichler, 2014/08/06)
+  </li>
+
   <li> Fixed: The FE_Nedelec element computed face interpolation matrices
   wrongly for elements of order p>1. This also led to trouble computing
   hanging node constraints in the context of hp adaptivity. This is now fixed.
