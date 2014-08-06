@@ -190,25 +190,25 @@ component of the numerical flux, and integrating by parts
 on the equation weighted by $w$, we arrive at the final form of the problem:
 Find $(\mathbf{q}_h, u_h, \hat{u}_h) \in
 \mathcal{V}_h^p \times \mathcal{W}_h^p \times \mathcal{M}_h^p$ such that
-@f{eqnarray*}
+@f{align*}
   (\mathbf{v}, \kappa^{-1} \mathbf{q}_h)_{\mathcal{T}}
     - ( \nabla\cdot\mathbf{v}, u_h)_{\mathcal{T}}
     + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}_h\right>_{\partial\mathcal{T}}
-    &=& 0,
+    &= 0,
     \quad &&\forall \mathbf{v} \in \mathcal{V}_h^p,
 \\
    - (\nabla w, \mathbf{c} u_h)_{\mathcal{T}}
    + (w, \nabla \cdot \mathbf{q}_h)_{\mathcal{T}}
    + (w, (\mathbf{c}\cdot\mathbf{n}) \hat{u}_H)_{\partial \mathcal{T}}
     + \left<w, \tau (u_h - \hat{u}_h)\right>_{\partial \mathcal{T}}
-    &=&
+    &=
     (w, f)_{\mathcal{T}},
     \quad &&\forall w \in \mathcal{W}_h^p,
 \\
   \left< \mu, \hat{u}_h\mathbf{c} \cdot \mathbf{n}
   		+ \mathbf{q}_h\cdot \mathbf{n}
   	    + \tau (u_h - \hat{u}_h)\right>_{\partial \mathcal{T}}
-    &=&
+    &=
     \left<\mu, g_N\right>_{\partial\Omega_N},
     \quad &&\forall \mu \in \mathcal{M}_h^p.
 @f}
