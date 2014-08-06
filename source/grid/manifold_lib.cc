@@ -125,11 +125,84 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
   }
   return p;
 }
+
+
+// ============================================================
+// CylindricalManifold
+// ============================================================
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+CylindricalManifold<dim,spacedim>::get_axis_vector (const unsigned int axis)
+{
+  Assert (axis < spacedim, ExcIndexRange (axis, 0, spacedim));
+  Point<spacedim> axis_vector;
+  axis_vector[axis] = 1;
+  return axis_vector;
+}
+
+
+template <int dim, int spacedim>
+CylindricalManifold<dim,spacedim>::CylindricalManifold(const unsigned int axis) :
+  direction (get_axis_vector (axis)),
+  point_on_axis (Point<spacedim>())
+{
+  Assert(spacedim > 1, ExcImpossibleInDim(1));
+}
+
+
+template <int dim, int spacedim>
+CylindricalManifold<dim,spacedim>::CylindricalManifold(const Point<spacedim> &direction,
+						       const Point<spacedim> &point_on_axis) :
+  direction (direction),
+  point_on_axis (point_on_axis)
+{
+  Assert(spacedim > 2, ExcImpossibleInDim(spacedim));
+}
+
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+CylindricalManifold<dim,spacedim>::
+get_new_point (const Quadrature<spacedim> &quad) const
+{
+  const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
+  const std::vector<double> &weights = quad.get_weights();
+
+  // compute a proposed new point  
+  Point<spacedim> middle = FlatManifold<dim,spacedim>::get_new_point(quad);
+
+  double radius = 0;
+  Point<spacedim> on_plane;
+  
+  for(unsigned int i=0; i<surrounding_points.size(); ++i)
+    {
+      on_plane = surrounding_points[i]-point_on_axis;
+      on_plane = on_plane - (on_plane*direction) * direction;
+      radius += weights[i]*on_plane.norm();
+    }
+  
+  // we then have to project this point out to the given radius from
+  // the axis. to this end, we have to take into account the offset
+  // point_on_axis and the direction of the axis
+  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
+					   ((middle-point_on_axis) * direction) * direction;
+
+  // scale it to the desired length and put everything back together,
+  // unless we have a point on the axis
+  if (vector_from_axis.norm() <= this->tolerance * middle.norm())
+    return middle;
+
+  else
+    return (vector_from_axis / vector_from_axis.norm() * radius +
+	    ((middle-point_on_axis) * direction) * direction +
+	    point_on_axis);
+}
 		
 // explicit instantiations
-template class SphericalManifold<1,2>;
-template class SphericalManifold<2,2>;
-template class SphericalManifold<2,3>;
-template class SphericalManifold<3,3>;
+#include "manifold_lib.inst"
 
 DEAL_II_NAMESPACE_CLOSE

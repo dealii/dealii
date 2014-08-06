@@ -259,8 +259,8 @@ get_new_point_on_hex (const typename Triangulation<3, 3>::hex_iterator &hex) con
 template <int dim, int spacedim>
 FlatManifold<dim,spacedim>::FlatManifold (const Point<spacedim> periodicity, 
 					  const double tolerance) :
-  periodicity(periodicity),
-  tolerance(tolerance)
+  tolerance(tolerance),
+  periodicity(periodicity)
 {}
 
 template <int dim, int spacedim>

@@ -298,8 +298,8 @@ public:
    * to refine, the middle point is not too far from the manifold mid
    * point, i.e., as long as the coarse mesh size is small enough.
    */
-    virtual Point<spacedim>
-    get_new_point(const Quadrature<spacedim> &quad) const;
+  virtual Point<spacedim>
+  get_new_point(const Quadrature<spacedim> &quad) const;
   
   
   /**
@@ -312,6 +312,12 @@ public:
   virtual
   Point<spacedim> project_to_manifold (const std::vector<Point<spacedim> > &points, 
 				       const Point<spacedim> &candidate) const;
+protected:
+  /**
+   * Tolerance. This tolerance is used to compute distances in double
+   * precision. Anything below this tolerance is considered zero.
+   */
+  const double tolerance;
 
 private:
   /**
@@ -329,12 +335,6 @@ private:
    * the default value for all directions.
    */
   const Point<spacedim> periodicity;
-
-  /**
-   * Tolerance. This tolerance is used to compute distances in double
-   * precision. Anything below this tolerance is considered zero.
-   */
-  const double tolerance;
 
   DeclException4(ExcPeriodicBox, int, Point<spacedim>, Point<spacedim>, double,
 		 << "The component number " << arg1 << " of the point [ " << arg2 

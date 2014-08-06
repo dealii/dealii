@@ -106,6 +106,72 @@ private:
 };
 
 
+/**
+ * Cylindrical Manifold description.  In three dimensions, points are
+ * transformed using a cylindrical coordinate system along the
+ * <tt>x-</tt>, <tt>y-</tt> or <tt>z</tt>-axis (when using the first
+ * constructor of this class), or an arbitrarily oriented cylinder
+ * described by the direction of its axis and a point located on the
+ * axis.
+ *
+ * This class was developed to be used in conjunction with the @p
+ * cylinder or @p cylinder_shell functions of GridGenerator. This
+ * function will throw an exception whenever spacedim is not equal to
+ * three. 
+ *
+ * @ingroup manifold
+ *
+ * @author Luca Heltai, 2014
+ */
+template <int dim, int spacedim = dim>
+class CylindricalManifold : public FlatManifold<dim,spacedim>
+{
+public:
+  /**
+   * Constructor. Using default values for the constructor arguments
+   * yields a cylinder along the x-axis (<tt>axis=0</tt>). Choose
+   * <tt>axis=1</tt> or <tt>axis=2</tt> for a tube along the y- or
+   * z-axis, respectively.
+   */
+  CylindricalManifold (const unsigned int axis = 0);
+
+  /**
+   * Constructor. If constructed with this constructor, the manifold
+   * described is a cylinder with an axis that points in direction
+   * #direction and goes through the given #point_on_axis. The
+   * direction may be arbitrarily scaled, and the given point may be
+   * any point on the axis.
+   */
+  CylindricalManifold (const Point<spacedim> &direction,
+		       const Point<spacedim> &point_on_axis);
+
+ /**
+   * Compute new points on the CylindricalManifold. See the documentation
+   * of the base class for a detailed description of what this
+   * function does.
+   */
+  virtual Point<spacedim>
+  get_new_point(const Quadrature<spacedim> &quad) const;
+
+protected:
+  /**
+   * The direction vector of the axis.
+   */
+  const Point<spacedim> direction;
+
+  /**
+   * An arbitrary point on the axis.
+   */
+  const Point<spacedim> point_on_axis;
+
+private:
+  /**
+   * Given a number for the axis, return a vector that denotes this
+   * direction.
+   */
+  static Point<spacedim> get_axis_vector (const unsigned int axis);
+};
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

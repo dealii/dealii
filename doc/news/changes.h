@@ -98,6 +98,15 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: Added CylindricalManifold descritpion.
+  <br>
+  This class allows refinement of cylindrical manifolds. It is a good
+  companion for GridGenerator::cylinder() and the perfect companion
+  for GridGenerator::cylinder_shell().
+  <br>
+  (Luca Heltai, 2014/08/06)
+  </li>
+
   <li> New: Added support for curved interior cells for all Triangulation
   dimensions.
   <br>
