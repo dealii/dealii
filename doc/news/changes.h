@@ -190,6 +190,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The FE_Nedelec element computed face interpolation matrices
+  wrongly for elements of order p>1. This also led to trouble computing
+  hanging node constraints in the context of hp adaptivity. This is now fixed.
+  <br>
+  (Alexander Grayver, 2014/08/05)
+  </li>
+
   <li> New: The function GridTools::get_patch_around_cell() extracts
   the set of cells that surround a single cell. The new functions
   DoFTools::count_dofs_on_patch() and DoFTools::get_dofs_on_patch()
