@@ -57,7 +57,7 @@ namespace GridGenerator
    * Initialize the given triangulation with a hypercube (line in 1D,
    * square in 2D, etc) consisting of exactly one cell. The hypercube
    * volume is the tensor product interval
-   * \f$ [left,right]^{\text{dim}}\f$ in the present number of
+   * $[left,right]^{\text{dim}}$ in the present number of
    * dimensions, where the limits are given as arguments. They default
    * to zero and unity, then producing the unit hypercube. If the
    * argument `colorize` is false, all boundary indicators are set to

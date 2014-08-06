@@ -114,7 +114,7 @@ namespace internal
  * It is in the responsibility of the user to make sure that the
  * radial variable attains only non-negative values.
  *
- * @precondition This class only makes sense if the first template
+ * @pre This class only makes sense if the first template
  * argument, <code>dim</code> equals the dimension of the
  * DoFHandler type given as the second template argument, i.e., if
  * <code>dim == DH::dimension</code>. This redundancy is a historical

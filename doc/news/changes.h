@@ -79,8 +79,8 @@ inconvenience this causes.
   inheritance is gone. For the most part, this should not lead to any
   incompatibilities except in cases where you accessed members of
   DataOutBase through their derived classes. For example, it was possible
-  to write <code>DataOut@<2@>::Patch@<2,2@></code> even though the
-  <code>Patch</code> class is actually declared in DataOutBase. Since
+  to write DataOut::Patch even though the
+  Patch class is actually declared in DataOutBase. Since
   the inheritance is now gone, this is no longer possible and one
   actually has to write DataOutBase::Patch instead. Using this form
   turns out to be compatible also with older versions of deal.II.
