@@ -19,6 +19,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/lac/vector.h>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -200,6 +201,91 @@ get_new_point (const Quadrature<spacedim> &quad) const
     return (vector_from_axis / vector_from_axis.norm() * radius +
             ((middle-point_on_axis) * direction) * direction +
             point_on_axis);
+}
+
+
+// ============================================================
+// FunctionManifoldChart
+// ============================================================
+template <int dim, int spacedim, int chartdim>
+FunctionManifoldChart<dim,spacedim,chartdim>::FunctionManifoldChart
+(const Function<chartdim> &push_forward_function,
+ const Function<spacedim> &pull_back_function,
+ const Point<chartdim> periodicity):
+  ManifoldChart<dim,spacedim,chartdim>(periodicity),
+  push_forward_function(&push_forward_function),
+  pull_back_function(&pull_back_function),
+  owns_pointers(false)
+{
+  AssertDimension(push_forward_function.n_components, spacedim);
+  AssertDimension(pull_back_function.n_components, chartdim);
+}
+
+template <int dim, int spacedim, int chartdim>
+FunctionManifoldChart<dim,spacedim,chartdim>::FunctionManifoldChart
+(const std::string push_forward_expression,
+ const std::string pull_back_expression, 
+ const Point<chartdim> periodicity, 
+ const typename FunctionParser<spacedim>::ConstMap const_map,
+ const std::string chart_vars, 
+ const std::string space_vars) :
+  ManifoldChart<dim,spacedim,chartdim>(periodicity),
+  const_map(const_map),
+  owns_pointers(true)
+{
+  FunctionParser<chartdim> * pf = new FunctionParser<chartdim>(spacedim);
+  FunctionParser<spacedim> * pb = new FunctionParser<spacedim>(chartdim);
+  pf->initialize(chart_vars, push_forward_expression, const_map);
+  pb->initialize(space_vars, pull_back_expression, const_map);
+  push_forward_function = pf;
+  pull_back_function = pb;
+}
+
+template <int dim, int spacedim, int chartdim>
+FunctionManifoldChart<dim,spacedim,chartdim>::~FunctionManifoldChart() {
+  if(owns_pointers == true) {
+    const Function<chartdim> * pf = push_forward_function;
+    push_forward_function = 0;
+    delete pf;
+    
+    const Function<spacedim> * pb = pull_back_function;
+    pull_back_function = 0;
+    delete pb;
+  }
+}
+								   
+template <int dim, int spacedim, int chartdim>
+Point<spacedim>
+FunctionManifoldChart<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &chart_point) const
+{
+  Vector<double> pf(spacedim);
+  Point<spacedim> result;
+  push_forward_function->vector_value(chart_point, pf);
+  for (unsigned int i=0; i<spacedim; ++i)
+    result[i] = pf[i];
+
+#ifdef DEBUG
+  Vector<double> pb(chartdim);
+  pull_back_function->vector_value(result, pb);
+  for (unsigned int i=0; i<chartdim; ++i)
+    Assert(abs(pb[i]-chart_point[i]) < 1e-10*chart_point.norm(),
+           ExcMessage("The push forward is not the inverse of the pull back! Bailing out."));
+#endif
+
+  return result;
+}
+
+
+template <int dim, int spacedim, int chartdim>
+Point<chartdim>
+FunctionManifoldChart<dim,spacedim,chartdim>::pull_back(const Point<spacedim> &space_point) const
+{
+  Vector<double> pb(chartdim);
+  Point<chartdim> result;
+  pull_back_function->vector_value(space_point, pb);
+  for (unsigned int i=0; i<chartdim; ++i)
+    result[i] = pb[i];
+  return result;
 }
 
 // explicit instantiations

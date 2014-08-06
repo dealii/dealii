@@ -20,6 +20,8 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/grid/manifold.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/function_parser.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -180,6 +182,103 @@ private:
   double tolerance;
 };
 
+
+/**
+ * Manifold description derived from ManifoldChart, based on explicit
+ * Function<spacedim> and Function<chartdim> objects describing the
+ * push_forward() and pull_back() functions. 
+ *
+ * You can use this Manifold object to describe any arbitray shape
+ * domain, as long as you can express it in terms of an invertible
+ * map, for which you provide both the forward expression, and the
+ * inverse expression.
+ *
+ * In debug mode, a check is performed to verify that the
+ * tranformations are actually one the inverse of the other.
+ * 
+ * @ingroup manifold
+ *
+ * @author Luca Heltai, 2014
+ */
+template <int dim, int spacedim=dim, int chartdim=dim>
+class FunctionManifoldChart : public ManifoldChart<dim, spacedim, chartdim> 
+{
+public:
+  /**
+   * Explicit functions constructor. Takes a push_forward function of
+   * spacedim components, and a pull_back function of chartdim
+   * components. See the documentation of the base class ManifoldChart
+   * for the meaning of the optional #periodicity argument.
+   */
+  FunctionManifoldChart(const Function<chartdim> &push_forward_function,
+			const Function<spacedim> &pull_back_function,
+			const Point<chartdim> periodicity=Point<chartdim>());
+
+  /**
+   * Expressions constructor. Takes the expressions of the
+   * push_forward function of spacedim components, and of the
+   * pull_back function of chartdim components. See the documentation
+   * of the base class ManifoldChart for the meaning of the optional
+   * #periodicity argument.
+   *
+   * The strings should be the readable by the default constructor of
+   * the FunctionParser classes. You can specify custom variable
+   * expressions with the last two optional arguments. If you don't,
+   * the default names are used, i.e., "x,y,z"
+   */
+  FunctionManifoldChart(const std::string push_forward_expression,
+			const std::string pull_back_expression,
+			const Point<chartdim> periodicity=Point<chartdim>(), 
+			const typename FunctionParser<spacedim>::ConstMap = typename FunctionParser<spacedim>::ConstMap(),
+			const std::string chart_vars=FunctionParser<chartdim>::default_variable_names(),
+			const std::string space_vars=FunctionParser<spacedim>::default_variable_names());
+
+  /**
+   * If needed, we delete the pointers we own.
+   */
+  ~FunctionManifoldChart();
+  
+  /**
+   * Given a point in the chartdim coordinate system, uses the
+   * push_forward_function to compute the push_forward of points in
+   * #chardim space dimensions to #spacedim space dimensions.
+   */
+  virtual Point<spacedim>
+  push_forward(const Point<chartdim> &chart_point) const;
+
+  /**
+   * Given a point in the spacedim coordinate system, uses the
+   * pull_back_function to compute the pull_back of points in
+   * #spacedim space dimensions to #chartdim space dimensions.
+   */
+  virtual Point<chartdim>
+  pull_back(const Point<spacedim> &space_point) const;
+
+private:
+  /**
+   * Constants for the FunctionParser classes.
+   */
+  const typename FunctionParser<spacedim>::ConstMap const_map;
+
+  /**
+   * Pointer to the push_forward function.
+   */
+  SmartPointer<const Function<chartdim>,
+	       FunctionManifoldChart<dim,spacedim,chartdim> > push_forward_function;
+  
+  /**
+   * Pointer to the pull_back function.
+   */
+  SmartPointer<const Function<spacedim>, 
+	       FunctionManifoldChart<dim,spacedim,chartdim> > pull_back_function;
+
+  /**
+   * Check ownership of the smart pointers.
+   */
+  const bool owns_pointers;
+};
+  
+  
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
