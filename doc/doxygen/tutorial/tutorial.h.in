@@ -600,20 +600,6 @@
  *     <td>step-30</td>
  *   </tr>
  *
- *   <tr>
- *     <td> Multilevel preconditioners
- *     </td>
- *     <td>
- *       step-16,
- *       step-31,
- *       step-32,
- *       step-39,
- *       step-41,
- *       step-42,
- *       step-43
- *     </td>
- *   </tr>
- *
  *   <tr valign="top">
  *     <td> Computing Jacobians from residuals, automatic differentiation
  *     </td>
