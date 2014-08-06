@@ -37,7 +37,7 @@ namespace TrilinosWrappers
   namespace
   {
 #ifndef DEAL_II_WITH_64BIT_INDICES
-    long long int n_global_rows (const Epetra_RowMatrix &matrix)
+    int n_global_rows (const Epetra_RowMatrix &matrix)
     {
       return matrix.NumGlobalRows();
     }
