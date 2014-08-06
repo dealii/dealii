@@ -1480,13 +1480,13 @@ namespace TrilinosWrappers
      * This initialization routine is useful in cases where the operator to be
      * preconditioned is not a TrilinosWrappers::SparseMatrix object but still
      * allows to get a copy of the entries in each of the locally owned matrix
-     * (method ExtractMyRowCopy) rows and implements a matrix-vector product
+     * rows (method ExtractMyRowCopy) and implements a matrix-vector product
      * (methods Multiply or Apply). An example are operators which provide
-     * faster matrix-vector multiplications than with the matrix entries
-     * (matrix-free methods) which can be beneficially combined with Chebyshev
-     * smoothers that only do matrix-vector products. The interface class
-     * Epetra_RowMatrix is very flexible to enable this kind of
-     * implementation.
+     * faster matrix-vector multiplications than possible with matrix entries
+     * (matrix-free methods). These implementations can be beneficially
+     * combined with Chebyshev smoothers that only perform matrix-vector
+     * products. The interface class Epetra_RowMatrix is very flexible to
+     * enable this kind of implementation.
      */
     void initialize (const Epetra_RowMatrix &matrix,
                      const AdditionalData   &additional_data = AdditionalData());
