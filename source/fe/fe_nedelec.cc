@@ -2496,26 +2496,27 @@ const
   // indices of the degrees of
   // freedom.
   if (dim == 3)
-    for (unsigned int i = 0; i <this->degree; ++i)
+  {
+    const unsigned int p = source_fe.degree;
+    const unsigned int q = this->degree;
+
+    for (unsigned int i = 0; i <q; ++i)
       {
         for (int j = 1; j < (int) GeometryInfo<dim>::lines_per_face; ++j)
-          interpolation_matrix (j * source_fe.degree + i,
-                                j * this->degree + i) = 1.0;
+          interpolation_matrix (j * p + i,
+                                j * q + i) = 1.0;
 
-        for (unsigned int j = 0; j < this->degree-1; ++j)
+        for (unsigned int j = 0; j < q-1; ++j)
           {
-            interpolation_matrix
-            ((i + GeometryInfo<dim>::lines_per_face) * (source_fe.degree - 1)
-             + j + GeometryInfo<dim>::lines_per_face,
-             (i + GeometryInfo<dim>::lines_per_face) * (this->degree-1) + j
-             + GeometryInfo<dim>::lines_per_face)
-              = 1.0;
-            interpolation_matrix
-            (i + (j + GeometryInfo<dim>::lines_per_face) * source_fe.degree,
-             i + (j + GeometryInfo<dim>::lines_per_face) * this->degree)
-              = 1.0;
+            interpolation_matrix (GeometryInfo<dim>::lines_per_face * p + i * (p - 1) + j,
+                                  GeometryInfo<dim>::lines_per_face * q + i * (q - 1) + j)
+                = 1.0;
+            interpolation_matrix (GeometryInfo<dim>::lines_per_face * p + i + (j + p - 1) * p,
+                                  GeometryInfo<dim>::lines_per_face * q + i + (j + q - 1) * q)
+                = 1.0;
           }
       }
+  }
 }
 
 
