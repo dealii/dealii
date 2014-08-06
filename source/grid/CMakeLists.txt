@@ -44,6 +44,7 @@ SET(_inst
   grid_tools.inst.in
   intergrid_map.inst.in
   manifold.inst.in
+  manifold_lib.inst.in
   tria_accessor.inst.in
   tria_boundary.inst.in
   tria_boundary_lib.inst.in
