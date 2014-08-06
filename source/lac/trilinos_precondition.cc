@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,6 +37,11 @@ namespace TrilinosWrappers
   namespace
   {
 #ifndef DEAL_II_WITH_64BIT_INDICES
+    int n_global_rows (const Epetra_RowMatrix &matrix)
+    {
+      return matrix.NumGlobalRows();
+    }
+
     int global_length (const Epetra_MultiVector &vector)
     {
       return vector.GlobalLength();
@@ -47,6 +52,11 @@ namespace TrilinosWrappers
       return map.GID(i);
     }
 #else
+    long long int n_global_rows (const Epetra_RowMatrix &matrix)
+    {
+      return matrix.NumGlobalRows64();
+    }
+
     long long int global_length (const Epetra_MultiVector &vector)
     {
       return vector.GlobalLength64();
@@ -728,12 +738,20 @@ namespace TrilinosWrappers
   }
 
 
+
   void
   PreconditionAMG:: initialize (const SparseMatrix   &matrix,
                                 const AdditionalData &additional_data)
   {
-    const size_type n_rows = matrix.m();
+    initialize(matrix.trilinos_matrix(), additional_data);
+  }
 
+
+
+  void
+  PreconditionAMG:: initialize (const Epetra_RowMatrix &matrix,
+                                const AdditionalData   &additional_data)
+  {
     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
 
@@ -749,15 +767,8 @@ namespace TrilinosWrappers
         // standard choice uncoupled. if higher order, right now we also just
         // use Uncoupled, but we should be aware that maybe MIS might be
         // needed
-        //
-        // TODO: Maybe there are any other/better options?
         if (additional_data.higher_order_elements)
-          {
-            //if (matrix.m()/matrix.matrix->Comm().NumProc() < 50000)
-            parameter_list.set("aggregation: type", "Uncoupled");
-            //else
-            //parameter_list.set("aggregation: type", "MIS");
-          }
+          parameter_list.set("aggregation: type", "Uncoupled");
       }
     else
       {
@@ -790,7 +801,7 @@ namespace TrilinosWrappers
     else
       parameter_list.set("ML output", 0);
 
-    const Epetra_Map &domain_map = matrix.domain_partitioner();
+    const Epetra_Map &domain_map = matrix.OperatorDomainMap();
 
     const size_type constant_modes_dimension =
       additional_data.constant_modes.size();
@@ -801,6 +812,7 @@ namespace TrilinosWrappers
 
     if (constant_modes_dimension > 0)
       {
+        const size_type n_rows = n_global_rows(matrix);
         const bool constant_modes_are_global =
           additional_data.constant_modes[0].size() == n_rows;
         const size_type n_relevant_rows =
@@ -856,9 +868,18 @@ namespace TrilinosWrappers
   PreconditionAMG::initialize (const SparseMatrix           &matrix,
                                const Teuchos::ParameterList &ml_parameters)
   {
+    initialize(matrix.trilinos_matrix(), ml_parameters);
+  }
+
+
+
+  void
+  PreconditionAMG::initialize (const Epetra_RowMatrix       &matrix,
+                               const Teuchos::ParameterList &ml_parameters)
+  {
     preconditioner.reset ();
     preconditioner.reset (new ML_Epetra::MultiLevelPreconditioner
-                          (matrix.trilinos_matrix(), ml_parameters));
+                          (matrix, ml_parameters));
   }
 
 
