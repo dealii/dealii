@@ -83,12 +83,12 @@
  *
  * <table align="center" width="90%">
  *   <tr valign="top">
- *       <td width="100px">Step-1</td>
+ *       <td width="100px">step-1</td>
  *       <td> Creating a grid. A simple way to write it to a file.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-2</td>
+ *       <td>step-2</td>
  *       <td> Associate degrees of freedom to
  *       each vertex and compute the resulting sparsity pattern of
  *       matrices. Show that renumbering reduces the bandwidth of
@@ -97,14 +97,14 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-3</td>
+ *       <td>step-3</td>
  *       <td> Actually solve Laplace's
  *       problem. Object-orientation. Assembling matrices and
  *       vectors. %Boundary values.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-4</td>
+ *       <td>step-4</td>
  *       <td> This example is programmed in a
  *       way that it is independent of the dimension for which we want to
  *       solve Laplace's equation; we will solve the equation in 2D and
@@ -113,7 +113,7 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-5</td>
+ *       <td>step-5</td>
  *       <td> Computations on successively
  *       refined grids. Reading a grid from disk. Some optimizations.
  *       Using assertions. Non-constant coefficient in
@@ -123,14 +123,14 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-6</td>
+ *       <td>step-6</td>
  *       <td> Adaptive local
  *       refinement. Handling of hanging nodes. Higher order elements.
  *       Catching exceptions in the <code>main</code>; function.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-7</td>
+ *       <td>step-7</td>
  *       <td> Helmholtz
  *       equation. Non-homogeneous Neumann boundary conditions and
  *       boundary integrals. Verification of correctness of computed
@@ -139,7 +139,7 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-8</td>
+ *       <td>step-8</td>
  *       <td> The elasticity equations will be
  *       solved instead of Laplace's equation. The solution is
  *       vector-valued and the equations form a system with as many
@@ -147,190 +147,190 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-9</td>
+ *       <td>step-9</td>
  *       <td> Linear advection equation, assembling
  *       the system of equations in parallel using multi-threading,
  *       implementing a refinement criterion based on a finite difference
  *       approximation of the gradient.
  *
  *   <tr valign="top">
- *       <td>Step-10</td>
+ *       <td>step-10</td>
  *       <td> Higher order mappings. Do not
  *       solve equations, but rather compute the value of pi to high
  *       accuracy.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-11</td>
+ *       <td>step-11</td>
  *       <td> Solving a Laplace problem with
  *       higher order mappings. Using strange constraints and
  *       intermediate representations of sparsity patterns.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-12</td>
+ *       <td>step-12</td>
  *       <td> Discontinuous Galerkin methods for linear advection problems.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-13</td>
+ *       <td>step-13</td>
  *       <td> Software design questions and
  *       how to write a modular, extensible finite element program.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-14</td>
+ *       <td>step-14</td>
  *       <td> Duality based error estimators,
  *       more strategies to write a modular, extensible finite element
  *       program.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-15</td>
+ *       <td>step-15</td>
  *       <td> A nonlinear elliptic problem: The minimal surface equation.
  *       Newton's method. Transferring a solution across mesh refinement.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-16</td>
+ *       <td>step-16</td>
  *       <td> Multigrid preconditioning of the Laplace equation on adaptive
  *       meshes.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-17</td>
+ *       <td>step-17</td>
  *       <td> Using PETSc for linear algebra; running
  *       in parallel on clusters of computers linked together by MPI.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-18</td>
+ *       <td>step-18</td>
  *       <td> A time dependent problem; using a much
  *       simplified version of implementing elasticity; moving meshes; handling
  *       large scale output of parallel programs.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-19</td>
+ *       <td>step-19</td>
  *       <td> Input parameter file handling. Merging
  *       output of a parallel program.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-20</td>
+ *       <td>step-20</td>
  *       <td> Mixed finite elements. Using block
  *       matrices and block vectors to define more complicated solvers and
  *       preconditioners working on the Schur complement.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-21</td>
+ *       <td>step-21</td>
  *       <td> The time dependent two-phase flow in
  *       porous media. Extensions of mixed Laplace discretizations. More
  *       complicated block solvers. Simple time stepping.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-22</td>
+ *       <td>step-22</td>
  *       <td> Solving the Stokes equations of slow fluid flow on adaptive
  *       meshes. More on Schur complement solvers. Advanced use of the
  *       ConstraintMatrix class.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-23</td>
+ *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-24</td>
+ *       <td>step-24</td>
  *       <td> A variant of step-23 with absorbing
  *       boundary conditions, and extracting practically useful data.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-25</td>
+ *       <td>step-25</td>
  *       <td> The sine-Gordon
  *       soliton equation, which is a nonlinear variant of the time
  *       dependent wave equation covered in step-23 and step-24.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-26</td>
+ *       <td>step-26</td>
  *       <td> The heat equation, solved on a mesh that is adapted
  *       every few time steps.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-27</td>
+ *       <td>step-27</td>
  *       <td> hp finite element methods  </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-28</td>
+ *       <td>step-28</td>
  *       <td> Multiple grids for solving a multigroup diffusion equation
  *       in nuclear physics simulating a nuclear reactor core  </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-29</td>
+ *       <td>step-29</td>
  *       <td> Solving a complex-valued Helmholtz equation. Sparse direct
  *       solvers. Dealing with parameter files.  </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-30</td>
+ *       <td>step-30</td>
  *       <td> Anisotropic refinement for DG finite element methods.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-31</td>
+ *       <td>step-31</td>
  *       <td> Time-dependent Stokes flow driven by temperature
  *       differences in a fluid. Adaptive meshes that change between time
  *       steps.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-32</td>
+ *       <td>step-32</td>
  *       <td> A massively parallel solver for time-dependent Stokes flow driven
  *       by temperature differences in a fluid. Adapting methods for real-world
  *       equations.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-33</td>
+ *       <td>step-33</td>
  *       <td> A nonlinear hyperbolic conservation law: The Euler equations of
  *       compressible gas dynamics.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-34</td>
+ *       <td>step-34</td>
  *       <td> %Boundary element methods (BEM) of low order: Exterior irrotational
  *       flow. The ParsedFunction class.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-35</td>
+ *       <td>step-35</td>
  *       <td> A projection solver for the Navier&ndash;Stokes equations.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-36</td>
+ *       <td>step-36</td>
  *       <td> Using SLEPc for linear algebra; solving an eigenspectrum
  *       problem. The Schrödinger wave equation.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-37</td>
+ *       <td>step-37</td>
  *       <td> Solving a Poisson problem with a multilevel preconditioner without
  *       explicitly storing the matrix (a matrix-free method).
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-38</td>
+ *       <td>step-38</td>
  *       <td>Solving the Laplace-Beltrami equation on curved manifolds embedded
  *       in higher dimensional spaces.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-39</td>
+ *       <td>step-39</td>
  *       <td> Solving Poisson's equation once more, this time with the
  *       interior penalty method, one of the discontinous Galerkin
  *       methods developed for this problem. Error estimator, adaptive
@@ -339,56 +339,56 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-40</td>
+ *       <td>step-40</td>
  *       <td> Techniques for the massively parallel solution of the Laplace
  *       equation (up to 10,000s of processors).
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-41</td>
+ *       <td>step-41</td>
  *       <td> Solving the obstacle problem, a variational inequality.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-42</td>
+ *       <td>step-42</td>
  *       <td> A solver for an elasto-plastic contact problem, running on
  *       parallel machines.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-43</td>
+ *       <td>step-43</td>
  *       <td> Advanced techniques for the simulation of porous media flow.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-44</td>
+ *       <td>step-44</td>
  *       <td> Finite strain hyperelasticity based on a three-field formulation.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-45</td>
+ *       <td>step-45</td>
  *       <td> Periodic boundary conditions.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-46</td>
+ *       <td>step-46</td>
  *       <td> Coupling different kinds of equations in different parts of the domain.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-48</td>
+ *       <td>step-48</td>
  *       <td> Explicit time stepping for the Sine&ndash;Gordon equation based on
  *       a diagonal mass matrix. Efficient implementation of (nonlinear) finite
  *       element operators.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-49</td>
+ *       <td>step-49</td>
  *       <td> Advanced mesh creation and manipulation techniques.
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>Step-51</td>
+ *       <td>step-51</td>
  *       <td> Solving the convection-diffusion equation with a hyrbidizable
  *       discontinuous Galerkin method using face elements.
  *       </td></tr>
@@ -402,49 +402,49 @@
  *
  *   <tr valign="top">
  *     <td width="400px"> Creating a grid. A simple way to write it to a file
- *     <td>Step-1</td>
+ *     <td>step-1</td>
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Degrees of freedom
- *     <td>Step-2</td>
+ *     <td>step-2</td>
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Solve the Laplace equation
- *     <td>Step-3</td>
+ *     <td>step-3</td>
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Dimension independent programming, non-zero data
- *     <td>Step-4</td>
+ *     <td>step-4</td>
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Computing on uniformly refined meshes
- *     <td>Step-5</td>
+ *     <td>step-5</td>
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Adaptivity
- *     <td>Step-6, step-26</td>
+ *     <td>step-6, step-26</td>
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Evaluating errors
- *     <td>Step-7</td>
+ *     <td>step-7</td>
  *     </td>
  *
  *   <tr valign="top">
  *     <td> Nonlinear problems, Newton's method
  *     </td>
- *     <td>Step-15</td>
+ *     <td>step-15</td>
  *   </tr>
  *
  * </table>
@@ -455,12 +455,12 @@
  *     <td width="400px"> Multithreading
  *     </td>
  *     <td>
- *       Step-9,
- *       Step-28,
- *       Step-32,
- *       Step-44,
- *       Step-48,
- *       Step-51
+ *       step-9,
+ *       step-28,
+ *       step-32,
+ *       step-44,
+ *       step-48,
+ *       step-51
  *     </td>
  *   </tr>
  *
@@ -468,13 +468,13 @@
  *     <td> Block solvers and preconditioners
  *     </td>
  *     <td>
- *       Step-20,
- *       Step-21,
- *       Step-22,
- *       Step-31,
- *       Step-32,
- *       Step-43,
- *       Step-44
+ *       step-20,
+ *       step-21,
+ *       step-22,
+ *       step-31,
+ *       step-32,
+ *       step-43,
+ *       step-44
  *     </td>
  *   </tr>
  *
@@ -482,12 +482,12 @@
  *     <td> Using Trilinos
  *     </td>
  *     <td>
- *       Step-31,
- *       Step-32,
- *       Step-33,
- *       Step-41,
- *       Step-42,
- *       Step-43
+ *       step-31,
+ *       step-32,
+ *       step-33,
+ *       step-41,
+ *       step-42,
+ *       step-43
  *     </td>
  *   </tr>
  *
@@ -495,10 +495,10 @@
  *     <td> Parallelization via PETSc and MPI
  *     </td>
  *     <td>
- *       Step-17,
- *       Step-18,
- *       Step-19,
- *       Step-40
+ *       step-17,
+ *       step-18,
+ *       step-19,
+ *       step-40
  *     </td>
  *   </tr>
  *
@@ -506,8 +506,8 @@
  *     <td> Parallelization via Trilinos and MPI
  *     </td>
  *     <td>
- *       Step-32,
- *       Step-42
+ *       step-32,
+ *       step-42
  *     </td>
  *   </tr>
  *
@@ -515,9 +515,9 @@
  *     <td> Parallelization on very large numbers of processors
  *     </td>
  *     <td>
- *       Step-32,
- *       Step-40,
- *       Step-42
+ *       step-32,
+ *       step-40,
+ *       step-42
  *     </td>
  *   </tr>
  *
@@ -525,16 +525,16 @@
  *     <td> Input parameter handling
  *     </td>
  *     <td>
- *       Step-19,
- *       Step-28,
- *       Step-29,
- *       Step-32,
- *       Step-33,
- *       Step-34,
- *       Step-35,
- *       Step-36,
- *       Step-42,
- *       Step-44
+ *       step-19,
+ *       step-28,
+ *       step-29,
+ *       step-32,
+ *       step-33,
+ *       step-34,
+ *       step-35,
+ *       step-36,
+ *       step-42,
+ *       step-44
  *     </td>
  *   </tr>
  *
@@ -542,9 +542,9 @@
  *     <td> Higher order mappings
  *     </td>
  *     <td>
- *       Step-10,
- *       Step-11,
- *       Step-32
+ *       step-10,
+ *       step-11,
+ *       step-32
  *     </td>
  *   </tr>
  *
@@ -552,10 +552,10 @@
  *     <td> Error indicators and estimators
  *     </td>
  *     <td>
- *       Step-6,
- *       Step-9,
- *       Step-14,
- *       Step-39
+ *       step-6,
+ *       step-9,
+ *       step-14,
+ *       step-39
  *     </td>
  *   </tr>
  *
@@ -563,13 +563,13 @@
  *     <td> Transferring solutions across mesh refinement
  *     </td>
  *     <td>
- *       Step-15,
- *       Step-28,
- *       Step-31,
- *       Step-32,
- *       Step-33,
- *       Step-42,
- *       Step-43
+ *       step-15,
+ *       step-28,
+ *       step-31,
+ *       step-32,
+ *       step-33,
+ *       step-42,
+ *       step-43
  *     </td>
  *   </tr>
  *
@@ -577,11 +577,11 @@
  *     <td> Discontinuous Galerkin methods
  *     </td>
  *     <td>
- *       Step-12,
- *       Step-21,
- *       Step-39,
- *       Step-46,
- *       Step-51
+ *       step-12,
+ *       step-21,
+ *       step-39,
+ *       step-46,
+ *       step-51
  *     </td>
  *   </tr>
  *
@@ -589,44 +589,30 @@
  *     <td> hp finite elements
  *     </td>
  *     <td>
- *       Step-27,
- *       Step-46
+ *       step-27,
+ *       step-46
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Anisotropic refinement for DG finite element methods
  *     </td>
- *     <td>Step-30</td>
- *   </tr>
- *
- *   <tr>
- *     <td> Multilevel preconditioners
- *     </td>
- *     <td>
- *       Step-16,
- *       Step-31,
- *       Step-32,
- *       Step-39,
- *       Step-41,
- *       Step-42,
- *       Step-43
- *     </td>
+ *     <td>step-30</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Computing Jacobians from residuals, automatic differentiation
  *     </td>
- *     <td>Step-33</td>
+ *     <td>step-33</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> %Boundary element methods, curved manifolds
  *     </td>
  *     <td>
- *       Step-32,
- *       Step-34,
- *       Step-38
+ *       step-32,
+ *       step-34,
+ *       step-38
  *     </td>
  *   </tr>
  *
@@ -634,7 +620,7 @@
  *     <td> Periodic boundary conditions
  *     </td>
  *     <td>
- *       Step-45
+ *       step-45
  *     </td>
  *   </tr>
  *
@@ -642,8 +628,8 @@
  *     <td> Matrix-free methods
  *     </td>
  *     <td>
- *       Step-37,
- *       Step-48
+ *       step-37,
+ *       step-48
  *     </td>
  *   </tr>
  *
@@ -651,7 +637,7 @@
  *     <td> Advanced meshes
  *     </td>
  *     <td>
- *       Step-49
+ *       step-49
  *     </td>
  *   </tr>
  *
@@ -662,33 +648,33 @@
  *   <tr valign="top">
  *     <td width="400px"> Conjugate Gradient solver
  *     </td>
- *     <td>Step-3</td>
+ *     <td>step-3</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Preconditioned CG solver
  *     </td>
- *     <td>Step-5</td>
+ *     <td>step-5</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> BiCGStab
  *     </td>
- *     <td>Step-9</td>
+ *     <td>step-9</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Multilevel preconditioners
  *     </td>
  *     <td>
- *       Step-16,
- *       Step-31,
- *       Step-32,
- *       Step-37,
- *       Step-39,
- *       Step-41,
- *       Step-42,
- *       Step-43
+ *       step-16,
+ *       step-31,
+ *       step-32,
+ *       step-37,
+ *       step-39,
+ *       step-41,
+ *       step-42,
+ *       step-43
  *     </td>
  *   </tr>
  *
@@ -696,11 +682,11 @@
  *     <td> Parallel solvers
  *     </td>
  *     <td>
- *       Step-17,
- *       Step-18,
- *       Step-32,
- *       Step-40,
- *       Step-42
+ *       step-17,
+ *       step-18,
+ *       step-32,
+ *       step-40,
+ *       step-42
  *     </td>
  *   </tr>
  *
@@ -708,36 +694,36 @@
  *     <td> Block and Schur complement solvers
  *     </td>
  *     <td>
- *       Step-20,
- *       Step-21,
- *       Step-22,
- *       Step-31,
- *       Step-32,
- *       Step-43
+ *       step-20,
+ *       step-21,
+ *       step-22,
+ *       step-31,
+ *       step-32,
+ *       step-43
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Decoupled projection solvers
  *     </td>
- *     <td>Step-35</td>
+ *     <td>step-35</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Linear Newton systems from nonlinear equations
  *     </td>
  *     <td>
- *       Step-33,
- *       Step-41,
- *       Step-42,
- *       Step-44
+ *       step-33,
+ *       step-41,
+ *       step-42,
+ *       step-44
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Eigenvalue solvers
  *     </td>
- *     <td>Step-36</td>
+ *     <td>step-36</td>
  *   </tr>
  *
  * </table>
@@ -748,8 +734,8 @@
  *     <td width="400px"> Helmholtz equation
  *     </td>
  *     <td>
- *       Step-7,
- *       Step-29
+ *       step-7,
+ *       step-29
  *     </td>
  *   </tr>
  *
@@ -757,9 +743,9 @@
  *     <td> Elasticity and elasto-plasticity equations
  *     </td>
  *     <td>
- *       Step-8,
- *       Step-42,
- *       Step-46
+ *       step-8,
+ *       step-42,
+ *       step-46
  *     </td>
  *   </tr>
  *
@@ -767,7 +753,7 @@
  *     <td> The heat equation
  *     </td>
  *     <td>
- *       Step-26
+ *       step-26
  *     </td>
  *   </tr>
  *
@@ -775,7 +761,7 @@
  *     <td> Minimal surface equation
  *     </td>
  *     <td>
- *       Step-15
+ *       step-15
  *     </td>
  *   </tr>
  *
@@ -783,36 +769,36 @@
  *     <td> Quasi-static elasticity equations
  *     </td>
  *     <td>
- *       Step-18,
- *       Step-44
+ *       step-18,
+ *       step-44
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Transport (advection) equations
  *     </td>
- *     <td>Step-9,
- *         Step-21,
- *         Step-31,
- *         Step-32,
- *         Step-43,
- *         Step-51
+ *     <td>step-9,
+ *         step-21,
+ *         step-31,
+ *         step-32,
+ *         step-43,
+ *         step-51
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> The nonlinear hyperbolic Euler system of compressible gas dynamics
  *     </td>
- *     <td>Step-33</td>
+ *     <td>step-33</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Mixed Laplace, Darcy, Porous media
  *     </td>
  *     <td>
- *       Step-20,
- *       Step-21,
- *       Step-43
+ *       step-20,
+ *       step-21,
+ *       step-43
  *     </td>
  *   </tr>
  *
@@ -820,11 +806,11 @@
  *     <td> Stokes and incompressible Navier-Stokes flow
  *     </td>
  *     <td>
- *       Step-22,
- *       Step-31,
- *       Step-32,
- *       Step-35,
- *       Step-46
+ *       step-22,
+ *       step-31,
+ *       step-32,
+ *       step-35,
+ *       step-46
  *     </td>
  *   </tr>
  *
@@ -832,44 +818,44 @@
  *     <td> The wave equation, in linear and nonlinear variants
  *     </td>
  *     <td>
- *       Step-23,
- *       Step-24,
- *       Step-25,
- *       Step-48
+ *       step-23,
+ *       step-24,
+ *       step-25,
+ *       step-48
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> A multigroup diffusion problem in neutron transport
  *     </td>
- *     <td>Step-28</td>
+ *     <td>step-28</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Irrotational flow
  *     </td>
- *     <td>Step-34</td>
+ *     <td>step-34</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> An eigenspectrum problem
  *     </td>
- *     <td>Step-36</td>
+ *     <td>step-36</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> The obstacle problem, a variational inequality
  *     </td>
  *     <td>
- *       Step-41,
- *       Step-42
+ *       step-41,
+ *       step-42
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
  *     </td>
- *     <td>Step-46</td>
+ *     <td>step-46</td>
  *   </tr>
  *
  * </table>
@@ -880,49 +866,49 @@
  *     <td width="400px"> Elasticity and elasto-plasticity equations
  *     </td>
  *     <td>
- *       Step-8,
- *       Step-42
+ *       step-8,
+ *       step-42
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Mixed Laplace
  *     </td>
- *     <td>Step-20</td>
+ *     <td>step-20</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Mixed Laplace plus an advection equation
  *     </td>
- *     <td>Step-21,
- *         Step-43
+ *     <td>step-21,
+ *         step-43
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Incompressible Stokes and Navier-Stokes flow
  *     </td>
- *     <td>Step-22,
- *         Step-31,
- *         Step-32,
- *         Step-35</td>
+ *     <td>step-22,
+ *         step-31,
+ *         step-32,
+ *         step-35</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> A complex-valued Helmholtz problem
  *     </td>
- *     <td>Step-29</td>
+ *     <td>step-29</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> The Euler equations of compressible gas dynamics
  *     </td>
- *     <td>Step-33</td>
+ *     <td>step-33</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
- *     <td>Step-46</td>
+ *     <td>step-46</td>
  *   </tr>
  *
  * </table>
@@ -934,7 +920,7 @@
  *   <tr valign="top">
  *     <td> The heat equation
  *     </td>
- *     <td>Step-26
+ *     <td>step-26
  *     </td>
  *   </tr>
  *
@@ -942,41 +928,41 @@
  *     <td width="400px"> Quasi-static elasticity
  *     </td>
  *     <td>
- *      Step-18,
- *      Step-44
+ *      step-18,
+ *      step-44
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Porous media flow
  *     </td>
- *     <td>Step-21,
- *         Step-43
+ *     <td>step-21,
+ *         step-43
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> The wave equation, in linear and nonlinear variants
  *     </td>
- *     <td>Step-23,
- *         Step-24,
- *         Step-25,
- *         Step-48
+ *     <td>step-23,
+ *         step-24,
+ *         step-25,
+ *         step-48
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Time dependent Stokes flow driven by buoyancy
  *     </td>
- *     <td>Step-31,
- *         Step-32
+ *     <td>step-31,
+ *         step-32
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> The Euler equations of compressible gas dynamics
  *     </td>
- *     <td>Step-33</td>
+ *     <td>step-33</td>
  *   </tr>
  * </table>
  */
