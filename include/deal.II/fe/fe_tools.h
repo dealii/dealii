@@ -707,15 +707,15 @@ namespace FETools
    * other:
    *
    * - It interpolates directly from every cell of @p dof1 to the
-   *   corresponding cell of @dof2 using the interpolation matrix of the
+   *   corresponding cell of `dof2` using the interpolation matrix of the
    *   finite element spaces used on these cells and provided by
    *   the finite element objects involved. This step is done using the
    *   FETools::interpolate() function.
-   * - It then performs a loop over all non-active cells of @dof2. If
+   * - It then performs a loop over all non-active cells of `dof2`. If
    *   such a non-active cell has at least one active child, then we
    *   call the children of this cell a "patch". We then interpolate
    *   from the children of this patch to the patch, using the finite
-   *   element space associated with @p dof2 and immediately interpolate
+   *   element space associated with `dof2` and immediately interpolate
    *   back to the children. In essence, this information throws away
    *   all information in the solution vector that lives on a scale
    *   smaller than the patch cell.

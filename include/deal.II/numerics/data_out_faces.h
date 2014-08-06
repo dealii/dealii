@@ -108,7 +108,7 @@ namespace internal
  * applications certainly exist, for which the author is not
  * imaginative enough.
  *
- * @precondition This class only makes sense if the first template
+ * @pre This class only makes sense if the first template
  * argument, <code>dim</code> equals the dimension of the
  * DoFHandler type given as the second template argument, i.e., if
  * <code>dim == DH::dimension</code>. This redundancy is a historical

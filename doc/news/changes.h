@@ -79,8 +79,8 @@ inconvenience this causes.
   inheritance is gone. For the most part, this should not lead to any
   incompatibilities except in cases where you accessed members of
   DataOutBase through their derived classes. For example, it was possible
-  to write <code>DataOut@<2@>::Patch@<2,2@></code> even though the
-  <code>Patch</code> class is actually declared in DataOutBase. Since
+  to write DataOut::Patch even though the
+  Patch class is actually declared in DataOutBase. Since
   the inheritance is now gone, this is no longer possible and one
   actually has to write DataOutBase::Patch instead. Using this form
   turns out to be compatible also with older versions of deal.II.
@@ -190,6 +190,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The FE_Nedelec element computed face interpolation matrices
+  wrongly for elements of order p>1. This also led to trouble computing
+  hanging node constraints in the context of hp adaptivity. This is now fixed.
+  <br>
+  (Alexander Grayver, 2014/08/05)
+  </li>
+
   <li> New: The function GridTools::get_patch_around_cell() extracts
   the set of cells that surround a single cell. The new functions
   DoFTools::count_dofs_on_patch() and DoFTools::get_dofs_on_patch()

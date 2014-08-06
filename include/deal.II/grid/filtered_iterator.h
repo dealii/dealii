@@ -357,7 +357,7 @@ namespace IteratorFilters
  * @endcode
  * Note that by the @p set_to_next_positive call the first cell with
  * a set user flag was assigned to the @p begin iterator. For the
- * #end iterator, no such call was necessary, since the past-the-end
+ * end iterator, no such call was necessary, since the past-the-end
  * iterator always satisfies all predicates.
  *
  * The same can be achieved by the following snippet, though harder to read:

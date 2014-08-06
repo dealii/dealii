@@ -180,7 +180,7 @@ namespace Algorithms
    * for us). Here, we first get the time step size from the AnyData
    * object that was provided as input. Then, if we are in the first
    * step or if the timestep has changed, we fill the local matrix
-   * <tt>m</tt>, such that with the given matrix \f$M\f$, it becomes
+   * $m$, such that with the given matrix $M$, it becomes
    * \f[
    * m = I - \Delta t M.
    * \f]
@@ -219,11 +219,11 @@ namespace Algorithms
     /**
      * The timestepping scheme.
      *
-     * @param `in` is ignored by
+     * @param in is ignored by
      * ThetaTimestepping, but is merged into the AnyData objects used
      * as input for the operators #op_explicit and #op_implicit.
      *
-     * @param `out` in its first argument must contain a pointer to a
+     * @param out in its first argument must contain a pointer to a
      * `VECTOR`, which contains the initial value when the operator is
      * called. It contains the final value when the operator returns.
      */
@@ -334,10 +334,10 @@ namespace Algorithms
      * with name "Current time solution". It should obtain the current
      * time and time step size from explicit_data().
      *
-     * Its return value is <i>Mu+cF(u)</i>, where <i>u</i> is the
-     * current state vector, <i>M</i> the mass matrix, <i>F</i> the
-     * operator in space and <i>c</i> is the adjusted
-     * time step size \f$ (1-\theta) \Delta t\f$.
+     * Its return value is $ Mu+cF(u) $, where $u$ is the
+     * current state vector, $M$ the mass matrix, $F$ the
+     * operator in space and $c$ is the adjusted
+     * time step size $(1-\theta) \Delta t$.
      */
     SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_explicit;
 
