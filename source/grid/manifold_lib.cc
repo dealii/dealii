@@ -131,22 +131,12 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
 // CylindricalManifold
 // ============================================================
 
-
 template <int dim, int spacedim>
-Point<spacedim>
-CylindricalManifold<dim,spacedim>::get_axis_vector (const unsigned int axis)
-{
-  Assert (axis < spacedim, ExcIndexRange (axis, 0, spacedim));
-  Point<spacedim> axis_vector;
-  axis_vector[axis] = 1;
-  return axis_vector;
-}
-
-
-template <int dim, int spacedim>
-CylindricalManifold<dim,spacedim>::CylindricalManifold(const unsigned int axis) :
-  direction (get_axis_vector (axis)),
-  point_on_axis (Point<spacedim>())
+CylindricalManifold<dim,spacedim>::CylindricalManifold(const unsigned int axis, 
+						       const double tolerance) :
+  direction (Point<spacedim>::unit_vector(axis)),
+  point_on_axis (Point<spacedim>()),
+  tolerance(tolerance)
 {
   Assert(spacedim > 1, ExcImpossibleInDim(1));
 }
@@ -154,9 +144,11 @@ CylindricalManifold<dim,spacedim>::CylindricalManifold(const unsigned int axis) 
 
 template <int dim, int spacedim>
 CylindricalManifold<dim,spacedim>::CylindricalManifold(const Point<spacedim> &direction,
-						       const Point<spacedim> &point_on_axis) :
+						       const Point<spacedim> &point_on_axis, 
+						       const double tolerance) :
   direction (direction),
-  point_on_axis (point_on_axis)
+  point_on_axis (point_on_axis),
+  tolerance(tolerance)
 {
   Assert(spacedim > 2, ExcImpossibleInDim(spacedim));
 }
@@ -173,7 +165,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
   const std::vector<double> &weights = quad.get_weights();
 
   // compute a proposed new point  
-  Point<spacedim> middle = FlatManifold<dim,spacedim>::get_new_point(quad);
+  Point<spacedim> middle = flat_manifold.get_new_point(quad);
 
   double radius = 0;
   Point<spacedim> on_plane;
@@ -193,7 +185,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
 
   // scale it to the desired length and put everything back together,
   // unless we have a point on the axis
-  if (vector_from_axis.norm() <= this->tolerance * middle.norm())
+  if (vector_from_axis.norm() <= tolerance * middle.norm())
     return middle;
 
   else

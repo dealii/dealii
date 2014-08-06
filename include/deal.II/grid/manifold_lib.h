@@ -124,26 +124,30 @@ private:
  * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim = dim>
-class CylindricalManifold : public FlatManifold<dim,spacedim>
+class CylindricalManifold : public Manifold<dim,spacedim>
 {
 public:
   /**
    * Constructor. Using default values for the constructor arguments
    * yields a cylinder along the x-axis (<tt>axis=0</tt>). Choose
    * <tt>axis=1</tt> or <tt>axis=2</tt> for a tube along the y- or
-   * z-axis, respectively.
+   * z-axis, respectively. The tolerance value is used to determine
+   * if a point is on the axis.
    */
-  CylindricalManifold (const unsigned int axis = 0);
+  CylindricalManifold (const unsigned int axis = 0, 
+		       const double tolerance = 1e-10);
 
   /**
    * Constructor. If constructed with this constructor, the manifold
    * described is a cylinder with an axis that points in direction
    * #direction and goes through the given #point_on_axis. The
    * direction may be arbitrarily scaled, and the given point may be
-   * any point on the axis.
+   * any point on the axis. The tolerance value is used to determine
+   * if a point is on the axis. 
    */
   CylindricalManifold (const Point<spacedim> &direction,
-		       const Point<spacedim> &point_on_axis);
+		       const Point<spacedim> &point_on_axis, 
+		       const double tolerance = 1e-10);
 
  /**
    * Compute new points on the CylindricalManifold. See the documentation
@@ -166,10 +170,14 @@ protected:
 
 private:
   /**
-   * Given a number for the axis, return a vector that denotes this
-   * direction.
+   * Helper FlatManifold to compute temptative midpoints.
    */
-  static Point<spacedim> get_axis_vector (const unsigned int axis);
+  FlatManifold<dim,spacedim> flat_manifold;
+  
+  /**
+   * Relative tolerance to measure zero distances.
+   */
+  double tolerance;
 };
 
 DEAL_II_NAMESPACE_CLOSE
