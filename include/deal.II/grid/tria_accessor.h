@@ -37,6 +37,7 @@ template <typename Accessor> class TriaIterator;
 template <typename Accessor> class TriaActiveIterator;
 
 template <int dim, int spacedim> class Boundary;
+template <int dim, int spacedim> class Manifold;
 
 
 namespace internal
@@ -1200,7 +1201,7 @@ public:
    * involves querying both the manifold or boundary indicators. See there
    * for more information.
    */
-  const Boundary<dim,spacedim> &get_manifold () const;
+  const Manifold<dim,spacedim> &get_manifold () const;
 
   /**
    * @}

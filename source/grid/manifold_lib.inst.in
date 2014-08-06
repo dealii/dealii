@@ -1,0 +1,25 @@
+// ---------------------------------------------------------------------
+// $Id: tria_boundary_lib.inst.in 30130 2013-07-23 13:01:18Z heltai $
+//
+// Copyright (C) 1999 - 2013 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template class PolarManifold<deal_II_dimension>;
+    template class CylinderManifold<deal_II_dimension>;
+//     template class ConeBoundary<deal_II_dimension>;
+  }
+
+

@@ -42,6 +42,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim> class Boundary;
 template <int dim, int spacedim> class StraightBoundary;
+template <int dim, int spacedim> class Manifold;
 
 template <int, int, int> class TriaAccessor;
 template <int spacedim> class TriaAccessor<0,1,spacedim>;
@@ -1864,7 +1865,7 @@ public:
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   void set_manifold (const types::manifold_id   number,
-                     const Boundary<dim,spacedim> &manifold_object);
+                     const Manifold<dim,spacedim> &manifold_object);
 
     
   /**
@@ -1897,7 +1898,7 @@ public:
    *
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */    
-  const Boundary<dim,spacedim> &get_manifold (const types::manifold_id number) const;
+  const Manifold<dim,spacedim> &get_manifold (const types::manifold_id number) const;
 
   /**
    * Returns a vector containing all boundary indicators assigned to
@@ -3331,7 +3332,7 @@ private:
    *  Collection of manifold objects. We store only objects, which are
    *  not of type FlatManifold.
    */
-  std::map<types::manifold_id, SmartPointer<const Boundary<dim,spacedim> , Triangulation<dim, spacedim> > >  manifold;
+  std::map<types::manifold_id, SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >  manifold;
 
 
   /**
@@ -3646,8 +3647,13 @@ template <> unsigned int Triangulation<1,3>::max_adjacent_cells () const;
 
 
 // -------------------------------------------------------------------
-
-
+// Explicit invalid things...
+template <> 
+const Manifold<2,1> & Triangulation<2, 1>::get_manifold(const types::manifold_id) const;
+template <> 
+const Manifold<3,1> & Triangulation<3, 1>::get_manifold(const types::manifold_id) const;
+template <> 
+const Manifold<3,2> & Triangulation<3, 2>::get_manifold(const types::manifold_id) const;
 
 
 #endif // DOXYGEN

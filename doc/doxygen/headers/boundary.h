@@ -37,12 +37,12 @@
  *   derived from the Manifold and Boundary base classes describe the
  *   geometry of a domain. One can then attach an object of a class
  *   derived from this base classes to the Triangulation object using
- *   the Triangulation::set_boundary() (the old, deprecated function)
- *   or Triangulation::set_manifold() functions, and the Triangulation
+ *   the Triangulation::set_boundary() or
+ *   Triangulation::set_manifold() functions, and the Triangulation
  *   will ask the manifold object where a new vertex should be located
  *   upon mesh refinement. Several classes already exist to support
  *   the boundary of the most common geometries, e.g.,
- *   CylinderBoundary, HyperBallBoundary, or HyperShellBoundary. 
+ *   CylinderBoundary, HyperBallBoundary, or HyperShellBoundary.
  *
  *   <li> Integration: When using higher order finite element methods,
  *   it is often necessary to compute cell terms (like cell
@@ -96,15 +96,19 @@
  * The behavior of the Triangulation class w.r.t. geometry
  * descriptions is the following: Triangulation::set_boundary() and
  * Triangulation::set_manifold() do the exact same thing: they attach
- * a manifold descriptor to the specified id. The first function is
- * maintained for backward compatibility, but will be deprecated in
- * future releases.
+ * a manifold descriptor to the specified id. The first function
+ * expects a Boundary descriptor (which is a specialization of a
+ * Manifold description) and is provided mainly for backward
+ * compatibility, while the second class expects a Manifold
+ * descriptor. Notice that the Triangulation class only uses the
+ * Manifold interface, and you could describe both the interior and
+ * the boundary of the domain using the same object. The additional
+ * information contained in the Boundary interface is related to the
+ * computation of the exact normals. 
  *
- * Whenever a new vertex is needed in an object that supports
- * geometry dependent refinement (i.e., a face on the boundary, an
- * interior face, or a cell in codimension one), the Triangulation
- * queries the manifold_id of the object which needs refinement. If the
- * manifold_id is set to numbers::invalid_manifold_id, then the
+ * Whenever a new vertex is needed in an object, the Triangulation
+ * queries the manifold_id of the object which needs refinement. If
+ * the manifold_id is set to numbers::invalid_manifold_id, then the
  * Triangulation queries the boundary_id (if the face is on the
  * boundary) or the material_id (if the Triangulation is of
  * codimension one and the object is a cell). If the previous queries

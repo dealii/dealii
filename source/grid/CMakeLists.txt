@@ -24,6 +24,8 @@ SET(_src
   grid_reordering.cc
   grid_tools.cc
   intergrid_map.cc
+  manifold.cc
+  manifold_lib.cc
   persistent_tria.cc
   tria_accessor.cc
   tria_boundary.cc
@@ -41,6 +43,7 @@ SET(_inst
   grid_refinement.inst.in
   grid_tools.inst.in
   intergrid_map.inst.in
+  manifold.inst.in
   tria_accessor.inst.in
   tria_boundary.inst.in
   tria_boundary_lib.inst.in

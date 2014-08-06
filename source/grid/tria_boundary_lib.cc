@@ -96,7 +96,7 @@ Point<3>
 CylinderBoundary<3>::
 get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
-  const Point<3> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
+  const Point<3> middle = StraightBoundary<3,3>::get_new_point_on_quad (quad);
 
   // same algorithm as above
   const unsigned int spacedim = 3;
@@ -355,7 +355,7 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 
   const Point<dim> axis = x_1 - x_0;
   // Compute the middle point of the quad.
-  const Point<dim> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
+  const Point<dim> middle = StraightBoundary<3,3>::get_new_point_on_quad (quad);
   // Same algorithm as above: To project it on the boundary of the cone we
   // first compute the orthogonal projection of the middle point onto the axis
   // of the cone.
