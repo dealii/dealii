@@ -68,8 +68,8 @@ All entries are signed with the names of the author.
        (GK 2001/12/07)
        </p>
 
-  <li> <p> Fixed: Previously, the $(INCLUDE) variable in Makefiles
-       included the values of the $INCLUDE environment variable. This
+  <li> <p> Fixed: Previously, the \$(INCLUDE) variable in Makefiles
+       included the values of the \$INCLUDE environment variable. This
        is not desirable, since the compiler evaluates that variable
        anyway and the Makefile variable has <code>-I</code> prefixed
        to all paths while the environment variable has not.

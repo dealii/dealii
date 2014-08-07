@@ -72,7 +72,7 @@ namespace TimeStepping
 
   /**
    * Abstract class for time stepping methods. These methods assume that the
-   * equation has the form: \f$ \frac{\partial y}{\partial t} = f(t,y) \f$.
+   * equation has the form: $ \frac{\partial y}{\partial t} = f(t,y) $.
    */
   template <typename VECTOR>
   class TimeStepping
@@ -85,12 +85,12 @@ namespace TimeStepping
 
     /**
      * Purely virtual function. This function is used to advance from time @p
-     * t to t+ @p delta_t. @p F is a vector of functions \f$ f(t,y) \f$ that should be
+     * t to t+ @p delta_t. @p F is a vector of functions $ f(t,y) $ that should be
      * integrated, the input parameters are the time t and the vector y and the
      * output is value of f at this point. @p J_inverse is a vector
      * functions that compute the inverse of the Jacobians associated to the
      * implicit problems. The input parameters are the
-     * time, \f$ \tau \f$, and a vector. The output is the value of function
+     * time, $ \tau $, and a vector. The output is the value of function
      * at this point. This function returns the time at the end of the
      * time step.
      */
@@ -135,12 +135,12 @@ namespace TimeStepping
     virtual void initialize(runge_kutta_method method) = 0;
     /**
      * This function is used to advance from time @p
-     * t to t+ @p delta_t. @p F is a vector of functions \f$ f(t,y) \f$ that should be
+     * t to t+ @p delta_t. @p F is a vector of functions $ f(t,y) $ that should be
      * integrated, the input parameters are the time t and the vector y and the
      * output is value of f at this point. @p J_inverse is a vector
      * functions that compute the inverse of the Jacobians associated to the
      * implicit problems. The input parameters are the
-     * time, \f$ \tau \f$, and a vector. The output is the value of function
+     * time, $ \tau $, and a vector. The output is the value of function
      * at this point. This function returns the time at the end of the
      * time step. When using Runge-Kutta methods, @p F and @ J_inverse can
      * only contain one element.
@@ -154,12 +154,12 @@ namespace TimeStepping
 
     /**
      * Purely virtual function. This function is used to advance from time @p t
-     * to t+ @p delta_t. @p f  is the function \f$ f(t,y) \f$ that should be
+     * to t+ @p delta_t. @p f  is the function $ f(t,y) $ that should be
      * integrated, the input parameters are the time t and the vector y and the
      * output is value of f at this point. @p id_minus_tau_J_inverse is a function
-     * that computes \f$ inv(I-\tau J)\f$ where \f$ I \f$ is the identity matrix,
-     * \f$ \tau \f$ is given, and \f$ J \f$ is the Jacobian \f$ \frac{\partial
-     * J}{\partial y} \f$. The input parameters are the time, \f$ \tau \f$, and
+     * that computes $ inv(I-\tau J)$ where $ I $ is the identity matrix,
+     * $ \tau $ is given, and $ J $ is the Jacobian $ \frac{\partial
+     * J}{\partial y} $. The input parameters are the time, $ \tau $, and
      * a vector. The output is the value of function at this point.
      * evolve_one_time_step returns the time at the end of the time step.
      */
@@ -221,12 +221,12 @@ namespace TimeStepping
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
-     * is the function \f$ f(t,y) \f$ that should be integrated, the input
+     * is the function $ f(t,y) $ that should be integrated, the input
      * parameters are the time t and the vector y and the output is value of
      * f at this point. @p id_minus_tau_J_inverse is a function that computes
-     * \f$ inv(I-\tau J)\f$ where \f$ I \f$ is the identity matrix, \f$ \tau
-     * \f$ is given, and \f$ J \f$ is the Jacobian \f$ \frac{\partial
-     * J}{\partial y} \f$. The input parameter are the time, \f$ \tau \f$, and
+     * $ inv(I-\tau J)$ where $ I $ is the identity matrix, $ \tau
+     * $ is given, and $ J $ is the Jacobian $ \frac{\partial
+     * J}{\partial y} $. The input parameter are the time, $ \tau $, and
      * a vector. The output is the value of function at this point.
      * evolve_one_time_step returns the time at the end of the time step.
      */
@@ -312,12 +312,12 @@ namespace TimeStepping
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
-     * is the function \f$ f(t,y) \f$ that should be integrated, the input
+     * is the function $ f(t,y) $ that should be integrated, the input
      * parameters are the time t and the vector y and the output is value of
      * f at this point. @p id_minus_tau_J_inverse is a function that computes
-     * \f$ inv(I-\tau J)\f$ where \f$ I \f$ is the identity matrix, \f$ \tau
-     * \f$ is given, and \f$ J \f$ is the Jacobian \f$ \frac{\partial
-     * J}{\partial y} \f$. The input parameters are the time, \f$ \tau \f$, and
+     * $ inv(I-\tau J)$ where $ I $ is the identity matrix, $ \tau
+     * $ is given, and $ J $ is the Jacobian $ \frac{\partial
+     * J}{\partial y} $. The input parameters are the time, $ \tau $, and
      * a vector. The output is the value of function at this point.
      * evolve_one_time_step returns the time at the end of the time step.
      */
@@ -455,12 +455,12 @@ namespace TimeStepping
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
-     * is the function \f$ f(t,y) \f$ that should be integrated, the input
+     * is the function $ f(t,y) $ that should be integrated, the input
      * parameters are the time t and the vector y and the output is value of
      * f at this point. @p id_minus_tau_J_inverse is a function that computes
-     * \f$ inv(I-\tau J)\f$ where \f$ I \f$ is the identity matrix, \f$ \tau
-     * \f$ is given, and \f$ J \f$ is the Jacobian \f$ \frac{\partial
-     * J}{\partial y} \f$. The input parameters are the time, \f$ \tau \f$, and
+     * $ inv(I-\tau J)$ where $ I $ is the identity matrix, $ \tau
+     * $ is given, and $ J $ is the Jacobian $ \frac{\partial
+     * J}{\partial y} $. The input parameters are the time, $ \tau $, and
      * a vector. The output is the value of function at this point.
      * evolve_one_time_step returns the time at the end of the time step.
      */

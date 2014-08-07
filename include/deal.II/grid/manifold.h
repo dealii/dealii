@@ -353,7 +353,7 @@ private:
  *   This is an helper class which is useful when you have an explicit
  *   map from an Euclidean space of dimension chartdim to an Euclidean
  *   space of dimension spacedim which represents your manifold, i.e.,
- *   when your manifold \f$\mathcal{M}\f$ can be represented by a map
+ *   when your manifold $\mathcal{M}$ can be represented by a map
  *   \f[
  *   F: \mathcal{B} \subset R^{\text{chartdim}} \mapsto \mathcal{M}
  *   \subset R^{\text{spacedim}}

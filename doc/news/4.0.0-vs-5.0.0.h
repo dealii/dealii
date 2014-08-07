@@ -698,7 +698,19 @@ inconvenience this causes.
        <br>
        (GK 2003/11/28)
        </p>
-<code>FiniteElementData</code> has a function>tensor_degree()</code>, returning the degree of thesuitable for choosing a tensor product quadratureimplemented before in theis now a function <code>GridTool</code>::<code>find_active_cell_around_point</code>
+
+  <li> <p>
+       Improved: <code>FiniteElementData</code> has a function
+       <code>tensor_degree()</code>, returning the degree of the
+       polynomial space suitable for choosing a tensor product quadrature
+       formula. 
+       <br>
+       (GK 2003/11/28)
+       </p>
+
+  <li> <p>
+       New: Long requested but never implemented before in the
+       library: there is now a function <code>GridTool::find_active_cell_around_point</code>
        that, given a point, finds the active cell in which this point
        lies.
        <br>
