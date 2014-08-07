@@ -259,7 +259,7 @@ public:
    * pi, but 2*pi (or zero), since, on a periodic manifold, these two
    * points are at distance 2*eps and not (2*pi-eps). Special cases
    * are taken into account, to ensure that the behavior is always as
-   * expected. The third argument is used as a tolerance when
+   * expected. The third argument is used as a relative tolerance when
    * computing distances.
    *
    * Periodicity will be intended in the following way: the domain is
@@ -270,8 +270,7 @@ public:
    * compute averages is called, an exception will be thrown if one of
    * the points which you are using for the average lies outside the
    * periodicity box. The return points are garanteed to lie in the
-   * perodicity box plus or minus the tolerance you set as the third
-   * argument.
+   * perodicity box plus or minus tolerance*periodicity.norm().
    */
   FlatManifold (const Point<spacedim> periodicity=Point<spacedim>(),
                 const double tolerance=1e-10);
@@ -312,13 +311,6 @@ public:
   virtual
   Point<spacedim> project_to_manifold (const std::vector<Point<spacedim> > &points,
                                        const Point<spacedim> &candidate) const;
-protected:
-  /**
-   * Tolerance. This tolerance is used to compute distances in double
-   * precision. Anything below this tolerance is considered zero.
-   */
-  const double tolerance;
-
 private:
   /**
    * The periodicity of this Manifold. Periodicity affects the way a
@@ -340,6 +332,12 @@ private:
                  << "The component number " << arg1 << " of the point [ " << arg2
                  << " ]  is not in the interval [ " << -arg4
                  << ", " << arg3[arg4] << "), bailing out.");
+
+  /**
+   * Relative tolerance. This tolerance is used to compute distances
+   * in double precision.
+   */
+  const double tolerance;
 };
 
 

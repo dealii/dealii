@@ -261,8 +261,8 @@ get_new_point_on_hex (const typename Triangulation<3, 3>::hex_iterator &hex) con
 template <int dim, int spacedim>
 FlatManifold<dim,spacedim>::FlatManifold (const Point<spacedim> periodicity,
                                           const double tolerance) :
-  tolerance(tolerance),
-  periodicity(periodicity)
+  periodicity(periodicity),
+  tolerance(tolerance)
 {}
 
 template <int dim, int spacedim>
@@ -277,6 +277,8 @@ get_new_point (const Quadrature<spacedim> &quad) const
   double sum=0;
   for (unsigned int i=0; i<weights.size(); ++i)
     sum+= weights[i];
+  // Here it is correct to use tolerance as an absolute one, since
+  // this should be relative to unity.
   Assert(std::abs(sum-1.0) < tolerance, ExcMessage("Weights should sum to 1!"));
 #endif
 
@@ -291,9 +293,9 @@ get_new_point (const Quadrature<spacedim> &quad) const
         {
           minP[d] = std::min(minP[d], surrounding_points[i][d]);
           if (periodicity[d] > 0)
-            Assert( (surrounding_points[i][d] < periodicity[d]+tolerance) ||
-                    (surrounding_points[i][d] >= -tolerance),
-                    ExcPeriodicBox(d, surrounding_points[i], periodicity, tolerance));
+            Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity.norm()) ||
+                    (surrounding_points[i][d] >= -tolerance*periodicity.norm()),
+                    ExcPeriodicBox(d, surrounding_points[i], periodicity, tolerance*periodicity.norm()));
         }
 
   for (unsigned int i=0; i<surrounding_points.size(); ++i)
