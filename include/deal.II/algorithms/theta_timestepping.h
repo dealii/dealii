@@ -351,7 +351,7 @@ namespace Algorithms
      * where <i>f</i> is the dual space vector found in the "Previous
      * time" entry of the input data, <i>M</i> the mass matrix,
      * <i>F</i> the operator in space and <i>c</i> is the adjusted
-     * time step size \f$ \theta \Delta t\f$
+     * time step size $ \theta \Delta t$
      */
     SmartPointer<Operator<VECTOR>, ThetaTimestepping<VECTOR> > op_implicit;
 

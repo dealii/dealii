@@ -1127,7 +1127,7 @@ namespace VectorTools
    *   of degrees of freedom.
    * @param boundary_functions A map from boundary indicators to pointers to functions
    *   that describe the desired values on those parts of the boundary marked
-   *   with this boundary indicator (see @GlossBoundaryIndicator "Boundary indicator").
+   *   with this boundary indicator (see @ref GlossBoundaryIndicator "Boundary indicator").
    *   The projection happens on only those parts of the boundary whose indicators
    *   are represented in this map.
    * @param q The face quadrature used in the integration necessary to compute the
