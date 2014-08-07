@@ -98,6 +98,19 @@ inconvenience this causes.
 
 <ol>
 
+
+  <li> New: Added FunctionManifold descritpion.
+  <br>
+  This class allows arbitrary manifold descriptions, in which you have
+  an explicit Function<chartdim> for the ManifoldChart::push_forward()
+  method, and an explicit Function<spacedim> for ManifoldChart::pull_back()
+  method (or an expression for both). In these cases, you can construct a
+  Manifold description on the fly.
+  <br>
+  (Luca Heltai, 2014/08/07)
+  </li>
+
+
   <li> New: Added CylindricalManifold descritpion.
   <br>
   This class allows refinement of cylindrical manifolds. It is a good
