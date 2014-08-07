@@ -1110,13 +1110,13 @@ set_all_manifold_ids (const types::manifold_id manifold_ind) const
     for (unsigned int c=0; c<this->n_children(); ++c)
       this->child(c)->set_all_manifold_ids (manifold_ind);
 
-				   // for hexes also set manifold_id
-				   // of bounding quads and lines
-  
-				   // Six bonding quads
-  for(unsigned int i=0; i<6; ++i)
+  // for hexes also set manifold_id
+  // of bounding quads and lines
+
+  // Six bonding quads
+  for (unsigned int i=0; i<6; ++i)
     this->quad(i)->set_manifold_id(manifold_ind);
-				   // Twelve bounding lines
+  // Twelve bounding lines
   for (unsigned int i=0; i<12; ++i)
     this->line(i)->set_manifold_id (manifold_ind);
 }

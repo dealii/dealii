@@ -24,7 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Manifold description for a spherical space coordinate system. 
+ * Manifold description for a spherical space coordinate system.
  *
  * You can use this Manifold object to describe any sphere, circle,
  * hypersphere or hyperdisc in two or three dimensions, both as a
@@ -47,13 +47,13 @@ DEAL_II_NAMESPACE_OPEN
  * be attached to cells containing the center of the coordinate
  * system. This point is a singular point of the coordinate
  * transformation, and there taking averages does not make any sense.
- * 
+ *
  * @ingroup manifold
  *
  * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim>
-class SphericalManifold : public ManifoldChart<dim, spacedim, spacedim> 
+class SphericalManifold : public ManifoldChart<dim, spacedim, spacedim>
 {
 public:
   /**
@@ -92,13 +92,13 @@ public:
    */
   virtual Point<spacedim>
   get_new_point(const Quadrature<spacedim> &quad) const;
-  
+
   /**
    * The center of the spherical coordinate system.
    */
   const Point<spacedim> center;
 private:
-  
+
   /** Helper function which returns the periodicity associated with
       this coordinate system, according to dim, chartdim, and
       spacedim. */
@@ -117,7 +117,7 @@ private:
  * This class was developed to be used in conjunction with the @p
  * cylinder or @p cylinder_shell functions of GridGenerator. This
  * function will throw an exception whenever spacedim is not equal to
- * three. 
+ * three.
  *
  * @ingroup manifold
  *
@@ -134,8 +134,8 @@ public:
    * z-axis, respectively. The tolerance value is used to determine
    * if a point is on the axis.
    */
-  CylindricalManifold (const unsigned int axis = 0, 
-		       const double tolerance = 1e-10);
+  CylindricalManifold (const unsigned int axis = 0,
+                       const double tolerance = 1e-10);
 
   /**
    * Constructor. If constructed with this constructor, the manifold
@@ -143,17 +143,17 @@ public:
    * #direction and goes through the given #point_on_axis. The
    * direction may be arbitrarily scaled, and the given point may be
    * any point on the axis. The tolerance value is used to determine
-   * if a point is on the axis. 
+   * if a point is on the axis.
    */
   CylindricalManifold (const Point<spacedim> &direction,
-		       const Point<spacedim> &point_on_axis, 
-		       const double tolerance = 1e-10);
+                       const Point<spacedim> &point_on_axis,
+                       const double tolerance = 1e-10);
 
- /**
-   * Compute new points on the CylindricalManifold. See the documentation
-   * of the base class for a detailed description of what this
-   * function does.
-   */
+  /**
+    * Compute new points on the CylindricalManifold. See the documentation
+    * of the base class for a detailed description of what this
+    * function does.
+    */
   virtual Point<spacedim>
   get_new_point(const Quadrature<spacedim> &quad) const;
 
@@ -173,7 +173,7 @@ private:
    * Helper FlatManifold to compute temptative midpoints.
    */
   FlatManifold<dim,spacedim> flat_manifold;
-  
+
   /**
    * Relative tolerance to measure zero distances.
    */

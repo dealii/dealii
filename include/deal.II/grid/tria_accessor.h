@@ -1191,7 +1191,7 @@ public:
    * get_manifold() internally.
    */
   const Boundary<dim,spacedim> &get_boundary () const;
-    
+
   /**
    * Return a constant reference to the manifold object used for this object.
    *
@@ -1269,8 +1269,8 @@ public:
 
   /**
    * @}
-   */    
-    
+   */
+
 
   /**
    * @name User data
@@ -2106,7 +2106,7 @@ public:
 
   /**
    * Return the manifold indicator of this
-   * object. 
+   * object.
    *
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
@@ -2285,7 +2285,7 @@ public:
    *
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-    
+
   void
   set_all_manifold_ids (const types::manifold_id);
   /**

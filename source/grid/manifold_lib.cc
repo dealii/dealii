@@ -35,7 +35,8 @@ SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center)
 
 template <int dim, int spacedim>
 Point<spacedim>
-SphericalManifold<dim,spacedim>::get_periodicity()  {
+SphericalManifold<dim,spacedim>::get_periodicity()
+{
   Point<spacedim> periodicity;
   periodicity[spacedim-1] = 2*numbers::PI; // theta and phi period.
   return periodicity;
@@ -44,85 +45,92 @@ SphericalManifold<dim,spacedim>::get_periodicity()  {
 
 template <int dim, int spacedim>
 Point<spacedim>
-SphericalManifold<dim,spacedim>::get_new_point(const Quadrature<spacedim> &quad) const {
-  if(spacedim == 2)
+SphericalManifold<dim,spacedim>::get_new_point(const Quadrature<spacedim> &quad) const
+{
+  if (spacedim == 2)
     return ManifoldChart<dim,spacedim,spacedim>::get_new_point(quad);
-  else {
-    double rho_average = 0;
-    Point<spacedim> mid_point;
-    for(unsigned int i=0; i<quad.size(); ++i) {
-      rho_average += quad.weight(i)*(quad.point(i)-center).norm();
-      mid_point += quad.weight(i)*quad.point(i);
+  else
+    {
+      double rho_average = 0;
+      Point<spacedim> mid_point;
+      for (unsigned int i=0; i<quad.size(); ++i)
+        {
+          rho_average += quad.weight(i)*(quad.point(i)-center).norm();
+          mid_point += quad.weight(i)*quad.point(i);
+        }
+      // Project the mid_pont back to the right location
+      Point<spacedim> R = mid_point-center;
+      // Scale it to have radius rho_average
+      R *= rho_average/R.norm();
+      // And return it.
+      return center+R;
     }
-    // Project the mid_pont back to the right location 
-    Point<spacedim> R = mid_point-center;
-    // Scale it to have radius rho_average
-    R *= rho_average/R.norm();
-    // And return it.
-    return center+R;
-  }
 }
 
 
 
 template <int dim, int spacedim>
 Point<spacedim>
-SphericalManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_point) const {
-  Assert(spherical_point[0] >=0.0, 
-	 ExcMessage("Negative radius for given point."));
+SphericalManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_point) const
+{
+  Assert(spherical_point[0] >=0.0,
+         ExcMessage("Negative radius for given point."));
   const double rho = spherical_point[0];
   const double theta = spherical_point[1];
-  
+
   Point<spacedim> p;
-  if(rho > 1e-10) 
-    switch(spacedim) {
-    case 2: 
-      p[0] = rho*cos(theta);
-      p[1] = rho*sin(theta);
-      break;
-    case 3:
+  if (rho > 1e-10)
+    switch (spacedim)
       {
-	const double &phi= spherical_point[2];
-	p[0] = rho*sin(theta)*cos(phi);
-	p[1] = rho*sin(theta)*sin(phi);
-	p[2] = rho*cos(theta);
+      case 2:
+        p[0] = rho*cos(theta);
+        p[1] = rho*sin(theta);
+        break;
+      case 3:
+      {
+        const double &phi= spherical_point[2];
+        p[0] = rho*sin(theta)*cos(phi);
+        p[1] = rho*sin(theta)*sin(phi);
+        p[2] = rho*cos(theta);
       }
       break;
-    default:
-      Assert(false, ExcInternalError());
-  }
+      default:
+        Assert(false, ExcInternalError());
+      }
   return p+center;
 }
 
 template <int dim, int spacedim>
 Point<spacedim>
-SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const {
+SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
+{
   const Point<spacedim> R = space_point-center;
   const double rho = R.norm();
   const double x = R[0];
   const double y = R[1];
-  
+
   Point<spacedim> p;
   p[0] = rho;
-  
-  switch(spacedim) {
-  case 2: 
-    p[1] = atan2(y,x);
-    if(p[1] < 0)
-      p[1] += 2*numbers::PI;
-    break;
-  case 3:
+
+  switch (spacedim)
+    {
+    case 2:
+      p[1] = atan2(y,x);
+      if (p[1] < 0)
+        p[1] += 2*numbers::PI;
+      break;
+    case 3:
     {
       const double z = R[2];
       p[2] = atan2(y,x); // phi
-      if(p[2] < 0)
-	p[2] += 2*numbers::PI; // phi is periodic
+      if (p[2] < 0)
+        p[2] += 2*numbers::PI; // phi is periodic
       p[1] = atan2(sqrt(x*x+y*y),z);  // theta
     }
     break;
-  default:
-    Assert(false, ExcInternalError());
-  }
+    default:
+      Assert(false, ExcInternalError());
+    }
   return p;
 }
 
@@ -132,8 +140,8 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
 // ============================================================
 
 template <int dim, int spacedim>
-CylindricalManifold<dim,spacedim>::CylindricalManifold(const unsigned int axis, 
-						       const double tolerance) :
+CylindricalManifold<dim,spacedim>::CylindricalManifold(const unsigned int axis,
+                                                       const double tolerance) :
   direction (Point<spacedim>::unit_vector(axis)),
   point_on_axis (Point<spacedim>()),
   tolerance(tolerance)
@@ -144,8 +152,8 @@ CylindricalManifold<dim,spacedim>::CylindricalManifold(const unsigned int axis,
 
 template <int dim, int spacedim>
 CylindricalManifold<dim,spacedim>::CylindricalManifold(const Point<spacedim> &direction,
-						       const Point<spacedim> &point_on_axis, 
-						       const double tolerance) :
+                                                       const Point<spacedim> &point_on_axis,
+                                                       const double tolerance) :
   direction (direction),
   point_on_axis (point_on_axis),
   tolerance(tolerance)
@@ -164,24 +172,24 @@ get_new_point (const Quadrature<spacedim> &quad) const
   const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();
   const std::vector<double> &weights = quad.get_weights();
 
-  // compute a proposed new point  
+  // compute a proposed new point
   Point<spacedim> middle = flat_manifold.get_new_point(quad);
 
   double radius = 0;
   Point<spacedim> on_plane;
-  
-  for(unsigned int i=0; i<surrounding_points.size(); ++i)
+
+  for (unsigned int i=0; i<surrounding_points.size(); ++i)
     {
       on_plane = surrounding_points[i]-point_on_axis;
       on_plane = on_plane - (on_plane*direction) * direction;
       radius += weights[i]*on_plane.norm();
     }
-  
+
   // we then have to project this point out to the given radius from
   // the axis. to this end, we have to take into account the offset
   // point_on_axis and the direction of the axis
   const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-					   ((middle-point_on_axis) * direction) * direction;
+                                           ((middle-point_on_axis) * direction) * direction;
 
   // scale it to the desired length and put everything back together,
   // unless we have a point on the axis
@@ -190,10 +198,10 @@ get_new_point (const Quadrature<spacedim> &quad) const
 
   else
     return (vector_from_axis / vector_from_axis.norm() * radius +
-	    ((middle-point_on_axis) * direction) * direction +
-	    point_on_axis);
+            ((middle-point_on_axis) * direction) * direction +
+            point_on_axis);
 }
-		
+
 // explicit instantiations
 #include "manifold_lib.inst"
 

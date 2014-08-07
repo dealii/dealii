@@ -202,8 +202,8 @@ namespace internal
 
           manifold_id.reserve (new_size);
           manifold_id.insert (manifold_id.end(),
-			      new_size-manifold_id.size(),
-			      numbers::flat_manifold_id);
+                              new_size-manifold_id.size(),
+                              numbers::flat_manifold_id);
 
         }
 
@@ -282,8 +282,8 @@ namespace internal
 
           manifold_id.reserve (new_size);
           manifold_id.insert (manifold_id.end(),
-			      new_size-manifold_id.size(),
-			      numbers::flat_manifold_id);
+                              new_size-manifold_id.size(),
+                              numbers::flat_manifold_id);
 
           user_data.reserve (new_size);
           user_data.resize (new_size);
@@ -513,7 +513,7 @@ namespace internal
               MemoryConsumption::memory_consumption (used) +
               MemoryConsumption::memory_consumption (user_flags) +
               MemoryConsumption::memory_consumption (boundary_or_material_id) +
-	      MemoryConsumption::memory_consumption (manifold_id) +
+              MemoryConsumption::memory_consumption (manifold_id) +
               MemoryConsumption::memory_consumption (refinement_cases) +
               user_data.capacity() * sizeof(UserData) + sizeof(user_data));
     }
