@@ -147,62 +147,105 @@ void FunctionParser<dim>:: init_muparser() const
   
   fp.get().resize(this->n_components);
   vars.get().resize(var_names.size());
-  for (unsigned int i=0; i<this->n_components; ++i)
+  for (unsigned int component=0; component<this->n_components; ++component)
     {
       for (std::map< std::string, double >::const_iterator constant = constants.begin();
           constant != constants.end(); ++constant)
         {
- 	  fp.get()[i].DefineConst(constant->first.c_str(), constant->second);
+ 	  fp.get()[component].DefineConst(constant->first.c_str(), constant->second);
 	}
 
       for (unsigned int iv=0;iv<var_names.size();++iv)
-	fp.get()[i].DefineVar(var_names[iv].c_str(), &vars.get()[iv]);
+	fp.get()[component].DefineVar(var_names[iv].c_str(), &vars.get()[iv]);
 
       // define some compatibility functions:
-      fp.get()[i].DefineFun("if",internal::mu_if, true);
-      fp.get()[i].DefineOprt("|", internal::mu_or, 1);
-      fp.get()[i].DefineOprt("&", internal::mu_and, 2);
-      fp.get()[i].DefineFun("int", internal::mu_int, true);
-      fp.get()[i].DefineFun("ceil", internal::mu_ceil, true);
-      fp.get()[i].DefineFun("cot", internal::mu_cot, true);
-      fp.get()[i].DefineFun("csc", internal::mu_csc, true);
-      fp.get()[i].DefineFun("floor", internal::mu_floor, true);
-      fp.get()[i].DefineFun("sec", internal::mu_sec, true);
-      fp.get()[i].DefineFun("log", internal::mu_log, true);
+      fp.get()[component].DefineFun("if",internal::mu_if, true);
+      fp.get()[component].DefineOprt("|", internal::mu_or, 1);
+      fp.get()[component].DefineOprt("&", internal::mu_and, 2);
+      fp.get()[component].DefineFun("int", internal::mu_int, true);
+      fp.get()[component].DefineFun("ceil", internal::mu_ceil, true);
+      fp.get()[component].DefineFun("cot", internal::mu_cot, true);
+      fp.get()[component].DefineFun("csc", internal::mu_csc, true);
+      fp.get()[component].DefineFun("floor", internal::mu_floor, true);
+      fp.get()[component].DefineFun("sec", internal::mu_sec, true);
+      fp.get()[component].DefineFun("log", internal::mu_log, true);
       
       try
 	{
-          // muparser expects that user defined functions have no
+          // muparser expects that functions have no
           // space between the name of the function and the opening
           // parenthesis. this is awkward because it is not backward
           // compatible to the library we used to use before muparser
           // (the fparser library) but also makes no real sense.
           // consequently, in the expressions we set, remove any space
           // we may find after function names
-          std::string transformed_expression = expressions[i];
-          std::string::size_type pos = 0;
-          while (true)
+          std::string transformed_expression = expressions[component];
+
+          const char *function_names[] = {
+                                           // functions predefined by muparser
+                                           "sin",
+                                           "cos",
+                                           "tan",
+                                           "asin",
+                                           "acos",
+                                           "atan",
+                                           "sinh",
+                                           "cosh",
+                                           "tanh",
+                                           "asinh",
+                                           "acosh",
+                                           "atanh",
+                                           "atan2",
+                                           "log2",
+                                           "log10",
+                                           "log",
+                                           "ln",
+                                           "exp",
+                                           "sqrt",
+                                           "sign",
+                                           "rint",
+                                           "abs",
+                                           "min",
+                                           "max",
+                                           "sum",
+                                           "avg",
+                                           // functions we define ourselves above
+                                           "if",
+                                           "int",
+                                           "ceil",
+                                           "cot",
+                                           "csc",
+                                           "floor",
+                                           "sec"  };
+          for (unsigned int f=0; f<sizeof(function_names)/sizeof(function_names[0]); ++f)
             {
-              // try to find any occurrences of 'if'
-              pos = transformed_expression.find ("if", pos);
-              if (pos == std::string::npos)
-                break;
+              const std::string  function_name        = function_names[f];
+              const unsigned int function_name_length = function_name.size();
 
-              // replace whitespace until there no longer is any
-              while ((pos+2<transformed_expression.size())
-                     &&
-                     ((transformed_expression[pos+2] == ' ')
-                      ||
-                      (transformed_expression[pos+2] == '\t')))
-                transformed_expression.erase (pos+2, pos+3);
+              std::string::size_type pos = 0;
+              while (true)
+                {
+                  // try to find any occurrences of the function name
+                  pos = transformed_expression.find (function_name, pos);
+                  if (pos == std::string::npos)
+                    break;
 
-              // move the current search position by the size of the
-              // actual 'if'
-              pos += 2;
+                  // replace whitespace until there no longer is any
+                  while ((pos+function_name_length<transformed_expression.size())
+                      &&
+                      ((transformed_expression[pos+function_name_length] == ' ')
+                          ||
+                          (transformed_expression[pos+function_name_length] == '\t')))
+                    transformed_expression.erase (transformed_expression.begin()+pos+function_name_length);
+
+                  // move the current search position by the size of the
+                  // actual function name
+                  pos += function_name_length;
+                }
             }
 
           // now use the transformed expression
-	  fp.get()[i].SetExpr(transformed_expression);
+	  fp.get()[component].SetExpr(transformed_expression);
 	}
       catch (mu::ParserError &e)
 	{

@@ -63,39 +63,39 @@ void test()
   double x,y;
   x=1.0;
   y=-3.1;
-  eval("atan2(x,y)",Point<2>(x,y), atan2(x,y));
+  eval("atan2 (x,y)",Point<2>(x,y), atan2(x,y));
   x=-1.0;
   y=3.1;
-  eval("atan2(x,y)",Point<2>(x,y), atan2(x,y));
+  eval("atan2 (x,y)",Point<2>(x,y), atan2(x,y));
 
   eval("if   (x==1.0,0,y)",Point<2>(1.0,-2.0), 0.0);  
   eval("if   (x==1.0,0,y)",Point<2>(1.1,-2.0), -2.0);
 
-  eval("int(2.1)",Point<2>(1.1,-2.0), 2.0);
-  eval("int(-3.8)",Point<2>(1.1,-2.0), -4.0);
+  eval("int (2.1)",Point<2>(1.1,-2.0), 2.0);
+  eval("int (-3.8)",Point<2>(1.1,-2.0), -4.0);
 
-  eval("abs(-2.3)",Point<2>(0,0), 2.3);
-  eval("acos(0.5)",Point<2>(0,0), acos(0.5));
-  eval("acosh(0.5)",Point<2>(0,0), acosh(0.5));
-  eval("asin(0.5)",Point<2>(0,0), asin(0.5));
-  eval("asinh(0.5)",Point<2>(0,0), asinh(0.5));
-  eval("atan(0.5)",Point<2>(0,0), atan(0.5));
-  eval("atanh(0.5)",Point<2>(0,0), atanh(0.5));
-  eval("ceil(0.5)",Point<2>(0,0), ceil(0.5));
-  eval("cos(0.5)",Point<2>(0,0), cos(0.5));
-  eval("cosh(0.5)",Point<2>(0,0), cosh(0.5));
-  eval("cot(0.5)",Point<2>(0,0), 1.0/tan(0.5));
-  eval("csc(0.5)",Point<2>(0,0), 1.0/sin(0.5));
-  eval("exp(0.5)",Point<2>(0,0), exp(0.5));
-  eval("floor(0.5)",Point<2>(0,0), floor(0.5));
-  eval("log(0.5)",Point<2>(0,0), log(0.5));
-  eval("log10(0.5)",Point<2>(0,0), log(0.5)/log(10.0));
-  eval("sec(0.5)",Point<2>(0,0), 1.0/cos(0.5));
-  eval("sin(0.5)",Point<2>(0,0), sin(0.5));
-  eval("sinh(0.5)",Point<2>(0,0), sinh(0.5));
-  eval("sqrt(0.5)",Point<2>(0,0), sqrt(0.5));
-  eval("tan(0.5)",Point<2>(0,0), tan(0.5));
-  eval("tanh(0.5)",Point<2>(0,0), tanh(0.5));
+  eval("abs (-2.3)",Point<2>(0,0), 2.3);
+  eval("acos (0.5)",Point<2>(0,0), acos(0.5));
+  eval("acosh (0.5)",Point<2>(0,0), acosh(0.5));
+  eval("asin (0.5)",Point<2>(0,0), asin(0.5));
+  eval("asinh (0.5)",Point<2>(0,0), asinh(0.5));
+  eval("atan (0.5)",Point<2>(0,0), atan(0.5));
+  eval("atanh (0.5)",Point<2>(0,0), atanh(0.5));
+  eval("ceil (0.5)",Point<2>(0,0), ceil(0.5));
+  eval("cos (0.5)",Point<2>(0,0), cos(0.5));
+  eval("cosh (0.5)",Point<2>(0,0), cosh(0.5));
+  eval("cot (0.5)",Point<2>(0,0), 1.0/tan(0.5));
+  eval("csc (0.5)",Point<2>(0,0), 1.0/sin(0.5));
+  eval("exp (0.5)",Point<2>(0,0), exp(0.5));
+  eval("floor (0.5)",Point<2>(0,0), floor(0.5));
+  eval("log (0.5)",Point<2>(0,0), log(0.5));
+  eval("log10 (0.5)",Point<2>(0,0), log(0.5)/log(10.0));
+  eval("sec (0.5)",Point<2>(0,0), 1.0/cos(0.5));
+  eval("sin (0.5)",Point<2>(0,0), sin(0.5));
+  eval("sinh (0.5)",Point<2>(0,0), sinh(0.5));
+  eval("sqrt (0.5)",Point<2>(0,0), sqrt(0.5));
+  eval("tan (0.5)",Point<2>(0,0), tan(0.5));
+  eval("tanh (0.5)",Point<2>(0,0), tanh(0.5));
 
 
 }
