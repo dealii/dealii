@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,8 +17,7 @@
 
 for (deal_II_dimension : DIMENSIONS)
   {
-#if deal_II_dimension > 1
-
+#if deal_II_dimension >= 2
     template dealii::TriaRawIterator<dealii::TriaAccessor<1,deal_II_dimension,deal_II_dimension> >
     TriaObjects<TriaObject<1> >::next_free_single_object (const dealii::Triangulation<deal_II_dimension> &tria);
     template dealii::TriaRawIterator<dealii::TriaAccessor<1,deal_II_dimension,deal_II_dimension> >
@@ -28,7 +27,13 @@ for (deal_II_dimension : DIMENSIONS)
     template dealii::TriaRawIterator<dealii::TriaAccessor<2,deal_II_dimension,deal_II_dimension> >
     TriaObjects<TriaObject<2> >::next_free_pair_object (const dealii::Triangulation<deal_II_dimension> &tria);
 #endif
-#if deal_II_dimension == 3
+
+#if deal_II_dimension >= 3
+    template dealii::TriaRawIterator<dealii::TriaAccessor<3,deal_II_dimension,deal_II_dimension> >
+    TriaObjects<TriaObject<3> >::next_free_single_object (const dealii::Triangulation<deal_II_dimension> &tria);
+    template dealii::TriaRawIterator<dealii::TriaAccessor<3,deal_II_dimension,deal_II_dimension> >
+    TriaObjects<TriaObject<3> >::next_free_pair_object (const dealii::Triangulation<deal_II_dimension> &tria);
+
     template dealii::Triangulation<deal_II_dimension>::raw_hex_iterator
     TriaObjects<TriaObject<3> >::next_free_hex(const dealii::Triangulation<deal_II_dimension> &, const unsigned int);
 #endif

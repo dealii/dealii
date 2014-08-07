@@ -242,9 +242,6 @@ namespace internal
     }
 
 
-
-
-
     void
     TriaObjectsHex::reserve_space (const unsigned int new_hexes)
     {
