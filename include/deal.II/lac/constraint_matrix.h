@@ -642,26 +642,6 @@ public:
   void condense (BlockSparseMatrix<number> &matrix) const;
 
   /**
-   * Condense the given vector @p uncondensed into @p condensed. It is the
-   * user's responsibility to guarantee that all entries of @p condensed be
-   * zero. Note that this function does not take any inhomogeneity into
-   * account and throws an exception in case there are any
-   * inhomogeneities. Use the function using both a matrix and vector for that
-   * case.
-   *
-   * The @p VectorType may be a Vector<float>, Vector<double>,
-   * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
-   * any other type having the same interface.
-   *
-   * @deprecated The functions converting an uncondensed matrix into
-   * its condensed form are deprecated. Use the functions doing the
-   * in-place condensation leaving the size of the linear system unchanged.
-   */
-  template <class VectorType>
-  void condense (const VectorType &uncondensed,
-                 VectorType       &condensed) const DEAL_II_DEPRECATED;
-
-  /**
    * Condense the given vector in-place. The @p VectorType may be a
    * Vector<float>, Vector<double>, BlockVector<tt><...></tt>, a PETSc or
    * Trilinos vector wrapper class, or any other type having the same
@@ -669,9 +649,22 @@ public:
    * account and throws an exception in case there are any
    * inhomogeneities. Use the function using both a matrix and vector for that
    * case.
+   * Note: this function does not work for MPI vectors because it would require 
+   * ghosted vector in that case, however all ghosted vectors are read-only objects.
+   * Instead, use the analogue with two input arguments.
    */
   template <class VectorType>
   void condense (VectorType &vec) const;
+
+  /**
+   * Same as above, but accepts two input arguments. If called in parallel, one 
+   * vector is supposed to be a ghosted vector and the other vector without ghost
+   * elements. The function copies and condenses values from @p vec_ghosted into 
+   * @p vec.
+   */
+  template <class VectorType>
+  void condense (const VectorType &vec_ghosted,
+                 VectorType       &vec) const;
 
   /**
    * Condense a given matrix and a given vector. The associated matrix struct
