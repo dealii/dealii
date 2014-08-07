@@ -649,22 +649,22 @@ public:
    * account and throws an exception in case there are any
    * inhomogeneities. Use the function using both a matrix and vector for that
    * case.
-   * Note: this function does not work for MPI vectors because it would require 
-   * ghosted vector in that case, however all ghosted vectors are read-only objects.
-   * Instead, use the analogue with two input arguments.
+   *
+   * @note This function does not work for MPI vectors. Use condense() with
+   * two vector arguments instead.
    */
   template <class VectorType>
   void condense (VectorType &vec) const;
 
   /**
-   * Same as above, but accepts two input arguments. If called in parallel, one 
-   * vector is supposed to be a ghosted vector and the other vector without ghost
-   * elements. The function copies and condenses values from @p vec_ghosted into 
-   * @p vec.
+   * The function copies and condenses values from @p vec_ghosted into @p
+   * output. In a serial code it is equivalent to calling condense (vec). If
+   * called in parallel, @p vec_ghosted is supposed to contain ghost elements
+   * while @p output should not.
    */
   template <class VectorType>
   void condense (const VectorType &vec_ghosted,
-                 VectorType       &vec) const;
+                 VectorType       &output) const;
 
   /**
    * Condense a given matrix and a given vector. The associated matrix struct

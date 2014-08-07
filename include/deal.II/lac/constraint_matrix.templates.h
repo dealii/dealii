@@ -78,7 +78,9 @@ ConstraintMatrix::condense (const VectorType &vec_ghosted,
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
-  vec = vec_ghosted;
+  // if this is called with different arguments, we need to copy the data over:
+  if (&vec != &vec_ghosted)
+    vec = vec_ghosted;
 
   // distribute all entries, and set them to zero. do so in
   // two loops because in the first one we need to add to elements
