@@ -201,7 +201,7 @@ private:
  * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim=dim, int chartdim=dim>
-class FunctionManifoldChart : public ManifoldChart<dim, spacedim, chartdim> 
+class FunctionManifold : public ManifoldChart<dim, spacedim, chartdim> 
 {
 public:
   /**
@@ -213,7 +213,7 @@ public:
    * The tolerance argument is used in debug mode to actually check
    * that the two functions are one the inverse of the other.
    */
-  FunctionManifoldChart(const Function<chartdim> &push_forward_function,
+  FunctionManifold(const Function<chartdim> &push_forward_function,
 			const Function<spacedim> &pull_back_function,
 			const Point<chartdim> periodicity=Point<chartdim>(),
 			const double tolerance=1e-10);
@@ -233,7 +233,7 @@ public:
    * The tolerance argument is used in debug mode to actually check
    * that the two functions are one the inverse of the other.
    */
-  FunctionManifoldChart(const std::string push_forward_expression,
+  FunctionManifold(const std::string push_forward_expression,
 			const std::string pull_back_expression,
 			const Point<chartdim> periodicity=Point<chartdim>(), 
 			const typename FunctionParser<spacedim>::ConstMap = typename FunctionParser<spacedim>::ConstMap(),
@@ -244,7 +244,7 @@ public:
   /**
    * If needed, we delete the pointers we own.
    */
-  ~FunctionManifoldChart();
+  ~FunctionManifold();
   
   /**
    * Given a point in the chartdim coordinate system, uses the
@@ -272,13 +272,13 @@ private:
    * Pointer to the push_forward function.
    */
   SmartPointer<const Function<chartdim>,
-	       FunctionManifoldChart<dim,spacedim,chartdim> > push_forward_function;
+	       FunctionManifold<dim,spacedim,chartdim> > push_forward_function;
   
   /**
    * Pointer to the pull_back function.
    */
   SmartPointer<const Function<spacedim>, 
-	       FunctionManifoldChart<dim,spacedim,chartdim> > pull_back_function;
+	       FunctionManifold<dim,spacedim,chartdim> > pull_back_function;
   
   /**
    * Relative tolerance. In debug mode, we check that the two

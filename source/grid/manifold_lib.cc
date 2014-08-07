@@ -208,7 +208,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
 // FunctionManifoldChart
 // ============================================================
 template <int dim, int spacedim, int chartdim>
-FunctionManifoldChart<dim,spacedim,chartdim>::FunctionManifoldChart
+FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
 (const Function<chartdim> &push_forward_function,
  const Function<spacedim> &pull_back_function,
  const Point<chartdim> periodicity,
@@ -224,7 +224,7 @@ FunctionManifoldChart<dim,spacedim,chartdim>::FunctionManifoldChart
 }
 
 template <int dim, int spacedim, int chartdim>
-FunctionManifoldChart<dim,spacedim,chartdim>::FunctionManifoldChart
+FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
 (const std::string push_forward_expression,
  const std::string pull_back_expression, 
  const Point<chartdim> periodicity, 
@@ -246,7 +246,7 @@ FunctionManifoldChart<dim,spacedim,chartdim>::FunctionManifoldChart
 }
 
 template <int dim, int spacedim, int chartdim>
-FunctionManifoldChart<dim,spacedim,chartdim>::~FunctionManifoldChart() {
+FunctionManifold<dim,spacedim,chartdim>::~FunctionManifold() {
   if(owns_pointers == true) {
     const Function<chartdim> * pf = push_forward_function;
     push_forward_function = 0;
@@ -260,7 +260,7 @@ FunctionManifoldChart<dim,spacedim,chartdim>::~FunctionManifoldChart() {
 								   
 template <int dim, int spacedim, int chartdim>
 Point<spacedim>
-FunctionManifoldChart<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &chart_point) const
+FunctionManifold<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &chart_point) const
 {
   Vector<double> pf(spacedim);
   Point<spacedim> result;
@@ -284,7 +284,7 @@ FunctionManifoldChart<dim,spacedim,chartdim>::push_forward(const Point<chartdim>
 
 template <int dim, int spacedim, int chartdim>
 Point<chartdim>
-FunctionManifoldChart<dim,spacedim,chartdim>::pull_back(const Point<spacedim> &space_point) const
+FunctionManifold<dim,spacedim,chartdim>::pull_back(const Point<spacedim> &space_point) const
 {
   Vector<double> pb(chartdim);
   Point<chartdim> result;

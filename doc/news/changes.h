@@ -99,7 +99,7 @@ inconvenience this causes.
 <ol>
 
 
-  <li> New: Added FunctionManifoldChart descritpion.
+  <li> New: Added FunctionManifold descritpion.
   <br>
   This class allows arbitrary manifold descriptions, in which you have
   an explicit Function<chartdim> for the ManifoldChart::push_forward()
