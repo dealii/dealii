@@ -97,7 +97,12 @@ inconvenience this causes.
 
 
 <ol>
-
+  <li> New: There is now a documentation module that describes
+  deal.II's support for and interaction with the
+  @ref CPP11 "C++11 standard".
+  <br>
+  (Wolfgang Bangerth, 2014/08/14)
+  </li>
 
   <li> New: Added FunctionManifold descritpion.
   <br>
@@ -109,7 +114,6 @@ inconvenience this causes.
   <br>
   (Luca Heltai, 2014/08/07)
   </li>
-
 
   <li> New: Added CylindricalManifold descritpion.
   <br>
@@ -246,6 +250,19 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: To better support applications that want to use C++11's
+  <a href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">range-based
+  for loops</a>, there are now functions Triangulation::cell_iterators(),
+  Triangulation::all_cell_iterators() and similarly in classes DoFHandler
+  and hp::DoFHandler
+  that return a range object that can then be used in range-based for loops.
+  The underlying implementation uses the new IteratorRange class.
+  <br>
+  See the new @ref CPP11 "C++11" page for more information.
+  <br>
+  (Wolfgang Bangerth, 2014/08/07)
+  </li>
+
   <li> New: TrilinosWrappers::PreconditionAMG can now be initialized from an
   object of type Epetra_RowMatrix, which allows using it with more arbitrary
   matrix objects, including matrix-free methods.

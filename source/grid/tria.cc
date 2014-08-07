@@ -10567,6 +10567,49 @@ Triangulation<dim, spacedim>::end_active (const unsigned int level) const
 }
 
 
+
+template <int dim, int spacedim>
+IteratorRange<typename Triangulation<dim, spacedim>::cell_iterator>
+Triangulation<dim, spacedim>::cell_iterators () const
+{
+  return
+    IteratorRange<typename Triangulation<dim, spacedim>::cell_iterator>
+    (begin(), end());
+}
+
+
+template <int dim, int spacedim>
+IteratorRange<typename Triangulation<dim, spacedim>::active_cell_iterator>
+Triangulation<dim, spacedim>::active_cell_iterators () const
+{
+  return
+    IteratorRange<typename Triangulation<dim, spacedim>::active_cell_iterator>
+    (begin_active(), end());
+}
+
+
+
+template <int dim, int spacedim>
+IteratorRange<typename Triangulation<dim, spacedim>::cell_iterator>
+Triangulation<dim, spacedim>::cell_iterators_on_level (const unsigned int level) const
+{
+  return
+    IteratorRange<typename Triangulation<dim, spacedim>::cell_iterator>
+    (begin(level), end(level));
+}
+
+
+
+template <int dim, int spacedim>
+IteratorRange<typename Triangulation<dim, spacedim>::active_cell_iterator>
+Triangulation<dim, spacedim>::active_cell_iterators_on_level (const unsigned int level) const
+{
+  return
+    IteratorRange<typename Triangulation<dim, spacedim>::active_cell_iterator>
+    (begin_active(level), end_active(level));
+}
+
+
 /*------------------------ Face iterator functions ------------------------*/
 
 
