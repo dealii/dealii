@@ -64,14 +64,17 @@ void FunctionParser<dim>::initialize (const std::string                   &varia
               use_degrees);
 }
 
+
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string              &vars,
 				      const std::vector<std::string> &expressions,
 				      const std::map<std::string, double> &constants,
 				      const bool time_dependent)
-  {
-    initialize(vars, expressions, constants, time_dependent, false);
-  }
+{
+  initialize(vars, expressions, constants, time_dependent, false);
+}
+
+
 
 namespace internal
 {
@@ -103,34 +106,38 @@ namespace internal
   {
     return static_cast<double>(mu_round(value));
   }
+
   double mu_ceil(double value)
   {
     return ceil(value);
   }
+
   double mu_floor(double value)
   {
     return floor(value);
   }
+
   double mu_cot(double value)
   {
     return 1.0/tan(value);
   }
+
   double mu_csc(double value)
   {
     return 1.0/sin(value);
   }
- double mu_sec(double value)
+
+  double mu_sec(double value)
   {
     return 1.0/cos(value);
   }
- double mu_log(double value)
+
+  double mu_log(double value)
   {
     return log(value);
   }
-    
-
-    
 }
+
 
 template <int dim>
 void FunctionParser<dim>:: init_muparser() const
@@ -142,11 +149,8 @@ void FunctionParser<dim>:: init_muparser() const
   vars.get().resize(var_names.size());
   for (unsigned int i=0; i<this->n_components; ++i)
     {
-      std::map< std::string, double >::const_iterator
-	constant = constants.begin(),
-	endc  = constants.end();
-
-      for (; constant != endc; ++constant)
+      for (std::map< std::string, double >::const_iterator constant = constants.begin();
+          constant != constants.end(); ++constant)
         {
  	  fp.get()[i].DefineConst(constant->first.c_str(), constant->second);
 	}
@@ -168,7 +172,37 @@ void FunctionParser<dim>:: init_muparser() const
       
       try
 	{
-	  fp.get()[i].SetExpr(expressions[i]);
+          // muparser expects that user defined functions have no
+          // space between the name of the function and the opening
+          // parenthesis. this is awkward because it is not backward
+          // compatible to the library we used to use before muparser
+          // (the fparser library) but also makes no real sense.
+          // consequently, in the expressions we set, remove any space
+          // we may find after function names
+          std::string transformed_expression = expressions[i];
+          std::string::size_type pos = 0;
+          while (true)
+            {
+              // try to find any occurrences of 'if'
+              pos = transformed_expression.find ("if", pos);
+              if (pos == std::string::npos)
+                break;
+
+              // replace whitespace until there no longer is any
+              while ((pos+2<transformed_expression.size())
+                     &&
+                     ((transformed_expression[pos+2] == ' ')
+                      ||
+                      (transformed_expression[pos+2] == '\t')))
+                transformed_expression.erase (pos+2, pos+3);
+
+              // move the current search position by the size of the
+              // actual 'if'
+              pos += 2;
+            }
+
+          // now use the transformed expression
+	  fp.get()[i].SetExpr(transformed_expression);
 	}
       catch (mu::ParserError &e)
 	{
@@ -182,6 +216,7 @@ void FunctionParser<dim>:: init_muparser() const
     }
 }
 
+
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string   &variables,
                                       const std::vector<std::string>      &expressions,
@@ -190,7 +225,6 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
                                       const bool time_dependent,
                                       const bool use_degrees)
 {
-
   this->fp.clear(); // this will reset all thread-local objects
   
   this->constants = constants;
@@ -236,14 +270,17 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
   initialized = true;
 }
 
+
+
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string &vars,
-                   const std::string &expression,
-                   const std::map<std::string, double> &constants,
-                   const bool time_dependent)
+                                      const std::string &expression,
+                                      const std::map<std::string, double> &constants,
+                                      const bool time_dependent)
 {
   initialize(vars, expression, constants, time_dependent, false);
 }
+
 
 
 template <int dim>

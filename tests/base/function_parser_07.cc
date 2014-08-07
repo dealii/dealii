@@ -14,8 +14,10 @@
 //
 // ---------------------------------------------------------------------
 
-// various checks (compatibility functionparser -> muparser)
 
+// like _06, but ensure that we can not only parse "if(cond,yes,no)" but also
+// "if (cond,yes,no)", i.e., including the whitespace between function and
+// argument list
 
 #include "../tests.h"
 #include <fstream>
@@ -42,24 +44,21 @@ void eval(const std::string & exp, const Point<2> & p, double expected)
 	  << " ( expected " << expected << " )" << std::endl;
   if (fabs(result-expected)>1e-10)
     deallog << "ERROR!" << std::endl;
-  
-  
-  
 }
 
 
 void test()
 {
-  eval("if(x<0.0,0.0,if(x>1.0,1.0,x))",Point<2>(0.5,0.0), 0.5);
-  eval("if(x<0.0,0.0,if(x>1.0,1.0,x))",Point<2>(-2.0,0.0), 0.0);
-  eval("if(x<0.0,0.0,if(x>1.0,1.0,x))",Point<2>(42.0,0.0), 1.0);
+  eval("if   (x<0.0,0.0,if(x>1.0,1.0,x))",Point<2>(0.5,0.0), 0.5);
+  eval("if   (x<0.0,0.0,if(x>1.0,1.0,x))",Point<2>(-2.0,0.0), 0.0);
+  eval("if   (x<0.0,0.0,if(x>1.0,1.0,x))",Point<2>(42.0,0.0), 1.0);
 
-  eval("if(x<1.0 | y<1.0,0,y)",Point<2>(0.5,1.5), 0.0);
-  eval("if(x<1.0 | y<1.0,0,y)",Point<2>(1.5,1.5), 1.5);
-  eval("if(x<1.0 | y<1.0,0,y)",Point<2>(1.5,0.5), 0.0);
-  eval("if(x<1.0 | y<1.0,0,y)",Point<2>(0.5,-2), 0.0);
+  eval("if   (x<1.0 | y<1.0,0,y)",Point<2>(0.5,1.5), 0.0);
+  eval("if   (x<1.0 | y<1.0,0,y)",Point<2>(1.5,1.5), 1.5);
+  eval("if   (x<1.0 | y<1.0,0,y)",Point<2>(1.5,0.5), 0.0);
+  eval("if   (x<1.0 | y<1.0,0,y)",Point<2>(0.5,-2), 0.0);
   
-  eval("if(x<1.0 & y<1.0,0,y)",Point<2>(1.5,-2.0), -2.0);
+  eval("if   (x<1.0 & y<1.0,0,y)",Point<2>(1.5,-2.0), -2.0);
 
   double x,y;
   x=1.0;
@@ -69,8 +68,8 @@ void test()
   y=3.1;
   eval("atan2(x,y)",Point<2>(x,y), atan2(x,y));
 
-  eval("if(x==1.0,0,y)",Point<2>(1.0,-2.0), 0.0);  
-  eval("if(x==1.0,0,y)",Point<2>(1.1,-2.0), -2.0);
+  eval("if   (x==1.0,0,y)",Point<2>(1.0,-2.0), 0.0);  
+  eval("if   (x==1.0,0,y)",Point<2>(1.1,-2.0), -2.0);
 
   eval("int(2.1)",Point<2>(1.1,-2.0), 2.0);
   eval("int(-3.8)",Point<2>(1.1,-2.0), -4.0);
