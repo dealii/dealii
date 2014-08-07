@@ -325,21 +325,21 @@ FlatManifold<dim, spacedim>::project_to_manifold (const std::vector<Point<spaced
 }
 
 
-/* -------------------------- ManifoldChart --------------------- */
+/* -------------------------- ChartManifold --------------------- */
 
 template <int dim, int spacedim, int chartdim>
-ManifoldChart<dim,spacedim,chartdim>::~ManifoldChart ()
+ChartManifold<dim,spacedim,chartdim>::~ChartManifold ()
 {}
 
 template <int dim, int spacedim, int chartdim>
-ManifoldChart<dim,spacedim,chartdim>::ManifoldChart (const Point<chartdim> periodicity):
+ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Point<chartdim> periodicity):
   sub_manifold(periodicity)
 {}
 
 
 template <int dim, int spacedim, int chartdim>
 Point<spacedim>
-ManifoldChart<dim,spacedim,chartdim>::
+ChartManifold<dim,spacedim,chartdim>::
 get_new_point (const Quadrature<spacedim> &quad) const
 {
   const std::vector<Point<spacedim> > &surrounding_points = quad.get_points();

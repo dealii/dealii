@@ -1,4 +1,4 @@
-//----------------------------  function_manifold_chart ---------------------------
+//----------------------------  function_manifold ---------------------------
 //    Copyright (C) 2011, 2013 by the mathLab team.
 //
 //    This file is subject to LGPL and may not be  distributed
@@ -6,7 +6,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//---------------------------- function_manifold_chart ---------------------------
+//---------------------------- function_manifold ---------------------------
 
 
 // Test the identity Manifold.

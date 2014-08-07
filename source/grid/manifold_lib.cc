@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center):
-  ManifoldChart<dim,spacedim,spacedim>(SphericalManifold<dim,spacedim>::get_periodicity()),
+  ChartManifold<dim,spacedim,spacedim>(SphericalManifold<dim,spacedim>::get_periodicity()),
   center(center)
 {
   Assert(spacedim != 1, ExcImpossibleInDim(1));
@@ -49,7 +49,7 @@ Point<spacedim>
 SphericalManifold<dim,spacedim>::get_new_point(const Quadrature<spacedim> &quad) const
 {
   if (spacedim == 2)
-    return ManifoldChart<dim,spacedim,spacedim>::get_new_point(quad);
+    return ChartManifold<dim,spacedim,spacedim>::get_new_point(quad);
   else
     {
       double rho_average = 0;
@@ -205,7 +205,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
 
 
 // ============================================================
-// FunctionManifoldChart
+// FunctionChartManifold
 // ============================================================
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
@@ -213,7 +213,7 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
  const Function<spacedim> &pull_back_function,
  const Point<chartdim> periodicity,
  const double tolerance):
-  ManifoldChart<dim,spacedim,chartdim>(periodicity),
+  ChartManifold<dim,spacedim,chartdim>(periodicity),
   push_forward_function(&push_forward_function),
   pull_back_function(&pull_back_function),
   tolerance(tolerance),
@@ -232,7 +232,7 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
  const std::string chart_vars, 
  const std::string space_vars,
  const double tolerance) :
-  ManifoldChart<dim,spacedim,chartdim>(periodicity),
+  ChartManifold<dim,spacedim,chartdim>(periodicity),
   const_map(const_map),
   tolerance(tolerance),
   owns_pointers(true)

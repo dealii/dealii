@@ -55,7 +55,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim>
-class SphericalManifold : public ManifoldChart<dim, spacedim, spacedim>
+class SphericalManifold : public ChartManifold<dim, spacedim, spacedim>
 {
 public:
   /**
@@ -184,7 +184,7 @@ private:
 
 
 /**
- * Manifold description derived from ManifoldChart, based on explicit
+ * Manifold description derived from ChartManifold, based on explicit
  * Function<spacedim> and Function<chartdim> objects describing the
  * push_forward() and pull_back() functions. 
  *
@@ -201,13 +201,13 @@ private:
  * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim=dim, int chartdim=dim>
-class FunctionManifold : public ManifoldChart<dim, spacedim, chartdim> 
+class FunctionManifold : public ChartManifold<dim, spacedim, chartdim> 
 {
 public:
   /**
    * Explicit functions constructor. Takes a push_forward function of
    * spacedim components, and a pull_back function of chartdim
-   * components. See the documentation of the base class ManifoldChart
+   * components. See the documentation of the base class ChartManifold
    * for the meaning of the optional #periodicity argument.
    *
    * The tolerance argument is used in debug mode to actually check
@@ -222,7 +222,7 @@ public:
    * Expressions constructor. Takes the expressions of the
    * push_forward function of spacedim components, and of the
    * pull_back function of chartdim components. See the documentation
-   * of the base class ManifoldChart for the meaning of the optional
+   * of the base class ChartManifold for the meaning of the optional
    * #periodicity argument.
    *
    * The strings should be the readable by the default constructor of

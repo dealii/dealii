@@ -367,7 +367,7 @@ private:
  *   \f]
  *   (the pull_back() function).
  *
- *   The get_new_point() function of the ManifoldChart class is
+ *   The get_new_point() function of the ChartManifold class is
  *   implemented by calling the pull_back() method for all
  *   #surrounding_points, computing their weighted average in the
  *   chartdim Euclidean space, and calling the push_forward() method
@@ -386,7 +386,7 @@ private:
  *   @author Luca Heltai, 2013
  */
 template <int dim, int spacedim=dim, int chartdim=dim>
-class ManifoldChart: public Manifold<dim,spacedim>
+class ChartManifold: public Manifold<dim,spacedim>
 {
 public:
   /**
@@ -405,13 +405,13 @@ public:
    * (eps) is not pi, but 2*pi (or zero), since, on the manifold,
    * these two points are at distance 2*eps and not (2*pi-eps)
    */
-  ManifoldChart(const Point<chartdim> periodicity=Point<chartdim>());
+  ChartManifold(const Point<chartdim> periodicity=Point<chartdim>());
 
   /**
    * Destructor. Does nothing here, but needs to be declared to make
    * it virtual.
    */
-  virtual ~ManifoldChart ();
+  virtual ~ChartManifold ();
 
 
   /**
