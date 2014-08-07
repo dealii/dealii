@@ -1488,7 +1488,7 @@ namespace internal
                                                   cells[cell].vertices[1]));
             next_free_line->set_used_flag ();
             next_free_line->set_material_id (cells[cell].material_id);
-	    next_free_line->set_manifold_id (cells[cell].manifold_id);
+            next_free_line->set_manifold_id (cells[cell].manifold_id);
             next_free_line->clear_user_data ();
             next_free_line->set_subdomain_id (0);
 
@@ -1576,24 +1576,24 @@ namespace internal
 
         // finally set the
         // vertex_to_boundary_id_map_1d
-	// and vertex_to_manifold_id_map_1d
+        // and vertex_to_manifold_id_map_1d
         // maps
         triangulation.vertex_to_boundary_id_map_1d->clear();
-	triangulation.vertex_to_manifold_id_map_1d->clear();
+        triangulation.vertex_to_manifold_id_map_1d->clear();
         for (typename Triangulation<dim,spacedim>::active_cell_iterator
              cell = triangulation.begin_active();
              cell != triangulation.end(); ++cell)
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	    {
-	      (*triangulation
-	       .vertex_to_manifold_id_map_1d)[cell->face(f)->vertex_index()]
-		= numbers::invalid_manifold_id;
-	      
-	      if (cell->at_boundary(f))
-		(*triangulation
-		 .vertex_to_boundary_id_map_1d)[cell->face(f)->vertex_index()]
-		  = f;
-	    }
+            {
+              (*triangulation
+               .vertex_to_manifold_id_map_1d)[cell->face(f)->vertex_index()]
+                = numbers::invalid_manifold_id;
+
+              if (cell->at_boundary(f))
+                (*triangulation
+                 .vertex_to_boundary_id_map_1d)[cell->face(f)->vertex_index()]
+                  = f;
+            }
       }
 
 
@@ -1770,7 +1770,7 @@ namespace internal
 
               cell->set_used_flag ();
               cell->set_material_id (cells[c].material_id);
-	      cell->set_manifold_id (cells[c].manifold_id);
+              cell->set_manifold_id (cells[c].manifold_id);
               cell->clear_user_data ();
               cell->set_subdomain_id (0);
 
@@ -1803,7 +1803,7 @@ namespace internal
             else
               // interior line -> numbers::internal_face_boundary_id
               line->set_boundary_indicator (numbers::internal_face_boundary_id);
-	    line->set_manifold_id(numbers::flat_manifold_id);
+            line->set_manifold_id(numbers::flat_manifold_id);
           }
 
         // set boundary indicators where
@@ -1847,7 +1847,7 @@ namespace internal
                          ExcInteriorLineCantBeBoundary());
 
             line->set_boundary_indicator (boundary_line->boundary_id);
-	    line->set_manifold_id (boundary_line->manifold_id);
+            line->set_manifold_id (boundary_line->manifold_id);
           }
 
 
@@ -2424,7 +2424,7 @@ namespace internal
 
               cell->set_used_flag ();
               cell->set_material_id (cells[c].material_id);
-	      cell->set_manifold_id (cells[c].manifold_id);
+              cell->set_manifold_id (cells[c].manifold_id);
               cell->clear_user_flag ();
               cell->clear_user_data ();
               cell->set_subdomain_id (0);
@@ -2526,10 +2526,10 @@ namespace internal
             else
               // interior quad -> numbers::internal_face_boundary_id
               quad->set_boundary_indicator (numbers::internal_face_boundary_id);
-					     // Manifold ids are set
-					     // independently of where
-					     // they are
-	    quad->set_manifold_id(numbers::flat_manifold_id);
+            // Manifold ids are set
+            // independently of where
+            // they are
+            quad->set_manifold_id(numbers::flat_manifold_id);
           }
 
         /////////////////////////////////////////
@@ -2540,12 +2540,12 @@ namespace internal
         // for this: first mark all lines as interior. use this loop
         // to also set all manifold ids of all lines
         for (typename Triangulation<dim,spacedim>::line_iterator
-	       line=triangulation.begin_line(); line!=triangulation.end_line(); ++line)
-	  {
-	    line->set_boundary_indicator (numbers::internal_face_boundary_id);
-	    line->set_manifold_id(numbers::flat_manifold_id);
-	  }
-	
+             line=triangulation.begin_line(); line!=triangulation.end_line(); ++line)
+          {
+            line->set_boundary_indicator (numbers::internal_face_boundary_id);
+            line->set_manifold_id(numbers::flat_manifold_id);
+          }
+
         // next reset all lines bounding
         // boundary quads as on the
         // boundary also. note that since
@@ -2618,8 +2618,8 @@ namespace internal
                                        "if they carry the same boundary indicator."));
 
             line->set_boundary_indicator (boundary_line->boundary_id);
-					     // Set manifold id if given
-	    line->set_manifold_id(boundary_line->manifold_id);
+            // Set manifold id if given
+            line->set_manifold_id(boundary_line->manifold_id);
           }
 
 
@@ -2752,7 +2752,7 @@ namespace internal
                                        "if they carry the same boundary indicator."));
 
             quad->set_boundary_indicator (boundary_quad->boundary_id);
-	    quad->set_manifold_id (boundary_quad->manifold_id);
+            quad->set_manifold_id (boundary_quad->manifold_id);
           }
 
 
@@ -3607,7 +3607,7 @@ namespace internal
                           switch_1->set_line_orientation(2, switch_2->line_orientation(2));
                           switch_1->set_line_orientation(3, switch_2->line_orientation(3));
                           switch_1->set_boundary_indicator(switch_2->boundary_indicator());
-			  switch_1->set_manifold_id(switch_2->manifold_id());
+                          switch_1->set_manifold_id(switch_2->manifold_id());
                           switch_1->set_user_index(switch_2->user_index());
                           if (switch_2->user_flag_set())
                             switch_1->set_user_flag();
@@ -3623,7 +3623,7 @@ namespace internal
                           switch_2->set_line_orientation(2, switch_1_line_orientations[2]);
                           switch_2->set_line_orientation(3, switch_1_line_orientations[3]);
                           switch_2->set_boundary_indicator(switch_1_boundary_indicator);
-			  switch_2->set_manifold_id(switch_1->manifold_id());
+                          switch_2->set_manifold_id(switch_1->manifold_id());
                           switch_2->set_user_index(switch_1_user_index);
                           if (switch_1_user_flag)
                             switch_2->set_user_flag();
@@ -3955,11 +3955,11 @@ namespace internal
             if (dim == spacedim)
               {
                 // triangulation.vertices[next_unused_vertex] = new_point;
-		triangulation.vertices[next_unused_vertex] = 
-		  cell->get_manifold().get_new_point
-		  (Manifolds::get_default_quadrature
-		   <typename Triangulation<dim,spacedim>::active_cell_iterator, 
-		   spacedim>(cell));
+                triangulation.vertices[next_unused_vertex] =
+                  cell->get_manifold().get_new_point
+                  (Manifolds::get_default_quadrature
+                   <typename Triangulation<dim,spacedim>::active_cell_iterator,
+                   spacedim>(cell));
 
                 // if the user_flag is set, i.e. if the
                 // cell is at the boundary, use a
@@ -4004,19 +4004,19 @@ namespace internal
                       // points on this face and on the opposite face,
                       // as returned by the underlying manifold
                       // object.
-		      {
-			std::vector<Point<spacedim> > ps(2);
-			std::vector<double> ws(2, 0.5);
-			ps[0] = cell->face(boundary_face)
-			  ->child(0)->vertex(1);
-			ps[1] = cell->face(GeometryInfo<dim>
-					   ::opposite_face[boundary_face])
-			  ->child(0)->vertex(1);
-			Quadrature<spacedim> qs(ps,ws);
-			triangulation.vertices[next_unused_vertex]
-			  = cell->get_manifold().get_new_point(qs);
-		      }
-		  }
+                      {
+                        std::vector<Point<spacedim> > ps(2);
+                        std::vector<double> ws(2, 0.5);
+                        ps[0] = cell->face(boundary_face)
+                                ->child(0)->vertex(1);
+                        ps[1] = cell->face(GeometryInfo<dim>
+                                           ::opposite_face[boundary_face])
+                                ->child(0)->vertex(1);
+                        Quadrature<spacedim> qs(ps,ws);
+                        triangulation.vertices[next_unused_vertex]
+                          = cell->get_manifold().get_new_point(qs);
+                      }
+                  }
               }
             else
               {
@@ -4037,8 +4037,8 @@ namespace internal
 
                 // new vertex is placed on the surface according to
                 // the information stored in the boundary class
-		const Manifold<dim,spacedim> &manifold = cell->get_manifold();
-		
+                const Manifold<dim,spacedim> &manifold = cell->get_manifold();
+
                 triangulation.vertices[next_unused_vertex] =
                   manifold.get_new_point_on_quad (cell);
               }
@@ -4133,7 +4133,7 @@ namespace internal
             new_lines[l]->clear_children();
             // interior line
             new_lines[l]->set_boundary_indicator(numbers::internal_face_boundary_id);
-	    new_lines[l]->set_manifold_id(cell->manifold_id());
+            new_lines[l]->set_manifold_id(cell->manifold_id());
           }
 
         // Now add the four (two)
@@ -4255,7 +4255,7 @@ namespace internal
             // inherit material
             // properties
             subcells[i]->set_material_id (cell->material_id());
-	    subcells[i]->set_manifold_id (cell->manifold_id());
+            subcells[i]->set_manifold_id (cell->manifold_id());
             subcells[i]->set_subdomain_id (subdomainid);
 
             if (i%2==0)
@@ -4403,19 +4403,19 @@ namespace internal
                   Assert (next_unused_vertex < triangulation.vertices.size(),
                           ExcTooFewVerticesAllocated());
 
-		  // Now we always ask the manifold where to put the
-		  // new point. The get_manifold function will return
-		  // a flat boundary if invalid_manifold_id is set,
-		  // behaving as before in the flat case.  Backward
-		  // compatibility requires us to use the material id
-		  // of the cell in the codimension one case, however
-		  // we only do this if the manifold_id is the invalid
-		  // one, otherwise use the material id. This is done
-		  // internally in the get_manifold() function.
-		  triangulation.vertices[next_unused_vertex] =
-		    cell->get_manifold().get_new_point_on_line(cell);
-		  triangulation.vertices_used[next_unused_vertex] = true;
-		     
+                  // Now we always ask the manifold where to put the
+                  // new point. The get_manifold function will return
+                  // a flat boundary if invalid_manifold_id is set,
+                  // behaving as before in the flat case.  Backward
+                  // compatibility requires us to use the material id
+                  // of the cell in the codimension one case, however
+                  // we only do this if the manifold_id is the invalid
+                  // one, otherwise use the material id. This is done
+                  // internally in the get_manifold() function.
+                  triangulation.vertices[next_unused_vertex] =
+                    cell->get_manifold().get_new_point_on_line(cell);
+                  triangulation.vertices_used[next_unused_vertex] = true;
+
                   // search for next two unused cell (++ takes care of
                   // the end of the vector)
                   typename Triangulation<dim,spacedim>::raw_cell_iterator
@@ -4442,16 +4442,16 @@ namespace internal
                                     ::TriaObject<1> (cell->vertex_index(0),
                                                      next_unused_vertex));
                   first_child->set_material_id (cell->material_id());
-		  first_child->set_manifold_id (cell->manifold_id());
+                  first_child->set_manifold_id (cell->manifold_id());
                   first_child->set_subdomain_id (subdomainid);
                   first_child->set_direction_flag (cell->direction_flag());
-		  
+
                   first_child->set_parent (cell->index ());
 
-		  // Set manifold id of the right face. Only do this
-		  // on the first child.
-		  first_child->face(1)->set_manifold_id(cell->manifold_id());
-		  
+                  // Set manifold id of the right face. Only do this
+                  // on the first child.
+                  first_child->face(1)->set_manifold_id(cell->manifold_id());
+
                   // reset neighborship info (refer to
                   // internal::Triangulation::TriaLevel<0> for
                   // details)
@@ -4493,7 +4493,7 @@ namespace internal
                                                      cell->vertex_index(1)));
                   second_child->set_neighbor (0, first_child);
                   second_child->set_material_id (cell->material_id());
-		  second_child->set_manifold_id (cell->manifold_id());
+                  second_child->set_manifold_id (cell->manifold_id());
                   second_child->set_subdomain_id (subdomainid);
                   second_child->set_direction_flag (cell->direction_flag());
 
@@ -4746,8 +4746,8 @@ namespace internal
                       // boundary lines differently; for interior
                       // lines we can compute the midpoint as the mean
                       // of the two vertices: if (line->at_boundary())
-                        triangulation.vertices[next_unused_vertex]
-                          = line->get_manifold().get_new_point_on_line (line);
+                      triangulation.vertices[next_unused_vertex]
+                        = line->get_manifold().get_new_point_on_line (line);
                     }
                   else
                     // however, if spacedim>dim, we always have to ask
@@ -4755,13 +4755,13 @@ namespace internal
                     // same object of the cell (which was stored in
                     // line->user_index() before) unless a manifold_id
                     // has been set on this very line.
-		    if(line->manifold_id() == numbers::invalid_manifold_id)
-		      triangulation.vertices[next_unused_vertex]
-			= triangulation.get_manifold(line->user_index()).get_new_point_on_line (line);
-		    else
-		      triangulation.vertices[next_unused_vertex]
-			= line->get_manifold().get_new_point_on_line (line);
-		      
+                    if (line->manifold_id() == numbers::invalid_manifold_id)
+                      triangulation.vertices[next_unused_vertex]
+                        = triangulation.get_manifold(line->user_index()).get_new_point_on_line (line);
+                    else
+                      triangulation.vertices[next_unused_vertex]
+                        = line->get_manifold().get_new_point_on_line (line);
+
                   // now that we created the right point, make up the
                   // two child lines.  To this end, find a pair of
                   // unused lines
@@ -5204,8 +5204,8 @@ namespace internal
                           ExcTooFewVerticesAllocated());
                   triangulation.vertices_used[next_unused_vertex] = true;
 
-		  triangulation.vertices[next_unused_vertex]
-		    = line->get_manifold().get_new_point_on_line (line);
+                  triangulation.vertices[next_unused_vertex]
+                    = line->get_manifold().get_new_point_on_line (line);
 
                   // now that we created the right point, make up the
                   // two child lines (++ takes care of the end of the
@@ -5248,8 +5248,8 @@ namespace internal
 
                   children[0]->set_boundary_indicator (line->boundary_indicator());
                   children[1]->set_boundary_indicator (line->boundary_indicator());
-		  
-		  children[0]->set_manifold_id (line->manifold_id());
+
+                  children[0]->set_manifold_id (line->manifold_id());
                   children[1]->set_manifold_id (line->manifold_id());
 
                   // finally clear flag
@@ -5362,7 +5362,7 @@ namespace internal
                     new_line->clear_user_data();
                     new_line->clear_children();
                     new_line->set_boundary_indicator(quad->boundary_indicator());
-		    new_line->set_manifold_id(quad->manifold_id());
+                    new_line->set_manifold_id(quad->manifold_id());
 
                     // child 0 and 1 of a line are switched if the
                     // line orientation is false. set up a miniature
@@ -5423,7 +5423,7 @@ namespace internal
                         new_quads[i]->clear_user_data();
                         new_quads[i]->clear_children();
                         new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
-			new_quads[i]->set_manifold_id (quad->manifold_id());
+                        new_quads[i]->set_manifold_id (quad->manifold_id());
                         // set all line orientations to true, change
                         // this after the loop, as we have to consider
                         // different lines for each child
@@ -5524,7 +5524,7 @@ namespace internal
                                 new_child[i]->set(internal::Triangulation::TriaObject<1>(old_child[i]->vertex_index(0),
                                                                                          old_child[i]->vertex_index(1)));
                                 new_child[i]->set_boundary_indicator(old_child[i]->boundary_indicator());
-				new_child[i]->set_manifold_id(old_child[i]->manifold_id());
+                                new_child[i]->set_manifold_id(old_child[i]->manifold_id());
                                 new_child[i]->set_user_index(old_child[i]->user_index());
                                 if (old_child[i]->user_flag_set())
                                   new_child[i]->set_user_flag();
@@ -5627,7 +5627,7 @@ namespace internal
                             switch_1->set_line_orientation(2, switch_2->line_orientation(2));
                             switch_1->set_line_orientation(3, switch_2->line_orientation(3));
                             switch_1->set_boundary_indicator(switch_2->boundary_indicator());
-			    switch_1->set_manifold_id(switch_2->manifold_id());
+                            switch_1->set_manifold_id(switch_2->manifold_id());
                             switch_1->set_user_index(switch_2->user_index());
                             if (switch_2->user_flag_set())
                               switch_1->set_user_flag();
@@ -5650,7 +5650,7 @@ namespace internal
                             switch_2->set_line_orientation(2, switch_1_line_orientations[2]);
                             switch_2->set_line_orientation(3, switch_1_line_orientations[3]);
                             switch_2->set_boundary_indicator(switch_1_boundary_indicator);
-			    switch_2->set_manifold_id(switch_1->manifold_id());
+                            switch_2->set_manifold_id(switch_1->manifold_id());
                             switch_2->set_user_index(switch_1_user_index);
                             if (switch_1_user_flag)
                               switch_2->set_user_flag();
@@ -5798,40 +5798,40 @@ namespace internal
 
                     // set the middle vertex
                     // appropriately
-                    if (quad->at_boundary() || 
-			(quad->manifold_id() != numbers::invalid_manifold_id) )
+                    if (quad->at_boundary() ||
+                        (quad->manifold_id() != numbers::invalid_manifold_id) )
                       triangulation.vertices[next_unused_vertex]
-			= quad->get_manifold().get_new_point_on_quad (quad);
+                        = quad->get_manifold().get_new_point_on_quad (quad);
                     else
-		      {
-			// it might be that the quad itself is not at
-			// the boundary, but that one of its lines
-			// actually is. in this case, the newly
-			// created vertices at the centers of the
-			// lines are not necessarily the mean values
-			// of the adjacent vertices, so do not compute
-			// the new vertex as the mean value of the 4
-			// vertices of the face, but rather as a
-			// weighted mean value of the 8 vertices which
-			// we already have (the four old ones, and the
-			// four ones inserted as middle points for the
-			// four lines). summing up some more points is
-			// generally cheaper than first asking whether
-			// one of the lines is at the boundary
-			//
-			// note that the exact weights are chosen such
-			// as to minimize the distortion of the four
-			// new quads from the optimal shape; their
-			// derivation and values is copied over from
-			// the @p{MappingQ::set_laplace_on_vector}
-			// function
-			triangulation.vertices[next_unused_vertex] =
-			  quad->get_manifold().get_new_point 
-			  (Manifolds::get_default_quadrature
-			   <typename Triangulation<dim,spacedim>::quad_iterator, 
-			   spacedim>(quad, true));
-		      }
-		    triangulation.vertices_used[next_unused_vertex] = true;
+                      {
+                        // it might be that the quad itself is not at
+                        // the boundary, but that one of its lines
+                        // actually is. in this case, the newly
+                        // created vertices at the centers of the
+                        // lines are not necessarily the mean values
+                        // of the adjacent vertices, so do not compute
+                        // the new vertex as the mean value of the 4
+                        // vertices of the face, but rather as a
+                        // weighted mean value of the 8 vertices which
+                        // we already have (the four old ones, and the
+                        // four ones inserted as middle points for the
+                        // four lines). summing up some more points is
+                        // generally cheaper than first asking whether
+                        // one of the lines is at the boundary
+                        //
+                        // note that the exact weights are chosen such
+                        // as to minimize the distortion of the four
+                        // new quads from the optimal shape; their
+                        // derivation and values is copied over from
+                        // the @p{MappingQ::set_laplace_on_vector}
+                        // function
+                        triangulation.vertices[next_unused_vertex] =
+                          quad->get_manifold().get_new_point
+                          (Manifolds::get_default_quadrature
+                           <typename Triangulation<dim,spacedim>::quad_iterator,
+                           spacedim>(quad, true));
+                      }
+                    triangulation.vertices_used[next_unused_vertex] = true;
                     // now that we created the right point, make up
                     // the four lines interior to the quad (++ takes
                     // care of the end of the vector)
@@ -5865,7 +5865,7 @@ namespace internal
                     // *--2--*
                     //
                     // the lines are numbered as follows:
-                    // 
+                    //
                     // *--*--*
                     // |  1  |
                     // *2-*-3*
@@ -5896,13 +5896,13 @@ namespace internal
                         new_lines[i]->clear_user_data();
                         new_lines[i]->clear_children();
                         new_lines[i]->set_boundary_indicator(quad->boundary_indicator());
-			new_lines[i]->set_manifold_id(quad->manifold_id());
+                        new_lines[i]->set_manifold_id(quad->manifold_id());
                       }
 
                     // now for the quads. again, first collect some
                     // data about the indices of the lines, with the
                     // following numbering:
-                    // 
+                    //
                     //   .-6-.-7-.
                     //   1   9   3
                     //   .-10.11-.
@@ -5996,7 +5996,7 @@ namespace internal
                         new_quads[i]->clear_user_data();
                         new_quads[i]->clear_children();
                         new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
-			new_quads[i]->set_manifold_id (quad->manifold_id());
+                        new_quads[i]->set_manifold_id (quad->manifold_id());
                         // set all line orientations to true, change
                         // this after the loop, as we have to consider
                         // different lines for each child
@@ -6129,7 +6129,7 @@ namespace internal
                       // interior quad
                       new_quads[i]->set_boundary_indicator (numbers::internal_face_boundary_id);
                       // they inherit geometry description of the hex they belong to
-		      new_quads[i]->set_manifold_id (hex->manifold_id());
+                      new_quads[i]->set_manifold_id (hex->manifold_id());
                       // set all line orientation flags to true by
                       // default, change this afterwards, if necessary
                       for (unsigned int j=0; j<GeometryInfo<dim>::lines_per_face; ++j)
@@ -6160,7 +6160,7 @@ namespace internal
                       // inherit material
                       // properties
                       new_hexes[i]->set_material_id (hex->material_id());
-		      new_hexes[i]->set_manifold_id (hex->manifold_id());
+                      new_hexes[i]->set_manifold_id (hex->manifold_id());
                       new_hexes[i]->set_subdomain_id (subdomainid);
 
                       if (i%2)
@@ -6393,7 +6393,7 @@ namespace internal
                       // the quads are numbered as follows:
                       //
                       // planes in the interior of the old hex:
-                      // 
+                      //
                       //      *
                       //     /|
                       //    / | x
@@ -6407,7 +6407,7 @@ namespace internal
                       //  *
                       //
                       // children of the faces of the old hex
-                      // 
+                      //
                       //      *---*---*        *---*---*
                       //     /|   |   |       /   /   /|
                       //    / |   |   |      / 9 / 10/ |
@@ -6593,7 +6593,7 @@ namespace internal
                       // the quads are numbered as follows:
                       //
                       // planes in the interior of the old hex:
-                      // 
+                      //
                       //      *
                       //     /|
                       //    / | x
@@ -6607,7 +6607,7 @@ namespace internal
                       //  *
                       //
                       // children of the faces of the old hex
-                      // 
+                      //
                       //      *-------*        *-------*
                       //     /|       |       /   10  /|
                       //    * |       |      *-------* |
@@ -6795,7 +6795,7 @@ namespace internal
                       // the quads are numbered as follows:
                       //
                       // planes in the interior of the old hex:
-                      // 
+                      //
                       //      *
                       //     /|
                       //    / | x
@@ -6809,7 +6809,7 @@ namespace internal
                       //  *
                       //
                       // children of the faces of the old hex
-                      // 
+                      //
                       //      *---*---*        *-------*
                       //     /|   8   |       /       /|
                       //    / |       |      /   10  / |
@@ -7115,7 +7115,7 @@ namespace internal
                       // the quads are numbered as follows:
                       //
                       // planes in the interior of the old hex:
-                      // 
+                      //
                       //      *
                       //     /|
                       //    * | x
@@ -7129,7 +7129,7 @@ namespace internal
                       //  *
                       //
                       // children of the faces of the old hex
-                      // 
+                      //
                       //      *---*---*        *---*---*
                       //     /|   |   |       /18 / 19/|
                       //    * |10 | 11|      /---/---* |
@@ -7457,7 +7457,7 @@ namespace internal
                       // the quads are numbered as follows:
                       //
                       // planes in the interior of the old hex:
-                      // 
+                      //
                       //      *
                       //     /|
                       //    / | x
@@ -7805,7 +7805,7 @@ namespace internal
                       // the quads are numbered as follows:
                       //
                       // planes in the interior of the old hex:
-                      // 
+                      //
                       //      *
                       //     /|
                       //    / | x
@@ -7936,34 +7936,15 @@ namespace internal
                       // function, and like the new vertex at the
                       // center of the quad is weighted (see above)
 
-		      // triangulation.vertices[next_unused_vertex] = Point<dim>();
-		      // // first add corners of hex
-		      // for (unsigned int vertex=0;
-		      // 	   vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-		      // 	triangulation.vertices[next_unused_vertex] += hex->vertex(vertex) / 128;
-		      // // now add center of lines
-		      // for (unsigned int line=0;
-		      // 	   line<GeometryInfo<dim>::lines_per_cell; ++line)
-		      // 	triangulation.vertices[next_unused_vertex] += hex->line(line)->child(0)->vertex(1) *
-		      // 	  7./192.;
-		      // // finally add centers of faces. note that
-		      // // vertex 3 of child 0 is an invariant with
-		      // // respect to the face orientation, flip and
-		      // // rotation
-		      // for (unsigned int face=0;
-		      // 	   face<GeometryInfo<dim>::faces_per_cell; ++face)
-		      // 	triangulation.vertices[next_unused_vertex] += hex->face(face)->isotropic_child(0)->vertex(3) *
-		      // 	  1./12.;
-
-		      triangulation.vertices[next_unused_vertex] =
-			hex->get_manifold().get_new_point_on_hex(hex);
+                      triangulation.vertices[next_unused_vertex] =
+                        hex->get_manifold().get_new_point_on_hex(hex);
 
                       // set the data of the six lines.  first collect
                       // the indices of the seven vertices (consider
                       // the two planes to be crossed to form the
                       // planes cutting the hex in two vertically and
                       // horizontally)
-                      // 
+                      //
                       //     *--3--*   *--5--*
                       //    /  /  /    |  |  |
                       //   0--6--1     0--6--1
@@ -8309,7 +8290,7 @@ namespace internal
                       // the quads are numbered as follows:
                       //
                       // planes in the interior of the old hex:
-                      // 
+                      //
                       //      *
                       //     /|
                       //    * |
@@ -8904,9 +8885,9 @@ Triangulation (const MeshSmoothing smooth_grid,
   if (dim == 1)
     {
       vertex_to_boundary_id_map_1d
-	= new std::map<unsigned int, types::boundary_id>();
+        = new std::map<unsigned int, types::boundary_id>();
       vertex_to_manifold_id_map_1d
-	= new std::map<unsigned int, types::manifold_id>();
+        = new std::map<unsigned int, types::manifold_id>();
     }
 
   // connect the any_change signal to the other signals
@@ -8994,7 +8975,7 @@ Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number,
                                             const Manifold<dim, spacedim> &manifold_object)
 {
   Assert(m_number < numbers::invalid_manifold_id,
-	 ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
+         ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
 
   manifold[m_number] = &manifold_object;
 }
@@ -9013,7 +8994,7 @@ void
 Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number)
 {
   Assert(m_number < numbers::invalid_manifold_id,
-	 ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
+         ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
 
   //delete the entry located at number.
   manifold.erase(m_number);
@@ -9025,11 +9006,11 @@ template <int dim, int spacedim>
 const Boundary<dim,spacedim> &
 Triangulation<dim, spacedim>::get_boundary (const types::manifold_id m_number) const
 {
-  const Boundary<dim, spacedim> * man = 
+  const Boundary<dim, spacedim> *man =
     dynamic_cast<const Boundary<dim, spacedim> *>(&get_manifold(m_number));
   Assert(man != NULL,
-	 ExcMessage("You tried to get a Boundary, but I only have a Manifold."));
-    
+         ExcMessage("You tried to get a Boundary, but I only have a Manifold."));
+
   return *man;
 }
 
@@ -9038,8 +9019,8 @@ template <int dim, int spacedim>
 const Manifold<dim,spacedim> &
 Triangulation<dim, spacedim>::get_manifold (const types::manifold_id m_number) const
 {
-				   //look, if there is a manifold stored at
-				   //manifold_id number.
+  //look, if there is a manifold stored at
+  //manifold_id number.
   typename std::map<types::manifold_id, SmartPointer<const Manifold<dim,spacedim>, Triangulation<dim, spacedim> > >::const_iterator it
     = manifold.find(m_number);
 
@@ -9095,13 +9076,14 @@ Triangulation<dim, spacedim>::get_manifold_ids () const
 {
   std::set<types::manifold_id> m_ids;
   active_cell_iterator cell=begin_active();
-  for (; cell!=end(); ++cell) {
-    m_ids.insert(cell->manifold_id());
-    if(dim>1)
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	if (cell->at_boundary(face))
-	  m_ids.insert(cell->face(face)->manifold_id());
-  }
+  for (; cell!=end(); ++cell)
+    {
+      m_ids.insert(cell->manifold_id());
+      if (dim>1)
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+          if (cell->at_boundary(face))
+            m_ids.insert(cell->face(face)->manifold_id());
+    }
   std::vector<types::manifold_id> manifold_indicators(m_ids.begin(), m_ids.end());
   return manifold_indicators;
 }
@@ -9132,8 +9114,8 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
   faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
 
   typename std::map<types::manifold_id,
-    SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
-  bdry_iterator = old_tria.manifold.begin();
+           SmartPointer<const Manifold<dim,spacedim> , Triangulation<dim, spacedim> > >::const_iterator
+           bdry_iterator = old_tria.manifold.begin();
   for (; bdry_iterator != old_tria.manifold.end() ; bdry_iterator++)
     manifold[bdry_iterator->first] = bdry_iterator->second;
 
@@ -11075,7 +11057,7 @@ unsigned int Triangulation<dim, spacedim>::n_active_cells (const unsigned int le
 template <int dim, int spacedim>
 bool Triangulation<dim, spacedim>::has_hanging_nodes () const
 {
-  for (unsigned int lvl = 0; lvl<n_global_levels()-1;lvl++)
+  for (unsigned int lvl = 0; lvl<n_global_levels()-1; lvl++)
     if (n_active_cells(lvl) != 0)
       return true;
 
@@ -12252,23 +12234,23 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
   //    coarsen flags on level 1 to avoid level 0 cells being created
   //    by coarsening.  As coarsen flags will never be added, this can
   //    be done once and for all before the actual loop starts.
-  //    
+  //
   // 1/ do not coarsen a cell if 'most of the neighbors' will be
   //    refined after the step. This is to prevent occurrence of
   //    unrefined islands.
-  //    
+  //
   // 2/ eliminate refined islands in the interior and at the
   //    boundary. since they don't do much harm besides increasing the
   //    number of degrees of freedom, doing this has a rather low
   //    priority.
-  //    
+  //
   // 3/ limit the level difference of neighboring cells at each
   //    vertex.
-  //    
+  //
   // 4/ eliminate unrefined islands. this has higher priority since
   //    this diminishes the approximation properties not only of the
   //    unrefined island, but also of the surrounding patch.
-  //    
+  //
   // 5/ ensure patch level 1. Then the triangulation consists of
   //    patches, i.e. of cells that are refined once. It follows that
   //    if at least one of the children of a cell is or will be
@@ -12278,13 +12260,13 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
   //    eliminate_unrefined_islands, eliminate_refined_inner_islands
   //    and eliminate_refined_boundary_islands will be fulfilled
   //    automatically and do not need to be enforced separately.
-  //    
+  //
   // 6/ take care of the requirement that no double refinement is done
   //    at each face
-  //    
+  //
   // 7/ take care that no double refinement is done at each line in 3d
   //    or higher dimensions.
-  //    
+  //
   // 8/ make sure that all children of each cell are either flagged
   //    for coarsening or none of the children is
   //
@@ -12448,7 +12430,7 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
         }
 
       //////////////////////////////////////
-      // STEP 3: 
+      // STEP 3:
       //    limit the level difference of neighboring cells at each
       //    vertex.
       //
@@ -13290,21 +13272,24 @@ Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &li
 }
 
 template <>
-const Manifold<2,1> & Triangulation<2, 1>::get_manifold(const types::manifold_id) const {
+const Manifold<2,1> &Triangulation<2, 1>::get_manifold(const types::manifold_id) const
+{
   Assert(false, ExcImpossibleInDim(1));
   static FlatManifold<2,1> flat;
   return flat;
 }
 
 template <>
-const Manifold<3,1> & Triangulation<3, 1>::get_manifold(const types::manifold_id) const {
+const Manifold<3,1> &Triangulation<3, 1>::get_manifold(const types::manifold_id) const
+{
   Assert(false, ExcImpossibleInDim(1));
   static FlatManifold<3,1> flat;
   return flat;
 }
 
 template <>
-const Manifold<3,2> & Triangulation<3, 2>::get_manifold(const types::manifold_id) const {
+const Manifold<3,2> &Triangulation<3, 2>::get_manifold(const types::manifold_id) const
+{
   Assert(false, ExcImpossibleInDim(2));
   static FlatManifold<3,2> flat;
   return flat;

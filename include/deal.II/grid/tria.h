@@ -1244,7 +1244,7 @@ public:
    * boundary description has been explicitly
    * set using set_manifold().
    */
-    static const StraightBoundary<dim,spacedim> straight_boundary;
+  static const StraightBoundary<dim,spacedim> straight_boundary;
 
   /**
    * Declare some symbolic names
@@ -1619,7 +1619,7 @@ public:
     virtual
     void
     create_notification (const Triangulation<dim, spacedim> &tria);
-  }; 
+  };
 
   /**
    * A structure that is used as an
@@ -1867,7 +1867,7 @@ public:
   void set_manifold (const types::manifold_id   number,
                      const Manifold<dim,spacedim> &manifold_object);
 
-    
+
   /**
    * Reset those parts of the triangulation with the given manifold_id
    * to use a FlatManifold object. This is the default state of a
@@ -1897,7 +1897,7 @@ public:
    * @ingroup manifold
    *
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
-   */    
+   */
   const Manifold<dim,spacedim> &get_manifold (const types::manifold_id number) const;
 
   /**
@@ -1912,7 +1912,7 @@ public:
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   std::vector<types::boundary_id> get_boundary_indicators() const;
-    
+
   /**
    * Returns a vector containing all manifold indicators assigned to
    * the objects of this Triangulation. Note, that each manifold
@@ -1925,7 +1925,7 @@ public:
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   std::vector<types::manifold_id> get_manifold_ids() const;
-    
+
   /**
    *  Copy a triangulation. This operation is not cheap, so you should
    *  be careful with using this. We do not implement this function as
@@ -3375,7 +3375,7 @@ private:
    * a pointer.
    */
   std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
-	
+
 
   /**
    * A map that relates the number of a boundary vertex to the
@@ -3556,10 +3556,11 @@ Triangulation<dim,spacedim>::save (Archive &ar,
 
   ar &check_for_distorted_cells;
 
-  if (dim == 1) {
-    ar &vertex_to_boundary_id_map_1d;
-    ar &vertex_to_manifold_id_map_1d;
-  }
+  if (dim == 1)
+    {
+      ar &vertex_to_boundary_id_map_1d;
+      ar &vertex_to_manifold_id_map_1d;
+    }
 }
 
 
@@ -3592,10 +3593,11 @@ Triangulation<dim,spacedim>::load (Archive &ar,
                       "same setting with regard to reporting distorted "
                       "cell as the one previously stored."));
 
-  if (dim == 1) {
-    ar &vertex_to_boundary_id_map_1d;
-    ar &vertex_to_manifold_id_map_1d;
-  }
+  if (dim == 1)
+    {
+      ar &vertex_to_boundary_id_map_1d;
+      ar &vertex_to_manifold_id_map_1d;
+    }
 
   // trigger the create signal to indicate
   // that new content has been imported into
@@ -3648,12 +3650,12 @@ template <> unsigned int Triangulation<1,3>::max_adjacent_cells () const;
 
 // -------------------------------------------------------------------
 // Explicit invalid things...
-template <> 
-const Manifold<2,1> & Triangulation<2, 1>::get_manifold(const types::manifold_id) const;
-template <> 
-const Manifold<3,1> & Triangulation<3, 1>::get_manifold(const types::manifold_id) const;
-template <> 
-const Manifold<3,2> & Triangulation<3, 2>::get_manifold(const types::manifold_id) const;
+template <>
+const Manifold<2,1> &Triangulation<2, 1>::get_manifold(const types::manifold_id) const;
+template <>
+const Manifold<3,1> &Triangulation<3, 1>::get_manifold(const types::manifold_id) const;
+template <>
+const Manifold<3,2> &Triangulation<3, 2>::get_manifold(const types::manifold_id) const;
 
 
 #endif // DOXYGEN

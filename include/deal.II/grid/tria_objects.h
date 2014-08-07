@@ -206,7 +206,7 @@ namespace internal
        * Store manifold ids. This field
        * stores the manifold id of each object, which
        * is a number between 0 and
-       * numbers::invalid_manifold_id-1. 
+       * numbers::invalid_manifold_id-1.
        */
       std::vector<types::manifold_id> manifold_id;
 
