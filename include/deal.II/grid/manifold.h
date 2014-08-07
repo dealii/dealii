@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -344,13 +344,16 @@ private:
 
 
 /**
- *   A chart of dimension chartdim, which is part of a
- *   Manifold<dim,spacedim>.  This object specializes a Manifold of
+ *   This class describes mappings that can be expressed in terms
+ *   of charts. Specifically, this class with its template arguments
+ *   describes a chart of dimension chartdim, which is part of a
+ *   Manifold<dim,spacedim> and is used in an object of type
+ *   Triangulation<dim,spacedim>:  It specializes a Manifold of
  *   dimension chartdim embedded in a manifold of dimension spacedim,
  *   for which you have explicit pull_back and push_forward
  *   transformations.
  *
- *   This is an helper class which is useful when you have an explicit
+ *   This is a helper class which is useful when you have an explicit
  *   map from an Euclidean space of dimension chartdim to an Euclidean
  *   space of dimension spacedim which represents your manifold, i.e.,
  *   when your manifold $\mathcal{M}$ can be represented by a map
@@ -359,7 +362,7 @@ private:
  *   \subset R^{\text{spacedim}}
  *   \f]
  *   (the push_forward() function)
- *   which admits the inverse transformation
+ *   and that admits the inverse transformation
  *   \f[
  *   F^{-1}: \mathcal{M}
  *   \subset R^{\text{spacedim}} \mapsto
@@ -375,15 +378,40 @@ private:
  *   F^{-1}(p_i)).  \f]
  *
  *   Derived classes are required to implement the push_forward() and
- *   the pull_back() methods.
+ *   the pull_back() methods. All other functions required by mappings
+ *   will then be provided by this class.
  *
- *   Notice that the dimenisions #chartdim and #spacedim can be
- *   arbitrary, as long as the transformation from $\mathcal{B}$ to
- *   $\mathcal{M}$ is invertible.
+ *   The dimension arguments #chartdim, #dim and #spacedim must
+ *   satisfy the following relationships:
+ *   @code
+ *      dim <= spacedim
+ *      chartdim <= spacedim
+ *   @endcode
+ *   However, there is no a priori relationship between #dim and
+ *   #chartdim. For example, if you want to describe a mapping
+ *   for an edge (a 1d object) in a 2d triangulation embedded in
+ *   3d space, you could do so by parameterizing it via a line
+ *   @f[
+ *      F: [0,1] \rightarrow {\mathbb R}^3
+ *   @f]
+ *   in which case #chartdim is 1. On the other hand, there is
+ *   no reason why one can't describe this as a mapping
+ *   @f[
+ *      F: {\mathbb R}^3 \rightarrow {\mathbb R}^3
+ *   @f]
+ *   in such a way that the line $[0,1]\times \{0\}\times \{0\}$ happens to be
+ *   mapped onto the edge in question. Here, #chartdim is 3. This may seem
+ *   cumbersome but satisfies the requirements of an invertible function $F$
+ *   just fine as long as it is possible to get from the edge to the pull-back
+ *   space and then back again. Finally, given that we are dealing with a 2d
+ *   triangulation in 3d, one will often have a mapping from, say, the 2d unit
+ *   square or unit disk to the domain in 3d space, and the edge in question
+ *   may simply be the mapped edge of the unit domain in 2d space. In
+ *   this case, #chartdim is 2.
  *
  *   @ingroup manifold
  *
- *   @author Luca Heltai, 2013
+ *   @author Luca Heltai, 2013, 2014
  */
 template <int dim, int spacedim=dim, int chartdim=dim>
 class ManifoldChart: public Manifold<dim,spacedim>
