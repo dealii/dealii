@@ -18,12 +18,20 @@
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
+#if deal_II_dimension <= deal_II_space_dimension 
+
     template class Manifold<deal_II_dimension, deal_II_space_dimension>;
     template class FlatManifold<deal_II_dimension, deal_II_space_dimension>;
 
     template class ManifoldChart<deal_II_dimension, deal_II_space_dimension, 1>;
+# if deal_II_dimension >= 2
     template class ManifoldChart<deal_II_dimension, deal_II_space_dimension, 2>;
+# endif
+# if deal_II_dimension >= 3
     template class ManifoldChart<deal_II_dimension, deal_II_space_dimension, 3>;
+# endif
+
+#endif
   }
 
 
