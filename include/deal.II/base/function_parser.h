@@ -57,8 +57,8 @@ template <typename> class Vector;
  * // FunctionParser with 2 variables and 1 component:
  * FunctionParser<2> fp(1);
  * fp.initialize(variables,
- * expression,
- * constants);
+ *               expression,
+ *               constants);
  *
  * // Point at which we want to evaluate the function
  * Point<2> point(0.0, 4.0);
@@ -67,8 +67,8 @@ template <typename> class Vector;
  * double result = fp.value(point);
  *
  * deallog << "Function '" << expression << "'"
- * << " @ " << point
- * << " is " << result << std::endl;
+ *         << " @ " << point
+ *         << " is " << result << std::endl;
  * @endcode
  * The second example is a bit more complex:
  * @code
@@ -90,8 +90,8 @@ template <typename> class Vector;
  *
  * // And populate it with the newly created objects.
  * vector_function.initialize(variables,
- *      expressions,
- *      constants);
+ *                            expressions,
+ *                            constants);
  *
  * // Point at which we want to evaluate the function
  * Point<3> point(0.0, 1.0, 1.0);
@@ -103,12 +103,12 @@ template <typename> class Vector;
  * vector_function.vector_value(point, result);
  *
  * // We can also only evaluate the 2nd component:
- * double c = vector_function.value(point, 1);
+ * const double c = vector_function.value(point, 1);
  *
  * // Output the evaluated function
  * deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
- * << " @ " << point
- * << " is " << result << std::endl;
+ *         << " at " << point
+ *         << " is " << result << std::endl;
  * @endcode
  *
  * This class overloads the virtual methods value() and vector_value() of the
@@ -189,7 +189,7 @@ class FunctionParser : public Function<dim>
      * been called, then an exception is thrown.
      */
     FunctionParser (const unsigned int n_components = 1,
-        const double       initial_time = 0.0);
+                    const double       initial_time = 0.0);
 
     /**
      * Destructor. Explicitly delete the FunctionParser objects (there is one
@@ -245,9 +245,9 @@ class FunctionParser : public Function<dim>
      * defaults to false, i.e. do not consider time.
      */
     void initialize (const std::string              &vars,
-        const std::vector<std::string> &expressions,
-        const ConstMap                 &constants,
-        const bool time_dependent = false);
+                     const std::vector<std::string> &expressions,
+                     const ConstMap                 &constants,
+                     const bool time_dependent = false);
 
     /**
      * Same as above, but with an additional parameter: <b>use_degrees</b>.
@@ -259,10 +259,10 @@ class FunctionParser : public Function<dim>
      * argument instead (which has the default use_degrees=false).
      */
     void initialize (const std::string              &vars,
-        const std::vector<std::string> &expressions,
-        const ConstMap                 &constants,
-        const bool time_dependent,
-        const bool use_degrees) DEAL_II_DEPRECATED;
+                     const std::vector<std::string> &expressions,
+                     const ConstMap                 &constants,
+                     const bool time_dependent,
+                     const bool use_degrees) DEAL_II_DEPRECATED;
 
 
     /**
@@ -273,11 +273,11 @@ class FunctionParser : public Function<dim>
      * then 3/2cm is 3 /(2*10).
      */
     void initialize (const std::string              &vars,
-        const std::vector<std::string> &expressions,
-        const ConstMap                 &constants,
-        const ConstMap                 &units,
-        const bool time_dependent = false,
-        const bool use_degrees = false) DEAL_II_DEPRECATED;
+                     const std::vector<std::string> &expressions,
+                     const ConstMap                 &constants,
+                     const ConstMap                 &units,
+                     const bool time_dependent = false,
+                     const bool use_degrees = false) DEAL_II_DEPRECATED;
 
     /**
      * Initialize the function. Same as above, but accepts a string rather
@@ -288,9 +288,9 @@ class FunctionParser : public Function<dim>
      * function.
      */
     void initialize (const std::string &vars,
-        const std::string &expression,
-        const ConstMap    &constants,
-        const bool time_dependent = false);
+                     const std::string &expression,
+                     const ConstMap    &constants,
+                     const bool time_dependent = false);
 
     /**
      * Same as above, but with an additional parameter: <b>use_degrees</b>.
@@ -302,20 +302,20 @@ class FunctionParser : public Function<dim>
      * argument instead (which has the default use_degrees=false).
      */
     void initialize (const std::string &vars,
-        const std::string &expression,
-        const ConstMap    &constants,
-        const bool time_dependent,
-        const bool use_degrees) DEAL_II_DEPRECATED;
+                     const std::string &expression,
+                     const ConstMap    &constants,
+                     const bool time_dependent,
+                     const bool use_degrees) DEAL_II_DEPRECATED;
+
     /**
      * Initialize the function. Same as above, but with <b>units</b>.
      */
-
     void initialize (const std::string &vars,
-        const std::string &expression,
-        const ConstMap    &constants,
-        const ConstMap    &units,
-        const bool time_dependent = false,
-        const bool use_degrees = false) DEAL_II_DEPRECATED;
+                     const std::string &expression,
+                     const ConstMap    &constants,
+                     const ConstMap    &units,
+                     const bool time_dependent = false,
+                     const bool use_degrees = false) DEAL_II_DEPRECATED;
 
     /**
      * A function that returns default names for variables, to be used in the
@@ -333,7 +333,7 @@ class FunctionParser : public Function<dim>
      * first component.
      */
     virtual double value (const Point<dim>   &p,
-        const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const;
 
     /**
      * Return all components of a vector-valued function at the given point @p
@@ -343,24 +343,25 @@ class FunctionParser : public Function<dim>
      * #n_components.
      */
     virtual void vector_value (const Point<dim>   &p,
-        Vector<double>     &values) const;
+                               Vector<double>     &values) const;
 
     /**
      * @addtogroup Exceptions
      * @{
      */
     DeclException2 (ExcParseError,
-        int, char *,
-        << "Parsing Error at Column " << arg1
-        << ". The parser said: " << arg2);
+                    int, char *,
+                    << "Parsing Error at Column " << arg1
+                    << ". The parser said: " << arg2);
 
     DeclException2 (ExcInvalidExpressionSize,
-        int, int,
-        << "The number of components (" << arg1
-        << ") is not equal to the number of expressions ("
-        << arg2 << ").");
+                    int, int,
+                    << "The number of components (" << arg1
+                    << ") is not equal to the number of expressions ("
+                    << arg2 << ").");
 
     //@}
+
   private:
 #ifdef DEAL_II_WITH_MUPARSER
     /**
@@ -376,7 +377,7 @@ class FunctionParser : public Function<dim>
      * keep track of all the constants, required to initialize fp in each
      * thread
      */
-    std::map< std::string, double > constants;
+    std::map<std::string, double> constants;
     /**
      * variable names, required to initialize fp in each thread
      */
