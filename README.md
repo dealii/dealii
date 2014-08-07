@@ -37,3 +37,8 @@ Further information:
 
 For further information have a look at ./doc/index.html or at
 http://www.dealii.org.
+
+Continuous Integration Status:
+------------------------
+
+[![Build Status](https://travis-ci.org/dealii/dealii.png)](https://travis-ci.org/dealii/dealii)
