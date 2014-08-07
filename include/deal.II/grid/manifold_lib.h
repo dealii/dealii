@@ -209,10 +209,14 @@ public:
    * spacedim components, and a pull_back function of chartdim
    * components. See the documentation of the base class ManifoldChart
    * for the meaning of the optional #periodicity argument.
+   *
+   * The tolerance argument is used in debug mode to actually check
+   * that the two functions are one the inverse of the other.
    */
   FunctionManifoldChart(const Function<chartdim> &push_forward_function,
 			const Function<spacedim> &pull_back_function,
-			const Point<chartdim> periodicity=Point<chartdim>());
+			const Point<chartdim> periodicity=Point<chartdim>(),
+			const double tolerance=1e-10);
 
   /**
    * Expressions constructor. Takes the expressions of the
@@ -224,14 +228,18 @@ public:
    * The strings should be the readable by the default constructor of
    * the FunctionParser classes. You can specify custom variable
    * expressions with the last two optional arguments. If you don't,
-   * the default names are used, i.e., "x,y,z"
+   * the default names are used, i.e., "x,y,z".
+   *
+   * The tolerance argument is used in debug mode to actually check
+   * that the two functions are one the inverse of the other.
    */
   FunctionManifoldChart(const std::string push_forward_expression,
 			const std::string pull_back_expression,
 			const Point<chartdim> periodicity=Point<chartdim>(), 
 			const typename FunctionParser<spacedim>::ConstMap = typename FunctionParser<spacedim>::ConstMap(),
 			const std::string chart_vars=FunctionParser<chartdim>::default_variable_names(),
-			const std::string space_vars=FunctionParser<spacedim>::default_variable_names());
+			const std::string space_vars=FunctionParser<spacedim>::default_variable_names(),
+			const double tolerance=1e-10);
 
   /**
    * If needed, we delete the pointers we own.
@@ -271,9 +279,21 @@ private:
    */
   SmartPointer<const Function<spacedim>, 
 	       FunctionManifoldChart<dim,spacedim,chartdim> > pull_back_function;
-
+  
   /**
-   * Check ownership of the smart pointers.
+   * Relative tolerance. In debug mode, we check that the two
+   * functions provided at construction time are actually one the
+   * inverse of the other. This value is used as relative tolerance in
+   * this check.
+   */
+  const double tolerance;
+  
+  /**
+   * Check ownership of the smart pointers. Indicates whether this
+   * class is the owner of the objects pointed to by the previous two
+   * member variables.  This value is set in the constructor of the
+   * class. If #true, then the destructor will delete the function
+   * objects pointed to be the two pointers.
    */
   const bool owns_pointers;
 };

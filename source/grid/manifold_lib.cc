@@ -211,10 +211,12 @@ template <int dim, int spacedim, int chartdim>
 FunctionManifoldChart<dim,spacedim,chartdim>::FunctionManifoldChart
 (const Function<chartdim> &push_forward_function,
  const Function<spacedim> &pull_back_function,
- const Point<chartdim> periodicity):
+ const Point<chartdim> periodicity,
+ const double tolerance):
   ManifoldChart<dim,spacedim,chartdim>(periodicity),
   push_forward_function(&push_forward_function),
   pull_back_function(&pull_back_function),
+  tolerance(tolerance),
   owns_pointers(false)
 {
   AssertDimension(push_forward_function.n_components, spacedim);
@@ -228,9 +230,11 @@ FunctionManifoldChart<dim,spacedim,chartdim>::FunctionManifoldChart
  const Point<chartdim> periodicity, 
  const typename FunctionParser<spacedim>::ConstMap const_map,
  const std::string chart_vars, 
- const std::string space_vars) :
+ const std::string space_vars,
+ const double tolerance) :
   ManifoldChart<dim,spacedim,chartdim>(periodicity),
   const_map(const_map),
+  tolerance(tolerance),
   owns_pointers(true)
 {
   FunctionParser<chartdim> * pf = new FunctionParser<chartdim>(spacedim);
@@ -268,7 +272,9 @@ FunctionManifoldChart<dim,spacedim,chartdim>::push_forward(const Point<chartdim>
   Vector<double> pb(chartdim);
   pull_back_function->vector_value(result, pb);
   for (unsigned int i=0; i<chartdim; ++i)
-    Assert(abs(pb[i]-chart_point[i]) < 1e-10*chart_point.norm(),
+    Assert( (chart_point.norm() > tolerance && 
+	     (abs(pb[i]-chart_point[i]) < tolerance*chart_point.norm() ) ||
+	     (abs(pb[i]-chart_point[i]) < tolerance) ),
            ExcMessage("The push forward is not the inverse of the pull back! Bailing out."));
 #endif
 
