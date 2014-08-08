@@ -146,7 +146,7 @@ void FunctionParser<dim>:: init_muparser() const
     return;
   
   fp.get().resize(this->n_components);
-  vars.get().resize(var_names.size());
+  vars.get().resize(var_names.size() + additional_variable_names.size());
   for (unsigned int component=0; component<this->n_components; ++component)
     {
       for (std::map< std::string, double >::const_iterator constant = constants.begin();
@@ -157,6 +157,9 @@ void FunctionParser<dim>:: init_muparser() const
 
       for (unsigned int iv=0;iv<var_names.size();++iv)
 	fp.get()[component].DefineVar(var_names[iv].c_str(), &vars.get()[iv]);
+      
+      for (unsigned int i=0; i<additional_variable_names.size(); ++i)
+        fp.get()[component].DefineVar(additional_variable_names[i].c_str(), &vars.get()[i+var_names.size()]);
 
       // define some compatibility functions:
       fp.get()[component].DefineFun("if",internal::mu_if, true);
@@ -271,9 +274,9 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
   this->fp.clear(); // this will reset all thread-local objects
   
   this->constants = constants;
-  this->var_names = Utilities::split_string_list(variables, ',');
+  std::vector<std::string> all_vars = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
-  AssertThrow(((time_dependent)?dim+1:dim) == var_names.size(),
+  AssertThrow(all_vars.size() >= ((time_dependent)?dim+1:dim),
 	      ExcMessage("wrong number of variables"));
   AssertThrow(!use_degrees, ExcNotImplemented());
 
@@ -306,7 +309,16 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
     n_vars = dim+1;
   else
     n_vars = dim;
+  
+  this->var_names.resize(n_vars);
+  
+  for (unsigned int i=0; i<n_vars; ++i)
+    this->var_names[i]=all_vars[i];
 
+  additional_variable_names.resize(all_vars.size() - n_vars);
+  for (unsigned int i=0; i<all_vars.size() - n_vars; ++i)
+    additional_variable_names[i] = all_vars[i + n_vars];
+  
   init_muparser();
   
   // Now set the initialization bit.
@@ -371,6 +383,8 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
   Assert (initialized==true, ExcNotInitialized());
   Assert (component < this->n_components,
           ExcIndexRange(component, 0, this->n_components));
+  Assert (additional_variable_names.size() == 0, 
+          ExcMessage("value() can only be used if there are no additional variables"));
 
   // initialize if not done so on this thread yet:
   init_muparser();
@@ -397,6 +411,45 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
 }
 
 
+template <int dim>
+double FunctionParser<dim>::value (const Point<dim>   &p,
+                          const unsigned int  component,
+                          const std::vector<double> & additional_variable_values
+                 ) const
+{
+  Assert (initialized==true, ExcNotInitialized());
+  Assert (component < this->n_components,
+          ExcIndexRange(component, 0, this->n_components));
+  Assert (additional_variable_names.size() == additional_variable_values.size(), 
+          ExcMessage("wrong number of additional variables"));
+  
+  // initialize if not done so on this thread yet:
+  init_muparser();
+
+  for (unsigned int i=0; i<dim; ++i)
+    vars.get()[i] = p(i);
+  if (dim != n_vars)
+    vars.get()[dim] = this->get_time();
+  for (unsigned int i=0; i<additional_variable_values.size(); ++i)
+    vars.get()[n_vars+i] = additional_variable_values[i];
+
+  try
+    {
+      return fp.get()[component].Eval();
+    }
+  catch (mu::ParserError &e)
+    {
+      std::cerr << "Message:  " << e.GetMsg() << "\n";
+      std::cerr << "Formula:  " << e.GetExpr() << "\n";
+      std::cerr << "Token:    " << e.GetToken() << "\n";
+      std::cerr << "Position: " << e.GetPos() << "\n";
+      std::cerr << "Errc:     " << e.GetCode() << std::endl;      
+      AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
+      return 0.0;
+    }  
+  
+}
+                 
 
 template <int dim>
 void FunctionParser<dim>::vector_value (const Point<dim> &p,
