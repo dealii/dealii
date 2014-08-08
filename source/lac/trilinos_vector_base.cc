@@ -295,13 +295,13 @@ namespace TrilinosWrappers
         AssertThrow (size() == v.size(),
                      ExcDimensionMismatch (size(), v.size()));
 
-#if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
+#if DEAL_II_TRILINOS_VERSION_GTE(11,11,0)
          Epetra_Import data_exchange (vector->Map(), v.vector->Map());
-         int ierr = vector->Import(*v.vector, data_exchange, Add);
+         int ierr = vector->Import(*v.vector, data_exchange, Epetra_AddLocalAlso);
          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
          last_action = Add;
 #else
-        // In versions older than 11.9 the Import function is broken for adding
+        // In versions older than 11.11 the Import function is broken for adding
         // Hence, we provide a workaround in this case
 
         Epetra_MultiVector dummy(vector->Map(), 1, false);
