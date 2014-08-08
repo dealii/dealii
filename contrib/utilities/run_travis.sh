@@ -6,7 +6,7 @@ case $1 in
 #    ;;
 build)
     echo "Running build tests."
-    mkdir build_test 
+    mkdir build_test
     cd build_test
     ctest -DCMAKE_BUILD_TYPE=$2 -V -j4 -S ../tests/run_buildtest.cmake
     ;;

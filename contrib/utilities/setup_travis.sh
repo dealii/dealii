@@ -1,7 +1,7 @@
 #/bin/sh -f
- 
+
 # things to do for travis-ci in the before_install section
- 
+
 if ( test "`uname -s`" = "Darwin" )
 then
   #cmake v2.8.12 is installed on the Mac workers now
