@@ -89,25 +89,24 @@ ADD_CUSTOM_COMMAND(
 #
 # Finalize the doxygen configuration:
 #
-file(GLOB _doxygen_input
-  ${CMAKE_CURRENT_BINARY_DIR}/tutorial/*.h
-  )
+
+SET(_doxygen_input
+  ${CMAKE_CURRENT_SOURCE_DIR}/headers/
+)
+
 LIST(APPEND _doxygen_input
   ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_BINARY_DIR}/include/
-  ${CMAKE_CURRENT_SOURCE_DIR}/headers/
   ${CMAKE_SOURCE_DIR}/doc/news/
   ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/
   )
-TO_STRING(_doxygen_input_string ${_doxygen_input})
 
 SET(_doxygen_image_path
   ${CMAKE_CURRENT_SOURCE_DIR}/images
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
   ${CMAKE_CURRENT_BINARY_DIR}/images
   )
-TO_STRING(_doxygen_image_path_string ${_doxygen_image_path})
 
 file(GLOB _doxygen_depend
   ${CMAKE_CURRENT_SOURCE_DIR}/headers/*.h
@@ -129,6 +128,9 @@ FOREACH(_step ${DEAL_II_STEPS})
     ${CMAKE_CURRENT_BINARY_DIR}/tutorial/${_step}.h
     )
 ENDFOREACH()
+
+TO_STRING(_doxygen_image_path_string ${_doxygen_image_path})
+TO_STRING(_doxygen_input_string ${_doxygen_input})
 
 FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
   "
