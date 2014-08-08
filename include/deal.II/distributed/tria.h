@@ -678,17 +678,18 @@ namespace parallel
                                                             void *)> &pack_callback);
 
       /**
-       * The given function is called for each new active cell and
-       * supplies a pointer to the data saved with
-       * register_data_attach().
-       * 
-       * This needs to be called after execute_coarsening_and_refinement()
+       * The supplied callback function is called for each newly locally owned
+       * cell and corresponding data saved with register_data_attach().  This
+       * function needs to be called after execute_coarsening_and_refinement()
        * with the offset returned by register_data_attach().
-       * 
+       *
        * The CellStatus will indicate if the cell was refined, coarsened, or
-       * persisted unchanged. Note that contrary to during
-       * register_data_attach() you can now access the children if the status
-       * is CELL_REFINE but not for CELL_COARSEN.
+       * persisted unchanged. The cell_iterator will either by an active,
+       * locally owned cell (if the cell was not refined), or the immediate
+       * parent if it was refined during
+       * execute_coarsening_and_refinement(). Therefore, contrary to during
+       * register_data_attach(), you can now access the children if the status
+       * is CELL_REFINE but no longer for callbacks with status CELL_COARSEN.
        */
       void
       notify_ready_to_unpack (const unsigned int offset,
