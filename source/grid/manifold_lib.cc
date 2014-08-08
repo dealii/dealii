@@ -226,10 +226,10 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
 (const std::string push_forward_expression,
- const std::string pull_back_expression, 
- const Point<chartdim> periodicity, 
+ const std::string pull_back_expression,
+ const Point<chartdim> periodicity,
  const typename FunctionParser<spacedim>::ConstMap const_map,
- const std::string chart_vars, 
+ const std::string chart_vars,
  const std::string space_vars,
  const double tolerance) :
   ChartManifold<dim,spacedim,chartdim>(periodicity),
@@ -237,8 +237,8 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
   tolerance(tolerance),
   owns_pointers(true)
 {
-  FunctionParser<chartdim> * pf = new FunctionParser<chartdim>(spacedim);
-  FunctionParser<spacedim> * pb = new FunctionParser<spacedim>(chartdim);
+  FunctionParser<chartdim> *pf = new FunctionParser<chartdim>(spacedim);
+  FunctionParser<spacedim> *pb = new FunctionParser<spacedim>(chartdim);
   pf->initialize(chart_vars, push_forward_expression, const_map);
   pb->initialize(space_vars, pull_back_expression, const_map);
   push_forward_function = pf;
@@ -246,18 +246,20 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
 }
 
 template <int dim, int spacedim, int chartdim>
-FunctionManifold<dim,spacedim,chartdim>::~FunctionManifold() {
-  if(owns_pointers == true) {
-    const Function<chartdim> * pf = push_forward_function;
-    push_forward_function = 0;
-    delete pf;
-    
-    const Function<spacedim> * pb = pull_back_function;
-    pull_back_function = 0;
-    delete pb;
-  }
+FunctionManifold<dim,spacedim,chartdim>::~FunctionManifold()
+{
+  if (owns_pointers == true)
+    {
+      const Function<chartdim> *pf = push_forward_function;
+      push_forward_function = 0;
+      delete pf;
+
+      const Function<spacedim> *pb = pull_back_function;
+      pull_back_function = 0;
+      delete pb;
+    }
 }
-								   
+
 template <int dim, int spacedim, int chartdim>
 Point<spacedim>
 FunctionManifold<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &chart_point) const
@@ -272,9 +274,9 @@ FunctionManifold<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &cha
   Vector<double> pb(chartdim);
   pull_back_function->vector_value(result, pb);
   for (unsigned int i=0; i<chartdim; ++i)
-    Assert( (chart_point.norm() > tolerance && 
-	     (abs(pb[i]-chart_point[i]) < tolerance*chart_point.norm() ) ||
-	     (abs(pb[i]-chart_point[i]) < tolerance) ),
+    Assert((chart_point.norm() > tolerance &&
+            (abs(pb[i]-chart_point[i]) < tolerance*chart_point.norm())) ||
+           (abs(pb[i]-chart_point[i]) < tolerance),
            ExcMessage("The push forward is not the inverse of the pull back! Bailing out."));
 #endif
 
