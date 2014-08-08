@@ -560,6 +560,15 @@
 #endif
 
 
+/**********************************************
+ * Configured in configure_opencascade.cmake: *
+ **********************************************/
+
+#cmakedefine DEAL_II_WITH_OPENCASCADE
+
+
+
+
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>
 

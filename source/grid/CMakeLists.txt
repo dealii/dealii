@@ -25,6 +25,7 @@ SET(_src
   intergrid_map.cc
   manifold.cc
   manifold_lib.cc
+  occ_utilities.cc
   persistent_tria.cc
   tria_accessor.cc
   tria_boundary.cc
