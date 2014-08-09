@@ -642,26 +642,6 @@ public:
   void condense (BlockSparseMatrix<number> &matrix) const;
 
   /**
-   * Condense the given vector @p uncondensed into @p condensed. It is the
-   * user's responsibility to guarantee that all entries of @p condensed be
-   * zero. Note that this function does not take any inhomogeneity into
-   * account and throws an exception in case there are any
-   * inhomogeneities. Use the function using both a matrix and vector for that
-   * case.
-   *
-   * The @p VectorType may be a Vector<float>, Vector<double>,
-   * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
-   * any other type having the same interface.
-   *
-   * @deprecated The functions converting an uncondensed matrix into
-   * its condensed form are deprecated. Use the functions doing the
-   * in-place condensation leaving the size of the linear system unchanged.
-   */
-  template <class VectorType>
-  void condense (const VectorType &uncondensed,
-                 VectorType       &condensed) const DEAL_II_DEPRECATED;
-
-  /**
    * Condense the given vector in-place. The @p VectorType may be a
    * Vector<float>, Vector<double>, BlockVector<tt><...></tt>, a PETSc or
    * Trilinos vector wrapper class, or any other type having the same
@@ -669,9 +649,22 @@ public:
    * account and throws an exception in case there are any
    * inhomogeneities. Use the function using both a matrix and vector for that
    * case.
+   *
+   * @note This function does not work for MPI vectors. Use condense() with
+   * two vector arguments instead.
    */
   template <class VectorType>
   void condense (VectorType &vec) const;
+
+  /**
+   * The function copies and condenses values from @p vec_ghosted into @p
+   * output. In a serial code it is equivalent to calling condense (vec). If
+   * called in parallel, @p vec_ghosted is supposed to contain ghost elements
+   * while @p output should not.
+   */
+  template <class VectorType>
+  void condense (const VectorType &vec_ghosted,
+                 VectorType       &output) const;
 
   /**
    * Condense a given matrix and a given vector. The associated matrix struct
