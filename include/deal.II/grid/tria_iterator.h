@@ -473,72 +473,52 @@ public:
   /**@name Advancement of iterators*/
   /*@{*/
   /**
-   *  Prefix <tt>++</tt> operator: <tt>++i</tt>. This
+   *  Prefix <tt>++</tt> operator: <tt>++iterator</tt>. This
    *  operator advances the iterator to
    *  the next element and returns
    *  a reference to <tt>*this</tt>.
-   *
-   *  The next element is next on this
-   *  level if there are more. If the
-   *  present element is the last on
-   *  this level, the first on the
-   *  next level is accessed. This is only
-   *  valid for iterators pointing to cells,
-   *  faces have no level.
    */
   TriaRawIterator &operator ++ ();
 
   /**
-   *  Postfix <tt>++</tt> operator: <tt>i++</tt>. This
+   *  Postfix <tt>++</tt> operator: <tt>iterator++</tt>. This
    *  operator advances the iterator to
    *  the next element, but
    *  returns an iterator to the element
-   *  priviously pointed to. Since this
+   *  previously pointed to.
+   *
+   *  Since this operation
    *  involves a temporary and a copy
    *  operation and since an
    *  @p iterator is quite a large
    *  object for a pointer, use the
-   *  prefix operator <tt>++i</tt> whenever
-   *  possible, especially in the head
+   *  prefix operator <tt>++iterator</tt> whenever
+   *  possible, especially in the header
    *  of for loops
-   *  (<tt>for (; i!=end; ++i)</tt>) since there
+   *  (<tt>for (; iterator!=end; ++iterator)</tt>) since there
    *  you normally never need the
    *  returned value.
    */
   TriaRawIterator operator ++ (int);
 
   /**
-   *  Prefix @p -- operator: @p --i. This
-   *  operator advances the iterator to
+   *  Prefix @p -- operator: @p --iterator. This
+   *  operator moves the iterator to
    *  the previous element and returns
    *  a reference to <tt>*this</tt>.
-   *
-   *  The previous element is previous on
-   *  this level if <tt>index>0</tt>. If the
-   *  present element is the first on
-   *  this level, the last on the
-   *  previous level is accessed. This is only
-   *  valid for iterators pointing to cells,
-   *  faces have no level.
    */
   TriaRawIterator &operator -- ();
 
   /**
-   *  Postfix @p -- operator: @p i--. This
-   *  operator advances the iterator to
+   *  Postfix @p -- operator: @p iterator--. This
+   *  operator moves the iterator to
    *  the previous element, but
    *  returns an iterator to the element
-   *  priviously pointed to. Since this
-   *  involves a temporary and a copy
-   *  operation and since an
-   *  @p iterator is quite a large
-   *  object for a pointer, use the
-   *  prefix operator @p --i whenever
-   *  possible, especially in the head
-   *  of for loops
-   *  (<tt>for (; i!=end; --i)</tt>) since there
-   *  you normally never need the
-   *  returned value.
+   *  previously pointed to.
+   *
+   *  The same applies as for the postfix operator++: If possible,
+   *  avoid it by using the prefix operator form to avoid the use
+   *  of a temporary variable.
    */
   TriaRawIterator operator -- (int);
   /*@}*/
