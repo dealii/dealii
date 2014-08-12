@@ -165,6 +165,19 @@ namespace OpenCASCADE
 			 const double tolerance=1e-7);
 
   /**
+   * Intersect a line passing through the given #origin point along
+   * #direction and the given topological shape. If there is more than
+   * one intersection, it will return the closest one.
+   *
+   * The optional #tolerance parameter is used to compute distances.
+   */
+  Point<3> axis_intersection(const TopoDS_Shape in_shape, 
+			     const Point<3> origin, 
+			     const Point<3> direction, 
+			     const double tolerance=1e-7);
+  
+
+  /**
    * Convert OpenCASCADE point into a Point<3>.
    */
   inline Point<3> Pnt(const gp_Pnt &p);
@@ -185,8 +198,34 @@ namespace OpenCASCADE
   inline bool point_compare(const dealii::Point<3> &p1, const dealii::Point<3> &p2,
 			    const dealii::Point<3> direction=Point<3>(),
 			    const double tolerance=1e-10);
-				      
-}
+
+
+  /**
+   * Exception thrown when the point specified as argument does not
+   * lie between #tolerance from the given TopoDS_Shape.
+   */
+  DeclException1 (ExcPointNotOnManifold,
+		  Point<3>,
+		  <<"The point [ "<<arg1<<" ] is not on the manifold.");
+
+  /**
+   * Exception thrown when the point specified as argument cannot be
+   * projected to the manifold.
+   */			      
+  DeclException1 (ExcProjectionFailed, 
+		  Point<3>,
+		  <<"Projection of point [ "<< arg1
+		  << " ] failed.");
+
+  /**
+   * Thrown when internal OpenCASCADE utilities fail to return the OK
+   * status.
+   */
+  DeclException1 (ExcOCCError, 
+		  IFSelect_ReturnStatus, 
+		  <<"An OpenCASCADE routine failed with return status "
+		  <<arg1);
+} 
 /*@}*/
 
 DEAL_II_NAMESPACE_CLOSE

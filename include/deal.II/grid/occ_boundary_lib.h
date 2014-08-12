@@ -73,13 +73,6 @@ namespace OpenCASCADE
     project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
 			 const Point<spacedim> &candidate) const;
 
-    /**
-     * Exception thrown when the point specified as argument does not
-     * lie between #tolerance from the given TopoDS_Shape.
-     */
-    DeclException1 (ExcPointNotOnManifold,
-		    Point<spacedim>,
-		    <<"The point [ "<<arg1<<" ] is not on the manifold.");
 
   private:
     /**
@@ -89,6 +82,63 @@ namespace OpenCASCADE
      * TopoDS_Shape with the geometry contained in the IGES file.
      */ 
     const TopoDS_Shape sh;
+
+    /**
+     * Relative tolerance used by this class to compute distances.
+     */
+    const double tolerance;
+  };
+
+  /**
+   * A Boundary object based on OpenCASCADE TopoDS_Shape where new
+   * points are first computed using the FlatManifold class, and then
+   * projected along the direction given at construction time, using
+   * OpenCASCADE utilities.
+   *
+   * This class makes no assumptions on the shape you pass to it, and
+   * the topological dimension of the Manifold is inferred from the
+   * TopoDS_Shape itself. In debug mode there is a sanity check to
+   * make sure that the surrounding points (the ones used in
+   * project_to_manifold()) actually live on the Manifold, i.e.,
+   * calling OpenCASCADE::closest_point() on those points leaves them
+   * untouched. If this is not the case, an ExcPointNotOnManifold is
+   * thrown.
+   * 
+   * @author Luca Heltai, Andrea Mola, 2011--2014.
+   */
+  template <int dim, int spacedim>
+  class AxisProjectionBoundary : public Boundary<dim,spacedim> {
+    public:
+    AxisProjectionBoundary(const TopoDS_Shape sh, 
+			   const Point<3> direction, 
+			   const double tolerance=1e-7);
+    
+    /**
+     * Perform the actual projection onto the manifold. This function,
+     * in debug mode, checks that each of the #surrounding_points is
+     * within tolerance from the given TopoDS_Shape. If this is not
+     * the case, an exception is thrown.
+     *
+     * The projected point is computed using OpenCASCADE normal
+     * projection algorithms.
+     */
+    virtual Point<spacedim>
+    project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
+			 const Point<spacedim> &candidate) const;
+
+  private:
+    /**
+     * The topological shape which is used internally to project
+     * points. You can construct one such a shape by calling the
+     * OpenCASCADE::read_IGES() function, which will create a
+     * TopoDS_Shape with the geometry contained in the IGES file.
+     */ 
+    const TopoDS_Shape sh;
+
+    /**
+     * Direction used to project new points on the shape. 
+     */
+    const Point<3> direction;
 
     /**
      * Relative tolerance used by this class to compute distances.

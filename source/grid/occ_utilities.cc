@@ -26,10 +26,12 @@
 #include <TColStd_SequenceOfTransient.hxx>
 #include <TColStd_HSequenceOfTransient.hxx>
 #include <TopExp_Explorer.hxx>
-// #include <gp_Pnt.hxx>
-// #include <gp_Vec.hxx>
+#include <gp_Pnt.hxx>
+#include <gp_Lin.hxx>
+#include <gp_Vec.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <IntCurvesFace_ShapeIntersector.hxx>
 // #include <Standard_Real.hxx>
 // #include <Standard_Integer.hxx>
 // #include <BRep_Tool.hxx>
@@ -243,6 +245,29 @@ namespace OpenCASCADE
    }
 
 
+  Point<3> axis_intersection(const TopoDS_Shape in_shape, 
+			     const Point<3> origin, 
+			     const Point<3> direction, 
+			     const double tolerance)
+  {
+    // translating original Point<dim> to gp point
+
+    gp_Pnt P0 = Pnt(origin);
+    gp_Ax1 gpaxis(P0, gp_Dir(direction(0), direction(1), direction(2)));
+    gp_Lin line(gpaxis);
+
+    // destination point
+    gp_Pnt Pproj(0.0,0.0,0.0);
+
+    // we prepare now the surface for the projection we get the whole
+    // shape from the iges model
+    IntCurvesFace_ShapeIntersector Inters;
+    Inters.Load(in_shape,tolerance);
+	
+    Inters.PerformNearest(line,-RealLast(),+RealLast());
+    Assert(Inters.IsDone(), ExcMessage("Could not project point."));
+    return Pnt(Inters.Pnt(1));
+  }
 
   TopoDS_Edge interpolation_curve(std::vector<Point<3> > &curve_points,
 				   const Point<3> direction,
