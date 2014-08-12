@@ -24,6 +24,7 @@
 
 #include <string>
 #include <TopoDS_Shape.hxx>
+#include <TopoDS_Edge.hxx>
 #include <IFSelect_ReturnStatus.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_Curve.hxx>
@@ -109,6 +110,14 @@ namespace OpenCASCADE
   TopoDS_Shape read_IGES(const std::string &filename, 
 			 const double scale_factor=1e-3);
   
+ /**
+   * Write the given topological shape into an IGES file.
+   */
+  void write_IGES(const TopoDS_Shape &shape, 
+		  const std::string &filename);
+		  
+  
+
   /**
    * Perform the intersection of the given topological shape with the
    * plane $c_x x + c_y y + c_z z +c = 0$. The returned topological
