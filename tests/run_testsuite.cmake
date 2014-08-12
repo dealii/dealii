@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013, 2014 by the deal.II authors
+## Copyright (C) 2013 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -35,7 +35,7 @@
 #
 #
 #   CTEST_SOURCE_DIRECTORY
-#     - The source directory of deal.II 
+#     - The source directory of deal.II
 #     - If unspecified, "../" relative to the location of this script is
 #       used. If this is not a source directory, an error is thrown.
 #
@@ -59,14 +59,13 @@
 #       "Experimental"     - all tests that are not specifically "build" or
 #                            "regression" tests should go into this track
 #
-#       "Build Tests"      - Build tests that configure and build in a
-#                            clean directory and run the build tests
-#                            "build_tests/*"
-#
-#       "Nightly"          - Reserved for nightly regression tests for
-#                            build bots on various architectures
+#       "Build Tests"      - Build tests that configure and build in a clean
+#                            directory and run exactly all build tests matching
+#                            "build_tests/.*"
 #
 #       "Regression Tests" - Reserved for the "official" regression tester
+#
+#       "Continuous"       - Reserved for the "official" regression tester
 #
 #   CONFIG_FILE
 #     - A configuration file (see ../docs/development/Config.sample)
@@ -109,8 +108,8 @@ ENDIF()
 
 IF( NOT "${TRACK}" STREQUAL "Experimental"
     AND NOT "${TRACK}" STREQUAL "Build Tests"
-    AND NOT "${TRACK}" STREQUAL "Nightly"
-    AND NOT "${TRACK}" STREQUAL "Regression Tests" )
+    AND NOT "${TRACK}" STREQUAL "Regression Tests"
+    AND NOT "${TRACK}" STREQUAL "Continuous" )
   MESSAGE(FATAL_ERROR "
 Unknown TRACK \"${TRACK}\" - see the manual for valid values.
 "
@@ -240,11 +239,11 @@ ENDIF()
 
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
 
-IF( "${TRACK}" STREQUAL "Regression Tests"
+IF( TRACK MATCHES "^(Regression Tests|Continuous)$"
     AND NOT CTEST_SITE MATCHES "^(simserv04|tester)$" )
   MESSAGE(FATAL_ERROR "
 I'm sorry ${CTEST_SITE}, I'm afraid I can't do that.
-The TRACK \"Regression Tests\" is not for you.
+The TRACK \"Regression Tests\" or \"Continuous\" is not for you.
 "
     )
 ENDIF()
@@ -582,4 +581,4 @@ IF("${_res}" STREQUAL "0")
   MESSAGE("-- Submission successful. Goodbye!")
 ENDIF()
 
-# .oO( This script is freaky 585 lines long... )
+# .oO( This script is freaky 584 lines long... )

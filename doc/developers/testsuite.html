@@ -820,17 +820,16 @@ TRACK
   - The track the test should be submitted to. Defaults to "Experimental".
     Possible values are:
 
-    "Experimental"     - all tests that are not specifically "build" or
-                         "regression" tests should go into this track
+    "Experimental"     - all tests that are not specifically "build" tests
+                         should go into this track
 
-    "Build Tests"      - Build tests that configure and build in a
-                         clean directory and run the build tests
-                         "build_tests/*"
-
-    "Nightly"          - Reserved for nightly regression tests for
-                         build bots on various architectures
+    "Build Tests"      - Build tests that configure and build in a clean
+                         directory and run exactly all build tests matching
+                         "build_tests/.*"
 
     "Regression Tests" - Reserved for the regression tester
+
+    "Continuous"       - Reserved for the regression tester
 
 CONFIG_FILE
   - A configuration file (see docs/development/Config.sample)
