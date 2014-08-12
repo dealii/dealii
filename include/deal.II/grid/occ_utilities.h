@@ -18,6 +18,8 @@
 #ifndef __deal2__occ_utilities_h
 #define __deal2__occ_utilities_h
 
+#include <deal.II/base/config.h>
+
 #ifdef DEAL_II_WITH_OPENCASCADE
 
 #include <string>
@@ -27,7 +29,7 @@
 #include <Geom_Curve.hxx>
 #include <gp_Pnt.hxx>
 
-#include <base/point.h>
+#include <deal.II/base/point.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -123,18 +125,28 @@ namespace OpenCASCADE
   
   /**
    * Creates a 3D smooth BSpline curve passing through the points in
-   * the assigned vector. The points are reordered internally
-   * according to their scalar product with the direction, if
-   * direction is different from zero, otherwise they are used as
+   * the assigned vector, and store it in the returned TopoDS_Shape
+   * (which is of type TopoDS_Edge). The points are reordered
+   * internally according to their scalar product with the direction,
+   * if direction is different from zero, otherwise they are used as
    * passed. Notice that this function changes the input points if
    * required by the algorithm.
    *
    * This class is used to interpolate a BsplineCurve passing through
-   * an array of points, with a C2 Continuity.
+   * an array of points, with a C2 Continuity. If the optional
+   * parameter #closed is set to true, then the curve will be C2 at
+   * all points execpt the first (where only C1 continuity will be
+   * given), and it will be a closed curve.
+   *
+   * The curve is garanteed to be at distance #tolerance from the
+   * input points. If the algorithm fails in generating such a curve,
+   * an exception is thrown.
    */
-  TopoDS_Shape interpolation_curve(std::vector<dealii::Point<3> >  &curve_points,
-				   const dealii::Point<3> direction=dealii::Point<3>(), 
-				   const double tolerance=1e-7);
+  TopoDS_Edge interpolation_curve(std::vector<dealii::Point<3> >  &curve_points,
+				  const dealii::Point<3> direction=dealii::Point<3>(), 
+				  const bool closed=false,
+				  const double tolerance=1e-7);
+
 
   /**
    * Get the closest point to the given topological shape. If the
@@ -155,19 +167,20 @@ namespace OpenCASCADE
   /**
    * Convert OpenCASCADE point into a Point<3>.
    */
-  Point<3> Pnt(const gp_Pnt &p);
+  inline Point<3> Pnt(const gp_Pnt &p);
 
 
   /**
    * Convert Point<3> into OpenCASCADE point.
    */
-  gp_Pnt Pnt(const Point<3> &p);
+  inline gp_Pnt Pnt(const Point<3> &p);
 
   
   /**
    * Sort two points according to their scalar product with
    * direction. If the norm of the direction is zero, then use
-   * lexycographical ordering.
+   * lexycographical ordering. The optional parameter is used as a
+   * relative tolerance when comparing objects.
    */
   inline bool point_compare(const dealii::Point<3> &p1, const dealii::Point<3> &p2,
 			    const dealii::Point<3> direction=Point<3>(),
