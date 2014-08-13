@@ -19,7 +19,8 @@
 for (deal_II_dimension : DIMENSIONS)
   {
 	template class NormalProjectionBoundary<deal_II_dimension, 3>;
-	template class AxisProjectionBoundary<deal_II_dimension, 3>;
+	template class DirectionalProjectionBoundary<deal_II_dimension, 3>;
+	template class ArclengthProjectionLineManifold<deal_II_dimension, 3>; 
   }
 
 

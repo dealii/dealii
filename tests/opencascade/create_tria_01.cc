@@ -9,8 +9,9 @@
 //
 //-----------------------------------------------------------
 
-// Create a Triangulation, interpolate its boundary points to a close
-// smooth BSpline, and use that as a Boundary Descriptor.
+// Read the first face of goteborg.iges, attach it to a projector,
+// create a single-cell Triangulation, and refine it with the new
+// projector.
 
 #include "../tests.h"
 
@@ -35,46 +36,38 @@
 #include <TopoDS_Wire.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
+#include <BRepPrimAPI_MakeSphere.hxx>
 
 using namespace OpenCASCADE;
 
 int main () 
 {
   std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog.depth_console(0);
-
-  // The curve passing through the vertices of the unit square.
-  std::vector<Point<3> > vertices;
-  vertices.push_back(Point<3>(0,0,0));
-  vertices.push_back(Point<3>(1,0,0));
-  vertices.push_back(Point<3>(1,1,0));
-  vertices.push_back(Point<3>(0,1,0));
-  TopoDS_Shape shape = interpolation_curve(vertices, Point<3>(), true);
   
-  // Create a boundary projector.
-  NormalProjectionBoundary<2,3> boundary_line(shape);
+  TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/goteborg.iges");
+  std::vector<TopoDS_Face> faces;
+  std::vector<TopoDS_Edge> edges;
+  std::vector<TopoDS_Vertex> vertices;
+  
+  extract_geometrical_shapes(sh, faces, edges, vertices);
 
-  // The unit square.
+  // Create a boundary projector on the first face.
+  NormalProjectionBoundary<2,3> boundary(faces[0], 1e-9);
+  
+  // Create a Triangulation with a single cell
   Triangulation<2,3> tria;
-  GridGenerator::hyper_cube(tria);
+  create_triangulation(faces[0], tria);
 
-  // Set the exterior boundary
-  tria.set_boundary(0, boundary_line);
+  // Set the boundary
+  tria.set_manifold(1, boundary);
+  tria.begin()->set_all_manifold_ids(1);
 
-  // This is here to ignore the points created in the interior of the
-  // face.
-  tria.begin()->set_material_id(1);
-
-  // We refine twice, and expect the outer points to end up on a
-  // smooth curve interpolating the square vertices.
   tria.refine_global(2);
 
-
-  // You can open the generated file with gmsh.
+  // You can open the generated file with gmsh
   GridOut gridout;
   gridout.write_msh (tria, logfile);
-
+  
   return 0;
 }
                   

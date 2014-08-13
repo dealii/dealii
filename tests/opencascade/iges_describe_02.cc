@@ -30,12 +30,18 @@ int main ()
   deallog.depth_console(0);
   
   TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/goteborg.iges");
-  unsigned int nf=0, ne=0, nv=0;
-  count_elements(sh, nf, ne, nv);
-  deallog << "Shape contains " << nf << " faces, "
-	  << ne << " edges, and " 
-	  << nv << " vertices." << std::endl;
-
+  std::vector<TopoDS_Compound> compounds;
+  std::vector<TopoDS_CompSolid> compsolids;
+  std::vector<TopoDS_Solid> solids;
+  std::vector<TopoDS_Shell> shells;
+  std::vector<TopoDS_Wire> wires;
+  extract_compound_shapes(sh, compounds, compsolids, solids, shells, wires);
+  
+  deallog << "Shape contains " << compounds.size() << " compounds, "
+	  << compsolids.size() << " compound solids, "
+	  << solids.size() << " solids, "
+	  << shells.size() << " shells, "
+	  << wires.size() << " wires." << std::endl;
   return 0;
 }
                   

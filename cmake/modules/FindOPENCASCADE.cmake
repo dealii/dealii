@@ -48,7 +48,7 @@ IF(EXISTS ${OPENCASCADE_INCLUDE_DIR}/Standard_Version.hxx)
 ENDIF()
 
 # These seem to be pretty much the only required ones.
-SET(OPENCASCADE_LIBRARIES  
+SET(_opencascade_libraries
     TKFillet
     TKMesh
     TKernel
@@ -75,9 +75,9 @@ SET(OPENCASCADE_LIBRARIES
   )
 
 SET(_libraries "")
-FOREACH(_library ${OPENCASCADE_LIBRARIES})
-  LIST(APPEND _libraries ${_library})
-  DEAL_II_FIND_LIBRARY(${_library}
+FOREACH(_library ${_opencascade_libraries})
+  LIST(APPEND _libraries OPENCASCADE_${_library})
+  DEAL_II_FIND_LIBRARY(OPENCASCADE_${_library}
     NAMES ${_library}
     HINTS ${OPENCASCADE_DIR}
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
@@ -99,6 +99,5 @@ DEAL_II_PACKAGE_HANDLE(OPENCASCADE
   USER_INCLUDE_DIRS
     REQUIRED OPENCASCADE_INCLUDE_DIR
   CLEAR
-    OPENCASCADE_LIBRARIES ${_libraries}
-    TRILINOS_SUPPORTS_CPP11 TRILINOS_HAS_C99_TR1_WORKAROUND
+    _opencascade_libraries ${_libraries}
   )

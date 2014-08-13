@@ -30,12 +30,25 @@ int main ()
   deallog.depth_console(0);
   
   TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/goteborg.iges");
+  std::vector<TopoDS_Face> faces;
+  std::vector<TopoDS_Edge> edges;
+  std::vector<TopoDS_Vertex> vertices;
+
+  extract_geometrical_shapes(sh, faces, edges, vertices);
+  
   unsigned int nf=0, ne=0, nv=0;
   count_elements(sh, nf, ne, nv);
   deallog << "Shape contains " << nf << " faces, "
 	  << ne << " edges, and " 
 	  << nv << " vertices." << std::endl;
-
+  
+  if(nf != faces.size())
+    deallog << "Error!" << std::endl;
+  if(ne != edges.size())
+    deallog << "Error!" << std::endl;
+  if(nv != vertices.size())
+    deallog << "Error!" << std::endl;
+  
   return 0;
 }
                   

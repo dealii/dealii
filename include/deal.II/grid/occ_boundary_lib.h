@@ -25,17 +25,23 @@
 #include <deal.II/grid/occ_utilities.h>
 #include <deal.II/grid/tria_boundary.h>
 
+#include <BRepAdaptor_Curve.hxx>
+#include <Adaptor3d_Curve.hxx>
+
 DEAL_II_NAMESPACE_OPEN
 
-namespace OpenCASCADE 
+/**
+ * @addtogroup OpenCASCADE
+ * @{
+ */
+
+namespace OpenCASCADE
 {
   /**
-   * @addtogroup OpenCASCADE
-   * @{
-   * 
-   * A Boundary object based on OpenCASCADE TopoDS_Shape where new
-   * points are first computed using the FlatManifold class, and then
-   * projected in the normal direction using OpenCASCADE utilities.
+   * A Boundary object based on OpenCASCADE TopoDS_Shape where where
+   * new points are first computed by averaging the surrounding points
+   * in the same way as FlatManifold does, and then projecting in the
+   * normal direction using OpenCASCADE utilities.
    *
    * This class makes no assumptions on the shape you pass to it, and
    * the topological dimension of the Manifold is inferred from the
@@ -49,20 +55,29 @@ namespace OpenCASCADE
    * This could happen, for example, if you are trying to use a shape
    * of type TopoDS_Edge when projecting on a face. In this case, the
    * vertices of the face would be collapsed to the edge, and your
-   * surrounding points would not be on lying on the given shape,
-   * raising an exception.
-   * 
+   * surrounding points would not be lying on the given shape, raising
+   * an exception.
+   *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class NormalProjectionBoundary : public Boundary<dim,spacedim> {
-    public:
-    NormalProjectionBoundary(const TopoDS_Shape sh, 
-			     const double tolerance=1e-7);
-    
+  class NormalProjectionBoundary : public Boundary<dim,spacedim>
+  {
+  public:
+
+    /**
+     * The standard constructor takes a generic TopoDS_Shape @p sh,
+     * and a tolerance used to compute distances internally.
+     *
+     * The TopoDS_Shape can be of arbitrary, i.e., a collection of
+     * shapes, faces, edges or a single face or edge.
+     */
+    NormalProjectionBoundary(const TopoDS_Shape &sh,
+                             const double tolerance=1e-7);
+
     /**
      * Perform the actual projection onto the manifold. This function,
-     * in debug mode, checks that each of the #surrounding_points is
+     * in debug mode, checks that each of the @p surrounding_points is
      * within tolerance from the given TopoDS_Shape. If this is not
      * the case, an exception is thrown.
      *
@@ -71,16 +86,16 @@ namespace OpenCASCADE
      */
     virtual Point<spacedim>
     project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
-			 const Point<spacedim> &candidate) const;
+                         const Point<spacedim> &candidate) const;
 
 
   private:
     /**
      * The topological shape which is used internally to project
-     * points. You can construct one such a shape by calling the
+     * points. You can construct such a shape by calling the
      * OpenCASCADE::read_IGES() function, which will create a
      * TopoDS_Shape with the geometry contained in the IGES file.
-     */ 
+     */
     const TopoDS_Shape sh;
 
     /**
@@ -91,9 +106,10 @@ namespace OpenCASCADE
 
   /**
    * A Boundary object based on OpenCASCADE TopoDS_Shape where new
-   * points are first computed using the FlatManifold class, and then
-   * projected along the direction given at construction time, using
-   * OpenCASCADE utilities.
+   * points are first computed by averaging the surrounding points in
+   * the same way as FlatManifold does, and then projecting in onto
+   * the manifold along the direction specified at construction time
+   * using OpenCASCADE utilities.
    *
    * This class makes no assumptions on the shape you pass to it, and
    * the topological dimension of the Manifold is inferred from the
@@ -103,40 +119,51 @@ namespace OpenCASCADE
    * calling OpenCASCADE::closest_point() on those points leaves them
    * untouched. If this is not the case, an ExcPointNotOnManifold is
    * thrown.
-   * 
+   *
+   * Notice that this type of Boundary descriptor may fail to give
+   * results if the triangulation to be refined is close to the
+   * boundary of the given TopoDS_Shape, or when the direction you use
+   * at construction time does not intersect the shape. An exception
+   * is thrown when this appens.
+   *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class AxisProjectionBoundary : public Boundary<dim,spacedim> {
-    public:
-    AxisProjectionBoundary(const TopoDS_Shape sh, 
-			   const Point<3> direction, 
-			   const double tolerance=1e-7);
-    
+  class DirectionalProjectionBoundary : public Boundary<dim,spacedim>
+  {
+  public:
+    /**
+     * Construct a Boundary object which will project points on the
+     * TopoDS_Shape @p sh, along the given @p direction.
+     */
+    DirectionalProjectionBoundary(const TopoDS_Shape &sh,
+                                  const Tensor<1,spacedim> &direction,
+                                  const double tolerance=1e-7);
+
     /**
      * Perform the actual projection onto the manifold. This function,
-     * in debug mode, checks that each of the #surrounding_points is
+     * in debug mode, checks that each of the @p surrounding_points is
      * within tolerance from the given TopoDS_Shape. If this is not
      * the case, an exception is thrown.
      *
-     * The projected point is computed using OpenCASCADE normal
+     * The projected point is computed using OpenCASCADE directional
      * projection algorithms.
      */
     virtual Point<spacedim>
     project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
-			 const Point<spacedim> &candidate) const;
+                         const Point<spacedim> &candidate) const;
 
   private:
     /**
      * The topological shape which is used internally to project
-     * points. You can construct one such a shape by calling the
+     * points. You can construct such a shape by calling the
      * OpenCASCADE::read_IGES() function, which will create a
      * TopoDS_Shape with the geometry contained in the IGES file.
-     */ 
+     */
     const TopoDS_Shape sh;
 
     /**
-     * Direction used to project new points on the shape. 
+     * Direction used to project new points on the shape.
      */
     const Point<3> direction;
 
@@ -146,6 +173,70 @@ namespace OpenCASCADE
     const double tolerance;
   };
 
+  /**
+   * A Boundary object based on OpenCASCADE TopoDS_Shape objects which
+   * have topological dimension equal to one (TopoDS_Edge or
+   * TopoDS_Wire) where new points are located at the arclength
+   * average of the surrounding points. If the given TopoDS_Shape can
+   * be casted to a periodic (closed) curve, then this information is
+   * used internally to set the periodicity of the base ChartManifold
+   * class.
+   *
+   * This class can only work on TopoDS_Edge or TopoDS_Wire objects,
+   * and it only makes sense when spacedim is three. If you use an
+   * object of topological dimension different from one, an exception
+   * is throw.
+   *
+   * In debug mode there is an additional sanity check to make sure
+   * that the surrounding points actually live on the Manifold, i.e.,
+   * calling OpenCASCADE::closest_point() on those points leaves them
+   * untouched. If this is not the case, an ExcPointNotOnManifold is
+   * thrown.
+   *
+   * @author Luca Heltai, Andrea Mola, 2011--2014.
+   */
+  template <int dim, int spacedim>
+  class ArclengthProjectionLineManifold : public  ChartManifold<dim,spacedim,1>
+  {
+  public:
+    /**
+     * Default constructor with a TopoDS_Edge.
+     */
+    ArclengthProjectionLineManifold(const TopoDS_Shape &sh,
+                                    const double tolerance=1e-7);
+
+    /**
+     * Given a point on real space, find its arclength
+     * parameter. Throws an error in debug mode, if the point is not
+     * on the TopoDS_Edge given at construction time.
+     */
+    virtual Point<1>
+    pull_back(const Point<spacedim> &space_point) const;
+
+    /**
+     * Given an arclength parameter, find its image in real space.
+     */
+    virtual Point<spacedim>
+    push_forward(const Point<1> &chart_point) const;
+
+  private:
+    /**
+     * A Curve adaptor. This is the one which is used in the
+     * computations, and it points to the right one above.
+     */
+    Handle_Adaptor3d_HCurve curve;
+
+    /**
+     * Relative tolerance used in all internal computations.
+     */
+    const double tolerance;
+
+    /**
+     * The total length of the curve. This is also used as a period if
+     * the edge is periodic.
+     */
+    const double length;
+  };
 }
 
 /*@}*/

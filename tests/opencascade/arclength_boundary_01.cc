@@ -9,21 +9,29 @@
 //
 //-----------------------------------------------------------
 
-// Create a bspline, and write it as an IGES file.
-
 #include "../tests.h"
 #include <fstream>
 #include <base/logstream.h>
 
 #include <deal.II/grid/occ_utilities.h>
+#include <deal.II/grid/occ_boundary_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_generator.h>
+
 #include <TopTools.hxx>
 #include <TopoDS_Shape.hxx>
 #include <Standard_Stream.hxx>
+
+// Create a Triangulation, interpolate its boundary points to a smooth
+// BSpline, and use that as an arlength Boundary Descriptor.
 
 using namespace OpenCASCADE;
 
 int main () 
 {
+  std::ofstream logfile("output");
+  
   // Create a bspline passign through the points
   std::vector<Point<3> > pts;
   pts.push_back(Point<3>(0,0,0));
@@ -32,7 +40,17 @@ int main ()
   pts.push_back(Point<3>(1,0,0));
 
   TopoDS_Edge edge = interpolation_curve(pts);
-  write_IGES(edge, "output");
+  ArclengthProjectionLineManifold<1,3> manifold(edge);
+  
+  Triangulation<1,3> tria;
+  GridGenerator::hyper_cube(tria);
+
+  tria.begin_active()->set_all_manifold_ids(1);
+  tria.set_manifold(1, manifold);
+  
+  tria.refine_global(4);
+  GridOut gridout;
+  gridout.write_msh(tria, logfile);
 
   return 0;
 }

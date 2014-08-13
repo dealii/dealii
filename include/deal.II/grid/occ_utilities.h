@@ -22,15 +22,23 @@
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 
+#include <deal.II/grid/tria.h>
+
 #include <string>
 #include <TopoDS_Shape.hxx>
+#include <TopoDS_Face.hxx>
 #include <TopoDS_Edge.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <TopoDS_Compound.hxx>
+#include <TopoDS_CompSolid.hxx>
+#include <TopoDS_Solid.hxx>
+#include <TopoDS_Shell.hxx>
+#include <TopoDS_Wire.hxx>
 #include <IFSelect_ReturnStatus.hxx>
-#include <Geom_Plane.hxx>
-#include <Geom_Curve.hxx>
 #include <gp_Pnt.hxx>
 
 #include <deal.II/base/point.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -52,10 +60,9 @@ DEAL_II_NAMESPACE_OPEN
  * contains 3 fields: location, orientation and a myTShape handle (of
  * the TopoDS_TShape type). According to OpenCASCADE documentation,
  * myTShape and Location are used to share data between various shapes
- * and thus save huge amounts of memory. For example, an edge
- * belonging to two faces has equal Locations and myTShape fields but
- * different Orientations (Forward in context of one face and Reversed
- * in one of the other).
+ * to save memory. For example, an edge belonging to two faces has
+ * equal Locations and myTShape fields but different Orientations
+ * (Forward in context of one face and Reversed in one of the other).
  *
  * Valid shapes include collection of other shapes, solids, faces,
  * edges, vertices, etc.
@@ -85,38 +92,38 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Luca Heltai, Andrea Mola, 2011--2014.
  */
-namespace OpenCASCADE 
+namespace OpenCASCADE
 {
   /**
-   * Count the subobjects of a shape. This function just outputs some
-   * information about the TopoDS_Shape passed as argument. It counts
-   * the number of faces, edges and vertices (the only topological
-   * entities associated with actual geometries) which are contained
-   * in the given shape.
+   * Count the subobjects of a shape. This function is useful to
+   * gather information about the TopoDS_Shape passed as argument. It
+   * counts the number of faces, edges and vertices (the only
+   * topological entities associated with actual geometries) which are
+   * contained in the given shape.
    */
   void count_elements(const TopoDS_Shape &shape,
-		      unsigned int &n_faces,
-		      unsigned int &n_edges,
-		      unsigned int &n_vertices);
-  
+                      unsigned int &n_faces,
+                      unsigned int &n_edges,
+                      unsigned int &n_vertices);
+
   /**
    * Read IGES files and translate their content into openCascade
    * topological entities. The option scale_factor is used to
    * compensate for different units being used in the IGES files and
    * in the target application. The standard unit for IGES files is
    * millimiters. The return object is a TopoDS_Shape which contains
-   * all objects from the file. 
+   * all objects from the file.
    */
-  TopoDS_Shape read_IGES(const std::string &filename, 
-			 const double scale_factor=1e-3);
-  
- /**
-   * Write the given topological shape into an IGES file.
-   */
-  void write_IGES(const TopoDS_Shape &shape, 
-		  const std::string &filename);
-		  
-  
+  TopoDS_Shape read_IGES(const std::string &filename,
+                         const double scale_factor=1e-3);
+
+  /**
+    * Write the given topological shape into an IGES file.
+    */
+  void write_IGES(const TopoDS_Shape &shape,
+                  const std::string &filename);
+
+
 
   /**
    * Perform the intersection of the given topological shape with the
@@ -125,13 +132,23 @@ namespace OpenCASCADE
    * thrown if the intersection produces an empty shape.
    */
   TopoDS_Shape  intersect_plane(const TopoDS_Shape &in_shape,
-				const double c_x,
-				const double c_y,
-				const double c_z,
-				const double c,
-				const double tolerance=1e-7);
+                                const double c_x,
+                                const double c_y,
+                                const double c_z,
+                                const double c,
+                                const double tolerance=1e-7);
 
-  
+  /**
+   * Try to join all edges contained in the given TopoDS_Shape into a
+   * single TopoDS_Edge, containing as few BSPlines as possible. If
+   * the input shape contains faces, they will be ignored by this
+   * function. If the contained edges cannot be joined into a single
+   * one, i.e., they form disconnected curves, an exception will be
+   * thrown.
+   */
+  TopoDS_Edge join_edges(const TopoDS_Shape &in_shape,
+                         const double tolerance=1e-7);
+
   /**
    * Creates a 3D smooth BSpline curve passing through the points in
    * the assigned vector, and store it in the returned TopoDS_Shape
@@ -143,18 +160,53 @@ namespace OpenCASCADE
    *
    * This class is used to interpolate a BsplineCurve passing through
    * an array of points, with a C2 Continuity. If the optional
-   * parameter #closed is set to true, then the curve will be C2 at
+   * parameter @p closed is set to true, then the curve will be C2 at
    * all points execpt the first (where only C1 continuity will be
    * given), and it will be a closed curve.
    *
-   * The curve is garanteed to be at distance #tolerance from the
+   * The curve is garanteed to be at distance @p tolerance from the
    * input points. If the algorithm fails in generating such a curve,
    * an exception is thrown.
    */
   TopoDS_Edge interpolation_curve(std::vector<dealii::Point<3> >  &curve_points,
-				  const dealii::Point<3> direction=dealii::Point<3>(), 
-				  const bool closed=false,
-				  const double tolerance=1e-7);
+                                  const dealii::Point<3> direction=dealii::Point<3>(),
+                                  const bool closed=false,
+                                  const double tolerance=1e-7);
+
+  /**
+   * Extract all subshapes from a TopoDS_Shape, and store the results
+   * into standard containers. If the shape does not contain a certain
+   * type of shape, the respective container will be empty.
+   */
+  void extract_geometrical_shapes(const TopoDS_Shape &shape,
+                                  std::vector<TopoDS_Face> &faces,
+                                  std::vector<TopoDS_Edge> &edges,
+                                  std::vector<TopoDS_Vertex> &vertices);
+
+  /**
+   * Create a triangulation from a single face. This class extract the
+   * first u and v parameter of the parametric surface making up this
+   * face, and creates a Triangulation<2,3> containing a single coarse
+   * cell reflecting this face. If the surface is not a trimmed
+   * surface, the vertices of this cell will coincide with the
+   * TopoDS_Vertex vertices of the original TopoDS_Face. This,
+   * however, is often not the case, and the user should be careful on
+   * how this mesh is used.
+   */
+  void create_triangulation(const TopoDS_Face &face,
+                            Triangulation<2,3> &tria);
+
+  /**
+   * Extract all compound shapes from a TopoDS_Shape, and store the
+   * results into standard containers. If the shape does not contain a
+   * certain type of compound, the respective container will be empty.
+   */
+  void extract_compound_shapes(const TopoDS_Shape &shape,
+                               std::vector<TopoDS_Compound> &compounds,
+                               std::vector<TopoDS_CompSolid> &compsolids,
+                               std::vector<TopoDS_Solid> &solids,
+                               std::vector<TopoDS_Shell> &shells,
+                               std::vector<TopoDS_Wire> &wires);
 
 
   /**
@@ -166,75 +218,86 @@ namespace OpenCASCADE
    * coordinate is filled with sensible information, and the v
    * coordinate is set to zero.
    */
-  Point<3> closest_point(const TopoDS_Shape in_shape, 
-			 const Point<3> origin,
-			 TopoDS_Shape &out_shape,
-			 double &u, 
-			 double &v, 
-			 const double tolerance=1e-7);
+  Point<3> closest_point(const TopoDS_Shape in_shape,
+                         const Point<3> origin,
+                         TopoDS_Shape &out_shape,
+                         double &u,
+                         double &v,
+                         const double tolerance=1e-7);
 
   /**
-   * Intersect a line passing through the given #origin point along
-   * #direction and the given topological shape. If there is more than
+   * Intersect a line passing through the given @p origin point along
+   * @p direction and the given topological shape. If there is more than
    * one intersection, it will return the closest one.
    *
-   * The optional #tolerance parameter is used to compute distances.
+   * The optional @p tolerance parameter is used to compute distances.
    */
-  Point<3> axis_intersection(const TopoDS_Shape in_shape, 
-			     const Point<3> origin, 
-			     const Point<3> direction, 
-			     const double tolerance=1e-7);
-  
+  Point<3> axis_intersection(const TopoDS_Shape in_shape,
+                             const Point<3> origin,
+                             const Point<3> direction,
+                             const double tolerance=1e-7);
+
 
   /**
    * Convert OpenCASCADE point into a Point<3>.
    */
-  inline Point<3> Pnt(const gp_Pnt &p);
+  Point<3> Pnt(const gp_Pnt &p);
 
 
   /**
    * Convert Point<3> into OpenCASCADE point.
    */
-  inline gp_Pnt Pnt(const Point<3> &p);
+  gp_Pnt Pnt(const Point<3> &p);
 
-  
+
   /**
    * Sort two points according to their scalar product with
    * direction. If the norm of the direction is zero, then use
    * lexycographical ordering. The optional parameter is used as a
    * relative tolerance when comparing objects.
    */
-  inline bool point_compare(const dealii::Point<3> &p1, const dealii::Point<3> &p2,
-			    const dealii::Point<3> direction=Point<3>(),
-			    const double tolerance=1e-10);
+  bool point_compare(const dealii::Point<3> &p1, const dealii::Point<3> &p2,
+                     const dealii::Point<3> direction=Point<3>(),
+                     const double tolerance=1e-10);
 
 
   /**
    * Exception thrown when the point specified as argument does not
-   * lie between #tolerance from the given TopoDS_Shape.
+   * lie between @p tolerance from the given TopoDS_Shape.
    */
   DeclException1 (ExcPointNotOnManifold,
-		  Point<3>,
-		  <<"The point [ "<<arg1<<" ] is not on the manifold.");
+                  Point<3>,
+                  <<"The point [ "<<arg1<<" ] is not on the manifold.");
 
   /**
    * Exception thrown when the point specified as argument cannot be
    * projected to the manifold.
-   */			      
-  DeclException1 (ExcProjectionFailed, 
-		  Point<3>,
-		  <<"Projection of point [ "<< arg1
-		  << " ] failed.");
+   */
+  DeclException1 (ExcProjectionFailed,
+                  Point<3>,
+                  <<"Projection of point [ "<< arg1
+                  << " ] failed.");
 
   /**
    * Thrown when internal OpenCASCADE utilities fail to return the OK
    * status.
    */
-  DeclException1 (ExcOCCError, 
-		  IFSelect_ReturnStatus, 
-		  <<"An OpenCASCADE routine failed with return status "
-		  <<arg1);
-} 
+  DeclException1 (ExcOCCError,
+                  IFSelect_ReturnStatus,
+                  <<"An OpenCASCADE routine failed with return status "
+                  <<arg1);
+
+  /**
+   * Trying to make curve operations on a degenerate edge.
+   */
+  DeclException0(ExcEdgeIsDegenerate);
+
+  /**
+   * Trying to make operations on the wrong type of shapes.
+   */
+  DeclException0(ExcUnsupportedShape);
+
+}
 /*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
