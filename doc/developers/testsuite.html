@@ -17,7 +17,7 @@
     <h1>The deal.II Testsuite</h1>
 
     <p>
-      The deal.II testsuite consists of two parts: 
+      The deal.II testsuite consists of two parts:
       <i>build tests</i> and the
       <i>regression testsuite</i>. While the build tests
       are used to check that the
@@ -29,17 +29,16 @@
     </p>
 
     <p>
-      deal.II has a testsuite that has, at the time this article is written
-      (mid-2013), some 2,900 small programs (growing by roughly one per day)
-      that we run every time we make a change to make sure that no existing
-      functionality is broken. The expected output for every test is stored in
-      our subversion archive, and when you run a test you are notified if a
-      test produces different output. These days, every time we add a
-      significant piece of functionality, we add at least one new test to the
-      testsuite, and we also do so if we fix a bug, in both cases to make sure
-      that future changes do not break what we have just checked in. Machines
-      running tests send results
-      back home and these are then converted into
+      deal.II has a testsuite that currently has (mid-2014), some 3,400
+      small programs (growing by roughly one per day) that we run every
+      time we make a change to make sure that no existing functionality is
+      broken. The expected output for every test is stored in an output
+      file, and when you run a test you are notified if a test produces
+      different output. These days, every time we add a significant piece
+      of functionality, we add at least one new test to the testsuite, and
+      we also do so if we fix a bug, in both cases to make sure that future
+      changes do not break what we have just checked in. Machines running
+      tests send results back home and these are then converted into
       <a href="http://cdash.kyomu.43-1.org/index.php?project=deal.II"
       target="body">a webpage showing the status of our regression tests</a>.
     </p>
@@ -48,10 +47,6 @@
       <ol>
         <li><a href="#quick">Quick instructions</a></li>
         <li><a href="#setup">Setting up the testsuite</a></li>
-        <ol>
-          <li><a href="#setupdownload">Downloading the testsuite</a></li>
-          <li><a href="#setupconfigure">Preparing the testsuite</a></li>
-        </ol>
         <li><a href="#run">Running the testsuite</a></li>
         <ol>
           <li><a href="#runoutput">How to interpret the output</a></li>
@@ -72,8 +67,8 @@
         </ol>
         <li><a href="#submit">Submitting test results</a></li>
         <li><a href="#build_tests">Build tests</a></li>
-	  <ol>
-	    <li><a href="#dedicatedbuilds">Dedicated build tests</a></li>
+          <ol>
+            <li><a href="#dedicatedbuilds">Dedicated build tests</a></li>
           </ol>
       </ol>
     </div>
@@ -101,43 +96,15 @@ $ ctest -j16
     <a name="setup"></a>
     <h2>Setting up the testsuite</h2>
 
-    <p> In order to run it, you need to download and set up the testsuite
-      first. The following paragraphs detail how to do that.
-    </p>
-
-    <a name="setupdownload"></a>
-    <h3>Downloading the testsuite</h3>
-
-    <p>
-      To download the testsuite, check it out from the subversion repository,
-      along with deal.II. To this end, go to an empty directory where you
-      want to test deal.II and do this:
+    <p> In order to run it, you need to checkout the git repository with
+    the development version of deal.II. If you haven't already done this
+    clone the repository via:
 <pre>
-$ svn checkout https://svn.dealii.org/trunk .
+$ git clone https://github.com/dealii/dealii.git
 </pre>
-      (The period at the end puts everything from under <code>trunk/</code>
-      into the current directory, rather than creating a
-      new <code>trunk/</code> directory.) You will then have
-      two folders:
-<pre>
-./deal.II
-./tests
-</pre>
+    More information about the git repository is available on the <a
+      href=http://www.dealii.org/download.html>homepage</a>.
     </p>
-
-    <p>
-      <b>Note:</b> CMake will pick up any testsuite that is located in a
-      <code>tests</code> folder next to the source directory
-      (<code>../tests</code>). If your test directory is at a different
-      location you have to hint during configuration by specifying
-      <code>TEST_DIR</code>:
-<pre>
-$ cmake -DTEST_DIR=&lt;...&gt;
-</pre>
-    </p>
-
-    <a name="setupconfigure"></a>
-    <h3>Preparing the testsuite</h3>
 
     <p>
       To enable the testsuite, configure and build deal.II in a build
@@ -728,20 +695,11 @@ $ ctest -V -R "category/my_new_test"
     <h4>Checking in</h4>
 
     <p>
-      Tests are a way to make sure everything keeps working. If they
-      aren't automated, they are no good. We are therefore very
-      interested in getting new tests. If you have subversion write access
-      already, you can add the new test and the expected output
-      file:
-<pre>
-svn add category/my_new_test.cc
-svn add category/my_new_test.output
-svn commit -m "New test"
-</pre>
-      If you don't have subversion write access, talk to us in the
-      discussion group; writing testcases is a worthy and laudable task,
-      and we would like to encourage it by giving people the opportunity to
-      contribute!
+      Tests are a way to make sure everything keeps working. If they aren't
+      automated, they are no good. We are therefore very interested in
+      getting new tests. Talk to us in the discussion group! Writing
+      testcases is a worthy and laudable task, and we would like to
+      encourage it by giving people the opportunity to contribute!
     </p>
 
 
@@ -820,17 +778,16 @@ TRACK
   - The track the test should be submitted to. Defaults to "Experimental".
     Possible values are:
 
-    "Experimental"     - all tests that are not specifically "build" or
-                         "regression" tests should go into this track
+    "Experimental"     - all tests that are not specifically "build" tests
+                         should go into this track
 
-    "Build Tests"      - Build tests that configure and build in a
-                         clean directory and run the build tests
-                         "build_tests/*"
-
-    "Nightly"          - Reserved for nightly regression tests for
-                         build bots on various architectures
+    "Build Tests"      - Build tests that configure and build in a clean
+                         directory and run exactly all build tests matching
+                         "build_tests/.*"
 
     "Regression Tests" - Reserved for the regression tester
+
+    "Continuous"       - Reserved for the regression tester
 
 CONFIG_FILE
   - A configuration file (see docs/development/Config.sample)
@@ -888,8 +845,7 @@ ctest -j4 -S ../cmake/scripts/run_buildtest.cmake
 
     <p>
       <b>Note:</b> Build tests require the designated build directory to be
-      completely empty and the source directory to be under subversion
-      version control. If you want to specify a build configuration for
+      completely empty If you want to specify a build configuration for
       cmake use a <a href="../users/Config.sample">configuration file</a>
       to preseed the cache as explained <a href="#submit">above</a>:
 <pre>
