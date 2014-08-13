@@ -3218,7 +3218,7 @@ namespace VectorTools
                      && (fe.base_element (base_indices.first).face_to_cell_index (2 * fe.degree, face)
                          <= fe.system_to_base_index (fe.face_to_cell_index (i, face)).second)
                      && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).second
-                         < fe.base_element (base_indices.first).face_to_cell_index (4 * fe.degree, face)))
+                         <= fe.base_element (base_indices.first).face_to_cell_index (4 * fe.degree - 1, face)))
                     || ((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != 0) && (2 * fe.degree <= i)
                         && (i < 4 * fe.degree)))
                   tmp -= dof_values[i] * fe_values[vec].value (fe.face_to_cell_index (i, face), q_point);
@@ -3328,7 +3328,9 @@ namespace VectorTools
                 if (((dynamic_cast<const FESystem<dim>*> (&fe) != 0)
                      && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).first == base_indices)
                      && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).second
-                         < fe.base_element (base_indices.first).face_to_cell_index (2 * fe.degree, face)))
+                         <= fe.base_element (base_indices.first).face_to_cell_index (2 * fe.degree - 1, face))
+                     && (fe.system_to_base_index (fe.face_to_cell_index (i, face)).second
+                         >= fe.base_element (base_indices.first).face_to_cell_index (0, face)))
                     || ((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != 0) && (i < 2 * fe.degree)))
                   tmp -= dof_values[i] * fe_values[vec].value (fe.face_to_cell_index (i, face), q_point);
 
