@@ -109,7 +109,10 @@ void test(unsigned order)
     }
   }
   else
+  {
     deallog << "Failed" << std::endl;
+    return;
+  }
 
   deallog << "OK" << std::endl;
 }
