@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -910,6 +910,72 @@ typename DoFHandler<dim, spacedim>::level_cell_iterator
 DoFHandler<dim, spacedim>::end_mg () const
 {
   return level_cell_iterator (&this->get_tria(), -1, -1, this);
+}
+
+
+
+template <int dim, int spacedim>
+IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+DoFHandler<dim, spacedim>::cell_iterators () const
+{
+  return
+    IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+    (begin(), end());
+}
+
+
+template <int dim, int spacedim>
+IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+DoFHandler<dim, spacedim>::active_cell_iterators () const
+{
+  return
+    IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+    (begin_active(), end());
+}
+
+
+
+template <int dim, int spacedim>
+IteratorRange<typename DoFHandler<dim, spacedim>::level_cell_iterator>
+DoFHandler<dim, spacedim>::mg_cell_iterators () const
+{
+  return
+    IteratorRange<typename DoFHandler<dim, spacedim>::level_cell_iterator>
+    (begin_mg(), end_mg());
+}
+
+
+
+
+template <int dim, int spacedim>
+IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+DoFHandler<dim, spacedim>::cell_iterators_on_level (const unsigned int level) const
+{
+  return
+    IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+    (begin(level), end(level));
+}
+
+
+
+template <int dim, int spacedim>
+IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+DoFHandler<dim, spacedim>::active_cell_iterators_on_level (const unsigned int level) const
+{
+  return
+    IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+    (begin_active(level), end_active(level));
+}
+
+
+
+template <int dim, int spacedim>
+IteratorRange<typename DoFHandler<dim, spacedim>::level_cell_iterator>
+DoFHandler<dim, spacedim>::mg_cell_iterators_on_level (const unsigned int level) const
+{
+  return
+    IteratorRange<typename DoFHandler<dim, spacedim>::level_cell_iterator>
+    (begin_mg(level), end_mg(level));
 }
 
 

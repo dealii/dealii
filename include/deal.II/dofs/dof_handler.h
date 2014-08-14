@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/iterator_range.h>
 #include <deal.II/base/std_cxx1x/shared_ptr.h>
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
@@ -632,6 +633,126 @@ public:
    */
   level_cell_iterator end_mg () const;
 
+  /*@}*/
+
+  /**
+   *  @name Cell iterator functions returning ranges of iterators
+   */
+
+  /**
+   * Return an iterator range that contains all cells (active or not)
+   * that make up this DoFHandler. Such a range is useful to
+   * initialize range-based for loops as supported by C++11. See the
+   * example in the documentation of active_cell_iterators().
+   *
+   * @return The half open range <code>[this->begin(), this->end())</code>
+   *
+   * @ingroup CPP11
+   */
+  IteratorRange<cell_iterator>        cell_iterators () const;
+
+  /**
+   * Return an iterator range that contains all active cells
+   * that make up this DoFHandler. Such a range is useful to
+   * initialize range-based for loops as supported by C++11,
+   * see also @ref CPP11 "C++11 standard".
+   *
+   * Range-based for loops are useful in that they require much less
+   * code than traditional loops (see
+   * <a href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">here</a>
+   * for a discussion of how they work). An example is that without
+   * range-based for loops, one often writes code such as the following:
+   * @code
+   *   DoFHandler<dim> dof_handler;
+   *   ...
+   *   typename DoFHandler<dim>::active_cell_iterator
+   *     cell = dof_handler.begin_active(),
+   *     endc = dof_handler.end();
+   *   for (; cell!=endc; ++cell)
+   *     {
+   *       fe_values.reinit (cell);
+   *       ...do the local integration on 'cell'...;
+   *     }
+   * @endcode
+   * Using C++11's range-based for loops, this is now entirely
+   * equivalent to the following:
+   * @code
+   *   DoFHandler<dim> dof_handler;
+   *   ...
+   *   for (auto cell : dof_handler.active_cell_iterators())
+   *     {
+   *       fe_values.reinit (cell);
+   *       ...do the local integration on 'cell'...;
+   *     }
+   * @endcode
+   * To use this feature, you need a compiler that supports C++11.
+   *
+   * @return The half open range <code>[this->begin_active(), this->end())</code>
+   *
+   * @ingroup CPP11
+   */
+  IteratorRange<active_cell_iterator> active_cell_iterators () const;
+
+  /**
+   * Return an iterator range that contains all cells (active or not)
+   * that make up this DoFHandler in their level-cell form. Such a range is useful to
+   * initialize range-based for loops as supported by C++11. See the
+   * example in the documentation of active_cell_iterators().
+   *
+   * @return The half open range <code>[this->begin_mg(), this->end_mg())</code>
+   *
+   * @ingroup CPP11
+   */
+  IteratorRange<level_cell_iterator>  mg_cell_iterators () const;
+
+  /**
+   * Return an iterator range that contains all cells (active or not)
+   * that make up the given level of this DoFHandler. Such a range is useful to
+   * initialize range-based for loops as supported by C++11. See the
+   * example in the documentation of active_cell_iterators().
+   *
+   * @param[in] level A given level in the refinement hierarchy of this
+   *   triangulation.
+   * @return The half open range <code>[this->begin(level), this->end(level))</code>
+   *
+   * @pre level must be less than this->n_levels().
+   *
+   * @ingroup CPP11
+   */
+  IteratorRange<cell_iterator>        cell_iterators_on_level (const unsigned int level) const;
+
+  /**
+   * Return an iterator range that contains all active cells
+   * that make up the given level of this DoFHandler. Such a range is useful to
+   * initialize range-based for loops as supported by C++11. See the
+   * example in the documentation of active_cell_iterators().
+   *
+   * @param[in] level A given level in the refinement hierarchy of this
+   *   triangulation.
+   * @return The half open range <code>[this->begin_active(level), this->end(level))</code>
+   *
+   * @pre level must be less than this->n_levels().
+   *
+   * @ingroup CPP11
+   */
+  IteratorRange<active_cell_iterator> active_cell_iterators_on_level (const unsigned int level) const;
+
+  /**
+   * Return an iterator range that contains all cells (active or not)
+   * that make up the given level of this DoFHandler in their level-cell form.
+   * Such a range is useful to
+   * initialize range-based for loops as supported by C++11. See the
+   * example in the documentation of active_cell_iterators().
+   *
+   * @param[in] level A given level in the refinement hierarchy of this
+   *   triangulation.
+   * @return The half open range <code>[this->begin_mg(level), this->end_mg(level))</code>
+   *
+   * @pre level must be less than this->n_levels().
+   *
+   * @ingroup CPP11
+   */
+  IteratorRange<level_cell_iterator> mg_cell_iterators_on_level (const unsigned int level) const;
 
   //@}
 

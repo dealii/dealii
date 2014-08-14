@@ -16,12 +16,17 @@
 
 
 /**
- * A namespace that contains a selection of classes and functions that will be part of the
- * next C++ standard (tentatively called C++1x) and that are currently
- * available via the <a href="http://www.boost.org/">BOOST</a> library. The
+ * A namespace that contains a selection of classes and functions that are part
+ * of the C++11 standard and that are also provided by the
+ * <a href="http://www.boost.org/">BOOST</a> library. The
  * elements that are available through the current namespace are either
  * imported from namespace <code>std</code> (if a compiler's library provides
  * them) or from namespace boost.
+ *
+ * For more information on the topic,
+ * see also @ref CPP11 "C++11 standard"
+ *
+ * @ingroup CPP11
  */
 namespace std_cxx1x
 {

@@ -1740,6 +1740,49 @@ namespace hp
 
 
 
+  template <int dim, int spacedim>
+  IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+  DoFHandler<dim, spacedim>::cell_iterators () const
+  {
+    return
+      IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+      (begin(), end());
+  }
+
+
+  template <int dim, int spacedim>
+  IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+  DoFHandler<dim, spacedim>::active_cell_iterators () const
+  {
+    return
+      IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+      (begin_active(), end());
+  }
+
+
+
+  template <int dim, int spacedim>
+  IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+  DoFHandler<dim, spacedim>::cell_iterators_on_level (const unsigned int level) const
+  {
+    return
+      IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+      (begin(level), end(level));
+  }
+
+
+
+  template <int dim, int spacedim>
+  IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+  DoFHandler<dim, spacedim>::active_cell_iterators_on_level (const unsigned int level) const
+  {
+    return
+      IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+      (begin_active(level), end_active(level));
+  }
+  
+
+
 
 //------------------------------------------------------------------
 
