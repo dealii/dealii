@@ -356,13 +356,18 @@ void Step3::assemble_system ()
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   // Now for the loop over all cells. We have seen before how this works, so
-  // this should be familiar including the conventional names for these
-  // variables:
+  // the following code should be familiar including the conventional names
+  // for these variables:
   DoFHandler<2>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
+      // @note As already mentioned in step-1, there is a more convenient way
+      // of writing such loops if your compiler supports the C++11
+      // standard. See @ref CPP11 "the deal.II C++11 page" to see
+      // how this works.
+      //
       // We are now sitting on one cell, and we would like the values and
       // gradients of the shape functions be computed, as well as the
       // determinants of the Jacobian matrices of the mapping between
