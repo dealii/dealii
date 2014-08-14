@@ -978,7 +978,7 @@ namespace
     // catch-all for all cases not explicitly
     // listed above
     Assert (false, ExcNotImplemented());
-    return -1e10;
+    return 1./0.;
   }
 }
 
