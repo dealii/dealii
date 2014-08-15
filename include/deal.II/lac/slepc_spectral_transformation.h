@@ -232,7 +232,8 @@ namespace SLEPcWrappers
 
   /**
    * An implementation of the transformation interface using the SLEPc
-   * Spectrum Folding.
+   * Spectrum Folding. This transformation type has been removed in
+   * SLEPc 3.5.0 and thus cannot be used in the newer versions.
    *
    * @ingroup SLEPcWrappers
    * @author Toby D. Young 2009
