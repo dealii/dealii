@@ -336,6 +336,14 @@ class FunctionParser : public Function<dim>
                           const unsigned int  component = 0) const;
 
     /**
+     *
+     */                      
+    double value (const Point<dim>   &p,
+                          const unsigned int  component,
+                          const std::vector<double> & additional_variable_values
+                 ) const;
+
+    /**
      * Return all components of a vector-valued function at the given point @p
      * p.
      *
@@ -387,6 +395,10 @@ class FunctionParser : public Function<dim>
      */
     std::vector<std::string> expressions;
     /**
+     * variable names, required to initialize fp in each thread
+     */
+    std::vector<std::string> additional_variable_names;
+   /**
      * this function will initialize fp on the current thread
      */
     void init_muparser() const;
