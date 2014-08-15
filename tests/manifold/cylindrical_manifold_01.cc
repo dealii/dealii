@@ -1,5 +1,5 @@
 //----------------------------  cylindrical_manifold_01.cc  ---------------------------
-//    Copyright (C) 2011, 2013 by the mathLab team.
+//    Copyright (C) 2011, 2013, 2014 by the mathLab team.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ void test(unsigned int ref=1)
   Triangulation<dim,spacedim> tria;
   GridGenerator::cylinder (tria);
 
-  for(auto cell = tria.begin_active(); cell != tria.end(); ++cell) {
+  for(typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell) {
     cell->set_all_manifold_ids(1);
   }
   
