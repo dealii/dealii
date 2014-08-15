@@ -250,6 +250,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Support SLEPc 3.5 by disabling SDFOLD spectrum transformation type
+  that has been removed from SLEPc. Therefore, TransformationSpectrumFolding 
+  cannot be used with newer SLEPc versions. 
+  <br>
+  (Alexander Grayver, 2014/08/15)
+  </li>
+
   <li> New: To better support applications that want to use C++11's
   <a href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">range-based
   for loops</a>, there are now functions Triangulation::cell_iterators(),
