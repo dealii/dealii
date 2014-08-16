@@ -54,7 +54,9 @@ FE_DGP<dim,spacedim>::get_name () const
   // kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_DGP<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_DGP<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree << ")";
 
   return namebuf.str();
 }
@@ -244,7 +246,7 @@ FE_DGP<dim,spacedim>::get_constant_modes () const
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
   constant_modes(0,0) = true;
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1, 0));
+         (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 

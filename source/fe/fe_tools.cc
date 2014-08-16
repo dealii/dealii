@@ -108,17 +108,12 @@ namespace FETools
 
 namespace
 {
-  // use a shared pointer to factory
-  // objects, to ensure that they get
-  // deleted at the end of the
-  // program run and don't end up as
-  // apparent memory leaks to
-  // programs like valgrind.
-  // a function that returns the
-  // default set of finite element
-  // names and factory objects for
-  // them. used to initialize
-  // fe_name_map below
+  // The following three functions serve to fill the maps from element
+  // names to elements fe_name_map below. The first one exists because
+  // we have finite elements which are not implemented for nonzero
+  // codimension. These should be transfered to the second function
+  // eventually.
+
   template <int dim>
   void
   fill_no_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> >& result)
@@ -151,6 +146,9 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim> >);
   }
 
+  // This function fills a map from names to finite elements for any
+  // dimension and codimension for those elements which support
+  // nonzero codimension.
   template <int dim, int spacedim>
   void
   fill_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> >& result)
@@ -167,6 +165,10 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim,spacedim> >);
   }
 
+  // The function filling the vector fe_name_map below. It iterates
+  // through all legal dimension/spacedimension pairs and fills
+  // fe_name_map[dimension][spacedimension] with the maps generated
+  // by the functions above.
 std::vector<std::vector<
 		std::map<std::string,
 			 std_cxx1x::shared_ptr<const Subscriptor> > > >
@@ -192,44 +194,37 @@ fill_default_map()
 }
   
 
-  // have a lock that guarantees that
-  // at most one thread is changing
-  // and accessing the fe_name_map
-  // variable. make this lock local
-  // to this file.
+  // have a lock that guarantees that at most one thread is changing
+  // and accessing the fe_name_map variable. make this lock local to
+  // this file.
   //
-  // this and the next variable are
-  // declared static (even though
-  // they're in an anonymous
-  // namespace) in order to make icc
-  // happy (which otherwise reports a
-  // multiply defined symbol when
-  // linking libraries for more than
-  // one space dimension together
+  // this and the next variable are declared static (even though
+  // they're in an anonymous namespace) in order to make icc happy
+  // (which otherwise reports a multiply defined symbol when linking
+  // libraries for more than one space dimension together
   static
   Threads::Mutex fe_name_map_lock;
 
-  // This is the map used by
-  // FETools::get_fe_from_name and
-  // FETools::add_fe_name. Since
-  // FEFactoryBase has a template
-  // parameter dim, it could not be a
-  // member variable of FETools. On
-  // the other hand, it is only
-  // accessed by functions in this
-  // file, so it is safe to make it a
-  // static variable here. It must be
-  // static so that we can link
-  // several dimensions together.
-  //
-  // it is initialized at program start time
-  // using the function above. because at
-  // this time there are no threads running,
-  // there are no thread-safety issues
-  // here. since this is compiled for all
-  // dimensions at once, need to create
-  // objects for each dimension and then
-  // separate between them further down
+  // This is the map used by FETools::get_fe_from_name and
+  // FETools::add_fe_name. It is only accessed by functions in this
+  // file, so it is safe to make it a static variable here. It must be
+  // static so that we can link several dimensions together.
+
+  // The organization of this storage is such that
+  // fe_name_map[dim][spacedim][name] points to an
+  // FEFactoryBase<dim,spacedim> with the name given. Since
+  // all entries of this vector are of different type, we store
+  // pointers to generic objects and cast them when needed.
+
+  // We use a shared pointer to factory objects, to ensure that they
+  // get deleted at the end of the program run and don't end up as
+  // apparent memory leaks to programs like valgrind.
+
+  // This vector is initialized at program start time using the
+  // function above. because at this time there are no threads
+  // running, there are no thread-safety issues here. since this is
+  // compiled for all dimensions at once, need to create objects for
+  // each dimension and then separate between them further down
   static
   std::vector<std::vector<
 		std::map<std::string,
@@ -1565,7 +1560,7 @@ namespace FETools
 
   template <int dim, int spacedim>
   FiniteElement<dim, spacedim> *
-  get_fe_from_name (const std::string &parameter_name)
+  get_fe_by_name (const std::string &parameter_name)
   {
     // Create a version of the name
     // string where all template
@@ -1634,13 +1629,13 @@ namespace FETools
   }
 
 
-// template <int dim>
-// FiniteElement<dim> *
-// get_fe_from_name (const std::string &parameter_name)
-// {
-//     return internal::get_fe_from_name<dim,dim>(parameter_name);
-// }
-
+  template <int dim>
+  FiniteElement<dim> *
+  get_fe_from_name (const std::string &parameter_name)
+  {
+    return get_fe_by_name<dim,dim> (parameter_name);
+  }
+  
 
   template <int dim, int spacedim>
   void

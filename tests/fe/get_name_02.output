@@ -1,0 +1,6 @@
+
+DEAL::FE_Q<2,3>(1)
+DEAL::FE_Q<2,3>(QGaussLobatto(4))
+DEAL::FE_DGQArbitraryNodes<2>(QUnknownNodes(4))
+DEAL::FE_DGQArbitraryNodes<2>(QGaussLobatto(5))
+DEAL::FE_DGQArbitraryNodes<2>(QUnknownNodes(2))

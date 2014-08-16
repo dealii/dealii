@@ -20,6 +20,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
@@ -75,10 +76,6 @@ namespace FETools
    *
    * This class is used in the FETools::get_fe_from_name() and
    * FETools::add_fe_name() functions.
-   *
-   * The Subscriptor base class was introduced such that we can have
-   * common pointers to the base class and then get the actual object
-   * through a `dynamic_cast`.
    *
    * @author Guido Kanschat, 2006
    */
@@ -814,7 +811,7 @@ namespace FETools
   template <int dim>
   void
   hierarchic_to_lexicographic_numbering (unsigned int degree,
-					 std::vector<unsigned int> &h2l);
+                                         std::vector<unsigned int> &h2l);
 
   template <int dim>
   void
@@ -879,8 +876,16 @@ namespace FETools
    * function, use the add_fe_name() function.  This function does not work if
    * one wants to get a codimension 1 finite element.
    */
-  template <int dim, int spacedim=dim>
+  template <int dim, int spacedim>
   FiniteElement<dim, spacedim> *
+  get_fe_by_name (const std::string &name);
+
+
+  /**
+   * @deprecated Use get_fe_by_name() with two template parameters instead
+   */
+  template <int dim>
+  FiniteElement<dim,dim> *
   get_fe_from_name (const std::string &name);
 
 
@@ -926,7 +931,7 @@ namespace FETools
    * then you should call this function for each space dimension for which you
    * want your finite element added to the map.
    */
-  template <int dim, int spacedim=dim>
+  template <int dim, int spacedim>
   void add_fe_name (const std::string &name,
                     const FEFactoryBase<dim,spacedim> *factory);
 

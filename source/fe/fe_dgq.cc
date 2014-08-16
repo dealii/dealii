@@ -224,7 +224,9 @@ FE_DGQ<dim, spacedim>::get_name () const
   // have to be kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_DGQ<"
+	  << Utilities::dim_string(dim,spacedim)
+	  << ">(" << this->degree << ")";
   return namebuf.str();
 }
 

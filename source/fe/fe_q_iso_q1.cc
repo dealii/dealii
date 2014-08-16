@@ -60,7 +60,9 @@ FE_Q_iso_Q1<dim,spacedim>::get_name () const
   // kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_Q_iso_Q1<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_Q_iso_Q1<" 
+	  << Utilities::dim_string(dim,spacedim)	  
+	  << ">(" << this->degree << ")";
   return namebuf.str();
 }
 

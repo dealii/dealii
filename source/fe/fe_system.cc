@@ -347,7 +347,9 @@ FESystem<dim,spacedim>::get_name () const
 
   std::ostringstream namebuf;
 
-  namebuf << "FESystem<" << dim << ">[";
+  namebuf << "FESystem<" 
+	  << Utilities::dim_string(dim,spacedim)	  
+	  << ">[";
   for (unsigned int i=0; i< this->n_base_elements(); ++i)
     {
       namebuf << base_element(i).get_name();

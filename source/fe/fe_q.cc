@@ -93,7 +93,9 @@ FE_Q<dim,spacedim>::get_name () const
       }
 
   if (equidistant == true)
-    namebuf << "FE_Q<" << dim << ">(" << this->degree << ")";
+    namebuf << "FE_Q<"
+            << Utilities::dim_string(dim,spacedim)
+            << ">(" << this->degree << ")";
   else
     {
       // Check whether the support points come from QGaussLobatto.
@@ -106,9 +108,13 @@ FE_Q<dim,spacedim>::get_name () const
             break;
           }
       if (gauss_lobatto == true)
-        namebuf << "FE_Q<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
+        namebuf << "FE_Q<"
+                << Utilities::dim_string(dim,spacedim)
+                << ">(QGaussLobatto(" << this->degree+1 << "))";
       else
-        namebuf << "FE_Q<" << dim << ">(QUnknownNodes(" << this->degree << "))";
+        namebuf << "FE_Q<"
+                << Utilities::dim_string(dim,spacedim)
+                << ">(QUnknownNodes(" << this->degree << "))";
     }
   return namebuf.str();
 }
