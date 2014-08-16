@@ -355,6 +355,11 @@ class FiniteElement : public Subscriptor,
 {
 public:
   /**
+   * The dimension of the image space, corresponding to Triangulation.     
+   */
+  static const unsigned int space_dimension = spacedim;
+    
+  /**
    * Base class for internal data.  Adds data for second derivatives to
    * Mapping::InternalDataBase()
    *

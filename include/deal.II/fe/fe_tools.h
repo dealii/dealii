@@ -76,10 +76,14 @@ namespace FETools
    * This class is used in the FETools::get_fe_from_name() and
    * FETools::add_fe_name() functions.
    *
+   * The Subscriptor base class was introduced such that we can have
+   * common pointers to the base class and then get the actual object
+   * through a `dynamic_cast`.
+   *
    * @author Guido Kanschat, 2006
    */
   template <int dim, int spacedim=dim>
-  class FEFactoryBase
+  class FEFactoryBase : public Subscriptor
   {
   public:
     /**
@@ -113,20 +117,20 @@ namespace FETools
    * @author Guido Kanschat, 2006
    */
   template <class FE>
-  class FEFactory : public FEFactoryBase<FE::dimension,FE::dimension>
+  class FEFactory : public FEFactoryBase<FE::dimension,FE::space_dimension>
   {
   public:
     /**
      * Create a FiniteElement and return a pointer to it.
      */
-    virtual FiniteElement<FE::dimension,FE::dimension> *
+    virtual FiniteElement<FE::dimension,FE::space_dimension> *
     get (const unsigned int degree) const;
 
     /**
      * Create a FiniteElement from a quadrature formula (currently only
      * implemented for FE_Q) and return a pointer to it.
      */
-    virtual FiniteElement<FE::dimension,FE::dimension> *
+    virtual FiniteElement<FE::dimension,FE::space_dimension> *
     get (const Quadrature<1> &quad) const;
   };
 
@@ -875,8 +879,8 @@ namespace FETools
    * function, use the add_fe_name() function.  This function does not work if
    * one wants to get a codimension 1 finite element.
    */
-  template <int dim>
-  FiniteElement<dim, dim> *
+  template <int dim, int spacedim=dim>
+  FiniteElement<dim, spacedim> *
   get_fe_from_name (const std::string &name);
 
 
@@ -922,7 +926,7 @@ namespace FETools
    * then you should call this function for each space dimension for which you
    * want your finite element added to the map.
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim=dim>
   void add_fe_name (const std::string &name,
                     const FEFactoryBase<dim,spacedim> *factory);
 
@@ -1031,7 +1035,7 @@ namespace FETools
 namespace FETools
 {
   template <class FE>
-  FiniteElement<FE::dimension, FE::dimension> *
+  FiniteElement<FE::dimension, FE::space_dimension> *
   FEFactory<FE>::get (const unsigned int degree) const
   {
     return new FE(degree);

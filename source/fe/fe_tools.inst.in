@@ -54,6 +54,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	(const FiniteElement<deal_II_dimension,deal_II_space_dimension> &,
 	 const FiniteElement<deal_II_dimension,deal_II_space_dimension> &,
 	 FullMatrix<double> &);
+
+      template FiniteElement<deal_II_dimension,deal_II_space_dimension> *
+	get_fe_from_name<deal_II_dimension,deal_II_space_dimension> (const std::string &);
+
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension
@@ -102,17 +106,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	 const FiniteElement<deal_II_dimension> &,
 	 FullMatrix<double> &);
 
-      
-
       template
 	void compute_face_embedding_matrices<deal_II_dimension,double>
 	(const FiniteElement<deal_II_dimension> &, FullMatrix<double> (&)[GeometryInfo<deal_II_dimension>::max_children_per_face],
 	 unsigned int, unsigned int);
-
-
-      template FiniteElement<deal_II_dimension,deal_II_dimension> *
-	get_fe_from_name<deal_II_dimension> (const std::string &);
-
 
       template
 	void

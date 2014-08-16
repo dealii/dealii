@@ -57,7 +57,7 @@ namespace FETools
 {
   // Not implemented in the general case.
   template <class FE>
-  FiniteElement<FE::dimension, FE::dimension> *
+  FiniteElement<FE::dimension, FE::space_dimension> *
   FEFactory<FE>::get (const Quadrature<1> &) const
   {
     Assert(false, ExcNotImplemented());
@@ -120,44 +120,77 @@ namespace
   // them. used to initialize
   // fe_name_map below
   template <int dim>
-  std::map<std::string,std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > >
-  get_default_fe_names ()
+  void
+  fill_no_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> >& result)
   {
-    std::map<std::string,
-        std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > > default_map;
+    typedef std_cxx1x::shared_ptr<const Subscriptor> FEFactoryPointer;
 
-    typedef std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> >
-    FEFactoryPointer;
-
-    default_map["FE_Q_Hierarchical"]
+    result["FE_Q_Hierarchical"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<dim> >);
-    default_map["FE_ABF"]
+    result["FE_ABF"]
       = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
-    default_map["FE_RaviartThomas"]
+    result["FE_RaviartThomas"]
       = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
-    default_map["FE_RaviartThomasNodal"]
+    result["FE_RaviartThomasNodal"]
       = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomasNodal<dim> >);
-    default_map["FE_Nedelec"]
+    result["FE_Nedelec"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Nedelec<dim> >);
-    default_map["FE_DGPNonparametric"]
+    result["FE_DGPNonparametric"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGPNonparametric<dim> >);
-    default_map["FE_DGP"]
+    result["FE_DGP"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGP<dim> >);
-    default_map["FE_DGPMonomial"]
+    result["FE_DGPMonomial"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGPMonomial<dim> >);
-    default_map["FE_DGQ"]
+    result["FE_DGQ"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
-    default_map["FE_DGQArbitraryNodes"]
+    result["FE_DGQArbitraryNodes"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
-    default_map["FE_Q"]
+    result["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim> >);
-    default_map["FE_Nothing"]
+    result["FE_Nothing"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim> >);
-
-    return default_map;
   }
 
+  template <int dim, int spacedim>
+  void
+  fill_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> >& result)
+  {
+    typedef std_cxx1x::shared_ptr<const Subscriptor> FEFactoryPointer;
 
+    result["FE_DGP"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGP<dim,spacedim> >);
+    result["FE_DGQ"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
+    result["FE_DGQArbitraryNodes"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
+    result["FE_Q"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim,spacedim> >);
+  }
+
+std::vector<std::vector<
+		std::map<std::string,
+			 std_cxx1x::shared_ptr<const Subscriptor> > > >
+fill_default_map()
+{
+  std::vector<std::vector<
+    std::map<std::string,
+	     std_cxx1x::shared_ptr<const Subscriptor> > > >
+    result(4);
+
+  for (unsigned int d=0;d<4;++d)
+    result[d].resize(4);
+  
+  fill_no_codim_fe_names<1> (result[1][1]);
+  fill_no_codim_fe_names<2> (result[2][2]);
+  fill_no_codim_fe_names<3> (result[3][3]);
+  
+  fill_codim_fe_names<1,2> (result[1][2]);
+  fill_codim_fe_names<1,3> (result[1][3]);
+  fill_codim_fe_names<2,3> (result[2][3]);
+    
+  return result;
+}
+  
 
   // have a lock that guarantees that
   // at most one thread is changing
@@ -198,20 +231,10 @@ namespace
   // objects for each dimension and then
   // separate between them further down
   static
-  std::map<std::string,
-      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<1> > >
-      fe_name_map_1d
-      = get_default_fe_names<1> ();
-  static
-  std::map<std::string,
-      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<2> > >
-      fe_name_map_2d
-      = get_default_fe_names<2> ();
-  static
-  std::map<std::string,
-      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<3> > >
-      fe_name_map_3d
-      = get_default_fe_names<3> ();
+  std::vector<std::vector<
+		std::map<std::string,
+			 std_cxx1x::shared_ptr<const Subscriptor> > > >
+  fe_name_map = fill_default_map();
 }
 
 
@@ -1264,10 +1287,10 @@ namespace FETools
 
 
 
-  template <>
+  template <int dim, int spacedim>
   void
   add_fe_name(const std::string &parameter_name,
-              const FEFactoryBase<1,1> *factory)
+              const FEFactoryBase<dim,spacedim> *factory)
   {
     // Erase everything after the
     // actual class name
@@ -1283,72 +1306,13 @@ namespace FETools
     // until we quit this function
     Threads::Mutex::ScopedLock lock(fe_name_map_lock);
 
-    Assert(fe_name_map_1d.find(name) == fe_name_map_1d.end(),
+    Assert(fe_name_map[dim][spacedim].find(name) == fe_name_map[dim][spacedim].end(),
            ExcMessage("Cannot change existing element in finite element name list"));
 
     // Insert the normalized name into
     // the map
-    fe_name_map_1d[name] =
-      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<1> > (factory);
-  }
-
-
-
-  template <>
-  void
-  add_fe_name(const std::string &parameter_name,
-              const FEFactoryBase<2,2> *factory)
-  {
-    // Erase everything after the
-    // actual class name
-    std::string name = parameter_name;
-    unsigned int name_end =
-      name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-    if (name_end < name.size())
-      name.erase(name_end);
-    // first make sure that no other
-    // thread intercepts the
-    // operation of this function;
-    // for this, acquire the lock
-    // until we quit this function
-    Threads::Mutex::ScopedLock lock(fe_name_map_lock);
-
-    Assert(fe_name_map_2d.find(name) == fe_name_map_2d.end(),
-           ExcMessage("Cannot change existing element in finite element name list"));
-
-    // Insert the normalized name into
-    // the map
-    fe_name_map_2d[name] =
-      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<2> > (factory);
-  }
-
-
-  template <>
-  void
-  add_fe_name(const std::string &parameter_name,
-              const FEFactoryBase<3,3> *factory)
-  {
-    // Erase everything after the
-    // actual class name
-    std::string name = parameter_name;
-    unsigned int name_end =
-      name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-    if (name_end < name.size())
-      name.erase(name_end);
-    // first make sure that no other
-    // thread intercepts the
-    // operation of this function;
-    // for this, acquire the lock
-    // until we quit this function
-    Threads::Mutex::ScopedLock lock(fe_name_map_lock);
-
-    Assert(fe_name_map_3d.find(name) == fe_name_map_3d.end(),
-           ExcMessage("Cannot change existing element in finite element name list"));
-
-    // Insert the normalized name into
-    // the map
-    fe_name_map_3d[name] =
-      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<3> > (factory);
+    fe_name_map[dim][spacedim][name] =
+      std_cxx1x::shared_ptr<const Subscriptor> (factory);
   }
 
 
@@ -1364,7 +1328,7 @@ namespace FETools
       FiniteElement<dim,spacedim> *
       get_fe_from_name_ext (std::string &name,
                             const std::map<std::string,
-                            std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > >
+                            std_cxx1x::shared_ptr<const Subscriptor> >
                             &fe_name_map)
       {
         // Extract the name of the
@@ -1475,8 +1439,7 @@ namespace FETools
                 // uses new FESystem constructor
                 // which is independent of
                 // the number of FEs in the system
-                system_element = new FESystem<dim>(base_fes,
-                                                   base_multiplicities);
+                system_element = new FESystem<dim,spacedim>(base_fes, base_multiplicities);
 
                 // now we don't need the
                 // list of base elements
@@ -1524,7 +1487,9 @@ namespace FETools
             // argument, which defaults to 1,
             // so this properly returns
             // FE_Nothing()
-            return fe_name_map.find(name_part)->second->get(1);
+	    const Subscriptor* ptr = fe_name_map.find(name_part)->second.get();
+	    const FEFactoryBase<dim,spacedim>* fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+            return fef->get(1);
           }
         else
           {
@@ -1545,7 +1510,9 @@ namespace FETools
                 const std::pair<int,unsigned int> tmp
                   = Utilities::get_integer_at_position (name, 0);
                 name.erase(0, tmp.second+1);
-                return fe_name_map.find(name_part)->second->get(tmp.first);
+		const Subscriptor* ptr = fe_name_map.find(name_part)->second.get();
+		const FEFactoryBase<dim,spacedim>* fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+		return fef->get(tmp.first);
               }
             else
               {
@@ -1558,7 +1525,9 @@ namespace FETools
                       = Utilities::get_integer_at_position (name, 0);
                     // delete "))"
                     name.erase(0, tmp.second+2);
-                    return fe_name_map.find(name_part)->second->get(QGaussLobatto<1>(tmp.first));
+		    const Subscriptor* ptr = fe_name_map.find(name_part)->second.get();
+		    const FEFactoryBase<dim,spacedim>* fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+		    return fef->get(QGaussLobatto<1>(tmp.first));
                   }
                 else
                   {
@@ -1582,31 +1551,10 @@ namespace FETools
 
 
 
-      // need to work around problem with different
-      // name map names for different dimensions
-      // TODO: should be possible to do nicer!
       template <int dim,int spacedim>
-      FiniteElement<dim,spacedim> *get_fe_from_name (std::string &name);
-
-      template <>
-      FiniteElement<1,1> *
-      get_fe_from_name<1> (std::string &name)
+      FiniteElement<dim,spacedim> *get_fe_from_name (std::string &name)
       {
-        return get_fe_from_name_ext<1,1> (name, fe_name_map_1d);
-      }
-
-      template <>
-      FiniteElement<2,2> *
-      get_fe_from_name<2> (std::string &name)
-      {
-        return get_fe_from_name_ext<2,2> (name, fe_name_map_2d);
-      }
-
-      template <>
-      FiniteElement<3,3> *
-      get_fe_from_name<3> (std::string &name)
-      {
-        return get_fe_from_name_ext<3,3> (name, fe_name_map_3d);
+	return get_fe_from_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
       }
     }
   }
@@ -1615,8 +1563,8 @@ namespace FETools
 
 
 
-  template <int dim>
-  FiniteElement<dim, dim> *
+  template <int dim, int spacedim>
+  FiniteElement<dim, spacedim> *
   get_fe_from_name (const std::string &parameter_name)
   {
     // Create a version of the name
@@ -1666,7 +1614,7 @@ namespace FETools
 
     try
       {
-        FiniteElement<dim,dim> *fe = internal::get_fe_from_name<dim,dim> (name);
+        FiniteElement<dim,spacedim> *fe = internal::get_fe_from_name<dim,spacedim> (name);
 
         // Make sure the auxiliary function
         // ate up all characters of the name.
