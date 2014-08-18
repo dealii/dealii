@@ -635,7 +635,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   const bool use_default_residual = additional_data.use_default_residual;
 
   // define two aliases
-  VECTOR &v = tmp_vectors(0, b);
+  VECTOR &v = tmp_vectors(0, x);
   VECTOR &p = tmp_vectors(n_tmp_vectors-1, b);
 
   // Following vectors are needed
@@ -673,8 +673,9 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
         }
       else
         {
-          A.vmult(v,x);
-          v.sadd(-1.,1.,b);
+          A.vmult(p,x);
+          p.sadd(-1.,1.,b);
+          v = p;
         };
 
       double rho = v.l2_norm();
