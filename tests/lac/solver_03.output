@@ -1,0 +1,15 @@
+
+DEAL:GMRES::Check 0	19.65
+DEAL:GMRES::Starting value 19.65
+DEAL:GMRES::Check 1	1.512
+DEAL:GMRES::Check 2	1.172
+DEAL:GMRES::Check 3	0
+DEAL:GMRES::Convergence step 3 value 0
+DEAL::2.000  -1.000 1.000  
+DEAL:GMRES::Check 0	19.65
+DEAL:GMRES::Starting value 19.65
+DEAL:GMRES::Check 1	1.512
+DEAL:GMRES::Check 2	1.172
+DEAL:GMRES::Check 3	0
+DEAL:GMRES::Convergence step 3 value 0
+DEAL::2.000  -1.000 1.000  
