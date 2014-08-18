@@ -250,6 +250,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: TriaAccessor::measure() is now also implemented for faces of
+  3d cells as long as the face is planar.
+  <br>
+  (Kevin Drzycimski, 2014/08/19)
+  </li>
+
   <li> Fixed: Support SLEPc 3.5 by disabling SDFOLD spectrum transformation type
   that has been removed from SLEPc. Therefore, TransformationSpectrumFolding 
   cannot be used with newer SLEPc versions. 
