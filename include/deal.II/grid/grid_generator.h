@@ -691,6 +691,39 @@ namespace GridGenerator
                          Triangulation<3,3>        &result);
 
   /**
+   * Given an input triangulation @p in_tria, this function makes a new
+   * flat triangulation @p out_tria which contains a single level with
+   * all active cells of the input triangulation. If spacedim1 and
+   * spacedim2 are different, only the smallest spacedim components of
+   * the vertices are copied over. This is useful to create a
+   * Triangulation<2,3> out of a Triangulation<2,2>, or to project a
+   * Triangulation<2,3> into a Triangulation<2,2>, by neglecting the z
+   * components of the vertices.
+   *
+   * No internal checks are performed on the vertices, which are
+   * assumed to make sense topologically in the target #spacedim2
+   * dimensional space. If this is not the case, you will encounter
+   * problems when using the triangulation later on.
+   *
+   * All informations about cell manifold_ids and material ids are
+   * copied from one triangulation to the other, and only the boundary
+   * manifold_ids and boundary_ids are copied over from the faces of
+   * @p in_tria to the faces of @p out_tria. If you need to specify
+   * manifold ids on interior faces, they have to be specified
+   * manually after the triangulation is created.
+   *
+   * This function will fail if the input Triangulation is of type
+   * parallel::distributed::Triangulation, as well as when the input
+   * Triangulation contains hanging nodes.
+   *
+   * @author Luca Heltai, 2014
+   */
+  template <int dim, int spacedim1, int spacedim2>
+  void flatten_triangulation(const Triangulation<dim,spacedim1> &in_tria,
+			     Triangulation<dim,spacedim2> &out_tria);
+
+
+  /**
    * This function transforms the @p Triangulation @p tria smoothly to a
    * domain that is described by the boundary points in the map @p
    * new_points. This map maps the point indices to the boundary points in the

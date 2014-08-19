@@ -2595,8 +2595,6 @@ next_cell:
 #endif
   }
 
-
-
 } /* namespace GridTools */
 
 

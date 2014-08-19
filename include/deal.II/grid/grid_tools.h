@@ -1001,6 +1001,7 @@ namespace GridTools
   std::vector<typename Container::active_cell_iterator>
   get_patch_around_cell(const typename Container::active_cell_iterator &cell);
 
+
   /*@}*/
   /**
    *  @name Lower-dimensional meshes for parts of higher-dimensional meshes 

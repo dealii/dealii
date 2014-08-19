@@ -97,6 +97,24 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There is now a GridGenerator::flatten_triangulation()
+  taking a Triangulation<dim, spacedim_1> as input and returning
+  a Triangulation<dim, spacedim_2> as output. The output
+  triangulation will contain a single level with all active
+  cells of the input triangulation, and will be topologically
+  equivalent to the input triangulation. If the two spacedimensions
+  are equal, then this function will copy the triangulation
+  removing all levels, e.g., flattening it. If the two spacedimensions
+  are different, then this function will copy the vertices only
+  up to the smallest spacedimension parameter. <br>
+  Using this function, you can create a Triangulation<2,3> from
+  a Triangulation<2,2> or project to the plane z=0 your
+  Triangulation<2,3>. No checks are performed on the validity of
+  the resulting Triangulation.
+  <br>
+  (Luca Heltai, 2014/08/19)
+  </li>
+
   <li> Fixed: Newer versions of GCC (e.g. 4.9.x) are no longer compatible
   with BOOST 1.46. Consequently, the CMake scripts now require at least
   BOOST 1.48 in order to use a BOOST version found on the system. If no
