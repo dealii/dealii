@@ -1558,12 +1558,32 @@ public:
   Point<spacedim> barycenter () const;
 
   /**
-   * Volume of the object.  Here, the
-   * volume is defined to be confined by
-   * the (dim-)linear mapping of the unit
-   * cell.  No information about the actual
-   * geometric boundary of the domain is
-   * used.
+   * Compute the dim-dimensional measure of the object. For a
+   * dim-dimensional cell in dim-dimensional space, this equals its
+   * volume. On the other hand, for a 2d cell in 3d space, or if the
+   * current object pointed to is a 2d face of a 3d cell in 3d space,
+   * then the function computes the area the object occupies. For a
+   * one-dimensional object, return its length.
+   *
+   * The function only computes the measure of cells, faces or edges
+   * assumed to be represented by (bi-/tri-)linear mappings. In other
+   * words, it only takes into account the locations of the vertices
+   * that bound the current object but not how the interior of the
+   * object may actually be mapped. In most simple cases, this is
+   * exactly what you want. However, for objects that are not
+   * "straight", e.g. 2d cells embedded in 3d space as part of a
+   * triangulation of a curved domain, two-dimensional faces of 3d
+   * cells that are not just parallelograms, or for faces that are at
+   * the boundary of a domain that is not just bounded by straight
+   * line segments or planes, this function only computes the
+   * dim-dimensional measure of a (bi-/tri-)linear interpolation of
+   * the "real" object as defined by the manifold or boundary object
+   * describing the real geometry of the object in question. If you
+   * want to consider the "real" geometry, you will need to compute
+   * the measure by integrating a function equal to one over the
+   * object, which after applying quadrature equals the summing the
+   * JxW values returned by the FEValues or FEFaceValues object you
+   * will want to use for the integral.
    */
   double measure () const;
 

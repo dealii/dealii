@@ -970,7 +970,46 @@ namespace
   }
 
 
+  // a 2d face in 3d space
+  double measure (const dealii::TriaAccessor<2,3,3> &accessor)
+  {
+    // If the face is planar, the diagonal from vertex 0 to vertex 3,
+    // v_03, should be in the plane P_012 of vertices 0, 1 and 2.  Get
+    // the normal vector of P_012 and test if v_03 is orthogonal to
+    // that. If so, the face is planar and computing its area is simple.
+    const Point<3> v01 = accessor.vertex(1) - accessor.vertex(0);
+    const Point<3> v02 = accessor.vertex(2) - accessor.vertex(0);
 
+    Point<3> normal;
+    cross_product(normal, v01, v02);
+
+    const Point<3> v03 = accessor.vertex(3) - accessor.vertex(0);
+
+    // check whether v03 does not lie in the plane of v01 and v02
+    // (i.e., whether the face is not planar). we do so by checking
+    // whether the triple product (v01 x v02) * v03 forms a positive
+    // volume relative to |v01|*|v02|*|v03|. the test checks the
+    // squares of these to avoid taking norms/square roots:
+    if (std::abs((v03 * normal) * (v03 * normal) /
+		 (v03.square() * v01.square() * v02.square()))
+	>=
+	1e-24)
+      {
+	Assert (false,
+		ExcMessage("Computing the measure of a nonplanar face is not implemented!"));
+	return std::numeric_limits<double>::quiet_NaN();
+      }
+
+    // the face is planar. then its area is 1/2 of the norm of the
+    // cross product of the two diagonals
+    const Point<3> v12 = accessor.vertex(2) - accessor.vertex(1);
+    Point<3> twice_area;
+    cross_product(twice_area, v03, v12);
+    return 0.5 * twice_area.norm();
+  }
+
+
+  
   template <int structdim, int dim, int spacedim>
   double
   measure (const TriaAccessor<structdim, dim, spacedim> &)
@@ -978,7 +1017,7 @@ namespace
     // catch-all for all cases not explicitly
     // listed above
     Assert (false, ExcNotImplemented());
-    return 1./0.;
+    return std::numeric_limits<double>::quiet_NaN();
   }
 }
 
