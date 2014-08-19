@@ -43,7 +43,7 @@ IF(NOT BUILD_SHARED_LIBS)
 ENDIF()
 
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-FIND_PACKAGE(Boost 1.44 COMPONENTS iostreams serialization system thread)
+FIND_PACKAGE(Boost 1.48 COMPONENTS iostreams serialization system thread)
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
@@ -51,7 +51,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 #
 IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
   SET(Boost_USE_STATIC_LIBS FALSE)
-  FIND_PACKAGE(Boost 1.44 COMPONENTS iostreams serialization system thread)
+  FIND_PACKAGE(Boost 1.48 COMPONENTS iostreams serialization system thread)
 ENDIF()
 
 IF(Boost_FOUND)
