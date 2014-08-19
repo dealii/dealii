@@ -1474,9 +1474,11 @@ namespace DataOutBase
    * parameters which determine the direction of sight, the mode of
    * colorization, the scaling of the height axis, etc. (Of course,
    * all these parameters have reasonable default values, which you
-   * may want to change from time to time.) At present, this format
-   * only supports output for two-dimensional data, with values in the
-   * third direction taken from a data vector.
+   * may want to change.)
+   *
+   * This function only supports output for two-dimensional
+   * domains (i.e., with dim==2), with values in the vertical
+   * direction taken from a data vector.
    *
    * Basically, output consists of the mesh and the cells in between
    * them. You can draw either of these, or both, or none if you are
@@ -1509,6 +1511,19 @@ namespace DataOutBase
    * documentation of the <tt>EpsFlags</tt> member class of this
    * class. See there for more and detailed information.
    */
+  template <int spacedim>
+  void write_eps (const std::vector<Patch<2,spacedim> > &patches,
+                  const std::vector<std::string>          &data_names,
+                  const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                  const EpsFlags                          &flags,
+                  std::ostream                            &out);
+
+  /**
+   * This is the same function as above except for domains that are
+   * not two-dimensional. This function is not implemented (and will
+   * throw an error if called) but is declared to allow for
+   * dimension-independent programs.
+   */
   template <int dim, int spacedim>
   void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
                   const std::vector<std::string>          &data_names,
@@ -1516,6 +1531,7 @@ namespace DataOutBase
                   const EpsFlags                          &flags,
                   std::ostream                            &out);
 
+  
   /**
    * Write the given list of patches to the output stream in
    * GMV format.
