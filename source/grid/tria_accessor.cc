@@ -983,9 +983,17 @@ namespace
     Point<3> normal;
     cross_product(normal, v01, v02);
 
-    const Point<3> v03 = accessor.vertex(3) - accessor.vertex(0); //1st diagonal
+    const Point<3> v03 = accessor.vertex(3) - accessor.vertex(0);
 
-    if (std::abs((v03 * normal) / (v03.norm() * v01.norm() * v02.norm())) >= 1e-12)
+    // check whether v03 does not lie in the plane of v01 and v02
+    // (i.e., whether the face is not planar). we do so by checking
+    // whether the triple product (v01 x v02) * v03 forms a positive
+    // volume relative to |v01|*|v02|*|v03|. the test checks the
+    // squares of these to avoid taking norms/square roots:
+    if (std::abs((v03 * normal) * (v03 * normal) /
+		 (v03.square() * v01.square() * v02.square()))
+	>=
+	1e-24)
       {
 	Assert (false,
 		ExcMessage("Computing the measure of a nonplanar face is not implemented!"));
