@@ -97,6 +97,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: Newer versions of GCC (e.g. 4.9.x) are no longer compatible
+  with BOOST 1.46. Consequently, the CMake scripts now require at least
+  BOOST 1.48 in order to use a BOOST version found on the system. If no
+  installed BOOST library is found, or if the version is older than 1.48,
+  CMake will simply take the one that comes bundled with deal.II
+  <br>
+  (Wolfgang Bangerth, 2014/08/19)
+  </li>
+
   <li> New: There is now a documentation module that describes
   deal.II's support for and interaction with the
   @ref CPP11 "C++11 standard".
