@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,6 +31,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
   template <int dim, class DOFINFO> class DoFInfoBox;
+
+
   /**
    * A class containing information on geometry and degrees of freedom
    * of a mesh object.
@@ -84,8 +86,8 @@ namespace MeshWorker
      * if the info object was
      * initialized with a cell.
      */
-
     unsigned int face_number;
+    
     /**
      * The number of the current
      * subface on the current
@@ -177,6 +179,7 @@ namespace MeshWorker
      * active data.
      */
     bool level_cell;
+    
   private:
     /**
      * Standard constructor, not setting any block indices. Use of
@@ -187,6 +190,7 @@ namespace MeshWorker
 
     /// Set up local block indices
     void set_block_indices ();
+    
     /// Fill index vector with active indices
     template <class DHCellIterator>
     void get_indices(const DHCellIterator &c);
@@ -278,6 +282,7 @@ namespace MeshWorker
      * face is available.
      */
     bool interior_face_available[GeometryInfo<dim>::faces_per_cell];
+
     /**
      * A set of flags, indicating
      * whether data on an exterior
@@ -296,6 +301,8 @@ namespace MeshWorker
 
   template <int dim, int spacedim, typename number>
   DoFInfo<dim,spacedim,number>::DoFInfo(const DoFHandler<dim,spacedim> &dof_handler)
+  :
+  level_cell (false)
   {
     std::vector<types::global_dof_index> aux(1);
     aux[0] = dof_handler.get_fe().dofs_per_cell;
