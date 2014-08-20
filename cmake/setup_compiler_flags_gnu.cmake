@@ -85,6 +85,13 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
+#
+# OpenMP 4.0 can be used for vectorization. Only the vectorization instructions
+# are allowed, the threading must done through TBB. Disable unknown-pragmas
+# warning, if OpenMP 4.0 is not supported.
+#
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fopenmp-simd")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unkown-pragmas")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #

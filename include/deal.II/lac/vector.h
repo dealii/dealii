@@ -586,7 +586,7 @@ public:
   Vector<Number> &operator -= (const Vector<Number> &V);
 
   /**
-   * A collective add operation: This funnction adds a whole set of values
+   * A collective add operation: This function adds a whole set of values
    * stored in @p values to the vector components specified by @p indices.
    */
   template <typename OtherNumber>
@@ -627,11 +627,13 @@ public:
   void add (const Vector<Number> &V);
 
   /**
-   * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
+   * Simple vectorized  (SIMD) vector addition, equal to the <tt>operator +=</tt>. 
+   * This function should not be used to add the vector to itself, i.e to
+   * multiply the current vector by two.
    *
    * @dealiiOperationIsMultithreaded
    */
-  void add (const Number a, const Vector<Number> &V);
+  void vectorized_add (const Vector<Number> &V);
 
   /**
    * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
@@ -640,6 +642,13 @@ public:
    */
   void add (const Number a, const Vector<Number> &V,
             const Number b, const Vector<Number> &W);
+
+  /**
+   * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
+   */
+  void add (const Number a, const Vector<Number> &V);
 
   /**
    * Scaling and simple vector addition, i.e.  <tt>*this = s*(*this)+V</tt>.

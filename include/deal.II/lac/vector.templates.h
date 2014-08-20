@@ -47,6 +47,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
+  typedef types::global_dof_index size_type;
+
   template <typename T>
   bool is_non_negative (const T &t)
   {
@@ -115,6 +117,22 @@ namespace internal
     Assert (false, ExcMessage ("Can't convert a vector of complex numbers "
                                "into a vector of reals/doubles"));
   }
+
+#ifdef DEAL_II_WITH_THREADS
+  template <typename Number>
+  struct Vectorization_add_1
+  {
+    Number* val;
+    Number* v_val;
+    void operator() (const tbb::blocked_range<size_type> &range) const
+    {
+#pragma omp simd
+      for (size_type i=range.begin(); i!=range.end(); ++i)
+        val[i] += v_val[i];
+    }
+  };
+#endif
+   
 }
 
 
@@ -989,6 +1007,36 @@ void Vector<Number>::add (const Number a, const Vector<Number> &v,
   else if (vec_size > 0)
     for (size_type i=0; i<vec_size; ++i)
       val[i] += a * v.val[i] + b * w.val[i];
+}
+
+
+template <typename Number>
+void Vector<Number>::vectorized_add (const Vector<Number> &v)
+{
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+
+#ifndef DEAL_II_WITH_THREADS
+#pragma omp simd
+  for (size_type i=0; i<vec_size; ++i)
+    val[i] += v.val[i];
+#else
+  if (vec_size>internal::Vector::minimum_parallel_grain_size)
+  {
+    internal::Vectorization_add_1<Number> vector_add;
+    vector_add.val = val;
+    vector_add.v_val = v.val;
+    tbb::parallel_for (tbb::blocked_range<size_type> (0, 
+                                                      vec_size, 
+                                                      internal::Vector::minimum_parallel_grain_size),
+                       vector_add,
+                       tbb::auto_partitioner());
+  }
+  else if (vec_size > 0)
+#pragma omp simd
+    for (size_type i=0; i<vec_size; ++i)
+      val[i] += v.val[i];
+#endif
 }
 
 

@@ -119,6 +119,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
 
 
+#
 # Also disable the following warnings that we frequently
 # trigger writing dimension independent code:
 #   -w111 statement is unreachable
@@ -130,10 +131,20 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
 #         that is executed only for one specific dimension
 #   -w280 selector expression is constant
 #         When writing 'switch(dim)'
+#
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd111")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd128")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd185")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd280")
+
+
+#
+# OpenMP 4.0 can be used for vectorization. Only the vectorization instructions
+# are allowed, the threading must done through TBB. Disable unknown-pragmas
+# warning, if OpenMP 4.0 is not supported.
+#
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-openmp-simd")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unkown-pragmas")
 
 
 
