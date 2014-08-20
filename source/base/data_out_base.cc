@@ -78,6 +78,7 @@ namespace
 
 namespace
 {
+#ifdef DEAL_II_WITH_ZLIB
   // the functions in this namespace are
   // taken from the libb64 project, see
   // http://sourceforge.net/projects/libb64
@@ -219,7 +220,7 @@ namespace
 
     return encoded_data;
   }
-
+#endif
 
 
 #ifdef DEAL_II_WITH_ZLIB
