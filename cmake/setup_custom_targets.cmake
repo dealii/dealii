@@ -95,24 +95,10 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    all            - compile the library and all enabled components
 #    clean          - remove all generated files
 #    install        - install into CMAKE_INSTALL_PREFIX
-")
-
-IF(CMAKE_GENERATOR MATCHES "Ninja")
-  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    info           - print this help message
+#    info           - print this help message
 #    help           - print a list of valid top level targets
 #
-")
-ELSE()
-  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    info           - print this help message in the toplevel directory,
-#                     otherwise print a list of targets (in subdirectories)
-#
-")
-ENDIF()
-
-FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    edit_cache     - run ccmake for changing (cached) configuration variables
+#    edit_cache     - run ccmake for changing (cached) configuration variables
 #                     and reruns the configure and generate phases of CMake
 #    rebuild_cache  - rerun the configure and generate phases of CMake
 #
@@ -136,13 +122,3 @@ FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 ADD_CUSTOM_TARGET(info
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   )
-
-#
-# In case of the Unix Makefiles generator it is safe to override the
-# default 'help' target, which is - frankly - quite unhelpful.
-#
-IF(CMAKE_GENERATOR MATCHES "Unix Makefiles")
-  ADD_CUSTOM_TARGET(help
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-    )
-ENDIF()

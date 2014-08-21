@@ -31,10 +31,17 @@
 #
 # General configuration for cmake:
 #
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-IF(NOT ${CMAKE_VERSION} VERSION_LESS 3.0.0)
-  CMAKE_POLICY(SET CMP0026 OLD) # enable target LOCATION property
-  CMAKE_POLICY(SET CMP0037 OLD) # allow to override the generic 'help' target
+
+IF(POLICY CMP0026)
+  # enable target LOCATION property
+  CMAKE_POLICY(SET CMP0026 OLD)
+ENDIF()
+
+IF(POLICY CMP0037)
+  # allow to override "test" target for quick tests
+  CMAKE_POLICY(SET CMP0037 OLD)
 ENDIF()
 
 MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
@@ -125,7 +132,6 @@ ENDFOREACH()
 INCLUDE(setup_custom_targets)
 INCLUDE(setup_finalize)
 INCLUDE(setup_write_config)
-#INCLUDE(setup_sanity_checks)
 
 
 ########################################################################
